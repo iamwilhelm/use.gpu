@@ -1,0 +1,8 @@
+{
+  "name": "use.gl",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true
+}

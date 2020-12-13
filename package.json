@@ -6,9 +6,10 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@webgpu/glslang": "^0.0.15",
+    "@webgpu/types": "^0.0.32"
   },
   "devDependencies": {
-    "babel-loader": "^8.2.2",
     "@babel/cli": "^7.8.3",
     "@babel/core": "^7.8.3",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
@@ -16,18 +17,19 @@
     "@babel/preset-env": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
     "@babel/register": "^7.12.10",
+    "babel-loader": "^8.2.2",
     "typescript": "^3.7.5",
     "webpack": "^5.10.1",
     "webpack-cli": "^4.2.0",
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
-    "start": "webpack serve",
+    "start": "NODE_ENV=development webpack serve",
     "types": "tsc --noEmit",
     "types:watch": "yarn run type-check -- --watch",
-    "build": "yarn run build:types && yarn run build:js && yarn run build:bundle",
+    "build": "yarn run build:types && yarn run build:bundle",
     "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
-    "build:bundle": "webpack"
+    "build:bundle": "webpack",
+    "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline"
   }
 }

@@ -1,5 +1,5 @@
 import '@babel/polyfill';
+import {main} from './app/main';
 
-import {mount} from './app/mount';
+window.onload = main;
 
-window.onload = mount;

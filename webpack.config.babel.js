@@ -1,10 +1,13 @@
 import path from 'path';
 
+const {NODE_ENV} = process.env;
+const isDevelopment = NODE_ENV === 'development';
+
 export default {
     entry: './src/index',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        publicPath: '/build/',
+        publicPath: '/dist/',
         filename: 'use.bundle.js'
     },
     resolve: {
@@ -13,12 +16,13 @@ export default {
     module: {
         rules: [{
             test: /\.(ts|js)x?$/,
-            exclude: /node_modules/,
+            exclude: [/node_modules/],
             loader: 'babel-loader',
         }],
     },
+    devtool: isDevelopment ? 'eval' : false,
     devServer: {
-      publicPath: '/build/',
+      publicPath: '/dist/',
       contentBase: path.join(__dirname, 'public'),
       compress: true,
       port: 8777,

@@ -37,10 +37,6 @@ export const main = async () => {
   const compileGLSL = await GLSL();
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 
-  const swapChain = makeSwapChain(device, canvas, SWAP_CHAIN_FORMAT);
-  const colorStates = [makeColorState(SWAP_CHAIN_FORMAT)];
-  const colorAttachments = [makeColorAttachment(BACKGROUND_COLOR)];
-
   const {width, height} = canvas;
   const depthTexture = makeDepthTexture(device, width, height, DEPTH_STENCIL_FORMAT);
   const depthStencilState = makeDepthStencilState(DEPTH_STENCIL_FORMAT);
@@ -52,6 +48,8 @@ export const main = async () => {
   const primitiveTopology = "triangle-list";
   const rasterizationState = {cullMode: "back"};
 
+  const colorStates = [makeColorState(SWAP_CHAIN_FORMAT)];
+  const colorAttachments = [makeColorAttachment(BACKGROUND_COLOR)];
 
   const pipelineDesc: GPURenderPipelineDescriptor = {
     vertexStage:   makeShaderStage(device, makeShader(compileGLSL(vertexShader, 'vertex'))),
@@ -75,6 +73,24 @@ export const main = async () => {
     entries,
   });
 
+  const swapChain = makeSwapChain(device, canvas, SWAP_CHAIN_FORMAT);
+
+  const renderFrame = (device: GPUDevice) => {
+    colorAttachments[0].attachment = swapChain
+      .getCurrentTexture()
+      .createView();
+
+    const commandEncoder = device.createCommandEncoder();
+    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+    passEncoder.setPipeline(pipeline);
+    passEncoder.setBindGroup(0, uniformBindGroup);
+    passEncoder.setVertexBuffer(0, vertexBuffers[0]);
+    passEncoder.draw(cube.count, 1, 0, 0);
+    passEncoder.endPass();
+
+    device.defaultQueue.submit([commandEncoder.finish()]);
+  }
+
   const updateFrameState = (device: GPUDevice) => {
     const {fov, near, far} = DEFAULT_CAMERA;
     const phi = 0.6;
@@ -94,21 +110,6 @@ export const main = async () => {
     depthStencilAttachment,
   };
 
-  const renderFrame = (device: GPUDevice) => {
-    colorAttachments[0].attachment = swapChain
-      .getCurrentTexture()
-      .createView();
-
-    const commandEncoder = device.createCommandEncoder();
-    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-    passEncoder.setPipeline(pipeline);
-    passEncoder.setBindGroup(0, uniformBindGroup);
-    passEncoder.setVertexBuffer(0, vertexBuffers[0]);
-    passEncoder.draw(cube.count, 1, 0, 0);
-    passEncoder.endPass();
-
-    device.defaultQueue.submit([commandEncoder.finish()]);
-  }
   
   const loop = () => {
     updateFrameState(device);

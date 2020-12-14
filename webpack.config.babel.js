@@ -26,7 +26,7 @@ export default {
       },
     ],
   },
-  devtool: isDevelopment ? 'eval' : false,
+  devtool: isDevelopment ? 'eval-source-map' : false,
   devServer: {
     publicPath: '/dist/',
     contentBase: path.join(__dirname, 'public'),

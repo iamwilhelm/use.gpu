@@ -5,7 +5,7 @@ export const makeCube = (): VertexData => {
   const vertices   = [cubeVertexArray]
   const attributes = [cubeAttributes];
 
-  return {vertices, attributes};
+  return {vertices, attributes, count: 36};
 }
 
 export const cubeAttributes = makeVertexAttributeLayout([

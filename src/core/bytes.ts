@@ -6,8 +6,8 @@ const setInt8   = (view: DataView, offset: number, value: number) => view.setUin
 const setInt16  = (view: DataView, offset: number, value: number) => view.setUint16(offset, value, true);
 const setInt32  = (view: DataView, offset: number, value: number) => view.setUint32(offset, value, true);
 
-const setFloat32 = (view: DataView, offset: number, value: number) => view.setFloat32(offset, value);
-const setFloat64 = (view: DataView, offset: number, value: number) => view.setFloat64(offset, value);
+const setFloat32 = (view: DataView, offset: number, value: number) => view.setFloat32(offset, value, true);
+const setFloat64 = (view: DataView, offset: number, value: number) => view.setFloat64(offset, value, true);
 
 const setUint8N = (n: number) => (view: DataView, offset: number, data: Uint8Array) => {
   for (let i = 0; i < n; ++i) setUint8(view, offset + i, data[i]);

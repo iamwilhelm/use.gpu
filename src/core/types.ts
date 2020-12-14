@@ -75,6 +75,7 @@ export enum UniformType {
 
 // Vertex attributes
 export type VertexData = {
+  count: number,
   vertices: TypedArray[],
   attributes: GPUVertexBufferLayoutDescriptor[],
   index?: TypedArray,

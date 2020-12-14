@@ -6,9 +6,8 @@ export const getTypedArrayConstructor = <T>(t: TypedArray): TypedArrayConstructo
   throw new Error("Unknown typed array");
 }
 
-export const makeVertexBuffers = (device: GPUDevice, datas: TypedArray[]) => {
+export const makeVertexBuffers = (device: GPUDevice, datas: TypedArray[]) =>
   datas.map((data: TypedArray) => makeVertexBuffer(device, data));
-}
 
 export const makeVertexBuffer = (device: GPUDevice, data: TypedArray) => {
   const vertices = device.createBuffer({

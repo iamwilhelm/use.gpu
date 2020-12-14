@@ -41,7 +41,7 @@ export const makeLayoutData = (layout: UniformLayout, count: number) => {
   return data;
 }
 
-export const fillLayoutData = (layout: UniformLayout, data: ArrayBuffer) => {
+export const makeLayoutFiller = (layout: UniformLayout, data: ArrayBuffer) => {
   const {length, attributes} = layout;
 
   const dataView = new DataView(data);

@@ -1,7 +1,9 @@
 #version 450
 
-layout(location = 0) in vec4 vColor;
-layout(location = 1) in vec2 vUV;
+layout(location = 0) in vec4 fragColor;
+layout(location = 1) in vec2 fragUV;
+
+layout(location = 0) out vec4 outColor;
 
 float getGrid(vec2 uv) {
   vec2 xy = abs(fract(uv - 0.5) - 0.5);
@@ -9,5 +11,5 @@ float getGrid(vec2 uv) {
 }
 
 void main() {
-  gl_FragColor = vec4(vColor.xyz * getGrid(vUV), vColor.w);
+  outColor = vec4(fragColor.xyz * getGrid(fragUV), fragColor.w);
 }

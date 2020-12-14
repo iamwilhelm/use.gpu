@@ -7,7 +7,9 @@ const LANGUAGES = (glslang: Glslang): ShaderLanguages => ({
   }
 });
 
-export const createShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescriptor) => {
+export const makeShader = (code: string, entryPoint: string = 'main') => ({code, entryPoint});
+
+export const makeShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescriptor) => {
   const {code, entryPoint} = descriptor;
 
   const gpuDescriptor = {code} as GPUShaderModuleDescriptor;
@@ -18,9 +20,11 @@ export const createShaderStage = (device: GPUDevice, descriptor: ShaderModuleDes
 
 /*
 export const makeRenderPipeline = (
+  device: GPUDevice,
   vertex: ShaderModuleDescriptor,
   fragment: ShaderModuleDescriptor,
-  primitiveTopology: string,
+  primitiveTopology: GPUPrimitiveTopology,
+  depthStencilState: GPUDepthStencilStateDescriptor,
 ) => {
 
   const pipeline = device.createRenderPipeline({

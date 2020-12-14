@@ -1,13 +1,18 @@
-export const cubeVertexSize = 4 * 10; // Byte size of one cube vertex.
-export const cubePositionOffset = 0;
-export const cubeColorOffset = 4 * 4; // Byte offset of cube vertex color attribute.
-export const cubeUVOffset = 4 * 8;
+import {VertexData} from '../core/types';
+import {makeVertexAttributeLayout} from '../core/attribute';
 
-export const cubeAttributes = [
-  { name: 'position', type: 'float4' },
-  { name: 'color', type: 'float4' },
-  { name: 'uv', type: 'float2' },
-];
+export const makeCube = (): VertexData => {
+  const vertices   = [cubeVertexArray]
+  const attributes = [cubeAttributes];
+
+  return {vertices, attributes};
+}
+
+export const cubeAttributes = makeVertexAttributeLayout([
+  { name: 'position', format: 'float4' },
+  { name: 'color', format: 'float4' },
+  { name: 'uv', format: 'float2' },
+]);
 
 export const cubeVertexArray = new Float32Array([
     // float4 position, float4 color, float2 uv,

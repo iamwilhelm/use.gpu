@@ -1,4 +1,3 @@
-
 export const makeDepthTexture = (device: GPUDevice, width: number, height: number, format: GPUTextureFormat) => {
   const depthTexture = device.createTexture({
     size: { width, height, depth: 1 },
@@ -8,3 +7,11 @@ export const makeDepthTexture = (device: GPUDevice, width: number, height: numbe
 
   return depthTexture;
 }
+
+export const makeColorState = (format: GPUTextureFormat): GPUColorStateDescriptor => ({
+  format,
+});
+
+export const makeColorAttachment = (loadValue: GPUColor) => ({
+  attachment: null, loadValue
+} as unknown as GPURenderPassColorAttachmentDescriptor);

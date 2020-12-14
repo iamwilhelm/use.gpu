@@ -79,8 +79,8 @@ export const main = async () => {
     entries,
   });
 
-  let phi = 0.0;
-  let theta = 0.0;
+  let phi = 0.2;
+  let theta = 0.1;
 
   const makeProjectionMatrix = () => {
     const aspect = width / height;
@@ -109,8 +109,6 @@ export const main = async () => {
     };
     
     fillUniformData(uniforms);
-    console.log(new Float32Array(uniformData));
-    debugger;
     device.defaultQueue.writeBuffer(buffer, 0, uniformData, 0, layout.length);
   };
 

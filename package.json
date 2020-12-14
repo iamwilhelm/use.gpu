@@ -8,6 +8,7 @@
   "dependencies": {
     "@webgpu/glslang": "^0.0.15",
     "@webgpu/types": "^0.0.32",
+    "gl-matrix": "^3.3.0",
     "raw-loader": "^4.0.2"
   },
   "devDependencies": {

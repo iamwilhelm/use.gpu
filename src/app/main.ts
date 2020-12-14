@@ -1,40 +1,40 @@
 import { mat4, vec3 } from 'gl-matrix';
 
-import {UniformAttribute, UniformType} from '../core/types';
+import { UniformAttribute, UniformType } from '../core/types';
 
-import {mountGPU, makeSwapChain} from '../canvas/mount';
-import {makeDepthTexture, makeDepthStencilState, makeDepthStencilAttachment} from '../core/depth';
-import {makeColorState, makeColorAttachment} from '../core/color';
-import {makeVertexBuffers, makeUniformBuffer} from '../core/buffer';
-import {makeUniformBindings, makeUniformLayout, makeLayoutData, makeLayoutFiller} from '../core/uniform';
-import {makeShader, makeShaderStage} from '../core/pipeline';
+import { mountGPU, makeSwapChain } from '../canvas/mount';
+import { makeDepthTexture, makeDepthStencilState, makeDepthStencilAttachment } from '../core/depth';
+import { makeColorState, makeColorAttachment } from '../core/color';
+import { makeVertexBuffers, makeUniformBuffer, uploadBuffer } from '../core/buffer';
+import { makeUniforms, makeUniformBindings } from '../core/uniform';
+import { makeShader, makeShaderStage } from '../core/pipeline';
+import { PROJECTION_UNIFORMS, VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '../camera/camera';
 
+import GLSL from './glsl';
 import {makeCube} from './cube';
 
 import vertexShader from './glsl/vertex.glsl';
 import fragmentShader from './glsl/fragment.glsl';
 
-import Glslang from '../glslang-web-devel/glslang';
-
 const SWAP_CHAIN_FORMAT = "bgra8unorm" as GPUTextureFormat;
 const DEPTH_STENCIL_FORMAT = "depth24plus-stencil8" as GPUTextureFormat;
 const BACKGROUND_COLOR = [0.1, 0.2, 0.3, 1.0] as GPUColor;
 
+const DEFAULT_CAMERA = {
+  fov: Math.PI / 3,
+  near: 0.01,
+  far: 100,
+};
+
 const ROOT_SELECTOR = '#use-gpu';
 
-const VIEW_UNIFORMS: UniformAttribute[] = [
-  {
-    name: 'projectionMatrix',
-    format: UniformType.mat4,
-  },
-  {
-    name: 'viewMatrix',
-    format: UniformType.mat4,
-  },
+const UNIFORMS: UniformAttribute[] = [
+  ...PROJECTION_UNIFORMS,
+  ...VIEW_UNIFORMS,
 ];
 
 export const main = async () => {
-  const glslang = await Glslang();
+  const compileGLSL = await GLSL();
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 
   const swapChain = makeSwapChain(device, canvas, SWAP_CHAIN_FORMAT);
@@ -52,11 +52,10 @@ export const main = async () => {
   const primitiveTopology = "triangle-list";
   const rasterizationState = {cullMode: "back"};
 
-  const transpileGLSL = (code: string, stage: string) => glslang.compileGLSL(code, stage);
 
   const pipelineDesc: GPURenderPipelineDescriptor = {
-    vertexStage:   makeShaderStage(device, makeShader(transpileGLSL(vertexShader, 'vertex'))),
-    fragmentStage: makeShaderStage(device, makeShader(transpileGLSL(fragmentShader, 'fragment'))),
+    vertexStage:   makeShaderStage(device, makeShader(compileGLSL(vertexShader, 'vertex'))),
+    fragmentStage: makeShaderStage(device, makeShader(compileGLSL(fragmentShader, 'fragment'))),
     primitiveTopology,
     depthStencilState,
     vertexState: {
@@ -65,51 +64,29 @@ export const main = async () => {
     },
     colorStates,
   };
-
   const pipeline = device.createRenderPipeline(pipelineDesc);
 
-  const layout = makeUniformLayout(VIEW_UNIFORMS);
-  const uniformData = makeLayoutData(layout, 1);
-  const fillUniformData = makeLayoutFiller(layout, uniformData);
-  const buffer = makeUniformBuffer(device, uniformData);
-
+  const {layout, data, fill} = makeUniforms(UNIFORMS);
+  const buffer = makeUniformBuffer(device, data);
   const entries = makeUniformBindings([{resource: {buffer}}]);
+  
   const uniformBindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(0),
     entries,
   });
 
-  let phi = 0.2;
-  let theta = 0.1;
-
-  const makeProjectionMatrix = () => {
-    const aspect = width / height;
-    const matrix = mat4.create();
-    mat4.perspective(matrix, Math.PI / 2, aspect, 0.01, 100.0);
-
-    const z = mat4.create();
-    mat4.translate(z, z, vec3.fromValues(0, 0, 0.5));
-    mat4.scale(z, z, vec3.fromValues(1, 1, 0.5));
-    mat4.multiply(matrix, z, matrix);
-
-    return matrix;
-  }
-
-  const makeViewMatrix = () => {
-    const matrix = mat4.create();
-    mat4.translate(matrix, matrix, vec3.fromValues(0, 0, -5));
-    mat4.rotate(matrix, matrix, 1, vec3.fromValues(theta, phi, 0));
-    return matrix;
-  }
-
   const updateFrameState = (device: GPUDevice) => {
+    const {fov, near, far} = DEFAULT_CAMERA;
+    const phi = 0.6;
+    const theta = 0.4;
+    
     const uniforms = {
-      projectionMatrix: makeProjectionMatrix(),
-      viewMatrix: makeViewMatrix(),
+      projectionMatrix: makeProjectionMatrix(width, height, fov, near, far),
+      viewMatrix: makeOrbitMatrix(5, phi, theta),
     };
     
-    fillUniformData(uniforms);
-    device.defaultQueue.writeBuffer(buffer, 0, uniformData, 0, layout.length);
+    fill(uniforms);
+    uploadBuffer(device, buffer, data);
   };
 
   const renderPassDescriptor: GPURenderPassDescriptor = {
@@ -118,7 +95,7 @@ export const main = async () => {
   };
 
   const renderFrame = (device: GPUDevice) => {
-    renderPassDescriptor.colorAttachments[0].attachment = swapChain
+    colorAttachments[0].attachment = swapChain
       .getCurrentTexture()
       .createView();
 

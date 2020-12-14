@@ -29,3 +29,11 @@ export const makeUniformBuffer = (device: GPUDevice, data: ArrayBuffer) =>
     size: data.byteLength,
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   });
+
+export const uploadBuffer = (
+  device: GPUDevice,
+  buffer: GPUBuffer,
+  data: ArrayBuffer,
+) => {
+  device.defaultQueue.writeBuffer(buffer, 0, data, 0, data.byteLength);
+}

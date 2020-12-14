@@ -5,6 +5,17 @@ import {UNIFORM_BYTE_SETTERS} from './bytes';
 export const getUniformAttributeSize = (format: UniformType) => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformByteSetter = (format: UniformType) => UNIFORM_BYTE_SETTERS[format];
 
+export const makeUniforms = (
+  uniforms: UniformAttribute[],
+  count: number = 1,
+) => {
+  const layout = makeUniformLayout(uniforms);
+  const data = makeLayoutData(layout, count);
+  const fill = makeLayoutFiller(layout, data);
+
+  return {layout, data, fill};
+}
+
 export const makeUniformBindings = (
   bindings: UniformBinding[],
   binding: number = 0
@@ -35,7 +46,10 @@ export const makeUniformLayout = (
   return {length: offset - base, attributes: out};
 };
 
-export const makeLayoutData = (layout: UniformLayout, count: number) => {
+export const makeLayoutData = (
+  layout: UniformLayout,
+  count: number = 1,
+) => {
   const {length} = layout;
   const data = new ArrayBuffer(length * count);
   return data;

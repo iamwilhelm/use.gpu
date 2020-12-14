@@ -7,7 +7,7 @@ const LANGUAGES = (glslang: Glslang): ShaderLanguages => ({
   }
 });
 
-export const makeShader = (code: string, entryPoint: string = 'main') => ({code, entryPoint});
+export const makeShader = (code: any, entryPoint: string = 'main') => ({code, entryPoint});
 
 export const makeShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescriptor) => {
   const {code, entryPoint} = descriptor;

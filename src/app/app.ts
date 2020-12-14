@@ -1,2 +1,2 @@
-import {cubeVertexArray, cubeAttributes} from './cube';
+import {live} from '../live/live';
 

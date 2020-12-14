@@ -38,18 +38,24 @@ export const main = async () => {
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 
   const {width, height} = canvas;
-  const depthTexture = makeDepthTexture(device, width, height, DEPTH_STENCIL_FORMAT);
+
+  const colorStates = [makeColorState(SWAP_CHAIN_FORMAT)];
+  const colorAttachments = [makeColorAttachment(BACKGROUND_COLOR)];
   const depthStencilState = makeDepthStencilState(DEPTH_STENCIL_FORMAT);
-  const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
 
   const cube = makeCube();
-  const vertexBuffers = makeVertexBuffers(device, cube.vertices);
 
   const primitiveTopology = "triangle-list";
   const rasterizationState = {cullMode: "back"};
 
-  const colorStates = [makeColorState(SWAP_CHAIN_FORMAT)];
-  const colorAttachments = [makeColorAttachment(BACKGROUND_COLOR)];
+  const {layout, data, fill} = makeUniforms(UNIFORMS);
+
+  ////
+
+  const depthTexture = makeDepthTexture(device, width, height, DEPTH_STENCIL_FORMAT);
+  const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
+
+  const vertexBuffers = makeVertexBuffers(device, cube.vertices);
 
   const pipelineDesc: GPURenderPipelineDescriptor = {
     vertexStage:   makeShaderStage(device, makeShader(compileGLSL(vertexShader, 'vertex'))),
@@ -62,12 +68,11 @@ export const main = async () => {
     },
     colorStates,
   };
+
   const pipeline = device.createRenderPipeline(pipelineDesc);
 
-  const {layout, data, fill} = makeUniforms(UNIFORMS);
   const buffer = makeUniformBuffer(device, data);
   const entries = makeUniformBindings([{resource: {buffer}}]);
-  
   const uniformBindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(0),
     entries,

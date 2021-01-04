@@ -1,6 +1,7 @@
-import {Initial, Live, LiveContext, StateContext, CallContext} from './types';
+import {Initial, Live, Key, LiveContext, StateContext, CallContext, DeferredCall} from './types';
 
-export const live = <F extends Function>(f: Live<F>, context?: LiveContext<F>) => {
+// Prepare to call a live function with optional given context
+export const bind = <F extends Function>(f: Live<F>, context?: LiveContext<F>) => {
   const c = context ?? makeContext(f);
   const bound = f(c);
   return (...args: any[]) => {
@@ -11,6 +12,28 @@ export const live = <F extends Function>(f: Live<F>, context?: LiveContext<F>) =
   }
 };
 
+// Defer a call to a live function
+export const defer = <F extends Function>(
+  f: Live<F>,
+  key?: Key,
+) => (
+  ...args: any[]
+): DeferredCall<F> => ({f, args, key});
+
+// Memoize a live function on all its arguments (shallow comparison)
+export const memo = <F extends Function>(
+  f: Live<F>
+) => (
+  context: LiveContext<F>
+) => {
+  const bound = f(context);
+  return (...args: any[]) => {
+    const value = useMemo(context)(() => bound(args), args);
+    return value;
+  };
+};
+
+// Allocate state value and a setter for it, initializing with the given value or function
 export const useState = <F extends Function>(context: LiveContext<F>) => <T>(
   initialState: Initial<T>,
 ): [
@@ -35,8 +58,9 @@ export const useState = <F extends Function>(context: LiveContext<F>) => <T>(
   return [value as unknown as T, setValue];
 }
 
+// Memoize a value with given dependencies
 export const useMemo = <F extends Function>(context: LiveContext<F>) => <T>(
-  initialState: Initial<T>,
+  initialState: () => T,
   dependencies: any[],
 ): T => {
   const {state} = context;
@@ -47,7 +71,7 @@ export const useMemo = <F extends Function>(context: LiveContext<F>) => <T>(
   let deps  = values[i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
-    value = (initialState instanceof Function) ? initialState() : initialState;
+    value = initialState();
 
     values[i] = value;
     values[i + 1] = dependencies;
@@ -56,7 +80,8 @@ export const useMemo = <F extends Function>(context: LiveContext<F>) => <T>(
   return value as unknown as T;
 }
 
-export const useCallback = <F extends Function>(context: LiveContext<F>) => <T>(
+// Memoize a function with given dependencies
+export const useCallback = <F extends Function>(context: LiveContext<F>) => <T extends Function>(
   initialValue: T,
   dependencies: any[],
 ): T => {
@@ -77,18 +102,24 @@ export const useCallback = <F extends Function>(context: LiveContext<F>) => <T>(
   return value as unknown as T;
 }
 
-export const makeContext = <F extends Function>(f: Live<F>, args?: any[]): LiveContext<F> => {
+// Make a context for a live function
+export const makeContext = <F extends Function>(
+  f: Live<F>,
+  args?: any[]
+): LiveContext<F> => {
   return {
     call:  makeCallContext(f, args),
     state: makeStateContext(),
   };
 };
 
+// Holds state for a context
 export const makeStateContext = (): StateContext => ({
   index: 0,
   values: [],
 });
 
+// Hold call info for a context
 export const makeCallContext = <F extends Function>(
   f: Live<F>,
   args?: any[],
@@ -96,6 +127,7 @@ export const makeCallContext = <F extends Function>(
   return {f, args};
 }
 
+// Compares dependency arrays
 export const isSameDependencies = <T>(
   prev: any[] | undefined,
   next: any[],

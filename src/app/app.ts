@@ -1,2 +1,2 @@
-import {live} from '../live/live';
+import {bind} from '../live/live';
 

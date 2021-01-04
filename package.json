@@ -31,15 +31,18 @@
     "test": "jest --watch",
     "coverage": "jest",
     "types": "tsc --noEmit",
-    "types:watch": "yarn run type-check -- --watch",
+    "types:watch": "yarn run types -- --watch",
     "build": "yarn run build:types && yarn run build:bundle",
     "build:types": "tsc --emitDeclarationOnly",
     "build:bundle": "webpack",
     "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline"
   },
   "dependencies": {
+    "webpack-dev-server": "^3.11.0"
   },
   "jest": {
-    "setupFiles": ["./test/setup.ts"]
+    "setupFiles": [
+      "./test/setup.ts"
+    ]
   }
 }

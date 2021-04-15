@@ -13,6 +13,10 @@ import { PROJECTION_UNIFORMS, VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatr
 import GLSL from './glsl';
 import {makeCube} from './cube';
 
+import {defer} from '../live/live';
+
+import {App} from './app';
+
 import vertexShader from './glsl/vertex.glsl';
 import fragmentShader from './glsl/fragment.glsl';
 
@@ -43,42 +47,41 @@ export const main = async () => {
   const colorAttachments = [makeColorAttachment(BACKGROUND_COLOR)];
   const depthStencilState = makeDepthStencilState(DEPTH_STENCIL_FORMAT);
 
-  const cube = makeCube();
-
-  const primitiveTopology = "triangle-list";
-  const rasterizationState = {cullMode: "back"};
-
-  const {layout, data, fill} = makeUniforms(UNIFORMS);
-
-  ////
-
   const depthTexture = makeDepthTexture(device, width, height, DEPTH_STENCIL_FORMAT);
   const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
 
+  const swapChain = makeSwapChain(device, canvas, SWAP_CHAIN_FORMAT);
+
+  ////
+
+  const cube = makeCube();
+  const primitive = {
+    topology: "triangle-list",
+    cullMode: "back",
+  };
   const vertexBuffers = makeVertexBuffers(device, cube.vertices);
 
+  //indexFormat: cube.indexFormat,
+  //vertexBuffers: cube.attributes,
+
   const pipelineDesc: GPURenderPipelineDescriptor = {
-    vertexStage:   makeShaderStage(device, makeShader(compileGLSL(vertexShader, 'vertex'))),
-    fragmentStage: makeShaderStage(device, makeShader(compileGLSL(fragmentShader, 'fragment'))),
-    primitiveTopology,
-    depthStencilState,
-    vertexState: {
-      indexFormat: cube.indexFormat,
-      vertexBuffers: cube.attributes,
-    },
-    colorStates,
+    vertex:   makeShaderStage(device, makeShader(compileGLSL(vertexShader, 'vertex')), {buffers: cube.attributes}),
+    fragment: makeShaderStage(device, makeShader(compileGLSL(fragmentShader, 'fragment')), {targets: colorStates}),
+    primitive,
+    depthStencil: depthStencilState,
   };
 
   const pipeline = device.createRenderPipeline(pipelineDesc);
 
-  const buffer = makeUniformBuffer(device, data);
+  const uniformPipe = makeUniforms(UNIFORMS);
+  const buffer = makeUniformBuffer(device, uniformPipe.data);
   const entries = makeUniformBindings([{resource: {buffer}}]);
   const uniformBindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(0),
     entries,
   });
 
-  const swapChain = makeSwapChain(device, canvas, SWAP_CHAIN_FORMAT);
+  ////
 
   const renderFrame = (device: GPUDevice) => {
     colorAttachments[0].attachment = swapChain
@@ -93,7 +96,7 @@ export const main = async () => {
     passEncoder.draw(cube.count, 1, 0, 0);
     passEncoder.endPass();
 
-    device.defaultQueue.submit([commandEncoder.finish()]);
+    device.queue.submit([commandEncoder.finish()]);
   }
 
   const updateFrameState = (device: GPUDevice) => {
@@ -106,15 +109,14 @@ export const main = async () => {
       viewMatrix: makeOrbitMatrix(5, phi, theta),
     };
     
-    fill(uniforms);
-    uploadBuffer(device, buffer, data);
+    uniformPipe.fill(uniforms);
+    uploadBuffer(device, buffer, uniformPipe.data);
   };
 
   const renderPassDescriptor: GPURenderPassDescriptor = {
     colorAttachments,
     depthStencilAttachment,
   };
-
   
   const loop = () => {
     updateFrameState(device);

@@ -1,18 +1,11 @@
-import { LiveComponent, DeferredResult } from '../live/types';
+import { LiveComponent, LiveElement } from '../live/types';
+import { CanvasRenderingContextGPU } from '../canvas/types';
+
 import { defer, useMemo, useOne, useResource, useState } from '../live/live';
 
 import { makeSwapChain } from '../canvas/mount';
 import { makeColorState, makeColorAttachment } from '../core/color';
 import { makeDepthTexture, makeDepthStencilState, makeDepthStencilAttachment } from '../core/depth';
-
-export type CanvasRenderContextGPU = {
-  swapChain: GPUSwapChain,
-  colorStates: GPUColorStateDescriptor[],
-  colorAttachments: GPURenderPassColorAttachmentDescriptor[],
-  depthTexture: GPUTexture,
-  depthStencilState: GPUDepthStencilStateDescriptor,
-  depthStencilAttachment: GPURenderPassDepthStencilAttachmentDescriptor,
-};
 
 export type CanvasProps = {
   device: GPUDevice,
@@ -23,7 +16,7 @@ export type CanvasProps = {
   depthStencilFormat?: GPUTextureFormat,
   backgroundColor?: GPUColor,
 
-  render: (context: CanvasRenderContextGPU) => LiveElement<any>,
+  render: (context: CanvasRenderingContextGPU) => LiveElement<any>,
 }
 
 export const SWAP_CHAIN_FORMAT = "bgra8unorm" as GPUTextureFormat;
@@ -71,7 +64,7 @@ export const Canvas: LiveComponent<CanvasProps> = (context) => (props) => {
     depthTexture,
     depthStencilState,
     depthStencilAttachment,
-  } as CanvasRenderContextGPU);
+  } as CanvasRenderingContextGPU);
 
   return deferred;
 }

@@ -7,10 +7,10 @@ type NullReturner = () => null;
 it('manages a dependent resource (hook)', () => {
 
   const dep = 'static';
-  let allocated;
-  let disposed;
+  let allocated: number;
+  let disposed: number;
 
-  const F: Live<FunctionReturner> = (context: LiveContext<FunctionReturner>) => (): NullReturner => {
+  const F: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
 
     const foo = useResource(context, 0)(() => {
       allocated++;
@@ -20,7 +20,7 @@ it('manages a dependent resource (hook)', () => {
     return null;
   };
 
-  const G: Live<FunctionReturner> = (context: LiveContext<FunctionReturner>) => (): NullReturner => {
+  const G: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
     const foo = useResource(context, 0)(() => {

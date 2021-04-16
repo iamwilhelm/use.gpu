@@ -1,5 +1,8 @@
-import {LiveContext, LiveComponent, Live} from './types';
-import {bind, defer, memo, useCallback, useMemo, useOne, useResource, useState} from './live';
+import { LiveContext, LiveComponent, Live, DeferredCall } from './types';
+import {
+  bind, defer, memo,
+  useCallback, useMemo, useOne, useResource, useState
+} from './live';
 
 type StringFormatter = (foo: string) => string;
 type NumberReturner = () => number;
@@ -152,7 +155,8 @@ it('returns a deferred call', () => {
     return defer(G)(foo);
   };
 
-  const result = bind(F)({foo: 'wat'});
+  const result = bind(F)({foo: 'wat'}) as any as DeferredCall<any>;
+  expect(result).toBeTruthy();
   expect(result.f).toEqual(G);
   expect(result.args).toEqual(['wat']);
 

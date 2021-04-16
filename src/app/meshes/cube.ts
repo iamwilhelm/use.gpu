@@ -9,8 +9,11 @@ export const makeCube = (): VertexData => {
 }
 
 export const cubeAttributes = makeVertexAttributeLayout([
+  // @ts-ignore
   { name: 'position', format: 'float32x4' },
+  // @ts-ignore
   { name: 'color', format: 'float32x4' },
+  // @ts-ignore
   { name: 'uv', format: 'float32x2' },
 ]);
 

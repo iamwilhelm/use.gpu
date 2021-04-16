@@ -10,7 +10,7 @@ const NO_RESOURCE = {tag: null, value: null};
 const STATE_SLOTS = 2;
 
 // Prepare to call a live function with optional given context
-export const bind = <F extends Function>(f: Live<F>, context?: LiveContext<F>) => {
+export const bind = <F extends Function>(f: Live<F>, context?: LiveContext<F> | null) => {
   const c = context ?? makeContext(f, null);
   const bound = f(c);
   return bound;
@@ -112,7 +112,7 @@ export const useOne = <F extends Function>(context: LiveContext<F>, index: numbe
 // Memoize a function with given dependencies
 export const useCallback = <F extends Function>(context: LiveContext<F>, index: number) => <T extends Function>(
   initialValue: T,
-  dependencies?: any[] = NO_DEPS,
+  dependencies: any[] = NO_DEPS,
 ): T => {
   const {state} = context;
   const i = index * STATE_SLOTS;
@@ -134,10 +134,10 @@ export const useCallback = <F extends Function>(context: LiveContext<F>, index: 
 export const useResource = <F extends Function>(
   context: LiveContext<F>,
   index: number
-) => <T extends Function>(
-  callback: T,
+) => <R, T extends Function>(
+  callback: () => [R] | [R, T] | T | void,
   dependencies: any[] = NO_DEPS,
-): void => {
+): R => {
   const {state, host} = context;
   const i = index * STATE_SLOTS;
 
@@ -164,6 +164,8 @@ export const useResource = <F extends Function>(
     else tag(res);
   }
 
+  // Assume if return type is used, it's T's
+  return (undefined as unknown as R);
 }
 
 // Cleanup effect tracker
@@ -206,8 +208,8 @@ export const useHook = <F extends Function>(
 // Make a context for a live function
 export const makeContext = <F extends Function, H>(
   f: Live<F>,
-  host?: HostInterface,
-  parent?: LiveContext<any>,
+  host?: HostInterface | null,
+  parent?: LiveContext<any> | null,
   args?: any[],
 ): LiveContext<F> => {
   const call = makeCallContext(f, args);
@@ -215,10 +217,10 @@ export const makeContext = <F extends Function, H>(
   const depth = parent ? parent.depth + 1 : 0;
   const generation = parent ? parent.generation : 0;
 
-  const self = {state, bound: null, call, depth, generation, host};
+  const self = {state, bound: null, call, depth, generation, host} as any as LiveContext<F>;
   self.bound = bind(f, self);
 
-  return self as LiveContext<F>;
+  return self;
 };
 
 // Hold call info for a context
@@ -235,7 +237,7 @@ export const isSameDependencies = <T>(
   let valid = true;
   if (next === undefined && prev === undefined) return true;
   if (prev === undefined) valid = false;
-  else {
+  if (next != null && prev != null) {
     const n = prev.length || 0;
     if (n !== next.length || 0) valid = false;
     else for (let i = 0; i < n; ++i) if (prev[i] !== next[i]) {

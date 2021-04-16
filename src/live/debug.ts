@@ -1,18 +1,18 @@
 import { DeferredCall } from './types';
 
-export const formatNode = <T>(node: DeferredCall<T>) => {
+export const formatNode = <F extends Function>(node: DeferredCall<F>) => {
   const name = node.f?.name || 'Node';
   const args = node.args?.map(x => formatValue(x));
   if (args?.length) args.unshift('');
   return `<${name}${args ? args.join(' ') : ''}>`;
 }
 
-export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()) => {
+export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return x;
-  if (Array.isArray(x)) return x.map((x) => formatValue(x, seen));
-  if (typeof x === 'boolean') return x;
-  if (typeof x === 'number') return x;
-  if (typeof x === 'symbol') return x;
+  if (Array.isArray(x)) return '[' + x.map((x) => formatValue(x, seen)).join(', ') + ']';
+  if (typeof x === 'boolean') return x ? 'true' : 'false';
+  if (typeof x === 'number') return '' + x;
+  if (typeof x === 'symbol') return '(symbol)';
   if (typeof x === 'string') return x;
   if (typeof x === 'function') return `${x.name}(...)`;
   if (typeof x === 'object') {

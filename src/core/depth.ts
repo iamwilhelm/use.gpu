@@ -1,7 +1,9 @@
 export const makeDepthTexture = (device: GPUDevice, width: number, height: number, format: GPUTextureFormat): GPUTexture => {
   const depthTexture = device.createTexture({
+    // @ts-ignore
     size: { width, height, depthOrArrayLayers: 1 },
     format,
+    // @ts-ignore
     usage: GPUTextureUsage.RENDER_ATTACHMENT,
   });
 

@@ -35,5 +35,6 @@ export const uploadBuffer = (
   buffer: GPUBuffer,
   data: ArrayBuffer,
 ) => {
+  // @ts-ignore
   device.queue.writeBuffer(buffer, 0, data, 0, data.byteLength);
 }

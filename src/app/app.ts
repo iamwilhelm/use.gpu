@@ -1,11 +1,15 @@
 import { LiveComponent } from '../live/types';
+import { CanvasRenderingContextGPU } from '../canvas/types';
+import { UniformAttribute, UniformType } from '../core/types';
+import { CameraUniforms } from '../camera/types';
+
 import { defer, useMemo, useOne } from '../live/live';
+
 import {
   AutoSize, Canvas,
   Loop, Pass,
-  Camera, CameraUniforms,
+  Camera,
 } from '../components';
-
 import { Cube } from './cube';
 
 import vertexShader from './glsl/vertex.glsl';
@@ -22,18 +26,6 @@ export type AppProps = {
   compileGLSL: (s: string, t: string) => any,
 };
 
-const updateFrameState = (device: GPUDevice, width: number, height: number) => {
-  const {fov, near, far} = DEFAULT_CAMERA;
-  const phi = 0.6;
-  const theta = 0.4;
-  
-  const uniforms = {
-    projectionMatrix: makeProjectionMatrix(width, height, fov, near, far),
-    viewMatrix: makeOrbitMatrix(5, phi, theta),
-  };
-  
-};
-
 export const App: LiveComponent<AppProps> = (context) => (props) => {
   const {canvas, device, adapter, compileGLSL} = props;
 
@@ -44,7 +36,7 @@ export const App: LiveComponent<AppProps> = (context) => (props) => {
         canvas, device, adapter,
         render: ({
           swapChain, colorStates, colorAttachments, depthStencilState, depthStencilAttachment,
-        }: CanvasRenderContextGPU) =>
+        }: CanvasRenderingContextGPU) =>
           defer(Camera)({
             width, height,
             render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>

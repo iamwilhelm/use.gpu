@@ -5,7 +5,7 @@ export type Initial<T> = (() => T) | T;
 export type Reducer<T> = T | ((t: T) => T);
 export type Setter<T> = (t: Reducer<T>) => void;
 
-export type Component<P> = (props: P) => DeferredCall<any>;
+export type Component<P> = (props: P) => LiveElement<any>;
 export type LiveComponent<P> = Live<Component<P>>;
 
 export type Task = () => void;
@@ -13,7 +13,8 @@ export type Action = {
   context: LiveContext<any>,
   task: Task,
 };
-export type Resource = () => (void | Task);
+export type Resource = <T>() => (void | Task | [T, Task]);
+export type Dispatcher = (as: Action[]) => void;
 
 export type HostInterface = {
   schedule: (c: LiveContext<any>, t: Task) => void,

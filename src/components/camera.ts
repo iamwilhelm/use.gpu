@@ -1,4 +1,7 @@
-import { LiveComponent } from '../live/types';
+import { LiveComponent, LiveElement } from '../live/types';
+
+import { UniformAttribute } from '../core/types';
+import { CameraUniforms } from '../camera/types';
 
 import { PROJECTION_UNIFORMS, VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '../camera/camera';
 import { mat4 } from 'gl-matrix';
@@ -14,18 +17,13 @@ const UNIFORMS: UniformAttribute[] = [
   ...VIEW_UNIFORMS,
 ];
 
-export type CameraUniforms = {
-  projectionMatrix: mat4,
-  viewMatrix: mat4,
-};
-
 export type CameraProps = {
   width: number,
   height: number,
   fov?: number,
   near?: number,
   far?: number,
-  render: (uniforms: CameraUniforms) => {},
+  render: (defs: UniformAttribute[], uniforms: CameraUniforms) => LiveElement<any>,
 };
 
 export const Camera: LiveComponent<CameraProps> = (context) => (props) => {

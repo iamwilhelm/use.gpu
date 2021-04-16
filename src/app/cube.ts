@@ -1,4 +1,6 @@
 import { LiveComponent } from '../live/types';
+import { UniformAttribute } from '../core/types';
+import { CameraUniforms } from '../camera/types';
 import { defer, useMemo, useOne } from '../live/live';
 
 import vertexShader from './glsl/vertex.glsl';
@@ -14,6 +16,8 @@ export type CubeProps = {
   colorStates: GPUColorStateDescriptor,
   depthStencilState: GPUDepthStencilStateDescriptor,
   passEncoder: GPURenderPassEncoder,
+  defs: UniformAttribute[]
+  uniforms: CameraUniforms,
   compileGLSL: (s: string, t: string) => any,
 };
 
@@ -26,6 +30,7 @@ export const Cube: LiveComponent<CubeProps> = (context) => (props) => {
 
   const pipeline = useMemo(context, 2)(() => {
     const pipelineDesc: GPURenderPipelineDescriptor = {
+      // @ts-ignore
       primitive: {
         topology: "triangle-list",
         cullMode: "back",
@@ -56,4 +61,5 @@ export const Cube: LiveComponent<CubeProps> = (context) => (props) => {
   passEncoder.setVertexBuffer(0, vertexBuffers[0]);
   passEncoder.draw(cube.count, 1, 0, 0);
   
+  return null;
 }

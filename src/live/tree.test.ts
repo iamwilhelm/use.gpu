@@ -1,15 +1,19 @@
-import {Task} from './types';
-import {defer, useState} from './live';
-import {render} from './tree';
+import { LiveContext, Task } from './types';
+import { defer, useState } from './live';
+import { renderSync } from './tree';
 
 it("mounts", () => {
   
   const Root = (context: LiveContext<any>) => () => defer(Node)();
   const Node = (context: LiveContext<any>) => () => {};
   
-  const result = render(defer(Root)());
+  const result = renderSync(defer(Root)());
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get(0).call.f).toBe(Node);
+  expect(result.mounts).toBeTruthy();
+  if (result.mounts) {
+    const node = result.mounts.get(0);
+    expect(node && node.call.f).toBe(Node);
+  }
   
 });
 
@@ -22,11 +26,17 @@ it("mounts multiple", () => {
   
   const Node = (context: LiveContext<any>) => () => {};
   
-  const result = render(defer(Root)());
+  const result = renderSync(defer(Root)());
+  expect(result.host).toBeTruthy();
+  expect(result.mounts).toBeTruthy();
+  if (!result.host) return;
+  if (!result.mounts) return;
+
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get('1').call.f).toBe(Node);
-  expect(result.mounts.get('2').call.f).toBe(Node);
-  
+  const node1 = result.mounts.get('1');
+  const node2 = result.mounts.get('2');
+  expect(node1 && node1.call.f).toBe(Node);
+  expect(node2 && node2.call.f).toBe(Node);
 });
 
 it("reacts on the root", () => {
@@ -41,7 +51,7 @@ it("reacts on the root", () => {
   const Root = (context: LiveContext<any>) => () => {
     rendered.root++;
 
-    const [value, setValue] = useState<number>(context, 0)(0);
+    const [value, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue(1));
 
     return defer(Node)();
@@ -51,11 +61,18 @@ it("reacts on the root", () => {
     rendered.node++;
   };
 
-  const result = render(defer(Root)());
+  const result = renderSync(defer(Root)());
+  expect(result.host).toBeTruthy();
+  expect(result.mounts).toBeTruthy();
+  if (!result.host) return;
+  if (!result.mounts) return;
+
   const {host: {__flush: flush}} = result;
 
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get(0).call.f).toBe(Node);
+  const node1 = result.mounts.get(0);
+  expect(node1 && node1.call.f).toBe(Node);
+
   expect(rendered.root).toBe(1);
   expect(rendered.node).toBe(1);
 
@@ -63,7 +80,9 @@ it("reacts on the root", () => {
   if (flush) flush();
 
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get(0).call.f).toBe(Node);
+  const node2 = result.mounts.get(0);
+  expect(node2 && node2.call.f).toBe(Node);
+
   expect(rendered.root).toBe(2);
   expect(rendered.node).toBe(2);
     
@@ -79,7 +98,7 @@ it("reacts and remounts on the root", () => {
   const setTrigger = (f: Task) => trigger = f;
 
   const Root = (context: LiveContext<any>) => () => {
-    const [value, setValue] = useState<number>(context, 0)(0);
+    const [value, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue(1));
 
     rendered.root++;
@@ -94,14 +113,24 @@ it("reacts and remounts on the root", () => {
     rendered.node++;
   };
 
-  const result = render(defer(Root)());
+  const result = renderSync(defer(Root)());
+  expect(result.host).toBeTruthy();
+  if (!result.host) return;
+
   const {host: {__flush: flush, __stats: stats}} = result;
 
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get('1').call.f).toBe(Node);
-  expect(result.mounts.get('2').call.f).toBe(Node);
-  expect(result.mounts.get('31').call.f).toBe(Node);
-  expect(result.mounts.get('32')).toBe(undefined);
+  expect(result.mounts).toBeTruthy();
+  if (result.mounts) {
+    const node1 = result.mounts.get('1');
+    const node2 = result.mounts.get('2');
+    const node3 = result.mounts.get('31');
+    const node4 = result.mounts.get('32');
+    expect(node1 && node1.call.f).toBe(Node);
+    expect(node2 && node2.call.f).toBe(Node);
+    expect(node3 && node3.call.f).toBe(Node);
+    expect(node4).toBe(undefined);
+  }
 
   expect(rendered.root).toBe(1);
   expect(rendered.node).toBe(3);
@@ -114,10 +143,17 @@ it("reacts and remounts on the root", () => {
   if (flush) flush();
 
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get('1').call.f).toBe(Node);
-  expect(result.mounts.get('2').call.f).toBe(Node);
-  expect(result.mounts.get('31')).toBe(undefined);
-  expect(result.mounts.get('32').call.f).toBe(Node);
+  expect(result.mounts).toBeTruthy();
+  if (result.mounts) {
+    const node1 = result.mounts.get('1');
+    const node2 = result.mounts.get('2');
+    const node3 = result.mounts.get('31');
+    const node4 = result.mounts.get('32');
+    expect(node1 && node1.call.f).toBe(Node);
+    expect(node2 && node2.call.f).toBe(Node);
+    expect(node3).toBe(undefined);
+    expect(node4 && node4.call.f).toBe(Node);
+  }
 
   expect(rendered.root).toBe(2);
   expect(rendered.node).toBe(6);
@@ -146,7 +182,7 @@ it("reacts and remounts a sub tree", () => {
   };
 
   const SubRoot = (context: LiveContext<any>) => () => {
-    const [value, setValue] = useState<number>(context, 0)(0);
+    const [value, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue(1));
 
     rendered.subroot++;
@@ -162,12 +198,21 @@ it("reacts and remounts a sub tree", () => {
     return;
   };
 
-  const result = render(defer(Root)());
+  const result = renderSync(defer(Root)());
+  expect(result.host).toBeTruthy();
+  expect(result.mounts).toBeTruthy();
+  if (!result.host) return;
+  if (!result.mounts) return;
+
   const {host: {__flush: flush, __stats: stats}} = result;
 
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get('subroot').call.f).toBe(SubRoot);
-  expect(result.mounts.get('subroot').mounts.get('31').call.f).toBe(Node);
+  expect(result.mounts).toBeTruthy();
+
+  const sub1 = result.mounts.get('subroot');
+  const node1 = sub1 && sub1.mounts && sub1.mounts.get('31');
+  expect(sub1 && sub1.call.f).toBe(SubRoot);
+  expect(node1 && node1.call.f).toBe(Node);
 
   expect(rendered.root).toBe(1);
   expect(rendered.subroot).toBe(1);
@@ -181,8 +226,12 @@ it("reacts and remounts a sub tree", () => {
   if (flush) flush();
 
   expect(result.call.f).toBe(Root);
-  expect(result.mounts.get('subroot').call.f).toBe(SubRoot);
-  expect(result.mounts.get('subroot').mounts.get('32').call.f).toBe(Node);
+  expect(result.mounts).toBeTruthy();
+
+  const sub2 = result.mounts.get('subroot');
+  const node2 = sub2 && sub2.mounts && sub2.mounts.get('32');
+  expect(sub2 && sub2.call.f).toBe(SubRoot);
+  expect(node2 && node2.call.f).toBe(Node);
 
   expect(rendered.root).toBe(1);
   expect(rendered.subroot).toBe(2);

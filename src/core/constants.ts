@@ -94,6 +94,7 @@ export const UNIFORM_SIZES = {
   "dmat4x4": 128,
 };
 
+// @ts-ignore
 export const VERTEX_ATTRIBUTE_SIZES = VERTEX_SIZES as {[t in GPUVertexFormat]: number};
 
 export const UNIFORM_ATTRIBUTE_SIZES = UNIFORM_SIZES as {[t in UniformType]: number};

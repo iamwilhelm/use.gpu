@@ -1,12 +1,12 @@
-import {LiveComponent} from '../live/types';
-import {useResource, useState} from '../live/live';
+import { LiveComponent, LiveElement } from '../live/types';
+import { useResource, useState } from '../live/live';
 
 export type AutoSizeProps = {
   canvas: HTMLCanvasElement,
-  render: (width: number, height: number) => void,
+  render: (width: number, height: number) => LiveElement<any>,
 }
 
-export const getCanvasSize = (window: HTMLWindowElement, canvas: HTMLCanvasElement) => {
+export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement) => {
   const dpi = window.devicePixelRatio;
   const {offsetWidth, offsetHeight} = canvas;
   return [dpi * offsetWidth, dpi * offsetHeight];

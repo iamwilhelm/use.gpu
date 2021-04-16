@@ -6,7 +6,7 @@ export type AutoSizeProps = {
   render: (width: number, height: number) => LiveElement<any>,
 }
 
-export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement) => {
+export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number] => {
   const dpi = window.devicePixelRatio;
   const {offsetWidth, offsetHeight} = canvas;
   return [dpi * offsetWidth, dpi * offsetHeight];

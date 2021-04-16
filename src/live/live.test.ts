@@ -1,7 +1,7 @@
 import { LiveContext, LiveComponent, Live, DeferredCall } from './types';
 import {
   bind, defer, memo,
-  useCallback, useMemo, useOne, useResource, useState
+  useCallback, useMemo, useOne, useState
 } from './live';
 
 type StringFormatter = (foo: string) => string;
@@ -10,7 +10,7 @@ type FunctionReturner = () => () => any;
 
 it('returns a value', () => {
 
-  const F: Live<StringFormatter> = (context: LiveContext<StringFormatter>) => (foo: string) => {
+  const F: Live<StringFormatter> = () => (foo: string) => {
     return `hello ${foo}`;
   };
 
@@ -22,9 +22,7 @@ it('returns a value', () => {
 it('holds state (hook)', () => {
 
   const F: Live<NumberReturner> = (context: LiveContext<NumberReturner>) => (): number => {
-
-    const [foo, setFoo] = useState(context, 0)(() => Math.random());
-
+    const [foo] = useState(context, 0)(() => Math.random());
     return foo;
   };
 
@@ -128,7 +126,7 @@ it('holds memoized callback (hook)', () => {
 
 it('memoizes a function', () => {
 
-  const F: Live<NumberReturner> = memo((context: LiveContext<NumberReturner>) => (): number => {
+  const F: Live<NumberReturner> = memo(() => (): number => {
     return Math.random();
   });
 
@@ -147,11 +145,11 @@ type FooProps = {
 
 it('returns a deferred call', () => {
 
-  const G: Live<StringFormatter> = (context) => (foo: string) => {
+  const G: Live<StringFormatter> = () => (foo: string) => {
     return `hello ${foo}`;
   };
 
-  const F: LiveComponent<FooProps> = (context) => ({foo}) => {
+  const F: LiveComponent<FooProps> = () => ({foo}) => {
     return defer(G)(foo);
   };
 

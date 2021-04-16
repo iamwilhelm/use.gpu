@@ -76,7 +76,7 @@ export const useMemo = <F extends Function>(context: LiveContext<F>, index: numb
   const i = index * STATE_SLOTS;
 
   let value = state[i];
-  let deps  = state[i + 1];
+  const deps  = state[i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
     value = initialState();
@@ -97,7 +97,7 @@ export const useOne = <F extends Function>(context: LiveContext<F>, index: numbe
   const i = index * STATE_SLOTS;
 
   let value = state[i];
-  let dep   = state[i + 1];
+  const dep   = state[i + 1];
 
   if (dep !== dependency) {
     value = initialState();
@@ -118,7 +118,7 @@ export const useCallback = <F extends Function>(context: LiveContext<F>, index: 
   const i = index * STATE_SLOTS;
 
   let value = state[i];
-  let deps  = state[i + 1];
+  const deps  = state[i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
     value = initialValue;
@@ -141,8 +141,8 @@ export const useResource = <F extends Function>(
   const {state, host} = context;
   const i = index * STATE_SLOTS;
 
-  let {tag, value} = state[i] || NO_RESOURCE;
-  let deps = state[i + 1];
+  let {tag} = state[i] || NO_RESOURCE;
+  const deps = state[i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
 
@@ -206,7 +206,7 @@ export const useHook = <F extends Function>(
 */
 
 // Make a context for a live function
-export const makeContext = <F extends Function, H>(
+export const makeContext = <F extends Function>(
   f: Live<F>,
   host?: HostInterface | null,
   parent?: LiveContext<any> | null,
@@ -230,7 +230,7 @@ export const makeCallContext = <F extends Function>(
 ): CallContext<F> => ({f, args});
 
 // Compares dependency arrays
-export const isSameDependencies = <T>(
+export const isSameDependencies = (
   prev: any[] | undefined,
   next: any[] | undefined,
 ) => {

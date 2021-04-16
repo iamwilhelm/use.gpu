@@ -1,6 +1,8 @@
 import { DeferredCall } from './types';
 
-export const formatNode = <F extends Function>(node: DeferredCall<F>) => {
+const {prototype: {hasOwnProperty}} = Object;
+
+export const formatNode = <F extends Function>(node: DeferredCall<F>): string => {
   const name = node.f?.name || 'Node';
   const args = node.args?.map(x => formatValue(x));
   if (args?.length) args.unshift('');
@@ -20,7 +22,9 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     seen.set(x, true);
 
     const out = [];
-    for (let k in x) if (x.hasOwnProperty(k)) out.push(`${k}: ${formatValue(x[k], seen)}`);
+    for (const k in x) if (hasOwnProperty.call(x, k)) {
+      out.push(`${k}: ${formatValue(x[k], seen)}`);
+    }
     return '{' + out.join(', ') + '}';
   }
   return '' + x;

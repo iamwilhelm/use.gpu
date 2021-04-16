@@ -1,5 +1,5 @@
-import { LiveContext, LiveComponent } from '../live/types';
-import { defer, useCallback, useOne, useResource } from '../live/live';
+import { LiveComponent } from '../live/types';
+import { defer, useCallback, useOne } from '../live/live';
 import { prepareSubContext, renderContext } from '../live/tree';
 
 export type PassProps = {
@@ -29,7 +29,7 @@ export const Pass: LiveComponent<PassProps> = (context) => (props) => {
   ref.render = render;
   ref.passEncoder = passEncoder;
 
-  const paint = useCallback(context, 1)((context: LiveContext<any>) => (ref: PassRef) => ref.render(ref.passEncoder));
+  const paint = useCallback(context, 1)(() => (ref: PassRef) => ref.render(ref.passEncoder));
   const subContext = useOne(context, 2)(() => prepareSubContext(context, defer(paint)(ref)));
 
   renderContext(subContext);

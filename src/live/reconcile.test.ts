@@ -12,7 +12,7 @@ it('manages a dependent resource (hook)', () => {
 
   const F: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
 
-    const foo = useResource(context, 0)(() => {
+    useResource(context, 0)(() => {
       allocated++;
       return () => { disposed++ };
     }, [dep]);
@@ -23,7 +23,7 @@ it('manages a dependent resource (hook)', () => {
   const G: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
-    const foo = useResource(context, 0)(() => {
+    useResource(context, 0)(() => {
       allocated++;
       return () => { disposed++ };
     }, [x]);
@@ -36,12 +36,12 @@ it('manages a dependent resource (hook)', () => {
     disposed = 0;
 
     const {context, tracker} = prepareHostContext(defer(F)());
-    const result1 = context.bound();
+    context.bound();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    const result2 = context.bound();
+    context.bound();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
@@ -58,12 +58,12 @@ it('manages a dependent resource (hook)', () => {
     disposed = 0;
 
     const {context, tracker} = prepareHostContext(defer(G)());
-    const result1 = context.bound();
+    context.bound();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    const result2 = context.bound();
+    context.bound();
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(1);

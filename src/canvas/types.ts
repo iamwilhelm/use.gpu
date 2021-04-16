@@ -8,6 +8,9 @@ export type GPUMount = GPUDeviceMount & {
 };
 
 export type CanvasRenderingContextGPU = {
+  width: number,
+  height: number,
+
   swapChain: GPUSwapChain,
   colorStates: GPUColorStateDescriptor[],
   colorAttachments: GPURenderPassColorAttachmentDescriptor[],

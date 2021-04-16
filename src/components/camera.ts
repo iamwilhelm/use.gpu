@@ -4,7 +4,6 @@ import { UniformAttribute } from '../core/types';
 import { CameraUniforms } from '../camera/types';
 
 import { PROJECTION_UNIFORMS, VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '../camera/camera';
-import { mat4 } from 'gl-matrix';
 
 const DEFAULT_CAMERA = {
   fov: Math.PI / 3,
@@ -26,7 +25,7 @@ export type CameraProps = {
   render: (defs: UniformAttribute[], uniforms: CameraUniforms) => LiveElement<any>,
 };
 
-export const Camera: LiveComponent<CameraProps> = (context) => (props) => {
+export const Camera: LiveComponent<CameraProps> = () => (props) => {
   const {
     width,
     height,

@@ -8,7 +8,7 @@ import { App } from './app';
 
 const ROOT_SELECTOR = '#use-gpu';
 
-export const main = async () => {
+export const main = async (): Promise<void> => {
   const compileGLSL = await GLSL();
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 

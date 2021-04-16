@@ -1,44 +1,44 @@
-const setUint8  = (view: DataView, offset: number, value: number) => view.setUint8(offset, value);
-const setUint16 = (view: DataView, offset: number, value: number) => view.setUint16(offset, value, true);
-const setUint32 = (view: DataView, offset: number, value: number) => view.setUint32(offset, value, true);
+export const setUint8  = (view: DataView, offset: number, value: number): void => view.setUint8(offset, value);
+export const setUint16 = (view: DataView, offset: number, value: number): void => view.setUint16(offset, value, true);
+export const setUint32 = (view: DataView, offset: number, value: number): void => view.setUint32(offset, value, true);
 
-const setInt8   = (view: DataView, offset: number, value: number) => view.setUint8(offset, value);
-const setInt16  = (view: DataView, offset: number, value: number) => view.setUint16(offset, value, true);
-const setInt32  = (view: DataView, offset: number, value: number) => view.setUint32(offset, value, true);
+export const setInt8   = (view: DataView, offset: number, value: number): void => view.setInt8(offset, value);
+export const setInt16  = (view: DataView, offset: number, value: number): void => view.setInt16(offset, value, true);
+export const setInt32  = (view: DataView, offset: number, value: number): void => view.setInt32(offset, value, true);
 
-const setFloat32 = (view: DataView, offset: number, value: number) => view.setFloat32(offset, value, true);
-const setFloat64 = (view: DataView, offset: number, value: number) => view.setFloat64(offset, value, true);
+const setFloat32 = (view: DataView, offset: number, value: number): void => view.setFloat32(offset, value, true);
+const setFloat64 = (view: DataView, offset: number, value: number): void => view.setFloat64(offset, value, true);
 
-const setUint8N = (n: number) => (view: DataView, offset: number, data: Uint8Array) => {
+export const setUint8N = (n: number) => (view: DataView, offset: number, data: Uint8Array): void => {
   for (let i = 0; i < n; ++i) setUint8(view, offset + i, data[i]);
 };
 
-const setInt8N = (n: number) => (view: DataView, offset: number, data: Uint8Array) => {
+export const setInt8N = (n: number) => (view: DataView, offset: number, data: Int8Array): void => {
   for (let i = 0; i < n; ++i) setInt8(view, offset + i, data[i]);
 };
 
-const setUint16N = (n: number) => (view: DataView, offset: number, data: Uint16Array) => {
+export const setUint16N = (n: number) => (view: DataView, offset: number, data: Uint16Array): void => {
   for (let i = 0; i < n; ++i) setUint16(view, offset + i * 2, data[i]);
 };
 
-const setInt16N = (n: number) => (view: DataView, offset: number, data: Uint16Array) => {
+export const setInt16N = (n: number) => (view: DataView, offset: number, data: Int16Array): void => {
   for (let i = 0; i < n; ++i) setInt16(view, offset + i * 2, data[i]);
 };
 
-const setUint32N = (n: number) => (view: DataView, offset: number, data: Uint32Array) => {
+export const setUint32N = (n: number) => (view: DataView, offset: number, data: Uint32Array): void => {
   for (let i = 0; i < n; ++i) setUint32(view, offset + i * 4, data[i]);
 };
 
-const setInt32N = (n: number) => (view: DataView, offset: number, data: Uint32Array) => {
+export const setInt32N = (n: number) => (view: DataView, offset: number, data: Int32Array): void => {
   for (let i = 0; i < n; ++i) setInt32(view, offset + i * 4, data[i]);
 };
 
-const setFloat32N = (n: number) => (view: DataView, offset: number, data: Float32Array) => {
+export const setFloat32N = (n: number) => (view: DataView, offset: number, data: Float32Array): void => {
   for (let i = 0; i < n; ++i) setFloat32(view, offset + i * 4, data[i]);
 };
 
-const setFloat64N = (n: number) => (view: DataView, offset: number, data: Float64Array) => {
-  for (let i = 0; i < n; ++i) setFloat32(view, offset + i * 8, data[i]);
+export const setFloat64N = (n: number) => (view: DataView, offset: number, data: Float64Array): void => {
+  for (let i = 0; i < n; ++i) setFloat64(view, offset + i * 8, data[i]);
 };
 
 export const UNIFORM_BYTE_SETTERS = {

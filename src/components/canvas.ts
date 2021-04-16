@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '../live/types';
 import { CanvasRenderingContextGPU } from '../canvas/types';
 
-import { defer, useMemo, useOne, useResource, useState } from '../live/live';
+import { useMemo, useOne, useResource } from '../live/live';
 
 import { makeSwapChain } from '../canvas/mount';
 import { makeColorState, makeColorAttachment } from '../core/color';
@@ -26,7 +26,6 @@ export const BACKGROUND_COLOR = [0.1, 0.2, 0.3, 1.0] as GPUColor;
 export const Canvas: LiveComponent<CanvasProps> = (context) => (props) => {
   const {
     device,
-    adapter,
     canvas,
     render,
     swapChainFormat = SWAP_CHAIN_FORMAT,
@@ -58,6 +57,8 @@ export const Canvas: LiveComponent<CanvasProps> = (context) => (props) => {
   );
 
   const deferred = render({
+    width,
+    height,
     swapChain,
     colorStates,
     colorAttachments,

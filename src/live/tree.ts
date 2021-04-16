@@ -1,5 +1,5 @@
-import { Key, Action, Task, Mounts, LiveContext, DeferredCall } from './types';
-import { bind, makeContext } from './live';
+import { Key, Action, Task, LiveContext, DeferredCall } from './types';
+import { makeContext } from './live';
 import { formatNode } from './debug';
 import { makeActionScheduler, makeDisposalTracker, makePaintRequester } from './util';
 
@@ -52,7 +52,7 @@ export const renderWithDispatch = <T>(
         const [{depth: min}] = ctxs;
         const top = ctxs.filter(({depth}) => depth === min);
         const uniq = top.filter((c, i) => top.indexOf(c) === i);
-        for (let ctx of uniq) {
+        for (const ctx of uniq) {
           DEBUG && console.log('Updating Sub-Root', formatNode(ctx.call));
           if (host) host.__stats.updates++;
           renderContext(ctx, generation);
@@ -96,13 +96,13 @@ export const renderContext = <F extends Function>(context: LiveContext<F>, gener
 
   if (mounts) {
     let index = 0;
-    for (let node of nodes) {
+    for (const node of nodes) {
       // Insert/update rendered nodes
-      let key = node.key ?? index++;
+      const key = node.key ?? index++;
       const prev = mounts.get(key) ?? null;
       updateNode(context, key, prev, node);
     }
-    for (let key of mounts.keys()) {
+    for (const key of mounts.keys()) {
       // Unmount unrendered nodes
       const prev = mounts.get(key);
       if (prev && (prev.generation !== context.generation)) updateNode(context, key, prev, null);
@@ -114,7 +114,7 @@ export const renderContext = <F extends Function>(context: LiveContext<F>, gener
 
 export const disposeContext = <F extends Function>(context: LiveContext<F>) => {
   const {mounts} = context;
-  if (mounts) for (let key of mounts.keys()) {
+  if (mounts) for (const key of mounts.keys()) {
     const prev = mounts.get(key);
     if (prev) disposeContext(prev);
   }

@@ -16,7 +16,7 @@ export const makeActionScheduler = () => {
   const flush = () => {
     timer = null;
     queue.sort((a: Action, b: Action) => a.context.depth - b.context.depth);
-    for (let {task} of queue) task();
+    for (const {task} of queue) task();
     if (onUpdate) {
       const q = queue.slice();
       queue.length = 0;
@@ -38,10 +38,10 @@ export const makeDisposalTracker = () => {
   }
 
   const dispose = (context: LiveContext<any>) => {
-    let tasks = disposal.get(context);
+    const tasks = disposal.get(context);
     if (tasks) {
       disposal.delete(context);
-      for (let task of tasks) task();
+      for (const task of tasks) task();
     }
   }
 
@@ -50,14 +50,14 @@ export const makeDisposalTracker = () => {
 
 export const makePaintRequester = () => {
   let pending = false;
-  let queue: Task[] = [];
+  const queue: Task[] = [];
 
   const flush = () => {
-    let q = queue.slice();
+    const q = queue.slice();
     queue.length = 0;
     pending = false;
 
-    for (let t of q) t();
+    for (const t of q) t();
   }
 
   return (t: Task) => {

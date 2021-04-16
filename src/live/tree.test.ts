@@ -4,8 +4,8 @@ import { renderSync } from './tree';
 
 it("mounts", () => {
   
-  const Root = (context: LiveContext<any>) => () => defer(Node)();
-  const Node = (context: LiveContext<any>) => () => {};
+  const Root = () => () => defer(Node)();
+  const Node = () => () => {};
   
   const result = renderSync(defer(Root)());
   expect(result.call.f).toBe(Root);
@@ -19,12 +19,12 @@ it("mounts", () => {
 
 it("mounts multiple", () => {
   
-  const Root = (context: LiveContext<any>) => () => [
+  const Root = () => () => [
     defer(Node, '1')(),
     defer(Node, '2')(),
   ];
   
-  const Node = (context: LiveContext<any>) => () => {};
+  const Node = () => () => {};
   
   const result = renderSync(defer(Root)());
   expect(result.host).toBeTruthy();
@@ -41,7 +41,7 @@ it("mounts multiple", () => {
 
 it("reacts on the root", () => {
 
-  let rendered = {
+  const rendered = {
     root: 0,
     node: 0,
   };
@@ -51,13 +51,13 @@ it("reacts on the root", () => {
   const Root = (context: LiveContext<any>) => () => {
     rendered.root++;
 
-    const [value, setValue] = useState(context, 0)(0);
+    const [, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue(1));
 
     return defer(Node)();
   };
   
-  const Node = (context: LiveContext<any>) => () => {
+  const Node = () => () => {
     rendered.node++;
   };
 
@@ -90,7 +90,7 @@ it("reacts on the root", () => {
 
 it("reacts and remounts on the root", () => {
 
-  let rendered = {
+  const rendered = {
     root: 0,
     node: 0,
   };
@@ -98,7 +98,7 @@ it("reacts and remounts on the root", () => {
   const setTrigger = (f: Task) => trigger = f;
 
   const Root = (context: LiveContext<any>) => () => {
-    const [value, setValue] = useState(context, 0)(0);
+    const [, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue(1));
 
     rendered.root++;
@@ -109,7 +109,7 @@ it("reacts and remounts on the root", () => {
     ];
   };
 
-  const Node = (context: LiveContext<any>) => () => {
+  const Node = () => () => {
     rendered.node++;
   };
 
@@ -166,7 +166,7 @@ it("reacts and remounts on the root", () => {
 
 it("reacts and remounts a sub tree", () => {
 
-  let rendered = {
+  const rendered = {
     root: 0,
     subroot: 0,
     node: 0,
@@ -174,7 +174,7 @@ it("reacts and remounts a sub tree", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (context: LiveContext<any>) => () => {
+  const Root = () => () => {
     rendered.root++;
     return [
       defer(SubRoot, 'subroot')(),
@@ -182,7 +182,7 @@ it("reacts and remounts a sub tree", () => {
   };
 
   const SubRoot = (context: LiveContext<any>) => () => {
-    const [value, setValue] = useState(context, 0)(0);
+    const [, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue(1));
 
     rendered.subroot++;
@@ -193,7 +193,7 @@ it("reacts and remounts a sub tree", () => {
     ];
   };
 
-  const Node = (context: LiveContext<any>) => () => {
+  const Node = () => () => {
     rendered.node++;
     return;
   };

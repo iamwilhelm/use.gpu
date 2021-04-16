@@ -1,5 +1,5 @@
 import {Glslang} from '@webgpu/glslang';
-import {ShaderLanguages, ShaderLanguage, ShaderModuleDescriptor} from './types';
+import {ShaderLanguages, ShaderLanguage, ShaderModuleDescriptor, ShaderStageDescriptor} from './types';
 
 export const LANGUAGES = (glslang: Glslang): ShaderLanguages => ({
   [ShaderLanguage.GLSL]: {
@@ -7,9 +7,9 @@ export const LANGUAGES = (glslang: Glslang): ShaderLanguages => ({
   }
 });
 
-export const makeShader = (code: any, entryPoint: string = 'main') => ({code, entryPoint});
+export const makeShader = (code: string, entryPoint: string = 'main'): ShaderModuleDescriptor => ({code, entryPoint});
 
-export const makeShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescriptor, extra: any = {}) => {
+export const makeShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescriptor, extra: any = {}): ShaderStageDescriptor => {
   const {code, entryPoint} = descriptor;
 
   const gpuDescriptor = {code} as GPUShaderModuleDescriptor;

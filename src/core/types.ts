@@ -109,6 +109,15 @@ export type UniformBinding = {
   resource: GPUBindingResource
 };
 
+export type UniformDefinition = {
+  layout: UniformLayout,
+  data: ArrayBuffer,
+  fill: UniformFiller,
+};
+
+export type UniformFiller = (items: any) => void;
+export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
+
 // Shaders
 export enum ShaderLanguage {
   GLSL = 'glsl',
@@ -118,5 +127,10 @@ export type ShaderLanguages = {[k in ShaderLanguage]: any};
 
 export type ShaderModuleDescriptor = {
   code: string,
+  entryPoint: string,
+};
+
+export type ShaderStageDescriptor = {
+  module: GPUShaderModule,
   entryPoint: string,
 };

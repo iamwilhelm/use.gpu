@@ -18,10 +18,10 @@ export const makeProjectionMatrix = (
   fov: number,
   near: number,
   far: number,
-) => {
+): mat4 => {
   const aspect = width / height;
   const matrix = mat4.create();
-  mat4.perspective(matrix, fov, aspect, 0.01, 100.0);
+  mat4.perspective(matrix, fov, aspect, near, far);
 
   const z = mat4.create();
   mat4.translate(z, z, vec3.fromValues(0, 0, 0.5));
@@ -31,7 +31,7 @@ export const makeProjectionMatrix = (
   return matrix;
 }
 
-export const makeOrbitMatrix = (radius: number, phi: number, theta: number) => {
+export const makeOrbitMatrix = (radius: number, phi: number, theta: number): mat4 => {
   const matrix = mat4.create();
   mat4.translate(matrix, matrix, vec3.fromValues(0, 0, -radius));
   mat4.rotate(matrix, matrix, theta, vec3.fromValues(1, 0, 0));

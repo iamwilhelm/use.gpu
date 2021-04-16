@@ -33,7 +33,11 @@ export const mountCanvas = (selector: string): HTMLCanvasElement => {
   return canvas;
 }
 
-export const makeSwapChain = (device: GPUDevice, canvas: HTMLCanvasElement, format: GPUTextureFormat) => {
+export const makeSwapChain = (
+  device: GPUDevice,
+  canvas: HTMLCanvasElement,
+  format: GPUTextureFormat,
+): GPUSwapChain => {
   const gpuContext = canvas.getContext("gpupresent") as unknown as GPUCanvasContext | null;
   if (!gpuContext) throw new Error("Cannot get WebGPU Canvas context");
 

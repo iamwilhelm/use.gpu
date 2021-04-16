@@ -1,4 +1,4 @@
-import { LiveContext, LiveComponent, LiveElement } from '../live/types';
+import { LiveComponent, LiveElement } from '../live/types';
 import { defer, useCallback, useOne, useResource } from '../live/live';
 import { prepareSubContext, renderContext } from '../live/tree';
 
@@ -21,7 +21,7 @@ export const Loop: LiveComponent<LoopProps> = (context) => (props) => {
   ref.update = update;
   ref.render = render;
 
-  const paint = useCallback(context, 1)((context: LiveContext<any>) => (ref: LoopRef) => ref.render());
+  const paint = useCallback(context, 1)(() => (ref: LoopRef) => ref.render());
   const subContext = useOne(context, 2)(() => prepareSubContext(context, defer(paint)(ref)));
 
   useResource(context, 3)(() => {

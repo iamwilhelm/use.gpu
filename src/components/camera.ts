@@ -1,5 +1,7 @@
 import { LiveComponent, LiveElement } from '../live/types';
 
+import { useResource, useState } from '../live/live';
+
 import { UniformAttribute } from '../core/types';
 import { CameraUniforms } from '../camera/types';
 
@@ -35,13 +37,17 @@ export const Camera: LiveComponent<CameraProps> = () => (props) => {
     far  = DEFAULT_CAMERA.far,
   } = props;
 
-  const phi = 0.6;
-  const theta = 0.4;
+  const [phi, setPhi] = useState<number>(context, 0)(0.6);
+  const [theta, setTheta] = useState<number>(context, 0)(0.4);
   
   const uniforms = {
     projectionMatrix: makeProjectionMatrix(width, height, fov, near, far),
     viewMatrix: makeOrbitMatrix(5, phi, theta),
   };
+
+  useResource(() => {
+    
+  });
 
   return render(UNIFORMS, uniforms);
 };

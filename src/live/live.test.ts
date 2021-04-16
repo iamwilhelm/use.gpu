@@ -1,9 +1,12 @@
 import { LiveContext, LiveComponent, Live, DeferredCall } from './types';
+
 import {
   bind, defer, memo,
-  useCallback, useMemo, useOne, useState
+  useCallback, useMemo, useOne, useResource, useState
 } from './live';
+import { prepareHostContext } from './tree';
 
+type FooProps = { foo: string };
 type StringFormatter = (foo: string) => string;
 type NumberReturner = () => number;
 type FunctionReturner = () => () => any;
@@ -18,6 +21,37 @@ it('returns a value', () => {
 
   expect(result).toBe('hello wat');
 })
+
+it('memoizes a function', () => {
+
+  const F: Live<NumberReturner> = memo(() => (): number => {
+    return Math.random();
+  });
+
+  {
+    const bound = bind(F);
+    const result1 = bound();
+    const result2 = bound();
+
+    expect(result1).toBe(result2);
+  }
+})
+
+it('returns a deferred call', () => {
+
+  const G: Live<StringFormatter> = () => (foo: string) => {
+    return `hello ${foo}`;
+  };
+
+  const F: LiveComponent<FooProps> = () => ({foo}) => {
+    return defer(G)(foo);
+  };
+
+  const result = bind(F)({foo: 'wat'}) as any as DeferredCall<any>;
+  expect(result).toBeTruthy();
+  expect(result.f).toEqual(G);
+  expect(result.args).toEqual(['wat']);
+});
 
 it('holds state (hook)', () => {
 
@@ -124,38 +158,74 @@ it('holds memoized callback (hook)', () => {
   }
 })
 
-it('memoizes a function', () => {
+it('manages a dependent resource (hook)', () => {
 
-  const F: Live<NumberReturner> = memo(() => (): number => {
-    return Math.random();
-  });
+  const dep = 'static';
+  let allocated: number;
+  let disposed: number;
+
+  const F: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
+
+    useResource(context, 0)(() => {
+      allocated++;
+      return () => { disposed++ };
+    }, [dep]);
+
+    return null;
+  };
+
+  const G: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
+
+    const x = Math.random();
+    useResource(context, 0)(() => {
+      allocated++;
+      return () => { disposed++ };
+    }, [x]);
+
+    return null;
+  };
 
   {
-    const bound = bind(F);
-    const result1 = bound();
-    const result2 = bound();
+    allocated = 0;
+    disposed = 0;
 
-    expect(result1).toBe(result2);
+    const {context, tracker} = prepareHostContext(defer(F)());
+    context.bound();
+
+    expect(allocated).toBe(1);
+    expect(disposed).toBe(0);
+
+    context.bound();
+
+    expect(allocated).toBe(1);
+    expect(disposed).toBe(0);
+
+    tracker.dispose(context);
+
+    expect(allocated).toBe(1);
+    expect(disposed).toBe(1);
+
   }
-})
 
-type FooProps = {
-  foo: string,
-};
+  {
+    allocated = 0;
+    disposed = 0;
 
-it('returns a deferred call', () => {
+    const {context, tracker} = prepareHostContext(defer(G)());
+    context.bound();
 
-  const G: Live<StringFormatter> = () => (foo: string) => {
-    return `hello ${foo}`;
-  };
+    expect(allocated).toBe(1);
+    expect(disposed).toBe(0);
 
-  const F: LiveComponent<FooProps> = () => ({foo}) => {
-    return defer(G)(foo);
-  };
+    context.bound();
 
-  const result = bind(F)({foo: 'wat'}) as any as DeferredCall<any>;
-  expect(result).toBeTruthy();
-  expect(result.f).toEqual(G);
-  expect(result.args).toEqual(['wat']);
+    expect(allocated).toBe(2);
+    expect(disposed).toBe(1);
 
+    tracker.dispose(context);
+
+    expect(allocated).toBe(2);
+    expect(disposed).toBe(2);
+
+  }
 })

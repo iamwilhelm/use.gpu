@@ -145,7 +145,7 @@ export const updateNode = <P extends Function, F extends Function>(
     DEBUG && console.log('Mounting', key, formatNode(node));
     if (host) host.__stats.mounts++;
 
-    const child = makeContext(node.f, context.host, context, node.args);
+    const child = makeContext(node.f, host, context, node.args);
     if (mounts) mounts.set(key, child);
     renderContext(child);
   }

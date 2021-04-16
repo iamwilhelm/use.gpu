@@ -9,27 +9,53 @@ type Dispatcher = (as: Action[]) => void;
 export const prepareHostContext = (node: DeferredCall<T>) => {
   const {host, scheduler, tracker} = makeHost();
   const context = makeContext(node.f, host, null, node.args);
-  context.generation = 1;
-
   return {context, host, scheduler, tracker};
 }
 
+export const prepareSubContext = (parent: LiveContext<any>, node: DeferredCall<T>) => {
+  const {host} = parent;
+  const context = makeContext(node.f, host, parent, node.args);
+  return context;
+}
+
 export const render = <T>(node: DeferredCall<T>) => {
+  let generation = 0;
+
   DEBUG && console.log('Rendering Root', formatNode(node));
 
   const {context, host, scheduler} = prepareHostContext(node);
 
   const reenter = (as: Action[]) => {
-    context.generation = (context.generation + 1) & 0xFFFFFFFF;
-    renderContext(context);
+    generation++;
+
+    const ctxs = as.map(({context}) => context);
+    ctxs.sort((a, b) => a.depth - b.depth);
+
+    if (ctxs.length) {
+      const [{depth: min}] = ctxs;
+      const top = ctxs.filter(({depth}) => depth === min);
+      for (let ctx of top) {
+        DEBUG && console.log('Updating Sub-Root', formatNode(ctx.call));
+        if (host) host.__stats.updates++;
+        renderContext(ctx, generation);
+      }
+    }
+    else {
+      DEBUG && console.log('Updating Root', formatNode(context.call));
+      if (host) host.__stats.updates++;
+      renderContext(context, generation);
+    }
   };
 
   scheduler.bind(reenter);
 
+  if (host) host.__stats.mounts++;
   return renderContext(context);
 }
 
-export const renderContext = <T>(context: LiveContext<T>) => {
+export const renderContext = <T>(context: LiveContext<T>, generation?: number) => {
+  if (generation !== undefined) context.generation = generation;
+
   const out = context.bound(...context.call.args);
   const nodes = (out ? (!Array.isArray(out) ? [out] : out) : []) as DeferredCall<any>[];
 
@@ -74,7 +100,7 @@ export const updateNode = <S, T>(
   const replace = from && to && from !== to;
 
   if ((!to && from) || replace) {
-    DEBUG && console.log('Unmounting', formatNode(from.call));
+    DEBUG && console.log('Unmounting', key, formatNode(prev?.call));
     if (host) host.__stats.unmounts++;
 
     if (mounts) mounts.delete(key);
@@ -82,7 +108,7 @@ export const updateNode = <S, T>(
   }
 
   if ((to && !from) || replace) {
-    DEBUG && console.log('Mounting', formatNode(to.call));
+    DEBUG && console.log('Mounting', key, formatNode(node));
     if (host) host.__stats.mounts++;
 
     const child = makeContext(node.f, context.host, context, node.args);
@@ -91,7 +117,7 @@ export const updateNode = <S, T>(
   }
 
   if (from && to && !replace) {
-    DEBUG && console.log('Updating', formatNode(to.call));
+    DEBUG && console.log('Updating', key, formatNode(node));
     if (host) host.__stats.updates++;
 
     prev.generation = context.generation;

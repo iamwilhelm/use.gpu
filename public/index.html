@@ -5,7 +5,22 @@
     <title>Use.gpu</title>
   </head>
   <style type="text/css" media="all">
-    html, body { margin: 0; padding: 0; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #use-gpu {
+      position: relative;
+      height: 100%;
+    }
+    #use-gpu > canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
   </style>
   <body>
     <div id="use-gpu"></div>

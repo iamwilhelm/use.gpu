@@ -15,9 +15,9 @@ export const getCanvasSize = (window: HTMLWindowElement, canvas: HTMLCanvasEleme
 export const AutoSize: LiveComponent<AutoSizeProps> = (context) => (props) => {
   const {canvas, render} = props;
   
-  const [size, setSize] = useState(context, 0)(() => getCanvasSize(window, canvas));
-  const width  = canvas.width  = size[0];
-  const height = canvas.height = size[1];
+  const [[width, height], setSize] = useState(context, 0)(() => getCanvasSize(window, canvas));
+  if (canvas.width  !==  width) canvas.width  = width;
+  if (canvas.height !== height) canvas.height = height;
 
   useResource(context, 1)(() => {
     const resize = () => setSize(getCanvasSize(window, canvas))

@@ -27,17 +27,20 @@ export type HostInterface = {
 export type Mounts = Map<Key, LiveContext<any>>;
 
 export type LiveContext<F extends Function> = {
-  state: any[],
-  bound: F,
+  host?: HostInterface,
   call: CallContext<F>,
+
+  mounts?: Mounts,
   depth: number,
   generation: number,
-  parent?: LiveContext<any>,
-  mounts?: Mounts,
-  host?: HostInterface,
+
+  state: any[],
+  bound: F,
 };
 
-export type DeferredResult<F extends Function> = DeferredCall<F> | DeferredCall<any>[];
+export type LiveElement<F extends Function> = DeferredResult<F>;
+
+export type DeferredResult<F extends Function> = null | DeferredCall<F> | DeferredCall<any>[];
 
 export type DeferredCall<F extends Function> = CallContext<F> & {
   key?: Key,

@@ -42,9 +42,11 @@ export const main = async () => {
   const compileGLSL = await GLSL();
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 
-  render(
-    defer(App)({adapter, device, canvas})
+  const root = render(
+    defer(App)({adapter, device, canvas, compileGLSL})
   );
+  
+  console.log({root})
 }
 
 export const mainOld = async () => {

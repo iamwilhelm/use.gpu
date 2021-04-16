@@ -1,5 +1,5 @@
 import {LiveContext, LiveComponent, Live} from './types';
-import {bind, defer, memo, useCallback, useMemo, useResource, useState} from './live';
+import {bind, defer, memo, useCallback, useMemo, useOne, useResource, useState} from './live';
 
 type StringFormatter = (foo: string) => string;
 type NumberReturner = () => number;
@@ -48,6 +48,33 @@ it('holds memoized value (hook)', () => {
   const F: Live<NumberReturner> = (context: LiveContext<NumberReturner>) => (): number => {
 
     const foo = useMemo(context, 0)(() => Math.random(), [dep]);
+
+    return foo;
+  };
+
+  {
+    const result1 = bind(F)();
+    const result2 = bind(F)();
+
+    expect(result1).not.toBe(result2);
+  }
+
+  {
+    const bound = bind(F);
+    const result1 = bound();
+    const result2 = bound();
+
+    expect(result1).toBe(result2);
+  }
+})
+
+it('holds memoized value with one dep (hook)', () => {
+
+  const dep = 'static';
+
+  const F: Live<NumberReturner> = (context: LiveContext<NumberReturner>) => (): number => {
+
+    const foo = useOne(context, 0)(() => Math.random(), dep);
 
     return foo;
   };

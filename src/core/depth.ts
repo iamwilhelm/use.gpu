@@ -1,4 +1,4 @@
-export const makeDepthTexture = (device: GPUDevice, width: number, height: number, format: GPUTextureFormat) => {
+export const makeDepthTexture = (device: GPUDevice, width: number, height: number, format: GPUTextureFormat): GPUTexture => {
   const depthTexture = device.createTexture({
     size: { width, height, depthOrArrayLayers: 1 },
     format,
@@ -14,7 +14,7 @@ export const makeDepthStencilState = (format: GPUTextureFormat): GPUDepthStencil
   format,
 });
 
-export const makeDepthStencilAttachment = (depthTexture: GPUTexture) => ({
+export const makeDepthStencilAttachment = (depthTexture: GPUTexture): GPURenderPassDepthStencilAttachmentDescriptor => ({
   attachment: depthTexture.createView(),
   depthLoadValue: 1.0,
   depthStoreOp: "store" as GPUStoreOp,

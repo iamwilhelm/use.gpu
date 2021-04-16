@@ -5,6 +5,7 @@ import {
 } from './types';
 
 const NOP = () => {};
+const NO_DEPS = [] as any[];
 const NO_RESOURCE = {tag: null, value: null};
 const STATE_SLOTS = 2;
 
@@ -69,7 +70,7 @@ export const useState = <F extends Function>(context: LiveContext<F>, index: num
 // Memoize a value with given dependencies
 export const useMemo = <F extends Function>(context: LiveContext<F>, index: number) => <T>(
   initialState: () => T,
-  dependencies: any[],
+  dependencies: any[] = NO_DEPS,
 ): T => {
   const {state} = context;
   const i = index * STATE_SLOTS;
@@ -90,7 +91,7 @@ export const useMemo = <F extends Function>(context: LiveContext<F>, index: numb
 // Memoize a value with one dependency
 export const useOne = <F extends Function>(context: LiveContext<F>, index: number) => <T>(
   initialState: () => T,
-  dependency: any,
+  dependency: any = null,
 ): T => {
   const {state} = context;
   const i = index * STATE_SLOTS;
@@ -111,7 +112,7 @@ export const useOne = <F extends Function>(context: LiveContext<F>, index: numbe
 // Memoize a function with given dependencies
 export const useCallback = <F extends Function>(context: LiveContext<F>, index: number) => <T extends Function>(
   initialValue: T,
-  dependencies: any[],
+  dependencies?: any[] = NO_DEPS,
 ): T => {
   const {state} = context;
   const i = index * STATE_SLOTS;
@@ -135,7 +136,7 @@ export const useResource = <F extends Function>(
   index: number
 ) => <T extends Function>(
   callback: T,
-  dependencies: any[],
+  dependencies: any[] = NO_DEPS,
 ): void => {
   const {state, host} = context;
   const i = index * STATE_SLOTS;
@@ -214,7 +215,7 @@ export const makeContext = <F extends Function, H>(
   const depth = parent ? parent.depth + 1 : 0;
   const generation = parent ? parent.generation : 0;
 
-  const self = {state, bound: null, call, depth, generation, parent, host};
+  const self = {state, bound: null, call, depth, generation, host};
   self.bound = bind(f, self);
 
   return self as LiveContext<F>;
@@ -229,13 +230,14 @@ export const makeCallContext = <F extends Function>(
 // Compares dependency arrays
 export const isSameDependencies = <T>(
   prev: any[] | undefined,
-  next: any[],
+  next: any[] | undefined,
 ) => {
   let valid = true;
+  if (next === undefined && prev === undefined) return true;
   if (prev === undefined) valid = false;
   else {
-    const n = prev.length;
-    if (n !== next.length) valid = false;
+    const n = prev.length || 0;
+    if (n !== next.length || 0) valid = false;
     else for (let i = 0; i < n; ++i) if (prev[i] !== next[i]) {
       valid = false;
       break;

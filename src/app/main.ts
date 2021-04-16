@@ -11,11 +11,12 @@ import { makeShader, makeShaderStage } from '../core/pipeline';
 import { PROJECTION_UNIFORMS, VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '../camera/camera';
 
 import GLSL from './glsl';
-import {makeCube} from './cube';
+import { makeCube } from './cube';
 
-import {defer} from '../live/live';
+import { defer } from '../live/live';
+import { render } from '../live/tree';
 
-import {App} from './app';
+import { App } from './app';
 
 import vertexShader from './glsl/vertex.glsl';
 import fragmentShader from './glsl/fragment.glsl';
@@ -41,13 +42,22 @@ export const main = async () => {
   const compileGLSL = await GLSL();
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 
+  render(
+    defer(App)({adapter, device, canvas})
+  );
+}
+
+export const mainOld = async () => {
+  const compileGLSL = await GLSL();
+  const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
+
   const {width, height} = canvas;
 
   const colorStates = [makeColorState(SWAP_CHAIN_FORMAT)];
   const colorAttachments = [makeColorAttachment(BACKGROUND_COLOR)];
-  const depthStencilState = makeDepthStencilState(DEPTH_STENCIL_FORMAT);
 
   const depthTexture = makeDepthTexture(device, width, height, DEPTH_STENCIL_FORMAT);
+  const depthStencilState = makeDepthStencilState(DEPTH_STENCIL_FORMAT);
   const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
 
   const swapChain = makeSwapChain(device, canvas, SWAP_CHAIN_FORMAT);

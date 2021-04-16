@@ -107,6 +107,7 @@ it("reacts and remounts", () => {
   expect(result.mounts.get('1').call.f).toBe(Node);
   expect(result.mounts.get('2').call.f).toBe(Node);
   expect(result.mounts.get('31').call.f).toBe(Node);
+  expect(result.mounts.get('32')).toBe(undefined);
 
   expect(rendered.root).toBe(1);
   expect(rendered.node).toBe(3);
@@ -121,6 +122,7 @@ it("reacts and remounts", () => {
   expect(result.call.f).toBe(Root);
   expect(result.mounts.get('1').call.f).toBe(Node);
   expect(result.mounts.get('2').call.f).toBe(Node);
+  expect(result.mounts.get('31')).toBe(undefined);
   expect(result.mounts.get('32').call.f).toBe(Node);
 
   expect(rendered.root).toBe(2);

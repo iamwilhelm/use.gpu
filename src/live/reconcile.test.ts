@@ -4,7 +4,7 @@ import {prepareHostContext} from './tree';
 
 type NullReturner = () => null;
 
-it('holds a resource (hook)', () => {
+it('manages a dependent resource (hook)', () => {
 
   const dep = 'static';
   let allocated;

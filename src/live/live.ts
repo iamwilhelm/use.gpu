@@ -5,6 +5,7 @@ import {
 } from './types';
 
 const NOP = () => {};
+const NO_RESOURCE = {tag: null, value: null};
 const STATE_SLOTS = 2;
 
 // Prepare to call a live function with optional given context
@@ -86,6 +87,27 @@ export const useMemo = <F extends Function>(context: LiveContext<F>, index: numb
   return value as unknown as T;
 }
 
+// Memoize a value with one dependency
+export const useOne = <F extends Function>(context: LiveContext<F>, index: number) => <T>(
+  initialState: () => T,
+  dependency: any,
+): T => {
+  const {state} = context;
+  const i = index * STATE_SLOTS;
+
+  let value = state[i];
+  let dep   = state[i + 1];
+
+  if (dep !== dependency) {
+    value = initialState();
+
+    state[i] = value;
+    state[i + 1] = dependency;
+  }
+
+  return value as unknown as T;
+}
+
 // Memoize a function with given dependencies
 export const useCallback = <F extends Function>(context: LiveContext<F>, index: number) => <T extends Function>(
   initialValue: T,
@@ -118,19 +140,27 @@ export const useResource = <F extends Function>(
   const {state, host} = context;
   const i = index * STATE_SLOTS;
 
-  let tag  = state[i];
+  let {tag, value} = state[i] || NO_RESOURCE;
   let deps = state[i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
 
     if (!tag) {
-      tag = state[i] = makeResourceTag();
+      tag = makeResourceTag();
+      state[i] = {tag, value: null};
+
       if (host) host.track(context, tag);
     }
 
     state[i + 1] = dependencies;
 
-    tag(callback());
+    const res = callback();
+    if (Array.isArray(res)) {
+      if (res.length > 1) state[i].value = res[0];
+      tag(res[1]);
+      return res[0];
+    }
+    else tag(res);
   }
 
 }

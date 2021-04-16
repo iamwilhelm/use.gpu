@@ -19,6 +19,9 @@ export type HostInterface = {
   schedule: (c: LiveContext<any>, t: Task) => void,
   track: (c: LiveContext<any>, t: Task) => void,
   dispose: (c: LiveContext<any>) => void,
+  
+  __stats: {mounts: number, unmounts: number, updates: number},
+  __flush: () => void,
 };
 
 export type Mounts = Map<Key, LiveContext<any>>;

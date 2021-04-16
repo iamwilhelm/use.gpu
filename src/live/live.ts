@@ -28,9 +28,10 @@ export const memo = <F extends Function>(
 ) => (
   context: LiveContext<F>
 ) => {
-  const bound = f(context);
+  const memod = makeContext(f, null, context);
+  const bound = bind(f, context);
   return (...args: any[]) => {
-    const value = useMemo(context, 0)(() => bound(args), args);
+    const value = useMemo(memod, 0)(() => bound(args), args);
     return value;
   };
 };

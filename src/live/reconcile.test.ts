@@ -35,8 +35,12 @@ it('holds a resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, host, tracker} = prepareHostContext(defer(F)());
+    const {context, tracker} = prepareHostContext(defer(F)());
     const result1 = context.bound();
+
+    expect(allocated).toBe(1);
+    expect(disposed).toBe(0);
+
     const result2 = context.bound();
 
     expect(allocated).toBe(1);
@@ -53,8 +57,12 @@ it('holds a resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, host, tracker} = prepareHostContext(defer(G)());
+    const {context, tracker} = prepareHostContext(defer(G)());
     const result1 = context.bound();
+
+    expect(allocated).toBe(1);
+    expect(disposed).toBe(0);
+
     const result2 = context.bound();
 
     expect(allocated).toBe(2);

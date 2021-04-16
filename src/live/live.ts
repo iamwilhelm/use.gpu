@@ -1,5 +1,5 @@
 import {
-  Initial, Reducer, Key,
+  Initial, Reducer, Key, Task,
   Live, LiveContext, CallContext,
   DeferredCall, HostInterface,
 } from './types';
@@ -11,10 +11,7 @@ const STATE_SLOTS = 2;
 export const bind = <F extends Function>(f: Live<F>, context?: LiveContext<F>) => {
   const c = context ?? makeContext(f, null);
   const bound = f(c);
-  return (...args: any[]) => {
-    c.call.args = args;
-    return bound(...args);
-  }
+  return bound;
 };
 
 // Defer a call to a live function
@@ -109,7 +106,47 @@ export const useCallback = <F extends Function>(context: LiveContext<F>, index: 
   return value as unknown as T;
 }
 
-// Memoize a function with given dependencies
+// Bind immediately to a resource, with auto-cleanup on dep change or unmount
+export const useResource = <F extends Function>(
+  context: LiveContext<F>,
+  index: number
+) => <T extends Function>(
+  callback: T,
+  dependencies: any[],
+): void => {
+  const {state, host} = context;
+  const i = index * STATE_SLOTS;
+
+  let tag  = state[i];
+  let deps = state[i + 1];
+
+  if (!isSameDependencies(deps, dependencies)) {
+
+    if (!tag) {
+      tag = state[i] = makeResourceTag();
+      if (host) host.track(context, tag);
+    }
+
+    state[i + 1] = dependencies;
+
+    tag(callback());
+  }
+
+}
+
+// Cleanup effect tracker
+// Calls previous cleanup before accepting new one
+export const makeResourceTag = () => {
+  let cleanup = undefined as Task | undefined;
+
+  return (f?: Task) => {
+    if (cleanup) cleanup();
+    cleanup = f;
+  }
+}
+
+// Reserve a new context for a hook
+/*
 export const useHook = <F extends Function>(
   context: LiveContext<F>,
   index: number
@@ -124,7 +161,7 @@ export const useHook = <F extends Function>(
 
   if (!bound) {
     ctx = makeContext(f, host, context);
-    bound = hook(c);
+    bound = hook(ctx);
 
     state[i] = bound;
     state[i + 1] = ctx;
@@ -132,18 +169,24 @@ export const useHook = <F extends Function>(
 
   return bound;
 }
+*/
 
 // Make a context for a live function
 export const makeContext = <F extends Function, H>(
   f: Live<F>,
   host?: HostInterface,
   parent?: LiveContext<any>,
-  args?: any[]
+  args?: any[],
 ): LiveContext<F> => {
   const call = makeCallContext(f, args);
   const state = [] as any[];
   const depth = parent ? parent.depth + 1 : 0;
-  return {state, call, depth, parent, host};
+  const generation = parent ? parent.generation : 0;
+
+  const self = {state, bound: null, call, depth, generation, parent, host};
+  self.bound = bind(f, self);
+
+  return self as LiveContext<F>;
 };
 
 // Hold call info for a context

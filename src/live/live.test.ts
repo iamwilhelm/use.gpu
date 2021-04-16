@@ -1,5 +1,5 @@
 import {LiveContext, LiveComponent, Live} from './types';
-import {bind, defer, memo, useCallback, useMemo, useState} from './live';
+import {bind, defer, memo, useCallback, useMemo, useResource, useState} from './live';
 
 type StringFormatter = (foo: string) => string;
 type NumberReturner = () => number;

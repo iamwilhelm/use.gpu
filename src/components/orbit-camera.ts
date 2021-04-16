@@ -1,13 +1,14 @@
 import { LiveComponent, LiveElement } from '../live/types';
 
-import { useResource, useState } from '../live/live';
-
 import { UniformAttribute } from '../core/types';
 import { CameraUniforms } from '../camera/types';
 
 import { PROJECTION_UNIFORMS, VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '../camera/camera';
 
 const DEFAULT_CAMERA = {
+  phi: 0,
+  theta: 0,
+  radius: 5,
   fov: Math.PI / 3,
   near: 0.01,
   far: 100,
@@ -18,36 +19,36 @@ const UNIFORMS: UniformAttribute[] = [
   ...VIEW_UNIFORMS,
 ];
 
-export type CameraProps = {
+export type OrbitCameraProps = {
   width: number,
   height: number,
+  phi: number,
+  theta: number,
+  radius: number,
+
   fov?: number,
   near?: number,
   far?: number,
   render: (defs: UniformAttribute[], uniforms: CameraUniforms) => LiveElement<any>,
 };
 
-export const Camera: LiveComponent<CameraProps> = () => (props) => {
+export const OrbitCamera: LiveComponent<OrbitCameraProps> = (context) => (props) => {
   const {
     width,
     height,
+    phi    = DEFAULT_CAMERA.phi,
+    theta  = DEFAULT_CAMERA.theta,
+    radius = DEFAULT_CAMERA.radius,
+    fov    = DEFAULT_CAMERA.fov,
+    near   = DEFAULT_CAMERA.near,
+    far    = DEFAULT_CAMERA.far,
     render,
-    fov  = DEFAULT_CAMERA.fov,
-    near = DEFAULT_CAMERA.near,
-    far  = DEFAULT_CAMERA.far,
   } = props;
-
-  const [phi, setPhi] = useState<number>(context, 0)(0.6);
-  const [theta, setTheta] = useState<number>(context, 0)(0.4);
   
   const uniforms = {
     projectionMatrix: makeProjectionMatrix(width, height, fov, near, far),
-    viewMatrix: makeOrbitMatrix(5, phi, theta),
+    viewMatrix: makeOrbitMatrix(radius, phi, theta),
   };
-
-  useResource(() => {
-    
-  });
 
   return render(UNIFORMS, uniforms);
 };

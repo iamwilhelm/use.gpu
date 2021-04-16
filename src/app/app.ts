@@ -8,7 +8,7 @@ import { defer } from '../live/live';
 import {
   AutoCanvas,
   Loop, Pass,
-  Camera,
+  OrbitCamera, OrbitControls,
 } from '../components';
 import { Cube } from './cube';
 
@@ -29,17 +29,22 @@ export const App: LiveComponent<AppProps> = () => (props) => {
       colorStates, colorAttachments,
       depthStencilState, depthStencilAttachment,
     }: CanvasRenderingContextGPU) =>
-      defer(Camera)({
-        width, height,
-        render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>
-          defer(Loop)({
-            device, swapChain, colorAttachments,
-            render: () =>
-              defer(Pass)({
-                device, colorAttachments, depthStencilAttachment,
-                render: (passEncoder: GPURenderPassEncoder) => [
-                  defer(Cube, 'cube')({device, colorStates, depthStencilState, compileGLSL, defs, uniforms, passEncoder}),
-                ]
+      defer(OrbitControls)({
+        canvas,
+        render: (radius: number, phi: number, theta: number) =>
+          defer(OrbitCamera)({
+            canvas, width, height,
+            radius, phi, theta,
+            render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>
+              defer(Loop)({
+                device, swapChain, colorAttachments,
+                render: () =>
+                  defer(Pass)({
+                    device, colorAttachments, depthStencilAttachment,
+                    render: (passEncoder: GPURenderPassEncoder) => [
+                      defer(Cube, 'cube')({device, colorStates, depthStencilState, compileGLSL, defs, uniforms, passEncoder}),
+                    ]
+                  })
               })
           })
       })

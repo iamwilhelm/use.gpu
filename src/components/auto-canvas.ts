@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '../live/types';
 import { CanvasRenderingContextGPU } from '../canvas/types';
 
-import { AutoSize } from './autosize';
+import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
 
 import { defer } from '../live/live';

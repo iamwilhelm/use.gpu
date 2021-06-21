@@ -91,20 +91,33 @@ export const render = renderPaint;
 export const renderContext = <F extends Function>(context: LiveContext<F>, generation?: number) => {
   if (generation !== undefined) context.generation = generation;
 
-  const out = context.bound(...(context.call.args ?? NO_ARGS));
-  const nodes = (out ? (!Array.isArray(out) ? [out] : out) : []) as DeferredCall<any>[];
+  const out = context.bound.apply(null, context.call.args ?? NO_ARGS);
+
+  const isArray = !!out && Array.isArray(out);
+  const node  = !isArray ? out as DeferredCall<any> : null;
+  const nodes =  isArray ? out as DeferredCall<any>[] : null; 
+  const n = isArray ? nodes.length : +!!node;
 
   let {mounts} = context;
-  if (!mounts && nodes.length) mounts = context.mounts = new Map();
+  if (!mounts && n) mounts = context.mounts = new Map();
 
   if (mounts) {
-    let index = 0;
-    for (const node of nodes) {
-      // Insert/update rendered nodes
-      const key = node.key ?? index++;
+    if (node) {
+      const key = node.key ?? 0;
       const prev = mounts.get(key) ?? null;
       updateNode(context, key, prev, node);
     }
+    else if (nodes) {
+      let index = 0;
+      for (const node of nodes) {
+        // Insert/update rendered nodes
+        const key = node.key ?? index++;
+        const prev = mounts.get(key) ?? null;
+        updateNode(context, key, prev, node);
+      }
+    }
+
+    if (mounts.size === n) return context;
     for (const key of mounts.keys()) {
       // Unmount unrendered nodes
       const prev = mounts.get(key);

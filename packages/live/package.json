@@ -1,0 +1,32 @@
+{
+  "name": "@use-gpu/live",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true,
+  "typesVersions": {
+    "*": { "types": ["src/types"] }
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "jest --collect-coverage",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+
+    "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir ../../build/packages/live/src --extensions \".ts\" --source-maps inline",
+    "build:pkg": "cp package.json ../../build/packages/live"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "debug.ts"
+    ]
+  }
+}

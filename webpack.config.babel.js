@@ -4,14 +4,18 @@ const {NODE_ENV} = process.env;
 const isDevelopment = NODE_ENV === 'development';
 
 export default {
-  entry: './src/index',
+  entry: {
+    app: {
+      import: './packages/app/src/index.ts',
+    }
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
-    filename: 'use.bundle.js'
+    filename: 'use.bundle.js',
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json']
+    extensions: ['.ts', '.js', '.json']
   },
   module: {
     rules: [

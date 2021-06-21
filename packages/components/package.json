@@ -1,0 +1,29 @@
+{
+  "name": "@use-gpu/components",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@use-gpu/live": "*",
+    "@use-gpu/core": "*",
+    "@use-gpu/webgpu": "*"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+
+    "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir ../../build/packages/components/src --extensions \".ts\" --source-maps inline",
+    "build:pkg": "cp package.json ../../build/packages/components"
+  }
+}

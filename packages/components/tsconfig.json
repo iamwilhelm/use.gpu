@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.pkg.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "baseUrl": "src",
+    "typeRoots": ["../../node_modules/@types"],
+    "outDir": "../../build/packages/components/src",
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"]
+  "references": [
+    { "path": "../live" },
+    { "path": "../core" },
+    { "path": "../webgpu" },
+  ]
+}

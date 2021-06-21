@@ -30,7 +30,16 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (context) => (pr
   const [bearing, setBearing] = useState<number>(context, 1)(0.6);
   const [pitch, setPitch]     = useState<number>(context, 2)(0.4);
 
-  useResource(context, 3)(() => {
+  useResource(context, 3)((dispose) => {
+    const onWheel = (e: WheelEvent) => {
+      const {deltaMode, deltaY} = e;
+      let f = 1;
+      if (deltaMode === 1) f = 10;
+      if (deltaMode === 2) f = 30;
+      setRadius((r: number) => r * (1 + deltaY * f / 100));
+      e.preventDefault();
+    };
+
     const onMouseMove = (e: MouseEvent) => {
       const {buttons, movementX, movementY} = e;
       const size = Math.min(canvas.width, canvas.height);
@@ -40,10 +49,16 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (context) => (pr
       if (buttons & 1) {
         setBearing((phi: number) => phi + movementX * speedX);
         setPitch((theta: number) => clamp(theta + movementY * speedY, -π/2, π/2));
+        e.preventDefault();
       }
     };
+
     canvas.addEventListener('mousemove', onMouseMove);
-    return () => canvas.removeEventListener('mousemove', onMouseMove);    
+    canvas.addEventListener('wheel', onWheel);
+    dispose(() => {
+      canvas.removeEventListener('mousemove', onMouseMove);
+      canvas.removeEventListener('wheel', onWheel);
+    });
   }, [canvas]);
 
   return render(radius, bearing, pitch);

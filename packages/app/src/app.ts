@@ -6,7 +6,7 @@ import { defer } from '@use-gpu/live';
 
 import {
   AutoCanvas,
-  Loop, Pass,
+  Loop, Draw, Pass,
   OrbitCamera, OrbitControls,
 } from '@use-gpu/components';
 import { Cube } from './cube';
@@ -38,7 +38,8 @@ export const App: LiveComponent<AppProps> = () => (props) => {
             radius, phi, theta,
             render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>
 
-              defer(Loop)({
+              //defer(Loop)({
+              defer(Draw)({
                 device, gpuContext, colorAttachments,
                 render: () =>
 

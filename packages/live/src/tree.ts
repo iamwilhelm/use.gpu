@@ -26,15 +26,6 @@ export const prepareHostContext = <F extends Function>(node: DeferredCall<F>) =>
   return {context, host, scheduler, tracker};
 }
 
-export const prepareSubContext = <F extends Function>(
-  parent: LiveContext<any>,
-  node: DeferredCall<F>,
-): LiveContext<F> => {
-  const {host} = parent;
-  const context = makeContext(node.f, host, parent, node.args);
-  return context;
-}
-
 export const renderWithDispatch = <T>(
   dispatch: (t: Task) => T,
 ) => <F extends Function>(node: DeferredCall<F>) => {
@@ -175,4 +166,38 @@ export const updateNode = <P extends Function, F extends Function>(
 
     renderContext(prev);
   }
+}
+
+// Prepare a new context for forked rendering
+export const prepareSubContext = <F extends Function>(
+  parent: LiveContext<any>,
+  node: DeferredCall<F>,
+): LiveContext<F> => {
+  const {host} = parent;
+  const context = makeContext(node.f, host, parent, node.args);
+  return context;
+}
+
+// Use a new context for forked rendering
+export const useSubContext = <F extends Function>(
+  context: LiveContext<F>,
+  index: number
+) => <H extends Function>(
+  hook: Live<H>,
+): T => {
+  const {state, host} = context;
+  const i = index * STATE_SLOTS;
+
+  let bound = state[i];
+  let ctx = state[i + 1];
+
+  if (!bound) {
+    ctx = makeContext(f, host, context);
+    bound = hook(ctx);
+
+    state[i] = bound;
+    state[i + 1] = ctx;
+  }
+
+  return bound;
 }

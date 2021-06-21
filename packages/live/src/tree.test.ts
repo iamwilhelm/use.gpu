@@ -1,5 +1,6 @@
 import { LiveContext, Mounts, Task } from './types';
-import { defer, useState } from './live';
+import { defer } from './live';
+import { useState } from './hooks';
 import { renderSync, prepareSubContext, renderContext } from './tree';
 
 it("mounts", () => {

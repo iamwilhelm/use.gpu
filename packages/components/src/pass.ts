@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  defer, useCallback, useOne,
-  prepareSubContext, renderContext,
+  defer, fork, useCallback, useOne,
+  useSubContext, renderContext,
 } from '@use-gpu/live';
 
 export type PassProps = {
@@ -16,6 +16,8 @@ export type PassRef = {
   render: (encoder: GPURenderPassEncoder) => void,
 };
 
+const Encode = () => (ref: PassRef) => ref.render(ref.passEncoder);
+
 export const Pass: LiveComponent<PassProps> = (context) => (props) => {
   const {device, colorAttachments, depthStencilAttachment, render} = props;
 
@@ -28,12 +30,10 @@ export const Pass: LiveComponent<PassProps> = (context) => (props) => {
   const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
 
   const ref: PassRef = useOne(context, 0)(() => ({passEncoder, render}));
-  const paint = useCallback(context, 1)(() => (ref: PassRef) => ref.render(ref.passEncoder));
-
   ref.render = render;
   ref.passEncoder = passEncoder;
 
-  const subContext = useOne(context, 2)(() => prepareSubContext(context, defer(paint)(ref)));
+  const subContext = useSubContext(context, 2)(defer(Encode)(ref));
 
   renderContext(subContext);
 
@@ -42,5 +42,5 @@ export const Pass: LiveComponent<PassProps> = (context) => (props) => {
   // @ts-ignore
   device.queue.submit([commandEncoder.finish()]);
 
-  return null;
+  return fork(subContext);
 }

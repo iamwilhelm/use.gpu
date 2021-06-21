@@ -3,6 +3,6 @@ export const makeColorState = (format: GPUTextureFormat): GPUColorStateDescripto
 });
 
 export const makeColorAttachment = (loadValue: GPUColor): GPURenderPassColorAttachmentDescriptor => ({
-  attachment: null,
+  view: null,
   loadValue
 } as unknown as GPURenderPassColorAttachmentDescriptor);

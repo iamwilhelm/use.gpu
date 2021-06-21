@@ -15,5 +15,7 @@ export const main = async (): Promise<void> => {
     defer(App)({adapter, device, canvas, compileGLSL})
   );
   
-  console.log(formatTree(root))
+  // @ts-ignore
+  const log = () => console.log(formatTree(root))
+  setTimeout(() => log(), 2000);
 }

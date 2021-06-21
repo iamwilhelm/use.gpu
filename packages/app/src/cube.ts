@@ -38,6 +38,7 @@ export const Cube: LiveComponent<CubeProps> = (context) => (props) => {
         cullMode: "back",
       },
       vertex:   makeShaderStage(device, makeShader(compileGLSL(vertexShader, 'vertex')), {buffers: cube.attributes}),
+      // @ts-ignore
       fragment: makeShaderStage(device, makeShader(compileGLSL(fragmentShader, 'fragment')), {targets: colorStates}),
       depthStencil: depthStencilState,
     };
@@ -52,9 +53,7 @@ export const Cube: LiveComponent<CubeProps> = (context) => (props) => {
       layout: pipeline.getBindGroupLayout(0),
       entries,
     });
-    return [uniformBuffer, uniformPipe, uniformBindGroup] as [
-      GPUBuffer, UniformDefinition, GPUBindGroup,
-    ];
+    return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformDefinition, GPUBindGroup];
   }, [device, defs, pipeline]);
 
   uniformPipe.fill(uniforms);

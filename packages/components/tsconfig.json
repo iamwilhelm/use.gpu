@@ -7,7 +7,7 @@
     "outDir": "../../build/packages/components/src",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
   "references": [
     { "path": "../live" },
     { "path": "../core" },

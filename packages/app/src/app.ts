@@ -24,7 +24,7 @@ export const App: LiveComponent<AppProps> = () => (props) => {
   return defer(AutoCanvas)({
     canvas, device, adapter,
     render: ({
-      width, height, swapChain,
+      width, height, gpuContext,
       colorStates, colorAttachments,
       depthStencilState, depthStencilAttachment,
     }: CanvasRenderingContextGPU) =>
@@ -39,7 +39,7 @@ export const App: LiveComponent<AppProps> = () => (props) => {
             render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>
 
               defer(Loop)({
-                device, swapChain, colorAttachments,
+                device, gpuContext, colorAttachments,
                 render: () =>
 
                   defer(Pass)({

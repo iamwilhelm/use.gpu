@@ -56,13 +56,13 @@ export const renderWithDispatch = <T>(
         const top = ctxs.filter(({depth}) => depth === min);
         const uniq = top.filter((c, i) => top.indexOf(c) === i);
         for (const ctx of uniq) {
-          DEBUG && console.log('Updating Sub-Root', formatNode(ctx.call));
+          DEBUG && console.log('Updating Sub-Root', formatNode(ctx));
           if (host) host.__stats.updates++;
           renderContext(ctx, generation);
         }
       }
       else {
-        DEBUG && console.log('Updating Root', formatNode(context.call));
+        DEBUG && console.log('Updating Root', formatNode(context));
         if (host) host.__stats.updates++;
         renderContext(context, generation);
       }
@@ -91,7 +91,7 @@ export const render = renderPaint;
 export const renderContext = <F extends Function>(context: LiveContext<F>, generation?: number) => {
   if (generation !== undefined) context.generation = generation;
 
-  const out = context.bound.apply(null, context.call.args ?? NO_ARGS);
+  const out = context.bound.apply(null, context.args ?? NO_ARGS);
 
   const isArray = !!out && Array.isArray(out);
   const node  = !isArray ? out as DeferredCall<any> : null;
@@ -144,13 +144,13 @@ export const updateNode = <P extends Function, F extends Function>(
   node: DeferredCall<F> | null,
 ) => {
   const {mounts, host} = context;
-  const from = prev?.call.f;
+  const from = prev?.f;
   const to = node?.f;
 
   const replace = from && to && from !== to;
 
   if ((!to && from) || replace) if (prev) {
-    DEBUG && console.log('Unmounting', key, formatNode(prev?.call));
+    DEBUG && console.log('Unmounting', key, formatNode(prev));
     if (host) host.__stats.unmounts++;
 
     if (mounts) mounts.delete(key);
@@ -171,7 +171,7 @@ export const updateNode = <P extends Function, F extends Function>(
     if (host) host.__stats.updates++;
 
     prev.generation = context.generation;
-    prev.call.args = node?.args;
+    prev.args = node?.args;
 
     renderContext(prev);
   }

@@ -3,9 +3,9 @@ import { DeferredCall } from './types';
 const {prototype: {hasOwnProperty}} = Object;
 
 export const formatTree = (root: LiveContext<any>, prefix: string = '') => {
-  const {call, mounts} = root;
+  const {mounts} = root;
   let out = [];
-  out.push(prefix + formatNode(call));
+  out.push(prefix + formatNode(root));
   if (mounts) for (const key of mounts.keys()) {
     const sub = mounts.get(key);
     if (sub) out.push(formatTree(sub, prefix + '  '));

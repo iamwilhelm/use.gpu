@@ -24,19 +24,28 @@ export type Dispatcher = (as: Action[]) => void;
 
 // Live host interface
 export type HostInterface = {
+  // Schedule a task on next flush
   schedule: (c: LiveContext<any>, t: Task) => void,
+  // Track a future cleanup on a context
   track: (c: LiveContext<any>, t: Task) => void,
+  // Dispose of a context by running all tracked cleanups
   dispose: (c: LiveContext<any>) => void,
-  
+
   __stats: {mounts: number, unmounts: number, updates: number},
   __flush: () => void,
 };
 
-export type LiveContext<F extends Function> = {
+export type CallContext<F extends Function> = {
+  f: Live<F>,
+  args?: any[],
+};
+
+export type LiveContext<F extends Function> = CallContext<F> & {
   host?: HostInterface,
-  call: CallContext<F>,
 
   mounts?: Mounts,
+  order?: Key[],
+
   depth: number,
   generation: number,
 
@@ -45,11 +54,6 @@ export type LiveContext<F extends Function> = {
 };
 
 export type Mounts = Map<Key, LiveContext<any>>;
-
-export type CallContext<F extends Function> = {
-  f: Live<F>,
-  args?: any[],
-};
 
 export type DeferredCall<F extends Function> = CallContext<F> & {
   key?: Key,

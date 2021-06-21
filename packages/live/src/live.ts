@@ -24,6 +24,14 @@ export const defer = <F extends Function>(
   ...args: any[]
 ): DeferredCall<F> => ({f, args, key});
 
+// Fork a render to a new subtree
+export const fork = <F extends Function>(
+  f: Live<F>,
+  key?: Key,
+) => (
+  ...args: any[]
+): DeferredCall<F> => ({f, args, key});
+
 // Memoize a live function on all its arguments (shallow comparison per arg)
 export const memo = <F extends Function>(
   f: Live<F>
@@ -211,12 +219,11 @@ export const makeContext = <F extends Function>(
   parent?: LiveContext<any> | null,
   args?: any[],
 ): LiveContext<F> => {
-  const call = makeCallContext(f, args);
   const state = [] as any[];
   const depth = parent ? parent.depth + 1 : 0;
   const generation = parent ? parent.generation : 0;
 
-  const self = {state, bound: null, call, depth, generation, host} as any as LiveContext<F>;
+  const self = {state, bound: null, f, args, depth, generation, host} as any as LiveContext<F>;
   self.bound = bind(f, self);
 
   return self;

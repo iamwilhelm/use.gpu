@@ -38,7 +38,6 @@ export const App: LiveComponent<AppProps> = () => (props) => {
             radius, phi, theta,
             render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>
 
-              //defer(Loop)({
               defer(Draw)({
                 device, gpuContext, colorAttachments,
                 render: () =>

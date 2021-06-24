@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
 import {
-  defer, fork, useCallback, useOne, useResource, useSubContext, renderContext,
+  defer, detach, useCallback, useOne, useResource, useSubContext, renderContext,
 } from '@use-gpu/live';
 
 export type LoopProps = {
@@ -48,5 +48,5 @@ export const Loop: LiveComponent<LoopProps> = (context) => (props) => {
     dispose(() => running = false);
   });
 
-  return fork(subContext);
+  return detach(subContext);
 }

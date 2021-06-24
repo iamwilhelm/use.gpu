@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
 import {
-  defer, fork, useCallback, useOne, useResource, useSubContext, renderContext,
+  defer, detach, useCallback, useOne, useResource, useSubContext, renderContext,
 } from '@use-gpu/live';
 
 export type DrawProps = {
@@ -32,5 +32,5 @@ export const Draw: LiveComponent<DrawProps> = (context) => (props) => {
 
   renderContext(subContext);
 
-  return fork(subContext);
+  return detach(subContext);
 }

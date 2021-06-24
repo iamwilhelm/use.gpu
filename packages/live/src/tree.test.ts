@@ -1,5 +1,5 @@
 import { LiveContext, Mounts, Task } from './types';
-import { defer, fork, makeSubContext } from './live';
+import { defer, detach, makeSubContext } from './live';
 import { useState } from './hooks';
 import { renderSync, renderContext } from './tree';
 
@@ -47,7 +47,7 @@ it("mounts a subcontext", () => {
     subContext = makeSubContext(context, defer(Sub)());
     return () => {
       renderContext(subContext!);
-      return fork(subContext!);
+      return detach(subContext!);
     };
   }
   const Sub = () => () => defer(Node)();

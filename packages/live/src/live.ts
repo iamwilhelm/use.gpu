@@ -4,7 +4,7 @@ import {
   DeferredCall, HostInterface,
 } from './types';
 
-export const FORK_NODE = () => () => {};
+export const DETACH = () => () => {};
 
 // Prepare to call a live function with optional given context
 export const bind = <F extends Function>(f: Live<F>, context?: LiveContext<F> | null) => {
@@ -21,11 +21,11 @@ export const defer = <F extends Function>(
   ...args: any[]
 ): DeferredCall<F> => ({f, args, key});
 
-// Fork the rendering of a subtree
-export const fork = <F extends Function>(
+// Detach the rendering of a subtree
+export const detach = <F extends Function>(
   context: LiveContext<F>,
   key?: Key,
-): DeferredCall<() => void> => ({f: FORK_NODE, args: [context], key});
+): DeferredCall<() => void> => ({f: DETACH, args: [context], key});
 
 // Make a context for a live function
 export const makeContext = <F extends Function>(

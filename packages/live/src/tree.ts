@@ -1,5 +1,5 @@
 import { Key, Action, Task, LiveContext, DeferredCall } from './types';
-import { makeContext, makeSubContext, FORK_NODE } from './live';
+import { makeContext, makeSubContext, DETACH } from './live';
 import { formatNode } from './debug';
 import { makeActionScheduler, makeDisposalTracker, makePaintRequester } from './util';
 
@@ -141,8 +141,8 @@ export const updateNode = <P extends Function>(
   const to = next?.f;
   let replace = from && to && from !== to;
 
-  const isFromFork = from === FORK_NODE;
-  const isToFork   = to   === FORK_NODE;
+  const isFromFork = from === DETACH;
+  const isToFork   = to   === DETACH;
   if (isFromFork && isToFork && prev!.args![0] !== next!.args![0]) replace = true;
 
   if ((!to && from) || replace) if (prev) {

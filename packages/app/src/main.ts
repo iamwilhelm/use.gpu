@@ -1,7 +1,7 @@
 import GLSL from './glsl';
 
 import { mountGPU } from '@use-gpu/webgpu';
-import { defer, render, formatTree } from '@use-gpu/live';
+import { use, render, formatTree } from '@use-gpu/live';
 
 import { App } from './app';
 
@@ -12,7 +12,7 @@ export const main = async (): Promise<void> => {
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 
   const root = await render(
-    defer(App)({adapter, device, canvas, compileGLSL})
+    use(App)({adapter, device, canvas, compileGLSL})
   );
   
   // @ts-ignore

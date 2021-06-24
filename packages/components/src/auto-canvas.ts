@@ -4,7 +4,7 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
 
-import { defer } from '@use-gpu/live';
+import { use } from '@use-gpu/live';
 
 export type AutoCanvasProps = {
   device: GPUDevice,
@@ -19,7 +19,7 @@ export type AutoCanvasProps = {
 }
 
 export const AutoCanvas: LiveComponent<AutoCanvasProps> = () => (props) =>
-  defer(AutoSize)({
+  use(AutoSize)({
     canvas: props.canvas,
-    render: () => defer(Canvas)(props)
+    render: () => use(Canvas)(props)
   });

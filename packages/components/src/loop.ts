@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
 import {
-  defer, detach, useCallback, useOne, useResource, useSubContext, renderContext,
+  use, detach, useCallback, useOne, useResource, useSubContext, renderContext,
 } from '@use-gpu/live';
 
 export type LoopProps = {
@@ -25,7 +25,7 @@ export const Loop: LiveComponent<LoopProps> = (context) => (props) => {
   ref.update = update;
   ref.render = render;
 
-  const subContext = useSubContext(context, 2)(defer(Paint)(ref));
+  const subContext = useSubContext(context, 2)(use(Paint)(ref));
 
   useResource(context, 3)((dispose) => {
     let running = true;

@@ -2,7 +2,7 @@
   "references": [
     { "path": "./packages/components" },
     { "path": "./packages/core" },
-    { "path": "./packages/live" }
+    { "path": "./packages/live" },
     { "path": "./packages/webgpu" }
   ],
   "files": [],

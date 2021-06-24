@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { CameraUniforms, UniformAttribute } from '@use-gpu/core/types';
 
-import { defer } from '@use-gpu/live';
+import { use } from '@use-gpu/live';
 
 import {
   AutoCanvas,
@@ -21,7 +21,7 @@ export type AppProps = {
 export const App: LiveComponent<AppProps> = () => (props) => {
   const {canvas, device, adapter, compileGLSL} = props;
 
-  return defer(AutoCanvas)({
+  return use(AutoCanvas)({
     canvas, device, adapter,
     render: ({
       width, height, gpuContext,
@@ -29,24 +29,24 @@ export const App: LiveComponent<AppProps> = () => (props) => {
       depthStencilState, depthStencilAttachment,
     }: CanvasRenderingContextGPU) =>
 
-      defer(OrbitControls)({
+      use(OrbitControls)({
         canvas,
         render: (radius: number, phi: number, theta: number) =>
 
-          defer(OrbitCamera)({
+          use(OrbitCamera)({
             canvas, width, height,
             radius, phi, theta,
             render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>
 
-              defer(Draw)({
+              use(Draw)({
                 device, gpuContext, colorAttachments,
                 render: () =>
 
-                  defer(Pass)({
+                  use(Pass)({
                     device, colorAttachments, depthStencilAttachment,
                     render: (passEncoder: GPURenderPassEncoder) => [
 
-                      defer(Cube, 'cube')({device, colorStates, depthStencilState, compileGLSL, defs, uniforms, passEncoder}),
+                      use(Cube, 'cube')({device, colorStates, depthStencilState, compileGLSL, defs, uniforms, passEncoder}),
 
                     ]
                   })

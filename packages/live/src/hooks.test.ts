@@ -1,6 +1,6 @@
 import { LiveContext, LiveComponent, Live, DeferredCall } from './types';
 
-import { bind, defer } from './live';
+import { bind, use } from './live';
 import { makeHostContext } from './tree';
 import { useCallback, useMemo, useOne, useResource, useState, memoFunction } from './hooks';
 
@@ -171,7 +171,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, tracker} = makeHostContext(defer(F)());
+    const {context, tracker} = makeHostContext(use(F)());
     context.bound();
 
     expect(allocated).toBe(1);
@@ -193,7 +193,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, tracker} = makeHostContext(defer(G)());
+    const {context, tracker} = makeHostContext(use(G)());
     context.bound();
 
     expect(allocated).toBe(1);
@@ -215,7 +215,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, tracker} = makeHostContext(defer(H)());
+    const {context, tracker} = makeHostContext(use(H)());
     context.bound();
 
     expect(allocated).toBe(1);

@@ -1,14 +1,14 @@
 import { LiveContext, Mounts, Task } from './types';
-import { defer, detach, makeSubContext } from './live';
+import { use, detach, makeSubContext } from './live';
 import { useState } from './hooks';
 import { renderSync, renderContext } from './tree';
 
 it("mounts", () => {
   
-  const Root = () => () => defer(Node)();
+  const Root = () => () => use(Node)();
   const Node = () => () => {};
   
-  const result = renderSync(defer(Root)());
+  const result = renderSync(use(Root)());
   expect(result.f).toBe(Root);
   expect(result.mounts).toBeTruthy();
   if (result.mounts) {
@@ -21,13 +21,13 @@ it("mounts", () => {
 it("mounts multiple", () => {
   
   const Root = () => () => [
-    defer(Node, '1')(),
-    defer(Node, '2')(),
+    use(Node, '1')(),
+    use(Node, '2')(),
   ];
   
   const Node = () => () => {};
   
-  const result = renderSync(defer(Root)());
+  const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
   expect(result.mounts).toBeTruthy();
   if (!result.host) return;
@@ -44,16 +44,16 @@ it("mounts a subcontext", () => {
 
   let subContext: LiveContext<any> | null = null;
   const Root = (context: LiveContext<any>) => {
-    subContext = makeSubContext(context, defer(Sub)());
+    subContext = makeSubContext(context, use(Sub)());
     return () => {
       renderContext(subContext!);
       return detach(subContext!);
     };
   }
-  const Sub = () => () => defer(Node)();
+  const Sub = () => () => use(Node)();
   const Node = () => () => {};
   
-  const result = renderSync(defer(Root)());
+  const result = renderSync(use(Root)());
   expect(result.f).toBe(Root);
 
   expect(result.mounts!.size).toBe(1);
@@ -85,14 +85,14 @@ it("reacts on the root (setter)", () => {
     const [, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue(1));
 
-    return defer(Node)();
+    return use(Node)();
   };
   
   const Node = () => () => {
     rendered.node++;
   };
 
-  const result = renderSync(defer(Root)());
+  const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
   expect(result.mounts).toBeTruthy();
   if (!result.host) return;
@@ -134,14 +134,14 @@ it("reacts on the root (reducer)", () => {
     const [, setValue] = useState(context, 0)(0);
     setTrigger(() => setValue((s: number) => s + 1));
 
-    return defer(Node)();
+    return use(Node)();
   };
   
   const Node = () => () => {
     rendered.node++;
   };
 
-  const result = renderSync(defer(Root)());
+  const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
   expect(result.mounts).toBeTruthy();
   if (!result.host) return;
@@ -183,9 +183,9 @@ it("reacts and remounts on the root", () => {
 
     rendered.root++;
     return [
-      defer(Node, '1')(),
-      defer(Node, '2')(),
-      defer(Node, '3' + rendered.root)(),
+      use(Node, '1')(),
+      use(Node, '2')(),
+      use(Node, '3' + rendered.root)(),
     ];
   };
 
@@ -193,7 +193,7 @@ it("reacts and remounts on the root", () => {
     rendered.node++;
   };
 
-  const result = renderSync(defer(Root)());
+  const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
   if (!result.host) return;
 
@@ -257,7 +257,7 @@ it("reacts and remounts a sub tree", () => {
   const Root = () => () => {
     rendered.root++;
     return [
-      defer(SubRoot, 'subroot')(),
+      use(SubRoot, 'subroot')(),
     ];
   };
 
@@ -267,9 +267,9 @@ it("reacts and remounts a sub tree", () => {
 
     rendered.subroot++;
     return [
-      defer(Node, '1')(),
-      defer(Node, '2')(),
-      defer(Node, '3' + rendered.subroot)(),
+      use(Node, '1')(),
+      use(Node, '2')(),
+      use(Node, '3' + rendered.subroot)(),
     ];
   };
 
@@ -278,7 +278,7 @@ it("reacts and remounts a sub tree", () => {
     return;
   };
 
-  const result = renderSync(defer(Root)());
+  const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
   expect(result.mounts).toBeTruthy();
   if (!result.host) return;

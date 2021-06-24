@@ -13,8 +13,8 @@ export const bind = <F extends Function>(f: Live<F>, context?: LiveContext<F> | 
   return bound;
 };
 
-// Defer a call to a live function
-export const defer = <F extends Function>(
+// use a call to a live function
+export const use = <F extends Function>(
   f: Live<F>,
   key?: Key,
 ) => (

@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  defer, fork, useCallback, useOne,
+  use, fork, useCallback, useOne,
   useSubContext, renderContext,
 } from '@use-gpu/live';
 
@@ -33,7 +33,7 @@ export const Pass: LiveComponent<PassProps> = (context) => (props) => {
   ref.render = render;
   ref.passEncoder = passEncoder;
 
-  const subContext = useSubContext(context, 2)(defer(Encode)(ref));
+  const subContext = useSubContext(context, 2)(use(Encode)(ref));
 
   renderContext(subContext);
 

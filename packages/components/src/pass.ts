@@ -1,7 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  use, fork, useCallback, useOne,
-  useSubContext, renderContext,
+  use, detach, mapReduce, useCallback, useOne, renderFiber,
 } from '@use-gpu/live';
 
 export type PassProps = {
@@ -11,15 +10,10 @@ export type PassProps = {
   render: (encoder: GPURenderPassEncoder) => void,
 };
 
-export type PassRef = {
-  passEncoder: GPURenderPassEncoder,
-  render: (encoder: GPURenderPassEncoder) => void,
-};
+export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
-const Encode = () => (ref: PassRef) => ref.render(ref.passEncoder);
-
-export const Pass: LiveComponent<PassProps> = (context) => (props) => {
-  const {device, colorAttachments, depthStencilAttachment, render} = props;
+export const Pass: LiveComponent<PassProps> = (fiber) => (props) => {
+  const {device, colorAttachments, depthStencilAttachment, children, render} = props;
 
   const renderPassDescriptor: GPURenderPassDescriptor = {
     colorAttachments,
@@ -29,18 +23,15 @@ export const Pass: LiveComponent<PassProps> = (context) => (props) => {
   const commandEncoder = device.createCommandEncoder();
   const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
 
-  const ref: PassRef = useOne(context, 0)(() => ({passEncoder, render}));
-  ref.render = render;
-  ref.passEncoder = passEncoder;
-
-  const subContext = useSubContext(context, 2)(use(Encode)(ref));
-
-  renderContext(subContext);
-
-  passEncoder.endPass();
-
-  // @ts-ignore
-  device.queue.submit([commandEncoder.finish()]);
-
-  return fork(subContext);
+  return mapReduce(
+    children ?? render(),
+    (t: RenderToPass) => [t],
+    (a: RenderToPass[], b: RenderToPass[]) => [...a, ...b],
+    (rs: RenderToPass[]) => {
+      for (let r of rs) r(passEncoder);
+      passEncoder.endPass(),
+      // @ts-ignore
+      device.queue.submit([commandEncoder.finish()]);
+    },
+  );
 }

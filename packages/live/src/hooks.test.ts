@@ -1,8 +1,8 @@
-import { LiveContext, LiveComponent, Live, DeferredCall } from './types';
+import { LiveFiber, LiveComponent, Live, DeferredCall } from './types';
 
 import { bind, use } from './live';
-import { makeHostContext } from './tree';
-import { useCallback, useMemo, useOne, useResource, useState, memoFunction } from './hooks';
+import { makeHostFiber } from './tree';
+import { useCallback, useMemo, useOne, useResource, useState, memoArgs, memoProps } from './hooks';
 
 type NullReturner = () => null;
 type NumberReturner = () => number;
@@ -10,9 +10,16 @@ type FunctionReturner = () => () => any;
 
 it('memoizes a function', () => {
 
-  const F: Live<NumberReturner> = memoFunction(() => (): number => {
+  const F: Live<NumberReturner> = memoArgs(() => (): number => {
     return Math.random();
   });
+
+  {
+    const result1 = bind(F)();
+    const result2 = bind(F)();
+
+    expect(result1).not.toBe(result2);
+  }
 
   {
     const bound = bind(F);
@@ -23,10 +30,33 @@ it('memoizes a function', () => {
   }
 })
 
+it('memoizes a component', () => {
+
+  const F: Live<NumberReturner> = memoProps(() => (props): number => {
+    return Math.random();
+  });
+
+  {
+    const bound = bind(F);
+    const result1 = bound({foo: 1, bar: 1});
+    const result2 = bound({foo: 1, bar: 2});
+
+    expect(result1).not.toBe(result2);
+  }
+
+  {
+    const bound = bind(F);
+    const result1 = bound({foo: 1, bar: 1});
+    const result2 = bound({foo: 1, bar: 1});
+
+    expect(result1).toBe(result2);
+  }
+})
+
 it('holds state (hook)', () => {
 
-  const F: Live<NumberReturner> = (context: LiveContext<NumberReturner>) => (): number => {
-    const [foo] = useState(context, 0)(() => Math.random());
+  const F: Live<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
+    const [foo] = useState(fiber)(() => Math.random());
     return foo;
   };
 
@@ -50,9 +80,9 @@ it('holds memoized value (hook)', () => {
 
   const dep = 'static';
 
-  const F: Live<NumberReturner> = (context: LiveContext<NumberReturner>) => (): number => {
+  const F: Live<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
 
-    const foo = useMemo(context, 0)(() => Math.random(), [dep]);
+    const foo = useMemo(fiber)(() => Math.random(), [dep]);
 
     return foo;
   };
@@ -77,9 +107,9 @@ it('holds memoized value with one dep (hook)', () => {
 
   const dep = 'static';
 
-  const F: Live<NumberReturner> = (context: LiveContext<NumberReturner>) => (): number => {
+  const F: Live<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
 
-    const foo = useOne(context, 0)(() => Math.random(), dep);
+    const foo = useOne(fiber)(() => Math.random(), dep);
 
     return foo;
   };
@@ -104,10 +134,10 @@ it('holds memoized callback (hook)', () => {
 
   const dep = 'static';
 
-  const F: Live<FunctionReturner> = (context: LiveContext<FunctionReturner>) => (): () => number => {
+  const F: Live<FunctionReturner> = (fiber: LiveFiber<FunctionReturner>) => (): () => number => {
 
     const x = Math.random();
-    const foo = useCallback(context, 0)(() => x, [dep]);
+    const foo = useCallback(fiber)(() => x, [dep]);
 
     return foo;
   };
@@ -134,9 +164,9 @@ it('manages a dependent resource (hook)', () => {
   let allocated: number;
   let disposed: number;
 
-  const F: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
+  const F: Live<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
-    useResource(context, 0)((dispose) => {
+    useResource(fiber)((dispose) => {
       allocated++;
       dispose(() => { disposed++ });
     }, [dep]);
@@ -144,10 +174,10 @@ it('manages a dependent resource (hook)', () => {
     return null;
   };
 
-  const G: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
+  const G: Live<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
-    useResource(context, 0)((dispose) => {
+    useResource(fiber)((dispose) => {
       allocated++;
       dispose(() => { disposed++ });
     }, [x]);
@@ -155,10 +185,10 @@ it('manages a dependent resource (hook)', () => {
     return null;
   };
 
-  const H: Live<NullReturner> = (context: LiveContext<NullReturner>): NullReturner => () => {
+  const H: Live<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
-    useResource(context, 0)((dispose) => {
+    useResource(fiber)((dispose) => {
       allocated++;
       dispose(() => { disposed++ });
       return allocated;
@@ -171,18 +201,18 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, tracker} = makeHostContext(use(F)());
-    context.bound();
+    const {fiber, tracker} = makeHostFiber(use(F)());
+    fiber.bound();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    context.bound();
+    fiber.bound();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    tracker.dispose(context);
+    tracker.dispose(fiber);
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(1);
@@ -193,18 +223,18 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, tracker} = makeHostContext(use(G)());
-    context.bound();
+    const {fiber, tracker} = makeHostFiber(use(G)());
+    fiber.bound();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    context.bound();
+    fiber.bound();
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(1);
 
-    tracker.dispose(context);
+    tracker.dispose(fiber);
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(2);
@@ -215,18 +245,18 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {context, tracker} = makeHostContext(use(H)());
-    context.bound();
+    const {fiber, tracker} = makeHostFiber(use(H)());
+    fiber.bound();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    context.bound();
+    fiber.bound();
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(1);
 
-    tracker.dispose(context);
+    tracker.dispose(fiber);
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(2);

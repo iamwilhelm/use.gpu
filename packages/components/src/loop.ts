@@ -7,46 +7,48 @@ import {
 export type LoopProps = {
   gpuContext: GPUPresentationContext,
   colorAttachments: GPURenderPassColorAttachmentDescriptor[],
-  update: () => void,
-  render: () => LiveElement<any>,
+  children?: LiveElement<any>,
+  update?: () => void,
+  render?: () => LiveElement<any>,
 };
 
 export type LoopRef = {
-  update: () => void,
-  render: () => LiveElement<any>,
+  children?: LiveElement<any>,
+  update?: () => void,
+  render?: () => LiveElement<any>,
 };
 
-const Paint = () => (ref: LoopRef) => ref.render();
+const Paint = () => (ref: LoopRef) => ref.children ?? ref.render();
 
-export const Loop: LiveComponent<LoopProps> = (context) => (props) => {
-  const {gpuContext, colorAttachments, update, render} = props;
+export const Loop: LiveComponent<LoopProps> = (fiber) => (props) => {
+  const {gpuContext, colorAttachments, children, update, render} = props;
 
-  const ref: LoopRef = useOne(context, 0)(() => ({update, render}));
+  const ref: LoopRef = useOne(fiber)(() => ({children, update, render}));
+  ref.children = children;
   ref.update = update;
   ref.render = render;
 
-  const subContext = useSubContext(context, 2)(use(Paint)(ref));
+  const fork = useOne(fiber)(() => use(Paint)(ref));
+  return detach(fork, (detached: LiveFiber<any>) => {
+    useResource(fiber)((dispose) => {
+      let running = true;
 
-  useResource(context, 3)((dispose) => {
-    let running = true;
+      const loop = () => {
+        if (ref.update) ref.update();
 
-    const loop = () => {
-      if (ref.update) ref.update();
+        // @ts-ignore
+        colorAttachments[0].view = gpuContext
+        // @ts-ignore
+          .getCurrentTexture()
+          .createView();
 
-      // @ts-ignore
-      colorAttachments[0].view = gpuContext
-      // @ts-ignore
-        .getCurrentTexture()
-        .createView();
+        renderFiber(detached);
 
-      renderContext(subContext);
+        if (running) requestAnimationFrame(loop);
+      }
 
-      if (running) requestAnimationFrame(loop);
-    }
-
-    requestAnimationFrame(loop);
-    dispose(() => running = false);
+      requestAnimationFrame(loop);
+      dispose(() => running = false);
+    });
   });
-
-  return detach(subContext);
 }

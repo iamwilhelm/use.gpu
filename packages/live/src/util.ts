@@ -1,4 +1,4 @@
-import { LiveContext, Task, Action, Dispatcher } from './types';
+import { LiveFiber, Task, Action, Dispatcher } from './types';
 
 export const makeActionScheduler = () => {
   const queue = [] as Action[];
@@ -8,14 +8,14 @@ export const makeActionScheduler = () => {
 
   const bind = (f: Dispatcher) => onUpdate = f;
 
-  const schedule = (context: LiveContext<any>, task: Task) => {
-    queue.push({context, task});
+  const schedule = (fiber: LiveFiber<any>, task: Task) => {
+    queue.push({fiber, task});
     if (!timer) timer = setTimeout(flush, 0);
   };
 
   const flush = () => {
     timer = null;
-    queue.sort((a: Action, b: Action) => a.context.depth - b.context.depth);
+    queue.sort((a: Action, b: Action) => a.fiber.depth - b.fiber.depth);
     for (const {task} of queue) task();
     if (onUpdate) {
       const q = queue.slice();
@@ -29,18 +29,18 @@ export const makeActionScheduler = () => {
 }
 
 export const makeDisposalTracker = () => {
-  const disposal = new WeakMap<LiveContext<any>, Task[]>();
+  const disposal = new WeakMap<LiveFiber<any>, Task[]>();
 
-  const track = (context: LiveContext<any>, t: Task) => {
-    let list = disposal.get(context);
-    if (!list) disposal.set(context, list = []);
+  const track = (fiber: LiveFiber<any>, t: Task) => {
+    let list = disposal.get(fiber);
+    if (!list) disposal.set(fiber, list = []);
     list.push(t);
   }
 
-  const dispose = (context: LiveContext<any>) => {
-    const tasks = disposal.get(context);
+  const dispose = (fiber: LiveFiber<any>) => {
+    const tasks = disposal.get(fiber);
     if (tasks) {
-      disposal.delete(context);
+      disposal.delete(fiber);
       for (const task of tasks) task();
     }
   }
@@ -48,7 +48,7 @@ export const makeDisposalTracker = () => {
   return {track, dispose};
 }
 
-export const makePaintRequester = () => {
+export const makePaintRequester = (raf: any = requestAnimationFrame) => {
   let pending = false;
   const queue: Task[] = [];
 
@@ -63,7 +63,7 @@ export const makePaintRequester = () => {
   return (t: Task) => {
     if (!pending) {
       pending = true;
-      requestAnimationFrame(flush);
+      raf(flush);
     }
     queue.push(t);
   }

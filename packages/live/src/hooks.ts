@@ -1,15 +1,26 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  Live, LiveContext, CallContext,
+  Live, LiveFiber,
   DeferredCall, HostInterface,
 } from './types';
 
-import { bind, makeContext, makeSubContext } from './live';
+import { bind } from './live';
+import { makeFiber, makeSubFiber } from './fiber';
 
 export const NOP = () => {};
 export const NO_DEPS = [] as any[];
 export const NO_RESOURCE = {tag: null, value: null};
 export const STATE_SLOTS = 2;
+
+export const reserveState = (slots: number) => slots * STATE_SLOTS;
+export const pushState = <F>(fiber: LiveFiber<F>) => {
+  if (!fiber.state) fiber.state = [];
+
+  const i = fiber.pointer;
+  fiber.pointer += STATE_SLOTS;
+
+  return i;
+}
 
 // Compares dependency arrays
 export const isSameDependencies = (
@@ -31,28 +42,25 @@ export const isSameDependencies = (
 }
 
 // Memoize a live function on all its arguments (shallow comparison per arg)
-export const memoFunction = <F extends Function>(
+export const memoArgs = <F extends Function>(
   f: Live<F>
 ) => (
-  context: LiveContext<F>
+  fiber: LiveFiber<F>
 ) => {
-  const subContext = makeContext(f, null, context);
-  const bound = bind(f, context);
+  const bound = bind(f, fiber, reserveState(1));
   return (...args: any[]) => {
-    const value = useMemo(subContext, 0)(() => bound(args), args);
+    const value = useMemo(fiber)(() => bound(args), args);
     return value;
   };
 };
 
-// Memoize a live component on its props (shallow comparison per arg)
-export const memoComponent = <F extends Function>(
+// Memoize a live function with 1 argument on its object props (shallow comparison per arg)
+export const memoProps = <F extends Function>(
   f: Live<F>
 ) => (
-  context: LiveContext<F>
+  fiber: LiveFiber<F>
 ) => {
-  const subContext = makeContext(f, null, context);
-  const bound = bind(f, context);
-
+  const bound = bind(f, fiber, reserveState(1));
   return (props: Record<string, any>) => {
     const args = [] as any[];
     for (let k in props) {
@@ -60,20 +68,20 @@ export const memoComponent = <F extends Function>(
       args.push(props[k]);
     }
 
-    const value = useMemo(subContext, 0)(() => bound(props), args);
+    const value = useMemo(fiber)(() => bound(props), args);
     return value;
   };
 };
 
 // Allocate state value and a setter for it, initializing with the given value or function
-export const useState = <S, F extends Function = any>(context: LiveContext<F>, index: number) => <T = S>(
+export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T = S>(
   initialState: Initial<T>,
 ): [
   T,
   Setter<T>,
 ] => {
-  const {state, host} = context;
-  const i = index * STATE_SLOTS;
+  const i = pushState(fiber);
+  let {state, host} = fiber;
 
   let value    = state[i];
   let setValue = state[i + 1];
@@ -81,7 +89,7 @@ export const useState = <S, F extends Function = any>(context: LiveContext<F>, i
   if (value === undefined) {
     value = (initialState instanceof Function) ? initialState() : initialState;
     setValue = host
-      ? (value: Reducer<T>) => host.schedule(context, () => {
+      ? (value: Reducer<T>) => host.schedule(fiber, () => {
           if (value instanceof Function) state[i] = value(state[i]);
           else state[i] = value;
         })
@@ -95,12 +103,12 @@ export const useState = <S, F extends Function = any>(context: LiveContext<F>, i
 }
 
 // Memoize a value with given dependencies
-export const useMemo = <S, F extends Function = any>(context: LiveContext<F>, index: number) => <T = S>(
+export const useMemo = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T = S>(
   initialState: () => T,
   dependencies: any[] = NO_DEPS,
 ): T => {
-  const {state} = context;
-  const i = index * STATE_SLOTS;
+  const i = pushState(fiber);
+  let {state, host} = fiber;
 
   let value = state[i];
   const deps = state[i + 1];
@@ -116,12 +124,12 @@ export const useMemo = <S, F extends Function = any>(context: LiveContext<F>, in
 }
 
 // Memoize a value with one dependency
-export const useOne = <S, F extends Function = any>(context: LiveContext<F>, index: number) => <T = S>(
+export const useOne = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T = S>(
   initialState: () => T,
   dependency: any = null,
 ): T => {
-  const {state} = context;
-  const i = index * STATE_SLOTS;
+  const i = pushState(fiber);
+  let {state, host} = fiber;
 
   let value = state[i];
   const dep = state[i + 1];
@@ -137,12 +145,12 @@ export const useOne = <S, F extends Function = any>(context: LiveContext<F>, ind
 }
 
 // Memoize a function with given dependencies
-export const useCallback = <F extends Function>(context: LiveContext<F>, index: number) => <T extends Function>(
+export const useCallback = <F extends Function>(fiber: LiveFiber<F>) => <T extends Function>(
   initialValue: T,
   dependencies: any[] = NO_DEPS,
 ): T => {
-  const {state} = context;
-  const i = index * STATE_SLOTS;
+  const i = pushState(fiber);
+  let {state, host} = fiber;
 
   let value = state[i];
   const deps = state[i + 1];
@@ -159,14 +167,13 @@ export const useCallback = <F extends Function>(context: LiveContext<F>, index: 
 
 // Bind immediately to a resource, with auto-cleanup on dep change or unmount
 export const useResource = <F extends Function>(
-  context: LiveContext<F>,
-  index: number
+  fiber: LiveFiber<F>,
 ) => <R>(
   callback: (dispose: (f: Function) => void) => R,
   dependencies: any[] = NO_DEPS,
 ): R => {
-  const {state, host} = context;
-  const i = index * STATE_SLOTS;
+  const i = pushState(fiber);
+  let {state, host} = fiber;
 
   let {tag} = state[i] || NO_RESOURCE;
   const deps = state[i + 1];
@@ -177,7 +184,7 @@ export const useResource = <F extends Function>(
       tag = makeResourceTag();
       state[i] = {tag, value: null};
 
-      if (host) host.track(context, tag);
+      if (host) host.track(fiber, tag);
     }
     else {
       tag(null);
@@ -194,25 +201,24 @@ export const useResource = <F extends Function>(
   return (undefined as unknown as R);
 }
 
-// Use a new context for forked rendering
-export const useSubContext = <F extends Function>(
-  context: LiveContext<F>,
-  index: number
+// Use a new fiber for forked rendering
+export const useSubFiber = <F extends Function>(
+  fiber: LiveFiber<F>,
 ) => <T extends Function>(
   node: DeferredCall<T>
-): LiveContext<T> => {
-  const {state, host} = context;
-  const i = index * STATE_SLOTS;
+): LiveFiber<T> => {
+  const i = pushState(fiber);
+  let {state, host} = fiber;
 
-  let ctx = state[i];
+  let sub = state[i];
 
-  if (!ctx || ctx.f !== node.f) {
-    ctx = makeSubContext(context, node);
+  if (!sub || sub.f !== node.f) {
+    sub = makeSubFiber(fiber, node);
 
-    state[i] = ctx;
+    state[i] = sub;
   }
   else {
-    ctx.args = node.args;
+    sub.args = node.args;
   }
 
   return ctx;
@@ -228,29 +234,3 @@ export const makeResourceTag = () => {
     cleanup = f;
   }
 }
-
-// Reserve a new context for a hook
-/*
-export const useHook = <F extends Function>(
-  context: LiveContext<F>,
-  index: number
-) => <H extends Function>(
-  hook: Live<H>,
-): T => {
-  const {state, host} = context;
-  const i = index * STATE_SLOTS;
-
-  let bound = state[i];
-  let ctx = state[i + 1];
-
-  if (!bound) {
-    ctx = makeContext(f, host, context);
-    bound = hook(ctx);
-
-    state[i] = bound;
-    state[i + 1] = ctx;
-  }
-
-  return bound;
-}
-*/

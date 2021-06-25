@@ -1,7 +1,7 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { LiveFiber, LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
 import {
-  use, detach, useCallback, useOne, useResource, useSubContext, renderContext,
+  use, detach, useCallback, useOne, renderFiber,
 } from '@use-gpu/live';
 
 export type DrawProps = {
@@ -14,15 +14,8 @@ export type DrawRef = {
   render: () => LiveElement<any>,
 };
 
-const Paint = () => (ref: DrawRef) => ref.render();
-
-export const Draw: LiveComponent<DrawProps> = (context) => (props) => {
-  const {gpuContext, colorAttachments, render} = props;
-
-  const ref: DrawRef = useOne(context, 0)(() => ({render}));
-  ref.render = render;
-
-  const subContext = useSubContext(context, 1)(use(Paint)(ref));
+export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
+  const {gpuContext, colorAttachments, children} = props;
 
   // @ts-ignore
   colorAttachments[0].view = gpuContext
@@ -30,7 +23,5 @@ export const Draw: LiveComponent<DrawProps> = (context) => (props) => {
     .getCurrentTexture()
     .createView();
 
-  renderContext(subContext);
-
-  return detach(subContext);
+  return children;
 }

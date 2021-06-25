@@ -11,6 +11,8 @@ export const main = async (): Promise<void> => {
   const compileGLSL = await GLSL();
   const {adapter, device, canvas} = await mountGPU(ROOT_SELECTOR);
 
+  debugger;
+
   const root = await render(
     use(App)({adapter, device, canvas, compileGLSL})
   );

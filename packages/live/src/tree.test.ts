@@ -1,7 +1,8 @@
-import { LiveContext, Mounts, Task } from './types';
-import { use, detach, makeSubContext } from './live';
+import { LiveFiber, Mounts, Task } from './types';
+import { use, detach, RECONCILE } from './live';
+import { renderFiber, makeSubFiber } from './fiber';
 import { useState } from './hooks';
-import { renderSync, renderContext } from './tree';
+import { renderSync } from './tree';
 
 it("mounts", () => {
   
@@ -9,13 +10,16 @@ it("mounts", () => {
   const Node = () => () => {};
   
   const result = renderSync(use(Root)());
+
+  expect(result.host).toBeTruthy();
+  if (!result.host) return;
+
   expect(result.f).toBe(Root);
-  expect(result.mounts).toBeTruthy();
-  if (result.mounts) {
-    const node = result.mounts.get(0);
-    expect(node && node.f).toBe(Node);
-  }
-  
+  expect(result.mount).toBeTruthy();
+  if (!result.mount) return;
+
+  const node = result.mount;
+  expect(node && node.f).toBe(Node);
 });
 
 it("mounts multiple", () => {
@@ -28,44 +32,39 @@ it("mounts multiple", () => {
   const Node = () => () => {};
   
   const result = renderSync(use(Root)());
-  expect(result.host).toBeTruthy();
+  expect(result.f).toBe(Root);
   expect(result.mounts).toBeTruthy();
-  if (!result.host) return;
   if (!result.mounts) return;
 
-  expect(result.f).toBe(Root);
   const node1 = result.mounts.get('1');
   const node2 = result.mounts.get('2');
   expect(node1 && node1.f).toBe(Node);
   expect(node2 && node2.f).toBe(Node);
 });
 
-it("mounts a subcontext", () => {
+it("mounts a subfiber", () => {
 
-  let subContext: LiveContext<any> | null = null;
-  const Root = (context: LiveContext<any>) => {
-    subContext = makeSubContext(context, use(Sub)());
-    return () => {
-      renderContext(subContext!);
-      return detach(subContext!);
-    };
-  }
+  let captureSubFiber: LiveFiber<any> | null = null;
+
+  const Root = (fiber: LiveFiber<any>) => () =>
+    detach(use(Sub)(), (mount: LiveFiber<any>) => {
+      captureSubFiber = mount;
+      renderFiber(mount);
+    });
+
   const Sub = () => () => use(Node)();
   const Node = () => () => {};
   
   const result = renderSync(use(Root)());
   expect(result.f).toBe(Root);
 
-  expect(result.mounts!.size).toBe(1);
-  expect(result.mounts!.get(0)!.mounts!.size).toBe(1);
+  expect(result.mount).toBeTruthy();
+  expect(result.mount.mount).toBeTruthy();
 
-  expect(subContext).toBeTruthy();
-  if (subContext != null) {
-    const {mounts} = subContext;
-    if (mounts) {
-      const node = (mounts as Mounts).get(0);
-      expect(node && node.f).toBe(Node);
-    }
+  expect(captureSubFiber).toBeTruthy();
+  if (captureSubFiber != null) {
+    const {mount} = captureSubFiber;
+    expect(mount && mount.f).toBe(Node);
   }
   
 });
@@ -79,10 +78,10 @@ it("reacts on the root (setter)", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (context: LiveContext<any>) => () => {
+  const Root = (fiber: LiveFiber<any>) => () => {
     rendered.root++;
 
-    const [, setValue] = useState(context, 0)(0);
+    const [, setValue] = useState(fiber, 0)(0);
     setTrigger(() => setValue(1));
 
     return use(Node)();
@@ -94,14 +93,14 @@ it("reacts on the root (setter)", () => {
 
   const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
-  expect(result.mounts).toBeTruthy();
+  expect(result.mount).toBeTruthy();
   if (!result.host) return;
-  if (!result.mounts) return;
+  if (!result.mount) return;
 
   const {host: {__flush: flush}} = result;
 
   expect(result.f).toBe(Root);
-  const node1 = result.mounts.get(0);
+  const node1 = result.mount;
   expect(node1 && node1.f).toBe(Node);
 
   expect(rendered.root).toBe(1);
@@ -111,7 +110,7 @@ it("reacts on the root (setter)", () => {
   if (flush) flush();
 
   expect(result.f).toBe(Root);
-  const node2 = result.mounts.get(0);
+  const node2 = result.mount;
   expect(node2 && node2.f).toBe(Node);
 
   expect(rendered.root).toBe(2);
@@ -128,10 +127,10 @@ it("reacts on the root (reducer)", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (context: LiveContext<any>) => () => {
+  const Root = (fiber: LiveFiber<any>) => () => {
     rendered.root++;
 
-    const [, setValue] = useState(context, 0)(0);
+    const [, setValue] = useState(fiber, 0)(0);
     setTrigger(() => setValue((s: number) => s + 1));
 
     return use(Node)();
@@ -143,14 +142,14 @@ it("reacts on the root (reducer)", () => {
 
   const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
-  expect(result.mounts).toBeTruthy();
+  expect(result.mount).toBeTruthy();
   if (!result.host) return;
-  if (!result.mounts) return;
+  if (!result.mount) return;
 
   const {host: {__flush: flush}} = result;
 
   expect(result.f).toBe(Root);
-  const node1 = result.mounts.get(0);
+  const node1 = result.mount;
   expect(node1 && node1.f).toBe(Node);
 
   expect(rendered.root).toBe(1);
@@ -160,7 +159,7 @@ it("reacts on the root (reducer)", () => {
   if (flush) flush();
 
   expect(result.f).toBe(Root);
-  const node2 = result.mounts.get(0);
+  const node2 = result.mount;
   expect(node2 && node2.f).toBe(Node);
 
   expect(rendered.root).toBe(2);
@@ -177,8 +176,8 @@ it("reacts and remounts on the root", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (context: LiveContext<any>) => () => {
-    const [, setValue] = useState(context, 0)(0);
+  const Root = (fiber: LiveFiber<any>) => () => {
+    const [, setValue] = useState(fiber, 0)(0);
     setTrigger(() => setValue(1));
 
     rendered.root++;
@@ -261,8 +260,8 @@ it("reacts and remounts a sub tree", () => {
     ];
   };
 
-  const SubRoot = (context: LiveContext<any>) => () => {
-    const [, setValue] = useState(context, 0)(0);
+  const SubRoot = (fiber: LiveFiber<any>) => () => {
+    const [, setValue] = useState(fiber, 0)(0);
     setTrigger(() => setValue(1));
 
     rendered.subroot++;

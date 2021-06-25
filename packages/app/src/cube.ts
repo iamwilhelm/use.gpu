@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { CameraUniforms, UniformDefinition, UniformAttribute } from '@use-gpu/core/types';
 
-import { useMemo, useOne } from '@use-gpu/live';
+import { yield, useMemo, useOne } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
   makeUniforms, makeUniformBindings,
@@ -17,20 +17,19 @@ export type CubeProps = {
   device: GPUDevice,
   colorStates: GPUColorStateDescriptor,
   depthStencilState: GPUDepthStencilStateDescriptor,
-  passEncoder: GPURenderPassEncoder,
   defs: UniformAttribute[]
   uniforms: CameraUniforms,
   compileGLSL: (s: string, t: string) => any,
 };
 
-export const Cube: LiveComponent<CubeProps> = (context) => (props) => {
+export const Cube: LiveComponent<CubeProps> = (fiber) => (props) => {
   const {device, colorStates, depthStencilState, passEncoder, defs, uniforms, compileGLSL} = props;
 
-  const cube = useOne(context, 0)(makeCube);
-  const vertexBuffers = useMemo(context, 1)(() =>
+  const cube = useOne(fiber)(makeCube);
+  const vertexBuffers = useMemo(fiber)(() =>
     makeVertexBuffers(device, cube.vertices), [device]);
 
-  const pipeline = useMemo(context, 2)(() => {
+  const pipeline = useMemo(fiber)(() => {
     const pipelineDesc: GPURenderPipelineDescriptor = {
       // @ts-ignore
       primitive: {
@@ -45,7 +44,7 @@ export const Cube: LiveComponent<CubeProps> = (context) => (props) => {
     return device.createRenderPipeline(pipelineDesc);
   }, [device, colorStates, depthStencilState]);
 
-  const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(context, 3)(() => {
+  const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(fiber)(() => {
     const uniformPipe = makeUniforms(defs);
     const uniformBuffer = makeUniformBuffer(device, uniformPipe.data);
     const entries = makeUniformBindings([{resource: {buffer: uniformBuffer}}]);
@@ -56,13 +55,13 @@ export const Cube: LiveComponent<CubeProps> = (context) => (props) => {
     return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformDefinition, GPUBindGroup];
   }, [device, defs, pipeline]);
 
-  uniformPipe.fill(uniforms);
-  uploadBuffer(device, uniformBuffer, uniformPipe.data);
+  return yield((passEncoder: GPURenderPassEncoder) => {
+    uniformPipe.fill(uniforms);
+    uploadBuffer(device, uniformBuffer, uniformPipe.data);
 
-  passEncoder.setPipeline(pipeline);
-  passEncoder.setBindGroup(0, uniformBindGroup);
-  passEncoder.setVertexBuffer(0, vertexBuffers[0]);
-  passEncoder.draw(cube.count, 1, 0, 0);
-  
-  return null;
+    passEncoder.setPipeline(pipeline);
+    passEncoder.setBindGroup(0, uniformBindGroup);
+    passEncoder.setVertexBuffer(0, vertexBuffers[0]);
+    passEncoder.draw(cube.count, 1, 0, 0);
+  });
 }

@@ -40,16 +40,16 @@ export const App: LiveComponent<AppProps> = () => (props) => {
 
               use(Draw)({
                 device, gpuContext, colorAttachments,
-                render: () =>
-
+                children: [
                   use(Pass)({
                     device, colorAttachments, depthStencilAttachment,
-                    render: (passEncoder: GPURenderPassEncoder) => [
+                    children: [
 
-                      use(Cube, 'cube')({device, colorStates, depthStencilState, compileGLSL, defs, uniforms, passEncoder}),
+                      use(Cube, 'cube')({device, colorStates, depthStencilState, compileGLSL, defs, uniforms}),
 
                     ]
                   })
+                ],
               })
           })
       })

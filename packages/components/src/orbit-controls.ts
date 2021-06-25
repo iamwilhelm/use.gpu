@@ -17,7 +17,7 @@ export type OrbitControlsProps = {
   render: (phi: number, theta: number, radius: number) => LiveElement<any>,
 };
 
-export const OrbitControls: LiveComponent<OrbitControlsProps> = (context) => (props) => {
+export const OrbitControls: LiveComponent<OrbitControlsProps> = (fiber) => (props) => {
   const {
     bearingSpeed = DEFAULT_OPTIONS.bearingSpeed,
     pitchSpeed   = DEFAULT_OPTIONS.pitchSpeed, 
@@ -26,11 +26,11 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (context) => (pr
   } = props;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [radius, setRadius]   = useState<number>(context, 0)(5);
-  const [bearing, setBearing] = useState<number>(context, 1)(0.6);
-  const [pitch, setPitch]     = useState<number>(context, 2)(0.4);
+  const [radius, setRadius]   = useState<number>(fiber)(5);
+  const [bearing, setBearing] = useState<number>(fiber)(0.6);
+  const [pitch, setPitch]     = useState<number>(fiber)(0.4);
 
-  useResource(context, 3)((dispose) => {
+  useResource(fiber)((dispose) => {
     const onWheel = (e: WheelEvent) => {
       const {deltaMode, deltaY} = e;
       let f = 1;

@@ -24,7 +24,7 @@ export const formatTree = (root: LiveContext<any>, depth: number = 0): string =>
 }
 
 export const formatNode = <F extends Function>(node: DeferredCall<F>): string => {
-  const name = node.f?.name || 'Node';
+  const name = (node.f?.displayName ?? node.f?.name) || 'Node';
   const args = [] as string[];
   if (node.arg !== undefined) {
     args.push(formatValue(node.arg));
@@ -39,6 +39,8 @@ export const formatNode = <F extends Function>(node: DeferredCall<F>): string =>
     }
   }
   if (args?.length) args.unshift('');
+  if (name === 'Node') console.log(node)
+
   return `<${name}${args ? args.join(' ') : ''}>`;
 }
 

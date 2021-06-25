@@ -137,8 +137,8 @@ export type ShaderStageDescriptor = {
   entryPoint: string,
 };
 
-// Camera
-export type CameraUniforms = {
+// Projection pipeline
+export type ViewUniforms = {
   projectionMatrix: mat4,
   viewMatrix: mat4,
 };

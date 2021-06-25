@@ -43,35 +43,45 @@ export const isSameDependencies = (
 
 // Memoize a live function on all its arguments (shallow comparison per arg)
 export const memoArgs = <F extends Function>(
-  f: Live<F>
-) => (
-  fiber: LiveFiber<F>
+  f: Live<F>,
+  name?: string,
 ) => {
-  const bound = bind(f, fiber, reserveState(1));
-  return (...args: any[]) => {
-    const value = useMemo(fiber)(() => bound(args), args);
-    return value;
+  const g = (
+    fiber: LiveFiber<F>,
+  ) => {
+    const bound = bind(f, fiber, reserveState(1));
+    return (...args: any[]) => {
+      const value = useMemo(fiber)(() => bound(args), args);
+      return value;
+    };
   };
-};
+  (g as any).displayName = name != null ? `Memo(${name})` : `Memo`;
+  return g;
+}
 
 // Memoize a live function with 1 argument on its object props (shallow comparison per arg)
 export const memoProps = <F extends Function>(
-  f: Live<F>
-) => (
-  fiber: LiveFiber<F>
+  f: Live<F>,
+  name?: string,
 ) => {
-  const bound = bind(f, fiber, reserveState(1));
-  return (props: Record<string, any>) => {
-    const args = [] as any[];
-    for (let k in props) {
-      args.push(k);
-      args.push(props[k]);
-    }
+  const g = (
+    fiber: LiveFiber<F>,
+  ) => {
+    const bound = bind(f, fiber, reserveState(1));
+    return (props: Record<string, any>) => {
+      const args = [] as any[];
+      for (let k in props) {
+        args.push(k);
+        args.push(props[k]);
+      }
 
-    const value = useMemo(fiber)(() => bound(props), args);
-    return value;
+      const value = useMemo(fiber)(() => bound(props), args);
+      return value;
+    };
   };
-};
+  (g as any).displayName = name != null ? `Memo(${name})` : `Memo`;
+  return g;
+}
 
 // Allocate state value and a setter for it, initializing with the given value or function
 export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T = S>(

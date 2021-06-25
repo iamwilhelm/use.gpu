@@ -64,4 +64,4 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     passEncoder.setVertexBuffer(0, vertexBuffers[0]);
     passEncoder.draw(cube.count, 1, 0, 0);
   });
-});
+}, 'Cube');

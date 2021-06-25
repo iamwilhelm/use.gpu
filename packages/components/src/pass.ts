@@ -12,21 +12,21 @@ export type PassProps = {
 
 export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
+export const mapper = (t: RenderToPass) => [t];
+export const reducer = (a: RenderToPass[], b: RenderToPass[]) => [...a, ...b];
+
 export const Pass: LiveComponent<PassProps> = (fiber) => (props) => {
   const {device, colorAttachments, depthStencilAttachment, children, render} = props;
 
-  const renderPassDescriptor: GPURenderPassDescriptor = {
-    colorAttachments,
-    depthStencilAttachment,
-  };
-
   return mapReduce(
-    children ?? render(),
-    (t: RenderToPass) => [t],
-    (a: RenderToPass[], b: RenderToPass[]) => [...a, ...b],
+    children ?? render(), mapper, reducer,
     (rs: RenderToPass[]) => {
-      const commandEncoder = device.createCommandEncoder();
+      const renderPassDescriptor: GPURenderPassDescriptor = {
+        colorAttachments,
+        depthStencilAttachment,
+      };
 
+      const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
       for (let r of rs) r(passEncoder);
       passEncoder.endPass(),

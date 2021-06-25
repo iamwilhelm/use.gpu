@@ -1,8 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { useOne } from '@use-gpu/live';
-import { CameraUniforms, UniformAttribute } from '@use-gpu/core/types';
-import { PROJECTION_UNIFORMS, VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '@use-gpu/core';
+import { ViewportUniforms, UniformAttribute } from '@use-gpu/core/types';
+import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '@use-gpu/core';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
@@ -12,11 +12,6 @@ const DEFAULT_ORBIT_CAMERA = {
   near: 0.01,
   far: 100,
 };
-
-const UNIFORMS: UniformAttribute[] = [
-  ...PROJECTION_UNIFORMS,
-  ...VIEW_UNIFORMS,
-];
 
 export type OrbitCameraProps = {
   width: number,
@@ -28,7 +23,7 @@ export type OrbitCameraProps = {
   fov?: number,
   near?: number,
   far?: number,
-  render: (defs: UniformAttribute[], uniforms: CameraUniforms) => LiveElement<any>,
+  render: (defs: UniformAttribute[], uniforms: ViewUniforms) => LiveElement<any>,
 };
 
 export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) => {
@@ -52,5 +47,5 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
   uniforms.projectionMatrix = makeProjectionMatrix(width, height, fov, near, far);
   uniforms.viewMatrix = makeOrbitMatrix(radius, phi, theta);
 
-  return render(UNIFORMS, uniforms);
+  return render(VIEW_UNIFORMS, uniforms);
 };

@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { CameraUniforms, UniformDefinition, UniformAttribute } from '@use-gpu/core/types';
 
-import { yield, useMemo, useOne } from '@use-gpu/live';
+import { yield, memoProps, useMemo, useOne } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
   makeUniforms, makeUniformBindings,
@@ -22,8 +22,8 @@ export type CubeProps = {
   compileGLSL: (s: string, t: string) => any,
 };
 
-export const Cube: LiveComponent<CubeProps> = (fiber) => (props) => {
-  const {device, colorStates, depthStencilState, passEncoder, defs, uniforms, compileGLSL} = props;
+export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
+  const {device, colorStates, depthStencilState, defs, uniforms, compileGLSL} = props;
 
   const cube = useOne(fiber)(makeCube);
   const vertexBuffers = useMemo(fiber)(() =>
@@ -64,4 +64,4 @@ export const Cube: LiveComponent<CubeProps> = (fiber) => (props) => {
     passEncoder.setVertexBuffer(0, vertexBuffers[0]);
     passEncoder.draw(cube.count, 1, 0, 0);
   });
-}
+});

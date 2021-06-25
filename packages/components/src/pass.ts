@@ -20,16 +20,17 @@ export const Pass: LiveComponent<PassProps> = (fiber) => (props) => {
     depthStencilAttachment,
   };
 
-  const commandEncoder = device.createCommandEncoder();
-  const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-
   return mapReduce(
     children ?? render(),
     (t: RenderToPass) => [t],
     (a: RenderToPass[], b: RenderToPass[]) => [...a, ...b],
     (rs: RenderToPass[]) => {
+      const commandEncoder = device.createCommandEncoder();
+
+      const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
       for (let r of rs) r(passEncoder);
       passEncoder.endPass(),
+
       // @ts-ignore
       device.queue.submit([commandEncoder.finish()]);
     },

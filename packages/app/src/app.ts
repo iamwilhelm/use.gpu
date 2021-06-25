@@ -23,13 +23,15 @@ export const App: LiveComponent<AppProps> = () => (props) => {
 
   return use(AutoCanvas)({
     canvas, device, adapter,
-    render: ({
-      width, height, gpuContext,
-      colorStates, colorAttachments,
-      depthStencilState, depthStencilAttachment,
-    }: CanvasRenderingContextGPU) =>
+    render: (renderContext: CanvasRenderingContextGPU) => {
+    
+      const {
+        width, height, gpuContext,
+        colorStates, colorAttachments,
+        depthStencilState, depthStencilAttachment,
+      } = renderContext;
 
-      use(OrbitControls)({
+      return use(OrbitControls)({
         canvas,
         render: (radius: number, phi: number, theta: number) =>
 
@@ -41,6 +43,7 @@ export const App: LiveComponent<AppProps> = () => (props) => {
               use(Draw)({
                 device, gpuContext, colorAttachments,
                 children: [
+     
                   use(Pass)({
                     device, colorAttachments, depthStencilAttachment,
                     children: [
@@ -49,10 +52,12 @@ export const App: LiveComponent<AppProps> = () => (props) => {
 
                     ]
                   })
+
                 ],
               })
           })
-      })
+      });
+    }
   });
 };
 

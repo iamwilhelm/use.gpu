@@ -1,11 +1,12 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  Live, LiveFiber,
+  LiveFunction, LiveFiber,
   DeferredCall, HostInterface,
 } from './types';
 
 import { bind } from './live';
 import { makeFiber, makeSubFiber } from './fiber';
+import { isSameDependencies } from './util';
 
 export const NOP = () => {};
 export const NO_DEPS = [] as any[];
@@ -22,28 +23,10 @@ export const pushState = <F>(fiber: LiveFiber<F>) => {
   return i;
 }
 
-// Compares dependency arrays
-export const isSameDependencies = (
-  prev: any[] | undefined,
-  next: any[] | undefined,
-) => {
-  let valid = true;
-  if (next === undefined && prev === undefined) return true;
-  if (prev === undefined) valid = false;
-  if (next != null && prev != null) {
-    const n = prev.length || 0;
-    if (n !== next.length || 0) valid = false;
-    else for (let i = 0; i < n; ++i) if (prev[i] !== next[i]) {
-      valid = false;
-      break;
-    }
-  }
-  return valid;
-}
-
 // Memoize a live function on all its arguments (shallow comparison per arg)
+// Unlike <Memo> this does not create a new sub-fiber
 export const memoArgs = <F extends Function>(
-  f: Live<F>,
+  f: LiveFunction<F>,
   name?: string,
 ) => {
   const g = (
@@ -61,7 +44,7 @@ export const memoArgs = <F extends Function>(
 
 // Memoize a live function with 1 argument on its object props (shallow comparison per arg)
 export const memoProps = <F extends Function>(
-  f: Live<F>,
+  f: LiveFunction<F>,
   name?: string,
 ) => {
   const g = (

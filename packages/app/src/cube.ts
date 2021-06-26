@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { CameraUniforms, UniformDefinition, UniformAttribute } from '@use-gpu/core/types';
+import { ViewUniforms, UniformDefinition, UniformAttribute, UniformType } from '@use-gpu/core/types';
 
-import { yield, memoProps, useMemo, useOne } from '@use-gpu/live';
+import { yield, memoProps, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
   makeUniforms, makeUniformBindings,
@@ -11,6 +11,13 @@ import {
 import vertexShader from './glsl/vertex.glsl';
 import fragmentShader from './glsl/fragment.glsl';
 
+export const CUBE_UNIFORM_DEFS: UniformAttribute[] = [
+  {
+    name: 'blink',
+    format: UniformType.float,
+  },
+];
+
 import { makeCube } from './meshes/cube';
 
 export type CubeProps = {
@@ -18,12 +25,21 @@ export type CubeProps = {
   colorStates: GPUColorStateDescriptor,
   depthStencilState: GPUDepthStencilStateDescriptor,
   defs: UniformAttribute[]
-  uniforms: CameraUniforms,
+  uniforms: ViewUniforms,
   compileGLSL: (s: string, t: string) => any,
 };
 
-export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
+export const Cube: LiveComponent<CubeProps> = (fiber) => (props) => {
   const {device, colorStates, depthStencilState, defs, uniforms, compileGLSL} = props;
+
+  const [blink, setBlink] = useState(fiber)(0);
+  useResource(fiber)((dispose) => {
+    const timer = setInterval(() => {
+      console.log('blink');
+      setBlink(b => !b);
+    }, 5000);
+    dispose(() => clearInterval(timer));
+  });
 
   const cube = useOne(fiber)(makeCube);
   const vertexBuffers = useMemo(fiber)(() =>
@@ -45,7 +61,7 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
   }, [device, colorStates, depthStencilState]);
 
   const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(fiber)(() => {
-    const uniformPipe = makeUniforms(defs);
+    const uniformPipe = makeUniforms([...defs, ...CUBE_UNIFORM_DEFS]);
     const uniformBuffer = makeUniformBuffer(device, uniformPipe.data);
     const entries = makeUniformBindings([{resource: {buffer: uniformBuffer}}]);
     const uniformBindGroup = device.createBindGroup({
@@ -55,8 +71,11 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformDefinition, GPUBindGroup];
   }, [device, defs, pipeline]);
 
+  console.log('yield cube');
   return yield((passEncoder: GPURenderPassEncoder) => {
-    uniformPipe.fill(uniforms);
+    console.log('draw cube');
+
+    uniformPipe.fill({...uniforms, blink});
     uploadBuffer(device, uniformBuffer, uniformPipe.data);
 
     passEncoder.setPipeline(pipeline);
@@ -64,4 +83,4 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     passEncoder.setVertexBuffer(0, vertexBuffers[0]);
     passEncoder.draw(cube.count, 1, 0, 0);
   });
-}, 'Cube');
+}//, 'Cube');

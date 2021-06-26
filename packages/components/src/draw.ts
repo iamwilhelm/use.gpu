@@ -10,10 +10,6 @@ export type DrawProps = {
   render: () => LiveElement<any>,
 };
 
-export type DrawRef = {
-  render: () => LiveElement<any>,
-};
-
 export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
   const {gpuContext, colorAttachments, children} = props;
 

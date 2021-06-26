@@ -1,5 +1,6 @@
 import { LiveFiber, Task, Action, Dispatcher } from './types';
 
+// Schedules actions to be run immediately after the current thread completes
 export const makeActionScheduler = () => {
   const queue = [] as Action[];
 
@@ -15,7 +16,6 @@ export const makeActionScheduler = () => {
 
   const flush = () => {
     timer = null;
-    queue.sort((a: Action, b: Action) => a.fiber.depth - b.fiber.depth);
     for (const {task} of queue) task();
     if (onUpdate) {
       const q = queue.slice();
@@ -28,6 +28,7 @@ export const makeActionScheduler = () => {
   return {bind, schedule, flush};
 }
 
+// Schedules actions to be run when an object is disposed of
 export const makeDisposalTracker = () => {
   const disposal = new WeakMap<LiveFiber<any>, Task[]>();
 
@@ -48,6 +49,7 @@ export const makeDisposalTracker = () => {
   return {track, dispose};
 }
 
+// Schedules callback(s) on next paint
 export const makePaintRequester = (raf: any = requestAnimationFrame) => {
   let pending = false;
   const queue: Task[] = [];
@@ -67,4 +69,30 @@ export const makePaintRequester = (raf: any = requestAnimationFrame) => {
     }
     queue.push(t);
   }
+}
+
+// Compares dependency arrays
+export const isSameDependencies = (
+  prev: any[] | undefined,
+  next: any[] | undefined,
+) => {
+  let valid = true;
+  if (next === undefined && prev === undefined) return true;
+  if (prev === undefined) valid = false;
+  if (next != null && prev != null) {
+    const n = prev.length || 0;
+    if (n !== next.length || 0) valid = false;
+    else for (let i = 0; i < n; ++i) if (prev[i] !== next[i]) {
+      valid = false;
+      break;
+    }
+  }
+  return valid;
+}
+
+// Checks if two paths overlap
+export const isSubPath = (a: Key[], b: Key[]) => {
+  const n = Math.min(a.length, b.length);
+  for (let i = 0; i < n; ++i) if (a[i] !== b[i]) return false;
+  return true;
 }

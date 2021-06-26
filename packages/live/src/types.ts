@@ -1,12 +1,12 @@
 // Live function
-export type Live<F extends Function> = (fiber: LiveFiber<F>) => F;
+export type LiveFunction<F extends Function> = (fiber: LiveFiber<F>) => F;
 
 // Mounting key
 export type Key = string | number;
 
 // Component with single props object
 export type Component<P> = (props: P) => LiveElement<any>;
-export type LiveComponent<P> = Live<Component<P>>;
+export type LiveComponent<P> = LiveFunction<Component<P>>;
 
 // State hook callbacks
 export type Initial<T> = (() => T) | T;
@@ -25,6 +25,7 @@ export type Dispatcher = (as: Action<any>[]) => void;
 // Fiber context
 export type LiveFiber<F extends Function> = FunctionCall<F> & {
   host?: HostInterface,
+  path: Key[],
   depth: number,
 
   // Instance of F bound to self
@@ -38,21 +39,22 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   seen?: Set<Key>,
   mount?: LiveFiber<any>,
   mounts?: FiberMap,
+  rendered?: any,
 
   // Yielding state
   yielded?: FiberYield<any>,
 };
 
 export type FiberYield<T> = {
-  value?: T,
-  emit?: Setter<T>,
+  value: T,
+  emit: Setter<T>,
 };
 
 export type FiberMap = Map<Key, LiveContext<any>>;
 
 // Deferred function calls
 export type FunctionCall<F extends Function> = {
-  f: Live<F>,
+  f: LiveFunction<F>,
   args?: any[],
   arg?: any
 };

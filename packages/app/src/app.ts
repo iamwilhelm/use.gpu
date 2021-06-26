@@ -2,11 +2,11 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { CameraUniforms, UniformAttribute } from '@use-gpu/core/types';
 
-import { use } from '@use-gpu/live';
+import { use, useOne } from '@use-gpu/live';
 
 import {
   AutoCanvas,
-  Loop, Draw, Pass,
+  Loop, Memo, Draw, Pass,
   OrbitCamera, OrbitControls,
 } from '@use-gpu/components';
 import { Cube } from './cube';
@@ -43,7 +43,7 @@ export const App: LiveComponent<AppProps> = () => (props) => {
               use(Draw)({
                 device, gpuContext, colorAttachments,
                 children: [
-     
+
                   use(Pass)({
                     device, colorAttachments, depthStencilAttachment,
                     children: [

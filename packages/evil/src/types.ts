@@ -1,12 +1,12 @@
 // Live function
-export type Live<F extends Function> = (context: LiveContext<F>) => F;
+export type LiveFunction<F extends Function> = (context: LiveContext<F>) => F;
 
 // Mounting key
 export type Key = string | number;
 
 // Component with single props object
 export type Component<P> = (props: P) => LiveElement<any>;
-export type LiveComponent<P> = Live<Component<P>>;
+export type LiveComponent<P> = LiveFunction<Component<P>>;
 
 // State hook callbacks
 export type Initial<T> = (() => T) | T;
@@ -36,7 +36,7 @@ export type HostInterface = {
 };
 
 export type CallContext<F extends Function> = {
-  f: Live<F>,
+  f: LiveFunction<F>,
   args?: any[],
 };
 

@@ -1,6 +1,6 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  Live, LiveFiber, LiveElement,
+  LiveFunction, LiveFiber, LiveElement,
   DeferredCall, HostInterface,
 } from './types';
 
@@ -11,32 +11,40 @@ export const RECONCILE  = () => () => {};
 export const MAP_REDUCE = () => () => {};
 export const YIELD      = () => () => {};
 
+(DETACH     as any).isLiveBuiltin = true;
+(RECONCILE  as any).isLiveBuiltin = true;
+(MAP_REDUCE as any).isLiveBuiltin = true;
+(YIELD      as any).isLiveBuiltin = true;
+
 // Prepare to call a live function with optional given persistent fiber
-export const bind = <F extends Function>(f: Live<F>, fiber?: LiveFiber<F> | null, base?: number = 0) => {
+export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base?: number = 0) => {
   fiber = fiber ?? makeFiber(f, null);
 
   const bound = f(fiber);
   if (bound.length === 0) {
     return () => {
       fiber.pointer = base;
+      if (fiber.yielded) fiber.yielded.value = undefined;
       return bound();
     }
   }
   if (bound.length === 1) {
     return (arg: any) => {
       fiber.pointer = base;
+      if (fiber.yielded) fiber.yielded.value = undefined;
       return bound(arg);
     }
   }
   return (...args: any[]) => {
     fiber.pointer = base;
+    if (fiber.yielded) fiber.yielded.value = undefined;
     return bound.apply(null, args);
   }
 };
 
 // use a call to a live function
 export const use = <F extends Function>(
-  f: Live<F>,
+  f: LiveFunction<F>,
   key?: Key,
 ) => (
   ...args: any[]
@@ -55,7 +63,7 @@ export const reconcile = <F extends Function>(
   key?: Key,
 ): DeferredCall<() => void> => {
   if (Array.isArray(calls)) return ({f: RECONCILE, args: calls, key});
-  return ({f: RECONCILE, arg: calls, key});
+  return ({f: RECONCILE, arg: [calls], key});
 }
 
 // Reduce a subtree
@@ -75,6 +83,6 @@ export const yield = <T>(
 
 // Hold call info for a fiber
 export const makeFunctionCall = <F extends Function>(
-  f: Live<F>,
+  f: LiveFunction<F>,
   args?: any[],
 ): FunctionCall<F> => ({f, args});

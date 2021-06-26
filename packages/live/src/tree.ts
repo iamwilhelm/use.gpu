@@ -1,7 +1,7 @@
 import { Key, Action, Task, LiveFiber, DeferredCall } from './types';
 
 import { makeFiber, makeSubFiber, renderFiber } from './fiber';
-import { makeActionScheduler, makeDisposalTracker, makePaintRequester } from './util';
+import { makeActionScheduler, makeDisposalTracker, makePaintRequester, isSubPath } from './util';
 import { formatNode } from './debug';
 
 let DEBUG = false;
@@ -31,20 +31,23 @@ export const makeHostFiber = <F extends Function>(node: DeferredCall<F>) => {
 export const renderWithDispatch = <T>(
   dispatch: (t: Task) => T,
 ) => <F extends Function>(node: DeferredCall<F>) => {
-  DEBUG && console.log('Rendering Root', formatFiber(node));
+  DEBUG && console.log('Rendering Root', formatNode(node));
 
   const {fiber, host, scheduler} = makeHostFiber(node);
 
   const reenter = (as: Action[]) => {
     dispatch(() => {
       const fibers = as.map(({fiber}) => fiber);
-      fibers.sort((a, b) => a.depth - b.depth);
 
       if (fibers.length) {
-        const [{depth: min}] = fibers;
-        const top = fibers.filter(({depth}) => depth === min);
-        const uniq = top.filter((fiber, i) => top.indexOf(fiber) === i);
-        for (const sub of uniq) {
+        const roots = [] as LiveFiber<any>[];
+        fibers.sort((a, b) => a.depth - b.depth);
+        nextFiber: for (let f of fibers) {
+          for (let r of roots) if (isSubPath(r.path, f.path)) continue nextFiber;
+          roots.push(f);
+        }
+
+        for (const sub of roots) {
           DEBUG && console.log('Updating Sub-Root', formatNode(sub));
           if (host) host.__stats.updates++;
           renderFiber(sub);

@@ -1,27 +1,34 @@
-import { LiveFiber, FiberYield, Key } from './types';
+import { LiveFiber, LiveFunction, FiberYield, Key } from './types';
 
 import { bind, reconcile, DETACH, RECONCILE, MAP_REDUCE, YIELD } from './live';
+import { isSameDependencies } from './util';
 import { formatNode } from './debug';
 
 let DEBUG = false;
 //setTimeout((() => DEBUG = false), 900);
 
 const EMPTY_ARRAY = [] as any[];
+const ROOT_PATH = [0] as Key[];
 
 // Make a fiber for a live function
 export const makeFiber = <F extends Function>(
-  f: Live<F>,
+  f: LiveFunction<F>,
   host?: HostInterface | null,
   parent?: LiveFiber<any> | null,
   args?: any[],
+  key?: Key,
 ): LiveFiber<F> => {
   const bound = null;
   const depth = parent ? parent.depth + 1 : 0;
+  const yielded = parent?.yielded ? {...parent.yielded} : null;
+
+  let path = parent ? parent.path : ROOT_PATH;
+  if (key != null) path = [...path, key];
 
   const self = {
     bound, f, args,
-    host, depth,
-    state: null, pointer: 0,
+    host, depth, path,
+    state: null, pointer: 0, yielded,
     mount: null, mounts: null, seen: null,
   } as any as LiveFiber<F>;
 
@@ -34,10 +41,10 @@ export const makeFiber = <F extends Function>(
 export const makeSubFiber = <F extends Function>(
   parent: LiveFiber<any>,
   node: DeferredCall<F>,
+  key?: Key,
 ): LiveFiber<F> => {
   const {host} = parent;
   const fiber = makeFiber(node.f, host, parent, node.args);
-  if (parent.yielded) fiber.yielded = {...parent.yielded};
   return fiber;
 }
 
@@ -51,36 +58,54 @@ export const makeYieldState = <A, B>(map?: (a: A) => B): FiberYield => ({
 
 // Render a fiber
 export const renderFiber = <F extends Function>(fiber: LiveFiber<F>) => {
-  const {bound, args, yielded} = fiber;
+  const {f, bound, args, yielded, rendered} = fiber;
 
-  const out = bound.apply(null, args ?? EMPTY_ARRAY);
+  const isBuiltIn = ((f as any).isLiveBuiltin);
+  const out = isBuiltIn
+    ? (fiber as any as DeferredCall<any>)
+    : bound.apply(null, args ?? EMPTY_ARRAY);
+
   let call = out as DeferredCall<any> | null;
-
   const fiberType = call?.f;
   const isArray = !!out && Array.isArray(out);
 
   if (isArray) {
     const calls = out as DeferredCall<any>[];
+    if (rendered === calls) return fiber;
+    fiber.rendered = calls;
+
+    mountFiberCall(fiber, null);
     reconcileFiberCalls(fiber, calls);
-    call = null;
   }
   else if (fiberType === RECONCILE) {
     const calls = call.args ?? EMPTY_ARRAY;
+    if (rendered === calls) return fiber;
+    fiber.rendered = calls;
+
+    mountFiberCall(fiber, null);
     reconcileFiberCalls(fiber, calls);
-    call = null;
   }
   else if (fiberType === MAP_REDUCE) {
     const [calls, map, reduce, done] = call.args ?? EMPTY_ARRAY;
+    if (rendered === calls) return fiber;
+    fiber.rendered = calls;
+
+    mountFiberCall(fiber, null);
     mapReduceFiberCalls(fiber, calls, map, reduce, done);
-    call = null;
   }
   else if (fiberType === YIELD) {
+    mountFiberCall(fiber, null);
+
     if (!yielded) throw new Error("Yield without aggregator");
     yielded.emit(fiber, call.arg);
-    call = null;
+  }
+  else {
+    if (rendered === call) return fiber;
+    fiber.rendered = call;
+
+    mountFiberCall(fiber, call);
   }
 
-  mountFiberCall(fiber, call);
   return fiber;
 }
 
@@ -117,7 +142,6 @@ export const mountFiberCall = <F extends Function>(
   const nextMount = updateMount(fiber, mount, call);
   if (nextMount !== false) {
     fiber.mount = nextMount;
-    if (yielded) flushYield(yielded);
     flushMount(nextMount, mount);
   }
 }
@@ -127,7 +151,7 @@ export const reconcileFiberCalls = <F extends Function>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[],
 ) => {
-  let {yielded, mounts, seen} = fiber;
+  let {mounts, seen} = fiber;
   if (!mounts) mounts = fiber.mounts = new Map();
   if (!seen) seen = fiber.seen = new Set();
 
@@ -137,11 +161,10 @@ export const reconcileFiberCalls = <F extends Function>(
     seen.add(key);
 
     const mount = mounts.get(key);
-    const nextMount = updateMount(fiber, mount, call);
+    const nextMount = updateMount(fiber, mount, call, key);
     if (nextMount !== false) {
       if (nextMount) mounts.set(key, nextMount);
       else mounts.delete(key);
-      if (yielded) flushYield(yielded);
       flushMount(nextMount, mount);
     }
   }
@@ -150,8 +173,6 @@ export const reconcileFiberCalls = <F extends Function>(
     const mount = mounts.get(key);
     updateMount(fiber, mount, null);
     mounts.delete(key);
-
-    if (yielded) flushYield(yielded);
     flushMount(null, mount);
   }
 
@@ -199,10 +220,10 @@ export const updateMount = <P extends Function>(
   parent: LiveFiber<P>,
   mount: LiveFiber<any> | null,
   next: DeferredCall<any> | null,
+  key?: Key = null,
 ): LiveFiber<F> | null | false => {
   const {host} = parent;
 
-  const key = next?.key ?? '';
   const from = mount?.f;
   const to = next?.f;
 
@@ -218,12 +239,15 @@ export const updateMount = <P extends Function>(
   if ((to && !from) || replace) {
     DEBUG && console.log('Mounting', key, formatNode(next!));
     if (host) host.__stats.mounts++;
-    return makeSubFiber(parent, next);
+    return makeSubFiber(parent, next, key);
   }
 
   if (update) {
-    DEBUG && console.log('Updating', key, formatNode(next));
+    DEBUG && console.log('Updating', key, formatNode(next!));
     if (host) host.__stats.updates++;
+
+    if (mount.args === next.args) return false;
+    if (isSameDependencies(mount.args, next.args)) return false;
 
     mount.args = next.args;
     return mount;
@@ -242,9 +266,3 @@ export const flushMount = <F extends Function>(mount: LiveFiber<F> | null, mount
     else renderFiber(mount);
   }
 }
-
-// Flush yield state after updating a mount
-export const flushYield = <F extends Function>(yield: FiberYield<T>) => {
-  yield.value = undefined;
-}
-

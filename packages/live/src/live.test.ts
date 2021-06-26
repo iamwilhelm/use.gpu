@@ -1,4 +1,4 @@
-import { LiveContext, LiveComponent, Live, DeferredCall } from './types';
+import { LiveContext, LiveComponent, LiveFunction, DeferredCall } from './types';
 
 import { bind, use } from './live';
 
@@ -8,7 +8,7 @@ type NumberReturner = () => number;
 
 it('returns a value', () => {
 
-  const F: Live<StringFormatter> = () => (foo: string) => {
+  const F: LiveFunction<StringFormatter> = () => (foo: string) => {
     return `hello ${foo}`;
   };
 
@@ -19,7 +19,7 @@ it('returns a value', () => {
 
 it('returns a deferred call', () => {
 
-  const G: Live<StringFormatter> = () => (foo: string) => {
+  const G: LiveFunction<StringFormatter> = () => (foo: string) => {
     return `hello ${foo}`;
   };
 

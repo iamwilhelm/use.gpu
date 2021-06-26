@@ -1,4 +1,4 @@
-import { LiveFiber, LiveComponent, Live, DeferredCall } from './types';
+import { LiveFiber, LiveComponent, LiveFunction, DeferredCall } from './types';
 
 import { bind, use } from './live';
 import { makeHostFiber } from './tree';
@@ -10,7 +10,7 @@ type FunctionReturner = () => () => any;
 
 it('memoizes a function', () => {
 
-  const F: Live<NumberReturner> = memoArgs(() => (): number => {
+  const F: LiveFunction<NumberReturner> = memoArgs(() => (): number => {
     return Math.random();
   });
 
@@ -32,7 +32,7 @@ it('memoizes a function', () => {
 
 it('memoizes a component', () => {
 
-  const F: Live<NumberReturner> = memoProps(() => (props): number => {
+  const F: LiveFunction<NumberReturner> = memoProps(() => (props): number => {
     return Math.random();
   });
 
@@ -55,7 +55,7 @@ it('memoizes a component', () => {
 
 it('holds state (hook)', () => {
 
-  const F: Live<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
+  const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
     const [foo] = useState(fiber)(() => Math.random());
     return foo;
   };
@@ -80,7 +80,7 @@ it('holds memoized value (hook)', () => {
 
   const dep = 'static';
 
-  const F: Live<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
+  const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
 
     const foo = useMemo(fiber)(() => Math.random(), [dep]);
 
@@ -107,7 +107,7 @@ it('holds memoized value with one dep (hook)', () => {
 
   const dep = 'static';
 
-  const F: Live<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
+  const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
 
     const foo = useOne(fiber)(() => Math.random(), dep);
 
@@ -134,7 +134,7 @@ it('holds memoized callback (hook)', () => {
 
   const dep = 'static';
 
-  const F: Live<FunctionReturner> = (fiber: LiveFiber<FunctionReturner>) => (): () => number => {
+  const F: LiveFunction<FunctionReturner> = (fiber: LiveFiber<FunctionReturner>) => (): () => number => {
 
     const x = Math.random();
     const foo = useCallback(fiber)(() => x, [dep]);
@@ -164,7 +164,7 @@ it('manages a dependent resource (hook)', () => {
   let allocated: number;
   let disposed: number;
 
-  const F: Live<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
+  const F: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
     useResource(fiber)((dispose) => {
       allocated++;
@@ -174,7 +174,7 @@ it('manages a dependent resource (hook)', () => {
     return null;
   };
 
-  const G: Live<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
+  const G: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
     useResource(fiber)((dispose) => {
@@ -185,7 +185,7 @@ it('manages a dependent resource (hook)', () => {
     return null;
   };
 
-  const H: Live<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
+  const H: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
     useResource(fiber)((dispose) => {

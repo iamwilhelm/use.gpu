@@ -1,23 +1,33 @@
-import { LiveFiber, LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
-import {
-  use, detach, useCallback, useOne, renderFiber,
-} from '@use-gpu/live';
+import { yeet, mapReduce, useMemo } from '@use-gpu/live';
 
 export type DrawProps = {
   gpuContext: GPUPresentationContext,
   colorAttachments: GPURenderPassColorAttachmentDescriptor[],
-  render: () => LiveElement<any>,
+  children?: LiveElement<any>,
+  render?: () => LiveElement<any>,
 };
+
+const mapper = (t: Task) => [t];
+const reducer = (a: Task[], b: Task[]) => [...a, ...b];
 
 export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
   const {gpuContext, colorAttachments, children} = props;
 
-  // @ts-ignore
-  colorAttachments[0].view = gpuContext
-  // @ts-ignore
-    .getCurrentTexture()
-    .createView();
+  const Done = useMemo(fiber)(() =>
+    (fiber) => (ts: Task[]) => {
+      // @ts-ignore
+      colorAttachments[0].view = gpuContext
+      // @ts-ignore
+        .getCurrentTexture()
+        .createView();
+    
+      for (let task of ts) task();
+    },
+    [gpuContext, colorAttachments]);
 
-  return children;
+  if (!Done.displayName) Done.displayName = '[Draw]';
+
+  return mapReduce(children ?? render(), mapper, reducer, Done);
 }

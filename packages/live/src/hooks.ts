@@ -34,6 +34,8 @@ export const memoArgs = <F extends Function>(
   ) => {
     const bound = bind(f, fiber, reserveState(1));
     return (...args: any[]) => {
+      args.push(fiber.version);
+
       const value = useMemo(fiber)(() => bound(args), args);
       return value;
     };
@@ -52,13 +54,13 @@ export const memoProps = <F extends Function>(
   ) => {
     const bound = bind(f, fiber, reserveState(1));
     return (props: Record<string, any>) => {
-      const args = [] as any[];
+      const deps = [fiber.version] as any[];
       for (let k in props) {
-        args.push(k);
-        args.push(props[k]);
+        deps.push(k);
+        deps.push(props[k]);
       }
 
-      const value = useMemo(fiber)(() => bound(props), args);
+      const value = useMemo(fiber)(() => bound(props), deps);
       return value;
     };
   };
@@ -85,6 +87,7 @@ export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T
       ? (value: Reducer<T>) => host.schedule(fiber, () => {
           if (value instanceof Function) state[i] = value(state[i]);
           else state[i] = value;
+          fiber.version++;
         })
       : NOP;
 
@@ -192,29 +195,6 @@ export const useResource = <F extends Function>(
 
   // Assume if return type is used, it's T's
   return (undefined as unknown as R);
-}
-
-// Use a new fiber for forked rendering
-export const useSubFiber = <F extends Function>(
-  fiber: LiveFiber<F>,
-) => <T extends Function>(
-  node: DeferredCall<T>
-): LiveFiber<T> => {
-  const i = pushState(fiber);
-  let {state, host} = fiber;
-
-  let sub = state[i];
-
-  if (!sub || sub.f !== node.f) {
-    sub = makeSubFiber(fiber, node);
-
-    state[i] = sub;
-  }
-  else {
-    sub.args = node.args;
-  }
-
-  return ctx;
 }
 
 // Cleanup effect tracker

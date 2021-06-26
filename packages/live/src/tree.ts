@@ -4,7 +4,7 @@ import { makeFiber, makeSubFiber, renderFiber } from './fiber';
 import { makeActionScheduler, makeDisposalTracker, makePaintRequester, isSubPath } from './util';
 import { formatNode } from './debug';
 
-let DEBUG = false;
+let DEBUG = true;
 //setTimeout((() => DEBUG = false), 900);
 
 const NO_ARGS = [] as any[];

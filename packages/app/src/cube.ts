@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformDefinition, UniformAttribute, UniformType } from '@use-gpu/core/types';
 
-import { yield, memoProps, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memoProps, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
   makeUniforms, makeUniformBindings,
@@ -29,14 +29,13 @@ export type CubeProps = {
   compileGLSL: (s: string, t: string) => any,
 };
 
-export const Cube: LiveComponent<CubeProps> = (fiber) => (props) => {
+export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
   const {device, colorStates, depthStencilState, defs, uniforms, compileGLSL} = props;
 
   const [blink, setBlink] = useState(fiber)(0);
   useResource(fiber)((dispose) => {
     const timer = setInterval(() => {
-      console.log('blink');
-      setBlink(b => !b);
+      setBlink(b => 1 - b);
     }, 5000);
     dispose(() => clearInterval(timer));
   });
@@ -71,8 +70,9 @@ export const Cube: LiveComponent<CubeProps> = (fiber) => (props) => {
     return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformDefinition, GPUBindGroup];
   }, [device, defs, pipeline]);
 
-  console.log('yield cube');
-  return yield((passEncoder: GPURenderPassEncoder) => {
+  console.log('yeet cube', blink);
+
+  return yeet((passEncoder: GPURenderPassEncoder) => {
     console.log('draw cube');
 
     uniformPipe.fill({...uniforms, blink});
@@ -83,4 +83,4 @@ export const Cube: LiveComponent<CubeProps> = (fiber) => (props) => {
     passEncoder.setVertexBuffer(0, vertexBuffers[0]);
     passEncoder.draw(cube.count, 1, 0, 0);
   });
-}//, 'Cube');
+}, 'Cube');

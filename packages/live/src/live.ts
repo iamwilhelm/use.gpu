@@ -9,12 +9,12 @@ import { makeFiber } from './fiber';
 export const DETACH     = () => () => {};
 export const RECONCILE  = () => () => {};
 export const MAP_REDUCE = () => () => {};
-export const YIELD      = () => () => {};
+export const YEET       = () => () => {};
 
 (DETACH     as any).isLiveBuiltin = true;
 (RECONCILE  as any).isLiveBuiltin = true;
 (MAP_REDUCE as any).isLiveBuiltin = true;
-(YIELD      as any).isLiveBuiltin = true;
+(YEET       as any).isLiveBuiltin = true;
 
 // Prepare to call a live function with optional given persistent fiber
 export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base?: number = 0) => {
@@ -24,20 +24,23 @@ export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F
   if (bound.length === 0) {
     return () => {
       fiber.pointer = base;
-      if (fiber.yielded) fiber.yielded.value = undefined;
+      const {yeeted} = fiber;
+      if (yeeted) yeeted.reduced = yeeted.value = undefined;
       return bound();
     }
   }
   if (bound.length === 1) {
     return (arg: any) => {
       fiber.pointer = base;
-      if (fiber.yielded) fiber.yielded.value = undefined;
+      const {yeeted} = fiber;
+      if (yeeted) yeeted.reduced = yeeted.value = undefined;
       return bound(arg);
     }
   }
   return (...args: any[]) => {
     fiber.pointer = base;
-    if (fiber.yielded) fiber.yielded.value = undefined;
+    const {yeeted} = fiber;
+    if (yeeted) yeeted.reduced = yeeted.value = undefined;
     return bound.apply(null, args);
   }
 };
@@ -75,11 +78,11 @@ export const mapReduce = <R, T>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key});
 
-// Yield value(s) upstream
-export const yield = <T>(
+// Yeet value(s) upstream
+export const yeet = <T>(
   value: T,
   key?: Key,
-): DeferredCall<() => void> => ({f: YIELD, arg: value, key});
+): DeferredCall<() => void> => ({f: YEET, arg: value, key});
 
 // Hold call info for a fiber
 export const makeFunctionCall = <F extends Function>(

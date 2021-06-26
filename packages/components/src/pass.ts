@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  use, detach, mapReduce, useCallback, useOne, renderFiber,
+  use, yeet, mapReduce, useMemo,
 } from '@use-gpu/live';
 
 export type PassProps = {
@@ -12,15 +12,14 @@ export type PassProps = {
 
 export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
-export const mapper = (t: RenderToPass) => [t];
-export const reducer = (a: RenderToPass[], b: RenderToPass[]) => [...a, ...b];
+const mapper = (t: RenderToPass) => [t];
+const reducer = (a: RenderToPass[], b: RenderToPass[]) => [...a, ...b];
 
 export const Pass: LiveComponent<PassProps> = (fiber) => (props) => {
   const {device, colorAttachments, depthStencilAttachment, children, render} = props;
 
-  return mapReduce(
-    children ?? render(), mapper, reducer,
-    (rs: RenderToPass[]) => {
+  const Done = useMemo(fiber)(() => (fiber) => (rs: RenderToPass[]) =>
+    yeet(() => {
       const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments,
         depthStencilAttachment,
@@ -33,6 +32,10 @@ export const Pass: LiveComponent<PassProps> = (fiber) => (props) => {
 
       // @ts-ignore
       device.queue.submit([commandEncoder.finish()]);
-    },
-  );
+    }),
+    [device, colorAttachments, depthStencilAttachment]);
+
+  if (!Done.displayName) Done.displayName = '[Pass]';
+
+  return mapReduce(children ?? render(), mapper, reducer, Done);
 }

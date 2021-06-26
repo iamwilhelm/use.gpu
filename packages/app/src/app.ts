@@ -48,7 +48,7 @@ export const App: LiveComponent<AppProps> = () => (props) => {
                     device, colorAttachments, depthStencilAttachment,
                     children: [
 
-                      use(Cube, 'cube')({device, colorStates, depthStencilState, compileGLSL, defs, uniforms}),
+                      use(Cube)({device, colorStates, depthStencilState, compileGLSL, defs, uniforms}),
 
                     ]
                   })

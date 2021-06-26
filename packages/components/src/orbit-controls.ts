@@ -60,6 +60,5 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (fiber) => (prop
       canvas.removeEventListener('wheel', onWheel);
     });
   }, [canvas]);
-
   return render(radius, bearing, pitch);
 };

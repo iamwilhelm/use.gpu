@@ -3,14 +3,14 @@ import { DeferredCall, LiveContext } from './types';
 const {prototype: {hasOwnProperty}} = Object;
 
 export const formatTree = (root: LiveContext<any>, depth: number = 0): string => {
-  const {mount, mounts} = root;
+  const {mount, mounts, next} = root;
   let out = [];
 
   const prefix = '  '.repeat(depth);
   out.push(prefix + formatNode(root));
 
   if (mount) {
-    out.push(formatTree(mount, depth));
+    out.push(formatTree(mount, depth + +!!mounts));
   }
 
   if (mounts) {
@@ -18,6 +18,10 @@ export const formatTree = (root: LiveContext<any>, depth: number = 0): string =>
       const sub = mounts.get(key);
       if (sub) out.push(formatTree(sub, depth + 1));
     }
+  }
+
+  if (next) {
+    out.push(formatTree(next, depth + 1));
   }
 
   return out.join("\n");
@@ -39,7 +43,6 @@ export const formatNode = <F extends Function>(node: DeferredCall<F>): string =>
     }
   }
   if (args?.length) args.unshift('');
-  if (name === 'Node') console.log(node)
 
   return `<${name}${args ? args.join(' ') : ''}>`;
 }

@@ -34,20 +34,27 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   // State for user hooks
   state: any[],
   pointer: number,
+  version: number,
+
+  // Rendered snapshot
+  type: Function,
+  rendered?: any,
 
   // Mounting state
   seen?: Set<Key>,
   mount?: LiveFiber<any>,
   mounts?: FiberMap,
-  rendered?: any,
+  next?: LiveFiber<any>,
 
-  // Yielding state
-  yielded?: FiberYield<any>,
+  // Yeeting state
+  yeeted?: FiberYeet<any>,
 };
 
-export type FiberYield<T> = {
-  value: T,
+export type FiberYeet<T> = {
   emit: Setter<T>,
+  value?: T,
+  reduced?: T,
+  parent?: FiberYeet<T>,
 };
 
 export type FiberMap = Map<Key, LiveContext<any>>;

@@ -15,12 +15,12 @@ export const makeActionScheduler = () => {
   };
 
   const flush = () => {
+    const q = queue.slice();
+    queue.length = 0;
     timer = null;
-    for (const {task} of queue) task();
-    if (onUpdate) {
-      const q = queue.slice();
-      queue.length = 0;
 
+    for (const {task} of q) task();
+    if (onUpdate) {
       onUpdate(q);
     }
   };

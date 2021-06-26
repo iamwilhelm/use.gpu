@@ -21,7 +21,7 @@ export const makeFiber = <F extends Function>(
   const bound = null;
   const depth = parent ? parent.depth + 1 : 0;
 
-  const yeeted = parent?.yeeted ? {...parent.yeeted, parent} : null;
+  const yeeted = parent?.yeeted ? {...parent.yeeted, parent: parent.yeeted} : null;
 
   let path = parent ? parent.path : ROOT_PATH;
   if (key != null) path = [...path, key];
@@ -52,13 +52,14 @@ export const makeSubFiber = <F extends Function>(
 }
 
 // Make fiber yeet state
-export const makeYeetState = <A, B>(map?: (a: A) => B): FiberYeet => ({
+export const makeYeetState = <A, B>(root: LiveContext<any>, map?: (a: A) => B): FiberYeet => ({
   emit: map
     ? (fiber: LiveFiber<any>, t: T) => fiber.yeeted!.value = map(t)
     : (fiber: LiveFiber<any>, t: T) => fiber.yeeted!.value = t,
   value: undefined,
   reduced: undefined,
   parent: undefined,
+  root,
 });
 
 // Render a fiber
@@ -183,7 +184,7 @@ export const mapReduceFiberCalls = <F extends Functions, R, T>(
   Done?: LiveFunction<any>,
 ) => {
   let {rendered, yeeted} = fiber;
-  if (!yeeted || yeeted.parent) yeeted = fiber.yeeted = makeYeetState(mapper);
+  if (!yeeted || yeeted.parent) yeeted = fiber.yeeted = makeYeetState(yeeted?.root ?? fiber, mapper);
 
   reconcileFiberCalls(fiber, calls);
 

@@ -37,6 +37,7 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     const timer = setInterval(() => {
       setBlink(b => 1 - b);
     }, 5000);
+    setTimeout(() => clearInterval(timer), 10000);
     dispose(() => clearInterval(timer));
   });
 

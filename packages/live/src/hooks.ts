@@ -76,7 +76,7 @@ export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T
   Setter<T>,
 ] => {
   const i = pushState(fiber);
-  let {state, host} = fiber;
+  let {state, host, yeeted} = fiber;
 
   let value    = state[i];
   let setValue = state[i + 1];
@@ -84,11 +84,18 @@ export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T
   if (value === undefined) {
     value = (initialState instanceof Function) ? initialState() : initialState;
     setValue = host
-      ? (value: Reducer<T>) => host.schedule(fiber, () => {
-          if (value instanceof Function) state[i] = value(state[i]);
-          else state[i] = value;
-          fiber.version++;
-        })
+      ? (value: Reducer<T>) => {
+          host.schedule(fiber, () => {
+            if (value instanceof Function) state[i] = value(state[i]);
+            else state[i] = value;
+            fiber.version++;
+            if (yeeted) {
+              let yt = yeeted;
+              do { yt.value = yt.reduce = undefined } while (yt = yt.parent);
+              host.schedule(fiber.yeeted.root, NOP);
+            }
+          });
+        }
       : NOP;
 
     state[i] = value;

@@ -55,6 +55,7 @@ export type FiberYeet<T> = {
   value?: T,
   reduced?: T,
   parent?: FiberYeet<T>,
+  root: LiveFiber<any>,
 };
 
 export type FiberMap = Map<Key, LiveContext<any>>;

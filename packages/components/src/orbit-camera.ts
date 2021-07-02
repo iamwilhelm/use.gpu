@@ -39,7 +39,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
     render,
   } = props;
   
-  const uniforms = useOne(fiber)(() => ({
+  const uniforms = useOne(() => ({
     projectionMatrix: null,
     viewMatrix: null,
   }));

@@ -19,7 +19,7 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (fiber) => (props) => {
   if (canvas.width  !==  width) canvas.width  = width;
   if (canvas.height !== height) canvas.height = height;
 
-  useResource(fiber)((dispose) => {
+  useResource((dispose) => {
     const resize = () => setSize(getCanvasSize(window, canvas))
     window.addEventListener('resize', resize);
     dispose(() => window.removeEventListener('resize', resize));

@@ -56,7 +56,7 @@ it('memoizes a component', () => {
 it('holds state (hook)', () => {
 
   const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
-    const [foo] = useState(fiber)(() => Math.random());
+    const [foo] = useState(() => Math.random());
     return foo;
   };
 
@@ -82,7 +82,7 @@ it('holds memoized value (hook)', () => {
 
   const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
 
-    const foo = useMemo(fiber)(() => Math.random(), [dep]);
+    const foo = useMemo(() => Math.random(), [dep]);
 
     return foo;
   };
@@ -109,7 +109,7 @@ it('holds memoized value with one dep (hook)', () => {
 
   const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
 
-    const foo = useOne(fiber)(() => Math.random(), dep);
+    const foo = useOne(() => Math.random(), dep);
 
     return foo;
   };
@@ -137,7 +137,7 @@ it('holds memoized callback (hook)', () => {
   const F: LiveFunction<FunctionReturner> = (fiber: LiveFiber<FunctionReturner>) => (): () => number => {
 
     const x = Math.random();
-    const foo = useCallback(fiber)(() => x, [dep]);
+    const foo = useCallback(() => x, [dep]);
 
     return foo;
   };
@@ -166,7 +166,7 @@ it('manages a dependent resource (hook)', () => {
 
   const F: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
-    useResource(fiber)((dispose) => {
+    useResource((dispose) => {
       allocated++;
       dispose(() => { disposed++ });
     }, [dep]);
@@ -177,7 +177,7 @@ it('manages a dependent resource (hook)', () => {
   const G: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
-    useResource(fiber)((dispose) => {
+    useResource((dispose) => {
       allocated++;
       dispose(() => { disposed++ });
     }, [x]);
@@ -188,7 +188,7 @@ it('manages a dependent resource (hook)', () => {
   const H: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
 
     const x = Math.random();
-    useResource(fiber)((dispose) => {
+    useResource((dispose) => {
       allocated++;
       dispose(() => { disposed++ });
       return allocated;

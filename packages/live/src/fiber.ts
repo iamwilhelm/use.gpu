@@ -1,6 +1,6 @@
-import { LiveFiber, LiveFunction, FiberYeet, Key } from './types';
+import { LiveFiber, LiveFunction, LiveContexts, FiberYeet, Key } from './types';
 
-import { use, bind, DETACH, RECONCILE, MAP_REDUCE, GATHER, YEET } from './live';
+import { use, bind, DETACH, RECONCILE, MAP_REDUCE, GATHER, YEET, PROVIDE } from './live';
 import { isSameDependencies } from './util';
 import { formatNode } from './debug';
 
@@ -9,6 +9,7 @@ let DEBUG = false;
 
 const EMPTY_ARRAY = [] as any[];
 const ROOT_PATH = [0] as Key[];
+const NO_CONTEXT = {} as LiveContexts;
 
 // Make a fiber for a live function
 export const makeFiber = <F extends Function>(
@@ -22,6 +23,7 @@ export const makeFiber = <F extends Function>(
   const depth = parent ? parent.depth + 1 : 0;
 
   const yeeted = parent?.yeeted ? {...parent.yeeted, parent: parent.yeeted} : null;
+  const context = parent?.context ?? NO_CONTEXT;
 
   let path = parent ? parent.path : ROOT_PATH;
   if (key != null) path = [...path, key];
@@ -29,7 +31,7 @@ export const makeFiber = <F extends Function>(
   const self = {
     bound, f, args,
     host, depth, path,
-    yeeted,
+    yeeted, context,
     state: null, pointer: 0, version: 1,
     mount: null, mounts: null, next: null, seen: null,
     type: null,
@@ -115,6 +117,11 @@ export const renderFiber = <F extends Function>(fiber: LiveFiber<F>, visit?: Set
   else if (fiberType === YEET) {
     if (!yeeted) throw new Error("Yeet without aggregator");
     yeeted.emit(fiber, call.arg);
+  }
+  // Context provider
+  else if (fiberType === PROVIDE) {
+		const [context, value] = call.args ?? EMPTY_ARRAY;
+    provideContext(fiber, context, value);
   }
   // Mount normal node (may still be built-in)
   else {
@@ -288,6 +295,15 @@ export const gatherFiberValues = <F extends Function, R, T>(
   }
   else if (mount) return yeeted.reduced = gatherFiberValues(mount);
   return undefined;
+}
+
+// Provide a value for a context on a fiber
+export const provideContext = <F extends Function>(
+	fiber: LiveFiber<F>,
+	context: LiveContext<any>,
+	value: any,
+) => {
+	fiber.context.set(context, value);
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating its execution

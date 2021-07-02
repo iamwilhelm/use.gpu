@@ -40,14 +40,14 @@ export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
 
   const {width, height} = canvas;
 
-  const colorStates      = useOne(fiber)(() => [makeColorState(presentationFormat)], presentationFormat);
-  const colorAttachments = useOne(fiber)(() => [makeColorAttachment(backgroundColor)], backgroundColor);
+  const colorStates      = useOne(() => [makeColorState(presentationFormat)], presentationFormat);
+  const colorAttachments = useOne(() => [makeColorAttachment(backgroundColor)], backgroundColor);
 
   const [
     depthTexture,
     depthStencilState,
     depthStencilAttachment,
-  ] = useResource(fiber)(() => {
+  ] = useResource(() => {
       const texture = makeDepthTexture(device, width, height, depthStencilFormat);
       const state = makeDepthStencilState(depthStencilFormat);
       const attachment = makeDepthStencilAttachment(texture);
@@ -56,7 +56,7 @@ export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
     [device, width, height, depthStencilFormat]
   );
 
-  const gpuContext = useMemo(fiber)(() =>
+  const gpuContext = useMemo(() =>
     makePresentationContext(device, canvas, presentationFormat),
     [device, canvas, presentationFormat, width, height],
   );

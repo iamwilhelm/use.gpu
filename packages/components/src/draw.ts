@@ -15,7 +15,7 @@ const reducer = (a: Task[], b: Task[]) => [...a, ...b];
 export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
   const {gpuContext, colorAttachments, children} = props;
 
-  const Done = useMemo(fiber)(() =>
+  const Done = useMemo(() =>
     (fiber) => (ts: Task[]) => {
       // @ts-ignore
       colorAttachments[0].view = gpuContext

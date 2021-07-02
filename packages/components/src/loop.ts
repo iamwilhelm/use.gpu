@@ -23,14 +23,14 @@ const Paint = () => (ref: LoopRef) => ref.children ?? ref.render();
 export const Loop: LiveComponent<LoopProps> = (fiber) => (props) => {
   const {gpuContext, colorAttachments, children, update, render} = props;
 
-  const ref: LoopRef = useOne(fiber)(() => ({children, update, render}));
+  const ref: LoopRef = useOne(() => ({children, update, render}));
   ref.children = children;
   ref.update = update;
   ref.render = render;
 
-  const fork = useOne(fiber)(() => use(Paint)(ref));
+  const fork = useOne(() => use(Paint)(ref));
   return detach(fork, (detached: LiveFiber<any>) => {
-    useResource(fiber)((dispose) => {
+    useResource((dispose) => {
       let running = true;
 
       const loop = () => {

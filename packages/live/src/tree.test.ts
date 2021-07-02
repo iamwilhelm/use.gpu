@@ -81,7 +81,7 @@ it("reacts on the root (setter form)", () => {
   const Root = (fiber: LiveFiber<any>) => () => {
     rendered.root++;
 
-    const [, setValue] = useState(fiber)(0);
+    const [, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
     return use(Node)(Math.random());
@@ -130,7 +130,7 @@ it("reacts on the root (reducer form)", () => {
   const Root = (fiber: LiveFiber<any>) => () => {
     rendered.root++;
 
-    const [, setValue] = useState(fiber)(0);
+    const [, setValue] = useState(0);
     setTrigger(() => setValue((s: number) => s + 1));
 
     return use(Node)(Math.random());
@@ -177,7 +177,7 @@ it("reacts and remounts on the root", () => {
   const setTrigger = (f: Task) => trigger = f;
 
   const Root = (fiber: LiveFiber<any>) => () => {
-    const [, setValue] = useState(fiber)(0);
+    const [, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
     rendered.root++;
@@ -261,7 +261,7 @@ it("reacts and remounts a sub tree", () => {
   };
 
   const SubRoot = (fiber: LiveFiber<any>) => () => {
-    const [, setValue] = useState(fiber)(0);
+    const [, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
     rendered.subroot++;
@@ -336,7 +336,7 @@ it("coalesces updates", () => {
   const Root = (fiber: LiveFiber<any>) => () => {
     rendered.root++;
 
-    const [, setValue] = useState(fiber)(0);
+    const [, setValue] = useState(0);
     setTrigger1(() => setValue(1));
 
     return use(Node)(Math.random());
@@ -345,7 +345,7 @@ it("coalesces updates", () => {
   const Node = (fiber: LiveFiber<any>) => () => {
     rendered.node++;
 
-    const [, setValue] = useState(fiber)(0);
+    const [, setValue] = useState(0);
     setTrigger2(() => setValue(1));
   };
 

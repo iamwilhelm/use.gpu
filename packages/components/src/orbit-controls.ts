@@ -26,11 +26,11 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (fiber) => (prop
   } = props;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [radius, setRadius]   = useState<number>(fiber)(5);
-  const [bearing, setBearing] = useState<number>(fiber)(0.6);
-  const [pitch, setPitch]     = useState<number>(fiber)(0.4);
+  const [radius, setRadius]   = useState<number>(5);
+  const [bearing, setBearing] = useState<number>(0.6);
+  const [pitch, setPitch]     = useState<number>(0.4);
 
-  useResource(fiber)((dispose) => {
+  useResource((dispose) => {
     const onWheel = (e: WheelEvent) => {
       const {deltaMode, deltaY} = e;
       let f = 1;

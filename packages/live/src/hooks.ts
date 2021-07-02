@@ -4,7 +4,7 @@ import {
   DeferredCall, HostInterface,
 } from './types';
 
-import { bind } from './live';
+import { bind, CURRENT_FIBER } from './live';
 import { makeFiber, makeSubFiber } from './fiber';
 import { isSameDependencies } from './util';
 
@@ -36,7 +36,7 @@ export const memoArgs = <F extends Function>(
     return (...args: any[]) => {
       args.push(fiber.version);
 
-      const value = useMemo(fiber)(() => bound(args), args);
+      const value = useMemo(() => bound(args), args);
       return value;
     };
   };
@@ -60,7 +60,7 @@ export const memoProps = <F extends Function>(
         deps.push(props[k]);
       }
 
-      const value = useMemo(fiber)(() => bound(props), deps);
+      const value = useMemo(() => bound(props), deps);
       return value;
     };
   };
@@ -69,12 +69,15 @@ export const memoProps = <F extends Function>(
 }
 
 // Allocate state value and a setter for it, initializing with the given value or function
-export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T = S>(
+export const useState = <T>(
   initialState: Initial<T>,
 ): [
   T,
   Setter<T>,
 ] => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+
   const i = pushState(fiber);
   let {state, host, yeeted} = fiber;
 
@@ -106,10 +109,13 @@ export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T
 }
 
 // Memoize a value with given dependencies
-export const useMemo = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T = S>(
+export const useMemo = <T>(
   initialState: () => T,
   dependencies: any[] = NO_DEPS,
 ): T => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+
   const i = pushState(fiber);
   let {state, host} = fiber;
 
@@ -127,10 +133,13 @@ export const useMemo = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T 
 }
 
 // Memoize a value with one dependency
-export const useOne = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T = S>(
+export const useOne = <T>(
   initialState: () => T,
   dependency: any = null,
 ): T => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+
   const i = pushState(fiber);
   let {state, host} = fiber;
 
@@ -148,10 +157,13 @@ export const useOne = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T =
 }
 
 // Memoize a function with given dependencies
-export const useCallback = <F extends Function>(fiber: LiveFiber<F>) => <T extends Function>(
+export const useCallback = <T extends Function>(
   initialValue: T,
   dependencies: any[] = NO_DEPS,
 ): T => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+
   const i = pushState(fiber);
   let {state, host} = fiber;
 
@@ -169,12 +181,13 @@ export const useCallback = <F extends Function>(fiber: LiveFiber<F>) => <T exten
 }
 
 // Bind immediately to a resource, with auto-cleanup on dep change or unmount
-export const useResource = <F extends Function>(
-  fiber: LiveFiber<F>,
-) => <R>(
+export const useResource = <R>(
   callback: (dispose: (f: Function) => void) => R,
   dependencies: any[] = NO_DEPS,
 ): R => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+
   const i = pushState(fiber);
   let {state, host} = fiber;
 
@@ -202,6 +215,16 @@ export const useResource = <F extends Function>(
 
   // Assume if return type is used, it's T's
   return (undefined as unknown as R);
+}
+
+// Grab a context from the fiber
+export const useContext = <C>(
+  context: C,
+) => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+
+  return fiber.context.get(context) ?? context.initialValue;
 }
 
 // Cleanup effect tracker

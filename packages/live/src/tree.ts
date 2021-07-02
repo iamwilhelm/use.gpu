@@ -4,7 +4,7 @@ import { makeFiber, makeSubFiber, renderFiber } from './fiber';
 import { makeActionScheduler, makeDisposalTracker, makePaintRequester, isSubPath } from './util';
 import { formatNode } from './debug';
 
-let DEBUG = true;
+let DEBUG = false;
 //setTimeout((() => DEBUG = false), 900);
 
 const NO_ARGS = [] as any[];
@@ -40,9 +40,12 @@ export const renderWithDispatch = <T>(
       const fibers = as.map(({fiber}) => fiber);
 
       if (fibers.length) {
+        const visit = new Set<LiveFiber<any>>();
+
         const roots = [] as LiveFiber<any>[];
         fibers.sort((a, b) => a.depth - b.depth);
         nextFiber: for (let f of fibers) {
+          visit.add(f);
           for (let r of roots) if (isSubPath(r.path, f.path)) continue nextFiber;
           roots.push(f);
         }
@@ -50,7 +53,14 @@ export const renderWithDispatch = <T>(
         for (const sub of roots) {
           DEBUG && console.log('Updating Sub-Root', formatNode(sub));
           if (host) host.__stats.updates++;
-          renderFiber(sub);
+          renderFiber(sub, visit);
+        }
+
+        while (visit.size) {
+          const next = visit.values().next().value;
+          DEBUG && console.log('Updating Fenced Sub-Node', formatNode(next));
+          if (host) host.__stats.updates++;
+          renderFiber(next, visit);
         }
       }
       else {

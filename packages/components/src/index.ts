@@ -4,7 +4,6 @@ export * from './canvas';
 export * from './draw';
 export * from './inline';
 export * from './loop';
-export * from './memo';
 export * from './orbit-camera';
 export * from './orbit-controls';
 export * from './pass';

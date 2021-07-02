@@ -36,8 +36,8 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
   useResource(fiber)((dispose) => {
     const timer = setInterval(() => {
       setBlink(b => 1 - b);
-    }, 5000);
-    setTimeout(() => clearInterval(timer), 10000);
+    }, 1000);
+    setTimeout(() => clearInterval(timer), 4000);
     dispose(() => clearInterval(timer));
   });
 
@@ -71,11 +71,7 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformDefinition, GPUBindGroup];
   }, [device, defs, pipeline]);
 
-  console.log('yeet cube', blink);
-
   return yeet((passEncoder: GPURenderPassEncoder) => {
-    console.log('draw cube');
-
     uniformPipe.fill({...uniforms, blink});
     uploadBuffer(device, uniformBuffer, uniformPipe.data);
 
@@ -83,5 +79,5 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     passEncoder.setBindGroup(0, uniformBindGroup);
     passEncoder.setVertexBuffer(0, vertexBuffers[0]);
     passEncoder.draw(cube.count, 1, 0, 0);
-  });
+  }); 
 }, 'Cube');

@@ -29,16 +29,15 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   depth: number,
 
   // Instance of F bound to self
-  bound: F,
+  bound?: F,
   
   // State for user hooks
   state: any[],
   pointer: number,
   version: number,
 
-  // Rendered snapshot
+  // Last snapshot
   type: Function,
-  rendered?: any,
 
   // Mounting state
   seen?: Set<Key>,
@@ -55,7 +54,7 @@ export type FiberYeet<T> = {
   value?: T,
   reduced?: T,
   parent?: FiberYeet<T>,
-  root: LiveFiber<any>,
+  roots: LiveFiber<any>[],
 };
 
 export type FiberMap = Map<Key, LiveContext<any>>;

@@ -92,7 +92,7 @@ export const useState = <S, F extends Function = any>(fiber: LiveFiber<F>) => <T
             if (yeeted) {
               let yt = yeeted;
               do { yt.value = yt.reduce = undefined } while (yt = yt.parent);
-              host.schedule(fiber.yeeted.root, NOP);
+              for (let root of yeeted.roots) host.schedule(root, NOP);
             }
           });
         }

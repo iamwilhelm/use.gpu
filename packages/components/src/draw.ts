@@ -1,6 +1,6 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
-import { yeet, mapReduce, useMemo } from '@use-gpu/live';
+import { yeet, gatherReduce, useMemo } from '@use-gpu/live';
 
 export type DrawProps = {
   gpuContext: GPUPresentationContext,
@@ -29,5 +29,5 @@ export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
 
   if (!Done.displayName) Done.displayName = '[Draw]';
 
-  return mapReduce(children ?? render(), mapper, reducer, Done);
+  return gatherReduce(children ?? render(), Done);
 }

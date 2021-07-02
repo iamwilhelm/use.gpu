@@ -9,11 +9,13 @@ import { makeFiber } from './fiber';
 export const DETACH     = () => () => {};
 export const RECONCILE  = () => () => {};
 export const MAP_REDUCE = () => () => {};
+export const GATHER     = () => () => {};
 export const YEET       = () => () => {};
 
 (DETACH     as any).isLiveBuiltin = true;
 (RECONCILE  as any).isLiveBuiltin = true;
 (MAP_REDUCE as any).isLiveBuiltin = true;
+(GATHER     as any).isLiveBuiltin = true;
 (YEET       as any).isLiveBuiltin = true;
 
 // Prepare to call a live function with optional given persistent fiber
@@ -77,6 +79,13 @@ export const mapReduce = <R, T>(
   done?: (r: R) => void,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key});
+
+// Gather items from a subtree
+export const gatherReduce = <T>(
+  calls: LiveElement<any>,
+  done?: (r: T[]) => void,
+  key?: Key,
+): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key});
 
 // Yeet value(s) upstream
 export const yeet = <T>(

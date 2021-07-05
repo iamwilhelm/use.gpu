@@ -15,7 +15,7 @@ export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [numbe
 export const AutoSize: LiveComponent<AutoSizeProps> = (fiber) => (props) => {
   const {canvas, render} = props;
   
-  const [[width, height], setSize] = useState(fiber)(() => getCanvasSize(window, canvas));
+  const [[width, height], setSize] = useState(() => getCanvasSize(window, canvas));
   if (canvas.width  !==  width) canvas.width  = width;
   if (canvas.height !== height) canvas.height = height;
 

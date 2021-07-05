@@ -1,14 +1,14 @@
 import { LiveFiber, Mounts, Task } from './types';
 import { use, detach, RECONCILE } from './live';
 import { renderFiber, makeSubFiber } from './fiber';
-import { useState } from './hooks';
+import { memoArgs, useState } from './hooks';
 import { renderSync } from './tree';
 
 it("mounts", () => {
-  
+
   const Root = () => () => use(Node)();
   const Node = () => () => {};
-  
+
   const result = renderSync(use(Root)());
 
   expect(result.host).toBeTruthy();
@@ -23,14 +23,14 @@ it("mounts", () => {
 });
 
 it("mounts multiple", () => {
-  
+
   const Root = () => () => [
     use(Node, '1')(),
     use(Node, '2')(),
   ];
-  
+
   const Node = () => () => {};
-  
+
   const result = renderSync(use(Root)());
   expect(result.f).toBe(Root);
   expect(result.mounts).toBeTruthy();
@@ -54,7 +54,7 @@ it("mounts a subfiber", () => {
 
   const Sub = () => () => use(Node)();
   const Node = () => () => {};
-  
+
   const result = renderSync(use(Root)());
   expect(result.f).toBe(Root);
 
@@ -66,7 +66,7 @@ it("mounts a subfiber", () => {
     const {mount} = captureSubFiber;
     expect(mount && mount.f).toBe(Node);
   }
-  
+
 });
 
 it("reacts on the root (setter form)", () => {
@@ -86,7 +86,7 @@ it("reacts on the root (setter form)", () => {
 
     return use(Node)(Math.random());
   };
-  
+
   const Node = () => () => {
     rendered.node++;
   };
@@ -115,7 +115,7 @@ it("reacts on the root (setter form)", () => {
 
   expect(rendered.root).toBe(2);
   expect(rendered.node).toBe(2);
-    
+
 });
 
 it("reacts on the root (reducer form)", () => {
@@ -135,7 +135,7 @@ it("reacts on the root (reducer form)", () => {
 
     return use(Node)(Math.random());
   };
-  
+
   const Node = () => () => {
     rendered.node++;
   };
@@ -164,7 +164,7 @@ it("reacts on the root (reducer form)", () => {
 
   expect(rendered.root).toBe(2);
   expect(rendered.node).toBe(2);
-    
+
 });
 
 it("reacts and remounts on the root", () => {
@@ -240,7 +240,7 @@ it("reacts and remounts on the root", () => {
   expect(stats.mounts).toBe(5);
   expect(stats.unmounts).toBe(1);
   expect(stats.updates).toBe(3);
-    
+
 });
 
 it("reacts and remounts a sub tree", () => {
@@ -319,7 +319,7 @@ it("reacts and remounts a sub tree", () => {
   expect(stats.mounts).toBe(6);
   expect(stats.unmounts).toBe(1);
   expect(stats.updates).toBe(3);
-    
+
 });
 
 it("coalesces updates", () => {
@@ -341,7 +341,7 @@ it("coalesces updates", () => {
 
     return use(Node)(Math.random());
   };
-  
+
   const Node = (fiber: LiveFiber<any>) => () => {
     rendered.node++;
 
@@ -374,5 +374,75 @@ it("coalesces updates", () => {
 
   expect(rendered.root).toBe(2);
   expect(rendered.node).toBe(2);
-    
+
+});
+
+it("updates with memo in the way", () => {
+
+  const rendered = {
+    root: 0,
+    memo: 0,
+    node: 0,
+  };
+  let trigger1 = null as Task | null;
+  let trigger2 = null as Task | null;
+  const setTrigger1 = (f: Task) => trigger1 = f;
+  const setTrigger2 = (f: Task) => trigger2 = f;
+
+  const Root = (fiber: LiveFiber<any>) => () => {
+    rendered.root++;
+
+    const [, setValue] = useState(0);
+    setTrigger1(() => setValue(1));
+
+    return use(Memo)();
+  };
+
+  const Memo = memoArgs((fiber: LiveFiber<any>) => () => {
+    rendered.memo++;
+
+    return use(Node)(Math.random());
+  });
+
+  const Node = (fiber: LiveFiber<any>) => () => {
+    rendered.node++;
+
+    const [, setValue] = useState(0);
+    setTrigger2(() => setValue(1));
+  };
+
+  const result = renderSync(use(Root)());
+  expect(result.host).toBeTruthy();
+  expect(result.mount).toBeTruthy();
+  expect(result.mount.mount).toBeTruthy();
+  if (!result.host) return;
+  if (!result.mount) return;
+  if (!result.mount.mount) return;
+
+  const {host: {__flush: flush}} = result;
+
+  expect(result.f).toBe(Root);
+  const memo1 = result.mount;
+  expect(memo1 && memo1.f).toBe(Memo);
+  const node1 = result.mount.mount;
+  expect(node1 && node1.f).toBe(Node);
+
+  expect(rendered.root).toBe(1);
+  expect(rendered.memo).toBe(1);
+  expect(rendered.node).toBe(1);
+
+  if (trigger1) trigger1();
+  if (trigger2) trigger2();
+  if (flush) flush();
+
+  expect(result.f).toBe(Root);
+  const memo2 = result.mount;
+  expect(memo2 && memo2.f).toBe(Memo);
+  const node2 = result.mount.mount;
+  expect(node2 && node2.f).toBe(Node);
+
+  expect(rendered.root).toBe(2);
+  expect(rendered.memo).toBe(1);
+  expect(rendered.node).toBe(2);
+
 });

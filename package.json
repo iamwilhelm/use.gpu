@@ -58,8 +58,6 @@
     "packages/core",
     "packages/webgpu",
     "packages/components",
-    "packages/app",
-    "packages/glslang-web-devel",
-    "packages/babel-parser"
+    "packages/app"
   ]
 }

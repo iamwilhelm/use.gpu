@@ -114,8 +114,9 @@ export const yeet = <T>(
 // Provide a value for a context
 export const provide = <T>(
 	context: LiveContext,
-	value?: T
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value]});
+	value?: T,
+	calls: LiveElement<any>,
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls]});
 
 // Hold call info for a fiber
 export const makeFunctionCall = <F extends Function>(

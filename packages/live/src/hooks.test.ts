@@ -1,8 +1,8 @@
 import { LiveFiber, LiveComponent, LiveFunction, DeferredCall } from './types';
 
-import { bind, use } from './live';
-import { makeHostFiber } from './tree';
-import { useCallback, useMemo, useOne, useResource, useState, memoArgs, memoProps } from './hooks';
+import { bind, use, provide, makeContext } from './live';
+import { makeHostFiber, renderSync } from './tree';
+import { useCallback, useContext, useMemo, useOne, useResource, useState, memoArgs, memoProps } from './hooks';
 
 type NullReturner = () => null;
 type NumberReturner = () => number;
@@ -156,7 +156,7 @@ it('holds memoized callback (hook)', () => {
 
     expect(result1).toBe(result2);
   }
-})
+});
 
 it('manages a dependent resource (hook)', () => {
 
@@ -263,3 +263,78 @@ it('manages a dependent resource (hook)', () => {
 
   }
 })
+
+it("provides a context", () => {
+
+  const Context = makeContext();
+  let value1 = null;
+  let value2 = null;
+
+  const Root = (fiber: LiveFiber<any>) => () =>
+    provide(Context, 123, [
+      use(Sub)()
+    ]);
+
+  const Sub = () => () => {
+    value1 = useContext(Context);
+    return use(Node)();
+  }
+  const Node = () => () => {
+    value2 = useContext(Context);
+  };
+
+  const result = renderSync(use(Root)());
+  expect(result.f).toBe(Root);
+
+  expect(result.mount).toBeTruthy();
+  expect(result.mount.mounts).toBeTruthy();
+
+  expect(value1).toBe(123);
+  expect(value2).toBe(123);
+});
+
+it("provides a changing context value", () => {
+
+  const Context = makeContext();
+  let value1 = null;
+  let value2 = null;
+
+  let trigger = null;
+
+  const Root = (fiber: LiveFiber<any>) => () => {
+    const [state, setState] = useState<number>(123);
+    trigger = () => setState(456);
+    return provide(Context, state, [
+      use(Sub)()
+    ]);
+  }
+
+  const Sub = () => () => {
+    value1 = useContext(Context);
+    return use(Node)();
+  }
+  const Node = () => () => {
+    value2 = useContext(Context);
+  };
+
+  const result = renderSync(use(Root)());
+  expect(result.f).toBe(Root);
+  if (!result.host) return;
+
+  const {host: {__flush: flush}} = result;
+
+  expect(result.mount).toBeTruthy();
+  expect(result.mount.mounts).toBeTruthy();
+
+  expect(value1).toBe(123);
+  expect(value2).toBe(123);
+
+  trigger();
+  flush();
+
+  expect(value1).toBe(456);
+  expect(value2).toBe(456);
+});
+
+
+

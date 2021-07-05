@@ -33,6 +33,7 @@ export const memoArgs = <F extends Function>(
     fiber: LiveFiber<F>,
   ) => {
     const bound = bind(f, fiber, reserveState(1));
+    fiber.version = 1;
     return (...args: any[]) => {
       args.push(fiber.version);
 
@@ -53,6 +54,7 @@ export const memoProps = <F extends Function>(
     fiber: LiveFiber<F>,
   ) => {
     const bound = bind(f, fiber, reserveState(1));
+    fiber.version = 1;
     return (props: Record<string, any>) => {
       const deps = [fiber.version] as any[];
       for (let k in props) {
@@ -91,7 +93,7 @@ export const useState = <T>(
           host.schedule(fiber, () => {
             if (value instanceof Function) state[i] = value(state[i]);
             else state[i] = value;
-            fiber.version++;
+            if (fiber.version != null) fiber.version++;
             if (yeeted) {
               let yt = yeeted;
               do { yt.value = yt.reduce = undefined } while (yt = yt.parent);
@@ -224,7 +226,7 @@ export const useContext = <C>(
   const fiber = CURRENT_FIBER;
   if (!fiber) throw new Error("Calling a hook outside a bound function");
 
-  return fiber.context.get(context) ?? context.initialValue;
+  return fiber.context.map.get(context) ?? context.initialValue;
 }
 
 // Cleanup effect tracker

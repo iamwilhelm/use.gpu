@@ -9,7 +9,7 @@ let DEBUG = false;
 
 const EMPTY_ARRAY = [] as any[];
 const ROOT_PATH = [0] as Key[];
-const NO_CONTEXT = {} as LiveContexts;
+const NO_CONTEXT = { map: new Map() as LiveContexts, roots: EMPTY_ARRAY };
 
 // Make a fiber for a live function
 export const makeFiber = <F extends Function>(
@@ -32,7 +32,7 @@ export const makeFiber = <F extends Function>(
     bound, f, args,
     host, depth, path,
     yeeted, context,
-    state: null, pointer: 0, version: 1,
+    state: null, pointer: 0, version: null,
     mount: null, mounts: null, next: null, seen: null,
     type: null,
   } as any as LiveFiber<F>;
@@ -66,6 +66,17 @@ export const makeYeetState = <A, B>(
   reduced: undefined,
   parent: undefined,
   roots: roots ? [...roots, fiber] : [fiber],
+});
+
+// Make fiber context state
+export const makeContextState = <A, B>(
+  fiber: LiveContext<any>,
+  roots?: LiveContext<any>,
+  parent?: FiberContext,
+): FiberContext => ({
+  map: null,
+  roots: roots ? [...roots, fiber] : [fiber],
+  parent,
 });
 
 // Render a fiber
@@ -117,11 +128,6 @@ export const renderFiber = <F extends Function>(fiber: LiveFiber<F>, visit?: Set
   else if (fiberType === YEET) {
     if (!yeeted) throw new Error("Yeet without aggregator");
     yeeted.emit(fiber, call.arg);
-  }
-  // Context provider
-  else if (fiberType === PROVIDE) {
-		const [context, value] = call.args ?? EMPTY_ARRAY;
-    provideContext(fiber, context, value);
   }
   // Mount normal node (may still be built-in)
   else {
@@ -298,12 +304,21 @@ export const gatherFiberValues = <F extends Function, R, T>(
 }
 
 // Provide a value for a context on a fiber
-export const provideContext = <F extends Function>(
-	fiber: LiveFiber<F>,
-	context: LiveContext<any>,
-	value: any,
+export const provideFiber = <F extends Function>(
+  fiber: LiveFiber<F>,
+  visit?: Set<LiveFiber<F>>,
 ) => {
-	fiber.context.set(context, value);
+  let {args: [context, value, calls]} = fiber;
+
+  if (fiber.context.roots.indexOf(fiber) < 0) {
+    const context = fiber.context = makeContextState(fiber, fiber.context.roots, fiber.context);
+    fiber.context.map = new Map(fiber.context.parent!.map);
+  }
+
+  fiber.context.map.set(context, value);
+
+  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls, visit);
+  else mountFiberCall(fiber, call, visit);
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating its execution
@@ -369,7 +384,10 @@ export const updateMount = <P extends Function>(
     DEBUG && console.log('Updating', key, formatNode(newMount!));
     if (host) host.__stats.updates++;
 
+    // If parent is memoized, check for identical render and skip it
+    if (parent.version && mount.args === newMount.args) return false;
     mount.args = newMount.args;
+
     return mount;
   }
 
@@ -387,6 +405,7 @@ export const flushMount = <F extends Function>(
   }
   if (mount) { 
     if (mount.f === DETACH) detachFiber(mount);
+    else if (mount.f === PROVIDE) provideFiber(mount, visit);
     else renderFiber(mount, visit);
   }
 }

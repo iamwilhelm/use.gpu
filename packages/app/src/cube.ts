@@ -32,20 +32,20 @@ export type CubeProps = {
 export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
   const {device, colorStates, depthStencilState, defs, uniforms, compileGLSL} = props;
 
-  const [blink, setBlink] = useState(fiber)(0);
-  useResource(fiber)((dispose) => {
+  const [blink, setBlink] = useState(0);
+  useResource((dispose) => {
     const timer = setInterval(() => {
       setBlink(b => 1 - b);
     }, 1000);
-    setTimeout(() => clearInterval(timer), 4000);
+    setTimeout(() => clearInterval(timer), 5500);
     dispose(() => clearInterval(timer));
   });
 
-  const cube = useOne(fiber)(makeCube);
-  const vertexBuffers = useMemo(fiber)(() =>
+  const cube = useOne(makeCube);
+  const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, cube.vertices), [device]);
 
-  const pipeline = useMemo(fiber)(() => {
+  const pipeline = useMemo(() => {
     const pipelineDesc: GPURenderPipelineDescriptor = {
       // @ts-ignore
       primitive: {
@@ -60,7 +60,7 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     return device.createRenderPipeline(pipelineDesc);
   }, [device, colorStates, depthStencilState]);
 
-  const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(fiber)(() => {
+  const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(() => {
     const uniformPipe = makeUniforms([...defs, ...CUBE_UNIFORM_DEFS]);
     const uniformBuffer = makeUniformBuffer(device, uniformPipe.data);
     const entries = makeUniformBindings([{resource: {buffer: uniformBuffer}}]);

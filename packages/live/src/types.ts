@@ -23,7 +23,6 @@ export type Action<F extends Function> = {
 export type Dispatcher = (as: Action<any>[]) => void;
 
 export type LiveContext<T> = { initialValue?: T };
-export type LiveContexts = Map<LiveContext<any>, any>;
 
 // Fiber context
 export type LiveFiber<F extends Function> = FunctionCall<F> & {
@@ -49,10 +48,16 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   next?: LiveFiber<any>,
 
   // User-specified context
-  context?: ,
+  context?: LiveContexts,
 
   // Yeeting state
   yeeted?: FiberYeet<any>,
+};
+
+export type FiberContext<T> = {
+  map: LiveContexts,
+  roots: LiveFiber<any>[],
+  parent?: FiberContext<T>,
 };
 
 export type FiberYeet<T> = {

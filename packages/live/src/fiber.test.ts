@@ -2,12 +2,12 @@ import { use } from './live';
 import { makeFiber, renderFiber } from './fiber';
 
 it("renders a fiber recursively", () => {
-  
+
   const Root = () => () => use(Node)();
   const Node = () => () => {};
-  
+
   const fiber = makeFiber(Root, null);
-  
+
   renderFiber(fiber);
 
   expect(fiber.f).toBe(Root);

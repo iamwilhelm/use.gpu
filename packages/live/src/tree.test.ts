@@ -1,4 +1,4 @@
-import { LiveFiber, Mounts, Task } from './types';
+import { LiveFiber, Task } from './types';
 import { use, detach, RECONCILE } from './live';
 import { renderFiber, makeSubFiber } from './fiber';
 import { memoArgs, useState } from './hooks';
@@ -59,11 +59,12 @@ it("mounts a subfiber", () => {
   expect(result.f).toBe(Root);
 
   expect(result.mount).toBeTruthy();
-  expect(result.mount.mount).toBeTruthy();
+  expect(result.mount!.mount).toBeTruthy();
 
   expect(captureSubFiber).toBeTruthy();
   if (captureSubFiber != null) {
     const {mount} = captureSubFiber;
+    // @ts-ignore
     expect(mount && mount.f).toBe(Node);
   }
 
@@ -418,7 +419,7 @@ it("updates with memo in the way", () => {
   const result = renderSync(use(Root)());
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
-  expect(result.mount.mount).toBeTruthy();
+  expect(result.mount!.mount).toBeTruthy();
   if (!result.host) return;
   if (!result.mount) return;
   if (!result.mount.mount) return;

@@ -1,4 +1,4 @@
-import { Key, Action, Task, LiveFiber, DeferredCall } from './types';
+import { Key, Action, Task, LiveFiber, DeferredCall, GroupedFibers } from './types';
 
 import { makeFiber, makeSubFiber, renderFiber, bustCaches } from './fiber';
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubOrSamePath, isSubPath } from './util';
@@ -39,7 +39,7 @@ export const renderWithDispatch = <T>(
 
   const {fiber, host, scheduler} = makeHostFiber(node);
 
-  const reenter = (as: Action[]) => {
+  const reenter = (as: Action<any>[]) => {
     dispatch(() => {
       const fibers = as.map(({fiber}) => fiber);
       if (fibers.length) renderFibers(fibers);
@@ -93,11 +93,11 @@ export const renderSubRoot = (
 }
 
 // Group fibers by shared ancestry
-export const groupFibers = (fibers: LiveFiber<any>) => {
+export const groupFibers = (fibers: LiveFiber<any>[]) => {
   fibers.sort((a, b) => a.depth - b.depth);
 
   // Group to top-level roots and descendants
-  const roots = [] as LiveFiber<any>[];
+  const roots = [] as GroupedFibers[];
   nextFiber: for (let f of fibers) {
     for (let r of roots) if (isSubOrSamePath(r.root.path, f.path)) {
       r.subs.add(f);

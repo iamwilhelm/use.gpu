@@ -1,7 +1,7 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveFiber, LiveElement,
-  DeferredCall, HostInterface,
+  LiveFunction, LiveFiber, LiveContext, LiveElement,
+  FunctionCall, DeferredCall, HostInterface,
 } from './types';
 
 import { makeFiber } from './fiber';
@@ -21,30 +21,30 @@ export const PROVIDE    = () => () => {};
 (PROVIDE    as any).isLiveBuiltin = true;
 
 // Prepare to call a live function with optional given persistent fiber
-export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base?: number = 0) => {
+export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
   fiber = fiber ?? makeFiber(f, null);
 
-  const bound = f(fiber);
+  const bound = f(fiber!);
   if (bound.length === 0) {
     return () => {
-      enterFiber(fiber, base);
+      enterFiber(fiber!, base);
       const value = bound();
-      exitFiber(fiber);
+      exitFiber();
       return value;
     }
   }
   if (bound.length === 1) {
     return (arg: any) => {
-      enterFiber(fiber, base);
+      enterFiber(fiber!, base);
       const value = bound(arg);
-      exitFiber(fiber);
+      exitFiber();
       return value;
     }
   }
   return (...args: any[]) => {
-    enterFiber(fiber, base);
+    enterFiber(fiber!, base);
     const value = bound.apply(null, args);
-    exitFiber(fiber);
+    exitFiber();
     return value;
   }
 };
@@ -53,7 +53,7 @@ export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F
 export let CURRENT_FIBER = null as LiveFiber<any> | null;
 
 // Enter/exit a fiber call
-export const enterFiber = <F extends Function>(fiber: LiveFunction, base: number) => {
+export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number) => {
   CURRENT_FIBER = fiber;
 
   // Reset state pointer
@@ -76,7 +76,7 @@ export const use = <F extends Function>(
 // Detach the rendering of a subtree
 export const detach = <F extends Function>(
   call: DeferredCall<F>,
-  callback: (fiber: LiveFiber<F>) => void,
+  callback: (render: () => void, fiber: LiveFiber<F>) => void,
   key?: Key,
 ): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key});
 
@@ -112,9 +112,9 @@ export const yeet = <T>(
 ): DeferredCall<() => void> => ({f: YEET, arg: value, key});
 
 // Provide a value for a context
-export const provide = <T>(
-  context: LiveContext,
-  value?: T,
+export const provide = <T, C>(
+  context: LiveContext<C>,
+  value: T,
   calls: LiveElement<any>,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls]});
 

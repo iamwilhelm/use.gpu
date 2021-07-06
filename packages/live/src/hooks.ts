@@ -1,6 +1,6 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveFiber,
+  LiveFunction, LiveFiber, LiveContext,
   DeferredCall, HostInterface,
 } from './types';
 
@@ -15,7 +15,7 @@ export const NO_RESOURCE = {tag: null, value: null};
 export const STATE_SLOTS = 2;
 
 export const reserveState = (slots: number) => slots * STATE_SLOTS;
-export const pushState = <F>(fiber: LiveFiber<F>) => {
+export const pushState = <F extends Function>(fiber: LiveFiber<F>) => {
   if (!fiber.state) fiber.state = [];
 
   const i = fiber.pointer;
@@ -30,7 +30,7 @@ export const memoArgs = <F extends Function>(
   f: LiveFunction<F>,
   name?: string,
 ) => {
-  const g = (
+  const g = ((
     fiber: LiveFiber<F>,
   ) => {
     const bound = bind(f, fiber, reserveState(1));
@@ -41,7 +41,7 @@ export const memoArgs = <F extends Function>(
       const value = useMemo(() => bound(args), args);
       return value;
     };
-  };
+  }) as any as LiveFunction<F>;
   (g as any).displayName = name != null ? `Memo(${name})` : `Memo`;
   return g;
 }
@@ -51,7 +51,7 @@ export const memoProps = <F extends Function>(
   f: LiveFunction<F>,
   name?: string,
 ) => {
-  const g = (
+  const g = ((
     fiber: LiveFiber<F>,
   ) => {
     const bound = bind(f, fiber, reserveState(1));
@@ -66,7 +66,7 @@ export const memoProps = <F extends Function>(
       const value = useMemo(() => bound(props), deps);
       return value;
     };
-  };
+  }) as any as LiveFunction<F>;
   (g as any).displayName = name != null ? `Memo(${name})` : `Memo`;
   return g;
 }
@@ -94,7 +94,7 @@ export const useState = <T>(
     value = (initialState instanceof Function) ? initialState() : initialState;
     setValue = host
       ? (value: Reducer<T>) => {
-          host.schedule(fiber, () => {
+          host!.schedule(fiber, () => {
             if (value instanceof Function) state[i] = value(state[i]);
             else state[i] = value;
             bustCaches(fiber);
@@ -220,19 +220,19 @@ export const useResource = <R>(
 
 // Grab a context from the fiber
 export const useContext = <C>(
-  context: C,
+  context: LiveContext<C>,
 ) => {
   const fiber = CURRENT_FIBER;
   if (!fiber) throw new Error("Calling a hook outside a bound function");
 
-  const {host, context: {map, roots}} = fiber;
-  const root = roots.get(context);
+  const {host, context: {values, roots}} = fiber;
+  const root = roots.get(context)!;
 
-  if (host.depend(fiber, root)) {
+  if (host && host.depend(fiber, root)) {
     host.track(fiber, () => host.undepend(fiber, root));
   }
 
-  return map.get(context) ?? context.initialValue;
+  return values.get(context) ?? context.initialValue;
 }
 
 // Cleanup effect tracker

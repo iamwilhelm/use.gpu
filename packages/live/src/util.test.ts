@@ -1,7 +1,7 @@
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester } from './util';
 
 it("schedules actions", () => {
-  let run = {a: 0, b: 0} as Record<string, boolean>;
+  let run = {a: 0, b: 0} as Record<string, number>;
   let flushed = [] as any[];
 
   let fiber = {} as any;
@@ -26,7 +26,7 @@ it("schedules actions", () => {
 })
 
 it("tracks disposal actions", () => {
-  let run = {a: 0, b: 0} as Record<string, boolean>;
+  let run = {a: 0, b: 0} as Record<string, number>;
 
   let fiber = {} as any;
 
@@ -69,7 +69,7 @@ it("tracks dependencies", () => {
 });
 
 it("requests paints", (done) => {
-  let run = {a: 0, b: 0} as Record<string, boolean>;
+  let run = {a: 0, b: 0} as Record<string, number>;
   let requested = 0;
 
   const raf = (f: any) => {

@@ -1,10 +1,10 @@
-import { LiveFiber, Task, Action, Dispatcher } from './types';
+import { LiveFiber, Task, Action, Dispatcher, Key } from './types';
 
 const NO_DEPS = [] as any[];
 
 // Schedules actions to be run immediately after the current thread completes
 export const makeActionScheduler = () => {
-  const queue = [] as Action[];
+  const queue = [] as Action<any>[];
 
   let timer = null as any;
   let onUpdate = null as any;

@@ -32,6 +32,7 @@ it('memoizes a function', () => {
 
 it('memoizes a component', () => {
 
+  // @ts-ignore
   const F: LiveFunction<NumberReturner> = memoProps(() => (props): number => {
     return Math.random();
   });
@@ -202,12 +203,12 @@ it('manages a dependent resource (hook)', () => {
     disposed = 0;
 
     const {fiber, disposal} = makeHostFiber(use(F)());
-    fiber.bound();
+    fiber.bound!();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    fiber.bound();
+    fiber.bound!();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
@@ -224,12 +225,12 @@ it('manages a dependent resource (hook)', () => {
     disposed = 0;
 
     const {fiber, disposal} = makeHostFiber(use(G)());
-    fiber.bound();
+    fiber.bound!();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    fiber.bound();
+    fiber.bound!();
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(1);
@@ -246,12 +247,12 @@ it('manages a dependent resource (hook)', () => {
     disposed = 0;
 
     const {fiber, disposal} = makeHostFiber(use(H)());
-    fiber.bound();
+    fiber.bound!();
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    fiber.bound();
+    fiber.bound!();
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(1);
@@ -287,7 +288,7 @@ it("provides a context", () => {
   expect(result.f).toBe(Root);
 
   expect(result.mount).toBeTruthy();
-  expect(result.mount.mounts).toBeTruthy();
+  expect(result.mount!.mounts).toBeTruthy();
 
   expect(value1).toBe(123);
   expect(value2).toBe(123);
@@ -296,10 +297,10 @@ it("provides a context", () => {
 it("provides a changing context value", () => {
 
   const Context = makeContext();
-  let value1 = null;
-  let value2 = null;
+  let value1 = null as number | null;
+  let value2 = null as number | null;
 
-  let trigger = null;
+  let trigger = null as Function | null;
 
   const Root = (fiber: LiveFiber<any>) => () => {
     const [state, setState] = useState<number>(123);
@@ -324,12 +325,12 @@ it("provides a changing context value", () => {
   const {host: {__flush: flush}} = result;
 
   expect(result.mount).toBeTruthy();
-  expect(result.mount.mounts).toBeTruthy();
+  expect(result.mount!.mounts).toBeTruthy();
 
   expect(value1).toBe(123);
   expect(value2).toBe(123);
 
-  trigger();
+  trigger!();
   flush();
 
   expect(value1).toBe(456);
@@ -340,9 +341,9 @@ it("provides a changing context value", () => {
 it("provides a changing context value on a memoized component", () => {
 
   const Context = makeContext();
-  let value = null;
+  let value = null as number | null;
 
-  let trigger = null;
+  let trigger = null as Function | null;
 
   const Root = (fiber: LiveFiber<any>) => () => {
     const [state, setState] = useState<number>(123);
@@ -353,6 +354,7 @@ it("provides a changing context value on a memoized component", () => {
   }
 
   const Sub = () => () => {
+    // @ts-ignore
     return use(Node)();
   };
 
@@ -367,11 +369,11 @@ it("provides a changing context value on a memoized component", () => {
   const {host: {__flush: flush}} = result;
 
   expect(result.mount).toBeTruthy();
-  expect(result.mount.mounts).toBeTruthy();
+  expect(result.mount!.mounts).toBeTruthy();
 
   expect(value).toBe(123);
 
-  trigger();
+  trigger!();
   flush();
 
   expect(value).toBe(456);
@@ -380,9 +382,9 @@ it("provides a changing context value on a memoized component", () => {
 it("provides a changing context value with a memoized component in the way", () => {
 
   const Context = makeContext();
-  let value = null;
+  let value = null as number | null;
 
-  let trigger = null;
+  let trigger = null as Function | null;
 
   const Root = (fiber: LiveFiber<any>) => () => {
     const [state, setState] = useState<number>(123);
@@ -407,11 +409,11 @@ it("provides a changing context value with a memoized component in the way", () 
   const {host: {__flush: flush}} = result;
 
   expect(result.mount).toBeTruthy();
-  expect(result.mount.mounts).toBeTruthy();
+  expect(result.mount!.mounts).toBeTruthy();
 
   expect(value).toBe(123);
 
-  trigger();
+  trigger!();
   flush();
 
   expect(value).toBe(456);

@@ -22,7 +22,9 @@ export type Action<F extends Function> = {
 };
 export type Dispatcher = (as: Action<any>[]) => void;
 export type OnFiber = (fiber: LiveFiber<any>) => void;
+export type FiberSetter<T> = (fiber: LiveFiber<any>, t: T) => void;
 
+// User=defined context
 export type LiveContext<T> = { initialValue?: T };
 
 // Fiber context
@@ -47,19 +49,19 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
 
   // Mounting state
   seen?: Set<Key>,
-  mount?: LiveFiber<any>,
-  mounts?: FiberMap,
+  mount?: LiveFiber<any> | null,
+  mounts?: FiberMap | null,
   order?: Key[],
-  next?: LiveFiber<any>,
+  next?: LiveFiber<any> | null,
 
   // User-specified context
-  context?: FiberContext,
+  context: FiberContext,
 
   // Yeeting state
   yeeted?: FiberYeet<any>,
 };
 
-export type FiberMap = Map<Key, LiveContext<any>>;
+export type FiberMap = Map<Key, LiveFiber<any>>;
 
 export type FiberContext = {
   values: ContextValues,
@@ -70,11 +72,16 @@ export type ContextValues = Map<LiveContext<any>, any>;
 export type ContextRoots = Map<LiveContext<any>, LiveFiber<any>>;
 
 export type FiberYeet<T> = {
-  emit: Setter<T>,
+  emit: FiberSetter<any>,
   value?: T,
   reduced?: T,
   parent?: FiberYeet<T>,
   roots: LiveFiber<any>[],
+};
+
+export type GroupedFibers = {
+  root: LiveFiber<any>,
+  subs: Set<LiveFiber<any>>,
 };
 
 // Deferred function calls
@@ -102,9 +109,9 @@ export type HostInterface = {
   dispose: (fiber: LiveFiber<any>) => void,
 
   // Track a long-range dependency for contexts
-  depend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => void,
+  depend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => boolean,
   undepend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => void,
-  invalidate: (fiber: LiveFiber<any>, visit: Set<LiveFiber<any>>) => void,
+  invalidate: (fiber: LiveFiber<any>) => LiveFiber<any>[],
 
   __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
   __flush: () => void,

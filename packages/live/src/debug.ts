@@ -1,8 +1,8 @@
-import { DeferredCall, LiveContext } from './types';
+import { DeferredCall, LiveFiber } from './types';
 
 const {prototype: {hasOwnProperty}} = Object;
 
-export const formatTree = (root: LiveContext<any>, depth: number = 0): string => {
+export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   const {mount, mounts, next} = root;
   let out = [];
 
@@ -28,6 +28,7 @@ export const formatTree = (root: LiveContext<any>, depth: number = 0): string =>
 }
 
 export const formatNode = <F extends Function>(node: DeferredCall<F>): string => {
+  // @ts-ignore
   const name = (node.f?.displayName ?? node.f?.name) || 'Node';
   const args = [] as string[];
   if (node.arg !== undefined) {

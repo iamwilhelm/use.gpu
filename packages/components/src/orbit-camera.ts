@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { useOne } from '@use-gpu/live';
-import { ViewportUniforms, UniformAttribute } from '@use-gpu/core/types';
+import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '@use-gpu/core';
 
 const DEFAULT_ORBIT_CAMERA = {
@@ -42,7 +42,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
   const uniforms = useOne(() => ({
     projectionMatrix: { value: null },
     viewMatrix: { value: null },
-  }));
+  })) as any as ViewUniforms;
 
   uniforms.projectionMatrix.value = makeProjectionMatrix(width, height, fov, near, far);
   uniforms.viewMatrix.value = makeOrbitMatrix(radius, phi, theta);

@@ -7,7 +7,8 @@ export type RawFiber = (fiber: LiveFiber<any>) => LiveElement<any>;
 export type LiveReturner = (fiber: RawFiber) => LiveElement<any>;
 
 export const Inline: LiveFunction<LiveReturner> = (fiber) => (f: RawFiber) => {
-  enterFiber(fiber);
-  f(fiber);
+  enterFiber(fiber, 0);
+  const v = f(fiber);
   exitFiber();
+  return v;
 }

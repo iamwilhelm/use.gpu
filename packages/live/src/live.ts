@@ -94,14 +94,14 @@ export const mapReduce = <R, T>(
   calls: LiveElement<any>,
   map?: (t: T) => R,
   reduce?: (a: R, b: R) => R,
-  done?: (r: R) => void,
+  done?: LiveFunction<(r: R) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key});
 
 // Gather items from a subtree
 export const gatherReduce = <T>(
   calls: LiveElement<any>,
-  done?: (r: T[]) => void,
+  done?: LiveFunction<(r: T[]) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key});
 

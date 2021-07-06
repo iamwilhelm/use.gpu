@@ -1,12 +1,12 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { CameraUniforms, UniformAttribute } from '@use-gpu/core/types';
+import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 
 import { use, useOne } from '@use-gpu/live';
 
 import {
   AutoCanvas,
-  Loop, Memo, Draw, Pass,
+  Loop, Draw, Pass,
   OrbitCamera, OrbitControls,
 } from '@use-gpu/components';
 import { Cube } from './cube';
@@ -38,7 +38,7 @@ export const App: LiveComponent<AppProps> = () => (props) => {
           use(OrbitCamera)({
             canvas, width, height,
             radius, phi, theta,
-            render: (defs: UniformAttribute[], uniforms: CameraUniforms) =>
+            render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
 
               use(Draw)({
                 device, gpuContext, colorAttachments,

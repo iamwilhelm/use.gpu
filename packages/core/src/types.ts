@@ -139,6 +139,6 @@ export type ShaderStageDescriptor = {
 
 // Projection pipeline
 export type ViewUniforms = {
-  projectionMatrix: mat4,
-  viewMatrix: mat4,
+  projectionMatrix: { value: mat4 },
+  viewMatrix: { value: mat4 },
 };

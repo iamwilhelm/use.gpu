@@ -1,4 +1,4 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
 import { use, detach, useCallback, useOne, useResource } from '@use-gpu/live';
 
@@ -16,7 +16,7 @@ export type LoopRef = {
   render?: () => LiveElement<any>,
 };
 
-const Paint = () => (ref: LoopRef) => ref.children ?? ref.render();
+const Paint = () => (ref: LoopRef) => ref.children ?? (ref.render ? ref.render() : null);
 
 export const Loop: LiveComponent<LoopProps> = (fiber) => (props) => {
   const {gpuContext, colorAttachments, children, update, render} = props;

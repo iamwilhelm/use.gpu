@@ -13,10 +13,10 @@ const mapper = (t: Task) => [t];
 const reducer = (a: Task[], b: Task[]) => [...a, ...b];
 
 export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
-  const {gpuContext, colorAttachments, children} = props;
+  const {gpuContext, colorAttachments, children, render} = props;
 
   const Done = useMemo(() =>
-    (fiber) => (ts: Task[]) => {
+    (fiber: LiveFiber<any>) => (ts: Task[]) => {
       // @ts-ignore
       colorAttachments[0].view = gpuContext
       // @ts-ignore
@@ -27,7 +27,8 @@ export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
     },
     [gpuContext, colorAttachments]);
 
+  // @ts-ignore
   if (!Done.displayName) Done.displayName = '[Draw]';
 
-  return gatherReduce(children ?? render(), Done);
+  return gatherReduce(children ?? (render ? render() : null), Done);
 }

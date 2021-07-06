@@ -42,12 +42,7 @@ export const renderWithDispatch = <T>(
   const reenter = (as: Action[]) => {
     dispatch(() => {
       const fibers = as.map(({fiber}) => fiber);
-
       if (fibers.length) renderFibers(fibers);
-      else {
-        DEBUG && console.log('Updating Root', formatNode(fiber));
-        renderFiber(host, fiber, onRender);
-      }
     });
   };
 

@@ -4,6 +4,8 @@ This is an experiment in reimplementing the core API of React without a target D
 
 For background, see the [associated article series](https://acko.net/blog/live-headless-react/).
 
+WebGPU is not available in mainline browsers, which means you need e.g. Google Chrome Canary to run the example app. You will need to turn on the `chrome://flags/#enable-unsafe-webgpu` flag.
+
 ![public/cube.png](public/cube.png)
 
 ## Usage

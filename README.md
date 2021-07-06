@@ -2,6 +2,8 @@
 
 This is an experiment in reimplementing the core API of React without a target DOM. It uses a map-reduce mechanism instead to gather the contents of mounted things.
 
+For background, see the [associated article series](https://acko.net/blog/live-headless-react/).
+
 ![public/cube.png](public/cube.png)
 
 ## Usage

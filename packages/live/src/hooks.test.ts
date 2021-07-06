@@ -201,7 +201,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {fiber, tracker} = makeHostFiber(use(F)());
+    const {fiber, disposal} = makeHostFiber(use(F)());
     fiber.bound();
 
     expect(allocated).toBe(1);
@@ -212,7 +212,7 @@ it('manages a dependent resource (hook)', () => {
     expect(allocated).toBe(1);
     expect(disposed).toBe(0);
 
-    tracker.dispose(fiber);
+    disposal.dispose(fiber);
 
     expect(allocated).toBe(1);
     expect(disposed).toBe(1);
@@ -223,7 +223,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {fiber, tracker} = makeHostFiber(use(G)());
+    const {fiber, disposal} = makeHostFiber(use(G)());
     fiber.bound();
 
     expect(allocated).toBe(1);
@@ -234,7 +234,7 @@ it('manages a dependent resource (hook)', () => {
     expect(allocated).toBe(2);
     expect(disposed).toBe(1);
 
-    tracker.dispose(fiber);
+    disposal.dispose(fiber);
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(2);
@@ -245,7 +245,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {fiber, tracker} = makeHostFiber(use(H)());
+    const {fiber, disposal} = makeHostFiber(use(H)());
     fiber.bound();
 
     expect(allocated).toBe(1);
@@ -256,7 +256,7 @@ it('manages a dependent resource (hook)', () => {
     expect(allocated).toBe(2);
     expect(disposed).toBe(1);
 
-    tracker.dispose(fiber);
+    disposal.dispose(fiber);
 
     expect(allocated).toBe(2);
     expect(disposed).toBe(2);
@@ -337,4 +337,82 @@ it("provides a changing context value", () => {
 });
 
 
+it("provides a changing context value on a memoized component", () => {
 
+  const Context = makeContext();
+  let value = null;
+
+  let trigger = null;
+
+  const Root = (fiber: LiveFiber<any>) => () => {
+    const [state, setState] = useState<number>(123);
+    trigger = () => setState(456);
+    return provide(Context, state, [
+      use(Sub)()
+    ]);
+  }
+
+  const Sub = () => () => {
+    return use(Node)();
+  };
+
+  const Node = memoProps(() => () => {
+    value = useContext(Context);
+  });
+
+  const result = renderSync(use(Root)());
+  expect(result.f).toBe(Root);
+  if (!result.host) return;
+
+  const {host: {__flush: flush}} = result;
+
+  expect(result.mount).toBeTruthy();
+  expect(result.mount.mounts).toBeTruthy();
+
+  expect(value).toBe(123);
+
+  trigger();
+  flush();
+
+  expect(value).toBe(456);
+});
+
+it("provides a changing context value with a memoized component in the way", () => {
+
+  const Context = makeContext();
+  let value = null;
+
+  let trigger = null;
+
+  const Root = (fiber: LiveFiber<any>) => () => {
+    const [state, setState] = useState<number>(123);
+    trigger = () => setState(456);
+    return provide(Context, state, [
+      use(Sub)()
+    ]);
+  }
+
+  const Sub = memoProps(() => () => {
+    return use(Node)();
+  });
+
+  const Node = () => () => {
+    value = useContext(Context);
+  };
+
+  const result = renderSync(use(Root)());
+  expect(result.f).toBe(Root);
+  if (!result.host) return;
+
+  const {host: {__flush: flush}} = result;
+
+  expect(result.mount).toBeTruthy();
+  expect(result.mount.mounts).toBeTruthy();
+
+  expect(value).toBe(123);
+
+  trigger();
+  flush();
+
+  expect(value).toBe(456);
+});

@@ -1,4 +1,4 @@
-import { makeActionScheduler, makeDisposalTracker, makePaintRequester } from './util';
+import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester } from './util';
 
 it("schedules actions", () => {
   let run = {a: 0, b: 0} as Record<string, boolean>;
@@ -43,6 +43,28 @@ it("tracks disposal actions", () => {
 
   expect(run.a).toBe(1);
   expect(run.b).toBe(1);
+
+});
+
+it("tracks dependencies", () => {
+  let root = {} as any;
+  let fiber1 = {} as any;
+  let fiber2 = {} as any;
+
+  const dependency = makeDependencyTracker();
+  dependency.depend(fiber1, root);
+  dependency.depend(fiber2, root);
+
+  let visit = new Set(dependency.invalidate(root));
+  expect(visit.size).toBe(2);
+  expect(visit.has(fiber1)).toBe(true);
+  expect(visit.has(fiber2)).toBe(true);
+
+  dependency.undepend(fiber1, root);
+
+  visit = new Set(dependency.invalidate(root));
+  expect(visit.size).toBe(1);
+  expect(visit.has(fiber2)).toBe(true);
 
 });
 

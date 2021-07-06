@@ -47,9 +47,9 @@ it("mounts a subfiber", () => {
   let captureSubFiber: LiveFiber<any> | null = null;
 
   const Root = (fiber: LiveFiber<any>) => () =>
-    detach(use(Sub)(), (mount: LiveFiber<any>) => {
+    detach(use(Sub)(), (render: () => void, mount: LiveFiber<any>) => {
       captureSubFiber = mount;
-      renderFiber(mount);
+      render();
     });
 
   const Sub = () => () => use(Node)();
@@ -217,6 +217,7 @@ it("reacts and remounts on the root", () => {
   expect(stats.mounts).toBe(4);
   expect(stats.unmounts).toBe(0);
   expect(stats.updates).toBe(0);
+  expect(stats.dispatch).toBe(1);
 
   if (trigger) trigger();
   if (flush) flush();
@@ -239,7 +240,8 @@ it("reacts and remounts on the root", () => {
 
   expect(stats.mounts).toBe(5);
   expect(stats.unmounts).toBe(1);
-  expect(stats.updates).toBe(3);
+  expect(stats.updates).toBe(2);
+  expect(stats.dispatch).toBe(2);
 
 });
 
@@ -300,6 +302,7 @@ it("reacts and remounts a sub tree", () => {
   expect(stats.mounts).toBe(5);
   expect(stats.unmounts).toBe(0);
   expect(stats.updates).toBe(0);
+  expect(stats.dispatch).toBe(1);
 
   if (trigger) trigger();
   if (flush) flush();
@@ -318,7 +321,8 @@ it("reacts and remounts a sub tree", () => {
 
   expect(stats.mounts).toBe(6);
   expect(stats.unmounts).toBe(1);
-  expect(stats.updates).toBe(3);
+  expect(stats.updates).toBe(2);
+  expect(stats.dispatch).toBe(2);
 
 });
 

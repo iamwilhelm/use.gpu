@@ -1,5 +1,7 @@
 import { LiveFiber, Task, Action, Dispatcher } from './types';
 
+const NO_DEPS = [] as any[];
+
 // Schedules actions to be run immediately after the current thread completes
 export const makeActionScheduler = () => {
   const queue = [] as Action[];
@@ -27,6 +29,33 @@ export const makeActionScheduler = () => {
 
   return {bind, schedule, flush};
 }
+
+// Tracks long-range dependencies for contexts
+export const makeDependencyTracker = () => {
+  const dependencies = new WeakMap<LiveFiber<any>, Set<LiveFiber<any>>>();
+
+  const depend = (fiber: LiveFiber<any>, root: LiveFiber<any>) => {
+    let list = dependencies.get(root);
+    if (!list) dependencies.set(root, list = new Set());
+
+    let exist = list.has(fiber);
+    if (!exist) list.add(fiber);
+    return !exist;
+  }
+
+  const undepend = (fiber: LiveFiber<any>, root: LiveFiber<any>) => {
+    let list = dependencies.get(root);
+    if (list) list.delete(fiber);
+  }
+
+  const invalidate = (fiber: LiveFiber<any>) => {
+    const fibers = dependencies.get(fiber);
+    return fibers ? Array.from(fibers.values()) : NO_DEPS;
+  }
+
+  return {depend, undepend, invalidate};
+}
+
 
 // Schedules actions to be run when an object is disposed of
 export const makeDisposalTracker = () => {
@@ -90,9 +119,18 @@ export const isSameDependencies = (
   return valid;
 }
 
-// Checks if two paths overlap
+// Checks if one path is a subpath of another
 export const isSubPath = (a: Key[], b: Key[]) => {
-  const n = Math.min(a.length, b.length);
+  if (b.length <= a.length) return false;
+  const n = a.length;
+  for (let i = 0; i < n; ++i) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+// Checks if one path is a subpath of another
+export const isSubOrSamePath = (a: Key[], b: Key[]) => {
+  if (b.length < a.length) return false;
+  const n = a.length;
   for (let i = 0; i < n; ++i) if (a[i] !== b[i]) return false;
   return true;
 }

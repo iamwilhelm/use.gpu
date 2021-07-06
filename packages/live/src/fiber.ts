@@ -1,4 +1,4 @@
-import { LiveFiber, LiveFunction, LiveContexts, FiberYeet, Key } from './types';
+import { LiveFiber, LiveFunction, FiberYeet, FiberContext, ContextValues, ContextRoots, OnFiber, Key } from './types';
 
 import { use, bind, DETACH, RECONCILE, MAP_REDUCE, GATHER, YEET, PROVIDE } from './live';
 import { isSameDependencies } from './util';
@@ -7,9 +7,13 @@ import { formatNode } from './debug';
 let DEBUG = false;
 //setTimeout((() => DEBUG = false), 900);
 
+const NOP = () => {};
 const EMPTY_ARRAY = [] as any[];
 const ROOT_PATH = [0] as Key[];
-const NO_CONTEXT = { map: new Map() as LiveContexts, roots: EMPTY_ARRAY };
+const NO_CONTEXT = {
+  values: new Map() as ContextValues,
+  roots: new Map() as ContextRoots,
+};
 
 // Make a fiber for a live function
 export const makeFiber = <F extends Function>(
@@ -32,7 +36,7 @@ export const makeFiber = <F extends Function>(
     bound, f, args,
     host, depth, path,
     yeeted, context,
-    state: null, pointer: 0, version: null,
+    state: null, pointer: 0, version: null, memo: null,
     mount: null, mounts: null, next: null, seen: null,
     type: null,
   } as any as LiveFiber<F>;
@@ -54,10 +58,10 @@ export const makeSubFiber = <F extends Function>(
 }
 
 // Make fiber yeet state
-export const makeYeetState = <A, B>(
-  fiber: LiveContext<any>,
+export const makeYeetState = <F extends Function, A, B>(
+  fiber: LiveFiber<F>,
   map?: (a: A) => B,
-  roots?: LiveContext<any>,
+  roots?: LiveFiber<any>,
 ): FiberYeet => ({
   emit: map
     ? (fiber: LiveFiber<any>, t: T) => fiber.yeeted!.value = map(t)
@@ -69,22 +73,30 @@ export const makeYeetState = <A, B>(
 });
 
 // Make fiber context state
-export const makeContextState = <A, B>(
-  fiber: LiveContext<any>,
-  roots?: LiveContext<any>,
-  parent?: FiberContext,
-): FiberContext => ({
-  map: null,
-  roots: roots ? [...roots, fiber] : [fiber],
-  parent,
-});
+export const makeContextState = <F extends Function>(
+  fiber: LiveFiber<F>,
+  parent: FiberContext,
+  context: LiveContext<any>,
+  value: any,
+): FiberContext => {
+  const map = new Map(parent.map);
+  const roots = new Map(parent.roots);
+  map.set(context, value);
+  roots.set(context, fiber);
+
+  return {map, roots};
+};
 
 // Render a fiber
-export const renderFiber = <F extends Function>(fiber: LiveFiber<F>, visit?: Set<LiveFiber<F>>) => {
+export const renderFiber = <F extends Function>(
+  fiber: LiveFiber<F>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
+) => {
   const {f, bound, args, yeeted} = fiber;
 
-  // Remove from to-visit set
-  if (visit) visit.delete(fiber);
+  // Let host do its thing
+  if (onRender) onRender(fiber);
 
   // Disposed fiber, ignore
   if (!bound) return;
@@ -94,6 +106,12 @@ export const renderFiber = <F extends Function>(fiber: LiveFiber<F>, visit?: Set
   if ((f as any).isLiveBuiltin) out = fiber as any as DeferredCall<any>;
   // Render live function
   else out = bound.apply(null, args ?? EMPTY_ARRAY);
+
+  // Early exit if memoized
+  if (fiber.version && fiber.type !== YEET) {
+    if (fiber.version === fiber.memo) return fiber;
+    fiber.memo = fiber.version;
+  }
 
   // Handle call and call[]
   let call = out as DeferredCall<any> | null;
@@ -107,22 +125,22 @@ export const renderFiber = <F extends Function>(fiber: LiveFiber<F>, visit?: Set
   // Reconcile literal array
   if (isArray) {
     const calls = out as DeferredCall<any>[];
-    reconcileFiberCalls(fiber, calls, visit);
+    reconcileFiberCalls(fiber, calls, onRender, onFence);
   }
   // Reconcile wrapped array
   else if (fiberType === RECONCILE) {
     const calls = call.args ?? EMPTY_ARRAY;
-    reconcileFiberCalls(fiber, calls, visit);
+    reconcileFiberCalls(fiber, calls, onRender, onFence);
   }
   // Map reduce
   else if (fiberType === MAP_REDUCE) {
     const [calls, map, reduce, done] = call.args ?? EMPTY_ARRAY;
-    mapReduceFiberCalls(fiber, calls, map, reduce, done, visit);
+    mapReduceFiberCalls(fiber, calls, map, reduce, done, onRender, onFence);
   }
   // Gather reduce
   else if (fiberType === GATHER) {
     const [calls, done] = call.args ?? EMPTY_ARRAY;
-    gatherFiberCalls(fiber, calls, done, visit);
+    gatherFiberCalls(fiber, calls, done, onRender, onFence);
   }
   // Yeet value upstream
   else if (fiberType === YEET) {
@@ -131,7 +149,7 @@ export const renderFiber = <F extends Function>(fiber: LiveFiber<F>, visit?: Set
   }
   // Mount normal node (may still be built-in)
   else {
-    mountFiberCall(fiber, call, visit);
+    mountFiberCall(fiber, call, onRender, onFence);
   }
 
   return fiber;
@@ -141,14 +159,15 @@ export const renderFiber = <F extends Function>(fiber: LiveFiber<F>, visit?: Set
 export const mountFiberCall = <F extends Function>(
   fiber: LiveFiber<F>,
   call: DeferredCall<any> | null,
-  visit?: Set<LiveFiber<F>>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   const {mount} = fiber;
 
   const nextMount = updateMount(fiber, mount, call);
   if (nextMount !== false) {
     fiber.mount = nextMount;
-    flushMount(nextMount, mount, visit);
+    flushMount(nextMount, mount, onRender, onFence);
   }
 }
 
@@ -156,13 +175,15 @@ export const mountFiberCall = <F extends Function>(
 export const mountFiberContinuation = <F extends Function>(
   fiber: LiveFiber<F>,
   call: DeferredCall<any> | null,
-  visit?: Set<LiveFiber<F>>,
+  key?: Key,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   const {next} = fiber;
-  const nextMount = updateMount(fiber, next, call);
+  const nextMount = updateMount(fiber, next, call, key);
   if (nextMount !== false) {
     fiber.next = nextMount;
-    flushMount(nextMount, next, visit);
+    flushMount(nextMount, next, onRender, onFence);
   }
 }
 
@@ -170,7 +191,8 @@ export const mountFiberContinuation = <F extends Function>(
 export const reconcileFiberCalls = <F extends Function>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[],
-  visit?: Set<LiveFiber<F>>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   let {mounts, seen} = fiber;
 
@@ -190,7 +212,7 @@ export const reconcileFiberCalls = <F extends Function>(
     if (nextMount !== false) {
       if (nextMount) mounts.set(key, nextMount);
       else mounts.delete(key);
-      flushMount(nextMount, mount, visit);
+      flushMount(nextMount, mount, onRender, onFence);
     }
   }
 
@@ -198,7 +220,7 @@ export const reconcileFiberCalls = <F extends Function>(
     const mount = mounts.get(key);
     updateMount(fiber, mount, null);
     mounts.delete(key);
-    flushMount(null, mount, visit);
+    flushMount(null, mount, onRender, onFence);
   }
 
   seen.clear();
@@ -211,15 +233,20 @@ export const mapReduceFiberCalls = <F extends Function, R, T>(
   mapper?: (t: T) => R,
   reducer?: (a: R, b: R) => R,
   next?: LiveFunction<any>,
-  visit?: Set<LiveFiber<F>>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   let {yeeted} = fiber;
-  if (!yeeted || yeeted.parent) yeeted = fiber.yeeted = makeYeetState(fiber, mapper, yeeted?.roots);
+  if (!yeeted || yeeted.parent) {
+    yeeted = fiber.yeeted = makeYeetState(fiber, mapper, yeeted?.roots);
+    fiber.path.push(0);
+  }
 
-  reconcileFiberCalls(fiber, calls, visit);
+  reconcileFiberCalls(fiber, calls, onRender, onFence);
+  onFence(fiber);
 
   const value = reduceFiberValues(fiber, reducer, true);
-  mountFiberContinuation(fiber, use(next)(value), visit);
+  mountFiberContinuation(fiber, use(next)(value), 1, onRender, onFence);
 }
 
 // Gather-reduce a fiber
@@ -227,15 +254,20 @@ export const gatherFiberCalls = <F extends Function, R, T>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[],
   next?: LiveFunction<any>,
-  visit?: Set<LiveFiber<F>>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   let {yeeted} = fiber;
-  if (!yeeted || yeeted.parent) yeeted = fiber.yeeted = makeYeetState(fiber, null, yeeted?.roots);
+  if (!yeeted || yeeted.parent) {
+    yeeted = fiber.yeeted = makeYeetState(fiber, null, yeeted?.roots);
+    fiber.path.push(0);
+  }
 
-  reconcileFiberCalls(fiber, calls, visit);
+  reconcileFiberCalls(fiber, calls, onRender, onFence);
+  onFence(fiber);
 
   const value = gatherFiberValues(fiber, true);
-  mountFiberContinuation(fiber, use(next)(value), visit);
+  mountFiberContinuation(fiber, use(next)(value), 1, onRender, onFence);
 }
 
 // Reduce yeeted values on a tree of fibers
@@ -306,31 +338,35 @@ export const gatherFiberValues = <F extends Function, R, T>(
 // Provide a value for a context on a fiber
 export const provideFiber = <F extends Function>(
   fiber: LiveFiber<F>,
-  visit?: Set<LiveFiber<F>>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   let {args: [context, value, calls]} = fiber;
 
-  if (fiber.context.roots.indexOf(fiber) < 0) {
-    const context = fiber.context = makeContextState(fiber, fiber.context.roots, fiber.context);
-    fiber.context.map = new Map(fiber.context.parent!.map);
+  if (fiber.context.roots.get(context) !== fiber) {
+    fiber.context = makeContextState(fiber, fiber.context, context, value);
   }
 
   fiber.context.map.set(context, value);
 
-  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls, visit);
-  else mountFiberCall(fiber, call, visit);
+  onRender(fiber);
+
+  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls, onRender, onFence);
+  else mountFiberCall(fiber, call, onRender, onFence);
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating its execution
 export const detachFiber = <F extends Function>(
-  fiber: LiveFiber<F>
+  fiber: LiveFiber<F>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   let {mount, args: [call, callback]} = fiber;
 
   if (!mount || (mount.f !== call.f)) mount = fiber.mount = makeSubFiber(fiber, call);
   mount.args = call.args;
 
-  callback(mount);
+  callback(() => renderFiber(mount, onRender, onFence), mount);
 }
 
 // Dispose of a fiber's resources and all its mounted sub-fibers
@@ -384,8 +420,6 @@ export const updateMount = <P extends Function>(
     DEBUG && console.log('Updating', key, formatNode(newMount!));
     if (host) host.__stats.updates++;
 
-    // If parent is memoized, check for identical render and skip it
-    if (parent.version && mount.args === newMount.args) return false;
     mount.args = newMount.args;
 
     return mount;
@@ -398,14 +432,26 @@ export const updateMount = <P extends Function>(
 export const flushMount = <F extends Function>(
   mount: LiveFiber<F> | null,
   mounted: LiveFiber<any>,
-  visit?: Set<LiveFiber<F>>,
+  onRender?: OnFiber,
+  onFence?: OnFiber,
 ) => {
   if (mounted && mounted !== mount) {
     disposeFiber(mounted);
   }
   if (mount) { 
-    if (mount.f === DETACH) detachFiber(mount);
-    else if (mount.f === PROVIDE) provideFiber(mount, visit);
-    else renderFiber(mount, visit);
+    if (mount.f === DETACH) detachFiber(mount, onRender, onFence);
+    else if (mount.f === PROVIDE) provideFiber(mount, onRender, onFence);
+    else renderFiber(mount, onRender, onFence);
+  }
+}
+
+// Bust caches for a fiber when state changes
+export const bustCaches = <F extends Function>(fiber: LiveFiber<F>) => {
+  const {host, version, yeeted} = fiber;
+  if (version != null) fiber.version++;
+  if (yeeted) {
+    let yt = yeeted;
+    do { yt.value = yt.reduced = undefined } while (yt = yt.parent);
+    for (let root of yeeted.roots) host.schedule(root, NOP);
   }
 }

@@ -1,8 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
-import {
-  use, detach, useCallback, useOne, useResource, useSubContext, renderContext,
-} from '@use-gpu/live';
+import { use, detach, useCallback, useOne, useResource } from '@use-gpu/live';
 
 export type LoopProps = {
   gpuContext: GPUPresentationContext,
@@ -29,7 +27,7 @@ export const Loop: LiveComponent<LoopProps> = (fiber) => (props) => {
   ref.render = render;
 
   const fork = useOne(() => use(Paint)(ref));
-  return detach(fork, (detached: LiveFiber<any>) => {
+  return detach(fork, (render: Task) => {
     useResource((dispose) => {
       let running = true;
 
@@ -42,7 +40,7 @@ export const Loop: LiveComponent<LoopProps> = (fiber) => (props) => {
           .getCurrentTexture()
           .createView();
 
-        renderFiber(detached);
+        render();
 
         if (running) requestAnimationFrame(loop);
       }

@@ -5,8 +5,9 @@ import {
 } from './types';
 
 import { bind, CURRENT_FIBER } from './live';
-import { makeFiber, makeSubFiber } from './fiber';
+import { makeFiber, makeSubFiber, bustCaches } from './fiber';
 import { isSameDependencies } from './util';
+import { formatNode } from './debug';
 
 export const NOP = () => {};
 export const NO_DEPS = [] as any[];
@@ -70,6 +71,9 @@ export const memoProps = <F extends Function>(
   return g;
 }
 
+// Shorthand
+export const memo = memoProps;
+
 // Allocate state value and a setter for it, initializing with the given value or function
 export const useState = <T>(
   initialState: Initial<T>,
@@ -93,12 +97,7 @@ export const useState = <T>(
           host.schedule(fiber, () => {
             if (value instanceof Function) state[i] = value(state[i]);
             else state[i] = value;
-            if (fiber.version != null) fiber.version++;
-            if (yeeted) {
-              let yt = yeeted;
-              do { yt.value = yt.reduce = undefined } while (yt = yt.parent);
-              for (let root of yeeted.roots) host.schedule(root, NOP);
-            }
+            bustCaches(fiber);
           });
         }
       : NOP;
@@ -226,7 +225,14 @@ export const useContext = <C>(
   const fiber = CURRENT_FIBER;
   if (!fiber) throw new Error("Calling a hook outside a bound function");
 
-  return fiber.context.map.get(context) ?? context.initialValue;
+  const {host, context: {map, roots}} = fiber;
+  const root = roots.get(context);
+
+  if (host.depend(fiber, root)) {
+    host.track(fiber, () => host.undepend(fiber, root));
+  }
+
+  return map.get(context) ?? context.initialValue;
 }
 
 // Cleanup effect tracker

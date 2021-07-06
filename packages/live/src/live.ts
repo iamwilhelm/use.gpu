@@ -27,25 +27,25 @@ export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F
   const bound = f(fiber);
   if (bound.length === 0) {
     return () => {
-			enterFiber(fiber, base);
+      enterFiber(fiber, base);
       const value = bound();
-			exitFiber(fiber);
-			return value;
+      exitFiber(fiber);
+      return value;
     }
   }
   if (bound.length === 1) {
     return (arg: any) => {
-			enterFiber(fiber, base);
+      enterFiber(fiber, base);
       const value = bound(arg);
-			exitFiber(fiber);
-			return value;
+      exitFiber(fiber);
+      return value;
     }
   }
   return (...args: any[]) => {
-		enterFiber(fiber, base);
+    enterFiber(fiber, base);
     const value = bound.apply(null, args);
-		exitFiber(fiber);
-		return value;
+    exitFiber(fiber);
+    return value;
   }
 };
 
@@ -113,9 +113,9 @@ export const yeet = <T>(
 
 // Provide a value for a context
 export const provide = <T>(
-	context: LiveContext,
-	value?: T,
-	calls: LiveElement<any>,
+  context: LiveContext,
+  value?: T,
+  calls: LiveElement<any>,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls]});
 
 // Hold call info for a fiber

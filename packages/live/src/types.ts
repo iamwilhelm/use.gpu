@@ -21,6 +21,7 @@ export type Action<F extends Function> = {
   task: Task,
 };
 export type Dispatcher = (as: Action<any>[]) => void;
+export type OnFiber = (fiber: LiveFiber<any>) => void;
 
 export type LiveContext<T> = { initialValue?: T };
 
@@ -36,7 +37,10 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   // State for user hooks
   state: any[],
   pointer: number,
+
+  // State for per-component memoization
   version: number,
+  memo: number,
 
   // Last snapshot
   type: Function,
@@ -48,17 +52,21 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   next?: LiveFiber<any>,
 
   // User-specified context
-  context?: LiveContexts,
+  context?: FiberContext,
 
   // Yeeting state
   yeeted?: FiberYeet<any>,
 };
 
-export type FiberContext<T> = {
-  map: LiveContexts,
-  roots: LiveFiber<any>[],
-  parent?: FiberContext<T>,
+export type FiberMap = Map<Key, LiveContext<any>>;
+
+export type FiberContext = {
+  values: ContextValues,
+  roots: ContextRoots,
 };
+
+export type ContextValues = Map<LiveContext<any>, any>;
+export type ContextRoots = Map<LiveContext<any>, LiveFiber<any>>;
 
 export type FiberYeet<T> = {
   emit: Setter<T>,
@@ -67,8 +75,6 @@ export type FiberYeet<T> = {
   parent?: FiberYeet<T>,
   roots: LiveFiber<any>[],
 };
-
-export type FiberMap = Map<Key, LiveContext<any>>;
 
 // Deferred function calls
 export type FunctionCall<F extends Function> = {
@@ -86,15 +92,19 @@ export type LiveElement<F extends Function> = null | DeferredCall<F> | DeferredC
 // Live host interface
 export type HostInterface = {
   // Schedule a task on next flush
-  schedule: (c: LiveContext<any>, t: Task) => void,
+  schedule: (fiber: LiveFiber<any>, task: Task) => void,
 
-  // Track a future cleanup on a context
-  track: (c: LiveContext<any>, t: Task) => void,
+  // Track a future cleanup on a fiber
+  track: (fiber: LiveFiber<any>, task: Task) => void,
 
-  // Dispose of a context by running all tracked cleanups
-  dispose: (c: LiveContext<any>) => void,
+  // Dispose of a fiber by running all tracked cleanups
+  dispose: (fiber: LiveFiber<any>) => void,
 
-  __stats: {mounts: number, unmounts: number, updates: number},
+  // Track a long-range dependency for contexts
+  depend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => void,
+  undepend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => void,
+  invalidate: (fiber: LiveFiber<any>, visit: Set<LiveFiber<any>>) => void,
+
+  __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
   __flush: () => void,
 };
-

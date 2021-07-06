@@ -194,15 +194,18 @@ export const reconcileFiberCalls = <F extends Function>(
   onRender?: OnFiber,
   onFence?: OnFiber,
 ) => {
-  let {mounts, seen} = fiber;
+  let {mounts, order, seen} = fiber;
 
   if (!mounts) mounts = fiber.mounts = new Map();
-  if (!seen) seen = fiber.seen = new Set();
+  if (!order)  order  = fiber.order  = [];
+  if (!seen)   seen   = fiber.seen   = new Set();
 
-  let i = 0;
+  order.length = 0;
+  let i = 0, j = 0;
   for (let call of calls) {
     let key = call.key ?? i++;
     seen.add(key);
+    order[j++] = key;
 
     // Array shorthand for nested reconciling
     if (Array.isArray(call)) call = reconcile(call as any, key);
@@ -276,7 +279,7 @@ export const reduceFiberValues = <F extends Function, R, T>(
   reducer?: (a: R, b: R) => R,
   self?: boolean = false,
 ) => {
-  const {yeeted, mount, mounts} = fiber;
+  const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
   if (!self) {
@@ -287,12 +290,13 @@ export const reduceFiberValues = <F extends Function, R, T>(
   if (yeeted.reduced !== undefined) return yeeted.reduced;
   if (mounts) {
     if (mounts.size) {
-      const ms = mounts.values();
-
-      const [first] = ms;
+      const n = mounts.size;
+      const first = mounts.get(order[0]);
       let value = reduceFiberValues(first, reducer);
-      for (let m of ms) value = reducer(value, reduceFiberValues(m, reducer));
-
+      if (n > 1) for (let i = 1; i < n; ++i) {
+        const m = mounts.get(order[i]);
+        value = reducer(value, reduceFiberValues(m, reducer));
+      }
       return yeeted.reduced = value;
     }
   }
@@ -305,7 +309,7 @@ export const gatherFiberValues = <F extends Function, R, T>(
   fiber: LiveFiber<F>,
   self?: boolean = false,
 ) => {
-  const {yeeted, mount, mounts} = fiber;
+  const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
   if (!self) {
@@ -317,9 +321,8 @@ export const gatherFiberValues = <F extends Function, R, T>(
   if (mounts) {
     if (mounts.size) {
       const items = [] as T[];
-      const ms = mounts.values();
-
-      for (let m of ms) {
+      for (let k of order) {
+        const m = mounts.get(k);
         const value = gatherFiberValues(m);
         if (Array.isArray(value)) {
           let n = value.length;

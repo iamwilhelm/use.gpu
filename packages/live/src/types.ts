@@ -49,6 +49,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   seen?: Set<Key>,
   mount?: LiveFiber<any>,
   mounts?: FiberMap,
+  order?: Key[],
   next?: LiveFiber<any>,
 
   // User-specified context

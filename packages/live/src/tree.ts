@@ -92,6 +92,7 @@ export const renderSubRoot = (
   }
 }
 
+// Group fibers by shared ancestry
 export const groupFibers = (fibers: LiveFiber<any>) => {
   fibers.sort((a, b) => a.depth - b.depth);
 

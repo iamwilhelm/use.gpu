@@ -19,11 +19,15 @@ export const main = async (): Promise<void> => {
     // @ts-ignore
     const log = () => console.log(formatTree(root))
     setTimeout(() => log(), 2000);
+
   } catch (e) {
+
+    // Display exception if no WebGPU support
     console.error(e);
     const div = document.createElement('div');
     div.innerText = e.toString();
     div.className = 'error';
     document.body.insertBefore(div, document.querySelector(ROOT_SELECTOR));
+
   }
 }

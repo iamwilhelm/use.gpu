@@ -60,7 +60,7 @@ export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number
   fiber.pointer = base;
 
   // Reset yeet state
-  const {yeeted} = fiber;
+  const {yeeted, next} = fiber;
   if (yeeted) yeeted.reduced = yeeted.value = undefined;
 }
 export const exitFiber  = () => CURRENT_FIBER = null;

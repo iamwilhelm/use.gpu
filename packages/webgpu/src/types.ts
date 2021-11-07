@@ -15,6 +15,9 @@ export type CanvasRenderingContextGPU = {
   width: number,
   height: number,
 
+  device: GPUDevice,
+  compileGLSL?: any,
+
   gpuContext: GPUPresentationContext,
   colorStates: GPUColorStateDescriptor[],
   colorAttachments: GPURenderPassColorAttachmentDescriptor[],

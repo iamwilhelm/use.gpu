@@ -48,14 +48,33 @@ export const Props: React.FC<PropsProps> = ({fiber}) => {
 	</>);
 }
 
-const inspectObject = (object: Object) => {
+export const inspectObject = (object: any, seen: Set<any> = new Set(), depth: number = 0) => {
 	if (!object) return null;
+
+	if (seen.has(object)) return '{Circular}';
+	seen.add(object);
+
+	if (Array.isArray(object)) if (object.reduce((b, o) => b && typeof o === 'number', true)) {
+		return `[${object.join(', ')}]`;
+	}
+
+	if (object instanceof Map) {
+		const o = {};
+		let i = 0;
+		for (let k of object.keys()) {
+			const v = object.get(k);
+			if (k instanceof Object) k = (i++).toString();
+			o[k] = v;
+		}
+		object = o;
+	}
+
 	if (Object.keys(object).join('/') === 'f/args/key') return formatNode(object);
 	return Object.keys(object).map((k: string) => (
 		<SplitRow key={k}>
 			<Label>{k}</Label>
 			<div>{
-				typeof object[k] === 'object' ? <IndentTree>{inspectObject(object[k])}</IndentTree> : formatValue(object[k])
+				typeof object[k] === 'object' && depth < 3 ? <IndentTree>{inspectObject(object[k], seen, depth + 1)}</IndentTree> : formatValue(object[k])
 			}</div>
 		</SplitRow>
 	));

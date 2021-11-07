@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { Node } from './node';
 import { Fiber } from './fiber';
 import { Props } from './props';
+import { Call } from './call';
 import { InspectContainer, SplitRow, RowPanel, Scrollable, Inset } from './layout';
 import { Grid } from 'semantic-ui-react'
 
@@ -37,6 +38,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 					<Scrollable>
 						<Inset>
 							{selectedFiber ? <Props fiber={selectedFiber} /> : null}
+							{selectedFiber ? <Call fiber={selectedFiber} /> : null}
 						</Inset>
 					</Scrollable>
 				</RowPanel>

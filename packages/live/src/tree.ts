@@ -1,10 +1,10 @@
 import { Key, Action, Task, LiveFiber, DeferredCall, GroupedFibers } from './types';
 
-import { makeFiber, makeSubFiber, renderFiber, bustCaches } from './fiber';
-import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubOrSamePath, isSubPath } from './util';
+import { makeFiber, renderFiber, bustFiberCaches, visitYeetRoots } from './fiber';
+import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubOrSamePath, isSubPath, comparePaths } from './util';
 import { formatNode } from './debug';
 
-let DEBUG = false;
+let DEBUG = true;
 //setTimeout((() => DEBUG = false), 900);
 
 const NO_ARGS = [] as any[];
@@ -43,6 +43,7 @@ export const renderWithDispatch = <T>(
   const reenter = (as: Action<any>[]) => {
     dispatch(() => {
       const fibers = as.map(({fiber}) => fiber);
+      DEBUG && console.log('Dispatching Roots', fibers.map(formatNode));
       if (fibers.length) renderFibers(fibers);
     });
   };
@@ -57,6 +58,7 @@ export const renderFibers = (fibers: LiveFiber<any>[]) => {
   // Filter to only the top-level roots
   // Gather sub-fibers that must have a visit
   const roots = groupFibers(fibers);
+  DEBUG && console.log('Dispatching Sub-Roots', roots.map((r) => formatNode(r.root)));
   for (let r of roots) renderSubRoot(r.root, r.subs);
 
   return fibers.length > 1 ? fibers : fibers[0];
@@ -75,7 +77,10 @@ export const renderSubRoot = (
     // Fence
     DEBUG && console.log('Fencing Sub-Root', formatNode(fiber));
     const {path} = fiber;
-    const nodes = Array.from(subs.values()).filter(f => isSubPath(path, f.path));
+    const before = [...path, 0];
+
+    const fibers = Array.from(subs.values());
+    const nodes = fibers.filter(f => isSubPath(before, f.path));
     if (nodes.length) {
       renderFibers(nodes);
       for (let n of nodes) subs.delete(n);
@@ -106,6 +111,7 @@ export const groupFibers = (fibers: LiveFiber<any>[]) => {
     }
     roots.push({root: f, subs: new Set()});
   }
+  roots.sort((a, b) => comparePaths(a.root.path, b.root.path));
 
   return roots;
 }
@@ -119,7 +125,8 @@ const makeOnRender = (visit: Set<LiveFiber<any>>) => (fiber: LiveFiber<any>) => 
   if (host) for (let sub of host.invalidate(fiber)) {
     DEBUG && console.log('Invalidating Node', formatNode(sub));
     visit.add(sub);
-    bustCaches(sub);
+    bustFiberCaches(sub);
+    visitYeetRoots(visit, sub);
   }
 
 	// Notify host / dev tool of render

@@ -1,7 +1,6 @@
 import { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live/types';
-import {
-  use, yeet, memo, gatherReduce, useMemo,
-} from '@use-gpu/live';
+import { use, yeet, memo, gatherReduce, useContext, useMemo } from '@use-gpu/live';
+import { RenderContext } from './render-provider';
 
 export type PassProps = {
   device: GPUDevice,
@@ -14,10 +13,12 @@ export type PassProps = {
 export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
 export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
-  const {device, colorAttachments, depthStencilAttachment, children, render} = props;
+  const {children, render} = props;
 
   const Done = useMemo(() => (fiber: LiveFiber<any>) => (rs: RenderToPass[]) =>
     yeet(() => {
+      const {device, colorAttachments, depthStencilAttachment} = useContext(RenderContext);
+
       const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments,
         depthStencilAttachment,
@@ -31,7 +32,7 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
       // @ts-ignore
       device.queue.submit([commandEncoder.finish()]);
     }),
-    [device, colorAttachments, depthStencilAttachment]);
+    []);
 
   // @ts-ignore
   if (!Done.displayName) Done.displayName = '[Pass]';

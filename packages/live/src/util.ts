@@ -134,3 +134,11 @@ export const isSubOrSamePath = (a: Key[], b: Key[]) => {
   for (let i = 0; i < n; ++i) if (a[i] !== b[i]) return false;
   return true;
 }
+
+
+// Sorting comparison of two paths
+export const comparePaths = (a: Key[], b: Key[]) => {
+  const n = Math.min(a.length, b.length);
+  for (let i = 0; i < n; ++i) if (a[i] !== b[i]) return a[i] - b[i];
+  return a.length - b.length;
+}

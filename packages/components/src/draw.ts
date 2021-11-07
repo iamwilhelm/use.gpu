@@ -1,19 +1,20 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { GPUPresentationContext } from '@use-gpu/webgpu/types';
-import { yeet, gatherReduce, useMemo } from '@use-gpu/live';
+import { gatherReduce, useContext, useMemo } from '@use-gpu/live';
+import { RenderContext } from './render-provider';
 
 export type DrawProps = {
-  gpuContext: GPUPresentationContext,
-  colorAttachments: GPURenderPassColorAttachmentDescriptor[],
   children?: LiveElement<any>,
   render?: () => LiveElement<any>,
 };
 
 export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
-  const {gpuContext, colorAttachments, children, render} = props;
+  const {children, render} = props;
 
   const Done = useMemo(() =>
     (fiber: LiveFiber<any>) => (ts: Task[]) => {
+      const {gpuContext, colorAttachments} = useContext(RenderContext);
+
       // @ts-ignore
       colorAttachments[0].view = gpuContext
       // @ts-ignore
@@ -22,10 +23,10 @@ export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
     
       for (let task of ts) task();
     },
-    [gpuContext, colorAttachments]);
+    []);
 
   // @ts-ignore
   if (!Done.displayName) Done.displayName = '[Draw]';
 
   return gatherReduce(children ?? (render ? render() : null), Done);
-}
+};

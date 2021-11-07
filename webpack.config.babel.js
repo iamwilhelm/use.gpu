@@ -15,7 +15,7 @@ export default {
     filename: 'use.bundle.js',
   },
   resolve: {
-    extensions: ['.ts', '.js', '.json']
+    extensions: ['.ts', '.tsx', '.js', '.json']
   },
   module: {
     rules: [
@@ -27,6 +27,10 @@ export default {
       {
         test: /\.glsl$/i,
         use: 'raw-loader',
+      },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
       },
     ],
   },

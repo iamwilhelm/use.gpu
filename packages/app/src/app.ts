@@ -5,7 +5,7 @@ import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { use, useMemo, useOne } from '@use-gpu/live';
 
 import {
-  AutoCanvas,
+  AutoCanvas, GLSLProvider,
   Loop, Draw, Pass,
   OrbitCamera, OrbitControls,
   RenderToTexture,
@@ -27,31 +27,37 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const view = (
     use(Pass)({
       children: [
-        use(Cube)({ compileGLSL }),
+        use(Cube)(),
       ]
     })
   );
 
   return [
-    use(AutoCanvas)({
-      canvas, device, adapter,
+    use(GLSLProvider)({
+      compileGLSL,
       children:
 
-        use(OrbitControls)({
-          canvas,
-          render: (radius: number, phi: number, theta: number) =>
-            use(OrbitCamera)({
-              canvas, radius, phi, theta,
-              render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
-                use(Draw)({
-                  children:
-                    use(ViewProvider)({
-                      defs, uniforms, children: view,
-                  })
-              })
+        use(AutoCanvas)({
+          canvas, device, adapter,
+          children:
+
+            use(OrbitControls)({
+              canvas,
+              render: (radius: number, phi: number, theta: number) =>
+
+                use(OrbitCamera)({
+                  canvas, radius, phi, theta,
+                  render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
+
+                    use(Draw)({
+                      children:
+                        use(ViewProvider)({
+                          defs, uniforms, children: view,
+                        })
+                    })
+                })
             })
         })
-  
     }),
     use(UseInspect)({fiber, canvas}),
   ];

@@ -9,7 +9,7 @@ import { isSameDependencies } from './util';
 import { formatNode } from './debug';
 
 let ID = 0;
-let DEBUG = true;
+let DEBUG = false;
 //setTimeout((() => DEBUG = false), 900);
 
 const NOP = () => {};
@@ -61,6 +61,27 @@ export const makeSubFiber = <F extends Function>(
   const {host} = parent;
   const fiber = makeFiber(node.f, host, parent, node.args, key) as LiveFiber<F>;
   return fiber;
+}
+
+// Make a resume continuation for a fiber
+export const makeResumeFiber = <F extends Function>(
+  fiber: LiveFiber<F>,
+  handler: Function,
+  next?: LiveFiber<any>,
+): LiveFiber<any> => {
+  const Resume = () => handler;
+  Resume.displayName = `Resume(${next.displayName ?? ''})`;
+
+  const nextFiber = makeSubFiber(fiber, use(Resume)(), 1);
+
+  // Adopt existing yeet context
+  // which will be overwritten.
+  if (fiber.yeeted) {
+    nextFiber.yeeted = fiber.yeeted;
+    nextFiber.yeeted.id = nextFiber.id;
+  }
+
+  return nextFiber;
 }
 
 // Make fiber yeet state
@@ -118,11 +139,8 @@ export const renderFiber = <F extends Function>(
   else out = bound.apply(null, args ?? EMPTY_ARRAY);
 
   // Early exit if memoized
-  if (fiber.version && /*fiber.type !== YEET &&*/ !fiber.next) {
-    console.log('memo?', fiber.version, fiber.memo, formatNode(fiber));
-    if (fiber.version === fiber.memo) {
-      return fiber;
-    }
+  if (fiber.version && !fiber.next) {
+    if (fiber.version === fiber.memo) return fiber;
     fiber.memo = fiber.version;
   }
 
@@ -255,32 +273,24 @@ export const mapReduceFiberCalls = <F extends Function, R, T>(
   onRender?: OnFiber,
   onFence?: OnFiber,
 ) => {
+  const {yeeted} = fiber;
   if (!fiber.next) {
-    const Done = () => (next?: LiveFunction<any>) => {
+    const resume = (next?: LiveFunction<any>) => {
       const value = reduceFiberValues(fiber, reducer, true);
       if (fiber.next.mount) bustFiberCaches(fiber.next.mount);
       return next ? use(next)(value) : null;
     };
-    Done.displayName = '[Done]' + (next.displayName ?? '');
 
-    fiber.next = makeSubFiber(fiber, use(Done)(), 1);
-    if (fiber.yeeted) {
-      fiber.next.yeeted = fiber.yeeted;
-      fiber.next.yeeted.id = fiber.next.id;
-    }
-  }
-  const Done = fiber.next.f;
-
-  let {yeeted} = fiber;
-  if (!yeeted || yeeted.parent) {
-    yeeted = fiber.yeeted = makeYeetState(fiber, mapper, yeeted?.roots);
+    fiber.next = makeResumeFiber(fiber, resume, next);
+    fiber.yeeted = makeYeetState(fiber, mapper, yeeted?.roots);
     fiber.path.push(0);
   }
 
   reconcileFiberCalls(fiber, calls, onRender, onFence);
   if (onFence) onFence(fiber);
 
-  mountFiberContinuation(fiber, use(Done)(next), 1, onRender, onFence);
+  const Resume = fiber.next.f;
+  mountFiberContinuation(fiber, use(Resume)(next), 1, onRender, onFence);
 }
 
 // Gather-reduce a fiber
@@ -291,32 +301,24 @@ export const gatherFiberCalls = <F extends Function, R, T>(
   onRender?: OnFiber,
   onFence?: OnFiber,
 ) => {
+  const {yeeted} = fiber;
   if (!fiber.next) {
-    const Done = () => (next?: LiveFunction<any>) => {
+    const resume = (next?: LiveFunction<any>) => {
       const value = gatherFiberValues(fiber, true);
       if (fiber.next.mount) bustFiberCaches(fiber.next.mount);
       return next ? use(next)(value) : null;
     };
-    Done.displayName = '[Done]' + (next.displayName ?? '');
 
-    fiber.next = makeSubFiber(fiber, use(Done)(), 1);
-    if (fiber.yeeted) {
-      fiber.next.yeeted = fiber.yeeted;
-      fiber.next.yeeted.id = fiber.next.id;
-    }
-  }
-  const Done = fiber.next.f;
-
-  let {yeeted} = fiber;
-  if (!yeeted || yeeted.parent) {
-    yeeted = fiber.yeeted = makeYeetState(fiber, undefined, yeeted?.roots);
+    fiber.next = makeResumeFiber(fiber, resume, next);
+    fiber.yeeted = makeYeetState(fiber, undefined, yeeted?.roots);
     fiber.path.push(0);
   }
 
   reconcileFiberCalls(fiber, calls, onRender, onFence);
   if (onFence) onFence(fiber);
 
-  mountFiberContinuation(fiber, use(Done)(next), 1, onRender, onFence);
+  const Resume = fiber.next.f;
+  mountFiberContinuation(fiber, use(Resume)(next), 1, onRender, onFence);
 }
 
 // Reduce yeeted values on a tree of fibers

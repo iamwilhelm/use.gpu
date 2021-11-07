@@ -9,13 +9,16 @@ import { Fiber } from './fiber';
 import { Props } from './props';
 import { Call } from './call';
 import { InspectContainer, SplitRow, RowPanel, Scrollable, Inset } from './layout';
-import { Grid } from 'semantic-ui-react'
+import { Tab, Grid } from 'semantic-ui-react'
 
 const { Row, Column } = Grid;
+const { Pane } = Tab;
 
 type InspectProps = {
 	fiber: LiveFiber<any>,
 }
+
+const TAB_STYLE = { secondary: true, pointing: true };
 
 export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 	const expandCursor = useUpdateState<ExpandState>({});
@@ -23,6 +26,17 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 
 	const [selectedFiber] = selectedCursor;
 	const ping = usePingTracker(fiber);
+
+	const panes = selectedFiber ? [
+		{
+			menuItem: 'Props',
+			render: () => <Props fiber={selectedFiber} />
+		},
+		{
+			menuItem: 'Fiber',
+			render: () => <Call fiber={selectedFiber} />
+		},
+	] : [];
 
 	return (
 		<InspectContainer>
@@ -37,8 +51,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 				<RowPanel style={{width: '67%'}}>
 					<Scrollable>
 						<Inset>
-							{selectedFiber ? <Props fiber={selectedFiber} /> : null}
-							{selectedFiber ? <Call fiber={selectedFiber} /> : null}
+							<Tab menu={TAB_STYLE} panes={panes} />
 						</Inset>
 					</Scrollable>
 				</RowPanel>

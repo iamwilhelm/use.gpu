@@ -13,6 +13,5 @@ export type RenderProviderProps = {
 
 export const RenderProvider: LiveComponent<RenderProviderProps> = memo((fiber) => (props) => {
   const {renderContext, children} = props;
-  useMemo(() => console.log('renderContext changed'), [renderContext]);
   return provide(RenderContext, renderContext, children);
 }, 'RenderProvider');

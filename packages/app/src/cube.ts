@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformDefinition, UniformAttribute, UniformType } from '@use-gpu/core/types';
 
-import { ViewContext, RenderContext } from '@use-gpu/components';
+import { ViewContext, RenderContext, GLSLContext } from '@use-gpu/components';
 import { yeet, memoProps, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
@@ -22,13 +22,12 @@ export const CUBE_UNIFORM_DEFS: UniformAttribute[] = [
 import { makeCube } from './meshes/cube';
 
 export type CubeProps = {
-  compileGLSL: (s: string, t: string) => any,
 };
 
 export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
+  const {compileGLSL} = useContext(GLSLContext);
   const {uniforms, defs} = useContext(ViewContext);
   const {width, device, colorStates, depthStencilState} = useContext(RenderContext);
-  const {compileGLSL} = props;
 
   const start = +new Date();
 
@@ -37,7 +36,6 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
   const blinkUniform = {value: blink};
   useResource((dispose) => {
     const timer = setInterval(() => {
-      console.log('-------')
       setBlink(b => 1 - b);
     }, 1000);
     setTimeout(() => clearInterval(timer), 5500);
@@ -76,8 +74,6 @@ export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
     });
     return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformDefinition, GPUBindGroup];
   }, [device, defs, pipeline]);
-
-  console.log('Render <Cube>', width);
 
   // Return a lambda back to parent(s)
   return yeet((passEncoder: GPURenderPassEncoder) => {

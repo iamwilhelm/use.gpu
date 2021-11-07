@@ -13,11 +13,11 @@ export const ExpandRow = styled.div`
 `;
 
 export const NotExpandRow = styled(ExpandRow)`
-	padding-left: 24px;
+	padding-left: 20px;
 `;
 
 export const IndentTree = styled.div`
-	padding-left: 24px;
+	padding-left: 20px;
 `;
 
 export const SplitRow = styled.div`

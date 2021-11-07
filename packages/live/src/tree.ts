@@ -4,7 +4,7 @@ import { makeFiber, renderFiber, bustFiberCaches, visitYeetRoots } from './fiber
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubOrSamePath, isSubPath, comparePaths } from './util';
 import { formatNode } from './debug';
 
-let DEBUG = true;
+let DEBUG = false;
 //setTimeout((() => DEBUG = false), 900);
 
 const NO_ARGS = [] as any[];
@@ -43,6 +43,7 @@ export const renderWithDispatch = <T>(
   const reenter = (as: Action<any>[]) => {
     dispatch(() => {
       const fibers = as.map(({fiber}) => fiber);
+      DEBUG && console.log('----------------------------');
       DEBUG && console.log('Dispatching Roots', fibers.map(formatNode));
       if (fibers.length) renderFibers(fibers);
     });

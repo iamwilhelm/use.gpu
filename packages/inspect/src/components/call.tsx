@@ -9,7 +9,6 @@ import { SplitRow, IndentTree, Label } from './layout';
 import { inspectObject } from './props';
 
 const StyledCall = styled.div`
-	margin-top: 20px;
 `
 
 type CallProps = {

@@ -13,9 +13,10 @@ type FiberProps = {
 	ping: PingState,
 	expandCursor: Cursor<ExpandState>,
 	selectedCursor: Cursor<SelectState>,
+	compact?: boolean,
 }
 
-export const Fiber: React.FC<FiberProps> = ({fiber, ping, expandCursor, selectedCursor}) => {
+export const Fiber: React.FC<FiberProps> = ({fiber, ping, compact, expandCursor, selectedCursor}) => {
   const {id, mount, mounts, next} = fiber;
 	const [selectState, updateSelectState] = selectedCursor;
 	
@@ -36,6 +37,7 @@ export const Fiber: React.FC<FiberProps> = ({fiber, ping, expandCursor, selected
 				ping={ping}
 				expandCursor={expandCursor}
 				selectedCursor={selectedCursor}
+				compact
 			/>
 		);
 	}
@@ -67,9 +69,10 @@ export const Fiber: React.FC<FiberProps> = ({fiber, ping, expandCursor, selected
   }
 
 	if (out.length) {
+		const hasIndent = !compact || mounts || next;
 		return (<>
 			<Expand id={id.toString()} expandCursor={expandCursor} label={node}>
-				<IndentTree>{out}</IndentTree>
+				{hasIndent ? <IndentTree>{out}</IndentTree> : out}
 			</Expand>
 		</>);
 	}

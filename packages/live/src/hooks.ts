@@ -101,7 +101,6 @@ export const useState = <T>(
     value = (initialState instanceof Function) ? initialState() : initialState;
     setValue = host
       ? (value: Reducer<T>) => {
-          console.log('----setState-----');
           host!.schedule(fiber, () => {
             if (value instanceof Function) state[i] = value(state[i]);
             else state[i] = value;

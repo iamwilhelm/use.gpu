@@ -127,9 +127,6 @@ export const renderFiber = <F extends Function>(
   // Let host do its thing
   if (onRender) onRender(fiber);
 
-  // @ts-ignore
-  if (window.STOP) return;
-
   // Disposed fiber, ignore
   if (!bound) return;
 
@@ -235,12 +232,13 @@ export const reconcileFiberCalls = <F extends Function>(
   if (!Array.isArray(calls)) calls = [calls];
 
   order.length = 0;
-  let i = 0, j = 0;
+  let i = 0;
   for (let call of calls) {
-    let key = call.key ?? i++;
+
+    let key = call?.key ?? i;
     if (seen.has(key)) throw new Error(`Duplicate key ${key} while reconciling`, formatNode(fiber));
     seen.add(key);
-    order[j++] = key;
+    order[i++] = key;
 
     // Array shorthand for nested reconciling
     if (Array.isArray(call)) call = reconcile(call as any, key);
@@ -421,7 +419,8 @@ export const detachFiber = <F extends Function>(
   if (!next || (next.f !== call.f)) next = fiber.next = makeSubFiber(fiber, call);
   next.args = call.args;
 
-  callback(() => renderFibers([next]));
+  const roots = [next];
+  callback(() => renderFibers(roots));
 }
 
 // Dispose of a fiber's resources and all its mounted sub-fibers

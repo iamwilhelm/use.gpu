@@ -4,7 +4,7 @@ import { memo, provide, makeContext, useOne } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '@use-gpu/core';
 
-export const GLSLContext = () => makeContext();
+export const GLSLContext = makeContext(null, 'GLSLContext');
 
 export type GLSLProviderProps = {
   compileGLSL: (s: string, t: string) => string,

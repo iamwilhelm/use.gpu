@@ -125,6 +125,6 @@ export const makeFunctionCall = <F extends Function>(
 ): FunctionCall<F> => ({f, args});
 
 // Make live context for holding shared data for child nodes
-export const makeContext = <T>(initialValue?: T): LiveContext<T> => ({initialValue});
+export const makeContext = <T>(initialValue?: T, displayName?: string): LiveContext<T> => ({initialValue, displayName});
 export const createContext = makeContext;
 

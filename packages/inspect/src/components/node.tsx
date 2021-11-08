@@ -50,7 +50,11 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) =>
   let name = (f?.displayName ?? f?.name) || 'Node';
   if (name === 'PROVIDE') {
     const [context] = args;
-    name = `Provide(${formatValue(context)})`;
+    name = `Provide(${formatValue(context.displayName)})`;
+  }
+  else if (name === 'DETACH') {
+    const [call] = args;
+    name = `Detach(${formatValue(call.f)})`;
   }
 
   return <Wrapper key={pinged} className={className} onClick={onClick}>{name}</Wrapper>;

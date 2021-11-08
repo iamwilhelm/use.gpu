@@ -34,7 +34,7 @@ export const Mesh: LiveComponent<MeshProps> = memoProps((fiber) => (props) => {
   const {device, colorStates, depthStencilState} = useContext(RenderContext);
 
   const vertexBuffers = useMemo(() =>
-    makeVertexBuffers(device, mesh.vertices), [device]);
+    makeVertexBuffers(device, mesh.vertices), [device, mesh]);
 
   // Rendering pipeline
   const pipeline = useMemo(() => {
@@ -68,7 +68,7 @@ export const Mesh: LiveComponent<MeshProps> = memoProps((fiber) => (props) => {
   // Return a lambda back to parent(s)
   return yeet((passEncoder: GPURenderPassEncoder) => {
     const t = +new Date() / 1000;
-    const light = [Math.cos(t) * 3, 3, Math.sin(t) * 3, 1];
+    const light = [Math.cos(t) * 5, 4, Math.sin(t) * 5, 1];
     uniformPipe.fill({
       ...uniforms,
       lightPosition: { value: light }

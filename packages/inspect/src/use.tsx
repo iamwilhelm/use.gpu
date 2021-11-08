@@ -20,7 +20,10 @@ export const UseInspect: LiveComponent<UseInspectProps> = () => ({fiber, canvas}
 		div.style.pointerEvents = 'none';
 		parent.appendChild(div);
 		
-		dispose(() => parent.removeChild(div));
+		dispose(() => {
+			ReactDOM.unmountComponentAtNode(container);
+			parent.removeChild(div);
+		});
 
 		return div;
 	}, [canvas])

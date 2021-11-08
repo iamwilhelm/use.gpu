@@ -4,7 +4,7 @@ import { memo, provide, makeContext, useMemo } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '@use-gpu/core';
 
-export const RenderContext = () => makeContext();
+export const RenderContext = makeContext(null, 'RenderContext');
 
 export type RenderProviderProps = {
   renderContext: CanvasRendering

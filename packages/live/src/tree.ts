@@ -44,7 +44,7 @@ export const renderWithDispatch = <T>(
     dispatch(() => {
       const fibers = as.map(({fiber}) => fiber);
       DEBUG && console.log('----------------------------');
-      DEBUG && console.log('Dispatching Roots', fibers.map(formatNode));
+      DEBUG && console.log('Dispatch to Roots', fibers.map(formatNode));
       if (fibers.length) renderFibers(fibers);
     });
   };
@@ -56,12 +56,17 @@ export const renderWithDispatch = <T>(
 }
 
 export const renderFibers = (fibers: LiveFiber<any>[]) => {
-  // Filter to only the top-level roots
-  // Gather sub-fibers that must have a visit
-  const roots = groupFibers(fibers);
-  DEBUG && console.log('Dispatching Sub-Roots', roots.map((r) => formatNode(r.root)));
-  for (let r of roots) renderSubRoot(r.root, r.subs);
-
+  if (fibers.length === 1) {
+    DEBUG && console.log('Dispatching Fiber', roots.map((r) => formatNode(r.root)));
+    renderSubRoot(fibers[0], new Set());
+  }
+  else {
+    // Filter to only the top-level roots
+    // Gather sub-fibers that must have a visit
+    const roots = groupFibers(fibers);
+    DEBUG && console.log('Dispatching Fibers', roots.map((r) => formatNode(r.root)));
+    for (let r of roots) renderSubRoot(r.root, r.subs);
+  }
   return fibers.length > 1 ? fibers : fibers[0];
 }
 
@@ -73,25 +78,13 @@ export const renderSubRoot = (
   if (host) host.__stats.dispatch++;
 
   const onRender = makeOnRender(subs);
+  const onFence = makeOnFence(subs);
 
-  const onFence = (fiber: LiveFiber<any>) => {
-    // Fence
-    DEBUG && console.log('Fencing Sub-Root', formatNode(fiber));
-    const {path} = fiber;
-    const before = [...path, 0];
-
-    const fibers = Array.from(subs.values());
-    const nodes = fibers.filter(f => isSubPath(before, f.path));
-    if (nodes.length) {
-      renderFibers(nodes);
-      for (let n of nodes) subs.delete(n);
-    }
-  }
-
+  // Update from the root down
   DEBUG && console.log('Updating Sub-Root', formatNode(root));
   renderFiber(root, onRender, onFence);
 
-  // Update remaining fenced nodes
+  // Update any remaining shielded nodes
   while (subs.size) {
     const next = subs.values().next().value;
     DEBUG && console.log('Updating Memoized Sub-Node', formatNode(next));
@@ -133,6 +126,23 @@ const makeOnRender = (visit: Set<LiveFiber<any>>) => (fiber: LiveFiber<any>) => 
 	// Notify host / dev tool of render
 	host.__ping(fiber);
 };
+
+const makeOnFence = (visit: Set<LiveFiber<any>>) => (fiber: LiveFiber<any>) => {
+  if (!visit.size) return;
+
+  // Continuation fence
+  // Ensure all child nodes of the fiber are rendered,
+  // before calling/resuming its continuation.
+  DEBUG && console.log('Fencing Sub-Root', formatNode(fiber));
+  const nodes = [];
+  const {path} = fiber;
+  const before = [...path, 0];
+  for (let f of visit.values()) if (isSubPath(before, f.path)) nodes.push(f);
+  if (nodes.length) {
+    renderFibers(nodes);
+    for (let n of nodes) visit.delete(n);
+  }
+}
 
 export const renderPaint = (() => {
   const onPaint = makePaintRequester();

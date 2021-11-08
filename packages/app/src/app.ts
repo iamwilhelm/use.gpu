@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 
-import { use, useMemo, useOne } from '@use-gpu/live';
+import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   AutoCanvas, GLSLProvider,
@@ -26,7 +26,8 @@ export type AppProps = {
 export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const {canvas, device, adapter, compileGLSL} = props;
 
-  const mesh = makeMesh()
+  const inspect = useInspector();
+  const mesh = makeMesh();
 
   const view = (
     use(Pass)({
@@ -66,9 +67,24 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             })
         })
     }),
-    use(UseInspect)({fiber, canvas}),
+    inspect ? use(UseInspect)({fiber, canvas}) : null,
   ];
 };
+
+const useInspector = () => {
+  const [inspect, setInspect] = useState<boolean>(false);
+  useResource((dispose) => {
+    const keydown = (e) => {
+      if (e.metaKey && e.key === 'i') setInspect((s) => !s);
+    }
+
+    window.addEventListener('keydown', keydown);
+    dispose(() => window.addEventListener('keydown', keydown));
+  });
+
+  return inspect;
+}
+
 
 /*
   use(RenderToTexture)({

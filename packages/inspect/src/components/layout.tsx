@@ -7,6 +7,13 @@ export const InspectContainer = styled.div`
 	cursor: default;
 `;
 
+export const InspectToggle = styled.div`
+	position: absolute;
+	right: 0;
+	top: 0;
+	pointer-events: auto;
+`;
+
 export const ExpandRow = styled.div`
 	display: flex;
 	height: 20px;

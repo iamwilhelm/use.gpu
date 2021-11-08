@@ -8,11 +8,13 @@ import { Node } from './node';
 import { Fiber } from './fiber';
 import { Props } from './props';
 import { Call } from './call';
-import { InspectContainer, SplitRow, RowPanel, Scrollable, Inset } from './layout';
-import { Tab, Grid } from 'semantic-ui-react'
+import { InspectContainer, InspectToggle, SplitRow, RowPanel, Scrollable, Inset } from './layout';
+import { Button, Tab, Grid } from 'semantic-ui-react'
 
 const { Row, Column } = Grid;
 const { Pane } = Tab;
+
+const ICON = (s: string) => <span className="m-icon">{s}</span>
 
 type InspectProps = {
 	fiber: LiveFiber<any>,
@@ -23,6 +25,9 @@ const TAB_STYLE = { secondary: true, pointing: true };
 export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 	const expandCursor = useUpdateState<ExpandState>({});
 	const selectedCursor = useUpdateState<SelectState>(null);
+
+	const [open, updateOpen] = useUpdateState<boolean>(false);
+	const toggleOpen = () => updateOpen(!open);
 
 	const [selectedFiber] = selectedCursor;
 	const ping = usePingTracker(fiber);
@@ -38,8 +43,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 		},
 	] : [];
 
-	return (
-		<InspectContainer>
+	return (<>
+		{open  ? <InspectContainer>
 			<SplitRow>
 				<RowPanel style={{width: '33%'}}>
 					<Scrollable>
@@ -56,8 +61,11 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 					</Scrollable>
 				</RowPanel>
 			</SplitRow>
-		</InspectContainer>
-	);
+		</InspectContainer> : null}
+		<InspectToggle onClick={toggleOpen}>
+			<Button>{open ? ICON("close") : ICON("bug_report")}</Button>
+		</InspectToggle>
+	</>);
 }
 
 const usePingTracker = (fiber: LiveFiber<any>) => {

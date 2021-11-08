@@ -12,6 +12,8 @@ import {
   ViewProvider,
 } from '@use-gpu/components';
 import { Cube } from './cube';
+import { Mesh } from './mesh';
+import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 
 export type AppProps = {
@@ -24,10 +26,12 @@ export type AppProps = {
 export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const {canvas, device, adapter, compileGLSL} = props;
 
+  const mesh = makeMesh()
+
   const view = (
     use(Pass)({
       children: [
-        use(Cube)(),
+        use(Mesh)({ mesh }),
       ]
     })
   );
@@ -49,10 +53,13 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
                   canvas, radius, phi, theta,
                   render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
 
-                    use(Draw)({
+                    use(Loop)({
                       children:
-                        use(ViewProvider)({
-                          defs, uniforms, children: view,
+                        use(Draw)({
+                          children:
+                            use(ViewProvider)({
+                              defs, uniforms, children: view,
+                            })
                         })
                     })
                 })

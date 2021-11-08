@@ -8,25 +8,23 @@ export type DrawProps = {
   render?: () => LiveElement<any>,
 };
 
-export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
-  const {children, render} = props;
-
-  const Done = useMemo(() =>
-    (fiber: LiveFiber<any>) => (ts: Task[]) => {
-      const {gpuContext, colorAttachments} = useContext(RenderContext);
-
-      // @ts-ignore
-      colorAttachments[0].view = gpuContext
-      // @ts-ignore
-        .getCurrentTexture()
-        .createView();
-    
-      for (let task of ts) task();
-    },
-    []);
+const Done = (fiber: LiveFiber<any>) => (ts: Task[]) => {
+  const {gpuContext, colorAttachments} = useContext(RenderContext);
 
   // @ts-ignore
-  if (!Done.displayName) Done.displayName = '[Draw]';
+  colorAttachments[0].view = gpuContext
+  // @ts-ignore
+    .getCurrentTexture()
+    .createView();
+
+  for (let task of ts) task();
+};
+
+// @ts-ignore
+if (!Done.displayName) Done.displayName = '[Draw]';
+
+export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
+  const {children, render} = props;
 
   return gatherReduce(children ?? (render ? render() : null), Done);
 };

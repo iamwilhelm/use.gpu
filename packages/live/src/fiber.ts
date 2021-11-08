@@ -5,6 +5,7 @@ import {
 } from './types';
 
 import { use, bind, reconcile, DETACH, RECONCILE, MAP_REDUCE, GATHER, YEET, PROVIDE } from './live';
+import { renderFibers } from './tree';
 import { isSameDependencies } from './util';
 import { formatNode } from './debug';
 
@@ -415,12 +416,12 @@ export const detachFiber = <F extends Function>(
   onFence?: OnFiber,
 ) => {
   if (!fiber.args) return;
-  let {mount, args: [call, callback]} = fiber;
+  let {next, args: [call, callback]} = fiber;
 
-  if (!mount || (mount.f !== call.f)) mount = fiber.mount = makeSubFiber(fiber, call);
-  mount.args = call.args;
+  if (!next || (next.f !== call.f)) next = fiber.next = makeSubFiber(fiber, call);
+  next.args = call.args;
 
-  callback(() => renderFiber(mount!, onRender, onFence), mount);
+  callback(() => renderFibers([next]));
 }
 
 // Dispose of a fiber's resources and all its mounted sub-fibers

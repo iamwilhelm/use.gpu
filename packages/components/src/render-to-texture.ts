@@ -27,12 +27,12 @@ export type RenderToTextureProps = {
 export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (props) => {
   const renderContext = useContext(RenderContext);
   const {device} = renderContext;
-  
+
   const {
     width = renderContext.width,
     height = renderContext.height,
-    presentationFormat = renderContext.presentationFormat,
-    depthStencilFormat = renderContext.depthStencilFormat,
+    presentationFormat = PRESENTATION_FORMAT,
+    depthStencilFormat = DEPTH_STENCIL_FORMAT,
     backgroundColor = EMPTY_COLOR,
     children,
   } = props;
@@ -68,7 +68,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
     [device, width, height, depthStencilFormat]
   );
 
-  const rttContext = {
+  const rttContext = useMemo(() => ({
     ...renderContext,
     width,
     height,
@@ -77,7 +77,8 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
     depthTexture,
     depthStencilState,
     depthStencilAttachment,
-  };
+  }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment]);
+
   const view = use(RenderProvider)({ renderContext: rttContext, children });
 
   const Done = useMemo(() =>

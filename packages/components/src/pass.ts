@@ -15,9 +15,9 @@ export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
   const {children, render} = props;
 
-  const Done = useMemo(() => (fiber: LiveFiber<any>) => (rs: RenderToPass[]) =>
-    yeet(() => {
-      const {device, colorAttachments, depthStencilAttachment} = useContext(RenderContext);
+  const Done = useMemo(() => (fiber: LiveFiber<any>) => (rs: RenderToPass[]) => {
+    const {device, colorAttachments, depthStencilAttachment} = useContext(RenderContext);
+    return yeet(() => {
 
       const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments,
@@ -31,8 +31,8 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
 
       // @ts-ignore
       device.queue.submit([commandEncoder.finish()]);
-    }),
-    []);
+    });
+  }, []);
 
   // @ts-ignore
   if (!Done.displayName) Done.displayName = '[Pass]';

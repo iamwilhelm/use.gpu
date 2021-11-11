@@ -22,7 +22,7 @@ const Dispatch = () => (props: LoopRef) => props.children ?? (props.render ? pro
 export const Loop: LiveComponent<LoopProps> = (fiber) => (props) => {
   const {children, update, render} = props;
 
-  const ref: LoopRef = useOne(() => ({children, update, render, dispatch: null}));
+  const ref: LoopRef = useOne(() => ({children, update, render}));
   ref.children = children;
   ref.update = update;
   ref.render = render;

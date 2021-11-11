@@ -9,7 +9,7 @@ export const ViewContext = makeContext(null, 'ViewContext');
 export type ViewProviderProps = {
   defs: UniformAttribute[],
   uniforms: ViewUniforms,
-  children: LiveElement<any>[],
+  children: LiveElement<any>,
 };
 
 export const ViewProvider: LiveComponent<ViewProviderProps> = memo((fiber) => (props) => {

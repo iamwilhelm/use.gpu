@@ -44,7 +44,7 @@ export const makeOrbitMatrix = (radius: number, phi: number, theta: number): mat
   return matrix;
 }
 
-export const makeOrbitPosition = (radius: number, phi: number, theta: number): mat4 => {
+export const makeOrbitPosition = (radius: number, phi: number, theta: number): number[] => {
   const ct = Math.cos(theta);
   return [
     -Math.sin(phi) * ct * radius,

@@ -68,6 +68,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 	</>);
 }
 
+type Timer = ReturnType<typeof setTimeout>;
+
 const usePingTracker = (fiber: LiveFiber<any>) => {
 	const [ping, setPing] = useState<PingState>({});
 
@@ -75,11 +77,11 @@ const usePingTracker = (fiber: LiveFiber<any>) => {
 	ref.ping = ping;
 
 	useEffect(() => {
-		let uTimer = null;
-		let rTimer = null;
+		let uTimer: Timer | null = null;
+		let rTimer: Timer | null = null;
 
-		let update = {};
-		let reset = {};
+		let update: Record<string, number> = {};
+		let reset: Record<string, number> = {};
 
 		const flush = () => {
 			const u = update;
@@ -96,12 +98,14 @@ const usePingTracker = (fiber: LiveFiber<any>) => {
 			}, 500);
 		}
 
+		if (!fiber.host) return;
+		
 		fiber.host.__ping = (fiber: LiveFiber<any>) => {
 			reset[fiber.id] = update[fiber.id] = ((ref.ping[fiber.id] || 0) % 256) + 1;			
 			if (!uTimer) uTimer = setTimeout(flush, 0);
 		};
 		return () => {
-			fiber.host.__ping = () => {};
+			if (fiber.host) fiber.host.__ping = () => {};
 		};
 	}, [ref]);
 

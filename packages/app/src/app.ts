@@ -54,14 +54,23 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
                   canvas, radius, phi, theta,
                   render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
 
-                    use(Loop)({
-                      children:
-                        use(Draw)({
-                          children:
-                            use(ViewProvider)({
-                              defs, uniforms, children: view,
-                            })
+                    use(ViewProvider)({
+                      defs, uniforms, children:
+
+                        use(Loop)({
+                          children: [
+
+                            use(RenderToTexture)({
+                              children: view,
+                            }),
+                      
+                            use(Draw)({
+                              children: view,
+                            }),
+
+                          ],
                         })
+                      
                     })
                 })
             })
@@ -74,7 +83,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
 const useInspector = () => {
   const [inspect, setInspect] = useState<boolean>(false);
   useResource((dispose) => {
-    const keydown = (e) => {
+    const keydown = (e: KeyboardEvent) => {
       if (e.metaKey && e.key === 'i') setInspect((s) => !s);
     }
 
@@ -84,25 +93,3 @@ const useInspector = () => {
 
   return inspect;
 }
-
-
-/*
-  use(RenderToTexture)({
-    device, width, height,
-    render: (renderContext: CanvasRenderingContextGPU) => {
-      const {
-        colorStates, colorAttachments,
-        depthStencilState, depthStencilAttachment,
-      } = renderContext;
-
-      return use(Pass)({
-        device, colorAttachments, depthStencilAttachment,
-        children: [
-
-          use(Cube)({device, colorStates, depthStencilState, compileGLSL, defs, uniforms}),
-
-        ]
-      });
-    },
-  }),
-*/

@@ -1,4 +1,4 @@
-import { Key, Action, Task, LiveFiber, DeferredCall, GroupedFibers } from './types';
+import { Key, Action, Task, LiveFiber, DeferredCall, GroupedFibers, HostInterface } from './types';
 
 import { makeFiber, renderFiber, bustFiberCaches, visitYeetRoots } from './fiber';
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubOrSamePath, isSubPath, comparePaths } from './util';
@@ -23,7 +23,7 @@ export const makeHost = () => {
 		__ping: () => {},
     __stats: {mounts: 0, unmounts: 0, updates: 0, dispatch: 0},
     __flush: scheduler.flush,
-  };
+  } as HostInterface;
   return {host, scheduler, disposal, dependency};
 }
 
@@ -57,7 +57,7 @@ export const renderWithDispatch = <T>(
 
 export const renderFibers = (fibers: LiveFiber<any>[]) => {
   if (fibers.length === 1) {
-    DEBUG && console.log('Dispatching Fiber', roots.map((r) => formatNode(r.root)));
+    DEBUG && console.log('Dispatching Fiber', formatNode(fibers[0]));
     renderSubRoot(fibers[0], new Set());
   }
   else {
@@ -124,7 +124,7 @@ const makeOnRender = (visit: Set<LiveFiber<any>>) => (fiber: LiveFiber<any>) => 
   }
 
 	// Notify host / dev tool of render
-	host.__ping(fiber);
+	if (host?.__ping) host.__ping(fiber);
 };
 
 const makeOnFence = (visit: Set<LiveFiber<any>>) => (fiber: LiveFiber<any>) => {

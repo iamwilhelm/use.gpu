@@ -3,9 +3,9 @@ import { useResource, formatValue } from '@use-gpu/live';
 
 import React from 'react';
 
-import { useRefineCursor } from './cursor';
+import { useRefineCursor, Cursor } from './cursor';
 import { Node } from './node';
-import { ExpandState, SelectState, Action } from './types';
+import { PingState, ExpandState, SelectState, Action } from './types';
 import { ExpandRow, NotExpandRow, IndentTree } from './layout';
 
 type FiberProps = {
@@ -89,7 +89,7 @@ type ExpandProps = {
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 
 export const Expand: React.FC<ExpandProps> = ({id, label, expandCursor, children}) => {
-	const [expand, updateExpand] = useRefineCursor(expandCursor)(id);
+	const [expand, updateExpand] = useRefineCursor<boolean>(expandCursor)(id);
 
 	const onClick = (e: any) => {
 		updateExpand(expand === false);

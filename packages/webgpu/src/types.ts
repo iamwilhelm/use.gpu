@@ -12,6 +12,7 @@ export type GPUMount = GPUDeviceMount & {
 };
 
 export type CanvasRenderingContextGPU = {
+  element: HTMLCanvasElement,
   width: number,
   height: number,
 

@@ -34,7 +34,7 @@
     "last 1 firefox version"
   ],
   "scripts": {
-    "build": "yarn lerna run build",
+    "build": "yarn lerna run build --concurrency 1",
     "start": "NODE_ENV=development webpack serve",
     "test": "jest --watch",
     "lint": "eslint packages/**/src --ext ts",

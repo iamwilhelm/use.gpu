@@ -39,7 +39,7 @@ export const memoArgs = <F extends Function>(
       args.push(fiber.version);
 
       const value = useMemo(() => {
-        fiber.memo = null;
+        fiber.memo = -1;
         return bound(args);
       }, args);
       return value;
@@ -67,7 +67,7 @@ export const memoProps = <F extends Function>(
       }
 
       const value = useMemo(() => {
-        fiber.memo = null;
+        fiber.memo = -1;
         return bound(props);
       }, deps);
 

@@ -8,6 +8,7 @@ export const GLSLContext = makeContext(null, 'GLSLContext');
 
 export type GLSLProviderProps = {
   compileGLSL: (s: string, t: string) => string,
+  children: LiveElement<any>,
 };
 
 export const GLSLProvider: LiveComponent<GLSLProviderProps> = memo((fiber) => (props) => {

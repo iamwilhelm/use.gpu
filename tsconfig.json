@@ -1,9 +1,11 @@
 {
   "references": [
-    { "path": "./packages/components" },
-    { "path": "./packages/core" },
     { "path": "./packages/live" },
-    { "path": "./packages/webgpu" }
+    { "path": "./packages/core" },
+    { "path": "./packages/webgpu" },
+    { "path": "./packages/components" },
+    { "path": "./packages/inspect" },
+    { "path": "./packages/app" }
   ],
   "files": [],
   "include": [],

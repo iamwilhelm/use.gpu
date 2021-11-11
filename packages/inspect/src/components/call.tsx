@@ -15,7 +15,7 @@ type CallProps = {
 	fiber: LiveFiber<any>,
 };
 
-export const Call: React.FC<PropsProps> = ({fiber}) => {
+export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
 	const {id, depth, path, context, state, yeeted, next} = fiber;
 

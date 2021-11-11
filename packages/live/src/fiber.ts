@@ -68,10 +68,10 @@ export const makeSubFiber = <F extends Function>(
 export const makeResumeFiber = <F extends Function>(
   fiber: LiveFiber<F>,
   handler: Function,
-  next?: LiveFiber<any>,
+  next?: LiveFunction<any>,
 ): LiveFiber<any> => {
   const Resume = () => handler;
-  Resume.displayName = `Resume(${next.displayName ?? ''})`;
+  Resume.displayName = `Resume(${(next as any)?.displayName ?? ''})`;
 
   const nextFiber = makeSubFiber(fiber, use(Resume)(), 1);
 
@@ -88,6 +88,7 @@ export const makeResumeFiber = <F extends Function>(
 // Make fiber yeet state
 export const makeYeetState = <F extends Function, A, B>(
   fiber: LiveFiber<F>,
+  nextFiber: LiveFiber<F>,
   map?: (a: A) => B,
   roots?: LiveFiber<any>[],
 ): FiberYeet<B> => ({
@@ -98,7 +99,7 @@ export const makeYeetState = <F extends Function, A, B>(
   value: undefined,
   reduced: undefined,
   parent: undefined,
-  roots: roots ? [...roots, fiber.next] : [fiber.next],
+  roots: roots ? [...roots, nextFiber] : [nextFiber],
 });
 
 // Make fiber context state
@@ -236,7 +237,7 @@ export const reconcileFiberCalls = <F extends Function>(
   for (let call of calls) {
 
     let key = call?.key ?? i;
-    if (seen.has(key)) throw new Error(`Duplicate key ${key} while reconciling`, formatNode(fiber));
+    if (seen.has(key)) throw new Error(`Duplicate key ${key} while reconciling ` + formatNode(fiber));
     seen.add(key);
     order[i++] = key;
 
@@ -276,12 +277,12 @@ export const mapReduceFiberCalls = <F extends Function, R, T>(
   if (!fiber.next) {
     const resume = (next?: LiveFunction<any>) => {
       const value = reduceFiberValues(fiber, reducer, true);
-      if (fiber.next.mount) bustFiberCaches(fiber.next.mount);
+      if (fiber.next?.mount) bustFiberCaches(fiber.next.mount);
       return next ? use(next)(value) : null;
     };
 
     fiber.next = makeResumeFiber(fiber, resume, next);
-    fiber.yeeted = makeYeetState(fiber, mapper, yeeted?.roots);
+    fiber.yeeted = makeYeetState(fiber, fiber.next, mapper, yeeted?.roots);
     fiber.path.push(0);
   }
 
@@ -304,12 +305,12 @@ export const gatherFiberCalls = <F extends Function, R, T>(
   if (!fiber.next) {
     const resume = (next?: LiveFunction<any>) => {
       const value = gatherFiberValues(fiber, true);
-      if (fiber.next.mount) bustFiberCaches(fiber.next.mount);
+      if (fiber.next?.mount) bustFiberCaches(fiber.next.mount);
       return next ? use(next)(value) : null;
     };
 
     fiber.next = makeResumeFiber(fiber, resume, next);
-    fiber.yeeted = makeYeetState(fiber, undefined, yeeted?.roots);
+    fiber.yeeted = makeYeetState(fiber, fiber.next, undefined, yeeted?.roots);
     fiber.path.push(0);
   }
 

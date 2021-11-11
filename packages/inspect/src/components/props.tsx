@@ -13,7 +13,7 @@ type PropsProps = {
 export const Props: React.FC<PropsProps> = ({fiber}) => {
   // @ts-ignore
 	const {id, f, arg, args} = fiber;
-  const name = (f?.displayName ?? f?.name) || 'Node';
+  const name = ((f as any)?.displayName ?? f?.name) || 'Node';
 	let props = {} as Record<string, any>;
 
   if (arg !== undefined) {
@@ -59,7 +59,7 @@ export const inspectObject = (object: any, seen: Set<any> = new Set(), depth: nu
 	}
 
 	if (object instanceof Map) {
-		const o = {};
+		const o = {} as Record<string, any>;
 		let i = 0;
 		for (let k of object.keys()) {
 			const v = object.get(k);

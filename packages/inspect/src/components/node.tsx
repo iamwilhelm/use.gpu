@@ -48,11 +48,11 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) =>
 
   // @ts-ignore
   let name = (f?.displayName ?? f?.name) || 'Node';
-  if (name === 'PROVIDE') {
+  if (name === 'PROVIDE' && args) {
     const [context] = args;
     name = `Provide(${formatValue(context.displayName)})`;
   }
-  else if (name === 'DETACH') {
+  else if (name === 'DETACH' && args) {
     const [call] = args;
     name = `Detach(${formatValue(call.f)})`;
   }

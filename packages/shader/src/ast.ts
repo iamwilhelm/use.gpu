@@ -18,7 +18,7 @@ export const formatAST = (node: SyntaxNode, program: string, depth: number = 0) 
 
   let child = node.firstChild;
   
-  const text = program.slice(node.from, node.to).replace(/\n/g, "⮐")
+  const text = program.slice(node.from, node.to).replace(/\n/g, "⮐ ")
   let out = [] as string[];
   
   let line = `${prefix}${type.name}`;

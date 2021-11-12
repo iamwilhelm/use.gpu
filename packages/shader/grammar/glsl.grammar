@@ -16,9 +16,8 @@
   andand @left,
   xorxor @left,
   oror @left,
-  ternary @right,
+  conditional @right,
   assign @right,
-  sequence @left,
   if @left
 }
 
@@ -35,9 +34,8 @@ Preprocessor { Hash Directive UntilEOL }
 externalDeclaration { FunctionDefinition | Declaration | Preprocessor }
 
 FunctionDefinition { FunctionPrototype compoundStatement }
-FunctionPrototype { QualifiedType Identifier '(' ParameterDeclaration? ')' }
-ParameterDeclaration { TypeQualifier? (ParameterDeclarator | typeSpecifier) }
-ParameterDeclarator { typeSpecifier Identifier ArraySpecifier? }
+FunctionPrototype { QualifiedType Identifier '(' (ParameterDeclaration (comma ParameterDeclaration)*)? ')' }
+ParameterDeclaration { TypeQualifier? typeSpecifier (Identifier ArraySpecifier?)? }
 
 Declaration {
   (
@@ -50,29 +48,29 @@ Declaration {
       )?
     )? |
     TypeQualifier (
-      Identifier (commaSeq Identifier)*
+      Identifier (comma Identifier)*
     )?
   ) semicolon
 }
 
 typeSpecifier { (basicType | Struct) ArraySpecifier? }
 ArraySpecifier { (LeftBracket constantExpression RightBracket)* EmptyBrackets | (LeftBracket constantExpression RightBracket)+ EmptyBrackets? }
-TypeNameList { TypeName (commaSeq TypeName)* }
+TypeNameList { TypeName (comma TypeName)* }
 TypeName { Identifier }
 QualifiedType { TypeQualifier? typeSpecifier }
 
 Struct { k<'struct'> Identifier? '{' StructDeclarationList '}' }
 StructDeclarationList { StructDeclaration* }
 StructDeclaration { TypeQualifier? typeSpecifier structDeclaratorList semicolon }
-structDeclaratorList { DeclarationSpecifier (commaSeq DeclarationSpecifier)* }
+structDeclaratorList { DeclarationSpecifier (comma DeclarationSpecifier)* }
 
 DeclarationSpecifier { Identifier ArraySpecifier? }
-VariableDeclaration { QualifiedType SingleDeclaration (commaSeq SingleDeclaration)* }
+VariableDeclaration { QualifiedType SingleDeclaration (comma SingleDeclaration)* }
 SingleDeclaration { DeclarationSpecifier (!assign Assign initializer)? }
 
 initializer {
   assignmentExpression |
-  '{' initializer (commaSeq initializer)* commaSeq? '}'
+  '{' initializer (comma initializer)* comma? '}'
 }
 
 StatementList { Statement* }
@@ -110,7 +108,7 @@ JumpStatement {
 }
 fieldSelection { Identifier }
 
-expression { assignmentExpression (commaSeq assignmentExpression)* }
+expression { assignmentExpression (comma assignmentExpression)* }
 
 primaryExpression {
   Reserved? (Identifier | Number | '(' expression ')') 
@@ -119,8 +117,10 @@ assignmentExpression { conditionalExpression | unaryExpression !assign Assign as
 constantExpression { conditionalExpression }
 integerExpression { expression }
 conditionalExpression {
-  unaryExpression | binaryExpression
+  unaryExpression | binaryExpression | ternaryExpression
 }
+unaryExpression { postfixExpression | Unary }
+ternaryExpression { Conditional }
 binaryExpression { Binary }
 postfixExpression {
   primaryExpression |
@@ -128,9 +128,6 @@ postfixExpression {
   FunctionCall |
   Field |
   Postfix
-}
-unaryExpression {
-  postfixExpression | Unary
 }
 
 Index { postfixExpression LeftBracket integerExpression RightBracket }
@@ -157,10 +154,10 @@ Binary {
   conditionalExpression !oror OrOr conditionalExpression |
   conditionalExpression !xorxor XorXor conditionalExpression
 }
-commaSeq { !sequence comma }
+Conditional { conditionalExpression !conditional '?' expression ':' assignmentExpression }
 
 FunctionCall {
-  (Identifier | basicType) '(' (k<'void'>? | assignmentExpression (commaSeq assignmentExpression)*) ')'
+  (Identifier | basicType) '(' (k<'void'>? | assignmentExpression (comma assignmentExpression)*) ')'
 }
 
 TypeQualifier {
@@ -194,7 +191,7 @@ StorageQualifier {
 }
 InvariantQualifier { k<'invariant'> }
 InterpolationQualifier { ( k<'smooth'> | k<'flat'> | k<'noperspective'> ) }
-LayoutQualifier { ( k<'layout'> '(' LayoutQualifierId (commaSeq LayoutQualifierId)* ')' ) }
+LayoutQualifier { ( k<'layout'> '(' LayoutQualifierId (comma LayoutQualifierId)* ')' ) }
 LayoutQualifierId { Identifier (!assign Assign constantExpression)? | k<'shared'> }
 PreciseQualifier { k<'precise'> }
 PrecisionQualifier { ( k<'highp'> | k<'medp'> | k<'lowp'> ) }

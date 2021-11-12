@@ -35,7 +35,6 @@ export const Mesh: LiveComponent<MeshProps> = memoProps((fiber) => (props) => {
 
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
-    console.log({colorStates})
 
   // Rendering pipeline
   const pipeline = useMemo(() => {

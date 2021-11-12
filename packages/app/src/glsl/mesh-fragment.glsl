@@ -8,7 +8,7 @@ layout(location = 3) in vec3 fragLight;
 layout(location = 4) in vec3 fragView;
 
 layout(location = 0) out vec4 outColor;
-layout(location = 1) out vec4 pickingColor;
+//layout(location = 1) out vec4 pickingColor;
 
 float PI = 3.141592;
 
@@ -118,5 +118,6 @@ void main() {
   vec3 color = PBR(N, L, V, albedo, metalness, roughness);
   
   outColor = vec4(color * grid, fragColor.a);
+  //pickingColor = vec4(1.0, 0.0, 1.0, 0.0);
 }
 

@@ -15,6 +15,7 @@ export type CanvasRenderingContextGPU = {
   element: HTMLCanvasElement,
   width: number,
   height: number,
+  samples: number,
 
   device: GPUDevice,
   compileGLSL?: any,

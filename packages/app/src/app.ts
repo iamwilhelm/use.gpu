@@ -44,11 +44,11 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
       children:
 
         use(AutoCanvas)({
-          canvas, device, adapter,
+          canvas, device, adapter, samples: 4,
           children:
           
-          use(Picking)({
-            children:
+//          use(Picking)({
+//            children:
 
                 use(OrbitControls)({
                   canvas,
@@ -78,7 +78,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
                         })
                     })
                 })
-            })
+//            })
         })
     }),
     inspect ? use(UseInspect)({fiber, canvas}) : null,

@@ -36,7 +36,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     pickingTexture,
   ] = useMemo(() => {
     const {device, width, height} = renderContext;
-    const pickingTexture = makeRenderTexture(device, width, height, pickingFormat);
+    const pickingTexture = makeRenderTexture(device, width, height, pickingFormat, 4);
 
     const colorStates = [
       ...renderContext.colorStates,

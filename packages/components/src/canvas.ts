@@ -22,7 +22,7 @@ export type CanvasProps = {
   depthStencilFormat?: GPUTextureFormat,
   backgroundColor?: GPUColor,
 
-  children: LiveElement<any>,
+  children?: LiveElement<any>,
 }
 
 export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {

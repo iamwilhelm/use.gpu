@@ -1,0 +1,263 @@
+@top Program { Unit* }
+@skip { space | Comment }
+@external tokens untilEOL from "./tokens" { UntilEOL, UntilCommentClose }
+@external specialize {Identifier} specializeDirective from "./tokens" { Directive }
+@external specialize {Identifier} specializeKeyword from "./tokens" { Keyword }
+@external specialize {Identifier} specializeReserved from "./tokens" { Reserved }
+@external specialize {Identifier} specializeType from "./tokens" { BasicType }
+@precedence {
+	parens @left,
+  subscript @left,
+  unary @right,
+  mul @left,
+  add @left,
+  shift @left,
+  compare @left,
+  equal @left,
+  and @left,
+  xor @left,
+  or @left,
+  andand @left,
+  xorxor @left,
+  oror @left,
+	ternary @right,
+	assign @right,
+	sequence @left,
+
+	keyword
+}
+
+Comment { CommentLine | CommentOpen UntilCommentClose }
+Preprocessor { Hash Directive UntilEOL }
+
+Unit { ExternalDeclaration+ }
+//ExternalDeclaration { FunctionDefinition | Declaration | Preprocessor }
+ExternalDeclaration { FunctionDefinition }
+
+FunctionDefinition { FunctionPrototype CompoundStatement }
+FunctionPrototype { FunctionDeclarator }
+FunctionDeclarator { FullyQualifiedType Identifier '(' ParameterDeclaration ')' }
+ParameterDeclaration { TypeQualifier? (ParameterDeclarator | TypeSpecifier) }
+ParameterDeclarator { TypeSpecifier Identifier ArraySpecifier? }
+
+Declaration {
+	FunctionPrototype Semicolon |
+	InitDeclaratorList Semicolon |
+	!keyword "precision" PrecisionQualifier TypeSpecifier Semicolon |
+	TypeQualifier (
+		Identifier (commaSeq Identifier)* (
+			LeftBrace StructDeclarationList RightBrace DeclarationSpecifier?
+		)?
+	)? Semicolon
+}
+
+TypeSpecifier { !keyword BasicType ArraySpecifier? }
+ArraySpecifier { ('[' constantExpression ']')* '[]' | ('[' constantExpression ']')+ '[]'? }
+TypeNameList { TypeName (commaSeq TypeName)* }
+TypeName { Identifier }
+
+TypeQualifier {
+	StorageQualifier |
+	LayoutQualifier |
+	PrecisionQualifier |
+	InterpolationQualifier |
+	InvariantQualifier |
+	PreciseQualifier
+}
+FullyQualifiedType { TypeQualifier? TypeSpecifier }
+StorageQualifier { !keyword (
+	'const' |
+  'inout' |
+  'in' |
+  'out' |
+  'centroid' |
+  'patch' |
+  'sample' |
+  'uniform' |
+  'buffer' |
+  'shared' |
+  'coherent' |
+  'volatile' |
+  'restrict' |
+  'readonly' |
+  'writeonly' |
+  'subroutine' |
+  'subroutine' '(' TypeNameList ')'
+	)
+}
+InvariantQualifier { !keyword 'invariant' }
+InterpolationQualifier { !keyword ( 'smooth' | 'flat' | 'noperspective' ) }
+LayoutQualifier { !keyword ( 'layout' '(' LayoutQualifierId (commaSeq LayoutQualifierId)* ')' ) }
+LayoutQualifierId { Identifier (!assign Assign constantExpression)? | 'shared' }
+PreciseQualifier { !keyword 'precise' }
+PrecisionQualifier { !keyword  ( 'highp' | 'medp' | 'lowp' ) }
+
+StructDeclarationList {	StructDeclaration* }
+StructDeclaration {	TypeQualifier? TypeSpecifier DeclarationSpecifier Semicolon }
+StructSpecifier {	!keyword 'struct' Identifier? LeftBrace StructDeclarationList RightBrace }
+
+DeclarationSpecifier { Identifier ArraySpecifier? }
+InitDeclaratorList { FullyQualifiedType SingleDeclaration (commaSeq SingleDeclaration)* }
+SingleDeclaration {	DeclarationSpecifier (!assign Assign Initializer)? }
+
+Initializer {
+	assignmentExpression |
+	LeftBrace Initializer (commaSeq Initializer)* commaSeq? RightBrace
+}
+
+StatementList { Statement* }
+Statement {
+	CompoundStatement |
+	SimpleStatement
+}
+CompoundStatement { LeftBrace StatementList RightBrace }
+SimpleStatement {
+	DeclarationStatement |
+	ExpressionStatement |
+	SelectionStatement |
+	SwitchStatement |
+	CaseLabel |
+	IterationStatement |
+	JumpStatement
+}
+
+DeclarationStatement { Declaration }
+ExpressionStatement { expression? Semicolon }
+SelectionStatement { !keyword "if" '(' expression ')' Statement ("else" Statement)? }
+Condition { expression | FullyQualifiedType Identifier !assign Assign Initializer }
+SwitchStatement { !keyword "switch" '(' expression ')' LeftBrace StatementList RightBrace }
+CaseLabel { !keyword ("default" | "case" expression) ':' }
+IterationStatement {
+	"while" '(' Condition ')' Statement |
+	"do" Statement "while" '(' expression ')' Semicolon |
+	"for" '(' (ExpressionStatement | DeclarationStatement) (Condition Semicolon expression?) ')'
+}
+JumpStatement {
+	"continue" Semicolon |
+	"break" Semicolon |
+	"return" expression? Semicolon |
+	"discard" Semicolon
+}
+fieldSelection { Identifier }
+
+expression { assignmentExpression (commaSeq assignmentExpression)* }
+
+primaryExpression {
+	Identifier | Number | '(' expression ')'
+}
+integerExpression { expression }
+
+postfixExpression {
+	primaryExpression |
+	postfixExpression '[' integerExpression ']' |
+	functionCall |
+	postfixExpression '.' fieldSelection |
+	postfixExpression (Inc | Dec)
+}
+unaryExpression {
+  postfixExpression | (Inc | Dec | Add | Sub | Bang | Tilde) unaryExpression
+}
+assignmentExpression { conditionalExpression | unaryExpression !assign Assign assignmentExpression }
+constantExpression { conditionalExpression }
+conditionalExpression {
+	unaryExpression | binaryExpression
+}
+binaryExpression {
+	conditionalExpression !mul Mul conditionalExpression |
+	conditionalExpression !mul Div conditionalExpression |
+	conditionalExpression !add Add conditionalExpression |
+	conditionalExpression !add Sub conditionalExpression |
+	conditionalExpression !shift ShiftLeft conditionalExpression |
+	conditionalExpression !shift ShiftRight conditionalExpression |
+	conditionalExpression !compare Lt conditionalExpression |
+	conditionalExpression !compare Lte conditionalExpression |
+	conditionalExpression !compare Gt conditionalExpression |
+	conditionalExpression !compare Gte conditionalExpression |
+	conditionalExpression !equal Eq conditionalExpression |
+	conditionalExpression !equal Neq conditionalExpression |
+	conditionalExpression !and And conditionalExpression |
+	conditionalExpression !or Or conditionalExpression |
+	conditionalExpression !xor Xor conditionalExpression |
+	conditionalExpression !andand AndAnd conditionalExpression |
+	conditionalExpression !oror OrOr conditionalExpression |
+	conditionalExpression !xorxor XorXor conditionalExpression
+}
+commaSeq { !sequence Comma }
+
+/*
+Identifier '(' (
+	BasicType<'void'>? |
+	assignmentExpression (commaSeq assignmentExpression)*
+) ')'
+*/
+
+functionCall {
+	Identifier '(' ('void'? | assignmentExpression (!sequence Comma assignmentExpression)*) ')'
+}
+
+
+
+@tokens {
+	space { std.whitespace+ }
+
+	CommentLine { "//" ![\n]* }
+	CommentOpen { "/*" }
+	
+	Identifier { $[A-Za-z_] $[A-Za-z0-9_]+ }
+
+  Number {
+    (std.digit+ ("." std.digit*)? | "." std.digit+)
+      (("e" | "E") "-"? std.digit+)? ('f' | 'F' | 'lf' | 'LF')? |
+    std.digit+ $[uU]? |
+    "0x" (std.digit | $[a-fA-F])+ $[uU]?
+  }
+
+	Hash { "#" }
+	Add { "+" }
+	Sub { "-" }
+	Mul { "*" }
+	Div { "/" }
+	Inc { "++" }
+	Dec { "--" }
+	Bang { "!" }
+	Tilde { '~' }
+
+	Assign { '=' }
+	Eq { '==' }
+	Neq { '!=' }
+	Lt { '<' }
+	Lte { '<=' }
+	Gt { '>' }
+	Gte { '>=' }
+
+	ShiftLeft { "<<" }
+	ShiftRight { ">>" }
+
+	And { "&" }
+	Xor { "^" }
+	Or { "|" }
+
+	AndAnd { "&&" }
+	XorXor { "^^" }
+	OrOr { "||" }
+	
+	Comma { Comma }
+	Semicolon { ";" }
+	LeftBrace { "{" }
+	RightBrace { "}" }
+
+	__LINE__ { "__LINE__" }
+	__FILE__ { "__FILE__" }
+	__VERSION__ { "__VERSION__" }
+
+	@precedence {
+		CommentLine, Div, AndAnd, And, OrOr, Or, XorXor, Xor,
+		'buffer', 'centroid', 'coherent', 'const', 'flat', 'highp',
+		'in', 'inout', 'invariant', 'layout', 'lowp', 'medp', 'noperspective',
+		'out', 'patch', 'precise', 'readonly', 'restrict', 'sample', 'shared',
+		'smooth', 'subroutine', 'uniform', 'volatile', 'writeonly',
+		'break', 'case', 'continue', 'default', 'discard', 'do', 'else', 'if', 'for',
+		'precision', 'return', 'switch', 'while', 'void',
+		Identifier
+	}
+}

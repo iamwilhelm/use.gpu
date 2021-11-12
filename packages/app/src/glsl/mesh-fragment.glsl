@@ -8,6 +8,7 @@ layout(location = 3) in vec3 fragLight;
 layout(location = 4) in vec3 fragView;
 
 layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 pickingColor;
 
 float PI = 3.141592;
 

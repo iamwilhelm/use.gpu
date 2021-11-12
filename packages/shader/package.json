@@ -1,0 +1,37 @@
+{
+  "name": "@use-gpu/shader",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true,
+  "typesVersions": {
+    "*": {
+      "types": [
+        "src/types"
+      ]
+    }
+  },
+  "dependencies": {
+    "@lezer/common": "^0.15.8",
+    "@lezer/generator": "^0.15.2",
+    "@lezer/lr": "^0.15.4",
+    "@use-gpu/core": "*"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+    "build": "yarn run build:grammar && yarn run build:types && yarn run build:js && yarn run build:pkg",
+    "build:grammar": "mkdir -p src/grammar; yarn run lezer-generator grammar/glsl.grammar -o src/grammar/glsl.js",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir ../../build/packages/shader/src --extensions \".ts\" --source-maps inline",
+    "build:pkg": "cp package.json ../../build/packages/shader"
+  }
+}

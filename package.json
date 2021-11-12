@@ -61,9 +61,10 @@
   "workspaces": [
     "packages/live",
     "packages/core",
+    "packages/shader",
     "packages/webgpu",
     "packages/components",
-    "packages/app",
-    "packages/inspect"
+    "packages/inspect",
+    "packages/app"
   ]
 }

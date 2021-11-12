@@ -20,7 +20,7 @@
     "types:watch": "yarn run types -- --watch",
 
     "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
-    "build:types": "tsc --emitDeclarationOnly",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/webgpu/src --extensions \".ts\" --source-maps inline",
     "build:pkg": "cp package.json ../../build/packages/webgpu"
   }

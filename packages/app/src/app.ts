@@ -8,6 +8,7 @@ import {
   AutoCanvas, GLSLProvider,
   Loop, Draw, Pass,
   OrbitCamera, OrbitControls,
+  Picking,
   RenderToTexture,
   ViewProvider,
 } from '@use-gpu/components';
@@ -45,32 +46,36 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(AutoCanvas)({
           canvas, device, adapter,
           children:
+          
+          use(Picking)({
+            children:
 
-            use(OrbitControls)({
-              canvas,
-              render: (radius: number, phi: number, theta: number) =>
+                use(OrbitControls)({
+                  canvas,
+                  render: (radius: number, phi: number, theta: number) =>
 
-                use(OrbitCamera)({
-                  canvas, radius, phi, theta,
-                  render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
+                    use(OrbitCamera)({
+                      canvas, radius, phi, theta,
+                      render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
 
-                    use(ViewProvider)({
-                      defs, uniforms, children:
+                        use(ViewProvider)({
+                          defs, uniforms, children:
 
-                        use(Loop)({
-                          children: [
+                            use(Loop)({
+                              children: [
 
-                            use(RenderToTexture)({
-                              children: view,
-                            }),
+                                //use(RenderToTexture)({
+                                //  children: view,
+                                //}),
                       
-                            use(Draw)({
-                              children: view,
-                            }),
+                                use(Draw)({
+                                  children: view,
+                                }),
 
-                          ],
+                              ],
+                            })
+                      
                         })
-                      
                     })
                 })
             })

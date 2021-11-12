@@ -2,6 +2,8 @@
 @skip { space | Comment }
 @external tokens untilEOL from "./tokens" { UntilEOL, UntilCommentClose }
 @precedence {
+  else @right,
+  if @right,
   parens @left,
   subscript @left,
   unary @right,
@@ -18,7 +20,7 @@
   oror @left,
   conditional @right,
   assign @right,
-  if @left
+  statement @cut
 }
 
 unit { externalDeclaration }
@@ -91,7 +93,7 @@ simpleStatement {
 
 DeclarationStatement { Declaration }
 ExpressionStatement { expression? semicolon }
-SelectionStatement { !if k<'if'> '(' expression ')' Statement (k<"else"> Statement)? }
+SelectionStatement { k<'if'> '(' expression ')' Statement (!else k<"else"> Statement)? }
 Condition { expression | QualifiedType Identifier !assign Assign initializer }
 SwitchStatement { k<"switch"> '(' expression ')' '{' StatementList '}' }
 CaseLabel { (k<"default"> | k<"case"> expression) ':' }

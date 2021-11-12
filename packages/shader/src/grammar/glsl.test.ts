@@ -1,79 +1,76 @@
-import { SyntaxNode } from '@lezer/common';
 import { parser } from './glsl';
+import { formatAST } from '../ast';
 
-const formatASTNode = (node: SyntaxNode) => {
-  const {type} = node;
-  let child = node.firstChild;
-  let inner = [] as string[];
-  while (child) {
-    inner.push(formatASTNode(child));
-    child = child.nextSibling;
-  }
-  const space = inner.length ? ' ' : '';
-  return `(${type.name}${space}${inner.join(" ")})`;
-}
-
-const formatAST = (node: SyntaxNode, program: string, depth: number = 0) => {
-  const {type, from ,to} = node;
-  const prefix = '  '.repeat(depth);
-
-  let child = node.firstChild;
-  
-  const text = program.slice(node.from, node.to).replace(/\n/g, "⮐")
-  let out = [] as string[];
-  
-  let line = `${prefix}${type.name}`;
-  const n = line.length;
-  line += ' '.repeat(60 - n);
-  line += text;
-  out.push(line);
-
-  while (child) {
-    out.push(formatAST(child, program, depth + 1));
-    child = child.nextSibling;
-  }
-  return out.join("\n");
-}
-
-`
-float foo = 1.0;
-#define WAT
-
-struct light {
- float intensity;
- vec3 position;
-} lightVar;
-void main();
-void main() {
-  int bar = wat(5, 6);
-  int x = 4 + 5 + +6;
-  struct s { } x;
-  gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
-}
-`
-
-const PROGRAM = `
-float foo = 1.0;
-#define WAT
-
-struct light {
- float intensity;
- vec3 position;
-} lightVar;
-void main();
-void main() {
-  int bar = wat(5, 6);
-  int x = 4 + 5 + +6;
-  struct s { } x;
-  gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
-}
-`;
-
-describe("glsl parser", () => {
-  it("parses", () => {
-    const text = PROGRAM;
-    const parsed = parser.parse(text);
-    console.log(formatASTNode(parsed.topNode));
-    console.log(formatAST(parsed.topNode, text));
-  });
+expect.addSnapshotSerializer({
+  print(val) {
+    return formatAST(val.topNode, val.text);
+  },
+  test(val) {
+    return val && val.hasOwnProperty('type') && val.hasOwnProperty('children') && val.hasOwnProperty('positions');
+  },
 });
+
+describe("GLSL grammar snapshots", () => {
+  
+  it("parses a test program", () => {
+    for (const program of PROGRAMS) {
+      const parsed = parser.parse(program);
+      parsed.text = program;
+      expect(parsed).toMatchSnapshot();
+    }
+  });
+  
+});
+
+const PROGRAMS = [
+`
+float foo = 1.0;
+#define WAT
+
+struct light {
+ float intensity;
+ vec3 position;
+} lightVar;
+void main();
+void main() {
+  int bar = wat(5, 6);
+  int x = 4 + 5 + +6;
+  struct s { } x;
+  gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
+}
+`,
+`
+#version 450
+
+layout(set = 0, binding = 0) uniform ViewUniforms {
+  mat4 projectionMatrix;
+  mat4 viewMatrix;
+  vec4 viewPosition;
+  vec4 lightPosition;
+} view;
+
+layout(location = 0) in vec4 position;
+layout(location = 1) in vec4 normal;
+layout(location = 2) in vec4 color;
+layout(location = 3) in vec2 uv;
+
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec2 fragUV;
+
+layout(location = 2) out vec3 fragNormal;
+layout(location = 3) out vec3 fragLight;
+layout(location = 4) out vec3 fragView;
+
+void main() {
+  gl_Position = view.projectionMatrix * view.viewMatrix * position;
+
+  fragColor = color;
+  fragUV = uv;
+
+  fragNormal = normal.xyz;
+  fragLight = view.lightPosition.xyz - position.xyz;
+  fragView = view.viewPosition.xyz - position.xyz;
+}
+`
+];
+

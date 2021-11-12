@@ -164,12 +164,14 @@ FunctionCall {
 }
 
 TypeQualifier {
-  StorageQualifier |
-  LayoutQualifier |
-  PrecisionQualifier |
-  InterpolationQualifier |
-  InvariantQualifier |
-  PreciseQualifier
+  (
+    StorageQualifier |
+    LayoutQualifier |
+    PrecisionQualifier |
+    InterpolationQualifier |
+    InvariantQualifier |
+    PreciseQualifier
+  )+
 }
 StorageQualifier {
   k<'const'> |

@@ -1,0 +1,356 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GLSL grammar snapshots parses a test program 1`] = `
+Program                                                     ⮐float foo = 1.0;⮐#define WAT⮐⮐struct light {⮐ float intensity;⮐ vec3 position;⮐} lightVar;⮐void main();⮐void main() {⮐  int bar = wat(5, 6);⮐  int x = 4 + 5 + +6;⮐  struct s { } x;⮐  gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);⮐}⮐
+  Declaration                                               float foo = 1.0;
+    VariableDeclaration                                     float foo = 1.0
+      QualifiedType                                         float
+        float                                               float
+      SingleDeclaration                                     foo = 1.0
+        DeclarationSpecifier                                foo
+          Identifier                                        foo
+        Assign                                              =
+        Number                                              1.0
+  Preprocessor                                              #define WAT
+    Hash                                                    #
+    Directive                                               define
+      define                                                define
+    UntilEOL                                                 WAT
+  Declaration                                               struct light {⮐ float intensity;⮐ vec3 position;⮐} lightVar;
+    VariableDeclaration                                     struct light {⮐ float intensity;⮐ vec3 position;⮐} lightVar
+      QualifiedType                                         struct light {⮐ float intensity;⮐ vec3 position;⮐}
+        Struct                                              struct light {⮐ float intensity;⮐ vec3 position;⮐}
+          struct                                            struct
+          Identifier                                        light
+          StructDeclarationList                             float intensity;⮐ vec3 position;
+            StructDeclaration                               float intensity;
+              float                                         float
+              DeclarationSpecifier                          intensity
+                Identifier                                  intensity
+            StructDeclaration                               vec3 position;
+              vec3                                          vec3
+              DeclarationSpecifier                          position
+                Identifier                                  position
+      SingleDeclaration                                     lightVar
+        DeclarationSpecifier                                lightVar
+          Identifier                                        lightVar
+  Declaration                                               void main();
+    FunctionPrototype                                       void main()
+      QualifiedType                                         void
+        void                                                void
+      Identifier                                            main
+  FunctionDefinition                                        void main() {⮐  int bar = wat(5, 6);⮐  int x = 4 + 5 + +6;⮐  struct s { } x;⮐  gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);⮐}
+    FunctionPrototype                                       void main()
+      QualifiedType                                         void
+        void                                                void
+      Identifier                                            main
+    StatementList                                           int bar = wat(5, 6);⮐  int x = 4 + 5 + +6;⮐  struct s { } x;⮐  gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
+      Statement                                             int bar = wat(5, 6);
+        DeclarationStatement                                int bar = wat(5, 6);
+          Declaration                                       int bar = wat(5, 6);
+            VariableDeclaration                             int bar = wat(5, 6)
+              QualifiedType                                 int
+                int                                         int
+              SingleDeclaration                             bar = wat(5, 6)
+                DeclarationSpecifier                        bar
+                  Identifier                                bar
+                Assign                                      =
+                FunctionCall                                wat(5, 6)
+                  Identifier                                wat
+                  Number                                    5
+                  Number                                    6
+      Statement                                             int x = 4 + 5 + +6;
+        DeclarationStatement                                int x = 4 + 5 + +6;
+          Declaration                                       int x = 4 + 5 + +6;
+            VariableDeclaration                             int x = 4 + 5 + +6
+              QualifiedType                                 int
+                int                                         int
+              SingleDeclaration                             x = 4 + 5 + +6
+                DeclarationSpecifier                        x
+                  Identifier                                x
+                Assign                                      =
+                Binary                                      4 + 5 + +6
+                  Binary                                    4 + 5
+                    Number                                  4
+                    Add                                     +
+                    Number                                  5
+                  Add                                       +
+                  Unary                                     +6
+                    Add                                     +
+                    Number                                  6
+      Statement                                             struct s { } x;
+        DeclarationStatement                                struct s { } x;
+          Declaration                                       struct s { } x;
+            VariableDeclaration                             struct s { } x
+              QualifiedType                                 struct s { }
+                Struct                                      struct s { }
+                  struct                                    struct
+                  Identifier                                s
+                  StructDeclarationList                     
+              SingleDeclaration                             x
+                DeclarationSpecifier                        x
+                  Identifier                                x
+      Statement                                             gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
+        ExpressionStatement                                 gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
+          Identifier                                        gl_FragColor
+          Assign                                            =
+          FunctionCall                                      vec4(0.1, 0.2, 0.3, 1.0)
+            vec4                                            vec4
+            Number                                          0.1
+            Number                                          0.2
+            Number                                          0.3
+            Number                                          1.0
+`;
+
+exports[`GLSL grammar snapshots parses a test program 2`] = `
+Program                                                     ⮐#version 450⮐⮐layout(set = 0, binding = 0) uniform ViewUniforms {⮐  mat4 projectionMatrix;⮐  mat4 viewMatrix;⮐  vec4 viewPosition;⮐  vec4 lightPosition;⮐} view;⮐⮐layout(location = 0) in vec4 position;⮐layout(location = 1) in vec4 normal;⮐layout(location = 2) in vec4 color;⮐layout(location = 3) in vec2 uv;⮐⮐layout(location = 0) out vec4 fragColor;⮐layout(location = 1) out vec2 fragUV;⮐⮐layout(location = 2) out vec3 fragNormal;⮐layout(location = 3) out vec3 fragLight;⮐layout(location = 4) out vec3 fragView;⮐⮐void main() {⮐  gl_Position = view.projectionMatrix * view.viewMatrix * position;⮐⮐  fragColor = color;⮐  fragUV = uv;⮐⮐  fragNormal = normal.xyz;⮐  fragLight = view.lightPosition.xyz - position.xyz;⮐  fragView = view.viewPosition.xyz - position.xyz;⮐}⮐
+  Preprocessor                                              #version 450
+    Hash                                                    #
+    Directive                                               version
+      version                                               version
+    UntilEOL                                                 450
+  Declaration                                               layout(set = 0, binding = 0) uniform ViewUniforms {⮐  mat4 projectionMatrix;⮐  mat4 viewMatrix;⮐  vec4 viewPosition;⮐  vec4 lightPosition;⮐} view;
+    TypeQualifier                                           layout(set = 0, binding = 0) uniform
+      LayoutQualifier                                       layout(set = 0, binding = 0)
+        layout                                              layout
+        LayoutQualifierId                                   set = 0
+          Identifier                                        set
+          Assign                                            =
+          Number                                            0
+        LayoutQualifierId                                   binding = 0
+          Identifier                                        binding
+          Assign                                            =
+          Number                                            0
+      StorageQualifier                                      uniform
+        uniform                                             uniform
+    Identifier                                              ViewUniforms
+    StructDeclarationList                                   mat4 projectionMatrix;⮐  mat4 viewMatrix;⮐  vec4 viewPosition;⮐  vec4 lightPosition;
+      StructDeclaration                                     mat4 projectionMatrix;
+        mat4                                                mat4
+        DeclarationSpecifier                                projectionMatrix
+          Identifier                                        projectionMatrix
+      StructDeclaration                                     mat4 viewMatrix;
+        mat4                                                mat4
+        DeclarationSpecifier                                viewMatrix
+          Identifier                                        viewMatrix
+      StructDeclaration                                     vec4 viewPosition;
+        vec4                                                vec4
+        DeclarationSpecifier                                viewPosition
+          Identifier                                        viewPosition
+      StructDeclaration                                     vec4 lightPosition;
+        vec4                                                vec4
+        DeclarationSpecifier                                lightPosition
+          Identifier                                        lightPosition
+    DeclarationSpecifier                                    view
+      Identifier                                            view
+  Declaration                                               layout(location = 0) in vec4 position;
+    VariableDeclaration                                     layout(location = 0) in vec4 position
+      QualifiedType                                         layout(location = 0) in vec4
+        TypeQualifier                                       layout(location = 0) in
+          LayoutQualifier                                   layout(location = 0)
+            layout                                          layout
+            LayoutQualifierId                               location = 0
+              Identifier                                    location
+              Assign                                        =
+              Number                                        0
+          StorageQualifier                                  in
+            in                                              in
+        vec4                                                vec4
+      SingleDeclaration                                     position
+        DeclarationSpecifier                                position
+          Identifier                                        position
+  Declaration                                               layout(location = 1) in vec4 normal;
+    VariableDeclaration                                     layout(location = 1) in vec4 normal
+      QualifiedType                                         layout(location = 1) in vec4
+        TypeQualifier                                       layout(location = 1) in
+          LayoutQualifier                                   layout(location = 1)
+            layout                                          layout
+            LayoutQualifierId                               location = 1
+              Identifier                                    location
+              Assign                                        =
+              Number                                        1
+          StorageQualifier                                  in
+            in                                              in
+        vec4                                                vec4
+      SingleDeclaration                                     normal
+        DeclarationSpecifier                                normal
+          Identifier                                        normal
+  Declaration                                               layout(location = 2) in vec4 color;
+    VariableDeclaration                                     layout(location = 2) in vec4 color
+      QualifiedType                                         layout(location = 2) in vec4
+        TypeQualifier                                       layout(location = 2) in
+          LayoutQualifier                                   layout(location = 2)
+            layout                                          layout
+            LayoutQualifierId                               location = 2
+              Identifier                                    location
+              Assign                                        =
+              Number                                        2
+          StorageQualifier                                  in
+            in                                              in
+        vec4                                                vec4
+      SingleDeclaration                                     color
+        DeclarationSpecifier                                color
+          Identifier                                        color
+  Declaration                                               layout(location = 3) in vec2 uv;
+    VariableDeclaration                                     layout(location = 3) in vec2 uv
+      QualifiedType                                         layout(location = 3) in vec2
+        TypeQualifier                                       layout(location = 3) in
+          LayoutQualifier                                   layout(location = 3)
+            layout                                          layout
+            LayoutQualifierId                               location = 3
+              Identifier                                    location
+              Assign                                        =
+              Number                                        3
+          StorageQualifier                                  in
+            in                                              in
+        vec2                                                vec2
+      SingleDeclaration                                     uv
+        DeclarationSpecifier                                uv
+          Identifier                                        uv
+  Declaration                                               layout(location = 0) out vec4 fragColor;
+    VariableDeclaration                                     layout(location = 0) out vec4 fragColor
+      QualifiedType                                         layout(location = 0) out vec4
+        TypeQualifier                                       layout(location = 0) out
+          LayoutQualifier                                   layout(location = 0)
+            layout                                          layout
+            LayoutQualifierId                               location = 0
+              Identifier                                    location
+              Assign                                        =
+              Number                                        0
+          StorageQualifier                                  out
+            out                                             out
+        vec4                                                vec4
+      SingleDeclaration                                     fragColor
+        DeclarationSpecifier                                fragColor
+          Identifier                                        fragColor
+  Declaration                                               layout(location = 1) out vec2 fragUV;
+    VariableDeclaration                                     layout(location = 1) out vec2 fragUV
+      QualifiedType                                         layout(location = 1) out vec2
+        TypeQualifier                                       layout(location = 1) out
+          LayoutQualifier                                   layout(location = 1)
+            layout                                          layout
+            LayoutQualifierId                               location = 1
+              Identifier                                    location
+              Assign                                        =
+              Number                                        1
+          StorageQualifier                                  out
+            out                                             out
+        vec2                                                vec2
+      SingleDeclaration                                     fragUV
+        DeclarationSpecifier                                fragUV
+          Identifier                                        fragUV
+  Declaration                                               layout(location = 2) out vec3 fragNormal;
+    VariableDeclaration                                     layout(location = 2) out vec3 fragNormal
+      QualifiedType                                         layout(location = 2) out vec3
+        TypeQualifier                                       layout(location = 2) out
+          LayoutQualifier                                   layout(location = 2)
+            layout                                          layout
+            LayoutQualifierId                               location = 2
+              Identifier                                    location
+              Assign                                        =
+              Number                                        2
+          StorageQualifier                                  out
+            out                                             out
+        vec3                                                vec3
+      SingleDeclaration                                     fragNormal
+        DeclarationSpecifier                                fragNormal
+          Identifier                                        fragNormal
+  Declaration                                               layout(location = 3) out vec3 fragLight;
+    VariableDeclaration                                     layout(location = 3) out vec3 fragLight
+      QualifiedType                                         layout(location = 3) out vec3
+        TypeQualifier                                       layout(location = 3) out
+          LayoutQualifier                                   layout(location = 3)
+            layout                                          layout
+            LayoutQualifierId                               location = 3
+              Identifier                                    location
+              Assign                                        =
+              Number                                        3
+          StorageQualifier                                  out
+            out                                             out
+        vec3                                                vec3
+      SingleDeclaration                                     fragLight
+        DeclarationSpecifier                                fragLight
+          Identifier                                        fragLight
+  Declaration                                               layout(location = 4) out vec3 fragView;
+    VariableDeclaration                                     layout(location = 4) out vec3 fragView
+      QualifiedType                                         layout(location = 4) out vec3
+        TypeQualifier                                       layout(location = 4) out
+          LayoutQualifier                                   layout(location = 4)
+            layout                                          layout
+            LayoutQualifierId                               location = 4
+              Identifier                                    location
+              Assign                                        =
+              Number                                        4
+          StorageQualifier                                  out
+            out                                             out
+        vec3                                                vec3
+      SingleDeclaration                                     fragView
+        DeclarationSpecifier                                fragView
+          Identifier                                        fragView
+  FunctionDefinition                                        void main() {⮐  gl_Position = view.projectionMatrix * view.viewMatrix * position;⮐⮐  fragColor = color;⮐  fragUV = uv;⮐⮐  fragNormal = normal.xyz;⮐  fragLight = view.lightPosition.xyz - position.xyz;⮐  fragView = view.viewPosition.xyz - position.xyz;⮐}
+    FunctionPrototype                                       void main()
+      QualifiedType                                         void
+        void                                                void
+      Identifier                                            main
+    StatementList                                           gl_Position = view.projectionMatrix * view.viewMatrix * position;⮐⮐  fragColor = color;⮐  fragUV = uv;⮐⮐  fragNormal = normal.xyz;⮐  fragLight = view.lightPosition.xyz - position.xyz;⮐  fragView = view.viewPosition.xyz - position.xyz;
+      Statement                                             gl_Position = view.projectionMatrix * view.viewMatrix * position;
+        ExpressionStatement                                 gl_Position = view.projectionMatrix * view.viewMatrix * position;
+          Identifier                                        gl_Position
+          Assign                                            =
+          Binary                                            view.projectionMatrix * view.viewMatrix * position
+            Binary                                          view.projectionMatrix * view.viewMatrix
+              Field                                         view.projectionMatrix
+                Identifier                                  view
+                Identifier                                  projectionMatrix
+              Mul                                           *
+              Field                                         view.viewMatrix
+                Identifier                                  view
+                Identifier                                  viewMatrix
+            Mul                                             *
+            Identifier                                      position
+      Statement                                             fragColor = color;
+        ExpressionStatement                                 fragColor = color;
+          Identifier                                        fragColor
+          Assign                                            =
+          Identifier                                        color
+      Statement                                             fragUV = uv;
+        ExpressionStatement                                 fragUV = uv;
+          Identifier                                        fragUV
+          Assign                                            =
+          Identifier                                        uv
+      Statement                                             fragNormal = normal.xyz;
+        ExpressionStatement                                 fragNormal = normal.xyz;
+          Identifier                                        fragNormal
+          Assign                                            =
+          Field                                             normal.xyz
+            Identifier                                      normal
+            Identifier                                      xyz
+      Statement                                             fragLight = view.lightPosition.xyz - position.xyz;
+        ExpressionStatement                                 fragLight = view.lightPosition.xyz - position.xyz;
+          Identifier                                        fragLight
+          Assign                                            =
+          Binary                                            view.lightPosition.xyz - position.xyz
+            Field                                           view.lightPosition.xyz
+              Field                                         view.lightPosition
+                Identifier                                  view
+                Identifier                                  lightPosition
+              Identifier                                    xyz
+            Sub                                             -
+            Field                                           position.xyz
+              Identifier                                    position
+              Identifier                                    xyz
+      Statement                                             fragView = view.viewPosition.xyz - position.xyz;
+        ExpressionStatement                                 fragView = view.viewPosition.xyz - position.xyz;
+          Identifier                                        fragView
+          Assign                                            =
+          Binary                                            view.viewPosition.xyz - position.xyz
+            Field                                           view.viewPosition.xyz
+              Field                                         view.viewPosition
+                Identifier                                  view
+                Identifier                                  viewPosition
+              Identifier                                    xyz
+            Sub                                             -
+            Field                                           position.xyz
+              Identifier                                    position
+              Identifier                                    xyz
+`;

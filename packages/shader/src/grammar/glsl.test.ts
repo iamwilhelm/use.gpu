@@ -19,7 +19,10 @@ describe("GLSL grammar snapshots", () => {
       
       const compact = formatASTNode(parsed.topNode);
       const hasError = compact.indexOf('⚠') >= 0;
-      if (hasError) console.log(formatAST(parsed.topNode, program));
+      if (hasError) {
+        console.error("Error while parsing");
+        console.log(formatAST(parsed.topNode, program));
+      }
       expect(hasError).toBe(false);
       expect(parsed).toMatchSnapshot();
     }
@@ -59,6 +62,8 @@ void main();
 //////////////////////////////////////////////////////////////////////
 
 `
+float foo = 1.0;
+#define WAT
 void main() {
   int bar = wat(5, 6);
   int x = 4 + 5 + +6;

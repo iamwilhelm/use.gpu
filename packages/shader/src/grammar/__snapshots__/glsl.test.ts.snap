@@ -54,7 +54,21 @@ Program                                                     ⮐ void main();⮐
 `;
 
 exports[`GLSL grammar snapshots parses a test program 5`] = `
-Program                                                     ⮐ void main() {⮐   int bar = wat(5, 6);⮐   int x = 4 + 5 + +6;⮐   struct s { } x;⮐   gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);⮐ }⮐ 
+Program                                                     ⮐ float foo = 1.0;⮐ #define WAT⮐ void main() {⮐   int bar = wat(5, 6);⮐   int x = 4 + 5 + +6;⮐   struct s { } x;⮐   gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);⮐ }⮐ 
+  Declaration                                               float foo = 1.0;
+    VariableDeclaration                                     float foo = 1.0
+      QualifiedType                                         float
+        float                                               float
+      SingleDeclaration                                     foo = 1.0
+        DeclarationSpecifier                                foo
+          Identifier                                        foo
+        Assign                                              =
+        Number                                              1.0
+  Preprocessor                                              #define WAT
+    Hash                                                    #
+    Directive                                               define
+      define                                                define
+    UntilEOL                                                 WAT
   FunctionDefinition                                        void main() {⮐   int bar = wat(5, 6);⮐   int x = 4 + 5 + +6;⮐   struct s { } x;⮐   gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);⮐ }
     FunctionPrototype                                       void main()
       QualifiedType                                         void

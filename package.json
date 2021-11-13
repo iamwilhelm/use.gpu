@@ -8,6 +8,7 @@
   "devDependencies": {
     "@babel/cli": "^7.14.5",
     "@babel/core": "^7.14.6",
+    "@babel/eslint-parser": "^7.13.14",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.14.5",
     "@babel/preset-typescript": "^7.14.5",
@@ -16,18 +17,21 @@
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "@webgpu/glslang": "^0.0.15",
-    "@webgpu/types": "^0.1.3",
+    "@webgpu/types": "^0.1.7",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
+    "css-loader": "^6.5.1",
     "eslint": "^7.5.0",
     "gl-matrix": "^3.3.0",
     "jest": "^26.6.3",
     "lerna": "^4.0.0",
     "raw-loader": "^4.0.2",
+    "style-loader": "^3.3.1",
     "ts-node": "^9.1.1",
     "typescript": "~4.2",
     "webpack": "^5.10.1",
-    "webpack-cli": "^4.2.0"
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
   },
   "browserslist": [
     "last 1 chrome version",
@@ -41,12 +45,7 @@
     "types": "yarn lerna run types",
     "coverage": "yarn lerna run coverage"
   },
-  "dependencies": {
-    "@babel/eslint-parser": "^7.13.14",
-    "css-loader": "^6.5.1",
-    "style-loader": "^3.3.1",
-    "webpack-dev-server": "^3.11.0"
-  },
+  "dependencies": {},
   "jest": {
     "modulePaths": [
       "<rootDir>/src"
@@ -59,6 +58,7 @@
     ]
   },
   "workspaces": [
+    "packages/glsl",
     "packages/live",
     "packages/core",
     "packages/shader",

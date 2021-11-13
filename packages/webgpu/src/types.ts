@@ -1,6 +1,4 @@
-export type GPUPresentationContext = {
-  configure: (descriptor: any) => {},
-};
+import { UseRenderingContextGPU } from '@use-gpu/core/types';
 
 export type GPUDeviceMount = {
   adapter: GPUAdapter,
@@ -11,19 +9,6 @@ export type GPUMount = GPUDeviceMount & {
   canvas: HTMLCanvasElement,
 };
 
-export type CanvasRenderingContextGPU = {
+export type CanvasRenderingContextGPU = UseRenderingContextGPU & {
   element: HTMLCanvasElement,
-  width: number,
-  height: number,
-  samples: number,
-
-  device: GPUDevice,
-  compileGLSL?: any,
-
-  gpuContext: GPUPresentationContext,
-  colorStates: GPUColorStateDescriptor[],
-  colorAttachments: GPURenderPassColorAttachmentDescriptor[],
-  depthTexture: GPUTexture,
-  depthStencilState: GPUDepthStencilStateDescriptor,
-  depthStencilAttachment: GPURenderPassDepthStencilAttachmentDescriptor,
 };

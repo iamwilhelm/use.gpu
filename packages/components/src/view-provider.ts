@@ -2,7 +2,6 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { memo, provide, makeContext, useMemo } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
-import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix } from '@use-gpu/core';
 
 export const ViewContext = makeContext(null, 'ViewContext');
 

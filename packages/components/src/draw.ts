@@ -1,5 +1,4 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
-import { GPUPresentationContext } from '@use-gpu/webgpu/types';
 import { gatherReduce, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from './render-provider';
 

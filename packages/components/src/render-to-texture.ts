@@ -1,5 +1,5 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
-import { GPUPresentationContext, CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
+import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { use, gatherReduce, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, EMPTY_COLOR } from './constants';
 import { RenderProvider, RenderContext } from './render-provider';
@@ -20,6 +20,7 @@ export type RenderToTextureProps = {
   presentationFormat?: GPUTextureFormat,
   depthStencilFormat?: GPUTextureFormat | null,
   backgroundColor?: GPUColor,
+  samples?: number,
 
   children?: LiveElement<any>, 
 };
@@ -31,6 +32,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
   const {
     width = renderContext.width,
     height = renderContext.height,
+    samples = renderContext.samples,
     presentationFormat = PRESENTATION_FORMAT,
     depthStencilFormat = DEPTH_STENCIL_FORMAT,
     backgroundColor = EMPTY_COLOR,

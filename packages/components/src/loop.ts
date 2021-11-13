@@ -1,10 +1,9 @@
 import { LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
-import { GPUPresentationContext } from '@use-gpu/webgpu/types';
 import { use, detach, useCallback, useOne, useResource } from '@use-gpu/live';
 
 export type LoopProps = {
-  gpuContext: GPUPresentationContext,
-  colorAttachments: GPURenderPassColorAttachmentDescriptor[],
+  gpuContext: GPUCanvasContext,
+  colorAttachments: GPURenderPassColorAttachment[],
   children?: LiveElement<any>,
   update?: () => void,
   render?: () => LiveElement<any>,

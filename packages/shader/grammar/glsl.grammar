@@ -65,9 +65,9 @@ StructDeclarationList { StructDeclaration* }
 StructDeclaration { TypeQualifier? typeSpecifier structDeclaratorList semicolon }
 structDeclaratorList { DeclarationSpecifier (comma DeclarationSpecifier)* }
 
-DeclarationSpecifier { Identifier ArraySpecifier? }
-VariableDeclaration { QualifiedType SingleDeclaration (comma SingleDeclaration)* }
+VariableDeclaration { QualifiedType (SingleDeclaration (comma SingleDeclaration)*)? }
 SingleDeclaration { DeclarationSpecifier (!assign assign initializer)? }
+DeclarationSpecifier { Identifier ArraySpecifier? }
 QualifiedStructDeclaration {
   TypeQualifier ~qualified (
     Identifier ~qualified (

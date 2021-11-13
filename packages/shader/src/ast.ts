@@ -1,5 +1,6 @@
 import { SyntaxNode, Tree } from '@lezer/common';
 import {
+  SymbolTable,
   SymbolRef,
   ModuleRef,
   ImportRef,
@@ -14,10 +15,12 @@ import {
   QualifiedStructRef,
 } from './types';
 import * as T from './grammar/glsl.terms';
+import { GLSL_NATIVE_TYPES, HASH_KEY } from './constants';
+import siphash from "./siphash13";
 
 const unescape = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
-function nodeToString() { return `[${this.type.name}]`; }
+function nodeToString(this: SyntaxNode) { return `[${this.type.name}]`; }
 
 export const getChildNodes = (node: SyntaxNode) => {
   const out = [] as SyntaxNode[];
@@ -76,7 +79,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
   const getNodes = (node: SyntaxNode, min?: number) => {
     const nodes = getChildNodes(node);
     for (const n of nodes) if (node.type.isError) throwError('error', node);
-    if (min != null && nodes.length < min) throwError('not enough nodes', node);
+    if (min != null && nodes.length < min) throwError(`not enough nodes (${min})`, node);
     return nodes;
   }
 
@@ -91,14 +94,28 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const [a, b] = getNodes(node);
 
     const qualifiers = b ? getNodes(a).map(getQualifier) : [];
-    const name = getText(b ?? a);
+    const def = b ?? a;
 
-    return {node, name, qualifiers};
+    if (def.type.id === T.Struct) {
+      const {name, members} = getStructType(def);
+      return {node, name, qualifiers, members};
+    }
+    else {
+      const name = getText(b ?? a);
+      return {node, name, qualifiers};
+    }
   }
 
-  const getType = (node: SyntaxNode): TypeRef => {
+  const getSimpleType = (node: SyntaxNode): TypeRef => {
     const name = getText(node);
-    return {node, name, qualifiers: []};
+    return {node, name};
+  }
+
+  const getStructType = (node: SyntaxNode): TypeRef => {
+    const [, b, c] = getNodes(node, 3);
+    const name = getText(b);
+    const {members} = getStructMembers(c);
+    return {node, name, members};
   }
 
   const getLocal = (node: SyntaxNode): LocalRef => {
@@ -110,12 +127,12 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
   const getMember = (node: SyntaxNode): MemberRef => {
     const [a, b] = getNodes(node, 2);
-    const type = getType(a);
+    const type = getSimpleType(a);
     const name = getText(b);
     return {node, name, type};
   }
 
-  const getStruct = (node: SyntaxNode): StructRef => {
+  const getStructMembers = (node: SyntaxNode): StructRef => {
     const nodes = getNodes(node);
     const members = nodes.map(getMember);
     return {node, members};
@@ -144,7 +161,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
   };
   
   const getVariable = (node: SyntaxNode): VariableRef => {
-    const [a, ...rest] = getNodes(node, 2);
+    const [a, ...rest] = getNodes(node, 1);
     const type = getQualifiedType(a);
     const locals = rest.map(getLocal);
 
@@ -156,7 +173,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     
     const type = getQualifiedType(node);
     const name = getText(d ?? b);
-    const struct = getStruct(c);
+    const struct = getStructMembers(c);
 
     return {node, name, type, struct};
   }
@@ -181,6 +198,10 @@ export const makeASTParser = (code: string, tree: Tree) => {
     if (a.type.id === T.VariableDeclaration) {
       const variable = getVariable(a);
       const symbols = variable.locals.map(({node, name}) => ({node, name}));
+
+      const {type} = variable;
+      if (!GLSL_NATIVE_TYPES.has(type.name)) symbols.push({node: type.node, name: type.name});
+
       return {node, symbols, variable};
     }
     if (a.type.id === T.QualifiedStructDeclaration) {
@@ -213,7 +234,6 @@ export const makeASTParser = (code: string, tree: Tree) => {
       
         items.push(...refs);
       }
-
     }
 
     const out = [] as ModuleRef[];
@@ -235,6 +255,20 @@ export const makeASTParser = (code: string, tree: Tree) => {
     return children.map(getDeclaration);
   };
 
-  return {extractImports, extractFunctions, extractDeclarations};
+  const extractSymbolTable = (): SymbolTable => {
+    const uint = siphash.hash_uint(HASH_KEY, code);
+    const hash = uint.toString(36).slice(-8);
+
+    const modules = extractImports();
+    const functions = extractFunctions();
+    const declarations = extractDeclarations();
+
+    const refs = [...modules, ...functions, ...declarations];
+    const symbols = refs.flatMap(r => r.symbols);
+
+    return {hash, refs, symbols, modules, functions, declarations};
+  }
+
+  return {extractImports, extractFunctions, extractDeclarations, extractSymbolTable};
 }
 

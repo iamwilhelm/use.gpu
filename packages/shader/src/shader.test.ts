@@ -2,20 +2,9 @@ import { GLSLModules } from '@use-gpu/glsl';
 import { parseGLSL } from './shader';
 import { makeASTParser } from './ast';
 import { formatAST, formatASTNode } from './ast';
+import { addASTSerializer } from './test/snapshot';
 
-expect.addSnapshotSerializer({
-  print(val: any) {
-    if (typeof val !== 'object') return val.toString();
-    if (val && val.positions && val.topNode) return formatAST(val.topNode, val.text);
-    if (val && val.type && val.enterUnfinishedNodesBefore) return formatAST(val, '');
-  },
-  test(val: any) {
-    return val && val.positions && val.topNode;
-  },
-});
-
-const PROGRAMS = [
-];
+addASTSerializer(expect);
 
 describe('shader', () => {
   
@@ -25,67 +14,4 @@ describe('shader', () => {
     expect(tree).toBeTruthy();
   });
   
-  it('extracts test declarations', () => {
-    const code = `
-      float x, y;
-      int a = 3, b = 1, c, d;
-    `;
-
-    const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
-
-    const declarations = extractDeclarations();
-    expect(declarations).toMatchSnapshot();
-  });
-  
-  it('extracts quad vertex imports', () => {
-    const code = GLSLModules['instance/quad/vertex'];
-
-    const tree = parseGLSL(code);
-    const {extractImports} = makeASTParser(code, tree);
-
-    const imports = extractImports();
-    expect(imports).toMatchSnapshot();
-  });
-  
-  it('extracts quad vertex functions', () => {
-    const code = GLSLModules['instance/quad/vertex'];
-
-    const tree = parseGLSL(code);
-    const {extractFunctions} = makeASTParser(code, tree);
-
-    const functions = extractFunctions();
-    expect(functions).toMatchSnapshot();
-  });
-
-  it('extracts quad vertex declarations', () => {
-    const code = GLSLModules['instance/quad/vertex'];
-
-    const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
-
-    const declarations = extractDeclarations();
-    expect(declarations).toMatchSnapshot();
-  });
-
-  it('extracts quad fragment declarations', () => {
-    const code = GLSLModules['instance/quad/fragment'];
-
-    const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
-
-    const declarations = extractDeclarations();
-    expect(declarations).toMatchSnapshot();
-  });
-
-  it('extracts use view declarations', () => {
-    const code = GLSLModules['use/view'];
-
-    const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
-
-    const declarations = extractDeclarations();
-    expect(declarations).toMatchSnapshot();
-  });
-
 });

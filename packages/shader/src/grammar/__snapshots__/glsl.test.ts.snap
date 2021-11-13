@@ -21,7 +21,7 @@ Program                                                     ⮐ #define WAT⮐
 `;
 
 exports[`GLSL grammar snapshots parses a test program 3`] = `
-Program                                                     ⮐ struct light {⮐  float intensity;⮐  vec3 position;⮐ } lightVar;⮐ 
+Program                                                     ⮐ struct light {⮐  float intensity;⮐  vec3 position;⮐ } lightVar;⮐ ⮐ struct light2 {⮐  float intensity;⮐  vec3 position;⮐ };⮐ 
   Declaration                                               struct light {⮐  float intensity;⮐  vec3 position;⮐ } lightVar;
     VariableDeclaration                                     struct light {⮐  float intensity;⮐  vec3 position;⮐ } lightVar
       QualifiedType                                         struct light {⮐  float intensity;⮐  vec3 position;⮐ }
@@ -40,6 +40,21 @@ Program                                                     ⮐ struct light {�
       SingleDeclaration                                     lightVar
         DeclarationSpecifier                                lightVar
           Identifier                                        lightVar
+  Declaration                                               struct light2 {⮐  float intensity;⮐  vec3 position;⮐ };
+    VariableDeclaration                                     struct light2 {⮐  float intensity;⮐  vec3 position;⮐ }
+      QualifiedType                                         struct light2 {⮐  float intensity;⮐  vec3 position;⮐ }
+        Struct                                              struct light2 {⮐  float intensity;⮐  vec3 position;⮐ }
+          struct                                            struct
+          Identifier                                        light2
+          StructDeclarationList                             float intensity;⮐  vec3 position;
+            StructDeclaration                               float intensity;
+              float                                         float
+              DeclarationSpecifier                          intensity
+                Identifier                                  intensity
+            StructDeclaration                               vec3 position;
+              vec3                                          vec3
+              DeclarationSpecifier                          position
+                Identifier                                  position
 `;
 
 exports[`GLSL grammar snapshots parses a test program 4`] = `

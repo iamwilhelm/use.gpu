@@ -1,17 +1,10 @@
 {
   "name": "@use-gpu/shader",
   "version": "0.0.1",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
-  "typesVersions": {
-    "*": {
-      "types": [
-        "src/types"
-      ]
-    }
-  },
   "dependencies": {
     "@lezer/common": "^0.15.8",
     "@lezer/generator": "^0.15.2",

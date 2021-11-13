@@ -1,5 +1,16 @@
 import { Tree, SyntaxNode } from '@lezer/common';
 
+export type ComboRef = ModuleRef | FunctionRef | DeclarationRef;
+
+export type SymbolTable = {
+  hash: string,
+  refs: ComboRef[],
+  symbols: SymbolRef[],
+  modules: ModuleRef[],
+  functions: FunctionRef[],
+  declarations: DeclarationRef[],
+};
+
 export type SymbolsRef = {
   symbols: SymbolRef[],
 }
@@ -35,7 +46,8 @@ export type DeclarationRef = SymbolsRef & {
 export type TypeRef = {
   node: SyntaxNode,
   name: string,
-  qualifiers: string[],
+  qualifiers?: string[],
+  members?: MemberRef[],
 }
 
 export type PrototypeRef = {

@@ -1,17 +1,9 @@
 import { Tree } from '@lezer/common';
 import { parser } from './glsl';
 import { formatAST, formatASTNode } from '../ast';
+import { addASTSerializer } from '../test/snapshot';
 
-expect.addSnapshotSerializer({
-  print(val: any) {
-    if (typeof val !== 'object') return val.toString();
-    if (val && val.positions && val.topNode) return formatAST(val.topNode, val.text);
-    if (val && val.type && val.enterUnfinishedNodesBefore) return formatAST(val, '');
-  },
-  test(val: any) {
-    return val && val.positions && val.topNode;
-  },
-});
+addASTSerializer(expect);
 
 describe("GLSL grammar snapshots", () => {
   
@@ -54,6 +46,11 @@ struct light {
  float intensity;
  vec3 position;
 } lightVar;
+
+struct light2 {
+ float intensity;
+ vec3 position;
+};
 `,
 
 //////////////////////////////////////////////////////////////////////

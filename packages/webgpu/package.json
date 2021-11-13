@@ -1,7 +1,7 @@
 {
   "name": "@use-gpu/webgpu",
   "version": "0.0.1",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,

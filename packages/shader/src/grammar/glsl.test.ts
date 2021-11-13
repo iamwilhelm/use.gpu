@@ -4,10 +4,12 @@ import { formatAST, formatASTNode } from '../ast';
 
 expect.addSnapshotSerializer({
   print(val: any) {
-    return formatAST(val.topNode, val.text);
+    if (typeof val !== 'object') return val.toString();
+    if (val && val.positions && val.topNode) return formatAST(val.topNode, val.text);
+    if (val && val.type && val.enterUnfinishedNodesBefore) return formatAST(val, '');
   },
   test(val: any) {
-    return val && val.hasOwnProperty('type') && val.hasOwnProperty('children') && val.hasOwnProperty('positions');
+    return val && val.positions && val.topNode;
   },
 });
 

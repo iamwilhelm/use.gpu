@@ -50,6 +50,7 @@
   "dependencies": {},
   "jest": {
     "preset": "ts-jest",
+    "testEnvironment": "jsdom",
     "transform": {
       "\\.jsx?$": "babel-jest",
       "\\.glsl$": "<rootDir>/test/fileTransformer.mjs"
@@ -72,7 +73,14 @@
       "ts",
       "tsx",
       "glsl"
-    ]
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": {
+          "ignoreCodes": [151001]
+        }
+      }
+    }
   },
   "workspaces": [
     "packages/glsl",

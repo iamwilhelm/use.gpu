@@ -209,37 +209,38 @@ Program                                                     ⮐ #version 450⮐ 
       version                                               version
     UntilEOL                                                 450
   Declaration                                               layout(set = 0, binding = 0) uniform ViewUniforms {⮐   mat4 projectionMatrix;⮐   mat4 viewMatrix;⮐   vec4 viewPosition;⮐   vec4 lightPosition;⮐ } view;
-    TypeQualifier                                           layout(set = 0, binding = 0) uniform
-      LayoutQualifier                                       layout(set = 0, binding = 0)
-        layout                                              layout
-        LayoutQualifierId                                   set = 0
-          Identifier                                        set
-          Number                                            0
-        LayoutQualifierId                                   binding = 0
-          Identifier                                        binding
-          Number                                            0
-      StorageQualifier                                      uniform
-        uniform                                             uniform
-    Identifier                                              ViewUniforms
-    StructDeclarationList                                   mat4 projectionMatrix;⮐   mat4 viewMatrix;⮐   vec4 viewPosition;⮐   vec4 lightPosition;
-      StructDeclaration                                     mat4 projectionMatrix;
-        mat4                                                mat4
-        DeclarationSpecifier                                projectionMatrix
-          Identifier                                        projectionMatrix
-      StructDeclaration                                     mat4 viewMatrix;
-        mat4                                                mat4
-        DeclarationSpecifier                                viewMatrix
-          Identifier                                        viewMatrix
-      StructDeclaration                                     vec4 viewPosition;
-        vec4                                                vec4
-        DeclarationSpecifier                                viewPosition
-          Identifier                                        viewPosition
-      StructDeclaration                                     vec4 lightPosition;
-        vec4                                                vec4
-        DeclarationSpecifier                                lightPosition
-          Identifier                                        lightPosition
-    DeclarationSpecifier                                    view
-      Identifier                                            view
+    QualifiedStructDeclaration                              layout(set = 0, binding = 0) uniform ViewUniforms {⮐   mat4 projectionMatrix;⮐   mat4 viewMatrix;⮐   vec4 viewPosition;⮐   vec4 lightPosition;⮐ } view
+      TypeQualifier                                         layout(set = 0, binding = 0) uniform
+        LayoutQualifier                                     layout(set = 0, binding = 0)
+          layout                                            layout
+          LayoutQualifierId                                 set = 0
+            Identifier                                      set
+            Number                                          0
+          LayoutQualifierId                                 binding = 0
+            Identifier                                      binding
+            Number                                          0
+        StorageQualifier                                    uniform
+          uniform                                           uniform
+      Identifier                                            ViewUniforms
+      StructDeclarationList                                 mat4 projectionMatrix;⮐   mat4 viewMatrix;⮐   vec4 viewPosition;⮐   vec4 lightPosition;
+        StructDeclaration                                   mat4 projectionMatrix;
+          mat4                                              mat4
+          DeclarationSpecifier                              projectionMatrix
+            Identifier                                      projectionMatrix
+        StructDeclaration                                   mat4 viewMatrix;
+          mat4                                              mat4
+          DeclarationSpecifier                              viewMatrix
+            Identifier                                      viewMatrix
+        StructDeclaration                                   vec4 viewPosition;
+          vec4                                              vec4
+          DeclarationSpecifier                              viewPosition
+            Identifier                                      viewPosition
+        StructDeclaration                                   vec4 lightPosition;
+          vec4                                              vec4
+          DeclarationSpecifier                              lightPosition
+            Identifier                                      lightPosition
+      DeclarationSpecifier                                  view
+        Identifier                                          view
   Declaration                                               layout(location = 0) in vec4 position;
     VariableDeclaration                                     layout(location = 0) in vec4 position
       QualifiedType                                         layout(location = 0) in vec4

@@ -1,4 +1,4 @@
-@top Program { unit+ }
+@top Program { unit }
 @skip { space | Comment }
 @external tokens untilEOL from "./tokens" { UntilEOL, UntilCommentClose }
 @precedence {
@@ -49,14 +49,8 @@ Declaration {
     FunctionPrototype |
     VariableDeclaration |
     k<"precision"> PrecisionQualifier typeSpecifier |
-    TypeQualifier (
-      Identifier (
-        '{' StructDeclarationList '}' DeclarationSpecifier?
-      )?
-    )? |
-    TypeQualifier (
-      Identifier (comma Identifier)*
-    )?
+		QualifiedStructDeclaration |
+		QualifiedDeclaration
   ) semicolon
 }
 
@@ -74,6 +68,18 @@ structDeclaratorList { DeclarationSpecifier (comma DeclarationSpecifier)* }
 DeclarationSpecifier { Identifier ArraySpecifier? }
 VariableDeclaration { QualifiedType SingleDeclaration (comma SingleDeclaration)* }
 SingleDeclaration { DeclarationSpecifier (!assign assign initializer)? }
+QualifiedStructDeclaration {
+  TypeQualifier ~qualified (
+    Identifier ~qualified (
+      '{' StructDeclarationList '}' DeclarationSpecifier?
+    )?
+  )?
+}
+QualifiedDeclaration {
+  TypeQualifier ~qualified (
+    Identifier ~qualified (comma Identifier)*
+  )?
+}
 
 initializer {
   assignmentExpression |

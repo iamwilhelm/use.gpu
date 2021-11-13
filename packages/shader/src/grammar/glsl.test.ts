@@ -1,6 +1,6 @@
 import { Tree } from '@lezer/common';
 import { parser } from './glsl';
-import { formatAST, formatASTNode } from '../ast';
+import { formatAST, formatASTNode } from '../transform/ast';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
@@ -85,10 +85,11 @@ void main() {
 //////////////////////////////////////////////////////////////////////
 
 `
-#import {MeshVertex} from 'use/types'
-#import {viewUniforms as view, worldToClip} from 'use/view'
-#import {getQuadUV} from 'geometry/quad'
+#pragma import {MeshVertex} from 'use/types'
+#pragma import {viewUniforms as view, worldToClip} from 'use/view'
+#pragma import {getQuadUV} from 'geometry/quad'
 
+#pragma export
 void main();
 `,
 

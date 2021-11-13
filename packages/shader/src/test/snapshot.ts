@@ -1,4 +1,4 @@
-import { formatAST } from '../ast';
+import { formatAST } from '../transform/ast';
 
 export const addASTSerializer = (expect: any) => expect.addSnapshotSerializer({
   print(val: any) {

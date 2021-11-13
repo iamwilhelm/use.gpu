@@ -21,7 +21,9 @@
   conditional @right,
   assign @right,
   statement @cut,
-	import
+	import,
+	export,
+	last
 }
 
 k<term> { @specialize[@name={term}]<Identifier, term> }
@@ -34,35 +36,44 @@ externalDeclaration { FunctionDefinition | Declaration | Preprocessor }
 
 Comment { CommentLine | CommentOpen UntilCommentClose }
 Preprocessor {
-	hash Directive UntilEOL |
-	hash d<'import'> ImportDeclarationList 'from' String UntilEOL
+	hash (
+	  d<'pragma'> (
+			!import d<'import'> ImportDeclarationList 'from' String |
+			!export d<'export'> |
+			d<'optimize'> |
+			d<'debug'>
+			d<'STDGL'>
+		) |
+	  Directive
+	)
+	UntilEOL
 }
 ImportDeclarationList { '{' (ImportDeclaration comma)* (ImportDeclaration comma?) '}' }
 ImportDeclaration { Identifier ('as' Identifier)? }
 
 FunctionDefinition { FunctionPrototype compoundStatement }
 FunctionPrototype { QualifiedType Identifier '(' (ParameterDeclaration (comma ParameterDeclaration)*)? ')' }
-ParameterDeclaration { TypeQualifier? typeSpecifier (Identifier ArraySpecifier?)? }
+ParameterDeclaration { TypeQualifier? TypeSpecifier (Identifier ArraySpecifier?)? }
 
 Declaration {
   (
     FunctionPrototype |
     VariableDeclaration |
-    k<"precision"> PrecisionQualifier typeSpecifier |
+    k<"precision"> PrecisionQualifier TypeSpecifier |
 		QualifiedStructDeclaration |
 		QualifiedDeclaration
   ) semicolon
 }
 
-typeSpecifier { (basicType | Struct) ArraySpecifier? }
+TypeSpecifier { (basicType | Struct) ArraySpecifier? }
 ArraySpecifier { (LeftBracket constantExpression RightBracket)* EmptyBrackets | (LeftBracket constantExpression RightBracket)+ EmptyBrackets? }
 TypeNameList { TypeName (comma TypeName)* }
 TypeName { Identifier }
-QualifiedType { TypeQualifier? typeSpecifier }
+QualifiedType { TypeQualifier? TypeSpecifier }
 
 Struct { k<'struct'> Identifier? '{' StructDeclarationList '}' }
 StructDeclarationList { StructDeclaration* }
-StructDeclaration { TypeQualifier? typeSpecifier structDeclaratorList semicolon }
+StructDeclaration { TypeQualifier? TypeSpecifier structDeclaratorList semicolon }
 structDeclaratorList { DeclarationSpecifier (comma DeclarationSpecifier)* }
 
 VariableDeclaration { QualifiedType (SingleDeclaration (comma SingleDeclaration)*)? }
@@ -312,7 +323,6 @@ Directive {
   d<"elif"> |
   d<"endif"> |
   d<"error"> |
-  d<"pragma"> |
   d<"extension"> |
   d<"version"> |
   d<"line">

@@ -13,10 +13,10 @@ import {
   StructRef,
   MemberRef,
   QualifiedStructRef,
-} from './types';
-import * as T from './grammar/glsl.terms';
-import { GLSL_NATIVE_TYPES, HASH_KEY } from './constants';
-import siphash from "./siphash13";
+} from '../types';
+import * as T from '../grammar/glsl.terms';
+import { GLSL_NATIVE_TYPES, HASH_KEY } from '../constants';
+import siphash from "../siphash13";
 
 const unescape = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
@@ -96,19 +96,30 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const qualifiers = b ? getNodes(a).map(getQualifier) : [];
     const def = b ?? a;
 
-    if (def.type.id === T.Struct) {
-      const {name, members} = getStructType(def);
-      return {node, name, qualifiers, members};
-    }
-    else {
-      const name = getText(b ?? a);
-      return {node, name, qualifiers};
-    }
-  }
+    const {name, members} = getTypeSpecifier(def);
+    if (members) return {node, name, qualifiers, members};
 
-  const getSimpleType = (node: SyntaxNode): TypeRef => {
-    const name = getText(node);
-    return {node, name};
+    return {node, name, qualifiers};
+  }
+  
+  const getTypeSpecifier = (node: SyntaxNode): TypeRef => {
+    if (node.type.id === T.Identifier) {
+      const name = getText(node);
+      return {node, name};
+    }
+    if (node.type.id === T.TypeSpecifier) {
+      const [def] = getNodes(node, 1);
+      if (def.type.id === T.Struct) {
+        const {name, members} = getStructType(def);
+        return {node, name, members};
+      }
+      else {
+        const name = getText(def);
+        return {node, name};
+      }
+    }
+    
+    throw throwError('type specifier', node);
   }
 
   const getStructType = (node: SyntaxNode): TypeRef => {
@@ -118,17 +129,22 @@ export const makeASTParser = (code: string, tree: Tree) => {
     return {node, name, members};
   }
 
+  const getArrayName = (node: SyntaxNode): string => {
+    const [a] = getNodes(node, 1);
+    return getText(a);
+  }
+
   const getLocal = (node: SyntaxNode): LocalRef => {
     const [a, b] = getNodes(node, 1);
-    const name = getText(a);
+    const name = getArrayName(a);
     const expr = b ? getText(b) : null;
     return {node, name, expr};
   }
 
   const getMember = (node: SyntaxNode): MemberRef => {
     const [a, b] = getNodes(node, 2);
-    const type = getSimpleType(a);
-    const name = getText(b);
+    const type = getTypeSpecifier(a);
+    const name = getArrayName(b);
     return {node, name, type};
   }
 
@@ -222,18 +238,20 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
     const children = tree.topNode.getChildren(T.Preprocessor);
     for (const child of children) {
-      const [a, b, c] = getNodes(child);    
+      const [a, b, c, d] = getNodes(child);    
+      const directive = getText(a);
+      if (directive !== 'pragma') continue;
 
-      const verb = getText(a);
-      if (verb === 'import') {
-        const refs = getNodes(b).map(getImport);
-        const module = unescape(getText(c));
+      const verb = getText(b);
+      if (verb !== 'import') continue;
 
-        let items = modules[module];
-        if (!items) items = modules[module] = [];
-      
-        items.push(...refs);
-      }
+      const refs = getNodes(c).map(getImport);
+      const module = unescape(getText(d));
+
+      let items = modules[module];
+      if (!items) items = modules[module] = [];
+    
+      items.push(...refs);
     }
 
     const out = [] as ModuleRef[];

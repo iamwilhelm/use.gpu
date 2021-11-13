@@ -2,7 +2,7 @@ import { GLSLModules } from '@use-gpu/glsl';
 import { parseGLSL } from './shader';
 import { makeASTParser } from './ast';
 import { formatAST, formatASTNode } from './ast';
-import { addASTSerializer } from './test/snapshot';
+import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
 

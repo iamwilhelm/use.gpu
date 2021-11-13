@@ -320,6 +320,37 @@ Array [
 ]
 `;
 
+exports[`ast extracts test declarations with array 1`] = `
+Array [
+  Object {
+    "node": "[Declaration]",
+    "symbols": Array [
+      Object {
+        "name": "QUAD",
+        "node": "[SingleDeclaration]",
+      },
+    ],
+    "variable": Object {
+      "locals": Array [
+        Object {
+          "expr": "ivec2(0, 0)",
+          "name": "QUAD",
+          "node": "[SingleDeclaration]",
+        },
+      ],
+      "node": "[VariableDeclaration]",
+      "type": Object {
+        "name": "ivec2",
+        "node": "[QualifiedType]",
+        "qualifiers": Array [
+          "const",
+        ],
+      },
+    },
+  },
+]
+`;
+
 exports[`ast extracts use types symbol table 1`] = `
 Object {
   "declarations": Array [
@@ -341,7 +372,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec4",
-                "node": "[vec4]",
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -349,7 +380,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec4",
-                "node": "[vec4]",
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -357,7 +388,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec2",
-                "node": "[vec2]",
+                "node": "[TypeSpecifier]",
               },
             },
           ],
@@ -390,7 +421,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec4",
-                "node": "[vec4]",
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -398,7 +429,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec4",
-                "node": "[vec4]",
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -406,7 +437,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec2",
-                "node": "[vec2]",
+                "node": "[TypeSpecifier]",
               },
             },
           ],
@@ -440,8 +471,7 @@ Array [
             "node": "[StructDeclaration]",
             "type": Object {
               "name": "mat4",
-              "node": "[mat4]",
-              "qualifiers": Array [],
+              "node": "[TypeSpecifier]",
             },
           },
           Object {
@@ -449,8 +479,7 @@ Array [
             "node": "[StructDeclaration]",
             "type": Object {
               "name": "mat4",
-              "node": "[mat4]",
-              "qualifiers": Array [],
+              "node": "[TypeSpecifier]",
             },
           },
           Object {
@@ -458,8 +487,7 @@ Array [
             "node": "[StructDeclaration]",
             "type": Object {
               "name": "vec4",
-              "node": "[vec4]",
-              "qualifiers": Array [],
+              "node": "[TypeSpecifier]",
             },
           },
           Object {
@@ -467,8 +495,7 @@ Array [
             "node": "[StructDeclaration]",
             "type": Object {
               "name": "vec2",
-              "node": "[vec2]",
-              "qualifiers": Array [],
+              "node": "[TypeSpecifier]",
             },
           },
         ],
@@ -508,8 +535,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "mat4",
-                "node": "[mat4]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -517,8 +543,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "mat4",
-                "node": "[mat4]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -526,8 +551,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec4",
-                "node": "[vec4]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -535,8 +559,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec2",
-                "node": "[vec2]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
           ],
@@ -708,8 +731,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "mat4",
-                "node": "[mat4]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -717,8 +739,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "mat4",
-                "node": "[mat4]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -726,8 +747,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec4",
-                "node": "[vec4]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
             Object {
@@ -735,8 +755,7 @@ Object {
               "node": "[StructDeclaration]",
               "type": Object {
                 "name": "vec2",
-                "node": "[vec2]",
-                "qualifiers": Array [],
+                "node": "[TypeSpecifier]",
               },
             },
           ],

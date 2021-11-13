@@ -1,7 +1,7 @@
 import { GLSLModules } from '@use-gpu/glsl';
 import { parseGLSL } from './shader';
 import { makeASTParser } from './ast';
-import { addASTSerializer } from './test/snapshot';
+import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
 
@@ -11,6 +11,23 @@ describe('ast', () => {
     const code = `
       float x, y;
       int a = 3, b = 1, c, d;
+    `;
+
+    const tree = parseGLSL(code);
+    const {extractDeclarations} = makeASTParser(code, tree);
+
+    const declarations = extractDeclarations();
+    expect(declarations).toMatchSnapshot();
+  });
+  
+  it('extracts test declarations with array', () => {
+    const code = `
+      const ivec2 QUAD[] = {
+        ivec2(0, 0),
+        ivec2(1, 0),
+        ivec2(0, 1),
+        ivec2(1, 1),
+      };
     `;
 
     const tree = parseGLSL(code);
@@ -80,7 +97,7 @@ describe('ast', () => {
     expect(symbolTable).toMatchSnapshot();
   });
 
-  fit('extracts use types symbol table', () => {
+  it('extracts use types symbol table', () => {
     const code = GLSLModules['use/types'];
 
     const tree = parseGLSL(code);

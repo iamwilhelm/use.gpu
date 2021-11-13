@@ -1,6 +1,6 @@
 import { GLSLModules } from '@use-gpu/glsl';
 import { linkModule } from './link';
-import { addASTSerializer } from './test/snapshot';
+import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
 
@@ -10,8 +10,9 @@ describe("link", () => {
     
     const code = GLSLModules['instance/quad/vertex'];
     const modules = GLSLModules;
-    linkModule(code, modules);
-    
+    const linked = linkModule(code, modules);
+    expect(linked).toMatchSnapshot();
+
   });
 
 });

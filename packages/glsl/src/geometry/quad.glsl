@@ -5,7 +5,8 @@ const ivec2 QUAD[] = {
   ivec2(1, 1),
 };
 
-export ivec2 getQuadIndex(int vertex) {
+#pragma export
+ivec2 getQuadIndex(int vertex) {
   return QUAD[vertex];
   /*
   vertex = min(vertex, 6 - vertex);
@@ -16,11 +17,13 @@ export ivec2 getQuadIndex(int vertex) {
   */
 }
 
-export vec2 getQuadUV(int vertex) {
+#pragma export
+vec2 getQuadUV(int vertex) {
   return vec2(getQuadIndex(vertex));
 }
 
-export MeshVertex getQuad(int vertex) {
+#pragma export
+MeshVertex getQuad(int vertex) {
   vec2 uv = getQuadUV(vertex);
   vec4 position = vec4(uv * 2.0 - 1.0, 0.0, 1.0);
   vec4 color = vec4(1.0, 0.0, 1.0, 1.0);

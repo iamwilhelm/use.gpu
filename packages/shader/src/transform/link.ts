@@ -1,7 +1,8 @@
 import { Tree } from '@lezer/common';
-import { SymbolTable } from './types';
+import { SymbolTable } from '../types';
 import { parseGLSL } from './shader';
 import { makeASTParser } from './ast';
+import * as T from '../grammar/glsl.terms';
 
 type Program = {
   entry: null,
@@ -44,7 +45,6 @@ export const linkModule = (code: string, library: Record<string, string>) => {
       }
     }
     
-    console.log('module', name, namespace, Array.from(rename.values()));
     program.push(rewriteAST(code, tree, rename));
   }
 
@@ -52,7 +52,31 @@ export const linkModule = (code: string, library: Record<string, string>) => {
 }
 
 export const rewriteAST = (code: string, tree: Tree, rename: Map<string, string>) => {
-  return code;
+  let out = '';
+  let pos = 0;
+
+  const passthrough = (from: number, to: number, replace?: string) => {
+    out = out + code.slice(pos, from);
+    pos = to;
+
+    if (replace != null) out = out + replace;
+  }
+
+  let cursor = tree.cursor();
+  do {
+    const {type, from, to} = cursor;
+    if (type.id === T.Identifier) {
+      const name = code.slice(from, to);
+      const replace = rename.get(name);
+
+      if (replace) passthrough(from, to, replace);      
+    }
+  } while (cursor.next());
+
+  const n = code.length;
+  passthrough(n, n);
+
+  return out;
 }
 
 export const loadModules = (code: string, library: Record<string, string>) => {

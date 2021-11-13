@@ -1,13 +1,15 @@
 {
   "references": [
+    { "path": "./packages/glsl" },
     { "path": "./packages/live" },
     { "path": "./packages/core" },
     { "path": "./packages/webgpu" },
     { "path": "./packages/components" },
     { "path": "./packages/inspect" },
+    { "path": "./packages/shader" },
     { "path": "./packages/app" }
   ],
-  "incremental": false,
+  "incremental": true,
   "files": [],
   "include": [],
   "exclude": ["**/node_modules"]

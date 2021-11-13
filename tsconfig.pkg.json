@@ -16,9 +16,10 @@
     "strict": true,
     "moduleResolution": "node",
     "baseUrl": "./",
-    "paths": {},
+    "paths": {
+      "@use-gpu/*": ["./packages/*/"]
+    },
     "rootDirs": [],
-    "typeRoots": ["node_modules"],
     "types": ["@webgpu/types", "jest"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -28,5 +29,8 @@
   "exclude": [
     "babel.config.*",
     "*/coverage/*",
+    "**/*.test.ts",
+    "node_modules",
+    "build"
   ]
 }

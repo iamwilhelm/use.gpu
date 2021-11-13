@@ -6,11 +6,7 @@
   "license": "MIT",
   "private": true,
   "typesVersions": {
-    "*": {
-      "types": [
-        "index"
-      ]
-    }
+    "*": { "types": ["src/index"] }
   },
   "exports": {
     ".": "./src/index.js",
@@ -22,13 +18,12 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "yarn run build:glsl && yarn run build:types && yarn run build:js && yarn run build:pkg",
+    "build": "yarn run build:glsl && yarn run build:js && yarn run build:pkg",
     "build:glsl": "node build.mjs",
-    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/glsl/src --extensions \".ts\" --source-maps inline",
+    "build:js": "babel src --out-dir ../../build/packages/glsl/src --extensions \".ts,.js\" --source-maps inline",
     "build:pkg": "cp package.json ../../build/packages/glsl"
   },
-  "dependencies": {
+  "devDependencies": {
     "glob": "^7.2.0"
   }
 }

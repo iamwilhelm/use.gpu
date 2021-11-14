@@ -12,8 +12,8 @@
     "@use-gpu/core": "*"
   },
   "exports": {
-    ".": "./src/index.js",
-    "./types": "./src/index.js"
+    ".": "./src/index.ts",
+    "./types": "./src/index.ts"
   },
   "scripts": {
     "test": "jest --watch",

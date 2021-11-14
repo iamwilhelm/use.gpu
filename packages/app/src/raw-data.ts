@@ -116,7 +116,12 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
       uploadBuffer(device, buffer, array.buffer);
     }, [data, expr]);
   }
-  else useNoMemo();
+  else {
+    useNoMemo();
+    if (data) copyArray(data, array);
+    if (expr) emitArray(expr, array, dims);
+    uploadBuffer(device, buffer, array.buffer);
+  }
 
   return render ? render(source) : null;
   /*

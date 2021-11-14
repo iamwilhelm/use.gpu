@@ -39,11 +39,11 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
       children: [
         use(RawData)({
           type: 'vec4',
-          data: seq(8).flatMap(() => [Math.random(), Math.random(), Math.random(), 1]),
-          render: (positions) => 
-            use(Quads)({ positions }),
+          data: seq(8).flatMap(() => [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1]),
+          render: (positions) => use(Quads)({ positions }),
+          live: true,
         }),
-        //use(Mesh)({ mesh }),
+        use(Mesh)({ mesh }),
         //use(Cube)(),
       ]
     }),

@@ -1,65 +1,72 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`link links 1`] = `
-"const ivec2 _g5bn_QUAD[] = {
+exports[`link links quad vertex 1`] = `
+"#version 450
+
+struct _qg_MeshVertex {
+  vec4 position;
+  vec4 color;
+  vec2 uv;
+};
+
+
+const ivec2 _s6_QUAD[] = {
   ivec2(0, 0),
   ivec2(1, 0),
   ivec2(0, 1),
   ivec2(1, 1),
 };
 
-#pragma export
-ivec2 _g5bn_getQuadIndex(int _g5bn_vertex) {
-  return _g5bn_QUAD[_g5bn_vertex];
+
+ivec2 _s6_getQuadIndex(int vertex) {
+  return _s6_QUAD[vertex];
   /*
-  _g5bn_vertex = min(_g5bn_vertex, 6 - _g5bn_vertex);
-  ivec2 iuv = _g5bn_vertex & ivec2(1, 2);
+  vertex = min(vertex, 6 - vertex);
+  ivec2 iuv = vertex & ivec2(1, 2);
   iuv.y = iuv.y >> 1;
 
   return iuv;
   */
 }
 
-#pragma export
-vec2 _g5bn_getQuadUV(int _g5bn_vertex) {
-  return vec2(_g5bn_getQuadIndex(_g5bn_vertex));
+
+vec2 _s6_getQuadUV(int vertex) {
+  return vec2(_s6_getQuadIndex(vertex));
 }
 
-#pragma export
-MeshVertex getQuad(int _g5bn_vertex) {
-  vec2 uv = _g5bn_getQuadUV(_g5bn_vertex);
+
+_qg_MeshVertex _s6_getQuad(int vertex) {
+  vec2 uv = _s6_getQuadUV(vertex);
   vec4 position = vec4(uv * 2.0 - 1.0, 0.0, 1.0);
   vec4 color = vec4(1.0, 0.0, 1.0, 1.0);
-  return MeshVertex(position, color, uv);
+  return _qg_MeshVertex(position, color, uv);
 }
 
-struct _r1pr_MeshVertex {
-  vec4 position;
-  vec4 color;
-  vec2 uv;
-};
 
 layout(set = 0, binding = 0) uniform ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;
   vec2 viewResolution;
-} _z22c_viewUniforms;
+} _ei_viewUniforms;
 
-export vec4 _z22c_worldToView(vec4 position) {
-  return view.viewMatrix * position;
+
+vec4 _ei_worldToView(vec4 position) {
+  return _ei_viewUniforms.viewMatrix * position;
 }
 
-export vec4 _z22c_viewToClip(vec4 position) {
-  return view.projectionMatrix * position;
+
+vec4 _ei_viewToClip(vec4 position) {
+  return _ei_viewUniforms.projectionMatrix * position;
 }
 
-export vec4 _z22c_worldToClip(vec4 position) {
-  return _z22c_viewToClip(_z22c_worldToView(position));
+
+vec4 _ei_worldToClip(vec4 position) {
+  return _ei_viewToClip(_ei_worldToView(position));
 }
-#pragma import {_r1pr_MeshVertex} from 'use/types'
-#pragma import {_z22c_viewUniforms, _z22c_worldToClip} from 'use/view'
-#pragma import {_g5bn_getQuadUV} from 'geometry/quad'
+
+
+
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec2 fragUV;
@@ -71,14 +78,14 @@ void main() {
   float r = float(instanceIndex);
   vec4 instancePosition = vec4(cos(r), sin(r * 1.341 + r * r), cos(r + cos(r)*1.173), 1.0);
 
-  vec4 position = _z22c_worldToClip(instancePosition);
+  vec4 position = _ei_worldToClip(instancePosition);
 
-  vec2 uv = _g5bn_getQuadUV(vertexIndex);
+  vec2 uv = _s6_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
-  position.xy += xy * _z22c_viewUniforms.viewResolution * (50.0 * position.w);
+  position.xy += xy * _ei_viewUniforms.viewResolution * (50.0 * position.w);
 
   gl_Position = position;
-  fragColor = vec4(abs(instancePosition), 1.0);
+  fragColor = vec4(abs(instancePosition.xyz), 1.0);
   fragUV = uv;
 }"
 `;

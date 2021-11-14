@@ -1,11 +1,22 @@
 import { GLSLModules } from '@use-gpu/glsl';
 import { parseGLSL } from './shader';
-import { makeASTParser } from './ast';
+import { makeASTParser, formatAST, hasErrorNode } from './ast';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
 
 describe('ast', () => {
+  
+  const makeGuardedParser = (code: any, tree: any) => {
+    let errorNode = hasErrorNode(tree);
+    if (errorNode) {
+      for (let i = 0; i < 2; ++i) if (errorNode.parent) errorNode = errorNode.parent;
+      console.log(formatAST(errorNode, code));
+      throw new Error("Error in AST");
+    }
+    
+    return makeASTParser(code, tree);
+  }
 
   it('extracts test declarations', () => {
     const code = `
@@ -14,7 +25,7 @@ describe('ast', () => {
     `;
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
+    const {extractDeclarations} = makeGuardedParser(code, tree);
 
     const declarations = extractDeclarations();
     expect(declarations).toMatchSnapshot();
@@ -31,7 +42,7 @@ describe('ast', () => {
     `;
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
+    const {extractDeclarations} = makeGuardedParser(code, tree);
 
     const declarations = extractDeclarations();
     expect(declarations).toMatchSnapshot();
@@ -41,7 +52,7 @@ describe('ast', () => {
     const code = GLSLModules['instance/quad/vertex'];
 
     const tree = parseGLSL(code);
-    const {extractImports} = makeASTParser(code, tree);
+    const {extractImports} = makeGuardedParser(code, tree);
 
     const imports = extractImports();
     expect(imports).toMatchSnapshot();
@@ -51,7 +62,7 @@ describe('ast', () => {
     const code = GLSLModules['instance/quad/vertex'];
 
     const tree = parseGLSL(code);
-    const {extractFunctions} = makeASTParser(code, tree);
+    const {extractFunctions} = makeGuardedParser(code, tree);
 
     const functions = extractFunctions();
     expect(functions).toMatchSnapshot();
@@ -61,7 +72,7 @@ describe('ast', () => {
     const code = GLSLModules['instance/quad/vertex'];
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
+    const {extractDeclarations} = makeGuardedParser(code, tree);
 
     const declarations = extractDeclarations();
     expect(declarations).toMatchSnapshot();
@@ -71,7 +82,7 @@ describe('ast', () => {
     const code = GLSLModules['instance/quad/fragment'];
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
+    const {extractDeclarations} = makeGuardedParser(code, tree);
 
     const declarations = extractDeclarations();
     expect(declarations).toMatchSnapshot();
@@ -81,17 +92,27 @@ describe('ast', () => {
     const code = GLSLModules['use/view'];
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeASTParser(code, tree);
+    const {extractDeclarations} = makeGuardedParser(code, tree);
 
     const declarations = extractDeclarations();
     expect(declarations).toMatchSnapshot();
   });
   
+  it('extracts geometry quad symbol table', () => {
+    const code = GLSLModules['geometry/quad'];
+
+    const tree = parseGLSL(code);
+    const {extractSymbolTable} = makeGuardedParser(code, tree);
+
+    const symbolTable = extractSymbolTable();
+    expect(symbolTable).toMatchSnapshot();
+  });
+
   it('extracts use view symbol table', () => {
     const code = GLSLModules['use/view'];
 
     const tree = parseGLSL(code);
-    const {extractSymbolTable} = makeASTParser(code, tree);
+    const {extractSymbolTable} = makeGuardedParser(code, tree);
 
     const symbolTable = extractSymbolTable();
     expect(symbolTable).toMatchSnapshot();
@@ -101,7 +122,7 @@ describe('ast', () => {
     const code = GLSLModules['use/types'];
 
     const tree = parseGLSL(code);
-    const {extractSymbolTable} = makeASTParser(code, tree);
+    const {extractSymbolTable} = makeGuardedParser(code, tree);
 
     const symbolTable = extractSymbolTable();
     expect(symbolTable).toMatchSnapshot();

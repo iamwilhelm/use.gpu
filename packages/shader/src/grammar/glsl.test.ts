@@ -85,12 +85,36 @@ void main() {
 //////////////////////////////////////////////////////////////////////
 
 `
+void main() {
+  int x = 1;
+  /*
+  int y = 2;
+  if (x) if (y) { } else { }
+  */
+  wat();
+}
+`,
+
+//////////////////////////////////////////////////////////////////////
+
+`
 #pragma import {MeshVertex} from 'use/types'
 #pragma import {viewUniforms as view, worldToClip} from 'use/view'
 #pragma import {getQuadUV} from 'geometry/quad'
 
 #pragma export
 void main();
+`,
+
+//////////////////////////////////////////////////////////////////////
+
+`
+MeshVertex getQuad(int vertex) {
+  vec2 uv = getQuadUV(vertex);
+  vec4 position = vec4(uv * 2.0 - 1.0, 0.0, 1.0);
+  vec4 color = vec4(1.0, 0.0, 1.0, 1.0);
+  return MeshVertex(position, color, uv);
+}
 `,
 
 //////////////////////////////////////////////////////////////////////

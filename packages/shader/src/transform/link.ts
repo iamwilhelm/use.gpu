@@ -1,7 +1,8 @@
 import { Tree } from '@lezer/common';
 import { SymbolTable } from '../types';
 import { parseGLSL } from './shader';
-import { makeASTParser } from './ast';
+import { makeASTParser, rewriteAST } from './ast';
+import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
 
 type Program = {
@@ -22,14 +23,14 @@ export const linkModule = (code: string, library: Record<string, string>) => {
 
   const modules = loadModules(code, library);
   const namespaces = new Map<string, string>();
-  const program = [] as string[];
+  const used = new Set<string>();
+  const program = [`#version ${GLSL_VERSION}`] as string[];
 
   for (const module of modules) {
     const {name, code, tree, table} = module;
-    const {hash, symbols, modules} = table;
+    const {symbols, modules} = table;
 
-    const namespace = '_' + table.hash.slice(0, 4) + '_';
-    namespaces.set(name, namespace);
+    const namespace = reserveNamespace(module, namespaces, used);
 
     const rename = new Map<string, string>();
     if (name !== 'main') {
@@ -37,46 +38,18 @@ export const linkModule = (code: string, library: Record<string, string>) => {
         rename.set(name, namespace + name);
       }
     }
-    
+
     for (const {name, imports} of modules) {
       const namespace = namespaces.get(name);
       for (const {name, imported} of imports) {
         rename.set(name, namespace + imported);
       }
     }
-    
+
     program.push(rewriteAST(code, tree, rename));
   }
 
   return program.join("\n");
-}
-
-export const rewriteAST = (code: string, tree: Tree, rename: Map<string, string>) => {
-  let out = '';
-  let pos = 0;
-
-  const passthrough = (from: number, to: number, replace?: string) => {
-    out = out + code.slice(pos, from);
-    pos = to;
-
-    if (replace != null) out = out + replace;
-  }
-
-  let cursor = tree.cursor();
-  do {
-    const {type, from, to} = cursor;
-    if (type.id === T.Identifier) {
-      const name = code.slice(from, to);
-      const replace = rename.get(name);
-
-      if (replace) passthrough(from, to, replace);      
-    }
-  } while (cursor.next());
-
-  const n = code.length;
-  passthrough(n, n);
-
-  return out;
 }
 
 export const loadModules = (code: string, library: Record<string, string>) => {
@@ -107,4 +80,23 @@ export const loadModules = (code: string, library: Record<string, string>) => {
   out.sort((a, b) => seen.get(b.name)! - seen.get(a.name)! || a.name.localeCompare(b.name));
 
   return out;
+}
+
+export const reserveNamespace = (
+  module: Module,
+  namespaces: Map<string, string>,
+  used: Set<string>,
+) => {
+  const {name, table: {hash}} = module;
+  let namespace;
+  let n = 2;
+
+  do {
+    namespace = '_' + hash.slice(0, n++) + '_';
+  } while (used.has(namespace));
+
+  namespaces.set(name, namespace);
+  used.add(namespace);
+
+  return namespace;
 }

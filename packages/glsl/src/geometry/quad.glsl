@@ -1,3 +1,5 @@
+#pragma import {MeshVertex} from 'use/types'
+
 const ivec2 QUAD[] = {
   ivec2(0, 0),
   ivec2(1, 0),
@@ -8,13 +10,6 @@ const ivec2 QUAD[] = {
 #pragma export
 ivec2 getQuadIndex(int vertex) {
   return QUAD[vertex];
-  /*
-  vertex = min(vertex, 6 - vertex);
-  ivec2 iuv = vertex & ivec2(1, 2);
-  iuv.y = iuv.y >> 1;
-
-  return iuv;
-  */
 }
 
 #pragma export

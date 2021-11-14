@@ -1,6 +1,7 @@
 @top Program { unit }
 @skip { space | Comment }
-@external tokens untilEOL from "./tokens" { UntilEOL, UntilCommentClose }
+@external tokens untilEOL from "./tokens" { UntilEOL }
+@external tokens untilCommentClose from "./tokens" { UntilCommentClose }
 @precedence {
   else @right,
   if @right,
@@ -65,7 +66,7 @@ Declaration {
   ) semicolon
 }
 
-TypeSpecifier { (basicType | Struct) ArraySpecifier? }
+TypeSpecifier { (basicType | Struct | Identifier ~qualified) ArraySpecifier? }
 ArraySpecifier { (LeftBracket constantExpression RightBracket)* EmptyBrackets | (LeftBracket constantExpression RightBracket)+ EmptyBrackets? }
 TypeNameList { TypeName (comma TypeName)* }
 TypeName { Identifier }
@@ -78,7 +79,7 @@ structDeclaratorList { DeclarationSpecifier (comma DeclarationSpecifier)* }
 
 VariableDeclaration { QualifiedType (SingleDeclaration (comma SingleDeclaration)*)? }
 SingleDeclaration { DeclarationSpecifier (!assign assign initializer)? }
-DeclarationSpecifier { Identifier ArraySpecifier? }
+DeclarationSpecifier { Identifier ~qualified ArraySpecifier? }
 QualifiedStructDeclaration {
   TypeQualifier ~qualified (
     Identifier ~qualified (
@@ -135,7 +136,7 @@ fieldSelection { Identifier }
 expression { assignmentExpression (comma assignmentExpression)* }
 
 primaryExpression {
-  Reserved? (Identifier | Number | Parens ) 
+  Reserved? (Identifier ~qualified | Number | Parens ) 
 }
 Parens { '(' expression ')' }
 assignmentExpression { conditionalExpression | Assignment }

@@ -22,6 +22,15 @@ const unescape = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
 function nodeToString(this: SyntaxNode) { return `[${this.type.name}]`; }
 
+export const hasErrorNode = (tree: Tree) => {
+  const cursor = tree.cursor();
+  do {
+    const {type, from, to} = cursor;
+    if (type.isError) return cursor.node;
+  } while (cursor.next());
+  return false;
+}
+
 export const getChildNodes = (node: SyntaxNode) => {
   const out = [] as SyntaxNode[];
   let n = node.firstChild;
@@ -233,6 +242,20 @@ export const makeASTParser = (code: string, tree: Tree) => {
     throw throwError('declaration', node);
   };
 
+  const isExported = (ref: FunctionRef | DeclarationRef): boolean => {  
+    const {node} = ref;
+    const pragma = node.prevSibling;
+
+    if (!pragma || pragma.type.id !== T.Preprocessor) return false;
+
+    const [a, b] = getNodes(pragma, 2);
+    const directive = getText(a);
+    if (directive !== 'pragma') return false;
+
+    const verb = getText(b);
+    return verb === 'export';
+  };
+
   const extractImports = (): ModuleRef[] => {
     const modules: Record<string, ImportRef[]> = {};
 
@@ -282,11 +305,47 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const declarations = extractDeclarations();
 
     const refs = [...modules, ...functions, ...declarations];
+    const exported = [...functions, ...declarations].filter(isExported);
+    
+    const exports = exported.flatMap(r => r.symbols);
     const symbols = refs.flatMap(r => r.symbols);
 
-    return {hash, refs, symbols, modules, functions, declarations};
+    return {hash, refs, symbols, exports, modules, functions, declarations};
   }
-
+  
   return {extractImports, extractFunctions, extractDeclarations, extractSymbolTable};
 }
 
+export const rewriteAST = (code: string, tree: Tree, rename: Map<string, string>) => {
+  let out = '';
+  let pos = 0;
+
+  const skip = (from: number, to: number, replace?: string) => {
+    out = out + code.slice(pos, from);
+    pos = to;
+
+    if (replace != null) out = out + replace;
+  }
+
+  const cursor = tree.cursor();
+  do {
+    const {type, from, to} = cursor;
+    if (type.name === 'import' || type.name === 'export') {
+      cursor.parent();
+      const {from, to} = cursor;
+      skip(from, to, '');
+      cursor.lastChild();
+    }
+    else if (type.id === T.Identifier) {
+      const name = code.slice(from, to);
+      const replace = rename.get(name);
+
+      if (replace) skip(from, to, replace);      
+    }
+  } while (cursor.next());
+
+  const n = code.length;
+  skip(n, n);
+
+  return out;
+}

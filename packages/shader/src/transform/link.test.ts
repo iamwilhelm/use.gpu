@@ -6,7 +6,7 @@ addASTSerializer(expect);
 
 describe("link", () => {
   
-  it("links", () => {
+  it("links quad vertex", () => {
     
     const code = GLSLModules['instance/quad/vertex'];
     const modules = GLSLModules;

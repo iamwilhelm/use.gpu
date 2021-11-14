@@ -19,6 +19,6 @@ void main() {
   position.xy += xy * viewUniforms.viewResolution * (50.0 * position.w);
 
   gl_Position = position;
-  fragColor = vec4(abs(instancePosition), 1.0);
+  fragColor = vec4(abs(instancePosition.xyz), 1.0);
   fragUV = uv;
 }

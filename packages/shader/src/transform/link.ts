@@ -31,11 +31,12 @@ export const linkModule = (
   const namespaces = new Map<string, string>();
 
   const used = new Set<string>();
-  const exported = new Set<string>();
+  const exists = new Set<string>();
+  const visible = new Set<string>();
 
   for (const module of modules) {
     const {name, code, tree, table} = module;
-    const {symbols, exports: exp, modules} = table;
+    const {symbols, visibles, modules} = table;
 
     const namespace = reserveNamespace(module, namespaces, used);
 
@@ -43,10 +44,10 @@ export const linkModule = (
     if (name !== 'main') {
       for (const {name} of symbols) {
         rename.set(name, namespace + name);
-        used.add(namespace + name);
+        exists.add(namespace + name);
       }
-      for (const {name} of exp) {
-        exported.add(namespace + name);
+      for (const {name} of visibles) {
+        visible.add(namespace + name);
       }
     }
 
@@ -54,8 +55,8 @@ export const linkModule = (
       const namespace = namespaces.get(module);
       for (const {name, imported} of imports) {
         const imp = namespace + imported;
-        if (!used.has(imp)) console.warn(`Import ${name} from '${module}' does not exist`);
-        else if (!exported.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
+        if (!exists.has(imp)) console.warn(`Import ${name} from '${module}' does not exist`);
+        else if (!visible.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
         rename.set(name, imp);
       }
     }

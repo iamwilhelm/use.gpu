@@ -7,7 +7,7 @@ addASTSerializer(expect);
 
 describe('ast', () => {
   
-  const makeGuardedParser = (code: any, tree: any) => {
+  const makeGuardedParser = (code: any, tree: any): ReturnType<typeof makeASTParser> => {
     let errorNode = hasErrorNode(tree);
     if (errorNode) {
       for (let i = 0; i < 2; ++i) if (errorNode.parent) errorNode = errorNode.parent;
@@ -97,7 +97,17 @@ describe('ast', () => {
     const declarations = extractDeclarations();
     expect(declarations).toMatchSnapshot();
   });
-  
+
+  it('extracts quad vertex symbol table', () => {
+    const code = GLSLModules['instance/quad/vertex'];
+
+    const tree = parseGLSL(code);
+    const {extractSymbolTable} = makeGuardedParser(code, tree);
+
+    const symbolTable = extractSymbolTable();
+    expect(symbolTable).toMatchSnapshot();
+  });
+
   it('extracts geometry quad symbol table', () => {
     const code = GLSLModules['geometry/quad'];
 

@@ -10,7 +10,7 @@ struct _qg_MeshVertex {
 };
 
 
-const ivec2 _s6_QUAD[] = {
+const ivec2 _f7_QUAD[] = {
   ivec2(0, 0),
   ivec2(1, 0),
   ivec2(0, 1),
@@ -18,25 +18,18 @@ const ivec2 _s6_QUAD[] = {
 };
 
 
-ivec2 _s6_getQuadIndex(int vertex) {
-  return _s6_QUAD[vertex];
-  /*
-  vertex = min(vertex, 6 - vertex);
-  ivec2 iuv = vertex & ivec2(1, 2);
-  iuv.y = iuv.y >> 1;
-
-  return iuv;
-  */
+ivec2 _f7_getQuadIndex(int vertex) {
+  return _f7_QUAD[vertex];
 }
 
 
-vec2 _s6_getQuadUV(int vertex) {
-  return vec2(_s6_getQuadIndex(vertex));
+vec2 _f7_getQuadUV(int vertex) {
+  return vec2(_f7_getQuadIndex(vertex));
 }
 
 
-_qg_MeshVertex _s6_getQuad(int vertex) {
-  vec2 uv = _s6_getQuadUV(vertex);
+_qg_MeshVertex _f7_getQuad(int vertex) {
+  vec2 uv = _f7_getQuadUV(vertex);
   vec4 position = vec4(uv * 2.0 - 1.0, 0.0, 1.0);
   vec4 color = vec4(1.0, 0.0, 1.0, 1.0);
   return _qg_MeshVertex(position, color, uv);
@@ -68,6 +61,8 @@ vec4 _ei_worldToClip(vec4 position) {
 
 
 
+vec3 getPosition(int);
+
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec2 fragUV;
 
@@ -75,12 +70,10 @@ void main() {
   int vertexIndex = gl_VertexIndex;
   int instanceIndex = gl_InstanceIndex;
 
-  float r = float(instanceIndex);
-  vec4 instancePosition = vec4(cos(r), sin(r * 1.341 + r * r), cos(r + cos(r)*1.173), 1.0);
-
+  vec4 instancePosition = vec4(getPosition(instanceIndex), 1.0);
   vec4 position = _ei_worldToClip(instancePosition);
 
-  vec2 uv = _s6_getQuadUV(vertexIndex);
+  vec2 uv = _f7_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
   position.xy += xy * _ei_viewUniforms.viewResolution * (50.0 * position.w);
 

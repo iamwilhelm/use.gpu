@@ -6,10 +6,11 @@ export type SymbolTable = {
   hash: string,
   refs: ComboRef[],
   symbols: SymbolRef[],
-  exports: SymbolRef[],
+  visibles: SymbolRef[],
   modules: ModuleRef[],
   functions: FunctionRef[],
   declarations: DeclarationRef[],
+  externals: DeclarationRef[],
 };
 
 export type SymbolsRef = {

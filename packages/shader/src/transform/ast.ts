@@ -304,13 +304,17 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const functions = extractFunctions();
     const declarations = extractDeclarations();
 
+    const externals = declarations
+      .filter(d => d.prototype)
+      .filter(d => !functions.find(f => f.prototype.name === d.prototype!.name));
+
     const refs = [...modules, ...functions, ...declarations];
     const exported = [...functions, ...declarations].filter(isExported);
     
-    const exports = exported.flatMap(r => r.symbols);
+    const visibles = exported.flatMap(r => r.symbols);
     const symbols = refs.flatMap(r => r.symbols);
 
-    return {hash, refs, symbols, exports, modules, functions, declarations};
+    return {hash, refs, symbols, visibles, externals, modules, functions, declarations};
   }
   
   return {extractImports, extractFunctions, extractDeclarations, extractSymbolTable};

@@ -19,16 +19,23 @@ type Module = {
 
 export const makeProgram = () => ({});
 
-export const linkModule = (code: string, library: Record<string, string>) => {
+export const linkModule = (
+  code: string,
+  library: Record<string, string>,
+  cache: Map<string, Module> | null = null,
+) => {
 
   const modules = loadModules(code, library);
-  const namespaces = new Map<string, string>();
-  const used = new Set<string>();
+
   const program = [`#version ${GLSL_VERSION}`] as string[];
+  const namespaces = new Map<string, string>();
+
+  const used = new Set<string>();
+  const exported = new Set<string>();
 
   for (const module of modules) {
     const {name, code, tree, table} = module;
-    const {symbols, modules} = table;
+    const {symbols, exports: exp, modules} = table;
 
     const namespace = reserveNamespace(module, namespaces, used);
 
@@ -36,13 +43,20 @@ export const linkModule = (code: string, library: Record<string, string>) => {
     if (name !== 'main') {
       for (const {name} of symbols) {
         rename.set(name, namespace + name);
+        used.add(namespace + name);
+      }
+      for (const {name} of exp) {
+        exported.add(namespace + name);
       }
     }
 
-    for (const {name, imports} of modules) {
-      const namespace = namespaces.get(name);
+    for (const {name: module, imports} of modules) {
+      const namespace = namespaces.get(module);
       for (const {name, imported} of imports) {
-        rename.set(name, namespace + imported);
+        const imp = namespace + imported;
+        if (!used.has(imp)) console.warn(`Import ${name} from '${module}' does not exist`);
+        else if (!exported.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
+        rename.set(name, imp);
       }
     }
 

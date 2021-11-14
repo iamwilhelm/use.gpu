@@ -1,8 +1,8 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { useResource, formatValue } from '@use-gpu/live';
+import { formatValue } from '@use-gpu/live';
 import styled, { keyframes } from "styled-components";
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Action } from './types';
 
 const pingAnimation = keyframes`
@@ -15,22 +15,31 @@ const selectedAnimation = keyframes`
  100% { background: rgba(210, 210, 255, 1); }
 `
 
-export const NodeNormal = styled.div`
+export const StyledNode = styled.div`
 	white-space: nowrap;
 	margin: -2px -5px;
 	padding: 2px 5px;
 	&.selected {
 		background: rgba(210, 210, 255, 1);
 	}
-`;
 
-export const NodeHighlight = styled(NodeNormal)`
-	animation-name: ${pingAnimation};
-	animation-duration: 0.5s;
-	animation-iteration-count: 1;
+	&.pinged {
+		animation-name: ${pingAnimation};
+		animation-duration: 0.5s;
+		animation-iteration-count: 1;
 
-	&.selected {
-		animation-name: ${selectedAnimation};
+		&.selected {
+			animation-name: ${selectedAnimation};
+		}
+	}
+
+	&.repinged {
+		animation-name: none;
+		background: rgba(255, 230, 0, 1);
+		
+		&.selected {
+			background: rgba(210, 190, 128, 1);
+		}
 	}
 `;
 
@@ -43,9 +52,24 @@ type NodeProps = {
 
 export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) => {
 	const {id, f, args} = fiber;
-	const Wrapper = pinged ? NodeHighlight : NodeNormal;
-	const className = selected ? 'selected' : '';
 
+	const classes = [] as string[];
+	if (selected) classes.push('selected');
+	if (pinged) classes.push('pinged');
+	const className = classes.join(' ');
+
+	const elRef = useRef<HTMLDivElement>();
+	const {current: el} = elRef;
+	const lastPinged = el && el.classList.contains('pinged');
+
+	useEffect(() => {
+		if (lastPinged) {
+			el.classList.add('repinged');
+			el.offsetHeight;
+			el.classList.remove('repinged');
+		}
+	});
+	
   // @ts-ignore
   let name = (f?.displayName ?? f?.name) || 'Node';
   if (name === 'PROVIDE' && args) {
@@ -56,7 +80,19 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) =>
     const [call] = args;
     name = `Detach(${formatValue(call.f)})`;
   }
+  else if (name === 'GATHER' && args) {
+    name = `[Gather]`;
+  }
+  else if (name === 'RECONCILE' && args) {
+    name = `[Reconcile]`;
+  }
+  else if (name === 'MAP_REDUCE' && args) {
+    name = `[MapReduce]`;
+  }
+  else if (name === 'YEET' && args) {
+    name = `[Yeet]`;
+  }
 
-  return <Wrapper key={pinged} className={className} onClick={onClick}>{name}</Wrapper>;
+  return <StyledNode ref={elRef} className={className} onClick={onClick}>{name}</StyledNode>;
 }
 

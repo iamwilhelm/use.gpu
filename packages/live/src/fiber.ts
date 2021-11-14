@@ -132,17 +132,29 @@ export const renderFiber = <F extends Function>(
   // Disposed fiber, ignore
   if (!bound) return;
 
-  let out: LiveElement<any>;
+  let element: LiveElement<any>;
   // Passthrough built-ins
-  if ((f as any).isLiveBuiltin) out = fiber as any as DeferredCall<any>;
+  if ((f as any).isLiveBuiltin) element = fiber as any as DeferredCall<any>;
   // Render live function
-  else out = bound.apply(null, args ?? EMPTY_ARRAY);
+  else element = bound.apply(null, args ?? EMPTY_ARRAY);
 
-  // Early exit if memoized
-  if (fiber.version && !fiber.next) {
-    if (fiber.version === fiber.memo) return fiber;
-    fiber.memo = fiber.version;
+  // Early exit if memoized and same result
+  if (fiber.version && !fiber.next && fiber.type !== YEET) {
+    if (element === fiber.memo) return fiber;
+    fiber.memo = element;
   }
+
+  // Apply rendered result
+  updateFiber(fiber, element, callbacks);
+}
+
+// Update a fiber with rendered result
+export const updateFiber = <F extends Function>(
+  fiber: LiveFiber<F>,
+  element: LiveElement<any>,
+  callbacks?: RenderCallbacks,
+) => {
+  const {f, bound, args, yeeted} = fiber;
 
   // Let host do its thing
   if (callbacks) {
@@ -150,8 +162,8 @@ export const renderFiber = <F extends Function>(
   }
 
   // Handle call and call[]
-  let call = out as DeferredCall<any> | null;
-  const isArray = !!out && Array.isArray(out);
+  let call = element as DeferredCall<any> | null;
+  const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : call?.f;
 
   // If fiber type changed, remount everything
@@ -160,7 +172,7 @@ export const renderFiber = <F extends Function>(
 
   // Reconcile literal array
   if (isArray) {
-    const calls = out as DeferredCall<any>[];
+    const calls = element as DeferredCall<any>[];
     reconcileFiberCalls(fiber, calls, callbacks);
   }
   // Reconcile wrapped array
@@ -235,6 +247,8 @@ export const reconcileFiberCalls = <F extends Function>(
 
   if (!Array.isArray(calls)) calls = [calls];
 
+  seen.clear();
+
   order.length = 0;
   let i = 0;
   for (let call of calls) {
@@ -263,7 +277,6 @@ export const reconcileFiberCalls = <F extends Function>(
     flushMount(null, mount, callbacks);
   }
 
-  seen.clear();
 }
 
 // Map-reduce a fiber
@@ -409,7 +422,15 @@ export const provideFiber = <F extends Function>(
   }
 
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls, callbacks);
-  else mountFiberCall(fiber, calls, callbacks);
+  else {
+    const call = calls;
+    if (call.f === GATHER || call.f === MAP_REDUCE || call.f === RECONCILE) {
+      updateFiber(fiber, call, callbacks);
+    }
+    else {
+      mountFiberCall(fiber, calls, callbacks);
+    }
+  }
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating its execution

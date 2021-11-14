@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource } from '@use-gpu/core/types';
-import { RenderContext } from '@use-gpu/components';
-import { yeet, useNoMemo, useMemo, useContext } from '@use-gpu/live';
+import { RenderContext, FrameContext } from '@use-gpu/components';
+import { yeet, useMemo, useSomeMemo, useNoMemo, useContext, useSomeContext, useNoContext } from '@use-gpu/live';
 import {
   makeStorageBuffer, uploadBuffer, UNIFORM_SIZES,
 } from '@use-gpu/core';
@@ -20,7 +20,7 @@ const copyArray = (from: TypedArray, to: TypedArray) => {
 }
 
 const emitArray = (expr: Emitter, to: TypedArray, dims: number) => {
-  const emit = makeEmitter(dims, to);
+  const emit = makeEmitter(to, dims);
   const n = to.length / dims;
   let i = 0;
   for (let i = 0; i < n; ++i) expr(emit, i, n);
@@ -108,15 +108,16 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
     };
   }, [buffer, t]);
 
-  // Update data
   if (!live) {
-    useMemo(() => {
+    useNoContext(FrameContext);
+    useSomeMemo(() => {
       if (data) copyArray(data, array);
       if (expr) emitArray(expr, array, dims);
       uploadBuffer(device, buffer, array.buffer);
     }, [data, expr]);
   }
   else {
+    useSomeContext(FrameContext);
     useNoMemo();
     if (data) copyArray(data, array);
     if (expr) emitArray(expr, array, dims);

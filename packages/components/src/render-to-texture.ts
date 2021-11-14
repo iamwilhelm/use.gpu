@@ -3,6 +3,7 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { use, gatherReduce, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, EMPTY_COLOR } from './constants';
 import { RenderProvider, RenderContext } from './render-provider';
+import { FrameContext } from './frame-context';
 
 import {
   makeColorState,
@@ -100,5 +101,8 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
   // @ts-ignore
   if (!Done.displayName) Done.displayName = '[RenderToTexture]';
 
-  return gatherReduce(view, Done);
+  const frame = useOne(() => ({current: 0}));
+  frame.current++;
+
+  return provide(FrameContext, frame.current, gatherReduce(view, Done));
 }

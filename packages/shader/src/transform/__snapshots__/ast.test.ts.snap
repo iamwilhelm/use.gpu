@@ -281,6 +281,22 @@ Array [
   },
   Object {
     "exported": false,
+    "prototype": Object {
+      "name": "getSize",
+      "parameters": Array [
+        "int",
+      ],
+      "type": Object {
+        "name": "float",
+        "qualifiers": Array [],
+      },
+    },
+    "symbols": Array [
+      "getSize",
+    ],
+  },
+  Object {
+    "exported": false,
     "symbols": Array [
       "fragColor",
     ],
@@ -410,6 +426,22 @@ Object {
     },
     Object {
       "exported": false,
+      "prototype": Object {
+        "name": "getSize",
+        "parameters": Array [
+          "int",
+        ],
+        "type": Object {
+          "name": "float",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "getSize",
+      ],
+    },
+    Object {
+      "exported": false,
       "symbols": Array [
         "fragColor",
       ],
@@ -468,6 +500,22 @@ Object {
         "getPosition",
       ],
     },
+    Object {
+      "exported": false,
+      "prototype": Object {
+        "name": "getSize",
+        "parameters": Array [
+          "int",
+        ],
+        "type": Object {
+          "name": "float",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "getSize",
+      ],
+    },
   ],
   "functions": Array [
     Object {
@@ -485,7 +533,7 @@ Object {
       ],
     },
   ],
-  "hash": "96tp4xqkwh",
+  "hash": "81l7mnms8t",
   "modules": Array [
     Object {
       "imports": Array [
@@ -603,6 +651,22 @@ Object {
     },
     Object {
       "exported": false,
+      "prototype": Object {
+        "name": "getSize",
+        "parameters": Array [
+          "int",
+        ],
+        "type": Object {
+          "name": "float",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "getSize",
+      ],
+    },
+    Object {
+      "exported": false,
       "symbols": Array [
         "fragColor",
       ],
@@ -651,6 +715,7 @@ Object {
     "getQuadUV",
     "main",
     "getPosition",
+    "getSize",
     "fragColor",
     "fragUV",
   ],
@@ -1140,6 +1205,16 @@ Array [
     "Identifier",
     87,
     95,
+  ],
+  Array [
+    "Identifier",
+    111,
+    112,
+  ],
+  Array [
+    "Identifier",
+    120,
+    121,
   ],
 ]
 `;

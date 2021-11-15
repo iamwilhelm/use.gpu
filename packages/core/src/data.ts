@@ -22,9 +22,38 @@ export const makeDataEmitter = (to: NumberArray, dims: number): Emitter => {
   }
 }
 
-export const copyDataArray = (from: any[], to: NumberArray, accessor: Accessor) => {
-  const n = Math.min(from.length, to.length);
-  for (let i = 0; i < n; ++i) to[i] = accessor(from[i]);
+export const copyDataArray = (from: any[], to: NumberArray, dims: number, accessor: Accessor) => {
+  const n = Math.min(from.length, Math.floor(to.length / dims));
+  if (dims === 1) {
+    for (let i = 0; i < n; ++i) {
+      to[i] = accessor(from[i]);
+    }
+  }
+  else if (dims === 2) {
+    let j = 0;
+    for (let i = 0; i < n; ++i) {
+      [to[j++], to[j++]] = accessor(from[i]);
+    }
+  }
+  else if (dims === 3) {
+    let j = 0;
+    for (let i = 0; i < n; ++i) {
+      [to[j++], to[j++], to[j++]] = accessor(from[i]);
+    }
+  }
+  else if (dims === 4) {
+    let j = 0;
+    for (let i = 0; i < n; ++i) {
+      [to[j++], to[j++], to[j++], to[j++]] = accessor(from[i]);
+    }
+  }
+  else {
+    let j = 0;
+    for (let i = 0; i < n; ++i) {
+      const v = accessor(from[i]);
+      for (let k = 0; k < v.length; ++k) to[j++] = v[k];
+    }
+  }
 }
 
 export const copyNumberArray = (from: NumberArray | number[], to: NumberArray) => {

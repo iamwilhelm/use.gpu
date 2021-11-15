@@ -9,6 +9,8 @@ exports[`link links an external 1`] = `
 
     vec4 _za_getColor();
     void main() {
+      vec4 v;
+      v.xyz = vec3(1.0, 0.0, 0.0);
       gl_FragColor = _za_getColor();
     }
     "
@@ -54,6 +56,10 @@ _4q_MeshVertex _ap_getQuad(int vertex) {
     vec4 _8u_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
+    
+    float _i1_getSize(int index) { return 1.0; }
+    
+
 layout(set = 0, binding = 0) uniform _mb_ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
@@ -80,6 +86,7 @@ vec4 _mb_worldToClip(vec4 position) {
 
 
 vec4 _8u_getPosition(int);
+float _i1_getSize(int);
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec2 fragUV;
@@ -89,11 +96,13 @@ void main() {
   int instanceIndex = gl_InstanceIndex;
 
   vec4 instancePosition = _8u_getPosition(instanceIndex);
+  float instanceSize = _i1_getSize(instanceIndex);
+
   vec4 position = _mb_worldToClip(instancePosition);
 
   vec2 uv = _ap_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
-  position.xy += xy * _mb_viewUniforms.viewResolution * (50.0 * position.w);
+  position.xy += xy * _mb_viewUniforms.viewResolution * (instanceSize * position.w);
 
   gl_Position = position;
   fragColor = vec4(abs(instancePosition.xyz), 1.0);

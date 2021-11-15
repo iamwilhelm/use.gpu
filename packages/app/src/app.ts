@@ -29,9 +29,9 @@ export type AppProps = {
 
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
-const data = seq(8).map((i) => ({
+const data = seq(100).map((i) => ({
   position: [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1],
-  size: Math.random() + 1,
+  size: Math.random() * 50 + 10,
 }));
 
 const fields = [

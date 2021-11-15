@@ -1,10 +1,10 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { ViewUniforms, UniformDefinition, UniformAttribute, UniformType, VertexData } from '@use-gpu/core/types';
+import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData } from '@use-gpu/core/types';
 import { ViewContext, RenderContext } from '@use-gpu/components';
 import { yeet, memoProps, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
-  makeUniforms, makeUniformBindings, 
+  makeUniformPipe, makeUniformBindings, 
   makeRenderPipeline, makeShaderModule,
 } from '@use-gpu/core';
 
@@ -58,14 +58,14 @@ export const Mesh: LiveComponent<MeshProps> = memoProps((fiber) => (props) => {
 
   // Uniforms
   const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(() => {
-    const uniformPipe = makeUniforms([...defs, ...MESH_UNIFORM_DEFS]);
+    const uniformPipe = makeUniformPipe([...defs, ...MESH_UNIFORM_DEFS]);
     const uniformBuffer = makeUniformBuffer(device, uniformPipe.data);
     const entries = makeUniformBindings([{resource: {buffer: uniformBuffer}}]);
     const uniformBindGroup = device.createBindGroup({
       layout: pipeline.getBindGroupLayout(0),
       entries,
     });
-    return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformDefinition, GPUBindGroup];
+    return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformPipe, GPUBindGroup];
   }, [device, defs, pipeline]);
 
   // Return a lambda back to parent(s)

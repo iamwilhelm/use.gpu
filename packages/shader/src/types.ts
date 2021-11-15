@@ -1,5 +1,14 @@
 import { Tree, SyntaxNode } from '@lezer/common';
+import LRU from 'lru-cache';
 
+export type ParsedModuleCache = LRU<string, {tree: Tree, table: SymbolTable}>;
+
+export type ParsedModule = {
+  name: string,
+  code: string,
+  tree: Tree,
+  table: SymbolTable,
+};
 export type ComboRef = ModuleRef | FunctionRef | DeclarationRef;
 
 export type CompressedNode = [string, number, number];

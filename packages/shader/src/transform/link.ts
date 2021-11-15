@@ -1,18 +1,12 @@
 import { Tree } from '@lezer/common';
-import { SymbolTable } from '../types';
+import { SymbolTable, ParsedModule, ParsedModuleCache } from '../types';
 import { parseGLSL } from './shader';
-import { makeASTParser, rewriteUsingAST } from './ast';
+import { makeASTParser, rewriteUsingAST, compressAST, decompressAST, getProgramHash } from './ast';
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
+import LRU from 'lru-cache';
 
 const TIMED = false;
-
-type Module = {
-  name: string,
-  code: string,
-  tree: Tree,
-  table: SymbolTable,
-};
 
 const timed = (name: string, f: any) => {
   if (!TIMED) return f;
@@ -24,13 +18,18 @@ const timed = (name: string, f: any) => {
   }
 }
 
+export const makeModuleCache = (options: Record<string, any> = {}) => new LRU({
+  max: 100,
+  ...options,
+});
+
 export const linkModule = timed('linkModule', (
   code: string,
   libraries: Record<string, string> = {},
   links: Record<string, string> = {},
-  cache: Map<string, Module> | null = null,
+  cache: ParsedModuleCache | null = null,
 ) => {
-  const modules = loadModules(code, libraries, links);
+  const modules = loadModules(code, libraries, links, cache);
 
   const program = [`#version ${GLSL_VERSION}`] as string[];
   const namespaces = new Map<string, string>();
@@ -40,7 +39,6 @@ export const linkModule = timed('linkModule', (
   const visible = new Set<string>();
 
   const unlinked = [];
-
   for (const module of modules) {
     const {name, code, tree, table} = module;
     const {symbols, visibles, externals, modules} = table;
@@ -88,13 +86,15 @@ export const linkModule = timed('linkModule', (
     if (!target) throw new Error(`Unlinked function ${name}`);
   }
 
-  return program.join("\n");
+  const result = program.join("\n");
+  return result;
 })
 
 export const loadModules = timed('loadModules', (
   code: string,
   libraries: Record<string, string>,
   links: Record<string, string>,
+  cache: ParsedModuleCache | null = null,
 ) => {
   const seen = new Map<string, number>();
   const out = [];
@@ -105,13 +105,26 @@ export const loadModules = timed('loadModules', (
   while (queue.length) {
     const {name, code, depth} = queue.shift()!;
 
-    const tree = parseGLSL(code);
-    const table = makeASTParser(code, tree).extractSymbolTable();
+    let tree, table;
+    if (cache) {
+      const hash = getProgramHash(code);
+      const entry = cache.get(hash);
+      if (entry) ({tree, table} = entry);
+    }
+    if (!tree || !table) {
+      tree = parseGLSL(code);
+      table = makeASTParser(code, tree).extractSymbolTable();
+      if (cache) {
+        tree = decompressAST(compressAST(tree));
+        cache.set(table.hash, { tree, table });
+      }
+    }
+
     out.push({name, code, tree, table});
 
     const {modules, externals} = table;
     for (const {name} of modules) {
-      const code = libraries[name];
+      const code = name.match(/^#/) ? links[name.slice(1)] : libraries[name];
       if (!code) throw new Error(`Unknown module '${name}'`);
       
       if (!seen.has(name)) queue.push({name, code, depth: depth + 1});
@@ -134,7 +147,7 @@ export const loadModules = timed('loadModules', (
 })
 
 export const reserveNamespace = (
-  module: Module,
+  module: ParsedModule,
   namespaces: Map<string, string>,
   used: Set<string>,
 ) => {

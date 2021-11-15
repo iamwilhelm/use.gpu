@@ -5,12 +5,24 @@ import {
   ShaderModuleDescriptor, ShaderStageDescriptor,
 } from './types';
 
-export const makeLanguages = ({glsl}: {glsl: ShaderCompiler}, modules?: Record<string, string>): ShaderLanguages => ({
-  [ShaderLanguage.GLSL]: {
-    modules: modules ?? {},
-    compile: (code: string, stage: any) => glsl(code, stage),
-  },
-});
+type LangDef = {
+  [ShaderLanguage.GLSL]?: ShaderCompiler,
+  modules?: Record<string, string>,
+  cache?: any,
+};
+
+export const makeLanguages = (langs: LangDef[]): ShaderLanguages => {
+  const out = {} as any;
+  for (const {glsl, modules, cache} of langs) {
+    if (glsl) {
+      out[ShaderLanguage.GLSL]= {
+        compile: (code: string, stage: any) => (glsl as any)(code, stage, false),
+        modules, cache,
+      };
+    }
+  }
+  return out;
+};
 
 export const makeShaderModule = (code: TypedArray | string, entryPoint: string = 'main'): ShaderModuleDescriptor => ({code, entryPoint});
 

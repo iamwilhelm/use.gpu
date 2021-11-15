@@ -9,7 +9,9 @@
     "@lezer/common": "^0.15.8",
     "@lezer/generator": "^0.15.2",
     "@lezer/lr": "^0.15.4",
-    "@use-gpu/core": "*"
+    "@types/lru-cache": "^5.1.1",
+    "@use-gpu/core": "*",
+    "lru-cache": "^6.0.0"
   },
   "exports": {
     ".": "./src/index.ts",

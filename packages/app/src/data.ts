@@ -32,18 +32,18 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
 
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
-    const fieldBuffers = fs.map(([type, accessor]) => {
-      if (type !in UNIFORM_DIMS) throw new Error(`Unknown data type "${type}"`);
-      const t = type as any as UniformType;
+    const fieldBuffers = fs.map(([format, accessor]) => {
+      if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
+      const f = format as any as UniformType;
 
-      const {array, dims} = makeDataArray(t, l || 1);
+      const {array, dims} = makeDataArray(f, l || 1);
       if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
       const buffer = makeStorageBuffer(device, array.byteLength);
       const source = {
         buffer,
-        type,
-        length,
+        format,
+        length: l,
       };
       
       if (typeof accessor === 'string') {
@@ -62,7 +62,8 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
     useSomeMemo(() => {
       if (data) {
         for (const {buffer, array, dims, accessor} of fieldBuffers) {
-          copyDataArray(data, array, accessor);
+          copyDataArray(data, array, dims, accessor);
+          console.log({data, array})
           uploadBuffer(device, buffer, array.buffer);
         }
       }
@@ -73,7 +74,7 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
     useNoMemo();
     if (data) {
       for (const {buffer, array, dims, accessor} of fieldBuffers) {
-        copyDataArray(data, array, accessor);
+        copyDataArray(data, array, dims, accessor);
         uploadBuffer(device, buffer, array.buffer);
       }
     }

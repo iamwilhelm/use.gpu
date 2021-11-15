@@ -23,6 +23,11 @@ const unescape = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
 function nodeToString(this: SyntaxNode) { return `[${this.type.name}]`; }
 
+export const getProgramHash = (code: string) => {
+  const uint = siphash.hash_uint(HASH_KEY, code);
+  return uint.toString(36).slice(-10);
+}
+
 export const hasErrorNode = (tree: Tree) => {
   const cursor = tree.cursor();
   do {
@@ -285,8 +290,16 @@ export const makeASTParser = (code: string, tree: Tree) => {
       const verb = getText(b);
       if (verb !== 'import') continue;
 
-      const refs = getNodes(c).map(getImport);
-      const module = unescape(getText(d));
+      let module: string;
+      let refs: ImportRef[];
+      if (c.type.id === T.String) {
+        refs = [];
+        module = unescape(getText(c));
+      } 
+      else {
+        refs = getNodes(c).map(getImport);
+        module = unescape(getText(d));
+      }
 
       let items = modules[module];
       if (!items) items = modules[module] = [];
@@ -314,8 +327,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
   };
 
   const extractSymbolTable = (): SymbolTable => {
-    const uint = siphash.hash_uint(HASH_KEY, code);
-    const hash = uint.toString(36).slice(-10);
+    const hash = getProgramHash(code);
 
     const modules = extractImports();
     const functions = extractFunctions();
@@ -367,6 +379,16 @@ export const rewriteUsingAST = (code: string, tree: Tree, rename: Map<string, st
       skip(from, to, '');
       cursor.lastChild();
     }
+    else if (type.name === 'Field') {
+      const sub = cursor.node.cursor;
+      do {} while (sub.firstChild());
+
+      const name = code.slice(sub.from, sub.to);
+      const replace = rename.get(name);
+
+      if (replace) skip(sub.from, sub.to, replace);
+      cursor.lastChild();
+    }
     else if (type.name === 'Identifier') {
       const name = code.slice(from, to);
       const replace = rename.get(name);
@@ -401,6 +423,12 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
+      cursor.lastChild();
+    }
+    else if (type.name === 'Field') {
+      const sub = cursor.node.cursor;
+      do {} while (sub.firstChild());
+      ident(sub.from, sub.to);
       cursor.lastChild();
     }
     else if (type.id === T.Identifier) {

@@ -162,6 +162,8 @@ describe('ast', () => {
     void main() {
       float x = 3.0;
       float y = getValue(2);
+      vec3 v;
+      v.xyz;
     }
     `;
 
@@ -177,6 +179,6 @@ describe('ast', () => {
 
     const output1 = rewriteUsingAST(code, tree, rename);
     const output2 = rewriteUsingAST(code, decompressed, rename);
-    expect(output1).toEqual(output2);
+    expect(output2).toEqual(output1);
   });
 });

@@ -11,7 +11,7 @@ export type RawDataProps = {
   length?: number,
   data?: number[] | TypedArray,
   expr?: (emit: Emitter, i: number, n: number) => void,
-  type?: string,
+  format?: string,
   live: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
@@ -21,29 +21,29 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
   const {device} = useContext(RenderContext);
 
   const {
-    type, length,
+    format, length,
     data, expr,
     live,
     render,
   } = props;
 
-  const t = (type && (type in UNIFORM_DIMS)) ? type as UniformType : UniformType.float;
+  const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.float;
   const l = length ?? (data?.length || 0);
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
-    const {array, dims} = makeDataArray(t, l || 1);
+    const {array, dims} = makeDataArray(f, l || 1);
     if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
     const buffer = makeStorageBuffer(device, array.byteLength);
     const source = {
       buffer,
-      type: t,
+      format: f,
       length: l,
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
-  }, [device, t, l]);
+  }, [device, f, l]);
 
   if (!live) {
     useNoContext(FrameContext);

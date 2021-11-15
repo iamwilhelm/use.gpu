@@ -6,7 +6,11 @@
   "license": "MIT",
   "private": true,
   "typesVersions": {
-    "*": { "types": ["src/types"] }
+    "*": {
+      "types": [
+        "src/types"
+      ]
+    }
   },
   "exports": {
     ".": "./src/index.ts",
@@ -14,7 +18,8 @@
   },
   "dependencies": {
     "@webgpu/glslang": "^0.0.15",
-    "gl-matrix": "^3.3.0"
+    "gl-matrix": "^3.3.0",
+    "lodash": "^4.17.21"
   },
   "scripts": {
     "test": "jest --watch",
@@ -22,10 +27,12 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-
     "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/core/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
     "build:pkg": "cp package.json ../../build/packages/core"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.176"
   }
 }

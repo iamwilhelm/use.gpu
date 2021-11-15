@@ -182,4 +182,6 @@ export type ViewUniforms = {
 // Data
 
 export type Emitter = (...args: number[]) => void;
-
+export type Accessor = (o: any) => any;
+export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
+export type DataField = [string, string | Accessor];

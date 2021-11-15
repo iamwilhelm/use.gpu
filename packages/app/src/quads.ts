@@ -15,6 +15,7 @@ import {
 
 export type QuadsProps = {
   positions: StorageSource,
+  sizes: StorageSource,
 };
 
 export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => {
@@ -25,11 +26,15 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
   const {glsl: {compile, modules}} = languages;
 
   // Storage
-  const {positions} = props;
+  const {positions, sizes} = props;
   const links = useMemo(() => {
     if (positions.type !== 'vec4') throw new Error("Positions must be vec4");
-    return {getPosition: positions};
-  }, [device, positions]);
+    if (sizes.type !== 'float') throw new Error("Sizes must be float");
+    return {
+      getPosition: positions,
+      getSize: sizes,
+    };
+  }, [device, positions, sizes]);
 
   const [vertex, fragment] = useOne(() => {
     const accessors = makeStorageAccessors({
@@ -79,8 +84,7 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
       entries: storageEntries,
     });
 
-    return [uniformBuffer, uniformPipe, uniformBindGroup, storageBindGroup]
-      as [GPUBuffer, UniformDefinition, GPUBindGroup, GPUBindGroup];
+    return [uniformBuffer, uniformPipe, uniformBindGroup, storageBindGroup];
   }, [device, defs, pipeline, links]);
 
   // Return a lambda back to parent(s)

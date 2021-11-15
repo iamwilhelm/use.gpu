@@ -58,12 +58,12 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) =>
 	if (pinged) classes.push('pinged');
 	const className = classes.join(' ');
 
-	const elRef = useRef<HTMLDivElement>();
+	const elRef = useRef<HTMLDivElement | null>(null);
 	const {current: el} = elRef;
 	const lastPinged = el && el.classList.contains('pinged');
 
 	useEffect(() => {
-		if (lastPinged) {
+		if (lastPinged && el) {
 			el.classList.add('repinged');
 			el.offsetHeight;
 			el.classList.remove('repinged');

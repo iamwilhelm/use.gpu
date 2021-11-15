@@ -1,4 +1,4 @@
-import { TypedArray } from './types';
+import { TypedArray, UniformType, EmitterExpression, Emitter, Accessor } from './types';
 import { UNIFORM_SIZES, UNIFORM_ARRAY_TYPE, UNIFORM_DIMS } from './constants';
 
 type NumberArray = TypedArray | number[];
@@ -22,12 +22,17 @@ export const makeDataEmitter = (to: NumberArray, dims: number): Emitter => {
   }
 }
 
+export const copyDataArray = (from: any[], to: NumberArray, accessor: Accessor) => {
+  const n = Math.min(from.length, to.length);
+  for (let i = 0; i < n; ++i) to[i] = accessor(from[i]);
+}
+
 export const copyNumberArray = (from: NumberArray | number[], to: NumberArray) => {
   const n = Math.min(from.length, to.length);
   for (let i = 0; i < n; ++i) to[i] = from[i];
 }
 
-export const emitIntoNumberArray = (expr: Emitter, to: NumberArray, dims: number) => {
+export const emitIntoNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number) => {
   const emit = makeDataEmitter(to, dims);
   const n = to.length / dims;
   let i = 0;

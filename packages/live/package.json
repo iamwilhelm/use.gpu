@@ -21,7 +21,7 @@
 
     "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/live/src --extensions \".ts\" --source-maps inline",
+    "build:js": "babel src --out-dir ../../build/packages/live/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
     "build:pkg": "cp package.json ../../build/packages/live"
   },
   "jest": {

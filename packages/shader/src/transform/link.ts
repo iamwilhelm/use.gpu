@@ -5,6 +5,8 @@ import { makeASTParser, rewriteUsingAST } from './ast';
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
 
+const TIMED = false;
+
 type Module = {
   name: string,
   code: string,
@@ -13,6 +15,7 @@ type Module = {
 };
 
 const timed = (name: string, f: any) => {
+  if (!TIMED) return f;
   return (...args: any[]) => {
     const t = +new Date();
     const v = f(...args);

@@ -16,7 +16,7 @@
     "types:watch": "yarn run types -- --watch",
     "build": "yarn run build:glsl && yarn run build:js && yarn run build:pkg",
     "build:glsl": "node build.mjs",
-    "build:js": "babel src --out-dir ../../build/packages/glsl/src --extensions \".ts,.js\" --source-maps inline",
+    "build:js": "babel src --out-dir ../../build/packages/glsl/src --extensions \".ts,.js\"",
     "build:pkg": "cp package.json ../../build/packages/glsl"
   },
   "devDependencies": {

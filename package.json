@@ -38,7 +38,7 @@
     "last 1 firefox version"
   ],
   "scripts": {
-    "build": "yarn lerna run build --concurrency 1; node scripts/to-index-js.mjs",
+    "build": "yarn lerna run build; node scripts/to-index-js.mjs",
     "start": "NODE_ENV=development webpack serve",
     "test": "jest --watch",
     "lint": "eslint packages/**/src --ext ts",

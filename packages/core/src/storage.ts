@@ -20,7 +20,7 @@ export const makeStorageAccessors = (
   set: number = 0,
   binding: number = 0,
 ): Record<string, string> => {
-  const modules = {} as Record<string, string>[];
+  const modules = {} as Record<string, string>;
 
   for (const k in types) {
     const type = types[k];

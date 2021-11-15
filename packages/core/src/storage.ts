@@ -16,14 +16,14 @@ export const makeStorageBindings = (
 };
 
 export const makeStorageAccessors = (
-  links: Record<string, StorageSource>,
+  types: Record<string, string>,
   set: number = 0,
   binding: number = 0,
 ): Record<string, string> => {
   const modules = {} as Record<string, string>[];
 
-  for (const k in links) {
-    const {type} = links[k];
+  for (const k in types) {
+    const type = types[k];
     modules[k] = makeStorageAccessor(set, binding, type, k);
     binding++;
   }
@@ -36,6 +36,7 @@ layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${name}Type 
   ${type} data[];
 } ${name}Storage;
 
+#pragma export
 ${type} ${name}(int index) {
   return ${name}Storage.data[index];
 }

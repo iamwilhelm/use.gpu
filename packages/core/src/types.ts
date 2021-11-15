@@ -178,3 +178,8 @@ export type ViewUniforms = {
   viewPosition: { value: vec3 | [number, number, number] | number[] },
   viewResolution: { value: vec2 | [number, number] | number[] }
 };
+
+// Data
+
+export type Emitter = (...args: number[]) => void;
+

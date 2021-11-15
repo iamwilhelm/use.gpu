@@ -57,6 +57,7 @@ export const memoArgs = <F extends Function>(
       args.push(fiber.version);
 
       const value = useMemo(() => {
+        fiber.memo = 0;
         return bound(args);
       }, args);
       return value;
@@ -84,6 +85,7 @@ export const memoProps = <F extends Function>(
       }
 
       const value = useMemo(() => {
+        fiber.memo = 0;
         return bound(props);
       }, deps);
 
@@ -270,12 +272,14 @@ export const useSomeContext = <C>(
   const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context)!;
 
-  if (!state[i]) {
-    state[i] = true;
-    host.track(fiber, () => host.undepend(fiber, root));
-  }
+  if (host) {
+    if (!state[i]) {
+      state[i] = true;
+      host.track(fiber, () => host.undepend(fiber, root));
+    }
 
-  if (host) host.depend(fiber, root);
+    host.depend(fiber, root);
+  }
 
   return values.get(context).current ?? context.initialValue;
 }

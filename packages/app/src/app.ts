@@ -39,7 +39,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
       children: [
         use(RawData)({
           type: 'vec4',
-          size: 100,
+          length: 100,
           expr: (emit) => emit(Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1),
           render: (positions) => use(Quads)({ positions }),
           //live: true,
@@ -88,12 +88,12 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             })
         })
     }),
-    (inspect||true) ? use(UseInspect)({fiber, canvas}) : null,
+    inspect ? use(UseInspect)({fiber, canvas}) : null,
   ];
 };
 
 const useInspector = () => {
-  const [inspect, setInspect] = useState<boolean>(false);
+  const [inspect, setInspect] = useState<boolean>(true);
   useResource((dispose) => {
     const keydown = (e: KeyboardEvent) => {
       if (e.metaKey && e.key === 'i') setInspect((s) => !s);

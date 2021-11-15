@@ -1,14 +1,9 @@
 import { Tree } from '@lezer/common';
 import { SymbolTable } from '../types';
 import { parseGLSL } from './shader';
-import { makeASTParser, rewriteAST } from './ast';
+import { makeASTParser, rewriteUsingAST } from './ast';
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
-
-type Program = {
-  entry: null,
-  code: string[],
-};
 
 type Module = {
   name: string,
@@ -17,9 +12,16 @@ type Module = {
   table: SymbolTable,
 };
 
-export const makeProgram = () => ({});
+const timed = (name: string, f: any) => {
+  return (...args: any[]) => {
+    const t = +new Date();
+    const v = f(...args);
+    console.log(name, (+new Date() - t).toFixed(2), 'ms');
+    return v;
+  }
+}
 
-export const linkModule = (
+export const linkModule = timed('linkModule', (
   code: string,
   libraries: Record<string, string> = {},
   links: Record<string, string> = {},
@@ -44,11 +46,11 @@ export const linkModule = (
 
     const rename = new Map<string, string>();
     if (name !== 'main') {
-      for (const {name} of symbols) {
+      for (const name of symbols) {
         rename.set(name, namespace + name);
         exists.add(namespace + name);
       }
-      for (const {name} of visibles) {
+      for (const name of visibles) {
         visible.add(namespace + name);
       }
     }
@@ -63,7 +65,7 @@ export const linkModule = (
       }
     }
 
-    for (const {prototype} of externals) {
+    for (const {prototype} of externals) if (prototype) {
       const {name} = prototype;
       const namespace = namespaces.get(name);
       const imp = namespace + name;
@@ -73,7 +75,7 @@ export const linkModule = (
       rename.set(name, imp);
     }
 
-    program.push(rewriteAST(code, tree, rename));
+    program.push(rewriteUsingAST(code, tree, rename));
     unlinked.push(...externals);
   }
 
@@ -84,9 +86,9 @@ export const linkModule = (
   }
 
   return program.join("\n");
-}
+})
 
-export const loadModules = (
+export const loadModules = timed('loadModules', (
   code: string,
   libraries: Record<string, string>,
   links: Record<string, string>,
@@ -113,7 +115,7 @@ export const loadModules = (
       seen.set(name, depth + 1);
     }
 
-    for (const {prototype} of externals) {
+    for (const {prototype} of externals) if (prototype) {
       const {name} = prototype;
       const code = links[name];
       if (!code) throw new Error(`Unlinked function '${name}'`);
@@ -126,7 +128,7 @@ export const loadModules = (
   out.sort((a, b) => seen.get(b.name)! - seen.get(a.name)! || a.name.localeCompare(b.name));
 
   return out;
-}
+})
 
 export const reserveNamespace = (
   module: Module,

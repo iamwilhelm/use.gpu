@@ -11,7 +11,7 @@ import {
 } from '@use-gpu/core';
 
 //import vertexShader from './glsl/quads-vertex.glsl';
-import fragmentShader from './glsl/quads-fragment.glsl';
+//import fragmentShader from './glsl/quads-fragment.glsl';
 
 export type QuadsProps = {
   positions: StorageSource,
@@ -31,17 +31,18 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     return {getPosition: positions};
   }, [device, positions]);
 
-  const [vertex, fragment] = useMemo(() => {
-    const accessors = makeStorageAccessors(links, 1);
+  const [vertex, fragment] = useOne(() => {
+    const accessors = makeStorageAccessors({
+      getPosition: 'vec4',
+    }, 1);
     const vertexShader = modules['instance/quad/vertex'];
-    //const vertexShader = modules['instance/quad/vertex'];
-    console.log(linkModule(vertexShader, modules, accessors))
+    const fragmentShader = modules['instance/quad/fragment'];
 
     const vertex = makeShaderModule(compile(linkModule(vertexShader, modules, accessors), 'vertex'));
     const fragment = makeShaderModule(compile(linkModule(fragmentShader, modules, accessors), 'fragment'));
 
     return [vertex, fragment];
-  }, [links]);
+  });
 
   // Rendering pipeline
   const pipeline = useMemo(() =>

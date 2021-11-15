@@ -2,6 +2,8 @@ import { Tree, SyntaxNode } from '@lezer/common';
 
 export type ComboRef = ModuleRef | FunctionRef | DeclarationRef;
 
+export type CompressedNode = [string, number, number];
+
 export type SymbolTable = {
   hash: string,
   refs: ComboRef[],
@@ -13,17 +15,13 @@ export type SymbolTable = {
   externals: DeclarationRef[],
 };
 
+export type SymbolRef = string;
+
 export type SymbolsRef = {
   symbols: SymbolRef[],
 }
 
-export type SymbolRef = {
-  node: SyntaxNode,
-  name: string,
-}
-
 export type ImportRef = {
-  node: SyntaxNode,
   name: string,
   imported: string,
 }
@@ -34,57 +32,50 @@ export type ModuleRef = SymbolsRef & {
 }
 
 export type FunctionRef = SymbolsRef & {
-  node: SyntaxNode,
   prototype: PrototypeRef,
+  exported: boolean,
 }
 
 export type DeclarationRef = SymbolsRef & {
-  node: SyntaxNode,
   prototype?: PrototypeRef,
   variable?: VariableRef,
   struct?: QualifiedStructRef,
+  exported: boolean,
 }
 
 export type TypeRef = {
-  node: SyntaxNode,
   name: string,
   qualifiers?: string[],
   members?: MemberRef[],
 }
 
 export type PrototypeRef = {
-  node: SyntaxNode,
   type: TypeRef,
   name: string,
   parameters: string[],
 }
 
 export type VariableRef = {
-  node: SyntaxNode,
   type: TypeRef,
   locals: LocalRef[],
 }
 
 export type MemberRef = {
-  node: SyntaxNode,
   type: TypeRef,
   name: string,
 }
 
 export type LocalRef = {
-  node: SyntaxNode,
   name: string,
   expr: any,
 }
 
 export type QualifiedStructRef = {
-  node: SyntaxNode,
   type: TypeRef,
   name: string,
   struct: StructRef,
 }
 
 export type StructRef = {
-  node: SyntaxNode,
   members: MemberRef[],
 }

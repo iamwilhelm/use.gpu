@@ -1,5 +1,6 @@
-import { TypedArray, UniformType, EmitterExpression, Emitter, Accessor } from './types';
+import { TypedArray, UniformType, UniformAttribute, EmitterExpression, Emitter, Accessor } from './types';
 import { UNIFORM_SIZES, UNIFORM_ARRAY_TYPE, UNIFORM_DIMS } from './constants';
+import { checkStorageType } from './storage';
 
 type NumberArray = TypedArray | number[];
 
@@ -66,4 +67,21 @@ export const emitIntoNumberArray = (expr: EmitterExpression, to: NumberArray, di
   const n = to.length / dims;
   let i = 0;
   for (let i = 0; i < n; ++i) expr(emit, i, n);
+}
+
+export const extractPropBindings = (uniforms: UniformAttribute[], bindings: any[]) => {
+  const constants = {} as Record<string, any>;
+  const links = {} as Record<string, any>;
+  for (const u of uniforms) {
+    const v = bindings.shift();
+    const b = bindings.shift();
+    if (b != null) {
+      checkStorageType(u, b);
+      links[u.name] = b;
+    }
+    else if (v != null) {
+      constants[u.name] = v;
+    }
+  }
+  return {links, constants};
 }

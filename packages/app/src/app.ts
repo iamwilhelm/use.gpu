@@ -7,6 +7,7 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import {
   AutoCanvas,
   Loop, Draw, Pass,
+	Data, RawData,
   OrbitCamera, OrbitControls,
   Picking,
   RenderToTexture,
@@ -15,8 +16,6 @@ import {
 import { Cube } from './cube';
 import { Mesh } from './mesh';
 import { Quads } from './quads';
-import { RawData } from './raw-data';
-import { Data } from './data';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 

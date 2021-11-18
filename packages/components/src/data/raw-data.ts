@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/types';
-import { RenderContext, FrameContext } from '@use-gpu/components';
+import { RenderContext, FrameContext } from '../providers';
 import { yeet, useMemo, useSomeMemo, useNoMemo, useContext, useSomeContext, useNoContext } from '@use-gpu/live';
 import {
   makeDataEmitter, makeDataArray, copyNumberArray, emitIntoNumberArray, 

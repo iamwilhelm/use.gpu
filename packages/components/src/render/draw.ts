@@ -1,7 +1,7 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { gatherReduce, makeContext, useContext, useOne, useMemo, provide } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
-import { FrameContext } from './frame-context';
+import { FrameContext } from '../providers/frame-context';
 
 export type DrawProps = {
   children?: LiveElement<any>,

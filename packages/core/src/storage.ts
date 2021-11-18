@@ -36,10 +36,18 @@ export const checkStorageTypes = (
   uniforms: UniformAttribute[],
   links: Record<string, StorageSource | null | undefined>,
 ) => {
-  for (const {name, format} of uniforms) {
+  for (const u of uniforms) {
     const link = links[name];
-    if (link && link.format !== format) throw new Error(`Invalid format ${link.format} bound for ${format} "${name}"`);
+    checkStorageType(u, link)
   }
+} 
+
+export const checkStorageType = (
+  uniform: UniformAttribute[],
+  link: StorageSource | null | undefined,
+) => {
+  const {name, format} = uniform;
+  if (link && link.format !== format) throw new Error(`Invalid format ${link.format} bound for ${format} "${name}"`);
 } 
 
 export const makeStorageAccessors = (

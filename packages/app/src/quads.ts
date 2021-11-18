@@ -8,6 +8,7 @@ import {
   makeUniformBindings, makeUniformBlockAccessor,
   makeStorage, makeStorageAccessors, checkStorageTypes,
   makeRenderPipeline, makeShaderModule,
+  extractPropBindings,
 } from '@use-gpu/core';
 import partition from 'lodash/partition';
 
@@ -44,26 +45,23 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     size = 1,
   } = props;
 
-  const constantValues = useOne(() => ({
-    getPosition: position,
-    getSize: size,
-  }), props);
+  const dataBindings = useOne(() => extractPropBindings(DATA_BINDINGS, [
+    position,
+    positions,
+    size,
+    sizes,
+  ]), props);
+
   const instanceCount = (positions ?? sizes)?.length || 1;
 
-  // Storage
-  const links = useMemo(() => ({
-    getPosition: positions,
-    getSize: sizes,
-  }), [device, positions, sizes]);
-
-  const storageKeys = Object.keys(links);
+  const storageKeys = Object.keys(dataBindings.links);
   const memoKeys = useMemo(() => storageKeys, storageKeys);
 
   // Shaders and data bindings
   const [vertex, fragment, attributes, constants] = useMemo(() => {
 
-    checkStorageTypes(DATA_BINDINGS, links);
-    const [attributes, constants] = partition(DATA_BINDINGS, ({name}) => !!(links as any)[name]);
+    checkStorageTypes(DATA_BINDINGS, dataBindings.links);
+    const [attributes, constants] = partition(DATA_BINDINGS, ({name}) => !!(dataBindings.links as any)[name]);
 
     const storageAccessors = makeStorageAccessors(attributes, 1);
     const constantAccessors = makeUniformBlockAccessor(constants, 2);
@@ -106,11 +104,11 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     storage,
   ] = useMemo(() => {
     const uniform = makeUniforms(device, pipeline, defs, 0);
-    const storage = attributes.length ? makeStorage(device, pipeline, links, 1) : null;
+    const storage = attributes.length ? makeStorage(device, pipeline, dataBindings.links, 1) : null;
     const constant = constants.length ? makeUniforms(device, pipeline, constants, 2) : null;
 
     return [uniform, constant, storage];
-  }, [device, defs, constants, attributes, pipeline, links]);
+  }, [device, defs, constants, attributes, pipeline, dataBindings]);
 
   // Return a lambda back to parent(s)
   return yeet((passEncoder: GPURenderPassEncoder) => {
@@ -118,7 +116,7 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
     if (constant) {
-      constant.pipe.fill(constantValues);
+      constant.pipe.fill(dataBindings.constants);
       uploadBuffer(device, constant.buffer, constant.pipe.data);
     }
 

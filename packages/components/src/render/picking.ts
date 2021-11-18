@@ -3,9 +3,9 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import {
   PICKING_FORMAT,
   PICKING_COLOR,
-} from './constants';
+} from '../constants';
 
-import { RenderContext, RenderProvider } from './render-provider';
+import { RenderContext, RenderProvider } from '../providers/render-provider';
 import { memo, use, provide, useContext, useMemo, makeContext } from '@use-gpu/live';
 import {
   makeColorState,

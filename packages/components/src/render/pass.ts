@@ -1,6 +1,6 @@
 import { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live/types';
 import { use, yeet, memo, gatherReduce, useContext, useMemo } from '@use-gpu/live';
-import { RenderContext } from './render-provider';
+import { RenderContext } from '../providers/render-provider';
 
 export type PassProps = {
   device: GPUDevice,

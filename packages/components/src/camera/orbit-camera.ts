@@ -3,7 +3,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { useContext, useOne } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
-import { RenderContext } from './render-provider';
+import { RenderContext } from '../providers/render-provider';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,

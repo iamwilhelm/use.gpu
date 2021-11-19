@@ -42,7 +42,6 @@ export const makeBoundStorageShader = (
 
   const vertexLinked = link(vertexShader, modules, accessors, cache);
   const fragmentLinked = link(fragmentShader, modules, accessors, cache);
-  console.log(vertexLinked)
 
   const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
   const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));

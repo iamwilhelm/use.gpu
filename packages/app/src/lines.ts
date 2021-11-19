@@ -106,6 +106,6 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
     if (storage) passEncoder.setBindGroup(1, storage);
     if (constant) passEncoder.setBindGroup(2, constant.bindGroup);
 
-    passEncoder.draw(4, instanceCount, 0, 0);
+    passEncoder.draw(4 + 5*2, instanceCount, 0, 0);
   }); 
 }, 'Lines');

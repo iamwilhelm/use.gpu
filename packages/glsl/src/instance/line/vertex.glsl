@@ -1,5 +1,8 @@
 #pragma import {viewUniforms, worldToClip3D} from 'use/view'
-#pragma import {getQuadIndex} from 'geometry/quad'
+#pragma import {getStripIndex} from 'geometry/strip'
+
+#define JOIN_SIZE 3
+#define JOIN_STYLE joinRound
 
 float NaN = 0.0/0.0;
 
@@ -17,11 +20,55 @@ vec2 turn(vec2 xy) {
   return vec2(xy.y, -xy.x);
 }
 
+vec2 joinMiter(vec2 left, vec2 right, int segment, int joinIndex) {
+  vec2 mid;
+  float scale = 1.0;
+
+  if (joinIndex == 0) return left;
+  if (joinIndex == JOIN_SIZE) return right;
+
+  if (segment == 3) {
+    mid = normalize((left + right) / 2.0);
+    scale = 1.0 / dot(mid, left);
+  }
+  else if (segment == 2) {
+    mid = left;
+  }
+  else if (segment == 1) {
+    mid = right;
+  }
+  return mid * scale;
+}
+
+vec2 joinRound(vec2 left, vec2 right, int segment, int joinIndex) {
+  vec2 mid;
+
+  if (joinIndex == 0) return left;
+  if (joinIndex == JOIN_SIZE) return right;
+
+  if (segment == 3) {
+    float f = float(joinIndex) / float(JOIN_SIZE);
+    mid = normalize(mix(left, right, f));
+  }
+  else if (segment == 2) {
+    mid = left;
+  }
+  else if (segment == 1) {
+    mid = right;
+  }
+  return mid;
+}
+
+vec2 joinBevel(vec2 left, vec2 right, int segment, int joinIndex) {
+  if (joinIndex > 0) return right;
+  return left;
+}
+
 void main() {
   int vertexIndex = gl_VertexIndex;
   int instanceIndex = gl_InstanceIndex;
 
-  ivec2 ij = getQuadIndex(vertexIndex);
+  ivec2 ij = getStripIndex(vertexIndex);
 
   int segmentLeft = getSegment(instanceIndex);
   if (segmentLeft == 2) {
@@ -30,7 +77,17 @@ void main() {
   }
 
   vec2 uv = vec2(ij) * 2.0 - 1.0;
-  int cornerIndex = instanceIndex + ij.x;
+
+  int cornerIndex, joinIndex;
+  if (ij.x == 0) {
+    joinIndex = JOIN_SIZE;
+    cornerIndex = instanceIndex;
+  }
+  else {
+    joinIndex = ij.x - 1;
+    cornerIndex = instanceIndex + 1;
+  }
+
   int segment = getSegment(cornerIndex);
   float size = getSize(cornerIndex);
 
@@ -46,26 +103,11 @@ void main() {
   vec2 pos = posClip.xy * viewUniforms.viewSize;
   vec2 after = afterClip.xy * viewUniforms.viewSize;
 
-  vec2 left = pos - before;
-  vec2 right = after - pos;
-  vec2 nLeft = normalize(left);
-  vec2 nRight = normalize(right);
+  vec2 left = turn(normalize(pos - before));
+  vec2 right = turn(normalize(after - pos));
+  vec2 mid = JOIN_STYLE(left, right, segment, joinIndex);
 
-  vec2 nMid;
-  float scale = 1.0;
-  if (segment == 3) {
-    nMid = normalize((nLeft + nRight) / 2.0);
-    scale = 1.0 / dot(nMid, nLeft);
-  }
-  else if (segment == 2) {
-    nMid = nLeft;
-  }
-  else if (segment == 1) {
-    nMid = nRight;
-  }
-  nMid = turn(nMid) * scale;
-
-  vec2 xy = nMid * (float(ij.y) * 2.0 - 1.0);
+  vec2 xy = mid * (float(ij.y) * 2.0 - 1.0);
   pos.xy += xy * size;
 
   gl_Position = vec4(pos * viewUniforms.viewResolution, posClip.z, 1.0);

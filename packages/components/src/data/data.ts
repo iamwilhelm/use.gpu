@@ -3,7 +3,7 @@ import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@us
 import { RenderContext, FrameContext } from '@use-gpu/components';
 import { yeet, useMemo, useSomeMemo, useNoMemo, useContext, useSomeContext, useNoContext } from '@use-gpu/live';
 import {
-  makeDataEmitter, makeDataArray, copyDataArray, emitIntoNumberArray, 
+  makeDataArray, copyDataArray, copyNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
 
@@ -36,22 +36,28 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
       if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
-      const {array, dims} = makeDataArray(f, l || 1);
+      let length = l, raw;
+      if (typeof accessor === 'object' && 
+          accessor.length === +accessor.length) {
+        length = Math.floor(accessor.length / UNIFORM_DIMS[f]);
+        raw = accessor;
+      }
+      else if (typeof accessor === 'string') {
+        const k = accessor;
+        accessor = (o: any) => o[k];
+      }
+
+      const {array, dims} = makeDataArray(f, length);
       if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
       const buffer = makeStorageBuffer(device, array.byteLength);
       const source = {
         buffer,
         format,
-        length: l,
+        length,
       };
       
-      if (typeof accessor === 'string') {
-        const k = accessor;
-        accessor = (o: any) => o[k];
-      }
-      
-      return {buffer, array, source, dims, accessor};
+      return {buffer, array, source, dims, accessor, raw};
     });
     const fieldSources = fieldBuffers.map(f => f.source);
     return [fieldBuffers, fieldSources];
@@ -60,23 +66,20 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
   if (!live) {
     useNoContext(FrameContext);
     useSomeMemo(() => {
-      if (data) {
-        for (const {buffer, array, dims, accessor} of fieldBuffers) {
-          copyDataArray(data, array, dims, accessor);
-          console.log({data, array})
-          uploadBuffer(device, buffer, array.buffer);
-        }
+      for (const {buffer, array, dims, accessor, raw} of fieldBuffers) if (raw || data) {
+        if (raw) copyNumberArray(raw, array);
+        else copyDataArray(data, array, dims, accessor);
+        uploadBuffer(device, buffer, array.buffer);
       }
     }, [device, data, fieldBuffers]);
   }
   else {
     useSomeContext(FrameContext);
     useNoMemo();
-    if (data) {
-      for (const {buffer, array, dims, accessor} of fieldBuffers) {
-        copyDataArray(data, array, dims, accessor);
-        uploadBuffer(device, buffer, array.buffer);
-      }
+    for (const {buffer, array, dims, accessor, raw} of fieldBuffers) if (raw || data) {
+      if (raw) copyNumberArray(raw, array);
+      else copyDataArray(data, array, dims, accessor);
+      uploadBuffer(device, buffer, array.buffer);
     }
   }
 

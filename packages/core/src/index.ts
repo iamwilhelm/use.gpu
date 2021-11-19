@@ -1,4 +1,5 @@
 export * from './attribute';
+export * from './binding';
 export * from './buffer';
 export * from './bytes';
 export * from './color';

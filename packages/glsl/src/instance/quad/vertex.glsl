@@ -1,4 +1,3 @@
-#pragma import {MeshVertex} from 'use/types'
 #pragma import {viewUniforms, worldToClip} from 'use/view'
 #pragma import {getQuadUV} from 'geometry/quad'
 

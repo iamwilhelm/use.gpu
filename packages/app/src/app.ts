@@ -16,6 +16,7 @@ import {
 import { Cube } from './cube';
 import { Mesh } from './mesh';
 import { Quads } from './quads';
+import { Lines } from './lines';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 
@@ -32,11 +33,17 @@ const data = seq(100).map((i) => ({
   position: [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1],
   size: Math.random() * 50 + 10,
 }));
-
-const fields = [
+const quadFields = [
   ['vec4', 'position'],
   ['float', 'size'],
 ];
+
+const lineFields = [
+  ['vec4', [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1]],
+  ['int', [1, 3, 3, 2]],
+  ['float', [10, 10, 10, 10]],
+];
+
 
 export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const {canvas, device, adapter, languages} = props;
@@ -48,12 +55,18 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
     use(Pass)({
       children: [
         use(Data)({
-          data,
-          fields,
-          render: ([positions, sizes]: StorageSource[]) => use(Quads)({ positions, sizes }),
-          //live: true,
+          fields: lineFields,
+          render: ([positions, segments, sizes]: StorageSource[]) => [
+            use(Quads)({ positions, size: 10 }),
+            use(Lines)({ positions, segments, size: 50 }),
+          ]
         }),
         /*
+        use(Data)({
+          data,
+          fields: quadFields,
+          render: ([positions, sizes]: StorageSource[]) => use(Quads)({ positions, sizes }),
+        }),
         use(RawData)({
           type: 'vec4',
           length: 100,
@@ -63,7 +76,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         }),
         */
         //use(Mesh)({ mesh }),
-        use(Cube)(),
+        //use(Cube)(),
       ]
     }),
   ];

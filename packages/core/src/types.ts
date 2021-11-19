@@ -154,14 +154,11 @@ export type StorageSource = {
 };
 
 // Shaders
-export enum ShaderLanguage {
-  GLSL = 'glsl',
-};
-
 export type ShaderStage = 'vertex' | 'fragment';
 export type ShaderCompiler = (code: string, stage: ShaderStage) => TypedArray;
+export type ShaderLib = Record<string, string>;
 
-export type ShaderLanguages = {[k in ShaderLanguage]: ShaderLanguageAPI};
+export type ShaderLanguages = {[k: string]: ShaderLanguageAPI};
 export type ShaderLanguageAPI = {
   compile: ShaderCompiler,
   modules: Record<string, string>,
@@ -191,4 +188,10 @@ export type ViewUniforms = {
 export type Emitter = (...args: number[]) => void;
 export type Accessor = (o: any) => any;
 export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
-export type DataField = [string, string | Accessor];
+export type DataField = [string, string | Accessor | ArrayLike];
+export type ArrayLike = any[] | TypedArray;
+
+export type ResolvedDataBindings = {
+  constants: Record<string, any>,
+  links: Record<string, any>,
+};

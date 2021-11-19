@@ -4,6 +4,7 @@ layout(set = 0, binding = 0) uniform ViewUniforms {
   mat4 viewMatrix;
   vec4 viewPosition;
   vec2 viewResolution;
+  vec2 viewSize;
 } viewUniforms;
 
 #pragma export
@@ -19,4 +20,10 @@ vec4 viewToClip(vec4 position) {
 #pragma export
 vec4 worldToClip(vec4 position) {
   return viewToClip(worldToView(position));
+}
+
+#pragma export
+vec3 worldToClip3D(vec4 position) {
+  position = viewToClip(worldToView(position));
+  return position.xyz / position.w;
 }

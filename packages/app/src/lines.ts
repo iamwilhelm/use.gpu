@@ -10,9 +10,11 @@ import { useBoundStorageShader } from '@use-gpu/components';
 
 export type QuadsProps = {
   position?: number[] | TypedArray,
+  segments?: number[] | TypedArray,
   size?: number,
 
   positions?: StorageSource,
+  segments?: StorageSource,
   sizes?: StorageSource,
 };
 
@@ -20,10 +22,11 @@ const ZERO = [0, 0, 0, 1];
 
 const DATA_BINDINGS = [
   { name: 'getPosition', format: 'vec4' },
+  { name: 'getSegment', format: 'int' },
   { name: 'getSize', format: 'float' },
 ] as UniformAttribute[];
 
-export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => {
+export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props) => {
 
   const {uniforms, defs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
@@ -31,18 +34,21 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
 
   // Render shader
   const {glsl: {modules}} = languages;
-  const vertexShader = modules['instance/quad/vertex'];
-  const fragmentShader = modules['instance/quad/fragment'];
+  const vertexShader = modules['instance/line/vertex'];
+  const fragmentShader = modules['instance/line/fragment'];
 
   // Data bindings
   const dataBindings = useOne(() => extractPropBindings(DATA_BINDINGS, [
     props.position ?? ZERO,
     props.positions,
+    props.segment ?? 0,
+    props.segments,
     props.size ?? 1,
     props.sizes,
   ]), props);
 
-  const instanceCount = (props.positions ?? props.sizes)?.length || 1;
+  let instanceCount = props.positions?.length || 2;
+  instanceCount--;
 
   // Shaders and data bindings
   const [vertex, fragment, attributes, constants] = useBoundStorageShader(
@@ -102,4 +108,4 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
 
     passEncoder.draw(4, instanceCount, 0, 0);
   }); 
-}, 'Quads');
+}, 'Lines');

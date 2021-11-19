@@ -1,9 +1,6 @@
 #pragma import {viewUniforms, worldToClip3D} from 'use/view'
 #pragma import {getStripIndex} from 'geometry/strip'
 
-#define JOIN_SIZE 3
-#define JOIN_STYLE joinRound
-
 float NaN = 0.0/0.0;
 
 vec4 getPosition(int);
@@ -20,46 +17,46 @@ vec2 turn(vec2 xy) {
   return vec2(xy.y, -xy.x);
 }
 
-vec2 joinMiter(vec2 left, vec2 right, int segment, int joinIndex) {
+vec2 slerp(float d, vec2 a, vec2 b, float t) {
+  float th = acos(d);
+  return normalize(a * sin((1.0 - t) * th) + b * sin(t * th));
+}
+
+vec2 miter(vec2 left, vec2 right, int segment, int joinIndex) {
   vec2 mid;
   float scale = 1.0;
 
   if (joinIndex == 0) return left;
   if (joinIndex == JOIN_SIZE) return right;
 
-  if (segment == 3) {
-    mid = normalize((left + right) / 2.0);
-    scale = 1.0 / dot(mid, left);
-  }
-  else if (segment == 2) {
-    mid = left;
-  }
-  else if (segment == 1) {
-    mid = right;
-  }
+  mid = normalize((left + right) / 2.0);
+  scale = min(2.0, 1.0 / dot(mid, left));
+
   return mid * scale;
 }
 
-vec2 joinRound(vec2 left, vec2 right, int segment, int joinIndex) {
+vec2 round(vec2 left, vec2 right, int segment, int joinIndex) {
   vec2 mid;
 
   if (joinIndex == 0) return left;
   if (joinIndex == JOIN_SIZE) return right;
 
-  if (segment == 3) {
-    float f = float(joinIndex) / float(JOIN_SIZE);
-    mid = normalize(mix(left, right, f));
+  float t = float(joinIndex) / float(JOIN_SIZE);
+  float d = dot(left, right);
+  if (d > 0.999) return left;
+  return slerp(d, left, right, t);
+  /*
+  if (d < -0.999) {
+    mid = normalize(turn(left) + turn(-right));
+    if (t < 0.5) return slerp(0.0, left, mid, t*2.0);
+    else return slerp(0.0, mid, right, t*2.0 - 1.0);
   }
-  else if (segment == 2) {
-    mid = left;
-  }
-  else if (segment == 1) {
-    mid = right;
-  }
-  return mid;
+  */
+
+  //return normalize(mix(left, right, t));
 }
 
-vec2 joinBevel(vec2 left, vec2 right, int segment, int joinIndex) {
+vec2 bevel(vec2 left, vec2 right, int segment, int joinIndex) {
   if (joinIndex > 0) return right;
   return left;
 }
@@ -105,7 +102,23 @@ void main() {
 
   vec2 left = turn(normalize(pos - before));
   vec2 right = turn(normalize(after - pos));
-  vec2 mid = JOIN_STYLE(left, right, segment, joinIndex);
+
+  vec2 mid;
+  if (segment == 2) {
+    mid = left;
+  }
+  else if (segment == 1) {
+    mid = right;
+  }
+  else {
+    float c = cross(vec3(left, 0.0), vec3(right, 0.0)).z;
+    if (c * uv.y < 0) {
+      mid = miter(left, right, segment, joinIndex);
+    }
+    else {
+      mid = JOIN_STYLE(left, right, segment, joinIndex);    
+    }
+  }
 
   vec2 xy = mid * (float(ij.y) * 2.0 - 1.0);
   pos.xy += xy * size;

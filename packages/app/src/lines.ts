@@ -4,6 +4,7 @@ import { ViewContext, RenderContext } from '@use-gpu/components';
 import { yeet, memoProps, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeUniforms, makeStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
+import { defineGLSL } from '@use-gpu/shader';
 
 //import vertexShader from './glsl/quads-vertex.glsl';
 //import fragmentShader from './glsl/quads-fragment.glsl';
@@ -16,6 +17,8 @@ export type QuadsProps = {
   positions?: StorageSource,
   segments?: StorageSource,
   sizes?: StorageSource,
+
+  join: 'miter' | 'round' | 'bevel',
 };
 
 const ZERO = [0, 0, 0, 1];
@@ -26,15 +29,26 @@ const DATA_BINDINGS = [
   { name: 'getSize', format: 'float' },
 ] as UniformAttribute[];
 
+const JOIN_SIZE = {
+  'bevel': 1,
+  'miter': 2,
+  'round': 4,
+};
+
 export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props) => {
 
   const {uniforms, defs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;
 
+  let {join} = props;
+  join = join in JOIN_SIZE ? join : 'bevel';
+  const segments = JOIN_SIZE[join];
+  const defines = { JOIN_STYLE: join, JOIN_SIZE: segments };
+
   // Render shader
   const {glsl: {modules}} = languages;
-  const vertexShader = modules['instance/line/vertex'];
+  const vertexShader = defineGLSL(modules['instance/line/vertex'], defines);
   const fragmentShader = modules['instance/line/fragment'];
 
   // Data bindings
@@ -106,6 +120,6 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
     if (storage) passEncoder.setBindGroup(1, storage);
     if (constant) passEncoder.setBindGroup(2, constant.bindGroup);
 
-    passEncoder.draw(4 + 5*2, instanceCount, 0, 0);
+    passEncoder.draw(4 + segments*2, instanceCount, 0, 0);
   }); 
 }, 'Lines');

@@ -58,7 +58,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
             use(Quads)({ positions, size: 10 }),
-            use(Lines)({ positions, segments, size: 50 }),
+            use(Lines)({ positions, segments, size: 50, join: 'miter' }),
           ]
         }),
         /*

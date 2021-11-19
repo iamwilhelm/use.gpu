@@ -53,7 +53,7 @@ export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
         samples,
       )
     : null,
-    [samples]
+    [device, width, height, presentationFormat, samples]
   );
 
   const colorStates      = useOne(() => [makeColorState(presentationFormat)], presentationFormat);

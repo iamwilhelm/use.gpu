@@ -50,7 +50,10 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     fragmentShader,
     DATA_BINDINGS,
     dataBindings,
+    {},
+    {},
     languages,
+    null,
     1,
   );
   

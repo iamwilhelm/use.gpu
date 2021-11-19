@@ -8,6 +8,11 @@ export const parseGLSL = (code: string): Tree => {
   return parsed;
 }
 
+export const defineGLSL = (defs: Record<string, string>): string => {
+  const out = [];
+  for (let k in defs) out.push(`#define ${k} ${defs[k]}`);
+  return out.join("\n");
+}
 
 type LangDef = {
   glsl?: ShaderCompiler,
@@ -28,10 +33,3 @@ export const makeShaderLanguages = (langs: LangDef[]): ShaderLanguages => {
   }
   return out;
 };
-
-export const defineGLSL = (code: string, defs: Record<string, string>): string => {
-  const out = [];
-  for (let k in defs) out.push(`#define ${k} ${defs[k]}`);
-  out.push(code);
-  return out.join("\n");
-}

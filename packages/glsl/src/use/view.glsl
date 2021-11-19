@@ -23,6 +23,16 @@ vec4 worldToClip(vec4 position) {
 }
 
 #pragma export
+vec3 clipToScreen3D(vec4 position) {
+  return vec3(position.xy * viewUniforms.viewSize, position.z);
+}
+
+#pragma export
+vec3 screenToClip3D(vec4 position) {
+  return vec3(position.xy * viewUniforms.viewResolution, position.z);
+}
+
+#pragma export
 vec3 worldToClip3D(vec4 position) {
   position = viewToClip(worldToView(position));
   return position.xyz / position.w;

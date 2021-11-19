@@ -1,7 +1,7 @@
 @top Program { unit }
-@skip { space | Comment }
+@skip { space | comment }
 @external tokens untilEOL from "./tokens" { UntilEOL }
-@external tokens untilCommentClose from "./tokens" { UntilCommentClose }
+@external tokens untilCommentClose from "./tokens" { untilCommentClose }
 @precedence {
   else @right,
   if @right,
@@ -35,7 +35,7 @@ r<term> { @specialize[@name={term}]<Identifier, term> }
 unit { externalDeclaration }
 externalDeclaration { FunctionDefinition | Declaration | Preprocessor }
 
-Comment { CommentLine | CommentOpen UntilCommentClose }
+comment { commentLine | commentOpen untilCommentClose }
 Preprocessor {
 	hash (
 	  d<'pragma'> (
@@ -243,8 +243,8 @@ PrecisionQualifier { ( k<'highp'> | k<'medp'> | k<'lowp'> ) }
 @tokens {
   space { std.whitespace+ }
 
-  CommentLine { "//" ![\n]* }
-  CommentOpen { "/*" }
+  commentLine { "//" ![\n]* }
+  commentOpen { "/*" }
   
   Identifier { $[A-Za-z_] $[A-Za-z0-9_]* }
 	String { '"' ( !["]+ | '\\"' )* '"' | "'" ( ![']+ | "\\'" )* "'" }
@@ -308,7 +308,7 @@ PrecisionQualifier { ( k<'highp'> | k<'medp'> | k<'lowp'> ) }
   EmptyBrackets { "[]"}
 
   @precedence {
-    CommentLine, Div, AndAnd, And, OrOr, Or, XorXor, Xor,
+    commentLine, Div, AndAnd, And, OrOr, Or, XorXor, Xor,
     Identifier,
     EmptyBrackets, LeftBracket
   }

@@ -44,6 +44,8 @@ const lineFields = [
   ['float', [10, 10, 10, 10]],
 ];
 
+let lj = 0;
+const getLineJoin = () => ['bevel', 'miter', 'round'][lj = (lj + 1) % 3];
 
 export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const {canvas, device, adapter, languages} = props;
@@ -58,15 +60,16 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
             use(Quads)({ positions, size: 10 }),
-            use(Lines)({ positions, segments, size: 50, join: 'miter' }),
+            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
+            use(Lines)({ positions, segments, size: 50, join: getLineJoin(), debug: true }),
           ]
         }),
-        /*
         use(Data)({
           data,
           fields: quadFields,
           render: ([positions, sizes]: StorageSource[]) => use(Quads)({ positions, sizes }),
         }),
+        /*
         use(RawData)({
           type: 'vec4',
           length: 100,

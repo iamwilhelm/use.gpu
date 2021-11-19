@@ -1,6 +1,6 @@
 import { Tree } from '@lezer/common';
 import { SymbolTable, ParsedModule, ParsedModuleCache } from '../types';
-import { parseGLSL } from './shader';
+import { parseGLSL, defineGLSL } from './shader';
 import { makeASTParser, rewriteUsingAST, compressAST, decompressAST, getProgramHash } from './ast';
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
@@ -23,17 +23,30 @@ export const makeModuleCache = (options: Record<string, any> = {}) => new LRU({
   ...options,
 });
 
+export const parseLinkAliases = (links: Record<string, string>) => {
+  const out = {} as Record<string, string>;
+  const aliases = new Map<string, string>();
+  for (let k in links) {
+    const [name, imported] = k.split(':');
+    out[name] = links[k];
+    aliases.set(name, imported);
+  }
+  return [out, aliases];
+}
+
 export const linkModule = timed('linkModule', (
   code: string,
   libraries: Record<string, string> = {},
-  links: Record<string, string> = {},
+  linkDefs: Record<string, string> = {},
+  defines: Record<string, string> = {},
   cache: ParsedModuleCache | null = null,
 ) => {
+  const [links, aliases] = parseLinkAliases(linkDefs)
   const modules = loadModules(code, libraries, links, cache);
 
-  const program = [`#version ${GLSL_VERSION}`] as string[];
-  const namespaces = new Map<string, string>();
+  const program = [`#version ${GLSL_VERSION}`, defineGLSL(defines)] as string[];
 
+  const namespaces = new Map<string, string>();
   const used = new Set<string>();
   const exists = new Set<string>();
   const visible = new Set<string>();
@@ -68,11 +81,12 @@ export const linkModule = timed('linkModule', (
 
     for (const {prototype} of externals) if (prototype) {
       const {name} = prototype;
+      const resolved = aliases.get(name) ?? name;
       const namespace = namespaces.get(name);
-      const imp = namespace + name;
+      const imp = namespace + resolved;
 
-      if (!exists.has(imp)) console.warn(`Link ${name} does not exist`);
-      else if (!visible.has(imp)) console.warn(`Link ${name} is private`);
+      if (!exists.has(imp)) console.warn(`Link ${name}:${resolved} does not exist`);
+      else if (!visible.has(imp)) console.warn(`Link ${name}:${resolved} is private`);
       rename.set(name, imp);
     }
 
@@ -121,8 +135,8 @@ export const loadModules = timed('loadModules', (
     }
 
     out.push({name, code, tree, table});
-
     const {modules, externals} = table;
+
     for (const {name} of modules) {
       const code = name.match(/^#/) ? links[name.slice(1)] : libraries[name];
       if (!code) throw new Error(`Unknown module '${name}'`);

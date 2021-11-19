@@ -28,6 +28,8 @@ export const makeBoundStorageShader = (
   fragmentShader: string,
   uniforms: UniformAttribute[],
   dataBindings: ResolvedDataBindings,
+  codeBindings: ShaderLib,
+  defines: Record<string, string>,
   compile: (code: string, stage: string) => any,
   link: (code: string, modules: ShaderLib, accessors: ShaderLib, cache: any) => any,
   modules: ShaderLib,
@@ -38,10 +40,10 @@ export const makeBoundStorageShader = (
 
   const storageAccessors = makeStorageAccessors(attributes, base);
   const constantAccessors = makeUniformBlockAccessor(constants, base + 1);
-  const accessors = {...storageAccessors, ...constantAccessors};
+  const links = {...codeBindings, ...storageAccessors, ...constantAccessors};
 
-  const vertexLinked = link(vertexShader, modules, accessors, cache);
-  const fragmentLinked = link(fragmentShader, modules, accessors, cache);
+  const vertexLinked = link(vertexShader, modules, links, defines, cache);
+  const fragmentLinked = link(fragmentShader, modules, links, defines, cache);
 
   const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
   const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));

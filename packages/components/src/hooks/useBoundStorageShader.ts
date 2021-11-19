@@ -1,4 +1,4 @@
-import { ShaderLanguages } from '@use-gpu/core/types';
+import { ShaderLanguages, ShaderLib } from '@use-gpu/core/types';
 import { UniformDefinition, UniformAttribute } from './types';
 import { makeBoundStorageShader } from '@use-gpu/core';
 import { linkModule as link } from '@use-gpu/shader';
@@ -12,7 +12,10 @@ export const useBoundStorageShader = (
   fragmentShader: string,
   uniforms: UniformDefinition[],
   dataBindings: ResolvedDataBindings,
+  codeBindings: ShaderLib,
+  defines: Record<string, string>,
   languages: ShaderLanguages,
+  deps: any[] | null = null,
   base: number = 0,
 ) => {
   const {glsl: {compile, modules, cache}} = languages;
@@ -20,7 +23,7 @@ export const useBoundStorageShader = (
 
   // Shader only needs to change if arrangement of links vs constants changes.
   const storageKeys = Object.keys(links);
-  const memoKeys = useMemo(() => storageKeys, storageKeys);
+  const memoKey = useMemo(() => Math.random(), deps ? [...storageKeys, ...deps] : storageKeys);
 
   return useOne(() => {
     return makeBoundStorageShader(
@@ -28,11 +31,13 @@ export const useBoundStorageShader = (
       fragmentShader,
       uniforms,
       dataBindings,
+      codeBindings,
+      defines,
       compile,
       link,
       modules,
       cache,
       base,
     );
-  }, memoKeys);
+  }, memoKey);
 };

@@ -18,7 +18,10 @@ export type QuadsProps = {
   segments?: StorageSource,
   sizes?: StorageSource,
 
+  depth?: number,
   join: 'miter' | 'round' | 'bevel',
+
+  debug?: boolean,
 };
 
 const ZERO = [0, 0, 0, 1];
@@ -29,10 +32,16 @@ const DATA_BINDINGS = [
   { name: 'getSize', format: 'float' },
 ] as UniformAttribute[];
 
-const JOIN_SIZE = {
+const LINE_JOIN_SIZE = {
   'bevel': 1,
   'miter': 2,
   'round': 4,
+};
+
+const LINE_JOIN_STYLE = {
+  'bevel': 0,
+  'miter': 1,
+  'round': 2,
 };
 
 export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props) => {
@@ -41,15 +50,27 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
   const renderContext = useContext(RenderContext);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;
 
-  let {join} = props;
-  join = join in JOIN_SIZE ? join : 'bevel';
-  const segments = JOIN_SIZE[join];
-  const defines = { JOIN_STYLE: join, JOIN_SIZE: segments };
+  // Customize shader
+  let {join, debug, depth = 0} = props;
+  join = join in LINE_JOIN_SIZE ? join : 'bevel';
+  const style = LINE_JOIN_STYLE[join];
+  const segments = LINE_JOIN_SIZE[join];
+
+  const vertices = 4 + segments*2;
+  const tris = (1+segments) * 2;
+  const edges = tris*2 + 1;
+
+  const defines = {
+    LINE_JOIN_STYLE: style,
+    LINE_JOIN_SIZE: segments,
+    WIREFRAME_STRIP_SEGMENTS: edges,
+  };
 
   // Render shader
   const {glsl: {modules}} = languages;
-  const vertexShader = defineGLSL(modules['instance/line/vertex'], defines);
+  const vertexShader = !debug ? modules['instance/virtual'] : modules['instance/wireframe-strip'];
   const fragmentShader = modules['instance/line/fragment'];
+  const codeBindings = { 'getVertex:getLineVertex': modules['instance/line/line'] };
 
   // Data bindings
   const dataBindings = useOne(() => extractPropBindings(DATA_BINDINGS, [
@@ -70,7 +91,10 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
     fragmentShader,
     DATA_BINDINGS,
     dataBindings,
+    codeBindings,
+    defines,
     languages,
+    [join],
     1,
   );
   
@@ -120,6 +144,11 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
     if (storage) passEncoder.setBindGroup(1, storage);
     if (constant) passEncoder.setBindGroup(2, constant.bindGroup);
 
-    passEncoder.draw(4 + segments*2, instanceCount, 0, 0);
+    if (!debug) {
+      passEncoder.draw(vertices, instanceCount, 0, 0);
+    }
+    else {
+      passEncoder.draw(4, edges * instanceCount, 0, 0);
+    }
   }); 
 }, 'Lines');

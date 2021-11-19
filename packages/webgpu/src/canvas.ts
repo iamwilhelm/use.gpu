@@ -16,7 +16,9 @@ export const mountGPUDevice = async (): Promise<GPUDeviceMount> => {
   });
   if (!adapter) throw new Error("Cannot get WebGPU adapter");
 
-  const device = await adapter.requestDevice();
+  const device = await adapter.requestDevice({
+    //requiredFeatures: ['depth32float-stencil8'],
+  });
   if (!device) throw new Error("Cannot get WebGPU device");
 
   return {adapter, device};

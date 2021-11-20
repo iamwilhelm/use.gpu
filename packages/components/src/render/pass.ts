@@ -12,7 +12,8 @@ export type PassProps = {
   render: () => LiveElement<any>,
 };
 
-export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
+export type RenderToPass = (passEncoder: GPURenderPassEncoder, mpde?: RenderPassMode) => void;
+export type Renderable = RenderToPass | {mode: RenderPassMode, pass: RenderToPass};
 
 const makeStaticDone = (c: any): any => {
   c.isStaticComponent = true;
@@ -23,15 +24,19 @@ const makeStaticDone = (c: any): any => {
 export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
   const {children, render} = props;
 
-  const Done = useMemo(() => makeStaticDone((fiber: LiveFiber<any>) => (rs: RenderToPass[]) => {
+  const Done = useMemo(() => makeStaticDone((fiber: LiveFiber<any>) => (rs: Renderable[]) => {
     const renderContext = useContext(RenderContext);
     const pickingContext = useContext(PickingContext);
 
     const {device} = renderContext;
 
+    const renders = rs.filter((r: Renderable) => r.mode ? r.mode === RenderPassMode.Render : true);
+    const pickings = rs.filter((r: Renderable) => r.mode ? r.mode === RenderPassMode.Picking : r.pass.length > 1);
+
     const renderToContext = (
       commandEncoder: GPUCommandEncoder,
       context: UseRenderingContextGPU,
+      rs: Renderable[],
       mode: RenderPassMode,
     ) => {
       const {colorAttachments, depthStencilAttachment} = context;
@@ -42,8 +47,8 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
 
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
       for (let r of rs) {
-        if (r.length === 1 && mode !== RenderPassMode.Render) continue;
-        r(passEncoder, mode);
+        const f = r.mode ? r.pass : r;
+        f(passEncoder, mode);
       }
       passEncoder.endPass();
     };
@@ -51,8 +56,8 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
     return yeet(() => {
       const commandEncoder = device.createCommandEncoder();
 
-      renderToContext(commandEncoder, renderContext, RenderPassMode.Render);
-      if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, RenderPassMode.Picking);
+      renderToContext(commandEncoder, renderContext, renders, RenderPassMode.Render);
+      if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, pickings, RenderPassMode.Picking);
 
       device.queue.submit([commandEncoder.finish()]);      
     });

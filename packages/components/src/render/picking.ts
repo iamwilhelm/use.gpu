@@ -70,7 +70,10 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const colorAttachments = [makeColorAttachment(pickingTexture, null, pickingColor)];
     const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
 
+    let waiting = false;
     const captureTexture = async () => {
+      if (waiting) return;
+
       const commandEncoder = device.createCommandEncoder();
       commandEncoder.copyTextureToBuffer(
         {texture: pickingTexture},
@@ -79,14 +82,15 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
       );
       device.queue.submit([commandEncoder.finish()]);
 
+      waiting = true;
       await pickingBuffer.mapAsync(GPUMapMode.READ);
-
       const ArrayType = TEXTURE_ARRAY_TYPES[pickingFormat];
       if (ArrayType) {
         const array = new ArrayType(pickingBuffer.getMappedRange());
         console.log(array.length, array[0], array[1], array[2], array[3], array[4], array[5], array[6], array[7]);
-        pickingBuffer.unmap();
       }
+      pickingBuffer.unmap();
+      waiting = false;
     }
 
     const context = {

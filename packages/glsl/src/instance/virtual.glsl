@@ -17,7 +17,7 @@ void main() {
 
   gl_Position = v.position;
 #ifdef IS_PICKING
-  fragIndex = instanceIndex;
+  fragIndex = uint(instanceIndex);
 #else
   fragColor = v.color;
   fragUV = v.uv;

@@ -103,9 +103,7 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
   }, [device, defs, constants, attributes, pipeline, dataBindings]);
 
   // Return a lambda back to parent(s)
-  return yeet((passEncoder: GPURenderPassEncoder, renderMode: RenderPassMode) => {
-    if (renderMode !== mode) return;
-
+  return yeet({mode, pass: (passEncoder: GPURenderPassEncoder) => {
     uniform.pipe.fill(uniforms);
     uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
@@ -118,5 +116,5 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
 
     if (!debug) passEncoder.draw(4, instanceCount, 0, 0);
     else passEncoder.draw(4, 5 * instanceCount, 0, 0);
-  }); 
+  }}); 
 }, 'Quads');

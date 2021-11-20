@@ -3,14 +3,18 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import {
   PICKING_FORMAT,
   PICKING_COLOR,
+  DEPTH_STENCIL_FORMAT,
 } from '../constants';
 
 import { RenderContext, RenderProvider } from '../providers/render-provider';
-import { memo, use, provide, useContext, useMemo, makeContext } from '@use-gpu/live';
+import { memo, use, provide, useContext, useMemo, useOne, makeContext } from '@use-gpu/live';
 import {
   makeColorState,
   makeColorAttachment,
   makeRenderTexture,
+  makeDepthTexture,
+  makeDepthStencilState,
+  makeDepthStencilAttachment,
 } from '@use-gpu/core';
 
 type PickingContextType = {
@@ -23,6 +27,7 @@ export const PickingContext = makeContext(null, 'PickingContext');
 export type PickingProps = {
   pickingFormat?: GPUTextureFormat, 
   pickingColor?: GPUColor,
+  depthStencilFormat?: GPUTextureFormat,
   resolution: number,
 
   children?: LiveElement<any>,
@@ -34,6 +39,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
   const {
     pickingFormat = PICKING_FORMAT,
     pickingColor = PICKING_COLOR,
+    depthStencilFormat = DEPTH_STENCIL_FORMAT,
     resolution = 1,
 
     children,
@@ -41,9 +47,12 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
 
   const {colorStates: renderColorStates} = renderContext;
   const colorStates = useMemo(() => [
-    ...renderContext.colorStates,
     makeColorState(pickingFormat),
-  ], [pickingFormat, renderColorStates]);
+  ], [pickingFormat]);
+  const depthStencilState = useOne(() =>
+    makeDepthStencilState(depthStencilFormat),
+    depthStencilFormat
+  );
 
   const pickingContext = useMemo(() => {
     const {device, width: w, height: h} = renderContext;
@@ -52,11 +61,10 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const samples = 1;
 
     const pickingTexture = makeRenderTexture(device, width, height, pickingFormat, samples);
+    const depthTexture = makeDepthTexture(device, width, height, depthStencilFormat, samples);
 
-    const colorAttachments = [
-      ...renderContext.colorAttachments,
-      makeColorAttachment(pickingTexture, null, pickingColor),
-    ];
+    const colorAttachments = [makeColorAttachment(pickingTexture, null, pickingColor)];
+    const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
 
     const context = {
       renderContext: {
@@ -66,14 +74,16 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
         samples,
         colorStates,
         colorAttachments,
+        depthStencilAttachment,
       } as CanvasRenderingContextGPU,
       pickingTexture,
     };
     
     return context;
-  }, [renderContext, pickingFormat, pickingColor, resolution]);
+  }, [renderContext, colorStates, depthStencilState, resolution]);
 
-  return use(PickingProvider)({ pickingContext, children });
+  return provide(PickingContext, pickingContext, children);
+  //return use(PickingProvider)({ pickingContext, children });
 }
 
 export type PickingProviderProps = {

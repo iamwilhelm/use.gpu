@@ -34,7 +34,7 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
       context: UseRenderingContextGPU,
       mode: RenderPassMode,
     ) => {
-      const {colorAttachments, depthStencilAttachment} = renderContext;
+      const {colorAttachments, depthStencilAttachment} = context;
       const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments,
         depthStencilAttachment,
@@ -49,7 +49,7 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
       const commandEncoder = device.createCommandEncoder();
 
       renderToContext(commandEncoder, renderContext, RenderPassMode.Render);
-      if (pickingContext) renderToContext(commandEncoder, pickingContext, RenderPassMode.Picking);
+      //if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, RenderPassMode.Picking);
 
       // @ts-ignore
       device.queue.submit([commandEncoder.finish()]);      

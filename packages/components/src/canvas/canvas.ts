@@ -3,8 +3,8 @@ import { ShaderLanguages } from '@use-gpu/core/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, BACKGROUND_COLOR } from '../constants';
 
-import { RenderProvider } from '../providers/render-provider';
-import { use, useMemo, useOne } from '@use-gpu/live';
+import { RenderContext } from '../providers/render-provider';
+import { use, useMemo, useOne, provide } from '@use-gpu/live';
 import { makePresentationContext } from '@use-gpu/webgpu';
 import {
   makeColorState,
@@ -93,5 +93,5 @@ export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
     depthStencilAttachment,
   } as CanvasRenderingContextGPU;
 
-  return use(RenderProvider)({ renderContext, children });
+  return provide(RenderContext, renderContext, children);
 }

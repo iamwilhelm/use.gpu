@@ -65,6 +65,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             use(Lines)({ positions, segments, size: 50, join: 'bevel', debug: true }),
           ]
         }),
+      */
         use(RawData)({
           format: 'vec4',
           length: 100,
@@ -81,7 +82,6 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           render: (positions) => use(Quads)({ positions, size: 20 }),
           live: true,
         }),
-      */
         /*
         use(Data)({
           data,
@@ -102,7 +102,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         }),
         */
         //use(Mesh)({ mesh }),
-        use(Cube)(),
+        //use(Cube)(),
       ]
     }),
   ];
@@ -154,6 +154,7 @@ const useInspector = () => {
   useResource((dispose) => {
     const keydown = (e: KeyboardEvent) => {
       if (e.metaKey && e.key === 'i') setInspect((s) => !s);
+      if (e.metaKey && e.key === 'j') setInspect((s) => s);
     }
 
     window.addEventListener('keydown', keydown);

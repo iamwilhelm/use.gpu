@@ -2,7 +2,7 @@ import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { use, provide, gatherReduce, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, EMPTY_COLOR } from '../constants';
-import { RenderProvider, RenderContext } from '../providers/render-provider';
+import { RenderContext } from '../providers/render-provider';
 import { FrameContext } from '../providers/frame-context';
 
 import {
@@ -89,7 +89,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
     depthStencilAttachment,
   }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment]);
 
-  const view = use(RenderProvider)({ renderContext: rttContext, children });
+  const view = provide(RenderContext, rttContext, childreZ);
 
   const Done = useMemo(() =>
     (fiber: LiveFiber<any>) => (ts: Task[]) => {

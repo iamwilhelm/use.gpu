@@ -425,6 +425,7 @@ export const provideFiber = <F extends Function>(
 
   if (fiber.context.roots.get(context) !== fiber) {
     fiber.context = makeContextState(fiber, fiber.context, context, value);
+    if (callbacks) callbacks.onUpdate(fiber);
   }
   else {
     const lastValue = fiber.context.values.get(context).current;

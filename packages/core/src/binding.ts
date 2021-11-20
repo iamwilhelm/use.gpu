@@ -38,13 +38,12 @@ export const makeBoundStorageShader = (
 ) => {
   const [attributes, constants] = partition(uniforms, ({name}) => !!(dataBindings.links as any)[name]);
 
-  const storageAccessors = makeStorageAccessors(attributes, base);
-  const constantAccessors = makeUniformBlockAccessor(constants, base + 1);
+  const constantAccessors = makeUniformBlockAccessor(constants, base);
+  const storageAccessors = makeStorageAccessors(attributes, base, constants.length);
   const links = {...codeBindings, ...storageAccessors, ...constantAccessors};
 
   const vertexLinked = link(vertexShader, modules, links, defines, cache);
   const fragmentLinked = link(fragmentShader, modules, links, defines, cache);
-  console.log(vertexLinked, fragmentLinked);
 
   const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
   const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));

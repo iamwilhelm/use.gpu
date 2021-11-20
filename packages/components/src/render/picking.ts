@@ -11,10 +11,13 @@ import { memo, use, provide, useContext, useMemo, useOne, makeContext } from '@u
 import {
   makeColorState,
   makeColorAttachment,
-  makeRenderTexture,
+  makeReadbackTexture,
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
+  makeTextureReadbackBuffer,
+  TEXTURE_ARRAY_TYPES,
+  TEXTURE_FORMAT_SIZES,
 } from '@use-gpu/core';
 
 type PickingContextType = {
@@ -60,11 +63,31 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const height = h * resolution;
     const samples = 1;
 
-    const pickingTexture = makeRenderTexture(device, width, height, pickingFormat, samples);
-    const depthTexture = makeDepthTexture(device, width, height, depthStencilFormat, samples);
+    const [pickingBuffer, bytesPerRow, itemsPerRow] = makeTextureReadbackBuffer(device, width, height, pickingFormat);
+    const pickingTexture = makeReadbackTexture(device, width, height, pickingFormat);
+    const depthTexture = makeDepthTexture(device, width, height, depthStencilFormat);
 
     const colorAttachments = [makeColorAttachment(pickingTexture, null, pickingColor)];
     const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
+
+    const captureTexture = async () => {
+      const commandEncoder = device.createCommandEncoder();
+      commandEncoder.copyTextureToBuffer(
+        {texture: pickingTexture},
+        {buffer: pickingBuffer, bytesPerRow},
+        {width, height}
+      );
+      device.queue.submit([commandEncoder.finish()]);
+
+      await pickingBuffer.mapAsync(GPUMapMode.READ);
+
+      const ArrayType = TEXTURE_ARRAY_TYPES[pickingFormat];
+      if (ArrayType) {
+        const array = new ArrayType(pickingBuffer.getMappedRange());
+        console.log(array.length, array[0], array[1], array[2], array[3], array[4], array[5], array[6], array[7]);
+        pickingBuffer.unmap();
+      }
+    }
 
     const context = {
       renderContext: {
@@ -76,7 +99,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
         colorAttachments,
         depthStencilAttachment,
       } as CanvasRenderingContextGPU,
-      pickingTexture,
+      captureTexture,
     };
     
     return context;

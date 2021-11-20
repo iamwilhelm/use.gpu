@@ -3,7 +3,7 @@
 MeshVertex getVertex(int, int);
 
 #ifdef IS_PICKING
-layout(location = 0) out flat int fragIndex;
+layout(location = 0) out flat uint fragIndex;
 #else
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec2 fragUV;

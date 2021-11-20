@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { ShaderLanguages, StorageSource, ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
+import { ShaderLanguages, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
@@ -56,16 +56,14 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const view = [
     use(Pass)({
       children: [
-      /*
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
-            use(Quads)({ positions, size: 10 }),
-//            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
-            use(Lines)({ positions, segments, size: 50, join: 'bevel', debug: true }),
+//            use(Quads)({ positions, size: 10 }),
+            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
+//            use(Lines)({ positions, segments, size: 50, join: 'bevel', debug: true }),
           ]
         }),
-      */
         use(RawData)({
           format: 'vec4',
           length: 100,
@@ -79,7 +77,10 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
               1,
             );
           },
-          render: (positions) => use(Quads)({ positions, size: 20 }),
+          render: (positions) => [
+            use(Quads)({ positions, size: 20 }),
+            use(Quads)({ positions, size: 20, mode: RenderPassMode.Picking }),
+          ],
           live: true,
         }),
         /*

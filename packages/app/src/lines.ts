@@ -1,8 +1,8 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource } from '@use-gpu/core/types';
+import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
 import { ViewContext, RenderContext } from '@use-gpu/components';
 import { yeet, memoProps, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { makeUniforms, makeStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
+import { makeUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 import { defineGLSL } from '@use-gpu/shader';
 
@@ -22,6 +22,7 @@ export type QuadsProps = {
   join: 'miter' | 'round' | 'bevel',
 
   debug?: boolean,
+  mode?: RenderPassMode,
 };
 
 const ZERO = [0, 0, 0, 1];
@@ -45,13 +46,17 @@ const LINE_JOIN_STYLE = {
 };
 
 export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props) => {
+  const {
+    debug = false,
+    mode = RenderPassMode.Render,
+  } = props;
 
   const {uniforms, defs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;
 
   // Customize shader
-  let {join, debug, depth = 0} = props;
+  let {join, depth = 0} = props;
   join = join in LINE_JOIN_SIZE ? join : 'bevel';
   const style = LINE_JOIN_STYLE[join];
   const segments = LINE_JOIN_SIZE[join];
@@ -119,30 +124,27 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
   // Uniforms
   const [
     uniform,
-    constant,
     storage,
   ] = useMemo(() => {
     const uniform = makeUniforms(device, pipeline, defs, 0);
-    const storage = attributes.length ? makeStorage(device, pipeline, dataBindings.links, 1) : null;
-    const constant = constants.length ? makeUniforms(device, pipeline, constants, 2) : null;
+    const storage = makeUniformsWithStorage(device, pipeline, constants, dataBindings.links, 1);
 
-    return [uniform, constant, storage];
+    return [uniform, storage];
   }, [device, defs, constants, attributes, pipeline, dataBindings]);
 
   // Return a lambda back to parent(s)
-  return yeet((passEncoder: GPURenderPassEncoder) => {
+  return yeet((passEncoder: GPURenderPassEncoder, renderMode: RenderPassMode) => {
+    if (renderMode !== mode) return;
+
     uniform.pipe.fill(uniforms);
     uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
-    if (constant) {
-      constant.pipe.fill(dataBindings.constants);
-      uploadBuffer(device, constant.buffer, constant.pipe.data);
-    }
+    storage.pipe.fill(dataBindings.constants);
+    uploadBuffer(device, storage.buffer, storage.pipe.data);
 
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, uniform.bindGroup);
-    if (storage) passEncoder.setBindGroup(1, storage);
-    if (constant) passEncoder.setBindGroup(2, constant.bindGroup);
+    passEncoder.setBindGroup(1, storage.bindGroup);
 
     if (!debug) passEncoder.draw(vertices, instanceCount, 0, 0);
     else passEncoder.draw(4, edges * instanceCount, 0, 0);

@@ -1,10 +1,10 @@
 import { TypedArray, UniformType, UniformAttribute, EmitterExpression, Emitter, Accessor } from './types';
-import { UNIFORM_SIZES, UNIFORM_ARRAY_TYPE, UNIFORM_DIMS } from './constants';
+import { UNIFORM_SIZES, UNIFORM_ARRAY_TYPES, UNIFORM_DIMS } from './constants';
 
 type NumberArray = TypedArray | number[];
 
 export const makeDataArray = (type: UniformType, length: number) => {
-  const ctor = UNIFORM_ARRAY_TYPE[type];
+  const ctor = UNIFORM_ARRAY_TYPES[type];
   const dims = UNIFORM_DIMS[type];
   const array = new ctor(length * dims);
   return {array, dims};

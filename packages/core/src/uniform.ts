@@ -2,9 +2,30 @@ import { UniformAllocation, UniformLayout, UniformAttribute, UniformBinding, Uni
 import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 import { makeUniformBuffer } from './buffer';
+import { makeStorageBindings } from './storage';
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
+
+export const makeUniformsWithStorage = (
+  device: GPUDevice,
+  pipeline: GPURenderPipeline | GPUComputePipeline,
+  uniforms: UniformAttribute[],
+  links: Record<string, StorageSource | null | undefined>,
+  set: number = 0,
+): UniformAllocation => {
+  const pipe = makeUniformPipe(uniforms);
+  const buffer = makeUniformBuffer(device, pipe.data);
+  const uniformEntries = makeUniformBindings([{resource: {buffer}}]);
+  const storageEntries = makeStorageBindings(links, uniformEntries.length);
+
+  const entries = [...uniformEntries, ...storageEntries];
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(set),
+    entries,
+  });
+  return {pipe, buffer, bindGroup};
+}
 
 export const makeUniforms = (
   device: GPUDevice,
@@ -91,7 +112,7 @@ export const makeLayoutFiller = (
       const o = item[name];
       const v = (o && typeof o === 'object' && o.hasOwnProperty('value'))
         ? o.value : o;
-      setter(dataView, base + offset, v);
+      if (v != null) setter(dataView, base + offset, v);
     }
   }
 

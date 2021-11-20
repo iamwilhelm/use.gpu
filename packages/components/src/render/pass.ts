@@ -41,7 +41,10 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
       };
 
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-      for (let r of rs) r(passEncoder, mode);
+      for (let r of rs) {
+        if (r.length === 1 && mode !== RenderPassMode.Render) continue;
+        r(passEncoder, mode);
+      }
       passEncoder.endPass();
     };
 
@@ -49,9 +52,8 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
       const commandEncoder = device.createCommandEncoder();
 
       renderToContext(commandEncoder, renderContext, RenderPassMode.Render);
-      //if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, RenderPassMode.Picking);
+      if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, RenderPassMode.Picking);
 
-      // @ts-ignore
       device.queue.submit([commandEncoder.finish()]);      
     });
   }), []);

@@ -1,7 +1,7 @@
 #pragma import {viewUniforms} from 'use/view';
 
 #ifdef IS_PICKING
-layout(location = 0) in flat int fragIndex;
+layout(location = 0) in flat uint fragIndex;
 #else
 layout(location = 0) in vec4 fragColor;
 layout(location = 1) in vec2 fragUV;

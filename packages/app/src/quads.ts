@@ -1,8 +1,8 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
-import { ViewContext, RenderContext } from '@use-gpu/components';
+import { ViewContext, RenderContext, PickingContext } from '@use-gpu/components';
 import { yeet, memoProps, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { makeUniforms, makeStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
+import { makeUniformsWithStorage, makeUniforms, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 
 //import vertexShader from './glsl/quads-vertex.glsl';
@@ -33,12 +33,13 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
   } = props;
 
   const {uniforms, defs} = useContext(ViewContext);
+  const renderContext = useContext(RenderContext);
 
   const isPicking = mode === RenderPassMode.Picking;
   const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext();
-
-  const renderContext = useContext(RenderContext);
-  const {device, colorStates, depthStencilState, samples, languages} = pickingContext ?? renderContext;
+  
+  const resolvedContext = pickingContext?.renderContext ?? renderContext;
+  const {device, colorStates, depthStencilState, samples, languages} = resolvedContext;
 
   // Render shader
   const {glsl: {modules}} = languages;
@@ -76,7 +77,7 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
   // Rendering pipeline
   const pipeline = useMemo(() =>
     makeRenderPipeline(
-      renderContext,
+      resolvedContext,
       vertex,
       fragment,
       {
@@ -94,14 +95,11 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
   // Uniforms
   const [
     uniform,
-    constant,
     storage,
   ] = useMemo(() => {
     const uniform = makeUniforms(device, pipeline, defs, 0);
-    const storage = attributes.length ? makeStorage(device, pipeline, dataBindings.links, 1) : null;
-    const constant = constants.length ? makeUniforms(device, pipeline, constants, 2) : null;
-
-    return [uniform, constant, storage];
+    const storage = makeUniformsWithStorage(device, pipeline, constants, dataBindings.links, 1);
+    return [uniform, storage];
   }, [device, defs, constants, attributes, pipeline, dataBindings]);
 
   // Return a lambda back to parent(s)
@@ -111,15 +109,12 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     uniform.pipe.fill(uniforms);
     uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
-    if (constant) {
-      constant.pipe.fill(dataBindings.constants);
-      uploadBuffer(device, constant.buffer, constant.pipe.data);
-    }
+    storage.pipe.fill(dataBindings.constants);
+    uploadBuffer(device, storage.buffer, storage.pipe.data);
 
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, uniform.bindGroup);
-    if (storage) passEncoder.setBindGroup(1, storage);
-    if (constant) passEncoder.setBindGroup(2, constant.bindGroup);
+    passEncoder.setBindGroup(1, storage.bindGroup);
 
     if (!debug) passEncoder.draw(4, instanceCount, 0, 0);
     else passEncoder.draw(4, 5 * instanceCount, 0, 0);

@@ -39,6 +39,12 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     children,
   } = props;
 
+  const {colorStates: renderColorStates} = renderContext;
+  const colorStates = useMemo(() => [
+    ...renderContext.colorStates,
+    makeColorState(pickingFormat),
+  ], [pickingFormat, renderColorStates]);
+
   const pickingContext = useMemo(() => {
     const {device, width: w, height: h} = renderContext;
     const width = w * resolution;
@@ -46,10 +52,6 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
 
     const pickingTexture = makeRenderTexture(device, width, height, pickingFormat, 4);
 
-    const colorStates = [
-      ...renderContext.colorStates,
-      makeColorState(pickingFormat),
-    ];
     const colorAttachments = [
       ...renderContext.colorAttachments,
       makeColorAttachment(pickingTexture, null, pickingColor),

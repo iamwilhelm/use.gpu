@@ -61,7 +61,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           render: ([positions, segments, sizes]: StorageSource[]) => [
             use(Quads)({ positions, size: 10 }),
 //            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
-            use(Lines)({ positions, segments, size: 50, join: getLineJoin(), debug: true }),
+            use(Lines)({ positions, segments, size: 50, join: 'bevel', debug: true }),
           ]
         }),
         use(RawData)({

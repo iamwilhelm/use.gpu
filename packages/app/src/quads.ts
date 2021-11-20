@@ -80,6 +80,7 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     ),
     [device, vertex, fragment, colorStates, depthStencilState, samples, languages]
   );
+  useMemo(() => console.log('pipeline changed'), [pipeline]);
 
   // Uniforms
   const [

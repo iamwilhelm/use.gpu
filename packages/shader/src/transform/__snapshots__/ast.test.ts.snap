@@ -60,52 +60,10 @@ Object {
         "getQuadUV",
       ],
     },
-    Object {
-      "exported": true,
-      "prototype": Object {
-        "name": "getQuad",
-        "parameters": Array [
-          "int",
-          "vertex",
-        ],
-        "type": Object {
-          "name": "MeshVertex",
-          "qualifiers": Array [],
-        },
-      },
-      "symbols": Array [
-        "getQuad",
-      ],
-    },
   ],
-  "hash": "apf7kbgdle",
-  "modules": Array [
-    Object {
-      "imports": Array [
-        Object {
-          "imported": "MeshVertex",
-          "name": "MeshVertex",
-        },
-      ],
-      "name": "use/types",
-      "symbols": Array [
-        "MeshVertex",
-      ],
-    },
-  ],
+  "hash": "wbun5hxc7b",
+  "modules": Array [],
   "refs": Array [
-    Object {
-      "imports": Array [
-        Object {
-          "imported": "MeshVertex",
-          "name": "MeshVertex",
-        },
-      ],
-      "name": "use/types",
-      "symbols": Array [
-        "MeshVertex",
-      ],
-    },
     Object {
       "exported": true,
       "prototype": Object {
@@ -141,23 +99,6 @@ Object {
       ],
     },
     Object {
-      "exported": true,
-      "prototype": Object {
-        "name": "getQuad",
-        "parameters": Array [
-          "int",
-          "vertex",
-        ],
-        "type": Object {
-          "name": "MeshVertex",
-          "qualifiers": Array [],
-        },
-      },
-      "symbols": Array [
-        "getQuad",
-      ],
-    },
-    Object {
       "exported": false,
       "symbols": Array [
         "QUAD",
@@ -179,16 +120,13 @@ Object {
     },
   ],
   "symbols": Array [
-    "MeshVertex",
     "getQuadIndex",
     "getQuadUV",
-    "getQuad",
     "QUAD",
   ],
   "visibles": Array [
     "getQuadIndex",
     "getQuadUV",
-    "getQuad",
   ],
 }
 `;
@@ -295,65 +233,26 @@ Array [
       "getSize",
     ],
   },
-  Object {
-    "exported": false,
-    "symbols": Array [
-      "fragColor",
-    ],
-    "variable": Object {
-      "locals": Array [
-        Object {
-          "expr": null,
-          "name": "fragColor",
-        },
-      ],
-      "type": Object {
-        "name": "vec4",
-        "qualifiers": Array [
-          "layout(location = 0)",
-          "out",
-        ],
-      },
-    },
-  },
-  Object {
-    "exported": false,
-    "symbols": Array [
-      "fragUV",
-    ],
-    "variable": Object {
-      "locals": Array [
-        Object {
-          "expr": null,
-          "name": "fragUV",
-        },
-      ],
-      "type": Object {
-        "name": "vec2",
-        "qualifiers": Array [
-          "layout(location = 1)",
-          "out",
-        ],
-      },
-    },
-  },
 ]
 `;
 
 exports[`ast extracts quad vertex functions 1`] = `
 Array [
   Object {
-    "exported": false,
+    "exported": true,
     "prototype": Object {
-      "name": "main",
-      "parameters": Array [],
+      "name": "getQuadVertex",
+      "parameters": Array [
+        "int",
+        "vertexIndex",
+      ],
       "type": Object {
-        "name": "void",
+        "name": "MeshVertex",
         "qualifiers": Array [],
       },
     },
     "symbols": Array [
-      "main",
+      "getQuadVertex",
     ],
   },
 ]
@@ -440,48 +339,6 @@ Object {
         "getSize",
       ],
     },
-    Object {
-      "exported": false,
-      "symbols": Array [
-        "fragColor",
-      ],
-      "variable": Object {
-        "locals": Array [
-          Object {
-            "expr": null,
-            "name": "fragColor",
-          },
-        ],
-        "type": Object {
-          "name": "vec4",
-          "qualifiers": Array [
-            "layout(location = 0)",
-            "out",
-          ],
-        },
-      },
-    },
-    Object {
-      "exported": false,
-      "symbols": Array [
-        "fragUV",
-      ],
-      "variable": Object {
-        "locals": Array [
-          Object {
-            "expr": null,
-            "name": "fragUV",
-          },
-        ],
-        "type": Object {
-          "name": "vec2",
-          "qualifiers": Array [
-            "layout(location = 1)",
-            "out",
-          ],
-        },
-      },
-    },
   ],
   "externals": Array [
     Object {
@@ -519,21 +376,24 @@ Object {
   ],
   "functions": Array [
     Object {
-      "exported": false,
+      "exported": true,
       "prototype": Object {
-        "name": "main",
-        "parameters": Array [],
+        "name": "getQuadVertex",
+        "parameters": Array [
+          "int",
+          "vertexIndex",
+        ],
         "type": Object {
-          "name": "void",
+          "name": "MeshVertex",
           "qualifiers": Array [],
         },
       },
       "symbols": Array [
-        "main",
+        "getQuadVertex",
       ],
     },
   ],
-  "hash": "81l7mnms8t",
+  "hash": "aassgu6e5l",
   "modules": Array [
     Object {
       "imports": Array [
@@ -620,17 +480,20 @@ Object {
       ],
     },
     Object {
-      "exported": false,
+      "exported": true,
       "prototype": Object {
-        "name": "main",
-        "parameters": Array [],
+        "name": "getQuadVertex",
+        "parameters": Array [
+          "int",
+          "vertexIndex",
+        ],
         "type": Object {
-          "name": "void",
+          "name": "MeshVertex",
           "qualifiers": Array [],
         },
       },
       "symbols": Array [
-        "main",
+        "getQuadVertex",
       ],
     },
     Object {
@@ -665,61 +528,19 @@ Object {
         "getSize",
       ],
     },
-    Object {
-      "exported": false,
-      "symbols": Array [
-        "fragColor",
-      ],
-      "variable": Object {
-        "locals": Array [
-          Object {
-            "expr": null,
-            "name": "fragColor",
-          },
-        ],
-        "type": Object {
-          "name": "vec4",
-          "qualifiers": Array [
-            "layout(location = 0)",
-            "out",
-          ],
-        },
-      },
-    },
-    Object {
-      "exported": false,
-      "symbols": Array [
-        "fragUV",
-      ],
-      "variable": Object {
-        "locals": Array [
-          Object {
-            "expr": null,
-            "name": "fragUV",
-          },
-        ],
-        "type": Object {
-          "name": "vec2",
-          "qualifiers": Array [
-            "layout(location = 1)",
-            "out",
-          ],
-        },
-      },
-    },
   ],
   "symbols": Array [
     "MeshVertex",
     "viewUniforms",
     "worldToClip",
     "getQuadUV",
-    "main",
+    "getQuadVertex",
     "getPosition",
     "getSize",
-    "fragColor",
-    "fragUV",
   ],
-  "visibles": Array [],
+  "visibles": Array [
+    "getQuadVertex",
+  ],
 }
 `;
 
@@ -848,7 +669,7 @@ Object {
   ],
   "externals": Array [],
   "functions": Array [],
-  "hash": "4qg47iyqm",
+  "hash": "y0g6sb9nv5",
   "modules": Array [],
   "refs": Array [
     Object {
@@ -926,6 +747,12 @@ Array [
               "name": "vec2",
             },
           },
+          Object {
+            "name": "viewSize",
+            "type": Object {
+              "name": "vec2",
+            },
+          },
         ],
       },
       "type": Object {
@@ -973,6 +800,12 @@ Object {
             },
             Object {
               "name": "viewResolution",
+              "type": Object {
+                "name": "vec2",
+              },
+            },
+            Object {
+              "name": "viewSize",
               "type": Object {
                 "name": "vec2",
               },
@@ -1046,8 +879,59 @@ Object {
         "worldToClip",
       ],
     },
+    Object {
+      "exported": true,
+      "prototype": Object {
+        "name": "clipToScreen3D",
+        "parameters": Array [
+          "vec4",
+          "position",
+        ],
+        "type": Object {
+          "name": "vec3",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "clipToScreen3D",
+      ],
+    },
+    Object {
+      "exported": true,
+      "prototype": Object {
+        "name": "screenToClip3D",
+        "parameters": Array [
+          "vec4",
+          "position",
+        ],
+        "type": Object {
+          "name": "vec3",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "screenToClip3D",
+      ],
+    },
+    Object {
+      "exported": true,
+      "prototype": Object {
+        "name": "worldToClip3D",
+        "parameters": Array [
+          "vec4",
+          "position",
+        ],
+        "type": Object {
+          "name": "vec3",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "worldToClip3D",
+      ],
+    },
   ],
-  "hash": "mbei1rzda7",
+  "hash": "je3ka1b7aj",
   "modules": Array [],
   "refs": Array [
     Object {
@@ -1103,6 +987,57 @@ Object {
     },
     Object {
       "exported": true,
+      "prototype": Object {
+        "name": "clipToScreen3D",
+        "parameters": Array [
+          "vec4",
+          "position",
+        ],
+        "type": Object {
+          "name": "vec3",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "clipToScreen3D",
+      ],
+    },
+    Object {
+      "exported": true,
+      "prototype": Object {
+        "name": "screenToClip3D",
+        "parameters": Array [
+          "vec4",
+          "position",
+        ],
+        "type": Object {
+          "name": "vec3",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "screenToClip3D",
+      ],
+    },
+    Object {
+      "exported": true,
+      "prototype": Object {
+        "name": "worldToClip3D",
+        "parameters": Array [
+          "vec4",
+          "position",
+        ],
+        "type": Object {
+          "name": "vec3",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "worldToClip3D",
+      ],
+    },
+    Object {
+      "exported": true,
       "struct": Object {
         "name": "viewUniforms",
         "struct": Object {
@@ -1131,6 +1066,12 @@ Object {
                 "name": "vec2",
               },
             },
+            Object {
+              "name": "viewSize",
+              "type": Object {
+                "name": "vec2",
+              },
+            },
           ],
         },
         "type": Object {
@@ -1151,6 +1092,9 @@ Object {
     "worldToView",
     "viewToClip",
     "worldToClip",
+    "clipToScreen3D",
+    "screenToClip3D",
+    "worldToClip3D",
     "viewUniforms",
     "ViewUniforms",
   ],
@@ -1158,6 +1102,9 @@ Object {
     "worldToView",
     "viewToClip",
     "worldToClip",
+    "clipToScreen3D",
+    "screenToClip3D",
+    "worldToClip3D",
     "viewUniforms",
     "ViewUniforms",
   ],

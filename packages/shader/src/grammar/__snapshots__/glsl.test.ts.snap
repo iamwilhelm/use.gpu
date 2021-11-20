@@ -220,9 +220,6 @@ Program                                                     ⮐ void main() {⮐
                 DeclarationSpecifier                        x
                   Identifier                                x
                 Number                                      1
-      Comment                                               /*⮐   int y = 2;⮐   if (x) if (y) { } else { }⮐   */
-        CommentOpen                                         /*
-        UntilCommentClose                                   ⮐   int y = 2;⮐   if (x) if (y) { } else { }⮐   */
       Statement                                             wat();
         ExpressionStatement                                 wat();
           FunctionCall                                      wat()
@@ -839,10 +836,6 @@ Program                                                     ⮐ #version 450⮐ 
               Identifier                                    x2
             Mul                                             *
             Identifier                                      x
-  Comment                                                   // https://www.shadertoy.com/view/XlKSDR
-    CommentLine                                             // https://www.shadertoy.com/view/XlKSDR
-  Comment                                                   // D - Normal distribution term
-    CommentLine                                             // D - Normal distribution term
   FunctionDefinition                                        float ndfGGX2(float cosTheta, float alpha) {⮐   float alphaSqr = alpha * alpha;⮐   float denom = cosTheta * cosTheta * (alphaSqr - 1.0) + 1.0f;⮐   return alphaSqr / (PI * denom * denom);⮐ }
     FunctionPrototype                                       float ndfGGX2(float cosTheta, float alpha)
       QualifiedType                                         float
@@ -1002,8 +995,6 @@ Program                                                     ⮐ #version 450⮐ 
         JumpStatement                                       return d;
           return                                            return
           Identifier                                        d
-  Comment                                                   // F - Schlick approximation of Fresnel
-    CommentLine                                             // F - Schlick approximation of Fresnel
   FunctionDefinition                                        vec3 fresnelSchlick(float cosTheta, vec3 F0) {⮐   float FT = pow5(1.0f - cosTheta);⮐   return F0 + (1.0 - F0) * FT;⮐ }
     FunctionPrototype                                       vec3 fresnelSchlick(float cosTheta, vec3 F0)
       QualifiedType                                         vec3
@@ -1178,8 +1169,6 @@ Program                                                     ⮐ #version 450⮐ 
                 Number                                      1.0
                 Div                                         /
                 Identifier                                  PI
-  Comment                                                   // G - Geometric attenuation term
-    CommentLine                                             // G - Geometric attenuation term
   FunctionDefinition                                        float G1X(float dotNX, float k) {⮐ 	return 1.0f / (dotNX * (1.0f - k) + k);⮐ }
     FunctionPrototype                                       float G1X(float dotNX, float k)
       QualifiedType                                         float
@@ -1575,10 +1564,6 @@ Program                                                     ⮐ #version 450⮐ 
                   Identifier                                dotNL
                   Identifier                                dotNV
                   Identifier                                alpha
-      Comment                                               //float G2 = geometricGGX(dotNL, dotNV, alpha);
-        CommentLine                                         //float G2 = geometricGGX(dotNL, dotNV, alpha);
-      Comment                                               //return vec3(abs(G - G2) / 100.0);
-        CommentLine                                         //return vec3(abs(G - G2) / 100.0);
       Statement                                             vec3 Fd = albedo * fdBurley(dotNL, dotNV, dotLH, alpha);
         DeclarationStatement                                vec3 Fd = albedo * fdBurley(dotNL, dotNV, dotLH, alpha);
           Declaration                                       vec3 Fd = albedo * fdBurley(dotNL, dotNV, dotLH, alpha);
@@ -1699,8 +1684,6 @@ Program                                                     ⮐ #version 450⮐ 
                 FunctionCall                                vec3(1.0)
                   vec3                                      vec3
                   Number                                    1.0
-      Comment                                               //fragColor.rgb;
-        CommentLine                                         //fragColor.rgb;
       Statement                                             float metalness = 0.2;
         DeclarationStatement                                float metalness = 0.2;
           Declaration                                       float metalness = 0.2;

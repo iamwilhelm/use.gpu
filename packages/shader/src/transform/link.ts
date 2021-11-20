@@ -163,8 +163,6 @@ export const loadModules = timed('loadModules', (
 
   const order = getGraphOrder(graph, 'main');
   out.sort((a, b) => order.get(b.name)! - order.get(a.name)! || a.name.localeCompare(b.name));
-  console.log(seen.entries())
-  console.log(out)
 
   return out;
 });

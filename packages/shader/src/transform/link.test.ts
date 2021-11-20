@@ -46,4 +46,38 @@ describe("link", () => {
 
   });
   
+  it("lifts recursive dependency", () => {
+    
+    const code = `
+    #pragma import {getLifted} from 'getLifted'
+    #pragma import {getColor1} from 'getColor1'
+    void main() {
+      gl_FragColor = getColor1();
+    }
+    `
+
+    const getLifted = `
+    // Lifted Code
+    #pragma export
+    void getLifted() {}
+    `
+
+    const getColor1 = `
+    #pragma import {getColor2} from 'getColor2'
+    #pragma export
+    vec4 getColor1() { return getColor2(); }
+    `
+    
+    const getColor2 = `
+    #pragma import {getLifted} from 'getLifted'
+    #pragma export
+    vec4 getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    `
+    
+    const linked = linkModule(code, {getColor1, getColor2, getLifted});
+    expect(linked.indexOf('// Lifted Code')).toBeLessThan(linked.indexOf('getColor2'));
+    expect(linked).toMatchSnapshot();
+
+  });
+  
 });

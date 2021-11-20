@@ -49,8 +49,9 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const {device, width: w, height: h} = renderContext;
     const width = w * resolution;
     const height = h * resolution;
+    const samples = 1;
 
-    const pickingTexture = makeRenderTexture(device, width, height, pickingFormat, 4);
+    const pickingTexture = makeRenderTexture(device, width, height, pickingFormat, samples);
 
     const colorAttachments = [
       ...renderContext.colorAttachments,
@@ -60,6 +61,9 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const context = {
       renderContext: {
         ...renderContext,
+        width,
+        height,
+        samples,
         colorStates,
         colorAttachments,
       } as CanvasRenderingContextGPU,

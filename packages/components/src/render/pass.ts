@@ -1,6 +1,8 @@
 import { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live/types';
+import { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core/types';
 import { use, yeet, memo, gatherReduce, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
+import { PickingContext } from './picking';
 
 export type PassProps = {
   device: GPUDevice,
@@ -12,32 +14,47 @@ export type PassProps = {
 
 export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
+const makeStaticDone = (c: any): any => {
+  c.isStaticComponent = true;
+  c.displayName = '[Pass]';
+  return c;
+}
+
 export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
   const {children, render} = props;
 
-  const Done = useMemo(() => (fiber: LiveFiber<any>) => (rs: RenderToPass[]) => {
-    const {device, colorAttachments, depthStencilAttachment} = useContext(RenderContext);
-    return yeet(() => {
+  const Done = useMemo(() => makeStaticDone((fiber: LiveFiber<any>) => (rs: RenderToPass[]) => {
+    const renderContext = useContext(RenderContext);
+    const pickingContext = useContext(PickingContext);
 
+    const {device} = renderContext;
+
+    const renderToContext = (
+      commandEncoder: GPUCommandEncoder,
+      context: UseRenderingContextGPU,
+      mode: RenderPassMode,
+    ) => {
+      const {colorAttachments, depthStencilAttachment} = renderContext;
       const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments,
         depthStencilAttachment,
       };
 
-      const commandEncoder = device.createCommandEncoder();
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-      for (let r of rs) r(passEncoder);
-      passEncoder.endPass(),
+      for (let r of rs) r(passEncoder, mode);
+      passEncoder.endPass();
+    };
+
+    return yeet(() => {
+      const commandEncoder = device.createCommandEncoder();
+
+      renderToContext(commandEncoder, renderContext, RenderPassMode.Render);
+      if (pickingContext) renderToContext(commandEncoder, pickingContext, RenderPassMode.Picking);
 
       // @ts-ignore
-      device.queue.submit([commandEncoder.finish()]);
+      device.queue.submit([commandEncoder.finish()]);      
     });
-  }, []);
-  // @ts-ignore
-  Done.isStaticComponent = true;
-
-  // @ts-ignore
-  if (!Done.displayName) Done.displayName = '[Pass]';
+  }), []);
 
   return gatherReduce(children ?? (render ? render() : null), Done);
 }, 'Pass');

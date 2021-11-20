@@ -195,3 +195,11 @@ export type ResolvedDataBindings = {
   constants: Record<string, any>,
   links: Record<string, any>,
 };
+
+// Passes
+
+export enum RenderPassMode {
+  Render = 'render',
+  Picking = 'picking',
+  Depth = 'depth',
+};

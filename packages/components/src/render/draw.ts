@@ -8,7 +8,13 @@ export type DrawProps = {
   render?: () => LiveElement<any>,
 };
 
-const Done = (fiber: LiveFiber<any>) => (ts: Task[]) => {
+const makeStaticDone = (c: any): any => {
+  c.isStaticComponent = true;
+  c.displayName = '[Draw]';
+  return c;
+}
+
+const Done = makeStaticDone((fiber: LiveFiber<any>) => (ts: Task[]) => {
   const {gpuContext, colorAttachments, samples} = useContext(RenderContext);
 
   const view = gpuContext
@@ -21,12 +27,7 @@ const Done = (fiber: LiveFiber<any>) => (ts: Task[]) => {
   else colorAttachments[0].view = view;
 
   for (let task of ts) task();
-};
-
-// @ts-ignore
-if (!Done.displayName) Done.displayName = '[Draw]';
-// @ts-ignore
-Done.isStaticComponent = true;
+});
 
 export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
   const {children, render} = props;

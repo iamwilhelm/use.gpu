@@ -56,6 +56,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const view = [
     use(Pass)({
       children: [
+      /*
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
@@ -80,6 +81,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           render: (positions) => use(Quads)({ positions, size: 20 }),
           live: true,
         }),
+      */
         /*
         use(Data)({
           data,
@@ -100,7 +102,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         }),
         */
         //use(Mesh)({ mesh }),
-        //use(Cube)(),
+        use(Cube)(),
       ]
     }),
   ];

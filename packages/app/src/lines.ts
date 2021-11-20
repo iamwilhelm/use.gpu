@@ -70,7 +70,7 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
   const {glsl: {modules}} = languages;
   const vertexShader = !debug ? modules['instance/virtual'] : modules['instance/wireframe-strip'];
   const fragmentShader = modules['instance/line/fragment'];
-  const codeBindings = { 'getVertex:getLineVertex': modules['instance/line/vertex'] };
+  const codeBindings = { 'getVertex:getLineVertex': modules['instance/vertex/line'] };
 
   // Data bindings
   const dataBindings = useOne(() => extractPropBindings(DATA_BINDINGS, [

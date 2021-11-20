@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource } from '@use-gpu/core/types';
+import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
 import { ViewContext, RenderContext } from '@use-gpu/components';
-import { yeet, memoProps, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memoProps, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeUniforms, makeStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 
@@ -15,6 +15,7 @@ export type QuadsProps = {
   positions?: StorageSource,
   sizes?: StorageSource,
   
+  mode?: RenderPassMode | string,
   debug?: boolean,
 };
 
@@ -26,18 +27,27 @@ const DATA_BINDINGS = [
 ] as UniformAttribute[];
 
 export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => {
+  const {
+    debug = false,
+    mode = RenderPassMode.Render,
+  } = props;
+
   const {uniforms, defs} = useContext(ViewContext);
+
+  const isPicking = mode === RenderPassMode.Picking;
+  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext();
+
   const renderContext = useContext(RenderContext);
-  const {device, colorStates, depthStencilState, samples, languages} = renderContext;
-  const {debug} = props;
+  const {device, colorStates, depthStencilState, samples, languages} = pickingContext ?? renderContext;
 
   // Render shader
   const {glsl: {modules}} = languages;
   const vertexShader = !debug ? modules['instance/virtual'] : modules['instance/wireframe-strip'];
-  const fragmentShader = !debug ? modules['instance/quad/fragment'] : modules['instance/line/fragment'];
-  const codeBindings = { 'getVertex:getQuadVertex': modules['instance/quad/vertex'] };
+  const fragmentShader = !debug ? modules['instance/fragment/solid'] : modules['instance/fragment/solid'];
+  const codeBindings = { 'getVertex:getQuadVertex': modules['instance/vertex/quad'] };
   const defines = {
     WIREFRAME_STRIP_SEGMENTS: 5,
+    IS_PICKING: isPicking,
   };
 
   // Data bindings
@@ -96,7 +106,9 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
   }, [device, defs, constants, attributes, pipeline, dataBindings]);
 
   // Return a lambda back to parent(s)
-  return yeet((passEncoder: GPURenderPassEncoder) => {
+  return yeet((passEncoder: GPURenderPassEncoder, renderMode: RenderPassMode) => {
+    if (renderMode !== mode) return;
+
     uniform.pipe.fill(uniforms);
     uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 

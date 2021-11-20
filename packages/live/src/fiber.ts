@@ -296,6 +296,7 @@ export const mapReduceFiberCalls = <F extends Function, R, T>(
     const resume = (next?: LiveFunction<any>) => {
       const value = reduceFiberValues(fiber, reducer, true);
       if (fiber.next?.mount) bustFiberCaches(fiber.next.mount);
+      else if (fiber.next) bustFiberCaches(fiber.next);
       if (!next) return null;
 
       // @ts-ignore
@@ -327,6 +328,7 @@ export const gatherFiberCalls = <F extends Function, R, T>(
     const resume = (next?: LiveFunction<any>) => {
       const value = gatherFiberValues(fiber, true);
       if (fiber.next?.mount) bustFiberCaches(fiber.next.mount);
+      else if (fiber.next) bustFiberCaches(fiber.next);
       if (!next) return null;
 
       // @ts-ignore

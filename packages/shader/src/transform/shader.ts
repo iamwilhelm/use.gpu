@@ -10,7 +10,7 @@ export const parseGLSL = (code: string): Tree => {
 
 export const defineGLSL = (defs: Record<string, string>): string => {
   const out = [];
-  for (let k in defs) out.push(`#define ${k} ${defs[k]}`);
+  for (let k in defs) if (defs[k] !== false && defs[k] !== null) out.push(`#define ${k} ${defs[k]}`);
   return out.join("\n");
 }
 

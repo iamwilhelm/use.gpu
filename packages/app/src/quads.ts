@@ -26,7 +26,6 @@ const DATA_BINDINGS = [
 ] as UniformAttribute[];
 
 export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => {
-
   const {uniforms, defs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;

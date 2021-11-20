@@ -144,6 +144,14 @@ export const renderFiber = <F extends Function>(
     fiber.memo = fiber.version;
   }
 
+  // Let host do its thing
+  //
+  // Call this here instead of in updateFiber
+  // so that collapsed provide+gather nodes don't update twice.
+  if (callbacks) {
+    callbacks.onUpdate(fiber);
+  }
+
   // Apply rendered result
   updateFiber(fiber, element, callbacks);
 }
@@ -155,11 +163,6 @@ export const updateFiber = <F extends Function>(
   callbacks?: RenderCallbacks,
 ) => {
   const {f, bound, args, yeeted} = fiber;
-
-  // Let host do its thing
-  if (callbacks) {
-    callbacks.onUpdate(fiber);
-  }
 
   // Handle call and call[]
   let call = element as DeferredCall<any> | null;
@@ -293,7 +296,11 @@ export const mapReduceFiberCalls = <F extends Function, R, T>(
     const resume = (next?: LiveFunction<any>) => {
       const value = reduceFiberValues(fiber, reducer, true);
       if (fiber.next?.mount) bustFiberCaches(fiber.next.mount);
-      return next ? use(next)(value) : null;
+      if (!next) return null;
+
+      // @ts-ignore
+      if (next.isStaticComponent) return next(fiber)(value);
+      else return use(next)(value);
     };
 
     fiber.next = makeResumeFiber(fiber, resume, next);
@@ -320,7 +327,11 @@ export const gatherFiberCalls = <F extends Function, R, T>(
     const resume = (next?: LiveFunction<any>) => {
       const value = gatherFiberValues(fiber, true);
       if (fiber.next?.mount) bustFiberCaches(fiber.next.mount);
-      return next ? use(next)(value) : null;
+      if (!next) return null;
+
+      // @ts-ignore
+      if (next.isStaticComponent) return next(fiber)(value);
+      else return use(next)(value);
     };
 
     fiber.next = makeResumeFiber(fiber, resume, next);

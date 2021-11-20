@@ -86,7 +86,7 @@ export const reconcile = <F extends Function>(
   key?: Key,
 ): DeferredCall<() => void> => {
   if (Array.isArray(calls)) return ({f: RECONCILE, args: calls, key});
-  return ({f: RECONCILE, arg: [calls], key});
+  return ({f: RECONCILE, args: [calls], key});
 }
 
 // Reduce a subtree

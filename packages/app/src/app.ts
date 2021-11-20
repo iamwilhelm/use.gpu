@@ -64,6 +64,23 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             use(Lines)({ positions, segments, size: 50, join: getLineJoin(), debug: true }),
           ]
         }),
+        use(RawData)({
+          format: 'vec4',
+          length: 100,
+          expr: (emit, i) => {
+            const t = +new Date() / 1000;
+            const s = ((i*i + i) % 13133) % 100;
+            emit(
+              Math.cos(t * 1.31 + Math.sin(t * 0.31) + s),
+              Math.sin(t * 1.113 + Math.sin(t * 0.414) - s),
+              Math.cos(t * 0.981 + Math.cos(t * 0.515) + s*s),
+              1,
+            );
+          },
+          render: (positions) => use(Quads)({ positions, size: 20 }),
+          live: true,
+        }),
+        /*
         use(Data)({
           data,
           fields: quadFields,
@@ -72,6 +89,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             //use(Quads)({ positions, sizes, debug: true }),
           ],
         }),
+        */
         /*
         use(RawData)({
           type: 'vec4',

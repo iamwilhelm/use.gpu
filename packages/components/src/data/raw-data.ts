@@ -27,11 +27,11 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
     render,
   } = props;
 
-  const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.float;
-  const l = length ?? (data?.length || 0);
-
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
+    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.float;
+    const l = length ?? (data?.length || 0);
+
     const {array, dims} = makeDataArray(f, l || 1);
     if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
@@ -43,7 +43,7 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
-  }, [device, f, l]);
+  }, [device, format, length]);
 
   if (!live) {
     useNoContext(FrameContext);

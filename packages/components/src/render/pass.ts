@@ -33,6 +33,8 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
       device.queue.submit([commandEncoder.finish()]);
     });
   }, []);
+  // @ts-ignore
+  Done.isStaticComponent = true;
 
   // @ts-ignore
   if (!Done.displayName) Done.displayName = '[Pass]';

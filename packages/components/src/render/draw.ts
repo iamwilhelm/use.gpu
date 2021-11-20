@@ -25,6 +25,8 @@ const Done = (fiber: LiveFiber<any>) => (ts: Task[]) => {
 
 // @ts-ignore
 if (!Done.displayName) Done.displayName = '[Draw]';
+// @ts-ignore
+Done.isStaticComponent = true;
 
 export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
   const {children, render} = props;

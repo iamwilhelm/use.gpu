@@ -14,6 +14,8 @@ export type QuadsProps = {
 
   positions?: StorageSource,
   sizes?: StorageSource,
+  
+  debug?: boolean,
 };
 
 const ZERO = [0, 0, 0, 1];
@@ -28,11 +30,16 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
   const {uniforms, defs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;
+  const {debug} = props;
 
   // Render shader
   const {glsl: {modules}} = languages;
-  const vertexShader = modules['instance/quad/vertex'];
-  const fragmentShader = modules['instance/quad/fragment'];
+  const vertexShader = !debug ? modules['instance/virtual'] : modules['instance/wireframe-strip'];
+  const fragmentShader = !debug ? modules['instance/quad/fragment'] : modules['instance/line/fragment'];
+  const codeBindings = { 'getVertex:getQuadVertex': modules['instance/quad/vertex'] };
+  const defines = {
+    WIREFRAME_STRIP_SEGMENTS: 5,
+  };
 
   // Data bindings
   const dataBindings = useOne(() => extractPropBindings(DATA_BINDINGS, [
@@ -50,13 +57,13 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     fragmentShader,
     DATA_BINDINGS,
     dataBindings,
-    {},
-    {},
+    codeBindings,
+    defines,
     languages,
     null,
     1,
   );
-  
+
   // Rendering pipeline
   const pipeline = useMemo(() =>
     makeRenderPipeline(
@@ -103,6 +110,7 @@ export const Quads: LiveComponent<QuadsProps> = memoProps((fiber) => (props) => 
     if (storage) passEncoder.setBindGroup(1, storage);
     if (constant) passEncoder.setBindGroup(2, constant.bindGroup);
 
-    passEncoder.draw(4, instanceCount, 0, 0);
+    if (!debug) passEncoder.draw(4, instanceCount, 0, 0);
+    else passEncoder.draw(4, 5 * instanceCount, 0, 0);
   }); 
 }, 'Quads');

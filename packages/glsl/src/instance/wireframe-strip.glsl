@@ -1,6 +1,7 @@
 #pragma import {MeshVertex} from 'use/types'
-#pragma import {getQuadIndex} from 'geometry/quad';
-#pragma import {getLineJoin} from 'instance/line/line'
+#pragma import {getQuadIndex} from 'geometry/quad'
+#pragma import {getStripIndex} from 'geometry/strip'
+#pragma import {getLineJoin} from 'geometry/line'
 
 MeshVertex getVertex(int, int);
 
@@ -17,14 +18,15 @@ void main() {
   int f = instanceIndex % WIREFRAME_STRIP_SEGMENTS;
   int i = instanceIndex / WIREFRAME_STRIP_SEGMENTS;
 
-  int edgeIndex = f & 1;
-  int triIndex = f >> 1;
+  ivec2 stripIndex = getStripIndex(f);
+  int edgeIndex = stripIndex.y;
+  int triIndex = stripIndex.x;
 
-  MeshVertex a  = getVertex(triIndex, i);
+  MeshVertex a = getVertex(triIndex, i);
   MeshVertex b = getVertex(triIndex + 1 + edgeIndex, i);
 
-  vec3 left = a.position.xyz;
-  vec3 right = b.position.xyz;
+  vec3 left = a.position.xyz / a.position.w;
+  vec3 right = b.position.xyz / b.position.w;
 
   vec3 join = (ij.x > 0)
     ? getLineJoin(left, left, right, 0.0, xy.y, 2.0, 1, 0)

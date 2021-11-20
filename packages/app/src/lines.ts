@@ -70,7 +70,7 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
   const {glsl: {modules}} = languages;
   const vertexShader = !debug ? modules['instance/virtual'] : modules['instance/wireframe-strip'];
   const fragmentShader = modules['instance/line/fragment'];
-  const codeBindings = { 'getVertex:getLineVertex': modules['instance/line/line'] };
+  const codeBindings = { 'getVertex:getLineVertex': modules['instance/line/vertex'] };
 
   // Data bindings
   const dataBindings = useOne(() => extractPropBindings(DATA_BINDINGS, [
@@ -144,11 +144,7 @@ export const Lines: LiveComponent<QuadLinesProps> = memoProps((fiber) => (props)
     if (storage) passEncoder.setBindGroup(1, storage);
     if (constant) passEncoder.setBindGroup(2, constant.bindGroup);
 
-    if (!debug) {
-      passEncoder.draw(vertices, instanceCount, 0, 0);
-    }
-    else {
-      passEncoder.draw(4, edges * instanceCount, 0, 0);
-    }
+    if (!debug) passEncoder.draw(vertices, instanceCount, 0, 0);
+    else passEncoder.draw(4, edges * instanceCount, 0, 0);
   }); 
 }, 'Lines');

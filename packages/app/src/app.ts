@@ -29,7 +29,7 @@ export type AppProps = {
 
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
-const data = seq(100).map((i) => ({
+const data = seq(10).map((i) => ({
   position: [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1],
   size: Math.random() * 50 + 10,
 }));
@@ -39,7 +39,7 @@ const quadFields = [
 ];
 
 const lineFields = [
-  ['vec4', [0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1]],
+  ['vec4', [-1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1]],
   ['int', [1, 3, 3, 2]],
   ['float', [10, 10, 10, 10]],
 ];
@@ -60,14 +60,14 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
             use(Quads)({ positions, size: 10 }),
+//            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
             use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
-            use(Lines)({ positions, segments, size: 50, join: getLineJoin(), debug: true }),
           ]
         }),
         use(Data)({
           data,
           fields: quadFields,
-          render: ([positions, sizes]: StorageSource[]) => use(Quads)({ positions, sizes }),
+          render: ([positions, sizes]: StorageSource[]) => use(Quads)({ positions, sizes, debug: true }),
         }),
         /*
         use(RawData)({

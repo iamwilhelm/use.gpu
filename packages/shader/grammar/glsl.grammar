@@ -1,7 +1,7 @@
 @top Program { unit }
 @skip { space | comment }
-@external tokens untilEOL from "./tokens" { UntilEOL }
-@external tokens untilCommentClose from "./tokens" { untilCommentClose }
+@external tokens untilEOLToken from "./tokens" { UntilEOL }
+@external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
 @precedence {
   else @right,
   if @right,

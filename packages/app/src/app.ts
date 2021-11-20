@@ -61,13 +61,16 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           render: ([positions, segments, sizes]: StorageSource[]) => [
             use(Quads)({ positions, size: 10 }),
 //            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
-            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
+            use(Lines)({ positions, segments, size: 50, join: getLineJoin(), debug: true }),
           ]
         }),
         use(Data)({
           data,
           fields: quadFields,
-          render: ([positions, sizes]: StorageSource[]) => use(Quads)({ positions, sizes, debug: true }),
+          render: ([positions, sizes]: StorageSource[]) => [
+            use(Quads)({ positions, sizes }),
+            //use(Quads)({ positions, sizes, debug: true }),
+          ],
         }),
         /*
         use(RawData)({

@@ -110,14 +110,15 @@ export const loadModules = timed('loadModules', (
   links: Record<string, string>,
   cache: ParsedModuleCache | null = null,
 ) => {
-  const seen = new Map<string, number>();
+  const graph = new Map<string, string[]>();
+  const seen = new Set<string>();
   const out = [];
 
-  const queue = [{name: 'main', code, depth: 0}];
-  seen.set('main', 0);
+  const queue = [{name: 'main', code}];
+  seen.add('main');
 
   while (queue.length) {
-    const {name, code, depth} = queue.shift()!;
+    const {name, code} = queue.shift()!;
 
     let tree, table;
     if (cache) {
@@ -133,16 +134,18 @@ export const loadModules = timed('loadModules', (
         cache.set(table.hash, { tree, table });
       }
     }
-
     out.push({name, code, tree, table});
+
     const {modules, externals} = table;
+    const deps = [] as string[];
 
     for (const {name} of modules) {
       const code = name.match(/^#/) ? links[name.slice(1)] : libraries[name];
       if (!code) throw new Error(`Unknown module '${name}'`);
       
-      if (!seen.has(name)) queue.push({name, code, depth: depth + 1});
-      seen.set(name, depth + 1);
+      if (!seen.has(name)) queue.push({name, code});
+      seen.add(name);
+      deps.push(name);
     }
 
     for (const {prototype} of externals) if (prototype) {
@@ -150,15 +153,38 @@ export const loadModules = timed('loadModules', (
       const code = links[name];
       if (!code) throw new Error(`Unlinked function '${name}'`);
       
-      if (!seen.has(name)) queue.push({name, code, depth: depth + 1});
-      seen.set(name, depth + 1);
+      if (!seen.has(name)) queue.push({name, code});
+      seen.add(name);
+      deps.push(name);
     }
+
+    graph.set(name, deps);
   }
 
-  out.sort((a, b) => seen.get(b.name)! - seen.get(a.name)! || a.name.localeCompare(b.name));
+  const order = getGraphOrder(graph, 'main');
+  out.sort((a, b) => order.get(b.name)! - order.get(a.name)! || a.name.localeCompare(b.name));
+  console.log(seen.entries())
+  console.log(out)
 
   return out;
-})
+});
+
+export const getGraphOrder = (
+  graph: Map<string, string[]>,
+  name: string,
+  depth: number = 0,
+) => {
+  const queue = [{name, depth: 0}] as string[];
+  const depths = new Map<string, number>(); 
+  while (queue.length) {
+    const {name, depth} = queue.shift()!;
+    depths.set(name, depth);
+
+    const deps = graph.get(name).map(name => ({name, depth: depth + 1}));
+    queue.push(...deps);
+  }
+  return depths;
+}
 
 export const reserveNamespace = (
   module: ParsedModule,

@@ -251,7 +251,8 @@ export const useContext = <C>(
   if (!fiber) throw new Error("Calling a hook outside a bound function");
 
   const {host, context: {values, roots}} = fiber;
-  const root = roots.get(context)!;
+  const root = roots.get(context);
+  if (!root) throw new Error(`Context ${context.displayName} was used without being provided.`);
 
   if (host && host.depend(fiber, root)) {
     host.track(fiber, () => host.undepend(fiber, root));
@@ -270,7 +271,8 @@ export const useSomeContext = <C>(
   const i = pushState(fiber, Hook.CONTEXT);
 
   const {state, host, context: {values, roots}} = fiber;
-  const root = roots.get(context)!;
+  const root = roots.get(context);
+  if (!root) throw new Error(`Context ${context.displayName} was used without being provided.`);
 
   if (host) {
     if (!state[i]) {

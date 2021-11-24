@@ -1,5 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { formatValue } from '@use-gpu/live';
+import { formatValue, formatNodeName } from '@use-gpu/live';
 import styled, { keyframes } from "styled-components";
 
 import React, { useRef, useEffect } from 'react';
@@ -69,30 +69,8 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) =>
 			el.classList.remove('repinged');
 		}
 	});
-	
-  // @ts-ignore
-  let name = (f?.displayName ?? f?.name) || 'Node';
-  if (name === 'PROVIDE' && args) {
-    const [context] = args;
-    name = `Provide(${formatValue(context.displayName)})`;
-  }
-  else if (name === 'DETACH' && args) {
-    const [call] = args;
-    name = `Detach(${formatValue(call.f)})`;
-  }
-  else if (name === 'GATHER' && args) {
-    name = `[Gather]`;
-  }
-  else if (name === 'RECONCILE' && args) {
-    name = `[Reconcile]`;
-  }
-  else if (name === 'MAP_REDUCE' && args) {
-    name = `[MapReduce]`;
-  }
-  else if (name === 'YEET' && args) {
-    name = `[Yeet]`;
-  }
+
+	const name = formatNodeName(fiber);
 
   return <StyledNode ref={elRef} className={className} onClick={onClick}>{name}</StyledNode>;
 }
-

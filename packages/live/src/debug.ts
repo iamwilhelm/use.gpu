@@ -27,21 +27,53 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   return out.join("\n");
 }
 
-export const formatNode = <F extends Function>(node: DeferredCall<F>): string => {
+export const formatNodeName = <F extends Function>(node: DeferredCall<F>): string => {
+  const {f, args} = node;
+
   // @ts-ignore
-  let name = (node.f?.displayName ?? node.f?.name) || 'Node';
+  let name = (f?.displayName ?? f?.name) || 'Node';
+  if (name === 'PROVIDE' && args) {
+    const [context,,, isMemo] = args;
+    const value = formatValue(context.displayName);
+    return isMemo ? `Provide(Memo(${value}))` : `Provide(${value})`;
+  }
+  else if (name === 'DETACH' && args) {
+    const [call] = args;
+    name = `Detach(${formatValue(call.f)})`;
+  }
+  else if (name === 'GATHER' && args) {
+    name = `[Gather]`;
+  }
+  else if (name === 'MULTI_GATHER' && args) {
+    name = `[MultiGather]`;
+  }
+  else if (name === 'RECONCILE' && args) {
+    name = `[Reconcile]`;
+  }
+  else if (name === 'MAP_REDUCE' && args) {
+    name = `[MapReduce]`;
+  }
+  else if (name === 'YEET' && args) {
+    name = `[Yeet]`;
+  }
+
+	return name;
+}
+
+export const formatNode = <F extends Function>(node: DeferredCall<F>): string => {
+  const name = formatNodeName(node);
+
   const args = [] as string[];
   if (node.arg !== undefined) {
     args.push(formatValue(node.arg));
   }
   if (node.args !== undefined) {
-    if (name === 'REDUCE') {
+    if (node.name === 'REDUCE') {
       const [, reduce, initial] = node.args;
       args.push(formatValue({reduce, initial}));
     }
-    else if (name === 'PROVIDE') {
-      const [context] = node.args;
-      name = 'Provide';
+    else if (node.name === 'PROVIDE') {
+      const [context,,, isMemo] = node.args;
       args.push(formatValue(context));
     }
     else {

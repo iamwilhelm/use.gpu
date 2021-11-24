@@ -43,11 +43,43 @@ export const makeUniforms = (
   return {pipe, buffer, bindGroup};
 }
 
+export const makeMultiUniforms = (
+  device: GPUDevice,
+  pipeline: GPURenderPipeline | GPUComputePipeline,
+  uniformGroups: UniformAttribute[][],
+  set: number = 0,
+): UniformAllocation => {
+  const pipe = makeMultiUniformPipe(uniformGroups);
+  const buffer = makeUniformBuffer(device, pipe.data);
+
+  const {layout: {offsets}} = pipe;
+  const bindings = offsets.map((offset) => ({resource: {buffer, offset}}));
+
+  const entries = makeUniformBindings(bindings);
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(set),
+    entries,
+  });
+
+  return {pipe, buffer, bindGroup};
+}
+
 export const makeUniformPipe = (
   uniforms: UniformAttribute[],
   count: number = 1,
 ): UniformPipe => {
   const layout = makeUniformLayout(uniforms);
+  const data = makeLayoutData(layout, count);
+  const fill = makeLayoutFiller(layout, data);
+
+  return {layout, data, fill};
+}
+
+export const makeMultiUniformPipe = (
+  uniformGroups: UniformAttribute[][],
+  count: number = 1,
+): UniformPipe => {
+  const layout = makeMultiUniformLayout(uniformGroups);
   const data = makeLayoutData(layout, count);
   const fill = makeLayoutFiller(layout, data);
 
@@ -69,13 +101,13 @@ export const makeUniformBindings = (
 };
 
 export const makeUniformLayout = (
-  attributes: UniformAttribute[],
+  uniforms: UniformAttribute[],
   base: number = 0,
 ): UniformLayout => {
   const out = [] as any[];
 
   let offset = base;
-  for (const {name, format} of attributes) {
+  for (const {name, format} of uniforms) {
     const s = getUniformAttributeSize(format);
 
     const o = offset % s;
@@ -85,7 +117,28 @@ export const makeUniformLayout = (
     offset += s;
   }
 
-  return {length: offset - base, attributes: out};
+  return {length: offset - base, attributes: out, offsets: [base]};
+};
+
+export const makeMultiUniformLayout = (
+  uniformGroups: UniformAttribute[][],
+  base: number = 0,
+): UniformLayout => {
+  const out = [] as any[];
+  const offsets = [];
+
+  let offset = base;
+  for (const uniforms of uniformGroups) {
+    const {length, attributes} = makeUniformLayout(uniforms, offset);
+    out.push(...attributes);
+    offsets.push(offset);
+    offset += length;
+    
+    const d = offset % 256;
+    offset += d ? 256 - d : 0;
+  }
+
+  return {length: offset - base, attributes: out, offsets};
 };
 
 export const makeLayoutData = (
@@ -103,13 +156,21 @@ export const makeLayoutFiller = (
 ): UniformFiller => {
   const {length, attributes} = layout;
 
+  const map = new Map<string, UniformAttribute>();
+  for (const attr of attributes) map.set(attr.name, attr);
+
   const dataView = new DataView(data);
 
   const setItem = (index: number, item: any) => {
     const base = index * length;
-    for (const {name, offset, format} of attributes) {
+    for (let k in item) {
+      const attr = map.get(k);
+      if (!attr) continue;
+
+      const {offset, format} = attr;
       const setter = getUniformByteSetter(format);
-      const o = item[name];
+
+      const o = item[k];
       const v = (o && typeof o === 'object' && o.hasOwnProperty('value'))
         ? o.value : o;
       if (v != null) setter(dataView, base + offset, v);

@@ -6,6 +6,7 @@ export * from './color';
 export * from './constants';
 export * from './data';
 export * from './depth';
+export * from './picking';
 export * from './pipeline';
 export * from './storage';
 export * from './target';

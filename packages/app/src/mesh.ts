@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData } from '@use-gpu/core/types';
 import { ViewContext, RenderContext } from '@use-gpu/components';
-import { yeet, memoProps, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
   makeUniformPipe, makeUniformBindings, 
@@ -24,7 +24,7 @@ export type MeshProps = {
   mesh: VertexData,
 };
 
-export const Mesh: LiveComponent<MeshProps> = memoProps((fiber) => (props) => {
+export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
   const {mesh} = props;
 
   const {uniforms, defs} = useContext(ViewContext);

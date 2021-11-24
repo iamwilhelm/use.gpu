@@ -124,6 +124,7 @@ export type UniformAttributeDescriptor = {
 export type UniformLayout = {
   length: number,
   attributes: UniformAttributeDescriptor[],
+  offsets: number[],
 };
 
 // Uniform bindings
@@ -183,6 +184,10 @@ export type ViewUniforms = {
   viewResolution: { value: vec2 | [number, number] | number[] }
 };
 
+export type PickingUniforms = {
+  pickingId: { value: number },
+};
+
 // Data
 
 export type Emitter = (...args: number[]) => void;
@@ -202,4 +207,5 @@ export enum RenderPassMode {
   Render = 'render',
   Picking = 'picking',
   Depth = 'depth',
+  Debug = 'debug',
 };

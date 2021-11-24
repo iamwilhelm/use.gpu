@@ -67,7 +67,7 @@ export const makeTextureReadbackBuffer = (
     usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
   });
 
-  return [buffer, bytesPerRow, itemsPerRow];
+  return [buffer, bytesPerRow, itemsPerRow, d];
 }
 
 export const uploadBuffer = (

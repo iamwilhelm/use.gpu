@@ -6,8 +6,8 @@ import {
   DEPTH_STENCIL_FORMAT,
 } from '../constants';
 
-import { RenderContext, RenderProvider } from '../providers/render-provider';
-import { memo, use, provide, useContext, useMemo, useOne, makeContext } from '@use-gpu/live';
+import { RenderContext, RenderProvider } from '../providers';
+import { memo, use, provide, useContext, useMemo, useOne, useResource, makeContext } from '@use-gpu/live';
 import {
   makeColorState,
   makeColorAttachment,
@@ -18,14 +18,23 @@ import {
   makeTextureReadbackBuffer,
   TEXTURE_ARRAY_TYPES,
   TEXTURE_FORMAT_SIZES,
+  PICKING_UNIFORMS,
 } from '@use-gpu/core';
+
+const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
+
+type OnPick = (index: number) => void;
 
 type PickingContextType = {
   renderContext: CanvasRenderingContextGPU,
   pickingTexture: GPUTexture,
+  captureTexture: () => void,
+  sampleTexture: (x: number, y: number) => number[],
+  usePicking: () => { pickingDefs: UniformAttribute[], pickingUniforms: any },
 };
 
-export const PickingContext = makeContext(null, 'PickingContext');
+export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
+export const useNoPicking = () => useResource(() => ({}));
 
 export type PickingProps = {
   pickingFormat?: GPUTextureFormat, 
@@ -36,6 +45,8 @@ export type PickingProps = {
   children?: LiveElement<any>,
 }
 
+const NOP = () => {};
+
 export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
   const renderContext = useContext(RenderContext);
 
@@ -43,7 +54,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     pickingFormat = PICKING_FORMAT,
     pickingColor = PICKING_COLOR,
     depthStencilFormat = DEPTH_STENCIL_FORMAT,
-    resolution = 1,
+    resolution = 1/2,
 
     children,
   } = props;
@@ -63,7 +74,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const height = h * resolution;
     const samples = 1;
 
-    const [pickingBuffer, bytesPerRow, itemsPerRow] = makeTextureReadbackBuffer(device, width, height, pickingFormat);
+    const [pickingBuffer, bytesPerRow, itemsPerRow, itemDims] = makeTextureReadbackBuffer(device, width, height, pickingFormat);
     const pickingTexture = makeReadbackTexture(device, width, height, pickingFormat);
     const depthTexture = makeDepthTexture(device, width, height, depthStencilFormat);
 
@@ -71,6 +82,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
 
     let waiting = false;
+    let captured = null;
     const captureTexture = async () => {
       if (waiting) return;
 
@@ -87,11 +99,26 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
       const ArrayType = TEXTURE_ARRAY_TYPES[pickingFormat];
       if (ArrayType) {
         const array = new ArrayType(pickingBuffer.getMappedRange());
-        console.log(array.length, array[0], array[1], array[2], array[3], array[4], array[5], array[6], array[7]);
+        captured = array.slice();
       }
       pickingBuffer.unmap();
       waiting = false;
     }
+
+    const sampleTexture = (x: number, y: number): number[] => {
+      if (!captured) return seq(itemDims).map(i => 0);
+
+      const offset = (itemsPerRow * y + x) * itemDims;
+      const index = seq(itemDims).map(i => captured[offset + i]);
+      return index;
+    }
+
+    const usePicking = (id: number) => useOne(() => ({
+      pickingDefs: PICKING_UNIFORMS,
+      pickingUniforms: {
+        pickingId: { value: id },
+      },
+    }));
 
     const context = {
       renderContext: {
@@ -104,14 +131,15 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
         depthStencilAttachment,
       } as CanvasRenderingContextGPU,
       captureTexture,
+      sampleTexture,
+      usePicking,
     };
     
     return context;
   }, [renderContext, colorStates, depthStencilState, resolution]);
 
   return provide(PickingContext, pickingContext, children);
-  //return use(PickingProvider)({ pickingContext, children });
-}
+};
 
 export type PickingProviderProps = {
   pickingContext: PickingContextType,

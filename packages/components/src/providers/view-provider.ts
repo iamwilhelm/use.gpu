@@ -12,7 +12,7 @@ export type ViewProviderProps = {
 };
 
 export const ViewProvider: LiveComponent<ViewProviderProps> = memo((fiber) => (props) => {
-  const {defs, uniforms, children} = props;
-  const context = useMemo(() => ({defs, uniforms}), [defs, uniforms]);
+  const {defs: viewDefs, uniforms: viewUniforms, children} = props;
+  const context = useMemo(() => ({viewDefs, viewUniforms}), [viewDefs, viewUniforms]);
   return provide(ViewContext, context, children);
 }, 'ViewProvider');

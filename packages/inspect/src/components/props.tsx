@@ -1,5 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { useResource, formatNode, formatValue } from '@use-gpu/live';
+import { useResource, formatNode, formatValue, formatNodeName } from '@use-gpu/live';
 import styled, { keyframes } from "styled-components";
 
 import React from 'react';
@@ -13,7 +13,7 @@ type PropsProps = {
 export const Props: React.FC<PropsProps> = ({fiber}) => {
   // @ts-ignore
 	const {id, f, arg, args} = fiber;
-  const name = ((f as any)?.displayName ?? f?.name) || 'Node';
+  const name = formatNodeName(fiber);
 	let props = {} as Record<string, any>;
 
   if (arg !== undefined) {

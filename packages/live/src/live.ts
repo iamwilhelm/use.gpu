@@ -6,19 +6,21 @@ import {
 
 import { makeFiber } from './fiber';
 
-export const DETACH     = () => () => {};
-export const RECONCILE  = () => () => {};
-export const MAP_REDUCE = () => () => {};
-export const GATHER     = () => () => {};
-export const YEET       = () => () => {};
-export const PROVIDE    = () => () => {};
+export const DETACH       = () => () => {};
+export const RECONCILE    = () => () => {};
+export const MAP_REDUCE   = () => () => {};
+export const GATHER       = () => () => {};
+export const MULTI_GATHER = () => () => {};
+export const YEET         = () => () => {};
+export const PROVIDE      = () => () => {};
 
-(DETACH     as any).isLiveBuiltin = true;
-(RECONCILE  as any).isLiveBuiltin = true;
-(MAP_REDUCE as any).isLiveBuiltin = true;
-(GATHER     as any).isLiveBuiltin = true;
-(YEET       as any).isLiveBuiltin = true;
-(PROVIDE    as any).isLiveBuiltin = true;
+(DETACH       as any).isLiveBuiltin = true;
+(RECONCILE    as any).isLiveBuiltin = true;
+(MAP_REDUCE   as any).isLiveBuiltin = true;
+(GATHER       as any).isLiveBuiltin = true;
+(MULTI_GATHER as any).isLiveBuiltin = true;
+(YEET         as any).isLiveBuiltin = true;
+(PROVIDE      as any).isLiveBuiltin = true;
 
 // Prepare to call a live function with optional given persistent fiber
 export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
@@ -105,6 +107,13 @@ export const gatherReduce = <T>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key});
 
+// Gather items from a subtree
+export const multiGatherReduce = <T>(
+  calls: LiveElement<any>,
+  done?: LiveFunction<(r: T[]) => void>,
+  key?: Key,
+): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key});
+
 // Yeet value(s) upstream
 export const yeet = <T>(
   value: T,
@@ -116,7 +125,14 @@ export const provide = <T, C>(
   context: LiveContext<C>,
   value: T,
   calls: LiveElement<any>,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls]});
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false]});
+
+// Provide a value for a context, memoizing if it doesn't change
+export const provideMemo = <T, C>(
+  context: LiveContext<C>,
+  value: T,
+  calls: LiveElement<any>,
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true]});
 
 // Hold call info for a fiber
 export const makeFunctionCall = <F extends Function>(

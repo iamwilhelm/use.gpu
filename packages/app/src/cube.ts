@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType } from '@use-gpu/core/types';
 
 import { ViewContext, RenderContext } from '@use-gpu/components';
-import { yeet, memoProps, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeUniformBuffer, uploadBuffer,
   makeUniformPipe, makeUniformBindings,
@@ -25,7 +25,7 @@ import { makeCube } from './meshes/cube';
 export type CubeProps = {
 };
 
-export const Cube: LiveComponent<CubeProps> = memoProps((fiber) => (props) => {
+export const Cube: LiveComponent<CubeProps> = memo((fiber) => (props) => {
   const {uniforms, defs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;

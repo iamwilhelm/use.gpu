@@ -1,6 +1,6 @@
 import { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live/types';
 import { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core/types';
-import { use, yeet, memo, gatherReduce, useContext, useMemo } from '@use-gpu/live';
+import { use, yeet, memo, multiGatherReduce, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { PickingContext } from './picking';
 
@@ -21,17 +21,19 @@ const makeStaticDone = (c: any): any => {
   return c;
 }
 
+const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : [x]; 
+
 export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
   const {children, render} = props;
 
-  const Done = useMemo(() => makeStaticDone((fiber: LiveFiber<any>) => (rs: Renderable[]) => {
+  const Done = useMemo(() => makeStaticDone((fiber: LiveFiber<any>) => (rs: Record<string, Renderable | Renderable[]>) => {
     const renderContext = useContext(RenderContext);
     const pickingContext = useContext(PickingContext);
 
     const {device} = renderContext;
-
-    const renders = rs.filter((r: Renderable) => r.mode ? r.mode === RenderPassMode.Render : true);
-    const pickings = rs.filter((r: Renderable) => r.mode ? r.mode === RenderPassMode.Picking : r.pass.length > 1);
+  
+    const renders = toArray(rs[RenderPassMode.Render]);
+    const pickings = toArray(rs[RenderPassMode.Picking]);
 
     const renderToContext = (
       commandEncoder: GPUCommandEncoder,
@@ -63,5 +65,5 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
     });
   }), []);
 
-  return gatherReduce(children ?? (render ? render() : null), Done);
+  return multiGatherReduce(children ?? (render ? render() : null), Done);
 }, 'Pass');

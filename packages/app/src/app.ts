@@ -9,7 +9,7 @@ import {
   Loop, Draw, Pass,
 	Data, RawData,
   OrbitCamera, OrbitControls,
-  Picking,
+  Picking, EventProvider,
   RenderToTexture,
   ViewProvider,
 } from '@use-gpu/components';
@@ -59,9 +59,10 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
-//            use(Quads)({ positions, size: 10 }),
+            use(Quads)({ positions, size: 10 }),
             use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
-//            use(Lines)({ positions, segments, size: 50, join: 'bevel', debug: true }),
+            use(Lines)({ positions, segments, size: 50, join: 'bevel', mode: RenderPassMode.Debug }),
+            use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]
         }),
         use(RawData)({
@@ -78,8 +79,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             );
           },
           render: (positions) => [
-            use(Quads)({ positions, size: 500 }),
-            use(Quads)({ positions, size: 500, mode: RenderPassMode.Picking }),
+            use(Quads)({ positions, size: 5 }),
+            use(Quads)({ positions, size: 5, mode: RenderPassMode.Picking }),
           ],
           live: true,
         }),
@@ -116,31 +117,35 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(Picking)({
           children:
 
-            use(OrbitControls)({
-              canvas,
-              render: (radius: number, phi: number, theta: number) =>
+            use(EventProvider)({
+              element: canvas, children:
 
-                use(OrbitCamera)({
-                  canvas, radius, phi, theta,
-                  render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
+                use(OrbitControls)({
+                  canvas,
+                  render: (radius: number, phi: number, theta: number) =>
 
-                    use(ViewProvider)({
-                      defs, uniforms, children:
+                    use(OrbitCamera)({
+                      canvas, radius, phi, theta,
+                      render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
 
-//                        use(Loop)({
-//                          children: [
+                        use(ViewProvider)({
+                          defs, uniforms, children:
 
-                            //use(RenderToTexture)({
-                            //  children: view,
-                            //}),
-                  
-                            use(Draw)({
-                              children: view,
-                            }),
+    //                        use(Loop)({
+    //                          children: [
 
-//                          ],
-//                        })
-                  
+                                //use(RenderToTexture)({
+                                //  children: view,
+                                //}),
+              
+                                use(Draw)({
+                                  children: view,
+                                }),
+
+    //                          ],
+    //                        })
+              
+                        })
                     })
                 })
             })

@@ -15,8 +15,8 @@ void main() {
   ivec2 ij = getQuadIndex(vertexIndex);
   vec2 xy = vec2(ij) * 2.0 - 1.0;
 
-  int f = instanceIndex % WIREFRAME_STRIP_SEGMENTS;
-  int i = instanceIndex / WIREFRAME_STRIP_SEGMENTS;
+  int f = instanceIndex % STRIP_SEGMENTS;
+  int i = instanceIndex / STRIP_SEGMENTS;
 
   ivec2 stripIndex = getStripIndex(f);
   int edgeIndex = stripIndex.y;

@@ -9,9 +9,6 @@ import {
 } from '@use-gpu/core';
 import { linkModule as link } from '@use-gpu/shader';
 
-import vertexShader from './glsl/mesh-vertex.glsl';
-import fragmentShader from './glsl/mesh-fragment.glsl';
-
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
     name: 'lightPosition',
@@ -49,9 +46,10 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
 
   const defines = {
+    IS_PICKING: isPicking,
     VIEW_BINDING: 0,
     LIGHT_BINDING: 1,
-    PICKING_BINDING: 1 + +isPicking,
+    PICKING_BINDING: 1,
   };
 
   // Render shader
@@ -68,7 +66,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
     const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
     
     return makeRenderPipeline(
-      renderContext,
+      resolvedContext,
       vertex,
       fragment,
       {
@@ -85,24 +83,26 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
   // Uniforms
   const uniform = useMemo(() => {
     const meshDefs = MESH_UNIFORM_DEFS;
-    const defs = isPicking ? [viewDefs, meshDefs, pickingDefs] : [viewDefs, meshDefs];
+    const defs = isPicking ? [viewDefs, pickingDefs] : [viewDefs, meshDefs];
     const uniform = makeMultiUniforms(device, pipeline, defs, 0);
     return uniform;
-  }, [device, viewDefs, pipeline]);
+  }, [device, viewDefs, pickingDefs, isPicking, pipeline]);
 
   // Return a lambda back to parent(s)
-  return yeet({ render: (passEncoder: GPURenderPassEncoder) => {
-    const t = +new Date() / 1000;
-    const light = [Math.cos(t) * 5, 4, Math.sin(t) * 5, 1];
+  return yeet({
+    [mode]: (passEncoder: GPURenderPassEncoder) => {
+      const t = +new Date() / 1000;
+      const light = [Math.cos(t) * 5, 4, Math.sin(t) * 5, 1];
 
-    uniform.pipe.fill(viewUniforms);
-    uniform.pipe.fill({ lightPosition: light });
-    if (isPicking) uniform.pipe.fill(pickingUniforms);
-    uploadBuffer(device, uniform.buffer, uniform.pipe.data);
+      uniform.pipe.fill(viewUniforms);
+      uniform.pipe.fill({ lightPosition: light });
+      if (isPicking) uniform.pipe.fill(pickingUniforms);
+      uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
-    passEncoder.setPipeline(pipeline);
-    passEncoder.setBindGroup(0, uniform.bindGroup);
-    passEncoder.setVertexBuffer(0, vertexBuffers[0]);
-    passEncoder.draw(mesh.count, 1, 0, 0);
-  }}); 
+      passEncoder.setPipeline(pipeline);
+      passEncoder.setBindGroup(0, uniform.bindGroup);
+      passEncoder.setVertexBuffer(0, vertexBuffers[0]);
+      passEncoder.draw(mesh.count, 1, 0, 0);
+    }
+  }); 
 }, 'Mesh');

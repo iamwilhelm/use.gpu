@@ -105,6 +105,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         }),
         */
         use(Mesh)({ mesh }),
+        use(Mesh)({ mesh, mode: RenderPassMode.Picking }),
         //use(Cube)(),
       ]
     }),

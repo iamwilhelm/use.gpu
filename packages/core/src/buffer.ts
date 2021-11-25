@@ -13,35 +13,38 @@ export const getTypedArrayConstructor = (t: TypedArray): TypedArrayConstructor =
   throw new Error("Unknown typed array");
 }
 
+export const makeTypedBuffer = (
+  device: GPUDevice,
+  size: number,
+  usage: GPUBufferUsage,
+  data?: TypedArray,
+): GPUBuffer => {
+  const buffer = device.createBuffer({
+    size,
+    usage,
+    mappedAtCreation: !!data,
+  });
+
+  if (data) {
+    const ArrayType = getTypedArrayConstructor(data);
+    if (ArrayType) new ArrayType(buffer.getMappedRange()).set(data);
+    buffer.unmap();
+  }
+
+  return buffer;
+}
+
 export const makeVertexBuffers = (device: GPUDevice, datas: TypedArray[]): GPUBuffer[] =>
   datas.map((data: TypedArray) => makeVertexBuffer(device, data));
 
-export const makeVertexBuffer = (device: GPUDevice, data: TypedArray): GPUBuffer => {
-  const vertices = device.createBuffer({
-    size: getByteSize(data),
-    usage: GPUBufferUsage.VERTEX,
-    mappedAtCreation: true,
-  });
+export const makeVertexBuffer = (device: GPUDevice, data: TypedArray): GPUBuffer =>
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.VERTEX, data);
 
-  const ArrayType = getTypedArrayConstructor(data);
-  if (ArrayType) new ArrayType(vertices.getMappedRange()).set(data);
-
-  vertices.unmap();
-
-  return vertices;
-}
-
-export const makeUniformBuffer = (device: GPUDevice, data: BufferArray): GPUBuffer =>
-  device.createBuffer({
-    size: getByteSize(data),
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
+export const makeUniformBuffer = (device: GPUDevice, data: TypedArray): GPUBuffer =>
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
 
 export const makeStorageBuffer = (device: GPUDevice, data: BufferArray): GPUBuffer =>
-  device.createBuffer({
-    size: getByteSize(data),
-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-  });
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
 
 export const makeTextureReadbackBuffer = (
   device: GPUDevice,

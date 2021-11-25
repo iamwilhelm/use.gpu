@@ -1,4 +1,6 @@
 #pragma import {viewUniforms} from 'use/view'
+#pragma import {pickingUniforms} from 'use/picking';
+#pragma import {lightUniforms} from 'use/light';
 
 layout(location = 0) in vec4 position;
 layout(location = 1) in vec4 normal;
@@ -16,6 +18,7 @@ layout(location = 3) out vec3 fragPosition;
 #endif
 
 void main() {
+  int instanceIndex = gl_InstanceIndex;
   gl_Position = viewUniforms.projectionMatrix * viewUniforms.viewMatrix * position;
 #ifdef IS_PICKING
   fragIndex = uint(instanceIndex);

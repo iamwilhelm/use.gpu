@@ -1,4 +1,4 @@
-#pragma import {MeshVertex} from 'use/types'
+#pragma import {SolidVertex} from 'use/types'
 #pragma import {worldToClip3D} from 'use/view'
 #pragma import {getStripIndex} from 'geometry/strip'
 #pragma import {getLineJoin} from 'geometry/line'
@@ -10,12 +10,12 @@ int getSegment(int);
 float getSize(int);
 
 #pragma export
-MeshVertex getLineVertex(int vertexIndex, int instanceIndex) {
+SolidVertex getLineVertex(int vertexIndex, int instanceIndex) {
   ivec2 ij = getStripIndex(vertexIndex);
 
   int segmentLeft = getSegment(instanceIndex);
   if (segmentLeft == 2) {
-    return MeshVertex(
+    return SolidVertex(
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
       vec2(NaN, NaN)
@@ -49,7 +49,7 @@ MeshVertex getLineVertex(int vertexIndex, int instanceIndex) {
   float arc = joinIndex / float(LINE_JOIN_SIZE);
   vec3 lineJoin = getLineJoin(before, center, after, arc, xy.y, size, segment, LINE_JOIN_STYLE);
 
-  return MeshVertex(
+  return SolidVertex(
     vec4(lineJoin, 1.0),
     vec4(0.2, 0.4, 1.0, 1.0),
     uv

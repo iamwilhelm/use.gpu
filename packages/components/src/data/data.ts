@@ -83,5 +83,5 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
     }
   }
 
-  return useMemo(() => render ? render(fieldSources) : null, [render, fieldSources]);
+  return useMemo(() => render ? render(fieldSources) : yeet(fieldSources), [render, fieldSources]);
 };

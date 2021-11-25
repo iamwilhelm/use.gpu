@@ -44,6 +44,7 @@ const lineFields = [
   ['float', [10, 10, 10, 10]],
 ];
 
+let t = 0;
 let lj = 0;
 const getLineJoin = () => ['bevel', 'miter', 'round'][lj = (lj + 1) % 3];
 
@@ -59,28 +60,28 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
-            use(Quads)({ positions, size: 10 }),
-            use(Lines)({ positions, segments, size: 50, join: getLineJoin() }),
-            use(Lines)({ positions, segments, size: 50, join: 'bevel', mode: RenderPassMode.Debug }),
-            use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
+            //use(Quads)({ positions, size: 10 }),
+            use(Lines)({ positions, segments, size: 50, join: 'round' }),
+            use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
+            //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]
         }),
         use(RawData)({
           format: 'vec4',
           length: 100,
           expr: (emit, i) => {
-            const t = +new Date() / 1000;
-            const s = ((i*i + i) % 13133) % 100;
+            t = t + 1/6000;
+            const s = ((i*i + i) % 13133.371) % 1000;
             emit(
-              Math.cos(t * 1.31 + Math.sin(t * 0.31) + s),
-              Math.sin(t * 1.113 + Math.sin(t * 0.414) - s),
-              Math.cos(t * 0.981 + Math.cos(t * 0.515) + s*s),
+              Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s),
+              Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s),
+              Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s),
               1,
             );
           },
           render: (positions) => [
             use(Quads)({ positions, size: 5 }),
-            use(Quads)({ positions, size: 5, mode: RenderPassMode.Picking }),
+            //use(Quads)({ positions, size: 50, mode: RenderPassMode.Debug }),
           ],
           live: true,
         }),
@@ -103,7 +104,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           //live: true,
         }),
         */
-        //use(Mesh)({ mesh }),
+        use(Mesh)({ mesh }),
         //use(Cube)(),
       ]
     }),

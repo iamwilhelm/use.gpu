@@ -26,14 +26,13 @@ export type CubeProps = {
 };
 
 export const Cube: LiveComponent<CubeProps> = memo((fiber) => (props) => {
-  const {uniforms, defs} = useContext(ViewContext);
+  const {viewUniforms, viewDefs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;
   const {glsl: {compile}} = languages;
 
   // Blink state, flips every second
   const [blink, setBlink] = useState(0);
-  const blinkUniform = {value: blink};
   useResource((dispose) => {
     const timer = setInterval(() => {
       setBlink(b => 1 - b);
@@ -69,7 +68,7 @@ export const Cube: LiveComponent<CubeProps> = memo((fiber) => (props) => {
 
   // Uniforms
   const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(() => {
-    const uniformPipe = makeUniformPipe([...defs, ...CUBE_UNIFORM_DEFS]);
+    const uniformPipe = makeUniformPipe([...viewDefs, ...CUBE_UNIFORM_DEFS]);
     const uniformBuffer = makeUniformBuffer(device, uniformPipe.data);
     const entries = makeUniformBindings([{resource: {buffer: uniformBuffer}}]);
     const uniformBindGroup = device.createBindGroup({
@@ -77,16 +76,19 @@ export const Cube: LiveComponent<CubeProps> = memo((fiber) => (props) => {
       entries,
     });
     return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformPipe, GPUBindGroup];
-  }, [device, defs, pipeline]);
+  }, [device, viewDefs, pipeline]);
+
+  const stateUniforms = {blink};
 
   // Return a lambda back to parent(s)
-  return yeet((passEncoder: GPURenderPassEncoder) => {
-    uniformPipe.fill({...uniforms, blink: blinkUniform});
+  return yeet({ render: (passEncoder: GPURenderPassEncoder) => {
+    uniformPipe.fill(viewUniforms);
+    uniformPipe.fill(stateUniforms);
     uploadBuffer(device, uniformBuffer, uniformPipe.data);
 
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, uniformBindGroup);
     passEncoder.setVertexBuffer(0, vertexBuffers[0]);
     passEncoder.draw(cube.count, 1, 0, 0);
-  }); 
+  }}); 
 }, 'Cube');

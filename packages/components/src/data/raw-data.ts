@@ -61,5 +61,5 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
     if (data || expr) uploadBuffer(device, buffer, array.buffer);
   }
 
-  return useMemo(() => render ? render(source) : null, [render, source]);
+  return useMemo(() => render ? render(source) : yeet(source), [render, source]);
 };

@@ -3,10 +3,7 @@ import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, V
 import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
 import { yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
-import { useBoundStorageShader } from '@use-gpu/components';
-
-//import vertexShader from './glsl/quads-vertex.glsl';
-//import fragmentShader from './glsl/quads-fragment.glsl';
+import { useBoundStorageShader } from '../hooks/useBoundStorageShader';
 
 export type VirtualProps = {
   topology: string,
@@ -22,6 +19,12 @@ export type VirtualProps = {
   mode?: RenderPassMode | string,
   id?: number,
 };
+
+const getDebugShader = (topology: string) => {
+  if (topology === 'triangle-strip') return 'instance/virtual/wireframe-strip';
+  if (topology === 'triangle-list') return 'instance/virtual/wireframe-list';
+  return '';
+}
 
 export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const {
@@ -51,7 +54,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   // Render shader
   const {glsl: {modules}} = languages;
   // TODO: non-strip topology
-  const vertexShader = !isDebug ? modules['instance/virtual'] : modules['instance/wireframe-strip'];
+  const vertexShader = !isDebug ? modules['instance/virtual/virtual'] : modules[getDebugShader(topology)];
   const fragmentShader = !isDebug ? modules['instance/fragment/solid'] : modules['instance/fragment/solid'];
 
   // Data bindings
@@ -59,6 +62,8 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const extDefines = useMemo(() => ({
     ...defines,
     IS_PICKING: isPicking,
+    VIEW_BINDING: 0,
+    PICKING_BINDING: 1,
   }), [isPicking, defines]);
 
   // Shaders and data bindings
@@ -119,10 +124,14 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
 
       if (!isDebug) passEncoder.draw(vertexCount, instanceCount, 0, 0);
       else {
-        // TODO: topology
-        const tris = (vertexCount - 2);
-        const edges = tris * 2 + 1;
-        passEncoder.draw(4, edges * instanceCount, 0, 0);
+        if (topology === 'triangle-strip') {
+          const tris = vertexCount - 2;
+          const edges = tris * 2 + 1;
+          passEncoder.draw(4, edges * instanceCount, 0, 0);
+        }
+        if (topology === 'triangle-list') {
+          passEncoder.draw(4, vertexCount * instanceCount, 0, 0);
+        }
       }
     },
   }); 

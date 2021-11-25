@@ -1,12 +1,13 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData } from '@use-gpu/core/types';
-import { ViewContext, RenderContext } from '@use-gpu/components';
-import { yeet, memo, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode } from '@use-gpu/core/types';
+import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
+import { yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
-  makeVertexBuffers, makeUniformBuffer, uploadBuffer,
-  makeUniformPipe, makeUniformBindings, 
+  makeVertexBuffers, makeMultiUniforms, 
   makeRenderPipeline, makeShaderModule,
+  uploadBuffer,
 } from '@use-gpu/core';
+import { linkModule as link } from '@use-gpu/shader';
 
 import vertexShader from './glsl/mesh-vertex.glsl';
 import fragmentShader from './glsl/mesh-fragment.glsl';
@@ -22,24 +23,49 @@ const LIGHT = [0.5, 3, 2, 1];
 
 export type MeshProps = {
   mesh: VertexData,
+  mode?: RenderPassMode,
+  id?: number,
 };
 
 export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
-  const {mesh} = props;
+  const {
+    mesh,
+    mode = RenderPassMode.Render,
+    id = 0,
+  } = props;
 
-  const {uniforms, defs} = useContext(ViewContext);
+  const {viewUniforms, viewDefs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
-  const {device, colorStates, depthStencilState, samples, languages} = renderContext;
-  const {glsl: {compile}} = languages;
 
+  const isDebug = mode === RenderPassMode.Debug;
+  const isPicking = mode === RenderPassMode.Picking;
+  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext();  
+  const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoPicking();
+
+  const resolvedContext = pickingContext?.renderContext ?? renderContext;
+  const {device, colorStates, depthStencilState, samples, languages} = resolvedContext;
 
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
 
+  const defines = {
+    VIEW_BINDING: 0,
+    LIGHT_BINDING: 1,
+    PICKING_BINDING: 1 + +isPicking,
+  };
+
+  // Render shader
+  const {glsl: {compile, modules, cache}} = languages;
+  const vertexShader = !isDebug ? modules['instance/mesh'] : module['instance/virtual/wireframe-mesh']
+  const fragmentShader = !isDebug ? modules['instance/fragment/mesh'] : modules['instance/fragment/solid'];
+
   // Rendering pipeline
   const pipeline = useMemo(() => {
-    const vertex = makeShaderModule(compile(vertexShader, 'vertex'));
-    const fragment = makeShaderModule(compile(fragmentShader, 'fragment'));
+    const vertexLinked = link(vertexShader, modules, {}, defines, cache);
+    const fragmentLinked = link(fragmentShader, modules, {}, defines, cache);
+
+    const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
+    const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
     
     return makeRenderPipeline(
       renderContext,
@@ -51,36 +77,32 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
           cullMode: "back",
         },
         vertex:   {buffers: mesh.attributes},
-        fragment: {targets: colorStates},
+        fragment: {},
       }
     );
   }, [device, colorStates, depthStencilState, samples, languages]);
 
   // Uniforms
-  const [uniformBuffer, uniformPipe, uniformBindGroup] = useMemo(() => {
-    const uniformPipe = makeUniformPipe([...defs, ...MESH_UNIFORM_DEFS]);
-    const uniformBuffer = makeUniformBuffer(device, uniformPipe.data);
-    const entries = makeUniformBindings([{resource: {buffer: uniformBuffer}}]);
-    const uniformBindGroup = device.createBindGroup({
-      layout: pipeline.getBindGroupLayout(0),
-      entries,
-    });
-    return [uniformBuffer, uniformPipe, uniformBindGroup] as [GPUBuffer, UniformPipe, GPUBindGroup];
-  }, [device, defs, pipeline]);
+  const uniform = useMemo(() => {
+    const meshDefs = MESH_UNIFORM_DEFS;
+    const defs = isPicking ? [viewDefs, meshDefs, pickingDefs] : [viewDefs, meshDefs];
+    const uniform = makeMultiUniforms(device, pipeline, defs, 0);
+    return uniform;
+  }, [device, viewDefs, pipeline]);
 
   // Return a lambda back to parent(s)
-  return yeet((passEncoder: GPURenderPassEncoder) => {
+  return yeet({ render: (passEncoder: GPURenderPassEncoder) => {
     const t = +new Date() / 1000;
     const light = [Math.cos(t) * 5, 4, Math.sin(t) * 5, 1];
-    uniformPipe.fill({
-      ...uniforms,
-      lightPosition: { value: light }
-    });
-    uploadBuffer(device, uniformBuffer, uniformPipe.data);
+
+    uniform.pipe.fill(viewUniforms);
+    uniform.pipe.fill({ lightPosition: light });
+    if (isPicking) uniform.pipe.fill(pickingUniforms);
+    uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
     passEncoder.setPipeline(pipeline);
-    passEncoder.setBindGroup(0, uniformBindGroup);
+    passEncoder.setBindGroup(0, uniform.bindGroup);
     passEncoder.setVertexBuffer(0, vertexBuffers[0]);
     passEncoder.draw(mesh.count, 1, 0, 0);
-  }); 
+  }}); 
 }, 'Mesh');

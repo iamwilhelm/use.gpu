@@ -1,11 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
-import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
+import { ViewContext, RenderContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
-
-import { Virtual } from './virtual';
 
 //import vertexShader from './glsl/quads-vertex.glsl';
 //import fragmentShader from './glsl/quads-fragment.glsl';
@@ -29,7 +27,7 @@ const DATA_BINDINGS = [
 ] as UniformAttribute[];
 
 const DEFINES = {
-  STRIP_SEGMENTS: 5,
+  STRIP_SEGMENTS: 2,
 };
 
 export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
@@ -60,7 +58,7 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
     attributes: DATA_BINDINGS,
     propBindings,
     codeBindings,
-    DEFINES,
+    defines: DEFINES,
     deps: null,
 
     mode,

@@ -119,6 +119,7 @@ export const loadModules = timed('loadModules', (
 
   while (queue.length) {
     const {name, code} = queue.shift()!;
+    if (code == null) throw new Error(`Shader code ${name} undefined`);
 
     let tree, table;
     if (cache) {

@@ -1,6 +1,6 @@
-#pragma import {MeshVertex} from 'use/types'
+#pragma import {SolidVertex} from 'use/types'
 
-MeshVertex getVertex(int, int);
+SolidVertex getVertex(int, int);
 
 #ifdef IS_PICKING
 layout(location = 0) out flat uint fragIndex;
@@ -13,7 +13,7 @@ void main() {
   int vertexIndex = gl_VertexIndex;
   int instanceIndex = gl_InstanceIndex;
 
-  MeshVertex v = getVertex(vertexIndex, instanceIndex);
+  SolidVertex v = getVertex(vertexIndex, instanceIndex);
 
   gl_Position = v.position;
 #ifdef IS_PICKING

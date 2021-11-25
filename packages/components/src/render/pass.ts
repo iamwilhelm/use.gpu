@@ -21,7 +21,7 @@ const makeStaticDone = (c: any): any => {
   return c;
 }
 
-const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : [x]; 
+const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : []; 
 
 export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
   const {children, render} = props;
@@ -31,15 +31,17 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
     const pickingContext = useContext(PickingContext);
 
     const {device} = renderContext;
-  
+
     const renders = toArray(rs[RenderPassMode.Render]);
+    const debugs = toArray(rs[RenderPassMode.Debug]);
     const pickings = toArray(rs[RenderPassMode.Picking]);
+
+    const visibles = [...renders, ...debugs];
 
     const renderToContext = (
       commandEncoder: GPUCommandEncoder,
       context: UseRenderingContextGPU,
       rs: Renderable[],
-      mode: RenderPassMode,
     ) => {
       const {colorAttachments, depthStencilAttachment} = context;
       const renderPassDescriptor: GPURenderPassDescriptor = {
@@ -48,18 +50,15 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
       };
 
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-      for (let r of rs) {
-        const f = r.mode ? r.pass : r;
-        f(passEncoder, mode);
-      }
+      for (let r of rs) r(passEncoder);
       passEncoder.endPass();
     };
 
     return yeet(() => {
       const commandEncoder = device.createCommandEncoder();
 
-      renderToContext(commandEncoder, renderContext, renders, RenderPassMode.Render);
-      if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, pickings, RenderPassMode.Picking);
+      renderToContext(commandEncoder, renderContext, visibles);
+      if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, pickings);
 
       device.queue.submit([commandEncoder.finish()]);      
     });

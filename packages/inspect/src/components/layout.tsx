@@ -5,6 +5,12 @@ export const InspectContainer = styled.div`
 	background: rgba(255, 255, 255, 0.9);
 	color: #000;
 	cursor: default;
+  position: relative;
+`;
+
+export const InspectContainerCollapsed = styled(InspectContainer)`
+	width: 400px;
+  position: relative;
 `;
 
 export const InspectToggle = styled.div`
@@ -47,6 +53,7 @@ export const SplitColumn = styled.div`
 `;
 
 export const RowPanel = styled.div`
+  position: relative;
 	&:not(:last-child) {
 		border-right: 1px solid #ccc;
 	}

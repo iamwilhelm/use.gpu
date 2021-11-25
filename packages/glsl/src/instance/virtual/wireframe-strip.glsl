@@ -1,9 +1,9 @@
-#pragma import {MeshVertex} from 'use/types'
+#pragma import {SolidVertex} from 'use/types'
 #pragma import {getQuadIndex} from 'geometry/quad'
 #pragma import {getStripIndex} from 'geometry/strip'
 #pragma import {getLineJoin} from 'geometry/line'
 
-MeshVertex getVertex(int, int);
+SolidVertex getVertex(int, int);
 
 layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec2 fragUV;
@@ -15,15 +15,16 @@ void main() {
   ivec2 ij = getQuadIndex(vertexIndex);
   vec2 xy = vec2(ij) * 2.0 - 1.0;
 
-  int f = instanceIndex % STRIP_SEGMENTS;
-  int i = instanceIndex / STRIP_SEGMENTS;
+  int n = STRIP_SEGMENTS * 2 + 1;
+  int f = instanceIndex % n;
+  int i = instanceIndex / n;
 
   ivec2 stripIndex = getStripIndex(f);
   int edgeIndex = stripIndex.y;
   int triIndex = stripIndex.x;
 
-  MeshVertex a = getVertex(triIndex, i);
-  MeshVertex b = getVertex(triIndex + 1 + edgeIndex, i);
+  SolidVertex a = getVertex(triIndex, i);
+  SolidVertex b = getVertex(triIndex + 1 + edgeIndex, i);
 
   vec3 left = a.position.xyz / a.position.w;
   vec3 right = b.position.xyz / b.position.w;

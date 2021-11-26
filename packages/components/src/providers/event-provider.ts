@@ -19,9 +19,9 @@ export type MouseEventState = {
   buttons: number,
   x: number,
   y: number,
-	index: number,
-	hovered: boolean,
-	clicked: boolean,
+  index: number,
+  hovered: boolean,
+  clicked: boolean,
 };
 
 export type MouseState = {
@@ -50,18 +50,18 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
     }),
   }));
 
-	const mouseContext = useMemo(() => ({
-		mouse: mouseState,
-		targetId: mouseTargetId,
-		targetIndex: mouseTargetIndex,
-		useMouseState: (id: number): MouseEventState => {
-			const index   = mouseTargetIndex;
-			const hovered = mouseTargetId == id;
-			const clicked = mouseState.buttons & 1;
+  const mouseContext = useMemo(() => ({
+    mouse: mouseState,
+    targetId: mouseTargetId,
+    targetIndex: mouseTargetIndex,
+    useMouseState: (id: number): MouseEventState => {
+      const index   = mouseTargetIndex;
+      const hovered = mouseTargetId == id;
+      const clicked = hovered && !!(mouseState.buttons & 1);
 
-			return {...mouseState, hovered, clicked, index};
-		},
-	}), [mouseState, mouseTargetId]);
+      return {...mouseState, hovered, clicked, index};
+    },
+  }), [mouseState, mouseTargetId]);
 
   useResource((dispose) => {
   }, mouseTargetId);
@@ -132,6 +132,6 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
   }, [element]);
 
   return provide(MouseContext, mouseContext,
-		provideMemo(EventContext, eventApi, children)
-	);
+    provideMemo(EventContext, eventApi, children)
+  );
 }, 'EventProvider');

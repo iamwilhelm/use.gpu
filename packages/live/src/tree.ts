@@ -22,7 +22,7 @@ export const makeHost = () => {
     depend: dependency.depend,
     undepend: dependency.undepend,
     invalidate: dependency.invalidate,
-		__ping: () => {},
+    __ping: () => {},
     __stats: {mounts: 0, unmounts: 0, updates: 0, dispatch: 0},
     __flush: scheduler.flush,
   } as HostInterface;
@@ -87,12 +87,12 @@ export const renderSubRoot = (
 
   // Update any remaining shielded nodes
   while (subs.size) {
-		// TODO: replace to-visit set with priority queue
-		const fibers = Array.from(subs.values());
+    // TODO: replace to-visit set with priority queue
+    const fibers = Array.from(subs.values());
     const [{root: sub}] = groupFibers(fibers);
 
     DEBUG && console.log('Updating Shielded Sub-Node', formatNode(sub));
-		callbacks.onSlice(sub);
+    callbacks.onSlice(sub);
     renderFiber(sub, callbacks);
   }
 }
@@ -116,19 +116,22 @@ export const groupFibers = (fibers: LiveFiber<any>[]) => {
 }
 
 const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): RenderCallbacks => {
-	let {depth} = root;
+  let {depth} = root;
 
   const onRender = (fiber: LiveFiber<any>) => {
-		const inSameStack = fiber.depth - depth <= SLICE_STACK;
-		if (inSameStack) {
-	    // Remove from to-visit set
-	    visit.delete(fiber);
-		}
-		else {
+    const inSameStack = fiber.depth - depth <= SLICE_STACK;
+    if (inSameStack) {
+      // Remove from to-visit set
+      visit.delete(fiber);
+
+      // Ensure yeet root is visited
+      if (fiber.yeeted?.value !== undefined) visitYeetRoots(visit, fiber);
+    }
+    else {
       console.log('Slicing at', formatNode(fiber));
-			visit.add(fiber);
-		}
-		return inSameStack;
+      visit.add(fiber);
+    }
+    return inSameStack;
   };
 
   const onUpdate = (fiber: LiveFiber<any>) => {
@@ -138,11 +141,10 @@ const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): 
       DEBUG && console.log('Invalidating Node', formatNode(sub));
       visit.add(sub);
       bustFiberCaches(sub);
-      if (sub.yeeted?.value !== undefined) visitYeetRoots(visit, sub);
     }
 
-  	// Notify host / dev tool of update
-  	if (host?.__ping) host.__ping(fiber);
+    // Notify host / dev tool of update
+    if (host?.__ping) host.__ping(fiber);
   };
 
   const onFence = (fiber: LiveFiber<any>) => {
@@ -162,9 +164,9 @@ const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): 
     }
   }
 
-	const onSlice = (fiber: LiveFiber<any>) => {
-		depth = fiber.depth;
-	}
+  const onSlice = (fiber: LiveFiber<any>) => {
+    depth = fiber.depth;
+  }
 
   return {onRender, onUpdate, onFence, onSlice};
 }

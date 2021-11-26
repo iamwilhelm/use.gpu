@@ -33,7 +33,7 @@ void main() {
   float metalness = 0.2;
   float roughness = 0.8;
 
-  vec3 color = PBR(N, L, V, albedo, metalness, roughness);
+  vec3 color = PBR(N, L, V, albedo, metalness, roughness) * lightUniforms.lightColor.xyz;
   outColor = vec4(color, fragColor.a);
 }
 #endif

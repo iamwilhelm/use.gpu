@@ -40,9 +40,9 @@ const quadFields = [
 ];
 
 const lineFields = [
-  ['vec4', [-1.5, 0, 0, 1, 1.5, 0, 0, 1, 1.5, 1.5, 0, 1, 1.5, 1.5, 1.5, 1]],
-  ['int', [1, 3, 3, 2]],
-  ['float', [10, 10, 10, 10]],
+  ['vec4', [0, 0, 0, 1, 1.5, 0, 0, 1, 1.5, 1.5, 0, 1, 1.5, 1.5, 1.5, 1, 1.5, -1.5, 1.5, 1]],
+  ['int', [1, 3, 3, 3, 2]],
+  ['float', [10, 10, 10, 10, 10]],
 ];
 
 let t = 0;
@@ -58,15 +58,17 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const view = [
     use(Pass)({
       children: [
+        /*
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
             //use(Quads)({ positions, size: 10 }),
             use(Lines)({ positions, segments, size: 50, join: 'round' }),
-            use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
+            //use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
             //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]
         }),
+        */
         use(RawData)({
           format: 'vec4',
           length: 100,
@@ -105,13 +107,13 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           //live: true,
         }),
         */
-        use(Mesh)({ mesh }),
-				use(Pick)({
-          render: ({id, hovered}) => [
-  					use(Mesh)({ id, mesh, mode: RenderPassMode.Picking }),
+        use(Pick)({
+          render: ({id, hovered, clicked}) => [
+            use(Mesh)({ mesh, blink: clicked }),
+            use(Mesh)({ id, mesh, mode: RenderPassMode.Picking }),
             hovered ? use(Cursor)({ cursor: 'pointer' }) : null,
           ],
-				}),
+        }),
         //use(Cube)(),
       ]
     }),

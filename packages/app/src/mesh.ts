@@ -14,14 +14,19 @@ export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
     name: 'lightPosition',
     format: UniformType.vec4,
   },
+  {
+    name: 'lightColor',
+    format: UniformType.vec4,
+  },
 ];
 
-const LIGHT = [0.5, 3, 2, 1];
+const LIGHT = [-2.5, 3, 2, 1];
 
 export type MeshProps = {
   mesh: VertexData,
   mode?: RenderPassMode,
   id?: number,
+	blink?: boolean,
 };
 
 export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
@@ -29,7 +34,13 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
     mesh,
     mode = RenderPassMode.Render,
     id = 0,
+    blink,
   } = props;
+
+  let blinkState = useOne(() => ({ state: false }));
+  useOne(() => {
+    if (blink) blinkState.state = !blinkState.state
+  }, blink);
 
   const {viewUniforms, viewDefs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
@@ -91,8 +102,10 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
   // Return a lambda back to parent(s)
   return yeet({
     [mode]: (passEncoder: GPURenderPassEncoder) => {
+      const l = blinkState.state ? 1 : 0.5;
+
       uniform.pipe.fill(viewUniforms);
-      uniform.pipe.fill({ lightPosition: LIGHT });
+      uniform.pipe.fill({ lightPosition: LIGHT, lightColor: [l, l, l, 1] });
       if (isPicking) uniform.pipe.fill(pickingUniforms);
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 

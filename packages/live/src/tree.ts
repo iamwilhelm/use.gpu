@@ -4,8 +4,10 @@ import { makeFiber, renderFiber, bustFiberCaches, visitYeetRoots } from './fiber
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubOrSamePath, isSubPath, comparePaths } from './util';
 import { formatNode } from './debug';
 
-let DEBUG = false;
-//setTimeout((() => DEBUG = false), 900);
+const SLICE_STACK = 20;
+
+let DEBUG = true;
+setTimeout((() => DEBUG = false), 4000);
 
 const NO_ARGS = [] as any[];
 
@@ -77,7 +79,7 @@ export const renderSubRoot = (
   const {host} = root;
   if (host) host.__stats.dispatch++;
 
-  const callbacks = makeRenderCallbacks(subs);
+  const callbacks = makeRenderCallbacks(root, subs);
 
   // Update from the root down
   DEBUG && console.log('Updating Sub-Root', formatNode(root));
@@ -85,9 +87,13 @@ export const renderSubRoot = (
 
   // Update any remaining shielded nodes
   while (subs.size) {
-    const next = subs.values().next().value;
-    DEBUG && console.log('Updating Memoized Sub-Node', formatNode(next));
-    renderFiber(next, callbacks);
+		// TODO: replace to-visit set with priority queue
+		const fibers = Array.from(subs.values());
+    const [{root: sub}] = groupFibers(fibers);
+
+    DEBUG && console.log('Updating Shielded Sub-Node', formatNode(sub));
+		callbacks.onSlice(sub);
+    renderFiber(sub, callbacks);
   }
 }
 
@@ -109,10 +115,20 @@ export const groupFibers = (fibers: LiveFiber<any>[]) => {
   return roots;
 }
 
-const makeRenderCallbacks = (visit: Set<LiveFiber<any>>): RenderCallbacks => {
+const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): RenderCallbacks => {
+	let {depth} = root;
+
   const onRender = (fiber: LiveFiber<any>) => {
-    // Remove from to-visit set
-    if (visit) visit.delete(fiber);
+		const inSameStack = fiber.depth - depth <= SLICE_STACK;
+		if (inSameStack) {
+	    // Remove from to-visit set
+	    visit.delete(fiber);
+		}
+		else {
+      console.log('Slicing at', formatNode(fiber));
+			visit.add(fiber);
+		}
+		return inSameStack;
   };
 
   const onUpdate = (fiber: LiveFiber<any>) => {
@@ -122,7 +138,7 @@ const makeRenderCallbacks = (visit: Set<LiveFiber<any>>): RenderCallbacks => {
       DEBUG && console.log('Invalidating Node', formatNode(sub));
       visit.add(sub);
       bustFiberCaches(sub);
-      visitYeetRoots(visit, sub);
+      if (sub.yeeted?.value !== undefined) visitYeetRoots(visit, sub);
     }
 
   	// Notify host / dev tool of update
@@ -138,15 +154,19 @@ const makeRenderCallbacks = (visit: Set<LiveFiber<any>>): RenderCallbacks => {
     DEBUG && console.log('Fencing Sub-Root', formatNode(fiber));
     const nodes = [];
     const {path} = fiber;
-    const before = [...path, 0];
-    for (let f of visit.values()) if (isSubPath(before, f.path)) nodes.push(f);
+
+    for (let f of visit.values()) if (isSubPath(path, f.path)) nodes.push(f);
     if (nodes.length) {
       renderFibers(nodes);
       for (let n of nodes) visit.delete(n);
     }
   }
 
-  return {onRender, onUpdate, onFence};
+	const onSlice = (fiber: LiveFiber<any>) => {
+		depth = fiber.depth;
+	}
+
+  return {onRender, onUpdate, onFence, onSlice};
 }
 
 export const renderPaint = (() => {

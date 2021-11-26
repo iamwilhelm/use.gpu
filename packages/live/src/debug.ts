@@ -37,6 +37,11 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
     const value = formatValue(context.displayName);
     return isMemo ? `Provide(Memo(${value}))` : `Provide(${value})`;
   }
+  else if (name === 'CONSUME' && args) {
+    const [context] = args;
+    const value = formatValue(context.displayName);
+    return `Consume(${value})`;
+  }
   else if (name === 'DETACH' && args) {
     const [call] = args;
     name = `Detach(${formatValue(call.f)})`;
@@ -87,8 +92,18 @@ export const formatNode = <F extends Function>(node: DeferredCall<F>): string =>
 
 export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return x;
+  if (Array.isArray(x)) {
+    if (seen.get(x)) return '[Repeated]';
+    seen.set(x, true);
+
+    const out = [];
+    for (const k in x) if (hasOwnProperty.call(x, k)) {
+      out.push(`${formatShortValue(x[k], seen)}`);
+    }
+    return '[' + out.join(', ') + ']';
+  }
   if (typeof x === 'object') {
-    if (seen.get(x)) return '[Circular]';
+    if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
 
     const out = [];

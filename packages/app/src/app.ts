@@ -9,7 +9,8 @@ import {
   Loop, Draw, Pass,
 	Data, RawData,
   OrbitCamera, OrbitControls,
-  Picking, EventProvider,
+  Picking, Pick, EventProvider,
+  CursorConsumer, Cursor,
   RenderToTexture,
   ViewProvider,
 } from '@use-gpu/components';
@@ -105,7 +106,12 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         }),
         */
         use(Mesh)({ mesh }),
-        use(Mesh)({ mesh, mode: RenderPassMode.Picking }),
+				use(Pick)({
+          render: ({id, hovered}) => [
+  					use(Mesh)({ id, mesh, mode: RenderPassMode.Picking }),
+            hovered ? use(Cursor)({ cursor: 'pointer' }) : null,
+          ],
+				}),
         //use(Cube)(),
       ]
     }),
@@ -119,37 +125,41 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(Picking)({
           children:
 
-            use(EventProvider)({
-              element: canvas, children:
+					use(CursorConsumer)({
+						element: canvas, children:
 
-                use(OrbitControls)({
-                  canvas,
-                  render: (radius: number, phi: number, theta: number) =>
+		            use(EventProvider)({
+		              element: canvas, children:
 
-                    use(OrbitCamera)({
-                      canvas, radius, phi, theta,
-                      render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
+		                use(OrbitControls)({
+		                  canvas,
+		                  render: (radius: number, phi: number, theta: number) =>
 
-                        use(ViewProvider)({
-                          defs, uniforms, children:
+		                    use(OrbitCamera)({
+		                      canvas, radius, phi, theta,
+		                      render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
 
-    //                        use(Loop)({
-    //                          children: [
+		                        use(ViewProvider)({
+		                          defs, uniforms, children:
 
-                                //use(RenderToTexture)({
-                                //  children: view,
-                                //}),
+		    //                        use(Loop)({
+		    //                          children: [
+
+		                                //use(RenderToTexture)({
+		                                //  children: view,
+		                                //}),
               
-                                use(Draw)({
-                                  children: view,
-                                }),
+		                                use(Draw)({
+		                                  children: view,
+		                                }),
 
-    //                          ],
-    //                        })
+		    //                          ],
+		    //                        })
               
-                        })
-                    })
-                })
+		                        })
+		                    })
+		                })
+								})
             })
         })
     }),

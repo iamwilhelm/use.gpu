@@ -4,6 +4,7 @@ import {
   FunctionCall, DeferredCall, HostInterface,
 } from './types';
 
+import { comparePaths } from './util';
 import { makeFiber } from './fiber';
 
 export const DETACH       = () => () => {};
@@ -13,6 +14,7 @@ export const GATHER       = () => () => {};
 export const MULTI_GATHER = () => () => {};
 export const YEET         = () => () => {};
 export const PROVIDE      = () => () => {};
+export const CONSUME      = () => () => {};
 
 (DETACH       as any).isLiveBuiltin = true;
 (RECONCILE    as any).isLiveBuiltin = true;
@@ -21,6 +23,12 @@ export const PROVIDE      = () => () => {};
 (MULTI_GATHER as any).isLiveBuiltin = true;
 (YEET         as any).isLiveBuiltin = true;
 (PROVIDE      as any).isLiveBuiltin = true;
+(CONSUME      as any).isLiveBuiltin = true;
+
+(RECONCILE    as any).isLiveInline = true;
+(MAP_REDUCE   as any).isLiveInline = true;
+(GATHER       as any).isLiveInline = true;
+(MULTI_GATHER as any).isLiveInline = true;
 
 // Prepare to call a live function with optional given persistent fiber
 export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
@@ -125,14 +133,24 @@ export const provide = <T, C>(
   context: LiveContext<C>,
   value: T,
   calls: LiveElement<any>,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false]});
+	key?: KEy,
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key});
 
 // Provide a value for a context, memoizing if it doesn't change
 export const provideMemo = <T, C>(
   context: LiveContext<C>,
   value: T,
   calls: LiveElement<any>,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true]});
+	key?: Key,
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key});
+
+// Consume value from a co-context
+export const consume = <T, C>(
+  context: LiveContext<C>,
+  calls: LiveElement<any>,
+  done?: LiveFunction<(r: T[]) => void>,
+  key?: Key,
+): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key});
 
 // Hold call info for a fiber
 export const makeFunctionCall = <F extends Function>(
@@ -144,3 +162,27 @@ export const makeFunctionCall = <F extends Function>(
 export const makeContext = <T>(initialValue?: T, displayName?: string): LiveContext<T> => ({initialValue, displayName});
 export const createContext = makeContext;
 
+// Co-context value return type sugar
+export const flattenRegistry = <T>(registry: Map<LiveFiber<any>, T>): [LiveFiber<any>, T] => {
+	const entries = Array.from(registry.entries());
+	entries.sort((a, b) => comparePaths(a[0].path, b[0].path) || (a[0].depth - b[0].depth));
+	return entries;
+}
+
+export const forRegistry = <T>(
+	registry: Map<LiveFiber<any>, T>,
+	map: (f: LiveFiber<any>, v: T) => void,
+) => {
+	for (const [f, v] of flattenRegistry(registry)) map(f, v);
+}
+
+export const getTailNode = <T>(
+	registry: Map<LiveFiber<any>, T>,
+) => {
+	const entries = flattenRegistry(registry);
+	return entries[0];
+}
+
+export const getTailValue = <T>(
+	registry: Map<LiveFiber<any>, T>,
+) => getTailNode(registry)?.[1];

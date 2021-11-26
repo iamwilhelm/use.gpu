@@ -17,7 +17,7 @@ type FiberProps = {
 }
 
 export const Fiber: React.FC<FiberProps> = ({fiber, ping, compact, expandCursor, selectedCursor}) => {
-  const {id, mount, mounts, next} = fiber;
+  const {id, mount, mounts, next, order} = fiber;
 	const [selectState, updateSelectState] = selectedCursor;
 	
 	const pinged = ping[id] || 0;
@@ -43,7 +43,7 @@ export const Fiber: React.FC<FiberProps> = ({fiber, ping, compact, expandCursor,
 	}
 
   if (mounts) {
-    for (const key of mounts.keys()) {
+    for (const key of order) {
       const sub = mounts.get(key);
       if (sub) out.push(
 				<Fiber

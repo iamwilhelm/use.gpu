@@ -19,7 +19,7 @@ export const makeIdAllocator = <T>() => {
       return i;
     },
     release: (j: number) => {
-      used.remove(j);
+      used.delete(j);
       i = Math.min(i, j);
     },
   };

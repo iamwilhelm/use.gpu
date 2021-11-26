@@ -60,11 +60,11 @@ export const makeTextureReadbackBuffer = (
   const paddingSize = partialBlock ? 256 - partialBlock : 0;
 
   const bytesPerRow = minBytes + paddingSize;
-  const itemsPerRow = bytesPerRow / d / s;
+  const itemsPerRow = bytesPerRow / s;
 
   if (itemsPerRow !== Math.round(itemsPerRow)) throw new Error("Readback size not a multiple of item size");
 
-  const n = bytesPerRow * height * s;
+  const n = bytesPerRow * height;
   const buffer = device.createBuffer({
     size: n,
     usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,

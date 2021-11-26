@@ -70,8 +70,8 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
 
   const pickingContext = useMemo(() => {
     const {device, width: w, height: h} = renderContext;
-    const width = w * resolution;
-    const height = h * resolution;
+    const width = Math.round(w * resolution);
+    const height = Math.round(h * resolution);
     const samples = 1;
 
     const [pickingBuffer, bytesPerRow, itemsPerRow, itemDims] = makeTextureReadbackBuffer(device, width, height, pickingFormat);
@@ -108,7 +108,10 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const sampleTexture = (x: number, y: number): number[] => {
       if (!captured) return seq(itemDims).map(i => 0);
 
-      const offset = (itemsPerRow * y + x) * itemDims;
+      const xs = Math.round(x * resolution);
+      const ys = Math.round(y * resolution);
+
+      const offset = (itemsPerRow * ys + xs) * itemDims;
       const index = seq(itemDims).map(i => captured[offset + i]);
       return index;
     }

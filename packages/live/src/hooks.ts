@@ -40,6 +40,7 @@ enum Hook {
   CALLBACK = 3,
   RESOURCE = 4,
   CONTEXT = 5,
+  COCONTEXT = 6,
 };
 
 // Memoize a live function on all its arguments (shallow comparison per arg)
@@ -298,6 +299,32 @@ export const useNoContext = <C>(
   const root = roots.get(context)!;
 
   if (host) host.undepend(fiber, root);
+}
+
+// Provide a value to a co-context from the fiber
+export const useConsumer = <C>(
+  context: LiveContext<C>,
+  value: any,
+) => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+
+  const {host, context: {values, roots}} = fiber;
+  const root = roots.get(context);
+  if (!root) throw new Error(`Co-context ${context.displayName} was used without being consumed.`);
+
+  if (host && host.depend(root.next, fiber)) {
+    host.track(fiber, () => {
+      registry.delete(fiber);
+      host.schedule(root.next, NOP);
+      host.undepend(root.next, fiber)
+    });
+  }
+
+  host.schedule(root.next, NOP);
+
+  const registry = values.get(context).current;
+  registry.set(fiber, value);
 }
 
 // Togglable hooks

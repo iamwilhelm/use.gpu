@@ -1,17 +1,27 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { PickingUniforms } from '@use-gpu/core/types';
 
-import { memo, provideMemo, makeContext, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { memo, provide, provideMemo, makeContext, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { makeIdAllocator, PICKING_UNIFORMS } from '@use-gpu/core';
 import { PickingContext } from '../render/picking';
 
 const CAPTURE_EVENT = {capture: true};
 
 export const EventContext = makeContext(null, 'EventContext');
+export const MouseContext = makeContext(null, 'MouseContext');
 
 export type EventProviderProps = {
   element: HTMLElement,
   children: LiveElement<any>,
+};
+
+export type MouseEventState = {
+  buttons: number,
+  x: number,
+  y: number,
+	index: number,
+	hovered: boolean,
+	clicked: boolean,
 };
 
 export type MouseState = {
@@ -30,24 +40,28 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
   });
 
   const allocId = useOne(() => makeIdAllocator<OnPick>());
-  const mouseTargetId = sampleTexture(mouseState.x, mouseState.y);
+  const [mouseTargetId, mouseTargetIndex] = sampleTexture(mouseState.x, mouseState.y);
 
-  const ref = useOne(() => ({
-    mouseState,
-    mouseTargetId,
-  }));
-  ref.mouseState = mouseState;
-  ref.mouseTargetId = mouseTargetId;
-
-  const api = useOne(() => ({
-    useId: () => useResource(() => {
+  const eventApi = useOne(() => ({
+    useId: () => useResource((dispose) => {
       const id = allocId.obtain();
       dispose(() => allocId.release(id));
       return id;
     }),
-    getMouseState: () => ref.mouseState,
-    getMouseTarget: () => ref.mouseTargetId,
   }));
+
+	const mouseContext = useMemo(() => ({
+		mouse: mouseState,
+		targetId: mouseTargetId,
+		targetIndex: mouseTargetIndex,
+		useMouseState: (id: number): MouseEventState => {
+			const index   = mouseTargetIndex;
+			const hovered = mouseTargetId == id;
+			const clicked = mouseState.buttons & 1;
+
+			return {...mouseState, hovered, clicked, index};
+		},
+	}), [mouseState, mouseTargetId]);
 
   useResource((dispose) => {
   }, mouseTargetId);
@@ -56,6 +70,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
     let left, top;
 
     const onSnapshot = () => ({left, top} = element.getBoundingClientRect());
+    onSnapshot();
 
     const onMove = (buttons: number, clientX: number, clientY: number) => {
       setMouseState({
@@ -68,7 +83,6 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
     const onTouchStart = (e: TouchEvent) => {
       const {targetTouches: [touch]} = e;
       const {clientX, clientY} = touch;
-      onSnapshot();
       onMove(1, clientX, clientY);
     }
 
@@ -85,7 +99,6 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
 
     const onMouseDown = (e: MouseEvent) => {
       const {buttons, clientX, clientY} = e;
-      onSnapshot();
       onMove(buttons, clientX, clientY);
     };
 
@@ -118,5 +131,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
     });
   }, [element]);
 
-  return provideMemo(EventContext, api, children);
+  return provide(MouseContext, mouseContext,
+		provideMemo(EventContext, eventApi, children)
+	);
 }, 'EventProvider');

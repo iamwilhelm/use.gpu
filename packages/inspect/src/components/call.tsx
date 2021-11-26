@@ -1,8 +1,8 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { useResource, formatNode, formatValue } from '@use-gpu/live';
+import { formatNode, formatValue } from '@use-gpu/live';
 import styled, { keyframes } from "styled-components";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Action } from './types';
 import { SplitRow, IndentTree, Label } from './layout';
 
@@ -21,8 +21,14 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
 
 	let props = {id, depth, path, state, yeeted, context, next} as Record<string, any>;
 
+	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+	const toggleExpanded = (id: string) => setExpanded((state) => ({
+		...expanded,
+		[id]: !expanded[id],
+	}));
+
 	return (<StyledCall>
 		<div><b>Fiber</b></div>
-		<div>{inspectObject(props)}</div>
+		<div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
 	</StyledCall>);
 }

@@ -21,12 +21,13 @@ export type Action<F extends Function> = {
   task: Task,
 };
 export type Dispatcher = (as: Action<any>[]) => void;
-export type OnFiber = (fiber: LiveFiber<any>) => void;
+export type OnFiber = <T = void>(fiber: LiveFiber<any>) => T;
 export type FiberSetter<T> = (fiber: LiveFiber<any>, t: T) => void;
 export type RenderCallbacks = {
-  onRender: OnFiber,
+  onRender: OnFiber<boolean>,
   onUpdate: OnFiber,
   onFence: OnFiber,
+	onSlice: OnFiber,
 };
 
 // User=defined context

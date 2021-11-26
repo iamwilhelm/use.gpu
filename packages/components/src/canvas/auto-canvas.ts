@@ -3,6 +3,7 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 
 import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
+import { CursorConsumer } from '../consumers/cursor-consumer';
 
 import { use } from '@use-gpu/live';
 
@@ -21,5 +22,8 @@ export type AutoCanvasProps = {
 export const AutoCanvas: LiveComponent<AutoCanvasProps> = () => (props) =>
   use(AutoSize)({
     canvas: props.canvas,
-    children: use(Canvas)({...props}),
+    children: use(CursorConsumer)({
+      element: props.canvas,
+      children: use(Canvas)({...props}),
+    })
   });

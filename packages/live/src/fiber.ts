@@ -673,7 +673,9 @@ export const flushMount = <F extends Function>(
 export const bustFiberCaches = <F extends Function>(fiber: LiveFiber<F>) => {
   const {host, version, yeeted} = fiber;
   if (DEBUG && (version != null || yeeted)) console.log('Busting caches on', formatNode(fiber));
-  if (version != null) fiber.version++;
+  if (version != null) {
+    fiber.version = (fiber.version + 1) & 0x7FFFFFFF;
+  }
   if (yeeted) {
     let yt = yeeted;
     do {

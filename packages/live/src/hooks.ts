@@ -86,7 +86,7 @@ export const memoProps = <F extends Function>(
       }
 
       const value = useMemo(() => {
-        fiber.memo = 0;
+        fiber.memo = -1;
         return bound(props);
       }, deps);
 

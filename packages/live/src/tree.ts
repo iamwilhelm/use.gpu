@@ -128,7 +128,7 @@ const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): 
       if (fiber.yeeted?.value !== undefined) visitYeetRoots(visit, fiber);
     }
     else {
-      console.log('Slicing at', formatNode(fiber));
+      DEBUG && console.log('Slicing at', formatNode(fiber));
       visit.add(fiber);
     }
     return inSameStack;

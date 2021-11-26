@@ -18,7 +18,7 @@ SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
 
   return SolidVertex(
     position,
-    vec4(abs(instancePosition.xyz), 1.0),
+    vec4(abs(instancePosition.xyz) / 2.0, 1.0),
     uv
   );
 }

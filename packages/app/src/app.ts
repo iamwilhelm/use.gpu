@@ -10,7 +10,7 @@ import {
   Data, RawData,
   OrbitCamera, OrbitControls,
   Picking, Pick, EventProvider,
-  CursorConsumer, Cursor,
+  Cursor,
   RenderToTexture,
   ViewProvider,
 } from '@use-gpu/components';
@@ -83,7 +83,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             );
           },
           render: (positions) => [
-            use(Quads)({ positions, size: 5 }),
+            use(Quads)({ positions, size: 50 }),
+            use(Quads)({ positions, size: 50, id: 2, mode: RenderPassMode.Picking }),
             //use(Quads)({ positions, size: 50, mode: RenderPassMode.Debug }),
           ],
           live: true,
@@ -127,38 +128,34 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(Picking)({
           children:
 
-          use(CursorConsumer)({
-            element: canvas, children:
+            use(EventProvider)({
+              element: canvas, children:
 
-                use(EventProvider)({
-                  element: canvas, children:
+                use(OrbitControls)({
+                  canvas,
+                  render: (radius: number, phi: number, theta: number) =>
 
-                    use(OrbitControls)({
-                      canvas,
-                      render: (radius: number, phi: number, theta: number) =>
+                    use(OrbitCamera)({
+                      canvas, radius, phi, theta,
+                      render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
 
-                        use(OrbitCamera)({
-                          canvas, radius, phi, theta,
-                          render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
+                        use(ViewProvider)({
+                          defs, uniforms, children:
 
-                            use(ViewProvider)({
-                              defs, uniforms, children:
+    //                        use(Loop)({
+    //                          children: [
 
-        //                        use(Loop)({
-        //                          children: [
+                                //use(RenderToTexture)({
+                                //  children: view,
+                                //}),
+          
+                                use(Draw)({
+                                  children: view,
+                                }),
 
-                                    //use(RenderToTexture)({
-                                    //  children: view,
-                                    //}),
-              
-                                    use(Draw)({
-                                      children: view,
-                                    }),
-
-        //                          ],
-        //                        })
-              
-                            })
+    //                          ],
+    //                        })
+          
                         })
                     })
                 })

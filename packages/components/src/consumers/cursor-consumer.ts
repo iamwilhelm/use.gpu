@@ -13,7 +13,7 @@ export type CursorConsumerProps = {
   children: LiveElement<any>,
 };
 
-export const CursorConsumer: LiveComponent<RenderProviderProps> = memo((fiber) => (props) => {
+export const CursorConsumer: LiveComponent<RenderProviderProps> = (fiber) => (props) => {
   const {element, children} = props;
   
   const Done = useOne(() => {
@@ -28,7 +28,7 @@ export const CursorConsumer: LiveComponent<RenderProviderProps> = memo((fiber) =
   }, element);
   
   return consume(CursorContext, children, Done);
-}, 'CursorConsumer');
+};
 
 export const Cursor: LiveComponent<CursorProps> = memo((fiber) => (props) => {
   useConsumer(CursorContext, props.cursor);

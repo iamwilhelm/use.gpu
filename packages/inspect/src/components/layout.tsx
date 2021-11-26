@@ -77,4 +77,5 @@ export const Label = styled.div`
 	font-weight: bold;
 	padding-right: 10px;
 	flex-shrink: 0;
+	display: flex;
 `;

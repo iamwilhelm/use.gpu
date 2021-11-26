@@ -4,7 +4,9 @@ import styled, { keyframes } from "styled-components";
 
 import React, { useState } from 'react';
 import { Action } from './types';
-import { SplitRow, IndentTree, Label } from './layout';
+import { SplitRow, ExpandRow, IndentTree, Label } from './layout';
+
+const ICON = (s: string) => <span className="m-icon">{s}</span>
 
 type PropsProps = {
 	fiber: LiveFiber<any>,
@@ -13,6 +15,11 @@ type PropsProps = {
 const Prefix = styled.div`
 	width: 20px;
 	display: inline-block;
+	white-space: nowrap;
+	line-height: 1;
+`;
+
+const Compact = styled.span`
 	white-space: nowrap;
 `;
 
@@ -88,13 +95,33 @@ export const inspectObject = (
 		object = o;
 	}
 
-  const proto = object.__proto__ !== Object.prototype ? object.__proto__.constructor.name : null;
+	const signature = Object.keys(object).join('/');
+	// @ts-ignore
+	if ((signature === 'f/args/key') && object.f && object.args) {
+		if (!object.f.isLiveBuiltin) {
+			object = Object.assign(Object.create(object.f), {
+				component: object.f,
+				props: object.args[0],
+				key: object.key,
+			});
+		}
+		else {
+			object = Object.assign(Object.create(object.f), {
+				component: object.f,
+				args: object.args,
+				arg: object.arg,
+				key: object.key,
+			});
+		}
+	}
 
 	const fields = Object.keys(object).map((k: string) => {
 		const key = path +'/'+ k;
 		const expandable = typeof object[k] === 'object' && object[k];
 		const expanded = !!state[key];
-		const prefix = expandable ? (expanded ? '–' : '+') : '';
+
+		const icon = expanded !== false ? ICON('expand_more') : ICON('chevron_right') ;
+		const prefix = expandable ? icon : '';
 		
 		const onClick = expandable ? (e: any) => {
 			toggleState(key);
@@ -102,21 +129,52 @@ export const inspectObject = (
 			e.stopPropagation();
 		} : null;
 
+		const onDblClick = (e: any) => {
+			e.preventDefault();
+			e.stopPropagation();
+		};
+
+		const compact = <Compact>
+			{expanded ? formatValue(object[k]) : truncate(formatValue(object[k]), 80)}
+		</Compact>
+
+		const full = expanded ? (
+			<IndentTree>{inspectObject(object[k], state, toggleState, key, seen, depth + 1)}</IndentTree>
+		) : null;
+
+	  const proto = object[k]?.__proto__ !== Object.prototype
+			? object[k]?.__proto__?.constructor?.name ??
+			  object[k]?.__proto__?.displayName
+			: null;
+
+		const showFull = typeof object[k] === 'object' && depth < 20;
+		if (showFull && expanded) {
+			return (
+				<div key={k} onClick={onClick} onDblClick={onDblClick}>
+					<ExpandRow>
+						<SplitRow>
+							<Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
+							<div>{proto}</div>
+						</SplitRow>
+					</ExpandRow>
+					<div>{full}</div>
+				</div>
+			);
+		}
+
 		return (
-			<SplitRow key={k} onClick={onClick}>
-				<Label><Prefix>{prefix}</Prefix>{k}</Label>
-				<div>{
-					expanded
-						? typeof object[k] === 'object' && depth < 5
-							? <IndentTree>{inspectObject(object[k], state, toggleState, key, seen, depth + 1)}</IndentTree>
-							: formatValue(object[k])
-						: (truncate(formatValue(object[k]), 80))
-				}</div>
-			</SplitRow>
+			<div key={k} onClick={onClick} onDblClick={onDblClick}>
+				<ExpandRow>
+					<SplitRow>
+						<Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
+						<div>{compact}</div>
+					</SplitRow>
+				</ExpandRow>
+			</div>
 		);
 	});
 	
-	return <>{proto}{fields}</>;
+	return fields;
 }
 
 const truncate = (s: string, n: number) => {

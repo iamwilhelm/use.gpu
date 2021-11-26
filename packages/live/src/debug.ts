@@ -133,6 +133,9 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
     return `${name}(…)`;
   }
   if (typeof x === 'object') {
+  	const signature = Object.keys(x).join('/');
+  	if (signature === 'f/args/key' || signature === 'f/arg/key') return `<${formatNodeName(x)} …/>`;
+
     return '{...}';
   }
   return '' + x;

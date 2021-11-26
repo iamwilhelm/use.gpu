@@ -62,7 +62,7 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
     name = `[Yeet]`;
   }
 
-	return name;
+  return name;
 }
 
 export const formatNode = <F extends Function>(node: DeferredCall<F>): string => {
@@ -106,8 +106,8 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
 
-  	const signature = Object.keys(x).join('/');
-  	if (signature === 'f/args/key' || signature === 'f/arg/key') return formatNode(x);
+    const signature = Object.keys(x).join('/');
+    if (signature === 'f/args/key' || signature === 'f/arg/key') return formatNode(x);
 
     const out = [];
     for (const k in x) if (hasOwnProperty.call(x, k)) {
@@ -133,8 +133,8 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
     return `${name}(…)`;
   }
   if (typeof x === 'object') {
-  	const signature = Object.keys(x).join('/');
-  	if (signature === 'f/args/key' || signature === 'f/arg/key') return `<${formatNodeName(x)} …/>`;
+    const signature = Object.keys(x).join('/');
+    if (signature === 'f/args/key' || signature === 'f/arg/key') return `<${formatNodeName(x)} …/>`;
 
     return '{...}';
   }

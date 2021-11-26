@@ -133,7 +133,7 @@ export const provide = <T, C>(
   context: LiveContext<C>,
   value: T,
   calls: LiveElement<any>,
-	key?: KEy,
+  key?: KEy,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key});
 
 // Provide a value for a context, memoizing if it doesn't change
@@ -141,7 +141,7 @@ export const provideMemo = <T, C>(
   context: LiveContext<C>,
   value: T,
   calls: LiveElement<any>,
-	key?: Key,
+  key?: Key,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key});
 
 // Consume value from a co-context
@@ -164,25 +164,25 @@ export const createContext = makeContext;
 
 // Co-context value return type sugar
 export const flattenRegistry = <T>(registry: Map<LiveFiber<any>, T>): [LiveFiber<any>, T] => {
-	const entries = Array.from(registry.entries());
-	entries.sort((a, b) => comparePaths(a[0].path, b[0].path) || (a[0].depth - b[0].depth));
-	return entries;
+  const entries = Array.from(registry.entries());
+  entries.sort((a, b) => comparePaths(a[0].path, b[0].path) || (a[0].depth - b[0].depth));
+  return entries;
 }
 
 export const forRegistry = <T>(
-	registry: Map<LiveFiber<any>, T>,
-	map: (f: LiveFiber<any>, v: T) => void,
+  registry: Map<LiveFiber<any>, T>,
+  map: (f: LiveFiber<any>, v: T) => void,
 ) => {
-	for (const [f, v] of flattenRegistry(registry)) map(f, v);
+  for (const [f, v] of flattenRegistry(registry)) map(f, v);
 }
 
 export const getTailNode = <T>(
-	registry: Map<LiveFiber<any>, T>,
+  registry: Map<LiveFiber<any>, T>,
 ) => {
-	const entries = flattenRegistry(registry);
-	return entries[0];
+  const entries = flattenRegistry(registry);
+  return entries[0];
 }
 
 export const getTailValue = <T>(
-	registry: Map<LiveFiber<any>, T>,
+  registry: Map<LiveFiber<any>, T>,
 ) => getTailNode(registry)?.[1];

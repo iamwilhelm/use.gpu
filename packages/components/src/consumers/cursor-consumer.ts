@@ -9,7 +9,7 @@ export type CursorProps = {
 };
 
 export type CursorConsumerProps = {
-	element: HTMLElement,
+  element: HTMLElement,
   children: LiveElement<any>,
 };
 
@@ -18,9 +18,9 @@ export const CursorConsumer: LiveComponent<RenderProviderProps> = (fiber) => (pr
   
   const Done = useOne(() => {
     const Done = () => (registry: Map<LiveFiber<any>, string>) => {
-  		const cursor = getTailValue(registry) ?? 'default';
-  		if (element.style.cursor !== cursor) element.style.cursor = cursor;
-  	};
+      const cursor = getTailValue(registry) ?? 'default';
+      if (element.style.cursor !== cursor) element.style.cursor = cursor;
+    };
     Done.displayName = '[Cursor]';
     // @ts-ignore
     Done.isStaticComponent = true;

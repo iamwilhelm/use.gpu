@@ -26,7 +26,7 @@ export type MeshProps = {
   mesh: VertexData,
   mode?: RenderPassMode,
   id?: number,
-	blink?: boolean,
+  blink?: boolean,
 };
 
 export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {

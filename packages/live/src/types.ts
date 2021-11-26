@@ -27,7 +27,7 @@ export type RenderCallbacks = {
   onRender: OnFiber<boolean>,
   onUpdate: OnFiber,
   onFence: OnFiber,
-	onSlice: OnFiber,
+  onSlice: OnFiber,
 };
 
 // User=defined context
@@ -38,7 +38,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   host?: HostInterface,
   path: Key[],
   depth: number,
-	id: number,
+  id: number,
 
   // Instance of F bound to self
   bound?: F,

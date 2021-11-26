@@ -49,7 +49,7 @@ describe('ast', () => {
   });
   
   it('extracts quad vertex imports', () => {
-    const code = GLSLModules['instance/quad/vertex'];
+    const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
     const {extractImports} = makeGuardedParser(code, tree);
@@ -59,7 +59,7 @@ describe('ast', () => {
   });
   
   it('extracts quad vertex functions', () => {
-    const code = GLSLModules['instance/quad/vertex'];
+    const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
     const {extractFunctions} = makeGuardedParser(code, tree);
@@ -69,7 +69,7 @@ describe('ast', () => {
   });
 
   it('extracts quad vertex declarations', () => {
-    const code = GLSLModules['instance/quad/vertex'];
+    const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
     const {extractDeclarations} = makeGuardedParser(code, tree);
@@ -78,8 +78,8 @@ describe('ast', () => {
     expect(declarations).toMatchSnapshot();
   });
 
-  it('extracts quad fragment declarations', () => {
-    const code = GLSLModules['instance/quad/fragment'];
+  it('extracts solid fragment declarations', () => {
+    const code = GLSLModules['instance/fragment/solid'];
 
     const tree = parseGLSL(code);
     const {extractDeclarations} = makeGuardedParser(code, tree);
@@ -99,7 +99,7 @@ describe('ast', () => {
   });
 
   it('extracts quad vertex symbol table', () => {
-    const code = GLSLModules['instance/quad/vertex'];
+    const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
     const {extractSymbolTable} = makeGuardedParser(code, tree);

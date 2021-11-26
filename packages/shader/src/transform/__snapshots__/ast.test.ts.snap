@@ -131,74 +131,6 @@ Object {
 }
 `;
 
-exports[`ast extracts quad fragment declarations 1`] = `
-Array [
-  Object {
-    "exported": false,
-    "symbols": Array [
-      "fragColor",
-    ],
-    "variable": Object {
-      "locals": Array [
-        Object {
-          "expr": null,
-          "name": "fragColor",
-        },
-      ],
-      "type": Object {
-        "name": "vec4",
-        "qualifiers": Array [
-          "layout(location = 0)",
-          "in",
-        ],
-      },
-    },
-  },
-  Object {
-    "exported": false,
-    "symbols": Array [
-      "fragUV",
-    ],
-    "variable": Object {
-      "locals": Array [
-        Object {
-          "expr": null,
-          "name": "fragUV",
-        },
-      ],
-      "type": Object {
-        "name": "vec2",
-        "qualifiers": Array [
-          "layout(location = 1)",
-          "in",
-        ],
-      },
-    },
-  },
-  Object {
-    "exported": false,
-    "symbols": Array [
-      "outColor",
-    ],
-    "variable": Object {
-      "locals": Array [
-        Object {
-          "expr": null,
-          "name": "outColor",
-        },
-      ],
-      "type": Object {
-        "name": "vec4",
-        "qualifiers": Array [
-          "layout(location = 0)",
-          "out",
-        ],
-      },
-    },
-  },
-]
-`;
-
 exports[`ast extracts quad vertex declarations 1`] = `
 Array [
   Object {
@@ -247,7 +179,7 @@ Array [
         "vertexIndex",
       ],
       "type": Object {
-        "name": "MeshVertex",
+        "name": "SolidVertex",
         "qualifiers": Array [],
       },
     },
@@ -263,13 +195,13 @@ Array [
   Object {
     "imports": Array [
       Object {
-        "imported": "MeshVertex",
-        "name": "MeshVertex",
+        "imported": "SolidVertex",
+        "name": "SolidVertex",
       },
     ],
     "name": "use/types",
     "symbols": Array [
-      "MeshVertex",
+      "SolidVertex",
     ],
   },
   Object {
@@ -384,7 +316,7 @@ Object {
           "vertexIndex",
         ],
         "type": Object {
-          "name": "MeshVertex",
+          "name": "SolidVertex",
           "qualifiers": Array [],
         },
       },
@@ -393,18 +325,18 @@ Object {
       ],
     },
   ],
-  "hash": "aassgu6e5l",
+  "hash": "sigd3et9jj",
   "modules": Array [
     Object {
       "imports": Array [
         Object {
-          "imported": "MeshVertex",
-          "name": "MeshVertex",
+          "imported": "SolidVertex",
+          "name": "SolidVertex",
         },
       ],
       "name": "use/types",
       "symbols": Array [
-        "MeshVertex",
+        "SolidVertex",
       ],
     },
     Object {
@@ -441,13 +373,13 @@ Object {
     Object {
       "imports": Array [
         Object {
-          "imported": "MeshVertex",
-          "name": "MeshVertex",
+          "imported": "SolidVertex",
+          "name": "SolidVertex",
         },
       ],
       "name": "use/types",
       "symbols": Array [
-        "MeshVertex",
+        "SolidVertex",
       ],
     },
     Object {
@@ -488,7 +420,7 @@ Object {
           "vertexIndex",
         ],
         "type": Object {
-          "name": "MeshVertex",
+          "name": "SolidVertex",
           "qualifiers": Array [],
         },
       },
@@ -530,7 +462,7 @@ Object {
     },
   ],
   "symbols": Array [
-    "MeshVertex",
+    "SolidVertex",
     "viewUniforms",
     "worldToClip",
     "getQuadUV",
@@ -542,6 +474,117 @@ Object {
     "getQuadVertex",
   ],
 }
+`;
+
+exports[`ast extracts solid fragment declarations 1`] = `
+Array [
+  Object {
+    "exported": false,
+    "symbols": Array [
+      "fragIndex",
+    ],
+    "variable": Object {
+      "locals": Array [
+        Object {
+          "expr": null,
+          "name": "fragIndex",
+        },
+      ],
+      "type": Object {
+        "name": "uint",
+        "qualifiers": Array [
+          "layout(location = 0)",
+          "in",
+          "flat",
+        ],
+      },
+    },
+  },
+  Object {
+    "exported": false,
+    "symbols": Array [
+      "outColor",
+    ],
+    "variable": Object {
+      "locals": Array [
+        Object {
+          "expr": null,
+          "name": "outColor",
+        },
+      ],
+      "type": Object {
+        "name": "uvec4",
+        "qualifiers": Array [
+          "layout(location = 0)",
+          "out",
+        ],
+      },
+    },
+  },
+  Object {
+    "exported": false,
+    "symbols": Array [
+      "fragColor",
+    ],
+    "variable": Object {
+      "locals": Array [
+        Object {
+          "expr": null,
+          "name": "fragColor",
+        },
+      ],
+      "type": Object {
+        "name": "vec4",
+        "qualifiers": Array [
+          "layout(location = 0)",
+          "in",
+        ],
+      },
+    },
+  },
+  Object {
+    "exported": false,
+    "symbols": Array [
+      "fragUV",
+    ],
+    "variable": Object {
+      "locals": Array [
+        Object {
+          "expr": null,
+          "name": "fragUV",
+        },
+      ],
+      "type": Object {
+        "name": "vec2",
+        "qualifiers": Array [
+          "layout(location = 1)",
+          "in",
+        ],
+      },
+    },
+  },
+  Object {
+    "exported": false,
+    "symbols": Array [
+      "outColor",
+    ],
+    "variable": Object {
+      "locals": Array [
+        Object {
+          "expr": null,
+          "name": "outColor",
+        },
+      ],
+      "type": Object {
+        "name": "vec4",
+        "qualifiers": Array [
+          "layout(location = 0)",
+          "out",
+        ],
+      },
+    },
+  },
+]
 `;
 
 exports[`ast extracts test declarations 1`] = `
@@ -636,6 +679,39 @@ Object {
     Object {
       "exported": true,
       "symbols": Array [
+        "SolidVertex",
+      ],
+      "variable": Object {
+        "locals": Array [],
+        "type": Object {
+          "members": Array [
+            Object {
+              "name": "position",
+              "type": Object {
+                "name": "vec4",
+              },
+            },
+            Object {
+              "name": "color",
+              "type": Object {
+                "name": "vec4",
+              },
+            },
+            Object {
+              "name": "uv",
+              "type": Object {
+                "name": "vec2",
+              },
+            },
+          ],
+          "name": "SolidVertex",
+          "qualifiers": Array [],
+        },
+      },
+    },
+    Object {
+      "exported": true,
+      "symbols": Array [
         "MeshVertex",
       ],
       "variable": Object {
@@ -646,6 +722,12 @@ Object {
               "name": "position",
               "type": Object {
                 "name": "vec4",
+              },
+            },
+            Object {
+              "name": "normal",
+              "type": Object {
+                "name": "vec3",
               },
             },
             Object {
@@ -669,13 +751,13 @@ Object {
   ],
   "externals": Array [],
   "functions": Array [],
-  "hash": "y0g6sb9nv5",
+  "hash": "n18t92hc2o",
   "modules": Array [],
   "refs": Array [
     Object {
       "exported": true,
       "symbols": Array [
-        "MeshVertex",
+        "SolidVertex",
       ],
       "variable": Object {
         "locals": Array [],
@@ -700,6 +782,45 @@ Object {
               },
             },
           ],
+          "name": "SolidVertex",
+          "qualifiers": Array [],
+        },
+      },
+    },
+    Object {
+      "exported": true,
+      "symbols": Array [
+        "MeshVertex",
+      ],
+      "variable": Object {
+        "locals": Array [],
+        "type": Object {
+          "members": Array [
+            Object {
+              "name": "position",
+              "type": Object {
+                "name": "vec4",
+              },
+            },
+            Object {
+              "name": "normal",
+              "type": Object {
+                "name": "vec3",
+              },
+            },
+            Object {
+              "name": "color",
+              "type": Object {
+                "name": "vec4",
+              },
+            },
+            Object {
+              "name": "uv",
+              "type": Object {
+                "name": "vec2",
+              },
+            },
+          ],
           "name": "MeshVertex",
           "qualifiers": Array [],
         },
@@ -707,9 +828,11 @@ Object {
     },
   ],
   "symbols": Array [
+    "SolidVertex",
     "MeshVertex",
   ],
   "visibles": Array [
+    "SolidVertex",
     "MeshVertex",
   ],
 }
@@ -758,7 +881,7 @@ Array [
       "type": Object {
         "name": "ViewUniforms",
         "qualifiers": Array [
-          "layout(set = 0, binding = 0)",
+          "layout(set = 0, binding = VIEW_BINDING)",
           "uniform",
         ],
       },
@@ -815,7 +938,7 @@ Object {
         "type": Object {
           "name": "ViewUniforms",
           "qualifiers": Array [
-            "layout(set = 0, binding = 0)",
+            "layout(set = 0, binding = VIEW_BINDING)",
             "uniform",
           ],
         },
@@ -931,7 +1054,7 @@ Object {
       ],
     },
   ],
-  "hash": "je3ka1b7aj",
+  "hash": "a7bpobogt7",
   "modules": Array [],
   "refs": Array [
     Object {
@@ -1077,7 +1200,7 @@ Object {
         "type": Object {
           "name": "ViewUniforms",
           "qualifiers": Array [
-            "layout(set = 0, binding = 0)",
+            "layout(set = 0, binding = VIEW_BINDING)",
             "uniform",
           ],
         },

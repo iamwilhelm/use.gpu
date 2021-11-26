@@ -39,7 +39,7 @@ describe("link", () => {
     float getSize(int index) { return 1.0; }
     `
     
-    const code = GLSLModules['instance/quad/vertex'];
+    const code = GLSLModules['instance/vertex/quad'];
     const modules = GLSLModules;
     const linked = linkModule(code, modules, {getPosition, getSize});
     expect(linked).toMatchSnapshot();

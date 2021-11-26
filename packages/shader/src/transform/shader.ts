@@ -1,14 +1,15 @@
 import { Tree, SyntaxNode } from '@lezer/common';
 import { parser } from '../grammar/glsl';
 import { makeModuleCache } from './link';
-import { ShaderLanguages, ShaderCompiler, ShaderLanguage } from '@use-gpu/core/types';
+import { ShaderLanguages, ShaderCompiler } from '@use-gpu/core/types';
 
 export const parseGLSL = (code: string): Tree => {
   const parsed = parser.parse(code);
   return parsed;
 }
 
-export const defineGLSL = (defs: Record<string, string>): string => {
+type Define = string | number | boolean | null | undefined;
+export const defineGLSL = (defs: Record<string, Define>): string => {
   const out = [];
   for (let k in defs) if (defs[k] !== false && defs[k] !== null) out.push(`#define ${k} ${defs[k]}`);
   return out.join("\n");

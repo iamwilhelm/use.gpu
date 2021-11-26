@@ -1,7 +1,7 @@
 import { Tree, SyntaxNode } from '@lezer/common';
 import LRU from 'lru-cache';
 
-export type ParsedModuleCache = LRU<string, {tree: Tree, table: SymbolTable}>;
+export type ParsedModuleCache = LRU<string, ParsedModule>;
 
 export type ParsedModule = {
   name: string,

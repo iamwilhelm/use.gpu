@@ -23,7 +23,13 @@ export const makeModuleCache = (options: Record<string, any> = {}) => new LRU({
   ...options,
 });
 
-export const parseLinkAliases = (links: Record<string, string>) => {
+// Parse keys `from:to` into a map of aliases
+export const parseLinkAliases = (
+  links: Record<string, string>,
+): [
+  Record<string, string>,
+  Map<string, string>
+] => {
   const out = {} as Record<string, string>;
   const aliases = new Map<string, string>();
   for (let k in links) {
@@ -34,6 +40,8 @@ export const parseLinkAliases = (links: Record<string, string>) => {
   return [out, aliases];
 }
 
+// Link a module with static modules and dynamic links.
+// Insert global constant definitions.
 export const linkModule = timed('linkModule', (
   code: string,
   libraries: Record<string, string> = {},
@@ -102,8 +110,22 @@ export const linkModule = timed('linkModule', (
 
   const result = program.join("\n");
   return result;
-})
+});
 
+// Parse a code module into its in-memory representation
+// (AST + symbol table)
+export const loadModule = (
+  name: string,
+  code: string,
+  compress: boolean = false,
+): ParsedModule => {
+  let tree = parseGLSL(code);
+  const table = makeASTParser(code, tree).extractSymbolTable();
+  if (compress) tree = decompressAST(compressAST(tree));
+  return {name, code, tree, table};
+}
+
+// Load all modules references from a piece of code
 export const loadModules = timed('loadModules', (
   code: string,
   libraries: Record<string, string>,
@@ -112,7 +134,7 @@ export const loadModules = timed('loadModules', (
 ) => {
   const graph = new Map<string, string[]>();
   const seen = new Set<string>();
-  const out = [];
+  const out = [] as ParsedModule[];
 
   const queue = [{name: 'main', code}];
   seen.add('main');
@@ -121,23 +143,22 @@ export const loadModules = timed('loadModules', (
     const {name, code} = queue.shift()!;
     if (code == null) throw new Error(`Shader code ${name} undefined`);
 
-    let tree, table;
+    let module;
     if (cache) {
       const hash = getProgramHash(code);
       const entry = cache.get(hash);
-      if (entry) ({tree, table} = entry);
+      if (entry) module = entry;
     }
-    if (!tree || !table) {
-      tree = parseGLSL(code);
-      table = makeASTParser(code, tree).extractSymbolTable();
+    if (!module) {
+      module = loadModule(name, code, !!cache);
       if (cache) {
-        tree = decompressAST(compressAST(tree));
-        cache.set(table.hash, { tree, table });
+        module.tree = decompressAST(compressAST(module.tree));
+        cache.set(module.table.hash, module);
       }
     }
-    out.push({name, code, tree, table});
+    out.push(module);
 
-    const {modules, externals} = table;
+    const {modules, externals} = module.table;
     const deps = [] as string[];
 
     for (const {name} of modules) {
@@ -168,18 +189,22 @@ export const loadModules = timed('loadModules', (
   return out;
 });
 
+// Get minimum depth for each module, so its symbols resolve correctly
 export const getGraphOrder = (
   graph: Map<string, string[]>,
   name: string,
   depth: number = 0,
 ) => {
-  const queue = [{name, depth: 0}] as string[];
+  const queue = [{name, depth: 0}];
   const depths = new Map<string, number>(); 
   while (queue.length) {
     const {name, depth} = queue.shift()!;
     depths.set(name, depth);
 
-    const deps = graph.get(name).map(name => ({name, depth: depth + 1}));
+    const module = graph.get(name);
+    if (!module) continue;
+
+    const deps = module.map(name => ({name, depth: depth + 1}));
     queue.push(...deps);
   }
   return depths;

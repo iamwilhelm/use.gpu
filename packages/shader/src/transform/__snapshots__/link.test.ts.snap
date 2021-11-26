@@ -73,49 +73,56 @@ vec2 _wb_getQuadUV(int vertex) {
     float _i1_getSize(int index) { return 1.0; }
     
 
-struct _y0_MeshVertex {
+struct _n1_SolidVertex {
   vec4 position;
-  //vec3 normal;
   vec4 color;
   vec2 uv;
 };
 
-layout(set = 0, binding = 0) uniform _je_ViewUniforms {
+
+struct _n1_MeshVertex {
+  vec4 position;
+  vec3 normal;
+  vec4 color;
+  vec2 uv;
+};
+
+layout(set = 0, binding = VIEW_BINDING) uniform _a7_ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;
   vec2 viewResolution;
   vec2 viewSize;
-} _je_viewUniforms;
+} _a7_viewUniforms;
 
 
-vec4 _je_worldToView(vec4 position) {
-  return _je_viewUniforms.viewMatrix * position;
+vec4 _a7_worldToView(vec4 position) {
+  return _a7_viewUniforms.viewMatrix * position;
 }
 
 
-vec4 _je_viewToClip(vec4 position) {
-  return _je_viewUniforms.projectionMatrix * position;
+vec4 _a7_viewToClip(vec4 position) {
+  return _a7_viewUniforms.projectionMatrix * position;
 }
 
 
-vec4 _je_worldToClip(vec4 position) {
-  return _je_viewToClip(_je_worldToView(position));
+vec4 _a7_worldToClip(vec4 position) {
+  return _a7_viewToClip(_a7_worldToView(position));
 }
 
 
-vec3 _je_clipToScreen3D(vec4 position) {
-  return vec3(position.xy * _je_viewUniforms.viewSize, position.z);
+vec3 _a7_clipToScreen3D(vec4 position) {
+  return vec3(position.xy * _a7_viewUniforms.viewSize, position.z);
 }
 
 
-vec3 _je_screenToClip3D(vec4 position) {
-  return vec3(position.xy * _je_viewUniforms.viewResolution, position.z);
+vec3 _a7_screenToClip3D(vec4 position) {
+  return vec3(position.xy * _a7_viewUniforms.viewResolution, position.z);
 }
 
 
-vec3 _je_worldToClip3D(vec4 position) {
-  position = _je_viewToClip(_je_worldToView(position));
+vec3 _a7_worldToClip3D(vec4 position) {
+  position = _a7_viewToClip(_a7_worldToView(position));
   return position.xyz / position.w;
 }
 
@@ -127,19 +134,19 @@ vec4 _8u_getPosition(int);
 float _i1_getSize(int);
 
 
-_y0_MeshVertex getQuadVertex(int vertexIndex, int instanceIndex) {
+_n1_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   vec4 instancePosition = _8u_getPosition(instanceIndex);
   float instanceSize = _i1_getSize(instanceIndex);
 
-  vec4 position = _je_worldToClip(instancePosition);
+  vec4 position = _a7_worldToClip(instancePosition);
 
   vec2 uv = _wb_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
-  position.xy += xy * _je_viewUniforms.viewResolution * (instanceSize * position.w);
+  position.xy += xy * _a7_viewUniforms.viewResolution * (instanceSize * position.w);
 
-  return _y0_MeshVertex(
+  return _n1_SolidVertex(
     position,
-    vec4(abs(instancePosition.xyz), 1.0),
+    vec4(abs(instancePosition.xyz) / 2.0, 1.0),
     uv
   );
 }"

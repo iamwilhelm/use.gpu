@@ -311,17 +311,20 @@ export const useConsumer = <C>(
 
   const {host, context: {values, roots}} = fiber;
   const root = roots.get(context);
-  if (!root) throw new Error(`Co-context ${context.displayName} was used without being consumed.`);
+  if (!root || !root.next) throw new Error(`Co-context ${context.displayName} was used without being consumed.`);
+  
+  const next= root.next;
+  if (host) {
+    if (host.depend(next, fiber)) {
+      host.track(fiber, () => {
+        registry.delete(fiber);
+        host.schedule(next, NOP);
+        host.undepend(next, fiber)
+      });
+    }
 
-  if (host && host.depend(root.next, fiber)) {
-    host.track(fiber, () => {
-      registry.delete(fiber);
-      host.schedule(root.next, NOP);
-      host.undepend(root.next, fiber)
-    });
+    host.schedule(next, NOP);
   }
-
-  host.schedule(root.next, NOP);
 
   const registry = values.get(context).current;
   registry.set(fiber, value);

@@ -133,7 +133,7 @@ export const provide = <T, C>(
   context: LiveContext<C>,
   value: T,
   calls: LiveElement<any>,
-  key?: KEy,
+  key?: Key,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key});
 
 // Provide a value for a context, memoizing if it doesn't change
@@ -163,7 +163,7 @@ export const makeContext = <T>(initialValue?: T, displayName?: string): LiveCont
 export const createContext = makeContext;
 
 // Co-context value return type sugar
-export const flattenRegistry = <T>(registry: Map<LiveFiber<any>, T>): [LiveFiber<any>, T] => {
+export const flattenRegistry = <T>(registry: Map<LiveFiber<any>, T>): [LiveFiber<any>, T][] => {
   const entries = Array.from(registry.entries());
   entries.sort((a, b) => comparePaths(a[0].path, b[0].path) || (a[0].depth - b[0].depth));
   return entries;

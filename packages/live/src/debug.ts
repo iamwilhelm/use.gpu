@@ -73,11 +73,11 @@ export const formatNode = <F extends Function>(node: DeferredCall<F>): string =>
     args.push(formatValue(node.arg));
   }
   if (node.args !== undefined) {
-    if (node.name === 'REDUCE') {
+    if (node.f.name === 'REDUCE') {
       const [, reduce, initial] = node.args;
       args.push(formatValue({reduce, initial}));
     }
-    else if (node.name === 'PROVIDE') {
+    else if (node.f.name === 'PROVIDE') {
       const [context,,, isMemo] = node.args;
       args.push(formatValue(context));
     }

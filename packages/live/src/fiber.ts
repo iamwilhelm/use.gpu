@@ -133,6 +133,7 @@ export const renderFiber = <F extends Function>(
 
   let element: LiveElement<any>;
   // Passthrough built-ins
+
   if ((f as any).isLiveBuiltin) element = fiber as any as DeferredCall<any>;
   // Render live function
   else element = bound.apply(null, args ?? EMPTY_ARRAY);
@@ -318,7 +319,7 @@ export const makeFiberContinuation = <F extends Function, R>(
 export const mountFiberReduction = <F extends Function, R, T>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[],
-  mapper: (t: T) => R | undefined,
+  mapper: ((t: T) => R) | undefined,
   reduction: () => R,
   next?: LiveFunction<any>,
   callbacks?: RenderCallbacks,
@@ -452,7 +453,7 @@ export const multiGatherFiberValues = <F extends Function, T>(
   if (!yeeted) throw new Error("Reduce without aggregator");
 
   if (!self) {
-    if (fiber.next) return multiGatherFiberValues(fiber.next);
+    if (fiber.next) return multiGatherFiberValues(fiber.next) as any;
     if (yeeted.value !== undefined) return yeeted.value;
   }
 
@@ -467,7 +468,7 @@ export const multiGatherFiberValues = <F extends Function, T>(
         const value = multiGatherFiberValues(m);
         for (let k in value) {
           const v = value[k];
-          let list = out[k];
+          let list = out[k] as T[];
           if (!list) list = out[k] = [];
 
           if (Array.isArray(v)) {
@@ -481,8 +482,8 @@ export const multiGatherFiberValues = <F extends Function, T>(
       return yeeted.reduced = out;
     }
   }
-  else if (mount) return yeeted.reduced = multiGatherFiberValues(mount);
-  return [];
+  else if (mount) return yeeted.reduced = multiGatherFiberValues(mount) as any;
+  return {} as Record<string, T | T[]>;
 }
 
 // Provide a value for a context on a fiber
@@ -534,7 +535,7 @@ export const consumeFiber = <F extends Function>(
 
   if (callbacks) if (!callbacks.onRender(fiber)) return;
 
-  if (fiber.context.roots.get(context) !== fiber) {
+  if (!fiber.next) {
     const registry = new Map<LiveFiber<any>, any>();
     const reduction = () => registry;
 

@@ -117,11 +117,11 @@ export const linkModule = timed('linkModule', (
 export const loadModule = (
   name: string,
   code: string,
-  compress: boolean = false,
+  compressed: boolean = false,
 ): ParsedModule => {
   let tree = parseGLSL(code);
   const table = makeASTParser(code, tree).extractSymbolTable();
-  if (compress) tree = decompressAST(compressAST(tree));
+  if (compressed) tree = decompressAST(compressAST(tree));
   return {name, code, tree, table};
 }
 
@@ -147,14 +147,13 @@ export const loadModules = timed('loadModules', (
     if (cache) {
       const hash = getProgramHash(code);
       const entry = cache.get(hash);
-      if (entry) module = entry;
+      if (entry) {
+        module = entry;
+      }
     }
     if (!module) {
-      module = loadModule(name, code, !!cache);
-      if (cache) {
-        module.tree = decompressAST(compressAST(module.tree));
-        cache.set(module.table.hash, module);
-      }
+      module = loadModule(name, code, true);
+      if (cache) cache.set(module.table.hash, module);
     }
     out.push(module);
 

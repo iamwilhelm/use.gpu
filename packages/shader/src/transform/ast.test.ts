@@ -181,4 +181,48 @@ describe('ast', () => {
     const output2 = rewriteUsingAST(code, decompressed, rename);
     expect(output2).toEqual(output1);
   });
+
+  it('rewrites a lot of code using the compressed AST', () => {
+    const code = `
+#pragma import {SolidVertex} from 'use/types'
+
+SolidVertex getVertex(int, int);
+
+#ifdef IS_PICKING
+layout(location = 0) out flat uint fragIndex;
+#else
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec2 fragUV;
+#endif
+
+void main() {
+  int vertexIndex = gl_VertexIndex;
+  int instanceIndex = gl_InstanceIndex;
+
+  SolidVertex v = getVertex(vertexIndex, instanceIndex);
+
+  gl_Position = v.position;
+#ifdef IS_PICKING
+  fragIndex = uint(instanceIndex);
+#else
+  fragColor = v.color;
+  fragUV = v.uv;
+#endif
+}
+    `;
+
+    const tree = parseGLSL(code);
+    const rename = new Map<string, string>();
+    rename.set('main', 'entryPoint');
+    rename.set('getVertex', '_zz_getVertex');
+    
+    const compressed = compressAST(tree);
+    const decompressed = decompressAST(compressed);
+    expect(compressed).toMatchSnapshot();
+    expect(decompressed).toMatchSnapshot();
+
+    const output1 = rewriteUsingAST(code, tree, rename);
+    const output2 = rewriteUsingAST(code, decompressed, rename);
+    expect(output2).toEqual(output1);
+  });
 });

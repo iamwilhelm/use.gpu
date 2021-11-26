@@ -61,7 +61,7 @@ Object {
       ],
     },
   ],
-  "hash": "wbun5hxc7b",
+  "hash": "6sp2mckooy",
   "modules": Array [],
   "refs": Array [
     Object {
@@ -325,7 +325,7 @@ Object {
       ],
     },
   ],
-  "hash": "sigd3et9jj",
+  "hash": "la43vh0i3i",
   "modules": Array [
     Object {
       "imports": Array [
@@ -751,7 +751,7 @@ Object {
   ],
   "externals": Array [],
   "functions": Array [],
-  "hash": "n18t92hc2o",
+  "hash": "89q8792cwv",
   "modules": Array [],
   "refs": Array [
     Object {
@@ -1054,7 +1054,7 @@ Object {
       ],
     },
   ],
-  "hash": "a7bpobogt7",
+  "hash": "ng9x7m5kzj",
   "modules": Array [],
   "refs": Array [
     Object {
@@ -1234,6 +1234,157 @@ Object {
 }
 `;
 
+exports[`ast rewrites a lot of code using the compressed AST 1`] = `
+Array [
+  Array [
+    "Skip",
+    1,
+    46,
+  ],
+  Array [
+    "Id",
+    48,
+    59,
+  ],
+  Array [
+    "Id",
+    60,
+    69,
+  ],
+  Array [
+    "Id",
+    107,
+    115,
+  ],
+  Array [
+    "Id",
+    135,
+    144,
+  ],
+  Array [
+    "Id",
+    159,
+    167,
+  ],
+  Array [
+    "Id",
+    182,
+    191,
+  ],
+  Array [
+    "Id",
+    200,
+    208,
+  ],
+  Array [
+    "Id",
+    223,
+    229,
+  ],
+  Array [
+    "Id",
+    244,
+    248,
+  ],
+  Array [
+    "Id",
+    259,
+    270,
+  ],
+  Array [
+    "Id",
+    273,
+    287,
+  ],
+  Array [
+    "Id",
+    295,
+    308,
+  ],
+  Array [
+    "Id",
+    311,
+    327,
+  ],
+  Array [
+    "Id",
+    332,
+    343,
+  ],
+  Array [
+    "Id",
+    344,
+    345,
+  ],
+  Array [
+    "Id",
+    348,
+    357,
+  ],
+  Array [
+    "Id",
+    358,
+    369,
+  ],
+  Array [
+    "Id",
+    371,
+    384,
+  ],
+  Array [
+    "Id",
+    390,
+    401,
+  ],
+  Array [
+    "Id",
+    404,
+    405,
+  ],
+  Array [
+    "Id",
+    423,
+    433,
+  ],
+  Array [
+    "Id",
+    436,
+    445,
+  ],
+  Array [
+    "Id",
+    453,
+    466,
+  ],
+  Array [
+    "Id",
+    477,
+    486,
+  ],
+  Array [
+    "Id",
+    489,
+    490,
+  ],
+  Array [
+    "Id",
+    500,
+    506,
+  ],
+  Array [
+    "Id",
+    509,
+    510,
+  ],
+]
+`;
+
+exports[`ast rewrites a lot of code using the compressed AST 2`] = `
+Object {
+  "cursor": [Function],
+}
+`;
+
 exports[`ast rewrites code using the AST 1`] = `
 "
     float _zz_getValue(int index);
@@ -1247,42 +1398,42 @@ exports[`ast rewrites code using the AST 1`] = `
 exports[`ast rewrites code using the compressed AST 1`] = `
 Array [
   Array [
-    "Identifier",
+    "Id",
     11,
     19,
   ],
   Array [
-    "Identifier",
+    "Id",
     24,
     29,
   ],
   Array [
-    "Identifier",
+    "Id",
     41,
     45,
   ],
   Array [
-    "Identifier",
+    "Id",
     62,
     63,
   ],
   Array [
-    "Identifier",
+    "Id",
     83,
     84,
   ],
   Array [
-    "Identifier",
+    "Id",
     87,
     95,
   ],
   Array [
-    "Identifier",
+    "Id",
     111,
     112,
   ],
   Array [
-    "Identifier",
+    "Id",
     120,
     121,
   ],

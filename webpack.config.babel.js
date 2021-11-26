@@ -15,6 +15,7 @@ export default {
     filename: 'use.bundle.js',
   },
   resolve: {
+    modules: ['node_modules', path.resolve('./packages/glsl/src')],
     extensions: ['.ts', '.tsx', '.js', '.json']
   },
   module: {
@@ -26,7 +27,7 @@ export default {
       },
       {
         test: /\.glsl$/i,
-        use: 'raw-loader',
+        use: [path.resolve('./packages/glsl-loader/src/index.ts')],
       },
       {
         test: /\.css$/i,

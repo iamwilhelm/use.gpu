@@ -1,0 +1,40 @@
+{
+  "name": "@use-gpu/glsl-loader",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true,
+  "typesVersions": {
+    "*": {
+      "types": [
+        "src/types"
+      ]
+    }
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "dependencies": {
+    "@types/loader-utils": "^2.0.3",
+    "@webgpu/glslang": "^0.0.15",
+    "gl-matrix": "^3.3.0",
+    "loader-utils": "^3.2.0",
+    "lodash": "^4.17.21"
+  },
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+    "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir ../../build/packages/glsl-loader/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:pkg": "cp package.json ../../build/packages/glsl-loader"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.176"
+  }
+}

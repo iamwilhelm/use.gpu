@@ -5,9 +5,6 @@ import { use, yeet, memo, useContext, useSomeContext, useNoContext, useMemo, use
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 
-//import vertexShader from './glsl/quads-vertex.glsl';
-//import fragmentShader from './glsl/quads-fragment.glsl';
-
 export type LinesProps = {
   position?: number[] | TypedArray,
   segments?: number[] | TypedArray,

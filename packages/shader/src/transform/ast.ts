@@ -17,14 +17,14 @@ import {
 } from '../types';
 import * as T from '../grammar/glsl.terms';
 import { GLSL_NATIVE_TYPES, HASH_KEY } from '../constants';
-import siphash from "../siphash13";
+import { toMurmur53 } from './hash';
 
 const unescape = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
 function nodeToString(this: SyntaxNode) { return `[${this.type.name}]`; }
 
 export const getProgramHash = (code: string) => {
-  const uint = siphash.hash_uint(HASH_KEY, code);
+  const uint = toMurmur53(code);
   return uint.toString(36).slice(-10);
 }
 
@@ -363,7 +363,7 @@ export const rewriteUsingAST = (code: string, tree: Tree, rename: Map<string, st
   const cursor = tree.cursor();
   do {
     const {type, from, to} = cursor;
-    if (type.name === 'skip') {
+    if (type.name === 'Skip') {
       skip(from, to, '');
     }
     else if (type.name === 'version') {
@@ -389,7 +389,7 @@ export const rewriteUsingAST = (code: string, tree: Tree, rename: Map<string, st
       if (replace) skip(sub.from, sub.to, replace);
       cursor.lastChild();
     }
-    else if (type.name === 'Identifier') {
+    else if (type.name === 'Identifier' || type.name === 'Id') {
       const name = code.slice(from, to);
       const replace = rename.get(name);
 
@@ -406,8 +406,8 @@ export const rewriteUsingAST = (code: string, tree: Tree, rename: Map<string, st
 export const compressAST = (tree: Tree): CompressedNode[] => {
   const out = [] as any[]
 
-  const skip = (from: number, to: number) => out.push(["skip", from, to]);
-  const ident = (from: number, to: number) => out.push(["Identifier", from, to]);
+  const skip = (from: number, to: number) => out.push(["Skip", from, to]);
+  const ident = (from: number, to: number) => out.push(["Id", from, to]);
 
   const cursor = tree.cursor();
   do {

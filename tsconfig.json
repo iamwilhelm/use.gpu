@@ -4,10 +4,11 @@
     { "path": "./packages/glsl" },
     { "path": "./packages/live" },
     { "path": "./packages/core" },
+    { "path": "./packages/shader" },
+    { "path": "./packages/glsl-loader" },
     { "path": "./packages/webgpu" },
     { "path": "./packages/components" },
     { "path": "./packages/inspect" },
-    { "path": "./packages/shader" },
     { "path": "./packages/app" }
   ],
   "incremental": true,

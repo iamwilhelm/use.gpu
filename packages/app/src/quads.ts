@@ -5,8 +5,8 @@ import { use, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, u
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 
-//import vertexShader from './glsl/quads-vertex.glsl';
-//import fragmentShader from './glsl/quads-fragment.glsl';
+import testShader from './glsl/quads-vertex.glsl';
+console.log({testShader});
 
 export type QuadsProps = {
   position?: number[] | TypedArray,

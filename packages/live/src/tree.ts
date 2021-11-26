@@ -6,7 +6,7 @@ import { formatNode } from './debug';
 
 const SLICE_STACK = 20;
 
-let DEBUG = true;
+let DEBUG = false;
 setTimeout((() => DEBUG = false), 4000);
 
 const NO_ARGS = [] as any[];

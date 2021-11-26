@@ -76,4 +76,5 @@ export const Inset = styled.div`
 export const Label = styled.div`
 	font-weight: bold;
 	padding-right: 10px;
+	flex-shrink: 0;
 `;

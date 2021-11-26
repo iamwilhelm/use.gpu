@@ -35,7 +35,7 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
   if (name === 'PROVIDE' && args) {
     const [context,,, isMemo] = args;
     const value = formatValue(context.displayName);
-    return isMemo ? `Provide(Memo(${value}))` : `Provide(${value})`;
+    return isMemo ? `ProvideMemo(${value})` : `Provide(${value})`;
   }
   else if (name === 'CONSUME' && args) {
     const [context] = args;
@@ -91,7 +91,7 @@ export const formatNode = <F extends Function>(node: DeferredCall<F>): string =>
 }
 
 export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
-  if (!x) return x;
+  if (!x) return '' + x;
   if (Array.isArray(x)) {
     if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
@@ -106,24 +106,29 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
 
+  	const signature = Object.keys(x).join('/');
+  	if (signature === 'f/args/key' || signature === 'f/arg/key') return formatNode(x);
+
     const out = [];
     for (const k in x) if (hasOwnProperty.call(x, k)) {
       out.push(`${k}: ${formatShortValue(x[k], seen)}`);
     }
-    return '{' + out.join(', ') + '}';
+    
+    const proto = x.__proto__ !== Object.prototype ? x.__proto__.constructor.name : '';
+    return proto + '{' + out.join(', ') + '}';
   }
   return formatShortValue(x, seen);
 }
 
 export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
-  if (!x) return x;
+  if (!x) return '' + x;
   if (Array.isArray(x)) return '[' + x.map((x) => formatValue(x, seen)).join(', ') + ']';
   if (typeof x === 'boolean') return x ? 'true' : 'false';
   if (typeof x === 'number') return '' + x;
   if (typeof x === 'symbol') return '(symbol)';
   if (typeof x === 'string') return x;
   if (typeof x === 'function') {
-    if (x.name === '' && !x.displayName) x.displayName = Math.round(Math.random() * 1000);
+    if (x.name === '' && !x.displayName) x.displayName = Math.round(Math.random() * 10000);
     const name = x.displayName ?? x.name;
     return `${name}(…)`;
   }

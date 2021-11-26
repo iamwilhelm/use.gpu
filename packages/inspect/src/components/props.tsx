@@ -10,6 +10,12 @@ type PropsProps = {
 	fiber: LiveFiber<any>,
 };
 
+const Prefix = styled.div`
+	width: 20px;
+	display: inline-block;
+	white-space: nowrap;
+`;
+
 export const Props: React.FC<PropsProps> = ({fiber}) => {
   // @ts-ignore
 	const {id, f, arg, args} = fiber;
@@ -82,29 +88,38 @@ export const inspectObject = (
 		object = o;
 	}
 
-	const signature = Object.keys(object).join('/');
-	if (signature === 'f/args/key' || signature === 'f/arg/key') return formatNode(object);
+  const proto = object.__proto__ !== Object.prototype ? object.__proto__.constructor.name : null;
 
-	return Object.keys(object).map((k: string) => {
+	const fields = Object.keys(object).map((k: string) => {
 		const key = path +'/'+ k;
+		const expandable = typeof object[k] === 'object' && object[k];
 		const expanded = !!state[key];
-		const prefix = expanded ? '– ' : '+ ';
-		const onClick = (e: any) => {
+		const prefix = expandable ? (expanded ? '–' : '+') : '';
+		
+		const onClick = expandable ? (e: any) => {
 			toggleState(key);
 			e.preventDefault();
 			e.stopPropagation();
-		}
+		} : null;
+
 		return (
-			<SplitRow key={k}>
-				<Label onClick={onClick}>{prefix} {k}</Label>
-				<div onClick={onClick}>{
+			<SplitRow key={k} onClick={onClick}>
+				<Label><Prefix>{prefix}</Prefix>{k}</Label>
+				<div>{
 					expanded
-						? typeof object[k] === 'object' && depth < 3
+						? typeof object[k] === 'object' && depth < 5
 							? <IndentTree>{inspectObject(object[k], state, toggleState, key, seen, depth + 1)}</IndentTree>
 							: formatValue(object[k])
-						: ('' + formatValue(object[k])).slice(0, 80)
+						: (truncate(formatValue(object[k]), 80))
 				}</div>
 			</SplitRow>
 		);
 	});
+	
+	return <>{proto}{fields}</>;
+}
+
+const truncate = (s: string, n: number) => {
+	if (s.length < n) return s;
+	return s.slice(0, n) + '…';
 }

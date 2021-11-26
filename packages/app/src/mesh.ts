@@ -91,11 +91,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
   // Return a lambda back to parent(s)
   return yeet({
     [mode]: (passEncoder: GPURenderPassEncoder) => {
-      const t = +new Date() / 1000;
-      const light = [Math.cos(t) * 5, 4, Math.sin(t) * 5, 1];
-
       uniform.pipe.fill(viewUniforms);
-      uniform.pipe.fill({ lightPosition: light });
+      uniform.pipe.fill({ lightPosition: LIGHT });
       if (isPicking) uniform.pipe.fill(pickingUniforms);
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 

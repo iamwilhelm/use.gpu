@@ -1,4 +1,4 @@
-#pragma import {viewUniforms} from 'use/view'
+#pragma import {worldToClip} from 'use/view'
 #pragma import {pickingUniforms} from 'use/picking';
 #pragma import {lightUniforms} from 'use/light';
 
@@ -19,7 +19,7 @@ layout(location = 3) out vec3 fragPosition;
 
 void main() {
   int instanceIndex = gl_InstanceIndex;
-  gl_Position = viewUniforms.projectionMatrix * viewUniforms.viewMatrix * position;
+  gl_Position = worldToClip(position);
 #ifdef IS_PICKING
   fragIndex = uint(instanceIndex);
 #else

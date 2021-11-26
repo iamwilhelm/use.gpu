@@ -40,7 +40,7 @@ const quadFields = [
 ];
 
 const lineFields = [
-  ['vec4', [-1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1]],
+  ['vec4', [-1.5, 0, 0, 1, 1.5, 0, 0, 1, 1.5, 1.5, 0, 1, 1.5, 1.5, 1.5, 1]],
   ['int', [1, 3, 3, 2]],
   ['float', [10, 10, 10, 10]],
 ];
@@ -74,9 +74,9 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             t = t + 1/6000;
             const s = ((i*i + i) % 13133.371) % 1000;
             emit(
-              Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s),
-              Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s),
-              Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s),
+              Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
+              Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2,
+              Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2,
               1,
             );
           },

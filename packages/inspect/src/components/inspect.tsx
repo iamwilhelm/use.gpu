@@ -11,6 +11,7 @@ import { Call } from './call';
 import { Shader } from './shader';
 import { InspectContainer, InspectContainerCollapsed, InspectToggle, SplitRow, RowPanel, Scrollable, Inset } from './layout';
 import { Button, Tab, Grid } from 'semantic-ui-react'
+import "../theme.css";
 
 const { Row, Column } = Grid;
 const { Pane } = Tab;
@@ -92,7 +93,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
       </Inset>
     </Scrollable>
   );
-  
+
+  // Avoid text selection on double click
 	const onMouseDown = (e: any) => {
     if (e.detail > 1) {
   		e.preventDefault();
@@ -100,7 +102,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 	};
 
   return (<>
-    {open  ? <Container onMouseDown={onMouseDown}>
+    {open  ? <Container onMouseDown={onMouseDown} className="ui inverted">
       {detail ? (
         <SplitRow>
           <RowPanel style={{width: '33%'}}>
@@ -122,8 +124,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   </>);
 }
 
+// Track update pings to show highlights in tree
 type Timer = ReturnType<typeof setTimeout>;
-
 const usePingTracker = (fiber: LiveFiber<any>) => {
   const [ping, setPing] = useState<PingState>({});
 

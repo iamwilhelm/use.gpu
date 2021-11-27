@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 export const InspectContainer = styled.div`
   pointer-events: auto;
-  background: rgba(255, 255, 255, 0.9);
-  color: #000;
+  background: var(--shim);
+  color: var(--colorText);
   cursor: default;
   position: relative;
 `;
@@ -40,7 +40,7 @@ export const IndentTree = styled.div`
 export const IndentTreeLine = styled.div`
   margin-left: 10px;
   padding-left: 10px;
-  border-left: 1px solid #ccc;
+  border-left: 1px dotted var(--borderThin);
 `;
 
 export const IndentContinuation = styled.div`
@@ -61,13 +61,13 @@ export const SplitColumn = styled.div`
 export const RowPanel = styled.div`
   position: relative;
   &:not(:last-child) {
-    border-right: 1px solid #ccc;
+    border-right: 1px solid var(--borderThin);
   }
 `;
 
 export const ColumnPanel = styled.div`
   &:not(:last-child) {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--borderThin);
   }
 `;
 

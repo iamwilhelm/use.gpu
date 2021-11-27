@@ -112,7 +112,12 @@ export type VertexAttribute = {
 // Uniform buffers
 export type UniformAttribute = {
   name: string,
-  format: UniformType
+  format: UniformType,
+  args?: UniformType[],
+};
+
+export type UniformAttributeValue = UniformAttribute & {
+  value: any,
 };
 
 export type UniformAttributeDescriptor = {
@@ -198,7 +203,12 @@ export type ArrayLike = any[] | TypedArray;
 
 export type ResolvedDataBindings = {
   constants: Record<string, any>,
-  links: Record<string, any>,
+  links: Record<string, StorageSource>,
+};
+
+export type ResolvedCodeBindings<T> = {
+  constants: Record<string, any>,
+  links: Record<string, T>,
 };
 
 // Passes

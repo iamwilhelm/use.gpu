@@ -9,7 +9,7 @@ import { SplitRow, IndentTree, Label } from './layout';
 import { inspectObject } from './props';
 
 const StyledShader = styled.div`
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.1);
   font-family: "Fira Code", "Bitstream Vera Mono", monospace;
   font-size: 12px;
   line-height: 13px;
@@ -22,9 +22,9 @@ const StyledEditor = styled.div`
 
 const StyledGutter = styled.div`
   padding: 0 5px;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid var(--borderThin);
   text-align: right;
-  color: #888;
+  color: var(--colorTextMuted);
   font-size: 0.9em;
 `
 

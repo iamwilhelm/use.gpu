@@ -1,5 +1,9 @@
 #pragma import {getPickingColor} from 'use/picking';
 
+#ifdef HAS_MASK
+float getMask(vec2);
+#endif
+
 #ifdef IS_PICKING
 layout(location = 0) in flat uint fragIndex;
 layout(location = 0) out uvec4 outColor;
@@ -17,5 +21,8 @@ void main() {
 #else
 void main() {
   outColor = fragColor;
+  #ifdef HAS_MASK
+  outColor.a *= getMask(fragUV);
+  #endif
 }
 #endif

@@ -23,11 +23,10 @@ type LangDef = {
 
 export const makeShaderLanguages = (langs: LangDef[]): ShaderLanguages => {
   const out = {} as any;
-  for (const {glsl, modules} of langs) {
+  for (const {glsl} of langs) {
     if (glsl) {
       out.glsl = {
         compile: (code: string, stage: any) => (glsl as any)(code, stage, false),
-        modules,
         cache: makeModuleCache(),
       };
     }

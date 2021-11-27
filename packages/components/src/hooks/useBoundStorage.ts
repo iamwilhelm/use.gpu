@@ -7,15 +7,17 @@ import partition from 'lodash/partition';
 import { useMemo, useOne } from '@use-gpu/live';
 
 export const useBoundStorage = (
-  uniforms: UniformDefinition[],
+  dataUniforms: UniformDefinition[],
+  codeUniforms: UniformDefinition[],
   dataBindings: ResolvedDataBindings,
+  codeBindings: ResolvedCodeBindings,
   base: number = 0,
 ) => {
   const {links, constants} = dataBindings;
 
   // Storage only needs to change if arrangement of links vs constants changes.
-  const storageKeys = Object.keys(links);
+  const storageKeys = [...Object.keys(dataBindings), ...Object.keys(codeBindings)];
   const memoKey = useMemo(() => Math.random(), storageKeys);
 
-  return useOne(() => makeBoundStorageAccessors(uniforms, dataBindings, base), memoKey);
+  return useOne(() => makeBoundStorageAccessors(dataUniforms, codeUniforms, dataBindings, codeBindings, base), memoKey);
 };

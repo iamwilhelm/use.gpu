@@ -1,5 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
+import {
+  TypedArray, ViewUniforms,
+  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  VertexData, StorageSource, RenderPassMode,
+} from '@use-gpu/core/types';
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
@@ -15,6 +19,8 @@ export type QuadsProps = {
   positions?: StorageSource,
   sizes?: StorageSource,
   colors?: StorageSource,
+
+  getMask?: ParsedBundle | ParsedModule,
   
   mode?: RenderPassMode | string,
   id?: number,
@@ -23,14 +29,23 @@ export type QuadsProps = {
 const ZERO = [0, 0, 0, 1];
 const GRAY = [0.5, 0.5, 0.5, 1];
 
-const DATA_BINDINGS = [
-  { name: 'getPosition', format: 'vec4' },
-  { name: 'getColor', format: 'vec4' },
-  { name: 'getSize', format: 'float' },
-] as UniformAttribute[];
+const ATTRIBUTES = [
+  { name: 'getPosition', format: 'vec4', value: ZERO },
+  { name: 'getColor', format: 'vec4', value: GRAY },
+  { name: 'getSize', format: 'float', value: 1 },
+] as UniformAttributeValue[];
+
+const LAMBDAS = [
+  { name: 'getMask', format: 'float', args: ['vec2'], value: 0.5 },
+] as UniformAttributeValue[];
 
 const DEFINES = {
+  HAS_MASK: true,
   STRIP_SEGMENTS: 2,
+};
+
+const LINKS = {
+  'getVertex:getQuadVertex': instanceVertexQuad,
 };
 
 export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
@@ -42,23 +57,28 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
   const vertexCount = 4;
   const instanceCount = props.positions?.length || 1;
 
-  const propBindings = [
-    props.positions ?? props.position ?? ZERO,
-    props.colors ?? props.color ?? GRAY,
-    props.sizes ?? props.size ?? 1,
-  ];
-  const codeBindings = {
-    'getVertex:getQuadVertex': instanceVertexQuad,
-  };  
+  const [attrBindings, lambdaBindings] = useOne(() => [
+    [
+      props.positions ?? props.position,
+      props.colors ?? props.color,
+      props.sizes ?? props.size,
+    ],
+    [
+      props.getMask,
+    ],
+  ], props);
 
   return use(Virtual)({
     topology: 'triangle-strip',
     vertexCount,
     instanceCount,
 
-    attributes: DATA_BINDINGS,
-    propBindings,
-    codeBindings,
+    attrBindings,
+    lambdaBindings,
+    
+    attributes: ATTRIBUTES,
+    lambdas: LAMBDAS,
+    links: LINKS,
     defines: DEFINES,
     deps: null,
 

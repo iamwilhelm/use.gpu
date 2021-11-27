@@ -197,8 +197,8 @@ export const makeUniformBlockAccessor = (
   const members = uniforms.map(({name, format}) => `${format} ${name}`);
   modules[`#${ubo}`] = makeUniformBlock(set, binding, ubo, members);
 
-  for (const {name, format} of uniforms) {
-    modules[name] = makeUniformGetter(format, ubo, name);
+  for (const {name, format, args} of uniforms) {
+    modules[name] = makeUniformGetter(format, ubo, name, args);
   }
 
   return modules;
@@ -211,16 +211,12 @@ layout (set = ${set}, binding = ${binding}) uniform ${ubo}Type {
 } ${ubo}Uniform;
 `;
 
-export const makeUniformGetter = (type: string, ubo: string, name: string) => `
+const intArg = ['int'];
+export const makeUniformGetter = (type: string, ubo: string, name: string, args?: string[] = intArg) => `
 #pragma import { ${ubo}Uniform } from '#${ubo}'
 
 #pragma export
-${type} ${name}() {
-  return ${ubo}Uniform.${name};
-}
-
-#pragma export
-${type} ${name}(int) {
+${type} ${name}(${args.join(', ')}) {
   return ${ubo}Uniform.${name};
 }
 `;

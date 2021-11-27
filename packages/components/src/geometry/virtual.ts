@@ -2,9 +2,15 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode, ShaderLib } from '@use-gpu/core/types';
 import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
 import { yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
+import {
+  makeMultiUniforms, makeUniformsWithStorage,
+  makeRenderPipeline,
+  extractDataBindings, extractCodeBindings,
+  uploadBuffer,
+} from '@use-gpu/core';
 import { useBoundStorage } from '../hooks/useBoundStorage';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { loadModule } from '@use-gpu/shader';
 
 import instanceVirtualVirtual from 'instance/virtual/virtual.glsl';
 import instanceVirtualWireframeStrip from 'instance/virtual/wireframe-strip.glsl';
@@ -16,8 +22,12 @@ export type VirtualProps = {
   instanceCount: number,
 
   attributes: UniformAttribute[],
+  callbacks: UniformAttribute[],
+
   propBindings: any[],
-  codeBindings: ShaderLib,
+  codeBindings: ShaderLib<any>,
+
+  links: ShaderLib<ParsedBundle | ParsedModule>
   defines: Record<string, any>,
   deps: any[],
 
@@ -36,9 +46,13 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const {
     topology,
     attributes: propAttributes,
-    propBindings,
-    codeBindings,
-    defines,
+    lambdas: propLambdas,
+    links: propLinks,
+    defines: propDefines,
+
+    attrBindings,
+    lambdaBindings,
+
     vertexCount,
     instanceCount,
     deps = null,
@@ -46,6 +60,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
     id = 0,
   } = props;
 
+  // Render set up
   const {viewUniforms, viewDefs} = useContext(ViewContext);
   const renderContext = useContext(RenderContext);
 
@@ -57,35 +72,44 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const resolvedContext = pickingContext?.renderContext ?? renderContext;
   const {device, colorStates, depthStencilState, samples, languages} = resolvedContext;
 
+  // External bindings
+  const dataBindings = useOne(() => extractDataBindings(propAttributes, attrBindings), attrBindings);
+  const codeBindings = useOne(() => extractCodeBindings(propLambdas, lambdaBindings), lambdaBindings);
+
   // Render shader
   const {glsl: {modules}} = languages;
   // TODO: non-strip topology
-  const vertexShader = !isDebug ? instanceVirtualVirtual : modules[getDebugShader(topology)];
+  const vertexShader = !isDebug ? instanceVirtualVirtual : getDebugShader(topology);
   const fragmentShader = instanceFragmentSolid;
-  const extDefines = useMemo(() => ({
-    ...defines,
+
+  const defines = useMemo(() => ({
+    ...propDefines,
     IS_PICKING: isPicking,
     VIEW_BINDING: 0,
     PICKING_BINDING: 1,
-  }), [isPicking, defines]);
+  }), [isPicking, propDefines]);
 
-  // Data bindings
-  const dataBindings = useOne(() => extractPropBindings(propAttributes, propBindings), propBindings);
+  const links = useMemo(() => ({
+    ...propLinks,
+    ...codeBindings.links,
+  }), [codeBindings, propLinks]);
 
-  // Shaders and data bindings
-  const [accessors, attributes, constants] = useBoundStorage(
+  // Shader data bindings
+  const {accessors, attributes, lambdas, constants} = useBoundStorage(
     propAttributes,
+    propLambdas,
     dataBindings,
+    codeBindings,
     1,
   );
-  
-  // Shaders and data bindings
+
+  // Shaders
   const [vertex, fragment] = useBoundShader(
     vertexShader,
     fragmentShader,
-    codeBindings,
+    links,
     accessors,
-    extDefines,
+    defines,
     languages,
     deps,
     1,
@@ -128,6 +152,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
       storage.pipe.fill(dataBindings.constants);
+      storage.pipe.fill(codeBindings.constants);
       uploadBuffer(device, storage.buffer, storage.pipe.data);
 
       passEncoder.setPipeline(pipeline);

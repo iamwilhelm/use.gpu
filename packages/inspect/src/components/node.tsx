@@ -9,13 +9,13 @@ const ICON = (s: string) => <span className="m-icon">{s}</span>
 const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
 
 const pingAnimation = keyframes`
- 0% { background: rgba(255, 230, 0, 1); }
- 100% { background: rgba(255, 230, 0, 0); }
+ 0% { background: rgba(10, 150, 75, 1.0); }
+ 100% { background: rgba(0, 0, 0, 1.0); }
 `
 
 const selectedAnimation = keyframes`
- 0% { background: rgba(210, 190, 128, 1); }
- 100% { background: rgba(210, 210, 255, 1); }
+ 0% { background: rgba(10, 100, 100, 0.5); }
+ 100% { background: rgba(50, 130, 200, 0.85); }
 `
 
 export const StyledNode = styled.div`
@@ -23,7 +23,7 @@ export const StyledNode = styled.div`
 	margin: -2px -5px;
 	padding: 2px 5px;
 	&.selected {
-		background: rgba(210, 210, 255, 1);
+    background: rgba(50, 130, 200, 0.85);
 	}
 
 	&.pinged {
@@ -38,10 +38,10 @@ export const StyledNode = styled.div`
 
 	&.repinged {
 		animation-name: none;
-		background: rgba(255, 230, 0, 1);
+    background: rgba(10, 150, 75, 1.0);
 		
 		&.selected {
-			background: rgba(210, 190, 128, 1);
+      background: rgba(20, 100, 200, 0.75);
 		}
 	}
 `;

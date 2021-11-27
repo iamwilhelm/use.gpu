@@ -1,5 +1,5 @@
 import { LiveFiber, LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { useResource } from '@use-gpu/live';
+import { useOne, useResource } from '@use-gpu/live';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -26,7 +26,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = () => ({fiber, canvas}
 		});
 
 		return div;
-	}, [canvas])
+	}, [canvas]);
 
 	ReactDOM.render(<Inspect fiber={fiber} />, container);
 

@@ -82,7 +82,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           },
           render: (positions) => [
             use(Quads)({ positions, size: 50 }),
-            use(Quads)({ positions, size: 50, id: 2, mode: RenderPassMode.Picking }),
+            //use(Quads)({ positions, size: 50, id: 2, mode: RenderPassMode.Picking }),
             //use(Quads)({ positions, size: 50, mode: RenderPassMode.Debug }),
           ],
           live: true,

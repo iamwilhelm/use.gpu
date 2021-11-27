@@ -10,8 +10,8 @@ export const extractPropBindings = (uniforms: UniformAttribute[], bindings: any[
   const links = {} as Record<string, any>;
   for (const u of uniforms) {
     const v = bindings.shift();
-    const b = bindings.shift();
-    if (b != null) {
+    if (v?.buffer != null) {
+      const b = v as StorageSource;
       checkStorageType(u, b);
       links[u.name] = b;
     }
@@ -34,7 +34,7 @@ export const makeBoundStorageAccessors = (
 ] => {
   const [attributes, constants] = partition(uniforms, ({name}) => !!(dataBindings.links as any)[name]);
   const constantAccessors = makeUniformBlockAccessor(constants, base);
-  const storageAccessors = makeStorageAccessors(attributes, base, constants.length);
+  const storageAccessors = makeStorageAccessors(attributes, base, 1);
   const accessors = {...constantAccessors, ...storageAccessors};
 
   return [accessors, attributes, constants];
@@ -57,5 +57,5 @@ export const makeBoundShader = <A, B>(
   const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
   const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
 
-  return [vertex, fragment];
+  return [vertex, fragment, vertexLinked, fragmentLinked];
 };

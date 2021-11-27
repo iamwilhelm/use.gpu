@@ -3,11 +3,13 @@
 #pragma import {getQuadUV} from 'geometry/quad'
 
 vec4 getPosition(int);
+vec4 getColor(int);
 float getSize(int);
 
 #pragma export
 SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   vec4 instancePosition = getPosition(instanceIndex);
+  vec4 instanceColor = getColor(instanceIndex);
   float instanceSize = getSize(instanceIndex);
 
   vec4 position = worldToClip(instancePosition);
@@ -18,7 +20,7 @@ SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
 
   return SolidVertex(
     position,
-    vec4(abs(instancePosition.xyz) / 2.0, 1.0),
+    instanceColor,
     uv
   );
 }

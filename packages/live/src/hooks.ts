@@ -28,10 +28,15 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
 }
 
 export const useNoHook = (hookType: Hook) => () => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
   const i = pushState(fiber, hookType);
 };
+
+export const useFiber = () => {
+  const fiber = CURRENT_FIBER;
+  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  return fiber;
+}
 
 enum Hook {
   STATE = 0,
@@ -107,8 +112,7 @@ export const useState = <T>(
   T,
   Setter<T>,
 ] => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const i = pushState(fiber, Hook.STATE);
   let {state, host, yeeted} = fiber;
@@ -141,8 +145,7 @@ export const useMemo = <T>(
   initialState: () => T,
   dependencies: any[] = NO_DEPS,
 ): T => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const i = pushState(fiber, Hook.MEMO);
   let {state, host} = fiber;
@@ -165,8 +168,7 @@ export const useOne = <T>(
   initialState: () => T,
   dependency: any = null,
 ): T => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const i = pushState(fiber, Hook.ONE);
   let {state, host} = fiber;
@@ -189,8 +191,7 @@ export const useCallback = <T extends Function>(
   initialValue: T,
   dependencies: any[] = NO_DEPS,
 ): T => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CALLBACK);
   let {state, host} = fiber;
@@ -213,8 +214,7 @@ export const useResource = <R>(
   callback: (dispose: (f: Function) => void) => R,
   dependencies: any[] = NO_DEPS,
 ): R => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const i = pushState(fiber, Hook.RESOURCE);
   let {state, host} = fiber;
@@ -248,8 +248,7 @@ export const useResource = <R>(
 export const useContext = <C>(
   context: LiveContext<C>,
 ) => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const {host, context: {values, roots}} = fiber;
   const root = roots.get(context);
@@ -266,8 +265,7 @@ export const useContext = <C>(
 export const useSomeContext = <C>(
   context: LiveContext<C>,
 ) => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CONTEXT);
 
@@ -291,8 +289,7 @@ export const useSomeContext = <C>(
 export const useNoContext = <C>(
   context: LiveContext<C>,
 ) => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CONTEXT);
   const {host, context: {values, roots}} = fiber;
@@ -306,8 +303,7 @@ export const useConsumer = <C>(
   context: LiveContext<C>,
   value: any,
 ) => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
+  const fiber = useFiber();
 
   const {host, context: {values, roots}} = fiber;
   const root = roots.get(context);

@@ -17,7 +17,7 @@ export const makeUniformsWithStorage = (
   const pipe = makeUniformPipe(uniforms);
   const buffer = makeUniformBuffer(device, pipe.data);
   const uniformEntries = makeUniformBindings([{resource: {buffer}}]);
-  const storageEntries = makeStorageBindings(links, uniformEntries.length);
+  const storageEntries = makeStorageBindings(links, 1);
 
   const entries = [...uniformEntries, ...storageEntries];
   const bindGroup = device.createBindGroup({

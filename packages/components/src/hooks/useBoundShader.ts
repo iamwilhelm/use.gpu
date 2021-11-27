@@ -1,6 +1,7 @@
 import { ShaderLanguages, ShaderLib } from '@use-gpu/core/types';
 import { makeBoundShader } from '@use-gpu/core';
 import { linkBundle as link, loadModule } from '@use-gpu/shader';
+import { useFiber } from '@use-gpu/live';
 import mapValues from 'lodash/mapValues';
 
 import { useMemo } from '@use-gpu/live';
@@ -20,7 +21,7 @@ export const useBoundShader = (
 ) => {
   const {glsl: {compile, cache}} = languages;
 
-  return useMemo(() => {
+  const shader = useMemo(() => {
     const bindings = {
       ...codeBindings,
       ...mapValues(accessors, loadModule),
@@ -37,4 +38,12 @@ export const useBoundShader = (
       base,
     );
   }, [...deps ?? NO_DEPS, codeBindings, accessors]);
+
+  const [,, vertexCode, fragmentCode] = shader;
+  const fiber = useFiber();
+  fiber.__inspect = fiber.__inspect || {};
+  fiber.__inspect.vertex = vertexCode;
+  fiber.__inspect.fragment = fragmentCode;
+
+  return shader;
 };

@@ -1,13 +1,14 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { useResource, formatValue } from '@use-gpu/live';
+import { formatNode, formatValue, traverseFiber, renderFibers } from '@use-gpu/live';
 import { useUpdateState } from './cursor';
 import { ExpandState, SelectState, PingState } from './types';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Node } from './node';
 import { Fiber } from './fiber';
 import { Props } from './props';
 import { Call } from './call';
+import { Shader } from './shader';
 import { InspectContainer, InspectContainerCollapsed, InspectToggle, SplitRow, RowPanel, Scrollable, Inset } from './layout';
 import { Button, Tab, Grid } from 'semantic-ui-react'
 
@@ -15,6 +16,9 @@ const { Row, Column } = Grid;
 const { Pane } = Tab;
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
+
+type InspectFiber = Record<string, any>;
+type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
 
 type InspectProps = {
   fiber: LiveFiber<any>,
@@ -45,6 +49,25 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
       render: () => <Call fiber={selectedFiber} />
     },
   ] : [];
+
+  if (selectedFiber) {
+    const inspect = selectedFiber.__inspect;
+    if (inspect) {
+      const {vertex, fragment} = inspect;
+      if (vertex) {
+        panes.push({
+          menuItem: 'Vertex',
+          render: () => <Shader shader={vertex} />
+        });
+      }
+      if (fragment) {
+        panes.push({
+          menuItem: 'Fragment',
+          render: () => <Shader shader={fragment} />
+        });
+      }
+    }
+  }
 
   const Container = detail ? InspectContainer : InspectContainerCollapsed;
 

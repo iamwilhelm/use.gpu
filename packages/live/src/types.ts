@@ -51,7 +51,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   version: number,
   memo: number,
 
-  // Last snapshot
+  // Last rendered return type
   type: Function,
 
   // Mounting state
@@ -66,6 +66,8 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
 
   // Yeeting state
   yeeted?: FiberYeet<any>,
+
+  __inspect?: Record<string, any> | null,
 };
 
 export type FiberMap = Map<Key, LiveFiber<any>>;

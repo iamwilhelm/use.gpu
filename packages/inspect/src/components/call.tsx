@@ -17,9 +17,9 @@ type CallProps = {
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
-	const {id, depth, path, context, state, yeeted, next} = fiber;
+	const {id, depth, path, context, state, yeeted, next, host} = fiber;
 
-	let props = {id, depth, path, state, yeeted, context, next} as Record<string, any>;
+	let props = {id, depth, path, state, yeeted, context, next, host} as Record<string, any>;
 
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 	const toggleExpanded = (id: string) => setExpanded((state) => ({
@@ -27,8 +27,10 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
 		[id]: !expanded[id],
 	}));
 
-	return (<StyledCall>
-		<div><b>Fiber</b></div>
-		<div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
-	</StyledCall>);
+	return (
+    <StyledCall>
+  		<div><b>Fiber</b></div>
+  		<div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
+  	</StyledCall>
+  );
 }

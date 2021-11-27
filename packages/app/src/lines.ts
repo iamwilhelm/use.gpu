@@ -49,36 +49,32 @@ export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
     id = 0,
   } = props;
 
-  // Customize shader
+  // Customize line shader
   let {join, depth = 0} = props;
   join = join in LINE_JOIN_SIZE ? join : 'bevel';
+
   const style = LINE_JOIN_STYLE[join];
   const segments = LINE_JOIN_SIZE[join];
-
-  const vertices = 4 + segments*2;
   const tris = (1+segments) * 2;
-  const edges = tris*2 + 1;
-
   const defines = {
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
     STRIP_SEGMENTS: tris,
   };
+
+  // Set up draw
+  const vertexCount = tris * 3;
+  const instanceCount = (props.positions?.length || 2) - 1;
+
+  // Bind to shader
+  const propBindings = [
+    props.positions ?? props.position ?? ZERO,
+    props.segments ?? props.segment ?? 0,
+    props.sizes ?? props.size ?? 1,
+  ];
   const codeBindings = {
     'getVertex:getLineVertex': instanceVertexLine,
   };
-
-  const propBindings = [
-    props.position ?? ZERO,
-    props.positions,
-    props.segment ?? 0,
-    props.segments,
-    props.size ?? 1,
-    props.sizes,
-  ];
-  
-  const vertexCount = vertices;
-  const instanceCount = (props.positions?.length || 2) - 1;
 
   return use(Virtual)({
     topology: 'triangle-strip',

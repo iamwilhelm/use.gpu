@@ -130,7 +130,8 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
   if (typeof x === 'function') {
     if (x.name === '' && !x.displayName) x.displayName = Math.round(Math.random() * 10000);
     const name = x.displayName ?? x.name;
-    return `${name}(…)`;
+    const body = x.toString().split(/=>/)[1];
+    return `${name}(…) ` + body;
   }
   if (typeof x === 'object') {
     const signature = Object.keys(x).join('/');

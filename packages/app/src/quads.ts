@@ -10,18 +10,22 @@ import instanceVertexQuad from 'instance/vertex/quad.glsl';
 export type QuadsProps = {
   position?: number[] | TypedArray,
   size?: number,
+  color?: number[],
 
   positions?: StorageSource,
   sizes?: StorageSource,
+  colors?: StorageSource,
   
   mode?: RenderPassMode | string,
   id?: number,
 };
 
 const ZERO = [0, 0, 0, 1];
+const GRAY = [0.5, 0.5, 0.5, 1];
 
 const DATA_BINDINGS = [
   { name: 'getPosition', format: 'vec4' },
+  { name: 'getColor', format: 'vec4' },
   { name: 'getSize', format: 'float' },
 ] as UniformAttribute[];
 
@@ -35,19 +39,17 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
     id = 0,
   } = props;
 
-  const codeBindings = {
-    'getVertex:getQuadVertex': instanceVertexQuad,
-  };
-
-  const propBindings = [
-    props.position ?? ZERO,
-    props.positions,
-    props.size ?? 1,
-    props.sizes,
-  ];
-  
   const vertexCount = 4;
   const instanceCount = props.positions?.length || 1;
+
+  const propBindings = [
+    props.positions ?? props.position ?? ZERO,
+    props.colors ?? props.color ?? GRAY,
+    props.sizes ?? props.size ?? 1,
+  ];
+  const codeBindings = {
+    'getVertex:getQuadVertex': instanceVertexQuad,
+  };  
 
   return use(Virtual)({
     topology: 'triangle-strip',

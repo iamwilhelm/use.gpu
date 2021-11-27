@@ -23,6 +23,7 @@ export const makeHost = () => {
     undepend: dependency.undepend,
     invalidate: dependency.invalidate,
     __ping: () => {},
+    __inspect: () => {},
     __stats: {mounts: 0, unmounts: 0, updates: 0, dispatch: 0},
     __flush: scheduler.flush,
   } as HostInterface;
@@ -113,6 +114,14 @@ export const groupFibers = (fibers: LiveFiber<any>[]) => {
   roots.sort((a, b) => comparePaths(a.root.path, b.root.path));
 
   return roots;
+}
+
+// Traverse over fiber and subfiber in render order
+export const traverseFiber = (fiber: LiveFiber<any>, f: (f: LiveFiber<any>) => void) => {
+  const {mount, mounts, next} = fiber;
+  if (mount) traverseFiber(mount, f);
+  if (mounts) for (const k of mounts.keys()) traverseFiber(mounts.get(k)!, f);
+  if (next) traverseFiber(next, f);
 }
 
 const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): RenderCallbacks => {

@@ -14,7 +14,7 @@ const timed = (name: string, f: any) => {
   return (...args: any[]) => {
     const t = +new Date();
     const v = f(...args);
-    console.log(name, (+new Date() - t).toFixed(2), 'ms');
+    console.log(name, (+new Date() - t), 'ms');
     return v;
   }
 }
@@ -28,8 +28,8 @@ export const makeModuleCache = (options: Record<string, any> = {}) => new LRU({
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
 export const loadModule = (
-  name: string,
   code: string,
+  name: string,
   compressed: boolean = false,
 ): ParsedModule => {
   if (code == null) throw new Error(`Shader code ${name} undefined`);
@@ -41,17 +41,17 @@ export const loadModule = (
 
 // Use cache to load modules
 export const loadCachedModule = (
-  name: string,
   code: string,
+  name: string,
   cache: ParsedModuleCache | null = null,
 ): ParsedModule => {
-  if (!cache) return loadModule(name, code, true);
+  if (!cache) return loadModule(code, name, true);
 
   const hash = getProgramHash(code);
   const entry = cache.get(hash);
   if (entry) return entry;
   
-  const module = loadModule(name, code, true);
+  const module = loadModule(code, name, true);
   cache.set(hash, module);
   return module;
 }
@@ -75,13 +75,15 @@ export const linkCode = timed('linkCode', (
 // Link a bundle of parsed module + libs and dynamic links.
 export const linkBundle = timed('linkBundle', (
   bundle: ParsedBundle,
-  linkBundles: Record<string, ParsedBundle> = {},
+  links: Record<string, ParsedBundle | ParsedModule> = {},
   defines: Record<string, string> = {},
 ) => {
   let [main, libs] = parseBundle(bundle);
 
-  const linkDefs = mapValues(linkBundles, (bundle: ParsedBundle, name: string) => {
-    const [link, linkLibs] = parseBundle(bundle);
+  const linkDefs = mapValues(links, (bundle: ParsedBundle | ParsedModule, name: string) => {
+    if ('table' in bundle) return bundle as any as ParsedModule;
+
+    const [link, linkLibs] = parseBundle(bundle as any as ParsedBundle);
     libs = {...libs, ...linkLibs};
     return link;
   });
@@ -128,10 +130,7 @@ export const linkModule = timed('linkModule', (
       const namespace = namespaces.get(module);
       for (const {name, imported} of imports) {
         const imp = namespace + imported;
-        if (!exists.has(imp)) {
-          console.warn(`Import ${name} from '${module}' does not exist`);
-          debugger;
-        }
+        if (!exists.has(imp)) console.warn(`Import ${name} from '${module}' does not exist`);
         else if (!visible.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
         rename.set(name, imp);
       }

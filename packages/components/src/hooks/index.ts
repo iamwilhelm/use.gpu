@@ -1,1 +1,2 @@
-export * from './useBoundStorageShader';
+export * from './useBoundShader';
+export * from './useBoundStorage';

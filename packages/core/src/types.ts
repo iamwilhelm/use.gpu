@@ -157,7 +157,7 @@ export type StorageSource = {
 // Shaders
 export type ShaderStage = 'vertex' | 'fragment';
 export type ShaderCompiler = (code: string, stage: ShaderStage) => TypedArray;
-export type ShaderLib = Record<string, string>;
+export type ShaderLib<T = string> = Record<string, T>;
 
 export type ShaderLanguages = {[k: string]: ShaderLanguageAPI};
 export type ShaderLanguageAPI = {

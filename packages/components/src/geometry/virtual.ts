@@ -3,7 +3,12 @@ import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, V
 import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
 import { yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
-import { useBoundStorageShader } from '../hooks/useBoundStorageShader';
+import { useBoundStorage } from '../hooks/useBoundStorage';
+import { useBoundShader } from '../hooks/useBoundShader';
+
+import instanceVirtualVirtual from 'instance/virtual/virtual.glsl';
+import instanceVirtualWireframeStrip from 'instance/virtual/wireframe-strip.glsl';
+import instanceFragmentSolid from 'instance/fragment/solid.glsl';
 
 export type VirtualProps = {
   topology: string,
@@ -21,8 +26,9 @@ export type VirtualProps = {
 };
 
 const getDebugShader = (topology: string) => {
-  if (topology === 'triangle-strip') return 'instance/virtual/wireframe-strip';
-  if (topology === 'triangle-list') return 'instance/virtual/wireframe-list';
+  if (topology === 'triangle-strip') return instanceVirtualWireframeStrip;
+  // TODO
+  if (topology === 'triangle-list') return instanceVirtualWireframeStrip;
   return '';
 }
 
@@ -54,11 +60,8 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   // Render shader
   const {glsl: {modules}} = languages;
   // TODO: non-strip topology
-  const vertexShader = !isDebug ? modules['instance/virtual/virtual'] : modules[getDebugShader(topology)];
-  const fragmentShader = !isDebug ? modules['instance/fragment/solid'] : modules['instance/fragment/solid'];
-
-  // Data bindings
-  const dataBindings = useOne(() => extractPropBindings(propAttributes, propBindings), propBindings);
+  const vertexShader = !isDebug ? instanceVirtualVirtual : modules[getDebugShader(topology)];
+  const fragmentShader = instanceFragmentSolid;
   const extDefines = useMemo(() => ({
     ...defines,
     IS_PICKING: isPicking,
@@ -66,13 +69,22 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
     PICKING_BINDING: 1,
   }), [isPicking, defines]);
 
+  // Data bindings
+  const dataBindings = useOne(() => extractPropBindings(propAttributes, propBindings), propBindings);
+
   // Shaders and data bindings
-  const [vertex, fragment, attributes, constants] = useBoundStorageShader(
-    vertexShader,
-    fragmentShader,
+  const [accessors, attributes, constants] = useBoundStorage(
     propAttributes,
     dataBindings,
+    1,
+  );
+  
+  // Shaders and data bindings
+  const [vertex, fragment] = useBoundShader(
+    vertexShader,
+    fragmentShader,
     codeBindings,
+    accessors,
     extDefines,
     languages,
     deps,

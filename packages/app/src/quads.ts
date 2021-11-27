@@ -1,12 +1,11 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
-import { ViewContext, RenderContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
-import { use, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
+import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 
-import testShader from './glsl/quads-vertex.glsl';
-console.log({testShader});
+import instanceVertexQuad from 'instance/vertex/quad.glsl';
 
 export type QuadsProps = {
   position?: number[] | TypedArray,
@@ -36,9 +35,9 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
     id = 0,
   } = props;
 
-  const renderContext = useContext(RenderContext);
-  const {languages: {glsl: {modules}}} = renderContext;
-  const codeBindings = { 'getVertex:getQuadVertex': modules['instance/vertex/quad'] };
+  const codeBindings = {
+    'getVertex:getQuadVertex': instanceVertexQuad,
+  };
 
   const propBindings = [
     props.position ?? ZERO,

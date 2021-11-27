@@ -58,7 +58,6 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const view = [
     use(Pass)({
       children: [
-        /*
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
@@ -68,7 +67,6 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]
         }),
-        */
         use(RawData)({
           format: 'vec4',
           length: 100,

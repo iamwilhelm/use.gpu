@@ -1,9 +1,11 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
-import { ViewContext, RenderContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
-import { use, yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
+import { use, yeet, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
+
+import instanceVertexLine from 'instance/vertex/line.glsl';
 
 export type LinesProps = {
   position?: number[] | TypedArray,
@@ -62,10 +64,9 @@ export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
     LINE_JOIN_SIZE: segments,
     STRIP_SEGMENTS: tris,
   };
-
-  const renderContext = useContext(RenderContext);
-  const {languages: {glsl: {modules}}} = renderContext;
-  const codeBindings = { 'getVertex:getLineVertex': modules['instance/vertex/line'] };
+  const codeBindings = {
+    'getVertex:getLineVertex': instanceVertexLine,
+  };
 
   const propBindings = [
     props.position ?? ZERO,

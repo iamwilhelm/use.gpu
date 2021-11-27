@@ -129,11 +129,6 @@ export const inspectObject = (
 			e.stopPropagation();
 		} : null;
 
-		const onDblClick = (e: any) => {
-			e.preventDefault();
-			e.stopPropagation();
-		};
-
 		const compact = <Compact>
 			{expanded ? formatValue(object[k]) : truncate(formatValue(object[k]), 80)}
 		</Compact>
@@ -150,7 +145,7 @@ export const inspectObject = (
 		const showFull = typeof object[k] === 'object' && depth < 20;
 		if (showFull && expanded) {
 			return (
-				<div key={k} onClick={onClick} onDblClick={onDblClick}>
+				<div key={k} onClick={onClick}>
 					<ExpandRow>
 						<SplitRow>
 							<Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
@@ -163,7 +158,7 @@ export const inspectObject = (
 		}
 
 		return (
-			<div key={k} onClick={onClick} onDblClick={onDblClick}>
+			<div key={k} onClick={onClick}>
 				<ExpandRow>
 					<SplitRow>
 						<Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>

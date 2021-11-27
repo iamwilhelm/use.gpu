@@ -1,5 +1,5 @@
 import { Tree } from '@lezer/common';
-import { SymbolTable, ParsedModule, ParsedModuleCache } from '../types';
+import { SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle } from '../types';
 import { parseGLSL, defineGLSL } from './shader';
 import { makeASTParser, rewriteUsingAST, compressAST, decompressAST, getProgramHash } from './ast';
 import { GLSL_VERSION } from '../constants';
@@ -56,8 +56,7 @@ export const loadCachedModule = (
   return module;
 }
 
-// Link a module with static modules and dynamic links.
-// Insert global constant definitions.
+// Link a source module with static modules and dynamic links.
 export const linkCode = timed('linkCode', (
   code: string,
   libraries: Record<string, string> = {},
@@ -73,8 +72,24 @@ export const linkCode = timed('linkCode', (
   return linkModule(main, parsedLibraries, parsedLinkDefs, defines);
 });
 
-// Link a module with static modules and dynamic links.
-// Insert global constant definitions.
+// Link a bundle of parsed module + libs and dynamic links.
+export const linkBundle = timed('linkBundle', (
+  bundle: ParsedBundle,
+  linkBundles: Record<string, ParsedBundle> = {},
+  defines: Record<string, string> = {},
+) => {
+  let [main, libs] = parseBundle(bundle);
+
+  const linkDefs = mapValues(linkBundles, (bundle: ParsedBundle, name: string) => {
+    const [link, linkLibs] = parseBundle(bundle);
+    libs = {...libs, ...linkLibs};
+    return link;
+  });
+
+  return linkModule(main, libs, linkDefs, defines);  
+});
+
+// Link a parsed module with static modules and dynamic links.
 export const linkModule = timed('linkModule', (
   main: ParsedModule,
   libraries: Record<string, ParsedModule> = {},
@@ -239,6 +254,20 @@ export const parseLinkAliases = <T>(
     aliases.set(name, imported);
   }
   return [out, aliases];
+}
+
+// Parse bundle of imports into main + libs
+export const parseBundle = (bundle: ParsedBundle): [ParsedModule, Record<string, ParsedModule>] => {
+  const out = {} as Record<string, ParsedModule>;
+  const traverse = (libs: Record<string, ParsedBundle>) => {
+    for (let k in libs) {
+      const bundle = libs[k];
+      out[k] = bundle.module;
+      traverse(bundle.libs);
+    }
+  };
+  traverse(bundle.libs);
+  return [bundle.module, out];
 }
 
 // Reserve a unique namespace based on truncated shader hash

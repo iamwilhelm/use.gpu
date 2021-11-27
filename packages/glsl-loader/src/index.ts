@@ -46,6 +46,7 @@ function glslLoader(this: any, source: string) {
   for (const {name} of table.modules) {
     imports.push(makeImport(`m${i}`, name + '.glsl'));
     symbols.push(`${stringify(name)}: m${i}`);
+    ++i;
   }
   const libs = `const libs = {${symbols.join(', ')}};`
 

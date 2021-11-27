@@ -7,7 +7,12 @@ import {
   makeRenderPipeline, makeShaderModule,
   uploadBuffer,
 } from '@use-gpu/core';
-import { linkCode as link } from '@use-gpu/shader';
+import { linkBundle as link } from '@use-gpu/shader';
+
+import instanceMesh from 'instance/mesh.glsl';
+import instanceFragmentMesh from 'instance/fragment/mesh.glsl';
+import instanceFragmentSolid from 'instance/fragment/solid.glsl';
+//import instanceVirtualWireframeMesh from 'instance/virtual/wireframe-mesh.glsl';
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
@@ -64,14 +69,15 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
   };
 
   // Render shader
-  const {glsl: {compile, modules, cache}} = languages;
-  const vertexShader = !isDebug ? modules['instance/mesh'] : module['instance/virtual/wireframe-mesh']
-  const fragmentShader = !isDebug ? modules['instance/fragment/mesh'] : modules['instance/fragment/solid'];
+  const {glsl: {compile, cache}} = languages;
+  // TODO: mesh debug
+  const vertexShader = !isDebug ? instanceMesh : instanceMesh;
+  const fragmentShader = !isDebug ? instanceFragmentMesh : instanceFragmentSolid;
 
   // Rendering pipeline
   const pipeline = useMemo(() => {
-    const vertexLinked = link(vertexShader, modules, {}, defines, cache);
-    const fragmentLinked = link(fragmentShader, modules, {}, defines, cache);
+    const vertexLinked = link(vertexShader, {}, defines, cache);
+    const fragmentLinked = link(fragmentShader, {}, defines, cache);
 
     const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
     const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));

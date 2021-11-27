@@ -69,9 +69,15 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
       </Inset>
     </Scrollable>
   );
+  
+	const onMouseDown = (e: any) => {
+    if (e.detail > 1) {
+  		e.preventDefault();
+    }
+	};
 
   return (<>
-    {open  ? <Container>
+    {open  ? <Container onMouseDown={onMouseDown}>
       {detail ? (
         <SplitRow>
           <RowPanel style={{width: '33%'}}>

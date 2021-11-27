@@ -3,6 +3,11 @@ import LRU from 'lru-cache';
 
 export type ParsedModuleCache = LRU<string, ParsedModule>;
 
+export type ParsedBundle = {
+  module: ParsedModule,
+  libs: Record<string, ParsedBundle>,
+};
+
 export type ParsedModule = {
   name: string,
   code: string,

@@ -12,8 +12,8 @@ import { useBoundStorage } from '../hooks/useBoundStorage';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { loadModule } from '@use-gpu/shader';
 
-import instanceVirtualVirtual from 'instance/virtual/virtual.glsl';
-import instanceVirtualWireframeStrip from 'instance/virtual/wireframe-strip.glsl';
+import instanceDrawVirtual from 'instance/draw/virtual.glsl';
+import instanceDrawWireframeStrip from 'instance/draw/wireframe-strip.glsl';
 import instanceFragmentSolid from 'instance/fragment/solid.glsl';
 
 export type VirtualProps = {
@@ -36,9 +36,9 @@ export type VirtualProps = {
 };
 
 const getDebugShader = (topology: string) => {
-  if (topology === 'triangle-strip') return instanceVirtualWireframeStrip;
+  if (topology === 'triangle-strip') return instanceDrawWireframeStrip;
   // TODO
-  if (topology === 'triangle-list') return instanceVirtualWireframeStrip;
+  if (topology === 'triangle-list') return instanceDrawWireframeStrip;
   return '';
 }
 
@@ -79,7 +79,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   // Render shader
   const {glsl: {modules}} = languages;
   // TODO: non-strip topology
-  const vertexShader = !isDebug ? instanceVirtualVirtual : getDebugShader(topology);
+  const vertexShader = !isDebug ? instanceDrawVirtual : getDebugShader(topology);
   const fragmentShader = instanceFragmentSolid;
 
   const defines = useMemo(() => ({

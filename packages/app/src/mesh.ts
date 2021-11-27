@@ -9,7 +9,7 @@ import {
 } from '@use-gpu/core';
 import { linkBundle as link } from '@use-gpu/shader';
 
-import instanceMesh from 'instance/mesh.glsl';
+import instanceDrawMesh from 'instance/draw/mesh.glsl';
 import instanceFragmentMesh from 'instance/fragment/mesh.glsl';
 import instanceFragmentSolid from 'instance/fragment/solid.glsl';
 //import instanceVirtualWireframeMesh from 'instance/virtual/wireframe-mesh.glsl';
@@ -71,7 +71,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
   // Render shader
   const {glsl: {compile, cache}} = languages;
   // TODO: mesh debug
-  const vertexShader = !isDebug ? instanceMesh : instanceMesh;
+  const vertexShader = !isDebug ? instanceDrawMesh : instanceDrawMesh;
   const fragmentShader = !isDebug ? instanceFragmentMesh : instanceFragmentSolid;
 
   // Rendering pipeline

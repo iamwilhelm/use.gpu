@@ -108,13 +108,12 @@ export const linkModule = timed('linkModule', (
   const exists = new Set<string>();
   const visible = new Set<string>();
 
-  const unlinked = [];
   for (const module of modules) {
     const {name, code, tree, table} = module;
     const {symbols, visibles, externals, modules} = table;
 
+    // Namespace all global symbols
     const namespace = reserveNamespace(module, namespaces, used);
-
     const rename = new Map<string, string>();
     if (module !== main) {
       for (const name of symbols) {
@@ -126,6 +125,7 @@ export const linkModule = timed('linkModule', (
       }
     }
 
+    // Replace imported symbols with target
     for (const {name: module, imports} of modules) {
       const namespace = namespaces.get(module);
       for (const {name, imported} of imports) {
@@ -136,6 +136,7 @@ export const linkModule = timed('linkModule', (
       }
     }
 
+    // Replace imported function prototypes with target
     for (const {prototype} of externals) if (prototype) {
       const {name} = prototype;
       const resolved = aliases.get(name) ?? name;
@@ -148,13 +149,6 @@ export const linkModule = timed('linkModule', (
     }
 
     program.push(rewriteUsingAST(code, tree, rename));
-    unlinked.push(...externals.filter(({optional}) => !optional));
-  }
-
-  for (const {prototype} of unlinked) if (prototype) {
-    const {name} = prototype;
-    const target = links[name];
-    if (!target) throw new Error(`Unlinked function ${name}`);
   }
 
   const result = program.join("\n");

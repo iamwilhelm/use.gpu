@@ -343,7 +343,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const visibles = exported.flatMap(r => r.symbols);
     const symbols = refs.flatMap(r => r.symbols);
 
-    return {hash, refs, symbols, visibles, externals, modules, functions, declarations};
+    return {hash, symbols, visibles, externals, modules, functions, declarations};
   }
   
   return {extractImports, extractFunctions, extractDeclarations, extractSymbolTable};

@@ -15,7 +15,6 @@ export type CompressedNode = [string, number, number];
 
 export type SymbolTable = {
   hash: string,
-  refs: ComboRef[],
   symbols: SymbolRef[],
   visibles: SymbolRef[],
   modules: ModuleRef[],

@@ -195,7 +195,7 @@ export const makeUniformBlockAccessor = (
   const modules = {} as Record<string, string>;
 
   const members = uniforms.map(({name, format}) => `${format} ${name}`);
-  modules[ubo] = makeUniformBlock(set, binding, ubo, members);
+  modules[`#${ubo}`] = makeUniformBlock(set, binding, ubo, members);
 
   for (const {name, format} of uniforms) {
     modules[name] = makeUniformGetter(format, ubo, name);

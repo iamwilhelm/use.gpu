@@ -5,6 +5,7 @@ import { makeASTParser, rewriteUsingAST, compressAST, decompressAST, getProgramH
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
 import LRU from 'lru-cache';
+import mapValues from 'lodash/mapValues';
 
 const TIMED = false;
 
@@ -18,39 +19,70 @@ const timed = (name: string, f: any) => {
   }
 }
 
+// LRU cache for parsed shader code
 export const makeModuleCache = (options: Record<string, any> = {}) => new LRU({
   max: 100,
   ...options,
 });
 
-// Parse keys `from:to` into a map of aliases
-export const parseLinkAliases = (
-  links: Record<string, string>,
-): [
-  Record<string, string>,
-  Map<string, string>
-] => {
-  const out = {} as Record<string, string>;
-  const aliases = new Map<string, string>();
-  for (let k in links) {
-    const [name, imported] = k.split(':');
-    out[name] = links[k];
-    aliases.set(name, imported);
-  }
-  return [out, aliases];
+// Parse a code module into its in-memory representation
+// (AST + symbol table)
+export const loadModule = (
+  name: string,
+  code: string,
+  compressed: boolean = false,
+): ParsedModule => {
+  if (code == null) throw new Error(`Shader code ${name} undefined`);
+  let tree = parseGLSL(code);
+  const table = makeASTParser(code, tree).extractSymbolTable();
+  if (compressed) tree = decompressAST(compressAST(tree));
+  return {name, code, tree, table};
+}
+
+// Use cache to load modules
+export const loadCachedModule = (
+  name: string,
+  code: string,
+  cache: ParsedModuleCache | null = null,
+): ParsedModule => {
+  if (!cache) return loadModule(name, code, true);
+
+  const hash = getProgramHash(code);
+  const entry = cache.get(hash);
+  if (entry) return entry;
+  
+  const module = loadModule(name, code, true);
+  cache.set(hash, module);
+  return module;
 }
 
 // Link a module with static modules and dynamic links.
 // Insert global constant definitions.
-export const linkModule = timed('linkModule', (
+export const linkCode = timed('linkCode', (
   code: string,
   libraries: Record<string, string> = {},
   linkDefs: Record<string, string> = {},
   defines: Record<string, string> = {},
   cache: ParsedModuleCache | null = null,
 ) => {
-  const [links, aliases] = parseLinkAliases(linkDefs)
-  const modules = loadModules(code, libraries, links, cache);
+  const main = loadCachedModule('main', code, cache);
+
+  const parsedLibraries = mapValues(libraries, (code: string, name: string) => loadCachedModule(name, code, cache));
+  const parsedLinkDefs = mapValues(linkDefs, (code: string, name: string) => loadCachedModule(name.split(':')[0], code, cache));
+
+  return linkModule(main, parsedLibraries, parsedLinkDefs, defines);
+});
+
+// Link a module with static modules and dynamic links.
+// Insert global constant definitions.
+export const linkModule = timed('linkModule', (
+  main: ParsedModule,
+  libraries: Record<string, ParsedModule> = {},
+  linkDefs: Record<string, ParsedModule> = {},
+  defines: Record<string, string> = {},
+) => {
+  const [links, aliases] = parseLinkAliases(linkDefs);
+  const modules = loadModules(main, libraries, links);
 
   const program = [`#version ${GLSL_VERSION}`, defineGLSL(defines)] as string[];
 
@@ -67,7 +99,7 @@ export const linkModule = timed('linkModule', (
     const namespace = reserveNamespace(module, namespaces, used);
 
     const rename = new Map<string, string>();
-    if (name !== 'main') {
+    if (module !== main) {
       for (const name of symbols) {
         rename.set(name, namespace + name);
         exists.add(namespace + name);
@@ -81,7 +113,10 @@ export const linkModule = timed('linkModule', (
       const namespace = namespaces.get(module);
       for (const {name, imported} of imports) {
         const imp = namespace + imported;
-        if (!exists.has(imp)) console.warn(`Import ${name} from '${module}' does not exist`);
+        if (!exists.has(imp)) {
+          console.warn(`Import ${name} from '${module}' does not exist`);
+          debugger;
+        }
         else if (!visible.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
         rename.set(name, imp);
       }
@@ -112,79 +147,59 @@ export const linkModule = timed('linkModule', (
   return result;
 });
 
-// Parse a code module into its in-memory representation
-// (AST + symbol table)
-export const loadModule = (
-  name: string,
-  code: string,
-  compressed: boolean = false,
-): ParsedModule => {
-  let tree = parseGLSL(code);
-  const table = makeASTParser(code, tree).extractSymbolTable();
-  if (compressed) tree = decompressAST(compressAST(tree));
-  return {name, code, tree, table};
-}
-
 // Load all modules references from a piece of code
 export const loadModules = timed('loadModules', (
-  code: string,
-  libraries: Record<string, string>,
-  links: Record<string, string>,
-  cache: ParsedModuleCache | null = null,
+  main: ParsedModule,
+  libraries: Record<string, ParsedModule>,
+  links: Record<string, ParsedModule>,
 ) => {
   const graph = new Map<string, string[]>();
   const seen = new Set<string>();
   const out = [] as ParsedModule[];
 
-  const queue = [{name: 'main', code}];
-  seen.add('main');
+  // Traverse graph starting from main
+  const queue = [{name: main.name, module: main}];
+  seen.add(main.name);
 
   while (queue.length) {
-    const {name, code} = queue.shift()!;
-    if (code == null) throw new Error(`Shader code ${name} undefined`);
+    const next = queue.shift()!;
+    const {name, module} = next;
+    if (module == null) throw new Error(`Shader module ${name} undefined`);
 
-    let module;
-    if (cache) {
-      const hash = getProgramHash(code);
-      const entry = cache.get(hash);
-      if (entry) {
-        module = entry;
-      }
-    }
-    if (!module) {
-      module = loadModule(name, code, true);
-      if (cache) cache.set(module.table.hash, module);
-    }
     out.push(module);
 
-    const {modules, externals} = module.table;
+    const {table: {modules, externals}} = module;
     const deps = [] as string[];
 
+    // Recurse into imports
     for (const {name} of modules) {
-      const code = name.match(/^#/) ? links[name.slice(1)] : libraries[name];
-      if (!code) throw new Error(`Unknown module '${name}'`);
+      const isLink = name.match(/^#/);
+      const module = isLink ? links[name] : libraries[name];
+      if (!module) throw new Error(`Unknown module '${name}'`);
       
-      if (!seen.has(name)) queue.push({name, code});
+      if (!seen.has(name)) queue.push({name, module: {...module, name}});
       seen.add(name);
       deps.push(name);
     }
 
+    // Recurse into links
     for (const {prototype} of externals) if (prototype) {
       const {name} = prototype;
-      const code = links[name];
-      if (!code) throw new Error(`Unlinked function '${name}'`);
-      
-      if (!seen.has(name)) queue.push({name, code});
+      const module = links[name];
+      if (!module) throw new Error(`Unlinked function '${name}'`);
+
+      if (!seen.has(name)) queue.push({name, module: {...module, name}});
       seen.add(name);
       deps.push(name);
     }
 
+    // Build module-to-module dependency graph
     graph.set(name, deps);
   }
 
-  const order = getGraphOrder(graph, 'main');
+  // Sort by graph depth
+  const order = getGraphOrder(graph, main.name);
   out.sort((a, b) => order.get(b.name)! - order.get(a.name)! || a.name.localeCompare(b.name));
-
   return out;
 });
 
@@ -209,6 +224,24 @@ export const getGraphOrder = (
   return depths;
 }
 
+// Parse run-time specified keys `from:to` into a map of aliases
+export const parseLinkAliases = <T>(
+  links: Record<string, T>,
+): [
+  Record<string, T>,
+  Map<string, string>
+] => {
+  const out = {} as Record<string, T>;
+  const aliases = new Map<string, string>();
+  for (let k in links) {
+    const [name, imported] = k.split(':');
+    out[name] = links[k];
+    aliases.set(name, imported);
+  }
+  return [out, aliases];
+}
+
+// Reserve a unique namespace based on truncated shader hash
 export const reserveNamespace = (
   module: ParsedModule,
   namespaces: Map<string, string>,

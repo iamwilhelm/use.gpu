@@ -1,7 +1,7 @@
 import { ShaderLanguages, ShaderLib } from '@use-gpu/core/types';
 import { UniformDefinition, UniformAttribute } from './types';
 import { makeBoundStorageShader } from '@use-gpu/core';
-import { linkModule as link } from '@use-gpu/shader';
+import { linkCode as link } from '@use-gpu/shader';
 import partition from 'lodash/partition';
 
 import { useMemo, useOne } from '@use-gpu/live';

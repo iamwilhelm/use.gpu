@@ -1,5 +1,5 @@
 import { GLSLModules } from '@use-gpu/glsl';
-import { linkModule } from './link';
+import { linkCode } from './link';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
@@ -22,7 +22,7 @@ describe("link", () => {
     vec4 getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     `
     
-    const linked = linkModule(code, {}, {getColor});
+    const linked = linkCode(code, {}, {getColor});
     expect(linked).toMatchSnapshot();
 
   });
@@ -41,7 +41,7 @@ describe("link", () => {
     
     const code = GLSLModules['instance/vertex/quad'];
     const modules = GLSLModules;
-    const linked = linkModule(code, modules, {getPosition, getSize});
+    const linked = linkCode(code, modules, {getPosition, getSize});
     expect(linked).toMatchSnapshot();
 
   });
@@ -74,7 +74,7 @@ describe("link", () => {
     vec4 getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
     `
     
-    const linked = linkModule(code, {getColor1, getColor2, getLifted});
+    const linked = linkCode(code, {getColor1, getColor2, getLifted});
     expect(linked.indexOf('// Lifted Code')).toBeLessThan(linked.indexOf('getColor2'));
     expect(linked).toMatchSnapshot();
 

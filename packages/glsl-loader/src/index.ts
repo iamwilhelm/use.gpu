@@ -24,41 +24,40 @@ function glslLoader(this: any, source: string) {
 
   const esModule = typeof options.esModule !== 'undefined' ? options.esModule : true;
   const makeImport = (symbol: string, from: string) => esModule
-    ? `import {${symbol}} from ${stringify(from)};`
-    : `const {${symbol}} = require(${stringify(from)});`;
+    ? `import ${symbol} from ${stringify(from)};`
+    : `const ${symbol} = require(${stringify(from)});`;
 
   const name = this.resourcePath.split('/').pop().replace(/\.glsl$/, '');
   const module = loadModule(name, source);
 
   const {code, table, tree} = module;
-  const def = `const module = {
+  const def = `const data = {
     "name": ${stringify(name)},
     "code": ${stringify(code)},
     "table": ${stringify(table)},
     "tree": decompressAST(${stringify(compressAST(tree))}),
   };`
 
-  const preamble = makeImport('decompressAST', '@use-gpu/shader');
+  const preamble = makeImport('{decompressAST}', '@use-gpu/shader');
 
   let i = 0;
   const imports = [] as string[];
   const symbols = [] as string[];
   for (const {name} of table.modules) {
-    imports.push(makeImport(`m as m${i}`, name + '.glsl'));
-    symbols.push(`m${i}`);
+    imports.push(makeImport(`m${i}`, name + '.glsl'));
+    symbols.push(`${stringify(name)}: m${i}`);
   }
-  const libs = `const libs = [${symbols.join(', ')}];`
+  const libs = `const libs = {${symbols.join(', ')}};`
 
   const output = [
     preamble,
     ...imports,
     def,
     libs,
-    `export const m = {module, libs};`,
+    `const m = {module: data, libs};`,
     `${esModule ? 'export default' : 'module.exports ='} m;`
   ].join("\n");
-  
-  console.log(output);
+  console.log(output)
 
   return output;
 }

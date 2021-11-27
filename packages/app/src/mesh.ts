@@ -7,7 +7,7 @@ import {
   makeRenderPipeline, makeShaderModule,
   uploadBuffer,
 } from '@use-gpu/core';
-import { linkModule as link } from '@use-gpu/shader';
+import { linkCode as link } from '@use-gpu/shader';
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {

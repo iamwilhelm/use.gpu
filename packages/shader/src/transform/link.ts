@@ -64,10 +64,10 @@ export const linkCode = timed('linkCode', (
   defines: Record<string, string> = {},
   cache: ParsedModuleCache | null = null,
 ) => {
-  const main = loadCachedModule('main', code, cache);
+  const main = loadCachedModule(code, 'main', cache);
 
-  const parsedLibraries = mapValues(libraries, (code: string, name: string) => loadCachedModule(name, code, cache));
-  const parsedLinkDefs = mapValues(linkDefs, (code: string, name: string) => loadCachedModule(name.split(':')[0], code, cache));
+  const parsedLibraries = mapValues(libraries, (code: string, name: string) => loadCachedModule(code, name, cache));
+  const parsedLinkDefs = mapValues(linkDefs, (code: string, name: string) => loadCachedModule(code, name.split(':')[0], cache));
 
   return linkModule(main, parsedLibraries, parsedLinkDefs, defines);
 });
@@ -148,7 +148,7 @@ export const linkModule = timed('linkModule', (
     }
 
     program.push(rewriteUsingAST(code, tree, rename));
-    unlinked.push(...externals);
+    unlinked.push(...externals.filter(({optional}) => !optional));
   }
 
   for (const {prototype} of unlinked) if (prototype) {
@@ -197,10 +197,13 @@ export const loadModules = timed('loadModules', (
     }
 
     // Recurse into links
-    for (const {prototype} of externals) if (prototype) {
+    for (const {prototype, optional} of externals) if (prototype) {
       const {name} = prototype;
       const module = links[name];
-      if (!module) throw new Error(`Unlinked function '${name}'`);
+      if (!module) {
+        if (optional) continue;
+        throw new Error(`Unlinked function '${name}'`);
+      }
 
       if (!seen.has(name)) queue.push({name, module: {...module, name}});
       seen.add(name);

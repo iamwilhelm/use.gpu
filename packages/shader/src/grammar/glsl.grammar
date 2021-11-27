@@ -24,6 +24,7 @@
   statement @cut,
 	import,
 	export,
+	optional,
 	last
 }
 
@@ -41,6 +42,7 @@ Preprocessor {
 	  d<'pragma'> (
 			!import d<'import'> (ImportDeclarationList 'from')? String |
 			!export d<'export'> |
+			d<'optional'> |
 			d<'optimize'> |
 			d<'debug'>
 			d<'STDGL'>
@@ -98,7 +100,7 @@ initializer {
   '{' initializer (comma initializer)* comma? '}'
 }
 
-StatementList { Statement* }
+StatementList { (Statement | Preprocessor)* }
 Statement {
   compoundStatement |
   simpleStatement

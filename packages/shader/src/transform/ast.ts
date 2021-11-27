@@ -220,12 +220,13 @@ export const makeASTParser = (code: string, tree: Tree) => {
   const getDeclaration = (node: SyntaxNode): DeclarationRef => {
     const [a] = getNodes(node);
     const exported = isExported(node);
+    const optional = isOptional(node);
 
     if (a.type.id === T.FunctionPrototype) {
       const prototype = getPrototype(a);
       const {name} = prototype;
       const symbols = [name];
-      return {symbols, prototype, exported};
+      return {symbols, prototype, exported, optional};
     }
     if (a.type.id === T.VariableDeclaration) {
       const variable = getVariable(a);
@@ -234,7 +235,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
       const {type} = variable;
       if (!GLSL_NATIVE_TYPES.has(type.name)) symbols.push(type.name);
 
-      return {symbols, variable, exported};
+      return {symbols, variable, exported, optional};
     }
     if (a.type.id === T.QualifiedStructDeclaration) {
       const struct = getQualifiedStruct(a);
@@ -255,11 +256,11 @@ export const makeASTParser = (code: string, tree: Tree) => {
         symbols.push(type.name);
       }
 
-      return {symbols, struct, exported};
+      return {symbols, struct, exported, optional};
     }
     if (a.type.id === T.QualifiedDeclaration) {
       // TODO: are members global symbols?
-      return {symbols: [], exported};
+      return {symbols: [], exported, optional};
     }
     
     throw throwError('declaration', node);
@@ -276,6 +277,19 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
     const verb = getText(b);
     return verb === 'export';
+  };
+
+  const isOptional = (node: SyntaxNode): boolean => {  
+    const pragma = node.prevSibling;
+
+    if (!pragma || pragma.type.id !== T.Preprocessor) return false;
+
+    const [a, b] = getNodes(pragma, 2);
+    const directive = getText(a);
+    if (directive !== 'pragma') return false;
+
+    const verb = getText(b);
+    return verb === 'optional';
   };
 
   const extractImports = (): ModuleRef[] => {

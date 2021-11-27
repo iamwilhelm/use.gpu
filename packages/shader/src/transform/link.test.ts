@@ -34,14 +34,19 @@ describe("link", () => {
     vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
     `
 
+    const getColor = `
+    #pragma export
+    vec4 getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    `
+
     const getSize = `
     #pragma export
     float getSize(int index) { return 1.0; }
     `
-    
+
     const code = GLSLModules['instance/vertex/quad'];
     const modules = GLSLModules;
-    const linked = linkCode(code, modules, {getPosition, getSize});
+    const linked = linkCode(code, modules, {getPosition, getColor, getSize});
     expect(linked).toMatchSnapshot();
 
   });

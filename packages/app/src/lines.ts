@@ -1,5 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
+import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, yeet, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
@@ -25,11 +25,17 @@ export type LinesProps = {
 
 const ZERO = [0, 0, 0, 1];
 
-const DATA_BINDINGS = [
-  { name: 'getPosition', format: 'vec4' },
-  { name: 'getSegment', format: 'int' },
-  { name: 'getSize', format: 'float' },
-] as UniformAttribute[];
+const ATTRIBUTES = [
+  { name: 'getPosition', format: 'vec4', value: ZERO },
+  { name: 'getSegment', format: 'int', value: 0 },
+  { name: 'getSize', format: 'float', value: 1 },
+] as UniformAttributeValue[];
+
+const LAMBDAS = [] as UniformAttribute[];
+
+const LINKS = {
+  'getVertex:getLineVertex': instanceVertexLine,
+};
 
 const LINE_JOIN_SIZE = {
   'bevel': 1,
@@ -67,23 +73,26 @@ export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
   const instanceCount = (props.positions?.length || 2) - 1;
 
   // Bind to shader
-  const propBindings = [
-    props.positions ?? props.position ?? ZERO,
-    props.segments ?? props.segment ?? 0,
-    props.sizes ?? props.size ?? 1,
-  ];
-  const codeBindings = {
-    'getVertex:getLineVertex': instanceVertexLine,
-  };
+  const [attrBindings, lambdaBindings] = useOne(() => [
+    [
+      props.positions ?? props.position,
+      props.segments ?? props.segment,
+      props.sizes ?? props.size,
+    ],
+    [],
+  ], props);
 
   return use(Virtual)({
     topology: 'triangle-strip',
     vertexCount,
     instanceCount,
 
-    attributes: DATA_BINDINGS,
-    propBindings,
-    codeBindings,
+    attrBindings,
+    lambdaBindings,
+    
+    attributes: ATTRIBUTES,
+    lambdas: LAMBDAS,
+    links: LINKS,
     defines,
     deps: [join],
 

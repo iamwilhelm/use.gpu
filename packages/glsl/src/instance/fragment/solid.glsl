@@ -1,6 +1,7 @@
 #pragma import {getPickingColor} from 'use/picking';
 
 #ifdef HAS_MASK
+#pragma optional
 float getMask(vec2);
 #endif
 

@@ -28,7 +28,7 @@ function glslLoader(this: any, source: string) {
     : `const ${symbol} = require(${stringify(from)});`;
 
   const name = this.resourcePath.split('/').pop().replace(/\.glsl$/, '');
-  const module = loadModule(name, source);
+  const module = loadModule(source, name);
 
   const {code, table, tree} = module;
   const def = `const data = {
@@ -58,7 +58,6 @@ function glslLoader(this: any, source: string) {
     `const m = {module: data, libs};`,
     `${esModule ? 'export default' : 'module.exports ='} m;`
   ].join("\n");
-  console.log(output)
 
   return output;
 }

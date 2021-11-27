@@ -54,6 +54,7 @@ export type DeclarationRef = SymbolsRef & {
   variable?: VariableRef,
   struct?: QualifiedStructRef,
   exported: boolean,
+  optional: boolean,
 }
 
 export type TypeRef = {

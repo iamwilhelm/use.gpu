@@ -66,6 +66,10 @@ vec2 _6s_getQuadUV(int vertex) {
 
 
     
+    vec4 _un_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    
+
+    
     vec4 _sh_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
@@ -131,11 +135,13 @@ vec3 _ng_worldToClip3D(vec4 position) {
 
 
 vec4 _sh_getPosition(int);
+vec4 _un_getColor(int);
 float _fz_getSize(int);
 
 
 _89_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   vec4 instancePosition = _sh_getPosition(instanceIndex);
+  vec4 instanceColor = _un_getColor(instanceIndex);
   float instanceSize = _fz_getSize(instanceIndex);
 
   vec4 position = _ng_worldToClip(instancePosition);
@@ -146,7 +152,7 @@ _89_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
 
   return _89_SolidVertex(
     position,
-    vec4(abs(instancePosition.xyz) / 2.0, 1.0),
+    instanceColor,
     uv
   );
 }"

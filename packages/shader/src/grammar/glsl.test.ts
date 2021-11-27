@@ -104,6 +104,11 @@ void main() {
 
 #pragma import 'test'
 
+#ifdef DEF
+#pragma optional
+int getInt();
+#endif
+
 #pragma export
 void main();
 `,

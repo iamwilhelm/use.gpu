@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode, ShaderLib,
+  VertexData, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
@@ -14,7 +14,6 @@ import {
 } from '@use-gpu/core';
 import { useBoundStorage } from '../hooks/useBoundStorage';
 import { useBoundShader } from '../hooks/useBoundShader';
-import { loadModule } from '@use-gpu/shader';
 
 import instanceDrawVirtual from '@use-gpu/glsl/instance/draw/virtual.glsl';
 import instanceDrawWireframeStrip from '@use-gpu/glsl/instance/draw/wireframe-strip.glsl';
@@ -31,7 +30,7 @@ export type VirtualProps = {
   attrBindings: any[],
   lambdaBindings: any[],
 
-  links: ShaderLib<ParsedBundle | ParsedModule>
+  links: Record<string, ParsedBundle | ParsedModule>
   defines: Record<string, any>,
   deps: any[],
 

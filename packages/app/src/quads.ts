@@ -4,6 +4,8 @@ import {
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
+import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
+
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 
@@ -19,6 +21,7 @@ export type QuadsProps = {
   colors?: StorageSource,
 
   getMask?: ParsedBundle | ParsedModule,
+  getTexture?: ParsedBundle | ParsedModule,
   
   mode?: RenderPassMode | string,
   id?: number,

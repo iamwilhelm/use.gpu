@@ -1,5 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType, VertexData, StorageSource, RenderPassMode } from '@use-gpu/core/types';
+import {
+    TypedArray, ViewUniforms,
+    UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+    VertexData, StorageSource, RenderPassMode,
+} from '@use-gpu/core/types';
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, yeet, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 

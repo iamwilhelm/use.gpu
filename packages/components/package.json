@@ -6,11 +6,11 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@use-gpu/core": "*",
     "@use-gpu/live": "*",
+    "@use-gpu/core": "*",
     "@use-gpu/webgpu": "*",
-    "@use-gpu/glsl": "*",
-    "@use-gpu/shader": "*"
+    "@use-gpu/shader": "*",
+    "@use-gpu/glsl": "*"
   },
   "exports": {
     ".": "./src/index.ts"

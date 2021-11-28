@@ -1,6 +1,6 @@
 import { getOptions } from 'loader-utils';
 import { validate } from 'schema-utils';
-import { loadModule, compressAST } from '@use-gpu/shader';
+import { loadModule, compressAST } from '@use-gpu/shader/glsl';
 
 const LOADER_NAME = 'GLSL Loader';
 
@@ -25,7 +25,7 @@ function glslLoader(this: any, source: string) {
   const makeImport = (symbol: string, from: string) => esModule
     ? `import ${symbol} from ${stringify(from)};`
     : `const ${symbol} = require(${stringify(from)});`;
-  const preamble = makeImport('{decompressAST}', '@use-gpu/shader');
+  const preamble = makeImport('{decompressAST}', '@use-gpu/shader/glsl');
 
   // Parse module source code
   const name = this.resourcePath.split('/').pop().replace(/\.glsl$/, '');

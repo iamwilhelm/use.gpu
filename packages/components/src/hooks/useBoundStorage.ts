@@ -1,10 +1,5 @@
-import {
-  ShaderLanguages, ShaderLib,
-  ResolvedDataBindings, ResolvedCodeBindings,
-  UniformAttribute,
-} from '@use-gpu/core/types';
+import { UniformAttribute, ResolvedDataBindings, ResolvedCodeBindings } from '@use-gpu/core/types';
 import { makeBoundStorageAccessors, makeBoundShader } from '@use-gpu/core';
-import { linkCode as link } from '@use-gpu/shader';
 import partition from 'lodash/partition';
 
 import { useMemo, useOne } from '@use-gpu/live';

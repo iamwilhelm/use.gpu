@@ -1,5 +1,9 @@
 {
   "extends": "../../tsconfig.pkg.json",
+  "references": [
+    { "path": "../glsl" },
+    { "path": "../shader" }
+  ],
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "src",
@@ -7,5 +11,5 @@
     "outDir": "../../build/packages",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "../glsl/**/*.glsl"]
 }

@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import glob from 'glob';
 
-import { loadModule } from '@use-gpu/shader';
+import { loadModule } from '@use-gpu/shader/glsl';
 
 const PACKAGE_JSON = './package.json';
 const INDEX_TS = './src/index.ts';

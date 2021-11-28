@@ -7,7 +7,7 @@ import {
   makeRenderPipeline, makeShaderModule,
   uploadBuffer,
 } from '@use-gpu/core';
-import { linkBundle as link } from '@use-gpu/shader';
+import { linkBundle } from '@use-gpu/shader/glsl';
 
 import instanceDrawMesh from '@use-gpu/glsl/instance/draw/mesh.glsl';
 import instanceFragmentMesh from '@use-gpu/glsl/instance/fragment/mesh.glsl';
@@ -76,8 +76,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
 
   // Rendering pipeline
   const pipeline = useMemo(() => {
-    const vertexLinked = link(vertexShader, {}, defines, cache);
-    const fragmentLinked = link(fragmentShader, {}, defines, cache);
+    const vertexLinked = linkBundle(vertexShader, {}, defines, cache);
+    const fragmentLinked = linkBundle(fragmentShader, {}, defines, cache);
 
     const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
     const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));

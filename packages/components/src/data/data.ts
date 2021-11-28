@@ -11,7 +11,7 @@ export type DataProps = {
   length?: number,
   data?: any[],
   fields?: DataField[],
-  live: boolean,
+  live?: boolean,
 
   render?: (sources: StorageSource[]) => LiveElement<any>,
 };

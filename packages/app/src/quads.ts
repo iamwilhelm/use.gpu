@@ -6,8 +6,6 @@ import {
 } from '@use-gpu/core/types';
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
-import { useBoundStorageShader } from '@use-gpu/components';
 
 import { getQuadVertex } from '@use-gpu/glsl/instance/vertex/quad.glsl';
 

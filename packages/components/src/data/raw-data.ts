@@ -12,7 +12,7 @@ export type RawDataProps = {
   data?: number[] | TypedArray,
   expr?: (emit: Emitter, i: number, n: number) => void,
   format?: string,
-  live: boolean,
+  live?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
 };

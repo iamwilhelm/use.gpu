@@ -41,7 +41,7 @@ export type PickingProps = {
   pickingFormat?: GPUTextureFormat, 
   pickingColor?: GPUColor,
   depthStencilFormat?: GPUTextureFormat,
-  resolution: number,
+  resolution?: number,
 
   children?: LiveElement<any>,
 }

@@ -5,11 +5,8 @@ import { RenderContext } from '../providers/render-provider';
 import { PickingContext } from './picking';
 
 export type PassProps = {
-  device: GPUDevice,
-  colorAttachments: GPURenderPassColorAttachment[],
-  depthStencilAttachment: GPURenderPassDepthStencilAttachment,
-  children: LiveElement<any>,
-  render: () => LiveElement<any>,
+  children?: LiveElement<any>,
+  render?: () => LiveElement<any>,
 };
 
 export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;

@@ -6,23 +6,23 @@ exports[`link lifts recursive dependency 1`] = `
 
     // Lifted Code
     
-    void _oy_getLifted() {}
+    void _lx_getLifted() {}
     
 
     
     
-    vec4 _8r_getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _p9_getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
     
     
-    vec4 _wn_getColor1() { return _8r_getColor2(); }
+    vec4 _u5_getColor1() { return _p9_getColor2(); }
     
 
     
     
     void main() {
-      gl_FragColor = _wn_getColor1();
+      gl_FragColor = _u5_getColor1();
     }
     "
 `;
@@ -32,14 +32,14 @@ exports[`link links an external 1`] = `
 
 
     
-    vec4 _aq_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _s8_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _aq_getColor();
+    vec4 _s8_getColor();
     void main() {
       vec4 v;
       v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = _aq_getColor();
+      gl_FragColor = _s8_getColor();
     }
     "
 `;
@@ -47,7 +47,7 @@ exports[`link links an external 1`] = `
 exports[`link links quad vertex 1`] = `
 "#version 450
 
-const ivec2 _6s_QUAD[] = {
+const ivec2 _3j_QUAD[] = {
   ivec2(0, 0),
   ivec2(1, 0),
   ivec2(0, 1),
@@ -55,102 +55,108 @@ const ivec2 _6s_QUAD[] = {
 };
 
 
-ivec2 _6s_getQuadIndex(int vertex) {
-  return _6s_QUAD[vertex];
+ivec2 _3j_getQuadIndex(int vertex) {
+  return _3j_QUAD[vertex];
 }
 
 
-vec2 _6s_getQuadUV(int vertex) {
-  return vec2(_6s_getQuadIndex(vertex));
+vec2 _3j_getQuadUV(int vertex) {
+  return vec2(_3j_getQuadIndex(vertex));
 }
 
 
-    
-    vec4 _un_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
-    
-
-    
-    vec4 _sh_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
-    
-
-    
-    float _fz_getSize(int index) { return 1.0; }
-    
-
-struct _89_SolidVertex {
+struct _t7_SolidVertex {
   vec4 position;
   vec4 color;
   vec2 uv;
 };
 
 
-struct _89_MeshVertex {
+struct _t7_MeshVertex {
   vec4 position;
   vec3 normal;
   vec4 color;
   vec2 uv;
 };
 
-layout(set = 0, binding = VIEW_BINDING) uniform _ng_ViewUniforms {
+layout(set = 0, binding = VIEW_BINDING) uniform _6e_ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;
   vec2 viewResolution;
   vec2 viewSize;
-} _ng_viewUniforms;
+} _6e_viewUniforms;
 
 
-vec4 _ng_worldToView(vec4 position) {
-  return _ng_viewUniforms.viewMatrix * position;
+vec4 _6e_worldToView(vec4 position) {
+  return _6e_viewUniforms.viewMatrix * position;
 }
 
 
-vec4 _ng_viewToClip(vec4 position) {
-  return _ng_viewUniforms.projectionMatrix * position;
+vec4 _6e_viewToClip(vec4 position) {
+  return _6e_viewUniforms.projectionMatrix * position;
 }
 
 
-vec4 _ng_worldToClip(vec4 position) {
-  return _ng_viewToClip(_ng_worldToView(position));
+vec4 _6e_worldToClip(vec4 position) {
+  return _6e_viewToClip(_6e_worldToView(position));
 }
 
 
-vec3 _ng_clipToScreen3D(vec4 position) {
-  return vec3(position.xy * _ng_viewUniforms.viewSize, position.z);
+vec3 _6e_clipToScreen3D(vec4 position) {
+  return vec3(position.xy * _6e_viewUniforms.viewSize, position.z);
 }
 
 
-vec3 _ng_screenToClip3D(vec4 position) {
-  return vec3(position.xy * _ng_viewUniforms.viewResolution, position.z);
+vec3 _6e_screenToClip3D(vec4 position) {
+  return vec3(position.xy * _6e_viewUniforms.viewResolution, position.z);
 }
 
 
-vec3 _ng_worldToClip3D(vec4 position) {
-  position = _ng_viewToClip(_ng_worldToView(position));
+vec3 _6e_worldToClip3D(vec4 position) {
+  position = _6e_viewToClip(_6e_worldToView(position));
   return position.xyz / position.w;
 }
 
 
+    
+    vec4 _3n_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    
+
+    
+    vec4 _hk_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    
+
+    
+    float _4i_getSize(int index) { return 1.0; }
+    
 
 
 
-vec4 _sh_getPosition(int);
-vec4 _un_getColor(int);
-float _fz_getSize(int);
+
+vec4 _hk_getPosition(int);
+vec4 _3n_getColor(int);
+float _4i_getSize(int);
 
 
-_89_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
-  vec4 instancePosition = _sh_getPosition(instanceIndex);
-  vec4 instanceColor = _un_getColor(instanceIndex);
-  float instanceSize = _fz_getSize(instanceIndex);
+_t7_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
+  vec4 instancePosition = _hk_getPosition(instanceIndex);
+  vec4 instanceColor = _3n_getColor(instanceIndex);
+  float instanceSize = _4i_getSize(instanceIndex);
 
-  vec4 position = _ng_worldToClip(instancePosition);
+  vec4 position = _6e_worldToClip(instancePosition);
 
-  vec2 uv = _6s_getQuadUV(vertexIndex);
+  vec2 uv = _3j_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
-  position.xy += xy * _ng_viewUniforms.viewResolution * (instanceSize * position.w);
+  
+  #ifdef HAS_EDGE_BLEED
+  xy = xy * (instanceSize + 0.5) / instanceSize;
+  uv = xy * .5 + .5;
+  #endif
+  
+  position.xy += xy * _6e_viewUniforms.viewResolution * (instanceSize * position.w);
 
-  return _89_SolidVertex(
+  return _t7_SolidVertex(
     position,
     instanceColor,
     uv

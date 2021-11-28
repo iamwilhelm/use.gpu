@@ -27,7 +27,7 @@ describe("link", () => {
 
   });
 
-  it("links quad vertex", () => {
+  fit("links quad vertex", () => {
 
     const getPosition = `
     #pragma export

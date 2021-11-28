@@ -9,7 +9,7 @@ import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 
-import instanceVertexQuad from 'instance/vertex/quad.glsl';
+import { getQuadVertex } from '@use-gpu/glsl/instance/vertex/quad.glsl';
 
 export type QuadsProps = {
   position?: number[] | TypedArray,
@@ -37,15 +37,18 @@ const ATTRIBUTES = [
 
 const LAMBDAS = [
   { name: 'getMask', format: 'float', args: ['vec2'], value: 0.5 },
+  { name: 'getTexture', format: 'vec4', args: ['vec2'], value: [1.0, 1.0, 1.0, 1.0] },
 ] as UniformAttributeValue[];
 
 const DEFINES = {
   HAS_MASK: true,
+  HAS_TEXTURE: true,
+  HAS_EDGE_BLEED: true,
   STRIP_SEGMENTS: 2,
 };
 
 const LINKS = {
-  'getVertex:getQuadVertex': instanceVertexQuad,
+  'getVertex': getQuadVertex,
 };
 
 export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
@@ -65,6 +68,7 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
     ],
     [
       props.getMask,
+      props.getTexture,
     ],
   ], props);
 

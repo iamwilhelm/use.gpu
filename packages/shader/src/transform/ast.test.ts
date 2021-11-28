@@ -1,6 +1,6 @@
 import { GLSLModules } from '@use-gpu/glsl';
 import { parseGLSL } from './shader';
-import { makeASTParser, formatAST, rewriteUsingAST, compressAST, decompressAST, hasErrorNode } from './ast';
+import { makeASTParser, formatAST, rewriteUsingAST, resolveShakeOps, compressAST, decompressAST, hasErrorNode } from './ast';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
@@ -18,20 +18,20 @@ describe('ast', () => {
     return makeASTParser(code, tree);
   }
 
-  it('extracts test declarations', () => {
+  it('gets test declarations', () => {
     const code = `
       float x, y;
       int a = 3, b = 1, c, d;
     `;
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeGuardedParser(code, tree);
+    const {getDeclarations} = makeGuardedParser(code, tree);
 
-    const declarations = extractDeclarations();
+    const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
   
-  it('extracts test declarations with array', () => {
+  it('gets test declarations with array', () => {
     const code = `
       const ivec2 QUAD[] = {
         ivec2(0, 0),
@@ -42,99 +42,99 @@ describe('ast', () => {
     `;
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeGuardedParser(code, tree);
+    const {getDeclarations} = makeGuardedParser(code, tree);
 
-    const declarations = extractDeclarations();
+    const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
   
-  it('extracts quad vertex imports', () => {
+  it('gets quad vertex imports', () => {
     const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
-    const {extractImports} = makeGuardedParser(code, tree);
+    const {getImports} = makeGuardedParser(code, tree);
 
-    const imports = extractImports();
+    const imports = getImports();
     expect(imports).toMatchSnapshot();
   });
   
-  it('extracts quad vertex functions', () => {
+  it('gets quad vertex functions', () => {
     const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
-    const {extractFunctions} = makeGuardedParser(code, tree);
+    const {getFunctions} = makeGuardedParser(code, tree);
 
-    const functions = extractFunctions();
+    const functions = getFunctions();
     expect(functions).toMatchSnapshot();
   });
 
-  it('extracts quad vertex declarations', () => {
+  it('gets quad vertex declarations', () => {
     const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeGuardedParser(code, tree);
+    const {getDeclarations} = makeGuardedParser(code, tree);
 
-    const declarations = extractDeclarations();
+    const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
 
-  it('extracts solid fragment declarations', () => {
+  it('gets solid fragment declarations', () => {
     const code = GLSLModules['instance/fragment/solid'];
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeGuardedParser(code, tree);
+    const {getDeclarations} = makeGuardedParser(code, tree);
 
-    const declarations = extractDeclarations();
+    const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
 
-  it('extracts use view declarations', () => {
+  it('gets use view declarations', () => {
     const code = GLSLModules['use/view'];
 
     const tree = parseGLSL(code);
-    const {extractDeclarations} = makeGuardedParser(code, tree);
+    const {getDeclarations} = makeGuardedParser(code, tree);
 
-    const declarations = extractDeclarations();
+    const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
 
-  it('extracts quad vertex symbol table', () => {
+  it('gets quad vertex symbol table', () => {
     const code = GLSLModules['instance/vertex/quad'];
 
     const tree = parseGLSL(code);
-    const {extractSymbolTable} = makeGuardedParser(code, tree);
+    const {getSymbolTable} = makeGuardedParser(code, tree);
 
-    const symbolTable = extractSymbolTable();
+    const symbolTable = getSymbolTable();
     expect(symbolTable).toMatchSnapshot();
   });
 
-  it('extracts geometry quad symbol table', () => {
+  it('gets geometry quad symbol table', () => {
     const code = GLSLModules['geometry/quad'];
 
     const tree = parseGLSL(code);
-    const {extractSymbolTable} = makeGuardedParser(code, tree);
+    const {getSymbolTable} = makeGuardedParser(code, tree);
 
-    const symbolTable = extractSymbolTable();
+    const symbolTable = getSymbolTable();
     expect(symbolTable).toMatchSnapshot();
   });
 
-  it('extracts use view symbol table', () => {
+  it('gets use view symbol table', () => {
     const code = GLSLModules['use/view'];
 
     const tree = parseGLSL(code);
-    const {extractSymbolTable} = makeGuardedParser(code, tree);
+    const {getSymbolTable} = makeGuardedParser(code, tree);
 
-    const symbolTable = extractSymbolTable();
+    const symbolTable = getSymbolTable();
     expect(symbolTable).toMatchSnapshot();
   });
 
-  it('extracts use types symbol table', () => {
+  it('gets use types symbol table', () => {
     const code = GLSLModules['use/types'];
 
     const tree = parseGLSL(code);
-    const {extractSymbolTable} = makeGuardedParser(code, tree);
+    const {getSymbolTable} = makeGuardedParser(code, tree);
 
-    const symbolTable = extractSymbolTable();
+    const symbolTable = getSymbolTable();
     expect(symbolTable).toMatchSnapshot();
   });
 
@@ -225,4 +225,96 @@ void main() {
     const output2 = rewriteUsingAST(code, decompressed, rename);
     expect(output2).toEqual(output1);
   });
+
+  it('shakes simple program', () => {
+    const code = `
+const float x = 1.0;
+
+#pragma export
+float getA() {
+  return x;
+}
+
+#pragma export
+float getB() {
+  return x;
+}
+    `;
+
+    const tree = parseGLSL(code);
+    const table = makeGuardedParser(code, tree).getShakeTable();
+
+    expect(table).toBeTruthy();
+    expect(table).toMatchSnapshot();
+    if (!table) return;
+    
+    const keep = new Set(['getA']);
+    const ops = resolveShakeOps(table, keep);
+    expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
+  });
+  
+  it('shakes use/view AST', () => {
+    const code = GLSLModules['use/view'];
+
+    const tree = parseGLSL(code);
+    const table = makeGuardedParser(code, tree).getShakeTable();
+
+    expect(table).toBeTruthy();
+    expect(table).toMatchSnapshot();
+    if (!table) return;
+    
+    const keep = new Set(['worldToClip']);
+    const ops = resolveShakeOps(table, keep);
+    expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
+  });
+
+  it('shakes use/view AST using compressed AST', () => {
+    const code = GLSLModules['use/view'];
+
+    const tree = parseGLSL(code);
+    const table = makeGuardedParser(code, tree).getShakeTable();
+
+    expect(table).toBeTruthy();
+    expect(table).toMatchSnapshot();
+    if (!table) return;
+    
+    const keep = new Set(['worldToClip']);
+    const ops = resolveShakeOps(table, keep);
+    
+    const tree1 = tree;
+    const tree2 = decompressAST(compressAST(tree1));
+
+    const code1 = rewriteUsingAST(code, tree1, new Map(), ops);
+    const code2 = rewriteUsingAST(code, tree2, new Map(), ops);
+
+    expect(code2).toEqual(code1);
+  });
+
+  it('gets shake information for instance/vertex/quad AST', () => {
+    const code = GLSLModules['instance/vertex/quad'];
+
+    const tree = parseGLSL(code);
+    const table = makeGuardedParser(code, tree).getShakeTable();
+    expect(table).toMatchSnapshot();
+    
+  });
+
+  it('gets shake information for geometry/quad AST', () => {
+    const code = GLSLModules['geometry/quad'];
+
+    const tree = parseGLSL(code);
+    const table = makeGuardedParser(code, tree).getShakeTable();
+    expect(table).toMatchSnapshot();
+    
+  });
+
+  fit('gets shake information for use/types AST', () => {
+    const code = GLSLModules['use/types'];
+
+    const tree = parseGLSL(code);
+    const table = makeGuardedParser(code, tree).getShakeTable();
+    expect(table).toMatchSnapshot();
+    
+  });
 });
+

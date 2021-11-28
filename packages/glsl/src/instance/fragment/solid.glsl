@@ -1,8 +1,13 @@
-#pragma import {getPickingColor} from 'use/picking';
+#pragma import {getPickingColor} from '@use-gpu/glsl/use/picking';
 
 #ifdef HAS_MASK
 #pragma optional
 float getMask(vec2);
+#endif
+
+#ifdef HAS_TEXTURE
+#pragma optional
+vec4 getTexture(vec2);
 #endif
 
 #ifdef IS_PICKING
@@ -22,8 +27,14 @@ void main() {
 #else
 void main() {
   outColor = fragColor;
+
   #ifdef HAS_MASK
-  outColor.a *= getMask(fragUV);
+  outColor *= getMask(fragUV);
   #endif
+  #ifdef HAS_TEXTURE
+  outColor *= getTexture(fragUV);
+  #endif
+
+  if (outColor.a <= 0.0) discard;
 }
 #endif

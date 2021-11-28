@@ -13,6 +13,7 @@ import {
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
+  BLEND_PREMULTIPLIED,
 } from '@use-gpu/core';
 
 export type CanvasProps = {
@@ -56,7 +57,7 @@ export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
     [device, width, height, presentationFormat, samples]
   );
 
-  const colorStates      = useOne(() => [makeColorState(presentationFormat)], presentationFormat);
+  const colorStates      = useOne(() => [makeColorState(presentationFormat, BLEND_PREMULTIPLIED)], presentationFormat);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, null, backgroundColor)],
     [backgroundColor, renderTexture]

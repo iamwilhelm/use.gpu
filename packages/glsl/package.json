@@ -6,7 +6,23 @@
   "license": "MIT",
   "private": true,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./fragment/pbr.glsl": "./src/fragment/pbr.glsl",
+    "./geometry/line.glsl": "./src/geometry/line.glsl",
+    "./geometry/quad.glsl": "./src/geometry/quad.glsl",
+    "./geometry/strip.glsl": "./src/geometry/strip.glsl",
+    "./instance/draw/mesh.glsl": "./src/instance/draw/mesh.glsl",
+    "./instance/draw/virtual.glsl": "./src/instance/draw/virtual.glsl",
+    "./instance/draw/wireframe-strip.glsl": "./src/instance/draw/wireframe-strip.glsl",
+    "./instance/fragment/mesh.glsl": "./src/instance/fragment/mesh.glsl",
+    "./instance/fragment/solid.glsl": "./src/instance/fragment/solid.glsl",
+    "./instance/vertex/line.glsl": "./src/instance/vertex/line.glsl",
+    "./instance/vertex/quad.glsl": "./src/instance/vertex/quad.glsl",
+    "./mask/point.glsl": "./src/mask/point.glsl",
+    "./use/light.glsl": "./src/use/light.glsl",
+    "./use/picking.glsl": "./src/use/picking.glsl",
+    "./use/types.glsl": "./src/use/types.glsl",
+    "./use/view.glsl": "./src/use/view.glsl"
   },
   "scripts": {
     "test": "jest --watch",

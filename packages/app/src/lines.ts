@@ -5,7 +5,7 @@ import { use, yeet, memo, useMemo, useOne, useState, useResource } from '@use-gp
 import { makeMultiUniforms, makeUniformsWithStorage, makeRenderPipeline, extractPropBindings, uploadBuffer } from '@use-gpu/core';
 import { useBoundStorageShader } from '@use-gpu/components';
 
-import instanceVertexLine from 'instance/vertex/line.glsl';
+import { getLineVertex } from '@use-gpu/glsl/instance/vertex/line.glsl';
 
 export type LinesProps = {
   position?: number[] | TypedArray,
@@ -34,7 +34,7 @@ const ATTRIBUTES = [
 const LAMBDAS = [] as UniformAttribute[];
 
 const LINKS = {
-  'getVertex:getLineVertex': instanceVertexLine,
+  'getVertex': getLineVertex,
 };
 
 const LINE_JOIN_SIZE = {

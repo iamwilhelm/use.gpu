@@ -6,6 +6,7 @@ export type ParsedModuleCache = LRU<string, ParsedModule>;
 export type ParsedBundle = {
   module: ParsedModule,
   libs: Record<string, ParsedBundle>,
+  entry?: string,
 };
 
 export type ParsedModule = {
@@ -13,7 +14,10 @@ export type ParsedModule = {
   code: string,
   tree: Tree,
   table: SymbolTable,
+  shake?: ShakeTable,
+  entry?: string,
 };
+
 export type ComboRef = ModuleRef | FunctionRef | DeclarationRef;
 
 export type CompressedNode = [string, number, number];
@@ -28,15 +32,19 @@ export type SymbolTable = {
   externals: DeclarationRef[],
 };
 
-export type SymbolRef = string;
+export type ShakeTable = ShakeOp[];
+export type ShakeOp = [number, string[]];
 
-export type SymbolsRef = {
-  symbols: SymbolRef[],
-}
+export type SymbolRef = string;
 
 export type ImportRef = {
   name: string,
   imported: string,
+}
+
+export type SymbolsRef = {
+  at: number,
+  symbols: SymbolRef[],
 }
 
 export type ModuleRef = SymbolsRef & {
@@ -46,6 +54,7 @@ export type ModuleRef = SymbolsRef & {
 
 export type FunctionRef = SymbolsRef & {
   prototype: PrototypeRef,
+  identifiers?: string[],
   exported: boolean,
 }
 
@@ -53,6 +62,7 @@ export type DeclarationRef = SymbolsRef & {
   prototype?: PrototypeRef,
   variable?: VariableRef,
   struct?: QualifiedStructRef,
+  identifiers?: string[],
   exported: boolean,
   optional: boolean,
 }

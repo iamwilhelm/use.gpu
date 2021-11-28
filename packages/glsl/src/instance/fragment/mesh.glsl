@@ -1,7 +1,7 @@
-#pragma import {PBR} from 'fragment/pbr';
-#pragma import {getPickingColor} from 'use/picking';
-#pragma import {viewUniforms} from 'use/view';
-#pragma import {lightUniforms} from 'use/light';
+#pragma import {PBR} from '@use-gpu/glsl/fragment/pbr';
+#pragma import {getPickingColor} from '@use-gpu/glsl/use/picking';
+#pragma import {viewUniforms} from '@use-gpu/glsl/use/view';
+#pragma import {lightUniforms} from '@use-gpu/glsl/use/light';
 
 #ifdef IS_PICKING
 layout(location = 0) in flat uint fragIndex;

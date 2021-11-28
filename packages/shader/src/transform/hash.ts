@@ -10,13 +10,14 @@ export const mul = Math.imul;
 
 export const toMurmur53 = (s: string, seed: number = 0) => {
   const n = s.length;
-  let a = seed ^ C3;
+  let a = seed;
   let b = seed ^ C4;
 
   for (let i = 0; i < n; ++i) {
     let k;
-    let d1 = s.charCodeAt(i);
-    let d2 = d1 ^ a;
+    let d = s.charCodeAt(i);
+    let d1 = add(d, b);
+    let d2 = add(d, a);
 
     k = mul(d1, C1);
     k = rot(k, 15);
@@ -31,8 +32,8 @@ export const toMurmur53 = (s: string, seed: number = 0) => {
     k = mul(k, C2);
 
     b ^= k;
-    b = rot(a, 13);
-    b = add(mul(a, 5), C3);
+    b = rot(b, 13);
+    b = add(mul(b, 5), C3);
   }
 
   a ^= n;

@@ -1,10 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ast extracts geometry quad symbol table 1`] = `
+exports[`ast gets geometry quad symbol table 1`] = `
 Object {
   "declarations": Array [
     Object {
+      "at": 0,
       "exported": false,
+      "identifiers": Array [],
       "optional": false,
       "symbols": Array [
         "QUAD",
@@ -28,7 +30,11 @@ Object {
   "externals": Array [],
   "functions": Array [
     Object {
+      "at": 102,
       "exported": true,
+      "identifiers": Array [
+        "QUAD",
+      ],
       "prototype": Object {
         "name": "getQuadIndex",
         "parameters": Array [
@@ -45,7 +51,11 @@ Object {
       ],
     },
     Object {
+      "at": 176,
       "exported": true,
+      "identifiers": Array [
+        "getQuadIndex",
+      ],
       "prototype": Object {
         "name": "getQuadUV",
         "parameters": Array [
@@ -62,7 +72,7 @@ Object {
       ],
     },
   ],
-  "hash": "6sp2mckooy",
+  "hash": "3jubnisvn4",
   "modules": Array [],
   "symbols": Array [
     "getQuadIndex",
@@ -76,10 +86,12 @@ Object {
 }
 `;
 
-exports[`ast extracts quad vertex declarations 1`] = `
+exports[`ast gets quad vertex declarations 1`] = `
 Array [
   Object {
+    "at": 196,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "prototype": Object {
       "name": "getPosition",
@@ -96,7 +108,9 @@ Array [
     ],
   },
   Object {
+    "at": 219,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "prototype": Object {
       "name": "getColor",
@@ -113,7 +127,9 @@ Array [
     ],
   },
   Object {
+    "at": 239,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "prototype": Object {
       "name": "getSize",
@@ -132,10 +148,28 @@ Array [
 ]
 `;
 
-exports[`ast extracts quad vertex functions 1`] = `
+exports[`ast gets quad vertex functions 1`] = `
 Array [
   Object {
+    "at": 275,
     "exported": true,
+    "identifiers": Array [
+      "instancePosition",
+      "getPosition",
+      "instanceIndex",
+      "instanceColor",
+      "getColor",
+      "instanceSize",
+      "getSize",
+      "position",
+      "worldToClip",
+      "uv",
+      "getQuadUV",
+      "vertexIndex",
+      "xy",
+      "viewUniforms",
+      "SolidVertex",
+    ],
     "prototype": Object {
       "name": "getQuadVertex",
       "parameters": Array [
@@ -154,21 +188,23 @@ Array [
 ]
 `;
 
-exports[`ast extracts quad vertex imports 1`] = `
+exports[`ast gets quad vertex imports 1`] = `
 Array [
   Object {
+    "at": 0,
     "imports": Array [
       Object {
         "imported": "SolidVertex",
         "name": "SolidVertex",
       },
     ],
-    "name": "use/types",
+    "name": "@use-gpu/glsl/use/types",
     "symbols": Array [
       "SolidVertex",
     ],
   },
   Object {
+    "at": 0,
     "imports": Array [
       Object {
         "imported": "viewUniforms",
@@ -179,20 +215,21 @@ Array [
         "name": "worldToClip",
       },
     ],
-    "name": "use/view",
+    "name": "@use-gpu/glsl/use/view",
     "symbols": Array [
       "viewUniforms",
       "worldToClip",
     ],
   },
   Object {
+    "at": 0,
     "imports": Array [
       Object {
         "imported": "getQuadUV",
         "name": "getQuadUV",
       },
     ],
-    "name": "geometry/quad",
+    "name": "@use-gpu/glsl/geometry/quad",
     "symbols": Array [
       "getQuadUV",
     ],
@@ -200,11 +237,13 @@ Array [
 ]
 `;
 
-exports[`ast extracts quad vertex symbol table 1`] = `
+exports[`ast gets quad vertex symbol table 1`] = `
 Object {
   "declarations": Array [
     Object {
+      "at": 196,
       "exported": false,
+      "identifiers": Array [],
       "optional": false,
       "prototype": Object {
         "name": "getPosition",
@@ -221,7 +260,9 @@ Object {
       ],
     },
     Object {
+      "at": 219,
       "exported": false,
+      "identifiers": Array [],
       "optional": false,
       "prototype": Object {
         "name": "getColor",
@@ -238,7 +279,9 @@ Object {
       ],
     },
     Object {
+      "at": 239,
       "exported": false,
+      "identifiers": Array [],
       "optional": false,
       "prototype": Object {
         "name": "getSize",
@@ -257,7 +300,9 @@ Object {
   ],
   "externals": Array [
     Object {
+      "at": 196,
       "exported": false,
+      "identifiers": Array [],
       "optional": false,
       "prototype": Object {
         "name": "getPosition",
@@ -274,7 +319,9 @@ Object {
       ],
     },
     Object {
+      "at": 219,
       "exported": false,
+      "identifiers": Array [],
       "optional": false,
       "prototype": Object {
         "name": "getColor",
@@ -291,7 +338,9 @@ Object {
       ],
     },
     Object {
+      "at": 239,
       "exported": false,
+      "identifiers": Array [],
       "optional": false,
       "prototype": Object {
         "name": "getSize",
@@ -310,7 +359,13 @@ Object {
   ],
   "functions": Array [
     Object {
+      "at": 275,
       "exported": true,
+      "identifiers": Array [
+        "getPosition",
+        "getColor",
+        "getSize",
+      ],
       "prototype": Object {
         "name": "getQuadVertex",
         "parameters": Array [
@@ -327,21 +382,23 @@ Object {
       ],
     },
   ],
-  "hash": "7fzsdvxaqv",
+  "hash": "4dr26g72kh",
   "modules": Array [
     Object {
+      "at": 0,
       "imports": Array [
         Object {
           "imported": "SolidVertex",
           "name": "SolidVertex",
         },
       ],
-      "name": "use/types",
+      "name": "@use-gpu/glsl/use/types",
       "symbols": Array [
         "SolidVertex",
       ],
     },
     Object {
+      "at": 0,
       "imports": Array [
         Object {
           "imported": "viewUniforms",
@@ -352,30 +409,27 @@ Object {
           "name": "worldToClip",
         },
       ],
-      "name": "use/view",
+      "name": "@use-gpu/glsl/use/view",
       "symbols": Array [
         "viewUniforms",
         "worldToClip",
       ],
     },
     Object {
+      "at": 0,
       "imports": Array [
         Object {
           "imported": "getQuadUV",
           "name": "getQuadUV",
         },
       ],
-      "name": "geometry/quad",
+      "name": "@use-gpu/glsl/geometry/quad",
       "symbols": Array [
         "getQuadUV",
       ],
     },
   ],
   "symbols": Array [
-    "SolidVertex",
-    "viewUniforms",
-    "worldToClip",
-    "getQuadUV",
     "getQuadVertex",
     "getPosition",
     "getColor",
@@ -387,10 +441,172 @@ Object {
 }
 `;
 
-exports[`ast extracts solid fragment declarations 1`] = `
+exports[`ast gets shake information for AST 1`] = `
+Array [
+  Array [
+    1,
+    Array [
+      "x",
+      "getA",
+      "getB",
+    ],
+  ],
+  Array [
+    38,
+    Array [
+      "getA",
+    ],
+  ],
+  Array [
+    83,
+    Array [
+      "getB",
+    ],
+  ],
+]
+`;
+
+exports[`ast gets shake information for geometry/quad AST 1`] = `
+Array [
+  Array [
+    0,
+    Array [
+      "QUAD",
+      "getQuadIndex",
+      "getQuadUV",
+    ],
+  ],
+  Array [
+    102,
+    Array [
+      "getQuadIndex",
+      "getQuadUV",
+    ],
+  ],
+  Array [
+    176,
+    Array [
+      "getQuadUV",
+    ],
+  ],
+]
+`;
+
+exports[`ast gets shake information for instance/vertex/quad AST 1`] = `
+Array [
+  Array [
+    196,
+    Array [
+      "getPosition",
+      "getQuadVertex",
+    ],
+  ],
+  Array [
+    219,
+    Array [
+      "getColor",
+      "getQuadVertex",
+    ],
+  ],
+  Array [
+    239,
+    Array [
+      "getSize",
+      "getQuadVertex",
+    ],
+  ],
+  Array [
+    275,
+    Array [
+      "getQuadVertex",
+    ],
+  ],
+]
+`;
+
+exports[`ast gets shake information for use/types AST 1`] = `
+Array [
+  Array [
+    15,
+    Array [
+      "SolidVertex",
+    ],
+  ],
+  Array [
+    97,
+    Array [
+      "MeshVertex",
+    ],
+  ],
+]
+`;
+
+exports[`ast gets shake information for use/view AST 1`] = `
+Array [
+  Array [
+    15,
+    Array [
+      "viewUniforms",
+      "ViewUniforms",
+      "worldToView",
+      "viewToClip",
+      "clipToScreen3D",
+      "screenToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    215,
+    Array [
+      "worldToView",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    312,
+    Array [
+      "viewToClip",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    414,
+    Array [
+      "worldToClip",
+    ],
+  ],
+  Array [
+    510,
+    Array [
+      "clipToScreen3D",
+    ],
+  ],
+  Array [
+    629,
+    Array [
+      "screenToClip3D",
+    ],
+  ],
+  Array [
+    754,
+    Array [
+      "worldToClip3D",
+    ],
+  ],
+]
+`;
+
+exports[`ast gets solid fragment declarations 1`] = `
 Array [
   Object {
+    "at": 101,
     "exported": false,
+    "identifiers": Array [],
     "optional": true,
     "prototype": Object {
       "name": "getMask",
@@ -407,7 +623,28 @@ Array [
     ],
   },
   Object {
+    "at": 166,
     "exported": false,
+    "identifiers": Array [],
+    "optional": true,
+    "prototype": Object {
+      "name": "getTexture",
+      "parameters": Array [
+        "vec2",
+      ],
+      "type": Object {
+        "name": "vec4",
+        "qualifiers": Array [],
+      },
+    },
+    "symbols": Array [
+      "getTexture",
+    ],
+  },
+  Object {
+    "at": 215,
+    "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "fragIndex",
@@ -430,7 +667,9 @@ Array [
     },
   },
   Object {
+    "at": 260,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "outColor",
@@ -452,7 +691,9 @@ Array [
     },
   },
   Object {
+    "at": 307,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "fragColor",
@@ -474,7 +715,9 @@ Array [
     },
   },
   Object {
+    "at": 347,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "fragUV",
@@ -496,7 +739,9 @@ Array [
     },
   },
   Object {
+    "at": 385,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "outColor",
@@ -520,10 +765,12 @@ Array [
 ]
 `;
 
-exports[`ast extracts test declarations 1`] = `
+exports[`ast gets test declarations 1`] = `
 Array [
   Object {
+    "at": 7,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "x",
@@ -547,7 +794,9 @@ Array [
     },
   },
   Object {
+    "at": 25,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "a",
@@ -583,10 +832,12 @@ Array [
 ]
 `;
 
-exports[`ast extracts test declarations with array 1`] = `
+exports[`ast gets test declarations with array 1`] = `
 Array [
   Object {
+    "at": 7,
     "exported": false,
+    "identifiers": Array [],
     "optional": false,
     "symbols": Array [
       "QUAD",
@@ -609,11 +860,15 @@ Array [
 ]
 `;
 
-exports[`ast extracts use types symbol table 1`] = `
+exports[`ast gets use types symbol table 1`] = `
 Object {
   "declarations": Array [
     Object {
+      "at": 15,
       "exported": true,
+      "identifiers": Array [
+        "SolidVertex",
+      ],
       "optional": false,
       "symbols": Array [
         "SolidVertex",
@@ -647,7 +902,11 @@ Object {
       },
     },
     Object {
+      "at": 97,
       "exported": true,
+      "identifiers": Array [
+        "MeshVertex",
+      ],
       "optional": false,
       "symbols": Array [
         "MeshVertex",
@@ -689,7 +948,7 @@ Object {
   ],
   "externals": Array [],
   "functions": Array [],
-  "hash": "89q8792cwv",
+  "hash": "t7yv9ff45p",
   "modules": Array [],
   "symbols": Array [
     "SolidVertex",
@@ -702,10 +961,19 @@ Object {
 }
 `;
 
-exports[`ast extracts use view declarations 1`] = `
+exports[`ast gets use view declarations 1`] = `
 Array [
   Object {
+    "at": 15,
     "exported": true,
+    "identifiers": Array [
+      "VIEW_BINDING",
+      "projectionMatrix",
+      "viewMatrix",
+      "viewPosition",
+      "viewResolution",
+      "viewSize",
+    ],
     "optional": false,
     "struct": Object {
       "name": "viewUniforms",
@@ -759,11 +1027,13 @@ Array [
 ]
 `;
 
-exports[`ast extracts use view symbol table 1`] = `
+exports[`ast gets use view symbol table 1`] = `
 Object {
   "declarations": Array [
     Object {
+      "at": 15,
       "exported": true,
+      "identifiers": Array [],
       "optional": false,
       "struct": Object {
         "name": "viewUniforms",
@@ -818,7 +1088,11 @@ Object {
   "externals": Array [],
   "functions": Array [
     Object {
+      "at": 215,
       "exported": true,
+      "identifiers": Array [
+        "viewUniforms",
+      ],
       "prototype": Object {
         "name": "worldToView",
         "parameters": Array [
@@ -835,7 +1109,11 @@ Object {
       ],
     },
     Object {
+      "at": 312,
       "exported": true,
+      "identifiers": Array [
+        "viewUniforms",
+      ],
       "prototype": Object {
         "name": "viewToClip",
         "parameters": Array [
@@ -852,7 +1130,12 @@ Object {
       ],
     },
     Object {
+      "at": 414,
       "exported": true,
+      "identifiers": Array [
+        "viewToClip",
+        "worldToView",
+      ],
       "prototype": Object {
         "name": "worldToClip",
         "parameters": Array [
@@ -869,7 +1152,11 @@ Object {
       ],
     },
     Object {
+      "at": 510,
       "exported": true,
+      "identifiers": Array [
+        "viewUniforms",
+      ],
       "prototype": Object {
         "name": "clipToScreen3D",
         "parameters": Array [
@@ -886,7 +1173,11 @@ Object {
       ],
     },
     Object {
+      "at": 629,
       "exported": true,
+      "identifiers": Array [
+        "viewUniforms",
+      ],
       "prototype": Object {
         "name": "screenToClip3D",
         "parameters": Array [
@@ -903,7 +1194,12 @@ Object {
       ],
     },
     Object {
+      "at": 754,
       "exported": true,
+      "identifiers": Array [
+        "viewToClip",
+        "worldToView",
+      ],
       "prototype": Object {
         "name": "worldToClip3D",
         "parameters": Array [
@@ -920,7 +1216,7 @@ Object {
       ],
     },
   ],
-  "hash": "ng9x7m5kzj",
+  "hash": "6e337xb8qt",
   "modules": Array [],
   "symbols": Array [
     "worldToView",
@@ -953,6 +1249,11 @@ Array [
     46,
   ],
   Array [
+    "Shake",
+    48,
+    80,
+  ],
+  Array [
     "Id",
     48,
     59,
@@ -961,6 +1262,11 @@ Array [
     "Id",
     60,
     69,
+  ],
+  Array [
+    "Shake",
+    100,
+    145,
   ],
   Array [
     "Id",
@@ -973,6 +1279,11 @@ Array [
     144,
   ],
   Array [
+    "Shake",
+    152,
+    192,
+  ],
+  Array [
     "Id",
     159,
     167,
@@ -981,6 +1292,11 @@ Array [
     "Id",
     182,
     191,
+  ],
+  Array [
+    "Shake",
+    193,
+    230,
   ],
   Array [
     "Id",
@@ -993,9 +1309,19 @@ Array [
     229,
   ],
   Array [
+    "Shake",
+    239,
+    523,
+  ],
+  Array [
     "Id",
     244,
     248,
+  ],
+  Array [
+    "Shake",
+    255,
+    288,
   ],
   Array [
     "Id",
@@ -1008,6 +1334,11 @@ Array [
     287,
   ],
   Array [
+    "Shake",
+    291,
+    328,
+  ],
+  Array [
     "Id",
     295,
     308,
@@ -1016,6 +1347,11 @@ Array [
     "Id",
     311,
     327,
+  ],
+  Array [
+    "Shake",
+    332,
+    386,
   ],
   Array [
     "Id",
@@ -1104,6 +1440,11 @@ exports[`ast rewrites code using the AST 1`] = `
 exports[`ast rewrites code using the compressed AST 1`] = `
 Array [
   Array [
+    "Shake",
+    5,
+    31,
+  ],
+  Array [
     "Id",
     11,
     19,
@@ -1114,14 +1455,29 @@ Array [
     29,
   ],
   Array [
+    "Shake",
+    36,
+    132,
+  ],
+  Array [
     "Id",
     41,
     45,
   ],
   Array [
+    "Shake",
+    56,
+    70,
+  ],
+  Array [
     "Id",
     62,
     63,
+  ],
+  Array [
+    "Shake",
+    77,
+    99,
   ],
   Array [
     "Id",
@@ -1132,6 +1488,11 @@ Array [
     "Id",
     87,
     95,
+  ],
+  Array [
+    "Shake",
+    106,
+    113,
   ],
   Array [
     "Id",
@@ -1150,4 +1511,259 @@ exports[`ast rewrites code using the compressed AST 2`] = `
 Object {
   "cursor": [Function],
 }
+`;
+
+exports[`ast shakes simple program 1`] = `
+Array [
+  Array [
+    1,
+    Array [
+      "x",
+      "getA",
+      "getB",
+    ],
+  ],
+  Array [
+    38,
+    Array [
+      "getA",
+    ],
+  ],
+  Array [
+    83,
+    Array [
+      "getB",
+    ],
+  ],
+]
+`;
+
+exports[`ast shakes simple program 2`] = `
+"
+const float x = 1.0;
+
+
+float getA() {
+  return x;
+}
+
+
+
+    "
+`;
+
+exports[`ast shakes use/view AST 1`] = `
+Array [
+  Array [
+    15,
+    Array [
+      "viewUniforms",
+      "ViewUniforms",
+      "worldToView",
+      "viewToClip",
+      "clipToScreen3D",
+      "screenToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    215,
+    Array [
+      "worldToView",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    312,
+    Array [
+      "viewToClip",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    414,
+    Array [
+      "worldToClip",
+    ],
+  ],
+  Array [
+    510,
+    Array [
+      "clipToScreen3D",
+    ],
+  ],
+  Array [
+    629,
+    Array [
+      "screenToClip3D",
+    ],
+  ],
+  Array [
+    754,
+    Array [
+      "worldToClip3D",
+    ],
+  ],
+]
+`;
+
+exports[`ast shakes use/view AST 2`] = `
+"
+layout(set = 0, binding = VIEW_BINDING) uniform ViewUniforms {
+  mat4 projectionMatrix;
+  mat4 viewMatrix;
+  vec4 viewPosition;
+  vec2 viewResolution;
+  vec2 viewSize;
+} viewUniforms;
+
+
+vec4 worldToView(vec4 position) {
+  return viewUniforms.viewMatrix * position;
+}
+
+
+vec4 viewToClip(vec4 position) {
+  return viewUniforms.projectionMatrix * position;
+}
+
+
+vec4 worldToClip(vec4 position) {
+  return viewToClip(worldToView(position));
+}
+
+
+
+
+
+
+
+
+
+"
+`;
+
+exports[`ast shakes use/view AST using compressed AST 1`] = `
+Array [
+  Array [
+    15,
+    Array [
+      "viewUniforms",
+      "ViewUniforms",
+      "worldToView",
+      "viewToClip",
+      "clipToScreen3D",
+      "screenToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    215,
+    Array [
+      "worldToView",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    312,
+    Array [
+      "viewToClip",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    414,
+    Array [
+      "worldToClip",
+    ],
+  ],
+  Array [
+    510,
+    Array [
+      "clipToScreen3D",
+    ],
+  ],
+  Array [
+    629,
+    Array [
+      "screenToClip3D",
+    ],
+  ],
+  Array [
+    754,
+    Array [
+      "worldToClip3D",
+    ],
+  ],
+]
+`;
+
+exports[`ast shakes use/view AST using compressedAST 1`] = `
+Array [
+  Array [
+    15,
+    Array [
+      "viewUniforms",
+      "ViewUniforms",
+      "worldToView",
+      "viewToClip",
+      "clipToScreen3D",
+      "screenToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    215,
+    Array [
+      "worldToView",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    312,
+    Array [
+      "viewToClip",
+      "worldToClip",
+      "worldToClip3D",
+    ],
+  ],
+  Array [
+    414,
+    Array [
+      "worldToClip",
+    ],
+  ],
+  Array [
+    510,
+    Array [
+      "clipToScreen3D",
+    ],
+  ],
+  Array [
+    629,
+    Array [
+      "screenToClip3D",
+    ],
+  ],
+  Array [
+    754,
+    Array [
+      "worldToClip3D",
+    ],
+  ],
+]
 `;

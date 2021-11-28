@@ -1,6 +1,6 @@
-#pragma import {worldToClip} from 'use/view'
-#pragma import {pickingUniforms} from 'use/picking';
-#pragma import {lightUniforms} from 'use/light';
+#pragma import {worldToClip} from '@use-gpu/glsl/use/view'
+#pragma import {pickingUniforms} from '@use-gpu/glsl/use/picking';
+#pragma import {lightUniforms} from '@use-gpu/glsl/use/light';
 
 layout(location = 0) in vec4 position;
 layout(location = 1) in vec4 normal;

@@ -1,7 +1,7 @@
-#pragma import {SolidVertex} from 'use/types'
-#pragma import {getQuadIndex} from 'geometry/quad'
-#pragma import {getStripIndex} from 'geometry/strip'
-#pragma import {getLineJoin} from 'geometry/line'
+#pragma import {SolidVertex} from '@use-gpu/glsl/use/types'
+#pragma import {getQuadIndex} from '@use-gpu/glsl/geometry/quad'
+#pragma import {getStripIndex} from '@use-gpu/glsl/geometry/strip'
+#pragma import {getLineJoin} from '@use-gpu/glsl/geometry/line'
 
 SolidVertex getVertex(int, int);
 

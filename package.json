@@ -24,7 +24,6 @@
     "css-loader": "^6.0.0",
     "eslint": "^7.5.0",
     "jest": "^27.2.0",
-    "lerna": "^4.0.0",
     "raw-loader": "^4.0.2",
     "style-loader": "^3.3.1",
     "ts-jest": "^27.0.0",
@@ -40,13 +39,14 @@
     "last 1 firefox version"
   ],
   "scripts": {
-    "build": "yarn wsrun run build && yarn run pkg && (pushd test/import; yarn run test)",
+    "build": "yarn wsrun run build && yarn run pkg && yarn run test:import",
     "pkg": "ts-node scripts/to-index-js.ts",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "jest --watch",
+    "test:import": "(cd test/import; yarn run test)",
     "lint": "eslint packages/**/src --ext ts",
-    "types": "yarn lerna run types",
-    "coverage": "yarn lerna run coverage"
+    "types": "yarn wsrun run types",
+    "coverage": "yarn wsrun run coverage"
   },
   "jest": {
     "preset": "ts-jest",

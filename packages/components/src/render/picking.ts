@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
+import { TypedArray, UniformAttribute } from '@use-gpu/core/types';
 import {
   PICKING_FORMAT,
   PICKING_COLOR,
@@ -82,7 +83,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
     const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
 
     let waiting = false;
-    let captured = null;
+    let captured = null as TypedArray | null;
     const captureTexture = async () => {
       if (waiting) return;
 
@@ -112,7 +113,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
       const ys = Math.round(y * resolution);
 
       const offset = (itemsPerRow * ys + xs) * itemDims;
-      const index = seq(itemDims).map(i => captured[offset + i]);
+      const index = seq(itemDims).map(i => captured![offset + i]);
       return index;
     }
 

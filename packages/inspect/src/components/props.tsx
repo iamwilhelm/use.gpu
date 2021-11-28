@@ -127,7 +127,7 @@ export const inspectObject = (
 			toggleState(key);
 			e.preventDefault();
 			e.stopPropagation();
-		} : null;
+		} : undefined;
 
 		const compact = <Compact>
 			{expanded ? formatValue(object[k]) : truncate(formatValue(object[k]), 80)}

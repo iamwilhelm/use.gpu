@@ -5,6 +5,28 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
+  "types": "./src/glsl.d.ts",
+  "typesVersions": {
+    "*": {
+      "types": [
+        "src/glsl.d.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+    "build": "yarn run build:glsl && yarn run build:js && yarn run build:pkg",
+    "build:glsl": "ts-node build",
+    "build:js": "babel src --out-dir ../../build/packages/glsl/src --extensions \".ts,.js\"",
+    "build:pkg": "cp package.json ../../build/packages/glsl"
+  },
+  "devDependencies": {
+    "glob": "^7.2.0"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./fragment/pbr.glsl": "./src/fragment/pbr.glsl",
@@ -16,26 +38,17 @@
     "./instance/draw/wireframe-strip.glsl": "./src/instance/draw/wireframe-strip.glsl",
     "./instance/fragment/mesh.glsl": "./src/instance/fragment/mesh.glsl",
     "./instance/fragment/solid.glsl": "./src/instance/fragment/solid.glsl",
+    "./instance/geometry/line.glsl": "./src/instance/geometry/line.glsl",
+    "./instance/geometry/quad.glsl": "./src/instance/geometry/quad.glsl",
+    "./instance/geometry/strip.glsl": "./src/instance/geometry/strip.glsl",
     "./instance/vertex/line.glsl": "./src/instance/vertex/line.glsl",
     "./instance/vertex/quad.glsl": "./src/instance/vertex/quad.glsl",
     "./mask/point.glsl": "./src/mask/point.glsl",
-    "./use/light.glsl": "./src/use/light.glsl",
-    "./use/picking.glsl": "./src/use/picking.glsl",
-    "./use/types.glsl": "./src/use/types.glsl",
-    "./use/view.glsl": "./src/use/view.glsl"
-  },
-  "scripts": {
-    "test": "jest --watch",
-    "lint": "eslint src --ext ts",
-    "coverage": "echo 'jest --collect-coverage' disabled",
-    "types": "tsc --noEmit",
-    "types:watch": "yarn run types -- --watch",
-    "build": "yarn run build:glsl && yarn run build:js && yarn run build:pkg",
-    "build:glsl": "node build.mjs",
-    "build:js": "babel src --out-dir ../../build/packages/glsl/src --extensions \".ts,.js\"",
-    "build:pkg": "cp package.json ../../build/packages/glsl"
-  },
-  "devDependencies": {
-    "glob": "^7.2.0"
+    "./use/light.glsl": "./use/light.glsl",
+    "./use/picking.glsl": "./use/picking.glsl",
+    "./use/types.glsl": "./use/types.glsl",
+    "./use/view.glsl": "./use/view.glsl",
+    "./vertex/line.glsl": "./src/vertex/line.glsl",
+    "./vertex/quad.glsl": "./src/vertex/quad.glsl"
   }
 }

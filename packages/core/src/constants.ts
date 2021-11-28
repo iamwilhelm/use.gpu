@@ -378,7 +378,7 @@ export const TEXTURE_FORMAT_SIZES = {
   // "depth32float-stencil8" feature
   "depth32float-stencil8",
   */
-};
+} as Record<GPUTextureFormat, number>;
 
 export const TEXTURE_FORMAT_DIMS = {
   // 8-bit formats
@@ -434,7 +434,7 @@ export const TEXTURE_FORMAT_DIMS = {
   "depth24plus": 1,
   "depth24plus-stencil8": 1,
   "depth32float": 1,
-};
+} as Record<GPUTextureFormat, number>;
 
 export const TEXTURE_ARRAY_TYPES = {
   // 8-bit formats
@@ -490,7 +490,7 @@ export const TEXTURE_ARRAY_TYPES = {
   "depth24plus": Uint32Array,
   "depth24plus-stencil8": Uint32Array,
   "depth32float": Uint32Array,
-};
+} as Record<GPUTextureFormat, TypedArrayConstructor>;
 
 // @ts-ignore
 export const VERTEX_ATTRIBUTE_SIZES = VERTEX_SIZES as {[t in GPUVertexFormat]: number};

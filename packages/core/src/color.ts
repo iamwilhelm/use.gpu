@@ -11,7 +11,7 @@ export const BLEND_RGBA = {
     srcFactor: "one",
     dstFactor: "one-minus-src-alpha",      
   },
-};
+} as any as GPUBlendState;
 
 export const BLEND_PREMULTIPLIED = {
   color: {
@@ -24,9 +24,9 @@ export const BLEND_PREMULTIPLIED = {
     srcFactor: "one",
     dstFactor: "one-minus-src-alpha",      
   },
-};
+} as any as GPUBlendState;
 
-export const makeColorState = (format: GPUTextureFormat, blend: GPUBlendState): GPUColorTargetState => ({
+export const makeColorState = (format: GPUTextureFormat, blend?: GPUBlendState): GPUColorTargetState => ({
   format,
   blend,
 });

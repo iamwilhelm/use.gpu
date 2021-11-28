@@ -16,7 +16,7 @@ export const getTypedArrayConstructor = (t: TypedArray): TypedArrayConstructor =
 export const makeTypedBuffer = (
   device: GPUDevice,
   size: number,
-  usage: GPUBufferUsage,
+  usage: GPUBufferUsageFlags,
   data?: TypedArray,
 ): GPUBuffer => {
   const buffer = device.createBuffer({
@@ -40,7 +40,7 @@ export const makeVertexBuffers = (device: GPUDevice, datas: TypedArray[]): GPUBu
 export const makeVertexBuffer = (device: GPUDevice, data: TypedArray): GPUBuffer =>
   makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.VERTEX, data);
 
-export const makeUniformBuffer = (device: GPUDevice, data: TypedArray): GPUBuffer =>
+export const makeUniformBuffer = (device: GPUDevice, data: BufferArray): GPUBuffer =>
   makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
 
 export const makeStorageBuffer = (device: GPUDevice, data: BufferArray): GPUBuffer =>
@@ -51,7 +51,7 @@ export const makeTextureReadbackBuffer = (
   width: number,
   height: number,
   format: GPUTextureFormat,
-): GPUBuffer => {
+): [GPUBuffer, number, number, number] => {
   const s = TEXTURE_FORMAT_SIZES[format] || 1;
   const d = TEXTURE_FORMAT_DIMS[format] || 1;
   const minBytes = width * s;
@@ -61,6 +61,7 @@ export const makeTextureReadbackBuffer = (
 
   const bytesPerRow = minBytes + paddingSize;
   const itemsPerRow = bytesPerRow / s;
+  const dimsPerItem = d;
 
   if (itemsPerRow !== Math.round(itemsPerRow)) throw new Error("Readback size not a multiple of item size");
 
@@ -70,7 +71,7 @@ export const makeTextureReadbackBuffer = (
     usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
   });
 
-  return [buffer, bytesPerRow, itemsPerRow, d];
+  return [buffer, bytesPerRow, itemsPerRow, dimsPerItem];
 }
 
 export const uploadBuffer = (

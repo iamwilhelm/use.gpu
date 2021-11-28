@@ -12,8 +12,7 @@ export type PassProps = {
   render: () => LiveElement<any>,
 };
 
-export type RenderToPass = (passEncoder: GPURenderPassEncoder, mpde?: RenderPassMode) => void;
-export type Renderable = RenderToPass | {mode: RenderPassMode, pass: RenderToPass};
+export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
 const makeStaticDone = (c: any): any => {
   c.isStaticComponent = true;
@@ -26,7 +25,7 @@ const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : [];
 export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
   const {children, render} = props;
 
-  const Done = useMemo(() => makeStaticDone((fiber: LiveFiber<any>) => (rs: Record<string, Renderable | Renderable[]>) => {
+  const Done = useMemo(() => makeStaticDone((fiber: LiveFiber<any>) => (rs: Record<string, RenderToPass | RenderToPass[]>) => {
     const renderContext = useContext(RenderContext);
     const pickingContext = useContext(PickingContext);
 
@@ -41,7 +40,7 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
     const renderToContext = (
       commandEncoder: GPUCommandEncoder,
       context: UseRenderingContextGPU,
-      rs: Renderable[],
+      rs: RenderToPass[],
     ) => {
       const {colorAttachments, depthStencilAttachment} = context;
       const renderPassDescriptor: GPURenderPassDescriptor = {

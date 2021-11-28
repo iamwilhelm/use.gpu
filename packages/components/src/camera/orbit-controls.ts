@@ -56,8 +56,10 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (fiber) => (prop
       }
     };
 
-    let lastX, lastY;
+    let lastX: number;
+    let lastY: number;
     const onTouchStart = (e: TouchEvent) => {
+      // @ts-ignore
       const {targetTouches: [touch]} = e;
       lastX = touch.pageX;
       lastY = touch.pageY;
@@ -65,7 +67,9 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (fiber) => (prop
       e.stopPropagation();
     }
 
+    // @ts-ignore
     const onTouchMove = (e: TouchEvent) => {
+      // @ts-ignore
       const {targetTouches: [touch]} = e;
       const x = touch.pageX;
       const y = touch.pageY;

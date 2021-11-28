@@ -1,16 +1,19 @@
-import { ShaderLanguages, ShaderLib } from '@use-gpu/core/types';
-import { UniformDefinition, UniformAttribute } from './types';
+import {
+  ShaderLanguages, ShaderLib,
+  ResolvedDataBindings, ResolvedCodeBindings,
+  UniformAttribute,
+} from '@use-gpu/core/types';
 import { makeBoundStorageAccessors, makeBoundShader } from '@use-gpu/core';
 import { linkCode as link } from '@use-gpu/shader';
 import partition from 'lodash/partition';
 
 import { useMemo, useOne } from '@use-gpu/live';
 
-export const useBoundStorage = (
-  dataUniforms: UniformDefinition[],
-  codeUniforms: UniformDefinition[],
+export const useBoundStorage = <T>(
+  dataUniforms: UniformAttribute[],
+  codeUniforms: UniformAttribute[],
   dataBindings: ResolvedDataBindings,
-  codeBindings: ResolvedCodeBindings,
+  codeBindings: ResolvedCodeBindings<T>,
   base: number = 0,
 ) => {
   const {links, constants} = dataBindings;

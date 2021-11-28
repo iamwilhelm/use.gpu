@@ -63,7 +63,10 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
     [makeColorAttachment(renderTexture, resolveTexture, backgroundColor)],
     [renderTexture, resolveTexture, backgroundColor]
   );
-  const depthStencilState = useOne(() => makeDepthStencilState(depthStencilFormat), depthStencilFormat);
+  const depthStencilState = useOne(() => depthStencilFormat
+    ? makeDepthStencilState(depthStencilFormat)
+    : undefined,
+    depthStencilFormat);
 
   const [
     depthTexture,
@@ -78,6 +81,9 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
     [device, width, height, depthStencilFormat, samples]
   );
 
+  const frame = useOne(() => ({current: 0}));
+  frame.current++;
+
   const rttContext = useMemo(() => ({
     ...renderContext,
     width,
@@ -89,19 +95,14 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
     depthStencilAttachment,
   }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment]);
 
-  const view = provide(RenderContext, rttContext, childreZ);
-
+  const view = provide(RenderContext, rttContext, children);
   const Done = useMemo(() =>
     (fiber: LiveFiber<any>) => (ts: Task[]) => {
       for (let task of ts) task();
     },
   );
-
   // @ts-ignore
   if (!Done.displayName) Done.displayName = '[RenderToTexture]';
-
-  const frame = useOne(() => ({current: 0}));
-  frame.current++;
 
   return provide(FrameContext, frame.current, gatherReduce(view, Done));
 }

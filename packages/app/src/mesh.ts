@@ -9,9 +9,9 @@ import {
 } from '@use-gpu/core';
 import { linkBundle as link } from '@use-gpu/shader';
 
-import instanceDrawMesh from 'instance/draw/mesh.glsl';
-import instanceFragmentMesh from 'instance/fragment/mesh.glsl';
-import instanceFragmentSolid from 'instance/fragment/solid.glsl';
+import instanceDrawMesh from '@use-gpu/glsl/instance/draw/mesh.glsl';
+import instanceFragmentMesh from '@use-gpu/glsl/instance/fragment/mesh.glsl';
+import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid.glsl';
 //import instanceVirtualWireframeMesh from 'instance/virtual/wireframe-mesh.glsl';
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
@@ -52,7 +52,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
 
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
-  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext();  
+  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  
   const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoPicking();
 
   const resolvedContext = pickingContext?.renderContext ?? renderContext;

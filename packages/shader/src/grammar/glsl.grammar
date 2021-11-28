@@ -22,9 +22,6 @@
   conditional @right,
   assign @right,
   statement @cut,
-	import,
-	export,
-	optional,
 	last
 }
 
@@ -40,9 +37,10 @@ comment { commentLine | commentOpen untilCommentClose }
 Preprocessor {
 	hash (
 	  d<'pragma'> (
-			!import d<'import'> (ImportDeclarationList 'from')? String |
-			!export d<'export'> |
+			d<'import'> (ImportDeclarationList 'from')? String |
+			d<'export'> |
 			d<'optional'> |
+			d<'global'> |
 			d<'optimize'> |
 			d<'debug'>
 			d<'STDGL'>

@@ -5,24 +5,17 @@ exports[`link lifts recursive dependency 1`] = `
 
 
     // Lifted Code
-    
-    void _lx_getLifted() {}
-    
-
-    
-    
-    vec4 _p9_getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    void _wh_getLifted() {}
     
 
-    
-    
-    vec4 _u5_getColor1() { return _p9_getColor2(); }
+    vec4 _2g_getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
+    vec4 _y5_getColor1() { return _2g_getColor2(); }
     
-    
+
     void main() {
-      gl_FragColor = _u5_getColor1();
+      gl_FragColor = _y5_getColor1();
     }
     "
 `;
@@ -31,15 +24,14 @@ exports[`link links an external 1`] = `
 "#version 450
 
 
-    
-    vec4 _s8_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _21_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _s8_getColor();
+    vec4 _21_getColor();
     void main() {
       vec4 v;
       v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = _s8_getColor();
+      gl_FragColor = _21_getColor();
     }
     "
 `;
@@ -47,106 +39,70 @@ exports[`link links an external 1`] = `
 exports[`link links quad vertex 1`] = `
 "#version 450
 
-const ivec2 _3j_QUAD[] = {
+const ivec2 _vz_QUAD[] = {
   ivec2(0, 0),
   ivec2(1, 0),
   ivec2(0, 1),
   ivec2(1, 1),
 };
 
-
-ivec2 _3j_getQuadIndex(int vertex) {
-  return _3j_QUAD[vertex];
+ivec2 _vz_getQuadIndex(int vertex) {
+  return _vz_QUAD[vertex];
 }
 
-
-vec2 _3j_getQuadUV(int vertex) {
-  return vec2(_3j_getQuadIndex(vertex));
+vec2 _vz_getQuadUV(int vertex) {
+  return vec2(_vz_getQuadIndex(vertex));
 }
 
-
-struct _t7_SolidVertex {
+struct _3w_SolidVertex {
   vec4 position;
   vec4 color;
   vec2 uv;
 };
 
 
-struct _t7_MeshVertex {
-  vec4 position;
-  vec3 normal;
-  vec4 color;
-  vec2 uv;
-};
-
-layout(set = 0, binding = VIEW_BINDING) uniform _6e_ViewUniforms {
+layout(set = 0, binding = VIEW_BINDING) uniform _e6_ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;
   vec2 viewResolution;
   vec2 viewSize;
-} _6e_viewUniforms;
+} _e6_viewUniforms;
 
+vec4 _e6_worldToView(vec4 position) {
+  return _e6_viewUniforms.viewMatrix * position;
+}
 
-vec4 _6e_worldToView(vec4 position) {
-  return _6e_viewUniforms.viewMatrix * position;
+vec4 _e6_viewToClip(vec4 position) {
+  return _e6_viewUniforms.projectionMatrix * position;
+}
+
+vec4 _e6_worldToClip(vec4 position) {
+  return _e6_viewToClip(_e6_worldToView(position));
 }
 
 
-vec4 _6e_viewToClip(vec4 position) {
-  return _6e_viewUniforms.projectionMatrix * position;
-}
 
-
-vec4 _6e_worldToClip(vec4 position) {
-  return _6e_viewToClip(_6e_worldToView(position));
-}
-
-
-vec3 _6e_clipToScreen3D(vec4 position) {
-  return vec3(position.xy * _6e_viewUniforms.viewSize, position.z);
-}
-
-
-vec3 _6e_screenToClip3D(vec4 position) {
-  return vec3(position.xy * _6e_viewUniforms.viewResolution, position.z);
-}
-
-
-vec3 _6e_worldToClip3D(vec4 position) {
-  position = _6e_viewToClip(_6e_worldToView(position));
-  return position.xyz / position.w;
-}
-
-
-    
-    vec4 _3n_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _9a_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    
-    vec4 _hk_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
-    
-
-    
-    float _4i_getSize(int index) { return 1.0; }
+    vec4 _hu_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
+    float _vi_getSize(int index) { return 1.0; }
+    
+vec4 _hu_getPosition(int);
+vec4 _9a_getColor(int);
+float _vi_getSize(int);
 
+_3w_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
+  vec4 instancePosition = _hu_getPosition(instanceIndex);
+  vec4 instanceColor = _9a_getColor(instanceIndex);
+  float instanceSize = _vi_getSize(instanceIndex);
 
+  vec4 position = _e6_worldToClip(instancePosition);
 
-vec4 _hk_getPosition(int);
-vec4 _3n_getColor(int);
-float _4i_getSize(int);
-
-
-_t7_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
-  vec4 instancePosition = _hk_getPosition(instanceIndex);
-  vec4 instanceColor = _3n_getColor(instanceIndex);
-  float instanceSize = _4i_getSize(instanceIndex);
-
-  vec4 position = _6e_worldToClip(instancePosition);
-
-  vec2 uv = _3j_getQuadUV(vertexIndex);
+  vec2 uv = _vz_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
   
   #ifdef HAS_EDGE_BLEED
@@ -154,9 +110,9 @@ _t7_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   uv = xy * .5 + .5;
   #endif
   
-  position.xy += xy * _6e_viewUniforms.viewResolution * (instanceSize * position.w);
+  position.xy += xy * _e6_viewUniforms.viewResolution * (instanceSize * position.w);
 
-  return _t7_SolidVertex(
+  return _3w_SolidVertex(
     position,
     instanceColor,
     uv

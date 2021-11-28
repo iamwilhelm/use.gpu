@@ -15,7 +15,7 @@ export default {
     filename: 'use.bundle.js',
   },
   resolve: {
-    modules: ['node_modules', path.resolve('./packages/glsl/src')],
+    modules: ['node_modules'],
     extensions: ['.ts', '.tsx', '.js', '.json']
   },
   module: {

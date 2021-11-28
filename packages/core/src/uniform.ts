@@ -1,4 +1,9 @@
-import { UniformAllocation, UniformLayout, UniformAttribute, UniformBinding, UniformType, UniformPipe, UniformByteSetter, UniformFiller } from './types';
+import {
+  UniformAllocation, UniformAttribute, UniformAttributeDescriptor,
+  UniformBinding, UniformLayout, UniformType,
+  UniformPipe, UniformByteSetter, UniformFiller,
+  StorageSource,
+} from './types';
 import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 import { makeUniformBuffer } from './buffer';
@@ -156,7 +161,7 @@ export const makeLayoutFiller = (
 ): UniformFiller => {
   const {length, attributes} = layout;
 
-  const map = new Map<string, UniformAttribute>();
+  const map = new Map<string, UniformAttributeDescriptor>();
   for (const attr of attributes) map.set(attr.name, attr);
 
   const dataView = new DataView(data);
@@ -212,7 +217,7 @@ layout (set = ${set}, binding = ${binding}) uniform ${ubo}Type {
 `;
 
 const intArg = ['int'];
-export const makeUniformGetter = (type: string, ubo: string, name: string, args?: string[] = intArg) => `
+export const makeUniformGetter = (type: string, ubo: string, name: string, args: string[] = intArg) => `
 #pragma import { ${ubo}Uniform } from '#${ubo}'
 
 #pragma export

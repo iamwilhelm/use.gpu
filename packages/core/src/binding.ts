@@ -1,4 +1,8 @@
-import { UniformAttribute, ResolvedDataBindings, ResolvedCodeBindings, ShaderLib } from './types';
+import {
+  UniformType, UniformAttribute, UniformAttributeValue,
+  ResolvedDataBindings, ResolvedCodeBindings,
+  ShaderModuleDescriptor, ShaderLib, StorageSource,
+} from './types';
 import { makeStorageAccessors, checkStorageTypes, checkStorageType } from './storage';
 import { makeUniformBlockAccessor } from './uniform';
 import { makeShaderModule } from './pipeline';
@@ -29,7 +33,7 @@ export const extractDataBindings = (
 export const extractCodeBindings = <T>(
   uniforms: UniformAttributeValue[],
   bindings: any[],
-): ResolvedCodeBindings => {
+): ResolvedCodeBindings<T> => {
   const constants = {} as Record<string, any>;
   const links = {} as Record<string, T>;
   for (const u of uniforms) {
@@ -46,17 +50,18 @@ export const extractCodeBindings = <T>(
 }
 
 // Generate accessors for bound dynamic uniforms, either attribute, lambda or constant
-export const makeBoundStorageAccessors = (
+export const makeBoundStorageAccessors = <T>(
   dataUniforms: UniformAttribute[],
   codeUniforms: UniformAttribute[],
   dataBindings: ResolvedDataBindings,
-  codeBindings: ResolvedCodeBindings,
+  codeBindings: ResolvedCodeBindings<T>,
   base: number = 0,
-): [
-  Record<string, string>,
-  UniformAttribute[],
-  UniformAttribute[],
-] => {
+): {
+  accessors: Record<string, string>,
+  attributes: UniformAttribute[],
+  constants: UniformAttribute[],
+  lambdas: UniformAttribute[],
+} => {
   const [attributes, dataConstants] = partition(dataUniforms, ({name}) => !!(dataBindings.links as any)[name]);
   const [lambdas, codeConstants] = partition(codeUniforms, ({name}) => !!(codeBindings.links as any)[name]);
   const constants = [...dataConstants, ...codeConstants];
@@ -70,15 +75,15 @@ export const makeBoundStorageAccessors = (
 
 // Bind a shader to a set of data bindings, either as constants or a buffer
 export const makeBoundShader = <A, B>(
-  vertexShader: T,
-  fragmentShader: T,
+  vertexShader: A,
+  fragmentShader: A,
   links: ShaderLib<A>,
-  defines: Record<string, string>,
+  defines: Record<string, any>,
   compile: (code: B, stage: string) => any,
-  link: (shader: A, links: ShaderLib<A>, defines: Record<string, string>, cache: any) => B,
+  link: (shader: A, links: ShaderLib<A>, defines: Record<string, any>, cache: any) => B,
   cache: any,
   base: number = 0,
-) => {
+): [ShaderModuleDescriptor, ShaderModuleDescriptor, B, B] => {
   const vertexLinked = link(vertexShader, links, defines, cache);
   const fragmentLinked = link(fragmentShader, links, defines, cache);
 
@@ -111,7 +116,7 @@ export const makeConstantValue = (
   const isFloat = t !== 'u' && t !== 'i' && t !== 'b';
   const fmt = isFloat ? fmtFloat : fmtInt;
   if (value.length) {
-    const l = Array.from(value).map(fmt).join(', ');
+    const l = Array.from(value).map(fmt as any).join(', ');
     return `${format}(${l})`;
   }
   else {

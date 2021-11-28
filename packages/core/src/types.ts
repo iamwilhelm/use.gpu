@@ -1,6 +1,6 @@
 import { vec2, vec3, mat4 } from 'gl-matrix';
 
-export type DeepPartial<T> = {
+export type DeepPartial<T> = T | {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
 
@@ -160,7 +160,7 @@ export type StorageSource = {
 };
 
 // Shaders
-export type ShaderStage = 'vertex' | 'fragment';
+export type ShaderStage = string;
 export type ShaderCompiler = (code: string, stage: ShaderStage) => TypedArray;
 export type ShaderLib<T = string> = Record<string, T>;
 
@@ -186,7 +186,8 @@ export type ViewUniforms = {
   projectionMatrix: { value: mat4 },
   viewMatrix: { value: mat4 },
   viewPosition: { value: vec3 | [number, number, number] | number[] },
-  viewResolution: { value: vec2 | [number, number] | number[] }
+  viewResolution: { value: vec2 | [number, number] | number[] },
+  viewSize: { value: vec2 | [number, number] | number[] },
 };
 
 export type PickingUniforms = {

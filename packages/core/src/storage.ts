@@ -37,13 +37,13 @@ export const checkStorageTypes = (
   links: Record<string, StorageSource | null | undefined>,
 ) => {
   for (const u of uniforms) {
-    const link = links[name];
+    const link = links[u.name];
     checkStorageType(u, link)
   }
 } 
 
 export const checkStorageType = (
-  uniform: UniformAttribute[],
+  uniform: UniformAttribute,
   link: StorageSource | null | undefined,
 ) => {
   const {name, format} = uniform;

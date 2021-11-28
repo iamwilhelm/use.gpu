@@ -1,11 +1,11 @@
+import { ShaderLanguages, ShaderCompiler } from '@use-gpu/core/types';
+import { ParsedModule, ParsedModuleCache, ShaderDefine } from '../types';
 import { Tree, SyntaxNode } from '@lezer/common';
+
 import { makeASTParser, compressAST, decompressAST, getProgramHash } from './ast';
 import { parser } from '../grammar/glsl';
-import { ShaderLanguages, ShaderCompiler } from '@use-gpu/core/types';
-import { ParsedModule, ParsedModuleCache } from '../types';
 import LRU from 'lru-cache';
 
-type Define = string | number | boolean | null | undefined;
 type LangDef = {
   glsl?: ShaderCompiler,
   cache?: any,
@@ -51,7 +51,7 @@ export const loadModuleWithCache = (
 export const parseGLSL = (code: string): Tree => parser.parse(code);
 
 // Make GLSL definitions
-export const defineGLSL = (defs: Record<string, Define>): string => {
+export const defineGLSL = (defs: Record<string, ShaderDefine>): string => {
   const out = [];
   for (let k in defs) if (defs[k] !== false && defs[k] !== null) out.push(`#define ${k} ${defs[k]}`);
   return out.join("\n");

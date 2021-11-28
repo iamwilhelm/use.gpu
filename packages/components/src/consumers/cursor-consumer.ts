@@ -1,4 +1,4 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { LiveFiber, LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { memo, consume, makeContext, useConsumer, useOne, useMemo, getTailValue } from '@use-gpu/live';
 
@@ -13,7 +13,7 @@ export type CursorConsumerProps = {
   children: LiveElement<any>,
 };
 
-export const CursorConsumer: LiveComponent<RenderProviderProps> = (fiber) => (props) => {
+export const CursorConsumer: LiveComponent<CursorConsumerProps> = (fiber) => (props) => {
   const {element, children} = props;
   
   const Done = useOne(() => {
@@ -32,4 +32,5 @@ export const CursorConsumer: LiveComponent<RenderProviderProps> = (fiber) => (pr
 
 export const Cursor: LiveComponent<CursorProps> = memo((fiber) => (props) => {
   useConsumer(CursorContext, props.cursor);
+  return null;
 }, 'Cursor');

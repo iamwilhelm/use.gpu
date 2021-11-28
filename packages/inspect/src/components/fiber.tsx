@@ -6,7 +6,7 @@ import React from 'react';
 import { useRefineCursor, Cursor } from './cursor';
 import { Node } from './node';
 import { PingState, ExpandState, SelectState, Action } from './types';
-import { ExpandRow, NotExpandRow, IndentTree, IndentTreeLine, IndentContinuation, IndentMini, SmallIcon } from './layout';
+import { ExpandRow, NotExpandRow, IndentTree, IndentTreeLine, IndentContinuation, IndentMini } from './layout';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
@@ -45,7 +45,7 @@ export const Fiber: React.FC<FiberProps> = ({fiber, ping, compact, expandCursor,
     );
   }
 
-  if (mounts) {
+  if (mounts && order) {
     for (const key of order) {
       const sub = mounts.get(key);
       if (sub) out.push(

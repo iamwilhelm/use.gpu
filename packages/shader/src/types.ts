@@ -26,6 +26,7 @@ export type SymbolTable = {
   hash: string,
   symbols: SymbolRef[],
   visibles: SymbolRef[],
+  globals: SymbolRef[],
   modules: ModuleRef[],
   functions: FunctionRef[],
   declarations: DeclarationRef[],
@@ -34,6 +35,12 @@ export type SymbolTable = {
 
 export type ShakeTable = ShakeOp[];
 export type ShakeOp = [number, string[]];
+
+export enum RefFlags {
+  Exported = 1,
+  Optional = 1 << 1,
+  Global   = 1 << 2,
+};
 
 export type SymbolRef = string;
 
@@ -55,7 +62,7 @@ export type ModuleRef = SymbolsRef & {
 export type FunctionRef = SymbolsRef & {
   prototype: PrototypeRef,
   identifiers?: string[],
-  exported: boolean,
+  flags: RefFlags,
 }
 
 export type DeclarationRef = SymbolsRef & {
@@ -63,8 +70,7 @@ export type DeclarationRef = SymbolsRef & {
   variable?: VariableRef,
   struct?: QualifiedStructRef,
   identifiers?: string[],
-  exported: boolean,
-  optional: boolean,
+  flags: RefFlags,
 }
 
 export type TypeRef = {
@@ -103,3 +109,5 @@ export type QualifiedStructRef = {
 export type StructRef = {
   members: MemberRef[],
 }
+
+export type ShaderDefine = string | number | boolean | null | undefined;

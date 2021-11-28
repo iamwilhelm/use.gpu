@@ -5,9 +5,8 @@ Object {
   "declarations": Array [
     Object {
       "at": 0,
-      "exported": false,
+      "flags": 0,
       "identifiers": Array [],
-      "optional": false,
       "symbols": Array [
         "QUAD",
       ],
@@ -31,7 +30,7 @@ Object {
   "functions": Array [
     Object {
       "at": 102,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "QUAD",
       ],
@@ -52,7 +51,7 @@ Object {
     },
     Object {
       "at": 176,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "getQuadIndex",
       ],
@@ -72,7 +71,8 @@ Object {
       ],
     },
   ],
-  "hash": "3jubnisvn4",
+  "globals": Array [],
+  "hash": "vz5280ybh9",
   "modules": Array [],
   "symbols": Array [
     "getQuadIndex",
@@ -90,9 +90,8 @@ exports[`ast gets quad vertex declarations 1`] = `
 Array [
   Object {
     "at": 196,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "prototype": Object {
       "name": "getPosition",
       "parameters": Array [
@@ -109,9 +108,8 @@ Array [
   },
   Object {
     "at": 219,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "prototype": Object {
       "name": "getColor",
       "parameters": Array [
@@ -128,9 +126,8 @@ Array [
   },
   Object {
     "at": 239,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "prototype": Object {
       "name": "getSize",
       "parameters": Array [
@@ -152,7 +149,7 @@ exports[`ast gets quad vertex functions 1`] = `
 Array [
   Object {
     "at": 275,
-    "exported": true,
+    "flags": 1,
     "identifiers": Array [
       "instancePosition",
       "getPosition",
@@ -242,9 +239,8 @@ Object {
   "declarations": Array [
     Object {
       "at": 196,
-      "exported": false,
+      "flags": 0,
       "identifiers": Array [],
-      "optional": false,
       "prototype": Object {
         "name": "getPosition",
         "parameters": Array [
@@ -261,9 +257,8 @@ Object {
     },
     Object {
       "at": 219,
-      "exported": false,
+      "flags": 0,
       "identifiers": Array [],
-      "optional": false,
       "prototype": Object {
         "name": "getColor",
         "parameters": Array [
@@ -280,9 +275,8 @@ Object {
     },
     Object {
       "at": 239,
-      "exported": false,
+      "flags": 0,
       "identifiers": Array [],
-      "optional": false,
       "prototype": Object {
         "name": "getSize",
         "parameters": Array [
@@ -301,9 +295,8 @@ Object {
   "externals": Array [
     Object {
       "at": 196,
-      "exported": false,
+      "flags": 0,
       "identifiers": Array [],
-      "optional": false,
       "prototype": Object {
         "name": "getPosition",
         "parameters": Array [
@@ -320,9 +313,8 @@ Object {
     },
     Object {
       "at": 219,
-      "exported": false,
+      "flags": 0,
       "identifiers": Array [],
-      "optional": false,
       "prototype": Object {
         "name": "getColor",
         "parameters": Array [
@@ -339,9 +331,8 @@ Object {
     },
     Object {
       "at": 239,
-      "exported": false,
+      "flags": 0,
       "identifiers": Array [],
-      "optional": false,
       "prototype": Object {
         "name": "getSize",
         "parameters": Array [
@@ -360,7 +351,7 @@ Object {
   "functions": Array [
     Object {
       "at": 275,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "getPosition",
         "getColor",
@@ -382,7 +373,8 @@ Object {
       ],
     },
   ],
-  "hash": "4dr26g72kh",
+  "globals": Array [],
+  "hash": "i8bdssda5g",
   "modules": Array [
     Object {
       "at": 0,
@@ -520,9 +512,8 @@ exports[`ast gets solid fragment declarations 1`] = `
 Array [
   Object {
     "at": 101,
-    "exported": false,
+    "flags": 2,
     "identifiers": Array [],
-    "optional": true,
     "prototype": Object {
       "name": "getMask",
       "parameters": Array [
@@ -539,9 +530,8 @@ Array [
   },
   Object {
     "at": 166,
-    "exported": false,
+    "flags": 2,
     "identifiers": Array [],
-    "optional": true,
     "prototype": Object {
       "name": "getTexture",
       "parameters": Array [
@@ -558,9 +548,8 @@ Array [
   },
   Object {
     "at": 215,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "fragIndex",
     ],
@@ -583,9 +572,8 @@ Array [
   },
   Object {
     "at": 260,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "outColor",
     ],
@@ -607,9 +595,8 @@ Array [
   },
   Object {
     "at": 307,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "fragColor",
     ],
@@ -631,9 +618,8 @@ Array [
   },
   Object {
     "at": 347,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "fragUV",
     ],
@@ -655,9 +641,8 @@ Array [
   },
   Object {
     "at": 385,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "outColor",
     ],
@@ -684,9 +669,8 @@ exports[`ast gets test declarations 1`] = `
 Array [
   Object {
     "at": 7,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "x",
       "y",
@@ -710,9 +694,8 @@ Array [
   },
   Object {
     "at": 25,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "a",
       "b",
@@ -751,9 +734,8 @@ exports[`ast gets test declarations with array 1`] = `
 Array [
   Object {
     "at": 7,
-    "exported": false,
+    "flags": 0,
     "identifiers": Array [],
-    "optional": false,
     "symbols": Array [
       "QUAD",
     ],
@@ -780,9 +762,8 @@ Object {
   "declarations": Array [
     Object {
       "at": 15,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [],
-      "optional": false,
       "symbols": Array [
         "SolidVertex",
       ],
@@ -816,9 +797,8 @@ Object {
     },
     Object {
       "at": 97,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [],
-      "optional": false,
       "symbols": Array [
         "MeshVertex",
       ],
@@ -859,7 +839,8 @@ Object {
   ],
   "externals": Array [],
   "functions": Array [],
-  "hash": "t7yv9ff45p",
+  "globals": Array [],
+  "hash": "3wmin9gcu9",
   "modules": Array [],
   "symbols": Array [
     "SolidVertex",
@@ -876,7 +857,7 @@ exports[`ast gets use view declarations 1`] = `
 Array [
   Object {
     "at": 15,
-    "exported": true,
+    "flags": 1,
     "identifiers": Array [
       "VIEW_BINDING",
       "projectionMatrix",
@@ -885,7 +866,6 @@ Array [
       "viewResolution",
       "viewSize",
     ],
-    "optional": false,
     "struct": Object {
       "name": "viewUniforms",
       "struct": Object {
@@ -943,9 +923,8 @@ Object {
   "declarations": Array [
     Object {
       "at": 15,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [],
-      "optional": false,
       "struct": Object {
         "name": "viewUniforms",
         "struct": Object {
@@ -1000,7 +979,7 @@ Object {
   "functions": Array [
     Object {
       "at": 215,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "viewUniforms",
       ],
@@ -1021,7 +1000,7 @@ Object {
     },
     Object {
       "at": 312,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "viewUniforms",
       ],
@@ -1042,7 +1021,7 @@ Object {
     },
     Object {
       "at": 414,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "viewToClip",
         "worldToView",
@@ -1064,7 +1043,7 @@ Object {
     },
     Object {
       "at": 510,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "viewUniforms",
       ],
@@ -1085,7 +1064,7 @@ Object {
     },
     Object {
       "at": 629,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "viewUniforms",
       ],
@@ -1106,7 +1085,7 @@ Object {
     },
     Object {
       "at": 754,
-      "exported": true,
+      "flags": 1,
       "identifiers": Array [
         "viewToClip",
         "worldToView",
@@ -1127,7 +1106,8 @@ Object {
       ],
     },
   ],
-  "hash": "6e337xb8qt",
+  "globals": Array [],
+  "hash": "e624uz4crh",
   "modules": Array [],
   "symbols": Array [
     "worldToView",

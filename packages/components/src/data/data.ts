@@ -68,7 +68,7 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
     useSomeMemo(() => {
       for (const {buffer, array, dims, accessor, raw} of fieldBuffers) if (raw || data) {
         if (raw) copyNumberArray(raw, array);
-        else copyDataArray(data, array, dims, accessor);
+        else if (data) copyDataArray(data, array, dims, accessor as Accessor);
         uploadBuffer(device, buffer, array.buffer);
       }
     }, [device, data, fieldBuffers]);
@@ -78,7 +78,7 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
     useNoMemo();
     for (const {buffer, array, dims, accessor, raw} of fieldBuffers) if (raw || data) {
       if (raw) copyNumberArray(raw, array);
-      else copyDataArray(data, array, dims, accessor);
+      else if (data) copyDataArray(data, array, dims, accessor as Accessor);
       uploadBuffer(device, buffer, array.buffer);
     }
   }

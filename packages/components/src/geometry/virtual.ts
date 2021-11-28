@@ -1,5 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, StorageSource, RenderPassMode, ShaderLib } from '@use-gpu/core/types';
+import {
+  TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  VertexData, StorageSource, RenderPassMode, ShaderLib,
+} from '@use-gpu/core/types';
+import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
 import { yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
@@ -12,20 +16,20 @@ import { useBoundStorage } from '../hooks/useBoundStorage';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { loadModule } from '@use-gpu/shader';
 
-import instanceDrawVirtual from 'instance/draw/virtual.glsl';
-import instanceDrawWireframeStrip from 'instance/draw/wireframe-strip.glsl';
-import instanceFragmentSolid from 'instance/fragment/solid.glsl';
+import instanceDrawVirtual from '@use-gpu/glsl/instance/draw/virtual.glsl';
+import instanceDrawWireframeStrip from '@use-gpu/glsl/instance/draw/wireframe-strip.glsl';
+import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid.glsl';
 
 export type VirtualProps = {
-  topology: string,
+  topology: GPUPrimitiveTopology,
   vertexCount: number,
   instanceCount: number,
 
-  attributes: UniformAttribute[],
-  callbacks: UniformAttribute[],
+  attributes: UniformAttributeValue[],
+  lambdas: UniformAttributeValue[],
 
-  propBindings: any[],
-  codeBindings: ShaderLib<any>,
+  attrBindings: any[],
+  lambdaBindings: any[],
 
   links: ShaderLib<ParsedBundle | ParsedModule>
   defines: Record<string, any>,
@@ -35,11 +39,11 @@ export type VirtualProps = {
   id?: number,
 };
 
-const getDebugShader = (topology: string) => {
+const getDebugShader = (topology: GPUPrimitiveTopology) => {
   if (topology === 'triangle-strip') return instanceDrawWireframeStrip;
   // TODO
   if (topology === 'triangle-list') return instanceDrawWireframeStrip;
-  return '';
+  return instanceDrawWireframeStrip;
 }
 
 export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
@@ -66,7 +70,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
 
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
-  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext();  
+  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  
   const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoPicking();
 
   const resolvedContext = pickingContext?.renderContext ?? renderContext;
@@ -107,7 +111,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const [vertex, fragment] = useBoundShader(
     vertexShader,
     fragmentShader,
-    links,
+    links as any,
     accessors,
     defines,
     languages,

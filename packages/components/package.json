@@ -6,9 +6,11 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@use-gpu/live": "*",
     "@use-gpu/core": "*",
-    "@use-gpu/webgpu": "*"
+    "@use-gpu/live": "*",
+    "@use-gpu/webgpu": "*",
+    "@use-gpu/glsl": "*",
+    "@use-gpu/shader": "*"
   },
   "exports": {
     ".": "./src/index.ts"
@@ -19,7 +21,6 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-
     "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/components/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",

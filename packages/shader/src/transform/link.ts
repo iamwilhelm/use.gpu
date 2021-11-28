@@ -1,5 +1,5 @@
 import { Tree } from '@lezer/common';
-import { SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle } from '../types';
+import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF } from '../types';
 import { parseGLSL, defineGLSL, loadModule, loadModuleWithCache } from './shader';
 import { rewriteUsingAST, resolveShakeOps } from './ast';
 import { GLSL_VERSION } from '../constants';
@@ -23,7 +23,7 @@ export const linkCode = timed('linkCode', (
   code: string,
   libraries: Record<string, string> = {},
   linkDefs: Record<string, string> = {},
-  defines: Record<string, string> = {},
+  defines: Record<string, ShaderDefine> = {},
   cache: ParsedModuleCache | null = null,
 ) => {
   const main = loadModuleWithCache(code, 'main', cache);
@@ -38,7 +38,7 @@ export const linkCode = timed('linkCode', (
 export const linkBundle = timed('linkBundle', (
   bundle: ParsedBundle,
   links: Record<string, ParsedBundle | ParsedModule> = {},
-  defines: Record<string, string> = {},
+  defines: Record<string, ShaderDefine> = {},
 ) => {
   let [main, libs] = parseBundle(bundle);
 
@@ -58,7 +58,7 @@ export const linkModule = timed('linkModule', (
   main: ParsedModule,
   libraries: Record<string, ParsedModule> = {},
   linkDefs: Record<string, ParsedModule> = {},
-  defines: Record<string, string> = {},
+  defines: Record<string, ShaderDefine> = {},
 ) => {
   const [links, aliases] = parseLinkAliases(linkDefs);
   const {modules, exported} = loadModules(main, libraries, links);
@@ -72,22 +72,19 @@ export const linkModule = timed('linkModule', (
 
   for (const module of modules) {
     const {name, code, tree, table, shake} = module;
-    const {symbols, visibles, externals, modules} = table;
+    const {globals, symbols, visibles, externals, modules} = table;
 
-    // Namespace all global symbols
-    const namespace = reserveNamespace(module, namespaces, used);
+    // Namespace all non-global symbols other than main
     const rename = new Map<string, string>();
     if (module !== main) {
-      for (const name of symbols) {
-        rename.set(name, namespace + name);
-        exists.add(namespace + name);
-      }
-      for (const name of visibles) {
-        visible.add(namespace + name);
-      }
+      const namespace = reserveNamespace(module, namespaces, used);
+      for (const name of symbols) rename.set(name, namespace + name);
+      for (const name of globals) rename.set(name, name);
+      for (const name of visibles) visible.add(namespace + name);
+      for (const name of rename.values()) exists.add(name);
     }
 
-    // Replace imported symbols with target
+    // Replace imported symbol names with target
     for (const {name: module, imports} of modules) {
       const namespace = namespaces.get(module);
       for (const {name, imported} of imports) {
@@ -98,24 +95,25 @@ export const linkModule = timed('linkModule', (
       }
     }
 
-    // Replace imported function prototypes with target
-    for (const {optional, prototype} of externals) if (prototype) {
+    // Replace imported function prototype names with target
+    for (const {flags, prototype} of externals) if (prototype) {
       const {name} = prototype;
       const resolved = aliases.get(name) ?? name;
       const namespace = namespaces.get(name);
-      if (namespace === undefined && optional) continue;
+
+      if ((namespace === undefined) && (flags & RF.Optional)) continue;
 
       const imp = namespace + resolved;
-
       if (!exists.has(imp)) console.warn(`Link ${name}:${resolved} does not exist`);
       else if (!visible.has(imp)) console.warn(`Link ${name}:${resolved} is private`);
       rename.set(name, imp);
     }
 
-    // Shake tree based on which symbols were exported
+    // Shake tree ops based on which symbols were exported
     const keep = exported.get(name);
     const ops = shake && keep ? resolveShakeOps(shake, keep) : null;
 
+    // Rename symbols using AST while tree shaking
     program.push(rewriteUsingAST(code, tree, rename, ops));
   }
 
@@ -165,11 +163,11 @@ export const loadModules = timed('loadModules', (
     }
 
     // Recurse into links
-    for (const {prototype, optional} of externals) if (prototype) {
+    for (const {prototype, flags} of externals) if (prototype) {
       const {name} = prototype;
       const module = links[name];
       if (!module) {
-        if (optional) continue;
+        if (flags & RF.Optional) continue;
         throw new Error(`Unlinked function '${name}'`);
       }
 

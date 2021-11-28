@@ -1,20 +1,21 @@
-import { ShaderLanguages, ShaderLib } from '@use-gpu/core/types';
+import { ShaderLanguages, ShaderLib, ResolvedDataBindings, ResolvedCodeBindings } from '@use-gpu/core/types';
+import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
+
 import { makeBoundShader } from '@use-gpu/core';
 import { linkBundle as link, loadModule } from '@use-gpu/shader';
 import { useFiber } from '@use-gpu/live';
 import mapValues from 'lodash/mapValues';
 
 import { useMemo } from '@use-gpu/live';
-import { checkStorageType } from './storage';
 
-const NO_DEPS = [];
+const NO_DEPS = [] as any[];
 
 export const useBoundShader = (
   vertexShader: ParsedBundle,
   fragmentShader: ParsedBundle,
   codeBindings: ShaderLib<ParsedBundle | ParsedModule>,
   accessors: Record<string, string>,
-  defines: Record<string, string>,
+  defines: Record<string, ShaderDefine>,
   languages: ShaderLanguages,
   deps: any[] | null = null,
   base: number = 0,

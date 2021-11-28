@@ -132,7 +132,7 @@ export const yeet = <T>(
 export const provide = <T, C>(
   context: LiveContext<C>,
   value: T,
-  calls: LiveElement<any>,
+  calls: LiveElement<any> | undefined,
   key?: Key,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key});
 
@@ -140,15 +140,15 @@ export const provide = <T, C>(
 export const provideMemo = <T, C>(
   context: LiveContext<C>,
   value: T,
-  calls: LiveElement<any>,
+  calls: LiveElement<any> | undefined,
   key?: Key,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key});
 
 // Consume value from a co-context
 export const consume = <T, C>(
   context: LiveContext<C>,
-  calls: LiveElement<any>,
-  done?: LiveFunction<(r: T[]) => void>,
+  calls: LiveElement<any> | undefined,
+  done?: LiveFunction<(r: T) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key});
 
@@ -159,7 +159,10 @@ export const makeFunctionCall = <F extends Function>(
 ): FunctionCall<F> => ({f, args});
 
 // Make live context for holding shared data for child nodes
-export const makeContext = <T>(initialValue?: T, displayName?: string): LiveContext<T> => ({initialValue, displayName});
+export const makeContext = <T>(initialValue?: T | null, displayName?: string): LiveContext<T> => ({
+  initialValue: initialValue ?? undefined,
+  displayName,
+});
 export const createContext = makeContext;
 
 // Co-context value return type sugar

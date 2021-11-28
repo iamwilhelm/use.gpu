@@ -7,9 +7,6 @@ const LOADER_NAME = 'GLSL Loader';
 const schema = {
   type: 'object',
   properties: {
-    paths: {
-      type: 'array',
-    }
   },
 } as any;
 

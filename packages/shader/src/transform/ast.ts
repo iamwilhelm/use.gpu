@@ -16,10 +16,12 @@ import {
   QualifiedStructRef,
   ShakeTable,
   ShakeOp,
+  RefFlags as RF,
 } from '../types';
 import * as T from '../grammar/glsl.terms';
 import { GLSL_NATIVE_TYPES, HASH_KEY } from '../constants';
 import { toMurmur53 } from './hash';
+import uniq from 'lodash/uniq';
 
 const NO_DEPS = [] as string[];
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
@@ -32,7 +34,7 @@ const isSpace = (s: string, i: number) => {
 };
 
 export const getProgramHash = (code: string) => {
-  const uint = toMurmur53(code);
+  const uint = toMurmur53(code, HASH_KEY);
   return uint.toString(36).slice(-10);
 }
 
@@ -215,20 +217,19 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
   const getFunction = (node: SyntaxNode): FunctionRef => {
     const [a, b] = getNodes(node, 1);
-    const exported = isExported(node);
+    const flags = getFlags(node);
     const prototype = getPrototype(a);
     const at = node.from;
 
     const symbols = [prototype.name];
     const identifiers = b ? getIdentifiers(b, symbols) : [];
 
-    return {at, symbols, prototype, exported, identifiers};
+    return {at, symbols, identifiers, flags, prototype};
   };
 
   const getDeclaration = (node: SyntaxNode): DeclarationRef => {
     const [a] = getNodes(node);
-    const exported = isExported(node);
-    const optional = isOptional(node);
+    const flags = getFlags(node);
     const at = node.from;
 
     if (a.type.id === T.FunctionPrototype) {
@@ -238,7 +239,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
       const symbols = [name];
       const identifiers = getIdentifiers(node, symbols);
 
-      return {at, symbols, identifiers, prototype, exported, optional};
+      return {at, symbols, identifiers, flags, prototype};
     }
     if (a.type.id === T.VariableDeclaration) {
       const variable = getVariable(a);
@@ -249,7 +250,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
       const identifiers = getIdentifiers(node, symbols);
 
-      return {at, symbols, identifiers, variable, exported, optional};
+      return {at, symbols, identifiers, flags, variable};
     }
     if (a.type.id === T.QualifiedStructDeclaration) {
       const struct = getQualifiedStruct(a);
@@ -273,14 +274,36 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
       const identifiers = getIdentifiers(node, symbols);
 
-      return {at, symbols, identifiers, struct, exported, optional};
+      return {at, symbols, identifiers, flags, struct};
     }
     if (a.type.id === T.QualifiedDeclaration) {
       // TODO: are members global symbols?
-      return {at, symbols: [], identifiers: [], exported, optional};
+      console.warn('Unimplemented - T.QualifiedDeclaration');
+      return {at, symbols: [], identifiers: [], flags};
     }
     
     throw throwError('declaration', node);
+  };
+
+  const getFlags = (node: SyntaxNode) => {
+    return (
+      (isExported(node) ? RF.Exported : 0) |
+      (isOptional(node) ? RF.Optional : 0) |
+      (isGlobal(node)   ? RF.Global   : 0)
+    );
+  }
+
+  const isGlobal = (node: SyntaxNode): boolean => {  
+    const pragma = node.prevSibling;
+
+    if (!pragma || pragma.type.id !== T.Preprocessor) return false;
+
+    const [a, b] = getNodes(pragma, 2);
+    const directive = getText(a);
+    if (directive !== 'pragma') return false;
+
+    const verb = getText(b);
+    return verb === 'global' || isGlobal(pragma);
   };
 
   const isExported = (node: SyntaxNode): boolean => {  
@@ -293,7 +316,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     if (directive !== 'pragma') return false;
 
     const verb = getText(b);
-    return verb === 'export';
+    return verb === 'export' || isExported(pragma);
   };
 
   const isOptional = (node: SyntaxNode): boolean => {  
@@ -306,7 +329,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     if (directive !== 'pragma') return false;
 
     const verb = getText(b);
-    return verb === 'optional';
+    return verb === 'optional' || isOptional(pragma);
   };
 
   const getIdentifiers = (node: SyntaxNode, exclude: string[] = []): string[] => {
@@ -393,21 +416,23 @@ export const makeASTParser = (code: string, tree: Tree) => {
       .filter(d => !functions.find(f => f.prototype.name === d.prototype!.name));
 
     const refs = [...functions, ...declarations];
-    const exported = [...functions, ...declarations].filter(d => d.exported);
-    
-    const visibles = exported.flatMap(r => r.symbols);
-    const symbols = refs.flatMap(r => r.symbols);
+    const exported = refs.filter(d => d.flags & RF.Exported);
+    const globalled = refs.filter(d => d.flags & RF.Global);
 
-    const globals = new Set(symbols);
+    const visibles = uniq(exported.flatMap(r => r.symbols));
+    const globals = uniq(globalled.flatMap(r => r.symbols));
+    const symbols = uniq(refs.flatMap(r => r.symbols));
+
+    const scope = new Set(symbols);
     for (let ref of refs) if (ref.identifiers) {
-      ref.identifiers = ref.identifiers.filter(s => globals.has(s));
+      ref.identifiers = ref.identifiers.filter(s => scope.has(s));
     }
 
-    return {hash, symbols, visibles, externals, modules, functions, declarations};
+    return {hash, symbols, visibles, globals, externals, modules, functions, declarations};
   }
 
   const getShakeTable = (table: SymbolTable = getSymbolTable()): ShakeTable | undefined => {
-    const {symbols, functions, declarations} = table;
+    const {functions, declarations} = table;
     const refs = [...functions, ...declarations] as (FunctionRef | DeclarationRef)[];
     refs.sort((a, b) => a.at - b.at);
 
@@ -517,7 +542,8 @@ export const rewriteUsingAST = (
       cursor.lastChild();
     }
     // #pragma import/export
-    else if (type.name === 'import' || type.name === 'export' || type.name === 'optional') {
+    else if (type.name === 'import' || type.name === 'export' ||
+             type.name === 'optional' || type.name === 'global') {
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
@@ -553,17 +579,22 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
   const cursor = tree.cursor();
   do {
     const {type, from, to} = cursor;
-    if (type.name === 'version') {
+    if (type.name === 'Declaration' || type.name === 'FunctionDefinition') {
+      if (cursor.node.parent?.type.name === 'Program') shake(from, to);
+    }
+    else if (type.name === 'Identifier' || type.name === 'Id') {
+      const {from, to} = cursor;
+      ident(from, to);
+    }
+    else if (type.name === 'version') {
       cursor.parent();
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
       cursor.lastChild();
     }
-    else if (type.name === 'Declaration' || type.name === 'FunctionDefinition') {
-      if (cursor.node.parent?.type.name === 'Program') shake(from, to);
-    }
-    else if (type.name === 'import' || type.name === 'export' || type.name === 'optional') {
+    else if (type.name === 'import' || type.name === 'export' ||
+             type.name === 'optional' || type.name === 'global') {
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
@@ -574,10 +605,6 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
       do {} while (sub.firstChild());
       ident(sub.from, sub.to);
       cursor.lastChild();
-    }
-    else if (type.name === 'Identifier' || type.name === 'Id') {
-      const {from, to} = cursor;
-      ident(from, to);
     }
   } while (cursor.next());
 

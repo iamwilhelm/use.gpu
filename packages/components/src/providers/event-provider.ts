@@ -39,7 +39,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
     y: 0,
   });
 
-  const allocId = useOne(() => makeIdAllocator<OnPick>());
+  const allocId = useOne(() => makeIdAllocator<any>());
   const [mouseTargetId, mouseTargetIndex] = sampleTexture(mouseState.x, mouseState.y);
 
   const eventApi = useOne(() => ({
@@ -67,7 +67,8 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
   }, mouseTargetId);
 
   useResource((dispose) => {
-    let left, top;
+    let left: number;
+    let top: number;
 
     const onSnapshot = () => ({left, top} = element.getBoundingClientRect());
     onSnapshot();
@@ -81,19 +82,19 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
     };
 
     const onTouchStart = (e: TouchEvent) => {
-      const {targetTouches: [touch]} = e;
+      const {targetTouches: [touch]} = e as any;
       const {clientX, clientY} = touch;
       onMove(1, clientX, clientY);
     }
 
     const onTouchMove = (e: TouchEvent) => {
-      const {targetTouches: [touch]} = e;
+      const {targetTouches: [touch]} = e as any;
       const {clientX, clientY} = touch;
       onMove(1, clientX, clientY);
     }
 
     const onTouchEnd = (e: TouchEvent) => {
-      const {targetTouches: [touch]} = e;
+      const {targetTouches: [touch]} = e as any;
       if (!touch.length) setMouseState((state) => ({...state, buttons: 0}));
     }
 

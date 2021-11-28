@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "test": "rm -rf ./node_modules; mkdir ./node_modules 2>/dev/null; mkdir ./node_modules/@use-gpu 2>/dev/null; cp -r ../../build/packages/* node_modules/@use-gpu; yarn run test:ts-node && yarn run test:webpack",
-    "test:ts-node": "../../node_modules/.bin/ts-node ./ts-node.ts",
-    "test:webpack": "../../node_modules/.bin/webpack build; ../../node_modules/.bin/ts-node ./webpack.ts"
+    "test:ts-node": "../../node_modules/.bin/ts-node ./src/ts-node.ts",
+    "test:webpack": "../../node_modules/.bin/webpack build; ../../node_modules/.bin/ts-node ./src/webpack.ts"
   }
 }

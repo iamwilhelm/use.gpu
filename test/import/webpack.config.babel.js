@@ -4,7 +4,7 @@ export default {
   mode: 'development',
   entry: {
     app: {
-      import: './import-tests.ts',
+      import: './src/import-tests.ts',
     }
   },
   output: {

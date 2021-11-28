@@ -3,9 +3,9 @@
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "src",
-    "typeRoots": ["../../node_modules/@types"],
+    "typeRoots": ["../node_modules/@types"],
     "outDir": "../../build/packages",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
-  "include": ["src/**/*.ts", "src/**/*.js"]
+  "include": ["src/**/*.ts", "src/**/*.js", "glsl.ts", "types.ts"]
 }

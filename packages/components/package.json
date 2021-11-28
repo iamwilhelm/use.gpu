@@ -9,6 +9,7 @@
     "@use-gpu/live": "*",
     "@use-gpu/core": "*",
     "@use-gpu/webgpu": "*",
+
     "@use-gpu/shader": "*",
     "@use-gpu/glsl": "*"
   },

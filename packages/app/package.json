@@ -22,7 +22,6 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-
     "build": "yarn run build:types && yarn run build:js && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/app/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",

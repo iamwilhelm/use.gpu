@@ -2,14 +2,19 @@
   "extends": "../../tsconfig.pkg.json",
   "references": [
     { "path": "../glsl" },
-    { "path": "../shader" }
+    { "path": "../shader" },
+    { "path": "../live" },
+    { "path": "../core" },
+    { "path": "../webgpu" },
   ],
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "src",
-    "typeRoots": ["../../node_modules/@types"],
+    "types": ["@webgpu/types", "jest", "glsl-files"],
+    "typeRoots": ["../../node_modules/@types", "../glsl/types"],
     "outDir": "../../build/packages",
-    "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
+    "traceResolution": true
   },
   "include": ["src/**/*.ts", "../glsl/**/*.glsl"]
 }

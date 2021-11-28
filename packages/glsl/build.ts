@@ -6,7 +6,7 @@ import { loadModule } from '@use-gpu/shader/glsl';
 
 const PACKAGE_JSON = './package.json';
 const INDEX_TS = './src/index.ts';
-const TYPEDEF_TS = './src/glsl.d.ts';
+const TYPEDEF_TS = './types/glsl-files/index.d.ts';
 const TARGET = '../../build/packages/glsl';
 
 const files = glob.sync('./**/*.glsl');
@@ -48,7 +48,10 @@ try {
   const PKG = JSON.parse(fs.readFileSync(PACKAGE_JSON).toString());
   PKG.exports = {".": "./src/index.ts"};
   for (let path of paths) {
-    PKG.exports[path.replace('src/', '')] = path;
+    PKG.exports[path.replace('src/', '')] = {
+      "types": "./types/glsl-files/index.d.ts",
+      "import": path,
+    };
   }
   const json = JSON.stringify(PKG, null, 2);
   fs.writeFileSync(PACKAGE_JSON, json);

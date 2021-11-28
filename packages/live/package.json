@@ -5,12 +5,9 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
-  "typesVersions": {
-    "*": { "types": ["src/types"] }
-  },
   "exports": {
-    ".": "./src/index.ts",
-    "./types": "./src/types.ts"
+    ".": "./src/index",
+    "./types": "./src/types"
   },
   "scripts": {
     "test": "jest --watch",

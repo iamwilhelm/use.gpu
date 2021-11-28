@@ -1,8 +1,13 @@
 {
   "extends": "../../tsconfig.pkg.json",
   "references": [
+    { "path": "../live" },
+    { "path": "../core" },
+    { "path": "../webgpu" },
     { "path": "../glsl" },
-    { "path": "../shader" }
+    { "path": "../shader" },
+    { "path": "../components" },
+    { "path": "../inspect" }
   ],
   "compilerOptions": {
     "rootDir": "..",

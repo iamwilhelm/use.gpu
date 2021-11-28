@@ -441,31 +441,6 @@ Object {
 }
 `;
 
-exports[`ast gets shake information for AST 1`] = `
-Array [
-  Array [
-    1,
-    Array [
-      "x",
-      "getA",
-      "getB",
-    ],
-  ],
-  Array [
-    38,
-    Array [
-      "getA",
-    ],
-  ],
-  Array [
-    83,
-    Array [
-      "getB",
-    ],
-  ],
-]
-`;
-
 exports[`ast gets shake information for geometry/quad AST 1`] = `
 Array [
   Array [
@@ -536,66 +511,6 @@ Array [
     97,
     Array [
       "MeshVertex",
-    ],
-  ],
-]
-`;
-
-exports[`ast gets shake information for use/view AST 1`] = `
-Array [
-  Array [
-    15,
-    Array [
-      "viewUniforms",
-      "ViewUniforms",
-      "worldToView",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "worldToClip",
-      "worldToClip3D",
-      "worldToClip",
-      "worldToClip3D",
-    ],
-  ],
-  Array [
-    215,
-    Array [
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-    ],
-  ],
-  Array [
-    312,
-    Array [
-      "viewToClip",
-      "worldToClip",
-      "worldToClip3D",
-    ],
-  ],
-  Array [
-    414,
-    Array [
-      "worldToClip",
-    ],
-  ],
-  Array [
-    510,
-    Array [
-      "clipToScreen3D",
-    ],
-  ],
-  Array [
-    629,
-    Array [
-      "screenToClip3D",
-    ],
-  ],
-  Array [
-    754,
-    Array [
-      "worldToClip3D",
     ],
   ],
 ]
@@ -866,9 +781,7 @@ Object {
     Object {
       "at": 15,
       "exported": true,
-      "identifiers": Array [
-        "SolidVertex",
-      ],
+      "identifiers": Array [],
       "optional": false,
       "symbols": Array [
         "SolidVertex",
@@ -904,9 +817,7 @@ Object {
     Object {
       "at": 97,
       "exported": true,
-      "identifiers": Array [
-        "MeshVertex",
-      ],
+      "identifiers": Array [],
       "optional": false,
       "symbols": Array [
         "MeshVertex",
@@ -1319,11 +1230,6 @@ Array [
     248,
   ],
   Array [
-    "Shake",
-    255,
-    288,
-  ],
-  Array [
     "Id",
     259,
     270,
@@ -1334,11 +1240,6 @@ Array [
     287,
   ],
   Array [
-    "Shake",
-    291,
-    328,
-  ],
-  Array [
     "Id",
     295,
     308,
@@ -1347,11 +1248,6 @@ Array [
     "Id",
     311,
     327,
-  ],
-  Array [
-    "Shake",
-    332,
-    386,
   ],
   Array [
     "Id",
@@ -1465,19 +1361,9 @@ Array [
     45,
   ],
   Array [
-    "Shake",
-    56,
-    70,
-  ],
-  Array [
     "Id",
     62,
     63,
-  ],
-  Array [
-    "Shake",
-    77,
-    99,
   ],
   Array [
     "Id",
@@ -1488,11 +1374,6 @@ Array [
     "Id",
     87,
     95,
-  ],
-  Array [
-    "Shake",
-    106,
-    113,
   ],
   Array [
     "Id",
@@ -1542,14 +1423,11 @@ exports[`ast shakes simple program 2`] = `
 "
 const float x = 1.0;
 
-
 float getA() {
   return x;
 }
 
-
-
-    "
+"
 `;
 
 exports[`ast shakes use/view AST 1`] = `
@@ -1558,15 +1436,13 @@ Array [
     15,
     Array [
       "viewUniforms",
-      "ViewUniforms",
       "worldToView",
+      "worldToClip",
+      "worldToClip3D",
       "viewToClip",
       "clipToScreen3D",
       "screenToClip3D",
-      "worldToClip",
-      "worldToClip3D",
-      "worldToClip",
-      "worldToClip3D",
+      "ViewUniforms",
     ],
   ],
   Array [
@@ -1613,8 +1489,7 @@ Array [
 `;
 
 exports[`ast shakes use/view AST 2`] = `
-"
-layout(set = 0, binding = VIEW_BINDING) uniform ViewUniforms {
+"layout(set = 0, binding = VIEW_BINDING) uniform ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;
@@ -1622,28 +1497,17 @@ layout(set = 0, binding = VIEW_BINDING) uniform ViewUniforms {
   vec2 viewSize;
 } viewUniforms;
 
-
 vec4 worldToView(vec4 position) {
   return viewUniforms.viewMatrix * position;
 }
-
 
 vec4 viewToClip(vec4 position) {
   return viewUniforms.projectionMatrix * position;
 }
 
-
 vec4 worldToClip(vec4 position) {
   return viewToClip(worldToView(position));
 }
-
-
-
-
-
-
-
-
 
 "
 `;
@@ -1654,75 +1518,13 @@ Array [
     15,
     Array [
       "viewUniforms",
+      "worldToView",
+      "worldToClip",
+      "worldToClip3D",
+      "viewToClip",
+      "clipToScreen3D",
+      "screenToClip3D",
       "ViewUniforms",
-      "worldToView",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "worldToClip",
-      "worldToClip3D",
-      "worldToClip",
-      "worldToClip3D",
-    ],
-  ],
-  Array [
-    215,
-    Array [
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-    ],
-  ],
-  Array [
-    312,
-    Array [
-      "viewToClip",
-      "worldToClip",
-      "worldToClip3D",
-    ],
-  ],
-  Array [
-    414,
-    Array [
-      "worldToClip",
-    ],
-  ],
-  Array [
-    510,
-    Array [
-      "clipToScreen3D",
-    ],
-  ],
-  Array [
-    629,
-    Array [
-      "screenToClip3D",
-    ],
-  ],
-  Array [
-    754,
-    Array [
-      "worldToClip3D",
-    ],
-  ],
-]
-`;
-
-exports[`ast shakes use/view AST using compressedAST 1`] = `
-Array [
-  Array [
-    15,
-    Array [
-      "viewUniforms",
-      "ViewUniforms",
-      "worldToView",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "worldToClip",
-      "worldToClip3D",
-      "worldToClip",
-      "worldToClip3D",
     ],
   ],
   Array [

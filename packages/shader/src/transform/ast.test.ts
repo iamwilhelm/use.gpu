@@ -308,7 +308,7 @@ float getB() {
     
   });
 
-  fit('gets shake information for use/types AST', () => {
+  it('gets shake information for use/types AST', () => {
     const code = GLSLModules['use/types'];
 
     const tree = parseGLSL(code);

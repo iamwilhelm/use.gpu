@@ -21,7 +21,7 @@ import { Lines } from './lines';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 
-import { circle, diamond, circleOutlined } from '@use-gpu/glsl/mask/point.glsl';
+import { circle, diamond, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/glsl/mask/point.glsl';
 
 export type AppProps = {
   device: GPUDevice,
@@ -83,7 +83,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             );
           },
           render: (positions) => [
-            use(Quads)({ positions, size: 50, getMask: circleOutlined }),
+            use(Quads)({ positions, size: 50, getMask: circle }),
             //use(Quads)({ positions, size: 50, id: 2, mode: RenderPassMode.Picking }),
             //use(Quads)({ positions, size: 50, mode: RenderPassMode.Debug }),
           ],

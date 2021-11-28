@@ -72,7 +72,6 @@ function glslLoader(this: any, source: string) {
     exportDefault,
     ...exportSymbols,
   ].join("\n");
-  console.log(output)
 
   return output;
 }

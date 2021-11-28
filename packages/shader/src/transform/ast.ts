@@ -24,9 +24,12 @@ import { toMurmur53 } from './hash';
 const NO_DEPS = [] as string[];
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
 
-const unescape = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
+const parseString = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
-function nodeToString(this: SyntaxNode) { return `[${this.type.name}]`; }
+const isSpace = (s: string, i: number) => {
+  const c = s.charCodeAt(i);
+  return c === 32 || c === 13 || c === 10 || c === 9;
+};
 
 export const getProgramHash = (code: string) => {
   const uint = toMurmur53(code);
@@ -46,12 +49,9 @@ export const getChildNodes = (node: SyntaxNode) => {
   const out = [] as SyntaxNode[];
   let n = node.firstChild;
   while (n) {
-    // @ts-ignore
-    n.__proto__.toJSON = nodeToString;
     out.push(n);
     n = n.nextSibling;
   }
-
   return out;
 }
 
@@ -348,11 +348,11 @@ export const makeASTParser = (code: string, tree: Tree) => {
       let refs: ImportRef[];
       if (c.type.id === T.String) {
         refs = [];
-        module = unescape(getText(c));
+        module = parseString(getText(c));
       } 
       else {
         refs = getNodes(c).map(getImport);
-        module = unescape(getText(d));
+        module = parseString(getText(d));
       }
 
       let items = modules[module];
@@ -425,18 +425,22 @@ export const makeASTParser = (code: string, tree: Tree) => {
       }
     }
 
-    const getAll = (ss: string[]): string[] => ss.length
-      ? [...ss, ...ss.flatMap(s => {
+    const getAll = (ss: string[], accum: Set<string>): Set<string> => {
+      if (ss.length) {
+        for (let s of ss) {
+          accum.add(s);
           const deps = graph.get(s);
-          return deps ? getAll(deps) : NO_DEPS;
-        })]
-      : NO_DEPS;
+          if (deps?.length) getAll(deps, accum);
+        }
+      }
+      return accum;
+    }
 
     const out = [] as ShakeOp[];
     for (const ref of refs) {
       const {at, symbols} = ref;
-      const deps = getAll(symbols);
-      if (deps.length) out.push([at, deps]);
+      const deps = getAll(symbols, new Set());
+      if (deps.size) out.push([at, Array.from(deps)]);
     }
 
     return out.length ? out : undefined;
@@ -478,6 +482,7 @@ export const rewriteUsingAST = (
     pos = to;
 
     if (replace != null) out = out + replace;
+    else while (isSpace(code, pos)) pos++;
   }
 
   const cursor = tree.cursor();
@@ -485,14 +490,14 @@ export const rewriteUsingAST = (
     const {type, from, to} = cursor;
     // Injected by compressed AST only: Skip, Shake, Id
 
-    if (type.name === 'Skip') skip(from, to, '');
+    if (type.name === 'Skip') skip(from, to);
     
     // Top level declaration
     else if (type.name === 'Declaration' || type.name === 'FunctionDefinition' || type.name === 'Shake') {
       if (cursor.node.parent?.type.name !== 'Program') continue;
       if (!shakes) continue;
       if (shakes.has(from)) {
-        skip(from, to, '');
+        skip(from, to);
         cursor.lastChild();
       }
     }
@@ -508,14 +513,14 @@ export const rewriteUsingAST = (
       cursor.parent();
       cursor.parent();
       const {from, to} = cursor;
-      skip(from, to, '');
+      skip(from, to);
       cursor.lastChild();
     }
     // #pragma import/export
     else if (type.name === 'import' || type.name === 'export' || type.name === 'optional') {
       cursor.parent();
       const {from, to} = cursor;
-      skip(from, to, '');
+      skip(from, to);
       cursor.lastChild();
     }
     // Field accessor

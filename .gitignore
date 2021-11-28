@@ -4,6 +4,5 @@ node_modules
 yarn-error.log
 coverage
 tsconfig.tsbuildinfo
-packages/babel-parser/benchmark
-packages/babel-parser/test
 .DS_Store
+test/import/node_modules

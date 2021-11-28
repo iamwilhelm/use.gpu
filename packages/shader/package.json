@@ -5,13 +5,6 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
-  "typesVersions": {
-    "*": {
-      "types": [
-        "src/types"
-      ]
-    }
-  },
   "exports": {
     ".": "./src/index.ts",
     "./types": "./src/types.ts",
@@ -22,8 +15,10 @@
     "@lezer/common": "^0.15.8",
     "@lezer/generator": "^0.15.2",
     "@lezer/lr": "^0.15.4",
-    "@types/lru-cache": "^5.1.1",
     "lru-cache": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/lru-cache": "^5.1.1"
   },
   "scripts": {
     "test": "jest --watch",
@@ -34,7 +29,7 @@
     "build": "yarn run build:grammar && yarn run build:types && yarn run build:js && yarn run build:pkg",
     "build:grammar": "yarn run lezer-generator src/grammar/glsl.grammar -o src/grammar/glsl.js",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/shader/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:js": "babel src --out-dir ../../build/packages/shader/src --extensions \".ts,.js\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel glsl.ts --out-dir ../../build/packages/shader --extensions \".ts\"",
     "build:pkg": "cp package.json ../../build/packages/shader"
   }
 }

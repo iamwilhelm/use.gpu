@@ -13,9 +13,6 @@
     "@use-gpu/shader": "*",
     "@use-gpu/glsl": "*"
   },
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "scripts": {
     "test": "jest --watch",
     "lint": "eslint src --ext ts",

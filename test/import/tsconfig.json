@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node12",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+  },
+  "include": ["ts-node.ts"]
+}

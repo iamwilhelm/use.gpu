@@ -4,6 +4,7 @@ const {NODE_ENV} = process.env;
 const isDevelopment = NODE_ENV === 'development';
 
 export default {
+  mode: 'development',
   entry: {
     app: {
       import: './packages/app/src/index.ts',

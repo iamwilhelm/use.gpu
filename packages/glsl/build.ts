@@ -51,6 +51,7 @@ try {
     PKG.exports[path.replace('src/', '')] = {
       "types": path.replace(/.glsl$/, '.d.ts'),
       "import": path,
+      "require": path,
     };
   }
   const json = JSON.stringify(PKG, null, 2);

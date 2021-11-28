@@ -15,12 +15,13 @@
     "@babel/preset-typescript": "^7.14.5",
     "@babel/register": "^7.14.5",
     "@types/jest": "^26.0.19",
+    "@types/webpack": "^5.10.0",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "@webgpu/types": "^0.1.7",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
-    "css-loader": "^6.5.1",
+    "css-loader": "^6.0.0",
     "eslint": "^7.5.0",
     "jest": "^27.2.0",
     "lerna": "^4.0.0",
@@ -28,17 +29,19 @@
     "style-loader": "^3.3.1",
     "ts-jest": "^27.0.0",
     "ts-node": "^10.4.0",
-    "typescript": "^4.5.2",
-    "webpack": "^5.10.1",
+    "typescript": "^4.6.0-dev.20211126",
+    "webpack": "5.10.1",
     "webpack-cli": "^4.2.0",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.0",
+    "wsrun": "^5.2.4"
   },
   "browserslist": [
     "last 1 chrome version",
     "last 1 firefox version"
   ],
   "scripts": {
-    "build": "yarn lerna run build --concurrency 1; ts-node scripts/to-index-js.ts",
+    "build": "yarn wsrun run build && yarn run pkg && (pushd test/import; yarn run test)",
+    "pkg": "ts-node scripts/to-index-js.ts",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "jest --watch",
     "lint": "eslint packages/**/src --ext ts",
@@ -91,6 +94,5 @@
     "packages/components",
     "packages/inspect",
     "packages/app"
-  ],
-  "dependencies": {}
+  ]
 }

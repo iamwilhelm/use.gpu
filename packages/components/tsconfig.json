@@ -10,11 +10,10 @@
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "src",
-    "types": ["@webgpu/types", "jest", "glsl-files"],
-    "typeRoots": ["../../node_modules/@types", "../glsl/types"],
+    "typeRoots": ["../../node_modules/@types"],
     "outDir": "../../build/packages",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
-    "traceResolution": true
+    "moduleResolution": "node12"
   },
   "include": ["src/**/*.ts", "../glsl/**/*.glsl"]
 }

@@ -5,7 +5,6 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
-  "types": "./types/glsl-files/index.d.ts",
   "scripts": {
     "test": "jest --watch",
     "lint": "eslint src --ext ts",
@@ -23,87 +22,87 @@
   "exports": {
     ".": "./src/index.ts",
     "./fragment/pbr.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/fragment/pbr.d.ts",
       "import": "./src/fragment/pbr.glsl"
     },
     "./geometry/line.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/geometry/line.d.ts",
       "import": "./src/geometry/line.glsl"
     },
     "./geometry/quad.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/geometry/quad.d.ts",
       "import": "./src/geometry/quad.glsl"
     },
     "./geometry/strip.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/geometry/strip.d.ts",
       "import": "./src/geometry/strip.glsl"
     },
     "./instance/draw/mesh.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/draw/mesh.d.ts",
       "import": "./src/instance/draw/mesh.glsl"
     },
     "./instance/draw/virtual.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/draw/virtual.d.ts",
       "import": "./src/instance/draw/virtual.glsl"
     },
     "./instance/draw/wireframe-strip.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/draw/wireframe-strip.d.ts",
       "import": "./src/instance/draw/wireframe-strip.glsl"
     },
     "./instance/fragment/mesh.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/fragment/mesh.d.ts",
       "import": "./src/instance/fragment/mesh.glsl"
     },
     "./instance/fragment/solid.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/fragment/solid.d.ts",
       "import": "./src/instance/fragment/solid.glsl"
     },
     "./instance/geometry/line.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/geometry/line.d.ts",
       "import": "./src/instance/geometry/line.glsl"
     },
     "./instance/geometry/quad.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/geometry/quad.d.ts",
       "import": "./src/instance/geometry/quad.glsl"
     },
     "./instance/geometry/strip.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/geometry/strip.d.ts",
       "import": "./src/instance/geometry/strip.glsl"
     },
     "./instance/vertex/line.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/vertex/line.d.ts",
       "import": "./src/instance/vertex/line.glsl"
     },
     "./instance/vertex/quad.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/instance/vertex/quad.d.ts",
       "import": "./src/instance/vertex/quad.glsl"
     },
     "./mask/point.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/mask/point.d.ts",
       "import": "./src/mask/point.glsl"
     },
     "./use/light.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/use/light.d.ts",
       "import": "./src/use/light.glsl"
     },
     "./use/picking.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/use/picking.d.ts",
       "import": "./src/use/picking.glsl"
     },
     "./use/types.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/use/types.d.ts",
       "import": "./src/use/types.glsl"
     },
     "./use/view.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/use/view.d.ts",
       "import": "./src/use/view.glsl"
     },
     "./vertex/line.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/vertex/line.d.ts",
       "import": "./src/vertex/line.glsl"
     },
     "./vertex/quad.glsl": {
-      "types": "./types/glsl-files/index.d.ts",
+      "types": "./src/vertex/quad.d.ts",
       "import": "./src/vertex/quad.glsl"
     }
   }

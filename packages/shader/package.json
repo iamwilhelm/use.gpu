@@ -15,9 +15,11 @@
     "@lezer/common": "^0.15.8",
     "@lezer/generator": "^0.15.2",
     "@lezer/lr": "^0.15.4",
-    "lru-cache": "^6.0.0"
+    "lru-cache": "^6.0.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.176",
     "@types/lru-cache": "^5.1.1"
   },
   "scripts": {

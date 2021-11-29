@@ -41,7 +41,7 @@
   "scripts": {
     "build": "yarn wsrun run build && yarn run pkg && yarn run test:import",
     "pkg": "ts-node scripts/package-json.ts",
-    "publish": "yarn run build; yarn run publish build/packages/shader build/packages/glsl-loader",
+    "publish": "yarn run build; yarn publish build/packages/shader build/packages/glsl-loader",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "jest --watch",
     "test:import": "(cd test/import; yarn run test)",

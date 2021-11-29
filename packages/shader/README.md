@@ -257,6 +257,7 @@ Load a module from the given cache, or parse it if missing.
   entry?: string,
   cache: LRU | null = null,
 ) => ParsedModule;
+```
 
 #### `makeModuleCache(...)`
 
@@ -265,7 +266,7 @@ Wrapper around npm `LRU`.
 
 ### Type Summary
 
-```
+```ts
 export type ParsedModule = {
   name: string,
   code: string,

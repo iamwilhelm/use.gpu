@@ -7,7 +7,7 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import {
   AutoCanvas,
   Loop, Draw, Pass,
-  Data, RawData,
+  Data, RawData, Inline,
   OrbitCamera, OrbitControls,
   Picking, Pick, EventProvider,
   Cursor,
@@ -57,6 +57,9 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const mesh = makeMesh();
 
   const view = [
+    use(Inline)((fiber: RawFiber) => {
+      t = t + 1/60;
+    }),
     use(Pass)({
       children: [
         use(Data)({
@@ -71,8 +74,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(RawData)({
           format: 'vec4',
           length: 100,
+          live: true,
           expr: (emit: Emitter, i: number) => {
-            t = t + 1/6000;
             const s = ((i*i + i) % 13133.371) % 1000;
             emit(
               Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
@@ -86,7 +89,6 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             //use(Quads)({ positions, size: 50, id: 2, mode: RenderPassMode.Picking }),
             //use(Quads)({ positions, size: 50, mode: RenderPassMode.Debug }),
           ],
-          live: true,
         }),
         /*
         use(Data)({

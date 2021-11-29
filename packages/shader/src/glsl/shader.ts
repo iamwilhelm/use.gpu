@@ -32,7 +32,7 @@ export const loadModuleWithCache = (
   code: string,
   name: string,
   entry?: string,
-  cache: ParsedModuleCache | null = null,
+  cache: ParsedModuleCache | null = DEFAULT_CACHE,
 ): ParsedModule => {
   if (!cache) return loadModule(code, name, entry, true);
 
@@ -66,3 +66,5 @@ export const makeModuleCache = (options: Record<string, any> = {}) => new LRU<st
   max: 100,
   ...options,
 });
+
+export const DEFAULT_CACHE = makeModuleCache();

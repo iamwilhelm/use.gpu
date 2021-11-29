@@ -1,14 +1,13 @@
 import { Tree } from '@lezer/common';
 import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF } from '../types';
-import { parseShader, defineConstants, loadModule, loadModuleWithCache, makeModuleCache } from './shader';
+import { parseShader, defineConstants, loadModule, loadModuleWithCache } from './shader';
 import { rewriteUsingAST, resolveShakeOps } from './ast';
 import { parseBundle } from '../util/bundle';
 import { getGraphOrder } from '../util/tree';
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
 import mapValues from 'lodash/mapValues';
-
-const CACHE = makeModuleCache();
+import { DEFAULT_CACHE } from './shader';
 
 const TIMED = false;
 
@@ -22,13 +21,18 @@ const timed = (name: string, f: any) => {
   }
 }
 
+// Override GLSL version/prefix
+let PREAMBLE = `#version ${GLSL_VERSION}`;
+export const setPreamble = (s: string): string => PREAMBLE = s;
+export const getPreamble = (): string => PREAMBLE;
+
 // Link a source module with static modules and dynamic links.
 export const linkCode = timed('linkCode', (
   code: string,
   libraries: Record<string, string> = {},
   linkDefs: Record<string, string> = {},
   defines: Record<string, ShaderDefine> = {},
-  cache: ParsedModuleCache | null = CACHE,
+  cache: ParsedModuleCache | null = DEFAULT_CACHE,
 ) => {
   const main = loadModuleWithCache(code, 'main', undefined, cache);
 
@@ -69,7 +73,7 @@ export const linkModule = timed('linkModule', (
   const [links, aliases] = parseLinkAliases(linkDefs);
   const {modules, exported} = loadModules(main, libraries, links);
 
-  const program = [`#version ${GLSL_VERSION}`, defineConstants(defines)] as string[];
+  const program = [getPreamble(), defineConstants(defines)] as string[];
 
   const namespaces = new Map<string, string>();
   const used = new Set<string>();

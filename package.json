@@ -1,6 +1,6 @@
 {
   "name": "use.gpu",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "index.js",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",

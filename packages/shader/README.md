@@ -14,8 +14,15 @@ yarn add @use-gpu/shader
 
 It enables two kinds of imports to be used:
 
-- **Static - ES Style** - `#pragma import { getColor } from 'path/to/color'` (functions, declarations and types)
-- **Dynamic - Function Prototype** - `vec4 getColor();` (linked at run-time)
+ - **Static - ES Style** 
+```
+#pragma import { getColor } from 'path/to/color'` (functions, declarations and types)
+```
+ - **Dynamic - Function Prototype**
+
+```
+vec4 getColor();` (linked at run-time)
+```
 
 This allows you to split up and organize your GLSL code as you see fit, as well as create dynamic shader permutations.
 

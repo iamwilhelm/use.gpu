@@ -47,7 +47,8 @@
     "test:import": "(cd test/import; yarn run test)",
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
-    "coverage": "yarn wsrun run coverage"
+    "coverage": "yarn wsrun run coverage",
+    "postinstall": "(cd packages/glsl; yarn run build)"
   },
   "jest": {
     "preset": "ts-jest",

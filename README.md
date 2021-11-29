@@ -45,13 +45,3 @@ This is a work in progress. Stability:
 - `yarn build` - Build packages
 - `yarn test` - Run unit tests
 
-## Code
-
-**Live**
- - `packages/live`: Live core (aka headless React)
-
-**WebGPU**
- - `packages/app`: Simple test app for WebGPU.
- - `packages/components`: Demo WebGPU Live components.
- - `packages/core`: WebGPU sanity helpers
- - `packages/webgpu`: WebGPU canvas mounter

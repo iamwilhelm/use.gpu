@@ -1,5 +1,6 @@
 import { GLSLModules } from '@use-gpu/glsl';
-import { linkCode } from './link';
+import { linkCode, linkModule } from './link';
+import { loadModule } from './shader';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
@@ -85,4 +86,33 @@ describe("link", () => {
 
   });
   
+  it("links same module twice with different entry point", () => {
+
+    const sub = `
+    #pragma export
+    vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+
+    #pragma export
+    vec4 getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    `
+
+    const main = `
+    vec4 getPosition(int index);
+    vec4 getColor(int index);
+    void main() {
+      vec4 a = getPosition(0);
+      vec4 b = getColor(0);
+    }
+    `
+
+    const modMain = loadModule(main, 'main');
+    const modSub = loadModule(sub, 'sub');
+
+    const getPosition = {...modSub, entry: 'getPosition'};
+    const getColor = {...modSub, entry: 'getColor'};
+
+    const linked = linkModule(modMain, {}, {getPosition, getColor});
+    expect(linked).toMatchSnapshot();
+
+  });
 });

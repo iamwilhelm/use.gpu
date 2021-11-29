@@ -1,12 +1,14 @@
 import { Tree } from '@lezer/common';
 import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF } from '../types';
-import { parseShader, defineConstants, loadModule, loadModuleWithCache } from './shader';
+import { parseShader, defineConstants, loadModule, loadModuleWithCache, makeModuleCache } from './shader';
 import { rewriteUsingAST, resolveShakeOps } from './ast';
 import { parseBundle } from '../util/bundle';
 import { getGraphOrder } from '../util/tree';
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
 import mapValues from 'lodash/mapValues';
+
+const CACHE = makeModuleCache();
 
 const TIMED = false;
 
@@ -26,12 +28,12 @@ export const linkCode = timed('linkCode', (
   libraries: Record<string, string> = {},
   linkDefs: Record<string, string> = {},
   defines: Record<string, ShaderDefine> = {},
-  cache: ParsedModuleCache | null = null,
+  cache: ParsedModuleCache | null = CACHE,
 ) => {
-  const main = loadModuleWithCache(code, 'main', cache);
+  const main = loadModuleWithCache(code, 'main', undefined, cache);
 
-  const parsedLibraries = mapValues(libraries, (code: string, name: string) => loadModuleWithCache(code, name, cache));
-  const parsedLinkDefs = mapValues(linkDefs, (code: string, name: string) => loadModuleWithCache(code, name.split(':')[0], cache));
+  const parsedLibraries = mapValues(libraries, (code: string, name: string) => loadModuleWithCache(code, name, undefined, cache));
+  const parsedLinkDefs = mapValues(linkDefs, (code: string, name: string) => loadModuleWithCache(code, name.split(':')[0], undefined, cache));
 
   return linkModule(main, parsedLibraries, parsedLinkDefs, defines);
 });
@@ -62,6 +64,8 @@ export const linkModule = timed('linkModule', (
   linkDefs: Record<string, ParsedModule> = {},
   defines: Record<string, ShaderDefine> = {},
 ) => {
+  if (typeof main === 'string') throw new Error("Module is a string instead of an object");
+
   const [links, aliases] = parseLinkAliases(linkDefs);
   const {modules, exported} = loadModules(main, libraries, links);
 

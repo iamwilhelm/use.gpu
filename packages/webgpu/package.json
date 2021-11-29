@@ -5,6 +5,10 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
+  "peerDependencies": {
+    "@use-gpu/core": "*",
+    "@use-gpu/live": "*"
+  },
   "scripts": {
     "test": "jest --watch",
     "lint": "eslint src --ext ts",

@@ -119,3 +119,23 @@ _3w_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   );
 }"
 `;
+
+exports[`link links same module twice with different entry point 1`] = `
+"#version 450
+
+
+    vec4 _lr_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    
+
+    vec4 _lrc_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+
+    
+
+    vec4 _lrc_getPosition(int index);
+    vec4 _lr_getColor(int index);
+    void main() {
+      vec4 a = _lrc_getPosition(0);
+      vec4 b = _lr_getColor(0);
+    }
+    "
+`;

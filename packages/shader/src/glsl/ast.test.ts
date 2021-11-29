@@ -49,6 +49,19 @@ describe('ast', () => {
     expect(declarations).toMatchSnapshot();
   });
   
+  it('gets test declarations with qualified declaration', () => {
+    const code = `
+      layout(location = 0) in wat;
+      layout(location = 1) in vec2;
+    `;
+
+    const tree = parseShader(code);
+    const {getDeclarations} = makeGuardedParser(code, tree);
+
+    const declarations = getDeclarations();
+    expect(declarations).toMatchSnapshot();
+  });
+
   it('gets quad vertex imports', () => {
     const code = GLSLModules['instance/vertex/quad'];
 

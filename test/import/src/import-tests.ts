@@ -8,6 +8,7 @@ import { uploadBuffer } from '@use-gpu/core';
 import { mountGPU } from '@use-gpu/webgpu';
 import { GLSLLinker } from '@use-gpu/shader';
 import { UseInspect } from '@use-gpu/inspect';
+import { Draw } from '@use-gpu/components';
 
 import GLSLLoader from '@use-gpu/glsl-loader';
 import { loadModule } from '@use-gpu/shader/glsl';

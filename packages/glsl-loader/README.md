@@ -56,7 +56,7 @@ If you use a named import:
 import { symbol } from './shader.glsl';
 ```
 
-You will get the same `ParsedBundle`, but with `entry` set to the symbol name in question. The symbol must be tagged with `#pragma export`.
+You will get the same `ParsedBundle`, but with `entry` set to the imported symbol name.
 
 ### Typescript
 

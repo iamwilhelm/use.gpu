@@ -30,14 +30,14 @@ export const getPreamble = (): string => PREAMBLE;
 export const linkCode = timed('linkCode', (
   code: string,
   libraries: Record<string, string> = {},
-  linkDefs: Record<string, string> = {},
+  links: Record<string, string> = {},
   defines: Record<string, ShaderDefine> = {},
   cache: ParsedModuleCache | null = DEFAULT_CACHE,
 ) => {
   const main = loadModuleWithCache(code, 'main', undefined, cache);
 
   const parsedLibraries = mapValues(libraries, (code: string, name: string) => loadModuleWithCache(code, name, undefined, cache));
-  const parsedLinkDefs = mapValues(linkDefs, (code: string, name: string) => loadModuleWithCache(code, name.split(':')[0], undefined, cache));
+  const parsedLinkDefs = mapValues(links, (code: string, name: string) => loadModuleWithCache(code, name.split(':')[0], undefined, cache));
 
   return linkModule(main, parsedLibraries, parsedLinkDefs, defines);
 });

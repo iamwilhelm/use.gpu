@@ -23,7 +23,7 @@ export const useBoundShader = (
   const shader = useMemo(() => {
     const bindings = {
       ...codeBindings,
-      ...mapValues(accessors, loadModule),
+      ...mapValues(accessors, (code: string, name: string) => loadModule(code, name)),
     };
 
     return makeBoundShader(

@@ -1,9 +1,5 @@
 # @use-gpu/shader
 
-## GLSL Linker and Tree Shaker
-
-`@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly.
-
 ```
 npm install --save @use-gpu/shader
 ```
@@ -11,6 +7,10 @@ npm install --save @use-gpu/shader
 ```
 yarn add @use-gpu/shader
 ```
+
+## GLSL Linker and Tree Shaker
+
+`@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly.
 
 It enables two kinds of imports to be used:
 

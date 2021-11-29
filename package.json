@@ -39,7 +39,7 @@
     "last 1 firefox version"
   ],
   "scripts": {
-    "build": "yarn wsrun run build && yarn run pkg && yarn run test:import",
+    "build": "yarn wsrun --serial run build && yarn run pkg && yarn run test:import",
     "pkg": "ts-node scripts/package-json.ts",
     "publish": "yarn run build && yarn publish --ignore-scripts build/packages/shader --access public && yarn publish --ignore-scripts --access public build/packages/glsl-loader",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
@@ -48,7 +48,7 @@
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/glsl; yarn run build)"
+    "postinstall": "(cd packages/glsl; yarn run build) && (cd packages/live; yarn run build) && (cd packages/core; yarn run build)"
   },
   "jest": {
     "preset": "ts-jest",

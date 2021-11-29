@@ -16,7 +16,7 @@ It enables two kinds of imports to be used:
 
  - **Static - ES Style** 
 ```
-#pragma import { getColor } from 'path/to/color'`  // functions, declarations and types
+#pragma import { getColor } from 'path/to/color'  // functions, declarations and types
 ```
  - **Dynamic - Function Prototype**
 

@@ -57,7 +57,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
   const mesh = makeMesh();
 
   const view = [
-    use(Inline)((fiber: RawFiber) => {
+    use(Inline)(() => {
       t = t + 1/60;
     }),
     use(Pass)({

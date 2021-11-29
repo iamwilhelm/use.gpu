@@ -20,6 +20,29 @@ exports[`link lifts recursive dependency 1`] = `
     "
 `;
 
+exports[`link links a global across a module 1`] = `
+"#version 450
+
+
+    void _gx_getPosition() {};
+    
+    vec4 _gx_getColor(int index) {
+      _gx_getPosition();
+      return vec4(1.0, 0.0, 1.0, 1.0);
+    }
+    
+
+    vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    
+
+    vec4 getPosition(int index);
+    vec4 _gx_getColor(int index);
+    void main() {
+      vec4 a = getPosition(0);
+    }
+    "
+`;
+
 exports[`link links an external 1`] = `
 "#version 450
 

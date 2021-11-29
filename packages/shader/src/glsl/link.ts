@@ -79,6 +79,7 @@ export const linkModule = timed('linkModule', (
   const used = new Set<string>();
   const exists = new Set<string>();
   const visible = new Set<string>();
+  const fixed = new Map<string, string>();
 
   for (const module of modules) {
     const {name, code, tree, table, shake} = module;
@@ -90,15 +91,19 @@ export const linkModule = timed('linkModule', (
       const namespace = reserveNamespace(module, namespaces, used);
       for (const name of symbols) rename.set(name, namespace + name);
       for (const name of globals) rename.set(name, name);
-      for (const name of visibles) visible.add(namespace + name);
+
+      for (const name of visibles) visible.add(rename.get(name)!);
       for (const name of rename.values()) exists.add(name);
+
+      for (const name of globals) fixed.set(namespace + name, name);
     }
 
     // Replace imported symbol names with target
     for (const {name: module, imports} of modules) {
       const namespace = namespaces.get(module);
       for (const {name, imported} of imports) {
-        const imp = namespace + imported;
+        let imp = namespace + imported;
+        if (fixed.has(imp)) imp = fixed.get(imp)!;
         if (!exists.has(imp)) console.warn(`Import ${name} from '${module}' does not exist`);
         else if (!visible.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
         rename.set(name, imp);
@@ -113,7 +118,8 @@ export const linkModule = timed('linkModule', (
 
       if ((namespace === undefined) && (flags & RF.Optional)) continue;
 
-      const imp = namespace + resolved;
+      let imp = namespace + resolved;
+      if (fixed.has(imp)) imp = fixed.get(imp)!;
       if (!exists.has(imp)) console.warn(`Link ${name}:${resolved} does not exist`);
       else if (!visible.has(imp)) console.warn(`Link ${name}:${resolved} is private`);
       rename.set(name, imp);

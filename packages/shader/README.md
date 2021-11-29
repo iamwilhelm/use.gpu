@@ -55,7 +55,7 @@ const moduleC = "...";
 const linked = linkCode(moduleC, {moduleA, moduleB});
 ```
 
-Shaders parsed at run-time will be cached on an least-recently-used basis, based on content hash.
+Shaders parsed at run-time will be cached on a least-recently-used basis, based on content hash.
 
 ## Syntax
 

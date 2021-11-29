@@ -7,3 +7,4 @@ tsconfig.tsbuildinfo
 .DS_Store
 test/import/node_modules
 test/import/dist
+test/import/yarn.lock

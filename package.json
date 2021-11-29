@@ -1,6 +1,6 @@
 {
   "name": "use.gpu",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "index.js",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -40,7 +40,8 @@
   ],
   "scripts": {
     "build": "yarn wsrun run build && yarn run pkg && yarn run test:import",
-    "pkg": "ts-node scripts/to-index-js.ts",
+    "pkg": "ts-node scripts/package-json.ts",
+    "publish": "yarn run build; yarn run publish build/packages/shader build/packages/glsl-loader",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "jest --watch",
     "test:import": "(cd test/import; yarn run test)",

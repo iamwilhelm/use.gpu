@@ -4,6 +4,14 @@
 
 This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
 
+```
+npm install --save @use-gpu/glsl-loader
+```
+
+```
+yarn add @use-gpu/glsl-loader
+```
+
 ### Usage
 
 #### Node.js

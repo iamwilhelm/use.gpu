@@ -4,6 +4,14 @@
 
 `@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly.
 
+```
+npm install --save @use-gpu/shader
+```
+
+```
+yarn add @use-gpu/shader
+```
+
 It enables two kinds of imports to be used:
 
 - **Static - ES Style** - `#pragma import { getColor } from 'path/to/color'` (works for functions, declarations and types)

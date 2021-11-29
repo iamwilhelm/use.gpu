@@ -73,5 +73,10 @@ declare module '*.glsl' {
 To make named imports `import { x } from ...` pass the type checker, you need to generate a custom .d.ts:
 
 ```
-./node_modules/.bin/glsl-tsgen [--base-dir rootDir] [file or *.glsl]
+npm run glsl-tsgen [--base-dir dir] [file or *.glsl]
 ```
+
+```
+yarn run glsl-tsgen [--base-dir dir] [file or *.glsl]
+```
+

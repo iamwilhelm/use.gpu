@@ -25,7 +25,7 @@ for (let i = 0; i < args.length; ++i) {
 }
 
 if (!globs.length) {
-  console.log(`Usage: ./node_modules/.bin/glsl-tsgen [--base-dir rootDir] [file or *.glsl]\n`);
+  console.log(`Usage: ./node_modules/.bin/glsl-tsgen [--base-dir dir] [file or *.glsl]\n`);
   process.exit();
 }
 

@@ -17,6 +17,7 @@ import GLSLModules from '@use-gpu/glsl';
 
 import maskPoint from '@use-gpu/glsl/mask/point.glsl';
 import { circle } from '@use-gpu/glsl/mask/point.glsl';
+import instanceVertex from '@use-gpu/glsl/instance/vertex/quad.glsl';
 
 type AppProps = {
   foo: number,
@@ -46,6 +47,11 @@ const testGLSL = () => {
   if (!GLSLModules['instance/vertex/quad']) return false;
   if (!(maskPoint.module && maskPoint.libs)) return false;
   if (!(circle.module && circle.libs)) return false;
+
+  if (!instanceVertex.libs['@use-gpu/glsl/use/view']) return false;
+  if (!instanceVertex.libs['@use-gpu/glsl/use/view'].module.table) return false;
+  if (!instanceVertex.libs['@use-gpu/glsl/use/types']) return false;
+  if (!instanceVertex.libs['@use-gpu/glsl/use/types'].module.table) return false;
 
   if (!isModule(loadModule(GLSLModules['instance/vertex/quad'], 'quad'))) return false;
 

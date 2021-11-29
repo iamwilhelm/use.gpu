@@ -48,16 +48,14 @@ const testGLSL = () => {
   if (!(maskPoint.module && maskPoint.libs)) return false;
   if (!(circle.module && circle.libs)) return false;
 
-  if (!instanceVertex.libs['@use-gpu/glsl/use/view']) return false;
-  if (!instanceVertex.libs['@use-gpu/glsl/use/view'].module.table) return false;
-  if (!instanceVertex.libs['@use-gpu/glsl/use/types']) return false;
-  if (!instanceVertex.libs['@use-gpu/glsl/use/types'].module.table) return false;
+  if (!isModule(instanceVertex.libs['@use-gpu/glsl/use/view']?.module)) return false;
+  if (!isModule(instanceVertex.libs['@use-gpu/glsl/use/types']?.module)) return false;
 
   if (!isModule(loadModule(GLSLModules['instance/vertex/quad'], 'quad'))) return false;
 
   return true;
 }
 
-const isModule = (module: any) => module.name && module.table && module.tree;
+const isModule = (module: any) => module?.name && module?.table && module?.tree;
 
 if (!testRender() || !testGLSL()) process.exit(1);

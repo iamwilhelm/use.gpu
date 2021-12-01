@@ -91,6 +91,8 @@ describe("link", () => {
 
     const sub = `
     float used() { return 1.0; }
+
+    float unused() { return 1.0; }
     
     #pragma export
     vec4 getPosition(int index) { return vec4(used(), 0.0, 1.0, 1.0); }

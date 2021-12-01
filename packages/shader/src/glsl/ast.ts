@@ -476,7 +476,7 @@ export const rewriteUsingAST = (
       if (!shakes) continue;
       if (shakes.has(from)) {
         skip(from, to);
-        cursor.lastChild();
+        while (cursor.lastChild()) {};
       }
     }
     // Any identifier
@@ -492,7 +492,7 @@ export const rewriteUsingAST = (
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
-      cursor.lastChild();
+      while (cursor.lastChild()) {};
     }
     // #pragma import/export
     else if (type.name === 'import' || type.name === 'export' ||
@@ -500,7 +500,7 @@ export const rewriteUsingAST = (
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
-      cursor.lastChild();
+      while (cursor.lastChild()) {};
     }
     // Field accessor
     else if (type.name === 'Field') {
@@ -511,7 +511,7 @@ export const rewriteUsingAST = (
       const replace = rename.get(name);
 
       if (replace) skip(sub.from, sub.to, replace);
-      cursor.lastChild();
+      while (cursor.lastChild()) {};
     }
   } while (cursor.next());
 
@@ -585,7 +585,7 @@ export const decompressAST = (nodes: CompressedNode[]) => {
         const {to} = self;
         do {
           const node = nodes[i + 1];
-          if (node && node[1] >= to) return true;
+          if (node && node[1] >= to) return false;
         } while (next());
         return false;
       }

@@ -147,18 +147,50 @@ exports[`link links same module twice with different entry point 1`] = `
 "#version 450
 
 
-    vec4 _lr_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    float _om_used() { return 1.0; }
+    
+    vec4 _om_getColor(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
     
 
-    vec4 _lrc_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
-
-    
-
-    vec4 _lrc_getPosition(int index);
-    vec4 _lr_getColor(int index);
+    vec4 _om_getPosition(int index);
+    vec4 _om_getColor(int index);
     void main() {
-      vec4 a = _lrc_getPosition(0);
-      vec4 b = _lr_getColor(0);
+      vec4 a = _om_getPosition(0);
+      vec4 b = _om_getColor(0);
+    }
+    "
+`;
+
+exports[`link tree shakes around identifiers 1`] = `
+"#version 450
+
+
+    float _om_used() { return 1.0; }
+    
+    vec4 _om_getPosition(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
+
+    
+
+    vec4 _om_getPosition(int index);
+    void main() {
+      vec4 a = _om_getPosition(0);
+    }
+    "
+`;
+
+exports[`link tree shakes around identifiers 2`] = `
+"#version 450
+
+
+    float _om_used() { return 1.0; }
+    
+    vec4 _om_getPosition(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
+
+    
+
+    vec4 _om_getPosition(int index);
+    void main() {
+      vec4 a = _om_getPosition(0);
     }
     "
 `;

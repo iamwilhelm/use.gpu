@@ -27,6 +27,7 @@ void main() {
 #else
 void main() {
   outColor = fragColor;
+  outColor.xyz *= outColor.a;
 
   #ifdef HAS_MASK
   outColor *= getMask(fragUV);

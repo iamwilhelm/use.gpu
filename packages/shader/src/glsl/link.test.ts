@@ -1,6 +1,7 @@
 import { GLSLModules } from '@use-gpu/glsl';
 import { linkCode, linkModule } from './link';
 import { loadModule } from './shader';
+import { formatAST } from '../util/tree'; 
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);
@@ -86,14 +87,59 @@ describe("link", () => {
 
   });
   
+  it("tree shakes around identifiers", () => {
+
+    const sub = `
+    float used() { return 1.0; }
+    
+    #pragma export
+    vec4 getPosition(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
+
+    #pragma export
+    vec4 getColor(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
+    `
+
+    const main = `
+    vec4 getPosition(int index);
+    void main() {
+      vec4 a = getPosition(0);
+    }
+    `
+
+    {
+      const modMain = loadModule(main, 'main', undefined, false);
+      const modSub = loadModule(sub, 'sub', undefined, false);
+
+      const getPosition = {...modSub, entry: 'getPosition'};
+      const getColor = {...modSub, entry: 'getColor'};
+
+      const linked = linkModule(modMain, {}, {getPosition, getColor});
+      expect(linked).toMatchSnapshot();
+    }
+
+    {
+      const modMain = loadModule(main, 'main', undefined, true);
+      const modSub = loadModule(sub, 'sub', undefined, true);
+
+      const getPosition = {...modSub, entry: 'getPosition'};
+      const getColor = {...modSub, entry: 'getColor'};
+
+      const linked = linkModule(modMain, {}, {getPosition, getColor});
+      expect(linked).toMatchSnapshot();
+    }
+
+  });
+  
   it("links same module twice with different entry point", () => {
 
     const sub = `
+    float used() { return 1.0; }
+    
     #pragma export
-    vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 getPosition(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
 
     #pragma export
-    vec4 getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 getColor(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
     `
 
     const main = `
@@ -105,8 +151,8 @@ describe("link", () => {
     }
     `
 
-    const modMain = loadModule(main, 'main');
-    const modSub = loadModule(sub, 'sub');
+    const modMain = loadModule(main, 'main', undefined, false);
+    const modSub = loadModule(sub, 'sub', undefined, false);
 
     const getPosition = {...modSub, entry: 'getPosition'};
     const getColor = {...modSub, entry: 'getColor'};

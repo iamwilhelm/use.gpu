@@ -75,6 +75,7 @@ export const linkModule = timed('linkModule', (
 
   const program = [getPreamble(), defineConstants(defines)] as string[];
 
+  const hashes = new Map<string, string>();
   const namespaces = new Map<string, string>();
   const used = new Set<string>();
   const exists = new Set<string>();
@@ -83,12 +84,20 @@ export const linkModule = timed('linkModule', (
 
   for (const module of modules) {
     const {name, code, tree, table, shake} = module;
-    const {globals, symbols, visibles, externals, modules} = table;
+    const {hash, globals, symbols, visibles, externals, modules} = table;
+
+    // Multiple links into same module with different name
+    if (hashes.has(hash)) {
+      namespaces.set(name, hashes.get(hash)!);
+      continue;
+    }
 
     // Namespace all non-global symbols other than main
     const rename = new Map<string, string>();
     if (module !== main) {
       const namespace = reserveNamespace(module, namespaces, used);
+      hashes.set(hash, namespace);
+
       for (const name of symbols) rename.set(name, namespace + name);
       for (const name of globals) rename.set(name, name);
 

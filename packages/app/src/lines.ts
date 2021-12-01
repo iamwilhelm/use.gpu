@@ -1,8 +1,8 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-    TypedArray, ViewUniforms,
-    UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-    VertexData, StorageSource, RenderPassMode,
+  TypedArray, ViewUniforms, DeepPartial,
+  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  VertexData, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, yeet, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
@@ -21,6 +21,7 @@ export type LinesProps = {
   depth?: number,
   join: 'miter' | 'round' | 'bevel',
 
+  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode,
   id?: number,
 };

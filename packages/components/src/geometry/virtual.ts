@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode,
+  VertexData, StorageSource, RenderPassMode, DeepPartial,
 } from '@use-gpu/core/types';
 import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';

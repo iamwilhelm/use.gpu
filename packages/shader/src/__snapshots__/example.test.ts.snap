@@ -67,7 +67,9 @@ float _u4_used() {
   return 1.0;
 }
 
-
+void _u4_unused() {
+  // ...
+}
 void main() {
   gl_FragColor = _u4_getColor();
 }"

@@ -83,7 +83,12 @@ struct _3w_SolidVertex {
   vec2 uv;
 };
 
-
+struct _3w_MeshVertex {
+  vec4 position;
+  vec3 normal;
+  vec4 color;
+  vec2 uv;
+};
 layout(set = 0, binding = VIEW_BINDING) uniform _e6_ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
@@ -104,6 +109,18 @@ vec4 _e6_worldToClip(vec4 position) {
   return _e6_viewToClip(_e6_worldToView(position));
 }
 
+vec3 _e6_clipToScreen3D(vec4 position) {
+  return vec3(position.xy * _e6_viewUniforms.viewSize, position.z);
+}
+
+vec3 _e6_screenToClip3D(vec4 position) {
+  return vec3(position.xy * _e6_viewUniforms.viewResolution, position.z);
+}
+
+vec3 _e6_worldToClip3D(vec4 position) {
+  position = _e6_viewToClip(_e6_worldToView(position));
+  return position.xyz / position.w;
+}
 
 
     vec4 _9a_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
@@ -149,6 +166,8 @@ exports[`link links same module twice with different entry point 1`] = `
 
     float _om_used() { return 1.0; }
     
+    vec4 _om_getPosition(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
+
     vec4 _om_getColor(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
     
 
@@ -169,6 +188,7 @@ exports[`link tree shakes around identifiers 1`] = `
     
     vec4 _om_getPosition(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
 
+    vec4 _om_getColor(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
     
 
     vec4 _om_getPosition(int index);
@@ -186,6 +206,7 @@ exports[`link tree shakes around identifiers 2`] = `
     
     vec4 _om_getPosition(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
 
+    vec4 _om_getColor(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
     
 
     vec4 _om_getPosition(int index);

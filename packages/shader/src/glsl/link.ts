@@ -182,8 +182,9 @@ export const loadModules = timed('loadModules', (
       seen.add(name);
       deps.push(name);
 
-      let list = exported.get(name);
-      if (!list) exported.set(name, list = new Set());
+      const {table: {hash}} = module;
+      let list = exported.get(hash);
+      if (!list) exported.set(hash, list = new Set());
       imports.forEach(i => list!.add(i.name));
     }
 
@@ -200,8 +201,9 @@ export const loadModules = timed('loadModules', (
       seen.add(name);
       deps.push(name);
 
-      let list = exported.get(name);
-      if (!list) exported.set(name, list = new Set());
+      const {table: {hash}} = module;
+      let list = exported.get(hash);
+      if (!list) exported.set(hash, list = new Set());
       list.add(module.entry ?? name);
     }
 

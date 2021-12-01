@@ -467,7 +467,6 @@ export const rewriteUsingAST = (
   do {
     const {type, from, to} = cursor;
     // Injected by compressed AST only: Skip, Shake, Id
-
     if (type.name === 'Skip') skip(from, to);
     
     // Top level declaration
@@ -492,7 +491,7 @@ export const rewriteUsingAST = (
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
-      while (cursor.lastChild()) {};
+      cursor.lastChild();
     }
     // #pragma import/export
     else if (type.name === 'import' || type.name === 'export' ||
@@ -500,7 +499,7 @@ export const rewriteUsingAST = (
       cursor.parent();
       const {from, to} = cursor;
       skip(from, to);
-      while (cursor.lastChild()) {};
+      cursor.lastChild();
     }
     // Field accessor
     else if (type.name === 'Field') {
@@ -511,7 +510,7 @@ export const rewriteUsingAST = (
       const replace = rename.get(name);
 
       if (replace) skip(sub.from, sub.to, replace);
-      while (cursor.lastChild()) {};
+      cursor.lastChild();
     }
   } while (cursor.next());
 

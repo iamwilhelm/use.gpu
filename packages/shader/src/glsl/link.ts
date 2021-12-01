@@ -135,7 +135,7 @@ export const linkModule = timed('linkModule', (
     }
 
     // Shake tree ops based on which symbols were exported
-    const keep = exported.get(name);
+    const keep = exported.get(hash);
     const ops = shake && keep ? resolveShakeOps(shake, keep) : null;
 
     // Rename symbols using AST while tree shaking

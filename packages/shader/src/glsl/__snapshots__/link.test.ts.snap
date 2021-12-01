@@ -149,6 +149,8 @@ exports[`link links same module twice with different entry point 1`] = `
 
     float _om_used() { return 1.0; }
     
+    vec4 _om_getPosition(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
+
     vec4 _om_getColor(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
     
 

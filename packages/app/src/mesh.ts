@@ -37,7 +37,7 @@ export type MeshProps = {
 export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
   const {
     mesh,
-    mode = RenderPassMode.Render,
+    mode = RenderPassMode.Opaque,
     id = 0,
     blink,
   } = props;

@@ -67,7 +67,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           render: ([positions, segments, sizes]: StorageSource[]) => [
             //use(Quads)({ positions, size: 10 }),
             use(Lines)({ positions, segments, size: 50, join: 'round' }),
-            //use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
+            use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
             //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]
         }),

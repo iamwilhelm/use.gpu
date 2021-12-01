@@ -28,11 +28,12 @@ export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
 
     const {device} = renderContext;
 
-    const renders = toArray(rs[RenderPassMode.Render]);
+    const opaques = toArray(rs[RenderPassMode.Opaque]);
+    const transparents = toArray(rs[RenderPassMode.Transparent]);
     const debugs = toArray(rs[RenderPassMode.Debug]);
     const pickings = toArray(rs[RenderPassMode.Picking]);
 
-    const visibles = [...renders, ...debugs];
+    const visibles = [...opaques, ...transparents, ...debugs];
 
     const renderToContext = (
       commandEncoder: GPUCommandEncoder,

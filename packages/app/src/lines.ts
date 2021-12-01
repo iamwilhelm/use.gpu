@@ -5,7 +5,7 @@ import {
     VertexData, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
-import { use, yeet, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, yeet, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 
 import { getLineVertex } from '@use-gpu/glsl/instance/vertex/line.glsl';
 
@@ -51,9 +51,17 @@ const LINE_JOIN_STYLE = {
   'round': 2,
 };
 
+const PIPELINE = {
+  primitive: {
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
+  },
+};
+
 export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
   const {
-    mode = RenderPassMode.Render,
+    pipeline: propPipeline,
+    mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
 
@@ -84,8 +92,9 @@ export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
     [],
   ], props);
 
+  const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
+
   return use(Virtual)({
-    topology: 'triangle-strip',
     vertexCount,
     instanceCount,
 
@@ -98,6 +107,7 @@ export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
     defines,
     deps: [join],
 
+    pipeline,
     mode,
     id,
   });

@@ -56,7 +56,7 @@ export const Props: React.FC<PropsProps> = ({fiber}) => {
     else if (name === 'GATHER') {
     }
     else {
-			if (args.length === 1) props = args[0];
+			if (args.length === 1 && typeof args[0] === 'object') props = args[0];
 			else for (let k in args) props[k] = args[k];
     }
   }

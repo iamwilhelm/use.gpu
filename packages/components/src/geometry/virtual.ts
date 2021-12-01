@@ -34,6 +34,7 @@ export type VirtualProps = {
   defines: Record<string, any>,
   deps: any[],
 
+  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
 };
@@ -47,7 +48,6 @@ const getDebugShader = (topology: GPUPrimitiveTopology) => {
 
 export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const {
-    topology,
     attributes: propAttributes,
     lambdas: propLambdas,
     links: propLinks,
@@ -58,8 +58,10 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
 
     vertexCount,
     instanceCount,
+
+    pipeline: propPipeline,
     deps = null,
-    mode = RenderPassMode.Render,
+    mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
 
@@ -82,6 +84,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   // Render shader
   const {glsl: {modules}} = languages;
   // TODO: non-strip topology
+  const topology = propPipeline.primitive?.topology ?? 'triangle-list';
   const vertexShader = !isDebug ? instanceDrawVirtual : getDebugShader(topology);
   const fragmentShader = instanceFragmentSolid;
 
@@ -119,22 +122,14 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   );
 
   // Rendering pipeline
-  const pipeline = useMemo(() =>
-    makeRenderPipeline(
+  const pipeline = useMemo(() => {
+    return makeRenderPipeline(
       resolvedContext,
       vertex,
       fragment,
-      {
-        primitive: {
-          topology,
-          stripIndexFormat: 'uint16',
-        },
-        vertex:   {},
-        fragment: {},
-      }
-    ),
-    [device, vertex, fragment, topology, colorStates, depthStencilState, samples, languages]
-  );
+      propPipeline,
+    );
+  }, [device, vertex, fragment, propPipeline, colorStates, depthStencilState, samples, languages]);
 
   // Uniforms
   const [

@@ -367,8 +367,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const declarations = getDeclarations();
 
     const externals = declarations
-      .filter(d => d.prototype)
-      .filter(d => !functions.find(f => f.prototype.name === d.prototype!.name));
+      .filter(d => d.prototype && !functions.find(f => f.prototype.name === d.prototype!.name));
 
     const refs = [...functions, ...declarations];
     const exported = refs.filter(d => d.flags & RF.Exported);

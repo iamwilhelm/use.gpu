@@ -82,7 +82,6 @@ export const makeBoundShader = <A, B>(
   compile: (code: B, stage: string) => any,
   link: (shader: A, links: Record<string, A>, defines: Record<string, any>, cache: any) => B,
   cache: any,
-  base: number = 0,
 ): [ShaderModuleDescriptor, ShaderModuleDescriptor, B, B] => {
   const vertexLinked = link(vertexShader, links, defines, cache);
   const fragmentLinked = link(fragmentShader, links, defines, cache);

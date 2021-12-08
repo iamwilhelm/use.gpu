@@ -1,5 +1,5 @@
 #pragma export
-layout(set = 0, binding = VIEW_BINDING) uniform ViewUniforms {
+layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING) uniform ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;

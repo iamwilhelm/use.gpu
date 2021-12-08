@@ -91,6 +91,7 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
 
   const linked = linkBundleVirtual(closure);
   console.log(linked.code);
+  console.log(linked.uniforms);
   console.log(linked.bindings);
 
   /*

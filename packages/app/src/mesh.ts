@@ -63,8 +63,11 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
 
   const defines = {
     IS_PICKING: isPicking,
+    VIEW_BINDGROUP: 0,
     VIEW_BINDING: 0,
+    LIGHT_BINDGROUP: 0,
     LIGHT_BINDING: 1,
+    PICKING_BINDGROUP: 0,
     PICKING_BINDING: 1,
   };
 

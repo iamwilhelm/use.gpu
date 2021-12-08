@@ -1,13 +1,15 @@
 import { Tree } from '@lezer/common';
 import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF, DataBinding } from '../types';
-import { parseShader, defineConstants, loadModule, loadModuleWithCache } from './shader';
+
+import { parseShader, defineConstants, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
 import { rewriteUsingAST, resolveShakeOps } from './ast';
+import { makeUniformBlock } from './gen';
 import { parseBundle, parseLinkAliases } from '../util/bundle';
 import { getGraphOrder } from '../util/tree';
-import { GLSL_VERSION } from '../constants';
+
+import { GLSL_VERSION, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP } from '../constants';
 import * as T from '../grammar/glsl.terms';
 import mapValues from 'lodash/mapValues';
-import { DEFAULT_CACHE } from './shader';
 
 const TIMED = false;
 
@@ -94,7 +96,7 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
   const [links, aliases] = parseLinkAliases(linkDefs);
   const {modules, exported} = loadModulesInOrder(main, libraries, links, aliases);
 
-  const program = [getPreamble(), defineConstants(defines)] as string[];
+  const program = [] as string[];
 
   const hashes = new Map<string, string>();
   const namespaces = new Map<string, string>();
@@ -105,7 +107,8 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
 
   let bindingIndex = 0;
   const nextBinding = () => bindingIndex++;
-  const bindings = [] as DataBinding[][];
+  const allBindings = [] as DataBinding[];
+  const allUniforms = [] as DataBinding[];
 
   for (const module of modules) {
     const {name, code, tree, table, shake, virtual} = module;
@@ -163,10 +166,11 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
       // Emit virtual module in target namespace,
       // with dynamically assigned binding slots.
       const namespace = hashes.get(hash)!;
-      const {code, virtuals} = virtual.render(namespace, nextBinding);
+      const {code, uniforms, bindings} = virtual.render(namespace, nextBinding);
 
       program.push(code);
-      bindings.push(...virtuals);
+      allBindings.push(...bindings);
+      allUniforms.push(...uniforms);
     }
     else {
       // Shake tree ops based on which symbols were exported
@@ -179,8 +183,14 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
     }
   }
 
-  const code = program.join("\n");
-  return {code, bindings};
+  const header = [
+    getPreamble(),
+    defineConstants(defines),
+    makeUniformBlock(allUniforms, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP, allBindings.length),
+  ].filter(s => s.length);
+
+  const code = [...header, ...program].join("\n");
+  return {code, bindings: allBindings, uniforms: allUniforms};
 });
 
 // Load all modules references from a piece of code,

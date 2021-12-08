@@ -2,6 +2,7 @@ import { ParsedBundle, ParsedModule, DataBinding } from '../types';
 
 import { loadVirtualModule } from './shader';
 import { makeKey } from '../util/hash';
+import { PREFIX_VIRTUAL } from '../constants';
 
 const INT_ARG = ['int'];
 
@@ -16,9 +17,6 @@ export const makeBindingAccessors = (
   const storages = bindings.filter(({storage}) => storage != null);
   const constants = bindings.filter(({constant}) => constant != null);
 
-  // Uniform Buffer Object struct members
-  const members = constants.map(({uniform: {name, format}}) => `${format} ${name}`);
-
   // Virtual module symbols
   const virtuals = [...constants, ...storages];
   const symbols = virtuals.map(({uniform}) => uniform.name);
@@ -27,12 +25,8 @@ export const makeBindingAccessors = (
   const render = (namespace: string, nextBinding: () => number) => {
     const program: string[] = [];
 
-    if (members.length) {
-      const b = nextBinding();
-      program.push(makeUniformBlockLayout(namespace, set, b, members));
-    }
     for (const {uniform: {name, format, args}} of constants) {
-      program.push(makeUniformFieldAccessor(namespace, format, name, args));
+      program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, format, name, args));
     }
 
     for (const {uniform: {name, format, args}} of storages) {
@@ -40,9 +34,13 @@ export const makeBindingAccessors = (
       program.push(makeStorageAccessor(namespace, set, b, format, name));
     }
 
+    // Gather actual uniform uniforms
+    const uniforms = constants.map((c: DataBinding) => namespaceBinding(namespace, c));
+
     return {
       code: program.join('\n'),
-      virtuals: [constants, ...storages.map(s => [s])],
+      uniforms,
+      bindings: storages,
     };
   }
 
@@ -55,6 +53,24 @@ export const makeBindingAccessors = (
 
   return links;
 };
+
+export const namespaceBinding = (namespace: string, binding: DataBinding) => {
+  const {uniform} = binding;
+  const {name} = uniform;
+  const imp = namespace + name;
+  return {...binding, uniform: {...uniform, name: imp}};
+};
+
+export const makeUniformBlock = (
+  constants: DataBinding[],
+  namespace: string,
+  set: number | string = 0,
+  binding: number | string = 0,
+): string => {
+  // Uniform Buffer Object struct members
+  const members = constants.map(({uniform: {name, format}}) => `${format} ${name}`);
+  return members.length ? makeUniformBlockLayout(namespace, set, binding, members) : '';
+}
 
 export const makeStorageAccessor = (
   ns: string,
@@ -85,12 +101,13 @@ layout (set = ${set}, binding = ${binding}) uniform ${ns}Type {
 `;
 
 export const makeUniformFieldAccessor = (
+  uniform: string,
   ns: string,
   type: string,
   name: string,
   args: string[] = INT_ARG,
 ) => `
 ${type} ${ns}${name}(${args.join(', ')}) {
-  return ${ns}Uniform.${name};
+  return ${uniform}Uniform.${ns}${name};
 }
 `;

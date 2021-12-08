@@ -5,6 +5,7 @@ import { compressAST, decompressAST } from './ast';
 import { getProgramHash, makeKey } from '../util/hash';
 import { makeBindingAccessors } from './gen';
 import { parseBundle, toBundle, parseLinkAliases } from '../util/bundle';
+import { PREFIX_CLOSURE, VIRTUAL_BINDGROUP } from '../constants';
 import mapValues from 'lodash/mapValues';
 
 const NO_SYMBOLS = [] as any[];
@@ -13,7 +14,7 @@ export const bindingsToLinks = (
   bindings: Record<string, DataBinding>,
   key: string | number = makeKey(),
 ): Record<string, ParsedBundle | ParsedModule> => {
-  return makeBindingAccessors(Object.values(bindings), 'VIRTUAL_BINDGROUP', key);
+  return makeBindingAccessors(Object.values(bindings), VIRTUAL_BINDGROUP, key);
 }
 
 export const bindBundle = (
@@ -39,7 +40,7 @@ export const bindModule = (
   const {hash, modules, externals} = table;
 
   const rehash = getProgramHash(`#closure ${hash} ${key.toString(16)}`);
-  const namespace = `_CL_${rehash.slice(0, 6)}_`;
+  const namespace = `${PREFIX_CLOSURE}${rehash.slice(0, 6)}_`;
 
   const relinks: Record<string, ParsedBundle | ParsedModule> = {};
   const reexternals = [];

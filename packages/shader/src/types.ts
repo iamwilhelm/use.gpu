@@ -142,5 +142,6 @@ export type VirtualRenderFunction = (namespace: string, nextBinding: () => numbe
 
 export type VirtualRender = {
   code: string,
-  virtuals: DataBinding[][],
+  uniforms: DataBinding[],
+  bindings: DataBinding[],
 };

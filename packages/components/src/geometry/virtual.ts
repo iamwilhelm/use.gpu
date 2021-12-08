@@ -91,7 +91,9 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const defines = useMemo(() => ({
     ...propDefines,
     IS_PICKING: isPicking,
+    VIEW_BINDGROUP: 0,
     VIEW_BINDING: 0,
+    PICKING_BINDGROUP: 0,
     PICKING_BINDING: 1,
   }), [isPicking, propDefines]);
 

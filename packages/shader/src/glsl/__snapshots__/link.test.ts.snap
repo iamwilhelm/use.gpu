@@ -3,7 +3,6 @@
 exports[`link lifts recursive dependency 1`] = `
 "#version 450
 
-
     // Lifted Code
     void _wh_getLifted() {}
     
@@ -22,7 +21,6 @@ exports[`link lifts recursive dependency 1`] = `
 
 exports[`link links a global across a module 1`] = `
 "#version 450
-
 
     void _gx_getPosition() {};
     
@@ -46,7 +44,6 @@ exports[`link links a global across a module 1`] = `
 exports[`link links an external 1`] = `
 "#version 450
 
-
     vec4 _21_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
@@ -61,7 +58,6 @@ exports[`link links an external 1`] = `
 
 exports[`link links quad vertex 1`] = `
 "#version 450
-
 const ivec2 _vz_QUAD[] = {
   ivec2(0, 0),
   ivec2(1, 0),
@@ -146,7 +142,6 @@ _3w_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
 exports[`link links same module twice with different entry point 1`] = `
 "#version 450
 
-
     float _om_used() { return 1.0; }
     
     vec4 _om_getPosition(int index) { return vec4(_om_used(), 0.0, 1.0, 1.0); }
@@ -166,7 +161,6 @@ exports[`link links same module twice with different entry point 1`] = `
 exports[`link tree shakes around identifiers 1`] = `
 "#version 450
 
-
     float _7p_used() { return 1.0; }
 
     vec4 _7p_getPosition(int index) { return vec4(_7p_used(), 0.0, 1.0, 1.0); }
@@ -182,7 +176,6 @@ exports[`link tree shakes around identifiers 1`] = `
 
 exports[`link tree shakes around identifiers 2`] = `
 "#version 450
-
 
     float _7p_used() { return 1.0; }
 
@@ -200,7 +193,6 @@ exports[`link tree shakes around identifiers 2`] = `
 exports[`link tree shakes constants 1`] = `
 "#version 450
 
-
     const vec4 _r5_colorUsed = vec4(0.0, 0.1, 0.2, 0.0);
     vec4 _r5_getColor() {
       return _r5_colorUsed;
@@ -216,7 +208,6 @@ exports[`link tree shakes constants 1`] = `
 
 exports[`link tree shakes constants 2`] = `
 "#version 450
-
 
     const vec4 _r5_colorUsed = vec4(0.0, 0.1, 0.2, 0.0);
     vec4 _r5_getColor() {

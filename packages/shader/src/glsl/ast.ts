@@ -523,6 +523,10 @@ export const rewriteUsingAST = (
 export const compressAST = (tree: Tree): CompressedNode[] => {
   const out = [] as any[]
 
+  // Pass through nodes from pre-compressed tree immediately
+  // @ts-ignore
+  if (tree.__nodes) return tree.__nodes();
+
   const shake = (from: number, to: number) => out.push(["Shake", from, to]);
   const skip = (from: number, to: number) => out.push(["Skip", from, to]);
   const ident = (from: number, to: number) => out.push(["Id", from, to]);
@@ -530,7 +534,11 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
   const cursor = tree.cursor();
   do {
     const {type, from, to} = cursor;
-    if (type.name === 'Declaration' || type.name === 'FunctionDefinition') {
+    // Injected by compressed AST only: Skip, Shake, Id
+    if (type.name === 'Skip') skip(from, to);
+    else if (type.name === 'Shake') shake(from, to);
+    
+    else if (type.name === 'Declaration' || type.name === 'FunctionDefinition') {
       if (cursor.node.parent?.type.name === 'Program') shake(from, to);
     }
     else if (type.name === 'Identifier' || type.name === 'Id') {
@@ -565,6 +573,7 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
 // Decompress a compressed AST on the fly by returning a pseudo-tree-cursor.
 export const decompressAST = (nodes: CompressedNode[]) => {
   const tree = {
+    __nodes: () => nodes,
     cursor: () => {
       let i = -1;
       const n = nodes.length;

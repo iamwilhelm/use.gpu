@@ -2,14 +2,23 @@ import {
   parseShader,
   loadModule,
   loadModuleWithCache,
+  loadStaticModule,
   defineConstants,
   makeLanguage,
   makeModuleCache,
 } from './shader';
 
 import {
+  bindBundle,
+  bindModule,
+  bindingsToLinks,
+} from './bind';
+
+import {
   linkBundle,
+  linkBundleVirtual,
   linkModule,
+  linkModuleVirtual,
   linkCode,
   getPreamble,
   setPreamble,
@@ -26,14 +35,23 @@ export {
   parseShader,
   loadModule,
   loadModuleWithCache,
+  loadStaticModule,
   defineConstants,
   makeLanguage,
   makeModuleCache,
 } from './shader';
 
 export {
+  bindBundle,
+  bindModule,
+  bindingsToLinks,
+} from './bind';
+
+export {
   linkBundle,
+  linkBundleVirtual,
   linkModule,
+  linkModuleVirtual,
   linkCode,
   getPreamble,
   setPreamble,
@@ -49,15 +67,22 @@ export {
 export const GLSLLinker = {
   loadModule,
   loadModuleWithCache,
+  loadStaticModule,
 
   parseShader,
   defineConstants,
 
   linkBundle,
+  linkBundleVirtual,
   linkModule,
+  linkModuleVirtual,
   linkCode,
   getPreamble,
   setPreamble,
+
+  bindBundle,
+  bindModule,
+  bindingsToLinks,
 
   makeASTParser,
   compressAST,

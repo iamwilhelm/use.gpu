@@ -15,7 +15,7 @@ import {
   ViewProvider,
 } from '@use-gpu/components';
 import { Mesh } from './mesh';
-import { Quads } from './quads';
+import { Quads } from './quads2';
 import { Lines } from './lines';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';

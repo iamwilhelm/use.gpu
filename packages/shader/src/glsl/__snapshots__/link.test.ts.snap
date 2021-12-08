@@ -196,3 +196,37 @@ exports[`link tree shakes around identifiers 2`] = `
     }
     "
 `;
+
+exports[`link tree shakes constants 1`] = `
+"#version 450
+
+
+    const vec4 _r5_colorUsed = vec4(0.0, 0.1, 0.2, 0.0);
+    vec4 _r5_getColor() {
+      return _r5_colorUsed;
+    }
+    
+
+    vec4 _r5_getColor();
+    void main() {
+      vec4 a = _r5_getColor();
+    }
+    "
+`;
+
+exports[`link tree shakes constants 2`] = `
+"#version 450
+
+
+    const vec4 _r5_colorUsed = vec4(0.0, 0.1, 0.2, 0.0);
+    vec4 _r5_getColor() {
+      return _r5_colorUsed;
+    }
+    
+
+    vec4 _r5_getColor();
+    void main() {
+      vec4 a = _r5_getColor();
+    }
+    "
+`;

@@ -1328,6 +1328,7 @@ Array [
 
 exports[`ast rewrites a lot of code using the compressed AST 2`] = `
 Object {
+  "__nodes": [Function],
   "cursor": [Function],
 }
 `;
@@ -1399,6 +1400,7 @@ Array [
 
 exports[`ast rewrites code using the compressed AST 2`] = `
 Object {
+  "__nodes": [Function],
   "cursor": [Function],
 }
 `;

@@ -1,10 +1,12 @@
-import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler } from '../types';
+import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler, VirtualRenderFunction } from '../types';
 import { Tree, SyntaxNode } from '@lezer/common';
 
 import { makeASTParser, compressAST, decompressAST } from './ast';
-import { getProgramHash } from '../util/hash';
+import { getProgramHash, makeKey } from '../util/hash';
 import { parser } from '../grammar/glsl';
 import LRU from 'lru-cache';
+
+const EMPTY_LIST = [] as any[];
 
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
@@ -24,7 +26,7 @@ export const loadModule = (
 
   if (compressed) tree = decompressAST(compressAST(tree));
 
-  return {name, code, tree, table, shake, entry};
+  return {name, code, table, entry, shake, tree};
 }
 
 // Use cache to load modules
@@ -43,6 +45,48 @@ export const loadModuleWithCache = (
   const module = loadModule(code, name, entry, true);
   cache.set(hash, module);
   return {...module, entry};
+}
+
+// Load a static (inert) module
+export const loadStaticModule = (code: string, name: string, entry?: string) => {
+  const table = {
+    hash: getProgramHash(code),
+    symbols: EMPTY_LIST,
+    visibles: EMPTY_LIST,
+    globals: EMPTY_LIST,
+    externals: EMPTY_LIST,
+    modules: EMPTY_LIST,
+    functions: EMPTY_LIST,
+    declarations: EMPTY_LIST,
+  };
+  const tree = decompressAST(EMPTY_LIST);
+  return { name, code, tree, table, entry };
+}
+
+// Load a virtual (generated) module
+export const loadVirtualModule = (
+  render: VirtualRenderFunction,
+  symbols: string[],
+  key: string | number = makeKey(),
+) => {
+  const code = `#virtual ${symbols.join(' ')} ${key}`;
+
+  const hash = getProgramHash(code);
+  const name = `_VT_${hash.slice(0, 6)}_`;
+
+  const table = {
+    hash,
+    symbols,
+    visibles: symbols,
+    globals: EMPTY_LIST,
+    externals: EMPTY_LIST,
+    modules: EMPTY_LIST,
+    functions: EMPTY_LIST,
+    declarations: EMPTY_LIST,
+  };
+  const virtual = { render };
+  const tree = decompressAST(EMPTY_LIST);
+  return { name, code, tree, table, virtual };
 }
 
 // Parse GLSL using lezer grammar

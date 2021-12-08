@@ -1,12 +1,49 @@
 import {
   UniformType, UniformAttribute, UniformAttributeValue,
   ResolvedDataBindings, ResolvedCodeBindings,
-  ShaderModuleDescriptor, StorageSource,
+  ShaderModuleDescriptor, StorageSource, DataBinding,
 } from './types';
 import { makeStorageAccessors, checkStorageTypes, checkStorageType } from './storage';
 import { makeUniformBlockAccessor } from './uniform';
 import { makeShaderModule } from './pipeline';
 import partition from 'lodash/partition';
+
+export const makeShaderBindings = <T>(
+  uniforms: UniformAttributeValue[],
+  sources: any[],
+): Record<string, DataBinding<T>> => {
+  const n = uniforms.length;
+  const out = {};
+  for (let i = 0; i < n; ++i) {
+    const u = uniforms[i];
+    const s = sources[i];
+    out[u.name] = makeShaderBinding<T>(u, s);
+  }
+  return out;
+}
+
+export const makeShaderBinding = (
+  uniform: UniformAttributeValue,
+  source?: StorageSource | T | any,
+): DataBinding<T> => {
+  if (source) {
+    if (source?.libs != null || source?.table != null) {
+      const lambda = source as T;
+      return {uniform, lambda};
+    }
+    if (source.buffer) {
+      const storage = source as StorageSource;
+      checkStorageType(uniform, storage);
+      return {uniform, storage};
+    }
+  }
+  return {uniform, constant: source ?? uniform.value};
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+
 
 // Extract data bindings from a list of `constant | buffer | null` values.
 export const extractDataBindings = (

@@ -87,6 +87,36 @@ describe("link", () => {
 
   });
   
+  it("tree shakes constants", () => {
+    const sub = `
+    const vec4 colorUsed = vec4(0.0, 0.1, 0.2, 0.0);
+    const vec4 colorNotUsed = vec4(0.0, 0.1, 0.2, 1.0);
+
+    #pragma export
+    vec4 getColor() {
+      return colorUsed;
+    }
+    `
+
+    const main = `
+    vec4 getColor();
+    void main() {
+      vec4 a = getColor();
+    }
+    `
+
+    for (let compressed of [false, true]) {
+      const modMain = loadModule(main, 'main', undefined, compressed);
+      const modSub = loadModule(sub, 'sub', undefined, compressed);
+
+      const getPosition = {...modSub, entry: 'getPosition'};
+      const getColor = {...modSub, entry: 'getColor'};
+
+      const linked = linkModule(modMain, {}, {getPosition, getColor});
+      expect(linked).toMatchSnapshot();
+    }
+  })
+  
   it("tree shakes around identifiers", () => {
 
     const sub = `
@@ -108,20 +138,9 @@ describe("link", () => {
     }
     `
 
-    {
-      const modMain = loadModule(main, 'main', undefined, false);
-      const modSub = loadModule(sub, 'sub', undefined, false);
-
-      const getPosition = {...modSub, entry: 'getPosition'};
-      const getColor = {...modSub, entry: 'getColor'};
-
-      const linked = linkModule(modMain, {}, {getPosition, getColor});
-      expect(linked).toMatchSnapshot();
-    }
-
-    {
-      const modMain = loadModule(main, 'main', undefined, true);
-      const modSub = loadModule(sub, 'sub', undefined, true);
+    for (let compressed of [false, true]) {
+      const modMain = loadModule(main, 'main', undefined, compressed);
+      const modSub = loadModule(sub, 'sub', undefined, compressed);
 
       const getPosition = {...modSub, entry: 'getPosition'};
       const getColor = {...modSub, entry: 'getColor'};

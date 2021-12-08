@@ -199,8 +199,16 @@ export type PickingUniforms = {
 export type Emitter = (...args: number[]) => void;
 export type Accessor = (o: any) => any;
 export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
-export type DataField = [string, string | Accessor | ArrayLike];
+
 export type ArrayLike = any[] | TypedArray;
+
+export type DataField = [string, string | Accessor | ArrayLike];
+export type DataBinding<T> = {
+  uniform: UniformAttributeValue,
+  storage?: StorageSource,
+  constant?: any,
+  lambda?: T,
+};
 
 export type ResolvedDataBindings = {
   constants: Record<string, any>,

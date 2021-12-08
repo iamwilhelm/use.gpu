@@ -1,8 +1,8 @@
 import { Tree } from '@lezer/common';
-import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF } from '../types';
+import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF, DataBinding } from '../types';
 import { parseShader, defineConstants, loadModule, loadModuleWithCache } from './shader';
 import { rewriteUsingAST, resolveShakeOps } from './ast';
-import { parseBundle } from '../util/bundle';
+import { parseBundle, parseLinkAliases } from '../util/bundle';
 import { getGraphOrder } from '../util/tree';
 import { GLSL_VERSION } from '../constants';
 import * as T from '../grammar/glsl.terms';
@@ -48,6 +48,27 @@ export const linkBundle = timed('linkBundle', (
   links: Record<string, ParsedBundle | ParsedModule> = {},
   defines: Record<string, ShaderDefine> = {},
 ) => {
+  const {code} = linkBundleVirtual(bundle, links, defines);
+  return code;
+});
+
+// Link a parsed module with static modules and dynamic links.
+export const linkModule = timed('linkModule', (
+  main: ParsedModule,
+  libraries: Record<string, ParsedModule> = {},
+  linkDefs: Record<string, ParsedModule> = {},
+  defines: Record<string, ShaderDefine> = {},
+) => {
+  const {code} = linkModuleVirtual(main, libraries, linkDefs, defines);
+  return code;
+});
+
+// Link a bundle of parsed module + libs, dynamic links and virtual bindings.
+export const linkBundleVirtual = timed('linkBundleVirtual', (
+  bundle: ParsedBundle,
+  links: Record<string, ParsedBundle | ParsedModule> = {},
+  defines: Record<string, ShaderDefine> = {},
+) => {
   let [main, libs] = parseBundle(bundle);
 
   const linkDefs = mapValues(links, (bundle: ParsedBundle | ParsedModule, name: string) => {
@@ -58,11 +79,11 @@ export const linkBundle = timed('linkBundle', (
     return link;
   });
 
-  return linkModule(main, libs, linkDefs, defines);  
+  return linkModuleVirtual(main, libs, linkDefs, defines);
 });
 
-// Link a parsed module with static modules and dynamic links.
-export const linkModule = timed('linkModule', (
+// Link a parsed module with static modules, dynamic links and virtual bindings.
+export const linkModuleVirtual = timed('linkModuleVirtual', (
   main: ParsedModule,
   libraries: Record<string, ParsedModule> = {},
   linkDefs: Record<string, ParsedModule> = {},
@@ -71,7 +92,7 @@ export const linkModule = timed('linkModule', (
   if (typeof main === 'string') throw new Error("Module is a string instead of an object");
 
   const [links, aliases] = parseLinkAliases(linkDefs);
-  const {modules, exported} = loadModules(main, libraries, links);
+  const {modules, exported} = loadModulesInOrder(main, libraries, links, aliases);
 
   const program = [getPreamble(), defineConstants(defines)] as string[];
 
@@ -82,8 +103,12 @@ export const linkModule = timed('linkModule', (
   const visible = new Set<string>();
   const fixed = new Map<string, string>();
 
+  let bindingIndex = 0;
+  const nextBinding = () => bindingIndex++;
+  const bindings = [] as DataBinding[][];
+
   for (const module of modules) {
-    const {name, code, tree, table, shake} = module;
+    const {name, code, tree, table, shake, virtual} = module;
     const {hash, globals, symbols, visibles, externals, modules} = table;
 
     // Multiple links into same module with different name
@@ -92,7 +117,7 @@ export const linkModule = timed('linkModule', (
       continue;
     }
 
-    // Namespace all non-global symbols other than main
+    // Namespace all non-global symbols outside main module
     const rename = new Map<string, string>();
     if (module !== main) {
       const namespace = reserveNamespace(module, namespaces, used);
@@ -122,7 +147,7 @@ export const linkModule = timed('linkModule', (
     // Replace imported function prototype names with target
     for (const {flags, prototype} of externals) if (prototype) {
       const {name} = prototype;
-      const resolved = aliases.get(name) ?? name;
+      const resolved = aliases?.get(name) ?? name;
       const namespace = namespaces.get(name);
 
       if ((namespace === undefined) && (flags & RF.Optional)) continue;
@@ -134,26 +159,41 @@ export const linkModule = timed('linkModule', (
       rename.set(name, imp);
     }
 
-    // Shake tree ops based on which symbols were exported
-    const keep = exported.get(hash);
-    const ops = shake && keep ? resolveShakeOps(shake, keep) : null;
+    if (virtual) {
+      // Emit virtual module in target namespace,
+      // with dynamically assigned binding slots.
+      const namespace = hashes.get(hash)!;
+      const {code, virtuals} = virtual.render(namespace, nextBinding);
 
-    // Rename symbols using AST while tree shaking
-    program.push(rewriteUsingAST(code, tree, rename, ops));
+      program.push(code);
+      bindings.push(...virtuals);
+    }
+    else {
+      // Shake tree ops based on which symbols were exported
+      const keep = exported.get(hash);
+      const ops = shake && keep ? resolveShakeOps(shake, keep) : null;
+
+      // Rename symbols using AST while tree shaking
+      const recode = rewriteUsingAST(code, tree, rename, ops);
+      program.push(recode);
+    }
   }
 
-  const result = program.join("\n");
-  return result;
+  const code = program.join("\n");
+  return {code, bindings};
 });
 
-// Load all modules references from a piece of code
-export const loadModules = timed('loadModules', (
+// Load all modules references from a piece of code,
+// while gathering info about what's exported (for tree shaking).
+export const loadModulesInOrder = timed('loadModules', (
   main: ParsedModule,
   libraries: Record<string, ParsedModule>,
   links: Record<string, ParsedModule>,
+  aliases: Map<string, string> | null,
 ) => {
   const graph = new Map<string, string[]>();
   const seen = new Set<string>();
+  const hoist = new Set<string>();
   const exported = new Map<string, Set<string>>();
 
   const out = [] as ParsedModule[];
@@ -173,7 +213,7 @@ export const loadModules = timed('loadModules', (
     const deps = [] as string[];
 
     // Recurse into imports
-    for (const {name, imports} of modules) {
+    for (const {at, name, imports} of modules) {
       const isLink = name.match(/^#/);
       const module = isLink ? links[name] : libraries[name];
       if (!module) throw new Error(`Unknown module '${name}'`);
@@ -182,10 +222,12 @@ export const loadModules = timed('loadModules', (
       seen.add(name);
       deps.push(name);
 
+      if (at < 0) hoist.add(name);
+
       const {table: {hash}} = module;
       let list = exported.get(hash);
       if (!list) exported.set(hash, list = new Set());
-      imports.forEach(i => list!.add(i.name));
+      imports.forEach(i => list!.add(module.entry ?? i.name));
     }
 
     // Recurse into links
@@ -204,7 +246,7 @@ export const loadModules = timed('loadModules', (
       const {table: {hash}} = module;
       let list = exported.get(hash);
       if (!list) exported.set(hash, list = new Set());
-      list.add(module.entry ?? name);
+      list.add(module.entry ?? aliases?.get(name) ?? name);
     }
 
     // Build module-to-module dependency graph
@@ -213,6 +255,7 @@ export const loadModules = timed('loadModules', (
 
   // Sort by graph depth
   const order = getGraphOrder(graph, main.name);
+  for (let [k, v] of order.entries()) if (hoist.has(k)) order.set(k, v + 1e5);
   out.sort((a, b) => order.get(b.name)! - order.get(a.name)! || a.name.localeCompare(b.name));
 
   return {
@@ -220,27 +263,6 @@ export const loadModules = timed('loadModules', (
     exported,
   };
 });
-
-// Parse run-time specified keys `from:to` into a map of aliases
-export const parseLinkAliases = (
-  links: Record<string, ParsedModule>,
-): [
-  Record<string, ParsedModule>,
-  Map<string, string>
-] => {
-  const out = {} as Record<string, ParsedModule>;
-  const aliases = new Map<string, string>();
-  for (let k in links) {
-    const link = links[k];
-
-    let [name, imported] = k.split(':');
-    if (!imported && link.entry != null) imported = link.entry;
-    out[name] = link;
-    aliases.set(name, imported);
-  }
-  return [out, aliases];
-}
-
 
 // Reserve a unique namespace based on truncated shader hash
 export const reserveNamespace = (

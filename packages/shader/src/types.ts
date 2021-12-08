@@ -5,7 +5,7 @@ export type ParsedModuleCache = LRU<string, ParsedModule>;
 
 export type ParsedBundle = {
   module: ParsedModule,
-  libs: Record<string, ParsedBundle>,
+  libs?: Record<string, ParsedBundle | ParsedModule>,
   entry?: string,
 };
 
@@ -15,6 +15,7 @@ export type ParsedModule = {
   tree: Tree,
   table: SymbolTable,
   shake?: ShakeTable,
+  virtual?: VirtualTable,
   entry?: string,
 };
 
@@ -112,3 +113,34 @@ export type StructRef = {
 
 export type ShaderDefine = string | number | boolean | null | undefined;
 export type ShaderCompiler = (code: string, stage: string) => Uint8Array | Uint32Array;
+
+export type StorageSource = {
+  buffer: GPUBuffer,
+  format: string,
+  length: number,
+};
+
+export type UniformAttributeValue = {
+  name: string,
+  format: string,
+  args: string[],
+  value: any,
+};
+
+export type DataBinding = {
+  uniform: UniformAttributeValue,
+  storage?: StorageSource,
+  lambda?: ParsedBundle | ParsedModule,
+  constant?: any,
+};
+
+export type VirtualTable<T = any> = {
+  render: VirtualRenderFunction,
+};
+
+export type VirtualRenderFunction = (namespace: string, nextBinding: () => number) => VirtualRender;
+
+export type VirtualRender = {
+  code: string,
+  virtuals: DataBinding[][],
+};

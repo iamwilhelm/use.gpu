@@ -15,6 +15,17 @@ export type Reducer<T> = T | ((t: T) => T);
 export type Setter<T> = (t: Reducer<T>) => void;
 export type Resource<T> = () => (void | Task | [T, Task]);
 
+// Hook types
+export enum Hook {
+  STATE = 0,
+  MEMO = 1,
+  ONE = 2,
+  CALLBACK = 3,
+  RESOURCE = 4,
+  CONTEXT = 5,
+  COCONTEXT = 6,
+};
+
 // Deferred actions
 export type Task = () => void;
 export type Action<F extends Function> = {

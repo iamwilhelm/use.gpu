@@ -11,12 +11,11 @@ import {
   OrbitCamera, OrbitControls,
   Picking, Pick, EventProvider,
   Cursor,
+  RawQuads as Quads, RawLines as Lines,
   RenderToTexture,
   ViewProvider,
 } from '@use-gpu/components';
 import { Mesh } from './mesh';
-import { Quads } from './quads';
-import { Lines } from './lines';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 

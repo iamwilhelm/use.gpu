@@ -7,7 +7,7 @@ import { makeUniformBlock } from './gen';
 import { parseBundle, parseLinkAliases } from '../util/bundle';
 import { getGraphOrder } from '../util/tree';
 
-import { GLSL_VERSION, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP } from '../constants';
+import { GLSL_VERSION, VIRTUAL_BINDGROUP } from '../constants';
 import * as T from '../grammar/glsl.terms';
 import mapValues from 'lodash/mapValues';
 
@@ -89,7 +89,7 @@ export const linkModule = timed('linkModule', (
   const fixed = new Map<string, string>();
 
   for (const module of modules) {
-    const {name, code, tree, table, shake, virtual, namespace} = module;
+    const {name, code, tree, table, shake, virtual} = module;
     const {hash, globals, symbols, visibles, externals, modules} = table;
 
     // Multiple links into same module with different name
@@ -101,6 +101,7 @@ export const linkModule = timed('linkModule', (
     // Namespace all non-global symbols outside main module
     const rename = new Map<string, string>();
     if (module !== main) {
+      const namespace = virtual?.namespace;
       const ns = reserveNamespace(module, namespaces, used, namespace);
       hashes.set(hash, ns);
 
@@ -148,6 +149,7 @@ export const linkModule = timed('linkModule', (
       // with dynamically assigned binding slots.
       const ns = hashes.get(hash)!;
       const code = virtual.render(ns, virtual.base);
+      if (libraries[VIRTUAL_BINDGROUP] == null) throw new Error(`Virtual module ${name} has unresolved data bindings`);
 
       program.push(code);
     }

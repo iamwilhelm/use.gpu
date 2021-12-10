@@ -18,7 +18,6 @@ export type ParsedModule = {
   table: SymbolTable,
   shake?: ShakeTable,
   virtual?: VirtualTable,
-  namespace?: string,
   entry?: string,
 };
 
@@ -39,6 +38,14 @@ export type SymbolTable = {
 
 export type ShakeTable = ShakeOp[];
 export type ShakeOp = [number, string[]];
+
+export type VirtualTable = {
+  render: VirtualRender,
+  uniforms: DataBinding[],
+  bindings: DataBinding[],
+  base: number,
+  namespace?: string,
+};
 
 export enum RefFlags {
   Exported = 1,
@@ -135,13 +142,6 @@ export type DataBinding = {
   storage?: StorageSource,
   lambda?: ParsedBundle | ParsedModule,
   constant?: any,
-};
-
-export type VirtualTable = {
-  render: VirtualRender,
-  uniforms: DataBinding[],
-  bindings: DataBinding[],
-  base: number,
 };
 
 export type VirtualRender = (namespace: string, base: number) => string;

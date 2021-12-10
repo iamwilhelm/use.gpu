@@ -4,7 +4,11 @@ import {
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
+
+import { ViewContext } from '../provider/view-provider';
+import { PickingContext, useNoPicking } from '../render/picking';
+import { Virtual } from './virtual';
+
 import { use, yeet, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
@@ -12,7 +16,7 @@ import { makeShaderBindings } from '@use-gpu/core';
 import { getLineVertex } from '@use-gpu/glsl/instance/vertex/line.glsl';
 import { getPassThruFragment } from '@use-gpu/glsl/mask/passthru.glsl';
 
-export type LinesProps = {
+export type RawLinesProps = {
   position?: number[] | TypedArray,
   segment?: number,
   size?: number,
@@ -56,7 +60,7 @@ const PIPELINE = {
   },
 };
 
-export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
+export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -106,4 +110,4 @@ export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
     mode,
     id,
   });
-}, 'Lines');
+}, 'RawLines');

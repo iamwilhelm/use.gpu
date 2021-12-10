@@ -13,27 +13,6 @@ import { makeStorageForDataBindings, makeStorageBindings } from './storage';
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
 
-// deprecated
-export const makeUniformsWithStorage = (
-  device: GPUDevice,
-  pipeline: GPURenderPipeline | GPUComputePipeline,
-  uniforms: UniformAttribute[],
-  links: Record<string, StorageSource | null | undefined>,
-  set: number = 0,
-): UniformAllocation => {
-  const pipe = makeUniformPipe(uniforms);
-  const buffer = makeUniformBuffer(device, pipe.data);
-  const uniformEntries = makeUniformBindings([{resource: {buffer}}]);
-  const storageEntries = makeStorageBindings(links, 1);
-
-  const entries = [...uniformEntries, ...storageEntries];
-  const bindGroup = device.createBindGroup({
-    layout: pipeline.getBindGroupLayout(set),
-    entries,
-  });
-  return {pipe, buffer, bindGroup};
-}
-
 export const makeUniforms = (
   device: GPUDevice,
   pipeline: GPURenderPipeline | GPUComputePipeline,

@@ -85,3 +85,81 @@ exports[`bind binds an external 4`] = `
     }
     "
 `;
+
+exports[`bind links data bindings 1`] = `
+"#version 450
+
+layout (set = VIRTUAL_BINDGROUP, binding = 1) uniform _VT_Type {
+  vec4 _VT_0_getColor;
+} _VT_Uniform;
+
+
+vec4 _VT_0_getColor(int) {
+  return _VT_Uniform._VT_0_getColor;
+}
+
+
+layout (std430, set = VIRTUAL_BINDGROUP, binding = 0) readonly buffer _VT_0_getSizeType {
+  vec2 data[];
+} _VT_0_getSizeStorage;
+
+vec2 _VT_0_getSize(int index) {
+  return _VT_0_getSizeStorage.data[index];
+}
+
+
+    vec4 _VT_0_getColor(int);
+    vec2 _VT_0_getSize(int);
+    
+    void main() {
+      _VT_0_getColor(0);
+      _VT_0_getSize(0);
+    }
+    "
+`;
+
+exports[`bind makes deterministic links for data bindings 1`] = `
+Object {
+  "base": 0,
+  "bindings": Array [],
+  "code": "#virtual getColor 0",
+  "name": "_VT_1ffruj_",
+  "table": Object {
+    "declarations": Array [],
+    "externals": Array [],
+    "functions": Array [],
+    "globals": Array [],
+    "hash": "1ffruj7ugw",
+    "modules": Array [],
+    "symbols": Array [
+      "getColor",
+    ],
+    "visibles": Array [
+      "getColor",
+    ],
+  },
+  "uniforms": Array [
+    Object {
+      "constant": Array [
+        1,
+        0.5,
+        1,
+        1,
+      ],
+      "uniform": Object {
+        "args": Array [
+          "int",
+        ],
+        "format": "vec4",
+        "name": "getColor",
+        "value": Array [
+          0,
+          0.5,
+          1,
+          1,
+        ],
+      },
+    },
+  ],
+}
+`;

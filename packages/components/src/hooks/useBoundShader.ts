@@ -38,6 +38,7 @@ export const useBoundShader = (
   // Memoize on specific keys to refresh shader
   const keys = [];
   for (const u of uniforms) keys.push(u.uniform.name);
+  keys.push('/');
   for (const b of bindings) keys.push(b.uniform.name);
 
   // Link final GLSL
@@ -68,7 +69,7 @@ export const useBoundShader = (
   // Refresh bindings if buffer assignment changed
   const buffers = [];
   for (const b of bindings) keys.push(b.buffer);  
-  useOne(() => ref.bindings = bindings, buffers);
+  useMemo(() => ref.bindings = bindings, buffers);
 
   return {shader, ...ref};
 };

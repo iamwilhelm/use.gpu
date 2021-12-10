@@ -1,7 +1,7 @@
 import {
   Initial, Setter, Reducer, Key, Task,
   LiveFunction, LiveFiber, LiveContext,
-  DeferredCall, HostInterface,
+  DeferredCall, HostInterface, Hook,
 } from './types';
 
 import { bind, CURRENT_FIBER } from './live';
@@ -37,16 +37,6 @@ export const useFiber = () => {
   if (!fiber) throw new Error("Calling a hook outside a bound function");
   return fiber;
 }
-
-enum Hook {
-  STATE = 0,
-  MEMO = 1,
-  ONE = 2,
-  CALLBACK = 3,
-  RESOURCE = 4,
-  CONTEXT = 5,
-  COCONTEXT = 6,
-};
 
 // Memoize a live function on all its arguments (shallow comparison per arg)
 // Unlike <Memo> this does not create a new sub-fiber

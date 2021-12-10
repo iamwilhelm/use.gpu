@@ -6,7 +6,10 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
+import { ViewContext } from '../provider/view-provider';
+import { PickingContext, useNoPicking } from '../render/picking';
+import { Virtual } from './virtual';
+
 import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
@@ -14,7 +17,7 @@ import { makeShaderBindings } from '@use-gpu/core';
 import { getQuadVertex } from '@use-gpu/glsl/instance/vertex/quad.glsl';
 import { getMaskedFragment } from '@use-gpu/glsl/mask/masked.glsl';
 
-export type QuadsProps = {
+export type RawQuadsProps = {
   position?: number[] | TypedArray,
   size?: number,
   color?: number[],
@@ -61,7 +64,7 @@ const PIPELINE = {
   },
 };
 
-export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
+export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -102,4 +105,4 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
     mode,
     id,
   });
-}, 'Quads');
+}, 'RawQuads');

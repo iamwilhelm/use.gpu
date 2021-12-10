@@ -5,7 +5,7 @@ import { compressAST, decompressAST } from './ast';
 import { getProgramHash, makeKey } from '../util/hash';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
 import { parseBundle, toBundle, parseLinkAliases, forBundleModules } from '../util/bundle';
-import { PREFIX_CLOSURE, VIRTUAL_BINDGROUP } from '../constants';
+import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP } from '../constants';
 import mapValues from 'lodash/mapValues';
 
 const TIMED = false;
@@ -105,13 +105,11 @@ export const resolveBindings = timed('resolveBindings', (
   modules: ShaderModule[],
   uniforms: DataBinding[],
   bindings: DataBinding[],
-  bases: Record<string, number>,
 } => {
   const allUniforms = [] as DataBinding[];
   const allBindings = [] as DataBinding[];
 
   const seen = new Set();
-  const bases = {} as Record<string, number>;
 
   // Gather all namespaced uniforms and bindings from all programs.
   // Assign base offset to each virtual module in-place.
@@ -120,15 +118,17 @@ export const resolveBindings = timed('resolveBindings', (
     forBundleModules(m, (m: ParsedModule) => {
       const {virtual} = m;
       if (virtual) {
-        const {table: {hash}, namespace} = m;
+        const {table: {hash}} = m;
         if (seen.has(hash)) return;
         seen.add(hash);
 
         const {uniforms, bindings} = virtual;
-        const ns = namespace ?? '';
-        for (const u of uniforms) allUniforms.push(namespaceBinding(ns, u));
+        const namespace = PREFIX_VIRTUAL + base + '_';
+        for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
         for (const b of bindings) allBindings.push(b);
 
+        // Mutate virtual modules as they are ephemeral
+        virtual.namespace = namespace;
         virtual.base = base;
         base += allBindings.length;
       }
@@ -167,7 +167,6 @@ export const resolveBindings = timed('resolveBindings', (
     modules: out,
     uniforms: allUniforms,
     bindings: allBindings,
-    bases,
   };
 });
 

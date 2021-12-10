@@ -1,5 +1,5 @@
-import { LiveFiber } from '@use-gpu/live/types';
-import { formatNode, formatValue } from '@use-gpu/live';
+import { LiveFiber, Hook } from '@use-gpu/live/types';
+import { formatNode, formatValue, STATE_SLOTS } from '@use-gpu/live';
 import styled, { keyframes } from "styled-components";
 
 import React, { useState } from 'react';
@@ -7,6 +7,7 @@ import { Action } from './types';
 import { SplitRow, IndentTree, Label } from './layout';
 
 import { inspectObject } from './props';
+import chunk from 'lodash/chunk';
 
 const StyledCall = styled.div`
 `
@@ -17,9 +18,9 @@ type CallProps = {
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
-	const {id, depth, path, context, state, yeeted, next, host} = fiber;
+	const {id, depth, path, type, state, context, yeeted, mount, mounts, next, host} = fiber;
 
-	let props = {id, depth, path, state, yeeted, context, next, host} as Record<string, any>;
+	let props = {id, depth, path, type, context, yeeted, mount, mounts, next, host} as Record<string, any>;
 
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 	const toggleExpanded = (id: string) => setExpanded((state) => ({
@@ -27,10 +28,32 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
 		[id]: !expanded[id],
 	}));
 
+	const hooks = chunk(state, STATE_SLOTS);
+
 	return (
     <StyledCall>
   		<div><b>Fiber</b></div>
   		<div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
+  		<div><b>State</b></div>
+  		<div>
+				{inspectObject(hooks.map(hookToObject), expanded, toggleExpanded, '')}
+			</div>
   	</StyledCall>
   );
+}
+
+const hookToObject = (
+	state: any[],
+) => {
+	const [type, a, b] = state;
+	if (type === Hook.STATE) {
+		return {state: a, deps: b};
+	}
+	if (type === Hook.MEMO || type === Hook.ONE || type === Hook.CALLBACK) {
+		return {memo: a, deps: b};
+	}
+	if (type === Hook.RESOURCE) {
+		return {resource: a.value, deps: b};
+	}
+	return null;
 }

@@ -74,7 +74,6 @@ export const loadVirtualModule = (
 
   const hash = getProgramHash(code);
   const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;
-  const namespace = `${PREFIX_VIRTUAL}${hash.slice(0, 2)}_`;
 
   const table = {
     hash,
@@ -87,7 +86,7 @@ export const loadVirtualModule = (
     declarations: EMPTY_LIST,
   };
   const tree = decompressAST(EMPTY_LIST);
-  return { name, code, tree, table, virtual, namespace };
+  return { name, code, tree, table, virtual };
 }
 
 // Parse GLSL using lezer grammar

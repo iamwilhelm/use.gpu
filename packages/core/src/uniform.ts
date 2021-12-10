@@ -1,5 +1,6 @@
 import {
-  UniformAllocation, UniformAttribute, UniformAttributeDescriptor,
+  UniformAllocation, VirtualAllocation,
+  UniformAttribute, UniformAttributeDescriptor,
   UniformBinding, UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller,
   StorageSource,
@@ -7,11 +8,12 @@ import {
 import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 import { makeUniformBuffer } from './buffer';
-import { makeStorageBindings } from './storage';
+import { makeStorageForDataBindings, makeStorageBindings } from './storage';
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
 
+// deprecated
 export const makeUniformsWithStorage = (
   device: GPUDevice,
   pipeline: GPURenderPipeline | GPUComputePipeline,
@@ -69,6 +71,44 @@ export const makeMultiUniforms = (
   return {pipe, buffer, bindGroup};
 }
 
+export const makeBoundUniforms = <T>(
+  device: GPUDevice,
+  pipeline: GPURenderPipeline | GPUComputePipeline,
+  uniforms: DataBinding<T>,
+  bindings: DataBinding<T>,
+  set: number = 0,
+): VirtualAllocation | null => {
+  const entries = [] as GPUBindGroupEntry[];
+
+  let pipe, buffer;
+
+  const hasBindings = !!bindings.length;
+  const hasUniforms = !!uniforms.length;
+
+  if (!hasBindings && !hasUniforms) return {};
+
+  if (hasBindings) {
+    const storageEntries = bindings.length ? makeStorageForDataBindings(bindings, 0) : [];
+    entries.push(...storageEntries);
+  }
+
+  if (hasUniforms) {
+    const struct = uniforms.map(({uniform}) => uniform);
+    pipe = makeUniformPipe(struct);
+    buffer = makeUniformBuffer(device, pipe.data);
+
+    const uniformEntries = makeUniformBindings([{resource: {buffer}}], bindings.length);
+    entries.push(...uniformEntries);
+  }
+
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(set),
+    entries,
+  });
+
+  return {pipe, buffer, bindGroup};
+}
+
 export const makeUniformPipe = (
   uniforms: UniformAttribute[],
   count: number = 1,
@@ -93,7 +133,7 @@ export const makeMultiUniformPipe = (
 
 export const makeUniformBindings = (
   bindings: UniformBinding[],
-  binding: number = 0
+  binding: number = 0,
 ): GPUBindGroupEntry[] => {
   const entries = [] as any[];
 

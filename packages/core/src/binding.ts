@@ -8,6 +8,7 @@ import { makeUniformBlockAccessor } from './uniform';
 import { makeShaderModule } from './pipeline';
 import partition from 'lodash/partition';
 
+// Parse a set of sources for a given set of uniforms/attributes
 export const makeShaderBindings = <T>(
   uniforms: UniformAttributeValue[],
   sources: any[],
@@ -22,6 +23,7 @@ export const makeShaderBindings = <T>(
   return out;
 }
 
+// Parse a source for a given uniform/attribute
 export const makeShaderBinding = (
   uniform: UniformAttributeValue,
   source?: StorageSource | T | any,
@@ -40,6 +42,24 @@ export const makeShaderBinding = (
   return {uniform, constant: source ?? uniform.value};
 }
 
+// Bind a shader to a set of data bindings, either as constants or a buffer
+export const makeBoundShader = <A, B>(
+  vertexShader: A,
+  fragmentShader: A,
+  links: Record<string, A>,
+  defines: Record<string, any>,
+  compile: (code: B, stage: string) => any,
+  link: (shader: A, links: Record<string, A>, defines: Record<string, any>, cache: any) => B,
+  cache: any,
+): [ShaderModuleDescriptor, ShaderModuleDescriptor, B, B] => {
+  const vertexLinked = link(vertexShader, links, defines, cache);
+  const fragmentLinked = link(fragmentShader, links, defines, cache);
+
+  const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
+  const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
+
+  return [vertex, fragment, vertexLinked, fragmentLinked];
+};
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -109,25 +129,6 @@ export const makeBoundStorageAccessors = <T>(
 
   return {accessors, attributes, lambdas, constants};
 }
-
-// Bind a shader to a set of data bindings, either as constants or a buffer
-export const makeBoundShader = <A, B>(
-  vertexShader: A,
-  fragmentShader: A,
-  links: Record<string, A>,
-  defines: Record<string, any>,
-  compile: (code: B, stage: string) => any,
-  link: (shader: A, links: Record<string, A>, defines: Record<string, any>, cache: any) => B,
-  cache: any,
-): [ShaderModuleDescriptor, ShaderModuleDescriptor, B, B] => {
-  const vertexLinked = link(vertexShader, links, defines, cache);
-  const fragmentLinked = link(fragmentShader, links, defines, cache);
-
-  const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
-  const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
-
-  return [vertex, fragment, vertexLinked, fragmentLinked];
-};
 
 // Make constant value accessor
 export const makeConstantAccessor = (

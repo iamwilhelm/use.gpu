@@ -44,29 +44,8 @@ export const linkCode = timed('linkCode', (
   return linkModule(main, parsedLibraries, parsedLinkDefs, defines);
 });
 
-// Link a bundle of parsed module + libs and dynamic links.
+// Link a bundle of parsed module + libs, dynamic links
 export const linkBundle = timed('linkBundle', (
-  bundle: ParsedBundle,
-  links: Record<string, ParsedBundle | ParsedModule> = {},
-  defines: Record<string, ShaderDefine> = {},
-) => {
-  const {code} = linkBundleVirtual(bundle, links, defines);
-  return code;
-});
-
-// Link a parsed module with static modules and dynamic links.
-export const linkModule = timed('linkModule', (
-  main: ParsedModule,
-  libraries: Record<string, ParsedModule> = {},
-  linkDefs: Record<string, ParsedModule> = {},
-  defines: Record<string, ShaderDefine> = {},
-) => {
-  const {code} = linkModuleVirtual(main, libraries, linkDefs, defines);
-  return code;
-});
-
-// Link a bundle of parsed module + libs, dynamic links and virtual bindings.
-export const linkBundleVirtual = timed('linkBundleVirtual', (
   bundle: ParsedBundle,
   links: Record<string, ParsedBundle | ParsedModule> = {},
   defines: Record<string, ShaderDefine> = {},
@@ -81,15 +60,16 @@ export const linkBundleVirtual = timed('linkBundleVirtual', (
     return link;
   });
 
-  return linkModuleVirtual(main, libs, linkDefs, defines);
+  return linkModule(main, libs, linkDefs, defines);
 });
 
-// Link a parsed module with static modules, dynamic links and virtual bindings.
-export const linkModuleVirtual = timed('linkModuleVirtual', (
+// Link a parsed module with static modules, dynamic links
+export const linkModule = timed('linkModule', (
   main: ParsedModule,
   libraries: Record<string, ParsedModule> = {},
   linkDefs: Record<string, ParsedModule> = {},
   defines: Record<string, ShaderDefine> = {},
+  bases: Record<string, number> = {},
 ) => {
   if (typeof main === 'string') throw new Error("Module is a string instead of an object");
 
@@ -98,20 +78,18 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
 
   const program = [] as string[];
 
-  const hashes = new Map<string, string>();
+  // Namespace by module name and module hash
   const namespaces = new Map<string, string>();
+  const hashes = new Map<string, string>();
   const used = new Set<string>();
+
+  // Track symbols in global namespace 
   const exists = new Set<string>();
   const visible = new Set<string>();
   const fixed = new Map<string, string>();
 
-  let bindingIndex = 0;
-  const nextBinding = () => bindingIndex++;
-  const allBindings = [] as DataBinding[];
-  const allUniforms = [] as DataBinding[];
-
   for (const module of modules) {
-    const {name, code, tree, table, shake, virtual} = module;
+    const {name, code, tree, table, shake, virtual, namespace} = module;
     const {hash, globals, symbols, visibles, externals, modules} = table;
 
     // Multiple links into same module with different name
@@ -123,25 +101,28 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
     // Namespace all non-global symbols outside main module
     const rename = new Map<string, string>();
     if (module !== main) {
-      const namespace = reserveNamespace(module, namespaces, used);
-      hashes.set(hash, namespace);
+      const ns = reserveNamespace(module, namespaces, used, namespace);
+      hashes.set(hash, ns);
 
-      for (const name of symbols) rename.set(name, namespace + name);
+      for (const name of symbols) rename.set(name, ns + name);
       for (const name of globals) rename.set(name, name);
 
       for (const name of visibles) visible.add(rename.get(name)!);
       for (const name of rename.values()) exists.add(name);
 
-      for (const name of globals) fixed.set(namespace + name, name);
+      for (const name of globals) fixed.set(ns + name, name);
     }
 
     // Replace imported symbol names with target
     for (const {name: module, imports} of modules) {
-      const namespace = namespaces.get(module);
+      const ns = namespaces.get(module);
       for (const {name, imported} of imports) {
-        let imp = namespace + imported;
+        let imp = ns + imported;
         if (fixed.has(imp)) imp = fixed.get(imp)!;
-        if (!exists.has(imp)) console.warn(`Import ${name} from '${module}' does not exist`);
+        if (!exists.has(imp)) {
+          console.warn(`Import ${name} from '${module}' does not exist`);
+          debugger;
+        }
         else if (!visible.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
         rename.set(name, imp);
       }
@@ -151,11 +132,11 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
     for (const {flags, prototype} of externals) if (prototype) {
       const {name} = prototype;
       const resolved = aliases?.get(name) ?? name;
-      const namespace = namespaces.get(name);
+      const ns = namespaces.get(name);
 
-      if ((namespace === undefined) && (flags & RF.Optional)) continue;
+      if ((ns === undefined) && (flags & RF.Optional)) continue;
 
-      let imp = namespace + resolved;
+      let imp = ns + resolved;
       if (fixed.has(imp)) imp = fixed.get(imp)!;
       if (!exists.has(imp)) console.warn(`Link ${name}:${resolved} does not exist`);
       else if (!visible.has(imp)) console.warn(`Link ${name}:${resolved} is private`);
@@ -165,12 +146,10 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
     if (virtual) {
       // Emit virtual module in target namespace,
       // with dynamically assigned binding slots.
-      const namespace = hashes.get(hash)!;
-      const {code, uniforms, bindings} = virtual.render(namespace, nextBinding);
+      const ns = hashes.get(hash)!;
+      const code = virtual.render(ns, bases[hash]);
 
       program.push(code);
-      allBindings.push(...bindings);
-      allUniforms.push(...uniforms);
     }
     else {
       // Shake tree ops based on which symbols were exported
@@ -186,11 +165,10 @@ export const linkModuleVirtual = timed('linkModuleVirtual', (
   const header = [
     getPreamble(),
     defineConstants(defines),
-    makeUniformBlock(allUniforms, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP, allBindings.length),
   ].filter(s => s.length);
 
   const code = [...header, ...program].join("\n");
-  return {code, bindings: allBindings, uniforms: allUniforms};
+  return code;
 });
 
 // Load all modules references from a piece of code,
@@ -279,17 +257,20 @@ export const reserveNamespace = (
   module: ParsedModule,
   namespaces: Map<string, string>,
   used: Set<string>,
-) => {
+  force?: string,
+): string => {
   const {name, table: {hash}} = module;
-  let namespace;
+  let namespace = force;
   let n = 2;
 
-  do {
-    namespace = '_' + hash.slice(0, n++) + '_';
-  } while (used.has(namespace));
+  if (force == null) {
+    do {
+      namespace = '_' + hash.slice(0, n++) + '_';
+    } while (used.has(namespace));
+  }
 
-  namespaces.set(name, namespace);
-  used.add(namespace);
+  namespaces.set(name, namespace!);
+  used.add(namespace!);
 
-  return namespace;
+  return namespace!;
 }

@@ -1,9 +1,10 @@
-import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler, VirtualRenderFunction } from '../types';
+import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler, VirtualTable } from '../types';
 import { Tree, SyntaxNode } from '@lezer/common';
 
 import { makeASTParser, compressAST, decompressAST } from './ast';
 import { getProgramHash, makeKey } from '../util/hash';
 import { parser } from '../grammar/glsl';
+import { PREFIX_VIRTUAL } from '../constants';
 import LRU from 'lru-cache';
 
 const EMPTY_LIST = [] as any[];
@@ -65,14 +66,15 @@ export const loadStaticModule = (code: string, name: string, entry?: string) => 
 
 // Load a virtual (generated) module
 export const loadVirtualModule = (
-  render: VirtualRenderFunction,
+  virtual: VirtualTable,
   symbols: string[],
   key: string | number = makeKey(),
 ) => {
   const code = `#virtual ${symbols.join(' ')} ${key}`;
 
   const hash = getProgramHash(code);
-  const name = `_VT_${hash.slice(0, 6)}_`;
+  const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;
+  const namespace = `${PREFIX_VIRTUAL}${key}_`;
 
   const table = {
     hash,
@@ -84,9 +86,8 @@ export const loadVirtualModule = (
     functions: EMPTY_LIST,
     declarations: EMPTY_LIST,
   };
-  const virtual = { render };
   const tree = decompressAST(EMPTY_LIST);
-  return { name, code, tree, table, virtual };
+  return { name, code, tree, table, virtual, namespace };
 }
 
 // Parse GLSL using lezer grammar

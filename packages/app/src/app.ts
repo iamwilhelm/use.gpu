@@ -85,7 +85,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             );
           },
           render: (positions) => [
-            use(Quads)({ positions, color: [1, 1, 1, 0.5], size: 50, getMask: circle, mode: RenderPassMode.Transparent }),
+            use(Quads)({ positions, color: positions, size: [50, 50], getMask: circle, mode: RenderPassMode.Transparent }),
             //use(Quads)({ positions, size: 50, id: 2, mode: RenderPassMode.Picking }),
             //use(Quads)({ positions, size: 50, mode: RenderPassMode.Debug }),
           ],

@@ -2,6 +2,7 @@ import  { ParsedBundle, ParsedModule } from '../types';
 
 const NO_LIBS = {};
 
+// Accept direct module or bundle, with entry point on either.
 export const toBundle = (bundle: ParsedBundle | ParsedModule): ParsedBundle => {
   if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");
 
@@ -11,8 +12,11 @@ export const toBundle = (bundle: ParsedBundle | ParsedModule): ParsedBundle => {
   } as ParsedBundle;
 
   let {module, libs, entry} = bundle;
-  if (entry != null) module = {...module, entry};
-  return {module, libs} as ParsedBundle;
+  if (entry != null) {
+    module = {...module, entry};
+    return {module, libs} as ParsedBundle;
+  }
+  return bundle;
 }
 
 // Parse bundle of imports into main + libs
@@ -32,25 +36,45 @@ export const parseBundle = (bundle: ParsedBundle | ParsedModule): [ParsedModule,
   return [module, out];
 }
 
+// Visit every module in a bundle
+export const forBundleModules = (
+  bundle: ParsedBundle | ParsedModule,
+  callback: (m: ParsedModule) => void,
+) => {
+  const traverse = (lib: ParsedBundle | ParsedModule) => {
+    if ('table' in lib) {
+      callback(lib);
+      return;
+    }
+
+    let {module, libs} = lib;
+    callback(module);
+
+    if (libs) for (let k in libs) traverse(libs[k]);
+  }
+
+  traverse(bundle);
+}
+
 // Parse escaped C-style string
 export const parseString = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
 // Parse run-time specified keys `from:to` into a map of aliases
-export const parseLinkAliases = (
-  links: Record<string, ParsedModule | ParsedBundle>,
+export const parseLinkAliases = <T>(
+  links: Record<string, T>,
 ): [
-  Record<string, ParsedModule>,
+  Record<string, T>,
   Map<string, string> | null,
 ] => {
-  const out = {} as Record<string, ParsedModule>;
+  const out = {} as Record<string, T>;
   let aliases = null as Map<string, string> | null;
 
   for (let k in links) {
-    const link = links[k];
+    const link = links[k] as any;
 
     let [name, imported] = k.split(':');
     if (!imported && link.entry != null) imported = link.entry;
-    out[name] = (link as any).module ?? link;
+    out[name] = link;
     if (imported) {
       if (!aliases) aliases = new Map<string, string>();
       aliases.set(name, imported);

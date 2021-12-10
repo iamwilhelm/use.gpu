@@ -22,7 +22,7 @@ export const makeBindingAccessors = (
   const symbols = virtuals.map(({uniform}) => uniform.name);
 
   // Code generator
-  const render = (namespace: string, nextBinding: () => number) => {
+  const render = (namespace: string, base: number = 0) => {
     const program: string[] = [];
 
     for (const {uniform: {name, format, args}} of constants) {
@@ -30,21 +30,17 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format, args}} of storages) {
-      const b = nextBinding();
-      program.push(makeStorageAccessor(namespace, set, b, format, name));
+      program.push(makeStorageAccessor(namespace, set, base++, format, name));
     }
 
-    // Gather actual uniform uniforms
-    const uniforms = constants.map((c: DataBinding) => namespaceBinding(namespace, c));
-
-    return {
-      code: program.join('\n'),
-      uniforms,
-      bindings: storages,
-    };
+    return program.join('\n');
   }
 
-  const virtual = loadVirtualModule(render, symbols, key);
+  const virtual = loadVirtualModule({
+    uniforms: constants,
+    bindings: storages,
+    render,
+  }, symbols, key);
 
   const links: Record<string, ParsedBundle | ParsedModule> = {};
   for (const binding of constants) links[binding.uniform.name] = virtual;
@@ -54,22 +50,14 @@ export const makeBindingAccessors = (
   return links;
 };
 
-export const namespaceBinding = (namespace: string, binding: DataBinding) => {
-  const {uniform} = binding;
-  const {name} = uniform;
-  const imp = namespace + name;
-  return {...binding, uniform: {...uniform, name: imp}};
-};
-
 export const makeUniformBlock = (
   constants: DataBinding[],
-  namespace: string,
   set: number | string = 0,
   binding: number | string = 0,
 ): string => {
   // Uniform Buffer Object struct members
   const members = constants.map(({uniform: {name, format}}) => `${format} ${name}`);
-  return members.length ? makeUniformBlockLayout(namespace, set, binding, members) : '';
+  return members.length ? makeUniformBlockLayout(PREFIX_VIRTUAL, set, binding, members) : '';
 }
 
 export const makeStorageAccessor = (

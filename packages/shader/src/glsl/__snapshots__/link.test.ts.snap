@@ -80,24 +80,24 @@ struct _3w_SolidVertex {
 };
 
 
-layout(set = 0, binding = VIEW_BINDING) uniform _e6_ViewUniforms {
+layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING) uniform _7v_ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;
   vec2 viewResolution;
   vec2 viewSize;
-} _e6_viewUniforms;
+} _7v_viewUniforms;
 
-vec4 _e6_worldToView(vec4 position) {
-  return _e6_viewUniforms.viewMatrix * position;
+vec4 _7v_worldToView(vec4 position) {
+  return _7v_viewUniforms.viewMatrix * position;
 }
 
-vec4 _e6_viewToClip(vec4 position) {
-  return _e6_viewUniforms.projectionMatrix * position;
+vec4 _7v_viewToClip(vec4 position) {
+  return _7v_viewUniforms.projectionMatrix * position;
 }
 
-vec4 _e6_worldToClip(vec4 position) {
-  return _e6_viewToClip(_e6_worldToView(position));
+vec4 _7v_worldToClip(vec4 position) {
+  return _7v_viewToClip(_7v_worldToView(position));
 }
 
 
@@ -119,7 +119,7 @@ _3w_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   vec4 instanceColor = _9a_getColor(instanceIndex);
   float instanceSize = _vi_getSize(instanceIndex);
 
-  vec4 position = _e6_worldToClip(instancePosition);
+  vec4 position = _7v_worldToClip(instancePosition);
 
   vec2 uv = _vz_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
@@ -129,7 +129,7 @@ _3w_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   uv = xy * .5 + .5;
   #endif
   
-  position.xy += xy * _e6_viewUniforms.viewResolution * (instanceSize * position.w);
+  position.xy += xy * _7v_viewUniforms.viewResolution * (instanceSize * position.w);
 
   return _3w_SolidVertex(
     position,

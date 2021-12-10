@@ -511,43 +511,7 @@ Array [
 exports[`ast gets solid fragment declarations 1`] = `
 Array [
   Object {
-    "at": 101,
-    "flags": 2,
-    "identifiers": Array [],
-    "prototype": Object {
-      "name": "getMask",
-      "parameters": Array [
-        "vec2",
-      ],
-      "type": Object {
-        "name": "float",
-        "qualifiers": Array [],
-      },
-    },
-    "symbols": Array [
-      "getMask",
-    ],
-  },
-  Object {
-    "at": 166,
-    "flags": 2,
-    "identifiers": Array [],
-    "prototype": Object {
-      "name": "getTexture",
-      "parameters": Array [
-        "vec2",
-      ],
-      "type": Object {
-        "name": "vec4",
-        "qualifiers": Array [],
-      },
-    },
-    "symbols": Array [
-      "getTexture",
-    ],
-  },
-  Object {
-    "at": 215,
+    "at": 86,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -571,7 +535,7 @@ Array [
     },
   },
   Object {
-    "at": 260,
+    "at": 131,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -594,7 +558,7 @@ Array [
     },
   },
   Object {
-    "at": 307,
+    "at": 178,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -617,7 +581,7 @@ Array [
     },
   },
   Object {
-    "at": 347,
+    "at": 218,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -640,7 +604,7 @@ Array [
     },
   },
   Object {
-    "at": 385,
+    "at": 256,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -888,6 +852,7 @@ Array [
     "at": 15,
     "flags": 1,
     "identifiers": Array [
+      "VIEW_BINDGROUP",
       "VIEW_BINDING",
       "projectionMatrix",
       "viewMatrix",
@@ -934,7 +899,7 @@ Array [
       "type": Object {
         "name": "ViewUniforms",
         "qualifiers": Array [
-          "layout(set = 0, binding = VIEW_BINDING)",
+          "layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING)",
           "uniform",
         ],
       },
@@ -993,7 +958,7 @@ Object {
         "type": Object {
           "name": "ViewUniforms",
           "qualifiers": Array [
-            "layout(set = 0, binding = VIEW_BINDING)",
+            "layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING)",
             "uniform",
           ],
         },
@@ -1007,7 +972,7 @@ Object {
   "externals": Array [],
   "functions": Array [
     Object {
-      "at": 215,
+      "at": 228,
       "flags": 1,
       "identifiers": Array [
         "viewUniforms",
@@ -1028,7 +993,7 @@ Object {
       ],
     },
     Object {
-      "at": 312,
+      "at": 325,
       "flags": 1,
       "identifiers": Array [
         "viewUniforms",
@@ -1049,7 +1014,7 @@ Object {
       ],
     },
     Object {
-      "at": 414,
+      "at": 427,
       "flags": 1,
       "identifiers": Array [
         "viewToClip",
@@ -1071,7 +1036,7 @@ Object {
       ],
     },
     Object {
-      "at": 510,
+      "at": 523,
       "flags": 1,
       "identifiers": Array [
         "viewUniforms",
@@ -1092,7 +1057,7 @@ Object {
       ],
     },
     Object {
-      "at": 629,
+      "at": 642,
       "flags": 1,
       "identifiers": Array [
         "viewUniforms",
@@ -1113,7 +1078,7 @@ Object {
       ],
     },
     Object {
-      "at": 754,
+      "at": 767,
       "flags": 1,
       "identifiers": Array [
         "viewToClip",
@@ -1136,7 +1101,7 @@ Object {
     },
   ],
   "globals": Array [],
-  "hash": "e624uz4crh",
+  "hash": "7vqg0ujg5g",
   "modules": Array [],
   "symbols": Array [
     "worldToView",
@@ -1457,7 +1422,7 @@ Array [
     ],
   ],
   Array [
-    215,
+    228,
     Array [
       "worldToView",
       "worldToClip",
@@ -1465,7 +1430,7 @@ Array [
     ],
   ],
   Array [
-    312,
+    325,
     Array [
       "viewToClip",
       "worldToClip",
@@ -1473,25 +1438,25 @@ Array [
     ],
   ],
   Array [
-    414,
+    427,
     Array [
       "worldToClip",
     ],
   ],
   Array [
-    510,
+    523,
     Array [
       "clipToScreen3D",
     ],
   ],
   Array [
-    629,
+    642,
     Array [
       "screenToClip3D",
     ],
   ],
   Array [
-    754,
+    767,
     Array [
       "worldToClip3D",
     ],
@@ -1500,7 +1465,7 @@ Array [
 `;
 
 exports[`ast shakes use/view AST 2`] = `
-"layout(set = 0, binding = VIEW_BINDING) uniform ViewUniforms {
+"layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING) uniform ViewUniforms {
   mat4 projectionMatrix;
   mat4 viewMatrix;
   vec4 viewPosition;
@@ -1539,7 +1504,7 @@ Array [
     ],
   ],
   Array [
-    215,
+    228,
     Array [
       "worldToView",
       "worldToClip",
@@ -1547,7 +1512,7 @@ Array [
     ],
   ],
   Array [
-    312,
+    325,
     Array [
       "viewToClip",
       "worldToClip",
@@ -1555,25 +1520,25 @@ Array [
     ],
   ],
   Array [
-    414,
+    427,
     Array [
       "worldToClip",
     ],
   ],
   Array [
-    510,
+    523,
     Array [
       "clipToScreen3D",
     ],
   ],
   Array [
-    629,
+    642,
     Array [
       "screenToClip3D",
     ],
   ],
   Array [
-    754,
+    767,
     Array [
       "worldToClip3D",
     ],

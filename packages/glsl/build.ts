@@ -31,7 +31,7 @@ for (const file of files) {
 
   const id = keys.pop()!.replace(/\.glsl$/, '');
   const tokens = [...keys.slice(1), id];
-	const name = tokens.join('/');
+  const name = tokens.join('/');
 
   copyToTarget(file);
 
@@ -39,7 +39,7 @@ for (const file of files) {
   const module = loadModule(code, 'code');
 
   paths.push(file);
-	names.push(name.replace('src/', ''));
+  names.push(name.replace('src/', ''));
   modules.push(module);
 }
 

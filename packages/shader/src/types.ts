@@ -3,6 +3,8 @@ import LRU from 'lru-cache';
 
 export type ParsedModuleCache = LRU<string, ParsedModule>;
 
+export type ShaderModule = ParsedBundle | ParsedModule;
+
 export type ParsedBundle = {
   module: ParsedModule,
   libs?: Record<string, ParsedBundle | ParsedModule>,
@@ -16,6 +18,7 @@ export type ParsedModule = {
   table: SymbolTable,
   shake?: ShakeTable,
   virtual?: VirtualTable,
+  namespace?: string,
   entry?: string,
 };
 
@@ -134,14 +137,10 @@ export type DataBinding = {
   constant?: any,
 };
 
-export type VirtualTable<T = any> = {
-  render: VirtualRenderFunction,
-};
-
-export type VirtualRenderFunction = (namespace: string, nextBinding: () => number) => VirtualRender;
-
-export type VirtualRender = {
-  code: string,
+export type VirtualTable = {
+  render: VirtualRender,
   uniforms: DataBinding[],
   bindings: DataBinding[],
 };
+
+export type VirtualRender = (namespace: string, base: number) => string;

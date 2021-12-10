@@ -12,13 +12,12 @@ import {
   bindBundle,
   bindModule,
   bindingsToLinks,
+  resolveBindings,
 } from './bind';
 
 import {
   linkBundle,
-  linkBundleVirtual,
   linkModule,
-  linkModuleVirtual,
   linkCode,
   getPreamble,
   setPreamble,
@@ -45,13 +44,12 @@ export {
   bindBundle,
   bindModule,
   bindingsToLinks,
+  resolveBindings,
 } from './bind';
 
 export {
   linkBundle,
-  linkBundleVirtual,
   linkModule,
-  linkModuleVirtual,
   linkCode,
   getPreamble,
   setPreamble,
@@ -73,9 +71,7 @@ export const GLSLLinker = {
   defineConstants,
 
   linkBundle,
-  linkBundleVirtual,
   linkModule,
-  linkModuleVirtual,
   linkCode,
   getPreamble,
   setPreamble,
@@ -83,6 +79,7 @@ export const GLSLLinker = {
   bindBundle,
   bindModule,
   bindingsToLinks,
+  resolveBindings,
 
   makeASTParser,
   compressAST,

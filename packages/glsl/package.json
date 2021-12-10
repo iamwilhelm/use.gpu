@@ -66,6 +66,11 @@
       "import": "./src/instance/fragment/solid.glsl",
       "require": "./src/instance/fragment/solid.glsl"
     },
+    "./instance/fragment/solid2.glsl": {
+      "types": "./src/instance/fragment/solid2.d.ts",
+      "import": "./src/instance/fragment/solid2.glsl",
+      "require": "./src/instance/fragment/solid2.glsl"
+    },
     "./instance/geometry/line.glsl": {
       "types": "./src/instance/geometry/line.d.ts",
       "import": "./src/instance/geometry/line.glsl",

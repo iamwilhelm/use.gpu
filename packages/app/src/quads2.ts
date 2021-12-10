@@ -6,9 +6,9 @@ import {
 } from '@use-gpu/core/types';
 import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 
-import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
+import { ViewContext, PickingContext, useNoPicking, Virtual2 } from '@use-gpu/components';
 import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, linkBundle, linkBundleVirtual, bindingsToLinks } from '@use-gpu/shader/glsl';
+import { bindBundle, linkBundle, resolveBindings, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
 import { getQuadVertex } from '@use-gpu/glsl/instance/vertex/quad.glsl';
@@ -36,7 +36,7 @@ const GRAY = [0.5, 0.5, 0.5, 1];
 const ATTRIBUTES = [
   { name: 'getPosition', format: 'vec4', value: ZERO },
   { name: 'getColor', format: 'vec4', value: GRAY },
-  { name: 'getSize', format: 'float', value: 1 },
+  { name: 'getSize', format: 'vec2', value: [1, 1] },
 ] as UniformAttributeValue[];
 
 const LAMBDAS = [
@@ -50,8 +50,6 @@ const BINDINGS = [
 ];
 
 const DEFINES = {
-  HAS_MASK: true,
-  HAS_TEXTURE: true,
   HAS_EDGE_BLEED: true,
   STRIP_SEGMENTS: 2,
 };
@@ -86,15 +84,9 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
     ],
   );
 
-  const closure = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings));
-  console.log(closure);
+  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), {}, 'quad');
+  const {getMask, getTexture} = bindingsToLinks(fragmentBindings);
 
-  const linked = linkBundleVirtual(closure);
-  console.log(linked.code);
-  console.log(linked.uniforms);
-  console.log(linked.bindings);
-
-  /*
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -104,38 +96,19 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
   const vertexCount = 4;
   const instanceCount = props.positions?.length || 1;
 
-  const [attrBindings, lambdaBindings] = useOne(() => [
-    [
-      props.positions ?? props.position,
-      props.colors ?? props.color,
-      props.sizes ?? props.size,
-    ],
-    [
-      props.getMask,
-      props.getTexture,
-    ],
-  ], props);
-
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
-  return use(Virtual)({
+  return use(Virtual2)({
     vertexCount,
     instanceCount,
 
-    attrBindings,
-    lambdaBindings,
-    
-    attributes: ATTRIBUTES,
-    lambdas: LAMBDAS,
-    links: LINKS,
+    getVertex,
+
     defines: DEFINES,
     deps: null,
 
-    pipeline: PIPELINE,
-
+    pipeline,
     mode,
     id,
   });
-  */
-  return null;
 }, 'Quads');

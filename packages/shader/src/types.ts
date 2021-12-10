@@ -40,10 +40,10 @@ export type ShakeTable = ShakeOp[];
 export type ShakeOp = [number, string[]];
 
 export type VirtualTable = {
-  render: VirtualRender,
   uniforms: DataBinding[],
   bindings: DataBinding[],
-  base: number,
+  render: VirtualRender,
+  base?: number,
   namespace?: string,
 };
 

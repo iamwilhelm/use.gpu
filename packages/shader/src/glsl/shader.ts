@@ -70,7 +70,7 @@ export const loadVirtualModule = (
   symbols: string[],
   key: string | number = makeKey(),
 ) => {
-  const code = `#virtual ${symbols.join(' ')} ${key}`;
+  const code = `#virtual ${symbols.join(' ')} ${key.toString(16)}`;
 
   const hash = getProgramHash(code);
   const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;

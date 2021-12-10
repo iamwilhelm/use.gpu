@@ -35,7 +35,7 @@ export const bindBundle = timed('bindBundle', (
   defines?: Record<string, ShaderDefine> | null,
   key: string | number = makeKey(),
 ): ParsedBundle => {
-  const [module, libs] = parseBundle(bundle);
+  const {module, libs} = toBundle(bundle);
 
   return bindModule(module, libs, linkDefs, defines, key);
 });

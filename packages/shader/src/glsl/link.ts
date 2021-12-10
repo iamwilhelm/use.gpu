@@ -49,6 +49,7 @@ export const linkBundle = timed('linkBundle', (
   bundle: ParsedBundle,
   links: Record<string, ParsedBundle | ParsedModule> = {},
   defines: Record<string, ShaderDefine> = {},
+  bases: Record<string, number> = {},
 ) => {
   let [main, libs] = parseBundle(bundle);
 

@@ -112,12 +112,12 @@ vec4 _7v_worldToClip(vec4 position) {
     
 vec4 _hu_getPosition(int);
 vec4 _9a_getColor(int);
-float _vi_getSize(int);
+vec2 _vi_getSize(int);
 
 _3w_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   vec4 instancePosition = _hu_getPosition(instanceIndex);
   vec4 instanceColor = _9a_getColor(instanceIndex);
-  float instanceSize = _vi_getSize(instanceIndex);
+  vec2 instanceSize = _vi_getSize(instanceIndex);
 
   vec4 position = _7v_worldToClip(instancePosition);
 
@@ -129,7 +129,7 @@ _3w_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   uv = xy * .5 + .5;
   #endif
   
-  position.xy += xy * _7v_viewUniforms.viewResolution * (instanceSize * position.w);
+  position.xy += xy * _7v_viewUniforms.viewResolution * instanceSize * position.w;
 
   return _3w_SolidVertex(
     position,

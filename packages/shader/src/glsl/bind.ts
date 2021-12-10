@@ -8,6 +8,18 @@ import { parseBundle, toBundle, parseLinkAliases, forBundleModules } from '../ut
 import { PREFIX_CLOSURE, VIRTUAL_BINDGROUP } from '../constants';
 import mapValues from 'lodash/mapValues';
 
+const TIMED = false;
+
+const timed = (name: string, f: any) => {
+  if (!TIMED) return f;
+  return (...args: any[]) => {
+    const t = +new Date();
+    const v = f(...args);
+    console.log(name, (+new Date() - t), 'ms');
+    return v;
+  }
+}
+
 const NO_SYMBOLS = [] as any[];
 
 export const bindingsToLinks = (
@@ -17,7 +29,7 @@ export const bindingsToLinks = (
   return makeBindingAccessors(Object.values(bindings), VIRTUAL_BINDGROUP, key);
 }
 
-export const bindBundle = (
+export const bindBundle = timed('bindBundle', (
   bundle: ShaderModule,
   linkDefs: Record<string, ShaderModule> = {},
   defines: Record<string, ShaderDefine> = {},
@@ -26,9 +38,9 @@ export const bindBundle = (
   const [module, libs] = parseBundle(bundle);
 
   return bindModule(module, libs, linkDefs, defines, key);
-}
+});
 
-export const bindModule = (
+export const bindModule = timed('bindModule', (
   main: ParsedModule,
   libs: Record<string, ShaderModule> = {},
   linkDefs: Record<string, ShaderModule> = {},
@@ -85,26 +97,28 @@ export const bindModule = (
     },
     libs: {...libs, ...relinks},
   };
-}
+});
 
-export const resolveBindings = (
+export const resolveBindings = timed('resolveBindings', (
   modules: ShaderModule[],
 ): {
   modules: ShaderModule[],
   uniforms: DataBinding[],
   bindings: DataBinding[],
+  bases: Record<string, number>,
 } => {
   const allUniforms = [] as DataBinding[];
   const allBindings = [] as DataBinding[];
 
   const seen = new Set();
-  const bases = new Map<string, number>();
+  const bases = {} as Record<string, number>;
 
   let base = 0;
   for (const m of modules) {
     forBundleModules(m, (m: ParsedModule) => {
-      const {table: {hash}, virtual, namespace} = m;
+      const {virtual} = m;
       if (virtual) {
+        const {table: {hash}, namespace} = m;
         if (seen.has(hash)) return;
         seen.add(hash);
 
@@ -113,7 +127,7 @@ export const resolveBindings = (
         for (const u of uniforms) allUniforms.push(namespaceBinding(ns, u));
         for (const b of bindings) allBindings.push(b);
 
-        bases.set(hash, base);
+        bases[hash] = base;
         base += allBindings.length;
       }
     });
@@ -149,8 +163,9 @@ export const resolveBindings = (
     modules: out,
     uniforms: allUniforms,
     bindings: allBindings,
+    bases,
   };
-}
+});
 
 export const namespaceBinding = (namespace: string, binding: DataBinding) => {
   const {uniform} = binding;

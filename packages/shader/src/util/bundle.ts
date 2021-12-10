@@ -71,6 +71,7 @@ export const parseLinkAliases = <T>(
 
   for (let k in links) {
     const link = links[k] as any;
+    if (!link) continue;
 
     let [name, imported] = k.split(':');
     if (!imported && link.entry != null) imported = link.entry;

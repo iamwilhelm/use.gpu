@@ -74,7 +74,7 @@ export const loadVirtualModule = (
 
   const hash = getProgramHash(code);
   const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;
-  const namespace = `${PREFIX_VIRTUAL}${key}_`;
+  const namespace = `${PREFIX_VIRTUAL}${hash.slice(0, 2)}_`;
 
   const table = {
     hash,

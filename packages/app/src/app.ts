@@ -15,7 +15,7 @@ import {
   ViewProvider,
 } from '@use-gpu/components';
 import { Mesh } from './mesh';
-import { Quads } from './quads2';
+import { Quads } from './quads';
 import { Lines } from './lines';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
@@ -65,7 +65,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
-            //use(Quads)({ positions, size: 10 }),
+            //use(Quads)({ positions, size: [10, 10] }),
             use(Lines)({ positions, segments, size: 50, join: 'round' }),
             use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
             //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
@@ -86,8 +86,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           },
           render: (positions) => [
             use(Quads)({ positions, color: positions, size: [50, 50], getMask: circle, mode: RenderPassMode.Transparent }),
-            //use(Quads)({ positions, size: 50, id: 2, mode: RenderPassMode.Picking }),
-            //use(Quads)({ positions, size: 50, mode: RenderPassMode.Debug }),
+            //use(Quads)({ positions, size: [50, 50], id: 2, mode: RenderPassMode.Picking }),
+            use(Quads)({ positions, size: [50, 50], mode: RenderPassMode.Debug }),
           ],
         }),
         /*

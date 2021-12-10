@@ -8,7 +8,11 @@ import {
 } from '../constants';
 
 import { RenderContext, RenderProvider } from '../providers';
-import { memo, use, provide, useContext, useMemo, useOne, useResource, makeContext } from '@use-gpu/live';
+import {
+  memo, use, provide, makeContext,
+  useMemo, useOne, useResource,
+  useContext, useSomeContext, useNoContext,
+} from '@use-gpu/live';
 import {
   makeColorState,
   makeColorAttachment,
@@ -36,6 +40,17 @@ type PickingContextType = {
 
 export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
 export const useNoPicking = () => useResource(() => ({}));
+
+export const usePickingContext = (isPicking?: boolean) => {
+  const renderContext = useContext(RenderContext);
+
+  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  
+  const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoPicking();
+  const resolvedContext = pickingContext?.renderContext ?? renderContext;
+
+  return {renderContext, pickingDefs, pickingUniforms};
+}
+
 
 export type PickingProps = {
   pickingFormat?: GPUTextureFormat, 

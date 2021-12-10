@@ -6,8 +6,11 @@ import {
 } from '@use-gpu/core/types';
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, yeet, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
+import { makeShaderBindings } from '@use-gpu/core';
 
 import { getLineVertex } from '@use-gpu/glsl/instance/vertex/line.glsl';
+import { getPassThruFragment } from '@use-gpu/glsl/mask/passthru.glsl';
 
 export type LinesProps = {
   position?: number[] | TypedArray,
@@ -28,17 +31,11 @@ export type LinesProps = {
 
 const ZERO = [0, 0, 0, 1];
 
-const ATTRIBUTES = [
+const VERTEX_BINDINGS = [
   { name: 'getPosition', format: 'vec4', value: ZERO },
   { name: 'getSegment', format: 'int', value: 0 },
   { name: 'getSize', format: 'float', value: 1 },
 ] as UniformAttributeValue[];
-
-const LAMBDAS = [] as UniformAttributeValue[];
-
-const LINKS = {
-  'getVertex': getLineVertex,
-};
 
 const LINE_JOIN_SIZE = {
   'bevel': 1,
@@ -83,28 +80,25 @@ export const Lines: LiveComponent<LinesProps> = memo((fiber) => (props) => {
   const vertexCount = tris * 3;
   const instanceCount = (props.positions?.length || 2) - 1;
 
-  // Bind to shader
-  const [attrBindings, lambdaBindings] = useOne(() => [
-    [
-      props.positions ?? props.position,
-      props.segments ?? props.segment,
-      props.sizes ?? props.size,
-    ],
-    [],
-  ], props);
-
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
+
+  const vertexBindings = makeShaderBindings(VERTEX_BINDINGS, [
+    props.positions ?? props.position,
+    props.segments ?? props.segment,
+    props.sizes ?? props.size,
+  ]);
+
+  const key = fiber.id;
+  const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings, key), {}, key);
+  const getFragment = getPassThruFragment;
 
   return use(Virtual)({
     vertexCount,
     instanceCount,
 
-    attrBindings,
-    lambdaBindings,
-    
-    attributes: ATTRIBUTES,
-    lambdas: LAMBDAS,
-    links: LINKS,
+    getVertex,
+    getFragment,
+
     defines,
     deps: [join],
 

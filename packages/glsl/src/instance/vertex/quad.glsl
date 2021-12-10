@@ -4,13 +4,13 @@
 
 vec4 getPosition(int);
 vec4 getColor(int);
-float getSize(int);
+vec2 getSize(int);
 
 #pragma export
 SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   vec4 instancePosition = getPosition(instanceIndex);
   vec4 instanceColor = getColor(instanceIndex);
-  float instanceSize = getSize(instanceIndex);
+  vec2 instanceSize = getSize(instanceIndex);
 
   vec4 position = worldToClip(instancePosition);
 
@@ -22,7 +22,7 @@ SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   uv = xy * .5 + .5;
   #endif
   
-  position.xy += xy * viewUniforms.viewResolution * (instanceSize * position.w);
+  position.xy += xy * viewUniforms.viewResolution * instanceSize * position.w;
 
   return SolidVertex(
     position,

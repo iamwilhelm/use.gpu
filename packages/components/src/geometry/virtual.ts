@@ -3,40 +3,35 @@ import {
   TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, RenderPassMode, DeepPartial,
 } from '@use-gpu/core/types';
-import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
-import { ViewContext, RenderContext, PickingContext, useNoPicking } from '@use-gpu/components';
+import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
+import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
 import { yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
-  makeMultiUniforms, makeUniformsWithStorage,
+  makeMultiUniforms, makeBoundUniforms,
   makeRenderPipeline,
-  extractDataBindings, extractCodeBindings,
   uploadBuffer,
 } from '@use-gpu/core';
-import { useBoundStorage } from '../hooks/useBoundStorage';
 import { useBoundShader } from '../hooks/useBoundShader';
 
 import instanceDrawVirtual from '@use-gpu/glsl/instance/draw/virtual.glsl';
 import instanceDrawWireframeStrip from '@use-gpu/glsl/instance/draw/wireframe-strip.glsl';
-import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid.glsl';
+import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid2.glsl';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 
 export type VirtualProps = {
-  topology: GPUPrimitiveTopology,
-  vertexCount: number,
-  instanceCount: number,
-
-  attributes: UniformAttributeValue[],
-  lambdas: UniformAttributeValue[],
-
-  attrBindings: any[],
-  lambdaBindings: any[],
-
-  links: Record<string, ParsedBundle | ParsedModule>
-  defines: Record<string, any>,
-  deps: any[],
-
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
+
+  vertexCount: number,
+  instanceCount: number,
+
+  getVertex: ShaderModule,
+  getFragment: ShaderModule,
+
+  defines: Record<string, any>,
+  deps: any[],
 };
 
 const getDebugShader = (topology: GPUPrimitiveTopology) => {
@@ -48,38 +43,25 @@ const getDebugShader = (topology: GPUPrimitiveTopology) => {
 
 export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const {
-    attributes: propAttributes,
-    lambdas: propLambdas,
-    links: propLinks,
-    defines: propDefines,
-
-    attrBindings,
-    lambdaBindings,
-
     vertexCount,
     instanceCount,
+    getVertex,
+    getFragment,
 
     pipeline: propPipeline,
+    defines: propDefines,
     deps = null,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
 
-  // Render set up
-  const {viewUniforms, viewDefs} = useContext(ViewContext);
-  const renderContext = useContext(RenderContext);
-
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
-  const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  
-  const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoPicking();
 
-  const resolvedContext = pickingContext?.renderContext ?? renderContext;
-  const {device, colorStates, depthStencilState, samples, languages} = resolvedContext;
-
-  // External bindings
-  const dataBindings = useOne(() => extractDataBindings(propAttributes, attrBindings), attrBindings);
-  const codeBindings = useOne(() => extractCodeBindings(propLambdas, lambdaBindings), lambdaBindings);
+  // Render set up
+  const {viewUniforms, viewDefs} = useContext(ViewContext);
+  const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(isPicking);
+  const {device, colorStates, depthStencilState, samples, languages} = renderContext;
 
   // Render shader
   const {glsl: {modules}} = languages;
@@ -89,34 +71,24 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   const fragmentShader = instanceFragmentSolid;
 
   const defines = useMemo(() => ({
-    ...propDefines,
     IS_PICKING: isPicking,
     VIEW_BINDGROUP: 0,
     VIEW_BINDING: 0,
     PICKING_BINDGROUP: 0,
     PICKING_BINDING: 1,
+    VIRTUAL_BINDGROUP: 1,
+    ...propDefines,
   }), [isPicking, propDefines]);
 
-  const links = useMemo(() => ({
-    ...propLinks,
-    ...codeBindings.links,
-  }), [codeBindings, propLinks]);
-
-  // Shader data bindings
-  const {accessors, attributes, lambdas, constants} = useBoundStorage(
-    propAttributes,
-    propLambdas,
-    dataBindings,
-    codeBindings,
-    1,
-  );
-
   // Shaders
-  const [vertex, fragment] = useBoundShader(
+  const {
+    shader,
+    uniforms,
+    bindings,
+  } = useBoundShader(
     vertexShader,
     fragmentShader,
-    links as any,
-    accessors,
+    {getVertex, getFragment},
     defines,
     languages,
     deps,
@@ -124,14 +96,15 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   );
 
   // Rendering pipeline
+  const [vertex, fragment] = shader;
   const pipeline = useMemo(() => {
     return makeRenderPipeline(
-      resolvedContext,
+      renderContext,
       vertex,
       fragment,
       propPipeline,
     );
-  }, [device, vertex, fragment, propPipeline, colorStates, depthStencilState, samples, languages]);
+  }, [device, shader, propPipeline, colorStates, depthStencilState, samples, languages]);
 
   // Uniforms
   const [
@@ -140,9 +113,12 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   ] = useMemo(() => {
     const defs = isPicking ? [viewDefs, pickingDefs] : [viewDefs];
     const uniform = makeMultiUniforms(device, pipeline, defs, 0);
-    const storage = makeUniformsWithStorage(device, pipeline, constants, dataBindings.links, 1);
+    const storage = makeBoundUniforms(device, pipeline, uniforms, bindings, 1);
     return [uniform, storage];
-  }, [device, viewDefs, constants, attributes, pipeline, dataBindings]);
+  }, [device, viewDefs, uniforms, bindings, pipeline]);
+
+  const uniformMap = keyBy(uniforms, ({uniform: {name}}) => name);
+  const constantUniforms = mapValues(uniformMap, u => u.constant);
 
   // Return a lambda back to parent(s)
   return yeet({
@@ -151,13 +127,14 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
       if (isPicking) uniform.pipe.fill(pickingUniforms);
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
-      storage.pipe.fill(dataBindings.constants);
-      storage.pipe.fill(codeBindings.constants);
-      uploadBuffer(device, storage.buffer, storage.pipe.data);
+      if (storage.pipe && storage.buffer) {
+        storage.pipe.fill(constantUniforms);
+        uploadBuffer(device, storage.buffer, storage.pipe.data);
+      }
 
       passEncoder.setPipeline(pipeline);
       passEncoder.setBindGroup(0, uniform.bindGroup);
-      passEncoder.setBindGroup(1, storage.bindGroup);
+      if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
 
       if (!isDebug) passEncoder.draw(vertexCount, instanceCount, 0, 0);
       else {
@@ -171,5 +148,5 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
         }
       }
     },
-  }); 
+  });
 }, 'Virtual');

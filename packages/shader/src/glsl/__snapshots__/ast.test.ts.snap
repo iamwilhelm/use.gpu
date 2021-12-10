@@ -134,7 +134,7 @@ Array [
         "int",
       ],
       "type": Object {
-        "name": "float",
+        "name": "vec2",
         "qualifiers": Array [],
       },
     },
@@ -148,7 +148,7 @@ Array [
 exports[`ast gets quad vertex functions 1`] = `
 Array [
   Object {
-    "at": 275,
+    "at": 274,
     "flags": 1,
     "identifiers": Array [
       "instancePosition",
@@ -283,7 +283,7 @@ Object {
           "int",
         ],
         "type": Object {
-          "name": "float",
+          "name": "vec2",
           "qualifiers": Array [],
         },
       },
@@ -339,7 +339,7 @@ Object {
           "int",
         ],
         "type": Object {
-          "name": "float",
+          "name": "vec2",
           "qualifiers": Array [],
         },
       },
@@ -350,7 +350,7 @@ Object {
   ],
   "functions": Array [
     Object {
-      "at": 275,
+      "at": 274,
       "flags": 1,
       "identifiers": Array [
         "getPosition",
@@ -374,7 +374,7 @@ Object {
     },
   ],
   "globals": Array [],
-  "hash": "i8bdssda5g",
+  "hash": "cjsjb69zka",
   "modules": Array [
     Object {
       "at": 0,
@@ -483,7 +483,7 @@ Array [
     ],
   ],
   Array [
-    275,
+    274,
     Array [
       "getQuadVertex",
     ],

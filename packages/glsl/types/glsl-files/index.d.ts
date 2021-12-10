@@ -119,6 +119,20 @@ declare module "@use-gpu/glsl/instance/vertex/quad.glsl" {
   export default __module;
 }
 
+declare module "@use-gpu/glsl/mask/masked.glsl" {
+  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getMaskedFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/glsl/mask/passthru.glsl" {
+  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getPassthruFragment: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/glsl/mask/point.glsl" {
   type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
   const __module: ParsedBundle;

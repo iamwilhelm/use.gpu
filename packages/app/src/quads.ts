@@ -4,12 +4,15 @@ import {
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 
 import { ViewContext, PickingContext, useNoPicking, Virtual } from '@use-gpu/components';
 import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
+import { makeShaderBindings } from '@use-gpu/core';
 
 import { getQuadVertex } from '@use-gpu/glsl/instance/vertex/quad.glsl';
+import { getMaskedFragment } from '@use-gpu/glsl/mask/masked.glsl';
 
 export type QuadsProps = {
   position?: number[] | TypedArray,
@@ -20,8 +23,8 @@ export type QuadsProps = {
   sizes?: StorageSource,
   colors?: StorageSource,
 
-  getMask?: ParsedBundle | ParsedModule,
-  getTexture?: ParsedBundle | ParsedModule,
+  getMask?: ShaderModule,
+  getTexture?: ShaderModule,
   
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
@@ -31,20 +34,18 @@ export type QuadsProps = {
 const ZERO = [0, 0, 0, 1];
 const GRAY = [0.5, 0.5, 0.5, 1];
 
-const ATTRIBUTES = [
+const VERTEX_BINDINGS = [
   { name: 'getPosition', format: 'vec4', value: ZERO },
   { name: 'getColor', format: 'vec4', value: GRAY },
-  { name: 'getSize', format: 'float', value: 1 },
+  { name: 'getSize', format: 'vec2', value: [1, 1] },
 ] as UniformAttributeValue[];
 
-const LAMBDAS = [
+const FRAGMENT_BINDINGS = [
   { name: 'getMask', format: 'float', args: ['vec2'], value: 0.5 },
   { name: 'getTexture', format: 'vec4', args: ['vec2'], value: [1.0, 1.0, 1.0, 1.0] },
 ] as UniformAttributeValue[];
 
 const DEFINES = {
-  HAS_MASK: true,
-  HAS_TEXTURE: true,
   HAS_EDGE_BLEED: true,
   STRIP_SEGMENTS: 2,
 };
@@ -70,35 +71,34 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
   const vertexCount = 4;
   const instanceCount = props.positions?.length || 1;
 
-  const [attrBindings, lambdaBindings] = useOne(() => [
-    [
-      props.positions ?? props.position,
-      props.colors ?? props.color,
-      props.sizes ?? props.size,
-    ],
-    [
-      props.getMask,
-      props.getTexture,
-    ],
-  ], props);
-
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
+
+  const vertexBindings = makeShaderBindings(VERTEX_BINDINGS, [
+    props.positions ?? props.position,
+    props.colors ?? props.color,
+    props.sizes ?? props.size,
+  ]);
+
+  const fragmentBindings = makeShaderBindings(FRAGMENT_BINDINGS, [
+    props.getMask,
+    props.getTexture,
+  ]);
+
+  const key = fiber.id;
+  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings, key), {}, key);
+  const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings, key), {}, key);
 
   return use(Virtual)({
     vertexCount,
     instanceCount,
 
-    attrBindings,
-    lambdaBindings,
-    
-    attributes: ATTRIBUTES,
-    lambdas: LAMBDAS,
-    links: LINKS,
+    getVertex,
+    getFragment,
+
     defines: DEFINES,
     deps: null,
 
-    pipeline: PIPELINE,
-
+    pipeline,
     mode,
     id,
   });

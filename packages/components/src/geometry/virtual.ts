@@ -107,15 +107,16 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   }, [device, shader, propPipeline, colorStates, depthStencilState, samples, languages]);
 
   // Uniforms
-  const [
-    uniform,
-    storage,
-  ] = useMemo(() => {
+  const uniform = useMemo(() => {
     const defs = isPicking ? [viewDefs, pickingDefs] : [viewDefs];
-    const uniform = makeMultiUniforms(device, pipeline, defs, 0);
-    const storage = makeBoundUniforms(device, pipeline, uniforms, bindings, 1);
-    return [uniform, storage];
-  }, [device, viewDefs, uniforms, bindings, pipeline]);
+    return makeMultiUniforms(device, pipeline, defs, 0);
+  }, [device, viewDefs, pipeline]);
+
+  // Bound storage
+  const storage = useMemo(() =>
+    makeBoundUniforms(device, pipeline, uniforms, bindings, 1),
+    [device, viewDefs, uniforms, bindings, pipeline]
+  );
 
   const uniformMap = keyBy(uniforms, ({uniform: {name}}) => name);
   const constantUniforms = mapValues(uniformMap, u => u.constant);

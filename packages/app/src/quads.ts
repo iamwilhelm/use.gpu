@@ -85,8 +85,8 @@ export const Quads: LiveComponent<QuadsProps> = memo((fiber) => (props) => {
   ]);
 
   const key = fiber.id;
-  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings, key), {}, key);
-  const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings, key), {}, key);
+  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings, key), null, key);
+  const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings, key), null, key);
 
   return use(Virtual)({
     vertexCount,

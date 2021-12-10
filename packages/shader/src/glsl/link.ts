@@ -33,7 +33,7 @@ export const linkCode = timed('linkCode', (
   code: string,
   libraries: Record<string, string> = {},
   links: Record<string, string> = {},
-  defines: Record<string, ShaderDefine> = {},
+  defines: Record<string, ShaderDefine> | null | undefined,
   cache: ParsedModuleCache | null = DEFAULT_CACHE,
 ) => {
   const main = loadModuleWithCache(code, 'main', undefined, cache);
@@ -48,8 +48,7 @@ export const linkCode = timed('linkCode', (
 export const linkBundle = timed('linkBundle', (
   bundle: ParsedBundle,
   links: Record<string, ParsedBundle | ParsedModule> = {},
-  defines: Record<string, ShaderDefine> = {},
-  bases: Record<string, number> = {},
+  defines: Record<string, ShaderDefine> | null | undefined,
 ) => {
   let [main, libs] = parseBundle(bundle);
 
@@ -69,15 +68,15 @@ export const linkModule = timed('linkModule', (
   main: ParsedModule,
   libraries: Record<string, ParsedModule> = {},
   linkDefs: Record<string, ParsedModule> = {},
-  defines: Record<string, ShaderDefine> = {},
-  bases: Record<string, number> = {},
+  defines: Record<string, ShaderDefine> | null | undefined,
 ) => {
   if (typeof main === 'string') throw new Error("Module is a string instead of an object");
 
   const [links, aliases] = parseLinkAliases(linkDefs);
   const {modules, exported} = loadModulesInOrder(main, libraries, links, aliases);
 
-  const program = [] as string[];
+  const program = [getPreamble()];
+  if (defines && Object.keys(defines).length) program.push(defineConstants(defines));
 
   // Namespace by module name and module hash
   const namespaces = new Map<string, string>();
@@ -148,7 +147,7 @@ export const linkModule = timed('linkModule', (
       // Emit virtual module in target namespace,
       // with dynamically assigned binding slots.
       const ns = hashes.get(hash)!;
-      const code = virtual.render(ns, bases[hash]);
+      const code = virtual.render(ns, virtual.base);
 
       program.push(code);
     }
@@ -163,12 +162,7 @@ export const linkModule = timed('linkModule', (
     }
   }
 
-  const header = [
-    getPreamble(),
-    defineConstants(defines),
-  ].filter(s => s.length);
-
-  const code = [...header, ...program].join("\n");
+  const code = program.join("\n");
   return code;
 });
 

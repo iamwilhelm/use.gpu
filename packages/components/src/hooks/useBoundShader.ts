@@ -13,7 +13,7 @@ export const useBoundShader = (
   vertex: ParsedBundle,
   fragment: ParsedBundle,
   links: Record<string, ParsedBundle | ParsedModule>,
-  defines: Record<string, ShaderDefine>,
+  defines: Record<string, ShaderDefine> | null | undefined,
   languages: ShaderLanguages,
   deps: any[] | null = null,
   base: number = 0,
@@ -22,39 +22,28 @@ export const useBoundShader = (
   const fiber = useFiber();
   const {glsl: {compile, cache}} = languages;
 
-  // Binds links/defines into shader and
+  // Binds links into shader and
   // resolve bindings between vertex and fragment.
-  const {modules, uniforms, bindings, bases} = useMemo(() => {
+  const {modules, uniforms, bindings} = useMemo(() => {
     const k = key ?? 'bound' + fiber.id;
-    const v = bindBundle(vertex, links, defines, k);
-    const f = bindBundle(fragment, links, defines, k);
+    const v = bindBundle(vertex, links, null, k);
+    const f = bindBundle(fragment, links, null, k);
 
     return resolveBindings([v, f]);
-  }, [vertex, fragment, links, defines])
+  }, [vertex, fragment, links])
 
-  // Memoize on specific keys
-  const keys = [
-    // Constant uniforms
-    ...uniforms.map(u => u.uniform.name),
-    // Storage buffers
-    ...bindings.map(b => b.buffer),
-  ];
-
-  // Keep canonical set of bindings
+  // Keep static set of bindings
   const ref = useOne(() => ({ uniforms, bindings }));
 
-  // Update bound uniform values in-place from latest
-  useOne(() => {
-    let i = 0;
-    for (const u of uniforms) if (u.constant) {
-      ref.uniforms[i++].constant = u.constant;
-    }
-  }, uniforms);
+  // Memoize on specific keys to refresh shader
+  const keys = [];
+  for (const u of uniforms) keys.push(u.uniform.name);
+  for (const b of bindings) keys.push(b.uniform.name);
 
+  // Link final GLSL
   const shader = useMemo(() => {
-    // Link final GLSL
-    const v = linkBundle(modules[0], NO_LIBS, NO_LIBS, bases);
-    const f = linkBundle(modules[1], NO_LIBS, NO_LIBS, bases);
+    const v = linkBundle(modules[0], NO_LIBS, defines);
+    const f = linkBundle(modules[1], NO_LIBS, defines);
     const vertex = makeShaderModule(compile(v, 'vertex'));
     const fragment = makeShaderModule(compile(f, 'fragment'));
 
@@ -67,6 +56,19 @@ export const useBoundShader = (
 
     return [vertex, fragment, v, f];
   }, [...deps ?? NO_DEPS, ...keys]);
+
+  // Update bound uniform values in-place from latest
+  useOne(() => {
+    let i = 0;
+    for (const u of uniforms) if (u.constant) {
+      ref.uniforms[i++].constant = u.constant;
+    }
+  }, uniforms);
+
+  // Refresh bindings if buffer assignment changed
+  const buffers = [];
+  for (const b of bindings) keys.push(b.buffer);  
+  useOne(() => ref.bindings = bindings, buffers);
 
   return {shader, ...ref};
 };

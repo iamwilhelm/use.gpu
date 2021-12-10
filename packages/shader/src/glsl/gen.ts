@@ -40,6 +40,7 @@ export const makeBindingAccessors = (
     uniforms: constants,
     bindings: storages,
     render,
+    base: 0,
   }, symbols, key);
 
   const links: Record<string, ParsedBundle | ParsedModule> = {};

@@ -32,7 +32,7 @@ export const bindingsToLinks = (
 export const bindBundle = timed('bindBundle', (
   bundle: ShaderModule,
   linkDefs: Record<string, ShaderModule> = {},
-  defines: Record<string, ShaderDefine> = {},
+  defines?: Record<string, ShaderDefine> | null,
   key: string | number = makeKey(),
 ): ParsedBundle => {
   const [module, libs] = parseBundle(bundle);
@@ -44,7 +44,7 @@ export const bindModule = timed('bindModule', (
   main: ParsedModule,
   libs: Record<string, ShaderModule> = {},
   linkDefs: Record<string, ShaderModule> = {},
-  defines: Record<string, ShaderDefine> = {},
+  defines?: Record<string, ShaderDefine> | null,
   key: string | number = makeKey(),
 ): ParsedBundle => {
   const [links, aliases] = parseLinkAliases(linkDefs);
@@ -113,6 +113,8 @@ export const resolveBindings = timed('resolveBindings', (
   const seen = new Set();
   const bases = {} as Record<string, number>;
 
+  // Gather all namespaced uniforms and bindings from all programs.
+  // Assign base offset to each virtual module in-place.
   let base = 0;
   for (const m of modules) {
     forBundleModules(m, (m: ParsedModule) => {
@@ -127,16 +129,18 @@ export const resolveBindings = timed('resolveBindings', (
         for (const u of uniforms) allUniforms.push(namespaceBinding(ns, u));
         for (const b of bindings) allBindings.push(b);
 
-        bases[hash] = base;
+        virtual.base = base;
         base += allBindings.length;
       }
     });
   }
 
+  // Create combined uniform block as top-level import
   const code = makeUniformBlock(allUniforms, VIRTUAL_BINDGROUP, allBindings.length);
   const lib = loadStaticModule(code, VIRTUAL_BINDGROUP);
   const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDGROUP, imports: NO_SYMBOLS};
 
+  // Append to modules
   const out = modules.map((m: ShaderModule) => {
     const {module, libs} = toBundle(m);
     const {table} = module;

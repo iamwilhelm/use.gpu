@@ -141,6 +141,7 @@ export type VirtualTable = {
   render: VirtualRender,
   uniforms: DataBinding[],
   bindings: DataBinding[],
+  base: number,
 };
 
 export type VirtualRender = (namespace: string, base: number) => string;

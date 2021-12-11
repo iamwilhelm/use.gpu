@@ -19,15 +19,20 @@ import { getMaskedFragment } from '@use-gpu/glsl/mask/masked.glsl';
 
 export type RawQuadsProps = {
   position?: number[] | TypedArray,
-  size?: number,
+  size?: number[],
   color?: number[],
 
   positions?: StorageSource,
   sizes?: StorageSource,
   colors?: StorageSource,
 
+  getPosition?: ShaderModule,
+  getSize?: ShaderModule,
+  getColor?: ShaderModule,
   getMask?: ShaderModule,
   getTexture?: ShaderModule,
+
+  count?: number,
   
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
@@ -44,7 +49,7 @@ const VERTEX_BINDINGS = [
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
-  { name: 'getMask', format: 'float', args: ['vec2'], value: 0.5 },
+  { name: 'getMask', format: 'float', args: ['vec2'], value: 1 },
   { name: 'getTexture', format: 'vec4', args: ['vec2'], value: [1.0, 1.0, 1.0, 1.0] },
 ] as UniformAttributeValue[];
 
@@ -69,17 +74,18 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
     id = 0,
+    count = 1,
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = props.positions?.length || 1;
+  const instanceCount = props.positions?.length ?? count;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const vertexBindings = makeShaderBindings(VERTEX_BINDINGS, [
-    props.positions ?? props.position,
-    props.colors ?? props.color,
-    props.sizes ?? props.size,
+    props.positions ?? props.position ?? props.getPosition,
+    props.colors ?? props.color ?? props.getColor,
+    props.sizes ?? props.size ?? props.getSize,
   ]);
 
   const fragmentBindings = makeShaderBindings(FRAGMENT_BINDINGS, [
@@ -88,8 +94,8 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
   ]);
 
   const key = fiber.id;
-  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings, key), null, key);
-  const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings, key), null, key);
+  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
+  const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
 
   return use(Virtual)({
     vertexCount,

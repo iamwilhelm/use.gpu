@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`cast casts 1`] = `
+"#version 450
+
+    vec2 _l0_getValue() { return vec2(1.0, 2.0); }
+    
+vec3 cast() {
+  return _l0_getValue().xyx;
+}"
+`;
+
+exports[`cast casts and links 1`] = `
+"#version 450
+
+    vec2 _l0_getValue() { return vec2(1.0, 2.0); }
+    
+vec3 _36_cast() {
+  return _l0_getValue().xyx;
+}
+
+    vec3 _36_cast();
+    void main() { _36_cast(); }
+    "
+`;

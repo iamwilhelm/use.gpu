@@ -1,15 +1,18 @@
-import { ParsedBundle, ParsedModule, DataBinding } from '../types';
+import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from '../types';
 
 import { loadVirtualModule } from './shader';
-import { makeKey } from '../util/hash';
 import { PREFIX_VIRTUAL } from '../constants';
 
+const NO_SYMBOLS = [] as string[];
 const INT_ARG = ['int'];
+
+const getBindingKey = (b: DataBinding) => (+!!b.constant) + ((+!!b.storage) << 8) + ((+!!b.lambda) << 16);
+const getBindingsKey = (bs: DataBinding[]) => bs.reduce((a, b) => a + getBindingKey(b), 0);
 
 export const makeBindingAccessors = (
   bindings: DataBinding[],
   set: number | string = 0,
-  key: number | string = makeKey(),
+  key: number | string = getBindingsKey(bindings),
 ): Record<string, ParsedBundle | ParsedModule> => {
 
   // Extract uniforms
@@ -20,15 +23,24 @@ export const makeBindingAccessors = (
   // Virtual module symbols
   const virtuals = [...constants, ...storages];
   const symbols = virtuals.map(({uniform}) => uniform.name);
+  const functions = virtuals.map(({uniform}) => ({
+    at: 0,
+    symbols: NO_SYMBOLS,
+    prototype: {
+      name: uniform.name,
+      type: {name: uniform.format},
+      parameters: uniform.args,
+    },
+    flags: 0,
+  }));
 
   // Code generator
-  const render = (namespace: string, base: number = 0) => {
+  const render = (namespace: string, rename: Map<string, string>, base: number = 0) => {
     const program: string[] = [];
 
     for (const {uniform: {name, format, args}} of constants) {
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, format, name, args));
     }
-
     for (const {uniform: {name, format, args}} of storages) {
       program.push(makeStorageAccessor(namespace, set, base++, format, name));
     }
@@ -40,8 +52,10 @@ export const makeBindingAccessors = (
     uniforms: constants,
     bindings: storages,
     render,
-    base: 0,
-  }, symbols, key);
+  }, {
+    symbols,
+    functions,
+  }, undefined, key);
 
   const links: Record<string, ParsedBundle | ParsedModule> = {};
   for (const binding of constants) links[binding.uniform.name] = virtual;
@@ -60,23 +74,6 @@ export const makeUniformBlock = (
   const members = constants.map(({uniform: {name, format}}) => `${format} ${name}`);
   return members.length ? makeUniformBlockLayout(PREFIX_VIRTUAL, set, binding, members) : '';
 }
-
-export const makeStorageAccessor = (
-  ns: string,
-  set: number | string,
-  binding: number | string,
-  type: string,
-  name: string,
-  args: string[] = INT_ARG,
-) => `
-layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}Type {
-  ${type} data[];
-} ${ns}${name}Storage;
-
-${type} ${ns}${name}(int index) {
-  return ${ns}${name}Storage.data[index];
-}
-`;
 
 export const makeUniformBlockLayout = (
   ns: string,
@@ -98,5 +95,22 @@ export const makeUniformFieldAccessor = (
 ) => `
 ${type} ${ns}${name}(${args.join(', ')}) {
   return ${uniform}Uniform.${ns}${name};
+}
+`;
+
+export const makeStorageAccessor = (
+  ns: string,
+  set: number | string,
+  binding: number | string,
+  type: string,
+  name: string,
+  args: string[] = INT_ARG,
+) => `
+layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}Type {
+  ${type} data[];
+} ${ns}${name}Storage;
+
+${type} ${ns}${name}(int index) {
+  return ${ns}${name}Storage.data[index];
 }
 `;

@@ -28,6 +28,8 @@ import uniq from 'lodash/uniq';
 const NO_DEPS = [] as string[];
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
 
+const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
+
 const isSpace = (s: string, i: number) => {
   const c = s.charCodeAt(i);
   return c === 32 || c === 13 || c === 10 || c === 9;
@@ -377,17 +379,28 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const globals = uniq(globalled.flatMap(r => r.symbols));
     const symbols = uniq(refs.flatMap(r => r.symbols));
 
-    const scope = new Set(symbols);
+    const scope = new Set(symbols ?? []);
     for (let ref of refs) if (ref.identifiers) {
       ref.identifiers = ref.identifiers.filter(s => scope.has(s));
     }
 
-    return {hash, symbols, visibles, globals, externals, modules, functions, declarations};
+    return {
+      hash,
+      symbols: orNone(symbols),
+      visibles: orNone(visibles),
+      globals: orNone(globals),
+      externals: orNone(externals),
+      modules: orNone(modules),
+      functions: orNone(functions),
+      declarations: orNone(declarations),
+    };
   }
 
   const getShakeTable = (table: SymbolTable = getSymbolTable()): ShakeTable | undefined => {
     const {functions, declarations} = table;
-    const refs = [...functions, ...declarations] as (FunctionRef | DeclarationRef)[];
+    const refs = [] as (FunctionRef | DeclarationRef)[];
+    if (functions) refs.push(...functions);
+    if (declarations) refs.push(...declarations);
     refs.sort((a, b) => a.at - b.at);
 
     const graph = new Map<string, string[]>();

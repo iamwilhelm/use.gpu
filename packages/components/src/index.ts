@@ -4,6 +4,7 @@ export * from './consumers';
 export * from './data';
 export * from './geometry';
 export * from './hooks';
+export * from './layers';
 export * from './inline';
 export * from './interact';
 export * from './providers';

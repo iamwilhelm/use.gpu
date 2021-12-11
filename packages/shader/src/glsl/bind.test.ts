@@ -69,12 +69,12 @@ describe("bind", () => {
   });
 
   it('makes deterministic links for data bindings', () => {
-    const dataBindings = {
-      getColor: {
+    const dataBindings = [
+      {
         uniform: { format: 'vec4', name: 'getColor', value: [0, 0.5, 1, 1], args: ['int'] },
         constant: [1, 0.5, 1, 1],
       },
-      getSize: {
+      {
         uniform: { format: 'vec2', name: 'getSize', value: [1, 1], args: ['int'] },
         buffer: {
           buffer: {} as any,
@@ -82,27 +82,27 @@ describe("bind", () => {
           length: 10,
         },
       },
-    };
+    ];
 
     const toSnapshot = (link: any) => {
       const { name, code, table, virtual: { uniforms, bindings, base }} = link;
       return { name, code, table, uniforms, bindings, base };
     }
 
-    const links1 = bindingsToLinks(dataBindings, 0);
+    const links1 = bindingsToLinks(dataBindings);
     expect(toSnapshot(links1.getColor)).toMatchSnapshot();
 
-    const links2 = bindingsToLinks(dataBindings, 0);
+    const links2 = bindingsToLinks(dataBindings);
     expect(toSnapshot(links2.getColor)).toEqual(toSnapshot(links1.getColor));
   });
 
   it('links data bindings', () => {
-    const dataBindings = {
-      getColor: {
+    const dataBindings = [
+      {
         uniform: { format: 'vec4', name: 'getColor', value: [0, 0.5, 1, 1], args: ['int'] },
         constant: [1, 0.5, 1, 1],
       },
-      getSize: {
+      {
         uniform: { format: 'vec2', name: 'getSize', value: [1, 1], args: ['int'] },
         storage: {
           buffer: {} as any,
@@ -110,7 +110,7 @@ describe("bind", () => {
           length: 10,
         },
       },
-    };
+    ];
 
     const code = `
     vec4 getColor(int);
@@ -128,7 +128,7 @@ describe("bind", () => {
       return { name, code, table, uniforms, bindings, base };
     }
 
-    const links = bindingsToLinks(dataBindings, 0);
+    const links = bindingsToLinks(dataBindings);
     const bound = bindBundle(mod, links);
 
     const fail = () => linkBundle(bound);

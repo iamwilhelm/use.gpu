@@ -15,7 +15,7 @@ import { useBoundShader } from '../hooks/useBoundShader';
 
 import instanceDrawVirtual from '@use-gpu/glsl/instance/draw/virtual.glsl';
 import instanceDrawWireframeStrip from '@use-gpu/glsl/instance/draw/wireframe-strip.glsl';
-import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid2.glsl';
+import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid.glsl';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 

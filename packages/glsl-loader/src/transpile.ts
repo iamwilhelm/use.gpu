@@ -20,14 +20,14 @@ export const transpileGLSL = (source: string, resourcePath: string, esModule: bo
     "code": ${stringify(code)},
     "table": ${stringify(table)},
     "shake": ${stringify(shake)},
-    "tree": decompressAST(${stringify(compressAST(tree))}),
+    "tree": decompressAST(${stringify(compressAST(tree!))}),
   };`
 
   // Emit dependency imports
   let i = 0;
   const imports = [] as string[];
   const markers = [] as string[];
-  for (const {name} of table.modules) {
+  if (table.modules) for (const {name} of table.modules) {
     imports.push(makeImport(`m${i}`, name + '.glsl'));
     markers.push(`${stringify(name)}: m${i}`);
     ++i;
@@ -35,7 +35,7 @@ export const transpileGLSL = (source: string, resourcePath: string, esModule: bo
   const libs = `const libs = {${markers.join(', ')}};`
 
   // Export visible symbols
-  const exportSymbols = table.visibles.map((s: string) => 
+  const exportSymbols = (table.visibles ?? []).map((s: string) => 
     `${esModule ? 'export const ' : 'exports.'}${s} = getSymbol(${stringify(s)});`
   );
   

@@ -12,8 +12,14 @@ import {
   bindBundle,
   bindModule,
   bindingsToLinks,
+  bindingToModule,
   resolveBindings,
 } from './bind';
+
+import {
+  castTo,
+  bundleToAttribute,
+} from './cast';
 
 import {
   linkBundle,
@@ -44,8 +50,14 @@ export {
   bindBundle,
   bindModule,
   bindingsToLinks,
+  bindingToModule,
   resolveBindings,
 } from './bind';
+
+export {
+  castTo,
+  bundleToAttribute,
+} from './cast';
 
 export {
   linkBundle,
@@ -79,7 +91,11 @@ export const GLSLLinker = {
   bindBundle,
   bindModule,
   bindingsToLinks,
+  bindingToModule,
   resolveBindings,
+
+  castTo,
+  bundleToAttribute,
 
   makeASTParser,
   compressAST,

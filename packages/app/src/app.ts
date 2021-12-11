@@ -10,7 +10,7 @@ import {
   Data, RawData, Inline,
   OrbitCamera, OrbitControls,
   Picking, Pick, EventProvider,
-  Cursor,
+  Cursor, Points,
   RawQuads as Quads, RawLines as Lines,
   RenderToTexture,
   ViewProvider,
@@ -86,7 +86,9 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           render: (positions) => [
             use(Quads)({ positions, color: positions, size: [50, 50], getMask: circle, mode: RenderPassMode.Transparent }),
             //use(Quads)({ positions, size: [50, 50], id: 2, mode: RenderPassMode.Picking }),
-            use(Quads)({ positions, size: [50, 50], mode: RenderPassMode.Debug }),
+            //use(Quads)({ positions, size: [50, 50], mode: RenderPassMode.Debug }),
+            
+            use(Points)({ positions, size: 100, mode: RenderPassMode.Debug }),
           ],
         }),
         /*

@@ -1,5 +1,7 @@
 #pragma import {getPickingColor} from '@use-gpu/glsl/use/picking';
 
+vec4 getFragment(vec4, vec2);
+
 #ifdef IS_PICKING
 layout(location = 0) in flat uint fragIndex;
 layout(location = 0) out uvec4 outColor;
@@ -18,6 +20,8 @@ void main() {
 void main() {
   outColor = fragColor;
   outColor.xyz *= outColor.a;
+
+  outColor = getFragment(outColor, fragUV);
 
   if (outColor.a <= 0.0) discard;
 }

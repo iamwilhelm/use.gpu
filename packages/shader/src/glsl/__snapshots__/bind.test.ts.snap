@@ -71,17 +71,17 @@ exports[`bind binds an external 4`] = `
 
     vec4 _21_getColor();
     
-    vec4 _zh_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 _zh_getColor() {
-      return _21_getColor() + _zh_colorUsed();
+    vec4 _7t_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
+    vec4 _7t_getColor() {
+      return _21_getColor() + _7t_colorUsed();
     }
     
 
-    vec4 _zh_getColor();
+    vec4 _7t_getColor();
     void main() {
       vec4 v;
       v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = _zh_getColor();
+      gl_FragColor = _7t_getColor();
     }
     "
 `;
@@ -120,17 +120,28 @@ vec2 _VT_0_getSize(int index) {
 
 exports[`bind makes deterministic links for data bindings 1`] = `
 Object {
-  "base": 0,
+  "base": undefined,
   "bindings": Array [],
-  "code": "#virtual getColor 0",
-  "name": "_VT_1ffruj_",
+  "code": "#virtual [getColor] 1",
+  "name": "_VT_x4yya1_",
   "table": Object {
-    "declarations": Array [],
-    "externals": Array [],
-    "functions": Array [],
-    "globals": Array [],
-    "hash": "1ffruj7ugw",
-    "modules": Array [],
+    "functions": Array [
+      Object {
+        "at": 0,
+        "flags": 0,
+        "prototype": Object {
+          "name": "getColor",
+          "parameters": Array [
+            "int",
+          ],
+          "type": Object {
+            "name": "vec4",
+          },
+        },
+        "symbols": Array [],
+      },
+    ],
+    "hash": "x4yya10vdr",
     "symbols": Array [
       "getColor",
     ],

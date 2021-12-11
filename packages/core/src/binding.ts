@@ -12,13 +12,13 @@ import partition from 'lodash/partition';
 export const makeShaderBindings = <T>(
   uniforms: UniformAttributeValue[],
   sources: any[],
-): Record<string, DataBinding<T>> => {
+): DataBinding<T>[] => {
   const n = uniforms.length;
-  const out = {};
+  const out = [] as DataBinding<T>[];
   for (let i = 0; i < n; ++i) {
     const u = uniforms[i];
     const s = sources[i];
-    out[u.name] = makeShaderBinding<T>(u, s);
+    out.push(makeShaderBinding<T>(u, s));
   }
   return out;
 }

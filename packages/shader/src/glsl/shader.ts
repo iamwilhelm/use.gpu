@@ -1,4 +1,4 @@
-import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler, VirtualTable } from '../types';
+import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler, SymbolTable, VirtualTable } from '../types';
 import { Tree, SyntaxNode } from '@lezer/common';
 
 import { makeASTParser, compressAST, decompressAST } from './ast';
@@ -8,6 +8,7 @@ import { PREFIX_VIRTUAL } from '../constants';
 import LRU from 'lru-cache';
 
 const EMPTY_LIST = [] as any[];
+const EMPTY_TABLE = {} as any;
 
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
@@ -52,25 +53,19 @@ export const loadModuleWithCache = (
 export const loadStaticModule = (code: string, name: string, entry?: string) => {
   const table = {
     hash: getProgramHash(code),
-    symbols: EMPTY_LIST,
-    visibles: EMPTY_LIST,
-    globals: EMPTY_LIST,
-    externals: EMPTY_LIST,
-    modules: EMPTY_LIST,
-    functions: EMPTY_LIST,
-    declarations: EMPTY_LIST,
   };
-  const tree = decompressAST(EMPTY_LIST);
-  return { name, code, tree, table, entry };
+  return { name, code, table, entry };
 }
 
 // Load a virtual (generated) module
 export const loadVirtualModule = (
   virtual: VirtualTable,
-  symbols: string[],
+  initTable: Partial<SymbolTable> = EMPTY_TABLE,
+  entry?: string,
   key: string | number = makeKey(),
 ) => {
-  const code = `#virtual ${symbols.join(' ')} ${key.toString(16)}`;
+  let symbols = initTable.symbols ?? EMPTY_LIST;
+  const code = `#virtual [${symbols.join(' ')}] ${key.toString(16)}`;
 
   const hash = getProgramHash(code);
   const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;
@@ -79,14 +74,9 @@ export const loadVirtualModule = (
     hash,
     symbols,
     visibles: symbols,
-    globals: EMPTY_LIST,
-    externals: EMPTY_LIST,
-    modules: EMPTY_LIST,
-    functions: EMPTY_LIST,
-    declarations: EMPTY_LIST,
+    ...initTable,
   };
-  const tree = decompressAST(EMPTY_LIST);
-  return { name, code, tree, table, virtual };
+  return { name, code, table, entry, virtual };
 }
 
 // Parse GLSL using lezer grammar

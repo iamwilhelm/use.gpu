@@ -26,7 +26,7 @@ Object {
       },
     },
   ],
-  "externals": Array [],
+  "externals": undefined,
   "functions": Array [
     Object {
       "at": 102,
@@ -71,9 +71,9 @@ Object {
       ],
     },
   ],
-  "globals": Array [],
+  "globals": undefined,
   "hash": "vz5280ybh9",
-  "modules": Array [],
+  "modules": undefined,
   "symbols": Array [
     "getQuadIndex",
     "getQuadUV",
@@ -373,7 +373,7 @@ Object {
       ],
     },
   ],
-  "globals": Array [],
+  "globals": undefined,
   "hash": "cjsjb69zka",
   "modules": Array [
     Object {
@@ -830,11 +830,11 @@ Object {
       },
     },
   ],
-  "externals": Array [],
-  "functions": Array [],
-  "globals": Array [],
+  "externals": undefined,
+  "functions": undefined,
+  "globals": undefined,
   "hash": "3wmin9gcu9",
-  "modules": Array [],
+  "modules": undefined,
   "symbols": Array [
     "SolidVertex",
     "MeshVertex",
@@ -969,7 +969,7 @@ Object {
       ],
     },
   ],
-  "externals": Array [],
+  "externals": undefined,
   "functions": Array [
     Object {
       "at": 228,
@@ -1100,9 +1100,9 @@ Object {
       ],
     },
   ],
-  "globals": Array [],
+  "globals": undefined,
   "hash": "7vqg0ujg5g",
-  "modules": Array [],
+  "modules": undefined,
   "symbols": Array [
     "worldToView",
     "viewToClip",

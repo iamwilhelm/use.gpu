@@ -105,17 +105,17 @@ export const linkModule = timed('linkModule', (
       const ns = reserveNamespace(module, namespaces, used, namespace);
       hashes.set(hash, ns);
 
-      for (const name of symbols) rename.set(name, ns + name);
-      for (const name of globals) rename.set(name, name);
-
-      for (const name of visibles) visible.add(rename.get(name)!);
+      if (symbols) for (const name of symbols) rename.set(name, ns + name);
+      if (globals) for (const name of globals) {
+        rename.set(name, name);
+        fixed.set(ns + name, name);
+      }
+      if (visibles) for (const name of visibles) visible.add(rename.get(name)!);
       for (const name of rename.values()) exists.add(name);
-
-      for (const name of globals) fixed.set(ns + name, name);
     }
 
     // Replace imported symbol names with target
-    for (const {name: module, imports} of modules) {
+    if (modules) for (const {name: module, imports} of modules) {
       const ns = namespaces.get(module);
       for (const {name, imported} of imports) {
         let imp = ns + imported;
@@ -130,7 +130,7 @@ export const linkModule = timed('linkModule', (
     }
 
     // Replace imported function prototype names with target
-    for (const {flags, prototype} of externals) if (prototype) {
+    if (externals) for (const {flags, prototype} of externals) if (prototype) {
       const {name} = prototype;
       const resolved = aliases?.get(name) ?? name;
       const ns = namespaces.get(name);
@@ -145,15 +145,19 @@ export const linkModule = timed('linkModule', (
     }
 
     if (virtual) {
+      const {uniforms, bindings} = virtual;
+      if (uniforms && bindings && (libraries[VIRTUAL_BINDGROUP] == null)) {
+        const id = code.replace('#virtual ', '');
+        throw new Error(`Virtual module ${id} has unresolved data bindings`);
+      }
+
       // Emit virtual module in target namespace,
       // with dynamically assigned binding slots.
       const ns = hashes.get(hash)!;
-      const code = virtual.render(ns, virtual.base);
-      if (libraries[VIRTUAL_BINDGROUP] == null) throw new Error(`Virtual module ${name} has unresolved data bindings`);
-
-      program.push(code);
+      const recode = virtual.render(ns, rename, virtual.base);
+      program.push(recode);
     }
-    else {
+    else if (tree) {
       // Shake tree ops based on which symbols were exported
       const keep = exported.get(hash);
       const ops = shake && keep ? resolveShakeOps(shake, keep) : null;
@@ -161,6 +165,10 @@ export const linkModule = timed('linkModule', (
       // Rename symbols using AST while tree shaking
       const recode = rewriteUsingAST(code, tree, rename, ops);
       program.push(recode);
+    }
+    else {
+      // Static include (defs)
+      program.push(code);
     }
   }
 
@@ -184,13 +192,19 @@ export const loadModulesInOrder = timed('loadModules', (
   const out = [] as ParsedModule[];
 
   // Traverse graph starting from main
-  const queue = [{name: main.name, module: main}];
+  const queue = [{name: main.name, module: main, context: main}];
   seen.add(main.name);
+
+  const getContext = (m: ParsedModule) => {
+    const {name, code} = m;
+    if (name.match(/^_[A-Z]{2}_/) && code.match(/^#/)) return code.replace(/^#/, '');
+    return name;
+  }
 
   while (queue.length) {
     const next = queue.shift()!;
-    const {name, module} = next;
-    if (module == null) throw new Error(`Shader module ${name} undefined`);
+    const {name, module, context} = next;
+    if (module == null) throw new Error(`Shader module ${name} undefined in ${getContext(context)}`);
 
     out.push(module);
 
@@ -198,12 +212,12 @@ export const loadModulesInOrder = timed('loadModules', (
     const deps = [] as string[];
 
     // Recurse into imports
-    for (const {at, name, imports} of modules) {
+    if (modules) for (const {at, name, imports} of modules) {
       const isLink = name.match(/^#/);
       const module = isLink ? links[name] : libraries[name];
-      if (!module) throw new Error(`Unknown module '${name}'`);
+      if (!module) throw new Error(`Unknown module '${name}' in ${getContext(context)}`);
 
-      if (!seen.has(name)) queue.push({name, module: {...module, name}});
+      if (!seen.has(name)) queue.push({name, module: {...module, name}, context: module});
       seen.add(name);
       deps.push(name);
 
@@ -216,15 +230,15 @@ export const loadModulesInOrder = timed('loadModules', (
     }
 
     // Recurse into links
-    for (const {prototype, flags} of externals) if (prototype) {
+    if (externals) for (const {prototype, flags} of externals) if (prototype) {
       const {name} = prototype;
       const module = links[name];
       if (!module) {
         if (flags & RF.Optional) continue;
-        throw new Error(`Unlinked function '${name}'`);
+        throw new Error(`Unlinked function '${name}' in ${getContext(context)}`);
       }
 
-      if (!seen.has(name)) queue.push({name, module: {...module, name}});
+      if (!seen.has(name)) queue.push({name, module: {...module, name}, context: module});
       seen.add(name);
       deps.push(name);
 

@@ -1,4 +1,4 @@
-import { ParsedModule, ParsedBundle, ShaderModule, CompressedNode, ShaderDefine, DataBinding } from '../types';
+import { ParsedModule, ParsedBundle, ShaderModule, CompressedNode, ShaderDefine, DataBinding, UniformAttribute } from '../types';
 
 import { defineConstants, loadStaticModule, loadVirtualModule } from './shader';
 import { compressAST, decompressAST } from './ast';
@@ -22,11 +22,19 @@ const timed = (name: string, f: any) => {
 
 const NO_SYMBOLS = [] as any[];
 
+export const bindingToModule = (
+  binding: DataBinding,
+): ShaderModule => {
+  const {uniform: {name}} = binding;
+  const links = makeBindingAccessors([binding], VIRTUAL_BINDGROUP);
+  const module = links[name];
+  return {...module, entry: name};
+}
+
 export const bindingsToLinks = (
-  bindings: Record<string, DataBinding>,
-  key: string | number = makeKey(),
+  bindings: DataBinding[],
 ): Record<string, ShaderModule> => {
-  return makeBindingAccessors(Object.values(bindings), VIRTUAL_BINDGROUP, key);
+  return makeBindingAccessors(bindings, VIRTUAL_BINDGROUP);
 }
 
 export const bindBundle = timed('bindBundle', (
@@ -36,7 +44,6 @@ export const bindBundle = timed('bindBundle', (
   key: string | number = makeKey(),
 ): ParsedBundle => {
   const {module, libs} = toBundle(bundle);
-
   return bindModule(module, libs, linkDefs, defines, key);
 });
 
@@ -49,15 +56,15 @@ export const bindModule = timed('bindModule', (
 ): ParsedBundle => {
   const [links, aliases] = parseLinkAliases(linkDefs);
 
-  const {table} = main;
+  const {name, table} = main;
   const {hash, modules, externals} = table;
 
-  const rehash = getProgramHash(`#closure ${hash} ${key.toString(16)}`);
+  const rehash = getProgramHash(`#closure [${name}] ${hash} ${key.toString(16)}`);
   const namespace = `${PREFIX_CLOSURE}${rehash.slice(0, 6)}_`;
 
   const relinks: Record<string, ShaderModule> = {};
   const reexternals = [];
-  const reimports = modules.slice();
+  const reimports = modules?.slice() ?? [];
 
   if (defines && Object.keys(defines).length) {
     const def = defineConstants(defines) + "\n";
@@ -65,7 +72,7 @@ export const bindModule = timed('bindModule', (
     relinks[namespace] = loadStaticModule(def, 'def');
   }
 
-  for (const external of externals) if (external.prototype) {
+  if (externals) for (const external of externals) if (external.prototype) {
     const {flags, prototype} = external;
     const {name} = prototype;
 
@@ -124,8 +131,8 @@ export const resolveBindings = timed('resolveBindings', (
 
         const {uniforms, bindings} = virtual;
         const namespace = PREFIX_VIRTUAL + base + '_';
-        for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
-        for (const b of bindings) allBindings.push(b);
+        if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
+        if (bindings) for (const b of bindings) allBindings.push(b);
 
         // Mutate virtual modules as they are ephemeral
         virtual.namespace = namespace;
@@ -148,7 +155,7 @@ export const resolveBindings = timed('resolveBindings', (
 
     const retable = {
       ...table,
-      modules: [...modules, imported],
+      modules: modules ? [...modules, imported] : [imported],
     };
 
     return {

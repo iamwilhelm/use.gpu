@@ -38,10 +38,21 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
 
   // Gather data length
   const [chunks, length] = useMemo(() => {
+
+    // Count simple array lengths as fallback
+    // in case of no composite field.
+    let l = fs.reduce((l, [, accessor]) => {
+      if (l != null) return l;
+      if (typeof accessor === 'object') return accessor?.length;
+      return null;
+    });
+
+    // Look for first composite field
     const composites = fs.filter(([format]) => isComposite(format));
     const [composite] = composites;
-    if (!composite) return [data?.length || 0];
+    if (!composite) return [data?.length || l || 0];
 
+    // Read out chunk lengths
     const [f, accessor] = composite;
     const chunks = [] as number[];
     let {raw, length: l, fn} = makeDataAccessor(f, accessor);
@@ -57,7 +68,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
     const length = chunks.reduce((a, b) => a + b) || 0;
     return [chunks, length];
   }, [data, fs]);
-  
+
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
     const l = length;
@@ -89,8 +100,6 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
     const fieldSources = fieldBuffers.map(f => f.source);
     return [fieldBuffers, fieldSources];
   }, [device, fs, chunks, length]);
-  
-  console.log({data, chunks, fieldBuffers, fieldSources})
   
   const refresh = () => {
     for (const {buffer, array, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {

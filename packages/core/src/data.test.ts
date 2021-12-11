@@ -32,6 +32,14 @@ describe('data', () => {
     expect(dst).toEqual([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6]);
   });
 
+  it('copies multiple nested data arrays into one', () => {
+    const src = [{xs: [[1, 1], [2, 2], [3, 3]]}, {xs: [[4, 4]]}, {xs: [[5, 5], [6, 6]]}];
+    const dst = [0, 0, 0, 0, 0, 0];
+
+    copyDataArrays(src, dst, 2, (o: any) => o.xs);
+    expect(dst).toEqual([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6]);
+  });
+
   it('copies number array into repeated chunks', () => {
     const src = [1, 2, 3];
     const dst = [0, 0, 0, 0, 0, 0];

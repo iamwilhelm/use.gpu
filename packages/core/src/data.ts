@@ -146,10 +146,15 @@ export const copyDataArrays = (from: any[], to: NumberArray, dims: number, acces
     const l = src.length;
     const el = src[0];
     if (el != null) {
-      if (typeof el === 'number') copyNumberArrayRange(src, to, 0, pos, l * dims);
-      else if (typeof el[0] === 'number') copyNestedNumberArrayRange(src, to, 0, pos, l, dims);
+      if (typeof el === 'number') {
+        copyNumberArrayRange(src, to, 0, pos, l);
+        pos += l;
+      }
+      else if (typeof el[0] === 'number') {
+        copyNestedNumberArrayRange(src, to, 0, pos, l, dims);
+        pos += l * dims;
+      }
     }
-    pos += l * dims;
   }
 }
 

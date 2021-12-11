@@ -23,8 +23,8 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
   const {
     format, length,
     data, expr,
-    live,
     render,
+    live = false,
   } = props;
 
   // Make data buffer
@@ -40,25 +40,26 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
       buffer,
       format: f,
       length: l,
+      live,
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
-  }, [device, format, length]);
+  }, [device, format, length, live]);
+
+  const refresh = () => {
+    if (data) copyNumberArray(data, array);
+    if (expr) emitIntoNumberArray(expr, array, dims);
+    if (data || expr) uploadBuffer(device, buffer, array.buffer);
+  };
 
   if (!live) {
     useNoContext(FrameContext);
-    useSomeMemo(() => {
-      if (data) copyNumberArray(data, array);
-      if (expr) emitIntoNumberArray(expr, array, dims);
-      if (data || expr) uploadBuffer(device, buffer, array.buffer);
-    }, [device, buffer, array, data, expr, dims]);
+    useSomeMemo(refresh, [device, buffer, array, data, expr, dims]);
   }
   else {
     useSomeContext(FrameContext);
     useNoMemo();
-    if (data) copyNumberArray(data, array);
-    if (expr) emitIntoNumberArray(expr, array, dims);
-    if (data || expr) uploadBuffer(device, buffer, array.buffer);
+    refresh();
   }
 
   return useMemo(() => render ? render(source) : yeet(source), [render, source]);

@@ -21,13 +21,20 @@ export type RawLinesProps = {
   position?: number[] | TypedArray,
   segment?: number,
   size?: number,
+  color?: number,
 
   positions?: StorageSource,
   segments?: StorageSource,
   sizes?: StorageSource,
+  colors?: StorageSource,
+
+  getPosition?: ShaderModule,
+  getSegment?: ShaderModule,
+  getSize?: ShaderModule,
+  getColor?: ShaderModule,
 
   depth?: number,
-  join: 'miter' | 'round' | 'bevel',
+  join?: 'miter' | 'round' | 'bevel',
 
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode,
@@ -39,6 +46,7 @@ const ZERO = [0, 0, 0, 1];
 const VERTEX_BINDINGS = [
   { name: 'getPosition', format: 'vec4', value: ZERO },
   { name: 'getSegment', format: 'int', value: 0 },
+  { name: 'getColor', format: 'vec4', value: [0.5, 0.5, 0.5, 1] },
   { name: 'getSize', format: 'float', value: 1 },
 ] as UniformAttributeValue[];
 
@@ -88,9 +96,10 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) =>
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [
-    props.positions ?? props.position,
-    props.segments ?? props.segment,
-    props.sizes ?? props.size,
+    props.positions ?? props.position ?? props.getPosition,
+    props.segments ?? props.segment ?? props.getSegment,
+    props.colors ?? props.color ?? props.getColor,
+    props.sizes ?? props.size ?? props.getSize,
   ]);
 
   const key = fiber.id;

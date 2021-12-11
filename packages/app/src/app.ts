@@ -7,11 +7,11 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import {
   AutoCanvas,
   Loop, Draw, Pass,
-  Data, RawData, Inline,
+  CompositeData, Data, RawData, Inline,
   OrbitCamera, OrbitControls,
   Picking, Pick, EventProvider,
-  Cursor, Points,
-  RawQuads as Quads, RawLines as Lines,
+  Cursor, Points, Lines,
+  RawQuads as Quads, RawLines,
   RenderToTexture,
   ViewProvider,
 } from '@use-gpu/components';
@@ -45,6 +45,18 @@ const lineFields = [
   ['float', [10, 10, 10, 10, 10]],
 ] as DataField[];
 
+const lineData = seq(4).map((i) => ({
+  path: seq(3 + i + Math.random() * 5).map(() => [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1]),
+  color: [Math.random(), Math.random(), Math.random(), 1], 
+  size: Math.random() * 50 + 10,
+}));
+
+const lineDataFields = [
+  ['vec4[]', (o: any) => o.path],
+  ['vec4', 'color'],
+  ['float', 'size'],
+] as DataField[];
+
 let t = 0;
 let lj = 0;
 const getLineJoin = () => ['bevel', 'miter', 'round'][lj = (lj + 1) % 3];
@@ -65,10 +77,20 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
             //use(Quads)({ positions, size: [10, 10] }),
-            use(Lines)({ positions, segments, size: 50, join: 'round' }),
-            use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
+            use(RawLines)({ positions, segments, size: 50, join: 'round' }),
+            use(RawLines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
             //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]
+        }),
+        use(CompositeData)({
+          fields: lineDataFields,
+          data: lineData,
+          render: ([positions, colors, sizes]: StorageSource[]) => [
+            //use(Quads)({ positions, size: [10, 10] }),
+            use(Lines)({ positions, colors, sizes, }),
+            use(Lines)({ positions, colors, sizes, mode: RenderPassMode.Debug }),
+            //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
+          ]          
         }),
         use(RawData)({
           format: 'vec4',

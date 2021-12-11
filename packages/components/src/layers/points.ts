@@ -14,9 +14,6 @@ import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 
 import { circle, diamond, square, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/glsl/mask/point.glsl';
 
-import { getQuadVertex } from '@use-gpu/glsl/instance/vertex/quad.glsl';
-import { getMaskedFragment } from '@use-gpu/glsl/mask/masked.glsl';
-
 export enum PointShape {
   Circle = 'circle',
   Diamond = 'diamond',
@@ -37,12 +34,12 @@ const MASK_SHADER = {
 
 export type PointsProps = {
   position?: number[] | TypedArray,
-  size?: number,
   color?: number[],
+  size?: number,
 
   positions?: StorageSource,
-  sizes?: StorageSource,
   colors?: StorageSource,
+  sizes?: StorageSource,
 
   shape?: PointShape,
   
@@ -56,10 +53,10 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
   const {
     position,
     positions,
-    size,
-    sizes,
     color,
     colors,
+    size,
+    sizes,
     shape,
     
     mode = RenderPassMode.Opaque,

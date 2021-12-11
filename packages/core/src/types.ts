@@ -165,6 +165,8 @@ export type StorageSource = {
   buffer: GPUBuffer,
   format: string,
   length: number,
+  live: boolean,
+  chunks?: number[],
 };
 
 // Shaders
@@ -208,7 +210,8 @@ export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
 
 export type ArrayLike = any[] | TypedArray;
 
-export type DataField = [string, string | Accessor | ArrayLike];
+export type AccessorSpec = string | Accessor | ArrayLike;
+export type DataField = [string, AccessorSpec];
 export type DataBinding<T> = {
   uniform: UniformAttributeValue,
   storage?: StorageSource,

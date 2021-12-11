@@ -3,7 +3,10 @@ import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@us
 import { RenderContext, FrameContext } from '@use-gpu/components';
 import { yeet, useMemo, useSomeMemo, useNoMemo, useContext, useSomeContext, useNoContext } from '@use-gpu/live';
 import {
-  makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
+  makeDataArray, makeDataAccessor,
+  copyDataArray, copyNumberArray,
+  copyDataArrays, copyNumberArrays,
+  copyDataArrayChunked, copyNumberArrayChunked,
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
 
@@ -18,7 +21,10 @@ export type DataProps = {
 
 const NO_FIELDS = [] as DataField[];
 
-export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
+const isComposite = (format: string) => !!format.match(/\[\]$/);
+const toSimple = (format: string) => format.replace(/\[\]$/, '');
+
+export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
   const {device} = useContext(RenderContext);
 
   const {
@@ -28,12 +34,38 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
     live = false,
   } = props;
 
-  const l = data?.length || 0;
   const fs = fields ?? NO_FIELDS;
 
+  // Gather data length
+  const [chunks, length] = useMemo(() => {
+    const composites = fs.filter(([format]) => isComposite(format));
+    const [composite] = composites;
+    if (!composite) return [data?.length || 0];
+
+    const [f, accessor] = composite;
+    const chunks = [] as number[];
+    let {raw, length: l, fn} = makeDataAccessor(f, accessor);
+
+    if (raw && l != null) for (let i = 0; i < l; ++i) {
+      chunks.push(raw[i]?.length || 0);
+    }
+    else if (fn) for (const v of data) {
+      const list = fn(v);
+      chunks.push(list?.length || 0);
+    }
+
+    const length = chunks.reduce((a, b) => a + b) || 0;
+    return [chunks, length];
+  }, [data, fs]);
+  
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
+    const l = length;
+
     const fieldBuffers = fs.map(([format, accessor]) => {
+      const composite = isComposite(format);
+      format = toSimple(format);
+
       if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
@@ -49,22 +81,31 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
         format,
         length,
         live,
+        chunks,
       };
-      
-      return {buffer, array, source, dims, accessor, raw};
+
+      return {buffer, array, source, dims, accessor: fn, raw, composite};
     });
     const fieldSources = fieldBuffers.map(f => f.source);
     return [fieldBuffers, fieldSources];
-  }, [device, fs, l]);
-
+  }, [device, fs, chunks, length]);
+  
+  console.log({data, chunks, fieldBuffers, fieldSources})
+  
   const refresh = () => {
-    for (const {buffer, array, dims, accessor, raw} of fieldBuffers) if (raw || data) {
-      if (raw) copyNumberArray(raw, array);
-      else if (data) copyDataArray(data, array, dims, accessor as Accessor);
+    for (const {buffer, array, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
+      if (composite) {
+        if (raw) copyNumberArrays(raw, array);
+        else if (data) copyDataArrays(data, array, dims, accessor as Accessor);
+      }
+      else {
+        if (raw) copyNumberArrayChunked(raw, array, dims, chunks);
+        else if (data) copyDataArrayChunked(data, array, dims, chunks, accessor as Accessor);
+      }
       uploadBuffer(device, buffer, array.buffer);
     }
   };
-
+  
   if (!live) {
     useNoContext(FrameContext);
     useSomeMemo(refresh, [device, data, fieldBuffers]);
@@ -72,7 +113,7 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
   else {
     useSomeContext(FrameContext);
     useNoMemo();
-    refresh();
+    refresh()
   }
 
   return useMemo(() => render ? render(fieldSources) : yeet(fieldSources), [render, fieldSources]);

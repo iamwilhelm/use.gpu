@@ -7,6 +7,7 @@ float NaN = 0.0/0.0;
 
 vec4 getPosition(int);
 int getSegment(int);
+vec4 getColor(int);
 float getSize(int);
 
 #pragma export
@@ -36,6 +37,7 @@ SolidVertex getLineVertex(int vertexIndex, int instanceIndex) {
   }
 
   int segment = getSegment(cornerIndex);
+  vec4 color = getColor(cornerIndex);
   float size = getSize(cornerIndex);
 
   vec4 beforePos = getPosition(cornerIndex - 1);
@@ -51,7 +53,7 @@ SolidVertex getLineVertex(int vertexIndex, int instanceIndex) {
 
   return SolidVertex(
     vec4(lineJoin, 1.0),
-    vec4(0.2, 0.4, 1.0, 1.0),
+    color,
     uv
   );
 }

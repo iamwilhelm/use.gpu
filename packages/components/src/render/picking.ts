@@ -42,14 +42,23 @@ export const PickingContext = makeContext<PickingContextType>(null, 'PickingCont
 
 export const NO_PICKING = {} as any;
 
+export const usePicking = (id: number) => useSomeOne(() => ({
+  pickingDefs: PICKING_UNIFORMS,
+  pickingUniforms: {
+    pickingId: { value: id },
+  },
+}));
+
+export const useNoPicking = () => useNoOne();
+
 export const usePickingContext = (id?: number, isPicking?: boolean) => {
   const renderContext = useContext(RenderContext);
 
   const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  
-  const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoOne() ?? NO_PICKING;
+  const {pickingDefs, pickingUniforms} = usePicking(id) ?? useNoOne() ?? NO_PICKING;
   const resolvedContext = pickingContext?.renderContext ?? renderContext;
 
-  return {renderContext, pickingDefs, pickingUniforms};
+  return {renderContext: resolvedContext, pickingDefs, pickingUniforms};
 }
 
 
@@ -132,13 +141,6 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
       const index = seq(itemDims).map(i => captured![offset + i]);
       return index;
     }
-
-    const usePicking = (id: number) => useSomeOne(() => ({
-      pickingDefs: PICKING_UNIFORMS,
-      pickingUniforms: {
-        pickingId: { value: id },
-      },
-    }));
 
     const context = {
       renderContext: {

@@ -82,6 +82,7 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     perspectives,
 
     getSize,
+    getMask,
 
     mode,
     id,

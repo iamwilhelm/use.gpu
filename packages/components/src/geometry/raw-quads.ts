@@ -95,7 +95,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
   ]);
 
   const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [
-    props.getMask,
+    (mode !== RenderPassMode.Debug) ? props.getMask : null,
     props.getTexture,
   ]);
 

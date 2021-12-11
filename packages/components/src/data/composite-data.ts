@@ -147,7 +147,6 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
       if (composite) {
         if (raw) copyNumberArraysComposite(raw, array, dims, chunks, loops);
         else if (data) copyDataArraysComposite(data, array, dims, chunks, loops, accessor as Accessor);
-        console.log('composite', array)
       }
       else {
         if (raw) copyNumberArrayChunked(raw, array, dims, chunks, loops);

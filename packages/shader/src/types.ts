@@ -133,7 +133,7 @@ export type StorageSource = {
 export type UniformAttribute = {
   name: string,
   format: string,
-  args: string[],
+  args?: string[],
 };
 
 export type UniformAttributeValue = UniformAttribute & {

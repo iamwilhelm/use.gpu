@@ -67,7 +67,7 @@ export const useBoundShader = (
   }, uniforms);
 
   // Refresh bindings if buffer assignment changed
-  const buffers = [];
+  const buffers = [] as GPUBuffer[];
   for (const b of bindings) keys.push(b.buffer);  
   useMemo(() => ref.bindings = bindings, buffers);
 

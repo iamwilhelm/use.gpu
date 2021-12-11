@@ -6,12 +6,10 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { ViewContext } from '../provider/view-provider';
-import { PickingContext, useNoPicking } from '../render/picking';
 import { RawQuads } from '../geometry/raw-quads';
 
 import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { linkBundle, bindBundle, bindingToModule, bindingsToLinks, bundleToUniform, resolveBindings, castTo } from '@use-gpu/shader/glsl';
+import { linkBundle, bindBundle, bindingToModule, bindingsToLinks, resolveBindings, castTo } from '@use-gpu/shader/glsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 
 import { circle, diamond, square, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/glsl/mask/point.glsl';
@@ -52,7 +50,7 @@ export type PointsProps = {
   id?: number,
 };
 
-const SIZE_BINDING = { name: 'getSize', format: 'float', value: 1, args: ['int'] };
+const SIZE_BINDING = { name: 'getSize', format: 'float', value: 1, args: ['int'] } as UniformAttributeValue;
 
 export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
   const {
@@ -69,7 +67,7 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
   } = props;
 
   const key = fiber.id;
-  const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, sizes ?? size), fiber.id);
+  const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, sizes ?? size));
   const getSize = castTo(getSizeFloat, 'vec2', 'xx');  
 
   const getMask = MASK_SHADER[shape ?? PointShape.Circle]; 

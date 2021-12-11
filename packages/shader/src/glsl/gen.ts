@@ -29,7 +29,7 @@ export const makeBindingAccessors = (
     prototype: {
       name: uniform.name,
       type: {name: uniform.format},
-      parameters: uniform.args,
+      parameters: uniform.args ?? INT_ARG,
     },
     flags: 0,
   }));

@@ -33,7 +33,7 @@ export const castTo = (
   const render = (namespace: string, rename: Map<string, string>) => {
     const name = rename.get('cast') ?? 'cast';
     const accessor = rename.get('getValue') ?? 'getValue';
-    return makeCastTo(name, accessor, args, format, type, swizzle);
+    return makeCastTo(name, accessor, args ?? [], format, type, swizzle);
   }
 
   const virtual = loadVirtualModule(

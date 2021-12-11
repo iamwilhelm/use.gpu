@@ -35,7 +35,7 @@ for (const {pattern, arg} of globs) {
   for (const file of files) {
     const core = readFileSync(file).toString();
     const module = loadModule(core, file);
-    const symbols = module.table.visibles.map((s: string) => `export const ${s}: ParsedBundle;`);
+    const symbols = (module.table.visibles ?? []).map((s: string) => `export const ${s}: ParsedBundle;`);
     
     let abs = path.resolve(file);
     let prefix = base ?? path.resolve(arg);

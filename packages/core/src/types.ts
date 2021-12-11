@@ -151,6 +151,12 @@ export type UniformAllocation = {
   bindGroup: GPUBindGroup,
 };
 
+export type VirtualAllocation = {
+  pipe?: UniformPipe,
+  buffer?: GPUBuffer,
+  bindGroup?: GPUBindGroup,
+};
+
 export type UniformFiller = (items: any) => void;
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 

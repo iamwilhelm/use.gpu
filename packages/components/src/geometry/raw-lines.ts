@@ -4,8 +4,9 @@ import {
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 
-import { ViewContext } from '../provider/view-provider';
+import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
@@ -86,14 +87,14 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) =>
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
-  const vertexBindings = makeShaderBindings(VERTEX_BINDINGS, [
+  const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [
     props.positions ?? props.position,
     props.segments ?? props.segment,
     props.sizes ?? props.size,
   ]);
 
   const key = fiber.id;
-  const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings, key), {}, key);
+  const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings), {}, key);
   const getFragment = getPassThruFragment;
 
   return use(Virtual)({

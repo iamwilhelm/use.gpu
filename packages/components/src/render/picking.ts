@@ -41,7 +41,7 @@ type PickingContextType = {
 export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
 export const useNoPicking = () => useResource(() => ({}));
 
-export const usePickingContext = (isPicking?: boolean) => {
+export const usePickingContext = (id?: number, isPicking?: boolean) => {
   const renderContext = useContext(RenderContext);
 
   const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  

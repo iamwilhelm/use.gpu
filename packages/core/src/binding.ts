@@ -24,7 +24,7 @@ export const makeShaderBindings = <T>(
 }
 
 // Parse a source for a given uniform/attribute
-export const makeShaderBinding = (
+export const makeShaderBinding = <T>(
   uniform: UniformAttributeValue,
   source?: StorageSource | T | any,
 ): DataBinding<T> => {

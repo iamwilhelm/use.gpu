@@ -3,6 +3,7 @@ import {
   UniformAttribute, UniformAttributeDescriptor,
   UniformBinding, UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller,
+  DataBinding,
   StorageSource,
 } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
@@ -53,10 +54,10 @@ export const makeMultiUniforms = (
 export const makeBoundUniforms = <T>(
   device: GPUDevice,
   pipeline: GPURenderPipeline | GPUComputePipeline,
-  uniforms: DataBinding<T>,
-  bindings: DataBinding<T>,
+  uniforms: DataBinding<T>[],
+  bindings: DataBinding<T>[],
   set: number = 0,
-): VirtualAllocation | null => {
+): VirtualAllocation => {
   const entries = [] as GPUBindGroupEntry[];
 
   let pipe, buffer;

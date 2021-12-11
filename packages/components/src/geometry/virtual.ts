@@ -60,7 +60,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
 
   // Render set up
   const {viewUniforms, viewDefs} = useContext(ViewContext);
-  const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(isPicking);
+  const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;
 
   // Render shader

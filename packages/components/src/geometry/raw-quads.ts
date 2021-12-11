@@ -6,7 +6,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { ViewContext } from '../provider/view-provider';
+import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
@@ -82,13 +82,13 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
-  const vertexBindings = makeShaderBindings(VERTEX_BINDINGS, [
+  const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [
     props.positions ?? props.position ?? props.getPosition,
     props.colors ?? props.color ?? props.getColor,
     props.sizes ?? props.size ?? props.getSize,
   ]);
 
-  const fragmentBindings = makeShaderBindings(FRAGMENT_BINDINGS, [
+  const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [
     props.getMask,
     props.getTexture,
   ]);

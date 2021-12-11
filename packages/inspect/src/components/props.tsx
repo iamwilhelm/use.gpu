@@ -4,7 +4,7 @@ import styled, { keyframes } from "styled-components";
 
 import React, { useState } from 'react';
 import { Action } from './types';
-import { SplitRow, ExpandRow, IndentTree, Label } from './layout';
+import { SplitRow, TreeRow, TreeIndent, Label } from './layout';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 
@@ -134,7 +134,7 @@ export const inspectObject = (
 		</Compact>
 
 		const full = expanded ? (
-			<IndentTree>{inspectObject(object[k], state, toggleState, key, seen, depth + 1)}</IndentTree>
+			<TreeIndent indent={1}>{inspectObject(object[k], state, toggleState, key, seen, depth + 1)}</TreeIndent>
 		) : null;
 
 	  const proto = object[k]?.__proto__ !== Object.prototype
@@ -146,12 +146,12 @@ export const inspectObject = (
 		if (showFull && expanded) {
 			return (
 				<div key={k} onClick={onClick}>
-					<ExpandRow>
+					<TreeRow>
 						<SplitRow>
 							<Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
 							<div>{proto}</div>
 						</SplitRow>
-					</ExpandRow>
+					</TreeRow>
 					<div>{full}</div>
 				</div>
 			);
@@ -159,12 +159,12 @@ export const inspectObject = (
 
 		return (
 			<div key={k} onClick={onClick}>
-				<ExpandRow>
+				<TreeRow>
 					<SplitRow>
 						<Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
 						<div>{compact}</div>
 					</SplitRow>
-				</ExpandRow>
+				</TreeRow>
 			</div>
 		);
 	});

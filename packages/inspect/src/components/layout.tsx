@@ -20,33 +20,6 @@ export const InspectToggle = styled.div`
   pointer-events: auto;
 `;
 
-export const ExpandRow = styled.div`
-  display: flex;
-  height: 20px;
-`;
-
-export const NotExpandRow = styled(ExpandRow)`
-  padding-left: 20px;
-`;
-
-export const IndentMini = styled.div`
-  padding-left: 2px;
-`;
-
-export const IndentTree = styled.div`
-  padding-left: 20px;
-`;
-
-export const IndentTreeLine = styled.div`
-  margin-left: 10px;
-  padding-left: 10px;
-  border-left: 1px dotted var(--borderThin);
-`;
-
-export const IndentContinuation = styled.div`
-  margin-left: -18px;
-`;
-
 export const SplitRow = styled.div`
   display: flex;
   min-height: 100%;
@@ -84,4 +57,21 @@ export const Label = styled.div`
   padding-right: 10px;
   flex-shrink: 0;
   display: flex;
+`;
+
+
+
+export const TreeRow = styled.div`
+  display: flex;
+  height: 20px;
+	padding-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
+`;
+
+export const TreeIndent = styled.div`
+	margin-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
+`;
+
+export const TreeLine = styled.div`
+	margin-left: -1px;
+  border-left: 2px dotted var(--borderThin);
 `;

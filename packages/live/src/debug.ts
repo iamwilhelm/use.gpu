@@ -35,7 +35,7 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
   if (name === 'PROVIDE' && args) {
     const [context,,, isMemo] = args;
     const value = formatValue(context.displayName);
-    return isMemo ? `ProvideMemo(${value})` : `Provide(${value})`;
+    return isMemo ? `Memo(Provide(${value}))` : `Provide(${value})`;
   }
   else if (name === 'CONSUME' && args) {
     const [context] = args;
@@ -44,7 +44,8 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
   }
   else if (name === 'DETACH' && args) {
     const [call] = args;
-    name = `Detach(${formatValue(call.f)})`;
+    // @ts-ignore
+    name = `Detach(${(call.f?.displayName ?? call.f?.name) || 'Node'})`;
   }
   else if (name === 'GATHER' && args) {
     name = `[Gather]`;

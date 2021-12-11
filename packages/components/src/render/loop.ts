@@ -28,7 +28,7 @@ export const Loop: LiveComponent<LoopProps> = (fiber) => (props) => {
 
     const loop = () => {
       if (ref.dispatch) ref.dispatch();
-      if (running) requestAnimationFrame(loop);
+      //if (running) requestAnimationFrame(loop);
     }
 
     requestAnimationFrame(loop);

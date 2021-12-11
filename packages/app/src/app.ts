@@ -173,8 +173,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
                         use(ViewProvider)({
                           defs, uniforms, children:
 
-    //                        use(Loop)({
-    //                          children: [
+                            use(Loop)({
+                              children: [
 
                                 //use(RenderToTexture)({
                                 //  children: view,
@@ -184,8 +184,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
                                   children: view,
                                 }),
 
-    //                          ],
-    //                        })
+                              ],
+                            })
           
                         })
                     })

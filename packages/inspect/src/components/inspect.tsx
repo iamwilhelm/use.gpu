@@ -5,7 +5,7 @@ import { ExpandState, SelectState, PingState } from './types';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Node } from './node';
-import { Fiber } from './fiber';
+import { FiberTree } from './fiber';
 import { Props } from './props';
 import { Call } from './call';
 import { Shader } from './shader';
@@ -75,7 +75,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const tree = (
     <Scrollable>
       <Inset>
-        <Fiber fiber={fiber} ping={ping} expandCursor={expandCursor} selectedCursor={selectedCursor} />
+				<FiberTree fiber={fiber}  ping={ping} expandCursor={expandCursor} selectedCursor={selectedCursor} />
       </Inset>
     </Scrollable>
   );

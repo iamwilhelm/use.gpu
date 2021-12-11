@@ -1,46 +1,83 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { useResource, formatValue } from '@use-gpu/live';
+import { formatValue } from '@use-gpu/live';
 
 import React from 'react';
 
 import { useRefineCursor, Cursor } from './cursor';
 import { Node } from './node';
 import { PingState, ExpandState, SelectState, Action } from './types';
-import { ExpandRow, NotExpandRow, IndentTree, IndentTreeLine, IndentContinuation, IndentMini } from './layout';
+
+import { TreeRow, TreeIndent, TreeLine } from './layout';
+import { Expandable } from './expandable';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
 
-type FiberProps = {
+type FiberTreeProps = {
   fiber: LiveFiber<any>,
   ping: PingState,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
-  compact?: boolean,
 }
 
-export const Fiber: React.FC<FiberProps> = ({fiber, ping, compact, expandCursor, selectedCursor}) => {
-  const {id, mount, mounts, next, order} = fiber;
+type FiberNodeProps = {
+  fiber: LiveFiber<any>,
+  ping: PingState,
+  expandCursor: Cursor<ExpandState>,
+  selectedCursor: Cursor<SelectState>,
+	indent?: number,
+	continuation?: boolean,
+}
+
+type TreeExpandProps = {
+	expand: boolean,
+  onToggle: Cursor<ExpandState>,
+}
+
+export const FiberTree: React.FC<FiberTreeProps> = ({fiber, ping, expandCursor, selectedCursor}) => {
+
+	return (
+		<FiberNode fiber={fiber} ping={ping} expandCursor={expandCursor} selectedCursor={selectedCursor} />
+	);
+
+}
+
+export const FiberNode: React.FC<FiberNodeProps> = ({
+	fiber,
+	ping,
+	expandCursor,
+	selectedCursor,
+	continuation,
+	compact,
+	indent = 0,
+}) => {
+  const {id, mount, mounts, next, order, depth} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
-  
+
   const pinged = ping[id] || 0;
   const selected = fiber === selectState;
   const select = () => {
     updateSelectState({ $set: fiber });
   }
 
-  const node = <Node key='node' fiber={fiber} pinged={pinged} selected={selected} onClick={select} />;
   const out = [] as React.ReactElement[];
 
+	const nodeRender = (
+		<Node key='node' fiber={fiber} pinged={pinged} selected={selected} onClick={select} />
+	);
+
+  const continuationIcon = ICONSMALL('subdirectory_arrow_right');
+		 
   if (mount) {
+		const hasNext = (mount.mount || mount.mounts || mount.next);
     out.push(
-      <Fiber
+      <FiberNode
         key='mount'
         fiber={mount}
         ping={ping}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
-        compact
+				indent={indent + (next || !hasNext ? 1 : .1)}
       />
     );
   }
@@ -48,74 +85,79 @@ export const Fiber: React.FC<FiberProps> = ({fiber, ping, compact, expandCursor,
   if (mounts && order) {
     for (const key of order) {
       const sub = mounts.get(key);
-      if (sub) out.push(
-        <Fiber
-          key={key}
-          fiber={sub}
-          ping={ping}
-          expandCursor={expandCursor}
-          selectedCursor={selectedCursor}
-        />);
+      if (sub) {
+				out.push(
+	        <FiberNode
+	          key={key}
+	          fiber={sub}
+	          ping={ping}
+	          expandCursor={expandCursor}
+	          selectedCursor={selectedCursor}
+						indent={indent + 1}
+	        />
+				);
+			}
     }
-  }
+	}
 
-  let nextRender = null;
+	let childRender = out as any;
+
+	let nextRender = null;
   if (next) {
-    const icon = ICONSMALL('subdirectory_arrow_right');
+		childRender = (
+			<TreeIndent indent={indent + .5}>
+				<TreeLine>
+					<TreeIndent indent={-indent - .5}>
+						{out}
+					</TreeIndent>
+				</TreeLine>
+			</TreeIndent>
+		);
     nextRender = (
-      <ExpandRow key="next">
-        <div>{icon}</div>
-        <IndentContinuation>
-          <Fiber
-            fiber={next}
-            ping={ping}
-            expandCursor={expandCursor}
-            selectedCursor={selectedCursor}
-          />
-        </IndentContinuation>
-      </ExpandRow>
+      <FiberNode
+        fiber={next}
+        ping={ping}
+        expandCursor={expandCursor}
+        selectedCursor={selectedCursor}
+				continuation
+				indent={indent - +!!out.length}
+      />
     );
   }
 
-  if (out.length || next) {
-    const hasIndent = !compact || mounts || next;
-    let Wrapper = IndentMini;
+	if (out.length) {
+		return (
+			<Expandable id={id} expandCursor={expandCursor}>{
+				(expand, onToggle) => (<>
+					<TreeRow indent={indent}>
+						{continuation ? <div>{continuationIcon}</div> : null}
+						<TreeExpand expand={expand} onToggle={onToggle}>
+							{nodeRender}
+						</TreeExpand>
+					</TreeRow>
+					{expand !== false ? childRender : null}
+					{nextRender}
+				</>)
+			}</Expandable>
+		);
+	}
 
-    if (hasIndent) Wrapper = IndentTree;
-    if (next) Wrapper = IndentTreeLine;
-
-    return (<>
-      <Expand id={id.toString()} expandCursor={expandCursor} label={node}>
-        {<Wrapper>{out}</Wrapper>}
-        {nextRender}
-      </Expand>
-    </>);
-  }
-
-  return <NotExpandRow>{node}</NotExpandRow>;
+	return (<>
+		<TreeRow indent={indent + 1}>
+			{continuation ? <div>{continuationIcon}</div> : null}
+			{nodeRender}
+		</TreeRow>
+		{nextRender}
+	</>);
 }
 
-type ExpandProps = {
-  id: string,
-  expandCursor: Cursor<ExpandState>,
-  label: React.ReactElement,
-}
-
-export const Expand: React.FC<ExpandProps> = ({id, label, expandCursor, children}) => {
-  const [expand, updateExpand] = useRefineCursor<boolean>(expandCursor)(id);
-
-  const onClick = (e: any) => {
-    updateExpand(expand === false);
-    e.preventDefault();
-  }
-
+export const TreeExpand: React.FC<TreeExpandProps> = ({expand, onToggle, children}) => {
   const icon = expand !== false ? ICON('expand_more') : ICON('chevron_right') ;
 
   return (<>
-    <ExpandRow>
-      <div onClick={onClick}>{icon}</div>
-      {label}
-    </ExpandRow>
-    {expand !== false ? children : null}
+    <TreeRow>
+      <div onClick={onToggle}>{icon}</div>
+      {children}
+    </TreeRow>
   </>);
 }

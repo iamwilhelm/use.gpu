@@ -1,6 +1,7 @@
 import {
   copyNumberArrays, copyNestedNumberArray, copyNumberArrayChunked,
   copyDataArrays, copyDataArrayChunked,
+  copyChunksToSegments,
 } from './data';
 
 describe('data', () => {
@@ -79,6 +80,14 @@ describe('data', () => {
 
     copyDataArrayChunked(data, dst, 4, [3, 2], accessor);
     expect(dst).toEqual([1, 10, 2, 20, 1, 10, 2, 20, 1, 10, 2, 20, 3, 30, 4, 40, 3, 30, 4, 40]);
+  });
+  
+  it('copies chunks to segments', () => {
+    const chunks = [3, 2, 5, 1, 4];
+    const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    copyChunksToSegments(dst, chunks);
+    expect(dst).toEqual([1, 3, 2, 1, 2, 1, 3, 3, 3, 2, 0, 1, 3, 3, 2])
   });
   
 });

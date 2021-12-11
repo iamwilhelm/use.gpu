@@ -167,6 +167,20 @@ export const copyNumberArrayChunked = (from: NumberArray, to: NumberArray, dims:
   }
 }
 
+export const copyChunksToSegments = (to: NumberArray, chunks: number[]) => {
+  let pos = 0;
+  for (const c of chunks) {
+    if (!c) continue;
+    if (c === 1) to[pos++] = 0;
+    else {
+      to[pos++] = 1;
+      for (let i = 2; i < c; ++i) to[pos++] = 3;
+      to[pos++] = 2;
+    }
+  }
+  while (pos < to.length) to[pos++] = 0;
+}
+
 export const copyDataArray = (from: any[], to: NumberArray, dims: number, accessor: Accessor) => {
   const n = Math.min(from.length, Math.floor(to.length / dims));
   let j = 0;

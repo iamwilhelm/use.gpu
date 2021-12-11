@@ -166,7 +166,6 @@ export type StorageSource = {
   format: string,
   length: number,
   live: boolean,
-  chunks?: number[],
 };
 
 // Shaders

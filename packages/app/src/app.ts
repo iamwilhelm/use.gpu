@@ -85,10 +85,10 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(CompositeData)({
           fields: lineDataFields,
           data: lineData,
-          render: ([positions, colors, sizes]: StorageSource[]) => [
+          render: ([segments, positions, colors, sizes]: StorageSource[]) => [
             //use(Quads)({ positions, size: [10, 10] }),
-            use(Lines)({ positions, colors, sizes, }),
-            use(Lines)({ positions, colors, sizes, mode: RenderPassMode.Debug }),
+            use(RawLines)({ segments, positions, colors, sizes, }),
+            use(RawLines)({ segments, positions, colors, sizes, mode: RenderPassMode.Debug }),
             //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]          
         }),
@@ -134,8 +134,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         */
         use(Pick)({
           render: ({id, hovered, clicked}) => [
-            use(Mesh)({ mesh, blink: clicked }),
-            use(Mesh)({ id, mesh, mode: RenderPassMode.Picking }),
+            //use(Mesh)({ mesh, blink: clicked }),
+            //use(Mesh)({ id, mesh, mode: RenderPassMode.Picking }),
             hovered ? use(Cursor)({ cursor: 'pointer' }) : null,
           ],
         }),

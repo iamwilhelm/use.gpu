@@ -7,6 +7,7 @@ import {
   copyDataArray, copyNumberArray,
   copyDataArrays, copyNumberArrays,
   copyDataArrayChunked, copyNumberArrayChunked,
+  copyChunksToSegments,
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
 
@@ -41,7 +42,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
 
     // Count simple array lengths as fallback
     // in case of no composite field.
-    let l = fs.reduce((l, [, accessor]) => {
+    const rawLength = fs.reduce((l, [, accessor]) => {
       if (l != null) return l;
       if (typeof accessor === 'object') return accessor?.length;
       return null;
@@ -50,7 +51,10 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
     // Look for first composite field
     const composites = fs.filter(([format]) => isComposite(format));
     const [composite] = composites;
-    if (!composite) return [data?.length || l || 0];
+    if (!composite) {
+      const length = data?.length ?? rawLength ?? 0;
+      return [[length], length];
+    }
 
     // Read out chunk lengths
     const [f, accessor] = composite;
@@ -70,7 +74,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
   }, [data, fs]);
 
   // Make data buffers
-  const [fieldBuffers, fieldSources] = useMemo(() => {
+  const [segmentBuffer, fieldBuffers, fieldSources] = useMemo(() => {
     const l = length;
 
     const fieldBuffers = fs.map(([format, accessor]) => {
@@ -92,16 +96,41 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
         format,
         length,
         live,
-        chunks,
       };
 
       return {buffer, array, source, dims, accessor: fn, raw, composite};
     });
-    const fieldSources = fieldBuffers.map(f => f.source);
-    return [fieldBuffers, fieldSources];
-  }, [device, fs, chunks, length]);
+
+    let segmentBuffer;
+    {
+      const format = UniformType.int;
+      const {array, dims} = makeDataArray(format, l);
+      const buffer = makeStorageBuffer(device, array.byteLength);
+      const source = {
+        buffer,
+        format,
+        length: l,
+        live,
+      };
+      segmentBuffer = {buffer, array, source, dims};
+    }
+
+    const fieldSources = [
+      segmentBuffer.source,
+      ...fieldBuffers.map(f => f.source),
+    ];
+    
+    return [segmentBuffer, fieldBuffers, fieldSources];
+  }, [device, fs, length]);
   
+  // Refresh and upload data
   const refresh = () => {
+    {
+      const {buffer, array} = segmentBuffer;
+      copyChunksToSegments(array, chunks, length);
+      uploadBuffer(device, buffer, array.buffer);
+    }
+
     for (const {buffer, array, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
       if (composite) {
         if (raw) copyNumberArrays(raw, array);

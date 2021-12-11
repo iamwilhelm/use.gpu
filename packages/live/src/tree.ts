@@ -23,7 +23,6 @@ export const makeHost = () => {
     undepend: dependency.undepend,
     invalidate: dependency.invalidate,
     __ping: () => {},
-    __inspect: () => {},
     __stats: {mounts: 0, unmounts: 0, updates: 0, dispatch: 0},
     __flush: scheduler.flush,
   } as HostInterface;

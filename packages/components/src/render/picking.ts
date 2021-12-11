@@ -10,7 +10,7 @@ import {
 import { RenderContext, RenderProvider } from '../providers';
 import {
   memo, use, provide, makeContext,
-  useMemo, useOne, useResource,
+  useMemo, useOne, useSomeOne, useNoOne, useResource,
   useContext, useSomeContext, useNoContext,
 } from '@use-gpu/live';
 import {
@@ -39,13 +39,14 @@ type PickingContextType = {
 };
 
 export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
-export const useNoPicking = () => useResource(() => ({}));
+
+export const NO_PICKING = {} as any;
 
 export const usePickingContext = (id?: number, isPicking?: boolean) => {
   const renderContext = useContext(RenderContext);
 
   const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  
-  const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoPicking();
+  const {pickingDefs, pickingUniforms} = pickingContext?.usePicking(id) ?? useNoOne() ?? NO_PICKING;
   const resolvedContext = pickingContext?.renderContext ?? renderContext;
 
   return {renderContext, pickingDefs, pickingUniforms};
@@ -132,7 +133,7 @@ export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
       return index;
     }
 
-    const usePicking = (id: number) => useOne(() => ({
+    const usePicking = (id: number) => useSomeOne(() => ({
       pickingDefs: PICKING_UNIFORMS,
       pickingUniforms: {
         pickingId: { value: id },

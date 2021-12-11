@@ -140,7 +140,7 @@ export const renderFiber = <F extends Function>(
 
   // Early exit if memoized and same result
   if (fiber.version && !fiber.next && fiber.type !== YEET) {
-    if (fiber.version === fiber.memo) return fiber;
+    if (fiber.version === fiber.memo) return;
     fiber.memo = fiber.version;
   }
 

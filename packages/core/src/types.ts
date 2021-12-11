@@ -165,7 +165,7 @@ export type StorageSource = {
   buffer: GPUBuffer,
   format: string,
   length: number,
-  live: boolean,
+  version: number,
 };
 
 // Shaders

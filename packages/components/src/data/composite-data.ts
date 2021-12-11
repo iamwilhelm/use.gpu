@@ -107,7 +107,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
         buffer,
         format,
         length,
-        live,
+        version: 0,
       };
 
       return {buffer, array, source, dims, accessor: fn, raw, composite};
@@ -122,7 +122,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
         buffer,
         format,
         length,
-        live,
+        version: 0,
       };
       segmentBuffer = {buffer, array, source, dims};
     }
@@ -138,12 +138,14 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
   // Refresh and upload data
   const refresh = () => {
     {
-      const {buffer, array} = segmentBuffer;
+      const {buffer, array, source} = segmentBuffer;
       copyChunksToSegments(array, chunks, loops, length);
+
       uploadBuffer(device, buffer, array.buffer);
+      source.version = (source.version + 1) | 0;
     }
 
-    for (const {buffer, array, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
+    for (const {buffer, array, source, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
       if (composite) {
         if (raw) copyNumberArraysComposite(raw, array, dims, chunks, loops);
         else if (data) copyDataArraysComposite(data, array, dims, chunks, loops, accessor as Accessor);
@@ -153,6 +155,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
         else if (data) copyDataArrayChunked(data, array, dims, chunks, loops, accessor as Accessor);
       }
       uploadBuffer(device, buffer, array.buffer);
+      source.version = (source.version + 1) | 0;
     }
   };
   

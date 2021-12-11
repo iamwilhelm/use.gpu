@@ -53,7 +53,7 @@ const hookToObject = (
 		return {memo: a, deps: b};
 	}
 	if (type === Hook.RESOURCE) {
-		return {resource: a.value, deps: b};
+		return {resource: a?.value, deps: b};
 	}
 	return null;
 }

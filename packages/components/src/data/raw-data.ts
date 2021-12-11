@@ -40,7 +40,7 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
       buffer,
       format: f,
       length: l,
-      live,
+      version: 0,
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
@@ -50,7 +50,10 @@ export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
   const refresh = () => {
     if (data) copyNumberArray(data, array);
     if (expr) emitIntoNumberArray(expr, array, dims);
-    if (data || expr) uploadBuffer(device, buffer, array.buffer);
+    if (data || expr) {
+      uploadBuffer(device, buffer, array.buffer);
+      source.version = (source.version + 1) | 0;
+    }
   };
 
   if (!live) {

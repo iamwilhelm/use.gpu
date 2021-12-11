@@ -29,7 +29,11 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
 
 export const useNoHook = (hookType: Hook) => () => {
   const fiber = useFiber();
+
   const i = pushState(fiber, hookType);
+  const {state} = fiber;
+  state[i] = null;
+  state[i + 1] = null;
 };
 
 export const useFiber = () => {
@@ -234,6 +238,20 @@ export const useResource = <R>(
   return state[i].value as R;
 }
 
+// Don't use a resource hook (clean up prior tag)
+export const useNoResource = () => {
+  const fiber = useFiber();
+
+  const i = pushState(fiber, Hook.RESOURCE);
+  let {state, host} = fiber;
+
+  let {tag} = state[i] || NO_RESOURCE;
+  if (tag) tag(null);
+
+  state[i] = null;
+  state[i + 1] = null;
+}
+
 // Grab a context from the fiber
 export const useContext = <C>(
   context: LiveContext<C>,
@@ -327,7 +345,6 @@ export const useNoState = useNoHook(Hook.STATE);
 export const useNoMemo = useNoHook(Hook.MEMO);
 export const useNoOne = useNoHook(Hook.ONE);
 export const useNoCallback = useNoHook(Hook.CALLBACK);
-export const useNoResource = useNoHook(Hook.RESOURCE);
 
 // Cleanup effect tracker
 // Calls previous cleanup before accepting new one

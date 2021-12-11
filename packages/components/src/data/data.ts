@@ -48,7 +48,7 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
         buffer,
         format,
         length,
-        live,
+        version: 0,
       };
       
       return {buffer, array, source, dims, accessor, raw};
@@ -59,10 +59,12 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
 
   // Refresh and upload data
   const refresh = () => {
-    for (const {buffer, array, dims, accessor, raw} of fieldBuffers) if (raw || data) {
+    for (const {buffer, array, source, dims, accessor, raw} of fieldBuffers) if (raw || data) {
       if (raw) copyNumberArray(raw, array);
       else if (data) copyDataArray(data, array, dims, accessor as Accessor);
+
       uploadBuffer(device, buffer, array.buffer);
+      source.version = (source.version + 1) | 0;
     }
   };
 

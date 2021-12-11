@@ -511,7 +511,25 @@ Array [
 exports[`ast gets solid fragment declarations 1`] = `
 Array [
   Object {
-    "at": 86,
+    "at": 68,
+    "flags": 0,
+    "identifiers": Array [],
+    "prototype": Object {
+      "name": "getFragment",
+      "parameters": Array [
+        "vec4",
+      ],
+      "type": Object {
+        "name": "vec4",
+        "qualifiers": Array [],
+      },
+    },
+    "symbols": Array [
+      "getFragment",
+    ],
+  },
+  Object {
+    "at": 117,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -535,7 +553,7 @@ Array [
     },
   },
   Object {
-    "at": 131,
+    "at": 162,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -558,7 +576,7 @@ Array [
     },
   },
   Object {
-    "at": 178,
+    "at": 209,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -581,7 +599,7 @@ Array [
     },
   },
   Object {
-    "at": 218,
+    "at": 249,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -604,7 +622,7 @@ Array [
     },
   },
   Object {
-    "at": 256,
+    "at": 287,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [

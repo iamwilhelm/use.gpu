@@ -6,6 +6,7 @@ import {
   makeDataArray, makeDataAccessor,
   copyDataArray, copyNumberArray,
   copyDataArrays, copyNumberArrays,
+  copyDataArraysComposite, copyNumberArraysComposite,
   copyDataArrayChunked, copyNumberArrayChunked,
   copyChunksToSegments,
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
@@ -16,6 +17,7 @@ export type DataProps = {
   data?: any[],
   fields?: DataField[],
   live?: boolean,
+  isLoop?: Accessor,
 
   render?: (sources: StorageSource[]) => LiveElement<any>,
 };
@@ -36,9 +38,10 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
   } = props;
 
   const fs = fields ?? NO_FIELDS;
+  let isLoop = props.isLoop ?? (() => false);
 
   // Gather data length
-  const [chunks, length] = useMemo(() => {
+  const [chunks, loops, length] = useMemo(() => {
 
     // Count simple array lengths as fallback
     // in case of no composite field.
@@ -56,26 +59,36 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
       return [[length], length];
     }
 
-    // Read out chunk lengths
+    // Read out chunk lengths and cycle flag
     const [f, accessor] = composite;
     const chunks = [] as number[];
+    const loops = [] as boolean[];
     let {raw, length: l, fn} = makeDataAccessor(f, accessor);
 
     if (raw && l != null) for (let i = 0; i < l; ++i) {
-      chunks.push(raw[i]?.length || 0);
+      const list = raw[i];
+      const loop = isLoop(raw, list);
+      const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);
+      chunks.push(n);
+      loops.push(loop);
     }
     else if (fn) for (const v of data) {
       const list = fn(v);
-      chunks.push(list?.length || 0);
+      const loop = isLoop(v, list);
+      const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);
+      chunks.push(n);
+      loops.push(loop);
     }
 
-    const length = chunks.reduce((a, b) => a + b) || 0;
-    return [chunks, length];
+    const length = (
+      chunks.reduce((a, b) => a + b) +
+      loops.reduce((a, b) => a + (b ? 2 : 0), 0)
+    );
+    return [chunks, loops, length];
   }, [data, fs]);
 
   // Make data buffers
   const [segmentBuffer, fieldBuffers, fieldSources] = useMemo(() => {
-    const l = length;
 
     const fieldBuffers = fs.map(([format, accessor]) => {
       const composite = isComposite(format);
@@ -84,8 +97,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
       if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
-      let {raw, length, fn} = makeDataAccessor(f, accessor);
-      if (length == null) length = l;
+      let {raw, fn} = makeDataAccessor(f, accessor);
 
       const {array, dims} = makeDataArray(f, length);
       if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
@@ -104,12 +116,12 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
     let segmentBuffer;
     {
       const format = UniformType.int;
-      const {array, dims} = makeDataArray(format, l);
+      const {array, dims} = makeDataArray(format, length);
       const buffer = makeStorageBuffer(device, array.byteLength);
       const source = {
         buffer,
         format,
-        length: l,
+        length,
         live,
       };
       segmentBuffer = {buffer, array, source, dims};
@@ -127,18 +139,19 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
   const refresh = () => {
     {
       const {buffer, array} = segmentBuffer;
-      copyChunksToSegments(array, chunks, length);
+      copyChunksToSegments(array, chunks, loops, length);
       uploadBuffer(device, buffer, array.buffer);
     }
 
     for (const {buffer, array, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
       if (composite) {
-        if (raw) copyNumberArrays(raw, array);
-        else if (data) copyDataArrays(data, array, dims, accessor as Accessor);
+        if (raw) copyNumberArraysComposite(raw, array, dims, chunks, loops);
+        else if (data) copyDataArraysComposite(data, array, dims, chunks, loops, accessor as Accessor);
+        console.log('composite', array)
       }
       else {
-        if (raw) copyNumberArrayChunked(raw, array, dims, chunks);
-        else if (data) copyDataArrayChunked(data, array, dims, chunks, accessor as Accessor);
+        if (raw) copyNumberArrayChunked(raw, array, dims, chunks, loops);
+        else if (data) copyDataArrayChunked(data, array, dims, chunks, loops, accessor as Accessor);
       }
       uploadBuffer(device, buffer, array.buffer);
     }

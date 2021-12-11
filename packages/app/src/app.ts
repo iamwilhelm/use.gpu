@@ -45,11 +45,18 @@ const lineFields = [
   ['float', [10, 10, 10, 10, 10]],
 ] as DataField[];
 
-const lineData = seq(4).map((i) => ({
+const lineData = seq(1).map((i) => ({
   path: seq(3 + i + Math.random() * 5).map(() => [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1]),
   color: [Math.random(), Math.random(), Math.random(), 1], 
-  size: Math.random() * 50 + 10,
+  size: Math.random() * 20 + 1,
 }));
+
+lineData.push({
+  path: [[2, 0, 0, 1], [2, 1, 0, 1], [2, 1, 1, 1], [2, 0, 1, 1]],
+  color: [0.7, 0, 0.5, 1],
+  size: 20,
+  loop: true,
+})
 
 const lineDataFields = [
   ['vec4[]', (o: any) => o.path],
@@ -85,6 +92,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(CompositeData)({
           fields: lineDataFields,
           data: lineData,
+          isLoop: (o: any) => o.loop,
           render: ([segments, positions, colors, sizes]: StorageSource[]) => [
             //use(Quads)({ positions, size: [10, 10] }),
             use(RawLines)({ segments, positions, colors, sizes, }),

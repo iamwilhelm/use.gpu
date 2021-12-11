@@ -15,7 +15,7 @@ SolidVertex getLineVertex(int vertexIndex, int instanceIndex) {
   ivec2 ij = getStripIndex(vertexIndex);
 
   int segmentLeft = getSegment(instanceIndex);
-  if (segmentLeft == 2) {
+  if (segmentLeft == 0 || segmentLeft == 2) {
     return SolidVertex(
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),

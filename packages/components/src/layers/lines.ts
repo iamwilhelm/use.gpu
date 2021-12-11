@@ -15,7 +15,7 @@ import { makeShaderBinding, makeShaderBindings, makeDataArray, makeStorageBuffer
 import { RenderContext } from '@use-gpu/components';
 
 export type LinesProps = {
-  //position?: number[] | TypedArray,
+  position?: number[] | TypedArray,
   color?: number[],
   size?: number,
 
@@ -35,7 +35,7 @@ export const Lines: LiveComponent<LinesProps> = (fiber) => (props) => {
   const {device} = useContext(RenderContext);
 
   const {
-    //position,
+    position,
     positions,
     color,
     colors,
@@ -46,20 +46,6 @@ export const Lines: LiveComponent<LinesProps> = (fiber) => (props) => {
     id = 0,
   } = props;
 
-  const [source, getSegment] = useOne(() => {
-    if (!positions) return [null, null];
-    const f = UniformType.int;
-    const {array, dims} = makeDataArray(f, l);
-    const buffer = makeStorageBuffer(device, array.byteLength);
-    const source = {
-      buffer,
-      format: f,
-      length: l,
-    };
-    const getSegment = bindingToModule(makeShaderBinding(SEGMENT_BINDING, source));
-    return [source, getSegment];
-  }, positions);
-
   return use(RawLines)({
     position,
     positions,
@@ -68,8 +54,6 @@ export const Lines: LiveComponent<LinesProps> = (fiber) => (props) => {
     size,
     sizes,
     join,
-
-    getSegment,
 
     mode,
     id,

@@ -61,8 +61,11 @@ export const useBoundShader = (
   // Update bound uniform values in-place from latest
   useOne(() => {
     let i = 0;
-    for (const u of uniforms) if (u.constant) {
-      ref.uniforms[i++].constant = u.constant;
+    for (const u of uniforms) {
+      if (u.constant != null) {
+        ref.uniforms[i].constant = u.constant;
+      }
+      ++i;
     }
   }, uniforms);
 

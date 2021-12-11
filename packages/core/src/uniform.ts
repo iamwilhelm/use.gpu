@@ -210,38 +210,3 @@ export const makeLayoutFiller = (
     }
   }
 }
-
-export const makeUniformBlockAccessor = (
-  uniforms: UniformAttribute[],
-  set: number = 0,
-  binding: number = 0,
-  ubo: string = 'UBO',
-): Record<string, string> => {
-  const modules = {} as Record<string, string>;
-
-  const members = uniforms.map(({name, format}) => `${format} ${name}`);
-  modules[`#${ubo}`] = makeUniformBlock(set, binding, ubo, members);
-
-  for (const {name, format, args} of uniforms) {
-    modules[name] = makeUniformGetter(format, ubo, name, args);
-  }
-
-  return modules;
-};
-
-export const makeUniformBlock = (set: number, binding: number, ubo: string, members: string[]) => `
-#pragma export
-layout (set = ${set}, binding = ${binding}) uniform ${ubo}Type {
-  ${members.map(m => `${m};`).join('\n  ')}
-} ${ubo}Uniform;
-`;
-
-const intArg = ['int'];
-export const makeUniformGetter = (type: string, ubo: string, name: string, args: string[] = intArg) => `
-#pragma import { ${ubo}Uniform } from '#${ubo}'
-
-#pragma export
-${type} ${name}(${args.join(', ')}) {
-  return ${ubo}Uniform.${name};
-}
-`;

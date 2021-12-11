@@ -130,7 +130,7 @@ export const resolveBindings = timed('resolveBindings', (
         seen.add(hash);
 
         const {uniforms, bindings} = virtual;
-        const namespace = PREFIX_VIRTUAL + base + '_';
+        const namespace = `${PREFIX_VIRTUAL}${base}_`;
         if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
         if (bindings) for (const b of bindings) allBindings.push(b);
 

@@ -36,10 +36,12 @@ export type PointsProps = {
   position?: number[] | TypedArray,
   color?: number[],
   size?: number,
+  perspective?: number,
 
   positions?: StorageSource,
-  colors?: StorageSource,
   sizes?: StorageSource,
+  colors?: StorageSource,
+  perspectives?: StorageSource,
 
   shape?: PointShape,
   
@@ -57,6 +59,8 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     colors,
     size,
     sizes,
+    perspective,
+    perspectives,
     shape,
     
     mode = RenderPassMode.Opaque,
@@ -74,6 +78,8 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     positions,
     color,
     colors,
+    perspective,
+    perspectives,
 
     getSize,
 

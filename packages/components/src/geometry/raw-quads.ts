@@ -21,17 +21,21 @@ export type RawQuadsProps = {
   position?: number[] | TypedArray,
   size?: number[],
   color?: number[],
+  perspective?: number,
 
   positions?: StorageSource,
   sizes?: StorageSource,
   colors?: StorageSource,
+  perspectives?: StorageSource,
 
   getPosition?: ShaderModule,
   getSize?: ShaderModule,
   getColor?: ShaderModule,
+  getPerspective?: ShaderModule,
   getMask?: ShaderModule,
   getTexture?: ShaderModule,
 
+  perspective?: number,
   count?: number,
   
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
@@ -46,6 +50,7 @@ const VERTEX_BINDINGS = [
   { name: 'getPosition', format: 'vec4', value: ZERO },
   { name: 'getColor', format: 'vec4', value: GRAY },
   { name: 'getSize', format: 'vec2', value: [1, 1] },
+  { name: 'getPerspective', format: 'float', value: 0 },
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
@@ -86,6 +91,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
     props.positions ?? props.position ?? props.getPosition,
     props.colors ?? props.color ?? props.getColor,
     props.sizes ?? props.size ?? props.getSize,
+    props.perspectives ?? props.perspective ?? props.getPerspective,
   ]);
 
   const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [

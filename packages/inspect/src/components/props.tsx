@@ -173,6 +173,7 @@ export const inspectObject = (
 }
 
 const truncate = (s: string, n: number) => {
+	s = s.replace(/\s+/g, ' ');
 	if (s.length < n) return s;
 	return s.slice(0, n) + '…';
 }

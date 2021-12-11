@@ -4,7 +4,6 @@ import {
   ShaderModuleDescriptor, StorageSource, DataBinding,
 } from './types';
 import { makeStorageAccessors, checkStorageTypes, checkStorageType } from './storage';
-import { makeUniformBlockAccessor } from './uniform';
 import { makeShaderModule } from './pipeline';
 import partition from 'lodash/partition';
 

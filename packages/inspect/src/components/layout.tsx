@@ -20,6 +20,11 @@ export const InspectToggle = styled.div`
   pointer-events: auto;
 `;
 
+export const Spacer = styled.div`
+	width: 20px;
+	height: 20px;
+`;
+
 export const SplitRow = styled.div`
   display: flex;
   min-height: 100%;

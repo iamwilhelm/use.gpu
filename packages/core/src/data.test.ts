@@ -61,7 +61,7 @@ describe('data', () => {
     const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     copyNumberArrayChunked(src, dst, 2, [3, 1, 2], [true, false, true]);
-    expect(dst).toEqual([1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 2, 20, 3, 30, 3, 30, 3, 30, 3, 30]);
+    expect(dst).toEqual([1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 2, 20, 3, 30, 3, 30, 3, 30, 3, 30, 3, 30]);
   });
 
   it('copies vec4 array into repeated chunks', () => {
@@ -96,7 +96,7 @@ describe('data', () => {
     const accessor = (o: any) => [o.x, o.y];
 
     copyDataArrayChunked(data, dst, 2, [3, 1, 2], [true, false, true], accessor);
-    expect(dst).toEqual([1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 2, 20, 3, 30, 3, 30, 3, 30, 3, 30]);
+    expect(dst).toEqual([1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 2, 20, 3, 30, 3, 30, 3, 30, 3, 30, 3, 30]);
   });
 
   it('copies vec4 array into repeated chunks', () => {
@@ -114,7 +114,7 @@ describe('data', () => {
     const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     copyChunksToSegments(dst, chunks, loops);
-    expect(dst).toEqual([1, 3, 2, 1, 2, 0, 3, 3, 3, 3, 3, 0, 0, 1, 3, 3, 2])
+    expect(dst).toEqual([1, 3, 2, 1, 2, 0, 3, 3, 3, 3, 3, 0, 0, 0, 1, 3, 3, 2])
   });
   
   it('copies flat composite number array with loops', () => {
@@ -122,7 +122,7 @@ describe('data', () => {
     const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     copyNumberArraysComposite(data, dst, 2, [3, 1, 2], [true, false, true]);
-    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4]);
+    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 2, 2, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4, 5, 5]);
   });
 
   it('copies nested composite number array with loops', () => {
@@ -130,7 +130,7 @@ describe('data', () => {
     const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     copyNumberArraysComposite(data, dst, 2, [3, 1, 2], [true, false, true]);
-    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4]);
+    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 2, 2, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4, 5, 5]);
   });
 
   it('copies flat composite data array with loops', () => {
@@ -139,7 +139,7 @@ describe('data', () => {
     const accessor = (o: any) => o.xs;
 
     copyDataArraysComposite(data, dst, 2, [3, 1, 2], [true, false, true], accessor);
-    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4]);
+    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 2, 2, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4, 5, 5]);
   });
   
   it('copies nested composite data array with loops', () => {
@@ -148,6 +148,6 @@ describe('data', () => {
     const accessor = (o: any) => o.xs;
 
     copyDataArraysComposite(data, dst, 2, [3, 1, 2], [true, false, true], accessor);
-    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4]);
+    expect(dst).toEqual([3, 3, 1, 1, 2, 2, 3, 3, 1, 1, 2, 2, 1, 1, 5, 5, 4, 4, 5, 5, 4, 4, 5, 5]);
   });
 });

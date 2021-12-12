@@ -4,7 +4,7 @@ import styled, { keyframes } from "styled-components";
 
 import React, { useState } from 'react';
 import { Action } from './types';
-import { SplitRow, IndentTree, Label } from './layout';
+import { SplitRow, Label, Spacer } from './layout';
 
 import { inspectObject } from './props';
 import chunk from 'lodash/chunk';
@@ -34,6 +34,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
     <StyledCall>
   		<div><b>Fiber</b></div>
   		<div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
+			<Spacer />
   		<div><b>State</b></div>
   		<div>
 				{inspectObject(hooks.map(hookToObject), expanded, toggleExpanded, '')}

@@ -176,6 +176,7 @@ export const copyChunksToSegments = (to: NumberArray, chunks: number[], loops: b
       }
     }
     if (l) to[pos++] = 0;
+    if (l) to[pos++] = 0;
   }
 
   while (pos < to.length) to[pos++] = 0;
@@ -193,7 +194,7 @@ export const copyNumberArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const read = i * dims;
       for (let j = 0; j < c; ++j) {
@@ -205,7 +206,7 @@ export const copyNumberArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const read = i * dims;
       for (let j = 0; j < c; ++j) {
@@ -218,7 +219,7 @@ export const copyNumberArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const read = i * dims;
       for (let j = 0; j < c; ++j) {
@@ -232,7 +233,7 @@ export const copyNumberArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const read = i * dims;
       for (let j = 0; j < c; ++j) {
@@ -247,7 +248,7 @@ export const copyNumberArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const read = i * dims;
       for (let j = 0; j < c; ++j) {
@@ -270,7 +271,7 @@ export const copyDataArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const v = accessor(from[i]);
       for (let k = 0; k < c; ++k) {
@@ -282,7 +283,7 @@ export const copyDataArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const v = accessor(from[i]);
       for (let k = 0; k < c; ++k) {
@@ -294,7 +295,7 @@ export const copyDataArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const v = accessor(from[i]);
       for (let k = 0; k < c; ++k) {
@@ -306,7 +307,7 @@ export const copyDataArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const v = accessor(from[i]);
       for (let k = 0; k < c; ++k) {
@@ -319,7 +320,7 @@ export const copyDataArrayChunked = (
     for (let i = 0; i < n; ++i) {
       const l = loops[i];
       let c = chunks[i];
-      if (l) c += 2;
+      if (l) c += 3;
 
       const v = accessor(from[i]);
       for (let k = 0; k < c; ++k) {
@@ -350,8 +351,8 @@ export const copyNumberArraysComposite = (
       if (l) {
         copyNumberArrayRange(src, to, range - dims, pos, dims);
         copyNumberArrayRange(src, to, 0, pos + dims, range);
-        copyNumberArrayRange(src, to, 0, pos + range + dims, dims);
-        pos += (c + 2) * dims;
+        copyNumberArrayRange(src, to, 0, pos + range + dims, dims * 2);
+        pos += (c + 3) * dims;
       }
       else {
         copyNumberArrayRange(src, to, 0, pos, range);
@@ -370,8 +371,8 @@ export const copyNumberArraysComposite = (
       if (l) {
         copyNestedNumberArrayRange(src, to, c - 1, pos, 1, dims);
         copyNestedNumberArrayRange(src, to, 0, pos + dims, c, dims);
-        copyNestedNumberArrayRange(src, to, 0, pos + range + dims, 1, dims);
-        pos += (c + 2) * dims;
+        copyNestedNumberArrayRange(src, to, 0, pos + range + dims, 2, dims);
+        pos += (c + 3) * dims;
       }
       else {
         copyNestedNumberArrayRange(src, to, 0, pos, c, dims);
@@ -403,8 +404,8 @@ export const copyDataArraysComposite = (
       if (l) {
         copyNumberArrayRange(src, to, range - dims, pos, dims);
         copyNumberArrayRange(src, to, 0, pos + dims, range);
-        copyNumberArrayRange(src, to, 0, pos + range + dims, dims);
-        pos += (c + 2) * dims;
+        copyNumberArrayRange(src, to, 0, pos + range + dims, dims * 2);
+        pos += (c + 3) * dims;
       }
       else {
         copyNumberArrayRange(src, to, 0, pos, range);
@@ -423,8 +424,8 @@ export const copyDataArraysComposite = (
       if (l) {
         copyNestedNumberArrayRange(src, to, c - 1, pos, 1, dims);
         copyNestedNumberArrayRange(src, to, 0, pos + dims, c, dims);
-        copyNestedNumberArrayRange(src, to, 0, pos + range + dims, 1, dims);
-        pos += (c + 2) * dims;
+        copyNestedNumberArrayRange(src, to, 0, pos + range + dims, 2, dims);
+        pos += (c + 3) * dims;
       }
       else {
         copyNestedNumberArrayRange(src, to, 0, pos, c, dims);

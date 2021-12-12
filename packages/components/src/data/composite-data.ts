@@ -82,7 +82,7 @@ export const CompositeData: LiveComponent<DataProps> = (fiber) => (props) => {
 
     const length = (
       chunks.reduce((a, b) => a + b) +
-      loops.reduce((a, b) => a + (b ? 2 : 0), 0)
+      loops.reduce((a, b) => a + (b ? 3 : 0), 0)
     );
     return [chunks, loops, length];
   }, [data, fs]);

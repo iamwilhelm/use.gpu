@@ -1,10 +1,11 @@
 import React from 'react';
 import { useRefineCursor, Cursor } from './cursor';
+import { ExpandState } from './types';
 
 type ExpandableProps = {
-  id: string,
+  id: string | number,
   expandCursor: Cursor<ExpandState>,
-  label: React.ReactElement,
+	children: (expand: boolean, onClick: (e: any) => void) => React.ReactElement,
 }
 
 export const Expandable: React.FC<ExpandableProps> = ({id, expandCursor, children}) => {

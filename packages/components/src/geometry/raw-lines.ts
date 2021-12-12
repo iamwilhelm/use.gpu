@@ -78,10 +78,10 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) =>
 
   // Customize line shader
   let {join, depth = 0} = props;
-  join = join in LINE_JOIN_SIZE ? join : 'bevel';
+  const j = (join! in LINE_JOIN_SIZE) ? join! : 'bevel';
 
-  const style = LINE_JOIN_STYLE[join];
-  const segments = LINE_JOIN_SIZE[join];
+  const style = LINE_JOIN_STYLE[j];
+  const segments = LINE_JOIN_SIZE[j];
   const tris = (1+segments) * 2;
   const defines = {
     LINE_JOIN_STYLE: style,
@@ -114,7 +114,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) =>
     getFragment,
 
     defines,
-    deps: [join],
+    deps: [j],
 
     pipeline,
     mode,

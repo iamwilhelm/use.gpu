@@ -31,7 +31,7 @@ type FiberNodeProps = {
 
 type TreeExpandProps = {
 	expand: boolean,
-  onToggle: Cursor<ExpandState>,
+  onToggle: (e: any) => void,
 }
 
 export const FiberTree: React.FC<FiberTreeProps> = ({fiber, ping, expandCursor, selectedCursor}) => {
@@ -48,7 +48,6 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
 	expandCursor,
 	selectedCursor,
 	continuation,
-	compact,
 	indent = 0,
 }) => {
   const {id, mount, mounts, next, order, depth} = fiber;
@@ -102,7 +101,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
 
 	let childRender = out as any;
 
-	let nextRender = null;
+	let nextRender = null as React.ReactElement | null;
   if (next) {
 		childRender = (
 			<TreeIndent indent={indent + .5}>

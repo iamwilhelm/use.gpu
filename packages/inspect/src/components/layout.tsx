@@ -1,5 +1,7 @@
 import styled from "styled-components";
 
+type TreeIndentProps = { indent?: number }
+
 export const InspectContainer = styled.div`
   pointer-events: auto;
   background: var(--shim);
@@ -64,15 +66,13 @@ export const Label = styled.div`
   display: flex;
 `;
 
-
-
-export const TreeRow = styled.div`
+export const TreeRow = styled.div<TreeIndentProps>`
   display: flex;
   height: 20px;
 	padding-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
 `;
 
-export const TreeIndent = styled.div`
+export const TreeIndent = styled.div<TreeIndentProps>`
 	margin-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
 `;
 

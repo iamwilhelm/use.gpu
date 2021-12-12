@@ -4,7 +4,7 @@ import styled, { keyframes } from "styled-components";
 
 import React, { Fragment, useState } from 'react';
 import { Action } from './types';
-import { SplitRow, IndentTree, Label } from './layout';
+import { SplitRow, Label } from './layout';
 
 import { inspectObject } from './props';
 

@@ -36,6 +36,11 @@ describe("link", () => {
     vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
     `
 
+    const getPerspective = `
+    #pragma export
+    vec4 getPerspective(int index) { return 1.0; }
+    `
+
     const getColor = `
     #pragma export
     vec4 getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
@@ -48,7 +53,7 @@ describe("link", () => {
 
     const code = GLSLModules['instance/vertex/quad'];
     const modules = GLSLModules;
-    const linked = linkCode(code, modules, {getPosition, getColor, getSize});
+    const linked = linkCode(code, modules, {getPosition, getPerspective, getColor, getSize});
     expect(linked).toMatchSnapshot();
 
   });

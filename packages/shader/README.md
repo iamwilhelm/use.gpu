@@ -24,7 +24,7 @@ It enables two kinds of imports to be used:
 vec4 getColor(); // linked at run-time
 ```
 
-This allows you to split up and organize your GLSL code as you see fit, as well as create dynamic shader permutations.
+This allows you to split up and organize your GLSL code as you see fit, as well as create dynamic shader permutations. It also lets you bind shaders at run-time without immediate linking, thus providing an equivalent of GLSL closures.
 
 `@use-gpu/shader` supports GLSL 4.5 and uses a [Lezer grammar](https://lezer.codemirror.net/) for the parsing.
 
@@ -40,6 +40,16 @@ const glslCode = linkBundle(mainShader);
 ```
 
 All dependencies will be parsed at build-time and deduplicated, using the normal import mechanism. They are packed with their symbol table and a sparse token list, so that code generation can happen immediately without re-parsing.
+
+#### Closures
+
+You can also bind shaders to each other using `bindBundle`. This returns a new module instead of immediately producing the linked shader code. The result acts as a GLSL closure that you can use as a first-class value in your program:
+
+```
+const bound = bindBundle(bundle, {moduleA, moduleB});
+```
+
+The `bound` module can be passed around, and used as a new link to bind to another module recursively. This is highly useful to e.g. abstract over data sources or decorate shaders with new behavior.
 
 #### Strings
 
@@ -212,7 +222,6 @@ Link parsed modules.
   modules: Record<string, ParsedModule> = {},
   links: Record<string, ParsedModule> = {},
   defines: Record<string, string | number | boolean | null | undefined> = {},
-  cache?: LRU | null,
 ) => string;
 ```
 
@@ -225,7 +234,6 @@ Link packaged bundle of module + libs.
   bundle: ParsedBundle,
   links: Record<string, ParsedBundle> = {},
   defines: Record<string, string | number | boolean | null | undefined> = {},
-  cache?: LRU | null,
 ) => string;
 ```
 
@@ -238,7 +246,42 @@ Link packaged bundle of module + libs.
 Replace the global `#version 450` preamble with another string.
 
 
+### Bind
+
+Link modules/bundles together into a new bundle at run-time. i.e.:
+
+`linkBundle(bindBundle(bundle, {links}))` is equivalent to `linkBundle(bundle, {links})`.
+
+This is a fast operation which only affects the top-level module in a bundle.
+
+Provide a unique `key` to ensure deterministic output.
+
+#### `bindBundle(...)`
+
+```ts
+(
+  bundle: ShaderModule,
+  links: Record<string, ParsedModule | ParsedBundle> = {},
+  defines?: Record<string, ShaderDefine> | null,
+  key?: string | number,
+) => ParsedBundle;
+```
+
+#### `bindModule(...)`
+
+```ts
+(
+  main: ParsedModule,
+  libs: Record<string, ParsedModule | ParsedBundle> = {},
+  links: Record<string, ParsedModule | ParsedBundle> = {},
+  defines?: Record<string, ShaderDefine> | null,
+  key?: string | number,
+) => ParsedBundle;
+```
+
 ### Module 
+
+Specify `entry` to point to a specific symbol as entry point.
 
 #### `loadModule(…)`
 
@@ -277,8 +320,8 @@ Wrapper around npm `LRU`.
 export type ParsedModule = {
   name: string,
   code: string,
-  tree: Tree,
   table: SymbolTable,
+  tree?: Tree,
   shake?: ShakeTable,
   entry?: string,
 };

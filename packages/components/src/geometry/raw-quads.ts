@@ -32,10 +32,10 @@ export type RawQuadsProps = {
   getSize?: ShaderModule,
   getColor?: ShaderModule,
   getPerspective?: ShaderModule,
+
   getMask?: ShaderModule,
   getTexture?: ShaderModule,
 
-  perspective?: number,
   count?: number,
   
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,

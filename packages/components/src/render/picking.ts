@@ -55,7 +55,7 @@ export const usePickingContext = (id?: number, isPicking?: boolean) => {
   const renderContext = useContext(RenderContext);
 
   const pickingContext = isPicking ? useSomeContext(PickingContext) : useNoContext(PickingContext);  
-  const {pickingDefs, pickingUniforms} = usePicking(id) ?? useNoOne() ?? NO_PICKING;
+  const {pickingDefs, pickingUniforms} = usePicking(id || 0) ?? useNoOne() ?? NO_PICKING;
   const resolvedContext = pickingContext?.renderContext ?? renderContext;
 
   return {renderContext: resolvedContext, pickingDefs, pickingUniforms};

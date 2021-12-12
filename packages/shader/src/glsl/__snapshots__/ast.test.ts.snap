@@ -142,13 +142,31 @@ Array [
       "getSize",
     ],
   },
+  Object {
+    "at": 258,
+    "flags": 0,
+    "identifiers": Array [],
+    "prototype": Object {
+      "name": "getPerspective",
+      "parameters": Array [
+        "int",
+      ],
+      "type": Object {
+        "name": "float",
+        "qualifiers": Array [],
+      },
+    },
+    "symbols": Array [
+      "getPerspective",
+    ],
+  },
 ]
 `;
 
 exports[`ast gets quad vertex functions 1`] = `
 Array [
   Object {
-    "at": 274,
+    "at": 301,
     "flags": 1,
     "identifiers": Array [
       "instancePosition",
@@ -158,12 +176,16 @@ Array [
       "getColor",
       "instanceSize",
       "getSize",
+      "instancePerspective",
+      "getPerspective",
       "position",
       "worldToClip",
       "uv",
       "getQuadUV",
       "vertexIndex",
       "xy",
+      "w",
+      "mix",
       "viewUniforms",
       "SolidVertex",
     ],
@@ -291,6 +313,24 @@ Object {
         "getSize",
       ],
     },
+    Object {
+      "at": 258,
+      "flags": 0,
+      "identifiers": Array [],
+      "prototype": Object {
+        "name": "getPerspective",
+        "parameters": Array [
+          "int",
+        ],
+        "type": Object {
+          "name": "float",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "getPerspective",
+      ],
+    },
   ],
   "externals": Array [
     Object {
@@ -347,15 +387,34 @@ Object {
         "getSize",
       ],
     },
+    Object {
+      "at": 258,
+      "flags": 0,
+      "identifiers": Array [],
+      "prototype": Object {
+        "name": "getPerspective",
+        "parameters": Array [
+          "int",
+        ],
+        "type": Object {
+          "name": "float",
+          "qualifiers": Array [],
+        },
+      },
+      "symbols": Array [
+        "getPerspective",
+      ],
+    },
   ],
   "functions": Array [
     Object {
-      "at": 274,
+      "at": 301,
       "flags": 1,
       "identifiers": Array [
         "getPosition",
         "getColor",
         "getSize",
+        "getPerspective",
       ],
       "prototype": Object {
         "name": "getQuadVertex",
@@ -374,7 +433,7 @@ Object {
     },
   ],
   "globals": undefined,
-  "hash": "cjsjb69zka",
+  "hash": "4kcvm0tquv",
   "modules": Array [
     Object {
       "at": 0,
@@ -426,6 +485,7 @@ Object {
     "getPosition",
     "getColor",
     "getSize",
+    "getPerspective",
   ],
   "visibles": Array [
     "getQuadVertex",
@@ -483,7 +543,14 @@ Array [
     ],
   ],
   Array [
-    274,
+    258,
+    Array [
+      "getPerspective",
+      "getQuadVertex",
+    ],
+  ],
+  Array [
+    301,
     Array [
       "getQuadVertex",
     ],

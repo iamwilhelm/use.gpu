@@ -49,6 +49,7 @@ const lineData = seq(1).map((i) => ({
   path: seq(3 + i + Math.random() * 5).map(() => [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1]),
   color: [Math.random(), Math.random(), Math.random(), 1], 
   size: Math.random() * 20 + 1,
+  loop: false,
 }));
 
 lineData.push({
@@ -114,7 +115,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
             );
           },
           render: (positions) => [
-            use(Points)({ positions, color: positions, size: 50, perspective: 0.95, mode: RenderPassMode.Transparent }),
+            use(Points)({ positions, colors: positions, size: 50, perspective: 0.95, mode: RenderPassMode.Transparent }),
             //use(Quads)({ positions, size: [50, 50], id: 2, mode: RenderPassMode.Picking }),
             //use(Quads)({ positions, size: [50, 50], mode: RenderPassMode.Debug }),
             

@@ -12,9 +12,10 @@ export type DeepUpdate<T> = {
   [P in keyof T]?: Update<T[P]>;
 };
 
-type RefineCursor<T> = (cursor: Cursor<any>) => (...keys: string[]) => Cursor<T>
+type Key = string | number;
+type RefineCursor<T> = (cursor: Cursor<any>) => (...keys: Key[]) => Cursor<T>
 
-export const refineCursor = <T>(cursor: Cursor<any>) => <S = T>(...keys: string[]): Cursor<S> => {
+export const refineCursor = <T>(cursor: Cursor<any>) => <S = T>(...keys: Key[]): Cursor<S> => {
   let [v, u] = cursor;
   for (const k of keys) {
     let updater = u;
@@ -25,7 +26,7 @@ export const refineCursor = <T>(cursor: Cursor<any>) => <S = T>(...keys: string[
   return [v, u];
 };
 
-export const useRefineCursor = <T>(cursor: Cursor<any>) => <S = T>(...keys: string[]) => (
+export const useRefineCursor = <T>(cursor: Cursor<any>) => <S = T>(...keys: Key[]) => (
   useMemo(() => refineCursor(cursor)<S>(...keys), [cursor, ...keys])
 );
 

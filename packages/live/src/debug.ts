@@ -132,7 +132,7 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
     if (x.name === '' && !x.displayName) x.displayName = Math.round(Math.random() * 10000);
     const name = x.displayName ?? x.name;
     const body = x.toString().split(/=>/)[1];
-    return `${name}(…) ` + body;
+    return `${name}(…) ` + truncate(body, 40);
   }
   if (typeof x === 'object') {
     const signature = Object.keys(x).join('/');
@@ -141,4 +141,11 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
     return '{...}';
   }
   return '' + x;
+}
+
+const truncate = (s: string, n: number) => {
+  if (typeof s !== 'string') return '' + s;
+	s = s.replace(/\s+/g, ' ');
+	if (s.length < n) return s;
+	return s.slice(0, n) + '…';
 }

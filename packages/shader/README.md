@@ -43,9 +43,9 @@ All dependencies will be parsed at build-time and deduplicated, using the normal
 
 #### Closures
 
-You can also bind shaders to each other using `bindBundle`. This returns a new module instead of immediately producing the linked shader code. The result acts as a GLSL closure that you can use as a first-class value in your program:
+You can bind shaders to each other using `bindBundle`. This returns a new module instead of immediately producing the linked shader code. The result acts as a GLSL closure that you can use as a first-class value in your program:
 
-```
+```ts
 const bound = bindBundle(bundle, {moduleA, moduleB});
 ```
 

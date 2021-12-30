@@ -31,6 +31,7 @@ export type MouseState = {
 };
 
 export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => ({element, children}) => {
+  const dpi = window.devicePixelRatio;
   const {sampleTexture} = useContext(PickingContext);
 
   const [mouseState, setMouseState] = useState<MouseState>({
@@ -40,7 +41,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo((fiber) => 
   });
 
   const allocId = useOne(() => makeIdAllocator<any>());
-  const [mouseTargetId, mouseTargetIndex] = sampleTexture(mouseState.x, mouseState.y);
+  const [mouseTargetId, mouseTargetIndex] = sampleTexture(mouseState.x * dpi, mouseState.y * dpi);
 
   const eventApi = useOne(() => ({
     useId: () => useResource((dispose) => {

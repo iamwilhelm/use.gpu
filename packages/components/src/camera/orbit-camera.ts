@@ -1,9 +1,10 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
-import { useContext, useOne } from '@use-gpu/live';
+import { use, useContext, useOne } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
 import { RenderContext } from '../providers/render-provider';
+import { ViewProvider } from '../providers/view-provider';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
@@ -24,13 +25,15 @@ export type OrbitCameraProps = {
   fov?: number,
   near?: number,
   far?: number,
-  render: (defs: UniformAttribute[], uniforms: ViewUniforms) => LiveElement<any>,
+  
+  children?: LiveElement<any>,
 };
 
 export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) => {
   const {
     width,
     height,
+    pixelRatio,
   } = useContext(RenderContext);
 
   const {
@@ -40,7 +43,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
     fov    = DEFAULT_ORBIT_CAMERA.fov,
     near   = DEFAULT_ORBIT_CAMERA.near,
     far    = DEFAULT_ORBIT_CAMERA.far,
-    render,
+    children,
   } = props;
   
   const uniforms = useOne(() => ({
@@ -49,6 +52,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
     viewPosition: { value: null },
     viewResolution: { value: null },
     viewSize: { value: null },
+    viewPixelRatio: { value: null },
   })) as any as ViewUniforms;
 
   uniforms.projectionMatrix.value = makeProjectionMatrix(width, height, fov, near, far);
@@ -56,6 +60,9 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
   uniforms.viewPosition.value = makeOrbitPosition(radius, phi, theta);
   uniforms.viewResolution.value = [ 1/width, 1/height ];
   uniforms.viewSize.value = [ width, height ];
+  uniforms.viewPixelRatio.value = pixelRatio;
 
-  return render(VIEW_UNIFORMS, uniforms);
+  return use(ViewProvider)({
+    defs: VIEW_UNIFORMS, uniforms, children,
+  });
 };

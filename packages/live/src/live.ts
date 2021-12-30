@@ -4,7 +4,7 @@ import {
   FunctionCall, DeferredCall, HostInterface, ArrowFunction,
 } from './types';
 
-import { comparePaths } from './util';
+import { compareFibers } from './util';
 import { makeFiber } from './fiber';
 
 export const DETACH       = () => () => {};
@@ -168,7 +168,7 @@ export const createContext = makeContext;
 // Co-context value return type sugar
 export const flattenRegistry = <T>(registry: Map<LiveFiber<any>, T>): [LiveFiber<any>, T][] => {
   const entries = Array.from(registry.entries());
-  entries.sort((a, b) => comparePaths(a[0].path, b[0].path) || (a[0].depth - b[0].depth));
+  entries.sort((a, b) => compareFibers(a[0], b[0]));
   return entries;
 }
 

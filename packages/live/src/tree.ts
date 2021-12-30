@@ -1,13 +1,13 @@
 import { Key, Action, Task, LiveFiber, DeferredCall, GroupedFibers, HostInterface, RenderCallbacks } from './types';
 
 import { makeFiber, renderFiber, bustFiberCaches, visitYeetRoots } from './fiber';
-import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubOrSamePath, isSubPath, comparePaths } from './util';
+import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubNode, compareFibers } from './util';
 import { formatNode } from './debug';
 
 const SLICE_STACK = 20;
 
 let DEBUG = false;
-setTimeout((() => DEBUG = false), 4000);
+//setTimeout((() => DEBUG = false), 4000);
 
 const NO_ARGS = [] as any[];
 
@@ -104,13 +104,13 @@ export const groupFibers = (fibers: LiveFiber<any>[]) => {
   // Group to top-level roots and descendants
   const roots = [] as GroupedFibers[];
   nextFiber: for (let f of fibers) {
-    for (let r of roots) if (isSubOrSamePath(r.root.path, f.path)) {
+    for (let r of roots) if (isSubNode(r.root, f)) {
       r.subs.add(f);
       continue nextFiber;
     }
     roots.push({root: f, subs: new Set()});
   }
-  roots.sort((a, b) => comparePaths(a.root.path, b.root.path));
+  roots.sort((a, b) => compareFibers(a.root, b.root));
 
   return roots;
 }
@@ -163,9 +163,8 @@ const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): 
     // before calling/resuming its continuation.
     DEBUG && console.log('Fencing Sub-Root', formatNode(fiber));
     const nodes = [];
-    const {path} = fiber;
 
-    for (let f of visit.values()) if (isSubPath(path, f.path)) nodes.push(f);
+    for (let f of visit.values()) if (isSubNode(fiber, f)) nodes.push(f);
     if (nodes.length) {
       renderFibers(nodes);
       for (let n of nodes) visit.delete(n);

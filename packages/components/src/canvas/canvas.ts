@@ -30,12 +30,15 @@ export type CanvasProps = {
   children?: LiveElement<any>,
 }
 
+const getPixelRatio = () => typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+
 export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
   const {
     device,
     canvas,
     children,
     languages,
+    pixelRatio = getPixelRatio(),
     presentationFormat = PRESENTATION_FORMAT,
     depthStencilFormat = DEPTH_STENCIL_FORMAT,
     backgroundColor = BACKGROUND_COLOR,
@@ -83,6 +86,7 @@ export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
   const renderContext = {
     width,
     height,
+    pixelRatio,
     samples,
     device,
     languages,

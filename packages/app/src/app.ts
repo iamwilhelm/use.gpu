@@ -19,8 +19,6 @@ import { Mesh } from './mesh';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 
-import { circle, diamond, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/glsl/mask/point.glsl';
-
 export type AppProps = {
   device: GPUDevice,
   adapter: GPUAdapter,
@@ -40,13 +38,13 @@ const quadFields = [
 ] as DataField[];
 
 const lineFields = [
-  ['vec4', [0, 0, 0, 1, 1.5, 0, 0, 1, 1.5, 1.5, 0, 1, 1.5, 1.5, 1.5, 1, 1.5, -1.5, 1.5, 1]],
-  ['int', [1, 3, 3, 3, 2]],
+  ['vec4', [2, -2, 2, 1, 2, -2, -2, 1, -2, -2, -2, 1, -2, -2, 0, 1, 0, -2, 0, 1, 0, 0, 0, 1]],
+  ['int', [1, 3, 3, 3, 3, 2]],
   ['float', [10, 10, 10, 10, 10]],
 ] as DataField[];
 
 const lineData = seq(1).map((i) => ({
-  path: seq(3 + i + Math.random() * 5).map(() => [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1]),
+  path: seq(3 + i + Math.random() * 5).map(() => [Math.random()*2-1, Math.random()*2-1 - 2, Math.random()*2-1, 1]),
   color: [Math.random(), Math.random(), Math.random(), 1], 
   size: Math.random() * 20 + 1,
   loop: false,
@@ -58,6 +56,7 @@ lineData.push({
   size: 20,
   loop: true,
 })
+
 
 const lineDataFields = [
   ['vec4[]', (o: any) => o.path],
@@ -84,10 +83,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         use(Data)({
           fields: lineFields,
           render: ([positions, segments, sizes]: StorageSource[]) => [
-            //use(Quads)({ positions, size: [10, 10] }),
             use(RawLines)({ positions, segments, size: 50, join: 'round' }),
             use(RawLines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
-            //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]
         }),
         use(CompositeData)({
@@ -95,10 +92,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           data: lineData,
           isLoop: (o: any) => o.loop,
           render: ([segments, positions, colors, sizes]: StorageSource[]) => [
-            //use(Quads)({ positions, size: [10, 10] }),
             use(RawLines)({ segments, positions, colors, sizes, }),
-            use(RawLines)({ segments, positions, colors, sizes, mode: RenderPassMode.Debug }),
-            //use(Lines)({ positions, segments, size: 50, join: getLineJoin(), mode: RenderPassMode.Picking }),
           ]          
         }),
         use(RawData)({
@@ -116,31 +110,9 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
           },
           render: (positions) => [
             use(Points)({ positions, colors: positions, size: 50, perspective: 0.95, mode: RenderPassMode.Transparent }),
-            //use(Quads)({ positions, size: [50, 50], id: 2, mode: RenderPassMode.Picking }),
-            //use(Quads)({ positions, size: [50, 50], mode: RenderPassMode.Debug }),
-            
             use(Points)({ positions, size: 100, perspective: 0.95, mode: RenderPassMode.Debug }),
           ],
         }),
-        /*
-        use(Data)({
-          data,
-          fields: quadFields,
-          render: ([positions, sizes]: StorageSource[]) => [
-            use(Quads)({ positions, sizes }),
-            //use(Quads)({ positions, sizes, debug: true }),
-          ],
-        }),
-        */
-        /*
-        use(RawData)({
-          type: 'vec4',
-          length: 100,
-          expr: (emit) => emit(Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1),
-          render: (positions) => use(Quads)({ positions }),
-          //live: true,
-        }),
-        */
         use(Pick)({
           render: ({id, hovered, clicked}) => [
             use(Mesh)({ mesh, blink: clicked }),
@@ -169,27 +141,23 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
 
                     use(OrbitCamera)({
                       radius, phi, theta,
-                      render: (defs: UniformAttribute[], uniforms: ViewUniforms) =>
+                      children: [
 
-                        use(ViewProvider)({
-                          defs, uniforms, children:
+//                        use(Loop)({
+//                          children: [
 
-//                            use(Loop)({
-//                              children: [
+                            //use(RenderToTexture)({
+                            //  children: view,
+                            //}),
+      
+                            use(Draw)({
+                              children: view,
+                            }),
 
-                                //use(RenderToTexture)({
-                                //  children: view,
-                                //}),
-          
-                                use(Draw)({
-                                  children: view,
-                                }),
-
-//                              ],
-//                            })
-          
-                        })
-                    })
+//                          ],
+//                        })
+                      ]
+                    })  
                 })
             })
         })

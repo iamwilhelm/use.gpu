@@ -23,7 +23,40 @@ export const VIEW_UNIFORMS: UniformAttribute[] = [
     name: 'viewSize',
     format: UniformType.vec2
   },
+  {
+    name: 'viewPixelRatio',
+    format: UniformType.float
+  },
 ];
+
+export const makeOrthogonalMatrix = (
+  left: number,
+  right: number,
+  top: number,
+  bottom: number,
+  near: number,
+  far: number,
+): mat4 => {
+  const aspect = width / height;
+  
+  const x = 2 / (right - left);
+  const y = 2 / (top - bottom);
+  const z = 1 / (far - near);
+
+  const wx = -(right + left) / (right - left);
+  const wy = -(bottom + top) / (bottom - top);
+  const wz = -(near) / (far - near);  
+
+  const matrix = mat4.create();
+  mat4.set(matrix,
+    x, 0, 0, wx,
+    0, y, 0, wy,
+    0, 0, z, wz,
+    0, 0, 0, 1,
+  );
+
+  return matrix;
+}
 
 export const makeProjectionMatrix = (
   width: number,

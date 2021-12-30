@@ -125,6 +125,8 @@ export const renderFiber = <F extends Function>(
 ) => {
   const {f, bound, args, yeeted} = fiber;
 
+  DEBUG && console.log('Rendering', formatNode(fiber));
+
   // Let host do its thing
   if (callbacks) if (!callbacks.onRender(fiber)) return;
 
@@ -329,7 +331,7 @@ export const mountFiberReduction = <F extends Function, R, T>(
     const resume = makeFiberContinuation(fiber, reduction);
     fiber.next = makeResumeFiber(fiber, resume, next);
     fiber.yeeted = makeYeetState(fiber, fiber.next, mapper, yeeted?.roots);
-    fiber.path.push(0);
+    fiber.path = [...fiber.path, 0];
   }
 
   reconcileFiberCalls(fiber, calls, callbacks);
@@ -544,7 +546,7 @@ export const consumeFiber = <F extends Function>(
 
     const resume = makeFiberContinuation(fiber, reduction);
     fiber.next = makeResumeFiber(fiber, resume, done);
-    fiber.path.push(0);
+    fiber.path = [...fiber.path, 0];
   }
 
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls, callbacks);

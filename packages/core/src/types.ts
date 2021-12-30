@@ -9,6 +9,7 @@ export type DeepPartial<T> = T | {
 export type UseRenderingContextGPU = {
   width: number,
   height: number,
+  pixelRatio: number,
   samples: number,
 
   device: GPUDevice,

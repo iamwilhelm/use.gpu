@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode } from '@use-gpu/core/types';
 import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
-import { yeet, memo, useContext, useSomeContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeMultiUniforms, 
   makeRenderPipeline, makeShaderModule,

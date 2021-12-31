@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { useContext, useMemo, useOne, useResource, useSomeResource, useNoResource } from '@use-gpu/live';
+import { useContext, useMemo, useOne, useResource, useNoResource } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
 
 type PickState = {id: number, hovered: boolean, clicked: boolean, index: number};
@@ -34,7 +34,7 @@ export const Pick: LiveComponent<PickProps> = (fiber) => ({
   ref.mouseState = mouseState;
 
   if (onMouseMove) {
-    useSomeResource(() => {
+    useResource(() => {
       if (onMouseMove) onMouseMove(ref.mouseState);
     }, [x, y]);
   }

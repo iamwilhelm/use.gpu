@@ -68,12 +68,11 @@ export const makeSubFiber = <F extends Function>(
 // Make a resume continuation for a fiber
 export const makeResumeFiber = <F extends Function>(
   fiber: LiveFiber<F>,
-  handler: Function,
-  next?: LiveFunction<any>,
+  Resume: LiveFunction<any>,
+  Next?: LiveFunction<any>,
 ): LiveFiber<any> => {
-  const Resume = () => handler;
-  Resume.displayName = `Resume(${(next as any)?.displayName ?? ''})`;
-
+  // @ts-ignore
+  Resume.displayName = `Resume(${(Next as any)?.displayName ?? ''})`;
   const nextFiber = makeSubFiber(fiber, use(Resume)(), 1);
 
   // Adopt existing yeet context
@@ -248,6 +247,54 @@ export const mountFiberContinuation = <F extends Function>(
   }
 }
 
+// Generalized mounting of reduction-like continuations
+export const mountFiberReduction = <F extends Function, R, T>(
+  fiber: LiveFiber<F>,
+  calls: DeferredCall<any>[],
+  mapper: ((t: T) => R) | undefined,
+  reduction: () => R,
+  Next?: LiveFunction<any>,
+  callbacks?: RenderCallbacks,
+) => {
+  const {yeeted} = fiber;
+  if (!fiber.next) {
+    const Resume = makeFiberContinuation(fiber, reduction);
+    fiber.next = makeResumeFiber(fiber, Resume, Next);
+    fiber.yeeted = makeYeetState(fiber, fiber.next, mapper, yeeted?.roots);
+    fiber.path = [...fiber.path, 0];
+  }
+
+  reconcileFiberCalls(fiber, calls, callbacks);
+  if (callbacks) callbacks.onFence(fiber);
+
+  const Resume = fiber.next.f;
+  mountFiberContinuation(fiber, use(Resume)(Next), 1, callbacks);
+}
+
+// Wrap a live function to act as a continuation of a prior fiber
+export const makeFiberContinuation = <F extends Function, R>(
+  fiber: LiveFiber<F>,
+  reduction: () => R,
+) => (
+  next: LiveFiber<F>,
+) => (
+  Next?: LiveFunction<any>
+) => {
+  const value = reduction();
+
+  // Bust cache on next fiber as it may immediately reduce
+  if (next?.mount) bustFiberCaches(next.mount);
+  // Next fiber may be inlined for efficiency
+  else bustFiberCaches(next);
+  if (!Next) return null;
+
+  // If mounting static component, inline into current fiber
+  // @ts-ignore
+  if (Next.isStaticComponent) return Next(next)(value);
+  // Mount as new sub fiber
+  else return use(Next)(value);
+}
+
 // Reconcile multiple calls on a fiber
 export const reconcileFiberCalls = <F extends Function>(
   fiber: LiveFiber<F>,
@@ -297,52 +344,6 @@ export const reconcileFiberCalls = <F extends Function>(
     flushMount(null, mount, args, callbacks);
   }
 
-}
-
-// Connect a live function as a continuation of a prior fiber
-export const makeFiberContinuation = <F extends Function, R>(
-  fiber: LiveFiber<F>,
-  reduction: () => R,
-) => (
-  next?: LiveFunction<any>
-) => {
-  const value = reduction();
-
-  // Bust cache on next fiber as it may immediately reduce
-  if (fiber.next?.mount) bustFiberCaches(fiber.next.mount);
-  // Next fiber may be inlined for efficiency
-  else if (fiber.next) bustFiberCaches(fiber.next);
-  if (!next) return null;
-
-  // If mounting static component, inline into current fiber
-  // @ts-ignore
-  if (next.isStaticComponent) return next(fiber)(value);
-  // Mount as new fiber
-  else return use(next)(value);
-}
-
-// Generalized mounting of reduction-like continuations
-export const mountFiberReduction = <F extends Function, R, T>(
-  fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[],
-  mapper: ((t: T) => R) | undefined,
-  reduction: () => R,
-  next?: LiveFunction<any>,
-  callbacks?: RenderCallbacks,
-) => {
-  const {yeeted} = fiber;
-  if (!fiber.next) {
-    const resume = makeFiberContinuation(fiber, reduction);
-    fiber.next = makeResumeFiber(fiber, resume, next);
-    fiber.yeeted = makeYeetState(fiber, fiber.next, mapper, yeeted?.roots);
-    fiber.path = [...fiber.path, 0];
-  }
-
-  reconcileFiberCalls(fiber, calls, callbacks);
-  if (callbacks) callbacks.onFence(fiber);
-
-  const Resume = fiber.next.f;
-  mountFiberContinuation(fiber, use(Resume)(next), 1, callbacks);
 }
 
 // Map-reduce a fiber

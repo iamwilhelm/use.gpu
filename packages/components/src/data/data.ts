@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core/types';
 import { RenderContext, FrameContext } from '@use-gpu/components';
-import { yeet, useMemo, useSomeMemo, useNoMemo, useContext, useSomeContext, useNoContext } from '@use-gpu/live';
+import { yeet, useMemo, useNoMemo, useContext, useNoContext } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
@@ -70,10 +70,10 @@ export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
 
   if (!live) {
     useNoContext(FrameContext);
-    useSomeMemo(refresh, [device, data, fieldBuffers]);
+    useMemo(refresh, [device, data, fieldBuffers]);
   }
   else {
-    useSomeContext(FrameContext);
+    useContext(FrameContext);
     useNoMemo();
     refresh();
   }

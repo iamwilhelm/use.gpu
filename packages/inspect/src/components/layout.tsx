@@ -8,6 +8,7 @@ export const InspectContainer = styled.div`
   color: var(--colorText);
   cursor: default;
   position: relative;
+  height: 100%;
 `;
 
 export const InspectContainerCollapsed = styled(InspectContainer)`
@@ -29,13 +30,13 @@ export const Spacer = styled.div`
 
 export const SplitRow = styled.div`
   display: flex;
-  min-height: 100%;
+  height: 100%;
 `;
 
 export const SplitColumn = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  width: 100%;
 `;
 
 export const RowPanel = styled.div`
@@ -52,6 +53,8 @@ export const ColumnPanel = styled.div`
 `;
 
 export const Scrollable = styled.div`
+  width: 100%;
+  height: 100%;
   overflow: auto;
 `;
 

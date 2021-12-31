@@ -252,18 +252,24 @@ export const useNoResource = () => {
   state![i + 1] = null;
 }
 
-// Grab a context from the fiber
+// Grab a context from the fiber (optional mode)
 export const useContext = <C>(
   context: LiveContext<C>,
 ) => {
   const fiber = useFiber();
 
-  const {host, context: {values, roots}} = fiber;
+  const i = pushState(fiber, Hook.CONTEXT);
+  const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context);
-  if (!root) throw new Error(`Context ${context.displayName} was used without being provided.`);
+  if (!root) throw new Error(`Context '${context.displayName}' was used without being provided.`);
 
-  if (host && host.depend(fiber, root)) {
-    host.track(fiber, () => host.undepend(fiber, root));
+  if (host) {
+    if (!state![i]) {
+      state![i] = true;
+      host.track(fiber, () => host.undepend(fiber, root));
+    }
+
+    host.depend(fiber, root);
   }
 
   return values.get(context).current ?? context.initialValue;
@@ -286,28 +292,35 @@ export const useOptionalContext = <C>(
   return values.get(context).current ?? context.initialValue;
 }
 
-// Grab a context from the fiber (optional mode)
-export const useSomeContext = <C>(
+// Return a value to a consumer from the fiber
+export const useConsumer = <C>(
   context: LiveContext<C>,
+  value: any,
 ) => {
   const fiber = useFiber();
 
-  const i = pushState(fiber, Hook.CONTEXT);
-
+  const i = pushState(fiber, Hook.CONSUMER);
   const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context);
-  if (!root) throw new Error(`Context ${context.displayName} was used without being provided.`);
+  if (!root || !root.next) throw new Error(`Consumer '${context.displayName}' was used without being consumed.`);
 
+  const next= root.next;
   if (host) {
     if (!state![i]) {
       state![i] = true;
-      host.track(fiber, () => host.undepend(fiber, root));
-    }
+      host.track(fiber, () => {
+        registry.delete(fiber);
+        host.schedule(next, NOP);
+        host.undepend(next, fiber);
+      });
 
-    host.depend(fiber, root);
+      host.depend(next, fiber);
+    }
+    host.schedule(next, NOP);
   }
 
-  return values.get(context).current ?? context.initialValue;
+  const registry = values.get(context).current;
+  registry.set(fiber, value);
 }
 
 // Don't use a context from the fiber
@@ -317,47 +330,35 @@ export const useNoContext = <C>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CONTEXT);
-  const {host, context: {values, roots}} = fiber;
+  const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context)!;
+  if (!context) throw new Error(`Context was not provided.`);
 
-  if (host) host.undepend(fiber, root);
+  if (state![i]) {
+    if (host) host.undepend(fiber, root);
+    state![i] = false;
+  }
 }
 
-// Provide a value to a co-context from the fiber
-export const useConsumer = <C>(
+// Don't use a consumer from the fiber
+export const useNoConsumer = <C>(
   context: LiveContext<C>,
-  value: any,
 ) => {
   const fiber = useFiber();
 
-  const {host, context: {values, roots}} = fiber;
-  const root = roots.get(context);
-  if (!root || !root.next) throw new Error(`Co-context ${context.displayName} was used without being consumed.`);
-  
-  const next= root.next;
-  if (host) {
-    if (host.depend(next, fiber)) {
-      host.track(fiber, () => {
-        registry.delete(fiber);
-        host.schedule(next, NOP);
-        host.undepend(next, fiber)
-      });
-    }
+  const i = pushState(fiber, Hook.CONSUMER);
+  const {state, host, context: {values, roots}} = fiber;
+  const root = roots.get(context)!;
+  if (!context) throw new Error(`Consumer was not provided.`);
 
-    host.schedule(next, NOP);
+  const next = root.next;
+  if (state![i] && next) {
+    if (host) host.undepend(next, fiber);
+    state![i] = false;
   }
-
-  const registry = values.get(context).current;
-  registry.set(fiber, value);
 }
 
 // Togglable hooks
-export const useSomeState = useState;
-export const useSomeMemo = useMemo;
-export const useSomeOne = useOne;
-export const useSomeCallback = useCallback;
-export const useSomeResource = useResource;
-
 export const useNoState = useNoHook(Hook.STATE);
 export const useNoMemo = useNoHook(Hook.MEMO);
 export const useNoOne = useNoHook(Hook.ONE);

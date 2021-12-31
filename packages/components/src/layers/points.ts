@@ -72,7 +72,7 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     getColor,
     getDepth,
     
-    shape = PointShape.Circle,
+    shape = PointShape.DiamondOutlined,
     
     mode = RenderPassMode.Opaque,
     id = 0,

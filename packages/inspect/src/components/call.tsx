@@ -13,48 +13,54 @@ const StyledCall = styled.div`
 `
 
 type CallProps = {
-	fiber: LiveFiber<any>,
+  fiber: LiveFiber<any>,
 };
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
-	const {id, depth, path, type, state, context, yeeted, mount, mounts, next, host} = fiber;
+  const {id, depth, path, type, state, context, yeeted, mount, mounts, next, host} = fiber;
 
-	let props = {id, depth, path, type, context, yeeted, mount, mounts, next, host, raw: fiber} as Record<string, any>;
+  let props = {id, depth, path, type, context, yeeted, mount, mounts, next, host, raw: fiber} as Record<string, any>;
 
-	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-	const toggleExpanded = (id: string) => setExpanded((state) => ({
-		...expanded,
-		[id]: !expanded[id],
-	}));
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const toggleExpanded = (id: string) => setExpanded((state) => ({
+    ...expanded,
+    [id]: !expanded[id],
+  }));
 
-	const hooks = chunk(state, STATE_SLOTS);
+  const hooks = chunk(state, STATE_SLOTS);
 
-	return (
+  return (
     <StyledCall>
-  		<div><b>Fiber</b></div>
-  		<div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
-			<Spacer />
-  		<div><b>State</b></div>
-  		<div>
-				{inspectObject(hooks.map(hookToObject), expanded, toggleExpanded, '')}
-			</div>
-  	</StyledCall>
+      <div><b>Fiber</b></div>
+      <div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
+      <Spacer />
+      <div><b>State</b></div>
+      <div>
+        {inspectObject(hooks.map(hookToObject), expanded, toggleExpanded, '')}
+      </div>
+    </StyledCall>
   );
 }
 
 const hookToObject = (
-	state: any[],
+  state: any[],
 ) => {
-	const [type, a, b] = state;
-	if (type === Hook.STATE) {
-		return {state: a, deps: b};
-	}
-	if (type === Hook.MEMO || type === Hook.ONE || type === Hook.CALLBACK) {
-		return {memo: a, deps: b};
-	}
-	if (type === Hook.RESOURCE) {
-		return {resource: a?.value, deps: b};
-	}
-	return null;
+  const [type, a, b] = state;
+  if (type === Hook.STATE) {
+    return {state: a, deps: b};
+  }
+  if (type === Hook.MEMO || type === Hook.ONE || type === Hook.CALLBACK) {
+    return {memo: a, deps: b};
+  }
+  if (type === Hook.RESOURCE) {
+    return {resource: a?.value, deps: b};
+  }
+  if (type === Hook.CONTEXT) {
+    return {context: a?.displayName};
+  }
+  if (type === Hook.CONSUMER) {
+    return {consumer: a?.displayName};
+  }
+  return null;
 }

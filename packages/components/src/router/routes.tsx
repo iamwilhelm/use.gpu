@@ -80,8 +80,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((fiber) => (props) => {
     for (const matcher of matchers) {
       const match = currentPath.match(matcher.regexp);
       if (match) {
-        ({ groups: params } = match);
-
+        if (match.groups) params = match.groups;
         if (matcher.routes) routes = matcher.routes;
         if (matcher.element) element = matcher.element;
         if (matcher.base) base = matcher.base;

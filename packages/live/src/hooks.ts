@@ -265,7 +265,7 @@ export const useContext = <C>(
 
   if (host) {
     if (!state![i]) {
-      state![i] = true;
+      state![i] = context;
       host.track(fiber, () => host.undepend(fiber, root));
     }
 
@@ -307,7 +307,7 @@ export const useConsumer = <C>(
   const next= root.next;
   if (host) {
     if (!state![i]) {
-      state![i] = true;
+      state![i] = context;
       host.track(fiber, () => {
         registry.delete(fiber);
         host.schedule(next, NOP);
@@ -336,7 +336,7 @@ export const useNoContext = <C>(
 
   if (state![i]) {
     if (host) host.undepend(fiber, root);
-    state![i] = false;
+    state![i] = null;
   }
 }
 
@@ -354,7 +354,7 @@ export const useNoConsumer = <C>(
   const next = root.next;
   if (state![i] && next) {
     if (host) host.undepend(next, fiber);
-    state![i] = false;
+    state![i] = null;
   }
 }
 

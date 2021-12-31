@@ -18,6 +18,7 @@ const StyledShader = styled.div`
 const StyledEditor = styled.div`
   display: flex;
   padding: 10px 0;
+  width: 100%;
 `
 
 const StyledGutter = styled.div`
@@ -36,16 +37,16 @@ const StyledCode = styled.div`
 `
 
 type ShaderProps = {
-	shader: string,
+  shader: string,
 };
 
 export const Shader: React.FC<ShaderProps> = ({shader}) => {
 
-	return (<>
+  return (<>
     <div><b>Shader</b></div>
     <StyledShader>
-  		{inspectCode(shader)}
-  	</StyledShader>
+      {inspectCode(shader)}
+    </StyledShader>
   </>);
 }
 

@@ -5,7 +5,7 @@ import { ExpandState } from './types';
 type ExpandableProps = {
   id: string | number,
   expandCursor: Cursor<ExpandState>,
-	children: (expand: boolean, onClick: (e: any) => void) => React.ReactElement,
+  children: (expand: boolean, onClick: (e: any) => void) => React.ReactElement,
 }
 
 export const Expandable: React.FC<ExpandableProps> = ({id, expandCursor, children}) => {

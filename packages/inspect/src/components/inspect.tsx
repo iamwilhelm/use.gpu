@@ -75,7 +75,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const tree = (
     <Scrollable>
       <Inset>
-				<FiberTree fiber={fiber}  ping={ping} expandCursor={expandCursor} selectedCursor={selectedCursor} />
+        <FiberTree fiber={fiber}  ping={ping} expandCursor={expandCursor} selectedCursor={selectedCursor} />
       </Inset>
     </Scrollable>
   );
@@ -95,17 +95,17 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   );
 
   // Avoid text selection on double click
-	const onMouseDown = (e: any) => {
+  const onMouseDown = (e: any) => {
     if (e.detail > 1) {
-  		e.preventDefault();
+      e.preventDefault();
     }
-	};
+  };
 
   return (<>
     {open  ? <Container onMouseDown={onMouseDown} className="ui inverted">
       {detail ? (
         <SplitRow>
-          <RowPanel style={{width: '33%'}}>
+          <RowPanel style={{width: '34%'}}>
             {tree}
             {expand}
           </RowPanel>

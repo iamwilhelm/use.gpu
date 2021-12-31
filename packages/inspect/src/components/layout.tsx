@@ -24,8 +24,8 @@ export const InspectToggle = styled.div`
 `;
 
 export const Spacer = styled.div`
-	width: 20px;
-	height: 20px;
+  width: 20px;
+  height: 20px;
 `;
 
 export const SplitRow = styled.div`
@@ -72,14 +72,14 @@ export const Label = styled.div`
 export const TreeRow = styled.div<TreeIndentProps>`
   display: flex;
   height: 20px;
-	padding-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
+  padding-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
 `;
 
 export const TreeIndent = styled.div<TreeIndentProps>`
-	margin-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
+  margin-left: ${props => props.indent ? `${props.indent * 20}px` : 0};
 `;
 
 export const TreeLine = styled.div`
-	margin-left: -1px;
+  margin-left: -1px;
   border-left: 2px dotted var(--borderThin);
 `;

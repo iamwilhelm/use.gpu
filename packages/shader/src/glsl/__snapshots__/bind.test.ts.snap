@@ -4,16 +4,16 @@ exports[`bind binds an external 1`] = `
 "#version 450
 #define TEST true
 
-    vec4 _21_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _00_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _21_getColor();
+    vec4 _00_getColor();
     
     vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
     vec4 colorNotUsed() { return vec4(0.0, 0.1, 0.2, 1.0); }
 
     vec4 getColor() {
-      return _21_getColor() + colorUsed();
+      return _00_getColor() + colorUsed();
     }
     "
 `;
@@ -23,16 +23,16 @@ exports[`bind binds an external 2`] = `
 #define TEST true
 
 
-    vec4 _21_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _21_getColor();
+    vec4 _01_getColor();
     
     vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
     vec4 colorNotUsed() { return vec4(0.0, 0.1, 0.2, 1.0); }
 
     vec4 getColor() {
-      return _21_getColor() + colorUsed();
+      return _01_getColor() + colorUsed();
     }
     "
 `;
@@ -41,22 +41,22 @@ exports[`bind binds an external 3`] = `
 "#version 450
 #define TEST true
 
-    vec4 _21_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _00_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _21_getColor();
+    vec4 _00_getColor();
     
-    vec4 _u0_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 _u0_getColor() {
-      return _21_getColor() + _u0_colorUsed();
+    vec4 _01_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
+    vec4 _01_getColor() {
+      return _00_getColor() + _01_colorUsed();
     }
     
 
-    vec4 _u0_getColor();
+    vec4 _01_getColor();
     void main() {
       vec4 v;
       v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = _u0_getColor();
+      gl_FragColor = _01_getColor();
     }
     "
 `;
@@ -66,22 +66,22 @@ exports[`bind binds an external 4`] = `
 #define TEST true
 
 
-    vec4 _21_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _21_getColor();
+    vec4 _01_getColor();
     
-    vec4 _7t_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 _7t_getColor() {
-      return _21_getColor() + _7t_colorUsed();
+    vec4 _02_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
+    vec4 _02_getColor() {
+      return _01_getColor() + _02_colorUsed();
     }
     
 
-    vec4 _7t_getColor();
+    vec4 _02_getColor();
     void main() {
       vec4 v;
       v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = _7t_getColor();
+      gl_FragColor = _02_getColor();
     }
     "
 `;

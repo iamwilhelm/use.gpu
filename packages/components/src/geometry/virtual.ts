@@ -12,6 +12,7 @@ import {
   uploadBuffer,
 } from '@use-gpu/core';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useRenderPipeline } from '../hooks/useRenderPipeline';
 
 import instanceDrawVirtual from '@use-gpu/glsl/instance/draw/virtual.glsl';
 import instanceDrawWireframeStrip from '@use-gpu/glsl/instance/draw/wireframe-strip.glsl';
@@ -61,7 +62,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   // Render set up
   const {viewUniforms, viewDefs} = useContext(ViewContext);
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
-  const {device, colorStates, depthStencilState, samples, languages} = renderContext;
+  const {device, languages} = renderContext;
 
   // Render shader
   const {glsl: {modules}} = languages;
@@ -96,15 +97,11 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   );
 
   // Rendering pipeline
-  const [vertex, fragment] = shader;
-  const pipeline = useMemo(() => {
-    return makeRenderPipeline(
-      renderContext,
-      vertex,
-      fragment,
-      propPipeline,
-    );
-  }, [device, shader, propPipeline, colorStates, depthStencilState, samples, languages]);
+  const pipeline = useRenderPipeline(
+    renderContext,
+    shader,
+    propPipeline,
+  );
 
   // Uniforms
   const uniform = useMemo(() => {

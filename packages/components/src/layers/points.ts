@@ -61,7 +61,7 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     sizes,
     perspective,
     perspectives,
-    shape,
+    shape = PointShape.Circle,
     
     mode = RenderPassMode.Opaque,
     id = 0,
@@ -71,7 +71,7 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
   const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, sizes ?? size));
   const getSize = castTo(getSizeFloat, 'vec2', 'xx');  
 
-  const getMask = MASK_SHADER[shape ?? PointShape.Circle]; 
+  const getMask = MASK_SHADER[shape] ?? MASK_SHADER[PointShape.Circle];
 
   return use(RawQuads)({
     position,

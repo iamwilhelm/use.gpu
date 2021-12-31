@@ -104,9 +104,12 @@ export const groupFibers = (fibers: LiveFiber<any>[]) => {
   // Group to top-level roots and descendants
   const roots = [] as GroupedFibers[];
   nextFiber: for (let f of fibers) {
-    for (let r of roots) if (isSubNode(r.root, f)) {
-      r.subs.add(f);
-      continue nextFiber;
+    for (let r of roots) {
+      if (r.root === f) continue nextFiber;
+      if (isSubNode(r.root, f)) {
+        r.subs.add(f);
+        continue nextFiber;
+      }
     }
     roots.push({root: f, subs: new Set()});
   }
@@ -126,7 +129,7 @@ export const traverseFiber = (fiber: LiveFiber<any>, f: (f: LiveFiber<any>) => v
 const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): RenderCallbacks => {
   let {depth} = root;
 
-  const onRender = (fiber: LiveFiber<any>, allowSlice?: boolean = true) => {
+  const onRender = (fiber: LiveFiber<any>, allowSlice: boolean = true) => {
     const inSameStack = !allowSlice || (fiber.depth - depth <= SLICE_STACK);
     if (inSameStack) {
       // Remove from to-visit set

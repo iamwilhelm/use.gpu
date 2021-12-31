@@ -38,7 +38,7 @@ export type Dispatcher = (as: Action<any>[]) => void;
 export type OnFiber<T = any> = (fiber: LiveFiber<any>) => T;
 export type FiberSetter<T> = (fiber: LiveFiber<any>, t: T) => void;
 export type RenderCallbacks = {
-  onRender: OnFiber<boolean>,
+  onRender: (fiber: LiveFiber<any>, allowSlice?: boolean) => boolean,
   onUpdate: OnFiber<void>,
   onFence: OnFiber<void>,
   onSlice: OnFiber<void>,

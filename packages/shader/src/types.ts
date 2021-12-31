@@ -7,8 +7,9 @@ export type ShaderModule = ParsedBundle | ParsedModule;
 
 export type ParsedBundle = {
   module: ParsedModule,
-  libs?: Record<string, ParsedBundle | ParsedModule>,
+  libs?: Record<string, ShaderModule>,
   entry?: string,
+  virtual?: ParsedModule[],
 };
 
 export type ParsedModule = {

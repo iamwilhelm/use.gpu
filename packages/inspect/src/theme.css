@@ -12,9 +12,9 @@ html {
   --shimGray: rgba(255, 255, 255, 0.1);
 
   --colorTextMuted: #888;
-  --colorText: #ccc;
-  --colorTextHover: #ddd;
-  --colorTextActive: #eee;
+  --colorText: #ddd;
+  --colorTextHover: #eee;
+  --colorTextActive: #fff;
 }
 
 html > body {

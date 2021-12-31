@@ -19,64 +19,69 @@ const selectedAnimation = keyframes`
 `
 
 export const StyledNode = styled.div`
-	white-space: nowrap;
-	margin: -2px -5px;
-	padding: 2px 5px;
-	&.selected {
+  white-space: nowrap;
+  margin: -2px -5px;
+  padding: 2px 5px;
+  &.selected {
     background: rgba(50, 130, 200, 0.85);
-	}
+  }
 
-	&.pinged {
-		animation-name: ${pingAnimation};
-		animation-duration: 0.5s;
-		animation-iteration-count: 1;
+  &.builtin {
+    color: var(--colorTextMuted);
+  }
 
-		&.selected {
-			animation-name: ${selectedAnimation};
-		}
-	}
+  &.pinged {
+    animation-name: ${pingAnimation};
+    animation-duration: 0.5s;
+    animation-iteration-count: 1;
 
-	&.repinged {
-		animation-name: none;
+    &.selected {
+      animation-name: ${selectedAnimation};
+    }
+  }
+
+  &.repinged {
+    animation-name: none;
     background: rgba(10, 150, 75, 1.0);
-		
-		&.selected {
+
+    &.selected {
       background: rgba(20, 100, 200, 0.75);
-		}
-	}
+    }
+  }
 `;
 
 type NodeProps = {
-	fiber: LiveFiber<any>,
-	pinged: number,
-	selected: boolean,
-	onClick?: Action,
+  fiber: LiveFiber<any>,
+  pinged: number,
+  selected: boolean,
+  onClick?: Action,
 };
 
 export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) => {
-	const {id, f, args, yeeted} = fiber;
+  const {id, f, args, yeeted} = fiber;
 
   const yeet = yeeted?.value !== undefined;
   const suffix = yeet ? ICONSMALL("switch_left") : null;
 
-	const classes = [] as string[];
-	if (selected) classes.push('selected');
-	if (pinged) classes.push('pinged');
-	const className = classes.join(' ');
+  const classes = [] as string[];
+  if (selected) classes.push('selected');
+  if (pinged) classes.push('pinged');
+  if (f.isLiveBuiltin) classes.push('builtin');
+  const className = classes.join(' ');
 
-	const elRef = useRef<HTMLDivElement | null>(null);
-	const {current: el} = elRef;
-	const lastPinged = el && el.classList.contains('pinged');
+  const elRef = useRef<HTMLDivElement | null>(null);
+  const {current: el} = elRef;
+  const lastPinged = el && el.classList.contains('pinged');
 
-	useEffect(() => {
-		if (lastPinged && el) {
-			el.classList.add('repinged');
-			el.offsetHeight;
-			el.classList.remove('repinged');
-		}
-	});
+  useEffect(() => {
+    if (lastPinged && el) {
+      el.classList.add('repinged');
+      el.offsetHeight;
+      el.classList.remove('repinged');
+    }
+  });
 
-	const name = formatNodeName(fiber);
+  const name = formatNodeName(fiber);
 
   return <StyledNode ref={elRef} className={className} onClick={onClick}>{name}{suffix}</StyledNode>;
 }

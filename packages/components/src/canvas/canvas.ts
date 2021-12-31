@@ -26,6 +26,7 @@ export type CanvasProps = {
   depthStencilFormat?: GPUTextureFormat,
   backgroundColor?: GPUColor,
   samples?: number,
+  pixelRatio?: number,
 
   children?: LiveElement<any>,
 }

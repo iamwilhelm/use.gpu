@@ -37,6 +37,9 @@ export const makeOrthogonalMatrix = (
   near: number,
   far: number,
 ): mat4 => {
+  const width = Math.abs(right - left);
+  const height = Math.abs(top - bottom);
+
   const aspect = width / height;
   
   const x = 2 / (right - left);

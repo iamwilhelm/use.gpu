@@ -3,7 +3,7 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { use, provide, gatherReduce, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
-import { FrameContext } from '../providers/frame-context';
+import { FrameContext } from '../providers/frame-provider';
 
 import {
   makeColorState,

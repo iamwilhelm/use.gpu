@@ -600,7 +600,7 @@ export const detachFiber = <F extends Function>(
 export const disposeFiber = <F extends Function>(fiber: LiveFiber<F>) => {
   disposeFiberMounts(fiber);
 
-  fiber.bound = null;
+  fiber.bound = undefined;
   if (fiber.host) fiber.host.dispose(fiber);
 }
 

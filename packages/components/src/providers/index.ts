@@ -1,4 +1,4 @@
 export * from './event-provider';
-export * from './frame-context';
+export * from './frame-provider';
 export * from './render-provider';
 export * from './view-provider';

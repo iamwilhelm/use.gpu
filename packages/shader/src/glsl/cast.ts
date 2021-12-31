@@ -13,7 +13,7 @@ export const castTo = (
   type: string,
   swizzle: string,
 ): ParsedBundle => {
-  const {module} = toBundle(bundle);
+  const {module, virtual} = toBundle(bundle);
   const {name, format, args} = bundleToAttribute(bundle);
 
   const {table: {hash}} = module;
@@ -36,14 +36,18 @@ export const castTo = (
     return makeCastTo(name, accessor, args ?? [], format, type, swizzle);
   }
 
-  const virtual = loadVirtualModule(
+  const cast = loadVirtualModule(
     { render },
     { symbols, modules },
     'cast',
     rehash,
   );
 
-  return {module: virtual, libs: {[namespace]: bundle}};
+  const revirtual = module.virtual
+    ? (virtual ? [...virtual, module] : [module])
+    : virtual;
+
+  return {module: cast, libs: {[namespace]: bundle}, virtual: revirtual};
 }
 
 export const makeCastTo = (
@@ -57,7 +61,8 @@ export const makeCastTo = (
   const symbols = args.map((t, i) => `${arg(i)}`);
   return `${to} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
   return ${accessor}(${symbols.join(', ')}).${swizzle};
-}`;
+}
+`;
 }
 
 export const bundleToAttribute = (

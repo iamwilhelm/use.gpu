@@ -171,7 +171,7 @@ export type StorageSource = {
 
 // Shaders
 export type ShaderStage = string;
-export type ShaderCompiler = (code: string, stage: ShaderStage) => TypedArray;
+export type ShaderCompiler = (code: string, stage: ShaderStage) => [TypedArray, number | string];
 
 export type ShaderLanguages = {[k: string]: ShaderLanguageAPI};
 export type ShaderLanguageAPI = {
@@ -182,6 +182,7 @@ export type ShaderLanguageAPI = {
 export type ShaderModuleDescriptor = {
   code: TypedArray | string,
   entryPoint: string,
+  hash: string | number,
 };
 
 export type ShaderStageDescriptor = {
@@ -196,6 +197,7 @@ export type ViewUniforms = {
   viewPosition: { value: vec3 | [number, number, number] | number[] },
   viewResolution: { value: vec2 | [number, number] | number[] },
   viewSize: { value: vec2 | [number, number] | number[] },
+  viewPixelRatio: { value: number },
 };
 
 export type PickingUniforms = {

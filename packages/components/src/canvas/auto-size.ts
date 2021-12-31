@@ -7,7 +7,7 @@ export type AutoSizeProps = {
   children?: LiveElement<any>,
 }
 
-export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number] => {
+export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number, number] => {
   const pixelRatio = window?.devicePixelRatio ?? 1;
   const {offsetWidth, offsetHeight} = canvas;
   return [pixelRatio * offsetWidth, pixelRatio * offsetHeight, pixelRatio];

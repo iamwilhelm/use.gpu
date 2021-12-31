@@ -145,7 +145,7 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
 
 const truncate = (s: string, n: number) => {
   if (typeof s !== 'string') return '' + s;
-	s = s.replace(/\s+/g, ' ');
-	if (s.length < n) return s;
-	return s.slice(0, n) + '…';
+  s = s.replace(/\s+/g, ' ');
+  if (s.length < n) return s;
+  return s.slice(0, n) + '…';
 }

@@ -81,7 +81,6 @@ export const linkModule = timed('linkModule', (
   // Namespace by module name and module hash
   const namespaces = new Map<string, string>();
   const hashes = new Map<string, string>();
-  const used = new Set<string>();
 
   // Track symbols in global namespace 
   const exists = new Set<string>();
@@ -102,7 +101,7 @@ export const linkModule = timed('linkModule', (
     const rename = new Map<string, string>();
     if (module !== main) {
       const namespace = virtual?.namespace;
-      const ns = reserveNamespace(module, namespaces, used, namespace);
+      const ns = reserveNamespace(module, namespaces, namespace);
       hashes.set(hash, ns);
 
       if (symbols) for (const name of symbols) rename.set(name, ns + name);
@@ -263,11 +262,10 @@ export const loadModulesInOrder = timed('loadModules', (
   };
 });
 
-// Reserve a unique namespace based on truncated shader hash
+// Generate a new namespace
 export const reserveNamespace = (
   module: ParsedModule,
   namespaces: Map<string, string>,
-  used: Set<string>,
   force?: string,
 ): string => {
   const {name, table: {hash}} = module;
@@ -275,13 +273,10 @@ export const reserveNamespace = (
   let n = 2;
 
   if (force == null) {
-    do {
-      namespace = '_' + hash.slice(0, n++) + '_';
-    } while (used.has(namespace));
+    namespace = '_' + ('00' + namespaces.size.toString(36)).slice(-2) + '_';
   }
 
   namespaces.set(name, namespace!);
-  used.add(namespace!);
 
   return namespace!;
 }

@@ -20,7 +20,7 @@ import { Mesh } from './mesh';
 import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 
-import { TestPage } from './pages/test';
+import { GeometryPage } from './pages/geometry';
 
 export type AppProps = {
   device: GPUDevice,
@@ -40,7 +40,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
       routes: {
         "/": {
           routes: {
-            "test": { element: use(TestPage)({ canvas }) },
+            "test": { element: use(GeometryPage)({ canvas }) },
           },
         },
       },

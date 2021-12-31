@@ -4,7 +4,7 @@ import { defineConstants, loadStaticModule, loadVirtualModule } from './shader';
 import { compressAST, decompressAST } from './ast';
 import { getProgramHash, makeKey } from '../util/hash';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
-import { parseBundle, toBundle, parseLinkAliases, forBundleModules } from '../util/bundle';
+import { parseBundle, toBundle, toModule, parseLinkAliases, forBundleModules } from '../util/bundle';
 import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP } from '../constants';
 import mapValues from 'lodash/mapValues';
 
@@ -43,8 +43,8 @@ export const bindBundle = timed('bindBundle', (
   defines?: Record<string, ShaderDefine> | null,
   key: string | number = makeKey(),
 ): ParsedBundle => {
-  const {module, libs} = toBundle(bundle);
-  return bindModule(module, libs, linkDefs, defines, key);
+  const {module, libs, virtual} = toBundle(bundle);
+  return bindModule(module, libs, linkDefs, defines, virtual, key);
 });
 
 export const bindModule = timed('bindModule', (
@@ -52,6 +52,7 @@ export const bindModule = timed('bindModule', (
   libs: Record<string, ShaderModule> = {},
   linkDefs: Record<string, ShaderModule> = {},
   defines?: Record<string, ShaderDefine> | null,
+  virtual?: ParsedModule[],
   key: string | number = makeKey(),
 ): ParsedBundle => {
   const [links, aliases] = parseLinkAliases(linkDefs);
@@ -64,6 +65,7 @@ export const bindModule = timed('bindModule', (
 
   const relinks: Record<string, ShaderModule> = {};
   const reexternals = [];
+  const revirtual = virtual ? virtual.slice() : [];
   const reimports = modules?.slice() ?? [];
 
   if (defines && Object.keys(defines).length) {
@@ -78,12 +80,23 @@ export const bindModule = timed('bindModule', (
 
     if (links[name]) {
       const link = links[name] as any;
-      const entry = link.module?.entry ?? link.entry;
+      const entry = link.entry ?? link.module?.entry;
       const resolved = entry ?? aliases?.get(name) ?? name;
 
       const imp = namespace + name;
       relinks[imp] = {...links[name], entry: resolved};
       reimports.push({at: 0, symbols: NO_SYMBOLS, name: imp, imports: [{name, imported: resolved}]});
+
+      // Collect virtual modules from links for resolving later
+      if ('name' in link) {
+        const {virtual} = link;
+        if (virtual) revirtual.push(link);
+      }
+      else {
+        const {virtual} = link;
+        if (virtual) for (const v of virtual) revirtual.push(v);
+        if (link.module.virtual) revirtual.push(link.module);
+      }
     }
     else {
       reexternals.push(external);
@@ -103,43 +116,42 @@ export const bindModule = timed('bindModule', (
       table: retable,
     },
     libs: {...libs, ...relinks},
+    virtual: revirtual.length ? revirtual : undefined,
   };
 });
 
 export const resolveBindings = timed('resolveBindings', (
-  modules: ShaderModule[],
+  modules: ParsedBundle[],
 ): {
-  modules: ShaderModule[],
+  modules: ParsedBundle[],
   uniforms: DataBinding[],
   bindings: DataBinding[],
 } => {
   const allUniforms = [] as DataBinding[];
   const allBindings = [] as DataBinding[];
 
-  const seen = new Set();
+  const seen = new Set<ParsedModule>();
 
-  // Gather all namespaced uniforms and bindings from all programs.
+  // Gather all namespaced uniforms and bindings from all virtual modules.
   // Assign base offset to each virtual module in-place.
   let base = 0;
-  for (const m of modules) {
-    forBundleModules(m, (m: ParsedModule) => {
-      const {virtual} = m;
-      if (virtual) {
-        const {table: {hash}} = m;
-        if (seen.has(hash)) return;
-        seen.add(hash);
+  for (const {virtual} of modules) {
+    if (virtual) for (const m of virtual) {
+      if (seen.has(m)) continue;
+      seen.add(m);
 
-        const {uniforms, bindings} = virtual;
+      if (m.virtual) {
+        const {uniforms, bindings} = m.virtual;
         const namespace = `${PREFIX_VIRTUAL}${base}_`;
         if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
         if (bindings) for (const b of bindings) allBindings.push(b);
 
         // Mutate virtual modules as they are ephemeral
-        virtual.namespace = namespace;
-        virtual.base = base;
+        m.virtual.namespace = namespace;
+        m.virtual.base = base;
         base += allBindings.length;
       }
-    });
+    };
   }
 
   // Create combined uniform block as top-level import

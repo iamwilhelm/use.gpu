@@ -6,22 +6,35 @@ const NO_LIBS = {};
 export const toBundle = (bundle: ParsedBundle | ParsedModule): ParsedBundle => {
   if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");
 
-  if ('table' in bundle) return {
+  if ('name' in bundle) return {
     module: bundle as ParsedModule,
     libs: NO_LIBS,
   } as ParsedBundle;
 
-  let {module, libs, entry} = bundle;
+  let {module, libs, virtual, entry} = bundle;
   if (entry != null) {
     module = {...module, entry};
-    return {module, libs} as ParsedBundle;
+    return {module, libs, virtual} as ParsedBundle;
   }
   return bundle;
 }
 
+// Accept direct module or bundle, with entry point on either.
+export const toModule = (bundle: ParsedBundle | ParsedModule) => {
+  if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");
+
+  if ('name' in bundle) return bundle as ParsedModule;
+
+  let {module, entry} = bundle;
+  if (entry != null) {
+    return {...module, entry} as ParsedModule;
+  }
+  return module;
+}
+
 // Parse bundle of imports into main + libs
-export const parseBundle = (bundle: ParsedBundle | ParsedModule): [ParsedModule, Record<string, ParsedModule>] => {
-  let {module, libs} = toBundle(bundle);
+export const parseBundle = (bundle: ParsedBundle | ParsedModule): [ParsedModule, Record<string, ParsedModule>, ParsedModule[]] => {
+  let {module, libs, virtual} = toBundle(bundle);
 
   const out = {} as Record<string, ParsedModule>;
   const traverse = (libs: Record<string, ParsedBundle | ParsedModule>) => {
@@ -33,7 +46,7 @@ export const parseBundle = (bundle: ParsedBundle | ParsedModule): [ParsedModule,
   };
   if (libs) traverse(libs);
 
-  return [module, out];
+  return [module, out, virtual ?? []];
 }
 
 // Visit every module in a bundle
@@ -42,7 +55,7 @@ export const forBundleModules = (
   callback: (m: ParsedModule) => void,
 ) => {
   const traverse = (lib: ParsedBundle | ParsedModule) => {
-    if ('table' in lib) {
+    if ('name' in lib) {
       callback(lib);
       return;
     }
@@ -75,6 +88,8 @@ export const parseLinkAliases = <T>(
 
     let [name, imported] = k.split(':');
     if (!imported && link.entry != null) imported = link.entry;
+    if (!imported && link.module?.entry != null) imported = link.module.entry;
+
     out[name] = link;
     if (imported) {
       if (!aliases) aliases = new Map<string, string>();

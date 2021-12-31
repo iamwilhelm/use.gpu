@@ -30,7 +30,7 @@ export const makeFiber = <F extends Function>(
   args?: any[],
   key?: Key,
 ): LiveFiber<F> => {
-  const bound = null;
+  const bound = null as any;
   const depth = parent ? parent.depth + 1 : 0;
   const id = ++ID;
 
@@ -689,7 +689,7 @@ export const bustFiberCaches = <F extends Function>(fiber: LiveFiber<F>) => {
   const {host, version, yeeted} = fiber;
   if (DEBUG && (version != null || yeeted)) console.log('Busting caches on', formatNode(fiber));
   if (version != null) {
-    fiber.version = (fiber.version + 1) & 0x7FFFFFFF;
+    fiber.version = (version + 1) & 0x7FFFFFFF;
   }
   if (yeeted) {
     let yt = yeeted;

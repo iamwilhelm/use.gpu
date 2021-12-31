@@ -58,28 +58,28 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   bound?: F,
   
   // State for user hooks
-  state: any[],
+  state: any[] | null,
   pointer: number,
 
   // State for per-component memoization
-  version: number,
-  memo: number,
+  version: number | null,
+  memo: number | null,
 
   // Last rendered return type
-  type: ArrowFunction,
+  type: ArrowFunction | null,
 
   // Mounting state
-  seen?: Set<Key>,
-  mount?: LiveFiber<any> | null,
-  mounts?: FiberMap | null,
-  order?: Key[],
-  next?: LiveFiber<any> | null,
+  seen: Set<Key> | null,
+  mount: LiveFiber<any> | null,
+  mounts: FiberMap | null,
+  order: Key[] | null,
+  next: LiveFiber<any> | null,
 
   // User-specified context
   context: FiberContext,
 
   // Yeeting state
-  yeeted?: FiberYeet<any>,
+  yeeted: FiberYeet<any> | null,
 
   __inspect?: Record<string, any> | null,
 };

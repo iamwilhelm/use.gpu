@@ -20,8 +20,8 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
   if (!state) state = fiber.state = [];
   fiber.pointer += STATE_SLOTS;
   
-  const marker = state[pointer];
-  if (marker === undefined) state[pointer] = hookType;
+  const marker = state![pointer];
+  if (marker === undefined) state![pointer] = hookType;
   else if (marker !== hookType) throw new Error("Hooks were not called in the same order as last render.");
 
   return pointer + 1;
@@ -32,8 +32,8 @@ export const useNoHook = (hookType: Hook) => () => {
 
   const i = pushState(fiber, hookType);
   const {state} = fiber;
-  state[i] = null;
-  state[i + 1] = null;
+  state![i] = null;
+  state![i + 1] = null;
 };
 
 export const useFiber = () => {
@@ -111,24 +111,24 @@ export const useState = <T>(
   const i = pushState(fiber, Hook.STATE);
   let {state, host, yeeted} = fiber;
 
-  let value    = state[i];
-  let setValue = state[i + 1];
+  let value    = state![i];
+  let setValue = state![i + 1];
 
   if (value === undefined) {
     value = (initialState instanceof Function) ? initialState() : initialState;
     setValue = host
       ? (value: Reducer<T>) => {
           host!.schedule(fiber, () => {
-            if (value instanceof Function) state[i] = value(state[i]);
-            else state[i] = value;
+            if (value instanceof Function) state![i] = value(state![i]);
+            else state![i] = value;
             bustFiberCaches(fiber);
             scheduleYeetRoots(fiber);
           });
         }
       : NOP;
 
-    state[i] = value;
-    state[i + 1] = setValue;
+    state![i] = value;
+    state![i + 1] = setValue;
   }
 
   return [value as unknown as T, setValue];
@@ -144,14 +144,14 @@ export const useMemo = <T>(
   const i = pushState(fiber, Hook.MEMO);
   let {state, host} = fiber;
 
-  let value = state[i];
-  const deps = state[i + 1];
+  let value = state![i];
+  const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
     value = initialState();
 
-    state[i] = value;
-    state[i + 1] = dependencies;
+    state![i] = value;
+    state![i + 1] = dependencies;
   }
 
   return value as unknown as T;
@@ -167,14 +167,14 @@ export const useOne = <T>(
   const i = pushState(fiber, Hook.ONE);
   let {state, host} = fiber;
 
-  let value = state[i];
-  const dep = state[i + 1];
+  let value = state![i];
+  const dep = state![i + 1];
 
   if (dep !== dependency) {
     value = initialState();
 
-    state[i] = value;
-    state[i + 1] = dependency;
+    state![i] = value;
+    state![i + 1] = dependency;
   }
 
   return value as unknown as T;
@@ -190,14 +190,14 @@ export const useCallback = <T extends Function>(
   const i = pushState(fiber, Hook.CALLBACK);
   let {state, host} = fiber;
 
-  let value = state[i];
-  const deps = state[i + 1];
+  let value = state![i];
+  const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
     value = initialValue;
 
-    state[i] = value;
-    state[i + 1] = dependencies;
+    state![i] = value;
+    state![i + 1] = dependencies;
   }
 
   return value as unknown as T;
@@ -213,14 +213,14 @@ export const useResource = <R>(
   const i = pushState(fiber, Hook.RESOURCE);
   let {state, host} = fiber;
 
-  let {tag} = state[i] || NO_RESOURCE;
-  const deps = state[i + 1];
+  let {tag} = state![i] || NO_RESOURCE;
+  const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
 
     if (!tag) {
       tag = makeResourceTag();
-      state[i] = {tag, value: null};
+      state![i] = {tag, value: null};
 
       if (host) host.track(fiber, tag);
     }
@@ -228,14 +228,14 @@ export const useResource = <R>(
       tag(null);
     }
 
-    state[i + 1] = dependencies;
+    state![i + 1] = dependencies;
 
     const value = callback(tag);
-    state[i].value = value;
+    state![i].value = value;
     return value;
   }
 
-  return state[i].value as R;
+  return state![i].value as R;
 }
 
 // Don't use a resource hook (clean up prior tag)
@@ -245,11 +245,11 @@ export const useNoResource = () => {
   const i = pushState(fiber, Hook.RESOURCE);
   let {state, host} = fiber;
 
-  let {tag} = state[i] || NO_RESOURCE;
+  let {tag} = state![i] || NO_RESOURCE;
   if (tag) tag(null);
 
-  state[i] = null;
-  state[i + 1] = null;
+  state![i] = null;
+  state![i + 1] = null;
 }
 
 // Grab a context from the fiber
@@ -299,8 +299,8 @@ export const useSomeContext = <C>(
   if (!root) throw new Error(`Context ${context.displayName} was used without being provided.`);
 
   if (host) {
-    if (!state[i]) {
-      state[i] = true;
+    if (!state![i]) {
+      state![i] = true;
       host.track(fiber, () => host.undepend(fiber, root));
     }
 

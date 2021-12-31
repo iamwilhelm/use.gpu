@@ -9,3 +9,4 @@ export * from './inline';
 export * from './interact';
 export * from './providers';
 export * from './render';
+export * from './router';

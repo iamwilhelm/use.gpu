@@ -113,7 +113,7 @@ export const makeContextState = <F extends Function>(
   const values = new Map(parent.values);
   const roots = new Map(parent.roots);
   roots.set(context, fiber);
-  values.set(context, { current: value });
+  values.set(context, { current: value, displayName: context.displayName });
   
   return {values, roots};
 };
@@ -219,6 +219,8 @@ export const mountFiberCall = <F extends Function>(
   call?: DeferredCall<any> | null,
   callbacks?: RenderCallbacks,
 ) => {
+  if (fiber.mounts?.size) reconcileFiberCalls(fiber, EMPTY_ARRAY, callbacks);
+
   const {mount} = fiber;
   const args = mount?.args;
 
@@ -252,6 +254,8 @@ export const reconcileFiberCalls = <F extends Function>(
   calls: DeferredCall<any>[],
   callbacks?: RenderCallbacks,
 ) => {
+  if (fiber.mount) mountFiberCall(fiber, null, callbacks);
+
   let {mounts, order, seen} = fiber;
 
   if (!mounts) mounts = fiber.mounts = new Map();
@@ -494,11 +498,12 @@ export const provideFiber = <F extends Function>(
   prevArgs: any[],
   callbacks?: RenderCallbacks,
 ) => {
+  // Disallow stack slicing because <Provide> is not renderable by itself as a built-in.
+  if (callbacks) if (!callbacks.onRender(fiber, false)) return;
+
   if (!fiber.args) return;
   let {args: [context, value, calls, isMemo]} = fiber;
   let [,, prevCalls] = prevArgs ?? [];
-
-  if (callbacks) if (!callbacks.onRender(fiber)) return;
 
   if (fiber.context.roots.get(context) !== fiber) {
     fiber.context = makeContextState(fiber, fiber.context, context, value);
@@ -506,13 +511,16 @@ export const provideFiber = <F extends Function>(
   }
   else {
     // Set new value if changed
-    const lastValue = fiber.context.values.get(context).current;
+    const ref = fiber.context.values.get(context);
+    const lastValue = ref.current;
     if (value !== lastValue) {
-      fiber.context.values.get(context).current = value;
-      if (callbacks) callbacks.onUpdate(fiber);
+      ref.current = value;
     }
     // If memoized and mounts are identical, stop
     else if (isMemo && prevCalls === calls) return;
+
+    // Invalidate downstream dependencies
+    if (callbacks) callbacks.onUpdate(fiber);
   }
 
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls, callbacks);
@@ -532,10 +540,11 @@ export const consumeFiber = <F extends Function>(
   fiber: LiveFiber<F>,
   callbacks?: RenderCallbacks,
 ) => {
+  // Disallow stack slicing because <Consume> is not renderable by itself as a built-in.
+  if (callbacks) if (!callbacks.onRender(fiber, false)) return;
+
   if (!fiber.args) return;
   let {args: [context, calls, done]} = fiber;
-
-  if (callbacks) if (!callbacks.onRender(fiber)) return;
 
   if (!fiber.next) {
     const registry = new Map<LiveFiber<any>, any>();
@@ -571,13 +580,14 @@ export const detachFiber = <F extends Function>(
   fiber: LiveFiber<F>,
   callbacks?: RenderCallbacks,
 ) => {
+  // Disallow stack slicing because <Detach> is not renderable by itself as a built-in.
+  if (callbacks) if (!callbacks.onRender(fiber, false)) return;
+
   if (!fiber.args) return;
   let {next, args: [call, callback]} = fiber;
 
   if (!next || (next.f !== call.f)) next = fiber.next = makeSubFiber(fiber, call);
   next.args = call.args;
-
-  if (callbacks) if (!callbacks.onRender(fiber)) return;
 
   const roots = [next];
   callback(() => {
@@ -589,6 +599,8 @@ export const detachFiber = <F extends Function>(
 // Dispose of a fiber's resources and all its mounted sub-fibers
 export const disposeFiber = <F extends Function>(fiber: LiveFiber<F>) => {
   disposeFiberMounts(fiber);
+
+  fiber.bound = null;
   if (fiber.host) fiber.host.dispose(fiber);
 }
 
@@ -604,7 +616,7 @@ export const disposeFiberMounts = <F extends Function>(fiber: LiveFiber<F>) => {
   if (next) disposeFiber(next);
 
   // @ts-ignore
-  fiber.bound = fiber.mount = fiber.mounts = fiber.next = null;
+  fiber.mount = fiber.mounts = fiber.next = null;
 }
 
 // Update a fiber in-place and recurse

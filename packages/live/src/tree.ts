@@ -126,8 +126,8 @@ export const traverseFiber = (fiber: LiveFiber<any>, f: (f: LiveFiber<any>) => v
 const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): RenderCallbacks => {
   let {depth} = root;
 
-  const onRender = (fiber: LiveFiber<any>) => {
-    const inSameStack = fiber.depth - depth <= SLICE_STACK;
+  const onRender = (fiber: LiveFiber<any>, allowSlice?: boolean = true) => {
+    const inSameStack = !allowSlice || (fiber.depth - depth <= SLICE_STACK);
     if (inSameStack) {
       // Remove from to-visit set
       visit.delete(fiber);

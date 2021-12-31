@@ -1,10 +1,11 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
-import { use, useContext, useOne } from '@use-gpu/live';
+import { provide, use, useContext, useOne } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
+import { FrameContext } from '../providers/frame-context';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
@@ -62,7 +63,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
   uniforms.viewSize.value = [ width, height ];
   uniforms.viewPixelRatio.value = pixelRatio;
 
-  return use(ViewProvider)({
+  return provide(FrameContext, null, use(ViewProvider)({
     defs: VIEW_UNIFORMS, uniforms, children,
-  });
+  }));
 };

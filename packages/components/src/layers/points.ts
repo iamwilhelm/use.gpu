@@ -34,14 +34,19 @@ const MASK_SHADER = {
 
 export type PointsProps = {
   position?: number[] | TypedArray,
-  color?: number[],
   size?: number,
-  perspective?: number,
+  color?: number[],
+  depth?: number,
 
   positions?: StorageSource,
   sizes?: StorageSource,
   colors?: StorageSource,
-  perspectives?: StorageSource,
+  depths?: StorageSource,
+
+  getPosition?: ShaderModule,
+  getSize?: ShaderModule,
+  getColor?: ShaderModule,
+  getDepth?: ShaderModule,
 
   shape?: PointShape,
   
@@ -59,8 +64,14 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     colors,
     size,
     sizes,
-    perspective,
-    perspectives,
+    depth,
+    depths,
+
+    getPosition,
+    getSize,
+    getColor,
+    getDepth,
+    
     shape = PointShape.Circle,
     
     mode = RenderPassMode.Opaque,
@@ -68,8 +79,8 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
   } = props;
 
   const key = fiber.id;
-  const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, sizes ?? size));
-  const getSize = castTo(getSizeFloat, 'vec2', 'xx');  
+  const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, sizes ?? size ?? getSize));
+  const getSizeVec2 = castTo(getSizeFloat, 'vec2', 'xx');  
 
   const getMask = MASK_SHADER[shape] ?? MASK_SHADER[PointShape.Circle];
 
@@ -78,10 +89,14 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     positions,
     color,
     colors,
-    perspective,
-    perspectives,
+    depth,
+    depths,
 
-    getSize,
+    getPosition,
+    getColor,
+    getDepth,
+
+    getSize: getSizeVec2,
     getMask,
 
     mode,

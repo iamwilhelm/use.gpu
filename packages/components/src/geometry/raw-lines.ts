@@ -21,19 +21,21 @@ export type RawLinesProps = {
   position?: number[] | TypedArray,
   segment?: number,
   size?: number,
-  color?: number,
+  color?: number[] | TypedArray,
+  depth?: number,
 
   positions?: StorageSource,
   segments?: StorageSource,
   sizes?: StorageSource,
   colors?: StorageSource,
+  depths?: number,
 
   getPosition?: ShaderModule,
   getSegment?: ShaderModule,
   getSize?: ShaderModule,
   getColor?: ShaderModule,
+  getDepth?: ShaderModule,
 
-  depth?: number,
   join?: 'miter' | 'round' | 'bevel',
 
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
@@ -48,6 +50,7 @@ const VERTEX_BINDINGS = [
   { name: 'getSegment', format: 'int', value: 0 },
   { name: 'getColor', format: 'vec4', value: [0.5, 0.5, 0.5, 1] },
   { name: 'getSize', format: 'float', value: 1 },
+  { name: 'getDepth', format: 'float', value: 0 },
 ] as UniformAttributeValue[];
 
 const LINE_JOIN_SIZE = {
@@ -100,6 +103,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) =>
     props.segments ?? props.segment ?? props.getSegment,
     props.colors ?? props.color ?? props.getColor,
     props.sizes ?? props.size ?? props.getSize,
+    props.depths ?? props.depth ?? props.getDepth,
   ]);
 
   const key = fiber.id;

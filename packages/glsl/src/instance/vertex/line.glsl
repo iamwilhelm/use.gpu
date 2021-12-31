@@ -1,5 +1,5 @@
 #pragma import {SolidVertex} from '@use-gpu/glsl/use/types'
-#pragma import {worldToClip3D} from '@use-gpu/glsl/use/view'
+#pragma import {worldToClip, worldToClip3D, getPerspectiveScale} from '@use-gpu/glsl/use/view'
 #pragma import {getStripIndex} from '@use-gpu/glsl/geometry/strip'
 #pragma import {getLineJoin} from '@use-gpu/glsl/geometry/line'
 
@@ -9,6 +9,7 @@ vec4 getPosition(int);
 int getSegment(int);
 vec4 getColor(int);
 float getSize(int);
+float getDepth(int);
 
 #pragma export
 SolidVertex getLineVertex(int vertexIndex, int instanceIndex) {
@@ -39,17 +40,22 @@ SolidVertex getLineVertex(int vertexIndex, int instanceIndex) {
   int segment = getSegment(cornerIndex);
   vec4 color = getColor(cornerIndex);
   float size = getSize(cornerIndex);
+  float depth = getDepth(cornerIndex);
 
   vec4 beforePos = getPosition(cornerIndex - 1);
   vec4 centerPos = getPosition(cornerIndex);
   vec4 afterPos = getPosition(cornerIndex + 1);
 
   vec3 before = worldToClip3D(beforePos);
-  vec3 center = worldToClip3D(centerPos);
+  vec4 center = worldToClip(centerPos);
   vec3 after = worldToClip3D(afterPos);
 
+  // Lerp between fixed size and full perspective
+  float pixelScale = getPerspectiveScale(center.w, depth);
+  size *= pixelScale;
+
   float arc = joinIndex / float(LINE_JOIN_SIZE);
-  vec3 lineJoin = getLineJoin(before, center, after, arc, xy.y, size, segment, LINE_JOIN_STYLE);
+  vec3 lineJoin = getLineJoin(before, center.xyz / center.w, after, arc, xy.y, size, segment, LINE_JOIN_STYLE);
 
   return SolidVertex(
     vec4(lineJoin, 1.0),

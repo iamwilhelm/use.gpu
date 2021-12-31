@@ -39,3 +39,12 @@ vec3 worldToClip3D(vec4 position) {
   position = viewToClip(worldToView(position));
   return position.xyz / position.w;
 }
+
+#pragma export
+float getPerspectiveScale(float w, float f) {
+  mat4 m = viewUniforms.projectionMatrix;
+  float worldScale = m[1][1] * viewUniforms.viewWorldUnit;
+  float clipScale = mix(1.0, worldScale / w, f);
+  float pixelScale = clipScale * viewUniforms.viewPixelRatio;
+  return pixelScale;
+}

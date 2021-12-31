@@ -15,7 +15,7 @@ const DEFAULT_ORBIT_CAMERA = {
   focus: 5,
   dolly: 1,
 
-  fov: Math.PI / 2,
+  fov: Math.PI / 3,
   near: 0.001,
   far: 1000,
 };

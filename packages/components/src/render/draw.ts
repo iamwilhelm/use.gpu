@@ -1,5 +1,5 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
-import { gatherReduce, makeContext, useContext, useSomeContext, useNoContext, useOne, useMemo, provide } from '@use-gpu/live';
+import { gatherReduce, makeContext, useContext, useSomeContext, useOptionalContext, useNoContext, useOne, useMemo, provide } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { FrameContext } from '../providers/frame-provider';
 import { PickingContext } from './picking';
@@ -19,7 +19,7 @@ const makeStaticDone = (c: any): any => {
 const Done = makeStaticDone((fiber: LiveFiber<any>) => (ts: Task[]) => {
   const {device, gpuContext, colorAttachments, samples} = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
-  const frameContext = useContext(FrameContext);
+  const frameContext = useOptionalContext(FrameContext);
 
   const view = gpuContext
   // @ts-ignore

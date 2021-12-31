@@ -3,10 +3,12 @@ import { memo, makeContext, use, useContext, useOne, useMemo, provide } from '@u
 import { RouterContext, Route } from './router';
 
 export type RouteState = {
-  element: LiveElement<any>,
+  base: string,
+  params: Record<string, string>,
+  routes?: Record<string, Route>,
 };
 
-export const RouteContext = makeContext<RouterState>(null, 'RouteContext');
+export const RouteContext = makeContext<RouteState>(null, 'RouteContext');
 
 type Matcher = {
   regexp: RegExp,
@@ -22,14 +24,13 @@ export type RoutesProps = {
 
 const NO_PATH = '';
 
-const toArray = <T,>(x: T | T[]): T[] => Array.isArray(x) ? x : x ? [x] : []; 
-
 const joinPath = (a: string, b: string) => {
   if (b[0] === '/') return b;
   if (a[a.length - 1] === '/') return a + b;
   return a + '/' + b;
 }
 
+const escapeName = (s: string) => s.replace(/[^A-Za-z0-9_-]*/g, '');
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const Outlet: LiveComponent<any> = (fiber) => () => {
@@ -55,8 +56,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((fiber) => (props) => {
       const {element, routes: rs} = routes[path];
 
       const fullPath = joinPath(base, path);
-      const isFolder = path[path.length - 1] === '/';
-      const regexp = new RegExp('^' + escapeRegExp(fullPath) + (isFolder ? '' : '(/|$)'));
+      const regexp = pathSpecToRegexp(fullPath);
 
       matchers.push({
         regexp,
@@ -69,24 +69,56 @@ export const Routes: LiveComponent<RoutesProps> = memo((fiber) => (props) => {
     return matchers;
   }, [base, routes]);
 
+  const b = base;
   const [context, element] = useMemo(() => {
-    let sub = base;
+    let base = b;
+
+    let params = {} as Record<string, string>;
     let routes = null as Record<string, Route> | null;
     let element = null as LiveElement<any>;
 
     for (const matcher of matchers) {
-      if (matcher.regexp.test(currentPath)) {
+      const match = currentPath.match(matcher.regexp);
+      if (match) {
+        ({ groups: params } = match);
+
         if (matcher.routes) routes = matcher.routes;
         if (matcher.element) element = matcher.element;
-        if (matcher.base) sub = matcher.base;
+        if (matcher.base) base = matcher.base;
+
         break;
       }
     }
 
-    return [{routes, base: sub}, element];
+    return [{routes, base, params}, element];
   }, [base, matchers, currentPath]);
 
   if (element) return provide(RouteContext, context, element);
   if (context.routes) return use(Routes)(context);
   return null;
 }, 'Routes');
+
+export const pathSpecToRegexp = (s: string) => {
+  const segments = s.split('/').filter(s => s.length);
+  let regexp = '^';
+
+  for (const segment of segments) {
+    regexp += '/';
+    if (segment[0] === ':') {
+      const name = escapeName(segment.slice(1));
+      regexp += `(?<${name}>[^/]*)`;
+    }
+    else if (segment === '*') {
+      regexp += '[^/]*';
+    }
+    else {
+      regexp += escapeRegExp(segment);
+    }
+  }
+
+  const isFolder = s[s.length - 1] === '/';
+  if (!isFolder) regexp += '(/|$)';
+  console.log({regexp})
+
+  return new RegExp(regexp);
+}

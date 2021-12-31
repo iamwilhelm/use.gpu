@@ -269,6 +269,23 @@ export const useContext = <C>(
   return values.get(context).current ?? context.initialValue;
 }
 
+// Grab an optional context from the fiber
+export const useOptionalContext = <C>(
+  context: LiveContext<C>,
+) => {
+  const fiber = useFiber();
+
+  const {host, context: {values, roots}} = fiber;
+  const root = roots.get(context);
+  if (!root) return context.initialValue ?? null;
+
+  if (host && host.depend(fiber, root)) {
+    host.track(fiber, () => host.undepend(fiber, root));
+  }
+
+  return values.get(context).current ?? context.initialValue;
+}
+
 // Grab a context from the fiber (optional mode)
 export const useSomeContext = <C>(
   context: LiveContext<C>,

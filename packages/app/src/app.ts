@@ -21,6 +21,7 @@ import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 
 import { GeometryPage } from './pages/geometry';
+import { EmptyPage } from './pages/empty';
 
 export type AppProps = {
   device: GPUDevice,
@@ -41,6 +42,8 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         "/": {
           routes: {
             "test": { element: use(GeometryPage)({ canvas }) },
+            ":a/hello/:b": { element: use(EmptyPage)() },
+            "*": { element: use(EmptyPage)() },
           },
         },
       },
@@ -65,8 +68,8 @@ const useInspector = () => {
   const [inspect, setInspect] = useState<boolean>(true);
   useResource((dispose) => {
     const keydown = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === 'i') setInspect((s) => !s);
-      if (e.metaKey && e.key === 'j') setInspect((s) => s);
+      if ((e.ctrlKey || e.metaKey) && e.key === 'i') setInspect((s) => !s);
+      if ((e.ctrlKey || e.metaKey) && e.key === 'j') setInspect((s) => s);
     }
 
     window.addEventListener('keydown', keydown);

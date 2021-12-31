@@ -11,7 +11,7 @@ html {
   --shim: rgba(0, 0, 0, 0.95);
   --shimGray: rgba(255, 255, 255, 0.1);
 
-  --colorTextMuted: #888;
+  --colorTextMuted: rgba(255, 255, 255, .5);
   --colorText: #ddd;
   --colorTextHover: #eee;
   --colorTextActive: #fff;

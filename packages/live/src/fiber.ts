@@ -45,9 +45,9 @@ export const makeFiber = <F extends Function>(
     host, depth, path,
     yeeted, context,
     state: null, pointer: 0, version: null, memo: null,
-    mount: null, mounts: null, next: null, seen: null,
+    mount: null, mounts: null, next: null, seen: null, order: null,
     type: null, id,
-  } as any as LiveFiber<F>;
+  } as LiveFiber<F>;
 
   self.bound = bind(f, self) as any as F;
 

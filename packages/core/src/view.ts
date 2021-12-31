@@ -17,15 +17,19 @@ export const VIEW_UNIFORMS: UniformAttribute[] = [
   },
   {
     name: 'viewResolution',
-    format: UniformType.vec2
+    format: UniformType.vec2,
   },
   {
     name: 'viewSize',
-    format: UniformType.vec2
+    format: UniformType.vec2,
+  },
+  {
+    name: 'viewWorldUnit',
+    format: UniformType.float,
   },
   {
     name: 'viewPixelRatio',
-    format: UniformType.float
+    format: UniformType.float,
   },
 ];
 
@@ -37,14 +41,9 @@ export const makeOrthogonalMatrix = (
   near: number,
   far: number,
 ): mat4 => {
-  const width = Math.abs(right - left);
-  const height = Math.abs(top - bottom);
-
-  const aspect = width / height;
-  
   const x = 2 / (right - left);
-  const y = 2 / (top - bottom);
-  const z = 1 / (far - near);
+  const y = 2 / (bottom - top);
+  const z = -1 / (far - near);
 
   const wx = -(right + left) / (right - left);
   const wy = -(bottom + top) / (bottom - top);
@@ -52,14 +51,16 @@ export const makeOrthogonalMatrix = (
 
   const matrix = mat4.create();
   mat4.set(matrix,
-    x, 0, 0, wx,
-    0, y, 0, wy,
-    0, 0, z, wz,
-    0, 0, 0, 1,
+    x, 0, 0, 0,
+    0, y, 0, 0,
+    0, 0, z, 0,
+    wx, wy, wz, 1,
   );
 
   return matrix;
 }
+
+let t = 0;
 
 export const makeProjectionMatrix = (
   width: number,
@@ -67,15 +68,49 @@ export const makeProjectionMatrix = (
   fov: number,
   near: number,
   far: number,
+  focus: number = 1,
+  dolly: number = 1,
 ): mat4 => {
   const aspect = width / height;
-  const matrix = mat4.create();
-  mat4.perspective(matrix, fov, aspect, near, far);
+  let matrix;
 
-  const z = mat4.create();
-  mat4.translate(z, z, vec3.fromValues(0, 0, 0.5));
-  mat4.scale(z, z, vec3.fromValues(1, 1, 0.5));
-  mat4.multiply(matrix, z, matrix);
+  if (dolly === 1) {
+    // Normal GL perspective matrix
+    matrix = mat4.create();
+    mat4.perspective(matrix, fov, aspect, near, far);
+
+    // Move Z from -1..1 to 0..1 in clip space
+    const z = mat4.create();
+    mat4.translate(z, z, vec3.fromValues(0, 0, 0.5));
+    mat4.scale(z, z, vec3.fromValues(1, 1, 0.5));
+    mat4.multiply(matrix, z, matrix);
+  }
+  else if (dolly > 0) {
+    const shift = (1 / dolly - 1) * focus;
+    const dFov = Math.atan(Math.tan(fov / 2) * dolly) * 2;
+    const dNear = near + shift;
+    const dFar = far + shift;
+
+    // GL perspective matrix with reduced FOV and shifted near/far plane
+    matrix = mat4.create();
+    mat4.perspective(matrix, dFov, aspect, dNear, dFar);
+
+    // Translate camera in -Z in view space
+    const t = mat4.create();
+    mat4.translate(t, t, vec3.fromValues(0, 0, -shift));
+    mat4.multiply(matrix, matrix, t);
+
+    // Move Z from -1..1 to 0..1 in clip space
+    const z = mat4.create();
+    mat4.translate(z, z, vec3.fromValues(0, 0, 0.5));
+    mat4.scale(z, z, vec3.fromValues(1, 1, 0.5));
+    mat4.multiply(matrix, z, matrix);
+  }
+  else {
+    // Orthogonal matrix
+    const s = focus * Math.tan(fov / 2);
+    matrix = makeOrthogonalMatrix(-aspect * s, aspect * s, -s, s, near, far);
+  }
 
   return matrix;
 }

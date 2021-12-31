@@ -197,6 +197,7 @@ export type ViewUniforms = {
   viewPosition: { value: vec3 | [number, number, number] | number[] },
   viewResolution: { value: vec2 | [number, number] | number[] },
   viewSize: { value: vec2 | [number, number] | number[] },
+  viewFocus: { value: number },
   viewPixelRatio: { value: number },
 };
 

@@ -5,6 +5,8 @@ layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING) uniform ViewUniforms {
   vec4 viewPosition;
   vec2 viewResolution;
   vec2 viewSize;
+  float viewWorldUnit;
+  float viewPixelRatio;
 } viewUniforms;
 
 #pragma export

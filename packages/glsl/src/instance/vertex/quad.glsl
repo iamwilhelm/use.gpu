@@ -24,7 +24,9 @@ SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
   uv = xy * .5 + .5;
   #endif
 
-  float w = mix(position.w, 1.0, instancePerspective);
+  mat4 m = viewUniforms.projectionMatrix;
+  float scale = m[1][1] * viewUniforms.viewWorldUnit;
+  float w = mix(position.w, scale, instancePerspective) * viewUniforms.viewPixelRatio;
   position.xy += xy * viewUniforms.viewResolution * instanceSize * w;
 
   return SolidVertex(

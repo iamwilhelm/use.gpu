@@ -118,7 +118,6 @@ export const pathSpecToRegexp = (s: string) => {
 
   const isFolder = s[s.length - 1] === '/';
   if (!isFolder) regexp += '(/|$)';
-  console.log({regexp})
 
   return new RegExp(regexp);
 }

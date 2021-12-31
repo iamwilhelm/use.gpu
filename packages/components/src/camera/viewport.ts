@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { makeContext, useContext, useOne } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
-import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
+import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
 
@@ -65,10 +65,10 @@ export const Viewport: LiveComponent<ViewportProps> = (fiber) => (props) => {
     viewPixelRatio: { value: null },
   })) as any as ViewUniforms;
 
-  uniforms.projectionMatrix.value = makeOrthogonalMatrix(0, w, 0, h, near, far);
+  uniforms.projectionMatrix.value = makeOrthogonalMatrix(left, right, top, bottom, near, far);
   uniforms.viewMatrix.value = mat4.create();
   uniforms.viewPosition.value = [ 0, 0, 1, 0 ];
-  uniforms.viewResolution.value = [ 1/w, 1/h ];
+  uniforms.viewResolution.value = [ 1 / w, 1 / h ];
   uniforms.viewSize.value = [ w, h ];
   uniforms.viewPixelRatio.value = pixelRatio;
 

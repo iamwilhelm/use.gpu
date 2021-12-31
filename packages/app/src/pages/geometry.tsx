@@ -104,8 +104,9 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (fiber) => (props)
                 );
               },
               render: (positions) => [
-                use(Points)({ positions, colors: positions, size: 50, perspective: 0.95, mode: RenderPassMode.Transparent }),
-                use(Points)({ positions, size: 100, perspective: 0.95, mode: RenderPassMode.Debug }),
+                use(Points)({ positions, colors: positions, size: 20, perspective: 1, mode: RenderPassMode.Transparent }),
+                use(Points)({ positions, size: 20, perspective: 1, mode: RenderPassMode.Debug }),
+                use(Points)({ positions, size: 100, perspective: 0, mode: RenderPassMode.Debug }),
               ],
             }),
             use(Pick)({
@@ -128,6 +129,7 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (fiber) => (props)
 
         use(OrbitCamera)({
           radius, phi, theta,
+          scale: 720,
           children:
             view
         })  

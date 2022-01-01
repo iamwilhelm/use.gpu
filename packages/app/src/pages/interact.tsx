@@ -4,7 +4,7 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   Draw, Pass,
-  Flat, Absolute, Layout, Block, Element,
+  Flat, Absolute, Layout, Block, Flex, Element,
   Aggregate,
 } from '@use-gpu/components';
 import { Mesh } from '../mesh';
@@ -30,9 +30,9 @@ export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props)
                   children:
 
                     use(Absolute)({
-                      left: 10,
+                      left: '50%',
                       top: 10,
-                      width: '50%',
+                      right: 10,
                       bottom: 10,
                       children:
                   
@@ -51,6 +51,15 @@ export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props)
                                   ]
                                 }),
 
+                                use(Flex)({
+                                  alignX: 'end',
+                                  children: [
+                                    use(Element)({ width: 200 }),
+                                    use(Element)({ width: 300 }),
+                                    use(Element)({ width: 200 }),
+                                  ]
+
+                                }),
                                 use(Element)({}),
                               ]
                             })

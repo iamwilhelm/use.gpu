@@ -1,9 +1,19 @@
 import { Key } from '@use-gpu/live/types';
-import { LayoutState } from '../providers/layout-provider';
 
-export type LayoutHandler = (layout: LayoutState) => LayoutResult;
+export type Rectangle = [number, number, number, number];
+export type Point = [number, number];
+
+export type LayoutState = Rectangle;
 export type LayoutResult = {
-  key: Key,
-  box: LayoutState,
-  element: LiveElement<any>,
+  box: Rectangle,
+  size: Point,
+  grow: number,
+  shrink: number,
+
+  results?: LayoutResult[],
+  element?: LiveElement<any>,
+  key?: Key,
 };
+
+export type LayoutGenerator = (layout: LayoutState) => LayoutResult;
+export type LayoutResolver = (layout: LayoutState, ls: LayoutHandler[]) => LayoutResult;

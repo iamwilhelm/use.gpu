@@ -62,5 +62,12 @@ const hookToObject = (
   if (type === Hook.CONSUMER) {
     return {consumer: a?.displayName};
   }
+  if (type === Hook.YOLO) {
+    if (a) {
+      const hooks = chunk(a, STATE_SLOTS);
+      return {yolo: hooks.map(hookToObject)};
+    }
+    return {yolo: a};
+  }
   return null;
 }

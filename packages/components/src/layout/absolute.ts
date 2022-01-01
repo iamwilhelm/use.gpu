@@ -1,8 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { provide, useContext, useMemo } from '@use-gpu/live';
-import { LayoutState, LayoutContext } from '../providers/layout-provider';
-import { parseDimension } from './util';
+import { LayoutContext } from '../providers/layout-provider';
+import { LayoutState } from './types';
+import { parseDimension } from './lib/util';
 
 export type AbsoluteProps = {
   left?: string | number | null,

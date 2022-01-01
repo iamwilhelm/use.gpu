@@ -9,7 +9,7 @@ export type AutoSizeProps = {
 
 export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number, number] => {
   const pixelRatio = window?.devicePixelRatio ?? 1;
-  const {offsetWidth, offsetHeight} = canvas;
+  const {offsetWidth, offsetHeight} = canvas.parentNode;
   return [pixelRatio * offsetWidth, pixelRatio * offsetHeight, pixelRatio];
 }
 
@@ -25,8 +25,14 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (fiber) => (props) => {
   }, [canvas]);
  
   const [[width, height, pixelRatio], setSize] = useState(() => getCanvasSize(window, canvas));
-  if (canvas.width  !==  width) canvas.width  = width;
-  if (canvas.height !== height) canvas.height = height;
+  if (canvas.width  !==  width) {
+    canvas.width  = width;
+    canvas.style.width = `${width / pixelRatio}px`;
+  }
+  if (canvas.height !== height) {
+    canvas.height = height;
+    canvas.style.height = `${height / pixelRatio}px`;
+  }
 
   useResource((dispose) => {
     const resize = () => setSize(getCanvasSize(window, canvas))

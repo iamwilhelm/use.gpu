@@ -3,7 +3,7 @@ import { UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
 import { LayerAggregate, LayerType } from './types';
 
 import { RenderContext } from '../providers/render-provider';
-import { use, resume, multiGather, useContext } from '@use-gpu/live';
+import { use, resume, multiGather, useContext, useYolo, useOne, useMemo } from '@use-gpu/live';
 import {
   makeDataArray,
   makeStorageBuffer,
@@ -20,6 +20,13 @@ import { Lines } from './lines';
 export type AggregateProps = {
   mode?: RenderPassMode | string,
   id?: number,
+};
+
+type AggregateBuffer = {
+  buffer: GPUBuffer,
+  array: TypedArray,
+  dims: number,
+  source: StorageSource,
 };
 
 const allCount = (a: number, b: number): number => a + b.count + (b.isLoop ? 3 : 0);
@@ -40,27 +47,54 @@ const Resume = resume((fiber) => (
   const {device} = useContext(RenderContext);
 
   const out = [] as LiveElement[];
-  for (const type in aggregates) {
-    if (type === LayerType.Line) {
-      const props = aggregateLines(device, aggregates[type]);
-      out.push(use(Lines)(props));      
+  useYolo(() => {
+    for (const type in aggregates) {
+      const aggregator = AGGREGATORS[type];
+      if (!aggregator) continue;
+
+      const [makeAggregator, Component] = aggregator;
+      const items = aggregates[type];
+      const {keys, count, memoKey} = getItemSummary(items);
+
+      // Invalidate storage if too small, or set of keys changes.
+      const sizeRef = useOne(() => ({ current: 0 }));
+      const versionRef = useOne(() => ({ current: 0 }));
+      if (sizeRef.current < count) {
+        versionRef.current++;
+
+        // Grow by at least 20%
+        sizeRef.current = Math.max(count, Math.round(sizeRef.current * 1.2) | 0x7);
+      }
+      useOne(() => versionRef.current++, memoKey);
+
+      const storage = useMemo(() =>
+        makeAggregator(device, items, keys, sizeRef.current),
+        [versionRef.current]
+      );
+      
+      const props = storage.update(items);
+      out.push(use(Component)(props));      
     }
-    else if (type === LayerType.Rectangle) {
-      const props = aggregateRectangles(device, aggregates[type]);
-      out.push(use(Rectangles)(props));
-    }
-  }
+  });
 
   return out;
 }, 'Aggregate');
 
-const aggregateLines = (
-  device: GPUDevice,
-  items: LineAggregate[],
-) => {
+const getItemSummary = (items: LayerAggregate[]) => {
   const keys = items.reduce(allKeys, new Set());
   const count = items.reduce(allCount, 0);
-  const props = {count, join: 'miter'};
+  const memoKey = Array.from(keys).join('/');
+
+  return {keys, count, memoKey};
+}
+
+const makeLineAccumulator = (
+  device: GPUDevice,
+  items: LineAggregate[],
+  keys: Set<string>,
+  count: number,
+) => {
+  const storage = {} as Record<string, AggregateBuffer>;
 
   const hasPosition = keys.has('positions') || keys.has('position');
   const hasSegment = keys.has('segments') || keys.has('segment');
@@ -68,85 +102,59 @@ const aggregateLines = (
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasDepth = keys.has('depths') || keys.has('depth');
 
-  if (hasSegment) props.segments = makeAggregateSource(device, UniformType.int, items, count, 'segment', 'segments').source;
-  else props.segments = makeAggregateSegments(device, items, count).source;
+  storage.segments = makeAggregateBuffer(device, UniformType.int, count);
 
-  if (hasPosition) props.positions = makeAggregateSource(device, UniformType.vec4, items, count, 'position', 'positions').source;
-  if (hasColor) props.colors = makeAggregateSource(device, UniformType.vec4, items, count, 'color', 'colors').source;
-  if (hasSize) props.sizes = makeAggregateSource(device, UniformType.float, items, count, 'size', 'sizes').source;
-  if (hasDepth) props.depth = makeAggregateSource(device, UniformType.float, items, count, 'depth', 'depths').source;
+  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.float, count);
+  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.float, count);
 
-  return props;
+  return {
+    count,
+    update: (items: LineAggregate[]) => {
+      const count = items.reduce(allCount, 0);
+      const props = {count, join: 'miter'};
+
+      if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
+      else props.segments = updateAggregateSegments(device, storage.segments, items, count);
+
+      if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
+      if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+      if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
+      if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
+
+      return props;
+    },
+  };
 };
 
-const aggregateRectangles = (
+const makeRectangleAccumulator = (
   device: GPUDevice,
-  items: RectangleAggregate[],
+  items: LineAggregate[],
+  keys: Set<string>,
+  count: number,
 ) => {
-  const keys = items.reduce(allKeys, new Set());
-  const count = items.reduce(allCount, 0);
-  const props = {count};
+  const storage = {} as Record<string, AggregateBuffer>;
 
   const hasRectangle = keys.has('rectangles') || keys.has('rectangle');
   const hasColor = keys.has('colors') || keys.has('color');
 
-  if (hasRectangle) props.rectangles = makeAggregateSource(device, UniformType.vec4, items, count, 'rectangle', 'rectangles').source;
-  if (hasColor) props.colors = makeAggregateSource(device, UniformType.vec4, items, count, 'color', 'colors').source;
+  if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
 
-  return props;
+  return {
+    count,
+    update: (items: LineAggregate[]) => {
+      const count = items.reduce(allCount, 0);
+      const props = {count, join: 'miter'};
+
+      if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');
+      if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+
+      return props;
+    },
+  };
 };
-
-const makeAggregateSegments = (
-  device: GPUDevice,
-  items: LayerAggregate[],
-  count: number,
-) => {
-  const aggregate = makeAggregateBuffer(device, 'int', count);
-  const {buffer, array, source, dims} = aggregate;
-
-  const chunks = [] as number[];
-  const loops = [] as boolean[];
-
-  for (const item of items) {
-    const {count, isLoop} = item;
-    chunks.push(count);
-    loops.push(!!isLoop);
-  }
-
-  copyChunksToSegments(array, chunks, loops);
-  uploadBuffer(device, buffer, array.buffer);
-  console.log('segments', array);
-
-  return aggregate;
-}
-
-const makeAggregateSource = (
-  device: GPUDevice,
-  format: UniformType,
-  items: LayerAggregate[],
-  count: number,
-  key: string,
-  keys: string,
-) => {
-  const aggregate = makeAggregateBuffer(device, format, count);
-  const {buffer, array, source, dims} = aggregate;
-
-  let pos = 0;
-  for (const item of items) {
-    const {count, [key]: single, [keys]: multiple, isLoop} = item;
-
-    if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count, isLoop);
-    else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count, isLoop);
-
-    const n = count + (isLoop ? 3 : 0);
-    pos += n * dims;
-  }
-
-  uploadBuffer(device, buffer, array.buffer);
-  console.log(key, array);
-
-  return aggregate;
-}
 
 const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number) => {
   const {array, dims} = makeDataArray(format, length);
@@ -162,3 +170,57 @@ const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: num
 
   return {buffer, array, source, dims};
 }
+
+const updateAggregateBuffer = (
+  device: GPUDevice,
+  aggregate: AggregateBuffer,
+  items: LayerAggregate[],
+  count: number,
+  key: string,
+  keys: string,
+) => {
+  const {buffer, array, source, dims} = aggregate;
+
+  let pos = 0;
+  for (const item of items) {
+    const {count, [key]: single, [keys]: multiple, isLoop} = item;
+
+    if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count, isLoop);
+    else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count, isLoop);
+
+    const n = count + (isLoop ? 3 : 0);
+    pos += n * dims;
+  }
+
+  uploadBuffer(device, buffer, array.buffer);
+
+  return source;
+}
+
+const updateAggregateSegments = (
+  device: GPUDevice,
+  aggregate: AggregateBuffer,
+  items: LayerAggregate[],
+  count: number,
+) => {
+  const {buffer, array, source, dims} = aggregate;
+
+  const chunks = [] as number[];
+  const loops = [] as boolean[];
+
+  for (const item of items) {
+    const {count, isLoop} = item;
+    chunks.push(count);
+    loops.push(!!isLoop);
+  }
+
+  copyChunksToSegments(array, chunks, loops);
+  uploadBuffer(device, buffer, array.buffer);
+
+  return source;
+}
+
+const AGGREGATORS = {
+  [LayerType.Line]: [makeLineAccumulator, Lines],
+  [LayerType.Rectangle]: [makeRectangleAccumulator, Rectangles],
+};

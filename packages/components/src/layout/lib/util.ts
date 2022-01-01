@@ -8,3 +8,11 @@ export const parseDimension = (x: string | number, total: number): number => {
 
   return +s;
 }
+
+export const parseAlignment = (x: string | number): number => {
+  const isStart = (x === 'start');
+  const isEnd = (x === 'end');
+
+  const align = isStart ? 0 : isEnd ? 1 : 0.5;
+  return align;
+}

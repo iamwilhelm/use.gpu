@@ -26,6 +26,37 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
 
   return pointer + 1;
 }
+export const yoloState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hook) => {
+  let {state, pointer} = fiber;
+  if (!state) return;
+
+  let n = state.length;
+  let j = pointer;
+  while (j < n) {
+    const type = state[j];
+    const i = j + 1;
+    switch (type) {
+      case Hook.STATE:
+      case Hook.MEMO:
+      case Hook.ONE:
+      case Hook.CALLBACK:
+        useNoHook(type);
+        break;
+      case Hook.RESOURCE:
+        useNoResource();
+        break;
+      case Hook.CONTEXT:
+        useNoContext();
+        break;
+      case Hook.CONSUMER:
+        useNoConsumer();
+        break;
+      case Hook.YOLO:
+        useNoYolo();
+        break;
+    }
+  }
+}
 
 export const useNoHook = (hookType: Hook) => () => {
   const fiber = useFiber();
@@ -357,6 +388,34 @@ export const useNoConsumer = <C>(
     if (host) host.undepend(next, fiber);
     state![i] = null;
   }
+}
+
+export const useYolo = (
+  callback: () => void,
+) => {
+  const fiber = useFiber();
+
+  const i = pushState(fiber, Hook.YOLO);
+  const {state, pointer} = fiber;
+
+  let sub = state[i];
+  if (!sub) sub = state[i] = [];
+
+  fiber.state = sub;
+  fiber.pointer = 0;
+  callback();
+  fiber.state = state;
+  fiber.pointer = pointer;  
+}
+
+export const useNoYolo = () => {
+  const fiber = useFiber();
+
+  const i = pushState(fiber, Hook.YOLO);
+  const {state, pointer} = fiber;
+
+  let sub = state[i];
+  if (sub) sub = null;
 }
 
 // Togglable hooks

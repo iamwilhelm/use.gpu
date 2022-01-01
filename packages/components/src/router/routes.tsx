@@ -33,7 +33,7 @@ const joinPath = (a: string, b: string) => {
 const escapeName = (s: string) => s.replace(/[^A-Za-z0-9_-]*/g, '');
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-export const Outlet: LiveComponent<any> = (fiber) => () => {
+const Outlet: LiveComponent<any> = (fiber) => () => {
   const context = useContext(RouteContext);
   return context.routes ? use(Routes)(context) : null;
 }

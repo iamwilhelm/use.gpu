@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { use, yeet, useContext } from '@use-gpu/live';
 import { LayoutContext } from '../providers/layout-provider';
-import { LayerType } from '../layaers/types';
+import { LayerType } from '../layers/types';
 
 import { Rectangles } from '../layers';
 

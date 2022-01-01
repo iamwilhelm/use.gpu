@@ -60,7 +60,7 @@ export const makeBoundUniforms = <T>(
 ): VirtualAllocation => {
   const entries = [] as GPUBindGroupEntry[];
 
-  let pipe, buffer;
+  let pipe, buffer, bindGroup;
 
   const hasBindings = !!bindings.length;
   const hasUniforms = !!uniforms.length;
@@ -81,7 +81,7 @@ export const makeBoundUniforms = <T>(
     entries.push(...uniformEntries);
   }
 
-  const bindGroup = device.createBindGroup({
+  if (entries.length) bindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(set),
     entries,
   });

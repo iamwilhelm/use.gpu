@@ -5,7 +5,7 @@ import {
 } from './types';
 
 import { bind, CURRENT_FIBER } from './live';
-import { makeFiber, makeSubFiber, bustFiberCaches, scheduleYeetRoots } from './fiber';
+import { makeFiber, makeStaticContinuation, bustFiberCaches, scheduleYeetRoots } from './fiber';
 import { isSameDependencies } from './util';
 import { formatNode } from './debug';
 
@@ -98,6 +98,7 @@ export const memoProps = <F extends Function>(
 
 // Shorthand
 export const memo = memoProps;
+export const resume = makeStaticContinuation;
 
 // Allocate state value and a setter for it, initializing with the given value or function
 export const useState = <T>(

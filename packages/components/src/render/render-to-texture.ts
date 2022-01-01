@@ -1,6 +1,6 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { use, provide, gatherReduce, useContext, useMemo, useOne } from '@use-gpu/live';
+import { use, provide, gather, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { FrameContext } from '../providers/frame-provider';
@@ -104,5 +104,5 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (
   // @ts-ignore
   if (!Done.displayName) Done.displayName = '[RenderToTexture]';
 
-  return provide(FrameContext, frame.current, gatherReduce(view, Done));
+  return provide(FrameContext, frame.current, gather(view, Done));
 }

@@ -1,7 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { provide, useContext, useMemo } from '@use-gpu/live';
-import { LayoutContext } from '../providers/layout-provider';
+import { LayoutState, LayoutContext } from '../providers/layout-provider';
+import { parseDimension } from './util';
 
 export type AbsoluteProps = {
   left?: string | number | null,
@@ -14,29 +15,19 @@ export type AbsoluteProps = {
   children?: LiveElement<any>,
 };
 
-const parse = (x: string | number, total: number): number => {
-  if (typeof x === 'number') return x;
-
-  const s = x as string;
-  if (s[s.length - 1] === '%') {
-    return +s.slice(0, -1) / 100 * total;
-  }
-
-  return +s;
-}
-
 export const Absolute: LiveComponent<AbsoluteProps> = (fiber) => (props) => {
   const layout = useContext(LayoutContext);
 
   const nextLayout = useMemo(() => {
-    let {
+    let [
       left,
       top,
       right,
       bottom,
-      width,
-      height,
-    } = layout;
+    ] = layout;
+
+    let width = right - left;
+    let height = bottom - top;
 
     let {
       left: l,
@@ -47,29 +38,23 @@ export const Absolute: LiveComponent<AbsoluteProps> = (fiber) => (props) => {
       height: h,
     } = props;
 
-    if (l != null) left += parse(l, width);
-    if (r != null) right -= parse(r, width);
-    if (t != null) top += parse(t, height);
-    if (b != null) bottom -= parse(b, height);
+    if (l != null) left   += parseDimension(l, width);
+    if (r != null) right  -= parseDimension(r, width);
+    if (t != null) top    += parseDimension(t, height);
+    if (b != null) bottom -= parseDimension(b, height);
     if (w != null) {
-      width = parse(w, width);
+      width = parseDimension(w, width);
       if (l != null || r == null) right = left + width;
       else left = right - width;
     }
-    else {
-      width = right - left;
-    }
 
     if (h != null) {
-      height = parse(h, height);
+      height = parseDimension(h, height);
       if (t != null || b == null) bottom = top + height;
       else top = bottom - height;
     }
-    else {
-      height = bottom - top;
-    }
 
-    return { left, top, right, bottom, width, height };  
+    return [left, top, right, bottom] as LayoutState;
   }, [props, layout]);
 
   const {children} = props;

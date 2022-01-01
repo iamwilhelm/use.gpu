@@ -3,7 +3,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
-  Draw, Pass, Flat, Absolute, Surface,
+  Draw, Pass,
+  Flat, Absolute, Layout, Block, Element,
+  Aggregate,
 } from '@use-gpu/components';
 import { Mesh } from '../mesh';
 import { makeMesh } from '../meshes/mesh';
@@ -23,15 +25,38 @@ export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props)
 
             use(Flat)({
               children:
-
-                use(Absolute)({
-                  left: 10,
-                  top: 10,
-                  width: '50%',
-                  bottom: 10,
+              
+                use(Aggregate)({
                   children:
+
+                    use(Absolute)({
+                      left: 10,
+                      top: 10,
+                      width: '50%',
+                      bottom: 10,
+                      children:
                   
-                    use(Surface)({}),
+                        use(Layout)({
+                          children:
+
+                            use(Block)({
+                              children: [
+                                use(Element)({}),
+
+                                use(Block)({
+                                  children: [
+                                    use(Element)({ width: 200 }),
+                                    use(Element)({ width: 300 }),
+                                    use(Element)({ width: 200 }),
+                                  ]
+                                }),
+
+                                use(Element)({}),
+                              ]
+                            })
+                        })
+
+                    })
 
                 })
 

@@ -37,7 +37,11 @@ export const StyledNode = styled.div`
   }
 
   &.depended {
-    background: rgba(80, 0, 220, 1.0);
+    background: rgba(80, 40, 220, 1.0);
+  }
+
+  &.live {
+    background: rgba(10, 150, 75, 1.0);
   }
 
   &.builtin {
@@ -66,10 +70,11 @@ export const StyledNode = styled.div`
 
 type NodeProps = {
   fiber: LiveFiber<any>,
-  pinged: number,
-  selected: boolean,
-  hovered: number,
-  depended: boolean,
+  pinged?: number,
+  live?: boolean,
+  selected?: boolean,
+  hovered?: number,
+  depended?: boolean,
   onClick?: Action,
   onMouseEnter?: Action,
   onMouseLeave?: Action,
@@ -78,6 +83,7 @@ type NodeProps = {
 export const Node: React.FC<NodeProps> = ({
   fiber,
   pinged,
+  live,
   selected,
   hovered,
   depended,
@@ -93,6 +99,7 @@ export const Node: React.FC<NodeProps> = ({
   const classes = [] as string[];
   if (selected) classes.push('selected');
   if (pinged) classes.push('pinged');
+  if (live) classes.push('live');
   if (depended) classes.push('depended');
   if (hovered === id) classes.push('hovered');
   if (hovered === by) classes.push('by');

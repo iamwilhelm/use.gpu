@@ -3,6 +3,8 @@ import { UNIFORM_SIZES, UNIFORM_ARRAY_TYPES, UNIFORM_DIMS } from './constants';
 
 type NumberArray = TypedArray | number[];
 
+const NO_LOOPS = [] as boolean[];
+
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
   const dims = UNIFORM_DIMS[type];
@@ -158,7 +160,11 @@ export const copyDataArrays = (from: any[], to: NumberArray, dims: number, acces
   }
 }
 
-export const copyChunksToSegments = (to: NumberArray, chunks: number[], loops: boolean[]) => {
+export const copyChunksToSegments = (
+  to: NumberArray,
+  chunks: number[],
+  loops: boolean[] = NO_LOOPS,
+) => {
   let pos = 0;
   let n = chunks.length;
 
@@ -182,9 +188,60 @@ export const copyChunksToSegments = (to: NumberArray, chunks: number[], loops: b
   while (pos < to.length) to[pos++] = 0;
 }
 
+export const copyNumberArrayRepeatedRange = (
+  from: NumberArray | number, to: NumberArray,
+  fromIndex: number, toIndex: number,
+  dims: number, count: number, loop: boolean = false,
+) => {
+  let pos = toIndex;
+  const read = fromIndex;
+
+  if (loop) count += 3;
+  const array = from as NumberArray;
+
+  if (typeof from === 'number' && dims === 1) {
+    for (let j = 0; j < count; ++j) {
+      to[pos++] = from;
+    }
+  }
+  else if (dims === 1) {
+    for (let j = 0; j < count; ++j) {
+      to[pos++] = array[read];
+    }
+  }
+  else if (dims === 2) {
+    for (let j = 0; j < count; ++j) {
+      to[pos++] = array[read];
+      to[pos++] = array[read + 1];
+    }
+  }
+  else if (dims === 3) {
+    for (let j = 0; j < count; ++j) {
+      to[pos++] = array[read];
+      to[pos++] = array[read + 1];
+      to[pos++] = array[read + 2];
+    }
+  }
+  else if (dims === 2) {
+    for (let j = 0; j < count; ++j) {
+      to[pos++] = array[read];
+      to[pos++] = array[read + 1];
+      to[pos++] = array[read + 2];
+      to[pos++] = array[read + 3];
+    }
+  }
+  else {
+    for (let j = 0; j < count; ++j) {
+      for (let k = 0; k < dims; ++k) {
+        to[pos++] = array[read + k];
+      }
+    }
+  }
+}
+
 export const copyNumberArrayChunked = (
   from: NumberArray, to: NumberArray, dims: number,
-  chunks: number[], loops: boolean[],
+  chunks: number[], loops: boolean[] = NO_LOOPS,
 ) => {
   let pos = 0;
   const c = chunks.length;
@@ -262,7 +319,7 @@ export const copyNumberArrayChunked = (
 
 export const copyDataArrayChunked = (
   from: any[], to: NumberArray, dims: number,
-  chunks: number[], loops: boolean[],
+  chunks: number[], loops: boolean[] = NO_LOOPS,
   accessor: Accessor,
 ) => {
   const n = from.length;
@@ -332,7 +389,7 @@ export const copyDataArrayChunked = (
 
 export const copyNumberArraysComposite = (
   from: (NumberArray[] | NumberArray)[], to: NumberArray, dims: number,
-  chunks: number[], loops: boolean[],
+  chunks: number[], loops: boolean[] = NO_LOOPS,
 ) => {
   let pos = 0;
   const n = chunks.length;
@@ -384,7 +441,7 @@ export const copyNumberArraysComposite = (
 
 export const copyDataArraysComposite = (
   from: any[], to: NumberArray, dims: number,
-  chunks: number[], loops: boolean[],
+  chunks: number[], loops: boolean[] = NO_LOOPS,
   accessor: Accessor,
 ) => {
   let pos = 0;
@@ -431,6 +488,44 @@ export const copyDataArraysComposite = (
         copyNestedNumberArrayRange(src, to, 0, pos, c, dims);
         pos += c * dims;
       }
+    }
+  }
+}
+
+export const copyNumberArrayCompositeRange = (
+  from: (NumberArray[] | NumberArray), to: NumberArray,
+  fromIndex: number, toIndex: number,
+  dims: number, count: number, loop: boolean = false,
+) => {
+  let pos = toIndex;
+
+  const el = (from as NumberArray[])[0][0];
+  const isNested = el && !(typeof el === 'number') && (typeof el[0] === 'number');
+
+  if (!isNested) {
+    const range = count * dims;
+    const src = from as NumberArray;
+
+    if (loop) {
+      copyNumberArrayRange(src, to, fromIndex + range - dims, pos, dims);
+      copyNumberArrayRange(src, to, fromIndex, pos + dims, range);
+      copyNumberArrayRange(src, to, fromIndex, pos + range + dims, dims * 2);
+    }
+    else {
+      copyNumberArrayRange(src, to, fromIndex, pos, range);
+    }
+  }
+  else {
+    const range = count * dims;
+    const src = from as NumberArray[];
+
+    if (loop) {
+      copyNestedNumberArrayRange(src, to, fromIndex + count - 1, pos, 1, dims);
+      copyNestedNumberArrayRange(src, to, fromIndex, pos + dims, count, dims);
+      copyNestedNumberArrayRange(src, to, fromIndex, pos + range + dims, 2, dims);
+    }
+    else {
+      copyNestedNumberArrayRange(src, to, fromIndex, pos, count, dims);
     }
   }
 }

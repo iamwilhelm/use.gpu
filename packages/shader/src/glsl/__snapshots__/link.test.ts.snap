@@ -86,6 +86,8 @@ layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING) uniform _02_ViewUniforms {
   vec4 viewPosition;
   vec2 viewResolution;
   vec2 viewSize;
+  float viewWorldUnit;
+  float viewPixelRatio;
 } _02_viewUniforms;
 
 vec4 _02_worldToView(vec4 position) {
@@ -100,12 +102,19 @@ vec4 _02_worldToClip(vec4 position) {
   return _02_viewToClip(_02_worldToView(position));
 }
 
+float _02_getPerspectiveScale(float w, float f) {
+  mat4 m = _02_viewUniforms.projectionMatrix;
+  float worldScale = m[1][1] * _02_viewUniforms.viewWorldUnit;
+  float clipScale = mix(1.0, worldScale / w, f);
+  float pixelScale = clipScale * _02_viewUniforms.viewPixelRatio;
+  return pixelScale;
+}
 
 
     vec4 _03_getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _04_getPerspective(int index) { return 1.0; }
+    float _04_getDepth(int index) { return 0.5; }
     
 
     vec4 _05_getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
@@ -116,30 +125,33 @@ vec4 _02_worldToClip(vec4 position) {
 vec4 _05_getPosition(int);
 vec4 _03_getColor(int);
 vec2 _06_getSize(int);
-float _04_getPerspective(int);
+float _04_getDepth(int);
 
 _01_SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
-  vec4 instancePosition = _05_getPosition(instanceIndex);
-  vec4 instanceColor = _03_getColor(instanceIndex);
-  vec2 instanceSize = _06_getSize(instanceIndex);
-  float instancePerspective = _04_getPerspective(instanceIndex);
+  vec4 position = _05_getPosition(instanceIndex);
+  vec4 color = _03_getColor(instanceIndex);
+  vec2 size = _06_getSize(instanceIndex);
+  float depth = _04_getDepth(instanceIndex);
 
-  vec4 position = _02_worldToClip(instancePosition);
+  vec4 center = _02_worldToClip(position);
 
   vec2 uv = _00_getQuadUV(vertexIndex);
   vec2 xy = uv * 2.0 - 1.0;
   
+  // Lerp between fixed size and full perspective.
+  float pixelScale = _02_getPerspectiveScale(center.w, depth);
+  size *= pixelScale;
+
   #ifdef HAS_EDGE_BLEED
-  xy = xy * (instanceSize + 0.5) / instanceSize;
+  xy = xy * (size + 0.5) / size;
   uv = xy * .5 + .5;
   #endif
 
-  float w = mix(position.w, 1.0, instancePerspective);
-  position.xy += xy * _02_viewUniforms.viewResolution * instanceSize * w;
+  center.xy += xy * size * _02_viewUniforms.viewResolution * center.w;
 
   return _01_SolidVertex(
-    position,
-    instanceColor,
+    center,
+    color,
     uv
   );
 }"

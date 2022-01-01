@@ -20,7 +20,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
   const {id, depth, path, type, state, context, yeeted, mount, mounts, next, host} = fiber;
 
-  let props = {id, depth, path, type, context, yeeted, mount, mounts, next, host, raw: fiber} as Record<string, any>;
+  let props = {id, depth, path, type, context, yeeted, mount, mounts, next, host, '[raw]': fiber} as Record<string, any>;
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const toggleExpanded = (id: string) => setExpanded((state) => ({

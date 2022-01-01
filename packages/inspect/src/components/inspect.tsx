@@ -9,7 +9,10 @@ import { FiberTree } from './fiber';
 import { Props } from './props';
 import { Call } from './call';
 import { Shader } from './shader';
-import { InspectContainer, InspectContainerCollapsed, InspectToggle, SplitRow, RowPanel, Panel, PanelFull, Scrollable, Inset } from './layout';
+import {
+  InspectContainer, InspectToggle,
+  SplitRow, RowPanel, Panel, PanelFull, Scrollable, ScrollableFull, Inset, InsetFull,
+} from './layout';
 import { Button, Tab, Grid } from 'semantic-ui-react'
 import "../theme.css";
 
@@ -69,11 +72,9 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
     }
   }
 
-  const Container = selectedFiber ? InspectContainer : InspectContainerCollapsed;
-
   const tree = (
-    <Scrollable onClick={() => setSelected(null)}>
-      <Inset>
+    <ScrollableFull onClick={() => setSelected(null)}>
+      <InsetFull>
         <FiberTree
           fiber={fiber}
           fibers={fibers}
@@ -82,8 +83,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
           selectedCursor={selectedCursor}
           hoveredCursor={hoveredCursor}
         />
-      </Inset>
-    </Scrollable>
+      </InsetFull>
+    </ScrollableFull>
   );
 
   const props = (
@@ -102,26 +103,24 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   };
 
   return (<>
-    {open  ? <Container onMouseDown={onMouseDown} className="ui inverted">
-      {selectedFiber ? (
+    {open ? (
+      <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
         <SplitRow>
           <RowPanel style={{width: '34%'}}>
             <PanelFull>
               {tree}
             </PanelFull>
           </RowPanel>
-          <RowPanel style={{width: '66%'}}>
-            <Panel>
-              {props}
-            </Panel>
-          </RowPanel>
+          {selectedFiber ? (
+            <RowPanel style={{width: '66%'}}>
+              <Panel>
+                {props}
+              </Panel>
+            </RowPanel>
+          ) : null}
         </SplitRow>
-      ) : (<>
-        <PanelFull>
-          {tree}
-        </PanelFull>
-      </>)}
-    </Container> : null}
+      </InspectContainer>
+    ) : null}
     <InspectToggle onClick={toggleOpen}>
       <Button>{open ? ICON("close") : ICON("bug_report")}</Button>
     </InspectToggle>

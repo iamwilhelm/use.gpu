@@ -51,9 +51,14 @@ describe("link", () => {
     float getSize(int index) { return 1.0; }
     `
 
+    const getDepth = `
+    #pragma export
+    float getDepth(int index) { return 0.5; }
+    `
+
     const code = GLSLModules['instance/vertex/quad'];
     const modules = GLSLModules;
-    const linked = linkCode(code, modules, {getPosition, getPerspective, getColor, getSize});
+    const linked = linkCode(code, modules, {getPosition, getPerspective, getColor, getSize, getDepth});
     expect(linked).toMatchSnapshot();
 
   });

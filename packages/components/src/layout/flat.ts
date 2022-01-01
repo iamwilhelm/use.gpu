@@ -3,7 +3,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { use, provide, makeContext, useContext, useOne, useMemo } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
-import { LayoutContext } from '../providers/layout-provider';
+import { LayoutState, LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
 import { mat4 } from 'gl-matrix';
@@ -50,9 +50,9 @@ export const Flat: LiveComponent<FlatProps> = (fiber) => (props) => {
     const top = 0;
     const right = w;
     const bottom = h;
-    const layout = { left, top, right, bottom, width, height };  
+    const layout = [left, top, right, bottom] as LayoutState;
 
-    const matrix = makeOrthogonalMatrix(left, right, top, bottom, -near, -far);
+    const matrix = makeOrthogonalMatrix(left, right, bottom, top, -near, -far);
 
     return [layout, matrix, ratio, w, h];
   }, [scale, width, height, pixelRatio]);

@@ -8,10 +8,11 @@ html {
 
   --borderThin: #444;
 
-  --shim: rgba(0, 0, 0, 0.95);
+  --shim: rgba(0, 0, 0, 0.85);
   --shimGray: rgba(255, 255, 255, 0.1);
 
   --colorTextMuted: rgba(255, 255, 255, .5);
+  --colorTextSemi: rgba(255, 255, 255, .65);
   --colorText: #ddd;
   --colorTextHover: #eee;
   --colorTextActive: #fff;

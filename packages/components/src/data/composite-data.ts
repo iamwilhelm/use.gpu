@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core/types';
 import { RenderContext, FrameContext } from '@use-gpu/components';
-import { yeet, useMemo, useNoMemo, useContext, useNoContext } from '@use-gpu/live';
+import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor,
   copyDataArray, copyNumberArray,
@@ -149,7 +149,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (fiber) => (prop
       copyChunksToSegments(array, chunks, loops);
 
       uploadBuffer(device, buffer, array.buffer);
-      source.version = (source.version + 1) | 0;
+      source.version = incrementVersion(source.version);
     }
 
     for (const {buffer, array, source, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
@@ -162,7 +162,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (fiber) => (prop
         else if (data) copyDataArrayChunked(data, array, dims, chunks, loops, accessor as Accessor);
       }
       uploadBuffer(device, buffer, array.buffer);
-      source.version = (source.version + 1) | 0;
+      source.version = incrementVersion(source.version);
     }
   };
   

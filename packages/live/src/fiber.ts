@@ -28,14 +28,13 @@ export const makeFiber = <F extends Function>(
   host?: HostInterface | null,
   parent?: LiveFiber<any> | null,
   args?: any[],
-  by?: number,
+  by: number = parent?.id ?? 0,
   key?: Key,
 ): LiveFiber<F> => {
   const bound = null as any;
   const depth = parent ? parent.depth + 1 : 0;
 
   const id = ++ID;
-  by = by ?? 0;
 
   const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted} : null;
   const context = parent?.context ?? NO_CONTEXT;
@@ -61,10 +60,11 @@ export const makeFiber = <F extends Function>(
 export const makeSubFiber = <F extends Function>(
   parent: LiveFiber<any>,
   node: DeferredCall<F>,
+  by: number = node.by ?? parent.id,
   key?: Key,
 ): LiveFiber<F> => {
   const {host} = parent;
-  const fiber = makeFiber(node.f, host, parent, node.args, node.by, key) as LiveFiber<F>;
+  const fiber = makeFiber(node.f, host, parent, node.args, by, key) as LiveFiber<F>;
   return fiber;
 }
 
@@ -76,7 +76,7 @@ export const makeResumeFiber = <F extends Function>(
 ): LiveFiber<any> => {
   // @ts-ignore
   Resume.displayName = `Resume(${(Next as any)?.displayName ?? ''})`;
-  const nextFiber = makeSubFiber(fiber, use(Resume)(), 1);
+  const nextFiber = makeSubFiber(fiber, use(Resume)(), fiber.id, 1);
 
   // Adopt existing yeet context
   // which will be overwritten.
@@ -292,10 +292,16 @@ export const makeFiberContinuation = <F extends Function, R>(
   if (!Next) return null;
 
   // If mounting static component, inline into current fiber
-  // @ts-ignore
-  if (Next.isStaticComponent) return Next(next)(value);
+  if ((Next as any).isStaticComponent) return Next(next)(value);
   // Mount as new sub fiber
   else return use(Next)(value);
+}
+
+// Tag a component as a static continuation
+export const makeStaticContinuation = (c: LiveFunction<any>, name: string): LiveFunction<any> => {
+  (c as any).isStaticComponent = true;
+  (c as any).displayName = name;
+  return c;
 }
 
 // Reconcile multiple calls on a fiber
@@ -619,7 +625,6 @@ export const disposeFiberMounts = <F extends Function>(fiber: LiveFiber<F>) => {
   }
   if (next) disposeFiber(next);
 
-  // @ts-ignore
   fiber.mount = fiber.mounts = fiber.next = null;
 }
 
@@ -647,7 +652,7 @@ export const updateMount = <P extends Function>(
   if ((to && !from) || replace) {
     DEBUG && console.log('Mounting', key, formatNode(newMount!));
     if (host) host.__stats.mounts++;
-    return makeSubFiber(parent, newMount!, key);
+    return makeSubFiber(parent, newMount!, newMount!.by ?? parent.id, key);
   }
 
   if (update) {
@@ -693,7 +698,7 @@ export const bustFiberCaches = <F extends Function>(fiber: LiveFiber<F>) => {
   const {host, version, yeeted} = fiber;
   if (DEBUG && (version != null || yeeted)) console.log('Busting caches on', formatNode(fiber));
   if (version != null) {
-    fiber.version = (version + 1) & 0x7FFFFFFF;
+    fiber.version = incrementVersion(version);
   }
   if (yeeted) {
     let yt = yeeted;
@@ -702,6 +707,9 @@ export const bustFiberCaches = <F extends Function>(fiber: LiveFiber<F>) => {
     } while (yt = yt.parent!);
   }
 }
+
+// Cyclic version number that skips 0
+export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
 
 // Schedule a re-render of any associated yeet roots
 export const scheduleYeetRoots = <F extends Function>(fiber: LiveFiber<F>) => {

@@ -4,7 +4,7 @@ import styled, { keyframes } from "styled-components";
 
 import React, { Fragment, useState } from 'react';
 import { Action } from './types';
-import { SplitRow, Label } from './layout';
+import { SplitRow, Label, Selectable } from './layout';
 
 import { inspectObject } from './props';
 
@@ -44,9 +44,9 @@ export const Shader: React.FC<ShaderProps> = ({shader}) => {
 
   return (<>
     <div><b>Shader</b></div>
-    <StyledShader>
+    <StyledShader><Selectable>
       {inspectCode(shader)}
-    </StyledShader>
+    </Selectable></StyledShader>
   </>);
 }
 

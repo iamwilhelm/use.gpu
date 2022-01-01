@@ -109,14 +109,14 @@ export const mapReduce = <R, T>(
 ): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key, by: CURRENT_FIBER?.id});
 
 // Gather items from a subtree
-export const gatherReduce = <T>(
+export const gather = <T>(
   calls: LiveElement<any>,
   done?: LiveFunction<(r: T[]) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key, by: CURRENT_FIBER?.id});
 
 // Gather items from a subtree
-export const multiGatherReduce = <T>(
+export const multiGather = <T>(
   calls: LiveElement<any>,
   done?: LiveFunction<(r: T[]) => void>,
   key?: Key,

@@ -8,34 +8,30 @@ import { ShaderModule } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
+import { LayoutContext } from '../providers/layout-provider';
 import { Virtual } from './virtual';
 
 import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
-import { getQuadVertex } from '@use-gpu/glsl/instance/vertex/quad.glsl';
+import { getRectangleVertex } from '@use-gpu/glsl/instance/vertex/rectangle.glsl';
 import { getMaskedFragment } from '@use-gpu/glsl/mask/masked.glsl';
 
-export type RawQuadsProps = {
-  position?: number[] | TypedArray,
-  size?: number[],
-  color?: number[],
-  depth?: number,
+export type RawRectanglesProps = {
+  rectangle?: number[] | TypedArray,
+  color?: number[] | TypedArray,
   mask?: number,
+  texture?: any,
 
-  positions?: StorageSource,
-  sizes?: StorageSource,
+  rectangles?: StorageSource,
   colors?: StorageSource,
-  depths?: StorageSource,
-  masks?: StorageSource,
+  masks?: number,
+  textures?: StorageSource,
 
-  getPosition?: ShaderModule,
-  getSize?: ShaderModule,
+  getRectangle?: ShaderModule,
   getColor?: ShaderModule,
-  getDepth?: ShaderModule,
   getMask?: ShaderModule,
-
   getTexture?: ShaderModule,
 
   count?: number,
@@ -49,10 +45,8 @@ const ZERO = [0, 0, 0, 1];
 const GRAY = [0.5, 0.5, 0.5, 1];
 
 const VERTEX_BINDINGS = [
-  { name: 'getPosition', format: 'vec4', value: ZERO },
+  { name: 'getRectangle', format: 'vec4', value: ZERO },
   { name: 'getColor', format: 'vec4', value: GRAY },
-  { name: 'getSize', format: 'vec2', value: [1, 1] },
-  { name: 'getDepth', format: 'float', value: 0 },
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
@@ -61,7 +55,6 @@ const FRAGMENT_BINDINGS = [
 ] as UniformAttributeValue[];
 
 const DEFINES = {
-  HAS_EDGE_BLEED: true,
   STRIP_SEGMENTS: 2,
 };
 
@@ -72,7 +65,7 @@ const PIPELINE = {
   },
 };
 
-export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) => {
+export const RawRectangles: LiveComponent<RawRectanglesProps> = (fiber) => (props) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -86,10 +79,8 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [
-    props.positions ?? props.position ?? props.getPosition,
+    props.rectangles ?? props.rectangle ?? props.getRectangle,
     props.colors ?? props.color ?? props.getColor,
-    props.sizes ?? props.size ?? props.getSize,
-    props.depths ?? props.depth ?? props.getDepth,
   ]);
 
   const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [
@@ -98,7 +89,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
   ]);
 
   const key = fiber.id;
-  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
+  const getVertex = bindBundle(getRectangleVertex, bindingsToLinks(vertexBindings), null, key);
   const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
 
   return use(Virtual)({
@@ -115,4 +106,4 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
     mode,
     id,
   });
-}, 'RawQuads');
+};

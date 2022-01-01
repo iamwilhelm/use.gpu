@@ -1,7 +1,7 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatNode, formatValue, traverseFiber, renderFibers } from '@use-gpu/live';
 import { useUpdateState } from './cursor';
-import { ExpandState, SelectState, PingState } from './types';
+import { ExpandState, SelectState, HoverState, PingState } from './types';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Node } from './node';
@@ -30,7 +30,7 @@ const TAB_STYLE = { secondary: true, pointing: true };
 export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
-  const hoveredCursor = useUpdateState<SelectState>(null);
+  const hoveredCursor = useUpdateState<HoverState>(() => ({ fiber: null, deps: [] }));
 
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);

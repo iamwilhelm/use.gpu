@@ -72,32 +72,6 @@ declare module "@use-gpu/glsl/instance/fragment/solid.glsl" {
   export default __module;
 }
 
-declare module "@use-gpu/glsl/instance/geometry/line.glsl" {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const lineJoinBevel: ParsedBundle;
-  export const lineJoinMiter: ParsedBundle;
-  export const lineJoinRound: ParsedBundle;
-  export const getLineJoin: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/glsl/instance/geometry/quad.glsl" {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getQuadIndex: ParsedBundle;
-  export const getQuadUV: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/glsl/instance/geometry/strip.glsl" {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getStripIndex: ParsedBundle;
-  export const getStripUV: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/glsl/instance/vertex/line.glsl" {
   type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -109,6 +83,13 @@ declare module "@use-gpu/glsl/instance/vertex/quad.glsl" {
   type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getQuadVertex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/glsl/instance/vertex/rectangle.glsl" {
+  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getRectangleVertex: ParsedBundle;
   export default __module;
 }
 
@@ -172,21 +153,8 @@ declare module "@use-gpu/glsl/use/view.glsl" {
   export const clipToScreen3D: ParsedBundle;
   export const screenToClip3D: ParsedBundle;
   export const worldToClip3D: ParsedBundle;
+  export const getPerspectiveScale: ParsedBundle;
   export const viewUniforms: ParsedBundle;
   export const ViewUniforms: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/glsl/vertex/line.glsl" {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getLineVertex: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/glsl/vertex/quad.glsl" {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getQuadVertex: ParsedBundle;
   export default __module;
 }

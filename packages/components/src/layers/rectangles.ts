@@ -6,7 +6,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { RawLines } from '../geometry/raw-lines';
+import { RawRectangles } from '../geometry/raw-rectangles';
 
 import { use, memo, patch, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { linkBundle, bindBundle, bindingToModule, bindingsToLinks, resolveBindings, castTo } from '@use-gpu/shader/glsl';
@@ -14,31 +14,26 @@ import { makeShaderBinding, makeShaderBindings, makeDataArray, makeStorageBuffer
 
 import { RenderContext } from '@use-gpu/components';
 
-export type LinesProps = {
-  position?: number[] | TypedArray,
-  segment?: number,
-  size?: number,
+export type RectanglesProps = {
+  rectangle?: number[] | TypedArray,
   color?: number[] | TypedArray,
-  depth?: number,
+  mask?: number,
+  texture?: any,
 
-  positions?: StorageSource,
-  segments?: StorageSource,
-  sizes?: StorageSource,
+  rectangles?: StorageSource,
   colors?: StorageSource,
-  depths?: number,
+  masks?: number,
+  textures?: StorageSource,
 
-  getPosition?: ShaderModule,
-  getSegment?: ShaderModule,
-  getSize?: ShaderModule,
+  getRectangle?: ShaderModule,
   getColor?: ShaderModule,
-  getDepth?: ShaderModule,
-
-  join?: 'miter' | 'round' | 'bevel',
+  getMask?: ShaderModule,
+  getTexture?: ShaderModule,
 
   mode?: RenderPassMode | string,
   id?: number,
 };
 
-export const Lines: LiveComponent<LinesProps> = (fiber) => (props) => {
-  return use(RawLines)(props);
+export const Rectangles: LiveComponent<RectanglesProps> = (fiber) => (props) => {
+  return use(RawRectangles)(props);
 };

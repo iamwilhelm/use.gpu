@@ -52,7 +52,7 @@ export const Flat: LiveComponent<FlatProps> = (fiber) => (props) => {
     const bottom = h;
     const layout = { left, top, right, bottom, width, height };  
 
-    const matrix = makeOrthogonalMatrix(left, right, top, bottom, near, far);
+    const matrix = makeOrthogonalMatrix(left, right, top, bottom, -near, -far);
 
     return [layout, matrix, ratio, w, h];
   }, [scale, width, height, pixelRatio]);

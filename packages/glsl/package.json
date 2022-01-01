@@ -66,21 +66,6 @@
       "import": "./src/instance/fragment/solid.glsl",
       "require": "./src/instance/fragment/solid.glsl"
     },
-    "./instance/geometry/line.glsl": {
-      "types": "./src/instance/geometry/line.d.ts",
-      "import": "./src/instance/geometry/line.glsl",
-      "require": "./src/instance/geometry/line.glsl"
-    },
-    "./instance/geometry/quad.glsl": {
-      "types": "./src/instance/geometry/quad.d.ts",
-      "import": "./src/instance/geometry/quad.glsl",
-      "require": "./src/instance/geometry/quad.glsl"
-    },
-    "./instance/geometry/strip.glsl": {
-      "types": "./src/instance/geometry/strip.d.ts",
-      "import": "./src/instance/geometry/strip.glsl",
-      "require": "./src/instance/geometry/strip.glsl"
-    },
     "./instance/vertex/line.glsl": {
       "types": "./src/instance/vertex/line.d.ts",
       "import": "./src/instance/vertex/line.glsl",
@@ -90,6 +75,11 @@
       "types": "./src/instance/vertex/quad.d.ts",
       "import": "./src/instance/vertex/quad.glsl",
       "require": "./src/instance/vertex/quad.glsl"
+    },
+    "./instance/vertex/rectangle.glsl": {
+      "types": "./src/instance/vertex/rectangle.d.ts",
+      "import": "./src/instance/vertex/rectangle.glsl",
+      "require": "./src/instance/vertex/rectangle.glsl"
     },
     "./mask/masked.glsl": {
       "types": "./src/mask/masked.d.ts",
@@ -125,16 +115,6 @@
       "types": "./src/use/view.d.ts",
       "import": "./src/use/view.glsl",
       "require": "./src/use/view.glsl"
-    },
-    "./vertex/line.glsl": {
-      "types": "./src/vertex/line.d.ts",
-      "import": "./src/vertex/line.glsl",
-      "require": "./src/vertex/line.glsl"
-    },
-    "./vertex/quad.glsl": {
-      "types": "./src/vertex/quad.d.ts",
-      "import": "./src/vertex/quad.glsl",
-      "require": "./src/vertex/quad.glsl"
     }
   }
 }

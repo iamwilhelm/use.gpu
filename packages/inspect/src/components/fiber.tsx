@@ -5,7 +5,7 @@ import React, { useMemo } from 'react';
 
 import { useRefineCursor, Cursor } from './cursor';
 import { Node } from './node';
-import { PingState, ExpandState, SelectState, Action } from './types';
+import { PingState, ExpandState, SelectState, HoverState, Action } from './types';
 
 import { TreeRow, TreeIndent, TreeLine } from './layout';
 import { Expandable } from './expandable';
@@ -19,7 +19,7 @@ type FiberTreeProps = {
   ping: PingState,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
-  hoveredCursor: Cursor<SelectState>,
+  hoveredCursor: Cursor<HoverState>,
 }
 
 type FiberNodeProps = {
@@ -28,7 +28,7 @@ type FiberNodeProps = {
   ping: PingState,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
-  hoveredCursor: Cursor<SelectState>,
+  hoveredCursor: Cursor<HoverState>,
   indent?: number,
   continuation?: boolean,
 }
@@ -69,7 +69,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
   continuation,
   indent = 0,
 }) => {
-  const {id, mount, mounts, next, order, depth} = fiber;
+  const {id, mount, mounts, next, order, depth, host} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
   const [hoverState, updateHoverState] = hoveredCursor;
 
@@ -77,12 +77,13 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
 
   const pinged = ping[id] || 0;
   const selected = fiber === selectState;
-  const hovered = hoverState?.id ?? -1;
+  const hovered = hoverState.fiber?.id ?? -1;
+  const depended = hoverState.deps.indexOf(fiber) >= 0;
 
   const [select, hover, unhover] = useMemo(() => {
     const select = () => updateSelectState({ $set: fiber });
-    const hover = () => updateHoverState({ $set: fiber });
-    const unhover = () => updateHoverState({ $set: null });
+    const hover = () => updateHoverState({ $set: { fiber, deps: host.invalidate(fiber) } });
+    const unhover = () => updateHoverState({ $set: { fiber: null, deps: [] } });
     return [select, hover, unhover];
   }, [fiber, updateSelectState, updateHoverState]);
 
@@ -95,6 +96,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
       pinged={pinged}
       selected={selected}
       hovered={hovered}
+      depended={depended}
       onClick={select}
       onMouseEnter={hover}
       onMouseLeave={unhover}

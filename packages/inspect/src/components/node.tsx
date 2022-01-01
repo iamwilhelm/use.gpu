@@ -22,17 +22,22 @@ export const StyledNode = styled.div`
   white-space: nowrap;
   margin: -2px -5px;
   padding: 2px 5px;
+  position: relative;
 
   &.selected {
     background: rgba(50, 130, 200, 0.85);
   }
 
   &.hovered {
-    background: rgba(50, 190, 200, 0.85);
+    background: rgba(50, 180, 200, 1.0);
   }
 
   &.by {
-    background: rgba(50, 190, 200, 0.65);
+    background: rgba(30, 140, 160, 1.0);
+  }
+
+  &.depended {
+    background: rgba(80, 0, 220, 1.0);
   }
 
   &.builtin {
@@ -64,12 +69,22 @@ type NodeProps = {
   pinged: number,
   selected: boolean,
   hovered: number,
+  depended: boolean,
   onClick?: Action,
   onMouseEnter?: Action,
   onMouseLeave?: Action,
 };
 
-export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, hovered, onClick, onMouseEnter, onMouseLeave}) => {
+export const Node: React.FC<NodeProps> = ({
+  fiber,
+  pinged,
+  selected,
+  hovered,
+  depended,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+}) => {
   const {id, by, f, args, yeeted} = fiber;
 
   const yeet = yeeted?.value !== undefined;
@@ -78,6 +93,7 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, hovered, onC
   const classes = [] as string[];
   if (selected) classes.push('selected');
   if (pinged) classes.push('pinged');
+  if (depended) classes.push('depended');
   if (hovered === id) classes.push('hovered');
   if (hovered === by) classes.push('by');
   if (f.isLiveBuiltin) classes.push('builtin');

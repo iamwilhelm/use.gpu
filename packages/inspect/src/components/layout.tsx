@@ -3,8 +3,7 @@ import styled from "styled-components";
 type TreeIndentProps = { indent?: number }
 
 export const InspectContainer = styled.div`
-  pointer-events: auto;
-  background: var(--shim);
+  pointer-events: none;
   color: var(--colorText);
   cursor: default;
   position: relative;
@@ -12,7 +11,7 @@ export const InspectContainer = styled.div`
 `;
 
 export const InspectContainerCollapsed = styled(InspectContainer)`
-  width: 400px;
+  width: 34%;
   position: relative;
 `;
 
@@ -52,9 +51,18 @@ export const ColumnPanel = styled.div`
   }
 `;
 
-export const Scrollable = styled.div`
-  width: 100%;
+export const Panel = styled.div`
+  pointer-events: auto;
+  background: var(--shim);
+`;
+
+export const PanelFull = styled(Panel)`
   height: 100%;
+`;
+
+export const Scrollable = styled.div`
+  max-width: 100%;
+  max-height: 100%;
   overflow: auto;
 `;
 

@@ -27,15 +27,18 @@ export type OrbitCameraProps = {
   theta: number,
   radius: number,
 
-  focus: number,
-  scale: number | null,
-
   fov?: number,
   near?: number,
   far?: number,
-  
+  dolly?: number,
+
+  focus?: number,
+  scale?: number | null,
+
   children?: LiveElement<any>,
 };
+
+let t = 0;
 
 export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) => {
   const {
@@ -44,15 +47,15 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
     pixelRatio,
   } = useContext(RenderContext);
 
-  const {
+  let {
     phi    = DEFAULT_ORBIT_CAMERA.phi,
     theta  = DEFAULT_ORBIT_CAMERA.theta,
     radius = DEFAULT_ORBIT_CAMERA.radius,
-    focus  = DEFAULT_ORBIT_CAMERA.focus,
     fov    = DEFAULT_ORBIT_CAMERA.fov,
     near   = DEFAULT_ORBIT_CAMERA.near,
     far    = DEFAULT_ORBIT_CAMERA.far,
     dolly  = DEFAULT_ORBIT_CAMERA.dolly,
+    focus  = DEFAULT_ORBIT_CAMERA.focus,
     scale  = null,
     children,
   } = props;
@@ -67,12 +70,12 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) =
     viewPixelRatio: { value: null },
   })) as any as ViewUniforms;
 
-  const unit = scale != null ? height / scale : 1;
+  const unit = scale != null ? height / pixelRatio / scale : 1;
 
   uniforms.projectionMatrix.value = makeProjectionMatrix(width, height, fov, near, far, radius, dolly);
-  uniforms.viewMatrix.value = makeOrbitMatrix(radius, phi, theta);
-  uniforms.viewPosition.value = makeOrbitPosition(radius, phi, theta);
-  uniforms.viewResolution.value = [ 1/width, 1/height ];
+  uniforms.viewMatrix.value = makeOrbitMatrix(radius, phi, theta, dolly);
+  uniforms.viewPosition.value = makeOrbitPosition(radius, phi, theta, dolly);
+  uniforms.viewResolution.value = [ 1 / width, 1 / height ];
   uniforms.viewSize.value = [ width, height ];
   uniforms.viewWorldUnit.value = focus * Math.tan(fov / 2);
   uniforms.viewPixelRatio.value = pixelRatio * unit;

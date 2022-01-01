@@ -28,11 +28,14 @@ export const makeFiber = <F extends Function>(
   host?: HostInterface | null,
   parent?: LiveFiber<any> | null,
   args?: any[],
+  by?: number,
   key?: Key,
 ): LiveFiber<F> => {
   const bound = null as any;
   const depth = parent ? parent.depth + 1 : 0;
+
   const id = ++ID;
+  by = by ?? 0;
 
   const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted} : null;
   const context = parent?.context ?? NO_CONTEXT;
@@ -46,7 +49,7 @@ export const makeFiber = <F extends Function>(
     yeeted, context,
     state: null, pointer: 0, version: null, memo: null,
     mount: null, mounts: null, next: null, seen: null, order: null,
-    type: null, id,
+    type: null, id, by,
   } as LiveFiber<F>;
 
   self.bound = bind(f, self) as any as F;
@@ -61,7 +64,7 @@ export const makeSubFiber = <F extends Function>(
   key?: Key,
 ): LiveFiber<F> => {
   const {host} = parent;
-  const fiber = makeFiber(node.f, host, parent, node.args, key) as LiveFiber<F>;
+  const fiber = makeFiber(node.f, host, parent, node.args, node.by, key) as LiveFiber<F>;
   return fiber;
 }
 

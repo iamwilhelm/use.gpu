@@ -1,7 +1,7 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatValue } from '@use-gpu/live';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useRefineCursor, Cursor } from './cursor';
 import { Node } from './node';
@@ -15,16 +15,20 @@ const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span
 
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
+  fibers: Map<number, LiveFiber<any>>,
   ping: PingState,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
+  hoveredCursor: Cursor<SelectState>,
 }
 
 type FiberNodeProps = {
   fiber: LiveFiber<any>,
+  fibers: Map<number, LiveFiber<any>>,
   ping: PingState,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
+  hoveredCursor: Cursor<SelectState>,
   indent?: number,
   continuation?: boolean,
 }
@@ -34,35 +38,67 @@ type TreeExpandProps = {
   onToggle: (e: any) => void,
 }
 
-export const FiberTree: React.FC<FiberTreeProps> = ({fiber, ping, expandCursor, selectedCursor}) => {
+export const FiberTree: React.FC<FiberTreeProps> = ({
+  fiber,
+  fibers,
+  ping,
+  expandCursor,
+  selectedCursor,
+  hoveredCursor,
+}) => {
 
   return (
-    <FiberNode fiber={fiber} ping={ping} expandCursor={expandCursor} selectedCursor={selectedCursor} />
+    <FiberNode
+      fiber={fiber}
+      fibers={fibers}
+      ping={ping}
+      expandCursor={expandCursor}
+      selectedCursor={selectedCursor}
+      hoveredCursor={hoveredCursor}
+    />
   );
-
 }
 
 export const FiberNode: React.FC<FiberNodeProps> = ({
   fiber,
+  fibers,
   ping,
   expandCursor,
   selectedCursor,
+  hoveredCursor,
   continuation,
   indent = 0,
 }) => {
   const {id, mount, mounts, next, order, depth} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
+  const [hoverState, updateHoverState] = hoveredCursor;
+
+  fibers.set(id, fiber);
 
   const pinged = ping[id] || 0;
   const selected = fiber === selectState;
-  const select = () => {
-    updateSelectState({ $set: fiber });
-  }
+  const hovered = hoverState?.id ?? -1;
+
+  const [select, hover, unhover] = useMemo(() => {
+    const select = () => updateSelectState({ $set: fiber });
+    const hover = () => updateHoverState({ $set: fiber });
+    const unhover = () => updateHoverState({ $set: null });
+    return [select, hover, unhover];
+  }, [fiber, updateSelectState, updateHoverState]);
 
   const out = [] as React.ReactElement[];
 
   const nodeRender = (
-    <Node key='node' fiber={fiber} pinged={pinged} selected={selected} onClick={select} />
+    <Node
+      key='node'
+      fiber={fiber}
+      pinged={pinged}
+      selected={selected}
+      hovered={hovered}
+      onClick={select}
+      onMouseEnter={hover}
+      onMouseLeave={unhover}
+    />
   );
 
   const continuationIcon = ICONSMALL('subdirectory_arrow_right');
@@ -73,9 +109,11 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
       <FiberNode
         key='mount'
         fiber={mount}
+        fibers={fibers}
         ping={ping}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
+        hoveredCursor={hoveredCursor}
         indent={indent + (next || !hasNext ? 1 : .1)}
       />
     );
@@ -89,9 +127,11 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
           <FiberNode
             key={key}
             fiber={sub}
+            fibers={fibers}
             ping={ping}
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
+            hoveredCursor={hoveredCursor}
             indent={indent + 1}
           />
         );
@@ -115,9 +155,11 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
     nextRender = (
       <FiberNode
         fiber={next}
+        fibers={fibers}
         ping={ping}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
+        hoveredCursor={hoveredCursor}
         continuation
         indent={indent - +!!out.length}
       />
@@ -129,7 +171,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
       <Expandable id={id} expandCursor={expandCursor}>{
         (expand, onToggle) => (<>
           <TreeRow indent={indent}>
-            {continuation ? <div>{continuationIcon}</div> : null}
+            {continuation ? <div onClick={onToggle}>{continuationIcon}</div> : null}
             <TreeExpand expand={expand} onToggle={onToggle}>
               {nodeRender}
             </TreeExpand>

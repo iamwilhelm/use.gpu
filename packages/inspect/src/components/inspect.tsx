@@ -9,7 +9,7 @@ import { FiberTree } from './fiber';
 import { Props } from './props';
 import { Call } from './call';
 import { Shader } from './shader';
-import { InspectContainer, InspectContainerCollapsed, InspectToggle, SplitRow, RowPanel, Scrollable, Inset } from './layout';
+import { InspectContainer, InspectContainerCollapsed, InspectToggle, SplitRow, RowPanel, Panel, PanelFull, Scrollable, Inset } from './layout';
 import { Button, Tab, Grid } from 'semantic-ui-react'
 import "../theme.css";
 
@@ -30,24 +30,23 @@ const TAB_STYLE = { secondary: true, pointing: true };
 export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
+  const hoveredCursor = useUpdateState<SelectState>(null);
 
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);
 
-  const [detail, updateDetail] = useUpdateState<boolean>(false);
-  const toggleDetail = () => updateDetail(!detail);
-
-  const [selectedFiber] = selectedCursor;
+  const fibers = new Map<number, LiveFiber<any>>();
+  const [selectedFiber, setSelected] = selectedCursor;
   const ping = usePingTracker(fiber);
 
   const panes = selectedFiber ? [
     {
       menuItem: 'Props',
-      render: () => <Props fiber={selectedFiber} />
+      render: () => <Props fiber={selectedFiber} fibers={fibers} />
     },
     {
       menuItem: 'Fiber',
-      render: () => <Call fiber={selectedFiber} />
+      render: () => <Call fiber={selectedFiber} fibers={fibers} />
     },
   ] : [];
 
@@ -70,22 +69,23 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
     }
   }
 
-  const Container = detail ? InspectContainer : InspectContainerCollapsed;
+  const Container = selectedFiber ? InspectContainer : InspectContainerCollapsed;
 
   const tree = (
-    <Scrollable>
+    <Scrollable onClick={() => setSelected(null)}>
       <Inset>
-        <FiberTree fiber={fiber}  ping={ping} expandCursor={expandCursor} selectedCursor={selectedCursor} />
+        <FiberTree
+          fiber={fiber}
+          fibers={fibers}
+          ping={ping}
+          expandCursor={expandCursor}
+          selectedCursor={selectedCursor}
+          hoveredCursor={hoveredCursor}
+        />
       </Inset>
     </Scrollable>
   );
 
-  const expand = (
-    <InspectToggle onClick={toggleDetail}>
-      <Button>{detail ? '<' : '>'}</Button>
-    </InspectToggle>
-  );
-  
   const props = (
     <Scrollable>
       <Inset>
@@ -103,19 +103,23 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 
   return (<>
     {open  ? <Container onMouseDown={onMouseDown} className="ui inverted">
-      {detail ? (
+      {selectedFiber ? (
         <SplitRow>
           <RowPanel style={{width: '34%'}}>
-            {tree}
-            {expand}
+            <PanelFull>
+              {tree}
+            </PanelFull>
           </RowPanel>
           <RowPanel style={{width: '66%'}}>
-            {props}
+            <Panel>
+              {props}
+            </Panel>
           </RowPanel>
         </SplitRow>
       ) : (<>
-        {expand}
-        {tree}
+        <PanelFull>
+          {tree}
+        </PanelFull>
       </>)}
     </Container> : null}
     <InspectToggle onClick={toggleOpen}>

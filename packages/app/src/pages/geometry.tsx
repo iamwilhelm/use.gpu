@@ -5,7 +5,7 @@ import { DataField, Emitter, ShaderLanguages, StorageSource, ViewUniforms, Unifo
 import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass,
+  Loop, Draw, Pass, Flat,
   CompositeData, Data, RawData, Inline,
   OrbitCamera, OrbitControls,
   Pick, Cursor, Points, Lines,
@@ -130,9 +130,8 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (fiber) => (props)
 
         use(OrbitCamera)({
           radius, phi, theta,
-          scale: 720,
-          children:
-            view
+          scale: 1080,
+          children: view,
         })  
     })
   );

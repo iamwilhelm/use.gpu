@@ -4,12 +4,13 @@ import styled, { keyframes } from "styled-components";
 
 import React, { useState } from 'react';
 import { Action } from './types';
-import { SplitRow, TreeRow, TreeIndent, Label } from './layout';
+import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from './layout';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 
 type PropsProps = {
   fiber: LiveFiber<any>,
+  fibers: Map<number, LiveFiber<any>>,
 };
 
 const Prefix = styled.div`
@@ -23,7 +24,7 @@ const Compact = styled.span`
   white-space: nowrap;
 `;
 
-export const Props: React.FC<PropsProps> = ({fiber}) => {
+export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   // @ts-ignore
   const {id, f, arg, args} = fiber;
   const name = formatNodeName(fiber);
@@ -61,9 +62,26 @@ export const Props: React.FC<PropsProps> = ({fiber}) => {
     }
   }
 
+  let history = null as React.ReactNode | null;
+  let parent = fiber;
+  if (parent.by) {
+    const parents = [] as LiveFiber<any>;
+    while (parent) {
+      const {by} = parent;
+      parent = fibers.get(by);
+      if (parent) parents.push(parent);
+    }
+    history = parents.map((fiber) => <div key={fiber.id}>{formatNode(fiber)}</div>)  }
+  else {
+    history = '[Runtime]';
+  }
+
   return (<>
     <div><b>{name}</b></div>
     <div>{inspectObject(props, state, toggleState, '')}</div>
+    <Spacer />
+    <div><b>Rendered By</b></div>
+    <div>{history}</div>
   </>);
 }
 

@@ -68,7 +68,7 @@ export const makeProjectionMatrix = (
   fov: number,
   near: number,
   far: number,
-  focus: number = 1,
+  radius: number = 1,
   dolly: number = 1,
 ): mat4 => {
   const aspect = width / height;
@@ -86,7 +86,7 @@ export const makeProjectionMatrix = (
     mat4.multiply(matrix, z, matrix);
   }
   else if (dolly > 0) {
-    const shift = (1 / dolly - 1) * focus;
+    const shift = (1 / dolly - 1) * radius;
     const dFov = Math.atan(Math.tan(fov / 2) * dolly) * 2;
     const dNear = near + shift;
     const dFar = far + shift;
@@ -94,11 +94,6 @@ export const makeProjectionMatrix = (
     // GL perspective matrix with reduced FOV and shifted near/far plane
     matrix = mat4.create();
     mat4.perspective(matrix, dFov, aspect, dNear, dFar);
-
-    // Translate camera in -Z in view space
-    const t = mat4.create();
-    mat4.translate(t, t, vec3.fromValues(0, 0, -shift));
-    mat4.multiply(matrix, matrix, t);
 
     // Move Z from -1..1 to 0..1 in clip space
     const z = mat4.create();
@@ -115,16 +110,17 @@ export const makeProjectionMatrix = (
   return matrix;
 }
 
-export const makeOrbitMatrix = (radius: number, phi: number, theta: number): mat4 => {
+export const makeOrbitMatrix = (radius: number, phi: number, theta: number, dolly: number): mat4 => {
   const matrix = mat4.create();
-  mat4.translate(matrix, matrix, vec3.fromValues(0, 0, -radius));
+  mat4.translate(matrix, matrix, vec3.fromValues(0, 0, -radius / (dolly || 1)));
   mat4.rotate(matrix, matrix, theta, vec3.fromValues(1, 0, 0));
   mat4.rotate(matrix, matrix, phi, vec3.fromValues(0, 1, 0));
   return matrix;
 }
 
-export const makeOrbitPosition = (radius: number, phi: number, theta: number): number[] => {
+export const makeOrbitPosition = (radius: number, phi: number, theta: number, dolly: number): number[] => {
   const ct = Math.cos(theta);
+  radius /= Math.max(1e-5, dolly);
   return [
     -Math.sin(phi) * ct * radius,
     Math.sin(theta) * radius,

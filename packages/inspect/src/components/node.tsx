@@ -2,7 +2,7 @@ import { LiveFiber } from '@use-gpu/live/types';
 import { formatValue, formatNodeName } from '@use-gpu/live';
 import styled, { keyframes } from "styled-components";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { Action } from './types';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
@@ -22,8 +22,17 @@ export const StyledNode = styled.div`
   white-space: nowrap;
   margin: -2px -5px;
   padding: 2px 5px;
+
   &.selected {
     background: rgba(50, 130, 200, 0.85);
+  }
+
+  &.hovered {
+    background: rgba(50, 190, 200, 0.85);
+  }
+
+  &.by {
+    background: rgba(50, 190, 200, 0.65);
   }
 
   &.builtin {
@@ -54,11 +63,14 @@ type NodeProps = {
   fiber: LiveFiber<any>,
   pinged: number,
   selected: boolean,
+  hovered: number,
   onClick?: Action,
+  onMouseEnter?: Action,
+  onMouseLeave?: Action,
 };
 
-export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) => {
-  const {id, f, args, yeeted} = fiber;
+export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, hovered, onClick, onMouseEnter, onMouseLeave}) => {
+  const {id, by, f, args, yeeted} = fiber;
 
   const yeet = yeeted?.value !== undefined;
   const suffix = yeet ? ICONSMALL("switch_left") : null;
@@ -66,12 +78,20 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) =>
   const classes = [] as string[];
   if (selected) classes.push('selected');
   if (pinged) classes.push('pinged');
+  if (hovered === id) classes.push('hovered');
+  if (hovered === by) classes.push('by');
   if (f.isLiveBuiltin) classes.push('builtin');
   const className = classes.join(' ');
 
   const elRef = useRef<HTMLDivElement | null>(null);
   const {current: el} = elRef;
   const lastPinged = el && el.classList.contains('pinged');
+
+  const handleClick = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onClick && onClick();
+  }, [onClick]);
 
   useEffect(() => {
     if (lastPinged && el) {
@@ -83,5 +103,15 @@ export const Node: React.FC<NodeProps> = ({fiber, pinged, selected, onClick}) =>
 
   const name = formatNodeName(fiber);
 
-  return <StyledNode ref={elRef} className={className} onClick={onClick}>{name}{suffix}</StyledNode>;
+  return (
+    <StyledNode
+      ref={elRef}
+      className={className}
+      onClick={handleClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {name}{suffix}
+    </StyledNode>
+  );
 }

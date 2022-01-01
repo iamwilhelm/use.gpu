@@ -81,21 +81,21 @@ export const use = <F extends Function>(
   key?: Key,
 ) => (
   ...args: F extends ArrowFunction ? Parameters<F> : any[]
-): DeferredCall<F> => ({f, args, key}) as any;
+): DeferredCall<F> => ({f, args, key, by: CURRENT_FIBER?.id}) as any;
 
 // Detach the rendering of a subtree
 export const detach = <F extends Function>(
   call: DeferredCall<F>,
   callback: (render: () => void, fiber: LiveFiber<F>) => void,
   key?: Key,
-): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key});
+): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key, by: CURRENT_FIBER?.id});
 
 // Reconcile an array of calls
 export const reconcile = <F extends Function>(
   calls: LiveElement<any>,
   key?: Key,
 ): DeferredCall<() => void> => {
-  if (Array.isArray(calls)) return ({f: RECONCILE, args: calls, key});
+  if (Array.isArray(calls)) return ({f: RECONCILE, args: calls, key, by: CURRENT_FIBER?.id});
   return ({f: RECONCILE, args: [calls], key});
 }
 
@@ -106,27 +106,27 @@ export const mapReduce = <R, T>(
   reduce?: (a: R, b: R) => R,
   done?: LiveFunction<(r: R) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key});
+): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key, by: CURRENT_FIBER?.id});
 
 // Gather items from a subtree
 export const gatherReduce = <T>(
   calls: LiveElement<any>,
   done?: LiveFunction<(r: T[]) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key});
+): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key, by: CURRENT_FIBER?.id});
 
 // Gather items from a subtree
 export const multiGatherReduce = <T>(
   calls: LiveElement<any>,
   done?: LiveFunction<(r: T[]) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key});
+): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key, by: CURRENT_FIBER?.id});
 
 // Yeet value(s) upstream
 export const yeet = <T>(
   value: T,
   key?: Key,
-): DeferredCall<() => void> => ({f: YEET, arg: value, key});
+): DeferredCall<() => void> => ({f: YEET, arg: value, key, by: CURRENT_FIBER?.id});
 
 // Provide a value for a context
 export const provide = <T, C>(
@@ -134,7 +134,7 @@ export const provide = <T, C>(
   value: T,
   calls: LiveElement<any> | undefined,
   key?: Key,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key});
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key, by: CURRENT_FIBER?.id});
 
 // Provide a value for a context, memoizing if it doesn't change
 export const provideMemo = <T, C>(
@@ -142,7 +142,7 @@ export const provideMemo = <T, C>(
   value: T,
   calls: LiveElement<any> | undefined,
   key?: Key,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key});
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key, by: CURRENT_FIBER?.id});
 
 // Consume value from a co-context
 export const consume = <T, C>(
@@ -150,13 +150,7 @@ export const consume = <T, C>(
   calls: LiveElement<any> | undefined,
   done?: LiveFunction<(r: T) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key});
-
-// Hold call info for a fiber
-export const makeFunctionCall = <F extends Function>(
-  f: LiveFunction<F>,
-  args?: any[],
-): FunctionCall<F> => ({f, args});
+): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key, by: CURRENT_FIBER?.id});
 
 // Make live context for holding shared data for child nodes
 export const makeContext = <T>(initialValue?: T | null, displayName?: string): LiveContext<T> => ({

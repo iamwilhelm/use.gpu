@@ -53,6 +53,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   path: Key[],
   depth: number,
   id: number,
+  by: number,
 
   // Instance of F bound to self
   bound?: F,
@@ -120,6 +121,7 @@ export type FunctionCall<F extends Function = ArrowFunction> = {
 
 export type DeferredCall<F extends Function = ArrowFunction> = FunctionCall<F> & {
   key?: Key,
+  by?: number,
 };
 
 export type LiveElement<F = any> = null | DeferredCall<any> | LiveElement<any>[];

@@ -2,6 +2,7 @@ export * from './canvas';
 export * from './camera';
 export * from './consumers';
 export * from './data';
+export * from './flat';
 export * from './geometry';
 export * from './hooks';
 export * from './layers';

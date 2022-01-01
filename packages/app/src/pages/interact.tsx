@@ -1,11 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { DataField, Emitter, ShaderLanguages, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
-  Draw, Pass, Viewport,
+  Draw, Pass, Flat, Absolute,
 } from '@use-gpu/components';
 import { Mesh } from '../mesh';
 import { makeMesh } from '../meshes/mesh';
@@ -17,11 +15,21 @@ export type InteractPageProps = {
 export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props) => {
 
   return (
-    use(Viewport)({
+    use(Flat)({
       children:
-        use(Draw)({
-          children: use(Pass)({}),
+
+        use(Absolute)({
+          left: 10,
+          top: 10,
+          right: 10,
+          bottom: 10,
+          children:
+
+            use(Draw)({
+              children: use(Pass)({}),
+            })
         })
+
     })
   );
 };

@@ -84,22 +84,24 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
   const instanceCount = props.positions?.length ?? count;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-
-  const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [
-    props.positions ?? props.position ?? props.getPosition,
-    props.colors ?? props.color ?? props.getColor,
-    props.sizes ?? props.size ?? props.getSize,
-    props.depths ?? props.depth ?? props.getDepth,
-  ]);
-
-  const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [
-    (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null,
-    props.getTexture,
-  ]);
-
   const key = fiber.id;
-  const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
-  const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
+
+  const p = props.positions ?? props.position ?? props.getPosition;
+  const c = props.colors ?? props.color ?? props.getColor;
+  const s = props.sizes ?? props.size ?? props.getSize;
+  const d = props.depths ?? props.depth ?? props.getDepth;
+
+  const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null;
+  const t = props.getTexture;
+
+  const [getVertex, getFragment] = useMemo(() => {
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, c, s, d]);
+    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
+
+    const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
+    const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
+    return [getVertex, getFragment];
+  }, [p, c, s, d, m, t]);
 
   return use(Virtual)({
     vertexCount,

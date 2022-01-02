@@ -65,7 +65,7 @@ const PIPELINE = {
   },
 };
 
-export const RawRectangles: LiveComponent<RawRectanglesProps> = (fiber) => (props) => {
+export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((fiber) => (props) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -77,20 +77,22 @@ export const RawRectangles: LiveComponent<RawRectanglesProps> = (fiber) => (prop
   const instanceCount = props.positions?.length ?? count;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-
-  const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [
-    props.rectangles ?? props.rectangle ?? props.getRectangle,
-    props.colors ?? props.color ?? props.getColor,
-  ]);
-
-  const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [
-    (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null,
-    props.getTexture,
-  ]);
-
   const key = fiber.id;
-  const getVertex = bindBundle(getRectangleVertex, bindingsToLinks(vertexBindings), null, key);
-  const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
+
+  const r = props.rectangles ?? props.rectangle ?? props.getRectangle;
+  const c = props.colors ?? props.color ?? props.getColor;
+  const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null;
+  const t = props.getTexture;
+
+  const [getVertex, getFragment] = useMemo(() => {
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, c]);
+    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
+
+    const getVertex = bindBundle(getRectangleVertex, bindingsToLinks(vertexBindings), null, key);
+    const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
+
+    return [getVertex, getFragment];
+  }, [r, c, m, t]);
 
   return use(Virtual)({
     vertexCount,
@@ -106,4 +108,4 @@ export const RawRectangles: LiveComponent<RawRectanglesProps> = (fiber) => (prop
     mode,
     id,
   });
-};
+}, 'RawRectangles');

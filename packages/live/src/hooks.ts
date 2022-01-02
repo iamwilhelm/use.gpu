@@ -19,14 +19,14 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
   let {state, pointer} = fiber;
   if (!state) state = fiber.state = [];
   fiber.pointer += STATE_SLOTS;
-  
+
   const marker = state![pointer];
   if (marker === undefined) state![pointer] = hookType;
   else if (marker !== hookType) throw new Error("Hooks were not called in the same order as last render.");
 
   return pointer + 1;
 }
-export const yoloState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hook) => {
+export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
   let {state, pointer} = fiber;
   if (!state) return;
 
@@ -413,8 +413,9 @@ export const useYolo = (
   fiber.state = sub;
   fiber.pointer = 0;
   callback();
+  discardState(fiber);
   fiber.state = state;
-  fiber.pointer = pointer;  
+  fiber.pointer = pointer;
 }
 
 export const useNoYolo = () => {
@@ -424,7 +425,15 @@ export const useNoYolo = () => {
   const {state, pointer} = fiber;
 
   let sub = state![i];
-  if (sub) sub = null;
+  if (sub) {
+    fiber.state = sub;
+    fiber.pointer = 0;
+    discardState(fiber);
+    fiber.state = state;
+    fiber.pointer = pointer;
+
+    sub = null;
+  }
 }
 
 // Togglable hooks

@@ -4,7 +4,9 @@ import { makeFiber, renderFiber, bustFiberCaches, visitYeetRoots } from './fiber
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester, isSubNode, compareFibers } from './util';
 import { formatNode } from './debug';
 
-const SLICE_STACK = 20;
+const LIVE_RUNTIME_CONFIG = {
+  sliceStack: 20,
+};
 
 let DEBUG = false;
 //setTimeout((() => DEBUG = false), 4000);
@@ -130,7 +132,7 @@ const makeRenderCallbacks = (root: LiveFiber<any>, visit: Set<LiveFiber<any>>): 
   let {depth} = root;
 
   const onRender = (fiber: LiveFiber<any>, allowSlice: boolean = true) => {
-    const inSameStack = !allowSlice || (fiber.depth - depth <= SLICE_STACK);
+    const inSameStack = !allowSlice || (fiber.depth - depth <= LIVE_RUNTIME_CONFIG.sliceStack);
     if (inSameStack) {
       // Remove from to-visit set
       visit.delete(fiber);

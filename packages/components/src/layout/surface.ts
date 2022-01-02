@@ -9,15 +9,19 @@ import { Rectangles } from '../layers';
 
 export type SurfaceProps = {
   layout?: Rectangle,
-  stroke?: number[],
-  fill?: number[],
+  stroke?: boolean,
+  fill?: boolean,
+  strokeColor?: number[],
+  fillColor?: number[],
   lineWidth?: number,
 };
 
 export const Surface: LiveComponent<SurfaceProps> = (fiber) => (props) => {
   const {
-    stroke = [1, 1, 1, 1],
-    fill = [0, 0, 0, 1],
+    stroke = false,
+    fill = true,
+    strokeColor = [1, 1, 1, 1],
+    fillColor = [0, 0, 0, 1],
     lineWidth = 1,
   } = props;
 
@@ -45,18 +49,29 @@ export const Surface: LiveComponent<SurfaceProps> = (fiber) => (props) => {
     left, bottom, 0.5, 1,
   ];
 
-  return yeet({
-    rectangle: {
-      rectangle: [left, top, right, bottom],
-      color: fill,
-      count: 1,
-    },
-    line: {
+  const render = {};
+  if (fill) {
+    render.point = {
       positions,
-      color: stroke,
+      color: strokeColor,
+      size: lineWidth * 5,
+      count: 4,
+    };
+    render.rectangle = {
+      rectangle: [left, top, right, bottom],
+      color: fillColor,
+      count: 1,
+    };
+  }
+  if (stroke) {
+    render.line = {
+      positions,
+      color: strokeColor,
       size: lineWidth,
       isLoop: true,
       count: 4,
-    },
-  });
+    };
+  }
+
+  return yeet(render);
 };

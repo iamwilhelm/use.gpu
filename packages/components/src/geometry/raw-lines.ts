@@ -97,18 +97,22 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) =>
   const instanceCount = (props.positions?.length || 2) - 1;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-
-  const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [
-    props.positions ?? props.position ?? props.getPosition,
-    props.segments ?? props.segment ?? props.getSegment,
-    props.colors ?? props.color ?? props.getColor,
-    props.sizes ?? props.size ?? props.getSize,
-    props.depths ?? props.depth ?? props.getDepth,
-  ]);
-
   const key = fiber.id;
-  const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings), {}, key);
-  const getFragment = getPassThruFragment;
+
+  const p = props.positions ?? props.position ?? props.getPosition;
+  const g = props.segments ?? props.segment ?? props.getSegment;
+  const c = props.colors ?? props.color ?? props.getColor;
+  const s = props.sizes ?? props.size ?? props.getSize;
+  const d = props.depths ?? props.depth ?? props.getDepth;
+
+  const [getVertex, getFragment] = useMemo(() => {
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, g, c, s, d]);
+
+    const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings), {}, key);
+    const getFragment = getPassThruFragment;
+
+    return [getVertex, getFragment];
+  }, [p, g, c, s, d]);
 
   return use(Virtual)({
     vertexCount,

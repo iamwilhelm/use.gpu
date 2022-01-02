@@ -3,7 +3,7 @@ import { formatNode, formatValue, traverseFiber, renderFibers } from '@use-gpu/l
 import { useUpdateState } from './cursor';
 import { ExpandState, SelectState, HoverState, PingState } from './types';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { memo, useLayoutEffect, useEffect, useMemo, useState } from 'react';
 import { Node } from './node';
 import { FiberTree } from './fiber';
 import { Props } from './props';
@@ -11,7 +11,7 @@ import { Call } from './call';
 import { Shader } from './shader';
 import {
   InspectContainer, InspectToggle,
-  SplitRow, RowPanel, Panel, PanelFull, Scrollable, ScrollableFull, Inset, InsetFull,
+  SplitRow, RowPanel, Panel, PanelFull, Scrollable, ScrollableFull, Inset, InsetColumnFull,
 } from './layout';
 import { Button, Tab, Grid } from 'semantic-ui-react'
 import "../theme.css";
@@ -74,7 +74,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 
   const tree = (
     <ScrollableFull onClick={() => setSelected(null)}>
-      <InsetFull>
+      <InsetColumnFull>
         <FiberTree
           fiber={fiber}
           fibers={fibers}
@@ -83,7 +83,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
           selectedCursor={selectedCursor}
           hoveredCursor={hoveredCursor}
         />
-      </InsetFull>
+      </InsetColumnFull>
     </ScrollableFull>
   );
 

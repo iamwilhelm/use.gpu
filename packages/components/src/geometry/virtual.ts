@@ -81,7 +81,13 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
     ...propDefines,
   }), [isPicking, propDefines]);
 
+
   // Shaders
+  const links = useMemo(() => ({
+    getVertex,
+    getFragment,
+  }), [getVertex, getFragment]);
+
   const {
     shader,
     uniforms,
@@ -89,7 +95,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
   } = useBoundShader(
     vertexShader,
     fragmentShader,
-    {getVertex, getFragment},
+    links,
     defines,
     languages,
     deps,

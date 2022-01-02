@@ -14,7 +14,7 @@ const pingAnimation = keyframes`
 `
 
 const mountAnimation = keyframes`
- 0% { background: rgba(140, 170, 25, 1.0); }
+ 0% { background: rgba(120, 120, 120, 1.0); }
  100% { background: rgba(0, 0, 0, 1.0); }
 `
 
@@ -46,7 +46,7 @@ export const StyledNode = styled.div`
   }
 
   &.staticMount {
-    background: rgba(140, 170, 25, 1.0);
+    background: rgba(120, 120, 120, 1.0);
   }
 
   &.staticPing {
@@ -59,7 +59,7 @@ export const StyledNode = styled.div`
 
   &.mounted {
     animation-name: ${mountAnimation};
-    animation-duration: 0.75s;
+    animation-duration: 1.0s;
     animation-iteration-count: 1;
 
     &.selected {
@@ -69,7 +69,7 @@ export const StyledNode = styled.div`
 
   &.pinged {
     animation-name: ${pingAnimation};
-    animation-duration: 0.75s;
+    animation-duration: 1.0s;
     animation-iteration-count: 1;
 
     &.selected {

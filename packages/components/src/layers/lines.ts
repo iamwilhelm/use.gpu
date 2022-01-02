@@ -14,6 +14,7 @@ import { makeShaderBinding, makeShaderBindings, makeDataArray, makeStorageBuffer
 
 import { RenderContext } from '@use-gpu/components';
 
+/*
 export type LinesProps = {
   position?: number[] | TypedArray,
   segment?: number,
@@ -42,3 +43,6 @@ export type LinesProps = {
 export const Lines: LiveComponent<LinesProps> = (fiber) => (props) => {
   return use(RawLines)(props);
 };
+*/
+
+export const Lines = RawLines;

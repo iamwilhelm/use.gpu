@@ -55,7 +55,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props)
                                   alignX: 'between',
                                   children: [
                                     use(Element)({ width: 200 }),
-                                    use(Element)({ width: 300, margin: 10, shrink: 1 }),
+                                    use(Element)({ width: 300, margin: 30, shrink: 1 }),
                                     use(Block)({
                                       children: [
                                         use(Element)({ width: 200 }),

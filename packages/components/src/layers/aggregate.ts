@@ -14,8 +14,9 @@ import {
   uploadBuffer,
 } from '@use-gpu/core';
 
-import { Rectangles } from './rectangles';
 import { Lines } from './lines';
+import { Points } from './points';
+import { Rectangles } from './rectangles';
 
 export type AggregateProps = {
   mode?: RenderPassMode | string,
@@ -87,6 +88,41 @@ const getItemSummary = (items: LayerAggregate[]) => {
 
   return {keys, count, memoKey};
 }
+
+const makePointAccumulator = (
+  device: GPUDevice,
+  items: LineAggregate[],
+  keys: Set<string>,
+  count: number,
+) => {
+  const storage = {} as Record<string, AggregateBuffer>;
+
+  const hasPosition = keys.has('positions') || keys.has('position');
+  const hasColor = keys.has('colors') || keys.has('color');
+  const hasSize = keys.has('sizes') || keys.has('size');
+  const hasDepth = keys.has('depths') || keys.has('depth');
+
+  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.float, count);
+  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.float, count);
+
+  return {
+    count,
+    update: (items: LineAggregate[]) => {
+      const count = items.reduce(allCount, 0);
+      const props = {count, shape: 'circle'};
+
+      if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
+      if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+      if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
+      if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');
+
+      return props;
+    },
+  };
+}
+
 
 const makeLineAccumulator = (
   device: GPUDevice,
@@ -222,5 +258,6 @@ const updateAggregateSegments = (
 
 const AGGREGATORS = {
   [LayerType.Line]: [makeLineAccumulator, Lines],
+  [LayerType.Point]: [makePointAccumulator, Points],
   [LayerType.Rectangle]: [makeRectangleAccumulator, Rectangles],
 };

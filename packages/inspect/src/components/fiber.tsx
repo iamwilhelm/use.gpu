@@ -7,7 +7,7 @@ import { useRefineCursor, Cursor } from './cursor';
 import { Node } from './node';
 import { PingState, ExpandState, SelectState, HoverState, Action } from './types';
 
-import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeLegend, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
+import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
@@ -153,7 +153,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
 
   const nodeRender = (
     <Node
-      key='node'
+      key={id}
       fiber={fiber}
       pinged={pinged}
       selected={selected}
@@ -267,7 +267,7 @@ export const TreeExpand: React.FC<TreeExpandProps> = ({
 
   return (<>
     <TreeRow>
-      <div onClick={onToggle}>{icon}</div>
+      <TreeToggle onClick={onToggle}>{icon}</TreeToggle>
       {children}
     </TreeRow>
   </>);

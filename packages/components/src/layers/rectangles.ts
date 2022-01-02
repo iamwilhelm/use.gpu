@@ -14,6 +14,7 @@ import { makeShaderBinding, makeShaderBindings, makeDataArray, makeStorageBuffer
 
 import { RenderContext } from '@use-gpu/components';
 
+/*
 export type RectanglesProps = {
   rectangle?: number[] | TypedArray,
   color?: number[] | TypedArray,
@@ -37,3 +38,6 @@ export type RectanglesProps = {
 export const Rectangles: LiveComponent<RectanglesProps> = (fiber) => (props) => {
   return use(RawRectangles)(props);
 };
+*/
+
+export const Rectangles = RawRectangles;

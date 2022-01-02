@@ -53,6 +53,7 @@ export const SplitRowFull = styled(SplitRow)`
 
 export const SplitColumnFull = styled(SplitColumn)`
   height: 100%;
+  flex-grow: 1;
 `;
 
 export const RowPanel = styled.div`
@@ -93,8 +94,10 @@ export const Inset = styled.div`
   padding: 20px;
 `;
 
-export const InsetFull = styled.div`
+export const InsetColumnFull = styled.div`
   padding: 20px;
+  display: flex;
+  flex-direction: column;
   min-height: 100%;
 `;
 
@@ -105,8 +108,13 @@ export const Label = styled.div`
   display: flex;
 `;
 
-export const TreeWrapper = styled.div<TreeWrapper>`
+export const TreeWrapper = styled.div`
   flex-grow: 1;
+`;
+
+export const TreeToggle = styled.div`
+  position: relative;
+  z-index: 1;
 `;
 
 export const TreeRow = styled.div<TreeIndentProps>`
@@ -119,6 +127,7 @@ export const TreeLegend = styled.div`
   color: var(--colorTextSemi);
   padding-top: 30px;
   display: flex;
+  flex-wrap: wrap;
   font-size: 0.9em;
 `;
 

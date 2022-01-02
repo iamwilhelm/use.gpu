@@ -44,8 +44,10 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
       shrink,
       render: (layout: LayoutState) => use(Surface, fiber.id)({
         layout,
-        fill: [Math.random(), Math.random(), Math.random(), 1],
-        stroke: [Math.random(), Math.random(), Math.random(), 1],
+        fill: true,
+        stroke: true,
+        fillColor: [Math.random(), Math.random(), Math.random(), 1],
+        strokeColor: [Math.random(), Math.random(), Math.random(), 1],
       }),
     };
   });

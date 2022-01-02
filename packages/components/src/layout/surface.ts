@@ -1,12 +1,14 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
-import { use, yeet, useContext } from '@use-gpu/live';
+import { use, yeet, useContext, useNoContext } from '@use-gpu/live';
 import { LayoutContext } from '../providers/layout-provider';
 import { LayerType } from '../layers/types';
+import { Rectangle } from '../layout/types';
 
 import { Rectangles } from '../layers';
 
 export type SurfaceProps = {
+  layout?: Rectangle,
   stroke?: number[],
   fill?: number[],
   lineWidth?: number,
@@ -19,8 +21,16 @@ export const Surface: LiveComponent<SurfaceProps> = (fiber) => (props) => {
     lineWidth = 1,
   } = props;
 
-  const rectangle = useContext(LayoutContext);
-  let [left, top, right, bottom] = rectangle;
+  let layout;
+  if (props.layout) {
+    layout = props.layout;
+    useNoContext(LayoutContext);
+  }
+  else {
+    layout = useContext(LayoutContext);
+  }
+
+  let [left, top, right, bottom] = layout;
 
   const d = lineWidth / 2;
   left += d;

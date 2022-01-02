@@ -18,8 +18,8 @@ const Resume = resume((fiber: LiveFiber<any>) => (ls: LayoutHandler[]) => {
 
   const out = [] as LiveElement[];
   for (let l of ls) {
-    const {box, element, key} = l(layout);
-    out.push(provide(LayoutContext, box, element, key));
+    const {box, render} = l(layout);
+    out.push(...render(box));
   }
 
   return out;

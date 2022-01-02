@@ -9,12 +9,17 @@ const ICON = (s: string) => <span className="m-icon">{s}</span>
 const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
 
 const pingAnimation = keyframes`
- 0% { background: rgba(10, 150, 75, 1.0); }
+ 0% { background: rgba(10, 170, 85, 1.0); }
+ 100% { background: rgba(0, 0, 0, 1.0); }
+`
+
+const mountAnimation = keyframes`
+ 0% { background: rgba(140, 170, 25, 1.0); }
  100% { background: rgba(0, 0, 0, 1.0); }
 `
 
 const selectedAnimation = keyframes`
- 0% { background: rgba(10, 100, 100, 0.5); }
+ 0% { background: rgba(10, 170, 85, 1.0); }
  100% { background: rgba(50, 130, 200, 0.85); }
 `
 
@@ -40,17 +45,31 @@ export const StyledNode = styled.div`
     background: rgba(80, 40, 220, 1.0);
   }
 
-  &.live {
-    background: rgba(10, 150, 75, 1.0);
+  &.staticMount {
+    background: rgba(140, 170, 25, 1.0);
+  }
+
+  &.staticPing {
+    background: rgba(10, 170, 85, 1.0);
   }
 
   &.builtin {
     color: var(--colorTextMuted);
   }
 
+  &.mounted {
+    animation-name: ${mountAnimation};
+    animation-duration: 0.75s;
+    animation-iteration-count: 1;
+
+    &.selected {
+      animation-name: ${selectedAnimation};
+    }
+  }
+
   &.pinged {
     animation-name: ${pingAnimation};
-    animation-duration: 0.5s;
+    animation-duration: 0.75s;
     animation-iteration-count: 1;
 
     &.selected {
@@ -71,7 +90,8 @@ export const StyledNode = styled.div`
 type NodeProps = {
   fiber: LiveFiber<any>,
   pinged?: number,
-  live?: boolean,
+  staticPing?: boolean,
+  staticMount?: boolean,
   selected?: boolean,
   hovered?: number,
   depended?: boolean,
@@ -83,7 +103,8 @@ type NodeProps = {
 export const Node: React.FC<NodeProps> = ({
   fiber,
   pinged,
-  live,
+  staticPing,
+  staticMount,
   selected,
   hovered,
   depended,
@@ -96,15 +117,20 @@ export const Node: React.FC<NodeProps> = ({
   const yeet = yeeted?.value !== undefined;
   const suffix = yeet ? ICONSMALL("switch_left") : null;
 
+  const newRef = useRef<boolean>(true);
+
   const classes = [] as string[];
+  if (pinged) classes.push(newRef.current ? 'mounted' : 'pinged');
   if (selected) classes.push('selected');
-  if (pinged) classes.push('pinged');
-  if (live) classes.push('live');
+  if (staticPing) classes.push('staticPing');
+  if (staticMount) classes.push('staticMount');
   if (depended) classes.push('depended');
   if (hovered === id) classes.push('hovered');
   if (hovered === by) classes.push('by');
   if (f.isLiveBuiltin) classes.push('builtin');
   const className = classes.join(' ');
+
+  newRef.current = false;
 
   const elRef = useRef<HTMLDivElement | null>(null);
   const {current: el} = elRef;

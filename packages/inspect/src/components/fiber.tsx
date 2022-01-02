@@ -1,5 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { formatValue } from '@use-gpu/live';
+import { formatValue, YEET } from '@use-gpu/live';
 
 import React, { useMemo } from 'react';
 
@@ -55,7 +55,14 @@ export const FiberLegend: React.FC = () => {
       <TreeLegendItem>
         <Node
           fiber={fiber}
-          live={true}
+          staticMount={true}
+        />
+        <span>Mounted</span>
+      </TreeLegendItem>
+      <TreeLegendItem>
+        <Node
+          fiber={fiber}
+          staticPing={true}
         />
         <span>Updated</span>
       </TreeLegendItem>
@@ -113,7 +120,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
   continuation,
   indent = 0,
 }) => {
-  const {id, mount, mounts, next, order, depth, host} = fiber;
+  const {id, mount, mounts, next, order, depth, host, yeeted} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
   const [hoverState, updateHoverState] = hoveredCursor;
 
@@ -122,12 +129,23 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
   const pinged = ping[id] || 0;
   const selected = fiber === selectState;
   const hovered = hoverState.fiber?.id ?? -1;
-  const depended = hoverState.deps.indexOf(fiber) >= 0;
+  const depended = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
 
   const [select, hover, unhover] = useMemo(() => {
-    const select = () => updateSelectState({ $set: fiber });
-    const hover = () => updateHoverState({ $set: { fiber, deps: host.invalidate(fiber) } });
-    const unhover = () => updateHoverState({ $set: { fiber: null, deps: [] } });
+    const roots = yeeted && fiber.type === YEET ? yeeted.roots : null;
+    const root  = roots ? roots[roots.length - 1] : null;
+
+    const select  = () => updateSelectState({ $set: fiber });
+    const hover   = () => updateHoverState({ $set: {
+      fiber,
+      deps: host.invalidate(fiber),
+      root,
+    } });
+    const unhover = () => updateHoverState({ $set: {
+      fiber: null,
+      deps: [],
+      root: null,
+    } });
     return [select, hover, unhover];
   }, [fiber, updateSelectState, updateHoverState]);
 

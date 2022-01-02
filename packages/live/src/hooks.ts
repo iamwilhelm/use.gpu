@@ -46,10 +46,10 @@ export const yoloState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
         useNoResource();
         break;
       case Hook.CONTEXT:
-        useNoContext();
+        useNoContext(state[j + 1]);
         break;
       case Hook.CONSUMER:
-        useNoConsumer();
+        useNoConsumer(state[j + 1]);
         break;
       case Hook.YOLO:
         useNoYolo();
@@ -297,7 +297,8 @@ export const useContext = <C>(
 
   if (host) {
     if (!state![i]) {
-      state![i] = context;
+      state![i] = true;
+      state![i + 1] = context;
       host.track(fiber, () => host.undepend(fiber, root));
     }
 
@@ -313,12 +314,19 @@ export const useOptionalContext = <C>(
 ) => {
   const fiber = useFiber();
 
-  const {host, context: {values, roots}} = fiber;
+  const i = pushState(fiber, Hook.CONTEXT);
+  const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context);
   if (!root) return context.initialValue ?? null;
 
-  if (host && host.depend(fiber, root)) {
-    host.track(fiber, () => host.undepend(fiber, root));
+  if (host) {
+    if (!state![i]) {
+      state![i] = true;
+      state![i + 1] = context;
+      host.track(fiber, () => host.undepend(fiber, root));
+    }
+
+    host.depend(fiber, root);
   }
 
   return values.get(context).current ?? context.initialValue;
@@ -339,7 +347,8 @@ export const useConsumer = <C>(
   const next= root.next;
   if (host) {
     if (!state![i]) {
-      state![i] = context;
+      state![i] = true;
+      state![i + 1] = context;
       host.track(fiber, () => {
         registry.delete(fiber);
         host.schedule(next, NOP);
@@ -368,7 +377,7 @@ export const useNoContext = <C>(
 
   if (state![i]) {
     if (host) host.undepend(fiber, root);
-    state![i] = null;
+    state![i] = false;
   }
 }
 
@@ -386,7 +395,7 @@ export const useNoConsumer = <C>(
   const next = root.next;
   if (state![i] && next) {
     if (host) host.undepend(next, fiber);
-    state![i] = null;
+    state![i] = false;
   }
 }
 
@@ -398,8 +407,8 @@ export const useYolo = (
   const i = pushState(fiber, Hook.YOLO);
   const {state, pointer} = fiber;
 
-  let sub = state[i];
-  if (!sub) sub = state[i] = [];
+  let sub = state![i];
+  if (!sub) sub = state![i] = [];
 
   fiber.state = sub;
   fiber.pointer = 0;
@@ -414,7 +423,7 @@ export const useNoYolo = () => {
   const i = pushState(fiber, Hook.YOLO);
   const {state, pointer} = fiber;
 
-  let sub = state[i];
+  let sub = state![i];
   if (sub) sub = null;
 }
 

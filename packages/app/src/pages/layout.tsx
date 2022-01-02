@@ -10,11 +10,11 @@ import {
 import { Mesh } from '../mesh';
 import { makeMesh } from '../meshes/mesh';
 
-export type InteractPageProps = {
+export type LayoutPageProps = {
   _unused?: boolean,
 };
 
-export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props) => {
+export const LayoutPage: LiveComponent<LayoutPageProps> = (fiber) => (props) => {
 
   return (
     use(Draw)({

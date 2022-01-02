@@ -1,4 +1,4 @@
-import { LayoutState, LayoutResult, Rectangle, Point } from '../types';
+import { LayoutState, LayoutResult, Rectangle, Point, Margin } from '../types';
 import { makeFlexLayout } from './flex';
 
 describe('flex layout', () => {
@@ -15,6 +15,7 @@ describe('flex layout', () => {
     height: number,
     grow: number = 0,
     shrink: number = 0,
+    margin: Margin = [0, 0, 0, 0],
   ) => (
     layout: LayoutState,
   ) => {
@@ -25,6 +26,7 @@ describe('flex layout', () => {
       size: [width, height] as Point,
       grow,
       shrink,
+      margin,
       element: null,
     };
   };

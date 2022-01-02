@@ -48,19 +48,19 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
     name = `Detach(${(call.f?.displayName ?? call.f?.name) || 'Node'})`;
   }
   else if (name === 'GATHER' && args) {
-    name = `[Gather]`;
+    name = `Gather`;
   }
   else if (name === 'MULTI_GATHER' && args) {
-    name = `[MultiGather]`;
+    name = `MultiGather`;
   }
   else if (name === 'RECONCILE' && args) {
-    name = `[Reconcile]`;
+    name = `Reconcile`;
   }
   else if (name === 'MAP_REDUCE' && args) {
-    name = `[MapReduce]`;
+    name = `MapReduce`;
   }
   else if (name === 'YEET' && args) {
-    name = `[Yeet]`;
+    name = `Yeet`;
   }
 
   return name;

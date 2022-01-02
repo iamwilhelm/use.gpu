@@ -1,4 +1,4 @@
-import { LayoutState, Rectangle, Point } from '../types';
+import { LayoutState, Rectangle, Point, Margin } from '../types';
 import { makeBlockLayout } from './block';
 
 describe('block layout', () => {
@@ -17,6 +17,7 @@ describe('block layout', () => {
       size: [width, height] as Point,
       grow: 0,
       shrink: 0,
+      margin: [0, 0, 0, 0] as Margin,
       element: null,
     };
   };

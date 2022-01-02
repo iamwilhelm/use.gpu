@@ -22,6 +22,7 @@ import { UseInspect } from '@use-gpu/inspect';
 
 import { GeometryPage } from './pages/geometry';
 import { InteractPage } from './pages/interact';
+import { LayoutPage } from './pages/layout';
 import { EmptyPage } from './pages/empty';
 
 export type AppProps = {
@@ -43,6 +44,7 @@ export const App: LiveComponent<AppProps> = (fiber) => (props) => {
         "/": {
           routes: {
             "geometry": { element: use(GeometryPage)({ canvas }) },
+            "layout": { element: use(LayoutPage)() },
             "interact": { element: use(InteractPage)() },
             "": { element: use(GeometryPage)({ canvas }) },
             "*": { element: use(EmptyPage)() },

@@ -9,6 +9,7 @@ import { Surface } from './surface';
 export type ElementProps = {
   width: number,
   height: number,
+  margin?: number | Rectangle,
   grow?: number,
   shrink?: number,
 
@@ -19,10 +20,15 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
   const {
     width = 100,
     height = 100,
+    margin = 0,
     grow = 0,
     shrink = 0,
     children,
   } = props;
+
+  const m = !Array.isArray(margin)
+    ? [margin || 0, margin || 0, margin || 0, margin || 0] as Margin
+    : margin;
 
   return yeet((layout: LayoutState): LayoutResult => {
     const [left, top] = layout;
@@ -33,9 +39,11 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
       key: fiber.id,
       box: [left, top, right, bottom] as Rectangle,
       size: [width, height] as Point,
+      margin: m,
       grow,
       shrink,
-      element: use(Surface)({
+      render: (layout: LayoutState) => use(Surface, fiber.id)({
+        layout,
         fill: [Math.random(), Math.random(), Math.random(), 1],
         stroke: [Math.random(), Math.random(), Math.random(), 1],
       }),

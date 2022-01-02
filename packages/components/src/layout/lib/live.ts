@@ -5,7 +5,7 @@ import { use, yeet, resume, provide, useContext } from '@use-gpu/live';
 import { LayoutContext } from '../../providers/layout-provider';
 
 const Outlet = () => (results: LayoutResult[]) => {
-  const [left, top] = useContext(LayoutContext);
+  const [left, top, right, bottom] = useContext(LayoutContext);
   const shift = ([l, t, r, b]: LayoutState) => [l + left, t + top, r + left, b + top];
   return results.map(({box, element, key}: LayoutResult) =>
     provide(LayoutContext, shift(box), element, key)

@@ -9,7 +9,8 @@ import { Surface } from './surface';
 export type ElementProps = {
   width: number,
   height: number,
-  flex?: number,
+  grow?: number,
+  shrink?: number,
 
   children?: LiveElement<any>,
 };
@@ -18,7 +19,8 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
   const {
     width = 100,
     height = 100,
-    flex = 0,
+    grow = 0,
+    shrink = 0,
     children,
   } = props;
 
@@ -31,7 +33,8 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
       key: fiber.id,
       box: [left, top, right, bottom] as Rectangle,
       size: [width, height] as Point,
-      flex,
+      grow,
+      shrink,
       element: use(Surface)({
         fill: [Math.random(), Math.random(), Math.random(), 1],
         stroke: [Math.random(), Math.random(), Math.random(), 1],

@@ -52,10 +52,10 @@ export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props)
                                 }),
 
                                 use(Flex)({
-                                  alignX: 'end',
+                                  alignX: 'between',
                                   children: [
                                     use(Element)({ width: 200 }),
-                                    use(Element)({ width: 300 }),
+                                    use(Element)({ width: 300, shrink: 1 }),
                                     use(Element)({ width: 200 }),
                                   ]
 

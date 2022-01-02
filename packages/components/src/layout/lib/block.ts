@@ -5,7 +5,7 @@ export const makeBlockLayout = (
   grow: number = 0,
   shrink: number = 0,
 ) => {
-  const isX = (direction === 'x');
+  const isX = direction === 'x';
 
   return (layout: LayoutState, ls: LayoutGenerator[]) => {
     const [l, t, r, b] = layout;

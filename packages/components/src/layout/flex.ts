@@ -10,6 +10,7 @@ export type FlexProps = {
   align?: 'start' | 'center' | 'end' | 'justify',
   justify?: 'start' | 'center' | 'end' | 'justify',
   wrap?: boolean,
+  snap?: boolean,
 
   render?: () => LiveElement<any>,
   children?: LiveElement<any>,
@@ -21,12 +22,13 @@ export const Flex: LiveComponent<BlockProps> = memo((fiber) => (props) => {
     alignX = 'start',
     alignY = 'start',
     wrap = false,
+    snap = true,
     render,
     children,
   } = props;
 
   const resolve = useMemo(() =>
-    makeFlexLayout(direction, alignX, alignY, wrap),
+    makeFlexLayout(direction, alignX, alignY, wrap, snap),
     [direction, alignX, alignY, wrap]
   );
 

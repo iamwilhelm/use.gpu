@@ -31,6 +31,7 @@ export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F
   fiber = fiber ?? makeFiber(f, null);
 
   const bound = f(fiber!);
+  console.log('args', bound.length)
   if (bound.length === 0) {
     return () => {
       enterFiber(fiber!, base);

@@ -31,7 +31,6 @@ export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F
   fiber = fiber ?? makeFiber(f, null);
 
   const bound = f(fiber!);
-  console.log('args', bound.length)
   if (bound.length === 0) {
     return () => {
       enterFiber(fiber!, base);
@@ -70,9 +69,7 @@ export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number
 }
 
 export const exitFiber = <F extends Function>(fiber: LiveFiber<F>) => {
-  console.log('discard', fiber.id, fiber.state, fiber.pointer)
   discardState(fiber);
-  console.log('discarded', fiber.id, fiber.state, fiber.pointer)
   CURRENT_FIBER = null;
 }
 

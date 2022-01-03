@@ -12,23 +12,26 @@ type PropNumberReturner = (x: number) => number;
 
 it('memoizes a function', () => {
 
-  const F: LiveFunction<NumberReturner> = memoArgs(() => (): number => {
+  const F: LiveFunction<PropNumberReturner> = memoArgs(() => (x: number): number => {
     return Math.random();
   });
 
   {
-    const result1 = bind(F)();
-    const result2 = bind(F)();
+    const result1 = bind(F)(1);
+    const result2 = bind(F)(1);
 
     expect(result1).not.toBe(result2);
   }
 
   {
     const bound = bind(F);
-    const result1 = bound();
-    const result2 = bound();
 
-    expect(result1).toBe(result2);
+    const result1 = bound(1);
+    const result2 = bound(1);
+    const result3 = bound(2);
+
+    expect(result2).toBe(result1);
+    expect(result3).not.toBe(result2);
   }
 })
 
@@ -161,19 +164,19 @@ it('holds memoized callback (hook)', () => {
   }
 });
 
-fit('holds state in memoized component (hook)', () => {
+it('holds state in memoized component (hook)', () => {
 
   let i: number;
   const F: LiveFunction<PropNumberReturner> = memoArgs((fiber: LiveFiber<PropNumberReturner>) => (x: number): number => {
     const [foo] = useState(() => Math.random());
-    console.log(fiber.id, fiber.state, fiber.pointer)
-    return foo + i++;
+    return foo + (i++);
   });
 
-  if (false) {
-    i = 0;
+  {
 
+    i = 0;
     const result1 = bind(F)(1);
+    i = 0;
     const result2 = bind(F)(1);
 
     expect(result1).not.toBe(result2);
@@ -184,20 +187,15 @@ fit('holds state in memoized component (hook)', () => {
 
     const bound = bind(F);
     const result1 = bound(1);
-    console.log("RESULT", result1);
     const result2 = bound(1);
-    console.log("RESULT", result2);
     const result3 = bound(2);
-    console.log("RESULT", result3);
     const result4 = bound(2);
-    console.log("RESULT", result4);
     const result5 = bound(3);
-    console.log("RESULT", result5);
 
-    expect(result1).toBe(result2);
-    expect(result2).toBe(result3 - 1);
-    expect(result3).toBe(result4);
-    expect(result4).toBe(result5 - 1);
+    expect(result2).toBe(result1);
+    expect(result3).toBe(result1 + 1);
+    expect(result4).toBe(result1 + 1);
+    expect(result5).toBe(result1 + 2);
   }
 })
 

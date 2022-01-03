@@ -32,10 +32,9 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
   if (!state) return;
 
   let n = state.length;
-  let j = pointer;
-  while (j < n) {
-    const type = state[j];
-    const i = j + 1;
+  while (fiber.pointer < n) {
+    const i = fiber.pointer;
+    const type = state[i];
     switch (type) {
       case Hook.STATE:
       case Hook.MEMO:
@@ -47,14 +46,14 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
         useNoResource();
         break;
       case Hook.CONTEXT:
-        useNoContext(state[j + 1]);
+        useNoContext(state[i + 2]);
         break;
       case Hook.CONSUMER:
-        useNoConsumer(state[j + 1]);
+        useNoConsumer(state[i + 2]);
         break;
     }
-    fiber.pointer = (j += STATE_SLOTS);
   }
+  state.length = pointer;
 }
 
 export const useNoHook = (hookType: Hook) => () => {
@@ -62,9 +61,8 @@ export const useNoHook = (hookType: Hook) => () => {
 
   const i = pushState(fiber, hookType);
   const {state} = fiber;
-  state![i] = null;
-  state![i + 1] = null;
-  console.log('useNoHook', hookType)
+  state![i] = undefined;
+  state![i + 1] = undefined;
 };
 
 export const useFiber = () => {
@@ -82,21 +80,29 @@ export const memoArgs = <F extends Function>(
   const g = ((
     fiber: LiveFiber<F>,
   ) => {
-    const bound = bind(f, fiber, reserveState(1));
+    const bound = f(fiber);
     fiber.version = 1;
-    return (...args: any[]) => {
+
+    const inner = (...args: any[]) => {
       args.push(fiber.version);
 
-      console.log('memoArgs', args)
+      let skip = true;
       const value = useMemo(() => {
         fiber.memo = -1;
+        skip = false;
         return bound(args);
       }, args);
 
-      if (fiber.memo! > -1) fiber.pointer = fiber.state!.length;
+      if (skip) fiber.pointer = fiber.state!.length;
 
       return value;
     };
+
+    const {length} = bound;
+    return new Proxy(inner, { get: (target: any, s: string) => {
+      if (s === 'length') return length;
+      return target[s];
+    }});
   }) as any as LiveFunction<F>;
   (g as any).displayName = name != null ? `Memo(${name})` : `Memo`;
   return g;
@@ -110,7 +116,7 @@ export const memoProps = <F extends Function>(
   const g = ((
     fiber: LiveFiber<F>,
   ) => {
-    const bound = bind(f, fiber, reserveState(1));
+    const bound = f(fiber);
     fiber.version = 1;
     return (props: Record<string, any>) => {
       const deps = [fiber.version] as any[];
@@ -119,12 +125,14 @@ export const memoProps = <F extends Function>(
         deps.push(props[k]);
       }
 
+      let skip = true;
       const value = useMemo(() => {
         fiber.memo = -1;
+        skip = false;
         return bound(props);
       }, deps);
 
-      if (fiber.memo! > -1) fiber.pointer = fiber.state!.length;
+      if (skip) fiber.pointer = fiber.state!.length;
 
       return value;
     };
@@ -286,8 +294,8 @@ export const useNoResource = () => {
   let {tag} = state![i] || NO_RESOURCE;
   if (tag) tag(null);
 
-  state![i] = null;
-  state![i + 1] = null;
+  state![i] = undefined;
+  state![i + 1] = undefined;
 }
 
 // Grab a context from the fiber (optional mode)

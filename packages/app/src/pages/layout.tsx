@@ -33,12 +33,21 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (fiber) => (props) => 
                       children: [
 
                         use(Flex)({
-                          align: ['evenly', 'center'],
-                          anchor: 'end',
+                          align: ['start', 'center'],
+                          anchor: 'center',
+                          wrap: true,
                           children: [
                             use(Element)({ width: 50, height: 50,  margin: 10 }),
+                            use(Element)({ width: 50, height: 50,  margin: 10 }),
                             use(Element)({ width: 70, height: 120, margin: 10, grow: 1 }),
+                            use(Element)({ width: 50, height: 50,  margin: 10 }),
+                            use(Element)({ width: 80, height: 50,  margin: 20 }),
                             use(Element)({ width: 50, height: 100, margin: 10 }),
+                            use(Element)({ width: 50, height: 100, margin: 10 }),
+                            use(Element)({ width: 50, height: 100, margin: 10 }),
+                            use(Element)({ width: 80, height: 50,  margin: 10 }),
+                            use(Element)({ width: 80, height: 50,  margin: 10 }),
+                            use(Element)({ width: 80, height: 50,  margin: 10 }),
                           ]
                         }),
                         

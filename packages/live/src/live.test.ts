@@ -1,6 +1,6 @@
 import { LiveContext, LiveComponent, LiveFunction, DeferredCall } from './types';
-
-import { bind, use } from './live';
+import { use } from './builtin';
+import { bind } from './fiber';
 
 type FooProps = { foo: string };
 type StringFormatter = (foo: string) => string;

@@ -48,6 +48,11 @@ export const getFlexMinMax = (
   }
   else for (const {sizing, margin, absolute} of els) {
     if (!absolute) {
+      const [minX, minY, maxX, maxY] = sizing;
+      const [ml, mt, mr, mb] = margin;
+
+      const mx = ml + mr;
+      const my = mt + mb;
 
       if (wrap) {
         allMinY = Math.max(allMinY, minY + my);
@@ -130,15 +135,15 @@ export const fitFlex = (
     if (!n) return;
 
     // Extra space to be grown (+) or shrunk (-)
-    const slack = spaceMain - accumMain;
+    let slack = spaceMain - accumMain;
 
     // Grow/shrink row if applicable
     let exact = slack === 0;
     if (slack > 0) {
-      if (growRow(slack, main, sizes)) slack = 0;
+      if (growRow(slack, main, mainSizes)) slack = 0;
     }
     else if (slack < 0) {
-      if (shrinkRow(slack, main, sizes)) slack = 0;
+      if (shrinkRow(slack, main, mainSizes)) slack = 0;
     }
 
     // Spacing on main axis
@@ -159,7 +164,10 @@ export const fitFlex = (
       const {render, size: fitted} = fit(into);
       const [ml, mt, mr, mb] = margin;
 
-      const [w, h] = fitted;
+      let [w, h] = fitted;
+      if (isX) w = mainSizes[i];
+      else h = mainSizes[i];
+
       const s = isX ? w : h;
       const c = isX ? h : w;
       const m = isX ? ml + mr : mt + mb;
@@ -210,7 +218,6 @@ export const fitFlex = (
       }
 
       crossPos += size + crossGap;
-      ++i;
     }
 
     cross.length = 0;

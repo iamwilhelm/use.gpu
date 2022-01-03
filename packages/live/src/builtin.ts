@@ -5,7 +5,7 @@ import {
 } from './types';
 
 import { compareFibers } from './util';
-import { makeFiber } from './fiber';
+import { makeFiber, CURRENT_FIBER } from './fiber';
 
 export const DETACH       = () => () => {};
 export const RECONCILE    = () => () => {};
@@ -29,51 +29,6 @@ export const CONSUME      = () => () => {};
 (MAP_REDUCE   as any).isLiveInline = true;
 (GATHER       as any).isLiveInline = true;
 (MULTI_GATHER as any).isLiveInline = true;
-
-// Prepare to call a live function with optional given persistent fiber
-export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
-  fiber = fiber ?? makeFiber(f, null);
-
-  const bound = f(fiber!);
-  if (bound.length === 0) {
-    return () => {
-      enterFiber(fiber!, base);
-      const value = bound();
-      exitFiber();
-      return value;
-    }
-  }
-  if (bound.length === 1) {
-    return (arg: any) => {
-      enterFiber(fiber!, base);
-      const value = bound(arg);
-      exitFiber();
-      return value;
-    }
-  }
-  return (...args: any[]) => {
-    enterFiber(fiber!, base);
-    const value = bound.apply(null, args);
-    exitFiber();
-    return value;
-  }
-};
-
-// Hide the fiber argument like in React
-export let CURRENT_FIBER = null as LiveFiber<any> | null;
-
-// Enter/exit a fiber call
-export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number) => {
-  CURRENT_FIBER = fiber;
-
-  // Reset state pointer
-  fiber.pointer = base;
-
-  // Reset yeet state
-  const {yeeted, next} = fiber;
-  if (yeeted) yeeted.reduced = yeeted.value = undefined;
-}
-export const exitFiber  = () => CURRENT_FIBER = null;
 
 // use a call to a live function
 export const use = <F extends Function>(

@@ -1,12 +1,14 @@
 import { LiveFiber, LiveComponent, LiveFunction, DeferredCall } from './types';
 
-import { bind, use, provide, makeContext } from './live';
+import { bind } from './fiber';
+import { use, provide, makeContext } from './builtin';
 import { makeHostFiber, renderSync } from './tree';
 import { useCallback, useContext, useMemo, useOne, useResource, useState, memoArgs, memoProps } from './hooks';
 
 type NullReturner = () => null;
 type NumberReturner = () => number;
 type FunctionReturner = () => () => any;
+type PropNumberReturner = (x: number) => number;
 
 it('memoizes a function', () => {
 
@@ -158,6 +160,46 @@ it('holds memoized callback (hook)', () => {
     expect(result1).toBe(result2);
   }
 });
+
+fit('holds state in memoized component (hook)', () => {
+
+  let i: number;
+  const F: LiveFunction<PropNumberReturner> = memoArgs((fiber: LiveFiber<PropNumberReturner>) => (x: number): number => {
+    const [foo] = useState(() => Math.random());
+    console.log(fiber.id, fiber.state, fiber.pointer)
+    return foo + i++;
+  });
+
+  if (false) {
+    i = 0;
+
+    const result1 = bind(F)(1);
+    const result2 = bind(F)(1);
+
+    expect(result1).not.toBe(result2);
+  }
+
+  {
+    i = 0;
+
+    const bound = bind(F);
+    const result1 = bound(1);
+    console.log("RESULT", result1);
+    const result2 = bound(1);
+    console.log("RESULT", result2);
+    const result3 = bound(2);
+    console.log("RESULT", result3);
+    const result4 = bound(2);
+    console.log("RESULT", result4);
+    const result5 = bound(3);
+    console.log("RESULT", result5);
+
+    expect(result1).toBe(result2);
+    expect(result2).toBe(result3 - 1);
+    expect(result3).toBe(result4);
+    expect(result4).toBe(result5 - 1);
+  }
+})
 
 it('manages a dependent resource (hook)', () => {
 

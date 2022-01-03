@@ -42,44 +42,44 @@ export const Aggregate: LiveComponent<AggregateProps> = (fiber) => (props) => {
   return multiGather(children ?? (render ? render() : null), Resume);
 };
 
-const Resume = resume((fiber) => (
-  aggregates: Record<string, LayerAggregate[]>
+const Resume = resume((fiber) => (aggregates: Record<string, LayerAggregate[]>) => 
+  Object.keys(aggregates).map((type: any) => use(Layer, key)(type, aggregates))
+}, 'Aggregate');
+
+const Layer: LiveFunction<any> = (fiber) => (
+  type: LayerType,
+  aggregates: LayerAggregate[],
 ) => {
   const {device} = useContext(RenderContext);
+  const {type, aggregates} = props;
 
   const out = [] as LiveElement[];
-  useYolo(() => {
-    for (const type in aggregates) {
-      const aggregator = AGGREGATORS[type];
-      if (!aggregator) continue;
+  const aggregator = AGGREGATORS[type];
+  if (!aggregator) continue;
 
-      const [makeAggregator, Component] = aggregator;
-      const items = aggregates[type];
-      const {keys, count, memoKey} = getItemSummary(items);
+  const [makeAggregator, Component] = aggregator;
+  const items = aggregates[type];
+  const {keys, count, memoKey} = getItemSummary(items);
 
-      // Invalidate storage if too small, or set of keys changes.
-      const sizeRef = useOne(() => ({ current: 0 }));
-      const versionRef = useOne(() => ({ current: 0 }));
-      if (sizeRef.current < count) {
-        versionRef.current++;
+  // Invalidate storage if too small, or set of keys changes.
+  const sizeRef = useOne(() => ({ current: 0 }));
+  const versionRef = useOne(() => ({ current: 0 }));
+  if (sizeRef.current < count) {
+    versionRef.current++;
 
-        // Grow by at least 20%
-        sizeRef.current = Math.max(count, Math.round(sizeRef.current * 1.2) | 0x7);
-      }
-      useOne(() => versionRef.current++, memoKey);
+    // Grow by at least 20%
+    sizeRef.current = Math.max(count, Math.round(sizeRef.current * 1.2) | 0x7);
+  }
+  useOne(() => versionRef.current++, memoKey);
 
-      const storage = useMemo(() =>
-        makeAggregator(device, items, keys, sizeRef.current),
-        [versionRef.current]
-      );
-      
-      const props = storage.update(items);
-      out.push(use(Component)(props));      
-    }
-  });
-
-  return out;
-}, 'Aggregate');
+  const storage = useMemo(() =>
+    makeAggregator(device, items, keys, sizeRef.current),
+    [versionRef.current]
+  );
+  
+  const props = storage.update(items);
+  return use(Component)(props));
+};
 
 const getItemSummary = (items: LayerAggregate[]) => {
   const keys = items.reduce(allKeys, new Set());

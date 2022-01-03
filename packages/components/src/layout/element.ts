@@ -34,6 +34,8 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
     key: useFiber().id,
     margin,
     sizing,
+    grow,
+    shrink,
     fit: (): Point => {
       const size = [width, height];
       const render = (layout: Rectangle): LiveElement<any> => (
@@ -41,6 +43,7 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
           layout,
           fill: true,
           stroke: true,
+          lineWidth: 8,
           fillColor: [Math.random(), Math.random(), Math.random(), 1],
           strokeColor: [Math.random(), Math.random(), Math.random(), 1],
         })

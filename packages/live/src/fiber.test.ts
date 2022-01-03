@@ -1,4 +1,4 @@
-import { use } from './live';
+import { use } from './builtin';
 import { makeFiber, renderFiber } from './fiber';
 
 it("renders a fiber recursively", () => {

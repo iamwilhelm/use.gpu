@@ -54,7 +54,7 @@ export const Surface: LiveComponent<SurfaceProps> = (fiber) => (props) => {
     render.point = {
       positions,
       color: strokeColor,
-      size: lineWidth * 5,
+      size: lineWidth * 2,
       count: 4,
     };
     render.rectangle = {

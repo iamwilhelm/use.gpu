@@ -4,8 +4,7 @@ import {
   DeferredCall, HostInterface, Hook,
 } from './types';
 
-import { bind, CURRENT_FIBER } from './live';
-import { makeFiber, makeStaticContinuation, bustFiberCaches, scheduleYeetRoots } from './fiber';
+import { bind, CURRENT_FIBER, makeFiber, makeStaticContinuation, bustFiberCaches, scheduleYeetRoots } from './fiber';
 import { isSameDependencies } from './util';
 import { formatNode } from './debug';
 
@@ -15,6 +14,7 @@ export const NO_RESOURCE = {tag: null, value: null};
 export const STATE_SLOTS = 3;
 
 export const reserveState = (slots: number) => slots * STATE_SLOTS;
+
 export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hook) => {
   let {state, pointer} = fiber;
   if (!state) state = fiber.state = [];
@@ -26,6 +26,7 @@ export const pushState = <F extends Function>(fiber: LiveFiber<F>, hookType: Hoo
 
   return pointer + 1;
 }
+
 export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
   let {state, pointer} = fiber;
   if (!state) return;
@@ -40,7 +41,7 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
       case Hook.MEMO:
       case Hook.ONE:
       case Hook.CALLBACK:
-        useNoHook(type);
+        useNoHook(type)();
         break;
       case Hook.RESOURCE:
         useNoResource();
@@ -51,10 +52,8 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
       case Hook.CONSUMER:
         useNoConsumer(state[j + 1]);
         break;
-      case Hook.YOLO:
-        useNoYolo();
-        break;
     }
+    fiber.pointer = (j += STATE_SLOTS);
   }
 }
 
@@ -65,6 +64,7 @@ export const useNoHook = (hookType: Hook) => () => {
   const {state} = fiber;
   state![i] = null;
   state![i + 1] = null;
+  console.log('useNoHook', hookType)
 };
 
 export const useFiber = () => {
@@ -87,10 +87,14 @@ export const memoArgs = <F extends Function>(
     return (...args: any[]) => {
       args.push(fiber.version);
 
+      console.log('memoArgs', args)
       const value = useMemo(() => {
-        fiber.memo = 0;
+        fiber.memo = -1;
         return bound(args);
       }, args);
+
+      if (fiber.memo! > -1) fiber.pointer = fiber.state!.length;
+
       return value;
     };
   }) as any as LiveFunction<F>;
@@ -119,6 +123,8 @@ export const memoProps = <F extends Function>(
         fiber.memo = -1;
         return bound(props);
       }, deps);
+
+      if (fiber.memo! > -1) fiber.pointer = fiber.state!.length;
 
       return value;
     };
@@ -396,43 +402,6 @@ export const useNoConsumer = <C>(
   if (state![i] && next) {
     if (host) host.undepend(next, fiber);
     state![i] = false;
-  }
-}
-
-export const useYolo = (
-  callback: () => void,
-) => {
-  const fiber = useFiber();
-
-  const i = pushState(fiber, Hook.YOLO);
-  const {state, pointer} = fiber;
-
-  let sub = state![i];
-  if (!sub) sub = state![i] = [];
-
-  fiber.state = sub;
-  fiber.pointer = 0;
-  callback();
-  discardState(fiber);
-  fiber.state = state;
-  fiber.pointer = pointer;
-}
-
-export const useNoYolo = () => {
-  const fiber = useFiber();
-
-  const i = pushState(fiber, Hook.YOLO);
-  const {state, pointer} = fiber;
-
-  let sub = state![i];
-  if (sub) {
-    fiber.state = sub;
-    fiber.pointer = 0;
-    discardState(fiber);
-    fiber.state = state;
-    fiber.pointer = pointer;
-
-    sub = null;
   }
 }
 

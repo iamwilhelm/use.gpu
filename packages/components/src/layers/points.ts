@@ -83,7 +83,7 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
   const s = sizes ?? size ?? getSize;
 
   const getSizeVec2 = useMemo(() => {
-    const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, ));
+    const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, s));
     return castTo(getSizeFloat, 'vec2', 'xx');
   }, [s]);
   const getMask = MASK_SHADER[shape] ?? MASK_SHADER[PointShape.Circle];

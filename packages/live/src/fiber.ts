@@ -4,7 +4,8 @@ import {
   OnFiber, DeferredCall, Key, RenderCallbacks,
 } from './types';
 
-import { use, bind, reconcile, DETACH, RECONCILE, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, PROVIDE, CONSUME } from './live';
+import { use, reconcile, DETACH, RECONCILE, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, PROVIDE, CONSUME } from './builtin';
+import { discardState } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies } from './util';
 import { formatNode } from './debug';
@@ -21,6 +22,58 @@ const NO_CONTEXT = {
   values: new Map() as ContextValues,
   roots: new Map() as ContextRoots,
 };
+
+// Hide the fiber argument like in React
+export let CURRENT_FIBER = null as LiveFiber<any> | null;
+
+// Prepare to call a live function with optional given persistent fiber
+export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
+  fiber = fiber ?? makeFiber(f, null);
+
+  const bound = f(fiber!);
+  if (bound.length === 0) {
+    return () => {
+      enterFiber(fiber!, base);
+      const value = bound();
+      exitFiber(fiber!);
+      return value;
+    }
+  }
+  if (bound.length === 1) {
+    return (arg: any) => {
+      enterFiber(fiber!, base);
+      const value = bound(arg);
+      exitFiber(fiber!);
+      return value;
+    }
+  }
+  return (...args: any[]) => {
+    enterFiber(fiber!, base);
+    const value = bound.apply(null, args);
+    exitFiber(fiber!);
+    return value;
+  }
+};
+
+// Enter/exit a fiber call
+let enter = 0; let exit = 0;
+export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number) => {
+  CURRENT_FIBER = fiber;
+
+  // Reset state pointer
+  fiber.pointer = base;
+
+  // Reset yeet state
+  const {yeeted, next} = fiber;
+  if (yeeted) yeeted.reduced = yeeted.value = undefined;
+}
+
+export const exitFiber = <F extends Function>(fiber: LiveFiber<F>) => {
+  console.log('discard', fiber.id, fiber.state, fiber.pointer)
+  discardState(fiber);
+  console.log('discarded', fiber.id, fiber.state, fiber.pointer)
+  CURRENT_FIBER = null;
+}
 
 // Make a fiber for a live function
 export const makeFiber = <F extends Function>(

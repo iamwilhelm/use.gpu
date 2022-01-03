@@ -1,5 +1,5 @@
 import { LiveFiber, Task } from './types';
-import { use, detach, provide, provideMemo, PROVIDE, makeContext } from './live';
+import { use, detach, provide, provideMemo, PROVIDE, makeContext } from './builtin';
 import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext } from './hooks';
 import { renderSync } from './tree';

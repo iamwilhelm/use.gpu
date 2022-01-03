@@ -29,7 +29,6 @@ export const useBoundShader = (
     const v = bindBundle(vertex, links, null, k);
     const f = bindBundle(fragment, links, null, k);
 
-    console.log('links changed');
     return resolveBindings([v, f]);
   }, [vertex, fragment, links])
 
@@ -44,7 +43,6 @@ export const useBoundShader = (
 
   // Link final GLSL
   const shader = useMemo(() => {
-    console.log('shader changed');
     const v = linkBundle(modules[0], NO_LIBS, defines);
     const f = linkBundle(modules[1], NO_LIBS, defines);
     const vertex = makeShaderModule(compile(v, 'vertex'));
@@ -62,7 +60,6 @@ export const useBoundShader = (
 
   // Update bound uniform values in-place from latest
   useOne(() => {
-    console.log('uniforms changed');
     let i = 0;
     for (const u of uniforms) {
       if (u.constant != null) {
@@ -76,7 +73,6 @@ export const useBoundShader = (
   const buffers = [] as GPUBuffer[];
   for (const b of bindings) buffers.push(b.storage?.buffer);  
   useMemo(() => {
-    console.log('buffers changed');
     ref.bindings = bindings;
   }, buffers);
 

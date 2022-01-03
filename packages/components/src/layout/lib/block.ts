@@ -1,97 +1,150 @@
-import { Point, LayoutState, LayoutGenerator, LayoutResult, Margin } from '../types';
+import { LiveElement } from '@use-gpu/live/types';
+import { Point, LayoutElement, LayoutRenderer, Margin, Rectangle } from '../types';
+import { mergeMargin } from './util';
 
-// Stack blocks horizontally or vertically.
-export const makeBlockLayout = (
-  direction: 'x' | 'y' = 'y',
-  grow: number = 0,
-  shrink: number = 0,
+const isAbsolute = (el: LayoutElement) => !!el.absolute;
+const isNotAbsolute = (el: LayoutElement) => !el.absolute;
+
+export const getBlockMinMax = (
+  els: LayoutElement[],
+  direction: 'x' | 'y',
+) => {
+  const isX = direction === 'x';
+  
+  let allMinX = 0;
+  let allMinY = 0;
+  let allMaxX = 0;
+  let allMaxY = 0;
+
+  let i = 0;
+  let m = 0;
+
+  const n = els.length;
+  if (isX) for (const {sizing, margin, absolute} of els) {
+    if (!absolute) {
+      const [minX, minY, maxX, maxY] = sizing;
+      const [ml, mt, mr, mb] = margin;
+    
+      allMinX = allMinX + minX;
+      allMinY = Math.max(allMinY, minY + mt + mb);
+
+      allMaxX = allMaxX + maxX;
+      allMaxY = Math.max(allMaxY, maxY + mt + mb);
+
+      if (i !== 0) {
+        m = mergeMargin(m, ml);
+        allMinX = allMinX + m;
+        allMaxX = allMaxX + m;
+      }
+      m = mr;
+      ++i;
+    }
+  }
+  else for (const {sizing, margin, absolute} of els) {
+    if (!absolute) {
+      const [minX, minY, maxX, maxY] = sizing;
+      const [ml, mt, mr, mb] = margin;
+
+      allMinY = allMinY + minY;
+      allMinX = Math.max(allMinX, minX + ml + mr);
+
+      allMaxY = allMaxY + maxY;
+      allMaxX = Math.max(allMaxX, maxX + ml + mr);
+
+      if (i !== 0) {
+        m = mergeMargin(m, mt);
+        allMinX = allMinX + m;
+        allMaxX = allMaxX + m;
+      }
+      m = mb;
+      ++i;
+    }
+  }
+
+  return [allMinX, allMinY, allMaxX, allMaxY];
+}
+
+export const getBlockMargin = (
+  els: LayoutElement[],
+  margin: Margin,
+  direction: 'x' | 'y',
 ) => {
   const isX = direction === 'x';
 
-  return (layout: LayoutState, ls: LayoutGenerator[]) => {
-    const [l, t, r, b] = layout;
+  const first = els.find(isNotAbsolute);
+  const last  = (els as any).findLast(isNotAbsolute);
 
-    const block = [0, 0, r - l, b - t] as LayoutState;
-    const spill = [0, 0, 0, 0] as Margin;
-    const max = [0, 0] as [number, number];
+  const out = margin.slice() as Margin;
+  if (first) {
+    const [ml, mt] = first.margin;
+    if (isX) margin[0] = mergeMargin(margin[0], ml);
+    else margin[1] = mergeMargin(margin[1], mt);
+  }
+  if (last) {
+    const [,, mr, mb] = last.margin;
+    if (isX) margin[2] = mergeMargin(margin[2], mr);
+    else margin[3] = mergeMargin(margin[3], mb);
+  }
 
-    const results = [] as LayoutResult[];
+  return margin;
+}
 
-    let i = 0;
-    let n = ls.length;
-    let m = 0;
+export const fitBlocks = (
+  els: LayoutElement[],
+  size: Point,
+  direction: 'x' | 'y',
+) => {
+  const isX = direction === 'x';
 
-    for (let l of ls) {
-      const result = l(block);
-      const {box, size, margin} = result;
-      const [ml, mt, mr, mb] = margin;
+  let w =  isX ? 0 : size[0];
+  let h = !isX ? 0 : size[1];
 
-      // First and last margin spills out
-      if (i === 0) {
-        if (isX) spill[0] = ml;
-        else spill[1] = mt;
-      }
-      else if (i === n - 1) {
-        if (isX) spill[2] = mr;
-        else spill[3] = mb;
-      }
+  let i = 0;
+  let m = 0;
 
-      // Margin between two blocks collapse to the max of the two
-      if (i > 0) {
-        // Shift box right/down
-        if (isX) {
-          m = Math.max(m, ml);
-          block[0] += m;
-          box[0] += m;
-          box[2] += m;
-          m = mr;
-        }
-        else {
-          m = Math.max(m, mt);
-          block[1] += m;
-          box[1] += m;
-          box[3] += m;
-          m = mb;
-        }
-      }
+  const sizes = [] as Point[];
+  const offsets = [] as Point[];
+  const renders = [] as LayoutRenderer[];
 
-      // Track block extents
+  for (const el of els) {
+    const {margin, fit} = el;
+    const {render, size: fitted} = fit(size);
+    const [ml, mt, mr, mb] = margin;
+
+    sizes.push(fitted);
+    renders.push(render);
+
+    if (isAbsolute(el)) {
       if (isX) {
-        block[0] = box[2];
-        max[1] = Math.max(size[1], max[1]);
+        offsets.push([w, mt]);
       }
       else {
-        block[1] = box[3];
-        max[0] = Math.max(size[0], max[0]);
+        offsets.push([ml, h]);
       }
-
-      results.push(result);
-      ++i;
-    }
-
-    let w: number;
-    let h: number;
-    let size: Point;
-
-    // Get final size
-    if (isX) {
-      w = block[0];
-      h = b - t;
-      size = [w, max[1]];
     }
     else {
-      w = r - l;
-      h = block[1];
-      size = [max[0], h];
-    }
+      if (isX) {
+        if (i !== 0) w += Math.max(m, ml);
+        m = mr;
 
-    return ([l, t]: LayoutState): LayoutResult => ({
-      box: [l, t, l + w, t + h],
-      size,
-      margin: spill,
-      grow,
-      shrink,
-      results,
-    });
+        offsets.push([w, mt]);
+        w += fitted[0];
+      }
+      else {
+        if (i !== 0) h += Math.max(m, mt);
+        m = mb;
+
+        offsets.push([ml, h]);
+        h += fitted[1];
+      }
+      ++i;
+    }
+  }
+  
+  return {
+    size,
+    sizes,
+    offsets,
+    renders,
   };
 }

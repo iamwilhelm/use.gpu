@@ -13,13 +13,23 @@ export const Layout: LiveComponent<LayoutProps> = memo((fiber) => (props) => {
   return gather(children ?? (render ? render() : null), Resume);
 }, 'Layout');
 
-const Resume = resume((fiber: LiveFiber<any>) => (ls: LayoutHandler[]) => {
+const Resume = resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
   const layout = useContext(LayoutContext);
+  const [left, top, right, bottom] = layout;
+  const size = [right - left, bottom - top];
 
   const out = [] as LiveElement[];
-  for (let l of ls) {
-    const {box, render} = l(layout);
-    out.push(...render(box));
+  for (const {margin, fit} of els) {
+    const {
+      size: [w, h],
+      render,
+    } = fit(size);
+
+    const [ml, mt] = margin;
+    const el = render([left + ml, top + mt, left + ml + w, top + mt + h]);
+
+    if (Array.isArray(el)) out.push(...el);
+    else out.push(el);
   }
 
   return out;

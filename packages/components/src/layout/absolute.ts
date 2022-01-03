@@ -1,9 +1,10 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
-import { provide, useContext, useMemo } from '@use-gpu/live';
-import { LayoutContext } from '../providers/layout-provider';
-import { LayoutState } from './types';
-import { parseDimension } from './lib/util';
+import { memo, gather, resume, yeet, useOne } from '@use-gpu/live';
+import { fitAbsoluteBox } from './lib/absolute';
+import { makeBoxLayout } from './lib/util';
+
+const NO_POINT4 = [0, 0, 0, 0];
 
 export type AbsoluteProps = {
   left?: string | number | null,
@@ -17,77 +18,50 @@ export type AbsoluteProps = {
   children?: LiveElement<any>,
 };
 
-export const Absolute: LiveComponent<AbsoluteProps> = (fiber) => (props) => {
-  const layout = useContext(LayoutContext);
+export const Absolute: LiveComponent<AbsoluteProps> = memo((fiber) => (props) => {
+  const {
+    left: l,
+    top: t,
+    right: r,
+    bottom: b,
+    width: w,
+    height: h,
+    snap = true,
 
-  const nextLayout = useMemo(() => {
-    let [
-      left,
-      top,
-      right,
-      bottom,
-    ] = layout;
+    render,
+    children,
+  } = props;
 
-    let width = right - left;
-    let height = bottom - top;
+  const Resume = useOne(() =>
+    makeResume(l, t, r, b, w, h),
+    [l, t, r, b, w, h]
+  );
 
-    let {
-      left: l,
-      right: r,
-      top: t,
-      bottom: b,
-      width: w,
-      height: h,
-      snap = true,
-    } = props;
+  return gather(children ?? (render ? render() : null), Resume);
+}, 'Absolute');
 
-    let favorW = false;
-    let favorH = false;
-
-    if (l != null) left   += parseDimension(l, width);
-    if (r != null) right  -= parseDimension(r, width);
-    if (t != null) top    += parseDimension(t, height);
-    if (b != null) bottom -= parseDimension(b, height);
-    if (w != null) {
-      width = parseDimension(w, width);
-      if (l != null || r == null) right = left + width;
-      else left = right - width;
-      favorW = true;
-    }
-
-    if (h != null) {
-      height = parseDimension(h, height);
-      if (t != null || b == null) bottom = top + height;
-      else top = bottom - height;
-      favorH = true;
-    }
-
-    if (snap) {
-      left = Math.round(left);
-      top = Math.round(top);
-
-      if (favorW) {
-        width = Math.round(width);
-        right = left + width;
+const makeResume = (
+  l?: string | number | null,
+  t?: string | number | null,
+  r?: string | number | null,
+  b?: string | number | null,
+  w?: string | number | null,
+  h?: string | number | null,
+  snap?: boolean,
+) =>
+  resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
+    return yeet({
+      key: fiber.id,
+      sizing: NO_POINT4,
+      margin: NO_POINT4,
+      absolute: true,
+      fit: (into: Point) => {
+        const {size, sizes, offsets, renders} = fitAbsoluteBox(els, into, l, t, r, b, w, h, snap);
+        return {
+          size,
+          render: makeBoxLayout(sizes, offsets, renders),
+        };
       }
-      else {
-        right = Math.round(right);
-        width = right - left;
-      }
+    });
+  }, 'Absolute');
 
-      if (favorH) {
-        height = Math.round(height);
-        bottom = top + height;
-      }
-      else {
-        bottom = Math.round(bottom);
-        height = bottom - top;
-      }
-    }
-
-    return [left, top, right, bottom] as LayoutState;
-  }, [props, layout]);
-
-  const {children} = props;
-  return provide(LayoutContext, nextLayout, children);
-};

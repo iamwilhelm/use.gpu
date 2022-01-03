@@ -29,33 +29,62 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (fiber) => (props) => 
                 use(Aggregate)({
                   children:
 
-                    use(Absolute)({
-                      left: '50%',
-                      top: 10,
-                      right: 10,
-                      bottom: 10,
-                      children:
-                  
-                        use(Layout)({
-                          children:
+                    use(Layout)({
+                      children: [
 
+                        use(Flex)({
+                          align: ['evenly', 'center'],
+                          anchor: 'end',
+                          children: [
+                            use(Element)({ width: 50, height: 50,  margin: 10 }),
+                            use(Element)({ width: 70, height: 120, margin: 10, grow: 1 }),
+                            use(Element)({ width: 50, height: 100, margin: 10 }),
+                          ]
+                        }),
+                        
+                        /*
+                      
+                        use(Block)({
+                          children: [
+                            use(Element)({ width: 50, margin: 10 }),
+                            use(Element)({ width: 70, margin: 10 }),
+                            use(Element)({ width: 50, margin: 10 }),
+                          ]
+                        }),
+
+                        use(Absolute)({
+                          left: '50%',
+                          top: 10,
+                          right: 10,
+                          bottom: 10,
+                          children:
+                
                             use(Block)({
                               children: [
                                 use(Element)({}),
 
-                                use(Block)({
-                                  children: [
-                                    use(Element)({ width: 200, margin: 10 }),
-                                    use(Element)({ width: 300, margin: 10 }),
-                                    use(Element)({ width: 200, margin: 10 }),
-                                  ]
+                                use(Absolute)({
+                                  left: 10,
+                                  top: 10,
+                                  right: 10,
+                                  bottom: 10,
+                                  children:
+
+                                        use(Block)({
+                                          children: [
+                                            use(Element)({ width: 50, margin: 10 }),
+                                            use(Element)({ width: 170, margin: 10 }),
+                                            use(Element)({ width: 50, margin: 10 }),
+                                          ]
+                                        })
+
                                 }),
 
                                 use(Flex)({
                                   alignX: 'between',
                                   children: [
                                     use(Element)({ width: 200 }),
-                                    use(Element)({ width: 300, margin: 10, shrink: 1 }),
+                                    use(Element)({ width: 300, margin: 30, shrink: 1 }),
                                     use(Block)({
                                       children: [
                                         use(Element)({ width: 200 }),
@@ -69,8 +98,10 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (fiber) => (props) => 
                                 use(Element)({}),
                               ]
                             })
-                        })
+                        }),
+                        */
 
+                      ],
                     })
 
                 })

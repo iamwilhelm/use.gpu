@@ -6,7 +6,7 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,
-  CompositeData, Data, RawData, Inline,
+  CompositeData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
   Pick, Cursor, Points, Lines,
   RawQuads as Quads, RawLines,
@@ -70,7 +70,7 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (fiber) => (props)
     use(Draw)({
       live: true,
       children: [
-        use(Inline)(() => {
+        use(Raw)(() => {
           t = t + 1/60;
         }),
         use(Pass)({

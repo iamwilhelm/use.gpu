@@ -8,7 +8,7 @@ import { Rectangle } from '../layout/types';
 import { Rectangles } from '../layers';
 
 export type SurfaceProps = {
-  layout?: Rectangle,
+  rectangle?: Rectangle,
   stroke?: boolean,
   fill?: boolean,
   strokeColor?: number[],

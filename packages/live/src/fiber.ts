@@ -138,7 +138,10 @@ export const renderFiber = <F extends Function>(
   let element: LiveElement<any>;
   // Passthrough built-ins
 
-  if ((f as any).isLiveBuiltin) element = fiber as any as DeferredCall<any>;
+  if ((f as any).isLiveBuiltin) {
+    element = fiber as any as DeferredCall<any>;
+    bound.apply(null);
+  }
   // Render live function
   else element = bound.apply(null, args ?? EMPTY_ARRAY);
 

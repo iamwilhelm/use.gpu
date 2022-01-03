@@ -1,14 +1,19 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { Margin, Direction, Alignment, Anchor } from './types';
 
-import { memo, gather, useOne, useMemo } from '@use-gpu/live';
+import { resume, yeet, memo, gather, useOne, useMemo } from '@use-gpu/live';
+import { getFlexMinMax, fitFlex } from './lib/flex';
+import { makeBoxLayout, normalizeAlignment, normalizeAnchor, normalizeGap } from './lib/util';
 
-import { makeFlexLayout } from './lib/flex';
-import { makeResumeLayout } from './lib/live';
+const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
 export type FlexProps = {
-  direction?: 'x' | 'y',
-  align?: 'start' | 'center' | 'end' | 'justify',
-  justify?: 'start' | 'center' | 'end' | 'justify',
+  direction?: Direction,
+
+  gap?: number | Point,
+  align?: Alignment | [Alignment, Alignment],
+  anchor?: Anchor,
+
   wrap?: boolean,
   snap?: boolean,
 
@@ -19,23 +24,46 @@ export type FlexProps = {
 export const Flex: LiveComponent<BlockProps> = memo((fiber) => (props) => {
   const {
     direction = 'x',
-    alignX = 'start',
-    alignY = 'start',
+    gap = 0,
+    align = 'start',
+    anchor = 'center',
     wrap = false,
     snap = true,
     render,
     children,
   } = props;
 
-  const resolve = useMemo(() =>
-    makeFlexLayout(direction, alignX, alignY, wrap, snap),
-    [direction, alignX, alignY, wrap]
-  );
-
   const Resume = useOne(() =>
-    makeResumeLayout(resolve, 'Flex'),
-    resolve,
+    makeResume(direction, gap, align, anchor, wrap, snap),
+    [direction, gap, align, anchor, wrap, snap]
   );
 
   return gather(children ?? (render ? render() : null), Resume);
 }, 'Flex');
+
+const makeResume = (
+  direction: Direction,
+  g: number | Point,
+  al: Alignment | [Alignment, Alignment],
+  anchor: Anchor,
+  wrap: boolean,
+  snap: boolean,
+) =>
+  resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
+    const gap    = normalizeGap(g);
+    const align  = normalizeAlignment(al);
+    const sizing = getFlexMinMax(els, direction, gap, wrap, snap);
+
+    return yeet({
+      key: fiber.id,
+      sizing,
+      margin: NO_MARGIN,
+      fit: (into: Point) => {
+        const {size, sizes, offsets, renders} = fitFlex(els, into, direction, gap, align[0], align[1], anchor, wrap, snap);
+        return {
+          size,
+          render: makeBoxLayout(sizes, offsets, renders),
+        };
+      }
+    });
+  }, 'Flex');

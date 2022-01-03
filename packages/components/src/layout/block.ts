@@ -1,13 +1,15 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { Margin } from './types';
 
-import { memo, gather, useOne, useMemo } from '@use-gpu/live';
-
-import { makeBlockLayout } from './lib/block';
-import { makeResumeLayout } from './lib/live';
+import { memo, gather, resume, yeet, useOne } from '@use-gpu/live';
+import { getBlockMinMax, getBlockMargin, fitBlocks } from './lib/block';
+import { normalizeMargin, makeBoxLayout } from './lib/util';
 
 export type BlockProps = {
   direction?: 'x' | 'y',
-  flex?: number,
+  grow?: number,
+  shrink?: number,
+  margin?: number | [number, number, number, number],
   render?: () => LiveElement<any>,
   children?: LiveElement<any>,
 };
@@ -15,20 +17,45 @@ export type BlockProps = {
 export const Block: LiveComponent<BlockProps> = memo((fiber) => (props) => {
   const {
     direction = 'y',
-    flex = 0,
+    grow = 0,
+    shrink = 0,
+    margin: m = 0,
     render,
     children,
   } = props;
 
-  const resolve = useMemo(() =>
-    makeBlockLayout(direction, flex),
-    [direction, flex]
-  );
+  const margin = normalizeMargin(m);
 
   const Resume = useOne(() =>
-    makeResumeLayout(resolve, 'Block'),
-    resolve,
+    makeResume(direction, grow, shrink, margin),
+    [direction, grow, shrink]
   );
 
   return gather(children ?? (render ? render() : null), Resume);
 }, 'Block');
+
+const makeResume = (
+  direction: 'x' | 'y',
+  grow: number,
+  shrink: number,
+  m: Margin,
+) =>
+  resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
+    const sizing = getBlockMinMax(els, direction);
+    const margin = getBlockMargin(els, m, direction);
+
+    return yeet({
+      key: fiber.id,
+      sizing,
+      margin,
+      grow,
+      shrink,
+      fit: (into: Point) => {
+        const {size, sizes, offsets, renders} = fitBlocks(els, into, direction);
+        return {
+          size,
+          render: makeBoxLayout(sizes, offsets, renders),
+        };
+      }
+    });
+  }, 'Block');

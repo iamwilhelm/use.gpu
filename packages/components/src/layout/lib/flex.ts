@@ -1,5 +1,5 @@
 import { LiveElement } from '@use-gpu/live/types';
-import { Point, LayoutElement, LayoutRenderer, Margin, Rectangle } from '../types';
+import { Point, LayoutElement, LayoutRenderer, Margin, Rectangle, Alignment } from '../types';
 
 import { parseAnchor } from './util';
 
@@ -119,7 +119,7 @@ export const fitFlex = (
   const cross = [] as {
     size: number,
     sizes: Point[],
-    offsets: number[],
+    offsets: Point[],
     renders: LayoutRenderer[],
   }[];
 
@@ -152,14 +152,14 @@ export const fitFlex = (
     if (slack) [axisGap, axisPos] = getFlexSpacing(slack, n, alignMain);
 
     // Lay out a row of flexed boxes into their final size
-    const crossSizes = [] as number[];
+    const crossSizes   = [] as Point[];
     const crossOffsets = [] as Point[];
     const crossRenders = [] as LayoutRenderer[];
 
     let maxSize = 0;
     for (let i = 0; i < n; ++i) {
       const {margin, sizing, fit} = main[i];
-      const into = isX ? [mainSizes[i], 0] : [0, mainSizes[i]];
+      const into = (isX ? [mainSizes[i], 0] : [0, mainSizes[i]]) as Point;
 
       const {render, size: fitted} = fit(into);
       const [ml, mt, mr, mb] = margin;
@@ -168,13 +168,18 @@ export const fitFlex = (
       if (isX) w = mainSizes[i];
       else h = mainSizes[i];
 
-      const s = isX ? w : h;
-      const c = isX ? h : w;
-      const m = isX ? ml + mr : mt + mb;
+      let s = isX ? w : h;
+      let c = isX ? h : w;
+      let m = isX ? ml + mr : mt + mb;
 
       crossRenders.push(render);
       crossOffsets.push(isX ? [ml + axisPos, mt] : [ml, mt + axisPos]);
       axisPos += s + m + axisGap;
+
+      if (snap) {
+        s = Math.round(s);
+        c = Math.round(c);
+      }
 
       crossSizes.push(isX ? [s, h] : [w, s]);
       maxSize = Math.max(maxSize, c);
@@ -209,8 +214,14 @@ export const fitFlex = (
         const lead = anchorRatio * (size - ss[j][isX ? 1 : 0]);
         let [l, t] = os[j];
 
-        if (isX) t += crossPos + lead;
-        else l += crossPos + lead;
+        const o = crossPos + lead;
+        if (isX) t += o;
+        else l += o;
+
+        if (snap) {
+          l = Math.round(l);
+          t = Math.round(t);
+        }
 
         sizes.push(ss[j]);
         offsets.push([l, t]);
@@ -229,7 +240,7 @@ export const fitFlex = (
     const [ml, mt, mr, mb] = margin;
 
     if (isAbsolute(el)) {
-      const {render, size: fitted} = fit(size);
+      const {render, size: fitted} = fit(sizing.slice(0, 2) as Point);
 
       sizes.push(fitted);
       renders.push(render);
@@ -302,11 +313,11 @@ export const growRow = (slack: number, row: LayoutElement[], sizes: number[]) =>
   const n = row.length;
 
   let weight = 0;
-  for (let i = 0; i < n; ++i) if (row[i].grow > 0) weight += row[i].grow;
+  for (let i = 0; i < n; ++i) if (row[i].grow! > 0) weight += row[i].grow!;
 
   if (weight > 0) {
-    for (let i = 0; i < n; ++i) if (row[i].grow > 0) {
-      sizes[i] += slack * row[i].grow / weight;
+    for (let i = 0; i < n; ++i) if (row[i].grow! > 0) {
+      sizes[i] += slack * row[i].grow! / weight;
     }
     return true;
   }
@@ -318,12 +329,12 @@ export const shrinkRow = (slack: number, row: LayoutElement[], sizes: number[]):
   const n = row.length;
 
   let weight = 0;
-  for (let i = 0; i < n; ++i) if (row[i].shrink) weight += row[i].shrink * sizes[i];
+  for (let i = 0; i < n; ++i) if (row[i].shrink!) weight += row[i].shrink! * sizes[i];
 
   if (weight > 0) {
     let negative = 0;
-    for (let i = 0; i < n; ++i) if (row[i].shrink > 0 && sizes[i]) {
-      sizes[i] += slack * row[i].shrink * sizes[i] / weight;
+    for (let i = 0; i < n; ++i) if (row[i].shrink! > 0 && sizes[i]) {
+      sizes[i] += slack * row[i].shrink! * sizes[i] / weight;
       if (sizes[i] < 0) {
         negative += sizes[i];
         sizes[i] = 0;

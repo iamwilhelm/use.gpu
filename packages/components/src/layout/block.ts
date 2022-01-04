@@ -45,7 +45,6 @@ const makeResume = (
     const margin = getBlockMargin(els, m, direction);
 
     return yeet({
-      key: fiber.id,
       sizing,
       margin,
       grow,

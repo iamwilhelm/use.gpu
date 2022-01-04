@@ -11,7 +11,7 @@ import { PickingContext, useNoPicking } from '../render/picking';
 import { LayoutContext } from '../providers/layout-provider';
 import { Virtual } from './virtual';
 
-import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -77,7 +77,7 @@ export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((fiber) => 
   const instanceCount = props.positions?.length ?? count;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-  const key = fiber.id;
+  const key = useFiber().id;
 
   const r = props.rectangles ?? props.rectangle ?? props.getRectangle;
   const c = props.colors ?? props.color ?? props.getColor;

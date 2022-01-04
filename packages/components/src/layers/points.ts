@@ -8,7 +8,7 @@ import { ShaderModule } from '@use-gpu/shader/types';
 
 import { RawQuads } from '../geometry/raw-quads';
 
-import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { linkBundle, bindBundle, bindingToModule, bindingsToLinks, resolveBindings, castTo } from '@use-gpu/shader/glsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 
@@ -78,7 +78,7 @@ export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
     id = 0,
   } = props;
 
-  const key = fiber.id;
+  const key = useFiber().id;
 
   const s = sizes ?? size ?? getSize;
 

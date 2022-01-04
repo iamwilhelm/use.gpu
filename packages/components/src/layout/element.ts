@@ -27,11 +27,11 @@ export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
     children,
   } = props;
 
+  const fiber = useFiber();
   const sizing = [width, height, width, height];
   const margin = normalizeMargin(m);
 
   return yeet({
-    key: useFiber().id,
     margin,
     sizing,
     grow,

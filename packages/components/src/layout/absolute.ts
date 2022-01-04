@@ -51,7 +51,6 @@ const makeResume = (
 ) =>
   resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
     return yeet({
-      key: fiber.id,
       sizing: NO_POINT4,
       margin: NO_POINT4,
       absolute: true,

@@ -55,7 +55,6 @@ const makeResume = (
     const sizing = getFlexMinMax(els, direction, gap, wrap, snap);
 
     return yeet({
-      key: fiber.id,
       sizing,
       margin: NO_MARGIN,
       fit: (into: Point) => {

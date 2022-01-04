@@ -10,7 +10,7 @@ import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
-import { use, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -84,7 +84,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((fiber) => (props) =>
   const instanceCount = props.positions?.length ?? count;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-  const key = fiber.id;
+  const key = useFiber().id;
 
   const p = props.positions ?? props.position ?? props.getPosition;
   const c = props.colors ?? props.color ?? props.getColor;

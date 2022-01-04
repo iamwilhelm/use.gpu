@@ -40,7 +40,6 @@ export type LayoutResult = {
 
   results?: LayoutResult[],
   render?: (layout: LayoutState) => LiveElement<any>,
-  key?: Key,
 };
 
 export type LayoutGenerator = (layout: LayoutState) => LayoutResult;

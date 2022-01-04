@@ -96,13 +96,11 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
   }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment]);
 
   const view = provide(RenderContext, rttContext, children);
-  const Done = useMemo(() =>
-    (fiber: LiveFiber<any>) => (ts: Task[]) => {
+  const Done = useOne(() =>
+    (ts: Task[]) => {
       for (let task of ts) task();
     },
   );
-  // @ts-ignore
-  if (!Done.displayName) Done.displayName = '[RenderToTexture]';
 
   return provide(FrameContext, frame.current, gather(view, Done));
 }

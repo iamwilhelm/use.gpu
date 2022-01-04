@@ -38,4 +38,4 @@ const Resume = resume((ts: Task[]) => {
 
   for (let task of ts) task();
   if (pickingContext) pickingContext.captureTexture();
-}, 'Draw');
+});

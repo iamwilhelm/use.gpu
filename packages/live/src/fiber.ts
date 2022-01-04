@@ -124,10 +124,14 @@ export const makeSubFiber = <F extends Function>(
 export const makeResumeFiber = <F extends Function>(
   fiber: LiveFiber<F>,
   Resume: LiveFunction<any>,
-  Next?: LiveFunction<any>,
+  name?: string,
 ): LiveFiber<any> => {
-  // @ts-ignore
-  Resume.displayName = `Resume(${(Next as any)?.displayName ?? ''})`;
+
+  const f = (fiber.f as any);
+  const n = f?.displayName ?? f?.name ?? '';
+  name = name ?? (n.match(/^Memo\(/) ? n.slice(5, -1) : n);
+  Resume.displayName = `Resume(${name})`;
+
   const nextFiber = makeSubFiber(fiber, use(Resume)(), fiber.id, 1);
 
   // Adopt existing yeet context
@@ -145,7 +149,6 @@ export const makeYeetState = <F extends Function, A, B>(
   fiber: LiveFiber<F>,
   nextFiber: LiveFiber<F>,
   map?: (a: A) => B,
-  roots?: LiveFiber<any>[],
 ): FiberYeet<B> => ({
   id: fiber.id,
   emit: map
@@ -154,7 +157,7 @@ export const makeYeetState = <F extends Function, A, B>(
   value: undefined,
   reduced: undefined,
   parent: undefined,
-  roots: roots ? [...roots, nextFiber] : [nextFiber],
+  root: nextFiber,
 });
 
 // Make fiber context state
@@ -334,8 +337,8 @@ export const mountFiberReduction = <F extends Function, R, T>(
   const {yeeted} = fiber;
   if (!fiber.next) {
     const Resume = makeFiberContinuation(fiber, reduction);
-    fiber.next = makeResumeFiber(fiber, Resume, Next);
-    fiber.yeeted = makeYeetState(fiber, fiber.next, mapper, yeeted?.roots);
+    fiber.next = makeResumeFiber(fiber, Resume);
+    fiber.yeeted = makeYeetState(fiber, fiber.next, mapper);
     fiber.path = [...fiber.path, 0];
   }
 
@@ -365,7 +368,6 @@ export const makeFiberContinuation = <F extends Function, R>(
 // Tag a component as a static continuation
 export const makeStaticContinuation = (c: LiveFunction<any>, name: string): LiveFunction<any> => {
   (c as any).isStaticComponent = true;
-  (c as any).displayName = name;
   return c;
 }
 export const resume = makeStaticContinuation;
@@ -624,7 +626,7 @@ export const consumeFiber = <F extends Function>(
     fiber.context = makeContextState(fiber, fiber.context, context, registry);
 
     const resume = makeFiberContinuation(fiber, reduction);
-    fiber.next = makeResumeFiber(fiber, resume, Next);
+    fiber.next = makeResumeFiber(fiber, resume, 'Consume');
     fiber.path = [...fiber.path, 0];
   }
 
@@ -750,7 +752,7 @@ export const flushMount = <F extends Function>(
   }
 }
 
-// Ensure a re-render of the associated yeet roots
+// Ensure a re-render of the associated yeet root
 export const visitYeetRoot = <F extends Function>(
   fiber: LiveFiber<F>,
 ) => {
@@ -761,10 +763,8 @@ export const visitYeetRoot = <F extends Function>(
       yeeted.reduced === undefined
     ) {
       DEBUG && console.log('Reduce', formatNode(fiber));
-      const {roots} = yeeted;
-      let last = roots[roots.length - 1];
-
-      if (host) host.visit(last);
+      const {root} = yeeted;
+      if (host) host.visit(root);
     }
   }
 }

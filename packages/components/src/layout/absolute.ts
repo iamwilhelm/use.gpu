@@ -62,5 +62,5 @@ const makeResume = (
         };
       }
     });
-  }, 'Absolute');
+  });
 

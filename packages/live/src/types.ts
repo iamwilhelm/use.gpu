@@ -109,7 +109,7 @@ export type FiberYeet<T> = {
   value?: T,
   reduced?: T,
   parent?: FiberYeet<T>,
-  roots: LiveFiber<any>[],
+  root: LiveFiber<any>,
 };
 
 // Deferred function calls

@@ -56,4 +56,4 @@ const Resume = resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
 
     device.queue.submit([commandEncoder.finish()]);      
   });
-}, 'Pass');
+});

@@ -33,4 +33,4 @@ const Resume = resume((els: LayoutElement[]) => {
   }
 
   return out;
-}, 'Layout');
+});

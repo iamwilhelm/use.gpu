@@ -197,24 +197,24 @@ export const renderFiber = <F extends Function>(
   // Passthrough built-ins as rendered result
   if ((f as any).isLiveBuiltin) {
     element = fiber as any as DeferredCall<any>;
+    // Enter/exit to clear yeet state
     bound.apply(null);
   }
   // Render live function
   else element = bound.apply(null, args ?? EMPTY_ARRAY);
 
   // Early exit if memoized and same result
-  if (fiber.version && !fiber.next && fiber.type !== YEET) {
-    if (fiber.version === fiber.memo) return;
-    fiber.memo = fiber.version;
+  if (fiber.version) {
+    const canExitEarly = fiber.type !== YEET && !fiber.next;
+    if (fiber.version !== fiber.memo) {
+      fiber.memo = fiber.version;
+      pingFiber(fiber);
+    }
+    else if (canExitEarly) return;
   }
-
-  // Let host do its thing
-  //
-  // Call this here instead of in updateFiber.
-  // so that inline provide/gather nodes don't update twice.
-  //
-  // They skip the call to renderFiber() and ping the fiber on their own.
-  pingFiber(fiber);
+  else {
+    pingFiber(fiber);
+  }
 
   // Apply rendered result
   return element ?? null;

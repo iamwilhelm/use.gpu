@@ -4,7 +4,7 @@ import {
   DeferredCall, HostInterface, Hook,
 } from './types';
 
-import { bind, CURRENT_FIBER, makeFiber, makeStaticContinuation, bustFiberCaches, scheduleYeetRoots } from './fiber';
+import { bind, makeFiber, bustFiberMemo, getCurrentFiber } from './fiber';
 import { isSameDependencies } from './util';
 import { formatNode } from './debug';
 
@@ -56,6 +56,14 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
   state.length = pointer;
 }
 
+export const useFiber = () => {
+  const fiber = getCurrentFiber();
+  if (!fiber) throw new Error("Hook called outside of rendering component");
+  return fiber;
+}
+
+export const useConsoleLog = (value: any, name: string) => useOne(() => console.log(name, value), value);
+
 export const useNoHook = (hookType: Hook) => () => {
   const fiber = useFiber();
 
@@ -64,12 +72,6 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i] = undefined;
   state![i + 1] = undefined;
 };
-
-export const useFiber = () => {
-  const fiber = CURRENT_FIBER;
-  if (!fiber) throw new Error("Calling a hook outside a bound function");
-  return fiber;
-}
 
 // Memoize a live function on all its arguments (shallow comparison per arg)
 // Unlike <Memo> this does not create a new sub-fiber
@@ -143,7 +145,6 @@ export const memoProps = <F extends Function>(
 
 // Shorthand
 export const memo = memoProps;
-export const resume = makeStaticContinuation;
 
 // Allocate state value and a setter for it, initializing with the given value or function
 export const useState = <T>(
@@ -167,8 +168,7 @@ export const useState = <T>(
           host!.schedule(fiber, () => {
             if (value instanceof Function) state![i] = value(state![i]);
             else state![i] = value;
-            bustFiberCaches(fiber);
-            scheduleYeetRoots(fiber);
+            bustFiberMemo(fiber);
           });
         }
       : NOP;

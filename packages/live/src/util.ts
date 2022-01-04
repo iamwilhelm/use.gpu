@@ -1,4 +1,4 @@
-import { LiveFiber, Task, Action, Dispatcher, Key } from './types';
+import { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types';
 
 const RAF = typeof window !== 'undefined' ? window.requestAnimationFrame : setTimeout;
 const NO_DEPS = [] as any[];
@@ -164,3 +164,7 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
   return (ak.length - bk.length) || (a.depth - b.depth);
 }
 
+export const tagFunction = <F extends ArrowFunction>(f: F) => {
+  (f as any).displayName = `${Math.floor(Math.random() * 10000)}`;
+  return f;
+}

@@ -43,22 +43,20 @@ export const Aggregate: LiveComponent<AggregateProps> = (fiber) => (props) => {
 };
 
 const Resume = resume((fiber) => (aggregates: Record<string, LayerAggregate[]>) => 
-  Object.keys(aggregates).map((type: any) => use(Layer, key)(type, aggregates))
-}, 'Aggregate');
+  Object.keys(AGGREGATORS).map((type: any) => aggregates[type] ? use(Layer, type)(type, aggregates[type]) : null)
+, 'Aggregate');
 
 const Layer: LiveFunction<any> = (fiber) => (
   type: LayerType,
-  aggregates: LayerAggregate[],
+  items: LayerAggregate[],
 ) => {
   const {device} = useContext(RenderContext);
-  const {type, aggregates} = props;
 
   const out = [] as LiveElement[];
   const aggregator = AGGREGATORS[type];
-  if (!aggregator) continue;
+  if (!aggregator) return null;
 
   const [makeAggregator, Component] = aggregator;
-  const items = aggregates[type];
   const {keys, count, memoKey} = getItemSummary(items);
 
   // Invalidate storage if too small, or set of keys changes.
@@ -78,7 +76,7 @@ const Layer: LiveFunction<any> = (fiber) => (
   );
   
   const props = storage.update(items);
-  return use(Component)(props));
+  return use(Component)(props);
 };
 
 const getItemSummary = (items: LayerAggregate[]) => {

@@ -25,6 +25,8 @@ const NO_CONTEXT = {
 
 // Hide the fiber argument like in React
 export let CURRENT_FIBER = null as LiveFiber<any> | null;
+export const getCurrentFiber = () => CURRENT_FIBER!;
+export const getCurrentFiberID = () => CURRENT_FIBER?.id;
 
 // Prepare to call a live function with optional given persistent fiber
 export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
@@ -228,7 +230,10 @@ export const updateFiber = <F extends Function>(
   const fiberType = isArray ? Array : call?.f;
 
   // If fiber type changed, remount everything
-  if (fiber.type && fiberType !== fiber.type) disposeFiberMounts(fiber);
+  if (fiber.type && fiberType !== fiber.type) {
+    disposeFiberMounts(fiber);
+    visitYeetRoot(fiber, callbacks);
+  }
   fiber.type = fiberType as any;
 
   // Reconcile literal array
@@ -260,6 +265,7 @@ export const updateFiber = <F extends Function>(
   else if (fiberType === YEET) {
     if (!yeeted) throw new Error("Yeet without aggregator");
     yeeted.emit(fiber, call!.arg);
+    visitYeetRoot(fiber, callbacks);
   }
   // Mount normal node (may still be built-in)
   else {
@@ -275,8 +281,6 @@ export const mountFiberCall = <F extends Function>(
   call?: DeferredCall<any> | null,
   callbacks?: RenderCallbacks,
 ) => {
-  if (fiber.mounts?.size) reconcileFiberCalls(fiber, EMPTY_ARRAY, callbacks);
-
   const {mount} = fiber;
   const args = mount?.args;
 
@@ -322,10 +326,9 @@ export const mountFiberReduction = <F extends Function, R, T>(
   }
 
   reconcileFiberCalls(fiber, calls, callbacks);
+  
   if (callbacks) callbacks.onFence(fiber);
-
-  const Resume = fiber.next.f;
-  mountFiberContinuation(fiber, use(Resume)(Next), 1, callbacks);
+  mountFiberContinuation(fiber, use(fiber.next.f)(Next), 1, callbacks)
 }
 
 // Wrap a live function to act as a continuation of a prior fiber
@@ -337,13 +340,8 @@ export const makeFiberContinuation = <F extends Function, R>(
 ) => (
   Next?: LiveFunction<any>
 ) => {
-  const value = reduction();
-
-  // Bust cache on next fiber as it may immediately reduce
-  if (next?.mount) bustFiberCaches(next.mount);
-  // Next fiber may be inlined for efficiency
-  else bustFiberCaches(next);
   if (!Next) return null;
+  const value = reduction();
 
   // If mounting static component, inline into current fiber
   if ((Next as any).isStaticComponent) return Next(next)(value);
@@ -357,6 +355,7 @@ export const makeStaticContinuation = (c: LiveFunction<any>, name: string): Live
   (c as any).displayName = name;
   return c;
 }
+export const resume = makeStaticContinuation;
 
 // Reconcile multiple calls on a fiber
 export const reconcileFiberCalls = <F extends Function>(
@@ -364,8 +363,6 @@ export const reconcileFiberCalls = <F extends Function>(
   calls: DeferredCall<any>[],
   callbacks?: RenderCallbacks,
 ) => {
-  if (fiber.mount) mountFiberCall(fiber, null, callbacks);
-
   let {mounts, order, seen} = fiber;
 
   if (!mounts) mounts = fiber.mounts = new Map();
@@ -563,7 +560,7 @@ export const provideFiber = <F extends Function>(
   callbacks?: RenderCallbacks,
 ) => {
   // Disallow stack slicing because <Provide> is not renderable by itself as a built-in.
-  if (callbacks) if (!callbacks.onRender(fiber, false)) return;
+  if (callbacks) callbacks.onRender(fiber, false);
 
   if (!fiber.args) return;
   let {args: [context, value, calls, isMemo]} = fiber;
@@ -605,10 +602,10 @@ export const consumeFiber = <F extends Function>(
   callbacks?: RenderCallbacks,
 ) => {
   // Disallow stack slicing because <Consume> is not renderable by itself as a built-in.
-  if (callbacks) if (!callbacks.onRender(fiber, false)) return;
+  if (callbacks) callbacks.onRender(fiber, false);
 
   if (!fiber.args) return;
-  let {args: [context, calls, done]} = fiber;
+  let {args: [context, calls, Next]} = fiber;
 
   if (!fiber.next) {
     const registry = new Map<LiveFiber<any>, any>();
@@ -618,7 +615,7 @@ export const consumeFiber = <F extends Function>(
     if (callbacks) callbacks.onUpdate(fiber);
 
     const resume = makeFiberContinuation(fiber, reduction);
-    fiber.next = makeResumeFiber(fiber, resume, done);
+    fiber.next = makeResumeFiber(fiber, resume, Next);
     fiber.path = [...fiber.path, 0];
   }
 
@@ -634,9 +631,7 @@ export const consumeFiber = <F extends Function>(
   }
 
   if (callbacks) callbacks.onFence(fiber);
-
-  const Resume = fiber.next.f;
-  mountFiberContinuation(fiber, use(Resume)(done), 1, callbacks);
+  mountFiberContinuation(fiber, use(fiber.next.f)(Next), 1, callbacks)
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating its execution
@@ -645,18 +640,19 @@ export const detachFiber = <F extends Function>(
   callbacks?: RenderCallbacks,
 ) => {
   // Disallow stack slicing because <Detach> is not renderable by itself as a built-in.
-  if (callbacks) if (!callbacks.onRender(fiber, false)) return;
+  if (callbacks) callbacks.onRender(fiber, false);
 
   if (!fiber.args) return;
-  let {next, args: [call, callback]} = fiber;
+  let {host, next, args: [call, callback]} = fiber;
 
   if (!next || (next.f !== call.f)) next = fiber.next = makeSubFiber(fiber, call);
   next.args = call.args;
 
-  const roots = [next];
   callback(() => {
-    if (callbacks) callbacks.onUpdate(fiber);
-    return renderFibers(roots);
+    if (callbacks) {
+      callbacks.onUpdate(fiber);
+      if (next && host) host.schedule(next, NOP);
+    }
   }, fiber.next);
 }
 
@@ -670,7 +666,7 @@ export const disposeFiber = <F extends Function>(fiber: LiveFiber<F>) => {
 
 // Dispose of a fiber's mounted sub-fibers
 export const disposeFiberMounts = <F extends Function>(fiber: LiveFiber<F>) => {
-  const {mount, mounts, next} = fiber;
+  const {mount, mounts, next, yeeted} = fiber;
 
   if (mount) disposeFiber(mount);
   if (mounts) for (const key of mounts.keys()) {
@@ -678,6 +674,8 @@ export const disposeFiberMounts = <F extends Function>(fiber: LiveFiber<F>) => {
     if (mount) disposeFiber(mount);
   }
   if (next) disposeFiber(next);
+
+  bustFiberYeet(fiber);
 
   fiber.mount = fiber.mounts = fiber.next = null;
 }
@@ -747,38 +745,41 @@ export const flushMount = <F extends Function>(
   }
 }
 
-// Bust caches for a fiber when state changes
-export const bustFiberCaches = <F extends Function>(fiber: LiveFiber<F>) => {
-  const {host, version, yeeted} = fiber;
-  if (DEBUG && (version != null || yeeted)) console.log('Busting caches on', formatNode(fiber));
-  if (version != null) {
-    fiber.version = incrementVersion(version);
-  }
+// Ensure a re-render of the associated yeet roots
+export const visitYeetRoot = <F extends Function>(
+  fiber: LiveFiber<F>,
+  callbacks?: RenderCallbacks,
+) => {
+  const {host, yeeted} = fiber;
   if (yeeted) {
-    let yt = yeeted;
-    do {
-      yt.value = yt.reduced = undefined;
-    } while (yt = yt.parent!);
+    if (
+      yeeted.value !== undefined ||
+      yeeted.reduced === undefined
+    ) {
+      DEBUG && console.log('Reduce', formatNode(fiber));
+      const {roots} = yeeted;
+      let last = roots[roots.length - 1];
+
+      if (host) host.visit(last);
+    }
   }
 }
 
 // Cyclic version number that skips 0
 export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
 
-// Schedule a re-render of any associated yeet roots
-export const scheduleYeetRoots = <F extends Function>(fiber: LiveFiber<F>) => {
-  DEBUG && console.log('Rescheduling', formatNode(fiber));
-  const {host, yeeted} = fiber;
-  if (yeeted) {
-    if (host) for (let root of yeeted.roots) host.schedule(root, NOP);
-  }
+// Force a memoized fiber to update next render
+export const bustFiberMemo = <F extends Function>(fiber: LiveFiber<F>) => {
+  if (fiber.version != null) fiber.version = incrementVersion(fiber.version);
 }
 
-// Schedule a re-render of any associated yeet roots
-export const visitYeetRoots = <F extends Function>(visit: Set<LiveFiber<F>>, fiber: LiveFiber<F>, ) => {
-  DEBUG && console.log('Revisiting', formatNode(fiber));
-  const {yeeted} = fiber;
-  if (yeeted) {
-    for (let root of yeeted.roots) visit.add(root);
+// Remove a cached yeeted value and all upstream reductions
+export const bustFiberYeet = <F extends Function>(fiber: LiveFiber<F>) => {
+  if (fiber.yeeted) {
+    let yt = fiber.yeeted;
+    yt.value = yt.reduced = undefined;
+    while ((yt = yt.parent!) && (yt.reduced !== undefined)) {
+      yt.reduced = undefined;
+    }
   }
 }

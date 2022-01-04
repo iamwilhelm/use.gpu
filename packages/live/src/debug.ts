@@ -108,7 +108,7 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     seen.set(x, true);
 
     const signature = Object.keys(x).join('/');
-    if (signature === 'f/args/key' || signature === 'f/arg/key') return formatNode(x);
+    if (signature === 'f/args/key/by' || signature === 'f/arg/key/by') return formatNode(x);
 
     const out = [];
     for (const k in x) if (hasOwnProperty.call(x, k)) {
@@ -123,7 +123,7 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
 
 export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return '' + x;
-  if (Array.isArray(x)) return '[' + x.map((x) => formatValue(x, seen)).join(', ') + ']';
+  if (Array.isArray(x)) return '[' + x.map((x) => formatShortValue(x, seen)).join(', ') + ']';
   if (typeof x === 'boolean') return x ? 'true' : 'false';
   if (typeof x === 'number') return '' + x;
   if (typeof x === 'symbol') return '(symbol)';

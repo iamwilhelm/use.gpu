@@ -26,7 +26,7 @@ export const Flex: LiveComponent<BlockProps> = memo((fiber) => (props) => {
     direction = 'x',
     gap = 0,
     align = 'start',
-    anchor = 'center',
+    anchor = 'start',
     wrap = false,
     snap = true,
     render,

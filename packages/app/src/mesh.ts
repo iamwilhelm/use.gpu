@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode } from '@use-gpu/core/types';
 import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
-import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeMultiUniforms, 
   makeRenderPipeline, makeShaderModule,
@@ -106,7 +106,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
 
   // Return a lambda back to parent(s)
   return yeet({
-    [mode]: (passEncoder: GPURenderPassEncoder) => {
+    [mode]: tagFunction((passEncoder: GPURenderPassEncoder) => {
       const l = blinkState.state ? 1 : 0.5;
 
       uniform.pipe.fill(viewUniforms);
@@ -118,6 +118,6 @@ export const Mesh: LiveComponent<MeshProps> = memo((fiber) => (props) => {
       passEncoder.setBindGroup(0, uniform.bindGroup);
       passEncoder.setVertexBuffer(0, vertexBuffers[0]);
       passEncoder.draw(mesh.count, 1, 0, 0);
-    }
+    })
   }); 
 }, 'Mesh');

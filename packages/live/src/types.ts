@@ -15,6 +15,12 @@ export type Reducer<T> = T | ((t: T) => T);
 export type Setter<T> = (t: Reducer<T>) => void;
 export type Resource<T> = () => (void | Task | [T, Task]);
 
+// Renderer options
+export type RenderOptions = {
+  // Stack slicing depth
+  stackSlice: number,
+};
+
 // Hook types
 export enum Hook {
   STATE = 0,
@@ -38,10 +44,10 @@ export type Dispatcher = (as: Action<any>[]) => void;
 export type OnFiber<T = any> = (fiber: LiveFiber<any>) => T;
 export type FiberSetter<T> = (fiber: LiveFiber<any>, t: T) => void;
 export type RenderCallbacks = {
+  dispatch: OnFiber<void>,
   onRender: (fiber: LiveFiber<any>, allowSlice?: boolean) => boolean,
   onUpdate: OnFiber<void>,
   onFence: OnFiber<void>,
-  onSlice: OnFiber<void>,
 };
 
 // User=defined context
@@ -106,12 +112,6 @@ export type FiberYeet<T> = {
   roots: LiveFiber<any>[],
 };
 
-// Ordered batch of fibers to update
-export type GroupedFibers = {
-  root: LiveFiber<any>,
-  subs: Set<LiveFiber<any>>,
-};
-
 // Deferred function calls
 export type FunctionCall<F extends Function = ArrowFunction> = {
   f: LiveFunction<F>,
@@ -125,6 +125,15 @@ export type DeferredCall<F extends Function = ArrowFunction> = FunctionCall<F> &
 };
 
 export type LiveElement<F = any> = null | DeferredCall<any> | LiveElement<any>[];
+
+// Priority queue
+export type FiberQueue = {
+  insert: (f: LiveFiber<any>) => void,
+  remove: (f: LiveFiber<any>) => void,
+  all: ()=> LiveFiber<any>[],
+  peek: () => LiveFiber<any> | null,
+  pop: () => LiveFiber<any> | null,
+};
 
 // Live host interface
 export type HostInterface = {
@@ -141,6 +150,12 @@ export type HostInterface = {
   depend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => boolean,
   undepend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => void,
   invalidate: (fiber: LiveFiber<any>) => LiveFiber<any>[],
+
+  // Fiber update queue
+  visit: (fiber: LiveFiber<any>) => void,
+  unvisit: (fiber: LiveFiber<any>) => void,
+  pop: () => LiveFiber<any> | null,
+  peek: () => LiveFiber<any> | null,
 
   __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
   __flush: () => void,

@@ -98,7 +98,7 @@ export const fitFlex = (
   const gapCross = isX ? gapY : gapX;
 
   const alignMain = isX ? alignX : alignY;
-  const alignCross = isX ? alignX : alignY;
+  const alignCross = isX ? alignY : alignX;
   const anchorRatio = parseAnchor(anchor);
 
   const isSnap = !!snap;
@@ -135,7 +135,7 @@ export const fitFlex = (
     if (!n) return;
 
     // Extra space to be grown (+) or shrunk (-)
-    let slack = spaceMain - accumMain;
+    let slack = spaceMain - accumMain - gapMain;
 
     // Grow/shrink row if applicable
     let exact = slack === 0;
@@ -150,6 +150,7 @@ export const fitFlex = (
     let axisGap = 0;
     let axisPos = 0;
     if (slack) [axisGap, axisPos] = getFlexSpacing(slack, n, alignMain);
+    axisGap += gapMain;
 
     // Lay out a row of flexed boxes into their final size
     const crossSizes   = [] as Point[];
@@ -191,7 +192,9 @@ export const fitFlex = (
       offsets: crossOffsets,
       renders: crossRenders,
     });
-    maxCross += maxSize;
+    accumCross += maxSize;
+    maxCross = Math.max(accumCross, maxCross);
+    accumCross += gapCross;
 
     accumMain = main.length = mainSizes.length = 0;
   }
@@ -200,11 +203,12 @@ export const fitFlex = (
     const n = cross.length;
     if (!n) return;
 
-    const slack = Math.max(0, spaceCross - maxCross);
+    const slack = Math.max(0, spaceCross - accumCross - gapCross);
 
     let crossGap = 0;
     let crossPos = 0;
     if (slack > 0) [crossGap, crossPos] = getFlexSpacing(slack, n, alignCross);
+    crossGap += gapCross;
 
     for (let i = 0; i < n; ++i) {
       const {size, sizes: ss, offsets: os, renders: rs} = cross[i];
@@ -253,6 +257,7 @@ export const fitFlex = (
       if (wrap && (accumMain + size + mOn > spaceMain)) reduceMain();
       accumMain += size + mOn;
       maxMain = Math.max(maxMain, accumMain);
+      accumMain += gapMain;
 
       main.push(el);
       mainSizes.push(size);

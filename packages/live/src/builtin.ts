@@ -5,7 +5,7 @@ import {
 } from './types';
 
 import { compareFibers } from './util';
-import { makeFiber, CURRENT_FIBER } from './fiber';
+import { makeFiber, getCurrentFiberID } from './fiber';
 
 export const DETACH       = () => () => {};
 export const RECONCILE    = () => () => {};
@@ -36,21 +36,21 @@ export const use = <F extends Function>(
   key?: Key,
 ) => (
   ...args: F extends ArrowFunction ? Parameters<F> : any[]
-): DeferredCall<F> => ({f, args, key, by: CURRENT_FIBER?.id}) as any;
+): DeferredCall<F> => ({f, args, key, by: getCurrentFiberID()}) as any;
 
 // Detach the rendering of a subtree
 export const detach = <F extends Function>(
   call: DeferredCall<F>,
   callback: (render: () => void, fiber: LiveFiber<F>) => void,
   key?: Key,
-): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key, by: getCurrentFiberID()});
 
 // Reconcile an array of calls
 export const reconcile = <F extends Function>(
   calls: LiveElement<any>,
   key?: Key,
 ): DeferredCall<() => void> => {
-  if (Array.isArray(calls)) return ({f: RECONCILE, args: calls, key, by: CURRENT_FIBER?.id});
+  if (Array.isArray(calls)) return ({f: RECONCILE, args: calls, key, by: getCurrentFiberID()});
   return ({f: RECONCILE, args: [calls], key});
 }
 
@@ -61,27 +61,27 @@ export const mapReduce = <R, T>(
   reduce?: (a: R, b: R) => R,
   done?: LiveFunction<(r: R) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key, by: getCurrentFiberID()});
 
 // Gather items from a subtree
 export const gather = <T>(
   calls: LiveElement<any>,
   done?: LiveFunction<(r: T[]) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key, by: getCurrentFiberID()});
 
 // Gather items from a subtree
 export const multiGather = <T>(
   calls: LiveElement<any>,
   done?: LiveFunction<(r: T[]) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key, by: getCurrentFiberID()});
 
 // Yeet value(s) upstream
 export const yeet = <T>(
   value: T,
   key?: Key,
-): DeferredCall<() => void> => ({f: YEET, arg: value, key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: YEET, arg: value, key, by: getCurrentFiberID()});
 
 // Provide a value for a context
 export const provide = <T, C>(
@@ -89,7 +89,7 @@ export const provide = <T, C>(
   value: T,
   calls: LiveElement<any> | undefined,
   key?: Key,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key, by: getCurrentFiberID()});
 
 // Provide a value for a context, memoizing if it doesn't change
 export const provideMemo = <T, C>(
@@ -97,7 +97,7 @@ export const provideMemo = <T, C>(
   value: T,
   calls: LiveElement<any> | undefined,
   key?: Key,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key, by: getCurrentFiberID()});
 
 // Consume value from a co-context
 export const consume = <T, C>(
@@ -105,7 +105,7 @@ export const consume = <T, C>(
   calls: LiveElement<any> | undefined,
   done?: LiveFunction<(r: T) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key, by: CURRENT_FIBER?.id});
+): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key, by: getCurrentFiberID()});
 
 // Make live context for holding shared data for child nodes
 export const makeContext = <T>(initialValue?: T | null, displayName?: string): LiveContext<T> => ({

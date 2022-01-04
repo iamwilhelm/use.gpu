@@ -5,7 +5,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
-import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import {
   makeMultiUniforms, makeBoundUniforms,
   makeRenderPipeline,
@@ -80,7 +80,6 @@ export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
     VIRTUAL_BINDGROUP: 1,
     ...propDefines,
   }), [isPicking, propDefines]);
-
 
   // Shaders
   const links = useMemo(() => ({

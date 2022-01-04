@@ -40,7 +40,7 @@ export type LinesProps = {
   id?: number,
 };
 
-export const Lines: LiveComponent<LinesProps> = (fiber) => (props) => {
+export const Lines: LiveComponent<LinesProps> = (props) => {
   return use(RawLines)(props);
 };
 */

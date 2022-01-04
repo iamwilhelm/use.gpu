@@ -56,7 +56,7 @@ export type PointsProps = {
 
 const SIZE_BINDING = { name: 'getSize', format: 'float', value: 1, args: ['int'] } as UniformAttributeValue;
 
-export const Points: LiveComponent<PointsProps> = memo((fiber) => (props) => {
+export const Points: LiveComponent<PointsProps> = memo((props) => {
   const {
     position,
     positions,

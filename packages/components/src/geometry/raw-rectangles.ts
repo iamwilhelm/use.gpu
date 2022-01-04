@@ -65,7 +65,7 @@ const PIPELINE = {
   },
 };
 
-export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((fiber) => (props) => {
+export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((props) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,

@@ -13,13 +13,13 @@ export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
 const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
-export const Pass: LiveComponent<PassProps> = memo((fiber) => (props) => {
+export const Pass: LiveComponent<PassProps> = memo((props) => {
   const {children, render} = props;
 
   return multiGather(children ?? (render ? render() : null), Resume);
 }, 'Pass');
 
-const Resume = resume((fiber: LiveFiber<any>) => (rs: Record<string, RenderToPass | RenderToPass[]>) => {
+const Resume = resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
   const renderContext = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
 

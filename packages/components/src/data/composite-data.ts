@@ -27,7 +27,7 @@ const NO_FIELDS = [] as DataField[];
 const isComposite = (format: string) => !!format.match(/\[\]$/);
 const toSimple = (format: string) => format.replace(/\[\]$/, '');
 
-export const CompositeData: LiveComponent<CompositeDataProps> = (fiber) => (props) => {
+export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   const {device} = useContext(RenderContext);
 
   const {

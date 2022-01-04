@@ -13,7 +13,7 @@ export const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [numbe
   return [pixelRatio * offsetWidth, pixelRatio * offsetHeight, pixelRatio];
 }
 
-export const AutoSize: LiveComponent<AutoSizeProps> = (fiber) => (props) => {
+export const AutoSize: LiveComponent<AutoSizeProps> = (props) => {
   const {canvas, render, children} = props;
 
   useResource(() => {

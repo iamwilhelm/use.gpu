@@ -28,7 +28,7 @@ export type RouterProps = {
   routes?: Record<string, Route>,
 };
 
-export const Router: LiveComponent<any> = memo((fiber) => ({source, routes, children}) => {
+export const Router: LiveComponent<any> = memo(({source, routes, children}) => {
   source = source ?? makeBrowserHistory();
 
   const [state, setState] = useState<RouterState>({

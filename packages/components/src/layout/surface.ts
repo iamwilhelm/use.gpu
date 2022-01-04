@@ -16,7 +16,7 @@ export type SurfaceProps = {
   lineWidth?: number,
 };
 
-export const Surface: LiveComponent<SurfaceProps> = (fiber) => (props) => {
+export const Surface: LiveComponent<SurfaceProps> = (props) => {
   const {
     stroke = false,
     fill = true,

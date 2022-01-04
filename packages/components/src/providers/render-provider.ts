@@ -10,7 +10,7 @@ export type RenderProviderProps = {
   children: LiveElement<any>,
 };
 
-export const RenderProvider: LiveComponent<RenderProviderProps> = memo((fiber) => (props) => {
+export const RenderProvider: LiveComponent<RenderProviderProps> = memo((props) => {
   const {renderContext, children} = props;
   return provide(RenderContext, renderContext, children);
 }, 'RenderProvider');

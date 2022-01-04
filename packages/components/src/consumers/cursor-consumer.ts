@@ -13,11 +13,11 @@ export type CursorConsumerProps = {
   children: LiveElement<any>,
 };
 
-export const CursorConsumer: LiveComponent<CursorConsumerProps> = (fiber) => (props) => {
+export const CursorConsumer: LiveComponent<CursorConsumerProps> = (props) => {
   const {element, children} = props;
   
   const Resume = useOne(() => 
-    resume((fiber: LiveFiber<any>) => (registry: Map<LiveFiber<any>, string>) => {
+    resume((registry: Map<LiveFiber<any>, string>) => {
       const cursor = getTailValue(registry) ?? 'default';
       if (element.style.cursor !== cursor) element.style.cursor = cursor;
     }, 'CursorConsumer'),
@@ -26,7 +26,7 @@ export const CursorConsumer: LiveComponent<CursorConsumerProps> = (fiber) => (pr
   return consume(CursorContext, children, Resume);
 };
 
-export const Cursor: LiveComponent<CursorProps> = memo((fiber) => (props) => {
+export const Cursor: LiveComponent<CursorProps> = memo((props) => {
   useConsumer(CursorContext, props.cursor);
   return null;
 }, 'Cursor');

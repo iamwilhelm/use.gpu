@@ -35,7 +35,7 @@ export type RectanglesProps = {
   id?: number,
 };
 
-export const Rectangles: LiveComponent<RectanglesProps> = (fiber) => (props) => {
+export const Rectangles: LiveComponent<RectanglesProps> = (props) => {
   return use(RawRectangles)(props);
 };
 */

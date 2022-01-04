@@ -14,7 +14,7 @@ export type BlockProps = {
   children?: LiveElement<any>,
 };
 
-export const Block: LiveComponent<BlockProps> = memo((fiber) => (props) => {
+export const Block: LiveComponent<BlockProps> = memo((props) => {
   const {
     direction = 'y',
     grow = 0,
@@ -40,7 +40,7 @@ const makeResume = (
   shrink: number,
   m: Margin,
 ) =>
-  resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
+  resume((els: LayoutElement[]) => {
     const sizing = getBlockMinMax(els, direction);
     const margin = getBlockMargin(els, m, direction);
 

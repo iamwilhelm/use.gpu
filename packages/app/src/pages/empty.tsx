@@ -7,7 +7,7 @@ export type EmptyPageProps = {
   _unused?: boolean,
 };
 
-export const EmptyPage: LiveComponent<EmptyPageProps> = (fiber) => (props) => {
+export const EmptyPage: LiveComponent<EmptyPageProps> = (props) => {
 
   return (
     use(Draw)({

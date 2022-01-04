@@ -17,7 +17,7 @@ export type ElementProps = {
   children?: LiveElement<any>,
 };
 
-export const Element: LiveComponent<BlockProps> = (fiber) => (props) => {
+export const Element: LiveComponent<BlockProps> = (props) => {
   const {
     width = 100,
     height = 100,

@@ -97,10 +97,11 @@ export const memoArgs = <F extends Function>(
     return value;
   };
 
+  const memoName = `Memo(${name ?? f.name})`;
   const {length} = f;
   return new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
-    if (s === 'name') return `Memo(${target.name})`;
+    if (s === 'name') return memoName;
     return target[s];
   }});
 };
@@ -132,10 +133,11 @@ export const memoProps = <F extends Function>(
     return value;
   };
 
+  const memoName = `Memo(${name ?? f.name})`;
   const {length} = f;
   return new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
-    if (s === 'name') return `Memo(${target.name})`;
+    if (s === 'name') return memoName;
     return target[s];
   }});
 }

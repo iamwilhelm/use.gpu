@@ -37,16 +37,16 @@ const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
   return a;
 }
 
-export const Aggregate: LiveComponent<AggregateProps> = (fiber) => (props) => {
+export const Aggregate: LiveComponent<AggregateProps> = (props) => {
   const {render, children} = props;
   return multiGather(children ?? (render ? render() : null), Resume);
 };
 
-const Resume = resume((fiber) => (aggregates: Record<string, LayerAggregate[]>) => 
+const Resume = resume((aggregates: Record<string, LayerAggregate[]>) => 
   Object.keys(AGGREGATORS).map((type: any) => aggregates[type] ? use(Layer, type)(type, aggregates[type]) : null)
 , 'Aggregate');
 
-const Layer: LiveFunction<any> = (fiber) => (
+const Layer: LiveFunction<any> = (
   type: LayerType,
   items: LayerAggregate[],
 ) => {

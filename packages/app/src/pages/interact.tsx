@@ -14,7 +14,7 @@ export type InteractPageProps = {
   _unused?: boolean,
 };
 
-export const InteractPage: LiveComponent<InteractPageProps> = (fiber) => (props) => {
+export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
   return (
     use(Draw)({

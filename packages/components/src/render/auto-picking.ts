@@ -10,7 +10,7 @@ export type AutoPickingProps = {
   children: LiveElement<any>,
 }
 
-export const AutoPicking: LiveComponent<AutoPickingProps> = () => ({ canvas, children }) =>
+export const AutoPicking: LiveComponent<AutoPickingProps> = ({ canvas, children }) =>
   use(Picking)({
     children:
 

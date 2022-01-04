@@ -18,7 +18,7 @@ export type DataProps = {
 
 const NO_FIELDS = [] as DataField[];
 
-export const Data: LiveComponent<DataProps> = (fiber) => (props) => {
+export const Data: LiveComponent<DataProps> = (props) => {
   const {device} = useContext(RenderContext);
 
   const {

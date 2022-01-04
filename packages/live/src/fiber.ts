@@ -348,15 +348,16 @@ export const makeFiberContinuation = <F extends Function, R>(
   fiber: LiveFiber<F>,
   reduction: () => R,
 ) => (
-  next: LiveFiber<F>,
-) => (
   Next?: LiveFunction<any>
 ) => {
+  const {next} = fiber;
+  if (!next) return null;
   if (!Next) return null;
+
   const value = reduction();
 
   // If mounting static component, inline into current fiber
-  if ((Next as any).isStaticComponent) return Next(next)(value);
+  if ((Next as any).isStaticComponent) return Next(value);
   // Mount as new sub fiber
   else return use(Next)(value);
 }

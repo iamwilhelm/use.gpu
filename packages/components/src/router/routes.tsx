@@ -33,14 +33,14 @@ const joinPath = (a: string, b: string) => {
 const escapeName = (s: string) => s.replace(/[^A-Za-z0-9_-]*/g, '');
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const Outlet: LiveComponent<any> = (fiber) => () => {
+const Outlet: LiveComponent<any> = () => {
   const context = useContext(RouteContext);
   return context.routes ? use(Routes)(context) : null;
 }
 
 const USE_OUTLET = use(Outlet)();
 
-export const Routes: LiveComponent<RoutesProps> = memo((fiber) => (props) => {
+export const Routes: LiveComponent<RoutesProps> = memo((props) => {
   const {
     routes,
     base = NO_PATH,

@@ -18,7 +18,7 @@ export type AbsoluteProps = {
   children?: LiveElement<any>,
 };
 
-export const Absolute: LiveComponent<AbsoluteProps> = memo((fiber) => (props) => {
+export const Absolute: LiveComponent<AbsoluteProps> = memo((props) => {
   const {
     left: l,
     top: t,
@@ -49,7 +49,7 @@ const makeResume = (
   h?: string | number | null,
   snap?: boolean,
 ) =>
-  resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
+  resume((els: LayoutElement[]) => {
     return yeet({
       sizing: NO_POINT4,
       margin: NO_POINT4,

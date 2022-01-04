@@ -14,7 +14,7 @@ export type PickProps = {
   onMouseMove?: (m: MouseEventState) => void,
 }
 
-export const Pick: LiveComponent<PickProps> = (fiber) => ({
+export const Pick: LiveComponent<PickProps> = ({
   render,
   children,
   onMouseEnter,

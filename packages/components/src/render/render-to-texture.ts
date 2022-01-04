@@ -26,7 +26,7 @@ export type RenderToTextureProps = {
   children?: LiveElement<any>, 
 };
 
-export const RenderToTexture: LiveComponent<RenderToTextureProps> = (fiber) => (props) => {
+export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
   const renderContext = useContext(RenderContext);
   const {device} = renderContext;
 

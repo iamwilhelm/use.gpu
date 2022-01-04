@@ -62,7 +62,7 @@ let t = 0;
 let lj = 0;
 const getLineJoin = () => ['bevel', 'miter', 'round'][lj = (lj + 1) % 3];
 
-export const GeometryPage: LiveComponent<GeometryPageProps> = (fiber) => (props) => {
+export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
   const mesh = makeMesh();
   const {canvas} = props;
 

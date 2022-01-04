@@ -42,7 +42,7 @@ const getDebugShader = (topology: GPUPrimitiveTopology) => {
   return instanceDrawWireframeStrip;
 }
 
-export const Virtual: LiveComponent<VirtualProps> = memo((fiber) => (props) => {
+export const Virtual: LiveComponent<VirtualProps> = memo((props) => {
   const {
     vertexCount,
     instanceCount,

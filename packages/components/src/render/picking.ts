@@ -73,7 +73,7 @@ export type PickingProps = {
 
 const NOP = () => {};
 
-export const Picking: LiveComponent<PickingProps> = (fiber) => (props) => {
+export const Picking: LiveComponent<PickingProps> = (props) => {
   const renderContext = useContext(RenderContext);
 
   const {
@@ -168,7 +168,7 @@ export type PickingProviderProps = {
   children: LiveElement<any>,
 };
 
-export const PickingProvider: LiveComponent<PickingProviderProps> = memo((fiber) => (props) => {
+export const PickingProvider: LiveComponent<PickingProviderProps> = memo((props) => {
   const {pickingContext, children} = props;
   return provide(PickingContext, pickingContext, children);
 }, 'PickingProvider');

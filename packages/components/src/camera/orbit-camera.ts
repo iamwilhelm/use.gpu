@@ -40,7 +40,7 @@ export type OrbitCameraProps = {
 
 let t = 0;
 
-export const OrbitCamera: LiveComponent<OrbitCameraProps> = (fiber) => (props) => {
+export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const {
     width,
     height,

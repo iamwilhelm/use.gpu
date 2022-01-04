@@ -10,7 +10,7 @@ export type UseInspectProps = {
   canvas: HTMLCanvasElement,
 };
 
-export const UseInspect: LiveComponent<UseInspectProps> = () => ({fiber, canvas}) => {
+export const UseInspect: LiveComponent<UseInspectProps> = ({fiber, canvas}) => {
   const container = useResource((dispose) => {
     const parent = canvas.parentElement;
 

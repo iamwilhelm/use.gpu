@@ -13,7 +13,7 @@ export type DrawProps = {
   children?: LiveElement<any>,
 };
 
-export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
+export const Draw: LiveComponent<DrawProps> = (props) => {
   const {live, render, children} = props;
 
   if (live) useContext(FrameContext);
@@ -22,7 +22,7 @@ export const Draw: LiveComponent<DrawProps> = (fiber) => (props) => {
   return gather(children ?? (render ? render() : null), Resume);
 };
 
-const Resume = resume((fiber: LiveFiber<any>) => (ts: Task[]) => {
+const Resume = resume((ts: Task[]) => {
   const {device, gpuContext, colorAttachments, samples} = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
   const frameContext = useOptionalContext(FrameContext);

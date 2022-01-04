@@ -8,12 +8,12 @@ export type LayoutProps = {
   children?: LiveElement<any>,
 };
 
-export const Layout: LiveComponent<LayoutProps> = memo((fiber) => (props) => {
+export const Layout: LiveComponent<LayoutProps> = memo((props) => {
   const {render, children} = props;
   return gather(children ?? (render ? render() : null), Resume);
 }, 'Layout');
 
-const Resume = resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
+const Resume = resume((els: LayoutElement[]) => {
   const layout = useContext(LayoutContext);
   const [left, top, right, bottom] = layout;
   const size = [right - left, bottom - top];

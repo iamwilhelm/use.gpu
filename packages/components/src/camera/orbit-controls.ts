@@ -19,7 +19,7 @@ export type OrbitControlsProps = {
   render: (phi: number, theta: number, radius: number) => LiveElement<any>,
 };
 
-export const OrbitControls: LiveComponent<OrbitControlsProps> = (fiber) => (props) => {
+export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   const {
     bearingSpeed = DEFAULT_OPTIONS.bearingSpeed,
     pitchSpeed   = DEFAULT_OPTIONS.pitchSpeed, 

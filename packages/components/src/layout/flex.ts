@@ -21,7 +21,7 @@ export type FlexProps = {
   children?: LiveElement<any>,
 };
 
-export const Flex: LiveComponent<BlockProps> = memo((fiber) => (props) => {
+export const Flex: LiveComponent<BlockProps> = memo((props) => {
   const {
     direction = 'x',
     gap = 0,
@@ -49,7 +49,7 @@ const makeResume = (
   wrap: boolean,
   snap: boolean,
 ) =>
-  resume((fiber: LiveFiber<any>) => (els: LayoutElement[]) => {
+  resume((els: LayoutElement[]) => {
     const gap    = normalizeGap(g);
     const align  = normalizeAlignment(al);
     const sizing = getFlexMinMax(els, direction, gap, wrap, snap);

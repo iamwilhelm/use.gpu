@@ -33,7 +33,7 @@ export type CanvasProps = {
 
 const getPixelRatio = () => typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
-export const Canvas: LiveComponent<CanvasProps> = (fiber) => (props) => {
+export const Canvas: LiveComponent<CanvasProps> = (props) => {
   const {
     device,
     canvas,

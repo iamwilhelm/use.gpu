@@ -22,7 +22,7 @@ export type AutoCanvasProps = {
   render: (context: CanvasRenderingContextGPU) => LiveElement<any>,
 }
 
-export const AutoCanvas: LiveComponent<AutoCanvasProps> = () => (props) =>
+export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) =>
   use(AutoSize)({
     canvas: props.canvas,
     children: use(CursorConsumer)({

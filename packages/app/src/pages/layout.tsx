@@ -14,7 +14,7 @@ export type LayoutPageProps = {
   _unused?: boolean,
 };
 
-export const LayoutPage: LiveComponent<LayoutPageProps> = (fiber) => (props) => {
+export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
 
   return (
     use(Draw)({

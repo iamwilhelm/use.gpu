@@ -24,7 +24,7 @@ export type FlatProps = {
   children?: LiveElement<any>,
 };
 
-export const Flat: LiveComponent<FlatProps> = (fiber) => (props) => {
+export const Flat: LiveComponent<FlatProps> = (props) => {
   const {
     scale = null,
     focus = DEFAULT_FLAT_CAMERA.focus,

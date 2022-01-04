@@ -17,7 +17,7 @@ export type RawDataProps = {
   render?: (source: StorageSource) => LiveElement<any>,
 };
 
-export const RawData: LiveComponent<RawDataProps> = (fiber) => (props) => {
+export const RawData: LiveComponent<RawDataProps> = (props) => {
   const {device} = useContext(RenderContext);
 
   const {

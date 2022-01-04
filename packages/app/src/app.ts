@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, ShaderLanguages, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
-import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { use, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   AutoCanvas,
@@ -32,9 +32,10 @@ export type AppProps = {
   languages: ShaderLanguages,
 };
 
-export const App: LiveComponent<AppProps> = (fiber) => (props) => {
+export const App: LiveComponent<AppProps> = (props) => {
   const {canvas, device, adapter, languages} = props;
 
+  const fiber = useFiber();
   const inspect = useInspector();
   const mesh = makeMesh();
 

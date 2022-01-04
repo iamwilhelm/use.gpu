@@ -10,7 +10,7 @@ import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
-import { use, yeet, memo, patch, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, yeet, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -72,7 +72,7 @@ const PIPELINE = {
   },
 };
 
-export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) => {
+export const RawLines: LiveComponent<RawLinesProps> = memo((props) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -97,7 +97,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((fiber) => (props) =>
   const instanceCount = (props.positions?.length || 2) - 1;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-  const key = fiber.id;
+  const key = useFiber().id;
 
   const p = props.positions ?? props.position ?? props.getPosition;
   const g = props.segments ?? props.segment ?? props.getSegment;

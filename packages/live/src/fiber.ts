@@ -32,26 +32,25 @@ export const getCurrentFiberID = () => CURRENT_FIBER?.id;
 export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
   fiber = fiber ?? makeFiber(f, null);
 
-  const bound = f(fiber!);
-  if (bound.length === 0) {
+  if (f.length === 0) {
     return () => {
       enterFiber(fiber!, base);
-      const value = bound();
+      const value = f();
       exitFiber(fiber!);
       return value;
     }
   }
-  if (bound.length === 1) {
+  if (f.length === 1) {
     return (arg: any) => {
       enterFiber(fiber!, base);
-      const value = bound(arg);
+      const value = f(arg);
       exitFiber(fiber!);
       return value;
     }
   }
   return (...args: any[]) => {
     enterFiber(fiber!, base);
-    const value = bound.apply(null, args);
+    const value = f.apply(null, args);
     exitFiber(fiber!);
     return value;
   }
@@ -198,7 +197,7 @@ export const renderFiber = <F extends Function>(
   if ((f as any).isLiveBuiltin) {
     element = fiber as any as DeferredCall<any>;
     // Enter/exit to clear yeet state
-    bound.apply(null);
+    bound();
   }
   // Render live function
   else element = bound.apply(null, args ?? EMPTY_ARRAY);
@@ -245,7 +244,7 @@ export const updateFiber = <F extends Function>(
 ) => {
   if (element === undefined) return;
 
-  const {f, bound, args, yeeted} = fiber;
+  const {f, args, yeeted} = fiber;
 
   // Handle call and call[]
   let call = element as DeferredCall<any> | null;

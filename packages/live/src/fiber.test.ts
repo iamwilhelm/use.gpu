@@ -1,4 +1,4 @@
-import { LiveFunction, LiveComponent, DeferredCall } from './types';
+import { Component, DeferredCall } from './types';
 import { use } from './builtin';
 import { bind, makeFiber, renderFiber, updateFiber } from './fiber';
 
@@ -8,7 +8,7 @@ type NumberReturner = () => number;
 
 it('returns a value', () => {
 
-  const F: LiveFunction<StringFormatter> = () => (foo: string) => {
+  const F: StringFormatter = (foo: string) => {
     return `hello ${foo}`;
   };
 
@@ -19,11 +19,11 @@ it('returns a value', () => {
 
 it('returns a deferred call', () => {
 
-  const G: LiveFunction<StringFormatter> = () => (foo: string) => {
+  const G: StringFormatter = (foo: string) => {
     return `hello ${foo}`;
   };
 
-  const F: LiveComponent<FooProps> = () => ({foo}) => {
+  const F: Component<FooProps> = ({foo}) => {
     return use(G)(foo);
   };
 
@@ -36,8 +36,8 @@ it('returns a deferred call', () => {
 
 it("renders a fiber recursively", () => {
 
-  const Root = () => () => use(Node)();
-  const Node = () => () => {};
+  const Root = () => use(Node)();
+  const Node = () => {};
 
   const fiber = makeFiber(Root, null);
 

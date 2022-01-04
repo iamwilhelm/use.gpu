@@ -1,10 +1,10 @@
 // Live function
 export type ArrowFunction = <T>(...args: T[]) => any;
-export type LiveFunction<F extends Function> = (fiber: LiveFiber<any>) => F;
+export type LiveFunction<F extends Function> = F;
 
 // Component with single props object
-export type Component<P> = (props: P) => LiveElement<any>;
-export type LiveComponent<P> = (fiber: LiveFiber<any>) => Component<P>;
+export type LiveComponent<P> = (props: P) => LiveElement<any>;
+export type Component<P> = LiveComponent<P>;
 
 // Mounting key
 export type Key = string | number;

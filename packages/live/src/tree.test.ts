@@ -6,8 +6,8 @@ import { renderSync } from './tree';
 
 it("mounts", () => {
 
-  const Root = () => () => use(Node)();
-  const Node = () => () => {};
+  const Root = () => use(Node)();
+  const Node = () => {};
 
   const result = renderSync(use(Root)());
 
@@ -24,12 +24,12 @@ it("mounts", () => {
 
 it("mounts multiple", () => {
 
-  const Root = () => () => [
+  const Root = () => [
     use(Node, '1')(),
     use(Node, '2')(),
   ];
 
-  const Node = () => () => {};
+  const Node = () => {};
 
   const result = renderSync(use(Root)());
   expect(result.f).toBe(Root);
@@ -46,14 +46,14 @@ it("detaches a subfiber", () => {
 
   let captureSubFiber: LiveFiber<any> | null = null;
 
-  const Root = (fiber: LiveFiber<any>) => () =>
+  const Root = () =>
     detach(use(Sub)(), (render: () => void, mount: LiveFiber<any>) => {
       captureSubFiber = mount;
       render();
     });
 
-  const Sub = () => () => use(Node)();
-  const Node = () => () => {};
+  const Sub = () => use(Node)();
+  const Node = () => {};
 
   const result = renderSync(use(Root)());
   expect(result.f).toBe(Root);
@@ -81,7 +81,7 @@ it("reacts on the root (setter form)", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     rendered.root++;
 
     const [, setValue] = useState(0);
@@ -90,7 +90,7 @@ it("reacts on the root (setter form)", () => {
     return use(Node)(Math.random());
   };
 
-  const Node = () => (x?: number) => {
+  const Node = (x?: number) => {
     rendered.node++;
   };
 
@@ -130,7 +130,7 @@ it("reacts on the root (reducer form)", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     rendered.root++;
 
     const [, setValue] = useState(0);
@@ -139,7 +139,7 @@ it("reacts on the root (reducer form)", () => {
     return use(Node)(Math.random());
   };
 
-  const Node = () => (x?: number) => {
+  const Node = (x?: number) => {
     rendered.node++;
   };
 
@@ -179,7 +179,7 @@ it("reacts and remounts on the root", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     const [, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
@@ -191,7 +191,7 @@ it("reacts and remounts on the root", () => {
     ];
   };
 
-  const Node = () => (x?: number) => {
+  const Node = (x?: number) => {
     rendered.node++;
   };
 
@@ -258,14 +258,14 @@ it("reacts and remounts a sub tree", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = () => () => {
+  const Root = () => {
     rendered.root++;
     return [
       use(SubRoot, 'subroot')(),
     ];
   };
 
-  const SubRoot = (fiber: LiveFiber<any>) => () => {
+  const SubRoot = () => {
     const [, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
@@ -277,7 +277,7 @@ it("reacts and remounts a sub tree", () => {
     ];
   };
 
-  const Node = () => (x?: number) => {
+  const Node = (x?: number) => {
     rendered.node++;
     return;
   };
@@ -340,7 +340,7 @@ it("coalesces updates", () => {
   const setTrigger1 = (f: Task) => trigger1 = f;
   const setTrigger2 = (f: Task) => trigger2 = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     rendered.root++;
 
     const [, setValue] = useState(0);
@@ -349,7 +349,7 @@ it("coalesces updates", () => {
     return use(Node)(Math.random());
   };
 
-  const Node = (fiber: LiveFiber<any>) => (x?: number) => {
+  const Node = (x?: number) => {
     rendered.node++;
 
     const [, setValue] = useState(0);
@@ -396,7 +396,7 @@ it("updates with memo in the way", () => {
   const setTrigger1 = (f: Task) => trigger1 = f;
   const setTrigger2 = (f: Task) => trigger2 = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     rendered.root++;
 
     const [, setValue] = useState(0);
@@ -405,13 +405,13 @@ it("updates with memo in the way", () => {
     return use(Memo)();
   };
 
-  const Memo = memoArgs((fiber: LiveFiber<any>) => () => {
+  const Memo = memoArgs(() => {
     rendered.memo++;
 
     return use(Node)(Math.random());
   });
 
-  const Node = (fiber: LiveFiber<any>) => (x?: number) => {
+  const Node = (x?: number) => {
     rendered.node++;
 
     const [, setValue] = useState(0);
@@ -467,7 +467,7 @@ it("updates context with memo in the way", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     rendered.root++;
 
     const [value, setValue] = useState(0);
@@ -476,13 +476,13 @@ it("updates context with memo in the way", () => {
     return provide(context, value, use(Memo)());
   };
 
-  const Memo = memoArgs((fiber: LiveFiber<any>) => () => {
+  const Memo = memoArgs(() => {
     rendered.memo++;
 
     return use(Node)();
   });
 
-  const Node = (fiber: LiveFiber<any>) => () => {
+  const Node = () => {
     rendered.node++;
     const value = useContext(context);
     rendered.value = value;
@@ -542,7 +542,7 @@ it("does update context if value is the same", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     rendered.root++;
 
     const [value, setValue] = useState(0);
@@ -551,13 +551,13 @@ it("does update context if value is the same", () => {
     return provide(context, 0, use(Memo)());
   };
 
-  const Memo = memoArgs((fiber: LiveFiber<any>) => () => {
+  const Memo = memoArgs(() => {
     rendered.memo++;
 
     return use(Node)();
   });
 
-  const Node = (fiber: LiveFiber<any>) => () => {
+  const Node = () => {
     rendered.node++;
     const value = useContext(context);
     rendered.value = value;
@@ -617,7 +617,7 @@ it("does not update memoized context if value is the same", () => {
   let trigger = null as Task | null;
   const setTrigger = (f: Task) => trigger = f;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     rendered.root++;
 
     const [value, setValue] = useState(0);
@@ -626,13 +626,13 @@ it("does not update memoized context if value is the same", () => {
     return provideMemo(context, 0, memoChild);
   };
 
-  const Memo = memoArgs((fiber: LiveFiber<any>) => () => {
+  const Memo = memoArgs(() => {
     rendered.memo++;
 
     return use(Node)();
   });
 
-  const Node = (fiber: LiveFiber<any>) => () => {
+  const Node = () => {
     rendered.node++;
     const value = useContext(context);
     rendered.value = value;

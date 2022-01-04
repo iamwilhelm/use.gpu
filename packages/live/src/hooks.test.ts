@@ -12,7 +12,7 @@ type PropNumberReturner = (x: number) => number;
 
 it('memoizes a function', () => {
 
-  const F: LiveFunction<PropNumberReturner> = memoArgs(() => (x: number): number => {
+  const F: LiveFunction<PropNumberReturner> = memoArgs((x: number): number => {
     return Math.random();
   });
 
@@ -38,7 +38,7 @@ it('memoizes a function', () => {
 it('memoizes a component', () => {
 
   // @ts-ignore
-  const F: LiveFunction<NumberReturner> = memoProps(() => (props): number => {
+  const F: LiveFunction<NumberReturner> = memoProps((props): number => {
     return Math.random();
   });
 
@@ -61,7 +61,7 @@ it('memoizes a component', () => {
 
 it('holds state (hook)', () => {
 
-  const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
+  const F: NumberReturner = (): number => {
     const [foo] = useState(() => Math.random());
     return foo;
   };
@@ -86,7 +86,7 @@ it('holds memoized value (hook)', () => {
 
   const dep = 'static';
 
-  const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
+  const F: NumberReturner = (): number => {
 
     const foo = useMemo(() => Math.random(), [dep]);
 
@@ -113,7 +113,7 @@ it('holds memoized value with one dep (hook)', () => {
 
   const dep = 'static';
 
-  const F: LiveFunction<NumberReturner> = (fiber: LiveFiber<NumberReturner>) => (): number => {
+  const F: NumberReturner = (): number => {
 
     const foo = useOne(() => Math.random(), dep);
 
@@ -140,7 +140,7 @@ it('holds memoized callback (hook)', () => {
 
   const dep = 'static';
 
-  const F: LiveFunction<FunctionReturner> = (fiber: LiveFiber<FunctionReturner>) => (): () => number => {
+  const F: FunctionReturner = (): () => number => {
 
     const x = Math.random();
     const foo = useCallback(() => x, [dep]);
@@ -167,7 +167,7 @@ it('holds memoized callback (hook)', () => {
 it('holds state in memoized component (hook)', () => {
 
   let i: number;
-  const F: LiveFunction<PropNumberReturner> = memoArgs((fiber: LiveFiber<PropNumberReturner>) => (x: number): number => {
+  const F: PropNumberReturner = memoArgs((x: number): number => {
     const [foo] = useState(() => Math.random());
     return foo + (i++);
   });
@@ -205,7 +205,7 @@ it('manages a dependent resource (hook)', () => {
   let allocated: number;
   let disposed: number;
 
-  const F: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
+  const F: NullReturner = () => {
 
     useResource((dispose) => {
       allocated++;
@@ -215,7 +215,7 @@ it('manages a dependent resource (hook)', () => {
     return null;
   };
 
-  const G: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
+  const G: NullReturner = () => {
 
     const x = Math.random();
     useResource((dispose) => {
@@ -226,7 +226,7 @@ it('manages a dependent resource (hook)', () => {
     return null;
   };
 
-  const H: LiveFunction<NullReturner> = (fiber: LiveFiber<NullReturner>): NullReturner => () => {
+  const H: NullReturner = () => {
 
     const x = Math.random();
     useResource((dispose) => {
@@ -311,16 +311,16 @@ it("provides a context", () => {
   let value1 = null;
   let value2 = null;
 
-  const Root = (fiber: LiveFiber<any>) => () =>
+  const Root = () =>
     provide(Context, 123, [
       use(Sub)()
     ]);
 
-  const Sub = () => () => {
+  const Sub = () => {
     value1 = useContext(Context);
     return use(Node)();
   }
-  const Node = () => () => {
+  const Node = () => {
     value2 = useContext(Context);
   };
 
@@ -342,7 +342,7 @@ it("provides a changing context value", () => {
 
   let trigger = null as Function | null;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     const [state, setState] = useState<number>(123);
     trigger = () => setState(456);
     return provide(Context, state, [
@@ -350,11 +350,11 @@ it("provides a changing context value", () => {
     ]);
   }
 
-  const Sub = () => () => {
+  const Sub = () => {
     value1 = useContext(Context);
     return use(Node)();
   }
-  const Node = () => () => {
+  const Node = () => {
     value2 = useContext(Context);
   };
 
@@ -385,7 +385,7 @@ it("provides a changing context value on a memoized component", () => {
 
   let trigger = null as Function | null;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     const [state, setState] = useState<number>(123);
     trigger = () => setState(456);
     return provide(Context, state, [
@@ -393,12 +393,12 @@ it("provides a changing context value on a memoized component", () => {
     ]);
   }
 
-  const Sub = () => () => {
+  const Sub = () => {
     // @ts-ignore
     return use(Node)();
   };
 
-  const Node = memoProps(() => () => {
+  const Node = memoProps(() => {
     value = useContext(Context);
   });
 
@@ -426,7 +426,7 @@ it("provides a changing context value with a memoized component in the way", () 
 
   let trigger = null as Function | null;
 
-  const Root = (fiber: LiveFiber<any>) => () => {
+  const Root = () => {
     const [state, setState] = useState<number>(123);
     trigger = () => setState(456);
     return provide(Context, state, [
@@ -434,11 +434,11 @@ it("provides a changing context value with a memoized component in the way", () 
     ]);
   }
 
-  const Sub = memoProps(() => () => {
+  const Sub = memoProps(() => {
     return use(Node)();
   });
 
-  const Node = () => () => {
+  const Node = () => {
     value = useContext(Context);
   };
 

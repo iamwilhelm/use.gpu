@@ -79,68 +79,65 @@ export const memoArgs = <F extends Function>(
   f: LiveFunction<F>,
   name?: string,
 ) => {
-  const g = ((
-    fiber: LiveFiber<F>,
-  ) => {
-    const bound = f(fiber);
-    fiber.version = 1;
+  const inner = (...args: any[]) => {
+    const fiber = useFiber();
+    if (!fiber.version) fiber.version = 1;
 
-    const inner = (...args: any[]) => {
-      args.push(fiber.version);
+    args.push(fiber.version);
 
-      let skip = true;
-      const value = useMemo(() => {
-        fiber.memo = -1;
-        skip = false;
-        return bound(args);
-      }, args);
+    let skip = true;
+    const value = useMemo(() => {
+      fiber.memo = -1;
+      skip = false;
+      return f(...args);
+    }, args);
 
-      if (skip) fiber.pointer = fiber.state!.length;
+    if (skip) fiber.pointer = fiber.state!.length;
 
-      return value;
-    };
+    return value;
+  };
 
-    const {length} = bound;
-    return new Proxy(inner, { get: (target: any, s: string) => {
-      if (s === 'length') return length;
-      return target[s];
-    }});
-  }) as any as LiveFunction<F>;
-  (g as any).displayName = name != null ? `Memo(${name})` : `Memo`;
-  return g;
-}
+  const {length} = f;
+  return new Proxy(inner, { get: (target: any, s: string) => {
+    if (s === 'length') return length;
+    if (s === 'name') return `Memo(${target.name})`;
+    return target[s];
+  }});
+};
 
 // Memoize a live function with 1 argument on its object props (shallow comparison per arg)
 export const memoProps = <F extends Function>(
   f: LiveFunction<F>,
   name?: string,
 ) => {
-  const g = ((
-    fiber: LiveFiber<F>,
-  ) => {
-    const bound = f(fiber);
-    fiber.version = 1;
-    return (props: Record<string, any>) => {
-      const deps = [fiber.version] as any[];
-      for (let k in props) {
-        deps.push(k);
-        deps.push(props[k]);
-      }
+  const inner = (props: Record<string, any>[]) => {
+    const fiber = useFiber();
+    if (!fiber.version) fiber.version = 1;
 
-      let skip = true;
-      const value = useMemo(() => {
-        fiber.memo = -1;
-        skip = false;
-        return bound(props);
-      }, deps);
+    const deps = [fiber.version] as any[];
+    for (let k in props) {
+      deps.push(k);
+      deps.push(props[k]);
+    }
 
-      if (skip) fiber.pointer = fiber.state!.length;
+    let skip = true;
+    const value = useMemo(() => {
+      fiber.memo = -1;
+      skip = false;
+      return f(props);
+    }, deps);
 
-      return value;
-    };
-  }) as any as LiveFunction<F>;
-  (g as any).displayName = name != null ? `Memo(${name})` : `Memo`;
-  return g;
+    if (skip) fiber.pointer = fiber.state!.length;
+
+    return value;
+  };
+
+  const {length} = f;
+  return new Proxy(inner, { get: (target: any, s: string) => {
+    if (s === 'length') return length;
+    if (s === 'name') return `Memo(${target.name})`;
+    return target[s];
+  }});
 }
 
 // Shorthand

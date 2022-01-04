@@ -362,7 +362,7 @@ it("provides a changing context value", () => {
   expect(result.f).toBe(Root);
   if (!result.host) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.mount).toBeTruthy();
   expect(result.mount!.mounts).toBeTruthy();
@@ -406,7 +406,7 @@ it("provides a changing context value on a memoized component", () => {
   expect(result.f).toBe(Root);
   if (!result.host) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.mount).toBeTruthy();
   expect(result.mount!.mounts).toBeTruthy();
@@ -446,7 +446,7 @@ it("provides a changing context value with a memoized component in the way", () 
   expect(result.f).toBe(Root);
   if (!result.host) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.mount).toBeTruthy();
   expect(result.mount!.mounts).toBeTruthy();

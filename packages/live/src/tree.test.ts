@@ -42,7 +42,7 @@ it("mounts multiple", () => {
   expect(node2 && node2.f).toBe(Node);
 });
 
-it("mounts a subfiber", () => {
+it("detaches a subfiber", () => {
 
   let captureSubFiber: LiveFiber<any> | null = null;
 
@@ -64,6 +64,8 @@ it("mounts a subfiber", () => {
   expect(captureSubFiber).toBeTruthy();
   if (captureSubFiber != null) {
     const {mount} = captureSubFiber;
+    // @ts-ignore
+    expect(captureSubFiber.f).toBe(Sub);
     // @ts-ignore
     expect(mount && mount.f).toBe(Node);
   }
@@ -98,7 +100,7 @@ it("reacts on the root (setter form)", () => {
   if (!result.host) return;
   if (!result.mount) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.f).toBe(Root);
   const node1 = result.mount;
@@ -147,7 +149,7 @@ it("reacts on the root (reducer form)", () => {
   if (!result.host) return;
   if (!result.mount) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.f).toBe(Root);
   const node1 = result.mount;
@@ -197,7 +199,7 @@ it("reacts and remounts on the root", () => {
   expect(result.host).toBeTruthy();
   if (!result.host) return;
 
-  const {host: {__flush: flush, __stats: stats}} = result;
+  const {host: {flush, __stats: stats}} = result;
 
   expect(result.f).toBe(Root);
   expect(result.mounts).toBeTruthy();
@@ -286,7 +288,7 @@ it("reacts and remounts a sub tree", () => {
   if (!result.host) return;
   if (!result.mounts) return;
 
-  const {host: {__flush: flush, __stats: stats}} = result;
+  const {host: {flush, __stats: stats}} = result;
 
   expect(result.f).toBe(Root);
   expect(result.mounts).toBeTruthy();
@@ -360,7 +362,7 @@ it("coalesces updates", () => {
   if (!result.host) return;
   if (!result.mount) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.f).toBe(Root);
   const node1 = result.mount;
@@ -424,7 +426,7 @@ it("updates with memo in the way", () => {
   if (!result.mount) return;
   if (!result.mount.mount) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.f).toBe(Root);
   const memo1 = result.mount;
@@ -494,7 +496,7 @@ it("updates context with memo in the way", () => {
   if (!result.mount) return;
   if (!result.mount.mount) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.f).toBe(Root);
   const provide1 = result.mount;
@@ -569,7 +571,7 @@ it("does update context if value is the same", () => {
   if (!result.mount) return;
   if (!result.mount.mount) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.f).toBe(Root);
   const provide1 = result.mount;
@@ -646,7 +648,7 @@ it("does not update memoized context if value is the same", () => {
   if (!result.mount) return;
   if (!result.mount.mount) return;
 
-  const {host: {__flush: flush}} = result;
+  const {host: {flush}} = result;
 
   expect(result.f).toBe(Root);
   const provide1 = result.mount;

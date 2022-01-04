@@ -1,6 +1,6 @@
 import { LiveFunction, LiveComponent, DeferredCall } from './types';
 import { use } from './builtin';
-import { bind, makeFiber, renderFiber } from './fiber';
+import { bind, makeFiber, renderFiber, updateFiber } from './fiber';
 
 type FooProps = { foo: string };
 type StringFormatter = (foo: string) => string;
@@ -41,7 +41,8 @@ it("renders a fiber recursively", () => {
 
   const fiber = makeFiber(Root, null);
 
-  renderFiber(fiber);
+  const element = renderFiber(fiber);
+  updateFiber(fiber, element);
 
   expect(fiber.f).toBe(Root);
   expect(fiber.mount).toBeTruthy();

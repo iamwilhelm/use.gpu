@@ -18,7 +18,7 @@ export type Resource<T> = () => (void | Task | [T, Task]);
 // Renderer options
 export type RenderOptions = {
   // Stack slicing depth
-  stackSlice: number,
+  stackSliceDepth: number,
 };
 
 // Hook types
@@ -139,6 +139,7 @@ export type FiberQueue = {
 export type HostInterface = {
   // Schedule a task on next flush
   schedule: (fiber: LiveFiber<any>, task: Task) => void,
+  flush: () => void,
 
   // Track a future cleanup on a fiber
   track: (fiber: LiveFiber<any>, task: Task) => void,
@@ -157,8 +158,11 @@ export type HostInterface = {
   pop: () => LiveFiber<any> | null,
   peek: () => LiveFiber<any> | null,
 
+  // Stack slicing
+  slice: (fiber: LiveFiber<any>) => boolean,
+  depth: (d: number) => void,
+
   __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
-  __flush: () => void,
   __ping: (fiber: LiveFiber<any>) => void,
 };
 

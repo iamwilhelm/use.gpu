@@ -14,7 +14,7 @@ import {
   Router, Routes,
 } from '@use-gpu/components';
 import { Mesh } from '../mesh';
-import { makeMesh } from '../meshes/mesh';
+import { makeMesh, makeTexture } from '../meshes/mesh';
 
 export type GeometryPageProps = {
   canvas: HTMLCanvasElement,
@@ -64,6 +64,7 @@ const getLineJoin = () => ['bevel', 'miter', 'round'][lj = (lj + 1) % 3];
 
 export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
   const mesh = makeMesh();
+  const texture = makeTexture();
   const {canvas} = props;
 
   const view = (
@@ -112,8 +113,8 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
             }),
             use(Pick)({
               render: ({id, hovered, clicked}) => [
-                use(Mesh)({ mesh, blink: clicked }),
-                use(Mesh)({ id, mesh, mode: RenderPassMode.Picking }),
+                use(Mesh)({ texture, mesh, blink: clicked }),
+                use(Mesh)({ id, texture, mesh, mode: RenderPassMode.Picking }),
                 hovered ? use(Cursor)({ cursor: 'pointer' }) : null,
               ],
             }),

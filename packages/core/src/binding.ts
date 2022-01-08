@@ -28,7 +28,7 @@ export const makeShaderBinding = <T>(
   source?: StorageSource | T | any,
 ): DataBinding<T> => {
   if (source) {
-    if (source?.libs != null || source?.table != null) {
+    if (source.libs || source.table) {
       const lambda = source as T;
       return {uniform, lambda};
     }
@@ -36,6 +36,10 @@ export const makeShaderBinding = <T>(
       const storage = source as StorageSource;
       checkStorageType(uniform, storage);
       return {uniform, storage};
+    }
+    if (source.texture) {
+      const texture = source as TextureSource;
+      return {uniform, texture};
     }
   }
   return {uniform, constant: source ?? uniform.value};

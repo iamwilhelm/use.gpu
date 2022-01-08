@@ -1,11 +1,11 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode } from '@use-gpu/core/types';
 import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
-import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
-  makeVertexBuffers, makeMultiUniforms, 
-  makeRenderPipeline, makeShaderModule,
-  uploadBuffer,
+  makeVertexBuffers, makeRawSourceTexture, makeMultiUniforms,
+  makeRenderPipeline, makeShaderModule, makeSampler, makeTextureUniforms,
+  uploadBuffer, uploadRawTexture,
 } from '@use-gpu/core';
 import { linkBundle } from '@use-gpu/shader/glsl';
 
@@ -29,6 +29,7 @@ const LIGHT = [-2.5, 3, 2, 1];
 
 export type MeshProps = {
   mesh: VertexData,
+  texture: RawTexture,
   mode?: RenderPassMode,
   id?: number,
   blink?: boolean,
@@ -37,6 +38,7 @@ export type MeshProps = {
 export const Mesh: LiveComponent<MeshProps> = memo((props) => {
   const {
     mesh,
+    texture,
     mode = RenderPassMode.Opaque,
     id = 0,
     blink,
@@ -57,6 +59,9 @@ export const Mesh: LiveComponent<MeshProps> = memo((props) => {
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
 
+  const sourceTexture = useMemo(() =>
+    makeRawSourceTexture(device, texture), [device, texture]);
+
   const defines = {
     IS_PICKING: isPicking,
     VIEW_BINDGROUP: 0,
@@ -73,6 +78,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props) => {
   const vertexShader = !isDebug ? instanceDrawMesh : instanceDrawMesh;
   const fragmentShader = !isDebug ? instanceFragmentMesh : instanceFragmentSolid;
 
+  const fiber = useFiber();
+
   // Rendering pipeline
   const pipeline = useMemo(() => {
     const vertexLinked = linkBundle(vertexShader, {}, defines, cache);
@@ -81,6 +88,10 @@ export const Mesh: LiveComponent<MeshProps> = memo((props) => {
     const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
     const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
     
+    fiber.__inspect = fiber.__inspect || {};
+    fiber.__inspect.vertex = vertexLinked;
+    fiber.__inspect.fragment = fragmentLinked;
+
     return makeRenderPipeline(
       renderContext,
       vertex,
@@ -97,11 +108,18 @@ export const Mesh: LiveComponent<MeshProps> = memo((props) => {
   }, [device, colorStates, depthStencilState, samples, languages]);
 
   // Uniforms
-  const uniform = useMemo(() => {
+  const [uniform, sampled] = useMemo(() => {
     const meshDefs = MESH_UNIFORM_DEFS;
     const defs = isPicking ? [viewDefs, pickingDefs] : [viewDefs, meshDefs];
     const uniform = makeMultiUniforms(device, pipeline, defs, 0);
-    return uniform;
+
+    let sampled;
+    if (!isPicking) {
+      const sampler = makeSampler(device, { });
+      sampled = makeTextureUniforms(device, pipeline, sampler, sourceTexture, 1);
+    }
+
+    return [uniform, sampled];
   }, [device, viewDefs, pickingDefs, isPicking, pipeline]);
 
   // Return a lambda back to parent(s)
@@ -116,6 +134,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props) => {
 
       passEncoder.setPipeline(pipeline);
       passEncoder.setBindGroup(0, uniform.bindGroup);
+      if (sampled) passEncoder.setBindGroup(1, sampled.bindGroup);
       passEncoder.setVertexBuffer(0, vertexBuffers[0]);
       passEncoder.draw(mesh.count, 1, 0, 0);
     })

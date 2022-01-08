@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode,
+  VertexData, StorageSource, TextureSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -22,12 +22,12 @@ export type RawRectanglesProps = {
   rectangle?: number[] | TypedArray,
   color?: number[] | TypedArray,
   mask?: number,
-  texture?: any,
+  texture?: GPUTexture | TextureSource,
 
   rectangles?: StorageSource,
   colors?: StorageSource,
-  masks?: number,
-  textures?: StorageSource,
+  masks?: StorageSource,
+  textures?: (GPUTexture | TextureSource)[],
 
   getRectangle?: ShaderModule,
   getColor?: ShaderModule,
@@ -82,7 +82,7 @@ export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((props) => 
   const r = props.rectangles ?? props.rectangle ?? props.getRectangle;
   const c = props.colors ?? props.color ?? props.getColor;
   const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null;
-  const t = props.getTexture;
+  const t = props.textures ?? props.texture ?? props.getTexture;
 
   const [getVertex, getFragment] = useMemo(() => {
     const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, c]);

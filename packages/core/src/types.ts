@@ -152,6 +152,10 @@ export type UniformAllocation = {
   bindGroup: GPUBindGroup,
 };
 
+export type ResourceAllocation = {
+  bindGroup: GPUBindGroup,
+};
+
 export type VirtualAllocation = {
   pipe?: UniformPipe,
   buffer?: GPUBuffer,
@@ -167,6 +171,20 @@ export type StorageSource = {
   format: string,
   length: number,
   version: number,
+};
+
+export type TextureSource = {
+  texture: GPUTexture,
+  view: GPUTextureView,
+  format: string,
+  size: [number, number] | [number, number, number],
+  version: number,
+};
+
+export type RawTexture = {
+  data: TypedArray,
+  format: string,
+  size: [number, number] | [number, number, number],
 };
 
 // Shaders
@@ -218,18 +236,9 @@ export type DataField = [string, AccessorSpec];
 export type DataBinding<T> = {
   uniform: UniformAttributeValue,
   storage?: StorageSource,
+  texture?: TextureSource,
   constant?: any,
   lambda?: T,
-};
-
-export type ResolvedDataBindings = {
-  constants: Record<string, any>,
-  links: Record<string, StorageSource>,
-};
-
-export type ResolvedCodeBindings<T> = {
-  constants: Record<string, any>,
-  links: Record<string, T>,
 };
 
 // Passes

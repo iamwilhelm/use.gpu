@@ -9,11 +9,15 @@ import { Rectangles } from '../layers';
 
 export type SurfaceProps = {
   rectangle?: Rectangle,
+
   stroke?: boolean,
   fill?: boolean,
   strokeColor?: number[],
   fillColor?: number[],
   lineWidth?: number,
+
+  texture?: TextureSource,
+  uv?: Rectangle,
 };
 
 export const Surface: LiveComponent<SurfaceProps> = (props) => {
@@ -23,6 +27,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
     strokeColor = [1, 1, 1, 1],
     fillColor = [0, 0, 0, 1],
     lineWidth = 1,
+    texture = null,
   } = props;
 
   let layout;
@@ -60,6 +65,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
     render.rectangle = {
       rectangle: [left, top, right, bottom],
       color: fillColor,
+      texture,
       count: 1,
     };
   }

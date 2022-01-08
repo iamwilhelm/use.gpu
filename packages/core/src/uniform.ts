@@ -1,5 +1,5 @@
 import {
-  UniformAllocation, VirtualAllocation,
+  UniformAllocation, VirtualAllocation, ResourceAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformBinding, UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller,
@@ -10,6 +10,7 @@ import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 import { makeUniformBuffer } from './buffer';
 import { makeStorageForDataBindings, makeStorageBindings } from './storage';
+import { makeTextureView } from './texture';
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
@@ -87,6 +88,45 @@ export const makeBoundUniforms = <T>(
   });
 
   return {pipe, buffer, bindGroup};
+}
+
+export const makeTextureUniforms = (
+  device: GPUDevice,
+  pipeline: GPURenderPipeline | GPUComputePipeline,
+  sampler: GPUSampler,
+  texture: GPUTexture,
+  set: number = 0,
+): ResourceAllocation => {
+  if (texture instanceof GPUTexture) texture = makeTextureView(texture);
+
+  console.dir(pipeline.getBindGroupLayout(set))
+
+  const entries = makeUniformBindings([{resource: sampler}, {resource: texture}]);
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(set),
+    entries,
+  });
+  return {bindGroup};
+}
+
+export const makeMultiTextureUniforms = (
+  device: GPUDevice,
+  pipeline: GPURenderPipeline | GPUComputePipeline,
+  textures: [GPUSampler, GPUTexture | GPUTextureView][],
+  set: number = 0,
+): ResourceAllocation => {
+
+  const bindings = textures.flatMap(([sampler, texture]) => {
+    if (texture instanceof GPUTexture) texture = makeTextureView(texture);
+    return [{resource: sampler}, {resource: texture}];
+  });
+
+  const entries = makeUniformBindings(bindings);
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(set),
+    entries,
+  });
+  return {bindGroup};
 }
 
 export const makeUniformPipe = (

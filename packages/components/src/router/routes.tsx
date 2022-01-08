@@ -1,5 +1,5 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
-import { memo, makeContext, use, useContext, useOne, useMemo, provide } from '@use-gpu/live';
+import { memo, morph, use, provide, makeContext, useContext, useOne, useMemo } from '@use-gpu/live';
 import { RouterContext, Route } from './router';
 
 export type RouteState = {
@@ -92,7 +92,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((props) => {
     return [{routes, base, params}, element];
   }, [base, matchers, currentPath]);
 
-  if (element) return provide(RouteContext, context, element);
+  if (element) return provide(RouteContext, context, morph(element));
   if (context.routes) return use(Routes)(context);
   return null;
 }, 'Routes');

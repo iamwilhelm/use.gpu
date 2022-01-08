@@ -70,12 +70,12 @@ const Layer: LiveFunction<any> = (
   }
   useOne(() => versionRef.current++, memoKey);
 
-  const storage = useMemo(() =>
+  const update = useMemo(() =>
     makeAggregator(device, items, keys, sizeRef.current),
     [versionRef.current]
   );
   
-  const props = storage.update(items);
+  const props = update(items);
   return use(Component)(props);
 };
 
@@ -105,19 +105,16 @@ const makePointAccumulator = (
   if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.float, count);
   if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.float, count);
 
-  return {
-    count,
-    update: (items: LineAggregate[]) => {
-      const count = items.reduce(allCount, 0);
-      const props = {count, shape: 'circle'};
+  return (items: LineAggregate[]) => {
+    const count = items.reduce(allCount, 0);
+    const props = {count, shape: 'circle'};
 
-      if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
-      if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
-      if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
-      if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');
+    if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
+    if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+    if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
+    if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');
 
-      return props;
-    },
+    return props;
   };
 }
 
@@ -143,22 +140,19 @@ const makeLineAccumulator = (
   if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.float, count);
   if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.float, count);
 
-  return {
-    count,
-    update: (items: LineAggregate[]) => {
-      const count = items.reduce(allCount, 0);
-      const props = {count, join: 'miter'};
+  return (items: LineAggregate[]) => {
+    const count = items.reduce(allCount, 0);
+    const props = {count, join: 'miter'};
 
-      if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
-      else props.segments = updateAggregateSegments(device, storage.segments, items, count);
+    if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
+    else props.segments = updateAggregateSegments(device, storage.segments, items, count);
 
-      if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
-      if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
-      if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
-      if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
+    if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
+    if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+    if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
+    if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
 
-      return props;
-    },
+    return props;
   };
 };
 
@@ -176,17 +170,14 @@ const makeRectangleAccumulator = (
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType.vec4, count);
   if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
 
-  return {
-    count,
-    update: (items: LineAggregate[]) => {
-      const count = items.reduce(allCount, 0);
-      const props = {count, join: 'miter'};
+  return (items: LineAggregate[]) => {
+    const count = items.reduce(allCount, 0);
+    const props = {count, join: 'miter'};
 
-      if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');
-      if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+    if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');
+    if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
 
-      return props;
-    },
+    return props;
   };
 };
 
@@ -227,6 +218,7 @@ const updateAggregateBuffer = (
   }
 
   uploadBuffer(device, buffer, array.buffer);
+  source.length = count;
 
   return source;
 }
@@ -250,6 +242,7 @@ const updateAggregateSegments = (
 
   copyChunksToSegments(array, chunks, loops);
   uploadBuffer(device, buffer, array.buffer);
+  source.length = count;
 
   return source;
 }

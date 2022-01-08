@@ -49,7 +49,8 @@ export type PointsProps = {
   getDepth?: ShaderModule,
 
   shape?: PointShape,
-  
+
+  count?: number,
   mode?: RenderPassMode | string,
   id?: number,
 };
@@ -72,8 +73,8 @@ export const Points: LiveComponent<PointsProps> = memo((props) => {
     getColor,
     getDepth,
     
+    count,
     shape = PointShape.DiamondOutlined,
-    
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
@@ -103,6 +104,7 @@ export const Points: LiveComponent<PointsProps> = memo((props) => {
     getSize: getSizeVec2,
     getMask,
 
+    count,
     mode,
     id,
   });

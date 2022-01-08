@@ -42,7 +42,7 @@ export const StyledNode = styled.div`
   }
 
   &.depended {
-    background: rgba(80, 40, 220, 1.0);
+    background: rgba(80, 60, 200, 1.0);
   }
 
   &.staticMount {

@@ -132,8 +132,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
   const depended = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
 
   const [select, hover, unhover] = useMemo(() => {
-    const roots = yeeted && fiber.type === YEET ? yeeted.roots : null;
-    const root  = roots ? roots[roots.length - 1] : null;
+    const root = yeeted && fiber.type === YEET ? yeeted.root : null;
 
     const select  = () => updateSelectState({ $set: fiber });
     const hover   = () => updateHoverState({ $set: {

@@ -72,6 +72,7 @@ export const ColumnPanel = styled.div`
 export const Panel = styled.div`
   pointer-events: auto;
   background: var(--shim);
+	max-height: 100%;
 `;
 
 export const PanelFull = styled(Panel)`

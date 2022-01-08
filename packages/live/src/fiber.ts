@@ -64,9 +64,9 @@ export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number
   // Reset state pointer
   fiber.pointer = base;
 
-  // Reset yeet state
-  const {yeeted, next} = fiber;
-  if (yeeted) yeeted.reduced = yeeted.value = undefined;
+  // Reset yeet value
+  const {yeeted} = fiber;
+  if (yeeted) yeeted.value = undefined;
 }
 
 export const exitFiber = <F extends Function>(fiber: LiveFiber<F>) => {
@@ -232,7 +232,6 @@ export const pingFiber = <F extends Function>(
     DEBUG && console.log('Invalidating Node', formatNode(sub));
     host.visit(sub);
     bustFiberMemo(sub);
-    bustFiberYeet(sub);
   }
 
   // Notify host / dev tool of update
@@ -297,8 +296,9 @@ export const updateFiber = <F extends Function>(
   // Yeet value upstream
   else if (fiberType === YEET) {
     if (!yeeted) throw new Error("Yeet without aggregator");
-    yeeted.emit(fiber, call!.arg);
+    bustFiberYeet(fiber);
     visitYeetRoot(fiber);
+    yeeted.emit(fiber, call!.arg);
   }
   // Mount normal node (may still be built-in)
   else {
@@ -586,8 +586,6 @@ export const morphFiberCall = <F extends Function>(
       // Discard all fiber state
       enterFiber(mount, 0);
       exitFiber(mount);
-      bustFiberYeet(mount);
-      visitYeetRoot(mount);
 
       // Change type in place while keeping existing mounts
       mount.type = null;
@@ -752,6 +750,8 @@ export const updateMount = <P extends Function>(
   if ((to && !from) || replace) {
     DEBUG && console.log('Mounting', key, formatNode(newMount!));
     if (host) host.__stats.mounts++;
+    // Destroy yeet caches because trail of contexts downwards starts empty
+    bustFiberYeet(parent, true);
     return makeSubFiber(parent, newMount!, newMount!.by ?? parent.id, key);
   }
 
@@ -796,33 +796,34 @@ export const visitYeetRoot = <F extends Function>(
   fiber: LiveFiber<F>,
 ) => {
   const {host, yeeted} = fiber;
-  if (yeeted) {
-    if (
-      yeeted.value !== undefined ||
-      yeeted.reduced === undefined
-    ) {
-      DEBUG && console.log('Reduce', formatNode(fiber));
-      const {root} = yeeted;
-      if (host) host.visit(root);
-    }
+  if (fiber.type === YEET) {
+    DEBUG && console.log('Reduce', formatNode(fiber), '->', formatNode(root));
+
+    const {root} = yeeted;
+    bustFiberMemo(root);
+
+    if (host) host.visit(root);
   }
 }
 
-// Cyclic version number that skips 0
-export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
+// Remove a cached yeeted value and all upstream reductions
+export const bustFiberYeet = <F extends Function>(fiber: LiveFiber<F>, force?: boolean) => {
+  const {type, yeeted} = fiber;
+  if ((fiber.type === YEET) || (yeeted && force)) {
+    let yt = yeeted;
+    yt.value = undefined;
+
+    if (force) yt.reduced = undefined;
+    while ((yt = yt.parent!) && (yt.reduced !== undefined)) {
+      yt.reduced = undefined;
+    }
+  }
+}
 
 // Force a memoized fiber to update next render
 export const bustFiberMemo = <F extends Function>(fiber: LiveFiber<F>) => {
   if (fiber.version != null) fiber.version = incrementVersion(fiber.version);
 }
 
-// Remove a cached yeeted value and all upstream reductions
-export const bustFiberYeet = <F extends Function>(fiber: LiveFiber<F>) => {
-  if (fiber.yeeted) {
-    let yt = fiber.yeeted;
-    yt.value = yt.reduced = undefined;
-    while ((yt = yt.parent!) && (yt.reduced !== undefined)) {
-      yt.reduced = undefined;
-    }
-  }
-}
+// Cyclic version number that skips 0
+export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;

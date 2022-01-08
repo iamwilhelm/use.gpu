@@ -39,7 +39,6 @@ export type RawQuadsProps = {
   getTexture?: ShaderModule,
 
   count?: number,
-  
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,

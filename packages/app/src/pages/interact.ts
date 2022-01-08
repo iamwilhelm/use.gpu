@@ -29,16 +29,16 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
                 use(Aggregate)({
                   children:
 
-                    use(Absolute)({
-                      left: '50%',
-                      top: 10,
-                      right: 10,
-                      bottom: 10,
+                    use(Layout)({
                       children:
-                  
-                        use(Layout)({
-                          children:
 
+                        use(Absolute)({
+                          left: '50%',
+                          top: 10,
+                          right: 10,
+                          bottom: 10,
+                          children:
+                  
                             use(Block)({
                               children: [
                                 use(Element)({}),

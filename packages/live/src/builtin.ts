@@ -7,15 +7,17 @@ import {
 import { compareFibers } from './util';
 import { makeFiber, getCurrentFiberID } from './fiber';
 
-export const DETACH       = () => () => {};
-export const RECONCILE    = () => () => {};
-export const MAP_REDUCE   = () => () => {};
-export const GATHER       = () => () => {};
-export const MULTI_GATHER = () => () => {};
-export const YEET         = () => () => {};
-export const PROVIDE      = () => () => {};
-export const CONSUME      = () => () => {};
+export const MORPH        = () => {};
+export const DETACH       = () => {};
+export const RECONCILE    = () => {};
+export const MAP_REDUCE   = () => {};
+export const GATHER       = () => {};
+export const MULTI_GATHER = () => {};
+export const YEET         = () => {};
+export const PROVIDE      = () => {};
+export const CONSUME      = () => {};
 
+(MORPH        as any).isLiveBuiltin = true;
 (DETACH       as any).isLiveBuiltin = true;
 (RECONCILE    as any).isLiveBuiltin = true;
 (MAP_REDUCE   as any).isLiveBuiltin = true;
@@ -36,7 +38,13 @@ export const use = <F extends Function>(
   key?: Key,
 ) => (
   ...args: F extends ArrowFunction ? Parameters<F> : any[]
-): DeferredCall<F> => ({f, args, key, by: getCurrentFiberID()}) as any;
+): DeferredCall<F> => ({f, args, key, by: getCurrentFiberID()});
+
+// morph a call to a live function
+export const morph = <F extends Function>(
+  call: DeferredCall<F>,
+  key?: Key,
+): DeferredCall<F> => ({f: MORPH, args: call, key, by: getCurrentFiberID()});
 
 // Detach the rendering of a subtree
 export const detach = <F extends Function>(

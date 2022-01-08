@@ -28,7 +28,7 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
 }
 
 export const formatNodeName = <F extends Function>(node: DeferredCall<F>): string => {
-  const {f, args} = node;
+  const {f, arg, args} = node;
 
   // @ts-ignore
   let name = (f?.displayName ?? f?.name) || 'Node';
@@ -47,20 +47,23 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
     // @ts-ignore
     name = `Detach(${(call.f?.displayName ?? call.f?.name) || 'Node'})`;
   }
-  else if (name === 'GATHER' && args) {
+  else if (name === 'GATHER') {
     name = `Gather`;
   }
-  else if (name === 'MULTI_GATHER' && args) {
+  else if (name === 'MULTI_GATHER') {
     name = `MultiGather`;
   }
-  else if (name === 'RECONCILE' && args) {
+  else if (name === 'RECONCILE') {
     name = `Reconcile`;
   }
-  else if (name === 'MAP_REDUCE' && args) {
+  else if (name === 'MAP_REDUCE') {
     name = `MapReduce`;
   }
-  else if (name === 'YEET' && args) {
+  else if (name === 'YEET') {
     name = `Yeet`;
+  }
+  else if (name === 'MORPH') {
+    name = `Morph`;
   }
 
   return name;

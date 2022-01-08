@@ -11,7 +11,7 @@ import { Call } from './call';
 import { Shader } from './shader';
 import {
   InspectContainer, InspectToggle,
-  SplitRow, RowPanel, Panel, PanelFull, Scrollable, ScrollableFull, Inset, InsetColumnFull,
+  SplitRow, RowPanel, Panel, PanelFull, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 import { Button, Tab, Grid } from 'semantic-ui-react'
 import "../theme.css";
@@ -73,26 +73,22 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   }
 
   const tree = (
-    <ScrollableFull onClick={() => setSelected(null)}>
-      <InsetColumnFull>
-        <FiberTree
-          fiber={fiber}
-          fibers={fibers}
-          ping={ping}
-          expandCursor={expandCursor}
-          selectedCursor={selectedCursor}
-          hoveredCursor={hoveredCursor}
-        />
-      </InsetColumnFull>
-    </ScrollableFull>
+    <InsetColumnFull>
+      <FiberTree
+        fiber={fiber}
+        fibers={fibers}
+        ping={ping}
+        expandCursor={expandCursor}
+        selectedCursor={selectedCursor}
+        hoveredCursor={hoveredCursor}
+      />
+    </InsetColumnFull>
   );
 
   const props = (
-    <Scrollable>
-      <Inset>
-        <Tab menu={TAB_STYLE} panes={panes} />
-      </Inset>
-    </Scrollable>
+    <Inset>
+      <Tab menu={TAB_STYLE} panes={panes} />
+    </Inset>
   );
 
   // Avoid text selection on double click
@@ -107,15 +103,15 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
       <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
         <SplitRow>
           <RowPanel style={{width: '34%'}}>
-            <PanelFull>
+            <PanelFull onClick={() => setSelected(null)}>
               {tree}
             </PanelFull>
           </RowPanel>
           {selectedFiber ? (
             <RowPanel style={{width: '66%'}}>
-              <Panel>
+              <PanelScrollable>
                 {props}
-              </Panel>
+              </PanelScrollable>
             </RowPanel>
           ) : null}
         </SplitRow>

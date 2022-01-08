@@ -4,7 +4,7 @@ import {
   OnFiber, DeferredCall, Key,
 } from './types';
 
-import { use, reconcile, DETACH, RECONCILE, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, PROVIDE, CONSUME } from './builtin';
+import { use, reconcile, DETACH, RECONCILE, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
 import { discardState } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies } from './util';
@@ -253,6 +253,18 @@ export const updateFiber = <F extends Function>(
   const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : call?.f;
 
+  // If morphing, do before noticing type change
+  if (fiberType === MORPH) {
+    const e = call!.args;
+    const c = e as DeferredCall<any>;
+    const isArray = !!e && Array.isArray(e);
+    const fiberType = isArray ? Array : c?.f;
+
+    if (isArray) reconcileFiberCalls(c.map(call => morph(call)));
+    morphFiberCall(fiber, fiberType, c);
+    return fiber;
+  }
+
   // If fiber type changed, remount everything
   if (fiber.type && fiberType !== fiber.type) disposeFiberMounts(fiber);
   fiber.type = fiberType as any;
@@ -277,7 +289,7 @@ export const updateFiber = <F extends Function>(
     const [calls, done] = call!.args ?? EMPTY_ARRAY;
     gatherFiberCalls(fiber, calls, done);
   }
-  // Multi-Gather reduce
+  // Multi-gather reduce
   else if (fiberType === MULTI_GATHER) {
     const [calls, done] = call!.args ?? EMPTY_ARRAY;
     multiGatherFiberCalls(fiber, calls, done);
@@ -561,6 +573,34 @@ export const multiGatherFiberValues = <F extends Function, T>(
   return {} as Record<string, T | T[]>;
 }
 
+// Morph one call on a fiber
+export const morphFiberCall = <F extends Function>(
+  fiber: LiveFiber<F>,
+  fiberType: any,
+  call?: DeferredCall<any> | null,
+) => {
+  const {mount} = fiber;
+
+  if (fiber.type && (fiber.type !== fiberType)) {
+    if (mount.context === fiber.context && !mount.next) {
+      // Discard all fiber state
+      enterFiber(mount, 0);
+      exitFiber(mount);
+      bustFiberYeet(mount);
+      visitYeetRoot(mount);
+
+      // Change type in place while keeping existing mounts
+      mount.type = null;
+      mount.f = call.f;
+      mount.bound = bind(call.f, mount);
+      mount.args = call.args;
+    }
+  }
+  fiber.type = fiberType;
+
+  mountFiberCall(fiber, call);
+}
+
 // Provide a value for a context on a fiber
 export const provideFiber = <F extends Function>(
   fiber: LiveFiber<F>,
@@ -604,7 +644,7 @@ export const provideFiber = <F extends Function>(
       updateFiber(fiber, call);
     }
     else {
-      mountFiberCall(fiber, calls);
+      mountFiberCall(fiber, call);
     }
   }
 }
@@ -636,7 +676,7 @@ export const consumeFiber = <F extends Function>(
       updateFiber(fiber, call);
     }
     else {
-      mountFiberCall(fiber, calls);
+      mountFiberCall(fiber, call);
     }
   }
 

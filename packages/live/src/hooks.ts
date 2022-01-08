@@ -32,7 +32,7 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
   if (!state) return;
 
   let n = state.length;
-  while (fiber.pointer < n) {
+  if (n) while (fiber.pointer < n) {
     const i = fiber.pointer;
     const type = state[i];
     switch (type) {

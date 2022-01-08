@@ -75,20 +75,16 @@ export const Panel = styled.div`
 	max-height: 100%;
 `;
 
+export const PanelScrollable = styled.div`
+  pointer-events: auto;
+  background: var(--shim);
+	max-height: 100%;
+	overflow: auto;
+`;
+
 export const PanelFull = styled(Panel)`
   height: 100%;
-`;
-
-export const Scrollable = styled.div`
-  max-width: 100%;
-  max-height: 100%;
-  overflow: auto;
-`;
-
-export const ScrollableFull = styled.div`
-  width: 100%;
-  height: 100%;
-  overflow: auto;
+	overflow: auto;
 `;
 
 export const Inset = styled.div`

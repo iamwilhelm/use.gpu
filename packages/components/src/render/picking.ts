@@ -152,6 +152,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
         colorAttachments,
         depthStencilAttachment,
       } as CanvasRenderingContextGPU,
+      pickingTexture,
       captureTexture,
       sampleTexture,
       usePicking,
@@ -162,13 +163,3 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
 
   return provide(PickingContext, pickingContext, children);
 };
-
-export type PickingProviderProps = {
-  pickingContext: PickingContextType,
-  children: LiveElement<any>,
-};
-
-export const PickingProvider: LiveComponent<PickingProviderProps> = memo((props) => {
-  const {pickingContext, children} = props;
-  return provide(PickingContext, pickingContext, children);
-}, 'PickingProvider');

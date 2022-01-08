@@ -8,7 +8,7 @@ import { use, reconcile, DETACH, RECONCILE, MAP_REDUCE, GATHER, MULTI_GATHER, YE
 import { discardState } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies } from './util';
-import { formatNode } from './debug';
+import { formatNode, formatNodeName } from './debug';
 
 let ID = 0;
 let DEBUG = false;
@@ -127,9 +127,8 @@ export const makeResumeFiber = <F extends Function>(
   name?: string,
 ): LiveFiber<any> => {
 
-  const f = (fiber.f as any);
-  const n = f?.displayName ?? f?.name ?? '';
-  name = name ?? (n.match(/^Memo\(/) ? n.slice(5, -1) : n);
+  const n = formatNodeName(fiber);
+  name = name ?? (n.match(/^[A-Za-z]+\(/) ? n.slice(n.indexOf('(') + 1, -1) : n);
   Resume.displayName = `Resume(${name})`;
 
   const nextFiber = makeSubFiber(fiber, use(Resume)(), fiber.id, 1);
@@ -626,7 +625,7 @@ export const consumeFiber = <F extends Function>(
     fiber.context = makeContextState(fiber, fiber.context, context, registry);
 
     const resume = makeFiberContinuation(fiber, reduction);
-    fiber.next = makeResumeFiber(fiber, resume, 'Consume');
+    fiber.next = makeResumeFiber(fiber, resume);
     fiber.path = [...fiber.path, 0];
   }
 

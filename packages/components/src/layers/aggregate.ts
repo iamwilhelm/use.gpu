@@ -66,7 +66,7 @@ const Layer: LiveFunction<any> = (
     versionRef.current++;
 
     // Grow by at least 20%
-    sizeRef.current = Math.max(count, Math.round(sizeRef.current * 1.2) | 0x7);
+    sizeRef.current = Math.max(count, (Math.round(sizeRef.current * 1.2) | 0x7) + 1);
   }
   useOne(() => versionRef.current++, memoKey);
 

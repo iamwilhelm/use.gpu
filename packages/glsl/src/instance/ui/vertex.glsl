@@ -7,12 +7,13 @@
 layout(location = 0) out flat vec4 fragRectangle;
 layout(location = 1) out flat vec4 fragRadius;
 layout(location = 2) out vec2 fragUV;
+layout(location = 3) out flat int fragMode;
 #ifdef IS_PICKING
-layout(location = 3) out flat uint fragIndex;
+layout(location = 4) out flat uint fragIndex;
 #else
-layout(location = 3) out flat vec4 fragBorder;
-layout(location = 4) out flat vec4 fragStroke;
-layout(location = 5) out flat vec4 fragFill;
+layout(location = 4) out flat vec4 fragBorder;
+layout(location = 5) out flat vec4 fragStroke;
+layout(location = 6) out flat vec4 fragFill;
 #endif
 
 vec4 getRectangle(int);
@@ -41,6 +42,7 @@ void main() {
 
   gl_Position = center;
 
+  fragMode = length(radius + border) == 0.0 ? 0 : length(radius) == 0 ? 1 : 2;
   fragRectangle = rectangle;
   fragRadius = radius;
   fragUV = uv;

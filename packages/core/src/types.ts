@@ -174,14 +174,13 @@ export type StorageSource = {
 };
 
 export type TextureSource = {
-  texture: GPUTexture,
   view: GPUTextureView,
   format: string,
   size: [number, number] | [number, number, number],
   version: number,
 };
 
-export type RawTexture = {
+export type DataTexture = {
   data: TypedArray,
   format: string,
   size: [number, number] | [number, number, number],

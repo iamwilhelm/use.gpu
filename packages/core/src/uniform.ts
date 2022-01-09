@@ -99,8 +99,6 @@ export const makeTextureUniforms = (
 ): ResourceAllocation => {
   if (texture instanceof GPUTexture) texture = makeTextureView(texture);
 
-  console.dir(pipeline.getBindGroupLayout(set))
-
   const entries = makeUniformBindings([{resource: sampler}, {resource: texture}]);
   const bindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(set),
@@ -188,6 +186,7 @@ export const makeUniformLayout = (
 export const makeMultiUniformLayout = (
   uniformGroups: UniformAttribute[][],
   base: number = 0,
+  alignment: number = 256,
 ): UniformLayout => {
   const out = [] as any[];
   const offsets = [];
@@ -199,8 +198,8 @@ export const makeMultiUniformLayout = (
     offsets.push(offset);
     offset += length;
     
-    const d = offset % 256;
-    offset += d ? 256 - d : 0;
+    const d = offset % alignment;
+    offset += d ? alignment - d : 0;
   }
 
   return {length: offset - base, attributes: out, offsets};

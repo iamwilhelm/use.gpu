@@ -175,7 +175,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
-        indent={indent + (next || !hasNext ? 1 : .1) + (continuation ? .1 : 0)}
+        indent={indent + (next || !hasNext ? 1 : .1) + (continuation ? 1 : 0)}
       />
     );
   }
@@ -193,7 +193,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
-            indent={indent + 1 + (continuation ? .1 : 0)}
+            indent={indent + 1 + (continuation ? 1 : 0)}
           />
         );
       }

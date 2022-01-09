@@ -28,9 +28,6 @@ export const CONSUME      = () => {};
 (CONSUME      as any).isLiveBuiltin = true;
 
 (RECONCILE    as any).isLiveInline = true;
-(MAP_REDUCE   as any).isLiveInline = true;
-(GATHER       as any).isLiveInline = true;
-(MULTI_GATHER as any).isLiveInline = true;
 
 // use a call to a live function
 export const use = <F extends Function>(

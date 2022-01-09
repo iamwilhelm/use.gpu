@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/types';
-import { RenderContext, FrameContext } from '../providers';
+import { DeviceContext, FrameContext } from '../providers';
 import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataEmitter, makeDataArray, copyNumberArray, emitIntoNumberArray, 
@@ -18,7 +18,7 @@ export type RawDataProps = {
 };
 
 export const RawData: LiveComponent<RawDataProps> = (props) => {
-  const {device} = useContext(RenderContext);
+  const device = useContext(DeviceContext);
 
   const {
     format, length,

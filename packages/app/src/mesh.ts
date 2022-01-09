@@ -59,8 +59,11 @@ export const Mesh: LiveComponent<MeshProps> = memo((props) => {
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
 
-  const sourceTexture = useMemo(() =>
-    makeRawSourceTexture(device, texture), [device, texture]);
+  const sourceTexture = useMemo(() => {
+    const t = makeRawSourceTexture(device, texture);
+    uploadRawTexture(device, t, texture);
+    return t;
+  }, [device, texture]);
 
   const defines = {
     IS_PICKING: isPicking,

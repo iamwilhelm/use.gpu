@@ -1,4 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { TextureSource } from '@use-gpu/core/types';
 
 import { use, yeet, useContext, useNoContext } from '@use-gpu/live';
 import { LayoutContext } from '../providers/layout-provider';
@@ -8,26 +9,34 @@ import { Rectangle } from '../layout/types';
 import { Rectangles } from '../layers';
 
 export type SurfaceProps = {
-  rectangle?: Rectangle,
+  layout?: Rectangle,
+  layer?: number,
 
-  stroke?: boolean,
-  fill?: boolean,
-  strokeColor?: number[],
-  fillColor?: number[],
-  lineWidth?: number,
+  backgroundColor?: Point4,
+  backgroundImage?: TextureSource,
+  backgroundFit?: Fit,
+  backgroundRepeat?: Repeat,
+  backgroundAlign?: Anchor | [Anchor, Anchor],
 
-  texture?: TextureSource,
-  uv?: Rectangle,
+  borderColor?: Point4,
+  borderSize?: number,
 };
+
+const WHITE = [1, 1, 1, 1];
+const BLACK = [0, 0, 0, 1];
+const TRANSPARENT = [0, 0, 0, 0];
 
 export const Surface: LiveComponent<SurfaceProps> = (props) => {
   const {
-    stroke = false,
-    fill = true,
-    strokeColor = [1, 1, 1, 1],
-    fillColor = [0, 0, 0, 1],
-    lineWidth = 1,
-    texture = null,
+    backgroundColor,
+    backgroundImage,
+    backgroundFit,
+    backgroundRepeat,
+    backgroundAlign,
+
+    borderColor,
+    borderSize = 0,
+    layer = 1,
   } = props;
 
   let layout;
@@ -41,39 +50,41 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
 
   let [left, top, right, bottom] = layout;
 
-  const d = lineWidth / 2;
+  const d = borderSize / 2;
   left += d;
   top += d;
   right -= d;
   bottom -= d;
 
+  const z = layer / 0xFFFF;
   const positions = [
-    left, top, 0.5, 1,
-    right, top, 0.5, 1,
-    right, bottom, 0.5, 1,
-    left, bottom, 0.5, 1,
+    left, top, z, 1,
+    right, top, z, 1,
+    right, bottom, z, 1,
+    left, bottom, z, 1,
   ];
 
   const render = {};
-  if (fill) {
-    render.point = {
-      positions,
-      color: strokeColor,
-      size: lineWidth * 2,
-      count: 4,
-    };
+  if (backgroundColor || backgroundImage) {
     render.rectangle = {
       rectangle: [left, top, right, bottom],
-      color: fillColor,
-      texture,
+      color: backgroundColor ?? TRANSPARENT,
+      z,
       count: 1,
     };
+    if (backgroundImage) render.rectangle.texture = backgroundImage;
   }
-  if (stroke) {
+  if (borderColor) {
+    render.point = {
+      positions,
+      color: borderColor,
+      size: borderSize * 2,
+      count: 4,
+    };
     render.line = {
       positions,
-      color: strokeColor,
-      size: lineWidth,
+      color: borderColor,
+      size: borderSize,
       isLoop: true,
       count: 4,
     };

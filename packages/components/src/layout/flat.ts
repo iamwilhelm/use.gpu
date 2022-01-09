@@ -9,8 +9,8 @@ import { ViewProvider } from '../providers/view-provider';
 import { mat4 } from 'gl-matrix';
 
 const DEFAULT_FLAT_CAMERA = {
-  near: 0.001,
-  far: 1000,
+  near: 0,
+  far: 1,
   focus: 1,
 };
 

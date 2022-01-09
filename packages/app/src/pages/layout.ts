@@ -4,7 +4,7 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   Draw, Pass,
-  Flat, Absolute, Layout, Block, Flex, Element,
+  Flat, Absolute, Layout, Stack, Flex, Element,
   Aggregate,
 } from '@use-gpu/components';
 import { Mesh } from '../mesh';
@@ -51,11 +51,11 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                           ]
                         }),
                       
-                        use(Block)({
+                        use(Stack)({
                           children: [
-                            use(Element)({ width: 50, margin: 10 }),
-                            use(Element)({ width: 70, margin: 10 }),
-                            use(Element)({ width: 50, margin: 10 }),
+                            use(Element)({ width: 50, height: 100, margin: 10 }),
+                            use(Element)({ width: 70, height: 100, margin: 10 }),
+                            use(Element)({ width: 50, height: 100, margin: 10 }),
                           ]
                         }),
 
@@ -66,9 +66,9 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                           bottom: 10,
                           children:
                 
-                            use(Block)({
+                            use(Stack)({
                               children: [
-                                use(Element)({}),
+                                use(Element)({ height: 100 }),
 
                                 use(Absolute)({
                                   left: 10,
@@ -77,11 +77,11 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                                   bottom: 10,
                                   children:
 
-                                        use(Block)({
+                                        use(Stack)({
                                           children: [
-                                            use(Element)({ width: 50, margin: 10 }),
-                                            use(Element)({ width: 170, margin: 10 }),
-                                            use(Element)({ width: 50, margin: 10 }),
+                                            use(Element)({ width: 50, height: 100, margin: 10 }),
+                                            use(Element)({ width: 170, height: 100, margin: 10 }),
+                                            use(Element)({ width: 50, height: 100, margin: 10 }),
                                           ]
                                         })
 
@@ -90,13 +90,13 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                                 use(Flex)({
                                   alignX: 'between',
                                   children: [
-                                    use(Element)({ width: 200 }),
-                                    use(Element)({ width: 300, margin: 30, shrink: 1 }),
-                                    use(Block)({
+                                    use(Element)({ width: 200, height: 100 }),
+                                    use(Element)({ width: 300, height: 100, margin: 30, shrink: 1 }),
+                                    use(Stack)({
                                       children: [
-                                        use(Element)({ width: 200 }),
-                                        use(Element)({ width: 300 }),
-                                        use(Element)({ width: 200 }),
+                                        use(Element)({ width: 200, height: 100 }),
+                                        use(Element)({ width: 300, height: 100 }),
+                                        use(Element)({ width: 200, height: 100 }),
                                       ]
                                     }),
                                   ]

@@ -32,5 +32,9 @@ const Resume = resume((els: LayoutElement[]) => {
     else out.push(el);
   }
 
+  let l = 0;
+  for (const el of out) {
+    if (typeof el.args[0] === 'object') el.args[0].layer = ++l;
+  }
   return out;
 });

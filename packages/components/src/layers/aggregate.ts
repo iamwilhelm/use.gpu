@@ -19,8 +19,7 @@ import { Points } from './points';
 import { Rectangles } from './rectangles';
 
 export type AggregateProps = {
-  mode?: RenderPassMode | string,
-  id?: number,
+  children: LiveElement<any>,
 };
 
 type AggregateBuffer = {
@@ -38,8 +37,8 @@ const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
 }
 
 export const Aggregate: LiveComponent<AggregateProps> = (props) => {
-  const {render, children} = props;
-  return multiGather(children ?? (render ? render() : null), Resume);
+  const {children} = props;
+  return multiGather(children, Resume);
 };
 
 const Resume = resume((aggregates: Record<string, LayerAggregate[]>) => 
@@ -166,9 +165,16 @@ const makeRectangleAccumulator = (
 
   const hasRectangle = keys.has('rectangles') || keys.has('rectangle');
   const hasColor = keys.has('colors') || keys.has('color');
+  const hasUV = keys.has('uvs') || keys.has('uv');
+  const hasZ = keys.has('zs') || keys.has('z');
+  const hasTexture = keys.has('textures') || keys.has('texture');
 
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType.vec4, count);
   if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasUV) storage.uvs = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasZ) storage.zs = makeAggregateBuffer(device, UniformType.float, count);
+
+  if (hasTexture) storage.textures = makeAggregateBuffer(device, UniformType.vec4, count);
 
   return (items: LineAggregate[]) => {
     const count = items.reduce(allCount, 0);
@@ -176,6 +182,10 @@ const makeRectangleAccumulator = (
 
     if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+    if (hasUV) props.uvs = updateAggregateBuffer(device, storage.uvs, items, count, 'uv', 'uvs');
+    if (hasZ) props.zs = updateAggregateBuffer(device, storage.zs, items, count, 'z', 'zs');
+
+    if (hasTexture) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
 
     return props;
   };

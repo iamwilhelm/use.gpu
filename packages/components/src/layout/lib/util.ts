@@ -1,15 +1,19 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { Point, Rectangle, Gap, Margin, Alignment, Anchor, LayoutRenderer } from '../types';
 
-export const parseDimension = (x: string | number, total: number): number => {
-  if (typeof x === 'number') return x;
+export const parseDimension = (x: string | number, total: number, snap?: boolean = false): number => {
+  if (typeof x === 'number') return snap ? Math.round(x) : x;
 
+  let v;
   const s = x as string;
   if (s[s.length - 1] === '%') {
-    return +s.slice(0, -1) / 100 * total;
+    v = +s.slice(0, -1) / 100 * total;
+  }
+  else {
+    v = +s;
   }
 
-  return +s;
+  return snap ? Math.round(v) : v;
 }
 
 export const parseAnchor = (x: string): number => {

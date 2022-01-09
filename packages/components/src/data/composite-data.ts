@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core/types';
-import { RenderContext, FrameContext } from '@use-gpu/components';
+import { DeviceContext, FrameContext } from '@use-gpu/components';
 import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor,
@@ -28,7 +28,7 @@ const isComposite = (format: string) => !!format.match(/\[\]$/);
 const toSimple = (format: string) => format.replace(/\[\]$/, '');
 
 export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
-  const {device} = useContext(RenderContext);
+  const device = useContext(DeviceContext);
 
   const {
     data,

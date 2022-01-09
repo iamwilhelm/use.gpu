@@ -599,6 +599,25 @@ export const morphFiberCall = <F extends Function>(
   mountFiberCall(fiber, call);
 }
 
+// Inline a call to a fiber after a built-in
+export const inlineFiberCall = <F extends Function>(
+  fiber: LiveFiber<F>,
+  element: LiveElement<any>,
+) => {
+  const isArray = !!element && Array.isArray(element);
+  const fiberType = isArray ? Array : element?.f;
+
+  if (fiber.type && fiber.type !== fiberType) disposeFiberMounts(fiber);
+  fiber.type = fiberType;
+
+  if (Array.isArray(element)) reconcileFiberCalls(fiber, element);
+  else {
+    const call = element as DeferredCall<any>;
+    if ((call?.f as any).isLiveInline) updateFiber(fiber, call);
+    else mountFiberCall(fiber, call);
+  }
+}
+
 // Provide a value for a context on a fiber
 export const provideFiber = <F extends Function>(
   fiber: LiveFiber<F>,
@@ -635,16 +654,7 @@ export const provideFiber = <F extends Function>(
     pingFiber(fiber);
   }
 
-  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
-  else {
-    const call = calls;
-    if (!isMemo && (call.f as any).isLiveInline) {
-      updateFiber(fiber, call);
-    }
-    else {
-      mountFiberCall(fiber, call);
-    }
-  }
+  inlineFiberCall(fiber, calls);
 }
 
 // Consume values from a co-context on a fiber
@@ -659,7 +669,6 @@ export const consumeFiber = <F extends Function>(
   if (!fiber.next) {
     const registry = new Map<LiveFiber<any>, any>();
     const reduction = () => registry;
-
     fiber.context = makeContextState(fiber, fiber.context, context, registry);
 
     const resume = makeFiberContinuation(fiber, reduction);
@@ -667,17 +676,7 @@ export const consumeFiber = <F extends Function>(
     fiber.path = [...fiber.path, 0];
   }
 
-  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
-  else {
-    const call = calls;
-    if ((call.f as any).isLiveInline) {
-      updateFiber(fiber, call);
-    }
-    else {
-      mountFiberCall(fiber, call);
-    }
-  }
-
+  inlineFiberCall(fiber, calls);
   mountFiberContinuation(fiber, use(fiber.next.f)(Next), 1);
 }
 

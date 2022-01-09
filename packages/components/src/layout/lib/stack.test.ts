@@ -69,7 +69,7 @@ describe('block layout', () => {
     ];
 
     const size = [110, 80] as Point;
-    const {sizes, offsets, renders} = fitBlocks(els, size, 'x');
+    const {sizes, offsets, renders} = fitBlocks(els, size, [0, 0, 0, 0], 'x');
 
     expect(offsets).toEqual([[0, 10], [70, 20]]);
     expect(sizes).toEqual([[50, 50], [20, 20]]);
@@ -86,7 +86,7 @@ describe('block layout', () => {
     ];
 
     const size = [110, 80] as Point;
-    const {sizes, offsets, renders} = fitBlocks(els, size, 'y');
+    const {sizes, offsets, renders} = fitBlocks(els, size, [0, 0, 0, 0], 'y');
 
     expect(offsets).toEqual([[10, 0], [20, 70]]);
     expect(sizes).toEqual([[50, 50], [20, 20]]);

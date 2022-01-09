@@ -1,3 +1,5 @@
+import { TextureSource } from '@use-gpu/core/types';
+
 export enum LayerType {
   Point = 'point',
   Line = 'line',
@@ -9,9 +11,13 @@ export type RectangleAggregate = {
 
   rectangles?: number[],
   colors?: number[],
+  textures?: TextureSource,
+  uvs?: number[],
 
   rectangle?: number[],
   color?: number[],
+  texture?: TextureSource,
+  uv?: number[],
 };
 
 export type PointAggregate = {

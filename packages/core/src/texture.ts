@@ -77,9 +77,7 @@ export const makeRawSourceTexture = (
   const {size, format} = rawTexture;
   const [w, h, d] = size as Point3;
 
-  const texture = makeSourceTexture(device, w, h, d || 1, format, 1);
-  uploadRawTexture(device, texture, rawTexture);
-  return texture;
+  return makeSourceTexture(device, w, h, d || 1, format, 1);
 }
 
 export const makeTextureView = (

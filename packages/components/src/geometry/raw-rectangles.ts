@@ -21,16 +21,22 @@ import { getMaskedFragment } from '@use-gpu/glsl/mask/masked.glsl';
 export type RawRectanglesProps = {
   rectangle?: number[] | TypedArray,
   color?: number[] | TypedArray,
+  uv?: number[] | TypedArray,
+  z?: number,
   mask?: number,
-  texture?: GPUTexture | TextureSource,
+  texture?: TextureSource,
 
   rectangles?: StorageSource,
   colors?: StorageSource,
   masks?: StorageSource,
-  textures?: (GPUTexture | TextureSource)[],
+  uvs?: StorageSource,
+  zs?: number,
+  textures?: TextureSource[],
 
   getRectangle?: ShaderModule,
   getColor?: ShaderModule,
+  getUV?: ShaderModule,
+  getZ?: ShaderModule,
   getMask?: ShaderModule,
   getTexture?: ShaderModule,
 
@@ -43,10 +49,13 @@ export type RawRectanglesProps = {
 
 const ZERO = [0, 0, 0, 1];
 const GRAY = [0.5, 0.5, 0.5, 1];
+const SQUARE = [0, 0, 1, 1];
 
 const VERTEX_BINDINGS = [
   { name: 'getRectangle', format: 'vec4', value: ZERO },
   { name: 'getColor', format: 'vec4', value: GRAY },
+  { name: 'getUV', format: 'vec4', value: SQUARE },
+  { name: 'getZ', format: 'float', value: 0.5 },
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
@@ -81,18 +90,20 @@ export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((props) => 
 
   const r = props.rectangles ?? props.rectangle ?? props.getRectangle;
   const c = props.colors ?? props.color ?? props.getColor;
+  const u = props.uvs ?? props.uv ?? props.getUV;
+  const z = props.zs ?? props.z ?? props.getZ;
   const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null;
   const t = props.textures ?? props.texture ?? props.getTexture;
 
   const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, c]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, c, u, z]);
     const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
 
     const getVertex = bindBundle(getRectangleVertex, bindingsToLinks(vertexBindings), null, key);
     const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
 
     return [getVertex, getFragment];
-  }, [r, c, m, t]);
+  }, [r, c, u, z, m, t]);
 
   return use(Virtual)({
     vertexCount,

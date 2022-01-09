@@ -79,9 +79,9 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
 
                                         use(Stack)({
                                           children: [
-                                            use(Element)({ width: 50, height: 100, margin: 10 }),
-                                            use(Element)({ width: 170, height: 100, margin: 10 }),
-                                            use(Element)({ width: 50, height: 100, margin: 10 }),
+                                            use(Element)({ width: 50, radius: 10, border: 5, height: 100, margin: 10 }),
+                                            use(Element)({ width: 170, radius: 10, height: 100, margin: 10 }),
+                                            use(Element)({ width: 50, radius: 10, height: 100, margin: 10 }),
                                           ]
                                         })
 

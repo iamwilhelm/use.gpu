@@ -76,6 +76,9 @@ const PIPELINE = {
     topology: 'triangle-strip',
     stripIndexFormat: 'uint16',
   },
+  depthStencil: {
+    depthWriteEnabled: false,
+  },
 };
 
 export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props) => {

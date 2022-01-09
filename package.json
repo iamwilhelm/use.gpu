@@ -87,6 +87,7 @@
     }
   },
   "workspaces": [
+    "packages/state",
     "packages/glsl",
     "packages/live",
     "packages/core",

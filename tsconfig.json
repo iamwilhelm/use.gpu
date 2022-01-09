@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.pkg.json",
   "references": [
+    { "path": "./packages/state" },
     { "path": "./packages/glsl" },
     { "path": "./packages/live" },
     { "path": "./packages/core" },

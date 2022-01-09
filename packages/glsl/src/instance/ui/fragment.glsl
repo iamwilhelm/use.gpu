@@ -75,7 +75,7 @@ SDF getRoundedBorderBoxSDF(vec4 box, vec4 radius, vec4 border, vec2 uv) {
     inner = r + 0.5 - length(clip) - neg;
   }
 
-  return SDF(outer / scale - 3.0, inner / scale - 3.0);
+  return SDF(outer / scale, inner / scale);
 }
 
 #ifdef IS_PICKING

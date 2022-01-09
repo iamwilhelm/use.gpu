@@ -66,6 +66,16 @@
       "import": "./src/instance/fragment/solid.glsl",
       "require": "./src/instance/fragment/solid.glsl"
     },
+    "./instance/ui/fragment.glsl": {
+      "types": "./src/instance/ui/fragment.d.ts",
+      "import": "./src/instance/ui/fragment.glsl",
+      "require": "./src/instance/ui/fragment.glsl"
+    },
+    "./instance/ui/vertex.glsl": {
+      "types": "./src/instance/ui/vertex.d.ts",
+      "import": "./src/instance/ui/vertex.glsl",
+      "require": "./src/instance/ui/vertex.glsl"
+    },
     "./instance/vertex/line.glsl": {
       "types": "./src/instance/vertex/line.d.ts",
       "import": "./src/instance/vertex/line.glsl",
@@ -75,11 +85,6 @@
       "types": "./src/instance/vertex/quad.d.ts",
       "import": "./src/instance/vertex/quad.glsl",
       "require": "./src/instance/vertex/quad.glsl"
-    },
-    "./instance/vertex/rectangle.glsl": {
-      "types": "./src/instance/vertex/rectangle.d.ts",
-      "import": "./src/instance/vertex/rectangle.glsl",
-      "require": "./src/instance/vertex/rectangle.glsl"
     },
     "./mask/masked.glsl": {
       "types": "./src/mask/masked.d.ts",

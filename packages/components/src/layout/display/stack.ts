@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Margin } from './types';
 
-import { memo, gather, resume, yeet, useOne } from '@use-gpu/live';
+import { memo, gather, resume, yeet, useFiber, useOne } from '@use-gpu/live';
 import { getStackMinMax, getStackMargin, fitStack } from '../lib/stack';
 import { normalizeMargin, makeBoxLayout } from '../lib/util';
 
@@ -59,6 +59,8 @@ const makeResume = (
 
     const sizing = getStackMinMax(els, direction);
     const margin = getStackMargin(els, stackMargin, padding, direction);
+    
+    const key = useFiber().id;
 
     return yeet({
       sizing,

@@ -72,6 +72,20 @@ declare module "@use-gpu/glsl/instance/fragment/solid.glsl" {
   export default __module;
 }
 
+declare module "@use-gpu/glsl/instance/ui/fragment.glsl" {
+  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/glsl/instance/ui/vertex.glsl" {
+  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
 declare module "@use-gpu/glsl/instance/vertex/line.glsl" {
   type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -83,13 +97,6 @@ declare module "@use-gpu/glsl/instance/vertex/quad.glsl" {
   type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getQuadVertex: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/glsl/instance/vertex/rectangle.glsl" {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getRectangleVertex: ParsedBundle;
   export default __module;
 }
 

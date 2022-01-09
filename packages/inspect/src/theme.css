@@ -57,21 +57,25 @@ body .ui.secondary.pointing.menu a.active.item:hover {
   border-color: var(--backgroundActive); 
 }
 
-body ::-webkit-scrollbar-track {
+html > body ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, .1);
   border-radius: 0;
 }
 
-body ::-webkit-scrollbar-thumb {
+html > body ::-webkit-scrollbar-thumb {
   cursor: pointer;
   border-radius: 5px;
-  background: rgba(128, 128, 128, .5);
+  background: rgba(128, 128, 128, .4);
   -webkit-transition: color .2s ease;
-  transition: color .2s ease;
+  transition: background .2s ease;
 }
 
-body ::-webkit-scrollbar {
+html > body ::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, .6);
+}
+
+html > body ::-webkit-scrollbar {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
 }

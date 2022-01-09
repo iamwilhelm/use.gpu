@@ -16,7 +16,7 @@ export const fitAbsoluteBox = (
   snap?: boolean,
 ) => {
   let [width, height] = into;
-  const box = resolveAbsoluteBox([0, 0, width, height], l, t, r, b, w, h);
+  const box = resolveAbsoluteBox([0, 0, width, height], l, t, r, b, w, h, snap);
   const [left, top, right, bottom] = box;
 
   width = right - left;

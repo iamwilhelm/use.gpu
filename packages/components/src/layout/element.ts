@@ -10,15 +10,15 @@ export type ElementProps = {
   width?: Dimension,
   height?: Dimension,
   margin?: number | Point4,
+  radius?: number | Point4,
+  border?: number | Point4,
+  stroke?: Point4,
+  fill?: Point4,
 
-  backgroundColor?: Point4,
   backgroundImage?: TextureSource,
   backgroundFit?: Fit,
   backgroundRepeat?: Repeat,
   backgroundAlign?: Anchor | [Anchor, Anchor],
-
-  borderColor?: Point4,
-  borderSize?: number,
 
   grow?: number,
   shrink?: number,
@@ -31,22 +31,21 @@ export const Element: LiveComponent<BlockProps> = (props) => {
   const {
     width,
     height,
-    
-    backgroundColor,
-    backgroundImage,
-    backgroundFit,
-    backgroundRepeat,
-    backgroundAlign,
-    
+    // margin
+    // radius
+    // border
+
+    image,
+    imageFit,
+    imageRepeat,
+    imageAlign,
+
     borderColor,
-    borderSize,
 
     grow = 0,
     shrink = 0,
     snap = false,
 
-    // margin
-    // padding
     children,
   } = props;
 
@@ -55,7 +54,10 @@ export const Element: LiveComponent<BlockProps> = (props) => {
 
   const fiber = useFiber();
   const sizing = [w, h, w, h];
+
   const margin = normalizeMargin(props.margin ?? 0);
+  const radius = normalizeMargin(props.radius ?? 0);
+  const border = normalizeMargin(props.border ?? 0);
 
   return yeet({
     sizing,
@@ -71,14 +73,15 @@ export const Element: LiveComponent<BlockProps> = (props) => {
         use(Surface, fiber.id)({
           layout,
 
-          backgroundColor: [Math.random(), Math.random(), Math.random(), 1],
-          backgroundImage,
-          backgroundFit,
-          backgroundRepeat,
-          backgroundAlign,
+          fill: [Math.random(), Math.random(), Math.random(), 1],
+          stroke: [Math.random(), Math.random(), Math.random(), 1],
+          border,
+          radius,
 
-          borderColor: [Math.random(), Math.random(), Math.random(), 1],
-          borderSize: 2,
+          image,
+          imageFit,
+          imageRepeat,
+          imageAlign,
         })
       );
       return {size, render};

@@ -9,35 +9,38 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
 import { LayoutContext } from '../providers/layout-provider';
-import { Virtual } from './virtual';
+import { render } from './render';
 
 import { use, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
-import { getRectangleVertex } from '@use-gpu/glsl/instance/vertex/rectangle.glsl';
-import { getMaskedFragment } from '@use-gpu/glsl/mask/masked.glsl';
+import rectangleVertex from '@use-gpu/glsl/instance/ui/vertex.glsl';
+import rectangleFragment from '@use-gpu/glsl/instance/ui/fragment.glsl';
 
-export type RawRectanglesProps = {
+export type UIRectanglesProps = {
   rectangle?: number[] | TypedArray,
-  color?: number[] | TypedArray,
+  radius?: number[] | TypedArray,
+  border?: number[] | TypedArray,
+  stroke?: number[] | TypedArray,
+  fill?: number[] | TypedArray,
   uv?: number[] | TypedArray,
-  z?: number,
-  mask?: number,
   texture?: TextureSource,
 
   rectangles?: StorageSource,
-  colors?: StorageSource,
-  masks?: StorageSource,
+  radiuses?: StorageSource,
+  borders?: StorageSource,
+  strokes?: StorageSource,
+  fills?: StorageSource,
   uvs?: StorageSource,
-  zs?: number,
   textures?: TextureSource[],
 
   getRectangle?: ShaderModule,
-  getColor?: ShaderModule,
+  getRadius?: ShaderModule,
+  getBorder?: ShaderModule,
+  getStroke?: ShaderModule,
+  getFill?: ShaderModule,
   getUV?: ShaderModule,
-  getZ?: ShaderModule,
-  getMask?: ShaderModule,
   getTexture?: ShaderModule,
 
   count?: number,
@@ -53,13 +56,14 @@ const SQUARE = [0, 0, 1, 1];
 
 const VERTEX_BINDINGS = [
   { name: 'getRectangle', format: 'vec4', value: ZERO },
-  { name: 'getColor', format: 'vec4', value: GRAY },
+  { name: 'getRadius', format: 'vec4', value: 0 },
+  { name: 'getBorder', format: 'vec4', value: 0 },
+  { name: 'getStroke', format: 'vec4', value: GRAY },
+  { name: 'getFill', format: 'vec4', value: GRAY },
   { name: 'getUV', format: 'vec4', value: SQUARE },
-  { name: 'getZ', format: 'float', value: 0.5 },
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
-  { name: 'getMask', format: 'float', args: ['vec2'], value: 1 },
   { name: 'getTexture', format: 'vec4', args: ['vec2'], value: [1.0, 1.0, 1.0, 1.0] },
 ] as UniformAttributeValue[];
 
@@ -74,7 +78,7 @@ const PIPELINE = {
   },
 };
 
-export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((props) => {
+export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -89,28 +93,30 @@ export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((props) => 
   const key = useFiber().id;
 
   const r = props.rectangles ?? props.rectangle ?? props.getRectangle;
-  const c = props.colors ?? props.color ?? props.getColor;
+  const a = props.radiuses ?? props.radius ?? props.getRadius;
+  const b = props.borders ?? props.border ?? props.getBorder;
+  const s = props.strokes ?? props.strokes ?? props.getStroke;
+  const f = props.fills ?? props.fill ?? props.getFill;
   const u = props.uvs ?? props.uv ?? props.getUV;
-  const z = props.zs ?? props.z ?? props.getZ;
-  const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null;
+
   const t = props.textures ?? props.texture ?? props.getTexture;
 
-  const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, c, u, z]);
-    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
+  const [vs, fs] = useMemo(() => {
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, a, b, s, f, u]);
+    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [t]);
 
-    const getVertex = bindBundle(getRectangleVertex, bindingsToLinks(vertexBindings), null, key);
-    const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
+    const vs = bindBundle(rectangleVertex, bindingsToLinks(vertexBindings), null, key);
+    const fs = bindBundle(rectangleFragment, bindingsToLinks(fragmentBindings), null, key);
 
-    return [getVertex, getFragment];
-  }, [r, c, u, z, m, t]);
+    return [vs, fs];
+  }, [r, a, b, s, f, u, t]);
 
-  return use(Virtual)({
+  return render({
     vertexCount,
     instanceCount,
 
-    getVertex,
-    getFragment,
+    vertex: vs,
+    fragment: fs,
 
     defines: DEFINES,
     deps: null,
@@ -119,4 +125,4 @@ export const RawRectangles: LiveComponent<RawRectanglesProps> = memo((props) => 
     mode,
     id,
   });
-}, 'RawRectangles');
+}, 'UIRectangles');

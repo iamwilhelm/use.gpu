@@ -9,34 +9,30 @@ import { Rectangle } from '../layout/types';
 import { Rectangles } from '../layers';
 
 export type SurfaceProps = {
-  layout?: Rectangle,
-  layer?: number,
+  layout: Rectangle,
 
-  backgroundColor?: Point4,
-  backgroundImage?: TextureSource,
-  backgroundFit?: Fit,
-  backgroundRepeat?: Repeat,
-  backgroundAlign?: Anchor | [Anchor, Anchor],
+  image?: TextureSource,
+  imageFit?: Fit,
+  imageRepeat?: Repeat,
+  imageAlign?: Anchor | [Anchor, Anchor],
 
-  borderColor?: Point4,
-  borderSize?: number,
+  fill?: Point4,
+  stroke?: Point4,
+  border?: Point4,
+  radius?: Point4,
 };
-
-const WHITE = [1, 1, 1, 1];
-const BLACK = [0, 0, 0, 1];
-const TRANSPARENT = [0, 0, 0, 0];
 
 export const Surface: LiveComponent<SurfaceProps> = (props) => {
   const {
-    backgroundColor,
-    backgroundImage,
-    backgroundFit,
-    backgroundRepeat,
-    backgroundAlign,
+    image,
+    imageFit,
+    imageRepeat,
+    imageAlign,
 
-    borderColor,
-    borderSize = 0,
-    layer = 1,
+    fill,
+    stroke,
+    radius,
+    border,
   } = props;
 
   let layout;
@@ -48,47 +44,17 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
     layout = useContext(LayoutContext);
   }
 
-  let [left, top, right, bottom] = layout;
-
-  const d = borderSize / 2;
-  left += d;
-  top += d;
-  right -= d;
-  bottom -= d;
-
-  const z = layer / 0xFFFF;
-  const positions = [
-    left, top, z, 1,
-    right, top, z, 1,
-    right, bottom, z, 1,
-    left, bottom, z, 1,
-  ];
-
-  const render = {};
-  if (backgroundColor || backgroundImage) {
-    render.rectangle = {
-      rectangle: [left, top, right, bottom],
-      color: backgroundColor ?? TRANSPARENT,
-      z,
+  const render = {
+    rectangle: {
+      rectangle: layout,
+      radius,
+      border,
+      stroke,
+      fill,
+      //uv:     [0, 0, 1, 1],
       count: 1,
-    };
-    if (backgroundImage) render.rectangle.texture = backgroundImage;
-  }
-  if (borderColor) {
-    render.point = {
-      positions,
-      color: borderColor,
-      size: borderSize * 2,
-      count: 4,
-    };
-    render.line = {
-      positions,
-      color: borderColor,
-      size: borderSize,
-      isLoop: true,
-      count: 4,
-    };
-  }
+    }
+  };
 
   return yeet(render);
 };

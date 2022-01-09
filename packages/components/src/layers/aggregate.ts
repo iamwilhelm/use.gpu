@@ -164,28 +164,33 @@ const makeRectangleAccumulator = (
   const storage = {} as Record<string, AggregateBuffer>;
 
   const hasRectangle = keys.has('rectangles') || keys.has('rectangle');
-  const hasColor = keys.has('colors') || keys.has('color');
+  const hasRadius = keys.has('radiuses') || keys.has('radius');
+  const hasBorder = keys.has('borders') || keys.has('border');
+  const hasStroke = keys.has('strokes') || keys.has('stroke');
+  const hasFill = keys.has('fills') || keys.has('fill');
   const hasUV = keys.has('uvs') || keys.has('uv');
-  const hasZ = keys.has('zs') || keys.has('z');
   const hasTexture = keys.has('textures') || keys.has('texture');
 
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasRadius) storage.radiuses = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasBorder) storage.borders = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasStroke) storage.strokes = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasFill) storage.fills = makeAggregateBuffer(device, UniformType.vec4, count);
   if (hasUV) storage.uvs = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasZ) storage.zs = makeAggregateBuffer(device, UniformType.float, count);
-
   if (hasTexture) storage.textures = makeAggregateBuffer(device, UniformType.vec4, count);
 
   return (items: LineAggregate[]) => {
     const count = items.reduce(allCount, 0);
-    const props = {count, join: 'miter'};
+    const props = {count};
 
     if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');
-    if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+    if (hasRadius) props.radiuses = updateAggregateBuffer(device, storage.radiuses, items, count, 'radius', 'radiuses');
+    if (hasBorder) props.borders = updateAggregateBuffer(device, storage.borders, items, count, 'border', 'borders');
+    if (hasStroke) props.strokes = updateAggregateBuffer(device, storage.strokes, items, count, 'stroke', 'strokes');
+    if (hasFill) props.fills = updateAggregateBuffer(device, storage.fills, items, count, 'fill', 'fills');
     if (hasUV) props.uvs = updateAggregateBuffer(device, storage.uvs, items, count, 'uv', 'uvs');
-    if (hasZ) props.zs = updateAggregateBuffer(device, storage.zs, items, count, 'z', 'zs');
 
-    if (hasTexture) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+    if (hasTexture) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'texture', 'textures');
 
     return props;
   };

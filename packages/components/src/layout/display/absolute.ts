@@ -31,8 +31,8 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props) => {
   } = props;
 
   const Resume = useOne(() =>
-    makeResume(l, t, r, b, w, h),
-    [l, t, r, b, w, h]
+    makeResume(l, t, r, b, w, h, snap),
+    [l, t, r, b, w, h, snap]
   );
 
   return gather(children, Resume);

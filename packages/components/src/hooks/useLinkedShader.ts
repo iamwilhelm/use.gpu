@@ -1,18 +1,16 @@
 import { ShaderLanguages } from '@use-gpu/core/types';
 import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
 
-import { resolveBindings, bindBundle, linkBundle, loadModule } from '@use-gpu/shader/glsl';
+import { resolveBindings, linkBundle } from '@use-gpu/shader/glsl';
 import { makeShaderModule } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
-import mapValues from 'lodash/mapValues';
 
 const NO_DEPS = [] as any[];
 const NO_LIBS = {} as Record<string, any>;
 
-export const useBoundShader = (
+export const useLinkedShader = (
   vertex: ParsedBundle,
   fragment: ParsedBundle,
-  links: Record<string, ParsedBundle | ParsedModule>,
   defines: Record<string, ShaderDefine> | null | undefined,
   languages: ShaderLanguages,
   deps: any[] | null = null,
@@ -22,15 +20,9 @@ export const useBoundShader = (
   const fiber = useFiber();
   const {glsl: {compile, cache}} = languages;
 
-  // Binds links into shader and
-  // resolve bindings between vertex and fragment.
-  const {modules, uniforms, bindings} = useMemo(() => {
-    const k = key ?? 'bound' + fiber.id;
-    const v = bindBundle(vertex, links, null, k);
-    const f = bindBundle(fragment, links, null, k);
-
-    return resolveBindings([v, f]);
-  }, [vertex, fragment, links])
+  // Resolve bindings between vertex and fragment.
+  const s = [vertex, fragment];
+  const {modules, uniforms, bindings} = useMemo(() => resolveBindings(s), s);
 
   // Keep static set of bindings
   const ref = useOne(() => ({ uniforms, bindings }));

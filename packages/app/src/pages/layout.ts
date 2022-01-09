@@ -54,7 +54,7 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                         use(Stack)({
                           children: [
                             use(Element)({ width: 50, height: 100, margin: 10 }),
-                            use(Element)({ width: 70, height: 100, margin: 10 }),
+                            use(Element)({ width: 70, height: 100, border: 10, margin: 10 }),
                             use(Element)({ width: 50, height: 100, margin: 10 }),
                           ]
                         }),
@@ -68,7 +68,7 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                 
                             use(Stack)({
                               children: [
-                                use(Element)({ radius: [10, 20, 30, 40], border: 3, height: 100 }),
+                                use(Element)({ radius: [10, 20, 30, 40], border: [3, 10, 20, 5], height: 100 }),
 
                                 use(Absolute)({
                                   left: 10,
@@ -94,9 +94,9 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                                     use(Element)({ width: 300, border: 4, height: 100, margin: 30, shrink: 1 }),
                                     use(Stack)({
                                       children: [
-                                        use(Element)({ width: 200, height: 100 }),
+                                        use(Element)({ width: 200, border: 3, height: 100 }),
                                         use(Element)({ radius: [10, 20, 30, 40], width: 300, height: 100 }),
-                                        use(Element)({ width: 200, height: 100 }),
+                                        use(Element)({ width: 200, radius: 3, height: 100 }),
                                       ]
                                     }),
                                   ]

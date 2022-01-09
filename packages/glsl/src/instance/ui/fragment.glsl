@@ -16,17 +16,38 @@ layout(location = 5) in flat vec4 fragFill;
 
 layout(location = 0) out vec4 outColor;
 
-float getBoxSDF(vec4 box, vec4 radius, vec2 uv) {
+struct SDF {
+  float outer;
+  float inner;
+};
+
+SDF getBoxSDF(vec4 box, vec4 radius, vec4 border, vec2 uv) {
+  float outer, inner;
+
   vec2 nearest = round(uv);
-  vec2 rr = mix(radius.xw, radius.yz, nearest.x);
-  float r = mix(rr.x, rr.y, nearest.y);
+  vec2 rs = mix(radius.xw, radius.yz, nearest.x);
+  float r = mix(rs.x, rs.y, nearest.y);
+
+  vec2 bs = mix(border.xy, border.zw, nearest);
+  float b = max(bs.x, bs.y);
 
   vec2 wh = box.zw - box.xy;
-  vec2 xy = (abs((uv - .5)) - .5) * wh + r;
-  vec2 clip = max(vec2(0.0), xy);
-  float neg = min(0.0, max(xy.x, xy.y));
+  vec2 xy = (abs(uv - .5) - .5) * wh;
 
-  return r + 0.5 - length(clip) - neg;
+  vec2 clip = max(vec2(0.0), xy + r);
+  float neg = min(0.0, max(xy.x, xy.y) + r);
+  inner = outer = r + 0.5 - length(clip) - neg;
+
+  if (b > 0.0) {
+    xy += bs;
+    r = max(0.0, r - b);
+
+    vec2 clip = max(vec2(0.0), xy + r);
+    float neg = min(0.0, max(xy.x, xy.y) + r);
+    inner = r + 0.5 - length(clip) - neg;
+  }
+
+  return SDF(outer, inner);
 }
 
 #ifdef IS_PICKING
@@ -35,12 +56,13 @@ void main() {
 }
 #else
 void main() {
-  float sdf = getBoxSDF(fragRectangle, fragRadius, fragUV);
+  SDF sdf = getBoxSDF(fragRectangle, fragRadius, fragBorder, fragUV);
 
-  vec4 color = mix(fragFill, fragStroke, clamp(sdf - fragBorder, 0.0, 1.0));
+  float mask = clamp(sdf.outer, 0.0, 1.0);
+  vec4 color = mix(fragStroke, fragFill, clamp(sdf.inner + (1.0 - mask), 0.0, 1.0));
   outColor = color;
-
-  float mask = clamp(sdf, 0.0, 1.0);
   outColor *= mask;
+
+  //outColor.xyz = vec3(sdf.sdf / 60.0 + .5);
 }
 #endif

@@ -8,7 +8,7 @@ import { parseBundle, parseLinkAliases } from '../util/bundle';
 import { getGraphOrder } from '../util/tree';
 
 import { GLSL_VERSION, VIRTUAL_BINDGROUP } from '../constants';
-import * as T from '../grammar/glsl.terms';
+import * as T from './grammar/glsl.terms';
 import mapValues from 'lodash/mapValues';
 
 const TIMED = false;

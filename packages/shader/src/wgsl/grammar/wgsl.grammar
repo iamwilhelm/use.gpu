@@ -1,0 +1,489 @@
+@top Program { unit }
+@skip { space | comment }
+@external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
+
+unit { globalDirective* globalDeclaration* }
+
+k<term> { @specialize[@name={term}]<Identifier, term> }
+t<term> { @specialize[@name={term}]<Identifier, term> }
+d<term> { @specialize[@name={term}]<Identifier, term> }
+r<term> { @specialize[@name={term}]<Identifier, term> }
+
+comment { commentLine | commentOpen untilCommentClose }
+
+globalDirective {
+  EnableDirective
+}
+
+globalDeclaration {
+  semicolon |
+  globalVariableDeclaration semicolon |
+  globalConstantDeclaration semicolon |
+  typeAliasDeclaration semicolon |
+  structDeclaration |
+  functionDeclaration
+}
+
+
+
+EnableDirective {
+  d<'enable'> Identifier semicolon
+}
+
+
+
+globalVariableDeclaration {
+  attribute* variableDeclaration (assign constExpression)?
+}
+
+globalConstantDeclaration {
+  k<'let'> (Identifier variableIdentifierDeclaration) assign constExpression |
+  (
+    attribute* k<'override'> (
+      Identifier |
+      variableIdentifierDeclaration
+    ) (assign expression)?
+  )
+}
+
+typeAliasDeclaration { k<'type'> Identifier assign typeDeclaration }
+
+structDeclaration { k<'struct'> Identifier structBodyDeclaration }
+structBodyDeclaration { '{' structMember* '}' }
+structMember { attribute* variableIdentifierDeclaration semicolon }
+
+functionDeclaration { attribute* functionHeader compoundStatement }
+functionHeader { k<'fn'> Identifier '(' paramList? ')' (arrow attribute* typeDeclaration)? }
+
+paramList { (param comma)* param comma? }
+param { attribute* variableIdentifierDeclaration }
+
+variableDeclaration { k<'var'> variableQualifier (Identifier | variableIdentifierDeclaration) }
+variableQualifier { Lt addressSpace (comma accessMode)? Gt }
+variableIdentifierDeclaration { Identifier colon typeDeclaration }
+
+variableStatement {
+  variableDeclaration (assign expression)? |
+  k<'let'> (Identifier | variableIdentifierDeclaration) assign expression
+}
+
+compoundStatement { '{' statement* '}' }
+
+statement {
+  semicolon |
+  returnStatement semicolon |
+  ifStatement |
+  switchStatement |
+  loopStatement |
+  forStatement |
+  funcCallStatement semicolon |
+  variableStatement semicolon |
+  keywordStatement semicolon |
+  assignmentStatement semicolon |
+  compoundStatement |
+  incrementStatement semicolon |
+  decrementStatement semicolon
+}
+
+assignmentStatement {
+  lhsExpression (assign | compoundAssignmentOperator) expression |
+  Underscore assign expression
+}
+
+compoundAssignmentOperator {
+  AddAssign |
+  SubAssign |
+  MulAssign |
+  DivAssign |
+  ModAssign |
+  AndAssign |
+  XorAssign |
+  OrAssign |
+  LeftAssign |
+  RightAssign 
+}
+
+incrementStatement { lhsExpression Inc }
+decrementStatement { lhsExpression Dec }
+
+ifStatement { k<'if'> parenExpression compoundStatement (k<'else'> elseStatement)? }
+elseStatement { compoundStatement | ifStatement }
+
+switchStatement { k<'switch'> parenExpression '{' switchBody+ '}' }
+switchBody {
+  k<'case'> caseSelectors colon '{' caseBody? '}' |
+  k<'default'> colon '{' caseBody? '}'
+}
+
+caseSelectors { (constLiteral comma)* constLiteral comma? }
+
+caseBody {
+  statement caseBody? |
+  k<'fallthrough'> semicolon
+}
+
+loopStatement { k<'loop'> '{' statement* continuingStatement? '}' }
+forStatement { k<'for'> '(' forHeader '}' compoundStatement }
+forHeader { forInit? semicolon expression? semicolon forUpdate? }
+forInit { variableStatement | assignmentStatement | funcCallStatement }
+forUpdate { incrementStatement | decrementStatement | assignmentStatement | funcCallStatement }
+
+continuingStatement { k<'continuing'> compoundStatement }
+returnStatement { k<'return'> expression? }
+keywordStatement { (k<'break'> | k<'continue'> | k<'discard'>) }
+
+funcCallStatement { Identifier argumentExpressionList }
+
+
+
+expression {
+  relationalExpression |
+  shortCircuitOrExpression OrOr relationalExpression |
+  shortCircuitAndExpression AndAnd relationalExpression |
+  binaryAndExpression And unaryExpression |
+  binaryOrExpression Or unaryExpression |
+  binaryXorExpression Xor unaryExpression
+}
+
+constExpression {
+  typeDeclaration '(' ((constExpression comma)* constExpression comma?)? ')' |
+  constLiteral
+}
+
+primaryExpression {
+  Reserved |
+  Identifier ~conflict argumentExpressionList? |
+  typeDeclaration argumentExpressionList |
+  constLiteral |
+  parenExpression |
+  k<'bitcast'> Lt typeDeclaration Gt parenExpression
+}
+
+parenExpression { '(' expression ')' }
+argumentExpressionList { '(' ((expression comma)* expression comma?)? ')' }
+
+postfixExpression {
+  LeftBracket expression RightBracket postfixExpression? |
+  '.' Identifier postfixExpression?
+}
+
+unaryExpression {
+  singularExpression |
+  Sub unaryExpression |
+  Bang unaryExpression |
+  Tilde unaryExpression |
+  Mul unaryExpression |
+  And unaryExpression
+}
+
+singularExpression { primaryExpression postfixExpression? }
+
+lhsExpression { (Mul | And)* coreLhsExpression postfixExpression? }
+
+coreLhsExpression {
+  Identifier |
+  '(' lhsExpression ')'
+}
+
+multiplicativeExpression {
+  unaryExpression |
+  multiplicativeExpression Mul unaryExpression |
+  multiplicativeExpression Div unaryExpression |
+  multiplicativeExpression Mod unaryExpression
+}
+
+additiveExpression {
+  multiplicativeExpression |
+  additiveExpression Add multiplicativeExpression |
+  additiveExpression Sub multiplicativeExpression
+}
+
+shiftExpression {
+  additiveExpression |
+  unaryExpression Left unaryExpression |
+  unaryExpression Right unaryExpression
+}
+
+relationalExpression {
+  shiftExpression |
+  shiftExpression Lt shiftExpression |
+  shiftExpression Gt shiftExpression |
+  shiftExpression Lte shiftExpression |
+  shiftExpression Gte shiftExpression |
+  shiftExpression Eq shiftExpression |
+  shiftExpression Neq shiftExpression
+}
+ 
+shortCircuitAndExpression {
+  relationalExpression |
+  shortCircuitAndExpression AndAnd relationalExpression
+}
+
+shortCircuitOrExpression {
+  relationalExpression |
+  shortCircuitOrExpression OrOr relationalExpression
+}
+
+binaryOrExpression {
+  unaryExpression |
+  binaryOrExpression Or unaryExpression
+}
+
+binaryAndExpression {
+  unaryExpression |
+  binaryAndExpression And unaryExpression
+}
+
+binaryXorExpression {
+  unaryExpression |
+  binaryXorExpression Xor unaryExpression
+}
+
+
+
+attribute {
+  at Identifier (
+    '(' (literalOrIdentifier comma)* literalOrIdentifier ')'
+  )?
+}
+
+literalOrIdentifier {
+  IntLiteral |
+  UintLiteral |
+  FloatLiteral |
+  Identifier
+}
+
+constLiteral {
+  IntLiteral |
+  UintLiteral |
+  FloatLiteral |
+  k<'true'> |
+  k<'false'>
+}
+
+elementCountExpression {
+  IntLiteral |
+  UintLiteral |
+  Identifier
+}
+
+addressSpace {
+  k<'function'> |
+  k<'private'> |
+  k<'workgroup'> |
+  k<'uniform'> |
+  k<'storage'>
+}
+
+accessMode {
+  k<'read'> |
+  k<'write'> |
+  k<'read_write'>
+}
+
+typeDeclaration {
+  Identifier ~conflict |
+  t<'bool'> |
+  t<'f32'> |
+  t<'i32'> |
+  t<'u32'> |
+  t<'vec2'> Lt typeDeclaration Gt |
+  t<'vec3'> Lt typeDeclaration Gt |
+  t<'vec4'> Lt typeDeclaration Gt |
+  t<'ptr'> Lt addressSpace comma typeDeclaration (comma accessMode)? Gt |
+  arrayTypeDeclaration |
+  t<'mat2x2'> Lt typeDeclaration Gt |
+  t<'mat2x3'> Lt typeDeclaration Gt |
+  t<'mat2x4'> Lt typeDeclaration Gt |
+  t<'mat3x2'> Lt typeDeclaration Gt |
+  t<'mat3x3'> Lt typeDeclaration Gt |
+  t<'mat3x4'> Lt typeDeclaration Gt |
+  t<'mat4x2'> Lt typeDeclaration Gt |
+  t<'mat4x3'> Lt typeDeclaration Gt |
+  t<'mat4x4'> Lt typeDeclaration Gt |
+  t<'atomic'> Lt typeDeclaration Gt |
+  textureSamplerTypes
+}
+
+arrayTypeDeclaration { t<'array'> Lt typeDeclaration (comma elementCountExpression)? Gt }
+
+textureSamplerTypes {
+  samplerType |
+  depthTextureType |
+  sampledTextureType Lt typeDeclaration Gt |
+  multisampledTextureType Lt typeDeclaration Gt |
+  storageTextureType Lt texelFormat comma accessMode Gt
+}
+
+samplerType {
+  t<'sampler'> |
+  t<'sampler_comparison'>
+}
+
+sampledTextureType {
+  t<'texture_1d'> |
+  t<'texture_2d'> |
+  t<'texture_2d_array'> |
+  t<'texture_3d'> |
+  t<'texture_cube'> |
+  t<'texture_cube_array'>
+}
+
+multisampledTextureType { k<'texture_multisampled_2d'> }
+storageTextureType {
+  t<'texture_storage_1d'> |
+  t<'texture_storage_2d'> |
+  t<'texture_storage_2d_array'> |
+  t<'texture_storage_3d'>
+}
+
+depthTextureType {
+  k<'texture_depth_2d'> |
+  k<'texture_depth_2d_array'> |
+  k<'texture_depth_cube'> |
+  k<'texture_depth_cube_array'> |
+  k<'texture_depth_multisampled_2d'>
+}
+
+texelFormat {
+  t<'rgba8unorm'> |
+  t<'rgba8snorm'> |
+  t<'rgba8uint'> |
+  t<'rgba8sint'> |
+  t<'rgba16uint'> |
+  t<'rgba16sint'> |
+  t<'rgba16float'> |
+  t<'r32uint'> |
+  t<'r32sint'> |
+  t<'r32float'> |
+  t<'rg32uint'> |
+  t<'rg32sint'> |
+  t<'rg32float'> |
+  t<'rgba32uint'> |
+  t<'rgba32sint'> |
+  t<'rgba32float'>
+}
+
+
+
+@tokens {
+  space { std.whitespace+ }
+  commentLine { "//" ![\n]* }
+  commentOpen { "/*" }
+
+  Identifier { $[a-zA-Z_] $[0-9a-zA-Z] $[0-9a-zA-Z_]* | $[a-zA-Z] $[0-9a-zA-Z_]* }
+ 
+  IntLiteral { "-"? "0" $[xX] $[0-9a-fA-F]+ | "0" | "-"? $[1-9] $[0-9]* }
+  UintLiteral { "0" $[xX] $[0-9a-fA-F]+ "u" | "0u" | $[1-9] $[0-9]* "u" }
+  FloatLiteral { 
+    (
+      ("-"? $[0-9]* "." $[0-9]+ | "-"? $[0-9]+ "." $[0-9]*)
+      ($[eE] $[+\-]? $[0-9]+)?
+      "f"?
+    ) |
+    (
+      "-"? $[0-9]+
+      $[eE] $[+\-]? $[0-9]+
+      "f"?
+    ) |
+    (
+      "-"? "0" $[xX]
+      (
+        (
+          (
+            $[0-9a-fA-F]* "." $[0-9a-fA-F]+ |
+            $[0-9a-fA-F]+ "." $[0-9a-fA-F]*
+          )
+          (
+            $[pP] $[+\-]? $[0-9]+ "f"?
+          )?
+        ) |
+        (
+          $[0-9a-fA-F]+ $[pP] $[+\-]? $[0-9]+ "f"?
+        )
+      )
+    )
+  }
+ 
+  comma { "," }
+  colon { ":" }
+  semicolon { ";" }
+  at { "@" }
+  arrow { "->" }
+
+  assign { "=" }
+  AddAssign { "+=" }
+  SubAssign { "-=" }
+  MulAssign { "*=" }
+  DivAssign { "/=" }
+  ModAssign { "%=" }
+  LeftAssign { "<<=" }
+  RightAssign { ">>=" }
+  AndAssign { "&=" }
+  XorAssign { "^=" }
+  OrAssign { "|=" }
+
+  Underscore { "_" }
+
+  Add { "+" }
+  Sub { "-" }
+  Mul { "*" }
+  Div { "/" }
+  Mod { "%" }
+  Left { "<<" }
+  Right { ">>" }
+  And { "&" }
+  Xor { "^" }
+  Or { "|" }
+
+  AndAnd { "&&" }
+  OrOr { "||" }
+  
+  Inc { "++" }
+  Dec { "--" }
+  Bang { "!" }
+  Tilde { "~" }
+
+  Eq { "==" }
+  Neq { "!=" }
+  Lt { "<" }
+  Lte { "<=" }
+  Gt { ">" }
+  Gte { ">=" }
+
+  LeftBracket { "[" }
+  RightBracket { "]" }
+
+  @precedence {
+    commentLine, Div,
+    FloatLiteral, UintLiteral, IntLiteral, Sub,
+    Underscore, Identifier
+  }
+}
+
+Reserved {
+  r<'asm'> |
+  r<'bf16'> |
+  r<'const'> |
+  r<'do'> |
+  r<'enum'> |
+  r<'f16'> |
+  r<'f64'> |
+  r<'handle'> |
+  r<'i8'> |
+  r<'i16'> |
+  r<'i64'> |
+  r<'mat'> |
+  r<'premerge'> |
+  r<'regardless'> |
+  r<'typedef'> |
+  r<'u8'> |
+  r<'u16'> |
+  r<'u64'> |
+  r<'unless'> |
+  r<'using'> |
+  r<'vec'> |
+  r<'void'> |
+  r<'while'>
+}

@@ -28,7 +28,9 @@
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
     "build": "yarn run build:grammar && yarn run build:js && yarn run build:types && yarn run build:pkg",
-    "build:grammar": "yarn run lezer-generator src/grammar/glsl.grammar -o src/grammar/glsl.js",
+    "build:grammar": "yarn run build:grammar:glsl && yarn run build:grammar:wgsl",
+    "build:grammar:glsl": "yarn run lezer-generator src/glsl/grammar/glsl.grammar -o src/glsl/grammar/glsl.js",
+    "build:grammar:wgsl": "yarn run lezer-generator src/wgsl/grammar/wgsl.grammar -o src/wgsl/grammar/wgsl.js",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/shader/src --extensions \".ts,.js\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel glsl.ts --out-dir ../../build/packages/shader --extensions \".ts\"",
     "build:pkg": "cp README.md package.json ../../build/packages/shader"

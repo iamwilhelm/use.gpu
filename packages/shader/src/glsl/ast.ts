@@ -18,7 +18,7 @@ import {
   ShakeOp,
   RefFlags as RF,
 } from '../types';
-import * as T from '../grammar/glsl.terms';
+import * as T from './grammar/glsl.terms';
 import { GLSL_NATIVE_TYPES } from '../constants';
 import { parseString } from '../util/bundle';
 import { getProgramHash } from '../util/hash';

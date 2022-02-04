@@ -3,7 +3,7 @@ import { Tree, SyntaxNode } from '@lezer/common';
 
 import { makeASTParser, compressAST, decompressAST } from './ast';
 import { getProgramHash, makeKey } from '../util/hash';
-import { parser } from '../grammar/glsl';
+import { parser } from './grammar/glsl';
 import { PREFIX_VIRTUAL } from '../constants';
 import LRU from 'lru-cache';
 

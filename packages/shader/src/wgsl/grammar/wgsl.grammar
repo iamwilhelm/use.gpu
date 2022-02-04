@@ -10,6 +10,7 @@ d<term> { @specialize[@name={term}]<Identifier, term> }
 r<term> { @specialize[@name={term}]<Identifier, term> }
 
 comment { commentLine | commentOpen untilCommentClose }
+template<content> { '<' content '>' }
 
 globalDirective {
   EnableDirective
@@ -17,11 +18,11 @@ globalDirective {
 
 globalDeclaration {
   semicolon |
-  globalVariableDeclaration semicolon |
-  globalConstantDeclaration semicolon |
-  typeAliasDeclaration semicolon |
-  structDeclaration |
-  functionDeclaration
+  GlobalVariableDeclaration semicolon |
+  GlobalConstantDeclaration semicolon |
+  TypeAliasDeclaration semicolon |
+  StructDeclaration |
+  FunctionDeclaration
 }
 
 
@@ -32,39 +33,36 @@ EnableDirective {
 
 
 
-globalVariableDeclaration {
-  attribute* variableDeclaration (assign constExpression)?
+GlobalVariableDeclaration {
+  AttributeList VariableDeclaration (assign constExpression)?
 }
 
-globalConstantDeclaration {
-  k<'let'> (Identifier variableIdentifierDeclaration) assign constExpression |
-  (
-    attribute* k<'override'> (
-      Identifier |
-      variableIdentifierDeclaration
-    ) (assign expression)?
-  )
+GlobalConstantDeclaration {
+  k<'let'> VariableIdentifier assign constExpression |
+  AttributeList k<'override'> VariableIdentifier (assign expression)?
 }
 
-typeAliasDeclaration { k<'type'> Identifier assign typeDeclaration }
+TypeAliasDeclaration { k<'type'> Identifier assign TypeDeclaration }
 
-structDeclaration { k<'struct'> Identifier structBodyDeclaration }
-structBodyDeclaration { '{' structMember* '}' }
-structMember { attribute* variableIdentifierDeclaration semicolon }
+StructDeclaration { k<'struct'> Identifier StructBodyDeclaration }
+StructBodyDeclaration { '{' (StructMember)* '}' }
+StructMember { AttributeList variableIdentifierDeclaration semicolon }
 
-functionDeclaration { attribute* functionHeader compoundStatement }
-functionHeader { k<'fn'> Identifier '(' paramList? ')' (arrow attribute* typeDeclaration)? }
+FunctionDeclaration { AttributeList functionHeader compoundStatement }
+functionHeader { k<'fn'> Identifier '(' paramList? ')' (arrow AttributeList TypeDeclaration)? }
 
 paramList { (param comma)* param comma? }
-param { attribute* variableIdentifierDeclaration }
+param { AttributeList variableIdentifierDeclaration }
 
-variableDeclaration { k<'var'> variableQualifier (Identifier | variableIdentifierDeclaration) }
-variableQualifier { Lt addressSpace (comma accessMode)? Gt }
-variableIdentifierDeclaration { Identifier colon typeDeclaration }
+VariableIdentifier { Identifier | variableIdentifierDeclaration }
+
+VariableDeclaration { k<'var'> VariableQualifier? VariableIdentifier }
+VariableQualifier { Lt addressSpace (comma accessMode)? Gt }
+variableIdentifierDeclaration { Identifier colon TypeDeclaration }
 
 variableStatement {
-  variableDeclaration (assign expression)? |
-  k<'let'> (Identifier | variableIdentifierDeclaration) assign expression
+  VariableDeclaration (assign expression)? |
+  k<'let'> VariableIdentifier assign expression
 }
 
 compoundStatement { '{' statement* '}' }
@@ -146,17 +144,17 @@ expression {
 }
 
 constExpression {
-  typeDeclaration '(' ((constExpression comma)* constExpression comma?)? ')' |
+  TypeDeclaration '(' ((constExpression comma)* constExpression comma?)? ')' |
   constLiteral
 }
 
 primaryExpression {
   Reserved |
   Identifier ~conflict argumentExpressionList? |
-  typeDeclaration argumentExpressionList |
+  TypeDeclaration argumentExpressionList |
   constLiteral |
   parenExpression |
-  k<'bitcast'> Lt typeDeclaration Gt parenExpression
+  k<'bitcast'> Lt TypeDeclaration Gt parenExpression
 }
 
 parenExpression { '(' expression ')' }
@@ -239,7 +237,7 @@ binaryXorExpression {
   binaryXorExpression Xor unaryExpression
 }
 
-
+AttributeList { attribute* }
 
 attribute {
   at Identifier (
@@ -282,37 +280,37 @@ accessMode {
   k<'read_write'>
 }
 
-typeDeclaration {
+TypeDeclaration {
   Identifier ~conflict |
   t<'bool'> |
   t<'f32'> |
   t<'i32'> |
   t<'u32'> |
-  t<'vec2'> Lt typeDeclaration Gt |
-  t<'vec3'> Lt typeDeclaration Gt |
-  t<'vec4'> Lt typeDeclaration Gt |
-  t<'ptr'> Lt addressSpace comma typeDeclaration (comma accessMode)? Gt |
+  t<'vec2'> template<TypeDeclaration> |
+  t<'vec3'> template<TypeDeclaration> |
+  t<'vec4'> template<TypeDeclaration> |
+  t<'ptr'> template<addressSpace comma TypeDeclaration (comma accessMode)?> |
   arrayTypeDeclaration |
-  t<'mat2x2'> Lt typeDeclaration Gt |
-  t<'mat2x3'> Lt typeDeclaration Gt |
-  t<'mat2x4'> Lt typeDeclaration Gt |
-  t<'mat3x2'> Lt typeDeclaration Gt |
-  t<'mat3x3'> Lt typeDeclaration Gt |
-  t<'mat3x4'> Lt typeDeclaration Gt |
-  t<'mat4x2'> Lt typeDeclaration Gt |
-  t<'mat4x3'> Lt typeDeclaration Gt |
-  t<'mat4x4'> Lt typeDeclaration Gt |
-  t<'atomic'> Lt typeDeclaration Gt |
+  t<'mat2x2'> template<TypeDeclaration> |
+  t<'mat2x3'> template<TypeDeclaration> |
+  t<'mat2x4'> template<TypeDeclaration> |
+  t<'mat3x2'> template<TypeDeclaration> |
+  t<'mat3x3'> template<TypeDeclaration> |
+  t<'mat3x4'> template<TypeDeclaration> |
+  t<'mat4x2'> template<TypeDeclaration> |
+  t<'mat4x3'> template<TypeDeclaration> |
+  t<'mat4x4'> template<TypeDeclaration> |
+  t<'atomic'> template<TypeDeclaration> |
   textureSamplerTypes
 }
 
-arrayTypeDeclaration { t<'array'> Lt typeDeclaration (comma elementCountExpression)? Gt }
+arrayTypeDeclaration { t<'array'> Lt TypeDeclaration (comma elementCountExpression)? Gt }
 
 textureSamplerTypes {
   samplerType |
   depthTextureType |
-  sampledTextureType Lt typeDeclaration Gt |
-  multisampledTextureType Lt typeDeclaration Gt |
+  sampledTextureType Lt TypeDeclaration Gt |
+  multisampledTextureType Lt TypeDeclaration Gt |
   storageTextureType Lt texelFormat comma accessMode Gt
 }
 
@@ -369,7 +367,7 @@ texelFormat {
 
 @tokens {
   space { std.whitespace+ }
-  commentLine { "//" ![\n]* }
+  commentLine { "//" ![\n\r\v\f]* }
   commentOpen { "/*" }
 
   Identifier { $[a-zA-Z_] $[0-9a-zA-Z] $[0-9a-zA-Z_]* | $[a-zA-Z] $[0-9a-zA-Z_]* }

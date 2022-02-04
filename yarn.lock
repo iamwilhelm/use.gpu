@@ -1332,23 +1332,35 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@lezer/common@^0.15.0", "@lezer/common@^0.15.8":
+"@lezer/common@^0.15.0":
   version "0.15.9"
   resolved "https://registry.yarnpkg.com/@lezer/common/-/common-0.15.9.tgz#0aab74ad14d2690fb09f83d5a05bd6039ad812f3"
   integrity sha512-N86tOY/g9pZQuKbmUjL4TQTegm4/34TZXxp1TYYFGdd9Rnhd9RPjQ3zp4q5qp/2qs4xlF4Dheg19K+JqAtvZxg==
 
-"@lezer/generator@^0.15.2":
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/@lezer/generator/-/generator-0.15.2.tgz#10fa8fab58a561c2bd2a27d7b4f20b1080c6cb6c"
-  integrity sha512-nxY6TTj0ZAcAvg1zEeaZnt1xODdyPhD0lTaPOgcGOVFHhwwx0Oz7CxZB7Rh+xRCXFr5kJWDtM1uXPp80UZjhAg==
+"@lezer/common@^0.15.11":
+  version "0.15.11"
+  resolved "https://registry.yarnpkg.com/@lezer/common/-/common-0.15.11.tgz#965b5067036305f12e8a3efc344076850be1d3a8"
+  integrity sha512-vv0nSdIaVCRcJ8rPuDdsrNVfBOYe/4Szr/LhF929XyDmBndLDuWiCCHooGlGlJfzELyO608AyDhVsuX/ZG36NA==
+
+"@lezer/generator@^0.15.4":
+  version "0.15.4"
+  resolved "https://registry.yarnpkg.com/@lezer/generator/-/generator-0.15.4.tgz#8a5546eefc65968bed28b4e377460f2f7297bbc5"
+  integrity sha512-9bBwU2TzKMBQ6OCEDevuMNWGOBKlkq5YIGEhjrz9pb3MLb+oYYR4dVFZ7ehwLcDoSecsSA7PdlAy0thJO5pt2w==
   dependencies:
     "@lezer/common" "^0.15.0"
     "@lezer/lr" "^0.15.0"
 
-"@lezer/lr@^0.15.0", "@lezer/lr@^0.15.4":
+"@lezer/lr@^0.15.0":
   version "0.15.4"
   resolved "https://registry.yarnpkg.com/@lezer/lr/-/lr-0.15.4.tgz#634670d7224040fddac1370af01211eecd9ac0a0"
   integrity sha512-vwgG80sihEGJn6wJp6VijXrnzVai/KPva/OzYKaWvIx0IiXKjoMQ8UAwcgpSBwfS4Fbz3IKOX/cCNXU3r1FvpQ==
+  dependencies:
+    "@lezer/common" "^0.15.0"
+
+"@lezer/lr@^0.15.7":
+  version "0.15.7"
+  resolved "https://registry.yarnpkg.com/@lezer/lr/-/lr-0.15.7.tgz#e7e6a8a106c6474b4586a66a3e60ba85f1faf368"
+  integrity sha512-rmUukgyKSm6xzXO4cK5hkpX3+ZTHF+bHDkEuhofAVUTS3J23YytUxGWsrDwBVvGbhvxW87kheb2mRYHRwKacDQ==
   dependencies:
     "@lezer/common" "^0.15.0"
 

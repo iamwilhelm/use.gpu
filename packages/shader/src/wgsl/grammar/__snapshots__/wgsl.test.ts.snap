@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WGSL grammar snapshots parses a test program 1`] = `
+Program                                                     ⮐ var foo: f32 = 1.0;⮐ 
+  AttributeList                                             
+  GlobalVariableDeclaration                                 ⮐ var foo: f32 = 1.0
+    VariableDeclaration                                     var foo: f32
+      var                                                   var
+      VariableIdentifier                                    foo: f32
+        Identifier                                          foo
+        TypeDeclaration                                     f32
+          f32                                               f32
+    FloatLiteral                                            1.0
+`;
+
+exports[`WGSL grammar snapshots parses a test program 2`] = `
+Program                                                     ⮐ let WAT = true;⮐ 
+  GlobalConstantDeclaration                                 let WAT = true
+    let                                                     let
+    VariableIdentifier                                      WAT
+      Identifier                                            WAT
+    true                                                    true
+`;
+
+exports[`WGSL grammar snapshots parses a test program 3`] = `
+Program                                                     ⮐ struct light {⮐  intensity: f32;⮐  position: vec3<f32>;⮐ };⮐ 
+  StructDeclaration                                         struct light {⮐  intensity: f32;⮐  position: vec3<f32>;⮐ }
+    struct                                                  struct
+    Identifier                                              light
+    AttributeList                                           
+    StructMember                                            intensity: f32;
+      Identifier                                            intensity
+      TypeDeclaration                                       f32
+        f32                                                 f32
+    AttributeList                                           
+    StructMember                                            position: vec3<f32>;
+      Identifier                                            position
+      TypeDeclaration                                       vec3<f32>
+        vec3                                                vec3
+        TypeDeclaration                                     f32
+          f32                                               f32
+`;
+
+exports[`WGSL grammar snapshots parses a test program 4`] = `
+Program                                                     ⮐ fn main() {}⮐ 
+  AttributeList                                             
+  FunctionDeclaration                                       ⮐ fn main() {}
+    fn                                                      fn
+    Identifier                                              main
+`;
+
+exports[`WGSL grammar snapshots parses a test program 5`] = `
+Program                                                     ⮐ @external fn main() {}⮐ 
+  FunctionDeclaration                                       @external fn main() {}
+    AttributeList                                           @external
+      Identifier                                            external
+    fn                                                      fn
+    Identifier                                              main
+`;

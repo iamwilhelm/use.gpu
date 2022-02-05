@@ -1,4 +1,4 @@
-import  { ParsedBundle, ParsedModule } from '../types';
+import { ParsedBundle, ParsedModule } from '../types';
 
 const NO_LIBS = {};
 

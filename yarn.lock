@@ -1357,10 +1357,10 @@
   dependencies:
     "@lezer/common" "^0.15.0"
 
-"@lezer/lr@^0.15.7":
-  version "0.15.7"
-  resolved "https://registry.yarnpkg.com/@lezer/lr/-/lr-0.15.7.tgz#e7e6a8a106c6474b4586a66a3e60ba85f1faf368"
-  integrity sha512-rmUukgyKSm6xzXO4cK5hkpX3+ZTHF+bHDkEuhofAVUTS3J23YytUxGWsrDwBVvGbhvxW87kheb2mRYHRwKacDQ==
+"@lezer/lr@^0.15.8":
+  version "0.15.8"
+  resolved "https://registry.yarnpkg.com/@lezer/lr/-/lr-0.15.8.tgz#1564a911e62b0a0f75ca63794a6aa8c5dc63db21"
+  integrity sha512-bM6oE6VQZ6hIFxDNKk8bKPa14hqFrV07J/vHGOeiAbJReIaQXmkVb6xQu4MR+JBTLa5arGRyAAjJe1qaQt3Uvg==
   dependencies:
     "@lezer/common" "^0.15.0"
 

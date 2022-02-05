@@ -2,8 +2,8 @@
 
 exports[`WGSL grammar snapshots parses a test program 1`] = `
 Program                                                     ⮐ var foo: f32 = 1.0;⮐ 
-  AttributeList                                             
   GlobalVariableDeclaration                                 ⮐ var foo: f32 = 1.0
+    AttributeList                                           
     VariableDeclaration                                     var foo: f32
       var                                                   var
       VariableIdentifier                                    foo: f32
@@ -23,37 +23,354 @@ Program                                                     ⮐ let WAT = true;�
 `;
 
 exports[`WGSL grammar snapshots parses a test program 3`] = `
-Program                                                     ⮐ struct light {⮐  intensity: f32;⮐  position: vec3<f32>;⮐ };⮐ 
-  StructDeclaration                                         struct light {⮐  intensity: f32;⮐  position: vec3<f32>;⮐ }
+Program                                                     ⮐ struct light {⮐   intensity: f32;⮐   position: vec3<f32>;⮐ };⮐ 
+  StructDeclaration                                         struct light {⮐   intensity: f32;⮐   position: vec3<f32>;⮐ }
     struct                                                  struct
     Identifier                                              light
-    AttributeList                                           
-    StructMember                                            intensity: f32;
-      Identifier                                            intensity
-      TypeDeclaration                                       f32
-        f32                                                 f32
-    AttributeList                                           
-    StructMember                                            position: vec3<f32>;
-      Identifier                                            position
-      TypeDeclaration                                       vec3<f32>
-        vec3                                                vec3
+    StructBodyDeclaration                                   {⮐   intensity: f32;⮐   position: vec3<f32>;⮐ }
+      StructMember                                          ⮐   intensity: f32;
+        AttributeList                                       
+        Identifier                                          intensity
         TypeDeclaration                                     f32
           f32                                               f32
+      StructMember                                          ⮐   position: vec3<f32>;
+        AttributeList                                       
+        Identifier                                          position
+        TypeDeclaration                                     vec3<f32>
+          vec3                                              vec3
+          TypeDeclaration                                   f32
+            f32                                             f32
 `;
 
 exports[`WGSL grammar snapshots parses a test program 4`] = `
 Program                                                     ⮐ fn main() {}⮐ 
-  AttributeList                                             
   FunctionDeclaration                                       ⮐ fn main() {}
-    fn                                                      fn
-    Identifier                                              main
+    AttributeList                                           
+    FunctionHeader                                          fn main()
+      fn                                                    fn
+      Identifier                                            main
+    CompoundStatement                                       {}
 `;
 
 exports[`WGSL grammar snapshots parses a test program 5`] = `
 Program                                                     ⮐ @external fn main() {}⮐ 
   FunctionDeclaration                                       @external fn main() {}
     AttributeList                                           @external
-      Identifier                                            external
-    fn                                                      fn
-    Identifier                                              main
+      Attribute                                             @external
+        Identifier                                          external
+    FunctionHeader                                          fn main()
+      fn                                                    fn
+      Identifier                                            main
+    CompoundStatement                                       {}
+`;
+
+exports[`WGSL grammar snapshots parses a test program 6`] = `
+Program                                                     ⮐ struct A {⮐   @location(0) x: f32;⮐   @location(1) y: f32;⮐ }⮐ ⮐ @stage(fragment)⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }⮐ 
+  StructDeclaration                                         struct A {⮐   @location(0) x: f32;⮐   @location(1) y: f32;⮐ }
+    struct                                                  struct
+    Identifier                                              A
+    StructBodyDeclaration                                   {⮐   @location(0) x: f32;⮐   @location(1) y: f32;⮐ }
+      StructMember                                          @location(0) x: f32;
+        AttributeList                                       @location(0)
+          Attribute                                         @location(0)
+            Identifier                                      location
+            IntLiteral                                      0
+        Identifier                                          x
+        TypeDeclaration                                     f32
+          f32                                               f32
+      StructMember                                          @location(1) y: f32;
+        AttributeList                                       @location(1)
+          Attribute                                         @location(1)
+            Identifier                                      location
+            IntLiteral                                      1
+        Identifier                                          y
+        TypeDeclaration                                     f32
+          f32                                               f32
+  FunctionDeclaration                                       @stage(fragment)⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }
+    AttributeList                                           @stage(fragment)
+      Attribute                                             @stage(fragment)
+        Identifier                                          stage
+        Identifier                                          fragment
+    FunctionHeader                                          fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32>
+      fn                                                    fn
+      Identifier                                            fragShader
+      ParamList                                             in1: A, @location(2) in2: f32
+        Param                                               in1: A
+          AttributeList                                     
+          Identifier                                        in1
+          TypeDeclaration                                   A
+            Identifier                                      A
+        Param                                               @location(2) in2: f32
+          AttributeList                                     @location(2)
+            Attribute                                       @location(2)
+              Identifier                                    location
+              IntLiteral                                    2
+          Identifier                                        in2
+          TypeDeclaration                                   f32
+            f32                                             f32
+      AttributeList                                         @location(0)
+        Attribute                                           @location(0)
+          Identifier                                        location
+          IntLiteral                                        0
+      TypeDeclaration                                       vec4<f32>
+        vec4                                                vec4
+        TypeDeclaration                                     f32
+          f32                                               f32
+    CompoundStatement                                       {⮐ }
+`;
+
+exports[`WGSL grammar snapshots parses a test program 7`] = `
+Program                                                     ⮐ let foo: f32 = 1.0;⮐ let WAT = true;⮐ struct s { x: i32; };⮐ fn main() -> @builtin vec4<f32> {⮐   var bar: i32 = wat(5, 6);⮐   let x: i32 = 4 + 5 + -6 + (-7);⮐   return vec4<f32>(0.1, 0.2, 0.3, 1.0);⮐ }⮐ 
+  GlobalConstantDeclaration                                 let foo: f32 = 1.0
+    let                                                     let
+    VariableIdentifier                                      foo: f32
+      Identifier                                            foo
+      TypeDeclaration                                       f32
+        f32                                                 f32
+    FloatLiteral                                            1.0
+  GlobalConstantDeclaration                                 let WAT = true
+    let                                                     let
+    VariableIdentifier                                      WAT
+      Identifier                                            WAT
+    true                                                    true
+  StructDeclaration                                         struct s { x: i32; }
+    struct                                                  struct
+    Identifier                                              s
+    StructBodyDeclaration                                   { x: i32; }
+      StructMember                                           x: i32;
+        AttributeList                                       
+        Identifier                                          x
+        TypeDeclaration                                     i32
+          i32                                               i32
+  FunctionDeclaration                                       ⮐ fn main() -> @builtin vec4<f32> {⮐   var bar: i32 = wat(5, 6);⮐   let x: i32 = 4 + 5 + -6 + (-7);⮐   return vec4<f32>(0.1, 0.2, 0.3, 1.0);⮐ }
+    AttributeList                                           
+    FunctionHeader                                          fn main() -> @builtin vec4<f32>
+      fn                                                    fn
+      Identifier                                            main
+      AttributeList                                         @builtin
+        Attribute                                           @builtin
+          Identifier                                        builtin
+      TypeDeclaration                                       vec4<f32>
+        vec4                                                vec4
+        TypeDeclaration                                     f32
+          f32                                               f32
+    CompoundStatement                                       {⮐   var bar: i32 = wat(5, 6);⮐   let x: i32 = 4 + 5 + -6 + (-7);⮐   return vec4<f32>(0.1, 0.2, 0.3, 1.0);⮐ }
+      Statement                                             var bar: i32 = wat(5, 6);
+        VariableDeclaration                                 var bar: i32
+          var                                               var
+          VariableIdentifier                                bar: i32
+            Identifier                                      bar
+            TypeDeclaration                                 i32
+              i32                                           i32
+        TypeDeclaration                                     wat
+          Identifier                                        wat
+        IntLiteral                                          5
+        IntLiteral                                          6
+      Statement                                             let x: i32 = 4 + 5 + -6 + (-7);
+        let                                                 let
+        VariableIdentifier                                  x: i32
+          Identifier                                        x
+          TypeDeclaration                                   i32
+            i32                                             i32
+        IntLiteral                                          4
+        Add                                                 +
+        IntLiteral                                          5
+        Add                                                 +
+        IntLiteral                                          -6
+        Add                                                 +
+        IntLiteral                                          -7
+      Statement                                             return vec4<f32>(0.1, 0.2, 0.3, 1.0);
+        return                                              return
+        TypeDeclaration                                     vec4<f32>
+          vec4                                              vec4
+          TypeDeclaration                                   f32
+            f32                                             f32
+        FloatLiteral                                        0.1
+        FloatLiteral                                        0.2
+        FloatLiteral                                        0.3
+        FloatLiteral                                        1.0
+`;
+
+exports[`WGSL grammar snapshots parses a test program 8`] = `
+Program                                                     ⮐ fn main() {⮐   let x: i32 = 1;⮐   let y: i32 = 2;⮐   if (x) { if (y) { } } else { }⮐   if (x) { if (y) { } else { } }⮐ }⮐ 
+  FunctionDeclaration                                       ⮐ fn main() {⮐   let x: i32 = 1;⮐   let y: i32 = 2;⮐   if (x) { if (y) { } } else { }⮐   if (x) { if (y) { } else { } }⮐ }
+    AttributeList                                           
+    FunctionHeader                                          fn main()
+      fn                                                    fn
+      Identifier                                            main
+    CompoundStatement                                       {⮐   let x: i32 = 1;⮐   let y: i32 = 2;⮐   if (x) { if (y) { } } else { }⮐   if (x) { if (y) { } else { } }⮐ }
+      Statement                                             let x: i32 = 1;
+        let                                                 let
+        VariableIdentifier                                  x: i32
+          Identifier                                        x
+          TypeDeclaration                                   i32
+            i32                                             i32
+        IntLiteral                                          1
+      Statement                                             let y: i32 = 2;
+        let                                                 let
+        VariableIdentifier                                  y: i32
+          Identifier                                        y
+          TypeDeclaration                                   i32
+            i32                                             i32
+        IntLiteral                                          2
+      Statement                                             if (x) { if (y) { } } else { }
+        if                                                  if
+        Identifier                                          x
+        CompoundStatement                                   { if (y) { } }
+          Statement                                         if (y) { }
+            if                                              if
+            Identifier                                      y
+            CompoundStatement                               { }
+        else                                                else
+        CompoundStatement                                   { }
+      Statement                                             if (x) { if (y) { } else { } }
+        if                                                  if
+        Identifier                                          x
+        CompoundStatement                                   { if (y) { } else { } }
+          Statement                                         if (y) { } else { }
+            if                                              if
+            Identifier                                      y
+            CompoundStatement                               { }
+            else                                            else
+            CompoundStatement                               { }
+`;
+
+exports[`WGSL grammar snapshots parses a test program 9`] = `
+Program                                                     ⮐ fn main() {⮐   let x: i32 = 1;⮐   /*⮐ 		/*⮐ 	  let y: i32 = 2;⮐ 		*/⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }⮐ 
+  FunctionDeclaration                                       ⮐ fn main() {⮐   let x: i32 = 1;⮐   /*⮐ 		/*⮐ 	  let y: i32 = 2;⮐ 		*/⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }
+    AttributeList                                           
+    FunctionHeader                                          fn main()
+      fn                                                    fn
+      Identifier                                            main
+    CompoundStatement                                       {⮐   let x: i32 = 1;⮐   /*⮐ 		/*⮐ 	  let y: i32 = 2;⮐ 		*/⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }
+      Statement                                             let x: i32 = 1;
+        let                                                 let
+        VariableIdentifier                                  x: i32
+          Identifier                                        x
+          TypeDeclaration                                   i32
+            i32                                             i32
+        IntLiteral                                          1
+      Statement                                             wat();
+        Identifier                                          wat
+`;
+
+exports[`WGSL grammar snapshots parses a test program 10`] = `
+Program                                                     ⮐ import {MeshVertex} from 'use/types';⮐ import {viewUniforms as view, worldToClip} from 'use/view';⮐ import {getQuadUV} from 'geometry/quad';⮐ ⮐ import 'test';⮐ ⮐ @optional @external fn getInt() -> i32 {}⮐ ⮐ @export fn main() {}⮐ 
+  ImportDeclaration                                         import {MeshVertex} from 'use/types'
+    import                                                  import
+    ImportDeclarationList                                   {MeshVertex}
+      ImportDeclarationIdentifier                           MeshVertex
+        Identifier                                          MeshVertex
+    String                                                  'use/types'
+  ImportDeclaration                                         import {viewUniforms as view, worldToClip} from 'use/view'
+    import                                                  import
+    ImportDeclarationList                                   {viewUniforms as view, worldToClip}
+      ImportDeclarationIdentifier                           viewUniforms as view
+        Identifier                                          viewUniforms
+        Identifier                                          view
+      ImportDeclarationIdentifier                           worldToClip
+        Identifier                                          worldToClip
+    String                                                  'use/view'
+  ImportDeclaration                                         import {getQuadUV} from 'geometry/quad'
+    import                                                  import
+    ImportDeclarationList                                   {getQuadUV}
+      ImportDeclarationIdentifier                           getQuadUV
+        Identifier                                          getQuadUV
+    String                                                  'geometry/quad'
+  ImportDeclaration                                         import 'test'
+    import                                                  import
+    String                                                  'test'
+  FunctionDeclaration                                       @optional @external fn getInt() -> i32 {}
+    AttributeList                                           @optional @external
+      Attribute                                             @optional
+        Identifier                                          optional
+      Attribute                                             @external
+        Identifier                                          external
+    FunctionHeader                                          fn getInt() -> i32
+      fn                                                    fn
+      Identifier                                            getInt
+      AttributeList                                         
+      TypeDeclaration                                       i32
+        i32                                                 i32
+    CompoundStatement                                       {}
+  FunctionDeclaration                                       @export fn main() {}
+    AttributeList                                           @export
+      Attribute                                             @export
+        Identifier                                          export
+    FunctionHeader                                          fn main()
+      fn                                                    fn
+      Identifier                                            main
+    CompoundStatement                                       {}
+`;
+
+exports[`WGSL grammar snapshots parses a test program 11`] = `
+Program                                                     ⮐ fn getQuad(vertex: i32) -> MeshVertex {⮐   let uv: vec2<f32> = getQuadUV(vertex);⮐   let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);⮐   let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);⮐   return MeshVertex(position, color, uv);⮐ }⮐ 
+  FunctionDeclaration                                       ⮐ fn getQuad(vertex: i32) -> MeshVertex {⮐   let uv: vec2<f32> = getQuadUV(vertex);⮐   let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);⮐   let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);⮐   return MeshVertex(position, color, uv);⮐ }
+    AttributeList                                           
+    FunctionHeader                                          fn getQuad(vertex: i32) -> MeshVertex
+      fn                                                    fn
+      Identifier                                            getQuad
+      ParamList                                             vertex: i32
+        Param                                               vertex: i32
+          AttributeList                                     
+          Identifier                                        vertex
+          TypeDeclaration                                   i32
+            i32                                             i32
+      AttributeList                                         
+      TypeDeclaration                                       MeshVertex
+        Identifier                                          MeshVertex
+    CompoundStatement                                       {⮐   let uv: vec2<f32> = getQuadUV(vertex);⮐   let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);⮐   let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);⮐   return MeshVertex(position, color, uv);⮐ }
+      Statement                                             let uv: vec2<f32> = getQuadUV(vertex);
+        let                                                 let
+        VariableIdentifier                                  uv: vec2<f32>
+          Identifier                                        uv
+          TypeDeclaration                                   vec2<f32>
+            vec2                                            vec2
+            TypeDeclaration                                 f32
+              f32                                           f32
+        TypeDeclaration                                     getQuadUV
+          Identifier                                        getQuadUV
+        Identifier                                          vertex
+      Statement                                             let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);
+        let                                                 let
+        VariableIdentifier                                  position: vec4<f32>
+          Identifier                                        position
+          TypeDeclaration                                   vec4<f32>
+            vec4                                            vec4
+            TypeDeclaration                                 f32
+              f32                                           f32
+        TypeDeclaration                                     vec4<f32>
+          vec4                                              vec4
+          TypeDeclaration                                   f32
+            f32                                             f32
+        Identifier                                          uv
+        Mul                                                 *
+        FloatLiteral                                        2.0
+        Sub                                                 -
+        FloatLiteral                                        1.0
+        FloatLiteral                                        0.0
+        FloatLiteral                                        1.0
+      Statement                                             let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);
+        let                                                 let
+        VariableIdentifier                                  color: vec4<f32>
+          Identifier                                        color
+          TypeDeclaration                                   vec4<f32>
+            vec4                                            vec4
+            TypeDeclaration                                 f32
+              f32                                           f32
+        TypeDeclaration                                     vec4<f32>
+          vec4                                              vec4
+          TypeDeclaration                                   f32
+            f32                                             f32
+        FloatLiteral                                        1.0
+        FloatLiteral                                        0.0
+        FloatLiteral                                        1.0
+        FloatLiteral                                        1.0
+      Statement                                             return MeshVertex(position, color, uv);
+        return                                              return
+        TypeDeclaration                                     MeshVertex
+          Identifier                                        MeshVertex
+        Identifier                                          position
+        Identifier                                          color
+        Identifier                                          uv
 `;

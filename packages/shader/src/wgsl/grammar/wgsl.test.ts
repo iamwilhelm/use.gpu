@@ -60,47 +60,54 @@ fn main() {}
 @external fn main() {}
 `,
 
-/*
 //////////////////////////////////////////////////////////////////////
 
 `
-layout(location = 0) in wat;
-layout(location = 0) in wat1, wat2;
-layout(location = 1) in vec2;
-`,
+struct A {
+  @location(0) x: f32;
+  @location(1) y: f32;
+}
 
-//////////////////////////////////////////////////////////////////////
-
-`
-float foo = 1.0;
-#define WAT
-void main() {
-  int bar = wat(5, 6);
-  int x = 4 + 5 + +6;
-  struct s { } x;
-  gl_FragColor = vec4(0.1, 0.2, 0.3, 1.0);
+@stage(fragment)
+fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {
 }
 `,
 
 //////////////////////////////////////////////////////////////////////
 
 `
-void main() {
-  int x = 1;
-  int y = 2;
-  if (x) if (y) { } else { }
+let foo: f32 = 1.0;
+let WAT = true;
+struct s { x: i32; };
+fn main() -> @builtin vec4<f32> {
+  var bar: i32 = wat(5, 6);
+  let x: i32 = 4 + 5 + -6 + (-7);
+  return vec4<f32>(0.1, 0.2, 0.3, 1.0);
 }
 `,
 
 //////////////////////////////////////////////////////////////////////
 
 `
-void main() {
-  int x = 1;
-  / *
-  int y = 2;
-  if (x) if (y) { } else { }
-  * /
+fn main() {
+  let x: i32 = 1;
+  let y: i32 = 2;
+  if (x) { if (y) { } } else { }
+  if (x) { if (y) { } else { } }
+}
+`,
+
+//////////////////////////////////////////////////////////////////////
+
+`
+fn main() {
+  let x: i32 = 1;
+  /*
+		/*
+	  let y: i32 = 2;
+		*/
+  if (x) { if (y) { } else { } }
+  */
   wat();
 }
 `,
@@ -108,31 +115,29 @@ void main() {
 //////////////////////////////////////////////////////////////////////
 
 `
-#pragma import {MeshVertex} from 'use/types'
-#pragma import {viewUniforms as view, worldToClip} from 'use/view'
-#pragma import {getQuadUV} from 'geometry/quad'
+import {MeshVertex} from 'use/types';
+import {viewUniforms as view, worldToClip} from 'use/view';
+import {getQuadUV} from 'geometry/quad';
 
-#pragma import 'test'
+import 'test';
 
-#ifdef DEF
-#pragma optional
-int getInt();
-#endif
+@optional @external fn getInt() -> i32 {}
 
-#pragma export
-void main();
+@export fn main() {}
 `,
 
 //////////////////////////////////////////////////////////////////////
 
 `
-MeshVertex getQuad(int vertex) {
-  vec2 uv = getQuadUV(vertex);
-  vec4 position = vec4(uv * 2.0 - 1.0, 0.0, 1.0);
-  vec4 color = vec4(1.0, 0.0, 1.0, 1.0);
+fn getQuad(vertex: i32) -> MeshVertex {
+  let uv: vec2<f32> = getQuadUV(vertex);
+  let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);
+  let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);
   return MeshVertex(position, color, uv);
 }
 `,
+
+/*
 
 //////////////////////////////////////////////////////////////////////
 

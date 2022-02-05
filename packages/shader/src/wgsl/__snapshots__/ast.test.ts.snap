@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ast gets quad vertex imports 1`] = `
+Array [
+  Object {
+    "at": 0,
+    "imports": Array [
+      Object {
+        "imported": "MeshVertex",
+        "name": "MeshVertex",
+      },
+    ],
+    "name": "use/types",
+    "symbols": Array [
+      "MeshVertex",
+    ],
+  },
+  Object {
+    "at": 0,
+    "imports": Array [
+      Object {
+        "imported": "viewUniforms",
+        "name": "view",
+      },
+      Object {
+        "imported": "worldToClip",
+        "name": "worldToClip",
+      },
+    ],
+    "name": "use/view",
+    "symbols": Array [
+      "view",
+      "worldToClip",
+    ],
+  },
+  Object {
+    "at": 0,
+    "imports": Array [
+      Object {
+        "imported": "getQuadUV",
+        "name": "getQuadUV",
+      },
+    ],
+    "name": "geometry/quad",
+    "symbols": Array [
+      "getQuadUV",
+    ],
+  },
+  Object {
+    "at": 0,
+    "imports": Array [],
+    "name": "test",
+    "symbols": Array [],
+  },
+]
+`;

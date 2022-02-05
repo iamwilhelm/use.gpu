@@ -1,4 +1,4 @@
-import { ParsedModule, ParsedBundle, ShaderModule, CompressedNode, ShaderDefine, DataBinding, UniformAttribute } from '../types';
+import { ParsedModule, ParsedBundle, ShaderModule, CompressedNode, ShaderDefine, DataBinding, UniformAttribute } from './types';
 
 import { defineConstants, loadStaticModule, loadVirtualModule } from './shader';
 import { compressAST, decompressAST } from './ast';

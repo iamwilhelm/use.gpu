@@ -64,7 +64,7 @@ Param { AttributeList variableIdentifierDeclaration }
 VariableIdentifier { Identifier | variableIdentifierDeclaration }
 
 VariableDeclaration { k<'var'> VariableQualifier? VariableIdentifier }
-VariableQualifier { Lt addressSpace (comma accessMode)? Gt }
+VariableQualifier { template<addressSpace (comma accessMode)?> }
 variableIdentifierDeclaration { Identifier colon TypeDeclaration }
 
 variableStatement {
@@ -161,7 +161,7 @@ primaryExpression {
   TypeDeclaration argumentExpressionList |
   constLiteral |
   parenExpression |
-  k<'bitcast'> Lt TypeDeclaration Gt parenExpression
+  k<'bitcast'> template<TypeDeclaration> parenExpression
 }
 
 parenExpression { '(' expression ')' }
@@ -311,14 +311,14 @@ TypeDeclaration {
   textureSamplerTypes
 }
 
-arrayTypeDeclaration { t<'array'> Lt TypeDeclaration (comma elementCountExpression)? Gt }
+arrayTypeDeclaration { t<'array'> template<TypeDeclaration> (comma elementCountExpression)? Gt }
 
 textureSamplerTypes {
   samplerType |
   depthTextureType |
-  sampledTextureType Lt TypeDeclaration Gt |
-  multisampledTextureType Lt TypeDeclaration Gt |
-  storageTextureType Lt texelFormat comma accessMode Gt
+  sampledTextureType template<TypeDeclaration> |
+  multisampledTextureType template<TypeDeclaration> |
+  storageTextureType template<texelFormat comma accessMode>
 }
 
 samplerType {

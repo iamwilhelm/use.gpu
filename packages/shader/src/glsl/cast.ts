@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
+import { UniformAttribute, ShaderModule, ParsedBundle } from './types';
 import { loadVirtualModule } from './shader';
 import { getProgramHash } from '../util/hash';
 import { toBundle } from '../util/bundle';

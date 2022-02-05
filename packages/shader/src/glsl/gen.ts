@@ -1,4 +1,4 @@
-import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from '../types';
+import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types';
 
 import { loadVirtualModule } from './shader';
 import { PREFIX_VIRTUAL } from '../constants';

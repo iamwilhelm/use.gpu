@@ -17,9 +17,9 @@ import {
   ShakeTable,
   ShakeOp,
   RefFlags as RF,
-} from '../types';
+} from './types';
 import * as T from './grammar/glsl.terms';
-import { GLSL_NATIVE_TYPES } from '../constants';
+import { GLSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
 import { getProgramHash } from '../util/hash';
 import { getChildNodes, hasErrorNode, formatAST, formatASTNode } from '../util/tree';

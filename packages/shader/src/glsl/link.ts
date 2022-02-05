@@ -1,5 +1,5 @@
 import { Tree } from '@lezer/common';
-import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF, DataBinding } from '../types';
+import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF, DataBinding } from './types';
 
 import { parseShader, defineConstants, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
 import { rewriteUsingAST, resolveShakeOps } from './ast';
@@ -7,7 +7,8 @@ import { makeUniformBlock } from './gen';
 import { parseBundle, parseLinkAliases } from '../util/bundle';
 import { getGraphOrder } from '../util/tree';
 
-import { GLSL_VERSION, VIRTUAL_BINDGROUP } from '../constants';
+import { VIRTUAL_BINDGROUP } from '../constants';
+import { GLSL_VERSION } from './constants';
 import * as T from './grammar/glsl.terms';
 import mapValues from 'lodash/mapValues';
 

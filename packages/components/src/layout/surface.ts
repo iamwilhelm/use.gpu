@@ -4,7 +4,7 @@ import { TextureSource } from '@use-gpu/core/types';
 import { use, yeet, useContext, useNoContext } from '@use-gpu/live';
 import { LayoutContext } from '../providers/layout-provider';
 import { LayerType } from '../layers/types';
-import { Rectangle } from '../layout/types';
+import { Rectangle, Fit, Repeat, Anchor, Point4 } from './types';
 
 import { Rectangles } from '../layers';
 

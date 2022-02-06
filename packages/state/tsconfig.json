@@ -1,8 +1,5 @@
 {
   "extends": "../../tsconfig.pkg.json",
-  "references": [
-    { "path": "../core" },
-  ],
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "src",

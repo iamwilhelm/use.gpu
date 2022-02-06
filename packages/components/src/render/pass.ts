@@ -13,7 +13,7 @@ export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
 const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
-export const Pass: LiveComponent<PassProps> = memo((props) => {
+export const Pass: LiveComponent<PassProps> = memo((props: PassProps) => {
   const {children, render} = props;
 
   return multiGather(children ?? (render ? render() : null), Resume);

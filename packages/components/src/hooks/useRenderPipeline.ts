@@ -18,7 +18,7 @@ export const makePipelineCache = (options: Record<string, any> = {}) => new LRU<
   ...options,
 });
 
-const CACHE = new WeakMap<RenderContext, LRU<RenderShader, any>>();
+const CACHE = new WeakMap<any, LRU<string, any>>();
 
 export const useRenderPipeline = (
   renderContext: CanvasRenderingContextGPU,
@@ -39,7 +39,7 @@ export const useRenderPipeline = (
     }
 
     const [vertex, fragment] = shader;
-    const key = vertex.hash + fragment.hash;
+    const key = vertex.hash.toString() + fragment.hash.toString();
     const cached = cache.get(key);
     if (cached) {
       DEBUG && console.log('pipeline cache hit', key)

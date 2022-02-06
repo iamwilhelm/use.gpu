@@ -8,7 +8,8 @@ import { ShaderModule } from '@use-gpu/shader/types';
 
 import { RawQuads } from '../geometry/raw-quads';
 
-import { use, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
+import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { linkBundle, bindBundle, bindingToModule, bindingsToLinks, resolveBindings, castTo } from '@use-gpu/shader/glsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 
@@ -57,7 +58,7 @@ export type PointsProps = {
 
 const SIZE_BINDING = { name: 'getSize', format: 'float', value: 1, args: ['int'] } as UniformAttributeValue;
 
-export const Points: LiveComponent<PointsProps> = memo((props) => {
+export const Points: LiveComponent<PointsProps> = memo((props: PointsProps) => {
   const {
     position,
     positions,
@@ -87,7 +88,7 @@ export const Points: LiveComponent<PointsProps> = memo((props) => {
     const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, s));
     return castTo(getSizeFloat, 'vec2', 'xx');
   }, [s]);
-  const getMask = MASK_SHADER[shape] ?? MASK_SHADER[PointShape.Circle];
+  const getMask = (MASK_SHADER as any)[shape] ?? MASK_SHADER[PointShape.Circle];
 
   return use(RawQuads)({
     position,

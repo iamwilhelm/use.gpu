@@ -10,7 +10,8 @@ import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
-import { use, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
+import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -39,7 +40,7 @@ export type RawQuadsProps = {
   getTexture?: ShaderModule,
 
   count?: number,
-  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
+  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
 };
@@ -69,9 +70,9 @@ const PIPELINE = {
     topology: 'triangle-strip',
     stripIndexFormat: 'uint16',
   },
-};
+} as DeepPartial<GPURenderPipelineDescriptor>;
 
-export const RawQuads: LiveComponent<RawQuadsProps> = memo((props) => {
+export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,

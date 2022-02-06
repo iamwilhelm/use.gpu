@@ -1,11 +1,11 @@
 import { SyntaxNode, TreeCursor, Tree } from '@lezer/common';
 import {
-	/*
+  ModuleRef,
+  ImportRef,
+  /*
   CompressedNode,
   SymbolTable,
   SymbolRef,
-  ModuleRef,
-  ImportRef,
   PrototypeRef,
   FunctionRef,
   DeclarationRef,
@@ -18,7 +18,7 @@ import {
   ShakeTable,
   ShakeOp,
   RefFlags as RF,
-	*/
+  */
 } from '../types';
 import * as T from './grammar/wgsl.terms';
 //import { GLSL_NATIVE_TYPES } from '../constants';
@@ -71,15 +71,6 @@ export const makeASTParser = (code: string, tree: Tree) => {
   const getImports = (): ModuleRef[] => {
     const modules: Record<string, ImportRef[]> = {};
 
-		/*
-	  ImportDeclaration                                         import {MeshVertex} from 'use/types'
-	    import                                                  import
-	    ImportDeclarationList                                   {MeshVertex}
-	      ImportDeclarationIdentifier                           MeshVertex
-	        Identifier                                          MeshVertex
-	    String                                                  'use/types'
-		*/
-
     const children = tree.topNode.getChildren(T.ImportDeclaration);
     for (const child of children) {
       const [, a, b] = getNodes(child);
@@ -110,6 +101,67 @@ export const makeASTParser = (code: string, tree: Tree) => {
     });
     return out;
   }
+
+  /*
+  const getDeclaration = (node: SyntaxNode): DeclarationRef => {
+    const [a] = getNodes(node);
+    const flags = getFlags(node);
+    const at = node.from;
+
+    if (a.type.id === T.FunctionPrototype) {
+      const prototype = getPrototype(a);
+      const {name} = prototype;
+
+      const symbols = [name];
+      const identifiers = getIdentifiers(node, symbols);
+
+      return {at, symbols, identifiers, flags, prototype};
+    }
+    if (a.type.id === T.VariableDeclaration) {
+      const variable = getVariable(a);
+
+      const symbols = variable.locals.map(({name}) => name);
+      const {type} = variable;
+      if (!GLSL_NATIVE_TYPES.has(type.name)) symbols.push(type.name);
+
+      const identifiers = getIdentifiers(node, symbols);
+
+      return {at, symbols, identifiers, flags, variable};
+    }
+    if (a.type.id === T.QualifiedStructDeclaration) {
+      const struct = getQualifiedStruct(a);
+      const {name, type} = struct;
+
+      const symbols = [name];
+
+      if (type.name === name) {
+        // Struct is anonymous, members are global
+        for (const {name, type} of struct.struct.members) {
+          symbols.push(name);
+          if (!GLSL_NATIVE_TYPES.has(type.name)) symbols.push(type.name);
+        }
+      }
+      else if (
+        !GLSL_NATIVE_TYPES.has(type.name)
+      ) {
+        // Custom type
+        symbols.push(type.name);
+      }
+
+      const identifiers = getIdentifiers(node, symbols);
+
+      return {at, symbols, identifiers, flags, struct};
+    }
+    if (a.type.id === T.QualifiedDeclaration) {
+      const variable = getQualifiedDeclaration(a);
+      const {type} = variable;
+      const symbols = [type.name];
+      return {at, symbols, identifiers: [], flags};
+    }
+    
+    throw throwError('declaration', node);
+  };
+  */
 
   return {
     getImports,

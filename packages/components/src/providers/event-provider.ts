@@ -30,7 +30,7 @@ export type MouseState = {
   y: number,
 };
 
-export const EventProvider: LiveComponent<EventProviderProps> = memo(({element, children}) => {
+export const EventProvider: LiveComponent<EventProviderProps> = memo(({element, children}: EventProviderProps) => {
   const dpi = window.devicePixelRatio;
   const {sampleTexture} = useContext(PickingContext);
 

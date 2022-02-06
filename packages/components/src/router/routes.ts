@@ -19,7 +19,7 @@ type Matcher = {
 
 export type RoutesProps = {
   base?: string,
-  routes?: Record<string, Route>,
+  routes?: Record<string, Route> | null,
 };
 
 const NO_PATH = '';
@@ -33,14 +33,14 @@ const joinPath = (a: string, b: string) => {
 const escapeName = (s: string) => s.replace(/[^A-Za-z0-9_-]*/g, '');
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-const Outlet: LiveComponent<any> = () => {
+const Outlet = () => {
   const context = useContext(RouteContext);
   return context.routes ? use(Routes)(context) : null;
 }
 
 const USE_OUTLET = use(Outlet)();
 
-export const Routes: LiveComponent<RoutesProps> = memo((props) => {
+export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
   const {
     routes,
     base = NO_PATH,
@@ -60,7 +60,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((props) => {
 
       matchers.push({
         regexp,
-        element,
+        element: element ?? null,
         base: fullPath,
         routes: rs,
       });

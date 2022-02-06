@@ -46,6 +46,3 @@ export type LayoutResult = {
   results?: LayoutResult[],
   render?: (layout: LayoutState) => LiveElement<any>,
 };
-
-export type LayoutGenerator = (layout: LayoutState) => LayoutResult;
-export type LayoutResolver = (layout: LayoutState, ls: LayoutHandler[]) => LayoutResult;

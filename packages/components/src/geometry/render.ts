@@ -25,11 +25,11 @@ export type RenderProps = {
   vertexCount: number,
   instanceCount: number,
 
-  vertex: ShaderModule,
-  fragment: ShaderModule,
+  vertex: ParsedBundle,
+  fragment: ParsedBundle,
 
   defines: Record<string, any>,
-  deps: any[],
+  deps: any[] | null,
 };
 
 export const render = (props: RenderProps) => {
@@ -85,7 +85,7 @@ export const render = (props: RenderProps) => {
   // Rendering pipeline
   const pipeline = useRenderPipeline(
     renderContext,
-    shader,
+    shader as any,
     propPipeline,
   );
 

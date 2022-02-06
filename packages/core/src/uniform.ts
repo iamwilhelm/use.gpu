@@ -94,7 +94,7 @@ export const makeTextureUniforms = (
   device: GPUDevice,
   pipeline: GPURenderPipeline | GPUComputePipeline,
   sampler: GPUSampler,
-  texture: GPUTexture,
+  texture: GPUTexture | GPUTextureView,
   set: number = 0,
 ): ResourceAllocation => {
   if (texture instanceof GPUTexture) texture = makeTextureView(texture);

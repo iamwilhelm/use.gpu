@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { ElementStyle, LayoutState, LayoutResult, Margin, Rectangle, Point } from './types';
+import { TextureSource } from '@use-gpu/core/types';
+import { LayoutState, LayoutResult, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from './types';
 
 import { use, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { parseDimension, normalizeMargin } from './lib/util';
@@ -9,16 +10,16 @@ import { Surface } from './surface';
 export type ElementProps = {
   width?: Dimension,
   height?: Dimension,
-  margin?: number | Point4,
-  radius?: number | Point4,
-  border?: number | Point4,
+  margin?: Margin | number,
+  radius?: Margin | number,
+  border?: Margin | number,
   stroke?: Point4,
   fill?: Point4,
 
-  backgroundImage?: TextureSource,
-  backgroundFit?: Fit,
-  backgroundRepeat?: Repeat,
-  backgroundAlign?: Anchor | [Anchor, Anchor],
+  image?: TextureSource,
+  imageFit?: Fit,
+  imageRepeat?: Repeat,
+  imageAlign?: Anchor | [Anchor, Anchor],
 
   grow?: number,
   shrink?: number,
@@ -27,7 +28,7 @@ export type ElementProps = {
   children?: LiveElement<any>,
 };
 
-export const Element: LiveComponent<BlockProps> = (props) => {
+export const Element: LiveComponent<ElementProps> = (props) => {
   const {
     width,
     height,
@@ -40,7 +41,8 @@ export const Element: LiveComponent<BlockProps> = (props) => {
     imageRepeat,
     imageAlign,
 
-    borderColor,
+    stroke,
+    fill,
 
     grow = 0,
     shrink = 0,
@@ -64,7 +66,7 @@ export const Element: LiveComponent<BlockProps> = (props) => {
     margin,
     grow,
     shrink,
-    fit: (into: Point): Point => {
+    fit: (into: Point) => {
       const w = width != null ? parseDimension(width, into[0], snap) : into[0];
       const h = height != null ? parseDimension(height, into[1], snap) : into[1];
       const size = [w, h];
@@ -73,8 +75,8 @@ export const Element: LiveComponent<BlockProps> = (props) => {
         use(Surface, fiber.id)({
           layout,
 
-          fill: [Math.random(), Math.random(), Math.random(), Math.random() + .5],
           stroke: [Math.random(), Math.random(), Math.random(), Math.random() + .5],
+          fill: [Math.random(), Math.random(), Math.random(), Math.random() + .5],
           border,
           radius,
 

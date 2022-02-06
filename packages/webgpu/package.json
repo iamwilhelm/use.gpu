@@ -5,7 +5,7 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
-  "peerDependencies": {
+  "dependencies": {
     "@use-gpu/core": "*",
     "@use-gpu/live": "*"
   },

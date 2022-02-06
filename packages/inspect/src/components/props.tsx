@@ -65,11 +65,11 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   let history = null as React.ReactNode | null;
   let parent = fiber;
   if (parent.by) {
-    const parents = [] as LiveFiber<any>;
+    const parents = [] as LiveFiber<any>[];
     while (parent) {
       const {by} = parent;
-      parent = fibers.get(by);
-      if (parent) parents.push(parent);
+      const source = fibers.get(by);
+      if (source) parents.push(source);
     }
     history = parents.map((fiber) => <div key={fiber.id}>{formatNode(fiber)}</div>)  }
   else {

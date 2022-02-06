@@ -1,11 +1,11 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode } from '@use-gpu/core/types';
+import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core/types';
 import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawSourceTexture, makeMultiUniforms,
   makeRenderPipeline, makeShaderModule, makeSampler, makeTextureUniforms,
-  uploadBuffer, uploadRawTexture,
+  uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle } from '@use-gpu/shader/glsl';
 
@@ -29,13 +29,13 @@ const LIGHT = [-2.5, 3, 2, 1];
 
 export type MeshProps = {
   mesh: VertexData,
-  texture: RawTexture,
+  texture: DataTexture,
   mode?: RenderPassMode,
   id?: number,
   blink?: boolean,
 };
 
-export const Mesh: LiveComponent<MeshProps> = memo((props) => {
+export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const {
     mesh,
     texture,
@@ -61,7 +61,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props) => {
 
   const sourceTexture = useMemo(() => {
     const t = makeRawSourceTexture(device, texture);
-    uploadRawTexture(device, t, texture);
+    uploadDataTexture(device, t, texture);
     return t;
   }, [device, texture]);
 

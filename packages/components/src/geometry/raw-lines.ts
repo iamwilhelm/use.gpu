@@ -10,7 +10,8 @@ import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
-import { use, yeet, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
+import { use, yeet, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -38,7 +39,7 @@ export type RawLinesProps = {
 
   join?: 'miter' | 'round' | 'bevel',
 
-  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
+  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode,
   id?: number,
 };
@@ -57,22 +58,22 @@ const LINE_JOIN_SIZE = {
   'bevel': 1,
   'miter': 2,
   'round': 4,
-};
+} as Record<string, number>;
 
 const LINE_JOIN_STYLE = {
   'bevel': 0,
   'miter': 1,
   'round': 2,
-};
+} as Record<string, number>;
 
 const PIPELINE = {
   primitive: {
     topology: 'triangle-strip',
     stripIndexFormat: 'uint16',
   },
-};
+} as DeepPartial<GPURenderPipelineDescriptor>;
 
-export const RawLines: LiveComponent<RawLinesProps> = memo((props) => {
+export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,

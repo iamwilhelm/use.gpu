@@ -103,9 +103,9 @@ fn main() {
 fn main() {
   let x: i32 = 1;
   /*
-		/*
-	  let y: i32 = 2;
-		*/
+    /*
+    let y: i32 = 2;
+    */
   if (x) { if (y) { } else { } }
   */
   wat();

@@ -8,7 +8,8 @@ import { ShaderModule } from '@use-gpu/shader/types';
 
 import { UIRectangles } from '../geometry/ui-rectangles';
 
-import { use, memo, patch, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
+import { use, memo, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { linkBundle, bindBundle, bindingToModule, bindingsToLinks, resolveBindings, castTo } from '@use-gpu/shader/glsl';
 import { makeShaderBinding, makeShaderBindings, makeDataArray, makeStorageBuffer } from '@use-gpu/core';
 

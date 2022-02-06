@@ -1,7 +1,6 @@
 import {
   UniformType, UniformAttribute, UniformAttributeValue,
-  ResolvedDataBindings, ResolvedCodeBindings,
-  ShaderModuleDescriptor, StorageSource, DataBinding,
+  ShaderModuleDescriptor, StorageSource, DataBinding, TextureSource,
 } from './types';
 import { makeStorageAccessors, checkStorageTypes, checkStorageType } from './storage';
 import { makeShaderModule } from './pipeline';

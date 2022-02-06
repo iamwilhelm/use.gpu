@@ -1,4 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
+import { TextureSource } from '@use-gpu/core/types';
 
 import { use, gather, resume, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
@@ -27,7 +28,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
             gather([
               use(RawTexture)({ data: texture }),
-            ], resume(([source]) =>
+            ], resume(([source]: [TextureSource]) =>
 
               use(Flat)({
                 children:
@@ -60,7 +61,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
                                     }),
 
                                     use(Flex)({
-                                      alignX: 'between',
+                                      align: ['between', 'start'],
                                       children: [
                                         use(Element)({ width: 200, height: 100 }),
                                         use(Element)({ width: 300, height: 100, margin: 30, shrink: 1 }),

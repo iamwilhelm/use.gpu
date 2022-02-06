@@ -19,7 +19,7 @@ export type AutoCanvasProps = {
   backgroundColor?: GPUColor,
   samples?: number,
 
-  render: (context: CanvasRenderingContextGPU) => LiveElement<any>,
+  children: LiveElement<any>,
 }
 
 export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) =>

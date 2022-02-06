@@ -103,7 +103,7 @@ export const makeProjectionMatrix = (
   }
   else {
     // Orthogonal matrix
-    const s = focus * Math.tan(fov / 2);
+    const s = radius * Math.tan(fov / 2);
     matrix = makeOrthogonalMatrix(-aspect * s, aspect * s, -s, s, near, far);
   }
 

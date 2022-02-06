@@ -137,7 +137,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
     const select  = () => updateSelectState({ $set: fiber });
     const hover   = () => updateHoverState({ $set: {
       fiber,
-      deps: host.invalidate(fiber),
+      deps: host ? host.invalidate(fiber) : [],
       root,
     } });
     const unhover = () => updateHoverState({ $set: {
@@ -233,7 +233,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
     return (
       <Expandable id={id} expandCursor={expandCursor}>{
         (expand, onToggle) => (<>
-          <TreeRow indent={indent + !!continuation}>
+          <TreeRow indent={indent + +!!continuation}>
             <TreeExpand expand={expand} onToggle={onToggle} openIcon={openIcon} closedIcon={closedIcon}>
               {nodeRender}
             </TreeExpand>

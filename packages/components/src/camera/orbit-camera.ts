@@ -21,8 +21,6 @@ const DEFAULT_ORBIT_CAMERA = {
 };
 
 export type OrbitCameraProps = {
-  width: number,
-  height: number,
   phi: number,
   theta: number,
   radius: number,

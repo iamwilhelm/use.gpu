@@ -24,7 +24,7 @@ export type VirtualProps = {
   getFragment: ShaderModule,
 
   defines: Record<string, any>,
-  deps: any[],
+  deps: any[] | null,
 };
 
 const getDebugShader = (topology: GPUPrimitiveTopology) => {
@@ -34,7 +34,7 @@ const getDebugShader = (topology: GPUPrimitiveTopology) => {
   return instanceDrawWireframeStrip;
 }
 
-export const Virtual: LiveComponent<VirtualProps> = memo((props) => {
+export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
   const {
     getVertex,
     getFragment,

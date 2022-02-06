@@ -1,7 +1,7 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { Point, Rectangle, Gap, Margin, Alignment, Anchor, LayoutRenderer } from '../types';
 
-export const parseDimension = (x: string | number, total: number, snap?: boolean = false): number => {
+export const parseDimension = (x: string | number, total: number, snap: boolean = false): number => {
   if (typeof x === 'number') return snap ? Math.round(x) : x;
 
   let v;

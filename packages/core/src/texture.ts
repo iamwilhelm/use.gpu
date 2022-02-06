@@ -1,4 +1,4 @@
-import { RawTexture } from './types';
+import { DataTexture } from './types';
 import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
 import { makeUniformBindings } from './uniform';
 
@@ -72,9 +72,9 @@ export const makeSourceTexture = (
 
 export const makeRawSourceTexture = (
   device: GPUDevice,
-  rawTexture: RawTexture,
+  dataTexture: DataTexture,
 ) => {
-  const {size, format} = rawTexture;
+  const {size, format} = dataTexture;
   const [w, h, d] = size as Point3;
 
   return makeSourceTexture(device, w, h, d || 1, format, 1);
@@ -82,11 +82,11 @@ export const makeRawSourceTexture = (
 
 export const makeTextureView = (
   texture: GPUTexture,
-  mipLevelCounts: number = 1,
+  mipLevelCount: number = 1,
   baseMipLevel: number = 0,
 ) =>
   texture.createView({
-    mipLevelCounts,
+    mipLevelCount,
     baseMipLevel,
   });
 
@@ -108,12 +108,12 @@ export const makeTextureDataLayout = (
   };
 };
 
-export const uploadRawTexture = (
+export const uploadDataTexture = (
   device: GPUDevice,
   texture: GPUTexture,
-  rawTexture: RawTexture,
+  dataTexture: DataTexture,
 ): void => {
-  const {data, size, format} = rawTexture;
+  const {data, size, format} = dataTexture;
 
   const layout = makeTextureDataLayout(size, format);  
   uploadTexture(device, texture, data, layout, size);

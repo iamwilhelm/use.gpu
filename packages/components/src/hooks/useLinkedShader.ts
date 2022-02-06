@@ -1,4 +1,4 @@
-import { ShaderLanguages } from '@use-gpu/core/types';
+import { ShaderModuleDescriptor, ShaderLanguages } from '@use-gpu/core/types';
 import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
 
 import { resolveBindings, linkBundle } from '@use-gpu/shader/glsl';
@@ -21,7 +21,7 @@ export const useLinkedShader = (
   const {glsl: {compile, cache}} = languages;
 
   // Resolve bindings between vertex and fragment.
-  const s = [vertex, fragment];
+  const s = [vertex, fragment] as [ParsedBundle, ParsedBundle];
   const {modules, uniforms, bindings} = useMemo(() => resolveBindings(s), s);
 
   // Keep static set of bindings
@@ -47,7 +47,7 @@ export const useLinkedShader = (
     ref.uniforms = uniforms;
     ref.bindings = bindings;
 
-    return [vertex, fragment, v, f];
+    return [vertex, fragment, v, f] as [ShaderModuleDescriptor, ShaderModuleDescriptor, string, string];
   }, [...deps ?? NO_DEPS, ...keys]);
 
   // Update bound uniform values in-place from latest

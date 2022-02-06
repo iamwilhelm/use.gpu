@@ -7,7 +7,7 @@ import { use, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/
 import {
   AutoCanvas,
   Loop, Draw, Pass,
-  CompositeData, Data, RawData, Inline,
+  CompositeData, Data, RawData,
   OrbitCamera, OrbitControls,
   AutoPicking, Pick,
   Cursor, Points, Lines,
@@ -45,10 +45,10 @@ export const App: LiveComponent<AppProps> = (props) => {
         "/": {
           routes: {
             "geometry": { element: use(GeometryPage)({ canvas }) },
-            "layout": { element: use(LayoutPage)() },
-            "interact": { element: use(InteractPage)() },
+            "layout": { element: use(LayoutPage)({ }) },
+            "interact": { element: use(InteractPage)({ }) },
             "": { element: use(GeometryPage)({ canvas }) },
-            "*": { element: use(EmptyPage)() },
+            "*": { element: use(EmptyPage)({ }) },
           },
         },
       },

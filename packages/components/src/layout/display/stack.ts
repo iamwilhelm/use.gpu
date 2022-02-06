@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Margin } from './types';
+import { LayoutElement, Point, Dimension, Margin } from '../types';
 
 import { memo, gather, resume, yeet, useFiber, useOne } from '@use-gpu/live';
 import { getStackMinMax, getStackMargin, fitStack } from '../lib/stack';
-import { normalizeMargin, makeBoxLayout } from '../lib/util';
+import { normalizeMargin, makeBoxLayout, parseDimension } from '../lib/util';
 
 export type StackProps = {
   direction?: 'x' | 'y',
@@ -13,20 +13,22 @@ export type StackProps = {
 
   grow?: number,
   shrink?: number,
-  margin?: number | [number, number, number, number],
-  padding?: number | [number, number, number, number],
+  margin?: number | Margin,
+  padding?: number | Margin,
+  snap?: boolean,
 
   element?: LiveElement<any>,
   children?: LiveElement<any>,
 };
 
-export const Stack: LiveComponent<StackProps> = memo((props) => {
+export const Stack: LiveComponent<StackProps> = memo((props: StackProps) => {
   const {
     direction = 'y',
     width,
     height,
     grow = 0,
     shrink = 0,
+    snap = true,
     margin: m = 0,
     padding: p = 0,
     children,
@@ -36,11 +38,11 @@ export const Stack: LiveComponent<StackProps> = memo((props) => {
   const padding = normalizeMargin(p);
 
   const Resume = useOne(() =>
-    makeResume(direction, width, height, grow, shrink, margin, padding),
-    [direction, width, height, grow, shrink, margin, padding]
+    makeResume(direction, width, height, grow, shrink, snap, margin, padding),
+    [direction, width, height, grow, shrink, snap, margin, padding]
   );
 
-  return gather(children, Resume);
+  return children ? gather(children, Resume) : null;
 }, 'Stack');
 
 const makeResume = (
@@ -49,6 +51,7 @@ const makeResume = (
   height: Dimension | undefined,
   grow: number,
   shrink: number,
+  snap: boolean,
   stackMargin: Margin,
   padding: Margin,
 ) =>

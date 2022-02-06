@@ -11,7 +11,8 @@ import { PickingContext, useNoPicking } from '../render/picking';
 import { LayoutContext } from '../providers/layout-provider';
 import { render } from './render';
 
-import { use, memo, patch, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
+import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -45,7 +46,7 @@ export type UIRectanglesProps = {
 
   count?: number,
   
-  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
+  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
 };
@@ -79,9 +80,9 @@ const PIPELINE = {
   depthStencil: {
     depthWriteEnabled: false,
   },
-};
+} as DeepPartial<GPURenderPipelineDescriptor>;
 
-export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props) => {
+export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
   const {
     pipeline: propPipeline,
     mode = RenderPassMode.Opaque,
@@ -90,7 +91,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props) => {
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = props.positions?.length ?? count;
+  const instanceCount = props.rectangles?.length ?? count;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;

@@ -14,6 +14,7 @@ const StyledCall = styled.div`
 
 type CallProps = {
   fiber: LiveFiber<any>,
+  fibers: Map<number, LiveFiber<any>>,
 };
 
 export const Call: React.FC<CallProps> = ({fiber}) => {

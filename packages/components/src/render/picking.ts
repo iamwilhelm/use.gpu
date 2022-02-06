@@ -7,7 +7,7 @@ import {
   DEPTH_STENCIL_FORMAT,
 } from '../constants';
 
-import { RenderContext, RenderProvider } from '../providers';
+import { RenderContext } from '../providers';
 import {
   memo, use, provide, makeContext,
   useMemo, useOne, useNoOne, useResource,

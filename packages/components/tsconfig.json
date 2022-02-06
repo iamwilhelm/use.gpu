@@ -2,9 +2,10 @@
   "extends": "../../tsconfig.pkg.json",
   "references": [
     { "path": "../glsl" },
-    { "path": "../shader" },
+    { "path": "../state" },
     { "path": "../live" },
     { "path": "../core" },
+    { "path": "../shader" },
     { "path": "../webgpu" },
   ],
   "compilerOptions": {

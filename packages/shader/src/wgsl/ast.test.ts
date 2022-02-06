@@ -21,16 +21,16 @@ describe('ast', () => {
 
   it('gets quad vertex imports', () => {
     const code = `
-		import {MeshVertex} from 'use/types';
-		import {viewUniforms as view, worldToClip} from 'use/view';
-		import {getQuadUV} from 'geometry/quad';
+    import {MeshVertex} from 'use/types';
+    import {viewUniforms as view, worldToClip} from 'use/view';
+    import {getQuadUV} from 'geometry/quad';
 
-		import 'test';
+    import 'test';
 
-		@optional @external fn getInt() -> i32 {}
+    @optional @external fn getInt() -> i32 {}
 
-		@export fn main() {}
-		`;
+    @export fn main() {}
+    `;
 
     const tree = parseShader(code);
     const {getImports} = makeGuardedParser(code, tree);
@@ -42,9 +42,9 @@ describe('ast', () => {
   it('gets test declarations', () => {
     const code = `
       var x: f32;
-			var y: f32;
+      var y: f32;
       let a: i32 = 3;
-			override b: i32;
+      override b: i32;
     `;
 
     const tree = parseShader(code);
@@ -54,7 +54,7 @@ describe('ast', () => {
     expect(declarations).toMatchSnapshot();
   });
 
-	/*
+  /*
   it('gets test declarations with array', () => {
     const code = `
       const ivec2 QUAD[] = {
@@ -389,6 +389,6 @@ float getB() {
     expect(table).toMatchSnapshot();
     
   });
-	*/
+  */
 });
 

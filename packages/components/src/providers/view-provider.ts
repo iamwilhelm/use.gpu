@@ -8,10 +8,10 @@ export const ViewContext = makeContext(null, 'ViewContext');
 export type ViewProviderProps = {
   defs: UniformAttribute[],
   uniforms: ViewUniforms,
-  children: LiveElement<any>,
+  children?: LiveElement<any>,
 };
 
-export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props) => {
+export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewProviderProps) => {
   const {defs: viewDefs, uniforms: viewUniforms, children} = props;
   const context = useMemo(() => ({viewDefs, viewUniforms}), [viewDefs, viewUniforms]);
   return provide(ViewContext, context, children);

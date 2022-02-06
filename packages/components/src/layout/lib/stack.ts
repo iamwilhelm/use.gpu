@@ -114,7 +114,7 @@ export const fitStack = (
     const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = into.slice();
+    const size = into.slice() as Point;
     size[0] -= pl + pr;
     size[1] -= pt + pb;
 

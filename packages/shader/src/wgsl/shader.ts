@@ -1,5 +1,5 @@
 import { Tree, SyntaxNode } from '@lezer/common';
-import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler, SymbolTable, VirtualTable } from './types';
+import { ParsedModule, ParsedModuleCache, ShaderDefine, SymbolTable, VirtualTable } from './types';
 
 import { makeASTParser /*, compressAST, decompressAST */ } from './ast';
 import { getProgramHash, makeKey } from '../util/hash';

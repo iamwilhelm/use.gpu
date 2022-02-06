@@ -14,7 +14,7 @@ export type LoopRef = {
   dispatch?: () => void,
 };
 
-const Dispatch = () => (props: LoopRef) => props.children ?? (props.render ? props.render() : null);
+const Dispatch = (props: LoopRef) => props.children ?? (props.render ? props.render() : null);
 
 export const Loop: LiveComponent<LoopProps> = (props) => {
   const {children, render} = props;

@@ -23,12 +23,12 @@ export type RouterAPI = {
 export const RouterContext = makeContext<RouterState>(null, 'RouterContext');
 
 export type RouterProps = {
-  source: any,
+  source?: any,
   children?: LiveElement<any>,
   routes?: Record<string, Route>,
 };
 
-export const Router: LiveComponent<any> = memo(({source, routes, children}) => {
+export const Router: LiveComponent<RouterProps> = memo(({source, routes, children}: RouterProps) => {
   source = source ?? makeBrowserHistory();
 
   const [state, setState] = useState<RouterState>({

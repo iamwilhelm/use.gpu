@@ -7,6 +7,7 @@
   "private": true,
   "dependencies": {
     "@use-gpu/live": "*",
+    "@use-gpu/state": "*",
     "@use-gpu/core": "*",
     "@use-gpu/webgpu": "*",
     "@use-gpu/components": "*",

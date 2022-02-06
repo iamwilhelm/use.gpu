@@ -88,7 +88,7 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
                                 }),
 
                                 use(Flex)({
-                                  alignX: 'between',
+                                  align: ['between', 'start'],
                                   children: [
                                     use(Element)({ radius: [20, 10, 20, 10], border: 12, width: 200, height: 100 }),
                                     use(Element)({ width: 300, border: 4, height: 100, margin: 30, shrink: 1 }),

@@ -6,6 +6,13 @@ export enum LayerType {
   Rectangle = 'rectangle',
 };
 
+export type LayerAggregator = (
+  device: GPUDevice,
+  items: LineAggregate[],
+  keys: Set<string>,
+  count: number,
+) => (items: LineAggregate[]) => void;
+
 export type RectangleAggregate = {
   count: number,
 

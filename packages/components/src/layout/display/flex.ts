@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Margin, Direction, Alignment, Anchor } from './types';
+import { LayoutElement, Margin, Direction, Alignment, Anchor, Point } from '../types';
 
 import { resume, yeet, memo, gather, useOne, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import { makeBoxLayout, normalizeAlignment, normalizeAnchor, normalizeGap } from '../lib/util';
+import { makeBoxLayout, normalizeAlignment, normalizeGap } from '../lib/util';
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
@@ -23,7 +23,7 @@ export type FlexProps = {
   children?: LiveElement<any>,
 };
 
-export const Flex: LiveComponent<BlockProps> = memo((props) => {
+export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const {
     direction = 'x',
     gap: g = 0,
@@ -33,7 +33,6 @@ export const Flex: LiveComponent<BlockProps> = memo((props) => {
     shrink = 1,
     wrap = false,
     snap = true,
-    render,
     children,
   } = props;
 
@@ -45,12 +44,12 @@ export const Flex: LiveComponent<BlockProps> = memo((props) => {
     [direction, gap, align, anchor, grow, shrink, wrap, snap]
   );
 
-  return gather(children, Resume);
+  return children ? gather(children, Resume) : null;
 }, 'Flex');
 
 const makeResume = (
   direction: Direction,
-  gap: number | Point,
+  gap: Point,
   align: [Alignment, Alignment],
   anchor: Anchor,
   grow: number,
@@ -74,4 +73,4 @@ const makeResume = (
         };
       }
     });
-  }, 'Flex');
+  });

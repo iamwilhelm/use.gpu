@@ -1,5 +1,5 @@
 import { LiveElement } from '@use-gpu/live/types';
-import { Point, LayoutElement, LayoutRenderer, Margin, Rectangle, Alignment } from '../types';
+import { LayoutElement, LayoutRenderer, Direction, Point, Margin, Rectangle, Alignment } from '../types';
 
 import { parseAnchor } from './util';
 
@@ -8,12 +8,12 @@ const isNotAbsolute = (el: LayoutElement) => !el.absolute;
 
 export const getFlexMinMax = (
   els: LayoutElement[],
-  direction: 'x' | 'y',
+  direction: Direction,
   gap: Point,
   wrap: boolean,
   snap: boolean,
 ) => {
-  const isX = direction === 'x';
+  const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
   const [gapX, gapY] = gap;
 
   let allMinX = 0;
@@ -83,7 +83,7 @@ export const getFlexMinMax = (
 export const fitFlex = (
   els: LayoutElement[],
   into: Point,
-  direction: 'x' | 'y',
+  direction: Direction,
   gap: Point,
   alignX: 'start' | 'center' | 'end' | 'justify' | 'between' | 'evenly',
   alignY: 'start' | 'center' | 'end' | 'justify' | 'between' | 'evenly',
@@ -91,7 +91,7 @@ export const fitFlex = (
   wrap: boolean,
   snap: boolean,
 ) => {
-  const isX = (direction === 'x');
+  const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
 
   const [gapX, gapY] = gap;
   const gapMain = isX ? gapX : gapY;

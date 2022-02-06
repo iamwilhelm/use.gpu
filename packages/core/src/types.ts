@@ -182,7 +182,7 @@ export type TextureSource = {
 
 export type DataTexture = {
   data: TypedArray,
-  format: string,
+  format: GPUTextureFormat,
   size: [number, number] | [number, number, number],
 };
 
@@ -214,7 +214,7 @@ export type ViewUniforms = {
   viewPosition: { value: vec3 | [number, number, number] | number[] },
   viewResolution: { value: vec2 | [number, number] | number[] },
   viewSize: { value: vec2 | [number, number] | number[] },
-  viewFocus: { value: number },
+  viewWorldUnit: { value: number },
   viewPixelRatio: { value: number },
 };
 

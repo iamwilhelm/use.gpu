@@ -1,8 +1,8 @@
 import { LayoutState, Rectangle, Sizing, Point, Margin } from '../types';
-import { getBlockMinMax, getBlockMargin, fitBlocks } from './block';
+import { getStackMinMax, getStackMargin, fitStack } from './stack';
 import { makeBoxLayout } from './util';
 
-describe('block layout', () => {
+describe('stack layout', () => {
   
   let ID = 0;
   const makeElement = (
@@ -23,53 +23,53 @@ describe('block layout', () => {
     };
   };
 
-  it("gets block min/max", () => {
+  it("gets stack min/max", () => {
     const els = [
       makeElement(50, 50),
       makeElement(20, 20),
     ];
 
-    const sizingX = getBlockMinMax(els, 'x');
+    const sizingX = getStackMinMax(els, 'x');
     expect(sizingX).toEqual([70, 50, 70, 50]);
 
-    const sizingY = getBlockMinMax(els, 'y');
+    const sizingY = getStackMinMax(els, 'y');
     expect(sizingY).toEqual([50, 70, 50, 70]);
   });
 
-  it("gets block margin", () => {
+  it("gets stack margin", () => {
     const els = [
       makeElement(50, 50, 10),
       makeElement(20, 20, 20),
     ];
 
-    const sizingX = getBlockMargin(els, [0, 0, 0, 0], 'x');
+    const sizingX = getStackMargin(els, [0, 0, 0, 0], [0, 0, 0, 0], 'x');
     expect(sizingX).toEqual([10, 0, 20, 0]);
 
-    const sizingY = getBlockMargin(els, [0, 0, 0, 0], 'y');
+    const sizingY = getStackMargin(els, [0, 0, 0, 0], [0, 0, 0, 0], 'y');
     expect(sizingY).toEqual([0, 10, 0, 20]);
   });
   
-  it("gets merged block margin", () => {
+  it("gets merged stack margin", () => {
     const els = [
       makeElement(50, 50, 10),
       makeElement(20, 20, 20),
     ];
 
-    const sizingX = getBlockMargin(els, [-5, -10, -25, 5], 'x');
+    const sizingX = getStackMargin(els, [-5, -10, -25, 5], [0, 0, 0, 0], 'x');
     expect(sizingX).toEqual([5, -10, -5, 5]);
 
-    const sizingY = getBlockMargin(els, [-5, -10, -25, 5], 'y');
+    const sizingY = getStackMargin(els, [-5, -10, -25, 5], [0, 0, 0, 0], 'y');
     expect(sizingY).toEqual([-5, 0, -25, 20]);
   });
 
-  it("fits block layout X", () => {
+  it("fits stack layout X", () => {
     const els = [
       makeElement(50, 50, 10),
       makeElement(20, 20, 20),
     ];
 
     const size = [110, 80] as Point;
-    const {sizes, offsets, renders} = fitBlocks(els, size, [0, 0, 0, 0], 'x');
+    const {sizes, offsets, renders} = fitStack(els, size, [0, 0, 0, 0], 'x');
 
     expect(offsets).toEqual([[0, 10], [70, 20]]);
     expect(sizes).toEqual([[50, 50], [20, 20]]);
@@ -79,14 +79,14 @@ describe('block layout', () => {
     expect((result as any)[0].layout).toEqual([10, 30, 60, 80]);
   });
 
-  it("fits block layout Y", () => {
+  it("fits stack layout Y", () => {
     const els = [
       makeElement(50, 50, 10),
       makeElement(20, 20, 20),
     ];
 
     const size = [110, 80] as Point;
-    const {sizes, offsets, renders} = fitBlocks(els, size, [0, 0, 0, 0], 'y');
+    const {sizes, offsets, renders} = fitStack(els, size, [0, 0, 0, 0], 'y');
 
     expect(offsets).toEqual([[10, 0], [20, 70]]);
     expect(sizes).toEqual([[50, 50], [20, 20]]);

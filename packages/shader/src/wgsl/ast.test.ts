@@ -39,6 +39,8 @@ describe('ast', () => {
     expect(imports).toMatchSnapshot();
   });
 
+  /*
+
   it('gets test declarations', () => {
     const code = `
       var x: f32;
@@ -54,7 +56,6 @@ describe('ast', () => {
     expect(declarations).toMatchSnapshot();
   });
 
-  /*
   it('gets test declarations with array', () => {
     const code = `
       const ivec2 QUAD[] = {

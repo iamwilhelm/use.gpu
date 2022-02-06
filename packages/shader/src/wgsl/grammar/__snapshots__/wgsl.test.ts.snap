@@ -236,13 +236,13 @@ Program                                                     ⮐ fn main() {⮐  
 `;
 
 exports[`WGSL grammar snapshots parses a test program 9`] = `
-Program                                                     ⮐ fn main() {⮐   let x: i32 = 1;⮐   /*⮐ 		/*⮐ 	  let y: i32 = 2;⮐ 		*/⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }⮐ 
-  FunctionDeclaration                                       ⮐ fn main() {⮐   let x: i32 = 1;⮐   /*⮐ 		/*⮐ 	  let y: i32 = 2;⮐ 		*/⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }
+Program                                                     ⮐ fn main() {⮐   let x: i32 = 1;⮐   /*⮐     /*⮐     let y: i32 = 2;⮐     */⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }⮐ 
+  FunctionDeclaration                                       ⮐ fn main() {⮐   let x: i32 = 1;⮐   /*⮐     /*⮐     let y: i32 = 2;⮐     */⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }
     AttributeList                                           
     FunctionHeader                                          fn main()
       fn                                                    fn
       Identifier                                            main
-    CompoundStatement                                       {⮐   let x: i32 = 1;⮐   /*⮐ 		/*⮐ 	  let y: i32 = 2;⮐ 		*/⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }
+    CompoundStatement                                       {⮐   let x: i32 = 1;⮐   /*⮐     /*⮐     let y: i32 = 2;⮐     */⮐   if (x) { if (y) { } else { } }⮐   */⮐   wat();⮐ }
       Statement                                             let x: i32 = 1;
         let                                                 let
         VariableIdentifier                                  x: i32

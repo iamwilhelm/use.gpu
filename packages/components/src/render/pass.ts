@@ -45,7 +45,7 @@ const Resume = resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     for (let r of rs) r(passEncoder);
-    passEncoder.endPass();
+    passEncoder.end();
   };
 
   return yeet(() => {

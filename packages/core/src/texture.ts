@@ -21,7 +21,7 @@ export const makeRenderTexture = (
 ): GPUTexture => {
   const texture = device.createTexture({
     // @ts-ignore
-    size: { width, height, depth: 1, depthOrArrayLayers: 1 },
+    size: [width, height, 1],
     sampleCount: samples,
     format,
     // @ts-ignore
@@ -40,7 +40,7 @@ export const makeReadbackTexture = (
 ): GPUTexture => {
   const texture = device.createTexture({
     // @ts-ignore
-    size: { width, height, depth: 1, depthOrArrayLayers: 1 },
+    size: [width, height, 1],
     sampleCount: samples,
     format,
     // @ts-ignore
@@ -60,7 +60,7 @@ export const makeSourceTexture = (
 ): GPUTexture => {
   const texture = device.createTexture({
     // @ts-ignore
-    size: { width, height, depth, depthOrArrayLayers: depth },
+    size: [width, height, depth],
     sampleCount: samples,
     format,
     // @ts-ignore
@@ -135,7 +135,7 @@ export const uploadTexture = (
 
   const [width, height, d] = size as Point3;
   // @ts-ignore
-  const extent = { width, height, depth: d || 1, depthOrArrayLayers: d || 1 };
+  const extent = [width, height, d || 1];
 
   const copy = {
     texture,

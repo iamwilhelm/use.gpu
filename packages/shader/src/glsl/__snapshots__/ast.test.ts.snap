@@ -89,7 +89,7 @@ Object {
 exports[`ast gets quad vertex declarations 1`] = `
 Array [
   Object {
-    "at": 217,
+    "at": 175,
     "flags": 0,
     "identifiers": Array [],
     "prototype": Object {
@@ -107,7 +107,7 @@ Array [
     ],
   },
   Object {
-    "at": 240,
+    "at": 198,
     "flags": 0,
     "identifiers": Array [],
     "prototype": Object {
@@ -125,7 +125,7 @@ Array [
     ],
   },
   Object {
-    "at": 260,
+    "at": 218,
     "flags": 0,
     "identifiers": Array [],
     "prototype": Object {
@@ -143,7 +143,7 @@ Array [
     ],
   },
   Object {
-    "at": 279,
+    "at": 237,
     "flags": 0,
     "identifiers": Array [],
     "prototype": Object {
@@ -166,7 +166,7 @@ Array [
 exports[`ast gets quad vertex functions 1`] = `
 Array [
   Object {
-    "at": 316,
+    "at": 274,
     "flags": 1,
     "identifiers": Array [
       "position",
@@ -217,7 +217,7 @@ Array [
         "name": "SolidVertex",
       },
     ],
-    "name": "@use-gpu/glsl/use/types",
+    "name": "use/types",
     "symbols": Array [
       "SolidVertex",
     ],
@@ -238,7 +238,7 @@ Array [
         "name": "getPerspectiveScale",
       },
     ],
-    "name": "@use-gpu/glsl/use/view",
+    "name": "use/view",
     "symbols": Array [
       "viewUniforms",
       "worldToClip",
@@ -253,7 +253,7 @@ Array [
         "name": "getQuadUV",
       },
     ],
-    "name": "@use-gpu/glsl/geometry/quad",
+    "name": "geometry/quad",
     "symbols": Array [
       "getQuadUV",
     ],
@@ -265,7 +265,7 @@ exports[`ast gets quad vertex symbol table 1`] = `
 Object {
   "declarations": Array [
     Object {
-      "at": 217,
+      "at": 175,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -283,7 +283,7 @@ Object {
       ],
     },
     Object {
-      "at": 240,
+      "at": 198,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -301,7 +301,7 @@ Object {
       ],
     },
     Object {
-      "at": 260,
+      "at": 218,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -319,7 +319,7 @@ Object {
       ],
     },
     Object {
-      "at": 279,
+      "at": 237,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -339,7 +339,7 @@ Object {
   ],
   "externals": Array [
     Object {
-      "at": 217,
+      "at": 175,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -357,7 +357,7 @@ Object {
       ],
     },
     Object {
-      "at": 240,
+      "at": 198,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -375,7 +375,7 @@ Object {
       ],
     },
     Object {
-      "at": 260,
+      "at": 218,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -393,7 +393,7 @@ Object {
       ],
     },
     Object {
-      "at": 279,
+      "at": 237,
       "flags": 0,
       "identifiers": Array [],
       "prototype": Object {
@@ -413,7 +413,7 @@ Object {
   ],
   "functions": Array [
     Object {
-      "at": 316,
+      "at": 274,
       "flags": 1,
       "identifiers": Array [
         "getPosition",
@@ -438,7 +438,7 @@ Object {
     },
   ],
   "globals": undefined,
-  "hash": "vidntg3d26",
+  "hash": "4ty31mhjri",
   "modules": Array [
     Object {
       "at": 0,
@@ -448,7 +448,7 @@ Object {
           "name": "SolidVertex",
         },
       ],
-      "name": "@use-gpu/glsl/use/types",
+      "name": "use/types",
       "symbols": Array [
         "SolidVertex",
       ],
@@ -469,7 +469,7 @@ Object {
           "name": "getPerspectiveScale",
         },
       ],
-      "name": "@use-gpu/glsl/use/view",
+      "name": "use/view",
       "symbols": Array [
         "viewUniforms",
         "worldToClip",
@@ -484,7 +484,7 @@ Object {
           "name": "getQuadUV",
         },
       ],
-      "name": "@use-gpu/glsl/geometry/quad",
+      "name": "geometry/quad",
       "symbols": Array [
         "getQuadUV",
       ],
@@ -532,35 +532,35 @@ Array [
 exports[`ast gets shake information for instance/vertex/quad AST 1`] = `
 Array [
   Array [
-    217,
+    175,
     Array [
       "getPosition",
       "getQuadVertex",
     ],
   ],
   Array [
-    240,
+    198,
     Array [
       "getColor",
       "getQuadVertex",
     ],
   ],
   Array [
-    260,
+    218,
     Array [
       "getSize",
       "getQuadVertex",
     ],
   ],
   Array [
-    279,
+    237,
     Array [
       "getDepth",
       "getQuadVertex",
     ],
   ],
   Array [
-    316,
+    274,
     Array [
       "getQuadVertex",
     ],
@@ -588,7 +588,7 @@ Array [
 exports[`ast gets solid fragment declarations 1`] = `
 Array [
   Object {
-    "at": 68,
+    "at": 54,
     "flags": 0,
     "identifiers": Array [],
     "prototype": Object {
@@ -606,7 +606,7 @@ Array [
     ],
   },
   Object {
-    "at": 117,
+    "at": 103,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -630,7 +630,7 @@ Array [
     },
   },
   Object {
-    "at": 162,
+    "at": 148,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -653,7 +653,7 @@ Array [
     },
   },
   Object {
-    "at": 209,
+    "at": 195,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -676,7 +676,7 @@ Array [
     },
   },
   Object {
-    "at": 249,
+    "at": 235,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [
@@ -699,7 +699,7 @@ Array [
     },
   },
   Object {
-    "at": 287,
+    "at": 273,
     "flags": 0,
     "identifiers": Array [],
     "symbols": Array [

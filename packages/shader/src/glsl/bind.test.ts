@@ -1,4 +1,4 @@
-import { GLSLModules } from '@use-gpu/glsl';
+import { GLSLModules } from './glsl.test.data';
 import { bindBundle, bindingsToLinks, resolveBindings } from './bind';
 import { loadModule } from './shader';
 import { linkBundle } from './link';

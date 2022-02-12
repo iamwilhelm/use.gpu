@@ -1,6 +1,401 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ast gets quad vertex imports 1`] = `
+exports[`ast gets shake table 1`] = `
+Array [
+  Array [
+    6,
+    Array [
+      "x",
+      "getFloat2",
+      "main",
+    ],
+  ],
+  Array [
+    27,
+    Array [
+      "y",
+      "getFloat2",
+      "main",
+    ],
+  ],
+  Array [
+    49,
+    Array [
+      "getFloat1",
+      "main",
+    ],
+  ],
+  Array [
+    100,
+    Array [
+      "getFloat2",
+      "main",
+    ],
+  ],
+  Array [
+    166,
+    Array [
+      "main",
+    ],
+  ],
+]
+`;
+
+exports[`ast gets symbol table 1`] = `
+Object {
+  "declarations": Array [
+    Object {
+      "at": 6,
+      "flags": 1,
+      "symbol": "x",
+      "variable": Object {
+        "attributes": Array [
+          Object {
+            "args": undefined,
+            "name": "exported",
+          },
+        ],
+        "identifiers": Array [],
+        "name": "x",
+        "qual": undefined,
+        "type": Object {
+          "args": undefined,
+          "name": "f32",
+        },
+        "value": undefined,
+      },
+    },
+    Object {
+      "at": 27,
+      "flags": 0,
+      "symbol": "y",
+      "variable": Object {
+        "attributes": undefined,
+        "identifiers": Array [],
+        "name": "y",
+        "qual": undefined,
+        "type": Object {
+          "args": undefined,
+          "name": "f32",
+        },
+        "value": undefined,
+      },
+    },
+    Object {
+      "at": 44,
+      "constant": Object {
+        "attributes": undefined,
+        "identifiers": Array [],
+        "name": "a",
+        "type": Object {
+          "args": undefined,
+          "name": "i32",
+        },
+        "value": "3",
+      },
+      "flags": 0,
+      "symbol": "a",
+    },
+    Object {
+      "alias": Object {
+        "attributes": undefined,
+        "name": "integer",
+        "type": Object {
+          "args": undefined,
+          "name": "i32",
+        },
+      },
+      "at": 65,
+      "flags": 0,
+      "symbol": "integer",
+    },
+    Object {
+      "at": 88,
+      "constant": Object {
+        "attributes": undefined,
+        "identifiers": Array [],
+        "name": "b",
+        "type": Object {
+          "args": undefined,
+          "name": "i32",
+        },
+        "value": undefined,
+      },
+      "flags": 0,
+      "symbol": "b",
+    },
+    Object {
+      "at": 115,
+      "flags": 1,
+      "struct": Object {
+        "attributes": Array [
+          Object {
+            "args": undefined,
+            "name": "exported",
+          },
+        ],
+        "members": Array [
+          Object {
+            "attributes": undefined,
+            "name": "intensity",
+            "type": Object {
+              "args": undefined,
+              "name": "f32",
+            },
+          },
+          Object {
+            "attributes": Array [
+              Object {
+                "args": undefined,
+                "name": "annotate",
+              },
+            ],
+            "name": "position",
+            "type": Object {
+              "args": Array [
+                Object {
+                  "args": undefined,
+                  "name": "f32",
+                },
+              ],
+              "name": "vec3",
+            },
+          },
+        ],
+        "name": "light",
+      },
+      "symbol": "light",
+    },
+    Object {
+      "at": 199,
+      "constant": Object {
+        "attributes": undefined,
+        "identifiers": Array [],
+        "name": "QUAD",
+        "type": Object {
+          "args": Array [
+            Object {
+              "args": Array [
+                Object {
+                  "args": undefined,
+                  "name": "i32",
+                },
+              ],
+              "name": "vec2",
+            },
+            Object {
+              "name": "4",
+            },
+          ],
+          "name": "array",
+        },
+        "value": "array<vec2<i32>, 4>(
+        vec2<i32>(0, 0),
+        vec2<i32>(1, 0),
+        vec2<i32>(0, 1),
+        vec2<i32>(1, 1),
+			)",
+      },
+      "flags": 0,
+      "symbol": "QUAD",
+    },
+    Object {
+      "at": 372,
+      "flags": 6,
+      "func": Object {
+        "attributes": Array [
+          Object {
+            "args": undefined,
+            "name": "optional",
+          },
+          Object {
+            "args": undefined,
+            "name": "external",
+          },
+        ],
+        "identifiers": Array [],
+        "name": "getInt",
+        "parameters": undefined,
+        "type": Object {
+          "args": undefined,
+          "attributes": undefined,
+          "name": "i32",
+        },
+      },
+      "symbol": "getInt",
+    },
+    Object {
+      "at": 420,
+      "flags": 0,
+      "func": Object {
+        "attributes": Array [
+          Object {
+            "args": undefined,
+            "name": "export",
+          },
+        ],
+        "identifiers": Array [],
+        "name": "main",
+        "parameters": undefined,
+        "type": Object {
+          "attributes": undefined,
+          "name": "void",
+        },
+      },
+      "symbol": "main",
+    },
+  ],
+  "globals": undefined,
+  "hash": "mtyot4jkqo",
+  "modules": undefined,
+  "symbols": Array [
+    "x",
+    "y",
+    "a",
+    "integer",
+    "b",
+    "light",
+    "QUAD",
+    "getInt",
+    "main",
+  ],
+  "visibles": Array [
+    "x",
+    "light",
+  ],
+}
+`;
+
+exports[`ast gets test declarations with array 1`] = `
+Array [
+  Object {
+    "at": 0,
+    "constant": Object {
+      "attributes": undefined,
+      "identifiers": Array [],
+      "name": "QUAD",
+      "type": Object {
+        "args": Array [
+          Object {
+            "args": Array [
+              Object {
+                "args": undefined,
+                "name": "i32",
+              },
+            ],
+            "name": "vec2",
+          },
+          Object {
+            "name": "4",
+          },
+        ],
+        "name": "array",
+      },
+      "value": "array<vec2<i32>, 4>(
+        vec2<i32>(0, 0),
+        vec2<i32>(1, 0),
+        vec2<i32>(0, 1),
+        vec2<i32>(1, 1),
+			)",
+    },
+    "flags": 0,
+    "symbol": "QUAD",
+  },
+]
+`;
+
+exports[`ast gets test empty function declaration 1`] = `
+Array [
+  Object {
+    "at": 4,
+    "flags": 0,
+    "func": Object {
+      "attributes": Array [
+        Object {
+          "args": undefined,
+          "name": "export",
+        },
+      ],
+      "identifiers": Array [],
+      "name": "main",
+      "parameters": undefined,
+      "type": Object {
+        "attributes": undefined,
+        "name": "void",
+      },
+    },
+    "symbol": "main",
+  },
+]
+`;
+
+exports[`ast gets test function declaration 1`] = `
+Array [
+  Object {
+    "at": 4,
+    "flags": 0,
+    "func": Object {
+      "attributes": Array [
+        Object {
+          "args": Array [
+            "fragment",
+          ],
+          "name": "stage",
+        },
+      ],
+      "identifiers": Array [
+        "foo",
+      ],
+      "name": "fragShader",
+      "parameters": Array [
+        Object {
+          "attributes": undefined,
+          "name": "in1",
+          "type": Object {
+            "args": undefined,
+            "name": "A",
+          },
+        },
+        Object {
+          "attributes": Array [
+            Object {
+              "args": Array [
+                "2",
+              ],
+              "name": "location",
+            },
+          ],
+          "name": "in2",
+          "type": Object {
+            "args": undefined,
+            "name": "f32",
+          },
+        },
+      ],
+      "type": Object {
+        "args": Array [
+          Object {
+            "args": undefined,
+            "name": "f32",
+          },
+        ],
+        "attributes": Array [
+          Object {
+            "args": Array [
+              "0",
+            ],
+            "name": "location",
+          },
+        ],
+        "name": "vec4",
+      },
+    },
+    "symbol": "fragShader",
+  },
+]
+`;
+
+exports[`ast gets test imports 1`] = `
 Array [
   Object {
     "at": 0,
@@ -51,6 +446,128 @@ Array [
     "imports": Array [],
     "name": "test",
     "symbols": Array [],
+  },
+]
+`;
+
+exports[`ast gets test struct declaration 1`] = `
+Array [
+  Object {
+    "at": 0,
+    "flags": 0,
+    "struct": Object {
+      "attributes": undefined,
+      "members": Array [
+        Object {
+          "attributes": undefined,
+          "name": "intensity",
+          "type": Object {
+            "args": undefined,
+            "name": "f32",
+          },
+        },
+        Object {
+          "attributes": Array [
+            Object {
+              "args": undefined,
+              "name": "annotate",
+            },
+          ],
+          "name": "position",
+          "type": Object {
+            "args": Array [
+              Object {
+                "args": undefined,
+                "name": "f32",
+              },
+            ],
+            "name": "vec3",
+          },
+        },
+      ],
+      "name": "light",
+    },
+    "symbol": "light",
+  },
+]
+`;
+
+exports[`ast gets test var/const declarations 1`] = `
+Array [
+  Object {
+    "at": 0,
+    "flags": 0,
+    "symbol": "x",
+    "variable": Object {
+      "attributes": undefined,
+      "identifiers": Array [],
+      "name": "x",
+      "qual": undefined,
+      "type": Object {
+        "args": undefined,
+        "name": "f32",
+      },
+      "value": undefined,
+    },
+  },
+  Object {
+    "at": 18,
+    "flags": 0,
+    "symbol": "y",
+    "variable": Object {
+      "attributes": undefined,
+      "identifiers": Array [],
+      "name": "y",
+      "qual": undefined,
+      "type": Object {
+        "args": undefined,
+        "name": "f32",
+      },
+      "value": undefined,
+    },
+  },
+  Object {
+    "at": 36,
+    "constant": Object {
+      "attributes": undefined,
+      "identifiers": Array [],
+      "name": "a",
+      "type": Object {
+        "args": undefined,
+        "name": "i32",
+      },
+      "value": "3",
+    },
+    "flags": 0,
+    "symbol": "a",
+  },
+  Object {
+    "alias": Object {
+      "attributes": undefined,
+      "name": "integer",
+      "type": Object {
+        "args": undefined,
+        "name": "i32",
+      },
+    },
+    "at": 58,
+    "flags": 0,
+    "symbol": "integer",
+  },
+  Object {
+    "at": 81,
+    "constant": Object {
+      "attributes": undefined,
+      "identifiers": Array [],
+      "name": "b",
+      "type": Object {
+        "args": undefined,
+        "name": "i32",
+      },
+      "value": undefined,
+    },
+    "flags": 0,
+    "symbol": "b",
   },
 ]
 `;

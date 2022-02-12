@@ -3,6 +3,7 @@
 @external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
 
 unit { globalDirective* globalDeclaration* }
+Skip { }
 
 k<term> { @specialize[@name={term}]<Identifier, term> }
 t<term> { @specialize[@name={term}]<Identifier, term> }
@@ -18,15 +19,17 @@ globalDirective {
 
 globalDeclaration {
   semicolon |
+  LocalDeclaration |
+  ImportDeclaration
+}
+
+LocalDeclaration {
   GlobalVariableDeclaration semicolon |
   GlobalConstantDeclaration semicolon |
   TypeAliasDeclaration semicolon |
   StructDeclaration |
-  FunctionDeclaration |
-  ImportDeclaration
+  FunctionDeclaration
 }
-
-
 
 EnableDirective {
   d<'enable'> Identifier semicolon
@@ -38,27 +41,28 @@ ImportDeclaration {
 ImportDeclarationList { '{' (ImportDeclarationIdentifier comma)* ImportDeclarationIdentifier comma? '}' }
 ImportDeclarationIdentifier { Identifier ('as' Identifier)? }
 
-
+Value<content> { content }
 
 GlobalVariableDeclaration {
-  AttributeList VariableDeclaration (assign constExpression)?
+  AttributeList VariableDeclaration (assign Value<constExpression>)?
 }
 
 GlobalConstantDeclaration {
-  k<'let'> VariableIdentifier assign constExpression |
-  AttributeList k<'override'> VariableIdentifier (assign expression)?
+  Skip k<'let'> VariableIdentifier assign Value<constExpression> |
+  AttributeList k<'override'> VariableIdentifier (assign Value<expression>)?
 }
 
-TypeAliasDeclaration { k<'type'> Identifier assign TypeDeclaration }
+TypeAliasDeclaration { AttributeList k<'type'> Identifier assign TypeDeclaration }
 
-StructDeclaration { k<'struct'> Identifier StructBodyDeclaration }
+StructDeclaration { AttributeList k<'struct'> Identifier StructBodyDeclaration }
 StructBodyDeclaration { '{' (StructMember)* '}' }
 StructMember { AttributeList variableIdentifierDeclaration semicolon }
 
 FunctionDeclaration { AttributeList FunctionHeader CompoundStatement }
-FunctionHeader { k<'fn'> Identifier '(' ParamList? ')' (arrow AttributeList TypeDeclaration)? }
+FunctionHeader { k<'fn'> Identifier '(' ParamList ')' ReturnType }
+ReturnType { (arrow AttributeList TypeDeclaration)? }
 
-ParamList { (Param comma)* Param comma? }
+ParamList { ((Param comma)* Param comma?)? }
 Param { AttributeList variableIdentifierDeclaration }
 
 VariableIdentifier { Identifier | variableIdentifierDeclaration }
@@ -68,8 +72,8 @@ VariableQualifier { template<addressSpace (comma accessMode)?> }
 variableIdentifierDeclaration { Identifier colon TypeDeclaration }
 
 variableStatement {
-  VariableDeclaration (assign expression)? |
-  k<'let'> VariableIdentifier assign expression
+  VariableDeclaration (assign Value<expression>)? |
+  k<'let'> VariableIdentifier assign Value<expression>
 }
 
 CompoundStatement { '{' Statement* '}' }
@@ -311,7 +315,7 @@ TypeDeclaration {
   textureSamplerTypes
 }
 
-arrayTypeDeclaration { t<'array'> template<TypeDeclaration> (comma elementCountExpression)? Gt }
+arrayTypeDeclaration { t<'array'> '<' TypeDeclaration (comma elementCountExpression)? '>' }
 
 textureSamplerTypes {
   samplerType |

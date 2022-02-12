@@ -19,7 +19,7 @@ describe('ast', () => {
     return makeASTParser(code, tree);
   }
 
-  it('gets quad vertex imports', () => {
+  it('gets test imports', () => {
     const code = `
     import {MeshVertex} from 'use/types';
     import {viewUniforms as view, worldToClip} from 'use/view';
@@ -39,14 +39,54 @@ describe('ast', () => {
     expect(imports).toMatchSnapshot();
   });
 
-  /*
-
-  it('gets test declarations', () => {
+  it('gets test var/const declarations', () => {
     const code = `
       var x: f32;
       var y: f32;
       let a: i32 = 3;
+			type integer = i32;
       override b: i32;
+    `;
+
+    const tree = parseShader(code);
+    const {getDeclarations} = makeGuardedParser(code, tree);
+
+    const declarations = getDeclarations();
+    expect(declarations).toMatchSnapshot();
+  });
+
+  it('gets test empty function declaration', () => {
+    const code = `
+			@export fn main() {}
+    `;
+
+    const tree = parseShader(code);
+    const {getDeclarations} = makeGuardedParser(code, tree);
+
+    const declarations = getDeclarations();
+    expect(declarations).toMatchSnapshot();
+  });
+
+  it('gets test function declaration', () => {
+    const code = `
+			@stage(fragment) fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {
+				return foo(in1, in2);
+			}
+    `;
+
+    const tree = parseShader(code);
+    const {getDeclarations} = makeGuardedParser(code, tree);
+
+    const declarations = getDeclarations();
+    expect(declarations).toMatchSnapshot();
+  });
+
+  it('gets test struct declaration', () => {
+    const code = `
+			struct light {
+				intensity: f32;
+				@annotate position: vec3<f32>;
+			}
     `;
 
     const tree = parseShader(code);
@@ -58,12 +98,12 @@ describe('ast', () => {
 
   it('gets test declarations with array', () => {
     const code = `
-      const ivec2 QUAD[] = {
-        ivec2(0, 0),
-        ivec2(1, 0),
-        ivec2(0, 1),
-        ivec2(1, 1),
-      };
+      let QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
+        vec2<i32>(0, 0),
+        vec2<i32>(1, 0),
+        vec2<i32>(0, 1),
+        vec2<i32>(1, 1),
+			);
     `;
 
     const tree = parseShader(code);
@@ -72,20 +112,61 @@ describe('ast', () => {
     const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
-  
-  it('gets test declarations with qualified declaration', () => {
+
+  it('gets symbol table', () => {
     const code = `
-      layout(location = 0) in wat;
-      layout(location = 1) in vec2;
+	    @exported var x: f32;
+	    var y: f32;
+	    let a: i32 = 3;
+			type integer = i32;
+	    override b: i32;
+
+			@exported struct light {
+				intensity: f32;
+				@annotate position: vec3<f32>;
+			}
+
+      let QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
+        vec2<i32>(0, 0),
+        vec2<i32>(1, 0),
+        vec2<i32>(0, 1),
+        vec2<i32>(1, 1),
+			);
+
+	    @optional @external fn getInt() -> i32 {}
+
+	    @export fn main() {}
     `;
 
     const tree = parseShader(code);
-    const {getDeclarations} = makeGuardedParser(code, tree);
+    const {getSymbolTable} = makeGuardedParser(code, tree);
 
-    const declarations = getDeclarations();
-    expect(declarations).toMatchSnapshot();
+    const table = getSymbolTable();
+    expect(table).toMatchSnapshot();
   });
 
+  it('gets shake table', () => {
+    const code = `
+	    @exported var x: f32;
+			var y: f32;
+
+	    @optional @external fn getFloat1() -> f32 {}
+
+	    @optional @external fn getFloat2() -> f32 { return x + y; }
+
+	    @export fn main() {
+				var z: f32 = getFloat1() + getFloat2();
+			}
+    `;
+
+    const tree = parseShader(code);
+    const {getShakeTable} = makeGuardedParser(code, tree);
+
+    const table = getShakeTable();
+    expect(table).toMatchSnapshot();
+  });
+
+	/*
   it('gets quad vertex imports', () => {
     const code = GLSLModules['instance/vertex/quad'];
 

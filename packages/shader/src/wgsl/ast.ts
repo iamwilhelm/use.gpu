@@ -1,34 +1,34 @@
 import { SyntaxNode, TreeCursor, Tree } from '@lezer/common';
 import {
-  ModuleRef,
+	AnnotatedTypeRef,
+	AttributeRef,
+	AttributesRef,
+	DeclarationRef,
+	FunctionHeaderRef,
+	FunctionRef,
   ImportRef,
-  /*
-  CompressedNode,
-  SymbolTable,
-  SymbolRef,
-  PrototypeRef,
-  FunctionRef,
-  DeclarationRef,
-  VariableRef,
-  LocalRef,
-  TypeRef,
-  StructRef,
-  MemberRef,
-  QualifiedStructRef,
+  ModuleRef,
+	ParameterRef,
+	QualifiedTypeAliasRef,
+	StructRef,
+	StructMemberRef,
+	TypeAliasRef,
+	TypeRef,
+	VariableRef,
+	SymbolTable,
   ShakeTable,
   ShakeOp,
   RefFlags as RF,
-  */
-} from '../types';
+} from './types';
 import * as T from './grammar/wgsl.terms';
-//import { GLSL_NATIVE_TYPES } from '../constants';
 import { parseString } from '../util/bundle';
 import { getProgramHash } from '../util/hash';
 import { getChildNodes, hasErrorNode, formatAST, formatASTNode } from '../util/tree';
 import uniq from 'lodash/uniq';
 
-const NO_DEPS = [] as string[];
-//const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
+const NO_STRINGS = [] as string[];
+const VOID_TYPE = {name: 'void'};
+const AUTO_TYPE = {name: 'auto'};
 
 const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
 
@@ -57,6 +57,32 @@ export const makeASTParser = (code: string, tree: Tree) => {
     if (!node) throwError('text');
     return code.slice(node.from, node.to);
   }
+	
+	////////////////
+	
+  const getIdentifiers = (node: SyntaxNode, symbol: string, exclude = NO_STRINGS): string[] => {
+    const {cursor, to} = node;
+    const ids = new Set<string>();
+
+    const visit = () => {
+      const {type} = cursor;
+      if (type.id === T.Attribute) {
+				return false;
+			}
+      if (type.id === T.Identifier) {
+        const t = getText(cursor);
+				if (t !== symbol && exclude.indexOf(t) < 0) ids.add(t);
+      }
+    }
+    do {
+			if (visit() === false) cursor.lastChild();
+			if (!cursor.next()) break;
+		} while (cursor.from < to);
+
+    return Array.from(ids);
+  };
+		
+	////////////////
 
   const getImport = (node: SyntaxNode): ImportRef => {
     const [a, b] = getNodes(node, 1);
@@ -67,6 +93,223 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
     return {name, imported};
   };
+
+	const getAttribute = (node: SyntaxNode): AttributeRef => {
+		const [a, ...rest] = getNodes(node, 1);
+
+		const name = getText(a);
+		const args = rest.length ? rest.map(getText) : undefined;
+
+		return {name, args};
+	};
+
+	const getParameter = (node: SyntaxNode): ParameterRef => {
+		const [a, b, c] = getNodes(node, 3);
+
+		const attributes = getAttributes(a);
+		const name = getText(b);
+		const type = getType(c);
+
+		return {name, type, attributes};
+	};
+
+	const getAttributes = (node: SyntaxNode): AttributeRef[] | undefined => {
+		const nodes = getNodes(node);
+		return nodes.length ? nodes.map(getAttribute) : undefined;
+	}
+
+	const getParameters = (node: SyntaxNode): ParameterRef[] | undefined => {
+		const nodes = getNodes(node);
+		return nodes.length ? nodes.map(getParameter) : undefined;
+	} 
+
+	const getType = (node: SyntaxNode): TypeRef => {
+		const [a, ...rest] = getNodes(node, 1);
+
+		const name = getText(a);
+		const args = rest.length ? rest.map((n) => {
+			if (n.type.id === T.TypeDeclaration) return getType(n);
+			return {name: getText(n)};
+		}) : undefined;
+
+		return {name, args};
+	};
+
+	const getReturnType = (node: SyntaxNode): AnnotatedTypeRef => {
+		const [a, b] = getNodes(node);
+
+		const attributes = a ? getAttributes(a) : undefined;
+		const type = b ? getType(b) : VOID_TYPE;
+
+		return {...type, attributes};
+	};
+
+	const getFunctionHeader = (node: SyntaxNode): FunctionHeaderRef => {
+		const [, a, b, c] = getNodes(node, 3);
+		const hasType = !!c;
+
+		const name = getText(a);
+		const parameters = getParameters(b);
+		const type = hasType ? getReturnType(c) : VOID_TYPE;
+
+ 		return {name, type, parameters};
+	};
+
+	const getFunction = (node: SyntaxNode): FunctionRef => {
+    const [a, b, c] = getNodes(node, 3);
+
+		const attributes = getAttributes(a);
+		const {name, type, parameters} = getFunctionHeader(b);
+
+		const exclude = parameters ? parameters.map(p => p.name) : undefined;
+		const identifiers = getIdentifiers(c, name, exclude);
+
+    return {name, type, attributes, parameters, identifiers};
+	};
+
+	const getVariableIdentifier = (node: SyntaxNode): TypeAliasRef => {
+		const [a, b] = getNodes(node, 1);
+    const hasType = !!b;
+
+		const name = getText(a);
+		const type = hasType ? getType(b) : AUTO_TYPE;
+
+		return {name, type};
+	};
+
+	const getVariableDeclaration = (node: SyntaxNode): QualifiedTypeAliasRef => {
+		const [, a, b] = getNodes(node, 2);
+		const hasQualifier = !!b;
+
+		if (hasQualifier) {
+			const qual = getText(a);
+			const {name, type} = getVariableIdentifier(b);
+			return {name, type, qual};
+		}
+		else {
+			return getVariableIdentifier(a);
+		}
+	}
+
+	const getVariable = (node: SyntaxNode): VariableRef => {
+    const [a, b, c] = getNodes(node, 2);
+		const hasValue = !!c;
+
+		const attributes = getAttributes(a);
+		const {name, type, qual} = getVariableDeclaration(b);
+		const value = hasValue ? getText(c) : undefined; 
+		const identifiers = hasValue ? getIdentifiers(c, name) : NO_STRINGS;
+
+    return {name, type, attributes, value, identifiers, qual};
+	};
+
+	const getConstant = (node: SyntaxNode): VariableRef => {
+    const nodes = getNodes(node, 2);
+		
+		const [a, b, c, d] = nodes;
+		const hasAttributes = a.type.id === T.AttributeList;
+		const attributes = hasAttributes ? getAttributes(a) : undefined;
+
+		const hasValue = !!d;
+		const {name, type} = getVariableIdentifier(c);
+		const value = hasValue ? getText(d) : undefined; 
+		const identifiers = hasValue ? getIdentifiers(d, name) : NO_STRINGS;
+
+    return {name, type, attributes, value, identifiers};
+	};
+	
+	const getTypeAlias = (node: SyntaxNode): TypeAliasRef => {
+		const [a,, b, c] = getNodes(node, 4);
+
+		const attributes = getAttributes(a);
+		const name = getText(b);
+		const type = getType(c);
+
+		return {name, type, attributes};
+	};
+
+	const getStructMember = (node: SyntaxNode): StructMemberRef => {
+		const [a, b, c] = getNodes(node, 3);
+
+		const attributes = getAttributes(a);
+		const name = getText(b);
+		const type = getType(c);
+
+		return {name, type, attributes};
+	};
+
+	const getStructMembers = (node: SyntaxNode): StructMemberRef[] => getNodes(node).map(getStructMember);
+
+	const getStruct = (node: SyntaxNode): StructRef => {
+		const [a,, b, c] = getNodes(node, 3);
+		
+		const attributes = getAttributes(a);
+		const name = getText(b);
+		const members = getStructMembers(c);
+
+		return {name, attributes, members};
+	};
+
+	////////////////
+
+	const hasAttribute = (attributes: AttributeRef[] | undefined, name: string) =>
+		!!attributes?.find(a => a.name === name);
+
+	const getFlags = (ref: AttributesRef) => {
+		const isExported = hasAttribute(ref.attributes, 'exported');
+		const isExternal = hasAttribute(ref.attributes, 'external');
+		const isOptional = hasAttribute(ref.attributes, 'optional');
+		const isGlobal = hasAttribute(ref.attributes, 'global');
+
+		return (
+			(isExported ? RF.Exported : 0) |
+			(isExternal ? RF.External : 0) |
+			(isOptional ? RF.Optional : 0) |
+			(isGlobal   ? RF.Global   : 0)
+		);
+	}
+
+	////////////////
+
+  const getDeclaration = (node: SyntaxNode): DeclarationRef => {
+    const [a] = getNodes(node);
+    const at = node.from;
+
+    if (a.type.id === T.FunctionDeclaration) {
+			const func = getFunction(a);
+			const flags = getFlags(func);
+			const symbol = func.name;
+      return {at, symbol, flags, func};
+    }
+		if (a.type.id === T.GlobalVariableDeclaration) {
+      const variable = getVariable(a);
+			const flags = getFlags(variable);
+			const symbol = variable.name;
+      return {at, symbol, flags, variable};
+		}
+		if (a.type.id === T.GlobalConstantDeclaration) {
+      const constant = getConstant(a);
+			const flags = getFlags(constant);
+			const symbol = constant.name;
+      return {at, symbol, flags, constant};
+		}
+		if (a.type.id === T.TypeAliasDeclaration) {
+      const alias = getTypeAlias(a);
+			const flags = getFlags(alias);
+			const symbol = alias.name;
+      return {at, symbol, flags, alias};
+		}
+		if (a.type.id === T.StructDeclaration) {
+			const struct = getStruct(a);
+			const flags = getFlags(struct);
+			const symbol = struct.name;
+			return {at, symbol, flags, struct};
+		}
+    
+    throw throwError('declaration', node);
+  };
+
+	////////////////
 
   const getImports = (): ModuleRef[] => {
     const modules: Record<string, ImportRef[]> = {};
@@ -102,72 +345,90 @@ export const makeASTParser = (code: string, tree: Tree) => {
     return out;
   }
 
-  /*
-  const getDeclaration = (node: SyntaxNode): DeclarationRef => {
-    const [a] = getNodes(node);
-    const flags = getFlags(node);
-    const at = node.from;
-
-    if (a.type.id === T.FunctionPrototype) {
-      const prototype = getPrototype(a);
-      const {name} = prototype;
-
-      const symbols = [name];
-      const identifiers = getIdentifiers(node, symbols);
-
-      return {at, symbols, identifiers, flags, prototype};
-    }
-    if (a.type.id === T.VariableDeclaration) {
-      const variable = getVariable(a);
-
-      const symbols = variable.locals.map(({name}) => name);
-      const {type} = variable;
-      if (!GLSL_NATIVE_TYPES.has(type.name)) symbols.push(type.name);
-
-      const identifiers = getIdentifiers(node, symbols);
-
-      return {at, symbols, identifiers, flags, variable};
-    }
-    if (a.type.id === T.QualifiedStructDeclaration) {
-      const struct = getQualifiedStruct(a);
-      const {name, type} = struct;
-
-      const symbols = [name];
-
-      if (type.name === name) {
-        // Struct is anonymous, members are global
-        for (const {name, type} of struct.struct.members) {
-          symbols.push(name);
-          if (!GLSL_NATIVE_TYPES.has(type.name)) symbols.push(type.name);
-        }
-      }
-      else if (
-        !GLSL_NATIVE_TYPES.has(type.name)
-      ) {
-        // Custom type
-        symbols.push(type.name);
-      }
-
-      const identifiers = getIdentifiers(node, symbols);
-
-      return {at, symbols, identifiers, flags, struct};
-    }
-    if (a.type.id === T.QualifiedDeclaration) {
-      const variable = getQualifiedDeclaration(a);
-      const {type} = variable;
-      const symbols = [type.name];
-      return {at, symbols, identifiers: [], flags};
-    }
-    
-    throw throwError('declaration', node);
+  const getDeclarations = (): DeclarationRef[] => {
+    const children = tree.topNode.getChildren(T.LocalDeclaration);
+    return children.map(getDeclaration);
   };
-  */
+	
+	////////////////
+
+  const getSymbolTable = (): SymbolTable => {
+    const hash = getProgramHash(code);
+
+    const modules = getImports();
+    const declarations = getDeclarations();
+
+    const exported  = declarations.filter(d => d.flags & RF.Exported);
+    const globalled = declarations.filter(d => d.flags & RF.Global);
+
+    const symbols  = uniq(declarations.map(r => r.symbol));
+    const visibles = uniq(exported.map(r => r.symbol));
+    const globals  = uniq(globalled.map(r => r.symbol));
+
+    const scope = new Set(symbols ?? []);
+    for (let ref of declarations) {
+			const {func, variable, constant} = ref;
+			if      (func?.identifiers)     func    .identifiers = func    .identifiers.filter(s => scope.has(s));
+			else if (variable?.identifiers) variable.identifiers = variable.identifiers.filter(s => scope.has(s));
+			else if (constant?.identifiers) constant.identifiers = constant.identifiers.filter(s => scope.has(s));
+    }
+
+    return {
+      hash,
+      symbols: orNone(symbols),
+      visibles: orNone(visibles),
+      globals: orNone(globals),
+      modules: orNone(modules),
+      declarations: orNone(declarations),
+    };
+  }
+
+  const getShakeTable = (table: SymbolTable = getSymbolTable()): ShakeTable | undefined => {
+    const {declarations: refs} = table;
+		if (!refs) return undefined;
+
+    const graph = new Map<string, string[]>();
+    const link = (from: string, to: string) => {
+      let list = graph.get(from);
+      if (!list) graph.set(from, list = []);
+      list.push(to);
+    };
+
+    for (const ref of refs) {
+			const {symbol, func, variable, constant} = ref;
+			const identifiers = (
+				func?.identifiers ??
+				variable?.identifiers ??
+				constant?.identifiers
+			);
+      if (identifiers) for (const id of identifiers) link(id, symbol);
+    }
+
+    const getAll = (ss: string[], accum: Set<string>): Set<string> => {
+      for (let s of ss) if (!accum.has(s)) {
+        accum.add(s);
+        const deps = graph.get(s);
+        if (deps?.length) getAll(deps, accum);
+      }
+      return accum;
+    }
+
+    const out = [] as ShakeOp[];
+    for (const ref of refs) {
+      const {at, symbol} = ref;
+      const deps = getAll([symbol], new Set());
+      if (deps.size) out.push([at, Array.from(deps)]);
+    }
+
+    return out.length ? out : undefined;
+  }
+	
+	////////////////
 
   return {
     getImports,
-    //getFunctions,
-    //getDeclarations,
-    //getSymbolTable,
-    //getShakeTable,
+    getDeclarations,
+    getSymbolTable,
+    getShakeTable,
   };
 }

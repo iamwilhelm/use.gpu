@@ -70,6 +70,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
       const {by} = parent;
       const source = fibers.get(by);
       if (source) parents.push(source);
+			parent = source;
     }
     history = parents.map((fiber) => <div key={fiber.id}>{formatNode(fiber)}</div>)  }
   else {

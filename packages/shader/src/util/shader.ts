@@ -2,6 +2,9 @@ import { VirtualTable } from '../types';
 import { getProgramHash, makeKey } from './hash';
 import { PREFIX_VIRTUAL } from '../constants';
 
+const EMPTY_LIST = [] as any[];
+const EMPTY_TABLE = {} as any;
+
 type SymbolTable = {
   symbols?: string[],
 };

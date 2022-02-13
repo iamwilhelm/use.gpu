@@ -9,9 +9,6 @@ import LRU from 'lru-cache';
 
 export { loadStaticModule, loadVirtualModule } from '../util/shader';
 
-const EMPTY_LIST = [] as any[];
-const EMPTY_TABLE = {} as any;
-
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
 export const loadModule = (

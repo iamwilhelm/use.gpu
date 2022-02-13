@@ -1,15 +1,14 @@
 import { Tree } from '@lezer/common';
 import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundle, RefFlags as RF, DataBinding } from './types';
 
-import { parseShader, defineConstants, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
-import { rewriteUsingAST, resolveShakeOps } from './ast';
-import { makeUniformBlock } from './gen';
+import { defineConstants, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
+import { rewriteUsingAST } from './ast';
+import { resolveShakeOps } from '../util/shake';
 import { parseBundle, parseLinkAliases } from '../util/bundle';
-import { getGraphOrder } from '../util/tree';
+import { getGraphOrder, reserveNamespace } from '../util/link';
 
 import { VIRTUAL_BINDGROUP } from '../constants';
 import { GLSL_VERSION } from './constants';
-import * as T from './grammar/glsl.terms';
 import mapValues from 'lodash/mapValues';
 
 const TIMED = false;
@@ -262,22 +261,3 @@ export const loadModulesInOrder = timed('loadModules', (
     exported,
   };
 });
-
-// Generate a new namespace
-export const reserveNamespace = (
-  module: ParsedModule,
-  namespaces: Map<string, string>,
-  force?: string,
-): string => {
-  const {name, table: {hash}} = module;
-  let namespace = force;
-  let n = 2;
-
-  if (force == null) {
-    namespace = '_' + ('00' + namespaces.size.toString(36)).slice(-2) + '_';
-  }
-
-  namespaces.set(name, namespace!);
-
-  return namespace!;
-}

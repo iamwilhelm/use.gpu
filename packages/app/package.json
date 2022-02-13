@@ -12,7 +12,8 @@
     "@use-gpu/webgpu": "*",
     "@use-gpu/components": "*",
     "@use-gpu/shader": "*",
-    "@use-gpu/glsl": "*"
+    "@use-gpu/glsl": "*",
+    "@use-gpu/wgsl": "*"
   },
   "scripts": {
     "test": "jest --watch",

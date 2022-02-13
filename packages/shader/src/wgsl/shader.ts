@@ -1,7 +1,7 @@
 import { Tree, SyntaxNode } from '@lezer/common';
 import { ParsedModule, ParsedModuleCache, ShaderDefine, SymbolTable, VirtualTable } from './types';
 
-import { makeASTParser /*, compressAST, decompressAST */ } from './ast';
+import { makeASTParser, compressAST, decompressAST } from './ast';
 import { getProgramHash, makeKey } from '../util/hash';
 import { parser } from './grammar/wgsl';
 import { PREFIX_VIRTUAL } from '../constants';
@@ -10,7 +10,6 @@ import LRU from 'lru-cache';
 const EMPTY_LIST = [] as any[];
 const EMPTY_TABLE = {} as any;
 
-/*
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
 export const loadModule = (
@@ -79,7 +78,6 @@ export const loadVirtualModule = (
   };
   return { name, code, table, entry, virtual };
 }
-*/
 
 // Parse WGSL using lezer grammar
 export const parseShader = (code: string): Tree => parser.parse(code);

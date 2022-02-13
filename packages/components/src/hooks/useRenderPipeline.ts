@@ -28,7 +28,7 @@ export const useRenderPipeline = (
   const {device, colorStates, depthStencilState, samples, languages} = renderContext;
 
   const memoKey = useMemoKey(
-    [device, colorStates, depthStencilState, languages, shader, props]
+    [device, colorStates, depthStencilState, languages, props]
   );
 
   return useMemo(() => {

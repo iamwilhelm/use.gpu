@@ -7,8 +7,6 @@ import {
   Flat, Absolute, Layout, Stack, Flex, Element,
   Aggregate,
 } from '@use-gpu/components';
-import { Mesh } from '../mesh';
-import { makeMesh } from '../meshes/mesh';
 
 export type LayoutPageProps = {
   _unused?: boolean,

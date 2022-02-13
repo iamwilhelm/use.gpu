@@ -1,6 +1,7 @@
 import GLSL from './glsl';
 
-import { makeLanguage } from '@use-gpu/shader/glsl';
+import { makeLanguage as makeGLSL } from '@use-gpu/shader/glsl';
+import { makeLanguage as makeWGSL } from '@use-gpu/shader/wgsl';
 import { mountGPU } from '@use-gpu/webgpu';
 import { use, render, formatTree } from '@use-gpu/live';
 
@@ -14,7 +15,8 @@ export const main = async (): Promise<void> => {
 
   const glsl = await GLSL();
   const languages = {
-    glsl: makeLanguage(glsl),
+    glsl: makeGLSL(glsl),
+    wgsl: makeWGSL(),
   };
 
   try {

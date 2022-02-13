@@ -3,7 +3,7 @@
 exports[`ast gets shake table 1`] = `
 Array [
   Array [
-    6,
+    7,
     Array [
       "x",
       "getFloat2",
@@ -11,7 +11,7 @@ Array [
     ],
   ],
   Array [
-    27,
+    28,
     Array [
       "y",
       "getFloat2",
@@ -19,21 +19,21 @@ Array [
     ],
   ],
   Array [
-    49,
+    54,
     Array [
       "getFloat1",
       "main",
     ],
   ],
   Array [
-    100,
+    106,
     Array [
       "getFloat2",
       "main",
     ],
   ],
   Array [
-    166,
+    173,
     Array [
       "main",
     ],
@@ -45,8 +45,8 @@ exports[`ast gets symbol table 1`] = `
 Object {
   "declarations": Array [
     Object {
-      "at": 6,
-      "flags": 1,
+      "at": 7,
+      "flags": 0,
       "symbol": "x",
       "variable": Object {
         "attributes": Array [
@@ -66,7 +66,7 @@ Object {
       },
     },
     Object {
-      "at": 27,
+      "at": 28,
       "flags": 0,
       "symbol": "y",
       "variable": Object {
@@ -82,7 +82,7 @@ Object {
       },
     },
     Object {
-      "at": 44,
+      "at": 46,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -105,12 +105,12 @@ Object {
           "name": "i32",
         },
       },
-      "at": 65,
+      "at": 68,
       "flags": 0,
       "symbol": "integer",
     },
     Object {
-      "at": 88,
+      "at": 94,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -125,8 +125,8 @@ Object {
       "symbol": "b",
     },
     Object {
-      "at": 115,
-      "flags": 1,
+      "at": 125,
+      "flags": 0,
       "struct": Object {
         "attributes": Array [
           Object {
@@ -167,7 +167,7 @@ Object {
       "symbol": "light",
     },
     Object {
-      "at": 199,
+      "at": 220,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -194,13 +194,13 @@ Object {
         vec2<i32>(1, 0),
         vec2<i32>(0, 1),
         vec2<i32>(1, 1),
-			)",
+      )",
       },
       "flags": 0,
       "symbol": "QUAD",
     },
     Object {
-      "at": 372,
+      "at": 397,
       "flags": 6,
       "func": Object {
         "attributes": Array [
@@ -225,8 +225,8 @@ Object {
       "symbol": "getInt",
     },
     Object {
-      "at": 420,
-      "flags": 0,
+      "at": 446,
+      "flags": 1,
       "func": Object {
         "attributes": Array [
           Object {
@@ -246,7 +246,7 @@ Object {
     },
   ],
   "globals": undefined,
-  "hash": "mtyot4jkqo",
+  "hash": "8ntk58pr4n",
   "modules": undefined,
   "symbols": Array [
     "x",
@@ -260,8 +260,7 @@ Object {
     "main",
   ],
   "visibles": Array [
-    "x",
-    "light",
+    "main",
   ],
 }
 `;
@@ -296,7 +295,7 @@ Array [
         vec2<i32>(1, 0),
         vec2<i32>(0, 1),
         vec2<i32>(1, 1),
-			)",
+      )",
     },
     "flags": 0,
     "symbol": "QUAD",
@@ -307,8 +306,8 @@ Array [
 exports[`ast gets test empty function declaration 1`] = `
 Array [
   Object {
-    "at": 4,
-    "flags": 0,
+    "at": 7,
+    "flags": 1,
     "func": Object {
       "attributes": Array [
         Object {
@@ -332,7 +331,7 @@ Array [
 exports[`ast gets test function declaration 1`] = `
 Array [
   Object {
-    "at": 4,
+    "at": 7,
     "flags": 0,
     "func": Object {
       "attributes": Array [
@@ -555,7 +554,7 @@ Array [
     "symbol": "integer",
   },
   Object {
-    "at": 81,
+    "at": 84,
     "constant": Object {
       "attributes": undefined,
       "identifiers": Array [],

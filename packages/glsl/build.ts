@@ -73,11 +73,10 @@ export default GLSLModules;
 fs.writeFileSync(INDEX_TS, ts);
 
 // Generate type definition
-// Insert useless wildcard into pattern to trigger TS support for non-TS/JS file extensions.
 const makeTSModule = (file: string, symbols?: string[]) => {
-  const pattern = file.replace('./src/', '@use-gpu/glsl/').replace('.glsl', '.glsl');
+  const pattern = file.replace('./src/', '@use-gpu/glsl/');
   return `declare module ${escape(pattern)} {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  type ParsedBundle = import('@use-gpu/shader/glsl/types').ParsedBundle;
   const __module: ParsedBundle;
   ${(symbols ?? []).map(s => `export const ${s}: ParsedBundle;`).join("\n  ")}
   export default __module;

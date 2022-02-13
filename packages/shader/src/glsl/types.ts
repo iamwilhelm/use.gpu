@@ -1,13 +1,21 @@
 import {
-	ParsedModuleCache as ParsedModuleCacheT,
-	ParsedBundle as ParsedBundleT,
-	ParsedModule as ParsedModuleT,
-	ShaderModule as ShaderModuleT,
-	VirtualTable as VirtualTableT,
-	DataBinding as DataBindingT,
+  ParsedModuleCache as ParsedModuleCacheT,
+  ParsedBundle as ParsedBundleT,
+  ParsedModule as ParsedModuleT,
+  ShaderModule as ShaderModuleT,
+  VirtualTable as VirtualTableT,
+  DataBinding as DataBindingT,
 } from '../types';
 
-export type { ShakeTable, ShakeOp, VirtualRender, StorageSource, UniformAttribute, UniformAttributeValue } from '../types';
+export type {
+  CompressedNode,
+  ShakeTable,
+  ShakeOp,
+  VirtualRender,
+  StorageSource,
+  UniformAttribute,
+  UniformAttributeValue,
+} from '../types';
 
 export type ParsedModuleCache = ParsedModuleCacheT<SymbolTable>;
 export type ParsedBundle = ParsedBundleT<SymbolTable>;
@@ -19,8 +27,6 @@ export type DataBinding = DataBindingT<SymbolTable>;
 export type ShaderCompiler = (code: string, stage: string) => Uint8Array | Uint32Array;
 
 export type ComboRef = ModuleRef | FunctionRef | DeclarationRef;
-
-export type CompressedNode = [string, number, number];
 
 export type SymbolTable = {
   hash: string,

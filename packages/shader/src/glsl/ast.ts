@@ -445,12 +445,6 @@ export const makeASTParser = (code: string, tree: Tree) => {
   };
 }
 
-// Resolve shake ops to preserve all code needed for the given exports
-export const resolveShakeOps = (
-  shake: ShakeOp[],
-  exports: Set<string>, 
-) => shake.filter(([, deps]) => deps.every(s => !exports.has(s))).map(([at]) => at);
-
 // Rewrite code using tree, renaming the given identifiers.
 // Removes:
 // - #version

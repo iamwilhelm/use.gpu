@@ -31,6 +31,10 @@ export default {
         use: [path.resolve('./packages/glsl-loader/src/index.ts')],
       },
       {
+        test: /\.wgsl$/i,
+        use: [path.resolve('./packages/wgsl-loader/src/index.ts')],
+      },
+      {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },

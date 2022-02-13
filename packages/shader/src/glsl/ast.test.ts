@@ -1,7 +1,8 @@
 import { GLSLModules } from './glsl.test.data';
 import { parseShader } from './shader';
-import { makeASTParser, rewriteUsingAST, resolveShakeOps, compressAST, decompressAST } from './ast';
+import { makeASTParser, rewriteUsingAST, compressAST, decompressAST } from './ast';
 import { formatAST, hasErrorNode } from '../util/tree';
+import { resolveShakeOps } from '../util/shake';
 import { addASTSerializer } from '../test/snapshot';
 
 addASTSerializer(expect);

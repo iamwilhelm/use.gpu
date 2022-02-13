@@ -1,16 +1,5 @@
 import { ExternalTokenizer } from '@lezer/lr';
-import { UntilEOL, untilCommentClose } from './wgsl.terms';
-
-export const untilEOLToken = new ExternalTokenizer(
-  (input, stack) => {
-    while (true) {
-      const v = input.next;
-      // \n | \r | \v | \f | EOF
-      if (v === 10 || v === 11 || v === 12 || v === 13 || v === -1) return input.acceptToken(UntilEOL);
-      input.advance();
-    }
-  }
-);
+import { untilCommentClose } from './wgsl.terms';
 
 export const untilCommentCloseToken = new ExternalTokenizer(
   (input, stack) => {

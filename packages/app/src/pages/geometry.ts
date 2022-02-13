@@ -14,6 +14,7 @@ import {
   Router, Routes,
 } from '@use-gpu/components';
 import { Mesh } from '../mesh';
+import { Mesh as MeshWGSL } from '../mesh-wgsl';
 import { makeMesh, makeTexture } from '../meshes/mesh';
 
 export type GeometryPageProps = {
@@ -113,7 +114,9 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
             }),
             use(Pick)({
               render: ({id, hovered, clicked}) => [
-                use(Mesh)({ texture, mesh, blink: clicked }),
+                use(MeshWGSL)({ texture, mesh, blink: clicked }),
+              
+                //use(Mesh)({ texture, mesh, blink: clicked }),
                 use(Mesh)({ id, texture, mesh, mode: RenderPassMode.Picking }),
                 hovered ? use(Cursor)({ cursor: 'pointer' }) : null,
               ],

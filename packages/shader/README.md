@@ -8,31 +8,54 @@ npm install --save @use-gpu/shader
 yarn add @use-gpu/shader
 ```
 
-## GLSL Linker and Tree Shaker
+## WGSL / GLSL Linker and Tree Shaker
 
-`@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly.
+`@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly. It supports either WGSL or GLSL, but can only link within a single language.
 
 It enables two kinds of imports to be used:
 
- - **Static - ES Style** 
+ - **Static - ES Style**  (functions, declarations and types)
+```wgsl
+// WGSL
+import { getColor } from 'path/to/color';
 ```
-#pragma import { getColor } from 'path/to/color'  // functions, declarations and types
+
+```glsl
+// GLSL
+#pragma import { getColor } from 'path/to/color'
 ```
+
  - **Dynamic - Function Prototype**
 
+```wgsl
+// WGSL
+@external fn getColor() -> vec4<f32> {}; // linked at run-time
 ```
+
+```glsl
+// GLSL
 vec4 getColor(); // linked at run-time
 ```
 
-This allows you to split up and organize your GLSL code as you see fit, as well as create dynamic shader permutations. It also lets you bind shaders at run-time without immediate linking, thus providing an equivalent of GLSL closures.
 
-`@use-gpu/shader` supports GLSL 4.5 and uses a [Lezer grammar](https://lezer.codemirror.net/) for the parsing.
+This allows you to split up and organize your WGSL / GLSL code as you see fit, as well as create dynamic shader permutations. It also lets you bind shaders at run-time without immediate linking, thus providing an equivalent of WGSL / GLSL closures.
+
+`@use-gpu/shader` supports WGSL 1.0 (provisional) and GLSL 4.5. It uses custom [Lezer grammars](https://lezer.codemirror.net/) for the parsing.
 
 #### Bundler
 
-When combined with `@use-gpu/glsl-loader` (webpack or node), you can import a tree of `.glsl` modules directly in JS/TS as a pre-packaged bundle:
+When combined with `@use-gpu/wgsl-loader` or `@use-gpu/glsl-loader` (webpack or node), you can import a tree of `.wgsl` / `.glsl` modules directly in JS/TS as a pre-packaged bundle:
 
 ```ts
+// WGSL
+import mainShader from 'path/to/main.wgsl';
+
+import { linkBundle } from '@use-gpu/shader/wgsl';
+const wgslCode = linkBundle(mainShader);
+```
+
+```ts
+// GLSL
 import mainShader from 'path/to/main.glsl';
 
 import { linkBundle } from '@use-gpu/shader/glsl';
@@ -56,7 +79,7 @@ The `bound` module can be passed around, and used as a new link to bind to anoth
 You can also skip the bundler and work with raw strings. In this case it is up to you to gather all the associated module code:
 
 ```ts
-import { linkCode } from '@use-gpu/shader/glsl';
+import { linkCode } from '@use-gpu/shader/wgsl';
 
 const moduleA = "...";
 const moduleB = "...";
@@ -67,7 +90,29 @@ const linked = linkCode(moduleC, {moduleA, moduleB});
 
 Shaders parsed at run-time will be cached on a least-recently-used basis, based on content hash.
 
-## Syntax
+## Syntax (WGSL)
+
+```glsl
+// Import symbols from a .wgsl file
+import { symbol, … } from "path/to/file"
+import { symbol as symbol, … } from "path/to/file"
+
+// Mark function as linked at runtime
+@external fn func() { }
+
+// Mark declaration as exported
+@export fn func() { }
+@export var name : i32;
+
+// Mark function prototype as optional
+@external @optional fn func() { }
+
+// Mark next declaration as global (don't namespace it)
+@global fn func() { }
+@global var name : i32;
+```
+
+## Syntax (GLSL)
 
 ```glsl
 // Import symbols from a .glsl file
@@ -237,7 +282,7 @@ Link packaged bundle of module + libs.
 ) => string;
 ```
 
-#### `setPreamble(…)`
+#### `setPreamble(…)` (GLSL only)
 
 ```ts
 (s: string) => void

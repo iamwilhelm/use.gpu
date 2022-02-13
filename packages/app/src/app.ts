@@ -16,8 +16,6 @@ import {
   Router, Routes,
   ViewProvider,
 } from '@use-gpu/components';
-import { Mesh } from './mesh';
-import { makeMesh } from './meshes/mesh';
 import { UseInspect } from '@use-gpu/inspect';
 
 import { GeometryPage } from './pages/geometry';
@@ -37,7 +35,6 @@ export const App: LiveComponent<AppProps> = (props) => {
 
   const fiber = useFiber();
   const inspect = useInspector();
-  const mesh = makeMesh();
 
   const routes = (
     use(Router)({

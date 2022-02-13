@@ -1,4 +1,4 @@
-import { getGraphOrder } from './tree';
+import { getGraphOrder } from './link';
 
 describe("getGraphOrder", () => {
 

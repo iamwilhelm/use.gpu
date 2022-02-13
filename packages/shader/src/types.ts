@@ -37,6 +37,8 @@ export type DataBinding<T = any> = {
   constant?: any,
 };
 
+export type CompressedNode = [string, number, number];
+
 export type ShakeTable = ShakeOp[];
 export type ShakeOp = [number, string[]];
 

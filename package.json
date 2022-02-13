@@ -1,6 +1,6 @@
 {
   "name": "use.gpu",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "index.js",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -41,21 +41,21 @@
   "scripts": {
     "build": "yarn wsrun --serial run build && yarn run pkg && yarn run test:import",
     "pkg": "ts-node scripts/package-json.ts",
-    "publish": "yarn run build && yarn publish --ignore-scripts build/packages/shader --access public && yarn publish --ignore-scripts --access public build/packages/glsl-loader",
+    "publish": "yarn run build && yarn publish --ignore-scripts build/packages/shader --access public && yarn publish --ignore-scripts --access public build/packages/glsl-loader && yarn publish --ignore-scripts --access public build/packages/wgsl-loader",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "jest --watch",
     "test:import": "(cd test/import; yarn run test)",
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/glsl; yarn run build)"
+    "postinstall": "(cd packages/glsl; yarn run build); (cd packages/wgsl; yarn run build)"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
     "transform": {
       "\\.jsx?$": "babel-jest",
-      "\\.glsl$": "<rootDir>/test/fileTransformer.mjs"
+      "\\.(wgsl|glsl)$": "<rootDir>/test/fileTransformer.mjs"
     },
     "moduleNameMapper": {
       "^@use-gpu/(.*)$": "<rootDir>/packages/$1"
@@ -74,7 +74,8 @@
       "jsx",
       "ts",
       "tsx",
-      "glsl"
+      "glsl",
+      "wgsl"
     ],
     "globals": {
       "ts-jest": {
@@ -89,10 +90,12 @@
   "workspaces": [
     "packages/state",
     "packages/glsl",
+    "packages/wgsl",
     "packages/live",
     "packages/core",
     "packages/shader",
     "packages/glsl-loader",
+    "packages/wgsl-loader",
     "packages/webgpu",
     "packages/components",
     "packages/inspect",

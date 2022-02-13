@@ -44,7 +44,7 @@ describe('ast', () => {
       var x: f32;
       var y: f32;
       let a: i32 = 3;
-			type integer = i32;
+      type integer = i32;
       override b: i32;
     `;
 
@@ -57,7 +57,7 @@ describe('ast', () => {
 
   it('gets test empty function declaration', () => {
     const code = `
-			@export fn main() {}
+      @export fn main() {}
     `;
 
     const tree = parseShader(code);
@@ -69,9 +69,9 @@ describe('ast', () => {
 
   it('gets test function declaration', () => {
     const code = `
-			@stage(fragment) fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {
-				return foo(in1, in2);
-			}
+      @stage(fragment) fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {
+        return foo(in1, in2);
+      }
     `;
 
     const tree = parseShader(code);
@@ -83,10 +83,10 @@ describe('ast', () => {
 
   it('gets test struct declaration', () => {
     const code = `
-			struct light {
-				intensity: f32;
-				@annotate position: vec3<f32>;
-			}
+      struct light {
+        intensity: f32;
+        @annotate position: vec3<f32>;
+      }
     `;
 
     const tree = parseShader(code);
@@ -103,7 +103,7 @@ describe('ast', () => {
         vec2<i32>(1, 0),
         vec2<i32>(0, 1),
         vec2<i32>(1, 1),
-			);
+      );
     `;
 
     const tree = parseShader(code);
@@ -115,27 +115,27 @@ describe('ast', () => {
 
   it('gets symbol table', () => {
     const code = `
-	    @exported var x: f32;
-	    var y: f32;
-	    let a: i32 = 3;
-			type integer = i32;
-	    override b: i32;
+      @exported var x: f32;
+      var y: f32;
+      let a: i32 = 3;
+      type integer = i32;
+      override b: i32;
 
-			@exported struct light {
-				intensity: f32;
-				@annotate position: vec3<f32>;
-			}
+      @exported struct light {
+        intensity: f32;
+        @annotate position: vec3<f32>;
+      }
 
       let QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
         vec2<i32>(0, 0),
         vec2<i32>(1, 0),
         vec2<i32>(0, 1),
         vec2<i32>(1, 1),
-			);
+      );
 
-	    @optional @external fn getInt() -> i32 {}
+      @optional @external fn getInt() -> i32 {}
 
-	    @export fn main() {}
+      @export fn main() {}
     `;
 
     const tree = parseShader(code);
@@ -147,16 +147,16 @@ describe('ast', () => {
 
   it('gets shake table', () => {
     const code = `
-	    @exported var x: f32;
-			var y: f32;
+      @exported var x: f32;
+      var y: f32;
 
-	    @optional @external fn getFloat1() -> f32 {}
+      @optional @external fn getFloat1() -> f32 {}
 
-	    @optional @external fn getFloat2() -> f32 { return x + y; }
+      @optional @external fn getFloat2() -> f32 { return x + y; }
 
-	    @export fn main() {
-				var z: f32 = getFloat1() + getFloat2();
-			}
+      @export fn main() {
+        var z: f32 = getFloat1() + getFloat2();
+      }
     `;
 
     const tree = parseShader(code);
@@ -166,7 +166,7 @@ describe('ast', () => {
     expect(table).toMatchSnapshot();
   });
 
-	/*
+  /*
   it('gets quad vertex imports', () => {
     const code = GLSLModules['instance/vertex/quad'];
 

@@ -4,8 +4,8 @@ import { ShaderDefine, SymbolTable, ParsedModule, ParsedModuleCache, ParsedBundl
 import { defineConstants, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
 import { rewriteUsingAST } from './ast';
 import { resolveShakeOps } from '../util/shake';
-import { parseBundle, parseLinkAliases } from '../util/bundle';
-import { getGraphOrder, reserveNamespace } from '../util/link';
+import { parseBundle } from '../util/bundle';
+import { parseLinkAliases, getGraphOrder, reserveNamespace } from '../util/link';
 
 import { VIRTUAL_BINDGROUP } from '../constants';
 import mapValues from 'lodash/mapValues';

@@ -22,8 +22,10 @@ import * as T from './grammar/glsl.terms';
 import { GLSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
 import { getProgramHash } from '../util/hash';
-import { getChildNodes, hasErrorNode, formatAST, formatASTNode } from '../util/tree';
+import { getChildNodes, hasErrorNode, formatAST, formatASTNode, decompressAST } from '../util/tree';
 import uniq from 'lodash/uniq';
+
+export { decompressAST } from '../util/tree';
 
 const NO_DEPS = [] as string[];
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
@@ -541,14 +543,11 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
   const cursor = tree.cursor();
   do {
     const {type, from, to} = cursor;
-    // Injected by compressed AST only: Skip, Shake, Id
-    if (type.name === 'Skip') skip(from, to);
-    else if (type.name === 'Shake') shake(from, to);
-    
-    else if (type.name === 'Declaration' || type.name === 'FunctionDefinition') {
+
+    if (type.name === 'Declaration' || type.name === 'FunctionDefinition') {
       if (cursor.node.parent?.type.name === 'Program') shake(from, to);
     }
-    else if (type.name === 'Identifier' || type.name === 'Id') {
+    else if (type.name === 'Identifier') {
       const {from, to} = cursor;
       ident(from, to);
     }
@@ -575,48 +574,4 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
   } while (cursor.next());
 
   return out;
-}
-
-// Decompress a compressed AST on the fly by returning a pseudo-tree-cursor.
-export const decompressAST = (nodes: CompressedNode[]) => {
-  const tree = {
-    __nodes: () => nodes,
-    cursor: () => {
-      let i = -1;
-      const n = nodes.length;
-
-      const next = () => {
-        const hasNext = ++i < n;
-        if (!hasNext) return false;
-        
-        const node = nodes[i];
-        [self.type.name, self.from, self.to] = node;
-
-        return true;
-      };
-
-      const lastChild = () => {
-        const {to} = self;
-        do {
-          const node = nodes[i + 1];
-          if (node && node[1] >= to) return false;
-        } while (next());
-        return false;
-      }
-
-      const self = {
-        type: {name: ''},
-        node: {parent: {type: {name: 'Program'}}},
-        from: 0,
-        to: 0,
-        next,
-        lastChild,
-      } as any;
-
-      next();
-
-      return self;
-    },
-  } as any as Tree;
-  return tree;
 }

@@ -1,10 +1,11 @@
 import { ParsedModule, ParsedBundle, ShaderModule, CompressedNode, ShaderDefine, DataBinding, UniformAttribute } from './types';
 
 import { defineConstants, loadStaticModule, loadVirtualModule } from './shader';
-import { compressAST, decompressAST } from './ast';
-import { getProgramHash, makeKey } from '../util/hash';
+import { compressAST } from './ast';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
-import { parseBundle, toBundle, toModule, parseLinkAliases, forBundleModules } from '../util/bundle';
+import { parseBundle, toBundle, toModule, forBundleModules } from '../util/bundle';
+import { getProgramHash, makeKey } from '../util/hash';
+import { parseLinkAliases } from '../util/link';
 import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP } from '../constants';
 import mapValues from 'lodash/mapValues';
 

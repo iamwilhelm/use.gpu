@@ -1,4 +1,5 @@
 import { SyntaxNode, Tree } from '@lezer/common';
+import { CompressedNode } from '../types';
 
 // Gather all child nodes (may be implicit)
 export const getChildNodes = (node: SyntaxNode) => {
@@ -55,4 +56,49 @@ export const formatASTNode = (node: SyntaxNode) => {
   }
   const space = inner.length ? ' ' : '';
   return `(${type.name}${space}${inner.join(" ")})`;
+}
+
+
+// Decompress a compressed AST on the fly by returning a pseudo-tree-cursor.
+export const decompressAST = (nodes: CompressedNode[]) => {
+  const tree = {
+    __nodes: () => nodes,
+    cursor: () => {
+      let i = -1;
+      const n = nodes.length;
+
+      const next = () => {
+        const hasNext = ++i < n;
+        if (!hasNext) return false;
+        
+        const node = nodes[i];
+        [self.type.name, self.from, self.to] = node;
+
+        return true;
+      };
+
+      const lastChild = () => {
+        const {to} = self;
+        do {
+          const node = nodes[i + 1];
+          if (node && node[1] >= to) return false;
+        } while (next());
+        return false;
+      }
+
+      const self = {
+        type: {name: ''},
+        node: {parent: {type: {name: 'Program'}}},
+        from: 0,
+        to: 0,
+        next,
+        lastChild,
+      } as any;
+
+      next();
+
+      return self;
+    },
+  } as any as Tree;
+  return tree;
 }

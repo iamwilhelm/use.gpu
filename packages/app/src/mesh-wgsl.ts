@@ -82,7 +82,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   // Rendering pipeline
   const pipeline = useMemo(() => {
     const {wgsl: {cache}} = languages;
-
+    
     const vertexLinked = linkBundle(vertexShader, {}, defines, cache);
     const fragmentLinked = linkBundle(fragmentShader, {}, defines, cache);
 

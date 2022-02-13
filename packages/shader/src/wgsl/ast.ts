@@ -24,12 +24,15 @@ import {
 import * as T from './grammar/wgsl.terms';
 import { parseString } from '../util/bundle';
 import { getProgramHash } from '../util/hash';
-import { getChildNodes, hasErrorNode, formatAST, formatASTNode } from '../util/tree';
+import { getChildNodes, hasErrorNode, formatAST, formatASTNode, decompressAST } from '../util/tree';
 import uniq from 'lodash/uniq';
+
+export { decompressAST } from '../util/tree';
 
 const NO_STRINGS = [] as string[];
 const VOID_TYPE = {name: 'void'};
 const AUTO_TYPE = {name: 'auto'};
+const PRIVATE_ANNOTATIONS = new Set(['@export', '@external', '@global', '@optional']);
 
 const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
 
@@ -436,8 +439,9 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
 // Rewrite code using tree, renaming the given identifiers.
 // Removes:
-// - #version
-// - #pragma import | export | optional | global
+// - import ... from declarations
+// - @export | @optional | @global attributes
+// - @external declarations
 // - white-space after shake point
 export const rewriteUsingAST = (
   code: string,
@@ -455,57 +459,72 @@ export const rewriteUsingAST = (
     pos = to;
 
     if (replace != null) out = out + replace;
-    else while (isSpace(code, pos)) pos++;
+    else {
+      if (out.length && !out[out.length - 1].match(/\s/)) out = out + "\n";
+      while (isSpace(code, pos)) pos++;
+    }
   }
 
   const cursor = tree.cursor();
   do {
     const {type, from, to} = cursor;
-    // Injected by compressed AST only: Skip, Shake, Id
+
+    // Injected by compressed AST only: Skip, Shake, Id, Attr
     if (type.name === 'Skip') skip(from, to);
-    
-    // Top level declaration
-    else if (type.name === 'Declaration'/* || type.name === 'FunctionDefinition'*/ || type.name === 'Shake') {
-      //if (cursor.node.parent?.type.name !== 'Program') continue;
+    else if (type.name === 'Shake') {
       if (!shakes) continue;
-      if (shakes.has(from)) {
+      const shaken = shakes.has(from);
+
+      if (shaken) {
         skip(from, to);
         while (cursor.lastChild()) {};
       }
     }
-    // Any identifier
+
+    // Any identifier (both full and compressed AST)
     else if (type.name === 'Identifier' || type.name === 'Id') {
       const name = code.slice(from, to);
       const replace = rename.get(name);
 
       if (replace) skip(from, to, replace);      
     }
-    // #version preprocessor
-    else if (type.name === 'version') {
-      cursor.parent();
-      cursor.parent();
+
+    // Top level declaration (full AST only)
+    else if (type.name === 'LocalDeclaration') {
+      const shaken = shakes?.has(from);
+
+      if (shaken) {
+        // Tree shake entire declaration
+        skip(from, to);
+        while (cursor.lastChild()) {};
+      }
+      else {
+        // Check if declaration is external
+        const sub = cursor.node.cursor;
+        sub.firstChild();
+        sub.firstChild();
+
+        const t = code.slice(sub.from, sub.to);
+        if (t.match('@external')) {
+          skip(from, to);
+          while (cursor.lastChild()) {};
+        }
+      }
+    }
+    // Private attributes (full AST only)
+    else if (type.name === 'Attribute' || type.name === 'Attr') {
+      const name = code.slice(from, to);
+      if (PRIVATE_ANNOTATIONS.has(name)) {
+        const {from, to} = cursor;
+        skip(from, to);
+        while (cursor.lastChild()) {};
+      }
+    }
+    // Import declaration (full AST only)
+    else if (type.name === 'ImportDeclaration') {
       const {from, to} = cursor;
       skip(from, to);
-      cursor.lastChild();
-    }
-    // #pragma import/export
-    else if (type.name === 'import' || type.name === 'export' ||
-             type.name === 'optional' || type.name === 'global') {
-      cursor.parent();
-      const {from, to} = cursor;
-      skip(from, to);
-      cursor.lastChild();
-    }
-    // Field accessor
-    else if (type.name === 'Field') {
-      const sub = cursor.node.cursor;
-      do {} while (sub.firstChild());
-
-      const name = code.slice(sub.from, sub.to);
-      const replace = rename.get(name);
-
-      if (replace) skip(sub.from, sub.to, replace);
-      cursor.lastChild();
+      while (cursor.lastChild()) {};
     }
   } while (cursor.next());
 
@@ -516,7 +535,7 @@ export const rewriteUsingAST = (
 }
 
 // Compress an AST to only the info needed to do symbol replacement and tree shaking
-export const compressAST = (tree: Tree): CompressedNode[] => {
+export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
   const out = [] as any[]
 
   // Pass through nodes from pre-compressed tree immediately
@@ -524,88 +543,49 @@ export const compressAST = (tree: Tree): CompressedNode[] => {
   if (tree.__nodes) return tree.__nodes();
 
   const shake = (from: number, to: number) => out.push(["Shake", from, to]);
-  const skip = (from: number, to: number) => out.push(["Skip", from, to]);
-  const ident = (from: number, to: number) => out.push(["Id", from, to]);
+  const skip  = (from: number, to: number) => out.push(["Skip",  from, to]);
+  const ident = (from: number, to: number) => out.push(["Id",    from, to]);
 
   const cursor = tree.cursor();
   do {
     const {type, from, to} = cursor;
-    // Injected by compressed AST only: Skip, Shake, Id
-    if (type.name === 'Skip') skip(from, to);
-    else if (type.name === 'Shake') shake(from, to);
-    
-    else if (type.name === 'Declaration') {
-      if (cursor.node.parent?.type.name === 'Program') shake(from, to);
-    }
-    else if (type.name === 'Identifier' || type.name === 'Id') {
-      const {from, to} = cursor;
+
+    // Any identifier
+    if (type.name === 'Identifier') {
       ident(from, to);
     }
-    else if (type.name === 'version') {
-      cursor.parent();
-      cursor.parent();
-      const {from, to} = cursor;
-      skip(from, to);
-      cursor.lastChild();
-    }
-    else if (type.name === 'import' || type.name === 'export' ||
-             type.name === 'optional' || type.name === 'global') {
-      cursor.parent();
-      const {from, to} = cursor;
-      skip(from, to);
-      cursor.lastChild();
-    }
-    else if (type.name === 'Field') {
+
+    // Top level declaration
+    else if (type.name === 'LocalDeclaration') {
+      // Check if declaration is external
       const sub = cursor.node.cursor;
-      do {} while (sub.firstChild());
-      ident(sub.from, sub.to);
-      cursor.lastChild();
+      sub.firstChild();
+      sub.firstChild();
+
+      const t = code.slice(sub.from, sub.to);
+      if (t.match('@external')) {
+        skip(from, to);
+        while (cursor.lastChild()) {};
+      }
+      else {
+        shake(from, to);
+      }
+    }
+    // Private attributes
+    else if (type.name === 'Attribute') {
+      const name = code.slice(from, to);
+      if (PRIVATE_ANNOTATIONS.has(name)) {
+        skip(from, to);
+        while (cursor.lastChild()) {};
+      }
+    }
+    // Import declaration
+    else if (type.name === 'ImportDeclaration') {
+      const {from, to} = cursor;
+      skip(from, to);
+      while (cursor.lastChild()) {};
     }
   } while (cursor.next());
 
   return out;
-}
-
-// Decompress a compressed AST on the fly by returning a pseudo-tree-cursor.
-export const decompressAST = (nodes: CompressedNode[]) => {
-  const tree = {
-    __nodes: () => nodes,
-    cursor: () => {
-      let i = -1;
-      const n = nodes.length;
-
-      const next = () => {
-        const hasNext = ++i < n;
-        if (!hasNext) return false;
-        
-        const node = nodes[i];
-        [self.type.name, self.from, self.to] = node;
-
-        return true;
-      };
-
-      const lastChild = () => {
-        const {to} = self;
-        do {
-          const node = nodes[i + 1];
-          if (node && node[1] >= to) return false;
-        } while (next());
-        return false;
-      }
-
-      const self = {
-        type: {name: ''},
-        node: {parent: {type: {name: 'Program'}}},
-        from: 0,
-        to: 0,
-        next,
-        lastChild,
-      } as any;
-
-      next();
-
-      return self;
-    },
-  } as any as Tree;
-  return tree;
 }

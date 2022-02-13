@@ -23,7 +23,7 @@ export const transpileWGSL = (source: string, resourcePath: string, esModule: bo
     "code": ${stringify(code)},
     "table": ${stringify(table)},
     "shake": ${stringify(shake)},
-    "tree": decompressAST(${stringify(compressAST(tree!))}),
+    "tree": decompressAST(${stringify(compressAST(code, tree!))}),
   };`
 
   // Emit dependency imports

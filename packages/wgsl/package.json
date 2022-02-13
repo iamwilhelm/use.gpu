@@ -21,6 +21,11 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./fragment/pbr.wgsl": {
+      "types": "./src/fragment/pbr.d.ts",
+      "import": "./src/fragment/pbr.wgsl",
+      "require": "./src/fragment/pbr.wgsl"
+    },
     "./instance/draw/mesh.wgsl": {
       "types": "./src/instance/draw/mesh.d.ts",
       "import": "./src/instance/draw/mesh.wgsl",

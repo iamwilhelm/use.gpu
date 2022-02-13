@@ -16,7 +16,7 @@ export const
   VariableIdentifier = 23,
   TypeDeclaration = 24,
   GlobalConstantDeclaration = 81,
-  Skip = 82,
+  EmptyToken = 82,
   Reserved = 86,
   LeftBracket = 111,
   RightBracket = 112,

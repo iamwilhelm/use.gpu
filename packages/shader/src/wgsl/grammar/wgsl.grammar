@@ -3,7 +3,7 @@
 @external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
 
 unit { globalDirective* globalDeclaration* }
-Skip { }
+EmptyToken { }
 
 k<term> { @specialize[@name={term}]<Identifier, term> }
 t<term> { @specialize[@name={term}]<Identifier, term> }
@@ -48,7 +48,7 @@ GlobalVariableDeclaration {
 }
 
 GlobalConstantDeclaration {
-  Skip k<'let'> VariableIdentifier assign Value<constExpression> |
+  EmptyToken k<'let'> VariableIdentifier assign Value<constExpression> |
   AttributeList k<'override'> VariableIdentifier (assign Value<expression>)?
 }
 

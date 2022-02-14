@@ -10,18 +10,21 @@ yarn add @use-gpu/shader
 
 ## WGSL / GLSL Linker and Tree Shaker
 
-`@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly. It supports either WGSL or GLSL, but can only link within a single language.
+`@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly. It supports both WGSL and GLSL, but it will only link code within a single language.
 
 It enables two kinds of imports to be used:
 
- - **Static - ES Style**  (functions, declarations and types)
+ - **Static - Symbol Import**  (functions, declarations and types)
 ```wgsl
-// WGSL
+// WGSL - Rust-flavored
+use 'path/to/color'::{ getColor };
+
+// WGSL - ES Style
 import { getColor } from 'path/to/color';
 ```
 
 ```glsl
-// GLSL
+// GLSL - ES Style
 #pragma import { getColor } from 'path/to/color'
 ```
 
@@ -40,7 +43,7 @@ vec4 getColor(); // linked at run-time
 
 This allows you to split up and organize your WGSL / GLSL code as you see fit, as well as create dynamic shader permutations. It also lets you bind shaders at run-time without immediate linking, thus providing an equivalent of WGSL / GLSL closures.
 
-`@use-gpu/shader` supports WGSL 1.0 (provisional) and GLSL 4.5. It uses custom [Lezer grammars](https://lezer.codemirror.net/) for the parsing.
+`@use-gpu/shader` supports GLSL 4.5 and WGSL 0.x (provisional). It uses custom [Lezer grammars](https://lezer.codemirror.net/) for the parsing.
 
 #### Bundler
 
@@ -104,7 +107,7 @@ import { symbol as symbol, … } from "path/to/file"
 @export fn func() { }
 @export var name : i32;
 
-// Mark function prototype as optional
+// Mark function as linked at runtime but optional
 @external @optional fn func() { }
 
 // Mark next declaration as global (don't namespace it)

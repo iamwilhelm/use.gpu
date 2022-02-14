@@ -1,4 +1,5 @@
-import { ParsedBundle, ParsedModule, ParsedModuleCache, ShaderDefine } from '../types';
+import { Tree } from '@lezer/common';
+import { ParsedBundle, ParsedModule, ParsedModuleCache, ShaderDefine, ImportRef, RefFlags as RF } from '../types';
 import { VIRTUAL_BINDGROUP } from '../constants';
 
 import { parseBundle } from './bundle';
@@ -23,7 +24,7 @@ export type LoadModuleWithCache = (
 export type GetPreambles = () => string[];
 
 export type DefineConstants = (
-  defines?: Record<string, ShaderDefine> | null
+  defines: Record<string, ShaderDefine>
 ) => string;
 
 export type RewriteUsingAST = (
@@ -240,7 +241,7 @@ export const loadModulesInOrder = timed('loadModules', (
       const {table: {hash}} = module;
       let list = exported.get(hash);
       if (!list) exported.set(hash, list = new Set());
-      imports.forEach(i => list!.add(module.entry ?? i.name));
+      imports.forEach((i: ImportRef) => list!.add(module.entry ?? i.name));
     }
 
     // Recurse into links

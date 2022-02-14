@@ -36,7 +36,8 @@ EnableDirective {
 }
 
 ImportDeclaration {
-  k<'import'> (ImportDeclarationList 'from')? String
+  k<'import'> (ImportDeclarationList 'from')? String |
+  k<'use'> String ('::' ImportDeclarationList)?
 }
 ImportDeclarationList { '{' (ImportDeclarationIdentifier comma)* ImportDeclarationIdentifier comma? '}' }
 ImportDeclarationIdentifier { Identifier ('as' Identifier)? }

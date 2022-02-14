@@ -320,18 +320,27 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
     const children = tree.topNode.getChildren(T.ImportDeclaration);
     for (const child of children) {
-      const [, a, b] = getNodes(child);
+      const [a, b, c] = getNodes(child);
 
       let module: string;
       let refs: ImportRef[];
-      if (a.type.id === T.String) {
-        refs = [];
-        module = parseString(getText(a));
-      } 
-      else {
-        refs = getNodes(a).map(getImport);
-        module = parseString(getText(b));
+      
+      let token = getText(a);
+      if (token === 'import') {
+        if (b.type.id === T.String) {
+          refs = [];
+          module = parseString(getText(b));
+        } 
+        else {
+          refs = getNodes(b).map(getImport);
+          module = parseString(getText(c));
+        }
       }
+      else if (token === 'use') {
+        module = parseString(getText(b));
+        refs = !!c ? getNodes(c).map(getImport) : [];
+      }
+      else continue;
 
       let items = modules[module];
       if (!items) items = modules[module] = [];

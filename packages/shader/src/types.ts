@@ -48,6 +48,25 @@ export type DataBinding<T extends SymbolTable = any> = {
 
 export type CompressedNode = [string, number, number];
 
+export type ImportRef = {
+  name: string,
+  imported: string,
+};
+
+export type ModuleRef = {
+  at: number,
+  symbols: string[],
+  name: string,
+  imports: ImportRef[],
+};
+
+export enum RefFlags {
+  Exported = 1,
+  External = 1 << 1,
+  Optional = 1 << 2,
+  Global   = 1 << 3,
+};
+
 export type ShaderDefine = string | number | boolean | null | undefined;
 
 export type ShakeTable = ShakeOp[];

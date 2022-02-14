@@ -129,6 +129,20 @@ import 'test';
 //////////////////////////////////////////////////////////////////////
 
 `
+use 'use/types'::{MeshVertex};
+use 'use/view'::{viewUniforms as view, worldToClip};
+use 'geometry/quad'::{getQuadUV};
+
+import 'test';
+
+@optional @external fn getInt() -> i32 {}
+
+@export fn main() {}
+`,
+
+//////////////////////////////////////////////////////////////////////
+
+`
 fn getQuad(vertex: i32) -> MeshVertex {
   let uv: vec2<f32> = getQuadUV(vertex);
   let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);

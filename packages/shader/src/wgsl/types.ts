@@ -5,10 +5,17 @@ import {
   ShaderModule as ShaderModuleT,
   VirtualTable as VirtualTableT,
   DataBinding as DataBindingT,
+  ImportRef,
+  RefFlags,
+} from '../types';
+
+export {
+  RefFlags,
 } from '../types';
 
 export type {
   CompressedNode,
+  ImportRef,
   ShakeTable,
   ShakeOp,
   ShaderDefine,
@@ -35,23 +42,11 @@ export type SymbolTable = {
   globals?: string[],
 };
 
-export enum RefFlags {
-  Exported = 1,
-  External = 1 << 1,
-  Optional = 1 << 2,
-  Global   = 1 << 3,
-};
-
 export type ModuleRef = {
   at: number,
   symbols: string[],
   name: string,
   imports: ImportRef[],
-};
-
-export type ImportRef = {
-  name: string,
-  imported: string,
 };
 
 export type DeclarationRef = {

@@ -349,6 +349,61 @@ Program                                                     ⮐ import {MeshVert
 `;
 
 exports[`WGSL grammar snapshots parses a test program 11`] = `
+Program                                                     ⮐ use 'use/types'::{MeshVertex};⮐ use 'use/view'::{viewUniforms as view, worldToClip};⮐ use 'geometry/quad'::{getQuadUV};⮐ ⮐ import 'test';⮐ ⮐ @optional @external fn getInt() -> i32 {}⮐ ⮐ @export fn main() {}⮐ 
+  ImportDeclaration                                         use 'use/types'::{MeshVertex}
+    use                                                     use
+    String                                                  'use/types'
+    ImportDeclarationList                                   {MeshVertex}
+      ImportDeclarationIdentifier                           MeshVertex
+        Identifier                                          MeshVertex
+  ImportDeclaration                                         use 'use/view'::{viewUniforms as view, worldToClip}
+    use                                                     use
+    String                                                  'use/view'
+    ImportDeclarationList                                   {viewUniforms as view, worldToClip}
+      ImportDeclarationIdentifier                           viewUniforms as view
+        Identifier                                          viewUniforms
+        Identifier                                          view
+      ImportDeclarationIdentifier                           worldToClip
+        Identifier                                          worldToClip
+  ImportDeclaration                                         use 'geometry/quad'::{getQuadUV}
+    use                                                     use
+    String                                                  'geometry/quad'
+    ImportDeclarationList                                   {getQuadUV}
+      ImportDeclarationIdentifier                           getQuadUV
+        Identifier                                          getQuadUV
+  ImportDeclaration                                         import 'test'
+    import                                                  import
+    String                                                  'test'
+  LocalDeclaration                                          @optional @external fn getInt() -> i32 {}
+    FunctionDeclaration                                     @optional @external fn getInt() -> i32 {}
+      AttributeList                                         @optional @external
+        Attribute                                           @optional
+          Identifier                                        optional
+        Attribute                                           @external
+          Identifier                                        external
+      FunctionHeader                                        fn getInt() -> i32
+        fn                                                  fn
+        Identifier                                          getInt
+        ParamList                                           
+        ReturnType                                          -> i32
+          AttributeList                                     
+          TypeDeclaration                                   i32
+            i32                                             i32
+      CompoundStatement                                     {}
+  LocalDeclaration                                          @export fn main() {}
+    FunctionDeclaration                                     @export fn main() {}
+      AttributeList                                         @export
+        Attribute                                           @export
+          Identifier                                        export
+      FunctionHeader                                        fn main()
+        fn                                                  fn
+        Identifier                                          main
+        ParamList                                           
+        ReturnType                                          
+      CompoundStatement                                     {}
+`;
+
+exports[`WGSL grammar snapshots parses a test program 12`] = `
 Program                                                     ⮐ fn getQuad(vertex: i32) -> MeshVertex {⮐   let uv: vec2<f32> = getQuadUV(vertex);⮐   let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);⮐   let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);⮐   return MeshVertex(position, color, uv);⮐ }⮐ 
   LocalDeclaration                                          ⮐ fn getQuad(vertex: i32) -> MeshVertex {⮐   let uv: vec2<f32> = getQuadUV(vertex);⮐   let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);⮐   let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);⮐   return MeshVertex(position, color, uv);⮐ }
     FunctionDeclaration                                     ⮐ fn getQuad(vertex: i32) -> MeshVertex {⮐   let uv: vec2<f32> = getQuadUV(vertex);⮐   let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);⮐   let color: vec4<f32> = vec4<f32>(1.0, 0.0, 1.0, 1.0);⮐   return MeshVertex(position, color, uv);⮐ }
@@ -425,7 +480,7 @@ Program                                                     ⮐ fn getQuad(verte
           Identifier                                        uv
 `;
 
-exports[`WGSL grammar snapshots parses a test program 12`] = `
+exports[`WGSL grammar snapshots parses a test program 13`] = `
 Program                                                     ⮐ type integer = i32;⮐ 
   LocalDeclaration                                          ⮐ type integer = i32;
     TypeAliasDeclaration                                    ⮐ type integer = i32

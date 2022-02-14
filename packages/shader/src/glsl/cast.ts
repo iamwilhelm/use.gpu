@@ -76,9 +76,9 @@ export const bundleToAttribute = (
   const entry = bundle.entry ?? module.entry ?? name;
 
   for (const fn of functions) {
-    const {prototype} = fn;
-    if (prototype) {
-      const {type, name, parameters} = prototype;
+    const {func} = fn;
+    if (func) {
+      const {type, name, parameters} = func;
       if (name === entry) {
         return {name, format: type.name, args: parameters};
       }

@@ -245,6 +245,33 @@ Object {
       "symbol": "main",
     },
   ],
+  "externals": Array [
+    Object {
+      "at": 397,
+      "flags": 6,
+      "func": Object {
+        "attributes": Array [
+          Object {
+            "args": undefined,
+            "name": "optional",
+          },
+          Object {
+            "args": undefined,
+            "name": "external",
+          },
+        ],
+        "identifiers": Array [],
+        "name": "getInt",
+        "parameters": undefined,
+        "type": Object {
+          "args": undefined,
+          "attributes": undefined,
+          "name": "i32",
+        },
+      },
+      "symbol": "getInt",
+    },
+  ],
   "globals": undefined,
   "hash": "8ntk58pr4n",
   "modules": undefined,

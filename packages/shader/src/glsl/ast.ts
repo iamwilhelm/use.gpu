@@ -176,13 +176,13 @@ export const makeASTParser = (code: string, tree: Tree) => {
   const getFunction = (node: SyntaxNode): FunctionRef => {
     const [a, b] = getNodes(node, 1);
     const flags = getFlags(node);
-    const prototype = getPrototype(a);
+    const func = getPrototype(a);
     const at = node.from;
 
-    const symbols = [prototype.name];
+    const symbols = [func.name];
     const identifiers = b ? getIdentifiers(b, symbols) : [];
 
-    return {at, symbols, identifiers, flags, prototype};
+    return {at, symbols, identifiers, flags, func};
   };
 
   const getDeclaration = (node: SyntaxNode): DeclarationRef => {
@@ -191,13 +191,13 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const at = node.from;
 
     if (a.type.id === T.FunctionPrototype) {
-      const prototype = getPrototype(a);
-      const {name} = prototype;
+      const func = getPrototype(a);
+      const {name} = func;
 
       const symbols = [name];
       const identifiers = getIdentifiers(node, symbols);
 
-      return {at, symbols, identifiers, flags, prototype};
+      return {at, symbols, identifiers, flags, func};
     }
     if (a.type.id === T.VariableDeclaration) {
       const variable = getVariable(a);
@@ -371,7 +371,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const declarations = getDeclarations();
 
     const externals = declarations
-      .filter(d => d.prototype && !functions.find(f => f.prototype.name === d.prototype!.name));
+      .filter(d => d.func && !functions.find(f => f.func.name === d.func!.name));
 
     const refs = [...functions, ...declarations];
     const exported = refs.filter(d => d.flags & RF.Exported);
@@ -529,7 +529,7 @@ export const rewriteUsingAST = (
 }
 
 // Compress an AST to only the info needed to do symbol replacement and tree shaking
-export const compressAST = (tree: Tree): CompressedNode[] => {
+export const compressAST = (_: string, tree: Tree): CompressedNode[] => {
   const out = [] as any[]
 
   // Pass through nodes from pre-compressed tree immediately

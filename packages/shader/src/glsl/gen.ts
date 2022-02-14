@@ -27,7 +27,7 @@ export const makeBindingAccessors = (
   const functions = virtuals.map(({uniform}) => ({
     at: 0,
     symbols: NO_SYMBOLS,
-    prototype: {
+    func: {
       name: uniform.name,
       type: {name: uniform.format},
       parameters: uniform.args ?? INT_ARG,

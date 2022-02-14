@@ -1,18 +1,27 @@
 import { Tree, SyntaxNode } from '@lezer/common';
 import LRU from 'lru-cache';
 
-export type ParsedModuleCache<T = any> = LRU<string, ParsedModule<T>>;
+export type ASTParser<T extends SymbolTable = any> = {
+  getSymbolTable: () => T,
+  getShakeTable: (table?: T) => ShakeTable | undefined,
+};
 
-export type ShaderModule<T = any> = ParsedBundle<T> | ParsedModule<T>;
+export type SymbolTable = {
+  symbols?: string[],
+};
 
-export type ParsedBundle<T = any> = {
+export type ParsedModuleCache<T extends SymbolTable = any> = LRU<string, ParsedModule<T>>;
+
+export type ShaderModule<T extends SymbolTable = any> = ParsedBundle<T> | ParsedModule<T>;
+
+export type ParsedBundle<T extends SymbolTable = any> = {
   module: ParsedModule<T>,
   libs?: Record<string, ShaderModule<T>>,
   entry?: string,
   virtual?: ParsedModule<T>[],
 };
 
-export type ParsedModule<T = any> = {
+export type ParsedModule<T extends SymbolTable = any> = {
   name: string,
   code: string,
   table: T,
@@ -22,7 +31,7 @@ export type ParsedModule<T = any> = {
   entry?: string,
 };
 
-export type VirtualTable<T = any> = {
+export type VirtualTable<T extends SymbolTable = any> = {
   render: VirtualRender,
   uniforms?: DataBinding<T>[],
   bindings?: DataBinding<T>[],
@@ -30,7 +39,7 @@ export type VirtualTable<T = any> = {
   namespace?: string,
 };
 
-export type DataBinding<T = any> = {
+export type DataBinding<T extends SymbolTable = any> = {
   uniform: UniformAttributeValue,
   storage?: StorageSource,
   lambda?: ShaderModule<T>,
@@ -39,10 +48,10 @@ export type DataBinding<T = any> = {
 
 export type CompressedNode = [string, number, number];
 
+export type ShaderDefine = string | number | boolean | null | undefined;
+
 export type ShakeTable = ShakeOp[];
 export type ShakeOp = [number, string[]];
-
-export type VirtualRender = (namespace: string, rename: Map<string, string>, base: number) => string;
 
 export type StorageSource = {
   buffer: GPUBuffer,
@@ -60,4 +69,4 @@ export type UniformAttributeValue = UniformAttribute & {
   value: any,
 };
 
-
+export type VirtualRender = (namespace: string, rename: Map<string, string>, base: number) => string;

@@ -129,7 +129,7 @@ Object {
       Object {
         "at": 0,
         "flags": 0,
-        "prototype": Object {
+        "func": Object {
           "name": "getColor",
           "parameters": Array [
             "int",

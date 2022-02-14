@@ -11,10 +11,11 @@ export type {
   CompressedNode,
   ShakeTable,
   ShakeOp,
-  VirtualRender,
+  ShaderDefine,
   StorageSource,
   UniformAttribute,
   UniformAttributeValue,
+  VirtualRender,
 } from '../types';
 
 export type ParsedModuleCache = ParsedModuleCacheT<SymbolTable>;
@@ -28,6 +29,7 @@ export type SymbolTable = {
   hash: string,
   modules?: ModuleRef[],
   declarations?: DeclarationRef[],
+  externals?: DeclarationRef[],
   symbols?: string[],
   visibles?: string[],
   globals?: string[],
@@ -121,5 +123,3 @@ export type StructRef = AttributesRef & {
   name: string,
   members: StructMemberRef[],
 };
-
-export type ShaderDefine = string | number | boolean | null | undefined;

@@ -9,12 +9,13 @@ import {
 
 export type {
   CompressedNode,
+  ShaderDefine,
   ShakeTable,
   ShakeOp,
-  VirtualRender,
   StorageSource,
   UniformAttribute,
   UniformAttributeValue,
+  VirtualRender,
 } from '../types';
 
 export type ParsedModuleCache = ParsedModuleCacheT<SymbolTable>;
@@ -63,13 +64,13 @@ export type ModuleRef = SymbolsRef & {
 }
 
 export type FunctionRef = SymbolsRef & {
-  prototype: PrototypeRef,
+  func: PrototypeRef,
   identifiers?: string[],
   flags: RefFlags,
 }
 
 export type DeclarationRef = SymbolsRef & {
-  prototype?: PrototypeRef,
+  func?: PrototypeRef,
   variable?: VariableRef,
   struct?: QualifiedStructRef,
   identifiers?: string[],
@@ -112,5 +113,3 @@ export type QualifiedStructRef = {
 export type StructRef = {
   members: MemberRef[],
 }
-
-export type ShaderDefine = string | number | boolean | null | undefined;

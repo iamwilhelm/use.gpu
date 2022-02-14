@@ -362,6 +362,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const modules = getImports();
     const declarations = getDeclarations();
 
+    const externals = declarations.filter(d => d.flags & RF.External);
     const exported  = declarations.filter(d => d.flags & RF.Exported);
     const globalled = declarations.filter(d => d.flags & RF.Global);
 
@@ -384,6 +385,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
       globals: orNone(globals),
       modules: orNone(modules),
       declarations: orNone(declarations),
+      externals: orNone(externals),
     };
   }
 

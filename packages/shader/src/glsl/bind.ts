@@ -75,9 +75,9 @@ export const bindModule = timed('bindModule', (
     relinks[namespace] = loadStaticModule(def, 'def');
   }
 
-  if (externals) for (const external of externals) if (external.prototype) {
-    const {flags, prototype} = external;
-    const {name} = prototype;
+  if (externals) for (const external of externals) if (external.func) {
+    const {flags, func} = external;
+    const {name} = func;
 
     if (links[name]) {
       const link = links[name] as any;

@@ -1,55 +1,31 @@
-import { Tree, SyntaxNode } from '@lezer/common';
-import { ParsedModule, ParsedModuleCache, ShaderDefine, ShaderCompiler, SymbolTable, VirtualTable } from './types';
+import { Tree } from '@lezer/common';
+import { ParsedModule, ParsedModuleCache, ShaderDefine } from './types';
 
+import { makeLoadModule, makeLoadModuleWithCache } from '../util/shader';
 import { makeASTParser, compressAST } from './ast';
 import { decompressAST } from '../util/tree';
-import { getProgramHash } from '../util/hash';
 import { parser } from './grammar/glsl';
 import LRU from 'lru-cache';
 
 export { loadStaticModule, loadVirtualModule } from '../util/shader';
 
+// LRU cache for parsed shader code
+export const makeModuleCache = (options: Record<string, any> = {}) => new LRU<string, ParsedModule>({
+  max: 100,
+  ...options,
+});
+
+export const DEFAULT_CACHE = makeModuleCache();
+
+// Parse GLSL code into lezer tree
+export const parseShader = (code: string): Tree => parser.parse(code);
+
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
-export const loadModule = (
-  code: string,
-  name: string,
-  entry?: string,
-  compressed: boolean = false,
-): ParsedModule => {
-  if (code == null) throw new Error(`Shader code ${name} undefined`);
-  if (typeof code !== 'string') throw new Error(`Shader code ${name} is not a string`);
-  let tree = parseShader(code);
-
-  const astParser = makeASTParser(code, tree);
-  const table = astParser.getSymbolTable();
-  const shake = astParser.getShakeTable(table);
-
-  if (compressed) tree = decompressAST(compressAST(tree));
-
-  return {name, code, table, entry, shake, tree};
-}
+export const loadModule = makeLoadModule(parseShader, makeASTParser, compressAST);
 
 // Use cache to load modules
-export const loadModuleWithCache = (
-  code: string,
-  name: string,
-  entry?: string,
-  cache: ParsedModuleCache | null = DEFAULT_CACHE,
-): ParsedModule => {
-  if (!cache) return loadModule(code, name, entry, true);
-
-  const hash = getProgramHash(code);
-  const cached = cache.get(hash);
-  if (cached) return {...cached, entry};
-  
-  const module = loadModule(code, name, entry, true);
-  cache.set(hash, module);
-  return {...module, entry};
-}
-
-// Parse GLSL using lezer grammar
-export const parseShader = (code: string): Tree => parser.parse(code);
+export const loadModuleWithCache = makeLoadModuleWithCache(loadModule, DEFAULT_CACHE);
 
 // Make GLSL definitions
 export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
@@ -63,11 +39,3 @@ export const makeLanguage = (compile: any, cache?: any) => ({
   compile: (code: string, stage: any) => (compile as any)(code, stage, false),
   cache: cache ?? makeModuleCache(),
 });
-
-// LRU cache for parsed shader code
-export const makeModuleCache = (options: Record<string, any> = {}) => new LRU<string, ParsedModule>({
-  max: 100,
-  ...options,
-});
-
-export const DEFAULT_CACHE = makeModuleCache();

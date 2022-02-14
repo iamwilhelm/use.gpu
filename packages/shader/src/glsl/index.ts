@@ -1,5 +1,4 @@
 import {
-  parseShader,
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
@@ -37,7 +36,6 @@ import {
 } from './ast';
 
 export {
-  parseShader,
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
@@ -79,7 +77,6 @@ export const GLSLLinker = {
   loadModuleWithCache,
   loadStaticModule,
 
-  parseShader,
   defineConstants,
 
   linkBundle,

@@ -1,4 +1,4 @@
-import { PBR } from '@use-gpu/wgsl/fragment/pbr';
+use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 
 ////////
 

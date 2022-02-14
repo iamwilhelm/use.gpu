@@ -32,7 +32,7 @@ export { decompressAST } from '../util/tree';
 const NO_STRINGS = [] as string[];
 const VOID_TYPE = {name: 'void'};
 const AUTO_TYPE = {name: 'auto'};
-const PRIVATE_ANNOTATIONS = new Set(['@export', '@external', '@global', '@optional']);
+const PRIVATE_ATTRIBUTES = new Set(['@export', '@external', '@global', '@optional']);
 
 const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
 
@@ -516,7 +516,7 @@ export const rewriteUsingAST = (
     // Private attributes (full AST only)
     else if (type.name === 'Attribute' || type.name === 'Attr') {
       const name = code.slice(from, to);
-      if (PRIVATE_ANNOTATIONS.has(name)) {
+      if (PRIVATE_ATTRIBUTES.has(name)) {
         const {from, to} = cursor;
         skip(from, to);
         while (cursor.lastChild()) {};
@@ -576,7 +576,7 @@ export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
     // Private attributes
     else if (type.name === 'Attribute') {
       const name = code.slice(from, to);
-      if (PRIVATE_ANNOTATIONS.has(name)) {
+      if (PRIVATE_ATTRIBUTES.has(name)) {
         skip(from, to);
         while (cursor.lastChild()) {};
       }

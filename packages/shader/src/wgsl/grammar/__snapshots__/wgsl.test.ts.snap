@@ -349,7 +349,7 @@ Program                                                     ⮐ import {MeshVert
 `;
 
 exports[`WGSL grammar snapshots parses a test program 11`] = `
-Program                                                     ⮐ use 'use/types'::{MeshVertex};⮐ use 'use/view'::{viewUniforms as view, worldToClip};⮐ use 'geometry/quad'::{getQuadUV};⮐ ⮐ import 'test';⮐ ⮐ @optional @external fn getInt() -> i32 {}⮐ ⮐ @export fn main() {}⮐ 
+Program                                                     ⮐ use 'use/types'::{MeshVertex};⮐ use 'use/view'::{viewUniforms as view, worldToClip};⮐ use 'geometry/quad'::{getQuadUV};⮐ ⮐ use 'test';⮐ ⮐ @optional @external fn getInt() -> i32 {}⮐ ⮐ @export fn main() {}⮐ 
   ImportDeclaration                                         use 'use/types'::{MeshVertex}
     use                                                     use
     String                                                  'use/types'
@@ -371,8 +371,8 @@ Program                                                     ⮐ use 'use/types':
     ImportDeclarationList                                   {getQuadUV}
       ImportDeclarationIdentifier                           getQuadUV
         Identifier                                          getQuadUV
-  ImportDeclaration                                         import 'test'
-    import                                                  import
+  ImportDeclaration                                         use 'test'
+    use                                                     use
     String                                                  'test'
   LocalDeclaration                                          @optional @external fn getInt() -> i32 {}
     FunctionDeclaration                                     @optional @external fn getInt() -> i32 {}

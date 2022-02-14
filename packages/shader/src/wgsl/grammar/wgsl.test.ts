@@ -133,7 +133,7 @@ use 'use/types'::{MeshVertex};
 use 'use/view'::{viewUniforms as view, worldToClip};
 use 'geometry/quad'::{getQuadUV};
 
-import 'test';
+use 'test';
 
 @optional @external fn getInt() -> i32 {}
 

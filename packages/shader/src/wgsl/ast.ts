@@ -325,8 +325,8 @@ export const makeASTParser = (code: string, tree: Tree) => {
       let module: string;
       let refs: ImportRef[];
       
-      let token = getText(a);
-      if (token === 'import') {
+      let verb = getText(a);
+      if (verb === 'import') {
         if (b.type.id === T.String) {
           refs = [];
           module = parseString(getText(b));
@@ -336,7 +336,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
           module = parseString(getText(c));
         }
       }
-      else if (token === 'use') {
+      else if (verb === 'use') {
         module = parseString(getText(b));
         refs = !!c ? getNodes(c).map(getImport) : [];
       }

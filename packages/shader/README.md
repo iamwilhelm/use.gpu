@@ -16,28 +16,25 @@ It enables two kinds of imports to be used:
 
  - **Static - Symbol Import**  (functions, declarations and types)
 ```wgsl
-// WGSL - Rust-flavored
-use 'path/to/color'::{ getColor };
-
-// WGSL - ES Style
-import { getColor } from 'path/to/color';
-```
-
-```glsl
-// GLSL - ES Style
-#pragma import { getColor } from 'path/to/color'
-```
-
- - **Dynamic - Function Prototype**
-
-```wgsl
 // WGSL
-@external fn getColor() -> vec4<f32> {}; // linked at run-time
+use 'path/to/color'::{ getColor };
 ```
 
 ```glsl
 // GLSL
-vec4 getColor(); // linked at run-time
+#pragma import { getColor } from 'path/to/color'
+```
+
+ - **Dynamic - Function Prototype** - Defined at run-time
+
+```wgsl
+// WGSL
+@external fn getColor() -> vec4<f32> {};
+```
+
+```glsl
+// GLSL
+vec4 getColor();
 ```
 
 
@@ -50,7 +47,7 @@ This allows you to split up and organize your WGSL / GLSL code as you see fit, a
 When combined with `@use-gpu/wgsl-loader` or `@use-gpu/glsl-loader` (webpack or node), you can import a tree of `.wgsl` / `.glsl` modules directly in JS/TS as a pre-packaged bundle:
 
 ```ts
-// WGSL
+// WGSL in JS/TS
 import mainShader from 'path/to/main.wgsl';
 
 import { linkBundle } from '@use-gpu/shader/wgsl';
@@ -58,7 +55,7 @@ const wgslCode = linkBundle(mainShader);
 ```
 
 ```ts
-// GLSL
+// GLSL in JS/TS
 import mainShader from 'path/to/main.glsl';
 
 import { linkBundle } from '@use-gpu/shader/glsl';
@@ -97,8 +94,8 @@ Shaders parsed at run-time will be cached on a least-recently-used basis, based 
 
 ```glsl
 // Import symbols from a .wgsl file
-import { symbol, … } from "path/to/file"
-import { symbol as symbol, … } from "path/to/file"
+use "path/to/file"::{ symbol, … };
+use "path/to/file"::{ symbol as symbol, … };
 
 // Mark function as linked at runtime
 @external fn func() { }

@@ -144,7 +144,7 @@ Object {
   "code": "#virtual [getColor getSize] 101",
   "name": "_VT_hoi6if_",
   "table": Object {
-    "functions": Array [
+    "declarations": Array [
       Object {
         "at": 0,
         "flags": 0,

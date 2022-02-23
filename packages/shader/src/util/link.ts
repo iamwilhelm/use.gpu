@@ -23,6 +23,10 @@ export type LoadModuleWithCache = (
 
 export type GetPreambles = () => string[];
 
+export type GetRenames = (
+	defines?: Record<string, ShaderDefine> | null,
+) => Map<string, string>;
+
 export type DefineConstants = (
   defines: Record<string, ShaderDefine>
 ) => string;
@@ -78,6 +82,7 @@ export const makeLinkBundle = (
 // Link a parsed module with static modules, dynamic links
 export const makeLinkModule = (
   getPreambles: GetPreambles,
+	getRenames: GetRenames,
   defineConstants: DefineConstants,
   rewriteUsingAST: RewriteUsingAST,
 ) => timed('linkModule', (
@@ -92,7 +97,12 @@ export const makeLinkModule = (
   const {modules, exported} = loadModulesInOrder(main, libraries, links, aliases);
 
   const program = getPreambles();
-  if (defines && Object.keys(defines).length) program.push(defineConstants(defines));
+  if (defines) {
+		const def = defineConstants(defines);
+		if (def.length) program.push(def);
+	}
+
+  const renames = getRenames(defines);
 
   // Namespace by module name and module hash
   const namespaces = new Map<string, string>();
@@ -114,7 +124,7 @@ export const makeLinkModule = (
     }
 
     // Namespace all non-global symbols outside main module
-    const rename = new Map<string, string>();
+	  const rename = new Map(renames);
     if (module !== main) {
       const namespace = virtual?.namespace;
       const ns = reserveNamespace(module, namespaces, namespace);

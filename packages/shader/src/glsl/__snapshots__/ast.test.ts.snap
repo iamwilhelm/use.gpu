@@ -25,9 +25,6 @@ Object {
         },
       },
     },
-  ],
-  "externals": undefined,
-  "functions": Array [
     Object {
       "at": 102,
       "flags": 1,
@@ -71,13 +68,14 @@ Object {
       ],
     },
   ],
+  "externals": undefined,
   "globals": undefined,
   "hash": "vz5280ybh9",
   "modules": undefined,
   "symbols": Array [
+    "QUAD",
     "getQuadIndex",
     "getQuadUV",
-    "QUAD",
   ],
   "visibles": Array [
     "getQuadIndex",
@@ -336,6 +334,30 @@ Object {
         "getDepth",
       ],
     },
+    Object {
+      "at": 274,
+      "flags": 1,
+      "func": Object {
+        "name": "getQuadVertex",
+        "parameters": Array [
+          "int",
+          "vertexIndex",
+        ],
+        "type": Object {
+          "name": "SolidVertex",
+          "qualifiers": Array [],
+        },
+      },
+      "identifiers": Array [
+        "getPosition",
+        "getColor",
+        "getSize",
+        "getDepth",
+      ],
+      "symbols": Array [
+        "getQuadVertex",
+      ],
+    },
   ],
   "externals": Array [
     Object {
@@ -411,32 +433,6 @@ Object {
       ],
     },
   ],
-  "functions": Array [
-    Object {
-      "at": 274,
-      "flags": 1,
-      "func": Object {
-        "name": "getQuadVertex",
-        "parameters": Array [
-          "int",
-          "vertexIndex",
-        ],
-        "type": Object {
-          "name": "SolidVertex",
-          "qualifiers": Array [],
-        },
-      },
-      "identifiers": Array [
-        "getPosition",
-        "getColor",
-        "getSize",
-        "getDepth",
-      ],
-      "symbols": Array [
-        "getQuadVertex",
-      ],
-    },
-  ],
   "globals": undefined,
   "hash": "4ty31mhjri",
   "modules": Array [
@@ -491,11 +487,11 @@ Object {
     },
   ],
   "symbols": Array [
-    "getQuadVertex",
     "getPosition",
     "getColor",
     "getSize",
     "getDepth",
+    "getQuadVertex",
   ],
   "visibles": Array [
     "getQuadVertex",
@@ -926,7 +922,6 @@ Object {
     },
   ],
   "externals": undefined,
-  "functions": undefined,
   "globals": undefined,
   "hash": "3wmin9gcu9",
   "modules": undefined,
@@ -1089,9 +1084,6 @@ Object {
         "ViewUniforms",
       ],
     },
-  ],
-  "externals": undefined,
-  "functions": Array [
     Object {
       "at": 275,
       "flags": 1,
@@ -1242,10 +1234,13 @@ Object {
       ],
     },
   ],
+  "externals": undefined,
   "globals": undefined,
   "hash": "q3u45dtwd2",
   "modules": undefined,
   "symbols": Array [
+    "viewUniforms",
+    "ViewUniforms",
     "worldToView",
     "viewToClip",
     "worldToClip",
@@ -1253,10 +1248,10 @@ Object {
     "screenToClip3D",
     "worldToClip3D",
     "getPerspectiveScale",
-    "viewUniforms",
-    "ViewUniforms",
   ],
   "visibles": Array [
+    "viewUniforms",
+    "ViewUniforms",
     "worldToView",
     "viewToClip",
     "worldToClip",
@@ -1264,8 +1259,6 @@ Object {
     "screenToClip3D",
     "worldToClip3D",
     "getPerspectiveScale",
-    "viewUniforms",
-    "ViewUniforms",
   ],
 }
 `;

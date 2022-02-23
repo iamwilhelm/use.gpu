@@ -25,6 +25,26 @@ describe("link", () => {
     expect(linked).toMatchSnapshot();
 
   });
+
+  it("substitutes attributes", () => {
+    
+    const code = `
+    @external fn getColor() -> vec4<f32> {};
+    fn main() -> @location(LOCATION) vec4<f32> {
+      return getColor();
+    }
+    `
+    
+    const getColor = `
+    @export fn getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
+    `
+    
+		const defs = {"@location(LOCATION)": "@location(0)"};
+    const linked = linkCode(code, {}, {getColor}, defs);
+    expect(linked).toMatchSnapshot();
+
+  });
+
   /*
 
   it("links quad vertex", () => {

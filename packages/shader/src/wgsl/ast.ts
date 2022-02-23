@@ -527,7 +527,7 @@ export const rewriteUsingAST = (
         }
       }
     }
-    // Private attributes (full AST only)
+    // Public or private attributes (both full and compressed AST)
     else if (type.name === 'Attribute' || type.name === 'Attr') {
       const name = code.slice(from, to);
       if (PRIVATE_ATTRIBUTES.has(name)) {
@@ -535,6 +535,10 @@ export const rewriteUsingAST = (
         skip(from, to);
         while (cursor.lastChild()) {};
       }
+			else {
+	      const replace = rename.get(name);
+	      if (replace) skip(from, to, replace);      
+			}
     }
     // Import declaration (full AST only)
     else if (type.name === 'ImportDeclaration') {
@@ -561,6 +565,7 @@ export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
   const shake = (from: number, to: number) => out.push(["Shake", from, to]);
   const skip  = (from: number, to: number) => out.push(["Skip",  from, to]);
   const ident = (from: number, to: number) => out.push(["Id",    from, to]);
+  const attr  = (from: number, to: number) => out.push(["Attr",  from, to]);
 
   const cursor = tree.cursor();
   do {
@@ -587,13 +592,16 @@ export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
         shake(from, to);
       }
     }
-    // Private attributes
+    // Public or private attributes
     else if (type.name === 'Attribute') {
       const name = code.slice(from, to);
       if (PRIVATE_ATTRIBUTES.has(name)) {
         skip(from, to);
         while (cursor.lastChild()) {};
       }
+			else {
+				attr(from, to);
+			}
     }
     // Import declaration
     else if (type.name === 'ImportDeclaration') {

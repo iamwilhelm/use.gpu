@@ -67,13 +67,12 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   }, [device, texture]);
 
   const defines = {
-    IS_PICKING: isPicking,
-    VIEW_BINDGROUP: 0,
-    VIEW_BINDING: 0,
-    LIGHT_BINDGROUP: 0,
-    LIGHT_BINDING: 1,
-    PICKING_BINDGROUP: 0,
-    PICKING_BINDING: 1,
+    '@group(VIEW_BINDGROUP)': 0,
+    '@binding(VIEW_BINDING)': 0,
+    '@group(LIGHT_BINDGROUP)': 0,
+    '@binding(LIGHT_BINDING)': 1,
+    '@group(PICKING_BINDGROUP)': 0,
+    '@binding(PICKING_BINDING)': 1,
   };
 
   // Render shader

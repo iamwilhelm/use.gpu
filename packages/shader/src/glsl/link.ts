@@ -12,8 +12,11 @@ export const setPreamble = (s: string): string => PREAMBLE = s;
 export const getPreamble = (): string => PREAMBLE;
 const getPreambles = (): string[] => [getPreamble()];
 
+// No preprocessor renames
+const getRenames = () => new Map<string, string>();
+
 // Link a parsed module with static modules, dynamic links
-export const linkModule = makeLinkModule(getPreambles, defineConstants, rewriteUsingAST);
+export const linkModule = makeLinkModule(getPreambles, getRenames, defineConstants, rewriteUsingAST);
 
 // Link a source module with static modules and dynamic links.
 export const linkCode = makeLinkCode(loadModuleWithCache, linkModule, DEFAULT_CACHE);

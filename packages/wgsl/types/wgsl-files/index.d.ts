@@ -100,6 +100,43 @@ declare module "@use-gpu/wgsl/instance/fragment/solid.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/ui/fragment-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/ui/fragment.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/ui/sdf.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SDF: ParsedBundle;
+  export const getBorderBoxSDF: ParsedBundle;
+  export const getRoundedBorderBoxSDF: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/ui/vertex-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/ui/vertex.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/vertex/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -107,10 +144,36 @@ declare module "@use-gpu/wgsl/instance/vertex/line.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/vertex/quad.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getQuadVertex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/mask/masked.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getMaskedFragment: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/mask/passthru.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getPassThruFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/mask/point.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const circle: ParsedBundle;
+  export const diamond: ParsedBundle;
+  export const square: ParsedBundle;
+  export const circleOutlined: ParsedBundle;
+  export const diamondOutlined: ParsedBundle;
+  export const squareOutlined: ParsedBundle;
   export default __module;
 }
 

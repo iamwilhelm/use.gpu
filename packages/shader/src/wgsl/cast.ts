@@ -13,10 +13,21 @@ export const makeCastAccessor = (
   swizzle: string,
 ) => {
   const symbols = args.map((t, i) => `${arg(i)}`);
-  return `${to} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
+
+  if (from.match(/vec/)) {
+    return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${to} {
   return ${accessor}(${symbols.join(', ')}).${swizzle};
 }
 `;
+  }
+  else {
+    // Scalar swizzle unsupported in WGSL
+    return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${to} {
+  let v = ${accessor}(${symbols.join(', ')});
+  return ${to}(${swizzle.split('').map(_ => 'v').join(', ')});
+}
+`;   
+  }
 }
 
 export const castTo = makeCastTo(makeCastAccessor);

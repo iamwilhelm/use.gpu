@@ -6,7 +6,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { UIRectangles } from '../geometry/ui-rectangles';
+import { UIRectangles } from '../geometry/ui-rectangles-wgsl';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';

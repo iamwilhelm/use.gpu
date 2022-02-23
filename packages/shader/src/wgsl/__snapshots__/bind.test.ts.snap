@@ -80,7 +80,7 @@ struct _VT_Type {
 @group(0) @binding(1) var<uniform> _VT_Uniform: _VT_Type;
 
 
-fn _VT_0_getColor(i: i32) -> vec4<f32> {
+fn _VT_0_getColor(a: i32) -> vec4<f32> {
   return _VT_Uniform._VT_0_getColor;
 }
 
@@ -111,7 +111,7 @@ Object {
       },
       "uniform": Object {
         "args": Array [
-          "i: i32",
+          "i32",
         ],
         "format": "vec2<f32>",
         "name": "getSize",
@@ -132,7 +132,7 @@ Object {
         "func": Object {
           "name": "getColor",
           "parameters": Array [
-            "i: i32",
+            "i32",
           ],
           "type": Object {
             "name": "vec4<f32>",
@@ -146,7 +146,7 @@ Object {
         "func": Object {
           "name": "getSize",
           "parameters": Array [
-            "i: i32",
+            "i32",
           ],
           "type": Object {
             "name": "vec2<f32>",
@@ -175,7 +175,7 @@ Object {
       ],
       "uniform": Object {
         "args": Array [
-          "i: i32",
+          "i32",
         ],
         "format": "vec4<f32>",
         "name": "getColor",

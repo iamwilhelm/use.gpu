@@ -68,11 +68,11 @@ describe("bind", () => {
   it('makes deterministic links for data bindings', () => {
     const dataBindings = [
       {
-        uniform: { format: 'vec4<f32>', name: 'getColor', value: [0, 0.5, 1, 1], args: ['i: i32'] },
+        uniform: { format: 'vec4<f32>', name: 'getColor', value: [0, 0.5, 1, 1], args: ['i32'] },
         constant: [1, 0.5, 1, 1],
       },
       {
-        uniform: { format: 'vec2<f32>', name: 'getSize', value: [1, 1], args: ['i: i32'] },
+        uniform: { format: 'vec2<f32>', name: 'getSize', value: [1, 1], args: ['i32'] },
         storage: {
           buffer: {} as any,
           format: 'vec2<f32>',
@@ -96,11 +96,11 @@ describe("bind", () => {
   it('links data bindings', () => {
     const dataBindings = [
       {
-        uniform: { format: 'vec4<f32>', name: 'getColor', value: [0, 0.5, 1, 1], args: ['i: i32'] },
+        uniform: { format: 'vec4<f32>', name: 'getColor', value: [0, 0.5, 1, 1], args: ['i32'] },
         constant: [1, 0.5, 1, 1],
       },
       {
-        uniform: { format: 'vec2<f32>', name: 'getSize', value: [1, 1], args: ['i: i32'] },
+        uniform: { format: 'vec2<f32>', name: 'getSize', value: [1, 1], args: ['i32'] },
         storage: {
           buffer: {} as any,
           format: 'vec2<f32>',

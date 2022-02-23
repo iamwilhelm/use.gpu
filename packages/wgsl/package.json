@@ -86,15 +86,55 @@
       "import": "./src/instance/fragment/solid.wgsl",
       "require": "./src/instance/fragment/solid.wgsl"
     },
+    "./instance/ui/fragment-pick.wgsl": {
+      "types": "./src/instance/ui/fragment-pick.d.ts",
+      "import": "./src/instance/ui/fragment-pick.wgsl",
+      "require": "./src/instance/ui/fragment-pick.wgsl"
+    },
+    "./instance/ui/fragment.wgsl": {
+      "types": "./src/instance/ui/fragment.d.ts",
+      "import": "./src/instance/ui/fragment.wgsl",
+      "require": "./src/instance/ui/fragment.wgsl"
+    },
+    "./instance/ui/sdf.wgsl": {
+      "types": "./src/instance/ui/sdf.d.ts",
+      "import": "./src/instance/ui/sdf.wgsl",
+      "require": "./src/instance/ui/sdf.wgsl"
+    },
+    "./instance/ui/vertex-pick.wgsl": {
+      "types": "./src/instance/ui/vertex-pick.d.ts",
+      "import": "./src/instance/ui/vertex-pick.wgsl",
+      "require": "./src/instance/ui/vertex-pick.wgsl"
+    },
+    "./instance/ui/vertex.wgsl": {
+      "types": "./src/instance/ui/vertex.d.ts",
+      "import": "./src/instance/ui/vertex.wgsl",
+      "require": "./src/instance/ui/vertex.wgsl"
+    },
     "./instance/vertex/line.wgsl": {
       "types": "./src/instance/vertex/line.d.ts",
       "import": "./src/instance/vertex/line.wgsl",
       "require": "./src/instance/vertex/line.wgsl"
     },
+    "./instance/vertex/quad.wgsl": {
+      "types": "./src/instance/vertex/quad.d.ts",
+      "import": "./src/instance/vertex/quad.wgsl",
+      "require": "./src/instance/vertex/quad.wgsl"
+    },
+    "./mask/masked.wgsl": {
+      "types": "./src/mask/masked.d.ts",
+      "import": "./src/mask/masked.wgsl",
+      "require": "./src/mask/masked.wgsl"
+    },
     "./mask/passthru.wgsl": {
       "types": "./src/mask/passthru.d.ts",
       "import": "./src/mask/passthru.wgsl",
       "require": "./src/mask/passthru.wgsl"
+    },
+    "./mask/point.wgsl": {
+      "types": "./src/mask/point.d.ts",
+      "import": "./src/mask/point.wgsl",
+      "require": "./src/mask/point.wgsl"
     },
     "./use/light.wgsl": {
       "types": "./src/use/light.d.ts",

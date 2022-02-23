@@ -6,7 +6,9 @@ import { PREFIX_VIRTUAL } from '../constants';
 import { VIRTUAL_BINDGROUP } from './constants';
 
 const INT_PARAMS = [{name: 'index', type: {name: 'i32'}}];
-const INT_ARG = ['index: i32'];
+const INT_ARG = ['i32'];
+
+const arg = (x: number) => String.fromCharCode(97 + x);
 
 const getBindingKey = (b: DataBinding) => (+!!b.constant) + ((+!!b.storage) << 8) + ((+!!b.lambda) << 16);
 const getBindingsKey = (bs: DataBinding[]) => bs.reduce((a, b) => a + getBindingKey(b), 0);
@@ -103,7 +105,7 @@ export const makeUniformFieldAccessor = (
   name: string,
   args: string[] = INT_ARG,
 ) => `
-fn ${ns}${name}(${args.join(', ')}) -> ${type} {
+fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   return ${uniform}Uniform.${ns}${name};
 }
 `;
@@ -114,7 +116,6 @@ export const makeStorageAccessor = (
   binding: number | string,
   type: string,
   name: string,
-  args: string[] = INT_ARG,
 ) => `
 @group(${set}) @binding(${binding}) var<storage> ${ns}${name}Storage: array<${type}>;
 

@@ -82,8 +82,8 @@ fn slerp(d: f32, a: vec2<f32>, b: vec2<f32>, t: f32) -> vec2<f32> {
 
   var offset = size * mid * y;
   // TODO: awaiting compound support
-  //center.xy += offset;
-  center = center.xy + offset;
+  //center += offset;
+  center = center + offset;
 
   return vec3<f32>(center * viewUniforms.viewResolution, centerPoint.z);
 }

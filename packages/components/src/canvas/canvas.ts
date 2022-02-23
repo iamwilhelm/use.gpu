@@ -1,5 +1,4 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { ShaderLanguages } from '@use-gpu/core/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, BACKGROUND_COLOR } from '../constants';
 
@@ -20,7 +19,6 @@ export type CanvasProps = {
   device: GPUDevice,
   adapter: GPUAdapter,
   canvas: HTMLCanvasElement,
-  languages: ShaderLanguages,
 
   presentationFormat?: GPUTextureFormat,
   depthStencilFormat?: GPUTextureFormat,
@@ -38,7 +36,6 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     device,
     canvas,
     children,
-    languages,
     pixelRatio = getPixelRatio(),
     presentationFormat = PRESENTATION_FORMAT,
     depthStencilFormat = DEPTH_STENCIL_FORMAT,
@@ -90,7 +87,6 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     pixelRatio,
     samples,
     device,
-    languages,
     gpuContext,
     colorStates,
     colorAttachments,

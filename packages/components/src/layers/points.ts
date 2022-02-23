@@ -6,7 +6,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { RawQuads } from '../geometry/raw-quads-wgsl';
+import { RawQuads } from '../geometry/raw-quads';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';

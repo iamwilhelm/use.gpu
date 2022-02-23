@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { DataField, Emitter, ShaderLanguages, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import { use, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
@@ -27,11 +27,10 @@ export type AppProps = {
   device: GPUDevice,
   adapter: GPUAdapter,
   canvas: HTMLCanvasElement,
-  languages: ShaderLanguages,
 };
 
 export const App: LiveComponent<AppProps> = (props) => {
-  const {canvas, device, adapter, languages} = props;
+  const {canvas, device, adapter} = props;
 
   const fiber = useFiber();
   const inspect = useInspector();
@@ -54,7 +53,7 @@ export const App: LiveComponent<AppProps> = (props) => {
 
   return [
     use(AutoCanvas)({
-      canvas, device, adapter, languages, samples: 4,
+      canvas, device, adapter, samples: 4,
       children:
       
         use(AutoPicking)({

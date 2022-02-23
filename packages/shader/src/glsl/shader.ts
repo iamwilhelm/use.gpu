@@ -33,9 +33,3 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
   for (let k in defs) if (defs[k] !== false && defs[k] !== null) out.push(`#define ${k} ${defs[k]}`);
   return out.join("\n");
 }
-
-// Make shader languages interface
-export const makeLanguage = (compile: any, cache?: any) => ({
-  compile: (code: string, stage: any) => (compile as any)(code, stage, false),
-  cache: cache ?? makeModuleCache(),
-});

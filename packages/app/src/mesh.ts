@@ -18,11 +18,11 @@ import instanceFragmentMeshPick from '@use-gpu/wgsl/instance/fragment/mesh-pick.
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
     name: 'lightPosition',
-    format: UniformType.vec4,
+    format: UniformType['vec4<f32>'],
   },
   {
     name: 'lightColor',
-    format: UniformType.vec4,
+    format: UniformType['vec4<f32>'],
   },
 ];
 
@@ -55,7 +55,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
-  const {device, colorStates, depthStencilState, languages, samples} = renderContext;
+  const {device, colorStates, depthStencilState, samples} = renderContext;
 
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
@@ -83,10 +83,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
   // Rendering pipeline
   const pipeline = useMemo(() => {
-    const {wgsl: {cache}} = languages;
-
-    const vertexLinked = linkBundle(vertexShader, {}, defines, cache);
-    const fragmentLinked = linkBundle(fragmentShader, {}, defines, cache);
+    const vertexLinked = linkBundle(vertexShader, {}, defines);
+    const fragmentLinked = linkBundle(fragmentShader, {}, defines);
 
     const vertex = makeShaderModule([vertexLinked, 0]);
     const fragment = makeShaderModule([fragmentLinked, 1]);
@@ -108,7 +106,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
         fragment: {},
       }
     );
-  }, [device, colorStates, depthStencilState, languages, samples]);
+  }, [device, colorStates, depthStencilState, samples]);
 
   // Uniforms
   const [uniform, sampled] = useMemo(() => {

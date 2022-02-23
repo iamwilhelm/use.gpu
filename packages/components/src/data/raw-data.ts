@@ -29,7 +29,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.float;
+    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.f32;
     const l = length ?? (data?.length || 0);
 
     const {array, dims} = makeDataArray(f, l || 1);

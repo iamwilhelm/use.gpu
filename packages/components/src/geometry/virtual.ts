@@ -3,12 +3,16 @@ import { RenderPassMode, DeepPartial } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { memo, use, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
+import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { useRenderPipeline } from '../hooks/useRenderPipeline';
 
-import instanceDrawVirtual from '@use-gpu/glsl/instance/draw/virtual.glsl';
-import instanceDrawWireframeStrip from '@use-gpu/glsl/instance/draw/wireframe-strip.glsl';
-import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid.glsl';
+import instanceDrawVirtual from '@use-gpu/wgsl/instance/draw/virtual.wgsl';
+import instanceDrawVirtualPick from '@use-gpu/wgsl/instance/draw/virtual-pick.wgsl';
+
+import instanceFragmentSolid from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
+import instanceFragmentSolidPick from '@use-gpu/wgsl/instance/fragment/solid-pick.wgsl';
+
+import instanceDrawWireframeStrip from '@use-gpu/wgsl/instance/draw/wireframe-strip.wgsl';
 
 import { render } from './render';
 
@@ -27,13 +31,6 @@ export type VirtualProps = {
   deps: any[] | null,
 };
 
-const getDebugShader = (topology: GPUPrimitiveTopology) => {
-  if (topology === 'triangle-strip') return instanceDrawWireframeStrip;
-  // TODO
-  if (topology === 'triangle-list') return instanceDrawWireframeStrip;
-  return instanceDrawWireframeStrip;
-}
-
 export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
   const {
     getVertex,
@@ -47,18 +44,29 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
   } = props;
 
   const isDebug = mode === RenderPassMode.Debug;
+  const isPicking = mode === RenderPassMode.Picking;
 
-  // TODO: non-strip topology
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
-  const vertexShader = !isDebug ? instanceDrawVirtual : getDebugShader(topology);
-  const fragmentShader = instanceFragmentSolid;
+
+  let vertexShader, fragmentShader;
+  if (isDebug) {
+    // TODO: non-strip topology
+    // if (topology === 'triangle-strip')
+    // if (topology === 'triangle-list')
+    vertexShader   = instanceDrawWireframeStrip;
+    fragmentShader = instanceFragmentSolid;
+  }
+  else {
+    vertexShader   = isPicking ? instanceDrawVirtualPick : instanceDrawVirtual;
+    fragmentShader = isPicking ? instanceFragmentSolidPick : instanceFragmentSolid;
+  }
 
   // Binds links into shader
   const key = useFiber().id;
   const [v, f] = useMemo(() => {
     const links = { getVertex, getFragment };
-    const v = bindBundle(vertexShader, links, defines, key);
-    const f = bindBundle(fragmentShader, links, defines, key);
+    const v = bindBundle(vertexShader, links, {}, key);
+    const f = bindBundle(fragmentShader, links, {}, key);
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment]);
 

@@ -1,7 +1,3 @@
-import GLSL from './glsl';
-
-import { makeLanguage as makeGLSL } from '@use-gpu/shader/glsl';
-import { makeLanguage as makeWGSL } from '@use-gpu/shader/wgsl';
 import { mountGPU } from '@use-gpu/webgpu';
 import { use, render, formatTree } from '@use-gpu/live';
 
@@ -13,12 +9,6 @@ const ROOT_SELECTOR = '#use-gpu';
 
 export const main = async (): Promise<void> => {
 
-  const glsl = await GLSL();
-  const languages = {
-    glsl: makeGLSL(glsl),
-    wgsl: makeWGSL(),
-  };
-
   try {
     const {adapter, device, canvas} = await mountGPU(
       ROOT_SELECTOR,
@@ -27,7 +17,7 @@ export const main = async (): Promise<void> => {
     );
 
     const root = await render(
-      use(App)({adapter, device, canvas, languages})
+      use(App)({adapter, device, canvas})
     );
   
   } catch (e: any) {

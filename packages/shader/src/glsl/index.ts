@@ -3,7 +3,6 @@ import {
   loadModuleWithCache,
   loadStaticModule,
   defineConstants,
-  makeLanguage,
   makeModuleCache,
 } from './shader';
 
@@ -44,7 +43,6 @@ export {
   loadModuleWithCache,
   loadStaticModule,
   defineConstants,
-  makeLanguage,
   makeModuleCache,
 } from './shader';
 
@@ -107,7 +105,6 @@ export const GLSLLinker = {
   decompressAST,
   rewriteUsingAST,
 
-  makeLanguage,
   makeModuleCache,
 
   getProgramHash,

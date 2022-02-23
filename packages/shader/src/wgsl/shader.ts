@@ -34,8 +34,3 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
   for (let k in defs) if (k[0] !== '@' && defs[k] !== false && defs[k] !== null) out.push(`let ${k} = ${defs[k]};`);
   return out.join("\n");
 }
-
-// Make shader languages interface
-export const makeLanguage = (cache?: any) => ({
-  cache: cache ?? makeModuleCache(),
-});

@@ -62,34 +62,3 @@ export const makeBoundShader = <A, B>(
 
   return [vertex, fragment, vertexLinked, fragmentLinked];
 };
-
-// Make constant value accessor
-export const makeConstantAccessor = (
-  uniform: UniformAttributeValue,
-) => {
-  const {name, format, value} = uniform;
-  const v = makeConstantValue(format, value);
-  
-  return `#pragma export
-{format} {name}() { return ${v}; }\n`;
-}
-
-const fmtInt   = (x: number) => Math.round(x).toString();
-const fmtFloat = (x: number) => x.toPrecision(8);
-
-// Serialize shader value
-export const makeConstantValue = (
-  format: UniformType,
-  value: any,
-) => {
-  const t = format[0];
-  const isFloat = t !== 'u' && t !== 'i' && t !== 'b';
-  const fmt = isFloat ? fmtFloat : fmtInt;
-  if (value.length) {
-    const l = Array.from(value).map(fmt as any).join(', ');
-    return `${format}(${l})`;
-  }
-  else {
-    return `${format}(${fmt(value)})`;
-  }
-}

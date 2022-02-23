@@ -13,11 +13,11 @@ import { render } from './render';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/glsl';
+import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
-import rectangleVertex from '@use-gpu/glsl/instance/ui/vertex.glsl';
-import rectangleFragment from '@use-gpu/glsl/instance/ui/fragment.glsl';
+import rectangleVertex from '@use-gpu/wgsl/instance/ui/vertex.wgsl';
+import rectangleFragment from '@use-gpu/wgsl/instance/ui/fragment.wgsl';
 
 export type UIRectanglesProps = {
   rectangle?: number[] | TypedArray,
@@ -56,16 +56,16 @@ const GRAY = [0.5, 0.5, 0.5, 1];
 const SQUARE = [0, 0, 1, 1];
 
 const VERTEX_BINDINGS = [
-  { name: 'getRectangle', format: 'vec4', value: ZERO },
-  { name: 'getRadius', format: 'vec4', value: 0 },
-  { name: 'getBorder', format: 'vec4', value: 0 },
-  { name: 'getStroke', format: 'vec4', value: GRAY },
-  { name: 'getFill', format: 'vec4', value: GRAY },
-  { name: 'getUV', format: 'vec4', value: SQUARE },
+  { name: 'getRectangle', format: 'vec4<f32>', value: ZERO },
+  { name: 'getRadius', format: 'vec4<f32>', value: 0 },
+  { name: 'getBorder', format: 'vec4<f32>', value: 0 },
+  { name: 'getStroke', format: 'vec4<f32>', value: GRAY },
+  { name: 'getFill', format: 'vec4<f32>', value: GRAY },
+  { name: 'getUV', format: 'vec4<f32>', value: SQUARE },
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
-  { name: 'getTexture', format: 'vec4', args: ['vec2'], value: [1.0, 1.0, 1.0, 1.0] },
+  { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [1.0, 1.0, 1.0, 1.0] },
 ] as UniformAttributeValue[];
 
 const DEFINES = {

@@ -99,10 +99,10 @@ const makePointAccumulator = (
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasDepth = keys.has('depths') || keys.has('depth');
 
-  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.float, count);
-  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.float, count);
+  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.f32, count);
+  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.f32, count);
 
   return (items: PointAggregate[]) => {
     const count = items.reduce(allCount, 0);
@@ -134,10 +134,10 @@ const makeLineAccumulator = (
 
   storage.segments = makeAggregateBuffer(device, UniformType.int, count);
 
-  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.float, count);
-  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.float, count);
+  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.f32, count);
+  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.f32, count);
 
   return (items: LineAggregate[]) => {
     const count = items.reduce(allCount, 0);
@@ -171,13 +171,13 @@ const makeRectangleAccumulator = (
   const hasUV = keys.has('uvs') || keys.has('uv');
   const hasTexture = keys.has('textures') || keys.has('texture');
 
-  if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasRadius) storage.radiuses = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasBorder) storage.borders = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasStroke) storage.strokes = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasFill) storage.fills = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasUV) storage.uvs = makeAggregateBuffer(device, UniformType.vec4, count);
-  if (hasTexture) storage.textures = makeAggregateBuffer(device, UniformType.vec4, count);
+  if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasRadius) storage.radiuses = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasBorder) storage.borders = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasStroke) storage.strokes = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasFill) storage.fills = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasUV) storage.uvs = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasTexture) storage.textures = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
 
   return (items: RectangleAggregate[]) => {
     const count = items.reduce(allCount, 0);

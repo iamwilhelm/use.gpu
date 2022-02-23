@@ -1,7 +1,7 @@
-import { ShaderModuleDescriptor, ShaderLanguages } from '@use-gpu/core/types';
+import { ShaderModuleDescriptor } from '@use-gpu/core/types';
 import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
 
-import { resolveBindings, linkBundle } from '@use-gpu/shader/glsl';
+import { resolveBindings, linkBundle, getProgramHash } from '@use-gpu/shader/wgsl';
 import { makeShaderModule } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
 
@@ -12,17 +12,18 @@ export const useLinkedShader = (
   vertex: ParsedBundle,
   fragment: ParsedBundle,
   defines: Record<string, ShaderDefine> | null | undefined,
-  languages: ShaderLanguages,
   deps: any[] | null = null,
   base: number = 0,
   key?: number | string,
 ) => {
   const fiber = useFiber();
-  const {glsl: {compile}} = languages;
 
   // Resolve bindings between vertex and fragment.
   const s = [vertex, fragment] as [ParsedBundle, ParsedBundle];
-  const {modules, uniforms, bindings} = useMemo(() => resolveBindings(s), s);
+  const {modules, uniforms, bindings} = useMemo(() =>
+    resolveBindings(s, defines),
+    [...s, defines]
+  );
 
   // Keep static set of bindings
   const ref = useOne(() => ({ uniforms, bindings }));
@@ -33,12 +34,12 @@ export const useLinkedShader = (
   keys.push('/');
   for (const b of bindings) keys.push(b.uniform.name);
 
-  // Link final GLSL
+  // Link final WGSL
   const shader = useMemo(() => {
     const v = linkBundle(modules[0], NO_LIBS, defines);
     const f = linkBundle(modules[1], NO_LIBS, defines);
-    const vertex = makeShaderModule(compile(v, 'vertex'));
-    const fragment = makeShaderModule(compile(f, 'fragment'));
+    const vertex   = makeShaderModule([v, getProgramHash(v)]);
+    const fragment = makeShaderModule([f, getProgramHash(f)]);
 
     fiber.__inspect = fiber.__inspect || {};
     fiber.__inspect.vertex = v;

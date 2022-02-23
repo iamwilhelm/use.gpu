@@ -7,12 +7,13 @@ import {
   makeRenderPipeline, makeShaderModule, makeSampler, makeTextureUniforms,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
-import { linkBundle } from '@use-gpu/shader/glsl';
+import { linkBundle } from '@use-gpu/shader/wgsl';
 
-import instanceDrawMesh from '@use-gpu/glsl/instance/draw/mesh.glsl';
-import instanceFragmentMesh from '@use-gpu/glsl/instance/fragment/mesh.glsl';
-import instanceFragmentSolid from '@use-gpu/glsl/instance/fragment/solid.glsl';
-//import instanceVirtualWireframeMesh from 'instance/virtual/wireframe-mesh.glsl';
+import instanceDrawMesh from '@use-gpu/wgsl/instance/draw/mesh.wgsl';
+import instanceFragmentMesh from '@use-gpu/wgsl/instance/fragment/mesh.wgsl';
+
+import instanceDrawMeshPick from '@use-gpu/wgsl/instance/draw/mesh-pick.wgsl';
+import instanceFragmentMeshPick from '@use-gpu/wgsl/instance/fragment/mesh-pick.wgsl';
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
@@ -54,7 +55,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
-  const {device, colorStates, depthStencilState, samples, languages} = renderContext;
+  const {device, colorStates, depthStencilState, languages, samples} = renderContext;
 
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
@@ -76,20 +77,20 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   };
 
   // Render shader
-  const {glsl: {compile, cache}} = languages;
-  // TODO: mesh debug
-  const vertexShader = !isDebug ? instanceDrawMesh : instanceDrawMesh;
-  const fragmentShader = !isDebug ? instanceFragmentMesh : instanceFragmentSolid;
+  const vertexShader 	 = isPicking ? instanceDrawMeshPick     : instanceDrawMesh;
+  const fragmentShader = isPicking ? instanceFragmentMeshPick : instanceFragmentMesh;
 
   const fiber = useFiber();
 
   // Rendering pipeline
   const pipeline = useMemo(() => {
+    const {wgsl: {cache}} = languages;
+    
     const vertexLinked = linkBundle(vertexShader, {}, defines, cache);
     const fragmentLinked = linkBundle(fragmentShader, {}, defines, cache);
 
-    const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
-    const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
+    const vertex = makeShaderModule([vertexLinked, 0]);
+    const fragment = makeShaderModule([fragmentLinked, 1]);
     
     fiber.__inspect = fiber.__inspect || {};
     fiber.__inspect.vertex = vertexLinked;
@@ -108,7 +109,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
         fragment: {},
       }
     );
-  }, [device, colorStates, depthStencilState, samples, languages]);
+  }, [device, colorStates, depthStencilState, languages, samples]);
 
   // Uniforms
   const [uniform, sampled] = useMemo(() => {

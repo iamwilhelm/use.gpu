@@ -374,6 +374,8 @@ export const makeASTParser = (code: string, tree: Tree) => {
       .filter(d => d.func && !functions.find(f => f.func.name === d.func!.name));
 
     const refs = [...functions, ...declarations];
+    refs.sort((a, b) => a.at - b.at);
+
     const exported = refs.filter(d => d.flags & RF.Exported);
     const globalled = refs.filter(d => d.flags & RF.Global);
 
@@ -393,17 +395,13 @@ export const makeASTParser = (code: string, tree: Tree) => {
       globals: orNone(globals),
       externals: orNone(externals),
       modules: orNone(modules),
-      functions: orNone(functions),
-      declarations: orNone(declarations),
+      declarations: orNone(refs),
     };
   }
 
   const getShakeTable = (table: SymbolTable = getSymbolTable()): ShakeTable | undefined => {
-    const {functions, declarations} = table;
-    const refs = [] as (FunctionRef | DeclarationRef)[];
-    if (functions) refs.push(...functions);
-    if (declarations) refs.push(...declarations);
-    refs.sort((a, b) => a.at - b.at);
+    const {declarations: refs} = table;
+		if (!refs) return undefined;
 
     const graph = new Map<string, string[]>();
     const link = (from: string, to: string) => {

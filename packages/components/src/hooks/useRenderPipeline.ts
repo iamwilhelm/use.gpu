@@ -25,10 +25,10 @@ export const useRenderPipeline = (
   shader: RenderShader,
   props: DeepPartial<GPURenderPipelineDescriptor>,
 ) => {
-  const {device, colorStates, depthStencilState, samples, languages} = renderContext;
+  const {device, colorStates, depthStencilState, samples} = renderContext;
 
   const memoKey = useMemoKey(
-    [device, colorStates, depthStencilState, languages, props]
+    [device, colorStates, depthStencilState, props]
   );
 
   return useMemo(() => {

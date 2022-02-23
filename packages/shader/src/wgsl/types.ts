@@ -99,7 +99,7 @@ export type ParameterRef = AttributesRef & {
 export type FunctionHeaderRef = {
   name: string,
   type: AnnotatedTypeRef,
-  parameters?: ParameterRef[],
+  parameters?: ParameterRef[] | string[],
 };
 
 export type VariableDeclarationRef = {

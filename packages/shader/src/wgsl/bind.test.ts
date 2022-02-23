@@ -11,31 +11,29 @@ describe("bind", () => {
   it("binds an external", () => {
     
     const codeMain = `
-    vec4 getColor();
-    void main() {
-      vec4 v;
-      v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = getColor();
+    @external fn getColor() -> vec4<f32> {};
+    fn main() {
+      var v: vec4<f32>;
+      v = getColor();
+			return v;
     }
     `
 
     const codeSub = `
-    vec4 getSubColor();
-    
-    vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 colorNotUsed() { return vec4(0.0, 0.1, 0.2, 1.0); }
+    @external fn getSubColor() -> vec4<f32> {};
 
-    #pragma export
-    vec4 getColor() {
+    fn colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
+    fn colorNotUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 1.0); }
+
+    @export fn getColor() -> vec4<f32> {
       return getSubColor() + colorUsed();
     }
     `
-    
+
     const codeColor = `
-    #pragma export
-    vec4 getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    @export fn getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     `
-    
+
     const module = loadModule(codeMain, 'main');
     const sub = loadModule(codeSub, 'sub');
     const getColor = loadModule(codeColor, 'getColor');
@@ -47,7 +45,7 @@ describe("bind", () => {
       const linked = linkBundle(sub, links, defines);
       expect(linked).toMatchSnapshot();
     }
-    
+
     {
       const bound = bindBundle(sub, links, defines, 'key');
       const linked = linkBundle(bound);
@@ -70,14 +68,14 @@ describe("bind", () => {
   it('makes deterministic links for data bindings', () => {
     const dataBindings = [
       {
-        uniform: { format: 'vec4', name: 'getColor', value: [0, 0.5, 1, 1], args: ['int'] },
+        uniform: { format: 'vec4<f32>', name: 'getColor', value: [0, 0.5, 1, 1], args: ['i: i32'] },
         constant: [1, 0.5, 1, 1],
       },
       {
-        uniform: { format: 'vec2', name: 'getSize', value: [1, 1], args: ['int'] },
+        uniform: { format: 'vec2<f32>', name: 'getSize', value: [1, 1], args: ['i: i32'] },
         storage: {
           buffer: {} as any,
-          format: 'vec2',
+          format: 'vec2<f32>',
           length: 10,
         },
       },
@@ -98,24 +96,24 @@ describe("bind", () => {
   it('links data bindings', () => {
     const dataBindings = [
       {
-        uniform: { format: 'vec4', name: 'getColor', value: [0, 0.5, 1, 1], args: ['int'] },
+        uniform: { format: 'vec4<f32>', name: 'getColor', value: [0, 0.5, 1, 1], args: ['i: i32'] },
         constant: [1, 0.5, 1, 1],
       },
       {
-        uniform: { format: 'vec2', name: 'getSize', value: [1, 1], args: ['int'] },
+        uniform: { format: 'vec2<f32>', name: 'getSize', value: [1, 1], args: ['i: i32'] },
         storage: {
           buffer: {} as any,
-          format: 'vec2',
+          format: 'vec2<f32>',
           length: 10,
         },
       },
     ];
 
     const code = `
-    vec4 getColor(int);
-    vec2 getSize(int);
-    
-    void main() {
+    @external fn getColor(i: i32) -> vec4<f32> {};
+    @external fn getSize(i: i32) -> vec2<f32> {};
+
+    fn main() {
       getColor(0);
       getSize(0);
     }

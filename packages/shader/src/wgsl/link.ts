@@ -3,7 +3,6 @@ import { Tree } from '@lezer/common';
 import { defineConstants, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
 import { rewriteUsingAST } from './ast';
 import { makeLinkCode, makeLinkBundle, makeLinkModule } from '../util/link';
-import { timed } from '../util/timed';
 
 const getPreambles = () => [];
 

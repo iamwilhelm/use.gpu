@@ -22,6 +22,7 @@ import {
   RefFlags as RF,
 } from './types';
 import * as T from './grammar/wgsl.terms';
+import { WGSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
 import { getProgramHash } from '../util/hash';
 import { getChildNodes, hasErrorNode, formatAST, formatASTNode, decompressAST } from '../util/tree';
@@ -36,9 +37,9 @@ const PRIVATE_ATTRIBUTES = new Set(['@export', '@external', '@global', '@optiona
 
 const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
 
-const isSpace = (s: string, i: number) => {
+const isSpaceOrSemiColon = (s: string, i: number) => {
   const c = s.charCodeAt(i);
-  return c === 32 || c === 13 || c === 12 || c === 11 || c === 10 || c === 9;
+  return c === 59 || c === 32 || c === 13 || c === 12 || c === 11 || c === 10 || c === 9;
 };
 
 // Parse AST for given code string
@@ -165,7 +166,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const attributes = getAttributes(a);
     const {name, type, parameters} = getFunctionHeader(b);
 
-    const exclude = parameters ? parameters.map(p => p.name) : undefined;
+    const exclude = parameters ? parameters.map(p => (p as any).name) : undefined;
     const identifiers = getIdentifiers(c, name, exclude);
 
     return {name, type, attributes, parameters, identifiers};
@@ -202,7 +203,9 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const attributes = getAttributes(a);
     const {name, type, qual} = getVariableDeclaration(b);
     const value = hasValue ? getText(c) : undefined; 
+
     const identifiers = hasValue ? getIdentifiers(c, name) : NO_STRINGS;
+		if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
 
     return {name, type, attributes, value, identifiers, qual};
   };
@@ -217,7 +220,9 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const hasValue = !!d;
     const {name, type} = getVariableIdentifier(c);
     const value = hasValue ? getText(d) : undefined; 
+
     const identifiers = hasValue ? getIdentifiers(d, name) : NO_STRINGS;
+		if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
 
     return {name, type, attributes, value, identifiers};
   };
@@ -453,7 +458,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
 // - import ... from declarations
 // - @export | @optional | @global attributes
 // - @external declarations
-// - white-space after shake point
+// - white-space/semi-colons after shake point
 export const rewriteUsingAST = (
   code: string,
   tree: Tree,
@@ -472,7 +477,7 @@ export const rewriteUsingAST = (
     if (replace != null) out = out + replace;
     else {
       if (out.length && !out[out.length - 1].match(/\s/)) out = out + "\n";
-      while (isSpace(code, pos)) pos++;
+      while (isSpaceOrSemiColon(code, pos)) pos++;
     }
   }
 

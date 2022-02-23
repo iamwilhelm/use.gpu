@@ -42,7 +42,6 @@ export type SymbolTable = {
   visibles?: SymbolRef[],
   globals?: SymbolRef[],
   modules?: ModuleRef[],
-  functions?: FunctionRef[],
   declarations?: DeclarationRef[],
   externals?: DeclarationRef[],
 };

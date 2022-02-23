@@ -3,8 +3,8 @@ import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types
 import { loadVirtualModule } from './shader';
 import { PREFIX_VIRTUAL } from '../constants';
 
-const NO_SYMBOLS = [] as string[];
-const INT_ARG = ['int'];
+const INT_PARAMS = [{name: 'index', type: {name: 'i32'}}];
+const INT_ARG = ['index: i32'];
 
 const getBindingKey = (b: DataBinding) => (+!!b.constant) + ((+!!b.storage) << 8) + ((+!!b.lambda) << 16);
 const getBindingsKey = (bs: DataBinding[]) => bs.reduce((a, b) => a + getBindingKey(b), 0);
@@ -26,11 +26,11 @@ export const makeBindingAccessors = (
   const symbols = virtuals.map(({uniform}) => uniform.name);
   const declarations = virtuals.map(({uniform}) => ({
     at: 0,
-    symbols: NO_SYMBOLS,
+    symbol: uniform.name,
     func: {
       name: uniform.name,
       type: {name: uniform.format},
-      parameters: uniform.args ?? INT_ARG,
+      parameters: uniform.args ?? INT_PARAMS,
     },
     flags: 0,
   }));
@@ -78,7 +78,7 @@ export const makeUniformBlock = (
   binding: number | string = 0,
 ): string => {
   // Uniform Buffer Object struct members
-  const members = constants.map(({uniform: {name, format}}) => `${format} ${name}`);
+  const members = constants.map(({uniform: {name, format}}) => `${name}: ${format}`);
   return members.length ? makeUniformBlockLayout(PREFIX_VIRTUAL, set, binding, members) : '';
 }
 
@@ -88,9 +88,10 @@ export const makeUniformBlockLayout = (
   binding: number | string,
   members: string[],
 ) => `
-layout (set = ${set}, binding = ${binding}) uniform ${ns}Type {
+struct ${ns}Type {
   ${members.map(m => `${m};`).join('\n  ')}
-} ${ns}Uniform;
+};
+@group(${set}) @binding(${binding}) var<uniform> ${ns}Uniform: ${ns}Type;
 `;
 
 export const makeUniformFieldAccessor = (
@@ -100,7 +101,7 @@ export const makeUniformFieldAccessor = (
   name: string,
   args: string[] = INT_ARG,
 ) => `
-${type} ${ns}${name}(${args.join(', ')}) {
+fn ${ns}${name}(${args.join(', ')}) -> ${type} {
   return ${uniform}Uniform.${ns}${name};
 }
 `;
@@ -113,12 +114,10 @@ export const makeStorageAccessor = (
   name: string,
   args: string[] = INT_ARG,
 ) => `
-layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}Type {
-  ${type} data[];
-} ${ns}${name}Storage;
+@group(${set}) @binding(${binding}) var<storage> ${ns}${name}Storage: array<${type}>;
 
-${type} ${ns}${name}(int index) {
-  return ${ns}${name}Storage.data[index];
+fn ${ns}${name}(index: i32) -> ${type} {
+  return ${ns}${name}Storage[index];
 }
 `;
 

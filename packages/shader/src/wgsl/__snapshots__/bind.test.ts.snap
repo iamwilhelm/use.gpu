@@ -1,117 +1,98 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`bind binds an external 1`] = `
-"#version 450
-#define TEST true
+"let TEST = true;
 
-    vec4 _00_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    fn _00_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _00_getColor();
-    
-    vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 colorNotUsed() { return vec4(0.0, 0.1, 0.2, 1.0); }
+    fn colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
+    fn colorNotUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 1.0); }
 
-    vec4 getColor() {
+    fn getColor() -> vec4<f32> {
       return _00_getColor() + colorUsed();
     }
     "
 `;
 
 exports[`bind binds an external 2`] = `
-"#version 450
-#define TEST true
+"let TEST = true;
 
 
-    vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _01_getColor();
-    
-    vec4 colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 colorNotUsed() { return vec4(0.0, 0.1, 0.2, 1.0); }
+    fn colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
+    fn colorNotUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 1.0); }
 
-    vec4 getColor() {
+    fn getColor() -> vec4<f32> {
       return _01_getColor() + colorUsed();
     }
     "
 `;
 
 exports[`bind binds an external 3`] = `
-"#version 450
-#define TEST true
+"let TEST = true;
 
-    vec4 _00_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    fn _00_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _00_getColor();
-    
-    vec4 _01_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 _01_getColor() {
+    fn _01_colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
+fn _01_getColor() -> vec4<f32> {
       return _00_getColor() + _01_colorUsed();
     }
     
 
-    vec4 _01_getColor();
-    void main() {
-      vec4 v;
-      v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = _01_getColor();
+    fn main() {
+      var v: vec4<f32>;
+      v = _01_getColor();
+			return v;
     }
     "
 `;
 
 exports[`bind binds an external 4`] = `
-"#version 450
-#define TEST true
+"let TEST = true;
 
 
-    vec4 _01_getColor() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
 
-    vec4 _01_getColor();
-    
-    vec4 _02_colorUsed() { return vec4(0.0, 0.1, 0.2, 0.0); }
-    vec4 _02_getColor() {
+    fn _02_colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
+fn _02_getColor() -> vec4<f32> {
       return _01_getColor() + _02_colorUsed();
     }
     
 
-    vec4 _02_getColor();
-    void main() {
-      vec4 v;
-      v.xyz = vec3(1.0, 0.0, 0.0);
-      gl_FragColor = _02_getColor();
+    fn main() {
+      var v: vec4<f32>;
+      v = _02_getColor();
+			return v;
     }
     "
 `;
 
 exports[`bind links data bindings 1`] = `
-"#version 450
+"
+struct _VT_Type {
+  _VT_0_getColor: vec4<f32>;
+};
+@group(VIRTUAL_BINDGROUP) @binding(1) var<uniform> _VT_Uniform: _VT_Type;
 
-layout (set = VIRTUAL_BINDGROUP, binding = 1) uniform _VT_Type {
-  vec4 _VT_0_getColor;
-} _VT_Uniform;
 
-
-vec4 _VT_0_getColor(int) {
+fn _VT_0_getColor(i: i32) -> vec4<f32> {
   return _VT_Uniform._VT_0_getColor;
 }
 
 
-layout (std430, set = VIRTUAL_BINDGROUP, binding = 0) readonly buffer _VT_0_getSizeType {
-  vec2 data[];
-} _VT_0_getSizeStorage;
+@group(VIRTUAL_BINDGROUP) @binding(0) var<storage> _VT_0_getSizeStorage: array<vec2<f32>>;
 
-vec2 _VT_0_getSize(int index) {
-  return _VT_0_getSizeStorage.data[index];
+fn _VT_0_getSize(index: i32) -> vec2<f32> {
+  return _VT_0_getSizeStorage[index];
 }
 
 
-    vec4 _VT_0_getColor(int);
-    vec2 _VT_0_getSize(int);
-    
-    void main() {
+    fn main() {
       _VT_0_getColor(0);
       _VT_0_getSize(0);
     }
@@ -125,14 +106,14 @@ Object {
     Object {
       "storage": Object {
         "buffer": Object {},
-        "format": "vec2",
+        "format": "vec2<f32>",
         "length": 10,
       },
       "uniform": Object {
         "args": Array [
-          "int",
+          "i: i32",
         ],
-        "format": "vec2",
+        "format": "vec2<f32>",
         "name": "getSize",
         "value": Array [
           1,
@@ -144,20 +125,20 @@ Object {
   "code": "#virtual [getColor getSize] 101",
   "name": "_VT_hoi6if_",
   "table": Object {
-    "functions": Array [
+    "declarations": Array [
       Object {
         "at": 0,
         "flags": 0,
         "func": Object {
           "name": "getColor",
           "parameters": Array [
-            "int",
+            "i: i32",
           ],
           "type": Object {
-            "name": "vec4",
+            "name": "vec4<f32>",
           },
         },
-        "symbols": Array [],
+        "symbol": "getColor",
       },
       Object {
         "at": 0,
@@ -165,13 +146,13 @@ Object {
         "func": Object {
           "name": "getSize",
           "parameters": Array [
-            "int",
+            "i: i32",
           ],
           "type": Object {
-            "name": "vec2",
+            "name": "vec2<f32>",
           },
         },
-        "symbols": Array [],
+        "symbol": "getSize",
       },
     ],
     "hash": "hoi6if8by6",
@@ -194,9 +175,9 @@ Object {
       ],
       "uniform": Object {
         "args": Array [
-          "int",
+          "i: i32",
         ],
-        "format": "vec4",
+        "format": "vec4<f32>",
         "name": "getColor",
         "value": Array [
           0,

@@ -16,7 +16,7 @@ export type MakeCastAccessor = (
 ) => string;
 
 export const makeCastTo = (
-	makeCastAccessor: MakeCastAccessor,
+  makeCastAccessor: MakeCastAccessor,
 ) => (
   bundle: ShaderModule,
   type: string,

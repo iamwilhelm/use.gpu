@@ -67,16 +67,16 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   }, [device, texture]);
 
   const defines = {
-    '@group(VIEW_BINDGROUP)': 0,
-    '@binding(VIEW_BINDING)': 0,
-    '@group(LIGHT_BINDGROUP)': 0,
-    '@binding(LIGHT_BINDING)': 1,
-    '@group(PICKING_BINDGROUP)': 0,
-    '@binding(PICKING_BINDING)': 1,
+    '@group(VIEW)': '@group(0)',
+    '@binding(VIEW)': '@binding(0)',
+    '@group(LIGHT)': '@group(0)',
+    '@binding(LIGHT)': '@binding(1)',
+    '@group(PICKING)': '@group(0)',
+    '@binding(PICKING)': '@binding(1)',
   };
 
   // Render shader
-  const vertexShader 	 = isPicking ? instanceDrawMeshPick     : instanceDrawMesh;
+  const vertexShader    = isPicking ? instanceDrawMeshPick     : instanceDrawMesh;
   const fragmentShader = isPicking ? instanceFragmentMeshPick : instanceFragmentMesh;
 
   const fiber = useFiber();
@@ -84,7 +84,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   // Rendering pipeline
   const pipeline = useMemo(() => {
     const {wgsl: {cache}} = languages;
-    
+
     const vertexLinked = linkBundle(vertexShader, {}, defines, cache);
     const fragmentLinked = linkBundle(fragmentShader, {}, defines, cache);
 

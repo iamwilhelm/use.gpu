@@ -43,12 +43,13 @@ const isSpaceOrSemiColon = (s: string, i: number) => {
 };
 
 // Parse AST for given code string
-export const makeASTParser = (code: string, tree: Tree) => {
+export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
   const throwError = (t: string, n?: SyntaxNode) => {
     if (!n) throw new Error(`Missing node`);
     console.log(formatAST(tree.topNode, code));
-    throw new Error(`Error parsing ${t} node '${code.slice(n.from, n.to)}'\n${formatAST(n, code)}`);
+    const loc = name != null ? ` in ${name}` : '';
+    throw new Error(`Error parsing: ${t} node '${code.slice(n.from, n.to)}'${loc}\n${formatAST(n, code)}`);
   }
 
   const getNodes = (node: SyntaxNode, min?: number) => {
@@ -205,7 +206,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const value = hasValue ? getText(c) : undefined; 
 
     const identifiers = hasValue ? getIdentifiers(c, name) : NO_STRINGS;
-		if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
+    if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
 
     return {name, type, attributes, value, identifiers, qual};
   };
@@ -222,7 +223,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const value = hasValue ? getText(d) : undefined; 
 
     const identifiers = hasValue ? getIdentifiers(d, name) : NO_STRINGS;
-		if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
+    if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
 
     return {name, type, attributes, value, identifiers};
   };
@@ -535,10 +536,10 @@ export const rewriteUsingAST = (
         skip(from, to);
         while (cursor.lastChild()) {};
       }
-			else {
-	      const replace = rename.get(name);
-	      if (replace) skip(from, to, replace);      
-			}
+      else {
+        const replace = rename.get(name);
+        if (replace) skip(from, to, replace);      
+      }
     }
     // Import declaration (full AST only)
     else if (type.name === 'ImportDeclaration') {
@@ -599,9 +600,9 @@ export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
         skip(from, to);
         while (cursor.lastChild()) {};
       }
-			else {
-				attr(from, to);
-			}
+      else {
+        attr(from, to);
+      }
     }
     // Import declaration
     else if (type.name === 'ImportDeclaration') {

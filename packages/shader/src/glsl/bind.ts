@@ -3,9 +3,11 @@ import { ShaderModule, DataBinding } from './types';
 import { defineConstants } from './shader';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
 import { makeBindModule, makeBindBundle, makeResolveBindings, namespaceBinding } from '../util/bind';
-import { VIRTUAL_BINDGROUP } from '../constants';
+import { VIRTUAL_BINDGROUP } from './constants';
 
 const NO_SYMBOLS = [] as any[];
+
+const getVirtualBindGroup = () => VIRTUAL_BINDGROUP;
 
 export const bindingToModule = (
   binding: DataBinding,
@@ -26,4 +28,4 @@ export const bindModule = makeBindModule(defineConstants);
 
 export const bindBundle = makeBindBundle(bindModule);
 
-export const resolveBindings = makeResolveBindings(makeUniformBlock);
+export const resolveBindings = makeResolveBindings(makeUniformBlock, getVirtualBindGroup);

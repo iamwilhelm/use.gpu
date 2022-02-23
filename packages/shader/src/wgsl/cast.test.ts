@@ -7,7 +7,7 @@ describe('cast', () => {
   it('casts', () => {
     
     const code = `
-   	@export fn getValue() -> vec2<f32> { return vec2<f32>(1.0, 2.0); }
+     @export fn getValue() -> vec2<f32> { return vec2<f32>(1.0, 2.0); }
     `;
 
     const mod = loadModule(code, 'code', 'getValue');

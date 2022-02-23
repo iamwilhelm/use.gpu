@@ -490,3 +490,21 @@ Program                                                     ⮐ type integer = i
       TypeDeclaration                                       i32
         i32                                                 i32
 `;
+
+exports[`WGSL grammar snapshots parses a test program 14`] = `
+Program                                                     ⮐ var foo;⮐ // var foo;⮐ var foo;⮐ 
+  LocalDeclaration                                          ⮐ var foo;
+    GlobalVariableDeclaration                               ⮐ var foo
+      AttributeList                                         
+      VariableDeclaration                                   var foo
+        var                                                 var
+        VariableIdentifier                                  foo
+          Identifier                                        foo
+  LocalDeclaration                                          ⮐ // var foo;⮐ var foo;
+    GlobalVariableDeclaration                               ⮐ // var foo;⮐ var foo
+      AttributeList                                         
+      VariableDeclaration                                   var foo
+        var                                                 var
+        VariableIdentifier                                  foo
+          Identifier                                        foo
+`;

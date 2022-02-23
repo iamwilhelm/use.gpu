@@ -1,25 +1,17 @@
 import {TypedArrayConstructor, UniformType} from './types';
 
 export const VALUE_TYPES = {
+  // GLSL
   'float': Float32Array,
   'double': Float64Array,
   'int': Int32Array,
   'uint': Uint32Array,
-};
 
-export const GLSL_TYPE_ALIASES = {
-  'float2': 'vec2',
-  'float3': 'vec3',
-  'float4': 'vec4',
-  'double2': 'dvec2',
-  'double3': 'dvec3',
-  'double4': 'dvec4',
-  'int2': 'ivec4',
-  'int3': 'ivec4',
-  'int4': 'ivec4',
-  'uint2': 'uvec4',
-  'uint3': 'uvec4',
-  'uint4': 'uvec4',
+  // WGSL
+  'f32': Float32Array,
+  'f64': Float64Array,
+  'i32': Int32Array,
+  'u32': Uint32Array,
 };
 
 export const TYPED_ARRAYS: TypedArrayConstructor[] = [
@@ -97,7 +89,7 @@ export const VERTEX_TO_UNIFORM = {
 };
 
 export const UNIFORM_SIZES = {
-  "bool":    1,
+  //"bool":    1,
   "bvec2":   2,
   "bvec3":   3,
   "bvec4":   4,
@@ -147,10 +139,56 @@ export const UNIFORM_SIZES = {
   "dmat4x3": 96,
   "dmat4":   128,
   "dmat4x4": 128,
+
+
+  "bool":         1,
+  "vec2<bool>":   2,
+  "vec3<bool>":   3,
+  "vec4<bool>":   4,
+
+  "u32":          4,
+  "vec2<u32>":    8,
+  "vec3<u32>":    12,
+  "vec4<u32>":    16,
+
+  "i32":          4,
+  "vec2<i32>":    8,
+  "vec3<i32>":    12,
+  "vec4<i32>":    16,
+
+  "f32":          4,
+  "vec2<f32>":    8,
+  "vec3<f32>":    12,
+  "vec4<f32>":    16,
+
+  "f64":          8,
+  "vec2<f64>":    16,
+  "vec3<f64>":    24,
+  "vec4<f64>":    32,
+
+  "mat2x2<f32>":  16,
+  "mat3x2<f32>":  24,
+  "mat2x3<f32>":  24,
+  "mat2x4<f32>":  32,
+  "mat4x2<f32>":  32,
+  "mat3x3<f32>":  36,
+  "mat3x4<f32>":  48,
+  "mat4x3<f32>":  48,
+  "mat4x4<f32>":  64,
+
+  "mat2x2<f64>": 32,
+  "mat3x2<f64>": 48,
+  "mat2x3<f64>": 48,
+  "mat2x4<f64>": 64,
+  "mat4x2<f64>": 64,
+  "mat3x3<f64>": 72,
+  "mat3x4<f64>": 96,
+  "mat4x3<f64>": 96,
+  "mat4x4<f64>": 128,
 };
 
 export const UNIFORM_DIMS = {
-  "bool":    1,
+  //"bool":    1,
   "bvec2":   2,
   "bvec3":   3,
   "bvec4":   4,
@@ -200,10 +238,56 @@ export const UNIFORM_DIMS = {
   "dmat4x3":  12,
   "dmat4":    16,
   "dmat4x4":  16,
+
+
+  "bool":         1,
+  "vec2<bool>":   2,
+  "vec3<bool>":   3,
+  "vec4<bool>":   4,
+
+  "u32":          1,
+  "vec2<u32>":    2,
+  "vec3<u32>":    3,
+  "vec4<u32>":    4,
+
+  "i32":          1,
+  "vec2<i32>":    2,
+  "vec3<i32>":    3,
+  "vec4<i32>":    4,
+
+  "f32":          1,
+  "vec2<f32>":    2,
+  "vec3<f32>":    3,
+  "vec4<f32>":    4,
+
+  "f64":          1,
+  "vec2<f64>":    2,
+  "vec3<f64>":    3,
+  "vec4<f64>":    4,
+
+  "mat2x2<f32>":  4,
+  "mat3x2<f32>":  6,
+  "mat2x3<f32>":  6,
+  "mat2x4<f32>":  8,
+  "mat4x2<f32>":  8,
+  "mat3x3<f32>":  9,
+  "mat3x4<f32>":  12,
+  "mat4x3<f32>":  12,
+  "mat4x4<f32>":  16,
+
+  "dmat2x2<f64>":  4,
+  "dmat3x2<f64>":  6,
+  "dmat2x3<f64>":  6,
+  "dmat2x4<f64>":  8,
+  "dmat4x2<f64>":  8,
+  "dmat3x3<f64>":  9,
+  "dmat3x4<f64>":  12,
+  "dmat4x3<f64>":  12,
+  "dmat4x4<f64>":  16,
 };
 
 export const UNIFORM_ARRAY_TYPES = {
-  "bool":    Uint32Array,
+  //"bool":    Uint32Array,
   "bvec2":   Uint32Array,
   "bvec3":   Uint32Array,
   "bvec4":   Uint32Array,
@@ -253,6 +337,52 @@ export const UNIFORM_ARRAY_TYPES = {
   "dmat4x3": Float64Array,
   "dmat4":   Float64Array,
   "dmat4x4": Float64Array,
+
+
+  "bool":         Uint32Array,
+  "vec2<bool>":   Uint32Array,
+  "vec3<bool>":   Uint32Array,
+  "vec4<bool>":   Uint32Array,
+
+  "u32":          Uint32Array,
+  "vec2<u32>":    Uint32Array,
+  "vec3<u32>":    Uint32Array,
+  "vec4<u32>":    Uint32Array,
+
+  "i32":          Int32Array,
+  "vec2<i32>":    Int32Array,
+  "vec3<i32>":    Int32Array,
+  "vec4<i32>":    Int32Array,
+
+  "f32":          Float32Array,
+  "vec2<f32>":    Float32Array,
+  "vec3<f32>":    Float32Array,
+  "vec4<f32>":    Float32Array,
+
+  "f64":          Float64Array,
+  "vec2<f64>":    Float64Array,
+  "vec3<f64>":    Float64Array,
+  "vec4<f64>":    Float64Array,
+
+  "mat2x2<f32>":  Float32Array,
+  "mat3x2<f32>":  Float32Array,
+  "mat2x3<f32>":  Float32Array,
+  "mat2x4<f32>":  Float32Array,
+  "mat4x2<f32>":  Float32Array,
+  "mat3x3<f32>":  Float32Array,
+  "mat3x4<f32>":  Float32Array,
+  "mat4x3<f32>":  Float32Array,
+  "mat4x4<f32>":  Float32Array,
+
+  "dmat2x2<f64>": Float64Array,
+  "dmat3x2<f64>": Float64Array,
+  "dmat2x3<f64>": Float64Array,
+  "dmat2x4<f64>": Float64Array,
+  "dmat4x2<f64>": Float64Array,
+  "dmat3x3<f64>": Float64Array,
+  "dmat3x4<f64>": Float64Array,
+  "dmat4x3<f64>": Float64Array,
+  "dmat4x4<f64>": Float64Array,
 };
 
 export const TEXTURE_FORMAT_SIZES = {

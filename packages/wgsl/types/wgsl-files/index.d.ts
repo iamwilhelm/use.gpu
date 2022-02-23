@@ -11,6 +11,32 @@ declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/geometry/line.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const lineJoinBevel: ParsedBundle;
+  export const lineJoinMiter: ParsedBundle;
+  export const lineJoinRound: ParsedBundle;
+  export const getLineJoin: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/geometry/quad.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getQuadIndex: ParsedBundle;
+  export const getQuadUV: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/geometry/strip.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getStripIndex: ParsedBundle;
+  export const getStripUV: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/draw/mesh-pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -19,6 +45,27 @@ declare module "@use-gpu/wgsl/instance/draw/mesh-pick.wgsl" {
 }
 
 declare module "@use-gpu/wgsl/instance/draw/mesh.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/draw/virtual-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/draw/virtual.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/draw/wireframe-strip.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
@@ -39,10 +86,38 @@ declare module "@use-gpu/wgsl/instance/fragment/mesh.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/use/light.wgsl" {
+declare module "@use-gpu/wgsl/instance/fragment/solid-pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/fragment/solid.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/vertex/line.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLineVertex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/mask/passthru.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getPassThruFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/use/light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const lightUniforms: ParsedBundle;
   export default __module;
 }
 
@@ -50,6 +125,14 @@ declare module "@use-gpu/wgsl/use/picking.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getPickingColor: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/use/types.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SolidVertex: ParsedBundle;
+  export const MeshVertex: ParsedBundle;
   export default __module;
 }
 

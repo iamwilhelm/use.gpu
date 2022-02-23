@@ -59,14 +59,13 @@ export const render = (props: RenderProps) => {
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
 
   const defines = useMemo(() => ({
-    IS_PICKING: isPicking,
-    VIEW_BINDGROUP: 0,
-    VIEW_BINDING: 0,
-    PICKING_BINDGROUP: 0,
-    PICKING_BINDING: 1,
-    VIRTUAL_BINDGROUP: 1,
+    '@group(VIEW)': '@group(0)',
+    '@binding(VIEW)': '@binding(0)',
+    '@group(PICKING)': '@group(0)',
+    '@binding(PICKING)': '@binding(1)',
+    '@group(VIRTUAL)': '@group(1)',
     ...propDefines,
-  }), [isPicking, propDefines]);
+  }), [propDefines]);
 
   // Shaders
   const {

@@ -15,7 +15,7 @@ describe("bind", () => {
     fn main() {
       var v: vec4<f32>;
       v = getColor();
-			return v;
+      return v;
     }
     `
 
@@ -118,6 +118,7 @@ describe("bind", () => {
       getSize(0);
     }
     `;
+
     const mod = loadModule(code, 'code');
 
     const toSnapshot = (link: any) => {
@@ -131,8 +132,9 @@ describe("bind", () => {
     const fail = () => linkBundle(bound);
     expect(fail).toThrow();
 
-    const {modules: [resolved], uniforms, bindings} = resolveBindings([bound]);
-    const result = linkBundle(resolved);
+    const defines = {'@group(VIRTUAL)': '@group(0)'};
+    const {modules: [resolved], uniforms, bindings} = resolveBindings([bound], defines);
+    const result = linkBundle(resolved, {}, defines);
     expect(result).toMatchSnapshot();
   });
 

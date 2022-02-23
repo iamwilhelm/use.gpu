@@ -1,6 +1,6 @@
 import { Tree } from '@lezer/common';
 import { ParsedBundle, ParsedModule, ParsedModuleCache, ShaderDefine, ImportRef, RefFlags as RF } from '../types';
-import { VIRTUAL_BINDGROUP } from '../constants';
+import { VIRTUAL_BINDINGS } from '../constants';
 
 import { parseBundle } from './bundle';
 import { resolveShakeOps } from './shake';
@@ -24,7 +24,7 @@ export type LoadModuleWithCache = (
 export type GetPreambles = () => string[];
 
 export type GetRenames = (
-	defines?: Record<string, ShaderDefine> | null,
+  defines?: Record<string, ShaderDefine> | null,
 ) => Map<string, string>;
 
 export type DefineConstants = (
@@ -82,7 +82,7 @@ export const makeLinkBundle = (
 // Link a parsed module with static modules, dynamic links
 export const makeLinkModule = (
   getPreambles: GetPreambles,
-	getRenames: GetRenames,
+  getRenames: GetRenames,
   defineConstants: DefineConstants,
   rewriteUsingAST: RewriteUsingAST,
 ) => timed('linkModule', (
@@ -98,11 +98,11 @@ export const makeLinkModule = (
 
   const program = getPreambles();
   if (defines) {
-		const def = defineConstants(defines);
-		if (def.length) program.push(def);
-	}
+    const def = defineConstants(defines);
+    if (def.length) program.push(def);
+  }
 
-  const renames = getRenames(defines);
+  const staticRename = getRenames(defines);
 
   // Namespace by module name and module hash
   const namespaces = new Map<string, string>();
@@ -124,7 +124,7 @@ export const makeLinkModule = (
     }
 
     // Namespace all non-global symbols outside main module
-	  const rename = new Map(renames);
+    const rename = new Map<string, string>();
     if (module !== main) {
       const namespace = virtual?.namespace;
       const ns = reserveNamespace(module, namespaces, namespace);
@@ -169,9 +169,12 @@ export const makeLinkModule = (
       rename.set(name, imp);
     }
 
+    // Copy over static renames
+    for (let k of staticRename.keys()) rename.set(k, staticRename.get(k)!);
+
     if (virtual) {
       const {uniforms, bindings} = virtual;
-      if (uniforms && bindings && (libraries[VIRTUAL_BINDGROUP] == null)) {
+      if (uniforms && bindings && (libraries[VIRTUAL_BINDINGS] == null)) {
         const id = code.replace('#virtual ', '');
         throw new Error(`Virtual module ${id} has unresolved data bindings`);
       }

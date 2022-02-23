@@ -1,7 +1,9 @@
 import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types';
 
+import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
 import { PREFIX_VIRTUAL } from '../constants';
+import { VIRTUAL_BINDGROUP } from './constants';
 
 const INT_PARAMS = [{name: 'index', type: {name: 'i32'}}];
 const INT_ARG = ['index: i32'];
@@ -11,7 +13,6 @@ const getBindingsKey = (bs: DataBinding[]) => bs.reduce((a, b) => a + getBinding
 
 export const makeBindingAccessors = (
   bindings: DataBinding[],
-  set: number | string = 0,
   key: number | string = getBindingsKey(bindings),
 ): Record<string, ParsedBundle | ParsedModule> => {
 
@@ -38,6 +39,7 @@ export const makeBindingAccessors = (
   // Code generator
   const render = (namespace: string, rename: Map<string, string>, base: number = 0) => {
     const program: string[] = [];
+    const set = getBindingArgument(rename.get(VIRTUAL_BINDGROUP));
 
     for (const {uniform: {name, format, args}} of constants) {
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, format, name, args));

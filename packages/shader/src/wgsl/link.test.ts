@@ -29,9 +29,11 @@ describe("link", () => {
   it("substitutes attributes", () => {
     
     const code = `
+    @group(GROUP) @binding(BINDING) var<uniform> color: vec4<f32>;
+
     @external fn getColor() -> vec4<f32> {};
     fn main() -> @location(LOCATION) vec4<f32> {
-      return getColor();
+      return getColor() + color;
     }
     `
     
@@ -39,7 +41,11 @@ describe("link", () => {
     @export fn getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     `
     
-		const defs = {"@location(LOCATION)": "@location(0)"};
+    const defs = {
+      '@group(GROUP)': '@group(0)',
+      '@binding(BINDING)': '@binding(0)',
+      '@location(LOCATION)': '@location(0)',
+    };
     const linked = linkCode(code, {}, {getColor}, defs);
     expect(linked).toMatchSnapshot();
 

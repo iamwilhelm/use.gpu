@@ -46,7 +46,7 @@ fn _01_getColor() -> vec4<f32> {
     fn main() {
       var v: vec4<f32>;
       v = _01_getColor();
-			return v;
+      return v;
     }
     "
 `;
@@ -67,7 +67,7 @@ fn _02_getColor() -> vec4<f32> {
     fn main() {
       var v: vec4<f32>;
       v = _02_getColor();
-			return v;
+      return v;
     }
     "
 `;
@@ -77,7 +77,7 @@ exports[`bind links data bindings 1`] = `
 struct _VT_Type {
   _VT_0_getColor: vec4<f32>;
 };
-@group(VIRTUAL_BINDGROUP) @binding(1) var<uniform> _VT_Uniform: _VT_Type;
+@group(0) @binding(1) var<uniform> _VT_Uniform: _VT_Type;
 
 
 fn _VT_0_getColor(i: i32) -> vec4<f32> {
@@ -85,7 +85,7 @@ fn _VT_0_getColor(i: i32) -> vec4<f32> {
 }
 
 
-@group(VIRTUAL_BINDGROUP) @binding(0) var<storage> _VT_0_getSizeStorage: array<vec2<f32>>;
+@group(0) @binding(0) var<storage> _VT_0_getSizeStorage: array<vec2<f32>>;
 
 fn _VT_0_getSize(index: i32) -> vec2<f32> {
   return _VT_0_getSizeStorage[index];

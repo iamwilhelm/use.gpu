@@ -18,7 +18,7 @@ export const useLinkedShader = (
   key?: number | string,
 ) => {
   const fiber = useFiber();
-  const {glsl: {compile, cache}} = languages;
+  const {glsl: {compile}} = languages;
 
   // Resolve bindings between vertex and fragment.
   const s = [vertex, fragment] as [ParsedBundle, ParsedBundle];

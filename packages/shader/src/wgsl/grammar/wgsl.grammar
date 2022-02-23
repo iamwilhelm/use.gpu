@@ -1,5 +1,6 @@
 @top Program { unit }
 @skip { space | comment }
+@external tokens untilEOLToken from "./tokens" { untilEOL }
 @external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
 
 unit { globalDirective* globalDeclaration* }
@@ -10,7 +11,7 @@ t<term> { @specialize[@name={term}]<Identifier, term> }
 d<term> { @specialize[@name={term}]<Identifier, term> }
 r<term> { @specialize[@name={term}]<Identifier, term> }
 
-comment { commentLine | commentOpen untilCommentClose }
+comment { commentLine untilEOL | commentOpen untilCommentClose }
 template<content> { '<' content '>' }
 
 globalDirective {
@@ -379,7 +380,7 @@ texelFormat {
 
 @tokens {
   space { std.whitespace+ }
-  commentLine { "//" ![\n\r\v\f]* }
+  commentLine { "//" }
   commentOpen { "/*" }
 
   Identifier { $[a-zA-Z_] $[0-9a-zA-Z] $[0-9a-zA-Z_]* | $[a-zA-Z] $[0-9a-zA-Z_]* }

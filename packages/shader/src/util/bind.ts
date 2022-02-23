@@ -4,17 +4,17 @@ import { parseLinkAliases } from '../util/link';
 import { getProgramHash, makeKey } from '../util/hash';
 import { toBundle } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
-import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDGROUP } from '../constants';
+import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
 
 import { timed } from './timed';
 
 const NO_SYMBOLS = [] as any[];
 
 export type BindBundle = (
-	bundle: ShaderModule,
-	linkDefs?: Record<string, ShaderModule>,
-	defines?: Record<string, ShaderDefine> | null,
-	key?: string | number,
+  bundle: ShaderModule,
+  linkDefs?: Record<string, ShaderModule>,
+  defines?: Record<string, ShaderDefine> | null,
+  key?: string | number,
 ) => string;
 
 export type BindModule = (
@@ -37,7 +37,7 @@ export type MakeUniformBlock = (
 ) => string;
 
 export const makeBindBundle = (
-	bindModule: BindModule,
+  bindModule: BindModule,
 ) => timed('bindBundle', (
   bundle: ShaderModule,
   linkDefs: Record<string, ShaderModule> = {},
@@ -49,7 +49,7 @@ export const makeBindBundle = (
 });
 
 export const makeBindModule = (
-	defineConstants: DefineConstants,
+  defineConstants: DefineConstants,
 ) => timed('bindModule', (
   main: ParsedModule,
   libs: Record<string, ShaderModule> = {},
@@ -124,9 +124,11 @@ export const makeBindModule = (
 });
 
 export const makeResolveBindings = (
-	makeUniformBlock: MakeUniformBlock,
+  makeUniformBlock: MakeUniformBlock,
+  getVirtualBindGroup: (defines?: Record<string, ShaderDefine>) => string | number,
 ) => timed('resolveBindings', (
   modules: ParsedBundle[],
+  defines?: Record<string, ShaderDefine>,
 ): {
   modules: ParsedBundle[],
   uniforms: DataBinding[],
@@ -160,9 +162,10 @@ export const makeResolveBindings = (
   }
 
   // Create combined uniform block as top-level import
-  const code = makeUniformBlock(allUniforms, VIRTUAL_BINDGROUP, allBindings.length);
-  const lib = loadStaticModule(code, VIRTUAL_BINDGROUP);
-  const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDGROUP, imports: NO_SYMBOLS};
+  const virtualBindGroup = getVirtualBindGroup(defines);
+  const code = makeUniformBlock(allUniforms, virtualBindGroup, allBindings.length);
+  const lib = loadStaticModule(code, VIRTUAL_BINDINGS);
+  const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDINGS, imports: NO_SYMBOLS};
 
   // Append to modules
   const out = modules.map((m: ShaderModule) => {
@@ -182,7 +185,7 @@ export const makeResolveBindings = (
       },
       libs: {
         ...libs,
-        [VIRTUAL_BINDGROUP]: lib,
+        [VIRTUAL_BINDINGS]: lib,
       },
     };
   });
@@ -200,3 +203,7 @@ export const namespaceBinding = (namespace: string, binding: DataBinding) => {
   const imp = namespace + name;
   return {...binding, uniform: {...uniform, name: imp}};
 };
+
+export const getBindingArgument = (binding?: ShaderDefine): string | number =>
+  typeof binding === 'string' ? binding.split(/[()]/)[1] :
+  typeof binding === 'number' ? binding : 'VIRTUAL';

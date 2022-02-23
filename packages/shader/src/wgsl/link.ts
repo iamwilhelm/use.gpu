@@ -10,11 +10,11 @@ const getPreambles = () => [];
 
 // Allow attribute renaming
 const getRenames = (
-	defines?: Record<string, ShaderDefine> | null,
+  defines?: Record<string, ShaderDefine> | null,
 ) => {
-	const rename = new Map<string, string>();
-	if (defines) for (let k in defines) if (k[0] === '@') rename.set(k, `${defines[k]}`);
-	return rename;
+  const rename = new Map<string, string>();
+  if (defines) for (let k in defines) if (k[0] === '@') rename.set(k, `${defines[k]}`);
+  return rename;
 }
 
 // Link a parsed module with static modules, dynamic links

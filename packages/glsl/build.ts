@@ -36,7 +36,7 @@ for (const file of files) {
   copyToTarget(file);
 
   const code = fs.readFileSync(file).toString();
-  const module = loadModule(code, 'code');
+  const module = loadModule(code, file);
 
   paths.push(file);
   names.push(name.replace('src/', ''));

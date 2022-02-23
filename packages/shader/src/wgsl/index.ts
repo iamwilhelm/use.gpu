@@ -8,6 +8,19 @@ import {
 } from './shader';
 
 import {
+  bindBundle,
+  bindModule,
+  bindingsToLinks,
+  bindingToModule,
+  resolveBindings,
+} from './bind';
+
+import {
+  castTo,
+  bundleToAttribute,
+} from './cast';
+
+import {
   linkBundle,
   linkModule,
   linkCode,
@@ -20,6 +33,10 @@ import {
   rewriteUsingAST,
 } from './ast';
 
+import {
+  getProgramHash
+} from '../util/hash';
+
 export {
   loadModule,
   loadModuleWithCache,
@@ -28,6 +45,19 @@ export {
   makeLanguage,
   makeModuleCache,
 } from './shader';
+
+export {
+  bindBundle,
+  bindModule,
+  bindingsToLinks,
+  bindingToModule,
+  resolveBindings,
+} from './bind';
+
+export {
+  castTo,
+  bundleToAttribute,
+} from './cast';
 
 export {
   linkBundle,
@@ -41,6 +71,10 @@ export {
   decompressAST,
   rewriteUsingAST,
 } from './ast';
+
+export {
+  getProgramHash
+} from '../util/hash';
 
 export const WGSLLinker = {
   loadModule,
@@ -53,7 +87,6 @@ export const WGSLLinker = {
   linkModule,
   linkCode,
 
-  /*
   bindBundle,
   bindModule,
   bindingsToLinks,
@@ -62,7 +95,6 @@ export const WGSLLinker = {
 
   castTo,
   bundleToAttribute,
-  */
 
   makeASTParser,
   compressAST,
@@ -71,65 +103,8 @@ export const WGSLLinker = {
 
   makeLanguage,
   makeModuleCache,
+
+  getProgramHash,
 };
 
 export default WGSLLinker;
-
-/*
-import {
-  bindBundle,
-  bindModule,
-  bindingsToLinks,
-  bindingToModule,
-  resolveBindings,
-} from './bind';
-
-import {
-  castTo,
-  bundleToAttribute,
-} from './cast';
-
-export {
-  bindBundle,
-  bindModule,
-  bindingsToLinks,
-  bindingToModule,
-  resolveBindings,
-} from './bind';
-
-export {
-  castTo,
-  bundleToAttribute,
-} from './cast';
-
-export const GLSLLinker = {
-  loadModule,
-  loadModuleWithCache,
-  loadStaticModule,
-
-  defineConstants,
-
-  linkBundle,
-  linkModule,
-  linkCode,
-  getPreamble,
-  setPreamble,
-
-  bindBundle,
-  bindModule,
-  bindingsToLinks,
-  bindingToModule,
-  resolveBindings,
-
-  castTo,
-  bundleToAttribute,
-
-  makeASTParser,
-  compressAST,
-  decompressAST,
-  rewriteUsingAST,
-
-  makeLanguage,
-  makeModuleCache,
-};
-*/

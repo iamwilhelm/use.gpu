@@ -35,6 +35,10 @@ import {
   rewriteUsingAST,
 } from './ast';
 
+import {
+  getProgramHash
+} from '../util/hash';
+
 export {
   loadModule,
   loadModuleWithCache,
@@ -72,6 +76,10 @@ export {
   rewriteUsingAST,
 } from './ast';
 
+export {
+  getProgramHash
+} from '../util/hash';
+
 export const GLSLLinker = {
   loadModule,
   loadModuleWithCache,
@@ -101,6 +109,8 @@ export const GLSLLinker = {
 
   makeLanguage,
   makeModuleCache,
+
+  getProgramHash,
 };
 
 export default GLSLLinker;

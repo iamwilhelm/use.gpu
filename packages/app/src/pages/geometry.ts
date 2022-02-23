@@ -9,7 +9,6 @@ import {
   CompositeData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
   Pick, Cursor, Points, Lines,
-  RawQuads as Quads, RawLines,
   RenderToTexture,
   Router, Routes,
 } from '@use-gpu/components';
@@ -79,9 +78,9 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
             use(Data)({
               fields: lineFields,
               render: ([positions, segments, sizes]: StorageSource[]) => [
-                use(RawLines)({ positions, segments, size: 50, join: 'round' }),
-                use(RawLines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
-                use(RawLines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug, depth: 1 }),
+                use(Lines)({ positions, segments, size: 50, join: 'round' }),
+                use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
+                use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug, depth: 1 }),
               ]
             }),
             use(CompositeData)({
@@ -89,7 +88,7 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
               data: lineData,
               isLoop: (o: any) => o.loop,
               render: ([segments, positions, colors, sizes]: StorageSource[]) => [
-                use(RawLines)({ segments, positions, colors, sizes, }),
+                use(Lines)({ segments, positions, colors, sizes, }),
               ]          
             }),
             use(RawData)({

@@ -6,7 +6,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { RawLines } from '../geometry/raw-lines';
+import { RawLines } from '../geometry/raw-lines-wgsl';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';

@@ -8,8 +8,7 @@ struct ViewUniforms {
   viewPixelRatio: f32;
 };
 
-//@export @group(VIEW_BINDGROUP) @binding(VIEW_BINDING) var<uniform> viewUniforms: ViewUniforms;
-@export @group(0) @binding(0) var<uniform> viewUniforms: ViewUniforms;
+@export @group(VIEW) @binding(VIEW) var<uniform> viewUniforms: ViewUniforms;
 
 @export fn worldToView(position: vec4<f32>) -> vec4<f32> {
   return viewUniforms.viewMatrix * position;
@@ -32,8 +31,8 @@ struct ViewUniforms {
 }
 
 @export fn worldToClip3D(position: vec4<f32>) -> vec3<f32> {
-  position = viewToClip(worldToView(position));
-  return position.xyz / position.w;
+  var pos = viewToClip(worldToView(position));
+  return pos.xyz / pos.w;
 }
 
 @export fn getPerspectiveScale(w: f32, f: f32) -> f32 {

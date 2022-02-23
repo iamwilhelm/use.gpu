@@ -43,7 +43,8 @@ export const makeASTParser = (code: string, tree: Tree) => {
   const throwError = (t: string, n?: SyntaxNode) => {
     if (!n) throw new Error(`Missing node`);
     console.log(formatAST(tree.topNode, code));
-    throw new Error(`Error parsing ${t} node '${code.slice(n.from, n.to)}'\n${formatAST(n, code)}`);
+    const loc = name != null ? ` in ${name}` : '';
+    throw new Error(`Error parsing: ${t} node '${code.slice(n.from, n.to)}'${loc}\n${formatAST(n, code)}`);
   }
 
   const getNodes = (node: SyntaxNode, min?: number) => {
@@ -401,7 +402,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
   const getShakeTable = (table: SymbolTable = getSymbolTable()): ShakeTable | undefined => {
     const {declarations: refs} = table;
-		if (!refs) return undefined;
+    if (!refs) return undefined;
 
     const graph = new Map<string, string[]>();
     const link = (from: string, to: string) => {

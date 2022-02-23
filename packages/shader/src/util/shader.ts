@@ -11,7 +11,7 @@ const EMPTY_TABLE = {} as any;
 // (AST + symbol table)
 export const makeLoadModule = <T>(
   parseShader: (code: string) => Tree,
-  makeASTParser: (code: string, tree: Tree) => ASTParser<T>,
+  makeASTParser: (code: string, tree: Tree, name?: string) => ASTParser<T>,
   compressAST: (code: string, tree: Tree) => CompressedNode[],
 ) => (
   code: string,
@@ -23,7 +23,7 @@ export const makeLoadModule = <T>(
   if (typeof code !== 'string') throw new Error(`Shader code ${name} is not a string`);
   let tree = parseShader(code);
 
-  const astParser = makeASTParser(code, tree);
+  const astParser = makeASTParser(code, tree, name);
   const table = astParser.getSymbolTable();
   const shake = astParser.getShakeTable(table);
 

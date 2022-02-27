@@ -51,37 +51,30 @@ describe("link", () => {
 
   });
 
-  /*
-
   it("links quad vertex", () => {
 
     const getPosition = `
-    #pragma export
-    vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    @export fn getPosition(index: i32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     `
 
     const getPerspective = `
-    #pragma export
-    vec4 getPerspective(int index) { return 1.0; }
+    @export fn getPerspective(index: i32) -> f32 { return 1.0; }
     `
 
     const getColor = `
-    #pragma export
-    vec4 getColor(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    @export fn getColor(index: i32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     `
 
     const getSize = `
-    #pragma export
-    float getSize(int index) { return 1.0; }
+    @export fn getSize(index: i32) -> f32 { return 1.0; }
     `
 
     const getDepth = `
-    #pragma export
-    float getDepth(int index) { return 0.5; }
+    @export fn getDepth(index: i32) -> f32 { return 0.5; }
     `
 
-    const code = GLSLModules['instance/vertex/quad'];
-    const modules = GLSLModules;
+    const code = WGSLModules['instance/vertex/quad'];
+    const modules = WGSLModules;
     const linked = linkCode(code, modules, {getPosition, getPerspective, getColor, getSize, getDepth});
     expect(linked).toMatchSnapshot();
 
@@ -90,29 +83,27 @@ describe("link", () => {
   it("lifts recursive dependency", () => {
     
     const code = `
-    #pragma import {getLifted} from 'getLifted'
-    #pragma import {getColor1} from 'getColor1'
-    void main() {
-      gl_FragColor = getColor1();
+    use 'getLifted'::{ getLifted };
+    use 'getColor1'::{ getColor1 };
+
+    fn main() -> vec4<f32> {
+      return getColor1();
     }
     `
 
     const getLifted = `
     // Lifted Code
-    #pragma export
-    void getLifted() {}
+    @export fn getLifted() {};
     `
 
     const getColor1 = `
-    #pragma import {getColor2} from 'getColor2'
-    #pragma export
-    vec4 getColor1() { return getColor2(); }
+    use 'getColor2'::{ getColor2 };
+    @export fn getColor1() -> vec4<f32> { return getColor2(); }
     `
     
     const getColor2 = `
-    #pragma import {getLifted} from 'getLifted'
-    #pragma export
-    vec4 getColor2() { return vec4(1.0, 0.0, 1.0, 1.0); }
+    use 'getLifted'::{ getLifted };
+    @export fn getColor2() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     `
     
     const linked = linkCode(code, {getColor1, getColor2, getLifted});
@@ -123,19 +114,18 @@ describe("link", () => {
   
   it("tree shakes constants", () => {
     const sub = `
-    const vec4 colorUsed = vec4(0.0, 0.1, 0.2, 0.0);
-    const vec4 colorNotUsed = vec4(0.0, 0.1, 0.2, 1.0);
+    let colorUsed = vec4<f32>(0.0, 0.1, 0.2, 0.0);
+    let colorNotUsed = vec4<f32>(0.0, 0.1, 0.2, 1.0);
 
-    #pragma export
-    vec4 getColor() {
+    @export fn getColor() -> vec4<f32> {
       return colorUsed;
     }
     `
 
     const main = `
-    vec4 getColor();
-    void main() {
-      vec4 a = getColor();
+    @external fn getColor() -> vec4<f32> {};
+    fn main() {
+      var a = getColor();
     }
     `
 
@@ -154,21 +144,19 @@ describe("link", () => {
   it("tree shakes around identifiers", () => {
 
     const sub = `
-    float used() { return 1.0; }
+    fn used() -> f32 { return 1.0; }
 
-    float unused() { return 1.0; }
+    fn unused() -> f32 { return 1.0; }
     
-    #pragma export
-    vec4 getPosition(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
+    @export fn getPosition(index: i32) -> vec4<f32> { return vec4<f32>(used(), 0.0, 1.0, 1.0); }
 
-    #pragma export
-    vec4 getColor(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
+    @export fn getColor(index: i32) -> vec4<f32> { return vec4<f32>(used(), 0.0, 1.0, 1.0); }
     `
 
     const main = `
-    vec4 getPosition(int index);
-    void main() {
-      vec4 a = getPosition(0);
+    @external fn getPosition(index: i32) -> vec4<f32> {};
+    fn main() {
+      var a = getPosition(0);
     }
     `
 
@@ -188,21 +176,19 @@ describe("link", () => {
   it("links same module twice with different entry point", () => {
 
     const sub = `
-    float used() { return 1.0; }
+    fn used() -> f32 { return 1.0; }
     
-    #pragma export
-    vec4 getPosition(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
+    @export fn getPosition(index: i32) -> vec4<f32> { return vec4<f32>(used(), 0.0, 1.0, 1.0); }
 
-    #pragma export
-    vec4 getColor(int index) { return vec4(used(), 0.0, 1.0, 1.0); }
+    @export fn getColor(index: i32) -> vec4<f32> { return vec4<f32>(used(), 0.0, 1.0, 1.0); }
     `
 
     const main = `
-    vec4 getPosition(int index);
-    vec4 getColor(int index);
-    void main() {
-      vec4 a = getPosition(0);
-      vec4 b = getColor(0);
+    @external fn getPosition(index: i32) -> vec4<f32> {};
+    @external fn getColor(index: i32) -> vec4<f32> {};
+    fn main() {
+      var a = getPosition(0);
+      var b = getColor(0);
     }
     `
 
@@ -220,26 +206,23 @@ describe("link", () => {
   it("links a global across a module", () => {
 
     const sub1 = `
-    #pragma global
-    #pragma export
-    vec4 getPosition(int index) { return vec4(1.0, 0.0, 1.0, 1.0); }
+    @global @export fn getPosition(index: i32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     `
 
     const sub2 = `
-    void getPosition() {};
+    fn getPosition() {};
     
-    #pragma export
-    vec4 getColor(int index) {
+    @export fn getColor(index: i32) -> vec4<f32> {
       getPosition();
-      return vec4(1.0, 0.0, 1.0, 1.0);
+      return vec4<f32>(1.0, 0.0, 1.0, 1.0);
     }
     `
 
     const main = `
-    vec4 getPosition(int index);
-    vec4 getColor(int index);
-    void main() {
-      vec4 a = getPosition(0);
+    @external fn getPosition(index: i32) -> vec4<f32> {};
+    @external fn getColor(index: i32) -> vec4<f32> {};
+    fn main() {
+      var a = getPosition(0);
     }
     `
 
@@ -253,12 +236,12 @@ describe("link", () => {
     const linked = linkModule(modMain, {}, {getPosition, getColor});
     expect(linked).toMatchSnapshot();
 
-    expect(linked).toMatch(/vec4 getPosition/);
-    expect(linked).not.toMatch(/vec4 _[A-Za-z0-9]{2,}_getPosition/);
+    expect(linked).toMatch(/fn getPosition\(index: i32\)/);
+    expect(linked).not.toMatch(/fn _[A-Za-z0-9]{2,}_getPosition\(index: i32\)/);
 
-    expect(linked).not.toMatch(/void getPosition/);
-    expect(linked).toMatch(/void _[A-Za-z0-9]{2,}_getPosition/);
+    expect(linked).not.toMatch(/fn getPosition\(\)/);
+    expect(linked).toMatch(/fn _[A-Za-z0-9]{2,}_getPosition\(\)/);
 
   });
-  */
+
 });

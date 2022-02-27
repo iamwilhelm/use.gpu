@@ -2056,10 +2056,10 @@
   resolved "https://registry.yarnpkg.com/@webgpu/glslang/-/glslang-0.0.15.tgz#f5ccaf6015241e6175f4b90906b053f88483d1f2"
   integrity sha512-niT+Prh3Aff8Uf1MVBVUsaNjFj9rJAKDXuoHIKiQbB+6IUP/3J3JIhBNyZ7lDhytvXxw6ppgnwKZdDJ08UMj4Q==
 
-"@webgpu/types@^0.1.7":
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.7.tgz#33efa2300d3dfba74ed55de4899da83f17c2febc"
-  integrity sha512-KOcGuwHPFHHXlXRS9HQSIpUwp9IgocqfMflEnOO8Hhykwk+UlYCxyUwbAN0VgQSpF0slrLcjtz0IRBeuAW1hsw==
+"@webgpu/types@^0.1.9":
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.13.tgz#afb6ac170884b29bc8f05e68fac74835b92acb9f"
+  integrity sha512-SAq8FRONvMANQi/eXw5ArKfSvih6am/EC+5y7+du2xf1VyprtKn4ylUPKGW4T6ZkDogtH3xZgGE+J/cx601L5w==
 
 "@webpack-cli/configtest@^1.1.0":
   version "1.1.0"

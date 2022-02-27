@@ -46,9 +46,9 @@ export type TypedArrayConstructor =
 
 export enum UniformType {
   "bool" = "bool",
-  "vec2<f32>" = "vec2<f32>",
-  "vec3<f32>" = "vec3<f32>",
-  "vec4<f32>" = "vec4<f32>",
+  "vec2<bool>" = "vec2<bool>",
+  "vec3<bool>" = "vec3<bool>",
+  "vec4<bool>" = "vec4<bool>",
 
   "u32" = "u32",
   "vec2<u32>" = "vec2<u32>",

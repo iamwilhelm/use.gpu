@@ -1,162 +1,148 @@
 // Testing shaders
 export const WGSLModules = {
   "instance/vertex/quad": `
-#pragma import {SolidVertex} from 'use/types'
-#pragma import {viewUniforms, worldToClip, getPerspectiveScale} from 'use/view'
-#pragma import {getQuadUV} from 'geometry/quad'
+use '@use-gpu/wgsl/use/types'::{ SolidVertex };
+use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }; 
+use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
-vec4 getPosition(int);
-vec4 getColor(int);
-vec2 getSize(int);
-float getDepth(int);
+@external fn getPosition(i: i32) -> vec4<f32> {};
+@external fn getColor(i: i32) -> vec4<f32> {};
+@external fn getSize(i: i32) -> vec2<f32> {};
+@external fn getDepth(i: i32) -> f32 {};
 
-#pragma export
-SolidVertex getQuadVertex(int vertexIndex, int instanceIndex) {
-  vec4 position = getPosition(instanceIndex);
-  vec4 color = getColor(instanceIndex);
-  vec2 size = getSize(instanceIndex);
-  float depth = getDepth(instanceIndex);
+@export fn getQuadVertex(vertexIndex: i32, instanceIndex: i32) -> SolidVertex {
+  var position = getPosition(instanceIndex);
+  var color = getColor(instanceIndex);
+  var size = getSize(instanceIndex);
+  var depth = getDepth(instanceIndex);
 
-  vec4 center = worldToClip(position);
+  var center = worldToClip(position);
 
-  vec2 uv = getQuadUV(vertexIndex);
-  vec2 xy = uv * 2.0 - 1.0;
-  
+  var uv = getQuadUV(vertexIndex);
+  var xy = uv * 2.0 - 1.0;
+
   // Lerp between fixed size and full perspective.
-  float pixelScale = getPerspectiveScale(center.w, depth);
-  size *= pixelScale;
+  var pixelScale = getPerspectiveScale(center.w, depth);
+  // TODO: awaiting compound support
+  //size *= pixelScale;
+  size = size * pixelScale;
 
-  #ifdef HAS_EDGE_BLEED
-  xy = xy * (size + 0.5) / size;
-  uv = xy * .5 + .5;
-  #endif
+  if (HAS_EDGE_BLEED) {
+    xy = xy * (size + 0.5) / size;
+    uv = xy * .5 + .5;
+  }
 
-  center.xy += xy * size * viewUniforms.viewResolution * center.w;
+  // TODO: awaiting compound support
+  //center.xy += xy * size * viewUniforms.viewResolution * center.w;
+  center = vec4<f32>(center.xy + xy * size * viewUniforms.viewResolution * center.w, center.zw);
 
   return SolidVertex(
     center,
     color,
     uv
   );
-}`,
-
-  "instance/fragment/solid": `
-#pragma import {getPickingColor} from 'use/picking';
-
-vec4 getFragment(vec4, vec2);
-
-#ifdef IS_PICKING
-layout(location = 0) in flat uint fragIndex;
-layout(location = 0) out uvec4 outColor;
-#else
-layout(location = 0) in vec4 fragColor;
-layout(location = 1) in vec2 fragUV;
-
-layout(location = 0) out vec4 outColor;
-#endif
-
-#ifdef IS_PICKING
-void main() {
-  outColor = getPickingColor(fragIndex);
 }
-#else
-void main() {
-  outColor = fragColor;
-  outColor.xyz *= outColor.a;
-
-  outColor = getFragment(outColor, fragUV);
-
-  if (outColor.a <= 0.0) discard;
-}
-#endif
 `,
 
-  "use/view": `
-#pragma export
-layout(set = VIEW_BINDGROUP, binding = VIEW_BINDING) uniform ViewUniforms {
-  mat4 projectionMatrix;
-  mat4 viewMatrix;
-  vec4 viewPosition;
-  vec2 viewResolution;
-  vec2 viewSize;
-  float viewWorldUnit;
-  float viewPixelRatio;
-} viewUniforms;
+  "instance/fragment/solid": `
+@external fn getFragment(color: vec4<f32>, uv: vec2<f32>) -> vec4<f32> {};
 
-#pragma export
-vec4 worldToView(vec4 position) {
+@stage(fragment)
+fn main(
+  @location(0) fragColor: vec4<f32>,
+  @location(1) fragUV: vec2<f32>,  
+) -> @location(0) vec4<f32> {
+  var outColor = fragColor;
+
+  // TODO: awaiting compound support
+  //outColor.xyz *= outColor.a;
+  outColor = vec4<f32>(outColor.xyz * outColor.a, outColor.a);
+  outColor = getFragment(outColor, fragUV);
+
+  if (outColor.a <= 0.0) { discard; }
+  return outColor;
+}
+`,
+
+  "@use-gpu/wgsl/geometry/quad": `
+
+let QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
+  vec2<i32>(0, 0),
+  vec2<i32>(1, 0),
+  vec2<i32>(0, 1),
+  vec2<i32>(1, 1),
+);
+
+@export fn getQuadIndex(vertex: i32) -> vec2<i32> {
+  return QUAD[vertex];
+}
+
+@export fn getQuadUV(vertex: i32) -> vec2<f32> {
+  return vec2<f32>(getQuadIndex(vertex));
+}
+
+`,
+
+  "@use-gpu/wgsl/use/view": `
+struct ViewUniforms {
+  projectionMatrix: mat4x4<f32>;
+  viewMatrix: mat4x4<f32>;
+  viewPosition: vec4<f32>;
+  viewResolution: vec2<f32>;
+  viewSize: vec2<f32>;
+  viewWorldUnit: f32;
+  viewPixelRatio: f32;
+};
+
+@export @group(VIEW) @binding(VIEW) var<uniform> viewUniforms: ViewUniforms;
+
+@export fn worldToView(position: vec4<f32>) -> vec4<f32> {
   return viewUniforms.viewMatrix * position;
 }
 
-#pragma export
-vec4 viewToClip(vec4 position) {
+@export fn viewToClip(position: vec4<f32>) -> vec4<f32> {
   return viewUniforms.projectionMatrix * position;
 }
 
-#pragma export
-vec4 worldToClip(vec4 position) {
+@export fn worldToClip(position: vec4<f32>) -> vec4<f32> {
   return viewToClip(worldToView(position));
 }
 
-#pragma export
-vec3 clipToScreen3D(vec4 position) {
+@export fn clipToScreen3D(position: vec4<f32>) -> vec3<f32> {
   return vec3(position.xy * viewUniforms.viewSize, position.z);
 }
 
-#pragma export
-vec3 screenToClip3D(vec4 position) {
+@export fn screenToClip3D(position: vec4<f32>) -> vec3<f32> {
   return vec3(position.xy * viewUniforms.viewResolution, position.z);
 }
 
-#pragma export
-vec3 worldToClip3D(vec4 position) {
-  position = viewToClip(worldToView(position));
-  return position.xyz / position.w;
+@export fn worldToClip3D(position: vec4<f32>) -> vec3<f32> {
+  var pos = viewToClip(worldToView(position));
+  return pos.xyz / pos.w;
 }
 
-#pragma export
-float getPerspectiveScale(float w, float f) {
-  mat4 m = viewUniforms.projectionMatrix;
-  float worldScale = m[1][1] * viewUniforms.viewWorldUnit;
-  float clipScale = mix(1.0, worldScale / w, f);
-  float pixelScale = clipScale * viewUniforms.viewPixelRatio;
+@export fn getPerspectiveScale(w: f32, f: f32) -> f32 {
+  var m = viewUniforms.projectionMatrix;
+  var worldScale = m[1][1] * viewUniforms.viewWorldUnit;
+  var clipScale = mix(1.0, worldScale / w, f);
+  var pixelScale = clipScale * viewUniforms.viewPixelRatio;
   return pixelScale;
 }
 `,
 
-  "use/types": `
-#pragma export
-struct SolidVertex {
-  vec4 position;
-  vec4 color;
-  vec2 uv;
+  "@use-gpu/wgsl/use/types": `
+@export struct SolidVertex {
+  position: vec4<f32>;
+  color: vec4<f32>;
+  uv: vec2<f32>;
 };
 
-#pragma export
-struct MeshVertex {
-  vec4 position;
-  vec3 normal;
-  vec4 color;
-  vec2 uv;
-};`,
-
-  "geometry/quad": `
-const ivec2 QUAD[] = {
-  ivec2(0, 0),
-  ivec2(1, 0),
-  ivec2(0, 1),
-  ivec2(1, 1),
+@export struct MeshVertex {
+  position: vec4<f32>;
+  normal: vec3<f32>;
+  color: vec4<f32>;
+  uv: vec2<f32>;
 };
-
-#pragma export
-ivec2 getQuadIndex(int vertex) {
-  return QUAD[vertex];
-}
-
-#pragma export
-vec2 getQuadUV(int vertex) {
-  return vec2(getQuadIndex(vertex));
-}
 `,
 };
 

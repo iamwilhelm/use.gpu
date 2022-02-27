@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.pkg.json",
   "references": [
-    { "path": "../glsl" },
+    { "path": "../wgsl" },
     { "path": "../state" },
     { "path": "../live" },
     { "path": "../core" },
@@ -16,5 +16,5 @@
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
     "moduleResolution": "node12"
   },
-  "include": ["src/**/*.ts", "../glsl/**/*.glsl"]
+  "include": ["src/**/*.ts", "../wgsl/**/*.glsl"]
 }

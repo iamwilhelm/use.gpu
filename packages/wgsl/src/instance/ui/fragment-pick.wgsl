@@ -9,9 +9,9 @@ let NO_BORDER = vec4<f32>(0.0, 0.0, 0.0, 0.0);
 fn main(
   @location(0) @interpolate(flat) fragRectangle: vec4<f32>,
   @location(1) @interpolate(flat) fragRadius: vec4<f32>,
-  @location(2)                    fragUV: vec2<f32>,
-  @location(3) @interpolate(flat) fragMode: i32,
-  @location(4) @interpolate(flat) fragIndex: u32,
+  @location(2) @interpolate(flat) fragMode: i32,
+  @location(3) @interpolate(flat) fragIndex: u32,
+  @location(4)                    fragUV: vec2<f32>,
 ) -> @location(0) vec4<u32> {
   var color = getPickingColor(fragIndex);
   if (fragMode == 0) { return color; }

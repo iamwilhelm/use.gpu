@@ -173,8 +173,8 @@ export const makeLinkModule = (
     for (let k of staticRename.keys()) rename.set(k, staticRename.get(k)!);
 
     if (virtual) {
-      const {uniforms, bindings} = virtual;
-      if (uniforms && bindings && (libraries[VIRTUAL_BINDINGS] == null)) {
+      const {uniforms, storages, textures} = virtual;
+      if ((uniforms || storages || textures) && (libraries[VIRTUAL_BINDINGS] == null)) {
         const id = code.replace('#virtual ', '');
         throw new Error(`Virtual module ${id} has unresolved data bindings`);
       }

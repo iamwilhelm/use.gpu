@@ -1,6 +1,6 @@
 import { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live/types';
 import { UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
-import { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, RectangleAggregate, LayerType } from './types';
+import { LayerAggregator, LayerAggregatorDef, LayerAggregate, PointAggregate, LineAggregate, RectangleAggregate, LayerType } from './types';
 
 import { RenderContext } from '../providers/render-provider';
 import { use, resume, multiGather, useContext, useOne, useMemo } from '@use-gpu/live';
@@ -42,17 +42,43 @@ export const Aggregate: LiveComponent<AggregateProps> = (props) => {
 };
 
 const Resume = resume((aggregates: Record<string, LayerAggregate[]>) => 
-  Object.keys(AGGREGATORS).map((type: any) => aggregates[type] ? use(Layer, type)(type, aggregates[type]) : null)
+  Object.keys(AGGREGATORS).map((type: string) => {
+    const aggregator = AGGREGATORS[type]!;
+    const [,, Component] = aggregator;
+    return aggregates[type] ? use(Component, type)(aggregator, aggregates[type]) : null;
+  })
 );
 
+const UILayer: LiveFunction<any> = (
+  aggregator: LayerAggregatorDef,
+  items: RectangleAggregate[],
+) => {
+  const layers = [] as RectangleAggregate[][];
+  const ids = [] as number[];
+
+  let layer = null;
+  let texture = null;
+  for (const item of items) {
+    if (!layer || item.texture !== texture) {
+      texture = item.texture;
+
+      layer = [] as RectangleAggregate[];
+      layers.push(layer);
+      ids.push(item.id);
+    }
+    layer.push(item);
+  }
+
+  return layers.map((layer, i) => use(Layer, ids[i])(aggregator, layer));
+};
+
 const Layer: LiveFunction<any> = (
-  type: LayerType,
+  aggregator: LayerAggregatorDef,
   items: LayerAggregate[],
 ) => {
   const {device} = useContext(RenderContext);
 
   const out = [] as LiveElement[];
-  const aggregator = AGGREGATORS[type];
   if (!aggregator) return null;
 
   const [makeAggregator, Component] = aggregator;
@@ -117,7 +143,6 @@ const makePointAccumulator = (
   };
 }
 
-
 const makeLineAccumulator = (
   device: GPUDevice,
   items: LineAggregate[],
@@ -132,7 +157,7 @@ const makeLineAccumulator = (
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasDepth = keys.has('depths') || keys.has('depth');
 
-  storage.segments = makeAggregateBuffer(device, UniformType.int, count);
+  storage.segments = makeAggregateBuffer(device, UniformType.i32, count);
 
   if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
   if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
@@ -169,7 +194,9 @@ const makeRectangleAccumulator = (
   const hasStroke = keys.has('strokes') || keys.has('stroke');
   const hasFill = keys.has('fills') || keys.has('fill');
   const hasUV = keys.has('uvs') || keys.has('uv');
-  const hasTexture = keys.has('textures') || keys.has('texture');
+  const hasRepeat = keys.has('repeats') || keys.has('repeat');
+
+  const hasTexture = keys.has('texture');
 
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
   if (hasRadius) storage.radiuses = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
@@ -177,7 +204,7 @@ const makeRectangleAccumulator = (
   if (hasStroke) storage.strokes = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
   if (hasFill) storage.fills = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
   if (hasUV) storage.uvs = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasTexture) storage.textures = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
+  if (hasRepeat) storage.repeats = makeAggregateBuffer(device, UniformType['i32'], count);
 
   return (items: RectangleAggregate[]) => {
     const count = items.reduce(allCount, 0);
@@ -189,8 +216,9 @@ const makeRectangleAccumulator = (
     if (hasStroke) props.strokes = updateAggregateBuffer(device, storage.strokes, items, count, 'stroke', 'strokes');
     if (hasFill) props.fills = updateAggregateBuffer(device, storage.fills, items, count, 'fill', 'fills');
     if (hasUV) props.uvs = updateAggregateBuffer(device, storage.uvs, items, count, 'uv', 'uvs');
+    if (hasRepeat) props.repeats = updateAggregateBuffer(device, storage.repeats, items, count, 'repeat', 'repeats');
 
-    if (hasTexture) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'texture', 'textures');
+    if (hasTexture) props.texture = items[0].texture;
 
     return props;
   };
@@ -263,7 +291,7 @@ const updateAggregateSegments = (
 }
 
 const AGGREGATORS = {
-  [LayerType.Line]: [makeLineAccumulator, Lines],
-  [LayerType.Point]: [makePointAccumulator, Points],
-  [LayerType.Rectangle]: [makeRectangleAccumulator, Rectangles],
-} as Record<LayerType, [LayerAggregator, LiveFunction<any>]>;
+  [LayerType.Line]: [makeLineAccumulator, Lines, Layer],
+  [LayerType.Point]: [makePointAccumulator, Points, Layer],
+  [LayerType.Rectangle]: [makeRectangleAccumulator, Rectangles, UILayer],
+} as Record<string, LayerAggregatorDef>;

@@ -1,3 +1,4 @@
+import { LiveFunction } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
 
 export enum LayerType {
@@ -5,6 +6,8 @@ export enum LayerType {
   Line = 'line',
   Rectangle = 'rectangle',
 };
+
+export type LayerAggregatorDef = [LayerAggregator, LiveFunction<any>, LiveFunction<any>];
 
 export type LayerAggregator = (
   device: GPUDevice,
@@ -14,6 +17,7 @@ export type LayerAggregator = (
 ) => (items: LineAggregate[]) => void;
 
 export type RectangleAggregate = {
+  id: number,
   count: number,
 
   rectangles?: number[],
@@ -28,6 +32,7 @@ export type RectangleAggregate = {
 };
 
 export type PointAggregate = {
+  id: number,
   count: number,
 
   positions?: number[],
@@ -42,6 +47,7 @@ export type PointAggregate = {
 };
 
 export type LineAggregate = {
+  id: number,
   count: number,
   isLoop?: boolean,
 

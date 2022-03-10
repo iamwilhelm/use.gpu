@@ -7,6 +7,7 @@ import { VIRTUAL_BINDGROUP } from './constants';
 
 const INT_PARAMS = [{name: 'index', type: {name: 'i32'}}];
 const INT_ARG = ['i32'];
+const UV_ARG = ['vec2<f32>'];
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
@@ -21,11 +22,11 @@ export const makeBindingAccessors = (
   // Extract uniforms
   const lambdas = bindings.filter(({lambda}) => lambda != null);
   const storages = bindings.filter(({storage}) => storage != null);
-  //const textures = bindings.filter(({texture}) => texture != null);
+  const textures = bindings.filter(({texture}) => texture != null);
   const constants = bindings.filter(({constant}) => constant != null);
 
   // Virtual module symbols
-  const virtuals = [...constants, ...storages];
+  const virtuals = [...constants, ...storages, ...textures];
   const symbols = virtuals.map(({uniform}) => uniform.name);
   const declarations = virtuals.map(({uniform}) => ({
     at: 0,
@@ -46,13 +47,14 @@ export const makeBindingAccessors = (
     for (const {uniform: {name, format, args}} of constants) {
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, format, name, args));
     }
-    /*
-    for (const {uniform: {name, format, args}} of textures) {
-      program.push(makeTextureAccessor(namespace, set, base++, format, name));
-    }
-    */
+
     for (const {uniform: {name, format, args}} of storages) {
       program.push(makeStorageAccessor(namespace, set, base++, format, name));
+    }
+
+    for (const {uniform: {name, format, args}, texture} of textures) {
+      program.push(makeTextureAccessor(namespace, set, base++, format, texture!.layout, name));
+      base++;
     }
 
     return program.join('\n');
@@ -60,7 +62,8 @@ export const makeBindingAccessors = (
 
   const virtual = loadVirtualModule({
     uniforms: constants,
-    bindings: storages,
+    storages,
+    textures,
     render,
   }, {
     symbols,
@@ -70,8 +73,8 @@ export const makeBindingAccessors = (
   const links: Record<string, ParsedBundle | ParsedModule> = {};
   for (const binding of constants) links[binding.uniform.name] = virtual;
   for (const binding of storages)  links[binding.uniform.name] = virtual;
-  //for (const binding of textures)  links[binding.uniform.name] = virtual;
-  for (const lambda  of lambdas)   links[lambda.uniform.name] = lambda.lambda!;
+  for (const binding of textures)  links[binding.uniform.name] = virtual;
+  for (const lambda  of lambdas)   links[lambda.uniform.name]  = lambda.lambda!;
 
   return links;
 };
@@ -124,19 +127,19 @@ fn ${ns}${name}(index: i32) -> ${type} {
 }
 `;
 
-/*
 export const makeTextureAccessor = (
   ns: string,
   set: number | string,
-  binding: number | string,
+  binding: number,
   type: string,
+  layout: string,
   name: string,
-  args: string[] = INT_ARG,
+  args: string[] = UV_ARG,
 ) => `
-layout (set = ${set}, binding = ${binding}) uniform ${type} ${name};
+@group(${set}) @binding(${binding}) var ${ns}${name}Sampler: sampler;
+@group(${set}) @binding(${binding + 1}) var ${ns}${name}Texture: ${layout};
 
-${type} ${ns}${name}(int index) {
-  return ${ns}${name}Storage.data[index];
+fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
+  return textureSample(${ns}${name}Texture, ${ns}${name}Sampler, ${args.map((_, i) => `${arg(i)}`).join(', ')});
 }
 `;
-*/

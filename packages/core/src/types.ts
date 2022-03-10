@@ -129,10 +129,6 @@ export type UniformLayout = {
 };
 
 // Uniform bindings
-export type UniformBinding = {
-  resource: GPUBindingResource
-};
-
 export type UniformPipe = {
   layout: UniformLayout,
   data: ArrayBuffer,
@@ -167,7 +163,9 @@ export type StorageSource = {
 };
 
 export type TextureSource = {
-  view: GPUTextureView,
+  view: GPUTexture | GPUTextureView,
+  sampler: GPUSampler | GPUSamplerDescriptor,
+  layout: string,
   format: string,
   size: [number, number] | [number, number, number],
   version: number,

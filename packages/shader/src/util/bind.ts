@@ -148,22 +148,24 @@ export const makeResolveBindings = (
       seen.add(m);
 
       if (m.virtual) {
-        const {uniforms, bindings} = m.virtual;
+        const {uniforms, storages, textures} = m.virtual;
         const namespace = `${PREFIX_VIRTUAL}${base}_`;
         if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
-        if (bindings) for (const b of bindings) allBindings.push(b);
+        if (storages) for (const b of storages) allBindings.push(b);
+        if (textures) for (const b of textures) allBindings.push(b);
 
         // Mutate virtual modules as they are ephemeral
         m.virtual.namespace = namespace;
         m.virtual.base = base;
-        base += allBindings.length;
+        if (storages) base += storages.length;
+        if (textures) base += textures.length * 2;
       }
     };
   }
 
   // Create combined uniform block as top-level import
   const virtualBindGroup = getVirtualBindGroup(defines);
-  const code = makeUniformBlock(allUniforms, virtualBindGroup, allBindings.length);
+  const code = makeUniformBlock(allUniforms, virtualBindGroup, base);
   const lib = loadStaticModule(code, VIRTUAL_BINDINGS);
   const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDINGS, imports: NO_SYMBOLS};
 

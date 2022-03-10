@@ -34,7 +34,8 @@ export type ParsedModule<T extends SymbolTable = any> = {
 export type VirtualTable<T extends SymbolTable = any> = {
   render: VirtualRender,
   uniforms?: DataBinding<T>[],
-  bindings?: DataBinding<T>[],
+  storages?: DataBinding<T>[],
+  textures?: DataBinding<T>[],
   base?: number,
   namespace?: string,
 };
@@ -42,6 +43,7 @@ export type VirtualTable<T extends SymbolTable = any> = {
 export type DataBinding<T extends SymbolTable = any> = {
   uniform: UniformAttributeValue,
   storage?: StorageSource,
+  texture?: TextureSource,
   lambda?: ShaderModule<T>,
   constant?: any,
 };
@@ -76,6 +78,16 @@ export type StorageSource = {
   buffer: GPUBuffer,
   format: string,
   length: number,
+  version: number,
+};
+
+export type TextureSource = {
+  view: GPUTexture | GPUTextureView,
+  sampler: GPUSampler | GPUSamplerDescriptor,
+  layout: string,
+  format: string,
+  size: [number, number] | [number, number, number],
+  version: number,
 };
 
 export type UniformAttribute = {

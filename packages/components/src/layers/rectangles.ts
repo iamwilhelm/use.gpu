@@ -15,30 +15,4 @@ import { makeShaderBinding, makeShaderBindings, makeDataArray, makeStorageBuffer
 
 import { RenderContext } from '@use-gpu/components';
 
-/*
-export type RectanglesProps = {
-  rectangle?: number[] | TypedArray,
-  color?: number[] | TypedArray,
-  mask?: number,
-  texture?: any,
-
-  rectangles?: StorageSource,
-  colors?: StorageSource,
-  masks?: number,
-  textures?: StorageSource,
-
-  getRectangle?: ShaderModule,
-  getColor?: ShaderModule,
-  getMask?: ShaderModule,
-  getTexture?: ShaderModule,
-
-  mode?: RenderPassMode | string,
-  id?: number,
-};
-
-export const Rectangles: LiveComponent<RectanglesProps> = (props) => {
-  return use(RawRectangles)(props);
-};
-*/
-
 export const Rectangles = UIRectangles;

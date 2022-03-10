@@ -94,17 +94,23 @@ export const getStackMargin = (
 export const fitStack = (
   els: LayoutElement[],
   into: Point,
+  fixed: [number | null, number | null],
   padding: Point4,
   direction: 'x' | 'y',
 ) => {
   const isX = direction === 'x';
 
   const [pl, pt, pr, pb] = padding;
-  let w =  isX ? pl : into[0];
-  let h = !isX ? pt : into[1];
+  let w =  isX ? pl : fixed[0] ?? into[0];
+  let h = !isX ? pt : fixed[1] ?? into[1];
 
   let i = 0;
   let m = 0;
+
+  const contain = [
+    (fixed[0] != null) ? (!isX ? Math.min(fixed[0], into[0]) : fixed[0]) : into[0],
+    (fixed[1] != null) ? ( isX ? Math.min(fixed[1], into[1]) : fixed[1]) : into[1],
+  ] as Point;
 
   const sizes = [] as Point[];
   const offsets = [] as Point[];
@@ -114,7 +120,7 @@ export const fitStack = (
     const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = into.slice() as Point;
+    const size = contain.slice() as Point;
     size[0] -= pl + pr;
     size[1] -= pt + pb;
 
@@ -153,8 +159,8 @@ export const fitStack = (
     }
   }
 
-  if (isX) w += padding[2];
-  else h += padding[3];
+  if (isX) w = fixed[0] != null ? fixed[0] : w + padding[2];
+  else     h = fixed[1] != null ? fixed[1] : h + padding[3];
 
   return {
     size: [w, h],

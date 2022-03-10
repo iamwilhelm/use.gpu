@@ -5,9 +5,9 @@ struct VertexOutput {
   @builtin(position)              position: vec4<f32>;
   @location(0) @interpolate(flat) fragRectangle: vec4<f32>;
   @location(1) @interpolate(flat) fragRadius: vec4<f32>;
-  @location(2)                    fragUV: vec2<f32>;
-  @location(3) @interpolate(flat) fragMode: i32;
-  @location(4) @interpolate(flat) fragIndex: u32;
+  @location(2) @interpolate(flat) fragMode: i32;
+  @location(3) @interpolate(flat) fragIndex: u32;
+  @location(4)                    fragUV: vec2<f32>;
 };
 
 @external fn getRectangle(i: i32) -> vec4<f32>;
@@ -22,13 +22,10 @@ fn main(
 
   var rectangle = getRectangle(i32(instanceIndex));
   var radius = getRadius(i32(instanceIndex));
-  var uv4 = getUV(i32(instanceIndex));
 
   var uv = getQuadUV(vertexIndex);
   var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv), 0.5, 1.0);
   var center = worldToClip(position);
-
-  uv = mix(uv4.xy, uv4.zw, uv);
 
   var mode: i32;
   if (length(radius + border) == 0.0) { mode = 0; }
@@ -39,8 +36,8 @@ fn main(
     center,
     rectangle,
     radius,
-    uv,
     fragMode,
     u32(instance_index),
+    uv,
   );
 }

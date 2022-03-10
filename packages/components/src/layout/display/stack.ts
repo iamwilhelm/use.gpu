@@ -58,7 +58,12 @@ const makeResume = (
   resume((els: LayoutElement[]) => {
     const w = width != null ? parseDimension(width, 0, snap) : 0;
     const h = height != null ? parseDimension(height, 0, snap) : 0;
+
     const size = [w, h];
+    const fixed = [
+      width != null ? w : null,
+      height != null ? h : null,
+    ] as [number | number, number | null];
 
     const sizing = getStackMinMax(els, direction);
     const margin = getStackMargin(els, stackMargin, padding, direction);
@@ -71,7 +76,7 @@ const makeResume = (
       grow,
       shrink,
       fit: (into: Point) => {
-        const {size, sizes, offsets, renders} = fitStack(els, into, padding, direction);
+        const {size, sizes, offsets, renders} = fitStack(els, into, fixed, padding, direction);
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),

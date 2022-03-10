@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
-import { LayoutState, LayoutResult, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from './types';
+import { LayoutState, LayoutResult, ImageAttachment, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from './types';
 
 import { use, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { parseDimension, normalizeMargin } from './lib/util';
@@ -16,10 +16,7 @@ export type ElementProps = {
   stroke?: Point4,
   fill?: Point4,
 
-  image?: TextureSource,
-  imageFit?: Fit,
-  imageRepeat?: Repeat,
-  imageAlign?: Anchor | [Anchor, Anchor],
+  image?: ImageAttachment,
 
   grow?: number,
   shrink?: number,
@@ -37,9 +34,6 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     // border
 
     image,
-    imageFit,
-    imageRepeat,
-    imageAlign,
 
     stroke,
     fill,
@@ -54,7 +48,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;
 
-  const fiber = useFiber();
+  const {id} = useFiber();
   const sizing = [w, h, w, h];
 
   const margin = normalizeMargin(props.margin ?? 0);
@@ -72,7 +66,8 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       const size = [w, h];
 
       const render = (layout: Rectangle): LiveElement<any> => (
-        use(Surface, fiber.id)({
+        use(Surface, id)({
+          id,
           layout,
 
           stroke: [Math.random(), Math.random(), Math.random(), Math.random() + .5],
@@ -81,9 +76,6 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           radius,
 
           image,
-          imageFit,
-          imageRepeat,
-          imageAlign,
         })
       );
       return {size, render};

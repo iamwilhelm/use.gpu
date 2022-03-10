@@ -4,7 +4,7 @@ import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawSourceTexture, makeMultiUniforms,
-  makeRenderPipeline, makeShaderModule, makeSampler, makeTextureUniforms,
+  makeRenderPipeline, makeShaderModule, makeSampler, makeTextureBinding,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle } from '@use-gpu/shader/wgsl';
@@ -117,7 +117,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     let sampled;
     if (!isPicking) {
       const sampler = makeSampler(device, { });
-      sampled = makeTextureUniforms(device, pipeline, sampler, sourceTexture, 1);
+      sampled = makeTextureBinding(device, pipeline, sampler, sourceTexture, 1);
     }
 
     return [uniform, sampled];
@@ -135,7 +135,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
       passEncoder.setPipeline(pipeline);
       passEncoder.setBindGroup(0, uniform.bindGroup);
-      if (sampled) passEncoder.setBindGroup(1, sampled.bindGroup);
+      if (sampled) passEncoder.setBindGroup(1, sampled);
       passEncoder.setVertexBuffer(0, vertexBuffers[0]);
       passEncoder.draw(mesh.count, 1, 0, 0);
     })

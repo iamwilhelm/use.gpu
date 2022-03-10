@@ -27,7 +27,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
             gather([
               use(RawTexture)({ data: texture }),
-            ], resume(([source]: [TextureSource]) =>
+            ], resume(([texture]: [TextureSource]) =>
 
               use(Flat)({
                 children:
@@ -48,7 +48,42 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
                                 use(Stack)({
                                   children: [
-                                    use(Element)({ width: 100, height: 100 }),
+
+                                    use(Stack)({
+                                      width: 300, height: 200, 
+                                      children: [
+
+                                        use(Absolute)({
+                                          children: [
+
+                                            use(Element)({ }),
+
+                                          ],
+                                        }),
+
+                                        use(Absolute)({
+                                          left: 10,
+                                          top: 10,
+                                          right: 10,
+                                          bottom: 10,
+
+                                          children: [
+
+                                            use(Element)({
+                                              radius: 10,
+                                              image: {
+                                                texture,
+                                                width: 100,
+                                                height: 100,
+                                                repeat: 'none',
+                                              },
+                                            }),
+
+                                          ],
+                                        }),
+
+                                      ],
+                                    }),
 
                                     use(Stack)({
                                       padding: 0,

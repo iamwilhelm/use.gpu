@@ -26,6 +26,7 @@ export type UIRectanglesProps = {
   stroke?: number[] | TypedArray,
   fill?: number[] | TypedArray,
   uv?: number[] | TypedArray,
+  repeat?: number,
   texture?: TextureSource,
 
   rectangles?: StorageSource,
@@ -34,7 +35,7 @@ export type UIRectanglesProps = {
   strokes?: StorageSource,
   fills?: StorageSource,
   uvs?: StorageSource,
-  textures?: TextureSource[],
+  repeats?: StorageSource,
 
   getRectangle?: ShaderModule,
   getRadius?: ShaderModule,
@@ -42,6 +43,7 @@ export type UIRectanglesProps = {
   getStroke?: ShaderModule,
   getFill?: ShaderModule,
   getUV?: ShaderModule,
+  getRepeat?: ShaderModule,
   getTexture?: ShaderModule,
 
   count?: number,
@@ -62,10 +64,11 @@ const VERTEX_BINDINGS = [
   { name: 'getStroke', format: 'vec4<f32>', value: GRAY },
   { name: 'getFill', format: 'vec4<f32>', value: GRAY },
   { name: 'getUV', format: 'vec4<f32>', value: SQUARE },
+  { name: 'getRepeat', format: 'i32', value: 0 },
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
-  { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [1.0, 1.0, 1.0, 1.0] },
+  { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [0.0, 0.0, 0.0, 0.0] },
 ] as UniformAttributeValue[];
 
 const DEFINES = {
@@ -102,18 +105,19 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const s = props.strokes ?? props.strokes ?? props.getStroke;
   const f = props.fills ?? props.fill ?? props.getFill;
   const u = props.uvs ?? props.uv ?? props.getUV;
+  const p = props.repeats ?? props.repeat ?? props.getRepeat;
 
-  const t = props.textures ?? props.texture ?? props.getTexture;
+  const t = props.texture ?? props.getTexture;
 
   const [vs, fs] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, a, b, s, f, u]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, a, b, s, f, u, p]);
     const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [t]);
 
     const vs = bindBundle(rectangleVertex, bindingsToLinks(vertexBindings), null, key);
     const fs = bindBundle(rectangleFragment, bindingsToLinks(fragmentBindings), null, key);
 
     return [vs, fs];
-  }, [r, a, b, s, f, u, t]);
+  }, [r, a, b, s, f, u, p, t]);
 
   return render({
     vertexCount,

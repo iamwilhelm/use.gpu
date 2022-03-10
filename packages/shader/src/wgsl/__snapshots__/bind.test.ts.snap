@@ -102,12 +102,15 @@ fn _VT_0_getSize(index: i32) -> vec2<f32> {
 exports[`bind makes deterministic links for data bindings 1`] = `
 Object {
   "base": undefined,
-  "bindings": Array [
+  "code": "#virtual [getColor getSize] 101",
+  "name": "_VT_hoi6if_",
+  "storages": Array [
     Object {
       "storage": Object {
         "buffer": Object {},
         "format": "vec2<f32>",
         "length": 10,
+        "version": 1,
       },
       "uniform": Object {
         "args": Array [
@@ -122,8 +125,6 @@ Object {
       },
     },
   ],
-  "code": "#virtual [getColor getSize] 101",
-  "name": "_VT_hoi6if_",
   "table": Object {
     "declarations": Array [
       Object {
@@ -165,6 +166,7 @@ Object {
       "getSize",
     ],
   },
+  "textures": Array [],
   "uniforms": Array [
     Object {
       "constant": Array [

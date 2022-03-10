@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, DataTexture, TextureSource, UniformType, Emitter } from '@use-gpu/core/types';
 import { DeviceContext, FrameContext } from '../providers';
 import { yeet, memo, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
-import { makeRawSourceTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
+import { makeSampler, makeRawSourceTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
 
 export type RawTextureProps = {
   data?: DataTexture,
@@ -31,6 +31,11 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
     const source = {
       texture,
       view: makeTextureView(texture),
+      sampler: {
+        minFilter: 'nearest',
+        magFilter: 'nearest',
+      } as GPUSamplerDescriptor,
+      layout: 'texture_2d<f32>',
       format,
       size,
       version: 0,

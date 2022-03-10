@@ -48,7 +48,8 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
 
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
 
-  let vertexShader, fragmentShader;
+  let vertexShader: ParsedBundle;
+  let fragmentShader: ParsedBundle;
   if (isDebug) {
     // TODO: non-strip topology
     // if (topology === 'triangle-strip')

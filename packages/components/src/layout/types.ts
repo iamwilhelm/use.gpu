@@ -1,3 +1,4 @@
+import { TextureSource } from '@use-gpu/core/types';
 import { LiveElement, Key } from '@use-gpu/live/types';
 
 export type Point = [number, number];
@@ -13,8 +14,17 @@ export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
 export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'between' | 'evenly';
 export type Anchor = 'start' | 'center' | 'end';
 
-export type Fit = 'fit' | 'cover' | 'scale' | 'none';
+export type Fit = 'contain' | 'cover' | 'scale' | 'none';
 export type Repeat = 'x' | 'y' | 'xy' | 'none';
+
+export type ImageAttachment = {
+  texture: TextureSource,
+  width?: Dimension,
+  height?: Dimension,
+  fit?: Fit,
+  repeat?: Repeat,
+  align?: Anchor | [Anchor, Anchor],
+};
 
 export type LayoutRenderer = (box: Rectangle) => LiveElement<any>;
 export type LayoutFit = {

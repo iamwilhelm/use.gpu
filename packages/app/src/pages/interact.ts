@@ -5,7 +5,7 @@ import { use, gather, resume, useMemo, useOne, useResource, useState } from '@us
 
 import {
   Draw, Pass,
-  Flat, Absolute, Layout, Stack, Flex, Element,
+  Flat, Absolute, Layout, Block, Flex, Element,
   Aggregate, RawTexture,
 } from '@use-gpu/components';
 import { makeTexture } from '../meshes/mesh';
@@ -46,10 +46,10 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
                               children: 
 
-                                use(Stack)({
+                                use(Block)({
                                   children: [
 
-                                    use(Stack)({
+                                    use(Block)({
                                       width: 300, height: 200, 
                                       children: [
 
@@ -85,7 +85,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
                                       ],
                                     }),
 
-                                    use(Stack)({
+                                    use(Block)({
                                       padding: 0,
                                       children: [
                                         use(Element)({ width: 200, height: 100, margin: 10 }),
@@ -99,7 +99,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
                                       children: [
                                         use(Element)({ width: 200, height: 100 }),
                                         use(Element)({ width: 300, height: 100, margin: 30, shrink: 1 }),
-                                        use(Stack)({
+                                        use(Block)({
                                           children: [
                                             use(Element)({ width: 200, height: 100 }),
                                             use(Element)({ width: 300, height: 100 }),

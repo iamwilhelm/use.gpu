@@ -1,11 +1,11 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, Point, Dimension, Margin } from '../types';
 
-import { memo, gather, resume, yeet, useFiber, useOne } from '@use-gpu/live';
-import { getStackMinMax, getStackMargin, fitStack } from '../lib/stack';
+import { memo, gather, resume, yeet, useOne } from '@use-gpu/live';
+import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { normalizeMargin, makeBoxLayout, parseDimension } from '../lib/util';
 
-export type StackProps = {
+export type BlockProps = {
   direction?: 'x' | 'y',
 
   width?: Dimension,
@@ -21,7 +21,7 @@ export type StackProps = {
   children?: LiveElement<any>,
 };
 
-export const Stack: LiveComponent<StackProps> = memo((props: StackProps) => {
+export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const {
     direction = 'y',
     width,
@@ -43,7 +43,7 @@ export const Stack: LiveComponent<StackProps> = memo((props: StackProps) => {
   );
 
   return children ? gather(children, Resume) : null;
-}, 'Stack');
+}, 'Block');
 
 const makeResume = (
   direction: 'x' | 'y',
@@ -52,23 +52,18 @@ const makeResume = (
   grow: number,
   shrink: number,
   snap: boolean,
-  stackMargin: Margin,
+  blockMargin: Margin,
   padding: Margin,
 ) =>
   resume((els: LayoutElement[]) => {
-    const w = width != null ? parseDimension(width, 0, snap) : 0;
-    const h = height != null ? parseDimension(height, 0, snap) : 0;
+    const w = width != null && width === +width ? width : null;
+    const h = height != null && height === +height ? height : null;
 
-    const size = [w, h];
-    const fixed = [
-      width != null ? w : null,
-      height != null ? h : null,
-    ] as [number | number, number | null];
+    const size = [w ?? 0, h ?? 0];
+    const fixed = [w, h];
 
-    const sizing = getStackMinMax(els, direction);
-    const margin = getStackMargin(els, stackMargin, padding, direction);
-    
-    const key = useFiber().id;
+    const sizing = getBlockMinMax(els, fixed, direction);
+    const margin = getBlockMargin(els, blockMargin, padding, direction);
 
     return yeet({
       sizing,
@@ -76,7 +71,14 @@ const makeResume = (
       grow,
       shrink,
       fit: (into: Point) => {
-        const {size, sizes, offsets, renders} = fitStack(els, into, fixed, padding, direction);
+        const w = width != null ? parseDimension(width, into[0], snap) : null;
+        const h = height != null ? parseDimension(height, into[1], snap) : null;
+        const fixed = [
+          width != null ? w : null,
+          height != null ? h : null,
+        ] as [number | number, number | null];
+
+        const {size, sizes, offsets, renders} = fitBlock(els, into, fixed, padding, direction);
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),

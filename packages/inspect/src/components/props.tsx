@@ -1,6 +1,6 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatNode, formatValue, formatNodeName } from '@use-gpu/live';
-import styled, { keyframes } from "styled-components";
+import { styled } from "@stitches/react";
 
 import React, { useState } from 'react';
 import { Action } from './types';
@@ -13,16 +13,16 @@ type PropsProps = {
   fibers: Map<number, LiveFiber<any>>,
 };
 
-const Prefix = styled.div`
-  width: 20px;
-  display: inline-block;
-  white-space: nowrap;
-  line-height: 1;
-`;
+const Prefix = styled('div', {
+  width: '20px',
+  display: 'inline-block',
+  whiteSpace: 'nowrap',
+  lineHeight: 1,
+});
 
-const Compact = styled.span`
-  white-space: nowrap;
-`;
+const Compact = styled('span', {
+  whiteSpace: 'nowrap',
+});
 
 export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   // @ts-ignore
@@ -70,7 +70,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
       const {by} = parent;
       const source = fibers.get(by);
       if (source) parents.push(source);
-			parent = source as any;
+      parent = source as any;
     }
     history = parents.map((fiber) => <div key={fiber.id}>{formatNode(fiber)}</div>)  }
   else {

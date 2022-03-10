@@ -13,6 +13,7 @@ export type Rectangle = Point4;
 export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
 export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'between' | 'evenly';
 export type Anchor = 'start' | 'center' | 'end';
+export type Base = 'start' | 'base' | 'center' | 'end';
 
 export type Fit = 'contain' | 'cover' | 'scale' | 'none';
 export type Repeat = 'x' | 'y' | 'xy' | 'none';

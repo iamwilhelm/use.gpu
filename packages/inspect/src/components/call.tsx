@@ -1,6 +1,5 @@
 import { LiveFiber, Hook } from '@use-gpu/live/types';
 import { formatNode, formatValue, STATE_SLOTS } from '@use-gpu/live';
-import styled, { keyframes } from "styled-components";
 
 import React, { useState } from 'react';
 import { Action } from './types';
@@ -8,9 +7,6 @@ import { SplitRow, Label, Spacer } from './layout';
 
 import { inspectObject } from './props';
 import chunk from 'lodash/chunk';
-
-const StyledCall = styled.div`
-`
 
 type CallProps = {
   fiber: LiveFiber<any>,
@@ -32,7 +28,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
   const hooks = chunk(state, STATE_SLOTS);
 
   return (
-    <StyledCall>
+    <div>
       <div><b>Fiber</b></div>
       <div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
       <Spacer />
@@ -40,7 +36,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
       <div>
         {inspectObject(hooks.map(hookToObject), expanded, toggleExpanded, '')}
       </div>
-    </StyledCall>
+    </div>
   );
 }
 

@@ -3,8 +3,6 @@ import { use, render, formatTree } from '@use-gpu/live';
 
 import { App } from './app';
 
-import 'semantic-ui-css/semantic.min.css'
-
 const ROOT_SELECTOR = '#use-gpu';
 
 export const main = async (): Promise<void> => {

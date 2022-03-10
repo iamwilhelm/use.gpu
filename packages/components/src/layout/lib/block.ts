@@ -5,10 +5,15 @@ import { mergeMargin } from './util';
 const isAbsolute = (el: LayoutElement) => !!el.absolute;
 const isNotAbsolute = (el: LayoutElement) => !el.absolute;
 
-export const getStackMinMax = (
+export const getBlockMinMax = (
   els: LayoutElement[],
+  fixed: [number | number, number | null],
   direction: 'x' | 'y',
 ) => {
+  if (fixed[0] != null && fixed[1] != null) {
+    return [fixed[0], fixed[1], fixed[0], fixed[1]];
+  }
+
   const isX = direction === 'x';
   
   let allMinX = 0;
@@ -61,10 +66,19 @@ export const getStackMinMax = (
     }
   }
 
+  if (fixed[0] != null) {
+    allMinX = fixed[0];
+    allMaxX = fixed[0];
+  }
+  if (fixed[1] != null) {
+    allMinY = fixed[1];
+    allMaxY = fixed[1];
+  }
+
   return [allMinX, allMinY, allMaxX, allMaxY];
 }
 
-export const getStackMargin = (
+export const getBlockMargin = (
   els: LayoutElement[],
   margin: Margin,
   padding: Margin,
@@ -91,7 +105,7 @@ export const getStackMargin = (
   return margin;
 }
 
-export const fitStack = (
+export const fitBlock = (
   els: LayoutElement[],
   into: Point,
   fixed: [number | null, number | null],

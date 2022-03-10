@@ -35,8 +35,8 @@ export const Element: LiveComponent<ElementProps> = (props) => {
 
     image,
 
-    stroke,
-    fill,
+    //stroke,
+    //fill,
 
     grow = 0,
     shrink = 0,
@@ -44,6 +44,9 @@ export const Element: LiveComponent<ElementProps> = (props) => {
 
     children,
   } = props;
+
+  const stroke = [Math.random(), Math.random(), Math.random(), Math.random() + .5];
+  const fill = [Math.random(), Math.random(), Math.random(), Math.random() + .5];
 
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;
@@ -70,8 +73,8 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           id,
           layout,
 
-          stroke: [Math.random(), Math.random(), Math.random(), Math.random() + .5],
-          fill: [Math.random(), Math.random(), Math.random(), Math.random() + .5],
+          stroke,
+          fill,
           border,
           radius,
 

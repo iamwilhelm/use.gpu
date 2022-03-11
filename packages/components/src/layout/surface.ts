@@ -92,7 +92,6 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
  
       let w = width != null ? parseDimension(width, size[0], false) : size[0];
       let h = height != null ? parseDimension(height, size[1], false) : size[1];
-      console.log({w, h});
 
       if (fit === 'contain') {
         let fitW = boxW / w;

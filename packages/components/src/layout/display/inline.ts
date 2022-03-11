@@ -39,8 +39,8 @@ export const Inline: LiveComponent<InlineProps> = memo((props: BlockProps) => {
   const padding = normalizeMargin(p);
 
   const Resume = useOne(() =>
-    makeResume(direction, grow, shrink, snap, margin, padding),
-    [direction, grow, shrink, snap, margin, padding]
+    makeResume(direction, align, anchor, grow, shrink, wrap, snap, margin, padding),
+    [direction, align, anchor, grow, shrink, wrap, snap, margin, padding]
   );
 
   return children ? gather(children, Resume) : null;
@@ -48,8 +48,11 @@ export const Inline: LiveComponent<InlineProps> = memo((props: BlockProps) => {
 
 const makeResume = (
   direction: 'x' | 'y',
+  align: Alignment,
+  anchor: Base,
   grow: number,
   shrink: number,
+  wrap: boolean,
   snap: boolean,
   margin: Margin,
   padding: Margin,

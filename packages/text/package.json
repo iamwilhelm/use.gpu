@@ -1,28 +1,20 @@
 {
-  "name": "@use-gpu/components",
+  "name": "@use-gpu/text",
   "version": "0.0.1",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
-  "dependencies": {
-    "@use-gpu/live": "*",
-    "@use-gpu/state": "*",
-    "@use-gpu/core": "*",
-    "@use-gpu/webgpu": "*",
-    "@use-gpu/shader": "*",
-    "@use-gpu/text": "*",
-    "@use-gpu/wgsl": "*"
-  },
   "scripts": {
     "test": "jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
+
     "build": "yarn run build:js && yarn run build:types && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/components/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
-    "build:pkg": "cp package.json ../../build/packages/components"
+    "build:js": "babel src --out-dir ../../build/packages/text/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:pkg": "cp package.json ../../build/packages/text"
   }
 }

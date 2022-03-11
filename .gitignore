@@ -8,3 +8,4 @@ tsconfig.tsbuildinfo
 test/import/node_modules
 test/import/dist
 test/import/yarn.lock
+*/pkg/*

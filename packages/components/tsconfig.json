@@ -6,6 +6,7 @@
     { "path": "../live" },
     { "path": "../core" },
     { "path": "../shader" },
+    { "path": "../text" },
     { "path": "../webgpu" },
   ],
   "compilerOptions": {

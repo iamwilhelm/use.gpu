@@ -115,46 +115,38 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
       let right  = boxW - (left + w);
       let bottom = boxH - (top + h);
 
-      console.log({left, top, right, bottom});
-
       uv = [
         -left / w,
         -top / h,
         1 + right / w,
         1 + bottom / h,
       ];
-
-      console.log(uv);
     }
 
     render = {
-      rectangle: {
-        id,
-        rectangle: layout,
-        radius,
-        border,
-        stroke,
-        fill,
-        
-        texture: sampledTexture,
-        repeat: REPEAT_FLAG[repeat] ?? 0,
-        uv,
+      id,
+      rectangle: layout,
+      radius,
+      border,
+      stroke,
+      fill,
+      
+      texture: sampledTexture,
+      repeat: REPEAT_FLAG[repeat] ?? 0,
+      uv,
 
-        count: 1,
-      }
+      count: 1,
     };
   }
   else {
     render = {
-      rectangle: {
-        id,
-        rectangle: layout,
-        radius,
-        border,
-        stroke,
-        fill,
-        count: 1,
-      }
+      id,
+      rectangle: layout,
+      radius,
+      border,
+      stroke,
+      fill,
+      count: 1,
     };
   }
 

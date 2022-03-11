@@ -13,7 +13,6 @@ export const getInlineMinMax = (
   snap: boolean,
 ) => {
   const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
-  const [gapX, gapY] = gap;
 
   let allMinX = 0;
   let allMinY = 0;

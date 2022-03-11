@@ -1,4 +1,5 @@
 import path from 'path';
+import WasmPackPlugin from '@wasm-tool/wasm-pack-plugin';
 
 const {NODE_ENV} = process.env;
 const isDevelopment = NODE_ENV === 'development';
@@ -18,6 +19,16 @@ export default {
   resolve: {
     modules: ['node_modules'],
     extensions: ['.ts', '.tsx', '.js', '.json']
+  },
+  plugins: [
+    new WasmPackPlugin({
+      crateDirectory: path.resolve(__dirname, 'rust/use-gpu-text'),
+      outDir: "../../packages/text/pkg",
+      outName: "use-gpu-text",
+    }),
+  ],
+  experiments: {
+    asyncWebAssembly: true,
   },
   module: {
     rules: [

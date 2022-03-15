@@ -81,7 +81,7 @@ export const makeAtlas = (
         const s = x === lastR ? 1.0 : y === lastB ? 0.75 : 0.5;
         const f = 1.0 - (Math.min(x / width, y / height) + (x / width * y / height)) * .25;
         const d = s * f * fx * fy;
-        if (debug) console.log({s, f, d, x, y})
+        //if (debug) console.log({s, f, d, x, y})
         if (d > max) {
           anchor = a;
           index = i;
@@ -115,7 +115,6 @@ export const makeAtlas = (
             splits.push([r + 1, a.pt[1], 0, 1]);
           }
           if (a.shadow === SPLIT_X && dy) {
-          
             splits.push([a.pt[0], b + 1, 1, 0]);
           }
         }
@@ -123,7 +122,6 @@ export const makeAtlas = (
     }
 
     for (let [x, y, dx, dy] of splits) {
-      console.log('split at', x, y, dx, dy)
       castSplit(anchors, edges, [x - dx * 2, y - dy * 2, x, y], dx, dy);
     }
   };
@@ -142,10 +140,15 @@ export const makeAtlas = (
       if (edge.dir === LEFT) {
         const yo = getRangeOverlap(t, t + h, y - 1, y);
         if (yo === Overlap.some) {
-          const xo = getRangeOverlap(l, l + w, x + dx, x, x + dx);
-          if (l === 210 && t === 700) console.log('clip X to', x, y, '@', xo, yo);
+          const xo = getRangeOverlap(l, l + w, x + dx, x);
           if (xo !== Overlap.none) {
             h = Math.min(h, y - t);
+          }
+        }
+
+        if (y === t) {
+          if (x + dx < l && l < x) {
+            w = 0;
           }
         }
       }
@@ -156,7 +159,13 @@ export const makeAtlas = (
           if (yo !== Overlap.none) {
             w = Math.min(w, x - l);
           }
-        }        
+        }
+
+        if (x === l) {
+          if (y < t && t < y + dy) {
+            h = 0;
+          }
+        }
       }
     }
     
@@ -171,7 +180,7 @@ export const makeAtlas = (
     anchors: Anchor[],
     edges: Edge[],
     index: number,
-    rect: Rectangle,
+    rect: Rectanle,
   ) => {
     const [l, t, r, b] = rect;
     const w = r - l;
@@ -181,10 +190,13 @@ export const makeAtlas = (
     const prevAnchor = anchors[index - 1];
     const nextAnchor = anchors[index + 1];
 
-    const {x, y, shadow} = oldAnchor;
+    const {pt: [x, y], shadow} = oldAnchor;
+    
+    console.log(prevAnchor.pt, oldAnchor.pt, nextAnchor.pt)
     
     const dx = getCornerX(edges, index);
     const dy = getCornerY(edges, index);
+    console.log({x, y, dx, dy, anchor: oldAnchor});
 
     const isShadowX = shadow === SPLIT_X;
     const isShadowY = shadow === SPLIT_Y;
@@ -212,7 +224,7 @@ export const makeAtlas = (
     const e0 = prevAnchor ? makeEdge(prevAnchor.pt, pa ?? pb ?? pc) : null;
     const e5 = nextAnchor ? makeEdge(pe ?? pd ?? pc, nextAnchor.pt) : null;
 
-    console.log({pa, pb, pc, pd, pe, e1, e2, e3});
+    //console.log({pa, pb, pc, pd, pe, e1, e2, e3});
 
     const newEdges: Edge[] = [];
     if (e0) newEdges.push(e0);
@@ -223,6 +235,7 @@ export const makeAtlas = (
     if (e5) newEdges.push(e5);
 
     const newAnchors: Anchor[] = newCarets.map((caret, i) => makeAnchor(newEdges[i], newEdges[i + 1], caret));
+    console.log({newAnchors, newEdges});
 
     anchors = anchors.slice();
     edges = edges.slice();
@@ -244,10 +257,22 @@ export const makeAtlas = (
       ...edges.slice(i + ne),
     ];
 
+    console.log('pre-resolve', anchors.map(a => [a.pt[0], a.pt[1], a.caret]));
+    console.log(JSON.stringify(anchors.find(a => a.pt[0] === 300 && a.pt[1] === 90)));    
+    
     resolveCarets(anchors, edges, rect);
+
+    console.log('before split', anchors.map(a => [a.pt[0], a.pt[1], a.caret]));
+
     castSplit(anchors, edges, rect, dx, dy);
 
-    return fixUp(anchors, edges);
+    console.log('after split', anchors.map(a => [a.pt[0], a.pt[1], a.caret]));
+
+    const [a, e] = fixUp(anchors, edges);
+
+    console.log(JSON.stringify(a.find(a => a.pt[0] === 300 && a.pt[1] === 90)));    
+
+    return [a, e];
   }
   
   const fixUp = (anchors: Anchor[], edges: Edge[]) => {
@@ -257,31 +282,39 @@ export const makeAtlas = (
     let newEdges: Edge[] = [];
 
     let measure: number[] = [];
+    
+    console.log('fixUp', anchors.map(a => [a.pt[0], a.pt[1], a.caret]));
 
-    let last = null;
     for (let i = 0; i < n; ++i) {
       const a = anchors[i];
+      const {shadow} = a;
       
       const e1 = edges[i - 1];
       const e2 = edges[i];
 
-      const degen = isDegen(e1, e2);
-      const {shadow} = a;
-      
+      if (e2?.dx === 0 && e2?.dy === 0) {
+        if (!shadow && i < n - 1) anchors[i + 1].shadow = undefined;
+        measure.push(newEdges.length);
+        continue;
+      }
+
+      const degen = isDegen(e1, e2);      
       if (degen) {
-        if (!shadow && last) last.shadow = undefined;
+        if (!shadow && i < n - 1) anchors[i + 1].shadow = undefined;
         measure.push(newEdges.length);
         continue;
       }
 
       if (newAnchors.length) newEdges.push(edges[i - 1]);
       newAnchors.push(a);
-      last = a;
+      console.log('push', a.pt[0], a.pt[1], a.caret);
     }
 
     for (const i of measure) {
-      newEdges[i] = measureEdge(newEdges[i], newAnchors, i);
+      newEdges[i] = measureEdge(newAnchors, i);
     }
+
+    console.log('->', anchors.map(a => [a.pt[0], a.pt[1], a.caret]));
 
     if (newAnchors.length !== anchors.length) return fixUp(newAnchors, newEdges);
     return [newAnchors, newEdges];
@@ -309,7 +342,7 @@ export const makeAtlas = (
         const [bx, by] = pb;
         
         if (ax === bx && ax < l) {
-          if (ay >= b && by < b) {
+          if (ay > b && by < b) {
             const d = l - ax;
             if (d < 0 || d >= min) continue;
             min = d;
@@ -327,6 +360,7 @@ export const makeAtlas = (
 
         const a = makeAnchor(e1, e2, NEW_CARET, SPLIT_Y);
         a.caret = clipCaretToEdges(pt, edges);
+        console.log('split Y at', l, t, at, pt, e1, e2, a, anchors[split], anchors[split + 1], anchors[split + 2]);
 
         anchors.splice(split + 1, 0, a);
         edges.splice(split, 1, e1, e2);
@@ -350,7 +384,7 @@ export const makeAtlas = (
         const [bx, by] = pb;
 
         if (ay === by && ay < t) {
-          if (bx >= r && ax < r) {
+          if (bx > r && ax < r) {
             const d = t - ay;
             if (d < 0 || d >= min) continue;
             min = d;
@@ -366,8 +400,9 @@ export const makeAtlas = (
         const e1 = makeEdge(anchors[split].pt, pt);
         const e2 = makeEdge(pt, anchors[split + 1].pt);
 
-        const a = makeAnchor(e1, e2, NEW_CARET, SPLIT_Y);
+        const a = makeAnchor(e1, e2, NEW_CARET, SPLIT_X);
         a.caret = clipCaretToEdges(pt, edges);
+        console.log('split X at', l, t, at, pt, e1, e2, a, anchors[split], anchors[split + 1], anchors[split + 2]);
 
         anchors.splice(split + 1, 0, a);
         edges.splice(split, 1, e1, e2);
@@ -378,8 +413,6 @@ export const makeAtlas = (
   const place = (key: number, w: number, h: number) => {
     console.log('-----')
     if (map.get(key)) throw new Error("key mapped already", key);
-
-    console.log({anchors, edges})
 
     const {anchor, index} = getNextAvailable(w, h, true);
     if (index < 0) {
@@ -399,12 +432,18 @@ export const makeAtlas = (
     console.log({anchors, edges})
     console.log({rect})
 
+    let n = anchors.length;
+    for (let i = 0; i < n; ++i) {
+      anchors[i].cx = getCornerX(edges, i);
+      anchors[i].cy = getCornerY(edges, i);
+    }
+
     const placement = {rect, uv};
     map.set(key, placement);
     return placement;
   };
 
-  const debugAnchors = () => anchors;
+  const debugAnchors = () => ({anchors, edges});
   const debugPlacements = () => Array.from(map.keys()).map(k => map.get(k)!);
   
   const debugValidate = () => {
@@ -445,7 +484,14 @@ export const makeAtlas = (
   anchors.push(a1, a2, a3);
   edges.push(e1, e2);
   
-  return {place, map, width, height, debugAnchors, debugPlacements, debugValidate};
+  let n = anchors.length;
+  for (let i = 0; i < n; ++i) {
+    anchors[i].cx = getCornerX(edges, i);
+    anchors[i].cy = getCornerY(edges, i);
+  }
+  console.log({anchors, edges})
+
+  return {place, map, width, height, debugAnchors, debugPlacements, debugValidate, getCornerX, getCornerY};
 };
 
 const isDegen = (a?: Edge | null, b?: Edge | null) => {
@@ -455,6 +501,9 @@ const isDegen = (a?: Edge | null, b?: Edge | null) => {
       // diag vertex, keep
       degen = false;
     }
+    //else if (!a.dx && !a.dy) {
+      // remove first
+      //}
     else if (a.dx && b.dx) {
       if (a.dir === b.dir) {
         degen = false;
@@ -501,28 +550,22 @@ const makeEdge = (
   return {a, b, dir, dx, dy};
 };
 
-const measureEdge = (edge: Edge, anchors: Anchor[], index: number) => {
+const measureEdge = (anchors: Anchor[], index: number) => {
   const a = anchors[index].pt;
   const b = anchors[index + 1].pt;
-
-  const dx = b[0] - a[0];
-  const dy = b[1] - a[1];
-
-  const dir = getDirection(dx, dy);
-  
-  return {a, b, dx, dy, dir};
+  return makeEdge(a, b);
 };
 
 const getCornerX = (edges: Edge[], index: number) => {
   const a = edges[index - 1];
   const b = edges[index];
-  return a?.dx || -b?.dx || 0;
+  return -a?.dx || b?.dx || 0;
 };
 
 const getCornerY = (edges: Edge[], index: number) => {
   const a = edges[index - 1];
   const b = edges[index];
-  return a?.dy || -b?.dy || 0;
+  return -a?.dy || b?.dy || 0;
 };
 
 const getRangeOverlap = (minA: number, maxA: number, minB: number, maxB: number) => {

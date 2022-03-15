@@ -50,7 +50,6 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
     atlas.place(2, 75, 120);
     atlas.place(3, 50, 50);
     atlas.place(4, 150, 100);
-    /*
     atlas.place(5, 250, 100);
     atlas.place(6, 350, 100);
     atlas.place(7, 600, 600);
@@ -61,13 +60,14 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
     atlas.place(12, 250, 100);
     atlas.place(13, 80, 100);
 
-    for (let i = 0; i < 30; ++i)
+    for (let i = 0; i < 1; ++i)
       atlas.place(15 + i, 95, 90);
 
-      for (let i = 0; i < 50; ++i)
+      for (let i = 0; i < 5; ++i)
         atlas.place(50 + i, 85 + (i%4)*5, 85 + (i%3)*5);
 
     //for (let i = 100; i < 150; ++i) atlas.place(i, Math.random() * 50 + 100, Math.random() * 50 + 100);
+    /*
     */
 
     const glyphs = new Map<number, GlyphCache>();

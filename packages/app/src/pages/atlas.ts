@@ -23,12 +23,12 @@ export const AtlasPage: LiveComponent<AtlasPageProps> = (props) => {
             use(Flat)({
               children:
               
-                use(UI)({
-                  children:
+//                use(UI)({
+//                  children:
 
                     use(DebugAtlas)(),
 
-                })
+//                })
 
             })
       

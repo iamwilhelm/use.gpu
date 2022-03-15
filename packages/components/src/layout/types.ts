@@ -29,7 +29,7 @@ export type ImageAttachment = {
 };
 
 export type LayoutRenderer = (box: Rectangle) => LiveElement<any>;
-export type InlineRenderer = (box: Rectangle, start: number, end: number) => LiveElement<any>;
+export type InlineRenderer = (box: Rectangle, start: number, end: number, spacing: number) => LiveElement<any>;
 
 export type LayoutFit = {
   size: Point,

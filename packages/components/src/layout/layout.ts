@@ -32,7 +32,7 @@ const Resume = resume((els: LayoutElement[]) => {
     if (Array.isArray(el)) out.push(...el);
     else if (el) out.push(el);
   }
-
+  
   /*
   let l = 0;
   for (const el of out) if (el) {

@@ -10,6 +10,7 @@ import {
   CompositeData, Data, RawData,
   OrbitCamera, OrbitControls,
   AutoPicking, Pick,
+  FontProvider,
   Cursor, Points, Lines,
   RawQuads as Quads, RawLines,
   RenderToTexture,
@@ -21,6 +22,7 @@ import { UseInspect } from '@use-gpu/inspect';
 import { GeometryPage } from './pages/geometry';
 import { InteractPage } from './pages/interact';
 import { LayoutPage } from './pages/layout';
+import { AtlasPage } from './pages/atlas';
 import { EmptyPage } from './pages/empty';
 
 export type AppProps = {
@@ -43,6 +45,7 @@ export const App: LiveComponent<AppProps> = (props) => {
             "geometry": { element: use(GeometryPage)({ canvas }) },
             "layout": { element: use(LayoutPage)({ }) },
             "interact": { element: use(InteractPage)({ }) },
+            "atlas": { element: use(AtlasPage)({ }) },
             "": { element: use(GeometryPage)({ canvas }) },
             "*": { element: use(EmptyPage)({ }) },
           },
@@ -52,16 +55,20 @@ export const App: LiveComponent<AppProps> = (props) => {
   );
 
   return [
-    use(AutoCanvas)({
-      canvas, device, adapter, samples: 4,
-      children:
+      use(AutoCanvas)({
+        canvas, device, adapter, samples: 4,
+        children:
       
-        use(AutoPicking)({
-          canvas,
-          children: routes,
-        })
-    }),
-    inspect ? use(UseInspect)({fiber, canvas}) : null,
+          use(FontProvider)({
+            children: 
+          
+              use(AutoPicking)({
+                canvas,
+                children: routes,
+              }),
+          }),
+      }),
+      inspect ? use(UseInspect)({fiber, canvas}) : null,
   ];
 };
 

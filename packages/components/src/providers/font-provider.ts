@@ -62,13 +62,20 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
 
     for (let i = 0; i < 1; ++i)
       atlas.place(15 + i, 95, 90);
+      for (let i = 0; i < 87; ++i)
+        atlas.place(50 + i, 85 + (i%4)*5, 85 + (i%3)*15);
 
-      for (let i = 0; i < 5; ++i)
-        atlas.place(50 + i, 85 + (i%4)*5, 85 + (i%3)*5);
+    let seed = 0x12345678;
+    const rnd = () => {
+      const C1 = 0xcc9e2d51;
+      const C2 = 0x1b873593;
+      seed = ((seed|0) * C1) ^ ((seed|0) * C2) ^ ((seed|0) >>> 16);
+      return (seed >>> 0) / 0xffffffff;
+    }
 
-    //for (let i = 100; i < 150; ++i) atlas.place(i, Math.random() * 50 + 100, Math.random() * 50 + 100);
-    /*
-    */
+    for (let i = 0; i < 28; ++i) atlas.place(200 + i, Math.round(rnd() * 50) + 100, Math.round(rnd() * 50) + 100);
+
+    atlas.flush();
 
     const glyphs = new Map<number, GlyphCache>();
 

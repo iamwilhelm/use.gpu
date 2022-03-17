@@ -59,8 +59,8 @@ const SQUARE = [0, 0, 1, 1];
 
 const VERTEX_BINDINGS = [
   { name: 'getRectangle', format: 'vec4<f32>', value: ZERO },
-  { name: 'getRadius', format: 'vec4<f32>', value: 0 },
-  { name: 'getBorder', format: 'vec4<f32>', value: 0 },
+  { name: 'getRadius', format: 'vec4<f32>', value: [0, 0, 0, 0] },
+  { name: 'getBorder', format: 'vec4<f32>', value: [0, 0, 0, 0] },
   { name: 'getStroke', format: 'vec4<f32>', value: GRAY },
   { name: 'getFill', format: 'vec4<f32>', value: GRAY },
   { name: 'getUV', format: 'vec4<f32>', value: SQUARE },

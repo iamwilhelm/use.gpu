@@ -1,32 +1,8 @@
+import { makeTextureDataLayout, uploadTexture } from './texture';
+import { AtlasMapping, Atlas } from './types';
+
 type Rectangle = [number, number, number, number];
 type Point = [number, number];
-type Caret = [number, number];
-type Direction = number;
-
-type Anchor = {
-  pt: Point,
-  shadow: [number, number] | null,
-  caret: Caret | null,
-};
-
-type Edge = {
-  a: Point,
-  b: Point,
-  dir: Direction,
-  dx: number,
-  dy: number,
-};
-
-const NONE = 0;
-const UL = 1;
-const UR = 2;
-const BL = 3;
-const BR = 4;
-
-export type AtlasMapping = {
-  rect: Rectangle,
-  uv: Rectangle,
-};
 
 type Slot = [number, number, number, number, number, number, number];
 type Bin = Set<Slot>;
@@ -35,7 +11,7 @@ type Bins = Map<number, Slot>;
 export const makeAtlas = (
   width: number,
   height: number,
-  snap: number = 10,
+  snap: number = 1,
 ) => {
   
   const ls: Bins = new Map();
@@ -44,22 +20,7 @@ export const makeAtlas = (
   const bs: Bins = new Map();
   const slots: Bin = new Set();
 
-  const queue: [number, number, number][] = [];
-
-  const place = (key: number, w: number, h: number) => {
-    queue.push([key, w, h]);
-  };
-  
-  const flush = () => {
-    //queue.sort((a, b) => (b[1] * b[2]) - (a[1] * a[2]));
-
-    let q = queue.slice();
-    queue.length = 0;
-
-    for (const [k, w, h] of q) _place(k, w, h);
-  };
-  
-  const _place = (key: number, w: number, h: number) => {    
+  const place = (key: number, w: number, h: number): AtlasMapping => {    
     if (map.get(key)) throw new Error("key mapped already", key);
 
     const cw = Math.ceil(w / snap) * snap;
@@ -73,14 +34,15 @@ export const makeAtlas = (
 
     const [x, y] = slot;
     const rect = [x, y, x + w, y + h];
-    const uv = [rect[0] / width, rect[1] / height, rect[2] / width, rect[2] / height];
+    const uv = [rect[0] / width, rect[1] / height, rect[2] / width, rect[3] / height];
 
-    lastR = x + w;
-    lastB = y + h;
+    if (snap) {
+      const clip = [x, y, x + cw, y + ch];
+      clipRectangle(clip);
+    }
+    else clipRectangle(rect);
 
-    clipRectangle(rect);
-
-    const placement = {rect, uv};
+    const placement = {key, rect, uv};
     map.set(key, placement);
     return placement;
   };
@@ -157,9 +119,6 @@ export const makeAtlas = (
   
   const map = new Map<number, AtlasMapping>();
 
-  let lastR = 0;
-  let lastB = 0;
-
   const getNextAvailable = (w: number, h: number, debug: boolean = false) => {
     let slot: Slot | null = null;
     let max = 0;
@@ -223,42 +182,9 @@ export const makeAtlas = (
   const debugPlacements = () => Array.from(map.keys()).map(k => map.get(k)!);
   const debugSlots = () => Array.from(slots.values()).map(s => s);
 
-  const debugClusters = () => {
-    const clusters: Rectangle[][] = [];
-  
-    const rects = debugSlots();
-    const n = rects.length;
-    
-    let wasted = 0;
-    const outer = [0, 0, width, height];
-    nextRect: for (let i = 0; i < n; ++i) {
-      const a = rects[i];
-      if (a[0] !== 0 && a[1] !== 0 && a[2] !== width && a[3] !== height) {
-        wasted += (a[2] - a[0]) * (a[3] - a[1]);
-      }
-    }
-    
-    nextRect: for (let i = 0; i < n; ++i) {
-      const a = rects[i];
-      for (let c of clusters) {
-        for (let b of c) {
-          if (touchRectangle(a, b)) {
-            c.push(a);
-            continue nextRect;
-          }
-        }
-      }
-      clusters.push([a]);
-    }
-    
-    console.log('clusters', clusters.length, '-', wasted);
-  }
-  
   const debugValidate = () => {
     const rects = debugPlacements().map(({rect}) => rect);
     let n = rects.length;
-    
-    debugClusters();
     
     const out: Caret[] = [];
     
@@ -289,23 +215,31 @@ export const makeAtlas = (
       }
     }
 
-    console.info('atlas', map.size, slots.size);
-    console.info('bounding box', box);
-    console.info('stats', stats);
-    
-    console.info('ls', Array.from(ls.keys()), Array.from(ls.keys()).map(k => ls.get(k).size));
-    console.info('rs', Array.from(rs.keys()), Array.from(rs.keys()).map(k => rs.get(k).size));
-    console.info('ts', Array.from(ts.keys()), Array.from(ts.keys()).map(k => ts.get(k).size));
-    console.info('bs', Array.from(bs.keys()), Array.from(bs.keys()).map(k => bs.get(k).size));
-
     return out;
   }
 
   const slot = [0, 0, width, height, width, height, 1];
   addSlot(slot);
 
-  return {place, flush, map, width, height, debugPlacements, debugSlots, debugValidate};
+  return {place, map, width, height, debugPlacements, debugSlots, debugValidate} as Atlas;
 };
+
+export const uploadAtlasMapping = (
+  device: GPUDevice,
+  texture: GPUTexture,
+  format: GPUTextureFormat,
+  data: Uint8Array,
+  mapping: AtlasMapping,
+): void => {
+  const {rect} = mapping;
+  const [l, t, r, b] = rect;
+
+  const offset = [l, t] as Point;
+  const size = [r - l, b - t] as Point;
+    
+  const layout = makeTextureDataLayout(size, format);  
+  uploadTexture(device, texture, data, layout, size, offset);
+}
 
 const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);
 const intersectRangeEnds = (minA: number, maxA: number, minB: number, maxB: number) => !(minA > maxB || minB > maxA);
@@ -346,13 +280,13 @@ const subtractRectangle = (a: Slot, b: Rectangle): Slot => {
     out.push([al, at, bl, ab, Math.min(sx, bl - al), ab - at, 1]);
   }
   if (ar > br) {
-    out.push([br, at, ar, ab, Math.min(sx, ar - br), h, +(at >= bt)]);
+    out.push([br, at, ar, ab, Math.min(sx, ar - br), Math.max(h, bb - at), +(at >= bt)]);
   }
   if (at < bt) {
     out.push([al, at, ar, bt, ar - al, Math.min(sy, bt - at), 1]);
   }
   if (ab > bb) {
-    out.push([al, bb, ar, ab, w, Math.min(sy, ab - bb), +(al >= bl)]);
+    out.push([al, bb, ar, ab, Math.max(w, br - al), Math.min(sy, ab - bb), +(al >= bl)]);
   }
 
   return out;

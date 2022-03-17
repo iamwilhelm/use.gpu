@@ -194,7 +194,7 @@ impl UseGPUText {
             id,
             
             layout_bounds: vec!(lb.min.x, lb.min.y, lb.max.x, lb.max.y),
-            outline_bounds: ob.map(|ob| { vec!(ob.min.x, ob.min.y, ob.max.x, ob.max.y) }),
+            outline_bounds: ob.map(|ob| { vec!(ob.min.x, ob.min.y, ob.max.x + 1.0, ob.max.y + 1.0) }),
             
             image,
             width,

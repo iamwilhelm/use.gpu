@@ -109,6 +109,8 @@ const makeUIAccumulator = (
 
   return (items: RectangleAggregate[]) => {
     const count = items.reduce(allCount, 0);
+    if (!count) return null;
+
     const props = {count} as Record<string, any>;
 
     if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');

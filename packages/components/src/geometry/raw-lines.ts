@@ -82,6 +82,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   // Customize line shader
   let {join, depth = 0} = props;
+  join = 'round';
   const j = (join! in LINE_JOIN_SIZE) ? join! : 'bevel';
 
   const style = LINE_JOIN_STYLE[j];
@@ -94,7 +95,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   };
 
   // Set up draw
-  const vertexCount = tris * 3;
+  const vertexCount = 2 + tris;
   const instanceCount = (props.positions?.length || 2) - 1;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);

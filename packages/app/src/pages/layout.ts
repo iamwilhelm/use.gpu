@@ -125,15 +125,15 @@ export const LayoutPage: LiveComponent<LayoutPageProps> = (props) => {
 
                         use(Absolute)({
                           left: '50%',
-                          top: 0,
+                          top: '50%',
                           right: 0,
-                          bottom: '50%',
+                          bottom: 0,
                           children: [
 
                             use(Inline)({
                               children: [
                                 
-                                use(Text)({ content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
+                                use(Text)({ size: 32, color: [1, 1, 1, 1], content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
                               
                               ],
                             }),

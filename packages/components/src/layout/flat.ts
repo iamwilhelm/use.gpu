@@ -6,6 +6,7 @@ import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
+import { FrameContext } from '../providers/frame-provider';
 import { ViewProvider } from '../providers/view-provider';
 import { mat4 } from 'gl-matrix';
 

@@ -49,6 +49,7 @@ export const DebugAtlas = ({texture}) => {
   const out = [];
   const pos = [] as number[];
 
+  /*
   for (const {rect, uv} of debugPlacements()) {
     out.push(
       use(Surface)({
@@ -101,6 +102,7 @@ export const DebugAtlas = ({texture}) => {
       })
     );
   }
+  */
 
   out.push(
     use(Surface)({
@@ -109,7 +111,7 @@ export const DebugAtlas = ({texture}) => {
         texture: source,
         fit: 'contain',
       },
-      fill: [0.5, 0.5, 0.5, 1],
+      fill: [0.0, 0.0, 0.0, 1],
       stroke: [1, 1, 1, 1],
       border: [1, 1, 1, 1],
     })

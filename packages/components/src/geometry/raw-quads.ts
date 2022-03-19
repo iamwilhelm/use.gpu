@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode,
+  VertexData, TextureSource, StorageSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -24,6 +24,7 @@ export type RawQuadsProps = {
   color?: number[],
   depth?: number,
   mask?: number,
+  texture?: TextureSource,
 
   positions?: StorageSource,
   sizes?: StorageSource,
@@ -92,7 +93,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const d = props.depths ?? props.depth ?? props.getDepth;
 
   const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null;
-  const t = props.getTexture;
+  const t = props.texture ?? props.getTexture;
 
   const [getVertex, getFragment] = useMemo(() => {
     const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, c, s, d]);

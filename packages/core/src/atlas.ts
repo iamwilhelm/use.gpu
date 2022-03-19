@@ -1,5 +1,5 @@
-import { makeTextureDataLayout, uploadTexture } from './texture';
-import { AtlasMapping, Atlas } from './types';
+import { makeTextureDataLayout, makeDynamicTexture, makeTextureView, uploadTexture } from './texture';
+import { AtlasMapping, Atlas, TextureSource } from './types';
 
 type Rectangle = [number, number, number, number];
 type Point = [number, number];
@@ -7,6 +7,27 @@ type Point = [number, number];
 type Slot = [number, number, number, number, number, number, number];
 type Bin = Set<Slot>;
 type Bins = Map<number, Slot>;
+
+export const makeAtlasSource = (
+  device: GPUDevice,
+  atlas: Atlas,
+  format: GPUTextureFormat,
+): TextureSource => {
+  const texture = makeDynamicTexture(device, atlas.width, atlas.height, 1, format);
+  const source = {
+    texture,
+    view: makeTextureView(texture),
+    sampler: {
+      minFilter: 'linear',
+      magFilter: 'linear',
+    } as GPUSamplerDescriptor,
+    layout: 'texture_2d<f32>',
+    format,
+    size: [atlas.width, atlas.height],
+    version: 1,
+  };
+  return source;
+}
 
 export const makeAtlas = (
   width: number,
@@ -47,6 +68,26 @@ export const makeAtlas = (
     return placement;
   };
   
+  const expand = () => {
+    const w = width * 2;
+    const h = height * 2;
+
+    const slot = [0, 0, w, h, w, h, 1];
+    const splits = subtractRectangle(slot, [0, 0, width, height]);
+    for (const s of splits) addSlot(s);
+
+    for (const k of map.keys()) {
+      const r = map.get(k);
+      r.uv[0] /= 2;
+      r.uv[1] /= 2;
+      r.uv[2] /= 2;
+      r.uv[3] /= 2;
+    }
+
+    self.width = width = w;
+    self.height = height = h;
+  };
+
   const getBin = (xs: Set, x: number) => {
     let vs = xs.get(x);
     if (!vs) xs.set(x, vs = new Set());
@@ -221,7 +262,13 @@ export const makeAtlas = (
   const slot = [0, 0, width, height, width, height, 1];
   addSlot(slot);
 
-  return {place, map, width, height, debugPlacements, debugSlots, debugValidate} as Atlas;
+  const self = {
+    place, map, expand,
+    width, height,
+    debugPlacements, debugSlots, debugValidate,
+  } as Atlas;
+
+  return self;
 };
 
 export const uploadAtlasMapping = (

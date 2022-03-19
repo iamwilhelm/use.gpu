@@ -17,9 +17,12 @@ export type UseRenderingContextGPU = {
   gpuContext: GPUCanvasContext,
   colorStates: GPUColorTargetState[],
   colorAttachments: GPURenderPassColorAttachment[],
+  targetTexture: GPUTexture,
   depthTexture: GPUTexture,
   depthStencilState: GPUDepthStencilState,
   depthStencilAttachment: GPURenderPassDepthStencilAttachment,
+
+  swapView: (view: GPUTextureView) => void,
 };
 
 export type TypedArray =
@@ -163,6 +166,7 @@ export type StorageSource = {
 };
 
 export type TextureSource = {
+  texture: GPUTexture,
   view: GPUTexture | GPUTextureView,
   sampler: GPUSampler | GPUSamplerDescriptor,
   layout: string,

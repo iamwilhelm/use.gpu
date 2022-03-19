@@ -1,5 +1,5 @@
 import { LiveFiber, Task } from './types';
-import { use, detach, provide, provideMemo, PROVIDE, makeContext } from './builtin';
+import { use, detach, provide, PROVIDE, makeContext } from './builtin';
 import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext } from './hooks';
 import { renderSync } from './tree';
@@ -529,7 +529,7 @@ it("updates context with memo in the way", () => {
 
 });
 
-it("does update context if value is the same", () => {
+it("does not update context if value is the same", () => {
 
   const context = makeContext();
 
@@ -548,82 +548,7 @@ it("does update context if value is the same", () => {
     const [value, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
-    return provide(context, 0, use(Memo)());
-  };
-
-  const Memo = memoArgs(() => {
-    rendered.memo++;
-
-    return use(Node)();
-  });
-
-  const Node = () => {
-    rendered.node++;
-    const value = useContext(context);
-    rendered.value = value;
-  };
-
-  const result = renderSync(use(Root)());
-  expect(result.host).toBeTruthy();
-  expect(result.mount).toBeTruthy();
-  expect(result.mount!.mount).toBeTruthy();
-  if (!result.host) return;
-  if (!result.mount) return;
-  if (!result.mount.mount) return;
-
-  const {host: {flush}} = result;
-
-  expect(result.f).toBe(Root);
-  const provide1 = result.mount;
-  expect(provide1 && provide1.f).toBe(PROVIDE);
-  const memo1 = result.mount.mount;
-  expect(memo1 && memo1.f).toBe(Memo);
-  const node1 = result.mount.mount.mount;
-  expect(node1 && node1.f).toBe(Node);
-
-  expect(rendered.root).toBe(1);
-  expect(rendered.memo).toBe(1);
-  expect(rendered.node).toBe(1);
-  expect(rendered.value).toBe(0);
-
-  if (trigger) trigger();
-  if (flush) flush();
-
-  expect(result.f).toBe(Root);
-  const provide2 = result.mount;
-  expect(provide2 && provide2.f).toBe(PROVIDE);
-  const memo2 = result.mount.mount;
-  expect(memo2 && memo2.f).toBe(Memo);
-  const node2 = result.mount.mount.mount;
-  expect(node2 && node2.f).toBe(Node);
-
-  expect(rendered.root).toBe(2);
-  expect(rendered.memo).toBe(1);
-  expect(rendered.node).toBe(2);
-  expect(rendered.value).toBe(0);
-
-});
-
-it("does not update memoized context if value is the same", () => {
-
-  const context = makeContext();
-
-  const rendered = {
-    root: 0,
-    memo: 0,
-    node: 0,
-    value: -1,
-  };
-  let trigger = null as Task | null;
-  const setTrigger = (f: Task) => trigger = f;
-
-  const Root = () => {
-    rendered.root++;
-
-    const [value, setValue] = useState(0);
-    setTrigger(() => setValue(1));
-
-    return provideMemo(context, 0, memoChild);
+    return provide(context, 0, memoChild);
   };
 
   const Memo = memoArgs(() => {

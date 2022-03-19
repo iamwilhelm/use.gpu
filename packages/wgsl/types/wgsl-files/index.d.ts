@@ -118,6 +118,7 @@ declare module "@use-gpu/wgsl/instance/ui/sdf.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const SDF: ParsedBundle;
+  export const getUVScale: ParsedBundle;
   export const getBorderBoxSDF: ParsedBundle;
   export const getRoundedBorderBoxSDF: ParsedBundle;
   export default __module;
@@ -137,6 +138,13 @@ declare module "@use-gpu/wgsl/instance/ui/vertex.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/vertex/full-screen.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getFullScreenVertex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/vertex/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -148,6 +156,14 @@ declare module "@use-gpu/wgsl/instance/vertex/quad.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getQuadVertex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/mask/filtered.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getFilteredFragment: ParsedBundle;
+  export const getFilteredTexture: ParsedBundle;
   export default __module;
 }
 
@@ -174,6 +190,27 @@ declare module "@use-gpu/wgsl/mask/point.wgsl" {
   export const circleOutlined: ParsedBundle;
   export const diamondOutlined: ParsedBundle;
   export const squareOutlined: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/mask/textured.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getTextureFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/use/gamma.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const toLinear: ParsedBundle;
+  export const toLinear2: ParsedBundle;
+  export const toLinear3: ParsedBundle;
+  export const toLinear4: ParsedBundle;
+  export const toGamma: ParsedBundle;
+  export const toGamma2: ParsedBundle;
+  export const toGamma3: ParsedBundle;
+  export const toGamma4: ParsedBundle;
   export default __module;
 }
 

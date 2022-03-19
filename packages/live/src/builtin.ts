@@ -9,7 +9,7 @@ import { makeFiber, getCurrentFiberID } from './fiber';
 
 export const MORPH        = () => {};
 export const DETACH       = () => {};
-export const RECONCILE    = () => {};
+export const FRAGMENT     = () => {};
 export const MAP_REDUCE   = () => {};
 export const GATHER       = () => {};
 export const MULTI_GATHER = () => {};
@@ -19,7 +19,7 @@ export const CONSUME      = () => {};
 
 (MORPH        as any).isLiveBuiltin = true;
 (DETACH       as any).isLiveBuiltin = true;
-(RECONCILE    as any).isLiveBuiltin = true;
+(FRAGMENT     as any).isLiveBuiltin = true;
 (MAP_REDUCE   as any).isLiveBuiltin = true;
 (GATHER       as any).isLiveBuiltin = true;
 (MULTI_GATHER as any).isLiveBuiltin = true;
@@ -27,7 +27,7 @@ export const CONSUME      = () => {};
 (PROVIDE      as any).isLiveBuiltin = true;
 (CONSUME      as any).isLiveBuiltin = true;
 
-(RECONCILE    as any).isLiveInline = true;
+(FRAGMENT     as any).isLiveInline = true;
 
 // use a call to a live function
 export const use = <F extends Function>(
@@ -51,12 +51,12 @@ export const detach = <F extends Function>(
 ): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key, by: getCurrentFiberID()});
 
 // Reconcile an array of calls
-export const reconcile = (
+export const fragment = (
   calls: LiveElement<any>,
   key?: Key,
 ): DeferredCall<() => void> => {
-  if (Array.isArray(calls)) return ({f: RECONCILE, args: calls, key, by: getCurrentFiberID()});
-  return ({f: RECONCILE, args: [calls], key});
+  if (Array.isArray(calls)) return ({f: FRAGMENT, args: calls, key, by: getCurrentFiberID()});
+  return ({f: FRAGMENT, args: [calls], key});
 }
 
 // Reduce a subtree

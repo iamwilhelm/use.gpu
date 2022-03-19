@@ -3,7 +3,7 @@ import { LayoutElement, Point, Dimension, Margin } from '../types';
 
 import { memo, gather, resume, yeet, useOne } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { normalizeMargin, makeBoxLayout, parseDimension } from '../lib/util';
+import { normalizeMargin, makeBoxLayout, parseDimension, memoFit } from '../lib/util';
 
 export type BlockProps = {
   direction?: 'x' | 'y',
@@ -37,11 +37,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const margin = normalizeMargin(m);
   const padding = normalizeMargin(p);
 
-  const Resume = useOne(() =>
-    makeResume(direction, width, height, grow, shrink, snap, margin, padding),
-    [direction, width, height, grow, shrink, snap, margin, padding]
-  );
-
+  const Resume = makeResume(direction, width, height, grow, shrink, snap, margin, padding);
   return children ? gather(children, Resume) : null;
 }, 'Block');
 
@@ -70,7 +66,7 @@ const makeResume = (
       margin,
       grow,
       shrink,
-      fit: (into: Point) => {
+      fit: memoFit((into: Point) => {
         const w = width != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;
         const fixed = [
@@ -83,6 +79,6 @@ const makeResume = (
           size,
           render: makeBoxLayout(sizes, offsets, renders),
         };
-      }
+      })
     });
   });

@@ -4,7 +4,7 @@ import {
   OnFiber, DeferredCall, Key,
 } from './types';
 
-import { use, reconcile, morph, DETACH, RECONCILE, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
+import { use, fragment, morph, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
 import { discardState } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies } from './util';
@@ -116,7 +116,7 @@ export const makeSubFiber = <F extends Function>(
   key?: Key,
 ): LiveFiber<F> => {
   const {host} = parent;
-  const fiber = makeFiber(node.f, host, parent, node.args ?? (node.arg ? [node.arg] : null), by, key) as LiveFiber<F>;
+  const fiber = makeFiber(node.f, host, parent, node.args ?? (node.arg !== undefined ? [node.arg] : null), by, key) as LiveFiber<F>;
   return fiber;
 }
 
@@ -275,7 +275,7 @@ export const updateFiber = <F extends Function>(
     reconcileFiberCalls(fiber, calls);
   }
   // Reconcile wrapped array
-  else if (fiberType === RECONCILE) {
+  else if (fiberType === FRAGMENT) {
     const calls = call!.args ?? EMPTY_ARRAY;
     reconcileFiberCalls(fiber, calls);
   }
@@ -299,7 +299,7 @@ export const updateFiber = <F extends Function>(
     if (!yeeted) throw new Error("Yeet without aggregator");
     bustFiberYeet(fiber);
     visitYeetRoot(fiber);
-    yeeted.emit(fiber, call!.arg ?? call!.args[0]);
+    yeeted.emit(fiber, call!.arg !== undefined ? call!.arg : call!.args[0]);
   }
   // Mount normal node (may still be built-in)
   else {
@@ -409,7 +409,7 @@ export const reconcileFiberCalls = <F extends Function>(
     order[i++] = key;
 
     // Array shorthand for nested reconciling
-    if (Array.isArray(call)) call = reconcile(call as any, key);
+    if (Array.isArray(call)) call = fragment(call as any, key);
 
     const mount = mounts.get(key);
 
@@ -643,6 +643,9 @@ export const provideFiber = <F extends Function>(
     const lastValue = ref.current;
     if (value !== lastValue) {
       ref.current = value;
+
+      // Invalidate downstream dependencies
+      pingFiber(fiber);
     }
     // If memoized and mounts are identical, stop
     else if (isMemo) {
@@ -650,9 +653,6 @@ export const provideFiber = <F extends Function>(
       if (lastCalls === calls) return;
       ref.memo = calls;
     }
-
-    // Invalidate downstream dependencies
-    pingFiber(fiber);
   }
 
   inlineFiberCall(fiber, calls);
@@ -756,8 +756,9 @@ export const updateMount = <P extends Function>(
   }
 
   if (update) {
-    const args = newMount.args ?? (newMount.arg ? [newMount.arg] : null);
-    
+    const {args: aas, arg: a} = newMount;
+    const args = aas !== undefined ? aas : (a !== undefined ? [a] : null);
+
     if (mount!.args === args && mount!.version) {
       DEBUG && console.log('Skipping', key, formatNode(newMount!));
       return false;

@@ -5,6 +5,10 @@ import { RenderContext } from '../providers/render-provider';
 import { PickingContext } from './picking';
 
 export type PassProps = {
+  transparent?: boolean,
+  opaque?: boolean,
+  picking?: boolean,
+  debug?: boolean,
   render?: () => LiveElement<any>,
   children?: LiveElement<any>,
 };
@@ -14,12 +18,17 @@ export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
 export const Pass: LiveComponent<PassProps> = memo((props: PassProps) => {
-  const {children, render} = props;
+  const {transparent, opaque, debug, picking, children, render} = props;
 
-  return multiGather(children ?? (render ? render() : null), Resume);
+  return multiGather(children ?? (render ? render() : null), makeResume(transparent, opaque, debug, picking));
 }, 'Pass');
 
-const Resume = resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
+const makeResume = (
+  transparent: boolean = true,
+  opaque: boolean = true,
+  debug: boolean = true,
+  picking: boolean = true,
+) => resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
   const renderContext = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
 
@@ -30,7 +39,10 @@ const Resume = resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
   const debugs = toArray(rs[RenderPassMode.Debug]);
   const pickings = toArray(rs[RenderPassMode.Picking]);
 
-  const visibles = [...opaques, ...transparents, ...debugs];
+  const visibles = [];
+  if (opaque) visibles.push(...opaques);
+  if (transparent) visibles.push(...transparents);
+  if (debug) visibles.push(...debugs);
 
   const renderToContext = (
     commandEncoder: GPUCommandEncoder,
@@ -52,7 +64,7 @@ const Resume = resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
     const commandEncoder = device.createCommandEncoder();
 
     renderToContext(commandEncoder, renderContext, visibles);
-    if (pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, pickings);
+    if (picking && pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, pickings);
 
     device.queue.submit([commandEncoder.finish()]);      
   });

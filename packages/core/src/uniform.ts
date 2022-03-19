@@ -82,10 +82,12 @@ export const makeBoundUniforms = <T>(
     entries.push(...uniformEntries);
   }
 
-  if (entries.length) bindGroup = device.createBindGroup({
-    layout: pipeline.getBindGroupLayout(set),
-    entries,
-  });
+  if (entries.length) {
+    bindGroup = device.createBindGroup({
+      layout: pipeline.getBindGroupLayout(set),
+      entries,
+    });
+  }
 
   return {pipe, buffer, bindGroup};
 }

@@ -64,7 +64,9 @@ export const useLinkedShader = (
 
   // Refresh bindings if buffer assignment changed
   const buffers = [] as GPUBuffer[];
-  for (const b of bindings) buffers.push(b.storage?.buffer);  
+  for (const {storage, texture} of bindings) {
+    buffers.push(storage?.buffer ?? texture?.texture);
+  }
   useMemo(() => {
     ref.bindings = bindings;
   }, buffers);

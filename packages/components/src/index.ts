@@ -11,3 +11,4 @@ export * from './providers';
 export * from './raw';
 export * from './render';
 export * from './router';
+export * from './shader';

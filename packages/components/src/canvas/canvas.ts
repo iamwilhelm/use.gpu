@@ -3,12 +3,13 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, BACKGROUND_COLOR } from '../constants';
 
 import { EventProvider, RenderContext, DeviceContext } from '../providers';
-import { provide, provideMemo, use, useMemo, useOne } from '@use-gpu/live';
+import { provide, provideMemo, use, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { makePresentationContext } from '@use-gpu/webgpu';
 import {
   makeColorState,
   makeColorAttachment,
   makeRenderTexture,
+  makeReadbackTexture,
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
@@ -46,7 +47,7 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
   const {width, height} = canvas;
 
   const renderTexture = useMemo(() =>
-    samples
+    samples > 1
     ? makeRenderTexture(
         device,
         width,
@@ -57,7 +58,7 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     : null,
     [device, width, height, presentationFormat, samples]
   );
-
+  
   const colorStates      = useOne(() => [makeColorState(presentationFormat, BLEND_PREMULTIPLIED)], presentationFormat);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, null, backgroundColor)],
@@ -80,6 +81,15 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     makePresentationContext(device, canvas, presentationFormat),
     [device, canvas, presentationFormat, width, height],
   );
+  
+  const swapView = useCallback((view?: GPUTextureView) => {
+    view = view ?? gpuContext
+      .getCurrentTexture()
+      .createView();
+
+    if (samples > 1) colorAttachments[0].resolveTarget = view; 
+    else colorAttachments[0].view = view;
+  }, [gpuContext, samples, colorAttachments])
 
   const renderContext = {
     width,
@@ -93,7 +103,9 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     depthTexture,
     depthStencilState,
     depthStencilAttachment,
+
+    swapView,
   } as CanvasRenderingContextGPU;
 
-  return provide(RenderContext, renderContext, provideMemo(DeviceContext, device, children));
+  return provide(RenderContext, renderContext, provide(DeviceContext, device, children));
 }

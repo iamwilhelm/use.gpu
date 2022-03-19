@@ -2,6 +2,20 @@ import { LiveElement } from '@use-gpu/live/types';
 import { SpanData } from '@use-gpu/text/types';
 import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, InlineRenderer } from '../types';
 
+type Fitter<T> = (into: Point) => T;
+export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
+  let last: Point | null = null;
+  let value: T | null = null;
+  return (into: Point) => {
+    if (last && last[0] === into[0] && last[1] === into[1]) {
+      return value!;
+    }
+    value = f(into);
+    last = into;
+    return value;
+  };
+}
+
 export const parseDimension = (x: string | number | null | undefined, total: number, snap: boolean = false): number => {
   if (typeof x === 'number') return snap ? Math.round(x) : x;
   if (x == null) return snap ? Math.round(total) : total;

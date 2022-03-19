@@ -36,13 +36,13 @@ export const UI: LiveComponent<AggregateProps> = (props) => {
   return gather(children, Resume);
 };
 
-const Resume = resume((items: UIAggregate[]) => {
+const Resume = resume((items: (UIAggregate | null)[]) => {
   const layers = [] as UIAggregate[][];
   const ids = [] as number[];
 
   let layer = null;
   let texture = null;
-  for (const item of items) {
+  for (const item of items) if (item) {
     if (!layer || item.texture !== texture) {
       texture = item.texture;
 

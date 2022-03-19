@@ -30,6 +30,7 @@ export type TextProps = {
 
 const BLACK = [0, 0, 0, 1];
 const NO_MARGIN = [0, 0, 0, 0];
+const NO_STROKE = [0.0, 0.0, 0.0, 0.0];
 
 export const Text: LiveComponent<TextProps> = (props) => {
   const {
@@ -131,18 +132,17 @@ export const Text: LiveComponent<TextProps> = (props) => {
         }
       }, startIndex, endIndex);
 
-      const render = {
+      const render = count ? {
         rectangles: rects,
         radius: [1 / scale, getRadius(), 0, 0],
-        fill: [0.5, 0.5, 0.5, 1.0],
-        stroke: [1.0, 1.0, 1.0, 1.0],
+        fill: color,
+        stroke: NO_STROKE,
         texture: source,
         uvs: uvs,
         repeat: -1,
 
         count,
-      };
-      console.log(scale)
+      } : null;
 
       //return use(() => yeet(render))();
       return yeet(render);

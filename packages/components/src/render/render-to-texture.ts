@@ -1,6 +1,6 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { use, provide, gather, useContext, useMemo, useOne } from '@use-gpu/live';
+import { use, provide, resume, gather, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { FrameContext } from '../providers/frame-provider';
@@ -8,22 +8,26 @@ import { FrameContext } from '../providers/frame-provider';
 import {
   makeColorState,
   makeColorAttachment,
-  makeRenderTexture,
+  makeRenderableTexture,
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
+  makeTextureView,
+  BLEND_PREMULTIPLIED,
 } from '@use-gpu/core';
 
 export type RenderToTextureProps = {
   width: number,
   height: number,
+  live?: boolean,
 
   presentationFormat?: GPUTextureFormat,
   depthStencilFormat?: GPUTextureFormat | null,
   backgroundColor?: GPUColor,
   samples?: number,
 
-  children?: LiveElement<any>, 
+  children?: LiveElement<any>,
+  then?: (targetTexture: GPUTexture) => LiveElement<any>,
 };
 
 export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
@@ -37,18 +41,23 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     presentationFormat = PRESENTATION_FORMAT,
     depthStencilFormat = DEPTH_STENCIL_FORMAT,
     backgroundColor = EMPTY_COLOR,
+    live = true,
     children,
+    then,
   } = props;
 
+  if (live) useContext(FrameContext);
+  else useNoContext(FrameContext);
+
   const [renderTexture, resolveTexture] = useMemo(() => [
-      makeRenderTexture(
+      makeRenderableTexture(
         device,
         width,
         height,
         presentationFormat,
         samples,
       ),
-      samples > 1 ? makeRenderTexture(
+      samples > 1 ? makeRenderableTexture(
         device,
         width,
         height,
@@ -57,8 +66,10 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     ] as [GPUTexture, GPUTexture | null],
     [device, width, height, presentationFormat, samples]
   );
+  
+  const targetTexture = resolveTexture ?? renderTexture;
 
-  const colorStates      = useOne(() => [makeColorState(presentationFormat)], presentationFormat);
+  const colorStates      = useOne(() => [makeColorState(presentationFormat, BLEND_PREMULTIPLIED)], presentationFormat);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, resolveTexture, backgroundColor)],
     [renderTexture, resolveTexture, backgroundColor]
@@ -80,9 +91,8 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     },
     [device, width, height, depthStencilFormat, samples]
   );
-
-  const frame = useOne(() => ({current: 0}));
-  frame.current++;
+  
+  const swapView = useOne(() => () => {});
 
   const rttContext = useMemo(() => ({
     ...renderContext,
@@ -93,14 +103,27 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     depthTexture,
     depthStencilState,
     depthStencilAttachment,
+    swapView,
   }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment]);
+
+  const source = useMemo(() => ({
+    texture: targetTexture,
+    view: makeTextureView(targetTexture),
+    sampler: {},
+    layout: 'texture_2d<f32>',
+    format: presentationFormat,
+    size: [width, height],
+    version: 0,
+  }), [targetTexture, width, height, presentationFormat]);
 
   const view = provide(RenderContext, rttContext, children);
   const Done = useOne(() =>
-    (ts: Task[]) => {
+    resume((ts: Task[]) => {
       for (let task of ts) task();
-    },
-  );
+      return then && then(source);
+    })
+  , source);
 
-  return provide(FrameContext, frame.current, gather(view, Done));
+  source.version++;
+  return gather(provide(FrameContext, source.version, view), Done);
 }

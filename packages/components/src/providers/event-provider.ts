@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { PickingUniforms } from '@use-gpu/core/types';
 
-import { memo, provide, provideMemo, makeContext, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { memo, provide, makeContext, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { makeIdAllocator, PICKING_UNIFORMS } from '@use-gpu/core';
 import { PickingContext } from '../render/picking';
 
@@ -134,6 +134,6 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({element, 
   }, [element]);
 
   return provide(MouseContext, mouseContext,
-    provideMemo(EventContext, eventApi, children)
+    provide(EventContext, eventApi, children)
   );
 }, 'EventProvider');

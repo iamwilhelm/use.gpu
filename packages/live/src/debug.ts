@@ -53,8 +53,8 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
   else if (name === 'MULTI_GATHER') {
     name = `MultiGather`;
   }
-  else if (name === 'RECONCILE') {
-    name = `Reconcile`;
+  else if (name === 'FRAGMENT') {
+    name = `Fragment`;
   }
   else if (name === 'MAP_REDUCE') {
     name = `MapReduce`;

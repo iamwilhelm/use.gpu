@@ -111,6 +111,11 @@
       "import": "./src/instance/ui/vertex.wgsl",
       "require": "./src/instance/ui/vertex.wgsl"
     },
+    "./instance/vertex/full-screen.wgsl": {
+      "types": "./src/instance/vertex/full-screen.d.ts",
+      "import": "./src/instance/vertex/full-screen.wgsl",
+      "require": "./src/instance/vertex/full-screen.wgsl"
+    },
     "./instance/vertex/line.wgsl": {
       "types": "./src/instance/vertex/line.d.ts",
       "import": "./src/instance/vertex/line.wgsl",
@@ -120,6 +125,11 @@
       "types": "./src/instance/vertex/quad.d.ts",
       "import": "./src/instance/vertex/quad.wgsl",
       "require": "./src/instance/vertex/quad.wgsl"
+    },
+    "./mask/filtered.wgsl": {
+      "types": "./src/mask/filtered.d.ts",
+      "import": "./src/mask/filtered.wgsl",
+      "require": "./src/mask/filtered.wgsl"
     },
     "./mask/masked.wgsl": {
       "types": "./src/mask/masked.d.ts",
@@ -135,6 +145,16 @@
       "types": "./src/mask/point.d.ts",
       "import": "./src/mask/point.wgsl",
       "require": "./src/mask/point.wgsl"
+    },
+    "./mask/textured.wgsl": {
+      "types": "./src/mask/textured.d.ts",
+      "import": "./src/mask/textured.wgsl",
+      "require": "./src/mask/textured.wgsl"
+    },
+    "./use/gamma.wgsl": {
+      "types": "./src/use/gamma.d.ts",
+      "import": "./src/use/gamma.wgsl",
+      "require": "./src/use/gamma.wgsl"
     },
     "./use/light.wgsl": {
       "types": "./src/use/light.d.ts",

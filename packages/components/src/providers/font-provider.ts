@@ -1,9 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { GPUTextContext } from '@use-gpu/text/types';
 
-import { provideMemo, useAsync, useContext, useMemo, makeContext } from '@use-gpu/live';
-import { GPUText, glyphToRGBA, glyphToSDF } from '@use-gpu/text';
-import { AtlasMapping, makeAtlas, makeSourceTexture, makeTextureView, uploadAtlasMapping } from '@use-gpu/core';
+import { provide, useAsync, useContext, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { GPUText, glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
+import { AtlasMapping, makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
 import { DeviceContext } from '../providers/device-provider';
 
 export const FontContext = makeContext(null, 'FontContext');
@@ -30,7 +30,7 @@ const roundUp2 = (v: number) => {
   return v;
 };
 
-const getNearestScale = (size: number) => roundUp2(size); 
+const getNearestScale = (size: number) => roundUp2(Math.max(32, size));
 
 const hashGlyph = (id: number, size: number) => (id << 16) + size;
 
@@ -43,32 +43,22 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
 
   const device = useContext(DeviceContext);
   const gpuText = useAsync(GPUText);
-  
+
+  const width = 200;
+  const height = 200;
+  const pad = 10;
+  const radius = 10;
+
+  const format = "rgba8unorm" as GPUTextureFormat;
+
+  const glyphs = useOne(() => new Map<number, GlyphCache>());
+  const atlas = useOne(() => makeAtlas(width, height));
+  const [source, setSource] = useState<TextureSource>(() => makeAtlasSource(device, atlas, format));
+
   const context = useMemo(() => {
     if (!gpuText) return null;
 
-    const width = 1024;
-    const height = 1024;
-    const pad = 10;
-    const radius = 10;
-    const atlas = makeAtlas(width, height);
-
-    const format = "rgba8unorm" as GPUTextureFormat;
-    const texture = makeSourceTexture(device, atlas.width, atlas.height, 1, format);
-    const source = {
-      texture,
-      view: makeTextureView(texture),
-      sampler: {
-        minFilter: 'linear',
-        magFilter: 'linear',
-      } as GPUSamplerDescriptor,
-      layout: 'texture_2d<f32>',
-      format,
-      size: [width, height],
-      version: 1,
-    };
-
-    const glyphs = new Map<number, GlyphCache>();
+    let s = source;
 
     const getRadius = () => radius;
     const getScale = (size: number) => size / getNearestScale(size);
@@ -78,22 +68,36 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
       const cache = glyphs.get(key);
       if (cache) return cache;
 
-      const glyph = gpuText.measureGlyph(id, scale);
+      let glyph = gpuText.measureGlyph(id, scale);
       let mapping: AtlasMapping | null = null;
 
       const {image, width: w, height: h, outlineBounds: ob} = glyph;
       if (image && w && h) {
         const {data, width, height} = glyphToSDF(image, w, h, pad, radius);
+        glyph.outlineBounds = padRectangle(ob, pad);
+        glyph.image = data;
 
-        ob[0] -= pad;
-        ob[1] -= pad;
-        ob[2] += pad;
-        ob[3] += pad;
+        try {
+          mapping = atlas.place(key, width, height);
+        }
+        catch (e) {
+          debugger;
+        }
+        if (!mapping) {
+          debugger;
+          atlas.expand();
+          mapping = atlas.place(key, width, height);
+          if (!mapping) {
+            throw new Error('atlas place failed');
+          }
 
-        mapping = atlas.place(id, width, height);
+          s = resizeTextureSource(device, s, atlas.width, atlas.height);
+          setSource(s);
+        }
+
         uploadAtlasMapping(
           device,
-          texture,
+          s.texture,
           format,
           data,
           mapping,
@@ -102,7 +106,7 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
 
       const entry = {glyph, mapping};
       glyphs.set(key, entry);
-      source.version++;
+      s.version = incrementVersion(s.version);
 
       return entry;
     };
@@ -110,13 +114,12 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
     return {
       gpuText,
       atlas,
-      texture,
       source,
       getRadius,
       getScale,
       getGlyph,
     };
-  }, [gpuText]);
+  }, [gpuText, atlas, source]);
 
-  return gpuText ? provideMemo(FontContext, context, children) : null;
+  return gpuText ? provide(FontContext, context, children) : null;
 };

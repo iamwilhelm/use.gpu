@@ -23,6 +23,7 @@ import { GeometryPage } from './pages/geometry';
 import { InteractPage } from './pages/interact';
 import { LayoutPage } from './pages/layout';
 import { AtlasPage } from './pages/atlas';
+import { RTTPage } from './pages/rtt';
 import { EmptyPage } from './pages/empty';
 
 export type AppProps = {
@@ -46,6 +47,7 @@ export const App: LiveComponent<AppProps> = (props) => {
             "layout": { element: use(LayoutPage)({ }) },
             "interact": { element: use(InteractPage)({ }) },
             "atlas": { element: use(AtlasPage)({ }) },
+            "rtt": { element: use(RTTPage)({ canvas }) },
             "": { element: use(GeometryPage)({ canvas }) },
             "*": { element: use(EmptyPage)({ }) },
           },

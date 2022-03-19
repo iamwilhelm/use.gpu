@@ -72,6 +72,12 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
     };
   }, [image?.texture, image?.repeat]);
 
+  if (sampledTexture) {
+    sampledTexture.texture = image.texture.texture;
+    sampledTexture.view = image.texture.view;
+    sampledTexture.size = image.texture.size;
+  }
+
   let render;
   if (image) {
     const {

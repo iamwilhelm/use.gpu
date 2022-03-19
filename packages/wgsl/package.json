@@ -151,6 +151,11 @@
       "import": "./src/mask/textured.wgsl",
       "require": "./src/mask/textured.wgsl"
     },
+    "./use/color.wgsl": {
+      "types": "./src/use/color.d.ts",
+      "import": "./src/use/color.wgsl",
+      "require": "./src/use/color.wgsl"
+    },
     "./use/gamma.wgsl": {
       "types": "./src/use/gamma.d.ts",
       "import": "./src/use/gamma.wgsl",

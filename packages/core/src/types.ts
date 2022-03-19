@@ -15,6 +15,8 @@ export type UseRenderingContextGPU = {
   device: GPUDevice,
 
   gpuContext: GPUCanvasContext,
+  colorSpace: ColorSpace,
+  colorInput: ColorSpace,
   colorStates: GPUColorTargetState[],
   colorAttachments: GPURenderPassColorAttachment[],
   targetTexture: GPUTexture,
@@ -24,6 +26,8 @@ export type UseRenderingContextGPU = {
 
   swapView: (view: GPUTextureView) => void,
 };
+
+export type ColorSpace = 'linear' | 'srgb' | 'p3';
 
 export type TypedArray =
   Int8Array |
@@ -171,6 +175,7 @@ export type TextureSource = {
   sampler: GPUSampler | GPUSamplerDescriptor,
   layout: string,
   format: string,
+  colorSpace?: ColorSpace,
   size: [number, number] | [number, number, number],
   version: number,
 };

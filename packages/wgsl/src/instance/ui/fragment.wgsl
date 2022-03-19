@@ -52,6 +52,7 @@ fn main(
   if (mask == 0.0) { discard; }
 
   var color = mix(fragStroke, fillColor, clamp(sdf.inner + (1.0 - mask), 0.0, 1.0));
+  color = color * fillColor.a;
   color = color * mask;
 
   return color;

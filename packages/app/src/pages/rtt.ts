@@ -2,8 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
-import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
-import { bindBundle } from '@use-gpu/shader/wgsl';
+import { use, useMemo, useOne, useResource, useState, memoArgs } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat, UI, Layout, Absolute, Inline, Text,
@@ -27,9 +26,6 @@ const data = seq(10).map((i) => ({
   position: [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1],
   size: Math.random() * 50 + 10,
 }));
-
-import { toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
-import { getFilteredTexture } from '@use-gpu/wgsl/mask/filtered.wgsl';
 
 const quadFields = [
   ['vec4<f32>', 'position'],
@@ -71,13 +67,35 @@ export const RTTPage: LiveComponent<RTTPageProps> = (props) => {
   const texture = makeTexture();
   const {canvas} = props;
 
+  const Post = memoArgs(
+    (rtt: TextureSource) =>
+      use(Pass)({
+        picking: false,
+        children: [
+      
+          use(TextureShader)({
+            texture: rtt,
+            render: (getTexture: ShaderModule) => 
+              use(RawFullScreen)({
+                getTexture,
+              }),
+          }),
+
+        ]
+      }),
+      'Post',
+  );
+
   const view = [
     use(RenderToTexture)({
+      presentationFormat: "rgba16float",
+      colorSpace: 'linear',
       children: [
         use(Raw)(() => {
           t = t + 1/60;
         }),
         use(Pass)({
+          picking: true,
           children: [
             use(CompositeData)({
               fields: lineDataFields,
@@ -149,41 +167,29 @@ export const RTTPage: LiveComponent<RTTPageProps> = (props) => {
                             use(Inline)({
                               children: [
                     
-                                use(Text)({ size: 32, color: [1, 1, 1, 1], content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
+                                use(Text)({ size: 32, color: [0.5, 0.5, 0.5, 1], content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
                   
                               ],
                             }),
 
                           ],
                         }),
+                        
+                    })
                       
                 })
-              })
-            })
+
+            }),
+            
           ],
         }),
       ],
-      then: (rtt: TextureSource) =>
+      then: (texture) =>  
         use(Draw)({
           live: true,
-          children: [
-
-            use(Pass)({
-              picking: false,
-              children: [
-              
-                use(TextureShader)({
-                  texture: rtt,
-                  render: (getTexture: ShaderModule) => 
-                    use(RawFullScreen)({
-                      getTexture: bindBundle(getFilteredTexture, {getColor: toGamma4, getTexture}),
-                    }),
-                })
-
-              ]
-            }),
-          ],
-        })
+          children:
+            use(Post)(texture),
+        }),
     }),
   ];
 

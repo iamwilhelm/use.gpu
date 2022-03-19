@@ -1,7 +1,8 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
+import { ColorSpace } from '@use-gpu/core/types';
 import { use, provide, resume, gather, useContext, useMemo, useOne } from '@use-gpu/live';
-import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, EMPTY_COLOR } from '../constants';
+import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { FrameContext } from '../providers/frame-provider';
 
@@ -24,6 +25,8 @@ export type RenderToTextureProps = {
   presentationFormat?: GPUTextureFormat,
   depthStencilFormat?: GPUTextureFormat | null,
   backgroundColor?: GPUColor,
+  colorSpace?: ColorSpace,
+  colorInput?: ColorSpace,
   samples?: number,
 
   children?: LiveElement<any>,
@@ -41,6 +44,8 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     presentationFormat = PRESENTATION_FORMAT,
     depthStencilFormat = DEPTH_STENCIL_FORMAT,
     backgroundColor = EMPTY_COLOR,
+    colorSpace = COLOR_SPACE,
+    colorInput = COLOR_SPACE,
     live = true,
     children,
     then,
@@ -98,6 +103,8 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     ...renderContext,
     width,
     height,
+    colorSpace,
+    colorInput,
     colorStates,
     colorAttachments,
     depthTexture,
@@ -112,6 +119,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     sampler: {},
     layout: 'texture_2d<f32>',
     format: presentationFormat,
+    colorSpace,
     size: [width, height],
     version: 0,
   }), [targetTexture, width, height, presentationFormat]);

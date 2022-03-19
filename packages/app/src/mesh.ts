@@ -5,6 +5,7 @@ import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useSta
 import {
   makeVertexBuffers, makeRawSourceTexture, makeMultiUniforms,
   makeRenderPipeline, makeShaderModule, makeSampler, makeTextureBinding,
+  getColorSpace,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle } from '@use-gpu/shader/wgsl';
@@ -55,7 +56,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
-  const {device, colorStates, depthStencilState, samples} = renderContext;
+  const {device, colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
 
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
@@ -66,6 +67,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     return t;
   }, [device, texture]);
 
+  const cs = getColorSpace(colorInput, colorSpace);
   const defines = {
     '@group(VIEW)': '@group(0)',
     '@binding(VIEW)': '@binding(0)',
@@ -73,6 +75,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     '@binding(LIGHT)': '@binding(1)',
     '@group(PICKING)': '@group(0)',
     '@binding(PICKING)': '@binding(1)',
+    'COLOR_SPACE': cs,
   };
 
   // Render shader

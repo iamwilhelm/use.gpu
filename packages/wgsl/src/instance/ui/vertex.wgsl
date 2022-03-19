@@ -1,5 +1,6 @@
 use '@use-gpu/wgsl/use/view'::{ worldToClip };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
+use "@use-gpu/wgsl/use/color"::{toColorSpace};
 
 struct VertexOutput {
   @builtin(position)              position: vec4<f32>;
@@ -53,8 +54,8 @@ fn main(
     radius,
     mode,
     border,
-    stroke,
-    fill,
+    toColorSpace(stroke),
+    toColorSpace(fill),
     repeat,
     uv,
     texUV,

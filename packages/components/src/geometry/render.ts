@@ -9,6 +9,7 @@ import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useRes
 import {
   makeMultiUniforms, makeBoundUniforms,
   makeRenderPipeline,
+  getColorSpace,
   uploadBuffer,
 } from '@use-gpu/core';
 import { useLinkedShader } from '../hooks/useLinkedShader';
@@ -52,11 +53,12 @@ export const render = (props: RenderProps) => {
   // Render set up
   const {viewUniforms, viewDefs} = useContext(ViewContext);
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
-  const {device} = renderContext;
+  const {device, colorInput, colorSpace} = renderContext;
 
   // Render shader
   // TODO: non-strip topology
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
+  const cs = getColorSpace(colorInput, colorSpace);
 
   const defines = useMemo(() => ({
     '@group(VIEW)': '@group(0)',
@@ -64,6 +66,7 @@ export const render = (props: RenderProps) => {
     '@group(PICKING)': '@group(0)',
     '@binding(PICKING)': '@binding(1)',
     '@group(VIRTUAL)': '@group(1)',
+    'COLOR_SPACE': cs,
     ...propDefines,
   }), [propDefines]);
 

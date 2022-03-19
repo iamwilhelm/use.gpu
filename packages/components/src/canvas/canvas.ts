@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, BACKGROUND_COLOR } from '../constants';
+import { ColorSpace } from '@use-gpu/core/types';
+import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLOR } from '../constants';
 
 import { EventProvider, RenderContext, DeviceContext } from '../providers';
 import { provide, provideMemo, use, useCallback, useMemo, useOne } from '@use-gpu/live';
@@ -24,6 +25,8 @@ export type CanvasProps = {
   presentationFormat?: GPUTextureFormat,
   depthStencilFormat?: GPUTextureFormat,
   backgroundColor?: GPUColor,
+  colorSpace?: ColorSpace,
+  colorInput?: ColorSpace,
   samples?: number,
   pixelRatio?: number,
 
@@ -41,6 +44,8 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     presentationFormat = PRESENTATION_FORMAT,
     depthStencilFormat = DEPTH_STENCIL_FORMAT,
     backgroundColor = BACKGROUND_COLOR,
+    colorSpace = COLOR_SPACE,
+    colorInput = COLOR_SPACE,
     samples = 1
   } = props;
 
@@ -98,6 +103,8 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     samples,
     device,
     gpuContext,
+    colorSpace,
+    colorInput,
     colorStates,
     colorAttachments,
     depthTexture,

@@ -83,8 +83,8 @@ export const FontProvider: LiveComponent<FontProviderProps> = ({children}) => {
         catch (e) {
           debugger;
         }
+
         if (!mapping) {
-          debugger;
           atlas.expand();
           mapping = atlas.place(key, width, height);
           if (!mapping) {

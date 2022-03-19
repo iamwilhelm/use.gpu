@@ -15,6 +15,15 @@ export type MakeCastAccessor = (
   swizzle: string,
 ) => string;
 
+export const toTypeString = (t: Type): string => {
+  if (typeof t === 'object') {
+    if (t.type) return toTypeString(t.type);
+    if (t.args) return `${t.name}<${t.args.map(t => toTypeString(t)).join(',')}>`;
+    else return t.name;
+  }
+  return t;
+}
+
 export const makeCastTo = (
   makeCastAccessor: MakeCastAccessor,
 ) => (
@@ -73,7 +82,7 @@ export const bundleToAttribute = (
     const {func} = fn;
     const {type, name, parameters} = func;
     if (name === entry) {
-      return {name, format: type.name, args: parameters};
+      return {name, format: toTypeString(type), args: parameters};
     }
   }
 

@@ -58,6 +58,10 @@ export {
 } from './cast';
 
 export {
+  chainTo,
+} from './chain';
+
+export {
   linkBundle,
   linkModule,
   linkCode,

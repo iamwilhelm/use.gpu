@@ -1,4 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
+use "@use-gpu/wgsl/use/color"::{ toColorSpace };
 
 @external fn getVertex(v: i32, i: i32) -> SolidVertex {};
 
@@ -17,7 +18,7 @@ fn main(
 
   return VertexOutput(
     v.position,
-    v.color,
+    toColorSpace(v.color),
     v.uv,
   );
 }

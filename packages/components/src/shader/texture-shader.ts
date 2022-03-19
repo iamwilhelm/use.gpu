@@ -4,7 +4,11 @@ import { ShaderModule } from '@use-gpu/shader/wgsl/types';
 
 import { yeet, useFiber, useMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import { makeShaderBindings } from '@use-gpu/core';
-import { bindingToModule } from '@use-gpu/shader/wgsl';
+import { bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
+
+import { RenderContext } from '../providers/render-provider';
+
+import { toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
 
 export type TextureShaderProps = {
   texture?: TextureSource,
@@ -16,6 +20,8 @@ const TEXTURE_BINDINGS = [
 ];
 
 export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
+  const { colorSpace } = useContext(RenderContext);
+
   const {
     texture,
     render,
@@ -25,7 +31,13 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
   
   const getTexture = useMemo(() => {
     const [textureBinding] = makeShaderBindings<ShaderModule>(TEXTURE_BINDINGS, [texture]);
-    const getTexture = bindingToModule(textureBinding);
+    let getTexture = bindingToModule(textureBinding);
+
+    const {colorSpace: colorInput} = texture;
+    if (colorInput && colorInput !== colorSpace) {
+      getTexture = chainTo(getTexture, toGamma4);
+    }
+
     return getTexture;
   }, [texture]);
 

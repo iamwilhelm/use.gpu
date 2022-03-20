@@ -1,4 +1,4 @@
-import { TextureSource } from '@use-gpu/core/types';
+import { TextureSource, TupleStore } from '@use-gpu/core/types';
 import { LiveElement, Key } from '@use-gpu/live/types';
 import { FontMetrics, TextMetrics } from '@use-gpu/text/types';
 
@@ -29,7 +29,7 @@ export type ImageAttachment = {
 };
 
 export type LayoutRenderer = (box: Rectangle) => LiveElement<any>;
-export type InlineRenderer = (box: Rectangle, start: number, end: number, spacing: number) => LiveElement<any>;
+export type InlineRenderer = (lines: InlineLine[]) => LiveElement<any>;
 
 export type LayoutFit = {
   size: Point,
@@ -48,7 +48,7 @@ export type LayoutElement = {
 };
 
 export type InlineElement = {
-  spans: InlineSpan[],
+  spans: TupleStore<4>,
   height: FontMetrics,
   absolute?: boolean,
   render: InlineRenderer,
@@ -59,6 +59,13 @@ export type InlineSpan = {
   end: number,
   hard: boolean,
   width: TextMetrics,
+};
+
+export type InlineLine = {
+  layout: Rectangle,
+  start: number,
+  end: number,
+  gap: number,
 };
 
 export type UIAggregate = {

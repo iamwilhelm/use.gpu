@@ -32,7 +32,7 @@ export const AtlasPage: LiveComponent<AtlasPageProps> = (props) => {
                   children: [
 
                     use(UI)({
-                      children: 
+                      children: [
 
                         use(Layout)({
                           children:
@@ -55,12 +55,12 @@ export const AtlasPage: LiveComponent<AtlasPageProps> = (props) => {
                               ],
                             }),
                         }),
+                        use(DebugAtlas)({texture}),
+
+                      ]
 
                     }),
-                
-
-                    use(DebugAtlas)({texture}),
-                
+                                
                   ],
                 })
             )),

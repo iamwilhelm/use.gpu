@@ -26,7 +26,6 @@ export const makeChainTo = (
   const {module: fromModule, virtual: fromVirtual} = toBundle(from);
   const {module: toModule, virtual: toVirtual} = toBundle(to);
 
-  console.log(from, to)
   const {name: fromName, format: fromFormat, args: fromArgs} = bundleToAttribute(from);
   const {name: toName, format: toFormat, args: toArgs} = bundleToAttribute(to);
 
@@ -41,7 +40,8 @@ export const makeChainTo = (
   const {table: {hash: h1}} = fromModule;
   const {table: {hash: h2}} = toModule;
 
-  const rehash = getProgramHash(`#chain [${fromName} ${toName} ${type}] ${h1} ${h2}`);
+  const code = `@chain [${fromName} ${toName}] ${h1} ${h2}`;
+  const rehash = getProgramHash(code);
   const symbols = ['chain', 'from', 'to'];
 
   const namespace1 = `${PREFIX_CHAIN}${rehash.slice(0, 6)}_1`;
@@ -74,7 +74,9 @@ export const makeChainTo = (
     { render },
     { symbols, modules },
     'chain',
+    0,
     rehash,
+    code,
   );
 
   const revirtual = [];

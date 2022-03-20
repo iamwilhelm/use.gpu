@@ -3,6 +3,7 @@ import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gp
 import { UIAggregate } from './types';
 
 import { RenderContext } from '../providers/render-provider';
+import { SDFFontProvider, SDF_FONT_ATLAS } from '../providers/sdf-font-provider';
 import { use, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
@@ -33,16 +34,36 @@ const getItemSummary = (items: UIAggregate[]) => {
 
 export const UI: LiveComponent<AggregateProps> = (props) => {
   const {children} = props;
-  return gather(children, Resume);
+  return use(SDFFontProvider)({
+    children,
+    then: Resume,
+  });
 };
 
-const Resume = resume((items: (UIAggregate | null)[]) => {
+const Resume = resume((
+  atlas: Atlas,
+  source: TextureSource,
+  items: (UIAggregate | null)[],
+) => {
   const layers = [] as UIAggregate[][];
   const ids = [] as number[];
 
+  const {width, height} = atlas;
+  const mapUV = (xs: number[]) => xs.map((x, i) => (i % 2) ? x / height : x / width);
+
   let layer = null;
   let texture = null;
-  for (const item of items) if (item) {
+  for (let item of items) if (item) {
+
+    if (item.texture === SDF_FONT_ATLAS) {
+      item = {
+        ...item,
+        texture: source,
+      };
+      if (item.uv) item.uv = mapUV(item.uv);
+      if (item.uvs) item.uvs = mapUV(item.uvs);
+    }
+
     if (!layer || item.texture !== texture) {
       texture = item.texture;
 

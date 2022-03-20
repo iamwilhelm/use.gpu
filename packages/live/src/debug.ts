@@ -85,8 +85,13 @@ export const formatNode = <F extends Function>(node: DeferredCall<F>): string =>
       const [context,,, isMemo] = node.args;
       args.push(formatValue(context));
     }
+    else if (node.f.name === 'MORPH') {
+      args.push(formatValue(node.args));
+    }
     else {
-      args.push(...node.args?.map(x => formatValue(x)));
+      if (Array.isArray(node.args)) {
+        args.push(...node.args?.map(x => formatValue(x)));
+      }
     }
   }
   if (args?.length) args.unshift('');

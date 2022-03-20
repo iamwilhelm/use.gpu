@@ -67,11 +67,14 @@ export const loadVirtualModule = <T extends SymbolTable = any>(
   initTable: Partial<T> = EMPTY_TABLE,
   entry?: string,
   key: string | number = makeKey(),
+  hash?: string | number,
+  code?: string,
 ) => {
   let symbols = initTable.symbols ?? EMPTY_LIST;
-  const code = `#virtual [${symbols.join(' ')}] ${key.toString(16)}`;
 
-  const hash = getProgramHash(code);
+  code = code ?? `@virtual [${symbols.join(' ')}] ${key.toString(16)}`;
+  hash = hash ?? getProgramHash(code);
+
   const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;
 
   const table = {

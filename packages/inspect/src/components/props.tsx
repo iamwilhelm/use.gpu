@@ -65,11 +65,11 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
     }
   }
 
-	let yt = yeeted?.value != null ? (<>
-		<Spacer />
-	  <div><b>Yeeted</b></div>
-	  <div>{inspectObject(yeeted?.value, state, toggleState, '')}</div>
-	</>) : null;
+  let yt = yeeted?.value != null ? (<>
+    <Spacer />
+    <div><b>Yeeted</b></div>
+    <div>{inspectObject(yeeted?.value, state, toggleState, '')}</div>
+  </>) : null;
 
   let history = null as React.ReactNode | null;
   let parent = fiber;
@@ -89,7 +89,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   return (<>
     <div><b>{name}</b></div>
     <div>{inspectObject(props, state, toggleState, '')}</div>
-		{yt}
+    {yt}
     <Spacer />
     <div><b>Rendered By</b></div>
     <div>{history}</div>

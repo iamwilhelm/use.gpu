@@ -1,5 +1,6 @@
 import { makeTextureDataLayout, makeDynamicTexture, makeTextureView, uploadTexture } from './texture';
-import { AtlasMapping, Atlas, TextureSource } from './types';
+import { Rectangle, Atlas, TextureSource } from './types';
+import uniq from 'lodash/uniq';
 
 type Rectangle = [number, number, number, number];
 type Point = [number, number];
@@ -32,6 +33,8 @@ export const makeAtlasSource = (
 export const makeAtlas = (
   width: number,
   height: number,
+  maxWidth: number = 4096,
+  maxHeight: number = 4096,
   snap: number = 1,
 ) => {
   
@@ -41,7 +44,7 @@ export const makeAtlas = (
   const bs: Bins = new Map();
   const slots: Bin = new Set();
 
-  const place = (key: number, w: number, h: number): AtlasMapping => {    
+  const place = (key: number, w: number, h: number): Rectangle => {
     if (map.get(key)) throw new Error("key mapped already", key);
 
     const cw = Math.ceil(w / snap) * snap;
@@ -49,39 +52,44 @@ export const makeAtlas = (
 
     const slot = getNextAvailable(cw, ch, true);
     if (!slot) {
-      console.warn('atlas full?', w, h);
-      return null;
+      expand();
+      return place(key, w, h);
     }
 
     const [x, y] = slot;
     const rect = [x, y, x + w, y + h];
-    const uv = [rect[0] / width, rect[1] / height, rect[2] / width, rect[3] / height];
 
     if (snap) {
       const clip = [x, y, x + cw, y + ch];
       clipRectangle(clip);
     }
     else clipRectangle(rect);
-
-    const placement = {key, rect, uv};
-    map.set(key, placement);
-    return placement;
+    map.set(key, rect);
+    return rect;
   };
   
   const expand = () => {
     const w = width * 2;
     const h = height * 2;
+    
+    if (w > maxWidth || h > maxHeight) {
+      throw new Error(`Atlas is full and can't expand any more (${maxWidth}x${maxHeight})`);
+    }
 
     const slot = [0, 0, w, h, w, h, 1];
     const splits = subtractRectangle(slot, [0, 0, width, height]);
     for (const s of splits) addSlot(s);
 
-    for (const k of map.keys()) {
-      const r = map.get(k);
-      r.uv[0] /= 2;
-      r.uv[1] /= 2;
-      r.uv[2] /= 2;
-      r.uv[3] /= 2;
+    const expandX = Array.from(rs.get(width).values());
+    const expandY = Array.from(bs.get(height).values());
+    const expand = uniq([...expandX, ...expandY]);
+
+    for (const s of expand) removeSlot(s);
+    for (const s of expand) {
+      let [l, t, r, b, sx, sy, corner] = s;
+      if (r === width) r = w;
+      if (b === height) b = h;
+      addSlot([l, t, r, b, sx, sy, corner]);
     }
 
     self.width = width = w;
@@ -158,7 +166,7 @@ export const makeAtlas = (
     if (bsb.size === 0) bs.delete(b);
   };
   
-  const map = new Map<number, AtlasMapping>();
+  const map = new Map<number, Rectangle>();
 
   const getNextAvailable = (w: number, h: number, debug: boolean = false) => {
     let slot: Slot | null = null;
@@ -224,7 +232,7 @@ export const makeAtlas = (
   const debugSlots = () => Array.from(slots.values()).map(s => s);
 
   const debugValidate = () => {
-    const rects = debugPlacements().map(({rect}) => rect);
+    const rects = debugPlacements();
     let n = rects.length;
     
     const out: Caret[] = [];
@@ -276,9 +284,8 @@ export const uploadAtlasMapping = (
   texture: GPUTexture,
   format: GPUTextureFormat,
   data: Uint8Array,
-  mapping: AtlasMapping,
+  rect: Rectangle,
 ): void => {
-  const {rect} = mapping;
   const [l, t, r, b] = rect;
 
   const offset = [l, t] as Point;

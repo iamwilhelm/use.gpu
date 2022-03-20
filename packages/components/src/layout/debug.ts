@@ -1,56 +1,18 @@
-
-import { use, useContext } from '@use-gpu/live';
-import { UI } from './ui';
-import { Surface } from './surface';
+import { use, yeet, useContext, useFiber } from '@use-gpu/live';
+import { Surface } from './shape/surface';
 import { CompositeData } from '../data';
 import { Lines } from '../layers';
-import { FontContext } from '../providers/font-provider';
-//import { makeAtlas } from '@use-gpu/core';
+import { SDFFontContext, SDF_FONT_ATLAS } from '../providers/sdf-font-provider';
 
 export const DebugAtlas = ({texture}) => {
-  const {atlas, source} = useContext(FontContext);
+  const {atlas} = useContext(SDFFontContext);
   const {map, width, height, debugPlacements, debugSlots, debugValidate} = atlas;  
-
-	/*
-    const atlas = makeAtlas(1500, 1500);
-    atlas.place(0, 100, 100);
-    atlas.place(1, 110, 90);
-    atlas.place(2, 75, 120);
-    atlas.place(3, 50, 50);
-    atlas.place(4, 150, 100);
-    atlas.place(5, 250, 100);
-    atlas.place(6, 350, 100);
-    atlas.place(7, 600, 600);
-    atlas.place(8, 140, 100);
-    atlas.place(9, 450, 200);
-    atlas.place(10, 140, 100);
-    atlas.place(11, 140, 100);
-    atlas.place(12, 250, 100);
-    atlas.place(13, 80, 100);
-
-    for (let i = 0; i < 1; ++i)
-      atlas.place(15 + i, 95, 90);
-      for (let i = 0; i < 87; ++i)
-        atlas.place(50 + i, 85 + (i%4)*5, 85 + (i%3)*15);
-
-    let seed = 0x12345678;
-    const rnd = () => {
-      const C1 = 0xcc9e2d51;
-      const C2 = 0x1b873593;
-      seed = ((seed|0) * C1) ^ ((seed|0) * C2) ^ ((seed|0) >>> 16);
-      return (seed >>> 0) / 0xffffffff;
-    }
-
-    for (let i = 0; i < 28; ++i) atlas.place(200 + i, Math.round(rnd() * 50) + 100, Math.round(rnd() * 50) + 100);
-
-    atlas.flush();
-	*/
+  const {id} = useFiber();
 
   const out = [];
   const pos = [] as number[];
 
-  /*
-  for (const {rect, uv} of debugPlacements()) {
+  for (const rect of debugPlacements()) {
     out.push(
       use(Surface)({
         layout: rect,
@@ -92,7 +54,7 @@ export const DebugAtlas = ({texture}) => {
     );
   }
   
-  for (const {rect, uv} of debugPlacements()) {
+  for (const rect of debugPlacements()) {
     out.push(
       use(Surface)({
         layout: rect,
@@ -102,22 +64,16 @@ export const DebugAtlas = ({texture}) => {
       })
     );
   }
-  */
 
   out.push(
-    use(Surface)({
-      layout: [width, 0, 500 + width, 500],
-      image: {
-        texture: source,
-        fit: 'contain',
-      },
-      fill: [0.0, 0.0, 0.0, 1],
-      stroke: [1, 1, 1, 1],
-      border: [1, 1, 1, 1],
+    yeet({
+      id,
+      rectangle: [width, 0, 500 + width, 500],
+      texture: SDF_FONT_ATLAS,
+      color: [1, 1, 1, 1],
+      count: 1,
     })
   );
 
-  return [
-    use(UI)({ children: out }),
-  ];
+  return out;
 };

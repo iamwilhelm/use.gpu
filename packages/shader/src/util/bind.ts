@@ -63,7 +63,8 @@ export const makeBindModule = (
   const {name, table} = main;
   const {hash, modules, externals} = table;
 
-  const rehash = getProgramHash(`#closure [${name}] ${hash} ${key.toString(16)}`);
+  const code = `@closure [${name}] ${hash} ${key.toString(16)}`;
+  const rehash = getProgramHash(code);
   const namespace = `${PREFIX_CLOSURE}${rehash.slice(0, 6)}_`;
 
   const relinks: Record<string, ShaderModule> = {};

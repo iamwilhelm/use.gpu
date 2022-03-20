@@ -1,6 +1,6 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { SpanData } from '@use-gpu/text/types';
-import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, InlineRenderer } from '../types';
+import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, InlineRenderer, InlineLine } from '../types';
 
 type Fitter<T> = (into: Point) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
@@ -112,26 +112,42 @@ export const makeInlineLayout = (
   box: Rectangle
 ) => {
   let [left, top, right, bottom] = box;
-  const out = [] as LiveElement<any>[];
   const n = ranges.length;
 
+  let last: InlineRenderer | null = null;
+  let lines: InlineLine[] = [];
+
+  const out: LiveElement<any> = [];
+  const flush = (render: InlineRenderer) => {
+    const el = render(lines);
+    if (Array.isArray(el)) out.push(...(el as any[]));
+    else out.push(el);
+  };
+  
   for (let i = 0; i < n; ++i) {
     const range = ranges[i];
     //const size = sizes[i];
     const offset = offsets[i];
     const render = renders[i];
 
-    const l = left + offset[0];
-    const t = top + offset[1];
+    const [x, y, gap] = offset;
+    const l = left + x;
+    const t = top + y;
     const r = l;// + size[0];
     const b = t;// + size[1];
 
     const layout = [l, t, r, b] as Rectangle;
-    const el = render(layout, range[0], range[1], offset[2]);
+    const [start, end] = range;
 
-    if (Array.isArray(el)) out.push(...(el as any[]));
-    else out.push(el);
+    if (last !== render) {
+      if (last) flush(last);
+      last = render;
+    }
+
+    lines.push({layout, start, end, gap});
   }
+
+  if (last) flush(last);
 
   return out;
 };

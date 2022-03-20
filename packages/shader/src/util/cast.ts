@@ -35,7 +35,8 @@ export const makeCastTo = (
   const {name, format, args} = bundleToAttribute(bundle);
 
   const {table: {hash}} = module;
-  const rehash = getProgramHash(`#cast [${name} ${format}] ${hash}`);
+  const code = `@cast [${name} ${format}] ${hash}`;
+  const rehash = getProgramHash(code);
   const symbols = ['cast', 'getValue'];
   const namespace = `${PREFIX_CAST}${rehash.slice(0, 6)}`;
 
@@ -58,7 +59,9 @@ export const makeCastTo = (
     { render },
     { symbols, modules },
     'cast',
+    0,
     rehash,
+    code,
   );
 
   const revirtual = module.virtual

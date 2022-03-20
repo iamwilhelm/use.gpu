@@ -22,11 +22,11 @@ export const getInlineMinMax = (
   let caretCross = 0;
 
   const n = els.length;
-  for (const {spanData, height, absolute} of els) {
+  for (const {spans, height, absolute} of els) {
     if (!absolute) {
       const {ascent, descent, lineHeight} = height;
 
-      spanData.forSpans((hard, advance, trim) => {
+      spans.iterate((advance, trim, hard) => {
         allMinMain = Math.max(allMinMain, advance - trim);
         allMaxCross += lineHeight;
 
@@ -105,7 +105,7 @@ export const fitInline = (
     let mainPos = 0;
     if (slack && !hard) [mainGap, mainPos] = getInlineSpacing(slack, wordCount, align);
 
-    const perSpan = (_h: boolean, advance: number, trim: number) => {
+    const perSpan = (advance: number, trim: number) => {
       mainPos += advance;
       if (trim > 0) mainPos += mainGap;
     };
@@ -114,13 +114,13 @@ export const fitInline = (
       const span = mainSpans[i];
       const {startIndex, endIndex} = span;
 
-      const {spanData, height, render} = mainEls[i];
+      const {spans, height, render} = mainEls[i];
       const {ascent, descent, lineHeight} = height;
 
       const crossPos = caretCross + mainBase - ascent;
       const offset = isX ? [mainPos, crossPos, mainGap] : [crossPos, mainPos, mainGap];
 
-      spanData.forSpans(perSpan, startIndex, endIndex);
+      spans.iterate(perSpan, startIndex, endIndex);
 
       ranges.push(span);
       offsets.push(offset);
@@ -158,8 +158,8 @@ export const fitInline = (
     let endIndex = 0;
 
     let i = 0;
-    const {spanData, absolute} = el;
-    spanData.forSpans((hard, advance, trim) => {
+    const {spans, absolute} = el;
+    spans.iterate((advance, trim, hard) => {
       if (wrap && (caretMain + advance - trim > spaceMain)) {
         addSpan(el, startIndex, endIndex);
         reduceMain(false);

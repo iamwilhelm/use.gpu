@@ -97,6 +97,7 @@ export const RTTPage: LiveComponent<RTTPageProps> = (props) => {
         use(Pass)({
           picking: true,
           children: [
+
             use(CompositeData)({
               fields: lineDataFields,
               data: lineData,
@@ -148,6 +149,7 @@ export const RTTPage: LiveComponent<RTTPageProps> = (props) => {
                 hovered ? use(Cursor)({ cursor: 'pointer' }) : null,
               ],
             }),
+
             use(Flat)({
               children: 
 
@@ -167,7 +169,7 @@ export const RTTPage: LiveComponent<RTTPageProps> = (props) => {
                             use(Inline)({
                               children: [
                     
-                                use(Text)({ size: 32, color: [0.5, 0.5, 0.5, 1], content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
+                                use(Text)({ size: 32, color: [1, 1, 1, 1], content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
                   
                               ],
                             }),

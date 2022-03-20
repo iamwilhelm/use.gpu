@@ -10,7 +10,7 @@ import {
   CompositeData, Data, RawData,
   OrbitCamera, OrbitControls,
   AutoPicking, Pick,
-  FontProvider,
+  GPUTextProvider,
   Cursor, Points, Lines,
   RawQuads as Quads, RawLines,
   RenderToTexture,
@@ -61,9 +61,9 @@ export const App: LiveComponent<AppProps> = (props) => {
         canvas, device, adapter, samples: 4,
         children:
       
-          use(FontProvider)({
+          use(GPUTextProvider)({
             children: 
-          
+
               use(AutoPicking)({
                 canvas,
                 children: routes,

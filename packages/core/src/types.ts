@@ -1,5 +1,8 @@
 import { vec2, vec3, mat4 } from 'gl-matrix';
 
+export type Point = [number, number];
+export type Rectangle = [number, number, number, number];
+
 export type Dictionary<T = string> = Record<string, T>;
 
 export type DeepPartial<T> = T | {
@@ -236,11 +239,6 @@ export type AggregateBuffer = {
   array: TypedArray,
   dims: number,
   source: StorageSource,
-};
-
-export type AtlasMapping = {
-  rect: Rectangle,
-  uv: Rectangle,
 };
 
 export type Atlas = {

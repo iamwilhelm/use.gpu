@@ -1,11 +1,11 @@
 struct ViewUniforms {
-  projectionMatrix: mat4x4<f32>;
-  viewMatrix: mat4x4<f32>;
-  viewPosition: vec4<f32>;
-  viewResolution: vec2<f32>;
-  viewSize: vec2<f32>;
-  viewWorldUnit: f32;
-  viewPixelRatio: f32;
+  projectionMatrix: mat4x4<f32>,
+  viewMatrix: mat4x4<f32>,
+  viewPosition: vec4<f32>,
+  viewResolution: vec2<f32>,
+  viewSize: vec2<f32>,
+  viewWorldUnit: f32,
+  viewPixelRatio: f32,
 };
 
 @export @group(VIEW) @binding(VIEW) var<uniform> viewUniforms: ViewUniforms;

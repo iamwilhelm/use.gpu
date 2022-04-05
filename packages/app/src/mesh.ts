@@ -34,7 +34,7 @@ export type MeshProps = {
   texture: DataTexture,
   mode?: RenderPassMode,
   id?: number,
-  blink?: boolean,
+  blink?: number,
 };
 
 export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
@@ -46,10 +46,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     blink,
   } = props;
 
-  let blinkState = useOne(() => ({ state: false }));
-  useOne(() => {
-    if (blink) blinkState.state = !blinkState.state
-  }, blink);
+  const blinkState = !!((blink || 0) % 2);
 
   const {viewUniforms, viewDefs} = useContext(ViewContext);
   
@@ -129,7 +126,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   // Return a lambda back to parent(s)
   return yeet({
     [mode]: tagFunction((passEncoder: GPURenderPassEncoder) => {
-      const l = blinkState.state ? 1 : 0.5;
+      const l = blinkState ? 1 : 0.5;
 
       uniform.pipe.fill(viewUniforms);
       uniform.pipe.fill({ lightPosition: LIGHT, lightColor: [l, l, l, 1] });

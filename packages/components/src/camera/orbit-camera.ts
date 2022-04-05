@@ -81,7 +81,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.viewWorldUnit.value = focus * Math.tan(fov / 2);
   uniforms.viewPixelRatio.value = pixelRatio * unit;
 
-  return provide(FrameContext, frame.current, use(ViewProvider)({
+  return provide(FrameContext, frame.current, use(ViewProvider, {
     defs: VIEW_UNIFORMS, uniforms, children,
   }));
 };

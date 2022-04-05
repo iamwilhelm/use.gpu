@@ -15,7 +15,7 @@ export const main = async (): Promise<void> => {
     );
 
     const root = await render(
-      use(App)({adapter, device, canvas})
+      use(App, {adapter, device, canvas})
     );
   
   } catch (e: any) {

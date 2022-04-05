@@ -5,7 +5,7 @@ import {
 } from './types';
 
 import { compareFibers } from './util';
-import { makeFiber, getCurrentFiberID } from './fiber';
+import { makeFiber, getCurrentFiberID, resume } from './fiber';
 
 export const MORPH        = () => {};
 export const DETACH       = () => {};
@@ -32,8 +32,13 @@ export const CONSUME      = () => {};
 // use a call to a live function
 export const use = <F extends Function>(
   f: LiveFunction<F>,
+  ...args: F extends ArrowFunction ? Parameters<F> : any[]
+): DeferredCall<F> => ({f, args, key: undefined, by: getCurrentFiberID()});
+
+// use a keyed call to a live function
+export const keyed = <F extends Function>(
+  f: LiveFunction<F>,
   key?: Key,
-) => (
   ...args: F extends ArrowFunction ? Parameters<F> : any[]
 ): DeferredCall<F> => ({f, args, key, by: getCurrentFiberID()});
 
@@ -111,6 +116,16 @@ export const consume = <T, C>(
   done?: LiveFunction<(r: T) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key, by: getCurrentFiberID()});
+
+// Fence two chunks of tree while passing on values from both sides
+export const fence = <T>(before: LiveElement<any>, after: LiveElement<any>) =>
+  gather(
+    before,
+    resume((value: T) => [
+      yeet(value),
+      after,
+    ])
+  );
 
 // Make live context for holding shared data for child nodes
 export const makeContext = <T>(initialValue?: T | null, displayName?: string): LiveContext<T> => ({

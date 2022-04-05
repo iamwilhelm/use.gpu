@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { Atlas } from '@use-gpu/core/types';
 
-import { gather, provide, resume, useAsync, useContext, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { gather, provide, provideMemo, resume, useAsync, useContext, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
 
@@ -98,7 +98,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({children, then}
           throw new Error('atlas place failed', key, width, height);
           */
         }
-        console.log(atlas.width, atlas.height)
 
         const [sw, sh] = source.size;
         if (atlas.width !== sw && atlas.height !== sh) {
@@ -131,11 +130,8 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({children, then}
 
   return gpuText ? (
     gather(
-      provide(SDFFontContext, context, children),
-      resume((gathered: any) => {
-        console.log('sdf font complete', glyphs.size);
-        return then(atlas, sourceRef.current, gathered);
-      }),
+      provideMemo(SDFFontContext, context, children),
+      resume((gathered: any) => then ? then(atlas, sourceRef.current, gathered) : null),
     )
   ) : null;
 };

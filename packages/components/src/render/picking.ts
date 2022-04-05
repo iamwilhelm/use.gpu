@@ -35,10 +35,14 @@ type PickingContextType = {
   pickingTexture: GPUTexture,
   captureTexture: () => void,
   sampleTexture: (x: number, y: number) => number[],
-  usePicking: () => { pickingDefs: UniformAttribute[], pickingUniforms: any },
 };
 
-export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
+export const PickingContext = makeContext<PickingContextType>({
+  renderContext: {} as CanvasRenderingContextGPU,
+  pickingTexture: {} as GPUTexture,
+  captureTexture: () => {},
+  sampleTexture: () => [0, 0],
+}, 'PickingContext');
 
 export const NO_PICKING = {} as any;
 
@@ -51,7 +55,7 @@ export const usePicking = (id: number) => useOne(() => ({
 
 export const useNoPicking = () => useNoOne();
 
-export const usePickingContext = (id?: number, isPicking?: boolean) => {
+export const usePickingContext = (id?: number, isPicking: boolean = true) => {
   const renderContext = useContext(RenderContext);
 
   const pickingContext = isPicking ? useContext(PickingContext) : useNoContext(PickingContext);  
@@ -155,7 +159,6 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
       pickingTexture,
       captureTexture,
       sampleTexture,
-      usePicking,
     };
     
     return context;

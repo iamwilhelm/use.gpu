@@ -116,7 +116,14 @@ export const makeSubFiber = <F extends Function>(
   key?: Key,
 ): LiveFiber<F> => {
   const {host} = parent;
-  const fiber = makeFiber(node.f, host, parent, node.args ?? (node.arg !== undefined ? [node.arg] : null), by, key) as LiveFiber<F>;
+  const fiber = makeFiber(
+    node.f,
+    host,
+    parent,
+    node.args ?? (node.arg !== undefined ? [node.arg] : undefined),
+    by,
+    key,
+  ) as LiveFiber<F>;
   return fiber;
 }
 
@@ -131,7 +138,7 @@ export const makeResumeFiber = <F extends Function>(
   name = name ?? (n.match(/^[A-Za-z]+\(/) ? n.slice(n.indexOf('(') + 1, -1) : n);
   Resume.displayName = `Resume(${name})`;
 
-  const nextFiber = makeSubFiber(fiber, use(Resume)(), fiber.id, 1);
+  const nextFiber = makeSubFiber(fiber, use(Resume), fiber.id, 1);
 
   // Adopt existing yeet context
   // which will be overwritten.
@@ -299,7 +306,9 @@ export const updateFiber = <F extends Function>(
     if (!yeeted) throw new Error("Yeet without aggregator");
     bustFiberYeet(fiber);
     visitYeetRoot(fiber);
-    yeeted.emit(fiber, call!.arg !== undefined ? call!.arg : call!.args[0]);
+
+    const value = call?.arg !== undefined ? call!.arg : call!.args?.[0];
+    if (value !== undefined) yeeted.emit(fiber, value);
   }
   // Mount normal node (may still be built-in)
   else {
@@ -355,7 +364,7 @@ export const mountFiberReduction = <F extends Function, R, T>(
   }
 
   reconcileFiberCalls(fiber, calls);
-  mountFiberContinuation(fiber, use(fiber.next.f)(Next), 1);
+  mountFiberContinuation(fiber, use(fiber.next.f, Next), 1);
 }
 
 // Wrap a live function to act as a continuation of a prior fiber
@@ -374,7 +383,7 @@ export const makeFiberContinuation = <F extends Function, R>(
   // If mounting static component, inline into current fiber
   if ((Next as any).isStaticComponent) return Next(value);
   // Mount as new sub fiber
-  else return use(Next)(value);
+  else return use(Next, value);
 }
 
 // Tag a component as a static continuation
@@ -625,6 +634,7 @@ export const provideFiber = <F extends Function>(
 ) => {
   if (!fiber.args) return;
   let {args: [context, value, calls, isMemo]} = fiber;
+  isMemo = true;
 
   if (fiber.context.roots.get(context) !== fiber) {
     fiber.context = makeContextState(fiber, fiber.context, context, value);
@@ -678,7 +688,7 @@ export const consumeFiber = <F extends Function>(
   }
 
   inlineFiberCall(fiber, calls);
-  mountFiberContinuation(fiber, use(fiber.next.f)(Next), 1);
+  mountFiberContinuation(fiber, use(fiber.next.f, Next), 1);
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating its execution
@@ -757,7 +767,7 @@ export const updateMount = <P extends Function>(
 
   if (update) {
     const {args: aas, arg: a} = newMount;
-    const args = aas !== undefined ? aas : (a !== undefined ? [a] : null);
+    const args = aas !== undefined ? aas : (a !== undefined ? [a] : undefined);
 
     if (mount!.args === args && mount!.version) {
       DEBUG && console.log('Skipping', key, formatNode(newMount!));

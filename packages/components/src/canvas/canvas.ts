@@ -4,7 +4,7 @@ import { ColorSpace } from '@use-gpu/core/types';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLOR } from '../constants';
 
 import { EventProvider, RenderContext, DeviceContext } from '../providers';
-import { provide, provideMemo, use, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { provide, use, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { makePresentationContext } from '@use-gpu/webgpu';
 import {
   makeColorState,
@@ -114,5 +114,11 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     swapView,
   } as CanvasRenderingContextGPU;
 
-  return provide(RenderContext, renderContext, provide(DeviceContext, device, children));
+  return (
+    provide(RenderContext, renderContext,
+      provide(DeviceContext, device,
+        children
+      )
+    )
+  );
 }

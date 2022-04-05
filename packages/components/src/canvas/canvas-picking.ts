@@ -1,21 +1,23 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
-import { Picking } from './picking';
+import { Picking } from '../render/picking';
 import { EventProvider } from '../providers/event-provider';
+import { DOMEvents } from './dom-events';
 
 import { use } from '@use-gpu/live';
 
-export type AutoPickingProps = {
+export type CanvasPickingProps = {
   canvas: HTMLCanvasElement,
   children: LiveElement<any>,
 }
 
-export const AutoPicking: LiveComponent<AutoPickingProps> = ({ canvas, children }) =>
-  use(Picking)({
+export const CanvasPicking: LiveComponent<CanvasPickingProps> = ({ canvas, children }) =>
+  use(Picking, {
     children:
 
-      use(EventProvider)({
+      use(DOMEvents, {
         element: canvas,
         children,
       })
+
   })

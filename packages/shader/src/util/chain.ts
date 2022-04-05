@@ -15,8 +15,6 @@ export type MakeChainAccessor = (
   to: string,
 ) => string;
 
-type Type = string | Record<string, Type>;
-
 export const makeChainTo = (
   makeChainAccessor: MakeChainAccessor,
 ) => (
@@ -34,7 +32,7 @@ export const makeChainTo = (
   const type = toTypeString(toFormat);
 
   if (check?.length !== 1 || check[0] !== fromFormat) {
-    throw new Error(`Cannot chain output ${fromFormat} of ${fromName} to args (${check.join(', ')}) of ${toName}`);
+    throw new Error(`Cannot chain output ${fromFormat} of ${fromName} to args (${check?.join(', ')}) of ${toName}`);
   }
 
   const {table: {hash: h1}} = fromModule;

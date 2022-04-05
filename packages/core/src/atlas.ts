@@ -46,6 +46,7 @@ export const makeAtlas = (
 
   const place = (key: number, w: number, h: number): Rectangle => {
     if (map.get(key)) throw new Error("key mapped already", key);
+    self.version = self.version + 1;
 
     const cw = Math.ceil(w / snap) * snap;
     const ch = Math.ceil(h / snap) * snap;
@@ -272,7 +273,7 @@ export const makeAtlas = (
 
   const self = {
     place, map, expand,
-    width, height,
+    width, height, version: 0,
     debugPlacements, debugSlots, debugValidate,
   } as Atlas;
 

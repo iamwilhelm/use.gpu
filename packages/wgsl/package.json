@@ -126,11 +126,6 @@
       "import": "./src/instance/vertex/quad.wgsl",
       "require": "./src/instance/vertex/quad.wgsl"
     },
-    "./mask/filtered.wgsl": {
-      "types": "./src/mask/filtered.d.ts",
-      "import": "./src/mask/filtered.wgsl",
-      "require": "./src/mask/filtered.wgsl"
-    },
     "./mask/masked.wgsl": {
       "types": "./src/mask/masked.d.ts",
       "import": "./src/mask/masked.wgsl",
@@ -150,6 +145,11 @@
       "types": "./src/mask/textured.d.ts",
       "import": "./src/mask/textured.wgsl",
       "require": "./src/mask/textured.wgsl"
+    },
+    "./transform/cartesian.wgsl": {
+      "types": "./src/transform/cartesian.d.ts",
+      "import": "./src/transform/cartesian.wgsl",
+      "require": "./src/transform/cartesian.wgsl"
     },
     "./use/color.wgsl": {
       "types": "./src/use/color.d.ts",

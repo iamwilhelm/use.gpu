@@ -116,7 +116,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     return [getVertex, getFragment];
   }, [p, g, c, s, d]);
 
-  return use(Virtual)({
+  return use(Virtual, {
     vertexCount,
     instanceCount,
 

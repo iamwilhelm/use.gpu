@@ -35,10 +35,10 @@ const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const Outlet = () => {
   const context = useContext(RouteContext);
-  return context.routes ? use(Routes)(context) : null;
+  return context.routes ? use(Routes, context) : null;
 }
 
-const USE_OUTLET = use(Outlet)();
+const USE_OUTLET = use(Outlet);
 
 export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
   const {
@@ -93,7 +93,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
   }, [base, matchers, currentPath]);
 
   if (element) return provide(RouteContext, context, morph(element));
-  if (context.routes) return use(Routes)(context);
+  if (context.routes) return use(Routes, context);
   return null;
 }, 'Routes');
 

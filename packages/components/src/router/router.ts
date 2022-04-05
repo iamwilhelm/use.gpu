@@ -51,7 +51,7 @@ export const Router: LiveComponent<RouterProps> = memo(({source, routes, childre
     replace: source.replace,
   }), [state, source]);
 
-  if (routes) children = use(Routes)({ routes });
+  if (routes) children = use(Routes, { routes });
 
   return provide(RouterContext, api, children);
 }, 'Router');

@@ -3,8 +3,8 @@ use '@use-gpu/wgsl/use/types'::{ SolidVertex };
 @external fn getVertex(v: i32, i: i32) -> SolidVertex {};
 
 struct VertexOutput {
-  @builtin(position) position: vec4<f32>;
-  @location(0) @interpolate(flat) fragIndex: u32;
+  @builtin(position) position: vec4<f32>,
+  @location(0) @interpolate(flat) fragIndex: u32,
 };
 
 @stage(vertex)

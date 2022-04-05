@@ -242,7 +242,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {fiber, disposal} = makeHostFiber(use(F)());
+    const {fiber, disposal} = makeHostFiber(use(F));
     fiber.bound!();
 
     expect(allocated).toBe(1);
@@ -264,7 +264,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {fiber, disposal} = makeHostFiber(use(G)());
+    const {fiber, disposal} = makeHostFiber(use(G));
     fiber.bound!();
 
     expect(allocated).toBe(1);
@@ -286,7 +286,7 @@ it('manages a dependent resource (hook)', () => {
     allocated = 0;
     disposed = 0;
 
-    const {fiber, disposal} = makeHostFiber(use(H)());
+    const {fiber, disposal} = makeHostFiber(use(H));
     fiber.bound!();
 
     expect(allocated).toBe(1);
@@ -313,18 +313,18 @@ it("provides a context", () => {
 
   const Root = () =>
     provide(Context, 123, [
-      use(Sub)()
+      use(Sub)
     ]);
 
   const Sub = () => {
     value1 = useContext(Context);
-    return use(Node)();
+    return use(Node);
   }
   const Node = () => {
     value2 = useContext(Context);
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.f).toBe(Root);
 
   expect(result.mount).toBeTruthy();
@@ -346,19 +346,19 @@ it("provides a changing context value", () => {
     const [state, setState] = useState<number>(123);
     trigger = () => setState(456);
     return provide(Context, state, [
-      use(Sub)()
+      use(Sub)
     ]);
   }
 
   const Sub = () => {
     value1 = useContext(Context);
-    return use(Node)();
+    return use(Node);
   }
   const Node = () => {
     value2 = useContext(Context);
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.f).toBe(Root);
   if (!result.host) return;
 
@@ -389,20 +389,20 @@ it("provides a changing context value on a memoized component", () => {
     const [state, setState] = useState<number>(123);
     trigger = () => setState(456);
     return provide(Context, state, [
-      use(Sub)()
+      use(Sub)
     ]);
   }
 
   const Sub = () => {
     // @ts-ignore
-    return use(Node)();
+    return use(Node);
   };
 
   const Node = memoProps(() => {
     value = useContext(Context);
   });
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.f).toBe(Root);
   if (!result.host) return;
 
@@ -430,19 +430,19 @@ it("provides a changing context value with a memoized component in the way", () 
     const [state, setState] = useState<number>(123);
     trigger = () => setState(456);
     return provide(Context, state, [
-      use(Sub)()
+      use(Sub)
     ]);
   }
 
   const Sub = memoProps(() => {
-    return use(Node)();
+    return use(Node);
   });
 
   const Node = () => {
     value = useContext(Context);
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.f).toBe(Root);
   if (!result.host) return;
 

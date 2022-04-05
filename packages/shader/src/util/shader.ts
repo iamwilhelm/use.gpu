@@ -67,7 +67,7 @@ export const loadVirtualModule = <T extends SymbolTable = any>(
   initTable: Partial<T> = EMPTY_TABLE,
   entry?: string,
   key: string | number = makeKey(),
-  hash?: string | number,
+  hash?: string,
   code?: string,
 ) => {
   let symbols = initTable.symbols ?? EMPTY_LIST;

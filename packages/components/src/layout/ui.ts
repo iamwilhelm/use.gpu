@@ -4,14 +4,14 @@ import { UIAggregate } from './types';
 
 import { RenderContext } from '../providers/render-provider';
 import { SDFFontProvider, SDF_FONT_ATLAS } from '../providers/sdf-font-provider';
-import { use, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
   updateAggregateSegments,
 } from '@use-gpu/core';
 
-import { UIRectangles } from '../geometry/ui-rectangles';
+import { UIRectangles } from '../primitives/ui-rectangles';
 
 export type AggregateProps = {
   children: LiveElement<any>,
@@ -34,7 +34,7 @@ const getItemSummary = (items: UIAggregate[]) => {
 
 export const UI: LiveComponent<AggregateProps> = (props) => {
   const {children} = props;
-  return use(SDFFontProvider)({
+  return use(SDFFontProvider, {
     children,
     then: Resume,
   });
@@ -74,7 +74,7 @@ const Resume = resume((
     layer.push(item);
   }
 
-  return layers.map((layer, i) => use(Layer, ids[i])(layer));
+  return layers.map((layer, i) => keyed(Layer, ids[i], layer));
 });
 
 const Layer: LiveFunction<any> = (
@@ -144,6 +144,6 @@ const makeUIAccumulator = (
 
     if (hasTexture) props.texture = items[0].texture;
 
-    return use(UIRectangles)(props);
+    return use(UIRectangles, props);
   };
 };

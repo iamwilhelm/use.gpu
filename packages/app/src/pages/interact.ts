@@ -19,26 +19,26 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
   const texture = makeTexture();
 
   return (
-    use(Draw)({
+    use(Draw, {
       children:
 
-        use(Pass)({
+        use(Pass, {
           children:
 
             gather([
-              use(RawTexture)({ data: texture }),
+              use(RawTexture, { data: texture }),
             ], resume(([texture]: [TextureSource]) =>
 
-              use(Flat)({
+              use(Flat, {
                 children:
               
-                    use(UI)({
+                    use(UI, {
                       children:
 
-                        use(Layout)({
+                        use(Layout, {
                           children:
 
-                            use(Absolute)({
+                            use(Absolute, {
                               left: '50%',
                               top: 10,
                               right: 10,
@@ -46,22 +46,22 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
                               children: 
 
-                                use(Block)({
+                                use(Block, {
                                   children: [
 
-                                    use(Block)({
+                                    use(Block, {
                                       width: 300, height: 200, 
                                       children: [
 
-                                        use(Absolute)({
+                                        use(Absolute, {
                                           children: [
 
-                                            use(Element)({ }),
+                                            use(Element, { }),
 
                                           ],
                                         }),
 
-                                        use(Absolute)({
+                                        use(Absolute, {
                                           left: 10,
                                           top: 10,
                                           right: 10,
@@ -69,7 +69,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
                                           children: [
 
-                                            use(Element)({
+                                            use(Element, {
                                               radius: 10,
                                               image: {
                                                 texture,
@@ -85,32 +85,32 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
                                       ],
                                     }),
 
-                                    use(Block)({
+                                    use(Block, {
                                       padding: 0,
                                       children: [
-                                        use(Element)({ width: 200, height: 100, margin: 10 }),
-                                        use(Element)({ height: 100, margin: 10 }),
-                                        use(Element)({ width: 200, height: 100, margin: 10 }),
+                                        use(Element, { width: 200, height: 100, margin: 10 }),
+                                        use(Element, { height: 100, margin: 10 }),
+                                        use(Element, { width: 200, height: 100, margin: 10 }),
                                       ]
                                     }),
 
-                                    use(Flex)({
+                                    use(Flex, {
                                       align: ['between', 'start'],
                                       children: [
-                                        use(Element)({ width: 200, height: 100 }),
-                                        use(Element)({ width: 300, height: 100, margin: 30, shrink: 1 }),
-                                        use(Block)({
+                                        use(Element, { width: 200, height: 100 }),
+                                        use(Element, { width: 300, height: 100, margin: 30, shrink: 1 }),
+                                        use(Block, {
                                           children: [
-                                            use(Element)({ width: 200, height: 100 }),
-                                            use(Element)({ width: 300, height: 100 }),
-                                            use(Element)({ width: 200, height: 100 }),
+                                            use(Element, { width: 200, height: 100 }),
+                                            use(Element, { width: 300, height: 100 }),
+                                            use(Element, { width: 200, height: 100 }),
                                           ]
                                         }),
                                       ]
 
                                     }),
 
-                                    use(Element)({}),
+                                    use(Element, {}),
                                   ]
                                 })
 

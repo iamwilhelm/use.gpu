@@ -104,7 +104,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     return [getVertex, getFragment];
   }, [p, c, s, d, m, t]);
 
-  return use(Virtual)({
+  return use(Virtual, {
     vertexCount,
     instanceCount,
 

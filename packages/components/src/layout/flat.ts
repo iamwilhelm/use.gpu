@@ -77,7 +77,7 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.viewWorldUnit.value = focus;
   uniforms.viewPixelRatio.value = ratio;
 
-  return use(ViewProvider)({
+  return use(ViewProvider, {
     defs: VIEW_UNIFORMS,
     uniforms,
     children: provide(LayoutContext, layout, children),

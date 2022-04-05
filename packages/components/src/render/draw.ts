@@ -31,19 +31,5 @@ const Resume = resume((ts: Task[]) => {
 
   for (let task of ts) task();
 
-  /*
-  const src = {
-    texture: targetTexture,
-  };
-  const dst = {
-    texture: gpuContext.getCurrentTexture(),
-  };
-  
-  const commandEncoder = device.createCommandEncoder();
-  commandEncoder.copyTextureToTexture(src, dst, [width, height, 1]);
-  device.queue.submit([commandEncoder.finish()]);
-  /*
-  */
-
   if (pickingContext) pickingContext.captureTexture();
 });

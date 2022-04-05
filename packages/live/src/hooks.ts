@@ -421,9 +421,9 @@ export const useNoCallback = useNoHook(Hook.CALLBACK);
 // Async wrapper
 export const useAsync = <T>(f: () => Promise<T>, deps: any[] = NO_DEPS): T | null => {
   const [value, setValue] = useState<T | null>(null);
-  const cancelled = false;
 
   const ref = useResource((dispose) => {
+    let cancelled = false;
     f().then((value) => {
       if (!cancelled) setValue(value);
     });

@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
 import { ImageAttachment, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from './types';
 
-import { use, yeet, useFiber, useMemo } from '@use-gpu/live';
+import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
 import { Surface } from '../shape/surface';
@@ -69,7 +69,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       const size = [w, h];
 
       const render = (layout: Rectangle): LiveElement<any> => (
-        use(Surface, id)({
+        keyed(Surface, id, {
           id,
           layout,
 

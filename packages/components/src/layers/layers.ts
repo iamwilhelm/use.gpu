@@ -3,15 +3,15 @@ import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gp
 import { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, RectangleAggregate, LayerType } from './types';
 
 import { RenderContext } from '../providers/render-provider';
-import { use, resume, multiGather, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, resume, multiGather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
   updateAggregateSegments,
 } from '@use-gpu/core';
 
-import { Lines } from './lines';
-import { Points } from './points';
+import { LineLayer } from './line-layer';
+import { PointLayer } from './point-layer';
 
 export type AggregateProps = {
   children: LiveElement<any>,
@@ -40,7 +40,7 @@ export const Layers: LiveComponent<AggregateProps> = (props) => {
 const Resume = resume((aggregates: Record<string, LayerAggregate[]>) => 
   Object.keys(AGGREGATORS).map((type: string) => {
     const makeAggregator = AGGREGATORS[type]!;
-    return aggregates[type] ? use(Layer, type)(makeAggregator, aggregates[type]) : null;
+    return aggregates[type] ? keyed(Layer, type, makeAggregator, aggregates[type]) : null;
   })
 );
 
@@ -97,7 +97,7 @@ const makePointAccumulator = (
     if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
     if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');
 
-    return use(Points)(props);
+    return use(PointLayer, props);
   };
 }
 
@@ -134,7 +134,7 @@ const makeLineAccumulator = (
     if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
     if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
 
-    return use(Lines)(props);
+    return use(LineLayer, props);
   };
 };
 

@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 use serde::{Serialize};
 use serde_wasm_bindgen;
 
-use ab_glyph::{Font, FontArc, Glyph, GlyphId, Point, PxScale, PxScaleFont, ScaleFont};
+use ab_glyph::{Font, FontArc, Glyph, GlyphId, Point, PxScale, ScaleFont};
 use xi_unicode::LineBreakIterator;
 
 #[cfg(feature = "wee_alloc")]
@@ -101,8 +101,8 @@ impl UseGPUText {
         let break_iter = LineBreakIterator::new(&text);
         let mut char_iter = text.char_indices();
 
-        let mut breaks = Vec::<(u32, u32)>::new();
-        let mut metrics = Vec::<(f32, f32)>::new();
+        let mut breaks = Vec::<u32>::new();
+        let mut metrics = Vec::<(f32, f32, f32)>::new();
         let mut glyphs = Vec::<(u32, u32)>::new();
 
         let mut i = 0;
@@ -130,22 +130,17 @@ impl UseGPUText {
                 if byte_index + c.len_utf8() == offset { break; }
             }
 
-            breaks.push((i as u32, hard as u32));
-            metrics.push((advance, trim));
+            breaks.push(i as u32);
+            metrics.push((advance, trim, if hard { 1.0 } else { 0.0 }));
         });
         
-        let mut breaks_u32 = Vec::<u32>::with_capacity(breaks.len() * 2);
-        let mut metrics_f32 = Vec::<f32>::with_capacity(metrics.len() * 2);
+        let mut metrics_f32 = Vec::<f32>::with_capacity(metrics.len() * 3);
         let mut glyphs_u32 = Vec::<u32>::with_capacity(glyphs.len() * 2);
 
-        breaks.iter().for_each(|(offset, hard)| {
-            breaks_u32.push(*offset);
-            breaks_u32.push(*hard);
-        });
-
-        metrics.iter().for_each(|(advance, trim)| {
+        metrics.iter().for_each(|(advance, trim, hard)| {
             metrics_f32.push(*advance);
             metrics_f32.push(*trim);
+            metrics_f32.push(*hard);
         });
 
         glyphs.iter().for_each(|(id, ws)| {
@@ -153,11 +148,11 @@ impl UseGPUText {
             glyphs_u32.push(*ws);
         });
 
-        let value = SpanMetrics { breaks: breaks_u32, metrics: metrics_f32, glyphs: glyphs_u32 };
+        let value = SpanMetrics { breaks, metrics: metrics_f32, glyphs: glyphs_u32 };
     	let js_value = serde_wasm_bindgen::to_value(&value)?;
         Ok(js_value)
     }
-    
+
     pub fn measure_glyph(&mut self, id: u32, size: f32) -> Result<JsValue, JsValue> {
         let font = self.fonts[0].as_scaled(size);
         let glyph = Glyph {
@@ -177,7 +172,7 @@ impl UseGPUText {
 
                 let size: usize = (width * height) as usize;
                 let mut image = Vec::<u8>::with_capacity(size);
-                for n in 0..size { image.push(0) }
+                for _ in 0..size { image.push(0) }
 
                 o.draw(|x, y, a| {
                     let i = (x + y * width) as usize;

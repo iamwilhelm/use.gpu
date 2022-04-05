@@ -6,6 +6,12 @@ import { PREFIX_CAST } from '../constants';
 
 const NO_SYMBOLS = [] as string[];
 
+type TypeLike = {
+  name: string,
+  type?: TypeLike,
+  args?: TypeLike[],
+};
+
 export type MakeCastAccessor = (
   name: string,
   accessor: string,
@@ -15,7 +21,7 @@ export type MakeCastAccessor = (
   swizzle: string,
 ) => string;
 
-export const toTypeString = (t: Type): string => {
+export const toTypeString = (t: TypeLike | string): string => {
   if (typeof t === 'object') {
     if (t.type) return toTypeString(t.type);
     if (t.args) return `${t.name}<${t.args.map(t => toTypeString(t)).join(',')}>`;

@@ -35,6 +35,6 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     dispose(() => running = false);
   });
 
-  const fork = useOne(() => use(Dispatch)(ref));
+  const fork = useOne(() => use(Dispatch, ref));
   return detach(fork, (render: Task) => ref.dispatch = render);
 }

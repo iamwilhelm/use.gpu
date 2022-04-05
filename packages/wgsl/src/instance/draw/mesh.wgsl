@@ -2,11 +2,11 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip };
 use "@use-gpu/wgsl/use/color"::{ toColorSpace };
 
 struct VertexOutput {
-  @builtin(position) position: vec4<f32>;
-  @location(0) fragColor: vec4<f32>;
-  @location(1) fragUV: vec2<f32>;
-  @location(2) fragNormal: vec3<f32>;
-  @location(3) fragPosition: vec3<f32>;
+  @builtin(position) position: vec4<f32>,
+  @location(0) fragColor: vec4<f32>,
+  @location(1) fragUV: vec2<f32>,
+  @location(2) fragNormal: vec3<f32>,
+  @location(3) fragPosition: vec3<f32>,
 };
 
 @stage(vertex)

@@ -96,7 +96,7 @@ export const makeUniformBlockLayout = (
   members: string[],
 ) => `
 struct ${ns}Type {
-  ${members.map(m => `${m};`).join('\n  ')}
+  ${members.map(m => `${m},`).join('\n  ')}
 };
 @group(${set}) @binding(${binding}) var<uniform> ${ns}Uniform: ${ns}Type;
 `;

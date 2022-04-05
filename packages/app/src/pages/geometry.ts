@@ -8,7 +8,7 @@ import {
   Loop, Draw, Pass, Flat,
   CompositeData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, Points, Lines,
+  Pick, Cursor, PointLayer, LineLayer,
   RenderToTexture,
   Router, Routes,
 } from '@use-gpu/components';
@@ -67,31 +67,31 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
   const {canvas} = props;
 
   const view = (
-    use(Draw)({
+    use(Draw, {
       live: true,
       children: [
-        use(Raw)(() => {
+        use(Raw, () => {
           t = t + 1/60;
         }),
-        use(Pass)({
+        use(Pass, {
           children: [
-            use(Data)({
+            use(Data, {
               fields: lineFields,
               render: ([positions, segments, sizes]: StorageSource[]) => [
-                use(Lines)({ positions, segments, size: 50, join: 'round' }),
-                use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
-                use(Lines)({ positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug, depth: 1 }),
+                use(LineLayer, { positions, segments, size: 50, join: 'round' }),
+                use(LineLayer, { positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
+                use(LineLayer, { positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug, depth: 1 }),
               ]
             }),
-            use(CompositeData)({
+            use(CompositeData, {
               fields: lineDataFields,
               data: lineData,
               isLoop: (o: any) => o.loop,
               render: ([segments, positions, colors, sizes]: StorageSource[]) => [
-                use(Lines)({ segments, positions, colors, sizes, }),
+                use(LineLayer, { segments, positions, colors, sizes, }),
               ]          
             }),
-            use(RawData)({
+            use(RawData, {
               format: 'vec4<f32>',
               length: 100,
               live: true,
@@ -105,16 +105,16 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
                 );
               },
               render: (positions) => [
-                use(Points)({ positions, colors: positions, size: 20, depth: 1, mode: RenderPassMode.Transparent }),
-                use(Points)({ positions, size: 20, depth: 1, mode: RenderPassMode.Debug }),
-                use(Points)({ positions, size: 20, depth: 0, mode: RenderPassMode.Debug }),
+                use(PointLayer, { positions, colors: positions, size: 20, depth: 1, mode: RenderPassMode.Transparent }),
+                //use(Points, { positions, size: 20, depth: 1, mode: RenderPassMode.Debug }),
+                //use(Points, { positions, size: 20, depth: 0, mode: RenderPassMode.Debug }),
               ],
             }),
-            use(Pick)({
-              render: ({id, hovered, clicked}) => [
-                use(Mesh)({ texture, mesh, blink: clicked }),
-                use(Mesh)({ id, texture, mesh, mode: RenderPassMode.Picking }),
-                hovered ? use(Cursor)({ cursor: 'pointer' }) : null,
+            use(Pick, {
+              render: ({id, hovered, presses}) => [
+                use(Mesh, { texture, mesh, blink: presses.left }),
+                use(Mesh, { id, texture, mesh, mode: RenderPassMode.Picking }),
+                hovered ? use(Cursor, { cursor: 'pointer' }) : null,
               ],
             }),
           ]
@@ -124,11 +124,11 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
   );
 
   return (
-    use(OrbitControls)({
+    use(OrbitControls, {
       canvas,
       render: (radius: number, phi: number, theta: number) =>
 
-        use(OrbitCamera)({
+        use(OrbitCamera, {
           radius, phi, theta,
           scale: 1080,
           children: view,

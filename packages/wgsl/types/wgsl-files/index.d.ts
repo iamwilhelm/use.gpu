@@ -159,14 +159,6 @@ declare module "@use-gpu/wgsl/instance/vertex/quad.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/mask/filtered.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getFilteredFragment: ParsedBundle;
-  export const getFilteredTexture: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/mask/masked.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -197,6 +189,13 @@ declare module "@use-gpu/wgsl/mask/textured.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getTextureFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/cartesian.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getCartesianPosition: ParsedBundle;
   export default __module;
 }
 

@@ -1,6 +1,6 @@
 @export struct SDF {
-  outer: f32;
-  inner: f32;
+  outer: f32,
+  inner: f32,
 };
 
 @export fn getUVScale(uv: vec2<f32>) -> f32 {

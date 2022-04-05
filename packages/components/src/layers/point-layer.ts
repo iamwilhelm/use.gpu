@@ -6,7 +6,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { RawQuads } from '../geometry/raw-quads';
+import { RawQuads } from '../primitives/raw-quads';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
@@ -33,7 +33,7 @@ const MASK_SHADER = {
   [PointShape.SquareOutlined]: squareOutlined,
 };
 
-export type PointsProps = {
+export type PointLayerProps = {
   position?: number[] | TypedArray,
   size?: number,
   color?: number[],
@@ -58,7 +58,7 @@ export type PointsProps = {
 
 const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['i32'] } as UniformAttributeValue;
 
-export const Points: LiveComponent<PointsProps> = memo((props: PointsProps) => {
+export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLayerProps) => {
   const {
     position,
     positions,
@@ -90,7 +90,7 @@ export const Points: LiveComponent<PointsProps> = memo((props: PointsProps) => {
   }, [s]);
   const getMask = (MASK_SHADER as any)[shape] ?? MASK_SHADER[PointShape.Circle];
 
-  return use(RawQuads)({
+  return use(RawQuads, {
     position,
     positions,
     color,

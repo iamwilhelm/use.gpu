@@ -21,10 +21,10 @@ export type AutoCanvasProps = {
 }
 
 export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) =>
-  use(AutoSize)({
+  use(AutoSize, {
     canvas: props.canvas,
-    children: use(CursorConsumer)({
+    children: use(CursorConsumer, {
       element: props.canvas,
-      children: use(Canvas)({...props}),
+      children: use(Canvas, {...props}),
     })
   });

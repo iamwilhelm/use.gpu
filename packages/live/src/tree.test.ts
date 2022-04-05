@@ -1,15 +1,15 @@
 import { LiveFiber, Task } from './types';
-import { use, detach, provide, PROVIDE, makeContext } from './builtin';
+import { use, keyed, detach, provide, PROVIDE, makeContext } from './builtin';
 import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext } from './hooks';
 import { renderSync } from './tree';
 
 it("mounts", () => {
 
-  const Root = () => use(Node)();
+  const Root = () => use(Node);
   const Node = () => {};
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
 
   expect(result.host).toBeTruthy();
   if (!result.host) return;
@@ -25,13 +25,13 @@ it("mounts", () => {
 it("mounts multiple", () => {
 
   const Root = () => [
-    use(Node, '1')(),
-    use(Node, '2')(),
+    keyed(Node, '1'),
+    keyed(Node, '2'),
   ];
 
   const Node = () => {};
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.f).toBe(Root);
   expect(result.mounts).toBeTruthy();
   if (!result.mounts) return;
@@ -47,15 +47,15 @@ it("detaches a subfiber", () => {
   let captureSubFiber: LiveFiber<any> | null = null;
 
   const Root = () =>
-    detach(use(Sub)(), (render: () => void, mount: LiveFiber<any>) => {
+    detach(use(Sub), (render: () => void, mount: LiveFiber<any>) => {
       captureSubFiber = mount;
       render();
     });
 
-  const Sub = () => use(Node)();
+  const Sub = () => use(Node);
   const Node = () => {};
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.f).toBe(Root);
 
   expect(result.mount).toBeTruthy();
@@ -87,14 +87,14 @@ it("reacts on the root (setter form)", () => {
     const [, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
-    return use(Node)(Math.random());
+    return keyed(Node, Math.random());
   };
 
   const Node = (x?: number) => {
     rendered.node++;
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
   if (!result.host) return;
@@ -136,14 +136,14 @@ it("reacts on the root (reducer form)", () => {
     const [, setValue] = useState(0);
     setTrigger(() => setValue((s: number) => s + 1));
 
-    return use(Node)(Math.random());
+    return keyed(Node, Math.random());
   };
 
   const Node = (x?: number) => {
     rendered.node++;
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
   if (!result.host) return;
@@ -185,9 +185,9 @@ it("reacts and remounts on the root", () => {
 
     rendered.root++;
     return [
-      use(Node, '1')(Math.random()),
-      use(Node, '2')(Math.random()),
-      use(Node, '3' + rendered.root)(Math.random()),
+      keyed(Node, '1', Math.random()),
+      keyed(Node, '2', Math.random()),
+      keyed(Node, '3' + rendered.root, Math.random()),
     ];
   };
 
@@ -195,7 +195,7 @@ it("reacts and remounts on the root", () => {
     rendered.node++;
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   if (!result.host) return;
 
@@ -261,7 +261,7 @@ it("reacts and remounts a sub tree", () => {
   const Root = () => {
     rendered.root++;
     return [
-      use(SubRoot, 'subroot')(),
+      keyed(SubRoot, 'subroot'),
     ];
   };
 
@@ -271,9 +271,9 @@ it("reacts and remounts a sub tree", () => {
 
     rendered.subroot++;
     return [
-      use(Node, '1')(Math.random()),
-      use(Node, '2')(Math.random()),
-      use(Node, '3' + rendered.subroot)(Math.random()),
+      keyed(Node, '1', Math.random()),
+      keyed(Node, '2', Math.random()),
+      keyed(Node, '3' + rendered.subroot, Math.random()),
     ];
   };
 
@@ -282,7 +282,7 @@ it("reacts and remounts a sub tree", () => {
     return;
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mounts).toBeTruthy();
   if (!result.host) return;
@@ -346,7 +346,7 @@ it("coalesces updates", () => {
     const [, setValue] = useState(0);
     setTrigger1(() => setValue(1));
 
-    return use(Node)(Math.random());
+    return keyed(Node, Math.random());
   };
 
   const Node = (x?: number) => {
@@ -356,7 +356,7 @@ it("coalesces updates", () => {
     setTrigger2(() => setValue(1));
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
   if (!result.host) return;
@@ -402,13 +402,13 @@ it("updates with memo in the way", () => {
     const [, setValue] = useState(0);
     setTrigger1(() => setValue(1));
 
-    return use(Memo)();
+    return use(Memo);
   };
 
   const Memo = memoArgs(() => {
     rendered.memo++;
 
-    return use(Node)(Math.random());
+    return keyed(Node, Math.random());
   });
 
   const Node = (x?: number) => {
@@ -418,7 +418,7 @@ it("updates with memo in the way", () => {
     setTrigger2(() => setValue(1));
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
   expect(result.mount!.mount).toBeTruthy();
@@ -473,13 +473,13 @@ it("updates context with memo in the way", () => {
     const [value, setValue] = useState(0);
     setTrigger(() => setValue(1));
 
-    return provide(context, value, use(Memo)());
+    return provide(context, value, use(Memo));
   };
 
   const Memo = memoArgs(() => {
     rendered.memo++;
 
-    return use(Node)();
+    return use(Node);
   });
 
   const Node = () => {
@@ -488,7 +488,7 @@ it("updates context with memo in the way", () => {
     rendered.value = value;
   };
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
   expect(result.mount!.mount).toBeTruthy();
@@ -554,7 +554,7 @@ it("does not update context if value is the same", () => {
   const Memo = memoArgs(() => {
     rendered.memo++;
 
-    return use(Node)();
+    return use(Node);
   });
 
   const Node = () => {
@@ -563,9 +563,9 @@ it("does not update context if value is the same", () => {
     rendered.value = value;
   };
 
-  const memoChild = use(Memo)();
+  const memoChild = use(Memo);
 
-  const result = renderSync(use(Root)());
+  const result = renderSync(use(Root));
   expect(result.host).toBeTruthy();
   expect(result.mount).toBeTruthy();
   expect(result.mount!.mount).toBeTruthy();

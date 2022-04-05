@@ -10,8 +10,8 @@ export type EmptyPageProps = {
 export const EmptyPage: LiveComponent<EmptyPageProps> = (props) => {
 
   return (
-    use(Draw)({
-      children: use(Pass)({}),
+    use(Draw, {
+      children: use(Pass, {}),
     })
   );
 };

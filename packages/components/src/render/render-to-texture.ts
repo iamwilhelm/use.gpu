@@ -124,7 +124,6 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     version: 0,
   }), [targetTexture, width, height, presentationFormat]);
 
-  const view = provide(RenderContext, rttContext, children);
   const Done = useOne(() =>
     resume((ts: Task[]) => {
       for (let task of ts) task();
@@ -133,5 +132,11 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
   , source);
 
   source.version++;
-  return gather(provide(FrameContext, source.version, view), Done);
+  return (
+    gather(
+      provide(RenderContext, rttContext,
+        provide(FrameContext, source.version, children)
+      )
+    , Done)
+  );
 }

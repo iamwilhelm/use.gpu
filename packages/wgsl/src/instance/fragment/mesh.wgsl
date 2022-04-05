@@ -6,7 +6,7 @@ use '@use-gpu/wgsl/use/light'::{ lightUniforms };
 @group(1) @binding(1) var t: texture_2d<f32>;
 
 struct FragmentOutput {
-  @location(0) outColor: vec4<f32>;
+  @location(0) outColor: vec4<f32>,
 };
 
 @stage(fragment)

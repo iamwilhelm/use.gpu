@@ -68,7 +68,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
     return [getVertex, getFragment];
   }, [t]);
 
-  return use(Virtual)({
+  return use(Virtual, {
     vertexCount,
     instanceCount,
 

@@ -75,7 +75,7 @@ fn _02_getColor() -> vec4<f32> {
 exports[`bind links data bindings 1`] = `
 "
 struct _VT_Type {
-  _VT_0_getColor: vec4<f32>;
+  _VT_0_getColor: vec4<f32>,
 };
 @group(0) @binding(1) var<uniform> _VT_Uniform: _VT_Type;
 
@@ -102,8 +102,8 @@ fn _VT_0_getSize(index: i32) -> vec2<f32> {
 exports[`bind makes deterministic links for data bindings 1`] = `
 Object {
   "base": undefined,
-  "code": "#virtual [getColor getSize] 101",
-  "name": "_VT_hoi6if_",
+  "code": "@virtual [getColor getSize] 101",
+  "name": "_VT_dfkj1d_",
   "storages": Array [
     Object {
       "storage": Object {
@@ -156,7 +156,7 @@ Object {
         "symbol": "getSize",
       },
     ],
-    "hash": "hoi6if8by6",
+    "hash": "dfkj1dt8f2",
     "symbols": Array [
       "getColor",
       "getSize",

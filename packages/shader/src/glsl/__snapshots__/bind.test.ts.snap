@@ -121,8 +121,8 @@ vec2 _VT_0_getSize(int index) {
 exports[`bind makes deterministic links for data bindings 1`] = `
 Object {
   "base": undefined,
-  "code": "#virtual [getColor getSize] 101",
-  "name": "_VT_hoi6if_",
+  "code": "@virtual [getColor getSize] 101",
+  "name": "_VT_dfkj1d_",
   "storages": Array [
     Object {
       "storage": Object {
@@ -175,7 +175,7 @@ Object {
         "symbols": Array [],
       },
     ],
-    "hash": "hoi6if8by6",
+    "hash": "dfkj1dt8f2",
     "symbols": Array [
       "getColor",
       "getSize",

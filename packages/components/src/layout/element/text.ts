@@ -3,7 +3,7 @@ import { TextureSource, Emitter } from '@use-gpu/core/types';
 import { SpanData, PerSpan, PerGlyph } from '@use-gpu/text/types';
 import { Point4, InlineSpan } from './types';
 
-import { use, yeet, useContext, useFiber, useMemo } from '@use-gpu/live';
+import { keyed, yeet, useContext, useFiber, useMemo } from '@use-gpu/live';
 import { makeTuples, emitIntoNumberArray } from '@use-gpu/core';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
@@ -62,7 +62,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
     spans,
     height,
     render: (lines: InlineLine[]) => (
-      use(Glyphs, id)({
+      keyed(Glyphs, id, {
         id,
         color,
         size,

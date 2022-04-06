@@ -128,8 +128,14 @@ export const fence = <T>(before: LiveElement<any>, after: LiveElement<any>) =>
   );
 
 // Make live context for holding shared data for child nodes
-export const makeContext = <T>(initialValue?: T | null, displayName?: string): LiveContext<T> => ({
-  initialValue: initialValue ?? undefined,
+interface MakeContext<T> {
+  <T>(i: undefined, d?: string): LiveContext<T>;
+  <T>(i: null, d?: string): LiveContext<T | null>;
+  <T>(i: T, d?: string): LiveContext<T>;
+};
+
+export const makeContext: MakeContext<unknown> = <T>(initialValue?: T | null, displayName?: string) => ({
+  initialValue,
   displayName,
 });
 export const createContext = makeContext;
@@ -152,7 +158,7 @@ export const getTailNode = <T>(
   registry: Map<LiveFiber<any>, T>,
 ) => {
   const entries = flattenRegistry(registry);
-  return entries[0];
+  return entries[entries.length - 1];
 }
 
 export const getTailValue = <T>(

@@ -307,7 +307,7 @@ it('manages a dependent resource (hook)', () => {
 
 it("provides a context", () => {
 
-  const Context = makeContext();
+  const Context = makeContext<number>(null);
   let value1 = null;
   let value2 = null;
 
@@ -336,7 +336,7 @@ it("provides a context", () => {
 
 it("provides a changing context value", () => {
 
-  const Context = makeContext();
+  const Context = makeContext<number>(null);
   let value1 = null as number | null;
   let value2 = null as number | null;
 
@@ -380,7 +380,7 @@ it("provides a changing context value", () => {
 
 it("provides a changing context value on a memoized component", () => {
 
-  const Context = makeContext();
+  const Context = makeContext<number>(null);
   let value = null as number | null;
 
   let trigger = null as Function | null;
@@ -421,7 +421,7 @@ it("provides a changing context value on a memoized component", () => {
 
 it("provides a changing context value with a memoized component in the way", () => {
 
-  const Context = makeContext();
+  const Context = makeContext<number>(null);
   let value = null as number | null;
 
   let trigger = null as Function | null;

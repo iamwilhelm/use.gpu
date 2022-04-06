@@ -21,14 +21,9 @@ export type GeometryPageProps = {
 
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
-const data = seq(10).map((i) => ({
-  position: [Math.random()*4-2, Math.random()*4-2, Math.random()*4-2, 1],
-  size: Math.random() * 50 + 10,
-}));
-
 const quadFields = [
   ['vec4<f32>', 'position'],
-  ['f32', 'size'],
+  ['f32', 'widths'],
 ] as DataField[];
 
 const lineFields = [
@@ -40,21 +35,21 @@ const lineFields = [
 const lineData = seq(1).map((i) => ({
   path: seq(3 + i + Math.random() * 5).map(() => [Math.random()*2-1, Math.random()*2-1 - 2, Math.random()*2-1, 1]),
   color: [Math.random(), Math.random(), Math.random(), 1], 
-  size: Math.random() * 20 + 1,
+  width: Math.random() * 20 + 1,
   loop: false,
 }));
 
 lineData.push({
   path: [[2, 0, 0, 1], [2, 1, 0, 1], [2, 1, 1, 1], [2, 0, 1, 1]],
   color: [0.7, 0, 0.5, 1],
-  size: 20,
+  width: 20,
   loop: true,
 })
 
 const lineDataFields = [
   ['array<vec4<f32>>', (o: any) => o.path],
   ['vec4<f32>', 'color'],
-  ['f32', 'size'],
+  ['f32', 'width'],
 ] as DataField[];
 
 let t = 0;
@@ -73,22 +68,23 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
         use(Raw, () => {
           t = t + 1/60;
         }),
+        use(Cursor, { cursor: 'move' }),
         use(Pass, {
           children: [
             use(Data, {
               fields: lineFields,
               render: ([positions, segments, sizes]: StorageSource[]) => [
-                use(LineLayer, { positions, segments, size: 50, join: 'round' }),
-                use(LineLayer, { positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug }),
-                use(LineLayer, { positions, segments, size: 50, join: 'round', mode: RenderPassMode.Debug, depth: 1 }),
+                use(LineLayer, { positions, segments, width: 50, join: 'round' }),
+                use(LineLayer, { positions, segments, width: 50, join: 'round', mode: RenderPassMode.Debug }),
+                use(LineLayer, { positions, segments, width: 50, join: 'round', mode: RenderPassMode.Debug, depth: 1 }),
               ]
             }),
             use(CompositeData, {
               fields: lineDataFields,
               data: lineData,
-              isLoop: (o: any) => o.loop,
-              render: ([segments, positions, colors, sizes]: StorageSource[]) => [
-                use(LineLayer, { segments, positions, colors, sizes, }),
+              loop: (o: any) => o.loop,
+              render: ([segments, positions, colors, widths]: StorageSource[]) => [
+                use(LineLayer, { segments, positions, colors, widths }),
               ]          
             }),
             use(RawData, {

@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core/types';
-import { DeviceContext, FrameContext } from '@use-gpu/components';
+import { DeviceContext } from '../providers/device-provider';
+import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
 import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
@@ -69,11 +70,13 @@ export const Data: LiveComponent<DataProps> = (props) => {
   };
 
   if (!live) {
-    useNoContext(FrameContext);
+    useNoPerFrame();
+    useNoAnimationFrame();
     useMemo(refresh, [device, data, fieldBuffers]);
   }
   else {
-    useContext(FrameContext);
+    usePerFrame();
+    useAnimationFrame();
     useNoMemo();
     refresh();
   }

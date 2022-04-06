@@ -168,9 +168,10 @@ export const makeUniformLayout = (
   let offset = base;
   for (const {name, format} of uniforms) {
     const s = getUniformAttributeSize(format);
+    const align = Math.min(s, 16);
 
-    const o = offset % s;
-    if (o) offset += s - o;
+    const o = offset % align;
+    if (o) offset += align - o;
     out.push({name, offset, format});
 
     offset += s;
@@ -231,8 +232,8 @@ export const makeLayoutFiller = (
       const setter = getUniformByteSetter(format);
 
       const o = item[k];
-      const v = (o && typeof o === 'object' && o.hasOwnProperty('value'))
-        ? o.value : o;
+      const v = (o && typeof o === 'object' && o.hasOwnProperty('current'))
+        ? o.current : o;
       if (v != null) setter(dataView, base + offset, v);
     }
   }

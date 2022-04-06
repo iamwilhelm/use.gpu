@@ -1,9 +1,12 @@
 import { TypedArray, UniformType, UniformAttribute, EmitterExpression, Emitter, Accessor, AccessorSpec } from './types';
 import { UNIFORM_SIZES, UNIFORM_ARRAY_TYPES, UNIFORM_DIMS } from './constants';
 
+import { vec4 } from 'gl-matrix';
+
 type NumberArray = TypedArray | number[];
 
 const NO_LOOPS = [] as boolean[];
+const NO_ENDS = [] as [boolean, boolean][];
 
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
@@ -160,6 +163,20 @@ export const copyDataArrays = (from: any[], to: NumberArray, dims: number, acces
   }
 }
 
+export const getChunkedDataLength = (
+  chunks: number[],
+  loops: boolean[] = NO_LOOPS,
+) => {
+  let length = 0;
+  let n = chunks.length;
+  for (let i = 0; i < n; ++i) {
+    const c = chunks[i];
+    const l = loops[i];
+    length += c + (l ? 3 : 0);
+  }
+  return length;
+};
+
 export const copyChunksToSegments = (
   to: NumberArray,
   chunks: number[],
@@ -187,6 +204,66 @@ export const copyChunksToSegments = (
 
   while (pos < to.length) to[pos++] = 0;
 }
+
+export const mapChunksToAnchors = (
+  chunks: number[],
+  loops: boolean[] = NO_LOOPS,
+  ends: [boolean, boolean][] = NO_ENDS,
+): [NumberArray, NumberArray] => {
+  const n = chunks.length;
+
+  const length = getChunkedDataLength(chunks, loops);
+  const count = ends.reduce((c, [a, b]) => c + +!!a + +!!b, 0);
+
+  const {array: anchors} = makeDataArray(UniformType['vec4<i32>'], count);
+  const {array: trims} = makeDataArray(UniformType['vec2<i32>'], length);
+
+  let o = 0;
+  let pos = 0;
+  for (let i = 0; i < n; ++i) {
+    const c = chunks[i];
+    const l = loops[i];
+
+    const start = pos + (l ? 1 : 0);
+    const end = pos + c - 1 + (l ? 1 : 0);
+    pos += c + (l ? 3 : 0);
+
+    const at = ends[i];
+    if (at) {
+      const [left, right] = at;
+      const both = left && right ? 1 : 0;
+
+      if (left) {
+        anchors[o++] = start;
+        anchors[o++] = end;
+        anchors[o++] = both;
+        anchors[o++] = 0;
+
+        for (let j = start; j <= end; ++j) trims[j * 2] = 1;
+      }
+      if (right) {
+        anchors[o++] = end;
+        anchors[o++] = start;
+        anchors[o++] = both;
+        anchors[o++] = 0;
+
+        for (let j = start; j <= end; ++j) trims[j * 2 + 1] = 1;
+      }
+    }
+  }
+
+  return [anchors, trims];
+}
+
+export const mapChunksToSegments = (
+  chunks: number[],
+  loops: boolean[] = NO_LOOPS,
+) => {
+  const length = getChunkedDataLength(chunks, loops);
+  const {array} = makeDataArray(UniformType['i32'], length);
+  copyChunksToSegments(array, chunks, loops);
+  return array;
+};
 
 export const copyNumberArrayRepeatedRange = (
   from: NumberArray | number, to: NumberArray,

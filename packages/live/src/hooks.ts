@@ -300,37 +300,19 @@ export const useNoResource = () => {
 // Grab a context from the fiber (optional mode)
 export const useContext = <C>(
   context: LiveContext<C>,
-) => {
+): C => {
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CONTEXT);
   const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context);
-  if (!root) throw new Error(`Context '${context.displayName}' was used without being provided.`);
-
-  if (host) {
-    if (!state![i]) {
-      state![i] = true;
-      state![i + 1] = context;
-      host.track(fiber, () => host.undepend(fiber, root));
+  if (!root) {
+    const {initialValue, displayName} = context;
+    if (initialValue === undefined) {
+      throw new Error(`Required context '${displayName}' was used without being provided.`);
     }
-
-    host.depend(fiber, root);
+    return initialValue;
   }
-
-  return values.get(context).current ?? context.initialValue;
-}
-
-// Grab an optional context from the fiber
-export const useOptionalContext = <C>(
-  context: LiveContext<C>,
-) => {
-  const fiber = useFiber();
-
-  const i = pushState(fiber, Hook.CONTEXT);
-  const {state, host, context: {values, roots}} = fiber;
-  const root = roots.get(context);
-  if (!root) return context.initialValue ?? null;
 
   if (host) {
     if (!state![i]) {
@@ -385,9 +367,11 @@ export const useNoContext = <C>(
 
   const i = pushState(fiber, Hook.CONTEXT);
   const {state, host, context: {values, roots}} = fiber;
-  const root = roots.get(context)!;
-  if (!context) throw new Error(`Context was not provided.`);
+  if (!context) {
+    throw new Error(`Context is undefined.`);
+  }
 
+  const root = roots.get(context)!;
   if (state![i]) {
     if (host) host.undepend(fiber, root);
     state![i] = false;
@@ -402,9 +386,9 @@ export const useNoConsumer = <C>(
 
   const i = pushState(fiber, Hook.CONSUMER);
   const {state, host, context: {values, roots}} = fiber;
-  const root = roots.get(context)!;
-  if (!context) throw new Error(`Consumer was not provided.`);
+  if (!context) throw new Error(`Consumer is undefined.`);
 
+  const root = roots.get(context)!;
   const next = root.next;
   if (state![i] && next) {
     if (host) host.undepend(next, fiber);

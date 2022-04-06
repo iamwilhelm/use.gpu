@@ -111,6 +111,11 @@
       "import": "./src/instance/ui/vertex.wgsl",
       "require": "./src/instance/ui/vertex.wgsl"
     },
+    "./instance/vertex/arrow.wgsl": {
+      "types": "./src/instance/vertex/arrow.d.ts",
+      "import": "./src/instance/vertex/arrow.wgsl",
+      "require": "./src/instance/vertex/arrow.wgsl"
+    },
     "./instance/vertex/full-screen.wgsl": {
       "types": "./src/instance/vertex/full-screen.d.ts",
       "import": "./src/instance/vertex/full-screen.wgsl",
@@ -145,6 +150,11 @@
       "types": "./src/mask/textured.d.ts",
       "import": "./src/mask/textured.wgsl",
       "require": "./src/mask/textured.wgsl"
+    },
+    "./plot/axis.wgsl": {
+      "types": "./src/plot/axis.d.ts",
+      "import": "./src/plot/axis.wgsl",
+      "require": "./src/plot/axis.wgsl"
     },
     "./transform/cartesian.wgsl": {
       "types": "./src/transform/cartesian.d.ts",

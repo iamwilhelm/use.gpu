@@ -4,7 +4,7 @@ import { GPUTextAPI } from '@use-gpu/text/types';
 import { provide, useAsync, makeContext } from '@use-gpu/live';
 import { GPUText } from '@use-gpu/text';
 
-export const GPUTextContext = makeContext(null, 'GPUTextContext');
+export const GPUTextContext = makeContext(undefined, 'GPUTextContext');
 
 export type GPUTextContext = {
   gpuText: GPUTextAPI,

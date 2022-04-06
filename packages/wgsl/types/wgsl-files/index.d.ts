@@ -138,6 +138,13 @@ declare module "@use-gpu/wgsl/instance/ui/vertex.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/vertex/arrow.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getArrowVertex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/vertex/full-screen.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -189,6 +196,13 @@ declare module "@use-gpu/wgsl/mask/textured.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getTextureFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/plot/axis.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getAxisPosition: ParsedBundle;
   export default __module;
 }
 

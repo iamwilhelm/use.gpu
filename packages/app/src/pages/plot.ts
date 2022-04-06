@@ -9,7 +9,7 @@ import {
   CompositeData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
-  Plot, Cartesian,
+  Plot, Cartesian, Axis,
   RenderToTexture,
   Router, Routes,
 } from '@use-gpu/components';
@@ -31,28 +31,49 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
   const {canvas} = props;
 
   const view = (
-    use(Draw, {
-      live: true,
+    use(Loop, {
       children: [
-        use(Raw, () => {
-          t = t + 1/60;
-        }),
-        use(Pass, {
+        use(Draw, {
+          live: true,
           children: [
-      
-            use(Plot, {
-              children: [
-                use(Cartesian, {
-                  
-                })
-              ]
-            })
 
-          ]
+            use(Cursor, { cursor: 'move' }),
+            use(Pass, {
+              children: [
+      
+                use(Pick, {
+                  render: ({id, hovered, presses}) => [
+                    //use(Mesh, { texture, mesh, blink: presses.left }),
+                    use(Mesh, { id, texture, mesh, mode: RenderPassMode.Picking }),
+                    hovered ? use(Cursor, { cursor: 'pointer' }) : null,
+                  ],
+                }),
+          
+                use(Plot, {
+                  children: [
+
+                    use(Cartesian, {
+                      scale: [3, 3, 3],
+                      children: [
+
+                        use(Axis, {
+                          width: 20,
+                          color: [1, 1, 1, 0.5],
+                          detail: 2,
+                        })
+                      ]
+                    })
+                  ]
+                })
+
+              ]
+            }),
+          ],
+
         }),
-      ],
+      ]
     })
-  );
+  );  
 
   return (
     use(OrbitControls, {

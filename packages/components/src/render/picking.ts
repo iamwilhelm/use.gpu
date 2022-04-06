@@ -49,7 +49,7 @@ export const NO_PICKING = {} as any;
 export const usePicking = (id: number) => useOne(() => ({
   pickingDefs: PICKING_UNIFORMS,
   pickingUniforms: {
-    pickingId: { value: id },
+    pickingId: { current: id },
   },
 }));
 

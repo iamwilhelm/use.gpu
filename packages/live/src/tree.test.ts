@@ -456,7 +456,7 @@ it("updates with memo in the way", () => {
 
 it("updates context with memo in the way", () => {
 
-  const context = makeContext();
+  const context = makeContext<number>(-1);
 
   const rendered = {
     root: 0,
@@ -531,7 +531,7 @@ it("updates context with memo in the way", () => {
 
 it("does not update context if value is the same", () => {
 
-  const context = makeContext();
+  const context = makeContext<number>(-1);
 
   const rendered = {
     root: 0,

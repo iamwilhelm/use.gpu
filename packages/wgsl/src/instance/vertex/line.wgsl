@@ -6,7 +6,7 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 @external fn getPosition(i: i32) -> vec4<f32> {};
 @external fn getSegment(i: i32) -> i32 {};
 @external fn getColor(i: i32) -> vec4<f32> {};
-@external fn getSize(i: i32) -> f32 {};
+@external fn getWidth(i: i32) -> f32 {};
 @external fn getDepth(i: i32) -> f32 {};
 
 @export fn getLineVertex(vertexIndex: i32, instanceIndex: i32) -> SolidVertex {
@@ -39,7 +39,7 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 
   var segment = getSegment(cornerIndex);
   var color = getColor(cornerIndex);
-  var size = getSize(cornerIndex);
+  var width = getWidth(cornerIndex);
   var depth = getDepth(cornerIndex);
 
   var beforePos = getPosition(cornerIndex - 1);
@@ -53,11 +53,11 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
   // Lerp between fixed size and full perspective
   var pixelScale = getPerspectiveScale(center.w, depth);
   // TODO: awaiting compound support
-  // size *= pixelScale;
-  size = size * pixelScale;
+  // width *= pixelScale;
+  width = width * pixelScale;
 
   var arc = f32(joinIndex) / f32(LINE_JOIN_SIZE);
-  var lineJoin = getLineJoin(before, center.xyz / center.w, after, arc, xy.y, size, segment, LINE_JOIN_STYLE);
+  var lineJoin = getLineJoin(before, center.xyz / center.w, after, arc, xy.y, width, segment, LINE_JOIN_STYLE);
 
   return SolidVertex(
     vec4<f32>(lineJoin, 1.0),

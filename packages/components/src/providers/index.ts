@@ -3,4 +3,5 @@ export * from './event-provider';
 export * from './frame-provider';
 export * from './gpu-text-provider';
 export * from './render-provider';
+export * from './time-provider';
 export * from './view-provider';

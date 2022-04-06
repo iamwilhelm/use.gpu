@@ -243,7 +243,7 @@ export type AggregateBuffer = {
 
 export type Atlas = {
   place: (key: number, w: number, h: number) => void,
-  map: Map<number, AtlasMapping>,
+  map: Map<number, Rectangle>,
   width: number,
   height: number,
 };

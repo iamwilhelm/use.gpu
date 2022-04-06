@@ -10,6 +10,7 @@ const makeComposeTransform = () => {
   const t = mat4.create();
 
   return (
+    transform: mat4,
     position?: TypedArray | null,
     rotation?: TypedArray | null,
     quaternion?: TypedArray | null,
@@ -32,9 +33,8 @@ const makeComposeTransform = () => {
     if (scale != null) vec3.copy(s, scale);
     else vec3.set(s, 1, 1, 1);
     
-    const m = mat4.create();
-    mat4.fromRotationTranslationScale(m, q, p, s);
-    return m;
+    mat4.fromRotationTranslationScale(transform, q, p, s);
+    return transform;
   }
 }
 

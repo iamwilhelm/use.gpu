@@ -8,7 +8,7 @@ import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } f
 import { DeviceContext } from './device-provider';
 import { GPUTextContext } from './gpu-text-provider';
 
-export const SDFFontContext = makeContext(null, "SDFFontContext");
+export const SDFFontContext = makeContext(undefined, 'SDFFontContext');
 export const useSDFFont = () => useContext(SDFFontContext);
 
 export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as TextureSource;

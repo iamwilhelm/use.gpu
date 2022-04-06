@@ -15,29 +15,35 @@ import { use, yeet, memo, useFiber, useMemo, useOne, useState, useResource } fro
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
-import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
+import { makeArrow } from './mesh/arrow';
+import { RawData } from '../data/raw-data';
+
+import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
-export type RawLinesProps = {
+export type RawArrowsProps = {
+  anchor?: number[] | TypedArray,
   position?: number[] | TypedArray,
-  segment?: number,
   color?: number[] | TypedArray,
+  size?: number,
   width?: number,
   depth?: number,
 
+  anchors?: StorageSource,
   positions?: StorageSource,
-  segments?: StorageSource,
   colors?: StorageSource,
+  sizes?: StorageSource,
   widths?: StorageSource,
   depths?: StorageSource,
 
+  getAnchor?: ShaderModule,
   getPosition?: ShaderModule,
-  getSegment?: ShaderModule,
   getColor?: ShaderModule,
+  getSize?: ShaderModule,
   getWidth?: ShaderModule,
   getDepth?: ShaderModule,
 
-  join?: 'miter' | 'round' | 'bevel',
+  detail?: number,
 
   count?: number,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -48,87 +54,83 @@ export type RawLinesProps = {
 const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = [
+  { name: 'getVertex', format: 'vec4<f32>', value: ZERO },
+  { name: 'getAnchor', format: 'vec4<i32>', value: [0, 1] },
+
   { name: 'getPosition', format: 'vec4<f32>', value: ZERO },
-  { name: 'getSegment', format: 'i32', value: 0 },
   { name: 'getColor', format: 'vec4<f32>', value: [0.5, 0.5, 0.5, 1] },
+  { name: 'getSize', format: 'f32', value: 3 },
   { name: 'getWidth', format: 'f32', value: 1 },
   { name: 'getDepth', format: 'f32', value: 0 },
 ] as UniformAttributeValue[];
 
-const LINE_JOIN_SIZE = {
-  'bevel': 1,
-  'miter': 2,
-  'round': 4,
-} as Record<string, number>;
-
-const LINE_JOIN_STYLE = {
-  'bevel': 0,
-  'miter': 1,
-  'round': 2,
-} as Record<string, number>;
-
 const PIPELINE = {
   primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
+    topology: 'triangle-list',
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
-export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps) => {
+const DEFINES: Record<string, any> = {};
+const NO_DEPS: any[] = [];
+
+export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsProps) => {
   const {
     pipeline: propPipeline,
-    count = 2,
+    detail = 12,
+    count = 1,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
-
-  // Customize line shader
-  let {join, depth = 0} = props;
-  const j = (join! in LINE_JOIN_SIZE) ? join! : 'bevel';
-
-  const style = LINE_JOIN_STYLE[j];
-  const segments = LINE_JOIN_SIZE[j];
-  const tris = (1+segments) * 2;
-  const defines = {
-    LINE_JOIN_STYLE: style,
-    LINE_JOIN_SIZE: segments,
-    STRIP_SEGMENTS: tris,
-  };
+  
+  const det = Math.max(4, detail);
+  const mesh = useOne(() => makeArrow(det), det);
 
   // Set up draw
-  const vertexCount = 2 + tris;
-  const instanceCount = ((props.positions?.length ?? count) || 2) - 1;
+  const vertexCount = mesh.count;
+  const instanceCount = ((props.anchors?.length ?? count) || 1);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
+  const a = props.anchors ?? props.anchor ?? props.getAnchor;
   const p = props.positions ?? props.position ?? props.getPosition;
-  const g = props.segments ?? props.segment ?? props.getSegment;
   const c = props.colors ?? props.color ?? props.getColor;
+  const z = props.sizes ?? props.size ?? props.getSize;
   const w = props.widths ?? props.width ?? props.getWidth;
   const d = props.depths ?? props.depth ?? props.getDepth;
 
-  const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, g, c, w, d]);
+  const useShader = (g: StorageSource) => {
+    return useMemo(() => {
+      const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [g, a, p, c, z, w, d]);
 
-    const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings), {}, key);
-    const getFragment = getPassThruFragment;
+      const getVertex = bindBundle(getArrowVertex, bindingsToLinks(vertexBindings), {}, key);
+      const getFragment = getPassThruFragment;
 
-    return [getVertex, getFragment];
-  }, [p, g, c, w, d]);
+      return [getVertex, getFragment];
+    }, [a, p, c, z, w, d]);
+  };
 
-  return use(Virtual, {
-    vertexCount,
-    instanceCount,
+  return use(RawData, {
+    data: mesh.vertices[0],
+    format: 'vec4<f32>',
+    render: (getMesh: StorageSource) => {
+      const [getVertex, getFragment] = useShader(getMesh);
+      return use(Virtual, {
+        vertexCount,
+        instanceCount,
 
-    getVertex,
-    getFragment,
+        getVertex,
+        getFragment,
 
-    defines,
-    deps: [j],
+        defines: DEFINES,
+        deps: NO_DEPS,
 
-    pipeline,
-    mode,
-    id,
+        pipeline,
+        mode,
+        id,
+      })
+    },
   });
-}, 'RawLines');
+}, 'RawArrows');
+
+

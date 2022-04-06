@@ -700,7 +700,10 @@ export const detachFiber = <F extends Function>(
 
   pingFiber(fiber);
 
-  if (!next || (next.f !== call.f)) next = fiber.next = makeSubFiber(fiber, call);
+  if (!next || (next.f !== call.f)) {
+    if (next) disposeFiber(next);
+    next = fiber.next = makeSubFiber(fiber, call);
+  }
   next.args = call.args;
 
   callback(() => {

@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Rectangle } from './types';
 
-import { use, provide, makeContext, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
@@ -60,22 +60,22 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   }, [scale, width, height, pixelRatio]);
 
   const uniforms = useOne(() => ({
-    projectionMatrix: { value: null },
-    viewMatrix: { value: mat4.create() },
-    viewPosition: { value: null },
-    viewResolution: { value: null },
-    viewSize: { value: null },
-    viewWorldUnit: { value: null },
-    viewPixelRatio: { value: null },
+    projectionMatrix: { current: null },
+    viewMatrix: { current: mat4.create() },
+    viewPosition: { current: null },
+    viewResolution: { current: null },
+    viewSize: { current: null },
+    viewWorldUnit: { current: null },
+    viewPixelRatio: { current: null },
   })) as any as ViewUniforms;
 
-  uniforms.projectionMatrix.value = matrix;
-  //uniforms.viewMatrix.value = ;
-  uniforms.viewPosition.value = [ 0, 0, 1, 0 ];
-  uniforms.viewResolution.value = [ 1 / width, 1 / height ];
-  uniforms.viewSize.value = [ width, height ];
-  uniforms.viewWorldUnit.value = focus;
-  uniforms.viewPixelRatio.value = ratio;
+  uniforms.projectionMatrix.current = matrix;
+  //uniforms.viewMatrix.current = ;
+  uniforms.viewPosition.current = [ 0, 0, 1, 0 ];
+  uniforms.viewResolution.current = [ 1 / width, 1 / height ];
+  uniforms.viewSize.current = [ width, height ];
+  uniforms.viewWorldUnit.current = focus;
+  uniforms.viewPixelRatio.current = ratio;
 
   return use(ViewProvider, {
     defs: VIEW_UNIFORMS,

@@ -31,7 +31,7 @@ export const makeShaderBinding = <T>(
       const lambda = source as T;
       return {uniform, lambda};
     }
-    if (source.buffer) {
+    if (source.buffer && (source.buffer instanceof GPUBuffer)) {
       const storage = source as StorageSource;
       checkStorageType(uniform, storage);
       return {uniform, storage};
@@ -43,6 +43,12 @@ export const makeShaderBinding = <T>(
   }
   return {uniform, constant: source ?? uniform.value};
 }
+
+// Bind a value ref for a given uniform/attribute
+export const makeRefBinding = <T>(
+  uniform: UniformAttributeValue,
+  value?: {current: T},
+): DataBinding<T> => ({uniform, constant: value ?? uniform.value});
 
 // Bind a shader to a set of data bindings, either as constants or a buffer
 export const makeBoundShader = <A, B>(

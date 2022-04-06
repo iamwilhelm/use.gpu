@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core/types';
-import { DeviceContext, FrameContext } from '@use-gpu/components';
+import { DeviceContext } from '../providers/device-provider';
+import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
 import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor,
@@ -17,7 +18,7 @@ export type CompositeDataProps = {
   data?: any[],
   fields?: DataField[],
   live?: boolean,
-  isLoop?: <T>(t: T[]) => boolean,
+  loop?: <T>(t: T[]) => boolean,
 
   render?: (sources: StorageSource[]) => LiveElement<any>,
 };
@@ -38,7 +39,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   } = props;
 
   const fs = fields ?? NO_FIELDS;
-  let isLoop = props.isLoop ?? (() => false);
+  let isLoop = props.loop ?? (() => false);
 
   // Gather data length
   const [chunks, loops, length] = useMemo(() => {
@@ -167,11 +168,13 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   };
   
   if (!live) {
-    useNoContext(FrameContext);
+    usePerFrame();
+    useAnimationFrame();
     useMemo(refresh, [device, data, fieldBuffers]);
   }
   else {
-    useContext(FrameContext);
+    useNoPerFrame();
+    useNoAnimationFrame();
     useNoMemo();
     refresh()
   }

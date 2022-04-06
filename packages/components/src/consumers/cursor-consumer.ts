@@ -2,7 +2,7 @@ import { LiveFiber, LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { memo, consume, resume, makeContext, useConsumer, useOne, useMemo, getTailValue } from '@use-gpu/live';
 
-export const CursorContext = makeContext(null, 'CursorContext');
+export const CursorContext = makeContext(undefined, 'CursorContext');
 
 export type CursorProps = {
   cursor?: string,

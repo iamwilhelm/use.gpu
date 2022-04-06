@@ -35,6 +35,12 @@ struct ViewUniforms {
   return pos.xyz / pos.w;
 }
 
+@export fn getWorldScale(w: f32, f: f32) -> f32 {
+  var m = viewUniforms.projectionMatrix;
+  var v = viewUniforms.viewResolution;
+  return getPerspectiveScale(w, f) * v.y * w;// m[1][1];//1.0;//getPerspectiveScale(w, f) * w * m[1][1];
+}
+
 @export fn getPerspectiveScale(w: f32, f: f32) -> f32 {
   var m = viewUniforms.projectionMatrix;
   var worldScale = m[1][1] * viewUniforms.viewWorldUnit;

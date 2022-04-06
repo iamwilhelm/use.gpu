@@ -8,8 +8,8 @@ import { RenderContext } from '../providers/render-provider';
 
 const CAPTURE_EVENT = {capture: true};
 
-export const EventContext = makeContext(null, 'EventContext');
-export const MouseContext = makeContext(null, 'MouseContext');
+export const EventContext = makeContext(undefined, 'EventContext');
+export const MouseContext = makeContext(undefined, 'MouseContext');
 
 export type EventProviderProps = {
   element: HTMLElement,

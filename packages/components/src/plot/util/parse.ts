@@ -61,6 +61,7 @@ export const makeParseArray = <T>(
     const l = vs.length;
     const n = defaults.length;
     if (l < n) for (let i = l; i < n; ++i) vs.push(defaults[i]);
+		return vs;
   }
   return defaults;
 };
@@ -150,7 +151,7 @@ export const parseROPProps = (props: Partial<ROPProps>): ROPProps => {
 
 export const parseArrowProps = (props: Partial<ROPProps>): ROPProps => {
   const {
-    size = 3,
+    size = 4,
     start = false,
     end = true,
   } = props;

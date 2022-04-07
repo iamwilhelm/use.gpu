@@ -66,10 +66,14 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
 
     const matrix = mat4.create();
     mat4.set(matrix,
-      2/dx, 0, 0, -(2*x+dx)/dx,
-      0, 2/dy, 0, -(2*y+dy)/dy,
-      0, 0, 2/dz, -(2*z+dz)/dz,
-      0, 0, 0, 1,
+      2/dx, 0, 0, 0,
+      0, 2/dy, 0, 0,
+      0, 0, 2/dz, 0,
+
+			-(2*x+dx)/dx,
+			-(2*y+dy)/dy,
+			-(2*z+dz)/dz,
+			1,
     );
 
     if (a !== 'xyzw') {

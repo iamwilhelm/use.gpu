@@ -29,8 +29,8 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [radius, setRadius]   = useState<number>(5);
-  const [bearing, setBearing] = useState<number>(0.6);
-  const [pitch, setPitch]     = useState<number>(0.4);
+  const [bearing, setBearing] = useState<number>(1.4);
+  const [pitch, setPitch]     = useState<number>(0.1);
 
   useResource((dispose) => {
     const onWheel = (e: WheelEvent) => {

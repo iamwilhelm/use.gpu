@@ -63,7 +63,6 @@ const FRAGMENT_BINDINGS = [
 
 const DEFINES = {
   HAS_EDGE_BLEED: true,
-  STRIP_SEGMENTS: 2,
 };
 
 const PIPELINE = {

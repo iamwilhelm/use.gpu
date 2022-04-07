@@ -63,6 +63,7 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     projectionMatrix: { current: null },
     viewMatrix: { current: mat4.create() },
     viewPosition: { current: null },
+    viewNearFar: { current: null },
     viewResolution: { current: null },
     viewSize: { current: null },
     viewWorldUnit: { current: null },
@@ -72,6 +73,7 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.projectionMatrix.current = matrix;
   //uniforms.viewMatrix.current = ;
   uniforms.viewPosition.current = [ 0, 0, 1, 0 ];
+  uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
   uniforms.viewWorldUnit.current = focus;

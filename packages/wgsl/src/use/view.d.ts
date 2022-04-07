@@ -8,6 +8,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const clipToScreen3D: ParsedBundle;
   export const screenToClip3D: ParsedBundle;
   export const worldToClip3D: ParsedBundle;
+  export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;
   export default __module;
 }

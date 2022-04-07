@@ -24,18 +24,24 @@ export type RawLinesProps = {
   color?: number[] | TypedArray,
   width?: number,
   depth?: number,
+  trim?: number[] | TypedArray,
+	size?: number,
 
   positions?: StorageSource,
   segments?: StorageSource,
   colors?: StorageSource,
   widths?: StorageSource,
   depths?: StorageSource,
+  trims?: StorageSource,
+  sizes?: StorageSource,
 
   getPosition?: ShaderModule,
   getSegment?: ShaderModule,
   getColor?: ShaderModule,
   getWidth?: ShaderModule,
   getDepth?: ShaderModule,
+  getTrim?: StorageSource,
+  getSize?: StorageSource,
 
   join?: 'miter' | 'round' | 'bevel',
 
@@ -53,6 +59,8 @@ const VERTEX_BINDINGS = [
   { name: 'getColor', format: 'vec4<f32>', value: [0.5, 0.5, 0.5, 1] },
   { name: 'getWidth', format: 'f32', value: 1 },
   { name: 'getDepth', format: 'f32', value: 0 },
+  { name: 'getTrim', format: 'vec4<i32>', value: [0, 0, 0, 0] },
+  { name: 'getSize', format: 'f32', value: 1 },
 ] as UniformAttributeValue[];
 
 const LINE_JOIN_SIZE = {
@@ -92,7 +100,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const defines = {
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
-    STRIP_SEGMENTS: tris,
   };
 
   // Set up draw
@@ -107,15 +114,17 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const c = props.colors ?? props.color ?? props.getColor;
   const w = props.widths ?? props.width ?? props.getWidth;
   const d = props.depths ?? props.depth ?? props.getDepth;
+  const t = props.trims ?? props.trim ?? props.getTrim;
+  const z = props.sizes ?? props.size ?? props.getSize;
 
   const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, g, c, w, d]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, g, c, w, d, t, z]);
 
     const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings), {}, key);
     const getFragment = getPassThruFragment;
 
     return [getVertex, getFragment];
-  }, [p, g, c, w, d]);
+  }, [p, g, c, w, d, t, z]);
 
   return use(Virtual, {
     vertexCount,

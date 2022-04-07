@@ -36,6 +36,6 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   return SolidVertex(
     center,
     color,
-    uv
+    uv,
   );
 }

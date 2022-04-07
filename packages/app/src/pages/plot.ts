@@ -53,14 +53,28 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                   children: [
 
                     use(Cartesian, {
+											range: [[0, 1], [0, 1], [0, 1]],
                       scale: [3, 3, 3],
                       children: [
 
                         use(Axis, {
+													axis: 'x',
                           width: 20,
-                          color: [1, 1, 1, 0.5],
-                          detail: 2,
-                        })
+                          color: [0.75, 0.75, 0.75, 1],
+                          detail: 1,
+                        }),
+                        use(Axis, {
+													axis: 'y',
+                          width: 20,
+                          color: [0.75, 0.75, 0.75, 1],
+                          detail: 24,
+                        }),
+                        use(Axis, {
+													axis: 'z',
+                          width: 20,
+                          color: [0.75, 0.75, 0.75, 1],
+                          detail: 24,
+                        }),
                       ]
                     })
                   ]

@@ -87,7 +87,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   // Set up draw
   const vertexCount = mesh.count;
-  const instanceCount = ((props.anchors?.length ?? count) || 1);
+  const instanceCount = ((props.anchors?.length ?? count) ?? 1);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
@@ -110,7 +110,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     }, [a, p, c, z, w, d]);
   };
 
-  return use(RawData, {
+  return instanceCount ? use(RawData, {
     data: mesh.vertices[0],
     format: 'vec4<f32>',
     render: (getMesh: StorageSource) => {
@@ -130,7 +130,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
         id,
       })
     },
-  });
+  }) : 0;
 }, 'RawArrows');
 
 

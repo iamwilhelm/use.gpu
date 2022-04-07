@@ -69,14 +69,19 @@ fn slerp(d: f32, a: vec2<f32>, b: vec2<f32>, t: f32) -> vec2<f32> {
     mid = right;
   }
   else {
-    var c = cross(vec3(left, 0.0), vec3(right, 0.0)).z;
-    if (c * y < 0.0) {
-      mid = lineJoinMiter(left, right, segment, arc);
+    if (dot(left, right) < 0.999) {
+      var c = cross(vec3(left, 0.0), vec3(right, 0.0)).z;
+      if (c * y < 0.0) {
+        mid = lineJoinMiter(left, right, segment, arc);
+      }
+      else {
+        if (style == 0) { mid = lineJoinBevel(left, right, segment, arc); }
+        if (style == 1) { mid = lineJoinMiter(left, right, segment, arc); }
+        if (style == 2) { mid = lineJoinRound(left, right, segment, arc); }
+      }
     }
     else {
-      if (style == 0) { mid = lineJoinBevel(left, right, segment, arc); }
-      if (style == 1) { mid = lineJoinMiter(left, right, segment, arc); }
-      if (style == 2) { mid = lineJoinRound(left, right, segment, arc); }
+      mid = left;
     }
   }
 

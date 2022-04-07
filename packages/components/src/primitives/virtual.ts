@@ -13,6 +13,7 @@ import instanceFragmentSolid from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
 import instanceFragmentSolidPick from '@use-gpu/wgsl/instance/fragment/solid-pick.wgsl';
 
 import instanceDrawWireframeStrip from '@use-gpu/wgsl/instance/draw/wireframe-strip.wgsl';
+import instanceDrawWireframeList from '@use-gpu/wgsl/instance/draw/wireframe-list.wgsl';
 
 import { render } from './render';
 
@@ -51,10 +52,8 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
   let vertexShader: ParsedBundle;
   let fragmentShader: ParsedBundle;
   if (isDebug) {
-    // TODO: non-strip topology
-    // if (topology === 'triangle-strip')
-    // if (topology === 'triangle-list')
-    vertexShader   = instanceDrawWireframeStrip;
+    if (topology === 'triangle-strip') vertexShader   = instanceDrawWireframeStrip;
+    else vertexShader = instanceDrawWireframeList;
     fragmentShader = instanceFragmentSolid;
   }
   else {
@@ -62,33 +61,37 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     fragmentShader = isPicking ? instanceFragmentSolidPick : instanceFragmentSolid;
   }
 
-  // Binds links into shader
-  const key = useFiber().id;
-  const [v, f] = useMemo(() => {
-    const links = { getVertex, getFragment };
-    const v = bindBundle(vertexShader, links, {}, key);
-    const f = bindBundle(fragmentShader, links, {}, key);
-    return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment]);
-
   // Debug wireframe
   let {
     vertexCount,
     instanceCount,
   } = props;
+	let instanceSize = vertexCount;
   if (isDebug) {
     if (topology === 'triangle-strip') {
       const tris = vertexCount - 2;
       const edges = tris * 2 + 1;
       
-      vertexCount = 4;
       instanceCount = edges * instanceCount;
-    }
-    if (topology === 'triangle-list') {
+			instanceSize = edges;
       vertexCount = 4;
+    }
+    else if (topology === 'triangle-list') {
       instanceCount = vertexCount * instanceCount;
+			instanceSize = vertexCount;
+      vertexCount = 18;
     }
   }
+
+  // Binds links into shader
+  const key = useFiber().id;
+  const [v, f] = useMemo(() => {
+		const defines = { WIREFRAME_INSTANCE_SIZE: instanceSize };
+    const links = { getVertex, getFragment };
+    const v = bindBundle(vertexShader, links, defines, key);
+    const f = bindBundle(fragmentShader, links, defines, key);
+    return [v, f];
+  }, [vertexShader, fragmentShader, getVertex, getFragment]);
 
   // Inline the render fiber to avoid another memo()
   return render({

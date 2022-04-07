@@ -11,6 +11,13 @@ declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/geometry/arrow.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getArrowSize: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/geometry/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -59,6 +66,13 @@ declare module "@use-gpu/wgsl/instance/draw/virtual-pick.wgsl" {
 }
 
 declare module "@use-gpu/wgsl/instance/draw/virtual.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/draw/wireframe-list.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
@@ -156,6 +170,7 @@ declare module "@use-gpu/wgsl/instance/vertex/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getLineVertex: ParsedBundle;
+  export const getTrimmedLineVertex: ParsedBundle;
   export default __module;
 }
 
@@ -266,6 +281,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const clipToScreen3D: ParsedBundle;
   export const screenToClip3D: ParsedBundle;
   export const worldToClip3D: ParsedBundle;
+  export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;
   export default __module;
 }

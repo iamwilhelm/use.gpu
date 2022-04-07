@@ -17,29 +17,46 @@ fn main(
   @builtin(instance_index) instanceIndex: u32,
 ) -> VertexOutput {
 
-  var ij = getQuadIndex(i32(vertexIndex));
+  let vi = i32(vertexIndex);
+  var ij = getStripIndex(vi - (vi / 3) * 2);
   var xy = vec2<f32>(ij) * 2.0 - 1.0;
 
   var n = WIREFRAME_INSTANCE_SIZE;
   var f = i32(instanceIndex) % n;
   var i = i32(instanceIndex) / n;
 
-  var stripIndex = getStripIndex(f);
-  var edgeIndex = stripIndex.y;
-  var triIndex = stripIndex.x;
+  var v = i32(f) % 3;
+  var t = i32(f) - v;
 
-  var a = getVertex(triIndex, i);
-  var b = getVertex(triIndex + 1 + edgeIndex, i);
+  var a: SolidVertex;
+  var b: SolidVertex;
+  var c: SolidVertex;
+  if (v == 0) {
+    a = getVertex(t, i);
+    b = getVertex(t + 1, i);
+    c = getVertex(t + 2, i);
+  }
+  else if (v == 1) {
+    a = getVertex(t + 1, i);
+    b = getVertex(t + 2, i);
+    c = getVertex(t, i);
+  }
+  else if (v == 2) {
+    a = getVertex(t + 2, i);
+    b = getVertex(t, i);
+    c = getVertex(t + 1, i);
+  }
 
   var left = a.position.xyz / a.position.w;
   var right = b.position.xyz / b.position.w;
+  var other = c.position.xyz / c.position.w;
 
   var join: vec3<f32>;
   if (ij.x > 0) {
-    join = getLineJoin(left, left, right, 0.0, xy.y, 2.0, 1, 0);
+    join = getLineJoin(left, right, other, (f32(ij.x) - 1.0) / 2.0, xy.y, 2.0, 3, 2);
   }
   else {
-    join = getLineJoin(left, right, right, 0.0, xy.y, 2.0, 2, 0);
+    join = getLineJoin(other, left, right, 1.0, xy.y, 2.0, 3, 2);
   }
 
   return VertexOutput(

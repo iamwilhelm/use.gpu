@@ -26,6 +26,11 @@
       "import": "./src/fragment/pbr.wgsl",
       "require": "./src/fragment/pbr.wgsl"
     },
+    "./geometry/arrow.wgsl": {
+      "types": "./src/geometry/arrow.d.ts",
+      "import": "./src/geometry/arrow.wgsl",
+      "require": "./src/geometry/arrow.wgsl"
+    },
     "./geometry/line.wgsl": {
       "types": "./src/geometry/line.d.ts",
       "import": "./src/geometry/line.wgsl",
@@ -60,6 +65,11 @@
       "types": "./src/instance/draw/virtual.d.ts",
       "import": "./src/instance/draw/virtual.wgsl",
       "require": "./src/instance/draw/virtual.wgsl"
+    },
+    "./instance/draw/wireframe-list.wgsl": {
+      "types": "./src/instance/draw/wireframe-list.d.ts",
+      "import": "./src/instance/draw/wireframe-list.wgsl",
+      "require": "./src/instance/draw/wireframe-list.wgsl"
     },
     "./instance/draw/wireframe-strip.wgsl": {
       "types": "./src/instance/draw/wireframe-strip.d.ts",

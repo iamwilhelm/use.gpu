@@ -216,7 +216,8 @@ export const mapChunksToAnchors = (
   const count = ends.reduce((c, [a, b]) => c + +!!a + +!!b, 0);
 
   const {array: anchors} = makeDataArray(UniformType['vec4<i32>'], count);
-  const {array: trims} = makeDataArray(UniformType['vec2<i32>'], length);
+  const {array: trims} = makeDataArray(UniformType['vec4<i32>'], length);
+	for (let i = 0; i < length * 2; ++i) trims[i] = -1;
 
   let o = 0;
   let pos = 0;
@@ -229,25 +230,30 @@ export const mapChunksToAnchors = (
     pos += c + (l ? 3 : 0);
 
     const at = ends[i];
+		console.log({at})
     if (at) {
       const [left, right] = at;
       const both = left && right ? 1 : 0;
+			const bits = +left + (+right << 1);
+
+      for (let j = start; j <= end; ++j) {
+				trims[j * 4] = start;
+				trims[j * 4 + 1] = end;
+				trims[j * 4 + 2] = bits;
+				trims[j * 4 + 3] = 0;
+			}
 
       if (left) {
         anchors[o++] = start;
+        anchors[o++] = start + 1;
         anchors[o++] = end;
         anchors[o++] = both;
-        anchors[o++] = 0;
-
-        for (let j = start; j <= end; ++j) trims[j * 2] = 1;
       }
       if (right) {
         anchors[o++] = end;
+        anchors[o++] = end - 1;
         anchors[o++] = start;
         anchors[o++] = both;
-        anchors[o++] = 0;
-
-        for (let j = start; j <= end; ++j) trims[j * 2 + 1] = 1;
       }
     }
   }

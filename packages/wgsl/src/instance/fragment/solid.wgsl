@@ -13,5 +13,6 @@ fn main(
   outColor = getFragment(outColor, fragUV);
 
   if (outColor.a <= 0.0) { discard; }
+
   return outColor;
 }

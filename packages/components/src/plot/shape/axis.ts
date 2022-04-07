@@ -99,7 +99,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
     return [
       ['i32', segments],
       ['vec4<i32>', anchors],
-      ['vec2<i32>', trims],
+      ['vec4<i32>', trims],
     ];
   }, [n, loop, start, end]);
 
@@ -107,19 +107,6 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
     use(Data, {
       fields,
       render: ([segments, anchors, trims]: StorageSource[]) => [
-        use(LineLayer, {
-          getPosition,
-          segments,
-          anchors,
-          trims,
-          count: n,
-
-          color,
-          width,
-          depth,
-          size,
-          join,
-        }),
         use(ArrowLayer, {
           getPosition,
           segments,
@@ -132,6 +119,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
           depth,
           size,
           join,
+					mode: 'd'
         }),
       ]
     })

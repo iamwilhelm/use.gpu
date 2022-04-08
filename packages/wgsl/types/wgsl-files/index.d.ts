@@ -15,6 +15,7 @@ declare module "@use-gpu/wgsl/geometry/arrow.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getArrowSize: ParsedBundle;
+  export const getArrowCorrection: ParsedBundle;
   export default __module;
 }
 
@@ -41,6 +42,13 @@ declare module "@use-gpu/wgsl/geometry/strip.wgsl" {
   const __module: ParsedBundle;
   export const getStripIndex: ParsedBundle;
   export const getStripUV: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/geometry/tick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getTickSegment: ParsedBundle;
   export default __module;
 }
 
@@ -170,7 +178,6 @@ declare module "@use-gpu/wgsl/instance/vertex/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getLineVertex: ParsedBundle;
-  export const getTrimmedLineVertex: ParsedBundle;
   export default __module;
 }
 
@@ -178,6 +185,14 @@ declare module "@use-gpu/wgsl/instance/vertex/quad.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getQuadVertex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/vertex/tick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getTickV: ParsedBundle;
+  export const getTickPosition: ParsedBundle;
   export default __module;
 }
 
@@ -218,6 +233,13 @@ declare module "@use-gpu/wgsl/plot/axis.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getAxisPosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/plot/scale.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getScalePosition: ParsedBundle;
   export default __module;
 }
 
@@ -281,6 +303,8 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const clipToScreen3D: ParsedBundle;
   export const screenToClip3D: ParsedBundle;
   export const worldToClip3D: ParsedBundle;
+  export const toClip3D: ParsedBundle;
+  export const clipLineIntoView: ParsedBundle;
   export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;
   export default __module;

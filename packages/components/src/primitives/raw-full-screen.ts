@@ -19,8 +19,7 @@ import { getFullScreenVertex } from '@use-gpu/wgsl/instance/vertex/full-screen.w
 import { getTextureFragment } from '@use-gpu/wgsl/mask/textured.wgsl';
 
 export type RawFullScreenProps = {
-  texture?: TextureSource,
-  getTexture?: ShaderModule,
+  texture?: TextureSource | LambdaSource | ShaderModule,
 
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode,
@@ -57,7 +56,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const t = props.texture ?? props.getTexture;
+  const t = props.texture;
 
   const [getVertex, getFragment] = useMemo(() => {
     const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [t]);

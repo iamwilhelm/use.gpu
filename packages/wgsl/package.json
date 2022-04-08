@@ -46,6 +46,11 @@
       "import": "./src/geometry/strip.wgsl",
       "require": "./src/geometry/strip.wgsl"
     },
+    "./geometry/tick.wgsl": {
+      "types": "./src/geometry/tick.d.ts",
+      "import": "./src/geometry/tick.wgsl",
+      "require": "./src/geometry/tick.wgsl"
+    },
     "./instance/draw/mesh-pick.wgsl": {
       "types": "./src/instance/draw/mesh-pick.d.ts",
       "import": "./src/instance/draw/mesh-pick.wgsl",
@@ -141,6 +146,11 @@
       "import": "./src/instance/vertex/quad.wgsl",
       "require": "./src/instance/vertex/quad.wgsl"
     },
+    "./instance/vertex/tick.wgsl": {
+      "types": "./src/instance/vertex/tick.d.ts",
+      "import": "./src/instance/vertex/tick.wgsl",
+      "require": "./src/instance/vertex/tick.wgsl"
+    },
     "./mask/masked.wgsl": {
       "types": "./src/mask/masked.d.ts",
       "import": "./src/mask/masked.wgsl",
@@ -165,6 +175,11 @@
       "types": "./src/plot/axis.d.ts",
       "import": "./src/plot/axis.wgsl",
       "require": "./src/plot/axis.wgsl"
+    },
+    "./plot/scale.wgsl": {
+      "types": "./src/plot/scale.d.ts",
+      "import": "./src/plot/scale.wgsl",
+      "require": "./src/plot/scale.wgsl"
     },
     "./transform/cartesian.wgsl": {
       "types": "./src/transform/cartesian.d.ts",

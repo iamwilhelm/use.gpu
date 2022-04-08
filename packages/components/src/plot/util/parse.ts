@@ -1,4 +1,4 @@
-import { LineProps, TypedArray, VectorLike } from '../types';
+import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, TypedArray, VectorLike } from '../types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
@@ -12,7 +12,18 @@ const GRAY = [0.5, 0.5, 0.5, 1];
 const NO_RANGE = vec2.fromValues(-1, 1);
 const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
 
+const NO_VECTOR = [];
+
 ///////////////////////////
+
+export const makeParseFloat = (def: number = 0, min?: number, max?: number) => (value?: number) => {
+  if (value != null) {
+    if (min != null) value = Math.max(min, value);
+    if (max != null) value = Math.min(max, value);
+    return +value;
+  }
+  return def;
+};
 
 export const makeParseInt = (def: number = 0, min?: number, max?: number) => (value?: number) => {
   if (value != null) {
@@ -20,6 +31,13 @@ export const makeParseInt = (def: number = 0, min?: number, max?: number) => (va
     if (min != null) value = Math.max(min, value);
     if (max != null) value = Math.min(max, value);
     return value;
+  }
+  return def;
+};
+
+export const makeParseBoolean = (def: boolean = false) => (value?: number | boolean) => {
+  if (value != null) {
+    return !!value;
   }
   return def;
 };
@@ -61,21 +79,34 @@ export const makeParseArray = <T>(
     const l = vs.length;
     const n = defaults.length;
     if (l < n) for (let i = l; i < n; ++i) vs.push(defaults[i]);
-		return vs;
+    return vs;
   }
   return defaults;
 };
 
-const AXES = {'x': 0, 'y': 1, 'z': 2, 'w': 3} as Record<string, number>;
+export const makeParseEnum = (
+  options: string[],
+) => {
+  const hash = new Set(options);
+  const [def] = options;
+
+  return (s?: string): string => {
+    if (s != null && hash.has(s)) return s;
+    return def;
+  };
+};
+
+const AXIS_NUMBERS = {'x': 0, 'y': 1, 'z': 2, 'w': 3} as Record<string, number>;
+const AXIS_LETTERS = ['x', 'y', 'z', 'w'];
 
 export const makeParseAxis = (def: number) => (s?: string) => {
-  if (s != null) return AXES[s] ?? def;
+  if (s != null) return AXIS_NUMBERS[s] ?? def;
   return def;
 };
 
 export const makeParseBasis = (defaults: string) => {
   const axes = defaults.split('');
-  const order = [0, 0, 0, 0];
+  const order = [0, 1, 2, 3];
 
   const getOrder = (s: string) => {
     order.sort((a, b) => {
@@ -85,7 +116,7 @@ export const makeParseBasis = (defaults: string) => {
       if (ai < 0 && bi < 0) return a - b;
       return (ai < 0) ? 1 : -1;
     });
-    return order.join('');
+    return order.map(x => AXIS_LETTERS[x]).join('');
   };
 
   return (s?: string) => {
@@ -94,7 +125,29 @@ export const makeParseBasis = (defaults: string) => {
   }
 };
 
+export const makeParseColor = (def: VectorLike[] = GRAY) => (c?: number | VectorLike) => {
+  if (c === +c) {
+    const a = ((c >> 24) & 255) / 255;
+    const r = ((c >> 16) & 255) / 255;
+    const g = ((c >> 8) & 255) / 255;
+    const b = ((c & 255)) / 255;
+    
+    return [r, g, b, a];
+  }
+  if (c.length) {
+    return [c[0] ?? def[0], c[1] ?? def[1], c[2] ?? def[2], c[3] ?? def[3] ];
+  }
+};
+
 //////////////////
+
+export const parseColor      = makeParseColor();
+
+export const parseFloat      = makeParseFloat();
+export const parseInt        = makeParseInt();
+export const parseBoolean    = makeParseBoolean();
+
+export const parseVector     = makeParseArray(NO_VECTOR, parseFloat);
 
 export const parsePosition4  = makeParseVec4();
 
@@ -112,49 +165,7 @@ export const parseAxis       = makeParseAxis(0);
 
 export const parseDetail     = makeParseInt(1, 1, 1e8);
 
-///////////////////
+export const parseDomain     = makeParseEnum<Domain>(['linear', 'log']);
+export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
+export const parseBlending   = makeParseEnum<Blending>(['none', 'normal', 'add', 'subtract', 'multiply', 'custom']);
 
-export const parseLineProps = (props: Partial<LineProps>): LineProps => {
-  const {
-    width = 1,
-    depth = 0,
-    join = 'bevel',
-    loop = false,
-    dash = null,
-    proximity = 0,
-  } = props;
-  
-  return { width, depth, join, loop, dash, proximity };
-};
-
-export const parseColorProps = (props: Partial<ColorProps>): vec4 => {
-  const {
-    color = GRAY,
-    opacity = 1,
-  } = props;
-
-  if (opacity === 1) return vec4.clone(color);
-  return vec4.fromValues(color[0], color[1], color[2], color[3] * opacity);
-};
-
-export const parseROPProps = (props: Partial<ROPProps>): ROPProps => {
-  const {
-    blending = 'normal',
-    zWrite = true,
-    zTest = true,
-    zBias = 0,
-    zIndex = 0,
-  } = props;
-
-  return { blending, zWrite, zTest, zBias, zIndex };
-};
-
-export const parseArrowProps = (props: Partial<ROPProps>): ROPProps => {
-  const {
-    size = 4,
-    start = false,
-    end = true,
-  } = props;
-
-  return { size, start, end };
-};

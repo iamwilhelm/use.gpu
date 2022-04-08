@@ -61,7 +61,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const uniforms = useOne(() => ({
     projectionMatrix: { current: null },
     viewMatrix: { current: null },
-		viewNearFar: { current: null },
+    viewNearFar: { current: null },
     viewPosition: { current: null },
     viewResolution: { current: null },
     viewSize: { current: null },

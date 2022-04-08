@@ -1,6 +1,6 @@
 import {
   UniformType, UniformAttribute, UniformAttributeValue,
-  ShaderModuleDescriptor, StorageSource, DataBinding, TextureSource,
+  ShaderModuleDescriptor, StorageSource, DataBinding, TextureSource, LambdaSource,
 } from './types';
 import { makeStorageAccessors, checkStorageTypes, checkStorageType } from './storage';
 import { makeShaderModule } from './pipeline';
@@ -24,11 +24,15 @@ export const makeShaderBindings = <T>(
 // Parse a source for a given uniform/attribute
 export const makeShaderBinding = <T>(
   uniform: UniformAttributeValue,
-  source?: StorageSource | T | any,
+  source?: StorageSource | TextureSource | LambdaSource<T> | T | any,
 ): DataBinding<T> => {
   if (source) {
+    if (source.shader) {
+      const lambda = source as LambdaSource<T>;
+      return {uniform, lambda};
+    }
     if (source.libs || source.table) {
-      const lambda = source as T;
+      const lambda = {shader: source} as LambdaSource<T>;
       return {uniform, lambda};
     }
     if (source.buffer && (source.buffer instanceof GPUBuffer)) {

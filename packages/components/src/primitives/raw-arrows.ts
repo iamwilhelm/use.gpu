@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode,
+  VertexData, StorageSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -17,6 +17,8 @@ import { makeShaderBindings } from '@use-gpu/core';
 
 import { makeArrow } from './mesh/arrow';
 import { RawData } from '../data/raw-data';
+import { useRawStorage } from '../hooks/useRawStorage';
+import { useApplyTransform } from '../hooks/useApplyTransform';
 
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -29,19 +31,12 @@ export type RawArrowsProps = {
   width?: number,
   depth?: number,
 
-  anchors?: StorageSource,
-  positions?: StorageSource,
-  colors?: StorageSource,
-  sizes?: StorageSource,
-  widths?: StorageSource,
-  depths?: StorageSource,
-
-  getAnchor?: ShaderModule,
-  getPosition?: ShaderModule,
-  getColor?: ShaderModule,
-  getSize?: ShaderModule,
-  getWidth?: ShaderModule,
-  getDepth?: ShaderModule,
+  anchors?:   StorageSource | LambdaSource | ShaderModule,
+  positions?: StorageSource | LambdaSource | ShaderModule,
+  colors?:    StorageSource | LambdaSource | ShaderModule,
+  sizes?:     StorageSource | LambdaSource | ShaderModule,
+  widths?:    StorageSource | LambdaSource | ShaderModule,
+  depths?:    StorageSource | LambdaSource | ShaderModule,
 
   detail?: number,
 
@@ -92,45 +87,41 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const a = props.anchors ?? props.anchor ?? props.getAnchor;
-  const p = props.positions ?? props.position ?? props.getPosition;
-  const c = props.colors ?? props.color ?? props.getColor;
-  const z = props.sizes ?? props.size ?? props.getSize;
-  const w = props.widths ?? props.width ?? props.getWidth;
-  const d = props.depths ?? props.depth ?? props.getDepth;
+  const a = props.anchors ?? props.anchor;
+  const p = props.positions ?? props.position;
+  const c = props.colors ?? props.color;
+  const z = props.sizes ?? props.size;
+  const w = props.widths ?? props.width;
+  const d = props.depths ?? props.depth;
+  
+  const g = useRawStorage(mesh.vertices[0], 'vec4<f32>');
+  const xf = useApplyTransform(p);
 
-  const useShader = (g: StorageSource) => {
-    return useMemo(() => {
-      const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [g, a, p, c, z, w, d]);
+  const [getVertex, getFragment] = useMemo(() => {
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [g, a, xf, c, z, w, d]);
 
-      const getVertex = bindBundle(getArrowVertex, bindingsToLinks(vertexBindings), {}, key);
-      const getFragment = getPassThruFragment;
+    const getVertex = bindBundle(getArrowVertex, bindingsToLinks(vertexBindings), {}, key);
+    const getFragment = getPassThruFragment;
 
-      return [getVertex, getFragment];
-    }, [a, p, c, z, w, d]);
-  };
+    return [getVertex, getFragment];
+  }, [g, a, xf, c, z, w, d]);
 
-  return instanceCount ? use(RawData, {
-    data: mesh.vertices[0],
-    format: 'vec4<f32>',
-    render: (getMesh: StorageSource) => {
-      const [getVertex, getFragment] = useShader(getMesh);
-      return use(Virtual, {
-        vertexCount,
-        instanceCount,
+  return instanceCount ? (
+     use(Virtual, {
+      vertexCount,
+      instanceCount,
 
-        getVertex,
-        getFragment,
+      getVertex,
+      getFragment,
 
-        defines: DEFINES,
-        deps: NO_DEPS,
+      defines: DEFINES,
+      deps: NO_DEPS,
 
-        pipeline,
-        mode,
-        id,
-      })
-    },
-  }) : 0;
+      pipeline,
+      mode,
+      id,
+    })
+  ) : null;
 }, 'RawArrows');
 
 

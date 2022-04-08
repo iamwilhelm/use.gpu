@@ -5,11 +5,12 @@ export type Swizzle = string;
 export type Axis = 'x' | 'y' | 'z' | 'w';
 export type Range = [number, number];
 export type Join = 'miter' | 'round' | 'bevel';
-export type Blending = 'no' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
+export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
+export type Domain = 'linear' | 'log',
 
 export type VectorLike = TypedArray | number[];
 
-export type LineProps = {
+export type LineTrait = {
   width: number,
   depth: number,
   join: Join,
@@ -18,12 +19,12 @@ export type LineProps = {
   proximity: number,
 };
 
-export type ColorProps = {
+export type ColorTrait = {
   color: number | VectorLike,
   opacity: number,
 };
 
-export type ROPProps = {
+export type ROPTrait = {
   blending: Blending,
   zWrite: boolean,
   zTest: boolean,
@@ -31,13 +32,30 @@ export type ROPProps = {
   zIndex: number,
 };
 
-export type ArrowProps = {
+export type ArrowTrait = {
   size: number,
   start: boolean,
   end: boolean,
 };
 
-export type TransformContextProps = {
-  range: Range[],
-  transform: ShaderModule | null,
+export type ScaleTrait = {
+  mode?: Domain,
+  divide?: number,
+  unit?: number,
+  base?: number,
+  start?: true,
+  end?: true,
+  zero?: true,
+  factor?: number,
+  nice?: boolean,
+};
+
+export type AxisTrait = {
+  range?: VectorLike,
+  axis?: Axis,
+};
+
+export type AxesTrait = {
+  range?: VectorLike[],
+  axes?: Swizzle,
 };

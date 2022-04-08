@@ -66,19 +66,19 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     vertexCount,
     instanceCount,
   } = props;
-	let instanceSize = vertexCount;
+  let instanceSize = vertexCount;
   if (isDebug) {
     if (topology === 'triangle-strip') {
       const tris = vertexCount - 2;
       const edges = tris * 2 + 1;
       
       instanceCount = edges * instanceCount;
-			instanceSize = edges;
+      instanceSize = edges;
       vertexCount = 4;
     }
     else if (topology === 'triangle-list') {
       instanceCount = vertexCount * instanceCount;
-			instanceSize = vertexCount;
+      instanceSize = vertexCount;
       vertexCount = 18;
     }
   }
@@ -86,7 +86,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
   // Binds links into shader
   const key = useFiber().id;
   const [v, f] = useMemo(() => {
-		const defines = { WIREFRAME_INSTANCE_SIZE: instanceSize };
+    const defines = { WIREFRAME_INSTANCE_SIZE: instanceSize };
     const links = { getVertex, getFragment };
     const v = bindBundle(vertexShader, links, defines, key);
     const f = bindBundle(fragmentShader, links, defines, key);

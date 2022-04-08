@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/types';
 import { DeviceContext } from '../providers/device-provider';
+import { DataContext } from '../providers/data-provider';
 import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
 import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
@@ -25,6 +26,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     format, length,
     data, expr,
     render,
+    children,
     live = false,
   } = props;
 
@@ -69,5 +71,8 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     refresh();
   }
 
-  return useMemo(() => render ? render(source) : yeet(source), [render, source]);
+  return useMemo(() => {
+    if (render == null && children === undefined) return yeet(source);
+    return provide(DataContext, source, render != null ? render(source) : children);
+  }, [render, children, source]);
 };

@@ -143,6 +143,7 @@ export const makeResolveBindings = (
   // Gather all namespaced uniforms and bindings from all virtual modules.
   // Assign base offset to each virtual module in-place.
   let base = 0;
+  let index = 0;
   for (const {virtual} of modules) {
     if (virtual) for (const m of virtual) {
       if (seen.has(m)) continue;
@@ -150,7 +151,7 @@ export const makeResolveBindings = (
 
       if (m.virtual) {
         const {uniforms, storages, textures} = m.virtual;
-        const namespace = `${PREFIX_VIRTUAL}${base}_`;
+        const namespace = `${PREFIX_VIRTUAL}${++index}_`;
         if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
         if (storages) for (const b of storages) allBindings.push(b);
         if (textures) for (const b of textures) allBindings.push(b);

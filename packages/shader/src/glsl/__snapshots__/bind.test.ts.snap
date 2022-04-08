@@ -90,30 +90,30 @@ exports[`bind links data bindings 1`] = `
 "#version 450
 
 layout (set = VIRTUAL_BINDGROUP, binding = 1) uniform _VT_Type {
-  vec4 _VT_0_getColor;
+  vec4 _VT_1_getColor;
 } _VT_Uniform;
 
 
-vec4 _VT_0_getColor(int) {
-  return _VT_Uniform._VT_0_getColor;
+vec4 _VT_1_getColor(int) {
+  return _VT_Uniform._VT_1_getColor;
 }
 
 
-layout (std430, set = VIRTUAL_BINDGROUP, binding = 0) readonly buffer _VT_0_getSizeType {
+layout (std430, set = VIRTUAL_BINDGROUP, binding = 0) readonly buffer _VT_1_getSizeType {
   vec2 data[];
-} _VT_0_getSizeStorage;
+} _VT_1_getSizeStorage;
 
-vec2 _VT_0_getSize(int index) {
-  return _VT_0_getSizeStorage.data[index];
+vec2 _VT_1_getSize(int index) {
+  return _VT_1_getSizeStorage.data[index];
 }
 
 
-    vec4 _VT_0_getColor(int);
-    vec2 _VT_0_getSize(int);
+    vec4 _VT_1_getColor(int);
+    vec2 _VT_1_getSize(int);
     
     void main() {
-      _VT_0_getColor(0);
-      _VT_0_getSize(0);
+      _VT_1_getColor(0);
+      _VT_1_getSize(0);
     }
     "
 `;

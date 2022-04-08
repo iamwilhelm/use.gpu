@@ -5,7 +5,7 @@ import {
 } from './types';
 
 import { bind, bustFiberMemo, getCurrentFiber } from './fiber';
-import { isSameDependencies } from './util';
+import { isSameDependencies, incrementVersion } from './util';
 import { formatNode } from './debug';
 
 export const NOP = () => {};
@@ -248,6 +248,22 @@ export const useCallback = <T extends Function>(
   return value as unknown as T;
 }
 
+// Version counter
+export const useVersion = <T>(nextValue: T) => {
+  const fiber = useFiber();
+
+  const i = pushState(fiber, Hook.VERSION);
+  let {state, host, yeeted} = fiber;
+
+  let value   = state![i];
+  let version = state![i + 1] || 0;
+  if (value !== nextValue) {
+    version = incrementVersion(state![i + 1]);
+  }
+
+  return version;
+}
+
 // Bind immediately to a resource, with auto-cleanup on dep change or unmount
 export const useResource = <R>(
   callback: (dispose: (f: Function) => void) => R,
@@ -401,6 +417,7 @@ export const useNoState = useNoHook(Hook.STATE);
 export const useNoMemo = useNoHook(Hook.MEMO);
 export const useNoOne = useNoHook(Hook.ONE);
 export const useNoCallback = useNoHook(Hook.CALLBACK);
+export const useNoVersion = useNoHook(Hook.VERSION);
 
 // Async wrapper
 export const useAsync = <T>(f: () => Promise<T>, deps: any[] = NO_DEPS): T | null => {

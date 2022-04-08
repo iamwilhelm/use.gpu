@@ -44,7 +44,7 @@ export type DataBinding<T extends SymbolTable = any> = {
   uniform: UniformAttributeValue,
   storage?: StorageSource,
   texture?: TextureSource,
-  lambda?: ShaderModule<T>,
+  lambda?: LambdaSource<T>,
   constant?: any,
 };
 
@@ -79,6 +79,11 @@ export type StorageSource = {
   format: string,
   length: number,
   version: number,
+};
+
+export type LambdaSource<T> = {
+  shader: ShaderModule<T>,
+  size: [number, number] | [number, number, number] | [number, number, number, number],
 };
 
 export type TextureSource = {

@@ -172,6 +172,13 @@ export type StorageSource = {
   version: number,
 };
 
+export type LambdaSource<T = any> = {
+  shader: T,
+  length?: number,
+  version?: number,
+  size?: number[],
+};
+
 export type TextureSource = {
   texture: GPUTexture,
   view: GPUTexture | GPUTextureView,
@@ -226,12 +233,12 @@ export type ArrayLike = any[] | TypedArray;
 
 export type AccessorSpec = string | Accessor | ArrayLike;
 export type DataField = [string, AccessorSpec];
-export type DataBinding<T> = {
+export type DataBinding<T = any> = {
   uniform: UniformAttributeValue,
   storage?: StorageSource,
   texture?: TextureSource,
+  lambda?: LambdaSource<T>,
   constant?: any,
-  lambda?: T,
 };
 
 export type AggregateBuffer = {

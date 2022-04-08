@@ -8,8 +8,8 @@ import {
   Loop, Draw, Pass, Flat,
   CompositeData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
-  Pick, Cursor,
-  Plot, Cartesian, Axis,
+  Pick, Cursor, PointLayer, Ticks,
+  Plot, Cartesian, Axis, Scale,
   RenderToTexture,
   Router, Routes,
 } from '@use-gpu/components';
@@ -22,21 +22,21 @@ export type GeometryPageProps = {
 
 
 let t = 0;
-let lj = 0;
-const getLineJoin = () => ['bevel', 'miter', 'round'][lj = (lj + 1) % 3];
 
 export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
   const mesh = makeMesh();
   const texture = makeTexture();
   const {canvas} = props;
-
+  
   const view = (
     use(Loop, {
       children: [
         use(Draw, {
-          live: true,
           children: [
 
+            use(Raw, () => {
+              t = t + 1/60;
+            }),
             use(Cursor, { cursor: 'move' }),
             use(Pass, {
               children: [
@@ -53,27 +53,31 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                   children: [
 
                     use(Cartesian, {
-											range: [[0, 1], [0, 1], [0, 1]],
-                      scale: [3, 3, 3],
+                      range: [[0, 1], [0, 1], [0, 1]],
+                      scale: [1, 1, 1],
                       children: [
 
                         use(Axis, {
-													axis: 'x',
+                          axis: 'x',
                           width: 20,
                           color: [0.75, 0.75, 0.75, 1],
-                          detail: 1,
+                        }),
+                        use(Scale, {
+                          axis: 'x',
+                          children: [
+                            use(Ticks, { size: 50, width: 10, offset: [0, 1, 0], depth: 0 }),
+                          ],
                         }),
                         use(Axis, {
-													axis: 'y',
+                          axis: 'y',
                           width: 20,
                           color: [0.75, 0.75, 0.75, 1],
-                          detail: 24,
+                          detail: 8,
                         }),
                         use(Axis, {
-													axis: 'z',
+                          axis: 'z',
                           width: 20,
                           color: [0.75, 0.75, 0.75, 1],
-                          detail: 24,
                         }),
                       ]
                     })

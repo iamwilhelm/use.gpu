@@ -7,7 +7,7 @@ import {
 import { use, fragment, morph, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
 import { discardState } from './hooks';
 import { renderFibers } from './tree';
-import { isSameDependencies } from './util';
+import { isSameDependencies, incrementVersion } from './util';
 import { formatNode, formatNodeName } from './debug';
 
 let ID = 0;
@@ -839,6 +839,3 @@ export const bustFiberYeet = <F extends Function>(fiber: LiveFiber<F>, force?: b
 export const bustFiberMemo = <F extends Function>(fiber: LiveFiber<F>) => {
   if (fiber.version != null) fiber.version = incrementVersion(fiber.version);
 }
-
-// Cyclic version number that skips 0
-export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;

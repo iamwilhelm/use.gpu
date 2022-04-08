@@ -3,6 +3,9 @@ import { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types
 const RAF = typeof window !== 'undefined' ? window.requestAnimationFrame : setTimeout;
 const NO_DEPS = [] as any[];
 
+// Cyclic version number that skips 0
+export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
+
 // Schedules actions to be run immediately after the current thread completes
 export const makeActionScheduler = () => {
   const queue = [] as Action<any>[];

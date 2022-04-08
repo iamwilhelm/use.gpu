@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode,
+  VertexData, StorageSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -14,6 +14,7 @@ import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
+import { useApplyTransform } from '../hooks/useApplyTransform';
 
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -25,23 +26,15 @@ export type RawLinesProps = {
   width?: number,
   depth?: number,
   trim?: number[] | TypedArray,
-	size?: number,
+  size?: number,
 
-  positions?: StorageSource,
-  segments?: StorageSource,
-  colors?: StorageSource,
-  widths?: StorageSource,
-  depths?: StorageSource,
-  trims?: StorageSource,
-  sizes?: StorageSource,
-
-  getPosition?: ShaderModule,
-  getSegment?: ShaderModule,
-  getColor?: ShaderModule,
-  getWidth?: ShaderModule,
-  getDepth?: ShaderModule,
-  getTrim?: StorageSource,
-  getSize?: StorageSource,
+  positions?: StorageSource | LambdaSource | ShaderModule,
+  segments?: StorageSource | LambdaSource | ShaderModule,
+  colors?: StorageSource | LambdaSource | ShaderModule,
+  widths?: StorageSource | LambdaSource | ShaderModule,
+  depths?: StorageSource | LambdaSource | ShaderModule,
+  trims?: StorageSource | LambdaSource | ShaderModule,
+  sizes?: StorageSource | LambdaSource | ShaderModule,
 
   join?: 'miter' | 'round' | 'bevel',
 
@@ -109,22 +102,24 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const p = props.positions ?? props.position ?? props.getPosition;
-  const g = props.segments ?? props.segment ?? props.getSegment;
-  const c = props.colors ?? props.color ?? props.getColor;
-  const w = props.widths ?? props.width ?? props.getWidth;
-  const d = props.depths ?? props.depth ?? props.getDepth;
-  const t = props.trims ?? props.trim ?? props.getTrim;
-  const z = props.sizes ?? props.size ?? props.getSize;
+  const p = props.positions ?? props.position;
+  const g = props.segments ?? props.segment;
+  const c = props.colors ?? props.color;
+  const w = props.widths ?? props.width;
+  const d = props.depths ?? props.depth;
+  const t = props.trims ?? props.trim;
+  const z = props.sizes ?? props.size;
+
+  const xf = useApplyTransform(p);
 
   const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, g, c, w, d, t, z]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [xf, g, c, w, d, t, z]);
 
     const getVertex = bindBundle(getLineVertex, bindingsToLinks(vertexBindings), {}, key);
     const getFragment = getPassThruFragment;
 
     return [getVertex, getFragment];
-  }, [p, g, c, w, d, t, z]);
+  }, [xf, g, c, w, d, t, z]);
 
   return use(Virtual, {
     vertexCount,

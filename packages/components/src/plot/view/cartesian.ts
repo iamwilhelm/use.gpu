@@ -7,11 +7,14 @@ import { makeRefBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
 
 import { TransformContext } from '../../providers/transform-provider';
-import { parseAxes, parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale, parseRanges } from '../util/parse';
-import { useOptional, useRequired } from '../prop';
+import { RangeContext } from '../../providers/range-provider';
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../util/parse';
 import { composeTransform } from '../util/compose';
 import { swizzleMatrix } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
+
+import { useAxesTrait } from '../traits';
+import { useOptional, useProp } from '../prop';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 
@@ -39,12 +42,14 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
     rotation,
     matrix,
 
-    range,
-    axes,
+    range = NO_RANGES,
+    axes = 'xyzw',
   //eulerOrder,
   
     children,
   } = props;
+
+  const {range: g, axes: a} = useAxesTrait(props);
 
   const p = useOptional(position, parsePosition);
   const s = useOptional(scale, parseScale);
@@ -52,8 +57,6 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   const r = useOptional(rotation, parseRotation);
   const m = useOptional(matrix, parseMatrix);
 
-  const g = useRequired(range, parseRanges);
-  const a = useRequired(axes, parseAxes);
   // const e = parseEulerOrder(eulerOrder);
 
   const combined = useMemo(() => {
@@ -70,10 +73,10 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
       0, 2/dy, 0, 0,
       0, 0, 2/dz, 0,
 
-			-(2*x+dx)/dx,
-			-(2*y+dy)/dy,
-			-(2*z+dz)/dz,
-			1,
+      -(2*x+dx)/dx,
+      -(2*y+dy)/dy,
+      -(2*z+dz)/dz,
+      1,
     );
 
     if (a !== 'xyzw') {
@@ -91,25 +94,23 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
     return matrix;
   }, [g, a, p, r, q, s]);
 
-  const {transform: parent} = useContext(TransformContext);
+  const parentTransform = useContext(TransformContext);
 
   const [transform, ref] = useMemo(() => {
     const ref = { current: combined };
 
-    const binding = makeRefBinding(MATRIX_BINDING, ref);
-    const getMatrix = bindingToModule(binding);
+    const getMatrix = bindingToModule(makeRefBinding(MATRIX_BINDING, ref));
     const bound = bindBundle(getCartesianPosition, {getMatrix});
-    const transform = parent ? chainTo(bound, parent) : bound;
+    const transform = parentTransform ? chainTo(bound, parentTransform) : bound;
 
     return [transform, ref];
   }, [parent]);
 
   ref.current = combined;
 
-  const context = useMemo(() => ({
-    range: g,
-    transform,
-  }), [g, transform]);
-
-  return provide(TransformContext, context, children ?? []);
+  return (
+    provide(TransformContext, transform,
+      provide(RangeContext, g, children ?? [])
+    )
+  );
 };

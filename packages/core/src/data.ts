@@ -217,7 +217,7 @@ export const mapChunksToAnchors = (
 
   const {array: anchors} = makeDataArray(UniformType['vec4<i32>'], count);
   const {array: trims} = makeDataArray(UniformType['vec4<i32>'], length);
-	for (let i = 0; i < length * 2; ++i) trims[i] = -1;
+  for (let i = 0; i < length * 2; ++i) trims[i] = -1;
 
   let o = 0;
   let pos = 0;
@@ -230,18 +230,17 @@ export const mapChunksToAnchors = (
     pos += c + (l ? 3 : 0);
 
     const at = ends[i];
-		console.log({at})
     if (at) {
       const [left, right] = at;
       const both = left && right ? 1 : 0;
-			const bits = +left + (+right << 1);
+      const bits = +left + (+right << 1);
 
       for (let j = start; j <= end; ++j) {
-				trims[j * 4] = start;
-				trims[j * 4 + 1] = end;
-				trims[j * 4 + 2] = bits;
-				trims[j * 4 + 3] = 0;
-			}
+        trims[j * 4] = start;
+        trims[j * 4 + 1] = end;
+        trims[j * 4 + 2] = bits;
+        trims[j * 4 + 3] = 0;
+      }
 
       if (left) {
         anchors[o++] = start;

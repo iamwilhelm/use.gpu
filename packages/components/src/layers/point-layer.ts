@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode,
+  VertexData, StorageSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -10,7 +10,7 @@ import { RawQuads } from '../primitives/raw-quads';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { linkBundle, bindBundle, bindingToModule, bindingsToLinks, resolveBindings, castTo } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingToModule, castTo } from '@use-gpu/shader/wgsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 
 import { circle, diamond, square, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/wgsl/mask/point.wgsl';
@@ -39,15 +39,10 @@ export type PointLayerProps = {
   color?: number[],
   depth?: number,
 
-  positions?: StorageSource,
-  sizes?: StorageSource,
-  colors?: StorageSource,
-  depths?: StorageSource,
-
-  getPosition?: ShaderModule,
-  getSize?: ShaderModule,
-  getColor?: ShaderModule,
-  getDepth?: ShaderModule,
+  positions?: StorageSource | LambdaSource | ShaderModule,
+  sizes?: StorageSource | LambdaSource | ShaderModule,
+  colors?: StorageSource | LambdaSource | ShaderModule,
+  depths?: StorageSource | LambdaSource | ShaderModule,
 
   shape?: PointShape,
 
@@ -69,26 +64,21 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     depth,
     depths,
 
-    getPosition,
-    getSize,
-    getColor,
-    getDepth,
-    
     count,
-    shape = PointShape.DiamondOutlined,
+    shape = PointShape.Circle,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
 
   const key = useFiber().id;
 
-  const s = sizes ?? size ?? getSize;
+  const s = sizes ?? size;
 
-  const getSizeVec2 = useMemo(() => {
+  const sizes2D = useOne(() => {
     const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, s));
     return castTo(getSizeFloat, 'vec2<f32>', 'xx');
-  }, [s]);
-  const getMask = (MASK_SHADER as any)[shape] ?? MASK_SHADER[PointShape.Circle];
+  }, s);
+  const masks = (MASK_SHADER as any)[shape] ?? MASK_SHADER[PointShape.Circle];
 
   return use(RawQuads, {
     position,
@@ -98,12 +88,8 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     depth,
     depths,
 
-    getPosition,
-    getColor,
-    getDepth,
-
-    getSize: getSizeVec2,
-    getMask,
+    sizes: sizes2D,
+    masks,
 
     count,
     mode,

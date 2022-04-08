@@ -20,6 +20,7 @@ export type {
   ShakeTable,
   ShakeOp,
   StorageSource,
+  LambdaSource,
   UniformAttribute,
   UniformAttributeValue,
   VirtualRender,

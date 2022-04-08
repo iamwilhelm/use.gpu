@@ -20,6 +20,7 @@ export type {
   ShakeOp,
   ShaderDefine,
   StorageSource,
+  LambdaSource,
   UniformAttribute,
   UniformAttributeValue,
   VirtualRender,

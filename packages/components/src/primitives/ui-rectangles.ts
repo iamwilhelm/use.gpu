@@ -27,24 +27,16 @@ export type UIRectanglesProps = {
   fill?: number[] | TypedArray,
   uv?: number[] | TypedArray,
   repeat?: number,
-  texture?: TextureSource,
 
-  rectangles?: StorageSource,
-  radiuses?: StorageSource,
-  borders?: StorageSource,
-  strokes?: StorageSource,
-  fills?: StorageSource,
-  uvs?: StorageSource,
-  repeats?: StorageSource,
+  texture?: TextureSource | LambdaSource | ShaderModule,
 
-  getRectangle?: ShaderModule,
-  getRadius?: ShaderModule,
-  getBorder?: ShaderModule,
-  getStroke?: ShaderModule,
-  getFill?: ShaderModule,
-  getUV?: ShaderModule,
-  getRepeat?: ShaderModule,
-  getTexture?: ShaderModule,
+  rectangles?: StorageSource | LambdaSource | ShaderModule
+  radiuses?: StorageSource | LambdaSource | ShaderModule,
+  borders?: StorageSource | LambdaSource | ShaderModule,
+  strokes?: StorageSource | LambdaSource | ShaderModule,
+  fills?: StorageSource | LambdaSource | ShaderModule,
+  uvs?: StorageSource | LambdaSource | ShaderModule,
+  repeats?: StorageSource | LambdaSource | ShaderModule,
 
   count?: number,
   
@@ -99,15 +91,15 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const r = props.rectangles ?? props.rectangle ?? props.getRectangle;
-  const a = props.radiuses ?? props.radius ?? props.getRadius;
-  const b = props.borders ?? props.border ?? props.getBorder;
-  const s = props.strokes ?? props.strokes ?? props.getStroke;
-  const f = props.fills ?? props.fill ?? props.getFill;
-  const u = props.uvs ?? props.uv ?? props.getUV;
-  const p = props.repeats ?? props.repeat ?? props.getRepeat;
+  const r = props.rectangles ?? props.rectangle;
+  const a = props.radiuses ?? props.radius;
+  const b = props.borders ?? props.border;
+  const s = props.strokes ?? props.strokes;
+  const f = props.fills ?? props.fill;
+  const u = props.uvs ?? props.uv;
+  const p = props.repeats ?? props.repeat;
 
-  const t = props.texture ?? props.getTexture;
+  const t = props.texture;
 
   const [vs, fs] = useMemo(() => {
     const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, a, b, s, f, u, p]);

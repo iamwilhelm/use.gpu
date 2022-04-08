@@ -11,6 +11,7 @@ import {
   bindModule,
   bindingsToLinks,
   bindingToModule,
+  sourceToModule,
   resolveBindings,
 } from './bind';
 
@@ -49,6 +50,7 @@ export {
   bindModule,
   bindingsToLinks,
   bindingToModule,
+  sourceToModule,
   resolveBindings,
 } from './bind';
 
@@ -93,6 +95,7 @@ export const WGSLLinker = {
   bindModule,
   bindingsToLinks,
   bindingToModule,
+  sourceToModule,
   resolveBindings,
 
   castTo,

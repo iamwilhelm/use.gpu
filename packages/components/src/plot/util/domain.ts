@@ -1,0 +1,107 @@
+// Generate equally spaced ticks in a range at sensible positions.
+//
+// @param min/max - Minimum and maximum of range
+// @param detail - Desired number of steps in range
+// @param unit - Base unit of scale (e.g. 1 or π).
+// @param base - Division scale (e.g. 2 = binary division, or 10 = decimal division).
+// @param factor - Multiplicative bias
+// @param start - Whether to include a tick at the start
+// @param end - Whether to include a tick at the end
+// @param zero - Whether to include zero as a tick
+// @param nice - Whether to round to a more reasonable interval
+
+const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
+
+type DomainOptions = {
+  detail: number,
+  unit: number,
+  base: number,
+  start: boolean,
+  end: boolean,
+  zero: boolean,
+  factor: number,
+  nice: boolean,
+};
+
+export const linear = (
+  min: number,
+  max: number,
+  props: Partial<DomainOptions>,
+) => {
+  const {
+    detail = 10,
+    unit = 1,
+    base = 10,
+    start = true,
+    end = true,
+    zero = true,
+    factor = 1,
+    nice = true
+  } = props;
+
+  // Calculate naive tick size.
+  const span = max - min;
+  const ideal = span / detail;
+
+  // Unsnapped division
+  if (!nice) {
+    ticks = seq(detail + 1, min, ideal);
+    if (!start) ticks.shift();
+    if (!end) ticks.pop();
+    if (!zero) ticks = ticks.filter(x => x != 0);
+    return ticks;
+  }
+
+  // Round to the floor'd power of 'scale'
+  const ref = unit * (Math.pow(base, Math.floor(Math.log(ideal / unit) / Math.log(base))))
+
+  // Make derived steps at sensible factors.
+  const factors =
+    (base % 2 == 0) ? [base / 2, 1, 1 / 2] :
+    (base % 3 == 0) ? [base / 3, 1, 1 / 3] :
+    [1];
+ 
+  const steps = factors.map(f => ref * f);
+
+  // Find step size closest to ideal.
+  let distance = Infinity;
+  const step = steps.reduce((ref: number, step: number) => {
+    const f = step / ideal;
+    const d = Math.max(f, 1 / f);
+
+    if (d < distance) {
+      distance = d;
+      return step;
+    } else {
+      return ref;
+    }
+  }, ref);
+
+  // Scale final step
+  const final = step * factor;
+
+  // Renormalize min/max onto aligned steps.
+  min = Math.ceil ((min + (start ? 0.0001 : -0.0001)) / final) * final;
+  max = Math.floor((max + (end ? -0.0001 : 0.0001)) / final) * final;
+  const n = Math.ceil((max - min) / final);
+
+  // Generate equally spaced ticks
+  let ticks = seq(n + 1, min, step);
+  if (!zero) ticks = ticks.filter((x) => x != 0);
+
+  return ticks;
+}
+
+// Generate logarithmically spaced ticks in a range at sensible positions.
+
+export const logarithmic = (
+  min: number,
+  max: number,
+  props: Partial<DomainOptions>
+) => {
+  const minL = Math.log(min) / Math.log(base);
+  const maxL = Math.log(min) / Math.log(base);
+
+  let ticks = linear(min, max, props);
+  return ticks.map(x => Math.pow(base, x));
+}

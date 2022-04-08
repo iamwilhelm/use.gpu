@@ -1,26 +1,24 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { StorageSource, UniformAttributeValue } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/wgsl/types';
 import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShaderWithRefs } from '../../hooks/useBoundShaderWithRefs';
+import { useRawStorage } from '../../hooks/useRawStorage';
 import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
-import { chainTo } from '@use-gpu/shader/wgsl';
 
-import { TransformContext } from '../../providers/transform-provider';
+import { RangeContext } from '../../providers/range-provider';
 import {
-  parseAxis,
   parseDetail,
   parsePosition4,
-  parseRange,
-
-  parseArrowProps,
-  parseColorProps,
-  parseLineProps,
-  parseROPProps,
 } from '../util/parse';
-import { useOptional, useRequired } from '../prop';
+import {
+  useAxisTrait,
+  useArrowTrait,
+  useColorTrait,
+  useLineTrait,
+  useROPTrait,
+} from '../traits';
+import { useProp } from '../prop';
 import { vec4 } from 'gl-matrix';
 
 import { Data } from '../../data/data';
@@ -34,94 +32,79 @@ const AXIS_BINDINGS = [
   { name: 'getAxisStep', format: 'vec4<f32>', value: vec4.fromValues(2, 0, 0, 0) },
 ];
 
-export type AxisProps = LineProps & ColorProps & ROPProps & ArrowProps & {
-  range?: VectorLike,
-  axis?: Axis,
+export type AxisProps =
+  Partial<AxisTrait> &
+  Partial<LineTrait> &
+  Partial<ColorTrait> &
+  Partial<ROPTrait> &
+  Partial<ArrowTrait> & {
   origin?: VectorLike,
   detail?: number,
 };
 
 export const Axis: LiveComponent<AxisProps> = (props) => {
   const {
-    range,
-    axis,
     origin,
     detail,
   } = props;
 
-  const g = useOptional(range, parseRange);
+  const {axis, range} = useAxisTrait(props);
+  const {size, start, end} = useArrowTrait(props);
+  const {width, depth, join, loop} = useLineTrait(props);
 
-  const a = useRequired(axis, parseAxis);
-  const p = useRequired(origin, parsePosition4);
-  const d = useRequired(detail, parseDetail);
+  const color = useColorTrait(props);
+  const rop = useROPTrait(props);
 
-  const {range: parentRange, transform} = useContext(TransformContext);
-  const r = g ?? parentRange[a];
+  const p = useProp(origin, parsePosition4);
+  const d = useProp(detail, parseDetail);
 
+  const parentRange = useContext(RangeContext);
+  const r = range ?? parentRange[axis];
+
+  // Calculate line origin + step
   const og = vec4.clone(p);
   const step = vec4.create();
   const min = r[0];
   const max = r[1];
-  og[a] = min;
-  step[a] = (max - min) / d;
+  og[axis] = min;
+  step[axis] = (max - min) / d;
   og[3] = 1;
 
-  const bound = useBoundShaderWithRefs(getAxisPosition, AXIS_BINDINGS, [og, step]);
-  const getPosition = useMemo(
-    () => transform ? chainTo(bound, transform) : bound,
-    [bound, transform],
-  );
-
-  const [
-    {width, depth, join, loop},
-    color,
-    rop,
-    {size, start, end},
-  ] = useOne(() => {
-    const l = parseLineProps(props);
-    const c = parseColorProps(props);
-    const r = parseROPProps(props);
-    const w = parseArrowProps(props);
-    return [l, c, r, w];
-  }, props);
+  // Make axis vertex shader
+  const positions = useBoundShaderWithRefs(getAxisPosition, AXIS_BINDINGS, [og, step]);
 
   const n = d + 1;
 
-  const fields = useMemo(() => {
+  // Make line/arrow data
+  const arrays = useMemo(() => {
     const chunks = [n];
     const loops = [loop];
     const ends = [[start, end]];
 
     const segments = mapChunksToSegments(chunks, loops);
     const [anchors, trims] = mapChunksToAnchors(chunks, loops, ends);
-    console.log({segments,anchors,trims})
 
-    return [
-      ['i32', segments],
-      ['vec4<i32>', anchors],
-      ['vec4<i32>', trims],
-    ];
+    return {segments, anchors, trims};
   }, [n, loop, start, end]);
 
-  return (
-    use(Data, {
-      fields,
-      render: ([segments, anchors, trims]: StorageSource[]) => [
-        use(ArrowLayer, {
-          getPosition,
-          segments,
-          anchors,
-          trims,
-          count: n,
+  const segments = useRawStorage(arrays.segments, 'i32');
+  const anchors = useRawStorage(arrays.anchors, 'vec4<i32>');
+  const trims = useRawStorage(arrays.trims, 'vec4<i32>');
 
-          color,
-          width,
-          depth,
-          size,
-          join,
-					mode: 'd'
-        }),
-      ]
+  return (
+    use(ArrowLayer, {
+      positions,
+      segments,
+      anchors,
+      trims,
+      count: n,
+
+      color,
+      width,
+      depth,
+      size,
+      join,
+      mode: 'd'
     })
   );
 };

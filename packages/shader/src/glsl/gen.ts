@@ -69,7 +69,7 @@ export const makeBindingAccessors = (
   for (const binding of constants) links[binding.uniform.name] = virtual;
   for (const binding of storages)  links[binding.uniform.name] = virtual;
   for (const binding of textures)  links[binding.uniform.name] = virtual;
-  for (const lambda  of lambdas)   links[lambda.uniform.name]  = lambda.lambda!;
+  for (const lambda  of lambdas)   links[lambda.uniform.name]  = lambda.lambda!.shader;
 
   return links;
 };

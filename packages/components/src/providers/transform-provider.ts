@@ -1,11 +1,7 @@
-import { ShaderModule } from '@use-gpu/shader/wgsl/types';
 import { makeContext, useContext } from '@use-gpu/live';
 
-const DEFAULT_TRANSFORM = {
-  range: [[-1, 1], [-1, 1], [-1, 1], [-1, 1]],
-  swizzle: 'xyzw',
-	transform: null,
-};
+export type TransformContextProps = ShaderModule | null;
+const DEFAULT_TRANSFORM = null;
 
 export const TransformContext = makeContext<TransformContextProps>(DEFAULT_TRANSFORM, 'TransformContext');
 

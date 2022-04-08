@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, StorageSource, RenderPassMode,
+  VertexData, TextureSource, StorageSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -14,6 +14,7 @@ import { patch } from '@use-gpu/state';
 import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
+import { useApplyTransform } from '../hooks/useApplyTransform';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedFragment } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -24,21 +25,14 @@ export type RawQuadsProps = {
   color?: number[],
   depth?: number,
   mask?: number,
-  texture?: TextureSource,
 
-  positions?: StorageSource,
-  sizes?: StorageSource,
-  colors?: StorageSource,
-  depths?: StorageSource,
-  masks?: StorageSource,
+  positions?: StorageSource | LambdaSource | ShaderModule,
+  sizes?: StorageSource | LambdaSource | ShaderModule,
+  colors?: StorageSource | LambdaSource | ShaderModule,
+  depths?: StorageSource | LambdaSource | ShaderModule,
+  masks?: StorageSource | LambdaSource | ShaderModule,
 
-  getPosition?: ShaderModule,
-  getSize?: ShaderModule,
-  getColor?: ShaderModule,
-  getDepth?: ShaderModule,
-  getMask?: ShaderModule,
-
-  getTexture?: ShaderModule,
+  texture?: TextureSource | LambdaSource | ShaderModule,
 
   count?: number,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -86,22 +80,24 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const p = props.positions ?? props.position ?? props.getPosition;
-  const c = props.colors ?? props.color ?? props.getColor;
-  const s = props.sizes ?? props.size ?? props.getSize;
-  const d = props.depths ?? props.depth ?? props.getDepth;
+  const p = props.positions ?? props.position;
+  const c = props.colors ?? props.color;
+  const s = props.sizes ?? props.size;
+  const d = props.depths ?? props.depth;
 
-  const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask ?? props.getMask) : null;
-  const t = props.texture ?? props.getTexture;
+  const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask) : null;
+  const t = props.texture;
+  
+  const xf = useApplyTransform(p);
 
   const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [p, c, s, d]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [xf, c, s, d]);
     const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
 
     const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
     const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
     return [getVertex, getFragment];
-  }, [p, c, s, d, m, t]);
+  }, [xf, c, s, d, m, t]);
 
   return use(Virtual, {
     vertexCount,

@@ -30,6 +30,7 @@ export enum Hook {
   RESOURCE = 4,
   CONTEXT = 5,
   CONSUMER = 6,
+  VERSION = 7,
 };
 
 // Deferred actions

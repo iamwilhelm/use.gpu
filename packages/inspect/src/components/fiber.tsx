@@ -5,7 +5,7 @@ import React, { useMemo } from 'react';
 
 import { useRefineCursor, Cursor } from './cursor';
 import { Node } from './node';
-import { PingState, ExpandState, SelectState, HoverState, Action } from './types';
+import { ExpandState, SelectState, HoverState, Action } from './types';
 
 import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
@@ -16,7 +16,6 @@ const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
-  ping: PingState,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
@@ -25,7 +24,6 @@ type FiberTreeProps = {
 type FiberNodeProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
-  ping: PingState,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
@@ -87,7 +85,6 @@ export const FiberLegend: React.FC = () => {
 export const FiberTree: React.FC<FiberTreeProps> = ({
   fiber,
   fibers,
-  ping,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -99,7 +96,6 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         <FiberNode
           fiber={fiber}
           fibers={fibers}
-          ping={ping}
           expandCursor={expandCursor}
           selectedCursor={selectedCursor}
           hoveredCursor={hoveredCursor}
@@ -113,7 +109,6 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 export const FiberNode: React.FC<FiberNodeProps> = ({
   fiber,
   fibers,
-  ping,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -126,7 +121,6 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
 
   fibers.set(id, fiber);
 
-  const pinged = ping[id] || 0;
   const selected = fiber === selectState;
   const hovered = hoverState.fiber?.id ?? -1;
   const depended = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
@@ -154,7 +148,6 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
     <Node
       key={id}
       fiber={fiber}
-      pinged={pinged}
       selected={selected}
       hovered={hovered}
       depended={depended}
@@ -171,7 +164,6 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
         key='mount'
         fiber={mount}
         fibers={fibers}
-        ping={ping}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -189,7 +181,6 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
             key={key}
             fiber={sub}
             fibers={fibers}
-            ping={ping}
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
@@ -217,7 +208,6 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
       <FiberNode
         fiber={next}
         fibers={fibers}
-        ping={ping}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}

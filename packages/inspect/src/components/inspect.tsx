@@ -13,6 +13,7 @@ import {
   InspectContainer, InspectToggle, Button,
   SplitRow, RowPanel, Panel, PanelFull, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
+import { PingProvider } from './ping';
 
 import * as Tabs from '@radix-ui/react-tabs';
 import "../theme.css";
@@ -103,22 +104,24 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 
   return (<>
     {open ? (
-      <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
-        <SplitRow>
-          <RowPanel style={{width: '34%'}}>
-            <PanelFull onClick={() => setSelected(null)}>
-              {tree}
-            </PanelFull>
-          </RowPanel>
-          {selectedFiber ? (
-            <RowPanel style={{width: '66%'}}>
-              <PanelScrollable>
-                {props}
-              </PanelScrollable>
+      <PingProvider fiber={fiber}>  
+        <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
+          <SplitRow>
+            <RowPanel style={{width: '34%'}}>
+              <PanelFull onClick={() => setSelected(null)}>
+                {tree}
+              </PanelFull>
             </RowPanel>
-          ) : null}
-        </SplitRow>
-      </InspectContainer>
+            {selectedFiber ? (
+              <RowPanel style={{width: '66%'}}>
+                <PanelScrollable>
+                  {props}
+                </PanelScrollable>
+              </RowPanel>
+            ) : null}
+          </SplitRow>
+        </InspectContainer>
+      </PingProvider>
     ) : null}
     <InspectToggle onClick={toggleOpen}>
       <Button>{open ? ICON("close") : ICON("bug_report")}</Button>

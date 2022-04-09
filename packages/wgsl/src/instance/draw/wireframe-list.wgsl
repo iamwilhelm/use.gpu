@@ -4,6 +4,7 @@ use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 
 @external fn getVertex(v: i32, i: i32) -> SolidVertex {};
+@external fn getInstanceSize(i: i32) -> i32 {};
 
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,
@@ -21,7 +22,7 @@ fn main(
   var ij = getStripIndex(vi - (vi / 3) * 2);
   var xy = vec2<f32>(ij) * 2.0 - 1.0;
 
-  var n = WIREFRAME_INSTANCE_SIZE;
+  var n = getInstanceSize(0);
   var f = i32(instanceIndex) % n;
   var i = i32(instanceIndex) / n;
 

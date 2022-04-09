@@ -258,7 +258,8 @@ export const useVersion = <T>(nextValue: T) => {
   let value   = state![i];
   let version = state![i + 1] || 0;
   if (value !== nextValue) {
-    version = incrementVersion(state![i + 1]);
+    state![i] = nextValue;
+    state![i + 1] = version = incrementVersion(state![i + 1]);
   }
 
   return version;

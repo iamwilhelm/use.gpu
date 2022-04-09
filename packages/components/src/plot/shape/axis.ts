@@ -17,8 +17,8 @@ import {
   useColorTrait,
   useLineTrait,
   useROPTrait,
+  useProp,
 } from '../traits';
-import { useProp } from '../prop';
 import { vec4 } from 'gl-matrix';
 
 import { Data } from '../../data/data';
@@ -104,7 +104,6 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
       depth,
       size,
       join,
-      mode: 'd'
     })
   );
 };

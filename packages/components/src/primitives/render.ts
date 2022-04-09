@@ -11,6 +11,7 @@ import {
   makeRenderPipeline,
   getColorSpace,
   uploadBuffer,
+  resolve,
 } from '@use-gpu/core';
 import { useLinkedShader } from '../hooks/useLinkedShader';
 import { useRenderPipeline } from '../hooks/useRenderPipeline';
@@ -23,8 +24,8 @@ export type RenderProps = {
   mode?: RenderPassMode | string,
   id?: number,
 
-  vertexCount: number,
-  instanceCount: number,
+  vertexCount: number | (() => number),
+  instanceCount: number | (() => number),
 
   vertex: ParsedBundle,
   fragment: ParsedBundle,
@@ -121,7 +122,7 @@ export const render = (props: RenderProps) => {
       passEncoder.setBindGroup(0, uniform.bindGroup);
       if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
 
-      passEncoder.draw(vertexCount, instanceCount, 0, 0);
+      passEncoder.draw(resolve(vertexCount), resolve(instanceCount), 0, 0);
     },
   });
 };

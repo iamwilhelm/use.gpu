@@ -1,4 +1,5 @@
-import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, TypedArray, VectorLike } from '../types';
+import { ArrowFunction } from '@use-gpu/live';
+import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, Color, Placement, Flip, TypedArray, ColorLike, VectorLike, ArrayLike } from '../types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
@@ -12,7 +13,12 @@ const GRAY = [0.5, 0.5, 0.5, 1];
 const NO_RANGE = vec2.fromValues(-1, 1);
 const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
 
-const NO_VECTOR = [];
+const NO_VECTOR: number[] = [];
+const NO_STRINGS: string[] = [];
+
+///////////////////////////
+
+export const optional = <A, B>(parse: (t?: A) => B) => (t?: A): B | undefined => t !== undefined ? parse(t) : undefined;
 
 ///////////////////////////
 
@@ -72,8 +78,8 @@ export const makeParseMat4 = () => (matrix?: VectorLike): mat4 => {
 
 export const makeParseArray = <T>(
   defaults: T[],
-  parse: (v: VectorLike) => T
-) => (vecs?: VectorLike[]): T[] => {
+  parse: (v: ArrayLike) => T
+) => (vecs?: ArrayLike[]): T[] => {
   if (vecs != null) {
     const vs = vecs.map(parse);
     const l = vs.length;
@@ -93,6 +99,24 @@ export const makeParseEnum = (
   return (s?: string): string => {
     if (s != null && hash.has(s)) return s;
     return def;
+  };
+};
+
+export const makeParseString = (
+  defaults: string = '',
+) => {
+  return (s?: string): string => {
+    if (s != null) return s;
+    return defaults;
+  };
+};
+
+export const makeParseStringFormatter = (
+  defaults: string = '',
+) => {
+  return (s?: ArrowFunction): ArrayFunction => {
+    if (typeof s === 'function') return s;
+    return (s?: string) => '' + s;
   };
 };
 
@@ -125,18 +149,47 @@ export const makeParseBasis = (defaults: string) => {
   }
 };
 
-export const makeParseColor = (def: VectorLike[] = GRAY) => (c?: number | VectorLike) => {
+const u4ToFloat = (s: string) => parseInt(x, 16) / 15;
+const u8ToFloat = (s: string) => parseInt(x, 16) / 255;
+
+export const makeParseColor = (def: Color = GRAY) => (c?: ColorLike): Color => {
   if (c === +c) {
-    const a = ((c >> 24) & 255) / 255;
     const r = ((c >> 16) & 255) / 255;
     const g = ((c >> 8) & 255) / 255;
     const b = ((c & 255)) / 255;
-    
-    return [r, g, b, a];
+    return [r, g, b, 1];
+  }
+  if (typeof c === 'string') {
+    if (c[0] === '#') {
+      if (c.length === 4) {
+        const r = u4ToFloat(c[1]);
+        const g = u4ToFloat(c[2]);
+        const b = u4ToFloat(c[3]);
+        return [r, g, b, 1];
+      }
+      if (c.length === 7) {
+        const r = u8ToFloat(c.slice(1, 3));
+        const g = u8ToFloat(c.slice(3, 5));
+        const b = u8ToFloat(c.slice(5, 7));
+        return [r, g, b, 1];
+      }
+    }
+    if (c[0] === 'r') {
+      throw new Error("Use {rgb:[r,g,b]} or rgba:[r,g,b,a]} to specify RGB(A) colors.")
+    }
+  }
+  if (c.rgba ?? c.rgb) {
+    const [r, g, b, a] = c.rgba ?? c.rgb;
+    return [r / 255, g / 255, b / 255, a ? a / 255 : 1];
   }
   if (c.length) {
     return [c[0] ?? def[0], c[1] ?? def[1], c[2] ?? def[2], c[3] ?? def[3] ];
   }
+  return def;
+};
+
+export const makeParseMap = <T>(map: Record<string, T>, defaults: T) => {
+  return (s: string) => map[s] ?? defaults;
 };
 
 //////////////////
@@ -146,6 +199,10 @@ export const parseColor      = makeParseColor();
 export const parseFloat      = makeParseFloat();
 export const parseInt        = makeParseInt();
 export const parseBoolean    = makeParseBoolean();
+
+export const parseString          = makeParseString();
+export const parseStringFormatter = makeParseStringFormatter();
+export const parseStringArray     = makeParseArray(NO_STRINGS, parseString);
 
 export const parseVector     = makeParseArray(NO_VECTOR, parseFloat);
 
@@ -169,3 +226,20 @@ export const parseDomain     = makeParseEnum<Domain>(['linear', 'log']);
 export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
 export const parseBlending   = makeParseEnum<Blending>(['none', 'normal', 'add', 'subtract', 'multiply', 'custom']);
 
+export const parseFlip       = makeParseMap({
+  'none':    0,
+  'outside': 1,
+  'inside': -1,
+});
+
+export const parsePlacement  = makeParseMap({
+  'center':      vec2.create(0,  0),
+  'left':        vec2.create(1,  0),
+  'top':         vec2.create(0, -1),
+  'right':       vec2.create(1,  0),
+  'bottom':      vec2.create(0,  1),
+  'topLeft':     vec2.create(1, -1),
+  'topRight':    vec2.create(1, -1),
+  'bottomLeft':  vec2.create(1,  1),
+  'bottomRight': vec2.create(1, -1),
+} as Record<string, vec2>);

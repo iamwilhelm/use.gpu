@@ -95,6 +95,8 @@ export type TextureSource = {
   version: number,
 };
 
+export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | ShaderModule;
+
 export type UniformAttribute = {
   name: string,
   format: string,

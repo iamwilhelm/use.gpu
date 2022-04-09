@@ -1,9 +1,10 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { RenderPassMode, DeepPartial } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
-import { memo, use, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
+import { memo, use, useContext, useNoContext, useFiber, useMemo, useNoMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
+import { resolve } from '@use-gpu/core';
 
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { useRenderPipeline } from '../hooks/useRenderPipeline';
 
 import instanceDrawVirtual from '@use-gpu/wgsl/instance/draw/virtual.wgsl';
@@ -31,6 +32,8 @@ export type VirtualProps = {
   defines: Record<string, any>,
   deps: any[] | null,
 };
+
+const DEBUG_BINDING = { name: 'getInstanceSize', format: 'i32', value: 0 };
 
 export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
   const {
@@ -66,30 +69,43 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     vertexCount,
     instanceCount,
   } = props;
-  let instanceSize = vertexCount;
+
+  let getInstanceSize: ShaderModule | null = null;
+
   if (isDebug) {
-    if (topology === 'triangle-strip') {
-      const tris = vertexCount - 2;
-      const edges = tris * 2 + 1;
-      
-      instanceCount = edges * instanceCount;
-      instanceSize = edges;
-      vertexCount = 4;
-    }
-    else if (topology === 'triangle-list') {
-      instanceCount = vertexCount * instanceCount;
-      instanceSize = vertexCount;
-      vertexCount = 18;
-    }
+    const i = instanceCount;
+    const v = vertexCount;
+
+    [vertexCount, instanceCount, getInstanceSize] = useMemo(() => {
+      let vertexCount, instanceCount, instanceSize;
+
+      if (topology === 'triangle-strip') {
+        const edges = () => (resolve(v) - 2) * 2 + 1;
+
+        vertexCount = 4;
+        instanceCount = () => edges() * resolve(i);
+        instanceSize = edges;
+      }
+      else if (topology === 'triangle-list') {
+        vertexCount = 18;
+        instanceCount = () => resolve(v) * resolve(i);
+        instanceSize = () => resolve(v);
+      }
+    
+      const getInstanceSize = bindingToModule({uniform: DEBUG_BINDING, constant: instanceSize});      
+      return [vertexCount, instanceCount, getInstanceSize];
+    }, [vertexCount, instanceCount]);
+  }
+  else {
+    useNoMemo();
   }
 
   // Binds links into shader
   const key = useFiber().id;
   const [v, f] = useMemo(() => {
-    const defines = { WIREFRAME_INSTANCE_SIZE: instanceSize };
-    const links = { getVertex, getFragment };
-    const v = bindBundle(vertexShader, links, defines, key);
-    const f = bindBundle(fragmentShader, links, defines, key);
+    const links = { getVertex, getFragment, getInstanceSize };
+    const v = bindBundle(vertexShader, links, undefined, key);
+    const f = bindBundle(fragmentShader, links, undefined, key);
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment]);
 

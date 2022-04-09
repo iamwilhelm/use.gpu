@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike } from '../types';
 
-import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShaderWithRefs } from '../../hooks/useBoundShaderWithRefs';
 import { useRawStorage } from '../../hooks/useRawStorage';
 import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
@@ -19,8 +19,8 @@ import {
   useColorTrait,
   useLineTrait,
   useROPTrait,
+  useProp,
 } from '../traits';
-import { useProp } from '../prop';
 import { vec4 } from 'gl-matrix';
 
 import { Data } from '../../data/data';
@@ -33,7 +33,7 @@ const AXIS_BINDINGS = [
   { name: 'getAxisStep', format: 'vec4<f32>', value: vec4.fromValues(2, 0, 0, 0) },
 ];
 
-export type TicksProps =
+export type TickProps =
   Partial<LineTrait> &
   Partial<ColorTrait> &
   Partial<ROPTrait> & {
@@ -44,7 +44,7 @@ export type TicksProps =
 
 const NO_OFFSET = vec4.fromValues(0, 1, 0, 0);
 
-export const Ticks: LiveComponent<TicksProps> = (props) => {
+export const Tick: LiveComponent<TickProps> = (props) => {
   const {
     size = 5,
     detail = 1,
@@ -52,7 +52,7 @@ export const Ticks: LiveComponent<TicksProps> = (props) => {
   } = props;
 
   const positions = useContext(DataContext);
-  const n = positions.length;
+  const count = useCallback(() => positions.length, [positions]);
 
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);
@@ -67,14 +67,13 @@ export const Ticks: LiveComponent<TicksProps> = (props) => {
       positions,
       offset: o,
       detail: d,
-      count: n,
+      count,
 
       color,
       width,
       depth,
       size: s,
       join,
-      mode: 'd'
     })
   );
 };

@@ -1,12 +1,15 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core/types';
-import { DeviceContext } from '../providers/device-provider';
-import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
+
 import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
+
+import { DeviceContext } from '../providers/device-provider';
+import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
+import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type DataProps = {
   length?: number,
@@ -29,7 +32,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
     live = false,
   } = props;
 
-  const l = data?.length || 0;
+  const l = useBufferedSize(data?.length || 0);
   const fs = fields ?? NO_FIELDS;
 
   // Make data buffers

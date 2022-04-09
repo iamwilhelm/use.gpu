@@ -238,8 +238,10 @@ export type DataBinding<T = any> = {
   storage?: StorageSource,
   texture?: TextureSource,
   lambda?: LambdaSource<T>,
-  constant?: any,
+  constant?: Prop<T>,
 };
+
+export type Prop<T> = T | {expr: () => T} | {current: T};
 
 export type AggregateBuffer = {
   buffer: GPUBuffer,

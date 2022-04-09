@@ -6,11 +6,18 @@ import {
   DataBinding,
   StorageSource,
   TextureSource,
+  Prop,
 } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
+
+export const resolve = (x: Prop<T>): T => {
+  if (typeof x === 'function') return x();
+  if (typeof x === 'object' && x.current != null) return x.current;
+  return x;
+};
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
@@ -232,8 +239,7 @@ export const makeLayoutFiller = (
       const setter = getUniformByteSetter(format);
 
       const o = item[k];
-      const v = (o && typeof o === 'object' && o.hasOwnProperty('current'))
-        ? o.current : o;
+      const v = resolve(o);
       if (v != null) setter(dataView, base + offset, v);
     }
   }

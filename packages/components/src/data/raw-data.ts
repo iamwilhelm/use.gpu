@@ -1,13 +1,15 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/types';
-import { DeviceContext } from '../providers/device-provider';
-import { DataContext } from '../providers/data-provider';
-import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
-import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+
+import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataEmitter, makeDataArray, copyNumberArray, emitIntoNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
+
+import { DeviceContext } from '../providers/device-provider';
+import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
+import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type RawDataProps = {
   length?: number,
@@ -30,10 +32,12 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     live = false,
   } = props;
 
+  const count = length ?? (data?.length || 0);
+  const l = useBufferedSize(count);
+
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
     const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.f32;
-    const l = length ?? (data?.length || 0);
 
     const {array, dims} = makeDataArray(f, l || 1);
     if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
@@ -42,7 +46,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     const source = {
       buffer,
       format: f,
-      length: l,
+      length: 0,
       version: 0,
     };
 
@@ -55,8 +59,9 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     if (expr) emitIntoNumberArray(expr, array, dims);
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
-      source.version = incrementVersion(source.version);
     }
+    source.length = count;
+    source.version = incrementVersion(source.version);
   };
 
   if (!live) {
@@ -73,6 +78,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
   return useMemo(() => {
     if (render == null && children === undefined) return yeet(source);
-    return provide(DataContext, source, render != null ? render(source) : children);
+    return render != null ? render(source) : children;
   }, [render, children, source]);
 };

@@ -3,7 +3,7 @@ import { memo, use, yeet, useContext, useFiber, useMemo } from '@use-gpu/live';
 import { Surface } from './shape/surface';
 import { CompositeData } from '../data';
 import { Lines } from '../layers';
-import { SDFFontContext, SDF_FONT_ATLAS } from '../providers/sdf-font-provider';
+import { SDFFontContext, SDF_FONT_DEBUG } from '../providers/sdf-font-provider';
 
 type DebugAtlasProps = {
   atlas: Atlas,
@@ -82,9 +82,12 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas}: Deb
     yeet({
       id,
       rectangle: [width, 0, 500 + width, 500],
-      texture: SDF_FONT_ATLAS,
-      color: [1, 1, 1, 1],
+      uv: [0, 0, 1, 1],
+      radius: [0, 0, 0, 0],
+      texture: SDF_FONT_DEBUG,
+      fill: [0, 0, 0, 1],
       count: 1,
+      repeat: 0,
     })
   );
   

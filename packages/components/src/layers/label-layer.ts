@@ -4,7 +4,7 @@ import {
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 
 import { RawLines } from '../primitives/raw-lines';
 
@@ -17,20 +17,31 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { getTickPosition } from '@use-gpu/wgsl/instance/vertex/tick.wgsl';
 import { getTickSegment } from '@use-gpu/wgsl/geometry/tick.wgsl';
 
-export type TickLayerProps = {
+export type LabelLayerProps = {
   position?: number[] | TypedArray,
+  placement?: number[] | TypedArray,
+  flip?: number,
+  offset?: number,
   size?: number,
-  width?: number,
-  color?: number[] | TypedArray,
   depth?: number,
-  offset?: number[] | TypedArray,
+  outline?: number,
+  box?: number,
+  color?: number[] | TypedArray,
+  background?: number[] | TypedArray,
 
-  positions?: StorageSource | LambdaSource | ShaderModule,
-  sizes?: StorageSource | LambdaSource | ShaderModule,
-  widths?: StorageSource | LambdaSource | ShaderModule,
-  colors?: StorageSource | LambdaSource | ShaderModule,
-  depths?: StorageSource | LambdaSource | ShaderModule,
-  offsets?: StorageSource | LambdaSource | ShaderModule,
+  positions?: ShaderSource,
+  placements?: ShaderSource,
+  flips?: ShaderSource,
+  offsets?: ShaderSource,
+  sizes?: ShaderSource,
+  depths?: ShaderSource,
+  outlines?: ShaderSource,
+  boxes?: ShaderSource,
+  colors?: ShaderSource,
+  backgrounds?: ShaderSource,
+
+  label?: string,
+  labels?: string[],
 
   detail?: number,
   count?: Prop<number>,
@@ -46,20 +57,30 @@ const TICK_BINDINGS = [
   { name: 'getSize', format: 'f32', value: 2, args: ['i32'] },
 ] as UniformAttributeValue[];
 
-export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerProps) => {
+export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLayerProps) => {
   const {
     position,
     positions,
-    color,
-    colors,
-    size,
-    sizes,
-    width,
-    widths,
-    depth,
-    depths,
+    placement,
+    placements,
+    flip,
+    flips,
     offset,
     offsets,
+    size,
+    sizes,
+    depth,
+    depths,
+    outline,
+    outlines,
+    box,
+    boxes,
+    color,
+    colors,
+    background,
+    backgrounds,
+    label,
+    labels,
 
     count = 1,
     detail = 1,
@@ -70,19 +91,27 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
   const key = useFiber().id;
 
   const p = useShaderRef(positions, position);
+  const l = useShaderRef(placements, placement);
+  const f = useShaderRef(flips, flip);
   const o = useShaderRef(offsets, offset);
-  const d = useShaderRef(depths, depth);
   const s = useShaderRef(sizes, size);
+  const d = useShaderRef(depths, depth);
+  const u = useShaderRef(outlines, outline);
+  const b = useShaderRef(boxes, box);
+  const c = useShaderRef(colors, color);
+  const g = useShaderRef(backgrounds, background);
 
   const xf = useTransformContext();
 
-  const c = useCallback(() => (positions?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
+  const n = useCallback(() => (positions?.length ?? resolve(count) ?? 1), [positions, count]);
+
+  return null;
 
   const bound = useMemo(() => {
     const defines = { TICK_DETAIL: detail };
     const bindings = makeShaderBindings(TICK_BINDINGS, [xf, p, o, d, s])
     const links = bindingsToLinks(bindings);
-    return bindBundle(getTickPosition, links, defines);
+    return bindBundle(getTickPosition, links, defines, key);
   }, [p, o, d, s, detail]);
 
   return (
@@ -97,10 +126,10 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
         depth,
         depths,
 
-        count: c,
+        count: n,
         mode,
         id,
       })
     )
   );
-}, 'TickLayer');
+}, 'LabelLayer');

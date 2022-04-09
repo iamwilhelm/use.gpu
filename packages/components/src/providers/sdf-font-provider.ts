@@ -12,6 +12,7 @@ export const SDFFontContext = makeContext(undefined, 'SDFFontContext');
 export const useSDFFont = () => useContext(SDFFontContext);
 
 export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as TextureSource;
+export const SDF_FONT_DEBUG = 'SDF_FONT_DEBUG' as any as TextureSource;
 
 export type SDFFontContextProps = {
   getRadius: () => number,
@@ -54,8 +55,8 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({children, then}
   const device = useContext(DeviceContext);
   const gpuText = useContext(GPUTextContext);
 
-  const width = 400;
-  const height = 400;
+  const width = 800;
+  const height = 800;
   const pad = 10;
   const radius = 10;
 
@@ -101,6 +102,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({children, then}
 
         const [sw, sh] = source.size;
         if (atlas.width !== sw && atlas.height !== sh) {
+          console.log('resize atlas')
           source = sourceRef.current = resizeTextureSource(device, source, atlas.width, atlas.height);
         }
 

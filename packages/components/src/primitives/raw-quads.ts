@@ -1,8 +1,8 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  TypedArray, ViewUniforms, DeepPartial,
+  TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, StorageSource, LambdaSource, RenderPassMode,
+  VertexData, TextureSource, ShaderSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -11,10 +11,11 @@ import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings } from '@use-gpu/core';
+import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
+import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedFragment } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -25,16 +26,18 @@ export type RawQuadsProps = {
   color?: number[],
   depth?: number,
   mask?: number,
+  uv?: number[] | TypedArray,
 
-  positions?: StorageSource | LambdaSource | ShaderModule,
-  sizes?: StorageSource | LambdaSource | ShaderModule,
-  colors?: StorageSource | LambdaSource | ShaderModule,
-  depths?: StorageSource | LambdaSource | ShaderModule,
-  masks?: StorageSource | LambdaSource | ShaderModule,
+  positions?: ShaderSource,
+  sizes?: ShaderSource,
+  colors?: ShaderSource,
+  depths?: ShaderSource,
+  masks?: ShaderSource,
+  uvs?: ShaderSource,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
 
-  count?: number,
+  count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
@@ -48,6 +51,7 @@ const VERTEX_BINDINGS = [
   { name: 'getColor', format: 'vec4<f32>', value: GRAY },
   { name: 'getSize', format: 'vec2<f32>', value: [1, 1] },
   { name: 'getDepth', format: 'f32', value: 0 },
+  { name: 'getUV', format: 'vec4<f32>', value: [0, 0, 1, 1] },
 ] as UniformAttributeValue[];
 
 const FRAGMENT_BINDINGS = [
@@ -75,15 +79,16 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = props.positions?.length ?? count;
+  const instanceCount = useCallback(() => (props.positions?.length ?? resolve(count)), [props.positions, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const p = props.positions ?? props.position;
-  const c = props.colors ?? props.color;
-  const s = props.sizes ?? props.size;
-  const d = props.depths ?? props.depth;
+  const p = useShaderRef(props.positions, props.position);
+  const c = useShaderRef(props.colors, props.color);
+  const s = useShaderRef(props.sizes, props.size);
+  const d = useShaderRef(props.depths, props.depth);
+  const u = useShaderRef(props.uvs, props.uv);
 
   const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask) : null;
   const t = props.texture;
@@ -91,13 +96,13 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const xf = useApplyTransform(p);
 
   const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [xf, c, s, d]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [xf, c, s, d, u]);
     const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
 
     const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
     const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
     return [getVertex, getFragment];
-  }, [xf, c, s, d, m, t]);
+  }, [xf, c, s, d, u, m, t]);
 
   return use(Virtual, {
     vertexCount,

@@ -5,15 +5,14 @@ import { ScaleTrait, AxisTrait } from '../types';
 
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
 
-import { DataContext } from '../../providers/data-provider';
+import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import { useRawStorage } from '../../hooks/useRawStorage';
 import { useBoundShaderWithRefs } from '../../hooks/useBoundShaderWithRefs';
 
-import { useScaleTrait, useAxisTrait } from '../traits';
+import { useProp, useScaleTrait, useAxisTrait } from '../traits';
 import { parsePosition4 } from '../util/parse';
 import { logarithmic, linear } from '../util/domain';
-import { useProp } from '../prop';
 
 import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';
 
@@ -67,6 +66,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   // Expose position source
   const source = useMemo(() => ({
     shader: bound,
+    alloc: data.alloc,
     length: n,
     size: [n],
     version: 0,
@@ -75,11 +75,18 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   useOne(() => {
     source.length = n;
     source.size[0] = n;
-    source.version = incrementVersion(source.version);
   }, n);
+
+  useOne(() => {
+    source.version = incrementVersion(source.version);
+  }, values);
 
   return useMemo(() => {
     if (render == null && children === undefined) return yeet(source);
-    return provide(DataContext, source, render != null ? render(source) : children);
-  }, [render, children, source]);
+    return (
+      provide(ValuesContext, values,
+        provide(DataContext, source, render != null ? render(source) : children)
+      )
+    );
+  }, [render, children, source, values]);
 }

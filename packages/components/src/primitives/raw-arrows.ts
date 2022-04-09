@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, LambdaSource, RenderPassMode,
+  VertexData, ShaderSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
@@ -11,7 +11,7 @@ import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, yeet, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -19,6 +19,7 @@ import { makeArrow } from './mesh/arrow';
 import { RawData } from '../data/raw-data';
 import { useRawStorage } from '../hooks/useRawStorage';
 import { useApplyTransform } from '../hooks/useApplyTransform';
+import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -31,12 +32,12 @@ export type RawArrowsProps = {
   width?: number,
   depth?: number,
 
-  anchors?:   StorageSource | LambdaSource | ShaderModule,
-  positions?: StorageSource | LambdaSource | ShaderModule,
-  colors?:    StorageSource | LambdaSource | ShaderModule,
-  sizes?:     StorageSource | LambdaSource | ShaderModule,
-  widths?:    StorageSource | LambdaSource | ShaderModule,
-  depths?:    StorageSource | LambdaSource | ShaderModule,
+  anchors?:   ShaderSource,
+  positions?: ShaderSource,
+  colors?:    ShaderSource,
+  sizes?:     ShaderSource,
+  widths?:    ShaderSource,
+  depths?:    ShaderSource,
 
   detail?: number,
 
@@ -82,17 +83,17 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   // Set up draw
   const vertexCount = mesh.count;
-  const instanceCount = ((props.anchors?.length ?? count) ?? 1);
+  const instanceCount = useCallback(() => (props.anchors?.length ?? count), [props.anchors, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const a = props.anchors ?? props.anchor;
-  const p = props.positions ?? props.position;
-  const c = props.colors ?? props.color;
-  const z = props.sizes ?? props.size;
-  const w = props.widths ?? props.width;
-  const d = props.depths ?? props.depth;
+  const a = useShaderRef(props.anchors, props.anchor);
+  const p = useShaderRef(props.positions, props.position);
+  const c = useShaderRef(props.colors, props.color);
+  const z = useShaderRef(props.sizes, props.size);
+  const w = useShaderRef(props.widths, props.width);
+  const d = useShaderRef(props.depths, props.depth);
   
   const g = useRawStorage(mesh.vertices[0], 'vec4<f32>');
   const xf = useApplyTransform(p);

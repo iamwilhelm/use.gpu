@@ -21,24 +21,26 @@ export const getInlineMinMax = (
   let caretMain = 0;
   let caretCross = 0;
 
+  let lineHeight = 0;
+  const perSpan = (advance: number, trim: number, hard: number) => {
+    allMinMain = Math.max(allMinMain, advance - trim);
+    allMaxCross += lineHeight;
+
+    caretMain += advance;
+    if (hard) {
+      caretMain -= trim;
+      caretCross += lineHeight;
+
+      allMaxMain = Math.max(allMaxMain, caretMain);
+      caretMain = 0;
+    }
+  };
+
   const n = els.length;
   for (const {spans, height, absolute} of els) {
     if (!absolute) {
-      const {ascent, descent, lineHeight} = height;
-
-      spans.iterate((advance, trim, hard) => {
-        allMinMain = Math.max(allMinMain, advance - trim);
-        allMaxCross += lineHeight;
-
-        caretMain += advance;
-        if (hard) {
-          caretMain -= trim;
-          caretCross += lineHeight;
-
-          allMaxMain = Math.max(allMaxMain, caretMain);
-          caretMain = 0;
-        }
-      });
+      lineHeight = height.lineHeight;
+      spans.iterate(perSpan);
       ++i;
     }
     if (!wrap) allMinMain = allMaxMain;

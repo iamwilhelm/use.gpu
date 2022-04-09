@@ -6,17 +6,20 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @external fn getColor(i: i32) -> vec4<f32> {};
 @external fn getSize(i: i32) -> vec2<f32> {};
 @external fn getDepth(i: i32) -> f32 {};
+@external fn getUV(i: i32) -> vec4<f32> {};
 
 @export fn getQuadVertex(vertexIndex: i32, instanceIndex: i32) -> SolidVertex {
   var position = getPosition(instanceIndex);
   var color = getColor(instanceIndex);
   var size = getSize(instanceIndex);
   var depth = getDepth(instanceIndex);
+  var uv4 = getUV(instanceIndex);
 
   var center = worldToClip(position);
 
-  var uv = getQuadUV(vertexIndex);
-  var xy = uv * 2.0 - 1.0;
+  var uv2 = getQuadUV(vertexIndex);
+  var uv = mix(uv4.xy, uv4.zw, uv2);
+  var xy = uv2 * 2.0 - 1.0;
   
   // Lerp between fixed size and full perspective.
   var pixelScale = getPerspectiveScale(center.w, depth);

@@ -81,9 +81,9 @@ export const linear = (
   const final = step * factor;
 
   // Renormalize min/max onto aligned steps.
-  min = Math.ceil ((min + (start ? 0.0001 : -0.0001)) / final) * final;
-  max = Math.floor((max + (end ? -0.0001 : 0.0001)) / final) * final;
-  const n = Math.ceil((max - min) / final);
+  min = Math.ceil ((min - span * (start ? 0.0001 : -0.0001)) / final) * final;
+  max = Math.floor((max + span * (end   ? 0.0001 : -0.0001)) / final) * final;
+  const n = Math.round((max - min) / final);
 
   // Generate equally spaced ticks
   let ticks = seq(n + 1, min, step);

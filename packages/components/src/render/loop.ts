@@ -57,9 +57,11 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
   const request = useResource((dispose) => {
     const {time, frame} = ref;
     let running = live;
+    let pending = false;
 
     const loop = (timestamp: number) => {
       frame.current++;
+      pending = false;
 
       if (time.timestamp === -Infinity) time.start = timestamp;
       else time.delta = timestamp - time.timestamp;
@@ -74,7 +76,8 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
     const request = (fiber?: LiveFiber<any>) => {
       if (fiber) requestAnimationFrame(() => fiber.host?.schedule(fiber, NOP));
-      requestAnimationFrame(loop);
+      if (!pending) requestAnimationFrame(loop);
+      pending = true;
     };
     dispose(() => running = false);
 

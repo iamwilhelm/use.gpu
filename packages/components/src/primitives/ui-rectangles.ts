@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  TypedArray, ViewUniforms, DeepPartial,
+  TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, TextureSource, RenderPassMode,
 } from '@use-gpu/core/types';
@@ -12,9 +12,10 @@ import { LayoutContext } from '../providers/layout-provider';
 import { render } from './render';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings } from '@use-gpu/core';
+import { makeShaderBindings, resolve } from '@use-gpu/core';
+import { useShaderRef } from '../hooks/useShaderRef';
 
 import rectangleVertex from '@use-gpu/wgsl/instance/ui/vertex.wgsl';
 import rectangleFragment from '@use-gpu/wgsl/instance/ui/fragment.wgsl';
@@ -86,18 +87,18 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = props.rectangles?.length ?? count;
+  const instanceCount = useCallback(() => (props.rectangles?.length ?? resolve(count)), [props.rectangles, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const r = props.rectangles ?? props.rectangle;
-  const a = props.radiuses ?? props.radius;
-  const b = props.borders ?? props.border;
-  const s = props.strokes ?? props.strokes;
-  const f = props.fills ?? props.fill;
-  const u = props.uvs ?? props.uv;
-  const p = props.repeats ?? props.repeat;
+  const r = useShaderRef(props.rectangles, props.rectangle);
+  const a = useShaderRef(props.radiuses, props.radius);
+  const b = useShaderRef(props.borders, props.border);
+  const s = useShaderRef(props.strokes, props.strokes);
+  const f = useShaderRef(props.fills, props.fill);
+  const u = useShaderRef(props.uvs, props.uv);
+  const p = useShaderRef(props.repeats, props.repeat);
 
   const t = props.texture;
 

@@ -13,8 +13,7 @@ import { composeTransform } from '../util/compose';
 import { swizzleMatrix } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
-import { useAxesTrait } from '../traits';
-import { useOptional, useProp } from '../prop';
+import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 
@@ -36,28 +35,11 @@ export type CartesianProps = {
 
 export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   const {
-    position,
-    scale,
-    quaternion,
-    rotation,
-    matrix,
-
-    range = NO_RANGES,
-    axes = 'xyzw',
-  //eulerOrder,
-  
     children,
   } = props;
 
   const {range: g, axes: a} = useAxesTrait(props);
-
-  const p = useOptional(position, parsePosition);
-  const s = useOptional(scale, parseScale);
-  const q = useOptional(quaternion, parseQuaternion);
-  const r = useOptional(rotation, parseRotation);
-  const m = useOptional(matrix, parseMatrix);
-
-  // const e = parseEulerOrder(eulerOrder);
+  const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
   const combined = useMemo(() => {
     const x = g[0][0];

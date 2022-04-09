@@ -1,9 +1,10 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatValue, YEET } from '@use-gpu/live';
 
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { useRefineCursor, Cursor } from './cursor';
+import { usePingContext } from './ping';
 import { Node } from './node';
 import { ExpandState, SelectState, HoverState, Action } from './types';
 
@@ -106,7 +107,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   );
 }
 
-export const FiberNode: React.FC<FiberNodeProps> = ({
+export const FiberNode: React.FC<FiberNodeProps> = memo(({
   fiber,
   fibers,
   expandCursor,
@@ -120,6 +121,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
   const [hoverState, updateHoverState] = hoveredCursor;
 
   fibers.set(id, fiber);
+  usePingContext(fiber);
 
   const selected = fiber === selectState;
   const hovered = hoverState.fiber?.id ?? -1;
@@ -243,7 +245,7 @@ export const FiberNode: React.FC<FiberNodeProps> = ({
     </TreeRow>
     {nextRender}
   </>);
-}
+});
 
 export const TreeExpand: React.FC<TreeExpandProps> = ({
   expand,

@@ -9,7 +9,7 @@ import {
   CompositeData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
   Pick, Cursor, PointLayer, LineLayer,
-  RenderToTexture, TextureShader,
+  RenderToTexture, LinearRGB, TextureShader,
   RawFullScreen,
   Router, Routes,
 } from '@use-gpu/components';
@@ -54,142 +54,114 @@ const lineDataFields = [
 ] as DataField[];
 
 let t = 0;
-let lj = 0;
-const getLineJoin = () => ['bevel', 'miter', 'round'][lj = (lj + 1) % 3];
 
 export const RTTPage: LiveComponent<RTTPageProps> = (props) => {
   const mesh = makeMesh();
   const texture = makeTexture();
   const {canvas} = props;
 
-  const Post = memoArgs(
-    (rtt: TextureSource) =>
-      use(Pass, {
-        picking: false,
-        children: [
-      
-          use(TextureShader, {
-            texture: rtt,
-            render: (getTexture: ShaderModule) => 
-              use(RawFullScreen, {
-                getTexture,
-              }),
-          }),
-
-        ]
-      }),
-      'Post',
-  );
-
-  const view = [
-    use(RenderToTexture, {
-      presentationFormat: "rgba16float",
-      colorSpace: 'linear',
-      children: [
-        use(Raw, () => {
-          t = t + 1/60;
-        }),
-        use(Cursor, { cursor: 'move' }),
-        use(Pass, {
-          picking: true,
+  const view = (
+    use(LinearRGB, {
+      children:
+        use(Draw, {
           children: [
-
-            use(CompositeData, {
-              fields: lineDataFields,
-              data: lineData,
-              loop: (o: any) => o.loop,
-              render: ([segments, positions, colors, widths]: StorageSource[]) => [
-                use(LineLayer, { segments, positions, colors, widths }),
-              ]          
+            use(Raw, () => {
+              t = t + 1/60;
             }),
+            use(Cursor, { cursor: 'move' }),
+            use(Pass, {
+              picking: true,
+              children: [
+
+                use(CompositeData, {
+                  fields: lineDataFields,
+                  data: lineData,
+                  loop: (o: any) => o.loop,
+                  render: ([segments, positions, colors, widths]: StorageSource[]) => [
+                    use(LineLayer, { segments, positions, colors, widths }),
+                  ]          
+                }),
             
-            use(RawData, {
-              format: 'vec4<f32>',
-              length: 100,
-              live: true,
-              expr: (emit: Emitter, i: number) => {
-                const s = ((i*i + i) % 13133.371) % 1000;
-                emit(
-                  Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
-                  Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2,
-                  Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2,
-                  1,
-                );
-              },
-              render: (positions) => [
-                use(PointLayer, { positions, colors: positions, size: 20, depth: 1, mode: RenderPassMode.Transparent }),
-              ],
-            }),
-            use(Pick, {
-              render: ({id, hovered, presses}) => [
-                use(Mesh, { texture, mesh, blink: presses.left }),
-                use(Mesh, { id, texture, mesh, mode: RenderPassMode.Picking }),
-                hovered ? use(Cursor, { cursor: 'pointer' }) : null,
-              ],
-            }),
+                use(RawData, {
+                  format: 'vec4<f32>',
+                  length: 100,
+                  live: true,
+                  expr: (emit: Emitter, i: number) => {
+                    const s = ((i*i + i) % 13133.371) % 1000;
+                    emit(
+                      Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
+                      Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2,
+                      Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2,
+                      1,
+                    );
+                  },
+                  render: (positions) => [
+                    use(PointLayer, { positions, colors: positions, size: 20, depth: 1, mode: RenderPassMode.Transparent }),
+                  ],
+                }),
+                use(Pick, {
+                  render: ({id, hovered, presses}) => [
+                    use(Mesh, { texture, mesh, blink: presses.left }),
+                    use(Mesh, { id, texture, mesh, mode: RenderPassMode.Picking }),
+                    hovered ? use(Cursor, { cursor: 'pointer' }) : null,
+                  ],
+                }),
 
-            /*
-            use(Flat, {
-              children: 
+                use(Flat, {
+                  children: 
 
-                use(UI, {
-                  children:
+                    use(UI, {
+                      children:
                 
-                    use(Layout, {
-                      children: 
+                        use(Layout, {
+                          children: 
               
-                        use(Absolute, {
-                          left: '50%',
-                          top: '50%',
-                          right: 0,
-                          bottom: 0,
-                          children: [
-
-                            use(Block, {
+                            use(Absolute, {
+                              left: '50%',
+                              top: '50%',
+                              right: 0,
+                              bottom: 0,
                               children: [
-                              
-                                use(Inline, {
-                                  margin: [0, 32, 0, 0],
-                                  children: [
-                    
-                                    use(Text, { size: 32, color: [1, 1, 1, 1], content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture." })
-                  
-                                  ],
-                                }),
 
-                                use(Inline, {
-                                  margin: [0, 32, 0, 0],
+                                use(Block, {
                                   children: [
+                              
+                                    use(Inline, {
+                                      margin: [0, 32, 0, 0],
+                                      children: [
                     
-                                    use(Text, { size: 32, color: [1, 1, 1, 1], content: "In the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
+                                        use(Text, { size: 32, color: [1, 1, 1, 1], content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture." })
                   
+                                      ],
+                                    }),
+
+                                    use(Inline, {
+                                      margin: [0, 32, 0, 0],
+                                      children: [
+                    
+                                        use(Text, { size: 32, color: [1, 1, 1, 1], content: "In the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware." })
+                  
+                                      ],
+                                    }),
+
                                   ],
-                                }),
+                                })
 
                               ],
-                            })
-
-                          ],
-                        }),
+                            }),
                         
-                    })
+                        })
                       
-                })
+                    })
 
-            }),
-            */
+                }),
             
+              ],
+            }),
           ],
         }),
-      ],
-      then: (texture) =>  
-        use(Draw, {
-          live: true,
-          children:
-            use(Post, texture),
-        }),
-    }),
-  ];
+    })
+  );
 
   return (
     use(OrbitControls, {

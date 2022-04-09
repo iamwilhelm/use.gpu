@@ -35,7 +35,8 @@ export const makeHost = (
     dispose: disposal.dispose,
     depend: dependency.depend,
     undepend: dependency.undepend,
-    invalidate: dependency.invalidate,
+    traceDown: dependency.traceDown,
+    traceUp: dependency.traceUp,
     flush: scheduler.flush,
 
     visit: queue.insert,

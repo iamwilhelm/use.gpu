@@ -10,12 +10,12 @@ const ICON = (s: string) => <span className="m-icon">{s}</span>
 const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
 
 const pingAnimation = keyframes({
-  '0%': { background: 'rgba(10, 170, 85, 1.0)' },
+  '0%': { background: 'rgba(10, 170, 85, 0.9)' },
   '100%': { background: 'rgba(10, 170, 85, 0.0)' },
 });
 
 const mountAnimation = keyframes({
-  '0%': { background: 'rgba(120, 120, 120, 1.0)' },
+  '0%': { background: 'rgba(120, 120, 120, 0.9)' },
   '100%': { background: 'rgba(120, 120, 120, 0.0)' },
 });
 
@@ -61,7 +61,7 @@ export const StyledHighlight = styled('div', {
   bottom: 0,
 
   '&&.selected': {
-    background: 'rgba(50, 130, 200, 0.85)',
+    background: 'rgba(50, 130, 200, 1.0)',
   },
 
   '&&.hovered': {
@@ -72,8 +72,16 @@ export const StyledHighlight = styled('div', {
     background: 'rgba(30, 140, 160, 1.0)',
   },
 
-  '&&.depended': {
-    background: 'rgba(80, 60, 200, 1.0)',
+  '&&.parents': {
+    background: 'rgba(30, 140, 160, 0.65)',
+  },
+
+  '&&.depends': {
+    background: 'rgba(75, 70, 200, 1.0)',
+  },
+
+  '&&.precedes': {
+    background: 'rgba(75, 70, 200, 0.65)',
   },
 
   '&&.staticMount': {
@@ -98,7 +106,7 @@ export const StyledPing = styled('div', {
   },
 
   '&.mounted': {
-    background: 'rgba(120, 120, 120, 1.0)',
+    background: 'rgba(120, 120, 120, 0.9)',
     
     '&.cold': {
       background: 'rgba(120, 120, 120, 0.0)',
@@ -107,7 +115,7 @@ export const StyledPing = styled('div', {
   },
 
   '&.pinged': {
-    background: 'rgba(10, 170, 85, 1.0)',
+    background: 'rgba(10, 170, 85, 0.9)',
 
     '&.cold': {
       background: 'rgba(10, 170, 85, 0.0)',
@@ -123,7 +131,9 @@ type NodeProps = {
   staticMount?: boolean,
   selected?: boolean,
   hovered?: number,
-  depended?: boolean,
+  depends?: boolean,
+  precedes?: boolean,
+  parents?: boolean,
   onClick?: Action,
   onMouseEnter?: Action,
   onMouseLeave?: Action,
@@ -135,7 +145,9 @@ export const Node: React.FC<NodeProps> = ({
   staticMount,
   selected,
   hovered,
-  depended,
+  depends,
+  precedes,
+  parents,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -147,13 +159,15 @@ export const Node: React.FC<NodeProps> = ({
 
   const [version, pinged] = usePingContext(fiber);
 
-  const classes = [version ? 'pinged' : 'mounted'] as string[];
+  const classes: string[] = version >= 0 ? [version ? 'pinged' : 'mounted'] : [];
 
   if (!pinged) classes.push('cold');
   if (selected) classes.push('selected');
   if (staticPing) classes.push('staticPing');
   if (staticMount) classes.push('staticMount');
-  if (depended) classes.push('depended');
+  if (depends) classes.push('depends');
+  if (precedes) classes.push('precedes');
+  if (parents) classes.push('parents');
   if (hovered === id) classes.push('hovered');
   if (hovered === by) classes.push('by');
   if (f.isLiveBuiltin) classes.push('builtin');
@@ -178,8 +192,8 @@ export const Node: React.FC<NodeProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <StyledHighlight className={className} />
       <StyledPing className={className} />
+      <StyledHighlight className={className} />
       <StyledLabel>{name}{suffix}</StyledLabel>
     </StyledNode>
   );

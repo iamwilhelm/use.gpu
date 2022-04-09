@@ -36,9 +36,21 @@ export const makeActionScheduler = () => {
 
 // Tracks long-range dependencies for contexts
 export const makeDependencyTracker = () => {
+  // Used in forward direction
   const dependencies = new WeakMap<LiveFiber<any>, Set<LiveFiber<any>>>();
 
+  // Inspector-only, backward direction
+  const precedents = new WeakMap<LiveFiber<any>, Set<LiveFiber<any>>>();
+
   const depend = (fiber: LiveFiber<any>, root: LiveFiber<any>) => {
+    {
+      let list = precedents.get(fiber);
+      if (!list) precedents.set(fiber, list = new Set());
+
+      let exist = list.has(root);
+      if (!exist) list.add(root);
+    }
+    
     let list = dependencies.get(root);
     if (!list) dependencies.set(root, list = new Set());
 
@@ -48,16 +60,26 @@ export const makeDependencyTracker = () => {
   }
 
   const undepend = (fiber: LiveFiber<any>, root: LiveFiber<any>) => {
+    {
+      let list = precedents.get(fiber);
+      if (list) list.delete(root);
+    }
+
     let list = dependencies.get(root);
     if (list) list.delete(fiber);
   }
 
-  const invalidate = (fiber: LiveFiber<any>) => {
+  const traceDown = (fiber: LiveFiber<any>) => {
     const fibers = dependencies.get(fiber);
     return fibers ? Array.from(fibers.values()) : NO_DEPS;
   }
 
-  return {depend, undepend, invalidate};
+  const traceUp = (fiber: LiveFiber<any>) => {
+    const fibers = precedents.get(fiber);
+    return fibers ? Array.from(fibers.values()) : NO_DEPS;
+  }
+
+  return {depend, undepend, traceDown, traceUp};
 }
 
 

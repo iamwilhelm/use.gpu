@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { use, detach, provide, useCallback, useOne, useResource } from '@use-gpu/live';
 
-import { LoopContext } from '../providers/loop-provider';
 import { FrameContext, usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
+import { LoopContext } from '../providers/loop-provider';
 
 const NOP = () => {};
 
@@ -45,6 +45,8 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     },
     frame: {
       current: 0,
+    },
+    loop: {
       request: () => {},
     },
     children,
@@ -55,11 +57,11 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
   ref.render = render;
 
   const request = useResource((dispose) => {
-    const {time, frame} = ref;
+    const {time, frame, loop} = ref;
     let running = live;
     let pending = false;
 
-    const loop = (timestamp: number) => {
+    const render = (timestamp: number) => {
       frame.current++;
       pending = false;
 
@@ -71,26 +73,28 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
       const {dispatch} = ref;
       if (dispatch) dispatch();
-      if (running) request(loop);
+      if (running) request(render);
     };
 
     const request = (fiber?: LiveFiber<any>) => {
       if (fiber) requestAnimationFrame(() => fiber.host?.schedule(fiber, NOP));
-      if (!pending) requestAnimationFrame(loop);
+      if (!pending) requestAnimationFrame(render);
       pending = true;
     };
     dispose(() => running = false);
 
-    return frame.request = request;
+    return loop.request = request;
   }, live);
 
   request();
 
   const Dispatch = useCallback(() => {
-    const {time, frame, render, children, request} = ref;
+    const {time, frame, loop, render, children, request} = ref;
     return (
-      provide(FrameContext, {...frame},
-        provide(TimeContext, {...time}, render ? render() : children ?? null)
+      provide(LoopContext, loop,
+        provide(FrameContext, {...frame},
+          provide(TimeContext, {...time}, render ? render() : children ?? null)
+        )
       )
     );
   });

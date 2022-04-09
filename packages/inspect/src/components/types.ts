@@ -7,6 +7,7 @@ export type HoverState = {
   fiber: LiveFiber<any> | null,
   root: LiveFiber<any> | null,
   deps: LiveFiber<any>[],
+  precs: LiveFiber<any>[],
 };
 
 export type Action = () => void;

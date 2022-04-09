@@ -4,7 +4,7 @@ import { ColorSpace } from '@use-gpu/core/types';
 import { use, provide, resume, gather, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
-import { FrameContext } from '../providers/frame-provider';
+import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 
 import {
   makeColorState,
@@ -22,8 +22,8 @@ export type RenderToTextureProps = {
   height: number,
   live?: boolean,
 
-  presentationFormat?: GPUTextureFormat,
-  depthStencilFormat?: GPUTextureFormat | null,
+  format?: GPUTextureFormat,
+  depthStencil?: GPUTextureFormat | null,
   backgroundColor?: GPUColor,
   colorSpace?: ColorSpace,
   colorInput?: ColorSpace,
@@ -41,60 +41,60 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     width = renderContext.width,
     height = renderContext.height,
     samples = renderContext.samples,
-    presentationFormat = PRESENTATION_FORMAT,
-    depthStencilFormat = DEPTH_STENCIL_FORMAT,
+    format = PRESENTATION_FORMAT,
+    depthStencil = DEPTH_STENCIL_FORMAT,
     backgroundColor = EMPTY_COLOR,
     colorSpace = COLOR_SPACE,
     colorInput = COLOR_SPACE,
-    live = true,
+    live,
     children,
     then,
   } = props;
-
-  if (live) useContext(FrameContext);
-  else useNoContext(FrameContext);
 
   const [renderTexture, resolveTexture] = useMemo(() => [
       makeRenderableTexture(
         device,
         width,
         height,
-        presentationFormat,
+        format,
         samples,
       ),
       samples > 1 ? makeRenderableTexture(
         device,
         width,
         height,
-        presentationFormat,
+        format,
       ) : null,
     ] as [GPUTexture, GPUTexture | null],
-    [device, width, height, presentationFormat, samples]
+    [device, width, height, format, samples]
   );
   
+  if (live) usePerFrame();
+  else useNoPerFrame();
+
   const targetTexture = resolveTexture ?? renderTexture;
 
-  const colorStates      = useOne(() => [makeColorState(presentationFormat, BLEND_PREMULTIPLIED)], presentationFormat);
+  const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLIED)], format);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, resolveTexture, backgroundColor)],
     [renderTexture, resolveTexture, backgroundColor]
   );
-  const depthStencilState = useOne(() => depthStencilFormat
-    ? makeDepthStencilState(depthStencilFormat)
+  const depthStencilState = useOne(() => depthStencil
+    ? makeDepthStencilState(depthStencil)
     : undefined,
-    depthStencilFormat);
+    depthStencil);
 
   const [
     depthTexture,
     depthStencilAttachment,
   ] = useMemo(() => {
-      if (!depthStencilFormat) return [];
+      if (!depthStencil) return [];
 
-      const texture = makeDepthTexture(device, width, height, depthStencilFormat, samples);
+      const texture = makeDepthTexture(device, width, height, depthStencil, samples);
       const attachment = makeDepthStencilAttachment(texture);
       return [texture, attachment];
     },
-    [device, width, height, depthStencilFormat, samples]
+    [device, width, height, depthStencil, samples]
   );
   
   const swapView = useOne(() => () => {});
@@ -118,25 +118,28 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     view: makeTextureView(targetTexture),
     sampler: {},
     layout: 'texture_2d<f32>',
-    format: presentationFormat,
+    format,
     colorSpace,
     size: [width, height],
     version: 0,
-  }), [targetTexture, width, height, presentationFormat]);
+  }), [targetTexture, width, height, format]);
 
   const Done = useOne(() =>
     resume((ts: Task[]) => {
+      usePerFrame();
+
       for (let task of ts) task();
+      source.version++;
       return then && then(source);
     })
   , source);
 
-  source.version++;
+  const frame = useOne(() => ({current: 0, request: () => {}}));
+  frame.current++;
+
   return (
     gather(
-      provide(RenderContext, rttContext,
-        provide(FrameContext, source.version, children)
-      )
+      provide(RenderContext, rttContext, children)
     , Done)
   );
 }

@@ -151,7 +151,8 @@ export type HostInterface = {
   // Track a long-range dependency for contexts
   depend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => boolean,
   undepend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => void,
-  invalidate: (fiber: LiveFiber<any>) => LiveFiber<any>[],
+  traceDown: (fiber: LiveFiber<any>) => LiveFiber<any>[],
+  traceUp: (fiber: LiveFiber<any>) => LiveFiber<any>[],
 
   // Fiber update queue
   visit: (fiber: LiveFiber<any>) => void,
@@ -164,5 +165,5 @@ export type HostInterface = {
   depth: (d: number) => void,
 
   __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
-  __ping: (fiber: LiveFiber<any>) => void,
+  __ping: (fiber: LiveFiber<any>, active?: boolean) => void,
 };

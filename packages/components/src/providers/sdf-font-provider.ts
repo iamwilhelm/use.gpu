@@ -55,8 +55,8 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({children, then}
   const device = useContext(DeviceContext);
   const gpuText = useContext(GPUTextContext);
 
-  const width = 800;
-  const height = 800;
+  const width = 256;
+  const height = 256;
   const pad = 10;
   const radius = 10;
 

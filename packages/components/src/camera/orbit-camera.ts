@@ -5,7 +5,7 @@ import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
-import { FrameContext } from '../providers/frame-provider';
+import { FrameContext, usePerFrame } from '../providers/frame-provider';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
@@ -71,7 +71,8 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
 
   const unit = scale != null ? height / pixelRatio / scale : 1;
 
-  const frame = useOne(() => ({ current: 0, request: () => {}}));
+  usePerFrame();
+  const frame = useOne(() => ({ current: 0 }));
   frame.current++;
 
   uniforms.projectionMatrix.current = makeProjectionMatrix(width, height, fov, near, far, radius, dolly);
@@ -83,7 +84,9 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.viewWorldUnit.current = focus * Math.tan(fov / 2);
   uniforms.viewPixelRatio.current = pixelRatio * unit;
 
-  return provide(FrameContext, {...frame}, use(ViewProvider, {
-    defs: VIEW_UNIFORMS, uniforms, children,
-  }));
+  return provide(FrameContext, {...frame},
+    use(ViewProvider, {
+      defs: VIEW_UNIFORMS, uniforms, children,
+    })
+  );
 };

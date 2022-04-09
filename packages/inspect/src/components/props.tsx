@@ -5,6 +5,7 @@ import { styled } from "@stitches/react";
 import React, { useState } from 'react';
 import { Action } from './types';
 import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from './layout';
+import { usePingContext } from './ping';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 
@@ -29,6 +30,8 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   const {id, f, arg, args, yeeted} = fiber;
   const name = formatNodeName(fiber);
   let props = {} as Record<string, any>;
+
+  usePingContext();
 
   const [state, setState] = useState<Record<string, boolean>>({});
   const toggleState = (id: string) => setState((state) => ({

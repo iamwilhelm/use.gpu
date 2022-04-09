@@ -75,7 +75,7 @@ export const FiberLegend: React.FC = () => {
       <TreeLegendItem>
         <Node
           fiber={fiber}
-          depended={true}
+          depends={true}
         />
         <span>Dependency</span>
       </TreeLegendItem>
@@ -124,8 +124,10 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   usePingContext(fiber);
 
   const selected = fiber === selectState;
-  const hovered = hoverState.fiber?.id ?? -1;
-  const depended = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
+  const hovered  = hoverState.fiber?.id ?? -1;
+  const parents  = hoverState.fiber?.by === fiber.id;
+  const depends  = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
+  const precedes = hoverState.precs.indexOf(fiber) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
 
   const [select, hover, unhover] = useMemo(() => {
     const root = yeeted && fiber.type === YEET ? yeeted.root : null;
@@ -133,12 +135,14 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     const select  = () => updateSelectState({ $set: fiber });
     const hover   = () => updateHoverState({ $set: {
       fiber,
-      deps: host ? host.invalidate(fiber) : [],
+      deps: host ? host.traceDown(fiber) : [],
+      precs: host ? host.traceUp(fiber) : [],
       root,
     } });
     const unhover = () => updateHoverState({ $set: {
       fiber: null,
       deps: [],
+      precs: [],
       root: null,
     } });
     return [select, hover, unhover];
@@ -152,7 +156,9 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       fiber={fiber}
       selected={selected}
       hovered={hovered}
-      depended={depended}
+      parents={parents}
+      precedes={precedes}
+      depends={depends}
       onClick={select}
       onMouseEnter={hover}
       onMouseLeave={unhover}

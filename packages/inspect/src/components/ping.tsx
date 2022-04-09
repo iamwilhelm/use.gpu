@@ -22,19 +22,28 @@ type PingProviderProps = {
 
 type Timer = ReturnType<typeof setTimeout>;
 
+type PingEntry = [number, ArrowFunction[]];
+
 // Track update pings to show highlights in tree
 export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => {
-   const [map, api] = useMemo(() => {
+   const [map, versions, all, api] = useMemo(() => {
     const map = new Map<number, Set<ArrowFunction>>();
+    const versions = new Map<number, number>();
+    const all = new Set<ArrowFunction>();
+
     const api = {
-      subscribe: (fiber: LiveFiber<any>, f: ArrowFunction) => {
+      subscribe: (fiber: LiveFiber<any> | null | undefined, f: ArrowFunction) => {
+        if (!fiber) return all.add(f);
+
         let s = map.get(fiber.id);
         if (!s) {
           map.set(fiber.id, s = new Set<ArrowFunction>());
         }
         s.add(f);
       },
-      unsubscribe: (fiber: LiveFiber<any>, f: ArrowFunction) => {
+      unsubscribe: (fiber: LiveFiber<any> | null | undefined, f: ArrowFunction) => {
+        if (!fiber) return all.delete(f);
+
         let s = map.get(fiber.id);
         if (s) {
           s.delete(f);
@@ -42,44 +51,60 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
         }
       },
     };
-    return [map, api];
+    return [map, versions, all, api];
   }, NO_DEPS);
 
   useLayoutEffect(() => {
     let timer: Timer | null = null;
     let reset: Timer | null = null;
 
-    let queue: ArrowFunction[] = [];
-		let hot: Set<ArrowFunction> = new Set();
+    let queue: PingEntry[] = [];
+    let hot: PingEntry[] = [];
+    let version = 0;
 
-		let timeout = () => {
+    let timeout = () => {
       reset = null;
-			flush();
-		};
+      flush();
+    };
 
     let flush = () => {
       timer = null;
 
-			const removed = new Set<ArrowFunction>();
-      const q = new Set(queue);
+      const q = queue.slice();
       queue.length = 0;
+      
+      const seen = new Set<number>();
 
-			for (let f of hot.values()) if (!q.has(f)) removed.add(f);
-			hot = q;
+      for (const [id, fs, active] of q) {
+        seen.add(id);
+        const v = versions.get(id);
+        for (const f of fs) f(v, active);
+      }
+      for (const [id, fs] of hot) if (!seen.has(id)) {
+        const v = versions.get(id);
+        for (const f of fs) f(v, false);
+      }
+      
+      for (const f of all) f(version, false);
 
-      for (let f of q) f(true);
-      for (let f of removed) f(false);
+      hot = q;
     };
 
-    fiber.host.__ping = (fiber: LiveFiber<any>) => {
-      const s = map.get(fiber.id);
-      if (s) queue.push(...s.values());
-      if (!timer) {
-				timer = setTimeout(flush, 0);
+    fiber.host.__ping = (fiber: LiveFiber<any>, active: boolean = true) => {
+      version = incrementVersion(version);
 
-				if (reset) clearTimeout(reset);
-				reset = setTimeout(timeout, 100);
-			}
+      const v = versions.get(fiber.id);
+      if (active) versions.set(fiber.id, v != null ? incrementVersion(v) : 0);
+
+      const s = map.get(fiber.id);
+      if (s) queue.push([fiber.id, [...s.values()], active]);
+
+      if (!timer) {
+        timer = setTimeout(flush, 0);
+
+        if (reset) clearTimeout(reset);
+        reset = setTimeout(timeout, 100);
+      }
     };
     return () => {
       if (fiber.host) fiber.host.__ping = () => {};
@@ -95,19 +120,19 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
 }
 
 export const usePingContext = (fiber: LiveFiber<any>) => {
+  const [version, setVersion] = useState<number>(-1);
   const [live, setLive] = useState<boolean>(false);
-	const [version, forceUpdate] = useForceUpdate();
 
   const {subscribe, unsubscribe} = useContext(PingContext);
   useLayoutEffect(() => {
-		const ping = (live: boolean) => {
-			setLive(live);
-			forceUpdate();
-		};
+    const ping = (version: number, live: boolean) => {
+      if (live) setVersion(version);
+      setLive(live);
+    };
 
     subscribe(fiber, ping);
     return () => unsubscribe(fiber, ping);
-  }, NO_DEPS);
+  }, [fiber]);
 
   return [version, live];
 }

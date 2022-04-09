@@ -1,7 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, DataTexture, TextureSource, UniformType, Emitter } from '@use-gpu/core/types';
 import { DeviceContext } from '../providers/device-provider';
-import { usePerFrame, useAnimationFrame, useNoPerFrame, useNoAnimationFrame } from '../providers/frame-provider';
+import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
+import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { yeet, memo, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import { makeSampler, makeRawSourceTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
 

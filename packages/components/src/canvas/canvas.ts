@@ -22,8 +22,8 @@ export type CanvasProps = {
   adapter: GPUAdapter,
   canvas: HTMLCanvasElement,
 
-  presentationFormat?: GPUTextureFormat,
-  depthStencilFormat?: GPUTextureFormat,
+  format?: GPUTextureFormat,
+  depthStencil?: GPUTextureFormat,
   backgroundColor?: GPUColor,
   colorSpace?: ColorSpace,
   colorInput?: ColorSpace,
@@ -41,8 +41,8 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     canvas,
     children,
     pixelRatio = getPixelRatio(),
-    presentationFormat = PRESENTATION_FORMAT,
-    depthStencilFormat = DEPTH_STENCIL_FORMAT,
+    format = PRESENTATION_FORMAT,
+    depthStencil = DEPTH_STENCIL_FORMAT,
     backgroundColor = BACKGROUND_COLOR,
     colorSpace = COLOR_SPACE,
     colorInput = COLOR_SPACE,
@@ -57,34 +57,34 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
         device,
         width,
         height,
-        presentationFormat,
+        format,
         samples,
       )
     : null,
-    [device, width, height, presentationFormat, samples]
+    [device, width, height, format, samples]
   );
   
-  const colorStates      = useOne(() => [makeColorState(presentationFormat, BLEND_PREMULTIPLIED)], presentationFormat);
+  const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLIED)], format);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, null, backgroundColor)],
     [backgroundColor, renderTexture]
   );
-  const depthStencilState = useOne(() => makeDepthStencilState(depthStencilFormat), depthStencilFormat);
+  const depthStencilState = useOne(() => makeDepthStencilState(depthStencil), depthStencil);
 
   const [
     depthTexture,
     depthStencilAttachment,
   ] = useMemo(() => {
-      const texture = makeDepthTexture(device, width, height, depthStencilFormat, samples);
+      const texture = makeDepthTexture(device, width, height, depthStencil, samples);
       const attachment = makeDepthStencilAttachment(texture);
       return [texture, attachment];
     },
-    [device, width, height, depthStencilFormat, samples]
+    [device, width, height, depthStencil, samples]
   );
 
   const gpuContext = useMemo(() =>
-    makePresentationContext(device, canvas, presentationFormat),
-    [device, canvas, presentationFormat, width, height],
+    makePresentationContext(device, canvas, format),
+    [device, canvas, format, width, height],
   );
   
   const swapView = useCallback((view?: GPUTextureView) => {

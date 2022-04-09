@@ -3,7 +3,7 @@ import { TypedArray } from '@use-gpu/core/types';
 
 import { useOne } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
-import { useAnimationFrame, useNoAnimationFrame } from '../providers/frame-provider';
+import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
 type Keyframe = [number, T, T?, T?];
 

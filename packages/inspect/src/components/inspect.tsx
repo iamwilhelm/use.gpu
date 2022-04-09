@@ -30,7 +30,7 @@ type InspectProps = {
 export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
-  const hoveredCursor = useUpdateState<HoverState>(() => ({ fiber: null, deps: [], root: null }));
+  const hoveredCursor = useUpdateState<HoverState>(() => ({ fiber: null, deps: [], precs: [], root: null }));
 
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);

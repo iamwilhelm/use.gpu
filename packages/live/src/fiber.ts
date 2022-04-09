@@ -216,11 +216,13 @@ export const renderFiber = <F extends Function>(
     const canExitEarly = fiber.type !== YEET && !fiber.next;
     if (fiber.version !== fiber.memo) {
       fiber.memo = fiber.version;
+      bustFiberDeps(fiber);
       pingFiber(fiber);
     }
     else if (canExitEarly) return;
   }
   else {
+    bustFiberDeps(fiber);
     pingFiber(fiber);
   }
 
@@ -228,21 +230,14 @@ export const renderFiber = <F extends Function>(
   return element ?? null;
 }
 
-// Ping a fiber when it's updated,
-// propagating to long-range dependencies.
+// Ping a fiber in dev tool
 export const pingFiber = <F extends Function>(
   fiber: LiveFiber<F>,
+  active: boolean = true,
 ) => {
-  // Bust far caches
-  const {host} = fiber;
-  if (host) for (let sub of host.invalidate(fiber)) {
-    DEBUG && console.log('Invalidating Node', formatNode(sub));
-    host.visit(sub);
-    bustFiberMemo(sub);
-  }
-
   // Notify host / dev tool of update
-  if (host?.__ping) host.__ping(fiber);
+  const {host} = fiber;
+  if (host?.__ping) host.__ping(fiber, active);
 }
 
 // Update a fiber with rendered result
@@ -633,32 +628,30 @@ export const provideFiber = <F extends Function>(
   fiber: LiveFiber<F>,
 ) => {
   if (!fiber.args) return;
-  let {args: [context, value, calls, isMemo]} = fiber;
-  isMemo = true;
+  let {args: [context, value, calls]} = fiber;
 
   if (fiber.context.roots.get(context) !== fiber) {
     fiber.context = makeContextState(fiber, fiber.context, context, value);
-
-    // If memoized, remember calls
-    if (isMemo) {
-      const ref = fiber.context.values.get(context);
-      ref.memo = calls;
-    }
-
     pingFiber(fiber);
+
+    // Remember calls
+    const ref = fiber.context.values.get(context);
+    ref.memo = calls;
   }
   else {
     // Set new value if changed
     const ref = fiber.context.values.get(context);
     const lastValue = ref.current;
     if (value !== lastValue) {
-      ref.current = value;
-
-      // Invalidate downstream dependencies
+      bustFiberDeps(fiber);
       pingFiber(fiber);
+
+      ref.current = value;
     }
     // If memoized and mounts are identical, stop
-    else if (isMemo) {
+    else {
+      pingFiber(fiber, false);
+
       const lastCalls = ref.memo;
       if (lastCalls === calls) return;
       ref.memo = calls;
@@ -675,6 +668,7 @@ export const consumeFiber = <F extends Function>(
   if (!fiber.args) return;
   let {args: [context, calls, Next]} = fiber;
 
+  bustFiberDeps(fiber);
   pingFiber(fiber);
 
   if (!fiber.next) {
@@ -698,6 +692,7 @@ export const detachFiber = <F extends Function>(
   if (!fiber.args) return;
   let {host, next, args: [call, callback]} = fiber;
 
+  bustFiberDeps(fiber);
   pingFiber(fiber);
 
   if (!next || (next.f !== call.f)) {
@@ -838,4 +833,18 @@ export const bustFiberYeet = <F extends Function>(fiber: LiveFiber<F>, force?: b
 // Force a memoized fiber to update next render
 export const bustFiberMemo = <F extends Function>(fiber: LiveFiber<F>) => {
   if (fiber.version != null) fiber.version = incrementVersion(fiber.version);
+}
+
+// Ping a fiber when it's updated,
+// propagating to long-range dependencies.
+export const bustFiberDeps = <F extends Function>(
+  fiber: LiveFiber<F>,
+) => {
+  // Bust far caches
+  const {host} = fiber;
+  if (host) for (let sub of host.traceDown(fiber)) {
+    DEBUG && console.log('Invalidating Node', formatNode(sub));
+    host.visit(sub);
+    bustFiberMemo(sub);
+  }
 }

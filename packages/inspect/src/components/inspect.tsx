@@ -41,7 +41,6 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const [selectedFiber, setSelected] = selectedCursor;
   const [depthLimit, setDepthLimit] = depthCursor;
 
-  const ping = usePingTracker(fiber);
   const panes = selectedFiber ? [
     {
       menuItem: 'Props',
@@ -76,7 +75,6 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
       <FiberTree
         fiber={fiber}
         fibers={fibers}
-        ping={ping}
         depthLimit={depthLimit}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
@@ -134,48 +132,4 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
       <Button>{open ? ICON("close") : ICON("bug_report")}</Button>
     </InspectToggle>
   </>);
-}
-
-// Track update pings to show highlights in tree
-type Timer = ReturnType<typeof setTimeout>;
-const usePingTracker = (fiber: LiveFiber<any>) => {
-  const [ping, setPing] = useState<PingState>({});
-
-  const [ref] = useState({ ping });
-  ref.ping = ping;
-
-  useEffect(() => {
-    let uTimer: Timer | null = null;
-    let rTimer: Timer | null = null;
-
-    let update: Record<string, number> = {};
-    let reset: Record<string, number> = {};
-
-    const flush = () => {
-      const u = update;
-      uTimer = null;
-      update = {};
-      setPing((s) => ({...s, ...u}));
-
-      for (let k in u) reset[k] = 0;
-      if (!rTimer) rTimer = setTimeout(() => {
-        const r = reset;
-        rTimer = null;
-        reset = {};
-        setPing((s) => ({...s, ...r}))
-      }, 500);
-    }
-
-    if (!fiber.host) return;
-    
-    fiber.host.__ping = (fiber: LiveFiber<any>) => {
-      reset[fiber.id] = update[fiber.id] = ((ref.ping[fiber.id] || 0) % 256) + 1;      
-      if (!uTimer) uTimer = setTimeout(flush, 0);
-    };
-    return () => {
-      if (fiber.host) fiber.host.__ping = () => {};
-    };
-  }, [ref]);
-
-  return ping;
 }

@@ -127,14 +127,14 @@ html > body ::-webkit-scrollbar {
 }
 
 @keyframes mountAnimation {
-  0:: { background: rgba(120, 120, 120, 0.9); }
+  0 { background: rgba(120, 120, 120, 0.9); }
   100%: { background: rgba(120, 120, 120, 0.0); }
 }
 
 @keyframes shadeAnimation {
-  0%: { background: rgba(0, 0, 0, 1.0); }
-  75%: { background: rgba(0, 0, 0, 1.0); }
-  100%: { background: rgba(0, 0, 0, 0.0); }
+  0% { background: rgba(0, 0, 0, 1.0); }
+  75% { background: rgba(0, 0, 0, 1.0); }
+  100% { background: rgba(0, 0, 0, 0.0); }
 }
 
 div.fiber-tree-label {
@@ -151,7 +151,7 @@ div.fiber-tree-label.depth-2 { color: var(--colorTextLevel5); }
 div.fiber-tree-label.depth-3 { color: var(--colorTextLevel7); }
 div.fiber-tree-label.depth-4 { color: var(--colorTextLevel8); }
 
-div.fiber-tree-label.builtin.depth--1 { color: var(--colorTextLevel1); }
+div.fiber-tree-label.builtin.depth--1 { color: var(--colorTextLevel10); }
 div.fiber-tree-label.builtin.depth-0 { color: var(--colorTextLevel8); }
 div.fiber-tree-label.builtin.depth-1 { color: var(--colorTextLevel9); }
 div.fiber-tree-label.builtin.depth-2 { color: var(--colorTextLevel10); }

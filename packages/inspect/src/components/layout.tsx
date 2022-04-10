@@ -135,6 +135,8 @@ export const TreeToggle = styled('div', {
 });
 
 export const TreeLegend = styled('div', {
+  position: 'sticky',
+  left: 0,
   color: 'var(--colorTextSemi)',
   paddingTop: '30px',
   display: 'flex',

@@ -146,6 +146,7 @@ export const TreeLegendItem = styled('div', {
   margin: '2px 0',
   padding: '0 10px',
   display: 'flex',
+  alignItems: 'center',
 
   '& > div': {
     width: '16px',
@@ -154,7 +155,7 @@ export const TreeLegendItem = styled('div', {
     padding: 0,
   },
   '& > span': {
-    marginLeft: '5px',
+    marginLeft: '10px',
   },
 });
 

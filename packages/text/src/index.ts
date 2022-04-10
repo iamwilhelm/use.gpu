@@ -1,11 +1,11 @@
-import { FontMetrics, SpanMetrics, GlyphMetrics, GPUTextContext } from './types';
+import { FontMetrics, SpanMetrics, GlyphMetrics, GPUTextAPI } from './types';
 
 export { glyphToRGBA, glyphToSDF, padRectangle } from './sdf';
 
 // @ts-ignore
 let UseGPUText: typeof import('../pkg');
 
-export const GPUText = async (): Promise<GPUTextContext> => {
+export const GPUText = async (): Promise<GPUTextAPI> => {
   if (!UseGPUText) {
     // @ts-ignore
     ({UseGPUText} = await import('../pkg'));

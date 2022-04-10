@@ -4,17 +4,17 @@ import { GPUTextAPI } from '@use-gpu/text/types';
 import { provide, useAsync, makeContext } from '@use-gpu/live';
 import { GPUText } from '@use-gpu/text';
 
-export const GPUTextContext = makeContext(undefined, 'GPUTextContext');
-
-export type GPUTextContext = {
+export type TextContextProps = {
   gpuText: GPUTextAPI,
 };
 
-export type GPUTextProvider = {
+export const TextContext = makeContext<TextContextProps>(undefined, 'TextContext');
+
+export type TextContext = {
   children: LiveElement<any>,
 };
 
-export const GPUTextProvider: LiveComponent<GPUTextProviderProps> = ({children}) => {
+export const TextProvider: LiveComponent<TextProviderProps> = ({children}) => {
   const gpuText = useAsync(GPUText);
-  return gpuText && children ? provide(GPUTextContext, gpuText, children) : null;
+  return gpuText && children ? provide(TextContext, gpuText, children) : null;
 };

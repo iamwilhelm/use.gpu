@@ -10,10 +10,11 @@ import { Props } from './props';
 import { Call } from './call';
 import { Shader } from './shader';
 import {
-  InspectContainer, InspectToggle, Button,
+  InspectContainer, InspectToggle, Button, TreeControls,
   SplitRow, RowPanel, Panel, PanelFull, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 import { PingProvider } from './ping';
+import { DetailSlider } from './detail';
 
 import * as Tabs from '@radix-ui/react-tabs';
 import "../theme.css";
@@ -30,15 +31,17 @@ type InspectProps = {
 export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
-  const hoveredCursor = useUpdateState<HoverState>(() => ({ fiber: null, deps: [], precs: [], root: null }));
+  const depthCursor = useUpdateState<number>(3);
+  const hoveredCursor = useUpdateState<HoverState>(() => ({ fiber: null, by: null, deps: [], precs: [], root: null, depth: 0 }));
 
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);
 
   const fibers = new Map<number, LiveFiber<any>>();
   const [selectedFiber, setSelected] = selectedCursor;
-  const ping = usePingTracker(fiber);
+  const [depthLimit, setDepthLimit] = depthCursor;
 
+  const ping = usePingTracker(fiber);
   const panes = selectedFiber ? [
     {
       menuItem: 'Props',
@@ -67,10 +70,14 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 
   const tree = (
     <InsetColumnFull>
+      <TreeControls>
+        <DetailSlider value={depthLimit} onChange={setDepthLimit} />
+      </TreeControls>
       <FiberTree
         fiber={fiber}
         fibers={fibers}
         ping={ping}
+        depthLimit={depthLimit}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}

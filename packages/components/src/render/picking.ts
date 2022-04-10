@@ -7,7 +7,7 @@ import {
   DEPTH_STENCIL_FORMAT,
 } from '../constants';
 
-import { RenderContext } from '../providers';
+import { DeviceContext, RenderContext } from '../providers';
 import {
   memo, use, provide, makeContext,
   useMemo, useOne, useNoOne, useResource,
@@ -78,6 +78,7 @@ export type PickingProps = {
 const NOP = () => {};
 
 export const Picking: LiveComponent<PickingProps> = (props) => {
+  const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 
   const {
@@ -99,7 +100,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
   );
 
   const pickingContext = useMemo(() => {
-    const {device, width: w, height: h} = renderContext;
+    const {width: w, height: h} = renderContext;
     const width = Math.round(w * resolution);
     const height = Math.round(h * resolution);
     const samples = 1;
@@ -162,7 +163,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
     };
     
     return context;
-  }, [renderContext, colorStates, depthStencilState, resolution]);
+  }, [device, renderContext, colorStates, depthStencilState, resolution]);
 
   return provide(PickingContext, pickingContext, children);
 };

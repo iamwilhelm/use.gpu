@@ -73,7 +73,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
 
   const key = useFiber().id;
 
-  const s = useShaderRef(sizes, size);
+  const s = useShaderRef(size, sizes);
 
   const sizes2D = useOne(() => {
     const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, s));

@@ -28,6 +28,25 @@ const shadeAnimation = keyframes({
 export const StyledLabel = styled('div', {
   position: 'relative',
   zIndex: 1,
+  
+  transition: '0.25s ease-in-out color',
+  
+  '&.depth--1': { color: 'var(--colorTextLevel8)' },
+  '&.depth-0': { color: 'var(--colorTextLevel1)' },
+  '&.depth-1': { color: 'var(--colorTextLevel3)' },
+  '&.depth-2': { color: 'var(--colorTextLevel5)' },
+  '&.depth-3': { color: 'var(--colorTextLevel7)' },
+  '&.depth-4': { color: 'var(--colorTextLevel8)' },
+
+  '&.builtin.depth--1': { color: 'var(--colorTextLevel10)' },
+  '&.builtin.depth-0': { color: 'var(--colorTextLevel8)' },
+  '&.builtin.depth-1': { color: 'var(--colorTextLevel9)' },
+  '&.builtin.depth-2': { color: 'var(--colorTextLevel10)' },
+  '&.builtin.depth-3': { color: 'var(--colorTextLevel10)' },
+  '&.builtin.depth-4': { color: 'var(--colorTextLevel10)' },
+
+  '&&.selected, &&.hovered, &&.by, &&.parents, &&.depends, &&.precedes': { color: 'var(--colorTextLevel1)' },
+  '&&.builtin.parents, &&.builtin.precedes': { color: 'var(--colorTextLevel3)' },
 });
   
 export const StyledNode = styled('div', {
@@ -46,6 +65,13 @@ export const StyledNode = styled('div', {
       animationDuration: '1.0s',
       animationIterationCount: 1,
     }
+  },
+  
+  '&.selected': {
+    zIndex: 2,
+  },
+  '&.hovered': {
+    zIndex: 2,
   },
   
   '&.builtin': {
@@ -73,7 +99,7 @@ export const StyledHighlight = styled('div', {
   },
 
   '&&.parents': {
-    background: 'rgba(30, 140, 160, 0.65)',
+    background: 'rgba(24, 112, 128, 1.0)',
   },
 
   '&&.depends': {
@@ -81,7 +107,7 @@ export const StyledHighlight = styled('div', {
   },
 
   '&&.precedes': {
-    background: 'rgba(75, 70, 200, 0.65)',
+    background: 'rgba(60, 56, 161, 1.0)',
   },
 
   '&&.staticMount': {
@@ -99,6 +125,12 @@ export const StyledPing = styled('div', {
   top: 0,
   right: 0,
   bottom: 0,
+
+  transition: '0.25s ease-in-out opacity',
+
+  '&.hovering': {
+    opacity: 0.65,
+  },
 
   '&.cold': {
     animationDuration: '1.0s',
@@ -134,6 +166,7 @@ type NodeProps = {
   depends?: boolean,
   precedes?: boolean,
   parents?: boolean,
+  depth?: number,
   onClick?: Action,
   onMouseEnter?: Action,
   onMouseLeave?: Action,
@@ -148,6 +181,7 @@ export const Node: React.FC<NodeProps> = ({
   depends,
   precedes,
   parents,
+  depth,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -168,9 +202,11 @@ export const Node: React.FC<NodeProps> = ({
   if (depends) classes.push('depends');
   if (precedes) classes.push('precedes');
   if (parents) classes.push('parents');
+  if (hovered !== -1) classes.push('hovering');
   if (hovered === id) classes.push('hovered');
   if (hovered === by) classes.push('by');
   if (f.isLiveBuiltin) classes.push('builtin');
+  classes.push(`depth-${Math.min(4, depth)}`);
   const className = classes.join(' ');
 
   const elRef = useRef<HTMLDivElement | null>(null);
@@ -194,7 +230,7 @@ export const Node: React.FC<NodeProps> = ({
     >
       <StyledPing className={className} />
       <StyledHighlight className={className} />
-      <StyledLabel>{name}{suffix}</StyledLabel>
+      <StyledLabel className={className}>{name}{suffix}</StyledLabel>
     </StyledNode>
   );
 }

@@ -8,7 +8,8 @@ import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import { useRawStorage } from '../../hooks/useRawStorage';
-import { useBoundShaderWithRefs } from '../../hooks/useBoundShaderWithRefs';
+import { useBoundShader } from '../../hooks/useBoundShader';
+import { useShaderRef } from '../../hooks/useShaderRef';
 
 import { useProp, useScaleTrait, useAxisTrait } from '../traits';
 import { parsePosition4 } from '../util/parse';
@@ -19,10 +20,9 @@ import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';
 import { vec4 } from 'gl-matrix';
 
 const SCALE_BINDINGS = [
+  { name: 'getScaleValue', format: 'f32', value: 0 },
   { name: 'getScaleOrigin', format: 'vec4<f32>', value: vec4.fromValues(0, 0, 0, 0) },
   { name: 'getScaleDirection', format: 'i32', value: 0 },
-
-  { name: 'getScaleValue', format: 'f32', value: 0 },
 ];
 
 export type ScaleProps = Partial<ScaleTrait> & Partial<AxisTrait> & {
@@ -43,13 +43,8 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   const domainOptions = useScaleTrait(props);
 
   const parentRange = useContext(RangeContext);
-  
   const r = range ?? parentRange[axis];
   const p = useProp(origin, parsePosition4);
-
-  const og = vec4.clone(p);
-  og[axis] = 0;
-  og[3] = 1;
 
   // Generate tick scale
   const values = useMemo(() => {
@@ -57,11 +52,17 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
     return new Float32Array(f(r[0], r[1], domainOptions));
   }, [r[0], r[1], props]);
 
-  const n = values.length;
   const data = useRawStorage(values, UniformType.f32);
+  const n = values.length;
 
   // Make tick vertex shader
-  const bound = useBoundShaderWithRefs(getScalePosition, SCALE_BINDINGS, [og, axis], [data]);
+  const og = vec4.clone(p);
+  og[axis] = 0;
+  og[3] = 1;
+
+  const o = useShaderRef(og);
+  const a = useShaderRef(axis);
+  const bound = useBoundShader(getScalePosition, SCALE_BINDINGS, [data, o, a]);
 
   // Expose position source
   const source = useMemo(() => ({

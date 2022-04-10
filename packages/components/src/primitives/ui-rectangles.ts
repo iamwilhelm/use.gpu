@@ -92,13 +92,13 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const r = useShaderRef(props.rectangles, props.rectangle);
-  const a = useShaderRef(props.radiuses, props.radius);
-  const b = useShaderRef(props.borders, props.border);
+  const r = useShaderRef(props.rectangle, props.rectangles);
+  const a = useShaderRef(props.radius, props.radiuses);
+  const b = useShaderRef(props.border, props.borders);
   const s = useShaderRef(props.strokes, props.strokes);
-  const f = useShaderRef(props.fills, props.fill);
-  const u = useShaderRef(props.uvs, props.uv);
-  const p = useShaderRef(props.repeats, props.repeat);
+  const f = useShaderRef(props.fill, props.fills);
+  const u = useShaderRef(props.uv, props.uvs);
+  const p = useShaderRef(props.repeat, props.repeats);
 
   const t = props.texture;
 

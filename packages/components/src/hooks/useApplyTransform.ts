@@ -3,7 +3,7 @@ import { ShaderModule } from '@use-gpu/shader/wgsl/types';
 
 import { useOne, useVersion } from '@use-gpu/live';
 import { useTransformContext } from '../providers/transform-provider';
-import { sourceToModule, chainTo } from '@use-gpu/shader/wgsl';
+import { sourceToModule, bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 
 const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['i32'] } as UniformAttributeValue;

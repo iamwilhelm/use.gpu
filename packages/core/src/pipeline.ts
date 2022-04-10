@@ -20,12 +20,13 @@ export const makeShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescr
 }
 
 export const makeRenderPipeline = (
+  device: GPUDevice,
   renderContext: UseRenderingContextGPU,
   vertexShader: ShaderModuleDescriptor,
   fragmentShader: ShaderModuleDescriptor,
   descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
 ) => {
-  const {device, colorStates, depthStencilState, samples} = renderContext;
+  const {colorStates, depthStencilState, samples} = renderContext;
 
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
     depthStencil: depthStencilState,

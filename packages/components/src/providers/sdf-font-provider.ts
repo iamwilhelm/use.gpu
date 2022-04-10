@@ -6,7 +6,7 @@ import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
 
 import { DeviceContext } from './device-provider';
-import { GPUTextContext } from './gpu-text-provider';
+import { TextContext } from './text-provider';
 
 export const SDFFontContext = makeContext(undefined, 'SDFFontContext');
 export const useSDFFont = () => useContext(SDFFontContext);
@@ -53,7 +53,7 @@ type GlyphCache = {
 export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({children, then}) => {
 
   const device = useContext(DeviceContext);
-  const gpuText = useContext(GPUTextContext);
+  const gpuText = useContext(TextContext);
 
   const width = 256;
   const height = 256;

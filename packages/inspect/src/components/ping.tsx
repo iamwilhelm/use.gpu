@@ -75,13 +75,22 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
       
       const seen = new Set<number>();
 
-      for (const [id, fs, active] of q) {
+      for (const [id, active] of q) {
         seen.add(id);
+
         const v = versions.get(id);
+        const s = map.get(id)!;
+        if (!s) continue;
+
+        const fs = s.values();        
         for (const f of fs) f(v, active);
       }
-      for (const [id, fs] of hot) if (!seen.has(id)) {
+      for (const [id] of hot) if (!seen.has(id)) {
         const v = versions.get(id);
+        const s = map.get(id)!;
+        if (!s) continue;
+
+        const fs = s.values();
         for (const f of fs) f(v, false);
       }
       
@@ -96,8 +105,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
       const v = versions.get(fiber.id);
       if (active) versions.set(fiber.id, v != null ? incrementVersion(v) : 0);
 
-      const s = map.get(fiber.id);
-      if (s) queue.push([fiber.id, [...s.values()], active]);
+      queue.push([fiber.id, active]);
 
       if (!timer) {
         timer = setTimeout(flush, 0);

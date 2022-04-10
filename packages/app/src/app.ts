@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
-import { use, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { use, morph, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   AutoCanvas, CanvasPicking,
@@ -10,11 +10,11 @@ import {
   CompositeData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick,
-  GPUTextProvider,
   Cursor, Points, Lines,
   RawQuads as Quads, RawLines,
   RenderToTexture,
   Router, Routes,
+  TextProvider,
   ViewProvider,
 } from '@use-gpu/components';
 import { UseInspect } from '@use-gpu/inspect';
@@ -59,18 +59,9 @@ export const App: LiveComponent<AppProps> = (props) => {
   );
 
   return [
-      use(GPUTextProvider, {
-        children: 
-
-          use(AutoCanvas, {
-            canvas, device, adapter, samples: 4,
-            children:
-      
-              use(CanvasPicking, {
-                canvas,
-                children: routes,
-              }),
-          }),
+      use(AutoCanvas, {
+        canvas, device, adapter, samples: 4,
+        children: routes,
       }),
       inspect ? use(UseInspect, {fiber, canvas}) : null,
   ];

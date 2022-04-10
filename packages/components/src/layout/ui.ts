@@ -2,7 +2,7 @@ import { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live/types';
 import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
 import { UIAggregate } from './types';
 
-import { RenderContext } from '../providers/render-provider';
+import { DeviceContext } from '../providers/device-provider';
 import { SDFFontProvider, SDF_FONT_ATLAS, SDF_FONT_DEBUG } from '../providers/sdf-font-provider';
 import { use, keyed, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
@@ -86,7 +86,7 @@ const Resume = resume((
 const Layer: LiveFunction<any> = (
   items: LayerAggregate[],
 ) => {
-  const {device} = useContext(RenderContext);
+  const device = useContext(DeviceContext);
   const {keys, count, memoKey} = getItemSummary(items);
 
   // Invalidate storage if too small, or set of keys changes.

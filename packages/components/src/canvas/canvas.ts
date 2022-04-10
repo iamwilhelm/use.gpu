@@ -101,7 +101,6 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
     height,
     pixelRatio,
     samples,
-    device,
     gpuContext,
     colorSpace,
     colorInput,

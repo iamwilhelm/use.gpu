@@ -111,4 +111,4 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
   }, [element]);
 
   return use(EventProvider, { mouse, children });
-}, 'CanvasEvents');
+}, 'DOMEvents');

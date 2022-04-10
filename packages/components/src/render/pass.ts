@@ -2,6 +2,7 @@ import { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live/types';
 import { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core/types';
 import { use, yeet, memo, resume, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
+import { DeviceContext } from '../providers/device-provider';
 import { PickingContext } from './picking';
 
 export type PassProps = {
@@ -29,10 +30,9 @@ const makeResume = (
   debug: boolean = true,
   picking: boolean = true,
 ) => resume((rs: Record<string, RenderToPass | RenderToPass[]>) => {
+  const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
-
-  const {device} = renderContext;
 
   const opaques = toArray(rs[RenderPassMode.Opaque]);
   const transparents = toArray(rs[RenderPassMode.Transparent]);

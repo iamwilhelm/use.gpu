@@ -48,7 +48,7 @@ const Layer: LiveFunction<any> = (
   makeAggregator: LayerAggregator,
   items: LayerAggregate[],
 ) => {
-  const {device} = useContext(RenderContext);
+  const device = useContext(DeviceContext);
   const {keys, count, memoKey} = getItemSummary(items);
 
   // Invalidate storage if too small, or set of keys changes.

@@ -39,6 +39,14 @@ export const InspectToggle = styled('div', {
   pointerEvents: 'auto',
 });
 
+export const TreeControls = styled('div', {
+  position: 'absolute',
+  right: 20,
+  top: 10,
+  width: 120,
+  pointerEvents: 'auto',
+});
+
 export const Muted = styled('span', {
   color: 'var(--colorTextMuted)',
 });
@@ -155,12 +163,24 @@ export const TreeLine = styled('div', {
   borderLeft: '2px dotted var(--borderThin)',
 });
 
+export const TreeRowOmittedChunk = styled('div', {
+  height: 20,
+  paddingBottom: 20,
+  '& + &': {
+    marginTop: -20,
+  },
+});
+
 export const TreeRow: React.FC<TreeIndentProps> = ({ indent, children }) => (
   <TreeRowInner css={{
     paddingLeft: indent ? `${indent * 20}px` : 0,
   }}>
     {children}
   </TreeRowInner>
+);
+
+export const TreeRowOmitted: React.FC<TreeIndentProps> = ({ indent, children }) => (
+  <TreeRowOmittedChunk />
 );
 
 export const TreeIndent: React.FC<TreeIndentProps> = ({ indent, children }) => (

@@ -4,11 +4,10 @@ import {
   VertexData, StorageSource, RenderPassMode, DeepPartial,
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
-import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
+import { DeviceContext, ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import {
   makeMultiUniforms, makeBoundUniforms,
-  makeRenderPipeline,
   getColorSpace,
   uploadBuffer,
   resolve,
@@ -52,9 +51,10 @@ export const render = (props: RenderProps) => {
   const isPicking = mode === RenderPassMode.Picking;
 
   // Render set up
+  const device = useContext(DeviceContext);
   const {viewUniforms, viewDefs} = useContext(ViewContext);
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
-  const {device, colorInput, colorSpace} = renderContext;
+  const {colorInput, colorSpace} = renderContext;
 
   // Render shader
   // TODO: non-strip topology

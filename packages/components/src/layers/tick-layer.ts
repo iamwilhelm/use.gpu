@@ -69,10 +69,10 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
 
   const key = useFiber().id;
 
-  const p = useShaderRef(positions, position);
-  const o = useShaderRef(offsets, offset);
-  const d = useShaderRef(depths, depth);
-  const s = useShaderRef(sizes, size);
+  const p = useShaderRef(position, positions);
+  const o = useShaderRef(offset, offsets);
+  const d = useShaderRef(depth, depths);
+  const s = useShaderRef(size, sizes);
 
   const xf = useTransformContext();
 

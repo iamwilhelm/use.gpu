@@ -4,6 +4,7 @@ import { ColorSpace } from '@use-gpu/core/types';
 import { use, provide, resume, gather, useContext, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
+import { DeviceContext } from '../providers/device-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 
 import {
@@ -34,8 +35,8 @@ export type RenderToTextureProps = {
 };
 
 export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
+  const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
-  const {device} = renderContext;
 
   const {
     width = renderContext.width,

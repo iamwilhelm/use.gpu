@@ -2,8 +2,9 @@ import { ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core/types';
 
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { makeRenderPipeline } from '@use-gpu/core';
-import { useMemo, useOne } from '@use-gpu/live';
+import { useContext, useMemo, useOne } from '@use-gpu/live';
 import { useMemoKey } from './useMemoKey';
+import { DeviceContext } from '../providers/device-provider';
 import LRU from 'lru-cache';
 
 const DEBUG = false;
@@ -25,7 +26,8 @@ export const useRenderPipeline = (
   shader: RenderShader,
   props: DeepPartial<GPURenderPipelineDescriptor>,
 ) => {
-  const {device, colorStates, depthStencilState, samples} = renderContext;
+  const device = useContext(DeviceContext);
+  const {colorStates, depthStencilState, samples} = renderContext;
 
   const memoKey = useMemoKey(
     [device, colorStates, depthStencilState, props]
@@ -47,6 +49,7 @@ export const useRenderPipeline = (
     }
 
     const pipeline = makeRenderPipeline(
+      device,
       renderContext,
       vertex,
       fragment,

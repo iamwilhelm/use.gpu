@@ -1,5 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { formatValue, YEET } from '@use-gpu/live';
+import { formatValue, isSubNode, YEET } from '@use-gpu/live';
 
 import React, { memo, useMemo } from 'react';
 
@@ -8,7 +8,7 @@ import { usePingContext } from './ping';
 import { Node } from './node';
 import { ExpandState, SelectState, HoverState, Action } from './types';
 
-import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
+import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
@@ -17,6 +17,7 @@ const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
+  depthLimit: number,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
@@ -30,6 +31,7 @@ type FiberNodeProps = {
   hoveredCursor: Cursor<HoverState>,
   indent?: number,
   continuation?: boolean,
+  siblings?: boolean,
 }
 
 type TreeExpandProps = {
@@ -38,6 +40,20 @@ type TreeExpandProps = {
   openIcon?: string,
   closedIcon?: string,
 }
+
+const getRenderDepth = (fibers: Map<number, LiveFiber<any>>, fiber: LiveFiber<any>) => {
+  let renderDepth = 0;
+  let parent = fiber;
+  if (parent.by) {
+    while (parent) {
+      const {by} = parent;
+      const source = fibers.get(by);
+      if (source && source?.next !== parent) renderDepth++;
+      parent = source as any;
+    }
+  }
+  return renderDepth;
+};
 
 export const FiberLegend: React.FC = () => {
   const makeFiber = (name: string) => {
@@ -86,6 +102,7 @@ export const FiberLegend: React.FC = () => {
 export const FiberTree: React.FC<FiberTreeProps> = ({
   fiber,
   fibers,
+  depthLimit,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -97,6 +114,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         <FiberNode
           fiber={fiber}
           fibers={fibers}
+          depthLimit={depthLimit}
           expandCursor={expandCursor}
           selectedCursor={selectedCursor}
           hoveredCursor={hoveredCursor}
@@ -110,13 +128,15 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 export const FiberNode: React.FC<FiberNodeProps> = memo(({
   fiber,
   fibers,
+  depthLimit,
   expandCursor,
   selectedCursor,
   hoveredCursor,
   continuation,
+  siblings,
   indent = 0,
 }) => {
-  const {id, mount, mounts, next, order, depth, host, yeeted} = fiber;
+  const {id, mount, mounts, next, order, host, yeeted} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
   const [hoverState, updateHoverState] = hoveredCursor;
 
@@ -129,28 +149,38 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const depends  = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
   const precedes = hoverState.precs.indexOf(fiber) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
 
+  const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;
+  const renderDepth = getRenderDepth(fibers, fiber);
+  const shouldRender = renderDepth < depthLimit;
+
+  const styleDepth = hoverState.fiber ? (subnode ? Math.max(-1, renderDepth - hoverState.depth) : -1) : 0;
+
   const [select, hover, unhover] = useMemo(() => {
     const root = yeeted && fiber.type === YEET ? yeeted.root : null;
 
     const select  = () => updateSelectState({ $set: fiber });
     const hover   = () => updateHoverState({ $set: {
       fiber,
+      by: fibers.get(fiber.by),
       deps: host ? host.traceDown(fiber) : [],
       precs: host ? host.traceUp(fiber) : [],
       root,
+      depth: renderDepth,
     } });
     const unhover = () => updateHoverState({ $set: {
       fiber: null,
+      by: null,
       deps: [],
       precs: [],
       root: null,
+      depth: 0,
     } });
     return [select, hover, unhover];
   }, [fiber, updateSelectState, updateHoverState]);
 
   const out = [] as React.ReactElement[];
 
-  const nodeRender = (
+  const nodeRender = shouldRender ? (
     <Node
       key={id}
       fiber={fiber}
@@ -159,11 +189,12 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       parents={parents}
       precedes={precedes}
       depends={depends}
+      depth={styleDepth}
       onClick={select}
       onMouseEnter={hover}
       onMouseLeave={unhover}
     />
-  );
+  ) : null;
      
   if (mount) {
     const hasNext = (mount.mount || mount.mounts || mount.next);
@@ -172,10 +203,11 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         key='mount'
         fiber={mount}
         fibers={fibers}
+        depthLimit={depthLimit}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
-        indent={indent + (next || !hasNext ? 1 : .1) + (continuation ? 1 : 0)}
+        indent={indent + (shouldRender ? ((next || !hasNext || siblings) ? 1 : .1) : 0) + (continuation ? 1 : 0)}
       />
     );
   }
@@ -189,10 +221,12 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             key={key}
             fiber={sub}
             fibers={fibers}
+            depthLimit={depthLimit}
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
-            indent={indent + 1 + (continuation ? 1 : 0)}
+            indent={indent + (shouldRender ? 1 : 0) + (continuation ? 1 : 0)}
+            siblings={order.length > 1}
           />
         );
       }
@@ -203,7 +237,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   let nextRender = null as React.ReactElement | null;
   if (next) {
-    childRender = (
+    childRender = shouldRender ? (
       <TreeIndent indent={indent + .5}>
         <TreeLine>
           <TreeIndent indent={-indent - .5}>
@@ -211,11 +245,13 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
           </TreeIndent>
         </TreeLine>
       </TreeIndent>
-    );
+    ) : out;
+
     nextRender = (
       <FiberNode
         fiber={next}
         fibers={fibers}
+        depthLimit={depthLimit}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -225,6 +261,14 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     );
   }
 
+  if (!shouldRender) {
+    return (<>
+      <TreeRowOmitted indent={indent} />
+      {childRender}
+      {nextRender}
+    </>);
+  }
+  
   if (out.length) {
     const openIcon = continuation ? 'arrow_downward' : undefined;
     const closedIcon = continuation ? 'subdirectory_arrow_right' : undefined;

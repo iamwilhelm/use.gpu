@@ -2,7 +2,6 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
-import { useBoundShaderWithRefs } from '../../hooks/useBoundShaderWithRefs';
 import { useRawStorage } from '../../hooks/useRawStorage';
 import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
 

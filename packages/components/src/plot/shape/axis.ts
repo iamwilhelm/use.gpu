@@ -2,8 +2,9 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
-import { useBoundShaderWithRefs } from '../../hooks/useBoundShaderWithRefs';
+import { useBoundShader } from '../../hooks/useBoundShader';
 import { useRawStorage } from '../../hooks/useRawStorage';
+import { useShaderRef } from '../../hooks/useShaderRef';
 import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
 
 import { RangeContext } from '../../providers/range-provider';
@@ -71,7 +72,9 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   og[3] = 1;
 
   // Make axis vertex shader
-  const positions = useBoundShaderWithRefs(getAxisPosition, AXIS_BINDINGS, [og, step]);
+  const o = useShaderRef(og);
+  const s = useShaderRef(step);
+  const positions = useBoundShader(getAxisPosition, AXIS_BINDINGS, [o, s]);
 
   const n = d + 1;
 

@@ -3,7 +3,9 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 
 import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
+import { CanvasPicking } from './canvas-picking';
 import { CursorConsumer } from '../consumers/cursor-consumer';
+import { TextProvider } from '../providers/text-provider';
 
 import { use } from '@use-gpu/live';
 
@@ -20,11 +22,29 @@ export type AutoCanvasProps = {
   children: LiveElement<any>,
 }
 
-export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) =>
-  use(AutoSize, {
-    canvas: props.canvas,
-    children: use(CursorConsumer, {
-      element: props.canvas,
-      children: use(Canvas, {...props}),
+export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
+  const {children, ...rest} = props;
+  const {canvas} = props;
+
+  return (
+    use(AutoSize, {
+      canvas,
+      children:
+        use(Canvas, {
+          ...rest,
+          children:
+            use(CanvasPicking, {
+              canvas,
+              children:
+                use(CursorConsumer, {
+                  element: canvas,
+                  children:
+                    use(TextProvider, {
+                      children,
+                    })
+                })
+            })
+        })
     })
-  });
+  );
+}

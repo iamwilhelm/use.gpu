@@ -5,7 +5,6 @@ import { memo, use, useContext, useNoContext, useFiber, useMemo, useNoMemo, useO
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
-import { useRenderPipeline } from '../hooks/useRenderPipeline';
 
 import instanceDrawVirtual from '@use-gpu/wgsl/instance/draw/virtual.wgsl';
 import instanceDrawVirtualPick from '@use-gpu/wgsl/instance/draw/virtual-pick.wgsl';

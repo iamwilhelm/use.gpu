@@ -88,12 +88,12 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const a = useShaderRef(props.anchors, props.anchor);
-  const p = useShaderRef(props.positions, props.position);
-  const c = useShaderRef(props.colors, props.color);
-  const z = useShaderRef(props.sizes, props.size);
-  const w = useShaderRef(props.widths, props.width);
-  const d = useShaderRef(props.depths, props.depth);
+  const a = useShaderRef(props.anchor, props.anchors);
+  const p = useShaderRef(props.position, props.positions);
+  const c = useShaderRef(props.color, props.colors);
+  const z = useShaderRef(props.size, props.sizes);
+  const w = useShaderRef(props.width, props.widths);
+  const d = useShaderRef(props.depth, props.depths);
   
   const g = useRawStorage(mesh.vertices[0], 'vec4<f32>');
   const xf = useApplyTransform(p);

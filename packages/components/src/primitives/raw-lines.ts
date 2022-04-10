@@ -103,13 +103,13 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const p = useShaderRef(props.positions, props.position);
-  const g = useShaderRef(props.segments, props.segment);
-  const c = useShaderRef(props.colors, props.color);
-  const w = useShaderRef(props.widths, props.width);
-  const d = useShaderRef(props.depths, props.depth);
-  const t = useShaderRef(props.trims, props.trim);
-  const z = useShaderRef(props.sizes, props.size);
+  const p = useShaderRef(props.position, props.positions);
+  const g = useShaderRef(props.segment, props.segments);
+  const c = useShaderRef(props.color, props.colors);
+  const w = useShaderRef(props.width, props.widths);
+  const d = useShaderRef(props.depth, props.depths);
+  const t = useShaderRef(props.trim, props.trims);
+  const z = useShaderRef(props.size, props.sizes);
 
   const xf = useApplyTransform(p);
 

@@ -7,7 +7,7 @@ import { keyed, yeet, useContext, useFiber, useMemo } from '@use-gpu/live';
 import { makeTuples, emitIntoNumberArray } from '@use-gpu/core';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
-import { GPUTextContext } from '../../providers/gpu-text-provider';
+import { TextContext } from '../../providers/text-provider';
 import { Glyphs } from '../shape/glyphs';
 
 export type TextProps = {
@@ -41,7 +41,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
     content = '',
   } = props;
 
-  const gpuText = useContext(GPUTextContext);
+  const gpuText = useContext(TextContext);
 
   const height = useMemo(() => {
     const {ascent, descent, lineHeight: fontHeight} = gpuText.measureFont(size);

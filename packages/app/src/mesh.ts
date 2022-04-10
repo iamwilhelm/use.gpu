@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core/types';
-import { ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
+import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@use-gpu/components';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawSourceTexture, makeMultiUniforms,
@@ -48,12 +48,13 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
   const blinkState = !!((blink || 0) % 2);
 
+  const device = useContext(DeviceContext);
   const {viewUniforms, viewDefs} = useContext(ViewContext);
   
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
-  const {device, colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
+  const {colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
 
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
@@ -94,6 +95,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     fiber.__inspect.fragment = fragmentLinked;
 
     return makeRenderPipeline(
+      device,
       renderContext,
       vertex,
       fragment,

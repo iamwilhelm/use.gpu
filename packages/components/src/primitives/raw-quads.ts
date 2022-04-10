@@ -84,11 +84,11 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
-  const p = useShaderRef(props.positions, props.position);
-  const c = useShaderRef(props.colors, props.color);
-  const s = useShaderRef(props.sizes, props.size);
-  const d = useShaderRef(props.depths, props.depth);
-  const u = useShaderRef(props.uvs, props.uv);
+  const p = useShaderRef(props.position, props.positions);
+  const c = useShaderRef(props.color, props.colors);
+  const s = useShaderRef(props.size, props.sizes);
+  const d = useShaderRef(props.depth, props.depths);
+  const u = useShaderRef(props.uv, props.uvs);
 
   const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask) : null;
   const t = props.texture;

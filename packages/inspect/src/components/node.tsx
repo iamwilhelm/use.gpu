@@ -9,153 +9,6 @@ import { usePingContext } from './ping';
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
 
-const pingAnimation = keyframes({
-  '0%': { background: 'rgba(10, 170, 85, 0.9)' },
-  '100%': { background: 'rgba(10, 170, 85, 0.0)' },
-});
-
-const mountAnimation = keyframes({
-  '0%': { background: 'rgba(120, 120, 120, 0.9)' },
-  '100%': { background: 'rgba(120, 120, 120, 0.0)' },
-});
-
-const shadeAnimation = keyframes({
-  '0%': { background: 'rgba(0, 0, 0, 1.0)' },
-  '75%': { background: 'rgba(0, 0, 0, 1.0)' },
-  '100%': { background: 'rgba(0, 0, 0, 0.0)' },
-});
-
-export const StyledLabel = styled('div', {
-  position: 'relative',
-  zIndex: 1,
-  
-  transition: '0.25s ease-in-out color',
-  
-  '&.depth--1': { color: 'var(--colorTextLevel8)' },
-  '&.depth-0': { color: 'var(--colorTextLevel1)' },
-  '&.depth-1': { color: 'var(--colorTextLevel3)' },
-  '&.depth-2': { color: 'var(--colorTextLevel5)' },
-  '&.depth-3': { color: 'var(--colorTextLevel7)' },
-  '&.depth-4': { color: 'var(--colorTextLevel8)' },
-
-  '&.builtin.depth--1': { color: 'var(--colorTextLevel10)' },
-  '&.builtin.depth-0': { color: 'var(--colorTextLevel8)' },
-  '&.builtin.depth-1': { color: 'var(--colorTextLevel9)' },
-  '&.builtin.depth-2': { color: 'var(--colorTextLevel10)' },
-  '&.builtin.depth-3': { color: 'var(--colorTextLevel10)' },
-  '&.builtin.depth-4': { color: 'var(--colorTextLevel10)' },
-
-  '&&.selected, &&.hovered, &&.by, &&.parents, &&.depends, &&.precedes': { color: 'var(--colorTextLevel1)' },
-  '&&.builtin.parents, &&.builtin.precedes': { color: 'var(--colorTextLevel3)' },
-});
-  
-export const StyledNode = styled('div', {
-  whiteSpace: 'nowrap',
-  margin: '-2px -5px',
-  padding: '2px 5px',
-  position: 'relative',
-  
-  '&.mounted, &.pinged': {
-    background: 'rgba(0, 0, 0, 1.0)',
-
-    '&.cold': {
-      background: 'rgba(0, 0, 0, 0.0)',
-
-      animationName: shadeAnimation,
-      animationDuration: '1.0s',
-      animationIterationCount: 1,
-    }
-  },
-  
-  '&.selected': {
-    zIndex: 2,
-  },
-  '&.hovered': {
-    zIndex: 2,
-  },
-  
-  '&.builtin': {
-    color: 'var(--colorTextMuted)',
-  },
-});
-
-export const StyledHighlight = styled('div', {
-  position: 'absolute',
-  left: 0,
-  top: 0,
-  right: 0,
-  bottom: 0,
-
-  '&&.selected': {
-    background: 'rgba(50, 130, 200, 1.0)',
-  },
-
-  '&&.hovered': {
-    background: 'rgba(50, 180, 200, 1.0)',
-  },
-
-  '&&.by': {
-    background: 'rgba(30, 140, 160, 1.0)',
-  },
-
-  '&&.parents': {
-    background: 'rgba(24, 112, 128, 1.0)',
-  },
-
-  '&&.depends': {
-    background: 'rgba(75, 70, 200, 1.0)',
-  },
-
-  '&&.precedes': {
-    background: 'rgba(60, 56, 161, 1.0)',
-  },
-
-  '&&.staticMount': {
-    background: 'rgba(120, 120, 120, 1.0)',
-  },
-
-  '&&.staticPing': {
-    background: 'rgba(10, 170, 85, 1.0)',
-  },
-});
-  
-export const StyledPing = styled('div', {
-  position: 'absolute',
-  left: 0,
-  top: 0,
-  right: 0,
-  bottom: 0,
-
-  transition: '0.25s ease-in-out opacity',
-
-  '&.hovering': {
-    opacity: 0.65,
-  },
-
-  '&.cold': {
-    animationDuration: '1.0s',
-    animationIterationCount: 1,
-  },
-
-  '&.mounted': {
-    background: 'rgba(120, 120, 120, 0.9)',
-    
-    '&.cold': {
-      background: 'rgba(120, 120, 120, 0.0)',
-      animationName: mountAnimation,
-    },
-  },
-
-  '&.pinged': {
-    background: 'rgba(10, 170, 85, 0.9)',
-
-    '&.cold': {
-      background: 'rgba(10, 170, 85, 0.0)',
-      animationName: pingAnimation,
-    }
-  },
-});
-
 type NodeProps = {
   fiber: LiveFiber<any>,
   pinged?: number,
@@ -221,16 +74,16 @@ export const Node: React.FC<NodeProps> = ({
   const name = formatNodeName(fiber);
 
   return (
-    <StyledNode
+    <div
       ref={elRef}
-      className={className}
+      className={"fiber-tree-node " + className}
       onClick={handleClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <StyledPing className={className} />
-      <StyledHighlight className={className} />
-      <StyledLabel className={className}>{name}{suffix}</StyledLabel>
-    </StyledNode>
+      <div className={"fiber-tree-ping cover-parent " + className} />
+      <div className={"fiber-tree-highlight cover-parent " + className} />
+      <div className={"fiber-tree-label " + className}>{name}{suffix}</div>
+    </div>
   );
 }

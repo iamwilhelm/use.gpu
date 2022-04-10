@@ -1,7 +1,8 @@
 import { LiveFiber, ArrowFunction } from '@use-gpu/live/types';
-import { incrementVersion } from '@use-gpu/live';
+import { formatNodeName, incrementVersion } from '@use-gpu/live';
 
 import React, { memo, createContext, useCallback, useContext, useLayoutEffect, useMemo, useState } from 'react';
+import ReactDOM from 'react-dom';
 
 const PingContext = createContext<PingContextProps>({
   set: () => {},
@@ -75,26 +76,30 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
       
       const seen = new Set<number>();
 
-      for (const [id, active] of q) {
-        seen.add(id);
+			ReactDOM.unstable_batchedUpdates(() => {
 
-        const v = versions.get(id);
-        const s = map.get(id)!;
-        if (!s) continue;
+        for (const [id, active] of q) {
+          seen.add(id);
 
-        const fs = s.values();        
-        for (const f of fs) f(v, active);
-      }
-      for (const [id] of hot) if (!seen.has(id)) {
-        const v = versions.get(id);
-        const s = map.get(id)!;
-        if (!s) continue;
+          const v = versions.get(id);
+          const s = map.get(id)!;
+          if (!s) continue;
 
-        const fs = s.values();
-        for (const f of fs) f(v, false);
-      }
+          const fs = s.values();        
+          for (const f of fs) f(v, active);
+        }
+        for (const [id] of hot) if (!seen.has(id)) {
+          const v = versions.get(id);
+          const s = map.get(id)!;
+          if (!s) continue;
+
+          const fs = s.values();
+          for (const f of fs) f(v, false);
+        }
       
-      for (const f of all) f(version, false);
+        for (const f of all) f(version, false);
+        
+      });
 
       hot = q;
     };
@@ -128,14 +133,16 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
 }
 
 export const usePingContext = (fiber: LiveFiber<any>) => {
+  const [, forceUpdate] = useForceUpdate();
   const [version, setVersion] = useState<number>(-1);
   const [live, setLive] = useState<boolean>(false);
 
   const {subscribe, unsubscribe} = useContext(PingContext);
   useLayoutEffect(() => {
-    const ping = (version: number, live: boolean) => {
+    const ping = (version: number, live: boolean) => {      
       if (live) setVersion(version);
       setLive(live);
+      forceUpdate();
     };
 
     subscribe(fiber, ping);

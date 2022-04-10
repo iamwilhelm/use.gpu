@@ -356,7 +356,7 @@ export const useConsumer = <C>(
   const root = roots.get(context);
   if (!root || !root.next) throw new Error(`Consumer '${context.displayName}' was used without being consumed.`);
 
-  const next= root.next;
+  const {next} = root;
   if (host) {
     if (!state![i]) {
       state![i] = true;
@@ -369,7 +369,8 @@ export const useConsumer = <C>(
 
       host.depend(next, fiber);
     }
-    host.schedule(next, NOP);
+
+    host.visit(next);
   }
 
   const registry = values.get(context).current;

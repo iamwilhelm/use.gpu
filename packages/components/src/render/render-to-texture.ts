@@ -1,7 +1,7 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { ColorSpace } from '@use-gpu/core/types';
-import { use, provide, resume, gather, useContext, useMemo, useOne } from '@use-gpu/live';
+import { use, provide, resume, gather, useCallback, useContext, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
@@ -98,7 +98,11 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     [device, width, height, depthStencil, samples]
   );
   
-  const swapView = useOne(() => () => {});
+  const fiber = useFiber();
+  const swapView = useCallback(() => {
+    const {host, next} = fiber;
+    if (host && next) host.visit(next);
+  });
 
   const rttContext = useMemo(() => ({
     ...renderContext,
@@ -125,18 +129,13 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     version: 0,
   }), [targetTexture, width, height, format]);
 
-  const Done = useOne(() =>
-    resume((ts: Task[]) => {
-      usePerFrame();
+  const Done = resume((ts: Task[]) => {
+    usePerFrame();
 
-      for (let task of ts) task();
-      source.version++;
-      return then && then(source);
-    })
-  , source);
-
-  const frame = useOne(() => ({current: 0, request: () => {}}));
-  frame.current++;
+    for (let task of ts) task();
+    source.version++;
+    return then && then(source);
+  });
 
   return (
     gather(

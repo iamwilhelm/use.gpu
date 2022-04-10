@@ -21,6 +21,8 @@ export const makeActionScheduler = () => {
   };
 
   const flush = () => {
+    if (timer) clearTimeout(timer);
+
     const q = queue.slice();
     queue.length = 0;
     timer = null;

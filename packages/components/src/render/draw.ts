@@ -1,6 +1,6 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import {
-  gather, provide, resume,
+  gather, provide, resume, yeet,
   makeContext, useContext, useNoContext,
 } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
@@ -12,6 +12,8 @@ export type DrawProps = {
   render?: () => LiveElement<any>,
   children?: LiveElement<any>,
 };
+
+const NOP = () => {};
 
 export const Draw: LiveComponent<DrawProps> = (props) => {
   const {live = true, render, children} = props;

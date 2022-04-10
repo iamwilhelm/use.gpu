@@ -10,6 +10,7 @@ const DEFAULT_RENDER_OPTIONS = {
 };
 
 let DEBUG = false;
+let START = +new Date();
 //setTimeout((() => DEBUG = false), 4000);
 
 const NO_ARGS = [] as any[];
@@ -81,7 +82,7 @@ export const renderWithDispatch = <T>(
       const fibers = dedupe(as.map(({fiber}) => fiber));
 
       DEBUG && console.log('----------------------------');
-      DEBUG && console.log('Dispatch to Roots', fibers.map(formatNode));
+      DEBUG && console.log('Dispatch to Roots', fibers.map(formatNode), +new Date() - START, 'ms');
 
       if (fibers.length) renderFibers(host, fibers);
     });

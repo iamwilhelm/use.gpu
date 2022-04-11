@@ -3,7 +3,7 @@ import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gp
 import { UIAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
-import { SDFFontProvider, SDF_FONT_ATLAS, SDF_FONT_DEBUG } from '../providers/sdf-font-provider';
+import { SDFFontProvider, SDF_FONT_ATLAS, SDF_FONT_DEBUG } from '../text/providers/sdf-font-provider';
 import { use, keyed, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,

@@ -66,14 +66,28 @@ declare module "@use-gpu/wgsl/instance/draw/mesh.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/draw/virtual-pick.wgsl" {
+declare module "@use-gpu/wgsl/instance/draw/virtual-solid-pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/draw/virtual.wgsl" {
+declare module "@use-gpu/wgsl/instance/draw/virtual-solid.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/draw/virtual-ui-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/draw/virtual-ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
@@ -174,6 +188,13 @@ declare module "@use-gpu/wgsl/instance/vertex/full-screen.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/vertex/label.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLabelVertex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/vertex/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -191,7 +212,6 @@ declare module "@use-gpu/wgsl/instance/vertex/quad.wgsl" {
 declare module "@use-gpu/wgsl/instance/vertex/tick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  export const getTickV: ParsedBundle;
   export const getTickPosition: ParsedBundle;
   export default __module;
 }
@@ -289,6 +309,7 @@ declare module "@use-gpu/wgsl/use/types.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const SolidVertex: ParsedBundle;
+  export const UIVertex: ParsedBundle;
   export const MeshVertex: ParsedBundle;
   export default __module;
 }

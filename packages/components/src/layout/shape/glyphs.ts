@@ -1,11 +1,11 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource, TupleStore } from '@use-gpu/core/types';
+import { TextureSource, Tuples } from '@use-gpu/core/types';
 import { FontMetrics } from '@use-gpu/text/types';
 import { Point4, InlineLine } from './types';
 
 import { use, yeet, useContext } from '@use-gpu/live';
 import { LayoutContext } from '../../providers/layout-provider';
-import { SDFFontProvider, useSDFFont, SDF_FONT_ATLAS } from '../../providers/sdf-font-provider';
+import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '../../text/providers/sdf-font-provider';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
 const BLACK = [0, 0, 0, 1];
@@ -18,8 +18,8 @@ export type GlyphsProps = {
   size?: number,
   snap?: boolean,
 
-  spans: TupleStore<3>,
-  glyphs: TupleStore<2>,
+  spans: Tuples<3>,
+  glyphs: Tuples<2>,
   breaks: number[],
   height: FontMetrics,
   lines: InlineLine[],
@@ -48,7 +48,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     layout = useContext(LayoutContext);
   }
 
-  const { getGlyph, getScale, getRadius } = useSDFFont();
+  const { getGlyph, getScale, getRadius } = useSDFFontContext();
   const scale = getScale(size);
       
   const out = [] as any[];

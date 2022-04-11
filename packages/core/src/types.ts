@@ -185,6 +185,8 @@ export type TextureSource = {
   sampler: GPUSampler | GPUSamplerDescriptor,
   layout: string,
   format: string,
+  variant?: string,
+  absolute?: boolean,
   colorSpace?: ColorSpace,
   size: [number, number] | [number, number, number],
   version: number,
@@ -225,6 +227,14 @@ export type PickingUniforms = {
 
 // Data
 
+export type Tuples<N extends number, T = number> = {
+  array: T[],
+  get: (i: number, j: number) => T,
+  iterate: (f: (...args: T[]) => void, start?: number, end?: number) => void;
+  dims: number,
+  length: number,
+};
+
 export type Emitter = (...args: number[]) => void;
 export type Accessor = (o: any) => any;
 export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
@@ -255,6 +265,7 @@ export type Atlas = {
   map: Map<number, Rectangle>,
   width: number,
   height: number,
+  version: number,
 };
 
 // Passes

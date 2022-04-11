@@ -3,7 +3,7 @@ import { memo, use, yeet, useContext, useFiber, useMemo } from '@use-gpu/live';
 import { Surface } from './shape/surface';
 import { CompositeData } from '../data';
 import { Lines } from '../layers';
-import { SDFFontContext, SDF_FONT_DEBUG } from '../providers/sdf-font-provider';
+import { SDFFontContext, SDF_FONT_DEBUG } from '../text/providers/sdf-font-provider';
 
 type DebugAtlasProps = {
   atlas: Atlas,

@@ -61,15 +61,25 @@
       "import": "./src/instance/draw/mesh.wgsl",
       "require": "./src/instance/draw/mesh.wgsl"
     },
-    "./instance/draw/virtual-pick.wgsl": {
-      "types": "./src/instance/draw/virtual-pick.d.ts",
-      "import": "./src/instance/draw/virtual-pick.wgsl",
-      "require": "./src/instance/draw/virtual-pick.wgsl"
+    "./instance/draw/virtual-solid-pick.wgsl": {
+      "types": "./src/instance/draw/virtual-solid-pick.d.ts",
+      "import": "./src/instance/draw/virtual-solid-pick.wgsl",
+      "require": "./src/instance/draw/virtual-solid-pick.wgsl"
     },
-    "./instance/draw/virtual.wgsl": {
-      "types": "./src/instance/draw/virtual.d.ts",
-      "import": "./src/instance/draw/virtual.wgsl",
-      "require": "./src/instance/draw/virtual.wgsl"
+    "./instance/draw/virtual-solid.wgsl": {
+      "types": "./src/instance/draw/virtual-solid.d.ts",
+      "import": "./src/instance/draw/virtual-solid.wgsl",
+      "require": "./src/instance/draw/virtual-solid.wgsl"
+    },
+    "./instance/draw/virtual-ui-pick.wgsl": {
+      "types": "./src/instance/draw/virtual-ui-pick.d.ts",
+      "import": "./src/instance/draw/virtual-ui-pick.wgsl",
+      "require": "./src/instance/draw/virtual-ui-pick.wgsl"
+    },
+    "./instance/draw/virtual-ui.wgsl": {
+      "types": "./src/instance/draw/virtual-ui.d.ts",
+      "import": "./src/instance/draw/virtual-ui.wgsl",
+      "require": "./src/instance/draw/virtual-ui.wgsl"
     },
     "./instance/draw/wireframe-list.wgsl": {
       "types": "./src/instance/draw/wireframe-list.d.ts",
@@ -135,6 +145,11 @@
       "types": "./src/instance/vertex/full-screen.d.ts",
       "import": "./src/instance/vertex/full-screen.wgsl",
       "require": "./src/instance/vertex/full-screen.wgsl"
+    },
+    "./instance/vertex/label.wgsl": {
+      "types": "./src/instance/vertex/label.d.ts",
+      "import": "./src/instance/vertex/label.wgsl",
+      "require": "./src/instance/vertex/label.wgsl"
     },
     "./instance/vertex/line.wgsl": {
       "types": "./src/instance/vertex/line.d.ts",

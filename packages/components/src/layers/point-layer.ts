@@ -52,7 +52,7 @@ export type PointLayerProps = {
   id?: number,
 };
 
-const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['i32'] } as UniformAttributeValue;
+const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttributeValue;
 
 export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLayerProps) => {
   const {
@@ -75,9 +75,9 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
 
   const s = useShaderRef(size, sizes);
 
-  const sizes2D = useOne(() => {
+  const rectangles = useOne(() => {
     const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, s));
-    return castTo(getSizeFloat, 'vec2<f32>', 'xx');
+    return castTo(getSizeFloat, 'vec4<f32>', 'xxxx--++');
   }, s);
   const masks = (MASK_SHADER as any)[shape] ?? MASK_SHADER[PointShape.Circle];
 
@@ -89,7 +89,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     depth,
     depths,
 
-    sizes: sizes2D,
+    rectangles,
     masks,
 
     count,

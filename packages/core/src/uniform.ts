@@ -13,9 +13,12 @@ import { UNIFORM_BYTE_SETTERS } from './bytes';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 
-export const resolve = (x: Prop<T>): T => {
+export const resolve = <T>(x: Prop<T>): T => {
   if (typeof x === 'function') return x();
-  if (typeof x === 'object' && x.current != null) return x.current;
+  if (typeof x === 'object') {
+    if ('expr' in x) return x.expr();
+    if ('current' in x) return x.current;
+  }
   return x;
 };
 

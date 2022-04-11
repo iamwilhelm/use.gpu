@@ -6,8 +6,8 @@ import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
-import instanceDrawVirtual from '@use-gpu/wgsl/instance/draw/virtual.wgsl';
-import instanceDrawVirtualPick from '@use-gpu/wgsl/instance/draw/virtual-pick.wgsl';
+import instanceDrawVirtual from '@use-gpu/wgsl/instance/draw/virtual-solid.wgsl';
+import instanceDrawVirtualPick from '@use-gpu/wgsl/instance/draw/virtual-solid-pick.wgsl';
 
 import instanceFragmentSolid from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
 import instanceFragmentSolidPick from '@use-gpu/wgsl/instance/fragment/solid-pick.wgsl';
@@ -32,7 +32,7 @@ export type VirtualProps = {
   deps: any[] | null,
 };
 
-const DEBUG_BINDING = { name: 'getInstanceSize', format: 'i32', value: 0 };
+const DEBUG_BINDING = { name: 'getInstanceSize', format: 'u32', value: 0, args: [] };
 
 export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
   const {

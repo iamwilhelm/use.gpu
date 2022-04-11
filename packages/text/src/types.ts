@@ -1,6 +1,7 @@
 export type FontMetrics = {
   ascent: number,
   descent: number,
+  baseline: number,
   lineHeight: number,
 };
 
@@ -24,5 +25,7 @@ export type GPUTextAPI = {
   measureFont: (size: number) => FontMetrics,
   measureSpans: (text: string, size: number) => SpanMetrics,
   measureGlyph: (id: number, size: number) => GlyphMetrics,
+  packString: (s: string) => Uint16Array,
+  packStrings: (s: string[]) => Uint16Array,
 };
 

@@ -1,11 +1,15 @@
+import { ColorSpace } from './types';
+
 const COLOR_SPACE = {
   'srgb': 0,
   'linear': 1,
+  'p3': 2,
 };
 
 const COLOR_CONVERSION = [
-  [0, 1],
-  [2, 0],
+  [0, 1, 3],
+  [2, 0, 5],
+  [4, 6, 7],
 ];
 
 export const makeColorState = (format: GPUTextureFormat, blend?: GPUBlendState): GPUColorTargetState => ({
@@ -14,8 +18,8 @@ export const makeColorState = (format: GPUTextureFormat, blend?: GPUBlendState):
 });
 
 export const makeColorAttachment = (
-  texture: GPUTextureView | null,
-  resolve: GPUTextureView | null,
+  texture: GPUTexture | null,
+  resolve: GPUTexture | null,
   clearValue: GPUColor = [0, 0, 0, 0],
   loadOp: GPULoadOp = 'clear',
   storeOp: GPUStoreOp = 'store',
@@ -28,8 +32,8 @@ export const makeColorAttachment = (
 } as unknown as GPURenderPassColorAttachment);
 
 export const makeColorAttachmentWithFormat = (
-  texture: GPUTextureView | null,
-  resolve: GPUTextureView | null,
+  texture: GPUTexture | null,
+  resolve: GPUTexture | null,
   format: GPUTextureFormat,
   clearValue: GPUColor = [0, 0, 0, 0],
   loadOp: GPULoadOp = 'clear',

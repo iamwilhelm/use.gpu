@@ -22,14 +22,14 @@ import { getMaskedFragment } from '@use-gpu/wgsl/mask/masked.wgsl';
 
 export type RawQuadsProps = {
   position?: number[] | TypedArray,
-  size?: number[],
+  rectangle?: number[] | TypedArray,
   color?: number[],
   depth?: number,
   mask?: number,
   uv?: number[] | TypedArray,
 
   positions?: ShaderSource,
-  sizes?: ShaderSource,
+  rectangles?: ShaderSource,
   colors?: ShaderSource,
   depths?: ShaderSource,
   masks?: ShaderSource,
@@ -48,8 +48,8 @@ const GRAY = [0.5, 0.5, 0.5, 1];
 
 const VERTEX_BINDINGS = [
   { name: 'getPosition', format: 'vec4<f32>', value: ZERO },
+  { name: 'getRectangle', format: 'vec4<f32>', value: [-1, -1, 1, 1] },
   { name: 'getColor', format: 'vec4<f32>', value: GRAY },
-  { name: 'getSize', format: 'vec2<f32>', value: [1, 1] },
   { name: 'getDepth', format: 'f32', value: 0 },
   { name: 'getUV', format: 'vec4<f32>', value: [0, 0, 1, 1] },
 ] as UniformAttributeValue[];
@@ -85,8 +85,8 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const key = useFiber().id;
 
   const p = useShaderRef(props.position, props.positions);
+  const r = useShaderRef(props.rectangle, props.rectangles);
   const c = useShaderRef(props.color, props.colors);
-  const s = useShaderRef(props.size, props.sizes);
   const d = useShaderRef(props.depth, props.depths);
   const u = useShaderRef(props.uv, props.uvs);
 
@@ -96,13 +96,13 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const xf = useApplyTransform(p);
 
   const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [xf, c, s, d, u]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [xf, r, c, d, u]);
     const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
 
     const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
     const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
     return [getVertex, getFragment];
-  }, [xf, c, s, d, u, m, t]);
+  }, [xf, r, c, d, u, m, t]);
 
   return use(Virtual, {
     vertexCount,

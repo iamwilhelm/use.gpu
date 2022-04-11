@@ -1,5 +1,4 @@
 import { LiveElement } from '@use-gpu/live/types';
-import { SpanData } from '@use-gpu/text/types';
 import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, InlineRenderer, InlineLine } from '../types';
 
 type Fitter<T> = (into: Point) => T;
@@ -33,8 +32,8 @@ export const parseDimension = (x: string | number | null | undefined, total: num
 }
 
 export const parseAnchor = (x: string): number => {
-  const isStart = (x === 'start');
-  const isEnd = (x === 'end');
+  const isStart = (x === 'start' || x === 'justify-start');
+  const isEnd = (x === 'end' || x === 'justify-end');
 
   const align = isStart ? 0 : isEnd ? 1 : 0.5;
   return align;
@@ -106,7 +105,7 @@ export const makeBoxLayout = (
 export const makeInlineLayout = (
   ranges: Point[],
   //sizes: Point[],
-  offsets: Point[],
+  offsets: [number, number, number, number][],
   renders: InlineRenderer[],
 ) => (
   box: Rectangle
@@ -151,22 +150,3 @@ export const makeInlineLayout = (
 
   return out;
 };
-
-export const makeGlyphLayout = (
-  box: Rectangle,
-  spanData: SpanData,
-) => {
-  const {forSpans, getStart, getEnd} = spanData;
-
-  const out = [] as LiveElement<any>[];
-  
-
-  let caret = 0;
-  forSpans((hard, advance, trim, index) => {
-    
-    console.log('render', content.slice(getStart(index), getEnd(index)), 'at', layout[0], layout[1]);
-  }, startIndex, endIndex);
-
-  return out;
-};
-

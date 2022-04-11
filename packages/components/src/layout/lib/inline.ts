@@ -87,14 +87,14 @@ export const fitInline = (
 
   let mainBase = 0;
   let mainSize = 0;
-  let wordCount = 0;
   let crossSize = 0;
+  let wordCount = 0;
 
   const ranges  = [] as Point[];
   const offsets = [] as [number, number, number][];
   const renders = [] as LayoutRenderer[];
 
-  const mainSpans = [] as [number, number];
+  const mainSpans = [] as [number, number, number, number];
   const mainEls = [] as InlineElement[];
 
   const reduceMain = (hard: boolean) => {
@@ -107,14 +107,9 @@ export const fitInline = (
     let mainPos = 0;
     if (slack && !hard) [mainGap, mainPos] = getInlineSpacing(slack, wordCount, align);
 
-    const perSpan = (advance: number, trim: number) => {
-      mainPos += advance;
-      if (trim > 0) mainPos += mainGap;
-    };
-
     for (let i = 0; i < n; ++i) {
       const span = mainSpans[i];
-      const {startIndex, endIndex} = span;
+      const [startIndex, endIndex, chunkAdvance, chunkCount] = span;
 
       const {spans, height, render} = mainEls[i];
       const {ascent, descent, lineHeight} = height;
@@ -122,7 +117,7 @@ export const fitInline = (
       const crossPos = caretCross + mainBase - ascent;
       const offset = isX ? [mainPos, crossPos, mainGap] : [crossPos, mainPos, mainGap];
 
-      spans.iterate(perSpan, startIndex, endIndex);
+      mainPos += chunkAdvance + chunkCount * mainGap;
 
       ranges.push(span);
       offsets.push(offset);
@@ -142,7 +137,7 @@ export const fitInline = (
     mainEls.length = 0;
   };
 
-  const addSpan = (el: InlineElement, startIndex: number, endIndex: number) => {
+  const addSpan = (el: InlineElement, startIndex: number, endIndex: number, chunkAdvance: number, chunkCount: number) => {
     if (startIndex === endIndex) return;
 
     const {height: {ascent, descent, lineHeight}} = el;
@@ -151,36 +146,44 @@ export const fitInline = (
     mainSize = Math.max(mainSize, ascent - descent);
     crossSize = Math.max(crossSize, lineHeight);
 
-    mainSpans.push([startIndex, endIndex]);
+    mainSpans.push([startIndex, endIndex, chunkAdvance, chunkCount]);
     mainEls.push(el);
   };
 
   for (const el of els) {
     let startIndex = 0;
     let endIndex = 0;
+    let chunkCount = 0;
+    let chunkAdvance = 0;
 
     let i = 0;
     const {spans, absolute} = el;
     spans.iterate((advance, trim, hard) => {
       if (wrap && (caretMain + advance - trim > spaceMain)) {
-        addSpan(el, startIndex, endIndex);
+        addSpan(el, startIndex, endIndex, chunkAdvance, chunkCount);
         reduceMain(false);
-
         startIndex = i;
-        caretMain = 0;
+        chunkCount = 0;
+        chunkAdvance = 0;
       }
 
       endIndex = ++i;
       caretMain += advance;
+      chunkAdvance += advance;
+
       trimMain = trim;
-      if (trim) wordCount++;
+      if (trim) {
+        wordCount++;
+        chunkCount++;
+      }
 
       if (hard) {
         addSpan(el, startIndex, endIndex);
         reduceMain(true);
 
         startIndex = endIndex;
-        caretMain = 0;
+        chunkCount = 0;
+        chunkAdvance = 0;
       }
     });
 

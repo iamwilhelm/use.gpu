@@ -4,9 +4,9 @@
 
 let STEP = vec2<f32>(0.0, 1.0);
 
-@export fn getScalePosition(index: i32) -> vec4<f32> {
+@export fn getScalePosition(index: u32) -> vec4<f32> {
   
-  let dir = getScaleDirection(0);
+  let dir = getScaleDirection(0u);
 
   var step: vec4<f32>;
   if (dir == 0) { step = STEP.yxxx; }
@@ -14,5 +14,5 @@ let STEP = vec2<f32>(0.0, 1.0);
   if (dir == 2) { step = STEP.xxyx; }
   if (dir == 3) { step = STEP.xxxy; }
   
-  return getScaleOrigin(0) + step * getScaleValue(index);
+  return getScaleOrigin(0u) + step * getScaleValue(index);
 }

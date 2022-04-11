@@ -27,7 +27,7 @@ export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, leng
 export const updateAggregateBuffer = (
   device: GPUDevice,
   aggregate: AggregateBuffer,
-  items: LayerAggregate[],
+  items: Record<string, any>[],
   count: number,
   key: string,
   keys: string,
@@ -54,7 +54,7 @@ export const updateAggregateBuffer = (
 export const updateAggregateSegments = (
   device: GPUDevice,
   aggregate: AggregateBuffer,
-  items: LayerAggregate[],
+  items: Record<string, any>[],
   count: number,
 ) => {
   const {buffer, array, source, dims} = aggregate;

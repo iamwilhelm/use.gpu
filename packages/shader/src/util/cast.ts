@@ -97,3 +97,26 @@ export const bundleToAttribute = (
 
   return {name: name ?? 'main', format: 'void', args: []};
 }
+
+export const parseSwizzle = (s: string) => {
+  const out: [string | number, boolean][] = [];
+
+  const match = s.match(/^([xyzw]+)([+-]+)$/);
+  if (match) {
+    const [, basis, signs] = match;
+
+    console.log({basis, signs})
+
+    let n = basis.length;
+    for (let i = 0; i < n; ++i) {
+      const char = basis[i];
+      const neg = signs[i] === '-';
+
+      if (char.match(/[xyzw]/)) out.push([char, neg]);
+      else if (char.match(/[01]/)) out.push([+char, neg]);
+    }
+  }
+  
+  while (out.length < 4) out.push([0, false]);
+  return out;
+}

@@ -1,5 +1,5 @@
 import { makeTextureDataLayout, makeDynamicTexture, makeTextureView, uploadTexture } from './texture';
-import { Rectangle, Atlas, TextureSource } from './types';
+import { Atlas, TextureSource } from './types';
 import uniq from 'lodash/uniq';
 
 type Rectangle = [number, number, number, number];
@@ -7,7 +7,9 @@ type Point = [number, number];
 
 type Slot = [number, number, number, number, number, number, number];
 type Bin = Set<Slot>;
-type Bins = Map<number, Slot>;
+type Bins = Map<number, Set<Slot>>;
+
+const EMPTY: any[] = [];
 
 export const makeAtlasSource = (
   device: GPUDevice,
@@ -23,8 +25,9 @@ export const makeAtlasSource = (
       magFilter: 'linear',
     } as GPUSamplerDescriptor,
     layout: 'texture_2d<f32>',
+    absolute: true,
     format,
-    size: [atlas.width, atlas.height],
+    size: [atlas.width, atlas.height] as [number, number],
     version: 1,
   };
   return source;
@@ -45,7 +48,7 @@ export const makeAtlas = (
   const slots: Bin = new Set();
 
   const place = (key: number, w: number, h: number): Rectangle => {
-    if (map.get(key)) throw new Error("key mapped already", key);
+    if (map.get(key)) throw new Error("key mapped already: " + key);
     self.version = self.version + 1;
 
     const cw = Math.ceil(w / snap) * snap;
@@ -58,10 +61,10 @@ export const makeAtlas = (
     }
 
     const [x, y] = slot;
-    const rect = [x, y, x + w, y + h];
+    const rect = [x, y, x + w, y + h] as Rectangle;
 
     if (snap) {
-      const clip = [x, y, x + cw, y + ch];
+      const clip = [x, y, x + cw, y + ch] as Rectangle;
       clipRectangle(clip);
     }
     else clipRectangle(rect);
@@ -77,12 +80,14 @@ export const makeAtlas = (
       throw new Error(`Atlas is full and can't expand any more (${maxWidth}x${maxHeight})`);
     }
 
-    const slot = [0, 0, w, h, w, h, 1];
-    const splits = subtractRectangle(slot, [0, 0, width, height]);
+    const slot = [0, 0, w, h, w, h, 1] as Slot;
+    const splits = subtractSlot(slot, [0, 0, width, height] as Rectangle);
     for (const s of splits) addSlot(s);
 
-    const expandX = Array.from(rs.get(width).values());
-    const expandY = Array.from(bs.get(height).values());
+    const r = rs.get(width);
+    const b = bs.get(height);
+    const expandX = r ? Array.from(r.values()) : EMPTY;
+    const expandY = b ? Array.from(b.values()) : EMPTY;
     const expand = uniq([...expandX, ...expandY]);
 
     for (const s of expand) removeSlot(s);
@@ -97,9 +102,9 @@ export const makeAtlas = (
     self.height = height = h;
   };
 
-  const getBin = (xs: Set, x: number) => {
+  const getBin = (xs: Bins, x: number) => {
     let vs = xs.get(x);
-    if (!vs) xs.set(x, vs = new Set());
+    if (!vs) xs.set(x, vs = new Set<Slot>());
     return vs;
   }
 
@@ -216,7 +221,7 @@ export const makeAtlas = (
     for (const slot of slots.values()) {
       stats.checks++;
       if (intersectRectangle(slot, other)) {
-        const splits = subtractRectangle(slot, other);
+        const splits = subtractSlot(slot, other);
         add.push(...splits);
         remove.push(slot);
 
@@ -236,7 +241,7 @@ export const makeAtlas = (
     const rects = debugPlacements();
     let n = rects.length;
     
-    const out: Caret[] = [];
+    const out: any[] = [];
     
     const box: Rectangle = [Infinity, Infinity, -Infinity, -Infinity];
 
@@ -268,7 +273,7 @@ export const makeAtlas = (
     return out;
   }
 
-  const slot = [0, 0, width, height, width, height, 1];
+  const slot = [0, 0, width, height, width, height, 1] as Slot;
   addSlot(slot);
 
   const self = {
@@ -301,35 +306,37 @@ const intersectRangeEnds = (minA: number, maxA: number, minB: number, maxB: numb
 const containsRange = (minA: number, maxA: number, minB: number, maxB: number) => (minA <= minB && maxA >= maxB);
 const getOverlap = (minA: number, maxA: number, minB: number, maxB: number) => Math.max(0, Math.min(maxA, maxB) - Math.max(minA, minB));
 
-const containsRectangle = (a: Rectangle, b: Rectangle) => {
+type RectLike = Rectangle | Slot;
+
+const containsRectangle = (a: RectLike, b: RectLike): boolean => {
   const [al, at, ar, ab] = a;
   const [bl, bt, br, bb] = b;
 
   return containsRange(al, ar, bl, br) && containsRange(at, ab, bt, bb);
 };
 
-const touchRectangle = (a: Rectangle, b: Rectangle) => {
+const touchRectangle = (a: RectLike, b: RectLike): boolean => {
   const [al, at, ar, ab] = a;
   const [bl, bt, br, bb] = b;
 
   return intersectRangeEnds(al, ar, bl, br) && intersectRangeEnds(at, ab, bt, bb);
 };
 
-const intersectRectangle = (a: Rectangle, b: Rectangle) => {
+const intersectRectangle = (a: RectLike, b: RectLike): boolean => {
   const [al, at, ar, ab] = a;
   const [bl, bt, br, bb] = b;
 
   return intersectRange(al, ar, bl, br) && intersectRange(at, ab, bt, bb);
 };
 
-const subtractRectangle = (a: Slot, b: Rectangle): Slot => {
+const subtractSlot = (a: Slot, b: RectLike): Slot[] => {
   const [al, at, ar, ab, sx, sy, corner] = a;
   const [bl, bt, br, bb] = b;
   
   const w = getOverlap(al, ar, bl, br);
   const h = getOverlap(at, ab, bt, bb);
 
-  const out: Rectangle[] = [];
+  const out: Slot[] = [];
 
   if (al < bl) {
     out.push([al, at, bl, ab, Math.min(sx, bl - al), ab - at, 1]);

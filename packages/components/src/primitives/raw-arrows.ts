@@ -51,7 +51,7 @@ const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = [
   { name: 'getVertex', format: 'vec4<f32>', value: ZERO },
-  { name: 'getAnchor', format: 'vec4<i32>', value: [0, 1] },
+  { name: 'getAnchor', format: 'vec4<u32>', value: [0, 1] },
 
   { name: 'getPosition', format: 'vec4<f32>', value: ZERO },
   { name: 'getColor', format: 'vec4<f32>', value: [0.5, 0.5, 0.5, 1] },

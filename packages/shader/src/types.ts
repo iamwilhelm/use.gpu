@@ -91,6 +91,8 @@ export type TextureSource = {
   sampler: GPUSampler | GPUSamplerDescriptor,
   layout: string,
   format: string,
+  variant?: string,
+  absolute?: boolean,
   size: [number, number] | [number, number, number],
   version: number,
 };

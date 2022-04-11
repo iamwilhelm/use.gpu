@@ -1,6 +1,6 @@
-declare module "@use-gpu/wgsl/instance/vertex/tick.wgsl" {
+declare module "@use-gpu/wgsl/instance/vertex/label.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  export const getTickPosition: ParsedBundle;
+  export const getLabelVertex: ParsedBundle;
   export default __module;
 }

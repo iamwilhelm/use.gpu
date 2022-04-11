@@ -47,11 +47,12 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   const p = useProp(origin, parsePosition4);
 
   // Generate tick scale
-  const values = useMemo(() => {
+  const newValues = useMemo(() => {
     const f = (props.mode === 'log') ? logarithmic : linear;
     return new Float32Array(f(r[0], r[1], domainOptions));
   }, [r[0], r[1], props]);
 
+  const values = useMemo(() => newValues, newValues);
   const data = useRawStorage(values, UniformType.f32);
   const n = values.length;
 

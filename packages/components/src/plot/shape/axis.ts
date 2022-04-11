@@ -91,8 +91,8 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   }, [n, loop, start, end]);
 
   const segments = useRawStorage(arrays.segments, 'i32');
-  const anchors = useRawStorage(arrays.anchors, 'vec4<i32>');
-  const trims = useRawStorage(arrays.trims, 'vec4<i32>');
+  const anchors = useRawStorage(arrays.anchors, 'vec4<u32>');
+  const trims = useRawStorage(arrays.trims, 'vec4<u32>');
 
   return (
     use(ArrowLayer, {

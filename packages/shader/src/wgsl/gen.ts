@@ -5,8 +5,8 @@ import { loadVirtualModule } from './shader';
 import { PREFIX_VIRTUAL } from '../constants';
 import { VIRTUAL_BINDGROUP } from './constants';
 
-const INT_PARAMS = [{name: 'index', type: {name: 'i32'}}];
-const INT_ARG = ['i32'];
+const INT_PARAMS = [{name: 'index', type: {name: 'u32'}}];
+const INT_ARG = ['u32'];
 const UV_ARG = ['vec2<f32>'];
 
 const arg = (x: number) => String.fromCharCode(97 + x);
@@ -53,7 +53,7 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format, args}, texture} of textures) {
-      program.push(makeTextureAccessor(namespace, set, base++, format, texture!.layout, name));
+      program.push(makeTextureAccessor(namespace, set, base++, format, name, texture!.layout, texture!.variant, texture!.absolute));
       base++;
     }
 
@@ -122,7 +122,7 @@ export const makeStorageAccessor = (
 ) => `
 @group(${set}) @binding(${binding}) var<storage> ${ns}${name}Storage: array<${type}>;
 
-fn ${ns}${name}(index: i32) -> ${type} {
+fn ${ns}${name}(index: u32) -> ${type} {
   return ${ns}${name}Storage[index];
 }
 `;
@@ -132,14 +132,24 @@ export const makeTextureAccessor = (
   set: number | string,
   binding: number,
   type: string,
-  layout: string,
   name: string,
+  layout: string,
+  variant: string = 'textureSample',
+  absolute: boolean = false,
   args: string[] = UV_ARG,
-) => `
+) => {
+  const m = layout.match(/[0-9]/);
+
+  const dims = m[0];
+  const dimsCast = dims === 1 ? 'f32' : `vec${dims}<f32>`;
+
+  return `
 @group(${set}) @binding(${binding}) var ${ns}${name}Sampler: sampler;
 @group(${set}) @binding(${binding + 1}) var ${ns}${name}Texture: ${layout};
 
 fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
-  return textureSample(${ns}${name}Texture, ${ns}${name}Sampler, ${args.map((_, i) => `${arg(i)}`).join(', ')});
+  ${absolute ? `let _VT_UV = ${arg(0)} / ${dimsCast}(textureDimensions(${ns}${name}Texture));\n  `
+  : ``}return ${variant}(${ns}${name}Texture, ${ns}${name}Sampler, ${args.map((_, i) => `${i === 2 && absolute ? '_VT_UV' : arg(i)}`).join(', ')});
 }
-`;
+`
+};

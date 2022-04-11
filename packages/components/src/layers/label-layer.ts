@@ -8,13 +8,14 @@ import { ShaderSource } from '@use-gpu/shader/types';
 
 import { RawLines } from '../primitives/raw-lines';
 
-import { use, memo, provide, resume, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, provide, resume, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
-import { TextContext } from '../providers/text-provider';
-import { SDFFontProvider } from '../providers/sdf-font-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
+
+import { SDFFontProvider } from '../text/providers/sdf-font-provider';
+import { GlyphSource } from '../text/glyph-source';
 
 import { getTickPosition } from '@use-gpu/wgsl/instance/vertex/tick.wgsl';
 import { getTickSegment } from '@use-gpu/wgsl/geometry/tick.wgsl';
@@ -22,18 +23,18 @@ import { getTickSegment } from '@use-gpu/wgsl/geometry/tick.wgsl';
 export type LabelLayerProps = {
   position?: number[] | TypedArray,
   placement?: number[] | TypedArray,
-  flip?: number,
+  //flip?: number,
   offset?: number,
   size?: number,
   depth?: number,
-  outline?: number,
-  box?: number,
   color?: number[] | TypedArray,
-  background?: number[] | TypedArray,
+
+  outline?: number,
+  outlineColor?: number[] | TypedArray,
 
   positions?: ShaderSource,
   placements?: ShaderSource,
-  flips?: ShaderSource,
+  //flips?: ShaderSource,
   offsets?: ShaderSource,
   sizes?: ShaderSource,
   depths?: ShaderSource,
@@ -59,59 +60,6 @@ const TICK_BINDINGS = [
   { name: 'getSize', format: 'f32', value: 2, args: ['i32'] },
 ] as UniformAttributeValue[];
 
-export const Glyphs: LiveComponent<GlyphsProps> = memo((props: GlyphsProps) => {
-  const gpuText = useContext(TextContext);
-  
-  const {strings} = props;
-  const n = strings.reduce((a, b) => a + b.length, 0);
-
-  const rectangles = new Float32Array(n * 4);
-  const uvs = new Float32Array(n * 4);
-  
-  const height = useMemo(() => {
-    const {ascent, descent, lineHeight: fontHeight} = gpuText.measureFont(size);
-    return {ascent, descent, lineHeight: lineHeight ?? fontHeight};
-  }, [size, lineHeight]);
-
-  const ln = [];
-  spans.iterate((_a, trim, _h, index) => {
-    glyphs.iterate((id: number, isWhiteSpace: boolean) => {
-      const {glyph, mapping} = getGlyph(id, size);
-      const {image, layoutBounds, outlineBounds} = glyph;
-      const [ll, lt, lr, lb] = layoutBounds;
-
-      if (!isWhiteSpace) {
-        if (image) {
-          const [gl, gt, gr, gb] = outlineBounds;
-
-          const cx = snap ? Math.round(sx) : sx;
-          const cy = snap ? Math.round(y) : y;
-
-          rects.push((scale * gl) + cx, (scale * gt) + cy, (scale * gr) + cx, (scale * gb) + cy);
-          uvs.push(mapping[0], mapping[1], mapping[2], mapping[3]);
-          count++;
-        }
-      }
-
-      sx += lr * scale;
-      x += lr * scale;
-      ln.push(id);
-    }, breaks[index - 1] || 0, breaks[index]);
-
-    if (trim) {
-      x += gap;
-      sx = snap ? Math.round(x) : x;
-    }
-  }, start, end);
-
-  let i = 0;
-  for (const s of strings) {
-    const {breaks, metrics: m, glyphs: g} = gpuText.measureSpans(content, size);
-    const spans = makeTuples(m, 3);
-    const glyphs = makeTuples(g, 2);
-  }
-  
-});
 
 export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLayerProps) => {
   const {
@@ -138,8 +86,8 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     label,
     labels,
 
+    detail,
     count = 1,
-    detail = 1,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
@@ -161,41 +109,49 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
 
   const n = useCallback(() => (positions?.length ?? resolve(count) ?? 1), [positions, count]);
 
-  return null;
+  return (
+    use(SDFFontProvider, {
+      children:
+        use(GlyphSource, {
+          strings: labels ?? [label],
+          detail,
+        }),
+      then: resume((
+        atlas: Atlas,
+        source: TextureSource,
+        buffers: StorageSource[],
+      ) => {
+        const [indices, rectangles, uvs, layouts] = buffers;
+        
+        useMemo(() => console.log({buffers}), buffers);
+        return null;
 
-  return use(SDFFontProvider, {
-    children: [],
-    then: resume((
-      atlas: Atlas,
-      source: TextureSource,
-      items: (UIAggregate | null)[],
-    ) => {
+        const bound = useMemo(() => {
+          const defines = { TICK_DETAIL: detail };
+          const bindings = makeShaderBindings(TICK_BINDINGS, [xf, p, o, d, s])
+          const links = bindingsToLinks(bindings);
+          return bindBundle(getTickPosition, links, defines, key);
+        }, [p, o, d, s, detail]);
 
-      const bound = useMemo(() => {
-        const defines = { TICK_DETAIL: detail };
-        const bindings = makeShaderBindings(TICK_BINDINGS, [xf, p, o, d, s])
-        const links = bindingsToLinks(bindings);
-        return bindBundle(getTickPosition, links, defines, key);
-      }, [p, o, d, s, detail]);
+        return (
+          provide(TransformContext, null,
+            use(RawQuads, {
+              positions: bound,
+              rectangles,
+              color,
+              colors,
+              width,
+              widths,
+              depth,
+              depths,
 
-      return (
-        provide(TransformContext, null,
-          use(RawLines, {
-            positions: bound,
-            segments: getTickSegment,
-            color,
-            colors,
-            width,
-            widths,
-            depth,
-            depths,
-
-            count: n,
-            mode,
-            id,
-          })
-        )
-      );
-    }),
-  });
+              count: n,
+              mode,
+              id,
+            })
+          )
+        );
+      }),
+    })
+  );
 }, 'LabelLayer');

@@ -60,7 +60,7 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                       delay: 0,
                       frames: [
                         [0,  [[0, 1], [0, 1], [0, 1]]],
-                        [4, [[-1, 1], [0, 1], [0, 1]]],
+                        [20, [[-1, 1], [0, 1], [0, 1]]],
                       ],
                       prop: 'range',
                       children:

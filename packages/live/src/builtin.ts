@@ -99,15 +99,7 @@ export const provide = <T, C>(
   value: T,
   calls: LiveElement<any> | undefined,
   key?: Key,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, false], key, by: getCurrentFiberID()});
-
-// Provide a value for a context, memoizing if it doesn't change
-export const provideMemo = <T, C>(
-  context: LiveContext<C>,
-  value: T,
-  calls: LiveElement<any> | undefined,
-  key?: Key,
-): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls, true], key, by: getCurrentFiberID()});
+): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls], key, by: getCurrentFiberID()});
 
 // Consume value from a co-context
 export const consume = <T, C>(

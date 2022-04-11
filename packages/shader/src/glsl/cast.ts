@@ -10,11 +10,17 @@ export const makeCastAccessor = (
   args: string[],
   from: string,
   to: string,
-  swizzle: string,
+  swizzle: string | string[],
 ) => {
   const symbols = args.map((t, i) => `${arg(i)}`);
+
+  let ret: string;
+  if (typeof swizzle === 'string') ret = 'v.' + swizzle;
+  else ret = `${to}(${swizzle.join(', ')})`;
+
   return `${to} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
-  return ${accessor}(${symbols.join(', ')}).${swizzle};
+  ${to} v = ${accessor}(${symbols.join(', ')});
+  return ${ret};
 }
 `;
 }

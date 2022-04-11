@@ -10,9 +10,9 @@ struct VertexOutput {
   @location(4)                    fragUV: vec2<f32>,
 };
 
-@external fn getRectangle(i: i32) -> vec4<f32>;
-@external fn getRadius(i: i32) -> vec4<f32>;
-@external fn getUV(i: i32) -> vec4<f32>;
+@external fn getRectangle(i: u32) -> vec4<f32>;
+@external fn getRadius(i: u32) -> vec4<f32>;
+@external fn getUV(i: u32) -> vec4<f32>;
 
 @stage(vertex)
 fn main(
@@ -20,8 +20,8 @@ fn main(
   @builtin(instance_index) instanceIndex: u32,
 ) -> VertexOutput {
 
-  var rectangle = getRectangle(i32(instanceIndex));
-  var radius = getRadius(i32(instanceIndex));
+  var rectangle = getRectangle(instanceIndex);
+  var radius = getRadius(instanceIndex);
 
   var uv = getQuadUV(vertexIndex);
   var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv), 0.5, 1.0);
@@ -37,7 +37,7 @@ fn main(
     rectangle,
     radius,
     fragMode,
-    u32(instance_index),
+    instanceIndex,
     uv,
   );
 }

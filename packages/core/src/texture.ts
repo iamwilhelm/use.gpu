@@ -196,7 +196,7 @@ export const resizeTextureSource = (
   aspect: GPUTextureAspect = "all",
 ) => {
   const {format} = source;
-  const newTexture = makeDynamicTexture(device, width, height, depth, format, 1);
+  const newTexture = makeDynamicTexture(device, width, height, depth, format as any, 1);
 
   const src = {
     texture: source.texture,

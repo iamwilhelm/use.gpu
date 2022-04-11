@@ -15,13 +15,13 @@ struct VertexOutput {
   @location(8)                    fragTextureUV: vec2<f32>,
 };
 
-@external fn getRectangle(i: i32) -> vec4<f32>;
-@external fn getRadius(i: i32) -> vec4<f32>;
-@external fn getBorder(i: i32) -> vec4<f32>;
-@external fn getFill(i: i32) -> vec4<f32>;
-@external fn getStroke(i: i32) -> vec4<f32>;
-@external fn getUV(i: i32) -> vec4<f32>;
-@external fn getRepeat(i: i32) -> i32;
+@external fn getRectangle(i: u32) -> vec4<f32>;
+@external fn getRadius(i: u32) -> vec4<f32>;
+@external fn getBorder(i: u32) -> vec4<f32>;
+@external fn getFill(i: u32) -> vec4<f32>;
+@external fn getStroke(i: u32) -> vec4<f32>;
+@external fn getUV(i: u32) -> vec4<f32>;
+@external fn getRepeat(i: u32) -> i32;
 
 @stage(vertex)
 fn main(
@@ -29,15 +29,15 @@ fn main(
   @builtin(instance_index) instanceIndex: u32,
 ) -> VertexOutput {
 
-  var rectangle = getRectangle(i32(instanceIndex));
-  var radius = getRadius(i32(instanceIndex));
-  var border = getBorder(i32(instanceIndex));
-  var fill = getFill(i32(instanceIndex));
-  var stroke = getStroke(i32(instanceIndex));
-  var uv4 = getUV(i32(instanceIndex));
-  var repeat = getRepeat(i32(instanceIndex));
+  var rectangle = getRectangle(instanceIndex);
+  var radius = getRadius(instanceIndex);
+  var border = getBorder(instanceIndex);
+  var fill = getFill(instanceIndex);
+  var stroke = getStroke(instanceIndex);
+  var uv4 = getUV(instanceIndex);
+  var repeat = getRepeat(instanceIndex);
 
-  var uv = getQuadUV(i32(vertexIndex));
+  var uv = getQuadUV(vertexIndex);
   var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv), 0.5, 1.0);
   var center = worldToClip(position);
 

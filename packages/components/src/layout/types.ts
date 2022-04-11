@@ -1,4 +1,4 @@
-import { TextureSource, TupleStore } from '@use-gpu/core/types';
+import { TextureSource, Tuples } from '@use-gpu/core/types';
 import { LiveElement, Key } from '@use-gpu/live/types';
 import { FontMetrics, TextMetrics } from '@use-gpu/text/types';
 
@@ -12,7 +12,7 @@ export type Sizing = Point4;
 export type Margin = Point4;
 export type Rectangle = Point4;
 export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
-export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'between' | 'evenly';
+export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'between' | 'evenly';
 export type Anchor = 'start' | 'center' | 'end';
 export type Base = 'start' | 'base' | 'center' | 'end';
 
@@ -48,7 +48,7 @@ export type LayoutElement = {
 };
 
 export type InlineElement = {
-  spans: TupleStore<4>,
+  spans: Tuples<4>,
   height: FontMetrics,
   absolute?: boolean,
   render: InlineRenderer,

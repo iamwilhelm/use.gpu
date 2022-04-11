@@ -53,7 +53,7 @@ const VERTEX_BINDINGS = [
   { name: 'getColor', format: 'vec4<f32>', value: [0.5, 0.5, 0.5, 1] },
   { name: 'getWidth', format: 'f32', value: 1 },
   { name: 'getDepth', format: 'f32', value: 0 },
-  { name: 'getTrim', format: 'vec4<i32>', value: [0, 0, 0, 0] },
+  { name: 'getTrim', format: 'vec4<u32>', value: [0, 0, 0, 0] },
   { name: 'getSize', format: 'f32', value: 1 },
 ] as UniformAttributeValue[];
 

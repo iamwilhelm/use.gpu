@@ -40,10 +40,10 @@ export type TickLayerProps = {
 
 const TICK_BINDINGS = [
   { name: 'transformPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['vec4<f32>'] },
-  { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['i32'] },
-  { name: 'getOffset', format: 'vec4<f32>', value: [0, 1, 0, 0], args: ['i32'] },
-  { name: 'getDepth', format: 'f32', value: 0, args: ['i32'] },
-  { name: 'getSize', format: 'f32', value: 2, args: ['i32'] },
+  { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0] },
+  { name: 'getOffset', format: 'vec4<f32>', value: [0, 1, 0, 0] },
+  { name: 'getDepth', format: 'f32', value: 0 },
+  { name: 'getSize', format: 'f32', value: 2 },
 ] as UniformAttributeValue[];
 
 export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerProps) => {

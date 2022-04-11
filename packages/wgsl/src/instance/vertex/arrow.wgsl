@@ -2,19 +2,19 @@ use '@use-gpu/wgsl/use/types'::{ SolidVertex };
 use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 
-@external fn getVertex(i: i32) -> vec4<f32> {};
+@external fn getVertex(i: u32) -> vec4<f32> {};
 
-@external fn getAnchor(i: i32) -> vec4<i32> {};
+@external fn getAnchor(i: u32) -> vec4<u32> {};
 
-@external fn getPosition(i: i32) -> vec4<f32> {};
-@external fn getColor(i: i32) -> vec4<f32> {};
-@external fn getSize(i: i32) -> f32 {};
-@external fn getWidth(i: i32) -> f32 {};
-@external fn getDepth(i: i32) -> f32 {};
+@external fn getPosition(i: u32) -> vec4<f32> {};
+@external fn getColor(i: u32) -> vec4<f32> {};
+@external fn getSize(i: u32) -> f32 {};
+@external fn getWidth(i: u32) -> f32 {};
+@external fn getDepth(i: u32) -> f32 {};
   
 let ARROW_ASPECT: f32 = 2.5;
 
-@export fn getArrowVertex(vertexIndex: i32, instanceIndex: i32) -> SolidVertex {
+@export fn getArrowVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
   var NaN: f32 = bitcast<f32>(0xffffffffu);
 
   let meshPosition = getVertex(vertexIndex);
@@ -23,7 +23,7 @@ let ARROW_ASPECT: f32 = 2.5;
   let anchorIndex = anchor.x;
   let nextIndex = anchor.y;
   let endIndex = anchor.z;
-  let both = anchor.w;
+  let both = i32(anchor.w);
   
   let color = getColor(anchorIndex);
   let size = getSize(anchorIndex);
@@ -32,7 +32,7 @@ let ARROW_ASPECT: f32 = 2.5;
 
   let startPos = getPosition(anchorIndex);
   let nextPos = getPosition(nextIndex);
-  let midPos = getPosition((anchorIndex + endIndex) / 2);
+  let midPos = getPosition((anchorIndex + endIndex) / 2u);
   let endPos = getPosition(endIndex);
 
   let center = worldToClip(startPos);
@@ -71,5 +71,6 @@ let ARROW_ASPECT: f32 = 2.5;
     position,
     color,
     uv,
+    instanceIndex,
   );
 }

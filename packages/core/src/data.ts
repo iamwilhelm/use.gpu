@@ -215,8 +215,8 @@ export const mapChunksToAnchors = (
   const length = getChunkedDataLength(chunks, loops);
   const count = ends.reduce((c, [a, b]) => c + +!!a + +!!b, 0);
 
-  const {array: anchors} = makeDataArray(UniformType['vec4<i32>'], count);
-  const {array: trims} = makeDataArray(UniformType['vec4<i32>'], length);
+  const {array: anchors} = makeDataArray(UniformType['vec4<u32>'], count);
+  const {array: trims} = makeDataArray(UniformType['vec4<u32>'], length);
   for (let i = 0; i < length * 2; ++i) trims[i] = -1;
 
   let o = 0;

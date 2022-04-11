@@ -5,7 +5,7 @@ import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
 import { CanvasPicking } from './canvas-picking';
 import { CursorConsumer } from '../consumers/cursor-consumer';
-import { TextProvider } from '../providers/text-provider';
+import { FontProvider } from '../text/providers/font-provider';
 
 import { use } from '@use-gpu/live';
 
@@ -39,7 +39,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
                 use(CursorConsumer, {
                   element: canvas,
                   children:
-                    use(TextProvider, {
+                    use(FontProvider, {
                       children,
                     })
                 })

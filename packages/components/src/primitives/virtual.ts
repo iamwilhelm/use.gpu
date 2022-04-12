@@ -6,16 +6,56 @@ import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
-import instanceDrawVirtual from '@use-gpu/wgsl/instance/draw/virtual-solid.wgsl';
-import instanceDrawVirtualPick from '@use-gpu/wgsl/instance/draw/virtual-solid-pick.wgsl';
+import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
+import instanceDrawVirtualPick from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
+import instanceDrawVirtualUI from '@use-gpu/wgsl/render/vertex/virtual-ui.wgsl';
 
-import instanceFragmentSolid from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
-import instanceFragmentSolidPick from '@use-gpu/wgsl/instance/fragment/solid-pick.wgsl';
+import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
+import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick-geometry.wgsl';
+import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
 
-import instanceDrawWireframeStrip from '@use-gpu/wgsl/instance/draw/wireframe-strip.wgsl';
-import instanceDrawWireframeList from '@use-gpu/wgsl/instance/draw/wireframe-list.wgsl';
+import instanceDrawWireframeStrip from '@use-gpu/wgsl/render/vertex/wireframe-strip.wgsl';
+import instanceDrawWireframeList from '@use-gpu/wgsl/render/vertex/wireframe-list.wgsl';
 
 import { render } from './render';
+
+const DEBUG_RENDERER = {
+  list: instanceDrawWireframeList,
+  strip: instanceDrawWireframeStrip,
+  fragment: instanceFragmentSolid,
+} as Record<string, ShaderModule>;
+
+const SOLID_RENDERER = {
+  color: [
+    instanceDrawVirtualSolid,
+    instanceFragmentSolid,
+  ],
+  pick: [
+    instanceDrawVirtualPick,
+    instanceFragmentPickGeometry,
+  ],
+};
+
+const UI_RENDERER = {
+  color: [
+    instanceDrawVirtualUI,
+    instanceFragmentUI,
+  ],
+  pick: [
+    instanceDrawVirtualPick,
+    instanceFragmentPickGeometry,
+  ],
+};
+
+const BUILTIN = {
+  solid: SOLID_RENDERER,
+  ui: UI_RENDERER,
+};
+
+type VirtualRenderer = {
+  color: [ParsedBundle, ParsedBundle],
+  pick: [ParsedBundle, ParsedBundle],
+};
 
 export type VirtualProps = {
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
@@ -28,6 +68,7 @@ export type VirtualProps = {
   getVertex: ShaderModule,
   getFragment: ShaderModule,
 
+  renderer: VirtualRenderer | string,
   defines: Record<string, any>,
   deps: any[] | null,
 };
@@ -41,6 +82,8 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
 
     pipeline,
     defines,
+
+    renderer = SOLID_RENDERER,
     deps = null,
     mode = RenderPassMode.Opaque,
     id = 0,
@@ -53,14 +96,18 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
 
   let vertexShader: ParsedBundle;
   let fragmentShader: ParsedBundle;
+  
   if (isDebug) {
-    if (topology === 'triangle-strip') vertexShader   = instanceDrawWireframeStrip;
-    else vertexShader = instanceDrawWireframeList;
-    fragmentShader = instanceFragmentSolid;
+    vertexShader = DEBUG_RENDERER[(topology === 'triangle-strip') ? 'strip' : 'list'];
+    fragmentShader = DEBUG_RENDERER.fragment;
   }
   else {
-    vertexShader   = isPicking ? instanceDrawVirtualPick : instanceDrawVirtual;
-    fragmentShader = isPicking ? instanceFragmentSolidPick : instanceFragmentSolid;
+    let r: VirtualRenderer | undefined;
+    r = (typeof renderer == 'string') ? BUILTIN[renderer] : renderer;
+    if (!r) throw new Error(`Unknown renderer '${renderer}'`);
+
+    const k = isPicking ? 'pick' : 'color';
+    [vertexShader, fragmentShader] = r[k];
   }
 
   // Debug wireframe

@@ -1,4 +1,4 @@
-declare module "@use-gpu/wgsl/instance/ui/sdf.wgsl" {
+declare module "@use-gpu/wgsl/render/ui/sdf.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const SDF: ParsedBundle;

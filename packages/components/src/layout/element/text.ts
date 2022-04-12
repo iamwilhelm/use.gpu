@@ -20,9 +20,12 @@ export type TextProps = {
   stroke?: Point4,
   fill?: Point4,
   */
+  
   color?: Point4,
+  
+  
+  lineHeight?: number,
   size?: number,
-  line?: number,
   snap?: boolean,
 
   content?: string,
@@ -36,9 +39,9 @@ const NO_STROKE = [0.0, 0.0, 0.0, 0.0];
 export const Text: LiveComponent<TextProps> = (props) => {
   const {
     color = BLACK,
+    lineHeight,
     size = 16,
     snap = false,
-    lineHeight,
     content = '',
     children,
   } = props;
@@ -46,17 +49,8 @@ export const Text: LiveComponent<TextProps> = (props) => {
   const gpuText = useContext(FontContext);
 
   const strings = children ?? content;
-  const packed = useFontText(strings, size);
+  const {spans, glyphs, breaks} = useFontText(strings, size);
   const height = useFontHeight(size, lineHeight);
-
-  const {spans, glyphs, breaks} = useMemo(() => {
-    const {breaks, metrics: m, glyphs: g} = gpuText.measureSpans(packed, size);
-
-    const spans = makeTuples(m, 3);
-    const glyphs = makeTuples(g, 2);
-
-    return {spans, glyphs, breaks};
-  }, [content, size]);
 
   const {id} = useFiber();
   return yeet({

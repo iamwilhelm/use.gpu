@@ -1,4 +1,4 @@
-declare module "@use-gpu/wgsl/instance/draw/mesh-pick.wgsl" {
+declare module "@use-gpu/wgsl/render/fragment/mesh.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   

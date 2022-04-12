@@ -17,8 +17,8 @@ import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
 
-import rectangleVertex from '@use-gpu/wgsl/instance/ui/vertex.wgsl';
-import rectangleFragment from '@use-gpu/wgsl/instance/ui/fragment.wgsl';
+import rectangleVertex from '@use-gpu/wgsl/render/ui/vertex.wgsl';
+import rectangleFragment from '@use-gpu/wgsl/render/ui/fragment.wgsl';
 
 export type UIRectanglesProps = {
   rectangle?: number[] | TypedArray,

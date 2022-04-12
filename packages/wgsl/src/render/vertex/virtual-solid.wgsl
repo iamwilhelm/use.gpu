@@ -14,7 +14,7 @@ fn main(
   @builtin(vertex_index) vertexIndex: u32,
   @builtin(instance_index) instanceIndex: u32,
 ) -> VertexOutput {
-  var v = getVertex(vertexIndex, instanceIndex);
+  let v = getVertex(vertexIndex, instanceIndex);
 
   return VertexOutput(
     v.position,

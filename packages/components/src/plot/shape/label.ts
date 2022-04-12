@@ -34,7 +34,7 @@ export const Label: LiveComponent<LabelProps> = (props) => {
 
   const count = useCallback(() => positions.length, [positions]);
 
-  const {labels, format, size, depth, outline, background, box} = useLabelTrait(props);
+  const {labels, format, size, depth, expand} = useLabelTrait(props);
   const {placement, flip, offset} = useAnchorTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
@@ -60,10 +60,8 @@ export const Label: LiveComponent<LabelProps> = (props) => {
       count,
       size,
       depth,
-      outline,
-      box,
       color,
-      background,
+      expand,
     })
   );
 };

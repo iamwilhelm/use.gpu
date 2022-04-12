@@ -77,7 +77,11 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
 
   const rectangles = useOne(() => {
     const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, s));
-    return castTo(getSizeFloat, 'vec4<f32>', 'xxxx--++');
+    return castTo(getSizeFloat, 'vec4<f32>', {
+      basis: 'xxxx',
+      signs: '--++',
+      gain: 0.5,
+    });
   }, s);
   const masks = (MASK_SHADER as any)[shape] ?? MASK_SHADER[PointShape.Circle];
 

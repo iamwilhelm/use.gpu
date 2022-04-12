@@ -1,4 +1,4 @@
-@external fn getFragment(color: vec4<f32>, uv: vec2<f32>) -> vec4<f32> {};
+@optional @external fn getFragment(color: vec4<f32>, uv: vec2<f32>) -> vec4<f32> { return color };
 
 @stage(fragment)
 fn main(
@@ -9,7 +9,7 @@ fn main(
 
   // TODO: awaiting compound support
   //outColor.xyz *= outColor.a;
-  outColor = vec4<f32>(outColor.xyz * outColor.a, outColor.a);
+  outColor = vec4<f32>(outColor.xyz, outColor.a);
   outColor = getFragment(outColor, fragUV);
 
   if (outColor.a <= 0.0) { discard; }

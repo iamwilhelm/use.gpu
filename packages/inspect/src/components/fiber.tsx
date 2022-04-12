@@ -1,5 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { formatValue, isSubNode, YEET } from '@use-gpu/live';
+import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
 
 import React, { memo, useMemo } from 'react';
 
@@ -151,7 +151,9 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;
   const renderDepth = getRenderDepth(fibers, fiber);
+
   const shouldRender = renderDepth < depthLimit;
+  const shouldStartOpen = fiber.f !== DEBUG;
 
   const styleDepth = hoverState.fiber ? (subnode ? Math.max(-1, renderDepth - hoverState.depth) : -1) : 0;
 
@@ -273,7 +275,11 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     const openIcon = continuation ? 'arrow_downward' : undefined;
     const closedIcon = continuation ? 'subdirectory_arrow_right' : undefined;
     return (
-      <Expandable id={id} expandCursor={expandCursor}>{
+      <Expandable
+        id={id}
+        expandCursor={expandCursor}
+        initialValue={shouldStartOpen}
+      >{
         (expand, onToggle) => (<>
           <TreeRow indent={indent + +!!continuation}>
             <TreeExpand expand={expand} onToggle={onToggle} openIcon={openIcon} closedIcon={closedIcon}>

@@ -11,6 +11,16 @@ declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/fragment/sdf-2d.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SDF: ParsedBundle;
+  export const getUVScale: ParsedBundle;
+  export const getBorderBoxSDF: ParsedBundle;
+  export const getRoundedBorderBoxSDF: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/geometry/arrow.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -52,122 +62,7 @@ declare module "@use-gpu/wgsl/geometry/tick.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/draw/mesh-pick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/draw/mesh.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/draw/virtual-solid-pick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/draw/virtual-solid.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/draw/virtual-ui-pick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/draw/virtual-ui.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/draw/wireframe-list.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/draw/wireframe-strip.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/fragment/mesh-pick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/fragment/mesh.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/fragment/solid-pick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/fragment/solid.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/ui/fragment-pick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/ui/fragment.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/ui/sdf.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const SDF: ParsedBundle;
-  export const getUVScale: ParsedBundle;
-  export const getBorderBoxSDF: ParsedBundle;
-  export const getRoundedBorderBoxSDF: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/ui/vertex-pick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/ui/vertex.wgsl" {
+declare module "@use-gpu/wgsl/instance/fragment/ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
@@ -263,6 +158,121 @@ declare module "@use-gpu/wgsl/plot/scale.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/fragment/mesh.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/fragment/pick-geometry.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/fragment/solid.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/fragment/ui.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/ui/fragment-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/ui/fragment.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/ui/sdf.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SDF: ParsedBundle;
+  export const getUVScale: ParsedBundle;
+  export const getBorderBoxSDF: ParsedBundle;
+  export const getRoundedBorderBoxSDF: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/ui/vertex-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/ui/vertex.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/mesh-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/mesh.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/virtual-pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/virtual-solid.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/virtual-ui.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/wireframe-list.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/wireframe-strip.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/transform/cartesian.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -308,6 +318,7 @@ declare module "@use-gpu/wgsl/use/picking.wgsl" {
 declare module "@use-gpu/wgsl/use/types.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
+  export const PickVertex: ParsedBundle;
   export const SolidVertex: ParsedBundle;
   export const UIVertex: ParsedBundle;
   export const MeshVertex: ParsedBundle;

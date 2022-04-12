@@ -54,16 +54,18 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                 use(Plot, {
                   children: [
                   
+                  /*
                     use(Animation, {
-                      loop: true,
+                      loop: false,
                       mirror: true,
                       delay: 0,
                       frames: [
-                        [0,  [[0, 1], [0, 1], [0, 1]]],
+                        [0,  [[0.25, 1], [0, 1], [0, 1]]],
                         [20, [[-1, 1], [0, 1], [0, 1]]],
                       ],
                       prop: 'range',
                       children:
+                  */
 
                         use(Cartesian, {
                           range: [],
@@ -78,13 +80,25 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                             use(Scale, {
                               axis: 'x',
                               children: [
+                              /*
                                 use(Tick, {
                                   size: 50,
                                   width: 10,
                                   offset: [0, 1, 0],
                                   color: [0.75, 0.75, 0.75, 1],
                                 }),
+                              */
                                 use(Label, {
+                                  size: 72,
+                                  color: '#808080',
+                                  expand: 5,
+                                  placement: 'bottom',
+                                }),
+                                use(Label, {
+                                  size: 72,
+                                  color: '#ffffff',
+                                  expand: 0,
+                                  placement: 'bottom',
                                 }),
                               ],
                             }),
@@ -101,7 +115,7 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                             }),
                           ]
                         })                     
-                    })
+//                    })
 
                   ]
                 })
@@ -122,7 +136,7 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
 
         use(OrbitCamera, {
           radius, phi, theta,
-          scale: 1080,
+          //scale: 540,
           children: view,
         })  
     })

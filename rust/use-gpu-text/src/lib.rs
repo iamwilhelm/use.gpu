@@ -1,6 +1,7 @@
 use wasm_bindgen::prelude::*;
 use serde::{Serialize};
 use serde_wasm_bindgen;
+use std::string::String;
 
 use ab_glyph::{Font, FontArc, Glyph, GlyphId, Point, PxScale, ScaleFont};
 use xi_unicode::LineBreakIterator;
@@ -27,6 +28,7 @@ pub struct UseGPUText {
 pub struct FontMetrics {
     ascent: f32,
     descent: f32,
+    baseline: f32,
     #[serde(rename = "lineHeight")]
     line_height: f32,
 }
@@ -66,19 +68,6 @@ impl UseGPUText {
         }
     }
 
-    pub fn get_line_breaks(&mut self, text: String) -> Result<JsValue, JsValue> {
-        let iter = LineBreakIterator::new(&text);
-
-        let mut breaks = Vec::<usize>::new();        
-        iter.for_each(|(offset, hard)| {
-            breaks.push(offset);
-            breaks.push(hard as usize);
-        });
-
-    	let js_value = serde_wasm_bindgen::to_value(&breaks)?;
-        Ok(js_value)
-    }
-
     pub fn measure_font(&mut self, size: f32) -> Result<JsValue, JsValue> {
         let font = self.fonts[0].as_scaled(size);
         
@@ -89,13 +78,15 @@ impl UseGPUText {
         let layout = FontMetrics {
             ascent,
             descent,
+            baseline: ascent,
             line_height,
         };
     	let js_value = serde_wasm_bindgen::to_value(&layout)?;
         Ok(js_value)
     }
-    
-    pub fn measure_spans(&mut self, text: String, size: f32) -> Result<JsValue, JsValue> {
+
+    pub fn measure_spans(&mut self, utf16: Vec<u16>, size: f32) -> Result<JsValue, JsValue> {
+        let text = String::from_utf16_lossy(&utf16);
         let font = self.fonts[0].as_scaled(size);
 
         let break_iter = LineBreakIterator::new(&text);
@@ -111,6 +102,14 @@ impl UseGPUText {
             let mut trim = 0.0;
 
             while let Some((byte_index, c)) = char_iter.next() {
+                if c == 0 as char {
+                    breaks.push(i as u32);
+                    metrics.push((advance, trim, 2.0));
+                    advance = 0.0;
+                    trim = 0.0;
+                    continue;
+                }
+                
                 let glyph_id = font.glyph_id(c);
                 let h_advance = font.h_advance(glyph_id);
                 advance += h_advance;

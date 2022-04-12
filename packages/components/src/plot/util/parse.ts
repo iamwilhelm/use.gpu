@@ -149,8 +149,8 @@ export const makeParseBasis = (defaults: string) => {
   }
 };
 
-const u4ToFloat = (s: string) => parseInt(x, 16) / 15;
-const u8ToFloat = (s: string) => parseInt(x, 16) / 255;
+const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
+const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
 
 export const makeParseColor = (def: Color = GRAY) => (c?: ColorLike): Color => {
   if (c === +c) {
@@ -188,8 +188,8 @@ export const makeParseColor = (def: Color = GRAY) => (c?: ColorLike): Color => {
   return def;
 };
 
-export const makeParseMap = <T>(map: Record<string, T>, defaults: T) => {
-  return (s: string) => map[s] ?? defaults;
+export const makeParseMap = <T>(map: Record<string, T>, def: string) => {
+  return (s: string) => map[s] ?? map[def]!;
 };
 
 //////////////////
@@ -197,7 +197,7 @@ export const makeParseMap = <T>(map: Record<string, T>, defaults: T) => {
 export const parseColor      = makeParseColor();
 
 export const parseFloat      = makeParseFloat();
-export const parseInt        = makeParseInt();
+export const parseInteger    = makeParseInt();
 export const parseBoolean    = makeParseBoolean();
 
 export const parseString          = makeParseString();
@@ -230,16 +230,16 @@ export const parseFlip       = makeParseMap({
   'none':    0,
   'outside': 1,
   'inside': -1,
-});
+}, 'none');
 
 export const parsePlacement  = makeParseMap({
-  'center':      vec2.create(0,  0),
-  'left':        vec2.create(1,  0),
-  'top':         vec2.create(0, -1),
-  'right':       vec2.create(1,  0),
-  'bottom':      vec2.create(0,  1),
-  'topLeft':     vec2.create(1, -1),
-  'topRight':    vec2.create(1, -1),
-  'bottomLeft':  vec2.create(1,  1),
-  'bottomRight': vec2.create(1, -1),
-} as Record<string, vec2>);
+  'center':      vec2.fromValues(0,  0),
+  'left':        vec2.fromValues(1,  0),
+  'top':         vec2.fromValues(0, -1),
+  'right':       vec2.fromValues(1,  0),
+  'bottom':      vec2.fromValues(0,  1),
+  'topLeft':     vec2.fromValues(1, -1),
+  'topRight':    vec2.fromValues(1, -1),
+  'bottomLeft':  vec2.fromValues(1,  1),
+  'bottomRight': vec2.fromValues(1, -1),
+}, 'center');

@@ -4,26 +4,28 @@ export { bundleToAttribute } from '../util/cast';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
+const literal = (v: number, neg: boolean, isFloat: boolean) => {
+  if (neg) v = -v;
+  if (isFloat) {
+    let s = v.toString();
+    if (!s.match(/[.eE]/)) s = s + '.0';
+    return s;
+  }
+  return Math.round(v).toString();
+};
+
 export const makeCastAccessor = (
   name: string,
   accessor: string,
   args: string[],
   from: string,
   to: string,
-  swizzle: string,
+  swizzle: string | CastTo,
 ) => {
   const symbols = args.map((t, i) => `${arg(i)}`);
-
   const isScalar = !from.match(/vec</)
 
-  let ret: string;
-  if (typeof swizzle === 'string' && !isScalar && swizzle.match(/^[xyzw]+$/)) {
-    ret = 'v.' + swizzle;
-  }
-  else {
-    const terms = makeSwizzle(from, swizzle, 'v');
-    ret = `${to}(${terms.join(', ')})`;
-  }
+  let ret = makeSwizzle(from, to, swizzle, 'v');
 
   return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${to} {
   let v = ${accessor}(${symbols.join(', ')});
@@ -34,25 +36,30 @@ export const makeCastAccessor = (
 
 export const makeSwizzle = (
   from: string,
-  swizzle: string,
+  to: string,
+  swizzle: string | CastTo,
   name: string,
 ) => {
-  const terms = parseSwizzle(swizzle);
 
   const isFloat = from.match(/(^|<)f/);
   const isScalar = !from.match(/vec</)
 
-  const literal = (v: number, neg: boolean) => {
-    if (neg) v = -v;
-    if (isFloat) return v.toString() + '.0';
-    return Math.round(v).toString();
-  };
+  if (!isScalar && typeof swizzle === 'string' && swizzle.match(/^[xyzw]+$/)) {
+    return 'v.' + swizzle;
+  }
 
-  const out: string[] = terms.map(([v, neg]) => 
-    typeof v === 'number' ? literal(v, neg) : 
-    (neg ? '-' : '') + (isScalar ? `${name}` : `${name}.${v}`));
+  const {basis, signs, gain} = parseSwizzle(swizzle);
+  const out: string[] = basis.split('').map((v, i) => {
+    const neg = signs && signs[i] === '-';
+    
+    if (v.match(/[0-9]/)) return literal(v, neg, isFloat);
+    else return (neg ? '-' : '') + (isScalar ? `${name}` : `${name}.${v}`);
+  });
+  
+  let ret = `${to}(${out.join(', ')})`;
+  if (gain != null) ret = `${ret} * ${literal(gain, false, isFloat)}`;
 
-  return out;
+  return ret;
 }
 
 export const castTo = makeCastTo(makeCastAccessor);

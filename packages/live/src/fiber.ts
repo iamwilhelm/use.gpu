@@ -4,7 +4,7 @@ import {
   OnFiber, DeferredCall, Key,
 } from './types';
 
-import { use, fragment, morph, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
+import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
 import { discardState } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion } from './util';
@@ -276,8 +276,8 @@ export const updateFiber = <F extends Function>(
     const calls = element as DeferredCall<any>[];
     reconcileFiberCalls(fiber, calls);
   }
-  // Reconcile wrapped array
-  else if (fiberType === FRAGMENT) {
+  // Reconcile wrapped array fragment
+  else if (fiberType === FRAGMENT || fiberType === DEBUG_BUILTIN) {
     const calls = call!.args ?? EMPTY_ARRAY;
     reconcileFiberCalls(fiber, calls);
   }

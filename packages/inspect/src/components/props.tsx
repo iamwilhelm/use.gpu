@@ -1,5 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { formatNode, formatValue, formatNodeName } from '@use-gpu/live';
+import { formatNode, formatValue, formatNodeName, YEET } from '@use-gpu/live';
 import { styled } from "@stitches/react";
 
 import React, { useState } from 'react';
@@ -69,10 +69,11 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   }
 
   let yt = yeeted?.value != null ? (<>
-    <Spacer />
     <div><b>Yeeted</b></div>
     <div>{inspectObject(yeeted?.value, state, toggleState, '')}</div>
   </>) : null;
+
+  let showProps = f !== YEET;
 
   let history = null as React.ReactNode | null;
   let parent = fiber;
@@ -90,8 +91,13 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   }
 
   return (<>
-    <div><b>{name}</b></div>
-    <div>{inspectObject(props, state, toggleState, '')}</div>
+    {showProps ? (
+      <>
+        <div><b>{name}</b></div>
+        <div>{inspectObject(props, state, toggleState, '')}</div>
+      </>
+    ) : null}
+    {showProps && yt ? <Spacer /> : null}
     {yt}
     <Spacer />
     <div><b>Rendered By</b></div>

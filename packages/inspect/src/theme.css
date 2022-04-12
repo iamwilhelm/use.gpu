@@ -133,7 +133,8 @@ html > body ::-webkit-scrollbar {
 
 @keyframes shadeAnimation {
   0% { background: rgba(0, 0, 0, 1.0); }
-  75% { background: rgba(0, 0, 0, 1.0); }
+  30% { background: rgba(0, 0, 0, 1.0); }
+  60% { background: rgba(0, 0, 0, 0.4); }
   100% { background: rgba(0, 0, 0, 0.0); }
 }
 
@@ -165,7 +166,10 @@ div.fiber-tree-label.parents.parents,
 div.fiber-tree-label.depends.depends,
 div.fiber-tree-label.precedes.precedes { color: var(--colorTextLevel1); }
 
-div.fiber-tree-label.builtin.parents, div.fiber-tree-label.builtin.precedes { color: var(--colorTextLevel3); }
+div.fiber-tree-label.builtin.parents, div.fiber-tree-label.builtin.precedes {
+  color: var(--colorTextLevel3);
+  transition: none;
+}
   
 div.fiber-tree-node {
   white-space: nowrap;

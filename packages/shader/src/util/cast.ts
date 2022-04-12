@@ -12,13 +12,19 @@ type TypeLike = {
   args?: TypeLike[],
 };
 
+export type CastTo = {
+  basis: string,
+  signs?: string,
+  gain?: number,
+};
+
 export type MakeCastAccessor = (
   name: string,
   accessor: string,
   args: string[],
   from: string,
   to: string,
-  swizzle: string,
+  swizzle: string | CastTo,
 ) => string;
 
 export const toTypeString = (t: TypeLike | string): string => {
@@ -35,7 +41,7 @@ export const makeCastTo = (
 ) => (
   bundle: ShaderModule,
   type: string,
-  swizzle: string,
+  swizzle: string | CastTo,
 ): ParsedBundle => {
   const {module, virtual} = toBundle(bundle);
   const {name, format, args} = bundleToAttribute(bundle);
@@ -98,25 +104,13 @@ export const bundleToAttribute = (
   return {name: name ?? 'main', format: 'void', args: []};
 }
 
-export const parseSwizzle = (s: string) => {
-  const out: [string | number, boolean][] = [];
+export const parseSwizzle = (swizzle: string | CastTo) => {
+  let c: CastTo;
+  if (typeof swizzle === 'string') c = {basis: swizzle};
+  else c = swizzle as CastTo;
 
-  const match = s.match(/^([xyzw]+)([+-]+)$/);
-  if (match) {
-    const [, basis, signs] = match;
+  const {basis} = c;
+  while (basis.length < 4) basis = basis + '0';
 
-    console.log({basis, signs})
-
-    let n = basis.length;
-    for (let i = 0; i < n; ++i) {
-      const char = basis[i];
-      const neg = signs[i] === '-';
-
-      if (char.match(/[xyzw]/)) out.push([char, neg]);
-      else if (char.match(/[01]/)) out.push([+char, neg]);
-    }
-  }
-  
-  while (out.length < 4) out.push([0, false]);
-  return out;
+  return c;
 }

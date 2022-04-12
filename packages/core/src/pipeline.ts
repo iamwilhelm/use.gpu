@@ -36,6 +36,7 @@ export const makeRenderPipeline = (
       targets: colorStates,
     }),
   }, descriptor) as any as GPURenderPipelineDescriptor;
+  console.log(pipelineDescriptor)
 
   return device.createRenderPipeline(pipelineDescriptor);
 }

@@ -32,7 +32,7 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
       <div><b>Fiber</b></div>
       <div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
       <Spacer />
-      <div><b>State</b></div>
+      <div><b>Hooks</b></div>
       <div>
         {inspectObject(hooks.map(hookToObject), expanded, toggleExpanded, '')}
       </div>

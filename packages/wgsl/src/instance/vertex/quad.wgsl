@@ -41,7 +41,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   }
 
   // Attach to position
-  center = vec4<f32>(center.xy + xy * viewUniforms.viewResolution * center.w, center.zw);
+  center = vec4<f32>(center.xy + 2.0 * xy * viewUniforms.viewResolution * center.w, center.zw);
 
   return SolidVertex(
     center,

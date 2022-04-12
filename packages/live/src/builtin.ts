@@ -16,6 +16,7 @@ export const MULTI_GATHER = () => {};
 export const YEET         = () => {};
 export const PROVIDE      = () => {};
 export const CONSUME      = () => {};
+export const DEBUG        = () => {};
 
 (MORPH        as any).isLiveBuiltin = true;
 (DETACH       as any).isLiveBuiltin = true;
@@ -26,6 +27,7 @@ export const CONSUME      = () => {};
 (YEET         as any).isLiveBuiltin = true;
 (PROVIDE      as any).isLiveBuiltin = true;
 (CONSUME      as any).isLiveBuiltin = true;
+(DEBUG        as any).isLiveBuiltin = true;
 
 (FRAGMENT     as any).isLiveInline = true;
 
@@ -41,6 +43,12 @@ export const keyed = <F extends Function>(
   key?: Key,
   ...args: F extends ArrowFunction ? Parameters<F> : any[]
 ): DeferredCall<F> => ({f, args, key, by: getCurrentFiberID()});
+
+// use a call to a live component with only a children prop
+export const wrap = <F extends Function>(
+  f: LiveFunction<F>,
+  children: any,
+): DeferredCall<F> => ({f, args: [{children}], key: undefined, by: getCurrentFiberID()});
 
 // morph a call to a live function
 export const morph = (
@@ -62,6 +70,15 @@ export const fragment = (
 ): DeferredCall<() => void> => {
   if (Array.isArray(calls)) return ({f: FRAGMENT, args: calls, key, by: getCurrentFiberID()});
   return ({f: FRAGMENT, args: [calls], key});
+}
+
+// Reconcile an array of calls
+export const debug = (
+  calls: LiveElement<any>,
+  key?: Key,
+): DeferredCall<() => void> => {
+  if (Array.isArray(calls)) return ({f: DEBUG, args: calls, key, by: getCurrentFiberID()});
+  return ({f: DEBUG, args: [calls], key});
 }
 
 // Reduce a subtree

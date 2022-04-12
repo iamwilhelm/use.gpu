@@ -1,7 +1,7 @@
 // Generate equally spaced ticks in a range at sensible positions.
 //
 // @param min/max - Minimum and maximum of range
-// @param detail - Desired number of steps in range
+// @param divide - Desired number of steps in range
 // @param unit - Base unit of scale (e.g. 1 or π).
 // @param base - Division scale (e.g. 2 = binary division, or 10 = decimal division).
 // @param factor - Multiplicative bias
@@ -13,7 +13,7 @@
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 type DomainOptions = {
-  detail: number,
+  divide: number,
   unit: number,
   base: number,
   start: boolean,
@@ -29,7 +29,7 @@ export const linear = (
   props: Partial<DomainOptions>,
 ) => {
   const {
-    detail = 10,
+    divide = 10,
     unit = 1,
     base = 10,
     start = true,
@@ -41,11 +41,11 @@ export const linear = (
 
   // Calculate naive tick size.
   const span = max - min;
-  const ideal = span / detail;
+  const ideal = span / divide;
 
   // Unsnapped division
   if (!nice) {
-    ticks = seq(detail + 1, min, ideal);
+    ticks = seq(divide + 1, min, ideal);
     if (!start) ticks.shift();
     if (!end) ticks.pop();
     if (!zero) ticks = ticks.filter(x => x != 0);

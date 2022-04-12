@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { Atlas, Tuples, Rectangle } from '@use-gpu/core/types';
 import { FontMetrics } from '@use-gpu/text/types';
 
-import { gather, provide, resume, useAsync, useContext, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { gather, provide, resume, useAsync, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
 
@@ -28,6 +28,10 @@ export type SDFFontSourceContextProps = {
 };
 
 export type SDFFontProvider = {
+  width?: number,
+  height?: number,
+  radius?: number,
+  pad?: number,
   children?: LiveElement<any>,
   then?: (atlas: Atlas, source: TextureSource, gathered: any) => LiveElement<any>
 };
@@ -52,17 +56,20 @@ type GlyphCache = {
   mapping: Map<number, AtlasMapping>,
 }
 
-export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({children, then}) => {
+export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
+  width = 256,
+  height = 256,
+  radius = 10,
+  pad = 0,
+  children,
+  then,
+}) => {
+  pad += radius;
 
   const device = useContext(DeviceContext);
   const gpuText = useContext(FontContext);
 
   // Allocate font atlas + backing texture
-  const width = 256;
-  const height = 256;
-  const pad = 10;
-  const radius = 10;
-
   const format = "rgba8unorm" as GPUTextureFormat;
 
   const glyphs = useOne(() => new Map<number, GlyphCache>());
@@ -163,8 +170,9 @@ export const useSDFGlyphData = (
   snap: boolean = false,
 ) => {
   const context = useSDFFontContext();
+  const {id} = useFiber();
 
-  const buffers = useMemo(() => {
+  return useMemo(() => {
     // Final buffers
     const n = glyphs.length;
     const rectangles = new Float32Array(n * 4);
@@ -203,10 +211,12 @@ export const useSDFGlyphData = (
       i++;
     };
 
+    // Push all text spans into layout
     const {baseline, lineHeight} = height;
     const cursor = makeLayoutCursor<number>(wrap, align);
     spans.iterate((advance, trim, hard) => cursor.push(advance, trim, hard, lineHeight));
 
+    // Gather lines produced
     const [left, top] = layout;
     const currentLayout = [left, top + baseline];
     let lastIndex = -1;
@@ -214,17 +224,25 @@ export const useSDFGlyphData = (
     const layouts = cursor.gather((start, end, lead, gap, index) => {
       if (index !== lastIndex) {
         currentLayout[1] = top + baseline;
-        index = lastIndex;
+        lastIndex = index;
       }
 
       emitGlyphSpans(context, currentLayout, index, spans, glyphs, breaks, start, end, size, gap, lead, snap, emit);
       currentLayout[1] += lineHeight;
     });
 
-    return [indices, rectangles, uvs, layouts];
+    const radius = context.getRadius();
+    const scale = context.getScale(size);
+    
+    return {
+      id,
+      indices,
+      layouts,
+      rectangles,
+      uvs,
+      sdf: [radius, scale, size, 0] as [number, number, number, number],
+    };
   }, [context, layout, spans, glyphs, breaks, height, align, size, wrap, snap]);
- 
-  return buffers;
 }
 
 export const emitGlyphSpans = (

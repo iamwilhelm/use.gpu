@@ -5,11 +5,14 @@ import uniq from 'lodash/uniq';
 type Rectangle = [number, number, number, number];
 type Point = [number, number];
 
-type Slot = [number, number, number, number, number, number, number];
+type Slot = [number, number, number, number, number, number, number, number, number];
 type Bin = Set<Slot>;
 type Bins = Map<number, Set<Slot>>;
 
 const EMPTY: any[] = [];
+const sqr = (x: number) => x * x;
+const lerp = (a: number, b: number, t: number) => a * t + b * (1 - t);
+const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 export const makeAtlasSource = (
   device: GPUDevice,
@@ -80,7 +83,7 @@ export const makeAtlas = (
       throw new Error(`Atlas is full and can't expand any more (${maxWidth}x${maxHeight})`);
     }
 
-    const slot = [0, 0, w, h, w, h, 1] as Slot;
+    const slot = [0, 0, w, h, w, h, w, h, 1] as Slot;
     const splits = subtractSlot(slot, [0, 0, width, height] as Rectangle);
     for (const s of splits) addSlot(s);
 
@@ -92,10 +95,10 @@ export const makeAtlas = (
 
     for (const s of expand) removeSlot(s);
     for (const s of expand) {
-      let [l, t, r, b, sx, sy, corner] = s;
+      let [l, t, r, b, nearX, nearY, farX, farY, corner] = s;
       if (r === width) r = w;
       if (b === height) b = h;
-      addSlot([l, t, r, b, sx, sy, corner]);
+      addSlot([l, t, r, b, nearX, nearY, farX, farY, corner]);
     }
 
     self.width = width = w;
@@ -173,13 +176,24 @@ export const makeAtlas = (
   };
   
   const map = new Map<number, Rectangle>();
+  
+  const slotFit = (x: number, near: number, far: number, full: number) => {
+    
+    // Must not exceed near, unless already close to full
+    const f1 = x <= near ? x / near : x / full;
+
+    // Must not exceed far, with penalty for overhang, unless far is close to full
+    const f2 = lerp(x <= far ? x / far : 0.5 + (x - far) / (full - far) / 2, 1.0, far / full);
+
+    return f1 * f2;
+  };
 
   const getNextAvailable = (w: number, h: number, debug: boolean = false) => {
     let slot: Slot | null = null;
     let max = 0;
 
     for (const s of slots.values()) {
-      const [l, t, r, b, sx, sy, corner] = s;
+      const [l, t, r, b, nearX, nearY, farX, farY, corner] = s;
       
       const x = l;
       const y = t;
@@ -187,11 +201,12 @@ export const makeAtlas = (
       const ch = b - t;
 
       if (w <= cw && h <= ch) {
-        const fx = (w <= sx ? w / sx : w / cw);
-        const fy = (h <= sy ? h / sy : h / ch);
+        const fx = slotFit(w, nearX, farX, cw);
+        const fy = slotFit(h, nearY, farY, ch);
+
+        const f = 1.0 - (Math.min(x / width, y / height) + (x / width * y / height)) * .25;
 
         const b = corner + 1;
-        const f = 1.0 - (Math.min(x / width, y / height) + (x / width * y / height)) * .25;
         const d = b * f * fx * fy;
 
         if (d > max) {
@@ -273,7 +288,7 @@ export const makeAtlas = (
     return out;
   }
 
-  const slot = [0, 0, width, height, width, height, 1] as Slot;
+  const slot = [0, 0, width, height, width, height, width, height, 1] as Slot;
   addSlot(slot);
 
   const self = {
@@ -330,25 +345,58 @@ const intersectRectangle = (a: RectLike, b: RectLike): boolean => {
 };
 
 const subtractSlot = (a: Slot, b: RectLike): Slot[] => {
-  const [al, at, ar, ab, sx, sy, corner] = a;
+  const [al, at, ar, ab, nearX, nearY, farX, farY, corner] = a;
   const [bl, bt, br, bb] = b;
   
-  const w = getOverlap(al, ar, bl, br);
-  const h = getOverlap(at, ab, bt, bb);
-
   const out: Slot[] = [];
 
+  const push = (l: number, t: number, r: number, b: number, nx: number, ny: number, fx: number, fy: number, corner: number) => {
+    const w = r - l;
+    const h = b - t;
+
+    nx = clamp(nx, 0, w) || w;
+    ny = clamp(ny, 0, h) || h;
+    fx = clamp(fx, 0, w) || w;
+    fy = clamp(fy, 0, h) || h;
+
+    out.push([
+      l, t, r, b,
+      clamp(nx, 0, w),
+      clamp(ny, 0, h),
+      clamp(fx, 0, w),
+      clamp(fy, 0, h),
+      corner,
+    ]);
+  };
+
   if (al < bl) {
-    out.push([al, at, bl, ab, Math.min(sx, bl - al), ab - at, 1]);
-  }
-  if (ar > br) {
-    out.push([br, at, ar, ab, Math.min(sx, ar - br), Math.max(h, bb - at), +(at >= bt)]);
+    const nx = at < bt ? nearX : Math.min(nearX, bl - al);
+    const fx = ab > bb ? farX : Math.min(farX, bl - al);
+    const ny = nearY;
+    const fy = at < bt ? 0 : at - bt;
+
+    push(al, at, bl, ab, nx, ny, fx, fy, 1);
   }
   if (at < bt) {
-    out.push([al, at, ar, bt, ar - al, Math.min(sy, bt - at), 1]);
+    const ny = al < bl ? nearY : Math.min(nearY, bt - at);
+    const fy = ar > br ? farY : Math.min(farY, bt - at);
+    const nx = nearX;
+    const fx = al < bl ? 0 : al - br;
+    push(al, at, ar, bt, nx, ny, fx, fy, 1);
+  }
+  if (ar > br) {
+    const nx = nearX - (br - al);
+    const fx = farX - (br - al);
+    const ny = at < bt ? ab - at : bb - at;
+    const fy = farY;
+    push(br, at, ar, ab, nx, ny, fx, fy, +((at >= bt) || (at === 0)));
   }
   if (ab > bb) {
-    out.push([al, bb, ar, ab, Math.max(w, br - al), Math.min(sy, ab - bb), +(al >= bl)]);
+    const ny = nearY - (bb - at);
+    const fy = farY - (bb - at);
+    const nx = al < br ? ar - al : br - al;
+    const fx = farX;
+    push(al, bb, ar, ab, nx, ny, fx, fy, +((al >= bl) || (al === 0)));
   }
 
   return out;

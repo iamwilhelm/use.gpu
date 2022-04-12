@@ -33,9 +33,9 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
   // @ts-ignore
   let name = (f?.displayName ?? f?.name) || 'Node';
   if (name === 'PROVIDE' && args) {
-    const [context,,, isMemo] = args;
+    const [context] = args;
     const value = formatValue(context.displayName);
-    return isMemo ? `Memo(Provide(${value}))` : `Provide(${value})`;
+    return `Provide(${value})`;
   }
   else if (name === 'CONSUME' && args) {
     const [context] = args;
@@ -64,6 +64,9 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
   }
   else if (name === 'MORPH') {
     name = `Morph`;
+  }
+  else if (name === 'DEBUG') {
+    name = `Debug`;
   }
 
   return name;
@@ -133,11 +136,11 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
   if (!x) return '' + x;
   if (Array.isArray(x)) return '[' + x.map((x) => formatShortValue(x, seen)).join(', ') + ']';
   if (typeof x === 'boolean') return x ? 'true' : 'false';
-  if (typeof x === 'number') return '' + x;
+  if (typeof x === 'number') return formatNumber(x, 5);
   if (typeof x === 'symbol') return '(symbol)';
   if (typeof x === 'string') return x;
   if (typeof x === 'function') {
-    if (x.name === '' && !x.displayName) x.displayName = Math.round(Math.random() * 10000);
+    if (x.name === '' && !x.displayName) x.displayName = '#' + Math.round(Math.random() * 10000);
     const name = x.displayName ?? x.name;
     const body = x.toString().split(/=>/)[1];
     return `${name}(…) ` + truncate(body, 40);
@@ -150,6 +153,11 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
   }
   return '' + x;
 }
+
+export const formatNumber = (x: number, precision: number = 5) => {
+  if (Math.abs(x) < 1) return x.toPrecision(precision).replace(/(?:\.0+)$|(\.[0-9]*[1-9])0+$/, '$1');
+  return x.toString();
+};
 
 const truncate = (s: string, n: number) => {
   if (typeof s !== 'string') return '' + s;

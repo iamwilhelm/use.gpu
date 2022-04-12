@@ -14,7 +14,7 @@ type GlyphSourceProps = {
   align?: Alignment,
   wrap?: number,
   snap?: boolean,
-  detail: 48,
+  size?: number,
   
   render?: (buffers: StorageSource[]) => void,
 };
@@ -36,7 +36,7 @@ export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSo
   const {spans, breaks, glyphs} = useFontText(strings, size);
   const height = useFontHeight(size, lineHeight);
 
-  const buffers = useSDFGlyphData(
+  const data = useSDFGlyphData(
     NO_LAYOUT,
     spans,
     glyphs,
@@ -48,7 +48,7 @@ export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSo
     snap,
   );
   
-  return render ? render(buffers) : yeet(buffers);
+  return render ? render(data) : yeet(data);
 });
 
 GlyphSource.displayName = 'GlyphSource';

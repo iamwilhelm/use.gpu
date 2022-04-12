@@ -10,11 +10,11 @@ import {
 } from '@use-gpu/core';
 import { linkBundle } from '@use-gpu/shader/wgsl';
 
-import instanceDrawMesh from '@use-gpu/wgsl/instance/draw/mesh.wgsl';
-import instanceFragmentMesh from '@use-gpu/wgsl/instance/fragment/mesh.wgsl';
+import instanceDrawMesh from '@use-gpu/wgsl/render/vertex/mesh.wgsl';
+import instanceDrawMeshPick from '@use-gpu/wgsl/render/vertex/mesh-pick.wgsl';
 
-import instanceDrawMeshPick from '@use-gpu/wgsl/instance/draw/mesh-pick.wgsl';
-import instanceFragmentMeshPick from '@use-gpu/wgsl/instance/fragment/mesh-pick.wgsl';
+import instanceFragmentMesh from '@use-gpu/wgsl/render/fragment/mesh.wgsl';
+import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick-geometry.wgsl';
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
@@ -78,7 +78,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
   // Render shader
   const vertexShader    = isPicking ? instanceDrawMeshPick     : instanceDrawMesh;
-  const fragmentShader = isPicking ? instanceFragmentMeshPick : instanceFragmentMesh;
+  const fragmentShader = isPicking ? instanceFragmentPickGeometry : instanceFragmentMesh;
 
   const fiber = useFiber();
 

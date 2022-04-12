@@ -3,7 +3,7 @@ import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gp
 import { UIAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
-import { SDFFontProvider, SDF_FONT_ATLAS, SDF_FONT_DEBUG } from '../text/providers/sdf-font-provider';
+import { SDFFontProvider, SDF_FONT_ATLAS } from '../text/providers/sdf-font-provider';
 import { use, keyed, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
@@ -56,14 +56,6 @@ const Resume = resume((
   for (let item of items) if (item) {
 
     if (item.texture === SDF_FONT_ATLAS) {
-      item = {
-        ...item,
-        texture: source,
-      };
-      if (item.uv) item.uv = mapUV(item.uv);
-      if (item.uvs) item.uvs = mapUV(item.uvs);
-    }
-    if (item.texture === SDF_FONT_DEBUG) {
       item = {
         ...item,
         texture: source,

@@ -14,3 +14,4 @@ export * from './raw';
 export * from './render';
 export * from './router';
 export * from './shader';
+export * from './text';

@@ -1,24 +1,22 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import {
-  TypedArray, ViewUniforms, DeepPartial, Prop,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, LambdaSource, RenderPassMode,
-} from '@use-gpu/core/types';
+import { TypedArray, Prop, RenderPassMode } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
+import { SDFGlyphData } from '../text/types';
 
-import { RawLines } from '../primitives/raw-lines';
-
-import { use, memo, provide, resume, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, keyed, wrap, memo, debug, fence, provide, resume, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
+import { useRawStorage } from '../hooks/useRawStorage';
 
 import { SDFFontProvider } from '../text/providers/sdf-font-provider';
+import { DebugAtlas } from '../text/debug-atlas';
 import { GlyphSource } from '../text/glyph-source';
+import { RawLabels } from '../primitives/raw-labels';
+import { UI, Flat } from '../layout';
 
-import { getTickPosition } from '@use-gpu/wgsl/instance/vertex/tick.wgsl';
-import { getTickSegment } from '@use-gpu/wgsl/geometry/tick.wgsl';
+import { getLabelPosition } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
 
 export type LabelLayerProps = {
   position?: number[] | TypedArray,
@@ -28,9 +26,7 @@ export type LabelLayerProps = {
   size?: number,
   depth?: number,
   color?: number[] | TypedArray,
-
-  outline?: number,
-  outlineColor?: number[] | TypedArray,
+  expand?: number,
 
   positions?: ShaderSource,
   placements?: ShaderSource,
@@ -38,10 +34,8 @@ export type LabelLayerProps = {
   offsets?: ShaderSource,
   sizes?: ShaderSource,
   depths?: ShaderSource,
-  outlines?: ShaderSource,
-  boxes?: ShaderSource,
   colors?: ShaderSource,
-  backgrounds?: ShaderSource,
+  expands?: ShaderSource,
 
   label?: string,
   labels?: string[],
@@ -52,106 +46,89 @@ export type LabelLayerProps = {
   id?: number,
 };
 
-const TICK_BINDINGS = [
-  { name: 'transformPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['vec4<f32>'] },
-  { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['i32'] },
-  { name: 'getOffset', format: 'vec4<f32>', value: [0, 1, 0, 0], args: ['i32'] },
-  { name: 'getDepth', format: 'f32', value: 0, args: ['i32'] },
-  { name: 'getSize', format: 'f32', value: 2, args: ['i32'] },
-] as UniformAttributeValue[];
-
-
 export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLayerProps) => {
   const {
     position,
     positions,
     placement,
     placements,
-    flip,
-    flips,
+    //flip,
+    //flips,
     offset,
     offsets,
     size,
     sizes,
     depth,
     depths,
-    outline,
-    outlines,
-    box,
-    boxes,
     color,
     colors,
-    background,
-    backgrounds,
+    expand,
+    expands,
+
     label,
     labels,
 
+    sdfRadius,
     detail,
-    count = 1,
+    count,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
 
   const key = useFiber().id;
 
-  const p = useShaderRef(position, positions);
-  const l = useShaderRef(placement, placements);
-  const f = useShaderRef(flip, flips);
-  const o = useShaderRef(offset, offsets);
-  const s = useShaderRef(size, sizes);
-  const d = useShaderRef(depth, depths);
-  const u = useShaderRef(outline, outlines);
-  const b = useShaderRef(box, boxes);
-  const c = useShaderRef(color, colors);
-  const g = useShaderRef(background, backgrounds);
-
-  const xf = useTransformContext();
-
-  const n = useCallback(() => (positions?.length ?? resolve(count) ?? 1), [positions, count]);
-
   return (
     use(SDFFontProvider, {
+      radius: sdfRadius,
       children:
         use(GlyphSource, {
           strings: labels ?? [label],
-          detail,
+          size: detail,
         }),
-      then: resume((
-        atlas: Atlas,
-        source: TextureSource,
-        buffers: StorageSource[],
-      ) => {
-        const [indices, rectangles, uvs, layouts] = buffers;
-        
-        useMemo(() => console.log({buffers}), buffers);
-        return null;
+      then:
+        resume((
+          atlas: Atlas,
+          source: TextureSource,
+          [data] : [SDFGlyphData],
+        ) => {
+          const {sdf} = data;
+          const indices = useRawStorage(data.indices, 'u32');
+          const rectangles = useRawStorage(data.rectangles, 'vec4<f32>');
+          const layouts = useRawStorage(data.layouts, 'vec2<f32>');
+          const uvs = useRawStorage(data.uvs, 'vec4<f32>');
 
-        const bound = useMemo(() => {
-          const defines = { TICK_DETAIL: detail };
-          const bindings = makeShaderBindings(TICK_BINDINGS, [xf, p, o, d, s])
-          const links = bindingsToLinks(bindings);
-          return bindBundle(getTickPosition, links, defines, key);
-        }, [p, o, d, s, detail]);
-
-        return (
-          provide(TransformContext, null,
-            use(RawQuads, {
-              positions: bound,
+          return ([
+            //debug(wrap(Flat, wrap(UI, use(DebugAtlas, {atlas, source})))),
+            use(RawLabels, {
+              indices,
               rectangles,
-              color,
-              colors,
-              width,
-              widths,
+              layouts,
+              uvs,
+              sdf,
+              texture: source,
+          
+              position,
+              positions,
+              placement,
+              placements,
+              offset,
+              offsets,
+              size,
+              sizes,
               depth,
               depths,
+              color,
+              colors,
+              expand,
+              expands,
 
-              count: n,
+              count,
               mode,
               id,
             })
-          )
-        );
-      }),
+          ]);
+        }),
     })
   );
 }, 'LabelLayer');
+

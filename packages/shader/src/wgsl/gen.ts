@@ -138,9 +138,8 @@ export const makeTextureAccessor = (
   absolute: boolean = false,
   args: string[] = UV_ARG,
 ) => {
-  const m = layout.match(/[0-9]/);
-
-  const dims = m[0];
+  const m = layout.match(/[0-9]/) ?? [2];
+  const dims = +m[0];
   const dimsCast = dims === 1 ? 'f32' : `vec${dims}<f32>`;
 
   return `
@@ -149,7 +148,7 @@ export const makeTextureAccessor = (
 
 fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   ${absolute ? `let _VT_UV = ${arg(0)} / ${dimsCast}(textureDimensions(${ns}${name}Texture));\n  `
-  : ``}return ${variant}(${ns}${name}Texture, ${ns}${name}Sampler, ${args.map((_, i) => `${i === 2 && absolute ? '_VT_UV' : arg(i)}`).join(', ')});
+  : ``}return ${variant}(${ns}${name}Texture, ${ns}${name}Sampler, ${args.map((_, i) => `${i === 0 && absolute ? '_VT_UV' : arg(i)}`).join(', ')});
 }
 `
 };

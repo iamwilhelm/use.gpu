@@ -24,7 +24,6 @@ import {
 import * as T from './grammar/wgsl.terms';
 import { WGSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
-import { getProgramHash } from '../util/hash';
 import { getChildNodes, hasErrorNode, formatAST, formatASTNode, decompressAST } from '../util/tree';
 import uniq from 'lodash/uniq';
 
@@ -387,8 +386,6 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   ////////////////
 
   const getSymbolTable = (): SymbolTable => {
-    const hash = getProgramHash(code);
-
     const modules = getImports();
     const declarations = getDeclarations();
 
@@ -409,7 +406,6 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     }
 
     return {
-      hash,
       symbols: orNone(symbols),
       visibles: orNone(visibles),
       globals: orNone(globals),

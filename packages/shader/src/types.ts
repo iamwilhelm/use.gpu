@@ -17,18 +17,27 @@ export type ShaderModule<T extends SymbolTable = any> = ParsedBundle<T> | Parsed
 export type ParsedBundle<T extends SymbolTable = any> = {
   module: ParsedModule<T>,
   libs?: Record<string, ShaderModule<T>>,
+  links?: Record<string, ShaderModule<T>>,
   entry?: string,
-  virtual?: ParsedModule<T>[],
+
+  hash?: string,
+  key?: string,
+  defines?: Record<string, any>,
+  virtuals?: ParsedModule<T>[],
 };
 
 export type ParsedModule<T extends SymbolTable = any> = {
   name: string,
   code: string,
+  hash: string,
   table: T,
+
   tree?: Tree,
   shake?: ShakeTable,
   virtual?: VirtualTable<T>,
   entry?: string,
+
+  key?: string,
 };
 
 export type VirtualTable<T extends SymbolTable = any> = {

@@ -29,7 +29,9 @@ export const makeLoadModule = <T>(
 
   if (compressed) tree = decompressAST(compressAST(code, tree));
 
-  return {name, code, table, entry, shake, tree};
+  const hash = getProgramHash(code);
+
+  return {name, code, hash, table, entry, shake, tree};
 }
 
 // Use cache to load modules
@@ -55,10 +57,8 @@ export const makeLoadModuleWithCache = (
 
 // Load a static (inert) module
 export const loadStaticModule = (code: string, name: string, entry?: string) => {
-  const table = {
-    hash: getProgramHash(code),
-  };
-  return { name, code, table, entry };
+  const hash = getProgramHash(code);
+  return { name, code, hash, entry, table: EMPTY_TABLE };
 }
 
 // Load a virtual (generated) module
@@ -66,22 +66,21 @@ export const loadVirtualModule = <T extends SymbolTable = any>(
   virtual: VirtualTable,
   initTable: Partial<T> = EMPTY_TABLE,
   entry?: string,
-  key: string | number = makeKey(),
   hash?: string,
   code?: string,
+  key?: string,
 ) => {
   let symbols = initTable.symbols ?? EMPTY_LIST;
 
-  code = code ?? `@virtual [${symbols.join(' ')}] ${key.toString(16)}`;
+  code = code ?? `@virtual [${symbols.join(' ')}]`;
   hash = hash ?? getProgramHash(code);
 
   const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;
 
   const table = {
-    hash,
     symbols,
     visibles: symbols,
     ...initTable,
   };
-  return { name, code, table, entry, virtual };
+  return { name, code, hash, table, entry, virtual, key };
 }

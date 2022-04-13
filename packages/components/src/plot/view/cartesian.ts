@@ -6,6 +6,7 @@ import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
 
+import { useShaderRef } from '../../hooks/useShaderRef';
 import { TransformContext } from '../../providers/transform-provider';
 import { RangeContext } from '../../providers/range-provider';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../util/parse';
@@ -78,17 +79,15 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
 
   const parentTransform = useContext(TransformContext);
 
-  const [transform, ref] = useMemo(() => {
-    const ref = { current: combined };
+  const ref = useShaderRef(combined);
+  const transform = useMemo(() => {
 
     const getMatrix = bindingToModule(makeRefBinding(MATRIX_BINDING, ref));
     const bound = bindBundle(getCartesianPosition, {getMatrix});
     const transform = parentTransform ? chainTo(bound, parentTransform) : bound;
 
-    return [transform, ref];
+    return transform;
   }, [parent]);
-
-  ref.current = combined;
 
   return (
     provide(TransformContext, transform,

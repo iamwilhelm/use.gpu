@@ -31,7 +31,7 @@ export const makeShaderBinding = <T>(
       const lambda = source as LambdaSource<T>;
       return {uniform, lambda};
     }
-    if (source.libs || source.table) {
+    if (source.module || source.table) {
       const lambda = {shader: source} as LambdaSource<T>;
       return {uniform, lambda};
     }
@@ -53,22 +53,3 @@ export const makeRefBinding = <T>(
   uniform: UniformAttributeValue,
   value?: {current: T},
 ): DataBinding<T> => ({uniform, constant: value ?? uniform.value});
-
-// Bind a shader to a set of data bindings, either as constants or a buffer
-export const makeBoundShader = <A, B>(
-  vertexShader: A,
-  fragmentShader: A,
-  links: Record<string, A>,
-  defines: Record<string, any>,
-  compile: (code: B, stage: string) => any,
-  link: (shader: A, links: Record<string, A>, defines: Record<string, any>, cache: any) => B,
-  cache: any,
-): [ShaderModuleDescriptor, ShaderModuleDescriptor, B, B] => {
-  const vertexLinked = link(vertexShader, links, defines, cache);
-  const fragmentLinked = link(fragmentShader, links, defines, cache);
-
-  const vertex = makeShaderModule(compile(vertexLinked, 'vertex'));
-  const fragment = makeShaderModule(compile(fragmentLinked, 'fragment'));
-
-  return [vertex, fragment, vertexLinked, fragmentLinked];
-};

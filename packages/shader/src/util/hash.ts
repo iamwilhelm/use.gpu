@@ -13,6 +13,28 @@ export const add = (a: number, b: number) => ((a|0) + (b|0)) >>> 0;
 export const rot = (a: number, b: number) => ((a << b) | (a >>> (32 - b))) >>> 0;
 export const mul = Math.imul;
 
+export const mixBits = (x: number, d: number) => {
+  d = mul(d, C1);
+  d = rot(d, 15);
+  d = mul(d, C2);
+
+  x ^= d;
+  x = rot(x, 13);
+  x = add(mul(x, 5), C3);
+
+  return x;
+};
+
+export const scrambleBits = (x: number) => {
+  x ^= x >>> 16;
+  x = mul(x, C4);
+  x ^= x >>> 13;
+  x = mul(x, C5);
+  x ^= x >>> 16;
+
+  return x;
+};
+
 export const toMurmur53 = (s: string, seed: number = 0) => {
   const n = s.length;
   let a = seed;

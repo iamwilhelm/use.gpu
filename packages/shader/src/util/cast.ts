@@ -1,7 +1,7 @@
 import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
 import { loadVirtualModule } from '../util/shader';
 import { getProgramHash } from '../util/hash';
-import { toBundle } from '../util/bundle';
+import { toBundle, getBundleHash, getBundleKey } from '../util/bundle';
 import { PREFIX_CAST } from '../constants';
 
 const NO_SYMBOLS = [] as string[];
@@ -36,29 +36,31 @@ export const toTypeString = (t: TypeLike | string): string => {
   return t;
 }
 
+const EXTERNALS = [{
+  func: {name: 'getValue'},
+  flags: 0,
+}];
+
 export const makeCastTo = (
   makeCastAccessor: MakeCastAccessor,
 ) => (
-  bundle: ShaderModule,
+  source: ShaderModule,
   type: string,
   swizzle: string | CastTo,
 ): ParsedBundle => {
-  const {module, virtual} = toBundle(bundle);
+  const bundle = toBundle(source);
+
+  const {module, virtuals} = bundle;
   const {name, format, args} = bundleToAttribute(bundle);
 
-  const {table: {hash}} = module;
-  const code = `@cast [${name} ${format}] ${hash}`;
-  const rehash = getProgramHash(code);
-  const symbols = ['cast', 'getValue'];
-  const namespace = `${PREFIX_CAST}${rehash.slice(0, 6)}`;
+  const hash = getBundleHash(bundle);
+  const key  = getBundleKey(bundle);
 
-  const imported = {
-    at: 0,
-    symbols: NO_SYMBOLS,
-    name: namespace,
-    imports: [{name: 'getValue', imported: name}],
-  };
-  const modules = [imported];
+  const code   = `@cast [${name} ${format}] [${hash}]`;
+  const rehash = getProgramHash(code);
+  const rekey  = getProgramHash(`${code} ${key}`);
+
+  const symbols = ['cast', 'getValue'];
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {
@@ -67,20 +69,21 @@ export const makeCastTo = (
     return makeCastAccessor(name, accessor, args ?? [], format, type, swizzle);
   }
 
+
   const cast = loadVirtualModule(
     { render },
-    { symbols, modules },
+    { symbols, externals: EXTERNALS },
     'cast',
-    0,
     rehash,
     code,
+    rekey,
   );
 
-  const revirtual = module.virtual
-    ? (virtual ? [...virtual, module] : [module])
-    : virtual;
+  const revirtuals = module.virtual
+    ? (virtuals ? [...virtuals, module] : [module])
+    : virtuals;
 
-  return {module: cast, libs: {[namespace]: bundle}, virtual: revirtual};
+  return {module: cast, links: {getValue: bundle}, virtuals: revirtuals};
 }
 
 export const bundleToAttribute = (
@@ -109,7 +112,7 @@ export const parseSwizzle = (swizzle: string | CastTo) => {
   if (typeof swizzle === 'string') c = {basis: swizzle};
   else c = swizzle as CastTo;
 
-  const {basis} = c;
+  let {basis} = c;
   while (basis.length < 4) basis = basis + '0';
 
   return c;

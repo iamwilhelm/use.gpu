@@ -34,7 +34,6 @@ export type VirtualTable = VirtualTableT<SymbolTable>;
 export type DataBinding = DataBindingT<SymbolTable>;
 
 export type SymbolTable = {
-  hash: string,
   modules?: ModuleRef[],
   declarations?: DeclarationRef[],
   externals?: DeclarationRef[],

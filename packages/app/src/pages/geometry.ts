@@ -102,7 +102,7 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
               },
               render: (positions) => [
                 use(PointLayer, { positions, colors: positions, shape: 'diamondOutlined', size: 20, depth: 1, mode: RenderPassMode.Transparent }),
-                use(PointLayer, { positions, size: 20, depth: 1, mode: RenderPassMode.Debug }),
+                //use(PointLayer, { positions, size: 20, depth: 1, mode: RenderPassMode.Debug }),
                 //use(PointLayer, { positions, size: 20, depth: 0, mode: RenderPassMode.Debug }),
               ],
             }),

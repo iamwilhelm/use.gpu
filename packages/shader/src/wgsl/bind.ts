@@ -2,8 +2,10 @@ import { ShaderModule, ShaderDefine, LambdaSource, DataBinding } from './types';
 
 import { defineConstants } from './shader';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
-import { makeBindModule, makeBindBundle, makeResolveBindings, namespaceBinding, getBindingArgument } from '../util/bind';
+import { makeResolveBindings, namespaceBinding, getBindingArgument } from '../util/bind';
 import { VIRTUAL_BINDGROUP } from './constants';
+
+export { bindBundle, bindModule } from '../util/bind';
 
 const NO_SYMBOLS = [] as any[];
 
@@ -34,9 +36,5 @@ export const sourceToModule = <T>(
   else if (s.table || s.libs) return source as ShaderModule;
   return null;
 }
-
-export const bindModule = makeBindModule(defineConstants);
-
-export const bindBundle = makeBindBundle(bindModule);
 
 export const resolveBindings = makeResolveBindings(makeUniformBlock, getVirtualBindGroup);

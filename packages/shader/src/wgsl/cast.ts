@@ -1,4 +1,4 @@
-import { makeCastTo, parseSwizzle } from '../util/cast';
+import { makeCastTo, parseSwizzle, CastTo } from '../util/cast';
 
 export { bundleToAttribute } from '../util/cast';
 
@@ -25,7 +25,7 @@ export const makeCastAccessor = (
   const symbols = args.map((t, i) => `${arg(i)}`);
   const isScalar = !from.match(/vec</)
 
-  let ret = makeSwizzle(from, to, swizzle, 'v');
+  const ret = makeSwizzle(from, to, swizzle, 'v');
 
   return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${to} {
   let v = ${accessor}(${symbols.join(', ')});
@@ -41,8 +41,8 @@ export const makeSwizzle = (
   name: string,
 ) => {
 
-  const isFloat = from.match(/(^|<)f/);
-  const isScalar = !from.match(/vec</)
+  const isFloat = !!from.match(/(^|<)f/);
+  const isScalar = !from.match(/(vec[0-9]|mat[0-9]x[0-9])</);
 
   if (!isScalar && typeof swizzle === 'string' && swizzle.match(/^[xyzw]+$/)) {
     return 'v.' + swizzle;
@@ -50,9 +50,9 @@ export const makeSwizzle = (
 
   const {basis, signs, gain} = parseSwizzle(swizzle);
   const out: string[] = basis.split('').map((v, i) => {
-    const neg = signs && signs[i] === '-';
+    const neg = !!(signs && signs[i] === '-');
     
-    if (v.match(/[0-9]/)) return literal(v, neg, isFloat);
+    if (v.match(/[0-9]/)) return literal(+v, neg, isFloat);
     else return (neg ? '-' : '') + (isScalar ? `${name}` : `${name}.${v}`);
   });
   

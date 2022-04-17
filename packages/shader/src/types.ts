@@ -10,6 +10,12 @@ export type SymbolTable = {
   symbols?: string[],
 };
 
+export type TypeLike = {
+  name: string,
+  type?: TypeLike,
+  args?: TypeLike[],
+};
+
 export type ParsedModuleCache<T extends SymbolTable = any> = LRU<string, ParsedModule<T>>;
 
 export type ShaderModule<T extends SymbolTable = any> = ParsedBundle<T> | ParsedModule<T>;

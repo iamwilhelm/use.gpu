@@ -7,7 +7,7 @@ import { keyed, yeet, useContext, useFiber, useOne, useMemo } from '@use-gpu/liv
 import { makeTuples, emitIntoNumberArray } from '@use-gpu/core';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
-import { FontContext, useFontText, useFontHeight } from '../../text/providers/font-provider';
+import { FontContext, useFontFamily, useFontText, useFontHeight } from '../../text/providers/font-provider';
 import { Glyphs } from '../shape/glyphs';
 
 export type TextProps = {
@@ -22,7 +22,10 @@ export type TextProps = {
   */
   
   color?: Point4,
-  
+
+  family?: string,
+  style?: string,
+  weight?: string | number,
   
   lineHeight?: number,
   size?: number,
@@ -38,6 +41,9 @@ const NO_STROKE = [0.0, 0.0, 0.0, 0.0];
 
 export const Text: LiveComponent<TextProps> = (props) => {
   const {
+    family,
+    style,
+    weight,
     color = BLACK,
     lineHeight,
     size = 16,
@@ -49,8 +55,10 @@ export const Text: LiveComponent<TextProps> = (props) => {
   const gpuText = useContext(FontContext);
 
   const strings = children ?? content;
-  const {spans, glyphs, breaks} = useFontText(strings, size);
-  const height = useFontHeight(size, lineHeight);
+
+  const font = useFontFamily(family, style, weight);
+  const {spans, glyphs, breaks} = useFontText(font, strings, size);
+  const height = useFontHeight(font, size, lineHeight);
 
   const {id} = useFiber();
   return yeet({
@@ -59,6 +67,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
     render: (lines: InlineLine[]) => (
       keyed(Glyphs, id, {
         id,
+        font,
         color,
         size,
         spans,

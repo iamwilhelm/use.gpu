@@ -54,19 +54,16 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                 use(Plot, {
                   children: [
                   
-                  /*
                     use(Animation, {
-                      loop: false,
+                      loop: true,
                       mirror: true,
                       delay: 0,
                       frames: [
-                        [0,  [[0.25, 1], [0, 1], [0, 1]]],
-                        [20, [[-1, 1], [0, 1], [0, 1]]],
+                        [0, [[0, 1], [0, 1], [0, 1]]],
+                        [10, [[-20, 8], [0, 1], [0, 1]]],
                       ],
                       prop: 'range',
                       children:
-                  */
-
                         use(Cartesian, {
                           range: [],
                           scale: [1, 1, 1],
@@ -78,27 +75,28 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                               color: [0.75, 0.75, 0.75, 1],
                             }),
                             use(Scale, {
+                              divide: 5,
                               axis: 'x',
                               children: [
-                              /*
                                 use(Tick, {
                                   size: 50,
                                   width: 10,
                                   offset: [0, 1, 0],
                                   color: [0.75, 0.75, 0.75, 1],
                                 }),
-                              */
                                 use(Label, {
-                                  size: 72,
-                                  color: '#808080',
-                                  expand: 5,
                                   placement: 'bottom',
+                                  color: '#808080',
+                                  size: 32,
+                                  offset: 16,
+                                  expand: 5,
                                 }),
                                 use(Label, {
-                                  size: 72,
-                                  color: '#ffffff',
-                                  expand: 0,
                                   placement: 'bottom',
+                                  color: '#ffffff',
+                                  size: 32,
+                                  offset: 16,
+                                  expand: 0,
                                 }),
                               ],
                             }),
@@ -115,7 +113,7 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                             }),
                           ]
                         })                     
-//                    })
+                    })
 
                   ]
                 })

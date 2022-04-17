@@ -32,13 +32,16 @@ export const makeHost = (
 
   const host = {
     schedule: scheduler.schedule,
+    flush: scheduler.flush,
+
     track: disposal.track,
+    untrack: disposal.untrack,
     dispose: disposal.dispose,
+
     depend: dependency.depend,
     undepend: dependency.undepend,
     traceDown: dependency.traceDown,
     traceUp: dependency.traceUp,
-    flush: scheduler.flush,
 
     visit: queue.insert,
     unvisit: queue.remove,

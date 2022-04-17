@@ -17,7 +17,7 @@ import { makeShaderBindings } from '@use-gpu/core';
 
 import { makeArrow } from './mesh/arrow';
 import { RawData } from '../data/raw-data';
-import { useRawStorage } from '../hooks/useRawStorage';
+import { useBoundStorage } from '../hooks/useBoundStorage';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 
@@ -95,7 +95,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const w = useShaderRef(props.width, props.widths);
   const d = useShaderRef(props.depth, props.depths);
   
-  const g = useRawStorage(mesh.vertices[0], 'vec4<f32>');
+  const g = useBoundStorage(mesh.vertices[0], 'vec4<f32>');
   const xf = useApplyTransform(p);
 
   const [getVertex, getFragment] = useMemo(() => {

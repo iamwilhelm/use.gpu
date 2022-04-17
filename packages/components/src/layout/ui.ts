@@ -40,7 +40,7 @@ export const UI: LiveComponent<AggregateProps> = (props) => {
   });
 };
 
-const Resume = resume((
+const Resume = (
   atlas: Atlas,
   source: TextureSource,
   items: (UIAggregate | null)[],
@@ -73,7 +73,7 @@ const Resume = resume((
   }
 
   return layers.map((layer, i) => keyed(Layer, ids[i], layer));
-});
+};
 
 const Layer: LiveFunction<any> = (
   items: LayerAggregate[],

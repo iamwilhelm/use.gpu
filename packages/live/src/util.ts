@@ -95,6 +95,14 @@ export const makeDisposalTracker = () => {
     list.push(t);
   }
 
+  const untrack = (fiber: LiveFiber<any>, t: Task) => {
+    let list = disposal.get(fiber);
+    if (!list) return;
+
+    const i = list.indexOf(t);
+    list.splice(t, i, 1);
+  }
+
   const dispose = (fiber: LiveFiber<any>) => {
     const tasks = disposal.get(fiber);
     if (tasks) {
@@ -103,7 +111,7 @@ export const makeDisposalTracker = () => {
     }
   }
 
-  return {track, dispose};
+  return {track, untrack, dispose};
 }
 
 // Schedules callback(s) on next paint
@@ -191,7 +199,8 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
   return (ak.length - bk.length) || (a.depth - b.depth);
 }
 
-export const tagFunction = <F extends ArrowFunction>(f: F) => {
-  (f as any).displayName = `${Math.floor(Math.random() * 10000)}`;
+export const tagFunction = <F extends ArrowFunction>(f: F, name?: string) => {
+  (f as any).displayName = name ?? `${Math.floor(Math.random() * 10000)}`;
   return f;
 }
+

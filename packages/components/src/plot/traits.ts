@@ -1,5 +1,4 @@
 import { useOne } from '@use-gpu/live';
-import { PropDef } from './types';
 import {
   parseFloat,
   parseInteger,
@@ -25,8 +24,23 @@ import {
   parseBlending,
   parsePlacement,
   parseFlip,
+  parseWeight,
   optional,
 } from './util/parse';
+import {
+  PropDef,
+  AnchorTrait,
+  ArrowTrait,
+  AxesTrait,
+  AxisTrait,
+  ColorTrait,
+  FontTrait,
+  LabelTrait,
+  LineTrait,
+  ObjectTrait,
+  ROPTrait,
+  ScaleTrait,
+} from './types';
 
 import { vec4 } from 'gl-matrix';
 
@@ -75,6 +89,14 @@ const AXIS_TRAIT = {
 const AXIS_DEFAULTS = {
   axis: 'x',
 };
+
+const FONT_TRAIT = {
+  family: optional(parseString),
+  weight: optional(parseWeight),
+  style: optional(parseString),
+};
+
+const FONT_DEFAULTS = {};
 
 const LABEL_TRAIT = {
   labels:     optional(parseStringArray),
@@ -181,6 +203,7 @@ export const useAnchorTrait = makeUseTrait<AnchorTrait>(ANCHOR_TRAIT, ANCHOR_DEF
 export const useArrowTrait  = makeUseTrait<ArrowTrait>(ARROW_TRAIT, ARROW_DEFAULTS);
 export const useAxesTrait   = makeUseTrait<AxesTrait>(AXES_TRAIT, AXES_DEFAULTS);
 export const useAxisTrait   = makeUseTrait<AxisTrait>(AXIS_TRAIT, AXIS_DEFAULTS);
+export const useFontTrait   = makeUseTrait<FontTrait>(FONT_TRAIT, FONT_DEFAULTS);
 export const useLabelTrait  = makeUseTrait<LabelTrait>(LABEL_TRAIT, LABEL_DEFAULTS);
 export const useLineTrait   = makeUseTrait<LineTrait>(LINE_TRAIT, LINE_DEFAULTS);
 export const useObjectTrait = makeUseTrait<ObjectTrait>(OBJECT_TRAIT, OBJECT_DEFAULTS);

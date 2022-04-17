@@ -2,9 +2,10 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { Atlas, Tuples, Rectangle } from '@use-gpu/core/types';
 import { FontMetrics } from '@use-gpu/text/types';
 
-import { gather, provide, resume, useAsync, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { gather, provide, useAsync, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
+import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 
 import { makeLayoutCursor } from '../../layout/lib/cursor';
 import { DeviceContext } from '../../providers/device-provider';
@@ -49,7 +50,7 @@ const roundUp2 = (v: number) => {
 
 const getNearestScale = (size: number) => roundUp2(Math.max(32, size));
 
-const hashGlyph = (id: number, size: number) => (id << 16) + size;
+const hashGlyph = (font: number, id: number, size: number) => scrambleBits53(mixBits53(mixBits53(font, id), size * 100));
 
 type GlyphCache = {
   glyph: GlyphMetrics,
@@ -67,7 +68,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
   pad += radius;
 
   const device = useContext(DeviceContext);
-  const gpuText = useContext(FontContext);
+  const rustText = useContext(FontContext);
 
   // Allocate font atlas + backing texture
   const format = "rgba8unorm" as GPUTextureFormat;
@@ -78,21 +79,21 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
 
   // Provide context to map glyphs on-demand
   const context = useMemo(() => {
-    if (!gpuText) return null;
+    if (!rustText) return null;
 
     const getRadius = () => radius;
     const getScale = (size: number) => size / getNearestScale(size);
 
-    const getGlyph = (id: number, size: number): Entry => {
+    const getGlyph = (font: number, id: number, size: number): Entry => {
       const scale = getNearestScale(size);
-      const key = hashGlyph(id, scale);
+      const key = hashGlyph(font, id, scale);
 
       const cache = glyphs.get(key);
       if (cache) return cache;
 
       // Measure glyph and get image
       let {current: source} = sourceRef;
-      let glyph = gpuText.measureGlyph(id, scale);
+      let glyph = rustText.measureGlyph(font, id, scale);
       let mapping: AtlasMapping | null = null;
 
       const {image, width: w, height: h, outlineBounds: ob} = glyph;
@@ -144,12 +145,12 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
       getScale,
       getGlyph,
     };
-  }, [gpuText, atlas]);
+  }, [rustText, atlas]);
 
-  return gpuText ? (
+  return rustText ? (
     gather(
       provide(SDFFontContext, context, children),
-      resume((gathered: any) => then ? then(atlas, sourceRef.current, gathered) : null),
+      (gathered: any) => then ? then(atlas, sourceRef.current, gathered) : null,
     )
   ) : null;
 };
@@ -250,6 +251,7 @@ export const emitGlyphSpans = (
   layout: Rectangle,
   currentIndex: number,
   
+  font: number[],
   spans: Tuples<3>,
   glyphs: Tuples<2>,
   breaks: number[],
@@ -286,8 +288,8 @@ export const emitGlyphSpans = (
   let sx = snap ? Math.round(x) : x;
 
   spans.iterate((_a, trim, hard, index) => {
-    glyphs.iterate((id: number, isWhiteSpace: boolean) => {
-      const {glyph, mapping} = getGlyph(id, size);
+    glyphs.iterate((fontIndex: number, id: number, isWhiteSpace: boolean) => {
+      const {glyph, mapping} = getGlyph(font[fontIndex], id, size);
       const {image, layoutBounds, outlineBounds} = glyph;
       const [ll, lt, lr, lb] = layoutBounds;
 

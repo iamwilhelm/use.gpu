@@ -39,6 +39,12 @@ export type ColorTrait = {
   opacity: number,
 };
 
+export type FontTrait = {
+  family: string,
+  weight: string | number,
+  style: string,
+};
+
 export type LabelTrait = {
   labels?: string[],
   expr?: (v: number, i: number) => string,

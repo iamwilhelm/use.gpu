@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, Margin, Dimension, Direction, Alignment, Anchor, Point } from '../types';
 
-import { resume, yeet, memo, gather, useOne, useMemo } from '@use-gpu/live';
+import { yeet, memo, gather, useOne, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
 import { makeBoxLayout, normalizeAlignment, normalizeGap, parseDimension, memoFit } from '../lib/util';
 
@@ -44,23 +44,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const gap    = normalizeGap(g);
   const align  = normalizeAlignment(al);
 
-  const Resume = makeResume(direction, width, height, gap, align, anchor, grow, shrink, wrap, snap);
-  return children ? gather(children, Resume) : null;
-}, 'Flex');
-
-const makeResume = (
-  direction: Direction,
-  width: Dimension | undefined,
-  height: Dimension | undefined,
-  gap: Point,
-  align: [Alignment, Alignment],
-  anchor: Anchor,
-  grow: number,
-  shrink: number,
-  wrap: boolean,
-  snap: boolean,
-) =>
-  resume((els: LayoutElement[]) => {
+  const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
 
@@ -89,4 +73,7 @@ const makeResume = (
         };
       }),
     });
-  });
+  };
+  
+  return children ? gather(children, Resume) : null;
+}, 'Flex');

@@ -7,7 +7,7 @@ import {
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
 import { discardState } from './hooks';
 import { renderFibers } from './tree';
-import { isSameDependencies, incrementVersion } from './util';
+import { isSameDependencies, incrementVersion, tagFunction } from './util';
 import { formatNode, formatNodeName } from './debug';
 
 let ID = 0;
@@ -277,7 +277,7 @@ export const updateFiber = <F extends Function>(
     reconcileFiberCalls(fiber, calls);
   }
   // Reconcile wrapped array fragment
-  else if (fiberType === FRAGMENT || fiberType === DEBUG_BUILTIN) {
+  else if (fiberType === FRAGMENT || (f === DEBUG_BUILTIN)) {
     const calls = call!.args ?? EMPTY_ARRAY;
     reconcileFiberCalls(fiber, calls);
   }
@@ -374,19 +374,15 @@ export const makeFiberContinuation = <F extends Function, R>(
   if (!Next) return null;
 
   const value = reduction();
-
-  // If mounting static component, inline into current fiber
-  if ((Next as any).isStaticComponent) return Next(value);
-  // Mount as new sub fiber
-  else return use(Next, value);
+  return Next(value);
 }
 
-// Tag a component as a static continuation
-export const makeStaticContinuation = (c: LiveFunction<any>): LiveFunction<any> => {
-  (c as any).isStaticComponent = true;
+// Tag a component as imperative, always re-rendered from above even if props/state didn't change
+export const makeImperativeFunction = (c: LiveFunction<any>, displayName?: string): LiveFunction<any> => {
+  (c as any).isImperativeFunction = true;
+  tagFunction(c, displayName);
   return c;
 }
-export const resume = makeStaticContinuation;
 
 // Reconcile multiple calls on a fiber
 export const reconcileFiberCalls = <F extends Function>(
@@ -586,7 +582,7 @@ export const morphFiberCall = <F extends Function>(
 ) => {
   const {mount} = fiber;
 
-  if (fiber.type && (fiber.type !== fiberType)) {
+  if (fiber.type && (fiber.type !== fiberType) && !fiber.type.isLiveBuiltin) {
     if (call && mount && mount.context === fiber.context && !mount.next) {
       // Discard all fiber state
       enterFiber(mount, 0);
@@ -596,7 +592,7 @@ export const morphFiberCall = <F extends Function>(
       mount.type = null;
       mount.f = call.f;
       mount.bound = bind(call.f, mount);
-      mount.args = call.args;
+      mount.args = null;
     }
   }
   fiber.type = fiberType;
@@ -743,8 +739,13 @@ export const updateMount = <P extends Function>(
 ): LiveFiber<any> | null | false => {
   const {host} = parent;
 
-  const from = mount?.f;
-  const to = newMount?.f;
+  let from = mount?.f;
+  let to = newMount?.f;
+
+  if ((from === to) && (from === PROVIDE || from === CONSUME)) {
+    from = mount?.args?.[0] as any;
+    to = newMount?.args?.[0] as any;
+  }
 
   const update  = from && to;
   const replace = update && from !== to;
@@ -767,7 +768,7 @@ export const updateMount = <P extends Function>(
     const {args: aas, arg: a} = newMount;
     const args = aas !== undefined ? aas : (a !== undefined ? [a] : undefined);
 
-    if (mount!.args === args && mount!.version) {
+    if (mount!.args === args && !to?.isImperativeFunction) {
       DEBUG && console.log('Skipping', key, formatNode(newMount!));
       return false;
     }

@@ -1,4 +1,5 @@
 import { makeChainTo } from '../util/chain';
+import { bundleToAttribute } from './shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
@@ -17,4 +18,4 @@ export const makeChainAccessor = (
 `;   
 }
 
-export const chainTo = makeChainTo(makeChainAccessor);
+export const chainTo = makeChainTo(makeChainAccessor, bundleToAttribute);

@@ -8,6 +8,7 @@ import {
   AutoCanvas, CanvasPicking,
   Loop, Draw, Pass,
   CompositeData, Data, RawData,
+  FontLoader,
   OrbitCamera, OrbitControls,
   Pick,
   Cursor, Points, Lines,
@@ -57,11 +58,36 @@ export const App: LiveComponent<AppProps> = (props) => {
       },
     })
   );
+  
+  const fonts = [
+    {
+      family: 'Lato',
+      weight: 400,
+      style: 'normal',
+      src: '/Lato-Regular.ttf',
+    },
+    {
+      family: 'Lato',
+      weight: 400,
+      style: 'italic',
+      src: '/Lato-Italic.ttf',
+    },
+    {
+      family: 'Lato',
+      weight: 500,
+      style: 'normal',
+      src: '/Lato-Bold.ttf',
+    },
+  ];
 
   return [
       use(AutoCanvas, {
         canvas, device, adapter, samples: 4,
-        children: routes,
+        children: 
+          use(FontLoader, {
+            fonts,
+            children: routes,
+          })
       }),
       inspect ? use(UseInspect, {fiber, canvas}) : null,
   ];

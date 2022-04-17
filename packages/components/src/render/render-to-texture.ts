@@ -1,7 +1,7 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { ColorSpace } from '@use-gpu/core/types';
-import { use, provide, resume, gather, useCallback, useContext, useFiber, useMemo, useOne } from '@use-gpu/live';
+import { use, provide, gather, useCallback, useContext, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
@@ -129,13 +129,13 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     version: 0,
   }), [targetTexture, width, height, format]);
 
-  const Done = resume((ts: Task[]) => {
+  const Done = (ts: Task[]) => {
     usePerFrame();
 
     for (let task of ts) task();
     source.version++;
     return then && then(source);
-  });
+  };
 
   return (
     gather(

@@ -31,6 +31,7 @@ export type RawLabelsProps = {
 
   position?: number[] | TypedArray,
   placement?: number[] | TypedArray,
+  density?: number[] | TypedArray,
   offset?: number,
   size?: number,
   depth?: number,
@@ -45,6 +46,7 @@ export type RawLabelsProps = {
 
   positions?: ShaderSource,
   placements?: ShaderSource,
+  densities?: ShaderSource,
   offsets?: ShaderSource,
   sizes?: ShaderSource,
   depths?: ShaderSource,

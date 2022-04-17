@@ -127,8 +127,8 @@ html > body ::-webkit-scrollbar {
 }
 
 @keyframes mountAnimation {
-  0 { background: rgba(120, 120, 120, 0.9); }
-  100%: { background: rgba(120, 120, 120, 0.0); }
+  0% { background: rgba(120, 120, 120, 0.9); }
+  100% { background: rgba(120, 120, 120, 0.0); }
 }
 
 @keyframes shadeAnimation {

@@ -1,7 +1,7 @@
 import { ShaderModuleDescriptor } from '@use-gpu/core/types';
 import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
 
-import { resolveBindings, linkBundle, getProgramHash } from '@use-gpu/shader/wgsl';
+import { resolveBindings, linkBundle, getHash } from '@use-gpu/shader/wgsl';
 import { makeShaderModule } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
 
@@ -36,11 +36,14 @@ export const useLinkedShader = (
 
   // Link final WGSL
   const shader = useMemo(() => {
+    const [{hash: vh}, {hash: fh}] = modules;
     const v = linkBundle(modules[0], NO_LIBS, defines);
     const f = linkBundle(modules[1], NO_LIBS, defines);
-    const vertex   = makeShaderModule([v, getProgramHash(v)]);
-    const fragment = makeShaderModule([f, getProgramHash(f)]);
+    const vertex   = makeShaderModule(v, getHash(v));
+    const fragment = makeShaderModule(f, getHash(f));
 
+    console.log(vh, fh, '/', vertex.hash, fragment.hash);
+    
     fiber.__inspect = fiber.__inspect || {};
     fiber.__inspect.vertex = v;
     fiber.__inspect.fragment = f;

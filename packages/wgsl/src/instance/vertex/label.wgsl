@@ -74,7 +74,7 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }
 
   // Attach to position
   center = vec4<f32>(center.xy + 2.0 * xy * viewUniforms.viewResolution * center.w, center.zw);
-
+  
   let sdfUV = uv;
   let textureUV = uv;
   let box = rectangle.zw - rectangle.xy;

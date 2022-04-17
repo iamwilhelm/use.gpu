@@ -59,6 +59,7 @@ export const linear = (
   const factors =
     (base % 2 == 0) ? [base / 2, 1, 1 / 2] :
     (base % 3 == 0) ? [base / 3, 1, 1 / 3] :
+    (base % 5 == 0) ? [base / 5, 1, 1 / 5] :
     [1];
  
   const steps = factors.map(f => ref * f);

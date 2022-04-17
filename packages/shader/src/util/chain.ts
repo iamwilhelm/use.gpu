@@ -1,11 +1,14 @@
 import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
-import { loadVirtualModule } from '../util/shader';
-import { getProgramHash } from '../util/hash';
-import { toBundle, getBundleHash, getBundleKey } from '../util/bundle';
-import { bundleToAttribute, toTypeString } from '../util/cast';
+import { loadVirtualModule } from './shader';
+import { getHash } from './hash';
+import { toBundle, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CHAIN } from '../constants';
 
 const NO_SYMBOLS = [] as string[];
+
+export type BundleToAttribute = (
+  bundle: ShaderModule,
+) => UniformAttribute;
 
 export type MakeChainAccessor = (
   type: string,
@@ -17,6 +20,7 @@ export type MakeChainAccessor = (
 
 export const makeChainTo = (
   makeChainAccessor: MakeChainAccessor,
+  bundleToAttribute: BundleToAttribute,
 ) => (
   from: ShaderModule,
   to: ShaderModule,
@@ -30,9 +34,10 @@ export const makeChainTo = (
   const {name: fromName, format: fromFormat, args: fromArgs} = bundleToAttribute(from);
   const {name: toName, format: toFormat, args: toArgs} = bundleToAttribute(to);
 
-  const args = fromArgs?.map(a => toTypeString(a));
-  const check = toArgs?.map(a => toTypeString(a));
-  const type = toTypeString(toFormat);
+  const entry = 'chain';
+
+  const args = fromArgs;
+  const check = toArgs;
 
   if (check?.length !== 1 || check[0] !== fromFormat) {
     throw new Error(`Cannot chain output ${fromFormat} of ${fromName} to args (${check?.join(', ')}) of ${toName}`);
@@ -44,10 +49,10 @@ export const makeChainTo = (
   const k1 = getBundleKey(fBundle);
   const k2 = getBundleKey(tBundle);
 
-  const code    = `@chain [${fromName} ${toName}] [${h1}] [${h2}]`;
-  const rehash  = getProgramHash(code);
-  const rekey   = getProgramHash(`${code} ${k1} ${k2}`);
-  const symbols = ['chain', 'from', 'to'];
+  const code    = `@chain [${entry}] [${h1}] [${h2}]`;
+  const rehash  = getHash(code);
+  const rekey   = getHash(`${code} ${k1} ${k2}`);
+  const symbols = [entry, 'from', 'to'];
 
   const namespace1 = `${PREFIX_CHAIN}${rehash.slice(0, 6)}_1`;
   const namespace2 = `${PREFIX_CHAIN}${rehash.slice(0, 6)}_2`;
@@ -69,16 +74,16 @@ export const makeChainTo = (
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {
-    const name = rename.get('chain') ?? 'chain';
+    const name = rename.get(entry) ?? entry;
     const from = rename.get('from') ?? 'from';
     const to = rename.get('to') ?? 'to';
-    return makeChainAccessor(type, name, args ?? [], from, to);
+    return makeChainAccessor(toFormat, name, args ?? [], from, to);
   }
 
   const chain = loadVirtualModule(
     { render },
     { symbols, modules },
-    'chain',
+    entry,
     rehash,
     code,
     rekey,

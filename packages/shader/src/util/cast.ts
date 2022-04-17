@@ -1,22 +1,20 @@
-import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
-import { loadVirtualModule } from '../util/shader';
-import { getProgramHash } from '../util/hash';
-import { toBundle, getBundleHash, getBundleKey } from '../util/bundle';
+import { ShaderModule, ParsedBundle, UniformAttribute } from '../types';
+import { loadVirtualModule } from './shader';
+import { getHash } from './hash';
+import { toBundle, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CAST } from '../constants';
 
 const NO_SYMBOLS = [] as string[];
-
-type TypeLike = {
-  name: string,
-  type?: TypeLike,
-  args?: TypeLike[],
-};
 
 export type CastTo = {
   basis: string,
   signs?: string,
   gain?: number,
 };
+
+export type BundleToAttribute = (
+  bundle: ShaderModule,
+) => UniformAttribute;
 
 export type MakeCastAccessor = (
   name: string,
@@ -27,15 +25,6 @@ export type MakeCastAccessor = (
   swizzle: string | CastTo,
 ) => string;
 
-export const toTypeString = (t: TypeLike | string): string => {
-  if (typeof t === 'object') {
-    if (t.type) return toTypeString(t.type);
-    if (t.args) return `${t.name}<${t.args.map(t => toTypeString(t)).join(',')}>`;
-    else return t.name;
-  }
-  return t;
-}
-
 const EXTERNALS = [{
   func: {name: 'getValue'},
   flags: 0,
@@ -43,6 +32,7 @@ const EXTERNALS = [{
 
 export const makeCastTo = (
   makeCastAccessor: MakeCastAccessor,
+  bundleToAttribute: BundleToAttribute,
 ) => (
   source: ShaderModule,
   type: string,
@@ -53,27 +43,28 @@ export const makeCastTo = (
   const {module, virtuals} = bundle;
   const {name, format, args} = bundleToAttribute(bundle);
 
+  const entry = 'cast';
+
   const hash = getBundleHash(bundle);
   const key  = getBundleKey(bundle);
 
   const code   = `@cast [${name} ${format}] [${hash}]`;
-  const rehash = getProgramHash(code);
-  const rekey  = getProgramHash(`${code} ${key}`);
+  const rehash = getHash(code);
+  const rekey  = getHash(`${code} ${key}`);
 
-  const symbols = ['cast', 'getValue'];
+  const symbols = [entry, 'getValue'];
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {
-    const name = rename.get('cast') ?? 'cast';
+    const name = rename.get(entry) ?? entry;
     const accessor = rename.get('getValue') ?? 'getValue';
     return makeCastAccessor(name, accessor, args ?? [], format, type, swizzle);
   }
 
-
   const cast = loadVirtualModule(
     { render },
     { symbols, externals: EXTERNALS },
-    'cast',
+    entry,
     rehash,
     code,
     rekey,
@@ -84,27 +75,6 @@ export const makeCastTo = (
     : virtuals;
 
   return {module: cast, links: {getValue: bundle}, virtuals: revirtuals};
-}
-
-export const bundleToAttribute = (
-  bundle: ShaderModule,
-  name?: string,
-): UniformAttribute => {
-  // @ts-ignore
-  const module = bundle.module ?? bundle;
-  const {table: {declarations}} = module;
-
-  const entry = bundle.entry ?? module.entry ?? name;
-
-  for (const fn of declarations) if (fn.func) {
-    const {func} = fn;
-    const {type, name, parameters} = func;
-    if (name === entry) {
-      return {name, format: toTypeString(type), args: parameters};
-    }
-  }
-
-  return {name: name ?? 'main', format: 'void', args: []};
 }
 
 export const parseSwizzle = (swizzle: string | CastTo) => {

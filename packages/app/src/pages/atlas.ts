@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 
-import { fence, gather, use, yeet, resume, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { gather, use, yeet, resume, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   Draw, Pass,
@@ -27,7 +27,7 @@ export const AtlasPage: LiveComponent<AtlasPageProps> = (props) => {
                 use(UI, {
                   children:
                   
-                    fence(
+                    gather(
                       use(Layout, {
                         children:
                           use(Absolute, {
@@ -40,8 +40,10 @@ export const AtlasPage: LiveComponent<AtlasPageProps> = (props) => {
                               use(Inline, {
                                 align: 'justify',
                                 children: [
-                  
-                                  use(Text, { size: 60, snap: false, content: "A simple and efficient method is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware.", color: [0.5, 0.5, 0.5, 1] })
+                
+                                  use(Text, { size: 60, snap: false, content: "A simple and efficient method", weight: "bold", color: [0.5, 0.5, 0.5, 1] }),
+                                                  
+                                  use(Text, { size: 60, snap: false, content: "is", color: [0.5, 0.5, 0.5, 1] }),
                 
                                 ],
                               }),
@@ -49,7 +51,10 @@ export const AtlasPage: LiveComponent<AtlasPageProps> = (props) => {
                             ],
                           }),
                       }),
-                      use(DebugAtlas, {}),
+                      (layout: any) => [
+                        yeet(layout),
+                        use(DebugAtlas, {}),
+                      ],
                     ),
                 }),
             }),

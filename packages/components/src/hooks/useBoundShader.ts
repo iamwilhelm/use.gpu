@@ -9,6 +9,7 @@ type Ref<T> = { current: T };
 
 const NO_SOURCES: any[] = [];
 
+// Bind shader sources/constants/lambdas to a loaded shader module
 export const useBoundShader = (
   shader: ShaderModule,
   defs: UniformAttributeValue[],

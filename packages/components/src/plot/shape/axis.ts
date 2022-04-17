@@ -3,7 +3,7 @@ import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike, Swizzle } from
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShader } from '../../hooks/useBoundShader';
-import { useRawStorage } from '../../hooks/useRawStorage';
+import { useBoundStorage } from '../../hooks/useBoundStorage';
 import { useShaderRef } from '../../hooks/useShaderRef';
 import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
 
@@ -90,9 +90,9 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
     return {segments, anchors, trims};
   }, [n, loop, start, end]);
 
-  const segments = useRawStorage(arrays.segments, 'i32');
-  const anchors = useRawStorage(arrays.anchors, 'vec4<u32>');
-  const trims = useRawStorage(arrays.trims, 'vec4<u32>');
+  const segments = useBoundStorage(arrays.segments, 'i32');
+  const anchors = useBoundStorage(arrays.anchors, 'vec4<u32>');
+  const trims = useBoundStorage(arrays.trims, 'vec4<u32>');
 
   return (
     use(ArrowLayer, {

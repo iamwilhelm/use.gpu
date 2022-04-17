@@ -1,7 +1,7 @@
 import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding } from '../types';
 
 import { parseLinkAliases } from '../util/link';
-import { getProgramHash, makeKey } from '../util/hash';
+import { getHash, makeKey } from '../util/hash';
 import { toBundle, toModule, getBundleHash } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
 import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
@@ -57,8 +57,8 @@ export const bindBundle = (
   for (const k in links) if (links[k]) external.push(getBundleHash(links[k]));
 
   const unique = `@closure [${hash}] [${external.join(' ')}]`;
-  const rehash = getProgramHash(unique);
-  const rekey  = getProgramHash(`${rehash} ${key.toString(16)}`);
+  const rehash = getHash(unique);
+  const rekey  = getHash(`${rehash} ${key.toString(16)}`);
   
   const relinks = bundle.links ? {
     ...bundle.links,
@@ -182,6 +182,14 @@ export const namespaceBinding = (namespace: string, binding: DataBinding) => {
   return {...binding, uniform: {...uniform, name: imp}};
 };
 
-export const getBindingArgument = (binding?: ShaderDefine): string | number =>
-  typeof binding === 'string' ? binding.split(/[()]/)[1] :
-  typeof binding === 'number' ? binding : 'VIRTUAL';
+const VIRTUAL = 'VIRTUAL';
+
+export const getBindingArgument = (binding?: ShaderDefine): string | number => {
+  if (typeof binding === 'string') {
+    const a = binding.indexOf('(');
+    const b = binding.indexOf(')');
+    return binding.slice(a + 1, b);
+  }
+  if (typeof binding === 'number') return binding;
+  return VIRTUAL;
+}

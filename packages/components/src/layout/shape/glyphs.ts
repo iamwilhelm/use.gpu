@@ -18,6 +18,7 @@ export type GlyphsProps = {
   size?: number,
   snap?: boolean,
 
+  font: number[],
   spans: Tuples<3>,
   glyphs: Tuples<2>,
   breaks: number[],
@@ -32,6 +33,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     size = 16,
     snap = false,
 
+    font,
     spans,
     glyphs,
     breaks,
@@ -69,10 +71,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
     let sx = x;
 
-    const ln = [];
     spans.iterate((_a, trim, _h, index) => {
-      glyphs.iterate((id: number, isWhiteSpace: boolean) => {
-        const {glyph, mapping} = getGlyph(id, size);
+      glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: boolean) => {
+        const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, size);
         const {image, layoutBounds, outlineBounds} = glyph;
         const [ll, lt, lr, lb] = layoutBounds;
 
@@ -91,7 +92,6 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
         sx += lr * scale;
         x += lr * scale;
-        ln.push(id);
       }, breaks[index - 1] || 0, breaks[index]);
 
       if (trim) {

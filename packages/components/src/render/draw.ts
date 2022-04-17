@@ -1,6 +1,6 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import {
-  gather, provide, resume, yeet,
+  gather, provide, yeet,
   makeContext, useContext, useNoContext,
 } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
@@ -24,7 +24,7 @@ export const Draw: LiveComponent<DrawProps> = (props) => {
   return gather(children ?? (render ? render() : null), Resume);
 };
 
-const Resume = resume((ts: Task[]) => {
+const Resume = (ts: Task[]) => {
   const {swapView} = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
 
@@ -34,4 +34,4 @@ const Resume = resume((ts: Task[]) => {
   for (let task of ts) task();
 
   if (pickingContext) pickingContext.captureTexture();
-});
+};

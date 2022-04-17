@@ -143,8 +143,12 @@ fn trimAnchor(
   var center4 = viewToClip(centerV);
 
   if (center4.w <= 0.0) {
-    if (ij.x == 0u) { centerV = clipLineIntoView(centerPos, afterPos, near); }
-    if (ij.x != 0u) { centerV = clipLineIntoView(centerPos, beforePos, near); }
+    if (ij.x == 0u) {
+      centerV = clipLineIntoView(centerPos, afterPos, near);
+    }
+    else if (ij.x != 0u) {
+      centerV = clipLineIntoView(centerPos, beforePos, near);
+    }
     else {
       return SolidVertex(
         vec4(NaN, NaN, NaN, NaN),

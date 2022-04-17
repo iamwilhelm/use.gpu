@@ -3,7 +3,6 @@ import {
   ShaderModuleDescriptor, StorageSource, DataBinding, TextureSource, LambdaSource,
 } from './types';
 import { makeStorageAccessors, checkStorageTypes, checkStorageType } from './storage';
-import { makeShaderModule } from './pipeline';
 import partition from 'lodash/partition';
 
 // Parse a set of sources for a given set of uniforms/attributes

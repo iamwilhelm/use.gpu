@@ -2,8 +2,8 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
-import { useRawStorage } from '../../hooks/useRawStorage';
 import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
+import { diffBy } from '@use-gpu/shader/wgsl';
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import {
@@ -14,18 +14,26 @@ import {
 import {
   useAnchorTrait,
   useColorTrait,
+  useFontTrait,
   useLabelTrait,
   useROPTrait,
 } from '../traits';
+import {
+  AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait,
+} from '../types';
 import { formatNumber } from '../util/format';
 import { vec4 } from 'gl-matrix';
 
 import { LabelLayer } from '../../layers/label-layer';
 
 export type LabelProps =
+  Partial<AnchorTrait> &
   Partial<ColorTrait> &
+  Partial<FontTrait> &
   Partial<LabelTrait> &
   Partial<ROPTrait>;
+
+const DENSITY_BINDING = [{ name: 'getDensity', type: 'vec4<f32>', value: [0, 0, 0, 0] }];
 
 export const Label: LiveComponent<LabelProps> = (props) => {
 
@@ -34,6 +42,7 @@ export const Label: LiveComponent<LabelProps> = (props) => {
 
   const count = useCallback(() => positions.length, [positions]);
 
+  const {family, weight, style} = useFontTrait(props);
   const {labels, format, size, depth, expand} = useLabelTrait(props);
   const {placement, flip, offset} = useAnchorTrait(props);
   const color = useColorTrait(props);
@@ -53,6 +62,10 @@ export const Label: LiveComponent<LabelProps> = (props) => {
   return (
     use(LabelLayer, {
       labels: strings,
+      family,
+      weight,
+      style,
+
       positions,
       placement,
       flip,

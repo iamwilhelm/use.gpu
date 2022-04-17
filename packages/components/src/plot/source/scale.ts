@@ -7,7 +7,7 @@ import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion
 
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
-import { useRawStorage } from '../../hooks/useRawStorage';
+import { useBoundStorage } from '../../hooks/useBoundStorage';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useShaderRef } from '../../hooks/useShaderRef';
 
@@ -53,7 +53,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   }, [r[0], r[1], props]);
 
   const values = useMemo(() => newValues, newValues);
-  const data = useRawStorage(values, UniformType.f32);
+  const data = useBoundStorage(values, UniformType.f32);
   const n = values.length;
 
   // Make tick vertex shader

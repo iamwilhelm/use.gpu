@@ -5,7 +5,17 @@ import { useOne } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
-type Keyframe = [number, T, T?, T?];
+type Ease = 'cosine' | 'linear' | 'zero' | 'auto' | 'bezier';
+
+type Keyframe = [
+  number,
+  T,
+  Ease,
+  [number, number] | null | undefined,
+  [number, number] | null | undefined,
+  T | null | undefined,
+  T | null | undefined,
+];
 
 export type AnimationProps<T> = {
   loop?: boolean,
@@ -68,7 +78,12 @@ const interpolateValue = <T>(a: Arg<T>, b: Arg<T>, t: number) => {
 const injectProp = (prop: string, value: any) => (call: DeferredCall<any>) => {
   if (call.args) {
     const [props] = call.args;
-    if (props) props[prop] = value;
+    if (props) {
+      call.args = [{
+        ...props,
+        [prop]: value,
+      }];
+    }
   }
   return call;
 };
@@ -128,7 +143,7 @@ export const Animation: LiveComponent<AnimationProps<unknown>> = <T>(props: Anim
   if (value == null) return null;
   if (render) return render(value);
   if (children && prop) {
-    const list = children.f ? [children] : children;
+    const list = children.f ? [children] : children.slice();
     list.map(injectProp(prop, value));
     return list;
   }

@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, Point, Dimension, Margin } from '../types';
 
-import { memo, gather, resume, yeet, useOne } from '@use-gpu/live';
+import { memo, gather, yeet, useOne } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { normalizeMargin, makeBoxLayout, parseDimension, memoFit } from '../lib/util';
 
@@ -37,21 +37,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const margin = normalizeMargin(m);
   const padding = normalizeMargin(p);
 
-  const Resume = makeResume(direction, width, height, grow, shrink, snap, margin, padding);
-  return children ? gather(children, Resume) : null;
-}, 'Block');
-
-const makeResume = (
-  direction: 'x' | 'y',
-  width: Dimension | undefined,
-  height: Dimension | undefined,
-  grow: number,
-  shrink: number,
-  snap: boolean,
-  blockMargin: Margin,
-  padding: Margin,
-) =>
-  resume((els: LayoutElement[]) => {
+  const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
 
@@ -81,4 +67,7 @@ const makeResume = (
         };
       })
     });
-  });
+  };
+  
+  return children ? gather(children, Resume) : null;
+}, 'Block');

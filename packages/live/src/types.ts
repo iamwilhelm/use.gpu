@@ -144,6 +144,7 @@ export type HostInterface = {
 
   // Track a future cleanup on a fiber
   track: (fiber: LiveFiber<any>, task: Task) => void,
+  untrack: (fiber: LiveFiber<any>, task: Task) => void,
 
   // Dispose of a fiber by running all tracked cleanups
   dispose: (fiber: LiveFiber<any>) => void,

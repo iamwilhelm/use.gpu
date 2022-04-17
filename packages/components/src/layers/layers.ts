@@ -3,7 +3,7 @@ import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gp
 import { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, RectangleAggregate, LayerType } from './types';
 
 import { RenderContext } from '../providers/render-provider';
-import { use, keyed, resume, multiGather, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, multiGather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -37,12 +37,11 @@ export const Layers: LiveComponent<AggregateProps> = (props) => {
   return multiGather(children, Resume);
 };
 
-const Resume = resume((aggregates: Record<string, LayerAggregate[]>) => 
+const Resume = (aggregates: Record<string, LayerAggregate[]>) => 
   Object.keys(AGGREGATORS).map((type: string) => {
     const makeAggregator = AGGREGATORS[type]!;
     return aggregates[type] ? keyed(Layer, type, makeAggregator, aggregates[type]) : null;
-  })
-);
+  });
 
 const Layer: LiveFunction<any> = (
   makeAggregator: LayerAggregator,

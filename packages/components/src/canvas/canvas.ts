@@ -4,7 +4,7 @@ import { ColorSpace } from '@use-gpu/core/types';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLOR } from '../constants';
 
 import { EventProvider, RenderContext, DeviceContext } from '../providers';
-import { provide, use, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { provide, use, imperative, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { makePresentationContext } from '@use-gpu/webgpu';
 import {
   makeColorState,
@@ -35,7 +35,7 @@ export type CanvasProps = {
 
 const getPixelRatio = () => typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
-export const Canvas: LiveComponent<CanvasProps> = (props) => {
+export const Canvas: LiveComponent<CanvasProps> = imperative((props) => {
   const {
     device,
     canvas,
@@ -120,4 +120,4 @@ export const Canvas: LiveComponent<CanvasProps> = (props) => {
       )
     )
   );
-}
+}, 'Canvas')

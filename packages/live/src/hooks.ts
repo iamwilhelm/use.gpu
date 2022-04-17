@@ -160,7 +160,7 @@ export const useState = <T>(
   let value    = state![i];
   let setValue = state![i + 1];
 
-  if (value === undefined) {
+  if (setValue === undefined) {
     value = (initialState instanceof Function) ? initialState() : initialState;
     setValue = host
       ? (value: Reducer<T>) => {
@@ -275,7 +275,7 @@ export const useResource = <R>(
   const i = pushState(fiber, Hook.RESOURCE);
   let {state, host} = fiber;
 
-  let {tag} = state![i] || NO_RESOURCE;
+  let {tag} = state![i] ?? NO_RESOURCE;
   const deps = state![i + 1];
 
   if (!isSameDependencies(deps, dependencies)) {
@@ -307,8 +307,11 @@ export const useNoResource = () => {
   const i = pushState(fiber, Hook.RESOURCE);
   let {state, host} = fiber;
 
-  let {tag} = state![i] || NO_RESOURCE;
-  if (tag) tag(null);
+  let {tag} = state![i] ?? NO_RESOURCE;
+  if (tag) {
+    tag(null);
+    if (host) host.untrack(fiber, tag);
+  }
 
   state![i] = undefined;
   state![i + 1] = undefined;
@@ -423,7 +426,7 @@ export const useNoVersion = useNoHook(Hook.VERSION);
 
 // Async wrapper
 export const useAsync = <T>(f: () => Promise<T>, deps: any[] = NO_DEPS): T | null => {
-  const [value, setValue] = useState<T | null>(null);
+  const [value, setValue] = useState<T | undefined>(undefined);
 
   const ref = useResource((dispose) => {
     let cancelled = false;

@@ -5,10 +5,14 @@ import { Alignment } from '../layout/types';
 import { memo, yeet, useContext, useOne } from '@use-gpu/live';
 import { makeTuples } from '@use-gpu/core';
 
-import { useFontText, useFontHeight } from './providers/font-provider';
+import { useFontFamily, useFontText, useFontHeight } from './providers/font-provider';
 import { useSDFGlyphData } from './providers/sdf-font-provider';
 
 type GlyphSourceProps = {
+  family?: string,
+  weight?: string | number,
+  style?: string,
+
   strings: string[] | string,
   lineHeight?: number,
   align?: Alignment,
@@ -23,6 +27,10 @@ const NO_LAYOUT: Rectangle = [0, 0, 0, 0];
 
 export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSourceProps) => {
   const {
+    family,
+    weight,
+    style,
+
     strings,
     lineHeight,
     align = 'center',
@@ -33,8 +41,9 @@ export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSo
     render,
   } = props;
 
-  const {spans, breaks, glyphs} = useFontText(strings, size);
-  const height = useFontHeight(size, lineHeight);
+  const font = useFontFamily(family, weight, style);
+  const {spans, breaks, glyphs} = useFontText(font, strings, size);
+  const height = useFontHeight(font, size, lineHeight);
 
   const data = useSDFGlyphData(
     NO_LAYOUT,

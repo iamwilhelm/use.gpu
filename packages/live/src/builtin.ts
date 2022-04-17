@@ -5,7 +5,7 @@ import {
 } from './types';
 
 import { compareFibers } from './util';
-import { makeFiber, getCurrentFiberID, resume } from './fiber';
+import { makeFiber, getCurrentFiberID, makeStaticContinuation, makeImperativeFunction } from './fiber';
 
 export const MORPH        = () => {};
 export const DETACH       = () => {};
@@ -30,6 +30,8 @@ export const DEBUG        = () => {};
 (DEBUG        as any).isLiveBuiltin = true;
 
 (FRAGMENT     as any).isLiveInline = true;
+
+// Inline render ops
 
 // use a call to a live function
 export const use = <F extends Function>(
@@ -72,7 +74,7 @@ export const fragment = (
   return ({f: FRAGMENT, args: [calls], key});
 }
 
-// Reconcile an array of calls
+// Wrap a fragment in a debug node to mark it
 export const debug = (
   calls: LiveElement<any>,
   key?: Key,
@@ -130,11 +132,14 @@ export const consume = <T, C>(
 export const fence = <T>(before: LiveElement<any>, after: LiveElement<any>) =>
   gather(
     before,
-    resume((value: T) => [
+    (value: T) => [
       yeet(value),
       after,
-    ])
+    ]
   );
+
+// Static component decorators
+export const imperative = makeImperativeFunction;
 
 // Make live context for holding shared data for child nodes
 interface MakeContext<T> {

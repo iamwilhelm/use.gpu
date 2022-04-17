@@ -154,7 +154,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     const f = bindBundle(fragmentShader, links, undefined, key);
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment]);
-
+  
   // Inline the render fiber to avoid another memo()
   return render({
     vertexCount,

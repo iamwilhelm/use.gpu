@@ -192,6 +192,10 @@ export const makeParseMap = <T>(map: Record<string, T>, def: string) => {
   return (s: string) => map[s] ?? map[def]!;
 };
 
+export const makeParseMapOrValue = <T>(map: Record<string, T>, def: string): T => {
+  return (s: string | T) => map[s] ?? (s as any as T) ?? map[def]!;
+};
+
 //////////////////
 
 export const parseColor      = makeParseColor();
@@ -243,3 +247,15 @@ export const parsePlacement  = makeParseMap({
   'bottomLeft':  vec2.fromValues(1,  1),
   'bottomRight': vec2.fromValues(1, -1),
 }, 'center');
+
+export const parseWeight = makeParseMapOrValue({
+  'thin': 100,
+  'extra-light': 200,
+  'light': 300,
+  'normal': 400,
+  'medium': 500,
+  'semi-bold': 600,
+  'bold': 700,
+  'extra-bold': 800,
+  'ultra-bold': 900,
+}, 'normal');

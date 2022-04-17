@@ -127,11 +127,13 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
 
       waiting = true;
       await pickingBuffer.mapAsync(GPUMapMode.READ);
+
       const ArrayType = TEXTURE_ARRAY_TYPES[pickingFormat];
       if (ArrayType) {
         const array = new ArrayType(pickingBuffer.getMappedRange());
         captured = array.slice();
       }
+
       pickingBuffer.unmap();
       waiting = false;
     }

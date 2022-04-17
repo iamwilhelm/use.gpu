@@ -1,6 +1,6 @@
 import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types';
 
-import { getProgramHash, makeKey, mixBits, scrambleBits } from '../util/hash';
+import { getHash, makeKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
@@ -18,7 +18,6 @@ const getBindingsKey = (bs: DataBinding[]) => scrambleBits(bs.reduce((a, b) => m
 
 export const makeBindingAccessors = (
   bindings: DataBinding[],
-  key: string | number = makeKey(),
 ): Record<string, ParsedBundle | ParsedModule> => {
 
   // Extract uniforms by type
@@ -48,8 +47,7 @@ export const makeBindingAccessors = (
   const external = lambdas.map(l => getBundleHash(l.lambda!.shader));
   const unique = `@access [${signature}] [${external}] [${readable}] [${types.join(' ')}]`;
 
-  const hash  = getProgramHash(unique);
-  const rekey = getProgramHash(`${hash} ${key.toString(16)}`);
+  const hash  = getHash(unique);
   const code  = `@access [${readable}] [${hash}]`;
 
   // Code generator
@@ -81,7 +79,7 @@ export const makeBindingAccessors = (
   }, {
     symbols,
     declarations,
-  }, undefined, hash, code, rekey);
+  }, undefined, hash, code);
 
   const links: Record<string, ParsedBundle | ParsedModule> = {};
   for (const binding of constants) links[binding.uniform.name] = virtual;

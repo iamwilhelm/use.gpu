@@ -1,6 +1,6 @@
 import { Tree } from '@lezer/common';
 import { ASTParser, VirtualTable, SymbolTable, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
-import { getProgramHash, makeKey } from './hash';
+import { getHash, makeKey } from './hash';
 import { decompressAST } from './tree';
 import { PREFIX_VIRTUAL } from '../constants';
 
@@ -29,7 +29,7 @@ export const makeLoadModule = <T>(
 
   if (compressed) tree = decompressAST(compressAST(code, tree));
 
-  const hash = getProgramHash(code);
+  const hash = getHash(code);
 
   return {name, code, hash, table, entry, shake, tree};
 }
@@ -46,7 +46,7 @@ export const makeLoadModuleWithCache = (
 ): ParsedModule => {
   if (!cache) return loadModule(code, name, entry, true);
 
-  const hash = getProgramHash(code);
+  const hash = getHash(code);
   const cached = cache.get(hash);
   if (cached) return {...cached, entry};
   
@@ -57,7 +57,7 @@ export const makeLoadModuleWithCache = (
 
 // Load a static (inert) module
 export const loadStaticModule = (code: string, name: string, entry?: string) => {
-  const hash = getProgramHash(code);
+  const hash = getHash(code);
   return { name, code, hash, entry, table: EMPTY_TABLE };
 }
 
@@ -73,9 +73,10 @@ export const loadVirtualModule = <T extends SymbolTable = any>(
   let symbols = initTable.symbols ?? EMPTY_LIST;
 
   code = code ?? `@virtual [${symbols.join(' ')}]`;
-  hash = hash ?? getProgramHash(code);
+  hash = hash ?? getHash(code);
+  key  = key  ?? hash;
 
-  const name = `${PREFIX_VIRTUAL}${hash.slice(0, 6)}_`;
+  const name = `${PREFIX_VIRTUAL}${key.slice(0, 6)}`;
 
   const table = {
     symbols,

@@ -1,6 +1,5 @@
 import { makeCastTo, parseSwizzle, CastTo } from '../util/cast';
-
-export { bundleToAttribute } from '../util/cast';
+import { bundleToAttribute } from './shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
@@ -62,4 +61,4 @@ export const makeSwizzle = (
   return ret;
 }
 
-export const castTo = makeCastTo(makeCastAccessor);
+export const castTo = makeCastTo(makeCastAccessor, bundleToAttribute);

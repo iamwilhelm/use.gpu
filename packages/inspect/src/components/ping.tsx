@@ -39,6 +39,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
         let s = map.get(fiber.id);
         if (!s) {
           map.set(fiber.id, s = new Set<ArrowFunction>());
+					console.log('subscribe', fiber.id);
         }
         s.add(f);
       },
@@ -105,6 +106,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
     };
 
     fiber.host.__ping = (fiber: LiveFiber<any>, active: boolean = true) => {
+			console.log('ping', fiber.id);
       version = incrementVersion(version);
 
       const v = versions.get(fiber.id);

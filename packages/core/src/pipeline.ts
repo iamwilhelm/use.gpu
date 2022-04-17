@@ -6,7 +6,8 @@ import {
 import { patch } from '@use-gpu/state';
 
 export const makeShaderModule = (
-  [code, hash]: [TypedArray | string, number | string],
+  code: TypedArray | string,
+  hash: string,
   entryPoint: string = 'main'
 ): ShaderModuleDescriptor => ({code, hash, entryPoint});
 
@@ -36,7 +37,6 @@ export const makeRenderPipeline = (
       targets: colorStates,
     }),
   }, descriptor) as any as GPURenderPipelineDescriptor;
-  console.log(pipelineDescriptor)
 
   return device.createRenderPipeline(pipelineDescriptor);
 }

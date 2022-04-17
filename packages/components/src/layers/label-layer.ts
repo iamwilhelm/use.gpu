@@ -3,13 +3,14 @@ import { TypedArray, Prop, RenderPassMode } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 import { SDFGlyphData } from '../text/types';
 
-import { use, keyed, wrap, memo, debug, fence, provide, resume, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, keyed, wrap, memo, debug, fence, provide, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useRawStorage } from '../hooks/useRawStorage';
+import { useBoundStorage } from '../hooks/useBoundStorage';
 
+import { useFontFamily } from '../text/providers/font-provider';
 import { SDFFontProvider } from '../text/providers/sdf-font-provider';
 import { DebugAtlas } from '../text/debug-atlas';
 import { GlyphSource } from '../text/glyph-source';
@@ -40,6 +41,10 @@ export type LabelLayerProps = {
   label?: string,
   labels?: string[],
 
+  family?: string,
+  weight?: string | number,
+  style?: string,
+
   detail?: number,
   count?: Prop<number>,
   mode?: RenderPassMode | string,
@@ -64,9 +69,15 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     colors,
     expand,
     expands,
+    density,
+    densities,
 
     label,
     labels,
+
+    family,
+    weight,
+    style,
 
     sdfRadius,
     detail,
@@ -82,20 +93,23 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
       radius: sdfRadius,
       children:
         use(GlyphSource, {
+          family,
+          weight,
+          style,
           strings: labels ?? [label],
           size: detail,
         }),
       then:
-        resume((
+        (
           atlas: Atlas,
           source: TextureSource,
           [data] : [SDFGlyphData],
         ) => {
           const {sdf} = data;
-          const indices = useRawStorage(data.indices, 'u32');
-          const rectangles = useRawStorage(data.rectangles, 'vec4<f32>');
-          const layouts = useRawStorage(data.layouts, 'vec2<f32>');
-          const uvs = useRawStorage(data.uvs, 'vec4<f32>');
+          const indices = useBoundStorage(data.indices, 'u32');
+          const rectangles = useBoundStorage(data.rectangles, 'vec4<f32>');
+          const layouts = useBoundStorage(data.layouts, 'vec2<f32>');
+          const uvs = useBoundStorage(data.uvs, 'vec4<f32>');
 
           return ([
             //debug(wrap(Flat, wrap(UI, use(DebugAtlas, {atlas, source})))),
@@ -121,13 +135,15 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
               colors,
               expand,
               expands,
+              density,
+              densities,
 
               count,
               mode,
               id,
             })
           ]);
-        }),
+        },
     })
   );
 }, 'LabelLayer');

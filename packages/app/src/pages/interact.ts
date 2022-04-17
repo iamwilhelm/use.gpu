@@ -27,7 +27,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
 
             gather([
               use(RawTexture, { data: texture }),
-            ], resume(([texture]: [TextureSource]) =>
+            ], ([texture]: [TextureSource]) =>
 
               use(Flat, {
                 children:
@@ -120,7 +120,7 @@ export const InteractPage: LiveComponent<InteractPageProps> = (props) => {
                         })
                     })
                 })
-            ))
+            )
         }),
     })
 

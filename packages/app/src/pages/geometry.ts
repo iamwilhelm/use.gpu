@@ -72,6 +72,13 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
         use(Pass, {
           children: [
             use(Data, {
+              fields: [
+                ['vec4<f32>', [-5, 0, 0, 1, 5, 0, 0, 1]],
+                ['u32', [1, 2]],
+              ],
+              render: ([positions, segments]) => use(LineLayer, { positions, segments, width: 30, depth: 1 }),
+            }),
+            use(Data, {
               fields: lineFields,
               render: ([positions, segments, sizes]: StorageSource[]) => [
                 use(LineLayer, { positions, segments, width: 50, join: 'round' }),

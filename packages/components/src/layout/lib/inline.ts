@@ -193,13 +193,6 @@ export const fitInline = (
   
   const size = isX ? [into[0], caretCross] : [caretCross, into[1]];
   
-  console.log({
-    size,
-    ranges,
-    offsets,
-    renders,
-  })
-  
   return {
     size,
     ranges,

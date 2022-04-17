@@ -35,7 +35,6 @@ export const RustText = async (): Promise<RustTextAPI> => {
     keys.forEach((k, i) => {
       if (!fontMap.has(k)) {
         const font = fonts[i];
-        console.log('load font', k, font);
         useRustText.load_font(k, new Uint8Array(font.buffer));
         fontMap.set(k, font.props);
       }
@@ -44,7 +43,6 @@ export const RustText = async (): Promise<RustTextAPI> => {
     
     for (const k of remove.keys()) {
       fontMap.delete(k);
-      console.log('unload font', k);
       useRustText.unload_font(k);
     }
   }
@@ -59,8 +57,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
       weight = 400,
       style = 'normal',
     } = font;
-    console.log('--------')
-    console.log({family, weight, style})
+
     for (const k of fontMap.keys()) {
       const font = fontMap.get(k)!;
       const {family: f, style: s, weight: w} = font;
@@ -69,8 +66,6 @@ export const RustText = async (): Promise<RustTextAPI> => {
       if (f === family) score += 2;
       if (s === style) score += 1;
       score += Math.min(weight / w, w / weight);
-
-      console.log({font, score})
       
       if (score > max) {
         max = score;
@@ -81,7 +76,10 @@ export const RustText = async (): Promise<RustTextAPI> => {
     return best;
   }
   
-  const resolveFontStack = (fonts: Partial<FontProps>[]): number[] => fonts.map(resolveFont).filter(x => x != null) as number[];
+  const resolveFontStack = (fonts: Partial<FontProps>[]): number[] => {
+    const stack = fonts.map(resolveFont).filter(x => x != null) as number[];
+    return stack.length ? stack : [0];
+  }
 
   const measureFont = (fontId: number, size: number): FontMetrics => {
     return useRustText.measure_font(fontId, size);
@@ -100,7 +98,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
     return useRustText.measure_glyph(fontId, glyphId, size);
   }
   
-  return {measureFont, measureSpans, measureGlyph, packString, packStrings, resolveFont, resolveFontStack, setFonts};
+  return {measureFont, measureSpans, measureGlyph, resolveFont, resolveFontStack, setFonts};
 }
 
 export const packStrings = (strings: string[] | string): Uint16Array => {

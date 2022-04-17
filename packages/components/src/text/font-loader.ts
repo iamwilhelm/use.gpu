@@ -17,7 +17,6 @@ export const FontLoader: LiveComponent<FontLoaderProps> = ({fonts, children}) =>
     keyed(Fetch, getHash(source), {
       url: source.src,
       type: 'buffer',
-      loading: null,
       render: (buffer: ArrayBuffer) => yeet({props: source, buffer}),
     })
   ), fonts);

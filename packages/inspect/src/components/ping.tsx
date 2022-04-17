@@ -29,6 +29,7 @@ type PingEntry = [number, ArrowFunction[]];
 export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => {
    const [map, versions, all, api] = useMemo(() => {
     const map = new Map<number, Set<ArrowFunction>>();
+
     const versions = new Map<number, number>();
     const all = new Set<ArrowFunction>();
 
@@ -39,7 +40,9 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
         let s = map.get(fiber.id);
         if (!s) {
           map.set(fiber.id, s = new Set<ArrowFunction>());
-					console.log('subscribe', fiber.id);
+
+          if (!fiber.version) fiber.version = 0;
+          versions.set(fiber.id, fiber.version);
         }
         s.add(f);
       },
@@ -77,7 +80,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
       
       const seen = new Set<number>();
 
-			ReactDOM.unstable_batchedUpdates(() => {
+      ReactDOM.unstable_batchedUpdates(() => {
 
         for (const [id, active] of q) {
           seen.add(id);
@@ -106,7 +109,6 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
     };
 
     fiber.host.__ping = (fiber: LiveFiber<any>, active: boolean = true) => {
-			console.log('ping', fiber.id);
       version = incrementVersion(version);
 
       const v = versions.get(fiber.id);

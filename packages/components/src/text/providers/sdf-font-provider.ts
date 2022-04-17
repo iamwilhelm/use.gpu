@@ -161,6 +161,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
 // Return data buffers with glyph rectangles
 export const useSDFGlyphData = (
   layout: Rectangle,
+  font: number[],
   spans: Tuples<3>,
   glyphs: Tuples<2>,
   breaks: number[],
@@ -228,7 +229,7 @@ export const useSDFGlyphData = (
         lastIndex = index;
       }
 
-      emitGlyphSpans(context, currentLayout, index, spans, glyphs, breaks, start, end, size, gap, lead, snap, emit);
+      emitGlyphSpans(context, currentLayout, index, font, spans, glyphs, breaks, start, end, size, gap, lead, snap, emit);
       currentLayout[1] += lineHeight;
     });
 

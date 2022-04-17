@@ -121,6 +121,8 @@ export const makeInlineLayout = (
     const el = render(lines);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
+
+    lines = [];
   };
   
   for (let i = 0; i < n; ++i) {

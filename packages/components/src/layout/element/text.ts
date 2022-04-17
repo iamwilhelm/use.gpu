@@ -7,7 +7,7 @@ import { keyed, yeet, useContext, useFiber, useOne, useMemo } from '@use-gpu/liv
 import { makeTuples, emitIntoNumberArray } from '@use-gpu/core';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
-import { FontContext, useFontFamily, useFontText, useFontHeight } from '../../text/providers/font-provider';
+import { useFontFamily, useFontText, useFontHeight } from '../../text/providers/font-provider';
 import { Glyphs } from '../shape/glyphs';
 
 export type TextProps = {
@@ -52,11 +52,9 @@ export const Text: LiveComponent<TextProps> = (props) => {
     children,
   } = props;
 
-  const gpuText = useContext(FontContext);
-
   const strings = children ?? content;
 
-  const font = useFontFamily(family, style, weight);
+  const font = useFontFamily(family, weight, style);
   const {spans, glyphs, breaks} = useFontText(font, strings, size);
   const height = useFontHeight(font, size, lineHeight);
 

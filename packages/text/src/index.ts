@@ -1,4 +1,4 @@
-import { Font, FontMetrics, SpanMetrics, GlyphMetrics, RustTextAPI } from './types';
+import { Font, FontProps, FontMetrics, SpanMetrics, GlyphMetrics, RustTextAPI } from './types';
 import { getHashValue } from '@use-gpu/state';
 
 export { glyphToRGBA, glyphToSDF, padRectangle } from './sdf';
@@ -12,7 +12,7 @@ const DEFAULT_FONTS = {
     weight: 400,
     style: 'normal',
   },
-};
+} as Record<string, FontProps>;
 
 export const RustText = async (): Promise<RustTextAPI> => {
   if (!UseRustText) {
@@ -23,7 +23,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
   // @ts-ignore
   const useRustText = UseRustText.new();
 
-  let fontMap = new Map<number, Font>();
+  let fontMap = new Map<number, FontProps>();
   for (let k in DEFAULT_FONTS) fontMap.set(+k, DEFAULT_FONTS[k]);
 
   const setFonts = (fonts: Font[]) => {
@@ -37,7 +37,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
         const font = fonts[i];
         console.log('load font', k, font);
         useRustText.load_font(k, new Uint8Array(font.buffer));
-        fontMap.set(k, font);
+        fontMap.set(k, font.props);
       }
       else remove.delete(k);
     });
@@ -49,33 +49,31 @@ export const RustText = async (): Promise<RustTextAPI> => {
     }
   }
 
-  const resolveFont = (font: Partial<Font>): number => {
-    let matches = [] as Font[];
-    let almosts = [] as Font[];
+  const resolveFont = (font: Partial<FontProps>): number => {
+
+    let best: number | null = null;
+    let max = 0;
 
     const {
-      family = 'sans-serif',
+      family = '',
       weight = 400,
       style = 'normal',
     } = font;
+    console.log('--------')
+    console.log({family, weight, style})
     for (const k of fontMap.keys()) {
       const font = fontMap.get(k)!;
+      const {family: f, style: s, weight: w} = font;
 
-      const match = font.family === family && font.style === style;
-      const almost = font.family === family;
-      if (match) matches.push(k);
-      if (almost) almosts.push(k);
-    }
+      let score = 0;
+      if (f === family) score += 2;
+      if (s === style) score += 1;
+      score += Math.min(weight / w, w / weight);
 
-    const candidates = matches.length ? matches : almosts;
-
-    let best: number | null = null;
-    let distance = Infinity;
-    for (const k of candidates) {
-      const f = fontMap.get(k)!;
-      let d = Math.min(weight / f.weight, f.weight / weight);
-      if (d < distance) {
-        distance = d;
+      console.log({font, score})
+      
+      if (score > max) {
+        max = score;
         best = k;
       }
     }
@@ -83,7 +81,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
     return best;
   }
   
-  const resolveFontStack = (fonts: Partial<Font>[]): number[] => fonts.map(resolveFont).filter(x => x != null) as number[];
+  const resolveFontStack = (fonts: Partial<FontProps>[]): number[] => fonts.map(resolveFont).filter(x => x != null) as number[];
 
   const measureFont = (fontId: number, size: number): FontMetrics => {
     return useRustText.measure_font(fontId, size);
@@ -106,10 +104,9 @@ export const RustText = async (): Promise<RustTextAPI> => {
 }
 
 export const packStrings = (strings: string[] | string): Uint16Array => {
-  let ss: string[];
-  if (!Array.isArray(strings)) ss = [strings];
-  else ss = strings;
+  if (!Array.isArray(strings)) return packString(strings);
 
+  const ss: string[] = strings;
   const c = ss.length;
   const n = ss.reduce((a, b) => a + b.length, 0);
 
@@ -129,4 +126,17 @@ export const packStrings = (strings: string[] | string): Uint16Array => {
   return array;
 };
 
-export const packString = packStrings;
+export const packString = (s: string): Uint16Array => {
+  const n = s.length;
+
+  let pos = 0;
+  const array = new Uint16Array(n);
+  for (let i = 0; i < n; ++i) {
+    const c = s.charCodeAt(i);
+    if (c !== 0) {
+      array[pos++] = c;
+    }
+  }
+
+  return array;
+};

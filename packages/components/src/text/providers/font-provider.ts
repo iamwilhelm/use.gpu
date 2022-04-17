@@ -1,8 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { RustTextAPI } from '@use-gpu/text/types';
+import { Font } from '../types';
 
 import { provide, useAsync, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';
-import { Font } from '../types';
+import { parseWeight } from '../../plot/util/parse';
 import { makeTuples } from '@use-gpu/core';
 import { RustText } from '@use-gpu/text';
 
@@ -38,7 +39,8 @@ export const useFontFamily = (
 
   return useMemo(() => {
     const families = family != null ? family.split(/\s*,\s*/g).filter(s => s !== '') : [undefined];
-    return resolveFontStack(families.map(family => ({family, weight, style})));
+    const w = parseWeight(weight);
+    return resolveFontStack(families.map(family => ({family, weight: w, style})));
   }, [family, weight, style, resolveFontStack]);
 }
 

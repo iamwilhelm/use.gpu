@@ -70,7 +70,6 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     let y = t + base;
 
     let sx = x;
-
     spans.iterate((_a, trim, _h, index) => {
       glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: boolean) => {
         const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, size);
@@ -86,6 +85,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
             rects.push((scale * gl) + cx, (scale * gt) + cy, (scale * gr) + cx, (scale * gb) + cy);
             uvs.push(mapping[0], mapping[1], mapping[2], mapping[3]);
+
             count++;
           }
         }

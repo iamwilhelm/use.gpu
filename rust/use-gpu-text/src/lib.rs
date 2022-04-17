@@ -2,8 +2,9 @@ use wasm_bindgen::prelude::*;
 use serde::{Serialize};
 use serde_wasm_bindgen;
 use std::string::String;
+use std::collections::HashMap;
 
-use ab_glyph::{Font, FontArc, Glyph, GlyphId, Point, PxScale, ScaleFont};
+use ab_glyph::{Font, FontArc, Glyph, GlyphId, Point, PxScale, PxScaleFont, ScaleFont};
 use xi_unicode::LineBreakIterator;
 
 #[cfg(feature = "wee_alloc")]
@@ -20,8 +21,8 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub struct UseGPUText {
-    fonts: Vec<FontArc>,
+pub struct UseRustText {
+    font_map: HashMap<u64, FontArc>,
 }
 
 #[derive(Serialize)]
@@ -35,9 +36,12 @@ pub struct FontMetrics {
 
 #[derive(Serialize)]
 pub struct SpanMetrics {
-    breaks: Vec::<u32>,
-    metrics: Vec::<f32>,
-    glyphs: Vec::<u32>,
+    #[serde(with = "serde_bytes")]
+    breaks: Vec::<u8>,
+    #[serde(with = "serde_bytes")]
+    metrics: Vec::<u8>,
+    #[serde(with = "serde_bytes")]
+    glyphs: Vec::<u8>,
 }
 
 #[derive(Serialize)]
@@ -57,19 +61,39 @@ pub struct GlyphMetrics {
 }
 
 #[wasm_bindgen]
-impl UseGPUText {
-    pub fn new() -> UseGPUText {
+impl UseRustText {
+    pub fn new() -> UseRustText {
         let ttf = include_bytes!("../../../public/Lato-Regular.ttf") as &[u8];
         let font = FontArc::try_from_slice(ttf).unwrap();
-        let fonts = vec!(font);
 
-        UseGPUText {
-            fonts,
+        let mut font_map = HashMap::new();
+        font_map.insert(0, font);
+
+        UseRustText {
+            font_map,
         }
     }
 
-    pub fn measure_font(&mut self, size: f32) -> Result<JsValue, JsValue> {
-        let font = self.fonts[0].as_scaled(size);
+    pub fn load_font(&mut self, key: f64, ttf: Vec<u8>) -> Result<JsValue, JsValue> {
+        let k = key as u64;
+        let font = FontArc::try_from_vec(ttf).unwrap();
+        self.font_map.insert(k, font);
+
+    	let js_value = serde_wasm_bindgen::to_value(&key)?;
+        Ok(js_value)
+    }
+
+    pub fn unload_font(&mut self, key: f64) -> Result<JsValue, JsValue> {
+        let k = key as u64;
+        self.font_map.remove(&k);
+
+    	let js_value = serde_wasm_bindgen::to_value(&key)?;
+        Ok(js_value)
+    }
+
+    pub fn measure_font(&mut self, key: f64, size: f32) -> Result<JsValue, JsValue> {
+        let k = key as u64;
+        let font = self.font_map.get(&k).unwrap().as_scaled(size);
         
         let ascent = font.ascent();
         let descent = font.descent();
@@ -85,16 +109,20 @@ impl UseGPUText {
         Ok(js_value)
     }
 
-    pub fn measure_spans(&mut self, utf16: Vec<u16>, size: f32) -> Result<JsValue, JsValue> {
+    pub fn measure_spans(&mut self, stack: Vec<f64>, utf16: Vec<u16>, size: f32) -> Result<JsValue, JsValue> {
         let text = String::from_utf16_lossy(&utf16);
-        let font = self.fonts[0].as_scaled(size);
+
+        let fonts: Vec<PxScaleFont<&FontArc>> = stack.iter().map(|k| {
+            let key = *k as u64;
+            self.font_map.get(&key).unwrap().as_scaled(size)
+        }).collect();
 
         let break_iter = LineBreakIterator::new(&text);
         let mut char_iter = text.char_indices();
 
-        let mut breaks = Vec::<u32>::new();
-        let mut metrics = Vec::<(f32, f32, f32)>::new();
-        let mut glyphs = Vec::<(u32, u32)>::new();
+        let mut breaks = Vec::<u8>::new();
+        let mut metrics = Vec::<u8>::new();
+        let mut glyphs = Vec::<u8>::new();
 
         let mut i = 0;
         break_iter.for_each(|(offset, hard)| {
@@ -103,57 +131,63 @@ impl UseGPUText {
 
             while let Some((byte_index, c)) = char_iter.next() {
                 if c == 0 as char {
-                    breaks.push(i as u32);
-                    metrics.push((advance, trim, 2.0));
+                    breaks.extend_from_slice(&mut u32::to_ne_bytes(i as u32));
+                    metrics.extend_from_slice(&mut f32::to_ne_bytes(advance));
+                    metrics.extend_from_slice(&mut f32::to_ne_bytes(trim));
+                    metrics.extend_from_slice(&mut f32::to_ne_bytes(2.0));
                     advance = 0.0;
                     trim = 0.0;
                     continue;
                 }
                 
-                let glyph_id = font.glyph_id(c);
-                let h_advance = font.h_advance(glyph_id);
-                advance += h_advance;
+                let found = fonts.iter().enumerate().filter_map(|(i, font)| {
+                    let glyph_id = font.glyph_id(c);
+                    match glyph_id { GlyphId(g) => if g > 0 { Some((font, glyph_id, i)) } else { None } }
+                }).next();
 
-                if c.is_whitespace() {
-                    trim += h_advance;
+                match found {
+                    Some((font, glyph_id, index)) => {
+                        let h_advance = font.h_advance(glyph_id);
+                        advance += h_advance;
+
+                        if c.is_whitespace() {
+                            trim += h_advance;
+                        }
+                        else {
+                            trim = 0.0;
+                        }
+
+                        match glyph_id {
+                            GlyphId(id) => {
+                                glyphs.extend_from_slice(&mut u32::to_ne_bytes(index as u32));
+                                glyphs.extend_from_slice(&mut u32::to_ne_bytes(id as u32));
+                                glyphs.extend_from_slice(&mut u32::to_ne_bytes(c.is_whitespace() as u32));
+                            }
+                        }
+
+                        i += 1;
+                    }
+                    None => {}
                 }
-                else {
-                    trim = 0.0;
-                }
 
-                match glyph_id {
-                    GlyphId(id) => { glyphs.push((id as u32, c.is_whitespace() as u32)); }
-                } 
-
-                i += 1;
-                if byte_index + c.len_utf8() == offset { break; }
+                if byte_index + c.len_utf8() == offset { break; }                        
             }
 
-            breaks.push(i as u32);
-            metrics.push((advance, trim, if hard { 1.0 } else { 0.0 }));
+            breaks.extend_from_slice(&mut u32::to_ne_bytes(i as u32));
+            metrics.extend_from_slice(&mut f32::to_ne_bytes(advance));
+            metrics.extend_from_slice(&mut f32::to_ne_bytes(trim));
+            metrics.extend_from_slice(&mut f32::to_ne_bytes(if hard { 1.0 } else { 0.0 }));
         });
         
-        let mut metrics_f32 = Vec::<f32>::with_capacity(metrics.len() * 3);
-        let mut glyphs_u32 = Vec::<u32>::with_capacity(glyphs.len() * 2);
-
-        metrics.iter().for_each(|(advance, trim, hard)| {
-            metrics_f32.push(*advance);
-            metrics_f32.push(*trim);
-            metrics_f32.push(*hard);
-        });
-
-        glyphs.iter().for_each(|(id, ws)| {
-            glyphs_u32.push(*id);
-            glyphs_u32.push(*ws);
-        });
-
-        let value = SpanMetrics { breaks, metrics: metrics_f32, glyphs: glyphs_u32 };
+        let value = SpanMetrics { breaks, metrics, glyphs };
     	let js_value = serde_wasm_bindgen::to_value(&value)?;
         Ok(js_value)
     }
 
-    pub fn measure_glyph(&mut self, id: u32, size: f32) -> Result<JsValue, JsValue> {
-        let font = self.fonts[0].as_scaled(size);
+    pub fn measure_glyph(&mut self, key: f64, id: u32, size: f32) -> Result<JsValue, JsValue> {
+        let k = key as u64;
+        let font = self.font_map.get(&k).unwrap().as_scaled(size);
+
         let glyph = Glyph {
             id: GlyphId(id as u16),
             scale: PxScale { x: size, y: size },

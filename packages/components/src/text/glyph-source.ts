@@ -47,6 +47,7 @@ export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSo
 
   const data = useSDFGlyphData(
     NO_LAYOUT,
+    font,
     spans,
     glyphs,
     breaks,

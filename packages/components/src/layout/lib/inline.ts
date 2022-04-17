@@ -178,7 +178,7 @@ export const fitInline = (
       }
 
       if (hard) {
-        addSpan(el, startIndex, endIndex);
+        addSpan(el, startIndex, endIndex, chunkAdvance, chunkCount);
         reduceMain(true);
 
         startIndex = endIndex;
@@ -187,11 +187,18 @@ export const fitInline = (
       }
     });
 
-    addSpan(el, startIndex, endIndex);
+    addSpan(el, startIndex, endIndex, chunkAdvance, chunkCount);
   }
   reduceMain(true);
   
   const size = isX ? [into[0], caretCross] : [caretCross, into[1]];
+  
+  console.log({
+    size,
+    ranges,
+    offsets,
+    renders,
+  })
   
   return {
     size,

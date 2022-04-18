@@ -42,6 +42,7 @@ export type RewriteUsingAST = (
   tree: Tree,
   rename: Map<string, string>,
   shake?: number[] | null,
+  optionals?: Set<string> | null,
 ) => string;
 
 const NO_LIBS: Record<string, ParsedBundle | ParsedModule> = {};
@@ -139,6 +140,8 @@ export const makeLinker = (
     const importMap = imported.get(key);
     const aliasMap = aliased.get(key);
 
+    let optionals: Set<string> | null = null;
+
     // Namespace all non-global symbols outside main module
     const rename = new Map<string, string>();
     if (key !== main) {
@@ -178,7 +181,11 @@ export const makeLinker = (
       const ns = namespaces.get(key);
 
       const resolved = aliasMap?.get(name) ?? name;
-      if ((ns === undefined) && (flags & RF.Optional)) continue;
+      if ((ns === undefined) && (flags & RF.Optional)) {
+        if (!optionals) optionals = new Set();
+        optionals!.add(name);
+        continue;
+      }
 
       let imp = ns + resolved;
       if (fixed.has(imp)) imp = fixed.get(imp)!;
@@ -214,7 +221,7 @@ export const makeLinker = (
       const ops = shake && keep ? resolveShakeOps(shake, keep) : null;
 
       // Rename symbols using AST while tree shaking
-      const recode = rewriteUsingAST(code, tree, rename, ops);
+      const recode = rewriteUsingAST(code, tree, rename, ops, optionals);
       program.push(recode);
     }
     else {
@@ -303,7 +310,9 @@ export const loadBundlesInOrder = timed('loadBundlesInOrder', (
       const {name} = func;
       const chunk = links[name];
       if (!chunk) {
-        if (flags & RF.Optional) continue;
+        if (flags & RF.Optional) {
+          continue;
+        }
         throw new Error(`Unlinked function '${name}' in ${getContext(module)}`);
       }
 

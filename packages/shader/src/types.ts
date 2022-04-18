@@ -63,7 +63,7 @@ export type DataBinding<T extends SymbolTable = any> = {
   constant?: any,
 };
 
-export type CompressedNode = [string, number, number];
+export type CompressedNode = [string, number, number] | [string, number, number, string];
 
 export type ImportRef = {
   name: string,

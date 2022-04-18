@@ -42,6 +42,7 @@ export const useRenderPipeline = (
 
     const [vertex, fragment] = shader;
     const key = vertex.hash.toString() + fragment.hash.toString();
+
     const cached = cache.get(key);
     if (cached) {
       DEBUG && console.log('pipeline cache hit', key)
@@ -58,5 +59,5 @@ export const useRenderPipeline = (
     cache.set(key, pipeline);
     DEBUG && console.log('pipeline cache miss', key)
     return pipeline;
-  }, [memoKey, samples]);
+  }, [memoKey, shader, samples]);
 };

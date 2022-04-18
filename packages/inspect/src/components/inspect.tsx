@@ -40,6 +40,15 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
   const fibers = new Map<number, LiveFiber<any>>();
   const [selectedFiber, setSelected] = selectedCursor;
   const [depthLimit, setDepthLimit] = depthCursor;
+  const [{fiber: hoveredFiber}] = hoveredCursor;
+
+  useLayoutEffect(() => {
+    const setHovered = hoveredFiber?.__inspect?.setHovered;
+    if (!setHovered) return;
+    
+    setHovered(true);
+    return () => setHovered(false);
+  }, [hoveredFiber])
 
   const panes = selectedFiber ? [
     {
@@ -59,10 +68,10 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
     if (inspect) {
       const {vertex, fragment} = inspect;
       if (vertex) {
-        vertexTab = <Shader shader={vertex} />;
+        vertexTab = <Shader type="vertex" fiber={selectedFiber} />;
       }
       if (fragment) {
-        fragmentTab = <Shader shader={fragment} />
+        fragmentTab = <Shader type="fragment" fiber={selectedFiber} />
       }
     }
   }

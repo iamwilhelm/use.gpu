@@ -7,6 +7,7 @@ import { Action } from './types';
 import { SplitRow, Label, Selectable } from './layout';
 
 import { inspectObject } from './props';
+import { usePingContext } from './ping';
 
 const StyledShader = styled('div', {
   background: 'rgba(255, 255, 255, 0.1)',
@@ -37,10 +38,14 @@ const StyledCode = styled('div', {
 });
 
 type ShaderProps = {
-  shader: string,
+  type: string,
+  fiber: LiveFiber<any>,
 };
 
-export const Shader: React.FC<ShaderProps> = ({shader}) => {
+export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
+  usePingContext();
+
+  const shader = fiber.__inspect?.[type];
 
   return (<>
     <div><b>Shader</b></div>

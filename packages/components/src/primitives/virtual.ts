@@ -5,6 +5,7 @@ import { memo, use, useContext, useNoContext, useFiber, useMemo, useNoMemo, useO
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
+import { useInspectable } from '../hooks/useInspectable';
 
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
 import instanceDrawVirtualPick from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
@@ -89,7 +90,9 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     id = 0,
   } = props;
 
-  const isDebug = mode === RenderPassMode.Debug;
+  const hovered = useInspectable();
+
+  const isDebug = mode === RenderPassMode.Debug || hovered;
   const isPicking = mode === RenderPassMode.Picking;
 
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
@@ -149,11 +152,11 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
   // Binds links into shader
   const key = useFiber().id;
   const [v, f] = useMemo(() => {
-    const links = { getVertex, getFragment, getInstanceSize };
+    const links = { getVertex, getFragment: isDebug ? null : getFragment, getInstanceSize };
     const v = bindBundle(vertexShader, links, undefined, key);
     const f = bindBundle(fragmentShader, links, undefined, key);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment]);
+  }, [vertexShader, fragmentShader, getVertex, getFragment, isDebug]);
   
   // Inline the render fiber to avoid another memo()
   return render({

@@ -70,7 +70,6 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
 
     let flush = () => {
       timer = null;
-      console.log('flush ping')
 
       const q = queue.slice();
       queue.length = 0;

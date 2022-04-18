@@ -195,7 +195,6 @@ export const generateChunkSegments = (
     const l = loops[i];
     const s = starts === true || starts[i];
     const e = ends === true || ends[i];
-    console.log({l, s, e})
 
     if (l) to[pos++] = 0;
     if (c) {

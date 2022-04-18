@@ -47,7 +47,6 @@ export const render = (props: RenderProps) => {
     id = 0,
   } = props;
 
-  const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
 
   // Render set up
@@ -83,7 +82,7 @@ export const render = (props: RenderProps) => {
     deps,
     1,
   );
-
+  
   // Rendering pipeline
   const pipeline = useRenderPipeline(
     renderContext,

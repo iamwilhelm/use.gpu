@@ -35,14 +35,12 @@ export const useLinkedShader = (
   for (const b of bindings) keys.push(b.uniform.name);
 
   // Link final WGSL
+  const [{hash: vHash}, {hash: fHash}] = modules;
   const shader = useMemo(() => {
-    const [{hash: vh}, {hash: fh}] = modules;
     const v = linkBundle(modules[0], NO_LIBS, defines);
     const f = linkBundle(modules[1], NO_LIBS, defines);
     const vertex   = makeShaderModule(v, getHash(v));
     const fragment = makeShaderModule(f, getHash(f));
-
-    console.log(vh, fh, '/', vertex.hash, fragment.hash);
     
     fiber.__inspect = fiber.__inspect || {};
     fiber.__inspect.vertex = v;
@@ -52,7 +50,7 @@ export const useLinkedShader = (
     ref.bindings = bindings;
 
     return [vertex, fragment, v, f] as [ShaderModuleDescriptor, ShaderModuleDescriptor, string, string];
-  }, [...deps ?? NO_DEPS, ...keys]);
+  }, [...deps ?? NO_DEPS, ...keys, vHash, fHash]);
 
   // Update bound uniform values in-place from latest
   useOne(() => {

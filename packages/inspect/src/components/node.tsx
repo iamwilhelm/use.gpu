@@ -73,10 +73,6 @@ export const Node: React.FC<NodeProps> = ({
 
   const name = formatNodeName(fiber);
 
-  if (name === 'Memo(Pass)') {
-    console.log({version})
-  }
-
   return (
     <div
       ref={elRef}

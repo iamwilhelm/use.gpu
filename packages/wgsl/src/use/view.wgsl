@@ -40,6 +40,9 @@ struct ViewUniforms {
 }
 
 @export fn clipLineIntoView(anchor: vec4<f32>, head: vec4<f32>, near: f32) -> vec4<f32> {
+  var d = anchor - head;
+  if (dot(d, d) == 0.0) { return worldToView(anchor); }
+
   var a = worldToView(anchor);
   var b = worldToView(head);
 

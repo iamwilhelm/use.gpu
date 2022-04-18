@@ -6,7 +6,7 @@ import {
   copyNumberArrayRange,
   copyNumberArrayRepeatedRange,
   copyNumberArrayCompositeRange,
-  copyChunksToSegments,
+  generateChunkSegments,
 } from './data';
 
 export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number) => {
@@ -36,12 +36,11 @@ export const updateAggregateBuffer = (
 
   let pos = 0;
   for (const item of items) {
-    const {count, [key]: single, [keys]: multiple, isLoop} = item as any;
+    const {count, [key]: single, [keys]: multiple} = item as any;
 
-    if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count, isLoop);
-    else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count, isLoop);
+    if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count);
+    else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count);
 
-    const n = count + (isLoop ? 3 : 0);
     pos += n * dims;
   }
 
@@ -53,24 +52,17 @@ export const updateAggregateBuffer = (
 
 export const updateAggregateSegments = (
   device: GPUDevice,
-  aggregate: AggregateBuffer,
-  items: Record<string, any>[],
+  segments: AggregateBuffer,
+  chunks: number[],
+  loops: number[],
   count: number,
 ) => {
-  const {buffer, array, source, dims} = aggregate;
+  const {buffer, array, source, dims} = segments;
 
-  const chunks = [] as number[];
-  const loops = [] as boolean[];
-
-  for (const item of items) {
-    const {count, isLoop} = item as any;
-    chunks.push(count);
-    loops.push(!!isLoop);
-  }
-
-  copyChunksToSegments(array, chunks, loops);
+  generateChunkSegments(array, chunks, loops);
   uploadBuffer(device, buffer, array.buffer);
   source.length = count;
 
   return source;
 }
+

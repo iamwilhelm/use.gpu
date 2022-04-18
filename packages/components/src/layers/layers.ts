@@ -9,6 +9,7 @@ import {
   updateAggregateBuffer,
   updateAggregateSegments,
 } from '@use-gpu/core';
+import { useBufferedSize } from '../hooks/useBufferedSize';
 
 import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
@@ -17,12 +18,26 @@ export type AggregateProps = {
   children: LiveElement<any>,
 };
 
-const allCount = (a: number, b: LayerAggregate): number => a + b.count + ((b as any).isLoop ? 3 : 0);
+const allCount = (a: number, b: LayerAggregate): number => a + b.count + ((b as any).loop ? 3 : 0);
 
 const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
   for (let k in b) a.add(k);
   return a;
 }
+
+const gatherItemChunks = (items: LayerAggregate[]) => {
+  const chunks = [] as number[];
+  const loops = [] as boolean[];
+  const {buffer, array, source, dims} = segments;
+
+  for (const item of items) {
+    const {count, loop} = item as any;
+    chunks.push(count);
+    loops.push(!!loop);
+  }
+
+  return {chunks, loops};
+};
 
 const getItemSummary = (items: LayerAggregate[]) => {
   const keys = items.reduce(allKeys, new Set());
@@ -50,30 +65,21 @@ const Layer: LiveFunction<any> = (
   const device = useContext(DeviceContext);
   const {keys, count, memoKey} = getItemSummary(items);
 
-  // Invalidate storage if too small, or set of keys changes.
-  const sizeRef = useOne(() => ({ current: 0 }));
-  const versionRef = useOne(() => ({ current: 0 }));
-  if (sizeRef.current < count) {
-    versionRef.current++;
-
-    // Grow by at least 20%
-    sizeRef.current = Math.max(count, (Math.round(sizeRef.current * 1.2) | 0x7) + 1);
-  }
-  useOne(() => versionRef.current++, memoKey);
+  const alloc = useBufferedSize(count);
 
   const render = useMemo(() =>
-    makeAggregator(device, items, keys, sizeRef.current),
-    [versionRef.current]
+    makeAggregator(device, items, keys, alloc),
+    [memoKey, alloc]
   );
   
-  return render(items);
+  return render(items, count);
 };
 
 const makePointAccumulator = (
   device: GPUDevice,
   items: PointAggregate[],
   keys: Set<string>,
-  count: number,
+  alloc: number,
 ) => {
   const storage = {} as Record<string, AggregateBuffer>;
 
@@ -82,13 +88,12 @@ const makePointAccumulator = (
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasDepth = keys.has('depths') || keys.has('depth');
 
-  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.f32, count);
-  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.f32, count);
+  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType['vec4<f32>'], alloc);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType['vec4<f32>'], alloc);
+  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.f32, alloc);
+  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.f32, alloc);
 
-  return (items: PointAggregate[]) => {
-    const count = items.reduce(allCount, 0);
+  return (items: PointAggregate[], count: number) => {
     const props = {count, shape: 'circle'} as Record<string, any>;
 
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
@@ -104,7 +109,7 @@ const makeLineAccumulator = (
   device: GPUDevice,
   items: LineAggregate[],
   keys: Set<string>,
-  count: number,
+  alloc: number,
 ) => {
   const storage = {} as Record<string, AggregateBuffer>;
 
@@ -114,19 +119,20 @@ const makeLineAccumulator = (
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasDepth = keys.has('depths') || keys.has('depth');
 
-  storage.segments = makeAggregateBuffer(device, UniformType.i32, count);
+  storage.segments = makeAggregateBuffer(device, UniformType.i32, alloc);
 
-  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.f32, count);
-  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.f32, count);
+  if (hasPosition) storage.positions = makeAggregateBuffer(device, UniformType['vec4<f32>'], alloc);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, UniformType['vec4<f32>'], alloc);
+  if (hasSize) storage.sizes = makeAggregateBuffer(device, UniformType.f32, alloc);
+  if (hasDepth) storage.depth = makeAggregateBuffer(device, UniformType.f32, alloc);
 
-  return (items: LineAggregate[]) => {
-    const count = items.reduce(allCount, 0);
+  return (items: LineAggregate[], count: number) => {
     const props = {count, join: 'miter'} as Record<string, any>;
 
+    const {chunks, loops} = gatherItemChunks(items);
+
     if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
-    else props.segments = updateAggregateSegments(device, storage.segments, items, count);
+    else props.segments = updateAggregateSegments(device, storage.segments, chunks, loops, count);
 
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');

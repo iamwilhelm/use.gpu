@@ -163,24 +163,29 @@ export const copyDataArrays = (from: any[], to: NumberArray, dims: number, acces
   }
 }
 
-export const getChunkedDataLength = (
+export const getChunkCount = (
   chunks: number[],
   loops: boolean[] = NO_LOOPS,
 ) => {
   let length = 0;
   let n = chunks.length;
+
+  let count = 0;
   for (let i = 0; i < n; ++i) {
     const c = chunks[i];
     const l = loops[i];
-    length += c + (l ? 3 : 0);
+    count += c + (l ? 3 : 0);
   }
-  return length;
+
+  return count;
 };
 
-export const copyChunksToSegments = (
+export const generateChunkSegments = (
   to: NumberArray,
   chunks: number[],
   loops: boolean[] = NO_LOOPS,
+  starts: boolean[] | boolean = false,
+  ends: boolean[] | boolean = false,
 ) => {
   let pos = 0;
   let n = chunks.length;
@@ -188,76 +193,87 @@ export const copyChunksToSegments = (
   for (let i = 0; i < n; ++i) {
     const c = chunks[i];
     const l = loops[i];
+    const s = starts === true || starts[i];
+    const e = ends === true || ends[i];
+    console.log({l, s, e})
 
     if (l) to[pos++] = 0;
     if (c) {
       if (c === 1) to[pos++] = 0;
       else {
-        to[pos++] = l ? 3 : 1;
-        for (let i = 2; i < c; ++i) to[pos++] = 3;
-        to[pos++] = l ? 3 : 2;
+        if (l && !s && !e) {
+          for (let i = 0; i < c; ++i) to[pos++] = 3;
+          if (l) to[pos++] = 0;
+        }
+        else if (l) {
+          to[pos++] = 1;
+          for (let i = 1; i < c; ++i) to[pos++] = 3;
+          to[pos++] = 2;
+        }
+        else {
+          to[pos++] = 1;
+          for (let i = 2; i < c; ++i) to[pos++] = 3;
+          to[pos++] = 2;
+        }
       }
     }
-    if (l) to[pos++] = 0;
     if (l) to[pos++] = 0;
   }
 
   while (pos < to.length) to[pos++] = 0;
 }
 
-export const mapChunksToAnchors = (
+export const generateChunkAnchors = (
+  anchors: NumberArray,
+  trims: NumberArray,
   chunks: number[],
   loops: boolean[] = NO_LOOPS,
-  ends: [boolean, boolean][] = NO_ENDS,
+  starts: boolean[] | boolean = false,
+  ends: boolean[] | boolean = false,
 ): [NumberArray, NumberArray] => {
+
   const n = chunks.length;
+  for (let i = 0; i < trims.length; ++i) trims[i] = 0;
 
-  const length = getChunkedDataLength(chunks, loops);
-  const count = ends.reduce((c, [a, b]) => c + +!!a + +!!b, 0);
-
-  const {array: anchors} = makeDataArray(UniformType['vec4<u32>'], count);
-  const {array: trims} = makeDataArray(UniformType['vec4<u32>'], length);
-  for (let i = 0; i < length * 2; ++i) trims[i] = -1;
+  const hasStart = !!starts;
+  const hasEnd = !!ends;
 
   let o = 0;
   let pos = 0;
-  for (let i = 0; i < n; ++i) {
+  if (hasStart || hasEnd) for (let i = 0; i < n; ++i) {
     const c = chunks[i];
     const l = loops[i];
 
+    const s = hasStart && (starts === true || starts[i]);
+    const e = hasEnd && (ends === true || ends[i]);
+
+    const both = s && e ? 1 : 0;
+    const bits = +s + (+e << 1);
+
     const start = pos + (l ? 1 : 0);
-    const end = pos + c - 1 + (l ? 1 : 0);
+    const end = pos + c - 1 + (l ? 2 : 0);
     pos += c + (l ? 3 : 0);
 
-    const at = ends[i];
-    if (at) {
-      const [left, right] = at;
-      const both = left && right ? 1 : 0;
-      const bits = +left + (+right << 1);
+    for (let j = start; j <= end; ++j) {
+      trims[j * 4] = start;
+      trims[j * 4 + 1] = end;
+      trims[j * 4 + 2] = bits;
+      trims[j * 4 + 3] = 0;
+    }
 
-      for (let j = start; j <= end; ++j) {
-        trims[j * 4] = start;
-        trims[j * 4 + 1] = end;
-        trims[j * 4 + 2] = bits;
-        trims[j * 4 + 3] = 0;
-      }
-
-      if (left) {
-        anchors[o++] = start;
-        anchors[o++] = start + 1;
-        anchors[o++] = end;
-        anchors[o++] = both;
-      }
-      if (right) {
-        anchors[o++] = end;
-        anchors[o++] = end - 1;
-        anchors[o++] = start;
-        anchors[o++] = both;
-      }
+    if (s) {
+      anchors[o++] = start;
+      anchors[o++] = start + 1;
+      anchors[o++] = end;
+      anchors[o++] = both;
+    }
+    if (e) {
+      anchors[o++] = end;
+      anchors[o++] = end - 1;
+      anchors[o++] = start;
+      anchors[o++] = both;
     }
   }
-
-  return [anchors, trims];
 }
 
 export const mapChunksToSegments = (

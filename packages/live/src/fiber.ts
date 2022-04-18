@@ -98,7 +98,7 @@ export const makeFiber = <F extends Function>(
     bound, f, args,
     host, depth, path,
     yeeted, context,
-    state: null, pointer: 0, version: null, memo: null,
+    state: null, pointer: 0, version: null, memo: null, renders: 0,
     mount: null, mounts: null, next: null, seen: null, order: null,
     type: null, id, by,
   } as LiveFiber<F>;
@@ -212,7 +212,7 @@ export const renderFiber = <F extends Function>(
   else element = bound.apply(null, args ?? EMPTY_ARRAY);
 
   // Early exit if memoized and same result
-  if (fiber.version) {
+  if (fiber.memo != null) {
     const canExitEarly = fiber.type !== YEET && !fiber.next;
     if (fiber.version !== fiber.memo) {
       fiber.memo = fiber.version;
@@ -237,6 +237,8 @@ export const pingFiber = <F extends Function>(
 ) => {
   // Notify host / dev tool of update
   const {host} = fiber;
+  const name = formatNodeName(fiber);
+  if (active) pingFiberCount(fiber);
   if (host?.__ping) host.__ping(fiber, active);
 }
 
@@ -849,3 +851,9 @@ export const bustFiberDeps = <F extends Function>(
     bustFiberMemo(sub);
   }
 }
+
+// Track number of runs per fiber
+export const pingFiberCount = <F extends Function>(fiber: LiveFiber<F>) => {
+  fiber.runs = incrementVersion(fiber.runs);
+}
+

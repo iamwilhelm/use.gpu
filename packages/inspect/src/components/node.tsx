@@ -46,7 +46,7 @@ export const Node: React.FC<NodeProps> = ({
 
   const [version, pinged] = usePingContext(fiber);
 
-  const classes: string[] = version >= 0 ? [version ? 'pinged' : 'mounted'] : [];
+  const classes: string[] = version >= 0 ? [version > 1 ? 'pinged' : 'mounted'] : [];
 
   if (!pinged) classes.push('cold');
   if (selected) classes.push('selected');
@@ -72,6 +72,10 @@ export const Node: React.FC<NodeProps> = ({
   }, [onClick]);
 
   const name = formatNodeName(fiber);
+
+  if (name === 'Memo(Pass)') {
+    console.log({version})
+  }
 
   return (
     <div

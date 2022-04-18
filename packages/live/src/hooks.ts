@@ -73,6 +73,16 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i + 1] = undefined;
 };
 
+const getArgCount = <F extends Function>(f: F) => {
+  let s = Function.toString.call(f).split(/\)|=>/)[0];
+  if (s == null) return 0;
+
+  s = s.replace(/\s+/g, '').replace(/^\(/, '').replace(/,$/, '');
+  if (s.length === 0) return 0;
+
+  return s.split(',').length;
+}
+
 // Memoize a live function on all its arguments (shallow comparison per arg)
 // Unlike <Memo> this does not create a new sub-fiber
 export const memoArgs = <F extends Function>(
@@ -98,7 +108,7 @@ export const memoArgs = <F extends Function>(
   };
 
   const memoName = `Memo(${name ?? f.name})`;
-  const {length} = f;
+  const length = getArgCount(f);
   return new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
     if (s === 'name') return memoName;
@@ -134,7 +144,7 @@ export const memoProps = <F extends Function>(
   };
 
   const memoName = `Memo(${name ?? f.name})`;
-  const {length} = f;
+  const length = getArgCount(f);
   return new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
     if (s === 'name') return memoName;

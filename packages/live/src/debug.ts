@@ -80,16 +80,23 @@ export const formatNode = <F extends Function>(node: DeferredCall<F>): string =>
     args.push(formatValue(node.arg));
   }
   if (node.args !== undefined) {
-    if (node.f.name === 'REDUCE') {
-      const [, reduce, initial] = node.args;
-      args.push(formatValue({reduce, initial}));
-    }
-    else if (node.f.name === 'PROVIDE') {
-      const [context,,, isMemo] = node.args;
-      args.push(formatValue(context));
-    }
-    else if (node.f.name === 'MORPH') {
-      args.push(formatValue(node.args));
+    if (node.f) {
+      if (node.f.name === 'REDUCE') {
+        const [, reduce, initial] = node.args;
+        args.push(formatValue({reduce, initial}));
+      }
+      else if (node.f.name === 'PROVIDE') {
+        const [context,,, isMemo] = node.args;
+        args.push(formatValue(context));
+      }
+      else if (node.f.name === 'MORPH') {
+        args.push(formatValue(node.args));
+      }
+      else {
+        if (Array.isArray(node.args)) {
+          args.push(...node.args?.map(x => formatValue(x)));
+        }
+      }
     }
     else {
       if (Array.isArray(node.args)) {

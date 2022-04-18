@@ -1,6 +1,6 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveFiber, LiveContext, LiveElement,
+  LiveFunction, LiveComponent, LiveFiber, LiveContext, LiveElement,
   FunctionCall, DeferredCall, HostInterface, ArrowFunction,
 } from './types';
 
@@ -48,9 +48,24 @@ export const keyed = <F extends Function>(
 
 // use a call to a live component with only a children prop
 export const wrap = <F extends Function>(
-  f: LiveFunction<F>,
+  f: LiveComponent<F>,
   children: any,
 ): DeferredCall<F> => ({f, args: [{children}], key: undefined, by: getCurrentFiberID()});
+
+// add arguments to an existing call or calls
+export const extend = (
+  calls: LiveElement<any>,
+  props: Record<string, any>,
+): DeferredCall<() => void> => {
+  if (!calls) return calls;
+
+  if (Array.isArray(calls)) return calls.map(call => extend(call, props));
+  if (calls.args?.length) {
+    const [existing, ...rest] = calls.args;
+    return ({...calls, args: [{...existing, ...props}, ...rest] });
+  }
+  return ({...calls, args: [props] });
+}
 
 // morph a call to a live function
 export const morph = (

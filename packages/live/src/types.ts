@@ -89,6 +89,9 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   // Yeeting state
   yeeted: FiberYeet<any> | null,
 
+  // Count number of runs for inspector
+  runs: number | null,
+
   __inspect?: Record<string, any> | null,
 };
 

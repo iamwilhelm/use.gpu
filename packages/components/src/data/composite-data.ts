@@ -1,16 +1,16 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core/types';
+import { TypedArray, StorageSource, UniformType, Accessor, DataField, ChunkLayout } from '@use-gpu/core/types';
 import { DeviceContext } from '../providers/device-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { yeet, extend, gather, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor,
   copyDataArray, copyNumberArray,
   copyDataArrays, copyNumberArrays,
   copyDataArraysComposite, copyNumberArraysComposite,
   copyDataArrayChunked, copyNumberArrayChunked,
-  copyChunksToSegments,
+  getChunkCount,
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
 
@@ -19,9 +19,14 @@ export type CompositeDataProps = {
   data?: any[],
   fields?: DataField[],
   live?: boolean,
-  loop?: <T>(t: T[]) => boolean,
 
-  render?: (sources: StorageSource[]) => LiveElement<any>,
+  loop?: <T>(t: T[]) => boolean,
+  start?: <T>(t: T[]) => boolean,
+  end?: <T>(t: T[]) => boolean,
+  
+  on?: LiveElement<any>,
+
+  render?: (sources: StorageSource[], layout: ChunkLayout) => LiveElement<any>,
 };
 
 const NO_FIELDS = [] as DataField[];
@@ -36,14 +41,18 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     data,
     fields,
     render,
+    on,
     live = false,
   } = props;
 
   const fs = fields ?? NO_FIELDS;
-  let isLoop = props.loop ?? (() => false);
 
-  // Gather data length
-  const [chunks, loops, length] = useMemo(() => {
+  const isLoop = props.loop;
+  const isStart = props.start;
+  const isEnd = props.end;
+
+  // Gather data layout/length
+  const {chunks, loops, starts, ends, count} = useMemo(() => {
 
     // Count simple array lengths as fallback
     // in case of no composite field.
@@ -65,39 +74,53 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     let [format, accessor] = composite;
     format = toSimple(format);
 
-    const chunks = [] as number[];
-    const loops = [] as boolean[];
-
+    // Prepare format appropriate accessor
     if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
     const f = format as any as UniformType;
     const dims = UNIFORM_DIMS[f];
 
     let {raw, length: l, fn} = makeDataAccessor(f, accessor);
 
-    if (raw && l != null) for (let i = 0; i < l; ++i) {
-      const list = raw[i];
-      const loop = isLoop(list);
+    // Gather chunk sizes and chunk metadata
+    const chunks = [] as number[];
+    const loops = isLoop ? [] as boolean[] : null;
+    const starts = isStart ? [] as boolean[] : null;
+    const ends = isEnd ? [] as boolean[] : null;
+
+    const push = (list: any, item?: any) => {
       const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);
       chunks.push(n);
-      loops.push(loop);
-    }
-    else if (fn && data) for (const v of data) {
-      const list = fn(v);
-      const loop = isLoop(v);
-      const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);
-      chunks.push(n);
-      loops.push(loop);
+
+      if (item != null) {
+        if (isLoop) {
+          const loop = isLoop(item);
+          loops!.push(!!loop);
+        }
+        if (isStart) {
+          const start = isStart(item);
+          starts!.push(!!start);
+        }
+        if (isEnd) {
+          const end = isEnd(item);
+          ends!.push(!!end);
+        }
+      }
     }
 
-    const length = (
-      chunks.reduce((a, b) => a + b, 0) +
-      loops.reduce((a, b) => a + (b ? 3 : 0), 0)
-    );
-    return [chunks, loops, length];
+    if (raw && l != null) for (let i = 0; i < l; ++i) {
+      push(raw[i]);
+    }
+    else if (fn && data) for (const v of data) {
+      push(fn(v), v);
+    }
+
+    const count = getChunkCount(chunks, loops);
+
+    return {chunks, loops, starts, ends, count};
   }, [data, fs]);
 
   // Make data buffers
-  const [segmentBuffer, fieldBuffers, fieldSources] = useMemo(() => {
+  const [fieldBuffers, fieldSources] = useMemo(() => {
 
     const fieldBuffers = fs.map(([format, accessor]) => {
       const composite = isComposite(format);
@@ -108,51 +131,27 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
       let {raw, fn} = makeDataAccessor(f, accessor);
 
-      const {array, dims} = makeDataArray(f, length);
+      const {array, dims} = makeDataArray(f, count);
       if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
       const buffer = makeStorageBuffer(device, array.byteLength);
       const source = {
         buffer,
         format,
-        length,
+        length: count,
         version: 0,
       };
 
       return {buffer, array, source, dims, accessor: fn, raw, composite};
     });
 
-    let segmentBuffer;
-    {
-      const format = UniformType.i32;
-      const {array, dims} = makeDataArray(format, length);
-      const buffer = makeStorageBuffer(device, array.byteLength);
-      const source = {
-        buffer,
-        format,
-        length,
-        version: 0,
-      };
-      segmentBuffer = {buffer, array, source, dims};
-    }
+    const fieldSources = fieldBuffers.map(f => f.source);
 
-    const fieldSources = [
-      segmentBuffer.source,
-      ...fieldBuffers.map(f => f.source),
-    ];
-    
-    return [segmentBuffer, fieldBuffers, fieldSources];
-  }, [device, fs, length]);
+    return [fieldBuffers, fieldSources];
+  }, [device, fs, count]);
   
   // Refresh and upload data
   const refresh = () => {
-    {
-      const {buffer, array, source} = segmentBuffer;
-      copyChunksToSegments(array, chunks, loops);
-
-      uploadBuffer(device, buffer, array.buffer);
-      source.version = incrementVersion(source.version);
-    }
 
     for (const {buffer, array, source, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
       if (composite) {
@@ -179,6 +178,17 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     useNoMemo();
     refresh()
   }
+  
+  if (on) {
+    useNoMemo();
 
-  return useMemo(() => render ? render(fieldSources) : yeet(fieldSources), [render, fieldSources]);
+    const els = extend(on, {chunks, loops, starts, ends});
+    return gather(els, (sources: ShaderSource[]) => {
+      const s = [...fieldSources, ...sources];
+      return render ? render(s) : yeet(s);
+    });
+  }
+  else {
+    return useMemo(() => render ? render(fieldSources) : yeet(fieldSources), [render, fieldSources]);
+  }
 };

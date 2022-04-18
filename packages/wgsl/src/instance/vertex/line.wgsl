@@ -96,17 +96,26 @@ fn trimAnchor(
   var width = getWidth(cornerIndex);
   var depth = getDepth(cornerIndex);
 
-  var beforePos = getPosition(cornerIndex - 1u);
   var centerPos = getPosition(cornerIndex);
-  var afterPos = getPosition(cornerIndex + 1u);
+  var beforePos = centerPos;
+  var afterPos = centerPos;
+
+  if (segment != 1) { beforePos = getPosition(cornerIndex - 1u); }
+  else { trimMode = trimMode & 1; }
+  if (segment != 2) { afterPos = getPosition(cornerIndex + 1u); }
+  else { trimMode = trimMode & 2; }
 
   // Trim from end points
   if (trimMode > 0) {
     var size = getSize(cornerIndex);
 
-    var startPos = getPosition(trim.x);
-    var midPos = getPosition((trim.x + trim.y) / 2u);
-    var endPos = getPosition(trim.y);
+    var startIndex = trim.x;
+    var endIndex = trim.y;
+    var midIndex = (startIndex + endIndex) / 2u;
+
+    var startPos = getPosition(startIndex);
+    var midPos = getPosition(midIndex);
+    var endPos = getPosition(endIndex);
 
     let maxLength = length(endPos.xyz - midPos.xyz) + length(midPos.xyz - startPos.xyz);
 

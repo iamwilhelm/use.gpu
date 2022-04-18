@@ -21,6 +21,7 @@ import {
 import { UseInspect } from '@use-gpu/inspect';
 
 import { GeometryPage } from './pages/geometry';
+import { GeometryLinesPage } from './pages/geometry/lines';
 import { InteractPage } from './pages/interact';
 import { LayoutPage } from './pages/layout';
 import { AtlasPage } from './pages/atlas';
@@ -45,6 +46,7 @@ export const App: LiveComponent<AppProps> = (props) => {
       routes: {
         "/": {
           routes: {
+            "geometry/lines": { element: use(GeometryLinesPage, { canvas }) },
             "geometry": { element: use(GeometryPage, { canvas }) },
             "layout": { element: use(LayoutPage, { }) },
             "interact": { element: use(InteractPage, { }) },

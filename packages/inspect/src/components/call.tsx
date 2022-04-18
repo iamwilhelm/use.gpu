@@ -4,6 +4,7 @@ import { formatNode, formatValue, STATE_SLOTS } from '@use-gpu/live';
 import React, { useState } from 'react';
 import { Action } from './types';
 import { SplitRow, Label, Spacer } from './layout';
+import { usePingContext } from './ping';
 
 import { inspectObject } from './props';
 import chunk from 'lodash/chunk';
@@ -18,6 +19,8 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
   const {id, depth, path, type, state, context, yeeted, mount, mounts, next, host} = fiber;
 
   let props = {id, depth, path, type, context, yeeted, mount, mounts, next, host, '[raw]': fiber} as Record<string, any>;
+
+  usePingContext();
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const toggleExpanded = (id: string) => setExpanded((state) => ({

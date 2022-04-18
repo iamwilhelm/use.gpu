@@ -29,6 +29,7 @@ export type RawLinesProps = {
   trim?: number[] | TypedArray,
   size?: number,
 
+  indices?: ShaderSource,
   positions?: ShaderSource,
   segments?: ShaderSource,
   colors?: ShaderSource,
@@ -54,7 +55,7 @@ const VERTEX_BINDINGS = [
   { name: 'getWidth', format: 'f32', value: 1 },
   { name: 'getDepth', format: 'f32', value: 0 },
   { name: 'getTrim', format: 'vec4<u32>', value: [0, 0, 0, 0] },
-  { name: 'getSize', format: 'f32', value: 1 },
+  { name: 'getSize', format: 'f32', value: 3 },
 ] as UniformAttributeValue[];
 
 const LINE_JOIN_SIZE = {

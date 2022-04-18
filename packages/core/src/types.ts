@@ -227,6 +227,13 @@ export type PickingUniforms = {
 
 // Data
 
+export type ChunkLayout = {
+  chunks: number[],
+  loops?: boolean[],
+  dataCount: number,
+  indexCount: number,
+};
+
 export type Tuples<N extends number, T = number> = {
   array: T[],
   get: (i: number, j: number) => T,

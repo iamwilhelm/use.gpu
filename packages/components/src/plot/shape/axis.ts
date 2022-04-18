@@ -5,7 +5,6 @@ import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useBoundStorage } from '../../hooks/useBoundStorage';
 import { useShaderRef } from '../../hooks/useShaderRef';
-import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
 
 import { RangeContext } from '../../providers/range-provider';
 import {
@@ -25,6 +24,7 @@ import { vec4 } from 'gl-matrix';
 import { Data } from '../../data/data';
 import { LineLayer } from '../../layers/line-layer';
 import { ArrowLayer } from '../../layers/arrow-layer';
+import { ArrowSegments } from '../../layers/arrow-segments';
 
 import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
 
@@ -76,37 +76,30 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const s = useShaderRef(step);
   const positions = useBoundShader(getAxisPosition, AXIS_BINDINGS, [o, s]);
 
+  // Render as 1 line chunk
   const n = d + 1;
-
-  // Make line/arrow data
-  const arrays = useMemo(() => {
-    const chunks = [n];
-    const loops = [loop];
-    const ends = [[start, end]];
-
-    const segments = mapChunksToSegments(chunks, loops);
-    const [anchors, trims] = mapChunksToAnchors(chunks, loops, ends);
-
-    return {segments, anchors, trims};
-  }, [n, loop, start, end]);
-
-  const segments = useBoundStorage(arrays.segments, 'i32');
-  const anchors = useBoundStorage(arrays.anchors, 'vec4<u32>');
-  const trims = useBoundStorage(arrays.trims, 'vec4<u32>');
+  const [chunks, loops] = useMemo(() => [[n], [loop]], [n, loop]);
 
   return (
-    use(ArrowLayer, {
-      positions,
-      segments,
-      anchors,
-      trims,
-      count: n,
+    use(ArrowSegments, {
+      chunks,
+      loops,
+      starts: start,
+      ends: end,
+      render: (segments: ShaderSource, anchors: ShaderSource, trims: ShaderSource) =>
+        use(ArrowLayer, {
+          positions,
+          segments,
+          anchors,
+          trims,
+          count: n,
 
-      color,
-      width,
-      depth,
-      size,
-      join,
+          color,
+          width,
+          depth,
+          size,
+          join,
+        })
     })
   );
 };

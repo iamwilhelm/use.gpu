@@ -113,5 +113,6 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
       canvas.removeEventListener('wheel', onWheel);
     });
   }, [canvas]);
+
   return render(radius, bearing, pitch);
 };

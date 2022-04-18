@@ -6,7 +6,7 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,
-  CompositeData, Data, RawData, Raw,
+  CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Pick, Cursor, PointLayer, LineLayer,
   RenderToTexture,
@@ -74,7 +74,7 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
             use(Data, {
               fields: [
                 ['vec4<f32>', [-5, 0, 0, 1, 5, 0, 0, 1]],
-                ['u32', [1, 2]],
+                ['i32', [1, 2]],
               ],
               render: ([positions, segments]) => use(LineLayer, { positions, segments, width: 30, depth: 1 }),
             }),
@@ -89,9 +89,10 @@ export const GeometryPage: LiveComponent<GeometryPageProps> = (props) => {
             use(CompositeData, {
               fields: lineDataFields,
               data: lineData,
-              loop: (o: any) => o.loop,
-              render: ([segments, positions, colors, widths]: StorageSource[]) => [
-                use(LineLayer, { segments, positions, colors, widths }),
+              loop: o => o.loop,
+              on: use(LineSegments),
+              render: ([positions, colors, widths, segments]: StorageSource[]) => [
+                use(LineLayer, { positions, colors, widths, segments }),
               ]          
             }),
             use(RawData, {

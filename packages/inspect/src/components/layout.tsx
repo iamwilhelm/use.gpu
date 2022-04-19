@@ -41,10 +41,13 @@ export const InspectToggle = styled('div', {
 
 export const TreeControls = styled('div', {
   position: 'absolute',
-  right: 20,
-  top: 10,
-  width: 120,
+  padding: '10px 20px',
+  right: '6px',
+  top: 0,
+  width: 160,
   pointerEvents: 'auto',
+  background: 'rgba(0, 0, 0, 0.75)',
+  zIndex: 10,
 });
 
 export const Muted = styled('span', {

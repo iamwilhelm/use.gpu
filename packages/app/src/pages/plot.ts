@@ -68,17 +68,25 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                           range: [],
                           scale: [1, 1, 1],
                           children: [
-
-                            use(Axis, {
-                              axis: 'x',
-                              width: 20,
-                              color: [0.75, 0.75, 0.75, 1],
-                            }),
                             use(Grid, {
                               axes: 'xy',
-                              width: 4,
+                              width: 3,
                               first: { detail: 3, divide: 5 },
                               second: { detail: 3, divide: 5 },
+                              depth: 0.5,
+                            }),
+                            use(Grid, {
+                              axes: 'xz',
+                              width: 3,
+                              first: { detail: 3, divide: 5 },
+                              second: { detail: 3, divide: 5 },
+                              depth: 0.5,
+                            }),
+                            use(Axis, {
+                              axis: 'x',
+                              width: 5,
+                              color: [0.75, 0.75, 0.75, 1],
+                              depth: 0.5,
                             }),
                             use(Scale, {
                               divide: 5,
@@ -86,9 +94,10 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                               children: [
                                 use(Tick, {
                                   size: 50,
-                                  width: 10,
+                                  width: 5,
                                   offset: [0, 1, 0],
                                   color: [0.75, 0.75, 0.75, 1],
+                                  depth: 0.5,
                                 }),
                                 use(Label, {
                                   placement: 'bottom',
@@ -96,6 +105,7 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                                   size: 32,
                                   offset: 16,
                                   expand: 5,
+                                  depth: 0.5,
                                 }),
                                 use(Label, {
                                   placement: 'bottom',
@@ -103,19 +113,22 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                                   size: 32,
                                   offset: 16,
                                   expand: 0,
+                                  depth: 0.5,
                                 }),
                               ],
                             }),
                             use(Axis, {
                               axis: 'y',
-                              width: 20,
+                              width: 5,
                               color: [0.75, 0.75, 0.75, 1],
                               detail: 8,
+                              depth: 0.5,
                             }),
                             use(Axis, {
                               axis: 'z',
-                              width: 20,
+                              width: 5,
                               color: [0.75, 0.75, 0.75, 1],
+                              depth: 0.5,
                             }),
                           ]
                         })                     

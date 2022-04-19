@@ -17,6 +17,18 @@ export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
   props: ArrowSegmentsProps,
 ) => {
   const {chunks, loops, starts, ends, render} = props;
+
+  const {segments, anchors, trims} = useArrowSegments(chunks, loops, starts, ends);
+
+  return render ? render(segments, anchors, trims) : yeet([segments, anchors, trims]);
+}, 'ArrowSegments');
+
+export const useArrowSegments = (
+  chunks: number[],
+  loops?: boolean[],
+  starts?: boolean[],
+  ends?: boolean[],
+) => {
   const count = getChunkCount(chunks, loops);
 
   // Make index data for line segments/anchor/trim data
@@ -35,6 +47,6 @@ export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
   const segments = useBoundStorage(segmentBuffer, 'i32');
   const anchors = useBoundStorage(anchorBuffer, 'vec4<u32>');
   const trims = useBoundStorage(trimBuffer, 'vec4<u32>');
-
-  return render ? render(segments, anchors, trims) : yeet([segments, anchors, trims]);
-}, 'ArrowSegments');
+  
+  return {segments, anchors, trims};
+}

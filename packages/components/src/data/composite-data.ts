@@ -3,6 +3,7 @@ import { TypedArray, StorageSource, UniformType, Accessor, DataField, ChunkLayou
 import { DeviceContext } from '../providers/device-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { useBufferedSize } from '../hooks/useBufferedSize';
 import { yeet, extend, gather, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor,
@@ -119,6 +120,8 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     return {chunks, loops, starts, ends, count};
   }, [data, fs]);
 
+  const l = useBufferedSize(count);
+
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
 
@@ -138,7 +141,8 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       const source = {
         buffer,
         format,
-        length: count,
+        length: 0,
+        size: [0],
         version: 0,
       };
 
@@ -148,11 +152,10 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     const fieldSources = fieldBuffers.map(f => f.source);
 
     return [fieldBuffers, fieldSources];
-  }, [device, fs, count]);
+  }, [device, fs, l]);
   
   // Refresh and upload data
   const refresh = () => {
-
     for (const {buffer, array, source, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
       if (composite) {
         if (raw) copyNumberArraysComposite(raw, array, dims, chunks, loops);
@@ -163,6 +166,9 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         else if (data) copyDataArrayChunked(data, array, dims, chunks, loops, accessor as Accessor);
       }
       uploadBuffer(device, buffer, array.buffer);
+
+      source.length = count;
+      source.size[0] = count;
       source.version = incrementVersion(source.version);
     }
   };
@@ -170,7 +176,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   if (!live) {
     useNoPerFrame();
     useNoAnimationFrame();
-    useMemo(refresh, [device, data, fieldBuffers]);
+    useMemo(refresh, [device, data, fieldBuffers, count]);
   }
   else {
     usePerFrame();

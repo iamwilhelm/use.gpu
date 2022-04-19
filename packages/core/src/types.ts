@@ -169,6 +169,7 @@ export type StorageSource = {
   buffer: GPUBuffer,
   format: string,
   length: number,
+  size: number[],
   version: number,
 };
 

@@ -12,29 +12,42 @@ import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
-export type RawDataProps = {
-  length?: number,
+export type ArrayDataProps = {
+  size?: number[],
   data?: number[] | TypedArray,
   expr?: (emit: Emitter, i: number, n: number) => void,
+  items?: number,
   format?: string,
   live?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
 };
 
-export const RawData: LiveComponent<RawDataProps> = (props) => {
+const INDEX_BINDINGS = [
+  { name: 'getIndex', format: 'u32', value: 0, args: [] },
+  { name: 'getIndex', format: 'u32', value: 0, args: ['u32'] },
+  { name: 'getIndex', format: 'u32', value: 0, args: ['u32', 'u32'] },
+  { name: 'getIndex', format: 'u32', value: 0, args: ['u32', 'u32', 'u32'] },
+  { name: 'getIndex', format: 'u32', value: 0, args: ['u32', 'u32', 'u32', 'u32'] },
+];
+
+export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   const device = useContext(DeviceContext);
 
   const {
-    format, length,
-    data, expr,
+    format,
+    size,
+    data,
+    expr,
+    items = 1,
     render,
     children,
     live = false,
   } = props;
 
-  const count = length ?? (data?.length || 0);
-  const l = useBufferedSize(count);
+  const length = size.length ? size.reduce((a, b) => a * b, 1) : [data?.length || 1];
+  const l = useBufferedSize(length);
+  const t = Math.max(1, Math.round(items) || 0);
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
@@ -48,7 +61,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
       buffer,
       format: f,
       length: 0,
-      size: [0],
+      size,
       version: 0,
     };
 
@@ -58,20 +71,20 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   // Refresh and upload data
   const refresh = () => {
     if (data) copyNumberArray(data, array);
-    if (expr) emitIntoNumberArray(expr, array, dims);
+    if (expr) emitIntoNumberArray(expr, array, dims, t);
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
 
-    source.length = count;
-    source.size[0] = count;
+    source.length = length;
+    source.size[0] = length;
     source.version = incrementVersion(source.version);
   };
 
   if (!live) {
     useNoPerFrame();
     useNoAnimationFrame();
-    useMemo(refresh, [device, buffer, array, data, expr, length, dims]);
+    useMemo(refresh, [device, buffer, array, data, expr, dims, length, items]);
   }
   else {
     usePerFrame();

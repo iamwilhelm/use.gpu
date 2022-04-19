@@ -24,7 +24,7 @@ import { vec4 } from 'gl-matrix';
 import { Data } from '../../data/data';
 import { LineLayer } from '../../layers/line-layer';
 import { ArrowLayer } from '../../layers/arrow-layer';
-import { ArrowSegments } from '../../layers/arrow-segments';
+import { useArrowSegments } from '../../layers/arrow-segments';
 
 import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
 
@@ -75,31 +75,25 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const s = useShaderRef(step);
   const positions = useBoundShader(getAxisPosition, AXIS_BINDINGS, [o, s]);
 
-  // Render as 1 line chunk
+  // Render as 1 arrow chunk
   const n = d + 1;
   const [chunks, loops] = useMemo(() => [[n], [loop]], [n, loop]);
+  const {segments, anchors, trims} = useArrowSegments(chunks, loops, start, end);
 
   return (
-    gather(use(ArrowSegments, {
-      chunks,
-      loops,
-      starts: start,
-      ends: end,
-    }), ([segments, anchors, trims]: ShaderSource[]) =>
-      use(ArrowLayer, {
-        positions,
-        segments,
-        anchors,
-        trims,
-        count: n,
+    use(ArrowLayer, {
+      positions,
+      segments,
+      anchors,
+      trims,
+      count: n,
 
-        color,
-        width,
-        depth,
-        size,
-        join,
-      })
-    )
+      color,
+      width,
+      depth,
+      size,
+      join,
+    })
   );
 };
 

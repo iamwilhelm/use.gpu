@@ -43,11 +43,11 @@ export const makeDataAccessor = (format: UniformType, accessor: AccessorSpec) =>
   else throw new Error(`Invalid accessor ${accessor}`);
 }
 
-export const emitIntoNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number) => {
+export const emitIntoNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number, items: number = 1) => {
   const emit = makeDataEmitter(to, dims);
   const n = to.length / dims;
   let i = 0;
-  for (let i = 0; i < n; ++i) expr(emit, i, n);
+  for (let i = 0; i < n; i += items) expr(emit, i, n);
 }
 
 export const copyNumberArray = (from: NumberArray, to: NumberArray) => {

@@ -33,7 +33,8 @@ export const Data: LiveComponent<DataProps> = (props) => {
     live = false,
   } = props;
 
-  const l = useBufferedSize(data?.length || 0);
+  const length = data?.length || 0;
+  const l = useBufferedSize(length);
   const fs = fields ?? NO_FIELDS;
 
   // Make data buffers
@@ -52,10 +53,11 @@ export const Data: LiveComponent<DataProps> = (props) => {
       const source = {
         buffer,
         format,
-        length,
+        length: 0,
+        size: [0],
         version: 0,
       };
-      
+
       return {buffer, array, source, dims, accessor, raw};
     });
     const fieldSources = fieldBuffers.map(f => f.source);
@@ -69,6 +71,9 @@ export const Data: LiveComponent<DataProps> = (props) => {
       else if (data) copyDataArray(data, array, dims, accessor as Accessor);
 
       uploadBuffer(device, buffer, array.buffer);
+
+      source.length = length;
+      source.size[0] = length;
       source.version = incrementVersion(source.version);
     }
   };
@@ -76,7 +81,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
   if (!live) {
     useNoPerFrame();
     useNoAnimationFrame();
-    useMemo(refresh, [device, data, fieldBuffers]);
+    useMemo(refresh, [device, data, fieldBuffers, length]);
   }
   else {
     usePerFrame();

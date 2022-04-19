@@ -10,12 +10,13 @@ import { RawLines } from '../primitives/raw-lines';
 
 import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings } from '@use-gpu/core';
+import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
+import { useBoundShader } from '../hooks/useBoundShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getTickPosition } from '@use-gpu/wgsl/instance/vertex/tick.wgsl';
-import { getTickSegment } from '@use-gpu/wgsl/geometry/tick.wgsl';
+import { getLineSegment } from '@use-gpu/wgsl/geometry/line.wgsl';
 
 export type TickLayerProps = {
   position?: number[] | TypedArray,
@@ -78,18 +79,14 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
 
   const c = useCallback(() => (positions?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
 
-  const bound = useMemo(() => {
-    const defines = { TICK_DETAIL: detail };
-    const bindings = makeShaderBindings(TICK_BINDINGS, [xf, p, o, d, s])
-    const links = bindingsToLinks(bindings);
-    return bindBundle(getTickPosition, links, defines);
-  }, [p, o, d, s, detail]);
+  const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
+  const bound = useBoundShader(getTickPosition, TICK_BINDINGS, [xf, p, o, d, s], defines);
 
   return (
     provide(TransformContext, null,
       use(RawLines, {
         positions: bound,
-        segments: getTickSegment,
+        segments: getLineSegment,
         color,
         colors,
         width,

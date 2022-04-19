@@ -5,6 +5,14 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms };
 // o--o--o  o--o--o--o  o--o
 // 1  3  2  1  3  3  2  1  2
 
+@export fn getLineSegment(index: u32) -> i32 {
+  let n = u32(LINE_DETAIL + 1);
+  let i = index % n;
+  if (i == 0u) { return 1; }
+  if (i == n - 1u) { return 2; }
+  return 3;
+};
+
 fn turn(xy: vec2<f32>) -> vec2<f32> {
   return vec2<f32>(xy.y, -xy.x);
 }

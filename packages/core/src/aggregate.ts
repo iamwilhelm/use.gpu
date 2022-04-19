@@ -41,7 +41,7 @@ export const updateAggregateBuffer = (
     if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count);
     else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count);
 
-    pos += n * dims;
+    pos += count * dims;
   }
 
   uploadBuffer(device, buffer, array.buffer);
@@ -54,7 +54,7 @@ export const updateAggregateSegments = (
   device: GPUDevice,
   segments: AggregateBuffer,
   chunks: number[],
-  loops: number[],
+  loops: boolean[],
   count: number,
 ) => {
   const {buffer, array, source, dims} = segments;

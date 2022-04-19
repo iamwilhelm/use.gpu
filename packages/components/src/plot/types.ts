@@ -45,6 +45,11 @@ export type FontTrait = {
   style: string,
 };
 
+export type GridTrait = {
+  range?: VectorLike[],
+  axes: Swizzle,
+};
+
 export type LabelTrait = {
   labels?: string[],
   expr?: (v: number, i: number) => string,
@@ -73,20 +78,13 @@ export type ROPTrait = {
 };
 
 export type ScaleTrait = {
-  mode?: Domain,
-  divide?: number,
-  unit?: number,
-  base?: number,
-  start?: true,
-  end?: true,
-  zero?: true,
-  factor?: number,
-  nice?: boolean,
+  mode: Domain,
+  divide: number,
+  unit: number,
+  base: number,
+  start: boolean,
+  end: boolean,
+  zero: boolean,
+  factor: number,
+  nice: boolean,
 };
-
-export type GridTrait = {
-  x: ScaleTrait,
-  y: ScaleTrait,
-  axes: Swizzle,
-};
-

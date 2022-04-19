@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike, Swizzle } from '../types';
 
-import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useBoundStorage } from '../../hooks/useBoundStorage';
 import { useShaderRef } from '../../hooks/useShaderRef';
@@ -69,7 +69,6 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const max = r[1];
   og[axis] = min;
   step[axis] = (max - min) / d;
-  og[3] = 1;
 
   // Make axis vertex shader
   const o = useShaderRef(og);
@@ -81,26 +80,26 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const [chunks, loops] = useMemo(() => [[n], [loop]], [n, loop]);
 
   return (
-    use(ArrowSegments, {
+    gather(use(ArrowSegments, {
       chunks,
       loops,
       starts: start,
       ends: end,
-      render: (segments: ShaderSource, anchors: ShaderSource, trims: ShaderSource) =>
-        use(ArrowLayer, {
-          positions,
-          segments,
-          anchors,
-          trims,
-          count: n,
+    }), ([segments, anchors, trims]: ShaderSource[]) =>
+      use(ArrowLayer, {
+        positions,
+        segments,
+        anchors,
+        trims,
+        count: n,
 
-          color,
-          width,
-          depth,
-          size,
-          join,
-        })
-    })
+        color,
+        width,
+        depth,
+        size,
+        join,
+      })
+    )
   );
 };
 

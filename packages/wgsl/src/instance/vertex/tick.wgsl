@@ -9,18 +9,13 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getWorldScale };
 
 let EPSILON: f32 = 0.001;
 
-fn getTickV(index: u32) -> f32 {
-  let n = u32(TICK_DETAIL + 1);
-  let i = index % n;
-  return f32(i) / f32(TICK_DETAIL) - 0.5;
-};
-
 @export fn getTickPosition(index: u32) -> vec4<f32> {
-  let n = u32(TICK_DETAIL + 1);
-  
   let offset = getOffset(index);
   let depth = getDepth(index);
   let size = getSize(index);
+
+  let n = u32(LINE_DETAIL + 1);
+  let v = f32(index % n) / f32(LINE_DETAIL) - 0.5;
 
   let anchor = getPosition(index / n);
   
@@ -28,8 +23,6 @@ fn getTickV(index: u32) -> f32 {
   let adj = transformPosition(anchor + offset * EPSILON);
 
   let tangent = normalize(adj.xyz - center.xyz);
-
-  let v = getTickV(index);
   
   let c = worldToClip(center);
   let s = getWorldScale(c.w, depth);

@@ -28,7 +28,6 @@ export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
     generateChunkSegments(segmentBuffer, chunks, loops, starts, ends);
     generateChunkAnchors(anchorBuffer, trimBuffer, chunks, loops, starts, ends);
 
-    console.log({segmentBuffer, anchorBuffer, trimBuffer})
     return [segmentBuffer, anchorBuffer, trimBuffer];
   }, [chunks, loops, starts, ends, count]);
 

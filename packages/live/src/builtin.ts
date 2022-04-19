@@ -5,7 +5,7 @@ import {
 } from './types';
 
 import { compareFibers } from './util';
-import { makeFiber, getCurrentFiberID, makeStaticContinuation, makeImperativeFunction } from './fiber';
+import { makeFiber, getCurrentFiberID, makeImperativeFunction } from './fiber';
 
 export const MORPH        = () => {};
 export const DETACH       = () => {};
@@ -48,7 +48,7 @@ export const keyed = <F extends Function>(
 
 // use a call to a live component with only a children prop
 export const wrap = <F extends Function>(
-  f: LiveComponent<F>,
+  f: LiveFunction<F>,
   children: any,
 ): DeferredCall<F> => ({f, args: [{children}], key: undefined, by: getCurrentFiberID()});
 
@@ -56,7 +56,7 @@ export const wrap = <F extends Function>(
 export const extend = (
   calls: LiveElement<any>,
   props: Record<string, any>,
-): DeferredCall<() => void> => {
+): LiveElement<any> => {
   if (!calls) return calls;
 
   if (Array.isArray(calls)) return calls.map(call => extend(call, props));
@@ -64,6 +64,7 @@ export const extend = (
     const [existing, ...rest] = calls.args;
     return ({...calls, args: [{...existing, ...props}, ...rest] });
   }
+  if (!calls) return calls;
   return ({...calls, args: [props] });
 }
 
@@ -142,16 +143,6 @@ export const consume = <T, C>(
   done?: LiveFunction<(r: T) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key, by: getCurrentFiberID()});
-
-// Fence two chunks of tree while passing on values from both sides
-export const fence = <T>(before: LiveElement<any>, after: LiveElement<any>) =>
-  gather(
-    before,
-    (value: T) => [
-      yeet(value),
-      after,
-    ]
-  );
 
 // Static component decorators
 export const imperative = makeImperativeFunction;

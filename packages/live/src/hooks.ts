@@ -435,7 +435,7 @@ export const useNoCallback = useNoHook(Hook.CALLBACK);
 export const useNoVersion = useNoHook(Hook.VERSION);
 
 // Async wrapper
-export const useAsync = <T>(f: () => Promise<T>, deps: any[] = NO_DEPS): T | null => {
+export const useAsync = <T>(f: () => Promise<T>, deps: any[] = NO_DEPS): T | undefined => {
   const [value, setValue] = useState<T | undefined>(undefined);
 
   const ref = useResource((dispose) => {

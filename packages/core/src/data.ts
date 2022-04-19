@@ -193,8 +193,8 @@ export const generateChunkSegments = (
   for (let i = 0; i < n; ++i) {
     const c = chunks[i];
     const l = loops[i];
-    const s = starts === true || starts[i];
-    const e = ends === true || ends[i];
+    const s = starts === true || (starts as any)[i];
+    const e = ends === true || (ends as any)[i];
 
     if (l) to[pos++] = 0;
     if (c) {
@@ -229,7 +229,7 @@ export const generateChunkAnchors = (
   loops: boolean[] = NO_LOOPS,
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
-): [NumberArray, NumberArray] => {
+) => {
 
   const n = chunks.length;
   for (let i = 0; i < trims.length; ++i) trims[i] = 0;
@@ -274,16 +274,6 @@ export const generateChunkAnchors = (
     }
   }
 }
-
-export const mapChunksToSegments = (
-  chunks: number[],
-  loops: boolean[] = NO_LOOPS,
-) => {
-  const length = getChunkedDataLength(chunks, loops);
-  const {array} = makeDataArray(UniformType['i32'], length);
-  copyChunksToSegments(array, chunks, loops);
-  return array;
-};
 
 export const copyNumberArrayRepeatedRange = (
   from: NumberArray | number, to: NumberArray,

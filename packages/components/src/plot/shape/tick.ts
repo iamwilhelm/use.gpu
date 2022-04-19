@@ -12,8 +12,6 @@ import {
   parsePosition4,
 } from '../util/parse';
 import {
-  useAxisTrait,
-  useArrowTrait,
   useColorTrait,
   useLineTrait,
   useROPTrait,
@@ -21,15 +19,7 @@ import {
 } from '../traits';
 import { vec4 } from 'gl-matrix';
 
-import { Data } from '../../data/data';
 import { TickLayer } from '../../layers/tick-layer';
-
-import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
-
-const AXIS_BINDINGS = [
-  { name: 'getAxisOrigin', format: 'vec4<f32>', value: vec4.fromValues(-1, 0, 0, 0) },
-  { name: 'getAxisStep', format: 'vec4<f32>', value: vec4.fromValues(2, 0, 0, 0) },
-];
 
 export type TickProps =
   Partial<LineTrait> &

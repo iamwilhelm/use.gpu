@@ -59,7 +59,6 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   // Make tick vertex shader
   const og = vec4.clone(p);
   og[axis] = 0;
-  og[3] = 1;
 
   const o = useShaderRef(og);
   const a = useShaderRef(axis);
@@ -87,7 +86,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
     if (render == null && children === undefined) return yeet(source);
     return (
       provide(ValuesContext, values,
-        provide(DataContext, source, render != null ? render(source) : children)
+        provide(DataContext, source, render != null ? render(source, values) : children)
       )
     );
   }, [render, children, source, values]);

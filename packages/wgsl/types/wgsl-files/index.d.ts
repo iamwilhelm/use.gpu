@@ -32,6 +32,7 @@ declare module "@use-gpu/wgsl/geometry/arrow.wgsl" {
 declare module "@use-gpu/wgsl/geometry/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
+  export const getLineSegment: ParsedBundle;
   export const lineJoinBevel: ParsedBundle;
   export const lineJoinMiter: ParsedBundle;
   export const lineJoinRound: ParsedBundle;
@@ -55,17 +56,17 @@ declare module "@use-gpu/wgsl/geometry/strip.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/geometry/tick.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getTickSegment: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/instance/fragment/ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const getUIFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/identity.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getIndex: ParsedBundle;
   export default __module;
 }
 
@@ -148,6 +149,13 @@ declare module "@use-gpu/wgsl/plot/axis.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getAxisPosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/plot/grid.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getGridPosition: ParsedBundle;
   export default __module;
 }
 

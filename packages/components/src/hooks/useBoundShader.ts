@@ -14,10 +14,11 @@ export const useBoundShader = (
   shader: ShaderModule,
   defs: UniformAttributeValue[],
   values: any[],
+  defines?: Record<string, any>,
 ) => {
   return useMemo(() => {
     const bindings = makeShaderBindings<ShaderModule>(defs, values);
     const links = bindingsToLinks(bindings);
-    return bindBundle(shader, links);
-  }, [shader, defs, ...values]);
+    return bindBundle(shader, links, defines);
+  }, [shader, defs, ...values, defines]);
 }

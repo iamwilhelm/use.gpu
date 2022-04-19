@@ -51,15 +51,15 @@
       "import": "./src/geometry/strip.wgsl",
       "require": "./src/geometry/strip.wgsl"
     },
-    "./geometry/tick.wgsl": {
-      "types": "./src/geometry/tick.d.ts",
-      "import": "./src/geometry/tick.wgsl",
-      "require": "./src/geometry/tick.wgsl"
-    },
     "./instance/fragment/ui.wgsl": {
       "types": "./src/instance/fragment/ui.d.ts",
       "import": "./src/instance/fragment/ui.wgsl",
       "require": "./src/instance/fragment/ui.wgsl"
+    },
+    "./instance/identity.wgsl": {
+      "types": "./src/instance/identity.d.ts",
+      "import": "./src/instance/identity.wgsl",
+      "require": "./src/instance/identity.wgsl"
     },
     "./instance/vertex/arrow.wgsl": {
       "types": "./src/instance/vertex/arrow.d.ts",
@@ -115,6 +115,11 @@
       "types": "./src/plot/axis.d.ts",
       "import": "./src/plot/axis.wgsl",
       "require": "./src/plot/axis.wgsl"
+    },
+    "./plot/grid.wgsl": {
+      "types": "./src/plot/grid.d.ts",
+      "import": "./src/plot/grid.wgsl",
+      "require": "./src/plot/grid.wgsl"
     },
     "./plot/scale.wgsl": {
       "types": "./src/plot/scale.d.ts",

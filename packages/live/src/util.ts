@@ -100,7 +100,7 @@ export const makeDisposalTracker = () => {
     if (!list) return;
 
     const i = list.indexOf(t);
-    list.splice(t, i, 1);
+    list.splice(i, 1);
   }
 
   const dispose = (fiber: LiveFiber<any>) => {
@@ -145,6 +145,8 @@ export const isSameDependencies = (
   if (next === undefined && prev === undefined) return true;
   if (prev === undefined) valid = false;
   if (next != null && prev != null) {
+    if (next === prev) return true;
+
     const n = prev.length || 0;
     if (n !== next.length || 0) valid = false;
     else for (let i = 0; i < n; ++i) if (prev[i] !== next[i]) {

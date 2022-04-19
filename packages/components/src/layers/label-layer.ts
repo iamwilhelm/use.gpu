@@ -3,7 +3,7 @@ import { TypedArray, Prop, RenderPassMode } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 import { SDFGlyphData } from '../text/types';
 
-import { use, keyed, wrap, memo, debug, fence, provide, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, keyed, wrap, memo, debug, provide, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';

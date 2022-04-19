@@ -98,7 +98,7 @@ export const makeFiber = <F extends Function>(
     bound, f, args,
     host, depth, path,
     yeeted, context,
-    state: null, pointer: 0, version: null, memo: null, renders: 0,
+    state: null, pointer: 0, version: null, memo: null, runs: 0,
     mount: null, mounts: null, next: null, seen: null, order: null,
     type: null, id, by,
   } as LiveFiber<F>;
@@ -279,7 +279,7 @@ export const updateFiber = <F extends Function>(
     reconcileFiberCalls(fiber, calls);
   }
   // Reconcile wrapped array fragment
-  else if (fiberType === FRAGMENT || (f === DEBUG_BUILTIN)) {
+  else if (fiberType === FRAGMENT || ((f as any) === DEBUG_BUILTIN)) {
     const calls = call!.args ?? EMPTY_ARRAY;
     reconcileFiberCalls(fiber, calls);
   }
@@ -584,7 +584,7 @@ export const morphFiberCall = <F extends Function>(
 ) => {
   const {mount} = fiber;
 
-  if (fiber.type && (fiber.type !== fiberType) && !fiber.type.isLiveBuiltin) {
+  if (fiber.type && (fiber.type !== fiberType) && !((fiber.type as any).isLiveBuiltin)) {
     if (call && mount && mount.context === fiber.context && !mount.next) {
       // Discard all fiber state
       enterFiber(mount, 0);
@@ -594,7 +594,7 @@ export const morphFiberCall = <F extends Function>(
       mount.type = null;
       mount.f = call.f;
       mount.bound = bind(call.f, mount);
-      mount.args = null;
+      mount.args = undefined;
     }
   }
   fiber.type = fiberType;
@@ -767,8 +767,9 @@ export const updateMount = <P extends Function>(
   }
 
   if (update) {
-    const {args: aas, arg: a} = newMount;
-    const args = aas !== undefined ? aas : (a !== undefined ? [a] : undefined);
+    const aas = newMount?.args;
+    const aa = newMount?.arg;
+    const args = aas !== undefined ? aas : (aa !== undefined ? [aa] : undefined);
 
     if (mount!.args === args && !to?.isImperativeFunction) {
       DEBUG && console.log('Skipping', key, formatNode(newMount!));

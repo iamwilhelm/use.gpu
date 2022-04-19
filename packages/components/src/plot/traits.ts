@@ -98,6 +98,15 @@ const FONT_TRAIT = {
 
 const FONT_DEFAULTS = {};
 
+const GRID_TRAIT = {
+  axes:  parseAxes,
+  range: optional(parseRanges),
+};
+
+const GRID_DEFAULTS = {
+  axes: 'xy',
+};
+
 const LABEL_TRAIT = {
   labels:     optional(parseStringArray),
   format:     optional(parseStringFormatter),
@@ -204,6 +213,7 @@ export const useArrowTrait  = makeUseTrait<ArrowTrait>(ARROW_TRAIT, ARROW_DEFAUL
 export const useAxesTrait   = makeUseTrait<AxesTrait>(AXES_TRAIT, AXES_DEFAULTS);
 export const useAxisTrait   = makeUseTrait<AxisTrait>(AXIS_TRAIT, AXIS_DEFAULTS);
 export const useFontTrait   = makeUseTrait<FontTrait>(FONT_TRAIT, FONT_DEFAULTS);
+export const useGridTrait   = makeUseTrait<GridTrait>(GRID_TRAIT, GRID_DEFAULTS);
 export const useLabelTrait  = makeUseTrait<LabelTrait>(LABEL_TRAIT, LABEL_DEFAULTS);
 export const useLineTrait   = makeUseTrait<LineTrait>(LINE_TRAIT, LINE_DEFAULTS);
 export const useObjectTrait = makeUseTrait<ObjectTrait>(OBJECT_TRAIT, OBJECT_DEFAULTS);

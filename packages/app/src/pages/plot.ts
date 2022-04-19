@@ -10,7 +10,7 @@ import {
   OrbitCamera, OrbitControls,
   Pick, Cursor, PointLayer,
   Animation,
-  Plot, Cartesian, Axis, Scale, Tick, Label,
+  Plot, Cartesian, Axis, Grid, Scale, Tick, Label,
   RenderToTexture,
   Router, Routes,
 } from '@use-gpu/components';
@@ -73,6 +73,12 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                               axis: 'x',
                               width: 20,
                               color: [0.75, 0.75, 0.75, 1],
+                            }),
+                            use(Grid, {
+                              axes: 'xy',
+                              width: 4,
+                              first: { detail: 3, divide: 5 },
+                              second: { detail: 3, divide: 5 },
                             }),
                             use(Scale, {
                               divide: 5,

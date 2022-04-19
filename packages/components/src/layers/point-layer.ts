@@ -16,22 +16,15 @@ import { useShaderRef } from '../hooks/useShaderRef';
 
 import { circle, diamond, square, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/wgsl/mask/point.wgsl';
 
-export enum PointShape {
-  Circle = 'circle',
-  Diamond = 'diamond',
-  Square = 'square',
-  CircleOutlined = 'circleOutlined',
-  DiamondOutlined = 'diamondOutlined',
-  SquareOutlined = 'squareOutlined',
-};
+export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
 
 const MASK_SHADER = {
-  [PointShape.Circle]: circle,
-  [PointShape.Diamond]: diamond,
-  [PointShape.Square]: square,
-  [PointShape.CircleOutlined]: circleOutlined,
-  [PointShape.DiamondOutlined]: diamondOutlined,
-  [PointShape.SquareOutlined]: squareOutlined,
+  'circle': circle,
+  'diamond': diamond, 
+  'square': square, 
+  'circleOutlined': circleOutlined, 
+  'diamondOutlined': diamondOutlined, 
+  'squareOutlined': squareOutlined, 
 };
 
 export type PointLayerProps = {
@@ -66,7 +59,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     depths,
 
     count,
-    shape = PointShape.Circle,
+    shape = 'circle',
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;

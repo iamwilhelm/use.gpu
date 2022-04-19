@@ -2,10 +2,8 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { ColorTrait, LineTrait, ROPTrait, VectorLike } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
-import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
 
 import { DataContext } from '../../providers/data-provider';
-import { RangeContext } from '../../providers/range-provider';
 import {
   parseFloat,
   parseDetail,
@@ -19,28 +17,22 @@ import {
 } from '../traits';
 import { vec4 } from 'gl-matrix';
 
-import { TickLayer } from '../../layers/tick-layer';
+import { LineLayer } from '../../layers/line-layer';
 
-export type TickProps =
+export type LineProps =
   Partial<ColorTrait> &
   Partial<LineTrait> &
   Partial<ROPTrait> & {
-  size?: number,
-  detail?: number,
-  offset?: VectorLike,
+
+  colors?: StorageSource,
+  widths?: StorageSource,
+  depths?: StorageSource,
 };
 
-const NO_OFFSET = vec4.fromValues(0, 1, 0, 0);
-
-export const Tick: LiveComponent<TickProps> = (props) => {
-  const {
-    size = 5,
-    detail = 1,
-    offset = NO_OFFSET
-  } = props;
+export const Line: LiveComponent<LineProps> = (props) => {
+  const {colors, widths, depths} = props;
 
   const positions = useContext(DataContext);
-  const count = useCallback(() => positions.length, [positions]);
 
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);
@@ -51,17 +43,17 @@ export const Tick: LiveComponent<TickProps> = (props) => {
   const o = useProp(offset, parsePosition4);
 
   return (
-    use(TickLayer, {
+    use(LineLayer, {
       positions,
-      offset: o,
-      detail: d,
-      count,
 
       color,
       width,
       depth,
-      size: s,
       join,
+
+      colors,
+      widths,
+      depths,
     })
   );
 };

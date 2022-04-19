@@ -6,11 +6,11 @@ import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,
-  CompositeData, Data, RawData, Raw,
+  CompositeData, ArrayData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
   Pick, Cursor, PointLayer,
   Animation,
-  Plot, Cartesian, Axis, Grid, Scale, Tick, Label,
+  Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled,
   RenderToTexture,
   Router, Routes,
 } from '@use-gpu/components';
@@ -21,13 +21,9 @@ export type GeometryPageProps = {
   canvas: HTMLCanvasElement,
 };
 
-
-console.log({Animation})
 let t = 0;
 
 export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
-  const mesh = makeMesh();
-  const texture = makeTexture();
   const {canvas} = props;
   
   const view = (
@@ -42,14 +38,6 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
             use(Cursor, { cursor: 'move' }),
             use(Pass, {
               children: [
-      
-                use(Pick, {
-                  render: ({id, hovered, presses}) => [
-                    //use(Mesh, { texture, mesh, blink: presses.left }),
-                    use(Mesh, { id, texture, mesh, mode: RenderPassMode.Picking }),
-                    hovered ? use(Cursor, { cursor: 'pointer' }) : null,
-                  ],
-                }),
           
                 use(Plot, {
                   children: [
@@ -59,15 +47,15 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                       mirror: true,
                       delay: 0,
                       frames: [
-                        [0, [[0, 1], [0, 1], [0, 1]]],
-                        [10, [[-20, 8], [0, 1], [0, 1]]],
+                        [0, [[-3, 0], [0, 1], [0, 3]]],
+                        [10, [[0, 3], [0, 1], [0, 3]]],
                       ],
                       prop: 'range',
                       children:
                         use(Cartesian, {
-                          range: [],
-                          scale: [1, 1, 1],
+                          scale: [2, 1, 1],
                           children: [
+
                             use(Grid, {
                               axes: 'xy',
                               width: 3,
@@ -99,6 +87,7 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                                   color: [0.75, 0.75, 0.75, 1],
                                   depth: 0.5,
                                 }),
+                                /*
                                 use(Label, {
                                   placement: 'bottom',
                                   color: '#808080',
@@ -115,6 +104,7 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                                   expand: 0,
                                   depth: 0.5,
                                 }),
+                                */
                               ],
                             }),
                             use(Axis, {
@@ -129,6 +119,18 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                               width: 5,
                               color: [0.75, 0.75, 0.75, 1],
                               depth: 0.5,
+                            }),
+                            
+                            use(Sampled, {
+                              axes: 'xz',
+                              format: 'vec4<f32>',
+                              size: [64, 32],
+                              expr: (emit, x, y) => {
+                                const v = Math.cos(x) * Math.cos(y);
+                                emit(x, v * .5 + .5, y, 1);
+                              },
+                              render: (data: ShaderSource) =>
+                                use(PointLayer, { positions: data, size: 10, color: [0.2, 0.5, 1, 1], depth: 0.5 }),
                             }),
                           ]
                         })                     

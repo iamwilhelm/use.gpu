@@ -43,11 +43,60 @@ export const makeDataAccessor = (format: UniformType, accessor: AccessorSpec) =>
   else throw new Error(`Invalid accessor ${accessor}`);
 }
 
-export const emitIntoNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number, items: number = 1) => {
+export const emitIntoNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number) => {
   const emit = makeDataEmitter(to, dims);
   const n = to.length / dims;
-  let i = 0;
-  for (let i = 0; i < n; i += items) expr(emit, i, n);
+  for (let i = 0; i < n; i++) expr(emit, i, n);
+}
+
+export const emitIntoMultiNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number, size: number[]) => {
+  const n = size.length;
+
+  const index = size.map(_ => 0);
+  const increment = () => {
+    for (let i = 0; i < n; ++i) {
+      let c = index[i];
+      if (c === size[i] - 1) index[i] = 0;
+      else {
+        index[i] = c + 1;
+        break;
+      }
+    }
+  };
+
+  let nest: Emitter;
+  if (n === 1) {
+    nest = (emit: Emitter) => {
+      expr(emit, index[0], size);
+      increment();
+    };
+  }
+  else if (n === 2) {
+    nest = (emit: Emitter) => {
+      expr(emit, index[0], index[1], size);
+      increment();
+    };
+  }
+  else if (n === 3) {
+    nest = (emit: Emitter) => {
+      expr(emit, index[0], index[1], index[2], size);
+      increment();
+    };
+  }
+  else if (n === 4) {
+    nest = (emit: Emitter) => {
+      expr(emit, index[0], index[1], index[2], index[3], size);
+      increment();
+    };
+  }
+  else {
+    nest = (emit: Emitter) => {
+      expr(emit, ...index, size);
+      increment();
+    };
+  }
+  
+  emitIntoNumberArray(nest, to, dims);
 }
 
 export const copyNumberArray = (from: NumberArray, to: NumberArray) => {

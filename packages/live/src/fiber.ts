@@ -237,7 +237,6 @@ export const pingFiber = <F extends Function>(
 ) => {
   // Notify host / dev tool of update
   const {host} = fiber;
-  const name = formatNodeName(fiber);
   if (active) pingFiberCount(fiber);
   if (host?.__ping) host.__ping(fiber, active);
 }
@@ -626,9 +625,9 @@ export const provideFiber = <F extends Function>(
   fiber: LiveFiber<F>,
 ) => {
   if (!fiber.args) return;
-  let {args: [context, value, calls]} = fiber;
+  let {context: {roots, values}, args: [context, value, calls]} = fiber;
 
-  if (fiber.context.roots.get(context) !== fiber) {
+  if (roots.get(context) !== fiber) {
     fiber.context = makeContextState(fiber, fiber.context, context, value);
     pingFiber(fiber);
 
@@ -638,7 +637,7 @@ export const provideFiber = <F extends Function>(
   }
   else {
     // Set new value if changed
-    const ref = fiber.context.values.get(context);
+    const ref = values.get(context);
     const lastValue = ref.current;
     if (value !== lastValue) {
       bustFiberDeps(fiber);

@@ -164,8 +164,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     const hover   = () => updateHoverState({ $set: {
       fiber,
       by: fibers.get(fiber.by),
-      deps: host ? host.traceDown(fiber) : [],
-      precs: host ? host.traceUp(fiber) : [],
+      deps: host ? Array.from(host.traceDown(fiber)) : [],
+      precs: host ? Array.from(host.traceUp(fiber)) : [],
       root,
       depth: renderDepth,
     } });

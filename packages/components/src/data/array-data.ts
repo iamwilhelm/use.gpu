@@ -3,7 +3,7 @@ import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/t
 
 import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
-  makeDataEmitter, makeDataArray, copyNumberArray, emitIntoNumberArray, 
+  makeDataEmitter, makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
 
@@ -13,23 +13,15 @@ import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provid
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type ArrayDataProps = {
-  size?: number[],
+  size: number[],
   data?: number[] | TypedArray,
-  expr?: (emit: Emitter, i: number, n: number) => void,
+  expr?: (emit: Emitter, ...args: number[]) => void,
   items?: number,
   format?: string,
   live?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
 };
-
-const INDEX_BINDINGS = [
-  { name: 'getIndex', format: 'u32', value: 0, args: [] },
-  { name: 'getIndex', format: 'u32', value: 0, args: ['u32'] },
-  { name: 'getIndex', format: 'u32', value: 0, args: ['u32', 'u32'] },
-  { name: 'getIndex', format: 'u32', value: 0, args: ['u32', 'u32', 'u32'] },
-  { name: 'getIndex', format: 'u32', value: 0, args: ['u32', 'u32', 'u32', 'u32'] },
-];
 
 export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   const device = useContext(DeviceContext);
@@ -60,7 +52,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     const source = {
       buffer,
       format: f,
-      length: 0,
+      length,
       size,
       version: 0,
     };
@@ -71,13 +63,15 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   // Refresh and upload data
   const refresh = () => {
     if (data) copyNumberArray(data, array);
-    if (expr) emitIntoNumberArray(expr, array, dims, t);
+    if (expr && size.length) {
+      emitIntoMultiNumberArray(expr, array, dims, size, t);
+    }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
 
     source.length = length;
-    source.size[0] = length;
+    source.size = size;
     source.version = incrementVersion(source.version);
   };
 

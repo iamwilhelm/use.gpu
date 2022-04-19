@@ -25,6 +25,7 @@ import {
   parsePlacement,
   parseFlip,
   parseWeight,
+  parsePointShape,
   optional,
 } from './util/parse';
 import {
@@ -145,6 +146,18 @@ const OBJECT_TRAIT = {
 };
 
 const OBJECT_DEFAULTS = {};
+
+const POINT_TRAIT = {
+  size:      parseFloat,
+  depth:     parseFloat,
+  shape:     parsePointShape,
+};
+
+const POINT_DEFAULTS = {
+  size: 1,
+  depth: 0,
+  shape: 'circle',
+};
 
 const ROP_TRAIT = {
   blending: parseBlending,

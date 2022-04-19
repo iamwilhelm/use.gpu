@@ -71,7 +71,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
     if (p || r || q || s) {
       const t = mat4.create();
       composeTransform(t, p, r, q, s);
-      mat4.multiply(matrix, matrix, t);
+      mat4.multiply(matrix, t, matrix);
     }
 
     return matrix;

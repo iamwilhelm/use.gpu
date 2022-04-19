@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike } from '../types';
+import { AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait, VectorLike } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
@@ -18,9 +18,6 @@ import {
   useLabelTrait,
   useROPTrait,
 } from '../traits';
-import {
-  AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait,
-} from '../types';
 import { formatNumber } from '../util/format';
 import { vec4 } from 'gl-matrix';
 

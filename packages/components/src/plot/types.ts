@@ -13,6 +13,7 @@ export type Domain = 'linear' | 'log',
 export type Color = [number, number, number, number];
 export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom';
 export type Flip = 'none' | 'outside' | 'inside';
+export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
 
 export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;
 export type VectorLike = TypedArray | number[];

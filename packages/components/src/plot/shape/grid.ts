@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LineProps, ColorProps, ROPProps, ArrowProps, VectorLike, Swizzle } from '../types';
+import { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, VectorLike, Swizzle } from '../types';
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShader } from '../../hooks/useBoundShader';

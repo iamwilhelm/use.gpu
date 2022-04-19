@@ -6,7 +6,7 @@ import { useTransformContext } from '../providers/transform-provider';
 import { sourceToModule, bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 
-const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['i32'] } as UniformAttributeValue;
+const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['u32'] } as UniformAttributeValue;
 
 export const useApplyTransform = (
   positions: StorageSource | LambdaSource | ShaderModule,

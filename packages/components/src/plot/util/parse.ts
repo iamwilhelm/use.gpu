@@ -1,5 +1,5 @@
 import { ArrowFunction } from '@use-gpu/live';
-import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, Color, Placement, Flip, TypedArray, ColorLike, VectorLike, ArrayLike } from '../types';
+import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, Color, Placement, Flip, TypedArray, ColorLike, VectorLike, ArrayLike, PointShape } from '../types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
@@ -259,3 +259,5 @@ export const parseWeight = makeParseMapOrValue({
   'extra-bold': 800,
   'ultra-bold': 900,
 }, 'normal');
+
+export const parsePointShape = makeParseEnum<PointShape>(['circle', 'diamond', 'square', 'circleOutlined', 'diamondOutlined', 'squareOutlined'])

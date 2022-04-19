@@ -7,11 +7,11 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }
 @external fn getUV(i: u32) -> vec2<f32> {};
 @external fn getLayout(i: u32) -> vec2<f32> {};
 
-@external fn getPosition(i: i32) -> vec4<f32> {};
+@external fn getPosition(i: u32) -> vec4<f32> {};
 @external fn getPlacement(i: u32) -> vec2<f32> {};
 @external fn getOffset(i: u32) -> f32 {};
 @external fn getSize(i: u32) -> f32 {};
-@external fn getDepth(i: i32) -> f32 {};
+@external fn getDepth(i: u32) -> f32 {};
 @external fn getColor(i: u32) -> f32 {};
 @external fn getExpand(i: u32) -> f32 {};
 // @external fn getFlip(i: u32) -> f32;

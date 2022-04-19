@@ -73,12 +73,12 @@ export const makeDependencyTracker = () => {
 
   const traceDown = (fiber: LiveFiber<any>) => {
     const fibers = dependencies.get(fiber);
-    return fibers ? Array.from(fibers.values()) : NO_DEPS;
+    return fibers ? fibers.values() : NO_DEPS;
   }
 
   const traceUp = (fiber: LiveFiber<any>) => {
     const fibers = precedents.get(fiber);
-    return fibers ? Array.from(fibers.values()) : NO_DEPS;
+    return fibers ? fibers.values() : NO_DEPS;
   }
 
   return {depend, undepend, traceDown, traceUp};

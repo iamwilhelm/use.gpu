@@ -1,3 +1,4 @@
+export * from './array-data';
 export * from './composite-data';
 export * from './data';
 export * from './fetch';

@@ -6,33 +6,26 @@ import React from '@use-gpu/live/jsx';
 
 import {
   Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Text, Element,
-  OrbitCamera, OrbitControls,
-  Pick, Cursor,
 } from '@use-gpu/components';
-import { Mesh } from '../../components/mesh';
-import { makeMesh, makeTexture } from '../../meshes/cube';
+import { makeTexture } from '../../meshes/cube';
 
-export type LayoutDisplayPageProps = {
-};
-
-export const LayoutDisplayPage: LiveComponent<LayoutDisplayPageProps> = (props) => {
-  const mesh = makeMesh();
+export const LayoutDisplayPage: LC = () => {
   const texture = makeTexture();
-  const {canvas} = props;
 
   const view = (
     <Draw>
-      <Cursor cursor='move' />
       <Pass>
         <Flat>
           <UI>
             <Layout>
               <Flex width="100%" height="100%">
-                <Block width="34%">
-                  <Element height={100} />
+                <Block width="34%" height={500}>
+                  <Absolute>
+                    <Element fill={[0, 0, 0, .5]} margin={10} />
+                  </Absolute>
                 </Block>
-                <Block width="66%">
-                  <Element />
+                <Block width="66%" height="100%">
+                  <Element fill={[0, 0, 0, .5]} />
                 </Block>
               </Flex>
             </Layout>

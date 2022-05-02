@@ -33,8 +33,8 @@ export const Data: LiveComponent<DataProps> = (props) => {
     live = false,
   } = props;
 
-  const length = data?.length || 0;
-  const l = useBufferedSize(length);
+  const length = data?.length || fields?.[0]?.[1]?.length;
+  const l = useBufferedSize(length || 1);
   const fs = fields ?? NO_FIELDS;
 
   // Make data buffers

@@ -18,7 +18,7 @@ const Resume = (els: LayoutElement[]) => {
   const layout = useContext(LayoutContext);
   const [left, top, right, bottom] = layout;
   const size = [right - left, bottom - top] as Point;
-
+  
   const out = [] as LiveElement[];
   for (const {margin, fit} of els) {
     const {

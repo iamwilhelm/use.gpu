@@ -62,8 +62,15 @@ export const Pass: LiveComponent<PassProps> = memo((props: PassProps) => {
     return yeet(() => {
       const commandEncoder = device.createCommandEncoder();
 
+      renderContext.swapView();
       renderToContext(commandEncoder, renderContext, visibles);
-      if (picking && pickingContext) renderToContext(commandEncoder, pickingContext.renderContext, pickings);
+
+      const shouldUpdatePicking = picking && pickingContext && pickings.length;
+      if (shouldUpdatePicking) {
+        const {renderContext} = pickingContext!;
+        renderContext.swapView();
+        renderToContext(commandEncoder, renderContext, pickings);
+      }
 
       device.queue.submit([commandEncoder.finish()]);      
     });

@@ -48,7 +48,6 @@ export const Inline: LiveComponent<InlineProps> = memo((props: BlockProps) => {
       shrink,
       fit: memoFit((into: Point) => {
         const {size, ranges, offsets, renders} = fitInline(els, into, direction, align, anchor, wrap, snap);
-        
         return {
           size,
           render: makeInlineLayout(ranges, offsets, renders),

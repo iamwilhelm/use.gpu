@@ -31,7 +31,7 @@ export type TextProps = {
   size?: number,
   snap?: boolean,
 
-  content?: string,
+  text?: string,
   children?: string,
 };
 
@@ -48,11 +48,11 @@ export const Text: LiveComponent<TextProps> = (props) => {
     lineHeight,
     size = 16,
     snap = false,
-    content = '',
+    text = '',
     children,
   } = props;
 
-  const strings = children ?? content;
+  const strings = children ?? text;
 
   const font = useFontFamily(family, weight, style);
   const {spans, glyphs, breaks} = useFontText(font, strings, size);

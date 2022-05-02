@@ -1,4 +1,4 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import { LC } from '@use-gpu/live/types';
 import React, { Gather, Yeet } from '@use-gpu/live/jsx';
 
 import {
@@ -7,12 +7,7 @@ import {
   DebugAtlas, RawTexture,
 } from '@use-gpu/components';
 
-export type DebugAtlasPageProps = {
-  canvas: HTMLCanvasElement,
-};
-
-export const DebugAtlasPage: LiveComponent<DebugAtlasPageProps> = (props) => {
-  const {canvas} = props;
+export const DebugAtlasPage: LC = () => {
 
   return (
     <Draw>

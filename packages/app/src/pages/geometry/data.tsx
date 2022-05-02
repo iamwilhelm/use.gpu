@@ -1,4 +1,4 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import { LC } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
@@ -12,10 +12,6 @@ import {
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
 } from '@use-gpu/components';
-
-export type GeometryPageProps = {
-  canvas: HTMLCanvasElement,
-};
 
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
@@ -98,8 +94,7 @@ const lineDataFields = [
 
 let t = 0;
 
-export const GeometryDataPage: LiveComponent<GeometryDataPageProps> = (props) => {
-  const {canvas} = props;
+export const GeometryDataPage: LC = () => {
 
   const view = (
     <Loop>
@@ -176,7 +171,6 @@ export const GeometryDataPage: LiveComponent<GeometryDataPageProps> = (props) =>
 
   return (
     <OrbitControls
-      canvas={canvas}
       radius={5}
       bearing={0.5}
       pitch={0.3}

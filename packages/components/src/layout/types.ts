@@ -40,6 +40,9 @@ export type LayoutElement = {
   sizing: Sizing,
   margin: Margin,
 
+  ratioX?: number,
+  ratioY?: number,
+
   grow?: number,
   shrink?: number,
   absolute?: boolean,

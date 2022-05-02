@@ -41,17 +41,23 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
 
-    const size = [w ?? 0, h ?? 0];
     const fixed = [w, h];
 
     const sizing = getBlockMinMax(els, fixed, direction);
     const margin = getBlockMargin(els, blockMargin, padding, direction);
+
+    let ratioX = undefined;
+    let ratioY = undefined;
+    if (typeof width  === 'string') ratioX = parseDimension(width,  1, false);
+    if (typeof height === 'string') ratioY = parseDimension(height, 1, false);
 
     return yeet({
       sizing,
       margin,
       grow,
       shrink,
+      ratioX,
+      ratioY,
       fit: memoFit((into: Point) => {
         const w = width != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;

@@ -48,14 +48,13 @@ export const Router: LiveComponent<RouterProps> = memo(({source, routes, childre
   });
 
   useResource((dispose) => {
-    src.resource(() => {
-      console.log('set state router');
+    src.resource(() =>
       setState((s) => ({
         ...s,
         path: src.path(),
         query: src.query(),
       }))
-    });
+    );
     dispose(() => src.resource(() => {}));
   }, [src]);
 

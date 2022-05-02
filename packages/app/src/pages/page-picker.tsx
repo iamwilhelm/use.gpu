@@ -12,18 +12,18 @@ const STYLE = {
   background: 'rgba(0, 0, 0, .5)',
 };
 
-export const makePicker = (canvas: HTMLCanvasElement) => ({
+export const makePicker = (container: HTMLElement) => ({
   "/": { element: null, exact: true },
-  "*": { element: use(PagePicker, canvas) },
+  "*": { element: use(PagePicker, container) },
 });
 
-export const PagePicker = (canvas: HTMLCanvasElement) => {
+export const PagePicker = (container: HTMLElement) => {
   const {route: {path}, push} = useRouterContext();
   const handleChange = (e: any) => push(e.target.value);
 
   return (
     use(HTML, {
-      container: canvas.parentElement,
+      container,
       style: STYLE,
       children: (
         <select onChange={handleChange} value={path}>

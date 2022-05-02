@@ -25,11 +25,9 @@ export const Draw: LiveComponent<DrawProps> = (props) => {
 };
 
 const Resume = (ts: Task[]) => {
-  const {swapView} = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
 
   usePerFrame();
-  swapView();
 
   for (let task of ts) task();
 

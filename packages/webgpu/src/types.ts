@@ -5,10 +5,6 @@ export type GPUDeviceMount = {
   device: GPUDevice,
 };
 
-export type GPUMount = GPUDeviceMount & {
-  canvas: HTMLCanvasElement,
-};
-
 export type CanvasRenderingContextGPU = UseRenderingContextGPU & {
   element: HTMLCanvasElement,
 };

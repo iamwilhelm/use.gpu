@@ -98,10 +98,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     [device, width, height, depthStencil, samples]
   );
   
-  const fiber = useFiber();
   const swapView = useCallback(() => {
-    const {host, next} = fiber;
-    if (host && next) host.visit(next);
   });
 
   const rttContext = useMemo(() => ({

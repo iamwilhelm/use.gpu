@@ -25,18 +25,21 @@ export type ElementProps = {
   children?: LiveElement<any>,
 };
 
+const TRANSPARENT: Point4 = [0, 0, 0, 0];
+
 export const Element: LiveComponent<ElementProps> = (props) => {
   const {
     width,
     height,
+    // -- unpacked below
     // margin
     // radius
     // border
 
     image,
 
-    //stroke,
-    //fill,
+    stroke = TRANSPARENT,
+    fill = TRANSPARENT,
 
     grow = 0,
     shrink = 0,
@@ -44,9 +47,6 @@ export const Element: LiveComponent<ElementProps> = (props) => {
 
     children,
   } = props;
-
-  const stroke = [Math.random(), Math.random(), Math.random(), Math.random() + .5];
-  const fill = [Math.random(), Math.random(), Math.random(), Math.random() + .5];
 
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;

@@ -7,7 +7,7 @@ import { Inspect } from './components/inspect';
 
 export type UseInspectProps = {
   fiber: LiveFiber<any>,
-  canvas: HTMLCanvasElement,
+  container: HTMLElement,
 };
 
 const STYLE = {
@@ -17,9 +17,9 @@ const STYLE = {
   zIndex: 10000,
 };
 
-export const UseInspect: LiveComponent<UseInspectProps> = ({fiber, canvas}) =>
+export const UseInspect: LiveComponent<UseInspectProps> = ({fiber, container}) =>
   use(HTML, {
-    container: canvas.parentElement,
+    container,
     style: STYLE,
     children: <Inspect fiber={fiber} />,
   });

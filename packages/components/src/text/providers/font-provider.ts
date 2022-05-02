@@ -20,7 +20,7 @@ export type FontProviderProps = {
 };
 
 export const FontProvider: LiveComponent<FontProviderProps> = ({fonts, children}) => {
-  const rustText = useAsync(RustText);
+  const [rustText] = useAsync(RustText);
 
   const context = useMemo(() => {
     if (!rustText) return null;

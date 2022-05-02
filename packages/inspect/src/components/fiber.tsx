@@ -255,7 +255,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   }
 
   // Render attached react root
-  if (__inspect?.react) {
+  if (shouldRender && __inspect?.react) {
     const {react} = __inspect;
     const node = react.root?.current;
     

@@ -1,4 +1,4 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import { LC } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
@@ -12,14 +12,9 @@ import {
 import { Mesh } from '../../components/mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
 
-export type LinearRGBPageProps = {
-  canvas: HTMLCanvasElement,
-};
-
-export const LinearRGBPage: LiveComponent<LinearRGBPageProps> = (props) => {
+export const LinearRGBPage: LC = () => {
   const mesh = makeMesh();
   const texture = makeTexture();
-  const {canvas} = props;
 
   const view = (
     <LinearRGB>
@@ -66,7 +61,6 @@ export const LinearRGBPage: LiveComponent<LinearRGBPageProps> = (props) => {
 
   return (
     <OrbitControls
-      canvas={canvas}
       radius={5}
       bearing={0.5}
       pitch={0.3}

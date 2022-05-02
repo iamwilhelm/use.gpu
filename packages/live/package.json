@@ -5,6 +5,11 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts",
+    "./jsx": "./src/jsx.ts"
+  },
   "scripts": {
     "test": "jest --watch",
     "lint": "eslint src --ext ts",

@@ -45,8 +45,8 @@ export const HomePage: LiveComponent<HomePageProps> = (props) => {
         
         <ul>
           {PAGES.slice(0, -1).map(({title, path}) => (
-            <li>
-              <a key={path} {...linkTo(path)}>{title}</a>
+            <li key={path}>
+              <a {...linkTo(path)}>{title}</a>
             </li>
           ))}
         </ul>

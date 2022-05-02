@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Tuples } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 import { FontMetrics } from '@use-gpu/text/types';
 import { Point4, InlineLine } from './types';
 
@@ -39,6 +40,8 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     breaks,
     height,
     lines,
+
+    transform,
   } = props;
 
   let layout;
@@ -61,13 +64,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   for (const {layout, start, end, gap} of lines) {
     const [l, t] = layout;
 
-    const {ascent, descent, lineHeight} = height;
-    const h = ascent - descent;
-    const g = (lineHeight - h) / 2;
-    const base = h + g;
-
+    const {baseline, lineHeight} = height;
     let x = l;
-    let y = t + base;
+    let y = t + baseline;
 
     let sx = x;
     spans.iterate((_a, trim, _h, index) => {
@@ -111,6 +110,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     repeat: -1,
 
     count,
+    transform,
   } : null;
 
   return yeet(render);

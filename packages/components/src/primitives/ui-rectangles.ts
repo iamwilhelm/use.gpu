@@ -13,7 +13,7 @@ import { render } from './render';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
 
@@ -30,6 +30,7 @@ export type UIRectanglesProps = {
   repeat?: number,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
+  transform?: ShaderModule,
 
   rectangles?: StorageSource | LambdaSource | ShaderModule
   radiuses?: StorageSource | LambdaSource | ShaderModule,
@@ -46,23 +47,8 @@ export type UIRectanglesProps = {
   id?: number,
 };
 
-const ZERO = [0, 0, 0, 1];
-const GRAY = [0.5, 0.5, 0.5, 1];
-const SQUARE = [0, 0, 1, 1];
-
-const VERTEX_BINDINGS = [
-  { name: 'getRectangle', format: 'vec4<f32>', value: ZERO },
-  { name: 'getRadius', format: 'vec4<f32>', value: [0, 0, 0, 0] },
-  { name: 'getBorder', format: 'vec4<f32>', value: [0, 0, 0, 0] },
-  { name: 'getStroke', format: 'vec4<f32>', value: GRAY },
-  { name: 'getFill', format: 'vec4<f32>', value: GRAY },
-  { name: 'getUV', format: 'vec4<f32>', value: SQUARE },
-  { name: 'getRepeat', format: 'i32', value: 0 },
-] as UniformAttributeValue[];
-
-const FRAGMENT_BINDINGS = [
-  { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [0.0, 0.0, 0.0, 0.0] },
-] as UniformAttributeValue[];
+const VERTEX_BINDINGS = bundleToAttributes(rectangleVertex);
+const FRAGMENT_BINDINGS = bundleToAttributes(rectangleFragment);
 
 const DEFINES = {
   STRIP_SEGMENTS: 2,
@@ -101,16 +87,17 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const p = useShaderRef(props.repeat, props.repeats);
 
   const t = props.texture;
+  const x = props.transform;
 
   const [vs, fs] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, a, b, s, f, u, p]);
+    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, a, b, s, f, u, p, x]);
     const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [t]);
 
     const vs = bindBundle(rectangleVertex, bindingsToLinks(vertexBindings), null, key);
     const fs = bindBundle(rectangleFragment, bindingsToLinks(fragmentBindings), null, key);
 
     return [vs, fs];
-  }, [r, a, b, s, f, u, p, t]);
+  }, [r, a, b, s, f, u, p, t, x]);
 
   return render({
     vertexCount,

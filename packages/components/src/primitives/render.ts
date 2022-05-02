@@ -33,6 +33,11 @@ export type RenderProps = {
   deps: any[] | null,
 };
 
+const NO_VIEW = {
+  viewUniforms: {none: {current: 0}},
+  viewDefs: [{format: 'i32', name: 'none'}],
+};
+
 export const render = (props: RenderProps) => {
   const {
     vertexCount,
@@ -51,7 +56,7 @@ export const render = (props: RenderProps) => {
 
   // Render set up
   const device = useContext(DeviceContext);
-  const {viewUniforms, viewDefs} = useContext(ViewContext);
+  const {viewUniforms, viewDefs} = useContext(ViewContext) ?? NO_VIEW;
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
   const {colorInput, colorSpace} = renderContext;
 

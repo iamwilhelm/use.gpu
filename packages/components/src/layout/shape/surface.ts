@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 
 import { use, yeet, useContext, useMemo, useNoContext } from '@use-gpu/live';
 import { LayoutContext } from '../../providers/layout-provider';
@@ -29,6 +30,8 @@ export type SurfaceProps = {
   stroke?: Point4,
   border?: Point4,
   radius?: Point4,
+
+  transform?: ShaderModule
 };
 
 export const Surface: LiveComponent<SurfaceProps> = (props) => {
@@ -40,6 +43,8 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
     stroke,
     radius,
     border,
+
+    transform,
   } = props;
 
   let layout;
@@ -141,6 +146,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
       uv,
 
       count: 1,
+      transform,
     };
   }
   else {
@@ -151,7 +157,9 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
       border,
       stroke,
       fill,
+
       count: 1,
+      transform,
     };
   }
 

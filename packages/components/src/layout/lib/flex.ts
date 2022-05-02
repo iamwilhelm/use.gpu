@@ -1,6 +1,7 @@
 import { LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, LayoutRenderer, Direction, Point, Point4, Margin, Rectangle, Alignment, Anchor } from '../types';
+import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, Point, Point4, Margin, Rectangle, Alignment, Anchor } from '../types';
 
+import { getAlignmentSpacing } from './cursor';
 import { parseAnchor } from './util';
 
 export const getFlexMinMax = (
@@ -127,6 +128,7 @@ export const fitFlex = (
   const sizes   = [] as Point[];
   const offsets = [] as Point[];
   const renders = [] as LayoutRenderer[];
+  const pickers = [] as LayoutPicker[];
 
   const main = [] as LayoutElement[];
   const mainSizes = [] as number[];
@@ -136,6 +138,7 @@ export const fitFlex = (
     sizes: Point[],
     offsets: Point[],
     renders: LayoutRenderer[],
+    pickers: LayoutPicker[],
   }[];
 
   let accumMain = 0;
@@ -145,15 +148,14 @@ export const fitFlex = (
   let maxCross = 0;
 
   // Lay out a full row of boxes
-  const reduceMain = () => {
+  const reduceMain = (hard?: boolean) => {
     const n = mainSizes.length;
     if (!n) return;
 
     // Extra space to be grown (+) or shrunk (-)
-    let slack = spaceMain - accumMain - gapMain;
+    let slack = spaceMain - accumMain + gapMain;
 
     // Grow/shrink row if applicable
-    let exact = slack === 0;
     if (slack > 0) {
       if (growRow(slack, main, mainSizes)) slack = 0;
     }
@@ -164,13 +166,14 @@ export const fitFlex = (
     // Spacing on main axis
     let axisGap = 0;
     let axisPos = 0;
-    if (slack) [axisGap, axisPos] = getFlexSpacing(slack, n, alignMain);
+    if (slack > 0) [axisGap, axisPos] = getAlignmentSpacing(slack, n, !!hard, alignMain);
     axisGap += gapMain;
-
+    
     // Lay out a row of flexed boxes into their final size
     const crossSizes   = [] as Point[];
     const crossOffsets = [] as [number, number][];
     const crossRenders = [] as LayoutRenderer[];
+    const crossPickers = [] as LayoutPicker[];
 
     let maxSize = 0;
     for (let i = 0; i < n; ++i) {
@@ -179,7 +182,7 @@ export const fitFlex = (
         ? [mainSizes[i] / (ratioX || 1), containY]
         : [containX, mainSizes[i] / (ratioY || 1)]) as Point;
 
-      const {render, size: fitted} = fit(into);
+      const {render, pick, size: fitted} = fit(into);
       const [ml, mt, mr, mb] = margin;
 
       let [w, h] = fitted;
@@ -193,6 +196,7 @@ export const fitFlex = (
       let hh = c + mc;
 
       crossRenders.push(render);
+      crossPickers.push(pick);
       crossOffsets.push(isX ? [ml + axisPos, mt, hh] : [ml, mt + axisPos, hh]);
       axisPos += s + mm + axisGap;
 
@@ -210,6 +214,7 @@ export const fitFlex = (
       sizes: crossSizes,
       offsets: crossOffsets,
       renders: crossRenders,
+      pickers: crossPickers,
     });
     accumCross += maxSize;
     maxCross = Math.max(accumCross, maxCross);
@@ -226,11 +231,11 @@ export const fitFlex = (
 
     let crossGap = 0;
     let crossPos = 0;
-    if (slack > 0) [crossGap, crossPos] = getFlexSpacing(slack, n, alignCross);
+    if (slack > 0) [crossGap, crossPos] = getAlignmentSpacing(slack, n, false, alignCross);
     crossGap += gapCross;
 
     for (let i = 0; i < n; ++i) {
-      const {size, sizes: ss, offsets: os, renders: rs} = cross[i];
+      const {size, sizes: ss, offsets: os, renders: rs, pickers: ps} = cross[i];
 
       const m = ss.length;
       for (let j = 0; j < m; ++j) {
@@ -249,6 +254,7 @@ export const fitFlex = (
         sizes.push(ss[j]);
         offsets.push([l, t]);
         renders.push(rs[j]);
+        pickers.push(ps[j]);
       }
 
       crossPos += size + crossGap;
@@ -257,82 +263,63 @@ export const fitFlex = (
     cross.length = 0;
   };
 
-  for (const el of els) {
-    const {margin, sizing, fit, grow, shrink, absolute, ratioX, ratioY} = el;
+  for (const el of els) if (!el.absolute) {
+    const {margin, sizing, fit, grow, shrink, ratioX, ratioY} = el;
     const [ml, mt, mr, mb] = margin;
 
-    if (absolute) {
-      const {render, size: fitted} = fit(sizing.slice(0, 2) as Point);
+    let size = sizing[isX ? 0 : 1];
+    const mOn = isX ? ml + mr : mt + mb;
 
-      sizes.push(fitted);
-      renders.push(render);
-      offsets.push([ml, mt]);
-    }
-    else {
-      let size = sizing[isX ? 0 : 1];
-      const mOn  = isX ? ml + mr : mt + mb;
+    if (isX && ratioX != null) size = spaceMain * ratioX;
+    if (!isX && ratioY != null) size = spaceMain * ratioY;
+    if (snap) size = Math.round(size);
 
-      if (isX && ratioX != null) size = spaceMain * ratioX;
-      if (!isX && ratioY != null) size = spaceMain * ratioY;
-      if (snap) size = Math.round(size);
+    if (wrap && (accumMain + size + mOn > spaceMain)) reduceMain();
+    accumMain += size + mOn;
+    maxMain = Math.max(maxMain, accumMain);
+    accumMain += gapMain;
 
-      if (wrap && (accumMain + size + mOn > spaceMain)) reduceMain();
-      accumMain += size + mOn;
-      maxMain = Math.max(maxMain, accumMain);
-      accumMain += gapMain;
-
-      main.push(el);
-      mainSizes.push(size);
-    }
+    main.push(el);
+    mainSizes.push(size);
   }
-  reduceMain();
+  reduceMain(true);
   reduceCross();
 
   const w =  isX ? containX : fixed[0] != null ? fixed[0] : maxCross;
   const h = !isX ? containY : fixed[0] != null ? fixed[1] : maxCross;
+
+  for (const el of els) if (el.absolute) {
+    const {margin, fit, under} = el;
+    const [ml, mt, mr, mb] = margin;
+
+    const size = resolved.slice() as Point;
+    if (isX) size[1] -= mt + mb;
+    else size[0] -= ml + mr;
+
+    const {render, pick, size: fitted} = fit(size);
+
+    if (under) {
+      sizes.unshift(fitted);
+      renders.unshift(render);
+      pickers.unshift(picker);
+      offsets.unshift([ml, mt]);
+    }
+    else {
+      sizes.push(fitted);
+      renders.push(render);
+      pickers.push(pick);
+      offsets.push([ml, mt]);
+    }
+  }
 
   return {
     size: [w, h],
     sizes,
     offsets,
     renders,
+    pickers,
   };
 }
-
-export const getFlexSpacing = (
-  slack: number,
-  n: number,
-  align: Alignment,
-) => {
-  let gap = 0;
-  let lead = 0;
-
-  const isJustify = align === 'justify';
-  const isBetween = align === 'between';
-  const isEvenly  = align === 'evenly';
-
-  if (slack > 0 && (isEvenly || isBetween || isJustify)) {
-    if (n === 1) {
-      lead = slack / 2;
-    }
-    else if (isEvenly) {
-      gap = Math.max(0, slack / (n + 1));
-      lead = gap;
-    }
-    else if (isBetween) {
-      gap = Math.max(0, slack / n);
-      lead = gap / 2;
-    }
-    else if (isJustify) {
-      gap = Math.max(0, slack / Math.max(1, n - 1));
-    }
-  }
-  else {
-    lead = parseAnchor(align) * slack;
-  }
-
-  return [gap, lead];
-};
 
 // Grow all applicable blocks in a row to add extra slack.
 export const growRow = (slack: number, row: LayoutElement[], sizes: number[]) => {

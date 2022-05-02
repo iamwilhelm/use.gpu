@@ -3,7 +3,7 @@ import { Point, LayoutElement } from '../types';
 
 import { memo, gather, yeet, useOne } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
-import { makeBoxLayout, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
 
 const NO_POINT4 = [0, 0, 0, 0];
 
@@ -15,6 +15,7 @@ export type AbsoluteProps = {
   width?: string | number | null,
   height?: string | number | null,
 
+  under?: boolean,
   snap?: boolean,
   children?: LiveElement<any>,
 };
@@ -27,6 +28,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
     bottom: b,
     width: w,
     height: h,
+    under = false,
     snap = true,
     children,
   } = props;
@@ -36,11 +38,13 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
       sizing: NO_POINT4,
       margin: NO_POINT4,
       absolute: true,
+      under,
       fit: memoFit((into: Point) => {
-        const {size, sizes, offsets, renders} = fitAbsoluteBox(els, into, l, t, r, b, w, h, snap);
+        const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, w, h, snap);
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),
+          pick: makeBoxPicker(sizes, offsets, pickers, 'absolute'),
         };
       }),
     });

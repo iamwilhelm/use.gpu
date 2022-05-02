@@ -4,7 +4,7 @@ import { VectorLike, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
-import { bindBundle, bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingToModule, bundleToAttribute, chainTo } from '@use-gpu/shader/wgsl';
 
 import { useShaderRef } from '../../hooks/useShaderRef';
 import { TransformContext } from '../../providers/transform-provider';
@@ -18,7 +18,7 @@ import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 
-const MATRIX_BINDING = { name: 'getMatrix', format: 'mat4x4<f32>', value: mat4.create() };
+const MATRIX_BINDING = bundleToAttribute(getCartesianPosition, 'getMatrix');
 
 export type CartesianProps = {
   range?: VectorLike[],

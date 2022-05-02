@@ -439,7 +439,7 @@ export const reconcileFiberCalls = <F extends Function>(
 // Map-reduce a fiber
 export const mapReduceFiberCalls = <F extends Function, R, T>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[],
+  calls: DeferredCall<any>[] | DeferredCall<any>,
   mapper: (t: T) => R,
   reducer: (a: R, b: R) => R,
   next?: LiveFunction<any>,
@@ -453,7 +453,7 @@ const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] :
 // Gather-reduce a fiber
 export const gatherFiberCalls = <F extends Function, R, T>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[],
+  calls: DeferredCall<any>[] | DeferredCall<any>,
   next?: LiveFunction<any>,
 ) => {
   const reduction = () => toArray(gatherFiberValues(fiber, true));
@@ -463,7 +463,7 @@ export const gatherFiberCalls = <F extends Function, R, T>(
 // Multi-gather-reduce a fiber
 export const multiGatherFiberCalls = <F extends Function, R, T>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[],
+  calls: DeferredCall<any>[] | DeferredCall<any>,
   next?: LiveFunction<any>,
 ) => {
   const reduction = () => multiGatherFiberValues(fiber, true);

@@ -119,7 +119,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
         // If atlas resized, resize the texture backing it
         const [sw, sh] = source.size;
         if (atlas.width !== sw && atlas.height !== sh) {
-          console.log('resize atlas')
           source = sourceRef.current = resizeTextureSource(device, source, atlas.width, atlas.height);
         }
 

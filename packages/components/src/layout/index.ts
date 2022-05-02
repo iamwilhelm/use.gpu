@@ -2,6 +2,7 @@ export * from './display/absolute';
 export * from './display/block';
 export * from './display/flex';
 export * from './display/inline';
+export * from './display/overflow';
 
 export * from './element/element';
 export * from './element/text';

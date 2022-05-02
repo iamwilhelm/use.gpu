@@ -1,4 +1,4 @@
-import { Point, LayoutElement, LayoutRenderer, Rectangle } from '../types';
+import { Point, LayoutElement, LayoutRenderer, LayoutPicker, Rectangle } from '../types';
 import { parseDimension } from './util';
 
 const NO_LAYOUT = [0, 0, 0, 0] as Rectangle;
@@ -25,6 +25,7 @@ export const fitAbsoluteBox = (
   const sizes = [] as Point[];
   const offsets = [] as Point[];
   const renders = [] as LayoutRenderer[];
+  const pickers = [] as LayoutPicker[];
 
   const n = els.length;
   for (const el of els) {
@@ -35,14 +36,15 @@ export const fitAbsoluteBox = (
     into[0] -= ml + mr;
     into[1] -= mt + mb;
 
-    const {render, size: fitted} = fit(into);
+    const {render, pick, size: fitted} = fit(into);
 
     sizes.push(fitted);
     offsets.push([left + ml, top + mt]);
     renders.push(render);
+    pickers.push(pick);
   }
 
-  return {size, sizes, offsets, renders};
+  return {size, sizes, offsets, renders, pickers};
 };
 
 export const resolveAbsoluteBox = (

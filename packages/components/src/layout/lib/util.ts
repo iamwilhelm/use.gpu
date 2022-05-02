@@ -1,5 +1,8 @@
 import { LiveElement } from '@use-gpu/live/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, InlineRenderer, InlineLine } from '../types';
+
+import { chainTo } from '@use-gpu/shader/wgsl';
 
 type Fitter<T> = (into: Point) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
@@ -57,7 +60,7 @@ export const normalizeAnchor = (x: Anchor | [Anchor, Anchor]): [Anchor, Anchor] 
 export const normalizeMargin = (m: number | Margin): Margin =>
   !Array.isArray(m)
     ? [m, m, m, m] as Margin
-    : m;
+    : [m[0] || 0, m[1] || 0, (m[2] ?? m[0]) || 0, (m[3] ?? m[1]) || 0];
 
 export const normalizeGap = (g: number | Gap): Gap =>
   !Array.isArray(g)
@@ -75,8 +78,10 @@ export const makeBoxLayout = (
   sizes: Point[],
   offsets: Point[],
   renders: LayoutRenderer[],
+  transform?: ShaderModule,
 ) => (
-  box: Rectangle
+  box: Rectangle,
+  parent?: ShaderModule,
 ) => {
   let [left, top, right, bottom] = box;
   const out = [] as LiveElement<any>[];
@@ -93,7 +98,7 @@ export const makeBoxLayout = (
     const b = t + size[1];
 
     const layout = [l, t, r, b] as Rectangle;
-    const el = render(layout);
+    const el = render(layout, parent && transform ? chainTo(parent, transform) : parent ?? transform);
 
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
@@ -108,7 +113,8 @@ export const makeInlineLayout = (
   offsets: [number, number, number, number][],
   renders: InlineRenderer[],
 ) => (
-  box: Rectangle
+  box: Rectangle,
+  transform?: ShaderModule,
 ) => {
   let [left, top, right, bottom] = box;
   const n = ranges.length;
@@ -118,7 +124,7 @@ export const makeInlineLayout = (
 
   const out: LiveElement<any> = [];
   const flush = (render: InlineRenderer) => {
-    const el = render(lines);
+    const el = render(lines, transform);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
 
@@ -151,4 +157,41 @@ export const makeInlineLayout = (
   if (last) flush(last);
 
   return out;
+};
+
+export const makeBoxPicker = (
+  sizes: Point[],
+  offsets: Point[],
+  pickers: LayoutPicker[],
+  tag: string,
+) => (
+  x: number,
+  y: number,
+  ox: number,
+  oy: number,
+): Rectangle | null => {
+  const n = sizes.length;
+
+  for (let i = n - 1; i >= 0; --i) {
+    const size = sizes[i];
+    const offset = offsets[i];
+    const pick = pickers[i];
+
+    const [w, h] = size;
+
+    let [l, t] = offset;
+    l += ox;
+    t += oy;
+
+    let r = l + w;
+    let b = t + h;
+    
+    if (x >= l && x < r && y >= t && y < b) {
+      const sub = pick && pick(x, y, l, t);
+      if (sub) return sub;
+      return [l, t, r, b];
+    }
+  }
+
+  return null;
 };

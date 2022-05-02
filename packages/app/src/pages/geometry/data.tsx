@@ -24,7 +24,7 @@ const vecSteps = [
   vec3.fromValues(0, 0, -1),
 ];
 
-const lineData1 = seq(10).map((i) => ({
+const lineData = seq(20).map((i) => ({
   path: seq(30).reduce((arr, i) => {
     let last = arr[arr.length - 1] ?? vec3.create();
     let dir = Math.floor(Math.random() * 6);
@@ -37,54 +37,6 @@ const lineData1 = seq(10).map((i) => ({
   width: Math.random() * 20 + 1,
   loop: false,
 }));
-
-const lineData2 = seq(10).map((i) => {
-  const path = seq(7).reduce((arr, i) => {
-    let last = arr[arr.length - 1] ?? vec3.create(Math.round(Math.random() * 6 - 3, Math.random() * 6 - 3, Math.random() * 6 - 3));
-    let dir = Math.floor(Math.random() * 6);
-    let next = vec3.clone(vecSteps[dir]);
-    vec3.add(next, next, last);
-    arr.push([next[0], next[1], next[2], 1.0]);
-    return arr;
-  }, []);
-  
-  while (true) {
-    let last = path[path.length - 1];
-    let first = path[0];
-    if (last[0] > first[0]) {
-      path.push([last[0] - 1, last[1], last[2], 1.0]);
-    }
-    else if (last[0] < first[0]) {
-      path.push([last[0] + 1, last[1], last[2], 1.0]);
-    }
-    else if (last[1] > first[1]) {
-      path.push([last[0], last[1] - 1, last[2], 1.0]);
-    }
-    else if (last[1] < first[1]) {
-      path.push([last[0], last[1] + 1, last[2], 1.0]);
-    }
-    else if (last[2] > first[2]) {
-      path.push([last[0], last[1], last[2] - 1, 1.0]);
-    }
-    else if (last[2] < first[2]) {
-      path.push([last[0], last[1], last[2] + 1, 1.0]);
-    }
-    else break;
-  }
-
-  path.pop();
-
-  return {
-    path,
-    color: [Math.random()*Math.random(), Math.random(), Math.random(), 1], 
-    width: Math.random() * 20 + 1,
-    loop: true,
-  };
-});
-
-const isLoop = (o: any) => o.loop;
-
-const lineData = [...lineData1, ...lineData2];
 
 const lineDataFields = [
   ['array<vec4<f32>>', (o: any) => o.path],
@@ -126,7 +78,6 @@ export const GeometryDataPage: LC = () => {
           <CompositeData
             fields={lineDataFields}
             data={lineData}
-            loop={isLoop}
             on={<LineSegments />}
             render={([positions, colors, widths, segments]: StorageSource[]) =>
               <LineLayer

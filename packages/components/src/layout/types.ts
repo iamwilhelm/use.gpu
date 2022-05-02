@@ -1,6 +1,8 @@
 import { TextureSource, Tuples } from '@use-gpu/core/types';
 import { LiveElement, Key } from '@use-gpu/live/types';
 import { FontMetrics, TextMetrics } from '@use-gpu/text/types';
+import { ShaderModule } from '@use-gpu/shader/types';
+import { mat4 } from 'gl-matrix';
 
 export type Point = [number, number];
 export type Point4 = [number, number, number, number];
@@ -28,12 +30,16 @@ export type ImageAttachment = {
   align?: Anchor | [Anchor, Anchor],
 };
 
-export type LayoutRenderer = (box: Rectangle) => LiveElement<any>;
-export type InlineRenderer = (lines: InlineLine[]) => LiveElement<any>;
+export type LayoutRenderer = (box: Rectangle, transform?: ShaderModule) => LiveElement<any>;
+export type InlineRenderer = (lines: InlineLine[], transform?: ShaderModule) => LiveElement<any>;
+
+export type LayoutPicker = (x: number, y: number, ox: number, oy: number) => Rectangle | null;
 
 export type LayoutFit = {
   size: Point,
   render: LayoutRenderer,
+  pick: LayoutPicker,
+  transform?: ShaderModule,
 };
 
 export type LayoutElement = {

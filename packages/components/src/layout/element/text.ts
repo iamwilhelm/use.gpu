@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Emitter } from '@use-gpu/core/types';
 import { SpanData, PerSpan, PerGlyph } from '@use-gpu/text/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 import { Point4, InlineSpan } from './types';
 
 import { keyed, yeet, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
@@ -62,7 +63,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
   return yeet({
     spans,
     height,
-    render: (lines: InlineLine[]) => (
+    render: (lines: InlineLine[], transform?: ShaderModule) => (
       keyed(Glyphs, id, {
         id,
         font,
@@ -74,6 +75,8 @@ export const Text: LiveComponent<TextProps> = (props) => {
         height,
         lines,
         snap,
+
+        transform,
       })
     ),
   });

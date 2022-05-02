@@ -14,7 +14,6 @@ type WebGPUProps = {
 
 export const WebGPU: FC<WebGPUProps> = ({fallback, children}) => {
   const [result, error] = useAsync(mountGPUDevice);
-  console.log({result, error})
   return (
     result ? provide(DeviceContext, result.device, children) :
     error ? (typeof fallback === 'function' ? fallback(error) : fallback) : null

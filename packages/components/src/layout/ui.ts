@@ -4,6 +4,7 @@ import { UIAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { SDFFontProvider, SDF_FONT_ATLAS } from '../text/providers/sdf-font-provider';
+import { useBufferedSize } from '../hooks/useBufferedSize';
 import { use, keyed, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
@@ -49,10 +50,11 @@ const Resume = (
   const ids = [] as number[];
 
   const {width, height} = atlas;
-  const mapUV = (xs: number[]) => xs.map((x, i) => (i % 2) ? x / height : x / width);
 
   let layer = null;
   let texture = null;
+  let transform = null;
+
   for (let item of items) if (item) {
 
     if (item.texture === SDF_FONT_ATLAS) {
@@ -62,8 +64,9 @@ const Resume = (
       };
     }
 
-    if (!layer || item.texture !== texture) {
+    if (!layer || item.texture !== texture || item.transform !== transform) {
       texture = item.texture;
+      transform = item.transform;
 
       layer = [] as UIAggregate[];
       layers.push(layer);
@@ -81,22 +84,12 @@ const Layer: LiveFunction<any> = (
   const device = useContext(DeviceContext);
   const {keys, count, memoKey} = getItemSummary(items);
 
-  // Invalidate storage if too small, or set of keys changes.
-  const sizeRef = useOne(() => ({ current: 0 }));
-  const versionRef = useOne(() => ({ current: 0 }));
-  if (sizeRef.current < count) {
-    versionRef.current++;
-
-    // Grow by at least 20%
-    sizeRef.current = Math.max(count, (Math.round(sizeRef.current * 1.2) | 0x7) + 1);
-  }
-  useOne(() => versionRef.current++, memoKey);
-
+  const size = useBufferedSize(count);
   const render = useMemo(() =>
-    makeUIAccumulator(device, items, keys, sizeRef.current),
-    [versionRef.current]
+    makeUIAccumulator(device, items, keys, size),
+    [memoKey, size]
   );
-  
+
   return render(items);
 };
 
@@ -117,6 +110,7 @@ const makeUIAccumulator = (
   const hasRepeat = keys.has('repeats') || keys.has('repeat');
 
   const hasTexture = keys.has('texture');
+  const hasTransform = keys.has('transform');
 
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
   if (hasRadius) storage.radiuses = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
@@ -141,6 +135,7 @@ const makeUIAccumulator = (
     if (hasRepeat) props.repeats = updateAggregateBuffer(device, storage.repeats, items, count, 'repeat', 'repeats');
 
     if (hasTexture) props.texture = items[0].texture;
+    if (hasTransform) props.transform = items[0].transform;
 
     return use(UIRectangles, props);
   };

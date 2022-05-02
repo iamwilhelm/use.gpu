@@ -118,7 +118,8 @@ export const pathSpecToRegexp = (s: string, exact: boolean = false) => {
   }
   
   if (exact) {
-    return new RegExp('^' + regexp + '$');
+    if (segments.length === 0) regexp += '/';
+    return new RegExp(regexp + '$');
   }
 
   const isFolder = s[s.length - 1] === '/';

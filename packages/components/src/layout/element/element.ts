@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 import { ImageAttachment, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from './types';
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
@@ -11,6 +12,7 @@ export type ElementProps = {
   width?: Dimension,
   height?: Dimension,
   margin?: Margin | number,
+
   radius?: Margin | number,
   border?: Margin | number,
   stroke?: Point4,
@@ -68,7 +70,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       const h = height != null ? parseDimension(height, into[1], snap) : into[1];
       const size = [w, h];
 
-      const render = (layout: Rectangle): LiveElement<any> => (
+      const render = (layout: Rectangle, transform?: ShaderModule): LiveElement<any> => (
         keyed(Surface, id, {
           id,
           layout,
@@ -79,6 +81,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           radius,
 
           image,
+          transform,
         })
       );
       return {size, render};

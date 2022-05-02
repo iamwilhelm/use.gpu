@@ -1,6 +1,6 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { FontMetrics } from '@use-gpu/text/types';
-import { LayoutElement, InlineElement, LayoutRenderer, Direction, Point, Margin, Rectangle, Alignment, Base } from '../types';
+import { LayoutElement, InlineElement, LayoutRenderer, LayoutPicker, Direction, Point, Margin, Rectangle, Alignment, Base } from '../types';
 
 import { parseBase, parseAnchor } from './util';
 import { getAlignmentSpacing } from './cursor';
@@ -94,6 +94,7 @@ export const fitInline = (
   const ranges  = [] as Point[];
   const offsets = [] as [number, number, number][];
   const renders = [] as LayoutRenderer[];
+  const pickers = [] as LayoutPicker[];
 
   const mainSpans = [] as [number, number, number, number];
   const mainEls = [] as InlineElement[];
@@ -112,7 +113,7 @@ export const fitInline = (
       const span = mainSpans[i];
       const [startIndex, endIndex, chunkAdvance, chunkCount] = span;
 
-      const {spans, height, render} = mainEls[i];
+      const {spans, height, render, pick} = mainEls[i];
       const {ascent, descent, lineHeight} = height;
 
       const crossPos = caretCross + mainBase - ascent;
@@ -123,6 +124,7 @@ export const fitInline = (
       ranges.push(span);
       offsets.push(offset);
       renders.push(render);
+      pickers.push(pick);
     }
 
     caretMain = 0;
@@ -199,6 +201,7 @@ export const fitInline = (
     ranges,
     offsets,
     renders,
+    pickers,
   };
 }
 

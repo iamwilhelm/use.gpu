@@ -1,11 +1,11 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import { LC } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
 
 import {
-  Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Text, Element,
+  LinearRGB, Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
 } from '@use-gpu/components';
 import { makeTexture } from '../../meshes/cube';
 
@@ -13,26 +13,91 @@ export const LayoutDisplayPage: LC = () => {
   const texture = makeTexture();
 
   const view = (
-    <Draw>
+    <LinearRGB>
       <Pass>
         <Flat>
           <UI>
             <Layout>
+              <Absolute>
+                <Element fill={[1, 1, 1, .5]}  />
+              </Absolute>
               <Flex width="100%" height="100%">
-                <Block width="34%" height={500}>
-                  <Absolute>
-                    <Element fill={[0, 0, 0, .5]} margin={10} />
-                  </Absolute>
+                <Block width="40%">
+                  <Block margin={12} padding={48} radius={5} fill={[0, 0, 0, .9]}>
+
+                    <Flex anchor="center">
+                      <Element width={48} height={48} fill={[0, 0, 0, .35]} />
+                      <Inline margin={[24, 0, 0, 0]}>
+                        <Text size={48} weight="bold" lineHeight={56} color={[1, 1, 1, 1]}>Use.GPU</Text>
+                      </Inline>
+                    </Flex>
+
+                    <Inline margin={[0, 24, 0, 0]}>
+                      <Text size={20} color={[1, 1, 1, 1]} weight="bold" lineHeight={24}>{"Lorem ipsum dolor sit amet,"}</Text>
+                      <Text size={20} color={[1, 1, 1, 1]} lineHeight={24}>{" consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}</Text>
+                    </Inline>
+
+                    <Block margin={[0, 20, 0, 0]} height={2} fill={[1, 1, 1, 1]} />
+
+                    <Block margin={[0, 20, 0, 0]}>
+                      <Flex align="justify-center" gap={[10, 10]} wrap>
+                        <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={110} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={40}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={70}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={140} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={70}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                      </Flex>
+                    </Block>
+
+                  </Block>
                 </Block>
-                <Block width="66%" height="100%">
-                  <Element fill={[0, 0, 0, .5]} />
+
+                <Block width="60%" height="100%" fill={[0, 0, 0, .9]}>
+                  <Overflow>
+                    <Block padding={48}>
+
+                      <Inline>
+                        <Text size={48} weight="bold" lineHeight={56} color={[1, 1, 1, 1]}>Use.GPU</Text>
+                      </Inline>
+
+                      <Inline margin={[0, 24, 0, 0]}>
+                        <Text size={20} color={[1, 1, 1, 1]} weight="bold" lineHeight={24}>{"Lorem ipsum dolor sit amet,"}</Text>
+                        <Text size={20} color={[1, 1, 1, 1]} lineHeight={24}>{" consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>
+
+                        <Text size={20} color={[1, 1, 1, 1]} lineHeight={24}>{"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}</Text>
+                      </Inline>
+
+                      <Block margin={[0, 20, 0, 0]} height={2} fill={[1, 1, 1, 1]} />
+
+                      <Inline margin={[0, 24, 0, 0]}>
+                        <Text size={20} color={[1, 1, 1, 1]} weight="bold" lineHeight={24}>{"Lorem ipsum dolor sit amet,"}</Text>
+                        <Text size={20} color={[1, 1, 1, 1]} lineHeight={24}>{" consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>
+
+                        <Text size={20} color={[1, 1, 1, 1]} lineHeight={24}>{"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>
+
+                        <Text size={20} color={[1, 1, 1, 1]} lineHeight={24}>{"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>
+                      </Inline>
+
+                      <Block margin={[0, 20, 0, 0]} height={2} fill={[1, 1, 1, 1]} />
+
+                    </Block>
+                  </Overflow>
                 </Block>
+
               </Flex>
             </Layout>
           </UI>
         </Flat>
       </Pass>
-    </Draw>
+    </LinearRGB>
   );
 
   return view;

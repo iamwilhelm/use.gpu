@@ -17,13 +17,13 @@ import {
 import { Mesh } from '../mesh';
 import { makeMesh, makeTexture } from '../meshes/mesh';
 
-export type GeometryPageProps = {
+export type SimplePlotPageProps = {
   canvas: HTMLCanvasElement,
 };
 
 let t = 0;
 
-export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
+export const SimplePlotPage: LiveComponent<SimplePlotPageProps> = (props) => {
   const {canvas} = props;
   
   const view = (
@@ -87,7 +87,6 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                                   color: [0.75, 0.75, 0.75, 1],
                                   depth: 0.5,
                                 }),
-                                /*
                                 use(Label, {
                                   placement: 'bottom',
                                   color: '#808080',
@@ -104,7 +103,6 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
                                   expand: 0,
                                   depth: 0.5,
                                 }),
-                                */
                               ],
                             }),
                             use(Axis, {
@@ -151,6 +149,9 @@ export const PlotPage: LiveComponent<PlotPageProps> = (props) => {
   return (
     use(OrbitControls, {
       canvas,
+      radius: 5,
+      bearing: 0.5,
+      pitch: 0.3,
       render: (radius: number, phi: number, theta: number) =>
 
         use(OrbitCamera, {

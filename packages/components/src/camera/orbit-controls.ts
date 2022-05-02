@@ -7,11 +7,6 @@ const CAPTURE_EVENT = {capture: true};
 const π = Math.PI;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
-const DEFAULT_OPTIONS = {
-  bearingSpeed: 5,
-  pitchSpeed: 5,
-};
-
 export type OrbitControlsProps = {
   bearingSpeed?: number,
   pitchSpeed?: number,
@@ -21,16 +16,18 @@ export type OrbitControlsProps = {
 
 export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   const {
-    bearingSpeed = DEFAULT_OPTIONS.bearingSpeed,
-    pitchSpeed   = DEFAULT_OPTIONS.pitchSpeed, 
+    radius: initialRadius = 1,
+    bearing: initialBearing = 0,
+    pitch: initialPitch = 0,
+    bearingSpeed = 5,
+    pitchSpeed   = 5,
     canvas,
     render,
   } = props;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [radius, setRadius]   = useState<number>(5);
-  const [bearing, setBearing] = useState<number>(0.5);
-  const [pitch, setPitch]     = useState<number>(0.3);
+  const [radius, setRadius]   = useState<number>(initialRadius);
+  const [bearing, setBearing] = useState<number>(initialBearing);
+  const [pitch, setPitch]     = useState<number>(initialPitch);
 
   useResource((dispose) => {
     const onWheel = (e: WheelEvent) => {

@@ -319,7 +319,8 @@ export const mountFiberCall = <F extends Function>(
   fiber: LiveFiber<F>,
   call?: DeferredCall<any> | null,
 ) => {
-  const {mount} = fiber;
+  const {mount, mounts} = fiber;
+  if (mounts) disposeFiberMounts(fiber);
 
   const nextMount = updateMount(fiber, mount, call);
   if (nextMount !== false) {
@@ -390,7 +391,9 @@ export const reconcileFiberCalls = <F extends Function>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[],
 ) => {
-  let {mounts, order, seen} = fiber;
+  let {mount, mounts, order, seen} = fiber;
+
+  if (mount) disposeFiberMounts(fiber);
 
   if (!mounts) mounts = fiber.mounts = new Map();
   if (!order)  order  = fiber.order  = [];

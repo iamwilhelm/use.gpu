@@ -36,7 +36,7 @@ use '@use-gpu/wgsl/fragment/sdf-2d'::{ SDF, getUVScale };
   var color = fill;
   if (sdf.outer != sdf.inner) { color = mix(stroke, fill, clamp(sdf.inner + (1.0 - mask), 0.0, 1.0)); }
   
-  if (!ALPHA_TO_COVERAGE_ENABLED) {
+  if (!HAS_ALPHA_TO_COVERAGE) {
     color = color * fill.a;
     color = color * mask;
   }

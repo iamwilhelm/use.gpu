@@ -6,6 +6,7 @@ import React, { memo, useMemo } from 'react';
 import { useRefineCursor, Cursor } from './cursor';
 import { usePingContext } from './ping';
 import { Node } from './node';
+import { ReactNode } from './react-node';
 import { ExpandState, SelectState, HoverState, Action } from './types';
 
 import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
@@ -34,6 +35,13 @@ type FiberNodeProps = {
   siblings?: boolean,
 }
 
+type FiberReactNodeProps = {
+  reactNode: any,
+  expandCursor: Cursor<ExpandState>,
+  indent?: number,
+  first?: boolean,
+}
+
 type TreeExpandProps = {
   expand: boolean,
   onToggle: (e: any) => void,
@@ -41,6 +49,7 @@ type TreeExpandProps = {
   closedIcon?: string,
 }
 
+// Get rendered-by depth by tracing `by` props up the tree
 const getRenderDepth = (fibers: Map<number, LiveFiber<any>>, fiber: LiveFiber<any>) => {
   let renderDepth = 0;
   let parent = fiber;
@@ -55,6 +64,7 @@ const getRenderDepth = (fibers: Map<number, LiveFiber<any>>, fiber: LiveFiber<an
   return renderDepth;
 };
 
+// Legend at bottom of fiber tree
 export const FiberLegend: React.FC = () => {
   const makeFiber = (name: string) => {
     const f = (() => {}) as any;
@@ -99,6 +109,7 @@ export const FiberLegend: React.FC = () => {
   </>)
 };
 
+// Fiber tree including legend
 export const FiberTree: React.FC<FiberTreeProps> = ({
   fiber,
   fibers,
@@ -125,6 +136,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   );
 }
 
+// One node in the tree
 export const FiberNode: React.FC<FiberNodeProps> = memo(({
   fiber,
   fibers,
@@ -136,27 +148,31 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   siblings,
   indent = 0,
 }) => {
-  const {id, mount, mounts, next, order, host, yeeted} = fiber;
+  const {id, mount, mounts, next, order, host, yeeted, __inspect} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
   const [hoverState, updateHoverState] = hoveredCursor;
 
+  // Hook up ping provider
   fibers.set(id, fiber);
   usePingContext(fiber);
 
+  // Resolve hover-state
   const selected = fiber === selectState;
   const hovered  = hoverState.fiber?.id ?? -1;
   const parents  = hoverState.fiber?.by === fiber.id;
   const depends  = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
   const precedes = hoverState.precs.indexOf(fiber) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
 
+  // Resolve depth-highlighting
   const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;
   const renderDepth = getRenderDepth(fibers, fiber);
-
-  const shouldRender = renderDepth < depthLimit;
-  const shouldStartOpen = fiber.f !== DEBUG;
-
   const styleDepth = hoverState.fiber ? (subnode ? Math.max(-1, renderDepth - hoverState.depth) : -1) : 0;
 
+  // Resolve node omission
+  const shouldRender = renderDepth < depthLimit;
+  const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
+
+  // Make click/hover handlers
   const [select, hover, unhover] = useMemo(() => {
     const root = yeeted && fiber.type === YEET ? yeeted.root : null;
 
@@ -182,6 +198,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   const out = [] as React.ReactElement[];
 
+  // Render node itself
   const nodeRender = shouldRender ? (
     <Node
       key={id}
@@ -197,7 +214,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       onMouseLeave={unhover}
     />
   ) : null;
-     
+
+  // Render single child   
   if (mount) {
     const hasNext = (mount.mount || mount.mounts || mount.next);
     out.push(
@@ -214,6 +232,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     );
   }
 
+  // Render multiple children
   if (mounts && order) {
     for (const key of order) {
       const sub = mounts.get(key);
@@ -235,8 +254,27 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     }
   }
 
+  // Render attached react root
+  if (__inspect?.react) {
+    const {react} = __inspect;
+    const node = react.root?.current;
+    
+    if (node) {
+      out.push(
+        <FiberReactNode
+          key={'react'}
+          reactNode={react.root.current}
+          expandCursor={expandCursor}
+          indent={indent + 1}
+          first={true}
+        />
+      );
+    }
+  }
+
   let childRender = out as any;
 
+  // Render fiber continuation
   let nextRender = null as React.ReactElement | null;
   if (next) {
     childRender = shouldRender ? (
@@ -263,6 +301,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     );
   }
 
+  // Compact omitted row
   if (!shouldRender) {
     return (<>
       <TreeRowOmitted indent={indent} />
@@ -271,6 +310,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     </>);
   }
   
+  // Expandable node
   if (out.length) {
     const openIcon = continuation ? 'arrow_downward' : undefined;
     const closedIcon = continuation ? 'subdirectory_arrow_right' : undefined;
@@ -293,6 +333,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     );
   }
 
+  // Leaf node
   const continuationIcon = ICONSMALL('subdirectory_arrow_right');
   return (<>
     <TreeRow indent={indent + 1}>
@@ -319,3 +360,44 @@ export const TreeExpand: React.FC<TreeExpandProps> = ({
     </TreeRow>
   </>);
 }
+
+export const FiberReactNode: React.FC<FiberNodeProps> = memo(({
+  reactNode,
+  expandCursor,
+  first = false,
+  indent = 0,
+}) => {
+  const nodeRender = <ReactNode reactNode={reactNode} root={first} />;
+  
+  const {child, sibling, _debugID} = reactNode;
+
+  const childRender = child ? <FiberReactNode reactNode={child} expandCursor={expandCursor} indent={indent + (sibling ? 1 : .1)} /> : null;
+  const siblingRender = sibling ? <FiberReactNode reactNode={sibling} expandCursor={expandCursor} indent={indent} /> : null;
+
+  if (child) {
+    return (
+      <Expandable
+        id={'react-' + _debugID}
+        expandCursor={expandCursor}
+        initialValue={true}
+      >{
+        (expand, onToggle) => (<>
+          <TreeRow indent={indent}>
+            <TreeExpand expand={expand} onToggle={onToggle}>
+              {nodeRender}
+            </TreeExpand>
+          </TreeRow>
+          {expand !== false ? childRender : null}
+          {siblingRender}
+        </>)
+      }</Expandable>
+    );  
+  }
+
+  return (<>
+    <TreeRow indent={indent + 1}>
+      {nodeRender}
+    </TreeRow>
+    {siblingRender}
+  </>);
+});

@@ -12,7 +12,7 @@ type DebugAtlasProps = {
   version: number,
 };
 
-export const DebugAtlas = (props: DebugAtlasProps) => {
+export const DebugAtlas = (props: DebugAtlasProps = {}) => {
   let {atlas, source} = props;
   if (!atlas && !source) {
     ({atlas, source} = useContext(SDFFontContext));
@@ -100,6 +100,11 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
       })
     );
   }
+
+  console.log({
+    slots: debugSlots().length,
+    placements: debugPlacements().length,
+  })  
 
   for (const rect of debugPlacements()) {
     out.push(

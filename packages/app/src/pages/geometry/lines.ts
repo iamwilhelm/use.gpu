@@ -5,12 +5,11 @@ import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, Rend
 import { use, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat,
-  CompositeData, Data, RawData, Raw, LineSegments, ArrowSegments,
+  Draw, Pass,
+  Cursor,
+  CompositeData, LineSegments, ArrowSegments,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, PointLayer, LineLayer, ArrowLayer,
-  RenderToTexture,
-  Router, Routes,
+  LineLayer, ArrowLayer,
 } from '@use-gpu/components';
 
 export type GeometryLinesPageProps = {
@@ -36,6 +35,12 @@ let lineData = seq(9).map((i) => ({
   loop: i >= 5,
 }));
 
+let zigzagData = [{
+  path: seq(24).map(i => [i / 14 - 1 - .2, -.1, ((i % 2) - .5) * .1, 1]),
+  color: randomColor(),
+  width: 10,
+}];
+
 let arrowData = seq(9).map((i) => ({
   path: (
     (i < 5) ? seq(10).map(j => [i / 5 - 1, j / 11, 0, 1]) :
@@ -59,9 +64,7 @@ export const GeometryLinesPage: LiveComponent<GeometryLinesPageProps> = (props) 
 
   const view = (
     use(Draw, {
-      live: true,
       children: [
-
         use(Pass, {
           children: [
 
@@ -71,7 +74,15 @@ export const GeometryLinesPage: LiveComponent<GeometryLinesPageProps> = (props) 
               loop: (o: any) => o.loop,
               on: use(LineSegments),
               render: ([positions, colors, widths, segments]: StorageSource[]) =>
-                use(LineLayer, { positions, colors, widths, segments }),
+                use(LineLayer, { positions, colors, widths, segments, depth: 0.5 }),
+            }),
+
+            use(CompositeData, {
+              fields: dataFields,
+              data: zigzagData,
+              on: use(LineSegments),
+              render: ([positions, colors, widths, segments]: StorageSource[]) =>
+                use(LineLayer, { positions, colors, widths, segments, depth: 0.5, join: 'round' }),
             }),
 
             use(CompositeData, {
@@ -82,7 +93,7 @@ export const GeometryLinesPage: LiveComponent<GeometryLinesPageProps> = (props) 
               end: (o: any) => o.end,
               on: use(ArrowSegments),
               render: ([positions, colors, widths, segments, anchors, trims]: StorageSource[]) =>
-                use(ArrowLayer, { positions, colors, widths, segments, anchors, trims }),
+                use(ArrowLayer, { positions, colors, widths, segments, anchors, trims, depth: 0.5 }),
             }),
           ],
         }),
@@ -90,15 +101,19 @@ export const GeometryLinesPage: LiveComponent<GeometryLinesPageProps> = (props) 
     })
   );
 
-  return (
+  return [
     use(OrbitControls, {
       canvas,
+      radius: 3,
+      bearing: 0.5,
+      pitch: 0.3,
       render: (radius: number, phi: number, theta: number) =>
-
         use(OrbitCamera, {
           radius, phi, theta,
           children: view,
+          scale: 2160,
         })  
-    })
-  );
+    }),
+    use(Cursor, {cursor: 'move'}),
+  ];
 };

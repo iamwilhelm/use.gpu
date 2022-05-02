@@ -48,9 +48,9 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
   const shader = fiber.__inspect?.[type];
 
   return (<>
-    <div><b>Shader</b></div>
+    <div><b>Shader</b> (<code>{shader.hash}</code>)</div>
     <StyledShader><Selectable>
-      {inspectCode(shader)}
+      {inspectCode(shader.code)}
     </Selectable></StyledShader>
   </>);
 }

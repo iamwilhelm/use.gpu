@@ -84,9 +84,9 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
     // Gather chunk sizes and chunk metadata
     const chunks = [] as number[];
-    const loops = isLoop ? [] as boolean[] : null;
-    const starts = isStart ? [] as boolean[] : null;
-    const ends = isEnd ? [] as boolean[] : null;
+    const loops = isLoop ? [] as boolean[] : undefined;
+    const starts = isStart ? [] as boolean[] : undefined;
+    const ends = isEnd ? [] as boolean[] : undefined;
 
     const push = (list: any, item?: any) => {
       const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);

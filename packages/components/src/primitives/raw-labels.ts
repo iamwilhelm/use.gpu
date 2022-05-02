@@ -12,10 +12,11 @@ import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
+import { useBoundShader } from '../hooks/useBoundShader';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
@@ -56,45 +57,34 @@ export type RawLabelsProps = {
 
   texture?: TextureSource | LambdaSource | ShaderModule,
 
+  alphaToCoverage?: boolean,
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
 };
 
-const ZERO = [0, 0, 0, 1];
-const GRAY = [0.5, 0.5, 0.5, 1];
+const VERTEX_BINDINGS = bundleToAttributes(getLabelVertex);
+const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
 
-const VERTEX_BINDINGS = [
-
-  { name: 'getIndex', format: 'u32', value: 0 },
-  { name: 'getRectangle', format: 'vec4<f32>', value: [-1, -1, 1, 1] },
-  { name: 'getUV', format: 'vec4<f32>', value: [0, 0, 1, 1] },
-  { name: 'getLayout', format: 'vec2<f32>', value: [0, 0] },
-
-  { name: 'getSDFConfig', format: 'vec4<f32>', value: [0, 0, 0, 0] },
-
-  { name: 'getPosition', format: 'vec4<f32>', value: ZERO },
-  { name: 'getPlacement', format: 'vec2<f32>', value: [0, 0] },
-  { name: 'getOffset', format: 'f32', value: 0 },
-  { name: 'getSize', format: 'f32', value: 1 },
-  { name: 'getDepth', format: 'f32', value: 0 },
-  { name: 'getColor', format: 'vec4<f32>', value: GRAY },
-  { name: 'getExpand', format: 'f32', value: 0 },
-
-] as UniformAttributeValue[];
-
-const FRAGMENT_BINDINGS = [
-  { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [1.0, 1.0, 1.0, 1.0] },
-] as UniformAttributeValue[];
-
-const DEFINES = {
+const DEFINES_ALPHA = {
   HAS_EDGE_BLEED: true,
-//  ALPHA_TO_COVERAGE_ENABLED: false,
-  ALPHA_TO_COVERAGE_ENABLED: true,
+  HAS_ALPHA_TO_COVERAGE: false,
 };
 
-const PIPELINE = {
+const DEFINES_ALPHA_TO_COVERAGE = {
+  HAS_EDGE_BLEED: true,
+  HAS_ALPHA_TO_COVERAGE: true,
+};
+
+const PIPELINE_ALPHA = {
+  primitive: {
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
+  },
+} as DeepPartial<GPURenderPipelineDescriptor>;
+
+const PIPELINE_ALPHA_TO_COVERAGE = {
   fragment: {
     targets: {
       0: { blend: {$set: undefined}, },
@@ -112,6 +102,7 @@ const PIPELINE = {
 export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsProps) => {
   const {
     pipeline: propPipeline,
+    alphaToCoverage = true,
     mode = RenderPassMode.Opaque,
     id = 0,
     count = 1,
@@ -120,7 +111,13 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const vertexCount = 4;
   const instanceCount = useCallback(() => (props.indices?.length ?? resolve(count)), [props.indices, count]);
 
-  const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
+  const pipeline = useMemo(() =>
+    patch(alphaToCoverage
+      ? PIPELINE_ALPHA_TO_COVERAGE
+      : PIPELINE,
+    propPipeline),
+    [propPipeline, alphaToCoverage]);
+
   const key = useFiber().id;
 
   const i = useShaderRef(props.index, props.indices);
@@ -141,14 +138,8 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const t = props.texture;
 
-  const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [i, r, u, l, a, xf, c, o, z, d, f, e]);
-    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [t]);
-
-    const getVertex = bindBundle(getLabelVertex, bindingsToLinks(vertexBindings), null, key);
-    const getFragment = bindBundle(getUIFragment, bindingsToLinks(fragmentBindings), null, key);
-    return [getVertex, getFragment];
-  }, [i, r, u, l, a, xf, c, o, z, d, f, e]);
+  const getVertex = useBoundShader(getLabelVertex, VERTEX_BINDINGS, [i, r, u, l, a, xf, c, o, z, d, f, e]);
+  const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
 
   return use(Virtual, {
     vertexCount,
@@ -157,7 +148,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     getVertex,
     getFragment,
 
-    defines: DEFINES,
+    defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
     deps: null,
 
     renderer: 'ui',

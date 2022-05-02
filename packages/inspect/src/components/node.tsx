@@ -5,6 +5,7 @@ import { styled, keyframes } from "@stitches/react";
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { Action } from './types';
 import { usePingContext } from './ping';
+import { SVGAtom } from './svg-atom';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
@@ -39,10 +40,13 @@ export const Node: React.FC<NodeProps> = ({
   onMouseEnter,
   onMouseLeave,
 }) => {
-  const {id, by, f, args, yeeted} = fiber;
+  const {id, by, f, args, yeeted, __inspect} = fiber;
 
   const yeet = yeeted?.value !== undefined;
-  const suffix = yeet ? ICONSMALL("switch_left") : null;
+  const react = !!__inspect?.react;
+
+  const suffix1 = yeet ? ICONSMALL("switch_left") : null;
+  const suffix2 = react ? <SVGAtom /> : null;
 
   const [version, pinged] = usePingContext(fiber);
 
@@ -83,7 +87,7 @@ export const Node: React.FC<NodeProps> = ({
     >
       <div className={"fiber-tree-ping cover-parent " + className} />
       <div className={"fiber-tree-highlight cover-parent " + className} />
-      <div className={"fiber-tree-label " + className}>{name}{suffix}</div>
+      <div className={"fiber-tree-label " + className}>{name}{suffix1}{suffix2}</div>
     </div>
   );
 }

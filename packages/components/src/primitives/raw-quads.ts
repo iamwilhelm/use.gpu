@@ -12,10 +12,11 @@ import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
+import { useBoundShader } from '../hooks/useBoundShader';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedFragment } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -37,27 +38,48 @@ export type RawQuadsProps = {
 
   texture?: TextureSource | LambdaSource | ShaderModule,
 
+  alphaToCoverage?: boolean,
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
 };
 
-const ZERO = [0, 0, 0, 1];
-const GRAY = [0.5, 0.5, 0.5, 1];
+const VERTEX_BINDINGS = bundleToAttributes(getQuadVertex);
+const FRAGMENT_BINDINGS = bundleToAttributes(getMaskedFragment);
 
-const VERTEX_BINDINGS = [
-  { name: 'getPosition', format: 'vec4<f32>', value: ZERO },
-  { name: 'getRectangle', format: 'vec4<f32>', value: [-1, -1, 1, 1] },
-  { name: 'getColor', format: 'vec4<f32>', value: GRAY },
-  { name: 'getDepth', format: 'f32', value: 0 },
-  { name: 'getUV', format: 'vec4<f32>', value: [0, 0, 1, 1] },
-] as UniformAttributeValue[];
+const DEFINES_ALPHA = {
+  HAS_EDGE_BLEED: true,
+  HAS_ALPHA_TO_COVERAGE: false,
+};
 
-const FRAGMENT_BINDINGS = [
-  { name: 'getMask', format: 'f32', args: ['vec2<f32>'], value: 1 },
-  { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [1.0, 1.0, 1.0, 1.0] },
-] as UniformAttributeValue[];
+const DEFINES_ALPHA_TO_COVERAGE = {
+  HAS_EDGE_BLEED: true,
+  HAS_ALPHA_TO_COVERAGE: true,
+};
+
+const PIPELINE_ALPHA = {
+  primitive: {
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
+  },
+} as DeepPartial<GPURenderPipelineDescriptor>;
+
+const PIPELINE_ALPHA_TO_COVERAGE = {
+  fragment: {
+    targets: {
+      0: { blend: {$set: undefined}, },
+    },
+  },
+  multisample: {
+    alphaToCoverageEnabled: true,
+  },
+  primitive: {
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
+  },
+} as DeepPartial<GPURenderPipelineDescriptor>;
+
 
 const DEFINES = {
   HAS_EDGE_BLEED: true,
@@ -73,6 +95,7 @@ const PIPELINE = {
 export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps) => {
   const {
     pipeline: propPipeline,
+    alphaToCoverage = true,
     mode = RenderPassMode.Opaque,
     id = 0,
     count = 1,
@@ -81,7 +104,13 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const vertexCount = 4;
   const instanceCount = useCallback(() => (props.positions?.length ?? resolve(count)), [props.positions, count]);
 
-  const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
+  const pipeline = useMemo(() =>
+    patch(alphaToCoverage
+      ? PIPELINE_ALPHA_TO_COVERAGE
+      : PIPELINE,
+    propPipeline),
+    [propPipeline, alphaToCoverage]);
+
   const key = useFiber().id;
 
   const p = useShaderRef(props.position, props.positions);
@@ -94,15 +123,9 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const t = props.texture;
   
   const xf = useApplyTransform(p);
-
-  const [getVertex, getFragment] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [xf, r, c, d, u]);
-    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [m, t]);
-
-    const getVertex = bindBundle(getQuadVertex, bindingsToLinks(vertexBindings), null, key);
-    const getFragment = bindBundle(getMaskedFragment, bindingsToLinks(fragmentBindings), null, key);
-    return [getVertex, getFragment];
-  }, [xf, r, c, d, u, m, t]);
+  
+  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, r, c, d, u]);
+  const getFragment = useBoundShader(getMaskedFragment, FRAGMENT_BINDINGS, [m, t]);
 
   return use(Virtual, {
     vertexCount,
@@ -111,7 +134,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     getVertex,
     getFragment,
 
-    defines: DEFINES,
+    defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
     deps: null,
 
     pipeline,

@@ -5,7 +5,7 @@ import { use, provide, gather, useCallback, useContext, useFiber, useMemo, useOn
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
+import { FrameContext, usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 
 import {
   makeColorState,
@@ -134,7 +134,9 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
 
     for (let task of ts) task();
     source.version++;
-    return then && then(source);
+    
+    if (!then) return null;    
+    return provide(FrameContext, {current: source.version}, then(source));
   };
 
   return (

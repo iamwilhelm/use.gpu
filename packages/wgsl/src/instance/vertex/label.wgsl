@@ -2,21 +2,20 @@ use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }; 
 
-@external fn getIndex(i: u32) -> u32 {};
-@external fn getRectangle(i: u32) -> vec4<f32> {};
-@external fn getUV(i: u32) -> vec2<f32> {};
-@external fn getLayout(i: u32) -> vec2<f32> {};
+@optional @external fn getIndex(i: u32) -> u32 { return 0u; };
+@optional @external fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
+@optional @external fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
+@optional @external fn getLayout(i: u32) -> vec2<f32> { return vec2<f32>(0.0, 0.0); };
 
-@external fn getPosition(i: u32) -> vec4<f32> {};
-@external fn getPlacement(i: u32) -> vec2<f32> {};
-@external fn getOffset(i: u32) -> f32 {};
-@external fn getSize(i: u32) -> f32 {};
-@external fn getDepth(i: u32) -> f32 {};
-@external fn getColor(i: u32) -> f32 {};
-@external fn getExpand(i: u32) -> f32 {};
-// @external fn getFlip(i: u32) -> f32;
+@optional @external fn getSDFConfig(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 1.0, 16.0, 0.0); };
 
-@external fn getSDFConfig(i: u32) -> vec2<f32> {};
+@optional @external fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
+@optional @external fn getPlacement(i: u32) -> vec2<f32> { return vec2<f32>(0.0, 0.0); };
+@optional @external fn getOffset(i: u32) -> f32 { return 0.0; };
+@optional @external fn getSize(i: u32) -> f32 { return 16.0; };
+@optional @external fn getDepth(i: u32) -> f32 { return 0.0; };
+@optional @external fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
+@optional @external fn getExpand(i: u32) -> f32 { return 0.0; };
 
 @export fn getLabelVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
 
@@ -35,7 +34,6 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }
   var depth = getDepth(index);
   var color = getColor(index);
   var expand = getExpand(index);
-  // var flip = getFlip(index);
 
   var center = worldToClip(position);
   

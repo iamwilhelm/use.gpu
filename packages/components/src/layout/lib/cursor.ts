@@ -5,11 +5,11 @@ import { parseAnchor } from './util';
 
 type Reduce = (start: number, end: number, gap: number, lead: number, index: number) => void;
 
+// Layout cursor for putting inline items on lines, with line wrapping, alignment and justification.
 export const makeLayoutCursor = (
   max: number,
   align: Alignment,
 ) => {
-
 
   let spanCount = 0;
   let spanAdvance = 0;
@@ -81,7 +81,7 @@ export const makeLayoutCursor = (
     const r = makeTuples(rows, 7);
     r.iterate((start: number, end: number, hard: number, advance: number, count: number, cross: number, index: number) => {
       const slack = s.get(index, 0) - advance;
-      const {gap, lead} = getAlignmentSpacing(slack, count, !!hard, align);
+      const [gap, lead] = getAlignmentSpacing(slack, count, !!hard, align);
       reduce(start, end, gap, lead, index);
     });
 
@@ -131,5 +131,5 @@ export const getAlignmentSpacing = (
     }
   }
 
-  return {gap, lead};
+  return [gap, lead];
 };

@@ -3,6 +3,7 @@
   "references": [
     { "path": "../live" },
     { "path": "../state" },
+    { "path": "../react" },
   ],
   "compilerOptions": {
     "rootDir": "..",

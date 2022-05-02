@@ -20,6 +20,7 @@ type Matcher = {
 export type RoutesProps = {
   base?: string,
   routes?: Record<string, Route> | null,
+  morph?: boolean,
 };
 
 const NO_PATH = '';
@@ -44,6 +45,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
   const {
     routes,
     base = NO_PATH,
+    morph: shouldMorph = true
   } = props;
 
   const {route: routeState} = useContext(RouterContext);
@@ -53,10 +55,10 @@ export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
     const matchers = [] as Matcher[];
 
     for (const path in routes) {
-      const {element, routes: rs} = routes[path];
+      const {element, routes: rs, exact} = routes[path];
 
       const fullPath = joinPath(base, path);
-      const regexp = pathSpecToRegexp(fullPath);
+      const regexp = pathSpecToRegexp(fullPath, exact);
 
       matchers.push({
         regexp,
@@ -92,12 +94,12 @@ export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
     return [{routes, base, params}, element];
   }, [base, matchers, currentPath]);
 
-  if (element) return provide(RouteContext, context, morph(element));
+  if (element) return provide(RouteContext, context, shouldMorph ? morph(element) : element);
   if (context.routes) return use(Routes, context);
   return null;
 }, 'Routes');
 
-export const pathSpecToRegexp = (s: string) => {
+export const pathSpecToRegexp = (s: string, exact: boolean = false) => {
   const segments = s.split('/').filter(s => s.length);
   let regexp = '^';
 
@@ -113,6 +115,10 @@ export const pathSpecToRegexp = (s: string) => {
     else {
       regexp += escapeRegExp(segment);
     }
+  }
+  
+  if (exact) {
+    return new RegExp('^' + regexp + '$');
   }
 
   const isFolder = s[s.length - 1] === '/';

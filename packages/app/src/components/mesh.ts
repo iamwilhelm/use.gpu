@@ -77,7 +77,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   };
 
   // Render shader
-  const vertexShader    = isPicking ? instanceDrawMeshPick     : instanceDrawMesh;
+  const vertexShader   = isPicking ? instanceDrawMeshPick     : instanceDrawMesh;
   const fragmentShader = isPicking ? instanceFragmentPickGeometry : instanceFragmentMesh;
 
   const fiber = useFiber();
@@ -91,8 +91,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     const fragment = makeShaderModule(fragmentLinked, 1);
     
     fiber.__inspect = fiber.__inspect || {};
-    fiber.__inspect.vertex = vertexLinked;
-    fiber.__inspect.fragment = fragmentLinked;
+    fiber.__inspect.vertex = vertex;
+    fiber.__inspect.fragment = fragment;
 
     return makeRenderPipeline(
       device,

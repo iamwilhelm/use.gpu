@@ -25,7 +25,7 @@ export const makeShaderBinding = <T>(
   uniform: UniformAttributeValue,
   source?: StorageSource | TextureSource | LambdaSource<T> | T | any,
 ): DataBinding<T> => {
-  if (source) {
+  if (source != null) {
     if (source.shader) {
       const lambda = source as LambdaSource<T>;
       return {uniform, lambda};

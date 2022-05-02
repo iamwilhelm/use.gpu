@@ -1,4 +1,4 @@
-import { UniformAttribute, ParsedBundle, ParsedModule, TypeLike } from '../types';
+import { UniformAttribute, ParsedBundle, ParsedModule, TypeLike, RefFlags as RF } from '../types';
 
 const NO_LIBS = {};
 
@@ -35,7 +35,7 @@ export const parseString = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1')
 type ToTypeString = (t: TypeLike | string) => string;
 type ToArgTypes = (t: (TypeLike | string)[]) => string[];
 
-// Convert bundle to attributes for its exported declarations
+// Convert bundle to attributes for its external declarations
 export const makeBundleToAttributes = (
   toTypeString: ToTypeString,
   toArgTypes: ToArgTypes,
@@ -47,9 +47,11 @@ export const makeBundleToAttributes = (
 
   const out: UniformAttribute[] = [];
   for (const fn of declarations) if (fn.func) {
-    const {func} = fn;
-    const {type, name, parameters} = func;
-    out.push({name, format: toTypeString(type), args: toArgTypes(parameters)});
+    const {func, flags} = fn;
+    if (flags & RF.External) {
+      const {type, name, parameters} = func;
+      out.push({name, format: toTypeString(type), args: toArgTypes(parameters)});
+    }
   }
 
   return out;

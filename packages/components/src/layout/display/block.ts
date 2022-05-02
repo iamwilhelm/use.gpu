@@ -34,7 +34,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
     children,
   } = props;
 
-  const margin = normalizeMargin(m);
+  const blockMargin = normalizeMargin(m);
   const padding = normalizeMargin(p);
 
   const Resume = (els: LayoutElement[]) => {

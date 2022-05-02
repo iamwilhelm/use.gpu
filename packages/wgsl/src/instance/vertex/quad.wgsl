@@ -2,11 +2,11 @@ use '@use-gpu/wgsl/use/types'::{ SolidVertex };
 use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }; 
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
-@external fn getPosition(i: u32) -> vec4<f32> {};
-@external fn getRectangle(i: u32) -> vec4<f32> {};
-@external fn getColor(i: u32) -> vec4<f32> {};
-@external fn getDepth(i: u32) -> f32 {};
-@external fn getUV(i: u32) -> vec4<f32> {};
+@optional @external fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
+@optional @external fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
+@optional @external fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
+@optional @external fn getDepth(i: u32) -> f32 { return 0; };
+@optional @external fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
 
 @export fn getQuadVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
   var position = getPosition(instanceIndex);

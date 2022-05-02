@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
-import { use, morph, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { use, wrap, morph, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 
 import {
   AutoCanvas, CanvasPicking,
@@ -20,14 +20,8 @@ import {
 } from '@use-gpu/components';
 import { UseInspect } from '@use-gpu/inspect';
 
-import { GeometryPage } from './pages/geometry';
-import { GeometryLinesPage } from './pages/geometry/lines';
-import { InteractPage } from './pages/interact';
-import { LayoutPage } from './pages/layout';
-import { AtlasPage } from './pages/atlas';
-import { RTTPage } from './pages/rtt';
-import { PlotPage } from './pages/plot';
-import { EmptyPage } from './pages/empty';
+import { makeRoutes } from './routes';
+import { makePicker } from './pages/page-picker';
 
 export type AppProps = {
   device: GPUDevice,
@@ -38,28 +32,14 @@ export type AppProps = {
 export const App: LiveComponent<AppProps> = (props) => {
   const {canvas, device, adapter} = props;
 
-  const fiber = useFiber();
-  const inspect = useInspector();
-
-  const routes = (
-    use(Router, {
-      routes: {
-        "/": {
-          routes: {
-            "geometry/lines": { element: use(GeometryLinesPage, { canvas }) },
-            "geometry": { element: use(GeometryPage, { canvas }) },
-            "layout": { element: use(LayoutPage, { }) },
-            "interact": { element: use(InteractPage, { }) },
-            "atlas": { element: use(AtlasPage, { }) },
-            "plot": { element: use(PlotPage, { canvas }) },
-            "rtt": { element: use(RTTPage, { canvas }) },
-            "": { element: use(GeometryPage, { canvas }) },
-            "*": { element: use(EmptyPage, { }) },
-          },
-        },
-      },
-    })
-  );
+  const router = wrap(Router, [
+    use(Routes, {
+      routes: makeRoutes(canvas),
+    }),
+    use(Routes, {
+      routes: makePicker(canvas),
+    }),
+  ]);
   
   const fonts = [
     {
@@ -82,25 +62,32 @@ export const App: LiveComponent<AppProps> = (props) => {
     },
   ];
 
+  const fiber = useFiber();
+  const inspect = useInspector();
+
   return [
-      use(AutoCanvas, {
-        canvas, device, adapter, samples: 4,
-        children: 
-          use(FontLoader, {
-            fonts,
-            children: routes,
-          })
-      }),
-      inspect ? use(UseInspect, {fiber, canvas}) : null,
+    use(AutoCanvas, {
+      canvas, device, adapter, samples: 4,
+      children: 
+        use(FontLoader, {
+          fonts,
+          children: router,
+        })
+    }),
+    inspect ? use(UseInspect, {fiber, canvas}) : null,
   ];
 };
 
+// Toggle inspector with ctrl/cmd-I.
+// Trigger re-render with ctrl/cmd-J.
 const useInspector = () => {
+  const [version, setVersion] = useState<number>(0);
   const [inspect, setInspect] = useState<boolean>(true);
+
   useResource((dispose) => {
     const keydown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'i') setInspect((s) => !s);
-      if ((e.ctrlKey || e.metaKey) && e.key === 'j') setInspect((s) => s);
+      if ((e.ctrlKey || e.metaKey) && e.key === 'j') setVersion((s) => s + 1);
     }
 
     window.addEventListener('keydown', keydown);

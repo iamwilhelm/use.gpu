@@ -3,6 +3,7 @@ import { FontMetrics } from '@use-gpu/text/types';
 import { LayoutElement, InlineElement, LayoutRenderer, Direction, Point, Margin, Rectangle, Alignment, Base } from '../types';
 
 import { parseBase, parseAnchor } from './util';
+import { getAlignmentSpacing } from './cursor';
 
 export const getInlineMinMax = (
   els: (LayoutElement | InlineElement)[],
@@ -105,7 +106,7 @@ export const fitInline = (
 
     let mainGap = 0;
     let mainPos = 0;
-    if (slack && !hard) [mainGap, mainPos] = getInlineSpacing(slack, wordCount, align);
+    if (slack) [mainGap, mainPos] = getAlignmentSpacing(slack, wordCount, hard, align);
 
     for (let i = 0; i < n; ++i) {
       const span = mainSpans[i];
@@ -172,7 +173,7 @@ export const fitInline = (
       chunkAdvance += advance;
 
       trimMain = trim;
-      if (trim) {
+      if (trim || hard) {
         wordCount++;
         chunkCount++;
       }

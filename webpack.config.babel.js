@@ -57,5 +57,6 @@ export default {
     contentBase: path.join(__dirname, 'public'),
     compress: true,
     port: 8777,
+    historyApiFallback: true,
   }
 };

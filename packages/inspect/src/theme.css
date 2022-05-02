@@ -23,8 +23,9 @@ html {
   --shim: rgba(0, 0, 0, 0.85);
   --shimGray: rgba(255, 255, 255, 0.1);
 
+  --colorLinkText: rgba(190, 210, 255, 1);
+
   --colorTextMuted: rgba(128, 128, 128, 1);
-/*  --colorTextMuted: rgba(255, 255, 255, .5);*/
   --colorTextSemi: rgba(255, 255, 255, .65);
   --colorText: #ddd;
   --colorTextHover: #eee;
@@ -259,3 +260,6 @@ div.fiber-tree-ping.pinged.cold {
   animation-name: pingAnimation;
 }
 
+a, a:hover, a:visited, a:active {
+  color: var(--colorLinkText);
+}

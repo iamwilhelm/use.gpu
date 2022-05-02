@@ -8,6 +8,7 @@
     { "path": "./packages/shader" },
     { "path": "./packages/glsl-loader" },
     { "path": "./packages/webgpu" },
+    { "path": "./packages/react" },
     { "path": "./packages/text" },
     { "path": "./packages/components" },
     { "path": "./packages/inspect" },

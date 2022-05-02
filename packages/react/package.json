@@ -1,0 +1,25 @@
+{
+  "name": "@use-gpu/react",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "jest --collect-coverage",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+
+    "build": "yarn run build:js && yarn run build:types && yarn run build:pkg",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir ../../build/packages/react/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:pkg": "cp package.json ../../build/packages/react"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "debug.ts"
+    ]
+  }
+}

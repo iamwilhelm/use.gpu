@@ -4,14 +4,14 @@ use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 
-@external fn getPosition(i: u32) -> vec4<f32> {};
-@external fn getSegment(i: u32) -> i32 {};
-@external fn getColor(i: u32) -> vec4<f32> {};
-@external fn getWidth(i: u32) -> f32 {};
-@external fn getDepth(i: u32) -> f32 {};
+@optional @external fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
+@optional @external fn getSegment(i: u32) -> i32 { return 0; };
+@optional @external fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
+@optional @external fn getWidth(i: u32) -> f32 { return 1.0; };
+@optional @external fn getDepth(i: u32) -> f32 { return 0.0; };
   
-@external fn getTrim(i: u32) -> vec4<u32> {};
-@external fn getSize(i: u32) -> vec2<f32> {};
+@optional @external fn getTrim(i: u32) -> vec4<u32> { return vec4<u32>(0u, 0u, 0u, 0u); };
+@optional @external fn getSize(i: u32) -> f32 { return 3.0; };
 
 let ARROW_ASPECT: f32 = 2.5;
 

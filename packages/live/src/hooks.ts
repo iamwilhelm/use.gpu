@@ -175,9 +175,16 @@ export const useState = <T>(
     setValue = host
       ? (value: Reducer<T>) => {
           host!.schedule(fiber, () => {
-            if (value instanceof Function) state![i] = value(state![i]);
-            else state![i] = value;
-            bustFiberMemo(fiber);
+            const prev = state![i];
+
+            let next: any;
+            if (value instanceof Function) next = value(prev);
+            else next = value;
+
+            if (prev !== next) {
+              state![i] = next;
+              bustFiberMemo(fiber);
+            }
           });
         }
       : NOP;

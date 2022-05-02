@@ -8,7 +8,7 @@ import {
   Flat, UI, Layout, Absolute, Block, Flex, Element,
   RawTexture,
 } from '@use-gpu/components';
-import { makeTexture } from '../meshes/mesh';
+import { makeTexture } from '../meshes/cube';
 
 export type InteractPageProps = {
   _unused?: boolean,

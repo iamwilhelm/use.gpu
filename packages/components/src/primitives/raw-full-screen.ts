@@ -12,8 +12,10 @@ import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
+
+import { useBoundShader } from '../hooks/useBoundShader';
 
 import { getFullScreenVertex } from '@use-gpu/wgsl/instance/vertex/full-screen.wgsl';
 import { getTextureFragment } from '@use-gpu/wgsl/mask/textured.wgsl';
@@ -29,14 +31,11 @@ export type RawFullScreenProps = {
 const ZERO = [0, 0, 0, 1];
 const NONE = [] as any[];
 
-const FRAGMENT_BINDINGS = [
-  { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [0.5, 0.5, 0.5, 1.0] },
-] as UniformAttributeValue[];
+const FRAGMENT_BINDINGS = bundleToAttributes(getTextureFragment);
 
 const PIPELINE = {
   primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
+    topology: 'triangle-list',
   },
   depthStencil: {
     depthWriteEnabled: false,
@@ -50,7 +49,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
     id = 0,
   } = props;
 
-  const vertexCount = 4;
+  const vertexCount = 3;
   const instanceCount = 1;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
@@ -58,14 +57,8 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
 
   const t = props.texture;
 
-  const [getVertex, getFragment] = useMemo(() => {
-    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [t]);
-
-    const getVertex = getFullScreenVertex;
-    const getFragment = bindBundle(getTextureFragment, bindingsToLinks(fragmentBindings), {}, key);
-
-    return [getVertex, getFragment];
-  }, [t]);
+  const getVertex = getFullScreenVertex;
+  const getFragment = useBoundShader(getTextureFragment, FRAGMENT_BINDINGS, [t]);
 
   return use(Virtual, {
     vertexCount,

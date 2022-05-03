@@ -10,7 +10,11 @@ export type HTMLProps = {
   children: React.ReactNode,
 };
 
-export const HTML: LiveComponent<HTMLProps> = ({container, style, children}) => {
+export const HTML: LiveComponent<HTMLProps> = ({
+  container = document.body,
+  style,
+  children,
+}) => {
   const fiber = useFiber();
 
   // Create wrapper div

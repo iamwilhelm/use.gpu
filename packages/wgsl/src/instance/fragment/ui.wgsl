@@ -30,15 +30,13 @@ use '@use-gpu/wgsl/fragment/sdf-2d'::{ SDF, getUVScale };
   }
 
   var mask = clamp(sdf.outer, 0.0, 1.0);
-
   if (mask == 0.0) { discard; }
 
   var color = fill;
   if (sdf.outer != sdf.inner) { color = mix(stroke, fill, clamp(sdf.inner + (1.0 - mask), 0.0, 1.0)); }
   
   if (!HAS_ALPHA_TO_COVERAGE) {
-    color = color * fill.a;
-    color = color * mask;
+    color = color * fill.a * mask;
   }
   else {
     color = vec4<f32>(color.xyz, color.a * fill.a * mask);

@@ -8,7 +8,7 @@ export default {
   mode: 'development',
   entry: {
     app: {
-      import: './packages/app/src/index.ts',
+      import: './packages/app/src/index.tsx',
     }
   },
   output: {

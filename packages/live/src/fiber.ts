@@ -480,7 +480,7 @@ export const reduceFiberValues = <F extends Function, R, T>(
   if (!yeeted) throw new Error("Reduce without aggregator");
 
   if (!self) {
-    if (fiber.next) return reduceFiberValues(fiber.next, reducer);
+    if (fiber.next && fiber.f !== CONSUME) return reduceFiberValues(fiber.next, reducer);
     if (yeeted.value !== undefined) return yeeted.value;
   }
 
@@ -512,7 +512,7 @@ export const gatherFiberValues = <F extends Function, T>(
   if (!yeeted) throw new Error("Reduce without aggregator");
 
   if (!self) {
-    if (fiber.next) return gatherFiberValues(fiber.next);
+    if (fiber.next && fiber.f !== CONSUME) return gatherFiberValues(fiber.next);
     if (yeeted.value !== undefined) return yeeted.value;
   }
 
@@ -549,7 +549,7 @@ export const multiGatherFiberValues = <F extends Function, T>(
   if (!yeeted) throw new Error("Reduce without aggregator");
 
   if (!self) {
-    if (fiber.next) return multiGatherFiberValues(fiber.next) as any;
+    if (fiber.next && fiber.f !== CONSUME) return multiGatherFiberValues(fiber.next) as any;
     if (yeeted.value !== undefined) return yeeted.value;
   }
 

@@ -33,7 +33,8 @@ export type ImageAttachment = {
 export type LayoutRenderer = (box: Rectangle, transform?: ShaderModule) => LiveElement<any>;
 export type InlineRenderer = (lines: InlineLine[], transform?: ShaderModule) => LiveElement<any>;
 
-export type LayoutPicker = (x: number, y: number, ox: number, oy: number) => Rectangle | null;
+export type LayoutScroller = (x: number, y: number) => void;
+export type LayoutPicker = (x: number, y: number, ox: number, oy: number, scroll: boolean) => [number, Rectangle, LayoutScroller] | null;
 
 export type LayoutFit = {
   size: Point,

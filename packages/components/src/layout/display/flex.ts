@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, Margin, Dimension, Direction, Alignment, Anchor, Point } from '../types';
 
-import { yeet, memo, gather } from '@use-gpu/live';
+import { yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import { makeBoxLayout, makeBoxPicker, normalizeAlignment, normalizeGap, parseDimension, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, makeBoxScroller, normalizeAlignment, normalizeGap, parseDimension, memoFit } from '../lib/util';
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
@@ -44,6 +44,8 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const gap    = normalizeGap(g);
   const align  = normalizeAlignment(al);
 
+  const {id} = useFiber();
+
   const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
@@ -71,8 +73,10 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),
-          pick: makeBoxPicker(sizes, offsets, pickers, 'flex'),
+          pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
+
+        return self;
       }),
     });
   };

@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Point, LayoutElement } from '../types';
 
-import { memo, gather, yeet, useOne } from '@use-gpu/live';
+import { memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
-import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, makeBoxScroller, memoFit } from '../lib/util';
 
 const NO_POINT4 = [0, 0, 0, 0];
 
@@ -33,6 +33,8 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
     children,
   } = props;
 
+  const {id} = useFiber();
+
   const Resume = (els: LayoutElement[]) => {
     return yeet({
       sizing: NO_POINT4,
@@ -44,7 +46,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),
-          pick: makeBoxPicker(sizes, offsets, pickers, 'absolute'),
+          pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
       }),
     });

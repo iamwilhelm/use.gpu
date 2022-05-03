@@ -5,7 +5,6 @@ import { FontMetrics } from '@use-gpu/text/types';
 import { Point4, InlineLine } from './types';
 
 import { use, yeet, useContext } from '@use-gpu/live';
-import { LayoutContext } from '../../providers/layout-provider';
 import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '../../text/providers/sdf-font-provider';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
@@ -43,15 +42,6 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
     transform,
   } = props;
-
-  let layout;
-  if (props.layout) {
-    layout = props.layout;
-    useNoContext(LayoutContext);
-  }
-  else {
-    layout = useContext(LayoutContext);
-  }
 
   const { getGlyph, getScale, getRadius } = useSDFFontContext();
   const scale = getScale(size);

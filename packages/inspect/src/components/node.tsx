@@ -1,5 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { formatValue, formatNodeName } from '@use-gpu/live';
+import { formatValue, formatNodeName, YEET } from '@use-gpu/live';
 import { styled, keyframes } from "@stitches/react";
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
@@ -40,9 +40,9 @@ export const Node: React.FC<NodeProps> = ({
   onMouseEnter,
   onMouseLeave,
 }) => {
-  const {id, by, f, args, yeeted, __inspect} = fiber;
+  const {id, by, f, type, args, yeeted, __inspect} = fiber;
 
-  const yeet = yeeted?.value !== undefined;
+  const yeet = type === YEET;
   const react = !!__inspect?.react;
 
   const suffix1 = yeet ? ICONSMALL("switch_left") : null;

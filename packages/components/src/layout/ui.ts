@@ -4,8 +4,9 @@ import { UIAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { SDFFontProvider, SDF_FONT_ATLAS } from '../text/providers/sdf-font-provider';
+import { ScrollConsumer } from '../consumers/scroll-consumer';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { use, keyed, resume, gather, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -35,10 +36,15 @@ const getItemSummary = (items: UIAggregate[]) => {
 
 export const UI: LiveComponent<AggregateProps> = (props) => {
   const {children} = props;
-  return use(SDFFontProvider, {
-    children,
-    then: Resume,
-  });
+
+  return (
+    wrap(ScrollConsumer, 
+      use(SDFFontProvider, {
+        children,
+        then: Resume,
+      })
+    )
+  );
 };
 
 const Resume = (

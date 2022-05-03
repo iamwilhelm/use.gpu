@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import { Atlas, Tuples, Rectangle } from '@use-gpu/core/types';
 import { FontMetrics } from '@use-gpu/text/types';
 
-import { gather, provide, useAsync, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
@@ -57,7 +57,7 @@ type GlyphCache = {
   mapping: Map<number, AtlasMapping>,
 }
 
-export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
+export const SDFFontProvider: LiveComponent<SDFFontProvider> = memo(({
   width = 256,
   height = 256,
   radius = 10,
@@ -152,8 +152,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = ({
       (gathered: any) => then ? then(atlas, sourceRef.current, gathered) : null,
     )
   ) : null;
-};
-
+}, 'SDFFontProvider');
 
 // Lay out glyphs from one or more spans into the given layout box.
 //

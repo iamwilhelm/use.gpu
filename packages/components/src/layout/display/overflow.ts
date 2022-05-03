@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Point, Point4, Margin, LayoutElement } from '../types';
 
-import { memo, use, gather, yeet, useMemo, useOne } from '@use-gpu/live';
+import { memo, use, gather, yeet, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
 
@@ -9,7 +9,7 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 
 import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
-import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, makeBoxScroller, memoFit } from '../lib/util';
 import { Block } from './block';
 import { mat4 } from 'gl-matrix';
 
@@ -41,13 +41,27 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
   const scrollRef = useMemo(() => [initialX, initialY], [initialX, initialY]);
   const sizeRef = useOne(() => [0, 0, 0, 0]);
-
   const matrix = useOne(() => mat4.create());
+
+  const scrollTo = (x: number, y: number) => {
+    const dx = Math.max(0, sizeRef[2] - sizeRef[0]);
+    const dy = Math.max(0, sizeRef[3] - sizeRef[1]);
+    scrollRef[0] = Math.max(0, Math.min(dx, x));
+    scrollRef[1] = Math.max(0, Math.min(dy, y));
+    matrix[12] = -scrollRef[0];
+    matrix[13] = -scrollRef[1];
+  };
+
+  const scrollBy = (dx: number, dy: number) => {
+    scrollTo(scrollRef[0] + dx, scrollRef[1] + dy);
+  };
 
   const transform = useOne(() => {
     const getMatrix = bindingToModule(makeRefBinding(MATRIX_BINDING, matrix));
     return bindBundle(getCartesianPosition, {getMatrix});
   });
+  
+  const {id} = useFiber();
 
   const Resume = (els: LayoutElement[]) => {
     const sizing = getBlockMinMax(els, NO_FIXED, direction);
@@ -67,24 +81,26 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
         const offsets = [[ml, mt]];
         const renders = [render];
         const pickers = [pick];
+        const scrollers = [scroll];
 
         sizeRef[0] = into[0];
         sizeRef[1] = into[1];
         sizeRef[2] = size[0];
         sizeRef[3] = size[1];
 
-        const dx = Math.max(0, size[0] - into[0] + ml + mr);
-        const dy = Math.max(0, size[1] - into[1] + mt + mb);
-        scrollRef[0] = Math.min(scrollRef[0], dx);
-        scrollRef[1] = Math.min(scrollRef[1], dy);
-        matrix[12] = -scrollRef[0];
-        matrix[13] = -scrollRef[1];
+        const [x, y] = scrollRef;
+        const sx = Math.max(0, Math.min(size[0] - into[0], x));
+        const sy = Math.max(0, Math.min(size[1] - into[1], y));
 
-        return {
+        scrollTo(sx, sy);
+
+        const self = {
           size,
           render: makeBoxLayout(sizes, offsets, renders, transform),
-          pick: makeBoxPicker(sizes, offsets, pickers),
+          pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
         };
+
+        return self;
       }),
     });
   };

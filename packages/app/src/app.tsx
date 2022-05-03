@@ -4,6 +4,7 @@ import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, Rend
 
 import React from '@use-gpu/live/jsx';
 import { FC, useFiber, useResource, useState } from '@use-gpu/live';
+import { HTML } from '@use-gpu/react';
 
 import {
   AutoCanvas, CanvasPicking,
@@ -62,9 +63,9 @@ export const App: FC = () => {
   const fiber = useFiber();
   const inspect = useInspector();
 
-  return (
+  return [
     <WebGPU
-      fallback={FALLBACK_MESSAGE}
+      fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error)}</HTML>}
     >
       <AutoCanvas
         selector={'#use-gpu'}
@@ -74,9 +75,9 @@ export const App: FC = () => {
           {router}
         </FontLoader>
       </AutoCanvas>
-      {inspect ? <UseInspect fiber={fiber} container={root} /> : null}
-    </WebGPU>
-  );
+    </WebGPU>,
+    inspect ? <UseInspect fiber={fiber} container={root} /> : null
+  ];
 };
 
 // Toggle inspector with ctrl/cmd-I.

@@ -17,7 +17,7 @@ export const LayoutDisplayPage: LC = () => {
       <Pass>
         <Flat>
           <UI>
-            <Layout>
+            <Layout inspect>
               <Absolute>
                 <Element fill={[1, 1, 1, .5]}  />
               </Absolute>
@@ -42,17 +42,23 @@ export const LayoutDisplayPage: LC = () => {
                     <Block margin={[0, 20, 0, 0]}>
                       <Flex align="justify-center" gap={[10, 10]} wrap>
                         <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
-                        <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
+                          radius={[20, 0, 20, 0]} border={3} stroke={[0.5, 0.5, 0.5, 1]} />
                         <Element width={110} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
-                        <Element width={40}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={40} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
+                          radius={[1, 10, 1, 1]} border={5} stroke={[0, 0, 0, 0.75]} />
                         <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
-                        <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
-                        <Element width={70}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
+                          radius={[10, 10, 10, 10]} border={20} stroke={[0.5, 0.5, 0.5, 1]} />
+                        <Element width={70} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
+                          radius={[10, 10, 10, 10]} border={5} stroke={[0.7, 0.7, 0.7, 0.5]} />
                         <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
-                        <Element width={140} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={140} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
+                          radius={[10, 10, 10, 10]} border={5} stroke={[0, 0, 0, 0.75]} />
                         <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
                         <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
-                        <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={50} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
+                          radius={[10, 10, 10, 10]} border={5} stroke={[1.0, 1.0, 1.0, 0.5]} />
                         <Element width={70}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
                       </Flex>
                     </Block>

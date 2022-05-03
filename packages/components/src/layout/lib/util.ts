@@ -160,15 +160,18 @@ export const makeInlineLayout = (
 };
 
 export const makeBoxPicker = (
+  id: number,
   sizes: Point[],
   offsets: Point[],
   pickers: LayoutPicker[],
-  tag: string,
+  scrollPos?: Point,
+  onScroll?: (dx: number, dy: number) => void,
 ) => (
   x: number,
   y: number,
   ox: number,
   oy: number,
+  scroll?: boolean,
 ): Rectangle | null => {
   const n = sizes.length;
 
@@ -183,13 +186,18 @@ export const makeBoxPicker = (
     l += ox;
     t += oy;
 
+    if (scrollPos) {
+      l -= scrollPos[0];
+      t -= scrollPos[1];
+    }
+    
     let r = l + w;
     let b = t + h;
     
     if (x >= l && x < r && y >= t && y < b) {
-      const sub = pick && pick(x, y, l, t);
+      const sub = pick && pick(x, y, l, t, scroll);
       if (sub) return sub;
-      return [l, t, r, b];
+      return (!scroll || onScroll) ? [id, [l, t, r, b], onScroll] : null;
     }
   }
 

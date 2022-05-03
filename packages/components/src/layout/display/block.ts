@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, Point, Dimension, Margin, Point4, ImageAttachment } from '../types';
 
-import { use, memo, gather, yeet, useOne } from '@use-gpu/live';
+import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { normalizeMargin, makeBoxLayout, makeBoxPicker, parseDimension, memoFit } from '../lib/util';
+import { normalizeMargin, makeBoxLayout, makeBoxPicker, makeBoxScroller, parseDimension, memoFit } from '../lib/util';
 
 import { Absolute } from './absolute';
 import { Element } from '../element/element';
@@ -61,6 +61,8 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const blockMargin = normalizeMargin(m);
   const padding = normalizeMargin(p);
 
+  const {id} = useFiber();
+
   const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
@@ -94,7 +96,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),
-          pick: makeBoxPicker(sizes, offsets, pickers, 'block'),
+          pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
       })
     });

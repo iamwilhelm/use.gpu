@@ -27,7 +27,7 @@ _For background, see:_
 
 On the surface, Use.GPU feels exactly like React, in that you can use `<JSX>` syntax to compose its functional components. React aficionados will be right at home:
 
-([full example](packages/src/pages/geometry/data.tsx))
+([full example](packages/app/src/pages/geometry/data.tsx))
 
 ```jsx
 <Draw>

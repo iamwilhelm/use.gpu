@@ -2,7 +2,7 @@
 
 Use.GPU is a set of **reactive, declarative WebGPU legos**. It lets you compose arbitrary graphics pipelines on the fly, thanks to a built-in shader linker and binding generator.
 
-Use.GPU is the **alpha stage**, and continues to evolve, but the basis is very promising.
+Use.GPU is in the **alpha stage**, and continues to evolve, but the basis is very promising.
 
 It offers components at different levels of abstraction:
 - All-in 2D/3D plotting (axes, grids, curves, labels, ...)

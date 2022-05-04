@@ -2,9 +2,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, LambdaSource, RenderPassMode,
+  VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 
 import { RawLines } from '../primitives/raw-lines';
 
@@ -26,12 +26,14 @@ export type TickLayerProps = {
   depth?: number,
   offset?: number[] | TypedArray,
 
-  positions?: StorageSource | LambdaSource | ShaderModule,
-  sizes?: StorageSource | LambdaSource | ShaderModule,
-  widths?: StorageSource | LambdaSource | ShaderModule,
-  colors?: StorageSource | LambdaSource | ShaderModule,
-  depths?: StorageSource | LambdaSource | ShaderModule,
-  offsets?: StorageSource | LambdaSource | ShaderModule,
+  positions?: ShaderSource,
+  sizes?: ShaderSource,
+  widths?: ShaderSource,
+  colors?: ShaderSource,
+  depths?: ShaderSource,
+  offsets?: ShaderSource,
+
+  join?: 'miter' | 'round' | 'bevel',
 
   detail?: number,
   count?: Prop<number>,
@@ -61,6 +63,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
     depths,
     offset,
     offsets,
+    join,
 
     count = 1,
     detail = 1,
@@ -77,7 +80,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
 
   const xf = useTransformContext();
 
-  const c = useCallback(() => (positions?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
+  const c = useCallback(() => ((positions as any)?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
 
   const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
   const bound = useBoundShader(getTickPosition, TICK_BINDINGS, [xf, p, o, d, s], defines);
@@ -93,6 +96,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
         widths,
         depth,
         depths,
+        join,
 
         count: c,
         mode,

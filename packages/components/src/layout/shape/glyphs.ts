@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Tuples } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { FontMetrics } from '@use-gpu/text/types';
-import { Point4, InlineLine } from './types';
+import { Point4, InlineLine } from '../types';
 
 import { use, yeet, useContext } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '../../text/providers/sdf-font-provider';
@@ -12,7 +12,6 @@ const BLACK = [0, 0, 0, 1];
 
 export type GlyphsProps = {
   id: number,
-  layout: Rectangle,
 
   color?: Point4,
   size?: number,
@@ -24,12 +23,14 @@ export type GlyphsProps = {
   breaks: number[],
   height: FontMetrics,
   lines: InlineLine[],
+  
+  transform?: ShaderModule,
 };
 
 export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   const {
     id,
-    color = black,
+    color = BLACK,
     size = 16,
     snap = false,
 
@@ -60,7 +61,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
     let sx = x;
     spans.iterate((_a, trim, _h, index) => {
-      glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: boolean) => {
+      glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number) => {
         const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, size);
         const {image, layoutBounds, outlineBounds} = glyph;
         const [ll, lt, lr, lb] = layoutBounds;

@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { memo, yeet, useMemo } from '@use-gpu/live';
+import { StorageSource } from '@use-gpu/core/types';
 
+import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkSegments, generateChunkAnchors } from '@use-gpu/core';
 import { useBoundStorage } from '../hooks/useBoundStorage';
 
@@ -10,7 +11,7 @@ type ArrowSegmentsProps = {
   starts?: boolean[],
   ends?: boolean[],
 
-  render?: (segments: ShaderSource, anchors: ShaderSource, trim: ShaderSource) => LiveElement<any>,
+  render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource) => LiveElement<any>,
 };
 
 export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((

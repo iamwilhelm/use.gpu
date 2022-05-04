@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { memo, yeet, useMemo } from '@use-gpu/live';
+import { StorageSource } from '@use-gpu/core/types';
 
+import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkSegments } from '@use-gpu/core';
 import { useBoundStorage } from '../hooks/useBoundStorage';
 
@@ -8,7 +9,7 @@ type LineSegmentsProps = {
   chunks: number[],
   loops?: boolean[],
 
-  render?: (segments: ShaderSource, anchors: ShaderSource, trim: ShaderSource) => LiveElement<any>,
+  render?: (segments: StorageSource) => LiveElement<any>,
 };
 
 export const LineSegments: LiveComponent<LineSegmentsProps> = memo((

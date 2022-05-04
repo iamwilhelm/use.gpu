@@ -1,4 +1,4 @@
-import { Key, Action, Task, LiveFiber, DeferredCall, FiberQueue, HostInterface, RenderCallbacks, RenderOptions } from './types';
+import { Key, Action, Task, LiveFiber, DeferredCall, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction } from './types';
 
 import { makeFiber, renderFiber, updateFiber } from './fiber';
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester } from './util';
@@ -61,7 +61,7 @@ export const makeHost = (
 }
 
 // Create top-most fiber with a new host
-export const makeHostFiber = <F extends Function>(
+export const makeHostFiber = <F extends ArrowFunction>(
   node: DeferredCall<F>,
   renderOptions: RenderOptions = DEFAULT_RENDER_OPTIONS,
 ) => {
@@ -73,7 +73,7 @@ export const makeHostFiber = <F extends Function>(
 // Rendering entry point
 export const renderWithDispatch = <T>(
   dispatch: (t: Task) => T,
-) => <F extends Function>(
+) => <F extends ArrowFunction>(
   node: DeferredCall<F>,
   renderOptions: RenderOptions = DEFAULT_RENDER_OPTIONS,
 ) => {
@@ -131,7 +131,7 @@ export const traverseFiber = (fiber: LiveFiber<any>, f: (f: LiveFiber<any>) => v
 // Render on next paint (animation frame)
 export const renderPaint = (() => {
   const onPaint = makePaintRequester();
-  return <F extends Function>(node: DeferredCall<F>) => {
+  return <F extends ArrowFunction>(node: DeferredCall<F>) => {
     return new Promise((resolve) => {
       onPaint(() => resolve(renderSync(node)));
     });

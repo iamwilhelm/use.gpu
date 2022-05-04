@@ -2,9 +2,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, ShaderSource, RenderPassMode,
+  VertexData, TextureSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
@@ -28,17 +28,15 @@ export type RawLabelsProps = {
   rectangle?: number[] | TypedArray,
   uv?: number[] | TypedArray,
   layout?: number[] | TypedArray,
-  sdf?: number,
+  sdf?: number[] | TypedArray,
 
   position?: number[] | TypedArray,
   placement?: number[] | TypedArray,
-  density?: number[] | TypedArray,
   offset?: number,
   size?: number,
   depth?: number,
-  color?: number,
-  outline?: number,
-  outlineColor?: number[] | TypedArray,
+  color?: number[] | TypedArray,
+  expand?: number,
 
   rectangles?: ShaderSource,
   uvs?: ShaderSource,
@@ -47,13 +45,11 @@ export type RawLabelsProps = {
 
   positions?: ShaderSource,
   placements?: ShaderSource,
-  densities?: ShaderSource,
   offsets?: ShaderSource,
   sizes?: ShaderSource,
   depths?: ShaderSource,
   colors?: ShaderSource,
-  outlines?: ShaderSource,
-  outlineColors?: ShaderSource,
+  expands?: ShaderSource,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
 
@@ -109,12 +105,12 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => (props.indices?.length ?? resolve(count)), [props.indices, count]);
+  const instanceCount = useCallback(() => ((props.indices as any)?.length ?? resolve(count)), [props.indices, count]);
 
   const pipeline = useMemo(() =>
     patch(alphaToCoverage
       ? PIPELINE_ALPHA_TO_COVERAGE
-      : PIPELINE,
+      : PIPELINE_ALPHA,
     propPipeline),
     [propPipeline, alphaToCoverage]);
 

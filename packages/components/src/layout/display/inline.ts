@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Point, Alignment, Base, Margin } from '../types';
+import { InlineElement, Point, Alignment, Base, Margin } from '../types';
 
 import { memo, gather, yeet, useOne } from '@use-gpu/live';
 import { getInlineMinMax, fitInline } from '../lib/inline';
@@ -21,7 +21,7 @@ export type InlineProps = {
   children?: LiveElement<any>,
 };
 
-export const Inline: LiveComponent<InlineProps> = memo((props: BlockProps) => {
+export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
   const {
     direction = 'x',
     align = 'start',
@@ -38,7 +38,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: BlockProps) => {
   const margin = normalizeMargin(m);
   const padding = normalizeMargin(p);
 
-  const Resume = (els: LayoutElement[]) => {
+  const Resume = (els: InlineElement[]) => {
     const sizing = getInlineMinMax(els, direction, wrap, snap);
 
     return yeet({

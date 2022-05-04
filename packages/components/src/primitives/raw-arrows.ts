@@ -2,9 +2,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, ShaderSource, RenderPassMode,
+  VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
@@ -75,7 +75,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   // Set up draw
   const vertexCount = mesh.count;
-  const instanceCount = useCallback(() => (props.anchors?.length ?? count), [props.anchors, count]);
+  const instanceCount = useCallback(() => ((props.anchors as any)?.length ?? count), [props.anchors, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
@@ -93,7 +93,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, c, z, w, d]);
   const getFragment = getPassThruFragment;
 
-  return instanceCount ? (
+  return (
      use(Virtual, {
       vertexCount,
       instanceCount,
@@ -108,7 +108,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
       mode,
       id,
     })
-  ) : null;
+  );
 }, 'RawArrows');
 
 

@@ -9,7 +9,7 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 
 import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
-import { makeBoxLayout, makeBoxPicker, makeBoxScroller, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
 import { Block } from './block';
 import { mat4 } from 'gl-matrix';
 
@@ -39,7 +39,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
     children,
   } = props;
 
-  const scrollRef = useMemo(() => [initialX, initialY], [initialX, initialY]);
+  const scrollRef = useMemo(() => [initialX, initialY] as [number, number], [initialX, initialY]);
   const sizeRef = useOne(() => [0, 0, 0, 0]);
   const matrix = useOne(() => mat4.create());
 
@@ -78,7 +78,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
         const {render, pick, size} = fit(into);
 
         const sizes = [size];
-        const offsets = [[ml, mt]];
+        const offsets = [[ml, mt]] as Point[];
         const renders = [render];
         const pickers = [pick];
         const scrollers = [scroll];

@@ -1,6 +1,6 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, InlineRenderer, InlineLine } from '../types';
+import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
 
@@ -110,7 +110,7 @@ export const makeBoxLayout = (
 export const makeInlineLayout = (
   ranges: Point[],
   //sizes: Point[],
-  offsets: [number, number, number, number][],
+  offsets: [number, number, number][],
   renders: InlineRenderer[],
 ) => (
   box: Rectangle,
@@ -171,8 +171,12 @@ export const makeBoxPicker = (
   y: number,
   ox: number,
   oy: number,
-  scroll?: boolean,
-): Rectangle | null => {
+  scroll: boolean = false,
+): [
+  number,
+  Rectangle,
+  ((dx: number, dy: number) => void) | undefined,
+] | null => {
   const n = sizes.length;
 
   for (let i = n - 1; i >= 0; --i) {

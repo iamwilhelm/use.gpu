@@ -34,15 +34,16 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
 
   const run = useMemo(() => {
     const f = async () => {
-      const response = await fetch(url ?? request, options);
+      const response = await fetch((url ?? request)!, options);
       if (type === 'buffer') return response.arrayBuffer();
       return response;
     };
-    
-    return SLOW ? () => delay(f(), SLOW) : f;
+
+    if (url ?? request) return SLOW ? () => delay(f(), SLOW) : f;
+    return async () => null;
   }, [url, request, JSON.stringify(options), type, version]);
 
-  const [resolved, error] = useAsync(run, run);
+  const [resolved, error] = useAsync(run, [run]);
   const result = resolved !== undefined ? resolved : (error !== undefined ? fallback : loading);
 
   return result !== undefined ? (render ? render(result) : yeet(result)) : null;

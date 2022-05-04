@@ -2,9 +2,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, LambdaSource, RenderPassMode,
+  VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 
 import { RawQuads } from '../primitives/raw-quads';
 
@@ -30,13 +30,13 @@ const MASK_SHADER = {
 export type PointLayerProps = {
   position?: number[] | TypedArray,
   size?: number,
-  color?: number[],
+  color?: number[] | TypedArray,
   depth?: number,
 
-  positions?: StorageSource | LambdaSource | ShaderModule,
-  sizes?: StorageSource | LambdaSource | ShaderModule,
-  colors?: StorageSource | LambdaSource | ShaderModule,
-  depths?: StorageSource | LambdaSource | ShaderModule,
+  positions?: ShaderSource,
+  sizes?: ShaderSource,
+  colors?: ShaderSource,
+  depths?: ShaderSource,
 
   shape?: PointShape,
 
@@ -76,7 +76,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
       gain: 0.5,
     });
   }, s);
-  const masks = (MASK_SHADER as any)[shape] ?? MASK_SHADER[PointShape.Circle];
+  const masks = (MASK_SHADER as any)[shape] ?? MASK_SHADER.circle;
 
   return use(RawQuads, {
     position,

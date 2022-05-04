@@ -1,4 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 import { ColorTrait, LineTrait, ROPTrait, VectorLike } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
@@ -24,9 +25,9 @@ export type LineProps =
   Partial<LineTrait> &
   Partial<ROPTrait> & {
 
-  colors?: StorageSource,
-  widths?: StorageSource,
-  depths?: StorageSource,
+  colors?: ShaderSource,
+  widths?: ShaderSource,
+  depths?: ShaderSource,
 };
 
 export const Line: LiveComponent<LineProps> = (props) => {
@@ -37,10 +38,6 @@ export const Line: LiveComponent<LineProps> = (props) => {
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
-
-  const s = useProp(size, parseFloat);
-  const d = useProp(detail, parseDetail);
-  const o = useProp(offset, parsePosition4);
 
   return (
     use(LineLayer, {

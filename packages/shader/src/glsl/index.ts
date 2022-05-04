@@ -131,8 +131,6 @@ export const GLSLLinker = {
   makeModuleCache,
 
   getHash,
-  bundleToAttribute,
-  bundleToAttributes,
 };
 
 export default GLSLLinker;

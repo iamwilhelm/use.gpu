@@ -2,7 +2,7 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode,
+  VertexData, TextureSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 

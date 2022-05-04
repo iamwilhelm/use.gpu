@@ -19,11 +19,11 @@ import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick-geo
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
     name: 'lightPosition',
-    format: UniformType['vec4<f32>'],
+    format: 'vec4<f32>',
   },
   {
     name: 'lightColor',
-    format: UniformType['vec4<f32>'],
+    format: 'vec4<f32>',
   },
 ];
 

@@ -2,6 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, VectorLike, Swizzle } from '../types';
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useBoundStorage } from '../../hooks/useBoundStorage';
 import { useShaderRef } from '../../hooks/useShaderRef';
@@ -29,12 +30,7 @@ import { LineLayer } from '../../layers/line-layer';
 import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/line.wgsl';
 
-const GRID_BINDINGS = [
-  { name: 'getGridValue', format: 'f32', value: 0 },
-  { name: 'getGridDirection', format: 'i32', value: 0 },
-  { name: 'getGridMin', format: 'vec4<f32>', value: vec4.fromValues(0, 0, 0, 0) },
-  { name: 'getGridMax', format: 'vec4<f32>', value: vec4.fromValues(0, 0, 0, 0) },
-];
+const GRID_BINDINGS = bundleToAttributes(getGridPosition);
 
 export type GridProps =
   Partial<GridTrait> &
@@ -46,7 +42,7 @@ export type GridProps =
   origin?: VectorLike,
 };
 
-const NO_PROPS: Record<string, any> = {};
+const NO_SCALE_PROPS: Partial<ScaleTrait> = {};
 
 export const Grid: LiveComponent<GridProps> = (props) => {
   const {
@@ -59,8 +55,8 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
 
-  const first = useScaleTrait(props.first ?? NO_PROPS);
-  const second = useScaleTrait(props.second ?? NO_PROPS);
+  const first = useScaleTrait(props.first ?? NO_SCALE_PROPS);
+  const second = useScaleTrait(props.second ?? NO_SCALE_PROPS);
 
   const firstDetail = useProp(props.first?.detail, parseDetail);
   const secondDetail = useProp(props.second?.detail, parseDetail);
@@ -69,7 +65,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
 
   const parentRange = useContext(RangeContext);
 
-  const getGrid = (options: DomainOptions, detail: number, index: number, other: number) => {
+  const getGrid = (options: ScaleTrait, detail: number, index: number, other: number) => {
     const main  = parseAxis(axes[index]);
     const cross = parseAxis(axes[other]);
 
@@ -81,15 +77,15 @@ export const Grid: LiveComponent<GridProps> = (props) => {
       return new Float32Array(f(r[0], r[1], options));
     }, [r[0], r[1], options]);
 
-    const values = useMemo(() => newValues, newValues);
+    const values = useMemo(() => newValues, newValues as any);
     const data = useBoundStorage(values, 'f32');
     const n = values.length * (detail + 1);
 
-    const min = vec4.clone(p);
+    const min = vec4.clone(p as any);
     min[main] = 0;
     min[cross] = r2[0];
 
-    const max = vec4.clone(p);
+    const max = vec4.clone(p as any);
     max[main] = 0;
     max[cross] = r2[1];
 
@@ -103,7 +99,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     // Expose position source
     const source = useMemo(() => ({
       shader: bound,
-      alloc: data.alloc,
+      alloc: (data as any).alloc,
       length: n,
       size: [n],
       version: 0,
@@ -115,8 +111,8 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     return source;
   };
 
-  const firstPositions = getGrid(first, firstDetail, 0, 1);
-  const secondPositions = getGrid(second, secondDetail, 1, 0);
+  const firstPositions = getGrid(first as any, firstDetail, 0, 1);
+  const secondPositions = getGrid(second as any, secondDetail, 1, 0);
 
   // const firstLoop = loop || props.first?.loop;
   // const secondLoop = loop || props.second?.loop;

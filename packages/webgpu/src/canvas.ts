@@ -1,4 +1,4 @@
-import { GPUMount, GPUDeviceMount } from './types';
+import { GPUDeviceMount } from './types';
 
 export const mountGPUDevice = async (
   requiredFeatures: GPUFeatureName[] = [],

@@ -33,7 +33,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   let {canvas} = props;
   if (!canvas && props.selector) {
     canvas = useResource((dispose) => {
-      const [c, d] = adoptCanvas(props.selector);
+      const [c, d] = adoptCanvas(props.selector!);
       dispose(d);
       return c;
     }, [props.selector]);

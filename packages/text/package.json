@@ -4,6 +4,10 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
   "private": true,
   "scripts": {
     "test": "jest --watch",

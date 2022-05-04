@@ -1,3 +1,5 @@
 import { makeContext } from '@use-gpu/live';
 
-export const LayoutContext = makeContext(undefined, 'LayoutContext');
+type Rectangle = [number, number, number, number];
+
+export const LayoutContext = makeContext<Rectangle>(undefined, 'LayoutContext');

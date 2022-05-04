@@ -6,7 +6,7 @@ import { parseAnchor } from './util';
 
 export const getFlexMinMax = (
   els: LayoutElement[],
-  fixed: [number | number, number | null],
+  fixed: [number | null, number | null],
   direction: Direction,
   gap: Point,
   wrap: boolean,
@@ -136,7 +136,7 @@ export const fitFlex = (
   const cross = [] as {
     size: number,
     sizes: Point[],
-    offsets: Point[],
+    offsets: [number, number, number][],
     renders: LayoutRenderer[],
     pickers: LayoutPicker[],
   }[];
@@ -171,7 +171,7 @@ export const fitFlex = (
     
     // Lay out a row of flexed boxes into their final size
     const crossSizes   = [] as Point[];
-    const crossOffsets = [] as [number, number][];
+    const crossOffsets = [] as [number, number, number][];
     const crossRenders = [] as LayoutRenderer[];
     const crossPickers = [] as LayoutPicker[];
 
@@ -292,7 +292,7 @@ export const fitFlex = (
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = resolved.slice() as Point;
+    const size = [w, h] as Point;
     if (isX) size[1] -= mt + mb;
     else size[0] -= ml + mr;
 
@@ -301,7 +301,7 @@ export const fitFlex = (
     if (under) {
       sizes.unshift(fitted);
       renders.unshift(render);
-      pickers.unshift(picker);
+      pickers.unshift(pick);
       offsets.unshift([ml, mt]);
     }
     else {

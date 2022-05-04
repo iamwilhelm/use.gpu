@@ -1,8 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Emitter } from '@use-gpu/core/types';
-import { SpanData, PerSpan, PerGlyph } from '@use-gpu/text/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Point4, InlineSpan } from './types';
+import { Point4, InlineLine } from '../types';
 
 import { keyed, yeet, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { makeTuples, emitIntoNumberArray } from '@use-gpu/core';
@@ -36,9 +35,9 @@ export type TextProps = {
   children?: string,
 };
 
-const BLACK = [0, 0, 0, 1];
-const NO_MARGIN = [0, 0, 0, 0];
-const NO_STROKE = [0.0, 0.0, 0.0, 0.0];
+const BLACK: Point4 = [0, 0, 0, 1];
+const NO_MARGIN: Point4 = [0, 0, 0, 0];
+const NO_STROKE: Point4 = [0.0, 0.0, 0.0, 0.0];
 
 export const Text: LiveComponent<TextProps> = (props) => {
   const {

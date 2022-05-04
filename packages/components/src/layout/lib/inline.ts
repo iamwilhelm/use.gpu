@@ -1,12 +1,11 @@
 import { LiveElement } from '@use-gpu/live/types';
-import { FontMetrics } from '@use-gpu/text/types';
-import { LayoutElement, InlineElement, LayoutRenderer, LayoutPicker, Direction, Point, Margin, Rectangle, Alignment, Base } from '../types';
+import { InlineElement, InlineRenderer, LayoutPicker, Direction, Point, Point4, Margin, Rectangle, Alignment, Base } from '../types';
 
 import { parseBase, parseAnchor } from './util';
 import { getAlignmentSpacing } from './cursor';
 
 export const getInlineMinMax = (
-  els: (LayoutElement | InlineElement)[],
+  els: InlineElement[],
   direction: Direction,
   wrap: boolean,
   snap: boolean,
@@ -61,7 +60,7 @@ export const getInlineMinMax = (
 }
 
 export const fitInline = (
-  els: LayoutElement[],
+  els: InlineElement[],
   into: Point,
   direction: Direction,
   align: Alignment,
@@ -93,10 +92,10 @@ export const fitInline = (
 
   const ranges  = [] as Point[];
   const offsets = [] as [number, number, number][];
-  const renders = [] as LayoutRenderer[];
+  const renders = [] as InlineRenderer[];
   const pickers = [] as LayoutPicker[];
 
-  const mainSpans = [] as [number, number, number, number];
+  const mainSpans = [] as Point4[];
   const mainEls = [] as InlineElement[];
 
   const reduceMain = (hard: boolean) => {
@@ -113,18 +112,18 @@ export const fitInline = (
       const span = mainSpans[i];
       const [startIndex, endIndex, chunkAdvance, chunkCount] = span;
 
-      const {spans, height, render, pick} = mainEls[i];
+      const {spans, height, render/*, pick*/} = mainEls[i];
       const {ascent, descent, lineHeight} = height;
 
       const crossPos = caretCross + mainBase - ascent;
-      const offset = isX ? [mainPos, crossPos, mainGap] : [crossPos, mainPos, mainGap];
+      const offset = (isX ? [mainPos, crossPos, mainGap] : [crossPos, mainPos, mainGap]) as [number, number, number];
 
       mainPos += chunkAdvance + chunkCount * mainGap;
 
-      ranges.push(span);
+      ranges.push(span as any);
       offsets.push(offset);
       renders.push(render);
-      pickers.push(pick);
+      //pickers.push(pick);
     }
 
     caretMain = 0;

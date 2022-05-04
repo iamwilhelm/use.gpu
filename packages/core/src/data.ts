@@ -64,7 +64,7 @@ export const emitIntoMultiNumberArray = (expr: EmitterExpression, to: NumberArra
     }
   };
 
-  let nest: Emitter;
+  let nest: EmitterExpression;
   if (n === 1) {
     nest = (emit: Emitter) => {
       expr(emit, index[0], size);

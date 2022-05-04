@@ -2,9 +2,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, ShaderSource, RenderPassMode,
+  VertexData, TextureSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
@@ -24,7 +24,7 @@ import { getMaskedFragment } from '@use-gpu/wgsl/mask/masked.wgsl';
 export type RawQuadsProps = {
   position?: number[] | TypedArray,
   rectangle?: number[] | TypedArray,
-  color?: number[],
+  color?: number[] | TypedArray,
   depth?: number,
   mask?: number,
   uv?: number[] | TypedArray,
@@ -102,12 +102,12 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => (props.positions?.length ?? resolve(count)), [props.positions, count]);
+  const instanceCount = useCallback(() => ((props.positions as any)?.length ?? resolve(count)), [props.positions, count]);
 
   const pipeline = useMemo(() =>
     patch(alphaToCoverage
       ? PIPELINE_ALPHA_TO_COVERAGE
-      : PIPELINE,
+      : PIPELINE_ALPHA,
     propPipeline),
     [propPipeline, alphaToCoverage]);
 

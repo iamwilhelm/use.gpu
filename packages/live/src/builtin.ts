@@ -101,30 +101,30 @@ export const debug = (
 
 // Reduce a subtree
 export const mapReduce = <R, T>(
-  calls: LiveElement<any>,
+  calls?: LiveElement<any>,
   map?: (t: T) => R,
   reduce?: (a: R, b: R) => R,
-  done?: LiveFunction<(r: R) => void>,
+  done?: LiveFunction<(r: R) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key, by: getCurrentFiberID()});
 
 // Gather items from a subtree
 export const gather = <T>(
-  calls: LiveElement<any>,
-  done?: LiveFunction<(r: T[]) => void>,
+  calls?: LiveElement<any>,
+  done?: LiveFunction<(r: T[]) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key, by: getCurrentFiberID()});
 
 // Gather items from a subtree
 export const multiGather = <T>(
-  calls: LiveElement<any>,
-  done?: LiveFunction<(r: T[]) => void>,
+  calls?: LiveElement<any>,
+  done?: LiveFunction<(r: Record<string, T[]>) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key, by: getCurrentFiberID()});
 
 // Yeet value(s) upstream
 export const yeet = <T>(
-  value: T,
+  value?: T,
   key?: Key,
 ): DeferredCall<() => void> => ({f: YEET, arg: value, key, by: getCurrentFiberID()});
 
@@ -132,14 +132,14 @@ export const yeet = <T>(
 export const provide = <T, C>(
   context: LiveContext<C>,
   value: T,
-  calls: LiveElement<any> | undefined,
+  calls?: LiveElement<any>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls], key, by: getCurrentFiberID()});
 
 // Consume value from a co-context
 export const consume = <T, C>(
   context: LiveContext<C>,
-  calls: LiveElement<any> | undefined,
+  calls?: LiveElement<any>,
   done?: LiveFunction<(r: T) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key, by: getCurrentFiberID()});
@@ -149,9 +149,9 @@ export const imperative = makeImperativeFunction;
 
 // Make live context for holding shared data for child nodes
 interface MakeContext<T> {
+  <T>(i: T, d?: string): LiveContext<T>;
   <T>(i: undefined, d?: string): LiveContext<T>;
   <T>(i: null, d?: string): LiveContext<T | null>;
-  <T>(i: T, d?: string): LiveContext<T>;
 };
 
 export const makeContext: MakeContext<unknown> = <T>(initialValue?: T | null, displayName?: string) => ({

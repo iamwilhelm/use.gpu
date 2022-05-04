@@ -1,5 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { RenderPassMode, DeepPartial } from '@use-gpu/core/types';
+import { RenderPassMode, DeepPartial, Prop } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { memo, use, useContext, useNoContext, useFiber, useMemo, useNoMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -63,13 +63,13 @@ export type VirtualProps = {
   mode?: RenderPassMode | string,
   id?: number,
 
-  vertexCount: number,
-  instanceCount: number,
+  vertexCount: Prop<number>,
+  instanceCount: Prop<number>,
 
   getVertex: ShaderModule,
   getFragment: ShaderModule,
 
-  renderer: VirtualRenderer | string,
+  renderer?: VirtualRenderer | string,
   defines: Record<string, any>,
   deps: any[] | null,
 };

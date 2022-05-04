@@ -2,14 +2,33 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { useContext, useMemo, useOne, useResource, useNoResource } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
 
-type PickState = {id: number, hovered: boolean, pressed: boolean, index: number};
+type PickState = {
+  id: number,
+  hovered: boolean,
+  pressed: {
+    left: boolean,
+    middle: boolean,
+    right: boolean,
+  },
+  presses: {
+    left: number,
+    middle: number,
+    right: number,
+  },
+  clicks: {
+    left: number,
+    middle: number,
+    right: number,
+  },
+  index: number,
+};
 
 export type PickProps = {
   capture?: boolean,
   render?: (state: PickState) => LiveElement<any>,
   children?: LiveElement<any>,
-  onMouseEnter?: (m: MouseEventState) => void,
-  onMouseLeave?: (m: MouseEventState) => void,
+  onMouseOver?: (m: MouseEventState) => void,
+  onMouseOut?: (m: MouseEventState) => void,
   onMouseDown?: (m: MouseEventState) => void,
   onMouseUp?: (m: MouseEventState) => void,
   onMouseMove?: (m: MouseEventState) => void,

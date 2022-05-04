@@ -3,7 +3,7 @@ import { Point, LayoutElement } from '../types';
 
 import { memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
-import { makeBoxLayout, makeBoxPicker, makeBoxScroller, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
 
 const NO_POINT4 = [0, 0, 0, 0];
 

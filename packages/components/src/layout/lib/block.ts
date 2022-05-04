@@ -6,7 +6,7 @@ const isNotAbsolute = (el: LayoutElement) => !el.absolute;
 
 export const getBlockMinMax = (
   els: LayoutElement[],
-  fixed: [number | number, number | null],
+  fixed: [number | null, number | null],
   direction: 'x' | 'y',
 ) => {
   if (fixed[0] != null && fixed[1] != null) {

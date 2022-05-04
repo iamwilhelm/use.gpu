@@ -10,5 +10,5 @@ export const swizzleMatrix = (m: mat4, swizzle: string) => {
     if (c === 'z') values.push(0, 0, 1, 0);
     if (c === 'w') values.push(0, 0, 0, 1);
   }
-  return mat4.copy(m, values);
+  return mat4.copy(m, values as any);
 };

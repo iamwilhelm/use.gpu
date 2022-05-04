@@ -13,9 +13,9 @@ export type TimeProviderProps = {
 */
 
 export type TimeContextProps = {
-  timestamp?: number,
-  elapsed?: number,
-  delta?: number,
+  timestamp: number,
+  elapsed: number,
+  delta: number,
 };
 
 export const TimeContext = makeContext<TimeContextProps>({

@@ -1,9 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, Prop, RenderPassMode } from '@use-gpu/core/types';
+import { TypedArray, TextureSource, Atlas, Prop, RenderPassMode } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 import { SDFGlyphData } from '../text/types';
 
-import { use, keyed, wrap, memo, debug, provide, useCallback, useContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, keyed, wrap, memo, debug, useFiber, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
@@ -17,12 +17,9 @@ import { GlyphSource } from '../text/glyph-source';
 import { RawLabels } from '../primitives/raw-labels';
 import { UI, Flat } from '../layout';
 
-import { getLabelPosition } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
-
 export type LabelLayerProps = {
   position?: number[] | TypedArray,
   placement?: number[] | TypedArray,
-  //flip?: number,
   offset?: number,
   size?: number,
   depth?: number,
@@ -31,7 +28,6 @@ export type LabelLayerProps = {
 
   positions?: ShaderSource,
   placements?: ShaderSource,
-  //flips?: ShaderSource,
   offsets?: ShaderSource,
   sizes?: ShaderSource,
   depths?: ShaderSource,
@@ -45,6 +41,7 @@ export type LabelLayerProps = {
   weight?: string | number,
   style?: string,
 
+  sdfRadius?: number,
   detail?: number,
   count?: Prop<number>,
   mode?: RenderPassMode | string,
@@ -57,8 +54,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     positions,
     placement,
     placements,
-    //flip,
-    //flips,
     offset,
     offsets,
     size,
@@ -69,8 +64,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     colors,
     expand,
     expands,
-    density,
-    densities,
 
     label,
     labels,
@@ -87,6 +80,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
   } = props;
 
   const key = useFiber().id;
+  const strings = useOne(() => labels ?? (label != null ? [label] : []), labels ?? label);
 
   return (
     use(SDFFontProvider, {
@@ -96,7 +90,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           family,
           weight,
           style,
-          strings: labels ?? [label],
+          strings: labels ?? (label != null ? [label] : []),
           size: detail,
         }),
       then:
@@ -135,8 +129,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
               colors,
               expand,
               expands,
-              density,
-              densities,
 
               count,
               mode,

@@ -3,7 +3,7 @@ import { LayoutElement, Margin, Dimension, Direction, Alignment, Anchor, Point }
 
 import { yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import { makeBoxLayout, makeBoxPicker, makeBoxScroller, normalizeAlignment, normalizeGap, parseDimension, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, normalizeAlignment, normalizeGap, parseDimension, memoFit } from '../lib/util';
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
@@ -50,8 +50,8 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
 
-    const size = [w ?? 0, h ?? 0];
-    const fixed = [w, h];
+    const size = [w ?? 0, h ?? 0] as [number, number];
+    const fixed = [w, h] as [number | null, number | null];
 
     const sizing = getFlexMinMax(els, fixed, direction, gap, wrap, snap);
 

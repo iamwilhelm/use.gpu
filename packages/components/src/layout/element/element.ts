@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { ImageAttachment, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from './types';
+import { ImageAttachment, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from '../types';
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { parseDimension, normalizeMargin } from '../lib/util';

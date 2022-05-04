@@ -1,14 +1,15 @@
-import { ArrowFunction } from '@use-gpu/live';
-import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, Color, Placement, Flip, TypedArray, ColorLike, VectorLike, ArrayLike, PointShape } from '../types';
+import { TypedArray } from '@use-gpu/core/types';
+import { ArrowFunction } from '@use-gpu/live/types';
+import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike, PointShape } from '../types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
 const NO_VEC3 = vec3.fromValues(0, 0, 0);
 const NO_VEC4 = vec4.fromValues(0, 0, 0, 0);
-const NO_QUAT = quat.fromValues(0, 0, 0);
+const NO_QUAT = quat.create();
 const NO_MAT4 = mat4.create();
 
-const GRAY = [0.5, 0.5, 0.5, 1];
+const GRAY = [0.5, 0.5, 0.5, 1] as Color;
 
 const NO_RANGE = vec2.fromValues(-1, 1);
 const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
@@ -48,21 +49,21 @@ export const makeParseBoolean = (def: boolean = false) => (value?: number | bool
   return def;
 };
 
-export const makeParseVec2 = (defaults: VectorLike = NO_VEC2) => (vec?: VectorLike): vec2 => {
+export const makeParseVec2 = (defaults: vec2 = NO_VEC2) => (vec?: VectorLike): vec2 => {
   if (vec != null) {
     return vec2.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1]);
   }
   return defaults;
 };
 
-export const makeParseVec3 = (defaults: VectorLike = NO_VEC3) => (vec?: VectorLike): vec3 => {
+export const makeParseVec3 = (defaults: vec3 = NO_VEC3) => (vec?: VectorLike): vec3 => {
   if (vec != null) {
     return vec3.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2]);
   }
   return defaults;
 };
 
-export const makeParseVec4 = (defaults: VectorLike = NO_VEC4) => (vec?: VectorLike): vec4 => {
+export const makeParseVec4 = (defaults: vec4 = NO_VEC4) => (vec?: VectorLike): vec4 => {
   if (vec != null) {
     return vec4.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2], vec[3] ?? defaults[3]);
   }
@@ -71,6 +72,7 @@ export const makeParseVec4 = (defaults: VectorLike = NO_VEC4) => (vec?: VectorLi
 
 export const makeParseMat4 = () => (matrix?: VectorLike): mat4 => {
   if (matrix != null) {
+    // @ts-ignore
     return mat4.fromValues(...matrix);
   }
   return NO_MAT4;
@@ -78,7 +80,7 @@ export const makeParseMat4 = () => (matrix?: VectorLike): mat4 => {
 
 export const makeParseArray = <T>(
   defaults: T[],
-  parse: (v: ArrayLike) => T
+  parse: (v: any) => T
 ) => (vecs?: ArrayLike[]): T[] => {
   if (vecs != null) {
     const vs = vecs.map(parse);
@@ -90,14 +92,14 @@ export const makeParseArray = <T>(
   return defaults;
 };
 
-export const makeParseEnum = (
-  options: string[],
-) => {
+export const makeParseEnum = <T>(
+  options: T[],
+): ((s?: string) => T) => {
   const hash = new Set(options);
   const [def] = options;
 
-  return (s?: string): string => {
-    if (s != null && hash.has(s)) return s;
+  return (s?: string): T => {
+    if (s != null && hash.has(s as any)) return s as any as T;
     return def;
   };
 };
@@ -114,7 +116,7 @@ export const makeParseString = (
 export const makeParseStringFormatter = (
   defaults: string = '',
 ) => {
-  return (s?: ArrowFunction): ArrayFunction => {
+  return (s?: ArrowFunction): ArrowFunction => {
     if (typeof s === 'function') return s;
     return (s?: string) => '' + s;
   };
@@ -152,12 +154,15 @@ export const makeParseBasis = (defaults: string) => {
 const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
 const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
 
-export const makeParseColor = (def: Color = GRAY) => (c?: ColorLike): Color => {
+export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color => {
+  const c = color as any;
+  if (c == null) return def;
+
   if (c === +c) {
     const r = ((c >> 16) & 255) / 255;
     const g = ((c >> 8) & 255) / 255;
     const b = ((c & 255)) / 255;
-    return [r, g, b, 1];
+    return [r, g, b, 1] as Color;
   }
   if (typeof c === 'string') {
     if (c[0] === '#') {
@@ -165,13 +170,13 @@ export const makeParseColor = (def: Color = GRAY) => (c?: ColorLike): Color => {
         const r = u4ToFloat(c[1]);
         const g = u4ToFloat(c[2]);
         const b = u4ToFloat(c[3]);
-        return [r, g, b, 1];
+        return [r, g, b, 1] as Color;
       }
       if (c.length === 7) {
         const r = u8ToFloat(c.slice(1, 3));
         const g = u8ToFloat(c.slice(3, 5));
         const b = u8ToFloat(c.slice(5, 7));
-        return [r, g, b, 1];
+        return [r, g, b, 1] as Color;
       }
     }
     if (c[0] === 'r') {
@@ -180,20 +185,20 @@ export const makeParseColor = (def: Color = GRAY) => (c?: ColorLike): Color => {
   }
   if (c.rgba ?? c.rgb) {
     const [r, g, b, a] = c.rgba ?? c.rgb;
-    return [r / 255, g / 255, b / 255, a ? a / 255 : 1];
+    return [r / 255, g / 255, b / 255, a ? a / 255 : 1] as Color;
   }
   if (c.length) {
-    return [c[0] ?? def[0], c[1] ?? def[1], c[2] ?? def[2], c[3] ?? def[3] ];
+    return [c[0] ?? def[0], c[1] ?? def[1], c[2] ?? def[2], c[3] ?? def[3] ] as Color;
   }
   return def;
 };
 
 export const makeParseMap = <T>(map: Record<string, T>, def: string) => {
-  return (s: string) => map[s] ?? map[def]!;
+  return (s?: string) => map[s as any] ?? map[def]!;
 };
 
-export const makeParseMapOrValue = <T>(map: Record<string, T>, def: string): T => {
-  return (s: string | T) => map[s] ?? (s as any as T) ?? map[def]!;
+export const makeParseMapOrValue = <T>(map: Record<string, T>, def: string): ((s?: string | T) => T) => {
+  return (s?: string | T) => map[s as any] ?? (s as any as T) ?? map[def]!;
 };
 
 //////////////////
@@ -215,7 +220,7 @@ export const parsePosition4  = makeParseVec4();
 export const parsePosition   = makeParseVec3();
 export const parseRotation   = makeParseVec3();
 export const parseQuaternion = makeParseVec3();
-export const parseScale      = makeParseVec3(1, 1, 1);
+export const parseScale      = makeParseVec3(vec3.fromValues(1, 1, 1));
 export const parseMatrix     = makeParseMat4();
 
 export const parseRange      = makeParseVec2(NO_RANGE);
@@ -229,12 +234,6 @@ export const parseDetail     = makeParseInt(1, 1, 1e8);
 export const parseDomain     = makeParseEnum<Domain>(['linear', 'log']);
 export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
 export const parseBlending   = makeParseEnum<Blending>(['none', 'normal', 'add', 'subtract', 'multiply', 'custom']);
-
-export const parseFlip       = makeParseMap({
-  'none':    0,
-  'outside': 1,
-  'inside': -1,
-}, 'none');
 
 export const parsePlacement  = makeParseMap({
   'center':      vec2.fromValues(0,  0),

@@ -1,8 +1,12 @@
 const INF = 1e10;
 
+type Rectangle = [number, number, number, number];
+
 type SDFStage = {
   outer: Float64Array,
   inner: Float64Array,
+  xs: Float32Array,
+  ys: Float32Array,
   f: Float64Array,
   z: Float64Array,
   v: Uint16Array,
@@ -22,7 +26,7 @@ const makeSDFStage = (size: number) => {
   const z = new Float64Array(size + 1);
   const v = new Uint16Array(size);
   
-  return {outer, inner, f, z, v, size};
+  return {outer, inner, xs, ys, f, z, v, size};
 }
 
 let SDF_STAGE: SDFStage | null = null;

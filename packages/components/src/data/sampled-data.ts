@@ -3,7 +3,7 @@ import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/t
 
 import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
-  makeDataEmitter, makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
+  makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
 
@@ -33,22 +33,20 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     range,
     format,
     size,
-    data,
     expr,
     items = 1,
     render,
-    children,
     centered = false,
     live = false,
   } = props;
 
-  const length = size.length ? (items * size.reduce((a, b) => a * b, 1)) : (data?.length || 1);
-  const l = useBufferedSize(length);
   const t = Math.max(1, Math.round(items) || 0);
+  const length = t * (size.length ? size.reduce((a, b) => a * b, 1) : 1);
+  const l = useBufferedSize(length);
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.f32;
+    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : 'f32';
 
     const {array, dims} = makeDataArray(f, l || 1);
     if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
@@ -58,7 +56,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       buffer,
       format: f,
       length: 0,
-      size: undefined,
+      size: [],
       version: 0,
     };
 
@@ -67,54 +65,78 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
 
   // Refresh and upload data
   const refresh = () => {
-    if (data) copyNumberArray(data, array);
     if (expr && size.length) {
       const n = size.length;
       let sampled;
       if (n === 1) {
-        const [min, max] = range[0];
-        const step = (max - min) / size[0];
+        const c = centered === true || (centered as any)[0];
+        let [min, max] = range[0];
+        let step = (max - min) / (size[0] - 1 + c);
+        if (c) min += step / 2;
+
         sampled = (emit: Emitter, i: number, n: number) =>
-          expr(emit, min + i * step, n);
+          expr(emit, min + i * step);
       }
       else if (n === 2) {
-        const [minX, maxX] = range[0];
-        const [minY, maxY] = range[1];
-        const stepX = (maxX - minX) / size[0];
-        const stepY = (maxY - minY) / size[1];
+        const cx = centered === true || (centered as any)[0];
+        const cy = centered === true || (centered as any)[1];
+
+        let [minX, maxX] = range[0];
+        let [minY, maxY] = range[1];
+        let stepX = (maxX - minX) / (size[0] - 1 + cx);
+        let stepY = (maxY - minY) / (size[1] - 1 + cy);
+        if (cx) minX += stepX / 2;
+        if (cy) minY += stepY / 2;
+
         sampled = (emit: Emitter, i: number, j: number) =>
           expr(
             emit,
             minX + i * stepX,
             minY + j * stepY,
-            size,
           );
       }
       else if (n === 3) {
-        const [minX, maxX] = range[0];
-        const [minY, maxY] = range[1];
-        const [minZ, maxZ] = range[2];
-        const stepX = (maxX - minX) / size[0];
-        const stepY = (maxY - minY) / size[1];
-        const stepZ = (maxZ - minZ) / size[2];
+        const cx = centered === true || (centered as any)[0];
+        const cy = centered === true || (centered as any)[1];
+        const cz = centered === true || (centered as any)[2];
+
+        let [minX, maxX] = range[0];
+        let [minY, maxY] = range[1];
+        let [minZ, maxZ] = range[2];
+        let stepX = (maxX - minX) / (size[0] - 1 + cx);
+        let stepY = (maxY - minY) / (size[1] - 1 + cy);
+        let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
+        if (cx) minX += stepX / 2;
+        if (cy) minY += stepY / 2;
+        if (cz) minZ += stepZ / 2;
+
         sampled = (emit: Emitter, i: number, j: number, k: number) =>
           expr(
             emit,
             minX + i * stepX,
             minY + j * stepY,
             minZ + k * stepZ,
-            size,
           );
       }
       else if (n === 4) {
-        const [minX, maxX] = range[0];
-        const [minY, maxY] = range[1];
-        const [minZ, maxZ] = range[2];
-        const [minW, maxW] = range[3];
-        const stepX = (maxX - minX) / size[0];
-        const stepY = (maxY - minY) / size[1];
-        const stepZ = (maxZ - minZ) / size[2];
-        const stepW = (maxW - minW) / size[3];
+        const cx = centered === true || (centered as any)[0];
+        const cy = centered === true || (centered as any)[1];
+        const cz = centered === true || (centered as any)[2];
+        const cw = centered === true || (centered as any)[3];
+
+        let [minX, maxX] = range[0];
+        let [minY, maxY] = range[1];
+        let [minZ, maxZ] = range[2];
+        let [minW, maxW] = range[3];
+        let stepX = (maxX - minX) / (size[0] - 1 + cx);
+        let stepY = (maxY - minY) / (size[1] - 1 + cy);
+        let stepZ = (maxZ - minZ) / (size[2] - 1 + cz);
+        let stepW = (maxW - minW) / (size[3] - 1 + cw);
+        if (cx) minX += stepX / 2;
+        if (cy) minY += stepY / 2;
+        if (cz) minZ += stepZ / 2;
+        if (cw) minW += stepW / 2;
+
         sampled = (emit: Emitter, i: number, j: number, k: number, l: number) =>
           expr(
             emit,
@@ -122,16 +144,15 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             minY + j * stepY,
             minZ + k * stepZ,
             minW + l * stepW,
-            size,
           );
       }
       else {
         throw new Error("Cannot sample across more than 4 dimensions");
       }
 
-      if (sampled) emitIntoMultiNumberArray(sampled, array, dims, size, t);
+      if (sampled) emitIntoMultiNumberArray(sampled, array, dims, size);
     }
-    if (data || expr) {
+    if (expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
 
@@ -143,7 +164,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   if (!live) {
     useNoPerFrame();
     useNoAnimationFrame();
-    useMemo(refresh, [device, buffer, array, data, expr, dims, length, items, range]);
+    useMemo(refresh, [device, buffer, array, expr, dims, length, items, range]);
   }
   else {
     usePerFrame();
@@ -153,7 +174,6 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   }
 
   return useMemo(() => {
-    if (render == null && children === undefined) return yeet(source);
-    return render != null ? render(source) : children;
-  }, [render, children, source]);
+    return render ? render(source) : yeet(source);
+  }, [render, source]);
 };

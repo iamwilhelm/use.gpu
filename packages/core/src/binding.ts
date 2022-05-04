@@ -7,7 +7,7 @@ import partition from 'lodash/partition';
 
 // Parse a set of sources for a given set of uniforms/attributes
 export const makeShaderBindings = <T>(
-  uniforms: UniformAttributeValue[],
+  uniforms: (UniformAttribute | UniformAttributeValue)[],
   sources: any[],
 ): DataBinding<T>[] => {
   const n = uniforms.length;
@@ -22,7 +22,7 @@ export const makeShaderBindings = <T>(
 
 // Parse a source for a given uniform/attribute
 export const makeShaderBinding = <T>(
-  uniform: UniformAttributeValue,
+  uniform: UniformAttribute | UniformAttributeValue,
   source?: StorageSource | TextureSource | LambdaSource<T> | T | any,
 ): DataBinding<T> => {
   if (source != null) {
@@ -44,11 +44,11 @@ export const makeShaderBinding = <T>(
       return {uniform, texture};
     }
   }
-  return {uniform, constant: source ?? uniform.value};
+  return {uniform, constant: source ?? (uniform as any).value};
 }
 
 // Bind a value ref for a given uniform/attribute
 export const makeRefBinding = <T>(
-  uniform: UniformAttributeValue,
-  value?: {current: T},
-): DataBinding<T> => ({uniform, constant: value ?? uniform.value});
+  uniform: UniformAttribute | UniformAttributeValue,
+  value?: {current: T} | T,
+): DataBinding<T> => ({uniform, constant: value ?? (uniform as any).value});

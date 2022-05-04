@@ -6,7 +6,7 @@ export const useShaderRef = <T>(value?: T, source?: ShaderSource) => {
     useNoOne();
     return source;
   }
-  if (value?.current != null) {
+  if ((value as any)?.current != null) {
     useNoOne();
     return value;
   }

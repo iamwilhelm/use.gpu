@@ -10,6 +10,11 @@ const π = Math.PI;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 export type OrbitControlsProps = {
+  radius?: number,
+  bearing?: number,
+  pitch?: number,
+
+  radiusSpeed?: number,
   bearingSpeed?: number,
   pitchSpeed?: number,
   render: (phi: number, theta: number, radius: number) => LiveElement<any>,
@@ -20,6 +25,8 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     radius: initialRadius = 1,
     bearing: initialBearing = 0,
     pitch: initialPitch = 0,
+
+    radiusSpeed  = 1/100,
     bearingSpeed = 5,
     pitchSpeed   = 5,
     render,
@@ -53,7 +60,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
 
   useOne(() => {
     const {moveY} = wheel;
-    const speedY = 1/100;
+    const speedY = radiusSpeed;
     if (moveY) setRadius((radius: number) => radius * (1 + moveY * speedY));
   }, wheel.version);
 

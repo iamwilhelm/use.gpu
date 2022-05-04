@@ -14,7 +14,7 @@ import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 
 export const resolve = <T>(x: Prop<T>): T => {
-  if (typeof x === 'function') return x();
+  if (typeof x === 'function') return (x as any)();
   if (typeof x === 'object') {
     if ('expr' in x) return x.expr();
     if ('current' in x) return x.current;

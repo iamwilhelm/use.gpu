@@ -1,9 +1,10 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { StorageSource, LambdaSource, UniformType } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/wgsl/types';
-import { ScaleTrait, AxisTrait } from '../types'; 
+import { ShaderModule } from '@use-gpu/shader/types';
+import { ScaleTrait, AxisTrait, VectorLike } from '../types'; 
 
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
@@ -19,15 +20,11 @@ import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';
 
 import { vec4 } from 'gl-matrix';
 
-const SCALE_BINDINGS = [
-  { name: 'getScaleValue', format: 'f32', value: 0 },
-  { name: 'getScaleOrigin', format: 'vec4<f32>', value: vec4.fromValues(0, 0, 0, 0) },
-  { name: 'getScaleDirection', format: 'i32', value: 0 },
-];
+const SCALE_BINDINGS = bundleToAttributes(getScalePosition);
 
 export type ScaleProps = Partial<ScaleTrait> & Partial<AxisTrait> & {
   origin?: VectorLike,
-  render?: (positions: LambdaSource) => LiveElement<any>,
+  render?: (positions: LambdaSource, values: Float32Array) => LiveElement<any>,
   children?: LiveElement<any>,
 };
 
@@ -52,12 +49,12 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
     return new Float32Array(f(r[0], r[1], domainOptions));
   }, [r[0], r[1], props]);
 
-  const values = useMemo(() => newValues, newValues);
-  const data = useBoundStorage(values, UniformType.f32);
+  const values = useMemo(() => newValues, newValues as any);
+  const data = useBoundStorage(values, 'f32');
   const n = values.length;
 
   // Make tick vertex shader
-  const og = vec4.clone(p);
+  const og = vec4.clone(p as any);
   og[axis] = 0;
 
   const o = useShaderRef(og);
@@ -67,7 +64,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   // Expose position source
   const source = useMemo(() => ({
     shader: bound,
-    alloc: data.alloc,
+    alloc: (data as any).alloc,
     length: n,
     size: [n],
     version: 0,

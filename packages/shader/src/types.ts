@@ -56,10 +56,10 @@ export type VirtualTable<T extends SymbolTable = any> = {
 };
 
 export type DataBinding<T extends SymbolTable = any> = {
-  uniform: UniformAttributeValue,
+  uniform: UniformAttribute,
   storage?: StorageSource,
   texture?: TextureSource,
-  lambda?: LambdaSource<T>,
+  lambda?: LambdaSource<ShaderModule<T>>,
   constant?: any,
 };
 
@@ -91,21 +91,25 @@ export type ShakeOp = [number, string[]];
 
 export type StorageSource = {
   buffer: GPUBuffer,
-  format: string,
+  format: any,
   length: number,
+  size: number[],
   version: number,
 };
 
-export type LambdaSource<T> = {
-  shader: ShaderModule<T>,
-  size: [number, number] | [number, number, number] | [number, number, number, number],
+export type LambdaSource<T = any> = {
+  shader: T,
+  length?: number,
+  version?: number,
+  size?: number[],
 };
 
 export type TextureSource = {
+  texture: GPUTexture,
   view: GPUTexture | GPUTextureView,
   sampler: GPUSampler | GPUSamplerDescriptor,
   layout: string,
-  format: string,
+  format: any,
   variant?: string,
   absolute?: boolean,
   size: [number, number] | [number, number, number],
@@ -116,8 +120,8 @@ export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | ShaderMo
 
 export type UniformAttribute = {
   name: string,
-  format: string,
-  args?: string[],
+  format: any,
+  args?: any[],
 };
 
 export type UniformAttributeValue = UniformAttribute & {

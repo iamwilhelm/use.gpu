@@ -1,3 +1,4 @@
+import { ArrowFunction } from '@use-gpu/live/types';
 import { useOne } from '@use-gpu/live';
 import {
   parseFloat,
@@ -23,7 +24,6 @@ import {
   parseJoin,
   parseBlending,
   parsePlacement,
-  parseFlip,
   parseWeight,
   parsePointShape,
   optional,
@@ -36,9 +36,11 @@ import {
   AxisTrait,
   ColorTrait,
   FontTrait,
+  GridTrait,
   LabelTrait,
   LineTrait,
   ObjectTrait,
+  PointTrait,
   ROPTrait,
   ScaleTrait,
 } from './types';
@@ -50,13 +52,11 @@ const WHITE = [1, 1, 1, 1];
 
 const ANCHOR_TRAIT = {
   placement:  parsePlacement,
-  flip:       parseFlip,
   offset:     parseFloat,
 };
 
 const ANCHOR_DEFAULTS = {
   placement: 'center',
-  flip: 'none',
   offset: 5,
 };
 
@@ -199,18 +199,35 @@ const SCALE_DEFAULTS = {
   nice: true,
 };
 
-export const useProp = <T>(value?: T, parse: (t?: T) => T, def?: T): T =>
+export const useProp = <A, B>(value: A | undefined, parse: (t?: A) => B, def?: B): B =>
   useOne(() => def !== undefined && value === undefined ? def : parse(value), value);
 
-type UseTrait<T> = (props: Partial<T>) => T;
+type PropDefTypes<T extends Record<string, ArrowFunction>> = {
+  [P in keyof T]?: ReturnType<T[P]>;
+};
 
-export const makeUseTrait = <T>(propDef: PropDef, defaultValues: Record<string, any>): UseTrait<T> => {
-  const defaults = {};
+type UseTrait<I, O> = (props: Partial<I>) => O;
+
+export const makeUseTrait = <
+  T extends Record<string, any>,
+  P extends PropDef = any,
+>(
+  propDef: P,
+  defaultValues: Record<string, any>
+): UseTrait<T, PropDefTypes<P>> => {
+  const defaults: Record<string, any> = {};
   for (const k in defaultValues) defaults[k] = propDef[k](defaultValues[k]);
   return (props: Partial<T>) => useTrait(props, propDef, defaults);
 };
 
-const useTrait = <T extends Record<string, any>>(props: Partial<T>, propDef: PropDef, defaults: Record<string, any>): T => {
+const useTrait = <
+  T extends Record<string, any>,
+  P extends PropDef = any,
+>(
+  props: Partial<T>,
+  propDef: P,
+  defaults: Record<string, any>,
+): PropDefTypes<P> => {
   const parsed: Record<string, any> = useOne(() => ({}));
 
   for (let k in propDef) {
@@ -230,6 +247,7 @@ export const useGridTrait   = makeUseTrait<GridTrait>(GRID_TRAIT, GRID_DEFAULTS)
 export const useLabelTrait  = makeUseTrait<LabelTrait>(LABEL_TRAIT, LABEL_DEFAULTS);
 export const useLineTrait   = makeUseTrait<LineTrait>(LINE_TRAIT, LINE_DEFAULTS);
 export const useObjectTrait = makeUseTrait<ObjectTrait>(OBJECT_TRAIT, OBJECT_DEFAULTS);
+export const usePointTrait  = makeUseTrait<PointTrait>(POINT_TRAIT, POINT_DEFAULTS);
 export const useROPTrait    = makeUseTrait<ROPTrait>(ROP_TRAIT, ROP_DEFAULTS);
 export const useScaleTrait  = makeUseTrait<ScaleTrait>(SCALE_TRAIT, SCALE_DEFAULTS);
 

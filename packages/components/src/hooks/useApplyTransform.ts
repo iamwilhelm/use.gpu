@@ -1,5 +1,5 @@
-import { StorageSource, LambdaSource } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/wgsl/types';
+import { StorageSource, LambdaSource, UniformAttributeValue, TypedArray } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 
 import { useOne, useVersion } from '@use-gpu/live';
 import { useTransformContext } from '../providers/transform-provider';
@@ -9,7 +9,7 @@ import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['u32'] } as UniformAttributeValue;
 
 export const useApplyTransform = (
-  positions: StorageSource | LambdaSource | ShaderModule,
+  positions?: StorageSource | LambdaSource | ShaderModule | TypedArray | number[] | {current: any},
 ) => {
   const transform = useTransformContext();
   const version = useVersion(positions) + useVersion(transform);

@@ -53,7 +53,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   const isEnd = props.end;
 
   // Gather data layout/length
-  const {chunks, loops, starts, ends, count} = useMemo(() => {
+  const layout = useMemo(() => {
 
     // Count simple array lengths as fallback
     // in case of no composite field.
@@ -68,7 +68,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     const [composite] = composites;
     if (!composite) {
       const length = data?.length ?? rawLength ?? 0;
-      return [[length], [false], length];
+      return {chunks: [length], loops: undefined, starts: undefined, ends: undefined, count: length};
     }
 
     // Read out chunk lengths and cycle flag
@@ -120,6 +120,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     return {chunks, loops, starts, ends, count};
   }, [data, fs]);
 
+  const {chunks, loops, starts, ends, count} = layout;
   const l = useBufferedSize(count);
 
   // Make data buffers
@@ -188,13 +189,13 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   if (on) {
     useNoMemo();
 
-    const els = extend(on, {chunks, loops, starts, ends});
-    return gather(els, (sources: ShaderSource[]) => {
+    const els = extend(on, layout);
+    return gather(els, (sources: StorageSource[]) => {
       const s = [...fieldSources, ...sources];
-      return render ? render(s) : yeet(s);
+      return render ? render(s, layout) : yeet(s);
     });
   }
   else {
-    return useMemo(() => render ? render(fieldSources) : yeet(fieldSources), [render, fieldSources]);
+    return useMemo(() => render ? render(fieldSources, layout) : yeet(fieldSources), [render, fieldSources]);
   }
 };

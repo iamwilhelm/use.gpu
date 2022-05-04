@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { ArrowTrait, LineTrait, ColorTrait, ROPTrait, VectorLike, Swizzle } from '../types';
+import { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait, VectorLike, Swizzle } from '../types';
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShader } from '../../hooks/useBoundShader';
@@ -26,12 +26,10 @@ import { LineLayer } from '../../layers/line-layer';
 import { ArrowLayer } from '../../layers/arrow-layer';
 import { useArrowSegments } from '../../layers/arrow-segments';
 
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
 
-const AXIS_BINDINGS = [
-  { name: 'getAxisOrigin', format: 'vec4<f32>', value: vec4.fromValues(-1, 0, 0, 0) },
-  { name: 'getAxisStep', format: 'vec4<f32>', value: vec4.fromValues(2, 0, 0, 0) },
-];
+const AXIS_BINDINGS = bundleToAttributes(getAxisPosition);
 
 export type AxisProps =
   Partial<AxisTrait> &
@@ -63,7 +61,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const r = range ?? parentRange[axis];
 
   // Calculate line origin + step
-  const og = vec4.clone(p);
+  const og = vec4.clone(p as any);
   const step = vec4.create();
   const min = r[0];
   const max = r[1];

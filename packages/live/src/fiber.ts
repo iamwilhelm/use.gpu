@@ -1,7 +1,7 @@
 import {
   HostInterface, LiveFiber, LiveFunction, LiveContext, LiveElement,
   FiberYeet, FiberContext, ContextValues, ContextRoots,
-  OnFiber, DeferredCall, Key,
+  OnFiber, DeferredCall, Key, ArrowFunction,
 } from './types';
 
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
@@ -29,7 +29,7 @@ export const getCurrentFiber = () => CURRENT_FIBER!;
 export const getCurrentFiberID = () => CURRENT_FIBER?.id;
 
 // Prepare to call a live function with optional given persistent fiber
-export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
+export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
   fiber = fiber ?? makeFiber(f, null);
 
   if (f.length === 0) {
@@ -58,7 +58,7 @@ export const bind = <F extends Function>(f: LiveFunction<F>, fiber?: LiveFiber<F
 
 // Enter/exit a fiber call
 let enter = 0; let exit = 0;
-export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number) => {
+export const enterFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>, base: number) => {
   CURRENT_FIBER = fiber;
 
   // Reset state pointer
@@ -69,13 +69,13 @@ export const enterFiber = <F extends Function>(fiber: LiveFiber<F>, base: number
   if (yeeted) yeeted.value = undefined;
 }
 
-export const exitFiber = <F extends Function>(fiber: LiveFiber<F>) => {
+export const exitFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   discardState(fiber);
   CURRENT_FIBER = null;
 }
 
 // Make a fiber for a live function
-export const makeFiber = <F extends Function>(
+export const makeFiber = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   host?: HostInterface | null,
   parent?: LiveFiber<any> | null,
@@ -109,7 +109,7 @@ export const makeFiber = <F extends Function>(
 };
 
 // Prepare a new sub fiber for continued rendering
-export const makeSubFiber = <F extends Function>(
+export const makeSubFiber = <F extends ArrowFunction>(
   parent: LiveFiber<any>,
   node: DeferredCall<F>,
   by: number = node.by ?? parent.id,
@@ -128,7 +128,7 @@ export const makeSubFiber = <F extends Function>(
 }
 
 // Make a resume continuation for a fiber
-export const makeResumeFiber = <F extends Function>(
+export const makeResumeFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   Resume: LiveFunction<any>,
   name?: string,
@@ -151,7 +151,7 @@ export const makeResumeFiber = <F extends Function>(
 }
 
 // Make fiber yeet state
-export const makeYeetState = <F extends Function, A, B>(
+export const makeYeetState = <F extends ArrowFunction, A, B>(
   fiber: LiveFiber<F>,
   nextFiber: LiveFiber<F>,
   map?: (a: A) => B,
@@ -167,7 +167,7 @@ export const makeYeetState = <F extends Function, A, B>(
 });
 
 // Make fiber context state
-export const makeContextState = <F extends Function>(
+export const makeContextState = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   parent: FiberContext,
   context: LiveContext<any>,
@@ -182,7 +182,7 @@ export const makeContextState = <F extends Function>(
 };
 
 // Render a fiber
-export const renderFiber = <F extends Function>(
+export const renderFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   const {f, host} = fiber;
@@ -231,7 +231,7 @@ export const renderFiber = <F extends Function>(
 }
 
 // Ping a fiber in dev tool
-export const pingFiber = <F extends Function>(
+export const pingFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   active: boolean = true,
 ) => {
@@ -242,7 +242,7 @@ export const pingFiber = <F extends Function>(
 }
 
 // Update a fiber with rendered result
-export const updateFiber = <F extends Function>(
+export const updateFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   element: LiveElement<any> | undefined | void,
 ) => {
@@ -315,7 +315,7 @@ export const updateFiber = <F extends Function>(
 }
 
 // Mount one call on a fiber
-export const mountFiberCall = <F extends Function>(
+export const mountFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   call?: DeferredCall<any> | null,
 ) => {
@@ -330,7 +330,7 @@ export const mountFiberCall = <F extends Function>(
 }
 
 // Mount a continuation on a fiber
-export const mountFiberContinuation = <F extends Function>(
+export const mountFiberContinuation = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   call: DeferredCall<any> | null,
   key?: Key,
@@ -345,7 +345,7 @@ export const mountFiberContinuation = <F extends Function>(
 }
 
 // Generalized mounting of reduction-like continuations
-export const mountFiberReduction = <F extends Function, R, T>(
+export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[] | DeferredCall<any>,
   mapper: ((t: T) => R) | undefined,
@@ -367,7 +367,7 @@ export const mountFiberReduction = <F extends Function, R, T>(
 }
 
 // Wrap a live function to act as a continuation of a prior fiber
-export const makeFiberContinuation = <F extends Function, R>(
+export const makeFiberContinuation = <F extends ArrowFunction, R>(
   fiber: LiveFiber<F>,
   reduction: () => R,
 ) => (
@@ -389,7 +389,7 @@ export const makeImperativeFunction = (c: LiveFunction<any>, displayName?: strin
 }
 
 // Reconcile multiple calls on a fiber
-export const reconcileFiberCalls = <F extends Function>(
+export const reconcileFiberCalls = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[],
 ) => {
@@ -437,7 +437,7 @@ export const reconcileFiberCalls = <F extends Function>(
 }
 
 // Map-reduce a fiber
-export const mapReduceFiberCalls = <F extends Function, R, T>(
+export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[] | DeferredCall<any>,
   mapper: (t: T) => R,
@@ -451,7 +451,7 @@ export const mapReduceFiberCalls = <F extends Function, R, T>(
 const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
 // Gather-reduce a fiber
-export const gatherFiberCalls = <F extends Function, R, T>(
+export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[] | DeferredCall<any>,
   next?: LiveFunction<any>,
@@ -461,7 +461,7 @@ export const gatherFiberCalls = <F extends Function, R, T>(
 }
 
 // Multi-gather-reduce a fiber
-export const multiGatherFiberCalls = <F extends Function, R, T>(
+export const multiGatherFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: DeferredCall<any>[] | DeferredCall<any>,
   next?: LiveFunction<any>,
@@ -471,7 +471,7 @@ export const multiGatherFiberCalls = <F extends Function, R, T>(
 }
 
 // Reduce yeeted values on a tree of fibers (values have already been mapped on emit)
-export const reduceFiberValues = <F extends Function, R, T>(
+export const reduceFiberValues = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   reducer: (a: R, b: R) => R,
   self: boolean = false,
@@ -504,7 +504,7 @@ export const reduceFiberValues = <F extends Function, R, T>(
 
 // Gather yeeted values on a tree of fibers
 // (recursive flatMap with optional array wrapper at leafs)
-export const gatherFiberValues = <F extends Function, T>(
+export const gatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,
 ): T | T[] | undefined => {
@@ -541,7 +541,7 @@ export const gatherFiberValues = <F extends Function, T>(
 
 // Multigather yeeted values on a tree of fibers
 // (recursive key-wise flatMap with optional array wrapper at leafs)
-export const multiGatherFiberValues = <F extends Function, T>(
+export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,
 ): Record<string, T | T[]> => {
@@ -583,7 +583,7 @@ export const multiGatherFiberValues = <F extends Function, T>(
 }
 
 // Morph one call on a fiber
-export const morphFiberCall = <F extends Function>(
+export const morphFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   fiberType: any,
   call?: DeferredCall<any> | null,
@@ -609,7 +609,7 @@ export const morphFiberCall = <F extends Function>(
 }
 
 // Inline a call to a fiber after a built-in
-export const inlineFiberCall = <F extends Function>(
+export const inlineFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   element: LiveElement<any>,
 ) => {
@@ -628,7 +628,7 @@ export const inlineFiberCall = <F extends Function>(
 }
 
 // Provide a value for a context on a fiber
-export const provideFiber = <F extends Function>(
+export const provideFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   if (!fiber.args) return;
@@ -666,7 +666,7 @@ export const provideFiber = <F extends Function>(
 }
 
 // Consume values from a co-context on a fiber
-export const consumeFiber = <F extends Function>(
+export const consumeFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   if (!fiber.args) return;
@@ -690,7 +690,7 @@ export const consumeFiber = <F extends Function>(
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating its execution
-export const detachFiber = <F extends Function>(
+export const detachFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   if (!fiber.args) return;
@@ -714,7 +714,7 @@ export const detachFiber = <F extends Function>(
 }
 
 // Dispose of a fiber's resources and all its mounted sub-fibers
-export const disposeFiber = <F extends Function>(fiber: LiveFiber<F>) => {
+export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   disposeFiberMounts(fiber);
 
   fiber.bound = undefined;
@@ -722,7 +722,7 @@ export const disposeFiber = <F extends Function>(fiber: LiveFiber<F>) => {
 }
 
 // Dispose of a fiber's mounted sub-fibers
-export const disposeFiberMounts = <F extends Function>(fiber: LiveFiber<F>) => {
+export const disposeFiberMounts = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   const {mount, mounts, next, yeeted} = fiber;
 
   if (mount) disposeFiber(mount);
@@ -739,7 +739,7 @@ export const disposeFiberMounts = <F extends Function>(fiber: LiveFiber<F>) => {
 }
 
 // Update a fiber in-place and recurse
-export const updateMount = <P extends Function>(
+export const updateMount = <P extends ArrowFunction>(
   parent: LiveFiber<P>,
   mount?: LiveFiber<any> | null,
   newMount?: DeferredCall<any> | null,
@@ -794,7 +794,7 @@ export const updateMount = <P extends Function>(
 }
 
 // Flush dependent updates after adding / updating / removing a mount
-export const flushMount = <F extends Function>(
+export const flushMount = <F extends ArrowFunction>(
   mount?: LiveFiber<F> | null,
   mounted?: LiveFiber<any> | null,
   fenced?: boolean,
@@ -813,7 +813,7 @@ export const flushMount = <F extends Function>(
 }
 
 // Ensure a re-render of the associated yeet root
-export const visitYeetRoot = <F extends Function>(
+export const visitYeetRoot = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   const {host, yeeted} = fiber;
@@ -827,7 +827,7 @@ export const visitYeetRoot = <F extends Function>(
 }
 
 // Remove a cached yeeted value and all upstream reductions
-export const bustFiberYeet = <F extends Function>(fiber: LiveFiber<F>, force?: boolean) => {
+export const bustFiberYeet = <F extends ArrowFunction>(fiber: LiveFiber<F>, force?: boolean) => {
   const {type, yeeted} = fiber;
   if ((fiber.type === YEET && yeeted) || (yeeted && force)) {
     let yt = yeeted;
@@ -841,13 +841,13 @@ export const bustFiberYeet = <F extends Function>(fiber: LiveFiber<F>, force?: b
 }
 
 // Force a memoized fiber to update next render
-export const bustFiberMemo = <F extends Function>(fiber: LiveFiber<F>) => {
+export const bustFiberMemo = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   if (fiber.version != null) fiber.version = incrementVersion(fiber.version);
 }
 
 // Ping a fiber when it's updated,
 // propagating to long-range dependencies.
-export const bustFiberDeps = <F extends Function>(
+export const bustFiberDeps = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   // Bust far caches
@@ -860,7 +860,7 @@ export const bustFiberDeps = <F extends Function>(
 }
 
 // Track number of runs per fiber
-export const pingFiberCount = <F extends Function>(fiber: LiveFiber<F>) => {
+export const pingFiberCount = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   fiber.runs = incrementVersion(fiber.runs);
 }
 

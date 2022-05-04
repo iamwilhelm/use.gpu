@@ -97,18 +97,19 @@ Shaders parsed at run-time will be cached on a least-recently-used basis, based 
 use "path/to/file"::{ symbol, … };
 use "path/to/file"::{ symbol as symbol, … };
 
-// Mark function as linked at runtime
+// Mark function as linked at runtime (function body is ignored).
+// Will be removed.
 @external fn func() { }
 
-// Mark declaration as exported
+// Mark declaration as exported (can be linked to)
 @export fn func() { }
-@export var name : i32;
 
-// Mark function as linked at runtime but optional
-@external @optional fn func() { }
+// Mark function as linked at runtime but optional.
+// Given function body is used if not linked.
+@external @optional fn func() -> f32 { return 1.0; }
 
 // Mark next declaration as global (don't namespace it)
-@global fn func() { }
+@global fn func() -> f32 { return 1.0; }
 @global var name : i32;
 ```
 
@@ -211,7 +212,7 @@ The linking mechanism works the same.
 
 ## Q&A
 
-**Does this interpret pre-processor directives?**
+**Does this interpret pre-processor directives? (GLSL)**
 
 No. It ignores and passes through all other `#directives`. This is done to avoid having to re-parse when definitions change.
 
@@ -221,11 +222,11 @@ You can mark prototypes as `#pragma optional` if it is ok to leave them unlinked
 
 **Does this work for WGSL?**
 
-Not right now. Though plugging in a WGSL grammar and doing the same trick should be feasible.
+Yes! It provides best-effort compatibility with the current dialect of WGSL supported in the wild. If there are gaps in the grammar, let me know.
 
 **Isn't it silly to ship and work with strings instead of byte code?**
 
-Processing pre-parsed GLSL bundles is very fast and simple, even with tree shaking. Rewriting a SPIR-V program the same way is much more fiddly.
+Processing pre-parsed WGSL / GLSL bundles is very fast and simple, even with tree shaking. Rewriting a SPIR-V program the same way is much more fiddly.
 
 
 ## API

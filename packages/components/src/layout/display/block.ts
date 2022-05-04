@@ -3,7 +3,7 @@ import { LayoutElement, Point, Dimension, Margin, Point4, ImageAttachment } from
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { normalizeMargin, makeBoxLayout, makeBoxPicker, makeBoxScroller, parseDimension, memoFit } from '../lib/util';
+import { normalizeMargin, makeBoxLayout, makeBoxPicker, parseDimension, memoFit } from '../lib/util';
 
 import { Absolute } from './absolute';
 import { Element } from '../element/element';
@@ -67,7 +67,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
 
-    const fixed = [w, h];
+    const fixed = [w, h] as [number | null, number | null];
 
     const sizing = getBlockMinMax(els, fixed, direction);
     const margin = getBlockMargin(els, blockMargin, padding, direction, contain);

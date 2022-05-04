@@ -29,7 +29,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     format, length,
     data, expr,
     render,
-    children,
     live = false,
   } = props;
 
@@ -38,7 +37,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.f32;
+    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : 'f32';
 
     const {array, dims} = makeDataArray(f, l || 1);
     if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
@@ -81,7 +80,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   }
 
   return useMemo(() => {
-    if (render == null && children === undefined) return yeet(source);
-    return render != null ? render(source) : children;
-  }, [render, children, source]);
+    return render ? render(source) : yeet(source);
+  }, [render, source]);
 };

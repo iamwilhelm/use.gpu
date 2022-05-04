@@ -10,7 +10,10 @@ export type LayerAggregator = (
   items: LayerAggregate[],
   keys: Set<string>,
   count: number,
-) => (items: LayerAggregate[]) => LiveElement<any>;
+) => (
+  items: LayerAggregate[],
+  count: number,
+) => LiveElement<any>;
 
 export type PointAggregate = {
   id: number,

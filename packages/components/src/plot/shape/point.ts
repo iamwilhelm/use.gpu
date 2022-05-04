@@ -1,4 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 import { ColorTrait, PointTrait, ROPTrait, VectorLike } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
@@ -24,9 +25,9 @@ export type PointProps =
   Partial<PointTrait> &
   Partial<ROPTrait> & {
 
-  colors?: StorageSource,
-  sizes?: StorageSource,
-  depths?: StorageSource,
+  colors?: ShaderSource,
+  sizes?: ShaderSource,
+  depths?: ShaderSource,
 };
 
 export const Point: LiveComponent<PointProps> = (props) => {
@@ -37,9 +38,6 @@ export const Point: LiveComponent<PointProps> = (props) => {
   const {size, depth} = usePointTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
-
-  const d = useProp(detail, parseDetail);
-  const o = useProp(offset, parsePosition4);
 
   return (
     use(PointLayer, {

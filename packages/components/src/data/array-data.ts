@@ -33,17 +33,17 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     expr,
     items = 1,
     render,
-    children,
     live = false,
   } = props;
 
-  const length = size.length ? size.reduce((a, b) => a * b, 1) : [data?.length || 1];
-  const l = useBufferedSize(length);
   const t = Math.max(1, Math.round(items) || 0);
+
+  const length = t * (size.length ? size.reduce((a, b) => a * b, 1) : (data?.length || 0));
+  const l = useBufferedSize(length);
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : UniformType.f32;
+    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : 'f32';
 
     const {array, dims} = makeDataArray(f, l || 1);
     if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
@@ -64,14 +64,14 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   const refresh = () => {
     if (data) copyNumberArray(data, array);
     if (expr && size.length) {
-      emitIntoMultiNumberArray(expr, array, dims, size, t);
+      emitIntoMultiNumberArray(expr, array, dims, size);
     }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
 
     source.length = length;
-    source.size = size;
+    source.size = items > 1 ? [items, ...size] : size;
     source.version = incrementVersion(source.version);
   };
 
@@ -88,7 +88,6 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   }
 
   return useMemo(() => {
-    if (render == null && children === undefined) return yeet(source);
-    return render != null ? render(source) : children;
-  }, [render, children, source]);
+    return render ? render(source) : yeet(source);
+  }, [render, source]);
 };

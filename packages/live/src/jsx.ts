@@ -5,7 +5,7 @@ import { ArrowFunction } from './types';
 
 const NO_PROPS: any[] = [{}];
 
-const toChildren = (t: T[]): T[] | T | undefined => {
+const toChildren = <T>(t: T[]): T[] | T | undefined => {
   if (t.length === 1) return t[0];
   if (t.length) return t;
   return undefined;

@@ -1,4 +1,4 @@
-import { UniformType, TypedArray } from '@use-gpu/core/types';
+import { StorageSource, UniformType, TypedArray } from '@use-gpu/core/types';
 
 import { useContext, useOne, useMemo, useNoOne, useNoMemo, incrementVersion } from '@use-gpu/live';
 import { makeStorageBuffer, uploadBuffer, UNIFORM_DIMS } from '@use-gpu/core';
@@ -17,14 +17,16 @@ export const useBoundStorage = (array: TypedArray, format: UniformType, live: bo
     format,
     alloc,
     length: 0,
+    size: [],
     version: 0,
-  }), buffer);
+  } as StorageSource), buffer);
 
   if (live) {
     useNoMemo();
     uploadBuffer(device, buffer, array.buffer);
 
     source.length = array.length / UNIFORM_DIMS[format];
+    source.size = [source.length];
     source.version = incrementVersion(source.version);
   }
   else {
@@ -32,6 +34,7 @@ export const useBoundStorage = (array: TypedArray, format: UniformType, live: bo
       uploadBuffer(device, buffer, array.buffer);
 
       source.length = array.length / UNIFORM_DIMS[format];
+      source.size = [source.length];
       source.version = incrementVersion(source.version);
     }, [array, buffer]);
   }

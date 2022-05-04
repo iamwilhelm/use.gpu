@@ -5,35 +5,35 @@ import { UniformAttribute, UniformType } from './types';
 export const VIEW_UNIFORMS: UniformAttribute[] = [
   {
     name: 'projectionMatrix',
-    format: UniformType['mat4x4<f32>'],
+    format: 'mat4x4<f32>',
   },
   {
     name: 'viewMatrix',
-    format: UniformType['mat4x4<f32>'],
+    format: 'mat4x4<f32>',
   },
   {
     name: 'viewPosition',
-    format: UniformType['vec4<f32>']
+    format: 'vec4<f32>'
   },
   {
     name: 'viewNearFar',
-    format: UniformType['vec2<f32>']
+    format: 'vec2<f32>'
   },
   {
     name: 'viewResolution',
-    format: UniformType['vec2<f32>'],
+    format: 'vec2<f32>',
   },
   {
     name: 'viewSize',
-    format: UniformType['vec2<f32>'],
+    format: 'vec2<f32>',
   },
   {
     name: 'viewWorldUnit',
-    format: UniformType.f32,
+    format: 'f32',
   },
   {
     name: 'viewPixelRatio',
-    format: UniformType.f32,
+    format: 'f32',
   },
 ];
 

@@ -375,7 +375,7 @@ export const useContext = <C>(
 // Return a value to a consumer from the fiber
 export const useConsumer = <C>(
   context: LiveContext<C>,
-  value: any,
+  value?: any,
 ) => {
   const fiber = useFiber();
 
@@ -450,7 +450,7 @@ export const useNoCallback = useNoHook(Hook.CALLBACK);
 export const useNoVersion = useNoHook(Hook.VERSION);
 
 // Async wrapper
-export const useAsync = <T, E>(f: () => Promise<T>, deps: any[] = NO_DEPS): [T | undefined, E | undefined] => {
+export const useAsync = <T, E = Error>(f: () => Promise<T>, deps: any[] = NO_DEPS): [T | undefined, E | undefined] => {
   const [value, setValue] = useState<[T | undefined, E | undefined]>([undefined, undefined]);
 
   const ref = useResource((dispose) => {

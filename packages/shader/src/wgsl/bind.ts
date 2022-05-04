@@ -1,4 +1,4 @@
-import { ShaderModule, ShaderDefine, LambdaSource, DataBinding } from './types';
+import { ShaderModule, ShaderDefine, LambdaSource, StorageSource, TextureSource, DataBinding } from './types';
 
 import { defineConstants } from './shader';
 import { makeBindingAccessors, makeUniformBlock } from './gen';
@@ -29,7 +29,7 @@ export const bindingsToLinks = (
 }
 
 export const sourceToModule = <T>(
-  source: ShaderModule | LambdaSource<T>,
+  source: ShaderModule | LambdaSource<T> | StorageSource | TextureSource | any,
 ): ShaderModule | null => {
   const s = source as any;
   if (s.shader) return s.shader as ShaderModule;

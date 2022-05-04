@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, LayoutPicker, Point } from './types';
 
-import { memo, yeet, provide, gather, use, keyed, useContext, useConsumer, useMemo, useOne } from '@use-gpu/live';
+import { memo, yeet, provide, gather, use, keyed, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
@@ -71,6 +71,7 @@ export const Scroller = (pickers: any[]) => {
 }
 
 export const Inspect = (pickers: any[]) => {
+  const { id } = useFiber();
   const { useMouse } = useContext(MouseContext);
   const { useWheel } = useContext(WheelContext);
   const { x, y } = useMouse();
@@ -84,9 +85,10 @@ export const Inspect = (pickers: any[]) => {
 
   if (!picked) return null;
 
-  const [id, rectangle] = picked;
+  const [, rectangle] = picked;
   return useMemo(() => 
     use(Surface, {
+      id,
       layout: rectangle,
       fill: [0, 1, 1, .2],
       stroke: [0.3, 0.9, 1, 1],

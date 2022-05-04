@@ -1,6 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { RustTextAPI } from '@use-gpu/text/types';
-import { Font } from '../types';
+import { RustTextAPI, Font } from '@use-gpu/text/types';
 
 import { provide, useAsync, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';
 import { parseWeight } from '../../plot/util/parse';

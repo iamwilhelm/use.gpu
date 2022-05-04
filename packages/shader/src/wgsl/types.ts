@@ -21,6 +21,7 @@ export type {
   ShaderDefine,
   StorageSource,
   LambdaSource,
+  TextureSource,
   UniformAttribute,
   UniformAttributeValue,
   VirtualRender,

@@ -8,6 +8,7 @@
     { "path": "../shader" },
     { "path": "../text" },
     { "path": "../webgpu" },
+    { "path": "../react" },
   ],
   "compilerOptions": {
     "rootDir": "..",

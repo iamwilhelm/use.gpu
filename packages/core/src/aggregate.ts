@@ -9,7 +9,7 @@ import {
   generateChunkSegments,
 } from './data';
 
-export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number) => {
+export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number): AggregateBuffer => {
   const {array, dims} = makeDataArray(format, length);
   if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
@@ -18,6 +18,7 @@ export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, leng
     buffer,
     format,
     length,
+    size: [length],
     version: 0,
   };
 

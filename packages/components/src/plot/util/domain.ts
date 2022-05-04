@@ -1,3 +1,5 @@
+import { DomainOptions } from '../types';
+
 // Generate equally spaced ticks in a range at sensible positions.
 //
 // @param min/max - Minimum and maximum of range
@@ -11,17 +13,6 @@
 // @param nice - Whether to round to a more reasonable interval
 
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
-
-type DomainOptions = {
-  divide: number,
-  unit: number,
-  base: number,
-  start: boolean,
-  end: boolean,
-  zero: boolean,
-  factor: number,
-  nice: boolean,
-};
 
 export const linear = (
   min: number,
@@ -45,7 +36,7 @@ export const linear = (
 
   // Unsnapped division
   if (!nice) {
-    ticks = seq(divide + 1, min, ideal);
+    let ticks = seq(divide + 1, min, ideal);
     if (!start) ticks.shift();
     if (!end) ticks.pop();
     if (!zero) ticks = ticks.filter(x => x != 0);
@@ -100,6 +91,8 @@ export const logarithmic = (
   max: number,
   props: Partial<DomainOptions>
 ) => {
+  const {base = 10} = props;
+
   const minL = Math.log(min) / Math.log(base);
   const maxL = Math.log(min) / Math.log(base);
 

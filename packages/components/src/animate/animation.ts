@@ -7,7 +7,7 @@ import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provid
 
 type Ease = 'cosine' | 'linear' | 'zero' | 'auto' | 'bezier';
 
-type Keyframe = [
+type Keyframe<T> = [
   number,
   T,
   Ease,
@@ -25,14 +25,14 @@ export type AnimationProps<T> = {
 
   delay?: number,
   pause?: number,
-  frames?: Keyframe[],
+  frames?: Keyframe<T>[],
 
   prop?: string,
   children?: LiveElement<any>,
   render?: (value: T) => LiveElement<any>,
 };
 
-const getActiveFrames = (frames: Keyframe[], time: number) => {
+const getActiveFrames = <T>(frames: Keyframe<T>[], time: number) => {
   const n = frames.length;
   let i = 0;
   for (; i < n - 1; ++i) {
@@ -58,25 +58,33 @@ const getLoopedTime = (time: number, duration: number, pause: number, repeat: nu
   return [t, max];
 }
 
-type Arg = T | T[] | TypedArray;
+interface Interpolator {
+  (a: number, b: number, t: number): number,
+  <T extends Array<any>>(a: T, b: T, t: number): T,
+  (a: TypedArray, b: TypedArray, t: number): number[],
+};
 
-const interpolateValue = <T>(a: Arg<T>, b: Arg<T>, t: number) => {
+const interpolateValue: Interpolator = <T>(a: any, b: any, t: number) => {
   if (a === +a && b === +b) {
-    return a * (1 - t) + b * t;
+    return (a * (1 - t) + b * t) as any as T;
   }
   if (a.length != null && b.length !== null) {
     let aa = a as T[];
     let bb = b as T[];
     let n = Math.min(aa.length, bb.length);
     let out: T[] = [];
-    for (let i = 0; i < n; ++i) out.push(interpolateValue(a[i], b[i], t));
+    for (let i = 0; i < n; ++i) out.push(interpolateValue(aa[i] as any, bb[i] as any, t));
     return out;
   }
   return a;
 };
 
-const injectProp = (prop: string, value: any) => (call: DeferredCall<any>) => {
-  if (call.args) {
+const injectProp = (prop: string, value: any) => (call: LiveElement<any>): LiveElement<any> => {
+  if (!call) return call;
+
+  if (Array.isArray(call)) return call.map(injectProp(prop, value));
+
+  if (call?.args) {
     const [props] = call.args;
     if (props) {
       call.args = [{
@@ -85,10 +93,14 @@ const injectProp = (prop: string, value: any) => (call: DeferredCall<any>) => {
       }];
     }
   }
+
   return call;
 };
 
-export const Animation: LiveComponent<AnimationProps<unknown>> = <T>(props: AnimationProps<T>) => {
+type NestedNumberArray = (number | NestedNumberArray)[];
+type Numberish = number | TypedArray | NestedNumberArray;
+
+export const Animation: LiveComponent<AnimationProps<Numberish>> = <T extends Numberish>(props: AnimationProps<T>) => {
   const {
     loop = false,
     mirror = false,
@@ -110,7 +122,7 @@ export const Animation: LiveComponent<AnimationProps<unknown>> = <T>(props: Anim
     delta,
   } = useTimeContext();
 
-  if (!frames) return;
+  if (!frames) return null;
 
   const started = useOne(() => elapsed, frames);
   const duration = useOne(() => frames[frames.length - 1][0], frames);
@@ -126,15 +138,15 @@ export const Animation: LiveComponent<AnimationProps<unknown>> = <T>(props: Anim
 
   let r = Math.max(0, Math.min(1, dt ? (t - start) / dt : 0));
 
-  let value: T | null = null;
+  let value: any = null;
 
   if (ease === 'bezier') {
-    value = interpolateValue(a[1], b[1],  r);
+    value = interpolateValue(a[1] as any, b[1] as any, r);
     //value = interpolateValueBezier(a[1], b[1], a[2], a[3], b[2], b[3], r);
   }
   else {
     if (ease === 'cosine') r = .5 - Math.cos(r * Math.PI) * .5;
-    value = interpolateValue(a[1], b[1],  r);
+    value = interpolateValue(a[1] as any, b[1] as any, r);
   }
 
   if (time < max) useAnimationFrame();
@@ -143,9 +155,10 @@ export const Animation: LiveComponent<AnimationProps<unknown>> = <T>(props: Anim
   if (value == null) return null;
   if (render) return render(value);
   if (children && prop) {
-    const list = children.f ? [children] : children.slice();
+    const list = Array.isArray(children) ? children.slice() : [children];
     list.map(injectProp(prop, value));
     return list;
   }
-  return children;
+
+  return children ?? null;
 };

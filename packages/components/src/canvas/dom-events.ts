@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { use, memo, useResource, useState, incrementVersion } from '@use-gpu/live';
-import { EventProvider } from '../providers/event-provider';
+import { EventProvider, MouseState, WheelState } from '../providers/event-provider';
 
 const CAPTURE_EVENT = {capture: true};
 
@@ -31,13 +31,13 @@ const makeMouseState = () => ({
   moveX: 0,
   moveY: 0,
   version: 0,
-});
+} as MouseState);
 
 const makeWheelState = () => ({
   moveX: 0,
   moveY: 0,
   version: 0,
-});
+} as WheelState);
 
 export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children}: DOMEventsProps) => {
   const [mouse, setMouse] = useState<MouseState>(makeMouseState);
@@ -85,7 +85,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onTouchStart = (e: TouchEvent) => {
       const {targetTouches: [touch]} = e as any;
       const {clientX, clientY} = touch;
-      if (!(buttons & 1)) onButtons(1, 1);
+      onButtons(1, 1);
       onMove(clientX, clientY);
       e.preventDefault();
       e.stopPropagation();

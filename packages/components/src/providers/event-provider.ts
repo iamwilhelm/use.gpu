@@ -8,18 +8,38 @@ import { RenderContext } from '../providers/render-provider';
 
 const CAPTURE_EVENT = {capture: true};
 
-export const EventContext = makeContext(undefined, 'EventContext');
-export const MouseContext = makeContext(undefined, 'MouseContext');
-export const WheelContext = makeContext(undefined, 'WheelContext');
+export const EventContext = makeContext<EventContextProps>(undefined, 'EventContext');
+export const MouseContext = makeContext<MouseContextProps>(undefined, 'MouseContext');
+export const WheelContext = makeContext<WheelContextProps>(undefined, 'WheelContext');
+
+export type EventContextProps = {
+  useId: () => number,
+};
+
+export type MouseContextProps = {
+  mouse: MouseState,
+  captureId: number | null,
+  targetId: number,
+  targetIndex: number,
+  beginCapture: (id: number) => void,
+  endCapture: () => void,
+  useMouse: (id?: number | null) => MouseEventState,
+};
+
+export type WheelContextProps = {
+  wheel: WheelState,
+  useWheel: (id?: number | null) => WheelEventState,
+};
 
 export type EventProviderProps = {
-  element: HTMLElement,
+  mouse: MouseState,
+  wheel: WheelState,
   children: LiveElement<any>,
 };
 
 export type MouseState = {
   buttons: { left: boolean, middle: boolean, right: boolean },
-  button: 'left' | 'middle' | 'right',
+  button: 'left' | 'middle' | 'right' | 'none',
   x: number,
   y: number,
   moveX: number,
@@ -36,7 +56,8 @@ export type WheelState = {
 export type MouseEventState = MouseState & {
   index: number,
   hovered: boolean,
-  pressed: boolean,
+  captured: boolean,
+  pressed: { left: boolean, middle: boolean, right: boolean },
   clicks: { left: number, middle: number, right: number },
   presses: { left: number, middle: number, right: number },
   capture: () => void,

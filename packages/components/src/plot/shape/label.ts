@@ -2,8 +2,6 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait, VectorLike } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
-import { mapChunksToSegments, mapChunksToAnchors } from '@use-gpu/core';
-import { diffBy } from '@use-gpu/shader/wgsl';
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import {
@@ -41,7 +39,7 @@ export const Label: LiveComponent<LabelProps> = (props) => {
 
   const {family, weight, style} = useFontTrait(props);
   const {labels, format, size, depth, expand} = useLabelTrait(props);
-  const {placement, flip, offset} = useAnchorTrait(props);
+  const {placement, offset} = useAnchorTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
 
@@ -65,7 +63,6 @@ export const Label: LiveComponent<LabelProps> = (props) => {
 
       positions,
       placement,
-      flip,
       offset,
       count,
       size,

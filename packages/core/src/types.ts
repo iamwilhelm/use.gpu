@@ -16,13 +16,11 @@ export type UseRenderingContextGPU = {
   samples: number,
 
   device: GPUDevice,
-
   gpuContext: GPUCanvasContext,
   colorSpace: ColorSpace,
   colorInput: ColorSpace,
   colorStates: GPUColorTargetState[],
   colorAttachments: GPURenderPassColorAttachment[],
-  targetTexture: GPUTexture,
   depthTexture: GPUTexture,
   depthStencilState: GPUDepthStencilState,
   depthStencilAttachment: GPURenderPassDepthStencilAttachment,
@@ -54,52 +52,52 @@ export type TypedArrayConstructor =
   Float32ArrayConstructor |
   Float64ArrayConstructor;
 
-export enum UniformType {
-  "bool" = "bool",
-  "vec2<bool>" = "vec2<bool>",
-  "vec3<bool>" = "vec3<bool>",
-  "vec4<bool>" = "vec4<bool>",
+export type UniformType =
+  | "bool"
+  | "vec2<bool>"
+  | "vec3<bool>"
+  | "vec4<bool>"
 
-  "u32" = "u32",
-  "vec2<u32>" = "vec2<u32>",
-  "vec3<u32>" = "vec3<u32>",
-  "vec4<u32>" = "vec4<u32>",
+  | "u32"
+  | "vec2<u32>"
+  | "vec3<u32>"
+  | "vec4<u32>"
 
-  "i32" = "i32",
-  "vec2<i32>" = "vec2<i32>",
-  "vec3<i32>" = "vec3<i32>",
-  "vec4<i32>" = "vec4<i32>",
+  | "i32"
+  | "vec2<i32>"
+  | "vec3<i32>"
+  | "vec4<i32>"
 
-  "f32" = "f32",
-  "vec2<f32>" = "vec2<f32>",
-  "vec3<f32>" = "vec3<f32>",
-  "vec4<f32>" = "vec4<f32>",
+  | "f32"
+  | "vec2<f32>"
+  | "vec3<f32>"
+  | "vec4<f32>"
 
-  "f64" = "f64",
-  "vec2<f64>" = "vec2<f64>",
-  "vec3<f64>" = "vec3<f64>",
-  "vec4<f64>" = "vec4<f64>",
+  | "f64"
+  | "vec2<f64>"
+  | "vec3<f64>"
+  | "vec4<f64>"
 
-  "mat2x2<f32>" = "mat2x2<f32>",
-  "mat3x2<f32>" = "mat3x2<f32>",
-  "mat2x3<f32>" = "mat2x3<f32>",
-  "mat2x4<f32>" = "mat2x4<f32>",
-  "mat4x2<f32>" = "mat4x2<f32>",
-  "mat3x3<f32>" = "mat3x3<f32>",
-  "mat3x4<f32>" = "mat3x4<f32>",
-  "mat4x3<f32>" = "mat4x3<f32>",
-  "mat4x4<f32>" = "mat4x4<f32>",
+  | "mat2x2<f32>"
+  | "mat3x2<f32>"
+  | "mat2x3<f32>"
+  | "mat2x4<f32>"
+  | "mat4x2<f32>"
+  | "mat3x3<f32>"
+  | "mat3x4<f32>"
+  | "mat4x3<f32>"
+  | "mat4x4<f32>"
 
-  "mat2x2<f64>" = "mat2x2<f64>",
-  "mat3x2<f64>" = "mat3x2<f64>",
-  "mat2x3<f64>" = "mat2x3<f64>",
-  "mat2x4<f64>" = "mat2x4<f64>",
-  "mat4x2<f64>" = "mat4x2<f64>",
-  "mat3x3<f64>" = "mat3x3<f64>",
-  "mat3x4<f64>" = "mat3x4<f64>",
-  "mat4x3<f64>" = "mat4x3<f64>",
-  "mat4x4<f64>" = "mat4x4<f64>",
-};
+  | "mat2x2<f64>"
+  | "mat3x2<f64>"
+  | "mat2x3<f64>"
+  | "mat2x4<f64>"
+  | "mat4x2<f64>"
+  | "mat3x3<f64>"
+  | "mat3x4<f64>"
+  | "mat4x3<f64>"
+  | "mat4x4<f64>"
+;
 
 // Vertex attributes
 export type VertexData = {
@@ -213,13 +211,14 @@ export type ShaderStageDescriptor = {
 
 // Projection pipeline
 export type ViewUniforms = {
-  projectionMatrix: { value: mat4 },
-  viewMatrix: { value: mat4 },
-  viewPosition: { value: vec3 | [number, number, number] | number[] },
-  viewResolution: { value: vec2 | [number, number] | number[] },
-  viewSize: { value: vec2 | [number, number] | number[] },
-  viewWorldUnit: { value: number },
-  viewPixelRatio: { value: number },
+  projectionMatrix: { current: mat4 },
+  viewMatrix: { current: mat4 },
+  viewPosition: { current: vec3 | [number, number, number] | number[] },
+  viewNearFar: { current: vec2 | [number, number] | number[] },
+  viewResolution: { current: vec2 | [number, number] | number[] },
+  viewSize: { current: vec2 | [number, number] | number[] },
+  viewWorldUnit: { current: number },
+  viewPixelRatio: { current: number },
 };
 
 export type PickingUniforms = {
@@ -231,8 +230,9 @@ export type PickingUniforms = {
 export type ChunkLayout = {
   chunks: number[],
   loops?: boolean[],
-  dataCount: number,
-  indexCount: number,
+  starts?: boolean[],
+  ends?: boolean[],
+  count: number,
 };
 
 export type Tuples<N extends number, T = number> = {
@@ -251,21 +251,21 @@ export type ArrayLike = any[] | TypedArray;
 
 export type AccessorSpec = string | Accessor | ArrayLike;
 export type DataField = [string, AccessorSpec];
-export type DataBinding<T = any> = {
-  uniform: UniformAttributeValue,
+export type DataBinding<T = any, S = any> = {
+  uniform: UniformAttribute,
   storage?: StorageSource,
   texture?: TextureSource,
-  lambda?: LambdaSource<T>,
+  lambda?: LambdaSource<S>,
   constant?: Prop<T>,
 };
 
-export type Prop<T> = T | {expr: () => T} | {current: T};
+export type Prop<T> = T | (() => T) | {expr: () => T} | {current: T};
 
 export type AggregateBuffer = {
   buffer: GPUBuffer,
   array: TypedArray,
-  dims: number,
   source: StorageSource,
+  dims: number,
 };
 
 export type Atlas = {

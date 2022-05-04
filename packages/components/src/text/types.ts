@@ -1,15 +1,5 @@
-import { StorageSource } from '@use-gpu/core/types';
-
-export type Font = {
-  props: FontProps,
-  data: Uint8Array,
-};
-
-export type FontProps = {
-  family: string,
-  weight: number,
-  style: string,
-};
+import { TypedArray } from '@use-gpu/core/types';
+import { FontProps } from '@use-gpu/text/types';
 
 export type FontSource = FontProps & {
   src: string,
@@ -17,10 +7,10 @@ export type FontSource = FontProps & {
 
 export type SDFGlyphData = {
   id: number,
-  indices: StorageSource,
-  layouts: StorageSource,
-  rectangles: StorageSource,
-  uvs: StorageSource,
+  indices: TypedArray,
+  layouts: TypedArray,
+  rectangles: TypedArray,
+  uvs: TypedArray,
   sdf: [number, number],
 };
 

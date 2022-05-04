@@ -47,7 +47,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
     }
   }
 
-  const resolveFont = (font: Partial<FontProps>): number => {
+  const resolveFont = (font: Partial<FontProps>): number | null => {
 
     let best: number | null = null;
     let max = 0;

@@ -72,7 +72,8 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
       uploadBuffer(device, buffer, array.buffer);
 
-      source.length = length;
+      const length = raw ? array.length / dims : data ? data.length : 0;
+      source.length  = length;
       source.size[0] = length;
       source.version = incrementVersion(source.version);
     }

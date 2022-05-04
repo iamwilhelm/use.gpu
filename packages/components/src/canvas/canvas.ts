@@ -6,8 +6,8 @@ import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLO
 import { EventProvider } from '../providers/event-provider';
 import { RenderContext } from '../providers/render-provider';
 import { LayoutContext } from '../providers/layout-provider';
-import { useDeviceContext } from '../providers/device-provider';
-import { provide, use, imperative, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { DeviceContext } from '../providers/device-provider';
+import { provide, use, imperative, useCallback, useContext, useMemo, useOne } from '@use-gpu/live';
 import { makePresentationContext } from '@use-gpu/webgpu';
 import {
   makeColorState,
@@ -21,7 +21,7 @@ import {
 } from '@use-gpu/core';
 
 export type CanvasProps = {
-  canvas?: HTMLCanvasElement,
+  canvas: HTMLCanvasElement,
 
   format?: GPUTextureFormat,
   depthStencil?: GPUTextureFormat,
@@ -36,7 +36,7 @@ export type CanvasProps = {
 
 const getPixelRatio = () => typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
-export const Canvas: LiveComponent<CanvasProps> = imperative((props) => {
+export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps) => {
   const {
     canvas,
     children,
@@ -49,7 +49,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props) => {
     samples = 1
   } = props;
 
-  const device = useDeviceContext();
+  const device = useContext(DeviceContext);
 
   const {width, height} = canvas;
   const layout = useMemo(() => [0, 0, width, height], [width, height]);
@@ -104,6 +104,8 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props) => {
     height,
     pixelRatio,
     samples,
+
+    device,
     gpuContext,
     colorSpace,
     colorInput,
@@ -114,6 +116,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props) => {
     depthStencilAttachment,
 
     swapView,
+    canvas,
   } as CanvasRenderingContextGPU;
 
   return (

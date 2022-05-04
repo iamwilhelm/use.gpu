@@ -32,7 +32,7 @@ export const fitAbsoluteBox = (
     const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
     
-    const into = size.slice();
+    const into = size.slice() as Point;
     into[0] -= ml + mr;
     into[1] -= mt + mb;
 

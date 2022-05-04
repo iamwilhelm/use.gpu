@@ -20,7 +20,7 @@ export const arrowAttributes = makeVertexAttributeLayout([
 export const makeArrowVertexArray = (detail: number, width: number = 2.5) => {
   const tris = detail + (detail - 2);
 
-  const ring = [] as number[];
+  const ring = [] as [number, number, number, number][];
   //const normals = [] as number[];
   const vertices = [] as number[];
   

@@ -1,5 +1,5 @@
 import { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live/types';
-import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
+import { AggregateBuffer, Atlas, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
 import { UIAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -15,7 +15,7 @@ import {
 
 import { UIRectangles } from '../primitives/ui-rectangles';
 
-export type AggregateProps = {
+export type UIProps = {
   children: LiveElement<any>,
 };
 
@@ -34,7 +34,7 @@ const getItemSummary = (items: UIAggregate[]) => {
   return {keys, count, memoKey};
 }
 
-export const UI: LiveComponent<AggregateProps> = (props) => {
+export const UI: LiveComponent<UIProps> = (props) => {
   const {children} = props;
 
   return (
@@ -85,7 +85,7 @@ const Resume = (
 };
 
 const Layer: LiveFunction<any> = (
-  items: LayerAggregate[],
+  items: UIAggregate[],
 ) => {
   const device = useContext(DeviceContext);
   const {keys, count, memoKey} = getItemSummary(items);
@@ -118,15 +118,15 @@ const makeUIAccumulator = (
   const hasTexture = keys.has('texture');
   const hasTransform = keys.has('transform');
 
-  if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasRadius) storage.radiuses = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasBorder) storage.borders = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasStroke) storage.strokes = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasFill) storage.fills = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasUV) storage.uvs = makeAggregateBuffer(device, UniformType['vec4<f32>'], count);
-  if (hasRepeat) storage.repeats = makeAggregateBuffer(device, UniformType['i32'], count);
+  if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, 'vec4<f32>', count);
+  if (hasRadius) storage.radiuses = makeAggregateBuffer(device, 'vec4<f32>', count);
+  if (hasBorder) storage.borders = makeAggregateBuffer(device, 'vec4<f32>', count);
+  if (hasStroke) storage.strokes = makeAggregateBuffer(device, 'vec4<f32>', count);
+  if (hasFill) storage.fills = makeAggregateBuffer(device, 'vec4<f32>', count);
+  if (hasUV) storage.uvs = makeAggregateBuffer(device, 'vec4<f32>', count);
+  if (hasRepeat) storage.repeats = makeAggregateBuffer(device, 'i32', count);
 
-  return (items: RectangleAggregate[]) => {
+  return (items: UIAggregate[]) => {
     const count = items.reduce(allCount, 0);
     if (!count) return null;
 

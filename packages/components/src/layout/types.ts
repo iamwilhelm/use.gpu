@@ -1,6 +1,6 @@
 import { TextureSource, Tuples } from '@use-gpu/core/types';
 import { LiveElement, Key } from '@use-gpu/live/types';
-import { FontMetrics, TextMetrics } from '@use-gpu/text/types';
+import { FontMetrics } from '@use-gpu/text/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { mat4 } from 'gl-matrix';
 
@@ -53,6 +53,7 @@ export type LayoutElement = {
   grow?: number,
   shrink?: number,
   absolute?: boolean,
+  under?: boolean,
 
   fit: (size: Point) => LayoutFit,
 };
@@ -62,13 +63,6 @@ export type InlineElement = {
   height: FontMetrics,
   absolute?: boolean,
   render: InlineRenderer,
-};
-
-export type InlineSpan = {
-  start: number,
-  end: number,
-  hard: boolean,
-  width: TextMetrics,
 };
 
 export type InlineLine = {
@@ -84,13 +78,14 @@ export type UIAggregate = {
 
   rectangles?: number[],
   colors?: number[],
-  textures?: TextureSource[],
   uvs?: number[],
   repeats?: number[],
 
   rectangle?: number[],
   color?: number[],
-  texture?: TextureSource,
   uv?: number[],
   repeat?: number,
+
+  texture?: TextureSource,
+  transform?: any,
 };

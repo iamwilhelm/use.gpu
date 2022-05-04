@@ -1,6 +1,5 @@
-import { ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core/types';
+import { UseRenderingContextGPU, ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core/types';
 
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { makeRenderPipeline } from '@use-gpu/core';
 import { useContext, useMemo, useOne } from '@use-gpu/live';
 import { useMemoKey } from './useMemoKey';
@@ -22,7 +21,7 @@ export const makePipelineCache = (options: Record<string, any> = {}) => new LRU<
 const CACHE = new WeakMap<any, LRU<string, any>>();
 
 export const useRenderPipeline = (
-  renderContext: CanvasRenderingContextGPU,
+  renderContext: UseRenderingContextGPU,
   shader: RenderShader,
   props: DeepPartial<GPURenderPipelineDescriptor>,
 ) => {

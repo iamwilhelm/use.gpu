@@ -1,23 +1,27 @@
 import { TypedArray } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/wgsl/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 
 export type PropParser<A, B> = (t?: A) => B;
-export type PropDef = Record<string, PropParser<A, B>>;
+export type PropDef = Record<string, PropParser<any, any>>;
 
 export type Swizzle = string;
 export type Axis = 'x' | 'y' | 'z' | 'w';
 export type Range = [number, number];
 export type Join = 'miter' | 'round' | 'bevel';
 export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
-export type Domain = 'linear' | 'log',
+export type Domain = 'linear' | 'log';
 export type Color = [number, number, number, number];
 export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom';
-export type Flip = 'none' | 'outside' | 'inside';
 export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
 
 export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;
 export type VectorLike = TypedArray | number[];
 export type ArrayLike<T = any> = TypedArray | T[];
+
+export type AnchorTrait = {
+  placement: Placement,
+  offset: number,
+};
 
 export type AxisTrait = {
   range: VectorLike,
@@ -36,7 +40,7 @@ export type ArrowTrait = {
 };
 
 export type ColorTrait = {
-  color: Color,
+  color: ColorLike,
   opacity: number,
 };
 
@@ -57,7 +61,7 @@ export type LabelTrait = {
   size: number,
   depth: number,
   outline: number,
-  background: Color,
+  background: ColorLike,
   box: number | [number, number],
 };
 
@@ -70,6 +74,20 @@ export type LineTrait = {
   proximity: number,
 };
 
+export type ObjectTrait = {
+  position: VectorLike,
+  scale: VectorLike,
+  quaternion: VectorLike,
+  rotation: VectorLike,
+  matrix: VectorLike,
+};
+
+export type PointTrait = {
+  size: number,
+  depth: number,
+  shape: PointShape,
+};
+
 export type ROPTrait = {
   blending: Blending,
   zWrite: boolean,
@@ -78,8 +96,11 @@ export type ROPTrait = {
   zIndex: number,
 };
 
-export type ScaleTrait = {
+export type ScaleTrait = DomainOptions & {
   mode: Domain,
+};
+
+export type DomainOptions = {
   divide: number,
   unit: number,
   base: number,

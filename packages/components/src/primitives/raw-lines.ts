@@ -2,9 +2,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, ShaderSource, RenderPassMode,
+  VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
@@ -43,7 +43,7 @@ export type RawLinesProps = {
 
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode,
+  mode?: RenderPassMode | string,
   id?: number,
 };
 
@@ -92,7 +92,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   // Set up draw
   const vertexCount = 2 + tris;
-  const instanceCount = useCallback(() => ((props.positions?.length ?? resolve(count)) || 2) - 1, [props.positions, count]);
+  const instanceCount = useCallback(() => (((props.positions as any)?.length ?? resolve(count)) || 2) - 1, [props.positions, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;

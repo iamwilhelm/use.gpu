@@ -6,7 +6,7 @@ export type PlotProps = {
 };
 
 export const Plot: LiveComponent<PlotProps> = (props) => {
-  return props.children;
+  return props.children ?? null;
 };
 
 

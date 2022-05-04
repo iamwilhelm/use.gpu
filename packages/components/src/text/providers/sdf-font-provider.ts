@@ -1,6 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { Atlas, Tuples, Rectangle } from '@use-gpu/core/types';
-import { FontMetrics } from '@use-gpu/text/types';
+import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { Atlas, Tuples, Rectangle, TextureSource } from '@use-gpu/core/types';
+import { FontMetrics, GlyphMetrics } from '@use-gpu/text/types';
 
 import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
@@ -11,7 +11,7 @@ import { makeLayoutCursor } from '../../layout/lib/cursor';
 import { DeviceContext } from '../../providers/device-provider';
 import { FontContext } from './font-provider';
 
-export const SDFFontContext = makeContext(undefined, 'SDFFontContext');
+export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFontContext');
 export const useSDFFontContext = () => useContext(SDFFontContext);
 
 export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as TextureSource;
@@ -20,7 +20,7 @@ export const SDF_FONT_DEBUG = 'SDF_FONT_DEBUG' as any as TextureSource;
 export type SDFFontContextProps = {
   getRadius: () => number,
   getScale: (size: number) => number,
-  getGlyph: (id: number, size: number) => number,
+  getGlyph: (font: number, id: number, size: number) => CachedGlyph,
 };
 
 export type SDFFontSourceContextProps = {
@@ -52,9 +52,9 @@ const getNearestScale = (size: number) => roundUp2(Math.max(32, size));
 
 const hashGlyph = (font: number, id: number, size: number) => scrambleBits53(mixBits53(mixBits53(font, id), size * 100));
 
-type GlyphCache = {
+type CachedGlyph = {
   glyph: GlyphMetrics,
-  mapping: Map<number, AtlasMapping>,
+  mapping: [number, number, number, number],
 }
 
 export const SDFFontProvider: LiveComponent<SDFFontProvider> = memo(({
@@ -73,7 +73,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = memo(({
   // Allocate font atlas + backing texture
   const format = "rgba8unorm" as GPUTextureFormat;
 
-  const glyphs = useOne(() => new Map<number, GlyphCache>());
+  const glyphs = useOne(() => new Map<number, CachedGlyph>());
   const atlas = useOne(() => makeAtlas(width, height));
   const sourceRef = useOne(() => ({ current: makeAtlasSource(device, atlas, format) }));
 
@@ -213,12 +213,12 @@ export const useSDFGlyphData = (
 
     // Push all text spans into layout
     const {baseline, lineHeight} = height;
-    const cursor = makeLayoutCursor<number>(wrap, align);
+    const cursor = makeLayoutCursor(wrap, align);
     spans.iterate((advance, trim, hard) => cursor.push(advance, trim, hard, lineHeight));
 
     // Gather lines produced
     const [left, top] = layout;
-    const currentLayout = [left, top + baseline];
+    const currentLayout = [left, top + baseline] as [number, number];
     let lastIndex = -1;
 
     const layouts = cursor.gather((start, end, lead, gap, index) => {

@@ -9,8 +9,6 @@ import { Rectangle, ImageAttachment, Fit, Repeat, Anchor, Point4 } from '../type
 
 import { parseDimension, parseAnchor, normalizeAnchor } from '../lib/util';
 
-import { Rectangles } from '../layers';
-
 const UV_SQUARE = [0, 0, 1, 1];
 
 const REPEAT_FLAG = {
@@ -57,7 +55,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
   }
 
   const sampledTexture = useMemo(() => {
-    if (!image) return null;
+    if (!image?.texture) return null;
     
     const {texture, repeat} = image;
     const addressModeU = repeat === 'x' || repeat === 'xy' ? 'repeat' : 'clamp-to-edge';
@@ -78,9 +76,9 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
   }, [image?.texture, image?.repeat]);
 
   if (sampledTexture) {
-    sampledTexture.texture = image.texture.texture;
-    sampledTexture.view = image.texture.view;
-    sampledTexture.size = image.texture.size;
+    sampledTexture.texture = image!.texture!.texture;
+    sampledTexture.view = image!.texture!.view;
+    sampledTexture.size = image!.texture!.size;
   }
 
   let render;

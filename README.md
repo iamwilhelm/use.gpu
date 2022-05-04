@@ -88,9 +88,9 @@ This repo is split into the following sub-packages:
  - `@use-gpu/text` - WASM/Rust library wrapping `ab_glyph` ✅
 
 **Shaders**
- - `@use-gpu/shader` - WGSL/GLSL Shader linker and tree-shaker ✅
- - `@use-gpu/wgsl-loader` - WGSL file bundler for webpack and node ✅
- - `@use-gpu/glsl-loader` - GLSL file bundler for webpack and node ✅
+ - [`@use-gpu/shader`](packages/shader/README.md) - WGSL/GLSL Shader linker and tree-shaker ✅
+ - [`@use-gpu/wgsl-loader`](packages/wgsl-loader/README.md) - WGSL file bundler for webpack and node ✅
+ - [`@use-gpu/glsl-loader`](packages/glsl-loader/README.md) - GLSL file bundler for webpack and node ✅
 
 **UI Components**
  - `@use-gpu/wgsl` - Supporting WGSL shaders ⏱

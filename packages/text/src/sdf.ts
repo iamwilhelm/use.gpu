@@ -32,7 +32,7 @@ const makeSDFStage = (size: number) => {
 let SDF_STAGE: SDFStage | null = null;
 
 // Pad rectangle by size
-export const padRectangle = ([l, t, r, b]: Rectangle, pad: number) => [l - pad, t - pad, r + pad, b + pad];
+export const padRectangle = ([l, t, r, b]: Rectangle, pad: number) => [l - pad, t - pad, r + pad, b + pad] as Rectangle;
 
 // Convert grayscale glyph to rgba
 export const glyphToRGBA = (data: Uint8Array, w: number, h: number) => {

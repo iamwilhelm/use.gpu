@@ -13,13 +13,6 @@ export type Linker = (
   libraries?: Record<string, ParsedBundle | ParsedModule>,
 ) => string;
 
-export type LinkModule = (
-  main: ParsedModule,
-  libraries?: Record<string, ParsedModule>,
-  linkDefs?: Record<string, ParsedModule>,
-  defines?: Record<string, ShaderDefine> | null,
-) => string;
-
 export type LoadModuleWithCache = (
   code: string,
   name: string,
@@ -55,14 +48,20 @@ export const makeLinkCode = (
 ) => timed('linkCode', (
   code: string,
   libraries: Record<string, string> = {},
-  links?: Record<string, string> | null,
+  links?: Record<string, string | null> | null,
   defines?: Record<string, ShaderDefine> | null,
   cache: ParsedModuleCache | null = defaultCache,
 ) => {
   const main = loadModuleWithCache(code, 'main', undefined, cache);
 
   const parsedLibraries = mapValues(libraries, (code: string, name: string) => loadModuleWithCache(code, name, undefined, cache));
-  const parsedLinks = mapValues(links, (code: string, name: string) => loadModuleWithCache(code, name.split(':')[0], undefined, cache));
+  const parsedLinks = mapValues(links, (code: string, name: string) =>
+    (
+      code != null
+      ? loadModuleWithCache(code, name.split(':')[0], undefined, cache)
+      : null
+    ) as ParsedBundle | ParsedModule | null
+  ) as any;
 
   const bundle = bindModule(main, parsedLinks, defines);
   return linker(bundle, parsedLibraries);
@@ -73,7 +72,7 @@ export const makeLinkBundle = (
   linker: Linker,
 ) => timed('linkBundle', (
   source: ParsedBundle | ParsedModule,
-  links?: Record<string, ParsedBundle | ParsedModule>,
+  links?: Record<string, ParsedBundle | ParsedModule | null>,
   defines?: Record<string, ShaderDefine> | null,
 ) => {
   let bundle = toBundle(source);
@@ -88,7 +87,7 @@ export const makeLinkModule = (
 ) => timed('linkBundle', (
   source: ParsedModule,
   libraries: Record<string, ParsedBundle | ParsedModule> = NO_LIBS,
-  links?: Record<string, ParsedBundle | ParsedModule>,
+  links?: Record<string, ParsedBundle | ParsedModule | null>,
   defines?: Record<string, ShaderDefine> | null,
 ) => {
   let bundle = toBundle(source);

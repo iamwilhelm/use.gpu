@@ -24,7 +24,7 @@ const DEBUG_RENDERER = {
   list: instanceDrawWireframeList,
   strip: instanceDrawWireframeStrip,
   fragment: instanceFragmentSolid,
-} as Record<string, ShaderModule>;
+} as Record<string, ParsedBundle>;
 
 const SOLID_RENDERER = {
   color: [
@@ -35,7 +35,7 @@ const SOLID_RENDERER = {
     instanceDrawVirtualPick,
     instanceFragmentPickGeometry,
   ],
-};
+} as VirtualRenderer;
 
 const UI_RENDERER = {
   color: [
@@ -46,12 +46,12 @@ const UI_RENDERER = {
     instanceDrawVirtualPick,
     instanceFragmentPickGeometry,
   ],
-};
+} as VirtualRenderer;
 
 const BUILTIN = {
   solid: SOLID_RENDERER,
   ui: UI_RENDERER,
-};
+} as Record<string, VirtualRenderer>;
 
 type VirtualRenderer = {
   color: [ParsedBundle, ParsedBundle],
@@ -135,7 +135,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
         instanceCount = () => edges() * resolve(i);
         instanceSize = edges;
       }
-      else if (topology === 'triangle-list') {
+      else /*if (topology === 'triangle-list')*/ {
         vertexCount = 18;
         instanceCount = () => resolve(v) * resolve(i);
         instanceSize = () => resolve(v);

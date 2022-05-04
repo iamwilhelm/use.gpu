@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Atlas, Tuples, Rectangle, TextureSource } from '@use-gpu/core/types';
 import { FontMetrics, GlyphMetrics } from '@use-gpu/text/types';
+import { Alignment } from '../../layout/types';
 
 import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
@@ -18,17 +19,15 @@ export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as TextureSource;
 export const SDF_FONT_DEBUG = 'SDF_FONT_DEBUG' as any as TextureSource;
 
 export type SDFFontContextProps = {
+  atlas: Atlas,
+  source: TextureSource,
+
   getRadius: () => number,
   getScale: (size: number) => number,
   getGlyph: (font: number, id: number, size: number) => CachedGlyph,
 };
 
-export type SDFFontSourceContextProps = {
-  atlas: Atlas,
-  source: TextureSource,
-};
-
-export type SDFFontProvider = {
+export type SDFFontProviderProps = {
   width?: number,
   height?: number,
   radius?: number,
@@ -36,6 +35,8 @@ export type SDFFontProvider = {
   children?: LiveElement<any>,
   then?: (atlas: Atlas, source: TextureSource, gathered: any) => LiveElement<any>
 };
+
+const NO_MAPPING = [0, 0, 0, 0] as Rectangle;
 
 const roundUp2 = (v: number) => {
   v--;
@@ -57,14 +58,14 @@ type CachedGlyph = {
   mapping: [number, number, number, number],
 }
 
-export const SDFFontProvider: LiveComponent<SDFFontProvider> = memo(({
+export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   width = 256,
   height = 256,
   radius = 10,
   pad = 0,
   children,
   then,
-}) => {
+}: SDFFontProviderProps) => {
   pad += radius;
 
   const device = useContext(DeviceContext);
@@ -84,7 +85,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = memo(({
     const getRadius = () => radius;
     const getScale = (size: number) => size / getNearestScale(size);
 
-    const getGlyph = (font: number, id: number, size: number): Entry => {
+    const getGlyph = (font: number, id: number, size: number): CachedGlyph => {
       const scale = getNearestScale(size);
       const key = hashGlyph(font, id, scale);
 
@@ -94,10 +95,10 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = memo(({
       // Measure glyph and get image
       let {current: source} = sourceRef;
       let glyph = rustText.measureGlyph(font, id, scale);
-      let mapping: AtlasMapping | null = null;
+      let mapping: Rectangle = NO_MAPPING;
 
       const {image, width: w, height: h, outlineBounds: ob} = glyph;
-      if (image && w && h) {
+      if (image && w && h && ob) {
 
         // Convert to SDF
         const {data, width, height} = glyphToSDF(image, w, h, pad, radius);
@@ -140,6 +141,8 @@ export const SDFFontProvider: LiveComponent<SDFFontProvider> = memo(({
 
     return {
       atlas,
+      source: sourceRef.current, 
+
       getRadius,
       getScale,
       getGlyph,
@@ -162,7 +165,7 @@ export const useSDFGlyphData = (
   font: number[],
   spans: Tuples<3>,
   glyphs: Tuples<2>,
-  breaks: number[],
+  breaks: Uint32Array,
   height: FontMetrics,
   align: Alignment,
   size: number = 48,
@@ -218,7 +221,7 @@ export const useSDFGlyphData = (
 
     // Gather lines produced
     const [left, top] = layout;
-    const currentLayout = [left, top + baseline] as [number, number];
+    const currentLayout: Rectangle = [left, top + baseline, 0, 0];
     let lastIndex = -1;
 
     const layouts = cursor.gather((start, end, lead, gap, index) => {
@@ -253,7 +256,7 @@ export const emitGlyphSpans = (
   font: number[],
   spans: Tuples<3>,
   glyphs: Tuples<2>,
-  breaks: number[],
+  breaks: Uint32Array,
 
   start: number,
   end: number,
@@ -287,13 +290,13 @@ export const emitGlyphSpans = (
   let sx = snap ? Math.round(x) : x;
 
   spans.iterate((_a, trim, hard, index) => {
-    glyphs.iterate((fontIndex: number, id: number, isWhiteSpace: boolean) => {
+    glyphs.iterate((fontIndex: number, id: number, isWhiteSpace: number) => {
       const {glyph, mapping} = getGlyph(font[fontIndex], id, size);
       const {image, layoutBounds, outlineBounds} = glyph;
       const [ll, lt, lr, lb] = layoutBounds;
 
       if (!isWhiteSpace) {
-        if (image) {
+        if (image && outlineBounds) {
           const [gl, gt, gr, gb] = outlineBounds;
 
           const cx = snap ? Math.round(sx) : sx;

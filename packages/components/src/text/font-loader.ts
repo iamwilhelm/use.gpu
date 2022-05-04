@@ -1,5 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { FontSource } from '@use-gpu/text/types';
+import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { Font } from '@use-gpu/text/types';
+import { FontSource } from './types';
 
 import { use, gather, keyed, yeet, useOne } from '@use-gpu/live';
 import { getHash } from '@use-gpu/state';

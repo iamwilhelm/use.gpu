@@ -1,6 +1,6 @@
 import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { ColorSpace } from '@use-gpu/core/types';
+import { ColorSpace, TextureSource } from '@use-gpu/core/types';
 import { use, provide, gather, useCallback, useContext, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
@@ -19,8 +19,8 @@ import {
 } from '@use-gpu/core';
 
 export type RenderToTextureProps = {
-  width: number,
-  height: number,
+  width?: number,
+  height?: number,
   live?: boolean,
 
   format?: GPUTextureFormat,
@@ -31,7 +31,7 @@ export type RenderToTextureProps = {
   samples?: number,
 
   children?: LiveElement<any>,
-  then?: (targetTexture: GPUTexture) => LiveElement<any>,
+  then?: (texture: TextureSource) => LiveElement<any>,
 };
 
 export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
@@ -122,7 +122,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     layout: 'texture_2d<f32>',
     format,
     colorSpace,
-    size: [width, height],
+    size: [width, height] as [number, number],
     version: 0,
   }), [targetTexture, width, height, format]);
 

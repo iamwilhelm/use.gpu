@@ -1,4 +1,4 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { RustTextAPI, Font } from '@use-gpu/text/types';
 
 import { provide, useAsync, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';
@@ -6,11 +6,7 @@ import { parseWeight } from '../../plot/util/parse';
 import { makeTuples } from '@use-gpu/core';
 import { RustText, packStrings } from '@use-gpu/text';
 
-export type FontContextProps = {
-  gpuText: RustTextAPI,
-};
-
-export const FontContext = makeContext<FontContextProps>(undefined, 'FontContext');
+export const FontContext = makeContext<RustTextAPI>(undefined, 'FontContext');
 export const useFontContext = () => useContext(FontContext);
 
 export type FontProviderProps = {
@@ -54,7 +50,7 @@ export const useFontText = (
 ) => {
   const rustText = useFontContext();
 
-  const packed = useMemo(() => packStrings(strings), strings);
+  const packed = useOne(() => packStrings(strings), strings);
 
   return useMemo(() => {
     const {breaks, metrics: m, glyphs: g} = rustText.measureSpans(stack, packed, size);

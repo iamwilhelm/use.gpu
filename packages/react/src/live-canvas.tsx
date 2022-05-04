@@ -1,19 +1,23 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
 import { render as renderLive } from '@use-gpu/live';
-import { LiveElement } from '@use-gpu/live/types';
+import { LiveFiber, DeferredCall } from '@use-gpu/live/types';
 
 export type LiveCanvasProps = {
   style?: Record<string, any>,
-  render: (canvas: HTMLCanvasElement) => LiveElement<any>,
+  render: (canvas: HTMLCanvasElement) => DeferredCall<any>,
 };
 
 export const LiveCanvas: React.FC<LiveCanvasProps> = ({style, render}) => {
-  const ref = useRef<HTMLCanvasElement>();
+  const el = useRef<HTMLCanvasElement>(null);
+  const fiber = useRef<LiveFiber<any>>();
 
   useLayoutEffect(() => {
-    if (ref.current) renderLive(render(ref.current));
+    if (el.current) {
+      const children = render(el.current);
+      fiber.current = renderLive(children, fiber.current);
+    }
   }, [render]);
 
-  return <canvas ref={ref} style={style} />;
+  return <canvas ref={el} style={style} />;
 };

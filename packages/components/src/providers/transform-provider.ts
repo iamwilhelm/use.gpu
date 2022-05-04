@@ -1,3 +1,4 @@
+import { ShaderModule } from '@use-gpu/shader/types';
 import { makeContext, useContext } from '@use-gpu/live';
 
 export type TransformContextProps = ShaderModule | null;

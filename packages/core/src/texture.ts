@@ -220,7 +220,7 @@ export const resizeTextureSource = (
     ...source,
     texture: newTexture,
     view: makeTextureView(newTexture),
-    size: [width, height, depth],
+    size: [width, height, depth] as [number, number, number],
     version: 1,
   };
 }

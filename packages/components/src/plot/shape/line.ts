@@ -33,7 +33,7 @@ export type LineProps =
 export const Line: LiveComponent<LineProps> = (props) => {
   const {colors, widths, depths} = props;
 
-  const positions = useContext(DataContext);
+  const positions = useContext(DataContext) ?? undefined;
 
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);

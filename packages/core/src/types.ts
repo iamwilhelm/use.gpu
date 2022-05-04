@@ -25,7 +25,7 @@ export type UseRenderingContextGPU = {
   depthStencilState: GPUDepthStencilState,
   depthStencilAttachment: GPURenderPassDepthStencilAttachment,
 
-  swapView: (view: GPUTextureView) => void,
+  swapView: (view?: GPUTextureView) => void,
 };
 
 export type ColorSpace = 'linear' | 'srgb' | 'p3';
@@ -269,7 +269,7 @@ export type AggregateBuffer = {
 };
 
 export type Atlas = {
-  place: (key: number, w: number, h: number) => void,
+  place: (key: number, w: number, h: number) => Rectangle,
   map: Map<number, Rectangle>,
   width: number,
   height: number,

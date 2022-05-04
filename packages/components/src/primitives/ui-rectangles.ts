@@ -2,9 +2,9 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, TextureSource, RenderPassMode,
+  VertexData, StorageSource, LambdaSource, TextureSource, RenderPassMode,
 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
@@ -32,13 +32,13 @@ export type UIRectanglesProps = {
   texture?: TextureSource | LambdaSource | ShaderModule,
   transform?: ShaderModule,
 
-  rectangles?: StorageSource | LambdaSource | ShaderModule
-  radiuses?: StorageSource | LambdaSource | ShaderModule,
-  borders?: StorageSource | LambdaSource | ShaderModule,
-  strokes?: StorageSource | LambdaSource | ShaderModule,
-  fills?: StorageSource | LambdaSource | ShaderModule,
-  uvs?: StorageSource | LambdaSource | ShaderModule,
-  repeats?: StorageSource | LambdaSource | ShaderModule,
+  rectangles?: ShaderSource,
+  radiuses?: ShaderSource,
+  borders?: ShaderSource,
+  strokes?: ShaderSource,
+  fills?: ShaderSource,
+  uvs?: ShaderSource,
+  repeats?: ShaderSource,
 
   count?: number,
   
@@ -73,7 +73,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => (props.rectangles?.length ?? resolve(count)), [props.rectangles, count]);
+  const instanceCount = useCallback(() => ((props.rectangles as any)?.length ?? resolve(count)), [props.rectangles, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;

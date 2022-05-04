@@ -7,6 +7,7 @@ import { makeTuples } from '@use-gpu/core';
 
 import { useFontFamily, useFontText, useFontHeight } from './providers/font-provider';
 import { useSDFGlyphData } from './providers/sdf-font-provider';
+import { SDFGlyphData } from './types';
 
 type GlyphSourceProps = {
   family?: string,
@@ -20,7 +21,7 @@ type GlyphSourceProps = {
   snap?: boolean,
   size?: number,
   
-  render?: (buffers: StorageSource[]) => void,
+  render?: (data: SDFGlyphData) => void,
 };
 
 const NO_LAYOUT: Rectangle = [0, 0, 0, 0];
@@ -59,6 +60,4 @@ export const GlyphSource: LiveComponent<GlyphSourceProps> = memo((props: GlyphSo
   );
   
   return render ? render(data) : yeet(data);
-});
-
-GlyphSource.displayName = 'GlyphSource';
+}, 'GlyphSource');

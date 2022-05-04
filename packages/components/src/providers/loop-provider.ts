@@ -2,7 +2,7 @@ import { LiveFiber } from '@use-gpu/live/types';
 import { makeContext, useContext, useFiber, useNoContext } from '@use-gpu/live';
 
 type LoopContextProps = {
-  request: () => void,
+  request: (fiber: LiveFiber<any>) => void,
 };
 
 export const LoopContext = makeContext<LoopContextProps>({

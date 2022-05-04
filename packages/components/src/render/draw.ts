@@ -32,4 +32,6 @@ const Resume = (ts: Task[]) => {
   for (let task of ts) task();
 
   if (pickingContext) pickingContext.captureTexture();
+
+  return null;
 };

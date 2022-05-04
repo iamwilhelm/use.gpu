@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
-import { use, detach, provide, useCallback, useOne, useResource } from '@use-gpu/live';
+import { LiveComponent, LiveElement, LiveFiber, Task } from '@use-gpu/live/types';
+import { use, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
 
 import { FrameContext, usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
@@ -22,6 +22,8 @@ export type LoopRef = {
   },
   frame: {
     current: number,
+  },
+  loop: {
     request?: (fiber?: LiveFiber<any>) => void,
   },
   children?: LiveElement<any>,
@@ -73,7 +75,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
       const {dispatch} = ref;
       if (dispatch) dispatch();
-      if (running) request(render);
+      if (running) request();
     };
 
     const request = (fiber?: LiveFiber<any>) => {
@@ -84,12 +86,12 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     dispose(() => running = false);
 
     return loop.request = request;
-  }, live);
+  }, [live]);
 
-  request();
+  request!();
 
-  const Dispatch = useCallback(() => {
-    const {time, frame, loop, render, children, request} = ref;
+  const Dispatch = useCallback(tagFunction(() => {
+    const {time, frame, loop, render, children} = ref;
     return (
       provide(LoopContext, loop,
         provide(FrameContext, {...frame},
@@ -97,8 +99,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
         )
       )
     );
-  });
-  Dispatch.displayName = 'Dispatch';
+  }, 'Dispatch'));
 
   return detach(use(Dispatch), (render: Task) => ref.dispatch = render);
 }

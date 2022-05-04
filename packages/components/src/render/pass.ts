@@ -38,7 +38,7 @@ export const Pass: LiveComponent<PassProps> = memo((props: PassProps) => {
     const debugs = toArray(rs[RenderPassMode.Debug]);
     const pickings = toArray(rs[RenderPassMode.Picking]);
 
-    const visibles = [];
+    const visibles: RenderToPass[] = [];
     if (opaque) visibles.push(...opaques);
     if (transparent) visibles.push(...transparents);
     if (debug) visibles.push(...debugs);

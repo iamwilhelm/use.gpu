@@ -60,8 +60,6 @@ export type MouseEventState = MouseState & {
   pressed: { left: boolean, middle: boolean, right: boolean },
   clicks: { left: number, middle: number, right: number },
   presses: { left: number, middle: number, right: number },
-  capture: () => void,
-  uncapture: () => void,
 };
 
 export type WheelEventState = WheelState & {
@@ -69,9 +67,9 @@ export type WheelEventState = WheelState & {
 };
 
 const toButtons = (buttons: number) => ({
-  left: buttons & 1,
-  middle: buttons & 3,
-  right: buttons & 2,
+  left: !!(buttons & 1),
+  middle: !!(buttons & 3),
+  right: !!(buttons & 2),
 });
 
 const makeMouseRef = () => ({
@@ -88,19 +86,23 @@ const makeWheelRef = () => ({
 });
 
 const makeCaptureRef = () => ({
-  current: null,
+  current: null as number | null,
 });
 
 export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wheel, children}: EventProviderProps) => {
   const {pixelRatio} = useContext(RenderContext);
-  const {sampleTexture} = useContext(PickingContext);
+  const pickingContext = useContext(PickingContext);
   const [captureId, setCaptureId] = useState<number | null>(null);
 
   const captureRef = useOne(makeCaptureRef);
   captureRef.current = captureId;
 
-  const allocId = useOne(() => makeIdAllocator<any>());
-  const [targetId, targetIndex] = sampleTexture(mouse.x * pixelRatio, mouse.y * pixelRatio);
+  const allocId = useOne(() => makeIdAllocator());
+
+  let targetId = -1, targetIndex = -1;
+  if (pickingContext) {
+    [targetId, targetIndex] = pickingContext.sampleTexture(mouse.x * pixelRatio, mouse.y * pixelRatio);
+  }
 
   const eventApi = useOne(() => ({
     useId: () => useResource((dispose) => {
@@ -166,7 +168,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
         ref.version = wheel.version;
       }
 
-      return {...ref};
+      return {...ref, index};
     },
   }), [wheel, targetId, captureId]);
 

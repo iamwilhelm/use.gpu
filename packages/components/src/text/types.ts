@@ -11,7 +11,7 @@ export type SDFGlyphData = {
   layouts: TypedArray,
   rectangles: TypedArray,
   uvs: TypedArray,
-  sdf: [number, number],
+  sdf: [number, number, number, number],
 };
 
 

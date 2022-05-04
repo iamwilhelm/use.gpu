@@ -20,7 +20,7 @@ export type GlyphsProps = {
   font: number[],
   spans: Tuples<3>,
   glyphs: Tuples<2>,
-  breaks: number[],
+  breaks: Uint32Array,
   height: FontMetrics,
   lines: InlineLine[],
   
@@ -67,7 +67,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
         const [ll, lt, lr, lb] = layoutBounds;
 
         if (!isWhiteSpace) {
-          if (image) {
+          if (image && outlineBounds) {
             const [gl, gt, gr, gb] = outlineBounds;
 
             const cx = snap ? Math.round(sx) : sx;

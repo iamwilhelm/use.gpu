@@ -33,7 +33,7 @@ export type PointProps =
 export const Point: LiveComponent<PointProps> = (props) => {
   const {colors, sizes, depths} = props;
 
-  const positions = useContext(DataContext);
+  const positions = useContext(DataContext) ?? undefined;
 
   const {size, depth} = usePointTrait(props);
   const color = useColorTrait(props);

@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode, DeepPartial,
+  VertexData, StorageSource, RenderPassMode, DeepPartial, Prop,
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { DeviceContext, ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
@@ -23,19 +23,14 @@ export type RenderProps = {
   mode?: RenderPassMode | string,
   id?: number,
 
-  vertexCount: number | (() => number),
-  instanceCount: number | (() => number),
+  vertexCount: Prop<number>,
+  instanceCount: Prop<number>,
 
   vertex: ParsedBundle,
   fragment: ParsedBundle,
 
   defines: Record<string, any>,
   deps: any[] | null,
-};
-
-const NO_VIEW = {
-  viewUniforms: {none: {current: 0}},
-  viewDefs: [{format: 'i32', name: 'none'}],
 };
 
 export const render = (props: RenderProps) => {
@@ -56,7 +51,7 @@ export const render = (props: RenderProps) => {
 
   // Render set up
   const device = useContext(DeviceContext);
-  const {viewUniforms, viewDefs} = useContext(ViewContext) ?? NO_VIEW;
+  const {viewUniforms, viewDefs} = useContext(ViewContext);
   const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
   const {colorInput, colorSpace} = renderContext;
 
@@ -98,7 +93,7 @@ export const render = (props: RenderProps) => {
   // Uniforms
   const uniform = useMemo(() => {
     const defs = isPicking ? [viewDefs, pickingDefs] : [viewDefs];
-    return makeMultiUniforms(device, pipeline, defs, 0);
+    return makeMultiUniforms(device, pipeline, defs as any, 0);
   }, [device, viewDefs, pipeline]);
 
   // Bound storage

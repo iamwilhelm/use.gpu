@@ -8,7 +8,10 @@ export type RouteState = {
   routes?: Record<string, Route>,
 };
 
-export const RouteContext = makeContext<RouteState>(null, 'RouteContext');
+export const RouteContext = makeContext<RouteState>({
+  base: '/',
+  params: {},
+}, 'RouteContext');
 
 type Matcher = {
   regexp: RegExp,

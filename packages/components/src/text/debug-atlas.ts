@@ -1,3 +1,4 @@
+import { LiveComponent } from '@use-gpu/live/types';
 import { Atlas } from '@use-gpu/core/types';
 import { debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } from '@use-gpu/live';
 import { TextureSource } from '@use-gpu/core';
@@ -12,7 +13,7 @@ type DebugAtlasProps = {
   version: number,
 };
 
-export const DebugAtlas = (props: DebugAtlasProps = {}) => {
+export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (props: Partial<DebugAtlasProps> = {}) => {
   let {atlas, source} = props;
   if (!atlas && !source) {
     ({atlas, source} = useContext(SDFFontContext));
@@ -20,14 +21,14 @@ export const DebugAtlas = (props: DebugAtlasProps = {}) => {
   else useNoContext(SDFFontContext);
 
   return debug(use(DebugAtlasView, {
-    atlas,
-    source,
-    version: atlas.version,
+    atlas: atlas!,
+    source: source!,
+    version: atlas!.version,
   }));
 };
 
 export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source}: DebugAtlasProps) => {
-  const {map, width, height, debugPlacements, debugSlots, debugValidate} = atlas;  
+  const {map, width, height, debugPlacements, debugSlots, debugValidate} = atlas as any;  
   const {id} = useFiber();
 
   const yeets = [];
@@ -49,7 +50,8 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     });
   }
   
-  const fix = ([l, t, r, b]) => [Math.min(l, r), Math.min(t, b), Math.max(l, r), Math.max(t, b)];
+  const fix = ([l, t, r, b]: [number, number, number, number]) =>
+    [Math.min(l, r), Math.min(t, b), Math.max(l, r), Math.max(t, b)];
 
   for (const [l, t, r, b, nearX, nearY, farX, farY, corner] of debugSlots()) {
     yeets.push({

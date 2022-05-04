@@ -12,14 +12,14 @@ const NO_SYMBOLS = [] as any[];
 3
 export type BindBundle2 = (
   bundle: ShaderModule,
-  links?: Record<string, ShaderModule>,
+  links?: Record<string, ShaderModule | null>,
   defines?: Record<string, ShaderDefine> | null,
   key?: string | number,
 ) => string;
 
 export type BindBundle = (
   bundle: ShaderModule,
-  linkDefs?: Record<string, ShaderModule>,
+  linkDefs?: Record<string, ShaderModule | null>,
   defines?: Record<string, ShaderDefine> | null,
   key?: string | number,
 ) => string;
@@ -27,7 +27,7 @@ export type BindBundle = (
 export type BindModule = (
   main: ParsedModule,
   libs?: Record<string, ShaderModule>,
-  linkDefs?: Record<string, ShaderModule>,
+  linkDefs?: Record<string, ShaderModule | null>,
   defines?: Record<string, ShaderDefine> | null,
   virtual?: ParsedModule[],
   key?: string | number,
@@ -45,7 +45,7 @@ export type MakeUniformBlock = (
 
 export const bindBundle = (
   subject: ShaderModule,
-  links: Record<string, ShaderModule> | null = null,
+  links: Record<string, ShaderModule | null> | null = null,
   defines: Record<string, ShaderDefine> | null = null,
   key: string | number = makeKey(),
 ): ParsedBundle => {
@@ -54,7 +54,7 @@ export const bindBundle = (
 
   const hash = getBundleHash(bundle);
   const external: string[] = [];
-  for (const k in links) if (links[k]) external.push(getBundleHash(links[k]));
+  for (const k in links) if (links[k]) external.push(getBundleHash(links[k]!));
 
   const unique = `@closure [${hash}] [${external.join(' ')}]`;
   const rehash = getHash(unique);
@@ -62,8 +62,7 @@ export const bindBundle = (
   
   const relinks = bundle.links ? {
     ...bundle.links,
-    ...links,
-  } : links ?? undefined;
+  } : {} ?? undefined;
 
   const redefines = defines && bundle.defines ? {
     ...bundle.defines,
@@ -80,6 +79,8 @@ export const bindBundle = (
     // Add virtual module to list
     if (chunk.virtual) revirtuals.push(chunk);
     if (chunk.module?.virtual) revirtuals.push(chunk.module);
+
+    relinks[k] = links[k]!;
   }
 
   return {

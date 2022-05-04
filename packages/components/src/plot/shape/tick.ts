@@ -38,8 +38,8 @@ export const Tick: LiveComponent<TickProps> = (props) => {
     offset = NO_OFFSET
   } = props;
 
-  const positions = useContext(DataContext);
-  const count = useCallback(() => positions.length, [positions]);
+  const positions = useContext(DataContext) ?? undefined;
+  const count = useCallback(() => (positions as any)?.length, [positions]);
 
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);

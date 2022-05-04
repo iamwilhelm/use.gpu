@@ -32,10 +32,10 @@ const DENSITY_BINDING = [{ name: 'getDensity', type: 'vec4<f32>', value: [0, 0, 
 
 export const Label: LiveComponent<LabelProps> = (props) => {
 
-  const positions = useContext(DataContext);
+  const positions = useContext(DataContext) ?? undefined;
   const values = useContext(ValuesContext);
 
-  const count = useCallback(() => positions.length, [positions]);
+  const count = useCallback(() => (positions as any)?.length || 0, [positions]);
 
   const {family, weight, style} = useFontTrait(props);
   const {labels, format, size, depth, expand} = useLabelTrait(props);

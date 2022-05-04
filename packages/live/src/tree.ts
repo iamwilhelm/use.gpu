@@ -1,6 +1,6 @@
 import { Key, Action, Task, LiveFiber, DeferredCall, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction } from './types';
 
-import { makeFiber, renderFiber, updateFiber } from './fiber';
+import { makeFiber, renderFiber, updateFiber, disposeFiberMounts } from './fiber';
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester } from './util';
 import { makeFiberQueue } from './queue';
 import { formatNode } from './debug';
@@ -75,26 +75,49 @@ export const renderWithDispatch = <T>(
   dispatch: (t: Task) => T,
 ) => <F extends ArrowFunction>(
   node: DeferredCall<F>,
+  fiber?: LiveFiber<any> | null,
   renderOptions: RenderOptions = DEFAULT_RENDER_OPTIONS,
 ) => {
-  DEBUG && console.log('Rendering Root', formatNode(node));
 
-  const {fiber, host, scheduler} = makeHostFiber(node, renderOptions);
-  const reenter = (as: Action<any>[]) => {
-    dispatch(() => {
-      const fibers = dedupe(as.map(({fiber}) => fiber));
+  let host: HostInterface | null = null;
+  if (!fiber) {
+    DEBUG && console.log('Rendering Root', formatNode(node));
 
-      DEBUG && console.log('----------------------------');
-      DEBUG && console.log('Dispatch to Roots', fibers.map(formatNode), +new Date() - START, 'ms');
+    // Make new root
+    let scheduler: any;
+    ({fiber, host, scheduler} = makeHostFiber(node, renderOptions));
+    const reenter = (as: Action<any>[]) => {
+      dispatch(() => {
+        const fibers = dedupe(as.map(({fiber}) => fiber));
 
-      if (fibers.length) renderFibers(host, fibers);
-    });
-  };
+        DEBUG && console.log('----------------------------');
+        DEBUG && console.log('Dispatch to Roots', fibers.map(formatNode), +new Date() - START, 'ms');
 
-  scheduler.bind(reenter);
+        if (fibers.length) renderFibers(host!, fibers);
+      });
+    };
 
-  if (host) host.__stats.mounts++;
-  return dispatch(() => renderFibers(host, [fiber])[0]);
+    scheduler.bind(reenter);
+    host.__stats.mounts++;
+  }
+  else if (fiber.host) {
+    host = fiber.host;
+    DEBUG && console.log('Updating Root', formatNode(node));
+
+    // Update existing root
+    if (fiber.f !== node.f) disposeFiberMounts(fiber);
+
+    fiber.f = node.f;
+    fiber.args = node.args;
+
+    host.__stats.updates++;
+  }
+
+  if (host) {
+    dispatch(() => renderFibers(host!, [fiber!])[0]);
+  }
+
+  return fiber;
 }
 
 // Render a list of updated fibers as one batch
@@ -128,17 +151,11 @@ export const traverseFiber = (fiber: LiveFiber<any>, f: (f: LiveFiber<any>) => v
   if (next) traverseFiber(next, f);
 }
 
-// Render on next paint (animation frame)
-export const renderPaint = (() => {
-  const onPaint = makePaintRequester();
-  return <F extends ArrowFunction>(node: DeferredCall<F>) => {
-    return new Promise((resolve) => {
-      onPaint(() => resolve(renderSync(node)));
-    });
-  };
-})();
+const onPaint = makePaintRequester();
 
-// Render sync/async, immediately
+// Render sync/async/onPaint
 export const renderSync = renderWithDispatch<LiveFiber<any>>((t: Task) => t() as any as LiveFiber<any>);
 export const renderAsync = renderWithDispatch<void>((t: Task) => { setTimeout(t, 0); });
-export const render = renderPaint;
+export const renderOnPaint = renderWithDispatch<void>((t: Task) => { onPaint(t); });
+
+export const render = renderSync;

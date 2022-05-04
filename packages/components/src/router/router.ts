@@ -5,6 +5,7 @@ import { Routes } from './routes';
 export type Route = {
   element?: LiveElement<any>,
   routes?: Record<string, Route>,
+  exact?: boolean,
 };
 
 export type RouterState = {
@@ -30,7 +31,7 @@ export type RouterAPI = {
   linkTo: (path: string, query: QueryParams | string) => RouterLink,
 };
 
-export const RouterContext = makeContext<RouterAPI>(null, 'RouterContext');
+export const RouterContext = makeContext<RouterAPI>(undefined, 'RouterContext');
 
 export type RouterProps = {
   source?: any,
@@ -76,7 +77,10 @@ export const Router: LiveComponent<RouterProps> = memo(({source, routes, childre
 export const useRouterContext = () => useContext(RouterContext);
 
 export const makeRelativeURL = (path: string, query?: QueryParams | string) => {
-  if (typeof query === 'string') if (query.length) return path + '?' + query.replace(/^\?/, '');
+  if (typeof query === 'string') {
+    if (query.length) return path + '?' + query.replace(/^\?/, '');
+    return path;
+  }
   if (query) {
     let i = 0;
     for (let k in query) {
@@ -90,11 +94,11 @@ export const makeRelativeURL = (path: string, query?: QueryParams | string) => {
 export const makeBrowserHistory = () => {
   const {history, location} = window;
 
-  let popState: (e: PopStateEvent) => void;
+  let popState: (e?: PopStateEvent) => void;
 
   let self = {
     resource: (callback: any) => {
-      const handlePopState = popState = (e: PopStateEvent) => callback(e);
+      const handlePopState = popState = (e?: PopStateEvent) => callback(e);
 
       window.addEventListener('popstate', handlePopState);
       return () => window.removeEventListener('popstate', handlePopState);
@@ -108,8 +112,8 @@ export const makeBrowserHistory = () => {
       const out = {} as Record<string, string>;
       const {search} = location;
       if (search.length) {
-        const params = URLSearchParams(search);
-        for (const k of params.keys()) out[k] = params.get(k);
+        const params = new URLSearchParams(search);
+        for (const k of (params as any).keys()) out[k] = params.get(k)!;
       }
       return out;
     },

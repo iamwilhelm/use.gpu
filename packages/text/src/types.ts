@@ -24,10 +24,9 @@ export type SpanMetrics = {
 
 export type GlyphMetrics = {
   id: number[],
-  layoutBounds: number[],
-  outlineBounds: number[] | null,
+  layoutBounds: [number, number, number, number],
+  outlineBounds: [number, number, number, number] | null,
   image: Uint8Array,
-  bounds: number[],
   width: number,
   height: number,
 };

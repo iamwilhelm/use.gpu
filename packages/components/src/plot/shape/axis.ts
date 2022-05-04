@@ -71,7 +71,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   // Make axis vertex shader
   const o = useShaderRef(og);
   const s = useShaderRef(step);
-  const positions = useBoundShader(getAxisPosition, AXIS_BINDINGS, [o, s]);
+  const positions = useBoundShader(getAxisPosition, AXIS_BINDINGS, [s, o]);
 
   // Render as 1 arrow chunk
   const n = d + 1;

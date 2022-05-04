@@ -59,7 +59,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
 
   const o = useShaderRef(og);
   const a = useShaderRef(axis);
-  const bound = useBoundShader(getScalePosition, SCALE_BINDINGS, [data, o, a]);
+  const bound = useBoundShader(getScalePosition, SCALE_BINDINGS, [data, a, o]);
 
   // Expose position source
   const source = useMemo(() => ({

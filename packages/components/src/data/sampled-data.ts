@@ -69,7 +69,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       const n = size.length;
       let sampled;
       if (n === 1) {
-        const c = centered === true || (centered as any)[0];
+        const c = +!!(centered === true || (centered as any)[0]);
         let [min, max] = range[0];
         let step = (max - min) / (size[0] - 1 + c);
         if (c) min += step / 2;
@@ -78,8 +78,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           expr(emit, min + i * step);
       }
       else if (n === 2) {
-        const cx = centered === true || (centered as any)[0];
-        const cy = centered === true || (centered as any)[1];
+        const cx = +!!(centered === true || (centered as any)[0]);
+        const cy = +!!(centered === true || (centered as any)[1]);
 
         let [minX, maxX] = range[0];
         let [minY, maxY] = range[1];
@@ -96,9 +96,9 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           );
       }
       else if (n === 3) {
-        const cx = centered === true || (centered as any)[0];
-        const cy = centered === true || (centered as any)[1];
-        const cz = centered === true || (centered as any)[2];
+        const cx = +!!(centered === true || (centered as any)[0]);
+        const cy = +!!(centered === true || (centered as any)[1]);
+        const cz = +!!(centered === true || (centered as any)[2]);
 
         let [minX, maxX] = range[0];
         let [minY, maxY] = range[1];
@@ -119,10 +119,10 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           );
       }
       else if (n === 4) {
-        const cx = centered === true || (centered as any)[0];
-        const cy = centered === true || (centered as any)[1];
-        const cz = centered === true || (centered as any)[2];
-        const cw = centered === true || (centered as any)[3];
+        const cx = +!!(centered === true || (centered as any)[0]);
+        const cy = +!!(centered === true || (centered as any)[1]);
+        const cz = +!!(centered === true || (centered as any)[2]);
+        const cw = +!!(centered === true || (centered as any)[3]);
 
         let [minX, maxX] = range[0];
         let [minY, maxY] = range[1];

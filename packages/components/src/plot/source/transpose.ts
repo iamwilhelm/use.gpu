@@ -26,14 +26,15 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
     ...rest
   } = props;
 
+  // Grab source data
   const data = useContext(DataContext) ?? undefined;
-  const sizeExpr = useOne(() => () => data?.size || [], data);
-
-  const getSizeIn = useBoundSource(SIZE_BINDING, sizeExpr);
 
   const dataBinding = useOne(() => ({name: 'getValue', format: data.format, args: ['u32']}), data.format);
+  const sizeExpr = useOne(() => () => data?.size || [], data);
   const swizzle = useOne(() => parseAxes(axes), axes);
 
+  // Construct size + index swizzle shader
+  const getSizeIn = useBoundSource(SIZE_BINDING, sizeExpr);
   const getDataIn = useBoundSource(dataBinding, data);
   const getDataOut = useMemo(() => {
     const getSizeOut = castTo(getSizeIn, 'vec4<u32>', swizzle);
@@ -44,7 +45,8 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
     return chainTo(chainTo(castTo(unpack, 'vec4<u32>', swizzle), pack), getDataIn);
   }, [getDataIn, getSizeIn, swizzle]);
 
-  const getProps = useMemo(() => {
+  // Swizzle size + index locally
+  const getSourceProps = useMemo(() => {
     const basis = swizzle.split('').map(parseAxis);
     return {
       length: () => data.length,
@@ -55,7 +57,7 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
     };
   }, [data, swizzle]);
 
-  const source = useDerivedSource(getDataOut, getProps);
+  const source = useDerivedSource(getDataOut, getSourceProps);
 
   return useMemo(() => {
     if (render == null && children === undefined) return yeet(source);

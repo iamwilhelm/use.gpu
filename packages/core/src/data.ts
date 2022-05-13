@@ -324,6 +324,38 @@ export const generateChunkAnchors = (
   }
 }
 
+export const generateChunkFaces = (
+  to: NumberArray,
+  chunks: number[],
+  loops: boolean[] = NO_LOOPS,
+) => {
+  let pos = 0;
+  let n = chunks.length;
+
+  for (let i = 0; i < n; ++i) {
+    const c = chunks[i];
+    const l = loops[i];
+
+    if (l) to[pos++] = 0;
+    if (c) {
+      if (c < 3) {
+        for (let i = 0; i < c; ++i) to[pos++] = 0;
+      }
+      else {
+        for (let i = 0; i < c - 2; ++i) to[pos++] = i + 1;
+        to[pos++] = 0;
+        to[pos++] = 0;
+      }
+    }
+    if (l) {
+      to[pos++] = 0;
+      to[pos++] = 0;
+    }
+  }
+
+  while (pos < to.length) to[pos++] = 0;
+}
+
 export const copyNumberArrayRepeatedRange = (
   from: NumberArray | number, to: NumberArray,
   fromIndex: number, toIndex: number,

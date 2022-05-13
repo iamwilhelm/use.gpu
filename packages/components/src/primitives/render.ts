@@ -108,6 +108,10 @@ export const render = (props: RenderProps) => {
   // Return a lambda back to parent(s)
   return yeet({
     [mode]: (passEncoder: GPURenderPassEncoder) => {
+      const v = resolve(vertexCount);
+      const i = resolve(instanceCount);
+      if (!(v * i)) return;
+
       uniform.pipe.fill(viewUniforms);
       if (isPicking) uniform.pipe.fill(pickingUniforms);
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
@@ -121,7 +125,7 @@ export const render = (props: RenderProps) => {
       passEncoder.setBindGroup(0, uniform.bindGroup);
       if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
 
-      passEncoder.draw(resolve(vertexCount), resolve(instanceCount), 0, 0);
+      passEncoder.draw(v, i, 0, 0);
     },
   });
 };

@@ -93,12 +93,13 @@ export const makeRelativeURL = (path: string, query?: QueryParams | string) => {
 export const makeBrowserHistory = () => {
   const {history, location} = window;
 
-  let popState: (e?: PopStateEvent) => void;
+  const notifyPopState = () => {
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
 
   let self = {
     resource: (callback: any) => {
-      const handlePopState = popState = (e?: PopStateEvent) => callback(e);
-
+      const handlePopState = (e?: PopStateEvent) => callback(e);
       window.addEventListener('popstate', handlePopState);
       return () => window.removeEventListener('popstate', handlePopState);
     },
@@ -122,11 +123,11 @@ export const makeBrowserHistory = () => {
     go: (n: number) => history.go(n),
     push: (path: string, query?: QueryParams | string) => {
       history.pushState({path, query}, document.title, makeRelativeURL(path, query));
-      popState();
+      notifyPopState();
     },
     replace: (path: string, query?: QueryParams | string) => {
       history.replaceState({path, query}, document.title, makeRelativeURL(path, query));
-      popState();
+      notifyPopState();
     },
 
     linkTo: (path: string, query?: QueryParams | string) => {
@@ -136,7 +137,6 @@ export const makeBrowserHistory = () => {
 
         e?.preventDefault();
         self.push(path, query);
-        popState();
       }
       return {href, onClick};
     },

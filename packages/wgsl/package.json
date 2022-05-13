@@ -38,6 +38,11 @@
       "import": "./src/geometry/arrow.wgsl",
       "require": "./src/geometry/arrow.wgsl"
     },
+    "./geometry/face.wgsl": {
+      "types": "./src/geometry/face.wgsl.d.ts",
+      "import": "./src/geometry/face.wgsl",
+      "require": "./src/geometry/face.wgsl"
+    },
     "./geometry/line.wgsl": {
       "types": "./src/geometry/line.wgsl.d.ts",
       "import": "./src/geometry/line.wgsl",
@@ -72,6 +77,11 @@
       "types": "./src/instance/vertex/arrow.wgsl.d.ts",
       "import": "./src/instance/vertex/arrow.wgsl",
       "require": "./src/instance/vertex/arrow.wgsl"
+    },
+    "./instance/vertex/face.wgsl": {
+      "types": "./src/instance/vertex/face.wgsl.d.ts",
+      "import": "./src/instance/vertex/face.wgsl",
+      "require": "./src/instance/vertex/face.wgsl"
     },
     "./instance/vertex/full-screen.wgsl": {
       "types": "./src/instance/vertex/full-screen.wgsl.d.ts",

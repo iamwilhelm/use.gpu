@@ -18,27 +18,19 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 
-import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
+import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
-export type RawLinesProps = {
+export type RawFacesProps = {
   position?: number[] | TypedArray,
+  normal?: number[] | TypedArray,
   segment?: number,
   color?: number[] | TypedArray,
-  width?: number,
-  depth?: number,
-  trim?: number[] | TypedArray,
-  size?: number,
 
   positions?: ShaderSource,
+  normals?: ShaderSource,
   segments?: ShaderSource,
   colors?: ShaderSource,
-  widths?: ShaderSource,
-  depths?: ShaderSource,
-  trims?: ShaderSource,
-  sizes?: ShaderSource,
-
-  join?: 'miter' | 'round' | 'bevel',
 
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -48,19 +40,7 @@ export type RawLinesProps = {
 
 const ZERO = [0, 0, 0, 1];
 
-const VERTEX_BINDINGS = bundleToAttributes(getLineVertex);
-
-const LINE_JOIN_SIZE = {
-  'bevel': 1,
-  'miter': 2,
-  'round': 4,
-} as Record<string, number>;
-
-const LINE_JOIN_STYLE = {
-  'bevel': 0,
-  'miter': 1,
-  'round': 2,
-} as Record<string, number>;
+const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
 
 const PIPELINE = {
   primitive: {
@@ -69,45 +49,38 @@ const PIPELINE = {
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
-export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps) => {
+export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
     pipeline: propPipeline,
-    count = 2,
+    count = 1,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
 
-  // Customize line shader
-  let {join, depth = 0} = props;
-  const j = (join! in LINE_JOIN_SIZE) ? join! : 'bevel';
+  const defines = {};
 
-  const style = LINE_JOIN_STYLE[j];
-  const segments = LINE_JOIN_SIZE[j];
-  const tris = (1+segments) * 2;
-
-  const defines = useOne(() => ({
-    LINE_JOIN_STYLE: style,
-    LINE_JOIN_SIZE: segments,
-  }), j);
-
-  // Set up draw
-  const vertexCount = 2 + tris;
-  const instanceCount = useCallback(() => (((props.positions as any)?.length ?? resolve(count)) || 2) - 1, [props.positions, count]);
+  // Set up draw, either individual tris, or triangle fans
+  const vertexCount = 3;
+  const instanceCount = useCallback(() => {
+    const segments = (props.segments as any)?.length;
+    const positions = (props.positions as any)?.length;
+    if (segments != null) return segments - 2;
+    if (positions != null) return positions / 3;
+    const c = resolve(count) || 0;
+    return (props.segments != null) ? c - 2 : c / 3;
+  }, [props.positions, props.segments, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
   const key = useFiber().id;
 
   const p = useShaderRef(props.position, props.positions);
+  const n = useShaderRef(props.normal, props.normals);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
-  const w = useShaderRef(props.width, props.widths);
-  const d = useShaderRef(props.depth, props.depths);
-  const t = useShaderRef(props.trim, props.trims);
-  const z = useShaderRef(props.size, props.sizes);
 
   const xf = useApplyTransform(p);
 
-  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, g, c, w, d, t, z]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c]);
   const getFragment = getPassThruFragment;
   
   return use(Virtual, {
@@ -118,10 +91,9 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     getFragment,
 
     defines,
-    deps: [j],
 
     pipeline,
     mode,
     id,
   });
-}, 'RawLines');
+}, 'RawFaces');

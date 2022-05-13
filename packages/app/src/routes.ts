@@ -1,6 +1,7 @@
 import { use } from '@use-gpu/live';
 
 import { GeometryDataPage } from './pages/geometry/data';
+import { GeometryFacesPage } from './pages/geometry/faces';
 import { GeometryLinesPage } from './pages/geometry/lines';
 import { DebugAtlasPage } from './pages/debug/atlas';
 import { LayoutDisplayPage } from './pages/layout/display';
@@ -13,6 +14,7 @@ import { EmptyPage } from './pages/empty';
 
 export const PAGES = [
   {path: "/geometry/lines", title: "Geometry - 3D Lines and Arrows"},
+  {path: "/geometry/faces", title: "Geometry - 3D Polygons"},
   {path: "/geometry/data", title: "Geometry - Data-driven Layers"},
   {path: "/layout/display", title: "Layout - Box model"},
   {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
@@ -24,6 +26,7 @@ export const PAGES = [
 
 export const makeRoutes = () => ({
   "/geometry/data": { element: use(GeometryDataPage) },
+  "/geometry/faces": { element: use(GeometryFacesPage) },
   "/geometry/lines": { element: use(GeometryLinesPage) },
   "/layout/display": { element: use(LayoutDisplayPage) },
   "/mesh/raw": { element: use(MeshRawPage) },

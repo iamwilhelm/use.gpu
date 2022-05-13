@@ -34,4 +34,6 @@
   normal: vec3<f32>,
   color: vec4<f32>,
   uv: vec2<f32>,
+
+  index: u32,
 };

@@ -12,7 +12,8 @@
     "@use-gpu/shader": "*",
     "@use-gpu/state": "*",
     "@use-gpu/webgpu": "*",
-    "@use-gpu/wgsl": "*"
+    "@use-gpu/wgsl": "*",
+    "earcut": "^2.2.3"
   },
   "scripts": {
     "test": "jest --watch",

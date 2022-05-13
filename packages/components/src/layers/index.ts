@@ -1,5 +1,6 @@
 export * from './arrow-layer';
 export * from './arrow-segments';
+export * from './face-layer';
 export * from './face-segments';
 export * from './layers';
 export * from './line-layer';

@@ -32,6 +32,8 @@ export type RawFacesProps = {
   segments?: ShaderSource,
   colors?: ShaderSource,
 
+  indices?: ShaderSource,
+
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
@@ -44,8 +46,7 @@ const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
 
 const PIPELINE = {
   primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
+    topology: 'triangle-list',
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
@@ -57,15 +58,17 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     id = 0,
   } = props;
 
-  const defines = {};
-
   // Set up draw, either individual tris, or triangle fans
   const vertexCount = 3;
   const instanceCount = useCallback(() => {
+    const indices = (props.indices as any)?.length;
     const segments = (props.segments as any)?.length;
     const positions = (props.positions as any)?.length;
+
+    if (indices != null) return indices / 3;
     if (segments != null) return segments - 2;
     if (positions != null) return positions / 3;
+
     const c = resolve(count) || 0;
     return (props.segments != null) ? c - 2 : c / 3;
   }, [props.positions, props.segments, count]);
@@ -78,9 +81,14 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
 
+  const i = useShaderRef(null, props.indices);
+
   const xf = useApplyTransform(p);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c]);
+  const hasIndices = !!props.indices;
+  const defines = useOne(() => ({ HAS_INDICES: hasIndices }), hasIndices);
+
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c, i]);
   const getFragment = getPassThruFragment;
   
   return use(Virtual, {

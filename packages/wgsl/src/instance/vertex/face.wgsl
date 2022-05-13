@@ -6,13 +6,18 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip };
 @optional @link fn getSegment(i: u32) -> i32 { return -1; };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 
+@optional @link fn getIndex(i: u32) -> u32 { return 0u; };
+
 @export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> MeshVertex {
   var NaN: f32 = bitcast<f32>(0xffffffffu);
 
   var segment = getSegment(instanceIndex);
   
   var cornerIndex: u32;
-  if (segment == -1) {
+  if (HAS_INDICES) {
+    cornerIndex = getIndex(instanceIndex * 3u + vertexIndex);
+  }
+  else if (segment == -1) {
     cornerIndex = instanceIndex * 3u + vertexIndex;
   }
   else if (segment == 0) {

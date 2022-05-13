@@ -35,6 +35,46 @@ const NO_FIELDS = [] as DataField[];
 const isComposite = (format: string) => !!format.match(/^array</);
 const toSimple = (format: string) => format.slice(6, -1);
 
+const accumulate = (xs: number[]): number[] => {
+  let out: number[] = [];
+  let n = xs.length;
+  let accum = 0;
+  for (let i = 0; i < n; ++i) {
+    out.push(accum);
+    accum += xs[i];
+  }
+  return out;
+}
+
+const iterateChunks = (
+  data: any[] | undefined,
+  field: DataField,
+  callback: (n: number, item?: any) => void,
+) => {
+  // Read out chunk lengths and cycle flag
+  let [format, accessor] = field;
+  format = toSimple(format);
+
+  // Prepare format appropriate accessor
+  if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
+  const f = format as any as UniformType;
+  const dims = UNIFORM_DIMS[f];
+
+  let {raw, length: l, fn} = makeDataAccessor(f, accessor);
+
+  const push = (list: any, item?: any) => {
+    const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);
+    callback(n, item);
+  }
+
+  if (raw && l != null) for (let i = 0; i < l; ++i) {
+    push(raw[i]);
+  }
+  else if (fn && data) for (const v of data) {
+    push(fn(v), v);
+  }
+}
+
 export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   const device = useContext(DeviceContext);
 
@@ -63,34 +103,27 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       return l;
     }, 0) as number;
 
-    // Look for first composite field
-    const composites = fs.filter(([format]) => isComposite(format));
+    // Look for index field
+    const indexes = fs.filter(([,, isIndex]) => isIndex);
+    const [index] = indexes;
+
+    // Look for first non-index composite field
+    const composites = fs.filter(([format,, isIndex]) => isComposite(format) && !isIndex);
     const [composite] = composites;
     if (!composite) {
       const length = data?.length ?? rawLength ?? 0;
       return {chunks: [length], loops: undefined, starts: undefined, ends: undefined, count: length};
     }
 
-    // Read out chunk lengths and cycle flag
-    let [format, accessor] = composite;
-    format = toSimple(format);
-
-    // Prepare format appropriate accessor
-    if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
-    const f = format as any as UniformType;
-    const dims = UNIFORM_DIMS[f];
-
-    let {raw, length: l, fn} = makeDataAccessor(f, accessor);
-
     // Gather chunk sizes and chunk metadata
-    const chunks = [] as number[];
+    const dataChunks = [] as number[];
+    const indexChunks = index ? [] as number[] : undefined;
     const loops = isLoop ? [] as boolean[] : undefined;
     const starts = isStart ? [] as boolean[] : undefined;
     const ends = isEnd ? [] as boolean[] : undefined;
 
-    const push = (list: any, item?: any) => {
-      const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);
-      chunks.push(n);
+    iterateChunks(data, composite, (n: number, item?: any) => {
+      dataChunks.push(n);
 
       if (item != null) {
         if (isLoop) {
@@ -106,18 +139,27 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
           ends!.push(!!end);
         }
       }
+    });
+
+    if (index) {
+      iterateChunks(data, index, (n: any) => indexChunks!.push(n));
     }
 
-    if (raw && l != null) for (let i = 0; i < l; ++i) {
-      push(raw[i]);
-    }
-    else if (fn && data) for (const v of data) {
-      push(fn(v), v);
-    }
+    const chunks = indexChunks ?? dataChunks;
+    const indexed = indexChunks && dataChunks;
 
     const count = getChunkCount(chunks, loops);
+    const offsets = indexed && accumulate(indexed);
 
-    return {chunks, loops, starts, ends, count};
+    return {
+      chunks,
+      loops,
+      starts,
+      ends,
+      count,
+      indexed,
+      offsets,
+    };
   }, [data, fs]);
 
   const {chunks, loops, starts, ends, count} = layout;
@@ -126,7 +168,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
 
-    const fieldBuffers = fs.map(([format, accessor]) => {
+    const fieldBuffers = fs.map(([format, accessor, isIndex]) => {
       const composite = isComposite(format);
       format = composite ? toSimple(format) : format;
 
@@ -147,7 +189,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         version: 0,
       };
 
-      return {buffer, array, source, dims, accessor: fn, raw, composite};
+      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex};
     });
 
     const fieldSources = fieldBuffers.map(f => f.source);
@@ -157,20 +199,25 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   
   // Refresh and upload data
   const refresh = () => {
-    for (const {buffer, array, source, dims, accessor, raw, composite} of fieldBuffers) if (raw || data) {
+    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex} of fieldBuffers) if (raw || data) {
+      const a = accessor as Accessor;
+      const c = isIndex ? chunks : layout.indexed ?? chunks;
+      const l = (!layout.indexed || isIndex) ? loops : false;
+      const o = isIndex ? layout.offsets : undefined;
       if (composite) {
-        if (raw) copyNumberArraysComposite(raw, array, dims, chunks, loops);
-        else if (data) copyDataArraysComposite(data, array, dims, chunks, loops, accessor as Accessor);
+        if (raw) copyNumberArraysComposite(raw, array, dims, a, c, l, o);
+        else if (data) copyDataArraysComposite(data, array, dims, a, c, l, o);
       }
       else {
-        if (raw) copyNumberArrayChunked(raw, array, dims, chunks, loops);
-        else if (data) copyDataArrayChunked(data, array, dims, chunks, loops, accessor as Accessor);
+        if (raw) copyNumberArrayChunked(raw, array, dims, c, l, layout.indexed);
+        else if (data) copyDataArrayChunked(data, array, dims, a, c, l, o);
       }
       uploadBuffer(device, buffer, array.buffer);
 
       source.length = count;
       source.size[0] = count;
       source.version = incrementVersion(source.version);
+      source.array = array;
     }
   };
   

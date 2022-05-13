@@ -229,6 +229,8 @@ export type PickingUniforms = {
 
 export type ChunkLayout = {
   chunks: number[],
+  indexed?: number[],
+  offsets?: number[],
   loops?: boolean[],
   starts?: boolean[],
   ends?: boolean[],
@@ -250,7 +252,7 @@ export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
 export type ArrayLike = any[] | TypedArray;
 
 export type AccessorSpec = string | Accessor | ArrayLike;
-export type DataField = [string, AccessorSpec];
+export type DataField = [string, AccessorSpec] | [string, AccessorSpec, boolean];
 export type DataBinding<T = any, S = any> = {
   uniform: UniformAttribute,
   storage?: StorageSource,

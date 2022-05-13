@@ -15,6 +15,21 @@ import {
   LineLayer, ArrowLayer,
 } from '@use-gpu/components';
 
+// Convex and concave polygon data
+
+const convexDataFields = [
+  ['array<vec4<f32>>', (o: any) => o.positions],
+  ['vec4<f32>', 'color'],
+] as DataField[];
+
+const concaveDataFields = [
+  ['array<vec4<f32>>', (o: any) => o.positions],
+  ['vec4<f32>', 'color'],
+  ['array<u32>', (o: any) => o.indices, true],
+] as DataField[];
+
+// Generate some random polygons
+
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 const randomColor = () => [Math.random(), Math.random(), Math.random(), 1];
@@ -66,19 +81,6 @@ let concaveFaceData = seq(20).map(i => {
 		color: randomColor(),
 	};
 });
-console.log(convexFaceData);
-console.log(concaveFaceData);
-
-const convexDataFields = [
-  ['array<vec4<f32>>', (o: any) => o.positions],
-  ['vec4<f32>', 'color'],
-] as DataField[];
-
-const concaveDataFields = [
-  ['array<vec4<f32>>', (o: any) => o.positions],
-  ['vec4<f32>', 'color'],
-  ['array<u32>', (o: any) => o.indices, true],
-] as DataField[];
 
 export const GeometryFacesPage: LC = () => {
 

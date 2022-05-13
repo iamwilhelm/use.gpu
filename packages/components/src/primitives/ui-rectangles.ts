@@ -12,7 +12,7 @@ import { LayoutContext } from '../providers/layout-provider';
 import { render } from './render';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, useCallback, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';

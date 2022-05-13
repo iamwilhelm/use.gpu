@@ -18,7 +18,7 @@ const REPEAT_FLAG = {
   'xy':   3,
 };
 
-export type SurfaceProps = {
+export type UIRectangleProps = {
   id: number,
   layout: Rectangle,
 
@@ -32,7 +32,7 @@ export type SurfaceProps = {
   transform?: ShaderModule
 };
 
-export const Surface: LiveComponent<SurfaceProps> = (props) => {
+export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
   const {
     id,
     image,

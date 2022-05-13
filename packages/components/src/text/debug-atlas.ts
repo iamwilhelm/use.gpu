@@ -4,7 +4,6 @@ import { debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } f
 import { TextureSource } from '@use-gpu/core';
 
 import { SDFFontContext, SDF_FONT_ATLAS } from './providers/sdf-font-provider';
-import { Surface } from '../layout/shape/surface';
 import { CompositeData } from '../data';
 
 type DebugAtlasProps = {

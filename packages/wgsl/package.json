@@ -148,6 +148,11 @@
       "import": "./src/plot/scale.wgsl",
       "require": "./src/plot/scale.wgsl"
     },
+    "./plot/surface.wgsl": {
+      "types": "./src/plot/surface.wgsl.d.ts",
+      "import": "./src/plot/surface.wgsl",
+      "require": "./src/plot/surface.wgsl"
+    },
     "./render/fragment/mesh.wgsl": {
       "types": "./src/render/fragment/mesh.wgsl.d.ts",
       "import": "./src/render/fragment/mesh.wgsl",

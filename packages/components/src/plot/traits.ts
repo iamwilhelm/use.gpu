@@ -43,6 +43,7 @@ import {
   PointTrait,
   ROPTrait,
   ScaleTrait,
+  SurfaceTrait,
 } from './types';
 
 import { vec4 } from 'gl-matrix';
@@ -199,6 +200,16 @@ const SCALE_DEFAULTS = {
   nice: true,
 };
 
+const SURFACE_TRAIT = {
+  loopX: parseBoolean,
+  loopY: parseBoolean,
+};
+
+const SURFACE_DEFAULTS = {
+  loopX: false,
+  loopY: false,
+};
+
 export const useProp = <A, B>(value: A | undefined, parse: (t?: A) => B, def?: B): B =>
   useOne(() => def !== undefined && value === undefined ? def : parse(value), value);
 
@@ -238,18 +249,19 @@ const useTrait = <
   return parsed as T;
 };
 
-export const useAnchorTrait = makeUseTrait<AnchorTrait>(ANCHOR_TRAIT, ANCHOR_DEFAULTS);
-export const useArrowTrait  = makeUseTrait<ArrowTrait>(ARROW_TRAIT, ARROW_DEFAULTS);
-export const useAxesTrait   = makeUseTrait<AxesTrait>(AXES_TRAIT, AXES_DEFAULTS);
-export const useAxisTrait   = makeUseTrait<AxisTrait>(AXIS_TRAIT, AXIS_DEFAULTS);
-export const useFontTrait   = makeUseTrait<FontTrait>(FONT_TRAIT, FONT_DEFAULTS);
-export const useGridTrait   = makeUseTrait<GridTrait>(GRID_TRAIT, GRID_DEFAULTS);
-export const useLabelTrait  = makeUseTrait<LabelTrait>(LABEL_TRAIT, LABEL_DEFAULTS);
-export const useLineTrait   = makeUseTrait<LineTrait>(LINE_TRAIT, LINE_DEFAULTS);
-export const useObjectTrait = makeUseTrait<ObjectTrait>(OBJECT_TRAIT, OBJECT_DEFAULTS);
-export const usePointTrait  = makeUseTrait<PointTrait>(POINT_TRAIT, POINT_DEFAULTS);
-export const useROPTrait    = makeUseTrait<ROPTrait>(ROP_TRAIT, ROP_DEFAULTS);
-export const useScaleTrait  = makeUseTrait<ScaleTrait>(SCALE_TRAIT, SCALE_DEFAULTS);
+export const useAnchorTrait  = makeUseTrait<AnchorTrait>(ANCHOR_TRAIT, ANCHOR_DEFAULTS);
+export const useArrowTrait   = makeUseTrait<ArrowTrait>(ARROW_TRAIT, ARROW_DEFAULTS);
+export const useAxesTrait    = makeUseTrait<AxesTrait>(AXES_TRAIT, AXES_DEFAULTS);
+export const useAxisTrait    = makeUseTrait<AxisTrait>(AXIS_TRAIT, AXIS_DEFAULTS);
+export const useFontTrait    = makeUseTrait<FontTrait>(FONT_TRAIT, FONT_DEFAULTS);
+export const useGridTrait    = makeUseTrait<GridTrait>(GRID_TRAIT, GRID_DEFAULTS);
+export const useLabelTrait   = makeUseTrait<LabelTrait>(LABEL_TRAIT, LABEL_DEFAULTS);
+export const useLineTrait    = makeUseTrait<LineTrait>(LINE_TRAIT, LINE_DEFAULTS);
+export const useObjectTrait  = makeUseTrait<ObjectTrait>(OBJECT_TRAIT, OBJECT_DEFAULTS);
+export const usePointTrait   = makeUseTrait<PointTrait>(POINT_TRAIT, POINT_DEFAULTS);
+export const useROPTrait     = makeUseTrait<ROPTrait>(ROP_TRAIT, ROP_DEFAULTS);
+export const useScaleTrait   = makeUseTrait<ScaleTrait>(SCALE_TRAIT, SCALE_DEFAULTS);
+export const useSurfaceTrait = makeUseTrait<SurfaceTrait>(SURFACE_TRAIT, SURFACE_DEFAULTS);
 
 export const useColorTrait = (props: Partial<ColorTrait>): vec4 => {
   const {

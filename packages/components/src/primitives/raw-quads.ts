@@ -11,7 +11,7 @@ import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, useCallback, useMemo } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -110,8 +110,6 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
       : PIPELINE_ALPHA,
     propPipeline),
     [propPipeline, alphaToCoverage]);
-
-  const key = useFiber().id;
 
   const p = useShaderRef(props.position, props.positions);
   const r = useShaderRef(props.rectangle, props.rectangles);

@@ -6,7 +6,7 @@ import { ImageAttachment, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Poi
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { parseDimension, normalizeMargin } from '../lib/util';
 
-import { Surface } from '../shape/surface';
+import { UIRectangle } from '../shape/ui-rectangle';
 
 export type ElementProps = {
   width?: Dimension,
@@ -71,7 +71,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       const size = [w, h];
 
       const render = (layout: Rectangle, transform?: ShaderModule): LiveElement<any> => (
-        keyed(Surface, id, {
+        keyed(UIRectangle, id, {
           id,
           layout,
 

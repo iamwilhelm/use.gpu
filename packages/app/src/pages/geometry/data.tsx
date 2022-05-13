@@ -13,6 +13,16 @@ import {
   Cursor, PointLayer, LineLayer,
 } from '@use-gpu/components';
 
+// Line data fields
+
+const lineDataFields = [
+  ['array<vec4<f32>>', (o: any) => o.path],
+  ['vec4<f32>', 'color'],
+  ['f32', 'width'],
+] as DataField[];
+
+// Generate a line voxel grid 
+
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 const vecSteps = [
@@ -37,12 +47,6 @@ const lineData = seq(20).map((i) => ({
   width: Math.random() * 20 + 1,
   loop: false,
 }));
-
-const lineDataFields = [
-  ['array<vec4<f32>>', (o: any) => o.path],
-  ['vec4<f32>', 'color'],
-  ['f32', 'width'],
-] as DataField[];
 
 let t = 0;
 

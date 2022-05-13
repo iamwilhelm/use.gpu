@@ -6,7 +6,7 @@ import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
 
-import { Surface } from './shape/surface';
+import { UIRectangle } from './shape/ui-rectangle';
 
 export type LayoutProps = {
   inspect?: boolean,
@@ -87,7 +87,7 @@ export const Inspect = (pickers: any[]) => {
 
   const [, rectangle] = picked;
   return useMemo(() => 
-    use(Surface, {
+    use(UIRectangle, {
       id,
       layout: rectangle,
       fill: [0, 1, 1, .2],

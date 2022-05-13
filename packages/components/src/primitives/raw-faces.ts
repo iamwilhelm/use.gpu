@@ -11,7 +11,7 @@ import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -67,14 +67,13 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
     if (indices != null) return indices / 3;
     if (segments != null) return segments - 2;
-    if (positions != null) return positions / 3;
+    if (positions != null && !props.indices) return positions / 3;
 
     const c = resolve(count) || 0;
-    return (props.segments != null) ? c - 2 : c / 3;
+    return (props.segments != null) ? c - 2 : c;
   }, [props.positions, props.segments, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-  const key = useFiber().id;
 
   const p = useShaderRef(props.position, props.positions);
   const n = useShaderRef(props.normal, props.normals);

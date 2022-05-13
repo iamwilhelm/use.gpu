@@ -110,3 +110,8 @@ export type DomainOptions = {
   factor: number,
   nice: boolean,
 };
+
+export type SurfaceTrait = {
+  loopX: boolean,
+  loopY: boolean,
+};

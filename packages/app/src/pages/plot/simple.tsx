@@ -9,7 +9,7 @@ import {
   Loop, Draw, Pass, Flat,
   CompositeData, ArrayData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, Point, Line,
+  Pick, Cursor, Line, Surface,
   Animation,
   Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
   LinearRGB,
@@ -117,11 +117,9 @@ export const PlotSimplePage: LC = () => {
                     emit(x, v * .5 + .5, y, 1);
                   }}
                 >
-                  <Point
-                    size={10}
-                    color={[0.2, 0.5, 1, 1]}
-                    depth={0.5}
-                  />
+									<Surface
+										color={[0.1, 0.3, 1, 1]}
+									/>
                   <Line
                     size={5}
                     color={[0.5, 0.5, 1, 0.5]}

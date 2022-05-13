@@ -11,7 +11,7 @@ import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, yeet, memo, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
@@ -53,7 +53,6 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
   const instanceCount = 1;
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-  const key = useFiber().id;
 
   const t = props.texture;
 

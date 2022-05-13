@@ -13,6 +13,20 @@ import {
   LineLayer, ArrowLayer,
 } from '@use-gpu/components';
 
+// Line data fields
+
+const dataFields = [
+  ['array<vec4<f32>>', (o: any) => o.path],
+  ['vec4<f32>', 'color'],
+  ['f32', 'width'],
+] as DataField[];
+
+const isLoop = (o: any) => o.loop;
+const isStart = (o: any) => o.start;
+const isEnd = (o: any) => o.end;
+
+// Generate some lines and arrows
+
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 const randomColor = () => [Math.random(), Math.random(), Math.random(), 1];
@@ -49,16 +63,6 @@ let arrowData = seq(9).map((i) => ({
   start: !(i % 2),
   end: !(i % 3) || i === 7,
 }))
-
-const isLoop = (o: any) => o.loop;
-const isStart = (o: any) => o.start;
-const isEnd = (o: any) => o.end;
-
-const dataFields = [
-  ['array<vec4<f32>>', (o: any) => o.path],
-  ['vec4<f32>', 'color'],
-  ['f32', 'width'],
-] as DataField[];
 
 export const GeometryLinesPage: LC = () => {
 

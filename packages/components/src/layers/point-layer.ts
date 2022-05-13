@@ -9,7 +9,7 @@ import { ShaderSource } from '@use-gpu/shader/types';
 import { RawQuads } from '../primitives/raw-quads';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingToModule, castTo } from '@use-gpu/shader/wgsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -63,8 +63,6 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
-
-  const key = useFiber().id;
 
   const s = useShaderRef(size, sizes);
 

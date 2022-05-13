@@ -194,6 +194,13 @@ declare module "@use-gpu/wgsl/plot/scale.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/plot/surface.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getSurfaceIndex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/render/fragment/mesh.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;

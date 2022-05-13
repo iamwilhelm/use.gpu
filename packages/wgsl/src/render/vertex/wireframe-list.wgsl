@@ -29,24 +29,28 @@ fn main(
   var v = u32(f) % 3u;
   var t = u32(f) - v;
 
-  var a: SolidVertex;
-  var b: SolidVertex;
-  var c: SolidVertex;
+  var ia: u32;
+  var ib: u32;
+  var ic: u32;
   if (v == 0u) {
-    a = getVertex(t, i);
-    b = getVertex(t + 1u, i);
-    c = getVertex(t + 2u, i);
+    ia = t;
+    ib = t + 1u;
+    ic = t + 2u;
   }
   else if (v == 1u) {
-    a = getVertex(t + 1u, i);
-    b = getVertex(t + 2u, i);
-    c = getVertex(t, i);
+    ia = t + 1u;
+    ib = t + 2u;
+    ic = t;
   }
   else if (v == 2u) {
-    a = getVertex(t + 2u, i);
-    b = getVertex(t, i);
-    c = getVertex(t + 1u, i);
+    ia = t + 2u;
+    ib = t;
+    ic = t + 1u;
   }
+
+  var a = getVertex(ia, i);
+  var b = getVertex(ib, i);
+  var c = getVertex(ic, i);
 
   var left = a.position.xyz / a.position.w;
   var right = b.position.xyz / b.position.w;

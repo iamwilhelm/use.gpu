@@ -1,7 +1,7 @@
 use '@use-gpu/glsl/use/picking'::{ getPickingColor };
 use './sdf'::{ SDF, getBorderBoxSDF, getRoundedBorderBoxSDF };
 
-@external fn getTexture(uv: vec2<f32>) -> vec4<f32> {};
+@link fn getTexture(uv: vec2<f32>) -> vec4<f32> {};
 
 let NO_BORDER = vec4<f32>(0.0, 0.0, 0.0, 0.0);
 

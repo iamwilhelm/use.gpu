@@ -9,9 +9,9 @@ import {
   Loop, Draw, Pass, Flat,
   CompositeData, ArrayData, Data, RawData, Raw,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, PointLayer,
+  Pick, Cursor, Point, Line,
   Animation,
-  Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled,
+  Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
   LinearRGB,
 } from '@use-gpu/components';
 
@@ -116,15 +116,25 @@ export const PlotSimplePage: LC = () => {
                     const v = Math.cos(x) * Math.cos(y);
                     emit(x, v * .5 + .5, y, 1);
                   }}
-                  render={(data: StorageSource) =>
-                    <PointLayer
-                      positions={data}
-                      size={10}
-                      color={[0.2, 0.5, 1, 1]}
+                >
+                  <Point
+                    size={10}
+                    color={[0.2, 0.5, 1, 1]}
+                    depth={0.5}
+                  />
+                  <Line
+                    size={5}
+                    color={[0.5, 0.5, 1, 0.5]}
+                    depth={0.5}
+                  />
+                  <Transpose axes='yx'>
+                    <Line
+                      size={5}
+                      color={[0.5, 0.5, 1, 0.5]}
                       depth={0.5}
                     />
-                  }
-                />
+                  </Transpose>
+                </Sampled>
               </Cartesian>
             </Animation>
           </Plot>

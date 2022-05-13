@@ -95,14 +95,17 @@ vec2 _VT_1_getSize(int index) {
 exports[`bind makes deterministic links for data bindings 1`] = `
 Object {
   "base": undefined,
-  "code": "@access [getColor getSize] [76t47n221m]",
-  "name": "_VT_76t47n",
+  "code": "@access [getColor getSize] [7fwcbrd6ow]",
+  "name": "_VT_7fwcbr",
   "storages": Array [
     Object {
       "storage": Object {
         "buffer": Object {},
         "format": "vec2",
         "length": 10,
+        "size": Array [
+          10,
+        ],
         "version": 1,
       },
       "uniform": Object {

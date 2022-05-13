@@ -2,20 +2,20 @@ use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }; 
 
-@optional @external fn getIndex(i: u32) -> u32 { return 0u; };
-@optional @external fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
-@optional @external fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
-@optional @external fn getLayout(i: u32) -> vec2<f32> { return vec2<f32>(0.0, 0.0); };
+@optional @link fn getIndex(i: u32) -> u32 { return 0u; };
+@optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
+@optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
+@optional @link fn getLayout(i: u32) -> vec2<f32> { return vec2<f32>(0.0, 0.0); };
 
-@optional @external fn getSDFConfig(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 1.0, 16.0, 0.0); };
+@optional @link fn getSDFConfig(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 1.0, 16.0, 0.0); };
 
-@optional @external fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
-@optional @external fn getPlacement(i: u32) -> vec2<f32> { return vec2<f32>(0.0, 0.0); };
-@optional @external fn getOffset(i: u32) -> f32 { return 0.0; };
-@optional @external fn getSize(i: u32) -> f32 { return 16.0; };
-@optional @external fn getDepth(i: u32) -> f32 { return 0.0; };
-@optional @external fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
-@optional @external fn getExpand(i: u32) -> f32 { return 0.0; };
+@optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
+@optional @link fn getPlacement(i: u32) -> vec2<f32> { return vec2<f32>(0.0, 0.0); };
+@optional @link fn getOffset(i: u32) -> f32 { return 0.0; };
+@optional @link fn getSize(i: u32) -> f32 { return 16.0; };
+@optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
+@optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
+@optional @link fn getExpand(i: u32) -> f32 { return 0.0; };
 
 @export fn getLabelVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
 

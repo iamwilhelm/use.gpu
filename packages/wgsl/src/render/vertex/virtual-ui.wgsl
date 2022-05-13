@@ -1,7 +1,7 @@
 use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use "@use-gpu/wgsl/use/color"::{ toColorSpace };
 
-@external fn getVertex(v: u32, i: u32) -> UIVertex {};
+@link fn getVertex(v: u32, i: u32) -> UIVertex {};
 
 struct VertexOutput {
   @builtin(position)               position: vec4<f32>,

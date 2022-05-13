@@ -29,7 +29,7 @@ use 'path/to/color'::{ getColor };
 
 ```wgsl
 // WGSL
-@external fn getColor() -> vec4<f32> {};
+@link fn getColor() -> vec4<f32> {};
 ```
 
 ```glsl
@@ -99,14 +99,14 @@ use "path/to/file"::{ symbol as symbol, … };
 
 // Mark function as linked at runtime (function body is ignored).
 // Will be removed.
-@external fn func() { }
+@link fn func() { }
 
 // Mark declaration as exported (can be linked to)
 @export fn func() { }
 
 // Mark function as linked at runtime but optional.
 // Given function body is used if not linked.
-@external @optional fn func() -> f32 { return 1.0; }
+@link @optional fn func() -> f32 { return 1.0; }
 
 // Mark next declaration as global (don't namespace it)
 @global fn func() -> f32 { return 1.0; }

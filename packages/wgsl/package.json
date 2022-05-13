@@ -48,6 +48,11 @@
       "import": "./src/geometry/quad.wgsl",
       "require": "./src/geometry/quad.wgsl"
     },
+    "./geometry/segment.wgsl": {
+      "types": "./src/geometry/segment.wgsl.d.ts",
+      "import": "./src/geometry/segment.wgsl",
+      "require": "./src/geometry/segment.wgsl"
+    },
     "./geometry/strip.wgsl": {
       "types": "./src/geometry/strip.wgsl.d.ts",
       "import": "./src/geometry/strip.wgsl",
@@ -112,6 +117,11 @@
       "types": "./src/mask/textured.wgsl.d.ts",
       "import": "./src/mask/textured.wgsl",
       "require": "./src/mask/textured.wgsl"
+    },
+    "./plot/array.wgsl": {
+      "types": "./src/plot/array.wgsl.d.ts",
+      "import": "./src/plot/array.wgsl",
+      "require": "./src/plot/array.wgsl"
     },
     "./plot/axis.wgsl": {
       "types": "./src/plot/axis.wgsl.d.ts",

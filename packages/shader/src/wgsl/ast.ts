@@ -32,7 +32,7 @@ export { decompressAST } from '../util/tree';
 const NO_STRINGS = [] as string[];
 const VOID_TYPE = {name: 'void'};
 const AUTO_TYPE = {name: 'auto'};
-const PRIVATE_ATTRIBUTES = new Set(['@export', '@external', '@global', '@optional']);
+const PRIVATE_ATTRIBUTES = new Set(['@export', '@link', '@global', '@optional']);
 
 const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
 
@@ -281,7 +281,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
   const getFlags = (ref: AttributesRef) => {
     const isExported = hasAttribute(ref.attributes, 'export');
-    const isExternal = hasAttribute(ref.attributes, 'external');
+    const isExternal = hasAttribute(ref.attributes, 'link');
     const isOptional = hasAttribute(ref.attributes, 'optional');
     const isGlobal   = hasAttribute(ref.attributes, 'global');
 
@@ -469,7 +469,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 // Removes:
 // - import ... from declarations
 // - @export | @optional | @global attributes
-// - @external declarations
+// - @link declarations
 // - white-space/semi-colons after shake point
 export const rewriteUsingAST = (
   code: string,
@@ -540,7 +540,7 @@ export const rewriteUsingAST = (
         sub.firstChild();
 
         const t = code.slice(sub.from, sub.to);
-        if (t.match('@external')) {
+        if (t.match('@link')) {
           if (t.match('@optional')) {
             while (sub.lastChild()) {};
             sub.next();
@@ -618,7 +618,7 @@ export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
       sub.firstChild();
 
       const t = code.slice(sub.from, sub.to);
-      if (t.match('@external')) {
+      if (t.match('@link')) {
         if (t.match('@optional')) {
           while (sub.lastChild()) {};
           sub.next();

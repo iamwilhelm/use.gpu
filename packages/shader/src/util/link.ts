@@ -176,7 +176,7 @@ export const makeLinker = (
     // Replace imported function prototype names with target
     if (externals) for (const {flags, func} of externals) if (func) {
       const {name} = func;
-      const key = importMap!.get(name);
+      const key = importMap?.get(name);
       const ns = namespaces.get(key);
 
       const resolved = aliasMap?.get(name) ?? name;

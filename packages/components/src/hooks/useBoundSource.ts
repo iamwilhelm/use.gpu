@@ -10,9 +10,9 @@ type Ref<T> = { current: T };
 const NO_SOURCES: any[] = [];
 
 // Turn a shader source/constant/lambda into a virtual shader module
-export const useBoundSource = (
+export const useBoundSource = <T = any>(
   def: UniformAttribute | UniformAttributeValue,
-  source: ShaderSource,
+  source: ShaderSource | T,
 ) => {
   return useMemo(() => {
     const s = source as any;

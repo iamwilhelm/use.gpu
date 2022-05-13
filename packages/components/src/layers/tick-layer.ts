@@ -16,7 +16,7 @@ import { useBoundShader } from '../hooks/useBoundShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getTickPosition } from '@use-gpu/wgsl/instance/vertex/tick.wgsl';
-import { getLineSegment } from '@use-gpu/wgsl/geometry/line.wgsl';
+import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 
 export type TickLayerProps = {
   position?: number[] | TypedArray,

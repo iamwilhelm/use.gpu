@@ -32,7 +32,6 @@ declare module "@use-gpu/wgsl/geometry/arrow.wgsl" {
 declare module "@use-gpu/wgsl/geometry/line.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  export const getLineSegment: ParsedBundle;
   export const lineJoinBevel: ParsedBundle;
   export const lineJoinMiter: ParsedBundle;
   export const lineJoinRound: ParsedBundle;
@@ -45,6 +44,13 @@ declare module "@use-gpu/wgsl/geometry/quad.wgsl" {
   const __module: ParsedBundle;
   export const getQuadIndex: ParsedBundle;
   export const getQuadUV: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/geometry/segment.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLineSegment: ParsedBundle;
   export default __module;
 }
 
@@ -142,6 +148,14 @@ declare module "@use-gpu/wgsl/mask/textured.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getTextureFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/plot/array.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const unpackIndex: ParsedBundle;
+  export const packIndex: ParsedBundle;
   export default __module;
 }
 

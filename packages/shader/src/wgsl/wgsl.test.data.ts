@@ -5,10 +5,10 @@ use '@use-gpu/wgsl/use/types'::{ SolidVertex };
 use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }; 
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
-@external fn getPosition(i: i32) -> vec4<f32> {};
-@external fn getColor(i: i32) -> vec4<f32> {};
-@external fn getSize(i: i32) -> vec2<f32> {};
-@external fn getDepth(i: i32) -> f32 {};
+@link fn getPosition(i: i32) -> vec4<f32> {};
+@link fn getColor(i: i32) -> vec4<f32> {};
+@link fn getSize(i: i32) -> vec2<f32> {};
+@link fn getDepth(i: i32) -> f32 {};
 
 @export fn getQuadVertex(vertexIndex: i32, instanceIndex: i32) -> SolidVertex {
   var position = getPosition(instanceIndex);
@@ -45,7 +45,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 `,
 
   "instance/fragment/solid": `
-@external fn getFragment(color: vec4<f32>, uv: vec2<f32>) -> vec4<f32> {};
+@link fn getFragment(color: vec4<f32>, uv: vec2<f32>) -> vec4<f32> {};
 
 @stage(fragment)
 fn main(

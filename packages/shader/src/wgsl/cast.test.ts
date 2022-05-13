@@ -43,7 +43,7 @@ describe('cast', () => {
     `;
 
     const main = `
-    @external fn getValue() -> vec3<f32> {};
+    @link fn getValue() -> vec3<f32> {};
     fn main() { getValue(); }
     `;
 

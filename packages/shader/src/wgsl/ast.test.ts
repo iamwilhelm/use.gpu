@@ -27,7 +27,7 @@ describe('ast', () => {
 
     import 'test';
 
-    @optional @external fn getInt() -> i32 {}
+    @optional @link fn getInt() -> i32 {}
 
     @export fn main() {}
     `;
@@ -133,7 +133,7 @@ describe('ast', () => {
         vec2<i32>(1, 1),
       );
 
-      @optional @external fn getInt() -> i32 {}
+      @optional @link fn getInt() -> i32 {}
 
       @export fn main() {}
     `;
@@ -150,9 +150,9 @@ describe('ast', () => {
       @exported var x: f32;
       var y: f32;
 
-      @optional @external fn getFloat1() -> f32 {}
+      @optional @link fn getFloat1() -> f32 {}
 
-      @optional @external fn getFloat2() -> f32 { return x + y; }
+      @optional @link fn getFloat2() -> f32 { return x + y; }
 
       @export fn main() {
         var z: f32 = getFloat1() + getFloat2();

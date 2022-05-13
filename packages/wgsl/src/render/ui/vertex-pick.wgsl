@@ -10,9 +10,9 @@ struct VertexOutput {
   @location(4)                    fragUV: vec2<f32>,
 };
 
-@external fn getRectangle(i: u32) -> vec4<f32>;
-@external fn getRadius(i: u32) -> vec4<f32>;
-@external fn getUV(i: u32) -> vec4<f32>;
+@link fn getRectangle(i: u32) -> vec4<f32>;
+@link fn getRadius(i: u32) -> vec4<f32>;
+@link fn getUV(i: u32) -> vec4<f32>;
 
 @stage(vertex)
 fn main(

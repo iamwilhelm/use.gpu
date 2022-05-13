@@ -3,8 +3,8 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadIndex };
 use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 
-@external fn getVertex(v: u32, i: u32) -> SolidVertex {};
-@external fn getInstanceSize() -> u32 {};
+@link fn getVertex(v: u32, i: u32) -> SolidVertex {};
+@link fn getInstanceSize() -> u32 {};
 
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,

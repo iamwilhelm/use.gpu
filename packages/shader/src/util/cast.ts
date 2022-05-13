@@ -1,4 +1,4 @@
-import { ShaderModule, ParsedBundle, UniformAttribute } from '../types';
+import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../types';
 import { loadVirtualModule } from './shader';
 import { getHash } from './hash';
 import { toBundle, getBundleHash, getBundleKey } from './bundle';
@@ -25,9 +25,16 @@ export type MakeCastAccessor = (
   swizzle: string | CastTo,
 ) => string;
 
+const SYMBOLS = ['cast', 'getValue'];
+
 const EXTERNALS = [{
   func: {name: 'getValue'},
-  flags: 0,
+  flags: RF.External,
+}];
+
+const makeDeclarations = (type: any, parameters: any) => [{
+  func: {name: 'cast', type, parameters},
+  flags: RF.Exported,
 }];
 
 export const makeCastTo = (
@@ -52,8 +59,6 @@ export const makeCastTo = (
   const rehash = getHash(code);
   const rekey  = getHash(`${code} ${key}`);
 
-  const symbols = [entry, 'getValue'];
-
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {
     const name = rename.get(entry) ?? entry;
@@ -61,9 +66,11 @@ export const makeCastTo = (
     return makeCastAccessor(name, accessor, args ?? [], format, type, swizzle);
   }
 
+  const declarations = makeDeclarations(type, args);
+
   const cast = loadVirtualModule(
     { render },
-    { symbols, externals: EXTERNALS },
+    { symbols: SYMBOLS, declarations, externals: EXTERNALS },
     entry,
     rehash,
     code,
@@ -74,7 +81,13 @@ export const makeCastTo = (
     ? (virtuals ? [...virtuals, module] : [module])
     : virtuals;
 
-  return {module: cast, links: {getValue: bundle}, virtuals: revirtuals};
+  return {
+    module: cast,
+    links: {
+      getValue: bundle,
+    },
+    virtuals: revirtuals,
+  };
 }
 
 export const parseSwizzle = (swizzle: string | CastTo) => {

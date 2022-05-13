@@ -30,13 +30,14 @@ export const makeRenderPipeline = (
   const {colorStates, depthStencilState, samples} = renderContext;
 
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
+    layout: 'auto',
     depthStencil: depthStencilState,
     multisample: { count: samples },
     vertex: makeShaderStage(device, vertexShader),
     fragment: makeShaderStage(device, fragmentShader, {
       targets: colorStates,
     }),
-  }, descriptor) as any as GPURenderPipelineDescriptor;
+  } as any, descriptor) as any as GPURenderPipelineDescriptor;
 
   return device.createRenderPipeline(pipelineDescriptor);
 }

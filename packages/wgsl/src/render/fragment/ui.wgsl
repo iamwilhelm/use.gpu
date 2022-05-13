@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/fragment/sdf-2d'::{ SDF, getUVScale };
 
-@external fn getFragment(
+@link fn getFragment(
   fragUV: vec2<f32>,
   fragTextureUV: vec2<f32>,
   fragSDFUV: vec2<f32>,

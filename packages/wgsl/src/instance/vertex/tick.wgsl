@@ -1,11 +1,11 @@
 use '@use-gpu/wgsl/use/view'::{ worldToClip, getWorldScale };
 
-@external fn transformPosition(p: vec4<f32>) -> vec4<f32>;
+@link fn transformPosition(p: vec4<f32>) -> vec4<f32>;
 
-@external fn getPosition(i: u32) -> vec4<f32>;
-@external fn getOffset(i: u32) -> vec4<f32>;
-@external fn getDepth(i: u32) -> f32;
-@external fn getSize(i: u32) -> f32;
+@link fn getPosition(i: u32) -> vec4<f32>;
+@link fn getOffset(i: u32) -> vec4<f32>;
+@link fn getDepth(i: u32) -> f32;
+@link fn getSize(i: u32) -> f32;
 
 let EPSILON: f32 = 0.001;
 

@@ -1,7 +1,7 @@
 use './sdf'::{ SDF, getUVScale, getBorderBoxSDF, getRoundedBorderBoxSDF };
 use '@use-gpu/wgsl/use/color'::{ premultiply };
 
-@optional @external fn getTexture(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
+@optional @link fn getTexture(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
 
 @stage(fragment)
 fn main(

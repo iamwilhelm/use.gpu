@@ -11,7 +11,7 @@ import { isSameDependencies, incrementVersion, tagFunction } from './util';
 import { formatNode, formatNodeName } from './debug';
 
 let ID = 0;
-let DEBUG = true;
+let DEBUG = false;
 //setTimeout((() => DEBUG = false), 900);
 
 const NO_FIBER = () => () => {};
@@ -637,7 +637,7 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   if (isArray) reconcileFiberCalls(fiber, element as any);
   else {
     const call = element as DeferredCall<any>;
-    if (call && (call.f as any).isLiveInline) updateFiber(fiber, call as any);
+    if (call && (call.f as any)?.isLiveInline) updateFiber(fiber, call as any);
     else mountFiberCall(fiber, call as any);
   }
 }

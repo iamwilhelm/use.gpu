@@ -2,15 +2,15 @@ use '@use-gpu/wgsl/use/types'::{ SolidVertex };
 use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 
-@optional @external fn getVertex(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
+@optional @link fn getVertex(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 
-@optional @external fn getAnchor(i: u32) -> vec4<u32> { return vec4<u32>(0u, 1u, 0u, 0u); };
+@optional @link fn getAnchor(i: u32) -> vec4<u32> { return vec4<u32>(0u, 1u, 0u, 0u); };
 
-@optional @external fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
-@optional @external fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
-@optional @external fn getSize(i: u32) -> f32 { return 3.0; };
-@optional @external fn getWidth(i: u32) -> f32 { return 1.0; };
-@optional @external fn getDepth(i: u32) -> f32 { return 0.0; };
+@optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
+@optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
+@optional @link fn getSize(i: u32) -> f32 { return 3.0; };
+@optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
+@optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
   
 let ARROW_ASPECT: f32 = 2.5;
 

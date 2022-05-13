@@ -26,14 +26,14 @@ Array [
     ],
   ],
   Array [
-    106,
+    102,
     Array [
       "getFloat2",
       "main",
     ],
   ],
   Array [
-    173,
+    165,
     Array [
       "main",
     ],
@@ -210,7 +210,7 @@ Object {
           },
           Object {
             "args": undefined,
-            "name": "external",
+            "name": "link",
           },
         ],
         "identifiers": Array [],
@@ -225,7 +225,7 @@ Object {
       "symbol": "getInt",
     },
     Object {
-      "at": 446,
+      "at": 442,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -257,7 +257,7 @@ Object {
           },
           Object {
             "args": undefined,
-            "name": "external",
+            "name": "link",
           },
         ],
         "identifiers": Array [],

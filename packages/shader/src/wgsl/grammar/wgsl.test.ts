@@ -57,7 +57,7 @@ fn main() {}
 //////////////////////////////////////////////////////////////////////
 
 `
-@external fn main() {}
+@link fn main() {}
 `,
 
 //////////////////////////////////////////////////////////////////////
@@ -121,7 +121,7 @@ import {getQuadUV} from 'geometry/quad';
 
 import 'test';
 
-@optional @external fn getInt() -> i32 {}
+@optional @link fn getInt() -> i32 {}
 
 @export fn main() {}
 `,
@@ -135,7 +135,7 @@ use 'geometry/quad'::{getQuadUV};
 
 use 'test';
 
-@optional @external fn getInt() -> i32 {}
+@optional @link fn getInt() -> i32 {}
 
 @export fn main() {}
 `,

@@ -28,7 +28,7 @@ import { Data } from '../../data/data';
 import { LineLayer } from '../../layers/line-layer';
 
 import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
-import { getLineSegment } from '@use-gpu/wgsl/geometry/line.wgsl';
+import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 
 const GRID_BINDINGS = bundleToAttributes(getGridPosition);
 

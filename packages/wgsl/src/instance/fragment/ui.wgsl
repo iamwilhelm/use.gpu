@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/fragment/sdf-2d'::{ SDF, getUVScale };
 
-@external fn getTexture(uv: vec2<f32>) -> vec4<f32> {};
+@link fn getTexture(uv: vec2<f32>) -> vec4<f32> {};
  
 @export fn getUIFragment(
   uv: vec2<f32>,

@@ -1,6 +1,8 @@
 import React from 'react';
-import { styled } from '@stitches/react';
+import { styled as _styled } from '@stitches/react';
 import * as SliderPrimitive from '@radix-ui/react-slider';
+
+const styled: any = _styled;
 
 export type DetailProps = {
   value: number,
@@ -60,7 +62,7 @@ export const DetailSlider: React.FC<DetailProps> = (props: DetailProps) => {
   const {value, onChange} = props;
   
   return (
-    <StyledSlider value={[Math.min(12, value)]} onValueChange={(v) => onChange(v[0] < 12 ? v[0] : 100)} min={1} max={12}>
+    <StyledSlider value={[Math.min(12, value)]} onValueChange={(v: [number]) => onChange(v[0] < 12 ? v[0] : 100)} min={1} max={12}>
       <StyledTrack>
         <StyledRange />
       </StyledTrack>

@@ -1,4 +1,5 @@
-import { DeferredCall, LiveFiber } from './types';
+import { DeferredCall, LiveElement, LiveFiber } from './types';
+import { reactInterop } from './fiber';
 
 const {prototype: {hasOwnProperty}} = Object;
 
@@ -27,7 +28,10 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   return out.join("\n");
 }
 
-export const formatNodeName = <F extends Function>(node: DeferredCall<F>): string => {
+export const formatNodeName = <F extends Function>(_node: LiveElement<F>): string => {
+  const node = reactInterop(_node) as DeferredCall<F> | null;
+  if (!node) return 'null';
+  
   const {f, arg, args} = node;
 
   // @ts-ignore
@@ -72,7 +76,10 @@ export const formatNodeName = <F extends Function>(node: DeferredCall<F>): strin
   return name;
 }
 
-export const formatNode = <F extends Function>(node: DeferredCall<F>): string => {
+export const formatNode = <F extends Function>(_node: LiveElement<F>): string => {
+  const node = reactInterop(_node) as DeferredCall<F> | null;
+  if (!node) return '<null />';
+
   const name = formatNodeName(node);
 
   const args = [] as string[];

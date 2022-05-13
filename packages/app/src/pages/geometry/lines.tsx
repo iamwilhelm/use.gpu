@@ -84,7 +84,7 @@ export const GeometryLinesPage: LC = () => {
         <CompositeData
           fields={dataFields}
           data={zigzagData}
-          on={use(LineSegments)}
+          on={<LineSegments />}
           render={([positions, colors, widths, segments]: StorageSource[]) =>
             <LineLayer
               positions={positions}

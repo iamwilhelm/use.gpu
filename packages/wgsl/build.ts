@@ -49,7 +49,7 @@ try {
   PKG.exports = {".": "./src/index.ts"};
   for (let path of paths) {
     PKG.exports[path.replace('src/', '')] = {
-      "types": path.replace(/.wgsl$/, '.d.ts'),
+      "types": path.replace(/.wgsl$/, '.wgsl.d.ts'),
       "import": path,
       "require": path,
     };
@@ -86,7 +86,7 @@ const makeTSModule = (file: string, symbols?: string[]) => {
 
 files.map((file, i) => {
   const typeDef = makeTSModule(file, modules[i].table.visibles);
-  const dts = file.replace(/\.wgsl$/, '.d.ts');
+  const dts = file.replace(/\.wgsl$/, '.wgsl.d.ts');
   fs.writeFileSync(dts, typeDef);
 });
 

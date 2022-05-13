@@ -1,9 +1,9 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { LiveComponent, LiveNode, PropsWithChildren } from '@use-gpu/live/types';
 import { makeContext, memo, provide, use, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { Routes } from './routes';
 
 export type Route = {
-  element?: LiveElement<any>,
+  element?: LiveNode<any>,
   routes?: Record<string, Route>,
   exact?: boolean,
 };
@@ -25,21 +25,20 @@ export type RouterAPI = {
   back: () => void,
   forward: () => void,
   go: (n: number) => void,
-  push: (path: string, query: QueryParams | string) => void,
-  replace: (path: string, query: QueryParams | string) => void,
+  push: (path: string, query?: QueryParams | string) => void,
+  replace: (path: string, query?: QueryParams | string) => void,
 
-  linkTo: (path: string, query: QueryParams | string) => RouterLink,
+  linkTo: (path: string, query?: QueryParams | string) => RouterLink,
 };
 
 export const RouterContext = makeContext<RouterAPI>(undefined, 'RouterContext');
 
 export type RouterProps = {
   source?: any,
-  children?: LiveElement<any>,
   routes?: Record<string, Route>,
 };
 
-export const Router: LiveComponent<RouterProps> = memo(({source, routes, children}: RouterProps) => {
+export const Router: LiveComponent<RouterProps> = memo(({source, routes, children}: PropsWithChildren<RouterProps>) => {
 
   const src = useOne(() => source ?? makeBrowserHistory(), source);
 

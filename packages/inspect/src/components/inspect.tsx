@@ -50,17 +50,6 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
     return () => setHovered(false);
   }, [hoveredFiber])
 
-  const panes = selectedFiber ? [
-    {
-      menuItem: 'Props',
-      render: () => <Props fiber={selectedFiber} fibers={fibers} />
-    },
-    {
-      menuItem: 'Fiber',
-      render: () => <Call fiber={selectedFiber} fibers={fibers} />
-    },
-  ] : [];
-
   let vertexTab: React.ReactNode;
   let fragmentTab: React.ReactNode;
   if (selectedFiber) {
@@ -71,7 +60,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
         vertexTab = <Shader type="vertex" fiber={selectedFiber} />;
       }
       if (fragment) {
-        fragmentTab = <Shader type="fragment" fiber={selectedFiber} />
+        fragmentTab = <Shader type="fragment" fiber={selectedFiber} />;
       }
     }
   }
@@ -101,8 +90,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
           {vertexTab ? <Tabs.Trigger value="vertex">Vertex</Tabs.Trigger> : null}
           {fragmentTab ? <Tabs.Trigger value="fragment">Fragment</Tabs.Trigger> : null}
         </Tabs.List>
-        <Tabs.Content value="props"><Props fiber={selectedFiber} fibers={fibers} /></Tabs.Content>
-        <Tabs.Content value="fiber"><Call fiber={selectedFiber} fibers={fibers} /></Tabs.Content>
+        <Tabs.Content value="props">{selectedFiber ? <Props fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
+        <Tabs.Content value="fiber">{selectedFiber ? <Call fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
         {vertexTab ? <Tabs.Content value="vertex">{vertexTab}</Tabs.Content> : null }
         {fragmentTab ? <Tabs.Content value="fragment">{fragmentTab}</Tabs.Content> : null }
       </Tabs.Root>

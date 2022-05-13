@@ -17,7 +17,6 @@ export type InlineProps = {
   wrap?: boolean,
   snap?: boolean,
 
-  element?: LiveElement<any>,
   children?: LiveElement<any>,
 };
 

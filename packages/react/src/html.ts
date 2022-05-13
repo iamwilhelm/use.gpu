@@ -5,16 +5,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 export type HTMLProps = {
-  container: HTMLElement,
-  style: Record<string, any>,
-  children: React.ReactNode,
+  container: Element,
+  style?: Record<string, any>,
+  children?: React.ReactNode,
 };
 
-export const HTML: LiveComponent<HTMLProps> = ({
+export const HTML = ({
   container = document.body,
   style,
   children,
-}) => {
+}: HTMLProps) => {
   const fiber = useFiber();
 
   // Create wrapper div
@@ -34,9 +34,9 @@ export const HTML: LiveComponent<HTMLProps> = ({
   // Apply/unapply styles
   if (style) {
     useResource((dispose) => {
-      for (let k in style!) div.style[k] = style[k];
+      for (let k in style!) (div.style as any)[k] = style[k];
       dispose(() => {
-        for (let k in style!) div.style[k] = 'unset';
+        for (let k in style!) (div.style as any)[k] = 'unset';
       });
     }, [div, style]);
   }
@@ -44,7 +44,12 @@ export const HTML: LiveComponent<HTMLProps> = ({
     useNoResource();
   }
 
-  ReactDOM.render(children, div);
+  if (children) {
+    ReactDOM.render(children as any, div);
+  }
+  else {
+    ReactDOM.render(React.createElement('div', {}, null), div);
+  }
 
   const f = fiber as any;
   const i = f.__inspect = f.__inspect ?? {};

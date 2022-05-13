@@ -13,7 +13,7 @@ import {
   Cursor, PointLayer, LineLayer,
 } from '@use-gpu/components';
 
-const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
+const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 const vecSteps = [
   vec3.fromValues(1, 0, 0),
@@ -29,10 +29,10 @@ const lineData = seq(20).map((i) => ({
     let last = arr[arr.length - 1] ?? vec3.create();
     let dir = Math.floor(Math.random() * 6);
     let next = vec3.clone(vecSteps[dir]);
-    vec3.add(next, next, last);
+    vec3.add(next, next, last as any);
     arr.push([next[0], next[1], next[2], 1.0]);
     return arr;
-  }, []),
+  }, [] as number[][]),
   color: [Math.random()*Math.random(), Math.random(), Math.random(), 1], 
   width: Math.random() * 20 + 1,
   loop: false,

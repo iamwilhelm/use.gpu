@@ -27,7 +27,6 @@ export type BlockProps = {
   snap?: boolean,
   contain?: boolean,
 
-  element?: LiveElement<any>,
   children?: LiveElement<any>,
 };
 

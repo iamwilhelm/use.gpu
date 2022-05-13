@@ -1,7 +1,7 @@
 import {
   HostInterface, LiveFiber, LiveFunction, LiveContext, LiveElement,
   FiberYeet, FiberContext, ContextValues, ContextRoots,
-  OnFiber, DeferredCall, Key, ArrowFunction,
+  OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
 
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
@@ -11,7 +11,7 @@ import { isSameDependencies, incrementVersion, tagFunction } from './util';
 import { formatNode, formatNodeName } from './debug';
 
 let ID = 0;
-let DEBUG = false;
+let DEBUG = true;
 //setTimeout((() => DEBUG = false), 900);
 
 const NO_FIBER = () => () => {};
@@ -204,12 +204,14 @@ export const renderFiber = <F extends ArrowFunction>(
 
   // Passthrough built-ins as rendered result
   if ((f as any).isLiveBuiltin) {
-    element = fiber as any as DeferredCall<any>;
+    // Fiber is shape-compatible
+    element = fiber as any as LiveElement<any>;
     // Enter/exit to clear yeet state
     bound();
   }
   // Render live function
   else element = bound.apply(null, args ?? EMPTY_ARRAY);
+  if (typeof element === 'string') throw new Error(`Component may not return a string (${element})`);
 
   // Early exit if memoized and same result
   if (fiber.memo != null) {
@@ -241,6 +243,15 @@ export const pingFiber = <F extends ArrowFunction>(
   if (host?.__ping) host.__ping(fiber, active);
 }
 
+// React element interop
+export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
+  let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
+  if (element && ('props' in element)) {
+    call = {f: element.type, key: element.key, args: [element.props], by: fiber?.id ?? 0};
+  }
+  return call ?? null;
+};
+
 // Update a fiber with rendered result
 export const updateFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
@@ -251,7 +262,9 @@ export const updateFiber = <F extends ArrowFunction>(
   const {f, args, yeeted} = fiber;
 
   // Handle call and call[]
+  element = reactInterop(element, fiber);
   let call = element as DeferredCall<any> | null;
+
   const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : call?.f;
 
@@ -261,9 +274,9 @@ export const updateFiber = <F extends ArrowFunction>(
     const c = e as any as DeferredCall<any>;
     const cs = e as any as DeferredCall<any>[];
     const isArray = !!e && Array.isArray(e);
-    const fiberType = isArray ? Array : c?.f;
+    const fiberType = isArray ? Array : (c as any)?.f;
 
-    if (isArray) reconcileFiberCalls(fiber, cs.map(call => morph(call)));
+    if (isArray) reconcileFiberCalls(fiber, cs.map(call => morph(call as any)));
     morphFiberCall(fiber, fiberType, c);
     return fiber;
   }
@@ -274,7 +287,7 @@ export const updateFiber = <F extends ArrowFunction>(
 
   // Reconcile literal array
   if (isArray) {
-    const calls = element as DeferredCall<any>[];
+    const calls = element as LiveElement<any>[];
     reconcileFiberCalls(fiber, calls);
   }
   // Reconcile wrapped array fragment
@@ -347,7 +360,7 @@ export const mountFiberContinuation = <F extends ArrowFunction>(
 // Generalized mounting of reduction-like continuations
 export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[] | DeferredCall<any>,
+  calls: LiveElement<any>[] | LiveElement<any>,
   mapper: ((t: T) => R) | undefined,
   reduction: () => R,
   Next?: LiveFunction<any>,
@@ -361,7 +374,7 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   }
 
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
-  else mountFiberCall(fiber, calls);
+  else mountFiberCall(fiber, calls as any);
 
   mountFiberContinuation(fiber, use(fiber.next.f, Next), 1);
 }
@@ -391,7 +404,7 @@ export const makeImperativeFunction = (c: LiveFunction<any>, displayName?: strin
 // Reconcile multiple calls on a fiber
 export const reconcileFiberCalls = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[],
+  calls: LiveElement<any>[],
 ) => {
   let {mount, mounts, order, seen} = fiber;
 
@@ -408,18 +421,18 @@ export const reconcileFiberCalls = <F extends ArrowFunction>(
   order.length = 0;
   let i = 0;
   for (let call of calls) {
+    call = reactInterop(call, fiber);
 
-    let key = call?.key ?? i;
+    let key = (call as any)?.key ?? i;
     if (seen.has(key)) throw new Error(`Duplicate key ${key} while reconciling ` + formatNode(fiber));
     seen.add(key);
     order[i++] = key;
 
     // Array shorthand for nested reconciling
-    if (Array.isArray(call)) call = fragment(call as any, key);
+    if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
 
     const mount = mounts.get(key);
-
-    const nextMount = updateMount(fiber, mount, call, key);
+    const nextMount = updateMount(fiber, mount, call as any, key);
     if (nextMount !== false) {
       if (nextMount) mounts.set(key, nextMount);
       else mounts.delete(key);
@@ -439,7 +452,7 @@ export const reconcileFiberCalls = <F extends ArrowFunction>(
 // Map-reduce a fiber
 export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[] | DeferredCall<any>,
+  calls: LiveElement<any>,
   mapper: (t: T) => R,
   reducer: (a: R, b: R) => R,
   next?: LiveFunction<any>,
@@ -453,7 +466,7 @@ const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] :
 // Gather-reduce a fiber
 export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[] | DeferredCall<any>,
+  calls: LiveElement<any>,
   next?: LiveFunction<any>,
 ) => {
   const reduction = () => toArray(gatherFiberValues(fiber, true));
@@ -463,7 +476,7 @@ export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
 // Multi-gather-reduce a fiber
 export const multiGatherFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
-  calls: DeferredCall<any>[] | DeferredCall<any>,
+  calls: LiveElement<any>,
   next?: LiveFunction<any>,
 ) => {
   const reduction = () => multiGatherFiberValues(fiber, true);
@@ -613,8 +626,10 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   element: LiveElement<any>,
 ) => {
+  if (typeof element === 'string') throw new Error("String is not a valid element");
+
   const isArray = !!element && Array.isArray(element);
-  const fiberType = isArray ? Array : element?.f;
+  const fiberType = isArray ? Array : (element as any)?.f;
 
   if (fiber.type && fiber.type !== fiberType) disposeFiberMounts(fiber);
   fiber.type = fiberType;
@@ -622,8 +637,8 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   if (isArray) reconcileFiberCalls(fiber, element as any);
   else {
     const call = element as DeferredCall<any>;
-    if (call && (call.f as any).isLiveInline) updateFiber(fiber, call);
-    else mountFiberCall(fiber, call);
+    if (call && (call.f as any).isLiveInline) updateFiber(fiber, call as any);
+    else mountFiberCall(fiber, call as any);
   }
 }
 

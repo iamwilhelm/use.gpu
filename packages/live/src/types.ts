@@ -1,17 +1,42 @@
 // Live function
 export type ArrowFunction = (...args: any[]) => any;
-export type LiveFunction<F extends Function> = F;
+export type LiveFunction<F extends Function = ArrowFunction> = F;
 
 // Component with single props object
-export type LiveComponent<P> = (props: P) => LiveElement<any>;
-export type Component<P> = LiveComponent<P>;
+export type RawLiveComponent<P> = (props: P) => LiveElement<any>;
 
-// React types interop
-export type PropsWithChildren<P> = P & { children?: LiveElement<any> };
-export type LC<P = object> = LiveComponent<PropsWithChildren<P>>;
+// React/JSX types interop
+export type PropsWithChildren<P> = P & { children?: string | LiveNode<any> };
+export type LiveComponent<P = object> = (props: PropsWithChildren<P>) => any;
+export type Component<P = object> = LiveComponent<P>;
+export type LC<P = object> = LiveComponent<P>;
+
+export type ReactElementInterop = {
+  type: any,
+  props: any,
+  key: any,
+};
+
+export type LivePure<F extends Function = ArrowFunction> = undefined | null | DeferredCall<F> | LivePure<any>[];
+export type LiveElement<F extends Function = ArrowFunction> = undefined | null | DeferredCall<F> | LiveElement<any>[] | ReactElementInterop;
+export type LiveNode<F extends Function = ArrowFunction> = LiveElement<F> | string | ArrowFunction | Array<LiveNode<any>>;
 
 // Mounting key
 export type Key = string | number;
+
+// Deferred function calls
+export type FunctionCall<F extends Function = ArrowFunction> = {
+  f: LiveFunction<F>,
+  args?: any[],
+  arg?: any
+};
+
+export type DeferredCall<F extends Function = ArrowFunction> = FunctionCall<F> & {
+  key?: Key,
+  by?: number,
+};
+
+export type DeferredCallInterop<F extends Function = ArrowFunction> = DeferredCall<F> | ReactElementInterop;
 
 // State hook callbacks
 export type Initial<T> = (() => T) | T;
@@ -119,20 +144,6 @@ export type FiberYeet<T> = {
   parent?: FiberYeet<T>,
   root: LiveFiber<any>,
 };
-
-// Deferred function calls
-export type FunctionCall<F extends Function = ArrowFunction> = {
-  f: LiveFunction<F>,
-  args?: any[],
-  arg?: any
-};
-
-export type DeferredCall<F extends Function = ArrowFunction> = FunctionCall<F> & {
-  key?: Key,
-  by?: number,
-};
-
-export type LiveElement<F = any> = null | DeferredCall<any> | LiveElement<any>[];
 
 // Priority queue
 export type FiberQueue = {

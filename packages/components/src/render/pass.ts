@@ -1,4 +1,4 @@
-import { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live/types';
+import { LC, PropsWithChildren, LiveFiber, LiveElement } from '@use-gpu/live/types';
 import { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core/types';
 import { use, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
@@ -11,14 +11,13 @@ export type PassProps = {
   picking?: boolean,
   debug?: boolean,
   render?: () => LiveElement<any>,
-  children?: LiveElement<any>,
 };
 
 export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
 
 const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
-export const Pass: LiveComponent<PassProps> = memo((props: PassProps) => {
+export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) => {
   const {
     transparent = true, 
     opaque = true,

@@ -14,8 +14,6 @@ import {
   Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled,
   LinearRGB,
 } from '@use-gpu/components';
-import { Mesh } from '../mesh';
-import { makeMesh, makeTexture } from '../meshes/mesh';
 
 let t = 0;
 
@@ -118,7 +116,7 @@ export const PlotSimplePage: LC = () => {
                     const v = Math.cos(x) * Math.cos(y);
                     emit(x, v * .5 + .5, y, 1);
                   }}
-                  render={(data: ShaderSource) =>
+                  render={(data: StorageSource) =>
                     <PointLayer
                       positions={data}
                       size={10}

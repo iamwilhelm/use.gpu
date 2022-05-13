@@ -1,24 +1,15 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import { LC } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
-import { FC, useFiber, useResource, useState } from '@use-gpu/live';
+import { useFiber, useResource, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 
 import {
   AutoCanvas, CanvasPicking,
-  Loop, Draw, Pass,
-  CompositeData, Data, RawData,
   FontLoader,
-  OrbitCamera, OrbitControls,
-  Pick,
-  Cursor, Points, Lines,
-  RawQuads as Quads, RawLines,
-  RenderToTexture,
   Router, Routes,
-  TextProvider,
-  ViewProvider,
   WebGPU,
 } from '@use-gpu/components';
 import { UseInspect } from '@use-gpu/inspect';
@@ -28,9 +19,9 @@ import { makePicker } from './pages/page-picker';
 
 import { FALLBACK_MESSAGE } from './fallback';
 
-export const App: FC = () => {
+export const App: LC = () => {
   
-  const root = document.querySelector('#use-gpu');
+  const root = document.querySelector('#use-gpu')!;
 
   const router = (
     <Router>
@@ -65,7 +56,7 @@ export const App: FC = () => {
 
   return [
     <WebGPU
-      fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error)}</HTML>}
+      fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
     >
       <AutoCanvas
         selector={'#use-gpu'}

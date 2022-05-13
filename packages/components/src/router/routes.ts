@@ -1,4 +1,4 @@
-import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
+import { LiveFiber, LiveComponent, LiveNode, LiveElement, Task } from '@use-gpu/live/types';
 import { memo, morph, use, provide, makeContext, useContext, useOne, useMemo } from '@use-gpu/live';
 import { RouterContext, Route } from './router';
 
@@ -15,7 +15,7 @@ export const RouteContext = makeContext<RouteState>({
 
 type Matcher = {
   regexp: RegExp,
-  element: LiveElement<any>,
+  element: LiveNode<any>,
   base: string,
   routes?: Record<string, Route>,
 };
@@ -80,7 +80,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
 
     let params = {} as Record<string, string>;
     let routes = null as Record<string, Route> | null;
-    let element = null as LiveElement<any>;
+    let element = null as LiveNode<any>;
 
     for (const matcher of matchers) {
       const match = currentPath.match(matcher.regexp);

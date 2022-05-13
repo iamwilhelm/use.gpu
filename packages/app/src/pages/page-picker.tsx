@@ -12,12 +12,12 @@ const STYLE = {
   background: 'rgba(0, 0, 0, .5)',
 };
 
-export const makePicker = (container: HTMLElement) => ({
+export const makePicker = (container: Element) => ({
   "/": { element: null, exact: true },
   "*": { element: use(PagePicker, container) },
 });
 
-export const PagePicker = (container: HTMLElement) => {
+export const PagePicker = (container: Element) => {
   const {route: {path}, push} = useRouterContext();
   const handleChange = (e: any) => push(e.target.value);
 

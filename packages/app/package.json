@@ -6,12 +6,12 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@use-gpu/live": "*",
-    "@use-gpu/state": "*",
-    "@use-gpu/core": "*",
-    "@use-gpu/webgpu": "*",
     "@use-gpu/components": "*",
+    "@use-gpu/core": "*",
+    "@use-gpu/live": "*",
     "@use-gpu/shader": "*",
+    "@use-gpu/state": "*",
+    "@use-gpu/webgpu": "*",
     "@use-gpu/wgsl": "*"
   },
   "scripts": {

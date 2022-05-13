@@ -6,7 +6,7 @@ import { getChunkCount, generateChunkSegments, generateChunkAnchors } from '@use
 import { useBoundStorage } from '../hooks/useBoundStorage';
 
 type ArrowSegmentsProps = {
-  chunks: number[],
+  chunks?: number[],
   loops?: boolean[],
   starts?: boolean[],
   ends?: boolean[],
@@ -18,6 +18,7 @@ export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
   props: ArrowSegmentsProps,
 ) => {
   const {chunks, loops, starts, ends, render} = props;
+  if (!chunks) return null;
 
   const {segments, anchors, trims} = useArrowSegments(chunks, loops, starts, ends);
 

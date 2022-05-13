@@ -31,6 +31,7 @@ type FiberNodeProps = {
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
   indent?: number,
+	depthLimit?: number,
   continuation?: boolean,
   siblings?: boolean,
 }
@@ -140,7 +141,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 export const FiberNode: React.FC<FiberNodeProps> = memo(({
   fiber,
   fibers,
-  depthLimit,
+  depthLimit = Infinity,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -179,7 +180,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     const select  = () => updateSelectState({ $set: fiber });
     const hover   = () => updateHoverState({ $set: {
       fiber,
-      by: fibers.get(fiber.by),
+      by: fibers.get(fiber.by) ?? null,
       deps: host ? Array.from(host.traceDown(fiber)) : [],
       precs: host ? Array.from(host.traceUp(fiber)) : [],
       root,
@@ -361,7 +362,7 @@ export const TreeExpand: React.FC<TreeExpandProps> = ({
   </>);
 }
 
-export const FiberReactNode: React.FC<FiberNodeProps> = memo(({
+export const FiberReactNode: React.FC<FiberReactNodeProps> = memo(({
   reactNode,
   expandCursor,
   first = false,

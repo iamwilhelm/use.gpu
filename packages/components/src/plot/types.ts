@@ -60,7 +60,7 @@ export type LabelTrait = {
   expr?: (v: number, i: number) => string,
   size: number,
   depth: number,
-  outline: number,
+  expand: number,
   background: ColorLike,
   box: number | [number, number],
 };

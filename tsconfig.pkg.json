@@ -3,7 +3,7 @@
     "composite": true,
     "incremental": true,
     "target": "esnext",
-    "module": "node12",
+    "module": "nodenext",
     "lib": ["esnext", "dom"],
     "allowJs": true,
     "checkJs": false,
@@ -17,6 +17,7 @@
     "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
+      "@use-gpu/wgsl/*": ["./packages/wgsl/src/*", "../../wgsl/src/*"],
       "@use-gpu/*": ["./packages/*", "../../*"]
     },
     "rootDirs": [],

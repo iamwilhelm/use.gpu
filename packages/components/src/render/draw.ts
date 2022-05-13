@@ -1,4 +1,4 @@
-import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
+import { LiveFiber, LC, PropsWithChildren, LiveElement, Task, DeferredCall } from '@use-gpu/live/types';
 import {
   gather, provide, yeet,
   makeContext, useContext, useNoContext,
@@ -10,12 +10,11 @@ import { PickingContext } from './picking';
 export type DrawProps = {
   live?: boolean,
   render?: () => LiveElement<any>,
-  children?: LiveElement<any>,
 };
 
 const NOP = () => {};
 
-export const Draw: LiveComponent<DrawProps> = (props) => {
+export const Draw: LC<DrawProps> = (props: PropsWithChildren<DrawProps>): DeferredCall<any> => {
   const {live = true, render, children} = props;
 
   if (live) usePerFrame();

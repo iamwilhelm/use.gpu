@@ -1,4 +1,4 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { LiveComponent } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 

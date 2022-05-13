@@ -1,6 +1,6 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatNode, formatValue } from '@use-gpu/live';
-import { styled } from "@stitches/react";
+import { styled as _styled } from '@stitches/react';
 
 import React, { Fragment, useState } from 'react';
 import { Action } from './types';
@@ -8,6 +8,8 @@ import { SplitRow, Label, Selectable } from './layout';
 
 import { inspectObject } from './props';
 import { usePingContext } from './ping';
+
+const styled: any = _styled;
 
 const StyledShader = styled('div', {
   background: 'rgba(255, 255, 255, 0.1)',

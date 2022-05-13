@@ -63,7 +63,7 @@ export const Node: React.FC<NodeProps> = ({
   if (hovered === id) classes.push('hovered');
   if (hovered === by) classes.push('by');
   if (f.isLiveBuiltin) classes.push('builtin');
-  classes.push(`depth-${Math.min(4, depth)}`);
+  classes.push(`depth-${Math.min(4, depth || 0)}`);
   const className = classes.join(' ');
 
   const elRef = useRef<HTMLDivElement | null>(null);

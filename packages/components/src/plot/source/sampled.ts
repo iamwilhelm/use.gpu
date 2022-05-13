@@ -11,7 +11,7 @@ export type SampledProps = {
   axis?: string,
   axes?: string,
 
-  range: [number, number][],
+  range?: [number, number][],
   size: number[],
 
   centered?: boolean[] | boolean,
@@ -26,17 +26,20 @@ export type SampledProps = {
 };
 
 export const Sampled: LiveComponent<SampledProps> = (props) => {
-  const parentRange = useContext(RangeContext);
   const {
     axis,
     axes = 'xyzw',
     render,
+    range: outerRange,
     children,
     ...rest
   } = props;
+
+  const parentRange = useContext(RangeContext);
+  const resolvedRange = outerRange ?? parentRange;
   
   const basis = (axis ?? axes).split('').map(parseAxis);
-  const range = basis.map(i => parentRange[i]);
+  const range = basis.map(i => resolvedRange[i]);
 
   return (
     gather(

@@ -11,233 +11,235 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "yarn run build:wgsl && yarn run build:js && yarn run build:pkg",
+    "build": "yarn run build:wgsl && yarn run build:js && yarn run build:types && yarn run build:pkg",
     "build:wgsl": "ts-node build",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/wgsl/src --extensions \".ts,.js\"",
     "build:pkg": "cp package.json ../../build/packages/wgsl"
   },
   "devDependencies": {
     "glob": "^7.2.0"
   },
+  "types": "./types/wgsl-files/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
     "./fragment/pbr.wgsl": {
-      "types": "./src/fragment/pbr.d.ts",
+      "types": "./src/fragment/pbr.wgsl.d.ts",
       "import": "./src/fragment/pbr.wgsl",
       "require": "./src/fragment/pbr.wgsl"
     },
     "./fragment/sdf-2d.wgsl": {
-      "types": "./src/fragment/sdf-2d.d.ts",
+      "types": "./src/fragment/sdf-2d.wgsl.d.ts",
       "import": "./src/fragment/sdf-2d.wgsl",
       "require": "./src/fragment/sdf-2d.wgsl"
     },
     "./geometry/arrow.wgsl": {
-      "types": "./src/geometry/arrow.d.ts",
+      "types": "./src/geometry/arrow.wgsl.d.ts",
       "import": "./src/geometry/arrow.wgsl",
       "require": "./src/geometry/arrow.wgsl"
     },
     "./geometry/line.wgsl": {
-      "types": "./src/geometry/line.d.ts",
+      "types": "./src/geometry/line.wgsl.d.ts",
       "import": "./src/geometry/line.wgsl",
       "require": "./src/geometry/line.wgsl"
     },
     "./geometry/quad.wgsl": {
-      "types": "./src/geometry/quad.d.ts",
+      "types": "./src/geometry/quad.wgsl.d.ts",
       "import": "./src/geometry/quad.wgsl",
       "require": "./src/geometry/quad.wgsl"
     },
     "./geometry/strip.wgsl": {
-      "types": "./src/geometry/strip.d.ts",
+      "types": "./src/geometry/strip.wgsl.d.ts",
       "import": "./src/geometry/strip.wgsl",
       "require": "./src/geometry/strip.wgsl"
     },
     "./instance/fragment/ui.wgsl": {
-      "types": "./src/instance/fragment/ui.d.ts",
+      "types": "./src/instance/fragment/ui.wgsl.d.ts",
       "import": "./src/instance/fragment/ui.wgsl",
       "require": "./src/instance/fragment/ui.wgsl"
     },
     "./instance/identity.wgsl": {
-      "types": "./src/instance/identity.d.ts",
+      "types": "./src/instance/identity.wgsl.d.ts",
       "import": "./src/instance/identity.wgsl",
       "require": "./src/instance/identity.wgsl"
     },
     "./instance/vertex/arrow.wgsl": {
-      "types": "./src/instance/vertex/arrow.d.ts",
+      "types": "./src/instance/vertex/arrow.wgsl.d.ts",
       "import": "./src/instance/vertex/arrow.wgsl",
       "require": "./src/instance/vertex/arrow.wgsl"
     },
     "./instance/vertex/full-screen.wgsl": {
-      "types": "./src/instance/vertex/full-screen.d.ts",
+      "types": "./src/instance/vertex/full-screen.wgsl.d.ts",
       "import": "./src/instance/vertex/full-screen.wgsl",
       "require": "./src/instance/vertex/full-screen.wgsl"
     },
     "./instance/vertex/label.wgsl": {
-      "types": "./src/instance/vertex/label.d.ts",
+      "types": "./src/instance/vertex/label.wgsl.d.ts",
       "import": "./src/instance/vertex/label.wgsl",
       "require": "./src/instance/vertex/label.wgsl"
     },
     "./instance/vertex/line.wgsl": {
-      "types": "./src/instance/vertex/line.d.ts",
+      "types": "./src/instance/vertex/line.wgsl.d.ts",
       "import": "./src/instance/vertex/line.wgsl",
       "require": "./src/instance/vertex/line.wgsl"
     },
     "./instance/vertex/quad.wgsl": {
-      "types": "./src/instance/vertex/quad.d.ts",
+      "types": "./src/instance/vertex/quad.wgsl.d.ts",
       "import": "./src/instance/vertex/quad.wgsl",
       "require": "./src/instance/vertex/quad.wgsl"
     },
     "./instance/vertex/tick.wgsl": {
-      "types": "./src/instance/vertex/tick.d.ts",
+      "types": "./src/instance/vertex/tick.wgsl.d.ts",
       "import": "./src/instance/vertex/tick.wgsl",
       "require": "./src/instance/vertex/tick.wgsl"
     },
     "./mask/masked.wgsl": {
-      "types": "./src/mask/masked.d.ts",
+      "types": "./src/mask/masked.wgsl.d.ts",
       "import": "./src/mask/masked.wgsl",
       "require": "./src/mask/masked.wgsl"
     },
     "./mask/passthru.wgsl": {
-      "types": "./src/mask/passthru.d.ts",
+      "types": "./src/mask/passthru.wgsl.d.ts",
       "import": "./src/mask/passthru.wgsl",
       "require": "./src/mask/passthru.wgsl"
     },
     "./mask/point.wgsl": {
-      "types": "./src/mask/point.d.ts",
+      "types": "./src/mask/point.wgsl.d.ts",
       "import": "./src/mask/point.wgsl",
       "require": "./src/mask/point.wgsl"
     },
     "./mask/textured.wgsl": {
-      "types": "./src/mask/textured.d.ts",
+      "types": "./src/mask/textured.wgsl.d.ts",
       "import": "./src/mask/textured.wgsl",
       "require": "./src/mask/textured.wgsl"
     },
     "./plot/axis.wgsl": {
-      "types": "./src/plot/axis.d.ts",
+      "types": "./src/plot/axis.wgsl.d.ts",
       "import": "./src/plot/axis.wgsl",
       "require": "./src/plot/axis.wgsl"
     },
     "./plot/grid.wgsl": {
-      "types": "./src/plot/grid.d.ts",
+      "types": "./src/plot/grid.wgsl.d.ts",
       "import": "./src/plot/grid.wgsl",
       "require": "./src/plot/grid.wgsl"
     },
     "./plot/scale.wgsl": {
-      "types": "./src/plot/scale.d.ts",
+      "types": "./src/plot/scale.wgsl.d.ts",
       "import": "./src/plot/scale.wgsl",
       "require": "./src/plot/scale.wgsl"
     },
     "./render/fragment/mesh.wgsl": {
-      "types": "./src/render/fragment/mesh.d.ts",
+      "types": "./src/render/fragment/mesh.wgsl.d.ts",
       "import": "./src/render/fragment/mesh.wgsl",
       "require": "./src/render/fragment/mesh.wgsl"
     },
     "./render/fragment/pick-geometry.wgsl": {
-      "types": "./src/render/fragment/pick-geometry.d.ts",
+      "types": "./src/render/fragment/pick-geometry.wgsl.d.ts",
       "import": "./src/render/fragment/pick-geometry.wgsl",
       "require": "./src/render/fragment/pick-geometry.wgsl"
     },
     "./render/fragment/solid.wgsl": {
-      "types": "./src/render/fragment/solid.d.ts",
+      "types": "./src/render/fragment/solid.wgsl.d.ts",
       "import": "./src/render/fragment/solid.wgsl",
       "require": "./src/render/fragment/solid.wgsl"
     },
     "./render/fragment/ui.wgsl": {
-      "types": "./src/render/fragment/ui.d.ts",
+      "types": "./src/render/fragment/ui.wgsl.d.ts",
       "import": "./src/render/fragment/ui.wgsl",
       "require": "./src/render/fragment/ui.wgsl"
     },
     "./render/ui/fragment-pick.wgsl": {
-      "types": "./src/render/ui/fragment-pick.d.ts",
+      "types": "./src/render/ui/fragment-pick.wgsl.d.ts",
       "import": "./src/render/ui/fragment-pick.wgsl",
       "require": "./src/render/ui/fragment-pick.wgsl"
     },
     "./render/ui/fragment.wgsl": {
-      "types": "./src/render/ui/fragment.d.ts",
+      "types": "./src/render/ui/fragment.wgsl.d.ts",
       "import": "./src/render/ui/fragment.wgsl",
       "require": "./src/render/ui/fragment.wgsl"
     },
     "./render/ui/sdf.wgsl": {
-      "types": "./src/render/ui/sdf.d.ts",
+      "types": "./src/render/ui/sdf.wgsl.d.ts",
       "import": "./src/render/ui/sdf.wgsl",
       "require": "./src/render/ui/sdf.wgsl"
     },
     "./render/ui/vertex-pick.wgsl": {
-      "types": "./src/render/ui/vertex-pick.d.ts",
+      "types": "./src/render/ui/vertex-pick.wgsl.d.ts",
       "import": "./src/render/ui/vertex-pick.wgsl",
       "require": "./src/render/ui/vertex-pick.wgsl"
     },
     "./render/ui/vertex.wgsl": {
-      "types": "./src/render/ui/vertex.d.ts",
+      "types": "./src/render/ui/vertex.wgsl.d.ts",
       "import": "./src/render/ui/vertex.wgsl",
       "require": "./src/render/ui/vertex.wgsl"
     },
     "./render/vertex/mesh-pick.wgsl": {
-      "types": "./src/render/vertex/mesh-pick.d.ts",
+      "types": "./src/render/vertex/mesh-pick.wgsl.d.ts",
       "import": "./src/render/vertex/mesh-pick.wgsl",
       "require": "./src/render/vertex/mesh-pick.wgsl"
     },
     "./render/vertex/mesh.wgsl": {
-      "types": "./src/render/vertex/mesh.d.ts",
+      "types": "./src/render/vertex/mesh.wgsl.d.ts",
       "import": "./src/render/vertex/mesh.wgsl",
       "require": "./src/render/vertex/mesh.wgsl"
     },
     "./render/vertex/virtual-pick.wgsl": {
-      "types": "./src/render/vertex/virtual-pick.d.ts",
+      "types": "./src/render/vertex/virtual-pick.wgsl.d.ts",
       "import": "./src/render/vertex/virtual-pick.wgsl",
       "require": "./src/render/vertex/virtual-pick.wgsl"
     },
     "./render/vertex/virtual-solid.wgsl": {
-      "types": "./src/render/vertex/virtual-solid.d.ts",
+      "types": "./src/render/vertex/virtual-solid.wgsl.d.ts",
       "import": "./src/render/vertex/virtual-solid.wgsl",
       "require": "./src/render/vertex/virtual-solid.wgsl"
     },
     "./render/vertex/virtual-ui.wgsl": {
-      "types": "./src/render/vertex/virtual-ui.d.ts",
+      "types": "./src/render/vertex/virtual-ui.wgsl.d.ts",
       "import": "./src/render/vertex/virtual-ui.wgsl",
       "require": "./src/render/vertex/virtual-ui.wgsl"
     },
     "./render/vertex/wireframe-list.wgsl": {
-      "types": "./src/render/vertex/wireframe-list.d.ts",
+      "types": "./src/render/vertex/wireframe-list.wgsl.d.ts",
       "import": "./src/render/vertex/wireframe-list.wgsl",
       "require": "./src/render/vertex/wireframe-list.wgsl"
     },
     "./render/vertex/wireframe-strip.wgsl": {
-      "types": "./src/render/vertex/wireframe-strip.d.ts",
+      "types": "./src/render/vertex/wireframe-strip.wgsl.d.ts",
       "import": "./src/render/vertex/wireframe-strip.wgsl",
       "require": "./src/render/vertex/wireframe-strip.wgsl"
     },
     "./transform/cartesian.wgsl": {
-      "types": "./src/transform/cartesian.d.ts",
+      "types": "./src/transform/cartesian.wgsl.d.ts",
       "import": "./src/transform/cartesian.wgsl",
       "require": "./src/transform/cartesian.wgsl"
     },
     "./use/color.wgsl": {
-      "types": "./src/use/color.d.ts",
+      "types": "./src/use/color.wgsl.d.ts",
       "import": "./src/use/color.wgsl",
       "require": "./src/use/color.wgsl"
     },
     "./use/gamma.wgsl": {
-      "types": "./src/use/gamma.d.ts",
+      "types": "./src/use/gamma.wgsl.d.ts",
       "import": "./src/use/gamma.wgsl",
       "require": "./src/use/gamma.wgsl"
     },
     "./use/light.wgsl": {
-      "types": "./src/use/light.d.ts",
+      "types": "./src/use/light.wgsl.d.ts",
       "import": "./src/use/light.wgsl",
       "require": "./src/use/light.wgsl"
     },
     "./use/picking.wgsl": {
-      "types": "./src/use/picking.d.ts",
+      "types": "./src/use/picking.wgsl.d.ts",
       "import": "./src/use/picking.wgsl",
       "require": "./src/use/picking.wgsl"
     },
     "./use/types.wgsl": {
-      "types": "./src/use/types.d.ts",
+      "types": "./src/use/types.wgsl.d.ts",
       "import": "./src/use/types.wgsl",
       "require": "./src/use/types.wgsl"
     },
     "./use/view.wgsl": {
-      "types": "./src/use/view.d.ts",
+      "types": "./src/use/view.wgsl.d.ts",
       "import": "./src/use/view.wgsl",
       "require": "./src/use/view.wgsl"
     }

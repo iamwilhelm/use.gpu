@@ -6,7 +6,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { SDFFontProvider, SDF_FONT_ATLAS } from '../text/providers/sdf-font-provider';
 import { ScrollConsumer } from '../consumers/scroll-consumer';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { use, keyed, wrap, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, fragment, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -81,7 +81,7 @@ const Resume = (
     layer.push(item);
   }
 
-  return layers.map((layer, i) => keyed(Layer, ids[i], layer));
+  return fragment(layers.map((layer, i) => keyed(Layer, ids[i], layer)));
 };
 
 const Layer: LiveFunction<any> = (

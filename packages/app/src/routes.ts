@@ -11,9 +11,6 @@ import { PlotSimplePage } from './pages/plot/simple';
 import { HomePage } from './pages/home';
 import { EmptyPage } from './pages/empty';
 
-import { InteractPage } from './pages/interact';
-import { LayoutPage } from './pages/layout';
-
 export const PAGES = [
   {path: "/geometry/lines", title: "Geometry - 3D Lines and Arrows"},
   {path: "/geometry/data", title: "Geometry - Data-driven Layers"},
@@ -33,9 +30,6 @@ export const makeRoutes = () => ({
   "/plot/simple": { element: use(PlotSimplePage) },
   "/rtt/linear-rgb": { element: use(LinearRGBPage)},
   "/debug/atlas": { element: use(DebugAtlasPage) },
-
-  "/layout": { element: use(LayoutPage) },
-  "/interact": { element: use(InteractPage) },
 
   "/": { element: use(HomePage, { container: document.querySelector('#use-gpu') }) },
   "*": { element: use(EmptyPage) },

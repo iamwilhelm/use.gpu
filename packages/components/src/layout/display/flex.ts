@@ -22,7 +22,6 @@ export type FlexProps = {
   wrap?: boolean,
   snap?: boolean,
 
-  element?: LiveElement<any>,
   children?: LiveElement<any>,
 };
 

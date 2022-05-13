@@ -6,7 +6,7 @@ import { getChunkCount, generateChunkSegments } from '@use-gpu/core';
 import { useBoundStorage } from '../hooks/useBoundStorage';
 
 type LineSegmentsProps = {
-  chunks: number[],
+  chunks?: number[],
   loops?: boolean[],
 
   render?: (segments: StorageSource) => LiveElement<any>,
@@ -16,6 +16,8 @@ export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
   props: LineSegmentsProps,
 ) => {
   const {chunks, loops, render} = props;
+  if (!chunks) return null;
+  
   const count = getChunkCount(chunks, loops);
 
   // Make index data for line segments/anchor/trim data

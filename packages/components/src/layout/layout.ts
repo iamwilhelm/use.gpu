@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, LayoutPicker, Point } from './types';
 
-import { memo, yeet, provide, gather, use, keyed, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
+import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
@@ -47,7 +47,7 @@ const Resume = (inspect?: boolean) => (els: LayoutElement[]) => {
   
   out.push(keyed(Scroller, -2, pickers));
   if (inspect) out.push(keyed(Inspect, -1, pickers));
-  return out;
+  return fragment(out);
 };
 
 export const Scroller = (pickers: any[]) => {

@@ -1,13 +1,30 @@
 import { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live/types';
 import { TypedArray } from '@use-gpu/core/types';
 
-import { useOne } from '@use-gpu/live';
+import { useOne, reactInterop } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
 type Ease = 'cosine' | 'linear' | 'zero' | 'auto' | 'bezier';
 
-type Keyframe<T> = [
+type Keyframe<T> = 
+| [
+  number,
+  T,
+]
+| [
+  number,
+  T,
+  Ease,
+]
+| [
+  number,
+  T,
+  Ease,
+  [number, number] | null | undefined,
+  [number, number] | null | undefined,
+]
+| [
   number,
   T,
   Ease,
@@ -80,21 +97,22 @@ const interpolateValue: Interpolator = <T>(a: any, b: any, t: number) => {
 };
 
 const injectProp = (prop: string, value: any) => (call: LiveElement<any>): LiveElement<any> => {
+  if (typeof call === 'string') return null;
   if (!call) return call;
 
-  if (Array.isArray(call)) return call.map(injectProp(prop, value));
-
-  if (call?.args) {
-    const [props] = call.args;
+  const c = reactInterop(call);
+  if (Array.isArray(c)) return c.map(injectProp(prop, value)) as any as LiveElement<any>;
+  if (c?.args) {
+    const [props] = c.args;
     if (props) {
-      call.args = [{
+      c.args = [{
         ...props,
         [prop]: value,
       }];
     }
   }
 
-  return call;
+  return c;
 };
 
 type NestedNumberArray = (number | NestedNumberArray)[];

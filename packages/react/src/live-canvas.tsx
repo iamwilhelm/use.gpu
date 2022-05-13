@@ -1,11 +1,11 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
-import { render as renderLive } from '@use-gpu/live';
-import { LiveFiber, DeferredCall } from '@use-gpu/live/types';
+import { render as renderLive, resolveRootNode } from '@use-gpu/live';
+import { LiveFiber, LiveElement } from '@use-gpu/live/types';
 
 export type LiveCanvasProps = {
   style?: Record<string, any>,
-  render: (canvas: HTMLCanvasElement) => DeferredCall<any>,
+  render: (canvas: HTMLCanvasElement) => LiveElement<any>,
 };
 
 export const LiveCanvas: React.FC<LiveCanvasProps> = ({style, render}) => {
@@ -14,7 +14,7 @@ export const LiveCanvas: React.FC<LiveCanvasProps> = ({style, render}) => {
 
   useLayoutEffect(() => {
     if (el.current) {
-      const children = render(el.current);
+      const children = resolveRootNode(render(el.current));
       fiber.current = renderLive(children, fiber.current);
     }
   }, [render]);

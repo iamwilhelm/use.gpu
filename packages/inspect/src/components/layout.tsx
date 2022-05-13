@@ -1,5 +1,8 @@
 import React from 'react';
-import { styled } from '@stitches/react';
+import { styled as _styled } from '@stitches/react';
+
+// TODO: TS nightly issue?
+const styled: any = _styled;
 
 type TreeIndentProps = { indent?: number };
 

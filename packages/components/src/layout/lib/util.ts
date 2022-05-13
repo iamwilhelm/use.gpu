@@ -122,7 +122,7 @@ export const makeInlineLayout = (
   let last: InlineRenderer | null = null;
   let lines: InlineLine[] = [];
 
-  const out: LiveElement<any> = [];
+  const out: LiveElement<any>[] = [];
   const flush = (render: InlineRenderer) => {
     const el = render(lines, transform);
     if (Array.isArray(el)) out.push(...(el as any[]));

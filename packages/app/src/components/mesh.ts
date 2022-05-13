@@ -87,8 +87,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     const vertexLinked = linkBundle(vertexShader, {}, defines);
     const fragmentLinked = linkBundle(fragmentShader, {}, defines);
 
-    const vertex = makeShaderModule(vertexLinked, 0);
-    const fragment = makeShaderModule(fragmentLinked, 1);
+    const vertex = makeShaderModule(vertexLinked, vertexShader.hash + cs);
+    const fragment = makeShaderModule(fragmentLinked, fragmentShader.hash + cs);
     
     fiber.__inspect = fiber.__inspect || {};
     fiber.__inspect.vertex = vertex;

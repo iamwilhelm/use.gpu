@@ -1,11 +1,11 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
-import { render as renderLive } from '@use-gpu/live';
-import { LiveFiber, DeferredCall } from '@use-gpu/live/types';
+import { render as renderLive, resolveRootNode } from '@use-gpu/live';
+import { LiveFiber, LiveElement } from '@use-gpu/live/types';
 
 export type LiveDivProps = {
   style?: Record<string, any>,
-  render: (div: HTMLDivElement) => DeferredCall<any>,
+  render: (div: HTMLDivElement) => LiveElement<any>,
 };
 
 export const LiveDiv: React.FC<LiveDivProps> = ({style, render}) => {
@@ -14,7 +14,7 @@ export const LiveDiv: React.FC<LiveDivProps> = ({style, render}) => {
 
   useLayoutEffect(() => {
     if (el.current) {
-      const children = render(el.current);
+      const children = resolveRootNode(render(el.current));
       fiber.current = renderLive(children, fiber.current);
     }
   }, [render]);

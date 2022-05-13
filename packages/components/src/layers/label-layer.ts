@@ -3,7 +3,7 @@ import { TypedArray, TextureSource, Atlas, Prop, RenderPassMode } from '@use-gpu
 import { ShaderSource } from '@use-gpu/shader/types';
 import { SDFGlyphData } from '../text/types';
 
-import { use, keyed, wrap, memo, debug, useFiber, useOne, useState, useResource } from '@use-gpu/live';
+import { use, keyed, wrap, memo, debug, fragment, useFiber, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
@@ -105,7 +105,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           const layouts = useBoundStorage(data.layouts, 'vec2<f32>');
           const uvs = useBoundStorage(data.uvs, 'vec4<f32>');
 
-          return ([
+          return fragment([
             //debug(wrap(Flat, wrap(UI, use(DebugAtlas, {atlas, source})))),
             use(RawLabels, {
               indices,

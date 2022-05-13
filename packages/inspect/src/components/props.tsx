@@ -1,11 +1,13 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatNode, formatValue, formatNodeName, YEET } from '@use-gpu/live';
-import { styled } from "@stitches/react";
+import { styled as _styled } from '@stitches/react';
 
 import React, { useState } from 'react';
 import { Action } from './types';
 import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from './layout';
 import { usePingContext } from './ping';
+
+const styled: any = _styled;
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 

@@ -15,8 +15,7 @@
     "baseUrl": "src",
     "typeRoots": ["../../node_modules/@types"],
     "outDir": "../../build/packages",
-    "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
-    "moduleResolution": "node12"
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
-  "include": ["src/**/*.ts", "../wgsl/**/*.glsl"]
+  "include": ["src/**/*.ts", "../wgsl/**/*.wgsl"]
 }

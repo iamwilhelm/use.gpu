@@ -14,10 +14,10 @@ export const Title = styled('h1', {
   textAlign: 'center',
   fontSize: '24px',
   lineHeight: '48px',
-});
+} as any);
 
 export type HomePageProps = {
-  container: HTMLElement,
+  container: Element,
 };
 
 const PANEL_STYLE = {

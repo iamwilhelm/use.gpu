@@ -7,7 +7,7 @@ import { Inspect } from './components/inspect';
 
 export type UseInspectProps = {
   fiber: LiveFiber<any>,
-  container: HTMLElement,
+  container: Element,
 };
 
 const STYLE = {

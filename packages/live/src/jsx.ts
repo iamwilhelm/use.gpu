@@ -1,7 +1,7 @@
 import { formatNodeName } from './debug';
-import { gather, provide, yeet, GATHER, PROVIDE, YEET } from './builtin';
+import { gather, provide, yeet, FRAGMENT, GATHER, PROVIDE, YEET } from './builtin';
 import { getCurrentFiberID } from './fiber';
-import { ArrowFunction } from './types';
+import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 
 const NO_PROPS: any[] = [{}];
 
@@ -16,6 +16,9 @@ export const React = {
     const by = getCurrentFiberID();
 
     if ((type as any)?.isLiveBuiltin) {
+      if (type === FRAGMENT) {
+        return children;
+      }
       if (type === GATHER) {
         return gather(children[0], children[1], props?.key);
       }
@@ -41,8 +44,11 @@ export const React = {
   },
 };
 
-export const Gather = GATHER;
-export const Provide = PROVIDE;
-export const Yeet = YEET;
+type AnyF = (...args: any[]) => any;
+
+export const Fragment = FRAGMENT as AnyF;
+export const Gather = GATHER as AnyF;
+export const Provide = PROVIDE as AnyF;
+export const Yeet = YEET as AnyF;
 
 export default React;

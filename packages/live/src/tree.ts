@@ -1,9 +1,10 @@
-import { Key, Action, Task, LiveFiber, DeferredCall, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction } from './types';
+import { Key, Action, Task, LiveFiber, LiveElement, LiveNode, LivePure, DeferredCall, DeferredCallInterop, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction, ReactElementInterop } from './types';
 
-import { makeFiber, renderFiber, updateFiber, disposeFiberMounts } from './fiber';
+import { makeFiber, renderFiber, updateFiber, disposeFiberMounts, reactInterop } from './fiber';
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePaintRequester } from './util';
 import { makeFiberQueue } from './queue';
 import { formatNode } from './debug';
+import { use, morph } from './builtin';
 
 const DEFAULT_RENDER_OPTIONS = {
   stackSliceDepth: 20,
@@ -13,6 +14,7 @@ let DEBUG = false;
 let START = +new Date();
 //setTimeout((() => DEBUG = false), 4000);
 
+const NO_NODE = () => null;
 const NO_ARGS = [] as any[];
 const dedupe = <T>(list: T[]): T[] => Array.from(new Set<T>(list));
 
@@ -62,7 +64,7 @@ export const makeHost = (
 
 // Create top-most fiber with a new host
 export const makeHostFiber = <F extends ArrowFunction>(
-  node: DeferredCall<F>,
+  node: DeferredCall<any>,
   renderOptions: RenderOptions = DEFAULT_RENDER_OPTIONS,
 ) => {
   const {host, scheduler, disposal, dependency} = makeHost(renderOptions);
@@ -70,14 +72,24 @@ export const makeHostFiber = <F extends ArrowFunction>(
   return {fiber, host, scheduler, disposal, dependency};
 }
 
+// Resolve a LiveElement root to a call
+export const resolveRootNode = (children: LiveNode<any>): DeferredCall<any> => {
+  const c = reactInterop(children);
+  if (Array.isArray(c)) return morph(use(() => c))!;
+  if (typeof c === 'string') return use(NO_NODE);
+  if (typeof c === 'function') return use(c);
+  return c ?? use(NO_NODE);
+}
+
 // Rendering entry point
 export const renderWithDispatch = <T>(
   dispatch: (t: Task) => T,
 ) => <F extends ArrowFunction>(
-  node: DeferredCall<F>,
+  calls: LiveNode<F>,
   fiber?: LiveFiber<any> | null,
   renderOptions: RenderOptions = DEFAULT_RENDER_OPTIONS,
 ) => {
+  const node = resolveRootNode(calls);
 
   let host: HostInterface | null = null;
   if (!fiber) {

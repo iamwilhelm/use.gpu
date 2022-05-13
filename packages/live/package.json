@@ -16,7 +16,6 @@
     "coverage": "jest --collect-coverage",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-
     "build": "yarn run build:js && yarn run build:types && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/live/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
@@ -26,5 +25,8 @@
     "coveragePathIgnorePatterns": [
       "debug.ts"
     ]
+  },
+  "dependencies": {
+    "typescript": "^4.8.0-dev.20220512"
   }
 }

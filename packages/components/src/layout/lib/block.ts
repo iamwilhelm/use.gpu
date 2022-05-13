@@ -1,4 +1,3 @@
-import { LiveElement } from '@use-gpu/live/types';
 import { Point, Point4, LayoutElement, LayoutRenderer, LayoutPicker, Margin, Rectangle } from '../types';
 import { mergeMargin } from './util';
 

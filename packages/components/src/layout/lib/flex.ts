@@ -1,4 +1,3 @@
-import { LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, Point, Point4, Margin, Rectangle, Alignment, Anchor } from '../types';
 
 import { getAlignmentSpacing } from './cursor';

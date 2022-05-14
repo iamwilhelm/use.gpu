@@ -146,7 +146,7 @@ export const scrambleBits = (x: number, n: number = 0) => {
 };
 
 export const mixBits53 = (x: number, d: number) => {
-  let a = (x & 0xffffffff) >>> 0;
+  let a = x >>> 0;
   let b = Math.floor(x / 0x100000000);
 
   let d1 = add(rot(d, 16), add(a, b));
@@ -172,7 +172,7 @@ export const mixBits53 = (x: number, d: number) => {
 };
 
 export const scrambleBits53 = (x: number, n: number = 0) => {
-  let a = (x & 0xffffffff) >>> 0;
+  let a = x >>> 0;
   let b = Math.floor(x / 0x100000000);
 
   a ^= n;
@@ -285,5 +285,3 @@ export const stringToMurmur53 = (s: string, seed: number = 0) => {
 }
 
 export const toMurmur53 = stringToMurmur53;
-
-const fmt = (x: number) => ('00000000000000000000000000000000' + (x >>> 0).toString(2)).slice(-32)

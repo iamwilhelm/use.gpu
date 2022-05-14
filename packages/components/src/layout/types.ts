@@ -88,4 +88,5 @@ export type UIAggregate = {
 
   texture?: TextureSource,
   transform?: any,
+  bounds: Rectangle,
 };

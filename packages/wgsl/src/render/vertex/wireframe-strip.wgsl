@@ -17,6 +17,7 @@ fn main(
   @builtin(vertex_index) vertexIndex: u32,
   @builtin(instance_index) instanceIndex: u32,
 ) -> VertexOutput {
+  var NaN: f32 = bitcast<f32>(0xffffffffu);
 
   var ij = getQuadIndex(vertexIndex);
   var xy = vec2<f32>(ij) * 2.0 - 1.0;
@@ -35,6 +36,14 @@ fn main(
   var left = a.position.xyz / a.position.w;
   var right = b.position.xyz / b.position.w;
 
+  if (a.position.w < 0.0 || b.position.w < 0.0) {
+    return VertexOutput(
+      vec4<f32>(NaN, NaN, NaN, NaN),
+      vec4<f32>(NaN, NaN, NaN, NaN),
+      vec2<f32>(NaN, NaN),
+    );
+  }
+  
   var join: vec3<f32>;
   if (ij.x > 0u) {
     join = getLineJoin(left, left, right, 0.0, xy.y, 2.0, 1, 0);

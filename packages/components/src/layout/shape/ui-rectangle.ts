@@ -143,6 +143,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
       repeat: REPEAT_FLAG[repeat] ?? 0,
       uv,
 
+      bounds: layout,
       count: 1,
       transform,
     };
@@ -156,6 +157,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
       stroke,
       fill,
 
+      bounds: layout,
       count: 1,
       transform,
     };

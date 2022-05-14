@@ -54,6 +54,8 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   const uvs = [] as number[];
   let count = 0;
 
+  const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+
   for (const {layout, start, end, gap} of lines) {
     const [l, t] = layout;
 
@@ -75,8 +77,18 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
             const cx = snap ? Math.round(sx) : sx;
             const cy = snap ? Math.round(y) : y;
 
-            rectangles.push((scale * gl) + cx, (scale * gt) + cy, (scale * gr) + cx, (scale * gb) + cy);
+            const left = (scale * gl) + cx;
+            const top = (scale * gt) + cy;
+            const right = (scale * gr) + cx;
+            const bottom = (scale * gb) + cy;
+
+            rectangles.push(left, top, right, bottom);
             uvs.push(mapping[0], mapping[1], mapping[2], mapping[3]);
+
+            bounds[0] = Math.min(bounds[0], left);
+            bounds[1] = Math.min(bounds[1], top);
+            bounds[2] = Math.max(bounds[2], right);
+            bounds[3] = Math.max(bounds[3], bottom);
 
             count++;
           }
@@ -102,6 +114,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     texture: SDF_FONT_ATLAS,
     count,
     transform,
+    bounds,
   } : null;
 
   return yeet(render);

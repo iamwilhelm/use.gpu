@@ -66,7 +66,9 @@ export const getBooleanHash = (b: boolean) => scrambleBits53(mixBits53(HASH_KEY 
 
 export const getArrayHash = (t: any[]) => {
   let h = mixBits53(HASH_KEY + 1023, 0);
-  for (let v of t) h = mixBits53(h, getHashValue(v));
+  for (let v of t) {
+    h = mixBits53(h, getHashValue(v));
+  }
   return scrambleBits53(h, t.length);
 }
 
@@ -147,7 +149,7 @@ export const mixBits53 = (x: number, d: number) => {
   let a = (x & 0xffffffff) >>> 0;
   let b = Math.floor(x / 0x100000000);
 
-  let d1 = add(d << 8, b);
+  let d1 = add(rot(d, 16), mul(a, b));
   let d2 = add(d, a);
 
   d1 = mul(d1, C1);
@@ -283,3 +285,5 @@ export const stringToMurmur53 = (s: string, seed: number = 0) => {
 }
 
 export const toMurmur53 = stringToMurmur53;
+
+const fmt = (x: number) => ('00000000000000000000000000000000' + (x >>> 0).toString(2)).slice(-32)

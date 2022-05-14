@@ -7,6 +7,7 @@ import { SDFFontProvider, SDF_FONT_ATLAS } from '../text/providers/sdf-font-prov
 import { ScrollConsumer } from '../consumers/scroll-consumer';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { use, keyed, wrap, fragment, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { getNumberHash, getObjectKey } from '@use-gpu/state';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -52,37 +53,23 @@ const Resume = (
   source: TextureSource,
   items: (UIAggregate | null)[],
 ) => {
-  const layers = [] as UIAggregate[][];
-  const ids = [] as number[];
-
-  const {width, height} = atlas;
-
-  let layer = null;
-  let texture = null;
-  let transform = null;
+  const partitioner = makePartitioner();
 
   for (let item of items) if (item) {
-
     if (item.texture === SDF_FONT_ATLAS) {
       item = {
         ...item,
         texture: source,
       };
     }
-
-    if (!layer || item.texture !== texture || item.transform !== transform) {
-      texture = item.texture;
-      transform = item.transform;
-
-      layer = [] as UIAggregate[];
-      layers.push(layer);
-      ids.push(item.id);
-    }
-    layer.push(item);
+    partitioner.push(item);
   }
+  
+  const layers = partitioner.resolve();
 
-  const els = layers.map((layer, i) => keyed(Layer, ids[i], layer));
+  const els = layers.map((layer, i) => keyed(Layer, layer[0]?.id, layer));
   els.push(yeet([]));
+
   return fragment(els);
 };
 
@@ -150,4 +137,70 @@ const makeUIAccumulator = (
 
     return use(UIRectangles, props);
   };
+};
+
+const getItemTypeKey = (item: UIAggregate) =>
+  getNumberHash(getObjectKey(item.texture)) ^
+  getNumberHash(getObjectKey(item.transform));
+
+type Partition = {
+  key: number,
+  items: UIAggregate[],
+  bounds: Rectangle,
+};
+
+const makePartitioner = () => {  
+  const layers: Partition[] = [];
+  const last = new Map<number, number>();
+
+  const push = (item: UIAggregate) => {
+    const key = getItemTypeKey(item);
+    const {bounds} = item;
+
+    const i = last.get(key);
+    const n = layers.length;
+    const layer = layers[i];
+
+    if (i != null) {
+      let blocked = false;
+      for (let j = i + 1; j < n; ++j) {
+        if (overlapBounds(layers[j].bounds, bounds)) {
+          blocked = true;
+          break;
+        }
+      }
+      if (!blocked) {
+        layer.items.push(item);
+        layer.bounds = joinBounds(layer.bounds, bounds);
+        return;
+      }
+    }
+
+    const partition = {key, items: [item], bounds};
+    last.set(key, layers.length);
+    layers.push(partition);
+  };
+
+  const resolve = () => layers.map(l => l.items);
+  return {push, resolve};
+}
+
+const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);
+
+const overlapBounds = (a: Rectangle, b: Rectangle) => {
+  const [al, at, ar, ab] = a;
+  const [bl, bt, br, bb] = b;
+
+  return intersectRange(al, ar, bl, br) && intersectRange(at, ab, bt, bb);
+}
+
+const joinBounds = (a: Rectangle, b: Rectangle) => {
+  const [al, at, ar, ab] = a;
+  const [bl, bt, br, bb] = b;
+  return [
+    Math.min(al, bl),
+    Math.min(at, bt),
+    Math.max(ar, br),
+    Math.max(ab, bb),
+  ];
 };

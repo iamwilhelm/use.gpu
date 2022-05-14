@@ -183,31 +183,6 @@
       "import": "./src/render/fragment/ui.wgsl",
       "require": "./src/render/fragment/ui.wgsl"
     },
-    "./render/ui/fragment-pick.wgsl": {
-      "types": "./src/render/ui/fragment-pick.wgsl.d.ts",
-      "import": "./src/render/ui/fragment-pick.wgsl",
-      "require": "./src/render/ui/fragment-pick.wgsl"
-    },
-    "./render/ui/fragment.wgsl": {
-      "types": "./src/render/ui/fragment.wgsl.d.ts",
-      "import": "./src/render/ui/fragment.wgsl",
-      "require": "./src/render/ui/fragment.wgsl"
-    },
-    "./render/ui/sdf.wgsl": {
-      "types": "./src/render/ui/sdf.wgsl.d.ts",
-      "import": "./src/render/ui/sdf.wgsl",
-      "require": "./src/render/ui/sdf.wgsl"
-    },
-    "./render/ui/vertex-pick.wgsl": {
-      "types": "./src/render/ui/vertex-pick.wgsl.d.ts",
-      "import": "./src/render/ui/vertex-pick.wgsl",
-      "require": "./src/render/ui/vertex-pick.wgsl"
-    },
-    "./render/ui/vertex.wgsl": {
-      "types": "./src/render/ui/vertex.wgsl.d.ts",
-      "import": "./src/render/ui/vertex.wgsl",
-      "require": "./src/render/ui/vertex.wgsl"
-    },
     "./render/vertex/mesh-pick.wgsl": {
       "types": "./src/render/vertex/mesh-pick.wgsl.d.ts",
       "import": "./src/render/vertex/mesh-pick.wgsl",

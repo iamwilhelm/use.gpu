@@ -12,7 +12,9 @@ import {
   Router, Routes,
   WebGPU,
 } from '@use-gpu/components';
+
 import { UseInspect } from '@use-gpu/inspect';
+import '@use-gpu/inspect/theme.css';
 
 import { makeRoutes } from './routes';
 import { makePicker } from './pages/page-picker';

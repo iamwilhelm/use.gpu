@@ -17,7 +17,6 @@ import { PingProvider } from './ping';
 import { DetailSlider } from './detail';
 
 import * as Tabs from '@radix-ui/react-tabs';
-import "../theme.css";
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 

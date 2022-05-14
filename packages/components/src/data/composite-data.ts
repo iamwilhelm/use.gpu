@@ -217,7 +217,6 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       source.length = count;
       source.size[0] = count;
       source.version = incrementVersion(source.version);
-      source.array = array;
     }
   };
   

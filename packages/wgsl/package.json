@@ -108,6 +108,11 @@
       "import": "./src/instance/vertex/tick.wgsl",
       "require": "./src/instance/vertex/tick.wgsl"
     },
+    "./instance/vertex/ui-rectangle.wgsl": {
+      "types": "./src/instance/vertex/ui-rectangle.wgsl.d.ts",
+      "import": "./src/instance/vertex/ui-rectangle.wgsl",
+      "require": "./src/instance/vertex/ui-rectangle.wgsl"
+    },
     "./mask/masked.wgsl": {
       "types": "./src/mask/masked.wgsl.d.ts",
       "import": "./src/mask/masked.wgsl",
@@ -163,6 +168,11 @@
       "import": "./src/render/fragment/pick-geometry.wgsl",
       "require": "./src/render/fragment/pick-geometry.wgsl"
     },
+    "./render/fragment/shaded.wgsl": {
+      "types": "./src/render/fragment/shaded.wgsl.d.ts",
+      "import": "./src/render/fragment/shaded.wgsl",
+      "require": "./src/render/fragment/shaded.wgsl"
+    },
     "./render/fragment/solid.wgsl": {
       "types": "./src/render/fragment/solid.wgsl.d.ts",
       "import": "./src/render/fragment/solid.wgsl",
@@ -213,6 +223,11 @@
       "import": "./src/render/vertex/virtual-pick.wgsl",
       "require": "./src/render/vertex/virtual-pick.wgsl"
     },
+    "./render/vertex/virtual-shaded.wgsl": {
+      "types": "./src/render/vertex/virtual-shaded.wgsl.d.ts",
+      "import": "./src/render/vertex/virtual-shaded.wgsl",
+      "require": "./src/render/vertex/virtual-shaded.wgsl"
+    },
     "./render/vertex/virtual-solid.wgsl": {
       "types": "./src/render/vertex/virtual-solid.wgsl.d.ts",
       "import": "./src/render/vertex/virtual-solid.wgsl",
@@ -247,6 +262,11 @@
       "types": "./src/use/gamma.wgsl.d.ts",
       "import": "./src/use/gamma.wgsl",
       "require": "./src/use/gamma.wgsl"
+    },
+    "./use/light-old.wgsl": {
+      "types": "./src/use/light-old.wgsl.d.ts",
+      "import": "./src/use/light-old.wgsl",
+      "require": "./src/use/light-old.wgsl"
     },
     "./use/light.wgsl": {
       "types": "./src/use/light.wgsl.d.ts",

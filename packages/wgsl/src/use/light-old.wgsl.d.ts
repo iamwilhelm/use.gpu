@@ -1,6 +1,6 @@
-declare module "@use-gpu/wgsl/render/ui/fragment.wgsl" {
+declare module "@use-gpu/wgsl/use/light-old.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const lightUniforms: ParsedBundle;
   export default __module;
 }

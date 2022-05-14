@@ -34,7 +34,10 @@ export const makeUniforms = (
   const pipe = makeUniformPipe(uniforms);
   const buffer = makeUniformBuffer(device, pipe.data);
   const entries = makeResourceEntries([{buffer}]);
+
+  const label = uniforms.map(u => u.name).join(' ');
   const bindGroup = device.createBindGroup({
+    label,
     layout: pipeline.getBindGroupLayout(set),
     entries,
   });
@@ -53,8 +56,10 @@ export const makeMultiUniforms = (
   const {layout: {offsets}} = pipe;
   const bindings = offsets.map((offset) => ({buffer, offset}));
 
+  const label = uniformGroups.flatMap(uniforms => uniforms.map(u => u.name)).join(' ');
   const entries = makeResourceEntries(bindings);
   const bindGroup = device.createBindGroup({
+    label,
     layout: pipeline.getBindGroupLayout(set),
     entries,
   });

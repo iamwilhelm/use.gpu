@@ -44,7 +44,7 @@ export const LayoutDisplayPage: LC = () => {
                         <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
                         <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
                           radius={[20, 0, 20, 0]} border={3} stroke={[0.5, 0.5, 0.5, 1]} />
-                        <Element width={110} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                        <Element width={110} border={3.99} height={50} fill={[0.5, 0.5, 0.5, 0.5]} stroke={[0.75, 0.75, 0.75, 1]} />
                         <Element width={40} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
                           radius={[1, 10, 1, 1]} border={5} stroke={[0, 0, 0, 0.75]} />
                         <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />

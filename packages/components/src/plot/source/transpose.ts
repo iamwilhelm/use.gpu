@@ -30,7 +30,10 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
   const data = useContext(DataContext) ?? undefined;
 
   const dataBinding = useOne(() => ({name: 'getValue', format: data.format, args: ['u32']}), data.format);
-  const sizeExpr = useOne(() => () => data?.size || [], data);
+  const sizeExpr = useOne(() => () => {
+    const s = data?.size || [];
+    return [s[0] || 1, s[1] || 1, s[2] || 1, s[3] || 1];
+  }, data);
   const swizzle = useOne(() => parseAxes(axes), axes);
 
   // Construct size + index swizzle shader

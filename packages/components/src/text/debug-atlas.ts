@@ -15,7 +15,7 @@ type DebugAtlasProps = {
 export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (props: Partial<DebugAtlasProps> = {}) => {
   let {atlas, source} = props;
   if (!atlas && !source) {
-    ({atlas, source} = useContext(SDFFontContext));
+    ({__debug: {atlas, sourceRef: {current: source}}} = useContext(SDFFontContext));
   }
   else useNoContext(SDFFontContext);
 

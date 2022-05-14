@@ -1,4 +1,4 @@
-import { use } from '@use-gpu/live';
+import React from '@use-gpu/live/jsx';
 
 import { GeometryDataPage } from './pages/geometry/data';
 import { GeometryFacesPage } from './pages/geometry/faces';
@@ -25,15 +25,15 @@ export const PAGES = [
 ];
 
 export const makeRoutes = () => ({
-  "/geometry/data": { element: use(GeometryDataPage) },
-  "/geometry/faces": { element: use(GeometryFacesPage) },
-  "/geometry/lines": { element: use(GeometryLinesPage) },
-  "/layout/display": { element: use(LayoutDisplayPage) },
-  "/mesh/raw": { element: use(MeshRawPage) },
-  "/plot/simple": { element: use(PlotSimplePage) },
-  "/rtt/linear-rgb": { element: use(LinearRGBPage)},
-  "/debug/atlas": { element: use(DebugAtlasPage) },
+  "/geometry/data":  { element: <GeometryDataPage /> },
+  "/geometry/faces": { element: <GeometryFacesPage /> },
+  "/geometry/lines": { element: <GeometryLinesPage /> },
+  "/layout/display": { element: <LayoutDisplayPage /> },
+  "/mesh/raw":       { element: <MeshRawPage /> },
+  "/plot/simple":    { element: <PlotSimplePage /> },
+  "/rtt/linear-rgb": { element: <LinearRGBPage /> },
+  "/debug/atlas":    { element: <DebugAtlasPage /> },
 
-  "/": { element: use(HomePage, { container: document.querySelector('#use-gpu') }) },
-  "*": { element: use(EmptyPage) },
+  "/": { element: <HomePage container={document.querySelector('#use-gpu')} /> },
+  "*": { element: <EmptyPage /> },
 });

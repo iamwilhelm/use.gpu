@@ -42,7 +42,7 @@ export const PlotSimplePage: LC = () => {
             >
               <Cartesian
                 scale={[2, 1, 1]}
-              >             
+              >
                 <Grid
                   axes='xy'
                   width={3}
@@ -107,11 +107,10 @@ export const PlotSimplePage: LC = () => {
                   detail={8}
                   depth={0.5}
                 />
-              
                 <Sampled
                   axes='xz'
                   format='vec4<f32>'
-                  size={[64, 32]}
+                  size={[20, 10]}
                   expr={(emit, x, y) => {
                     const v = Math.cos(x) * Math.cos(y);
                     emit(x, v * .5 + .5, y, 1);

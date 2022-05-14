@@ -9,9 +9,7 @@
   return (length(dx) + length(dy)) * 0.5;
 }
 
-@export fn getBorderBoxSDF(box: vec2<f32>, uv: vec4<f32>, sdfUV: vec4<f32>, border: vec4<f32>) -> SDF {
-  var scale = getUVScale(sdfUV);
-
+@export fn getBorderBoxSDF(box: vec2<f32>, border: vec4<f32>, uv: vec2<f32>, scale: f32) -> SDF {
   var nearest = round(uv);
   var xy = (abs(uv - .5) - .5) * box;
 
@@ -28,9 +26,7 @@
   return SDF(outer / scale, inner / scale);
 }
 
-@export fn getRoundedBorderBoxSDF(box: vec2<f32>, uv: vec4<f32>, sdfUV: vec4<f32>, border: vec4<f32>, radius: vec4<f32>) -> SDF {
-  var scale = getUVScale(sdfUV);
-
+@export fn getRoundedBorderBoxSDF(box: vec2<f32>, border: vec4<f32>, radius: vec4<f32>, uv: vec2<f32>, scale: f32) -> SDF {
   var nearest = round(uv);
   var rs = mix(radius.xw, radius.yz, nearest.x);
   var r = mix(rs.x, rs.y, nearest.y);

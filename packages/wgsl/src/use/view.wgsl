@@ -11,6 +11,11 @@ struct ViewUniforms {
 
 @export @group(VIEW) @binding(VIEW) var<uniform> viewUniforms: ViewUniforms;
 
+@export fn getViewPosition() -> vec2<f32> { return viewUniforms.viewPosition; }
+@export fn getViewResolution() -> vec2<f32> { return viewUniforms.viewResolution; }
+@export fn getViewSize() -> vec2<f32> { return viewUniforms.viewSize; }
+@export fn getViewNearFar() -> vec2<f32> { return viewUniforms.viewNearFar; }
+
 @export fn worldToView(position: vec4<f32>) -> vec4<f32> {
   return viewUniforms.viewMatrix * position;
 }
@@ -23,23 +28,25 @@ struct ViewUniforms {
   return viewToClip(worldToView(position));
 }
 
-@export fn clipToScreen3D(position: vec4<f32>) -> vec3<f32> {
-  return vec3(position.xy * viewUniforms.viewSize, position.z);
-}
-
-@export fn screenToClip3D(position: vec4<f32>) -> vec3<f32> {
-  return vec3(position.xy * viewUniforms.viewResolution, position.z);
-}
-
-@export fn worldToClip3D(position: vec4<f32>) -> vec3<f32> {
-  return toClip3D(viewToClip(worldToView(position)));
-}
-
 @export fn toClip3D(position: vec4<f32>) -> vec3<f32> {
   return position.xyz / position.w;
 }
 
-@export fn clipLineIntoView(anchor: vec4<f32>, head: vec4<f32>, near: f32) -> vec4<f32> {
+@export fn worldToClip3D(position: vec4<f32>) -> vec3<f32> {
+  return toClip3D(worldToClip(position));
+}
+
+@export fn clip3DToScreen(position: vec3<f32>) -> vec2<f32> {
+  return position.xy * viewUniforms.viewSize;
+}
+
+@export fn screenToClip3D(position: vec2<f32>, z: f32) -> vec3<f32> {
+  return vec3(position.xy * viewUniforms.viewResolution, z);
+}
+
+@export fn clipLineIntoView(anchor: vec4<f32>, head: vec4<f32>) -> vec4<f32> {
+  var near = viewUniforms.viewNearFar.x * 2.0;
+
   var d = anchor - head;
   if (dot(d, d) == 0.0) { return worldToView(anchor); }
 

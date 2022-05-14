@@ -58,7 +58,10 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     id = 0,
   } = props;
 
-  // Set up draw, either individual tris, or triangle fans
+  // Set up draw as:
+  // - pre-indexed triangles
+  // - segmented triangle fans (convex faces)
+  // - individual tris
   const vertexCount = 3;
   const instanceCount = useCallback(() => {
     const indices = (props.indices as any)?.length;

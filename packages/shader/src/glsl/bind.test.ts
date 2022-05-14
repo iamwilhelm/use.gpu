@@ -49,13 +49,13 @@ describe("bind", () => {
     }
     
     {
-      const bound = bindBundle(sub, links, defines, 'key');
+      const bound = bindBundle(sub, links, defines);
       const linked = linkBundle(bound);
       expect(linked).toMatchSnapshot();
     }
 
     {
-      const bound = bindBundle(sub, links, defines, 'key');
+      const bound = bindBundle(sub, links, defines);
       const linked = linkBundle(module, {getColor: bound});
       expect(linked).toMatchSnapshot();
     }

@@ -26,15 +26,27 @@ const DEBUG_RENDERER = {
   fragment: instanceFragmentSolid,
 } as Record<string, ParsedBundle>;
 
+const PICK_PASS = [
+  instanceDrawVirtualPick,
+  instanceFragmentPickGeometry,
+] as [ParsedBundle, ParsedBundle];
+
 const SOLID_RENDERER = {
   color: [
     instanceDrawVirtualSolid,
     instanceFragmentSolid,
   ],
-  pick: [
-    instanceDrawVirtualPick,
-    instanceFragmentPickGeometry,
+  pick: PICK_PASS,
+} as VirtualRenderer;
+
+const SHADED_RENDERER = {
+  color: [
+    instanceDrawVirtualSolid,
+    instanceFragmentSolid,
+    //instanceDrawVirtualShaded,
+    //instanceFragmentShaded,
   ],
+  pick: PICK_PASS,
 } as VirtualRenderer;
 
 const UI_RENDERER = {
@@ -42,14 +54,12 @@ const UI_RENDERER = {
     instanceDrawVirtualUI,
     instanceFragmentUI,
   ],
-  pick: [
-    instanceDrawVirtualPick,
-    instanceFragmentPickGeometry,
-  ],
+  pick: PICK_PASS,
 } as VirtualRenderer;
 
 const BUILTIN = {
   solid: SOLID_RENDERER,
+  shaded: SHADED_RENDERER,
   ui: UI_RENDERER,
 } as Record<string, VirtualRenderer>;
 

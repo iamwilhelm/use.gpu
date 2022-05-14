@@ -45,10 +45,12 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   } = props;
 
   const { getGlyph, getScale, getRadius } = useSDFFontContext();
+  
+  const radius = getRadius();
   const scale = getScale(size);
       
   const out = [] as any[];
-  const rects = [] as number[];
+  const rectangles = [] as number[];
   const uvs = [] as number[];
   let count = 0;
 
@@ -73,7 +75,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
             const cx = snap ? Math.round(sx) : sx;
             const cy = snap ? Math.round(y) : y;
 
-            rects.push((scale * gl) + cx, (scale * gt) + cy, (scale * gr) + cx, (scale * gb) + cy);
+            rectangles.push((scale * gl) + cx, (scale * gt) + cy, (scale * gr) + cx, (scale * gb) + cy);
             uvs.push(mapping[0], mapping[1], mapping[2], mapping[3]);
 
             count++;
@@ -93,13 +95,11 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
   const render = count ? {
     id,
-    rectangles: rects,
+    rectangles,
     uvs,
-    radius: [1 / scale, getRadius(), 0, 0],
+    sdf: [radius, scale, size, 0],
     fill: color,
     texture: SDF_FONT_ATLAS,
-    repeat: -1,
-
     count,
     transform,
   } : null;

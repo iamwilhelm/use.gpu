@@ -1,5 +1,18 @@
 let KEY = 0;
+const KEYS = new WeakMap<object, number>();
+
 export const makeKey = (): number => ++KEY;
+export const getObjectKey = (v: any) => {
+  if (v && typeof v === 'object') {
+    const c = KEYS.get(v);
+    if (c != null) return c;
+
+    const k = makeKey();
+    KEYS.set(v, k);
+    return k;
+  }
+  return 0;
+}
 
 const HASH_KEY = 0xf1c3a587;
 
@@ -21,9 +34,9 @@ export const formatHash = (uint: number) => {
   return uint.toString(36).slice(-10);
 }
 
-export const getHash = <T>(t: T) => formatHash(getValueHash(t));
+export const getHash = <T>(t: T) => formatHash(getHashValue(t));
 
-export const getValueHash = (s: any) => {
+export const getHashValue = (s: any) => {
   if (typeof s === 'string') return getStringHash(s);
   if (typeof s === 'number') return getNumberHash(s);
   if (typeof s === 'boolean') return getBooleanHash(s);
@@ -40,7 +53,8 @@ export const getStringHash  = (s: string) => stringToMurmur53(s, HASH_KEY + 15);
 
 const f64 = new Float64Array(1);
 const uint32 = new Uint32Array(f64.buffer);
-export const getNumberHash  = (n: number) => {
+export const getNumberHash = (n: number) => scrambleBits53(getNumberHashRaw(n));
+export const getNumberHashRaw = (n: number) => {
   f64[0] = n;
   let k = HASH_KEY + 63;
   k = mixBits53(k, uint32[0]);
@@ -52,7 +66,7 @@ export const getBooleanHash = (b: boolean) => scrambleBits53(mixBits53(HASH_KEY 
 
 export const getArrayHash = (t: any[]) => {
   let h = mixBits53(HASH_KEY + 1023, 0);
-  for (let v of t) h = mixBits53(h, getValueHash(v));
+  for (let v of t) h = mixBits53(h, getHashValue(v));
   return scrambleBits53(h, t.length);
 }
 
@@ -60,8 +74,8 @@ export const getObjectHash = (t: Record<string, any>) => {
   let i = 0;
   let h = mixBits53(HASH_KEY + 4095, 0);
   for (let k in t) {
-    h = mixBits53(h, getValueHash(k));
-    h = mixBits53(h, getValueHash(t[k]));
+    h = mixBits53(h, getHashValue(k));
+    h = mixBits53(h, getHashValue(t[k]));
     ++i;
   }
   return scrambleBits53(h, i);
@@ -99,7 +113,7 @@ export const getTypedArrayHash = (t: TypedArray) => {
   }
   else {
     let n = t.length;
-    for (let i = 0; i < n; ++i) h = mixBits53(h, getNumberHash(t[i]));
+    for (let i = 0; i < n; ++i) h = mixBits53(h, getNumberHashRaw(t[i]));
   }
 
   return scrambleBits53(h);

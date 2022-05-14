@@ -1,6 +1,6 @@
-struct LightUniforms {
-  lightPosition: vec4<f32>,
-  lightColor: vec4<f32>,
+struct Light {
+  kind: i32,
+  position: vec4<f32>,
+  color: vec4<f32>,
+  intensity: f32,
 };
-
-@export @group(LIGHT) @binding(LIGHT) var<uniform> lightUniforms: LightUniforms;

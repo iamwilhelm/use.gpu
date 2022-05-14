@@ -56,7 +56,6 @@ export const render = (props: RenderProps) => {
   const {colorInput, colorSpace} = renderContext;
 
   // Render shader
-  // TODO: non-strip topology
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
   const cs = getColorSpace(colorInput, colorSpace);
 

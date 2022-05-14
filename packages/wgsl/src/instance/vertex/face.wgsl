@@ -1,5 +1,5 @@
-use '@use-gpu/wgsl/use/types'::{ MeshVertex };
-use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip };
+use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
+use '@use-gpu/wgsl/use/view'::{ worldToClip };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getNormal(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
@@ -8,7 +8,7 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip };
 
 @optional @link fn getIndex(i: u32) -> u32 { return 0u; };
 
-@export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> MeshVertex {
+@export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> ShadedVertex {
   var NaN: f32 = bitcast<f32>(0xffffffffu);
 
   var segment = getSegment(instanceIndex);
@@ -21,7 +21,8 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip };
     cornerIndex = instanceIndex * 3u + vertexIndex;
   }
   else if (segment == 0) {
-    return MeshVertex(
+    return ShadedVertex(
+      vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
       vec3(NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
@@ -42,12 +43,14 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip };
   }
 
   var color = getColor(cornerIndex);
-  var position = worldToClip(getPosition(cornerIndex));
+  var world = getPosition(cornerIndex);
+  var position = worldToClip(world);
   var normal = getNormal(cornerIndex).xyz;
   var uv = vec2<f32>(0.5, 0.5);
 
-  return MeshVertex(
+  return ShadedVertex(
     position,
+    world,
     normal,
     color,
     uv,

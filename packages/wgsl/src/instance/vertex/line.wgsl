@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, worldToView, viewToClip, toClip3D, clipLineIntoView, getPerspectiveScale };
+use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToView, viewToClip, toClip3D, clipLineIntoView, getPerspectiveScale };
 use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
@@ -141,9 +141,8 @@ fn trimAnchor(
   }
 
   // Clip ends into view
-  var near = viewUniforms.viewNearFar.x * 2.0;
-  var clipBeforeV = clipLineIntoView(beforePos, centerPos, near);
-  var clipAfterV  = clipLineIntoView(afterPos, centerPos, near);
+  var clipBeforeV = clipLineIntoView(beforePos, centerPos);
+  var clipAfterV  = clipLineIntoView(afterPos, centerPos);
 
   var before = toClip3D(viewToClip(clipBeforeV));
   var after  = toClip3D(viewToClip(clipAfterV));
@@ -153,10 +152,10 @@ fn trimAnchor(
 
   if (center4.w <= 0.0) {
     if (ij.x == 0u) {
-      centerV = clipLineIntoView(centerPos, afterPos, near);
+      centerV = clipLineIntoView(centerPos, afterPos);
     }
     else if (ij.x != 0u) {
-      centerV = clipLineIntoView(centerPos, beforePos, near);
+      centerV = clipLineIntoView(centerPos, beforePos);
     }
     else {
       return SolidVertex(

@@ -2,14 +2,15 @@ import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding } f
 
 import { parseLinkAliases } from '../util/link';
 import { getHash, makeKey } from '../util/hash';
-import { toBundle, toModule, getBundleHash } from '../util/bundle';
+import { toBundle, toModule, getBundleHash, getBundleKey } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
 import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
 
 import { timed } from './timed';
 
 const NO_SYMBOLS = [] as any[];
-3
+const DEBUG = false;
+
 export type BindBundle2 = (
   bundle: ShaderModule,
   links?: Record<string, ShaderModule | null>,
@@ -47,18 +48,19 @@ export const bindBundle = (
   subject: ShaderModule,
   links: Record<string, ShaderModule | null> | null = null,
   defines: Record<string, ShaderDefine> | null = null,
-  key: string | number = makeKey(),
 ): ParsedBundle => {
   const bundle = toBundle(subject);
   if (!links && !defines) return bundle;
 
   const hash = getBundleHash(bundle);
+  const key = getBundleKey(bundle);
+
   const external: string[] = [];
   for (const k in links) if (links[k]) external.push(getBundleHash(links[k]!));
 
   const unique = `@closure [${hash}] [${external.join(' ')}]`;
   const rehash = getHash(unique);
-  const rekey  = getHash(`${rehash} ${key.toString(16)}`);
+  const rekey  = getHash(`${rehash} ${key}`);
   
   const relinks = bundle.links ? {
     ...bundle.links,
@@ -109,7 +111,8 @@ export const makeResolveBindings = (
   const allUniforms = [] as DataBinding[];
   const allBindings = [] as DataBinding[];
 
-  const seen = new Set<ParsedModule>();
+  const seen = new Set<string>();
+  DEBUG && console.log('------------')
 
   // Gather all namespaced uniforms and bindings from all virtual modules.
   // Assign base offset to each virtual module in-place.
@@ -117,8 +120,12 @@ export const makeResolveBindings = (
   let index = 0;
   for (const {virtuals} of modules) {
     if (virtuals) for (const m of virtuals) {
-      if (seen.has(m)) continue;
-      seen.add(m);
+      const key = getBundleKey(m);
+
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      DEBUG && console.log('virtual', m.code, m.hash, m.key);
 
       if (m.virtual) {
         const {uniforms, storages, textures} = m.virtual;

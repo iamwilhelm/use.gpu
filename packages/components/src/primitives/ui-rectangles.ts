@@ -2,23 +2,24 @@ import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, LambdaSource, TextureSource, RenderPassMode,
+  VertexData, TextureSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
 import { PickingContext, useNoPicking } from '../render/picking';
-import { LayoutContext } from '../providers/layout-provider';
-import { render } from './render';
+import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useCallback, useFiber, useMemo, useOne } from '@use-gpu/live';
+import { use, memo, useCallback, useMemo } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings, resolve } from '@use-gpu/core';
+import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
+import { useTransformContext } from '../providers/transform-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
+import { useBoundShader } from '../hooks/useBoundShader';
 
-import rectangleVertex from '@use-gpu/wgsl/render/ui/vertex.wgsl';
-import rectangleFragment from '@use-gpu/wgsl/render/ui/fragment.wgsl';
+import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
+import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
 
 export type UIRectanglesProps = {
   rectangle?: number[] | TypedArray,
@@ -28,9 +29,7 @@ export type UIRectanglesProps = {
   fill?: number[] | TypedArray,
   uv?: number[] | TypedArray,
   repeat?: number,
-
-  texture?: TextureSource | LambdaSource | ShaderModule,
-  transform?: ShaderModule,
+  sdf?: number[] | TypedArray,
 
   rectangles?: ShaderSource,
   radiuses?: ShaderSource,
@@ -39,44 +38,70 @@ export type UIRectanglesProps = {
   fills?: ShaderSource,
   uvs?: ShaderSource,
   repeats?: ShaderSource,
+  sdfs?: ShaderSource,
 
-  count?: number,
-  
+  texture?: TextureSource | LambdaSource | ShaderModule,
+
+  alphaToCoverage?: boolean,
+  count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
 };
 
-const VERTEX_BINDINGS = bundleToAttributes(rectangleVertex);
-const FRAGMENT_BINDINGS = bundleToAttributes(rectangleFragment);
+const VERTEX_BINDINGS = bundleToAttributes(getUIRectangleVertex);
+const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
 
-const DEFINES = {
-  STRIP_SEGMENTS: 2,
+const DEFINES_ALPHA = {
+  HAS_EDGE_BLEED: true,
+  HAS_ALPHA_TO_COVERAGE: false,
 };
 
-const PIPELINE = {
+const DEFINES_ALPHA_TO_COVERAGE = {
+  HAS_EDGE_BLEED: true,
+  HAS_ALPHA_TO_COVERAGE: true,
+};
+
+const PIPELINE_ALPHA = {
   primitive: {
     topology: 'triangle-strip',
     stripIndexFormat: 'uint16',
   },
-  depthStencil: {
-    depthWriteEnabled: false,
+} as DeepPartial<GPURenderPipelineDescriptor>;
+
+const PIPELINE_ALPHA_TO_COVERAGE = {
+  fragment: {
+    targets: {
+      0: { blend: {$set: undefined}, },
+    },
+  },
+  multisample: {
+    alphaToCoverageEnabled: true,
+  },
+  primitive: {
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
 export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
   const {
     pipeline: propPipeline,
+    alphaToCoverage = false,
     mode = RenderPassMode.Opaque,
     id = 0,
     count = 1,
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => ((props.rectangles as any)?.length ?? resolve(count)), [props.rectangles, count]);
+  const instanceCount = useCallback(() => ((props.indices as any)?.length ?? resolve(count)), [props.indices, count]);
 
-  const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
-  const key = useFiber().id;
+  const pipeline = useMemo(() =>
+    patch(alphaToCoverage
+      ? PIPELINE_ALPHA_TO_COVERAGE
+      : PIPELINE_ALPHA,
+    propPipeline),
+    [propPipeline, alphaToCoverage]);
 
   const r = useShaderRef(props.rectangle, props.rectangles);
   const a = useShaderRef(props.radius, props.radiuses);
@@ -85,30 +110,26 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const f = useShaderRef(props.fill, props.fills);
   const u = useShaderRef(props.uv, props.uvs);
   const p = useShaderRef(props.repeat, props.repeats);
+  const d = useShaderRef(props.sdf, props.sdfs);
 
+  const parent = useTransformContext(p);
+  const x = props.transform || parent;
   const t = props.texture;
-  const x = props.transform;
 
-  const [vs, fs] = useMemo(() => {
-    const vertexBindings = makeShaderBindings<ShaderModule>(VERTEX_BINDINGS, [r, a, b, s, f, u, p, x]);
-    const fragmentBindings = makeShaderBindings<ShaderModule>(FRAGMENT_BINDINGS, [t]);
+  const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x]);
+  const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
 
-    const vs = bindBundle(rectangleVertex, bindingsToLinks(vertexBindings), null, key);
-    const fs = bindBundle(rectangleFragment, bindingsToLinks(fragmentBindings), null, key);
-
-    return [vs, fs];
-  }, [r, a, b, s, f, u, p, t, x]);
-
-  return render({
+  return use(Virtual, {
     vertexCount,
     instanceCount,
 
-    vertex: vs,
-    fragment: fs,
+    getVertex,
+    getFragment,
 
-    defines: DEFINES,
+    defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
     deps: null,
 
+    renderer: 'ui',
     pipeline,
     mode,
     id,

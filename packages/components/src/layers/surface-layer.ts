@@ -12,9 +12,13 @@ import { patch } from '@use-gpu/state';
 import { use, memo, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
-import { useBoundShader } from '../hooks/useBoundShader';
 
-import { getSurfaceIndex } from '@use-gpu/wgsl/plot/surface.wgsl';
+import { useShaderRef } from '../hooks/useShaderRef';
+import { useBoundSource } from '../hooks/useBoundSource';
+import { useBoundShader } from '../hooks/useBoundShader';
+import { useApplyTransform } from '../hooks/useApplyTransform';
+
+import { getSurfaceIndex, getSurfaceNormal } from '@use-gpu/wgsl/plot/surface.wgsl';
 
 export type SurfaceLayerProps = {
   position?: number[] | TypedArray,
@@ -31,7 +35,7 @@ export type SurfaceLayerProps = {
   id?: number,
 };
 
-const SURFACE_BINDINGS = bundleToAttributes(getSurfaceIndex);
+const [SIZE_BINDING, POSITION_BINDING] = bundleToAttributes(getSurfaceIndex);
 
 export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: SurfaceLayerProps) => {
   const {
@@ -51,6 +55,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   const sizeExpr = useMemo(() => () =>
     props.positions?.size ?? resolve(size),
     [props.positions, size]);
+  const boundSize = useBoundSource(SIZE_BINDING, sizeExpr);
 
   const countExpr = useOne(() => () => {
     const s = resolve(sizeExpr);
@@ -58,7 +63,11 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   }, sizeExpr);
 
   const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY}), [loopX, loopY]);
-  const indices = useBoundShader(getSurfaceIndex, SURFACE_BINDINGS, [sizeExpr], defines);
+  const indices = useBoundShader(getSurfaceIndex, [SIZE_BINDING], [boundSize], defines);
+
+  const p = useShaderRef(props.position, props.positions);
+  const xf = useApplyTransform(p);
+  const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, xf], defines);
 
   return use(RawFaces, {
     position,
@@ -67,6 +76,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     colors,
 
     indices,
+    //normals,
 
     count: countExpr,
     mode,

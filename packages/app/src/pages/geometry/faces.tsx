@@ -125,7 +125,6 @@ export const GeometryFacesPage: LC = () => {
           radius={radius}
           phi={phi}
           theta={theta}
-          scale={2160}
         >
           {view}
         </OrbitCamera>

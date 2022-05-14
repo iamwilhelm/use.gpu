@@ -1,19 +1,6 @@
-use '@use-gpu/wgsl/use/view'::{ worldToClip };
+use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
-use "@use-gpu/wgsl/use/color"::{toColorSpace};
-
-struct VertexOutput {
-  @builtin(position)              position: vec4<f32>,
-  @location(0) @interpolate(flat) fragRectangle: vec4<f32>,
-  @location(1) @interpolate(flat) fragRadius: vec4<f32>,
-  @location(2) @interpolate(flat) fragMode: i32,
-  @location(3) @interpolate(flat) fragBorder: vec4<f32>,
-  @location(4) @interpolate(flat) fragStroke: vec4<f32>,
-  @location(5) @interpolate(flat) fragFill: vec4<f32>,
-  @location(6) @interpolate(flat) fragRepeat: i32,
-  @location(7)                    fragUV: vec2<f32>,
-  @location(8)                    fragTextureUV: vec2<f32>,
-};
+use '@use-gpu/wgsl/use/view'::{ worldToClip }; 
 
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 @optional @link fn getRadius(i: u32)    -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
@@ -23,13 +10,10 @@ struct VertexOutput {
 @optional @link fn getUV(i: u32)        -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); }
 @optional @link fn getRepeat(i: u32)    -> i32       { return 0; }
 
+@optional @link fn getSDFConfig(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
 @optional @link fn applyTransform(p: vec4<f32>) -> vec4<f32> { return p; }
 
-@stage(vertex)
-fn main(
-  @builtin(vertex_index) vertexIndex: u32,
-  @builtin(instance_index) instanceIndex: u32,
-) -> VertexOutput {
+@export fn getUIRectangleVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
 
   var rectangle = getRectangle(instanceIndex);
   var radius = getRadius(instanceIndex);
@@ -39,27 +23,38 @@ fn main(
   var uv4 = getUV(instanceIndex);
   var repeat = getRepeat(instanceIndex);
 
-  var uv = getQuadUV(vertexIndex);
-  var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv), 0.5, 1.0);
+  var sdfConfig = getSDFConfig(instanceIndex);
+
+  var uv1 = getQuadUV(vertexIndex);
+
+  var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.5, 1.0);
   var center = worldToClip(applyTransform(position));
 
-  var texUV = mix(uv4.xy, uv4.zw, uv);
+  var uv = mix(uv4.xy, uv4.zw, uv1);
 
   var mode: i32;
-  if (length(radius + border) == 0.0) { mode = 0; }
+  if (sdfConfig.x > 0.0) { mode = -1; }
+  else if (length(radius + border) == 0.0) { mode = 0; }
   else if (length(radius) == 0.0) { mode = 1; }
   else { mode = 2; };
 
-  return VertexOutput(
+  let box = rectangle.zw - rectangle.xy;
+  let sdfUV = uv1 * box;
+  let textureUV = uv;
+
+  return UIVertex(
     center,
-    rectangle,
-    radius,
-    mode,
-    border,
-    toColorSpace(stroke),
-    toColorSpace(fill),
+    uv1,
+    sdfConfig,
+    sdfUV,
+    textureUV,
     repeat,
-    uv,
-    texUV,
+    mode,
+    vec4<f32>(box, 0.0, 0.0),
+    radius,
+    border,
+    stroke,
+    fill,
+    instanceIndex,
   );
 }

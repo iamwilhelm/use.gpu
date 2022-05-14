@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
-use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }; 
+use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveScale }; 
 
 @optional @link fn getIndex(i: u32) -> u32 { return 0u; };
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
@@ -71,11 +71,10 @@ use '@use-gpu/wgsl/use/view'::{ viewUniforms, worldToClip, getPerspectiveScale }
   xy = xy * vec2<f32>(1.0, -1.0);
 
   // Attach to position
-  center = vec4<f32>(center.xy + 2.0 * xy * viewUniforms.viewResolution * center.w, center.zw);
+  center = vec4<f32>(center.xy + 2.0 * xy * getViewResolution() * center.w, center.zw);
   
   let sdfUV = uv;
   let textureUV = uv;
-  let box = rectangle.zw - rectangle.xy;
 
   return UIVertex(
     center,

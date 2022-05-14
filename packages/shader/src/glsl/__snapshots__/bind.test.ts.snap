@@ -96,7 +96,7 @@ exports[`bind makes deterministic links for data bindings 1`] = `
 Object {
   "base": undefined,
   "code": "@access [getColor getSize] [7fwcbrd6ow]",
-  "name": "_VT_7fwcbr",
+  "name": "_VT_80l2v3",
   "storages": Array [
     Object {
       "storage": Object {

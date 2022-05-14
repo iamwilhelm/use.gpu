@@ -19,8 +19,10 @@ export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as TextureSource;
 export const SDF_FONT_DEBUG = 'SDF_FONT_DEBUG' as any as TextureSource;
 
 export type SDFFontContextProps = {
-  atlas: Atlas,
-  source: TextureSource,
+  __debug: {
+    atlas: Atlas,
+    source: {current: TextureSource},
+  },
 
   getRadius: () => number,
   getScale: (size: number) => number,
@@ -140,8 +142,10 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
     };
 
     return {
-      atlas,
-      source: sourceRef.current, 
+      __debug: {
+        atlas,
+        sourceRef,
+      },
 
       getRadius,
       getScale,

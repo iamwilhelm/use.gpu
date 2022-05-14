@@ -20,5 +20,5 @@ export const useBoundShader = (
     const bindings = makeShaderBindings<ShaderModule>(defs, values);
     const links = bindingsToLinks(bindings);
     return bindBundle(shader, links, defines);
-  }, [shader, defs, ...values, defines]);
+  }, [shader, ...defs, ...values, defines]);
 }

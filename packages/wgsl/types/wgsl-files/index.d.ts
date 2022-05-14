@@ -132,6 +132,13 @@ declare module "@use-gpu/wgsl/instance/vertex/tick.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getUIRectangleVertex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/mask/masked.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -198,6 +205,7 @@ declare module "@use-gpu/wgsl/plot/surface.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getSurfaceIndex: ParsedBundle;
+  export const getSurfaceNormal: ParsedBundle;
   export default __module;
 }
 
@@ -209,6 +217,13 @@ declare module "@use-gpu/wgsl/render/fragment/mesh.wgsl" {
 }
 
 declare module "@use-gpu/wgsl/render/fragment/pick-geometry.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/fragment/shaded.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
@@ -288,6 +303,13 @@ declare module "@use-gpu/wgsl/render/vertex/virtual-pick.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/render/vertex/virtual-solid.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -345,10 +367,17 @@ declare module "@use-gpu/wgsl/use/gamma.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/use/light.wgsl" {
+declare module "@use-gpu/wgsl/use/light-old.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const lightUniforms: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/use/light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  
   export default __module;
 }
 
@@ -364,6 +393,7 @@ declare module "@use-gpu/wgsl/use/types.wgsl" {
   const __module: ParsedBundle;
   export const PickVertex: ParsedBundle;
   export const SolidVertex: ParsedBundle;
+  export const ShadedVertex: ParsedBundle;
   export const UIVertex: ParsedBundle;
   export const MeshVertex: ParsedBundle;
   export default __module;
@@ -373,13 +403,17 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const viewUniforms: ParsedBundle;
+  export const getViewPosition: ParsedBundle;
+  export const getViewResolution: ParsedBundle;
+  export const getViewSize: ParsedBundle;
+  export const getViewNearFar: ParsedBundle;
   export const worldToView: ParsedBundle;
   export const viewToClip: ParsedBundle;
   export const worldToClip: ParsedBundle;
-  export const clipToScreen3D: ParsedBundle;
-  export const screenToClip3D: ParsedBundle;
-  export const worldToClip3D: ParsedBundle;
   export const toClip3D: ParsedBundle;
+  export const worldToClip3D: ParsedBundle;
+  export const clip3DToScreen: ParsedBundle;
+  export const screenToClip3D: ParsedBundle;
   export const clipLineIntoView: ParsedBundle;
   export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;

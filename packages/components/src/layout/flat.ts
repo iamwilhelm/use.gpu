@@ -71,7 +71,6 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   })) as any as ViewUniforms;
 
   uniforms.projectionMatrix.current = matrix;
-  //uniforms.viewMatrix.current = ;
   uniforms.viewPosition.current = [ 0, 0, 1, 0 ];
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];

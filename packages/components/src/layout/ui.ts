@@ -6,7 +6,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { SDFFontProvider, SDF_FONT_ATLAS } from '../text/providers/sdf-font-provider';
 import { ScrollConsumer } from '../consumers/scroll-consumer';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { use, keyed, wrap, fragment, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, fragment, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -81,7 +81,9 @@ const Resume = (
     layer.push(item);
   }
 
-  return fragment(layers.map((layer, i) => keyed(Layer, ids[i], layer)));
+  const els = layers.map((layer, i) => keyed(Layer, ids[i], layer));
+  els.push(yeet([]));
+  return fragment(els);
 };
 
 const Layer: LiveFunction<any> = (
@@ -114,6 +116,7 @@ const makeUIAccumulator = (
   const hasFill = keys.has('fills') || keys.has('fill');
   const hasUV = keys.has('uvs') || keys.has('uv');
   const hasRepeat = keys.has('repeats') || keys.has('repeat');
+  const hasSDF = keys.has('sdfs') || keys.has('sdf');
 
   const hasTexture = keys.has('texture');
   const hasTransform = keys.has('transform');
@@ -125,6 +128,7 @@ const makeUIAccumulator = (
   if (hasFill) storage.fills = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasUV) storage.uvs = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasRepeat) storage.repeats = makeAggregateBuffer(device, 'i32', count);
+  if (hasSDF) storage.sdfs = makeAggregateBuffer(device, 'vec4<f32>', count);
 
   return (items: UIAggregate[]) => {
     const count = items.reduce(allCount, 0);
@@ -139,6 +143,7 @@ const makeUIAccumulator = (
     if (hasFill) props.fills = updateAggregateBuffer(device, storage.fills, items, count, 'fill', 'fills');
     if (hasUV) props.uvs = updateAggregateBuffer(device, storage.uvs, items, count, 'uv', 'uvs');
     if (hasRepeat) props.repeats = updateAggregateBuffer(device, storage.repeats, items, count, 'repeat', 'repeats');
+    if (hasSDF) props.sdfs = updateAggregateBuffer(device, storage.sdfs, items, count, 'sdf', 'sdfs');
 
     if (hasTexture) props.texture = items[0].texture;
     if (hasTransform) props.transform = items[0].transform;

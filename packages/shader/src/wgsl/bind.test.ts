@@ -41,7 +41,7 @@ describe("bind", () => {
     const links = {"getSubColor:getColor": getColor};
     const defines = {'TEST': true};
 
-    const bound = bindBundle(sub, links, defines, 'key');
+    const bound = bindBundle(sub, links, defines);
 
     expect(bound.hash).not.toEqual(sub.table.hash);
     expect(bound.hash).toBeTruthy();
@@ -90,13 +90,13 @@ describe("bind", () => {
     }
 
     {
-      const bound = bindBundle(sub, links, defines, 'key');
+      const bound = bindBundle(sub, links, defines);
       const linked = linkBundle(bound);
       expect(linked).toMatchSnapshot();
     }
 
     {
-      const bound = bindBundle(sub, links, defines, 'key');
+      const bound = bindBundle(sub, links, defines);
       const linked = linkBundle(module, {getColor: bound});
       expect(linked).toMatchSnapshot();
     }

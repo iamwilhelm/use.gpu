@@ -1,4 +1,4 @@
-import { getHash } from './hash';
+import { getHash, getHashValue } from './hash';
 import uniq from 'lodash/uniq';
 
 const add = (a: number, b: number) => ((a|0) + (b|0)) >>> 0;
@@ -60,4 +60,17 @@ describe('hash', () => {
     expect(uniq(hashes).length).toBe(hashes.length);
   });
   
+  it("doesn't collide 16-bit ints", () => {
+
+    const seen = new Map<number, number>();
+    for (let i = 0; i < 0xffff; ++i) {
+      const v = getHashValue(i);
+      if (seen.has(v)) {
+        console.log('hash collision', seen.get(v), i, '=', v);
+        expect(false).toBe(true);
+      }
+      seen.set(v, i);
+    }
+
+  });
 });

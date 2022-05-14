@@ -149,7 +149,7 @@ export const mixBits53 = (x: number, d: number) => {
   let a = (x & 0xffffffff) >>> 0;
   let b = Math.floor(x / 0x100000000);
 
-  let d1 = add(rot(d, 16), mul(a, b));
+  let d1 = add(rot(d, 16), add(a, b));
   let d2 = add(d, a);
 
   d1 = mul(d1, C1);
@@ -201,7 +201,7 @@ export const arrayToMurmur53 = (list: number[] | TypedArray, seed: number = 0) =
 
   for (let i = 0; i < n; ++i) {
     let d = list[i];
-    let d1 = add(d << 8, b);
+    let d1 = add(rot(d, 16), b);
     let d2 = add(d, a);
 
     d1 = mul(d1, C1);
@@ -246,7 +246,7 @@ export const stringToMurmur53 = (s: string, seed: number = 0) => {
 
   for (let i = 0; i < n; ++i) {
     let d = s.charCodeAt(i);
-    let d1 = add(d << 8, b);
+    let d1 = add(rot(d, 16), b);
     let d2 = add(d, a);
 
     d1 = mul(d1, C1);

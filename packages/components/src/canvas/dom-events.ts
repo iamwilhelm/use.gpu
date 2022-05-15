@@ -163,14 +163,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       document.removeEventListener('mouseup', onMouseUp, CAPTURE_EVENT);
     };
     
-    const onKeyDown = (e: KeyboardEvent) => {
-      console.log(e)
-      onModifiers(e);
-    };
-
-    const onKeyUp = (e: KeyboardEvent) => {
-      onModifiers(e);
-    };
+    const onKeyDown = (e: KeyboardEvent) => onModifiers(e);
+    const onKeyUp = (e: KeyboardEvent) => onModifiers(e);
 
     element.addEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
     element.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);

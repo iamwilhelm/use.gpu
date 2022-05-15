@@ -34,7 +34,7 @@
     return vec4<u32>(start, start + 1u, end, both);
   }
   if (e != 0 && (s == 0 || d == 1u)) {
-    return vec4<u32>(end, end - 1u, end, both);
+    return vec4<u32>(end, end - 1u, start, both);
   }
 
   return vec4<u32>(0u, 0u, 0u, 0u);

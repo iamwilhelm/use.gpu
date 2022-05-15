@@ -81,8 +81,8 @@ export const glyphToSDF = (
   edt(inner, pad, pad, w, h, wp, f, z, v);
 
   for (let i = 0; i < np; i++) {
-      const d = Math.sqrt(outer[i]) - Math.sqrt(inner[i]);
-      out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
+    const d = Math.sqrt(outer[i]) - Math.sqrt(inner[i]);
+    out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   } 
 
   return glyphToRGBA(out, wp, hp);

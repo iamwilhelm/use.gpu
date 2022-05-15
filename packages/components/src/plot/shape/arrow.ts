@@ -7,6 +7,7 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useBoundSource } from '../../hooks/useBoundSource';
+import { useDerivedSource } from '../../hooks/useDerivedSource';
 import { useShaderRef } from '../../hooks/useShaderRef';
 import { DataContext } from '../../providers/data-provider';
 import {
@@ -56,8 +57,8 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
 
   const detailExpr = useOne(() => () => (positions?.size?.[0] || 1) - 1, positions);
 
-  const boundStart = useBoundSource(START_ATTRIBUTE, useShaderRef(start));
-  const boundEnd = useBoundSource(END_ATTRIBUTE, useShaderRef(end));
+  const boundStart = useBoundSource(START_ATTRIBUTE, useShaderRef(+start));
+  const boundEnd = useBoundSource(END_ATTRIBUTE, useShaderRef(+end));
   const deps = [detailExpr, boundStart, boundEnd];
 
   const segments = useOne(() => useBoundShader(getLineSegment, LINE_ATTRIBUTES, [detailExpr]), detailExpr);
@@ -79,6 +80,8 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
       colors,
       widths,
       depths,
+      
+      count: () => (positions?.length || 0) * (+start + +end) / 2,
     })
   );
 };

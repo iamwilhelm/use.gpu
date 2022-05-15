@@ -44,7 +44,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   const {range: g, axes: a} = useAxesTrait(props);
   const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
-  const combined = useMemo(() => {
+  const matrix = useMemo(() => {
     const x = g[0][0];
     const y = g[1][0];
     const z = g[2][0];

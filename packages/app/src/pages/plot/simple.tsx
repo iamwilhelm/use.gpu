@@ -69,7 +69,7 @@ export const PlotSimplePage: LC = () => {
                   axis='x'
                 >
                   <Tick
-                    size={50}
+                    size={20}
                     width={5}
                     offset={[0, 1, 0]}
                     color={[0.75, 0.75, 0.75, 1]}

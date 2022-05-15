@@ -64,7 +64,6 @@ let ARROW_ASPECT: f32 = 2.5;
     arrowRadius = getArrowCorrection(cap.w, center.w, depth);
   }
 
-  //let position = vec4<f32>(meshPosition.xyz * finalSize + startPos.xyz, 1.0);
   let uv = vec2<f32>(f32(anchorIndex), 0.0);
 
   let orientedPos = m * vec4<f32>(vec3<f32>(meshPosition.x, meshPosition.yz * arrowRadius) * arrowSize, 1.0);

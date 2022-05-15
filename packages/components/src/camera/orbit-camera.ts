@@ -65,7 +65,6 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
     viewPosition: { current: null },
     viewResolution: { current: null },
     viewSize: { current: null },
-    viewScaleUnit: { current: null },
     viewWorldDepth: { current: null },
     viewPixelRatio: { current: null },
   })) as any as ViewUniforms;
@@ -78,7 +77,6 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
-  uniforms.viewScaleUnit.current = 1;
   uniforms.viewWorldDepth.current = focus * Math.tan(fov / 2);
   uniforms.viewPixelRatio.current = pixelRatio * unit;
 

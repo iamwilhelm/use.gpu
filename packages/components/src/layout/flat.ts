@@ -73,7 +73,6 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     viewNearFar: { current: null },
     viewResolution: { current: null },
     viewSize: { current: null },
-    viewScaleUnit: { current: null },
     viewWorldDepth: { current: null },
     viewPixelRatio: { current: null },
   })) as any as ViewUniforms;
@@ -96,7 +95,6 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
-  uniforms.viewScaleUnit.current = viewHeight / zoom;
   uniforms.viewWorldDepth.current = focus * viewHeight / 2.0;
   uniforms.viewPixelRatio.current = ratio;
 

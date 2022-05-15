@@ -1,4 +1,4 @@
-use '@use-gpu/wgsl/use/view'::{ worldToClip, getWorldScale };
+use '@use-gpu/wgsl/use/view'::{ worldToClip, getWorldScale, getViewScale };
 
 @link fn transformPosition(p: vec4<f32>) -> vec4<f32>;
 
@@ -25,7 +25,7 @@ let EPSILON: f32 = 0.001;
   let tangent = normalize(adj.xyz - center.xyz);
   
   let c = worldToClip(center);
-  let s = getWorldScale(c.w, depth);
+  let s = getWorldScale(c.w, depth) * getViewScale();
 
   return center + vec4<f32>(tangent * size * v * s, 0.0);
 }

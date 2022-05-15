@@ -13,7 +13,7 @@ import { Virtual } from './virtual';
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings } from '@use-gpu/core';
+import { makeShaderBindings, resolve } from '@use-gpu/core';
 
 import { makeArrow } from './mesh/arrow';
 import { RawData } from '../data/raw-data';
@@ -75,8 +75,8 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   // Set up draw
   const vertexCount = mesh.count;
-  const instanceCount = useCallback(() => ((props.anchors as any)?.length ?? count), [props.anchors, count]);
-
+  const instanceCount = useCallback(() => ((props.anchors as any)?.length ?? resolve(count)), [props.anchors, count]);
+  
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const a = useShaderRef(props.anchor, props.anchors);

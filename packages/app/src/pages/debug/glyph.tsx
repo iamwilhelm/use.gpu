@@ -47,42 +47,99 @@ export const DebugGlyphPage: LC = () => {
           
             <Flex align={"center"} height={'100%'}>
               <RawTexture data={rgbaTexture} render={(texture) => 
-                <Block margin={radius} width={width} height={height} fill={[0.5, 0.5, 0.5, 1.0]} image={{
+                <Block margin={radius} width={width} height={height} fill={[0.0, 0.0, 0.0, 1.0]} image={{
                   texture,
                   repeat: 'none',
-                  fit: 'contain',
-                }} />
+                }}>
+                  <Embed width="100%" height="100%" render={(layout: Rectangle) =>
+                    <Embedded layout={layout}>
+                      <Axis axis="x" width={5} color={0x808080} end={false} />
+                      <Axis axis="y" width={5} color={0x808080} end={false} />
+
+                      <Scale axis="x" unit={1} divide={w}>
+                        <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} />
+                      </Scale>
+                      <Scale axis="y" unit={1} divide={h}>
+                        <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} offset={[1, 0, 0]} />
+                      </Scale>
+
+                      <Sampled
+                        axes='xy'
+                        format='vec4<f32>'
+                        size={[width, height]}
+                        items={1}
+                        centered={true}
+                        expr={(emit, x, y) => {
+                          emit(x, y, 0.5, 1);
+                        }}              
+                      >
+                        <Point size={3} depth={0.15} />
+                      </Sampled>
+
+                      <Sampled
+                        axes='xy'
+                        format='vec4<f32>'
+                        size={[width, height]}
+                        items={2}
+                        centered={true}
+                        expr={(emit, x, y) => {
+                          emit(x, y, 0.5, 1);
+                          emit(x + 1, y, 0.5, 1);
+                        }}              
+                      >
+                        <Arrow width={3} color={0xffffff} />
+                      </Sampled>
+                    </Embedded>
+                  } />
+                </Block>
               } />
+
               <RawTexture data={sdfTexture} render={(texture) => 
                 <Block width={w} height={h} fill={[0.0, 0.0, 0.0, 1.0]} image={{
                   texture,
                   repeat: 'none',
-                  fit: 'contain',
                 }}>
                   <Embed width="100%" height="100%" render={(layout: Rectangle) =>
                     <Embedded layout={layout}>
                       <Axis axis="x" width={5} color={0x808080} end={true} />
                       <Axis axis="y" width={5} color={0x808080} end={true} />
+
                       <Scale axis="x" unit={1} divide={w}>
-                        <Tick size={10} width={2.5} color={0xffffff} />
+                        <Tick size={10} width={2.5} color={0x808080} depth={0} />
                       </Scale>
+                      <Scale axis="y" unit={1} divide={h}>
+                        <Tick size={10} width={2.5} color={0x808080} depth={0} offset={[1, 0, 0]} />
+                      </Scale>
+
                       <Sampled
                         axes='xy'
                         format='vec4<f32>'
-                        xsize={[Math.round(w / 10), Math.round(h / 10)]}
                         size={[w, h]}
                         items={1}
                         centered={true}
                         expr={(emit, x, y) => {
                           emit(x, y, 0.5, 1);
-                          //emit(x + 1, y, 0.5, 1);
                         }}              
                       >
-                        <Point size={0.5} depth={1} />
-                      {/*<Arrow width={3} color={0xffffff} />*/}
+                        <Point size={3} depth={0.15} />
+                      </Sampled>
+
+                      <Sampled
+                        axes='xy'
+                        format='vec4<f32>'
+                        size={[w, h]}
+                        items={2}
+                        centered={true}
+                        expr={(emit, x, y) => {
+                          emit(x, y, 0.5, 1);
+                          emit(x + 1, y, 0.5, 1);
+                        }}              
+                      >
+                        <Arrow width={3} color={0xffffff} />
                       </Sampled>
                     </Embedded>
                   } />
+                  
                 </Block>
               } />
             </Flex>
@@ -98,7 +155,7 @@ export const DebugGlyphPage: LC = () => {
     <PanControls
       active={true}
       render={(x, y, zoom) =>
-        <Flat x={x} y={y} zoom={zoom}>
+        <Flat x={x} y={y} zoom={zoom} focus={1/3}>
           {view}
         </Flat>
       }

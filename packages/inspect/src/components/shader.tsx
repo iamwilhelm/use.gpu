@@ -59,8 +59,14 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
   
   const toObject = (us: any[]) => {
     const out: Record<string, any> = {};
-    for (const u of us) {
+    for (let u of us) {
+      u = {...u};
       out[u.uniform.name] = u;
+      if (u.constant) {
+        if (typeof u.constant === 'function') {
+          u.resolved = u.constant();
+        }
+      }
     }
     return out;
   }

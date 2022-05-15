@@ -5,7 +5,7 @@ struct ViewUniforms {
   viewNearFar: vec2<f32>,
   viewResolution: vec2<f32>,
   viewSize: vec2<f32>,
-  viewWorldUnit: f32,
+  viewWorldDepth: f32,
   viewPixelRatio: f32,
 };
 
@@ -15,6 +15,10 @@ struct ViewUniforms {
 @export fn getViewResolution() -> vec2<f32> { return viewUniforms.viewResolution; }
 @export fn getViewSize() -> vec2<f32> { return viewUniforms.viewSize; }
 @export fn getViewNearFar() -> vec2<f32> { return viewUniforms.viewNearFar; }
+
+@export fn to3D(position: vec4<f32>) -> vec4<f32> {
+  return vec4<f32>(position.xyz, 1.0);
+}
 
 @export fn worldToView(position: vec4<f32>) -> vec4<f32> {
   return viewUniforms.viewMatrix * position;
@@ -63,6 +67,11 @@ struct ViewUniforms {
   return a;
 }
 
+@export fn getViewScale() -> f32 {
+  var m = viewUniforms.projectionMatrix;
+  return 2.0 / length(m[1]);
+}
+
 @export fn getWorldScale(w: f32, f: f32) -> f32 {
   var v = viewUniforms.viewResolution;
   return getPerspectiveScale(w, f) * v.y * w;
@@ -70,7 +79,7 @@ struct ViewUniforms {
 
 @export fn getPerspectiveScale(w: f32, f: f32) -> f32 {
   var m = viewUniforms.projectionMatrix;
-  var worldScale = m[1][1] * viewUniforms.viewWorldUnit;
+  var worldScale = length(m[1]) * viewUniforms.viewWorldDepth;
   var clipScale = mix(1.0, worldScale / w, f);
   var pixelScale = clipScale * viewUniforms.viewPixelRatio;
   return pixelScale;

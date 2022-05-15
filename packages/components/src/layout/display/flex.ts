@@ -49,16 +49,22 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
     const w = width != null && width === +width ? width : null;
     const h = height != null && height === +height ? height : null;
 
-    const size = [w ?? 0, h ?? 0] as [number, number];
     const fixed = [w, h] as [number | null, number | null];
 
     const sizing = getFlexMinMax(els, fixed, direction, gap, wrap, snap);
+
+    let ratioX = undefined;
+    let ratioY = undefined;
+    if (typeof width  === 'string') ratioX = parseDimension(width,  1, false);
+    if (typeof height === 'string') ratioY = parseDimension(height, 1, false);
 
     return yeet({
       sizing,
       margin: NO_MARGIN,
       grow,
       shrink,
+      ratioX,
+      ratioY,
       fit: memoFit((into: Point) => {
         const w = width != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;

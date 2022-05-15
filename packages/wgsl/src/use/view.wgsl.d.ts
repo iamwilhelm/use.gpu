@@ -6,6 +6,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const getViewResolution: ParsedBundle;
   export const getViewSize: ParsedBundle;
   export const getViewNearFar: ParsedBundle;
+  export const to3D: ParsedBundle;
   export const worldToView: ParsedBundle;
   export const viewToClip: ParsedBundle;
   export const worldToClip: ParsedBundle;
@@ -14,6 +15,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const clip3DToScreen: ParsedBundle;
   export const screenToClip3D: ParsedBundle;
   export const clipLineIntoView: ParsedBundle;
+  export const getViewScale: ParsedBundle;
   export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;
   export default __module;

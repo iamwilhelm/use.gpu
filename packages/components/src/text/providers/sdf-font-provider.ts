@@ -51,7 +51,7 @@ const roundUp2 = (v: number) => {
   return v;
 };
 
-const getNearestScale = (size: number) => roundUp2(Math.max(16, size)) * 2;
+const getNearestScale = (size: number) => roundUp2(Math.max(16, size)) * 1.5;
 
 const hashGlyph = (font: number, id: number, size: number) => scrambleBits53(mixBits53(mixBits53(font, id), size * 100));
 
@@ -63,7 +63,7 @@ type CachedGlyph = {
 export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   width = 256,
   height = 256,
-  radius = 10,
+  radius = 20,
   pad = 0,
   children,
   then,

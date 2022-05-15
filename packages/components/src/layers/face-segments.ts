@@ -25,7 +25,6 @@ export const FaceSegments: LiveComponent<FaceSegmentsProps> = memo((
     const segmentBuffer = new Int32Array(count);
 
     generateChunkFaces(segmentBuffer, chunks, loops);
-    console.log({segmentBuffer})
 
     return segmentBuffer;
   }, [chunks, loops, count]);

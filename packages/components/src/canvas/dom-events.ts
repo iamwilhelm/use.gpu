@@ -55,6 +55,31 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
   const [keyboard, setKeyboard] = useState<KeyboardState>(makeKeyboardState);
 
   useResource((dispose) => {
+
+    const onModifiers = (e: Event) => {
+      setKeyboard((state) => {
+        if (
+          state.ctrl === e.ctrlKey &&
+          state.alt === e.altKey &&
+          state.shift === e.shiftKey &&
+          state.meta === e.metaKey
+        ) {
+          return state;
+        }
+
+        return {
+          ...state,
+          modifiers: {
+            ctrl:  e.ctrlKey,
+            alt:   e.altKey,
+            shift: e.shiftKey,
+            meta:  e.metaKey,
+          },
+          version: incrementVersion(state.version),        
+        };
+      });
+    };
+
     const onWheel = (e: WheelEvent) => {
       const {deltaMode, deltaX, deltaY, clientX, clientY} = e;
       let f = 1;
@@ -68,22 +93,10 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       }));
 
       onMove(clientX, clientY);
+      onModifiers(e);
 
       e.preventDefault();
       e.stopPropagation();
-    };
-
-    const onModifiers = (e: Event) => {
-      setKeyboard((state) => ({
-        ...state,
-        modifiers: {
-          ctrl:  e.ctrlKey,
-          alt:   e.altKey,
-          shift: e.shiftKey,
-          meta:  e.metaKey,
-        },
-        version: incrementVersion(state.version),        
-      }));
     };
 
     const onMove = (clientX: number, clientY: number) => {
@@ -136,6 +149,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       const {button, buttons, clientX, clientY} = e;
       onButtons(buttons, button);
       onMove(clientX, clientY);
+      onModifiers(e);
       e.preventDefault();
       e.stopPropagation();
 
@@ -147,6 +161,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onMouseMove = (e: MouseEvent) => {
       const {clientX, clientY} = e;
       onMove(clientX, clientY);
+      onModifiers(e);
       e.preventDefault();
       e.stopPropagation();
     };
@@ -155,6 +170,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       const {button, buttons, clientX, clientY} = e;
       onButtons(buttons, button);
       onMove(clientX, clientY);
+      onModifiers(e);
       e.preventDefault();
       e.stopPropagation();
 

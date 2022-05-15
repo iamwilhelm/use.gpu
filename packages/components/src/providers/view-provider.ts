@@ -13,7 +13,7 @@ const VIEW_UNIFORM_DEFAULTS = {
   viewNearFar: { current: [1, 1] },
   viewResolution: { current: [1, 1] },
   viewSize: { current: [1, 1] },
-  viewWorldUnit: { current: 1 },
+  viewWorldDepth: { current: 1 },
   viewPixelRatio: { current: 1 },
 };
 

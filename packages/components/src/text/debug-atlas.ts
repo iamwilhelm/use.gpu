@@ -27,11 +27,15 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (
 };
 
 export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source}: DebugAtlasProps) => {
-  const {map, width, height, debugPlacements, debugSlots, debugValidate} = atlas as any;  
+  const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate} = atlas as any;  
   const {id} = useFiber();
 
   const yeets = [];
   const pos = [] as number[];
+  
+  const width = w / 2;
+  const height = h / 2;
+  const fit = ([l, t, r, b]) => [l / 2, t / 2, r / 2, b / 2];
   
   let ID = 0;
   const next = () => `${id}-${ID++}`;
@@ -39,7 +43,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
   for (const rect of debugPlacements()) {
     yeets.push({
       id: next(),
-      rectangle: rect,
+      rectangle: fit(rect),
       uv: [0, 0, 1, 1],
       fill: [Math.random() * .5, Math.random() * .5, Math.random(), 0.5],
       stroke: [1, 1, 1, 1],
@@ -55,7 +59,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
   for (const [l, t, r, b, nearX, nearY, farX, farY, corner] of debugSlots()) {
     yeets.push({
       id: next(),
-      rectangle: [l + 4, t + 4, r - 4, b - 4],
+      rectangle: fit([l + 4, t + 4, r - 4, b - 4]),
       uv: [0, 0, 1, 1],
       fill: [0, 0, 0.25, 0.25],
       stroke: [0, 0.45, 0.95, 1],
@@ -65,7 +69,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     });
     yeets.push({
       id: next(),
-      rectangle: fix([l + 8, t + 8, l + nearX - 8, t + nearY - 8]),
+      rectangle: fit(fix([l + 8, t + 8, l + nearX - 8, t + nearY - 8])),
       uv: [0, 0, 1, 1],
       fill: [0, 0, 0, 0.5],
       stroke: [1, 1, 0.2, 1],
@@ -75,7 +79,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     });
     yeets.push({
       id: next(),
-      rectangle: fix([l + 6, t + 6, l + farX - 6, t + farY - 6]),
+      rectangle: fit(fix([l + 6, t + 6, l + farX - 6, t + farY - 6])),
       uv: [0, 0, 1, 1],
       fill: [0, 0, 0, 0.5],
       stroke: [0.2, 0.5, 1.0, 1],
@@ -89,7 +93,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     const {x, y, dx, dy} = anchor;
     yeets.push({
       id: next(),
-      rectangle: [x, y, x + dx, y + dy],
+      rectangle: fit([x, y, x + dx, y + dy]),
       uv: [0, 0, 1, 1],
       fill: [1, 0, 0, 0.05],
       stroke: [1, 0, 0, 1],
@@ -107,7 +111,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
   for (const rect of debugPlacements()) {
     yeets.push({
       id: next(),
-      rectangle: rect,
+      rectangle: fit(rect),
       uv: [0, 0, 1, 1],
       fill: [Math.random() * .5, Math.random() * .5, Math.random(), 0.5],
       stroke: [1, 1, 1, 1],
@@ -120,7 +124,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
   yeets.push({
     id: next(),
     rectangle: [width, 0, 500 + width, 500],
-    uv: [0, 0, width, height],
+    uv: [0, 0, w, h],
     radius: [0, 0, 0, 0],
     texture: source ?? SDF_FONT_ATLAS,
     fill: [0, 0, 0, 1],

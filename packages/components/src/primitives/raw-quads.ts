@@ -80,11 +80,6 @@ const PIPELINE_ALPHA_TO_COVERAGE = {
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
-
-const DEFINES = {
-  HAS_EDGE_BLEED: true,
-};
-
 const PIPELINE = {
   primitive: {
     topology: 'triangle-strip',

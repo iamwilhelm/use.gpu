@@ -8,17 +8,16 @@ import { LayoutControls } from '../../ui/layout-controls';
 import {
   LinearRGB, Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
   PanControls, PanCamera,
+  DebugProvider,
 } from '@use-gpu/components';
-import { makeTexture } from '../../meshes/cube';
 
 export const LayoutDisplayPage: LC = () => {
-  const texture = makeTexture();
 
-  const makeView = (inspect: boolean, debugSDF: boolean) => (
+  const view = (
     <LinearRGB>
       <Pass>
-        <UI debugSDF={debugSDF}>
-          <Layout inspect={inspect}>
+        <UI>
+          <Layout>
             <Absolute>
               <Element fill={[1, 1, 1, .5]}  />
             </Absolute>
@@ -45,10 +44,12 @@ export const LayoutDisplayPage: LC = () => {
                       <Element width={50}  height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
                       <Element width={100} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
                         radius={[20, 0, 20, 0]} border={3} stroke={[0.5, 0.5, 0.5, 1]} />
-                      <Element width={110} border={3.99} height={50} fill={[0.5, 0.5, 0.5, 0.5]} stroke={[0.75, 0.75, 0.75, 1]} />
+                      <Element width={110} border={[10, 3, 10, 3]} height={50} fill={[0.5, 0.5, 0.5, 0.5]} stroke={[0.75, 0.75, 0.75, 1]} />
                       <Element width={40} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
                         radius={[1, 10, 1, 1]} border={5} stroke={[0, 0, 0, 0.75]} />
                       <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]} />
+                      <Element width={130} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
+                        radius={[15, 10, 20, 55]} border={[5, 5, 5, 10]} stroke={[1.0, 1.0, 1.0, 0.5]} />
                       <Element width={120} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
                         radius={[10, 10, 10, 10]} border={20} stroke={[0.5, 0.5, 0.5, 1]} />
                       <Element width={70} height={50} fill={[0.5, 0.5, 0.5, 0.5]}
@@ -115,9 +116,16 @@ export const LayoutDisplayPage: LC = () => {
         <PanControls
           active={mode !== 'inspect'}
           render={(x, y, zoom) =>
-            <Flat x={x} y={y} zoom={zoom}>
-              {makeView(mode === 'inspect', mode === 'sdf')}
-            </Flat>
+            <DebugProvider
+              debug={{
+                sdf2d: { contours: mode === 'sdf' },
+                layout: { inspect: mode === 'inspect' },
+              }}
+            >
+              <Flat x={x} y={y} zoom={zoom}>
+                {view}
+              </Flat>
+            </DebugProvider>
           }
       />}
     />

@@ -16,8 +16,16 @@ declare module "@use-gpu/wgsl/fragment/sdf-2d.wgsl" {
   const __module: ParsedBundle;
   export const SDF: ParsedBundle;
   export const getUVScale: ParsedBundle;
+  export const getBoxSDF: ParsedBundle;
   export const getBorderBoxSDF: ParsedBundle;
   export const getRoundedBorderBoxSDF: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/geometry/anchor.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLineAnchor: ParsedBundle;
   export default __module;
 }
 
@@ -66,6 +74,13 @@ declare module "@use-gpu/wgsl/geometry/strip.wgsl" {
   const __module: ParsedBundle;
   export const getStripIndex: ParsedBundle;
   export const getStripUV: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/geometry/trim.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLineTrim: ParsedBundle;
   export default __module;
 }
 
@@ -369,6 +384,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const getViewResolution: ParsedBundle;
   export const getViewSize: ParsedBundle;
   export const getViewNearFar: ParsedBundle;
+  export const to3D: ParsedBundle;
   export const worldToView: ParsedBundle;
   export const viewToClip: ParsedBundle;
   export const worldToClip: ParsedBundle;
@@ -377,6 +393,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const clip3DToScreen: ParsedBundle;
   export const screenToClip3D: ParsedBundle;
   export const clipLineIntoView: ParsedBundle;
+  export const getViewScale: ParsedBundle;
   export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;
   export default __module;

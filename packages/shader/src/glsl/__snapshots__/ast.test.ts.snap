@@ -946,7 +946,7 @@ Array [
       "viewPosition",
       "viewResolution",
       "viewSize",
-      "viewWorldUnit",
+      "viewWorldDepth",
       "viewPixelRatio",
     ],
     "struct": Object {
@@ -984,7 +984,7 @@ Array [
             },
           },
           Object {
-            "name": "viewWorldUnit",
+            "name": "viewWorldDepth",
             "type": Object {
               "name": "float",
             },
@@ -1055,7 +1055,7 @@ Object {
               },
             },
             Object {
-              "name": "viewWorldUnit",
+              "name": "viewWorldDepth",
               "type": Object {
                 "name": "float",
               },
@@ -1611,7 +1611,7 @@ exports[`ast shakes use/view AST 2`] = `
   vec4 viewPosition;
   vec2 viewResolution;
   vec2 viewSize;
-  float viewWorldUnit;
+  float viewWorldDepth;
   float viewPixelRatio;
 } viewUniforms;
 

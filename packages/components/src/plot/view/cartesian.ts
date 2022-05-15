@@ -4,11 +4,13 @@ import { VectorLike, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
-import { bindBundle, bindingToModule, bundleToAttribute, chainTo } from '@use-gpu/shader/wgsl';
+import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 
-import { useShaderRef } from '../../hooks/useShaderRef';
 import { TransformContext } from '../../providers/transform-provider';
 import { RangeContext } from '../../providers/range-provider';
+import { useShaderRef } from '../../hooks/useShaderRef';
+import { useBoundShader } from '../../hooks/useBoundShader';
+import { useCombinedTransform } from '../../hooks/useCombinedTransform';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../util/parse';
 import { composeTransform } from '../util/compose';
 import { swizzleMatrix } from '../util/swizzle';
@@ -18,7 +20,7 @@ import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 
-const MATRIX_BINDING = bundleToAttribute(getCartesianPosition, 'getMatrix');
+const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
 
 export type CartesianProps = {
   range?: VectorLike[],
@@ -77,17 +79,9 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
     return matrix;
   }, [g, a, p, r, q, s]);
 
-  const parentTransform = useContext(TransformContext);
-
-  const ref = useShaderRef(combined);
-  const transform = useMemo(() => {
-
-    const getMatrix = bindingToModule(makeRefBinding(MATRIX_BINDING, ref));
-    const bound = bindBundle(getCartesianPosition, {getMatrix});
-    const transform = parentTransform ? chainTo(bound, parentTransform) : bound;
-
-    return transform;
-  }, [parent]);
+  const ref = useShaderRef(matrix);
+  const bound = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [ref]);
+  const transform = useCombinedTransform(bound);
 
   return (
     provide(TransformContext, transform,

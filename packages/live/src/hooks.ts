@@ -184,12 +184,15 @@ export const useState = <T>(
             if (prev !== next) {
               state![i] = next;
               bustFiberMemo(fiber);
+              return true;
             }
+            return false;
           };
 
           if (fiber.id === getCurrentFiberID()) {
-            apply();
-            host!.visit(fiber);
+            if (apply()) {
+              host!.visit(fiber);
+            }
           }
           else {
             host!.schedule(fiber, apply);

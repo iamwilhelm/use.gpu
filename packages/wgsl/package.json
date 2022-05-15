@@ -33,6 +33,11 @@
       "import": "./src/fragment/sdf-2d.wgsl",
       "require": "./src/fragment/sdf-2d.wgsl"
     },
+    "./geometry/anchor.wgsl": {
+      "types": "./src/geometry/anchor.wgsl.d.ts",
+      "import": "./src/geometry/anchor.wgsl",
+      "require": "./src/geometry/anchor.wgsl"
+    },
     "./geometry/arrow.wgsl": {
       "types": "./src/geometry/arrow.wgsl.d.ts",
       "import": "./src/geometry/arrow.wgsl",
@@ -62,6 +67,11 @@
       "types": "./src/geometry/strip.wgsl.d.ts",
       "import": "./src/geometry/strip.wgsl",
       "require": "./src/geometry/strip.wgsl"
+    },
+    "./geometry/trim.wgsl": {
+      "types": "./src/geometry/trim.wgsl.d.ts",
+      "import": "./src/geometry/trim.wgsl",
+      "require": "./src/geometry/trim.wgsl"
     },
     "./instance/fragment/ui.wgsl": {
       "types": "./src/instance/fragment/ui.wgsl.d.ts",

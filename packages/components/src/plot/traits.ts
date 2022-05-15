@@ -68,7 +68,7 @@ const ARROW_TRAIT = {
 };
 
 const ARROW_DEFAULTS = {
-  size: 4,
+  size: 3,
   start: false,
   end: true,
 };

@@ -4,6 +4,7 @@ import { GeometryDataPage } from './pages/geometry/data';
 import { GeometryFacesPage } from './pages/geometry/faces';
 import { GeometryLinesPage } from './pages/geometry/lines';
 import { DebugAtlasPage } from './pages/debug/atlas';
+import { DebugGlyphPage } from './pages/debug/glyph';
 import { LayoutDisplayPage } from './pages/layout/display';
 import { MeshRawPage } from './pages/mesh/raw';
 import { LinearRGBPage } from './pages/rtt/linear-rgb';
@@ -21,6 +22,7 @@ export const PAGES = [
   {path: "/plot/simple", title: "Plot - Simple"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
+  {path: "/debug/glyph", title: "Debug - Glyph SDF"},
   {path: "/", title: "Index"},
 ];
 
@@ -33,6 +35,7 @@ export const makeRoutes = () => ({
   "/plot/simple":    { element: <PlotSimplePage /> },
   "/rtt/linear-rgb": { element: <LinearRGBPage /> },
   "/debug/atlas":    { element: <DebugAtlasPage /> },
+  "/debug/glyph":    { element: <DebugGlyphPage /> },
 
   "/": { element: <HomePage container={document.querySelector('#use-gpu')} /> },
   "*": { element: <EmptyPage /> },

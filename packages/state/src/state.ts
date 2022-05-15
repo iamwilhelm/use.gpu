@@ -1,9 +1,12 @@
 import { Update, Merge } from './types';
 
+const $DELETE = {$delete: true};
+const $NOP = {$nop: true};
+
 export const $set = <T>($set: T) => ({$set});
 export const $merge = <T>($merge: T) => ({$merge});
-export const $delete = <T>() => ({$delete: true});
-export const $nop = <T>() => ({$nop: true});
+export const $delete = <T>() => $DELETE;
+export const $nop = <T>() => $NOP;
 export const $apply = <T>($apply: (t: T) => T) => ({$apply});
 export const $patch = <T>($patch: (t: T) => Update<T>) => ({$patch});
 

@@ -28,7 +28,7 @@ export const VIEW_UNIFORMS: UniformAttribute[] = [
     format: 'vec2<f32>',
   },
   {
-    name: 'viewWorldUnit',
+    name: 'viewWorldDepth',
     format: 'f32',
   },
   {

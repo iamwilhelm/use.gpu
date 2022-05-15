@@ -118,7 +118,7 @@ export const makeDynamicTexture = (
   return texture;
 }
 
-export const makeRawSourceTexture = (
+export const makeRawTexture = (
   device: GPUDevice,
   dataTexture: DataTexture,
 ) => {

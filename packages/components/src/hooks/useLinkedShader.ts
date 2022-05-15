@@ -64,6 +64,8 @@ export const useLinkedShader = (
     fiber.__inspect = fiber.__inspect || {};
     fiber.__inspect.vertex = vertex;
     fiber.__inspect.fragment = fragment;
+    fiber.__inspect.uniforms = uniforms;
+    fiber.__inspect.bindings = bindings;
 
     ref.uniforms = uniforms;
     ref.bindings = bindings;

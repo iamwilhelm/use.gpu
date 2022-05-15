@@ -4,7 +4,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { yeet, memo, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
-import { makeSampler, makeRawSourceTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
+import { makeSampler, makeRawTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
 
 export type RawTextureProps = {
   data?: DataTexture,
@@ -29,7 +29,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
     if (!data) return null;
 
     const {size, format} = data;
-    const texture = makeRawSourceTexture(device, data);
+    const texture = makeRawTexture(device, data);
     const source = {
       texture,
       view: makeTextureView(texture),

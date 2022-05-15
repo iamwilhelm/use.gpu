@@ -3,7 +3,7 @@ import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, R
 import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@use-gpu/components';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
-  makeVertexBuffers, makeRawSourceTexture, makeMultiUniforms,
+  makeVertexBuffers, makeRawTexture, makeMultiUniforms,
   makeRenderPipeline, makeShaderModule, makeSampler, makeTextureBinding,
   getColorSpace,
   uploadBuffer, uploadDataTexture,
@@ -60,7 +60,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
 
   const sourceTexture = useMemo(() => {
-    const t = makeRawSourceTexture(device, texture);
+    const t = makeRawTexture(device, texture);
     uploadDataTexture(device, t, texture);
     return t;
   }, [device, texture]);

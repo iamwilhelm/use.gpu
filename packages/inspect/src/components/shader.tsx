@@ -4,7 +4,7 @@ import { styled as _styled } from '@stitches/react';
 
 import React, { Fragment, useState } from 'react';
 import { Action } from './types';
-import { SplitRow, Label, Selectable } from './layout';
+import { SplitRow, Label, Selectable, Spacer } from './layout';
 
 import { inspectObject } from './props';
 import { usePingContext } from './ping';
@@ -48,8 +48,30 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
   usePingContext();
 
   const shader = fiber.__inspect?.[type];
+  const bindings = fiber.__inspect?.bindings;
+  const uniforms = fiber.__inspect?.uniforms;
+
+  const [state, setState] = useState<Record<string, boolean>>({});
+  const toggleState = (id: string) => setState((state) => ({
+    ...state,
+    [id]: !state[id],
+  }));
+  
+  const toObject = (us: any[]) => {
+    const out: Record<string, any> = {};
+    for (const u of us) {
+      out[u.uniform.name] = u;
+    }
+    return out;
+  }
 
   return (<>
+    {uniforms || bindings ? (<>
+      <div><b>Bindings</b></div>
+      {inspectObject(toObject(uniforms), state, toggleState, 'u')}
+      {inspectObject(toObject(bindings), state, toggleState, 'b')}
+      <Spacer />
+    </>) : null}
     <div><b>Shader</b> (<code>{shader.hash}</code>)</div>
     <StyledShader><Selectable>
       {inspectCode(shader.code)}

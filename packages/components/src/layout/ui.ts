@@ -3,6 +3,7 @@ import { AggregateBuffer, Atlas, TextureSource, UniformType, TypedArray, Storage
 import { UIAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
+import { DebugContext } from '../providers/debug-provider';
 import { SDFFontProvider, SDF_FONT_ATLAS } from '../text/providers/sdf-font-provider';
 import { ScrollConsumer } from '../consumers/scroll-consumer';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -17,7 +18,6 @@ import {
 import { UIRectangles } from '../primitives/ui-rectangles';
 
 export type UIProps = {
-  debugSDF?: boolean,
   children: LiveElement<any>,
 };
 
@@ -37,19 +37,19 @@ const getItemSummary = (items: UIAggregate[]) => {
 }
 
 export const UI: LiveComponent<UIProps> = (props) => {
-  const {debugSDF, children} = props;
+  const {children} = props;
 
   return (
     wrap(ScrollConsumer, 
       use(SDFFontProvider, {
         children,
-        then: Resume(debugSDF),
+        then: Resume,
       })
     )
   );
 };
 
-const Resume = (debugSDF: boolean) => (
+const Resume = (
   atlas: Atlas,
   source: TextureSource,
   items: (UIAggregate | null)[],
@@ -65,26 +65,30 @@ const Resume = (debugSDF: boolean) => (
     }
     partitioner.push(item);
   }
-  
+
   const layers = partitioner.resolve();
 
-  const els = layers.map((layer, i) => keyed(Layer, layer[0]?.id, layer, debugSDF));
-  els.push(yeet([]));
+  const els = layers.flatMap((layer, i) => {
+    if (layer[0]?.f) return layer;
+    return keyed(Layer, layer[0]?.id, layer);
+  });
+  els.push(yeet());
 
   return fragment(els);
 };
 
 const Layer: LiveFunction<any> = (
   items: UIAggregate[],
-  debugSDF?: boolean,
 ) => {
   const device = useContext(DeviceContext);
   const {keys, count, memoKey} = getItemSummary(items);
 
+  const {sdf2d: {contours}} = useContext(DebugContext);
+
   const size = useBufferedSize(count);
   const render = useMemo(() =>
-    makeUIAccumulator(device, items, keys, size, debugSDF),
-    [memoKey, size, debugSDF]
+    makeUIAccumulator(device, items, keys, size, contours),
+    [memoKey, size, contours]
   );
 
   return render(items);
@@ -95,7 +99,7 @@ const makeUIAccumulator = (
   items: UIAggregate[],
   keys: Set<string>,
   count: number,
-  debugSDF?: boolean,
+  debugContours?: boolean,
 ) => {
   const storage = {} as Record<string, AggregateBuffer>;
 
@@ -124,7 +128,7 @@ const makeUIAccumulator = (
     const count = items.reduce(allCount, 0);
     if (!count) return null;
 
-    const props = {count, debugSDF} as Record<string, any>;
+    const props = {count, debugContours} as Record<string, any>;
 
     if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');
     if (hasRadius) props.radiuses = updateAggregateBuffer(device, storage.radiuses, items, count, 'radius', 'radiuses');
@@ -143,6 +147,7 @@ const makeUIAccumulator = (
 };
 
 const getItemTypeKey = (item: UIAggregate) =>
+  item.f ? -1 :
   getNumberHash(getObjectKey(item.texture)) ^
   getNumberHash(getObjectKey(item.transform));
 
@@ -166,20 +171,22 @@ const makePartitioner = () => {
 
     if (i != null) {
       let blocked = false;
-      for (let j = i + 1; j < n; ++j) {
-        if (overlapBounds(layers[j].bounds, bounds)) {
-          blocked = true;
-          break;
+      if (bounds) {
+        for (let j = i + 1; j < n; ++j) {
+          if (overlapBounds(layers[j].bounds, bounds)) {
+            blocked = true;
+            break;
+          }
         }
       }
       if (!blocked) {
         layer.items.push(item);
-        layer.bounds = joinBounds(layer.bounds, bounds);
+        if (bounds) layer.bounds = joinBounds(layer.bounds, bounds);
         return;
       }
     }
 
-    const partition = {key, items: [item], bounds};
+    const partition = {key, items: [item], bounds: bounds ?? [0, 0, 0, 0]};
     last.set(key, layers.length);
     layers.push(partition);
   };

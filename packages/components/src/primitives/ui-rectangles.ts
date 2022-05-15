@@ -42,7 +42,7 @@ export type UIRectanglesProps = {
 
   texture?: TextureSource | LambdaSource | ShaderModule,
 
-  debugSDF?: boolean,
+  debugContours?: boolean,
 
   alphaToCoverage?: boolean,
   count?: Prop<number>,
@@ -91,7 +91,7 @@ const PIPELINE_ALPHA_TO_COVERAGE = {
 export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
   const {
     pipeline: propPipeline,
-    debugSDF = false,
+    debugContours = false,
     alphaToCoverage = false,
     mode = RenderPassMode.Opaque,
     id = 0,
@@ -125,7 +125,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
 
   let defines = alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA;
-  if (debugSDF) {
+  if (debugContours) {
     defines = {...defines, DEBUG_SDF: true};
   }
 

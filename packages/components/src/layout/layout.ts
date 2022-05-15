@@ -52,10 +52,10 @@ const Resume = (inspect?: boolean) => (els: LayoutElement[]) => {
   return fragment(out);
 };
 
-const screenToView = (viewMatrix: mat4, x: number, y: number) => {
+const screenToView = (projectionMatrix: mat4, x: number, y: number) => {
   const v = [x, y, 0.5, 1.0];
   const m = mat4.create();
-  mat4.invert(m, viewMatrix);
+  mat4.invert(m, projectionMatrix);
   vec3.transformMat4(v, v, m);
   return [v[0], v[1]];
 };
@@ -63,10 +63,13 @@ const screenToView = (viewMatrix: mat4, x: number, y: number) => {
 export const Scroller = (pickers: any[]) => {
   const { useWheel } = useContext(WheelContext);
   const { viewUniforms } = useContext(ViewContext);
-  const { viewMatrix: { current: viewMatrix } } = viewUniforms;
+  const {
+    viewSize: { current: [width, height] },
+    projectionMatrix: { current: matrix },
+  } = viewUniforms;
 
   const { x, y, moveX, moveY, version, stopped } = useWheel();
-  const [px, py] = screenToView(viewMatrix, x, y);
+  const [px, py] = screenToView(matrix, x / width * 2.0 - 1.0, 1.0 - y / height * 2.0);
   
   useOne(() => {
     if (stopped) return;
@@ -88,10 +91,13 @@ export const Inspect = (pickers: any[]) => {
   const { id } = useFiber();
   const { useMouse } = useContext(MouseContext);
   const { viewUniforms } = useContext(ViewContext);
-  const { viewMatrix: { current: viewMatrix } } = viewUniforms;
+  const {
+    viewSize: { current: [width, height] },
+    projectionMatrix: { current: matrix },
+  } = viewUniforms;
 
   const { x, y } = useMouse();
-  const [px, py] = screenToView(viewMatrix, x, y);
+  const [px, py] = screenToView(matrix, x / width * 2.0 - 1.0, 1.0 - y / height * 2.0);
 
   const picked = useOne(() => {
     for (const picker of pickers) {

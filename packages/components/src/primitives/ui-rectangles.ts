@@ -42,6 +42,8 @@ export type UIRectanglesProps = {
 
   texture?: TextureSource | LambdaSource | ShaderModule,
 
+  debugSDF?: boolean,
+
   alphaToCoverage?: boolean,
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -55,11 +57,13 @@ const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
 const DEFINES_ALPHA = {
   HAS_EDGE_BLEED: true,
   HAS_ALPHA_TO_COVERAGE: false,
+  DEBUG_SDF: false,
 };
 
 const DEFINES_ALPHA_TO_COVERAGE = {
   HAS_EDGE_BLEED: true,
   HAS_ALPHA_TO_COVERAGE: true,
+  DEBUG_SDF: false,
 };
 
 const PIPELINE_ALPHA = {
@@ -87,6 +91,7 @@ const PIPELINE_ALPHA_TO_COVERAGE = {
 export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
   const {
     pipeline: propPipeline,
+    debugSDF = false,
     alphaToCoverage = false,
     mode = RenderPassMode.Opaque,
     id = 0,
@@ -119,6 +124,11 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x]);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
 
+  let defines = alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA;
+  if (debugSDF) {
+    defines = {...defines, DEBUG_SDF: true};
+  }
+
   return use(Virtual, {
     vertexCount,
     instanceCount,
@@ -126,7 +136,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     getVertex,
     getFragment,
 
-    defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
+    defines,
     deps: null,
 
     renderer: 'ui',

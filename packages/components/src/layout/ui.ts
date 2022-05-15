@@ -17,6 +17,7 @@ import {
 import { UIRectangles } from '../primitives/ui-rectangles';
 
 export type UIProps = {
+  debugSDF?: boolean,
   children: LiveElement<any>,
 };
 
@@ -36,19 +37,19 @@ const getItemSummary = (items: UIAggregate[]) => {
 }
 
 export const UI: LiveComponent<UIProps> = (props) => {
-  const {children} = props;
+  const {debugSDF, children} = props;
 
   return (
     wrap(ScrollConsumer, 
       use(SDFFontProvider, {
         children,
-        then: Resume,
+        then: Resume(debugSDF),
       })
     )
   );
 };
 
-const Resume = (
+const Resume = (debugSDF: boolean) => (
   atlas: Atlas,
   source: TextureSource,
   items: (UIAggregate | null)[],
@@ -67,7 +68,7 @@ const Resume = (
   
   const layers = partitioner.resolve();
 
-  const els = layers.map((layer, i) => keyed(Layer, layer[0]?.id, layer));
+  const els = layers.map((layer, i) => keyed(Layer, layer[0]?.id, layer, debugSDF));
   els.push(yeet([]));
 
   return fragment(els);
@@ -75,14 +76,15 @@ const Resume = (
 
 const Layer: LiveFunction<any> = (
   items: UIAggregate[],
+  debugSDF?: boolean,
 ) => {
   const device = useContext(DeviceContext);
   const {keys, count, memoKey} = getItemSummary(items);
 
   const size = useBufferedSize(count);
   const render = useMemo(() =>
-    makeUIAccumulator(device, items, keys, size),
-    [memoKey, size]
+    makeUIAccumulator(device, items, keys, size, debugSDF),
+    [memoKey, size, debugSDF]
   );
 
   return render(items);
@@ -93,6 +95,7 @@ const makeUIAccumulator = (
   items: UIAggregate[],
   keys: Set<string>,
   count: number,
+  debugSDF?: boolean,
 ) => {
   const storage = {} as Record<string, AggregateBuffer>;
 
@@ -121,7 +124,7 @@ const makeUIAccumulator = (
     const count = items.reduce(allCount, 0);
     if (!count) return null;
 
-    const props = {count} as Record<string, any>;
+    const props = {count, debugSDF} as Record<string, any>;
 
     if (hasRectangle) props.rectangles = updateAggregateBuffer(device, storage.rectangles, items, count, 'rectangle', 'rectangles');
     if (hasRadius) props.radiuses = updateAggregateBuffer(device, storage.radiuses, items, count, 'radius', 'radiuses');

@@ -38,10 +38,12 @@ export const useLinkedShader = (
   // Keep static set of bindings
   const ref = useOne(() => ({ uniforms, bindings }));
 
-  // Link final WGSL
+  // Hash code + defines
+  const dHash = getHash(defines);
   const [{hash: vHash}, {hash: fHash}] = modules;
+
+  // Link final WGSL
   const shader = useMemo(() => {
-    const dHash = getHash(defines);
     const vKey = vHash +'-'+ dHash;
     const fKey = fHash +'-'+ dHash;
 
@@ -67,7 +69,7 @@ export const useLinkedShader = (
     ref.bindings = bindings;
 
     return [vertex, fragment] as [ShaderModuleDescriptor, ShaderModuleDescriptor];
-  }, [...deps ?? NO_DEPS, vHash, fHash]);
+  }, [...deps ?? NO_DEPS, vHash, fHash, dHash]);
 
   // Update bound uniform values in-place from latest
   useOne(() => {

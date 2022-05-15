@@ -41,12 +41,14 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip };
   var uv = mix(uv4.xy, uv4.zw, uv1);
   let textureUV = uv;
   let sdfUV = uv1 * box;
+  let clipUV = vec4<f32>(0.0, 0.0, 1.0, 1.0);
   
   return UIVertex(
     center,
     uv1,
     sdfConfig,
     sdfUV,
+    clipUV,
     textureUV,
     repeat,
     mode,

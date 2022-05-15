@@ -26,6 +26,7 @@
   uv: vec2<f32>,
   sdfConfig: vec4<f32>,
   sdfUV: vec2<f32>,
+  clipUV: vec4<f32>,
   textureUV: vec2<f32>,
   repeat: i32,
 

@@ -6,6 +6,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
 @export fn getUIFragment(
   uv: vec2<f32>,
   textureUV: vec2<f32>,
+  clipUV: vec4<f32>,
   sdfUV: vec2<f32>,
   sdfConfig: vec4<f32>,
   repeat: i32,
@@ -18,12 +19,13 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
 ) -> vec4<f32> {
   var fillColor = fill;
   var strokeColor = stroke;
-  
+
+  var scale = getUVScale(sdfUV);
+  if (uv.x < clipUV.x || uv.y < clipUV.y || uv.x > clipUV.z || uv.y > clipUV.w) { discard; }
+
   var sdf: SDF;
   var texture = getTexture(textureUV);
-  var scale = getUVScale(sdfUV);
-
-  var mark = vec4<f32>(0.0);
+  var mark = 0.0;
   
   if (mode == -1) {
     let sdfRadius = sdfConfig.x;
@@ -58,34 +60,32 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     if (mode == 1) { sdf = getBorderBoxSDF(layout.xy, border, uv, scale); }
     else { sdf = getRoundedBorderBoxSDF(layout.xy, border, radius, uv, scale); }
     
-    let bleed = -0.5 / scale;
+    let bleed = 0.5;
     sdf.outer += bleed;
     sdf.inner += bleed;
-
-    /*
-    let o = sdf.outer;
-    let i = sdf.inner;
-
-    let m = ((o + 0.5) % 1.0) - 0.5;
-    let line = clamp(1.0 - abs(m * scale) * 2.0, 0.0, 1.0);
-    
-    mark = vec4<f32>(vec3<f32>((o / 4.0 + .5) + line), 1.0);
-    */
   }
 
   var mask = clamp(sdf.outer, 0.0, 1.0);
+
+  if (DEBUG_SDF) {
+    let o = sdf.outer * scale / 4.0;
+    let m = ((o + 100.0 + 0.5 - 0.5 * scale) % 1.0) - 0.5;
+    mark = clamp(1.0 - abs(m / scale) * 4.0, 0.0, 1.0);
+  }
   if (mask == 0.0) { discard; }
 
   var color = fill;
   if (sdf.outer != sdf.inner) { color = mix(strokeColor, fillColor, clamp(sdf.inner + (1.0 - mask), 0.0, 1.0)); }
 
   if (!HAS_ALPHA_TO_COVERAGE) {
-    color = vec4<f32>(color.rgb * color.a * mask, color.a * mask);
+    color = vec4<f32>((color.rgb + mark) * color.a * mask, color.a * mask);
   }
   else {
-    color = vec4<f32>(color.rgb, color.a * mask);
+    color = vec4<f32>(color.rgb + mark, color.a * mask);
   }
 
+  if (DEBUG_SDF) {
+    return vec4<f32>(mix(color.rgb, vec3<f32>(mark), 0.5), color.a);
+  }
   return color;
-  //return mix(color, mark, 0.9);  
 }

@@ -14,17 +14,17 @@ import { makeTexture } from '../../meshes/cube';
 export const LayoutDisplayPage: LC = () => {
   const texture = makeTexture();
 
-  const makeView = (inspect: boolean) => (
+  const makeView = (inspect: boolean, debugSDF: boolean) => (
     <LinearRGB>
       <Pass>
-        <UI>
+        <UI debugSDF={debugSDF}>
           <Layout inspect={inspect}>
             <Absolute>
               <Element fill={[1, 1, 1, .5]}  />
             </Absolute>
             <Flex width="100%" height="100%">
               <Block width="40%">
-                <Block margin={12} padding={48} radius={5}>{/* fill={[0, 0, 0, .9]}> */}
+                <Block margin={12} padding={48} radius={5} fill={[0, 0, 0, .9]}>
 
                   <Flex anchor="center">
                     <Element width={48} height={48} fill={[0, 0, 0, .35]} />
@@ -113,10 +113,10 @@ export const LayoutDisplayPage: LC = () => {
       container={root}
       render={(mode) => 
         <PanControls
-          active={mode === 'zoom'}
+          active={mode !== 'inspect'}
           render={(x, y, zoom) =>
             <Flat x={x} y={y} zoom={zoom}>
-              {makeView(mode === 'inspect')}
+              {makeView(mode === 'inspect', mode === 'sdf')}
             </Flat>
           }
       />}

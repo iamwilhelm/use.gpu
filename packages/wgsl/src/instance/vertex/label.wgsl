@@ -75,12 +75,14 @@ use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveSc
   
   let sdfUV = uv;
   let textureUV = uv;
+  let clipUV = vec4<f32>(0.0, 0.0, 1.0, 1.0);
 
   return UIVertex(
     center,
     uv1,
     sdfConfig,
     sdfUV,
+    clipUV,
     textureUV,
     0,
     -1,

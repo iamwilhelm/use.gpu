@@ -77,14 +77,18 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     viewPixelRatio: { current: null },
   })) as any as ViewUniforms;
 
-  if (x || y || (zoom !== 1)) {
+  const panned = useMemo(() => {
+    if (!x && !y && (zoom == 1)) return matrix;
+
     const m = mat4.create();
     mat4.scale(m, m, vec3.fromValues(zoom, zoom, 1));
     mat4.translate(m, m, vec3.fromValues(x, y, 0));
-    uniforms.viewMatrix.current = m;
-  }
+    
+    mat4.multiply(m, matrix, m);
+    return m;
+  }, [matrix, x, y, zoom]);
 
-  uniforms.projectionMatrix.current = matrix;
+  uniforms.projectionMatrix.current = panned;
   uniforms.viewPosition.current = [ 0, 0, 1, 0 ];
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];

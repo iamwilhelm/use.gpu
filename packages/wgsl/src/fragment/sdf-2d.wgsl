@@ -9,6 +9,16 @@
   return (length(dx) + length(dy)) * 0.5;
 }
 
+@export fn getBoxSDF(box: vec2<f32>, uv: vec2<f32>, scale: f32) -> f32 {
+  var nearest = round(uv);
+  var xy = (abs(uv - .5) - .5) * box;
+
+  var d1 = max(xy.x, xy.y);
+  var outer = -d1;
+
+  return outer / scale;
+}
+
 @export fn getBorderBoxSDF(box: vec2<f32>, border: vec4<f32>, uv: vec2<f32>, scale: f32) -> SDF {
   var nearest = round(uv);
   var xy = (abs(uv - .5) - .5) * box;

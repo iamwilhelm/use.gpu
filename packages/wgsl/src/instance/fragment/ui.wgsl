@@ -1,4 +1,4 @@
-use '@use-gpu/wgsl/fragment/sdf-2d'::{ SDF, getUVScale, getBorderBoxSDF, getRoundedBorderBoxSDF };
+use '@use-gpu/wgsl/fragment/sdf-2d'::{ SDF, getUVScale, getBoxSDF, getBorderBoxSDF, getRoundedBorderBoxSDF };
 use '@use-gpu/wgsl/use/color'::{ premultiply };
 
 @optional @link fn getTexture(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
@@ -34,6 +34,8 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var d = (texture.a - 0.75) * sdfRadius;
     var s = (d + expand) / scale * sdfConfig.y + 0.5;
     sdf = SDF(s, s);
+    
+    if (texture.a == 0.0 && sdf.outer > 0.0) { sdf.outer = 0.5; }
   }
   else {
     if (texture.a > 0.0) {
@@ -53,14 +55,17 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
       fillColor = premultiply(fillColor);
     }
   
+    let bleed = 0.5;
     if (mode == 0) {
       if (fillColor.a <= 0.0) { discard; }
-      return fillColor;
+      
+      var s = getBoxSDF(layout.xy, uv, scale);
+      sdf.outer = s;
+      sdf.inner = s;
     }
-    if (mode == 1) { sdf = getBorderBoxSDF(layout.xy, border, uv, scale); }
+    else if (mode == 1) { sdf = getBorderBoxSDF(layout.xy, border, uv, scale); }
     else { sdf = getRoundedBorderBoxSDF(layout.xy, border, radius, uv, scale); }
     
-    let bleed = 0.5;
     sdf.outer += bleed;
     sdf.inner += bleed;
   }
@@ -68,11 +73,11 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   var mask = clamp(sdf.outer, 0.0, 1.0);
 
   if (DEBUG_SDF) {
-    let o = sdf.outer * scale / 4.0;
-    let m = ((o + 100.0 + 0.5 - 0.5 * scale) % 1.0) - 0.5;
+    let o = (sdf.outer - 0.5) * scale / 4.0;
+    let m = ((o + 0.5) % 1.0) - 0.5;
     mark = clamp(1.0 - abs(m / scale) * 4.0, 0.0, 1.0);
   }
-  if (mask == 0.0) { discard; }
+  if (mask == 0.0 && mark == 0.0) { discard; }
 
   var color = fill;
   if (sdf.outer != sdf.inner) { color = mix(strokeColor, fillColor, clamp(sdf.inner + (1.0 - mask), 0.0, 1.0)); }

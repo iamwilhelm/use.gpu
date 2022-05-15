@@ -23,12 +23,14 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   var texture = getTexture(textureUV);
   var scale = getUVScale(sdfUV);
 
+  var mark = vec4<f32>(0.0);
+  
   if (mode == -1) {
     let sdfRadius = sdfConfig.x;
     var expand = border.x;
     
-    var d = (texture.a - 0.75) * sdfRadius + 0.5;
-    var s = (d + expand) / scale;
+    var d = (texture.a - 0.75) * sdfRadius;
+    var s = (d + expand) / scale * sdfConfig.y + 0.5;
     sdf = SDF(s, s);
   }
   else {
@@ -55,6 +57,20 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     }
     if (mode == 1) { sdf = getBorderBoxSDF(layout.xy, border, uv, scale); }
     else { sdf = getRoundedBorderBoxSDF(layout.xy, border, radius, uv, scale); }
+    
+    let bleed = -0.5 / scale;
+    sdf.outer += bleed;
+    sdf.inner += bleed;
+
+    /*
+    let o = sdf.outer;
+    let i = sdf.inner;
+
+    let m = ((o + 0.5) % 1.0) - 0.5;
+    let line = clamp(1.0 - abs(m * scale) * 2.0, 0.0, 1.0);
+    
+    mark = vec4<f32>(vec3<f32>((o / 4.0 + .5) + line), 1.0);
+    */
   }
 
   var mask = clamp(sdf.outer, 0.0, 1.0);
@@ -70,5 +86,6 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     color = vec4<f32>(color.rgb, color.a * mask);
   }
 
-  return color;  
+  return color;
+  //return mix(color, mark, 0.9);  
 }

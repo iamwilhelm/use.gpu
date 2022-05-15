@@ -132,3 +132,18 @@ export const makeOrbitPosition = (radius: number, phi: number, theta: number, do
   ];
 }
 
+export const makePanMatrix = (x: number, y: number, zoom: number, dolly: number): mat4 => {
+  const matrix = mat4.create();
+  mat4.translate(matrix, matrix, vec3.fromValues(x, y, 1 - 1 / (dolly || 1)));
+  mat4.scale(matrix, matrix, vec3.fromValues(zoom, zoom, zoom));
+  return matrix;
+}
+
+export const makePanPosition = (x: number, y: number, zoom: number, dolly: number): number[] => {
+  const z = 1 - 1 / Math.max(1e-5, dolly);
+  return [
+    x,
+    y,
+    z,
+  ];
+}

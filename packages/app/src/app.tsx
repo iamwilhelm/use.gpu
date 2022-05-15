@@ -17,7 +17,7 @@ import { UseInspect } from '@use-gpu/inspect';
 import '@use-gpu/inspect/theme.css';
 
 import { makeRoutes } from './routes';
-import { makePicker } from './pages/page-picker';
+import { makePicker } from './ui/page-picker';
 
 import { FALLBACK_MESSAGE } from './fallback';
 

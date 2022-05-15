@@ -71,10 +71,6 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
 
   const unit = scale != null ? height / pixelRatio / scale : 1;
 
-  usePerFrame();
-  const frame = useOne(() => ({ current: 0 }));
-  frame.current++;
-
   uniforms.projectionMatrix.current = makeProjectionMatrix(width, height, fov, near, far, radius, dolly);
   uniforms.viewMatrix.current = makeOrbitMatrix(radius, phi, theta, dolly);
   uniforms.viewPosition.current = makeOrbitPosition(radius, phi, theta, dolly);
@@ -84,9 +80,15 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.viewWorldUnit.current = focus * Math.tan(fov / 2);
   uniforms.viewPixelRatio.current = pixelRatio * unit;
 
-  return provide(FrameContext, {...frame},
-    use(ViewProvider, {
-      defs: VIEW_UNIFORMS, uniforms, children,
-    })
+  usePerFrame();
+  const frame = useOne(() => ({ current: 0 }));
+  frame.current++;
+
+  return (
+    provide(FrameContext, {...frame},
+      use(ViewProvider, {
+        defs: VIEW_UNIFORMS, uniforms, children,
+      })
+    )
   );
 };

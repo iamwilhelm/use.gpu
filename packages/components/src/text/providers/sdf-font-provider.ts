@@ -51,7 +51,7 @@ const roundUp2 = (v: number) => {
   return v;
 };
 
-const getNearestScale = (size: number) => roundUp2(Math.max(32, size));
+const getNearestScale = (size: number) => roundUp2(Math.max(16, size)) * 2;
 
 const hashGlyph = (font: number, id: number, size: number) => scrambleBits53(mixBits53(mixBits53(font, id), size * 100));
 

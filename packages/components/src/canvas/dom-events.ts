@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { use, memo, useResource, useState, incrementVersion } from '@use-gpu/live';
-import { EventProvider, MouseState, WheelState } from '../providers/event-provider';
+import { EventProvider, MouseState, WheelState, ModifierState } from '../providers/event-provider';
 
 const CAPTURE_EVENT = {capture: true};
 
@@ -39,13 +39,24 @@ const makeWheelState = () => ({
   version: 0,
 } as WheelState);
 
+const makeKeyboardState = () => ({
+  modifiers: {
+    ctrl: false,
+    alt: false,
+    shift: false,
+    meta: false,
+  },
+  version: 0,
+} as ModifierState);
+
 export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children}: DOMEventsProps) => {
   const [mouse, setMouse] = useState<MouseState>(makeMouseState);
   const [wheel, setWheel] = useState<WheelState>(makeWheelState);
+  const [keyboard, setKeyboard] = useState<KeyboardState>(makeKeyboardState);
 
   useResource((dispose) => {
     const onWheel = (e: WheelEvent) => {
-      const {deltaMode, deltaX, deltaY} = e;
+      const {deltaMode, deltaX, deltaY, clientX, clientY} = e;
       let f = 1;
       if (deltaMode === 1) f = 10;
       if (deltaMode === 2) f = 30;
@@ -56,8 +67,23 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
         version: incrementVersion(state.version),
       }));
 
+      onMove(clientX, clientY);
+
       e.preventDefault();
       e.stopPropagation();
+    };
+
+    const onModifiers = (e: Event) => {
+      setKeyboard((state) => ({
+        ...state,
+        modifiers: {
+          ctrl:  e.ctrlKey,
+          alt:   e.altKey,
+          shift: e.shiftKey,
+          meta:  e.metaKey,
+        },
+        version: incrementVersion(state.version),        
+      }));
     };
 
     const onMove = (clientX: number, clientY: number) => {
@@ -136,6 +162,15 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       document.removeEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
       document.removeEventListener('mouseup', onMouseUp, CAPTURE_EVENT);
     };
+    
+    const onKeyDown = (e: KeyboardEvent) => {
+      console.log(e)
+      onModifiers(e);
+    };
+
+    const onKeyUp = (e: KeyboardEvent) => {
+      onModifiers(e);
+    };
 
     element.addEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
     element.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
@@ -143,6 +178,9 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     element.addEventListener('touchstart', onTouchStart, CAPTURE_EVENT);
     element.addEventListener('touchmove', onTouchMove, CAPTURE_EVENT);
     element.addEventListener('touchend', onTouchEnd, CAPTURE_EVENT);
+
+    document.addEventListener('keydown', onKeyDown, CAPTURE_EVENT);
+    document.addEventListener('keyup', onKeyUp, CAPTURE_EVENT);
 
     element.addEventListener('wheel', onWheel);
 
@@ -155,9 +193,12 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       element.removeEventListener('touchmove', onTouchMove, CAPTURE_EVENT);
       element.removeEventListener('touchend', onTouchEnd, CAPTURE_EVENT);
 
+      document.removeEventListener('keydown', onKeyDown, CAPTURE_EVENT);
+      document.removeEventListener('keyup', onKeyUp, CAPTURE_EVENT);
+
       element.removeEventListener('wheel', onWheel);
     });
   }, [element]);
 
-  return use(EventProvider, { mouse, wheel, children });
+  return use(EventProvider, { mouse, wheel, keyboard, children });
 }, 'DOMEvents');

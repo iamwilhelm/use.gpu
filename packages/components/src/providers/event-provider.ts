@@ -11,6 +11,7 @@ const CAPTURE_EVENT = {capture: true};
 export const EventContext = makeContext<EventContextProps>(undefined, 'EventContext');
 export const MouseContext = makeContext<MouseContextProps>(undefined, 'MouseContext');
 export const WheelContext = makeContext<WheelContextProps>(undefined, 'WheelContext');
+export const KeyboardContext = makeContext<KeyboardContextProps>(undefined, 'KeyboardContext');
 
 export type EventContextProps = {
   useId: () => number,
@@ -18,9 +19,11 @@ export type EventContextProps = {
 
 export type MouseContextProps = {
   mouse: MouseState,
+  stopped: boolean,
   captureId: number | null,
   targetId: number,
   targetIndex: number,
+  stopPropagation: () => void,
   beginCapture: (id: number) => void,
   endCapture: () => void,
   useMouse: (id?: number | null) => MouseEventState,
@@ -31,9 +34,15 @@ export type WheelContextProps = {
   useWheel: (id?: number | null) => WheelEventState,
 };
 
+export type KeyboardContextProps = {
+  keyboard: KeyboardState,
+  useKeyboard: (id?: number | null) => KeyboardEventState,
+};
+
 export type EventProviderProps = {
   mouse: MouseState,
   wheel: WheelState,
+  keyboard: KeyboardState,
   children: LiveElement<any>,
 };
 
@@ -48,8 +57,20 @@ export type MouseState = {
 };
 
 export type WheelState = {
+  x: number,
+  y: number,
   moveX: number,
   moveY: number,
+  version: number,
+};
+
+export type KeyboardState = {
+  modifiers: {
+    ctrl: boolean,
+    alt: boolean,
+    shift: boolean,
+    meta: boolean,
+  },
   version: number,
 };
 
@@ -60,10 +81,21 @@ export type MouseEventState = MouseState & {
   pressed: { left: boolean, middle: boolean, right: boolean },
   clicks: { left: number, middle: number, right: number },
   presses: { left: number, middle: number, right: number },
+
+  stopped: boolean,
+  stop: () => void,
 };
 
 export type WheelEventState = WheelState & {
   index: number,
+
+  stopped: boolean,
+  stop: () => void,
+};
+
+export type KeyboardEventState = KeyboardState & {
+  stopped: boolean,
+  stop: () => void,
 };
 
 const toButtons = (buttons: number) => ({
@@ -77,19 +109,29 @@ const makeMouseRef = () => ({
   pressed: { left: false, middle: false, right: false },
   presses: { left: 0, middle: 0, right: 0 },
   clicks:  { left: 0, middle: 0, right: 0 },
+  stopped: false,
 });
 
 const makeWheelRef = () => ({
   moveX: 0,
   moveY: 0,
   version: 0,
+  stopped: false,
+});
+
+const makeKeyboardRef = () => ({
+  ctrl: false,
+  alt: false,
+  shift: false,
+  meta: false,
+  stopped: false,
 });
 
 const makeCaptureRef = () => ({
   current: null as number | null,
 });
 
-export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wheel, children}: EventProviderProps) => {
+export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wheel, keyboard, children}: EventProviderProps) => {
   const {pixelRatio} = useContext(RenderContext);
   const pickingContext = useContext(PickingContext);
   const [captureId, setCaptureId] = useState<number | null>(null);
@@ -115,6 +157,14 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
     }),
   }));
   
+  mouse.stopped = false;
+  wheel.stopped = false;
+  keyboard.stopped = false;
+
+  const stopMouse = () => mouse.stopped = true;
+  const stopWheel = () => wheel.stopped = true;
+  const stopKeyboard = () => keyboard.stopped = true;
+
   const mouseContext = useMemo(() => ({
     mouse,
     captureId,
@@ -149,7 +199,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
         ref.buttons = buttons;
       }, buttons);
 
-      return {...mouse, index, hovered, captured, pressed, presses, clicks};
+      return {...mouse, index, hovered, captured, pressed, presses, clicks, stop: stopMouse};
     },
   }), [mouse, targetId, captureId]);
 
@@ -157,10 +207,12 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
     wheel,
     useWheel: (id: number | null = null): WheelEventState => {
       const ref = useOne(makeWheelRef);
+      const {x, y} = mouse;
+      const {stopped} = wheel;
 
       const index    = targetIndex;
       const captured = captureId === id;
-      const hovered = (captureId == null || captured) && (targetId === id || id === null);
+      const hovered  = (captureId == null || captured) && (targetId === id || id === null);
 
       if (hovered) {
         ref.moveX = wheel.moveX;
@@ -168,14 +220,23 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
         ref.version = wheel.version;
       }
 
-      return {...ref, index};
+      return {...ref, x, y, stopped, index, stop: stopWheel};
     },
   }), [wheel, targetId, captureId]);
+
+  const keyboardContext = useMemo(() => ({
+    keyboard,
+    useKeyboard: (id: number | null = null): KeyboardEventState => {
+      return {...keyboard, stop: stopKeyboard};
+    },
+  }), [keyboard, targetId, captureId]);
 
   return (
     provide(MouseContext, mouseContext,
       provide(WheelContext, wheelContext,
-        provide(EventContext, eventApi, children)
+        provide(KeyboardContext, keyboardContext,
+          provide(EventContext, eventApi, children)
+        )
       )
     )
   );

@@ -5,8 +5,10 @@ import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useConsu
 import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
+import { ViewContext } from '../providers/view-provider';
 
 import { UIRectangle } from './shape/ui-rectangle';
+import { mat4, vec3 } from 'gl-matrix';
 
 export type LayoutProps = {
   inspect?: boolean,
@@ -50,15 +52,27 @@ const Resume = (inspect?: boolean) => (els: LayoutElement[]) => {
   return fragment(out);
 };
 
-export const Scroller = (pickers: any[]) => {
-  const { useMouse } = useContext(MouseContext);
-  const { useWheel } = useContext(WheelContext);
+const screenToView = (viewMatrix: mat4, x: number, y: number) => {
+  const v = [x, y, 0.5, 1.0];
+  const m = mat4.create();
+  mat4.invert(m, viewMatrix);
+  vec3.transformMat4(v, v, m);
+  return [v[0], v[1]];
+};
 
-  const { x, y } = useMouse();
-  const { moveX, moveY, version } = useWheel();
+export const Scroller = (pickers: any[]) => {
+  const { useWheel } = useContext(WheelContext);
+  const { viewUniforms } = useContext(ViewContext);
+  const { viewMatrix: { current: viewMatrix } } = viewUniforms;
+
+  const { x, y, moveX, moveY, version, stopped } = useWheel();
+  const [px, py] = screenToView(viewMatrix, x, y);
+  
   useOne(() => {
+    if (stopped) return;
+
     for (const picker of pickers) {
-      const picked = picker(x, y, true);
+      const picked = picker(px, py, true);
       if (picked) {
         const [id, rectangle, onScroll] = picked;
         if (onScroll) onScroll(moveX, moveY);
@@ -73,12 +87,15 @@ export const Scroller = (pickers: any[]) => {
 export const Inspect = (pickers: any[]) => {
   const { id } = useFiber();
   const { useMouse } = useContext(MouseContext);
-  const { useWheel } = useContext(WheelContext);
+  const { viewUniforms } = useContext(ViewContext);
+  const { viewMatrix: { current: viewMatrix } } = viewUniforms;
+
   const { x, y } = useMouse();
+  const [px, py] = screenToView(viewMatrix, x, y);
 
   const picked = useOne(() => {
     for (const picker of pickers) {
-      const picked = picker(x, y);
+      const picked = picker(px, py);
       if (picked) return picked;
     }
   }, [pickers]);

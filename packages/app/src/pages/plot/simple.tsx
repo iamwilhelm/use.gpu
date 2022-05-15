@@ -116,9 +116,9 @@ export const PlotSimplePage: LC = () => {
                     emit(x, v * .5 + .5, y, 1);
                   }}
                 >
-									<Surface
-										color={[0.1, 0.3, 1, 1]}
-									/>
+                  <Surface
+                    color={[0.1, 0.3, 1, 1]}
+                  />
                   <Line
                     size={5}
                     color={[0.5, 0.5, 1, 0.5]}

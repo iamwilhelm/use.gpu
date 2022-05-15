@@ -25,23 +25,23 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip };
 
   var sdfConfig = getSDFConfig(instanceIndex);
 
-  var uv1 = getQuadUV(vertexIndex);
-
-  var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.5, 1.0);
-  var center = worldToClip(applyTransform(position));
-
-  var uv = mix(uv4.xy, uv4.zw, uv1);
-
   var mode: i32;
   if (sdfConfig.x > 0.0) { mode = -1; }
   else if (length(radius + border) == 0.0) { mode = 0; }
   else if (length(radius) == 0.0) { mode = 1; }
   else { mode = 2; };
 
-  let box = rectangle.zw - rectangle.xy;
-  let sdfUV = uv1 * box;
-  let textureUV = uv;
+  var uv1 = getQuadUV(vertexIndex);
+  
+  let box = rectangle.zw - rectangle.xy;  
 
+  var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.5, 1.0);
+  var center = worldToClip(applyTransform(position));
+
+  var uv = mix(uv4.xy, uv4.zw, uv1);
+  let textureUV = uv;
+  let sdfUV = uv1 * box;
+  
   return UIVertex(
     center,
     uv1,

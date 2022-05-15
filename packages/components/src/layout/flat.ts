@@ -6,9 +6,9 @@ import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
-import { FrameContext } from '../providers/frame-provider';
+import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { ViewProvider } from '../providers/view-provider';
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 const DEFAULT_FLAT_CAMERA = {
   near: 0,
@@ -17,6 +17,10 @@ const DEFAULT_FLAT_CAMERA = {
 };
 
 export type FlatProps = {
+  x?: number,
+  y?: number,
+  zoom?: number,
+
   focus?: number,
   scale?: number | null,
 
@@ -28,6 +32,9 @@ export type FlatProps = {
 
 export const Flat: LiveComponent<FlatProps> = (props) => {
   const {
+    x = 0,
+    y = 0,
+    zoom = 1,
     scale = null,
     focus = DEFAULT_FLAT_CAMERA.focus,
     near = DEFAULT_FLAT_CAMERA.near,
@@ -70,6 +77,13 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     viewPixelRatio: { current: null },
   })) as any as ViewUniforms;
 
+  if (x || y || (zoom !== 1)) {
+    const m = mat4.create();
+    mat4.scale(m, m, vec3.fromValues(zoom, zoom, 1));
+    mat4.translate(m, m, vec3.fromValues(x, y, 0));
+    uniforms.viewMatrix.current = m;
+  }
+
   uniforms.projectionMatrix.current = matrix;
   uniforms.viewPosition.current = [ 0, 0, 1, 0 ];
   uniforms.viewNearFar.current = [ near, far ];
@@ -78,9 +92,17 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.viewWorldUnit.current = focus;
   uniforms.viewPixelRatio.current = ratio;
 
-  return use(ViewProvider, {
-    defs: VIEW_UNIFORMS,
-    uniforms,
-    children: provide(LayoutContext, layout, children),
-  });
+  usePerFrame();
+  const frame = useOne(() => ({ current: 0 }));
+  frame.current++;
+
+  return (
+    provide(FrameContext, {...frame},
+      use(ViewProvider, {
+        defs: VIEW_UNIFORMS,
+        uniforms,
+        children: provide(LayoutContext, layout, children),
+      })
+    )
+  );
 };

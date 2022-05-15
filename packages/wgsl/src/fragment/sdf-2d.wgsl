@@ -14,14 +14,14 @@
   var xy = (abs(uv - .5) - .5) * box;
 
   var d1 = max(xy.x, xy.y);
-  var outer = 0.5 - d1;
+  var outer = -d1;
 
   var bs = mix(border.xy, border.zw, nearest);
   var b = max(bs.x, bs.y);
 
   xy = xy + bs;
   var d2 = max(xy.x, xy.y);
-  var inner = 0.5 - d2;
+  var inner = -d2;
 
   return SDF(outer / scale, inner / scale);
 }
@@ -41,7 +41,7 @@
 
   var outer: f32;
   var inner: f32;
-  outer = r + 0.5 - length(clip) - neg;
+  outer = r - length(clip) - neg;
   inner = outer;
   if (b > 0.0) {
     xy = xy + bs;
@@ -49,7 +49,7 @@
 
     var clip = max(vec2<f32>(0.0), xy + r);
     var neg = min(0.0, max(xy.x, xy.y) + r);
-    inner = r + 0.5 - length(clip) - neg;
+    inner = r - length(clip) - neg;
   }
 
   return SDF(outer / scale, inner / scale);

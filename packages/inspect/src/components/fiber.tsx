@@ -31,7 +31,7 @@ type FiberNodeProps = {
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
   indent?: number,
-	depthLimit?: number,
+  depthLimit?: number,
   continuation?: boolean,
   siblings?: boolean,
 }

@@ -117,7 +117,7 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
       hot = q;
     };
 
-		if (!fiber.host) return;
+    if (!fiber.host) return;
 
     fiber.host.__ping = (fiber: LiveFiber<any>, active?: boolean) => {
       version = incrementVersion(version);

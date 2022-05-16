@@ -5,7 +5,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { DeviceContext, ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
-import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import {
   makeMultiUniforms, makeBoundUniforms,
   getColorSpace,
@@ -104,11 +104,19 @@ export const render = (props: RenderProps) => {
   const uniformMap = keyBy(uniforms, ({uniform: {name}}) => name);
   const constantUniforms = mapValues(uniformMap, u => u.constant);
 
+  const fiber = useFiber();
+
   // Return a lambda back to parent(s)
   return yeet({
     [mode]: (passEncoder: GPURenderPassEncoder) => {
       const v = resolve(vertexCount);
       const i = resolve(instanceCount);
+
+      if (!fiber.__inspect.render) {
+        fiber.__inspect.render = {vertexCount: 0, instanceCount: 0};
+      }
+      fiber.__inspect.render.vertexCount = v;
+      fiber.__inspect.render.instanceCount = i;
       if (!(v * i)) return;
 
       uniform.pipe.fill(viewUniforms);

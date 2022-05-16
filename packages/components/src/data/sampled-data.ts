@@ -16,6 +16,7 @@ export type SampledDataProps = {
   range: [number, number][],
   size: number[],
 
+  sparse?: boolean,
   centered?: boolean[] | boolean,
   expr?: (emit: Emitter, ...args: number[]) => void,
   items?: number,
@@ -36,6 +37,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     expr,
     items = 1,
     render,
+    sparse = false,
     centered = false,
     live = false,
   } = props;
@@ -65,6 +67,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
 
   // Refresh and upload data
   const refresh = () => {
+    let emitted = 0;
+
     if (expr && size.length) {
       const n = size.length;
       let sampled;
@@ -150,14 +154,16 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         throw new Error("Cannot sample across more than 4 dimensions");
       }
 
-      if (sampled) emitIntoMultiNumberArray(sampled, array, dims, size);
+      if (sampled) {
+        emitted = emitIntoMultiNumberArray(sampled, array, dims, size);
+      }
     }
     if (expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
 
-    source.length = length;
-    source.size = items > 1 ? [items, ...size] : size;
+    source.length = sparse ? emitted / items : length;
+    source.size = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
     source.version = incrementVersion(source.version);
   };
 

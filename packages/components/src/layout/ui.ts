@@ -170,7 +170,7 @@ const makePartitioner = () => {
     const layer = layers[i];
 
     if (i != null) {
-      let blocked = false;
+      let blocked = !bounds;
       if (bounds) {
         for (let j = i + 1; j < n; ++j) {
           if (overlapBounds(layers[j].bounds, bounds)) {
@@ -179,7 +179,7 @@ const makePartitioner = () => {
           }
         }
       }
-      if (!blocked) {
+      if (!blocked || i === n - 1) {
         layer.items.push(item);
         if (bounds) layer.bounds = joinBounds(layer.bounds, bounds);
         return;

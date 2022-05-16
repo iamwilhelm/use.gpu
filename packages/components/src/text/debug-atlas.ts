@@ -129,7 +129,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     texture: source ?? SDF_FONT_ATLAS,
     fill: [0, 0, 0, 1],
     count: 1,
-    repeat: 0,
+    repeat: 3,
   });
   
   return yeet(yeets);

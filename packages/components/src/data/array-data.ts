@@ -3,7 +3,7 @@ import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/t
 
 import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
-  makeDataEmitter, makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
+  makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
 } from '@use-gpu/core';
 

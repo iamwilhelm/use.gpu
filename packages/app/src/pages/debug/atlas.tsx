@@ -4,7 +4,7 @@ import React, { Gather, Yeet } from '@use-gpu/live/jsx';
 import {
   Draw, Pass, PanControls,
   Flat, UI, Layout, Absolute, Inline, Text,
-  DebugAtlas, RawTexture,
+  DebugAtlas, RawTexture, DebugProvider,
 } from '@use-gpu/components';
 
 export const DebugAtlasPage: LC = () => {
@@ -53,7 +53,13 @@ export const DebugAtlasPage: LC = () => {
       active={true}
       render={(x, y, zoom) =>
         <Flat x={x} y={y} zoom={zoom}>
-          {view}
+          <DebugProvider
+            debug={{
+              sdf2d: { contours: true },
+            }}
+          >
+            {view}
+          </DebugProvider>
         </Flat>
       }
     />

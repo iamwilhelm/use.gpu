@@ -32,5 +32,5 @@ export const useDebugContext = () => useContext(DataContext);
 
 export const DebugProvider: LC<DebugProviderProps> = memo(({debug, children}: PropsWithChildren<DebugProviderProps>) => {
   const context = useOne(() => patch(DEBUG_DEFAULTS, debug), debug);
-  return provide(DebugContext, debug, children);
+  return provide(DebugContext, context, children);
 }, 'DebugProvider');

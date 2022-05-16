@@ -77,14 +77,21 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
 
   // SDF iso-contours
   if (DEBUG_SDF) {
-    let o = (sdf.outer - 0.5) * scale / 4.0;
-    let m = ((o + 0.5) % 1.0) - 0.5;
-    mark = clamp(1.0 - abs(m / scale) * 4.0, 0.0, 1.0);
+    var s = 4.0;
+    var b = 0.0;
+    if (mode == -1) {
+      s = 1.0;
+      b = 3.0;
+    }
+
+    let o = (sdf.outer - 0.5) * scale / s;
+    let m = ((o + 0.5 + b) % 1.0) - 0.5;
+    mark = clamp(1.0 - abs(m / scale) * s, 0.0, 1.0);
     
     if ((border.x != border.y) || (border.z != border.w) || (border.x != border.z)) {
-      let o = (sdf.inner - 0.5) * scale / 4.0;
-      let m = ((o + 0.5) % 1.0) - 0.5;
-      let mark2 = 1.0 * clamp(1.0 - abs(m / scale) * 4.0, 0.0, 1.0);
+      let o = (sdf.inner - 0.5) * scale / s;
+      let m = ((o + 0.5 + b) % 1.0) - 0.5;
+      let mark2 = 1.0 * clamp(1.0 - abs(m / scale) * s, 0.0, 1.0);
       
       if (sdf.inner > -0.5) { mark = mark2 + mark * 0.5; }
     }

@@ -14,6 +14,7 @@ export type PanControlsProps = {
   y?: number,
   zoom?: number,
   zoomSpeed?: number,
+  anchor?: [number, number],
   active?: boolean,
   version?: number,
 

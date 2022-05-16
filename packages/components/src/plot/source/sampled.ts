@@ -14,6 +14,7 @@ export type SampledProps = {
   range?: [number, number][],
   size: number[],
 
+  sparse?: boolean,
   centered?: boolean[] | boolean,
   expr?: (emit: Emitter, ...args: number[]) => void,
   items?: number,

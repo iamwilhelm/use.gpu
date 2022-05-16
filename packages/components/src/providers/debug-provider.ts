@@ -8,6 +8,7 @@ import { patch } from '@use-gpu/state';
 export const DEBUG_DEFAULTS = {
   sdf2d: {
     contours: false,
+    subpixel: true,
   },
   layout: {
     inspect: false,
@@ -16,7 +17,8 @@ export const DEBUG_DEFAULTS = {
 
 export type DebugContextProps = {
   sdf2D: {
-    contours: false,
+    contours: boolean,
+    subpixel: boolean,
   },
   layout: {
     inspect: boolean,

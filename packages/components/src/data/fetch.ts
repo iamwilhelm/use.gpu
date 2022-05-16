@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { yeet, useAsync, useMemo, useOne } from '@use-gpu/live';
 
-const SLOW = 1000;
+const SLOW = 0;
 
 type FetchAPIOptions = Parameters<typeof fetch>[1];
 
@@ -39,7 +39,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
       return response;
     };
 
-    if (url ?? request) return SLOW ? () => delay(f(), SLOW) : f;
+    if (url ?? request) return slow ? () => delay(f(), slow) : f;
     return async () => null;
   }, [url, request, JSON.stringify(options), type, version]);
 

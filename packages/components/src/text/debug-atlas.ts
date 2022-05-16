@@ -19,6 +19,8 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (
   }
   else useNoContext(SDFFontContext);
 
+  console.log('render debugatlas', source)
+
   return debug(use(DebugAtlasView, {
     atlas: atlas!,
     source: source!,
@@ -29,6 +31,8 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (
 export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source}: DebugAtlasProps) => {
   const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate} = atlas as any;  
   const {id} = useFiber();
+
+  console.log('render debugatlas view', source)
 
   const yeets = [];
   const pos = [] as number[];

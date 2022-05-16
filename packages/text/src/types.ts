@@ -39,4 +39,6 @@ export type RustTextAPI = {
   measureFont: (fontId: number, size: number) => FontMetrics,
   measureSpans: (fontStack: number[], text: Uint16Array, size: number) => SpanMetrics,
   measureGlyph: (fontId: number, glyphId: number, size: number) => GlyphMetrics,
+
+  findGlyph: (fontId: number, char: string) => number;
 };

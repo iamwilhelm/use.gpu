@@ -7,6 +7,8 @@ import {
   DebugAtlas, RawTexture, DebugProvider,
 } from '@use-gpu/components';
 
+import { GlyphControls } from '../../ui/glyph-controls';
+
 export const DebugAtlasPage: LC = () => {
 
   const view = (
@@ -49,19 +51,24 @@ export const DebugAtlasPage: LC = () => {
   );
   
   return (
-    <PanControls
-      active={true}
-      render={(x, y, zoom) =>
-        <Flat x={x} y={y} zoom={zoom}>
-          <DebugProvider
-            debug={{
-              sdf2d: { contours: true },
-            }}
-          >
-            {view}
-          </DebugProvider>
-        </Flat>
-      }
-    />
+    <GlyphControls
+      hasContours
+      render={({subpixel, contours}) =>
+        <PanControls
+          key="atlas"
+          active={true}
+          render={(x, y, zoom) =>
+            <Flat x={x} y={y} zoom={zoom}>
+              <DebugProvider
+                debug={{
+                  sdf2d: { subpixel, contours },
+                }}
+              >
+                {view}
+              </DebugProvider>
+            </Flat>
+          }
+        />
+    } />
   )
 };

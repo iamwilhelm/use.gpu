@@ -1,4 +1,5 @@
 import React from 'react';
+import { LiveElement } from '@use-gpu/live/types';
 import { PAGES } from '../routes';
 import { use, fragment, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
@@ -19,6 +20,7 @@ const STYLE = {
 
 type LayoutControlsProps = {
   container: Element,
+  render?: (mode: string) => LiveElement<any>,
 };
 
 export const LayoutControls = (props: LayoutControlsProps) => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { LiveElement } from '@use-gpu/live/types';
 import { PAGES } from '../routes';
 import { use, fragment, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
@@ -18,19 +19,39 @@ const STYLE = {
 };
 
 type GlyphControlsProps = {
+  hasGlyph?: boolean,
+  hasContours?: boolean,
   container: Element,
+  render?: ({
+    subpixel: boolean,
+    contours: boolean,
+    glyph: string,
+  }) => LiveElement<any>
 };
 
 export const GlyphControls = (props: GlyphControlsProps) => {
-  const {container, render} = props;
+  const {hasGlyph, hasContours, container, render} = props;
+
   const [subpixel, setSubpixel] = useState(true);
+  const [contours, setContours] = useState(false);
+  const [glyph, setGlyph] = useState('Q');
 
   return fragment([
-		render(subpixel),
+		render({subpixel, contours, glyph}),
     use(HTML, {
       container,
       style: STYLE,
       children: (<>
+        {hasGlyph ? (
+          <div>
+            <label>Glyph <input type="text" value={glyph} onChange={(e) => setGlyph(e.target.value)} /></label>
+          </div>
+        ) : null}
+        {hasContours ? (
+          <div>
+            <label><input type="checkbox" checked={contours} onChange={(e) => setContours(e.target.checked)} /> Show SDF Contours</label>
+          </div>
+        ) : null}
         <div>
           <label><input type="checkbox" checked={subpixel} onChange={(e) => setSubpixel(e.target.checked)} /> Subpixel SDF</label>
         </div>

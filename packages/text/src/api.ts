@@ -95,8 +95,14 @@ export const RustText = async (): Promise<RustTextAPI> => {
   const measureGlyph = (fontId: number, glyphId: number, size: number): GlyphMetrics => {
     return useRustText.measure_glyph(fontId, glyphId, size);
   }
+
+  const findGlyph = (fontId: number, char: string): number => {
+    const {glyphs} = useRustText.measure_spans([fontId], packString(char), 16);
+    const array = new Uint32Array(glyphs.buffer);
+    return array[1];
+  };
   
-  return {measureFont, measureSpans, measureGlyph, resolveFont, resolveFontStack, setFonts};
+  return {findGlyph, measureFont, measureSpans, measureGlyph, resolveFont, resolveFontStack, setFonts};
 }
 
 export const packStrings = (strings: string[] | string): Uint16Array => {

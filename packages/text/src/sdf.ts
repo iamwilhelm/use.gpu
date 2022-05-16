@@ -67,6 +67,7 @@ export const glyphToRGBA = (data: Uint8Array, w: number, h: number) => {
   return {data: out, width: w, height: h};
 };
 
+let TRACE = false;
 // Convert grayscale glyph to SDF
 export const glyphToSDF = (
   data: Uint8Array,
@@ -74,8 +75,9 @@ export const glyphToSDF = (
   h: number,
   pad: number = 4,
   radius: number = 3,
-  subpixel: boolean = true,
+  subpixel: boolean = false,
   cutoff: number = 0.25,
+  half: number = 0,
 ) => {
   const wp = w + pad * 2;
   const hp = h + pad * 2;
@@ -93,39 +95,44 @@ export const glyphToSDF = (
 
   const {outer, inner, outer2, inner2, xo, yo, xi, yi, f, z, v, b} = SDF_STAGE!;
 
-  const row = 31;
-  const start = row * wp + 10;
-  const end = row * wp + 25;
-  
   if (subpixel) {
     // EDT no longer commutes, so need to do both X->Y and Y->X
-    edtSubpixel(outer, xo, yo, 0, 0, wp, hp, wp, f, z, v, b);
-    edtSubpixel(inner, xi, yi, pad, pad, w, h, wp, f, z, v, b);
+    edtSubpixel(inner, xi, yi, pad - 1, pad - 1, w + 1, h + 1, wp, f, z, v, b, !!half);
+    edtSubpixel(outer, xo, yo, 0, 0, wp, hp, wp, f, z, v, b, !!half);
 
-    edtSubpixelAlt(outer2, xo, yo, 0, 0, wp, hp, wp, f, z, v, b);
-    edtSubpixelAlt(inner2, xi, yi, pad, pad, w, h, wp, f, z, v, b);
+    edtSubpixelAlt(inner2, xi, yi, pad - 1, pad - 1, w + 1, h + 1, wp, f, z, v, b, !!half);
+    edtSubpixelAlt(outer2, xo, yo, 0, 0, wp, hp, wp, f, z, v, b, !!half);
   }
   else {
-    edt(outer, 0, 0, wp, hp, wp, f, z, v);
-    edt(inner, pad, pad, w, h, wp, f, z, v);
+    edt(outer, 0, 0, wp, hp, wp, f, z, v, !!half);
+    edt(inner, pad, pad, w, h, wp, f, z, v, !!half);
   }
 
-  const sdf: number[] = [];
-
-  if (subpixel) {
+  if (subpixel || half) {
     // Take max of both EDTs to resolve subpixel SDF
-    for (let i = 0; i < np; i++) {
-      outer[i] = Math.max(outer[i], outer2[i]);
-      inner[i] = Math.max(inner[i], inner2[i]);
+    if (!half) {
+      for (let i = 0; i < np; i++) {
+        outer[i] = Math.max(outer[i], outer2[i]);
+        inner[i] = Math.max(inner[i], inner2[i]);
+      }
+    }
+    // Debug viewing
+    else if (half == 2) {
+      for (let i = 0; i < np; i++) {
+        outer[i] = outer2[i];
+        inner[i] = inner2[i];
+      }
     }
   }
 
-  for (let i = 0; i < np; i++) {
-    const d =
-       Math.max(0, Math.sqrt(outer[i]) - 0.5) -
-       Math.max(0, Math.sqrt(inner[i]) - 0.5);
+  const resolve = subpixel
+    ? (i: number) => 
+      Math.max(0, Math.sqrt(outer[i]) - 0.5) -
+      Math.max(0, Math.sqrt(inner[i]) - 0.5)
+    : (i: number) => Math.sqrt(outer[i]) - Math.sqrt(inner[i])
 
-    sdf[i] = d;
+  for (let i = 0; i < np; i++) {
+    const d = resolve(i);
     out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   } 
 
@@ -190,17 +197,11 @@ export const paintIntoStage = (
   
   outer.fill(INF, 0, np);
   inner.fill(0, 0, np);
-  if (subpixel) {
-    outer2.fill(INF, 0, np);
-    inner2.fill(0, 0, np);
-  }
+  outer2.fill(INF, 0, np);
+  inner2.fill(0, 0, np);
 
   const flip = subpixel
     ? (i: number) => {
-      outer[i] = 0;
-      inner[i] = INF
-      outer2[i] = 0;
-      inner2[i] = INF
     }
     : (i: number) => {
       outer[i] = 0;
@@ -209,12 +210,35 @@ export const paintIntoStage = (
 
   const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
   
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const a = getData(x, y);
-      if (a >= 0.5) {
+  if (subpixel) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const a = getData(x, y);
+        if (a >= 0.5) {
+          const i = (y + pad) * wp + x + pad;
+          outer[i] = 0;
+          inner[i] = INF
+          outer2[i] = 0;
+          inner2[i] = INF
+        }
+      }
+    }
+  }
+  else {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const a = getData(x, y);
         const i = (y + pad) * wp + x + pad;
-        flip(i);
+
+        if (a >= 254/255) {
+          outer[i] = 0;
+          inner[i] = INF
+        }
+        else if (a > 0) {
+          const d = 0.5 - a;
+          outer[i] = d > 0 ? d*d : 0;
+          inner[i] = d < 0 ? d*d : 0;
+        }
       }
     }
   }
@@ -232,32 +256,43 @@ export const paintSubpixelOffsets = (
   const hp = h + pad * 2;
   const np = wp * hp;
 
-  const {xo, yo, xi, yi} = stage;
+  const {outer, inner, outer2, inner2, xo, yo, xi, yi} = stage;
   
   xo.fill(0, 0, np);
   yo.fill(0, 0, np);
   xi.fill(0, 0, np);
   yi.fill(0, 0, np);
+  
+  const mix = (a: number, b: number) => a ? (a + b) / 2 : b;
 
-  const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
+  const getData = (x: number, y: number) => 
+    (x >= 0 && x < w && y >= 0 && y < h) ? (data[y * w + x] ?? 0) / 255 : 0;
+
   const getShift = (left: number, center: number, right: number) => {
     const dl = center - left;
     const dr = center - right;
-    
-    const shift = dr * dl < 0
-      ? (dl + dr) / (dr - dl) / 2
-      : (dl - dr) / (dr + dl) / 2;
-    
-    const mag = Math.max(Math.abs(dl), Math.abs(dr));
-    return [shift, mag];
-  }
 
+    // Shift if on an edge, not a crease/ridge 
+    const edge = dr * dl < 0 ? 1 : 0;
+    const shift = (dl + dr) * (dr - dl > 0 ? 1 : -1) / 2;
+
+    // Get step magnitude of sides to compare X vs Y
+    const mag = (Math.abs(dl) + Math.abs(dr)) / 2;
+
+    // Get value range in triplet to reduce shift on corners
+    const min = Math.min(left, center, right);
+    const max = Math.max(left, center, right);
+    const range = (max - min) * (max - min);
+
+    return [shift, mag, range, edge];
+  }
+  
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const a = getData(x, y);
       if (a === 0) continue;
 
-      const j = (y + pad) * wp + x + pad;
+      let j = (y + pad) * wp + x + pad;
 
       if (a > 0 && a < 254/255) {
         const l = getData(x - 1, y);
@@ -265,56 +300,89 @@ export const paintSubpixelOffsets = (
         const t = getData(x, y - 1);
         const b = getData(x, y + 1);
 
-        const [dx, mx] = getShift(l, a, r);
-        const [dy, my] = getShift(t, a, b);
-
-        const fx = mx > my ? (dx <= 0 ? dx + 0.5 : dx - 0.5) : 0;
-        const fy = mx <= my ? (dy <= 0 ? dy + 0.5 : dy - 0.5) : 0;
+        let [dx, mx, sx, ex] = getShift(l, a, r);
+        let [dy, my, sy, ey] = getShift(t, a, b);
         
-        if (dx <= 0) {
-          if (r > l) {
-            xo[j]     += fx;
-            xi[j - 1] += fx;
-          }
-          else {
-            xi[j]     += fx;
-            xo[j - 1] += fx;
-          }
+        //if (a < l -.25 && a < r - .25) debugger;
+
+        if (dx === 0) dx = r > l ? 0.0001 : -0.0001;
+        if (dy === 0) dy = b > t ? 0.0001 : -0.0001;
+
+        let fx = sx * (ex ? ((dx < 0) ? dx + 0.5 : dx - 0.5) : 0);
+        let fy = sy * (ey ? ((dy < 0) ? dy + 0.5 : dy - 0.5) : 0);
+        
+        if ((fx === 0 && fy === 0)) {// || (fx && fy)) {
+          const d = 0.5 - a;
+          outer2[j] = outer[j] = d > 0 ? d*d + 0.25 : 0;
+          outer2[j] = inner[j] = d < 0 ? d*d + 0.25 : 0;
         }
+        
         else {
-          if (r > l) {
-            xi[j]     += fx;
-            xo[j + 1] += fx;
+          if (fx) {
+            if (dx < 0) {
+              if (r > l) {
+                xo[j]     = mix(xo[j], fx);
+                xi[j - 1] = mix(xi[j - 1], fx);
+              }
+              else if (r < l) {
+                xi[j]     = mix(xi[j], fx);
+                xo[j - 1] = mix(xi[j - 1], fx);
+              }
+            }
+            else {
+              if (r > l) {
+                xi[j]     = mix(xi[j], fx);
+                xo[j + 1] = mix(xo[j + 1], fx);
+              }
+              else if (r < l) {
+                xo[j]     = mix(xo[j]    , fx);
+                xi[j + 1] = mix(xi[j + 1], fx);
+              }
+            }
           }
-          else {
-            xo[j]     += fx;
-            xi[j + 1] += fx;
+
+           if (fy) {
+            if (dy < 0) {
+              if (b > t) {
+                yo[j]      = mix(yo[j]     , fy);
+                yi[j - wp] = mix(yi[j - wp], fy);
+              }
+              else if (b < t) {
+                yi[j]      = mix(yi[j]     , fy);
+                yo[j - wp] = mix(yo[j - wp], fy);
+              }
+            }
+            else {
+              if (b > t) {
+                yi[j]      = mix(yi[j]     , fy);
+                yo[j + wp] = mix(yo[j + wp], fy);
+              }
+              else if (b < t) {
+                yo[j]      = mix(yo[j]     , fy);
+                yi[j + wp] = mix(yi[j + wp], fy);
+              }
+            }
           }
         }
 
-        if (dy <= 0) {
-          if (b > t) {
-            yo[j]      += fy;
-            yi[j - wp] += fy;
-          }
-          else {
-            yi[j]      += fy;
-            yo[j - wp] += fy;
-          }
-        }
-        else {
-          if (b > t) {
-            yi[j]      += fy;
-            yo[j + wp] += fy;
-          }
-          else {
-            yo[j]      += fy;
-            yi[j + wp] += fy;
-          }
-        }
       }
     }
   }
+  
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let j = (y + pad) * wp + x + pad;
+      if (xi[j] && xo[j]) {
+        const v = (xi[j] + xo[j]) / 2;
+        xi[j] = xo[j] = v;
+      }
+      if (yi[j] && yo[j]) {
+        const v = (yi[j] + yo[j]) / 2;
+        yi[j] = yo[j] = v;
+      }
+    }
+  }
+  
 }
 
 // 2D Euclidean squared distance transform w/ subpixel offsets
@@ -333,7 +401,9 @@ export const edtSubpixel = (
   b: Float32Array,
   half?: boolean,
 ) => {
-  for (let y = y0; y < y0 + height; y++) edt1dSubpixel(data, xs, y * gridWidth + x0, 1, width, f, z, v, b);
+  for (let y = y0; y < y0 + height; y++) {
+    edt1dSubpixel(data, xs, y * gridWidth + x0, 1, width, f, z, v, b);
+  }
   if (!half) for (let x = x0; x < x0 + width; x++) edt1dSubpixel(data, ys, y0 * gridWidth + x, gridWidth, height, f, z, v, b);
 }
 
@@ -393,6 +463,7 @@ export const edt1dSubpixel = (
     z[k + 1] = INF;
   }
   
+  const gs: number[] = [];
   for (let q = 0, k = 0; q < length; q++) {
     const o = offset + q * stride;
 
@@ -403,6 +474,7 @@ export const edt1dSubpixel = (
     const qr = q + shifts[o] - rs;
 
     const g = fr + qr * qr;
+    gs.push(g);
     grid[o] = g;
   }
 }
@@ -419,9 +491,10 @@ export const edt = (
   f: Float64Array,
   z: Float64Array,
   v: Uint16Array,
+  half?: boolean,
 ) => {
   for (let y = y0; y < y0 + height; y++) edt1d(data, y * gridWidth + x0, 1, width, f, z, v);
-  for (let x = x0; x < x0 + width; x++) edt1d(data, y0 * gridWidth + x, gridWidth, height, f, z, v);
+  if (!half) for (let x = x0; x < x0 + width; x++) edt1d(data, y0 * gridWidth + x, gridWidth, height, f, z, v);
 }
 
 // 1D squared distance transform

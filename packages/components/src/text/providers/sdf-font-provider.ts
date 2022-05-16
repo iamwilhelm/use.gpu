@@ -9,6 +9,7 @@ import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } f
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 
 import { makeLayoutCursor } from '../../layout/lib/cursor';
+import { DebugContext } from '../../providers/debug-provider';
 import { DeviceContext } from '../../providers/device-provider';
 import { FontContext } from './font-provider';
 
@@ -34,6 +35,7 @@ export type SDFFontProviderProps = {
   height?: number,
   radius?: number,
   pad?: number,
+  subpixel?: boolean,
   children?: LiveElement<any>,
   then?: (atlas: Atlas, source: TextureSource, gathered: any) => LiveElement<any>
 };
@@ -73,12 +75,14 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   const device = useContext(DeviceContext);
   const rustText = useContext(FontContext);
 
+  const {sdf2d: {subpixel}} = useContext(DebugContext);
+
   // Allocate font atlas + backing texture
   const format = "rgba8unorm" as GPUTextureFormat;
 
-  const glyphs = useOne(() => new Map<number, CachedGlyph>());
-  const atlas = useOne(() => makeAtlas(width, height));
-  const sourceRef = useOne(() => ({ current: makeAtlasSource(device, atlas, format) }));
+  const glyphs = useOne(() => new Map<number, CachedGlyph>(), subpixel);
+  const atlas = useOne(() => makeAtlas(width, height), subpixel);
+  const sourceRef = useOne(() => ({ current: makeAtlasSource(device, atlas, format) }), subpixel);
 
   // Provide context to map glyphs on-demand
   const context = useMemo(() => {
@@ -103,7 +107,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       if (image && w && h && ob) {
 
         // Convert to SDF
-        const {data, width, height} = glyphToSDF(image, w, h, pad, radius);
+        const {data, width, height} = glyphToSDF(image, w, h, pad, radius, subpixel);
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
 
@@ -151,7 +155,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       getScale,
       getGlyph,
     };
-  }, [rustText, atlas]);
+  }, [rustText, atlas, subpixel]);
 
   return rustText ? (
     gather(

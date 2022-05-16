@@ -59,6 +59,7 @@ describe('edt', () => {
     expect(ds).toEqual([-3, -2, -1, 1, 2, 3, 2, 1, -1, -2, -3]);
   });
   
+  /*
   it('edt2d pixel aligned', () => {
     
     const I = INF;
@@ -88,6 +89,7 @@ describe('edt', () => {
 
     console.log(fmt(ds, wp, hp));
   });
+  */
   
   ////////////////////////////////
 
@@ -152,7 +154,7 @@ describe('edt', () => {
     
     edt1dSubpixel(grid, shift, offset, stride, length, f, z, v, b);
 
-    console.log(fmt(grid.map(Math.sqrt), 11, 1))
+    //console.log(fmt(grid.map(Math.sqrt), 11, 1))
 
     const ds = grid.map((x: number) => Math.sqrt(x));
     expect(ds).toEqual([0, 0, 0, 0.75, 1.75, 2.75, 1.75, 0.75, 0, 0, 0])

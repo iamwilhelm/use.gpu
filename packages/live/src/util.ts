@@ -192,10 +192,15 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
     const at = typeof ai === 'string';
     const bt = typeof bi === 'string';
     if (at && bt) {
-      const v = (ai as string) < (bi as string) ? -1 : 1;
+      const lt = (ai as string) < (bi as string);
+      const gt = (ai as string) > (bi as string);
+      const v = lt ? -1 : gt ? 1 : 0;
       if (v) return v;
       continue;
     }
+    
+    if (at && !bt) return 1;
+    if (!at && bt) return -1;
   }
 
   return (ak.length - bk.length) || (a.depth - b.depth);

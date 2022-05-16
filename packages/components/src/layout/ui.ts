@@ -72,7 +72,7 @@ const Resume = (
     if (layer[0]?.f) return layer;
     return keyed(Layer, layer[0]?.id, layer);
   });
-  els.push(yeet());
+  els.push(yeet([]));
 
   return fragment(els);
 };

@@ -19,8 +19,6 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (
   }
   else useNoContext(SDFFontContext);
 
-  console.log('render debugatlas', source)
-
   return debug(use(DebugAtlasView, {
     atlas: atlas!,
     source: source!,

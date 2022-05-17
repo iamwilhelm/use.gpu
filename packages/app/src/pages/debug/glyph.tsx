@@ -25,7 +25,7 @@ export const DebugGlyphPage: LC = () => {
       hasContours
       render={({subpixel, contours, glyph}) =>
         <PanControls
-          xkey="glyph"
+          key="glyph"
           active={true}
           zoom={1}
           render={(x, y, zoom) =>
@@ -60,26 +60,6 @@ const GlyphView = memo(({subpixel, contours, glyph}) => {
   const paddedWidth = width + radius * 2;
   const paddedHeight = height + radius * 2;
   const padded = [paddedWidth, paddedHeight];
-
-  /*
-  image[130] = 255;
-  image[131] = 0;
-  image[132] = 192;
-  image[133] = 0;
-  image[130+width] = 255;
-  image[131+width] = 0;
-  image[132+width] = 192;
-  image[133+width] = 0;
-
-  image[131+width*2] = 0;
-  image[132+width*2] = 192;
-  image[133+width*2] = 64;
-  image[134+width*2] = 0;
-  image[131+width*3] = 0;
-  image[132+width*3] = 192;
-  image[133+width*3] = 64;
-  image[134+width*3] = 0;
-  */
 
   const rgbaData = glyphToRGBA(image, width, height).data;
 

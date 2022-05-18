@@ -16,7 +16,6 @@ export const FontLoader: LiveComponent<FontLoaderProps> = ({fonts, children}) =>
 
   const resources = useOne(() => fonts.map((source: FontSource) =>
     keyed(Fetch, getHash(source), {
-      slow: 50000,
       url: source.src,
       type: 'buffer',
       render: (buffer: ArrayBuffer) => yeet({props: source, buffer}),

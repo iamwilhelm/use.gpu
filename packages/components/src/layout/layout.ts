@@ -73,10 +73,11 @@ export const Scroller = (pickers: any[]) => {
     projectionMatrix: { current: matrix },
   } = viewUniforms;
 
-  const { x, y, moveX, moveY, version, stopped } = useWheel();
-  const [px, py] = screenToView(matrix, x / width * 2.0 - 1.0, 1.0 - y / height * 2.0);
+  const { wheel } = useWheel();
+  const [px, py] = screenToView(matrix, wheel.x / width * 2.0 - 1.0, 1.0 - wheel.y / height * 2.0);
   
   useOne(() => {
+    const { x, y, moveX, moveY, version, stopped } = wheel;
     if (stopped) return;
 
     for (const picker of pickers) {
@@ -89,7 +90,7 @@ export const Scroller = (pickers: any[]) => {
         return;
       }
     }
-  }, version);
+  }, wheel);
 }
 
 export const Inspect = (pickers: any[]) => {
@@ -101,8 +102,8 @@ export const Inspect = (pickers: any[]) => {
     projectionMatrix: { current: matrix },
   } = viewUniforms;
 
-  const { x, y } = useMouse();
-  const [px, py] = screenToView(matrix, x / width * 2.0 - 1.0, 1.0 - y / height * 2.0);
+  const { mouse } = useMouse();
+  const [px, py] = screenToView(matrix, mouse.x / width * 2.0 - 1.0, 1.0 - mouse.y / height * 2.0);
 
   const picked = useOne(() => {
     for (const picker of pickers) {

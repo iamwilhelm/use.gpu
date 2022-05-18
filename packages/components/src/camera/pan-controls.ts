@@ -16,17 +16,22 @@ export type PanControlsProps = {
   zoomSpeed?: number,
   anchor?: [number, number],
   active?: boolean,
+  centered?: boolean,
   version?: number,
 
   render: (x: number, y: number, zoom: number) => LiveElement<any>,
 };
 
 export const PanControls: LiveComponent<PanControlsProps> = (props) => {
+  const layout = useContext(LayoutContext);
+  const [l, t, r, b] = layout;
+
   const {
+    zoom: initialZoom = 1,
     x: initialX = 0,
     y: initialY = 0,
-    zoom: initialZoom = 1,
     zoomSpeed = 1/100,
+    centered = true,
     active = true,
     version,
     render,
@@ -35,6 +40,13 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const [x, setX]       = useState<number>(initialX);
   const [y, setY]       = useState<number>(initialY);
   const [zoom, setZoom] = useState<number>(initialZoom);
+
+  let originX = 0;
+  let originY = 0;
+  if (centered) {
+    originX = (r - l) / 2;
+    originY = (b - t) / 2;
+  }
 
   useOne(() => {
     setX(initialX);
@@ -45,11 +57,10 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const { useMouse } = useContext(MouseContext);
   const { useWheel } = useContext(WheelContext);
   const { useKeyboard } = useContext(KeyboardContext);
-  const layout = useContext(LayoutContext);
 
-  const mouse = useMouse();
-  const wheel = useWheel();
-  const keyboard = useKeyboard();
+  const { mouse } = useMouse();
+  const { wheel, stopWheel } = useWheel();
+  const { keyboard } = useKeyboard();
 
   useOne(() => {
     if (!active) return;
@@ -62,7 +73,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
         setY(y => y + moveY / zoom);
       }
     }
-  }, mouse.version);
+  }, mouse);
 
   useOne(() => {
     if (!active) return;
@@ -78,11 +89,14 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     else if (moveY) {
       const z = zoom * (1 - moveY * zoomSpeed);
       
-      const px = (mouse.x / zoom) - x;
-      const py = (mouse.y / zoom) - y;
+      const mx = mouse.x - originX;
+      const my = mouse.y - originY;
 
-      const dx = (mouse.x / z) - px;
-      const dy = (mouse.y / z) - py;
+      const px = (mx / zoom) - x;
+      const py = (my / zoom) - y;
+
+      const dx = (mx / z) - px;
+      const dy = (my / z) - py;
 
       setZoom(z);
       setX(dx);
@@ -90,7 +104,10 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     }
 
     stop();
-  }, wheel.version);
+  }, wheel);
 
-  return useMemo(() => render(x, y, zoom), [render, x, y, zoom]);
+  const panX = x - originX * (zoom - 1) / zoom;
+  const panY = y - originY * (zoom - 1) / zoom;
+
+  return useMemo(() => render(panX, panY, zoom), [render, panX, panY, zoom]);
 };

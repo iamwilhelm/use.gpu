@@ -27,7 +27,7 @@ export const DebugGlyphPage: LC = () => {
         <PanControls
           key="glyph"
           active={true}
-          zoom={1}
+          zoom={8}
           render={(x, y, zoom) =>
             <Flat x={x} y={y} zoom={zoom} focus={1/3}>
               <GlyphView subpixel={subpixel} contours={contours} glyph={glyph} />
@@ -173,6 +173,13 @@ const GlyphView = memo(({subpixel, contours, glyph}) => {
 
               <TextureFrame texture={sdfTextureX} />
               <TextureFrame texture={sdfTextureY} />
+
+              <RawTexture data={sdfTexture} render={(texture) => 
+                <Block width={paddedWidth} height={paddedHeight} fill={[0.0, 0.0, 0.0, 1.0]} image={{
+                  texture,
+                  repeat: 'none',
+                }} />
+              }/>
 
               <TextureFrame texture={sdfTexture}>
                 <Sampled

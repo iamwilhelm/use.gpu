@@ -40,8 +40,8 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   const { useWheel } = useContext(WheelContext);
   const layout = useContext(LayoutContext);
 
-  const mouse = useMouse();
-  const wheel = useWheel();
+  const { mouse } = useMouse();
+  const { wheel } = useWheel();
   const size = Math.min(Math.abs(layout[2] - layout[0]), Math.abs(layout[3] - layout[1]));
 
   useOne(() => {
@@ -56,13 +56,13 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
         setPitch((theta: number) => clamp(theta + moveY * speedY, -π/2, π/2));
       }
     }
-  }, mouse.version);
+  }, mouse);
 
   useOne(() => {
     const {moveY} = wheel;
     const speedY = radiusSpeed;
     if (moveY) setRadius((radius: number) => radius * (1 + moveY * speedY));
-  }, wheel.version);
+  }, wheel);
 
   return useMemo(() => render(radius, bearing, pitch), [render, radius, bearing, pitch]);
 };

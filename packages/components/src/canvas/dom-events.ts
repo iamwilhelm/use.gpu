@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
-import { use, memo, useResource, useState, incrementVersion } from '@use-gpu/live';
+import { use, memo, useResource, useState } from '@use-gpu/live';
 import { EventProvider, MouseState, WheelState, ModifierState } from '../providers/event-provider';
 
 const CAPTURE_EVENT = {capture: true};
@@ -30,13 +30,13 @@ const makeMouseState = () => ({
   y: 0,
   moveX: 0,
   moveY: 0,
-  version: 0,
 } as MouseState);
 
 const makeWheelState = () => ({
+  x: 0,
+  y: 0,
   moveX: 0,
   moveY: 0,
-  version: 0,
 } as WheelState);
 
 const makeKeyboardState = () => ({
@@ -46,7 +46,6 @@ const makeKeyboardState = () => ({
     shift: false,
     meta: false,
   },
-  version: 0,
 } as ModifierState);
 
 export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children}: DOMEventsProps) => {
@@ -75,7 +74,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
             shift: e.shiftKey,
             meta:  e.metaKey,
           },
-          version: incrementVersion(state.version),        
         };
       });
     };
@@ -86,10 +84,15 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       if (deltaMode === 1) f = 10;
       if (deltaMode === 2) f = 30;
 
+      const {left, top} = element.getBoundingClientRect();
+      const x = clientX - left;
+      const y = clientY - top;
+
       setWheel((state) => ({
+        x,
+        y,
         moveX: deltaX * f,
         moveY: deltaY * f,
-        version: incrementVersion(state.version),
       }));
 
       onMove(clientX, clientY);
@@ -109,7 +112,6 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
         y,
         moveX: x - state.x,
         moveY: y - state.y,
-        version: incrementVersion(state.version),
       }));
     };
 

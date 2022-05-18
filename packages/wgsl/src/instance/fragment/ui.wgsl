@@ -81,7 +81,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var b = 0.0;
     if (mode == -1) {
       s = 1.0;
-      b = 3.0;
+      b = 4.0;
     }
 
     let o = (sdf.outer - 0.5) * scale / s;

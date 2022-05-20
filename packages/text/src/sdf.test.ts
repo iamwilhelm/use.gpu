@@ -335,23 +335,65 @@ describe('edt', () => {
     expect(ds.map((x: number) => Math.round(x * 100) / 100)).toEqual([2.43, 1.43, 0.43, -0.57, -1.57, -2.57, -1.57, -0.57, 0.43, 1.43, 2.43]);
   });
 
+  /*
   it('gets subpixel offsets', () => {
     
+    const I = 100;
     const H = 0.5;
     const Q = 0.25;
     
-    const data = [
+    const outer = [
+      I, I, I, I, I, I,
+      I, I, I, I, I, I,
+      0, 0, 0, I, I, I,
       0, 0, 0, 0, 0, 0,
-      0, Q, H, H, Q, 0,
-      0, H, 1, 1, H, 0,
-      0, H, 1, 1, H, 0,
-      0, Q, H, H, Q, 0,
+    ] as any;
+
+    const xs = [
       0, 0, 0, 0, 0, 0,
-    ];
+      0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0,
+    ] as any;
+
+    const ys = [
+      0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0,
+      0, Q, H, 0, 0, 0,
+      0, 0, 0,-H,-Q, 0,
+    ] as any;
     
-    const sdf = makeSDFStage(6);
-    const {xo, yo} = sdf;
-    paintSubpixelOffsets(sdf, data, 6, 6, 0);
+    const {f, z, v, b} = makeSDFStage(6);
+
+    const fmt = (xs: number[], w: number, h: number) => {
+      const rows = [];
+      for (let y = 0; y < h; ++y) {
+        const row = [];
+        for (let x = 0; x < w; ++x) {
+          const v = xs[x + y * w];
+          row.push((v < 0 ? '' : ' ') + v.toFixed(2));
+        }
+        rows.push(row.join(' '));
+      }
+      return rows.join("\n");
+    }
+    
+    let o1 = outer.slice();
+    edtSubpixelAlt(o1, xs, ys, 0, 0, 6, 4, 6, f, z, v, b, true);
+    console.log(fmt(o1, 6, 4));
+    o1 = outer.slice();
+    edtSubpixelAlt(o1, xs, ys, 0, 0, 6, 4, 6, f, z, v, b);
+    console.log(fmt(o1, 6, 4));
+    console.log(fmt(o1.map((x: number) => Math.max(0, Math.sqrt(x) - 0.5)), 6, 4));
+
+    let o2 = outer.slice();
+    edtSubpixel(o2, xs, ys, 0, 0, 6, 4, 6, f, z, v, b, true);
+    console.log(fmt(o2, 6, 4));
+    o2 = outer.slice();
+    edtSubpixel(o2, xs, ys, 0, 0, 6, 4, 6, f, z, v, b);
+    console.log(fmt(o2, 6, 4));
+    console.log(fmt(o2.map((x: number) => Math.max(0, Math.sqrt(x) - 0.5)), 6, 4));
   });
+  */
 
 });

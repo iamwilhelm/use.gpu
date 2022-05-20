@@ -12,7 +12,7 @@ const STYLE = {
   //left: '50%',
   //marginLeft: '-100px',
 
-	bottom: 0,
+  bottom: 0,
   width: '200px',
   padding: '20px',
   background: 'rgba(0, 0, 0, .75)',
@@ -28,7 +28,7 @@ export const LayoutControls = (props: LayoutControlsProps) => {
   const [mode, setMode] = useState('inspect');
 
   return fragment([
-		render(mode),
+    render(mode),
     use(HTML, {
       container,
       style: STYLE,

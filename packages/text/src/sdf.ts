@@ -127,8 +127,9 @@ export const glyphToSDF = (
 
   const resolve = subpixel
     ? (i: number) => 
-      Math.max(0, Math.sqrt(outer[i]) - 0.5) -
-      Math.max(0, Math.sqrt(inner[i]) - 0.5)
+      outer[i] > inner[i]
+      ? Math.max(0, Math.sqrt(outer[i]) - 0.5)
+      : -Math.max(0, Math.sqrt(inner[i]) - 0.5)
     : (i: number) => Math.sqrt(outer[i]) - Math.sqrt(inner[i])
 
   for (let i = 0; i < np; i++) {
@@ -303,13 +304,14 @@ export const paintSubpixelOffsets = (
         let [dx, mx, sx, ex] = getShift(l, a, r);
         let [dy, my, sy, ey] = getShift(t, a, b);
         
-        //if (a < l -.25 && a < r - .25) debugger;
-
         if (dx === 0) dx = r > l ? 0.0001 : -0.0001;
         if (dy === 0) dy = b > t ? 0.0001 : -0.0001;
 
         let fx = sx * (ex ? ((dx < 0) ? dx + 0.5 : dx - 0.5) : 0);
         let fy = sy * (ey ? ((dy < 0) ? dy + 0.5 : dy - 0.5) : 0);
+        
+        const doX = fx && mx >= mx;
+        const doY = fy && my > mx;
         
         if ((fx === 0 && fy === 0)) {
           const d = 0.5 - a;
@@ -318,7 +320,7 @@ export const paintSubpixelOffsets = (
         }
         
         else {
-          if (fx) {
+          if (doX) {
             if (dx < 0) {
               if (r > l) {
                 xo[j]     = mix(xo[j], fx);
@@ -341,7 +343,7 @@ export const paintSubpixelOffsets = (
             }
           }
 
-           if (fy) {
+           if (doY) {
             if (dy < 0) {
               if (b > t) {
                 yo[j]      = mix(yo[j]     , fy);
@@ -401,10 +403,8 @@ export const edtSubpixel = (
   b: Float32Array,
   half?: boolean,
 ) => {
-  for (let y = y0; y < y0 + height; y++) {
-    edt1dSubpixel(data, xs, y * gridWidth + x0, 1, width, f, z, v, b);
-  }
-  if (!half) for (let x = x0; x < x0 + width; x++) edt1dSubpixel(data, ys, y0 * gridWidth + x, gridWidth, height, f, z, v, b);
+  for (let y = y0; y < y0 + height; y++) edt1dSubpixel(data, xs, y * gridWidth + x0, 1, width, f, z, v, b);
+  if (!half) for (let x = x0; x < x0 + width; x++) edt1dSubpixel(data, ys, y0 * gridWidth + x, gridWidth, height, f, z, v, b, true);
 }
 
 export const edtSubpixelAlt = (
@@ -423,7 +423,7 @@ export const edtSubpixelAlt = (
   half?: boolean,
 ) => {
   for (let x = x0; x < x0 + width; x++) edt1dSubpixel(data, ys, y0 * gridWidth + x, gridWidth, height, f, z, v, b);
-  if (!half) for (let y = y0; y < y0 + height; y++) edt1dSubpixel(data, xs, y * gridWidth + x0, 1, width, f, z, v, b);
+  if (!half) for (let y = y0; y < y0 + height; y++) edt1dSubpixel(data, xs, y * gridWidth + x0, 1, width, f, z, v, b, true);
 }
 
 // 1D squared distance transform w/ subpixel offsets
@@ -437,6 +437,7 @@ export const edt1dSubpixel = (
   z: Float64Array,
   v: Uint16Array,
   b: Float32Array,
+  conservative: boolean = false,
 ) => {
   v[0] = 0;
   b[0] = shifts[offset];
@@ -447,7 +448,12 @@ export const edt1dSubpixel = (
   for (let q = 1, k = 0, s = 0; q < length; q++) {
     const o = offset + q * stride;
     f[q] = grid[o];
-
+    
+    if (conservative) {
+      if (shifts[o] && f[q] > 0) f[q] = grid[o] = 0;
+      if (shifts[o] && f[q] > 0) f[q] = grid[o] = 0;
+    }
+    
     const qs = q + shifts[o];
     const q2 = qs * qs;
     do {
@@ -462,8 +468,7 @@ export const edt1dSubpixel = (
     z[k] = s;
     z[k + 1] = INF;
   }
-  
-  const gs: number[] = [];
+    
   for (let q = 0, k = 0; q < length; q++) {
     const o = offset + q * stride;
     const s = shifts[o];
@@ -475,7 +480,8 @@ export const edt1dSubpixel = (
     const rs = b[k];
     const fr = f[r];
 
-    let qr = q - rs;
+    let qr = q + s - rs;
+    /*
     if (q === r) {
       if ((s > 0) && (z[k + 1] >= q + 1)) {
         qr = 0;
@@ -484,10 +490,9 @@ export const edt1dSubpixel = (
         qr = 0;
       }
     }
+    */
 
-    const g = fr + qr * qr;
-
-    gs.push(g);
+    let g = fr + qr * qr;
     grid[o] = g;
   }
 }

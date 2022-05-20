@@ -12,7 +12,7 @@ const STYLE = {
   //left: '50%',
   //marginLeft: '-100px',
 
-	bottom: 0,
+  bottom: 0,
   width: '200px',
   padding: '20px',
   background: 'rgba(0, 0, 0, .75)',
@@ -37,7 +37,7 @@ export const GlyphControls = (props: GlyphControlsProps) => {
   const [glyph, setGlyph] = useState('Q');
 
   return fragment([
-		render({subpixel, contours, glyph}),
+    render({subpixel, contours, glyph}),
     use(HTML, {
       container,
       style: STYLE,

@@ -311,7 +311,7 @@ export const paintSubpixelOffsets = (
         let fx = sx * (ex ? ((dx < 0) ? dx + 0.5 : dx - 0.5) : 0);
         let fy = sy * (ey ? ((dy < 0) ? dy + 0.5 : dy - 0.5) : 0);
         
-        if ((fx === 0 && fy === 0)) {// || (fx && fy)) {
+        if ((fx === 0 && fy === 0)) {
           const d = 0.5 - a;
           outer2[j] = outer[j] = d > 0 ? d*d + 0.25 : 0;
           outer2[j] = inner[j] = d < 0 ? d*d + 0.25 : 0;
@@ -466,14 +466,27 @@ export const edt1dSubpixel = (
   const gs: number[] = [];
   for (let q = 0, k = 0; q < length; q++) {
     const o = offset + q * stride;
+    const s = shifts[o];
 
+    const lk = k;
     while (z[k + 1] < q) k++;
+
     const r = v[k];
     const rs = b[k];
     const fr = f[r];
-    const qr = q + shifts[o] - rs;
+
+    let qr = q - rs;
+    if (q === r) {
+      if ((s > 0) && (z[k + 1] >= q + 1)) {
+        qr = 0;
+      }
+      if ((s < 0) && (lk === k)) {
+        qr = 0;
+      }
+    }
 
     const g = fr + qr * qr;
+
     gs.push(g);
     grid[o] = g;
   }

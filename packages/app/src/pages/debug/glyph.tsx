@@ -54,41 +54,28 @@ const GlyphView = memo(({subpixel, contours, glyph}) => {
   const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, SIZE);
 
   const {width, height, image} = glyphMetrics;
-  const size = [width, height];
 
   const radius = 10;
   const paddedWidth = width + radius * 2;
   const paddedHeight = height + radius * 2;
   const padded = [paddedWidth, paddedHeight];
 
-  const rgbaData = glyphToRGBA(image, width, height).data;
+  const rgbaData = glyphToRGBA(image, width, height, radius).data;
 
-  const sdfDataX = glyphToSDF(image, width, height, radius, radius, subpixel, 0.25, 1).data;
-  const sdfDataY = glyphToSDF(image, width, height, radius, radius, subpixel, 0.25, 2).data;
-  const sdfData  = glyphToSDF(image, width, height, radius, radius, subpixel, undefined, undefined).data;
+  const debugs = [];
+  const pushDebug = (image: any) => debugs.push(image);
 
+  const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, pushDebug).data;
   const gradientData = sdfToGradient(sdfData, width, height, radius, radius).data;
 
   const rgbaTexture = {
     data: rgbaData,
     format: "rgba8unorm",
-    size,
+    size: padded,
   };
 
   const sdfTexture = {
     data: sdfData,
-    format: "rgba8unorm",
-    size: padded,
-  };
-
-  const sdfTextureX = {
-    data: sdfDataX,
-    format: "rgba8unorm",
-    size: padded,
-  };
-
-  const sdfTextureY = {
-    data: sdfDataY,
     format: "rgba8unorm",
     size: padded,
   };
@@ -100,30 +87,79 @@ const GlyphView = memo(({subpixel, contours, glyph}) => {
   };
 
   const s = Math.max(paddedWidth, paddedHeight);
-  const sdf = makeSDFStage(s);
-  paintSubpixelOffsets(sdf, image, width, height, radius);
+  const sdf1 = makeSDFStage(s);
+  const sdf2 = makeSDFStage(s);
+  paintSubpixelOffsets(sdf1, image, width, height, radius, true);
+  paintSubpixelOffsets(sdf2, image, width, height, radius, false);
+
+  const {xo, yo, xi, yi} = sdf1;
+  const {xo: xo2, yo: yo2, xi: xi2, yi: yi2} = sdf2;
   
-  const {xo, yo, xi, yi} = sdf;
-  
+  const outerField = [
+    xo,
+    yo,
+    paddedWidth,
+    paddedHeight,
+  ];
+
+  const outer2Field = [
+    xo2,
+    yo2,
+    paddedWidth,
+    paddedHeight,
+  ];
+
+  const inner2Field = [
+    xi2,
+    yi2,
+    paddedWidth,
+    paddedHeight,
+  ];
+
+  const pointEmitter = (xs: any, ys: any, width: any, height: any) => (emit, x, y) => {
+    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
+    const dx = xs[i];
+    const dy = ys[i];
+    emit(x + dx, y + dy, 0.5, 1);
+  };
+
+  const shiftedPointEmitter = (xs: any, ys: any, width: any, height: any) => (emit, x, y) => {
+    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
+    const dx = xs[i];
+    const dy = ys[i];
+    if (dx || dy) {
+      emit(x + dx, y + dy, 0.5, 1);
+    }
+  };
+
+  const arrowEmitter = (xs: any, ys: any, width: any, height: any) => (emit, x, y) => {
+    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
+    const dx = xs[i];
+    const dy = ys[i];
+
+    if (dx || dy) {
+      emit(x, y, 0.5, 1);
+      emit(x + dx, y + dy, 0.5, 1);
+    }
+  };
+
   return (
     <DebugProvider debug={{sdf2d: {subpixel, contours}}}>
     <Draw>
       <Pass>
         <UI>
           <Layout>
-        
-            <Flex align={"center"} height={'100%'}>
-              <TextureFrame margin={radius} texture={rgbaTexture}>
+
+            <Flex align={"center"} height={'100%'} gap={10}>
+              <TextureFrame texture={rgbaTexture}>
                 <Sampled
                   axes='xy'
                   format='vec4<f32>'
-                  size={[width, height]}
+                  size={padded}
                   items={1}
                   sparse
                   centered
-                  expr={(emit, x, y) => {
-                    emit(x, y, 0.5, 1);
-                  }}              
+                  expr={pointEmitter(...outerField)}
                 >
                   <Point size={0.5} depth={1} />
                 </Sampled>
@@ -131,180 +167,109 @@ const GlyphView = memo(({subpixel, contours, glyph}) => {
                 <Sampled
                   axes='xy'
                   format='vec4<f32>'
-                  size={[width, height]}
+                  size={padded}
                   items={2}
                   sparse
                   centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x + radius) + Math.floor(y + radius) * paddedWidth;
-                    const dx = xo[i];
-                    const dy = yo[i];
-                  
-                    if (dx || dy) {
-                      emit(x, y, 0.5, 1);
-                      emit(x + dx, y + dy, 0.5, 1);
-                    }
-                  }}              
+                  expr={arrowEmitter(...outerField)}
                 >
-                  <Arrow width={3} color={0xff6090} />
+                  <Arrow width={3} color={0xff3090} />
+                </Sampled>
+              </TextureFrame>
+
+              <TextureFrame texture={rgbaTexture}>
+                <Sampled
+                  axes='xy'
+                  format='vec4<f32>'
+                  size={padded}
+                  items={1}
+                  sparse
+                  centered
+                  expr={shiftedPointEmitter(...outer2Field)}
+                >
+                  <Point size={0.5} depth={1} color={0xff3090} />
                 </Sampled>
 
                 <Sampled
                   axes='xy'
                   format='vec4<f32>'
-                  size={[width, height]}
+                  size={padded}
+                  items={1}
+                  sparse
+                  centered
+                  expr={shiftedPointEmitter(...inner2Field)}
+                >
+                  <Point size={0.5} depth={1} color={0x30c0f0} />
+                </Sampled>
+
+                <Sampled
+                  axes='xy'
+                  format='vec4<f32>'
+                  size={padded}
                   items={2}
                   sparse
                   centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x + radius) + Math.floor(y + radius) * paddedWidth;
-                    const dx = xi[i];
-                    const dy = yi[i];
-                  
-                    if (dx || dy) {
-                      emit(x, y, 0.5, 1);
-                      emit(x + dx, y + dy, 0.5, 1);
-                    }
-                  }}              
+                  expr={arrowEmitter(...outer2Field)}
                 >
-                  <Arrow width={3} color={0x60d0ff} />
+                  <Arrow width={3} color={0xff3090} />
+                </Sampled>
+
+                <Sampled
+                  axes='xy'
+                  format='vec4<f32>'
+                  size={padded}
+                  items={2}
+                  sparse
+                  centered
+                  expr={arrowEmitter(...inner2Field)}
+                >
+                  <Arrow width={3} color={0x30c0f0} />
                 </Sampled>
               </TextureFrame>
+              {
+                debugs.map((image) => (
+                  <TextureFrame texture={{
+                    data: image.data,
+                    format: "rgba8unorm",
+                    size: [image.width, image.height],
+                  }}>
 
-              <TextureFrame texture={sdfTextureX} />
-              <TextureFrame texture={sdfTextureY} />
+                    { image.xi && image.yi ? <Sampled
+                      axes='xy'
+                      format='vec4<f32>'
+                      size={padded}
+                      items={2}
+                      sparse
+                      centered
+                      expr={arrowEmitter(image.xi, image.yi, image.width, image.height)}
+                    >
+                      <Arrow width={2} color={0xff3090} depth={0.001} />
+                    </Sampled> : null}
 
-              <RawTexture data={sdfTexture} render={(texture) => 
+                    { image.xo && image.yo ? <Sampled
+                      axes='xy'
+                      format='vec4<f32>'
+                      size={padded}
+                      items={2}
+                      sparse
+                      centered
+                      expr={arrowEmitter(image.xo, image.yo, image.width, image.height)}
+                    >
+                      <Arrow width={2} color={0x30c0f0} depth={0.001} />
+                    </Sampled> : null}
+
+                  </TextureFrame>
+                ))
+              }
+
+              <RawTexture data={sdfTexture} render={(texture) =>
                 <Block width={paddedWidth} height={paddedHeight} fill={[0.0, 0.0, 0.0, 1.0]} image={{
                   texture,
                   repeat: 'none',
                 }} />
               }/>
-
-              <TextureFrame texture={sdfTexture}>
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={1}
-                  sparse
-                  centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
-                    const dx = xo[i];
-                    const dy = yo[i];
-
-                    if (dx || dy) emit(x + dx, y + dy, 0.5, 1);
-                  }}              
-                >
-                  <Point size={3} depth={0.15} color={0x3090FF} />
-                </Sampled>
-
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={1}
-                  sparse
-                  centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
-                    const dx = xi[i];
-                    const dy = yi[i];
-
-                    if (dx || dy) emit(x + dx, y + dy, 0.5, 1);
-                  }}              
-                >
-                  <Point size={3} depth={0.15} color={0xFF9030} />
-                </Sampled>
-
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={2}
-                  sparse
-                  centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
-                    const dx = xo[i];
-                    const dy = yo[i];
-                  
-                    if (dx) {
-                      emit(x, y, 0.5, 1);
-                      emit(x + dx, y, 0.5, 1);
-                    }
-                  }}              
-                >
-                  <Arrow width={3} color={0xffffff} />
-                </Sampled>
-
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={2}
-                  sparse
-                  centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
-                    const dx = xo[i];
-                    const dy = yo[i];
-                  
-                    if (dy) {
-                      emit(x, y, 0.5, 1);
-                      emit(x, y + dy, 0.5, 1);
-                    }
-                  }}              
-                >
-                  <Arrow width={3} color={0xffffff} />
-                </Sampled>
-
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={2}
-                  sparse
-                  centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
-                    const dx = xi[i];
-                    const dy = yi[i];
-                  
-                    if (dx) {
-                      emit(x, y, 0.5, 1);
-                      emit(x + dx, y, 0.5, 1);
-                    }
-                  }}              
-                >
-                  <Arrow width={3} color={0xffffff} />
-                </Sampled>
-
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={2}
-                  sparse
-                  centered
-                  expr={(emit, x, y) => {
-                    const i = Math.floor(x) + Math.floor(y) * paddedWidth;
-                    const dx = xi[i];
-                    const dy = yi[i];
-                  
-                    if (dy) {
-                      emit(x, y, 0.5, 1);
-                      emit(x, y + dy, 0.5, 1);
-                    }
-                  }}              
-                >
-                  <Arrow width={3} color={0xffffff} />
-                </Sampled>
-              </TextureFrame>
-
               <TextureFrame texture={gradientTexture} />
-              
+
               <Block width={100} margin={radius}>
                 <Inline>
                   <Text
@@ -337,7 +302,7 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
   const {size: [width, height]} = texture;
 
   return (
-    <RawTexture data={texture} render={(texture) => 
+    <RawTexture data={texture} render={(texture) =>
       <Block margin={margin} width={width} height={height} fill={[0.0, 0.0, 0.0, 1.0]} image={{
         texture,
         repeat: 'none',

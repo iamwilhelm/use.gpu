@@ -107,7 +107,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       if (image && w && h && ob) {
 
         // Convert to SDF
-        const {data, width, height} = glyphToSDF(image, w, h, pad, radius, subpixel);
+        const {data, width, height} = glyphToSDF(image, w, h, pad, radius, undefined, subpixel);
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
 

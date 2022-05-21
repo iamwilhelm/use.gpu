@@ -34,6 +34,8 @@ export const glyphToEDT = (
     debug(sdfToDebugView(null, inner));
     edt(inner, pad, pad, w, h, wp, f, z, v, 2);
     debug(sdfToDebugView(null, inner));
+
+    debug(sdfToDebugView(outer, inner));
   }
   else {
     edt(outer, 0, 0, wp, hp, wp, f, z, v);

@@ -3,7 +3,7 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { Rectangle, DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
-import { memo } from '@use-gpu/live';
+import { memo, fragment } from '@use-gpu/live';
 import { makeRawTexture } from '@use-gpu/core';
 import { glyphToRGBA, glyphToSDF, sdfToGradient, makeSDFStage, paintSubpixelOffsets } from '@use-gpu/text';
 import { GlyphControls } from '../../ui/glyph-controls';
@@ -23,14 +23,15 @@ export const DebugGlyphPage: LC = () => {
     <GlyphControls
       hasGlyph
       hasContours
-      render={({subpixel, contours, glyph}) =>
+      hasRelax
+      render={({subpixel, contours, relax, glyph}) =>
         <PanControls
           key="glyph"
           active={true}
           zoom={8}
           render={(x, y, zoom) =>
             <Flat x={x} y={y} zoom={zoom} focus={1/3}>
-              <GlyphView subpixel={subpixel} contours={contours} glyph={glyph} />
+              <GlyphView subpixel={subpixel} contours={contours} relax={relax} glyph={glyph} />
             </Flat>
           }
         />
@@ -44,7 +45,7 @@ type GlyphViewProps = {
   glyph: string,
 };
 
-const GlyphView = memo(({subpixel, contours, glyph}) => {
+const GlyphView = memo(({subpixel, relax, contours, glyph}) => {
   const device = useDeviceContext();
   const rustText = useFontContext();
 
@@ -65,7 +66,7 @@ const GlyphView = memo(({subpixel, contours, glyph}) => {
   const debugs = [];
   const pushDebug = (image: any) => debugs.push(image);
 
-  const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, pushDebug).data;
+  const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, relax, pushDebug).data;
   const gradientData = sdfToGradient(sdfData, width, height, radius, radius).data;
 
   const rgbaTexture = {
@@ -142,125 +143,148 @@ const GlyphView = memo(({subpixel, contours, glyph}) => {
       emit(x + dx, y + dy, 0.5, 1);
     }
   };
+  
+  const debugFrame = (image: Image) => (
+    image ? <TextureFrame texture={{
+      data: image.data,
+      format: "rgba8unorm",
+      size: [image.width, image.height],
+    }}>
+
+      { image.xi && image.yi ? <Sampled
+        axes='xy'
+        format='vec4<f32>'
+        size={padded}
+        items={2}
+        sparse
+        centered
+        expr={arrowEmitter(image.xi, image.yi, image.width, image.height)}
+      >
+        <Arrow width={2} color={0xff3090} depth={0.001} />
+      </Sampled> : null}
+
+      { image.xo && image.yo ? <Sampled
+        axes='xy'
+        format='vec4<f32>'
+        size={padded}
+        items={2}
+        sparse
+        centered
+        expr={arrowEmitter(image.xo, image.yo, image.width, image.height)}
+      >
+        <Arrow width={2} color={0x30c0f0} depth={0.001} />
+      </Sampled> : null}
+
+    </TextureFrame> : null
+  );
 
   return (
-    <DebugProvider debug={{sdf2d: {subpixel, contours}}}>
+    <DebugProvider debug={{sdf2d: {subpixel, contours, relax}}}>
     <Draw>
       <Pass>
         <UI>
           <Layout>
 
             <Flex align={"center"} height={'100%'} gap={10}>
-              <TextureFrame texture={rgbaTexture}>
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={1}
-                  sparse
-                  centered
-                  expr={pointEmitter(...outerField)}
-                >
-                  <Point size={0.5} depth={1} />
-                </Sampled>
+              <Block>
+                <TextureFrame texture={rgbaTexture}>
+                  <Sampled
+                    axes='xy'
+                    format='vec4<f32>'
+                    size={padded}
+                    items={1}
+                    sparse
+                    centered
+                    expr={pointEmitter(...outerField)}
+                  >
+                    <Point size={0.5} depth={1} />
+                  </Sampled>
 
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={2}
-                  sparse
-                  centered
-                  expr={arrowEmitter(...outerField)}
-                >
-                  <Arrow width={3} color={0xff3090} />
-                </Sampled>
-              </TextureFrame>
+                  <Sampled
+                    axes='xy'
+                    format='vec4<f32>'
+                    size={padded}
+                    items={2}
+                    sparse
+                    centered
+                    expr={arrowEmitter(...outerField)}
+                  >
+                    <Arrow width={3} color={0xff3090} />
+                  </Sampled>
+                </TextureFrame>
 
-              <TextureFrame texture={rgbaTexture}>
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={1}
-                  sparse
-                  centered
-                  expr={shiftedPointEmitter(...outer2Field)}
-                >
-                  <Point size={0.5} depth={1} color={0xff3090} />
-                </Sampled>
+                <TextureFrame texture={rgbaTexture}>
+                  <Sampled
+                    axes='xy'
+                    format='vec4<f32>'
+                    size={padded}
+                    items={1}
+                    sparse
+                    centered
+                    expr={shiftedPointEmitter(...outer2Field)}
+                  >
+                    <Point size={0.5} depth={1} color={0xff3090} />
+                  </Sampled>
 
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={1}
-                  sparse
-                  centered
-                  expr={shiftedPointEmitter(...inner2Field)}
-                >
-                  <Point size={0.5} depth={1} color={0x30c0f0} />
-                </Sampled>
+                  <Sampled
+                    axes='xy'
+                    format='vec4<f32>'
+                    size={padded}
+                    items={1}
+                    sparse
+                    centered
+                    expr={shiftedPointEmitter(...inner2Field)}
+                  >
+                    <Point size={0.5} depth={1} color={0x30c0f0} />
+                  </Sampled>
 
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={2}
-                  sparse
-                  centered
-                  expr={arrowEmitter(...outer2Field)}
-                >
-                  <Arrow width={3} color={0xff3090} />
-                </Sampled>
+                  <Sampled
+                    axes='xy'
+                    format='vec4<f32>'
+                    size={padded}
+                    items={2}
+                    sparse
+                    centered
+                    expr={arrowEmitter(...outer2Field)}
+                  >
+                    <Arrow width={3} color={0xff3090} />
+                  </Sampled>
 
-                <Sampled
-                  axes='xy'
-                  format='vec4<f32>'
-                  size={padded}
-                  items={2}
-                  sparse
-                  centered
-                  expr={arrowEmitter(...inner2Field)}
-                >
-                  <Arrow width={3} color={0x30c0f0} />
-                </Sampled>
-              </TextureFrame>
-              {
-                debugs.map((image) => (
-                  <TextureFrame texture={{
-                    data: image.data,
-                    format: "rgba8unorm",
-                    size: [image.width, image.height],
-                  }}>
+                  <Sampled
+                    axes='xy'
+                    format='vec4<f32>'
+                    size={padded}
+                    items={2}
+                    sparse
+                    centered
+                    expr={arrowEmitter(...inner2Field)}
+                  >
+                    <Arrow width={3} color={0x30c0f0} />
+                  </Sampled>
+                </TextureFrame>
+              </Block>
 
-                    { image.xi && image.yi ? <Sampled
-                      axes='xy'
-                      format='vec4<f32>'
-                      size={padded}
-                      items={2}
-                      sparse
-                      centered
-                      expr={arrowEmitter(image.xi, image.yi, image.width, image.height)}
-                    >
-                      <Arrow width={2} color={0xff3090} depth={0.001} />
-                    </Sampled> : null}
-
-                    { image.xo && image.yo ? <Sampled
-                      axes='xy'
-                      format='vec4<f32>'
-                      size={padded}
-                      items={2}
-                      sparse
-                      centered
-                      expr={arrowEmitter(image.xo, image.yo, image.width, image.height)}
-                    >
-                      <Arrow width={2} color={0x30c0f0} depth={0.001} />
-                    </Sampled> : null}
-
-                  </TextureFrame>
-                ))
-              }
+              { debugs.length ? <>
+                <Block>
+                  {debugFrame(debugs[0])}
+                </Block>     
+                <Block>
+                  {debugFrame(debugs[1])}
+                  {debugFrame(debugs[2])}
+                </Block>                
+                <Block>
+                  {debugFrame(debugs[3])}
+                  {debugFrame(debugs[4])}
+                </Block>                
+                <Block>
+                  {debugFrame(debugs[5])}
+                  {debugFrame(debugs[6])}
+                </Block>                
+                <Block>
+                  {debugFrame(debugs[7])}
+                  {debugFrame(debugs[8])}
+                </Block>
+              </> : null}
 
               <RawTexture data={sdfTexture} render={(texture) =>
                 <Block width={paddedWidth} height={paddedHeight} fill={[0.0, 0.0, 0.0, 1.0]} image={{

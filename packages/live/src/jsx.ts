@@ -11,6 +11,13 @@ const toChildren = <T>(t: T[]): T[] | T | undefined => {
   return undefined;
 };
 
+type AnyF = (...args: any[]) => any;
+
+export const Fragment = FRAGMENT as AnyF;
+export const Gather = GATHER as AnyF;
+export const Provide = PROVIDE as AnyF;
+export const Yeet = YEET as AnyF;
+
 export const React = {
   createElement: (type: ArrowFunction, props: any, ...children: any[]) => {
     const by = getCurrentFiberID();
@@ -42,13 +49,7 @@ export const React = {
       return {f: type, args: NO_PROPS, key: undefined, by};
     }
   },
+  Fragment,
 };
-
-type AnyF = (...args: any[]) => any;
-
-export const Fragment = FRAGMENT as AnyF;
-export const Gather = GATHER as AnyF;
-export const Provide = PROVIDE as AnyF;
-export const Yeet = YEET as AnyF;
 
 export default React;

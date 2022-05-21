@@ -36,6 +36,7 @@ export type SDFFontProviderProps = {
   radius?: number,
   pad?: number,
   subpixel?: boolean,
+  relax?: boolean,
   children?: LiveElement<any>,
   then?: (atlas: Atlas, source: TextureSource, gathered: any) => LiveElement<any>
 };
@@ -75,14 +76,15 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   const device = useContext(DeviceContext);
   const rustText = useContext(FontContext);
 
-  const {sdf2d: {subpixel}} = useContext(DebugContext);
+  const {sdf2d: {subpixel, relax}} = useContext(DebugContext);
 
   // Allocate font atlas + backing texture
   const format = "rgba8unorm" as GPUTextureFormat;
 
-  const glyphs = useOne(() => new Map<number, CachedGlyph>(), subpixel);
-  const atlas = useOne(() => makeAtlas(width, height), subpixel);
-  const sourceRef = useOne(() => ({ current: makeAtlasSource(device, atlas, format) }), subpixel);
+  const opts = [subpixel, relax];
+  const glyphs = useMemo(() => new Map<number, CachedGlyph>(), opts);
+  const atlas = useMemo(() => makeAtlas(width, height), opts);
+  const sourceRef = useMemo(() => ({ current: makeAtlasSource(device, atlas, format) }), opts);
 
   // Provide context to map glyphs on-demand
   const context = useMemo(() => {
@@ -107,7 +109,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       if (image && w && h && ob) {
 
         // Convert to SDF
-        const {data, width, height} = glyphToSDF(image, w, h, pad, radius, undefined, subpixel);
+        const {data, width, height} = glyphToSDF(image, w, h, pad, radius, undefined, subpixel, relax);
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
 
@@ -155,7 +157,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       getScale,
       getGlyph,
     };
-  }, [rustText, atlas, subpixel]);
+  }, [rustText, atlas]);
 
   return rustText ? (
     gather(

@@ -84,9 +84,10 @@ export const glyphToSDF = (
   radius: number = 3,
   cutoff: number = 0.25,
   subpixel: boolean = true,
+  relax: boolean = true,
   debug?: (image: Image) => void,
 ): Image => {
-  if (subpixel) return glyphToESDT(data, w, h, pad, radius, cutoff, debug);
+  if (subpixel) return glyphToESDT(data, w, h, pad, radius, cutoff, relax, debug);
   else return glyphToEDT(data, w, h, pad, radius, cutoff, debug);
 }
 

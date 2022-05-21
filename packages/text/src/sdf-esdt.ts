@@ -9,6 +9,7 @@ export const glyphToESDT = (
   pad: number = 4,
   radius: number = 3,
   cutoff: number = 0.25,
+  relax: boolean = true,
   debug?: (image: Image) => void,
 ): Image => {
   const wp = w + pad * 2;
@@ -29,11 +30,8 @@ export const glyphToESDT = (
     const sdfToDebugView = makeSDFToDebugView(wp, hp, np, radius, cutoff);
     debug(sdfToDebugView(xo, yo, null, null, outer, inner));
 
-    console.log('----------')
     esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 2);
     debug(sdfToDebugView(xo, yo, null, null, outer, null));
-
-    console.log('----------')
     esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 1);
     debug(sdfToDebugView(xo, yo, null, null, outer, null));
 
@@ -41,10 +39,14 @@ export const glyphToESDT = (
     debug(sdfToDebugView(null, null, xi, yi, null, inner));
     esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1, 2);
     debug(sdfToDebugView(null, null, xi, yi, null, inner));
+
+    if (relax) relaxSubpixelOffsets(stage, data, w, h, pad);
+    debug(sdfToDebugView(xo, yo, xi, yi, outer, inner));
   }
   else {
     esdt(outer, xo, yo, wp, hp, f, z, b, t, v,  1);
     esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1);
+    if (relax) relaxSubpixelOffsets(stage, data, w, h, pad);
   }
 
   resolveSDF(xo, yo, xi, yi, (d: number, i: number) => {
@@ -132,6 +134,8 @@ export const paintSubpixelOffsets = (
   const getData = (x: number, y: number) => 
     (x >= 0 && x < w && y >= 0 && y < h) ? (data[y * w + x] ?? 0) / 255 : 0;
 
+  // Make vector from pixel center to nearest boundary
+  let k = 0;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const c = getData(x, y);
@@ -197,15 +201,18 @@ export const paintSubpixelOffsets = (
 
   if (half) return;
   
+  // Blend neighboring offsets but preserve normal direction
+  // Uses xo as input, xi as output
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
+      const c = getData(x, y);
       const j = (y + pad) * wp + x + pad;
+      
+      if (isSolid(c)) continue;
 
       const nx = xo[j];
       const ny = yo[j];
-      if (!nx && !ny) continue;
 
-      const c = getData(x, y);
       const l = getData(x - 1, y);
       const r = getData(x + 1, y);
       const t = getData(x, y - 1);
@@ -260,18 +267,20 @@ export const paintSubpixelOffsets = (
         dy += (dyr + dyb + 1) / 2;
         dw++;
       }
-      
+    
       const nn = Math.sqrt(nx*nx + ny*ny);
       const dt = (dx * nx + dy * ny) / nn;
 
       dx = nx * dt / dw / nn;
       dy = ny * dt / dw / nn;
-      
+    
       xi[j] = dx;
       yi[j] = dy;
     }
   }
   
+  // Produce zero points for positive and negative DF, at +0.5 / -0.5.
+  // Splits xi into xo/xi
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const j = (y + pad) * wp + x + pad;
@@ -296,6 +305,66 @@ export const paintSubpixelOffsets = (
     }
   }
 };
+
+// Snap distance targets to neighboring target points, if closer, or halfway if closer.
+export const relaxSubpixelOffsets = (
+  stage: SDFStage,
+  data: Uint8Array | number[],
+  w: number,
+  h: number,
+  pad: number,
+) => {
+  const wp = w + pad * 2;
+  const hp = h + pad * 2;
+  const np = wp * hp;
+  
+  const {xo, yo, xi, yi} = stage;
+  
+  const relax = (xs: number[], ys: number) => {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const j = (y + pad) * wp + x + pad;
+
+        const dx = xs[j];
+        const dy = ys[j];
+        if (!dx && !dy) continue;
+
+        // Step towards target minus 0.5px to find countour
+        let d = Math.sqrt(dx*dx + dy*dy);
+        const ds = (d - 0.5) / d;
+        const tx = x + dx * ds;
+        const ty = y + dy * ds;
+
+        // Check area around array index
+        const ix = Math.round(tx);
+        const iy = Math.round(ty);
+        d = check(xs, ys, ix + 1, iy, ix - x + 1, iy - y, tx, ty, d, j);
+        d = check(xs, ys, ix - 1, iy, ix - x - 1, iy - y, tx, ty, d, j);
+        d = check(xs, ys, ix, iy + 1, ix - x, iy - y + 1, tx, ty, d, j);
+        d = check(xs, ys, ix, iy - 1, ix - x, iy - y - 1, tx, ty, d, j);
+      }
+    }
+  };
+
+  const check = (xs: number[], ys: number[], x: number, y: number, dx: number, dy: number, tx: number, ty: number, d: number, j: number) => {
+    const k = (y + pad) * wp + x + pad;
+
+    const dx2 = dx + xs[k];
+    const dy2 = dy + ys[k];
+    const d2 = Math.sqrt(sqr(dx2) + sqr(dy2));
+
+    if (d2 < d) {
+      xs[j] = dx2;
+      ys[j] = dy2;
+      return d2;
+    }    
+    return d;
+  };
+
+  relax(xo, yo);
+  relax(xi, yi);
+}
+
 
 const makeSDFToDebugView = (
   wp: number,

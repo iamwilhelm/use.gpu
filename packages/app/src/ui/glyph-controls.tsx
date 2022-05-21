@@ -21,23 +21,26 @@ const STYLE = {
 type GlyphControlsProps = {
   hasGlyph?: boolean,
   hasContours?: boolean,
+	hasRelax?: boolean,
   container: Element,
   render?: ({
     subpixel: boolean,
     contours: boolean,
+		relax: boolean,
     glyph: string,
   }) => LiveElement<any>
 };
 
 export const GlyphControls = (props: GlyphControlsProps) => {
-  const {hasGlyph, hasContours, container, render} = props;
+  const {hasGlyph, hasContours, hasRelax, container, render} = props;
 
   const [subpixel, setSubpixel] = useState(true);
   const [contours, setContours] = useState(false);
+  const [relax, setRelax] = useState(false);
   const [glyph, setGlyph] = useState('Q');
 
   return fragment([
-    render({subpixel, contours, glyph}),
+    render({subpixel, contours, relax, glyph}),
     use(HTML, {
       container,
       style: STYLE,
@@ -55,6 +58,11 @@ export const GlyphControls = (props: GlyphControlsProps) => {
         <div>
           <label><input type="checkbox" checked={subpixel} onChange={(e) => setSubpixel(e.target.checked)} /> Subpixel SDF</label>
         </div>
+        {hasRelax ? (
+          <div>
+            <label><input type="checkbox" checked={relax} onChange={(e) => setRelax(e.target.checked)} /> Post-Pass</label>
+          </div>
+        ) : null}
       </>)
     }),
   ]);

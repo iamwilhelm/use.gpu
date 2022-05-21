@@ -30,9 +30,9 @@ export const glyphToESDT = (
     const sdfToDebugView = makeSDFToDebugView(wp, hp, np, radius, cutoff);
     debug(sdfToDebugView(xo, yo, null, null, outer, inner));
 
-    esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 2);
-    debug(sdfToDebugView(xo, yo, null, null, outer, null));
     esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 1);
+    debug(sdfToDebugView(xo, yo, null, null, outer, null));
+    esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 2);
     debug(sdfToDebugView(xo, yo, null, null, outer, null));
 
     esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1, 1);
@@ -208,10 +208,9 @@ export const paintSubpixelOffsets = (
       const c = getData(x, y);
       const j = (y + pad) * wp + x + pad;
       
-      if (isSolid(c)) continue;
-
       const nx = xo[j];
       const ny = yo[j];
+      if (!nx && !ny) continue;
 
       const l = getData(x - 1, y);
       const r = getData(x + 1, y);
@@ -295,8 +294,8 @@ export const paintSubpixelOffsets = (
       const d = getData(x + Math.sign(nx), y + Math.sign(ny));
       const s = d > c ? 1 : -1;
 
-      const dlo = (nn + .5 * s) / nn;
-      const dli = (nn - .5 * s) / nn;
+      const dlo = (nn + .499 * s) / nn;
+      const dli = (nn - .499 * s) / nn;
 
       xo[j] = nx * dlo;
       yo[j] = ny * dlo;
@@ -346,6 +345,7 @@ export const relaxSubpixelOffsets = (
     }
   };
 
+  // Check if target's neighbor is closer
   const check = (xs: number[], ys: number[], x: number, y: number, dx: number, dy: number, tx: number, ty: number, d: number, j: number) => {
     const k = (y + pad) * wp + x + pad;
 
@@ -383,7 +383,9 @@ const makeSDFToDebugView = (
   
   const out: number[] = [];
   for (let i = 0; i < np; i++) {
-    const d = Math.sqrt(sqr(xo ? xo[i] ?? 0 : 0) + sqr(yo ? yo[i] ?? 0 : 0)) - Math.sqrt(sqr(xi ? xi[i] ?? 0 : 0) + sqr(yi ? yi[i] ?? 0: 0));
+    const d =
+      Math.max(0, Math.sqrt(sqr(xo ? xo[i] : 0) + sqr(yo ? yo[i] : 0)) - 0.5)
+      -Math.max(0, Math.sqrt(sqr(xi ? xi[i] : 0) + sqr(yi ? yi[i] : 0)) - 0.5);
     out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   }
 
@@ -393,16 +395,22 @@ const makeSDFToDebugView = (
   rgba.xi = xi && xi.slice();
   rgba.yi = yi && yi.slice();
   
-  if (outer) for (let i = 0; i < np; ++i) {
-    if (outer[i]) {
-      rgba.data[i * 4 + 0] *= 0.05;
-      rgba.data[i * 4 + 1] *= 0.85;
+  if (outer) {
+    for (let i = 0; i < np; ++i) {
+      if (outer[i]) {
+        rgba.data[i * 4 + 0] *= 0.65;
+        rgba.data[i * 4 + 1] *= 0.35;
+        rgba.data[i * 4 + 2] *= 1.0;
+      }
     }
   }
-  if (inner) for (let i = 0; i < np; ++i) {
-    if (inner[i]) {
-      rgba.data[i * 4 + 0] *= 0.65;
-      rgba.data[i * 4 + 2] *= 0.45;
+  if (inner) {
+    for (let i = 0; i < np; ++i) {
+      if (inner[i]) {
+        rgba.data[i * 4 + 0] *= 0.45;
+        rgba.data[i * 4 + 1] *= 0.65;
+        rgba.data[i * 4 + 2] *= 1.0;
+      }
     }
   }
   

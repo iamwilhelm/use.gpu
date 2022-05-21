@@ -45,14 +45,24 @@ type GlyphViewProps = {
   glyph: string,
 };
 
+const roundUp2 = (v: number) => {
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  v++;
+  return v;
+};
+
 const GlyphView = memo(({subpixel, relax, contours, glyph}) => {
   const device = useDeviceContext();
   const rustText = useFontContext();
 
   const SIZE = 60;
-
   const glyphId = rustText.findGlyph(0, glyph ?? '@');
-  const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, SIZE);
+  const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, 96);
 
   const {width, height, image} = glyphMetrics;
 

@@ -204,3 +204,13 @@ const TreeRowInner = styled('div', {
   display: 'flex',
   height: '20px',
 });
+
+export const DOMMock = styled('button', {
+	position: 'absolute',
+  border: '1px solid rgba(255, 255, 255, 0.5)',
+	background: 'rgba(255, 255, 255, 0.1)',
+  padding: '10px 10px',
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+});

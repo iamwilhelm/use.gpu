@@ -4,6 +4,7 @@ import { Point, LayoutElement } from '../types';
 import { memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
 import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { useInspectable } from '../../hooks/useInspectable'
 
 const NO_POINT4 = [0, 0, 0, 0];
 
@@ -34,6 +35,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
   } = props;
 
   const {id} = useFiber();
+  const inspect = useInspectable();
 
   const Resume = (els: LayoutElement[]) => {
     return yeet({
@@ -43,6 +45,16 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
       under,
       fit: memoFit((into: Point) => {
         const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, w, h, snap);
+
+        inspect({
+          layout: {
+            into,
+            size,
+            sizes,
+            offsets,
+          },
+        });
+    
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),

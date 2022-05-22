@@ -2,9 +2,9 @@ import { LiveFiber, Hook } from '@use-gpu/live/types';
 import { formatNode, formatValue, STATE_SLOTS } from '@use-gpu/live';
 
 import React, { useState } from 'react';
-import { Action } from './types';
-import { SplitRow, Label, Spacer } from './layout';
-import { usePingContext } from './ping';
+import { Action } from '../types';
+import { SplitRow, Label, Spacer } from '../layout';
+import { usePingContext } from '../ping';
 
 import { inspectObject } from './props';
 import chunk from 'lodash/chunk';

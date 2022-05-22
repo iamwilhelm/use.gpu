@@ -4,6 +4,7 @@ import { InlineElement, Point, Alignment, Base, Margin } from '../types';
 import { memo, gather, yeet, useOne } from '@use-gpu/live';
 import { getInlineMinMax, fitInline } from '../lib/inline';
 import { normalizeMargin, makeInlineLayout, parseDimension, memoFit } from '../lib/util';
+import { useInspectable } from '../../hooks/useInspectable'
 
 export type InlineProps = {
   direction?: 'x' | 'y',
@@ -37,6 +38,8 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
   const margin = normalizeMargin(m);
   const padding = normalizeMargin(p);
 
+  const inspect = useInspectable();
+
   const Resume = (els: InlineElement[]) => {
     const sizing = getInlineMinMax(els, direction, wrap, snap);
 
@@ -47,6 +50,16 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
       shrink,
       fit: memoFit((into: Point) => {
         const {size, ranges, offsets, renders} = fitInline(els, into, direction, align, anchor, wrap, snap);
+
+        inspect({
+          layout: {
+            into,
+            size,
+            sizes: [],
+            offsets: [],
+          },
+        });
+
         return {
           size,
           render: makeInlineLayout(ranges, offsets, renders),

@@ -14,6 +14,7 @@ import {
 } from '@use-gpu/core';
 import { useLinkedShader } from '../hooks/useLinkedShader';
 import { useRenderPipeline } from '../hooks/useRenderPipeline';
+import { useInspectable } from '../hooks/useInspectable'
 
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
@@ -48,6 +49,7 @@ export const render = (props: RenderProps) => {
   } = props;
 
   const isPicking = mode === RenderPassMode.Picking;
+  const inspect = useInspectable();
 
   // Render set up
   const device = useContext(DeviceContext);
@@ -106,17 +108,21 @@ export const render = (props: RenderProps) => {
 
   const fiber = useFiber();
 
+  const inspected = inspect({
+    render: {
+      vertexCount: 0,
+      instanceCount: 0,
+    },
+  });
+
   // Return a lambda back to parent(s)
   return yeet({
     [mode]: (passEncoder: GPURenderPassEncoder) => {
       const v = resolve(vertexCount);
       const i = resolve(instanceCount);
 
-      if (!fiber.__inspect) fiber.__inspect = {};
-      if (!fiber.__inspect.render) fiber.__inspect.render = {vertexCount: 0, instanceCount: 0};
-      fiber.__inspect!.render!.vertexCount = v;
-      fiber.__inspect!.render!.instanceCount = i;
-      if (!(v * i)) return;
+      inspected.render.vertexCount = v;
+      inspected.render.instanceCount = i;
 
       uniform.pipe.fill(viewUniforms);
       if (isPicking) uniform.pipe.fill(pickingUniforms);

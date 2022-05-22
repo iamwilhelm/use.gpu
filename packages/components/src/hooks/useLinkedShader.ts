@@ -4,6 +4,7 @@ import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types'
 import { resolveBindings, linkBundle, getHash } from '@use-gpu/shader/wgsl';
 import { makeShaderModule } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
+import { useInspectable } from './useInspectable'
 import LRU from 'lru-cache';
 
 const NO_DEPS = [] as any[];
@@ -27,6 +28,7 @@ export const useLinkedShader = (
   key?: number | string,
 ) => {
   const fiber = useFiber();
+  const inspect = useInspectable();
 
   // Resolve bindings between vertex and fragment.
   const s = [vertex, fragment] as [ParsedBundle, ParsedBundle];
@@ -61,11 +63,12 @@ export const useLinkedShader = (
       CACHE.set(fKey, fragment);
     }
     
-    fiber.__inspect = fiber.__inspect || {};
-    fiber.__inspect.vertex = vertex;
-    fiber.__inspect.fragment = fragment;
-    fiber.__inspect.uniforms = uniforms;
-    fiber.__inspect.bindings = bindings;
+    inspect({
+      vertex,
+      fragment,
+      uniforms,
+      bindings,
+    });
 
     ref.uniforms = uniforms;
     ref.bindings = bindings;

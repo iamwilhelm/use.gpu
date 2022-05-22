@@ -11,6 +11,19 @@ import {
   DebugProvider,
 } from '@use-gpu/components';
 
+const TRANSPARENT = [1, 1, 1, 0.1];
+
+const FILL = [0.4, 0.7, 1, 0.5];
+
+const BOXES = (<>
+	<Element width={180} height={50} fill={FILL} />
+	<Element width={140} height={60} fill={FILL} />
+	<Element width={160} height={30} fill={FILL} />
+	<Element width={180} height={100} fill={FILL} />
+	<Element width={180} height={50} fill={FILL} />
+	<Element width={140} height={60} fill={FILL} />
+</>)
+
 export const LayoutTestPage: LC = () => {
 
   const view = (
@@ -20,14 +33,14 @@ export const LayoutTestPage: LC = () => {
           <Layout>
 						<Overflow>
 
-							<Block margin={10} height={400} fill={[1, 1, 1, 0.1]}>
+							<Block margin={10} fill={[1, 1, 1, 0.1]}>
 
-								<Flex>
-	                <Element width={80}  height={50} />
-	                <Element width={40}  height={60} />
-	                <Element width={60}  height={50} />
-	                <Element width={80}  height={70} />
-								</Flex>
+								<Flex gap={10} align="start" anchor="center" height={200}>{BOXES}</Flex>
+								<Flex gap={10} align="center" anchor="center" height={200}>{BOXES}</Flex>
+								<Flex gap={10} align="end" anchor="center" height={200}>{BOXES}</Flex>
+								<Flex gap={10} align="justify" anchor="center" height={200}>{BOXES}</Flex>
+								<Flex gap={10} align="between" anchor="center" height={200}>{BOXES}</Flex>
+								<Flex gap={10} align="evenly" anchor="center" height={200}>{BOXES}</Flex>
 								
 							</Block>
 							

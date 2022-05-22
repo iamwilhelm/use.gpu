@@ -4,6 +4,7 @@ import { LayoutElement, Point, Dimension, MarginLike, Margin, Point4, ImageAttac
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { normalizeMargin, makeBoxLayout, makeBoxPicker, parseDimension, memoFit } from '../lib/util';
+import { useInspectable } from '../../hooks/useInspectable'
 
 import { Absolute } from './absolute';
 import { Element } from '../element/element';
@@ -61,6 +62,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const padding = normalizeMargin(p);
 
   const {id} = useFiber();
+  const inspect = useInspectable();
 
   const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
@@ -92,6 +94,16 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
         ] as [number | number, number | null];
 
         const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
+
+        inspect({
+          layout: {
+            into,
+            size,
+            sizes,
+            offsets,
+          },
+        });
+
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),

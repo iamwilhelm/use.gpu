@@ -4,6 +4,7 @@ import { LayoutElement, Margin, Dimension, Direction, Alignment, Anchor, Point }
 import { yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
 import { makeBoxLayout, makeBoxPicker, normalizeAlignment, normalizeGap, parseDimension, memoFit } from '../lib/util';
+import { useInspectable } from '../../hooks/useInspectable'
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
@@ -44,6 +45,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const align  = normalizeAlignment(al);
 
   const {id} = useFiber();
+  const inspect = useInspectable();
 
   const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
@@ -68,13 +70,19 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
       fit: memoFit((into: Point) => {
         const w = width != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;
-        const fixed = [
-          width != null ? w : null,
-          height != null ? h : null,
-        ] as [number | number, number | null];
+        const fixed = [w, h] as [number | number, number | null];
 
         const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);
         
+        inspect({
+          layout: {
+            into,
+            size,
+            sizes,
+            offsets,
+          },
+        });
+
         return {
           size,
           render: makeBoxLayout(sizes, offsets, renders),

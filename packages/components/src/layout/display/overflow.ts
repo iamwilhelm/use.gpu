@@ -4,6 +4,7 @@ import { Point, Point4, Margin, LayoutElement } from '../types';
 import { memo, use, gather, yeet, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
+import { useInspectable } from '../../hooks/useInspectable'
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 
@@ -62,6 +63,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
   });
   
   const {id} = useFiber();
+  const inspect = useInspectable();
 
   const Resume = (els: LayoutElement[]) => {
     const sizing = getBlockMinMax(els, NO_FIXED, direction);
@@ -82,6 +84,15 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
         const renders = [render];
         const pickers = [pick];
         const scrollers = [scroll];
+
+        inspect({
+          layout: {
+            into,
+            size,
+            sizes,
+            offsets,
+          },
+        });
 
         sizeRef[0] = into[0];
         sizeRef[1] = into[1];

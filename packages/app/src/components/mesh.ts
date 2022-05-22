@@ -9,6 +9,7 @@ import {
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle } from '@use-gpu/shader/wgsl';
+import { useInspectable } from '@use-gpu/components';
 
 import instanceDrawMesh from '@use-gpu/wgsl/render/vertex/mesh.wgsl';
 import instanceDrawMeshPick from '@use-gpu/wgsl/render/vertex/mesh-pick.wgsl';
@@ -81,6 +82,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const fragmentShader = isPicking ? instanceFragmentPickGeometry : instanceFragmentMesh;
 
   const fiber = useFiber();
+  const inspect = useInspectable();
 
   // Rendering pipeline
   const pipeline = useMemo(() => {
@@ -90,9 +92,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     const vertex = makeShaderModule(vertexLinked, vertexShader.hash + cs);
     const fragment = makeShaderModule(fragmentLinked, fragmentShader.hash + cs);
     
-    fiber.__inspect = fiber.__inspect || {};
-    fiber.__inspect.vertex = vertex;
-    fiber.__inspect.fragment = fragment;
+    inspect({vertex});
+    inspect({fragment});
 
     return makeRenderPipeline(
       device,

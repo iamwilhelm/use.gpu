@@ -121,7 +121,7 @@ export const fitFlex = (
   const containY = fixed[1] != null ? Math.min(fixed[1], into[1]) : into[1];
 
   const spaceMain  = isX ? containX : containY;
-  const spaceCross = isX ? into[1] : into[0];
+  const spaceCross = isX ? containY : containX;
   const isCrossFixed = isX ? fixed[1] != null : fixed[0] != null;
 
   const sizes   = [] as Point[];
@@ -226,7 +226,7 @@ export const fitFlex = (
     const n = cross.length;
     if (!n) return;
 
-    const slack = isCrossFixed ? Math.max(0, spaceCross - accumCross - gapCross) : 0;
+    const slack = isCrossFixed ? Math.max(0, spaceCross - accumCross + gapCross) : 0;
 
     let crossGap = 0;
     let crossPos = 0;
@@ -285,7 +285,7 @@ export const fitFlex = (
   reduceCross();
 
   const w =  isX ? containX : fixed[0] != null ? fixed[0] : maxCross;
-  const h = !isX ? containY : fixed[0] != null ? fixed[1] : maxCross;
+  const h = !isX ? containY : fixed[1] != null ? fixed[1] : maxCross;
 
   for (const el of els) if (el.absolute) {
     const {margin, fit, under} = el;

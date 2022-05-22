@@ -62,7 +62,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     const {time, frame, loop} = ref;
     let running = live;
     let pending = false;
-    let fibers: LiveFiber<any> = [];
+    let fibers: LiveFiber<any>[] = [];
 
     const render = (timestamp: number) => {
       frame.current++;

@@ -3,11 +3,11 @@ import { formatNode, formatValue } from '@use-gpu/live';
 import { styled as _styled } from '@stitches/react';
 
 import React, { Fragment, useState } from 'react';
-import { Action } from './types';
-import { SplitRow, Label, Selectable, Spacer } from './layout';
+import { Action } from '../types';
+import { SplitRow, Label, Selectable, Spacer } from '../layout';
 
 import { inspectObject } from './props';
-import { usePingContext } from './ping';
+import { usePingContext } from '../ping';
 
 const styled: any = _styled;
 
@@ -74,8 +74,8 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
   return (<>
     {uniforms || bindings ? (<>
       <div><b>Bindings</b></div>
-      {inspectObject(toObject(uniforms), state, toggleState, 'u')}
-      {inspectObject(toObject(bindings), state, toggleState, 'b')}
+      {uniforms ? inspectObject(toObject(uniforms), state, toggleState, 'u') : null}
+      {bindings ? inspectObject(toObject(bindings), state, toggleState, 'b') : null}
       <Spacer />
     </>) : null}
     <div><b>Shader</b> (<code>{shader.hash}</code>)</div>

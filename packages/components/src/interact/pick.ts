@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { useContext, useMemo, useOne, useResource, useNoResource } from '@use-gpu/live';
+import { useContext, useMemo, useNoMemo, useOne, useResource, useNoResource } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
 
 type PickState = {
@@ -48,27 +48,24 @@ export const Pick: LiveComponent<PickProps> = ({
 
   const id = useId();
   const mouse = useMouse(id);
-  const { buttons, x, y, hovered, captured, pressed, presses, clicks, index } = mouse;
-
-  const ref = useOne(() => ({mouse}));
-  ref.mouse = mouse;
+  const { mouse: {x, y}, hovered, captured, pressed, presses, clicks, index } = mouse;
 
   if (onMouseMove) {
-    useResource(() => {
+    useMemo(() => {
       if (hovered || captured) {
-        if (onMouseMove) onMouseMove(ref.mouse);
+        if (onMouseMove) onMouseMove(mouse);
       }
     }, [x, y]);
   }
   else {
-    useNoResource();
+    useNoMemo();
   }
 
   if (onMouseOver || onMouseOut) {
     useResource((dispose) => {
       if (hovered) {
-        if (onMouseOver) onMouseOver(ref.mouse);
-        if (onMouseOut) dispose(() => onMouseOut(ref.mouse));
+        if (onMouseOver) onMouseOver(mouse);
+        if (onMouseOut) dispose(() => onMouseOut(mouse));
       }
     }, [hovered]);
   }
@@ -80,24 +77,26 @@ export const Pick: LiveComponent<PickProps> = ({
     const { left, middle, right } = pressed;
     useResource((dispose) => {
       if (left) {
-        if (onMouseDown) onMouseDown(ref.mouse);
-        if (onMouseUp) dispose(() => onMouseUp(ref.mouse));
+        if (onMouseDown) onMouseDown(mouse);
+        if (onMouseUp) dispose(() => onMouseUp(mouse));
       }
     }, [left]);
     useResource((dispose) => {
       if (middle) {
-        if (onMouseDown) onMouseDown(ref.mouse);
-        if (onMouseUp) dispose(() => onMouseUp(ref.mouse));
+        if (onMouseDown) onMouseDown(mouse);
+        if (onMouseUp) dispose(() => onMouseUp(mouse));
       }
     }, [middle]);
     useResource((dispose) => {
       if (right) {
-        if (onMouseDown) onMouseDown(ref.mouse);
-        if (onMouseUp) dispose(() => onMouseUp(ref.mouse));
+        if (onMouseDown) onMouseDown(mouse);
+        if (onMouseUp) dispose(() => onMouseUp(mouse));
       }
     }, [right]);
   }
   else {
+    useNoResource();
+    useNoResource();
     useNoResource();
   }
 

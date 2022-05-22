@@ -7,7 +7,7 @@ import { LayoutControls } from '../../ui/layout-controls';
 
 import {
   LinearRGB, Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
-  PanControls, PanCamera,
+  PanControls,
   DebugProvider,
 } from '@use-gpu/components';
 

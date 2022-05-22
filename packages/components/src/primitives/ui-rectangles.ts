@@ -41,6 +41,7 @@ export type UIRectanglesProps = {
   sdfs?: ShaderSource,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
+  transform?: ShaderModule,
 
   debugContours?: boolean,
 
@@ -99,7 +100,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => ((props.indices as any)?.length ?? resolve(count)), [props.indices, count]);
+  const instanceCount = useCallback(() => ((props.rectangles as any)?.length ?? resolve(count)), [props.rectangles, count]);
 
   const pipeline = useMemo(() =>
     patch(alphaToCoverage
@@ -117,7 +118,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const p = useShaderRef(props.repeat, props.repeats);
   const d = useShaderRef(props.sdf, props.sdfs);
 
-  const parent = useTransformContext(p);
+  const parent = useTransformContext();
   const x = props.transform || parent;
   const t = props.texture;
 

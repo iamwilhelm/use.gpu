@@ -9,16 +9,18 @@ export const DEBUG_DEFAULTS = {
   sdf2d: {
     contours: false,
     subpixel: true,
+    relax: true,
   },
   layout: {
     inspect: false,
   }
-};
+} as DebugContextProps;
 
 export type DebugContextProps = {
-  sdf2D: {
+  sdf2d: {
     contours: boolean,
     subpixel: boolean,
+    relax: boolean,
   },
   layout: {
     inspect: boolean,
@@ -30,7 +32,7 @@ export type DebugProviderProps = {
 };
 
 export const DebugContext = makeContext<DebugContextProps>(DEBUG_DEFAULTS, 'DebugContext');
-export const useDebugContext = () => useContext(DataContext);
+export const useDebugContext = () => useContext(DebugContext);
 
 export const DebugProvider: LC<DebugProviderProps> = memo(({debug, children}: PropsWithChildren<DebugProviderProps>) => {
   const context = useOne(() => patch(DEBUG_DEFAULTS, debug), debug);

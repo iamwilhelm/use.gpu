@@ -1,7 +1,8 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live/types';
 
 import { provide, useContext, useOne } from '@use-gpu/live';
 
+import { Rectangle } from '@use-gpu/core/types'; 
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import { TransformContext } from '../../providers/transform-provider';
 import { RangeContext } from '../../providers/range-provider';
@@ -15,11 +16,10 @@ import { mat4, vec3 } from 'gl-matrix';
 const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
 
 export type EmbeddedProps = {
-  layout?: Rectangle,
-  children?: LiveElement<any>,
+  layout: Rectangle,
 };
 
-export const Embedded: LiveComponent<EmbeddedProps> = (props) => {
+export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<EmbeddedProps>) => {
   const {
     layout,
     children,

@@ -29,6 +29,7 @@ export type TextProps = {
   
   lineHeight?: number,
   size?: number,
+  detail?: number,
   snap?: boolean,
 
   text?: string,
@@ -46,6 +47,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
     weight,
     color = BLACK,
     lineHeight,
+    detail,
     size = 16,
     snap = false,
     text = '',
@@ -68,6 +70,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
         font,
         color,
         size,
+        detail,
         spans,
         glyphs,
         breaks,

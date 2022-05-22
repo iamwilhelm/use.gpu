@@ -37,8 +37,8 @@ export type GridProps =
   Partial<LineTrait> &
   Partial<ColorTrait> &
   Partial<ROPTrait> & {
-  first?: Partial<ScaleTrait> & { detail: number },
-  second?: Partial<ScaleTrait> & { detail: number },
+  first?: Partial<ScaleTrait> & { detail?: number },
+  second?: Partial<ScaleTrait> & { detail?: number },
   origin?: VectorLike,
 };
 

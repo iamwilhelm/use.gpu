@@ -1,5 +1,5 @@
 import React from 'react';
-import { LiveElement } from '@use-gpu/live/types';
+import { LC, LiveElement } from '@use-gpu/live/types';
 import { PAGES } from '../routes';
 import { use, fragment, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
@@ -19,16 +19,16 @@ const STYLE = {
 };
 
 type LayoutControlsProps = {
-  container: Element,
+  container?: Element | null,
   render?: (mode: string) => LiveElement<any>,
 };
 
-export const LayoutControls = (props: LayoutControlsProps) => {
+export const LayoutControls: LC<LayoutControlsProps> = (props: LayoutControlsProps) => {
   const {container, render} = props;
   const [mode, setMode] = useState('inspect');
 
   return fragment([
-    render(mode),
+    render ? render(mode) : null,
     use(HTML, {
       container,
       style: STYLE,

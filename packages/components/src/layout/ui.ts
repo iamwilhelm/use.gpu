@@ -1,6 +1,6 @@
 import { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live/types';
 import { AggregateBuffer, Atlas, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
-import { UIAggregate } from './types';
+import { UIAggregate, Rectangle } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { DebugContext } from '../providers/debug-provider';
@@ -68,8 +68,8 @@ const Resume = (
 
   const layers = partitioner.resolve();
 
-  const els = layers.flatMap((layer, i) => {
-    if (layer[0]?.f) return layer;
+  const els = layers.flatMap((layer, i): LiveElement<any> => {
+    if ((layer[0] as any)?.f) return (layer as any);
     return keyed(Layer, layer[0]?.id, layer);
   });
   els.push(yeet([]));
@@ -147,7 +147,7 @@ const makeUIAccumulator = (
 };
 
 const getItemTypeKey = (item: UIAggregate) =>
-  item.f ? -1 :
+  (item as any).f ? -1 :
   getNumberHash(getObjectKey(item.texture)) ^
   getNumberHash(getObjectKey(item.transform));
 
@@ -165,7 +165,7 @@ const makePartitioner = () => {
     const key = getItemTypeKey(item);
     const {bounds} = item;
 
-    const i = last.get(key);
+    const i = last.get(key)!;
     const n = layers.length;
     const layer = layers[i];
 
@@ -197,14 +197,14 @@ const makePartitioner = () => {
 
 const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);
 
-const overlapBounds = (a: Rectangle, b: Rectangle) => {
+const overlapBounds = (a: Rectangle, b: Rectangle): boolean => {
   const [al, at, ar, ab] = a;
   const [bl, bt, br, bb] = b;
 
   return intersectRange(al, ar, bl, br) && intersectRange(at, ab, bt, bb);
 }
 
-const joinBounds = (a: Rectangle, b: Rectangle) => {
+const joinBounds = (a: Rectangle, b: Rectangle): Rectangle => {
   const [al, at, ar, ab] = a;
   const [bl, bt, br, bb] = b;
   return [
@@ -212,5 +212,5 @@ const joinBounds = (a: Rectangle, b: Rectangle) => {
     Math.min(at, bt),
     Math.max(ar, br),
     Math.max(ab, bb),
-  ];
+  ] as Rectangle;
 };

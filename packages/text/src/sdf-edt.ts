@@ -1,4 +1,5 @@
 import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage } from './sdf';
+import { Image } from './types';
 
 // Convert grayscale glyph to SDF using pixel-based distance transform
 export const glyphToEDT = (
@@ -23,7 +24,7 @@ export const glyphToEDT = (
   const {outer, inner, f, z, v} = stage;
   if (debug) {
     const sdfToDebugView = makeSDFToDebugView(wp, hp, np, radius, cutoff);
-    debug(sdfToDebugView(outer, inner));
+    debug(sdfToDebugView(outer, inner, true));
 
     edt(outer, 0, 0, wp, hp, wp, f, z, v, 1);
     debug(sdfToDebugView(outer, null));
@@ -100,44 +101,65 @@ const makeSDFToDebugView = (
 ) => (
   outer: any | null,
   inner: any | null,
+  mask: boolean = false,
 ): Image => {
   
   const out: number[] = [];
   for (let i = 0; i < np; i++) {
-    const d = (outer ? Math.sqrt(outer[i]) : 0) - (inner ? Math.sqrt(inner[i]) : 0);
+    const d = mask ? 0 : (outer ? Math.sqrt(outer[i]) : 0) - (inner ? Math.sqrt(inner[i]) : 0);
     out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   }
 
   const rgba = glyphToRGBA(new Uint8Array(out), wp, hp);
   
-  if (outer) for (let i = 0; i < np; ++i) {
-    if (outer[i]) {
-      rgba.data[i * 4 + 0] *= 0.05;
-      rgba.data[i * 4 + 1] *= 0.85;
+  if (mask) {
+    if (outer) for (let i = 0; i < np; ++i) {
+      if (outer[i] != INF) {
+        rgba.data[i * 4 + 0] *= 0.25;
+        rgba.data[i * 4 + 1] *= 0.65;
+        rgba.data[i * 4 + 2] *= 0.90;
+      }
+    }
+    if (inner) for (let i = 0; i < np; ++i) {
+      if (inner[i] != INF) {
+        rgba.data[i * 4 + 0] *= 0.35;
+        rgba.data[i * 4 + 1] *= 0.95;
+        rgba.data[i * 4 + 2] *= 0.9;
+      }
     }
   }
-  if (inner) for (let i = 0; i < np; ++i) {
-    if (inner[i]) {
-      rgba.data[i * 4 + 0] *= 0.65;
-      rgba.data[i * 4 + 2] *= 0.45;
+  else {
+    if (outer) for (let i = 0; i < np; ++i) {
+      if (outer[i]) {
+        rgba.data[i * 4 + 0] *= 0.35;
+        rgba.data[i * 4 + 1] *= 0.95;
+        rgba.data[i * 4 + 2] *= 0.9;
+      }
+    }
+    if (inner) for (let i = 0; i < np; ++i) {
+      if (inner[i]) {
+        rgba.data[i * 4 + 0] *= 0.25;
+        rgba.data[i * 4 + 1] *= 0.65;
+        rgba.data[i * 4 + 2] *= 0.90;
+      }
     }
   }
-  
+
   return rgba;
 }
 
 // 2D Euclidean squared distance transform by Felzenszwalb & Huttenlocher https://cs.brown.edu/~pff/papers/dt-final.pdf
 export const edt = (
-  data: Float64Array,
+  data: Float32Array,
   x0: number,
   y0: number,
   width: number,
   height: number,
   gridWidth: number,
-  f: Float64Array,
-  z: Float64Array,
+  f: Float32Array,
+  z: Float32Array,
   v: Uint16Array,
-  half?: boolean,
+  half?: number,
 ) => {
   if (half !== 2) for (let y = y0; y < y0 + height; y++) edt1d(data, y * gridWidth + x0, 1, width, f, z, v);
   if (half !== 1) for (let x = x0; x < x0 + width; x++) edt1d(data, y0 * gridWidth + x, gridWidth, height, f, z, v);
@@ -145,12 +167,12 @@ export const edt = (
 
 // 1D squared distance transform
 export const edt1d = (
-  grid: Float64Array,
+  grid: Float32Array,
   offset: number,
   stride: number,
   length: number,
-  f: Float64Array,
-  z: Float64Array,
+  f: Float32Array,
+  z: Float32Array,
   v: Uint16Array,
 ) => {
   v[0] = 0;

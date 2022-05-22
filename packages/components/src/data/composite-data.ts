@@ -202,10 +202,10 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     for (const {buffer, array, source, dims, accessor, raw, composite, isIndex} of fieldBuffers) if (raw || data) {
       const a = accessor as Accessor;
       const c = isIndex ? chunks : layout.indexed ?? chunks;
-      const l = (!layout.indexed || isIndex) ? loops : false;
+      const l = (!layout.indexed || isIndex) ? loops : undefined;
       const o = isIndex ? layout.offsets : undefined;
       if (composite) {
-        if (raw) copyNumberArraysComposite(raw, array, dims, a, c, l, o);
+        if (raw) copyNumberArraysComposite(raw, array, dims, c, l, o);
         else if (data) copyDataArraysComposite(data, array, dims, a, c, l, o);
       }
       else {

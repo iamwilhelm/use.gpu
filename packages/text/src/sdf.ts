@@ -1,3 +1,4 @@
+import { Image } from './types';
 import { glyphToEDT } from './sdf-edt'; 
 import { glyphToESDT } from './sdf-esdt'; 
 
@@ -6,16 +7,6 @@ export { paintSubpixelOffsets } from './sdf-esdt';
 export const INF = 1e10;
 
 export type Rectangle = [number, number, number, number];
-
-export type Image = {
-  data: Uint8Array,
-  width: number,
-  height: number,
-  xo?: Float32Array | null,
-  yo?: Float32Array | null,
-  xi?: Float32Array | null,
-  yi?: Float32Array | null,
-};
 
 export type SDFStage = {
   outer: Float32Array,

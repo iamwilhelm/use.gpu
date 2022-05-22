@@ -58,7 +58,7 @@ const Resume = (els: LayoutElement[]) => {
 };
 
 const screenToView = (projectionMatrix: mat4, x: number, y: number) => {
-  const v = [x, y, 0.5, 1.0];
+  const v = [x, y, 0.5, 1.0] as any;
   const m = mat4.create();
   mat4.invert(m, projectionMatrix);
   vec3.transformMat4(v, v, m);
@@ -77,7 +77,7 @@ export const Scroller = (pickers: any[]) => {
   const [px, py] = screenToView(matrix, wheel.x / width * 2.0 - 1.0, 1.0 - wheel.y / height * 2.0);
   
   useOne(() => {
-    const { x, y, moveX, moveY, version, stopped } = wheel;
+    const { x, y, moveX, moveY, stopped } = wheel;
     if (stopped) return;
 
     for (const picker of pickers) {

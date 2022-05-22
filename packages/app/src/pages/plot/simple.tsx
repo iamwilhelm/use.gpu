@@ -120,13 +120,13 @@ export const PlotSimplePage: LC = () => {
                     color={[0.1, 0.3, 1, 1]}
                   />
                   <Line
-                    size={5}
+                    width={5}
                     color={[0.5, 0.5, 1, 0.5]}
                     depth={0.5}
                   />
                   <Transpose axes='yx'>
                     <Line
-                      size={5}
+                      width={5}
                       color={[0.5, 0.5, 1, 0.5]}
                       depth={0.5}
                     />

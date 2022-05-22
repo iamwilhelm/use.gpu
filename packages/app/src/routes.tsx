@@ -6,6 +6,7 @@ import { GeometryLinesPage } from './pages/geometry/lines';
 import { DebugAtlasPage } from './pages/debug/atlas';
 import { DebugGlyphPage } from './pages/debug/glyph';
 import { LayoutDisplayPage } from './pages/layout/display';
+import { LayoutTestPage } from './pages/layout/test';
 import { MeshRawPage } from './pages/mesh/raw';
 import { LinearRGBPage } from './pages/rtt/linear-rgb';
 import { PlotSimplePage } from './pages/plot/simple';
@@ -18,6 +19,7 @@ export const PAGES = [
   {path: "/geometry/faces", title: "Geometry - 3D Polygons"},
   {path: "/geometry/data", title: "Geometry - Data-driven Layers"},
   {path: "/layout/display", title: "Layout - Box model"},
+  {path: "/layout/test", title: "Layout - Test"},
   {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
   {path: "/plot/simple", title: "Plot - Simple"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
@@ -31,6 +33,7 @@ export const makeRoutes = () => ({
   "/geometry/faces": { element: <GeometryFacesPage /> },
   "/geometry/lines": { element: <GeometryLinesPage /> },
   "/layout/display": { element: <LayoutDisplayPage /> },
+  "/layout/test":    { element: <LayoutTestPage /> },
   "/mesh/raw":       { element: <MeshRawPage /> },
   "/plot/simple":    { element: <PlotSimplePage /> },
   "/rtt/linear-rgb": { element: <LinearRGBPage /> },

@@ -50,8 +50,11 @@ export const DebugAtlasPage: LC = () => {
     </Draw>
   );
   
+  const root = document.querySelector('#use-gpu');
+	
   return (
     <GlyphControls
+			container={root}
       hasContours
       render={({subpixel, contours}) =>
         <PanControls

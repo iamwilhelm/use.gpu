@@ -52,6 +52,7 @@ export type MouseState = {
   y: number,
   moveX: number,
   moveY: number,
+  stopped: boolean,
 };
 
 export type WheelState = {
@@ -59,6 +60,7 @@ export type WheelState = {
   y: number,
   moveX: number,
   moveY: number,
+  stopped: boolean,
 };
 
 export type KeyboardState = {
@@ -68,6 +70,7 @@ export type KeyboardState = {
     shift: boolean,
     meta: boolean,
   },
+  stopped: boolean,
 };
 
 export type MouseEventState = {
@@ -102,6 +105,7 @@ const toButtons = (buttons: number) => ({
 });
 
 const makeClickTracker = () => ({
+  buttons: { left: false, middle: false, right: false },
   pressed: { left: false, middle: false, right: false },
   presses: { left: 0, middle: 0, right: 0 },
   clicks:  { left: 0, middle: 0, right: 0 },
@@ -147,9 +151,9 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
     }),
   }));
   
-  const stopMouse    = useOne(() => mouse.stop    = () => mouse.stopped    = true, mouse);
-  const stopWheel    = useOne(() => wheel.stop    = () => wheel.stopped    = true, wheel);
-  const stopKeyboard = useOne(() => keyboard.stop = () => keyboard.stopped = true, keyboard);
+  const stopMouse    = useOne(() => (mouse    as any).stop = () => mouse.stopped    = true, mouse);
+  const stopWheel    = useOne(() => (wheel    as any).stop = () => wheel.stopped    = true, wheel);
+  const stopKeyboard = useOne(() => (keyboard as any).stop = () => keyboard.stopped = true, keyboard);
 
   mouse.stopped    = false;
   wheel.stopped    = false;
@@ -195,7 +199,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
         tracker.buttons = buttons;
       }, buttons);
 
-      return {mouse: ref.mouse, index, hovered, captured, pressed, presses, clicks, stop: stopMouse};
+      return {mouse: ref.mouse as any, index, hovered, captured, pressed, presses, clicks, stop: stopMouse};
     },
   }), [mouse, targetId, captureId]);
 
@@ -212,7 +216,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
         ref.wheel = wheel;
       }
 
-      return {wheel: ref.wheel, index, stop: stopWheel};
+      return {wheel: ref.wheel as any, index, stop: stopWheel};
     },
   }), [wheel, targetId, captureId]);
 
@@ -221,7 +225,7 @@ export const EventProvider: LiveComponent<EventProviderProps> = memo(({mouse, wh
     useKeyboard: (id: number | null = null): KeyboardEventState => {
       const ref = useOne(() => ({keyboard}));
 
-      return {keyboard, stop: stopKeyboard};
+      return {keyboard: keyboard as any, stop: stopKeyboard};
     },
   }), [keyboard, targetId, captureId]);
 

@@ -18,6 +18,8 @@ export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start'
 export type Anchor = 'start' | 'center' | 'end';
 export type Base = 'start' | 'base' | 'center' | 'end';
 
+export type MarginLike = number | number[];
+
 export type Fit = 'contain' | 'cover' | 'scale' | 'none';
 export type Repeat = 'x' | 'y' | 'xy' | 'none';
 

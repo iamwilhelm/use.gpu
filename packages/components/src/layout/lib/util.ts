@@ -1,6 +1,6 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Point, Rectangle, Gap, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
+import { Point, Rectangle, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
 
@@ -57,7 +57,7 @@ export const normalizeAnchor = (x: Anchor | [Anchor, Anchor]): [Anchor, Anchor] 
     ? [x, x] as [Anchor, Anchor]
     : x;
 
-export const normalizeMargin = (m: number | Margin): Margin =>
+export const normalizeMargin = (m: MarginLike): Margin =>
   !Array.isArray(m)
     ? [m, m, m, m] as Margin
     : [m[0] || 0, m[1] || 0, (m[2] ?? m[0]) || 0, (m[3] ?? m[1]) || 0];

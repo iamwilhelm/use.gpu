@@ -1,5 +1,5 @@
 import React from 'react';
-import { LiveElement } from '@use-gpu/live/types';
+import { LC, LiveElement } from '@use-gpu/live/types';
 import { PAGES } from '../routes';
 import { use, fragment, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
@@ -22,8 +22,8 @@ type GlyphControlsProps = {
   hasGlyph?: boolean,
   hasContours?: boolean,
 	hasRelax?: boolean,
-  container: Element,
-  render?: ({
+  container?: Element | null,
+  render?: ({subpixel, contours, relax, glyph}: {
     subpixel: boolean,
     contours: boolean,
 		relax: boolean,
@@ -31,16 +31,16 @@ type GlyphControlsProps = {
   }) => LiveElement<any>
 };
 
-export const GlyphControls = (props: GlyphControlsProps) => {
+export const GlyphControls: LC<GlyphControlsProps> = (props: GlyphControlsProps) => {
   const {hasGlyph, hasContours, hasRelax, container, render} = props;
 
   const [subpixel, setSubpixel] = useState(true);
   const [contours, setContours] = useState(false);
-  const [relax, setRelax] = useState(false);
-  const [glyph, setGlyph] = useState('Q');
+  const [relax, setRelax] = useState(true);
+  const [glyph, setGlyph] = useState('@');
 
   return fragment([
-    render({subpixel, contours, relax, glyph}),
+    render ? render({subpixel, contours, relax, glyph}) : null,
     use(HTML, {
       container,
       style: STYLE,
@@ -60,7 +60,7 @@ export const GlyphControls = (props: GlyphControlsProps) => {
         </div>
         {hasRelax ? (
           <div>
-            <label><input type="checkbox" checked={relax} onChange={(e) => setRelax(e.target.checked)} /> Post-Pass</label>
+            <label><input type="checkbox" checked={relax} onChange={(e) => setRelax(e.target.checked)} /> Relaxation Pass</label>
           </div>
         ) : null}
       </>)

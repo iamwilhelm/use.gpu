@@ -42,3 +42,13 @@ export type RustTextAPI = {
 
   findGlyph: (fontId: number, char: string) => number;
 };
+
+export type Image = {
+  data: Uint8Array,
+  width: number,
+  height: number,
+  xo?: Float32Array | null,
+  yo?: Float32Array | null,
+  xi?: Float32Array | null,
+  yi?: Float32Array | null,
+};

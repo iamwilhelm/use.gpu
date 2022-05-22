@@ -5,6 +5,7 @@ import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } 
 import { SampledData } from '../../data/sampled-data';
 import { DataContext } from '../../providers/data-provider';
 import { useBoundSource } from '../../hooks/useBoundSource';
+import { useDataBinding } from '../../hooks/useDataBinding';
 import { useDerivedSource } from '../../hooks/useDerivedSource';
 import { parseAxes, parseAxis } from '../util/parse';
 
@@ -28,17 +29,14 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
 
   // Grab source data
   const data = useContext(DataContext) ?? undefined;
+  if (!data) return;
 
-  const dataBinding = useOne(() => ({name: 'getValue', format: data.format, args: ['u32']}), data.format);
-  const sizeExpr = useOne(() => () => {
-    const s = data?.size || [];
-    return [s[0] || 1, s[1] || 1, s[2] || 1, s[3] || 1];
-  }, data);
+  const [binding, length, size] = useDataBinding(data);
   const swizzle = useOne(() => parseAxes(axes), axes);
 
   // Construct size + index swizzle shader
-  const getSizeIn = useBoundSource(SIZE_BINDING, sizeExpr);
-  const getDataIn = useBoundSource(dataBinding, data);
+  const getSizeIn = useBoundSource(SIZE_BINDING, size);
+  const getDataIn = useBoundSource(binding, data);
   const getDataOut = useMemo(() => {
     const getSizeOut = castTo(getSizeIn, 'vec4<u32>', swizzle);
 
@@ -52,9 +50,9 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
   const getSourceProps = useMemo(() => {
     const basis = swizzle.split('').map(parseAxis);
     return {
-      length: () => data.length,
+      length,
       size: () => {
-        const s = data.size;
+        const s = size();
         return basis.map(i => s[i] ?? 1);
       },
     };

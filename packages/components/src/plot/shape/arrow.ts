@@ -55,7 +55,8 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
 
-  const detailExpr = useOne(() => () => (positions?.size?.[0] || 1) - 1, positions);
+  const detailExpr = useOne(() => () => ((positions as any)?.size?.[0] || 1) - 1, positions);
+  const countExpr = useOne(() => () => ((positions as any)?.length || 0) * (+start + +end) / 2, positions);
 
   const boundStart = useBoundSource(START_ATTRIBUTE, useShaderRef(+start));
   const boundEnd = useBoundSource(END_ATTRIBUTE, useShaderRef(+end));
@@ -81,7 +82,7 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
       widths,
       depths,
       
-      count: () => (positions?.length || 0) * (+start + +end) / 2,
+      count: countExpr,
     })
   );
 };

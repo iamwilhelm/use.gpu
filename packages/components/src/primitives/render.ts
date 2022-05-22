@@ -112,11 +112,10 @@ export const render = (props: RenderProps) => {
       const v = resolve(vertexCount);
       const i = resolve(instanceCount);
 
-      if (!fiber.__inspect.render) {
-        fiber.__inspect.render = {vertexCount: 0, instanceCount: 0};
-      }
-      fiber.__inspect.render.vertexCount = v;
-      fiber.__inspect.render.instanceCount = i;
+      if (!fiber.__inspect) fiber.__inspect = {};
+      if (!fiber.__inspect.render) fiber.__inspect.render = {vertexCount: 0, instanceCount: 0};
+      fiber.__inspect!.render!.vertexCount = v;
+      fiber.__inspect!.render!.instanceCount = i;
       if (!(v * i)) return;
 
       uniform.pipe.fill(viewUniforms);

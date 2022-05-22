@@ -1,5 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { Atlas } from '@use-gpu/core/types';
+import { Atlas, Rectangle } from '@use-gpu/core/types';
 import { debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } from '@use-gpu/live';
 import { TextureSource } from '@use-gpu/core';
 
@@ -15,7 +15,7 @@ type DebugAtlasProps = {
 export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (props: Partial<DebugAtlasProps> = {}) => {
   let {atlas, source} = props;
   if (!atlas && !source) {
-    ({__debug: {atlas, sourceRef: {current: source}}} = useContext(SDFFontContext));
+    ({__debug: {atlas, sourceRef: {current: source}}} = useContext(SDFFontContext) as any);
   }
   else useNoContext(SDFFontContext);
 
@@ -37,7 +37,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
   
   const width = w / 2;
   const height = h / 2;
-  const fit = ([l, t, r, b]) => [l / 2, t / 2, r / 2, b / 2];
+  const fit = ([l, t, r, b]: Rectangle) => [l / 2, t / 2, r / 2, b / 2];
   
   let ID = 0;
   const next = () => `${id}-${ID++}`;
@@ -55,7 +55,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     });
   }
   
-  const fix = ([l, t, r, b]: [number, number, number, number]) =>
+  const fix = ([l, t, r, b]: Rectangle): Rectangle =>
     [Math.min(l, r), Math.min(t, b), Math.max(l, r), Math.max(t, b)];
 
   for (const [l, t, r, b, nearX, nearY, farX, farY, corner] of debugSlots()) {

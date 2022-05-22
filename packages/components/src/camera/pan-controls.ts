@@ -59,7 +59,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const { useKeyboard } = useContext(KeyboardContext);
 
   const { mouse } = useMouse();
-  const { wheel, stopWheel } = useWheel();
+  const { wheel } = useWheel();
   const { keyboard } = useKeyboard();
 
   useOne(() => {
@@ -106,8 +106,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     stop();
   }, wheel);
 
-  const panX = x - originX * (zoom - 1) / zoom;
-  const panY = y - originY * (zoom - 1) / zoom;
+  const panX = centered ? x - originX * (zoom - 1) / zoom : x;
+  const panY = centered ? y - originY * (zoom - 1) / zoom : y;
 
   return useMemo(() => render(panX, panY, zoom), [render, panX, panY, zoom]);
 };

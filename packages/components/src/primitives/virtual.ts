@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { RenderPassMode, DeepPartial, Prop } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
-import { memo, use, useContext, useNoContext, useFiber, useMemo, useNoMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
+import { memo, use, useContext, useNoContext, useMemo, useNoMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
@@ -160,11 +160,10 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
   }
 
   // Binds links into shader
-  const key = useFiber().id;
   const [v, f] = useMemo(() => {
     const links = { getVertex, getFragment: isDebug ? null : getFragment, getInstanceSize };
-    const v = bindBundle(vertexShader, links, undefined, key);
-    const f = bindBundle(fragmentShader, links, undefined, key);
+    const v = bindBundle(vertexShader, links, undefined);
+    const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment, isDebug]);
   

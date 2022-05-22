@@ -15,6 +15,7 @@ export type GlyphsProps = {
 
   color?: Point4,
   size?: number,
+  detail?: number,
   snap?: boolean,
 
   font: number[],
@@ -31,6 +32,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   const {
     id,
     color = BLACK,
+    detail,
     size = 16,
     snap = false,
 
@@ -46,8 +48,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
   const { getGlyph, getScale, getRadius } = useSDFFontContext();
   
+  const adjust = size / (detail ?? size);
   const radius = getRadius();
-  const scale = getScale(size);
+  const scale = getScale(detail ?? size) * adjust;
       
   const out = [] as any[];
   const rectangles = [] as number[];
@@ -66,7 +69,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     let sx = x;
     spans.iterate((_a, trim, _h, index) => {
       glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number) => {
-        const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, size);
+        const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail ?? size);
         const {image, layoutBounds, outlineBounds} = glyph;
         const [ll, lt, lr, lb] = layoutBounds;
 

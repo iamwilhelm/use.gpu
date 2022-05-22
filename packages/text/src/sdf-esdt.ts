@@ -1,5 +1,6 @@
 import { glyphToSDF as glyphToSDFv1 } from './sdf'; 
 import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage, isBlack, isWhite, isSolid, sqr } from './sdf';
+import { Image } from './types';
 
 // Convert grayscale glyph to SDF using subpixel distance transform
 export const glyphToESDT = (
@@ -28,7 +29,7 @@ export const glyphToESDT = (
   
   if (debug) {
     const sdfToDebugView = makeSDFToDebugView(wp, hp, np, radius, cutoff);
-    debug(sdfToDebugView(xo, yo, null, null, outer, inner));
+    debug(sdfToDebugView(xo, yo, xi, yi, outer, inner));
 
     esdt(outer, xo, yo, wp, hp, f, z, b, t, v, 1, 1);
     debug(sdfToDebugView(xo, yo, null, null, outer, null));
@@ -49,9 +50,12 @@ export const glyphToESDT = (
     if (relax) relaxSubpixelOffsets(stage, data, w, h, pad);
   }
 
+
   resolveSDF(xo, yo, xi, yi, (d: number, i: number) => {
     out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   });
+  
+  paintIntoDistanceField(out, data, w, h, pad, radius, cutoff);
 
   return glyphToRGBA(out, wp, hp);
 };
@@ -66,8 +70,8 @@ export const resolveSDF = (
 ) => {
   const np = xo.length;
   for (let i = 0; i < np; ++i) {
-    const outer = Math.sqrt(sqr(xo[i]) + sqr(yo[i])) - 0.5;
-    const inner = Math.sqrt(sqr(xi[i]) + sqr(yi[i])) - 0.5;
+    const outer = Math.max(0, Math.sqrt(sqr(xo[i]) + sqr(yo[i])) - 0.5);
+    const inner = Math.max(0, Math.sqrt(sqr(xi[i]) + sqr(yi[i])) - 0.5);
     f(outer >= inner ? outer : - inner, i);
   }
 }
@@ -107,6 +111,34 @@ export const paintIntoStage = (
       else {
         outer[i] = 0;
         inner[i] = 0;
+      }
+    }
+  }
+}
+
+// Paint glyph data into sdf
+export const paintIntoDistanceField = (
+  image: Uint8Array,
+  data: Uint8Array | number[],
+  w: number,
+  h: number,
+  pad: number,
+  radius: number,
+  cutoff: number,
+) => {
+  const wp = w + pad * 2;
+  const hp = h + pad * 2;
+  const np = wp * hp;
+
+  const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
+  
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const a = getData(x, y);
+      if (!isSolid(a)) {
+        const j = x + pad + (y + pad) * wp;
+        const d = 0.5 - a;
+        image[j] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
       }
     }
   }
@@ -153,12 +185,22 @@ export const paintSubpixelOffsets = (
         const tr = getData(x + 1, y - 1);
         const bl = getData(x - 1, y + 1);
         const br = getData(x + 1, y + 1);
-
+        
         const ll = (tl + l*2 + bl) / 4;
         const rr = (tr + r*2 + br) / 4;
         const tt = (tl + t*2 + tr) / 4;
         const bb = (bl + b*2 + br) / 4;
         
+        const min = Math.min(l, r, t, b, tl, tr, bl, br);
+        const max = Math.max(l, r, t, b, tl, tr, bl, br);
+        const range = max - min;
+
+        if (min > 0) {
+          // Interior creases
+          inner[j] = INF;
+          continue;
+        }
+
         let dx = rr - ll;
         let dy = bb - tt;
         let dl = 1 / Math.sqrt(sqr(dx) + sqr(dy))
@@ -205,13 +247,13 @@ export const paintSubpixelOffsets = (
   // Uses xo as input, xi as output
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
-      const c = getData(x, y);
       const j = (y + pad) * wp + x + pad;
       
       const nx = xo[j];
       const ny = yo[j];
       if (!nx && !ny) continue;
 
+      const c = getData(x, y);
       const l = getData(x - 1, y);
       const r = getData(x + 1, y);
       const t = getData(x, y - 1);
@@ -231,40 +273,72 @@ export const paintSubpixelOffsets = (
       let dy = ny;
       let dw = 1;
 
+      const dc = (c - 0.5);
+
       if (!isSolid(l) && !isSolid(r)) {
-        dx += (dxl + dxr) / 2;
-        dy += (dyl + dyr) / 2;
-        dw++;
+        if (
+          ((dxl * nx + dyl * ny) * (dc * (l - .5)) > 0) &&
+          ((dxr * nx + dyr * ny) * (dc * (r - .5)) > 0)
+        ) {
+          dx += (dxl + dxr) / 2;
+          dy += (dyl + dyr) / 2;
+          dw++;
+        }
       }
 
       if (!isSolid(t) && !isSolid(b)) {
-        dx += (dxt + dxb) / 2;
-        dy += (dyt + dyb) / 2;
-        dw++;
+        if (
+          ((dxt * nx + dyt * ny) * (dc * (t - .5)) > 0) &&
+          ((dxb * nx + dyb * ny) * (dc * (b - .5)) > 0)
+        ) {
+          dx += (dxt + dxb) / 2;
+          dy += (dyt + dyb) / 2;
+          dw++;
+        }
       }
 
       if (!isSolid(l) && !isSolid(t)) {
-        dx += (dxl + dxt - 1) / 2;
-        dy += (dyl + dyt - 1) / 2;
-        dw++;
+        if (
+          ((dxl * nx + dyl * ny) * (dc * (l - .5)) > 0) &&
+          ((dxt * nx + dyt * ny) * (dc * (t - .5)) > 0)
+        ) {
+          dx += (dxl + dxt - 1) / 2;
+          dy += (dyl + dyt - 1) / 2;
+          dw++;
+        }
       }
 
       if (!isSolid(r) && !isSolid(t)) {
-        dx += (dxr + dxt + 1) / 2;
-        dy += (dyr + dyt - 1) / 2;
-        dw++;
+        if (
+          ((dxr * nx + dyr * ny) * (dc * (r - .5)) > 0) &&
+          ((dxt * nx + dyt * ny) * (dc * (t - .5)) > 0)
+        ) {
+          dx += (dxr + dxt + 1) / 2;
+          dy += (dyr + dyt - 1) / 2;
+          dw++;
+        }
       }
 
       if (!isSolid(l) && !isSolid(b)) {
-        dx += (dxl + dxb - 1) / 2;
-        dy += (dyl + dyb + 1) / 2;
-        dw++;
+        if (
+          ((dxl * nx + dyl * ny) * (dc * (l - .5)) > 0) &&
+          ((dxb * nx + dyb * ny) * (dc * (b - .5)) > 0)
+        ) {
+          dx += (dxl + dxb - 1) / 2;
+          dy += (dyl + dyb + 1) / 2;
+          dw++;
+        }
       }
 
       if (!isSolid(r) && !isSolid(b)) {
-        dx += (dxr + dxb + 1) / 2;
-        dy += (dyr + dyb + 1) / 2;
-        dw++;
+        if (
+          ((dxr * nx + dyr * ny) * (dc * (r - .5)) > 0) &&
+          ((dxb * nx + dyb * ny) * (dc * (b - .5)) > 0)
+        ) {
+          dx += (dxr + dxb + 1) / 2;
+          dy += (dyr + dyb + 1) / 2;
+          dw++;
+        }
       }
     
       const nn = Math.sqrt(nx*nx + ny*ny);
@@ -305,7 +379,7 @@ export const paintSubpixelOffsets = (
   }
 };
 
-// Snap distance targets to neighboring target points, if closer, or halfway if closer.
+// Snap distance targets to neighboring target points, if closer
 export const relaxSubpixelOffsets = (
   stage: SDFStage,
   data: Uint8Array | number[],
@@ -319,7 +393,7 @@ export const relaxSubpixelOffsets = (
   
   const {xo, yo, xi, yi} = stage;
   
-  const relax = (xs: number[], ys: number) => {
+  const relax = (xs: Float32Array, ys: Float32Array) => {
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const j = (y + pad) * wp + x + pad;
@@ -346,7 +420,7 @@ export const relaxSubpixelOffsets = (
   };
 
   // Check if target's neighbor is closer
-  const check = (xs: number[], ys: number[], x: number, y: number, dx: number, dy: number, tx: number, ty: number, d: number, j: number) => {
+  const check = (xs: Float32Array, ys: Float32Array, x: number, y: number, dx: number, dy: number, tx: number, ty: number, d: number, j: number) => {
     const k = (y + pad) * wp + x + pad;
 
     const dx2 = dx + xs[k];
@@ -365,7 +439,7 @@ export const relaxSubpixelOffsets = (
   relax(xi, yi);
 }
 
-
+// Debug coloration
 const makeSDFToDebugView = (
   wp: number,
   hp: number,
@@ -395,22 +469,18 @@ const makeSDFToDebugView = (
   rgba.xi = xi && xi.slice();
   rgba.yi = yi && yi.slice();
   
-  if (outer) {
-    for (let i = 0; i < np; ++i) {
-      if (outer[i]) {
-        rgba.data[i * 4 + 0] *= 0.65;
-        rgba.data[i * 4 + 1] *= 0.35;
-        rgba.data[i * 4 + 2] *= 1.0;
-      }
+  if (outer) for (let i = 0; i < np; ++i) {
+    if (outer[i]) {
+      rgba.data[i * 4 + 0] *= 0.35;
+      rgba.data[i * 4 + 1] *= 0.95;
+      rgba.data[i * 4 + 2] *= 0.9;
     }
   }
-  if (inner) {
-    for (let i = 0; i < np; ++i) {
-      if (inner[i]) {
-        rgba.data[i * 4 + 0] *= 0.45;
-        rgba.data[i * 4 + 1] *= 0.65;
-        rgba.data[i * 4 + 2] *= 1.0;
-      }
+  if (inner) for (let i = 0; i < np; ++i) {
+    if (inner[i]) {
+      rgba.data[i * 4 + 0] *= 0.25;
+      rgba.data[i * 4 + 1] *= 0.65;
+      rgba.data[i * 4 + 2] *= 0.90;
     }
   }
   

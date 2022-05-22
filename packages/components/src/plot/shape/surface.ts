@@ -14,7 +14,7 @@ import {
 
 import { SurfaceLayer } from '../../layers/surface-layer';
 
-export type LineProps =
+export type SurfaceProps =
   Partial<ColorTrait> &
   Partial<LineTrait> &
   Partial<ROPTrait> &
@@ -23,7 +23,7 @@ export type LineProps =
 };
 
 export const Surface: LiveComponent<SurfaceProps> = (props) => {
-  const {colors, widths, depths} = props;
+  const {colors} = props;
 
   const positions = useContext(DataContext) ?? undefined;
 

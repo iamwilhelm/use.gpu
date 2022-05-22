@@ -5,31 +5,32 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 export type HTMLProps = {
-  container: Element,
+  container?: Element | null,
   style?: Record<string, any>,
   children?: React.ReactNode,
 };
 
 export const HTML = ({
-  container = document.body,
+  container,
   style,
   children,
 }: HTMLProps) => {
+  const element = container ?? document.body;
   const fiber = useFiber();
 
   // Create wrapper div
   const div = useResource((dispose) => {
 
     const div = document.createElement('div');
-    container.appendChild(div);
+    element.appendChild(div);
 
     dispose(() => {
-      ReactDOM.unmountComponentAtNode(container);
-      container.removeChild(div);
+      ReactDOM.unmountComponentAtNode(element);
+      element.removeChild(div);
     });
 
     return div;
-  }, [container]);
+  }, [element]);
 
   // Apply/unapply styles
   if (style) {

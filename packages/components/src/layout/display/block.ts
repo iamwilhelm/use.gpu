@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Point, Dimension, Margin, Point4, ImageAttachment } from '../types';
+import { LayoutElement, Point, Dimension, MarginLike, Margin, Point4, ImageAttachment } from '../types';
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
@@ -14,16 +14,16 @@ export type BlockProps = {
   width?: Dimension,
   height?: Dimension,
 
-  radius?: Margin | number,
-  border?: Margin | number,
+  radius?: MarginLike,
+  border?: MarginLike,
   stroke?: Point4,
   fill?: Point4,
   image?: ImageAttachment,
 
   grow?: number,
   shrink?: number,
-  margin?: number | Margin,
-  padding?: number | Margin,
+  margin?: MarginLike,
+  padding?: MarginLike,
   snap?: boolean,
   contain?: boolean,
 

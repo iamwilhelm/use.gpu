@@ -1,5 +1,5 @@
-import { LambdaSource, StorageSource } from '@use-gpu/shader/wgsl/types';
-import { ShaderModule } from '@use-gpu/shader/wgsl/types';
+import { LambdaSource, StorageSource } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 import { ArrowFunction } from '@use-gpu/live/types';
 
 import { resolve } from '@use-gpu/core';
@@ -7,8 +7,8 @@ import { useMemo } from '@use-gpu/live';
 
 type InputSource = LambdaSource | StorageSource;
 type GetProps = {
-  length: (source: InputSource) => number,
-  size: (source: InputSource) => number[],
+  length: () => number,
+  size: () => number[],
 };
 
 export const useDerivedSource = (shader: ShaderModule, getProps: GetProps) => {
@@ -19,7 +19,7 @@ export const useDerivedSource = (shader: ShaderModule, getProps: GetProps) => {
       get: (target, s) => {
         if (s === 'length') return resolve(getProps.length);
         if (s === 'size') return resolve(getProps.size);
-        return target[s];
+        return (target as any)[s];
       },
     }) as LambdaSource
   , [shader, getProps]);

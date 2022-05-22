@@ -52,7 +52,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps
   const device = useContext(DeviceContext);
 
   const {width, height} = canvas;
-  const layout = useMemo(() => [0, 0, width, height], [width, height]);
+  const layout = useMemo(() => [0, 0, width / pixelRatio, height / pixelRatio], [width, height, pixelRatio]);
 
   const renderTexture = useMemo(() =>
     samples > 1

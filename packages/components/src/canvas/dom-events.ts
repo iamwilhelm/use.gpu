@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { use, memo, useResource, useState } from '@use-gpu/live';
-import { EventProvider, MouseState, WheelState, ModifierState } from '../providers/event-provider';
+import { EventProvider, MouseState, WheelState, KeyboardState } from '../providers/event-provider';
 
 const CAPTURE_EVENT = {capture: true};
 
@@ -30,6 +30,7 @@ const makeMouseState = () => ({
   y: 0,
   moveX: 0,
   moveY: 0,
+  stopped: false,
 } as MouseState);
 
 const makeWheelState = () => ({
@@ -37,6 +38,7 @@ const makeWheelState = () => ({
   y: 0,
   moveX: 0,
   moveY: 0,
+  stopped: false,
 } as WheelState);
 
 const makeKeyboardState = () => ({
@@ -46,7 +48,8 @@ const makeKeyboardState = () => ({
     shift: false,
     meta: false,
   },
-} as ModifierState);
+  stopped: false,
+} as KeyboardState);
 
 export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children}: DOMEventsProps) => {
   const [mouse, setMouse] = useState<MouseState>(makeMouseState);
@@ -55,13 +58,14 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
 
   useResource((dispose) => {
 
-    const onModifiers = (e: Event) => {
+    const onModifiers = (event: Event) => {
+      const e = event as any;
       setKeyboard((state) => {
         if (
-          state.ctrl === e.ctrlKey &&
-          state.alt === e.altKey &&
-          state.shift === e.shiftKey &&
-          state.meta === e.metaKey
+          state.modifiers.ctrl === e.ctrlKey &&
+          state.modifiers.alt === e.altKey &&
+          state.modifiers.shift === e.shiftKey &&
+          state.modifiers.meta === e.metaKey
         ) {
           return state;
         }
@@ -74,6 +78,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
             shift: e.shiftKey,
             meta:  e.metaKey,
           },
+          stopped: false,
         };
       });
     };
@@ -93,6 +98,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
         y,
         moveX: deltaX * f,
         moveY: deltaY * f,
+        stopped: false,
       }));
 
       onMove(clientX, clientY);
@@ -112,6 +118,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
         y,
         moveX: x - state.x,
         moveY: y - state.y,
+        stopped: false,
       }));
     };
 

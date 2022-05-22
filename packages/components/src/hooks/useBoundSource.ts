@@ -1,7 +1,7 @@
 import { UniformAttribute, UniformAttributeValue } from '@use-gpu/core/types';
 import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 
-import { useOne, useMemo, useVersion } from '@use-gpu/live';
+import { useOne, useMemo, useNoMemo, useVersion } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindingToModule } from '@use-gpu/shader/wgsl';
 
@@ -27,3 +27,6 @@ export const useBoundSource = <T = any>(
     return bindingToModule(binding);
   }, [source, def]);
 }
+
+export const useNoBoundSource = useNoMemo;
+

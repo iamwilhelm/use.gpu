@@ -79,7 +79,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (c) min += step / 2;
 
         sampled = (emit: Emitter, i: number, n: number) =>
-          expr(emit, min + i * step);
+          expr(emit, min + i * step, i);
       }
       else if (n === 2) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -97,6 +97,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             emit,
             minX + i * stepX,
             minY + j * stepY,
+            i,
+            j,
           );
       }
       else if (n === 3) {
@@ -120,6 +122,9 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             minX + i * stepX,
             minY + j * stepY,
             minZ + k * stepZ,
+            i,
+            j,
+            k,
           );
       }
       else if (n === 4) {
@@ -148,6 +153,10 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             minY + j * stepY,
             minZ + k * stepZ,
             minW + l * stepW,
+            i,
+            j,
+            k,
+            l,
           );
       }
       else {

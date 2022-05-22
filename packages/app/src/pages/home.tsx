@@ -17,7 +17,7 @@ export const Title = styled('h1', {
 } as any);
 
 export type HomePageProps = {
-  container: Element,
+  container?: Element | null,
 };
 
 const PANEL_STYLE = {

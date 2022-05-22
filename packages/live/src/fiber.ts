@@ -704,7 +704,7 @@ export const consumeFiber = <F extends ArrowFunction>(
   mountFiberContinuation(fiber, use(fiber.next.f, Next), 1);
 }
 
-// Detach a fiber by mounting a subcontext manually and delegating its execution
+// Detach a fiber by mounting a subcontext manually and delegating the triggering of its execution
 export const detachFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {

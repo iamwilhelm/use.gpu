@@ -62,6 +62,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     const {time, frame, loop} = ref;
     let running = live;
     let pending = false;
+    let fibers: LiveFiber<any> = [];
 
     const render = (timestamp: number) => {
       frame.current++;
@@ -73,14 +74,17 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
       time.elapsed = timestamp - time.start;
       time.timestamp = timestamp;
 
+      for (const fiber of fibers) fiber.host?.schedule(fiber, NOP);
+      fibers.length = 0;
+
       const {dispatch} = ref;
       if (dispatch) dispatch();
       if (running) request();
     };
 
     const request = (fiber?: LiveFiber<any>) => {
-      if (fiber) requestAnimationFrame(() => fiber.host?.schedule(fiber, NOP));
       if (!pending) requestAnimationFrame(render);
+      if (fiber && fibers.indexOf(fiber) < 0) fibers.push(fiber);
       pending = true;
     };
     dispose(() => running = false);

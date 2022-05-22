@@ -3,7 +3,7 @@ import { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait, VectorLike, Swi
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShader } from '../../hooks/useBoundShader';
-import { useBoundStorage } from '../../hooks/useBoundStorage';
+import { useRawSource } from '../../hooks/useRawSource';
 import { useShaderRef } from '../../hooks/useShaderRef';
 
 import { RangeContext } from '../../providers/range-provider';

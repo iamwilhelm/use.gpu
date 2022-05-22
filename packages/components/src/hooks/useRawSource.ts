@@ -6,7 +6,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { useBufferedSize } from './useBufferedSize';
 
 // Turn a typed array into a storage source
-export const useBoundStorage = (array: TypedArray, format: UniformType, live: boolean = false) => {
+export const useRawSource = (array: TypedArray, format: UniformType, live: boolean = false) => {
   const device = useContext(DeviceContext);
 
   const alloc = useBufferedSize(array.byteLength);

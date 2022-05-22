@@ -8,7 +8,7 @@ import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundStorage } from '../hooks/useBoundStorage';
+import { useRawSource } from '../hooks/useRawSource';
 
 import { useFontFamily } from '../text/providers/font-provider';
 import { SDFFontProvider } from '../text/providers/sdf-font-provider';
@@ -100,10 +100,10 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           [data] : [SDFGlyphData],
         ) => {
           const {sdf} = data;
-          const indices = useBoundStorage(data.indices, 'u32');
-          const rectangles = useBoundStorage(data.rectangles, 'vec4<f32>');
-          const layouts = useBoundStorage(data.layouts, 'vec2<f32>');
-          const uvs = useBoundStorage(data.uvs, 'vec4<f32>');
+          const indices = useRawSource(data.indices, 'u32');
+          const rectangles = useRawSource(data.rectangles, 'vec4<f32>');
+          const layouts = useRawSource(data.layouts, 'vec2<f32>');
+          const uvs = useRawSource(data.uvs, 'vec4<f32>');
 
           return fragment([
             //debug(wrap(Flat, wrap(UI, use(DebugAtlas, {atlas, source})))),

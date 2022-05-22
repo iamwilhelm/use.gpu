@@ -3,7 +3,7 @@ import { StorageSource } from '@use-gpu/core/types';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkFaces } from '@use-gpu/core';
-import { useBoundStorage } from '../hooks/useBoundStorage';
+import { useRawSource } from '../hooks/useRawSource';
 
 type FaceSegmentsProps = {
   chunks?: number[],
@@ -30,7 +30,7 @@ export const FaceSegments: LiveComponent<FaceSegmentsProps> = memo((
   }, [chunks, loops, count]);
 
   // Bind as shader storage
-  const segments = useBoundStorage(segmentBuffer, 'i32');
+  const segments = useRawSource(segmentBuffer, 'i32');
 
   return render ? render(segments) : yeet(segments);
 }, 'FaceSegments');

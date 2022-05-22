@@ -3,7 +3,7 @@ import { StorageSource } from '@use-gpu/core/types';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkSegments, generateChunkAnchors } from '@use-gpu/core';
-import { useBoundStorage } from '../hooks/useBoundStorage';
+import { useRawSource } from '../hooks/useRawSource';
 
 type ArrowSegmentsProps = {
   chunks?: number[],
@@ -46,9 +46,9 @@ export const useArrowSegments = (
   }, [chunks, loops, starts, ends, count]);
 
   // Bind as shader storage
-  const segments = useBoundStorage(segmentBuffer, 'i32');
-  const anchors = useBoundStorage(anchorBuffer, 'vec4<u32>');
-  const trims = useBoundStorage(trimBuffer, 'vec4<u32>');
+  const segments = useRawSource(segmentBuffer, 'i32');
+  const anchors = useRawSource(anchorBuffer, 'vec4<u32>');
+  const trims = useRawSource(trimBuffer, 'vec4<u32>');
   
   return {segments, anchors, trims};
 }

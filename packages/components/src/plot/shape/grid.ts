@@ -4,7 +4,7 @@ import { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, VectorLike, Swi
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useBoundShader } from '../../hooks/useBoundShader';
-import { useBoundStorage } from '../../hooks/useBoundStorage';
+import { useRawSource } from '../../hooks/useRawSource';
 import { useShaderRef } from '../../hooks/useShaderRef';
 
 import { RangeContext } from '../../providers/range-provider';
@@ -78,7 +78,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     }, [r[0], r[1], options]);
 
     const values = useMemo(() => newValues, newValues as any);
-    const data = useBoundStorage(values, 'f32');
+    const data = useRawSource(values, 'f32');
     const n = values.length * (detail + 1);
 
     const min = vec4.clone(p as any);

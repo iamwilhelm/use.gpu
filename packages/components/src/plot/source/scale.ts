@@ -8,7 +8,7 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
-import { useBoundStorage } from '../../hooks/useBoundStorage';
+import { useRawSource } from '../../hooks/useRawSource';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useShaderRef } from '../../hooks/useShaderRef';
 
@@ -50,7 +50,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
   }, [r[0], r[1], props]);
 
   const values = useMemo(() => newValues, newValues as any);
-  const data = useBoundStorage(values, 'f32');
+  const data = useRawSource(values, 'f32');
   const n = values.length;
 
   // Make tick vertex shader

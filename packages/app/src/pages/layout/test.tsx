@@ -35,15 +35,16 @@ export const LayoutTestPage: LC = () => {
 
 							<Block margin={10} fill={[1, 1, 1, 0.1]}>
 
-								<Flex gap={10} align="start" anchor="center" height={200}>{BOXES}</Flex>
-								<Flex gap={10} align="center" anchor="center" height={200}>{BOXES}</Flex>
-								<Flex gap={10} align="end" anchor="center" height={200}>{BOXES}</Flex>
-								<Flex gap={10} align="justify" anchor="center" height={200}>{BOXES}</Flex>
-								<Flex gap={10} align="between" anchor="center" height={200}>{BOXES}</Flex>
-								<Flex gap={10} align="evenly" anchor="center" height={200}>{BOXES}</Flex>
-								
+								<Flex margin={10} gap={10} align="start"   anchor="center" height={200}>{BOXES}</Flex>
+								<Flex margin={10} gap={10} align="center"  anchor="center" height={200}>{BOXES}</Flex>
+								<Flex margin={10} gap={10} align="end"     anchor="center" height={200}>{BOXES}</Flex>
+
+								<Flex wrap margin={10} gap={10} align="justify" anchor="center" height={250}>{BOXES}{BOXES}</Flex>
+								<Flex wrap margin={10} gap={10} align="between" anchor="center" height={250}>{BOXES}{BOXES}</Flex>
+								<Flex wrap margin={10} gap={10} align="evenly"  anchor="center" height={250}>{BOXES}{BOXES}</Flex>
+
 							</Block>
-							
+
 						</Overflow>
           </Layout>
         </UI>

@@ -17,7 +17,7 @@ import { makeShaderBindings, resolve } from '@use-gpu/core';
 
 import { makeArrow } from './mesh/arrow';
 import { RawData } from '../data/raw-data';
-import { useBoundStorage } from '../hooks/useBoundStorage';
+import { useRawSource } from '../hooks/useRawSource';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -86,7 +86,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const w = useShaderRef(props.width, props.widths);
   const d = useShaderRef(props.depth, props.depths);
   
-  const g = useBoundStorage(mesh.vertices[0], 'vec4<f32>');
+  const g = useRawSource(mesh.vertices[0], 'vec4<f32>');
   const xf = useApplyTransform(p);
 
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, c, z, w, d]);

@@ -185,4 +185,5 @@ export type HostInterface = {
 
   __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
   __ping: (fiber: LiveFiber<any>, active?: boolean) => void,
+  __highlight: (id: number | null, active?: boolean) => void,
 };

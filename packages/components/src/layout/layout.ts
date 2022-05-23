@@ -7,6 +7,7 @@ import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
 import { ViewContext } from '../providers/view-provider';
+import { useInspectFiber } from '../hooks/useInspectable';
 
 import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec3 } from 'gl-matrix';
@@ -101,8 +102,10 @@ export const Inspect = (pickers: any[]) => {
     viewSize: { current: [width, height] },
     projectionMatrix: { current: matrix },
   } = viewUniforms;
+  
+  const setHighlight = useInspectFiber();
 
-  const { mouse } = useMouse();
+  const { mouse, pressed } = useMouse();
   const [px, py] = screenToView(matrix, mouse.x / width * 2.0 - 1.0, 1.0 - mouse.y / height * 2.0);
 
   const picked = useOne(() => {
@@ -114,7 +117,10 @@ export const Inspect = (pickers: any[]) => {
 
   if (!picked) return null;
 
-  const [, rectangle] = picked;
+  const [pickedId, rectangle] = picked;
+  useOne(() => setHighlight(pickedId ?? null), pickedId);
+  useOne(() => pressed.left && setHighlight(pickedId ?? null, true), pressed.left);
+
   return useMemo(() => 
     use(UIRectangle, {
       id,

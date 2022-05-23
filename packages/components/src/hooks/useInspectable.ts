@@ -1,4 +1,4 @@
-import { useOne, useFiber, useState } from '@use-gpu/live';
+import { useCallback, useOne, useFiber, useState } from '@use-gpu/live';
 
 export const useInspectable = () => {
   const fiber = useFiber();
@@ -22,5 +22,11 @@ export const useInspectHover = () => {
   }
   
   return hovered;
+}
+
+export const useInspectFiber = () => {
+  const fiber = useFiber();
+  const highlight = fiber.host?.__highlight;
+  return highlight;
 }
 

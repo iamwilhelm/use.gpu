@@ -143,8 +143,12 @@ export const fitBlock = (
     const [ml, mt, mr, mb] = margin;
 
     const size = relativeFit.slice() as AutoPoint;
-    if (isX) size[1] -= mt + mb;
-    else size[0] -= ml + mr;
+    if (isX) {
+      if (size[1] != null) size[1] -= mt + mb;
+    }
+    else {
+      if (size[0] != null) size[0] -= ml + mr;
+    }
 
     const {render, pick, size: fitted} = fit(size);
 

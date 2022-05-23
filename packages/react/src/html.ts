@@ -25,7 +25,7 @@ export const HTML = ({
     element.appendChild(div);
 
     dispose(() => {
-      ReactDOM.unmountComponentAtNode(element);
+      ReactDOM.unmountComponentAtNode(div);
       element.removeChild(div);
     });
 

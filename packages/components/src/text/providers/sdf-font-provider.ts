@@ -225,18 +225,18 @@ export const useSDFGlyphData = (
     };
 
     // Push all text spans into layout
-    const {baseline, lineHeight} = height;
+    const {ascent, lineHeight} = height;
     const cursor = makeLayoutCursor(wrap, align);
     spans.iterate((advance, trim, hard) => cursor.push(advance, trim, hard, lineHeight));
 
     // Gather lines produced
     const [left, top] = layout;
-    const currentLayout: Rectangle = [left, top + baseline, 0, 0];
+    const currentLayout: Rectangle = [left, top + ascent, 0, 0];
     let lastIndex = -1;
 
-    const layouts = cursor.gather((start, end, lead, gap, count, cross, base, index) => {
+    const layouts = cursor.gather((start, end, lead, gap, count, cross, base, descent, index) => {
       if (index !== lastIndex) {
-        currentLayout[1] = top + baseline;
+        currentLayout[1] = top + ascent;
         lastIndex = index;
       }
 

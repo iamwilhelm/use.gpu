@@ -87,6 +87,7 @@ export const makeBoxLayout = (
   let [left, top, right, bottom] = box;
   const out = [] as LiveElement<any>[];
   const n = sizes.length;
+  const xform = parent && transform ? chainTo(parent, transform) : parent ?? transform;
 
   for (let i = 0; i < n; ++i) {
     const size = sizes[i];
@@ -99,7 +100,7 @@ export const makeBoxLayout = (
     const b = t + size[1];
 
     const layout = [l, t, r, b] as Rectangle;
-    const el = render(layout, parent && transform ? chainTo(parent, transform) : parent ?? transform);
+    const el = render(layout, xform);
 
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);

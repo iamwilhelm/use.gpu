@@ -57,6 +57,7 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
       shrink,
       ratioX,
       ratioY,
+      absolute: true,
       fit: memoFit((into: Point) => {
         const w = width != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;

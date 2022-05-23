@@ -16,6 +16,7 @@ export const makeLayoutCursor = (
   let spanTrim = 0;
   let spanCross = 0;
   let spanBase = 0;
+  let spanDescent = 0;
 
   let start: number = 0;
   let end: number = 0;
@@ -28,7 +29,7 @@ export const makeLayoutCursor = (
   let sizes: number[] = [];
   let index = 0;
 
-  const push = (advance: number, trim: number, hard: number, cross: number = 0, base: number = 0) => {
+  const push = (advance: number, trim: number, hard: number, cross: number = 0, base: number = 0, descent: number = 0) => {
     if (max > 0 && (spanAdvance + advance - trim > max)) {
       flush(0);
       start = index;
@@ -43,6 +44,7 @@ export const makeLayoutCursor = (
     spanAdvance += advance;
     spanCross = Math.max(spanCross, cross);
     spanBase = Math.max(spanBase, base);
+    spanDescent = Math.max(spanDescent, descent);
 
     if (hard) {
       flush(hard);
@@ -58,7 +60,7 @@ export const makeLayoutCursor = (
       const spanSize = spanAdvance - spanTrim;
       chunkAdvance = Math.max(chunkAdvance, spanSize);
 
-      rows.push(start, end, hard, spanSize, spanCount, spanCross, spanBase, chunkIndex);
+      rows.push(start, end, hard, spanSize, spanCount, spanCross, spanBase, spanDescent, chunkIndex);
       chunkCross += spanCross;
     }
 
@@ -67,6 +69,7 @@ export const makeLayoutCursor = (
     spanTrim = 0;
     spanCross = 0;
     spanBase = 0;
+    spanDescent = 0;
 
     if (hard === 2) {
       chunkIndex++;
@@ -81,11 +84,11 @@ export const makeLayoutCursor = (
     flush(2);
 
     const s = makeTuples(sizes, 2);
-    const r = makeTuples(rows, 8);
-    r.iterate((start: number, end: number, hard: number, advance: number, count: number, cross: number, base: number, index: number) => {
-      const slack = s.get(index, 0) - advance;
+    const r = makeTuples(rows, 9);
+    r.iterate((start: number, end: number, hard: number, advance: number, count: number, cross: number, base: number, descent: number, index: number) => {
+      const slack = (max || s.get(index, 0)) - advance;
       const [gap, lead] = getAlignmentSpacing(slack, count, !!hard, align);
-      reduce(start, end, gap, lead, count, cross, base, index);
+      reduce(start, end, gap, lead, count, cross, base, descent, index);
     });
 
     return new Float32Array(sizes);

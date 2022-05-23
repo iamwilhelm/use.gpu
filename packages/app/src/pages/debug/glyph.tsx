@@ -213,14 +213,14 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   );
   
   return (
-    <DebugProvider debug={{sdf2d: {subpixel, contours, relax}, layout: {inspect: false}}}>
+    <DebugProvider debug={{sdf2d: {subpixel, contours, relax}, layout: {inspect: true}}}>
       <Draw>
         <Pass>
           <UI>
             <Layout>
               <Flex direction="y" anchor={"center"} align={"center"} height={'100%'}>
 
-                <Block margin={20} height={50}>
+                <Block margin={20}>
                   <Inline align={"center"}>
                     <Text
                       size={32}

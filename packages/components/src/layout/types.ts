@@ -65,6 +65,9 @@ export type LayoutElement = {
 export type InlineElement = {
   spans: Tuples<4>,
   height: FontMetrics,
+  margin?: Margin,
+  anchor?: Base,
+  block?: LayoutFit,
   absolute?: boolean,
   render: InlineRenderer,
 };

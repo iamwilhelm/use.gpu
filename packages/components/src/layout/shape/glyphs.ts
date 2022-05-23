@@ -62,9 +62,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   for (const {layout, start, end, gap} of lines) {
     const [l, t] = layout;
 
-    const {baseline, lineHeight} = height;
+    const {ascent, lineHeight} = height;
     let x = l;
-    let y = t + baseline;
+    let y = t + ascent;
 
     let sx = x;
     spans.iterate((_a, trim, _h, index) => {

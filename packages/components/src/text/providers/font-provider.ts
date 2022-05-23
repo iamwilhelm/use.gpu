@@ -70,11 +70,13 @@ export const useFontHeight = (
   const [id] = stack;
 
   return useMemo(() => {
-    const {ascent, descent, lineHeight: fontHeight} = rustText.measureFont(id, size);
+    let {ascent, descent, lineHeight: fontHeight} = rustText.measureFont(id, size);
 
     const lh = lineHeight ?? fontHeight;
-    const baseline = ascent + (lh - fontHeight) / 2;
+    const pad = (lh - fontHeight) / 2;
+    ascent += pad;
+    descent -= pad;
 
-    return {ascent, descent, baseline, lineHeight: lh};
+    return {ascent, descent, lineHeight: lh};
   }, [id, size, lineHeight, rustText]);
 }

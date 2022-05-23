@@ -4,6 +4,28 @@ declare module '@use-gpu/wgsl' {
   export default WGSLModules;
 }
   
+declare module "@use-gpu/wgsl/clip/clip.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getCombinedClip: ParsedBundle;
+  export const getTransformedClip: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/clip/layout.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getShiftedRectangle: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/clip/scroll.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getScrolledPosition: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;

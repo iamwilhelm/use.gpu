@@ -7,7 +7,7 @@ import { useFiber, useResource, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 
 import {
-  AutoCanvas, CanvasPicking,
+  AutoCanvas, DebugProvider,
   FontLoader,
   Router, Routes,
   WebGPU,
@@ -54,23 +54,25 @@ export const App: LC = () => {
   ];
 
   const fiber = useFiber();
-  const inspect = useInspector();
+  const {inspect, layout, setLayout} = useInspector();
 
-  return [
-    <WebGPU
-      fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
-    >
-      <AutoCanvas
-        selector={'#use-gpu'}
-        samples={4}
-      >
-        <FontLoader fonts={fonts}>
-          {router}
-        </FontLoader>
-      </AutoCanvas>
-    </WebGPU>,
-    inspect ? <UseInspect fiber={fiber} container={root} /> : null
-  ];
+  return (<>
+		<DebugProvider debug={{layout: {inspect: layout}}}>
+		  <WebGPU
+		    fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
+		  >
+		    <AutoCanvas
+		      selector={'#use-gpu'}
+		      samples={4}
+		    >
+		      <FontLoader fonts={fonts}>
+		        {router}
+		      </FontLoader>
+		    </AutoCanvas>
+		  </WebGPU>
+		</DebugProvider>
+    {inspect ? <UseInspect fiber={fiber} container={root} onInspect={setLayout} /> : null}
+  </>)
 };
 
 // Toggle inspector with ctrl/cmd-I.
@@ -78,6 +80,7 @@ export const App: LC = () => {
 const useInspector = () => {
   const [version, setVersion] = useState<number>(0);
   const [inspect, setInspect] = useState<boolean>(true);
+  const [layout, setLayout] = useState<boolean>(false);
 
   useResource((dispose) => {
     const keydown = (e: KeyboardEvent) => {
@@ -89,5 +92,5 @@ const useInspector = () => {
     dispose(() => window.addEventListener('keydown', keydown));
   });
 
-  return inspect;
+  return {inspect, layout, setLayout};
 }

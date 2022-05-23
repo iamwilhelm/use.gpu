@@ -5,7 +5,7 @@ const NO_LAYOUT = [0, 0, 0, 0] as Rectangle;
 
 export const fitAbsoluteBox = (
   els: LayoutElement[],
-  into: Point,
+  into: AutoPoint,
   l?: string | number | null,
   t?: string | number | null,
   r?: string | number | null,
@@ -14,12 +14,12 @@ export const fitAbsoluteBox = (
   h?: string | number | null,
   snap?: boolean,
 ) => {
-  let [width, height] = into;
-  const box = resolveAbsoluteBox([0, 0, width, height], l, t, r, b, w, h, snap);
+  const [iw, ih] = into;
+  const box = resolveAbsoluteBox([0, 0, iw ?? 0, ih ?? 0], l, t, r, b, w, h, snap);
   const [left, top, right, bottom] = box;
 
-  width = right - left;
-  height = bottom - top;
+  const width = right - left;
+  const height = bottom - top;
   const size = [width, height] as Point;
 
   const sizes = [] as Point[];
@@ -70,20 +70,20 @@ export const resolveAbsoluteBox = (
   let favorW = false;
   let favorH = false;
 
-  if (l != null) left   += parseDimension(l, width);
-  if (r != null) right  -= parseDimension(r, width);
-  if (t != null) top    += parseDimension(t, height);
-  if (b != null) bottom -= parseDimension(b, height);
+  if (l != null) left   += parseDimension(l, width)!;
+  if (r != null) right  -= parseDimension(r, width)!;
+  if (t != null) top    += parseDimension(t, height)!;
+  if (b != null) bottom -= parseDimension(b, height)!;
 
   if (w != null) {
-    width = parseDimension(w, width);
+    width = parseDimension(w, width)!;
     if (l != null || r == null) right = left + width;
     else left = right - width;
     favorW = true;
   }
 
   if (h != null) {
-    height = parseDimension(h, height);
+    height = parseDimension(h, height)!;
     if (t != null || b == null) bottom = top + height;
     else top = bottom - height;
     favorH = true;

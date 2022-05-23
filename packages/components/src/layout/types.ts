@@ -34,8 +34,8 @@ export type ImageAttachment = {
   align?: Anchor | [Anchor, Anchor],
 };
 
-export type LayoutRenderer = (box: Rectangle, transform?: ShaderModule) => LiveElement<any>;
-export type InlineRenderer = (lines: InlineLine[], transform?: ShaderModule) => LiveElement<any>;
+export type LayoutRenderer = (box: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>;
+export type InlineRenderer = (lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>;
 
 export type LayoutScroller = (x: number, y: number) => void;
 export type LayoutPicker = (x: number, y: number, ox: number, oy: number, scroll: boolean) => [number, Rectangle, LayoutScroller] | null;
@@ -59,7 +59,7 @@ export type LayoutElement = {
   absolute?: boolean,
   under?: boolean,
 
-  fit: (size: Point) => LayoutFit,
+  fit: (size: AutoPoint) => LayoutFit,
 };
 
 export type InlineElement = {
@@ -94,6 +94,7 @@ export type UIAggregate = {
   repeat?: number,
 
   texture?: TextureSource,
-  transform?: any,
+  clip?: ShaderModule,
+  transform?: ShaderModule,
   bounds: Rectangle,
 };

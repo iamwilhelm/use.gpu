@@ -11,7 +11,7 @@ import { Call } from './panels/call';
 import { Shader } from './panels/shader';
 import { Layout } from './panels/layout';
 import {
-  InspectContainer, InspectToggle, Button, TreeControls,
+  InspectContainer, InspectToggle, Button, SmallButton, TreeControls, Spacer,
   SplitRow, RowPanel, Panel, PanelFull, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 import { PingProvider } from './ping';
@@ -26,13 +26,22 @@ type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
 
 type InspectProps = {
   fiber: LiveFiber<any>,
+	onInspect?: (b: boolean) => void,
 }
 
-export const Inspect: React.FC<InspectProps> = ({fiber}) => {
+export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
   const depthCursor = useUpdateState<number>(10);
   const hoveredCursor = useUpdateState<HoverState>(() => ({ fiber: null, by: null, deps: [], precs: [], root: null, depth: 0 }));
+	
+	const [inspect, setInspect] = useState<boolean>(false);
+	const toggleInspect = () => {
+		setInspect(s => {
+			onInspect && onInspect(!s);
+			return !s;
+		});
+	};
 
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);
@@ -55,7 +64,10 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
 		host.__highlight = (id: number | null, active?: boolean) => {
 			const fiber = fibers.get(id);
 			if (fiber) {
-				if (active) return setSelected({ $set: fiber });
+				if (active) {
+					setInspect(false);
+					return setSelected({ $set: fiber });
+				}
 
 		    const root = fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null;
 				updateHovered({ $set: {
@@ -105,6 +117,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber}) => {
     <InsetColumnFull>
       <TreeControls>
         <DetailSlider value={depthLimit} onChange={setDepthLimit} />
+				<Spacer />
+        <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}>{ICON('ads_click')}</SmallButton>
       </TreeControls>
       <FiberTree
         fiber={fiber}

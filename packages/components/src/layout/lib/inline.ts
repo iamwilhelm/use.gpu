@@ -179,12 +179,12 @@ export const fitInline = (
       renders.push(render);
       //pickers.push(pick);
       
-      if (block) anchors.push(offset);
-      
       span += count;
       n -= count;
       
       if (count === last) {
+        if (block) anchors.push(offset as number[] as Point);
+
         i++;
         span = 0;
       }

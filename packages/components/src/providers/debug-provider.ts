@@ -2,7 +2,7 @@ import { DeepPartial, StorageSource, LambdaSource, TypedArray } from '@use-gpu/c
 import { ShaderModule } from '@use-gpu/shader/types';
 import { LC, PropsWithChildren } from '@use-gpu/live/types';
 
-import { provide, memo, makeContext, useContext, useOne } from '@use-gpu/live';
+import { provide, memo, makeContext, useContext, useMemo } from '@use-gpu/live';
 import { patch } from '@use-gpu/state';
 
 export const DEBUG_DEFAULTS = {
@@ -35,6 +35,7 @@ export const DebugContext = makeContext<DebugContextProps>(DEBUG_DEFAULTS, 'Debu
 export const useDebugContext = () => useContext(DebugContext);
 
 export const DebugProvider: LC<DebugProviderProps> = memo(({debug, children}: PropsWithChildren<DebugProviderProps>) => {
-  const context = useOne(() => patch(DEBUG_DEFAULTS, debug), debug);
+  const parent = useContext(DebugContext);
+  const context = useMemo(() => patch(parent, debug), [parent, debug]);
   return provide(DebugContext, context, children);
 }, 'DebugProvider');

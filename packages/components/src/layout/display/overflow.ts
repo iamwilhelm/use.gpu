@@ -1,12 +1,17 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { AutoPoint, Point, Point4, Margin, LayoutElement } from '../types';
+import { ShaderModule } from '@use-gpu/shader/types';
+import { UniformType } from '@use-gpu/core/types';
+import { AutoPoint, Rectangle, Point, Point4, Margin, LayoutElement } from '../types';
 
 import { memo, use, gather, yeet, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
-import { bindBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
-import { useInspectable } from '../../hooks/useInspectable'
+import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
+import { useInspectable } from '../../hooks/useInspectable';
+import { useBoundShader } from '../../hooks/useBoundShader';
+import { useBoundSource } from '../../hooks/useBoundSource';
 
-import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
+import { getScrolledPosition } from '@use-gpu/wgsl/clip/scroll.wgsl';
+import { getShiftedRectangle } from '@use-gpu/wgsl/clip/layout.wgsl';
 
 import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
@@ -17,7 +22,8 @@ import { mat4 } from 'gl-matrix';
 const NO_FIXED: [null, null] = [null, null];
 const NO_POINT4: Point4 = [0, 0, 0, 0];
 
-const MATRIX_BINDING = bundleToAttribute(getCartesianPosition, 'getMatrix');
+const OFFSET_BINDING = bundleToAttribute(getScrolledPosition, 'getOffset');
+const CLIP_BINDING = {name: 'getClip', format: 'vec4<f32>' as UniformType};
 
 export type OverflowProps = {
   x?: 'visible' | 'scroll' | 'hidden' | 'auto',
@@ -42,26 +48,38 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
   const scrollRef = useMemo(() => [initialX, initialY] as [number, number], [initialX, initialY]);
   const sizeRef = useOne(() => [0, 0, 0, 0]);
-  const matrix = useOne(() => mat4.create());
+  const offsetRef = useOne(() => [-initialX, -initialY]);
+  const clipRef = useOne(() => [0, 0, 0, 0]);
+  const boxRef = useOne(() => ({current: [0, 0]}));
 
   const scrollTo = (x: number, y: number) => {
-    const dx = Math.max(0, sizeRef[2] - sizeRef[0]);
-    const dy = Math.max(0, sizeRef[3] - sizeRef[1]);
-    scrollRef[0] = Math.max(0, Math.min(dx, x));
-    scrollRef[1] = Math.max(0, Math.min(dy, y));
-    matrix[12] = -scrollRef[0];
-    matrix[13] = -scrollRef[1];
+    const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
+    
+    const dx = Math.max(0, innerWidth - outerWidth);
+    const dy = Math.max(0, innerHeight - outerHeight);
+    const sx = scrollRef[0] = Math.max(0, Math.min(dx, x));
+    const sy = scrollRef[1] = Math.max(0, Math.min(dy, y));
+    offsetRef[0] = -sx;
+    offsetRef[1] = -sy;
+    clipRef[0] = sx;
+    clipRef[1] = sy;
+    clipRef[2] = sx + outerWidth;
+    clipRef[3] = sy + outerHeight;
   };
 
   const scrollBy = (dx: number, dy: number) => {
     scrollTo(scrollRef[0] + dx, scrollRef[1] + dy);
   };
 
-  const transform = useOne(() => {
-    const getMatrix = bindingToModule(makeRefBinding(MATRIX_BINDING, matrix));
-    return bindBundle(getCartesianPosition, {getMatrix});
-  });
-  
+  const c = useBoundSource(CLIP_BINDING, clipRef);
+  const b = useBoundSource(OFFSET_BINDING, boxRef);
+
+  const shift = useBoundShader(getShiftedRectangle, [OFFSET_BINDING], [b]);
+  const transform = useBoundShader(getScrolledPosition, [OFFSET_BINDING], [offsetRef]);
+  const inverse = useBoundShader(getScrolledPosition, [OFFSET_BINDING], [scrollRef]);
+
+  const clip = useOne(() => chainTo(c, shift));
+
   const {id} = useFiber();
   const inspect = useInspectable();
 
@@ -76,7 +94,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
       absolute: true,
       fit: memoFit((into: AutoPoint) => {
 
-        const resolved = direction === 'x' ? [null, into[1]] : [into[0], null]
+        const resolved: AutoPoint = direction === 'x' ? [null, into[1]] : [into[0], null];
         const {render, pick, size} = fit(resolved);
 
         const sizes = [size];
@@ -98,17 +116,20 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
         sizeRef[1] = into[1] ?? 0;
         sizeRef[2] = size[0] + ml + mr;
         sizeRef[3] = size[1] + mt + mb;
-        console.log({sizeRef, into})
 
         const [x, y] = scrollRef;
-        const sx = into[0] != null ? Math.max(0, Math.min(size[0] - into[0], x)) : 0;
-        const sy = into[1] != null ? Math.max(0, Math.min(size[1] - into[1], y)) : 0;
-
-        scrollTo(sx, sy);
+        scrollTo(x, y);
 
         const self = {
           size,
-          render: makeBoxLayout(sizes, offsets, renders, transform),
+          render: (
+            box: Rectangle,
+            parentClip?: ShaderModule,
+            parentTransform?: ShaderModule,
+          ) => {
+            boxRef.current = box;
+            return makeBoxLayout(sizes, offsets, renders, clip, transform, inverse)(box, parentClip, parentTransform);
+          },
           pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
         };
 

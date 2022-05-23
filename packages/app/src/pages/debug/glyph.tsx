@@ -213,7 +213,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   );
   
   return (
-    <DebugProvider debug={{sdf2d: {subpixel, contours, relax}, layout: {inspect: true}}}>
+    <DebugProvider debug={{sdf2d: {subpixel, contours, relax}}}>
       <Draw>
         <Pass>
           <UI>
@@ -231,7 +231,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                   </Inline>
                 </Block>
 
-                <Flex align={"center"} gap={0}>
+                <Flex align={"center"} gap={10}>
                   <Block>
                     <TextureFrame texture={rgbaTexture}>
                       <Sampled

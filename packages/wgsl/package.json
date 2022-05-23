@@ -23,6 +23,21 @@
   "types": "./types/wgsl-files/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./clip/clip.wgsl": {
+      "types": "./src/clip/clip.wgsl.d.ts",
+      "import": "./src/clip/clip.wgsl",
+      "require": "./src/clip/clip.wgsl"
+    },
+    "./clip/layout.wgsl": {
+      "types": "./src/clip/layout.wgsl.d.ts",
+      "import": "./src/clip/layout.wgsl",
+      "require": "./src/clip/layout.wgsl"
+    },
+    "./clip/scroll.wgsl": {
+      "types": "./src/clip/scroll.wgsl.d.ts",
+      "import": "./src/clip/scroll.wgsl",
+      "require": "./src/clip/scroll.wgsl"
+    },
     "./fragment/pbr.wgsl": {
       "types": "./src/fragment/pbr.wgsl.d.ts",
       "import": "./src/fragment/pbr.wgsl",

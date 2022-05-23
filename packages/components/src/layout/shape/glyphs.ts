@@ -25,6 +25,7 @@ export type GlyphsProps = {
   height: FontMetrics,
   lines: InlineLine[],
   
+  clip?: ShaderModule,
   transform?: ShaderModule,
 };
 
@@ -43,6 +44,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     height,
     lines,
 
+    clip,
     transform,
   } = props;
 
@@ -116,6 +118,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     fill: color,
     texture: SDF_FONT_ATLAS,
     count,
+    clip,
     transform,
     bounds,
   } : null;

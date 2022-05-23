@@ -3,13 +3,19 @@ import { Alignment } from '../types';
 import { makeTuples } from '@use-gpu/core';
 import { parseAnchor } from './util';
 
-type Reduce = (start: number, end: number, gap: number, lead: number, count: number, cross: number, index: number) => void;
+type Reduce = (start: number, end: number, gap: number, lead: number, count: number, cross: number, ascent: number, descent: number, index: number) => void;
+
+type LayoutCursor = {
+  push: (advance: number, trim: number, hard: number, cross?: number, base?: number, descent?: number) => void,
+  flush: (x: number) => void,
+  gather: (reduce: Reduce) => Float32Array,
+};
 
 // Layout cursor for putting inline items on lines, with line wrapping, alignment and justification.
 export const makeLayoutCursor = (
   max: number,
   align: Alignment,
-) => {
+): LayoutCursor => {
 
   let spanCount = 0;
   let spanAdvance = 0;

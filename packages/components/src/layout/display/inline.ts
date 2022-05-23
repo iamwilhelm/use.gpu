@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Point, Alignment, Base, Margin } from '../types';
+import { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Point, Rectangle, Alignment, Base, Margin } from '../types';
+import { ShaderModule } from '@use-gpu/shader/types';
 
 import { memo, gather, yeet, useFiber, useOne } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
@@ -82,10 +83,11 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
           size,
           render: (
             box: Rectangle,
+            clip?: ShaderModule,
             transform?: ShaderModule,
           ) => {
-            const out = makeInlineLayout(ranges, offsets, renders)(box, transform);
-            if (sizes.length) out.push(...makeBoxLayout(sizes, blockOffsets, blockRenders)(box, transform));
+            const out = makeInlineLayout(ranges, offsets, renders)(box, clip, transform);
+            if (sizes.length) out.push(...makeBoxLayout(sizes, blockOffsets, blockRenders)(box, clip, transform));
             return out;
           },
           pick: makeBoxPicker(id, sizes, blockOffsets, blockPickers),

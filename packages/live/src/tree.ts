@@ -56,6 +56,7 @@ export const makeHost = (
     options,
 
     __ping: () => {},
+    __highlight: () => {},
     __stats: {mounts: 0, unmounts: 0, updates: 0, dispatch: 0},
   } as HostInterface;
 

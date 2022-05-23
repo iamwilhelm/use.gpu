@@ -42,6 +42,7 @@ export type UIRectanglesProps = {
 
   texture?: TextureSource | LambdaSource | ShaderModule,
   transform?: ShaderModule,
+  clip?: ShaderModule,
 
   debugContours?: boolean,
 
@@ -120,9 +121,10 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
 
   const parent = useTransformContext();
   const x = props.transform || parent;
+  const c = props.clip;
   const t = props.texture;
 
-  const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x]);
+  const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x, c]);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
 
   let defines = alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA;

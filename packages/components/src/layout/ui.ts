@@ -14,6 +14,7 @@ import {
   updateAggregateBuffer,
   updateAggregateSegments,
 } from '@use-gpu/core';
+import { overlapBounds, joinBounds } from './lib/util'
 
 import { UIRectangles } from '../primitives/ui-rectangles';
 
@@ -114,6 +115,7 @@ const makeUIAccumulator = (
 
   const hasTexture = keys.has('texture');
   const hasTransform = keys.has('transform');
+  const hasClip = keys.has('clip');
 
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasRadius) storage.radiuses = makeAggregateBuffer(device, 'vec4<f32>', count);
@@ -141,6 +143,7 @@ const makeUIAccumulator = (
 
     if (hasTexture) props.texture = items[0].texture;
     if (hasTransform) props.transform = items[0].transform;
+    if (hasClip) props.clip = items[0].clip;
 
     return use(UIRectangles, props);
   };
@@ -149,7 +152,8 @@ const makeUIAccumulator = (
 const getItemTypeKey = (item: UIAggregate) =>
   (item as any).f ? -1 :
   getNumberHash(getObjectKey(item.texture)) ^
-  getNumberHash(getObjectKey(item.transform));
+  getNumberHash(getObjectKey(item.transform)) ^
+  getNumberHash(getObjectKey(item.clip));
 
 type Partition = {
   key: number,
@@ -194,23 +198,3 @@ const makePartitioner = () => {
   const resolve = () => layers.map(l => l.items);
   return {push, resolve};
 }
-
-const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);
-
-const overlapBounds = (a: Rectangle, b: Rectangle): boolean => {
-  const [al, at, ar, ab] = a;
-  const [bl, bt, br, bb] = b;
-
-  return intersectRange(al, ar, bl, br) && intersectRange(at, ab, bt, bb);
-}
-
-const joinBounds = (a: Rectangle, b: Rectangle): Rectangle => {
-  const [al, at, ar, ab] = a;
-  const [bl, bt, br, bb] = b;
-  return [
-    Math.min(al, bl),
-    Math.min(at, bt),
-    Math.max(ar, br),
-    Math.max(ab, bb),
-  ] as Rectangle;
-};

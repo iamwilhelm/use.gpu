@@ -30,6 +30,7 @@ html {
   --colorText: #ddd;
   --colorTextHover: #eee;
   --colorTextActive: #fff;
+  --colorTextOn: rgba(70, 180, 220, 1.0);
 
   --colorTextLevel1: rgba(255, 255, 255, 1.0);
   --colorTextLevel2: rgba(255, 255, 255, 0.93);

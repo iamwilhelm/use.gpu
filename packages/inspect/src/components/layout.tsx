@@ -11,10 +11,31 @@ export const Button = styled('button', {
   padding: '10px 20px',
   background: 'var(--backgroundInactive)',
   color: 'var(--colorText)',
+  '&:active': {
+    color: 'var(--colorTextMuted)',
+  },
   '&:hover': {
     background: 'var(--backgroundActive)',
-    color: 'var(--colorTextHighlight)',
+    color: 'var(--colorTextHover)',
   },
+});
+
+export const SmallButton = styled('button', {
+  border: 0,
+  padding: '5px 10px',
+  background: 'var(--backgroundInactive)',
+  color: 'var(--colorText)',
+  '&:hover': {
+    background: 'var(--backgroundActive)',
+    color: 'var(--colorTextHover)',
+  },
+  '&:active': {
+    color: 'var(--colorTextMuted)',
+  },
+  '&.active': {
+    background: 'var(--backgroundActive)',
+    color: 'var(--colorTextOn)',
+	},
 });
 
 export const InspectContainer = styled('div', {
@@ -51,6 +72,10 @@ export const TreeControls = styled('div', {
   pointerEvents: 'auto',
   background: 'rgba(0, 0, 0, 0.75)',
   zIndex: 10,
+
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'end',
 });
 
 export const Muted = styled('span', {

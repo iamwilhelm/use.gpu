@@ -12,7 +12,6 @@ export type FontProps = {
 export type FontMetrics = {
   ascent: number,
   descent: number,
-  baseline: number,
   lineHeight: number,
 };
 

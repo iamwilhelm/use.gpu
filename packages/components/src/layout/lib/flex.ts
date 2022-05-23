@@ -1,4 +1,4 @@
-import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, Point, Point4, Margin, Rectangle, Alignment, Anchor } from '../types';
+import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Point, Point4, Margin, Rectangle, Alignment, Anchor } from '../types';
 
 import { getAlignmentSpacing } from './cursor';
 import { parseAnchor } from './util';
@@ -94,7 +94,7 @@ export const getFlexMinMax = (
 
 export const fitFlex = (
   els: LayoutElement[],
-  into: Point,
+  into: AutoPoint,
   fixed: [number | number, number | null],
   direction: Direction,
   gap: Point,
@@ -153,7 +153,7 @@ export const fitFlex = (
     if (!n) return;
 
     // Extra space to be grown (+) or shrunk (-)
-    let slack = spaceMain - accumMain + gapMain;
+    let slack = spaceMain != null ? spaceMain - accumMain + gapMain : 0;
 
     // Grow/shrink row if applicable
     if (slack > 0) {
@@ -278,7 +278,7 @@ export const fitFlex = (
     if (!isX && ratioY != null && spaceMain != null) size = spaceMain * ratioY;
     if (snap) size = Math.round(size);
 
-    if (wrap && (accumMain + size + mOn > spaceMain)) reduceMain();
+    if (wrap && spaceMain && (accumMain + size + mOn > spaceMain)) reduceMain();
     accumMain += size + mOn;
     maxMain = Math.max(maxMain, accumMain);
     accumMain += gapMain;

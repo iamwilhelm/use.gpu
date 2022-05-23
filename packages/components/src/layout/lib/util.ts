@@ -1,8 +1,9 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Point, Rectangle, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
+import { AutoPoint, Point, Rectangle, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
 
-import { chainTo } from '@use-gpu/shader/wgsl';
+import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
+import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/clip/clip.wgsl';
 
 type Fitter<T> = (into: AutoPoint) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
@@ -79,28 +80,47 @@ export const makeBoxLayout = (
   sizes: Point[],
   offsets: Point[],
   renders: LayoutRenderer[],
+  clip?: ShaderModule,
   transform?: ShaderModule,
+  inverse?: ShaderModule,
 ) => (
   box: Rectangle,
-  parent?: ShaderModule,
+  parentClip?: ShaderModule,
+  parentTransform?: ShaderModule,
 ) => {
   let [left, top, right, bottom] = box;
   const out = [] as LiveElement<any>[];
   const n = sizes.length;
-  const xform = parent && transform ? chainTo(parent, transform) : parent ?? transform;
+
+  const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
+  const xclip = parentClip ? (
+    transform
+    ? bindBundle(
+        clip ? getCombinedClip : getTransformedClip,
+        {
+          getParent: parentClip,
+          getSelf: clip ?? null,
+          applyTransform: inverse ?? null,
+        }
+      )
+    : parentClip
+  ) : clip;
 
   for (let i = 0; i < n; ++i) {
     const size = sizes[i];
     const offset = offsets[i];
     const render = renders[i];
 
+    const w = size[0];
+    const h = size[1];
+
     const l = left + offset[0];
     const t = top + offset[1];
-    const r = l + size[0];
-    const b = t + size[1];
-
+    const r = l + w;
+    const b = t + h;
+    
     const layout = [l, t, r, b] as Rectangle;
-    const el = render(layout, xform);
+    const el = render(layout, xclip, xform);
 
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
@@ -116,6 +136,7 @@ export const makeInlineLayout = (
   renders: InlineRenderer[],
 ) => (
   box: Rectangle,
+  clip?: ShaderModule,
   transform?: ShaderModule,
 ) => {
   let [left, top, right, bottom] = box;
@@ -126,7 +147,7 @@ export const makeInlineLayout = (
 
   const out: LiveElement<any>[] = [];
   const flush = (render: InlineRenderer) => {
-    const el = render(lines, transform);
+    const el = render(lines, clip, transform);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
 
@@ -208,4 +229,35 @@ export const makeBoxPicker = (
   }
 
   return null;
+};
+
+export const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);
+
+export const overlapBounds = (a: Rectangle, b: Rectangle): boolean => {
+  const [al, at, ar, ab] = a;
+  const [bl, bt, br, bb] = b;
+
+  return intersectRange(al, ar, bl, br) && intersectRange(at, ab, bt, bb);
+}
+
+export const joinBounds = (a: Rectangle, b: Rectangle): Rectangle => {
+  const [al, at, ar, ab] = a;
+  const [bl, bt, br, bb] = b;
+  return [
+    Math.min(al, bl),
+    Math.min(at, bt),
+    Math.max(ar, br),
+    Math.max(ab, bb),
+  ] as Rectangle;
+};
+
+export const intersectBounds = (a: Rectangle, b: Rectangle): Rectangle => {
+  const [al, at, ar, ab] = a;
+  const [bl, bt, br, bb] = b;
+  return [
+    Math.max(al, bl),
+    Math.max(at, bt),
+    Math.min(ar, br),
+    Math.min(ab, bb),
+  ] as Rectangle;
 };

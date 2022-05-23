@@ -5,6 +5,7 @@ import { use, memo, gather, provide, yeet, tagFunction, useFiber } from '@use-gp
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { normalizeMargin, parseDimension, memoFit } from '../lib/util';
 import { LayoutContext } from '../../providers/layout-provider';
+import { TransformContext } from '../../providers/transform-provider';
 
 export type EmbedProps = {
   direction?: 'x' | 'y',
@@ -17,7 +18,7 @@ export type EmbedProps = {
   margin?: number | Margin,
   snap?: boolean,
 
-  render?: (layout: Rectangle) => LiveElement<any>,
+  render?: (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>,
   children?: LiveElement<any>,
 };
 
@@ -58,7 +59,7 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
       ratioX,
       ratioY,
       absolute: true,
-      fit: memoFit((into: Point) => {
+      fit: memoFit((into: AutoPoint) => {
         const w = width != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;
 
@@ -69,8 +70,16 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
 
         return {
           size,
-          render: (layout: Rectangle) => {
-            const view = render ? render(layout) : provide(LayoutContext, layout, children);
+          render: (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => {
+            const view = render
+              ? render(layout, clip, transform)
+              : (
+                provide(LayoutContext, layout,
+                  provide(TransformContext, transform,
+                    children
+                  )
+                )
+              );
             return yeet(view);
           },
         };

@@ -76,7 +76,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       const h = height != null ? parseDimension(height, into[1] || 0, snap) : into[1] || 0;
       const size = [w, h];
 
-      const render = (layout: Rectangle, transform?: ShaderModule): LiveElement<any> => (
+      const render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
         keyed(UIRectangle, id, {
           id,
           layout,
@@ -87,6 +87,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           radius,
 
           image,
+          clip,
           transform,
         })
       );

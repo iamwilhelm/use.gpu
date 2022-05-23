@@ -12,8 +12,10 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
 
 @optional @link fn getSDFConfig(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
 @optional @link fn applyTransform(p: vec4<f32>) -> vec4<f32> { return p; }
+@optional @link fn getClip(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 
 @export fn getUIRectangleVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
+  var NaN: f32 = bitcast<f32>(0xffffffffu);
 
   var rectangle = getRectangle(instanceIndex);
   var radius = getRadius(instanceIndex);
@@ -23,6 +25,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
   var uv4 = getUV(instanceIndex);
   var repeat = getRepeat(instanceIndex);
 
+  var clip = getClip(instanceIndex);
   var sdfConfig = getSDFConfig(instanceIndex);
 
   // Fragment shader mode
@@ -37,23 +40,43 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
   var xy1 = uv1 * 2.0 - 1.0;
   let box = rectangle.zw - rectangle.xy;
 
-  // Clip radius to size
-  if (radius.x + radius.y > box.x) {
-    var xy = radius.xy * (box.x / (radius.x + radius.y));
-    radius = vec4<f32>(xy, radius.zw);
-  }
-  if (radius.z + radius.w > box.x) {
-    var zw = radius.zw * (box.x / (radius.z + radius.w));
-    radius = vec4<f32>(radius.xy, zw);
-  }
+  var clipUV = vec4<f32>(-1.0, -1.0, 2.0, 2.0);
 
-  if (radius.x + radius.w > box.y) {
-    var xz = radius.xw * (box.y / (radius.x + radius.w));
-    radius = vec4<f32>(xz.x, radius.y, radius.z, xz.y);
-  }
-  if (radius.y + radius.z > box.y) {
-    var yw = radius.yz * (box.y / (radius.y + radius.z));
-    radius = vec4<f32>(radius.x, yw.x, yw.y, radius.w);
+  if (length(clip) > 0.0) {
+    if (
+      rectangle.z < clip.x || rectangle.w < clip.y ||
+      rectangle.x > clip.z || rectangle.y > clip.w
+    ) {
+      return UIVertex(
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec2<f32>(NaN, NaN),
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec2<f32>(NaN, NaN),
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec2<f32>(NaN, NaN),
+        0,
+        0,
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec4<f32>(NaN, NaN, NaN, NaN),
+        0u,
+      );
+    }
+    
+    if (rectangle.x < clip.x) {
+      clipUV.x = (clip.x - rectangle.x) / (rectangle.z - rectangle.x);
+    }
+    if (rectangle.z > clip.z) {
+      clipUV.z = (clip.z - rectangle.x) / (rectangle.z - rectangle.x);
+    }
+    if (rectangle.y < clip.y) {
+      clipUV.y = (clip.y - rectangle.y) / (rectangle.w - rectangle.y);
+    }
+    if (rectangle.w > clip.w) {
+      clipUV.w = (clip.w - rectangle.y) / (rectangle.w - rectangle.y);
+    }
   }
 
   // Get corner + two adjacent vertices
@@ -87,7 +110,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
   var uv = mix(uv4.xy, uv4.zw, uv1);
   let textureUV = uv;
   let sdfUV = uv1 * box;
-  let clipUV = vec4<f32>(-1.0, -1.0, 2.0, 2.0);
   
   return UIVertex(
     vec4<f32>(conservative, 1.0),

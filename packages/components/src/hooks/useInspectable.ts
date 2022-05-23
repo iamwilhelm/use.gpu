@@ -24,9 +24,10 @@ export const useInspectHover = () => {
   return hovered;
 }
 
+const NOP = () => {};
 export const useInspectFiber = () => {
   const fiber = useFiber();
-  const highlight = fiber.host?.__highlight;
+  const highlight = fiber.host?.__highlight ?? NOP;
   return highlight;
 }
 

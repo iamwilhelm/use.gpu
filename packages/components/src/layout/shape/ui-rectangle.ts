@@ -29,6 +29,7 @@ export type UIRectangleProps = {
   border?: Point4,
   radius?: Point4,
 
+  clip?: ShaderModule,
   transform?: ShaderModule
 };
 
@@ -42,6 +43,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     radius,
     border,
 
+    clip,
     transform,
   } = props;
 
@@ -80,6 +82,39 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     sampledTexture.view = image!.texture!.view;
     sampledTexture.size = image!.texture!.size;
   }
+  
+  let boxW = layout[2] - layout[0];
+  let boxH = layout[3] - layout[1];
+  if (radius) {
+    let [tl, tr, br, bl] = radius;
+
+    // Clip radius to size
+    if (tl + tr > boxW) {
+      const f = boxW / (tl + tr);
+      tl *= f;
+      tr *= f;
+    }
+    if (bl + br > boxW) {
+      const f = boxW / (bl + br);
+      bl *= f;
+      br *= f;
+    }
+    if (tl + bl > boxH) {
+      const f = boxH / (tl + bl);
+      tl *= f;
+      bl *= f;
+    }
+    if (tr + br > boxH) {
+      const f = boxH / (tr + br);
+      tr *= f;
+      br *= f;
+    }
+    
+    radius[0] = tl;
+    radius[1] = tr;
+    radius[2] = br;
+    radius[3] = bl;
+  }
 
   let render;
   if (image) {
@@ -96,11 +131,9 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     let uv = UV_SQUARE;
 
     if (fit !== 'scale') {
-      let boxW = layout[2] - layout[0];
-      let boxH = layout[3] - layout[1];
  
-      let w = width != null ? parseDimension(width, size[0], false) : size[0];
-      let h = height != null ? parseDimension(height, size[1], false) : size[1];
+      let w = (width != null ? parseDimension(width, size[0], false) : size[0])!;
+      let h = (height != null ? parseDimension(height, size[1], false) : size[1])!;
 
       if (fit === 'contain') {
         let fitW = boxW / w;
@@ -159,6 +192,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
 
       bounds: layout,
       count: 1,
+      clip,
       transform,
     };
   }

@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Point, Dimension, MarginLike, Margin, Point4, ImageAttachment } from '../types';
+import { LayoutElement, Point, AutoPoint, Dimension, MarginLike, Margin, Point4, ImageAttachment } from '../types';
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
@@ -51,11 +51,8 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
     image,
   } = props;
 
-  const background = (fill || image) ? (
-    use(Absolute, {
-      under: true,
-      children: use(Element, {radius, border, stroke, fill, image})
-    })
+  const background = (stroke || fill || image) ? (
+    use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
   ) : null;
 
   const blockMargin = normalizeMargin(m);
@@ -85,7 +82,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       shrink,
       ratioX,
       ratioY,
-      fit: memoFit((into: Point) => {
+      fit: memoFit((into: AutoPoint) => {
         const w = width != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;
         const fixed = [

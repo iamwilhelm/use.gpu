@@ -1,7 +1,6 @@
 export * from './useApplyTransform';
 export * from './useBoundShader';
 export * from './useBoundSource';
-export * from './useRawSource';
 export * from './useBufferedSize';
 export * from './useCombinedTransform';
 export * from './useDataBinding';
@@ -10,5 +9,6 @@ export * from './useForceUpdate';
 export * from './useInspectable';
 export * from './useLinkedShader';
 export * from './useMemoKey';
+export * from './useRawSource';
 export * from './useRenderPipeline';
 export * from './useShaderRef';

@@ -282,7 +282,7 @@ export const updateFiber = <F extends ArrowFunction>(
   }
 
   // If fiber type changed, remount everything
-  if (fiber.type && fiberType !== fiber.type) disposeFiberMounts(fiber);
+  if (fiber.type && fiberType !== fiber.type) disposeFiberState(fiber);
   fiber.type = fiberType as any;
 
   // Reconcile literal array
@@ -407,7 +407,6 @@ export const reconcileFiberCalls = <F extends ArrowFunction>(
   calls: LiveElement<any>[],
 ) => {
   let {mount, mounts, order, seen} = fiber;
-
   if (mount) disposeFiberMounts(fiber);
 
   if (!mounts) mounts = fiber.mounts = new Map();
@@ -631,7 +630,7 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : (element as any)?.f;
 
-  if (fiber.type && fiber.type !== fiberType) disposeFiberMounts(fiber);
+  if (fiber.type && fiber.type !== fiberType) disposeFiberState(fiber);
   fiber.type = fiberType;
 
   if (isArray) reconcileFiberCalls(fiber, element as any);
@@ -730,7 +729,7 @@ export const detachFiber = <F extends ArrowFunction>(
 
 // Dispose of a fiber's resources and all its mounted sub-fibers
 export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
-  disposeFiberMounts(fiber);
+  disposeFiberState(fiber);
 
   fiber.bound = undefined;
   if (fiber.host) fiber.host.dispose(fiber);
@@ -738,19 +737,28 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
 
 // Dispose of a fiber's mounted sub-fibers
 export const disposeFiberMounts = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
-  const {mount, mounts, next, yeeted} = fiber;
+  const {mount, mounts} = fiber;
 
   if (mount) disposeFiber(mount);
   if (mounts) for (const key of mounts.keys()) {
     const mount = mounts.get(key);
     if (mount) disposeFiber(mount);
   }
+
+  fiber.mount = fiber.mounts = null;
+}
+
+// Dispose of a fiber's mounted sub-fibers
+export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
+  const {next} = fiber;
+
+  disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
 
   bustFiberYeet(fiber);
   visitYeetRoot(fiber);
 
-  fiber.mount = fiber.mounts = fiber.next = null;
+  fiber.next = null;
 }
 
 // Update a fiber in-place and recurse

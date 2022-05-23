@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { ImageAttachment, Dimension, Margin, Fit, Repeat, Rectangle, Anchor, Point, Point4 } from '../types';
+import { ImageAttachment, Dimension, Margin, MarginLike, Fit, Repeat, Rectangle, Anchor, AutoPoint, Point, Point4 } from '../types';
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { parseDimension, normalizeMargin } from '../lib/util';
@@ -11,10 +11,10 @@ import { UIRectangle } from '../shape/ui-rectangle';
 export type ElementProps = {
   width?: Dimension,
   height?: Dimension,
-  margin?: Margin | number,
+  margin?: MarginLike,
 
-  radius?: Margin | number,
-  border?: Margin | number,
+  radius?: MarginLike,
+  border?: MarginLike,
   stroke?: Point4,
   fill?: Point4,
 
@@ -23,6 +23,8 @@ export type ElementProps = {
   grow?: number,
   shrink?: number,
   snap?: boolean,
+  absolute?: boolean,
+  under?: boolean,
 
   children?: LiveElement<any>,
 };
@@ -46,6 +48,8 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     grow = 0,
     shrink = 0,
     snap = false,
+    absolute = false,
+    under = false,
 
     children,
   } = props;
@@ -65,9 +69,11 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     margin,
     grow,
     shrink,
-    fit: (into: Point) => {
-      const w = width != null ? parseDimension(width, into[0], snap) : into[0];
-      const h = height != null ? parseDimension(height, into[1], snap) : into[1];
+    absolute,
+    under,
+    fit: (into: AutoPoint) => {
+      const w = width != null ? parseDimension(width, into[0] || 0, snap) : into[0] || 0;
+      const h = height != null ? parseDimension(height, into[1] || 0, snap) : into[1] || 0;
       const size = [w, h];
 
       const render = (layout: Rectangle, transform?: ShaderModule): LiveElement<any> => (

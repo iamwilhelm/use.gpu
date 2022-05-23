@@ -14,6 +14,10 @@ export const useShaderRef = <T>(value?: T, source?: ShaderSource) => {
     useNoOne();
     return value;
   }
+  if (typeof value === 'function') {
+    useNoOne();
+    return value;
+  }
   const ref = useOne(() => ({current: value}));
   ref.current = value;
   return ref;

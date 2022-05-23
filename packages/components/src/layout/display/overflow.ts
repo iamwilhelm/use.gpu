@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Point, Point4, Margin, LayoutElement } from '../types';
+import { AutoPoint, Point, Point4, Margin, LayoutElement } from '../types';
 
 import { memo, use, gather, yeet, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
@@ -67,17 +67,17 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
   const Resume = (els: LayoutElement[]) => {
     const sizing = getBlockMinMax(els, NO_FIXED, direction);
-    const [{margin}] = els;
+    const [{margin, fit}] = els;
     const [ml, mt, mr, mb] = margin;
 
     return yeet({
       sizing,
       margin: NO_POINT4,
       absolute: true,
-      fit: memoFit((into: Point) => {
+      fit: memoFit((into: AutoPoint) => {
 
-        const [{fit}] = els;
-        const {render, pick, size} = fit(into);
+        const resolved = direction === 'x' ? [null, into[1]] : [into[0], null]
+        const {render, pick, size} = fit(resolved);
 
         const sizes = [size];
         const offsets = [[ml, mt]] as Point[];
@@ -94,14 +94,15 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
           },
         });
 
-        sizeRef[0] = into[0];
-        sizeRef[1] = into[1];
-        sizeRef[2] = size[0];
-        sizeRef[3] = size[1];
+        sizeRef[0] = into[0] ?? 0;
+        sizeRef[1] = into[1] ?? 0;
+        sizeRef[2] = size[0] + ml + mr;
+        sizeRef[3] = size[1] + mt + mb;
+        console.log({sizeRef, into})
 
         const [x, y] = scrollRef;
-        const sx = Math.max(0, Math.min(size[0] - into[0], x));
-        const sy = Math.max(0, Math.min(size[1] - into[1], y));
+        const sx = into[0] != null ? Math.max(0, Math.min(size[0] - into[0], x)) : 0;
+        const sy = into[1] != null ? Math.max(0, Math.min(size[1] - into[1], y)) : 0;
 
         scrollTo(sx, sy);
 

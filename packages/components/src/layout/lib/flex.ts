@@ -117,12 +117,13 @@ export const fitFlex = (
   const isSnap = !!snap;
   const isWrap = !!wrap;
 
-  const containX = fixed[0] != null ? Math.min(fixed[0], into[0]) : into[0];
-  const containY = fixed[1] != null ? Math.min(fixed[1], into[1]) : into[1];
+  const containX = (fixed[0] != null) ? (into[0] != null ? Math.min(fixed[0], into[0]) : fixed[0]) : into[0];
+  const containY = (fixed[1] != null) ? (into[1] != null ? Math.min(fixed[1], into[1]) : fixed[1]) : into[1];
 
   const spaceMain  = isX ? containX : containY;
   const spaceCross = isX ? containY : containX;
-  const isCrossFixed = isX ? fixed[1] != null : fixed[0] != null;
+  const isMainFixed = spaceMain != null;
+  const isCrossFixed = spaceCross != null;
 
   const sizes   = [] as Point[];
   const offsets = [] as Point[];
@@ -177,12 +178,16 @@ export const fitFlex = (
     let maxSize = 0;
     for (let i = 0; i < n; ++i) {
       const {margin, sizing, fit, ratioX, ratioY} = main[i];
+      const [ml, mt, mr, mb] = margin;
+
+      const mOn  =  isX ? ml + mr : mt + mb;
+      const mOff = !isX ? ml + mr : mt + mb;
+      
       const into = (isX
-        ? [mainSizes[i] / (ratioX || 1), containY]
-        : [containX, mainSizes[i] / (ratioY || 1)]) as Point;
+        ? [mainSizes[i] / (ratioX || 1) - mOn, containY != null ? containY - mOff : null]
+        : [containX != null ? containX - mOff : null, mainSizes[i] / (ratioY || 1) - mOn]) as AutoPoint;
 
       const {render, pick, size: fitted} = fit(into);
-      const [ml, mt, mr, mb] = margin;
 
       let [w, h] = fitted;
       if (isX) w = mainSizes[i];
@@ -269,8 +274,8 @@ export const fitFlex = (
     let size = sizing[isX ? 0 : 1];
     const mOn = isX ? ml + mr : mt + mb;
 
-    if (isX && ratioX != null) size = spaceMain * ratioX;
-    if (!isX && ratioY != null) size = spaceMain * ratioY;
+    if (isX && ratioX != null && spaceMain != null) size = spaceMain * ratioX;
+    if (!isX && ratioY != null && spaceMain != null) size = spaceMain * ratioY;
     if (snap) size = Math.round(size);
 
     if (wrap && (accumMain + size + mOn > spaceMain)) reduceMain();
@@ -279,13 +284,13 @@ export const fitFlex = (
     accumMain += gapMain;
 
     main.push(el);
-    mainSizes.push(size);
+    mainSizes.push(size + mOn);
   }
   reduceMain(true);
   reduceCross();
 
-  const w =  isX ? containX : fixed[0] != null ? fixed[0] : maxCross;
-  const h = !isX ? containY : fixed[1] != null ? fixed[1] : maxCross;
+  const w =  isX ? containX ?? maxMain : fixed[0] ?? maxCross;
+  const h = !isX ? containY ?? maxMain : fixed[1] ?? maxCross;
 
   for (const el of els) if (el.absolute) {
     const {margin, fit, under} = el;

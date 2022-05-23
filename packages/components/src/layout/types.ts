@@ -7,6 +7,8 @@ import { mat4 } from 'gl-matrix';
 export type Point = [number, number];
 export type Point4 = [number, number, number, number];
 
+export type AutoPoint = [number | null, number | null];
+
 export type Dimension = number | string;
 
 export type Gap = Point;

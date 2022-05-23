@@ -4,11 +4,11 @@ import { Point, Rectangle, Gap, MarginLike, Margin, Alignment, Anchor, Dimension
 
 import { chainTo } from '@use-gpu/shader/wgsl';
 
-type Fitter<T> = (into: Point) => T;
+type Fitter<T> = (into: AutoPoint) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
-  let last: Point | null = null;
+  let last: AutoPoint | null = null;
   let value: T | null = null;
-  return (into: Point) => {
+  return (into: AutoPoint) => {
     if (last && last[0] === into[0] && last[1] === into[1]) {
       return value!;
     }
@@ -18,13 +18,14 @@ export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
   };
 }
 
-export const parseDimension = (x: string | number | null | undefined, total: number, snap: boolean = false): number => {
+export const parseDimension = (x: string | number | null | undefined, total: number | null, snap: boolean = false): number | null => {
   if (typeof x === 'number') return snap ? Math.round(x) : x;
-  if (x == null) return snap ? Math.round(total) : total;
+  if (x == null) return total != null ? (snap ? Math.round(total) : total) : null;
 
   let v;
   const s = x as string;
   if (s[s.length - 1] === '%') {
+    if (total == null) return null;
     v = +s.slice(0, -1) / 100 * total;
   }
   else {

@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Margin, Dimension, Direction, Alignment, Anchor, Point } from '../types';
+import { LayoutElement, Margin, Dimension, Direction, Alignment, Anchor, AutoPoint, Point } from '../types';
 
 import { yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
@@ -57,8 +57,8 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
 
     let ratioX = undefined;
     let ratioY = undefined;
-    if (typeof width  === 'string') ratioX = parseDimension(width,  1, false);
-    if (typeof height === 'string') ratioY = parseDimension(height, 1, false);
+    if (typeof width  === 'string') ratioX = parseDimension(width,  1, false) ?? 1;
+    if (typeof height === 'string') ratioY = parseDimension(height, 1, false) ?? 1;
 
     return yeet({
       sizing,
@@ -67,13 +67,13 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
       shrink,
       ratioX,
       ratioY,
-      fit: memoFit((into: Point) => {
-        const w = width != null ? parseDimension(width, into[0], snap) : null;
+      fit: memoFit((into: AutoPoint) => {
+        const w = width  != null ? parseDimension(width, into[0], snap) : null;
         const h = height != null ? parseDimension(height, into[1], snap) : null;
         const fixed = [w, h] as [number | number, number | null];
 
         const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);
-        
+
         inspect({
           layout: {
             into,

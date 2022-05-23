@@ -145,11 +145,13 @@ export const memoProps = <F extends Function>(
 
   const memoName = `Memo(${name ?? f.name})`;
   const length = getArgCount(f);
-  return new Proxy(inner, { get: (target: any, s: string) => {
+  const p = new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
     if (s === 'name') return memoName;
     return target[s];
   }});
+  p.displayName = memoName;
+  return p;
 }
 
 // Shorthand

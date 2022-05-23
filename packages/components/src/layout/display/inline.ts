@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { InlineElement, Point, Alignment, Base, Margin } from '../types';
+import { InlineElement, AutoPoint, Point, Alignment, Base, Margin } from '../types';
 
 import { memo, gather, yeet, useOne } from '@use-gpu/live';
 import { getInlineMinMax, fitInline } from '../lib/inline';
@@ -48,7 +48,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
       margin,
       grow,
       shrink,
-      fit: memoFit((into: Point) => {
+      fit: memoFit((into: AutoPoint) => {
         const {size, ranges, offsets, renders} = fitInline(els, into, direction, align, anchor, wrap, snap);
 
         inspect({

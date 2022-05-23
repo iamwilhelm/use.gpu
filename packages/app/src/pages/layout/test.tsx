@@ -45,6 +45,8 @@ export const LayoutTestPage: LC = () => {
 
 							</Block>
 
+							<Block margin={10} direction='x'>{BOXES}</Block>
+
 						</Overflow>
           </Layout>
         </UI>

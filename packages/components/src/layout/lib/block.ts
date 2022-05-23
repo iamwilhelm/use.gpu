@@ -1,4 +1,4 @@
-import { Point, Point4, LayoutElement, LayoutRenderer, LayoutPicker, Margin, Rectangle } from '../types';
+import { AutoPoint, Point, Point4, LayoutElement, LayoutRenderer, LayoutPicker, Margin, Rectangle } from '../types';
 import { mergeMargin } from './util';
 
 const isNotAbsolute = (el: LayoutElement) => !el.absolute;
@@ -106,25 +106,32 @@ export const getBlockMargin = (
 
 export const fitBlock = (
   els: LayoutElement[],
-  into: Point,
-  fixed: [number | null, number | null],
+  into: AutoPoint,
+  fixed: AutoPoint,
   padding: Point4,
   direction: 'x' | 'y',
   contain: boolean,
 ) => {
   const isX = direction === 'x';
-
   const [pl, pt, pr, pb] = padding;
-  let w =  isX ? pl : fixed[0] ?? into[0];
-  let h = !isX ? pt : fixed[1] ?? into[1];
+
+  // Track growing width and height
+  let w = 0;
+  let h = 0;
 
   let i = 0;
   let m = 0;
 
+  // Resolved fit size
   const resolved = [
-    (fixed[0] != null) ? (!isX ? Math.min(fixed[0], into[0]) : fixed[0]) : into[0],
-    (fixed[1] != null) ? ( isX ? Math.min(fixed[1], into[1]) : fixed[1]) : into[1],
-  ] as Point;
+    (fixed[0] != null) ? (!isX && into[0] != null ? Math.min(fixed[0], into[0]) : fixed[0]) : into[0],
+    (fixed[1] != null) ? ( isX && into[1] != null ? Math.min(fixed[1], into[1]) : fixed[1]) : into[1],
+  ] as AutoPoint;
+
+  const relativeFit = [
+     isX ? null : resolved[0] != null ? resolved[0] - (pl + pr) : null,
+    !isX ? null : resolved[1] != null ? resolved[1] - (pt + pb) : null,
+  ] as AutoPoint;
 
   const sizes = [] as Point[];
   const offsets = [] as Point[];
@@ -135,10 +142,7 @@ export const fitBlock = (
     const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = resolved.slice() as Point;
-    size[0] -= pl + pr;
-    size[1] -= pt + pb;
-
+    const size = relativeFit.slice() as AutoPoint;
     if (isX) size[1] -= mt + mb;
     else size[0] -= ml + mr;
 
@@ -152,33 +156,31 @@ export const fitBlock = (
       if (contain || i !== 0) w += Math.max(m, ml);
       m = mr;
 
-      offsets.push([w, pt + mt]);
+      offsets.push([w + pl, pt + mt]);
       w += fitted[0];
+      h = Math.max(h, mt + fitted[1] + mb);
     }
     else {
       if (contain || i !== 0) h += Math.max(m, mt);
       m = mb;
 
-      offsets.push([pl + ml, h]);
+      offsets.push([pl + ml, h + pt]);
       h += fitted[1];
+      w = Math.max(w, ml + fitted[0] + mr);
     }
     ++i;
   }
-  
-  if (isX) w = fixed[0] != null ? fixed[0] : w + pr;
-  else     h = fixed[1] != null ? fixed[1] : h + pb;
 
-  if (isX) resolved[0] = w;
-  else resolved[1] = h;
+  if (resolved[0] == null) resolved[0] = w + pl + pr;
+  if (resolved[1] == null) resolved[1] = h + pt + pb;
 
-  i = 0;
   for (const el of els) if (el.absolute) {
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
     const size = resolved.slice() as Point;
-    if (isX) size[1] -= mt + mb;
-    else size[0] -= ml + mr;
+    size[0] -= ml + mr;
+    size[1] -= mt + mb;
 
     const {render, pick, size: fitted} = fit(size);
     
@@ -197,7 +199,7 @@ export const fitBlock = (
   }
 
   return {
-    size: [w, h],
+    size: resolved,
     sizes,
     offsets,
     renders,

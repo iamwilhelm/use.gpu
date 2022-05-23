@@ -20,7 +20,7 @@ describe('layout cursor', () => {
     cursor.push(100, 10, 1, lineHeight);
 
     const out: number[][] = [];
-    const blocks = cursor.gather((start, end, gap, lead, index) => out.push([start, end, gap, lead, index]));
+    const blocks = cursor.gather((start, end, gap, lead, count, cross, base, index) => out.push([start, end, gap, lead, index]));
     
     expect(out).toMatchSnapshot();
     expect(blocks).toMatchSnapshot();
@@ -41,7 +41,7 @@ describe('layout cursor', () => {
     cursor.push(100, 10, 1, lineHeight);
 
     const out: number[][] = [];
-    const blocks = cursor.gather((start, end, gap, lead, index) => out.push([start, end, gap, lead, index]));
+    const blocks = cursor.gather((start, end, gap, lead, count, cross, base, index) => out.push([start, end, gap, lead, index]));
     
     expect(out).toMatchSnapshot();
     expect(blocks).toMatchSnapshot();
@@ -62,7 +62,7 @@ describe('layout cursor', () => {
     cursor.push(100, 10, 1, lineHeight);
 
     const out: number[][] = [];
-    const blocks = cursor.gather((start, end, gap, lead, index) => out.push([start, end, gap, lead, index]));
+    const blocks = cursor.gather((start, end, gap, lead, count, cross, base, index) => out.push([start, end, gap, lead, index]));
     
     expect(out).toMatchSnapshot();
     expect(blocks).toMatchSnapshot();
@@ -83,7 +83,7 @@ describe('layout cursor', () => {
     cursor.push(100, 10, 1, lineHeight);
 
     const out: number[][] = [];
-    const blocks = cursor.gather((start, end, gap, lead, index) => out.push([start, end, gap, lead, index]));
+    const blocks = cursor.gather((start, end, gap, lead, count, cross, base, index) => out.push([start, end, gap, lead, index]));
     
     expect(out).toMatchSnapshot();
     expect(blocks).toMatchSnapshot();

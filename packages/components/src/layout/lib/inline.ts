@@ -1,7 +1,7 @@
-import { InlineElement, InlineRenderer, LayoutPicker, Direction, Point, Point4, Margin, Rectangle, Alignment, Base } from '../types';
+import { InlineElement, InlineRenderer, LayoutPicker, Direction, Point, Point4, Margin, Rectangle, Alignment, Anchor, Base } from '../types';
 
 import { parseBase, parseAnchor } from './util';
-import { getAlignmentSpacing } from './cursor';
+import { makeLayoutCursor, getAlignmentSpacing } from './cursor';
 
 export const getInlineMinMax = (
   els: InlineElement[],
@@ -60,7 +60,7 @@ export const getInlineMinMax = (
 
 export const fitInline = (
   els: InlineElement[],
-  into: Point,
+  into: AutoPoint,
   direction: Direction,
   align: Alignment,
   anchor: Base,
@@ -74,125 +74,69 @@ export const fitInline = (
   const isSnap = !!snap;
   const isWrap = !!wrap;
 
-  const spaceMain  = isX ? into[0] : into[1];
-  const spaceCross = isX ? into[1] : into[0];
+  const spaceMain = isX ? into[0] : into[1];
 
-  let caretMain = 0;
   let caretCross = 0;
-  let trimMain = 0;
-  let trimCross = 0;
+  let maxMain = 0;
 
   const n = els.length;
-
-  let mainBase = 0;
-  let mainSize = 0;
-  let crossSize = 0;
-  let wordCount = 0;
 
   const ranges  = [] as Point[];
   const offsets = [] as [number, number, number][];
   const renders = [] as InlineRenderer[];
   const pickers = [] as LayoutPicker[];
 
-  const mainSpans = [] as Point4[];
-  const mainEls = [] as InlineElement[];
+  // Push all text spans into layout
+  const cursor = makeLayoutCursor(wrap ? spaceMain || 0 : 0, align);
 
-  const reduceMain = (hard: boolean) => {
-    const n = mainEls.length;
-    if (!n) return;
+  for (const el of els) {
+    const {spans, absolute, height: {lineHeight, baseline}} = el;
+    spans.iterate((advance, trim, hard) => cursor.push(advance, trim, hard, lineHeight, baseline));
+  }
 
-    const slack = spaceMain - (caretMain - trimMain);
+  // Process produced spans
+  let i = 0;
+  let span = 0;
+  const layouts = cursor.gather((start, end, lead, gap, count, cross, base, index) => {
+    let n = end - start;
+    let mainPos = lead;
 
-    let mainGap = 0;
-    let mainPos = 0;
-    if (slack) [mainGap, mainPos] = getAlignmentSpacing(slack, wordCount, hard, align);
+    while (n > 0 && i < els.length) {
+      const el = els[i];
+      const {spans, height, render/*, pick*/} = el;
+      const {baseline, lineHeight} = height;
 
-    for (let i = 0; i < n; ++i) {
-      const span = mainSpans[i];
-      const [startIndex, endIndex, chunkAdvance, chunkCount] = span;
+      const crossPos = anchor === 'base'
+        ? caretCross + base - baseline
+        : caretCross + getAlignmentSpacing(Math.max(0, cross - lineHeight), 1, false, anchor as Anchor)[1];
 
-      const {spans, height, render/*, pick*/} = mainEls[i];
-      const {ascent, descent, lineHeight} = height;
+      const offset = (isX ? [mainPos, crossPos, gap] : [crossPos, mainPos, gap]) as [number, number, number];
 
-      const crossPos = caretCross + mainBase - ascent;
-      const offset = (isX ? [mainPos, crossPos, mainGap] : [crossPos, mainPos, mainGap]) as [number, number, number];
+      const count = Math.min(n, spans.length - span);
+      const s = span;
+      const e = span + count;
+      spans.iterate((advance) => mainPos += advance, s, e);
+      mainPos += count * gap;
 
-      mainPos += chunkAdvance + chunkCount * mainGap;
-
-      ranges.push(span as any);
+      ranges.push([s, e]);
       offsets.push(offset);
       renders.push(render);
       //pickers.push(pick);
+      
+      span += count;
+      n -= count;
+      
+      if (count === spans.length - span) {
+        i++;
+        span = 0;
+      }
     }
 
-    caretMain = 0;
-    caretCross += crossSize;
-
-    mainBase = 0;
-    mainSize = 0;
-    trimMain = 0;
-    crossSize = 0;
-    wordCount = 0;
+    maxMain = Math.max(maxMain - gap, 0);
+    caretCross += cross;
+  });
   
-    mainSpans.length = 0;
-    mainEls.length = 0;
-  };
-
-  const addSpan = (el: InlineElement, startIndex: number, endIndex: number, chunkAdvance: number, chunkCount: number) => {
-    if (startIndex === endIndex) return;
-
-    const {height: {ascent, descent, lineHeight}} = el;
-
-    mainBase = Math.max(mainBase, ascent);
-    mainSize = Math.max(mainSize, ascent - descent);
-    crossSize = Math.max(crossSize, lineHeight);
-
-    mainSpans.push([startIndex, endIndex, chunkAdvance, chunkCount]);
-    mainEls.push(el);
-  };
-
-  for (const el of els) {
-    let startIndex = 0;
-    let endIndex = 0;
-    let chunkCount = 0;
-    let chunkAdvance = 0;
-
-    let i = 0;
-    const {spans, absolute} = el;
-    spans.iterate((advance, trim, hard) => {
-      if (wrap && (caretMain + advance - trim > spaceMain)) {
-        addSpan(el, startIndex, endIndex, chunkAdvance, chunkCount);
-        reduceMain(false);
-        startIndex = i;
-        chunkCount = 0;
-        chunkAdvance = 0;
-      }
-
-      endIndex = ++i;
-      caretMain += advance;
-      chunkAdvance += advance;
-
-      trimMain = trim;
-      if (trim || hard) {
-        wordCount++;
-        chunkCount++;
-      }
-
-      if (hard) {
-        addSpan(el, startIndex, endIndex, chunkAdvance, chunkCount);
-        reduceMain(true);
-
-        startIndex = endIndex;
-        chunkCount = 0;
-        chunkAdvance = 0;
-      }
-    });
-
-    addSpan(el, startIndex, endIndex, chunkAdvance, chunkCount);
-  }
-  reduceMain(true);
-  
-  const size = isX ? [into[0], caretCross] : [caretCross, into[1]];
+  const size = isX ? [into[0] ?? maxMain, caretCross] : [caretCross, into[1] ?? maxMain];
   
   return {
     size,
@@ -202,38 +146,3 @@ export const fitInline = (
     pickers,
   };
 }
-
-export const getInlineSpacing = (
-  slack: number,
-  n: number,
-  align: Alignment,
-) => {
-  let gap = 0;
-  let lead = 0;
-
-  const isJustify = align === 'justify';
-  const isBetween = align === 'between';
-  const isEvenly  = align === 'evenly';
-
-  if (slack > 0 && (isEvenly || isBetween || isJustify)) {
-    if (n === 1) {
-      lead = slack / 2;
-    }
-    else if (isEvenly) {
-      gap = Math.max(0, slack / (n + 1));
-      lead = gap;
-    }
-    else if (isBetween) {
-      gap = Math.max(0, slack / n);
-      lead = gap / 2;
-    }
-    else if (isJustify) {
-      gap = Math.max(0, slack / Math.max(1, n - 1));
-    }
-  }
-  else {
-    lead = parseAnchor(align) * slack;
-  }
-
-  return [gap, lead];
-};

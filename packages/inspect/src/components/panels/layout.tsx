@@ -22,11 +22,23 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
 	let n = sizes.length;
 	
 	const SCALE = 1/3;
+
+	const width  = Math.max(size[0], into[0] || 0);
+	const height = Math.max(size[1], into[1] || 0);
 	
-	return (
-		<div style={{position: 'relative'}}>
-			<DOMMock style={{marginBottom: "20px", width: size[0] * SCALE, height: size[1] * SCALE}} />
-			<DOMMock style={{position: 'relative', width: into[0] * SCALE, height: into[1] * SCALE, borderStyle: 'dashed'}} />
+  const [state, setState] = useState<Record<string, boolean>>({});
+  const toggleState = (id: string) => setState((state) => ({
+    ...state,
+    [id]: !state[id],
+  }));
+
+	return (<>
+    <div><b>Props</b></div>
+    {inspectObject(layout, state, toggleState, 'u')}
+    <Spacer />
+		<div style={{position: 'relative', width: width * SCALE, height: height * SCALE}}>
+			<DOMMock style={{width: size[0] * SCALE, height: size[1] * SCALE}} />
+			<DOMMock style={{width: (into[0] || 0) * SCALE, height: (into[1] || 0) * SCALE, borderStyle: 'dashed'}} />
 			{
 				sizes.map((size, i) =>
 					<DOMMock key={i.toString()} style={{
@@ -39,7 +51,7 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
 				)
 			}
 		</div>
-	);
+	</>);
 }
 
 const hookToObject = (

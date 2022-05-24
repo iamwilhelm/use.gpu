@@ -26,7 +26,7 @@ type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
 
 type InspectProps = {
   fiber: LiveFiber<any>,
-	onInspect?: (b: boolean) => void,
+  onInspect?: (b: boolean) => void,
 }
 
 export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
@@ -34,14 +34,14 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const selectedCursor = useUpdateState<SelectState>(null);
   const depthCursor = useUpdateState<number>(10);
   const hoveredCursor = useUpdateState<HoverState>(() => ({ fiber: null, by: null, deps: [], precs: [], root: null, depth: 0 }));
-	
-	const [inspect, setInspect] = useState<boolean>(false);
-	const toggleInspect = () => {
-		setInspect(s => {
-			onInspect && onInspect(!s);
-			return !s;
-		});
-	};
+  
+  const [inspect, setInspect] = useState<boolean>(false);
+  const toggleInspect = () => {
+    setInspect(s => {
+      onInspect && onInspect(!s);
+      return !s;
+    });
+  };
 
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);
@@ -58,45 +58,45 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     setHovered(true);
     return () => setHovered(false);
   }, [hoveredFiber])
-	
-	const {host} = fiber;
-	useLayoutEffect(() => {
-		host.__highlight = (id: number | null, active?: boolean) => {
-			const fiber = fibers.get(id);
-			if (fiber) {
-				if (active) {
-					setInspect(false);
-					return setSelected({ $set: fiber });
-				}
+  
+  const {host} = fiber;
+  useLayoutEffect(() => {
+    host.__highlight = (id: number | null, active?: boolean) => {
+      const fiber = fibers.get(id);
+      if (fiber) {
+        if (active) {
+          toggleInspect();
+          return setSelected({ $set: fiber });
+        }
 
-		    const root = fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null;
-				updateHovered({ $set: {
-		      fiber,
-		      by: fibers.get(fiber.by) ?? null,
-		      deps: host ? Array.from(host.traceDown(fiber)) : [],
-		      precs: host ? Array.from(host.traceUp(fiber)) : [],
-		      root,
-		      depth: 0,
-		    } });
-			}
-			else {
-				updateHovered({ $set: {
-		      fiber: null,
-		      by: null,
-		      deps: [],
-		      precs: [],
-		      root: null,
-		      depth: 0,
-		    } });
-			}
-		};
+        const root = fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null;
+        updateHovered({ $set: {
+          fiber,
+          by: fibers.get(fiber.by) ?? null,
+          deps: host ? Array.from(host.traceDown(fiber)) : [],
+          precs: host ? Array.from(host.traceUp(fiber)) : [],
+          root,
+          depth: 0,
+        } });
+      }
+      else {
+        updateHovered({ $set: {
+          fiber: null,
+          by: null,
+          deps: [],
+          precs: [],
+          root: null,
+          depth: 0,
+        } });
+      }
+    };
 
-		return () => host.__highlight = null;
-	}, [host, fibers]);
+    return () => host.__highlight = null;
+  }, [host, fibers]);
 
   let vertexTab: React.ReactNode;
   let fragmentTab: React.ReactNode;
-	let layoutTab: React.ReactNode;
+  let layoutTab: React.ReactNode;
   if (selectedFiber) {
     const inspect = selectedFiber.__inspect;
     if (inspect) {
@@ -117,7 +117,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     <InsetColumnFull>
       <TreeControls>
         <DetailSlider value={depthLimit} onChange={setDepthLimit} />
-				<Spacer />
+        <Spacer />
         <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}>{ICON('ads_click')}</SmallButton>
       </TreeControls>
       <FiberTree

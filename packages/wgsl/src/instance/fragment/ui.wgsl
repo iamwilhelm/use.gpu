@@ -21,11 +21,12 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   var strokeColor = stroke;
 
   var scale = getUVScale(sdfUV);
-  if (uv.x < clipUV.x || uv.y < clipUV.y || uv.x > clipUV.z || uv.y > clipUV.w) { discard; }
 
   var sdf: SDF;
   var texture = getTexture(textureUV);
   var mark = 0.0;
+
+  if (uv.x < clipUV.x || uv.y < clipUV.y || uv.x > clipUV.z || uv.y > clipUV.w) { discard; }
 
   if (mode == -1) {
     // SDF Glyph

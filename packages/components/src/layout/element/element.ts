@@ -91,7 +91,13 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           transform,
         })
       );
-      return {size, render};
+      return {
+        size,
+        render,
+        pick: (x: number, y: number, l: number, t: number, scroll?: boolean) => {
+          return !scroll ? [id, [l, t, l + w, t + h]] : null;
+        },
+      };
     },
   });
 };

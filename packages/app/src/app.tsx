@@ -3,7 +3,7 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
-import { useFiber, useResource, useState } from '@use-gpu/live';
+import { useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 
 import {
@@ -25,14 +25,14 @@ export const App: LC = () => {
   
   const root = document.querySelector('#use-gpu')!;
 
-  const router = (
+  const router = useOne(() => (
     <Router>
       <Routes routes={makeRoutes()} />
       <Routes routes={makePicker(root)} />
     </Router>
-  );
+  ), root);
   
-  const fonts = [
+  const fonts = useOne(() => [
     {
       family: 'Lato',
       weight: 400,
@@ -51,26 +51,30 @@ export const App: LC = () => {
       style: 'normal',
       src: '/Lato-Bold.ttf',
     },
-  ];
+  ]);
 
   const fiber = useFiber();
   const {inspect, layout, setLayout} = useInspector();
 
+	const view = useMemo(() => (
+	  <WebGPU
+	    fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
+	  >
+	    <AutoCanvas
+	      selector={'#use-gpu'}
+	      samples={4}
+	    >
+	      <FontLoader fonts={fonts}>
+	        {router}
+	      </FontLoader>
+	    </AutoCanvas>
+	  </WebGPU>
+	), [root, fonts, router]);
+
   return (<>
-		<DebugProvider debug={{layout: {inspect: layout}}}>
-		  <WebGPU
-		    fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
-		  >
-		    <AutoCanvas
-		      selector={'#use-gpu'}
-		      samples={4}
-		    >
-		      <FontLoader fonts={fonts}>
-		        {router}
-		      </FontLoader>
-		    </AutoCanvas>
-		  </WebGPU>
-		</DebugProvider>
+    <DebugProvider debug={{layout: {inspect: layout}}}>
+			{view}
+    </DebugProvider>
     {inspect ? <UseInspect fiber={fiber} container={root} onInspect={setLayout} /> : null}
   </>)
 };

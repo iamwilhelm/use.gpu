@@ -35,7 +35,7 @@ export const SmallButton = styled('button', {
   '&.active': {
     background: 'var(--backgroundActive)',
     color: 'var(--colorTextOn)',
-	},
+  },
 });
 
 export const InspectContainer = styled('div', {
@@ -73,9 +73,9 @@ export const TreeControls = styled('div', {
   background: 'rgba(0, 0, 0, 0.75)',
   zIndex: 10,
 
-	display: 'flex',
-	flexDirection: 'column',
-	alignItems: 'end',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'end',
 });
 
 export const Muted = styled('span', {
@@ -205,13 +205,13 @@ export const TreeRowOmittedChunk = styled('div', {
   },
 });
 
-export const TreeRow: React.FC<TreeIndentProps> = ({ indent, children }) => (
-  <TreeRowInner css={{
+export const TreeRow: React.FC<TreeIndentProps> = React.forwardRef<HTMLDivElement, TreeIndentProps>(({ indent, children }, ref) => (
+  <TreeRowInner ref={ref} css={{
     paddingLeft: indent ? `${indent * 20}px` : 0,
   }}>
     {children}
   </TreeRowInner>
-);
+));
 
 export const TreeRowOmitted: React.FC<TreeIndentProps> = ({ indent, children }) => (
   <TreeRowOmittedChunk />
@@ -231,10 +231,10 @@ const TreeRowInner = styled('div', {
 });
 
 export const DOMMock = styled('div', {
-	position: 'absolute',
+  position: 'absolute',
   border: '1px solid rgba(255, 255, 255, 0.5)',
-	background: 'rgba(255, 255, 255, 0.1)',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
+  background: 'rgba(255, 255, 255, 0.1)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });

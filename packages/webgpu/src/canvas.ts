@@ -47,7 +47,7 @@ export const makePresentationContext = (
     format,
     usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST,
     compositingAlphaMode: "opaque",
-    viewFormats: [format, format + '-srgb'],
+    //viewFormats: [format, format + '-srgb'],
   };
 
   // @ts-ignore

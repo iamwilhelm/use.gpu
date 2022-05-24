@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { LC, LiveElement } from '@use-gpu/live/types';
-import { provide, wrap, useAsync } from '@use-gpu/live';
+import { provide, wrap, useAsync, useOne } from '@use-gpu/live';
 import { mountGPUDevice } from '@use-gpu/webgpu';
 
 import { HTML } from '@use-gpu/react';

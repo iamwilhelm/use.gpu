@@ -21,12 +21,12 @@ const STYLE = {
 type GlyphControlsProps = {
   hasGlyph?: boolean,
   hasContours?: boolean,
-	hasRelax?: boolean,
+  hasRelax?: boolean,
   container?: Element | null,
   render?: ({subpixel, contours, relax, glyph}: {
     subpixel: boolean,
     contours: boolean,
-		relax: boolean,
+    relax: boolean,
     glyph: string,
   }) => LiveElement<any>
 };

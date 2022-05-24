@@ -17,31 +17,11 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
 @export fn getUIRectangleVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
   var NaN: f32 = bitcast<f32>(0xffffffffu);
 
+  // Layout clipping for overflow
   var rectangle = getRectangle(instanceIndex);
-  var radius = getRadius(instanceIndex);
-  var border = getBorder(instanceIndex);
-  var fill = getFill(instanceIndex);
-  var stroke = getStroke(instanceIndex);
-  var uv4 = getUV(instanceIndex);
-  var repeat = getRepeat(instanceIndex);
-
   var clip = getClip(instanceIndex);
-  var sdfConfig = getSDFConfig(instanceIndex);
-
-  // Fragment shader mode
-  var mode: i32;
-  if (sdfConfig.x > 0.0) { mode = -1; } // SDF glyph
-  else if (length(radius + border) == 0.0) { mode = 0; } // Rectangle
-  else if (length(radius) == 0.0) { mode = 1; } // Rectangle with border
-  else { mode = 2; }; // Rounded rectangle with border
-
-  // Prepare quad -> pixel mapping
-  var uv1 = getQuadUV(vertexIndex);
-  var xy1 = uv1 * 2.0 - 1.0;
-  let box = rectangle.zw - rectangle.xy;
 
   var clipUV = vec4<f32>(-1.0, -1.0, 2.0, 2.0);
-
   if (length(clip) > 0.0) {
     if (
       rectangle.z < clip.x || rectangle.w < clip.y ||
@@ -78,6 +58,26 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
       clipUV.w = (clip.w - rectangle.y) / (rectangle.w - rectangle.y);
     }
   }
+
+  var radius = getRadius(instanceIndex);
+  var border = getBorder(instanceIndex);
+  var fill = getFill(instanceIndex);
+  var stroke = getStroke(instanceIndex);
+  var uv4 = getUV(instanceIndex);
+  var repeat = getRepeat(instanceIndex);
+  var sdfConfig = getSDFConfig(instanceIndex);
+
+  // Fragment shader mode
+  var mode: i32;
+  if (sdfConfig.x > 0.0) { mode = -1; } // SDF glyph
+  else if (length(radius + border) == 0.0) { mode = 0; } // Rectangle
+  else if (length(radius) == 0.0) { mode = 1; } // Rectangle with border
+  else { mode = 2; }; // Rounded rectangle with border
+
+  // Prepare quad -> pixel mapping
+  var uv1 = getQuadUV(vertexIndex);
+  var xy1 = uv1 * 2.0 - 1.0;
+  let box = rectangle.zw - rectangle.xy;
 
   // Get corner + two adjacent vertices
   var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.5, 1.0);

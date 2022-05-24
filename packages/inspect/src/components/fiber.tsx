@@ -1,7 +1,7 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
 
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useLayoutEffect, useRef } from 'react';
 
 import { useRefineCursor, Cursor } from './cursor';
 import { usePingContext } from './ping';
@@ -122,7 +122,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 
   return (
     <SplitColumnFull>
-      <TreeWrapper>
+      <TreeWrapper className="tree-scroller">
         <FiberNode
           fiber={fiber}
           fibers={fibers}
@@ -197,7 +197,33 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     return [select, hover, unhover];
   }, [fiber, updateSelectState, updateHoverState]);
 
+	const rowRef = useRef<HTMLDivElement>();
   const out = [] as React.ReactElement[];
+
+	useLayoutEffect(() => {
+		const {current: row} = rowRef;
+		if (selected && row) {
+			const rect = row.getBoundingClientRect();
+
+			let parent = row;
+			while (parent) {
+				if (parent.classList.contains('tree-scroller')) break;
+				parent = parent.parentElement;
+			}
+			
+			if (parent) {
+				const container = parent.getBoundingClientRect();
+				
+				if (
+					(rect.left < container.left || rect.right > container.right) ||
+					(rect.top < container.top || rect.bottom > container.bottom)
+				) {
+					container.scrollLeft = rect.left - container.left - 10;
+					container.scrollTop = rect.top - container.top - 10;
+				}
+			}
+		}
+	}, [selected]);
 
   // Render node itself
   const nodeRender = shouldRender ? (
@@ -337,7 +363,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   // Leaf node
   const continuationIcon = ICONSMALL('subdirectory_arrow_right');
   return (<>
-    <TreeRow indent={indent + 1}>
+    <TreeRow indent={indent + 1} ref={rowRef}>
       {continuation ? <Muted>{continuationIcon}</Muted> : null}
       {nodeRender}
     </TreeRow>

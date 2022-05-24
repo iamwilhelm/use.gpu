@@ -44,7 +44,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
 
   const Resume = (els: InlineElement[]) => {
     const inlineEls = resolveInlineBlockElements(els, direction);
-    const blockEls = inlineEls.filter(el => !!el.block);
+    const blockEls = inlineEls.filter(el=> !!el.block);
 
     const sizing = getInlineMinMax(inlineEls, direction, wrap, snap);
 
@@ -54,30 +54,36 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
       grow,
       shrink,
       fit: memoFit((into: AutoPoint) => {
-        const {size, ranges, offsets, anchors, renders} = fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
+        const {size, sizes, ranges, offsets, anchors, renders, pickers} = fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
 
-        const sizes: Point[] = [];
+        const blockSizes: Point[] = [];
         const blockOffsets: Point[] = [];
         const blockRenders: LayoutRenderer[] = [];
         const blockPickers: LayoutPicker[] = [];
 
         let i = 0;
         for (const el of blockEls) {
-          const {size, render, pick} = el.block!;
-          sizes.push(size);
+          const {block} = el;
+          const {size, render, pick} = block!;
+
+          blockSizes.push(size);
           blockOffsets.push(anchors[i++]);
           blockRenders.push(render);
           blockPickers.push(pick);
         }
-
+        
         inspect({
           layout: {
             into,
             size,
             sizes,
-            offsets: blockOffsets,
+            offsets,
           },
         });
+        
+        const pickSizes   = blockSizes.length ? [...sizes,   ...blockSizes] : [];
+        const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : [];
+        const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : [];
 
         return {
           size,
@@ -87,10 +93,10 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
             transform?: ShaderModule,
           ) => {
             const out = makeInlineLayout(ranges, offsets, renders)(box, clip, transform);
-            if (sizes.length) out.push(...makeBoxLayout(sizes, blockOffsets, blockRenders)(box, clip, transform));
+            if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
             return out;
           },
-          pick: makeBoxPicker(id, sizes, blockOffsets, blockPickers),
+          pick: makeBoxPicker(id, pickSizes, pickOffsets, pickPickers),
         };
       })
     });

@@ -124,6 +124,7 @@ export const fitInline = (
   const n = els.length;
 
   const ranges  = [] as Point[];
+  const sizes   = [] as Point[];
   const offsets = [] as [number, number, number][];
   const anchors = [] as Point[];
   const renders = [] as InlineRenderer[];
@@ -154,37 +155,45 @@ export const fitInline = (
 
     while (n > 0 && i < els.length) {
       const el = els[i];
-      const {spans, height, margin, anchor: blockAnchor, block, render/*, pick*/} = el;
+      const {spans, height, margin, anchor: blockAnchor, block, render, pick} = el;
       const {ascent: a, descent: d, lineHeight} = height;
       const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
+      
+      const last = spans.length - span + 2;
+      const count = Math.min(n, last);
+
+      const indentStart = span  === 0    ? (isX ? ml : mt) : 0;
+      const indentEnd   = count === last ? (isX ? mr : mb) : 0;
+      mainPos += indentStart;
       
       const crossPos = (blockAnchor ?? anchor) === 'base'
         ? caretCross + ascent - a + getAlignmentSpacing(Math.max(0, cross - lineHeight), 1, false, 'center')[1]
         : caretCross + getAlignmentSpacing(Math.max(0, cross - lineHeight), 1, false, anchor as Anchor)[1];
 
-      const offset = (isX ? [mainPos + ml, crossPos, gap] : [crossPos, mainPos + mt, gap]) as [number, number, number];
+      const offset = (isX ? [mainPos, crossPos, gap] : [crossPos, mainPos, gap]) as [number, number, number];
 
-      const last = spans.length - span + 2;
-      const count = Math.min(n, last);
+      let accum = 0;
       const s = Math.max(1, span) - 1;
       const e = Math.min(spans.length, span + count - 1);
-      spans.iterate((advance) => mainPos += advance, s, e);
+      spans.iterate((advance) => accum += advance, s, e);
 
-      mainPos += count * gap;
-      if (span === 0) mainPos += isX ? ml : mt;
-      if (count === last) mainPos += isX ? mr : mb;
+      accum += count * gap;
+      mainPos += accum;
+      mainPos += indentEnd;
+
+      const size = (isX ? [accum, cross] : [cross, accum]) as Point;
 
       ranges.push([s, e]);
+      sizes.push(size);
       offsets.push(offset);
       renders.push(render);
-      //pickers.push(pick);
-      
+      pickers.push(pick);
+
       span += count;
       n -= count;
       
       if (count === last) {
         if (block) anchors.push(offset as number[] as Point);
-
         i++;
         span = 0;
       }
@@ -199,6 +208,7 @@ export const fitInline = (
   return {
     size,
     ranges,
+    sizes,
     offsets,
     anchors,
     renders,

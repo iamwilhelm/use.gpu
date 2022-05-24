@@ -7,7 +7,7 @@ import { Inspect } from './components/inspect';
 
 export type UseInspectProps = {
   fiber: LiveFiber<any>,
-	onInspect?: (b: boolean) => void,
+  onInspect?: (b: boolean) => void,
   container: Element,
 };
 
@@ -19,12 +19,12 @@ const STYLE = {
 };
 
 export const UseInspect: LiveComponent<UseInspectProps> = ({fiber, onInspect, container}) => {
-	return (
-	  use(HTML, {
-	    container,
-	    style: STYLE,
-			onInspect,
-	    children: <Inspect fiber={fiber} onInspect={onInspect} />,
-	  })
-	);
+  return (
+    use(HTML, {
+      container,
+      style: STYLE,
+      onInspect,
+      children: <Inspect fiber={fiber} onInspect={onInspect} />,
+    })
+  );
 }

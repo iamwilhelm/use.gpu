@@ -25,7 +25,7 @@ export const DebugGlyphPage: LC = () => {
 
   return (
     <GlyphControls
-			container={root}
+      container={root}
       hasGlyph
       hasContours
       hasRelax
@@ -46,16 +46,16 @@ export const DebugGlyphPage: LC = () => {
 
 type GlyphViewProps = {
   subpixel: boolean,
-	relax: boolean,
+  relax: boolean,
   contours: boolean,
   glyph: string,
 };
 
 type DebugImage = {
-	xs: Float32Array,
-	ys: Float32Array,
-	width: number,
-	height: number,
+  xs: Float32Array,
+  ys: Float32Array,
+  width: number,
+  height: number,
 };
 
 const roundUp2 = (v: number) => {
@@ -140,34 +140,34 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   };
 
   const pointEmitter = ({xs, ys, width, height}: DebugImage) =>
-		(emit: Emitter, x: number, y: number, i: number, j: number) => {
-	    const index = i + j * paddedWidth;
-	    const dx = xs[index];
-	    const dy = ys[index];
-	    emit(x + dx, y + dy, 0.5, 1);
-	  };
+    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+      const index = i + j * paddedWidth;
+      const dx = xs[index];
+      const dy = ys[index];
+      emit(x + dx, y + dy, 0.5, 1);
+    };
 
   const shiftedPointEmitter = ({xs, ys, width, height}: DebugImage) =>
-		(emit: Emitter, x: number, y: number, i: number, j: number) => {
-	    const index = i + j * paddedWidth;
-	    const dx = xs[index];
-	    const dy = ys[index];
-	    if (dx || dy) {
-	      emit(x + dx, y + dy, 0.5, 1);
-	    }
-	  };
+    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+      const index = i + j * paddedWidth;
+      const dx = xs[index];
+      const dy = ys[index];
+      if (dx || dy) {
+        emit(x + dx, y + dy, 0.5, 1);
+      }
+    };
 
   const arrowEmitter = ({xs, ys, width, height}: DebugImage) =>
-		(emit: Emitter, x: number, y: number, i: number, j: number) => {
-	    const index = i + j * paddedWidth;
-	    const dx = xs[index];
-	    const dy = ys[index];
+    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+      const index = i + j * paddedWidth;
+      const dx = xs[index];
+      const dy = ys[index];
 
-	    if (dx || dy) {
-	      emit(x, y, 0.5, 1);
-	      emit(x + dx, y + dy, 0.5, 1);
-	    }
-	  };
+      if (dx || dy) {
+        emit(x, y, 0.5, 1);
+        emit(x + dx, y + dy, 0.5, 1);
+      }
+    };
   
   const debugFrame = (image: Image) => (
     image ? <TextureFrame texture={{
@@ -184,11 +184,11 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
         sparse
         centered
         expr={arrowEmitter({
-					xs: image.xi,
-					ys: image.yi,
-					width: image.width,
-					height: image.height,
-				})}
+          xs: image.xi,
+          ys: image.yi,
+          width: image.width,
+          height: image.height,
+        })}
       >
         <Arrow width={2} color={0x4080ff} depth={0.01} />
       </Sampled> : null}
@@ -201,11 +201,11 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
         sparse
         centered
         expr={arrowEmitter({
-					xs: image.xo,
-					ys: image.yo,
-					width: image.width,
-					height: image.height,
-				})}
+          xs: image.xo,
+          ys: image.yo,
+          width: image.width,
+          height: image.height,
+        })}
       >
         <Arrow width={2} color={0x40c0ff} depth={0.01} />
       </Sampled> : null}

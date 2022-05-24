@@ -217,7 +217,7 @@ export const makeBoxPicker = (
       l -= scrollPos[0];
       t -= scrollPos[1];
     }
-    
+
     let r = l + w;
     let b = t + h;
     

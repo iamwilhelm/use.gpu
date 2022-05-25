@@ -9,7 +9,6 @@ import {
   useColorTrait,
   useSurfaceTrait,
   useROPTrait,
-  useProp,
 } from '../traits';
 
 import { SurfaceLayer } from '../../layers/surface-layer';

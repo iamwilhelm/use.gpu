@@ -7,7 +7,7 @@ import { DataContext } from '../../providers/data-provider';
 import { useBoundSource } from '../../hooks/useBoundSource';
 import { useDataBinding } from '../../hooks/useDataBinding';
 import { useDerivedSource } from '../../hooks/useDerivedSource';
-import { parseAxes, parseAxis } from '../util/parse';
+import { parseAxes, parseAxis } from '../parse';
 
 import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
 import plotArray, { packIndex, unpackIndex } from '@use-gpu/wgsl/plot/array.wgsl';

@@ -1,6 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ShaderSource } from '@use-gpu/shader/types';
-import { ArrowTrait, ColorTrait, LineTrait, ROPTrait, VectorLike } from '../types';
+import { ArrowTrait, ColorTrait, LineTrait, ROPTrait } from '../types';
+import { VectorLike } from '../traits/types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
@@ -14,7 +15,7 @@ import {
   parseFloat,
   parseDetail,
   parsePosition4,
-} from '../util/parse';
+} from '../../traits/parse';
 import {
   useArrowTrait,
   useColorTrait,

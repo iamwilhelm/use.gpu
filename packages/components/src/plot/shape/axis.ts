@@ -1,5 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait, VectorLike, Swizzle } from '../types';
+import { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait } from '../types';
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { useBoundShader } from '../../hooks/useBoundShader';
@@ -8,17 +8,19 @@ import { useShaderRef } from '../../hooks/useShaderRef';
 
 import { RangeContext } from '../../providers/range-provider';
 import {
-  parseDetail,
   parsePosition4,
-} from '../util/parse';
+} from '../../traits/parse';
+import {
+  parseDetail,
+} from '../parse';
 import {
   useAxisTrait,
   useArrowTrait,
   useColorTrait,
   useLineTrait,
   useROPTrait,
-  useProp,
 } from '../traits';
+import { useProp } from '../../traits/useProp';
 import { vec4 } from 'gl-matrix';
 
 import { Data } from '../../data/data';

@@ -1,5 +1,5 @@
 import { Point, LayoutElement, LayoutRenderer, LayoutPicker, Rectangle } from '../types';
-import { parseDimension } from './util';
+import { evaluateDimension } from '../parse';
 
 const NO_LAYOUT = [0, 0, 0, 0] as Rectangle;
 
@@ -29,14 +29,27 @@ export const fitAbsoluteBox = (
 
   const n = els.length;
   for (const el of els) {
-    const {margin, fit} = el;
+    const {margin, fit, stretch} = el;
     const [ml, mt, mr, mb] = margin;
+
+    const mw = ml + mr;
+    const mh = mt + mb;
     
     const into = size.slice() as Point;
-    into[0] -= ml + mr;
-    into[1] -= mt + mb;
+    into[0] -= mw;
+    into[1] -= mh;
 
-    const {render, pick, size: fitted} = fit(into);
+    let {render, pick, size: fitted} = fit(into);
+
+    if (stretch) {
+      let ew = fitted[0] + mw;
+      let eh = fitted[1] + mh;
+
+      if (into[0] != null) ew = Math.min(ew, width);
+      if (into[1] != null) eh = Math.min(eh, height);
+
+      fitted = [ew - mw, eh - mh];
+    }
 
     sizes.push(fitted);
     offsets.push([left + ml, top + mt]);
@@ -70,20 +83,20 @@ export const resolveAbsoluteBox = (
   let favorW = false;
   let favorH = false;
 
-  if (l != null) left   += parseDimension(l, width)!;
-  if (r != null) right  -= parseDimension(r, width)!;
-  if (t != null) top    += parseDimension(t, height)!;
-  if (b != null) bottom -= parseDimension(b, height)!;
+  if (l != null) left   += evaluateDimension(l, width)!;
+  if (r != null) right  -= evaluateDimension(r, width)!;
+  if (t != null) top    += evaluateDimension(t, height)!;
+  if (b != null) bottom -= evaluateDimension(b, height)!;
 
   if (w != null) {
-    width = parseDimension(w, width)!;
+    width = evaluateDimension(w, width)!;
     if (l != null || r == null) right = left + width;
     else left = right - width;
     favorW = true;
   }
 
   if (h != null) {
-    height = parseDimension(h, height)!;
+    height = evaluateDimension(h, height)!;
     if (t != null || b == null) bottom = top + height;
     else top = bottom - height;
     favorH = true;

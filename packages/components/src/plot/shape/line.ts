@@ -1,6 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ShaderSource } from '@use-gpu/shader/types';
-import { ColorTrait, LineTrait, ROPTrait, VectorLike } from '../types';
+import { ColorTrait, LineTrait, ROPTrait } from '../types';
+import { VectorLike } from '../traits/types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
@@ -8,15 +9,9 @@ import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { DataContext } from '../../providers/data-provider';
 import {
-  parseFloat,
-  parseDetail,
-  parsePosition4,
-} from '../util/parse';
-import {
   useColorTrait,
   useLineTrait,
   useROPTrait,
-  useProp,
 } from '../traits';
 import { vec4 } from 'gl-matrix';
 

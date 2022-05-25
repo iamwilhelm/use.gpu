@@ -1,6 +1,6 @@
 import { TypedArray } from '@use-gpu/core/types';
 import { ArrowFunction } from '@use-gpu/live/types';
-import { LineTrait, ColorTrait, ROPTrait, ArrowTrait, ScaleTrait, Domain, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike, PointShape } from '../types';
+import { Domain, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike, PointShape } from './types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
@@ -11,9 +11,6 @@ const NO_MAT4 = mat4.create();
 
 const GRAY = [0.5, 0.5, 0.5, 1] as Color;
 
-const NO_RANGE = vec2.fromValues(-1, 1);
-const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
-
 const NO_VECTOR: number[] = [];
 const NO_STRINGS: string[] = [];
 
@@ -23,11 +20,13 @@ export const optional = <A, B>(parse: (t?: A) => B) => (t?: A): B | undefined =>
 
 ///////////////////////////
 
+export const makeParseObject = <T>(def: object) => (value?: T) => value ?? def;
+
 export const makeParseFloat = (def: number = 0, min?: number, max?: number) => (value?: number) => {
   if (value != null) {
     if (min != null) value = Math.max(min, value);
     if (max != null) value = Math.min(max, value);
-    return +value;
+    return +value || 0;
   }
   return def;
 };
@@ -104,6 +103,14 @@ export const makeParseEnum = <T>(
   };
 };
 
+export const makeParseMap = <T>(map: Record<string, T>, def: string) => {
+  return (s?: string) => map[s as any] ?? map[def]!;
+};
+
+export const makeParseMapOrValue = <T>(map: Record<string, T>, def: string): ((s?: string | T) => T) => {
+  return (s?: string | T) => map[s as any] ?? (s as any as T) ?? map[def]!;
+};
+
 export const makeParseString = (
   defaults: string = '',
 ) => {
@@ -122,37 +129,9 @@ export const makeParseStringFormatter = (
   };
 };
 
-const AXIS_NUMBERS = {'x': 0, 'y': 1, 'z': 2, 'w': 3} as Record<string, number>;
-const AXIS_LETTERS = ['x', 'y', 'z', 'w'];
-
-export const makeParseAxis = (def: number) => (s?: string) => {
-  if (s != null) return AXIS_NUMBERS[s] ?? def;
-  return def;
-};
-
-export const makeParseBasis = (defaults: string) => {
-  const axes = defaults.split('');
-  const order = [0, 1, 2, 3];
-
-  const getOrder = (s: string) => {
-    order.sort((a, b) => {
-      const ai = s.indexOf(axes[a]);
-      const bi = s.indexOf(axes[b]);
-      if (ai >= 0 && bi >= 0) return ai - bi;
-      if (ai < 0 && bi < 0) return a - b;
-      return (ai < 0) ? 1 : -1;
-    });
-    return order.map(x => AXIS_LETTERS[x]).join('');
-  };
-
-  return (s?: string) => {
-    if (s != null) return getOrder(s);
-    return defaults;
-  }
-};
-
 const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
 const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
+const strToFloat = (s: string) => s.match('%') ? parseFloat(s) / 100 : parseFloat(s);
 
 export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color => {
   const c = color as any;
@@ -178,9 +157,18 @@ export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color 
         const b = u8ToFloat(c.slice(5, 7));
         return [r, g, b, 1] as Color;
       }
+      if (c.length === 9) {
+        const r = u8ToFloat(c.slice(1, 3));
+        const g = u8ToFloat(c.slice(3, 5));
+        const b = u8ToFloat(c.slice(5, 7));
+        const a = u8ToFloat(c.slice(5, 7));
+        return [r, g, b, a] as Color;
+      }
     }
     if (c[0] === 'r') {
-      throw new Error("Use {rgb:[r,g,b]} or rgba:[r,g,b,a]} to specify RGB(A) colors.")
+      const cs = c.split(',').map(strToFloat);
+      if (c[3] === 'a') return [cs[0], cs[1], cs[2], cs[3]];
+      else return [cs[0], cs[1], cs[2], 1];
     }
   }
   if (c.rgba ?? c.rgb) {
@@ -193,17 +181,7 @@ export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color 
   return def;
 };
 
-export const makeParseMap = <T>(map: Record<string, T>, def: string) => {
-  return (s?: string) => map[s as any] ?? map[def]!;
-};
-
-export const makeParseMapOrValue = <T>(map: Record<string, T>, def: string): ((s?: string | T) => T) => {
-  return (s?: string | T) => map[s as any] ?? (s as any as T) ?? map[def]!;
-};
-
 //////////////////
-
-export const parseColor      = makeParseColor();
 
 export const parseFloat      = makeParseFloat();
 export const parseInteger    = makeParseInt();
@@ -215,6 +193,7 @@ export const parseStringArray     = makeParseArray(NO_STRINGS, parseString);
 
 export const parseVector     = makeParseArray(NO_VECTOR, parseFloat);
 
+export const parseColor      = makeParseColor();
 export const parsePosition4  = makeParseVec4();
 
 export const parsePosition   = makeParseVec3();
@@ -223,15 +202,6 @@ export const parseQuaternion = makeParseVec3();
 export const parseScale      = makeParseVec3(vec3.fromValues(1, 1, 1));
 export const parseMatrix     = makeParseMat4();
 
-export const parseRange      = makeParseVec2(NO_RANGE);
-export const parseRanges     = makeParseArray(NO_RANGES, parseRange);
-
-export const parseAxes       = makeParseBasis('xyzw');
-export const parseAxis       = makeParseAxis(0);
-
-export const parseDetail     = makeParseInt(1, 1, 1e8);
-
-export const parseDomain     = makeParseEnum<Domain>(['linear', 'log']);
 export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
 export const parseBlending   = makeParseEnum<Blending>(['none', 'normal', 'add', 'subtract', 'multiply', 'custom']);
 
@@ -258,5 +228,3 @@ export const parseWeight = makeParseMapOrValue({
   'extra-bold': 800,
   'ultra-bold': 900,
 }, 'normal');
-
-export const parsePointShape = makeParseEnum<PointShape>(['circle', 'diamond', 'square', 'circleOutlined', 'diamondOutlined', 'squareOutlined'])

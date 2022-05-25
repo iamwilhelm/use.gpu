@@ -3,38 +3,34 @@ import { LayoutElement, Point, Dimension, Margin, Point4, Rectangle, ImageAttach
 
 import { use, memo, gather, provide, yeet, tagFunction, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { normalizeMargin, parseDimension, memoFit } from '../lib/util';
+import { memoFit } from '../lib/util';
+import { evaluateDimension } from '../parse';
 import { LayoutContext } from '../../providers/layout-provider';
 import { TransformContext } from '../../providers/transform-provider';
 
-export type EmbedProps = {
-  direction?: 'x' | 'y',
+import { useProp } from '../../traits/useProp';
+import { BoxTrait, ElementTrait } from '../types';
+import { useBoxTrait, useElementTrait } from '../traits';
+import { parseDimension, parseMargin } from '../parse';
 
-  width?: Dimension,
-  height?: Dimension,
-
-  grow?: number,
-  shrink?: number,
-  margin?: number | Margin,
+export type EmbedProps = Partial<BoxTrait> &
+{
   snap?: boolean,
-
   render?: (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>,
   children?: LiveElement<any>,
 };
 
 export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
   const {
-    width,
-    height,
-    grow = 0,
-    shrink = 0,
     snap = true,
-    margin: m = 0,
     render,
     children,
   } = props;
 
-  const margin = normalizeMargin(m);
+  const { margin, grow, shrink } = useBoxTrait(props);
+
+  const width  = useProp(props.width,  parseDimension);
+  const height = useProp(props.height, parseDimension);
 
   const {id} = useFiber();
 
@@ -48,8 +44,8 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
 
     let ratioX = undefined;
     let ratioY = undefined;
-    if (typeof width  === 'string') ratioX = parseDimension(width,  1, false);
-    if (typeof height === 'string') ratioY = parseDimension(height, 1, false);
+    if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false);
+    if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
     return yeet({
       sizing,
@@ -60,8 +56,8 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
       ratioY,
       absolute: true,
       fit: memoFit((into: AutoPoint) => {
-        const w = width != null ? parseDimension(width, into[0], snap) : null;
-        const h = height != null ? parseDimension(height, into[1], snap) : null;
+        const w = width != null ? evaluateDimension(width, into[0], snap) : null;
+        const h = height != null ? evaluateDimension(height, into[1], snap) : null;
 
         const size = [
           w ?? into[0],

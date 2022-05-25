@@ -1,5 +1,7 @@
 import { LiveFunction, LiveElement } from '@use-gpu/live/types';
 
+export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
+
 export enum LayerType {
   Point = 'point',
   Line = 'line',

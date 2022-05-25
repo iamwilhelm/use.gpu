@@ -1,6 +1,8 @@
 import { vec2, vec3, mat4 } from 'gl-matrix';
 
 export type Point = [number, number];
+export type Point3 = [number, number, number];
+export type Point4 = [number, number, number, number];
 export type Rectangle = [number, number, number, number];
 
 export type Dictionary<T = string> = Record<string, T>;

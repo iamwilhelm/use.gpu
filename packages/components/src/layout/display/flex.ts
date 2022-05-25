@@ -1,48 +1,51 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Margin, Dimension, Direction, Alignment, Anchor, AutoPoint, Point } from '../types';
+import { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, AutoPoint, Point } from '../types';
 
-import { yeet, memo, gather, useFiber } from '@use-gpu/live';
+import { use, yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import { makeBoxLayout, makeBoxPicker, normalizeAlignment, normalizeGap, parseDimension, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable } from '../../hooks/useInspectable'
+import { useProp } from '../../traits/useProp';
+import { BoxTrait, ElementTrait } from '../types';
+import { useBoxTrait, useElementTrait } from '../traits';
+import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY, parseMargin } from '../parse';
+import { Element } from '../element/element';
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
-export type FlexProps = {
+export type FlexProps =
+  Partial<BoxTrait> &
+  Partial<ElementTrait> &
+{
   direction?: Direction,
 
-  width?: Dimension,
-  height?: Dimension,
-
-  gap?: number | Point,
-  align?: Alignment | [Alignment, Alignment],
+  gap?: GapLike,
+  align?: AlignmentLike,
   anchor?: Anchor,
 
-  grow?: number,
-  shrink?: number,
   wrap?: boolean,
   snap?: boolean,
-
   children?: LiveElement<any>,
 };
 
 export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const {
-    direction = 'x',
-    width,
-    height,
-    gap: g = 0,
-    align: al = 'start',
-    anchor = 'start',
-    grow = 0,
-    shrink = 1,
     wrap = false,
     snap = true,
     children,
   } = props;
 
-  const gap    = normalizeGap(g);
-  const align  = normalizeAlignment(al);
+  const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { margin, grow, shrink } = useBoxTrait(props);
+
+  const direction = useProp(props.direction, parseDirectionX);
+  const align     = useProp(props.align, parseAlignmentXY);
+  const anchor    = useProp(props.anchor, parseAnchor);
+  const gap       = useProp(props.gap, parseGapXY);
+
+  const background = (stroke || fill || image) ? (
+    use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
+  ) : null;
 
   const {id} = useFiber();
   const inspect = useInspectable();
@@ -57,19 +60,19 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
 
     let ratioX = undefined;
     let ratioY = undefined;
-    if (typeof width  === 'string') ratioX = parseDimension(width,  1, false) ?? 1;
-    if (typeof height === 'string') ratioY = parseDimension(height, 1, false) ?? 1;
+    if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false) ?? 1;
+    if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false) ?? 1;
 
     return yeet({
       sizing,
-      margin: NO_MARGIN,
+      margin,
       grow,
       shrink,
       ratioX,
       ratioY,
       fit: memoFit((into: AutoPoint) => {
-        const w = width  != null ? parseDimension(width, into[0], snap) : null;
-        const h = height != null ? parseDimension(height, into[1], snap) : null;
+        const w = width  != null ? evaluateDimension(width, into[0], snap) : null;
+        const h = height != null ? evaluateDimension(height, into[1], snap) : null;
         const fixed = [w, h] as [number | number, number | null];
 
         const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);

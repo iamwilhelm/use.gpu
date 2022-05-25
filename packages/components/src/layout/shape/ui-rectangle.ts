@@ -7,7 +7,7 @@ import { LayoutContext } from '../../providers/layout-provider';
 import { LayerType } from '../../layers/types';
 import { Rectangle, ImageAttachment, Fit, Repeat, Anchor, Point4 } from '../types';
 
-import { parseDimension, parseAnchor, normalizeAnchor } from '../lib/util';
+import { evaluateDimension, evaluateAnchor, parseAnchorXY } from '../parse';
 
 const UV_SQUARE = [0, 0, 1, 1];
 
@@ -123,8 +123,8 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
       fit,
       width,
       height,
-      repeat = 'none',
-      align = 'center',
+      repeat,
+      align,
     } = image;
     const {size} = texture;
 
@@ -132,8 +132,8 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
 
     if (fit !== 'scale') {
  
-      let w = (width != null ? parseDimension(width, size[0], false) : size[0])!;
-      let h = (height != null ? parseDimension(height, size[1], false) : size[1])!;
+      let w = (width != null ? evaluateDimension(width, size[0], false) : size[0])!;
+      let h = (height != null ? evaluateDimension(height, size[1], false) : size[1])!;
 
       if (fit === 'contain') {
         let fitW = boxW / w;
@@ -150,9 +150,9 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         h *= scale;
       }
 
-      const [alignX, alignY] = normalizeAnchor(align);
-      let left   = parseAnchor(alignX) * (boxW - w);
-      let top    = parseAnchor(alignY) * (boxH - h);
+      const [alignX, alignY] = parseAnchorXY(align);
+      let left   = evaluateAnchor(alignX) * (boxW - w);
+      let top    = evaluateAnchor(alignY) * (boxH - h);
       let right  = boxW - (left + w);
       let bottom = boxH - (top + h);
 

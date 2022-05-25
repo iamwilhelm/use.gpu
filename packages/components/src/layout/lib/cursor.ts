@@ -1,7 +1,7 @@
 import { Alignment } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
-import { parseAnchor } from './util';
+import { evaluateAnchor } from '../parse';
 
 type Reduce = (start: number, end: number, gap: number, lead: number, count: number, cross: number, ascent: number, descent: number, index: number) => void;
 
@@ -139,7 +139,7 @@ export const getAlignmentSpacing = (
       }
     }
     else {
-      lead = parseAnchor(align) * slack;
+      lead = evaluateAnchor(align) * slack;
     }
   }
 

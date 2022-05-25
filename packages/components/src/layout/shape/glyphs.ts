@@ -6,8 +6,7 @@ import { Point4, InlineLine } from '../types';
 
 import { use, yeet, useContext } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '../../text/providers/sdf-font-provider';
-import { parseDimension, normalizeMargin } from '../lib/util';
-
+import { evaluateDimension } from '../lib/util';
 const BLACK = [0, 0, 0, 1];
 
 export type GlyphsProps = {

@@ -17,38 +17,40 @@ const FILL = [0.4, 0.7, 1, 0.5];
 
 export const LayoutTestPage: LC = () => {
 
-	const BOXES = (<>
-	  <Element width={180} height={50} fill={FILL} />
-	  <Element width={140} height={60} fill={FILL} />
-	  <Element width={160} height={30} fill={FILL} />
-	  <Element width={180} height={100} fill={FILL} />
-	  <Element width={180} height={50} fill={FILL} />
-	  <Element width={140} height={60} fill={FILL} />
-	</>)
+  const BOXES = (<>
+    <Element width={180} height={50} fill={FILL} />
+    <Element width={140} height={60} fill={FILL} />
+    <Element width={160} height={30} fill={FILL} />
+    <Element width={180} height={100} fill={FILL} />
+    <Element width={180} height={50} fill={FILL} />
+    <Element width={140} height={60} fill={FILL} />
+  </>)
 
   const view = (
     <LinearRGB>
       <Pass>
         <UI>
           <Layout>
-            <Overflow>
+            <Absolute>
+              <Overflow y="scroll">
 
-              <Block margin={10} fill={[1, 1, 1, 0.1]}>
+                <Block margin={10}>
 
-								<Label>Flex Start</Label>
-                <Flex margin={10} gap={10} align="start"   anchor="center" height={200}>{BOXES}</Flex>
-                <Flex margin={10} gap={10} align="center"  anchor="center" height={200}>{BOXES}</Flex>
-                <Flex margin={10} gap={10} align="end"     anchor="center" height={200}>{BOXES}</Flex>
+                  <Label>Flex Start</Label>
+                  <Flex margin={10} gap={10} align="start"   anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Flex margin={10} gap={10} align="center"  anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Flex margin={10} gap={10} align="end"     anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
 
-                <Flex wrap margin={10} gap={10} align="justify" anchor="center" height={250}>{BOXES}{BOXES}</Flex>
-                <Flex wrap margin={10} gap={10} align="between" anchor="center" height={250}>{BOXES}{BOXES}</Flex>
-                <Flex wrap margin={10} gap={10} align="evenly"  anchor="center" height={250}>{BOXES}{BOXES}</Flex>
+                  <Flex wrap margin={10} gap={10} align="justify" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Flex wrap margin={10} gap={10} align="between" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Flex wrap margin={10} gap={10} align="evenly"  anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
 
-              </Block>
+                </Block>
 
-              <Block margin={10} direction='x'>{BOXES}</Block>
+                <Block margin={10} direction='x'>{BOXES}</Block>
 
-            </Overflow>
+              </Overflow>
+            </Absolute>
           </Layout>
         </UI>
       </Pass>
@@ -79,4 +81,4 @@ export const LayoutTestPage: LC = () => {
   );
 };
 
-const Label = ({children}: {children: string}) => <Inline><Text>{children}</Text></Inline>
+const Label = ({children}: {children: string}) => <Inline><Text size={32} color={[1, 1, 1, 1]}>{children}</Text></Inline>

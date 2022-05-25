@@ -1,37 +1,58 @@
-import { TextureSource, Tuples } from '@use-gpu/core/types';
+import { TextureSource, Tuples, Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { LiveElement, Key } from '@use-gpu/live/types';
 import { FontMetrics } from '@use-gpu/text/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { mat4 } from 'gl-matrix';
 
-export type Point = [number, number];
-export type Point4 = [number, number, number, number];
-
 export type AutoPoint = [number | null, number | null];
-
-export type Dimension = number | string;
-
 export type Gap = Point;
-export type Sizing = Point4;
 export type Margin = Point4;
-export type Rectangle = Point4;
-export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
+export type Sizing = Point4;
+
 export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'between' | 'evenly';
 export type Anchor = 'start' | 'center' | 'end';
 export type Base = 'start' | 'base' | 'center' | 'end';
-
-export type MarginLike = number | number[];
-
+export type Dimension = number | string;
+export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
 export type Fit = 'contain' | 'cover' | 'scale' | 'none';
+export type Overflow = 'visible' | 'scroll' | 'hidden' | 'auto';
 export type Repeat = 'x' | 'y' | 'xy' | 'none';
 
-export type ImageAttachment = {
+export type MarginLike = number | number[];
+export type GapLike = number | number[];
+export type AlignmentLike = Alignment | Alignment[]
+
+export type BoxTrait = {
+  grow: number,
+  shrink: number,
+  margin: MarginLike,
+};
+
+export type ElementTrait = {
+  width: Dimension,
+  height: Dimension,
+
+  radius: MarginLike,
+  border: MarginLike,
+  stroke: Color,
+  fill: Color,
+  image: ImageTrait,
+};
+
+export type ImageTrait = {
   texture: TextureSource,
-  width?: Dimension,
-  height?: Dimension,
-  fit?: Fit,
-  repeat?: Repeat,
-  align?: Anchor | [Anchor, Anchor],
+  width: Dimension,
+  height: Dimension,
+  fit: Fit,
+  repeat: Repeat,
+  align: AnchorLike,
+};
+
+export type OverflowTrait = {
+  x: Overflow,
+  y: Overflow,
+  scrollX: number,
+  scrollY: number,
 };
 
 export type LayoutRenderer = (box: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>;
@@ -58,6 +79,7 @@ export type LayoutElement = {
   shrink?: number,
   absolute?: boolean,
   under?: boolean,
+  stretch?: boolean,
 
   fit: (size: AutoPoint) => LayoutFit,
 };

@@ -1,22 +1,11 @@
-import { TypedArray } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-
-export type PropParser<A, B> = (t?: A) => B;
-export type PropDef = Record<string, PropParser<any, any>>;
-
-export type Swizzle = string;
 export type Axis = 'x' | 'y' | 'z' | 'w';
-export type Range = [number, number];
-export type Join = 'miter' | 'round' | 'bevel';
 export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
+export type Dimension = string | number;
 export type Domain = 'linear' | 'log';
-export type Color = [number, number, number, number];
+export type Join = 'miter' | 'round' | 'bevel';
 export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom';
+export type Swizzle = string;
 export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
-
-export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;
-export type VectorLike = TypedArray | number[];
-export type ArrayLike<T = any> = TypedArray | T[];
 
 export type AnchorTrait = {
   placement: Placement,
@@ -115,3 +104,4 @@ export type SurfaceTrait = {
   loopX: boolean,
   loopY: boolean,
 };
+

@@ -5,7 +5,7 @@ import { Rectangle, Point4, InlineLine } from '../types';
 
 import { keyed, yeet, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { makeTuples, emitIntoNumberArray } from '@use-gpu/core';
-import { parseDimension, normalizeMargin } from '../lib/util';
+import { evaluateDimension, normalizeMargin } from '../lib/util';
 
 import { useFontFamily, useFontText, useFontHeight } from '../../text/providers/font-provider';
 import { Glyphs } from '../shape/glyphs';

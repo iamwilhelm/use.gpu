@@ -1,9 +1,13 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { AutoPoint, Point, Rectangle, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
+import { AutoPoint, Point, Direction, Rectangle, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
 
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/clip/clip.wgsl';
+
+export const isHorizontal = (d: Direction) => d === 'x' || d === 'lr' || d === 'rl';
+export const isVertical = (d: Direction) => d === 'y' || d === 'tb' || d === 'bt';
+export const isFlipped = (d: Direction) => d === 'rl' || d === 'bt';
 
 type Fitter<T> = (into: AutoPoint) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
@@ -19,56 +23,6 @@ export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
   };
 }
 
-export const parseDimension = (x: string | number | null | undefined, total: number | null, snap: boolean = false): number | null => {
-  if (typeof x === 'number') return snap ? Math.round(x) : x;
-  if (x == null) return total != null ? (snap ? Math.round(total) : total) : null;
-
-  let v;
-  const s = x as string;
-  if (s[s.length - 1] === '%') {
-    if (total == null) return null;
-    v = +s.slice(0, -1) / 100 * total;
-  }
-  else {
-    v = +s;
-  }
-
-  return snap ? Math.round(v) : v;
-}
-
-export const parseAnchor = (x: string): number => {
-  const isStart = (x === 'start' || x === 'justify-start');
-  const isEnd = (x === 'end' || x === 'justify-end');
-
-  const align = isStart ? 0 : isEnd ? 1 : 0.5;
-  return align;
-}
-
-export const parseBase = (x: string): number | null => {
-  const isBase = (x === 'base');
-    return isBase ? null : parseAnchor(x);
-}
-
-export const normalizeAlignment = (x: Alignment | [Alignment, Alignment]): [Alignment, Alignment] =>
-  !Array.isArray(x)
-    ? [x, x] as [Alignment, Alignment]
-    : x;
-
-export const normalizeAnchor = (x: Anchor | [Anchor, Anchor]): [Anchor, Anchor] =>
-  !Array.isArray(x)
-    ? [x, x] as [Anchor, Anchor]
-    : x;
-
-export const normalizeMargin = (m: MarginLike): Margin =>
-  !Array.isArray(m)
-    ? [m, m, m, m] as Margin
-    : [m[0] || 0, m[1] || 0, (m[2] ?? m[0]) || 0, (m[3] ?? m[1]) || 0];
-
-export const normalizeGap = (g: number | Gap): Gap =>
-  !Array.isArray(g)
-    ? [g, g] as Gap
-    : g;
-
 export const mergeMargin = (a: number, b: number) => {
   if (a >= 0 && b >= 0) return Math.max(a, b);
   if (a >= 0) return a + b;
@@ -83,6 +37,7 @@ export const makeBoxLayout = (
   clip?: ShaderModule,
   transform?: ShaderModule,
   inverse?: ShaderModule,
+  update?: (r: Rectangle) => void,
 ) => (
   box: Rectangle,
   parentClip?: ShaderModule,
@@ -91,6 +46,8 @@ export const makeBoxLayout = (
   let [left, top, right, bottom] = box;
   const out = [] as LiveElement<any>[];
   const n = sizes.length;
+
+  if (update) update(box);
 
   const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
   const xclip = parentClip ? (

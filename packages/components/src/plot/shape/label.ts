@@ -1,14 +1,17 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait, VectorLike } from '../types';
+import { AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait } from '../traits';
+import { VectorLike } from '../traits/types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import {
   parseFloat,
-  parseDetail,
   parsePosition4,
-} from '../util/parse';
+} from '../../traits/parse';
+import {
+  parseDetail,
+} from '../parse';
 import {
   useAnchorTrait,
   useColorTrait,

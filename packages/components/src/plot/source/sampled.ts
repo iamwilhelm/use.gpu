@@ -5,7 +5,7 @@ import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } 
 import { SampledData } from '../../data/sampled-data';
 import { DataContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
-import { parseAxis } from '../util/parse';
+import { parseAxis } from '../parse';
 
 export type SampledProps = {
   axis?: string,

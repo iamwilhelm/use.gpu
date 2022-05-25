@@ -3,27 +3,21 @@ import { LayoutElement, Point, AutoPoint, Dimension, MarginLike, Margin, Point4,
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { normalizeMargin, makeBoxLayout, makeBoxPicker, parseDimension, memoFit } from '../lib/util';
-import { useInspectable } from '../../hooks/useInspectable'
+import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { useInspectable } from '../../hooks/useInspectable';
 
-import { Absolute } from './absolute';
+import { BoxTrait, ElementTrait } from '../types';
+import { useBoxTrait, useElementTrait } from '../traits';
+import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
+import { useProp } from '../../traits/useProp';
 import { Element } from '../element/element';
 
-export type BlockProps = {
-  direction?: 'x' | 'y',
-
-  width?: Dimension,
-  height?: Dimension,
-
-  radius?: MarginLike,
-  border?: MarginLike,
-  stroke?: Point4,
-  fill?: Point4,
-  image?: ImageAttachment,
-
-  grow?: number,
-  shrink?: number,
-  margin?: MarginLike,
+export type BlockProps =
+  Partial<BoxTrait> &
+  Partial<ElementTrait> &
+{
+  direction?: Direction,
+  
   padding?: MarginLike,
   snap?: boolean,
   contain?: boolean,
@@ -33,30 +27,21 @@ export type BlockProps = {
 
 export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const {
-    direction = 'y',
-    width,
-    height,
-    grow = 0,
-    shrink = 0,
     snap = true,
-    margin: m = 0,
-    padding: p = 0,
     children,
-    contain = !!p,
-    
-    radius,
-    border,
-    stroke,
-    fill,
-    image,
   } = props;
+
+  const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { margin: blockMargin, grow, shrink } = useBoxTrait(props);
+
+  const direction = useProp(props.direction, parseDirectionY);
+  const padding = useProp(props.padding, parseMargin);
+
+  const contain = props.contain ?? !!padding;
 
   const background = (stroke || fill || image) ? (
     use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
   ) : null;
-
-  const blockMargin = normalizeMargin(m);
-  const padding = normalizeMargin(p);
 
   const {id} = useFiber();
   const inspect = useInspectable();
@@ -72,8 +57,8 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
 
     let ratioX = undefined;
     let ratioY = undefined;
-    if (typeof width  === 'string') ratioX = parseDimension(width,  1, false);
-    if (typeof height === 'string') ratioY = parseDimension(height, 1, false);
+    if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false);
+    if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
     return yeet({
       sizing,
@@ -83,14 +68,14 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       ratioX,
       ratioY,
       fit: memoFit((into: AutoPoint) => {
-        const w = width != null ? parseDimension(width, into[0], snap) : null;
-        const h = height != null ? parseDimension(height, into[1], snap) : null;
+        const w = width != null ? evaluateDimension(width, into[0], snap) : null;
+        const h = height != null ? evaluateDimension(height, into[1], snap) : null;
         const fixed = [
           width != null ? w : null,
           height != null ? h : null,
         ] as [number | number, number | null];
 
-        const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
+        const {size, overflow, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
 
         inspect({
           layout: {

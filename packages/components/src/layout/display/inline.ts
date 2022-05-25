@@ -1,46 +1,46 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Point, Rectangle, Alignment, Base, Margin } from '../types';
+import { Point } from '@use-gpu/core/types';
+import { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Rectangle, Alignment, Base, MarginLike } from '../types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
 import { memo, gather, yeet, useFiber, useOne } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
-import { normalizeMargin, makeInlineLayout, makeBoxLayout, makeBoxPicker, parseDimension, memoFit } from '../lib/util';
+import { makeInlineLayout, makeBoxLayout, makeBoxPicker, evaluateDimension, memoFit } from '../lib/util';
 import { useInspectable } from '../../hooks/useInspectable'
+import { useProp } from '../../traits/useProp';
+import { BoxTrait } from '../types';
+import { useBoxTrait } from '../traits';
+import { parseAlignment, parseAnchor, parseDirectionX, parseMargin } from '../parse';
 
-export type InlineProps = {
+export type InlineProps = BoxTrait & {
   direction?: 'x' | 'y',
+
   align?: Alignment,
   anchor?: Base,
+  padding?: MarginLike,
 
-  grow?: number,
-  shrink?: number,
-  margin?: number | Margin,
-  padding?: number | Margin,
   wrap?: boolean,
   snap?: boolean,
-
   children?: LiveElement<any>,
 };
 
 export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
   const {
-    direction = 'x',
-    align = 'start',
-    anchor = 'base',
-    grow = 1,
-    shrink = 1,
     wrap = true,
     snap = true,
-    margin: m = 0,
-    padding: p = 0,
     children,
   } = props;
 
-  const margin = normalizeMargin(m);
-  const padding = normalizeMargin(p);
+  const { margin, grow, shrink } = useBoxTrait(props);
+
+  const direction = useProp(props.direction, parseDirectionX);
+  const padding = useProp(props.padding, parseMargin);
+  const anchor = useProp(props.anchor, parseAnchor);
+  const align = useProp(props.align, parseAlignment);
 
   const {id} = useFiber();
   const inspect = useInspectable();
+  if (margin === undefined) debugger
 
   const Resume = (els: InlineElement[]) => {
     const inlineEls = resolveInlineBlockElements(els, direction);

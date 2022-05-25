@@ -6,15 +6,9 @@ import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu
 
 import { DataContext } from '../../providers/data-provider';
 import {
-  parseFloat,
-  parseDetail,
-  parsePosition4,
-} from '../util/parse';
-import {
   useColorTrait,
   usePointTrait,
   useROPTrait,
-  useProp,
 } from '../traits';
 import { vec4 } from 'gl-matrix';
 

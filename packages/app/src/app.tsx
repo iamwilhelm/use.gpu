@@ -56,24 +56,24 @@ export const App: LC = () => {
   const fiber = useFiber();
   const {inspect, layout, setLayout} = useInspector();
 
-	const view = useMemo(() => (
-	  <WebGPU
-	    fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
-	  >
-	    <AutoCanvas
-	      selector={'#use-gpu'}
-	      samples={4}
-	    >
-	      <FontLoader fonts={fonts}>
-	        {router}
-	      </FontLoader>
-	    </AutoCanvas>
-	  </WebGPU>
-	), [root, fonts, router]);
+  const view = useMemo(() => (
+    <WebGPU
+      fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
+    >
+      <AutoCanvas
+        selector={'#use-gpu'}
+        samples={4}
+      >
+        <FontLoader fonts={fonts}>
+          {router}
+        </FontLoader>
+      </AutoCanvas>
+    </WebGPU>
+  ), [root, fonts, router]);
 
   return (<>
     <DebugProvider debug={{layout: {inspect: layout}}}>
-			{view}
+      {view}
     </DebugProvider>
     {inspect ? <UseInspect fiber={fiber} container={root} onInspect={setLayout} /> : null}
   </>)

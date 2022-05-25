@@ -1,18 +1,18 @@
-import { AutoPoint, Point, Point4, LayoutElement, LayoutRenderer, LayoutPicker, Margin, Rectangle } from '../types';
-import { mergeMargin } from './util';
+import { AutoPoint, Direction, Point, Point4, LayoutElement, LayoutRenderer, LayoutPicker, Margin, Rectangle } from '../types';
+import { isHorizontal, mergeMargin } from './util';
 
 const isNotAbsolute = (el: LayoutElement) => !el.absolute;
 
 export const getBlockMinMax = (
   els: LayoutElement[],
   fixed: [number | null, number | null],
-  direction: 'x' | 'y',
+  direction: Direction,
 ) => {
   if (fixed[0] != null && fixed[1] != null) {
     return [fixed[0], fixed[1], fixed[0], fixed[1]];
   }
 
-  const isX = direction === 'x';
+  const isX = isHorizontal(direction);
   
   let allMinX = 0;
   let allMinY = 0;
@@ -80,10 +80,10 @@ export const getBlockMargin = (
   els: LayoutElement[],
   margin: Margin,
   padding: Margin,
-  direction: 'x' | 'y',
+  direction: Direction,
   contain: boolean,
 ) => {
-  const isX = direction === 'x';
+  const isX = isHorizontal(direction);
   const [pl, pt, pr, pb] = padding;
 
   const first = els.find(isNotAbsolute);
@@ -109,10 +109,10 @@ export const fitBlock = (
   into: AutoPoint,
   fixed: AutoPoint,
   padding: Point4,
-  direction: 'x' | 'y',
+  direction: Direction,
   contain: boolean,
 ) => {
-  const isX = direction === 'x';
+  const isX = isHorizontal(direction);
   const [pl, pt, pr, pb] = padding;
 
   // Track growing width and height
@@ -138,7 +138,7 @@ export const fitBlock = (
   const renders = [] as LayoutRenderer[];
   const pickers = [] as LayoutPicker[];
 
-  for (const el of els) if (!el.absolute) {
+  for (const el of els) if (!el.absolute && !el.stretch) {
     const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
 
@@ -175,6 +175,33 @@ export const fitBlock = (
     ++i;
   }
 
+  const overflow = [(w + pl + pr), (h + pt + pb)] as Point;
+
+  for (const el of els) if (el.stretch) {
+    const {margin, fit, under} = el;
+    const [ml, mt, mr, mb] = margin;
+
+    const size = resolved.slice() as Point;
+    if (size[0] != null) size[0] -= ml + mr;
+    if (size[1] != null) size[1] -= mt + mb;
+
+    const {render, pick, size: fitted} = fit(size);
+
+    let ew = fitted[0] + ml + mr;
+    let eh = fitted[1] + mt + mb;
+
+    if (resolved[0] != null) ew = Math.min(ew, resolved[0]);
+    if (resolved[1] != null) eh = Math.min(eh, resolved[1]);
+
+    if (isX) w = Math.max(ew, fitted[0]);
+    else h = Math.max(eh, fitted[1]);
+
+    sizes.push([ew - ml - mr, eh - mt - mb]);
+    renders.push(render);
+    pickers.push(pick);
+    offsets.push([ml, mt]);
+  }
+
   if (resolved[0] == null) resolved[0] = w + pl + pr;
   if (resolved[1] == null) resolved[1] = h + pt + pb;
 
@@ -204,6 +231,7 @@ export const fitBlock = (
 
   return {
     size: resolved,
+    overflow,
     sizes,
     offsets,
     renders,

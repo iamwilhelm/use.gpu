@@ -4,7 +4,7 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { ImageAttachment, Dimension, Margin, MarginLike, Fit, Repeat, Rectangle, Anchor, AutoPoint, Point, Point4 } from '../types';
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
-import { parseDimension, normalizeMargin } from '../lib/util';
+import { evaluateDimension, parseMargin } from '../parse';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 
@@ -60,9 +60,9 @@ export const Element: LiveComponent<ElementProps> = (props) => {
   const {id} = useFiber();
   const sizing = [w, h, w, h];
 
-  const margin = normalizeMargin(props.margin ?? 0);
-  const radius = normalizeMargin(props.radius ?? 0);
-  const border = normalizeMargin(props.border ?? 0);
+  const margin = parseMargin(props.margin ?? 0);
+  const radius = parseMargin(props.radius ?? 0);
+  const border = parseMargin(props.border ?? 0);
 
   return yeet({
     sizing,
@@ -72,8 +72,8 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     absolute,
     under,
     fit: (into: AutoPoint) => {
-      const w = width != null ? parseDimension(width, into[0] || 0, snap) : into[0] || 0;
-      const h = height != null ? parseDimension(height, into[1] || 0, snap) : into[1] || 0;
+      const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
+      const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
       const size = [w, h];
 
       const render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (

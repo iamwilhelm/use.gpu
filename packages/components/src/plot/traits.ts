@@ -1,5 +1,4 @@
-import { ArrowFunction } from '@use-gpu/live/types';
-import { useOne } from '@use-gpu/live';
+import { makeUseTrait } from '../traits/useTrait';
 import {
   parseFloat,
   parseInteger,
@@ -15,21 +14,22 @@ import {
   parseColor,
   parseScale,
   parseMatrix,
-  parseRange,
-  parseRanges,
-  parseAxes,
-  parseAxis,
-  parseDetail,
-  parseDomain,
   parseJoin,
   parseBlending,
   parsePlacement,
   parseWeight,
-  parsePointShape,
   optional,
-} from './util/parse';
+} from '../traits/parse';
 import {
-  PropDef,
+  parseAxes,
+  parseAxis,
+  parseDetail,
+  parseDomain,
+  parsePointShape,
+  parseRange,
+  parseRanges,
+} from './parse';
+import {
   AnchorTrait,
   ArrowTrait,
   AxesTrait,
@@ -149,9 +149,9 @@ const OBJECT_TRAIT = {
 const OBJECT_DEFAULTS = {};
 
 const POINT_TRAIT = {
-  size:      parseFloat,
-  depth:     parseFloat,
-  shape:     parsePointShape,
+  size:  parseFloat,
+  depth: parseFloat,
+  shape: parsePointShape,
 };
 
 const POINT_DEFAULTS = {
@@ -208,45 +208,6 @@ const SURFACE_TRAIT = {
 const SURFACE_DEFAULTS = {
   loopX: false,
   loopY: false,
-};
-
-export const useProp = <A, B>(value: A | undefined, parse: (t?: A) => B, def?: B): B =>
-  useOne(() => def !== undefined && value === undefined ? def : parse(value), value);
-
-type PropDefTypes<T extends Record<string, ArrowFunction>> = {
-  [P in keyof T]?: ReturnType<T[P]>;
-};
-
-type UseTrait<I, O> = (props: Partial<I>) => O;
-
-export const makeUseTrait = <
-  T extends Record<string, any>,
-  P extends PropDef = any,
->(
-  propDef: P,
-  defaultValues: Record<string, any>
-): UseTrait<T, PropDefTypes<P>> => {
-  const defaults: Record<string, any> = {};
-  for (const k in defaultValues) defaults[k] = propDef[k](defaultValues[k]);
-  return (props: Partial<T>) => useTrait(props, propDef, defaults);
-};
-
-const useTrait = <
-  T extends Record<string, any>,
-  P extends PropDef = any,
->(
-  props: Partial<T>,
-  propDef: P,
-  defaults: Record<string, any>,
-): PropDefTypes<P> => {
-  const parsed: Record<string, any> = useOne(() => ({}));
-
-  for (let k in propDef) {
-    const v = props[k];
-    parsed[k] = useProp(v, propDef[k], defaults ? defaults[k] : undefined);
-  }
-
-  return parsed as T;
 };
 
 export const useAnchorTrait  = makeUseTrait<AnchorTrait>(ANCHOR_TRAIT, ANCHOR_DEFAULTS);

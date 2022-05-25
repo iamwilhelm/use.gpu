@@ -7,15 +7,17 @@ import { DataContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import {
   parseFloat,
-  parseDetail,
   parsePosition4,
-} from '../util/parse';
+} from '../../traits/parse';
+import {
+  parseDetail,
+} from '../parse';
 import {
   useColorTrait,
   useLineTrait,
   useROPTrait,
-  useProp,
 } from '../traits';
+import { useProp } from '../../traits/useProp';
 import { vec4 } from 'gl-matrix';
 
 import { TickLayer } from '../../layers/tick-layer';

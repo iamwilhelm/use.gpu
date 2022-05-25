@@ -1,8 +1,8 @@
 import { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Point, Point4, Margin, Rectangle, Alignment, Anchor, Base } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
-import { parseBase, parseAnchor } from './util';
 import { makeLayoutCursor, getAlignmentSpacing } from './cursor';
+import { isHorizontal } from './util';
 
 const NO_RENDER = () => null;
 const NO_MARGIN: Point4 = [0, 0, 0, 0];
@@ -11,7 +11,7 @@ export const resolveInlineBlockElements = (els: (InlineElement | LayoutElement)[
 
   const into = [null, null] as AutoPoint;
 
-  const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
+  const isX = isHorizontal(direction);
 
   const out: InlineElement[] = [];
   for (const el of els) {
@@ -46,7 +46,7 @@ export const getInlineMinMax = (
   wrap: boolean,
   snap: boolean,
 ) => {
-  const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
+  const isX = isHorizontal(direction);
 
   let allMinMain = 0;
   let allMinCross = 0;
@@ -110,8 +110,6 @@ export const fitInline = (
   snap: boolean,
 ) => {
   const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
-
-  const anchorRatio = parseBase(anchor);
 
   const isSnap = !!snap;
   const isWrap = !!wrap;

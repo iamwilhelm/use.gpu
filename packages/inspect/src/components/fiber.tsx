@@ -197,33 +197,33 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     return [select, hover, unhover];
   }, [fiber, updateSelectState, updateHoverState]);
 
-	const rowRef = useRef<HTMLDivElement>();
+  const rowRef = useRef<HTMLDivElement>();
   const out = [] as React.ReactElement[];
 
-	useLayoutEffect(() => {
-		const {current: row} = rowRef;
-		if (selected && row) {
-			const rect = row.getBoundingClientRect();
+  useLayoutEffect(() => {
+    const {current: row} = rowRef;
+    if (selected && row) {
+      const rect = row.getBoundingClientRect();
 
-			let parent = row;
-			while (parent) {
-				if (parent.classList.contains('tree-scroller')) break;
-				parent = parent.parentElement;
-			}
-			
-			if (parent) {
-				const container = parent.getBoundingClientRect();
-				
-				if (
-					(rect.left < container.left || rect.right > container.right) ||
-					(rect.top < container.top || rect.bottom > container.bottom)
-				) {
-					container.scrollLeft = rect.left - container.left - 10;
-					container.scrollTop = rect.top - container.top - 10;
-				}
-			}
-		}
-	}, [selected]);
+      let parent = row;
+      while (parent) {
+        if (parent.classList.contains('tree-scroller')) break;
+        parent = parent.parentElement;
+      }
+      
+      if (parent) {
+        const container = parent.getBoundingClientRect();
+        
+        if (
+          (rect.left < container.left || rect.right > container.right) ||
+          (rect.top < container.top || rect.bottom > container.bottom)
+        ) {
+          container.scrollLeft = rect.left - container.left - 10;
+          container.scrollTop = rect.top - container.top - 10;
+        }
+      }
+    }
+  }, [selected]);
 
   // Render node itself
   const nodeRender = shouldRender ? (

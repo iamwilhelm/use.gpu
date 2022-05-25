@@ -1,7 +1,8 @@
 import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Point, Point4, Margin, Rectangle, Alignment, Anchor } from '../types';
 
 import { getAlignmentSpacing } from './cursor';
-import { parseAnchor } from './util';
+import { isHorizontal } from './util';
+import { evaluateAnchor } from '../parse';
 
 export const getFlexMinMax = (
   els: LayoutElement[],
@@ -16,7 +17,7 @@ export const getFlexMinMax = (
     return [fixed[0], fixed[1], fixed[0], fixed[1]];
   }
 
-  const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
+  const isX = isHorizontal(direction);
   const [gapX, gapY] = gap;
 
   let allMinX = 0;
@@ -104,7 +105,7 @@ export const fitFlex = (
   wrap: boolean,
   snap: boolean,
 ) => {
-  const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
+  const isX = isHorizontal(direction);
 
   const [gapX, gapY] = gap;
   const gapMain = isX ? gapX : gapY;
@@ -112,7 +113,7 @@ export const fitFlex = (
 
   const alignMain = isX ? alignX : alignY;
   const alignCross = isX ? alignY : alignX;
-  const anchorRatio = parseAnchor(anchor);
+  const anchorRatio = evaluateAnchor(anchor);
 
   const isSnap = !!snap;
   const isWrap = !!wrap;

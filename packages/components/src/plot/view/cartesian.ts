@@ -11,11 +11,11 @@ import { RangeContext } from '../../providers/range-provider';
 import { useShaderRef } from '../../hooks/useShaderRef';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useCombinedTransform } from '../../hooks/useCombinedTransform';
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../util/parse';
 import { composeTransform } from '../util/compose';
 import { swizzleMatrix } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../../traits/parse';
 import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';

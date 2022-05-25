@@ -1,7 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { StorageSource, LambdaSource, UniformType } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { ScaleTrait, AxisTrait, VectorLike } from '../types'; 
+import { ScaleTrait, AxisTrait } from '../types';
+import { VectorLike } from '../traits/types'; 
 
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
@@ -12,8 +13,9 @@ import { useRawSource } from '../../hooks/useRawSource';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useShaderRef } from '../../hooks/useShaderRef';
 
-import { useProp, useScaleTrait, useAxisTrait } from '../traits';
-import { parsePosition4 } from '../util/parse';
+import { useProp } from '../../traits/useProp';
+import { useScaleTrait, useAxisTrait } from '../traits';
+import { parsePosition4 } from '../../traits/parse';
 import { logarithmic, linear } from '../util/domain';
 
 import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';

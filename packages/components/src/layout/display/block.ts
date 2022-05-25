@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Point, AutoPoint, Dimension, MarginLike, Margin, Point4, ImageAttachment } from '../types';
+import { Point, Point4 } from '@use-gpu/core/types';
+import { LayoutElement, AutoPoint, Dimension, Direction, MarginLike, Margin } from '../types';
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';

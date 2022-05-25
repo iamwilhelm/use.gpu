@@ -1,5 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Point, Dimension, Margin, Point4, Rectangle, ImageAttachment } from '../types';
+import { AutoPoint, LayoutElement, Dimension, Margin } from '../types';
+import { Rectangle, Point, Point4 } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 
 import { use, memo, gather, provide, yeet, tagFunction, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
@@ -15,6 +17,8 @@ import { parseDimension, parseMargin } from '../parse';
 
 export type EmbedProps = Partial<BoxTrait> &
 {
+  width?: Dimension,
+  height?: Dimension,
   snap?: boolean,
   render?: (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>,
   children?: LiveElement<any>,

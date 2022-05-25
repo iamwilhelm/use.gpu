@@ -1,6 +1,6 @@
 import { TypedArray } from '@use-gpu/core/types';
 import { ArrowFunction } from '@use-gpu/live/types';
-import { Domain, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike, PointShape } from './types';
+import { Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike } from './types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
@@ -131,7 +131,7 @@ export const makeParseStringFormatter = (
 
 const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
 const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
-const strToFloat = (s: string) => s.match('%') ? parseFloat(s) / 100 : parseFloat(s);
+const strToFloat = (s: string) => s.match('%') ? +s / 100 : +s;
 
 export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color => {
   const c = color as any;

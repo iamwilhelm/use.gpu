@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { StorageSource, LambdaSource, UniformType } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { ScaleTrait, AxisTrait } from '../types';
-import { VectorLike } from '../traits/types'; 
+import { VectorLike } from '../../traits/types';
 
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';

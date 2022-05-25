@@ -1,4 +1,5 @@
-import { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Point, Point4, Margin, Rectangle, Alignment, Anchor, Base } from '../types';
+import { Point, Point4, Rectangle } from '@use-gpu/core/types';
+import { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor, Base } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
 import { makeLayoutCursor, getAlignmentSpacing } from './cursor';
@@ -126,7 +127,7 @@ export const fitInline = (
   const offsets = [] as [number, number, number][];
   const anchors = [] as Point[];
   const renders = [] as InlineRenderer[];
-  const pickers = [] as LayoutPicker[];
+  const pickers = [] as (LayoutPicker | null)[];
 
   // Push all text spans into layout
   const cursor = makeLayoutCursor(wrap ? spaceMain || 0 : 0, align);
@@ -185,7 +186,7 @@ export const fitInline = (
       sizes.push(size);
       offsets.push(offset);
       renders.push(render);
-      pickers.push(pick);
+      pickers.push(pick ?? null);
 
       span += count;
       n -= count;

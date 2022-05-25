@@ -1,4 +1,5 @@
-import { Point, LayoutElement, LayoutRenderer, LayoutPicker, Rectangle } from '../types';
+import { Point, Rectangle } from '@use-gpu/core/types';
+import { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint } from '../types';
 import { evaluateDimension } from '../parse';
 
 const NO_LAYOUT = [0, 0, 0, 0] as Rectangle;

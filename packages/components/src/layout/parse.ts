@@ -1,4 +1,5 @@
-import { Anchor, Base, Alignment, AlignmentLike, Margin, MarginLike, Fit, Repeaet } from './types';
+import { TextureSource } from '@use-gpu/core/types';
+import { Alignment, AlignmentLike, Anchor, AnchorLike, Base, Dimension, Direction, Fit, Gap, GapLike, Margin, MarginLike, OverflowMode, Repeat } from './types';
 import { makeParseEnum, makeParseObject } from '../traits/parse';
  
 const explode = new Proxy({}, {get: () => { throw new Error('Invalid texture source'); }}) as any as TextureSource;
@@ -12,7 +13,7 @@ export const makeParseDimension = (def: Dimension | null = null) => (x?: string 
 export const makeParseAlignmentXY = (
   def: [Alignment, Alignment] = ['start', 'start'],
 ) => (
-  x?: Alignment | [Alignment, Alignment]
+  x?: AlignmentLike,
 ): [Alignment, Alignment] =>
   Array.isArray(x) ? [x[0] ?? 'start', x[1] ?? 'start'] as [Alignment, Alignment] :
   x != null ? [x, x] as [Alignment, Alignment] :
@@ -21,13 +22,13 @@ export const makeParseAlignmentXY = (
 export const makeParseAnchorXY = (
   def: [Anchor, Anchor] = ['start', 'start'],
 ) => (
-  x?: Anchor | [Anchor, Anchor]
+  x?: AnchorLike,
 ): [Anchor, Anchor] =>
   Array.isArray(x) ? [x[0] ?? 'start', x[1] ?? 'start'] as [Anchor, Anchor] :
   x != null ? [x, x] as [Anchor, Anchor] :
   def;
 
-export const makeParseGapXY = (def: Gap = [0, 0]) => (g?: number | Gap): Gap =>
+export const makeParseGapXY = (def: Gap = [0, 0]) => (g?: GapLike): Gap =>
   Array.isArray(g) ? [g[0] || 0, (g[1] ?? g[0]) || 0] as Gap :
   g != null ? [g, g] as Gap :
   def;
@@ -45,7 +46,7 @@ export const parseBase       = makeParseEnum<Base>(['start', 'base', 'center', '
 export const parseDirectionX = makeParseEnum<Direction>(['x', 'y', 'lr', 'rl', 'tb', 'bt']);
 export const parseDirectionY = makeParseEnum<Direction>(['y', 'x', 'lr', 'rl', 'tb', 'bt']);
 export const parseFit        = makeParseEnum<Fit>(['none', 'contain', 'cover', 'scale']);
-export const parseOverflow   = makeParseEnum<Overflow>(['visible', 'scroll', 'hidden', 'auto']);
+export const parseOverflow   = makeParseEnum<OverflowMode>(['visible', 'scroll', 'hidden', 'auto']);
 export const parseRepeat     = makeParseEnum<Repeat>(['x', 'y', 'xy', 'none']);
 
 export const parseDimension   = makeParseDimension();
@@ -71,7 +72,7 @@ export const evaluateDimension = (x: string | number | null | undefined, total: 
   return snap ? Math.round(v) : v;
 }
 
-export const evaluateAnchor = (x: Anchor): number => {
+export const evaluateAnchor = (x: Alignment): number => {
   const isStart = (x === 'start' || x === 'justify-start');
   const isEnd = (x === 'end' || x === 'justify-end');
 

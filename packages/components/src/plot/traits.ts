@@ -1,4 +1,6 @@
 import { makeUseTrait } from '../traits/useTrait';
+import { useOne } from '@use-gpu/live';
+import { useProp } from '../traits/useProp';
 import {
   parseFloat,
   parseInteger,

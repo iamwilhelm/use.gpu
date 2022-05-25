@@ -1,8 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Rectangle } from './types';
+import { ViewUniforms, Rectangle } from '@use-gpu/core/types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
-import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';

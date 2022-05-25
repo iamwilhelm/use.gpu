@@ -1,12 +1,13 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TextureSource, Tuples } from '@use-gpu/core/types';
+import { TextureSource, Tuples, Point4 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { FontMetrics } from '@use-gpu/text/types';
-import { Point4, InlineLine } from '../types';
+import { InlineLine } from '../types';
 
 import { use, yeet, useContext } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '../../text/providers/sdf-font-provider';
-import { evaluateDimension } from '../lib/util';
+import { evaluateDimension } from '../parse';
+
 const BLACK = [0, 0, 0, 1];
 
 export type GlyphsProps = {

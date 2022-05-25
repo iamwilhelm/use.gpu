@@ -1,11 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TextureSource, Emitter } from '@use-gpu/core/types';
+import { Point4 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Rectangle, Point4, InlineLine } from '../types';
+import { InlineLine } from '../types';
 
-import { keyed, yeet, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
-import { makeTuples, emitIntoNumberArray } from '@use-gpu/core';
-import { evaluateDimension, normalizeMargin } from '../lib/util';
+import { keyed, yeet, useFiber } from '@use-gpu/live';
 
 import { useFontFamily, useFontText, useFontHeight } from '../../text/providers/font-provider';
 import { Glyphs } from '../shape/glyphs';

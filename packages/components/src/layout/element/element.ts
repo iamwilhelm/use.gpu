@@ -1,10 +1,11 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource } from '@use-gpu/core/types';
+import { TextureSource, Point4, Rectangle } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { ImageAttachment, Dimension, Margin, MarginLike, Fit, Repeat, Rectangle, Anchor, AutoPoint, Point, Point4 } from '../types';
+import { Dimension, Margin, MarginLike, Fit, Repeat, Anchor, AutoPoint } from '../types';
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension, parseMargin } from '../parse';
+import { ImageTrait } from '../types';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 
@@ -18,7 +19,7 @@ export type ElementProps = {
   stroke?: Point4,
   fill?: Point4,
 
-  image?: ImageAttachment,
+  image?: Partial<ImageTrait>,
 
   grow?: number,
   shrink?: number,
@@ -74,7 +75,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     fit: (into: AutoPoint) => {
       const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
       const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
-      const size = [w, h];
+      const size = [w ?? 0, h ?? 0];
 
       const render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
         keyed(UIRectangle, id, {
@@ -95,7 +96,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
         size,
         render,
         pick: (x: number, y: number, l: number, t: number, scroll?: boolean) => {
-          return !scroll ? [id, [l, t, l + w, t + h]] : null;
+          return !scroll ? [id, [l, t, l + size[0], t + size[1]]] : null;
         },
       };
     },

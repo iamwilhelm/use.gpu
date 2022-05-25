@@ -1,11 +1,11 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TextureSource } from '@use-gpu/core/types';
+import { TextureSource, Rectangle, Point4 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
 import { use, yeet, memo, useContext, useMemo, useNoContext } from '@use-gpu/live';
 import { LayoutContext } from '../../providers/layout-provider';
 import { LayerType } from '../../layers/types';
-import { Rectangle, ImageAttachment, Fit, Repeat, Anchor, Point4 } from '../types';
+import { ImageTrait, Fit, Repeat, Anchor } from '../types';
 
 import { evaluateDimension, evaluateAnchor, parseAnchorXY } from '../parse';
 
@@ -22,7 +22,7 @@ export type UIRectangleProps = {
   id: number,
   layout: Rectangle,
 
-  image?: ImageAttachment,
+  image?: Partial<ImageTrait>,
 
   fill?: Point4,
   stroke?: Point4,
@@ -117,7 +117,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
   }
 
   let render;
-  if (image) {
+  if (image && image.texture) {
     const {
       texture,
       fit,
@@ -173,7 +173,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
       fill,
       
       texture: sampledTexture,
-      repeat: REPEAT_FLAG[repeat] ?? 0,
+      repeat: (repeat != null ? REPEAT_FLAG[repeat] : repeat) ?? 0,
       uv,
 
       bounds: layout,

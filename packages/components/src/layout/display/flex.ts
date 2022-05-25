@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, AutoPoint, Point } from '../types';
+import { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, AutoPoint } from '../types';
 
 import { use, yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';

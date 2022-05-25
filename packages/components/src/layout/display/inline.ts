@@ -1,11 +1,11 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Point } from '@use-gpu/core/types';
-import { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Rectangle, Alignment, Base, MarginLike } from '../types';
+import { Point, Rectangle } from '@use-gpu/core/types';
+import { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Direction, Alignment, Base, MarginLike } from '../types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
 import { memo, gather, yeet, useFiber, useOne } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
-import { makeInlineLayout, makeBoxLayout, makeBoxPicker, evaluateDimension, memoFit } from '../lib/util';
+import { makeInlineLayout, makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable } from '../../hooks/useInspectable'
 import { useProp } from '../../traits/useProp';
 import { BoxTrait } from '../types';
@@ -96,7 +96,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
             if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
             return out;
           },
-          pick: makeBoxPicker(id, pickSizes, pickOffsets, pickPickers),
+          pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),
         };
       })
     });

@@ -10,7 +10,6 @@ import {
   parseAnchorXY,
   parseDimension,
   parseFit,
-  parseGap,
   parseMargin,
   parseRepeat,
   parseTexture,

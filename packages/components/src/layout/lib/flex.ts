@@ -1,4 +1,5 @@
-import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Point, Point4, Margin, Rectangle, Alignment, Anchor } from '../types';
+import { Point, Point4, Rectangle } from '@use-gpu/core/types';
+import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor } from '../types';
 
 import { getAlignmentSpacing } from './cursor';
 import { isHorizontal } from './util';

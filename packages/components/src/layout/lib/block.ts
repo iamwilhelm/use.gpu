@@ -1,4 +1,5 @@
-import { AutoPoint, Direction, Point, Point4, LayoutElement, LayoutRenderer, LayoutPicker, Margin, Rectangle } from '../types';
+import { Point, Point4, Rectangle } from '@use-gpu/core/types';
+import { AutoPoint, Direction, LayoutElement, LayoutRenderer, LayoutPicker, Margin } from '../types';
 import { isHorizontal, mergeMargin } from './util';
 
 const isNotAbsolute = (el: LayoutElement) => !el.absolute;

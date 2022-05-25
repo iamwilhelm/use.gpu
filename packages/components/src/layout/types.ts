@@ -2,6 +2,7 @@ import { TextureSource, Tuples, Point, Point4, Rectangle } from '@use-gpu/core/t
 import { LiveElement, Key } from '@use-gpu/live/types';
 import { FontMetrics } from '@use-gpu/text/types';
 import { ShaderModule } from '@use-gpu/shader/types';
+import { Color } from '../traits/types';
 import { mat4 } from 'gl-matrix';
 
 export type AutoPoint = [number | null, number | null];
@@ -15,12 +16,13 @@ export type Base = 'start' | 'base' | 'center' | 'end';
 export type Dimension = number | string;
 export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
 export type Fit = 'contain' | 'cover' | 'scale' | 'none';
-export type Overflow = 'visible' | 'scroll' | 'hidden' | 'auto';
+export type OverflowMode = 'visible' | 'scroll' | 'hidden' | 'auto';
 export type Repeat = 'x' | 'y' | 'xy' | 'none';
 
 export type MarginLike = number | number[];
 export type GapLike = number | number[];
-export type AlignmentLike = Alignment | Alignment[]
+export type AlignmentLike = Alignment | Alignment[];
+export type AnchorLike = Anchor | Anchor[];
 
 export type BoxTrait = {
   grow: number,
@@ -46,13 +48,6 @@ export type ImageTrait = {
   fit: Fit,
   repeat: Repeat,
   align: AnchorLike,
-};
-
-export type OverflowTrait = {
-  x: Overflow,
-  y: Overflow,
-  scrollX: number,
-  scrollY: number,
 };
 
 export type LayoutRenderer = (box: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>;
@@ -92,6 +87,7 @@ export type InlineElement = {
   block?: LayoutFit,
   absolute?: boolean,
   render: InlineRenderer,
+  pick?: LayoutPicker,
 };
 
 export type InlineLine = {

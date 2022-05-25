@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LayoutElement, LayoutPicker, Point } from './types';
+import { Point } from '@use-gpu/core/types';
+import { LayoutElement, LayoutPicker } from './types';
 
 import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { DebugContext } from '../providers/debug-provider';

@@ -1,5 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { ColorTrait, LineTrait, ROPTrait, VectorLike } from '../types';
+import { ColorTrait, LineTrait, ROPTrait } from '../types';
+import { VectorLike } from '../../traits/types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 

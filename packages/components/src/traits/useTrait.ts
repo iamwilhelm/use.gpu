@@ -1,12 +1,7 @@
 import { ArrowFunction } from '@use-gpu/live/types';
 import { useOne } from '@use-gpu/live';
 import { useProp, getProp } from './useProp';
-
-type PropDefTypes<T extends Record<string, ArrowFunction>> = {
-  [P in keyof T]?: ReturnType<T[P]>;
-};
-
-type UseTrait<I, O> = (props: Partial<I>) => O;
+import { PropDef, PropDefTypes, UseTrait } from './types'; 
 
 export const makeUseTrait = <
   T extends Record<string, any>,

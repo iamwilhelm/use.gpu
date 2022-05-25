@@ -1,3 +1,5 @@
+import { VectorLike, ColorLike } from '../traits/types';
+
 export type Axis = 'x' | 'y' | 'z' | 'w';
 export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
 export type Dimension = string | number;

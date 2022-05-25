@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 import { ArrowTrait, ColorTrait, LineTrait, ROPTrait } from '../types';
-import { VectorLike } from '../traits/types';
+import { VectorLike } from '../../traits/types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
@@ -13,16 +13,18 @@ import { useShaderRef } from '../../hooks/useShaderRef';
 import { DataContext } from '../../providers/data-provider';
 import {
   parseFloat,
-  parseDetail,
   parsePosition4,
 } from '../../traits/parse';
+import {
+  parseDetail,
+} from '../parse';
 import {
   useArrowTrait,
   useColorTrait,
   useLineTrait,
   useROPTrait,
-  useProp,
 } from '../traits';
+import { useProp } from '../../traits/useProp';
 import { vec4 } from 'gl-matrix';
 
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';

@@ -1,6 +1,7 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { AutoPoint, Point, Direction, Rectangle, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
+import { Point, Rectangle } from '@use-gpu/core/types';
+import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
 
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/clip/clip.wgsl';
@@ -143,7 +144,7 @@ export const makeBoxPicker = (
   id: number,
   sizes: Point[],
   offsets: Point[],
-  pickers: LayoutPicker[],
+  pickers: (LayoutPicker | null)[],
   scrollPos?: Point,
   onScroll?: (dx: number, dy: number) => void,
 ) => (

@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { UniformType } from '@use-gpu/core/types';
-import { AutoPoint, Rectangle, Point, Point4, Margin, LayoutElement } from '../types';
+import { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core/types';
+import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement } from '../types';
 
-import { memo, use, gather, yeet, useFiber, useMemo, useOne } from '@use-gpu/live';
+import { memo, use, gather, yeet, useFiber, useOne } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
 import { useInspectable } from '../../hooks/useInspectable';
@@ -26,20 +26,20 @@ const OFFSET_BINDING = bundleToAttribute(getScrolledPosition, 'getOffset');
 const CLIP_BINDING = {name: 'getClip', format: 'vec4<f32>' as UniformType};
 
 export type OverflowProps = {
-  x?: Overflow,
-  y?: Overflow,
+  x?: OverflowMode,
+  y?: OverflowMode,
   
-  initialX?: number,
-  initialY?: number,
+  scrollX?: number,
+  scrollY?: number,
   
-  direction?: 'x' | 'y',
+  direction?: Direction,
   children?: LiveElement<any>,
 };
 
 export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps) => {
   const {
-    initialX = 0,
-    initialY = 0,
+    scrollX = 0,
+    scrollY = 0,
     direction = 'y',
     children,
   } = props;
@@ -48,11 +48,11 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
   const y = useProp(props.y, parseOverflow);
 
   const api = useOne(() => {
-    const scrollRef = [0, 0];
-    const offsetRef = [0, 0];
-    const sizeRef = [0, 0, 0, 0];
-    const clipRef = [0, 0, 0, 0];
-    const boxRef = [0, 0];
+    const scrollRef = [0, 0] as Point;
+    const offsetRef = [0, 0] as Point;
+    const sizeRef = [0, 0, 0, 0] as Point4;
+    const clipRef = [0, 0, 0, 0] as Point4;
+    const boxRef = [0, 0] as Point;
 
     const scrollTo = (x?: number | null, y?: number | null) => {
       const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
@@ -111,7 +111,10 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
     return {clip, transform, inverse, scrollRef, fitTo, sizeTo, scrollTo, scrollBy};
   });
   
-  const {clip, transform, inverse, scrollRef, fitTo, sizeTo, scrollBy} = api;
+  const {clip, transform, inverse, scrollRef, fitTo, sizeTo, scrollTo, scrollBy} = api;
+
+  useOne(() => scrollTo(scrollX, null), scrollX);
+  useOne(() => scrollTo(null, scrollY), scrollY);
 
   const {id} = useFiber();
   const inspect = useInspectable();

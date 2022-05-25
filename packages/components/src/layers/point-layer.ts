@@ -15,8 +15,7 @@ import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { circle, diamond, square, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/wgsl/mask/point.wgsl';
-
-export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
+import { PointShape } from './types';
 
 const MASK_SHADER = {
   'circle': circle,

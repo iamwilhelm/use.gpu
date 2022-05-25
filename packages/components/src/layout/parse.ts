@@ -5,7 +5,6 @@ import { makeParseEnum, makeParseObject } from '../traits/parse';
 const explode = new Proxy({}, {get: () => { throw new Error('Invalid texture source'); }}) as any as TextureSource;
 
 export const makeParseDimension = (def: Dimension | null = null) => (x?: string | number): Dimension | null => {
-  console.log('parse dim', def, x)
   if (typeof x === 'string' || typeof x === 'number') return x;
   return def;
 };

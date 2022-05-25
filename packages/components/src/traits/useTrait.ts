@@ -12,7 +12,6 @@ export const makeUseTrait = <
 ): UseTrait<T, PropDefTypes<P>> => {
   const defaults: Record<string, any> = {};
   for (const k in propDef) defaults[k] = propDef[k](defaultValues[k]);
-  console.log('trait', propDef, defaultValues)
   return (props: Partial<T> | undefined) => useTrait(props, propDef, defaults);
 };
 

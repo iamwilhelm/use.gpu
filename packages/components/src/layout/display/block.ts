@@ -3,7 +3,7 @@ import { LayoutElement, Point, AutoPoint, Dimension, MarginLike, Margin, Point4,
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { isHorizontal, makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable } from '../../hooks/useInspectable';
 
 import { BoxTrait, ElementTrait } from '../types';
@@ -37,7 +37,10 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const direction = useProp(props.direction, parseDirectionY);
   const padding = useProp(props.padding, parseMargin);
 
-  const contain = props.contain ?? !!padding;
+  const contain = props.contain ??
+    !!(isHorizontal(direction)
+      ? Math.abs(padding[0]) + Math.abs(padding[2])
+      : Math.abs(padding[1]) + Math.abs(padding[3]));
 
   const background = (stroke || fill || image) ? (
     use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})

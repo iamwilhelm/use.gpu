@@ -174,6 +174,11 @@ export const fitBlock = (
     }
     ++i;
   }
+  
+  if (contain && m) {
+    if (isX) w += m;
+    else h += m;
+  }
 
   const overflow = [(w + pl + pr), (h + pt + pb)] as Point;
 

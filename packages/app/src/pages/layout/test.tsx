@@ -34,20 +34,37 @@ export const LayoutTestPage: LC = () => {
             <Absolute>
               <Overflow y="scroll">
 
-                <Block margin={10}>
+                <Block margin={[10, 0, 10, 50]}>
 
                   <Label>Flex Start</Label>
                   <Flex margin={10} gap={10} align="start"   anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
-                  <Flex margin={10} gap={10} align="center"  anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
-                  <Flex margin={10} gap={10} align="end"     anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Block fill={[1, 1, 1, 0.5]} height={2} />
 
+                  <Label>Flex Center</Label>
+                  <Flex margin={10} gap={10} align="center"  anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Block fill={[1, 1, 1, 0.5]} height={2} />
+
+                  <Label>Flex End</Label>
+                  <Flex margin={10} gap={10} align="end"     anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Block fill={[1, 1, 1, 0.5]} height={2} />
+
+                  <Label>Flex Justify</Label>
                   <Flex wrap margin={10} gap={10} align="justify" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Block fill={[1, 1, 1, 0.5]} height={2} />
+
+                  <Label>Flex Between</Label>
                   <Flex wrap margin={10} gap={10} align="between" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Block fill={[1, 1, 1, 0.5]} height={2} />
+
+                  <Label>Flex Evenly</Label>
                   <Flex wrap margin={10} gap={10} align="evenly"  anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Block fill={[1, 1, 1, 0.5]} height={2} />
+
+
+                  <Label>Block Direction X</Label>
+                  <Block margin={10} direction='x'>{BOXES}</Block>
 
                 </Block>
-
-                <Block margin={10} direction='x'>{BOXES}</Block>
 
               </Overflow>
             </Absolute>
@@ -81,4 +98,4 @@ export const LayoutTestPage: LC = () => {
   );
 };
 
-const Label = ({children}: {children: string}) => <Inline><Text size={32} color={[1, 1, 1, 1]}>{children}</Text></Inline>
+const Label = ({children}: {children: string}) => <Inline margin={[0, 10, 0, 0]}><Text size={32} color={[1, 1, 1, 1]}>{children}</Text></Inline>

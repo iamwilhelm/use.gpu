@@ -165,5 +165,5 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
     });
   };
 
-  return children ? gather(use(Block, {direction, children}), Resume) : null;
+  return children ? gather(use(Block, {contain: true, direction, children}), Resume) : null;
 }, 'Overflow');

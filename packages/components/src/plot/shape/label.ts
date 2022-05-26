@@ -43,6 +43,7 @@ export const Label: LiveComponent<LabelProps> = (props) => {
   const {family, weight, style} = useFontTrait(props);
   const {labels, format, size, depth, expand} = useLabelTrait(props);
   const {placement, offset} = useAnchorTrait(props);
+
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
 

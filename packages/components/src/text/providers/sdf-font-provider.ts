@@ -234,7 +234,7 @@ export const useSDFGlyphData = (
     const currentLayout: Rectangle = [left, top + ascent, 0, 0];
     let lastIndex = -1;
 
-    const layouts = cursor.gather((start, end, lead, gap, count, cross, ascent, descent, index) => {
+    const layouts = cursor.gather((start, end, lead, gap, count, _c, _a, _d, index) => {
       if (index !== lastIndex) {
         currentLayout[1] = top + ascent;
         lastIndex = index;

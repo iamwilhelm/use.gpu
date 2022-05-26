@@ -29,7 +29,7 @@ const BOX_TRAIT = {
 };
 
 const BOX_DEFAULTS = {
-  inline: 'base-center',
+  inline: 'center',
 };
 
 const IMAGE_TRAIT = {

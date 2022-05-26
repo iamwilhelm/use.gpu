@@ -18,7 +18,7 @@ export const resolveInlineBlockElements = (els: (InlineElement | LayoutElement)[
   for (const el of els) {
     if ('spans' in el) out.push(el);
     else {
-      const {fit, absolute, margin, inline = 'base-center'} = el;
+      const {fit, absolute, margin, inline = 'center'} = el;
       const [ml, mt, mr, mb] = margin;
 
       const block = fit(into);
@@ -164,7 +164,6 @@ export const fitInline = (
 
     const cross = Math.max(lineHeight, ascent + descent);
     const blockSlack = Math.max(0, cross - ascent - descent);
-    console.log({lineHeight, ascent, descent, cross, blockSlack})
 
     let t = 0;
 
@@ -182,7 +181,6 @@ export const fitInline = (
       mainPos += indentStart;
       
       const resolvedAnchor = inline ?? anchor;
-      console.log({anchor, inline, resolvedAnchor, height})
 
       let crossPos = caretCross;
       if (resolvedAnchor === 'base') {

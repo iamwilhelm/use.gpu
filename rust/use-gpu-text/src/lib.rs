@@ -128,7 +128,6 @@ impl UseRustText {
             }
             _ => {}
         }            
-        console_log!("xh {:?}", x_height);
 
         let layout = FontMetrics {
             ascent,

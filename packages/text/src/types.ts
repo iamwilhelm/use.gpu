@@ -13,6 +13,8 @@ export type FontMetrics = {
   ascent: number,
   descent: number,
   lineHeight: number,
+  xHeight: number,
+  emUnit: number,
 };
 
 export type SpanMetrics = {

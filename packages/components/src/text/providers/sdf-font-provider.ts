@@ -174,7 +174,7 @@ export const useSDFGlyphData = (
   layout: Rectangle,
   font: number[],
   spans: Tuples<3>,
-  glyphs: Tuples<2>,
+  glyphs: Tuples<4>,
   breaks: Uint32Array,
   height: FontMetrics,
   align: Alignment,
@@ -234,7 +234,7 @@ export const useSDFGlyphData = (
     const currentLayout: Rectangle = [left, top + ascent, 0, 0];
     let lastIndex = -1;
 
-    const layouts = cursor.gather((start, end, lead, gap, count, _c, _a, _d, index) => {
+    const layouts = cursor.gather((start, end, gap, lead, count, _c, _a, _d, _x, index) => {
       if (index !== lastIndex) {
         currentLayout[1] = top + ascent;
         lastIndex = index;
@@ -300,10 +300,14 @@ export const emitGlyphSpans = (
   let sx = snap ? Math.round(x) : x;
 
   spans.iterate((_a, trim, hard, index) => {
-    glyphs.iterate((fontIndex: number, id: number, isWhiteSpace: number) => {
+    glyphs.iterate((fontIndex: number, id: number, isWhiteSpace: number, kerning: number) => {
       const {glyph, mapping} = getGlyph(font[fontIndex], id, size);
       const {image, layoutBounds, outlineBounds} = glyph;
       const [ll, lt, lr, lb] = layoutBounds;
+
+      const k = kerning / 65536.0 * scale;
+      x += k;
+      sx += k;
 
       if (!isWhiteSpace) {
         if (image && outlineBounds) {

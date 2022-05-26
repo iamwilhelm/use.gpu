@@ -10,10 +10,10 @@ import { useInspectable } from '../../hooks/useInspectable'
 import { useProp } from '../../traits/useProp';
 import { BoxTrait } from '../types';
 import { useBoxTrait } from '../traits';
-import { parseAlignment, parseAnchor, parseDirectionX, parseMargin } from '../parse';
+import { parseAlignment, parseBase, parseDirectionX, parseMargin } from '../parse';
 
 export type InlineProps = BoxTrait & {
-  direction?: 'x' | 'y',
+  direction?: Direction,
 
   align?: Alignment,
   anchor?: Base,
@@ -31,16 +31,15 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
     children,
   } = props;
 
-  const { margin, grow, shrink } = useBoxTrait(props);
+  const { margin, grow, shrink, inline } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
   const padding = useProp(props.padding, parseMargin);
-  const anchor = useProp(props.anchor, parseAnchor);
+  const anchor = useProp(props.anchor, parseBase, 'base');
   const align = useProp(props.align, parseAlignment);
 
   const {id} = useFiber();
   const inspect = useInspectable();
-  if (margin === undefined) debugger
 
   const Resume = (els: InlineElement[]) => {
     const inlineEls = resolveInlineBlockElements(els, direction);
@@ -53,6 +52,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
       margin,
       grow,
       shrink,
+      inline,
       fit: memoFit((into: AutoPoint) => {
         const {size, sizes, ranges, offsets, anchors, renders, pickers} = fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
 
@@ -81,9 +81,9 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
           },
         });
         
-        const pickSizes   = blockSizes.length ? [...sizes,   ...blockSizes] : [];
-        const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : [];
-        const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : [];
+        const pickSizes   = blockSizes.length ? [...sizes,   ...blockSizes] : sizes;
+        const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : offsets;
+        const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : pickers;
 
         return {
           size,

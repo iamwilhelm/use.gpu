@@ -1,28 +1,17 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Point4, Rectangle } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Dimension, Margin, MarginLike, Fit, Repeat, Anchor, AutoPoint } from '../types';
+import { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint } from '../types';
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
-import { evaluateDimension, parseMargin } from '../parse';
-import { ImageTrait } from '../types';
+import { evaluateDimension } from '../parse';
+
+import { BoxTrait, ElementTrait } from '../types';
+import { useBoxTrait, useElementTrait } from '../traits';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 
-export type ElementProps = {
-  width?: Dimension,
-  height?: Dimension,
-  margin?: MarginLike,
-
-  radius?: MarginLike,
-  border?: MarginLike,
-  stroke?: Point4,
-  fill?: Point4,
-
-  image?: Partial<ImageTrait>,
-
-  grow?: number,
-  shrink?: number,
+export type ElementProps = Partial<BoxTrait> & Partial<ImageTrait> & {
   snap?: boolean,
   absolute?: boolean,
   under?: boolean,
@@ -34,20 +23,6 @@ const TRANSPARENT: Point4 = [0, 0, 0, 0];
 
 export const Element: LiveComponent<ElementProps> = (props) => {
   const {
-    width,
-    height,
-    // -- unpacked below
-    // margin
-    // radius
-    // border
-
-    image,
-
-    stroke = TRANSPARENT,
-    fill = TRANSPARENT,
-
-    grow = 0,
-    shrink = 0,
     snap = false,
     absolute = false,
     under = false,
@@ -55,15 +30,14 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     children,
   } = props;
 
+  const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { margin, grow, shrink, inline } = useBoxTrait(props);
+
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;
 
   const {id} = useFiber();
   const sizing = [w, h, w, h];
-
-  const margin = parseMargin(props.margin ?? 0);
-  const radius = parseMargin(props.radius ?? 0);
-  const border = parseMargin(props.border ?? 0);
 
   return yeet({
     sizing,
@@ -72,6 +46,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     shrink,
     absolute,
     under,
+    inline,
     fit: (into: AutoPoint) => {
       const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
       const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
@@ -82,8 +57,8 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           id,
           layout,
 
-          stroke,
-          fill,
+          stroke: stroke ?? TRANSPARENT,
+          fill: fill ?? TRANSPARENT,
           border,
           radius,
 

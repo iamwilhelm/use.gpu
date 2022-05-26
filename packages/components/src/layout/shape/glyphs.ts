@@ -4,7 +4,7 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { FontMetrics } from '@use-gpu/text/types';
 import { InlineLine } from '../types';
 
-import { use, yeet, useContext } from '@use-gpu/live';
+import { use, yeet, useContext, useMemo } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '../../text/providers/sdf-font-provider';
 import { evaluateDimension } from '../parse';
 
@@ -34,6 +34,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     id,
     color = BLACK,
     detail,
+    expand = 0,
     size = 16,
     snap = false,
 
@@ -50,78 +51,86 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
   const { getGlyph, getScale, getRadius } = useSDFFontContext();
   
-  const adjust = size / (detail ?? size);
-  const radius = getRadius();
-  const scale = getScale(detail ?? size) * adjust;
+  return useMemo(() => {
+    const adjust = size / (detail ?? size);
+    const radius = getRadius();
+    const scale = getScale(detail ?? size) * adjust;
+  
+    const rectangles = [] as number[];
+    const uvs = [] as number[];
+    let count = 0;
+
+    const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+
+    for (const {layout, start, end, gap} of lines) {
+      const [l, t] = layout;
+
+      const {ascent, lineHeight} = height;
+      let x = l;
+      let y = t + ascent;
       
-  const out = [] as any[];
-  const rectangles = [] as number[];
-  const uvs = [] as number[];
-  let count = 0;
+      let first = true;
 
-  const bounds = [Infinity, Infinity, -Infinity, -Infinity];
+      let sx = x;
+      spans.iterate((_a, trim, _h, index) => {
+        glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number, kerning: number) => {
+          const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail ?? size);
+          const {image, layoutBounds, outlineBounds} = glyph;
+          const [ll, lt, lr, lb] = layoutBounds;
 
-  for (const {layout, start, end, gap} of lines) {
-    const [l, t] = layout;
+          const k = kerning / 65536.0 * scale;
+          x += k;
+          sx += k;
 
-    const {ascent, lineHeight} = height;
-    let x = l;
-    let y = t + ascent;
+          if (!isWhiteSpace) {
+            if (image && outlineBounds) {
+              const [gl, gt, gr, gb] = outlineBounds;
 
-    let sx = x;
-    spans.iterate((_a, trim, _h, index) => {
-      glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number) => {
-        const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail ?? size);
-        const {image, layoutBounds, outlineBounds} = glyph;
-        const [ll, lt, lr, lb] = layoutBounds;
+              const cx = snap ? Math.round(sx) : sx;
+              const cy = snap ? Math.round(y) : y;
 
-        if (!isWhiteSpace) {
-          if (image && outlineBounds) {
-            const [gl, gt, gr, gb] = outlineBounds;
+              const left = (scale * gl) + cx;
+              const top = (scale * gt) + cy;
+              const right = (scale * gr) + cx;
+              const bottom = (scale * gb) + cy;
 
-            const cx = snap ? Math.round(sx) : sx;
-            const cy = snap ? Math.round(y) : y;
+              rectangles.push(left, top, right, bottom);
+              uvs.push(mapping[0], mapping[1], mapping[2], mapping[3]);
 
-            const left = (scale * gl) + cx;
-            const top = (scale * gt) + cy;
-            const right = (scale * gr) + cx;
-            const bottom = (scale * gb) + cy;
+              bounds[0] = Math.min(bounds[0], left);
+              bounds[1] = Math.min(bounds[1], top);
+              bounds[2] = Math.max(bounds[2], right);
+              bounds[3] = Math.max(bounds[3], bottom);
 
-            rectangles.push(left, top, right, bottom);
-            uvs.push(mapping[0], mapping[1], mapping[2], mapping[3]);
-
-            bounds[0] = Math.min(bounds[0], left);
-            bounds[1] = Math.min(bounds[1], top);
-            bounds[2] = Math.max(bounds[2], right);
-            bounds[3] = Math.max(bounds[3], bottom);
-
-            count++;
+              count++;
+            }
           }
+
+          sx += lr * scale;
+          x += lr * scale;
+        }, breaks[index - 1] || 0, breaks[index]);
+
+        if (trim) {
+          x += gap;
+          sx = snap ? Math.round(x) : x;
         }
+      }, start, end);
+    }
 
-        sx += lr * scale;
-        x += lr * scale;
-      }, breaks[index - 1] || 0, breaks[index]);
+    const render = count ? {
+      id,
+      rectangles,
+      uvs,
+      border: [0, Math.min(size / 32, 1.0) * 0.25, 0, 0],
+      sdf: [radius, scale, size, 0],
+      fill: color,
+      texture: SDF_FONT_ATLAS,
+      count,
+      clip,
+      transform,
+      bounds,
+    } : null;
 
-      if (trim) {
-        x += gap;
-        sx = snap ? Math.round(x) : x;
-      }
-    }, start, end);
-  }
-
-  const render = count ? {
-    id,
-    rectangles,
-    uvs,
-    sdf: [radius, scale, size, 0],
-    fill: color,
-    texture: SDF_FONT_ATLAS,
-    count,
-    clip,
-    transform,
-    bounds,
-  } : null;
-
-  return yeet(render);
+    return yeet(render);
+  }, [props, getGlyph, getScale, getRadius]);
 };

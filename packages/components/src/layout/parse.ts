@@ -41,7 +41,7 @@ export const parseTexture = makeParseObject<TextureSource>(explode);
 
 export const parseAlignment  = makeParseEnum<Alignment>(['start', 'center', 'end', 'justify', 'justify-start', 'justify-center', 'justify-end', 'between', 'evenly']);
 export const parseAnchor     = makeParseEnum<Anchor>(['start', 'center', 'end']);
-export const parseBase       = makeParseEnum<Base>(['start', 'base', 'center', 'end']);
+export const parseBase       = makeParseEnum<Base>(['start', 'base', 'base-center', 'center', 'end']);
 export const parseDirectionX = makeParseEnum<Direction>(['x', 'y', 'lr', 'rl', 'tb', 'bt']);
 export const parseDirectionY = makeParseEnum<Direction>(['y', 'x', 'lr', 'rl', 'tb', 'bt']);
 export const parseFit        = makeParseEnum<Fit>(['none', 'contain', 'cover', 'scale']);

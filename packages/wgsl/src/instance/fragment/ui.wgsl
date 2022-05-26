@@ -32,9 +32,10 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     // SDF Glyph
     let sdfRadius = sdfConfig.x;
     var expand = border.x;
+    var bleed = border.y;
     
     var d = (texture.a - 0.75) * sdfRadius;
-    var s = (d + expand) / scale * sdfConfig.y + 0.5;
+    var s = (d + expand) / scale * sdfConfig.y + 0.5 + bleed;
     sdf = SDF(s, s);
     
     if (texture.a == 0.0 && sdf.outer > 0.0) { sdf.outer = 0.5; }

@@ -1,6 +1,6 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Point, Rectangle } from '@use-gpu/core/types';
+import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
 
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
@@ -22,6 +22,10 @@ export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
     last = into;
     return value;
   };
+}
+
+export const mergePadding = (a: Point4, b: Point4) => {
+  return [a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]];
 }
 
 export const mergeMargin = (a: number, b: number) => {

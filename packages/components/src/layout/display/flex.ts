@@ -36,7 +36,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   } = props;
 
   const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
-  const { margin, grow, shrink } = useBoxTrait(props);
+  const { margin, grow, shrink, inline } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
   const align     = useProp(props.align, parseAlignmentXY);
@@ -68,6 +68,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
       margin,
       grow,
       shrink,
+      inline,
       ratioX,
       ratioY,
       fit: memoFit((into: AutoPoint) => {

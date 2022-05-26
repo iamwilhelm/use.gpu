@@ -9,7 +9,7 @@ import { useInspectable } from '../../hooks/useInspectable';
 
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
-import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
+import { evaluateDimension, parseDirectionY, parseMargin, mergePadding } from '../parse';
 import { useProp } from '../../traits/useProp';
 import { Element } from '../element/element';
 
@@ -33,7 +33,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   } = props;
 
   const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
-  const { margin: blockMargin, grow, shrink } = useBoxTrait(props);
+  const { margin: blockMargin, grow, shrink, inline } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionY);
   const padding = useProp(props.padding, parseMargin);
@@ -69,6 +69,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       margin,
       grow,
       shrink,
+      inline,
       ratioX,
       ratioY,
       fit: memoFit((into: AutoPoint) => {

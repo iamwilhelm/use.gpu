@@ -18,7 +18,8 @@ export const resolveInlineBlockElements = (els: (InlineElement | LayoutElement)[
   for (const el of els) {
     if ('spans' in el) out.push(el);
     else {
-      const {fit, absolute, margin} = el;
+      const {fit, absolute, margin, inline = 'base-center'} = el;
+      const [ml, mt, mr, mb] = margin;
 
       const block = fit(into);
       const {size} = block;
@@ -27,10 +28,10 @@ export const resolveInlineBlockElements = (els: (InlineElement | LayoutElement)[
       const cross = isX ? size[1] : size[0];
 
       out.push({
-        spans: makeTuples([advance, 0, 0], 3),
-        height: {ascent: 0, descent: 0, lineHeight: cross},
+        spans: makeTuples([advance, 1e-10, 0], 3),
+        height: {ascent: 0, descent: 0, lineHeight: cross, xHeight: 0, emUnit: 1},
         margin,
-        anchor: 'center',
+        inline,
         block,
         absolute,
         render: NO_RENDER,
@@ -113,7 +114,6 @@ export const fitInline = (
   const isX = direction === 'x' || direction === 'lr' || direction === 'rl';
 
   const isSnap = !!snap;
-  const isWrap = !!wrap;
 
   const spaceMain = isX ? into[0] : into[1];
 
@@ -133,54 +133,87 @@ export const fitInline = (
   const cursor = makeLayoutCursor(wrap ? spaceMain || 0 : 0, align);
 
   for (const el of els) {
-    const {spans, margin, absolute, height: {lineHeight, ascent, descent}} = el;
+    const {spans, block, margin, absolute, height: {lineHeight, ascent, descent, xHeight}} = el;
     const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
 
-    cursor.push(isX ? ml : mt, 0, 0, 0, 0, 0);
-    spans.iterate((advance, trim, hard) => {
-      cursor.push(advance, trim, hard, lineHeight + (isX ? (mt + mb) : (ml + mr)), ascent, descent);
-    });
-    cursor.push(isX ? mr : mb, 0, 0, 0, 0, 0);
+    const n = spans.length;
+    if (n === 1) {
+      spans.iterate((advance, trim, hard) => {
+        cursor.push(advance + (isX ? ml + mr : mt + mb), trim, hard, lineHeight + (isX ? (mt + mb) : (ml + mr)), ascent, -descent, xHeight);
+      }, 0, 1);
+    }
+    else {
+      spans.iterate((advance, trim, hard) => {
+        cursor.push(advance + (isX ? ml : mt), trim, hard, lineHeight + (isX ? (mt + mb) : (ml + mr)), ascent, -descent, xHeight);
+      }, 0, 1);
+      spans.iterate((advance, trim, hard) => {
+        cursor.push(advance, trim, hard, lineHeight + (isX ? (mt + mb) : (ml + mr)), ascent, -descent, xHeight);
+      }, 1, n - 1);
+      spans.iterate((advance, trim, hard) => {
+        cursor.push(advance + (isX ? mr : mb), trim, hard, lineHeight + (isX ? (mt + mb) : (ml + mr)), ascent, -descent, xHeight);
+      }, n - 1, n);
+    }
   }
 
   // Process produced spans
   let i = 0;
   let span = 0;
-  const layouts = cursor.gather((start, end, gap, lead, count, lineHeight, ascent, descent, index) => {
+  const layouts = cursor.gather((start, end, gap, lead, count, lineHeight, ascent, descent, xHeight, index) => {
     let n = end - start;
     let mainPos = lead;
 
     const cross = Math.max(lineHeight, ascent + descent);
+    const blockSlack = Math.max(0, cross - ascent - descent);
+    console.log({lineHeight, ascent, descent, cross, blockSlack})
+
+    let t = 0;
 
     while (n > 0 && i < els.length) {
       const el = els[i];
-      const {spans, height, margin, anchor: blockAnchor, block, render, pick} = el;
-      const {ascent: a, descent: d, lineHeight} = height;
+      const {spans, height, margin, inline, block, render, pick} = el;
+      const {ascent: a, descent: d, lineHeight: lh} = height;
       const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
       
-      const last = spans.length - span + 2;
+      const last = spans.length - span;
       const count = Math.min(n, last);
 
       const indentStart = span  === 0    ? (isX ? ml : mt) : 0;
       const indentEnd   = count === last ? (isX ? mr : mb) : 0;
       mainPos += indentStart;
       
-      const crossPos = (blockAnchor ?? anchor) === 'base'
-        ? caretCross + ascent - a + getAlignmentSpacing(Math.max(0, cross - lineHeight), 1, false, 'center')[1]
-        : caretCross + getAlignmentSpacing(Math.max(0, cross - lineHeight), 1, false, anchor as Anchor)[1];
+      const resolvedAnchor = inline ?? anchor;
+      console.log({anchor, inline, resolvedAnchor, height})
 
-      const offset = (isX ? [mainPos, crossPos, gap] : [crossPos, mainPos, gap]) as [number, number, number];
+      let crossPos = caretCross;
+      if (resolvedAnchor === 'base') {
+        crossPos += getAlignmentSpacing(blockSlack, 1, false, 'center')[1];
+        crossPos += ascent - (block ? lh : a);
+      }
+      else if (resolvedAnchor === 'base-center') {
+        crossPos += getAlignmentSpacing(blockSlack, 1, false, 'center')[1];
+        crossPos += ascent - xHeight / 2 - (block ? lh / 2 : a / 2);
+      }
+      else {
+        crossPos += getAlignmentSpacing(cross - lh, 1, false, resolvedAnchor as Anchor)[1];
+      }
+
+      const sm = isSnap ? Math.round(mainPos) : mainPos;
+      const sc = isSnap ? Math.round(crossPos) : crossPos;
+      const offset = (isX ? [sm, sc, gap] : [sc, sm, gap]) as [number, number, number];
 
       let accum = 0;
-      const s = Math.max(1, span) - 1;
-      const e = Math.min(spans.length, span + count - 1);
-      spans.iterate((advance) => accum += advance, s, e);
+      const s = span;
+      const e = span + count;
+      spans.iterate((advance, trim) => {
+        accum += advance;
+        if (trim) accum += gap;
+        t = trim;
+      }, s, e);
 
-      accum += count * gap;
       mainPos += accum;
       mainPos += indentEnd;
 
-      const size = (isX ? [accum, cross] : [cross, accum]) as Point;
+      const size = (isX ? [accum - gap, cross] : [cross, accum - gap]) as Point;
 
       ranges.push([s, e]);
       sizes.push(size);
@@ -198,7 +231,7 @@ export const fitInline = (
       }
     }
 
-    maxMain = Math.max(maxMain, mainPos - gap, 0);
+    maxMain = Math.max(maxMain, mainPos - gap - t, 0);
     caretCross += cross;
   });
   

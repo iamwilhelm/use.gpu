@@ -55,7 +55,7 @@ export const useFontText = (
   return useMemo(() => {
     const {breaks, metrics: m, glyphs: g} = rustText.measureSpans(stack, packed, size);
     const spans = makeTuples(m, 3);
-    const glyphs = makeTuples(g, 3);
+    const glyphs = makeTuples(g, 4);
     return {spans, glyphs, breaks};
   }, [packed, size, rustText]);
 }
@@ -70,13 +70,14 @@ export const useFontHeight = (
   const [id] = stack;
 
   return useMemo(() => {
-    let {ascent, descent, lineHeight: fontHeight} = rustText.measureFont(id, size);
+    let {ascent, descent, lineHeight: fontHeight, xHeight, emUnit} = rustText.measureFont(id, size);
 
     const lh = lineHeight ?? fontHeight;
+    const xh = xHeight * lh / fontHeight;
     const pad = (lh - fontHeight) / 2;
     ascent += pad;
     descent -= pad;
 
-    return {ascent, descent, lineHeight: lh};
+    return {ascent, descent, lineHeight: lh, xHeight: xh, emUnit};
   }, [id, size, lineHeight, rustText]);
 }

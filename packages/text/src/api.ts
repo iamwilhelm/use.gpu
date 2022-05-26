@@ -88,7 +88,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
     return {
       breaks: new Uint32Array(s.breaks.buffer),
       metrics: new Float32Array(s.metrics.buffer),
-      glyphs: new Uint32Array(s.glyphs.buffer),
+      glyphs: new Int32Array(s.glyphs.buffer),
     };
   }
   

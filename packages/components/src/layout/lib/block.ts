@@ -158,7 +158,7 @@ export const fitBlock = (
     pickers.push(pick);
 
     if (isX) {
-      if (contain || i !== 0) w += Math.max(m, ml);
+      if (contain || i !== 0) w += mergeMargin(m, ml);
       m = mr;
 
       offsets.push([w + pl, pt + mt]);
@@ -166,7 +166,7 @@ export const fitBlock = (
       h = Math.max(h, mt + fitted[1] + mb);
     }
     else {
-      if (contain || i !== 0) h += Math.max(m, mt);
+      if (contain || i !== 0) h += mergeMargin(m, mt);
       m = mb;
 
       offsets.push([pl + ml, h + pt]);

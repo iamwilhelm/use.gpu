@@ -23,7 +23,7 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
   const {into, size, sizes, offsets} = layout;
   let n = sizes.length;
   
-  const SCALE = 1/3;
+  const SCALE = 1/2;
 
   const width  = Math.max(size[0], into[0] || 0);
   const height = Math.max(size[1], into[1] || 0);

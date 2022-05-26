@@ -12,7 +12,7 @@ export type Sizing = Point4;
 
 export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'between' | 'evenly';
 export type Anchor = 'start' | 'center' | 'end';
-export type Base = 'start' | 'base' | 'center' | 'end';
+export type Base = 'start' | 'base' | 'base-center' | 'center' | 'end';
 export type Dimension = number | string;
 export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
 export type Fit = 'contain' | 'cover' | 'scale' | 'none';
@@ -28,6 +28,7 @@ export type BoxTrait = {
   grow: number,
   shrink: number,
   margin: MarginLike,
+  inline: Base,
 };
 
 export type ElementTrait = {
@@ -75,6 +76,7 @@ export type LayoutElement = {
   absolute?: boolean,
   under?: boolean,
   stretch?: boolean,
+  inline?: Base,
 
   fit: (size: AutoPoint) => LayoutFit,
 };
@@ -83,7 +85,7 @@ export type InlineElement = {
   spans: Tuples<4>,
   height: FontMetrics,
   margin?: Margin,
-  anchor?: Base,
+  inline?: Base,
   block?: LayoutFit,
   absolute?: boolean,
   render: InlineRenderer,

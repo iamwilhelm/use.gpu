@@ -8,6 +8,7 @@ import {
   parseAlignmentXY,
   parseAnchor,
   parseAnchorXY,
+  parseBase,
   parseDimension,
   parseFit,
   parseMargin,
@@ -24,9 +25,11 @@ const BOX_TRAIT = {
   grow: parseFloat,
   shrink: parseFloat,
   margin: parseMargin,
+  inline: parseBase,
 };
 
 const BOX_DEFAULTS = {
+  inline: 'base-center',
 };
 
 const IMAGE_TRAIT = {

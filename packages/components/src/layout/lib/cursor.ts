@@ -3,10 +3,29 @@ import { Alignment } from '../types';
 import { makeTuples } from '@use-gpu/core';
 import { evaluateAnchor } from '../parse';
 
-type Reduce = (start: number, end: number, gap: number, lead: number, count: number, cross: number, ascent: number, descent: number, index: number) => void;
+type Reduce = (
+  start: number,
+  end: number,
+  gap: number,
+  lead: number,
+  count: number,
+  cross: number,
+  ascent: number,
+  descent: number,
+  xHeight: number,
+  index: number,
+) => void;
 
 type LayoutCursor = {
-  push: (advance: number, trim: number, hard: number, cross?: number, base?: number, descent?: number) => void,
+  push: (
+    advance: number,
+    trim: number,
+    hard: number,
+    cross: number,
+    base: number,
+    descent: number,
+    xHeight: number,
+  ) => void;
   flush: (x: number) => void,
   gather: (reduce: Reduce) => Float32Array,
 };
@@ -21,8 +40,9 @@ export const makeLayoutCursor = (
   let spanAdvance = 0;
   let spanTrim = 0;
   let spanCross = 0;
-  let spanBase = 0;
+  let spanAscent = 0;
   let spanDescent = 0;
+  let spanXHeight = 0;
 
   let start: number = 0;
   let end: number = 0;
@@ -35,7 +55,15 @@ export const makeLayoutCursor = (
   let sizes: number[] = [];
   let index = 0;
 
-  const push = (advance: number, trim: number, hard: number, cross: number = 0, base: number = 0, descent: number = 0) => {
+  const push = (
+    advance: number,
+    trim: number,
+    hard: number,
+    cross: number = 0,
+    ascent: number = 0,
+    descent: number = 0,
+    xHeight: number = 0,
+  ) => {
     if (max > 0 && (spanAdvance + advance - trim > max)) {
       flush(0);
       start = index;
@@ -43,14 +71,18 @@ export const makeLayoutCursor = (
 
     end = index + 1;
 
-    if (trim) {
+    if (hard) {
+      spanCount++;
+    }
+    else if (trim) {
       spanCount++;
       spanTrim = trim;
     }
     spanAdvance += advance;
     spanCross = Math.max(spanCross, cross);
-    spanBase = Math.max(spanBase, base);
+    spanAscent = Math.max(spanAscent, ascent);
     spanDescent = Math.max(spanDescent, descent);
+    spanXHeight = Math.max(spanXHeight, xHeight);
 
     if (hard) {
       flush(hard);
@@ -66,7 +98,7 @@ export const makeLayoutCursor = (
       const spanSize = spanAdvance - spanTrim;
       chunkAdvance = Math.max(chunkAdvance, spanSize);
 
-      rows.push(start, end, hard, spanSize, spanCount, spanCross, spanBase, spanDescent, chunkIndex);
+      rows.push(start, end, hard, spanSize, spanCount, spanCross, spanAscent, spanDescent, spanXHeight, chunkIndex);
       chunkCross += spanCross;
     }
 
@@ -74,7 +106,7 @@ export const makeLayoutCursor = (
     spanAdvance = 0;
     spanTrim = 0;
     spanCross = 0;
-    spanBase = 0;
+    spanAscent = 0;
     spanDescent = 0;
 
     if (hard === 2) {
@@ -90,11 +122,22 @@ export const makeLayoutCursor = (
     flush(2);
 
     const s = makeTuples(sizes, 2);
-    const r = makeTuples(rows, 9);
-    r.iterate((start: number, end: number, hard: number, advance: number, count: number, cross: number, base: number, descent: number, index: number) => {
+    const r = makeTuples(rows, 10);
+    r.iterate((
+      start: number,
+      end: number,
+      hard: number,
+      advance: number,
+      count: number,
+      cross: number,
+      ascent: number,
+      descent: number,
+      xHeight: number,
+      index: number,
+    ) => {
       const slack = (max || s.get(index, 0)) - advance;
       const [gap, lead] = getAlignmentSpacing(slack, count, !!hard, align);
-      reduce(start, end, gap, lead, count, cross, base, descent, index);
+      reduce(start, end, gap, lead, count, cross, ascent, descent, xHeight, index);
     });
 
     return new Float32Array(sizes);

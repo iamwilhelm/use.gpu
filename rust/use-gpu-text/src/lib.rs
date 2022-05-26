@@ -20,6 +20,12 @@ extern "C" {
     fn log_u32(a: u32);
 }
 
+macro_rules! console_log {
+    // Note that this is using the `log` function imported above during
+    // `bare_bones`
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
+}
+
 #[wasm_bindgen]
 pub struct UseRustText {
     font_map: HashMap<u64, FontArc>,
@@ -32,6 +38,10 @@ pub struct FontMetrics {
     baseline: f32,
     #[serde(rename = "lineHeight")]
     line_height: f32,
+    #[serde(rename = "xHeight")]
+    x_height: f32,
+    #[serde(rename = "emUnit")]
+    em_unit: f32,
 }
 
 #[derive(Serialize)]
@@ -58,6 +68,12 @@ pub struct GlyphMetrics {
     image: Option<Vec<u8>>,
     width: u32,
     height: u32,
+}
+
+fn px_size_to_px_scale<F: Font>(font: &F, px_size: f32) -> f32 {
+    let units_per_em = font.units_per_em().unwrap();
+    let height = font.height_unscaled();
+    px_size * height / units_per_em
 }
 
 #[wasm_bindgen]
@@ -91,19 +107,36 @@ impl UseRustText {
         Ok(js_value)
     }
 
-    pub fn measure_font(&mut self, key: f64, size: f32) -> Result<JsValue, JsValue> {
+    pub fn measure_font(&mut self, key: f64, mut size: f32) -> Result<JsValue, JsValue> {        
         let k = key as u64;
-        let font = self.font_map.get(&k).unwrap().as_scaled(size);
+        let unscaled_font = self.font_map.get(&k).unwrap();
+        let scale = px_size_to_px_scale(unscaled_font, size);
+        let font = unscaled_font.as_scaled(scale);
         
         let ascent = font.ascent();
         let descent = font.descent();
         let line_height = ascent - descent + font.line_gap();
+        let em_unit = scale;
         
+        let x_id = font.glyph_id('x');
+        let mut x_height = ascent * 0.6;
+        let outline = unscaled_font.outline(x_id);
+        match outline {
+            Some(o) => {
+                let ob = o.bounds;
+                x_height = f32::abs(ob.max.y - ob.min.y) / unscaled_font.height_unscaled() * scale;
+            }
+            _ => {}
+        }            
+        console_log!("xh {:?}", x_height);
+
         let layout = FontMetrics {
             ascent,
             descent,
             baseline: ascent,
             line_height,
+            x_height,
+            em_unit,
         };
     	let js_value = serde_wasm_bindgen::to_value(&layout)?;
         Ok(js_value)
@@ -114,7 +147,11 @@ impl UseRustText {
 
         let fonts: Vec<PxScaleFont<&FontArc>> = stack.iter().map(|k| {
             let key = *k as u64;
-            self.font_map.get(&key).unwrap().as_scaled(size)
+            let unscaled_font = self.font_map.get(&key).unwrap();
+            let scale = px_size_to_px_scale(unscaled_font, size);
+            let font = unscaled_font.as_scaled(scale);
+        
+            return font;
         }).collect();
 
         let break_iter = LineBreakIterator::new(&text);
@@ -124,6 +161,7 @@ impl UseRustText {
         let mut metrics = Vec::<u8>::new();
         let mut glyphs = Vec::<u8>::new();
 
+        let mut last_glyph_id = GlyphId(0);
         let mut i = 0;
         break_iter.for_each(|(offset, hard)| {
             let mut advance = 0.0;
@@ -137,6 +175,7 @@ impl UseRustText {
                     metrics.extend_from_slice(&mut f32::to_ne_bytes(2.0));
                     advance = 0.0;
                     trim = 0.0;
+                    last_glyph_id = GlyphId(0);
                     continue;
                 }
                 
@@ -157,11 +196,16 @@ impl UseRustText {
                             trim = 0.0;
                         }
 
+                        let kerning = font.kern(last_glyph_id, glyph_id);
+                        advance += kerning;
+                        last_glyph_id = glyph_id;
+
                         match glyph_id {
                             GlyphId(id) => {
-                                glyphs.extend_from_slice(&mut u32::to_ne_bytes(index as u32));
-                                glyphs.extend_from_slice(&mut u32::to_ne_bytes(id as u32));
-                                glyphs.extend_from_slice(&mut u32::to_ne_bytes(c.is_whitespace() as u32));
+                                glyphs.extend_from_slice(&mut i32::to_ne_bytes(index as i32));
+                                glyphs.extend_from_slice(&mut i32::to_ne_bytes(id as i32));
+                                glyphs.extend_from_slice(&mut i32::to_ne_bytes(c.is_whitespace() as i32));
+                                glyphs.extend_from_slice(&mut i32::to_ne_bytes((kerning * 65536.0) as i32));
                             }
                         }
 
@@ -186,11 +230,13 @@ impl UseRustText {
 
     pub fn measure_glyph(&mut self, key: f64, id: u32, size: f32) -> Result<JsValue, JsValue> {
         let k = key as u64;
-        let font = self.font_map.get(&k).unwrap().as_scaled(size);
-
+        let unscaled_font = self.font_map.get(&k).unwrap();
+        let scale = px_size_to_px_scale(unscaled_font, size);
+        let font = unscaled_font.as_scaled(scale);
+        
         let glyph = Glyph {
             id: GlyphId(id as u16),
-            scale: PxScale { x: size, y: size },
+            scale: PxScale { x: scale, y: scale },
             position: Point { x: 0.0, y: 0.0 },
         };
         

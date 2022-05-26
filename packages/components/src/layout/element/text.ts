@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { Point4 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { InlineLine } from '../types';
+import { Base, InlineLine } from '../types';
 
 import { keyed, yeet, useFiber } from '@use-gpu/live';
 
@@ -20,6 +20,7 @@ export type TextProps = {
   */
   
   color?: Point4,
+  expand?: number,
 
   family?: string,
   style?: string,
@@ -30,6 +31,7 @@ export type TextProps = {
   detail?: number,
   snap?: boolean,
 
+  inline?: Base,
   text?: string,
   children?: string,
 };
@@ -46,6 +48,8 @@ export const Text: LiveComponent<TextProps> = (props) => {
     color = BLACK,
     lineHeight,
     detail,
+    inline,
+    expand = 0,
     size = 16,
     snap = false,
     text = '',
@@ -62,6 +66,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
   return yeet({
     spans,
     height,
+    inline,
     render: (lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule) => (
       keyed(Glyphs, id, {
         id,
@@ -75,6 +80,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
         height,
         lines,
         snap,
+        expand,
 
         clip,
         transform,

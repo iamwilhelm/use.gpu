@@ -7,7 +7,6 @@
   "private": true,
   "dependencies": {
     "@use-gpu/state": "*",
-    "@webgpu/glslang": "^0.0.15",
     "gl-matrix": "^3.3.0",
     "lodash": "^4.17.21"
   },

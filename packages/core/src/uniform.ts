@@ -10,6 +10,8 @@ import {
 } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
+
+import { getObjectKey, getHashValue } from '@use-gpu/state';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 
@@ -73,15 +75,15 @@ export const makeBoundUniforms = <T>(
   uniforms: DataBinding<T>[],
   bindings: DataBinding<T>[],
   set: number = 0,
+  force?: boolean,
 ): VirtualAllocation => {
-  const entries = [] as GPUBindGroupEntry[];
-
-  let pipe, buffer, bindGroup;
-
   const hasBindings = !!bindings.length;
   const hasUniforms = !!uniforms.length;
 
-  if (!hasBindings && !hasUniforms) return {};
+  if (!hasBindings && !hasUniforms && !force) return {};
+
+  const entries = [] as GPUBindGroupEntry[];
+  let pipe, buffer;
 
   if (hasBindings) {
     const bindingEntries = bindings.length ? makeDataBindingsEntries(device, bindings, 0) : [];
@@ -97,14 +99,60 @@ export const makeBoundUniforms = <T>(
     entries.push(...uniformEntries);
   }
 
-  if (entries.length) {
-    bindGroup = device.createBindGroup({
+  const bindGroup = device.createBindGroup({
+    layout: pipeline.getBindGroupLayout(set),
+    entries,
+  });
+
+  return {pipe, buffer, bindGroup};
+}
+
+export const makeVolatileUniforms = <T>(
+  device: GPUDevice,
+  pipeline: GPURenderPipeline | GPUComputePipeline,
+  bindings: DataBinding<T>[],
+  set: number = 0,
+): VolatileAllocation => {
+  const hasBindings = !!bindings.length;
+  if (!hasBindings) return {};
+
+  let depth = 1;
+  for (const b of bindings) {
+    if (b.storage) depth = Math.max(depth, +b.storage.volatile);
+    else if (b.texture.volatile) depth = Math.max(depth, +b.texture.volatile);
+  }
+
+  const cache = miniLRU(depth + 1);
+
+  const ids: number[] = [];
+  const bindGroup = () => {
+
+    ids.length = 0;
+    for (const b of bindings) {
+      let v: any = undefined;
+      if (b.texture) v = b.texture.view ?? b.texture.texture;
+      else if (b.storage) v = b.storage.buffer;      
+
+      ids.push(getObjectKey(v));
+    }
+
+    const key = getHashValue(ids);
+    const cached = cache.get(key);
+    if (cached) {
+      return cached;
+    }
+
+    const entries = bindings.length ? makeDataBindingsEntries(device, bindings, 0) : [];
+    const bindGroup = device.createBindGroup({
       layout: pipeline.getBindGroupLayout(set),
       entries,
     });
-  }
 
-  return {pipe, buffer, bindGroup};
+    cache.set(key, bindGroup);
+    return bindGroup;
+  };
+
+  return {bindGroup};
 }
 
 export const makeDataBindingsEntries = <T>(
@@ -122,9 +170,9 @@ export const makeDataBindingsEntries = <T>(
     }
     else if (b.texture) {
       const {texture} = b;
-      const {view, sampler} = texture;
-      
-      const textureResource = (view instanceof GPUTextureView) ? view : makeTextureView(view);
+      const {texture: t, view, sampler} = texture;
+
+      const textureResource = view ?? makeTextureView(t);
       const samplerResource = (sampler instanceof GPUSampler) ? sampler : makeSampler(device, sampler);
 
       entries.push({binding, resource: samplerResource});
@@ -259,4 +307,27 @@ export const makeLayoutFiller = (
       setItem(index++, item);
     }
   }
+}
+
+const miniLRU = <T>(max: number) => {
+  const keys   = [] as number[];
+  const values = [] as T[];
+
+  for (let i = 0; i < max; ++i) {
+    keys.push(null as any);
+    values.push(null as any);
+  }
+
+  let h = 0;
+  return {
+    get: (key: number) => {
+      const i = keys.indexOf(key);
+      return i >= 0 ? values[i] : null;
+    },
+    set: (key: number, value: T) => {
+      keys[h] = key;
+      values[h] = value;
+      h = (h + 1) % max;
+    },
+  };
 }

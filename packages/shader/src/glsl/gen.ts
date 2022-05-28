@@ -15,7 +15,8 @@ const getValueKey = (b: DataBinding) => getObjectKey(b.constant ?? b.storage ?? 
 
 export const makeBindingAccessors = (
   bindings: DataBinding[],
-  set: number | string = 0,
+  bindingSet: number | string = 0,
+  volatileSet: number | string = 0,
 ): Record<string, ParsedBundle | ParsedModule> => {
 
   // Extract uniforms
@@ -52,19 +53,30 @@ export const makeBindingAccessors = (
   const key   = getHash(`${hash} ${keyed}`);
 
   // Code generator
-  const render = (namespace: string, rename: Map<string, string>, base: number = 0) => {
+  const render = (
+    namespace: string,
+    rename: Map<string, string>,
+    bindingBase: number = 0,
+    volatileBase: number = 0,
+  ) => {
     const program: string[] = [];
 
     for (const {uniform: {name, format, args}} of constants) {
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, format, name, args));
     }
-    for (const {uniform: {name, format, args}} of storages) {
-      program.push(makeStorageAccessor(namespace, set, base++, format, name));
+
+    for (const {uniform: {name, format, args}, storage} of storages) {
+      const {volatile} = storage!;
+      const base = volatile ? volatileBase++ : bindingBase++;
+      const set = volatile ? volatileSet : bindingSet;
+      program.push(makeStorageAccessor(namespace, set, base, format, name));
     }
 
-    for (const {uniform: {name, format, args}, texture} of textures) if (texture) {
-      program.push(makeTextureAccessor(namespace, set, base++, format, texture!.layout, name));
-      base++;
+    for (const {uniform: {name, format, args}, texture} of textures) {
+      const {volatile, layout, variant, absolute} = texture!;
+      const base = volatile ? volatileBase++ : bindingBase++;
+      const set = volatile ? volatileSet : bindingSet;
+      program.push(makeTextureAccessor(namespace, set, base, format, name, layout, variant, absolute));
     }
 
     return program.join('\n');
@@ -73,7 +85,7 @@ export const makeBindingAccessors = (
   const virtual = loadVirtualModule({
     uniforms: constants,
     storages,
-    //textures,
+    textures,
     render,
   }, {
     symbols,
@@ -145,6 +157,8 @@ export const makeTextureAccessor = (
   binding: number,
   type: string,
   layout: string,
+  variant: string = 'sampler2D',
+  absolute: boolean = false,
   name: string,
   args: string[] = UV_ARG,
 ) => `
@@ -152,6 +166,7 @@ layout (set = ${set}, binding = ${binding}) uniform sampler ${ns}${name}Sampler;
 layout (set = ${set}, binding = ${binding + 1}) uniform ${layout} ${ns}${name}Texture;
 
 ${type} ${ns}${name}(vec2 uv) {
-  return texture(sampler2D(${ns}${name}Texture, ${ns}${name}Sampler), uv);
+  ${absolute ? `uv = uv / vec2(textureSize(${ns}${name}Texture));\n  `
+  return texture(${variant}(${ns}${name}Texture, ${ns}${name}Sampler), uv);
 }
 `;

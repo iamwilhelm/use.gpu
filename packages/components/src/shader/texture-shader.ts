@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, UniformAttributeValue } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { yeet, useFiber, useMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { yeet, useFiber, useOne, useMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
 
@@ -27,7 +27,7 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
   
   const key = useFiber().id;
   
-  const getTexture = useMemo(() => {
+  const getTexture = useOne(() => {
     const textureBinding = makeShaderBinding<ShaderModule>(TEXTURE_BINDING, texture);
     let getTexture = bindingToModule(textureBinding);
 
@@ -39,7 +39,7 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
     }
 
     return getTexture;
-  }, [texture]);
+  }, texture);
 
-  return useMemo(() => getTexture ? (render ? render(getTexture) : yeet(getTexture)) : null, [render, getTexture]);
+  return useMemo(() => render ? render(getTexture) : yeet(getTexture), [render, getTexture]);
 };

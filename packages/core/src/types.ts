@@ -155,10 +155,10 @@ export type ResourceAllocation = {
   bindGroup: GPUBindGroup,
 };
 
-export type VirtualAllocation = {
-  pipe?: UniformPipe,
-  buffer?: GPUBuffer,
-  bindGroup?: GPUBindGroup,
+export type VirtualAllocation = Partial<UniformAllocation>;
+
+export type VolatileAllocation = {
+  bindGroup?: () => GPUBindGroup,
 };
 
 export type UniformFiller = (items: any) => void;
@@ -170,6 +170,7 @@ export type StorageSource = {
   format: string,
   length: number,
   size: number[],
+  volatile?: number,
   version: number,
 };
 
@@ -182,12 +183,13 @@ export type LambdaSource<T = any> = {
 
 export type TextureSource = {
   texture: GPUTexture,
-  view: GPUTexture | GPUTextureView,
+  view?: GPUTextureView,
   sampler: GPUSampler | GPUSamplerDescriptor,
   layout: string,
   format: string,
   variant?: string,
   absolute?: boolean,
+  volatile?: number,
   colorSpace?: ColorSpace,
   size: [number, number] | [number, number, number],
   version: number,

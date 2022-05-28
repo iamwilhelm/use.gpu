@@ -47,6 +47,11 @@ import {
   getHash
 } from '../util/hash';
 
+import {
+  getBundleHash,
+  getBundleKey,
+} from '../util/bundle';
+
 export {
   loadModule,
   loadModuleWithCache,
@@ -96,6 +101,11 @@ export {
   getHash
 } from '../util/hash';
 
+export {
+  getBundleHash,
+  getBundleKey,
+} from '../util/bundle';
+
 export const WGSLLinker = {
   loadModule,
   loadModuleWithCache,
@@ -128,6 +138,8 @@ export const WGSLLinker = {
   makeModuleCache,
 
   getHash,
+  getBundleHash,
+  getBundleKey,
 };
 
 export default WGSLLinker;

@@ -60,7 +60,10 @@ export const bindBundle = (
 
   const unique = `@closure [${hash}] [${external.join(' ')}]`;
   const rehash = getHash(unique);
-  const rekey  = getHash(`${rehash} ${key}`);
+
+  external.length = 0;
+  for (const k in links) if (links[k]) external.push(getBundleKey(links[k]!));
+  const rekey  = getHash(`${key} ${external.join(' ')}`);
   
   const relinks = bundle.links ? {
     ...bundle.links,
@@ -103,20 +106,35 @@ export const makeResolveBindings = (
 ) => timed('resolveBindings', (
   modules: ParsedBundle[],
   defines?: Record<string, ShaderDefine>,
+  lazy?: boolean,
 ): {
-  modules: ParsedBundle[],
   uniforms: DataBinding[],
   bindings: DataBinding[],
+  volatiles: DataBinding[],
 } => {
-  const allUniforms = [] as DataBinding[];
-  const allBindings = [] as DataBinding[];
+  const allUniforms  = [] as DataBinding[];
+  const allBindings  = [] as DataBinding[];
+  const allVolatiles = [] as DataBinding[];
 
   const seen = new Set<string>();
   DEBUG && console.log('------------')
 
+  const addBinding = (b: DataBinding[], slots: number) => {
+    const s = (b.source ?? b.texture) as any;
+    if (s && s.volatile) {
+      allVolatiles.push(b);
+      volatileBase += slots;
+    }
+    else {
+      allBindings.push(b);
+      bindingBase += slots;
+    }
+  }
+
   // Gather all namespaced uniforms and bindings from all virtual modules.
   // Assign base offset to each virtual module in-place.
-  let base = 0;
+  let bindingBase = 0;
+  let volatileBase = 0;
   let index = 0;
   for (const {virtuals} of modules) {
     if (virtuals) for (const m of virtuals) {
@@ -129,57 +147,64 @@ export const makeResolveBindings = (
 
       if (m.virtual) {
         const {uniforms, storages, textures} = m.virtual;
-        const namespace = `${PREFIX_VIRTUAL}${++index}_`;
-        if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
-        if (storages) for (const b of storages) allBindings.push(b);
-        if (textures) for (const b of textures) allBindings.push(b);
 
         // Mutate virtual modules as they are ephemeral
-        m.virtual.namespace = namespace;
-        m.virtual.base = base;
-        if (storages) base += storages.length;
-        if (textures) base += textures.length * 2;
+        const namespace = `${PREFIX_VIRTUAL}${++index}_`;
+        if (!lazy) {
+          m.virtual.namespace = namespace;
+          m.virtual.bindingBase = bindingBase;
+          m.virtual.volatileBase = volatileBase;
+        }
+
+        if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
+        if (storages) for (const b of storages) addBinding(b, 1);
+        if (textures) for (const b of textures) addBinding(b, 2);
       }
     };
   }
 
+  let out = modules;
+
   // Create combined uniform block as top-level import
-  const virtualBindGroup = getVirtualBindGroup(defines);
-  const code = makeUniformBlock(allUniforms, virtualBindGroup, base);
-  const lib = loadStaticModule(code, VIRTUAL_BINDINGS);
+  if (!lazy) {
+    const virtualBindGroup = getVirtualBindGroup(defines);
+    const code = makeUniformBlock(allUniforms, virtualBindGroup, bindingBase);
+    const lib = loadStaticModule(code, VIRTUAL_BINDINGS);
 
-  const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDINGS, imports: NO_SYMBOLS};
+    const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDINGS, imports: NO_SYMBOLS};
 
-  // Append to modules
-  const out = modules.map((m: ShaderModule) => {
-    const bundle = toBundle(m);
+    // Append to modules
+    out = modules.map((m: ShaderModule) => {
+      const bundle = toBundle(m);
 
-    const {module, libs} = bundle;
-    const {table} = module;
-    const {modules} = table;
+      const {module, libs} = bundle;
+      const {table} = module;
+      const {modules} = table;
 
-    const retable = {
-      ...table,
-      modules: modules ? [...modules, imported] : [imported],
-    };
+      const retable = {
+        ...table,
+        modules: modules ? [...modules, imported] : [imported],
+      };
 
-    return {
-      ...bundle,
-      module: {
-        ...module,
-        table: retable,
-      },
-      libs: {
-        ...libs,
-        [VIRTUAL_BINDINGS]: lib,
-      },
-    };
-  });
+      return {
+        ...bundle,
+        module: {
+          ...module,
+          table: retable,
+        },
+        libs: {
+          ...libs,
+          [VIRTUAL_BINDINGS]: lib,
+        },
+      };
+    });
+  }
 
   return {
     modules: out,
     uniforms: allUniforms,
     bindings: allBindings,
+    volatiles: allVolatiles,
   };
 });
 

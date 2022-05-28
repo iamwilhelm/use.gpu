@@ -204,14 +204,14 @@ export const makeLinker = (
     if (virtual) {
       const {uniforms, storages, textures} = virtual;
       if ((uniforms || storages || textures) && (!hasBoundVirtuals)) {
-        const id = code.replace('#virtual ', '');
+        const id = code.replace('@virtual ', '');
         throw new Error(`Virtual module ${id} has unresolved data bindings`);
       }
 
       // Emit virtual module in target namespace,
       // with dynamically assigned binding slots.
       const ns = namespaces.get(key)!;
-      const recode = virtual.render(ns, rename, virtual.base);
+      const recode = virtual.render(ns, rename, virtual.bindingBase, virtual.volatileBase);
       program.push(recode);
     }
     else if (tree) {

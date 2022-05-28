@@ -48,6 +48,11 @@ import {
   getHash
 } from '../util/hash';
 
+import {
+  getBundleHash,
+  getBundleKey,
+} from '../util/bundle';
+
 export {
   loadModule,
   loadModuleWithCache,
@@ -98,6 +103,11 @@ export {
   getHash
 } from '../util/hash';
 
+export {
+  getBundleHash,
+  getBundleKey,
+} from '../util/bundle';
+
 export const GLSLLinker = {
   loadModule,
   loadModuleWithCache,
@@ -131,6 +141,8 @@ export const GLSLLinker = {
   makeModuleCache,
 
   getHash,
+  getBundleHash,
+  getBundleKey,
 };
 
 export default GLSLLinker;

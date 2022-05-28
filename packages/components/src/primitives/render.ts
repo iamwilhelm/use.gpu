@@ -7,7 +7,7 @@ import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types'
 import { DeviceContext, ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import {
-  makeMultiUniforms, makeBoundUniforms,
+  makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
   getColorSpace,
   uploadBuffer,
   resolve,
@@ -67,6 +67,7 @@ export const render = (props: RenderProps) => {
     '@group(PICKING)': '@group(0)',
     '@binding(PICKING)': '@binding(1)',
     '@group(VIRTUAL)': '@group(1)',
+    '@group(VOLATILE)': '@group(2)',
     'COLOR_SPACE': cs,
     ...propDefines,
   }), [propDefines]);
@@ -76,6 +77,8 @@ export const render = (props: RenderProps) => {
     shader,
     uniforms,
     bindings,
+    constants,
+    volatiles,
   } = useLinkedShader(
     vertexShader,
     fragmentShader,
@@ -98,13 +101,17 @@ export const render = (props: RenderProps) => {
   }, [device, viewDefs, pipeline]);
 
   // Bound storage
+	const force = !!volatiles.length;
   const storage = useMemo(() =>
-    makeBoundUniforms(device, pipeline, uniforms, bindings, 1),
-    [device, viewDefs, uniforms, bindings, pipeline]
+    makeBoundUniforms(device, pipeline, uniforms, bindings, 1, force),
+    [device, pipeline, uniforms, bindings]
   );
 
-  const uniformMap = keyBy(uniforms, ({uniform: {name}}) => name);
-  const constantUniforms = mapValues(uniformMap, u => u.constant);
+  // Volatile storage
+  const volatile = useMemo(() =>
+    makeVolatileUniforms(device, pipeline, volatiles, 2),
+    [device, pipeline, uniforms, volatiles]
+  );
 
   const fiber = useFiber();
 
@@ -129,13 +136,14 @@ export const render = (props: RenderProps) => {
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
       if (storage.pipe && storage.buffer) {
-        storage.pipe.fill(constantUniforms);
+        storage.pipe.fill(constants);
         uploadBuffer(device, storage.buffer, storage.pipe.data);
       }
 
       passEncoder.setPipeline(pipeline);
       passEncoder.setBindGroup(0, uniform.bindGroup);
       if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
+      if (volatile.bindGroup) passEncoder.setBindGroup(2, volatile.bindGroup());
 
       passEncoder.draw(v, i, 0, 0);
     },

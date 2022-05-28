@@ -5,7 +5,7 @@ import { getBundleHash } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
 import { PREFIX_VIRTUAL } from '../constants';
-import { VIRTUAL_BINDGROUP } from './constants';
+import { VIRTUAL_BINDGROUP, VOLATILE_BINDGROUP } from './constants';
 
 const INT_PARAMS = [{name: 'index', type: {name: 'u32'}}];
 const INT_ARG = ['u32'];
@@ -55,21 +55,32 @@ export const makeBindingAccessors = (
   const key   = getHash(`${hash} ${keyed}`);
 
   // Code generator
-  const render = (namespace: string, rename: Map<string, string>, base: number = 0) => {
+  const render = (
+    namespace: string,
+    rename: Map<string, string>,
+    bindingBase: number = 0,
+    volatileBase: number = 0,
+  ) => {
     const program: string[] = [];
-    const set = getBindingArgument(rename.get(VIRTUAL_BINDGROUP));
+    const bindingSet = getBindingArgument(rename.get(VIRTUAL_BINDGROUP));
+    const volatileSet = getBindingArgument(rename.get(VOLATILE_BINDGROUP));
 
     for (const {uniform: {name, format, args}} of constants) {
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, format, name, args));
     }
 
-    for (const {uniform: {name, format, args}} of storages) {
-      program.push(makeStorageAccessor(namespace, set, base++, format, name));
+    for (const {uniform: {name, format, args}, storage} of storages) {
+      const {volatile} = storage!;
+      const base = volatile ? volatileBase++ : bindingBase++;
+      const set = volatile ? volatileSet : bindingSet;
+      program.push(makeStorageAccessor(namespace, set, base, format, name));
     }
 
     for (const {uniform: {name, format, args}, texture} of textures) {
-      program.push(makeTextureAccessor(namespace, set, base++, format, name, texture!.layout, texture!.variant, texture!.absolute));
-      base++;
+      const {volatile, layout, variant, absolute} = texture!;
+      const base = volatile ? volatileBase++ : bindingBase++;
+      const set = volatile ? volatileSet : bindingSet;
+      program.push(makeTextureAccessor(namespace, set, base, format, name, layout, variant, absolute));
     }
 
     return program.join('\n');

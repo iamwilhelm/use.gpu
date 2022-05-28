@@ -51,7 +51,8 @@ export type VirtualTable<T extends SymbolTable = any> = {
   uniforms?: DataBinding<T>[],
   storages?: DataBinding<T>[],
   textures?: DataBinding<T>[],
-  base?: number,
+  bindingBase?: number,
+  volatileBase?: number,
   namespace?: string,
 };
 
@@ -94,6 +95,7 @@ export type StorageSource = {
   format: any,
   length: number,
   size: number[],
+  volatile?: number,
   version: number,
 };
 
@@ -112,6 +114,7 @@ export type TextureSource = {
   format: any,
   variant?: string,
   absolute?: boolean,
+  volatile?: number,
   size: [number, number] | [number, number, number],
   version: number,
 };

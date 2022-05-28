@@ -1,7 +1,7 @@
 import { ShaderModuleDescriptor } from '@use-gpu/core/types';
 import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
 
-import { resolveBindings, linkBundle, getHash } from '@use-gpu/shader/wgsl';
+import { resolveBindings, linkBundle, getHash, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderModule } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
 import { useInspectable } from './useInspectable'
@@ -30,21 +30,32 @@ export const useLinkedShader = (
   const fiber = useFiber();
   const inspect = useInspectable();
 
-  // Resolve bindings between vertex and fragment.
+  // Get hash for defines, shader code, shader instance
+  const pHash = getHash(deps);
+  const dHash = getHash(defines);
+  const vHash = getBundleHash(vertex);
+  const fHash = getBundleHash(fragment);
+  const vKey  = getBundleKey(vertex);
+  const fKey  = getBundleKey(fragment);
+
+  const instanceKey   = vKey  + fKey  + dHash + pHash;
+  const structuralKey = vHash + fHash + dHash + pHash;
+
+  // If structural key hasn't changed, we don't need updated modules
+  let lazy = true;
+  useOne(() => { lazy = false }, structuralKey);
+
+  // Resolve bindings between vertex and fragment if instance key changed
   const s = [vertex, fragment] as [ParsedBundle, ParsedBundle];
-  const {modules, uniforms, bindings} = useMemo(() =>
-    resolveBindings(s, defines),
-    [...s, defines]
+  const {modules, uniforms, bindings, volatiles} = useOne(() =>
+    resolveBindings(s, defines, lazy),
+    instanceKey
   );
 
-  // Keep static set of bindings
-  const ref = useOne(() => ({ uniforms, bindings }));
+  // Keep static set of uniforms/bindings to avoid recreating descriptors unless necessary
+  const ref = useOne(() => ({ uniforms, bindings, constants: {} as Record<string, any> }));
 
-  // Hash code + defines
-  const dHash = getHash(defines);
-  const [{hash: vHash}, {hash: fHash}] = modules;
-
-  // Link final WGSL
+  // Link final WGSL if code structure changed.
   const shader = useMemo(() => {
     const vKey = vHash +'-'+ dHash;
     const fKey = fHash +'-'+ dHash;
@@ -70,31 +81,24 @@ export const useLinkedShader = (
       bindings,
     });
 
+    // Replace uniforms/bindings as structure changed
     ref.uniforms = uniforms;
     ref.bindings = bindings;
 
     return [vertex, fragment] as [ShaderModuleDescriptor, ShaderModuleDescriptor];
-  }, [...deps ?? NO_DEPS, vHash, fHash, dHash]);
+  }, structuralKey);
 
-  // Update bound uniform values in-place from latest
+  // Update uniform constant values in-place
   useOne(() => {
-    let i = 0;
-    for (const u of uniforms) {
-      if (u.constant != null) {
-        ref.uniforms[i].constant = u.constant;
-      }
-      ++i;
-    }
+    for (const u of uniforms) ref.constants[u.uniform.name] = u.constant;
   }, uniforms);
 
-  // Refresh bindings if buffer assignment changed
-  const buffers = [] as GPUBuffer[];
-  for (const {storage, texture} of bindings) {
-    buffers.push(storage?.buffer ?? texture?.texture);
-  }
+  // Refresh all bindings if buffer assignment changed, as they need new a storage bind group
+  const buffers = [] as (GPUBuffer | GPUTexture)[];
+  for (const {storage, texture} of bindings) buffers.push(storage?.buffer ?? texture?.view ?? texture?.texture);
   useMemo(() => {
     ref.bindings = bindings;
   }, buffers);
 
-  return {shader, ...ref};
+  return {shader, ...ref, volatiles};
 };

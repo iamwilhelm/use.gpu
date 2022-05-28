@@ -101,7 +101,7 @@ export const render = (props: RenderProps) => {
   }, [device, viewDefs, pipeline]);
 
   // Bound storage
-	const force = !!volatiles.length;
+  const force = !!volatiles.length;
   const storage = useMemo(() =>
     makeBoundUniforms(device, pipeline, uniforms, bindings, 1, force),
     [device, pipeline, uniforms, bindings]

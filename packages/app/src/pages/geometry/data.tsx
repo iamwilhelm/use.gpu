@@ -55,11 +55,11 @@ export const GeometryDataPage: LC = () => {
   const view = (
     <Loop>
       <Draw live>
-        {
-          use(Raw, () => {
+        <Raw>
+          {() => {
             t = t + 1/60;
-          })
-        }
+          }}
+        </Raw>
         <Cursor cursor='move' />
         <Pass>
 

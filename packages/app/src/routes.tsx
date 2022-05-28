@@ -9,6 +9,7 @@ import { LayoutDisplayPage } from './pages/layout/display';
 import { LayoutTestPage } from './pages/layout/test';
 import { MeshRawPage } from './pages/mesh/raw';
 import { LinearRGBPage } from './pages/rtt/linear-rgb';
+import { FeedbackPage } from './pages/rtt/feedback';
 import { PlotSimplePage } from './pages/plot/simple';
 
 import { HomePage } from './pages/home';
@@ -23,6 +24,7 @@ export const PAGES = [
   {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
   {path: "/plot/simple", title: "Plot - Simple"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
+  {path: "/rtt/feedback", title: "RTT - Feedback"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
   {path: "/debug/glyph", title: "Debug - Glyph SDF"},
   {path: "/", title: "Index"},
@@ -37,6 +39,7 @@ export const makeRoutes = () => ({
   "/mesh/raw":       { element: <MeshRawPage /> },
   "/plot/simple":    { element: <PlotSimplePage /> },
   "/rtt/linear-rgb": { element: <LinearRGBPage /> },
+  "/rtt/feedback":   { element: <FeedbackPage /> },
   "/debug/atlas":    { element: <DebugAtlasPage /> },
   "/debug/glyph":    { element: <DebugGlyphPage /> },
 

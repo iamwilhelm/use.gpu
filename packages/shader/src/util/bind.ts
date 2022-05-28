@@ -108,6 +108,7 @@ export const makeResolveBindings = (
   defines?: Record<string, ShaderDefine>,
   lazy?: boolean,
 ): {
+  modules: ParsedBundle[],
   uniforms: DataBinding[],
   bindings: DataBinding[],
   volatiles: DataBinding[],
@@ -119,8 +120,8 @@ export const makeResolveBindings = (
   const seen = new Set<string>();
   DEBUG && console.log('------------')
 
-  const addBinding = (b: DataBinding[], slots: number) => {
-    const s = (b.source ?? b.texture) as any;
+  const addBinding = (b: DataBinding, slots: number) => {
+    const s = (b.storage ?? b.texture) as any;
     if (s && s.volatile) {
       allVolatiles.push(b);
       volatileBase += slots;

@@ -19,14 +19,16 @@ import {
   BLEND_PREMULTIPLIED,
 } from '@use-gpu/core';
 
-export const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
+const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
+
+const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 
 export type RenderToTextureProps = {
   width?: number,
   height?: number,
   live?: boolean,
   history?: number,
-
+  sampler?: Partial<GPUSamplerDescriptor>,
   format?: GPUTextureFormat,
   depthStencil?: GPUTextureFormat | null,
   backgroundColor?: GPUColor,
@@ -48,6 +50,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     samples = renderContext.samples,
     format = PRESENTATION_FORMAT,
     history = 0,
+    sampler = NO_SAMPLER,
     depthStencil = DEPTH_STENCIL_FORMAT,
     backgroundColor = EMPTY_COLOR,
     colorSpace = COLOR_SPACE,
@@ -157,26 +160,26 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
   const source = useMemo(() => ({
     texture: targetTexture,
     view: makeTextureView(targetTexture),
-    sampler: {},
+    sampler,
     layout: 'texture_2d<f32>',
     format,
     colorSpace,
     size: [width, height] as [number, number],
     volatile: history,
     version: 0,
-  }), [targetTexture, width, height, format, history]);
+  }), [targetTexture, width, height, format, history, sampler]);
 
   const feedback = useMemo(() => history ? {
     texture: targetTexture,
     view: makeTextureView(targetTexture),
-    sampler: {},
+    sampler,
     layout: 'texture_2d<f32>',
     format,
     colorSpace,
     size: [width, height] as [number, number],
     volatile: history,
     version: 0,
-  } : null, [targetTexture, width, height, format, history]);
+  } : null, [targetTexture, width, height, format, history, sampler]);
 
   const Done = (ts: Task[]) => {
     usePerFrame();
@@ -188,7 +191,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     return provide(FrameContext, {current: source.version}, then(source));
   };
 
-  const view = history ? provide(FeedbackContext, source, children) : children;
+  const view = history ? provide(FeedbackContext, feedback, children) : children;
 
   return (
     gather(

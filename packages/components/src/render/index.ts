@@ -1,4 +1,5 @@
 export * from './draw';
+export * from './feedback';
 export * from './linear-rgb';
 export * from './loop';
 export * from './pass';

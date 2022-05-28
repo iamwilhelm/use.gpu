@@ -5,19 +5,17 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { use, useOne } from '@use-gpu/live';
 import { Draw } from './draw';
 import { Pass } from './pass';
-import { RenderToTexture } from './render-to-texture';
+import { RenderToTexture, RenderToTextureProps } from './render-to-texture';
 import { TextureShader } from '../shader';
 import { RawFullScreen } from '../primitives';
 
-type LinearRGBProps = {
-  children?: LiveElement<any>,
-};
+type LinearRGBProps = Omit<RenderToTextureProps, "format" | "colorSpace">;
 
-export const LinearRGB: LiveComponent<LinearRGBProps> = ({children}: LinearRGBProps) => ( 
+export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => ( 
   use(RenderToTexture, {
+    ...props,
     format: "rgba16float",
     colorSpace: 'linear',
-    children,
     then: (texture: TextureSource) => 
       useOne(() =>
         use(Draw, {

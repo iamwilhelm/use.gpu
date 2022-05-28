@@ -98,6 +98,11 @@
       "import": "./src/instance/identity.wgsl",
       "require": "./src/instance/identity.wgsl"
     },
+    "./instance/interleave.wgsl": {
+      "types": "./src/instance/interleave.wgsl.d.ts",
+      "import": "./src/instance/interleave.wgsl",
+      "require": "./src/instance/interleave.wgsl"
+    },
     "./instance/vertex/arrow.wgsl": {
       "types": "./src/instance/vertex/arrow.wgsl.d.ts",
       "import": "./src/instance/vertex/arrow.wgsl",

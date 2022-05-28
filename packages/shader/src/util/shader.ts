@@ -9,13 +9,13 @@ const EMPTY_TABLE = {} as any;
 
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
-export const makeLoadModule = <T>(
+export const makeLoadModule = <T extends SymbolTable = any>(
   parseShader: (code: string) => Tree,
   makeASTParser: (code: string, tree: Tree, name?: string) => ASTParser<T>,
   compressAST: (code: string, tree: Tree) => CompressedNode[],
 ) => (
   code: string,
-  name: string,
+  name: string = 'main',
   entry?: string,
   compressed: boolean = false,
 ): ParsedModule => {
@@ -26,6 +26,8 @@ export const makeLoadModule = <T>(
   const astParser = makeASTParser(code, tree, name);
   const table = astParser.getSymbolTable();
   const shake = astParser.getShakeTable(table);
+
+  if (entry == null && table.symbols?.includes('main')) entry = 'main';
 
   if (compressed) tree = decompressAST(compressAST(code, tree));
 

@@ -91,7 +91,7 @@ export const GeometryFacesPage: LC = () => {
           fields={convexDataFields}
           data={convexFaceData}
           on={<FaceSegments />}
-          render={([positions, colors, segments]: StorageSource[]) =>
+          render={(positions, colors, segments) =>
             <FaceLayer
               positions={positions}
               segments={segments}
@@ -103,7 +103,7 @@ export const GeometryFacesPage: LC = () => {
         <CompositeData
           fields={concaveDataFields}
           data={concaveFaceData}
-          render={([positions, colors, indices]: StorageSource[]) =>
+          render={(positions, colors, indices) =>
             <FaceLayer
               positions={positions}
               indices={indices}

@@ -6,7 +6,7 @@ import React from '@use-gpu/live/jsx';
 
 import {
   Loop, Draw, Pass, Flat,
-  CompositeData, Data, RawData, Raw, LineSegments,
+  Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Pick, Cursor, PointLayer, LineLayer,
   RenderToTexture,

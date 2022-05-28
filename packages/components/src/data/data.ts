@@ -18,7 +18,7 @@ export type DataProps = {
   fields?: DataField[],
   live?: boolean,
 
-  render?: (sources: StorageSource[]) => LiveElement<any>,
+  render?: (...sources: StorageSource[]) => LiveElement<any>,
 };
 
 const NO_FIELDS = [] as DataField[];
@@ -91,5 +91,5 @@ export const Data: LiveComponent<DataProps> = (props) => {
     refresh();
   }
 
-  return useMemo(() => render ? render(fieldSources) : yeet(fieldSources), [render, fieldSources]);
+  return useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
 };

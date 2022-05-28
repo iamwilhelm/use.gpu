@@ -68,7 +68,7 @@ export const GeometryDataPage: LC = () => {
               ['vec4<f32>', [-5, -2.5, 0, 1, 5, -2.5, 0, 1, 0, -2.5, -5, 1, 0, -2.5, 5, 1]],
               ['i32', [1, 2, 1, 2]],
             ]}
-            render={([positions, segments]) =>
+            render={(positions, segments) =>
               <LineLayer
                 positions={positions}
                 segments={segments}
@@ -83,7 +83,7 @@ export const GeometryDataPage: LC = () => {
             fields={lineDataFields}
             data={lineData}
             on={<LineSegments />}
-            render={([positions, colors, widths, segments]: StorageSource[]) =>
+            render={(positions, colors, widths, segments) =>
               <LineLayer
                 positions={positions}
                 colors={colors}

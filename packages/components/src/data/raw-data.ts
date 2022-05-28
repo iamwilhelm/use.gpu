@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TypedArray, StorageSource, LambdaSource, UniformType, Emitter } from '@use-gpu/core/types';
 
-import { provide, yeet, useMemo, useNoMemo, useOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
@@ -108,8 +108,8 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
     if (sources) {
       for (const s of sources) {
-        s.length  = source.length;
-        s.size    = source.size;
+        s.length  = source.length / t;
+        s.size    = source.size.slice(1);
         s.version = source.version;
       }
     }

@@ -9,6 +9,7 @@ import { makeASTParser, compressAST } from './ast';
 import { toTypeString, toTypeArgs } from './type';
 import { parser } from './grammar/wgsl';
 import LRU from 'lru-cache';
+import zip from 'lodash/zip';
 
 export { loadStaticModule, loadVirtualModule } from '../util/shader';
 
@@ -39,3 +40,9 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
 
 export const bundleToAttribute = makeBundleToAttribute(toTypeString, toTypeArgs);
 export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArgs);
+
+// Templated literal syntax
+export const wgsl = (literals: string[], ...tokens: string[]) => {
+  const code = zip(literals, tokens).flat();
+  return loadModule(code.join(''));
+};

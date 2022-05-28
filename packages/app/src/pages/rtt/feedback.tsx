@@ -3,7 +3,7 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
-import { loadModule } from '@use-gpu/shader/wgsl';
+import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
   Loop, Draw, Pass, OrbitCamera, RawData, PointLayer, Raw,
@@ -25,21 +25,21 @@ export const FeedbackPage: LC = () => {
         <Pass>
           <OrbitCamera scale={1080}>
             <Feedback shader={
-              loadModule(`
+              wgsl`
                 @link fn getFeedback(uv: vec2<f32>) -> vec4<f32> {}
                 @export fn main(uv: vec2<f32>) -> vec4<f32> {
                   let advectedUV = (uv - 0.5) * 0.99 + 0.5;
                   return getFeedback(advectedUV);
                 }
-              `)
+              `
             }/>
           
             <RawData
               format='vec4<f32>'
               length={100}
-              live
-              split
               items={2}
+              split
+              live
               expr={(emit: Emitter, i: number) => {
                 const s = ((i*i + i) % 13133.371) % 1000;
 

@@ -7,6 +7,8 @@ import {
 
   bundleToAttribute,
   bundleToAttributes,
+
+  wgsl,
 } from './shader';
 
 import {
@@ -61,6 +63,8 @@ export {
 
   bundleToAttribute,
   bundleToAttributes,
+
+  wgsl,
 } from './shader';
 
 export {
@@ -112,6 +116,7 @@ export const WGSLLinker = {
   loadStaticModule,
   bundleToAttribute,
   bundleToAttributes,
+  wgsl,
 
   defineConstants,
 

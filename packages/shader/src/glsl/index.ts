@@ -7,6 +7,8 @@ import {
 
   bundleToAttribute,
   bundleToAttributes,
+
+  glsl,
 } from './shader';
 
 import {
@@ -62,6 +64,8 @@ export {
 
   bundleToAttribute,
   bundleToAttributes,
+
+  glsl,
 } from './shader';
 
 export {
@@ -114,6 +118,7 @@ export const GLSLLinker = {
   loadStaticModule,
   bundleToAttribute,
   bundleToAttributes,
+  glsl,
 
   defineConstants,
 

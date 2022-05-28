@@ -74,7 +74,7 @@ export const GeometryLinesPage: LC = () => {
           data={lineData}
           loop={isLoop}
           on={<LineSegments />}
-          render={([positions, colors, widths, segments]: StorageSource[]) =>
+          render={(positions, colors, widths, segments) =>
             <LineLayer
               positions={positions}
               colors={colors}
@@ -89,7 +89,7 @@ export const GeometryLinesPage: LC = () => {
           fields={dataFields}
           data={zigzagData}
           on={<LineSegments />}
-          render={([positions, colors, widths, segments]: StorageSource[]) =>
+          render={(positions, colors, widths, segments) =>
             <LineLayer
               positions={positions}
               colors={colors}
@@ -108,7 +108,7 @@ export const GeometryLinesPage: LC = () => {
           start={isStart}
           end={isEnd}
           on={<ArrowSegments />}
-          render={([positions, colors, widths, segments, anchors, trims]: StorageSource[]) =>
+          render={(positions, colors, widths, segments, anchors, trims) =>
             <ArrowLayer
               positions={positions}
               colors={colors}

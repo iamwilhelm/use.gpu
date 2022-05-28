@@ -27,7 +27,7 @@ export type CompositeDataProps = {
   
   on?: LiveElement<any>,
 
-  render?: (sources: StorageSource[], layout: ChunkLayout) => LiveElement<any>,
+  render?: (...sources: StorageSource[]) => LiveElement<any>,
 };
 
 const NO_FIELDS = [] as DataField[];
@@ -238,10 +238,10 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     const els = extend(on, layout);
     return gather(els, (sources: StorageSource[]) => {
       const s = [...fieldSources, ...sources];
-      return render ? render(s, layout) : yeet(s);
+      return render ? render(...s) : yeet(s);
     });
   }
   else {
-    return useMemo(() => render ? render(fieldSources, layout) : yeet(fieldSources), [render, fieldSources]);
+    return useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
   }
 };

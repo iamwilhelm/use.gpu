@@ -69,7 +69,7 @@ export const makeChainTo = (
 
   const code    = `@chain [${entry}] [${h1}] [${h2}]`;
   const rehash  = getHash(code);
-  const rekey   = getHash(`${code} ${k1} ${k2}`);
+  const rekey   = getHash(`${rehash} ${k1} ${k2}`);
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {

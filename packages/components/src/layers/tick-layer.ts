@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, DeepPartial, Prop,
-  UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
+  UniformPipe, UniformType,
   VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
@@ -9,8 +9,8 @@ import { ShaderSource } from '@use-gpu/shader/types';
 import { RawLines } from '../primitives/raw-lines';
 
 import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
-import { resolve, makeShaderBindings } from '@use-gpu/core';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { resolve } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -41,13 +41,7 @@ export type TickLayerProps = {
   id?: number,
 };
 
-const TICK_BINDINGS = [
-  { name: 'transformPosition', format: 'vec4<f32>', value: [0, 0, 0, 0], args: ['vec4<f32>'] },
-  { name: 'getPosition', format: 'vec4<f32>', value: [0, 0, 0, 0] },
-  { name: 'getOffset', format: 'vec4<f32>', value: [0, 1, 0, 0] },
-  { name: 'getDepth', format: 'f32', value: 0 },
-  { name: 'getSize', format: 'f32', value: 2 },
-] as UniformAttributeValue[];
+const TICK_BINDINGS = bundleToAttributes(getTickPosition);
 
 export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerProps) => {
   const {
@@ -63,6 +57,10 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
     depths,
     offset,
     offsets,
+    tangent,
+    tangents,
+    base,
+    bases,
     join,
 
     count = 1,
@@ -77,13 +75,15 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
   const o = useShaderRef(offset, offsets);
   const d = useShaderRef(depth, depths);
   const s = useShaderRef(size, sizes);
+  const t = useShaderRef(tangent, tangents);
+  const b = useShaderRef(base, bases);
 
   const xf = useTransformContext();
 
   const c = useCallback(() => ((positions as any)?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
 
   const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-  const bound = useBoundShader(getTickPosition, TICK_BINDINGS, [xf, p, o, d, s], defines);
+  const bound = useBoundShader(getTickPosition, TICK_BINDINGS, [xf, p, o, d, s, t, b], defines);
 
   return (
     provide(TransformContext, null,

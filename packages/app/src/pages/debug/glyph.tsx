@@ -251,7 +251,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         centered
                         expr={pointEmitter(outerField)}
                       >
-                        <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} />
+                        <Point size={0.5} depth={1} color={'#80808080'} shape={'circleOutlined'} />
                       </Sampled>
 
                       <Sampled

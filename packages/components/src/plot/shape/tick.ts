@@ -3,9 +3,11 @@ import { ColorTrait, LineTrait, ROPTrait } from '../types';
 import { VectorLike } from '../../traits/types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { diffBy } from '@use-gpu/shader/wgsl';
 
 import { DataContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
+import { useBoundSource } from '../../hooks/useBoundSource';
 import {
   parseFloat,
   parsePosition4,
@@ -27,17 +29,21 @@ export type TickProps =
   Partial<ColorTrait> &
   Partial<LineTrait> &
   Partial<ROPTrait> & {
+  base?: number,
   size?: number,
   detail?: number,
   offset?: VectorLike,
 };
 
 const NO_OFFSET = vec4.fromValues(0, 1, 0, 0);
+const GET_POSITION = {format: 'vec4<f32>', name: 'getPosition'};
+const GET_SIZE = {format: 'u32', name: 'getSize', args: []};
 
 export const Tick: LiveComponent<TickProps> = (props) => {
   const {
     size = 5,
     detail = 1,
+    base = 10,
     offset = NO_OFFSET
   } = props;
 
@@ -52,11 +58,17 @@ export const Tick: LiveComponent<TickProps> = (props) => {
   const d = useProp(detail, parseDetail);
   const o = useProp(offset, parsePosition4);
 
+  const getPosition = useBoundSource(GET_POSITION, positions);
+  const getSize = useBoundSource(GET_SIZE, count);
+  const tangents = diffBy(getPosition, [-1], getSize);
+
   return (
     use(TickLayer, {
       positions,
       offset: o,
       detail: d,
+      base,
+      tangents,
       count,
 
       color,

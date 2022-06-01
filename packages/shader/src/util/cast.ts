@@ -57,7 +57,7 @@ export const makeCastTo = (
 
   const code   = `@cast [${name} ${format}] [${hash}]`;
   const rehash = getHash(code);
-  const rekey  = getHash(`${code} ${key}`);
+  const rekey  = getHash(`${rehash} ${key}`);
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {

@@ -55,7 +55,7 @@ export const glyphToESDT = (
     out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   });
   
-  //paintIntoDistanceField(out, data, w, h, pad, radius, cutoff);
+  paintIntoDistanceField(out, data, w, h, pad, radius, cutoff);
 
   return glyphToRGBA(out, wp, hp);
 };

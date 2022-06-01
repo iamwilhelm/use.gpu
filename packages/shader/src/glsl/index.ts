@@ -2,6 +2,7 @@ import {
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
+  bindEntryPoint,
   defineConstants,
   makeModuleCache,
 
@@ -59,6 +60,7 @@ export {
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
+  bindEntryPoint,
   defineConstants,
   makeModuleCache,
 
@@ -116,6 +118,7 @@ export const GLSLLinker = {
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
+  bindEntryPoint,
   bundleToAttribute,
   bundleToAttributes,
   glsl,

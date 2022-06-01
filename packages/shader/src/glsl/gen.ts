@@ -156,17 +156,17 @@ export const makeTextureAccessor = (
   set: number | string,
   binding: number,
   type: string,
+  name: string,
   layout: string,
   variant: string = 'sampler2D',
   absolute: boolean = false,
-  name: string,
   args: string[] = UV_ARG,
 ) => `
 layout (set = ${set}, binding = ${binding}) uniform sampler ${ns}${name}Sampler;
 layout (set = ${set}, binding = ${binding + 1}) uniform ${layout} ${ns}${name}Texture;
 
 ${type} ${ns}${name}(vec2 uv) {
-  ${absolute ? `uv = uv / vec2(textureSize(${ns}${name}Texture));\n  `
+  ${absolute ? `uv = uv / vec2(textureSize(${ns}${name}Texture));\n  ` : ''}
   return texture(${variant}(${ns}${name}Texture, ${ns}${name}Sampler), uv);
 }
 `;

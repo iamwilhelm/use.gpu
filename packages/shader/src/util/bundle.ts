@@ -10,6 +10,10 @@ export const getBundleHash = (bundle: ParsedBundle | ParsedModule) => {
   return ('module' in bundle) ? bundle.hash ?? bundle.module.hash : bundle.hash;
 };
 
+export const getBundleEntry = (bundle: ParsedBundle | ParsedModule) => {
+  return ('module' in bundle) ? bundle.entry ?? bundle.module.entry : bundle.entry;
+};
+
 // Force module/bundle to bundle
 export const toBundle = (bundle: ParsedBundle | ParsedModule): ParsedBundle => {
   if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");

@@ -11,7 +11,7 @@ import { parser } from './grammar/wgsl';
 import LRU from 'lru-cache';
 import zip from 'lodash/zip';
 
-export { loadStaticModule, loadVirtualModule } from '../util/shader';
+export { loadStaticModule, loadVirtualModule, bindEntryPoint } from '../util/shader';
 
 // LRU cache for parsed shader code
 export const makeModuleCache = (options: Record<string, any> = {}) => new LRU<string, ParsedModule>({

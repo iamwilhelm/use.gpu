@@ -8,7 +8,7 @@ export const transpileWGSL = (source: string, resourcePath: string, esModule: bo
     ? `import ${symbol} from ${stringify(from)};`
     : `const ${symbol} = require(${stringify(from)});`;
   const preamble = [
-    makeImport('{decompressAST}', '@use-gpu/shader/wgsl'),
+    makeImport('{bindEntryPoint, decompressAST}', '@use-gpu/shader/wgsl'),
   ].join("\n");
 
   // Parse module source code
@@ -62,7 +62,7 @@ exports.default = __default;
     def,
     libs,
 
-    `const getSymbol = (entry) => ({module: data, libs, entry});`,
+    `const getSymbol = (entry) => ({module: bindEntryPoint(data, entry), libs});`,
     exportDefault,
     ...exportSymbols,
     '/* __WGSL_LOADER_GENERATED */',

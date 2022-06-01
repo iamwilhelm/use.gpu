@@ -161,7 +161,7 @@ Object {
       "getSize",
     ],
   },
-  "textures": undefined,
+  "textures": Array [],
   "uniforms": Array [
     Object {
       "constant": Array [

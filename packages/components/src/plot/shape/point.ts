@@ -30,7 +30,7 @@ export const Point: LiveComponent<PointProps> = (props) => {
 
   const positions = useContext(DataContext) ?? undefined;
 
-  const {size, depth} = usePointTrait(props);
+  const {size, depth, shape} = usePointTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
 
@@ -41,6 +41,7 @@ export const Point: LiveComponent<PointProps> = (props) => {
       color,
       size,
       depth,
+      shape,
       
       colors,
       sizes,

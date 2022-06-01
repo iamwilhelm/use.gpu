@@ -251,7 +251,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         centered
                         expr={pointEmitter(outerField)}
                       >
-                        <Point size={0.5} depth={1} color={'#80808080'} />
+                        <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} />
                       </Sampled>
 
                       <Sampled
@@ -263,7 +263,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         centered
                         expr={pointEmitter(innerField)}
                       >
-                        <Point size={0.5} depth={1} color={'#808080ff'} />
+                        <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} />
                       </Sampled>
 
                       <Sampled
@@ -350,7 +350,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                     </Block>                
                     <Block>
                       {debugFrame(debugs[5])}
-                      <Label>{subpixel ? "X and Y Offsets" : "Squared Distance"}</Label>
+                      <Label>{subpixel ? "X and Y Offsets" + (relax ? '\n(Relaxed)' : '') : "Squared Distance"}</Label>
                     </Block>                
                   </> : null}
 

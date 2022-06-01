@@ -1,6 +1,6 @@
 import { Tree } from '@lezer/common';
 import { ASTParser, VirtualTable, SymbolTable, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
-import { getHash, makeKey } from './hash';
+import { getHash } from './hash';
 import { decompressAST } from './tree';
 import { PREFIX_VIRTUAL } from '../constants';
 
@@ -27,13 +27,10 @@ export const makeLoadModule = <T extends SymbolTable = any>(
   const table = astParser.getSymbolTable();
   const shake = astParser.getShakeTable(table);
 
-  if (entry == null && table.symbols?.includes('main')) entry = 'main';
-
   if (compressed) tree = decompressAST(compressAST(code, tree));
-
   const hash = getHash(code);
 
-  return {name, code, hash, table, entry, shake, tree};
+  return bindEntryPoint({name, code, hash, table, shake, tree}, entry);
 }
 
 // Use cache to load modules
@@ -50,17 +47,19 @@ export const makeLoadModuleWithCache = (
 
   const hash = getHash(code);
   const cached = cache.get(hash);
-  if (cached) return {...cached, entry};
+  if (cached) {
+    return bindEntryPoint(cached, entry);
+  }
   
-  const module = loadModule(code, name, entry, true);
+  const module = loadModule(code, name, undefined, true);
   cache.set(hash, module);
-  return {...module, entry};
+  return bindEntryPoint(module, entry);
 }
 
 // Load a static (inert) module
 export const loadStaticModule = (code: string, name: string, entry?: string) => {
-  const hash = getHash(code);
-  return { name, code, hash, entry, table: EMPTY_TABLE };
+  const hash = getHash([code, entry]);
+  return ({ name, code, hash, table: EMPTY_TABLE });
 }
 
 // Load a virtual (generated) module
@@ -87,3 +86,15 @@ export const loadVirtualModule = <T extends SymbolTable = any>(
   };
   return { name, code, hash, table, entry, virtual, key };
 }
+
+// Set entry point of a module, returns new module.
+// Is the same instance as the original (key = old hash), so it merges with copies of itself.
+// But is structurally different (hash = new key), so differences in links are reflected in the shader hash.
+export const bindEntryPoint = (module: ParsedModule, entry?: string) => {
+  const {hash, table} = module;
+  if (entry == null && table.symbols?.includes('main')) entry = 'main';
+  if (entry == null) return module;
+
+  const structural = getHash([hash, entry]);
+  return {...module, entry, hash: structural, key: hash};
+};

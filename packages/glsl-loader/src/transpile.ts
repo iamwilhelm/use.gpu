@@ -62,7 +62,7 @@ exports.default = __default;
     def,
     libs,
 
-    `const getSymbol = (entry) => ({module: data, libs, entry});`,
+    `const getSymbol = (entry) => ({module: bindEntryPoint(data, entry), libs});`,
     exportDefault,
     ...exportSymbols,
     '/* __GLSL_LOADER_GENERATED */',

@@ -193,11 +193,15 @@ export const paintSubpixelOffsets = (
         
         const min = Math.min(l, r, t, b, tl, tr, bl, br);
         const max = Math.max(l, r, t, b, tl, tr, bl, br);
-        const range = max - min;
 
         if (min > 0) {
           // Interior creases
           inner[j] = INF;
+          continue;
+        }
+        if (max < 1) {
+          // Exterior creases
+          outer[j] = INF;
           continue;
         }
 
@@ -368,9 +372,12 @@ export const paintSubpixelOffsets = (
 
       const nn = Math.sqrt(sqr(nx) + sqr(ny));
 
+      const sx = (Math.abs(nx / nn) - 0.5) > 0 ? Math.sign(nx) : 0;
+      const sy = (Math.abs(ny / nn) - 0.5) > 0 ? Math.sign(ny) : 0;
+
       const c = getData(x, y);
-      const d = getData(x + Math.sign(nx), y + Math.sign(ny));
-      const s = d > c ? 1 : -1;
+      const d = getData(x + sx, y + sy);
+      const s = Math.sign(d - c);
 
       let dlo = (nn + .4999 * s);
       let dli = (nn - .4999 * s);

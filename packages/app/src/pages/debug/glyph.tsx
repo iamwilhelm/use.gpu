@@ -74,7 +74,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   const rustText = useFontContext();
 
   const glyphId = rustText.findGlyph(0, glyph ?? '@');
-  const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, DETAIL);
+  const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, DETAIL * 1.5);
 
   const {width, height, image} = glyphMetrics;
 
@@ -231,6 +231,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                   <Inline align={"center"}>
                     <Text
                       size={32}
+                      detail={64}
                       snap={false}
                       text={subpixel ? "The Subpixel Distance Transform" : "The Euclidean Distance Transform"}
                       color={[1, 1, 1, 1]}

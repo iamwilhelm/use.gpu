@@ -250,7 +250,19 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         centered
                         expr={pointEmitter(outerField)}
                       >
-                        <Point size={0.5} depth={1} />
+                        <Point size={0.5} depth={1} color={'#80808080'} />
+                      </Sampled>
+
+                      <Sampled
+                        axes='xy'
+                        format='vec4<f32>'
+                        size={padded}
+                        items={1}
+                        sparse
+                        centered
+                        expr={pointEmitter(innerField)}
+                      >
+                        <Point size={0.5} depth={1} color={'#808080ff'} />
                       </Sampled>
 
                       <Sampled
@@ -265,17 +277,6 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         <Arrow width={3} depth={0.05} color={0x40c0ff} />
                       </Sampled>
 
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={2}
-                        sparse
-                        centered
-                        expr={arrowEmitter(innerField)}
-                      >
-                        <Arrow width={3} depth={0.05} color={0x90c0ff} />
-                      </Sampled>
                     </TextureFrame>
 
                     <TextureFrame texture={rgbaTexture}>

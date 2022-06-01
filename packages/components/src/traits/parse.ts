@@ -161,7 +161,7 @@ export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color 
         const r = u8ToFloat(c.slice(1, 3));
         const g = u8ToFloat(c.slice(3, 5));
         const b = u8ToFloat(c.slice(5, 7));
-        const a = u8ToFloat(c.slice(5, 7));
+        const a = u8ToFloat(c.slice(7, 9));
         return [r, g, b, a] as Color;
       }
     }

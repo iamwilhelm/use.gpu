@@ -336,7 +336,7 @@ export const paintSubpixelOffsets = (
       }
 
       if (!isSolid(r) && !isSolid(b)) {
-        if (checkCross(nx, ny, dc, dr, dt, dxr, dyr, dxt, dyt)) {
+        if (checkCross(nx, ny, dc, dr, db, dxr, dyr, dxb, dyb)) {
           dx += (dxr + dxb + 1) / 2;
           dy += (dyr + dyb + 1) / 2;
           dw++;
@@ -372,8 +372,8 @@ export const paintSubpixelOffsets = (
       const d = getData(x + Math.sign(nx), y + Math.sign(ny));
       const s = d > c ? 1 : -1;
 
-      let dlo = (nn + .5 * s);
-      let dli = (nn - .5 * s);
+      let dlo = (nn + .4999 * s);
+      let dli = (nn - .4999 * s);
 
       if (dlo > 1) { dlo = 1; dli = 0; }
       if (dli > 1) { dli = 1; dlo = 0; }

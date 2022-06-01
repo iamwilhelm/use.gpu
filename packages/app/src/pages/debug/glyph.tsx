@@ -33,7 +33,7 @@ export const DebugGlyphPage: LC = () => {
         <PanControls
           key="glyph"
           active={true}
-          zoom={8}
+          zoom={2}
           render={(x, y, zoom) =>
             <Flat x={x} y={y} zoom={zoom} focus={1/3}>
               <GlyphView subpixel={subpixel} contours={contours} relax={relax} glyph={glyph} />
@@ -121,6 +121,13 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   const outerField = {
     xs: xo,
     ys: yo,
+    width: paddedWidth,
+    height: paddedHeight,
+  };
+
+  const innerField = {
+    xs: xi,
+    ys: yi,
     width: paddedWidth,
     height: paddedHeight,
   };
@@ -256,6 +263,18 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         expr={arrowEmitter(outerField)}
                       >
                         <Arrow width={3} depth={0.05} color={0x40c0ff} />
+                      </Sampled>
+
+                      <Sampled
+                        axes='xy'
+                        format='vec4<f32>'
+                        size={padded}
+                        items={2}
+                        sparse
+                        centered
+                        expr={arrowEmitter(innerField)}
+                      >
+                        <Arrow width={3} depth={0.05} color={0x90c0ff} />
                       </Sampled>
                     </TextureFrame>
 

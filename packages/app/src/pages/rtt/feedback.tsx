@@ -9,8 +9,6 @@ import {
   Loop, Draw, Pass, OrbitCamera, RawData, PointLayer, Raw,
   LinearRGB, Feedback,
 } from '@use-gpu/components';
-import { Mesh } from '../../components/mesh';
-import { makeMesh, makeTexture } from '../../meshes/cube';
 
 export const FeedbackPage: LC = () => {
   let t = 0;
@@ -47,8 +45,12 @@ export const FeedbackPage: LC = () => {
                 const y = Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2;
                 const z = Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2;
 
+                const r = Math.abs(x) / 2;
+                const g = Math.abs(y) / 2;
+                const b = Math.abs(z) / 2;
+
                 emit(x, y, z, 1);
-                emit(Math.abs(x) / 2, Math.abs(y) / 2, Math.abs(z) / 2, 0.5);
+                emit(r, g, b, 0.5);
               }}
               render={(positions, colors) => (
                 <PointLayer

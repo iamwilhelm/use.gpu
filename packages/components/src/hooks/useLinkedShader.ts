@@ -79,6 +79,7 @@ export const useLinkedShader = (
       fragment,
       uniforms,
       bindings,
+      volatiles,
     });
 
     // Replace uniforms/bindings as structure changed

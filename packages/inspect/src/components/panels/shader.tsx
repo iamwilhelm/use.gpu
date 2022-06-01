@@ -48,8 +48,9 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
   usePingContext();
 
   const shader = fiber.__inspect?.[type];
-  const bindings = fiber.__inspect?.bindings;
   const uniforms = fiber.__inspect?.uniforms;
+  const bindings = fiber.__inspect?.bindings;
+  const volatiles = fiber.__inspect?.volatiles;
 
   const [state, setState] = useState<Record<string, boolean>>({});
   const toggleState = (id: string) => setState((state) => ({
@@ -76,6 +77,7 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
       <div><b>Bindings</b></div>
       {uniforms ? inspectObject(toObject(uniforms), state, toggleState, 'u') : null}
       {bindings ? inspectObject(toObject(bindings), state, toggleState, 'b') : null}
+      {volatiles ? inspectObject(toObject(volatiles), state, toggleState, 'v') : null}
       <Spacer />
     </>) : null}
     <div><b>Shader</b> (<code>{shader.hash}</code>)</div>

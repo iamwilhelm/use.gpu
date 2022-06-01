@@ -55,7 +55,7 @@ export const glyphToESDT = (
     out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   });
   
-  paintIntoDistanceField(out, data, w, h, pad, radius, cutoff);
+  //paintIntoDistanceField(out, data, w, h, pad, radius, cutoff);
 
   return glyphToRGBA(out, wp, hp);
 };
@@ -72,7 +72,7 @@ export const resolveSDF = (
   for (let i = 0; i < np; ++i) {
     const outer = Math.max(0, Math.sqrt(sqr(xo[i]) + sqr(yo[i])) - 0.5);
     const inner = Math.max(0, Math.sqrt(sqr(xi[i]) + sqr(yi[i])) - 0.5);
-    f(outer >= inner ? outer : - inner, i);
+    f(outer >= inner ? outer : -inner, i);
   }
 }
 
@@ -240,9 +240,25 @@ export const paintSubpixelOffsets = (
       }
     }
   }
-
-  if (half) return;
   
+  const checkCross = (
+    nx: number,
+    ny: number,
+    dc: number,
+    dl: number,
+    dr: number,
+    dxl: number,
+    dyl: number,
+    dxr: number,
+    dyr: number,
+  ) => {
+    return (
+      ((dxl * nx + dyl * ny) * (dc * dl) > 0) &&
+      ((dxr * nx + dyr * ny) * (dc * dr) > 0) &&
+      ((dxl * dxr + dyl * dyr) * (dl * dr) > 0)
+    );
+  }
+
   // Blend neighboring offsets but preserve normal direction
   // Uses xo as input, xi as output
   for (let y = 0; y < h; y++) {
@@ -273,13 +289,14 @@ export const paintSubpixelOffsets = (
       let dy = ny;
       let dw = 1;
 
-      const dc = (c - 0.5);
+      const dc = c - 0.5;
+      const dl = l - 0.5;
+      const dr = r - 0.5;
+      const dt = t - 0.5;
+      const db = b - 0.5;
 
       if (!isSolid(l) && !isSolid(r)) {
-        if (
-          ((dxl * nx + dyl * ny) * (dc * (l - .5)) > 0) &&
-          ((dxr * nx + dyr * ny) * (dc * (r - .5)) > 0)
-        ) {
+        if (checkCross(nx, ny, dc, dl, dr, dxl, dyl, dxr, dyr)) {
           dx += (dxl + dxr) / 2;
           dy += (dyl + dyr) / 2;
           dw++;
@@ -287,10 +304,7 @@ export const paintSubpixelOffsets = (
       }
 
       if (!isSolid(t) && !isSolid(b)) {
-        if (
-          ((dxt * nx + dyt * ny) * (dc * (t - .5)) > 0) &&
-          ((dxb * nx + dyb * ny) * (dc * (b - .5)) > 0)
-        ) {
+        if (checkCross(nx, ny, dc, dt, db, dxt, dyt, dxb, dyb)) {
           dx += (dxt + dxb) / 2;
           dy += (dyt + dyb) / 2;
           dw++;
@@ -298,10 +312,7 @@ export const paintSubpixelOffsets = (
       }
 
       if (!isSolid(l) && !isSolid(t)) {
-        if (
-          ((dxl * nx + dyl * ny) * (dc * (l - .5)) > 0) &&
-          ((dxt * nx + dyt * ny) * (dc * (t - .5)) > 0)
-        ) {
+        if (checkCross(nx, ny, dc, dl, dt, dxl, dyl, dxt, dyt)) {
           dx += (dxl + dxt - 1) / 2;
           dy += (dyl + dyt - 1) / 2;
           dw++;
@@ -309,10 +320,7 @@ export const paintSubpixelOffsets = (
       }
 
       if (!isSolid(r) && !isSolid(t)) {
-        if (
-          ((dxr * nx + dyr * ny) * (dc * (r - .5)) > 0) &&
-          ((dxt * nx + dyt * ny) * (dc * (t - .5)) > 0)
-        ) {
+        if (checkCross(nx, ny, dc, dr, dt, dxr, dyr, dxt, dyt)) {
           dx += (dxr + dxt + 1) / 2;
           dy += (dyr + dyt - 1) / 2;
           dw++;
@@ -320,10 +328,7 @@ export const paintSubpixelOffsets = (
       }
 
       if (!isSolid(l) && !isSolid(b)) {
-        if (
-          ((dxl * nx + dyl * ny) * (dc * (l - .5)) > 0) &&
-          ((dxb * nx + dyb * ny) * (dc * (b - .5)) > 0)
-        ) {
+        if (checkCross(nx, ny, dc, dl, db, dxl, dyl, dxb, dyb)) {
           dx += (dxl + dxb - 1) / 2;
           dy += (dyl + dyb + 1) / 2;
           dw++;
@@ -331,10 +336,7 @@ export const paintSubpixelOffsets = (
       }
 
       if (!isSolid(r) && !isSolid(b)) {
-        if (
-          ((dxr * nx + dyr * ny) * (dc * (r - .5)) > 0) &&
-          ((dxb * nx + dyb * ny) * (dc * (b - .5)) > 0)
-        ) {
+        if (checkCross(nx, ny, dc, dr, dt, dxr, dyr, dxt, dyt)) {
           dx += (dxr + dxb + 1) / 2;
           dy += (dyr + dyb + 1) / 2;
           dw++;
@@ -342,15 +344,17 @@ export const paintSubpixelOffsets = (
       }
     
       const nn = Math.sqrt(nx*nx + ny*ny);
-      const dt = (dx * nx + dy * ny) / nn;
+      const ll = (dx * nx + dy * ny) / nn;
 
-      dx = nx * dt / dw / nn;
-      dy = ny * dt / dw / nn;
+      dx = nx * ll / dw / nn;
+      dy = ny * ll / dw / nn;
     
       xi[j] = dx;
       yi[j] = dy;
     }
   }
+  
+  if (half) return;
   
   // Produce zero points for positive and negative DF, at +0.5 / -0.5.
   // Splits xi into xo/xi
@@ -368,8 +372,14 @@ export const paintSubpixelOffsets = (
       const d = getData(x + Math.sign(nx), y + Math.sign(ny));
       const s = d > c ? 1 : -1;
 
-      const dlo = (nn + .499 * s) / nn;
-      const dli = (nn - .499 * s) / nn;
+      let dlo = (nn + .5 * s);
+      let dli = (nn - .5 * s);
+
+      if (dlo > 1) { dlo = 1; dli = 0; }
+      if (dli > 1) { dli = 1; dlo = 0; }
+      
+      dli /= nn;
+      dlo /= nn;
 
       xo[j] = nx * dlo;
       yo[j] = ny * dlo;
@@ -503,8 +513,8 @@ export const esdt = (
   sign: number = 1,
   half: number = 0,
 ) => {
-  if (half !== 2) for (let y = 0; y < h; ++y) esdt1d(mask, xs, ys, y * w, 1, w, f, z, b, t, v, sign);
   if (half !== 1) for (let x = 0; x < w; ++x) esdt1d(mask, ys, xs, x, w, h, f, z, b, t, v, sign);
+  if (half !== 2) for (let y = 0; y < h; ++y) esdt1d(mask, xs, ys, y * w, 1, w, f, z, b, t, v, sign);
 }
 
 // 1D subpixel distance transform

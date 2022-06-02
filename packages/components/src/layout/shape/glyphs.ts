@@ -75,9 +75,11 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       spans.iterate((_a, trim, _h, index) => {
         glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number, kerning: number) => {
           const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail ?? size);
-          const {image, layoutBounds, outlineBounds} = glyph;
-          const [ll, lt, lr, lb] = layoutBounds;
+          const {image, layoutBounds, outlineBounds, rgba, scale: glyphScale} = glyph;
+          const [ll, lt, lr, lb] = layoutBounds;      
 
+          const r = rgba ? -1 : 1;
+          const s = scale * glyphScale;
           const k = kerning / 65536.0 * scale;
           x += k;
           sx += k;
@@ -89,13 +91,13 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
               const cx = snap ? Math.round(sx) : sx;
               const cy = snap ? Math.round(y) : y;
 
-              const left = (scale * gl) + cx;
-              const top = (scale * gt) + cy;
-              const right = (scale * gr) + cx;
-              const bottom = (scale * gb) + cy;
+              const left = (s * gl) + cx;
+              const top = (s * gt) + cy;
+              const right = (s * gr) + cx;
+              const bottom = (s * gb) + cy;
 
               rectangles.push(left, top, right, bottom);
-              uvs.push(mapping[0], mapping[1], mapping[2], mapping[3]);
+              uvs.push(r * mapping[0], r * mapping[1], r * mapping[2], r * mapping[3]);
 
               bounds[0] = Math.min(bounds[0], left);
               bounds[1] = Math.min(bounds[1], top);
@@ -106,8 +108,8 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
             }
           }
 
-          sx += lr * scale;
-          x += lr * scale;
+          sx += lr * s;
+          x += lr * s;
         }, breaks[index - 1] || 0, breaks[index]);
 
         if (trim) {

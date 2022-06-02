@@ -13,7 +13,13 @@ const UV_ARG = ['vec2<f32>'];
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
-const getBindingKey = (b: DataBinding) => (+!!b.constant) + (+!!b.storage) * 2 + (+!!b.lambda) * 4 + (+!!b.texture) * 8;
+const getBindingKey = (b: DataBinding) =>
+  (+!!b.constant) +
+  (+!!b.storage) * 2 +
+  (+!!b.lambda) * 4 +
+  (+!!b.texture) * 8 + 
+  (+!!(b.storage?.volatile || b.texture?.volatile)) * 16;
+
 const getBindingsKey = (bs: DataBinding[]) => scrambleBits(bs.reduce((a, b) => mixBits(a, getBindingKey(b)), 0)) >>> 0;
 const getValueKey = (b: DataBinding) => getObjectKey(b.constant ?? b.storage ?? b.texture);
 

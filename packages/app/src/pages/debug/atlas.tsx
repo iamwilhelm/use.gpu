@@ -34,7 +34,8 @@ export const DebugAtlasPage: LC = () => {
                   <Text
                     size={60}
                     snap={false}
-                    text={" is presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware."}
+                    family="Lato, Noto Emoji"
+                    text={" is ⭐️✨✌️🌿🌳🐲💧🍅🍲🫕🏀🏈 presented which allows improved rendering of glyphs composed of curved and linear elements. A distance field is generated from a high resolution image, and then stored into a channel of a lower-resolution texture.\n\nIn the simplest case, this texture can then be rendered simply by using the alpha-testing and alpha-thresholding feature of modern GPUs, without a custom shader. This allows the technique to be used on even the lowest-end 3D graphics hardware."}
                     color={[0.5, 0.5, 0.5, 1]}
                   />
                 </Inline>

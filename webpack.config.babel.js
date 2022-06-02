@@ -25,6 +25,7 @@ export default {
       crateDirectory: path.resolve(__dirname, 'rust/use-gpu-text'),
       outDir: "../../packages/text/pkg",
       outName: "use-gpu-text",
+      forceMode: "production",
     }),
   ],
   experiments: {

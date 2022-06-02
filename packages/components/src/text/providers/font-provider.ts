@@ -68,7 +68,7 @@ export const useFontHeight = (
 ) => {
   const rustText = useFontContext();
   const [id] = stack;
-
+  
   return useMemo(() => {
     let {ascent, descent, lineHeight: fontHeight, xHeight, emUnit} = rustText.measureFont(id, size);
 

@@ -3,6 +3,7 @@ use serde::{Serialize};
 use serde_wasm_bindgen;
 use std::string::String;
 use std::collections::HashMap;
+use png::{Decoder};
 
 use ab_glyph::{Font, FontArc, Glyph, GlyphId, Point, PxScale, PxScaleFont, ScaleFont};
 use xi_unicode::LineBreakIterator;
@@ -68,6 +69,8 @@ pub struct GlyphMetrics {
     image: Option<Vec<u8>>,
     width: u32,
     height: u32,
+    rgba: bool,
+    scale: f32,
 }
 
 fn px_size_to_px_scale<F: Font>(font: &F, px_size: f32) -> f32 {
@@ -107,7 +110,7 @@ impl UseRustText {
         Ok(js_value)
     }
 
-    pub fn measure_font(&mut self, key: f64, mut size: f32) -> Result<JsValue, JsValue> {        
+    pub fn measure_font(&mut self, key: f64, size: f32) -> Result<JsValue, JsValue> {        
         let k = key as u64;
         let unscaled_font = self.font_map.get(&k).unwrap();
         let scale = px_size_to_px_scale(unscaled_font, size);
@@ -240,39 +243,110 @@ impl UseRustText {
         };
         
         let lb = font.glyph_bounds(&glyph);
+        let layout_bounds = vec!(lb.min.x, lb.min.y, lb.max.x, lb.max.y);
 
-        let outline = font.outline_glyph(glyph);
-        let (ob, width, height, image) = match outline {
-            Some(o) => {
-                let ob = o.px_bounds();
-                let width: u32 = (ob.max.x - ob.min.x) as u32 + 1;
-                let height: u32 = (ob.max.y - ob.min.y) as u32 + 1;
+        let rgba = unscaled_font.glyph_raster_image(
+            GlyphId(id as u16),
+            f32::round(scale) as u16,
+        );
+        
+        let value: GlyphMetrics;
+        match rgba {
+            Some(rgba) => {
+                let l = rgba.origin.x;
+                let t = -font.ascent() * scale / rgba.scale;
 
-                let size: usize = (width * height) as usize;
-                let mut image = Vec::<u8>::with_capacity(size);
-                for _ in 0..size { image.push(0) }
+                let decoder = Decoder::new(rgba.data);
+                let mut reader = decoder.read_info().unwrap();
+                let mut buf = vec![0; reader.output_buffer_size()];
 
-                o.draw(|x, y, a| {
-                    let i = (x + y * width) as usize;
-                    image[i] = (a * 255.0) as u8;
-                });
-                (Some(ob), width, height, Some(image))
-            }
-            None => {
-                (None, 0, 0, None)
-            }
-        };
+                let output_info = reader.next_frame(&mut buf).unwrap();
+                let mut bytes = Vec::<u8>::from(&buf[..output_info.buffer_size()]);
 
-        let value = GlyphMetrics {
-            id,
+                let info = reader.info().clone();
+                
+                match &info.palette {
+                    Some(palette) => {
+                        let mut color = Vec::<u8>::with_capacity(bytes.len() * 4);
+                        match &info.trns {
+                            Some(trns) => {
+                                for b in &bytes {
+                                    let i = *b as usize;
+                                    color.push(palette[i * 3]);
+                                    color.push(palette[i * 3 + 1]);
+                                    color.push(palette[i * 3 + 2]);
+                                    if i < trns.len() { color.push(trns[i]); }
+                                    else { color.push(255); }
+                                }
+                            }
+                            _ => {
+                                for b in &bytes {
+                                    let i = *b as usize;
+                                    color.push(palette[i * 3]);
+                                    color.push(palette[i * 3 + 1]);
+                                    color.push(palette[i * 3 + 2]);
+                                    color.push(255);
+                                }
+                            }
+                        }
+                        bytes = color;
+                    }
+                    _ => {
+                    }
+                }
+                
+                value = GlyphMetrics {
+                    id,
             
-            layout_bounds: vec!(lb.min.x, lb.min.y, lb.max.x, lb.max.y),
-            outline_bounds: ob.map(|ob| { vec!(ob.min.x, ob.min.y, ob.max.x + 1.0, ob.max.y + 1.0) }),
+                    layout_bounds,
+                    outline_bounds: Some(vec!(l, t, l + rgba.scale, t + rgba.scale)),
             
-            image,
-            width,
-            height,
-         };
+                    image: Some(bytes),
+                    width: output_info.width,
+                    height: output_info.height,
+                    rgba: true,
+                    scale: rgba.scale / scale,
+                };       
+            }
+            _ => {
+                let outline = font.outline_glyph(glyph);
+                let (ob, width, height, image) = match outline {
+                    Some(o) => {
+                        let ob = o.px_bounds();
+                        let width: u32 = (ob.max.x - ob.min.x) as u32 + 1;
+                        let height: u32 = (ob.max.y - ob.min.y) as u32 + 1;
+
+                        let size: usize = (width * height) as usize;
+                        let mut image = Vec::<u8>::with_capacity(size);
+                        for _ in 0..size { image.push(0) }
+
+                        o.draw(|x, y, a| {
+                            let i = (x + y * width) as usize;
+                            image[i] = (a * 255.0) as u8;
+                        });
+                        (Some(ob), width, height, Some(image))
+                    }
+                    None => {
+                        (None, 0, 0, None)
+                    }
+                };
+
+                value = GlyphMetrics {
+                    id,
+            
+                    layout_bounds,
+                    outline_bounds: ob.map(|ob| { vec!(ob.min.x, ob.min.y, ob.max.x + 1.0, ob.max.y + 1.0) }),
+            
+                    image,
+                    width,
+                    height,
+                    rgba: false,
+                    scale: 1.0,
+                };                
+            }
+        }
+        
+
     	let js_value = serde_wasm_bindgen::to_value(&value)?;
         Ok(js_value)
     }

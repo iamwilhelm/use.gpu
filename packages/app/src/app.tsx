@@ -51,6 +51,12 @@ export const App: LC = () => {
       style: 'normal',
       src: '/Lato-Bold.ttf',
     },
+    {
+      family: 'Noto Emoji',
+      weight: 400,
+      style: 'normal',
+      src: '/NotoColorEmoji.ttf',
+    },
   ]);
 
   const fiber = useFiber();

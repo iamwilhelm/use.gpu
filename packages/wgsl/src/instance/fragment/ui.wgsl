@@ -28,7 +28,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
 
   if (uv.x < clipUV.x || uv.y < clipUV.y || uv.x > clipUV.z || uv.y > clipUV.w) { discard; }
 
-  if (mode == -1) {
+  if (mode == -1 || mode == -2) {
     // SDF Glyph
     let sdfRadius = sdfConfig.x;
     var expand = border.x;
@@ -39,6 +39,9 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     sdf = SDF(s, s);
     
     if (texture.a == 0.0 && sdf.outer > 0.0) { sdf.outer = 0.5; }
+    if (mode == -2) {
+      fillColor = vec4<f32>(texture.rgb, fillColor.a);
+    }
   }
   else {
     // Textured box
@@ -81,7 +84,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   if (DEBUG_SDF) {
     var s = 4.0;
     var b = 0.0;
-    if (mode == -1) {
+    if (mode == -1 || mode == -2) {
       s = 1.0;
       b = 4.0;
     }

@@ -69,7 +69,12 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
 
   // Fragment shader mode
   var mode: i32;
-  if (sdfConfig.x > 0.0) { mode = -1; } // SDF glyph
+  if (sdfConfig.x > 0.0) {
+    // SDF glyph
+    if (uv4.x < 0.0) { mode = -2; }
+    else { mode = -1; }
+    uv4 = abs(uv4);
+  }
   else if (length(radius + border) == 0.0) { mode = 0; } // Rectangle
   else if (length(radius) == 0.0) { mode = 1; } // Rectangle with border
   else { mode = 2; }; // Rounded rectangle with border

@@ -30,6 +30,8 @@ export type GlyphMetrics = {
   image: Uint8Array,
   width: number,
   height: number,
+  rgba: boolean,
+  scale: number,
 };
 
 export type RustTextAPI = {

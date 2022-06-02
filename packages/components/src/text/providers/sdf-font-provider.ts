@@ -4,7 +4,7 @@ import { FontMetrics, GlyphMetrics } from '@use-gpu/text/types';
 import { Alignment } from '../../layout/types';
 
 import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
-import { glyphToRGBA, glyphToSDF, padRectangle } from '@use-gpu/text';
+import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/text';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 
@@ -105,11 +105,15 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       let glyph = rustText.measureGlyph(font, id, scale);
       let mapping: Rectangle = NO_MAPPING;
 
-      const {image, width: w, height: h, outlineBounds: ob} = glyph;
+      const {image, width: w, height: h, outlineBounds: ob, rgba} = glyph;
       if (image && w && h && ob) {
 
+        let width: number;
+        let height: number;
+        let data: Uint8Array;
+
         // Convert to SDF
-        const {data, width, height} = glyphToSDF(image, w, h, pad, radius, undefined, subpixel, relax);
+        ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, relax));
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
 

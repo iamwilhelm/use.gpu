@@ -9,7 +9,7 @@ export const DEBUG_DEFAULTS = {
   sdf2d: {
     contours: false,
     subpixel: true,
-    relax: true,
+    relax: false,
   },
   layout: {
     inspect: false,

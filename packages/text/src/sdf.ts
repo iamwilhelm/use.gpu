@@ -82,6 +82,24 @@ export const glyphToSDF = (
   else return glyphToEDT(data, w, h, pad, radius, cutoff, debug);
 }
 
+// Convert color glyph to SDF
+export const rgbaToSDF = (
+  data: Uint8Array,
+  w: number,
+  h: number,
+  pad: number = 4,
+  radius: number = 3,
+  cutoff: number = 0.25,
+  subpixel: boolean = true,
+  relax: boolean = true,
+  debug?: (image: Image) => void,
+): Image => {
+  const alpha = rgbaToGlyph(data, w, h).data;
+  const color = rgbaToColor(data, w, h, pad).data;
+  const sdf = glyphToSDF(alpha, w, h, pad, radius, cutoff, subpixel, relax, debug);
+  return {...sdf, data: combineRGBA(sdf.data, color)};
+}
+
 // Convert grayscale glyph to rgba
 export const glyphToRGBA = (data: Uint8Array, w: number, h: number, pad: number = 0): Image => {
   const wp = w + pad * 2;
@@ -105,6 +123,73 @@ export const glyphToRGBA = (data: Uint8Array, w: number, h: number, pad: number 
   };
   return {data: out, width: wp, height: hp};
 };
+
+// Extract rgb channels as filled out color mask
+export const rgbaToColor = (data: Uint8Array, w: number, h: number, pad: number = 0): Image => {
+  const wp = w + pad * 2;
+  const hp = h + pad * 2;
+  const out = new Uint8Array(wp * hp * 4);
+
+  let i = 0;
+  let j = (pad + pad * wp) * 4;
+  for (let y = 0; y < h; ++y) {
+    for (let x = 0; x < w; ++x) {
+      const r = data[i++];
+      const g = data[i++];
+      const b = data[i++];
+      const a = data[i++];
+
+      if (a > 0) {
+        out[j++] = r;
+        out[j++] = g;
+        out[j++] = b;
+        out[j++] = 255;
+      }
+      else {
+        j += 4;
+      }
+    }
+    j += pad * 2 * 4;
+  };
+
+  fill(out, 0, 0, wp, hp, wp);
+
+  return {data: out, width: wp, height: hp};
+}
+
+// Extract alpha channel as grayscale glyph
+export const rgbaToGlyph = (data: Uint8Array, w: number, h: number, pad: number = 0): Image => {
+  const wp = w + pad * 2;
+  const hp = h + pad * 2;
+  const out = new Uint8Array(wp * hp);
+
+  let i = 0;
+  let j = (pad + pad * wp);
+  for (let y = 0; y < h; ++y) {
+    for (let x = 0; x < w; ++x) {
+      const v = data[(i++) * 4 + 3];
+      out[j++] = v;
+    }
+    j += pad * 2;
+  };
+  return {data: out, width: wp, height: hp};
+};
+
+// Combine RGB + SDF
+export const combineRGBA = (sdf: Uint8Array, color: Uint8Array): Image => {
+  const out = new Uint8Array(sdf.length);
+
+  const n = sdf.length;
+  let j = 0;
+  for (let i = 0; i < n;) {
+    out[j++] = color[i++];
+    out[j++] = color[i++];
+    out[j++] = color[i++];
+    out[j++] = sdf[i++];
+  }
+
+  return out;
+}
 
 // Convert SDF to its gradient (for debug)
 export const sdfToGradient = (
@@ -146,3 +231,64 @@ export const sdfToGradient = (
 
   return glyphToRGBA(out, wp, hp);
 };
+
+// Fill out colors in transparent areas
+export const fill = (
+  data: Uint8Array,
+  x0: number,
+  y0: number,
+  width: number,
+  height: number,
+  gridWidth: number,
+) => {
+  for (let y = y0; y < y0 + height; y++) fill1d(data, y * gridWidth + x0, 1, width);
+  for (let x = x0; x < x0 + width; x++) fill1d(data, y0 * gridWidth + x, gridWidth, height);
+}
+
+export const fill1d = (
+  data: Uint8Array,
+  offset: number,
+  stride: number,
+  length: number,
+) => {
+  let s = -1;
+  for (let i = 0; i < length; ++i) {
+    const o = (offset + stride * i) * 4;
+    const a = data[o + 3];
+    if (a > 0) {
+      if (s < i - 1) {
+        if (s === -1) {
+          fillSpan(data, offset, stride, length, i, 0);
+        }
+        else {
+          let m = Math.floor((s + i) / 2);
+          fillSpan(data, offset, stride, length, s, m);
+          fillSpan(data, offset, stride, length, i, m);
+        }
+      }
+      s = i;
+    }
+  }
+  if (s < length && s !== -1) {
+    fillSpan(data, offset, stride, length, s, length - 1);
+  }
+}
+
+export const fillSpan = (
+  data: Uint8Array,
+  offset: number,
+  stride: number,
+  length: number,
+  from: number,
+  to: number,
+) => {
+  const o = (offset + stride * from) * 4;
+  const s = Math.sign(to - from);
+  if (from !== to) for (let i = from + s; i*s <= to*s; i += s) {
+    const t = (offset + stride * i) * 4;
+    data[t]     = data[o];
+    data[t + 1] = data[o + 1];
+    data[t + 2] = data[o + 2];
+    data[t + 3] = 255
+  }
+}

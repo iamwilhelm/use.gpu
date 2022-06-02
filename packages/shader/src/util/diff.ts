@@ -1,7 +1,7 @@
 import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
 import { loadVirtualModule } from './shader';
 import { getHash } from './hash';
-import { toBundle, getBundleHash, getBundleKey } from './bundle';
+import { toBundle, toModule, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CAST } from '../constants';
 
 const NO_SYMBOLS = [] as string[];
@@ -13,9 +13,10 @@ export type BundleToAttribute = (
 export type MakeDiffAccessor = (
   name: string,
   accessor: string,
+  sizers: (string | null)[],
   args: string[],
   type: string,
-  offsets: (number | string)[],
+  offsets: (number | string | null)[],
 ) => string;
 
 const EXTERNALS = [{
@@ -58,7 +59,7 @@ export const makeDiffBy = (
   ];
   const links = {
     getValue: bundle,
-  };
+  } as Record<string, any>;
   getSizes.forEach((getSize, i) => links[getSize] = sizes[i]);
 
   // Code generator
@@ -80,8 +81,11 @@ export const makeDiffBy = (
 
   const revirtuals = module.virtual
     ? (virtuals ? [...virtuals, module] : [module])
-    : virtuals;
-  for (const m of sizes) if (m.virtual) revirtuals.push(m);
+    : virtuals ?? [];
+  for (const m of sizes) if (m) {
+    const v = toModule(m);
+    if (v?.virtual) revirtuals.push(v);
+  }
 
   return {
     module: diff,

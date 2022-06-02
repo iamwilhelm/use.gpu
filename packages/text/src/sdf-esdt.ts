@@ -245,6 +245,12 @@ export const paintSubpixelOffsets = (
     }
   }
   
+  // Blend neighboring offsets but preserve normal direction
+  // Uses xo as input, xi as output
+  // Improves quality slightly, but slows things down.
+  let xs = xo;
+  let ys = yo;
+  /*
   const checkCross = (
     nx: number,
     ny: number,
@@ -263,8 +269,6 @@ export const paintSubpixelOffsets = (
     );
   }
 
-  // Blend neighboring offsets but preserve normal direction
-  // Uses xo as input, xi as output
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const j = (y + pad) * wp + x + pad;
@@ -357,6 +361,9 @@ export const paintSubpixelOffsets = (
       yi[j] = dy;
     }
   }
+  xs = xi;
+  ys = yi;
+  */
   
   if (half) return;
   
@@ -366,8 +373,8 @@ export const paintSubpixelOffsets = (
     for (let x = 0; x < w; x++) {
       const j = (y + pad) * wp + x + pad;
 
-      const nx = xi[j];
-      const ny = yi[j];
+      const nx = xs[j];
+      const ny = ys[j];
       if (!nx && !ny) continue;
 
       const nn = Math.sqrt(sqr(nx) + sqr(ny));
@@ -382,9 +389,6 @@ export const paintSubpixelOffsets = (
       let dlo = (nn + .4999 * s);
       let dli = (nn - .4999 * s);
 
-      if (dlo > 1) { dlo = 1; dli = 0; }
-      if (dli > 1) { dli = 1; dlo = 0; }
-      
       dli /= nn;
       dlo /= nn;
 

@@ -47,6 +47,8 @@ export const Node: React.FC<NodeProps> = ({
 
   const suffix1 = yeet ? ICONSMALL("switch_left") : null;
   const suffix2 = react ? <SVGAtom /> : null;
+  const suffix3 = __inspect?.setHovered ? ICONSMALL("view_in_ar") : null;
+  const suffix4 = __inspect?.layout ? ICONSMALL("space_dashboard") : null;
 
   const [version, pinged] = usePingContext(fiber);
 
@@ -87,7 +89,7 @@ export const Node: React.FC<NodeProps> = ({
     >
       <div className={"fiber-tree-ping cover-parent " + className} />
       <div className={"fiber-tree-highlight cover-parent " + className} />
-      <div className={"fiber-tree-label " + className}>{name}{suffix1}{suffix2}</div>
+      <div className={"fiber-tree-label " + className}>{name}{suffix1}{suffix2}{suffix3}{suffix4}</div>
     </div>
   );
 }

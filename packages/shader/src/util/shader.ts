@@ -35,11 +35,11 @@ export const makeLoadModule = <T extends SymbolTable = any>(
 
 // Use cache to load modules
 export const makeLoadModuleWithCache = (
-  loadModule: (code: string, name: string, entry?: string, compressed?: boolean) => ParsedModule,
+  loadModule: (code: string, name?: string, entry?: string, compressed?: boolean) => ParsedModule,
   defaultCache: ParsedModuleCache,
 ) => (
   code: string,
-  name: string,
+  name?: string,
   entry?: string,
   cache: ParsedModuleCache | null = defaultCache,
 ): ParsedModule => {

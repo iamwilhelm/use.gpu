@@ -4,4 +4,4 @@ import { provide, makeContext, useContext } from '@use-gpu/live';
 
 export const FeedbackContext = makeContext<TextureSource>(undefined, 'FeedbackContext');
 
-export const useFeedbackContext = () => useContext<FeedbackContextProps>(FeedbackContext);
+export const useFeedbackContext = () => useContext<TextureSource>(FeedbackContext);

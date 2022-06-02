@@ -24,8 +24,8 @@ export default {
         loader: 'babel-loader',
       },
       {
-        test: /\.glsl$/i,
-        use: ['@use-gpu/glsl-loader'],
+        test: /\.wgsl$/i,
+        use: ['@use-gpu/wgsl-loader'],
       },
     ],
   },

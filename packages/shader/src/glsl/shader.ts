@@ -41,8 +41,8 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
 export const bundleToAttribute = makeBundleToAttribute(toTypeString, toTypeArgs);
 export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArgs);
 
-// Templated literal syntax
-export const glsl = (literals: string[], ...tokens: string[]) => {
+// Templated literal syntax: glsl`...`
+export const glsl = (literals: TemplateStringsArray, ...tokens: string[]) => {
   const code = zip(literals, tokens).flat();
-  return loadModule(code.join(''));
+  return loadModuleWithCache(code.join(''));
 };

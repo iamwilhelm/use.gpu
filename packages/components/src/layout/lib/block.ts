@@ -57,8 +57,8 @@ export const getBlockMinMax = (
 
       if (i !== 0) {
         m = mergeMargin(m, mt);
-        allMinX = allMinX + m;
-        allMaxX = allMaxX + m;
+        allMinY = allMinY + m;
+        allMaxY = allMaxY + m;
       }
       m = mb;
       ++i;
@@ -93,16 +93,16 @@ export const getBlockMargin = (
   const out = margin.slice() as Margin;
   if (!contain && first) {
     const [ml, mt] = first.margin;
-    if (isX) margin[0] = mergeMargin(margin[0], Math.max(0, ml - pl));
-    else margin[1] = mergeMargin(margin[1], Math.max(0, mt - pt));
+    if (isX) out[0] = mergeMargin(out[0], Math.max(0, ml - pl));
+    else out[1] = mergeMargin(out[1], Math.max(0, mt - pt));
   }
   if (!contain && last) {
     const [,, mr, mb] = last.margin;
-    if (isX) margin[2] = mergeMargin(margin[2], Math.max(0, mr - pr));
-    else margin[3] = mergeMargin(margin[3], Math.max(0, mb - pb));
+    if (isX) out[2] = mergeMargin(out[2], Math.max(0, mr - pr));
+    else out[3] = mergeMargin(out[3], Math.max(0, mb - pb));
   }
 
-  return margin;
+  return out;
 }
 
 export const fitBlock = (

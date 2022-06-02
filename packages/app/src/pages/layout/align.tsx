@@ -1,6 +1,6 @@
 import { LC } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode, Point4 } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
 import { LayoutControls } from '../../ui/layout-controls';
@@ -11,11 +11,11 @@ import {
   DebugProvider,
 } from '@use-gpu/components';
 
-const TRANSPARENT = [1, 1, 1, 0.1];
+const TRANSPARENT = [1, 1, 1, 0.1] as Point4;
 
-const FILL = [0.4, 0.7, 1, 0.5];
+const FILL = [0.4, 0.7, 1, 0.5] as Point4;
 
-export const LayoutTestPage: LC = () => {
+export const LayoutAlignPage: LC = () => {
 
   const BOXES = (<>
     <Element width={180} height={50} fill={FILL} />

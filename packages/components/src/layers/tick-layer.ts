@@ -24,14 +24,18 @@ export type TickLayerProps = {
   width?: number,
   color?: number[] | TypedArray,
   depth?: number,
+  base?: number,
   offset?: number[] | TypedArray,
+  tangent?: number[] | TypedArray,
 
   positions?: ShaderSource,
   sizes?: ShaderSource,
   widths?: ShaderSource,
   colors?: ShaderSource,
   depths?: ShaderSource,
+  bases?: ShaderSource,
   offsets?: ShaderSource,
+  tangents?: ShaderSource,
 
   join?: 'miter' | 'round' | 'bevel',
 

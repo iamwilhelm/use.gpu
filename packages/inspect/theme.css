@@ -120,6 +120,12 @@ html > body ::-webkit-scrollbar {
   bottom: 0;
 }
 
+label {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
 
 
 /* Fiber tree (optimized) */

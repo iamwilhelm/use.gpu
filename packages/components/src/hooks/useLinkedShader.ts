@@ -38,7 +38,7 @@ export const useLinkedShader = (
   const vKey  = getBundleKey(vertex);
   const fKey  = getBundleKey(fragment);
 
-  const instanceKey   = vKey  + fKey  + dHash + pHash;
+  const instanceKey   = vHash + fHash + vKey  + fKey  + dHash + pHash;
   const structuralKey = vHash + fHash + dHash + pHash;
 
   // If structural key hasn't changed, we don't need updated modules
@@ -56,7 +56,7 @@ export const useLinkedShader = (
   const ref = useOne(() => ({ uniforms, bindings, constants: {} as Record<string, any> }));
 
   // Link final WGSL if code structure changed.
-  const shader = useMemo(() => {
+  const shader = useOne(() => {
     const vKey = vHash +'-'+ dHash;
     const fKey = fHash +'-'+ dHash;
 

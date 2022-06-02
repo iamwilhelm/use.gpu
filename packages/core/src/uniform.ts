@@ -1,5 +1,5 @@
 import {
-  UniformAllocation, VirtualAllocation, ResourceAllocation,
+  UniformAllocation, VirtualAllocation, VolatileAllocation, ResourceAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller,
@@ -118,11 +118,11 @@ export const makeVolatileUniforms = <T>(
 
   let depth = 1;
   for (const b of bindings) {
-    if (b.storage) depth = Math.max(depth, +b.storage.volatile);
-    else if (b.texture.volatile) depth = Math.max(depth, +b.texture.volatile);
+    if (b.storage?.volatile) depth = Math.max(depth, +b.storage.volatile);
+    else if (b.texture?.volatile) depth = Math.max(depth, +b.texture.volatile);
   }
 
-  const cache = miniLRU(depth + 1);
+  const cache = miniLRU<GPUBindGroup>(depth + 1);
 
   const ids: number[] = [];
   const bindGroup = () => {

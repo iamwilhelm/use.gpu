@@ -5,19 +5,19 @@ import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 
 import { use, renderSync } from '@use-gpu/live';
 import { uploadBuffer } from '@use-gpu/core';
-import { mountGPU } from '@use-gpu/webgpu';
-import { GLSLLinker } from '@use-gpu/shader';
+import { mountGPUDevice } from '@use-gpu/webgpu';
+import { WGSLLinker } from '@use-gpu/shader';
 import { UseInspect } from '@use-gpu/inspect';
 import { Draw } from '@use-gpu/components';
 
-import GLSLLoader from '@use-gpu/glsl-loader';
-import { loadModule } from '@use-gpu/shader/glsl';
+import WGSLLoader from '@use-gpu/wgsl-loader';
+import { loadModule } from '@use-gpu/shader/wgsl';
 
-import GLSLModules from '@use-gpu/glsl';
+import WGSLModules from '@use-gpu/wgsl';
 
-import maskPoint from '@use-gpu/glsl/mask/point.glsl';
-import { circle } from '@use-gpu/glsl/mask/point.glsl';
-import instanceVertex from '@use-gpu/glsl/instance/vertex/quad.glsl';
+import maskPoint from '@use-gpu/wgsl/mask/point.wgsl';
+import { circle } from '@use-gpu/wgsl/mask/point.wgsl';
+import instanceVertex from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 
 type AppProps = {
   foo: number,
@@ -28,13 +28,12 @@ type NodeProps = {
 };
 
 const testRender = () => {
-  const App: LiveComponent<AppProps> = () => (props) => use(Node)({bar: props.foo});
-  const Node: LiveComponent<NodeProps> = () => (props) => null;
+  const App: LiveComponent<AppProps> = (props) => use(Node, {bar: props.foo});
+  const Node: LiveComponent<NodeProps> = (props) => null;
 
   try {
-
     const root = renderSync(
-      use(App)({foo: 1})
+      use(App, {foo: 1})
     );
     return root && root.id && root.bound && root.mount;
   } catch (e: any) {
@@ -43,19 +42,29 @@ const testRender = () => {
   }
 }
 
-const testGLSL = () => {
-  if (!GLSLModules['instance/vertex/quad']) return false;
-  if (!(maskPoint.module && maskPoint.libs)) return false;
-  if (!(circle.module && circle.libs)) return false;
+const testWGSL = () => {
+  if (!WGSLModules['instance/vertex/quad']) return [false, 'cannot find /quad in modules'];
+  if (!(maskPoint.module && maskPoint.libs)) return [false, 'cannot find maskpoint'];
+  if (!(circle.module && circle.libs)) return [false, 'cannot find circle module'];
 
-  if (!isModule(instanceVertex.libs['@use-gpu/glsl/use/view']?.module)) return false;
-  if (!isModule(instanceVertex.libs['@use-gpu/glsl/use/types']?.module)) return false;
+  if (!isModule(instanceVertex.libs['@use-gpu/wgsl/use/view']?.module)) return [false, 'cannot find use/view'];
+  if (!isModule(instanceVertex.libs['@use-gpu/wgsl/use/types']?.module)) return [false, 'cannot find use/types'];
 
-  if (!isModule(loadModule(GLSLModules['instance/vertex/quad'], 'quad'))) return false;
+  if (!isModule(loadModule(WGSLModules['instance/vertex/quad'], 'quad'))) return [false, 'cannot load /quad'];
 
-  return true;
+  return [true];
 }
 
 const isModule = (module: any) => module?.name && module?.table && module?.tree;
 
-if (!testRender() || !testGLSL()) process.exit(1);
+if (!testRender()) {
+  console.error('failed during render test');
+  process.exit(1);
+}
+
+const [ok, error] = testWGSL();
+if (!ok) {
+  console.error('failed during wgsl test', error);
+  process.exit(1);
+}
+

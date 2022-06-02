@@ -1,2 +1,2 @@
-import '@use-gpu/glsl-loader/node';
+import '@use-gpu/wgsl-loader/node';
 import './import-tests';

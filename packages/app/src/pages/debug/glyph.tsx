@@ -29,14 +29,14 @@ export const DebugGlyphPage: LC = () => {
       hasGlyph
       hasContours
       hasRelax
-      render={({subpixel, contours, relax, glyph}) =>
+      render={({subpixel, contours, preprocess, postprocess, glyph}) =>
         <PanControls
           key="glyph"
           active={true}
           zoom={2}
           render={(x, y, zoom) =>
             <Flat x={x} y={y} zoom={zoom} focus={1/3}>
-              <GlyphView subpixel={subpixel} contours={contours} relax={relax} glyph={glyph} />
+              <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
             </Flat>
           }
         />
@@ -46,7 +46,8 @@ export const DebugGlyphPage: LC = () => {
 
 type GlyphViewProps = {
   subpixel: boolean,
-  relax: boolean,
+  preprocess: boolean,
+  postprocess: boolean,
   contours: boolean,
   glyph: string,
 };
@@ -69,7 +70,7 @@ const roundUp2 = (v: number) => {
   return v;
 };
 
-const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
+const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: GlyphViewProps) => {
   const device = useDeviceContext();
   const rustText = useFontContext();
 
@@ -88,7 +89,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   const debugs: Image[] = [];
   const pushDebug = (image: Image) => debugs.push(image);
 
-  const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, relax, pushDebug).data;
+  const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, preprocess, postprocess, pushDebug).data;
   const gradientData = sdfToGradient(sdfData, width, height, radius, radius).data;
 
   const rgbaTexture = {
@@ -112,8 +113,8 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   const s = Math.max(paddedWidth, paddedHeight);
   const sdf1 = makeSDFStage(s);
   const sdf2 = makeSDFStage(s);
-  paintSubpixelOffsets(sdf1, image, width, height, radius, true);
-  paintSubpixelOffsets(sdf2, image, width, height, radius, false);
+  paintSubpixelOffsets(sdf1, image, width, height, radius, preprocess, true);
+  paintSubpixelOffsets(sdf2, image, width, height, radius, preprocess, false);
 
   const {xo, yo, xi, yi} = sdf1;
   const {xo: xo2, yo: yo2, xi: xi2, yi: yi2} = sdf2;
@@ -145,6 +146,14 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
     width: paddedWidth,
     height: paddedHeight,
   };
+
+  const gridEmitter = ({xs, ys, width, height}: DebugImage) =>
+    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+      const index = i + j * paddedWidth;
+      const dx = xs[index];
+      const dy = ys[index];
+      if (dx || dy) emit(x, y, 0.5, 1);
+    };
 
   const pointEmitter = ({xs, ys, width, height}: DebugImage) =>
     (emit: Emitter, x: number, y: number, i: number, j: number) => {
@@ -220,7 +229,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
   );
   
   return (
-    <DebugProvider debug={{sdf2d: {subpixel, contours, relax}}}>
+    <DebugProvider debug={{sdf2d: {subpixel, contours, preprocess, postprocess}}}>
       <Draw>
         <Pass>
           <UI>
@@ -242,6 +251,19 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                 <Flex align={"center"} gap={10}>
                   <Block>
                     <TextureFrame texture={rgbaTexture}>
+                    {subpixel ? <>
+                      <Sampled
+                        axes='xy'
+                        format='vec4<f32>'
+                        size={padded}
+                        items={1}
+                        sparse
+                        centered
+                        expr={gridEmitter(outerField)}
+                      >
+                        <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} />
+                      </Sampled>
+
                       <Sampled
                         axes='xy'
                         format='vec4<f32>'
@@ -251,10 +273,10 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         centered
                         expr={pointEmitter(outerField)}
                       >
-                        <Point size={0.5} depth={1} color={'#80808080'} shape={'circleOutlined'} />
+                        <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape={'circle'} />
                       </Sampled>
 
-                      <Sampled
+                      {preprocess ? <Sampled
                         axes='xy'
                         format='vec4<f32>'
                         size={padded}
@@ -264,7 +286,7 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         expr={pointEmitter(innerField)}
                       >
                         <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} />
-                      </Sampled>
+                      </Sampled> : null}
 
                       <Sampled
                         axes='xy'
@@ -273,14 +295,15 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                         items={2}
                         sparse
                         centered
-                        expr={arrowEmitter(outerField)}
+                        expr={arrowEmitter(preprocess ? innerField : outerField)}
                       >
                         <Arrow width={3} depth={0.05} color={0x40c0ff} />
                       </Sampled>
-
+                      </> : null}
                     </TextureFrame>
 
                     <TextureFrame texture={rgbaTexture}>
+                    {subpixel ? <>
                       <Sampled
                         axes='xy'
                         format='vec4<f32>'
@@ -328,9 +351,10 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                       >
                         <Arrow width={3} depth={0.05} color={0x40c0ff} />
                       </Sampled>
+                      </> : null}
                     </TextureFrame>
                     
-                    <Label>RGBA</Label>
+                    <Label>RGBA{subpixel ? ' + Offsets' + (preprocess ? ' (Relaxed)' : '') : ''}</Label>
                   </Block>
 
                   { debugs.length ? <>
@@ -346,11 +370,11 @@ const GlyphView = memo(({subpixel, relax, contours, glyph}: GlyphViewProps) => {
                     <Block>
                       {debugFrame(debugs[3])}
                       {debugFrame(debugs[4])}
-                      <Label>{subpixel ? "ESDT Inside" : "EDT Outside"}</Label>
+                      <Label>{subpixel ? "ESDT Inside" : "EDT Inside"}</Label>
                     </Block>                
                     <Block>
                       {debugFrame(debugs[5])}
-                      <Label>{subpixel ? "X and Y Offsets" + (relax ? '\n(Relaxed)' : '') : "Squared Distance"}</Label>
+                      <Label>{subpixel ? "X and Y Offsets" + (postprocess ? '\n(Relaxed)' : '') : "Squared Distance"}</Label>
                     </Block>                
                   </> : null}
 
@@ -427,17 +451,17 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
 }
 
 type LabelProps = {
-  children: string,
+  children: string | string[],
 }
 
 const Label: LC<LabelProps> = (props: PropsWithChildren<LabelProps>) => (
-  <Block margin={0}>
+  <Block margin={[0, 3, 0, 0]}>
     <Inline align={"center"}>
       <Text
-        size={8}
+        size={10}
         snap={false}
-        text={props.children}
-        color={[1, 1, 1, 0.5]}
+        text={Array.isArray(props.children) ? props.children.join('') : props.children}
+        color={[1, 1, 1, 0.75]}
       />
     </Inline>
   </Block>

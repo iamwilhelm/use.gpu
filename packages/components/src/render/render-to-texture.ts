@@ -131,13 +131,13 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
 
     const texture = bufferTextures![counter.current];
     const view = bufferViews![counter.current];
-    counter.current = (counter.current + 1) % bufferViews.length;
+    counter.current = (counter.current + 1) % bufferViews!.length;
 
     if (resolveTexture) colorAttachments[0].resolveTarget = view;
     else colorAttachments[0].view = view;
 
-    feedback.texture = source.texture;
-    feedback.view = source.view;
+    feedback!.texture = source.texture;
+    feedback!.view = source.view;
 
     source.texture = texture;
     source.view = view;

@@ -8,7 +8,7 @@ import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
 import { ViewContext } from '../providers/view-provider';
-import { useInspectFiber } from '../hooks/useInspectable';
+import { useInspectable, useInspectClick, Inspector } from '../hooks/useInspectable';
 
 import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec3 } from 'gl-matrix';
@@ -20,29 +20,36 @@ export type LayoutProps = {
 };
 
 export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
-  const {inspect, render, children} = props;
-  return gather(children ?? (render ? render() : null), Resume);
+  const {render, children} = props;
+  const inspect = useInspectable();
+  return gather(children ?? (render ? render() : null), Resume(inspect));
 }, 'Layout');
 
-const Resume = (els: LayoutElement[]) => {
+const Resume = (inspect: Inspector) => (els: LayoutElement[]) => {
   const layout = useContext(LayoutContext);
-  const {layout: {inspect}} = useContext(DebugContext);
+  const {layout: {inspect: toggleInspect}} = useContext(DebugContext);
 
   const [left, top, right, bottom] = layout;
-  const size = [right - left, bottom - top] as Point;
+  const into = [right - left, bottom - top] as Point;
   
   const pickers: any[] = [];
+  const sizes: Point[] = [];
+  const offsets: Point[] = [];
 
   const out = [] as LiveElement[];
   for (const {margin, fit} of els) {
     const {
-      size: [w, h],
+      size,
       render,
       pick,
-    } = fit(size);
+    } = fit(into);
 
+    const [w, h] = size;
     const [ml, mt] = margin;
     const el = render([left + ml, top + mt, left + ml + w, top + mt + h]);
+    
+    sizes.push(size);
+    offsets.push([left + ml, top + mt]);
 
     if (Array.isArray(el)) out.push(...el);
     else if (el) out.push(el);
@@ -51,10 +58,19 @@ const Resume = (els: LayoutElement[]) => {
   }
   
   pickers.reverse();
+
+  inspect({
+    layout: {
+      into,
+      size: into,
+      sizes,
+      offsets,
+    },
+  });
   
   out.push(keyed(Scroller, -2, pickers));
 
-  if (inspect) out.push(keyed(Inspect, -1, pickers));
+  if (toggleInspect) out.push(keyed(Inspect, -1, pickers));
 
   return fragment(out);
 };
@@ -104,7 +120,7 @@ export const Inspect = (pickers: any[]) => {
     projectionMatrix: { current: matrix },
   } = viewUniforms;
   
-  const setHighlight = useInspectFiber();
+  const setHighlight = useInspectClick();
 
   const { mouse, pressed } = useMouse();
   const [px, py] = screenToView(matrix, mouse.x / width * 2.0 - 1.0, 1.0 - mouse.y / height * 2.0);

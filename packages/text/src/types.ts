@@ -20,7 +20,7 @@ export type FontMetrics = {
 export type SpanMetrics = {
   breaks: Uint32Array,
   metrics: Float32Array,
-  glyphs: Uint32Array,
+  glyphs: Int32Array,
 };
 
 export type GlyphMetrics = {

@@ -11,6 +11,8 @@ export const makeTuples = <N extends number, T = number>(array: TypedArray | T[]
   const length = n;
 
   const iterate = (f: (...args: any[]) => void, start: number = 0, end: number = n) => {
+    if (n === 0) return;
+
     while (start < 0) start += n;
     while (end < 0) end += n;
     

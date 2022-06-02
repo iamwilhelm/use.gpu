@@ -39,7 +39,7 @@ export type ElementTrait = {
   border: MarginLike,
   stroke: Color,
   fill: Color,
-  image: ImageTrait,
+  image: Partial<ImageTrait>,
 };
 
 export type ImageTrait = {

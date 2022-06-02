@@ -76,10 +76,11 @@ export const glyphToSDF = (
   radius: number = 3,
   cutoff: number = 0.25,
   subpixel: boolean = true,
-  relax: boolean = true,
+  preprocess: boolean = false,
+  postprocess: boolean = false,
   debug?: (image: Image) => void,
 ): Image => {
-  if (subpixel) return glyphToESDT(data, null, w, h, pad, radius, cutoff, relax, debug);
+  if (subpixel) return glyphToESDT(data, null, w, h, pad, radius, cutoff, preprocess, postprocess, debug);
   else return glyphToEDT(data, w, h, pad, radius, cutoff, debug);
 }
 
@@ -92,17 +93,18 @@ export const rgbaToSDF = (
   radius: number = 3,
   cutoff: number = 0.25,
   subpixel: boolean = true,
-  relax: boolean = true,
+  preprocess: boolean = false,
+  postprocess: boolean = false,
   debug?: (image: Image) => void,
 ): Image => {
   const alpha = rgbaToGlyph(data, w, h).data;
 
   // ESDT can resolve RGBA directly
-  if (subpixel) return glyphToESDT(alpha, data, w, h, pad, radius, cutoff, relax, debug);
+  if (subpixel) return glyphToESDT(alpha, data, w, h, pad, radius, cutoff, preprocess, postprocess, debug);
 
   // EDT color is resolved separately
   const color = rgbaToColor(data, w, h, pad).data;
-  const sdf   = glyphToSDF(alpha, w, h, pad, radius, cutoff, subpixel, relax, debug);
+  const sdf   = glyphToSDF(alpha, w, h, pad, radius, cutoff, false, false, false, debug);
   return {...sdf, data: combineRGBA(sdf.data, color)};
 }
 
@@ -182,7 +184,7 @@ export const rgbaToGlyph = (data: Uint8Array, w: number, h: number, pad: number 
 };
 
 // Combine RGB + SDF
-export const combineRGBA = (sdf: Uint8Array, color: Uint8Array): Image => {
+export const combineRGBA = (sdf: Uint8Array, color: Uint8Array): Uint8Array => {
   const out = new Uint8Array(sdf.length);
 
   const n = sdf.length;

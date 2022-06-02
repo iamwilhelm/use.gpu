@@ -42,7 +42,7 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
       <DOMMock style={{width: size[0] * SCALE, height: size[1] * SCALE}} />
       <DOMMock style={{width: (into[0] || 0) * SCALE, height: (into[1] || 0) * SCALE, borderStyle: 'dashed'}} />
       {
-        sizes.map((size, i) =>
+        sizes.map((size: [number, number], i: number) =>
           <DOMMock key={i.toString()} style={{
             position: 'absolute',
             left: offsets[i][0] * SCALE,

@@ -35,8 +35,6 @@ export type SDFFontProviderProps = {
   height?: number,
   radius?: number,
   pad?: number,
-  subpixel?: boolean,
-  relax?: boolean,
   children?: LiveElement<any>,
   then?: (atlas: Atlas, source: TextureSource, gathered: any) => LiveElement<any>
 };
@@ -76,12 +74,12 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   const device = useContext(DeviceContext);
   const rustText = useContext(FontContext);
 
-  const {sdf2d: {subpixel, relax}} = useContext(DebugContext);
+  const {sdf2d: {subpixel, preprocess, postprocess}} = useContext(DebugContext);
 
   // Allocate font atlas + backing texture
   const format = "rgba8unorm" as GPUTextureFormat;
 
-  const opts = [subpixel, relax];
+  const opts = [subpixel, preprocess, postprocess];
   const glyphs = useMemo(() => new Map<number, CachedGlyph>(), opts);
   const atlas = useMemo(() => makeAtlas(width, height), opts);
   const sourceRef = useMemo(() => ({ current: makeAtlasSource(device, atlas, format) }), opts);
@@ -113,7 +111,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         let data: Uint8Array;
 
         // Convert to SDF
-        ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, relax));
+        ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, preprocess, postprocess));
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
 
@@ -231,7 +229,7 @@ export const useSDFGlyphData = (
     // Push all text spans into layout
     const {ascent, lineHeight} = height;
     const cursor = makeLayoutCursor(wrap, align);
-    spans.iterate((advance, trim, hard) => cursor.push(advance, trim, hard, lineHeight));
+    spans.iterate((advance, trim, hard) => cursor.push(advance, trim, hard, lineHeight, 0, 0, 0));
 
     // Gather lines produced
     const [left, top] = layout;

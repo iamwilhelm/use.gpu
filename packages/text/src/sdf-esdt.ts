@@ -2,7 +2,7 @@ import { glyphToSDF as glyphToSDFv1 } from './sdf';
 import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage, isBlack, isWhite, isSolid, sqr } from './sdf';
 import { Image } from './types';
 
-// Convert grayscale glyph to SDF using subpixel distance transform
+// Convert grayscale or color glyph to SDF using subpixel distance transform
 export const glyphToESDT = (
   data: Uint8Array,
   color: Uint8Array | null,
@@ -11,7 +11,8 @@ export const glyphToESDT = (
   pad: number = 4,
   radius: number = 3,
   cutoff: number = 0.25,
-  relax: boolean = true,
+  preprocess: boolean = false,
+  postprocess: boolean = false,
   debug?: (image: Image) => void,
 ): Image => {
   const wp = w + pad * 2;
@@ -25,7 +26,7 @@ export const glyphToESDT = (
   const {outer, inner, xo, yo, xi, yi, f, z, b, t, v} = stage;
 
   paintIntoStage(stage, data, w, h, pad);
-  paintSubpixelOffsets(stage, data, w, h, pad);
+  paintSubpixelOffsets(stage, data, w, h, pad, preprocess);
   
   if (debug) {
     const sdfToDebugView = makeSDFToDebugView(wp, hp, np, radius, cutoff);
@@ -41,13 +42,13 @@ export const glyphToESDT = (
     esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1, 2);
     debug(sdfToDebugView(null, null, xi, yi, null, inner));
 
-    if (relax) relaxSubpixelOffsets(stage, data, w, h, pad);
+    if (postprocess) relaxSubpixelOffsets(stage, data, w, h, pad);
     debug(sdfToDebugView(xo, yo, xi, yi, outer, inner));
   }
   else {
     esdt(outer, xo, yo, wp, hp, f, z, b, t, v,  1);
     esdt(inner, xi, yi, wp, hp, f, z, b, t, v, -1);
-    if (relax) relaxSubpixelOffsets(stage, data, w, h, pad);
+    if (postprocess) relaxSubpixelOffsets(stage, data, w, h, pad);
   }
 
   const alpha = new Uint8Array(np);
@@ -58,12 +59,12 @@ export const glyphToESDT = (
     alpha[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   }
 
-  paintIntoDistanceField(alpha, data, w, h, pad, radius, cutoff, !color);
+  if (!preprocess) paintIntoDistanceField(alpha, data, w, h, pad, radius, cutoff, !color);
 
   if (color) {
     const out = new Uint8Array(np * 4);
     paintIntoRGB(out, color, xo, yo, w, h, pad);
-    paintIntoAlpha(out, alpha, 0, 0, wp, hp, 0);
+    paintIntoAlpha(out, alpha, wp, hp, 0);
     return {data: out, width: wp, height: hp};
   }
   else {
@@ -147,6 +148,7 @@ export const paintSubpixelOffsets = (
   w: number,
   h: number,
   pad: number,
+  relax?: boolean,
   half?: number | boolean,
 ) => {
   const wp = w + pad * 2;
@@ -247,125 +249,125 @@ export const paintSubpixelOffsets = (
   // Improves quality slightly, but slows things down.
   let xs = xo;
   let ys = yo;
-  /*
-  const checkCross = (
-    nx: number,
-    ny: number,
-    dc: number,
-    dl: number,
-    dr: number,
-    dxl: number,
-    dyl: number,
-    dxr: number,
-    dyr: number,
-  ) => {
-    return (
-      ((dxl * nx + dyl * ny) * (dc * dl) > 0) &&
-      ((dxr * nx + dyr * ny) * (dc * dr) > 0) &&
-      ((dxl * dxr + dyl * dyr) * (dl * dr) > 0)
-    );
-  }
-
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const j = (y + pad) * wp + x + pad;
-      
-      const nx = xo[j];
-      const ny = yo[j];
-      if (!nx && !ny) continue;
-
-      const c = getData(x, y);
-      const l = getData(x - 1, y);
-      const r = getData(x + 1, y);
-      const t = getData(x, y - 1);
-      const b = getData(x, y + 1);
-
-      const dxl = xo[j - 1];
-      const dxr = xo[j + 1];
-      const dxt = xo[j - wp];
-      const dxb = xo[j + wp];
-
-      const dyl = yo[j - 1];
-      const dyr = yo[j + 1];
-      const dyt = yo[j - wp];
-      const dyb = yo[j + wp];
-
-      let dx = nx;
-      let dy = ny;
-      let dw = 1;
-
-      const dc = c - 0.5;
-      const dl = l - 0.5;
-      const dr = r - 0.5;
-      const dt = t - 0.5;
-      const db = b - 0.5;
-
-      if (!isSolid(l) && !isSolid(r)) {
-        if (checkCross(nx, ny, dc, dl, dr, dxl, dyl, dxr, dyr)) {
-          dx += (dxl + dxr) / 2;
-          dy += (dyl + dyr) / 2;
-          dw++;
-        }
-      }
-
-      if (!isSolid(t) && !isSolid(b)) {
-        if (checkCross(nx, ny, dc, dt, db, dxt, dyt, dxb, dyb)) {
-          dx += (dxt + dxb) / 2;
-          dy += (dyt + dyb) / 2;
-          dw++;
-        }
-      }
-
-      if (!isSolid(l) && !isSolid(t)) {
-        if (checkCross(nx, ny, dc, dl, dt, dxl, dyl, dxt, dyt)) {
-          dx += (dxl + dxt - 1) / 2;
-          dy += (dyl + dyt - 1) / 2;
-          dw++;
-        }
-      }
-
-      if (!isSolid(r) && !isSolid(t)) {
-        if (checkCross(nx, ny, dc, dr, dt, dxr, dyr, dxt, dyt)) {
-          dx += (dxr + dxt + 1) / 2;
-          dy += (dyr + dyt - 1) / 2;
-          dw++;
-        }
-      }
-
-      if (!isSolid(l) && !isSolid(b)) {
-        if (checkCross(nx, ny, dc, dl, db, dxl, dyl, dxb, dyb)) {
-          dx += (dxl + dxb - 1) / 2;
-          dy += (dyl + dyb + 1) / 2;
-          dw++;
-        }
-      }
-
-      if (!isSolid(r) && !isSolid(b)) {
-        if (checkCross(nx, ny, dc, dr, db, dxr, dyr, dxb, dyb)) {
-          dx += (dxr + dxb + 1) / 2;
-          dy += (dyr + dyb + 1) / 2;
-          dw++;
-        }
-      }
-    
-      const nn = Math.sqrt(nx*nx + ny*ny);
-      const ll = (dx * nx + dy * ny) / nn;
-
-      dx = nx * ll / dw / nn;
-      dy = ny * ll / dw / nn;
-    
-      xi[j] = dx;
-      yi[j] = dy;
+  if (relax) {
+    const checkCross = (
+      nx: number,
+      ny: number,
+      dc: number,
+      dl: number,
+      dr: number,
+      dxl: number,
+      dyl: number,
+      dxr: number,
+      dyr: number,
+    ) => {
+      return (
+        ((dxl * nx + dyl * ny) * (dc * dl) > 0) &&
+        ((dxr * nx + dyr * ny) * (dc * dr) > 0) &&
+        ((dxl * dxr + dyl * dyr) * (dl * dr) > 0)
+      );
     }
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const j = (y + pad) * wp + x + pad;
+      
+        const nx = xo[j];
+        const ny = yo[j];
+        if (!nx && !ny) continue;
+
+        const c = getData(x, y);
+        const l = getData(x - 1, y);
+        const r = getData(x + 1, y);
+        const t = getData(x, y - 1);
+        const b = getData(x, y + 1);
+
+        const dxl = xo[j - 1];
+        const dxr = xo[j + 1];
+        const dxt = xo[j - wp];
+        const dxb = xo[j + wp];
+
+        const dyl = yo[j - 1];
+        const dyr = yo[j + 1];
+        const dyt = yo[j - wp];
+        const dyb = yo[j + wp];
+
+        let dx = nx;
+        let dy = ny;
+        let dw = 1;
+
+        const dc = c - 0.5;
+        const dl = l - 0.5;
+        const dr = r - 0.5;
+        const dt = t - 0.5;
+        const db = b - 0.5;
+
+        if (!isSolid(l) && !isSolid(r)) {
+          if (checkCross(nx, ny, dc, dl, dr, dxl, dyl, dxr, dyr)) {
+            dx += (dxl + dxr) / 2;
+            dy += (dyl + dyr) / 2;
+            dw++;
+          }
+        }
+
+        if (!isSolid(t) && !isSolid(b)) {
+          if (checkCross(nx, ny, dc, dt, db, dxt, dyt, dxb, dyb)) {
+            dx += (dxt + dxb) / 2;
+            dy += (dyt + dyb) / 2;
+            dw++;
+          }
+        }
+
+        if (!isSolid(l) && !isSolid(t)) {
+          if (checkCross(nx, ny, dc, dl, dt, dxl, dyl, dxt, dyt)) {
+            dx += (dxl + dxt - 1) / 2;
+            dy += (dyl + dyt - 1) / 2;
+            dw++;
+          }
+        }
+
+        if (!isSolid(r) && !isSolid(t)) {
+          if (checkCross(nx, ny, dc, dr, dt, dxr, dyr, dxt, dyt)) {
+            dx += (dxr + dxt + 1) / 2;
+            dy += (dyr + dyt - 1) / 2;
+            dw++;
+          }
+        }
+
+        if (!isSolid(l) && !isSolid(b)) {
+          if (checkCross(nx, ny, dc, dl, db, dxl, dyl, dxb, dyb)) {
+            dx += (dxl + dxb - 1) / 2;
+            dy += (dyl + dyb + 1) / 2;
+            dw++;
+          }
+        }
+
+        if (!isSolid(r) && !isSolid(b)) {
+          if (checkCross(nx, ny, dc, dr, db, dxr, dyr, dxb, dyb)) {
+            dx += (dxr + dxb + 1) / 2;
+            dy += (dyr + dyb + 1) / 2;
+            dw++;
+          }
+        }
+    
+        const nn = Math.sqrt(nx*nx + ny*ny);
+        const ll = (dx * nx + dy * ny) / nn;
+
+        dx = nx * ll / dw / nn;
+        dy = ny * ll / dw / nn;
+    
+        xi[j] = dx;
+        yi[j] = dy;
+      }
+    }
+    xs = xi;
+    ys = yi;
   }
-  xs = xi;
-  ys = yi;
-  */
   
   if (half) return;
   
   // Produce zero points for positive and negative DF, at +0.5 / -0.5.
-  // Splits xi into xo/xi
+  // Splits xs into xo/xi
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const j = (y + pad) * wp + x + pad;
@@ -397,7 +399,8 @@ export const paintSubpixelOffsets = (
   }
 };
 
-// Snap distance targets to neighboring target points, if closer
+// Snap distance targets to neighboring target points, if closer.
+// Makes the SDF more correct and less XY vs YX dependent, but has only little effect on final contours.
 export const relaxSubpixelOffsets = (
   stage: SDFStage,
   data: Uint8Array | number[],
@@ -505,7 +508,7 @@ const makeSDFToDebugView = (
   return rgba;
 }
 
-// Paint original color data into final RGBA
+// Paint original color data into final RGBA (emoji)
 export const paintIntoRGB = (
   image: Uint8Array,
   color: Uint8Array | number[],
@@ -560,12 +563,10 @@ export const paintIntoRGB = (
   }
 }
 
-// Paint sdf alpha data into final RGBA
+// Paint sdf alpha data into final RGBA (emoji)
 export const paintIntoAlpha = (
   image: Uint8Array,
   alpha: Uint8Array | number[],
-  xs: Float32Array,
-  ys: Float32Array,
   w: number,
   h: number,
   pad: number,
@@ -624,6 +625,7 @@ export const esdt1d = (
 ) => {
   v[0] = 0;
   b[0] = xs[offset];
+  t[0] = ys[offset];
   z[0] = -INF;
   z[1] = INF;
   f[0] = mask[offset] ? INF : ys[offset] * ys[offset];
@@ -670,7 +672,26 @@ export const esdt1d = (
     const o = offset + q * stride;
     xs[o] = rq;
     ys[o] = dy;
+    if (dy === undefined) console.log({q, k, o, r, t})
 
     if (r !== q) mask[o] = 0;
   }
+}
+
+// Helper for testing
+export const resolveSDF = (
+  xo: Float32Array | number[],
+  yo: Float32Array | number[],
+  xi: Float32Array | number[],
+  yi: Float32Array | number[],
+) => {
+  const np = xo.length;
+  const out = [] as number[];
+  for (let i = 0; i < np; ++i) {
+    const outer = Math.max(0, Math.sqrt(sqr(xo[i]) + sqr(yo[i])) - 0.5);
+    const inner = Math.max(0, Math.sqrt(sqr(xi[i]) + sqr(yi[i])) - 0.5);
+    const d = outer >= inner ? outer : -inner;
+    out[i] = d;
+  }
+  return out;
 }

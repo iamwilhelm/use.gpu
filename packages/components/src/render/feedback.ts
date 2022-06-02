@@ -1,4 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { UniformAttribute } from '@use-gpu/core/types';
 import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 
 import { use, useMemo } from '@use-gpu/live';
@@ -11,7 +12,7 @@ type FeedbackProps = {
   shader?: ShaderModule,
 };
 
-const FEEDBACK_BINDING = {name: 'getFeedback', format: 'vec4<f32>', args: ['vec2<f32>']};
+const FEEDBACK_BINDING = {name: 'getFeedback', format: 'vec4<f32>', args: ['vec2<f32>']} as UniformAttribute;
 
 export const Feedback: LiveComponent<FeedbackProps> = ({shader}: FeedbackProps) => {
   const texture = useFeedbackContext();

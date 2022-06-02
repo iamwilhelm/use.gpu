@@ -11,7 +11,7 @@ import { useBoxTrait, useElementTrait } from '../traits';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 
-export type ElementProps = Partial<BoxTrait> & Partial<ImageTrait> & {
+export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & {
   snap?: boolean,
   absolute?: boolean,
   under?: boolean,

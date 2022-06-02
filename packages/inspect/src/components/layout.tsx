@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { styled as _styled } from '@stitches/react';
 
 // TODO: TS nightly issue?
@@ -205,7 +205,7 @@ export const TreeRowOmittedChunk = styled('div', {
   },
 });
 
-export const TreeRow: React.FC<TreeIndentProps> = React.forwardRef<HTMLDivElement, TreeIndentProps>(({ indent, children }, ref) => (
+export const TreeRow = React.forwardRef<HTMLDivElement, PropsWithChildren<TreeIndentProps>>(({ indent, children }, ref) => (
   <TreeRowInner ref={ref} css={{
     paddingLeft: indent ? `${indent * 20}px` : 0,
   }}>

@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TypedArray, StorageSource, LambdaSource, UniformType, Emitter } from '@use-gpu/core/types';
+import { StorageSource, LambdaSource, TypedArray, UniformType, Emitter } from '@use-gpu/core/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 
 import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
@@ -34,7 +35,7 @@ export type RawDataProps = {
   format?: string,
   live?: boolean,
 
-  render?: (...source: StorageSource[]) => LiveElement<any>,
+  render?: (...source: ShaderSource[]) => LiveElement<any>,
   children?: LiveElement<any>,
 };
 
@@ -77,7 +78,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   // Make de-interleaving shader
   let sources: LambdaSource[] | undefined;
   if (split) {
-    const binding = useOne(() => ({name: 'getData', format}), format);
+    const binding = useOne(() => ({name: 'getData', format: format as any as UniformType}), format);
     const getData = useBoundSource(binding, source);
     sources = useMemo(() => (
       seq(t).map(i => ({
@@ -96,8 +97,10 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
   // Refresh and upload data
   const refresh = () => {
+    let emitted = 0;
+
     if (data) copyNumberArray(data, array);
-    if (expr) emitIntoNumberArray(expr, array, dims);
+    if (expr) emitted = emitIntoNumberArray(expr, array, dims);
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
@@ -127,6 +130,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     refresh();
   }
 
-  if (sources) return useMemo(() => render ? render(...sources) : yeet(sources), [render, sources]);
+  if (sources) return useMemo(() => render ? render(...sources!) : yeet(sources!), [render, sources]);
   return useMemo(() => render ? render(source) : yeet(source), [render, source]);
 };

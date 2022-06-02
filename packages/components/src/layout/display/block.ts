@@ -9,7 +9,7 @@ import { useInspectable } from '../../hooks/useInspectable';
 
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
-import { evaluateDimension, parseDirectionY, parseMargin, mergePadding } from '../parse';
+import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
 import { useProp } from '../../traits/useProp';
 import { Element } from '../element/element';
 

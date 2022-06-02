@@ -16,6 +16,7 @@ export type GlyphsProps = {
   color?: Point4,
   size?: number,
   detail?: number,
+  expand?: number,
   snap?: boolean,
 
   font: number[],
@@ -123,7 +124,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       id,
       rectangles,
       uvs,
-      border: [0, Math.min(size / 32, 1.0) * 0.25, 0, 0],
+      border: [expand, Math.min(size / 32, 1.0) * 0.25, 0, 0],
       sdf: [radius, scale, size, 0],
       fill: color,
       texture: SDF_FONT_ATLAS,

@@ -61,8 +61,10 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   
   const {host} = fiber;
   useLayoutEffect(() => {
+    if (!host) return;
+
     host.__highlight = (id: number | null, active?: boolean) => {
-      const fiber = fibers.get(id);
+      const fiber = fibers.get(id ?? 0);
       if (fiber) {
         if (active) {
           toggleInspect();
@@ -91,7 +93,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       }
     };
 
-    return () => host.__highlight = null;
+    return () => { host.__highlight = () => {}; }
   }, [host, fibers]);
 
   let vertexTab: React.ReactNode;

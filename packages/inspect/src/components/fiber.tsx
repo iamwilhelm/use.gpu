@@ -197,15 +197,16 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
     return [select, hover, unhover];
   }, [fiber, updateSelectState, updateHoverState]);
 
-  const rowRef = useRef<HTMLDivElement>();
+  const rowRef = useRef<HTMLDivElement>(null);
   const out = [] as React.ReactElement[];
 
   useLayoutEffect(() => {
     const {current: row} = rowRef;
+    debugger;
     if (selected && row) {
       const rect = row.getBoundingClientRect();
 
-      let parent = row;
+      let parent = row as HTMLElement | null;
       while (parent) {
         if (parent.classList.contains('tree-scroller')) break;
         parent = parent.parentElement;
@@ -218,8 +219,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
           (rect.left < container.left || rect.right > container.right) ||
           (rect.top < container.top || rect.bottom > container.bottom)
         ) {
-          container.scrollLeft = rect.left - container.left - 10;
-          container.scrollTop = rect.top - container.top - 10;
+          parent.scrollLeft = rect.left - container.left - 10;
+          parent.scrollTop = rect.top - container.top - 10;
         }
       }
     }

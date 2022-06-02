@@ -108,7 +108,7 @@ export type LambdaSource<T = any> = {
 
 export type TextureSource = {
   texture: GPUTexture,
-  view: GPUTexture | GPUTextureView,
+  view?: GPUTextureView,
   sampler: GPUSampler | GPUSamplerDescriptor,
   layout: string,
   format: any,

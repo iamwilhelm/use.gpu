@@ -12,7 +12,7 @@ import { BoxTrait } from '../types';
 import { useBoxTrait } from '../traits';
 import { parseAlignment, parseBase, parseDirectionX, parseMargin } from '../parse';
 
-export type InlineProps = BoxTrait & {
+export type InlineProps = Partial<BoxTrait> & {
   direction?: Direction,
 
   align?: Alignment,

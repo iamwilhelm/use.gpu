@@ -59,10 +59,10 @@ export const makeLayoutCursor = (
     advance: number,
     trim: number,
     hard: number,
-    cross: number = 0,
-    ascent: number = 0,
-    descent: number = 0,
-    xHeight: number = 0,
+    cross: number,
+    ascent: number,
+    descent: number,
+    xHeight: number,
   ) => {
     if (max > 0 && (spanAdvance + advance - trim > max)) {
       flush(0);

@@ -1,4 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
+import { UniformAttribute } from '@use-gpu/core/types';
 import { ColorTrait, LineTrait, ROPTrait } from '../types';
 import { VectorLike } from '../../traits/types';
 
@@ -36,8 +37,8 @@ export type TickProps =
 };
 
 const NO_OFFSET = vec4.fromValues(0, 1, 0, 0);
-const GET_POSITION = {format: 'vec4<f32>', name: 'getPosition'};
-const GET_SIZE = {format: 'u32', name: 'getSize', args: []};
+const GET_POSITION = {format: 'vec4<f32>', name: 'getPosition'} as UniformAttribute;
+const GET_SIZE = {format: 'u32', name: 'getSize', args: []} as UniformAttribute;
 
 export const Tick: LiveComponent<TickProps> = (props) => {
   const {

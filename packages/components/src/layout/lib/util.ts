@@ -1,10 +1,12 @@
 import { LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { Point, Point4, Rectangle } from '@use-gpu/core/types';
-import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine } from '../types';
+import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
+import { yeet } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/clip/clip.wgsl';
+import { INSPECT_STYLE } from './constants';
 
 export const isHorizontal = (d: Direction) => d === 'x' || d === 'lr' || d === 'rl';
 export const isVertical = (d: Direction) => d === 'y' || d === 'tb' || d === 'bt';
@@ -48,7 +50,7 @@ export const makeBoxLayout = (
   parentClip?: ShaderModule,
   parentTransform?: ShaderModule,
 ) => {
-  let [left, top, right, bottom] = box;
+  const [left, top, right, bottom] = box;
   const out = [] as LiveElement<any>[];
   const n = sizes.length;
 
@@ -91,9 +93,90 @@ export const makeBoxLayout = (
   return out;
 };
 
+export const makeBoxInspectLayout = (
+  id: number,
+  sizes: Point[],
+  offsets: Point[],
+  renders: LayoutRenderer[],
+  clip?: ShaderModule,
+  transform?: ShaderModule,
+  inverse?: ShaderModule,
+  update?: (r: Rectangle) => void,
+) => (
+  box: Rectangle,
+  parentClip?: ShaderModule,
+  parentTransform?: ShaderModule,
+) => {
+  const out = makeBoxLayout(sizes, offsets, renders, clip, transform, inverse, update)(box, parentClip, parentTransform);
+  
+  const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
+  const xclip = parentClip ? (
+    transform
+    ? bindBundle(
+        clip ? getCombinedClip : getTransformedClip,
+        {
+          getParent: parentClip,
+          getSelf: clip ?? null,
+          applyTransform: inverse ?? null,
+        }
+      )
+    : parentClip
+  ) : clip;
+
+  let i = 0;
+  const next = () => id.toString() + i++;
+  const yeets = [] as UIAggregate[];
+  yeets.push({
+    id: next(),
+    rectangle: box,
+    uv: [0, 0, 1, 1],
+    fill: [0, 1, 1, .2],
+    stroke: [0.3, 0.9, 1, 1],
+    border: [2, 2, 2, 2],
+    count: 1,
+    repeat: 0,
+    clip: parentClip,
+    transform: parentTransform,
+    bounds: box,
+  });
+
+  const [left, top] = box;
+  const n = sizes.length;
+  for (let i = 0; i < n; ++i) {
+    const size = sizes[i];
+    const offset = offsets[i];
+    const render = renders[i];
+
+    const w = size[0];
+    const h = size[1];
+
+    const l = left + offset[0];
+    const t = top + offset[1];
+    const r = l + w;
+    const b = t + h;
+    const layout = [l, t, r, b] as Rectangle;
+
+    yeets.push({
+      id: next(),
+      rectangle: layout,
+      uv: [0, 0, 1, 1],
+      fill: [.5, 1, .7, .2],
+      stroke: [.5, 1, .7, .5],
+      border: [1, 1, 1, 1],
+      count: 1,
+      repeat: 0,
+      clip: xclip,
+      transform: xform,
+    });
+  }
+  
+  out.push(yeet(yeets));
+  return out;
+}
+
 export const makeInlineLayout = (
   ranges: Point[],
-  //sizes: Point[],
+  sizes: Point[],
   offsets: [number, number, number][],
   renders: InlineRenderer[],
 ) => (
@@ -118,15 +201,15 @@ export const makeInlineLayout = (
   
   for (let i = 0; i < n; ++i) {
     const range = ranges[i];
-    //const size = sizes[i];
+    const size = sizes[i];
     const offset = offsets[i];
     const render = renders[i];
 
     const [x, y, gap] = offset;
     const l = left + x;
     const t = top + y;
-    const r = l;// + size[0];
-    const b = t;// + size[1];
+    const r = l + size[0];
+    const b = t + size[1];
 
     const layout = [l, t, r, b] as Rectangle;
     const [start, end] = range;
@@ -141,6 +224,66 @@ export const makeInlineLayout = (
 
   if (last) flush(last);
 
+  return out;
+};
+
+export const makeInlineInspectLayout = (
+  id: number,
+  ranges: Point[],
+  sizes: Point[],
+  offsets: [number, number, number][],
+  renders: InlineRenderer[],
+) => (
+  box: Rectangle,
+  clip?: ShaderModule,
+  transform?: ShaderModule,
+) => {
+  const out = makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform);
+
+  let i = 0;
+  const next = () => id.toString() + i++;
+  const yeets = [] as UIAggregate[];
+  yeets.push({
+    id: next(),
+    rectangle: box,
+    uv: [0, 0, 1, 1],
+    count: 1,
+    repeat: 0,
+    clip,
+    transform,
+    bounds: box,
+    ...INSPECT_STYLE.parent,
+  });
+
+  const [left, top] = box;
+  const n = ranges.length;
+  for (let i = 0; i < n; ++i) {
+    const range = ranges[i];
+    const size = sizes[i];
+    const offset = offsets[i];
+    const render = renders[i];
+
+    const [x, y, gap] = offset;
+    const l = left + x;
+    const t = top + y;
+    const r = l + size[0];
+    const b = t + size[1];
+
+    const layout = [l, t, r, b] as Rectangle;
+
+    yeets.push({
+      id: next(),
+      rectangle: layout,
+      uv: [0, 0, 1, 1],
+      count: 1,
+      repeat: 0,
+      clip,
+      transform,
+      ...INSPECT_STYLE.child
+    });
+  }
+  
+  out.push(yeet(yeets));
   return out;
 };
 

@@ -3,8 +3,8 @@ import { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, 
 
 import { use, yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
-import { useInspectable } from '../../hooks/useInspectable'
+import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 import { useProp } from '../../traits/useProp';
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
@@ -43,12 +43,13 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const anchor    = useProp(props.anchor, parseAnchor);
   const gap       = useProp(props.gap, parseGapXY);
 
+  const {id} = useFiber();
   const background = (stroke || fill || image) ? (
-    use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
+    use(Element, {id, radius, border, stroke, fill, image, absolute: true, under: true})
   ) : null;
 
-  const {id} = useFiber();
   const inspect = useInspectable();
+  const hovered = useInspectHoverable();
 
   const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
@@ -89,7 +90,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
 
         return {
           size,
-          render: makeBoxLayout(sizes, offsets, renders),
+          render: hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
 

@@ -5,8 +5,8 @@ import { ShaderModule } from '@use-gpu/shader/types';
 
 import { memo, gather, yeet, useFiber, useOne } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
-import { makeInlineLayout, makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
-import { useInspectable } from '../../hooks/useInspectable'
+import { makeInlineLayout, makeInlineInspectLayout, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 import { useProp } from '../../traits/useProp';
 import { BoxTrait } from '../types';
 import { useBoxTrait } from '../traits';
@@ -40,6 +40,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
 
   const {id} = useFiber();
   const inspect = useInspectable();
+  const hovered = useInspectHoverable();
 
   const Resume = (els: InlineElement[]) => {
     const inlineEls = resolveInlineBlockElements(els, direction);
@@ -92,9 +93,16 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
             clip?: ShaderModule,
             transform?: ShaderModule,
           ) => {
-            const out = makeInlineLayout(ranges, offsets, renders)(box, clip, transform);
-            if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
-            return out;
+            if (hovered) {
+              const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders)(box, clip, transform);
+              if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
+              return out;
+            }
+            else {
+              const out = makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform);
+              if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
+              return out;
+            }
           },
           pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),
         };

@@ -47,8 +47,8 @@ export const Node: React.FC<NodeProps> = ({
 
   const suffix1 = yeet ? ICONSMALL("switch_left") : null;
   const suffix2 = react ? <SVGAtom /> : null;
-  const suffix3 = __inspect?.setHovered ? ICONSMALL("view_in_ar") : null;
   const suffix4 = __inspect?.layout ? ICONSMALL("space_dashboard") : null;
+  const suffix3 = !suffix4 && __inspect?.setHovered ? ICONSMALL("view_in_ar") : null;
 
   const [version, pinged] = usePingContext(fiber);
 

@@ -122,7 +122,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 
   return (
     <SplitColumnFull>
-      <TreeWrapper className="tree-scroller">
+      <TreeWrapper>
         <FiberNode
           fiber={fiber}
           fibers={fibers}
@@ -202,7 +202,6 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   useLayoutEffect(() => {
     const {current: row} = rowRef;
-    debugger;
     if (selected && row) {
       const rect = row.getBoundingClientRect();
 
@@ -211,9 +210,10 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         if (parent.classList.contains('tree-scroller')) break;
         parent = parent.parentElement;
       }
-      
+      console.log({row, parent})
       if (parent) {
         const container = parent.getBoundingClientRect();
+        console.log({container, rect})
         
         if (
           (rect.left < container.left || rect.right > container.right) ||
@@ -349,7 +349,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         initialValue={shouldStartOpen}
       >{
         (expand, onToggle) => (<>
-          <TreeRow indent={indent + +!!continuation}>
+          <TreeRow indent={indent + +!!continuation} ref={rowRef}>
             <TreeExpand expand={expand} onToggle={onToggle} openIcon={openIcon} closedIcon={closedIcon}>
               {nodeRender}
             </TreeExpand>

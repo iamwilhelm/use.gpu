@@ -199,6 +199,7 @@ export type DataTexture = {
   data: TypedArray,
   format: GPUTextureFormat,
   size: [number, number] | [number, number, number],
+  colorSpace?: ColorSpace,
 };
 
 // Shaders

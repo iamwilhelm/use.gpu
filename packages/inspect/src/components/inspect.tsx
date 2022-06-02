@@ -165,7 +165,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
         <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
           <SplitRow>
             <RowPanel style={{width: '34%'}}>
-              <PanelFull onClick={() => setSelected(null)}>
+              <PanelFull onClick={() => setSelected(null)} className="tree-scroller">
                 {tree}
               </PanelFull>
             </RowPanel>

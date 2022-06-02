@@ -71,7 +71,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
   var mode: i32;
   if (sdfConfig.x > 0.0) {
     // SDF glyph
-    if (uv4.x < 0.0) { mode = -2; }
+    if (uv4.z < 0.0) { mode = -2; }
     else { mode = -1; }
     uv4 = abs(uv4);
   }
@@ -101,20 +101,22 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
   var stepX = normalize(dx);
   var stepY = normalize(dy);
 
+  var sdfUV: vec2<f32>;
   var conservative: vec3<f32>;
-  if (mode == -1) {
+  if (mode == -1 || mode == -2) {
     // Rasterize glyphs normally (they are pre-padded)
     conservative = center;
+    sdfUV = uv1 * (uv4.zw - uv4.xy);
   }
   else {
     // Rasterize shapes conservatively
     conservative = vec3<f32>(center.xy + (stepX + stepY) * getViewResolution(), center.z);
     uv1 = uv1 + xy1 / vec2<f32>(length(dx), length(dy));
+    sdfUV = uv1 * box;
   }
 
   var uv = mix(uv4.xy, uv4.zw, uv1);
   let textureUV = uv;
-  let sdfUV = uv1 * box;
   
   return UIVertex(
     vec4<f32>(conservative, 1.0),

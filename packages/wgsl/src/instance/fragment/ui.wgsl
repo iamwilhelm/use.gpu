@@ -35,7 +35,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var bleed = border.y;
     
     var d = (texture.a - 0.75) * sdfRadius;
-    var s = (d + expand) / scale * sdfConfig.y + 0.5 + bleed;
+    var s = (d + expand / sdfConfig.y) / scale + 0.5 + bleed;
     sdf = SDF(s, s);
     
     if (texture.a == 0.0 && sdf.outer > 0.0) { sdf.outer = 0.5; }
@@ -116,7 +116,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   }
 
   if (!HAS_ALPHA_TO_COVERAGE) {
-    color = vec4<f32>((color.rgb + mark) * color.a * mask, color.a * mask);
+    color = vec4<f32>((color.rgb + mark) * color.a * mask, color.a * mask + mark);
   }
   else {
     color = vec4<f32>(color.rgb + mark, color.a * mask);

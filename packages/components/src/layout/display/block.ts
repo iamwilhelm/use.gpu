@@ -4,8 +4,8 @@ import { LayoutElement, AutoPoint, Dimension, Direction, MarginLike, Margin } fr
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { isHorizontal, makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
-import { useInspectable } from '../../hooks/useInspectable';
+import { isHorizontal, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
@@ -43,12 +43,13 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       ? Math.abs(padding[0]) + Math.abs(padding[2])
       : Math.abs(padding[1]) + Math.abs(padding[3]));
 
+  const {id} = useFiber();
   const background = (stroke || fill || image) ? (
-    use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
+    use(Element, {id, radius, border, stroke, fill, image, absolute: true, under: true})
   ) : null;
 
-  const {id} = useFiber();
   const inspect = useInspectable();
+  const hovered = useInspectHoverable();
 
   const Resume = (els: LayoutElement[]) => {
     const w = width != null && width === +width ? width : null;
@@ -93,7 +94,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
 
         return {
           size,
-          render: makeBoxLayout(sizes, offsets, renders),
+          render: hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
       })

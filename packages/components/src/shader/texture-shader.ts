@@ -2,9 +2,8 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, UniformAttributeValue } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { yeet, useFiber, useOne, useMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
-import { makeShaderBinding } from '@use-gpu/core';
-import { bindingToModule, chainTo } from '@use-gpu/shader/wgsl';
+import { yeet, useMemo } from '@use-gpu/live';
+import { useColorTexture } from '../hooks/useColorTexture';
 
 import { RenderContext } from '../providers/render-provider';
 
@@ -18,28 +17,12 @@ export type TextureShaderProps = {
 const TEXTURE_BINDING = { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [0, 0, 0, 0] } as UniformAttributeValue;
 
 export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
-  const { colorSpace } = useContext(RenderContext);
-
   const {
     texture,
     render,
   } = props;
   
-  const key = useFiber().id;
-  
-  const getTexture = useOne(() => {
-    const textureBinding = makeShaderBinding<ShaderModule>(TEXTURE_BINDING, texture);
-    let getTexture = bindingToModule(textureBinding);
-
-    if (texture) {
-      const {colorSpace: colorInput} = texture;
-      if (colorInput && colorInput !== colorSpace) {
-        getTexture = chainTo(getTexture, toGamma4);
-      }
-    }
-
-    return getTexture;
-  }, texture);
+  const getTexture = useColorTexture(texture);
 
   return useMemo(() => render ? render(getTexture) : yeet(getTexture), [render, getTexture]);
 };

@@ -92,9 +92,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
               const cx = snap ? Math.round(sx) : sx;
               const cy = snap ? Math.round(y) : y;
 
-              const left = (s * gl) + cx;
-              const top = (s * gt) + cy;
-              const right = (s * gr) + cx;
+              const left   = (s * gl) + cx;
+              const top    = (s * gt) + cy;
+              const right  = (s * gr) + cx;
               const bottom = (s * gb) + cy;
 
               rectangles.push(left, top, right, bottom);
@@ -109,8 +109,8 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
             }
           }
 
-          sx += lr * s;
-          x += lr * s;
+          sx += lr * scale;
+          x += lr * scale;
         }, breaks[index - 1] || 0, breaks[index]);
 
         if (trim) {

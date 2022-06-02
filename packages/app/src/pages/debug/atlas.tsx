@@ -2,7 +2,7 @@ import { LC } from '@use-gpu/live/types';
 import React, { Gather, Yeet } from '@use-gpu/live/jsx';
 
 import {
-  Draw, Pass, PanControls,
+  LinearRGB, Pass, PanControls,
   Flat, UI, Layout, Absolute, Inline, Text,
   DebugAtlas, RawTexture, DebugProvider,
 } from '@use-gpu/components';
@@ -12,7 +12,7 @@ import { GlyphControls } from '../../ui/glyph-controls';
 export const DebugAtlasPage: LC = () => {
 
   const view = (
-    <Draw>
+    <LinearRGB>
       <Pass>
         <UI>
           <Gather>
@@ -48,7 +48,7 @@ export const DebugAtlasPage: LC = () => {
           </Gather>
         </UI>
       </Pass>
-    </Draw>
+    </LinearRGB>
   );
   
   const root = document.querySelector('#use-gpu');

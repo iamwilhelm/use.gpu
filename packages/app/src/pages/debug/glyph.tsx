@@ -95,18 +95,21 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   const rgbaTexture = {
     data: rgbaData,
     format: "rgba8unorm" as GPUTextureFormat,
+    colorSpace: 'srgb',
     size: padded,
   };
 
   const sdfTexture = {
     data: sdfData,
     format: "rgba8unorm" as GPUTextureFormat,
+    colorSpace: 'srgb',
     size: padded,
   };
 
   const gradientTexture = {
     data: gradientData,
     format: "rgba8unorm" as GPUTextureFormat,
+    colorSpace: 'srgb',
     size: padded,
   };
 
@@ -189,6 +192,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
     image ? <TextureFrame texture={{
       data: image.data,
       format: "rgba8unorm",
+      colorSpace: 'srgb',
       size: [image.width, image.height],
     }}>
 
@@ -230,7 +234,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   
   return (
     <DebugProvider debug={{sdf2d: {subpixel, contours, preprocess, postprocess}}}>
-      <Draw>
+      <LinearRGB>
         <Pass>
           <UI>
             <Layout>
@@ -409,7 +413,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
             </Layout>
           </UI>
         </Pass>
-      </Draw>
+      </LinearRGB>
     </DebugProvider>
   );
 }, 'View');

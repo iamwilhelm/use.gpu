@@ -304,9 +304,11 @@ export const emitGlyphSpans = (
   spans.iterate((_a, trim, hard, index) => {
     glyphs.iterate((fontIndex: number, id: number, isWhiteSpace: number, kerning: number) => {
       const {glyph, mapping} = getGlyph(font[fontIndex], id, size);
-      const {image, layoutBounds, outlineBounds} = glyph;
+      const {image, layoutBounds, outlineBounds, rgba, scale: glyphScale} = glyph;
       const [ll, lt, lr, lb] = layoutBounds;
 
+      const r = rgba ? -1 : 1;
+      const s = scale * glyphScale;
       const k = kerning / 65536.0 * scale;
       x += k;
       sx += k;
@@ -319,15 +321,15 @@ export const emitGlyphSpans = (
           const cy = snap ? Math.round(y) : y;
 
           emit(
-            (scale * gl) + cx,
-            (scale * gt) + cy,
-            (scale * gr) + cx,
-            (scale * gb) + cy,
+            (s * gl) + cx,
+            (s * gt) + cy,
+            (s * gr) + cx,
+            (s * gb) + cy,
 
-            mapping[0],
-            mapping[1],
-            mapping[2],
-            mapping[3],
+            r * mapping[0],
+            r * mapping[1],
+            r * mapping[2],
+            r * mapping[3],
           
             currentIndex,
           );

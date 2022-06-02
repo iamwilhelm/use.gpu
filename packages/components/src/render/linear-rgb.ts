@@ -6,7 +6,6 @@ import { use, useOne } from '@use-gpu/live';
 import { Draw } from './draw';
 import { Pass } from './pass';
 import { RenderToTexture, RenderToTextureProps } from './render-to-texture';
-import { TextureShader } from '../shader';
 import { RawFullScreen } from '../primitives';
 
 type LinearRGBProps = Omit<RenderToTextureProps, "format" | "colorSpace">;
@@ -23,12 +22,8 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
             use(Pass, {
               picking: false,
               children:
-                use(TextureShader, {
+                use(RawFullScreen, {
                   texture,
-                  render: (texture: ShaderModule) => 
-                    use(RawFullScreen, {
-                      texture,
-                    }),
                 }),
             }),
         }),

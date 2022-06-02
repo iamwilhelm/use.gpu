@@ -5,7 +5,7 @@ import { memo, use, useContext, useNoContext, useMemo, useNoMemo, useOne, useSta
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
-import { useInspectHover } from '../hooks/useInspectable';
+import { useInspectHoverable } from '../hooks/useInspectable';
 
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
 import instanceDrawVirtualPick from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
@@ -100,7 +100,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     id = 0,
   } = props;
 
-  const hovered = useInspectHover();
+  const hovered = useInspectHoverable();
 
   const isDebug = mode === RenderPassMode.Debug || hovered;
   const isPicking = mode === RenderPassMode.Picking;

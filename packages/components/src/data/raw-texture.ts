@@ -28,7 +28,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
   const source = useMemo(() => {
     if (!data) return null;
 
-    const {size, format} = data;
+    const {size, format, colorSpace} = data;
     const texture = makeRawTexture(device, data);
     const source = {
       texture,
@@ -40,6 +40,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
       layout: 'texture_2d<f32>',
       format,
       size,
+      colorSpace,
       version: 0,
     };
     return source;

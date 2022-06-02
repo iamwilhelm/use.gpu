@@ -3,8 +3,8 @@ import { AutoPoint, Dimension, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
-import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
-import { useInspectable } from '../../hooks/useInspectable';
+import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 
 import { ElementTrait } from '../types';
 import { useElementTrait } from '../traits';
@@ -43,6 +43,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
 
   const {id} = useFiber();
   const inspect = useInspectable();
+  const hovered = useInspectHoverable();
 
   const Resume = (els: LayoutElement[]) => {
     return yeet({
@@ -64,7 +65,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
     
         return {
           size,
-          render: makeBoxLayout(sizes, offsets, renders),
+          render: hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
       }),

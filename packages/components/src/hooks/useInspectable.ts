@@ -14,7 +14,7 @@ export const useInspectable = () => {
   return inspect;
 }
 
-export const useInspectHover = () => {
+export const useInspectHoverable = () => {
   const fiber = useFiber();
   const inspect = fiber.__inspect = fiber.__inspect || {};
 
@@ -27,9 +27,8 @@ export const useInspectHover = () => {
 }
 
 const NOP = () => {};
-export const useInspectClick = () => {
+export const useInspectorSelect = () => {
   const fiber = useFiber();
   const highlight = fiber.host?.__highlight ?? NOP;
   return highlight;
 }
-

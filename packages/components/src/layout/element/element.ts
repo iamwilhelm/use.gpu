@@ -5,13 +5,16 @@ import { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint } f
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';
+import { useInspectHoverable } from '../../hooks/useInspectable';
 
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
+import { INSPECT_STYLE } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 
 export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & {
+  id?: number,
   snap?: boolean,
   absolute?: boolean,
   under?: boolean,
@@ -36,8 +39,11 @@ export const Element: LiveComponent<ElementProps> = (props) => {
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;
 
-  const {id} = useFiber();
+  const {id: fiberId} = useFiber();
+  const id = props.id ?? fiberId;
   const sizing = [w, h, w, h];
+
+  const hovered = useInspectHoverable();
 
   return yeet({
     sizing,
@@ -52,14 +58,14 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
       const size = [w ?? 0, h ?? 0];
 
-      const render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
+      let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
         keyed(UIRectangle, id, {
           id,
           layout,
 
-          stroke: stroke ?? TRANSPARENT,
-          fill: fill ?? TRANSPARENT,
-          border,
+          stroke: hovered ? INSPECT_STYLE.parent.stroke : stroke ?? TRANSPARENT,
+          fill:   hovered ? INSPECT_STYLE.parent.fill : fill ?? TRANSPARENT,
+          border: hovered ? INSPECT_STYLE.parent.border : border,
           radius,
 
           image,
@@ -67,6 +73,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           transform,
         })
       );
+
       return {
         size,
         render,

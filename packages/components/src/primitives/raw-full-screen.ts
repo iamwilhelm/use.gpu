@@ -16,6 +16,7 @@ import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader
 import { makeShaderBindings } from '@use-gpu/core';
 
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useColorTexture } from '../hooks/useColorTexture';
 
 import { getFullScreenVertex } from '@use-gpu/wgsl/instance/vertex/full-screen.wgsl';
 import { getTextureFragment } from '@use-gpu/wgsl/mask/textured.wgsl';
@@ -54,7 +55,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
-  const t = props.texture;
+  const t = useColorTexture(props.texture);
 
   const getVertex = getFullScreenVertex;
   const getFragment = useBoundShader(getTextureFragment, FRAGMENT_BINDINGS, [t]);

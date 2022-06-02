@@ -30,9 +30,10 @@ export const makeAtlasSource = (
     layout: 'texture_2d<f32>',
     absolute: true,
     format,
-    size: [atlas.width, atlas.height] as [number, number],
+    colorSpace: 'srgb',
+    size: [atlas.width, atlas.height],
     version: 1,
-  };
+  } as TextureSource;
   return source;
 }
 

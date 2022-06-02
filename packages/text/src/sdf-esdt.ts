@@ -5,6 +5,7 @@ import { Image } from './types';
 // Convert grayscale glyph to SDF using subpixel distance transform
 export const glyphToESDT = (
   data: Uint8Array,
+  color: Uint8Array | null,
   w: number,
   h: number,
   pad: number = 4,
@@ -18,7 +19,6 @@ export const glyphToESDT = (
   const np = wp * hp;
   const sp = Math.max(wp, hp);
 
-  const out = new Uint8Array(np);
   const getData = (x: number, y: number) => (data[y * w + x] ?? 0) / 255;
 
   const stage = getSDFStage(sp);
@@ -50,33 +50,28 @@ export const glyphToESDT = (
     if (relax) relaxSubpixelOffsets(stage, data, w, h, pad);
   }
 
-
-  resolveSDF(xo, yo, xi, yi, (d: number, i: number) => {
-    out[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
-  });
-  
-  paintIntoDistanceField(out, data, w, h, pad, radius, cutoff);
-
-  return glyphToRGBA(out, wp, hp);
-};
-
-// Resolve outer and inner X/Y offsets into signed distance
-export const resolveSDF = (
-  xo: Float32Array,
-  yo: Float32Array,
-  xi: Float32Array,
-  yi: Float32Array,
-  f: (i: number, d: number) => void,
-) => {
-  const np = xo.length;
+  const alpha = new Uint8Array(np);
   for (let i = 0; i < np; ++i) {
     const outer = Math.max(0, Math.sqrt(sqr(xo[i]) + sqr(yo[i])) - 0.5);
     const inner = Math.max(0, Math.sqrt(sqr(xi[i]) + sqr(yi[i])) - 0.5);
-    f(outer >= inner ? outer : -inner, i);
+    const d = outer >= inner ? outer : -inner;
+    alpha[i] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
   }
-}
 
-// Paint glyph data into stage
+  paintIntoDistanceField(alpha, data, w, h, pad, radius, cutoff, !color);
+
+  if (color) {
+    const out = new Uint8Array(np * 4);
+    paintIntoRGB(out, color, xo, yo, w, h, pad);
+    paintIntoAlpha(out, alpha, 0, 0, wp, hp, 0);
+    return {data: out, width: wp, height: hp};
+  }
+  else {
+    return glyphToRGBA(alpha, wp, hp);
+  }
+};
+
+// Paint alpha channel into SDF stage
 export const paintIntoStage = (
   stage: SDFStage,
   data: Uint8Array | number[],
@@ -116,7 +111,7 @@ export const paintIntoStage = (
   }
 }
 
-// Paint glyph data into sdf
+// Paint original alpha channel into final SDF when gray
 export const paintIntoDistanceField = (
   image: Uint8Array,
   data: Uint8Array | number[],
@@ -125,6 +120,7 @@ export const paintIntoDistanceField = (
   pad: number,
   radius: number,
   cutoff: number,
+  rgba: boolean,
 ) => {
   const wp = w + pad * 2;
   const hp = h + pad * 2;
@@ -136,7 +132,7 @@ export const paintIntoDistanceField = (
     for (let x = 0; x < w; x++) {
       const a = getData(x, y);
       if (!isSolid(a)) {
-        const j = x + pad + (y + pad) * wp;
+        const j = (x + pad + (y + pad) * wp);
         const d = 0.5 - a;
         image[j] = Math.max(0, Math.min(255, Math.round(255 - 255 * (d / radius + cutoff))));
       }
@@ -144,6 +140,7 @@ export const paintIntoDistanceField = (
   }
 }
 
+// Generate subpixel offsets for all border pixels
 export const paintSubpixelOffsets = (
   stage: SDFStage,
   data: Uint8Array | number[],
@@ -508,6 +505,88 @@ const makeSDFToDebugView = (
   return rgba;
 }
 
+// Paint original color data into final RGBA
+export const paintIntoRGB = (
+  image: Uint8Array,
+  color: Uint8Array | number[],
+  xs: Float32Array,
+  ys: Float32Array,
+  w: number,
+  h: number,
+  pad: number,
+) => {
+  const wp = w + pad * 2;
+  const hp = h + pad * 2;
+  const np = wp * hp;
+
+  {
+    let i = 0;
+    let o = (pad + pad * wp) * 4;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (color[i + 3]) {
+          image[o]     = color[i];
+          image[o + 1] = color[i + 1];
+          image[o + 2] = color[i + 2];
+          image[o + 3] = color[i + 3];
+        }
+        i += 4;
+        o += 4;
+      }
+      o += pad * 8;
+    }
+  }
+
+  {
+    let i = 0, j = 0;
+    for (let y = 0; y < hp; y++) {
+      for (let x = 0; x < wp; x++) {
+        if (image[i + 3] === 0) {
+          const dx = xs[j];
+          const dy = ys[j];
+          const ox = Math.round(x + dx);
+          const oy = Math.round(y + dy);
+
+          const k = (ox + oy * wp) * 4;
+          image[i]     = image[k];
+          image[i + 1] = image[k + 1];
+          image[i + 2] = image[k + 2];        
+          image[i + 3] = 1;
+        }
+        i += 4;
+        j++;
+      }
+    }
+  }
+}
+
+// Paint sdf alpha data into final RGBA
+export const paintIntoAlpha = (
+  image: Uint8Array,
+  alpha: Uint8Array | number[],
+  xs: Float32Array,
+  ys: Float32Array,
+  w: number,
+  h: number,
+  pad: number,
+) => {
+  const wp = w + pad * 2;
+  const hp = h + pad * 2;
+  const np = wp * hp;
+
+  let i = 0;
+  let o = (pad + pad * wp) * 4;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      image[o + 3] = alpha[i];
+      i++;
+      o += 4;
+    }
+    o += pad * 8;
+  }
+}
+
+
 // 2D subpixel distance transform by unconed
 // extended from Felzenszwalb & Huttenlocher https://cs.brown.edu/~pff/papers/dt-final.pdf
 export const esdt = (
@@ -557,7 +636,7 @@ export const esdt1d = (
     const dy = ys[o];    
     const fq = f[q] = mask[o] ? INF : dy * dy;
 
-    const qs = q + xs[o];
+    const qs = q + dx;
     const q2 = qs * qs;
     b[q] = qs;
     t[q] = dy;

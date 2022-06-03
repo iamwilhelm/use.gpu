@@ -92,7 +92,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
     const depthTexture = makeDepthTexture(device, width, height, depthStencilFormat);
 
     const colorAttachments = [makeColorAttachment(pickingTexture, null, pickingColor)];
-    const depthStencilAttachment = makeDepthStencilAttachment(depthTexture);
+    const depthStencilAttachment = makeDepthStencilAttachment(depthTexture, depthStencilFormat);
 
     let updated = false;
     let waiting = false;

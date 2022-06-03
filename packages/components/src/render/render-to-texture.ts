@@ -120,7 +120,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
       if (!depthStencil) return [];
 
       const texture = makeDepthTexture(device, width, height, depthStencil, samples);
-      const attachment = makeDepthStencilAttachment(texture);
+      const attachment = makeDepthStencilAttachment(texture, depthStencil);
       return [texture, attachment];
     },
     [device, width, height, depthStencil, samples]

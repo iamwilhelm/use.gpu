@@ -7,7 +7,7 @@ import React from '@use-gpu/live/jsx';
 
 import {
   Loop, Draw, Pass, Flat,
-  ArrayData, Data, RawData, Raw,
+  ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor, Line, Surface,
   Animation,
@@ -22,11 +22,6 @@ export const PlotSimplePage: LC = () => {
   const view = (
     <Loop>
       <Draw>
-        {
-          use(Raw, () => {
-            t = t + 1/60;
-          })
-        }
         <Cursor cursor="move" />
         <Pass>
           <Plot>
@@ -120,15 +115,17 @@ export const PlotSimplePage: LC = () => {
                     color={[0.1, 0.3, 1, 1]}
                   />
                   <Line
-                    width={5}
+                    width={2}
                     color={[0.5, 0.5, 1, 0.5]}
                     depth={0.5}
+                    zBias={1}
                   />
                   <Transpose axes='yx'>
                     <Line
-                      width={5}
+                      width={2}
                       color={[0.5, 0.5, 1, 0.5]}
                       depth={0.5}
+                      zBias={1}
                     />
                   </Transpose>
                 </Sampled>

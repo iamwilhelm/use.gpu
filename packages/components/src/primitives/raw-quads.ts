@@ -26,6 +26,7 @@ export type RawQuadsProps = {
   rectangle?: number[] | TypedArray,
   color?: number[] | TypedArray,
   depth?: number,
+  zBias?: number,
   mask?: number,
   uv?: number[] | TypedArray,
 
@@ -33,6 +34,7 @@ export type RawQuadsProps = {
   rectangles?: ShaderSource,
   colors?: ShaderSource,
   depths?: ShaderSource,
+  zBiases?: ShaderSource,
   masks?: ShaderSource,
   uvs?: ShaderSource,
 
@@ -110,6 +112,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const r = useShaderRef(props.rectangle, props.rectangles);
   const c = useShaderRef(props.color, props.colors);
   const d = useShaderRef(props.depth, props.depths);
+  const z = useShaderRef(props.zBias, props.zBiases);
   const u = useShaderRef(props.uv, props.uvs);
 
   const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask) : null;
@@ -117,7 +120,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   
   const xf = useApplyTransform(p);
   
-  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, r, c, d, u]);
+  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, r, c, d, z, u]);
   const getFragment = useBoundShader(getMaskedFragment, FRAGMENT_BINDINGS, [m, t]);
 
   return use(Virtual, {

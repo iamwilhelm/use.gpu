@@ -88,7 +88,6 @@ export const makeBindingAccessors = (
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       if (sampler) volatile ? volatileBase++ : bindingBase++;
-      console.log({texture})
       program.push(makeTextureAccessor(namespace, set, base, format, name, layout, variant, absolute, !!sampler));
     }
 

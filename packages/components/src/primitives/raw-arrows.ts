@@ -84,7 +84,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const a = useShaderRef(props.anchor, props.anchors);
   const p = useShaderRef(props.position, props.positions);
   const c = useShaderRef(props.color, props.colors);
-  const z = useShaderRef(props.size, props.sizes);
+  const e = useShaderRef(props.size, props.sizes);
   const w = useShaderRef(props.width, props.widths);
   const d = useShaderRef(props.depth, props.depths);
 
@@ -93,7 +93,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const g = useRawSource(mesh.vertices[0], 'vec4<f32>');
   const xf = useApplyTransform(p);
 
-  const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, c, z, w, d, l]);
+  const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, c, e, w, d, l]);
   const getFragment = getPassThruFragment;
 
   return (

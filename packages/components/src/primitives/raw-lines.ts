@@ -27,6 +27,7 @@ export type RawLinesProps = {
   color?: number[] | TypedArray,
   width?: number,
   depth?: number,
+  zBias?: number,
   trim?: number[] | TypedArray,
   size?: number,
 
@@ -35,6 +36,7 @@ export type RawLinesProps = {
   colors?: ShaderSource,
   widths?: ShaderSource,
   depths?: ShaderSource,
+  zBiases?: ShaderSource,
   trims?: ShaderSource,
   sizes?: ShaderSource,
 
@@ -103,14 +105,15 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const c = useShaderRef(props.color, props.colors);
   const w = useShaderRef(props.width, props.widths);
   const d = useShaderRef(props.depth, props.depths);
+  const z = useShaderRef(props.zBias, props.zBiases);
   const t = useShaderRef(props.trim, props.trims);
-  const z = useShaderRef(props.size, props.sizes);
+  const e = useShaderRef(props.size, props.sizes);
   
   const l = useShaderRef(null, props.lookups);
 
   const xf = useApplyTransform(p);
 
-  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, g, c, w, d, t, z, l]);
+  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, g, c, w, d, z, t, e, l]);
   const getFragment = getPassThruFragment;
   
   return use(Virtual, {

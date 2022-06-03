@@ -79,7 +79,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps
     depthStencilAttachment,
   ] = useMemo(() => {
       const texture = makeDepthTexture(device, width, height, depthStencil, samples);
-      const attachment = makeDepthStencilAttachment(texture);
+      const attachment = makeDepthStencilAttachment(texture, depthStencil);
       return [texture, attachment];
     },
     [device, width, height, depthStencil, samples]

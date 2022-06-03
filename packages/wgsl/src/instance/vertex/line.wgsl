@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToView, viewToClip, toClip3D, clipLineIntoView, getPerspectiveScale };
+use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToView, viewToClip, toClip3D, clipLineIntoView, getPerspectiveScale, applyZBias3 };
 use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
@@ -9,6 +9,7 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
 @optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
+@optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
   
 @optional @link fn getTrim(i: u32) -> vec4<u32> { return vec4<u32>(0u, 0u, 0u, 0u); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
@@ -97,6 +98,7 @@ fn trimAnchor(
   var color = getColor(cornerIndex);
   var width = getWidth(cornerIndex);
   var depth = getDepth(cornerIndex);
+  var zBias = getZBias(cornerIndex);
 
   var centerPos = getPosition(cornerIndex);
   var beforePos = centerPos;
@@ -178,6 +180,10 @@ fn trimAnchor(
 
   var arc = f32(joinIndex) / f32(LINE_JOIN_SIZE);
   var lineJoin = getLineJoin(before, center, after, arc, xy.y, width, segment, LINE_JOIN_STYLE);
+
+  if (zBias != 0.0) {
+    lineJoin = applyZBias3(lineJoin, width * zBias, center4.w);
+  }
 
   return SolidVertex(
     vec4<f32>(lineJoin, 1.0),

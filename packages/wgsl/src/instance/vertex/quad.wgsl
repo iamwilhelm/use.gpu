@@ -1,11 +1,12 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveScale, getViewScale }; 
+use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveScale, getViewScale, applyZBias }; 
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getDepth(i: u32) -> f32 { return 0; };
+@optional @link fn getZBias(i: u32) -> f32 { return 0; };
 @optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
 
 @export fn getQuadVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
@@ -14,6 +15,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   var color = getColor(instanceIndex);
   var depth = getDepth(instanceIndex);
   var uv4 = getUV(instanceIndex);
+  var zBias = getZBias(instanceIndex);
 
   var center = worldToClip(position);
 
@@ -41,7 +43,14 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   }
 
   // Attach to position
-  center = vec4<f32>(center.xy + 2.0 * xy * getViewResolution() * center.w, center.zw);
+  var vr = getViewResolution();
+  var offset = xy * vr;
+  center = vec4<f32>(center.xy + 2.0 * offset * center.w, center.zw);
+
+  if (zBias != 0.0) {
+    var size = max(xy.x, xy.y) * vr.y;
+    center = applyZBias(center, size * zBias);
+  }
 
   return SolidVertex(
     center,

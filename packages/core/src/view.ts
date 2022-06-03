@@ -83,10 +83,10 @@ export const makeProjectionMatrix = (
     matrix = mat4.create();
     mat4.perspective(matrix, fov, aspect, near, far);
 
-    // Move Z from -1..1 to 0..1 in clip space
+    // Move Z from -1..1 to 1..0 in clip space (reversed Z)
     const z = mat4.create();
     mat4.translate(z, z, vec3.fromValues(0, 0, 0.5));
-    mat4.scale(z, z, vec3.fromValues(1, 1, 0.5));
+    mat4.scale(z, z, vec3.fromValues(1, 1, -0.5));
     mat4.multiply(matrix, z, matrix);
   }
   else if (dolly > 0) {
@@ -99,16 +99,16 @@ export const makeProjectionMatrix = (
     matrix = mat4.create();
     mat4.perspective(matrix, dFov, aspect, dNear, dFar);
 
-    // Move Z from -1..1 to 0..1 in clip space
+    // Move Z from -1..1 to 1..0 in clip space (reversed Z)
     const z = mat4.create();
     mat4.translate(z, z, vec3.fromValues(0, 0, 0.5));
-    mat4.scale(z, z, vec3.fromValues(1, 1, 0.5));
+    mat4.scale(z, z, vec3.fromValues(1, 1, -0.5));
     mat4.multiply(matrix, z, matrix);
   }
   else {
     // Orthogonal matrix
     const s = radius * Math.tan(fov / 2);
-    matrix = makeOrthogonalMatrix(-aspect * s, aspect * s, -s, s, near, far);
+    matrix = makeOrthogonalMatrix(-aspect * s, aspect * s, -s, s, far, near);
   }
 
   return matrix;

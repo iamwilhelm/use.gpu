@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D };
+use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, applyZBias };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 
 @optional @link fn getVertex(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
@@ -70,8 +70,8 @@ let ARROW_ASPECT: f32 = 2.5;
 
   let orientedPos = m * vec4<f32>(vec3<f32>(meshPosition.x, meshPosition.yz * arrowRadius) * arrowSize, 1.0);
   let finalPos = vec4<f32>(orientedPos.xyz + startPos.xyz, 1.0);
-  let position = worldToClip(finalPos);
-
+  var position = worldToClip(finalPos);
+  
   return SolidVertex(
     position,
     color,

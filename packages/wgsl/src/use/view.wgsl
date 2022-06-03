@@ -49,13 +49,13 @@ struct ViewUniforms {
 }
 
 @export fn clipLineIntoView(anchor: vec4<f32>, head: vec4<f32>) -> vec4<f32> {
-  var near = viewUniforms.viewNearFar.x * 2.0;
+  let near = viewUniforms.viewNearFar.x * 2.0;
 
-  var d = anchor - head;
+  let d = anchor - head;
   if (dot(d, d) == 0.0) { return worldToView(anchor); }
 
-  var a = worldToView(anchor);
-  var b = worldToView(head);
+  let a = worldToView(anchor);
+  let b = worldToView(head);
 
   if (-a.z < near) {
     if (abs(b.z - a.z) > 0.001) {
@@ -68,19 +68,35 @@ struct ViewUniforms {
 }
 
 @export fn getViewScale() -> f32 {
-  var m = viewUniforms.projectionMatrix;
+  let m = viewUniforms.projectionMatrix;
   return 2.0 / length(m[1]);
 }
 
 @export fn getWorldScale(w: f32, f: f32) -> f32 {
-  var v = viewUniforms.viewResolution;
+  let v = viewUniforms.viewResolution;
   return getPerspectiveScale(w, f) * v.y * w;
 }
 
 @export fn getPerspectiveScale(w: f32, f: f32) -> f32 {
-  var m = viewUniforms.projectionMatrix;
-  var worldScale = length(m[1]) * viewUniforms.viewWorldDepth;
-  var clipScale = mix(1.0, worldScale / w, f);
-  var pixelScale = clipScale * viewUniforms.viewPixelRatio;
+  let m = viewUniforms.projectionMatrix;
+  let worldScale = length(m[1]) * viewUniforms.viewWorldDepth;
+  let clipScale = mix(1.0, worldScale / w, f);
+  let pixelScale = clipScale * viewUniforms.viewPixelRatio;
   return pixelScale;
 }
+
+@export fn applyZBias3(position: vec3<f32>, zBias: f32, w: f32) -> vec3<f32> {
+  let m = viewUniforms.projectionMatrix;
+  let v = viewUniforms.viewResolution;
+  // reversed z!
+  let z = m[3].z / (-w + w * zBias * v.y) + m[2].z;
+  return vec3<f32>(position.xy, -z);
+}
+
+@export fn applyZBias(position: vec4<f32>, zBias: f32) -> vec3<f32> {
+  let w = position.w;
+  // reversed z!
+  let z = m[3].z / (-w + w * zBias * v.y) + m[2].z;
+  return vec4<f32>(position.xy, -z * w, w);
+}
+

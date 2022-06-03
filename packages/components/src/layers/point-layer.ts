@@ -31,11 +31,13 @@ export type PointLayerProps = {
   size?: number,
   color?: number[] | TypedArray,
   depth?: number,
+  zBias?: number,
 
   positions?: ShaderSource,
   sizes?: ShaderSource,
   colors?: ShaderSource,
   depths?: ShaderSource,
+  zBiases?: ShaderSource,
 
   shape?: PointShape,
 
@@ -56,6 +58,8 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     sizes,
     depth,
     depths,
+    zBias,
+    zBiases,
 
     count,
     shape = 'circle',
@@ -82,6 +86,8 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     colors,
     depth,
     depths,
+    zBias,
+    zBiases,
 
     rectangles,
     masks,

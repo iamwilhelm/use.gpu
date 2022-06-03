@@ -4,18 +4,20 @@ import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
-  makeRenderPipeline, makeShaderModule, makeSampler, makeTextureBinding,
+  makeRenderPipeline, makeShaderModule, makeShaderBinding, makeSampler, makeTextureBinding,
   getColorSpace,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
-import { linkBundle } from '@use-gpu/shader/wgsl';
+import { linkBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { useInspectable } from '@use-gpu/components';
 
 import instanceDrawMesh from '@use-gpu/wgsl/render/vertex/mesh.wgsl';
 import instanceDrawMeshPick from '@use-gpu/wgsl/render/vertex/mesh-pick.wgsl';
 
 import instanceFragmentMesh from '@use-gpu/wgsl/render/fragment/mesh.wgsl';
-import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick-geometry.wgsl';
+import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick.wgsl';
+
+const ID_BINDING = bundleToAttribute(instanceDrawMeshPick, 'getId');
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
@@ -54,7 +56,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
-  const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
+  const {renderContext} = usePickingContext(id, isPicking);
   const {colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
 
   const vertexBuffers = useMemo(() =>
@@ -72,9 +74,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     '@binding(VIEW)': '@binding(0)',
     '@group(LIGHT)': '@group(0)',
     '@binding(LIGHT)': '@binding(1)',
-    '@group(PICKING)': '@group(0)',
-    '@binding(PICKING)': '@binding(1)',
     'COLOR_SPACE': cs,
+    'PICKING_ID': id,
   };
 
   // Render shader
@@ -114,7 +115,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   // Uniforms
   const [uniform, sampled] = useMemo(() => {
     const meshDefs = MESH_UNIFORM_DEFS;
-    const defs = isPicking ? [viewDefs, pickingDefs] : [viewDefs, meshDefs];
+    const defs = isPicking ? [viewDefs] : [viewDefs, meshDefs];
     const uniform = makeMultiUniforms(device, pipeline, defs, 0);
 
     let sampled;
@@ -124,7 +125,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     }
 
     return [uniform, sampled];
-  }, [device, viewDefs, pickingDefs, isPicking, pipeline]);
+  }, [device, viewDefs, isPicking, pipeline]);
 
   // Return a lambda back to parent(s)
   return yeet({
@@ -133,7 +134,6 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
       uniform.pipe.fill(viewUniforms);
       uniform.pipe.fill({ lightPosition: LIGHT, lightColor: [l, l, l, 1] });
-      if (isPicking) uniform.pipe.fill(pickingUniforms);
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
       passEncoder.setPipeline(pipeline);

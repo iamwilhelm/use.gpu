@@ -177,7 +177,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
       let {raw, fn} = makeDataAccessor(f, accessor);
 
-      const {array, dims} = makeDataArray(f, count);
+      const {array, dims} = makeDataArray(f, l);
       if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
       const buffer = makeStorageBuffer(device, array.byteLength);

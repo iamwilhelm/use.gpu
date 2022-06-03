@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { RenderPassMode, DeepPartial, Prop } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
-import { memo, use, fragment, useContext, useNoContext, useMemo, useNoMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
+import { memo, use, useContext, useNoContext, useMemo, useNoMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
@@ -101,19 +101,10 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     id = 0,
   } = props;
 
-  if (id && mode !== RenderPassMode.Picking) {
-    return fragment([
-      use(Virtual, {...props, id: 0}),
-      use(Virtual, {...props, mode: RenderPassMode.Picking}),
-    ]);
-  }
-
-  let m = mode;
   const hovered = useInspectHoverable();
-  if (hovered) m = RenderPassMode.Debug;
 
-  const isDebug = m === RenderPassMode.Debug;
-  const isPicking = m === RenderPassMode.Picking;
+  const isDebug = mode === RenderPassMode.Debug || hovered;
+  const isPicking = mode === RenderPassMode.Picking;
 
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
 
@@ -174,9 +165,9 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
   // Binds links into shader
   const [v, f] = useMemo(() => {
     const links = {
-      getId,
       getVertex,
       getFragment: isDebug ? null : getFragment,
+      getId,
       getInstanceSize: isDebug ? getInstanceSize : null,
     };
     const v = bindBundle(vertexShader, links, undefined);
@@ -194,7 +185,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     deps,
 
     pipeline,
-    mode: m,
+    mode,
     id,
   });
 }, "Virtual");

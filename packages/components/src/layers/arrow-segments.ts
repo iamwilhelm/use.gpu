@@ -11,7 +11,7 @@ type ArrowSegmentsProps = {
   starts?: boolean[],
   ends?: boolean[],
 
-  render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource) => LiveElement<any>,
+  render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource, lookups: StorageSource) => LiveElement<any>,
 };
 
 export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
@@ -20,9 +20,9 @@ export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
   const {chunks, loops, starts, ends, render} = props;
   if (!chunks) return null;
 
-  const {segments, anchors, trims} = useArrowSegments(chunks, loops, starts, ends);
+  const {segments, anchors, trims, lookups} = useArrowSegments(chunks, loops, starts, ends);
 
-  return render ? render(segments, anchors, trims) : yeet([segments, anchors, trims]);
+  return render ? render(segments, anchors, trims, lookups) : yeet([segments, anchors, trims, lookups]);
 }, 'ArrowSegments');
 
 export const useArrowSegments = (
@@ -34,21 +34,23 @@ export const useArrowSegments = (
   const count = getChunkCount(chunks, loops);
 
   // Make index data for line segments/anchor/trim data
-  const [segmentBuffer, anchorBuffer, trimBuffer] = useMemo(() => {
+  const [segmentBuffer, anchorBuffer, trimBuffer, lookupBuffer] = useMemo(() => {
     const segmentBuffer = new Int32Array(count);
     const anchorBuffer = new Uint32Array(count * 4);
     const trimBuffer = new Uint32Array(count * 4);
+    const lookupBuffer = new Uint32Array(count);
 
-    generateChunkSegments(segmentBuffer, chunks, loops, starts, ends);
+    generateChunkSegments(segmentBuffer, lookupBuffer, chunks, loops, starts, ends);
     generateChunkAnchors(anchorBuffer, trimBuffer, chunks, loops, starts, ends);
 
-    return [segmentBuffer, anchorBuffer, trimBuffer];
+    return [segmentBuffer, anchorBuffer, trimBuffer, lookupBuffer];
   }, [chunks, loops, starts, ends, count]);
 
   // Bind as shader storage
   const segments = useRawSource(segmentBuffer, 'i32');
   const anchors = useRawSource(anchorBuffer, 'vec4<u32>');
   const trims = useRawSource(trimBuffer, 'vec4<u32>');
+  const lookups = useRawSource(lookupBuffer, 'u32');
   
-  return {segments, anchors, trims};
+  return {segments, anchors, trims, lookups};
 }

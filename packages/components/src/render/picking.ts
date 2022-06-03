@@ -39,27 +39,14 @@ type PickingContextType = {
 
 export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
 
-export const NO_PICKING = {} as any;
-
-export const usePicking = (id: number) => useOne(() => ({
-  pickingDefs: PICKING_UNIFORMS,
-  pickingUniforms: {
-    pickingId: { current: id },
-  },
-}));
-
-export const useNoPicking = () => useNoOne();
-
 export const usePickingContext = (id?: number, isPicking: boolean = true) => {
   const renderContext = useContext(RenderContext);
 
   const pickingContext = isPicking ? useContext(PickingContext) : useNoContext(PickingContext);  
-  const {pickingDefs, pickingUniforms} = usePicking(id || 0) ?? useNoOne() ?? NO_PICKING;
   const resolvedContext = pickingContext?.renderContext ?? renderContext;
 
-  return {renderContext: resolvedContext, pickingDefs, pickingUniforms};
+  return {renderContext: resolvedContext};
 }
-
 
 export type PickingProps = {
   pickingFormat?: GPUTextureFormat, 

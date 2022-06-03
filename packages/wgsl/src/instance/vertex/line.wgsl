@@ -13,6 +13,8 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 @optional @link fn getTrim(i: u32) -> vec4<u32> { return vec4<u32>(0u, 0u, 0u, 0u); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
 
+@optional @link fn getLookup(i: u32) -> u32 { return i; };
+
 let ARROW_ASPECT: f32 = 2.5;
 
 fn getAnchorDistance(anchor: vec3<f32>, tangent: vec3<f32>, center: vec3<f32>) -> f32 {
@@ -181,6 +183,6 @@ fn trimAnchor(
     vec4<f32>(lineJoin, 1.0),
     color,
     uv,
-    instanceIndex,
+    getLookup(cornerIndex),
   );
 }

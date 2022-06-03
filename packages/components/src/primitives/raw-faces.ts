@@ -12,14 +12,16 @@ import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bundleToAttribute, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
+import instanceDrawVirtualPick from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
 
 export type RawFacesProps = {
   position?: number[] | TypedArray,
@@ -33,6 +35,7 @@ export type RawFacesProps = {
   colors?: ShaderSource,
 
   indices?: ShaderSource,
+  lookups?: ShaderSource,
 
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -43,6 +46,7 @@ export type RawFacesProps = {
 const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
+const LOOKUP_BINDING = bundleToAttribute(instanceDrawVirtualPick, 'getLookup');
 
 const PIPELINE = {
   primitive: {
@@ -84,26 +88,29 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const c = useShaderRef(props.color, props.colors);
 
   const i = useShaderRef(null, props.indices);
+  const l = useShaderRef(null, props.lookups);
 
   const xf = useApplyTransform(p);
 
   const hasIndices = !!props.indices;
   const defines = useOne(() => ({ HAS_INDICES: hasIndices }), hasIndices);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c, i]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c, i, l]);
   const getFragment = getPassThruFragment;
   
-  return use(Virtual, {
-    vertexCount,
-    instanceCount,
+  return (
+    use(Virtual, {
+      vertexCount,
+      instanceCount,
 
-    getVertex,
-    getFragment,
+      getVertex,
+      getFragment,
 
-    defines,
+      defines,
 
-    pipeline,
-    mode,
-    id,
-  });
+      pipeline,
+      mode,
+      id,
+    })
+  );
 }, 'RawFaces');

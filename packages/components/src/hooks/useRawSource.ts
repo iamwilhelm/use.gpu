@@ -15,7 +15,6 @@ export const useRawSource = (array: TypedArray, format: UniformType, live: boole
   const source = useOne(() => ({
     buffer,
     format,
-    alloc,
     length: 0,
     size: [],
     version: 0,

@@ -257,6 +257,7 @@ export const getChunkCount = (
 
 export const generateChunkSegments = (
   to: NumberArray,
+  lookup: NumberArray,
   chunks: number[],
   loops: boolean[] = NO_LOOPS,
   starts: boolean[] | boolean = false,
@@ -270,6 +271,8 @@ export const generateChunkSegments = (
     const l = loops[i];
     const s = starts === true || (starts as any)[i];
     const e = ends === true || (ends as any)[i];
+
+    const b = pos;
 
     if (l) to[pos++] = 0;
     if (c) {
@@ -292,6 +295,8 @@ export const generateChunkSegments = (
       }
     }
     if (l) to[pos++] = 0;
+
+    for (let j = b; j < pos; ++j) lookup[j] = i;
   }
 
   while (pos < to.length) to[pos++] = 0;
@@ -352,6 +357,7 @@ export const generateChunkAnchors = (
 
 export const generateChunkFaces = (
   to: NumberArray,
+  lookup: NumberArray,
   chunks: number[],
   loops: boolean[] = NO_LOOPS,
 ) => {
@@ -362,6 +368,7 @@ export const generateChunkFaces = (
     const c = chunks[i];
     const l = loops[i];
 
+    const b = pos;
     if (l) to[pos++] = 0;
     if (c) {
       if (c < 3) {
@@ -377,6 +384,8 @@ export const generateChunkFaces = (
       to[pos++] = 0;
       to[pos++] = 0;
     }
+    
+    for (let j = b; j < pos; ++j) lookup[j] = i;
   }
 
   while (pos < to.length) to[pos++] = 0;

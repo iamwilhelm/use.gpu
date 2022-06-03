@@ -1,8 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { useContext, useMemo, useNoMemo, useOne, useResource, useNoResource } from '@use-gpu/live';
+import { extend, useContext, useMemo, useNoMemo, useOne, useResource, useNoResource } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
 
-type PickState = {
+export type PickState = {
   id: number,
   hovered: boolean,
   pressed: {
@@ -27,14 +27,15 @@ export type PickProps = {
   capture?: boolean,
   render?: (state: PickState) => LiveElement<any>,
   children?: LiveElement<any>,
-  onMouseOver?: (m: MouseEventState) => void,
-  onMouseOut?: (m: MouseEventState) => void,
-  onMouseDown?: (m: MouseEventState) => void,
-  onMouseUp?: (m: MouseEventState) => void,
-  onMouseMove?: (m: MouseEventState) => void,
+  onMouseOver?: (m: MouseEventState, index: number) => void,
+  onMouseOut?:  (m: MouseEventState, index: number) => void,
+  onMouseDown?: (m: MouseEventState, index: number) => void,
+  onMouseUp?:   (m: MouseEventState, index: number) => void,
+  onMouseMove?: (m: MouseEventState, index: number) => void,
 }
 
 export const Pick: LiveComponent<PickProps> = ({
+  capture,
   render,
   children,
   onMouseOver,
@@ -44,16 +45,19 @@ export const Pick: LiveComponent<PickProps> = ({
   onMouseMove,
 }) => {
   const { useId } = useContext(EventContext);
-  const { useMouse } = useContext(MouseContext);
+  const { useMouse, beginCapture, endCapture } = useContext(MouseContext);
 
   const id = useId();
   const mouse = useMouse(id);
   const { mouse: {x, y}, hovered, captured, pressed, presses, clicks, index } = mouse;
 
+  const mouseRef = useOne(() => ({current: mouse}));
+  mouseRef.current = mouse;
+
   if (onMouseMove) {
     useMemo(() => {
       if (hovered || captured) {
-        if (onMouseMove) onMouseMove(mouse);
+        if (onMouseMove) onMouseMove(mouse, index);
       }
     }, [x, y]);
   }
@@ -64,33 +68,45 @@ export const Pick: LiveComponent<PickProps> = ({
   if (onMouseOver || onMouseOut) {
     useResource((dispose) => {
       if (hovered) {
-        if (onMouseOver) onMouseOver(mouse);
-        if (onMouseOut) dispose(() => onMouseOut(mouse));
+        if (onMouseOver) onMouseOver(mouse, index);
+        if (onMouseOut) dispose(() => onMouseOut(mouse, index));
       }
-    }, [hovered]);
+    }, [hovered, index]);
   }
   else {
     useNoResource();
   }
 
-  if (onMouseDown || onMouseUp) {
+  if (onMouseDown || onMouseUp || capture) {
     const { left, middle, right } = pressed;
     useResource((dispose) => {
       if (left) {
-        if (onMouseDown) onMouseDown(mouse);
-        if (onMouseUp) dispose(() => onMouseUp(mouse));
+        if (onMouseDown) onMouseDown(mouse, index);
+        if (capture) beginCapture(id);
+        dispose(() => {
+          if (capture) endCapture();
+          if (onMouseUp) onMouseUp(mouseRef.current, index);
+        });
       }
     }, [left]);
     useResource((dispose) => {
       if (middle) {
-        if (onMouseDown) onMouseDown(mouse);
-        if (onMouseUp) dispose(() => onMouseUp(mouse));
+        if (onMouseDown) onMouseDown(mouse, index);
+        if (capture) beginCapture(id);
+        dispose(() => {
+          if (capture) endCapture();
+          if (onMouseUp) onMouseUp(mouseRef.current, index);
+        });
       }
     }, [middle]);
     useResource((dispose) => {
       if (right) {
-        if (onMouseDown) onMouseDown(mouse);
-        if (onMouseUp) dispose(() => onMouseUp(mouse));
+        if (onMouseDown) onMouseDown(mouse, index);
+        if (capture) beginCapture(id);
+        dispose(() => {
+          if (capture) endCapture();
+          if (onMouseUp) onMouseUp(mouseRef.current, index);
+        });
       }
     }, [right]);
   }
@@ -103,7 +119,7 @@ export const Pick: LiveComponent<PickProps> = ({
   const count = presses.left + clicks.left + presses.middle + clicks.middle + presses.right + clicks.right;
 
   return useMemo(() =>
-    render ? render({id, index, hovered, pressed, presses, clicks}) : (children ?? null),
+    render ? render({id, index, hovered, pressed, presses, clicks}) : (children ? extend(children, {id}) : null),
     [render, children, id, index, hovered, pressed, count]
   );
 };

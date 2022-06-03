@@ -38,6 +38,8 @@ export type RawLinesProps = {
   trims?: ShaderSource,
   sizes?: ShaderSource,
 
+  lookups?: ShaderSource,
+
   join?: 'miter' | 'round' | 'bevel',
 
   count?: Prop<number>,
@@ -103,10 +105,12 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const d = useShaderRef(props.depth, props.depths);
   const t = useShaderRef(props.trim, props.trims);
   const z = useShaderRef(props.size, props.sizes);
+  
+  const l = useShaderRef(null, props.lookups);
 
   const xf = useApplyTransform(p);
 
-  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, g, c, w, d, t, z]);
+  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, g, c, w, d, t, z, l]);
   const getFragment = getPassThruFragment;
   
   return use(Virtual, {

@@ -9,7 +9,7 @@ import earcut from 'earcut';
 
 import {
   Draw, Pass,
-  Cursor,
+  Cursor, Pick,
   CompositeData, FaceSegments, FaceLayer,
   OrbitCamera, OrbitControls,
   LineLayer, ArrowLayer,
@@ -91,11 +91,33 @@ export const GeometryFacesPage: LC = () => {
           fields={convexDataFields}
           data={convexFaceData}
           on={<FaceSegments />}
-          render={(positions, colors, segments) =>
-            <FaceLayer
-              positions={positions}
-              segments={segments}
-              colors={colors}
+          render={(positions, colors, segments, lookups) =>
+            <Pick
+              onMouseOver={(mouse, index) => console.log({mouse, index})}
+              render={({id, hovered, index}) => [
+                hovered ? <Cursor cursor='pointer' /> : null,
+                <FaceLayer
+                  id={id}
+                  positions={positions}
+                  segments={segments}
+                  colors={colors}
+                  lookups={lookups}
+                />,
+                hovered ? (
+                  <CompositeData
+                    fields={convexDataFields}
+                    data={convexFaceData.slice(index, index + 1)}
+                    on={<FaceSegments />}
+                    render={(positions, colors, segments) =>
+                      <FaceLayer
+                        positions={positions}
+                        segments={segments}
+                        color={[1, 1, 1, 1]}
+                      />
+                    }
+                  />
+                ) : null
+              ]}
             />
           }
         />
@@ -116,6 +138,7 @@ export const GeometryFacesPage: LC = () => {
   );
 
   return [
+    <Cursor cursor='move' />,
     <OrbitControls
       radius={3}
       bearing={0.5}
@@ -130,6 +153,5 @@ export const GeometryFacesPage: LC = () => {
         </OrbitCamera>
       }
     />,
-    <Cursor cursor='move' />
   ];
 };

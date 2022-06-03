@@ -11,6 +11,8 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
 @optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
 @optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
+
+@optional @link fn getLookup(i: u32) -> u32 { return i; };
   
 let ARROW_ASPECT: f32 = 2.5;
 
@@ -74,6 +76,6 @@ let ARROW_ASPECT: f32 = 2.5;
     position,
     color,
     uv,
-    instanceIndex,
+    getLookup(anchorIndex),
   );
 }

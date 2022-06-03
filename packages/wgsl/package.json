@@ -193,10 +193,10 @@
       "import": "./src/render/fragment/mesh.wgsl",
       "require": "./src/render/fragment/mesh.wgsl"
     },
-    "./render/fragment/pick-geometry.wgsl": {
-      "types": "./src/render/fragment/pick-geometry.wgsl.d.ts",
-      "import": "./src/render/fragment/pick-geometry.wgsl",
-      "require": "./src/render/fragment/pick-geometry.wgsl"
+    "./render/fragment/pick.wgsl": {
+      "types": "./src/render/fragment/pick.wgsl.d.ts",
+      "import": "./src/render/fragment/pick.wgsl",
+      "require": "./src/render/fragment/pick.wgsl"
     },
     "./render/fragment/shaded.wgsl": {
       "types": "./src/render/fragment/shaded.wgsl.d.ts",
@@ -277,11 +277,6 @@
       "types": "./src/use/light.wgsl.d.ts",
       "import": "./src/use/light.wgsl",
       "require": "./src/use/light.wgsl"
-    },
-    "./use/picking.wgsl": {
-      "types": "./src/use/picking.wgsl.d.ts",
-      "import": "./src/use/picking.wgsl",
-      "require": "./src/use/picking.wgsl"
     },
     "./use/types.wgsl": {
       "types": "./src/use/types.wgsl.d.ts",

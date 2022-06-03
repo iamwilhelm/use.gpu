@@ -9,7 +9,7 @@ type LineSegmentsProps = {
   chunks?: number[],
   loops?: boolean[],
 
-  render?: (segments: StorageSource) => LiveElement<any>,
+  render?: (segments: StorageSource, lookups: StorageSource) => LiveElement<any>,
 };
 
 export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
@@ -21,16 +21,18 @@ export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
   const count = getChunkCount(chunks, loops);
 
   // Make index data for line segments/anchor/trim data
-  const segmentBuffer = useMemo(() => {
+  const [segmentBuffer, lookupBuffer] = useMemo(() => {
     const segmentBuffer = new Int32Array(count);
+    const lookupBuffer = new Uint32Array(count);
 
-    generateChunkSegments(segmentBuffer, chunks, loops);
+    generateChunkSegments(segmentBuffer, lookupBuffer, chunks, loops);
 
-    return segmentBuffer;
+    return [segmentBuffer, lookupBuffer];
   }, [chunks, loops, count]);
 
   // Bind as shader storage
   const segments = useRawSource(segmentBuffer, 'i32');
+  const lookups = useRawSource(lookupBuffer, 'u32');
 
-  return render ? render(segments) : yeet(segments);
+  return render ? render(segments, lookups) : yeet([segments, lookups]);
 }, 'LineSegments');

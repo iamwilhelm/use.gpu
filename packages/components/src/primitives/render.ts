@@ -5,7 +5,7 @@ import {
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { DeviceContext, ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
-import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
   getColorSpace,
@@ -54,7 +54,7 @@ export const render = (props: RenderProps) => {
   // Render set up
   const device = useContext(DeviceContext);
   const {viewUniforms, viewDefs} = useContext(ViewContext);
-  const {renderContext, pickingUniforms, pickingDefs} = usePickingContext(id, isPicking);
+  const {renderContext} = usePickingContext(id, isPicking);
   const {colorInput, colorSpace} = renderContext;
 
   // Render shader
@@ -64,8 +64,6 @@ export const render = (props: RenderProps) => {
   const defines = useMemo(() => ({
     '@group(VIEW)': '@group(0)',
     '@binding(VIEW)': '@binding(0)',
-    '@group(PICKING)': '@group(0)',
-    '@binding(PICKING)': '@binding(1)',
     '@group(VIRTUAL)': '@group(1)',
     '@group(VOLATILE)': '@group(2)',
     'COLOR_SPACE': cs,
@@ -96,7 +94,7 @@ export const render = (props: RenderProps) => {
 
   // Uniforms
   const uniform = useMemo(() => {
-    const defs = isPicking ? [viewDefs, pickingDefs] : [viewDefs];
+    const defs = [viewDefs];
     return makeMultiUniforms(device, pipeline, defs as any, 0);
   }, [device, viewDefs, pipeline]);
 
@@ -132,7 +130,6 @@ export const render = (props: RenderProps) => {
       inspected.render.instanceCount = i;
 
       uniform.pipe.fill(viewUniforms);
-      if (isPicking) uniform.pipe.fill(pickingUniforms);
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);
 
       if (storage.pipe && storage.buffer) {

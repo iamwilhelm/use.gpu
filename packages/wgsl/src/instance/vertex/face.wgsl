@@ -7,6 +7,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 
 @optional @link fn getIndex(i: u32) -> u32 { return 0u; };
+@optional @link fn getLookup(i: u32) -> u32 { return i; };
 
 @export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> ShadedVertex {
   var NaN: f32 = bitcast<f32>(0xffffffffu);
@@ -54,6 +55,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip };
     normal,
     color,
     uv,
-    instanceIndex,
+    getLookup(cornerIndex),
   );
 }

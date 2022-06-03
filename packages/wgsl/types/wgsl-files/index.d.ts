@@ -260,7 +260,7 @@ declare module "@use-gpu/wgsl/render/fragment/mesh.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/render/fragment/pick-geometry.wgsl" {
+declare module "@use-gpu/wgsl/render/fragment/pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
@@ -384,13 +384,6 @@ declare module "@use-gpu/wgsl/use/light.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/use/picking.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getPickingColor: ParsedBundle;
   export default __module;
 }
 

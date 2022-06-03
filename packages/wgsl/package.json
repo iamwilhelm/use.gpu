@@ -88,6 +88,11 @@
       "import": "./src/geometry/trim.wgsl",
       "require": "./src/geometry/trim.wgsl"
     },
+    "./instance/fragment/shaded.wgsl": {
+      "types": "./src/instance/fragment/shaded.wgsl.d.ts",
+      "import": "./src/instance/fragment/shaded.wgsl",
+      "require": "./src/instance/fragment/shaded.wgsl"
+    },
     "./instance/fragment/ui.wgsl": {
       "types": "./src/instance/fragment/ui.wgsl.d.ts",
       "import": "./src/instance/fragment/ui.wgsl",
@@ -162,6 +167,11 @@
       "types": "./src/mask/textured.wgsl.d.ts",
       "import": "./src/mask/textured.wgsl",
       "require": "./src/mask/textured.wgsl"
+    },
+    "./material/pbr.wgsl": {
+      "types": "./src/material/pbr.wgsl.d.ts",
+      "import": "./src/material/pbr.wgsl",
+      "require": "./src/material/pbr.wgsl"
     },
     "./plot/array.wgsl": {
       "types": "./src/plot/array.wgsl.d.ts",
@@ -242,16 +252,6 @@
       "types": "./src/render/vertex/virtual-ui.wgsl.d.ts",
       "import": "./src/render/vertex/virtual-ui.wgsl",
       "require": "./src/render/vertex/virtual-ui.wgsl"
-    },
-    "./render/vertex/wireframe-list.wgsl": {
-      "types": "./src/render/vertex/wireframe-list.wgsl.d.ts",
-      "import": "./src/render/vertex/wireframe-list.wgsl",
-      "require": "./src/render/vertex/wireframe-list.wgsl"
-    },
-    "./render/vertex/wireframe-strip.wgsl": {
-      "types": "./src/render/vertex/wireframe-strip.wgsl.d.ts",
-      "import": "./src/render/vertex/wireframe-strip.wgsl",
-      "require": "./src/render/vertex/wireframe-strip.wgsl"
     },
     "./render/wireframe/wireframe-list.wgsl": {
       "types": "./src/render/wireframe/wireframe-list.wgsl.d.ts",

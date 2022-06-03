@@ -10,6 +10,7 @@ import { VIRTUAL_BINDGROUP, VOLATILE_BINDGROUP } from './constants';
 const INT_PARAMS = [{name: 'index', type: {name: 'u32'}}];
 const INT_ARG = ['u32'];
 const UV_ARG = ['vec2<f32>'];
+const LOAD_ARG = ['vec2<i32>', 'i32'];
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
@@ -77,16 +78,18 @@ export const makeBindingAccessors = (
 
     for (const {uniform: {name, format, args}, storage} of storages) {
       const {volatile} = storage!;
-      const base = volatile ? volatileBase++ : bindingBase++;
       const set = volatile ? volatileSet : bindingSet;
+      const base = volatile ? volatileBase++ : bindingBase++;
       program.push(makeStorageAccessor(namespace, set, base, format, name));
     }
 
     for (const {uniform: {name, format, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute} = texture!;
-      const base = volatile ? volatileBase++ : bindingBase++;
+      const {volatile, layout, variant, absolute, sampler} = texture!;
       const set = volatile ? volatileSet : bindingSet;
-      program.push(makeTextureAccessor(namespace, set, base, format, name, layout, variant, absolute));
+      const base = volatile ? volatileBase++ : bindingBase++;
+      if (sampler) volatile ? volatileBase++ : bindingBase++;
+      console.log({texture})
+      program.push(makeTextureAccessor(namespace, set, base, format, name, layout, variant, absolute, !!sampler));
     }
 
     return program.join('\n');
@@ -168,19 +171,19 @@ export const makeTextureAccessor = (
   layout: string,
   variant: string = 'textureSample',
   absolute: boolean = false,
-  args: string[] = UV_ARG,
+  sampler: boolean = true,
+  args: string[] = (variant === 'textureLoad' ? LOAD_ARG : UV_ARG),
 ) => {
   const m = layout.match(/[0-9]/) ?? [2];
   const dims = +m[0];
   const dimsCast = dims === 1 ? 'f32' : `vec${dims}<f32>`;
 
   return `
-@group(${set}) @binding(${binding}) var ${ns}${name}Sampler: sampler;
-@group(${set}) @binding(${binding + 1}) var ${ns}${name}Texture: ${layout};
-
+@group(${set}) @binding(${binding}) var ${ns}${name}Texture: ${layout};
+${sampler ? `@group(${set}) @binding(${binding + 1}) var ${ns}${name}Sampler: sampler;\n` : ''}
 fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   ${absolute ? `let _VT_UV = ${arg(0)} / ${dimsCast}(textureDimensions(${ns}${name}Texture));\n  `
-  : ``}return ${variant}(${ns}${name}Texture, ${ns}${name}Sampler, ${args.map((_, i) => `${i === 0 && absolute ? '_VT_UV' : arg(i)}`).join(', ')});
+  : ``}return ${variant}(${ns}${name}Texture, ${sampler ? `${ns}${name}Sampler, ` : ''}${args.map((_, i) => `${i === 0 && absolute ? '_VT_UV' : arg(i)}`).join(', ')});
 }
 `
 };

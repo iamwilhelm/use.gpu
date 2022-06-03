@@ -173,13 +173,15 @@ export const makeDataBindingsEntries = <T>(
       const {texture: t, view, sampler} = texture;
 
       const textureResource = view ?? makeTextureView(t);
-      const samplerResource = (sampler instanceof GPUSampler) ? sampler : makeSampler(device, sampler);
-
-      entries.push({binding, resource: samplerResource});
-      binding++;
+      const samplerResource = sampler ? ((sampler instanceof GPUSampler) ? sampler : makeSampler(device, sampler)) : null;
 
       entries.push({binding, resource: textureResource});
       binding++;
+
+      if (sampler) {
+        entries.push({binding, resource: samplerResource});
+        binding++;
+      }
     }
   }
 

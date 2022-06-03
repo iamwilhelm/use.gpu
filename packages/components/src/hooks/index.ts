@@ -9,6 +9,7 @@ export * from './useForceUpdate';
 export * from './useInspectable';
 export * from './useLinkedShader';
 export * from './useMemoKey';
+export * from './useNativeColor';
 export * from './useRawSource';
 export * from './useRenderPipeline';
 export * from './useShaderRef';

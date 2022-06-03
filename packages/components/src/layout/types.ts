@@ -6,6 +6,7 @@ import { Color } from '../traits/types';
 import { mat4 } from 'gl-matrix';
 
 export type AutoPoint = [number | null, number | null];
+export type AutoRectangle = [number | null, number | null, number | null, number | null];
 export type Gap = Point;
 export type Margin = Point4;
 export type Sizing = Point4;

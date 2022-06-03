@@ -11,7 +11,7 @@ struct ViewUniforms {
 
 @export @group(VIEW) @binding(VIEW) var<uniform> viewUniforms: ViewUniforms;
 
-@export fn getViewPosition() -> vec2<f32> { return viewUniforms.viewPosition; }
+@export fn getViewPosition() -> vec4<f32> { return viewUniforms.viewPosition; }
 @export fn getViewResolution() -> vec2<f32> { return viewUniforms.viewResolution; }
 @export fn getViewSize() -> vec2<f32> { return viewUniforms.viewSize; }
 @export fn getViewNearFar() -> vec2<f32> { return viewUniforms.viewNearFar; }

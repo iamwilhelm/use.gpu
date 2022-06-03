@@ -30,7 +30,7 @@ export type UseRenderingContextGPU = {
   swapView: (view?: GPUTextureView) => void,
 };
 
-export type ColorSpace = 'linear' | 'srgb' | 'p3';
+export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking';
 
 export type TypedArray =
   Int8Array |
@@ -184,7 +184,7 @@ export type LambdaSource<T = any> = {
 export type TextureSource = {
   texture: GPUTexture,
   view?: GPUTextureView,
-  sampler: GPUSampler | GPUSamplerDescriptor,
+  sampler: GPUSampler | GPUSamplerDescriptor | null,
   layout: string,
   format: string,
   variant?: string,

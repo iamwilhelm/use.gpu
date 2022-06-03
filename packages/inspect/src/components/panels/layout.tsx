@@ -1,13 +1,10 @@
-import { LiveFiber, Hook } from '@use-gpu/live/types';
-import { formatNode, formatValue, STATE_SLOTS } from '@use-gpu/live';
+import { LiveFiber } from '@use-gpu/live/types';
 
 import React, { useState } from 'react';
-import { Action } from '../types';
 import { DOMMock, SplitRow, Label, Spacer } from '../layout';
 import { usePingContext } from '../ping';
 
 import { inspectObject } from './props';
-import chunk from 'lodash/chunk';
 
 type LayoutProps = {
   fiber: LiveFiber<any>,
@@ -54,26 +51,4 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
       }
     </div>
   </>);
-}
-
-const hookToObject = (
-  state: any[],
-) => {
-  const [type, a, b] = state;
-  if (type === Hook.STATE) {
-    return {state: a, deps: b};
-  }
-  if (type === Hook.MEMO || type === Hook.ONE || type === Hook.CALLBACK) {
-    return {memo: a, deps: b};
-  }
-  if (type === Hook.RESOURCE) {
-    return {resource: a?.value, deps: b};
-  }
-  if (type === Hook.CONTEXT) {
-    return {context: a?.displayName};
-  }
-  if (type === Hook.CONSUMER) {
-    return {consumer: a?.displayName};
-  }
-  return null;
 }

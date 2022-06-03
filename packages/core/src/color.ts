@@ -1,17 +1,5 @@
 import { ColorSpace } from './types';
 
-const COLOR_SPACE = {
-  'srgb': 0,
-  'linear': 1,
-  'p3': 2,
-};
-
-const COLOR_CONVERSION = [
-  [0, 1, 3],
-  [2, 0, 5],
-  [4, 6, 7],
-];
-
 export const makeColorState = (format: GPUTextureFormat, blend?: GPUBlendState): GPUColorTargetState => ({
   format,
   blend,
@@ -45,9 +33,3 @@ export const makeColorAttachmentWithFormat = (
   loadOp,
   storeOp,
 } as unknown as GPURenderPassColorAttachment);
-
-export const getColorSpace = (from: ColorSpace, to: ColorSpace) => {
-  const f = COLOR_SPACE[from];
-  const t = COLOR_SPACE[to];
-  return COLOR_CONVERSION[f][t];
-};

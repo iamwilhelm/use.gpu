@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
-use '@use-gpu/wgsl/use/view'::{ worldToClip };
+use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getNormal(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
@@ -48,6 +48,8 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip };
   var position = worldToClip(world);
   var normal = getNormal(cornerIndex).xyz;
   var uv = vec2<f32>(0.5, 0.5);
+
+  var viewPosition = getViewPosition().xyz;
 
   return ShadedVertex(
     position,

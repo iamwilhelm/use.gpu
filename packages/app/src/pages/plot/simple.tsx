@@ -21,7 +21,7 @@ export const PlotSimplePage: LC = () => {
   
   const view = (
     <Loop>
-      <LinearRGB>
+      <Draw>
         {
           use(Raw, () => {
             t = t + 1/60;
@@ -108,12 +108,12 @@ export const PlotSimplePage: LC = () => {
                   depth={0.5}
                 />
                 <Sampled
-                  axes='xz'
+                  axes='zx'
                   format='vec4<f32>'
-                  size={[20, 10]}
-                  expr={(emit, x, y) => {
-                    const v = Math.cos(x) * Math.cos(y);
-                    emit(x, v * .5 + .5, y, 1);
+                  size={[10, 20]}
+                  expr={(emit, z, x) => {
+                    const v = Math.cos(x) * Math.cos(z);
+                    emit(x, v * .5 + .5, z, 1);
                   }}
                 >
                   <Surface
@@ -136,7 +136,7 @@ export const PlotSimplePage: LC = () => {
             </Animation>
           </Plot>
         </Pass>
-      </LinearRGB>
+      </Draw>
     </Loop>
   );
 

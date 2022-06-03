@@ -16,11 +16,7 @@ export const useBoundShader = (
   values: any[],
   defines?: Record<string, any>,
 ) => {
-  return useMemo(() => {
-    const bindings = makeShaderBindings<ShaderModule>(defs, values);
-    const links = bindingsToLinks(bindings);
-    return bindBundle(shader, links, defines);
-  }, [shader, ...defs, ...values, defines]);
+  return useMemo(() => getBoundShader(shader, defs, values, defines), [shader, ...defs, ...values, defines]);
 }
 
 export const getBoundShader = (

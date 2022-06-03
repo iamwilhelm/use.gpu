@@ -2,17 +2,21 @@ import { LC } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
+import { wgsl, bindModule, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import React from '@use-gpu/live/jsx';
-import { use } from '@use-gpu/live';
+import { use, useContext } from '@use-gpu/live';
 
 import earcut from 'earcut';
 
 import {
   Draw, Pass,
-  Cursor, Pick,
+  Cursor, Pick, Raw,
   CompositeData, FaceSegments, FaceLayer,
   OrbitCamera, OrbitControls,
   LineLayer, ArrowLayer,
+  Flat, UI, Layout, Absolute, Block, Inline, Text,
+  PickingContext,
+  useBoundSource, useDerivedSource,
 } from '@use-gpu/components';
 
 // Convex and concave polygon data
@@ -26,6 +30,7 @@ const concaveDataFields = [
   ['array<vec4<f32>>', (o: any) => o.positions],
   ['vec4<f32>', 'color'],
   ['array<u32>', (o: any) => o.indices, true],
+  ['u32', 'lookup'],
 ] as DataField[];
 
 // Generate some random polygons
@@ -79,11 +84,56 @@ let concaveFaceData = seq(20).map(i => {
     positions,
     indices,
     color: randomColor(),
+    lookup: i,
   };
 });
 
 export const GeometryFacesPage: LC = () => {
 
+  // Display picking buffer for funsies
+  const scale = 0.5;
+  const {pickingSource} = useContext(PickingContext);
+  const colorizeShader = wgsl`
+    @link fn getSize() -> vec2<f32> {}
+    @link fn getPicking(uv: vec2<i32>, level: i32) -> vec4<u32> {}
+    @export fn main(uv: vec2<f32>) -> vec4<f32> {
+      let iuv = vec2<i32>(uv * getSize() / ${scale});
+      let pick = vec2<f32>(getPicking(iuv, 0).xy);
+      return vec4<f32>(
+        (pick.r / 16.0) % 1.0,
+        (pick.g / 16.0) % 1.0,
+        (pick.r + pick.g) / 256.0,
+        1.0,
+      );
+    }
+  `;
+  const [GET_SIZE, GET_PICKING] = bundleToAttributes(colorizeShader);
+  const getSize = useBoundSource(GET_SIZE, () => pickingSource.size);
+  const getPicking = useBoundSource(GET_PICKING, pickingSource);
+  const textureSource = useDerivedSource(bindModule(colorizeShader, {getPicking, getSize}), pickingSource);
+  const pickingView = (
+    <Flat>
+      <UI>
+        <Layout>
+          <Absolute
+            right={0}
+          >
+            <Block fill={[0, 0, 0, .5]}>
+              <Block
+                width={textureSource.size[0] * scale}
+                height={textureSource.size[1] * scale}
+                image={{texture: textureSource}}
+                fill={[0, 0, 0, 1]}
+              />
+              <Inline align="center" margin={[0, 5]}><Text color={[1, 1, 1, 1]} size={24}>GPU Picking Buffer</Text></Inline>
+            </Block>
+          </Absolute>
+        </Layout>
+      </UI>
+    </Flat>
+  );
+  
+  // Render polygons
   const view = (
     <Draw>
       <Pass>
@@ -93,9 +143,9 @@ export const GeometryFacesPage: LC = () => {
           on={<FaceSegments />}
           render={(positions, colors, segments, lookups) =>
             <Pick
-              onMouseOver={(mouse, index) => console.log({mouse, index})}
+              onMouseOver={(mouse, index) => console.log('round', {mouse, index})}
               render={({id, hovered, index}) => [
-                hovered ? <Cursor cursor='pointer' /> : null,
+                hovered ? <Cursor cursor='default' /> : null,
                 <FaceLayer
                   id={id}
                   positions={positions}
@@ -125,14 +175,37 @@ export const GeometryFacesPage: LC = () => {
         <CompositeData
           fields={concaveDataFields}
           data={concaveFaceData}
-          render={(positions, colors, indices) =>
-            <FaceLayer
-              positions={positions}
-              indices={indices}
-              colors={colors}
+          render={(positions, colors, indices, lookups) =>
+            <Pick
+              onMouseOver={(mouse, index) => console.log('spiky', {mouse, index})}
+              render={({id, hovered, index}) => [
+                hovered ? <Cursor cursor='default' /> : null,
+                <FaceLayer
+                  id={id}
+                  positions={positions}
+                  indices={indices}
+                  colors={colors}
+                  lookups={lookups}
+                />,
+                hovered ? (
+                  <CompositeData
+                    fields={concaveDataFields}
+                    data={concaveFaceData.slice(index, index + 1)}
+                    render={(positions, colors, indices) =>
+                      <FaceLayer
+                        positions={positions}
+                        indices={indices}
+                        color={[1, 1, 1, 1]}
+                      />
+                    }
+                  />
+                ) : null
+              ]}
             />
           }
         />
+
+        {pickingView}
       </Pass>
     </Draw>
   );

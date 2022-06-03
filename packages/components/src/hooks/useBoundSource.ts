@@ -14,18 +14,24 @@ export const useBoundSource = <T = any>(
   def: UniformAttribute | UniformAttributeValue,
   source: ShaderSource | T,
 ) => {
-  return useMemo(() => {
-    const s = source as any;
+  return useMemo(() => getBoundSource(def, source), [source, def]);
+}
 
-    // ParsedBundle | ParsedModule
-    if (s.module || s.table) return s;
+// Turn a shader source/constant/lambda into a virtual shader module
+export const getBoundSource = <T = any>(
+  def: UniformAttribute | UniformAttributeValue,
+  source: ShaderSource | T,
+) => {
+  const s = source as any;
 
-    // LambdaSource
-    if (s.shader) return s.shader;
+  // ParsedBundle | ParsedModule
+  if (s.module || s.table) return s;
 
-    const binding = makeShaderBinding<ShaderModule>(def, s);
-    return bindingToModule(binding);
-  }, [source, def]);
+  // LambdaSource
+  if (s.shader) return s.shader;
+
+  const binding = makeShaderBinding<ShaderModule>(def, s);
+  return bindingToModule(binding);
 }
 
 export const useNoBoundSource = useNoMemo;

@@ -14,14 +14,14 @@ import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
 import { bundleToAttribute, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
+import { useMaterialContext } from '../providers/material-provider';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader } from '../hooks/useBoundShader';
-import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
+import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
+import { getShadedFragment } from '@use-gpu/wgsl/instance/fragment/shaded.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
-import instanceDrawVirtualPick from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
 
 export type RawFacesProps = {
   position?: number[] | TypedArray,
@@ -37,6 +37,7 @@ export type RawFacesProps = {
   indices?: ShaderSource,
   lookups?: ShaderSource,
 
+  shaded?: boolean,
   count?: Prop<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
@@ -46,7 +47,7 @@ export type RawFacesProps = {
 const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
-const LOOKUP_BINDING = bundleToAttribute(instanceDrawVirtualPick, 'getLookup');
+const FRAGMENT_BINDINGS = bundleToAttributes(getShadedFragment);
 
 const PIPELINE = {
   primitive: {
@@ -57,6 +58,7 @@ const PIPELINE = {
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
     pipeline: propPipeline,
+    shaded = false,
     count = 1,
     mode = RenderPassMode.Opaque,
     id = 0,
@@ -91,12 +93,15 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const l = useShaderRef(null, props.lookups);
 
   const xf = useApplyTransform(p);
+  const m = useMaterialContext();
 
   const hasIndices = !!props.indices;
   const defines = useOne(() => ({ HAS_INDICES: hasIndices }), hasIndices);
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c, i, l]);
-  const getFragment = getPassThruFragment;
+  const getFragment = shaded
+    ? useBoundShader(getShadedFragment, FRAGMENT_BINDINGS, [m])
+    : useNoBoundShader() ?? getPassThruFragment;
   
   return (
     use(Virtual, {
@@ -107,6 +112,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
       getFragment,
 
       defines,
+
+      renderer: shaded ? 'shaded' : 'solid',
 
       pipeline,
       mode,

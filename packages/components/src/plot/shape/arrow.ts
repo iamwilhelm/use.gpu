@@ -53,7 +53,7 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
 
   const positions = useContext(DataContext) ?? undefined;
 
-  const {size, start, end} = useArrowTrait(props);
+  const {size, start, end, detail} = useArrowTrait(props);
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
@@ -80,6 +80,7 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
       width,
       depth,
       join,
+      detail,
 
       colors,
       widths,

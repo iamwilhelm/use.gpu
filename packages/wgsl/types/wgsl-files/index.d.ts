@@ -106,6 +106,13 @@ declare module "@use-gpu/wgsl/geometry/trim.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/fragment/shaded.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getShadedFragment: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/fragment/ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -213,6 +220,13 @@ declare module "@use-gpu/wgsl/mask/textured.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getTextureFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/pbr.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const applyPBRMaterial: ParsedBundle;
   export default __module;
 }
 
@@ -324,20 +338,6 @@ declare module "@use-gpu/wgsl/render/vertex/virtual-solid.wgsl" {
 }
 
 declare module "@use-gpu/wgsl/render/vertex/virtual-ui.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/render/vertex/wireframe-list.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/render/vertex/wireframe-strip.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   

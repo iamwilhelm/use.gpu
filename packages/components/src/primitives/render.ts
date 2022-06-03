@@ -1,14 +1,16 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode, DeepPartial, Prop,
+  VertexData, StorageSource, RenderPassMode, DeepPartial, Prop, UseRenderingContextGPU,
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
-import { DeviceContext, ViewContext, RenderContext, PickingContext, usePickingContext } from '@use-gpu/components';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+
+import { DeviceContext } from '../providers/device-provider';
+import { ViewContext } from '../providers/view-provider';
+
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
-  getColorSpace,
   uploadBuffer,
   resolve,
 } from '@use-gpu/core';
@@ -29,17 +31,22 @@ export type RenderProps = {
 
   vertex: ParsedBundle,
   fragment: ParsedBundle,
+  
+  renderContext: UseRenderingContextGPU,
 
   defines: Record<string, any>,
   deps: any[] | null,
 };
 
+// Inlined into <Virtual>
 export const render = (props: RenderProps) => {
   const {
     vertexCount,
     instanceCount,
     vertex: vertexShader,
     fragment: fragmentShader,
+
+    renderContext,
 
     pipeline: propPipeline,
     defines: propDefines,
@@ -54,19 +61,15 @@ export const render = (props: RenderProps) => {
   // Render set up
   const device = useContext(DeviceContext);
   const {viewUniforms, viewDefs} = useContext(ViewContext);
-  const {renderContext} = usePickingContext(id, isPicking);
-  const {colorInput, colorSpace} = renderContext;
 
   // Render shader
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
-  const cs = getColorSpace(colorInput, colorSpace);
 
   const defines = useMemo(() => ({
     '@group(VIEW)': '@group(0)',
     '@binding(VIEW)': '@binding(0)',
     '@group(VIRTUAL)': '@group(1)',
     '@group(VOLATILE)': '@group(2)',
-    'COLOR_SPACE': cs,
     ...propDefines,
   }), [propDefines]);
 
@@ -119,15 +122,22 @@ export const render = (props: RenderProps) => {
       instanceCount: 0,
     },
   });
+  
+  const isStrip = topology === 'triangle-strip';
 
   // Return a lambda back to parent(s)
   return yeet({
-    [mode]: (passEncoder: GPURenderPassEncoder) => {
+    [mode]: (passEncoder: GPURenderPassEncoder, countGeometry: (v: number, t: number) => void) => {
       const v = resolve(vertexCount);
       const i = resolve(instanceCount);
 
+      const t = isStrip ? (v - 2) * i : Math.floor(v * i / 3);
+
       inspected.render.vertexCount = v;
       inspected.render.instanceCount = i;
+      inspected.render.triangleCount = t;
+
+      countGeometry(v * i, t);
 
       uniform.pipe.fill(viewUniforms);
       uploadBuffer(device, uniform.buffer, uniform.pipe.data);

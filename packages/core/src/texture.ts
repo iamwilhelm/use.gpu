@@ -72,7 +72,7 @@ export const makeReadbackTexture = (
     sampleCount: samples,
     format,
     // @ts-ignore
-    usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+    usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC | GPUTextureUsage.TEXTURE_BINDING,
   });
 
   return texture;

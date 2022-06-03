@@ -233,7 +233,7 @@ export const sdfToGradient = (
       
       const e = Math.abs(dl - 1);
       
-      out[j] = Math.max(0, Math.min(255, 128 + e * 128));
+      out[j] = Math.max(0, Math.min(255, 64 + e * 192));
     }
   }
 

@@ -67,15 +67,16 @@ export const makeBindingAccessors = (
 
     for (const {uniform: {name, format, args}, storage} of storages) {
       const {volatile} = storage!;
-      const base = volatile ? volatileBase++ : bindingBase++;
       const set = volatile ? volatileSet : bindingSet;
+      const base = volatile ? volatileBase++ : bindingBase++;
       program.push(makeStorageAccessor(namespace, set, base, format, name));
     }
 
     for (const {uniform: {name, format, args}, texture} of textures) {
       const {volatile, layout, variant, absolute} = texture!;
-      const base = volatile ? volatileBase++ : bindingBase++;
       const set = volatile ? volatileSet : bindingSet;
+      const base = volatile ? volatileBase++ : bindingBase++;
+      volatile ? volatileBase++ : bindingBase++;
       program.push(makeTextureAccessor(namespace, set, base, format, name, layout, variant, absolute));
     }
 
@@ -162,8 +163,8 @@ export const makeTextureAccessor = (
   absolute: boolean = false,
   args: string[] = UV_ARG,
 ) => `
-layout (set = ${set}, binding = ${binding}) uniform sampler ${ns}${name}Sampler;
-layout (set = ${set}, binding = ${binding + 1}) uniform ${layout} ${ns}${name}Texture;
+layout (set = ${set}, binding = ${binding}) uniform ${layout} ${ns}${name}Texture;
+layout (set = ${set}, binding = ${binding + 1}) uniform sampler ${ns}${name}Sampler;
 
 ${type} ${ns}${name}(vec2 uv) {
   ${absolute ? `uv = uv / vec2(textureSize(${ns}${name}Texture));\n  ` : ''}

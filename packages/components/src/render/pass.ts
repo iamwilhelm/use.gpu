@@ -4,6 +4,7 @@ import { use, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { PickingContext } from './picking';
+import { useInspectable } from '../hooks/useInspectable'
 
 export type PassProps = {
   transparent?: boolean,
@@ -13,7 +14,8 @@ export type PassProps = {
   render?: () => LiveElement<any>,
 };
 
-export type RenderToPass = (passEncoder: GPURenderPassEncoder) => void;
+type RenderCounter = (v: number, t: number) => void;
+export type RenderToPass = (passEncoder: GPURenderPassEncoder, countGeometry: RenderCounter) => void;
 
 const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
@@ -26,6 +28,8 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     children,
     render,
   } = props;
+
+  const inspect = useInspectable();
 
   const Resume = (rs: Record<string, RenderToPass | RenderToPass[]>) => {
     const device = useContext(DeviceContext);
@@ -46,6 +50,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
       commandEncoder: GPUCommandEncoder,
       context: UseRenderingContextGPU,
       rs: RenderToPass[],
+      countGeometry: RenderCounter,
     ) => {
       const {colorAttachments, depthStencilAttachment} = context;
       const renderPassDescriptor: GPURenderPassDescriptor = {
@@ -54,24 +59,35 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
       };
 
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-      for (let r of rs) r(passEncoder);
+      for (let r of rs) r(passEncoder, countGeometry);
       passEncoder.end();
     };
 
     return yeet(() => {
+      let vs = 0;
+      let ts = 0;
+      const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
+
       const commandEncoder = device.createCommandEncoder();
 
       renderContext.swapView();
-      renderToContext(commandEncoder, renderContext, visibles);
+      renderToContext(commandEncoder, renderContext, visibles, countGeometry);
 
       const shouldUpdatePicking = picking && pickingContext && pickings.length;
       if (shouldUpdatePicking) {
         const {renderContext} = pickingContext!;
         renderContext.swapView();
-        renderToContext(commandEncoder, renderContext, pickings);
+        renderToContext(commandEncoder, renderContext, pickings, countGeometry);
       }
 
-      device.queue.submit([commandEncoder.finish()]);      
+      device.queue.submit([commandEncoder.finish()]);
+
+      inspect({
+        render: {
+          vertexCount: vs,
+          triangleCount: ts,
+        },
+      });
     });
   };
 

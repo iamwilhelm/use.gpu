@@ -17,7 +17,7 @@ import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useTransformContext } from '../providers/transform-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
-import { useColorTexture } from '../hooks/useColorTexture';
+import { useNativeColorTexture } from '../hooks/useNativeColor';
 
 import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
@@ -123,7 +123,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const parent = useTransformContext();
   const x = props.transform || parent;
   const c = props.clip;
-  const t = useColorTexture(props.texture);
+  const t = useNativeColorTexture(props.texture);
 
   const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x, c]);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);

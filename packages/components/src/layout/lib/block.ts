@@ -112,6 +112,7 @@ export const fitBlock = (
   padding: Point4,
   direction: Direction,
   contain: boolean,
+  shrinkWrap?: boolean,
 ) => {
   const isX = isHorizontal(direction);
   const [pl, pt, pr, pb] = padding;
@@ -129,6 +130,11 @@ export const fitBlock = (
     (fixed[1] != null) ? ( isX && into[1] != null ? Math.min(fixed[1], into[1]) : fixed[1]) : into[1],
   ] as AutoPoint;
 
+  if (shrinkWrap) {
+    if (!isX && fixed[0] == null) resolved[0] = Math.min(into[0] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[0]), 0));
+    if ( isX && fixed[1] == null) resolved[1] = Math.min(into[1] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[1]), 0));
+  }
+
   const relativeFit = [
      isX ? null : resolved[0] != null ? resolved[0] - (pl + pr) : null,
     !isX ? null : resolved[1] != null ? resolved[1] - (pt + pb) : null,
@@ -140,7 +146,7 @@ export const fitBlock = (
   const pickers = [] as LayoutPicker[];
 
   for (const el of els) if (!el.absolute && !el.stretch) {
-    const {margin, fit} = el;
+    const {margin, fit, sizing} = el;
     const [ml, mt, mr, mb] = margin;
 
     const size = relativeFit.slice() as AutoPoint;
@@ -151,6 +157,7 @@ export const fitBlock = (
       if (size[0] != null) size[0] -= ml + mr;
     }
 
+    console.log('block fit', size)
     const {render, pick, size: fitted} = fit(size);
 
     sizes.push(fitted);
@@ -180,8 +187,6 @@ export const fitBlock = (
     if (isX) w += m;
     else h += m;
   }
-
-  const overflow = [(w + pl + pr), (h + pt + pb)] as Point;
 
   for (const el of els) if (el.stretch) {
     const {margin, fit, under} = el;
@@ -237,7 +242,6 @@ export const fitBlock = (
 
   return {
     size: resolved,
-    overflow,
     sizes,
     offsets,
     renders,

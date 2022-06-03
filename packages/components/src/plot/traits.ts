@@ -67,12 +67,14 @@ const ARROW_TRAIT = {
   size: parseFloat,
   start: parseBoolean,
   end: parseBoolean,
+  detail: parseDetail,
 };
 
 const ARROW_DEFAULTS = {
   size: 3,
   start: false,
   end: true,
+  detail: 12,
 };
 
 const AXES_TRAIT = {
@@ -205,11 +207,13 @@ const SCALE_DEFAULTS = {
 const SURFACE_TRAIT = {
   loopX: parseBoolean,
   loopY: parseBoolean,
+  shaded: parseBoolean,
 };
 
 const SURFACE_DEFAULTS = {
   loopX: false,
   loopY: false,
+  shaded: true,
 };
 
 export const useAnchorTrait  = makeUseTrait<AnchorTrait>(ANCHOR_TRAIT, ANCHOR_DEFAULTS);

@@ -159,7 +159,7 @@ export const makeResolveBindings = (
 
         if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
         if (storages) for (const b of storages) addBinding(b, 1);
-        if (textures) for (const b of textures) addBinding(b, 2);
+        if (textures) for (const b of textures) addBinding(b, 1 + +!!b.texture!.sampler);
       }
     };
   }

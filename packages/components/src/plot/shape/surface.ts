@@ -26,7 +26,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
 
   const positions = useContext(DataContext) ?? undefined;
 
-  const {loopX, loopY} = useSurfaceTrait(props);
+  const {loopX, loopY, shaded} = useSurfaceTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
 
@@ -37,6 +37,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
       colors,
       loopX,
       loopY,
+      shaded,
     })
   );
 };

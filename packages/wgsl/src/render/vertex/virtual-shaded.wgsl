@@ -1,7 +1,7 @@
 use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
-use "@use-gpu/wgsl/use/color"::{ toColorSpace };
 
 @link fn getVertex(v: u32, i: u32) -> ShadedVertex {};
+@optional @link fn toColorSpace(c: vec4<f32>) -> vec4<f32> { return c; }
 
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,

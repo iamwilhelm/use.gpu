@@ -22,7 +22,9 @@ fn sizeToModulus(size: vec4<u32>) -> vec3<u32> {
   let size = s - vec4<u32>(dx, dy, 0u, 0u);
   let modulus = sizeToModulus(size);
 
-  let xy = getStripIndex(vertex - (vertex / 3u) * 2u);
+  var xy = getStripIndex(vertex - (vertex / 3u) * 2u);
+  if (vertex < 3u) { xy = xy.yx; }
+
   let xyd = offsetIndex(unpackIndex(instance, modulus), s, vec2<i32>(xy));
 
   return packIndex(xyd, sizeToModulus(s));
@@ -42,7 +44,8 @@ fn sizeToModulus(size: vec4<u32>) -> vec3<u32> {
   let dx = getPosition(right) - getPosition(left);
   let dy = getPosition(bottom) - getPosition(top);
 
-  return vec4<f32>(normalize(cross(dx.xyz, dy.xyz)), 0.0);
+  let normal = vec4<f32>(normalize(cross(dx.xyz, dy.xyz)), 0.0);
+  return normal;
 }
 
 fn packIndex(index: vec3<u32>, modulus: vec3<u32>) -> u32 {

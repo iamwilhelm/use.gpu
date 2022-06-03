@@ -210,16 +210,15 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         if (parent.classList.contains('tree-scroller')) break;
         parent = parent.parentElement;
       }
-      console.log({row, parent})
       if (parent) {
         const container = parent.getBoundingClientRect();
         console.log({container, rect})
-        
-        if (
-          (rect.left < container.left || rect.right > container.right) ||
-          (rect.top < container.top || rect.bottom > container.bottom)
-        ) {
+
+        if (rect.left < container.left || rect.right > container.right) {
           parent.scrollLeft = rect.left - container.left - 10;
+        }
+        
+        if (rect.top < container.top || rect.bottom > container.bottom) {
           parent.scrollTop = rect.top - container.top - 10;
         }
       }

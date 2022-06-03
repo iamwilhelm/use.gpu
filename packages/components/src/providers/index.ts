@@ -6,6 +6,7 @@ export * from './feedback-provider';
 export * from './frame-provider';
 export * from './layout-provider';
 export * from './loop-provider';
+export * from './material-provider';
 export * from './range-provider';
 export * from './render-provider';
 export * from './time-provider';

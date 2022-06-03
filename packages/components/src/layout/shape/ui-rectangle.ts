@@ -63,13 +63,13 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     const addressModeU = repeat === 'x' || repeat === 'xy' ? 'repeat' : 'clamp-to-edge';
     const addressModeV = repeat === 'y' || repeat === 'xy' ? 'repeat' : 'clamp-to-edge';
 
-    const sampler = {
+    const sampler = texture.sampler !== null ? {
       minFilter: 'linear',
       magFilter: 'linear',
       ...texture.sampler,
       addressModeU,
       addressModeV,
-    };
+    } : null;
 
     return {
       ...texture,

@@ -28,6 +28,7 @@ export type ArrowTrait = {
   size: number,
   start: boolean,
   end: boolean,
+  detail: number,
 };
 
 export type ColorTrait = {

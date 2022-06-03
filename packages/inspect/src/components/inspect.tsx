@@ -8,6 +8,7 @@ import { Node } from './node';
 import { FiberTree } from './fiber';
 import { Props } from './panels/props';
 import { Call } from './panels/call';
+import { Geometry } from './panels/geometry';
 import { Shader } from './panels/shader';
 import { Layout } from './panels/layout';
 import {
@@ -99,10 +100,11 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   let vertexTab: React.ReactNode;
   let fragmentTab: React.ReactNode;
   let layoutTab: React.ReactNode;
+  let geometryTab: React.ReactNode;
   if (selectedFiber) {
     const inspect = selectedFiber.__inspect;
     if (inspect) {
-      const {vertex, fragment, layout} = inspect;
+      const {vertex, fragment, layout, render} = inspect;
       if (vertex) {
         vertexTab = <Shader type="vertex" fiber={selectedFiber} />;
       }
@@ -111,6 +113,9 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       }
       if (layout) {
         layoutTab = <Layout fiber={selectedFiber} />;
+      }
+      if (render) {
+        geometryTab = <Geometry fiber={selectedFiber} />;
       }
     }
   }
@@ -142,12 +147,14 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
           {vertexTab ? <Tabs.Trigger value="vertex">Vertex</Tabs.Trigger> : null}
           {fragmentTab ? <Tabs.Trigger value="fragment">Fragment</Tabs.Trigger> : null}
           {layoutTab ? <Tabs.Trigger value="layout">Layout</Tabs.Trigger> : null}
+          {geometryTab ? <Tabs.Trigger value="geometry">Geometry</Tabs.Trigger> : null}
         </Tabs.List>
         <Tabs.Content value="props">{selectedFiber ? <Props fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
         <Tabs.Content value="fiber">{selectedFiber ? <Call fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
         {vertexTab ? <Tabs.Content value="vertex">{vertexTab}</Tabs.Content> : null }
         {fragmentTab ? <Tabs.Content value="fragment">{fragmentTab}</Tabs.Content> : null }
         {layoutTab ? <Tabs.Content value="layout">{layoutTab}</Tabs.Content> : null }
+        {geometryTab ? <Tabs.Content value="geometry">{geometryTab}</Tabs.Content> : null }
       </Tabs.Root>
     </Inset>
   );

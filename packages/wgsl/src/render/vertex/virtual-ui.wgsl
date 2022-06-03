@@ -1,8 +1,8 @@
 use '@use-gpu/wgsl/use/types'::{ UIVertex };
-use "@use-gpu/wgsl/use/color"::{ toColorSpace };
 
 @link fn getVertex(v: u32, i: u32) -> UIVertex {};
-
+@optional @link fn toColorSpace(c: vec4<f32>) -> vec4<f32> { return c; }
+  
 struct VertexOutput {
   @builtin(position)               position: vec4<f32>,
   @location(0)                     fragUV: vec2<f32>,
@@ -15,7 +15,7 @@ struct VertexOutput {
   @location(7)  @interpolate(flat) fragLayout: vec4<f32>,
   @location(8)  @interpolate(flat) fragRadius: vec4<f32>,
   @location(9)  @interpolate(flat) fragBorder: vec4<f32>,
-  @location(10)  @interpolate(flat) fragStroke: vec4<f32>,
+  @location(10) @interpolate(flat) fragStroke: vec4<f32>,
   @location(11) @interpolate(flat) fragFill: vec4<f32>,
 };
 

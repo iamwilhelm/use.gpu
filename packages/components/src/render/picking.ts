@@ -39,7 +39,7 @@ type PickingContextType = {
 
 export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
 
-export const usePickingContext = (id?: number, isPicking: boolean = true) => {
+export const usePickingContext = (isPicking: boolean = true) => {
   const renderContext = useContext(RenderContext);
 
   const pickingContext = isPicking ? useContext(PickingContext) : useNoContext(PickingContext);  
@@ -140,6 +140,17 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
       const index = seq(itemDims).map(i => captured![offset + i]);
       return index;
     }
+    
+    const pickingSource = {
+      texture: pickingTexture,
+      sampler: null,
+      layout: 'texture_2d<u32>',
+      variant: 'textureLoad',
+      format: pickingFormat,
+      size: [width, height],
+      colorSpace: 'picking',
+      version: 0,
+    };
 
     const context = {
       renderContext: {
@@ -153,6 +164,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
         swapView,
       } as CanvasRenderingContextGPU,
       pickingTexture,
+      pickingSource,
       captureTexture,
       sampleTexture,
     };

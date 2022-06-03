@@ -1,5 +1,6 @@
 use '@use-gpu/wgsl/use/view'::{ worldToClip };
-use "@use-gpu/wgsl/use/color"::{ toColorSpace };
+
+@optional @link fn toColorSpace(c: vec4<f32>) -> vec4<f32> { return c; }
 
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,

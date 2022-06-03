@@ -210,7 +210,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow width={2} color={0x4080ff} depth={0.01} />
+        <Arrow width={2} color={0x4080ff} depth={0.01} detail={6} />
       </Sampled> : null}
 
       { image.xo && image.yo ? <Sampled
@@ -227,7 +227,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow width={2} color={0x40c0ff} depth={0.01} />
+        <Arrow width={2} color={0x40c0ff} depth={0.01} detail={6} />
       </Sampled> : null}
     </TextureFrame> : null
   );
@@ -301,7 +301,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={arrowEmitter(preprocess ? innerField : outerField)}
                       >
-                        <Arrow width={3} depth={0.05} color={0x40c0ff} />
+                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={6} />
                       </Sampled>
                       </> : null}
                     </TextureFrame>
@@ -341,7 +341,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={arrowEmitter(outer2Field)}
                       >
-                        <Arrow width={3} depth={0.05} color={0x4080ff} />
+                        <Arrow width={3} depth={0.05} color={0x4080ff} detail={6} />
                       </Sampled>
 
                       <Sampled
@@ -353,7 +353,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={arrowEmitter(inner2Field)}
                       >
-                        <Arrow width={3} depth={0.05} color={0x40c0ff} />
+                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={6} />
                       </Sampled>
                       </> : null}
                     </TextureFrame>

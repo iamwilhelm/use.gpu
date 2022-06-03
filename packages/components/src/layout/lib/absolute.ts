@@ -1,6 +1,7 @@
 import { Point, Rectangle } from '@use-gpu/core/types';
-import { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint } from '../types';
+import { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint, AutoRectangle } from '../types';
 import { evaluateDimension } from '../parse';
+import { fitBlock } from './block';
 
 const NO_LAYOUT = [0, 0, 0, 0] as Rectangle;
 
@@ -13,49 +14,27 @@ export const fitAbsoluteBox = (
   b?: string | number | null,
   w?: string | number | null,
   h?: string | number | null,
+  direction?: Direction,
   snap?: boolean,
 ) => {
   const [iw, ih] = into;
   const box = resolveAbsoluteBox([0, 0, iw ?? 0, ih ?? 0], l, t, r, b, w, h, snap);
-  const [left, top, right, bottom] = box;
+  let [left, top, right, bottom] = box;
 
-  const width = right - left;
-  const height = bottom - top;
-  const size = [width, height] as Point;
+  const fixed = [
+    left != null && right != null ? right - left : null,
+    top != null && bottom != null ? bottom - top : null,
+  ];
 
-  const sizes = [] as Point[];
-  const offsets = [] as Point[];
-  const renders = [] as LayoutRenderer[];
-  const pickers = [] as LayoutPicker[];
+  console.log({into, fixed})
+  const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, NO_LAYOUT, direction, true, true);
+  
+  if (left == null) left = right - size[0];
+  if (top == null) top = bottom - size[1];
 
-  const n = els.length;
-  for (const el of els) {
-    const {margin, fit, stretch} = el;
-    const [ml, mt, mr, mb] = margin;
-
-    const mw = ml + mr;
-    const mh = mt + mb;
-    
-    const into = size.slice() as Point;
-    into[0] -= mw;
-    into[1] -= mh;
-
-    let {render, pick, size: fitted} = fit(into);
-
-    if (stretch) {
-      let ew = fitted[0] + mw;
-      let eh = fitted[1] + mh;
-
-      if (into[0] != null) ew = Math.min(ew, width);
-      if (into[1] != null) eh = Math.min(eh, height);
-
-      fitted = [ew - mw, eh - mh];
-    }
-
-    sizes.push(fitted);
-    offsets.push([left + ml, top + mt]);
-    renders.push(render);
-    pickers.push(pick);
+  for (const o of offsets) {
+    o[0] += left;
+    o[1] += top;
   }
 
   return {size, sizes, offsets, renders, pickers};
@@ -126,5 +105,11 @@ export const resolveAbsoluteBox = (
     }
   }
 
-  return [left, top, right, bottom] as Rectangle;
+  const rect = [left, top, right, bottom] as AutoRectangle;
+  if (r != null && l == null && w == null) rect[0] = null;
+  if (l != null && r == null && w == null) rect[2] = null;
+  if (b != null && t == null && h == null) rect[1] = null;
+  if (t != null && b == null && h == null) rect[2] = null;
+
+  return rect;
 }

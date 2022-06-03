@@ -46,6 +46,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
 
     loopX = false,
     loopY = false,
+    shaded = true,
 
     size,
     mode = RenderPassMode.Opaque,
@@ -76,8 +77,9 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     colors,
 
     indices,
-    //normals,
+    normals,
 
+    shaded,
     count: countExpr,
     mode,
     id,

@@ -5,11 +5,10 @@ import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useSta
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
   makeRenderPipeline, makeShaderModule, makeShaderBinding, makeSampler, makeTextureBinding,
-  getColorSpace,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
-import { useInspectable } from '@use-gpu/components';
+import { useInspectable, useNativeColor } from '@use-gpu/components';
 
 import instanceDrawMesh from '@use-gpu/wgsl/render/vertex/mesh.wgsl';
 import instanceDrawMeshPick from '@use-gpu/wgsl/render/vertex/mesh-pick.wgsl';
@@ -68,13 +67,12 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     return t;
   }, [device, texture]);
 
-  const cs = getColorSpace(colorInput, colorSpace);
+  const toColorSpace = useNativeColor(colorInput, colorSpace);
   const defines = {
     '@group(VIEW)': '@group(0)',
     '@binding(VIEW)': '@binding(0)',
     '@group(LIGHT)': '@group(0)',
     '@binding(LIGHT)': '@binding(1)',
-    'COLOR_SPACE': cs,
     'PICKING_ID': id,
   };
 
@@ -87,11 +85,11 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
   // Rendering pipeline
   const pipeline = useMemo(() => {
-    const vertexLinked = linkBundle(vertexShader, {}, defines);
-    const fragmentLinked = linkBundle(fragmentShader, {}, defines);
+    const vertexLinked = linkBundle(vertexShader, {toColorSpace}, defines);
+    const fragmentLinked = linkBundle(fragmentShader, {toColorSpace}, defines);
 
-    const vertex = makeShaderModule(vertexLinked, vertexShader.hash + cs);
-    const fragment = makeShaderModule(fragmentLinked, fragmentShader.hash + cs);
+    const vertex = makeShaderModule(vertexLinked, vertexShader.hash);
+    const fragment = makeShaderModule(fragmentLinked, fragmentShader.hash);
     
     inspect({vertex});
     inspect({fragment});
@@ -110,7 +108,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
         fragment: {},
       }
     );
-  }, [device, colorStates, depthStencilState, samples]);
+  }, [device, colorStates, depthStencilState, samples, toColorSpace]);
 
   // Uniforms
   const [uniform, sampled] = useMemo(() => {

@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { AutoPoint, Dimension, LayoutElement } from '../types';
+import { AutoPoint, Dimension, Direction, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
@@ -19,6 +19,8 @@ export type AbsoluteProps = Partial<ElementTrait> &
   right?: Dimension,
   bottom?: Dimension,
 
+  direction: Direction,
+
   under?: boolean,
   snap?: boolean,
   children?: LiveElement<any>,
@@ -30,6 +32,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
     top: t,
     right: r,
     bottom: b,
+    direction = 'y',
     under = false,
     snap = true,
     children,
@@ -52,7 +55,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
       absolute: true,
       under,
       fit: memoFit((into: AutoPoint) => {
-        const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, snap);
+        const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, direction, snap);
 
         inspect({
           layout: {

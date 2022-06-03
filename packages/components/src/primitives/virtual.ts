@@ -8,10 +8,18 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { getWireframe } from '../render/wireframe';
 import { useInspectHoverable } from '../hooks/useInspectable';
 
+import { DeviceContext } from '../providers/device-provider';
+import { ViewContext } from '../providers/view-provider';
+import { RenderContext } from '../providers/render-provider';
+import { PickingContext } from '../render/picking';
+import { getNativeColor } from '../hooks/useNativeColor';
+
+import instanceDrawVirtualShaded from '@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl';
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
 import instanceDrawVirtualPick from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
 import instanceDrawVirtualUI from '@use-gpu/wgsl/render/vertex/virtual-ui.wgsl';
 
+import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
 import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
 import instanceFragmentPick from '@use-gpu/wgsl/render/fragment/pick.wgsl';
 import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
@@ -32,10 +40,8 @@ const SOLID_RENDERER = [
 ] as VirtualRenderer;
 
 const SHADED_RENDERER = [
-  instanceDrawVirtualSolid,
-  instanceFragmentSolid,
-  //instanceDrawVirtualShaded,
-  //instanceFragmentShaded,
+  instanceDrawVirtualShaded,
+  instanceFragmentShaded,
 ] as VirtualRenderer;
 
 const UI_RENDERER = [
@@ -111,6 +117,11 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
   const isPicking = m === RenderPassMode.Picking;
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
 
+  const renderContext = useContext(RenderContext);
+  const {renderContext: pickingContext} = useContext(PickingContext);
+  const resolvedContext = isPicking ? pickingContext : renderContext;
+  const {colorInput, colorSpace} = resolvedContext;
+
   const [
     vertexShader,
     fragmentShader,
@@ -150,11 +161,12 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
       getId,
       getVertex,
       getFragment: isDebug ? null : getFragment,
+      toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment, getId, isDebug]);
+  }, [vertexShader, fragmentShader, getVertex, getFragment, getId, isDebug, colorInput, colorSpace]);
   
   // Inline the render fiber to avoid another memo()
   return render({
@@ -164,8 +176,8 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     fragment: f,
     defines,
     deps,
-
     pipeline,
+    renderContext: resolvedContext,
     mode: m,
     id,
   });

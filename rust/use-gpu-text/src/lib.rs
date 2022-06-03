@@ -253,8 +253,9 @@ impl UseRustText {
         let value: GlyphMetrics;
         match rgba {
             Some(rgba) => {
+                let s = scale / rgba.scale;
                 let l = rgba.origin.x;
-                let t = -font.ascent() * scale / rgba.scale;
+                let t = lb.min.y / s;
 
                 let decoder = Decoder::new(rgba.data);
                 let mut reader = decoder.read_info().unwrap();
@@ -305,7 +306,7 @@ impl UseRustText {
                     width: output_info.width,
                     height: output_info.height,
                     rgba: true,
-                    scale: rgba.scale / scale,
+                    scale: s,
                 };       
             }
             _ => {

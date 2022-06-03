@@ -8,8 +8,9 @@ import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
 import { ViewContext } from '../providers/view-provider';
-import { useInspectable, useInspectorSelect, Inspector } from '../hooks/useInspectable';
+import { useInspectable, useInspectHoverable, useInspectorSelect, Inspector } from '../hooks/useInspectable';
 
+import { makeBoxInspectLayout } from './lib/util';
 import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec3 } from 'gl-matrix';
 
@@ -22,39 +23,42 @@ export type LayoutProps = {
 export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
   const {render, children} = props;
   const inspect = useInspectable();
-  return gather(children ?? (render ? render() : null), Resume(inspect));
+  const hovered = useInspectHoverable();
+  return gather(children ?? (render ? render() : null), Resume(inspect, hovered));
 }, 'Layout');
 
-const Resume = (inspect: Inspector) => (els: LayoutElement[]) => {
+const Resume = (inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) => {
   const layout = useContext(LayoutContext);
   const {layout: {inspect: toggleInspect}} = useContext(DebugContext);
 
   const [left, top, right, bottom] = layout;
   const into = [right - left, bottom - top] as Point;
-  
+
+  const {id} = useFiber();  
   const pickers: any[] = [];
   const sizes: Point[] = [];
   const offsets: Point[] = [];
 
   const out = [] as LiveElement[];
-  for (const {margin, fit} of els) {
+  for (const {margin, fit, absolute} of els) {
     const {
       size,
       render,
       pick,
     } = fit(into);
 
-    const [w, h] = size;
+    const [w, h] = absolute ? into : size;
     const [ml, mt] = margin;
-    const el = render([left + ml, top + mt, left + ml + w, top + mt + h]);
+    const layout = [left + ml, top + mt, left + ml + w, top + mt + h];
+    const el = render(layout);
     
-    sizes.push(size);
+    sizes.push([w, h]);
     offsets.push([left + ml, top + mt]);
 
     if (Array.isArray(el)) out.push(...el);
     else if (el) out.push(el);
 
-    if (pick) pickers.push((x: number, y: number, scroll: boolean = false) => pick(x, y, left + ml, top + mt, scroll));
+    if (pick) pickers.push((x: number, y: number, scroll: boolean = false) => pick(x, y, layout[0], layout[1], layout[2], layout[3], scroll));
   }
   
   pickers.reverse();
@@ -70,6 +74,11 @@ const Resume = (inspect: Inspector) => (els: LayoutElement[]) => {
   
   out.push(keyed(Scroller, -2, pickers));
 
+  if (hovered) {
+    out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0]));
+    console.log(out)
+  }
+  
   if (toggleInspect) out.push(keyed(Inspect, -1, pickers));
 
   return fragment(out);
@@ -87,12 +96,13 @@ export const Scroller = (pickers: any[]) => {
   const { useWheel } = useContext(WheelContext);
   const { viewUniforms } = useContext(ViewContext);
   const {
+    viewPixelRatio: { current: dpi },
     viewSize: { current: [width, height] },
     projectionMatrix: { current: matrix },
   } = viewUniforms;
 
   const { wheel } = useWheel();
-  const [px, py] = screenToView(matrix, wheel.x / width * 2.0 - 1.0, 1.0 - wheel.y / height * 2.0);
+  const [px, py] = screenToView(matrix, wheel.x / width * dpi * 2.0 - 1.0, 1.0 - wheel.y / height * dpi * 2.0);
   
   useOne(() => {
     const { x, y, moveX, moveY, stopped } = wheel;
@@ -116,6 +126,7 @@ export const Inspect = (pickers: any[]) => {
   const { useMouse } = useContext(MouseContext);
   const { viewUniforms } = useContext(ViewContext);
   const {
+    viewPixelRatio: { current: dpi },
     viewSize: { current: [width, height] },
     projectionMatrix: { current: matrix },
   } = viewUniforms;
@@ -123,7 +134,7 @@ export const Inspect = (pickers: any[]) => {
   const setHighlight = useInspectorSelect();
 
   const { mouse, pressed } = useMouse();
-  const [px, py] = screenToView(matrix, mouse.x / width * 2.0 - 1.0, 1.0 - mouse.y / height * 2.0);
+  const [px, py] = screenToView(matrix, mouse.x / width * dpi * 2.0 - 1.0, 1.0 - mouse.y / height * dpi * 2.0);
 
   const picked = useOne(() => {
     for (const picker of pickers) {

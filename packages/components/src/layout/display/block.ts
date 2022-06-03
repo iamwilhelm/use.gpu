@@ -81,7 +81,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
           height != null ? h : null,
         ] as [number | number, number | null];
 
-        const {size, overflow, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
+        const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
 
         inspect({
           layout: {

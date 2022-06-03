@@ -65,7 +65,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
 
           stroke: hovered ? INSPECT_STYLE.parent.stroke : stroke ?? TRANSPARENT,
           fill:   hovered ? INSPECT_STYLE.parent.fill : fill ?? TRANSPARENT,
-          border: hovered ? INSPECT_STYLE.parent.border : border,
+          border: hovered ? INSPECT_STYLE.parent.border : border ?? TRANSPARENT,
           radius,
 
           image,
@@ -77,8 +77,9 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       return {
         size,
         render,
-        pick: (x: number, y: number, l: number, t: number, scroll?: boolean) => {
-          return !scroll ? [id, [l, t, l + size[0], t + size[1]]] : null;
+        pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {
+          if (x < l || x > r || y < t || y > b) return null;
+          return !scroll ? [id, [l, t, r, b]] : null;
         },
       };
     },

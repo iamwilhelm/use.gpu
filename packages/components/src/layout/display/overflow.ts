@@ -3,7 +3,7 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core/types';
 import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement } from '../types';
 
-import { memo, use, gather, yeet, useFiber, useOne } from '@use-gpu/live';
+import { memo, use, gather, yeet, extend, useFiber, useOne } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
 import { useInspectable } from '../../hooks/useInspectable';
@@ -16,6 +16,7 @@ import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
 import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
 import { parseOverflow } from '../parse';
+import { ScrollBar } from '../element/scrollbar';
 import { Block } from './block';
 import { mat4 } from 'gl-matrix';
 
@@ -25,12 +26,16 @@ const NO_POINT4: Point4 = [0, 0, 0, 0];
 const OFFSET_BINDING = bundleToAttribute(getScrolledPosition, 'getOffset');
 const CLIP_BINDING = {name: 'getClip', format: 'vec4<f32>' as UniformType};
 
+const SCROLLBAR = use(ScrollBar, {});
+
 export type OverflowProps = {
   x?: OverflowMode,
   y?: OverflowMode,
   
   scrollX?: number,
   scrollY?: number,
+
+  scrollBar?: LiveElement<any>,
   
   direction?: Direction,
   children?: LiveElement<any>,
@@ -40,6 +45,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
   const {
     scrollX = 0,
     scrollY = 0,
+    scrollBar = SCROLLBAR,
     direction = 'y',
     children,
   } = props;
@@ -108,10 +114,10 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
     const transform = bindBundle(getScrolledPosition, {getOffset: o});
     const inverse = bindBundle(getScrolledPosition, {getOffset: s});
 
-    return {clip, transform, inverse, scrollRef, fitTo, sizeTo, scrollTo, scrollBy};
+    return {clip, transform, inverse, sizeRef, scrollRef, fitTo, sizeTo, scrollTo, scrollBy};
   });
   
-  const {clip, transform, inverse, scrollRef, fitTo, sizeTo, scrollTo, scrollBy} = api;
+  const {clip, transform, inverse, sizeRef, scrollRef, fitTo, sizeTo, scrollTo, scrollBy} = api;
 
   useOne(() => scrollTo(scrollX, null), scrollX);
   useOne(() => scrollTo(null, scrollY), scrollY);
@@ -121,7 +127,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
   const Resume = (els: LayoutElement[]) => {
     const sizing = getBlockMinMax(els, NO_FIXED, direction);
-    const [{margin, fit}] = els;
+    const [{margin, fit}, ...scrollBars] = els;
     const [ml, mt, mr, mb] = margin;
 
     return yeet({
@@ -133,11 +139,18 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
         const resolved: AutoPoint = direction === 'x' ? [null, into[1]] : [into[0], null];
         const {render, pick, size} = fit(resolved);
 
-        const sizes = [size];
+        const sizes   = [size];
         const offsets = [[ml, mt]] as Point[];
         const renders = [render];
         const pickers = [pick];
-        const scrollers = [scroll];
+
+        for (const {fit} of scrollBars) {
+          const {render, pick, size} = fit(into);
+          sizes.push(size);
+          offsets.push([0, 0]);
+          renders.push(render);
+          pickers.push(null);
+        }
 
         inspect({
           layout: {
@@ -150,7 +163,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
         sizeTo(size);
 
-        const self = {
+        return {
           size,
           render: (
             box: Rectangle,
@@ -158,15 +171,23 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
             parentTransform?: ShaderModule,
           ) => {
             fitTo(box);
-            return makeBoxLayout(sizes, offsets, renders, clip, transform, inverse)(box, parentClip, parentTransform);
+            return [
+              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
+              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
+            ];
           },
           pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
         };
-
-        return self;
       }),
     });
   };
 
-  return children ? gather(use(Block, {contain: true, direction, children}), Resume) : null;
+  const scrollBarX = x === 'scroll' || x === 'auto' ? extend(scrollBar, { direction: 'x', overflow: x, scrollRef, sizeRef }) : null;
+  const scrollBarY = y === 'scroll' || y === 'auto' ? extend(scrollBar, { direction: 'y', overflow: y, scrollRef, sizeRef }) : null;
+
+  return children ? gather([
+    use(Block, {contain: true, direction, children}),
+    scrollBarX,
+    scrollBarY,
+  ], Resume) : null;
 }, 'Overflow');

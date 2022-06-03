@@ -97,7 +97,7 @@ export const makeBoxInspectLayout = (
   id: number,
   sizes: Point[],
   offsets: Point[],
-  renders: LayoutRenderer[],
+  renders?: LayoutRenderer[],
   clip?: ShaderModule,
   transform?: ShaderModule,
   inverse?: ShaderModule,
@@ -107,7 +107,7 @@ export const makeBoxInspectLayout = (
   parentClip?: ShaderModule,
   parentTransform?: ShaderModule,
 ) => {
-  const out = makeBoxLayout(sizes, offsets, renders, clip, transform, inverse, update)(box, parentClip, parentTransform);
+  const out = renders ? makeBoxLayout(sizes, offsets, renders, clip, transform, inverse, update)(box, parentClip, parentTransform) : [];
   
   const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
   const xclip = parentClip ? (
@@ -124,7 +124,7 @@ export const makeBoxInspectLayout = (
   ) : clip;
 
   let i = 0;
-  const next = () => id.toString() + i++;
+  const next = () => id.toString() + '-' + i++;
   const yeets = [] as UIAggregate[];
   yeets.push({
     id: next(),
@@ -145,7 +145,6 @@ export const makeBoxInspectLayout = (
   for (let i = 0; i < n; ++i) {
     const size = sizes[i];
     const offset = offsets[i];
-    const render = renders[i];
 
     const w = size[0];
     const h = size[1];
@@ -232,16 +231,16 @@ export const makeInlineInspectLayout = (
   ranges: Point[],
   sizes: Point[],
   offsets: [number, number, number][],
-  renders: InlineRenderer[],
+  renders?: InlineRenderer[],
 ) => (
   box: Rectangle,
   clip?: ShaderModule,
   transform?: ShaderModule,
 ) => {
-  const out = makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform);
+  const out = renders ? makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform) : [];
 
   let i = 0;
-  const next = () => id.toString() + i++;
+  const next = () => id.toString() + '-' + i++;
   const yeets = [] as UIAggregate[];
   yeets.push({
     id: next(),
@@ -261,7 +260,6 @@ export const makeInlineInspectLayout = (
     const range = ranges[i];
     const size = sizes[i];
     const offset = offsets[i];
-    const render = renders[i];
 
     const [x, y, gap] = offset;
     const l = left + x;
@@ -297,8 +295,10 @@ export const makeBoxPicker = (
 ) => (
   x: number,
   y: number,
-  ox: number,
-  oy: number,
+  l: number,
+  t: number,
+  r: number,
+  b: number,
   scroll: boolean = false,
 ): [
   number,
@@ -307,6 +307,8 @@ export const makeBoxPicker = (
 ] | null => {
   const n = sizes.length;
 
+  if (x < l || x > r || y < t || y > b) return null;
+
   for (let i = n - 1; i >= 0; --i) {
     const size = sizes[i];
     const offset = offsets[i];
@@ -314,26 +316,23 @@ export const makeBoxPicker = (
 
     const [w, h] = size;
 
-    let [l, t] = offset;
-    l += ox;
-    t += oy;
+    let [ll, tt] = offset;
+    ll += l;
+    tt += t;
 
     if (scrollPos) {
-      l -= scrollPos[0];
-      t -= scrollPos[1];
+      ll -= scrollPos[0];
+      tt -= scrollPos[1];
     }
 
-    let r = l + w;
-    let b = t + h;
+    let rr = ll + w;
+    let bb = tt + h;
     
-    if (x >= l && x < r && y >= t && y < b) {
-      const sub = pick && pick(x, y, l, t, scroll);
-      if (sub) return sub;
-      return (!scroll || onScroll) ? [id, [l, t, r, b], onScroll] : null;
-    }
+    const sub = pick && pick(x, y, ll, tt, rr, bb, scroll);
+    if (sub) return sub;
   }
 
-  return null;
+  return (!scroll || onScroll) ? [id, [l, t, r, b], onScroll] : null;
 };
 
 export const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);

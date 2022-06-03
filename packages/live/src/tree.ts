@@ -133,6 +133,12 @@ export const renderWithDispatch = <T>(
   return fiber;
 }
 
+let NEXT_FIBER: LiveFiber<any> | null = null;
+export const sliceNextFiber = (fiber: LiveFiber<any>) => {
+  if (NEXT_FIBER) throw new Error("can't slice fiber twice");
+  NEXT_FIBER = fiber;
+}
+
 // Render a list of updated fibers as one batch
 export const renderFibers = (
   host: HostInterface,
@@ -148,9 +154,15 @@ export const renderFibers = (
     host.__stats.dispatch++;
 
     DEBUG && console.log('Next Sub-Root', formatNode(fiber));
-    
-    const element = renderFiber(fiber);
-    updateFiber(fiber, element);
+
+    NEXT_FIBER = fiber;
+    while (NEXT_FIBER) {
+      const fiber = NEXT_FIBER;
+      NEXT_FIBER = null;
+
+      const element = renderFiber(fiber);
+      updateFiber(fiber, element);
+    }
   }
 
   return fibers;

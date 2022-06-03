@@ -39,6 +39,7 @@ const Resume = (inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) 
   const sizes: Point[] = [];
   const offsets: Point[] = [];
 
+  // Render children into root container
   const out = [] as LiveElement[];
   for (const {margin, fit, absolute} of els) {
     const {
@@ -58,11 +59,14 @@ const Resume = (inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) 
     if (Array.isArray(el)) out.push(...el);
     else if (el) out.push(el);
 
-    if (pick) pickers.push((x: number, y: number, scroll: boolean = false) => pick(x, y, layout[0], layout[1], layout[2], layout[3], scroll));
+    if (pick) pickers.push((x: number, y: number, scroll: boolean = false) =>
+      pick(x, y, layout[0], layout[1], layout[2], layout[3], scroll));
   }
-  
+
+  // Picking goes front-to-back
   pickers.reverse();
 
+  // Inspectable layout
   inspect({
     layout: {
       into,
@@ -71,14 +75,12 @@ const Resume = (inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) 
       offsets,
     },
   });
-  
-  out.push(keyed(Scroller, -2, pickers));
+  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0]));
 
-  if (hovered) {
-    out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0]));
-    console.log(out)
-  }
+  // Add scroll listener
+  out.push(keyed(Scroller, -2, pickers));
   
+  // Interactive inspect handler
   if (toggleInspect) out.push(keyed(Inspect, -1, pickers));
 
   return fragment(out);

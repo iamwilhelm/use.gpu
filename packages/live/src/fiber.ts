@@ -6,7 +6,7 @@ import {
 
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
 import { discardState } from './hooks';
-import { renderFibers } from './tree';
+import { renderFibers, sliceNextFiber } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction } from './util';
 import { formatNode, formatNodeName } from './debug';
 

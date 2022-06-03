@@ -5,6 +5,7 @@ import { memo, use, fragment, useContext, useNoContext, useMemo, useNoMemo, useO
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
+import { getWireframe } from '../render/wireframe';
 import { useInspectHoverable } from '../hooks/useInspectable';
 
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
@@ -20,42 +21,27 @@ import instanceDrawWireframeList from '@use-gpu/wgsl/render/vertex/wireframe-lis
 
 import { render } from './render';
 
-const DEBUG_RENDERER = {
-  list: instanceDrawWireframeList,
-  strip: instanceDrawWireframeStrip,
-  fragment: instanceFragmentSolid,
-} as Record<string, ParsedBundle>;
-
-const PICK_PASS = [
+const PICK_RENDERER = [
   instanceDrawVirtualPick,
   instanceFragmentPick,
-] as [ParsedBundle, ParsedBundle];
+] as VirtualRenderer;
 
-const SOLID_RENDERER = {
-  color: [
-    instanceDrawVirtualSolid,
-    instanceFragmentSolid,
-  ],
-  pick: PICK_PASS,
-} as VirtualRenderer;
+const SOLID_RENDERER = [
+  instanceDrawVirtualSolid,
+  instanceFragmentSolid,
+] as VirtualRenderer;
 
-const SHADED_RENDERER = {
-  color: [
-    instanceDrawVirtualSolid,
-    instanceFragmentSolid,
-    //instanceDrawVirtualShaded,
-    //instanceFragmentShaded,
-  ],
-  pick: PICK_PASS,
-} as VirtualRenderer;
+const SHADED_RENDERER = [
+  instanceDrawVirtualSolid,
+  instanceFragmentSolid,
+  //instanceDrawVirtualShaded,
+  //instanceFragmentShaded,
+] as VirtualRenderer;
 
-const UI_RENDERER = {
-  color: [
-    instanceDrawVirtualUI,
-    instanceFragmentUI,
-  ],
-  pick: PICK_PASS,
-} as VirtualRenderer;
+const UI_RENDERER = [
+  instanceDrawVirtualUI,
+  instanceFragmentUI,
+] as VirtualRenderer;
 
 const BUILTIN = {
   solid: SOLID_RENDERER,
@@ -63,10 +49,7 @@ const BUILTIN = {
   ui: UI_RENDERER,
 } as Record<string, VirtualRenderer>;
 
-type VirtualRenderer = {
-  color: [ParsedBundle, ParsedBundle],
-  pick: [ParsedBundle, ParsedBundle],
-};
+type VirtualRenderer = [ParsedBundle, ParsedBundle];
 
 export type VirtualProps = {
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
@@ -89,7 +72,26 @@ const ID_BINDING = { name: 'getId', format: 'u32', value: 0, args: [] };
 
 export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
   const {
-    getVertex,
+    mode = RenderPassMode.Opaque,
+    id = 0,
+  } = props;
+
+  if (id && mode !== RenderPassMode.Picking) {
+    return fragment([
+      use(Variant, {...props, id: 0}),
+      use(Variant, {...props, mode: RenderPassMode.Picking}),
+    ]);
+  }
+  
+  return Variant(props);
+}, 'Virtual'); 
+
+export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
+  let {
+    getVertex: gV,
+    vertexCount: vC,
+    instanceCount: iC,
+
     getFragment,
 
     pipeline,
@@ -101,73 +103,44 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     id = 0,
   } = props;
 
-  if (id && mode !== RenderPassMode.Picking) {
-    return fragment([
-      use(Virtual, {...props, id: 0}),
-      use(Virtual, {...props, mode: RenderPassMode.Picking}),
-    ]);
-  }
-
   let m = mode;
   const hovered = useInspectHoverable();
   if (hovered) m = RenderPassMode.Debug;
 
   const isDebug = m === RenderPassMode.Debug;
   const isPicking = m === RenderPassMode.Picking;
-
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
 
-  let vertexShader: ParsedBundle;
-  let fragmentShader: ParsedBundle;
-  
-  if (isDebug) {
-    vertexShader = DEBUG_RENDERER[(topology === 'triangle-strip') ? 'strip' : 'list'];
-    fragmentShader = DEBUG_RENDERER.fragment;
-  }
-  else {
-    let r: VirtualRenderer | undefined;
-    r = (typeof renderer == 'string') ? BUILTIN[renderer] : renderer;
-    if (!r) throw new Error(`Unknown renderer '${renderer}'`);
-
-    const k = isPicking ? 'pick' : 'color';
-    [vertexShader, fragmentShader] = r[k];
-  }
-
-  // Debug wireframe
-  let {
+  const [
+    vertexShader,
+    fragmentShader,
+    getVertex,
     vertexCount,
-    instanceCount,
-  } = props;
+    instanceCount
+  ] = useMemo(() => {
+    let vertexShader: ShaderModule;
+    let fragmentShader: ShaderModule;
 
-  let getInstanceSize: ShaderModule | null = null;
+    let getVertex: ShaderModule = gV;
+    let vertexCount: Prop<number> = vC;
+    let instanceCount: Prop<number> = iC;
 
-  if (isDebug) {
-    const i = instanceCount;
-    const v = vertexCount;
+    if (isDebug) {
+      [vertexShader, fragmentShader] = SOLID_RENDERER;
+      ({getVertex, vertexCount, instanceCount} = getWireframe(gV, vC, iC, topology));
+    }
+    else if (isPicking) {
+      [vertexShader, fragmentShader] = PICK_RENDERER;
+    }
+    else {
+      let r: VirtualRenderer | undefined;
+      r = (typeof renderer == 'string') ? BUILTIN[renderer] : renderer;
+      if (!r) throw new Error(`Unknown renderer '${renderer}'`);
+      [vertexShader, fragmentShader] = r;
+    }
 
-    [vertexCount, instanceCount, getInstanceSize] = useMemo(() => {
-      let vertexCount, instanceCount, instanceSize;
-
-      if (topology === 'triangle-strip') {
-        const edges = () => (resolve(v) - 2) * 2 + 1;
-
-        vertexCount = 4;
-        instanceCount = () => edges() * resolve(i);
-        instanceSize = edges;
-      }
-      else /*if (topology === 'triangle-list')*/ {
-        vertexCount = 18;
-        instanceCount = () => resolve(v) * resolve(i);
-        instanceSize = () => resolve(v);
-      }
-    
-      const getInstanceSize = bindingToModule({uniform: DEBUG_BINDING, constant: instanceSize});      
-      return [vertexCount, instanceCount, getInstanceSize];
-    }, [vertexCount, instanceCount]);
-  }
-  else {
-    useNoMemo();
-  }
+    return [vertexShader, fragmentShader, getVertex, vertexCount, instanceCount];
+  }, [gV, vC, iC, m, topology]);
 
   const getId = useOne(() => isPicking ? bindingToModule({uniform: ID_BINDING, constant: id}) : null, id);
 
@@ -177,7 +150,6 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
       getId,
       getVertex,
       getFragment: isDebug ? null : getFragment,
-      getInstanceSize: isDebug ? getInstanceSize : null,
     };
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
@@ -197,4 +169,4 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     mode: m,
     id,
   });
-}, "Virtual");
+};

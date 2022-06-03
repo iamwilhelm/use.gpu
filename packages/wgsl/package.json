@@ -253,6 +253,16 @@
       "import": "./src/render/vertex/wireframe-strip.wgsl",
       "require": "./src/render/vertex/wireframe-strip.wgsl"
     },
+    "./render/wireframe/wireframe-list.wgsl": {
+      "types": "./src/render/wireframe/wireframe-list.wgsl.d.ts",
+      "import": "./src/render/wireframe/wireframe-list.wgsl",
+      "require": "./src/render/wireframe/wireframe-list.wgsl"
+    },
+    "./render/wireframe/wireframe-strip.wgsl": {
+      "types": "./src/render/wireframe/wireframe-strip.wgsl.d.ts",
+      "import": "./src/render/wireframe/wireframe-strip.wgsl",
+      "require": "./src/render/wireframe/wireframe-strip.wgsl"
+    },
     "./transform/cartesian.wgsl": {
       "types": "./src/transform/cartesian.wgsl.d.ts",
       "import": "./src/transform/cartesian.wgsl",

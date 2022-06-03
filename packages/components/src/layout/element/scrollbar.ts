@@ -103,6 +103,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
           uv: [0, 0, 1, 1],
           fill:   track,
           radius: [size/2, size/2, size/2, size/2],
+          ...(hovered ? INSPECT_STYLE.parent : undefined),
 
           clip,
           transform,
@@ -114,6 +115,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
           uv: [0, 0, 1, 1],
           fill:   thumb,
           radius: [size/2, size/2, size/2, size/2],
+          ...(hovered ? INSPECT_STYLE.parent : undefined),
 
           clip,
           transform: transform ? chainTo(transform, thumbTransform) : thumbTransform,

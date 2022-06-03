@@ -344,6 +344,20 @@ declare module "@use-gpu/wgsl/render/vertex/wireframe-strip.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/wireframe/wireframe-list.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getWireframeListVertex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/wireframe/wireframe-strip.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getWireframeStripVertex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/transform/cartesian.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;

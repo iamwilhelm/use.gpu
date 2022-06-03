@@ -6,19 +6,7 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 @link fn getVertex(v: u32, i: u32) -> SolidVertex {};
 @link fn getInstanceSize() -> u32 {};
 
-struct VertexOutput {
-  @builtin(position) position: vec4<f32>,
-  @location(0) fragColor: vec4<f32>,
-  @location(1) fragUV: vec2<f32>,
-};
-
-@stage(vertex)
-fn main(
-  @builtin(vertex_index) vertexIndex: u32,
-  @builtin(instance_index) instanceIndex: u32,
-) -> VertexOutput {
-  var NaN: f32 = bitcast<f32>(0xffffffffu);
-
+@export fn getWireframeListVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
   let vi = vertexIndex;
   var ij = getStripIndex(vi - (vi / 3u) * 2u);
   var xy = vec2<f32>(ij) * 2.0 - 1.0;
@@ -54,14 +42,16 @@ fn main(
   var c = getVertex(ic, i);
   
   if (a.position.w < 0.0 || b.position.w < 0.0 || c.position.w < 0.0) {
-    return VertexOutput(
+    var NaN: f32 = bitcast<f32>(0xffffffffu);
+    return SolidVertex(
       vec4<f32>(NaN, NaN, NaN, NaN),
       vec4<f32>(NaN, NaN, NaN, NaN),
       vec2<f32>(NaN, NaN),
+      0u,
     );
   }
 
-  var left = a.position.xyz / a.position.w;
+  var left  = a.position.xyz / a.position.w;
   var right = b.position.xyz / b.position.w;
   var other = c.position.xyz / c.position.w;
 
@@ -73,9 +63,10 @@ fn main(
     join = getLineJoin(other, left, right, 1.0, xy.y, 2.0, 3, 2);
   }
 
-  return VertexOutput(
+  return SolidVertex(
     vec4<f32>(join, 1.0),
     vec4<f32>(1.0, 1.0, 1.0, 1.0),
     vec2<f32>(0.0, 0.0),
+    0u,
   );
 }

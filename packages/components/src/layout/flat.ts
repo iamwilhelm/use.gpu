@@ -60,7 +60,7 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     const bottom = h;
     const layout = [left, top, right, bottom] as Rectangle;
 
-    const matrix = makeOrthogonalMatrix(left, right, bottom, top, -near, -far);
+    const matrix = makeOrthogonalMatrix(left, right, bottom, top, near, far);
 
     return [layout, matrix, ratio, w, h];
   }, [scale, width, height, pixelRatio]);
@@ -94,7 +94,7 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
-  uniforms.viewWorldDepth.current = focus * viewHeight / 2.0;
+  uniforms.viewWorldDepth.current = [focus * viewHeight / 2.0, viewHeight / (far - near) / 2.0];
   uniforms.viewPixelRatio.current = ratio;
 
   usePerFrame();

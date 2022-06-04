@@ -22,6 +22,7 @@ type GlyphControlsProps = {
   hasGlyph?: boolean,
   hasContours?: boolean,
   hasRelax?: boolean,
+  has3D?: boolean,
   container?: Element | null,
   render?: ({subpixel, contours, preprocess, postprocess, glyph}: {
     subpixel: boolean,
@@ -33,16 +34,17 @@ type GlyphControlsProps = {
 };
 
 export const GlyphControls: LC<GlyphControlsProps> = (props: GlyphControlsProps) => {
-  const {hasGlyph, hasContours, hasRelax, container, render} = props;
+  const {hasGlyph, hasContours, hasRelax, has3D, container, render} = props;
 
   const [subpixel, setSubpixel] = useState(true);
   const [contours, setContours] = useState(false);
   const [preprocess, setPreprocess] = useState(true);
   const [postprocess, setPostprocess] = useState(true);
+  const [orbit, setOrbit] = useState(false);
   const [glyph, setGlyph] = useState('@');
 
   return fragment([
-    render ? render({subpixel, contours, preprocess, postprocess, glyph}) : null,
+    render ? render({subpixel, contours, preprocess, postprocess, glyph, orbit}) : null,
     use(HTML, {
       container,
       style: STYLE,
@@ -66,6 +68,11 @@ export const GlyphControls: LC<GlyphControlsProps> = (props: GlyphControlsProps)
         {hasContours ? (
           <div>
             <label><input type="checkbox" checked={contours} onChange={(e) => setContours(e.target.checked)} /> Show SDF Contours</label>
+          </div>
+        ) : null}
+        {has3D ? (
+          <div>
+            <label><input type="checkbox" value={orbit} onChange={(e) => setOrbit(e.target.checked)} /> 3D View</label>
           </div>
         ) : null}
       </>)

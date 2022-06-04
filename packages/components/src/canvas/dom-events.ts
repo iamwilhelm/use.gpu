@@ -188,11 +188,17 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       document.removeEventListener('mouseup', onMouseUp, CAPTURE_EVENT);
     };
     
+    const onContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    
     const onKeyDown = (e: KeyboardEvent) => onModifiers(e);
     const onKeyUp = (e: KeyboardEvent) => onModifiers(e);
 
     element.addEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
     element.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
+    element.addEventListener('contextmenu', onContextMenu, CAPTURE_EVENT);
 
     element.addEventListener('touchstart', onTouchStart, CAPTURE_EVENT);
     element.addEventListener('touchmove', onTouchMove, CAPTURE_EVENT);

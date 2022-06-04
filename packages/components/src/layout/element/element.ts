@@ -10,6 +10,7 @@ import { useInspectHoverable } from '../../hooks/useInspectable';
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { INSPECT_STYLE } from '../lib/constants';
+import { memoLayout } from '../lib/util';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 
@@ -58,7 +59,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
       const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
       const size = [w ?? 0, h ?? 0];
 
-      let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
+      let render = memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
         keyed(UIRectangle, id, {
           id,
           layout,
@@ -72,7 +73,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
           clip,
           transform,
         })
-      );
+      ));
 
       return {
         size,

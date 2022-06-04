@@ -1,4 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 
 import { UniformAttribute, UniformType } from './types';
 
@@ -29,7 +29,7 @@ export const VIEW_UNIFORMS: UniformAttribute[] = [
   },
   {
     name: 'viewWorldDepth',
-    format: 'f32',
+    format: 'vec2<f32>',
   },
   {
     name: 'viewPixelRatio',
@@ -114,21 +114,38 @@ export const makeProjectionMatrix = (
   return matrix;
 }
 
-export const makeOrbitMatrix = (radius: number, phi: number, theta: number, dolly: number): mat4 => {
+const NO_TARGET = [0, 0, 0];
+
+export const makeOrbitMatrix = (
+  radius: number,
+  phi: number,
+  theta: number,
+  target: number[] | vec3 | vec4 = NO_TARGET,
+  dolly: number = 1,
+): mat4 => {
+
   const matrix = mat4.create();
   mat4.translate(matrix, matrix, vec3.fromValues(0, 0, -radius / (dolly || 1)));
   mat4.rotate(matrix, matrix, theta, vec3.fromValues(1, 0, 0));
   mat4.rotate(matrix, matrix, phi, vec3.fromValues(0, 1, 0));
+  mat4.translate(matrix, matrix, target);
+  
   return matrix;
 }
 
-export const makeOrbitPosition = (radius: number, phi: number, theta: number, dolly: number): number[] => {
+export const makeOrbitPosition = (
+  radius: number,
+  phi: number,
+  theta: number,
+  target: number[] | vec3 | vec4 = NO_TARGET,
+  dolly: number = 1,
+): number[] => {
   const ct = Math.cos(theta);
   radius /= Math.max(1e-5, dolly);
   return [
-    -Math.sin(phi) * ct * radius,
-    Math.sin(theta) * radius,
-    Math.cos(phi) * ct * radius,
+    -Math.sin(phi) * ct * radius + (target[0] || 0),
+    Math.sin(theta) * radius + (target[1] || 0),
+    Math.cos(phi) * ct * radius + (target[2] || 0),
   ];
 }
 

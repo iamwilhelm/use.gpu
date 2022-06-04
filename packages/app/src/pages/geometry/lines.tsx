@@ -16,7 +16,9 @@ import {
 // Line data fields
 
 const dataFields = [
+  // Accessor syntax
   ['array<vec4<f32>>', (o: any) => o.path],
+  // Shorthand => o.color
   ['vec4<f32>', 'color'],
   ['f32', 'width'],
 ] as DataField[];
@@ -25,7 +27,7 @@ const isLoop = (o: any) => o.loop;
 const isStart = (o: any) => o.start;
 const isEnd = (o: any) => o.end;
 
-// Generate some lines and arrows
+// Generate some random lines and arrows
 
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
@@ -37,10 +39,12 @@ const circleY = (a: number, r: number) => Math.sin(a * Math.PI * 2) * r;
 const N = 32;
 
 let lineData = seq(9).map((i) => ({
+  // path: [[x, y, z, w], ...]
   path: (
     (i < 5) ? seq(10).map(j => [i / 5 - 1, j / 11 - 1, 0, 1]) :
     seq(N).map(j => [.25 + (i%2)*.5 + circleX(j/N, .15), (i - 5) / 5 - 1 + circleY(j/N, .15), 0, 1])
   ),
+  // color: [r, g, b, a]
   color: randomColor(),
   width: Math.random() * 30 + 5,
   loop: i >= 5,

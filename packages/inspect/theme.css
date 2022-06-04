@@ -127,6 +127,18 @@ label {
   -ms-user-select: none;
 }
 
+button.round {
+  border-radius: 100%;
+  width: 32px;
+  height: 32px;
+  background: #888;
+  border: 0;
+  color: #fff;
+  
+  :hover {
+    background: #aaa;
+  }
+} 
 
 /* Fiber tree (optimized) */
 @keyframes pingAnimation {

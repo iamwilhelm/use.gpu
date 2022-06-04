@@ -12,6 +12,13 @@ declare module "@use-gpu/wgsl/clip/clip.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/clip/flip.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getFlippedPosition: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/clip/layout.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -368,7 +375,6 @@ declare module "@use-gpu/wgsl/transform/cartesian.wgsl" {
 declare module "@use-gpu/wgsl/use/color.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  export const toColorSpace: ParsedBundle;
   export const premultiply: ParsedBundle;
   export default __module;
 }
@@ -432,5 +438,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const getViewScale: ParsedBundle;
   export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;
+  export const applyZBias3: ParsedBundle;
+  export const applyZBias: ParsedBundle;
   export default __module;
 }

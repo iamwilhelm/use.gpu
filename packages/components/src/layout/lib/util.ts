@@ -4,6 +4,7 @@ import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
 import { yeet, fragment } from '@use-gpu/live';
+import { getHashValue } from '@use-gpu/state';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/clip/clip.wgsl';
 import { INSPECT_STYLE } from './constants';
@@ -51,6 +52,34 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
     }
     value = f(box, clip, transform);
     lastBox = box;
+    lastClip = clip;
+    lastTransform = transform;
+    return value;
+  };
+}
+
+type Inline<T> = (
+  lines: InlineLine[],
+  clip?: ShaderModule,
+  transform?: ShaderModule,
+) => T;
+export const memoInline = <T>(f: Inline<T>): Inline<T> => {
+  let lastHash: number | null = null;
+  let lastClip: ShaderModule | null = null;
+  let lastTransform: ShaderModule | null = null;
+
+  let value: T | null = null;
+  return (
+    lines: InlineLine[],
+    clip?: ShaderModule,
+    transform?: ShaderModule,
+  ) => {
+    const hash = getHashValue(lines);
+    if (lastHash && lastHash === hash && lastClip === clip && lastTransform === transform) {
+      return value!;
+    }
+    value = f(lines, clip, transform);
+    lastHash = hash;
     lastClip = clip;
     lastTransform = transform;
     return value;
@@ -117,7 +146,10 @@ export const makeBoxLayout = (
     const layout = [l, t, r, b] as Rectangle;
     const el = render(layout, xclip, xform);
 
-    if (Array.isArray(el)) out.push(fragment(el as any[]));
+    if (Array.isArray(el)) {
+      if (el.length > 1) out.push(fragment(el as any[]));
+      else out.push(el[0] as any);
+    }
     else out.push(el);
   }
   
@@ -139,7 +171,7 @@ export const makeBoxInspectLayout = (
   parentClip?: ShaderModule,
   parentTransform?: ShaderModule,
 ) => {
-  const out = renders ? makeBoxLayout(sizes, offsets, renders, clip, transform, inverse, update)(box, parentClip, parentTransform) : [];
+  let out = renders ? makeBoxLayout(sizes, offsets, renders, clip, transform, inverse, update)(box, parentClip, parentTransform) : [];
   
   const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
   const xclip = parentClip ? (
@@ -201,7 +233,7 @@ export const makeBoxInspectLayout = (
     });
   }
   
-  out.push(yeet(yeets));
+  out = [...out, yeet(yeets)];
   return out;
 }
 
@@ -269,7 +301,7 @@ export const makeInlineInspectLayout = (
   clip?: ShaderModule,
   transform?: ShaderModule,
 ) => {
-  const out = renders ? makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform) : [];
+  let out = renders ? makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform) : [];
 
   let i = 0;
   const next = () => id.toString() + '-' + i++;
@@ -313,7 +345,7 @@ export const makeInlineInspectLayout = (
     });
   }
   
-  out.push(yeet(yeets));
+  out = [...out, yeet(yeets)];
   return out;
 };
 

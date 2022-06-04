@@ -26,7 +26,7 @@ type NodeProps = {
   onMouseLeave?: Action,
 };
 
-export const Node: React.FC<NodeProps> = ({
+export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   fiber,
   staticPing,
   staticMount,
@@ -39,7 +39,7 @@ export const Node: React.FC<NodeProps> = ({
   onClick,
   onMouseEnter,
   onMouseLeave,
-}) => {
+}, ref) => {
   const {id, by, f, type, args, yeeted, __inspect} = fiber;
 
   const yeet = type === YEET;
@@ -68,9 +68,6 @@ export const Node: React.FC<NodeProps> = ({
   classes.push(`depth-${Math.min(4, depth || 0)}`);
   const className = classes.join(' ');
 
-  const elRef = useRef<HTMLDivElement | null>(null);
-  const {current: el} = elRef;
-
   const handleClick = useCallback((e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -81,7 +78,7 @@ export const Node: React.FC<NodeProps> = ({
 
   return (
     <div
-      ref={elRef}
+      ref={ref}
       className={"fiber-tree-node " + className}
       onClick={handleClick}
       onMouseEnter={onMouseEnter}
@@ -92,4 +89,4 @@ export const Node: React.FC<NodeProps> = ({
       <div className={"fiber-tree-label " + className}>{name}{suffix1}{suffix2}{suffix3}{suffix4}</div>
     </div>
   );
-}
+});

@@ -7,6 +7,7 @@ import { keyed, yeet, useFiber } from '@use-gpu/live';
 
 import { useFontFamily, useFontText, useFontHeight } from '../../text/providers/font-provider';
 import { Glyphs } from '../shape/glyphs';
+import { memoInline } from '../lib/util';
 
 export type TextProps = {
   /*
@@ -67,7 +68,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
     spans,
     height,
     inline,
-    render: (lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule) => (
+    render: memoInline((lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule) => (
       keyed(Glyphs, id, {
         id,
         font,
@@ -85,6 +86,6 @@ export const Text: LiveComponent<TextProps> = (props) => {
         clip,
         transform,
       })
-    ),
+    )),
   });
 };

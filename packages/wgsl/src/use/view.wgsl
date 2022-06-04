@@ -5,7 +5,7 @@ struct ViewUniforms {
   viewNearFar: vec2<f32>,
   viewResolution: vec2<f32>,
   viewSize: vec2<f32>,
-  viewWorldDepth: f32,
+  viewWorldDepth: vec2<f32>,
   viewPixelRatio: f32,
 };
 
@@ -79,7 +79,7 @@ struct ViewUniforms {
 
 @export fn getPerspectiveScale(w: f32, f: f32) -> f32 {
   let m = viewUniforms.projectionMatrix;
-  let worldScale = length(m[1]) * viewUniforms.viewWorldDepth;
+  let worldScale = length(m[1]) * viewUniforms.viewWorldDepth.x;
   let clipScale = mix(1.0, worldScale / w, f);
   let pixelScale = clipScale * viewUniforms.viewPixelRatio;
   return pixelScale;
@@ -88,17 +88,48 @@ struct ViewUniforms {
 @export fn applyZBias3(position: vec3<f32>, zBias: f32, w: f32) -> vec3<f32> {
   let m = viewUniforms.projectionMatrix;
   let v = viewUniforms.viewResolution;
-  // reversed z!
-  let z = m[3].z / (-w + w * zBias * v.y) + m[2].z;
-  return vec3<f32>(position.xy, -z);
+  let zw = m[2].w;
+
+  if (zw < 0.0) {
+    // reversed z - perspective
+    let z = m[3].z / (-w + w * zBias * v.y * viewUniforms.viewWorldDepth.y) + m[2].z;
+    return vec3<f32>(position.xy, -z);
+  }
+  else if (zw > 0.0) {
+    // normal z - perspective
+    let z = m[3].z / (w + w * zBias * v.y * viewUniforms.viewWorldDepth.y) + m[2].z;
+    return vec3<f32>(position.xy, z);
+  }
+  else {
+    // orthographic - reversed z
+    let w = (position.z - m[3].z) / m[2].z;
+    let z = (w - w * zBias * v.y * viewUniforms.viewWorldDepth.y) * m[2].z + m[3].z;
+    return vec3<f32>(position.xy, z);
+  }
 }
 
 @export fn applyZBias(position: vec4<f32>, zBias: f32) -> vec4<f32> {
   let m = viewUniforms.projectionMatrix;
   let v = viewUniforms.viewResolution;
   let w = position.w;
-  // reversed z!
-  let z = m[3].z / (-w + w * zBias * v.y) + m[2].z;
-  return vec4<f32>(position.xy, -z * w, w);
+
+  let zw = m[2].w;
+  if (zw < 0.0) {
+    // reversed z - perspective
+    let z = m[3].z / (-w + w * zBias * v.y * viewUniforms.viewWorldDepth.y) + m[2].z;
+    return vec4<f32>(position.xy, -z * w, w);
+  }
+  else if (zw > 0.0) {
+    // normal z - perspective
+    let z = m[3].z / (w + w * zBias * v.y * viewUniforms.viewWorldDepth.y) + m[2].z;
+    return vec4<f32>(position.xy, z * w, w);
+  }
+  else {
+    // orthographic - reversed z
+    return position;
+    let w = (position.z - m[3].z) / m[2].z;
+    let z = (w + w * 0.0 * zBias * v.y * viewUniforms.viewWorldDepth.y) * m[2].z + m[3].z;
+    return vec4<f32>(position.xy, -z, 1.0);
+  }
 }
 

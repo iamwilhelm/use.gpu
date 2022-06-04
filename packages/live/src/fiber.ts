@@ -65,8 +65,8 @@ export const enterFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>, base: n
   fiber.pointer = base;
 
   // Reset yeet value
-  const {yeeted} = fiber;
-  if (yeeted) yeeted.value = undefined;
+  //const {yeeted} = fiber;
+  //if (yeeted) yeeted.value = undefined;
 }
 
 export const exitFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
@@ -318,6 +318,7 @@ export const updateFiber = <F extends ArrowFunction>(
 
     const value = call?.arg !== undefined ? call!.arg : call!.args?.[0];
     if (value !== undefined) yeeted.emit(fiber, value);
+    else fiber.yeeted!.value = undefined;
   }
   // Mount normal node (may still be built-in)
   else {
@@ -460,7 +461,7 @@ export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
   return mountFiberReduction(fiber, calls, mapper, reduction, next);
 }
 
-const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
+const toArray = <T>(x: T | T[] | undefined): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
 // Gather-reduce a fiber
 export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
@@ -548,7 +549,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
     }
   }
   else if (mount) {
-    if (self) return yeeted.reduced = toArray(gatherFiberValues(mount));
+    if (self) return yeeted.reduced = toArray<T>(gatherFiberValues(mount));
     return yeeted.reduced = gatherFiberValues(mount);
   }
   return [];
@@ -610,12 +611,16 @@ export const morphFiberCall = <F extends ArrowFunction>(
       // Discard all fiber state
       enterFiber(mount, 0);
       exitFiber(mount);
+      bustFiberYeet(mount, true);
+      visitYeetRoot(mount);
 
       // Change type in place while keeping existing mounts
       mount.type = null;
       mount.f = call.f;
       mount.bound = bind(call.f, mount);
       mount.args = undefined;
+      mount.memo = null;
+      mount.version = -1;
     }
   }
   fiber.type = fiberType;

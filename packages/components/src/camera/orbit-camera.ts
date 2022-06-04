@@ -6,11 +6,13 @@ import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
+import { VectorLike } from '../traits/types';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
   theta: 0,
   radius: 5,
+  target: [0, 0, 0, 1],
 
   focus: 5,
   dolly: 1,
@@ -24,6 +26,7 @@ export type OrbitCameraProps = {
   phi?: number,
   theta?: number,
   radius?: number,
+  target?: VectorLike,
 
   fov?: number,
   near?: number,
@@ -54,6 +57,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
     far    = DEFAULT_ORBIT_CAMERA.far,
     dolly  = DEFAULT_ORBIT_CAMERA.dolly,
     focus  = DEFAULT_ORBIT_CAMERA.focus,
+    target = DEFAULT_ORBIT_CAMERA.target,
     scale  = null,
     children,
   } = props;
@@ -72,12 +76,12 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const unit = scale != null ? height / pixelRatio / scale : 1;
 
   uniforms.projectionMatrix.current = makeProjectionMatrix(width, height, fov, near, far, radius, dolly);
-  uniforms.viewMatrix.current = makeOrbitMatrix(radius, phi, theta, dolly);
-  uniforms.viewPosition.current = makeOrbitPosition(radius, phi, theta, dolly);
+  uniforms.viewMatrix.current = makeOrbitMatrix(radius, phi, theta, target, dolly);
+  uniforms.viewPosition.current = makeOrbitPosition(radius, phi, theta, target, dolly);
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
-  uniforms.viewWorldDepth.current = focus * Math.tan(fov / 2);
+  uniforms.viewWorldDepth.current = [focus * Math.tan(fov / 2), 1];
   uniforms.viewPixelRatio.current = pixelRatio * unit;
 
   usePerFrame();

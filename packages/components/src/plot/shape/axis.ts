@@ -82,7 +82,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const {segments, anchors, trims} = useArrowSegments(chunks, loops, start, end);
 
   return (
-    use(ArrowLayer, {
+    use(start || end ? ArrowLayer : LineLayer, {
       positions,
       segments,
       anchors,

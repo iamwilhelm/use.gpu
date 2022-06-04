@@ -28,6 +28,11 @@
       "import": "./src/clip/clip.wgsl",
       "require": "./src/clip/clip.wgsl"
     },
+    "./clip/flip.wgsl": {
+      "types": "./src/clip/flip.wgsl.d.ts",
+      "import": "./src/clip/flip.wgsl",
+      "require": "./src/clip/flip.wgsl"
+    },
     "./clip/layout.wgsl": {
       "types": "./src/clip/layout.wgsl.d.ts",
       "import": "./src/clip/layout.wgsl",

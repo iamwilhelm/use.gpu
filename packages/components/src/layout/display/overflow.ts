@@ -3,7 +3,7 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core/types';
 import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement } from '../types';
 
-import { memo, use, gather, yeet, extend, useFiber, useOne } from '@use-gpu/live';
+import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
 import { useInspectable } from '../../hooks/useInspectable';
@@ -126,60 +126,62 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
   const inspect = useInspectable();
 
   const Resume = (els: LayoutElement[]) => {
-    const sizing = getBlockMinMax(els, NO_FIXED, direction);
-    const [{margin, fit}, ...scrollBars] = els;
-    const [ml, mt, mr, mb] = margin;
+    return useMemo(() => {
+      const sizing = getBlockMinMax(els, NO_FIXED, direction);
+      const [{margin, fit}, ...scrollBars] = els;
+      const [ml, mt, mr, mb] = margin;
 
-    return yeet({
-      sizing,
-      margin: NO_POINT4,
-      stretch: true,
-      fit: memoFit((into: AutoPoint) => {
+      return yeet({
+        sizing,
+        margin: NO_POINT4,
+        stretch: true,
+        fit: memoFit((into: AutoPoint) => {
 
-        const resolved: AutoPoint = direction === 'x' ? [null, into[1]] : [into[0], null];
-        const {render, pick, size} = fit(resolved);
+          const resolved: AutoPoint = direction === 'x' ? [null, into[1]] : [into[0], null];
+          const {render, pick, size} = fit(resolved);
 
-        const sizes   = [size];
-        const offsets = [[ml, mt]] as Point[];
-        const renders = [render];
-        const pickers = [pick];
+          const sizes   = [size];
+          const offsets = [[ml, mt]] as Point[];
+          const renders = [render];
+          const pickers = [pick];
 
-        for (const {fit} of scrollBars) {
-          const {render, pick, size} = fit(into);
-          sizes.push(size);
-          offsets.push([0, 0]);
-          renders.push(render);
-          pickers.push(null);
-        }
+          for (const {fit} of scrollBars) {
+            const {render, pick, size} = fit(into);
+            sizes.push(size);
+            offsets.push([0, 0]);
+            renders.push(render);
+            pickers.push(null);
+          }
 
-        inspect({
-          layout: {
-            into,
+          inspect({
+            layout: {
+              into,
+              size,
+              sizes,
+              offsets,
+            },
+          });
+
+          sizeTo(size);
+
+          return {
             size,
-            sizes,
-            offsets,
-          },
-        });
-
-        sizeTo(size);
-
-        return {
-          size,
-          render: memoLayout((
-            box: Rectangle,
-            parentClip?: ShaderModule,
-            parentTransform?: ShaderModule,
-          ) => {
-            fitTo(box);
-            return [
-              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
-              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
-            ];
-          }),
-          pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
-        };
-      }),
-    });
+            render: memoLayout((
+              box: Rectangle,
+              parentClip?: ShaderModule,
+              parentTransform?: ShaderModule,
+            ) => {
+              fitTo(box);
+              return [
+                ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
+                ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
+              ];
+            }),
+            pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
+          };
+        }),
+      });
+    }, [props, els]);
   };
 
   const scrollBarX = x === 'scroll' || x === 'auto' ? extend(scrollBar, { direction: 'x', overflow: x, scrollRef, sizeRef }) : null;

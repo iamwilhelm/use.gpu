@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
-use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize }; 
+use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, toClip3D, getViewResolution, getViewSize }; 
 
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 @optional @link fn getRadius(i: u32)    -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
@@ -85,11 +85,13 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
   let box = rectangle.zw - rectangle.xy;
 
   // Get corner + two adjacent vertices
-  var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.5, 1.0);
-  var posFlipX = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(1.0 - uv1.x, uv1.y)), 0.5, 1.0);
-  var posFlipY = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(uv1.x, 1.0 - uv1.y)), 0.5, 1.0);
+  var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.0, 1.0);
+  var posFlipX = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(1.0 - uv1.x, uv1.y)), 0.0, 1.0);
+  var posFlipY = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(uv1.x, 1.0 - uv1.y)), 0.0, 1.0);
 
-  var center  = worldToClip3D(applyTransform(position));
+  var center4  = worldToClip(applyTransform(position));
+
+  var center  = toClip3D(center4);
   var centerX = worldToClip3D(applyTransform(posFlipX));
   var centerY = worldToClip3D(applyTransform(posFlipY));
 
@@ -119,7 +121,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip3D, getViewResolution, getViewSize };
   let textureUV = uv;
   
   return UIVertex(
-    vec4<f32>(conservative, 1.0),
+    vec4<f32>(conservative, 1.0) * center4.w,
     uv1,
     sdfConfig,
     sdfUV,

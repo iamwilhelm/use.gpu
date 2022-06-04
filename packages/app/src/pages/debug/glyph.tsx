@@ -8,12 +8,14 @@ import { makeRawTexture } from '@use-gpu/core';
 import { glyphToRGBA, glyphToSDF, sdfToGradient, makeSDFStage, paintSubpixelOffsets } from '@use-gpu/text';
 import { Image } from '@use-gpu/text/types';
 import { GlyphControls } from '../../ui/glyph-controls';
+import { vec3 } from 'gl-matrix';
 
 import {
   LinearRGB, Draw, Pass, Flat, UI, Layout, Block, Inline, Text, Flex, Embed, RawTexture,
   Embedded, Axis, Grid, Scale, Tick, Point, Arrow, Sampled,
   PanControls,
   useDeviceContext, useFontContext, DebugProvider,
+  OrbitCamera, OrbitControls,
 } from '@use-gpu/components';
 
 const SIZE = 64;
@@ -29,18 +31,42 @@ export const DebugGlyphPage: LC = () => {
       hasGlyph
       hasContours
       hasRelax
-      render={({subpixel, contours, preprocess, postprocess, glyph}) =>
-        <PanControls
-          key="glyph"
-          active={true}
-          zoom={2}
-          render={(x, y, zoom) =>
-            <Flat x={x} y={y} zoom={zoom} focus={1/3}>
-              <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
-            </Flat>
-          }
-        />
-    } />
+      has3D
+      render={({subpixel, contours, preprocess, postprocess, glyph, orbit}) =>       
+        orbit
+        ? [
+          <OrbitControls
+            radius={1000}
+            moveSpeed={1/1000}
+            bearing={0.3}
+            pitch={0.5}
+            render={(radius: number, phi: number, theta: number, target: vec3) =>
+              <OrbitCamera
+                radius={radius}
+                phi={phi}
+                theta={theta}
+                target={target}
+                near={0.1}
+                far={5000}
+              >
+                <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
+              </OrbitCamera>
+            }
+          />,
+        ] : [
+          <PanControls
+            key="glyph"
+            active={true}
+            zoom={2}
+            render={(x, y, zoom) =>
+              <Flat x={x} y={y} zoom={zoom} focus={1/3}>
+                <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
+              </Flat>
+            }
+          />
+        ]
+      }
+    />
   );
 };
 
@@ -155,7 +181,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
       const index = i + j * paddedWidth;
       const dx = xs[index];
       const dy = ys[index];
-      if (dx || dy) emit(x, y, 0.5, 1);
+      if (dx || dy) emit(x, y, 0, 1);
     };
 
   const pointEmitter = ({xs, ys, width, height}: DebugImage) =>
@@ -163,7 +189,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
       const index = i + j * paddedWidth;
       const dx = xs[index];
       const dy = ys[index];
-      emit(x + dx, y + dy, 0.5, 1);
+      emit(x + dx, y + dy, 0, 1);
     };
 
   const shiftedPointEmitter = ({xs, ys, width, height}: DebugImage) =>
@@ -172,7 +198,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
       const dx = xs[index];
       const dy = ys[index];
       if (dx || dy) {
-        emit(x + dx, y + dy, 0.5, 1);
+        emit(x + dx, y + dy, 0, 1);
       }
     };
 
@@ -183,8 +209,8 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
       const dy = ys[index];
 
       if (dx || dy) {
-        emit(x, y, 0.5, 1);
-        emit(x + dx, y + dy, 0.5, 1);
+        emit(x, y, 0, 1);
+        emit(x + dx, y + dy, 0, 1);
       }
     };
   
@@ -210,7 +236,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow width={2} color={0x4080ff} depth={0.01} detail={6} />
+        <Arrow width={2} color={0x4080ff} depth={0.01} detail={4} zBias={100000} />
       </Sampled> : null}
 
       { image.xo && image.yo ? <Sampled
@@ -227,7 +253,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow width={2} color={0x40c0ff} depth={0.01} detail={6} />
+        <Arrow width={2} color={0x40c0ff} depth={0.01} detail={4} zBias={1} />
       </Sampled> : null}
     </TextureFrame> : null
   );
@@ -265,7 +291,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={gridEmitter(outerField)}
                       >
-                        <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} />
+                        <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} zBias={1} />
                       </Sampled>
 
                       <Sampled
@@ -277,7 +303,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={pointEmitter(outerField)}
                       >
-                        <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape={'circle'} />
+                        <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape={'circle'} zBias={1} />
                       </Sampled>
 
                       {preprocess ? <Sampled
@@ -289,7 +315,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={pointEmitter(innerField)}
                       >
-                        <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} />
+                        <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} zBias={1} />
                       </Sampled> : null}
 
                       <Sampled
@@ -301,7 +327,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={arrowEmitter(preprocess ? innerField : outerField)}
                       >
-                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={6} />
+                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={1} />
                       </Sampled>
                       </> : null}
                     </TextureFrame>
@@ -317,7 +343,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={shiftedPointEmitter(outer2Field)}
                       >
-                        <Point size={0.5} depth={1} color={0x4080ff} />
+                        <Point size={0.5} depth={1} color={0x4080ff} zBias={1} />
                       </Sampled>
 
                       <Sampled
@@ -329,7 +355,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={shiftedPointEmitter(inner2Field)}
                       >
-                        <Point size={0.5} depth={1} color={0x40c0ff} />
+                        <Point size={0.5} depth={1} color={0x40c0ff} zBias={1} />
                       </Sampled>
 
                       <Sampled
@@ -341,7 +367,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={arrowEmitter(outer2Field)}
                       >
-                        <Arrow width={3} depth={0.05} color={0x4080ff} detail={6} />
+                        <Arrow width={3} depth={0.05} color={0x4080ff} detail={4} zBias={1} />
                       </Sampled>
 
                       <Sampled
@@ -353,7 +379,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         centered
                         expr={arrowEmitter(inner2Field)}
                       >
-                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={6} />
+                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={1} />
                       </Sampled>
                       </> : null}
                     </TextureFrame>
@@ -434,11 +460,11 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
         fit: 'contain',
         repeat: 'none',
       }}>
-        <Embed width="100%" height="100%" render={(layout: Rectangle) =>
-          <Embedded layout={layout}>
+        <Embed width="100%" height="100%">
+          <Embedded>
             <Axis axis="x" width={5} color={0x808080} end={false} />
             <Axis axis="y" width={5} color={0x808080} end={false} />
-            <Grid axes="xy" width={2} color={0xcccccc} first={{divide: width / 10}} second={{divide: height / 10}} />
+            <Grid axes="xy" width={2} color={0xcccccc} first={{divide: width / 10}} second={{divide: height / 10}} zBias={0} />
 
             <Scale axis="x" unit={1} divide={width}>
               <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} />
@@ -448,7 +474,7 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
             </Scale>
             {children}
           </Embedded>
-        } />
+        </Embed>
       </Block>
     }/>
   );

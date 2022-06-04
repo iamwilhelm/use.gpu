@@ -1,8 +1,14 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { makeOrbitMatrix } from '@use-gpu/core';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
+import { VectorLike } from '../traits/types';
+import { parsePosition } from '../traits/parse';
+import { useProp } from '../traits/useProp';
+import { useDerivedState } from '../hooks/useDerivedState';
+import { mat4, vec3 } from 'gl-matrix';
 
 const CAPTURE_EVENT = {capture: true};
 
@@ -13,10 +19,14 @@ export type OrbitControlsProps = {
   radius?: number,
   bearing?: number,
   pitch?: number,
+  target?: VectorLike,
+  version?: number,
 
   radiusSpeed?: number,
   bearingSpeed?: number,
   pitchSpeed?: number,
+  moveSpeed?: number,
+
   render: (phi: number, theta: number, radius: number) => LiveElement<any>,
 };
 
@@ -25,16 +35,22 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     radius: initialRadius = 1,
     bearing: initialBearing = 0,
     pitch: initialPitch = 0,
+    version = 0,
 
     radiusSpeed  = 1/100,
     bearingSpeed = 5,
     pitchSpeed   = 5,
+    moveSpeed    = 1,
+    
     render,
   } = props;
 
-  const [radius, setRadius]   = useState<number>(initialRadius);
-  const [bearing, setBearing] = useState<number>(initialBearing);
-  const [pitch, setPitch]     = useState<number>(initialPitch);
+  const initialTarget = useProp(props.target, parsePosition);
+
+  const [radius, setRadius]   = useDerivedState<number>(initialRadius, version);
+  const [bearing, setBearing] = useDerivedState<number>(initialBearing, version);
+  const [pitch, setPitch]     = useDerivedState<number>(initialPitch, version);
+  const [target, setTarget]   = useDerivedState<number>(initialTarget, version);
 
   const { useMouse } = useContext(MouseContext);
   const { useWheel } = useContext(WheelContext);
@@ -56,6 +72,20 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
         setPitch((theta: number) => clamp(theta + moveY * speedY, -π/2, π/2));
       }
     }
+    if (buttons.right) {
+      if (moveX || moveY) {
+        const m = makeOrbitMatrix(radius, bearing, pitch, [0, 0, 0], 1);
+        m[12] = m[13] = m[14] = 0;
+        mat4.invert(m, m);
+
+        const speed = moveSpeed * radius;
+        const move = vec3.fromValues(moveX * speed, -moveY * speed, 0);
+        vec3.transformMat4(move, move, m);
+
+        vec3.add(move, move, target);
+        setTarget(move);
+      }
+    }
   }, mouse);
 
   useOne(() => {
@@ -64,5 +94,5 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     if (moveY) setRadius((radius: number) => radius * (1 + moveY * speedY));
   }, wheel);
 
-  return useMemo(() => render(radius, bearing, pitch), [render, radius, bearing, pitch]);
+  return useMemo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
 };

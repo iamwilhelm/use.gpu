@@ -215,11 +215,11 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         console.log({container, rect})
 
         if (rect.left < container.left || rect.right > container.right) {
-          parent.scrollLeft = rect.left - container.left - 10;
+          parent.scrollLeft += rect.left - container.left - 50;
         }
         
         if (rect.top < container.top || rect.bottom > container.bottom) {
-          parent.scrollTop = rect.top - container.top - 10;
+          parent.scrollTop += rect.top - container.top - 150;
         }
       }
     }
@@ -239,6 +239,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       onClick={select}
       onMouseEnter={hover}
       onMouseLeave={unhover}
+      ref={rowRef}
     />
   ) : null;
 
@@ -348,7 +349,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         initialValue={shouldStartOpen}
       >{
         (expand, onToggle) => (<>
-          <TreeRow indent={indent + +!!continuation} ref={rowRef}>
+          <TreeRow indent={indent + +!!continuation}>
             <TreeExpand expand={expand} onToggle={onToggle} openIcon={openIcon} closedIcon={closedIcon}>
               {nodeRender}
             </TreeExpand>
@@ -363,7 +364,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   // Leaf node
   const continuationIcon = ICONSMALL('subdirectory_arrow_right');
   return (<>
-    <TreeRow indent={indent + 1} ref={rowRef}>
+    <TreeRow indent={indent + 1}>
       {continuation ? <Muted>{continuationIcon}</Muted> : null}
       {nodeRender}
     </TreeRow>

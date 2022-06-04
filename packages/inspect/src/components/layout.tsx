@@ -205,13 +205,13 @@ export const TreeRowOmittedChunk = styled('div', {
   },
 });
 
-export const TreeRow = React.forwardRef<HTMLDivElement, PropsWithChildren<TreeIndentProps>>(({ indent, children }, ref) => (
-  <TreeRowInner ref={ref} css={{
+export const TreeRow: React.FC<TreeRowIndentProps> = ({ indent, children }) => (
+  <TreeRowInner css={{
     paddingLeft: indent ? `${indent * 20}px` : 0,
   }}>
     {children}
   </TreeRowInner>
-));
+);
 
 export const TreeRowOmitted: React.FC<TreeIndentProps> = ({ indent, children }) => (
   <TreeRowOmittedChunk />

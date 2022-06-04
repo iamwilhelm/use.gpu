@@ -49,53 +49,55 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   const hovered = useInspectHoverable();
 
   const Resume = (els: LayoutElement[]) => {
-    const w = width != null && width === +width ? width : null;
-    const h = height != null && height === +height ? height : null;
+    return useMemo(() => {
+      const w = width != null && width === +width ? width : null;
+      const h = height != null && height === +height ? height : null;
 
-    const fixed = [w, h] as [number | null, number | null];
+      const fixed = [w, h] as [number | null, number | null];
 
-    const sizing = getBlockMinMax(els, fixed, direction);
-    const margin = getBlockMargin(els, blockMargin, padding, direction, contain);
+      const sizing = getBlockMinMax(els, fixed, direction);
+      const margin = getBlockMargin(els, blockMargin, padding, direction, contain);
 
-    let ratioX = undefined;
-    let ratioY = undefined;
-    if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false);
-    if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
+      let ratioX = undefined;
+      let ratioY = undefined;
+      if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false);
+      if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
-    return yeet({
-      sizing,
-      margin,
-      grow,
-      shrink,
-      inline,
-      ratioX,
-      ratioY,
-      fit: memoFit((into: AutoPoint) => {
-        const w = width != null ? evaluateDimension(width, into[0], snap) : null;
-        const h = height != null ? evaluateDimension(height, into[1], snap) : null;
-        const fixed = [
-          width != null ? w : null,
-          height != null ? h : null,
-        ] as [number | number, number | null];
+      return yeet({
+        sizing,
+        margin,
+        grow,
+        shrink,
+        inline,
+        ratioX,
+        ratioY,
+        fit: memoFit((into: AutoPoint) => {
+          const w = width != null ? evaluateDimension(width, into[0], snap) : null;
+          const h = height != null ? evaluateDimension(height, into[1], snap) : null;
+          const fixed = [
+            width != null ? w : null,
+            height != null ? h : null,
+          ] as [number | number, number | null];
 
-        const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
+          const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
 
-        inspect({
-          layout: {
-            into,
+          inspect({
+            layout: {
+              into,
+              size,
+              sizes,
+              offsets,
+            },
+          });
+
+          return {
             size,
-            sizes,
-            offsets,
-          },
-        });
-
-        return {
-          size,
-          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
-          pick: makeBoxPicker(id, sizes, offsets, pickers),
-        };
-      })
-    });
+            render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
+            pick: makeBoxPicker(id, sizes, offsets, pickers),
+          };
+        })
+      });
+    }, [props, els, hovered]);
   };
 
   const c = useImplicitElement(id, radius, border, stroke, fill, image, children);

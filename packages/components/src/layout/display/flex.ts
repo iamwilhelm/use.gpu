@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, AutoPoint } from '../types';
 
-import { use, yeet, memo, gather, useFiber } from '@use-gpu/live';
+import { use, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
 import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
@@ -49,51 +49,53 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const hovered = useInspectHoverable();
 
   const Resume = (els: LayoutElement[]) => {
-    const w = width != null && width === +width ? width : null;
-    const h = height != null && height === +height ? height : null;
+    return useMemo(() => {
+      const w = width != null && width === +width ? width : null;
+      const h = height != null && height === +height ? height : null;
 
-    const fixed = [w, h] as [number | null, number | null];
+      const fixed = [w, h] as [number | null, number | null];
 
-    const sizing = getFlexMinMax(els, fixed, direction, gap, wrap, snap);
+      const sizing = getFlexMinMax(els, fixed, direction, gap, wrap, snap);
 
-    let ratioX = undefined;
-    let ratioY = undefined;
-    if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false) ?? 1;
-    if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false) ?? 1;
+      let ratioX = undefined;
+      let ratioY = undefined;
+      if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false) ?? 1;
+      if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false) ?? 1;
 
-    return yeet({
-      sizing,
-      margin,
-      grow,
-      shrink,
-      inline,
-      ratioX,
-      ratioY,
-      fit: memoFit((into: AutoPoint) => {
-        const w = width  != null ? evaluateDimension(width, into[0], snap) : null;
-        const h = height != null ? evaluateDimension(height, into[1], snap) : null;
-        const fixed = [w, h] as [number | number, number | null];
+      return yeet({
+        sizing,
+        margin,
+        grow,
+        shrink,
+        inline,
+        ratioX,
+        ratioY,
+        fit: memoFit((into: AutoPoint) => {
+          const w = width  != null ? evaluateDimension(width, into[0], snap) : null;
+          const h = height != null ? evaluateDimension(height, into[1], snap) : null;
+          const fixed = [w, h] as [number | number, number | null];
 
-        const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);
+          const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);
 
-        inspect({
-          layout: {
-            into,
+          inspect({
+            layout: {
+              into,
+              size,
+              sizes,
+              offsets,
+            },
+          });
+
+          return {
             size,
-            sizes,
-            offsets,
-          },
-        });
+            render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
+            pick: makeBoxPicker(id, sizes, offsets, pickers),
+          };
 
-        return {
-          size,
-          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
-          pick: makeBoxPicker(id, sizes, offsets, pickers),
-        };
-
-        return self;
-      }),
-    });
+          return self;
+        }),
+      });
+    }, [props, els, hovered]);
   };
 
   const c = useImplicitElement(id, radius, border, stroke, fill, image, children);

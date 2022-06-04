@@ -44,8 +44,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   let originX = 0;
   let originY = 0;
   if (centered) {
-    originX = (r - l) / 2;
-    originY = (b - t) / 2;
+    originX = Math.abs(r - l) / 2;
+    originY = Math.abs(b - t) / 2;
   }
 
   useOne(() => {

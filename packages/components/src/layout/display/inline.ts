@@ -43,71 +43,73 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
   const hovered = useInspectHoverable();
 
   const Resume = (els: InlineElement[]) => {
-    const inlineEls = resolveInlineBlockElements(els, direction);
-    const blockEls = inlineEls.filter(el=> !!el.block);
+    return useMemo(() => {
+      const inlineEls = resolveInlineBlockElements(els, direction);
+      const blockEls = inlineEls.filter(el=> !!el.block);
 
-    const sizing = getInlineMinMax(inlineEls, direction, wrap, snap);
+      const sizing = getInlineMinMax(inlineEls, direction, wrap, snap);
 
-    return yeet({
-      sizing,
-      margin,
-      grow,
-      shrink,
-      inline,
-      fit: memoFit((into: AutoPoint) => {
-        const {size, sizes, ranges, offsets, anchors, renders, pickers} = fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
+      return yeet({
+        sizing,
+        margin,
+        grow,
+        shrink,
+        inline,
+        fit: memoFit((into: AutoPoint) => {
+          const {size, sizes, ranges, offsets, anchors, renders, pickers} = fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
 
-        const blockSizes: Point[] = [];
-        const blockOffsets: Point[] = [];
-        const blockRenders: LayoutRenderer[] = [];
-        const blockPickers: LayoutPicker[] = [];
+          const blockSizes: Point[] = [];
+          const blockOffsets: Point[] = [];
+          const blockRenders: LayoutRenderer[] = [];
+          const blockPickers: LayoutPicker[] = [];
 
-        let i = 0;
-        for (const el of blockEls) {
-          const {block} = el;
-          const {size, render, pick} = block!;
+          let i = 0;
+          for (const el of blockEls) {
+            const {block} = el;
+            const {size, render, pick} = block!;
 
-          blockSizes.push(size);
-          blockOffsets.push(anchors[i++]);
-          blockRenders.push(render);
-          blockPickers.push(pick);
-        }
+            blockSizes.push(size);
+            blockOffsets.push(anchors[i++]);
+            blockRenders.push(render);
+            blockPickers.push(pick);
+          }
       
-        inspect({
-          layout: {
-            into,
+          inspect({
+            layout: {
+              into,
+              size,
+              sizes,
+              offsets,
+            },
+          });
+      
+          const pickSizes   = blockSizes.length ? [...sizes,   ...blockSizes] : sizes;
+          const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : offsets;
+          const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : pickers;
+
+          return {
             size,
-            sizes,
-            offsets,
-          },
-        });
-      
-        const pickSizes   = blockSizes.length ? [...sizes,   ...blockSizes] : sizes;
-        const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : offsets;
-        const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : pickers;
-
-        return {
-          size,
-          render: memoLayout((
-            box: Rectangle,
-            clip?: ShaderModule,
-            transform?: ShaderModule,
-          ) => {
-            if (hovered) {
-              const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders)(box, clip, transform);
-              if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
-              return out;
-            }
-            else {
-              const out = makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform);
-              if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
-              return out;
-            }
-          }),
-          pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),
-        };
-      })
-    });
+            render: memoLayout((
+              box: Rectangle,
+              clip?: ShaderModule,
+              transform?: ShaderModule,
+            ) => {
+              if (hovered) {
+                const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders)(box, clip, transform);
+                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
+                return out;
+              }
+              else {
+                const out = makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform);
+                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
+                return out;
+              }
+            }),
+            pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),
+          };
+        })
+      });
+    }, [props, els, hovered]);
   };
   
   return children ? gather(children, Resume) : null;

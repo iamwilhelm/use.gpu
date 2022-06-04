@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { AutoPoint, Dimension, Direction, LayoutElement } from '../types';
 
-import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
+import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
 import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
@@ -45,30 +45,32 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
   const hovered = useInspectHoverable();
 
   const Resume = (els: LayoutElement[]) => {
-    return yeet({
-      sizing: NO_POINT4,
-      margin: NO_POINT4,
-      absolute: true,
-      under,
-      fit: memoFit((into: AutoPoint) => {
-        const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, direction, snap);
+    return useMemo(() => {
+      return yeet({
+        sizing: NO_POINT4,
+        margin: NO_POINT4,
+        absolute: true,
+        under,
+        fit: memoFit((into: AutoPoint) => {
+          const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, direction, snap);
 
-        inspect({
-          layout: {
-            into,
-            size,
-            sizes,
-            offsets,
-          },
-        });
+          inspect({
+            layout: {
+              into,
+              size,
+              sizes,
+              offsets,
+            },
+          });
     
-        return {
-          size,
-          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
-          pick: makeBoxPicker(id, sizes, offsets, pickers),
-        };
-      }),
-    });
+          return {
+            size,
+            render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
+            pick: makeBoxPicker(id, sizes, offsets, pickers),
+          };
+        }),
+      });
+    }, [props, els, hovered]);
   };
 
   const c = useImplicitElement(id, radius, border, stroke, fill, image, children);

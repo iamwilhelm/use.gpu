@@ -222,7 +222,7 @@ export type ViewUniforms = {
   viewNearFar: { current: vec2 | [number, number] | number[] },
   viewResolution: { current: vec2 | [number, number] | number[] },
   viewSize: { current: vec2 | [number, number] | number[] },
-  viewWorldDepth: { current: number },
+  viewWorldDepth: { current: vec2 | [number, number] | number[] },
   viewPixelRatio: { current: number },
 };
 

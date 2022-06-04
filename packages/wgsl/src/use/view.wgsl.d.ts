@@ -18,5 +18,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const getViewScale: ParsedBundle;
   export const getWorldScale: ParsedBundle;
   export const getPerspectiveScale: ParsedBundle;
+  export const applyZBias3: ParsedBundle;
+  export const applyZBias: ParsedBundle;
   export default __module;
 }

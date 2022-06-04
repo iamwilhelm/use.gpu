@@ -5,8 +5,8 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
-@optional @link fn getDepth(i: u32) -> f32 { return 0; };
-@optional @link fn getZBias(i: u32) -> f32 { return 0; };
+@optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
+@optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 @optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
 
 @export fn getQuadVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {

@@ -301,8 +301,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
     if (a.type.id === T.FunctionDeclaration) {
       const func = getFunction(a);
-      const flags = getFlags(func);
+      const fs = getFlags(func);
       const symbol = func.name;
+      const flags = (symbol === 'main') ? fs | RF.Exported : fs;
       return {at, symbol, flags, func};
     }
     if (a.type.id === T.GlobalVariableDeclaration) {

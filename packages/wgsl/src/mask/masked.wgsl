@@ -14,9 +14,5 @@
     c = c * t * clamp(m, 0.0, 1.0);
   }
 
-  if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) {
-    c = vec4<f32>(c.x + 0.0, c.yz, c.a);
-  }
-
   return c;
 }

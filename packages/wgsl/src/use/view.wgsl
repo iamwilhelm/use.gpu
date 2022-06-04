@@ -101,7 +101,7 @@ struct ViewUniforms {
     return vec3<f32>(position.xy, z);
   }
   else {
-    // orthographic - reversed z
+    // orthographic
     let w = (position.z - m[3].z) / m[2].z;
     let z = (w - w * zBias * v.y * viewUniforms.viewWorldDepth.y) * m[2].z + m[3].z;
     return vec3<f32>(position.xy, z);
@@ -125,11 +125,10 @@ struct ViewUniforms {
     return vec4<f32>(position.xy, z * w, w);
   }
   else {
-    // orthographic - reversed z
-    return position;
+    // orthographic
     let w = (position.z - m[3].z) / m[2].z;
-    let z = (w + w * 0.0 * zBias * v.y * viewUniforms.viewWorldDepth.y) * m[2].z + m[3].z;
-    return vec4<f32>(position.xy, -z, 1.0);
+    let z = (w - w * zBias * v.y * viewUniforms.viewWorldDepth.y) * m[2].z + m[3].z;
+    return vec4<f32>(position.xy, z, 1.0);
   }
 }
 

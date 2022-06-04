@@ -15,7 +15,7 @@ import {
   resolve,
 } from '@use-gpu/core';
 import { useLinkedShader } from '../hooks/useLinkedShader';
-import { useRenderPipeline } from '../hooks/useRenderPipeline';
+import { useRenderPipelineAsync } from '../hooks/useRenderPipeline';
 import { useInspectable } from '../hooks/useInspectable'
 
 import keyBy from 'lodash/keyBy';
@@ -89,11 +89,13 @@ export const render = (props: RenderProps) => {
   );
   
   // Rendering pipeline
-  const pipeline = useRenderPipeline(
+  const pipeline = useRenderPipelineAsync(
     renderContext,
     shader as any,
     propPipeline,
   );
+
+  if (!pipeline) return;
 
   // Uniforms
   const uniform = useMemo(() => {

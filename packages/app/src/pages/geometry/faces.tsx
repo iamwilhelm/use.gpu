@@ -11,23 +11,30 @@ import earcut from 'earcut';
 import {
   Draw, Pass,
   Cursor, Pick, Raw,
-  CompositeData, FaceSegments, FaceLayer,
+  CompositeData, LineSegments, FaceSegments,
   OrbitCamera, OrbitControls,
-  LineLayer, ArrowLayer,
+  LineLayer, FaceLayer,
 } from '@use-gpu/components';
 
 // Convex and concave polygon data
 
 const convexDataFields = [
+  // Accessor syntax
   ['array<vec4<f32>>', (o: any) => o.positions],
+  // Shorthand => o.color
   ['vec4<f32>', 'color'],
 ] as DataField[];
 
 const concaveDataFields = [
   ['array<vec4<f32>>', (o: any) => o.positions],
   ['vec4<f32>', 'color'],
+  // Indexed attribute - must be adjusted when aggregated.
   ['array<u32>', (o: any) => o.indices, true],
   ['u32', 'lookup'],
+] as DataField[];
+
+const lineDataFields = [
+  ['array<vec4<f32>>', (o: any) => o],
 ] as DataField[];
 
 // Generate some random polygons
@@ -84,6 +91,11 @@ let concaveFaceData = seq(20).map(i => {
     lookup: i,
   };
 });
+
+let lineData = seq(22).map((i) => (
+  // path: [[x, y, z, w], ...]
+  i < 11 ? seq(2).map(j => [i / 2.5 - 2, -1, j * 4 - 2, 1]) : seq(2).map(j => [j * 4 - 2, -1, (i - 11) / 2.5 - 2, 1])
+));
 
 export const GeometryFacesPage: LC = () => {
 
@@ -155,6 +167,21 @@ export const GeometryFacesPage: LC = () => {
                   />
                 ) : null
               ]}
+            />
+          }
+        />
+
+        <CompositeData
+          fields={lineDataFields}
+          data={lineData}
+          on={<LineSegments />}
+          render={(positions, segments) =>
+            <LineLayer
+              positions={positions}
+              color={[1, 1, 1, .2]}
+              width={3}
+              segments={segments}
+              depth={0.5}
             />
           }
         />

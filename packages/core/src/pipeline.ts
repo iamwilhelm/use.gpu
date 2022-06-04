@@ -41,3 +41,25 @@ export const makeRenderPipeline = (
 
   return device.createRenderPipeline(pipelineDescriptor);
 }
+
+export const makeRenderPipelineAsync = (
+  device: GPUDevice,
+  renderContext: UseRenderingContextGPU,
+  vertexShader: ShaderModuleDescriptor,
+  fragmentShader: ShaderModuleDescriptor,
+  descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
+) => {
+  const {colorStates, depthStencilState, samples} = renderContext;
+
+  const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
+    layout: 'auto',
+    depthStencil: depthStencilState,
+    multisample: { count: samples },
+    vertex: makeShaderStage(device, vertexShader),
+    fragment: makeShaderStage(device, fragmentShader, {
+      targets: colorStates,
+    }),
+  } as any, descriptor) as any as GPURenderPipelineDescriptor;
+
+  return device.createRenderPipelineAsync(pipelineDescriptor);
+}

@@ -41,6 +41,7 @@ export type LabelLayerProps = {
   weight?: string | number,
   style?: string,
 
+  flip?: [number, number],
   sdfRadius?: number,
   detail?: number,
   count?: Prop<number>,
@@ -72,6 +73,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     weight,
     style,
 
+    flip,
     sdfRadius,
     detail,
     count,
@@ -130,6 +132,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
               expand,
               expands,
 
+              flip,
               count,
               mode,
               id,

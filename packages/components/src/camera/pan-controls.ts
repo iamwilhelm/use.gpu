@@ -22,6 +22,8 @@ export type PanControlsProps = {
   render: (x: number, y: number, zoom: number) => LiveElement<any>,
 };
 
+const DEFAULT_ANCHOR = [0.5, 0.5];
+
 export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const layout = useContext(LayoutContext);
   const [l, t, r, b] = layout;
@@ -33,6 +35,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     zoomSpeed = 1/100,
     centered = true,
     active = true,
+    anchor = DEFAULT_ANCHOR,
     version,
     render,
   } = props;
@@ -43,9 +46,17 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
 
   let originX = 0;
   let originY = 0;
+  let offsetX = 0;
+  let offsetY = 0;
+
   if (centered) {
-    originX = Math.abs(r - l) / 2;
-    originY = Math.abs(b - t) / 2;
+    const w = Math.abs(r - l);
+    const h = Math.abs(b - t);
+    originX = w / 2;
+    originY = h / 2;
+    
+    offsetX = -w * (anchor[0] - 0.5);
+    offsetY = -h * (anchor[1] - 0.5);
   }
 
   useOne(() => {
@@ -106,8 +117,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     stop();
   }, wheel);
 
-  const panX = centered ? x - originX * (zoom - 1) / zoom : x;
-  const panY = centered ? y - originY * (zoom - 1) / zoom : y;
+  const panX = centered ? x - originX * (zoom - 1) / zoom + offsetX : x;
+  const panY = centered ? y - originY * (zoom - 1) / zoom + offsetY : y;
 
   return useMemo(() => render(panX, panY, zoom), [render, panX, panY, zoom]);
 };

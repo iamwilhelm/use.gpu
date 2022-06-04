@@ -24,6 +24,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
 
   var sdf: SDF;
   var texture = getTexture(textureUV);
+  var sdfRaw = 0.0;
   var mark = 0.0;
 
   if (uv.x < clipUV.x || uv.y < clipUV.y || uv.x > clipUV.z || uv.y > clipUV.w) { discard; }
@@ -38,7 +39,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var s = (d + expand / sdfConfig.y) / scale + 0.5 + bleed;
     sdf = SDF(s, s);
     
-    if (texture.a == 0.0 && sdf.outer > 0.0) { sdf.outer = 0.5; }
+//    if (texture.a == 0.0 && sdf.outer > 0.0) { sdf.outer = 0.5; }
     if (mode == -2) {
       fillColor = vec4<f32>(texture.rgb, fillColor.a);
     }
@@ -86,12 +87,14 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var b = 0.0;
     if (mode == -1 || mode == -2) {
       s = 1.0;
-      b = 4.0;
+      b = 6.0;
     }
 
     let o = (sdf.outer - 0.5) * scale / s;
-    let m = ((o + 0.5 + b) % 1.0) - 0.5;
+    var m = (max(0.0, o + 0.5 + b) % 1.0) - 0.5;
+    if (o < -b) { m = 1.0 + (o + b - 1.0); }
     mark = clamp(1.0 - abs(m / scale) * s, 0.0, 1.0);
+    //if (m != 1000.0) { mark += 0.5; }
     
     if ((border.x != border.y) || (border.z != border.w) || (border.x != border.z)) {
       let o = (sdf.inner - 0.5) * scale / s;

@@ -16,6 +16,7 @@ use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveSc
 @optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getExpand(i: u32) -> f32 { return 0.0; };
+@optional @link fn getFlip(i: u32) -> vec2<f32> { return vec2<f32>(1.0, 1.0); };
 
 @export fn getLabelVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
 
@@ -26,8 +27,10 @@ use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveSc
   var rectangle = getRectangle(instanceIndex);
   var uv4 = getUV(instanceIndex);
 
+  var flip = getFlip(index);
+
   var position = getPosition(index);
-  var placement = getPlacement(index);
+  var placement = getPlacement(index) * flip;
   var layout = getLayout(index);
   var offset = getOffset(index);
   var size = getSize(index);
@@ -68,7 +71,7 @@ use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveSc
     uv = mix(uv4.xy, uv4.zw, uv1);
   // }
 
-  xy = xy * vec2<f32>(1.0, -1.0);
+  xy = xy * flip;
 
   // Attach to position
   center = vec4<f32>(center.xy + 2.0 * xy * getViewResolution() * center.w, center.zw);

@@ -52,6 +52,7 @@ export type RawLabelsProps = {
   expands?: ShaderSource,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
+  flip?: [number, number],
 
   alphaToCoverage?: boolean,
   count?: Prop<number>,
@@ -131,10 +132,11 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const e = useShaderRef(props.expand, props.expands);
 
   const xf = useApplyTransform(p);
+  const q  = useShaderRef(props.flip);
 
   const t = props.texture;
 
-  const getVertex = useBoundShader(getLabelVertex, VERTEX_BINDINGS, [i, r, u, l, a, xf, c, o, z, d, f, e]);
+  const getVertex = useBoundShader(getLabelVertex, VERTEX_BINDINGS, [i, r, u, l, a, xf, c, o, z, d, f, e, q]);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
 
   return use(Virtual, {

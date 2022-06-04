@@ -36,7 +36,7 @@ export const DebugGlyphPage: LC = () => {
         orbit
         ? [
           <OrbitControls
-            radius={1000}
+            radius={500}
             moveSpeed={1/1000}
             bearing={0.3}
             pitch={0.5}
@@ -58,6 +58,7 @@ export const DebugGlyphPage: LC = () => {
             key="glyph"
             active={true}
             zoom={2}
+            anchor={[0, 0]}
             render={(x, y, zoom) =>
               <Flat x={x} y={y} zoom={zoom} focus={1/3}>
                 <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
@@ -236,7 +237,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           height: image.height,
         })}
       >
-        <Arrow width={2} color={0x4080ff} depth={0.01} detail={4} zBias={100000} />
+        <Arrow width={2} color={0x4080ff} depth={0.01} detail={4} zBias={1} />
       </Sampled> : null}
 
       { image.xo && image.yo ? <Sampled
@@ -263,7 +264,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
       <LinearRGB>
         <Pass>
           <UI>
-            <Layout>
+            <Layout placement="center">
               <Flex direction="y" anchor={"center"} align={"center"} height={'100%'}>
 
                 <Block margin={20}>
@@ -464,7 +465,7 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
           <Embedded>
             <Axis axis="x" width={5} color={0x808080} end={false} />
             <Axis axis="y" width={5} color={0x808080} end={false} />
-            <Grid axes="xy" width={2} color={0xcccccc} first={{divide: width / 10}} second={{divide: height / 10}} zBias={0} />
+            <Grid axes="xy" width={2} color={0xcccccc} first={{divide: width / 10}} second={{divide: height / 10}} zBias={1} />
 
             <Scale axis="x" unit={1} divide={width}>
               <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} />

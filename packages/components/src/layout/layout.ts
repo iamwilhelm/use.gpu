@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Point } from '@use-gpu/core/types';
-import { LayoutElement, LayoutPicker } from './types';
+import { LayoutElement, LayoutPicker, Placement } from './types';
 
 import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { DebugContext } from '../providers/debug-provider';
@@ -8,45 +8,59 @@ import { LayoutContext } from '../providers/layout-provider';
 import { MouseContext, WheelContext } from '../providers/event-provider';
 import { ScrollContext } from '../consumers/scroll-consumer';
 import { ViewContext } from '../providers/view-provider';
+import { TransformContext } from '../providers/transform-provider';
 import { useInspectable, useInspectHoverable, useInspectorSelect, Inspector } from '../hooks/useInspectable';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useProp } from '../traits/useProp';
+import { parsePlacement }  from '../traits/parse';
 
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import { getFlippedPosition } from '@use-gpu/wgsl/clip/flip.wgsl';
+import { getScrolledPosition } from '@use-gpu/wgsl/clip/scroll.wgsl';
 
 import { makeBoxInspectLayout } from './lib/util';
 import { UIRectangle } from './shape/ui-rectangle';
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec2, vec3 } from 'gl-matrix';
 
 const FLIP_BINDINGS = bundleToAttributes(getFlippedPosition);
+const SHIFT_BINDINGS = bundleToAttributes(getScrolledPosition);
 
 export type LayoutProps = {
+  width?: number,
+  height?: number,
+  placement?: Placement,
   inspect?: boolean,
   render?: () => LiveElement<any>,
   children?: LiveElement<any>,
 };
 
+const DEFAULT_PLACEMENT = vec2.fromValues(1, 1);
+
 export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
-  const {render, children} = props;
+  const {width, height, render, children} = props;
+  const placement = useProp(props.placement, parsePlacement, DEFAULT_PLACEMENT);
+
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
 
+  // Remove X/Y flip from layout
   const layout = useContext(LayoutContext);
-
   const [l, t, r, b] = layout;
-  const left = Math.min(l, r);
-  const top = Math.min(t, b);
-  const right = Math.max(l, r);
-  const bottom = Math.max(t, b);
+  let left = Math.min(l, r);
+  let top = Math.min(t, b);
+  let right = Math.max(l, r);
+  let bottom = Math.max(t, b);
+  if (width != null) right = left + width;
+  if (height != null) bottom = top + height;
 
   const view = (l > r || t > b) ? (
     provide(LayoutContext, [left, top, right, bottom], children ?? (render ? render() : null))
   ) : children;
 
-  return gather(view, Resume(inspect, hovered));
+  return gather(view, Resume(placement, inspect, hovered));
 }, 'Layout');
 
-const Resume = (inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) => {
+const Resume = (placement: Placement, inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) => {
   const layout = useContext(LayoutContext);
   const {layout: {inspect: toggleInspect}} = useContext(DebugContext);
 
@@ -60,12 +74,24 @@ const Resume = (inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) 
   const sizes: Point[] = [];
   const offsets: Point[] = [];
 
-  // Global X or Y flip
-  let transform: ShaderModule | null = null;
+  let transform = useContext(TransformContext);
+
+  // Global X/Y flip
   const flip = [0, 0] as Point;
   if (l > r) flip[0] = l + r;
   if (t > b) flip[1] = b + t;
   if (flip[0] || flip[1]) transform = useBoundShader(getFlippedPosition, FLIP_BINDINGS, [flip]);
+  else useNoBoundShader();
+
+  // Global X/Y shift
+  if (placement[0] !== 1 && placement[1] !== 1) {
+    const shift = [
+      (placement[0] - 1.0) / 2 * into[0],
+      (placement[1] - 1.0) / 2 * into[1],
+    ];
+    const bound = useBoundShader(getScrolledPosition, SHIFT_BINDINGS, [shift]);
+    transform = transform ? chainTo(transform, bound) : bound;
+  }
   else useNoBoundShader();
 
   // Render children into root container

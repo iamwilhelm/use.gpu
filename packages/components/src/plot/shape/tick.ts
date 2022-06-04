@@ -53,7 +53,7 @@ export const Tick: LiveComponent<TickProps> = (props) => {
 
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);
-  const rop = useROPTrait(props);
+  const {zBias} = useROPTrait(props);
 
   const s = useProp(size, parseFloat);
   const d = useProp(detail, parseDetail);
@@ -75,6 +75,7 @@ export const Tick: LiveComponent<TickProps> = (props) => {
       color,
       width,
       depth,
+      zBias,
       size: s,
       join,
     })

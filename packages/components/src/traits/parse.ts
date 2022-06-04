@@ -206,15 +206,15 @@ export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
 export const parseBlending   = makeParseEnum<Blending>(['none', 'normal', 'add', 'subtract', 'multiply', 'custom']);
 
 export const parsePlacement  = makeParseMap({
-  'center':      vec2.fromValues(0,  0),
-  'left':        vec2.fromValues(1,  0),
-  'top':         vec2.fromValues(0, -1),
-  'right':       vec2.fromValues(1,  0),
-  'bottom':      vec2.fromValues(0,  1),
-  'topLeft':     vec2.fromValues(1, -1),
-  'topRight':    vec2.fromValues(1, -1),
-  'bottomLeft':  vec2.fromValues(1,  1),
-  'bottomRight': vec2.fromValues(1, -1),
+  'center':      vec2.fromValues( 0,  0),
+  'left':        vec2.fromValues( 1,  0),
+  'top':         vec2.fromValues( 0,  1),
+  'right':       vec2.fromValues(-1,  0),
+  'bottom':      vec2.fromValues( 0, -1),
+  'topLeft':     vec2.fromValues( 1,  1),
+  'topRight':    vec2.fromValues(-1,  1),
+  'bottomLeft':  vec2.fromValues( 1, -1),
+  'bottomRight': vec2.fromValues(-1, -1),
 }, 'center');
 
 export const parseWeight = makeParseMapOrValue({

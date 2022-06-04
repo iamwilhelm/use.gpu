@@ -5,6 +5,7 @@ import { VectorLike } from '../../traits/types';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
+import { LayoutContext } from '../../providers/layout-provider';
 import {
   parseFloat,
   parsePosition4,
@@ -37,6 +38,11 @@ export const Label: LiveComponent<LabelProps> = (props) => {
 
   const positions = useContext(DataContext) ?? undefined;
   const values = useContext(ValuesContext);
+  const layout = useContext(LayoutContext);
+
+  const flip = [1, 1];
+  if (layout[2] < layout[0]) flip[0] = -1;
+  if (layout[3] < layout[1]) flip[1] = -1;
 
   const count = useCallback(() => (positions as any)?.length || 0, [positions]);
 
@@ -73,6 +79,7 @@ export const Label: LiveComponent<LabelProps> = (props) => {
       depth,
       color,
       expand,
+      flip,
     })
   );
 };

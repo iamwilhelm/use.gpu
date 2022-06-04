@@ -6,7 +6,7 @@ import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
 import LRU from 'lru-cache';
 
-const DEBUG = true;
+const DEBUG = false;
 
 const NO_DEPS = [] as any[];
 const NO_LIBS = {} as Record<string, any>;

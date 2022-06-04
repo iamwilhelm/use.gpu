@@ -53,7 +53,7 @@ export type ImageTrait = {
 };
 
 export type LayoutRenderer = (box: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>;
-export type InlineRenderer = (lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>;
+export type InlineRenderer = (lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule, version?: number) => LiveElement<any>;
 
 export type LayoutScroller = (x: number, y: number) => void;
 export type LayoutPicker = (x: number, y: number, ox: number, oy: number, scroll: boolean) => [number, Rectangle, LayoutScroller] | null;

@@ -129,6 +129,11 @@ export const fitInline = (
   const renders = [] as InlineRenderer[];
   const pickers = [] as (LayoutPicker | null)[];
 
+  // Text rendering is expensive
+  let key = 0;
+  const rot = (a: number, b: number) => ((a << b) | (a >>> (32 - b))) >>> 0;
+  const miniHash = (x: number) => key = rot(Math.imul(key, 0xc2b2ae35) ^ x, 5);
+
   // Push all text spans into layout
   const cursor = makeLayoutCursor(wrap ? spaceMain || 0 : 0, align);
 
@@ -161,6 +166,11 @@ export const fitInline = (
   const layouts = cursor.gather((start, end, gap, lead, count, lineHeight, ascent, descent, xHeight, index) => {
     let n = end - start;
     let mainPos = lead;
+
+    miniHash(start);
+    miniHash(end);
+    miniHash(gap * 100);
+    miniHash(lead * 100);
 
     const cross = Math.max(lineHeight, ascent + descent);
     const blockSlack = Math.max(0, cross - ascent - descent);
@@ -211,7 +221,7 @@ export const fitInline = (
       mainPos += accum;
       mainPos += indentEnd;
 
-      const size = (isX ? [accum - gap, cross] : [cross, accum - gap]) as Point;
+      const size = (isX ? [accum - gap, lh] : [lh, accum - gap]) as Point;
 
       ranges.push([s, e]);
       sizes.push(size);
@@ -243,5 +253,6 @@ export const fitInline = (
     anchors,
     renders,
     pickers,
+    key,
   };
 }

@@ -73,8 +73,9 @@ export const memoInline = <T>(f: Inline<T>): Inline<T> => {
     lines: InlineLine[],
     clip?: ShaderModule,
     transform?: ShaderModule,
+    version?: number,
   ) => {
-    const hash = getHashValue(lines);
+    const hash = version ?? getHashValue(lines);
     if (lastHash && lastHash === hash && lastClip === clip && lastTransform === transform) {
       return value!;
     }
@@ -242,6 +243,7 @@ export const makeInlineLayout = (
   sizes: Point[],
   offsets: [number, number, number][],
   renders: InlineRenderer[],
+  key: number,
 ) => (
   box: Rectangle,
   clip?: ShaderModule,
@@ -252,10 +254,10 @@ export const makeInlineLayout = (
 
   let last: InlineRenderer | null = null;
   let lines: InlineLine[] = [];
-
+  
   const out: LiveElement<any>[] = [];
   const flush = (render: InlineRenderer) => {
-    const el = render(lines, clip, transform);
+    const el = render(lines, clip, transform, key);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
 
@@ -296,12 +298,13 @@ export const makeInlineInspectLayout = (
   sizes: Point[],
   offsets: [number, number, number][],
   renders?: InlineRenderer[],
+  versionRef: ({current: number}),
 ) => (
   box: Rectangle,
   clip?: ShaderModule,
   transform?: ShaderModule,
 ) => {
-  let out = renders ? makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform) : [];
+  let out = renders ? makeInlineLayout(ranges, sizes, offsets, renders, versionRef)(box, clip, transform) : [];
 
   let i = 0;
   const next = () => id.toString() + '-' + i++;

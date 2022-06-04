@@ -56,7 +56,8 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
         shrink,
         inline,
         fit: memoFit((into: AutoPoint) => {
-          const {size, sizes, ranges, offsets, anchors, renders, pickers} = fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
+          const {size, sizes, ranges, offsets, anchors, renders, pickers, key} =
+            fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
 
           const blockSizes: Point[] = [];
           const blockOffsets: Point[] = [];
@@ -95,12 +96,12 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
               transform?: ShaderModule,
             ) => {
               if (hovered) {
-                const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders)(box, clip, transform);
+                const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders, key)(box, clip, transform);
                 if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
                 return out;
               }
               else {
-                const out = makeInlineLayout(ranges, sizes, offsets, renders)(box, clip, transform);
+                const out = makeInlineLayout(ranges, sizes, offsets, renders, key)(box, clip, transform);
                 if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
                 return out;
               }

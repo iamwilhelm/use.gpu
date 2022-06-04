@@ -93,7 +93,9 @@ struct ViewUniforms {
   return vec3<f32>(position.xy, -z);
 }
 
-@export fn applyZBias(position: vec4<f32>, zBias: f32) -> vec3<f32> {
+@export fn applyZBias(position: vec4<f32>, zBias: f32) -> vec4<f32> {
+  let m = viewUniforms.projectionMatrix;
+  let v = viewUniforms.viewResolution;
   let w = position.w;
   // reversed z!
   let z = m[3].z / (-w + w * zBias * v.y) + m[2].z;

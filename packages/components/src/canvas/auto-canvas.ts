@@ -3,7 +3,8 @@ import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 
 import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
-import { CanvasPicking } from './canvas-picking';
+import { DOMEvents } from './dom-events';
+import { Picking } from '../render/picking';
 import { CursorConsumer } from '../consumers/cursor-consumer';
 
 import { use, useResource, useNoResource } from '@use-gpu/live';
@@ -44,9 +45,13 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   if (!canvas) throw new Error(`Cannot find canvas '${props.selector ?? props.canvas}'`);
 
   const view = (
-    use(CursorConsumer, {
+    use(DOMEvents, {
       element: canvas,
-      children,
+      children:
+        use(CursorConsumer, {
+          element: canvas,
+          children,
+        })
     })
   );
 
@@ -59,7 +64,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
           canvas,
           children:
             picking
-            ? use(CanvasPicking, {
+            ? use(Picking, {
                 canvas,
                 children: view,
               })

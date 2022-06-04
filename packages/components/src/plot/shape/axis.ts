@@ -55,7 +55,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const {width, depth, join, loop} = useLineTrait(props);
 
   const color = useColorTrait(props);
-  const rop = useROPTrait(props);
+  const {zBias} = useROPTrait(props);
 
   const p = useProp(origin, parsePosition4);
   const d = useProp(detail, parseDetail);
@@ -94,6 +94,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
       depth,
       size,
       join,
+      zBias,
     })
   );
 };

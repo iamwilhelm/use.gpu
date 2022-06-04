@@ -40,14 +40,14 @@ export const PlotSimplePage: LC = () => {
               >
                 <Grid
                   axes='xy'
-                  width={3}
+                  width={2}
                   first={{ detail: 3, divide: 5 }}
                   second={{ detail: 3, divide: 5 }}
                   depth={0.5}
                 />
                 <Grid
                   axes='xz'
-                  width={3}
+                  width={2}
                   first={{ detail: 3, divide: 5 }}
                   second={{ detail: 3, divide: 5 }}
                   depth={0.5}
@@ -72,8 +72,8 @@ export const PlotSimplePage: LC = () => {
                   />
                   <Label
                     placement='bottom'
-                    color='#808080'
-                    size={32}
+                    color='#80808080'
+                    size={24}
                     offset={16}
                     expand={5}
                     depth={0.5}
@@ -81,7 +81,7 @@ export const PlotSimplePage: LC = () => {
                   <Label
                     placement='bottom'
                     color='#ffffff'
-                    size={32}
+                    size={24}
                     offset={16}
                     expand={0}
                     depth={0.5}
@@ -108,7 +108,7 @@ export const PlotSimplePage: LC = () => {
                   size={[10, 20]}
                   expr={(emit, z, x) => {
                     const v = Math.cos(x) * Math.cos(z);
-                    emit(x, v * .5 + .5, z, 1);
+                    emit(x, v * .4 + .5, z, 1);
                   }}
                 >
                   <Surface

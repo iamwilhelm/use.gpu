@@ -94,7 +94,6 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var m = (max(0.0, o + 0.5 + b) % 1.0) - 0.5;
     if (o < -b) { m = 1.0 + (o + b - 1.0); }
     mark = clamp(1.0 - abs(m / scale) * s, 0.0, 1.0);
-    //if (m != 1000.0) { mark += 0.5; }
     
     if ((border.x != border.y) || (border.z != border.w) || (border.x != border.z)) {
       let o = (sdf.inner - 0.5) * scale / s;

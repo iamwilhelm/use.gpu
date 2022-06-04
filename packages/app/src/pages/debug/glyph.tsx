@@ -468,10 +468,10 @@ const TextureFrame: LC<TextureFrameProps> = (props: PropsWithChildren<TextureFra
             <Grid axes="xy" width={2} color={0xcccccc} first={{divide: width / 10}} second={{divide: height / 10}} zBias={1} />
 
             <Scale axis="x" unit={1} divide={width}>
-              <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} />
+              <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} zBias={1} />
             </Scale>
             <Scale axis="y" unit={1} divide={height}>
-              <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} offset={[1, 0, 0]} />
+              <Tick size={10} width={2.5} color={0xc0c0c0} depth={0} offset={[1, 0, 0]} zBias={1} />
             </Scale>
             {children}
           </Embedded>

@@ -3,12 +3,12 @@ import { AutoPoint, Dimension, Direction, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
-import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 
 import { ElementTrait } from '../types';
 import { useElementTrait } from '../traits';
-import { Element } from '../element/element';
+import { useImplicitElement } from '../element/element';
 
 const NO_POINT4 = [0, 0, 0, 0];
 
@@ -40,10 +40,6 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
 
   const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
 
-  const background = (stroke || fill || image) ? (
-    use(Element, {radius, border, stroke, fill, image, absolute: true, under: true})
-  ) : null;
-
   const {id} = useFiber();
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
@@ -68,13 +64,13 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
     
         return {
           size,
-          render: hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders),
+          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
       }),
     });
   };
 
-  const c = background ? (children ? [background, children] : background) : children;
+  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
   return gather(c, Resume);
 }, 'Absolute');

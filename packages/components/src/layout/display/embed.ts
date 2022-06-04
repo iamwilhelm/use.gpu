@@ -5,7 +5,7 @@ import { ShaderModule } from '@use-gpu/shader/types';
 
 import { use, memo, gather, provide, yeet, tagFunction, useFiber } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { memoFit } from '../lib/util';
+import { memoFit, memoLayout } from '../lib/util';
 import { evaluateDimension } from '../parse';
 import { LayoutContext } from '../../providers/layout-provider';
 import { TransformContext } from '../../providers/transform-provider';
@@ -71,7 +71,7 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
 
         return {
           size,
-          render: (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => {
+          render: memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => {
             const view = render
               ? render(layout, clip, transform)
               : (
@@ -82,7 +82,7 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
                 )
               );
             return yeet(view);
-          },
+          }),
         };
       }),
     });

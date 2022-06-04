@@ -2,7 +2,7 @@ import { TextureSource, Tuples, Point, Point4, Rectangle } from '@use-gpu/core/t
 import { LiveElement, Key } from '@use-gpu/live/types';
 import { FontMetrics } from '@use-gpu/text/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Color } from '../traits/types';
+import { Color, ColorLike } from '../traits/types';
 import { mat4 } from 'gl-matrix';
 
 export type AutoPoint = [number | null, number | null];
@@ -38,8 +38,8 @@ export type ElementTrait = {
 
   radius: MarginLike,
   border: MarginLike,
-  stroke: Color,
-  fill: Color,
+  stroke: ColorLike,
+  fill: ColorLike,
   image: Partial<ImageTrait>,
 };
 

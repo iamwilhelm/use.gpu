@@ -14,7 +14,7 @@ import { getShiftedRectangle } from '@use-gpu/wgsl/clip/layout.wgsl';
 
 import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
-import { makeBoxLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { parseOverflow } from '../parse';
 import { ScrollBar } from '../element/scrollbar';
 import { Block } from './block';
@@ -165,7 +165,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
         return {
           size,
-          render: (
+          render: memoLayout((
             box: Rectangle,
             parentClip?: ShaderModule,
             parentTransform?: ShaderModule,
@@ -175,7 +175,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
               ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
               ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
             ];
-          },
+          }),
           pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
         };
       }),

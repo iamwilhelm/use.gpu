@@ -99,10 +99,13 @@ export const GeometryFacesPage: LC = () => {
     @export fn main(uv: vec2<f32>) -> vec4<f32> {
       let iuv = vec2<i32>(uv * getSize() / ${scale});
       let pick = vec2<f32>(getPicking(iuv, 0).xy);
+      let a = (pick.r / 16.0) % 1.0;
+      let b = (pick.g / 16.0) % 1.0;
+      let c = (pick.r + pick.g) / 256.0;
       return vec4<f32>(
-        (pick.r / 16.0) % 1.0,
-        (pick.g / 16.0) % 1.0,
-        (pick.r + pick.g) / 256.0,
+        a,
+        c,
+        b,
         1.0,
       );
     }
@@ -118,7 +121,7 @@ export const GeometryFacesPage: LC = () => {
           <Absolute
             right={0}
           >
-            <Block fill={[0, 0, 0, .5]}>
+            <Block fill={[0, 0, 0, .5]} contain>
               <Block
                 width={textureSource.size[0] * scale}
                 height={textureSource.size[1] * scale}

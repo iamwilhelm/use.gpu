@@ -468,7 +468,7 @@ export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
   calls: LiveElement<any>,
   next?: LiveFunction<any>,
 ) => {
-  const reduction = () => toArray(gatherFiberValues(fiber, true));
+  const reduction = () => gatherFiberValues(fiber, true);
   return mountFiberReduction(fiber, calls, undefined, reduction, next);
 }
 
@@ -547,7 +547,10 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
       return yeeted.reduced = items;
     }
   }
-  else if (mount) return yeeted.reduced = gatherFiberValues(mount);
+  else if (mount) {
+    if (self) return yeeted.reduced = toArray(gatherFiberValues(mount));
+    return yeeted.reduced = gatherFiberValues(mount);
+  }
   return [];
 }
 

@@ -51,8 +51,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   } = props;
 
   const { getGlyph, getScale, getRadius } = useSDFFontContext();
-  
+
   return useMemo(() => {
+    console.log('glyph re-render')
     const adjust = size / (detail ?? size);
     const radius = getRadius();
     const scale = getScale(detail ?? size) * adjust;

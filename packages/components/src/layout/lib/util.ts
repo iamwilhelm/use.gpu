@@ -3,7 +3,7 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
-import { yeet } from '@use-gpu/live';
+import { yeet, fragment } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/clip/clip.wgsl';
 import { INSPECT_STYLE } from './constants';
@@ -22,6 +22,37 @@ export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
     }
     value = f(into);
     last = into;
+    return value;
+  };
+}
+
+type Layout<T> = (
+  box: Rectangle,
+  clip?: ShaderModule,
+  transform?: ShaderModule,
+) => T;
+export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
+  let lastBox: Rectangle | null = null;
+  let lastClip: ShaderModule | null = null;
+  let lastTransform: ShaderModule | null = null;
+
+  const sameBox = (a: Rectangle, b: Rectangle) => {
+    return (a[0] === b[0]) && (a[1] === b[1]) && (a[2] === b[2]) && (a[3] === b[3]);
+  }
+
+  let value: T | null = null;
+  return (
+    box: Rectangle,
+    clip?: ShaderModule,
+    transform?: ShaderModule,
+  ) => {
+    if (lastBox && sameBox(lastBox, box) && lastClip === clip && lastTransform === transform) {
+      return value!;
+    }
+    value = f(box, clip, transform);
+    lastBox = box;
+    lastClip = clip;
+    lastTransform = transform;
     return value;
   };
 }
@@ -86,10 +117,11 @@ export const makeBoxLayout = (
     const layout = [l, t, r, b] as Rectangle;
     const el = render(layout, xclip, xform);
 
-    if (Array.isArray(el)) out.push(...(el as any[]));
+    if (Array.isArray(el)) out.push(fragment(el as any[]));
     else out.push(el);
   }
-
+  
+  if (out.length === 1 && Array.isArray(out[0])) return out[0];
   return out;
 };
 

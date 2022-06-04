@@ -2,16 +2,16 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Point, Point4 } from '@use-gpu/core/types';
 import { LayoutElement, AutoPoint, Dimension, Direction, MarginLike, Margin } from '../types';
 
-import { use, memo, gather, yeet, useFiber } from '@use-gpu/live';
+import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { isHorizontal, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { isHorizontal, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
 import { useProp } from '../../traits/useProp';
-import { Element } from '../element/element';
+import { useImplicitElement } from '../element/element';
 
 export type BlockProps =
   Partial<BoxTrait> &
@@ -44,9 +44,6 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       : Math.abs(padding[1]) + Math.abs(padding[3]));
 
   const {id} = useFiber();
-  const background = (stroke || fill || image) ? (
-    use(Element, {id, radius, border, stroke, fill, image, absolute: true, under: true})
-  ) : null;
 
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
@@ -94,13 +91,13 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
 
         return {
           size,
-          render: hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders),
+          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
       })
     });
   };
-  
-  const c = background ? (children ? [background, children] : background) : children;
+
+  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
   return gather(c, Resume);
 }, 'Block');

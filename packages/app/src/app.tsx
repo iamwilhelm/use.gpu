@@ -60,7 +60,7 @@ export const App: LC = () => {
   ]);
 
   const fiber = useFiber();
-  const {inspect, layout, setLayout} = useInspector();
+  const inspect = useInspector();
 
   const view = useMemo(() => (
     <WebGPU
@@ -77,12 +77,16 @@ export const App: LC = () => {
     </WebGPU>
   ), [root, fonts, router]);
 
-  return (<>
-    <DebugProvider debug={{layout: {inspect: layout}}}>
+  return (
+    <UseInspect
+      fiber={fiber}
+      container={root}
+      active={inspect}
+      provider={DebugProvider}
+    >
       {view}
-    </DebugProvider>
-    {inspect ? <UseInspect fiber={fiber} container={root} onInspect={setLayout} /> : null}
-  </>)
+    </UseInspect>
+  )
 };
 
 // Toggle inspector with ctrl/cmd-I.
@@ -90,7 +94,6 @@ export const App: LC = () => {
 const useInspector = () => {
   const [version, setVersion] = useState<number>(0);
   const [inspect, setInspect] = useState<boolean>(true);
-  const [layout, setLayout] = useState<boolean>(false);
 
   useResource((dispose) => {
     const keydown = (e: KeyboardEvent) => {
@@ -102,5 +105,5 @@ const useInspector = () => {
     dispose(() => window.addEventListener('keydown', keydown));
   });
 
-  return {inspect, layout, setLayout};
+  return inspect;
 }

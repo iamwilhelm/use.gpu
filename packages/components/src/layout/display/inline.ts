@@ -3,9 +3,9 @@ import { Point, Rectangle } from '@use-gpu/core/types';
 import { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Direction, Alignment, Base, MarginLike } from '../types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
-import { memo, gather, yeet, useFiber, useOne } from '@use-gpu/live';
+import { memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
-import { makeInlineLayout, makeInlineInspectLayout, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { makeInlineLayout, makeInlineInspectLayout, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 import { useProp } from '../../traits/useProp';
 import { BoxTrait } from '../types';
@@ -72,7 +72,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
           blockRenders.push(render);
           blockPickers.push(pick);
         }
-        
+      
         inspect({
           layout: {
             into,
@@ -81,14 +81,14 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
             offsets,
           },
         });
-        
+      
         const pickSizes   = blockSizes.length ? [...sizes,   ...blockSizes] : sizes;
         const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : offsets;
         const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : pickers;
 
         return {
           size,
-          render: (
+          render: memoLayout((
             box: Rectangle,
             clip?: ShaderModule,
             transform?: ShaderModule,
@@ -103,7 +103,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
               if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
               return out;
             }
-          },
+          }),
           pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),
         };
       })

@@ -3,13 +3,13 @@ import { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, 
 
 import { use, yeet, memo, gather, useFiber } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit } from '../lib/util';
+import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '../../hooks/useInspectable';
 import { useProp } from '../../traits/useProp';
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY, parseMargin } from '../parse';
-import { Element } from '../element/element';
+import { useImplicitElement } from '../element/element';
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
@@ -44,9 +44,6 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   const gap       = useProp(props.gap, parseGapXY);
 
   const {id} = useFiber();
-  const background = (stroke || fill || image) ? (
-    use(Element, {id, radius, border, stroke, fill, image, absolute: true, under: true})
-  ) : null;
 
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
@@ -90,7 +87,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
 
         return {
           size,
-          render: hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders),
+          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
 
@@ -98,6 +95,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
       }),
     });
   };
-  
+
+  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
   return children ? gather(children, Resume) : null;
 }, 'Flex');

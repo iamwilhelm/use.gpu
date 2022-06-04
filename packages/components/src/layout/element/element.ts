@@ -1,9 +1,9 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Point4, Rectangle } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint } from '../types';
+import { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint, ImageTrait } from '../types';
 
-import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
+import { use, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';
 import { useInspectHoverable } from '../../hooks/useInspectable';
 
@@ -85,3 +85,19 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     },
   });
 };
+
+export const useImplicitElement = (
+  id: number,
+  radius: MarginLike,
+  border: MarginLike,
+  stroke: ColorLike,
+  fill: ColorLike,
+  image: Partial<ImageTrait>,
+  children: any,
+) =>
+  useMemo(() => {
+    const element = (stroke || fill || image) ? (
+      use(Element, {id, radius, border, stroke, fill, image, absolute: true, under: true})
+    ) : null;
+    return element && children ? [element, children] : element ?? children;
+  }, [id, radius, border, stroke, fill, image, children]);

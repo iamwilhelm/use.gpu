@@ -157,7 +157,6 @@ export const fitBlock = (
       if (size[0] != null) size[0] -= ml + mr;
     }
 
-    console.log('block fit', size)
     const {render, pick, size: fitted} = fit(size);
 
     sizes.push(fitted);

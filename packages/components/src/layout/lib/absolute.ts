@@ -26,7 +26,6 @@ export const fitAbsoluteBox = (
     top != null && bottom != null ? bottom - top : null,
   ];
 
-  console.log({into, fixed})
   const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, NO_LAYOUT, direction, true, true);
   
   if (left == null) left = right - size[0];

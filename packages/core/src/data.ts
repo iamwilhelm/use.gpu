@@ -804,7 +804,7 @@ export const copyNumberArrayCompositeRange = (
       copyNumberArrayRange(src, to, fromIndex, pos + range4 + dims4, dims * 2, dims);
     }
     else {
-      copyNumberArrayRange(src, to, fromIndex, pos, range, 0, dims);
+      copyNumberArrayRange(src, to, fromIndex, pos, range, dims);
     }
   }
   else {

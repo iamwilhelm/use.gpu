@@ -286,7 +286,8 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                     />
                   </Inline>
                 </Block>
-
+                
+                {/*
                 <Flex align={"center"} gap={10}>
                   <Block>
                     <TextureFrame texture={rgbaTexture}>
@@ -444,6 +445,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                     </Inline>
                   </Block>
                 </Flex>
+                */}
               </Flex>
             </Layout>
           </UI>

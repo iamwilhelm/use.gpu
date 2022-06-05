@@ -146,7 +146,7 @@ export const fitBlock = (
   const pickers = [] as (LayoutPicker | null | undefined)[];
 
   for (const el of els) if (!el.absolute && !el.stretch) {
-    const {margin, fit, sizing} = el;
+    const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
 
     const size = relativeFit.slice() as AutoPoint;

@@ -73,7 +73,7 @@ export const getInlineMinMax = (
       caretMain = 0;
     }
   };
-
+  
   const n = els.length;
   for (const {spans, height, margin, absolute} of els) {
     const [ml, mt, mr, mb] = margin ?? NO_MARGIN;
@@ -87,8 +87,11 @@ export const getInlineMinMax = (
       ++i;
     }
     if (!wrap) allMinMain = allMaxMain;
-    allMinCross = caretCross;
   }
+
+  caretCross += lineHeight;
+  allMinCross = caretCross;
+  allMaxMain = Math.max(allMaxMain, caretMain);
 
   if (snap) {
     allMinMain = Math.round(allMinMain);

@@ -103,11 +103,7 @@ export const render = (props: RenderProps) => {
   );
 
   if (!pipeline) return;
-
-  if (stale) {
-    console.log('SUSPEND');
-    return yeet(SUSPEND);
-  }
+  if (stale) return yeet(SUSPEND);
   
   // Uniforms
   const uniform = useMemo(() => {

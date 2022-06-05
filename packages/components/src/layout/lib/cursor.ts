@@ -65,6 +65,8 @@ export const makeLayoutCursor = (
     xHeight: number,
   ) => {
     if (max > 0 && (spanAdvance + advance - trim > max)) {
+      if (!spanTrim) spanCount++;
+
       flush(0);
       start = index;
     }
@@ -76,13 +78,14 @@ export const makeLayoutCursor = (
     }
     else if (trim) {
       spanCount++;
-      spanTrim = trim;
     }
+
     spanAdvance += advance;
     spanCross = Math.max(spanCross, cross);
     spanAscent = Math.max(spanAscent, ascent);
     spanDescent = Math.max(spanDescent, descent);
     spanXHeight = Math.max(spanXHeight, xHeight);
+    spanTrim = trim;
 
     if (hard) {
       flush(hard);

@@ -215,8 +215,13 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
               parentClip?: ShaderModule,
               parentTransform?: ShaderModule,
             ) => {
-              if (fitTo(box, scrollBarWidth, scrollBarHeight) && (hasScrollX || hasScrollY)) fit();
-              
+
+              // If scrollbar must appear/disappear, re-fit.
+              if (fitTo(box, scrollBarWidth, scrollBarHeight) && (hasScrollX || hasScrollY)) {
+                fit();
+                fitTo(box, scrollBarWidth, scrollBarHeight);
+              }
+
               return [
                 ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
                 ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),

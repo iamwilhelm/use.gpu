@@ -184,7 +184,7 @@ export const fitFlex = (
 
       const mOn  =  isX ? ml + mr : mt + mb;
       const mOff = !isX ? ml + mr : mt + mb;
-      
+
       const into = (isX
         ? [mainSizes[i] / (ratioX || 1), containY != null ? containY - mOff : null]
         : [containX != null ? containX - mOff : null, mainSizes[i] / (ratioY || 1)]) as AutoPoint;

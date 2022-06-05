@@ -64,12 +64,12 @@ type CachedGlyph = {
 export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   width = 256,
   height = 256,
-  radius = 20,
+  radius = 16,
   pad = 0,
   children,
   then,
 }: SDFFontProviderProps) => {
-  pad += radius;
+  pad += Math.ceil(radius * 0.75);
 
   const device = useContext(DeviceContext);
   const rustText = useContext(FontContext);

@@ -35,6 +35,24 @@ describe('cast', () => {
     expect(recode).toMatchSnapshot();
 
   });
+
+  it('casts compact swizzle', () => {
+    
+    const code = `
+     @export fn getValue() -> vec2<f32> { return vec2<f32>(1.0, 2.0); }
+    `;
+
+    const mod = loadModule(code, 'code', 'getValue');
+    const result = castTo(mod, 'vec4<f32>', {
+      basis: 'xyzw',
+      signs: '++-+',
+      gain: 2,
+    });
+    
+    const recode = linkBundle(result);
+    expect(recode).toMatchSnapshot();
+
+  });
   
   it('casts and links', () => {
     

@@ -150,9 +150,9 @@ layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}
 } ${ns}${name}Storage;
 
 ${type} ${ns}${name}(int index) {
-  ${format} v = ${ns}${name}Storage.data[index];
-  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
-}
+  ${format !== type ? `${format} v =` : 'return'} ${ns}${name}Storage.data[index];
+${format !== type ? `  return ${makeSwizzle(format, type, 'v')};` : ''
+}}
 `;
 
 export const makeTextureAccessor = (
@@ -172,7 +172,8 @@ layout (set = ${set}, binding = ${binding + 1}) uniform sampler ${ns}${name}Samp
 
 ${type} ${ns}${name}(vec2 uv) {
   ${absolute ? `uv = uv / vec2(textureSize(${ns}${name}Texture));\n  ` : ''}
-  ${format} v = texture(${variant}(${ns}${name}Texture, ${ns}${name}Sampler), uv);
-  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
-}
+
+  ${format !== type ? `${format} v =` : 'return'} texture(${variant}(${ns}${name}Texture, ${ns}${name}Sampler), uv);
+${format !== type ? `  return ${makeSwizzle(format, type, 'v')};` : ''
+}}
 `;

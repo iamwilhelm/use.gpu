@@ -48,7 +48,7 @@ export const Routes: LiveComponent<RoutesProps> = memo((props: RoutesProps) => {
   const {
     routes,
     base = NO_PATH,
-    morph: shouldMorph = true
+    morph: shouldMorph = false
   } = props;
 
   const {route: routeState} = useContext(RouterContext);

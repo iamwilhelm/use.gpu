@@ -53,9 +53,9 @@ export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
   if (width != null) right = left + width;
   if (height != null) bottom = top + height;
 
-  const view = (l > r || t > b) ? (
+  const view = (
     provide(LayoutContext, [left, top, right, bottom], children ?? (render ? render() : null))
-  ) : children;
+  );
 
   return gather(view, Resume(placement, inspect, hovered));
 }, 'Layout');

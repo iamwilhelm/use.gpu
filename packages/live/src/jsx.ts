@@ -1,5 +1,5 @@
 import { formatNodeName } from './debug';
-import { gather, provide, yeet, FRAGMENT, GATHER, PROVIDE, YEET } from './builtin';
+import { gather, provide, yeet, morph, FRAGMENT, GATHER, PROVIDE, YEET, MORPH } from './builtin';
 import { getCurrentFiberID } from './fiber';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 
@@ -17,6 +17,7 @@ export const Fragment = FRAGMENT as AnyF;
 export const Gather = GATHER as AnyF;
 export const Provide = PROVIDE as AnyF;
 export const Yeet = YEET as AnyF;
+export const Morph = MORPH as AnyF;
 
 export const React = {
   createElement: (type: ArrowFunction, props: any, ...children: any[]) => {
@@ -34,6 +35,10 @@ export const React = {
       }
       if (type === YEET) {
         return yeet(children[0], props?.key);
+      }
+      if (type === MORPH) {
+        if (children.length === 1) return morph(children[0]);
+        return children.map(morph);
       }
       throw new Error("Builtin `${formatNodeName({f: type})}` unsupported in JSX. Use raw function syntax instead.");
     }

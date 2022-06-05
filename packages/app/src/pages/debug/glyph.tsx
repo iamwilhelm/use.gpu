@@ -2,7 +2,7 @@ import { LC, PropsWithChildren } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { Rectangle, DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
-import React from '@use-gpu/live/jsx';
+import React, { Morph } from '@use-gpu/live/jsx';
 import { memo, fragment } from '@use-gpu/live';
 import { makeRawTexture } from '@use-gpu/core';
 import { glyphToRGBA, glyphToSDF, sdfToGradient, makeSDFStage, paintSubpixelOffsets } from '@use-gpu/text';
@@ -13,7 +13,7 @@ import { vec3 } from 'gl-matrix';
 import {
   LinearRGB, Draw, Pass, Flat, UI, Layout, Block, Inline, Text, Flex, Embed, RawTexture,
   Embedded, Axis, Grid, Scale, Tick, Point, Arrow, Sampled,
-  PanControls,
+  PanControls, LayoutContext,
   useDeviceContext, useFontContext, DebugProvider,
   OrbitCamera, OrbitControls,
 } from '@use-gpu/components';
@@ -35,36 +35,44 @@ export const DebugGlyphPage: LC = () => {
       render={({subpixel, contours, preprocess, postprocess, glyph, orbit}) =>       
         orbit
         ? [
-          <OrbitControls
-            radius={500}
-            moveSpeed={1/1000}
-            bearing={0.3}
-            pitch={0.5}
-            render={(radius: number, phi: number, theta: number, target: vec3) =>
-              <OrbitCamera
-                radius={radius}
-                phi={phi}
-                theta={theta}
-                target={target}
-                near={0.1}
-                far={5000}
-              >
-                <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
-              </OrbitCamera>
-            }
-          />,
+          <Morph>
+            <OrbitControls
+              radius={500}
+              moveSpeed={1/1000}
+              bearing={0.3}
+              pitch={0.5}
+              render={(radius: number, phi: number, theta: number, target: vec3) =>
+                <Morph>
+                  <OrbitCamera
+                    radius={radius}
+                    phi={phi}
+                    theta={theta}
+                    target={target}
+                    near={0.1}
+                    far={5000}
+                  >
+                    <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
+                  </OrbitCamera>
+                </Morph>
+              }
+            />
+          </Morph>,
         ] : [
-          <PanControls
-            key="glyph"
-            active={true}
-            zoom={2}
-            anchor={[0, 0]}
-            render={(x, y, zoom) =>
-              <Flat x={x} y={y} zoom={zoom} focus={1/3}>
-                <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
-              </Flat>
-            }
-          />
+          <Morph>
+            <PanControls
+              key="glyph"
+              active={true}
+              zoom={2}
+              anchor={[0, 0]}
+              render={(x, y, zoom) =>
+                <Morph>
+                  <Flat x={x} y={y} zoom={zoom} focus={1/3}>
+                    <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
+                  </Flat>
+                </Morph>
+              }
+            />
+          </Morph>
         ]
       }
     />

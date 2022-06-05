@@ -57,10 +57,10 @@ const hookToObject = (
     return {resource: a?.value, deps: b};
   }
   if (type === Hook.CONTEXT) {
-    return {context: a?.displayName};
+    return {context: b?.displayName};
   }
   if (type === Hook.CONSUMER) {
-    return {consumer: a?.displayName};
+    return {consumer: b?.displayName};
   }
   return null;
 }

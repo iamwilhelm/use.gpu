@@ -29,17 +29,20 @@ export const useRenderPipeline = (
   const device = useContext(DeviceContext);
   const {colorStates, depthStencilState, samples} = renderContext;
 
+  // Memo key for unique render context
   const memoKey = useMemoKey(
     [device, colorStates, depthStencilState, props]
   );
 
   return useMemo(() => {
+    // Cache by unique render context
     let cache = CACHE.get(memoKey);
     if (!cache) {
       DEBUG && console.log('pipeline cache created', memoKey.__id)
       CACHE.set(memoKey, cache = makePipelineCache());
     }
 
+    // Cache by shader structural hash
     const [vertex, fragment] = shader;
     const key = vertex.hash.toString() + fragment.hash.toString();
 
@@ -49,6 +52,7 @@ export const useRenderPipeline = (
       return cached;
     }
 
+    // Make new pipeline
     const pipeline = makeRenderPipeline(
       device,
       renderContext,
@@ -70,19 +74,28 @@ export const useRenderPipelineAsync = (
   const device = useContext(DeviceContext);
   const {colorStates, depthStencilState, samples} = renderContext;
 
+  // Memo key for unique render context
   const memoKey = useMemoKey(
     [device, colorStates, depthStencilState, props]
   );
 
   const [resolved, setResolved] = useState<GPURenderPipeline | null>(null);
+  const staleRef = useOne(() => ({current: false}));
 
   const immediate = useMemo(() => {
+    // Cache by unique render context
     let cache = CACHE.get(memoKey);
+    let pending = PENDING.get(memoKey);
     if (!cache) {
       DEBUG && console.log('pipeline cache created', memoKey.__id)
       CACHE.set(memoKey, cache = makePipelineCache());
     }
+    if (!pending) {
+      DEBUG && console.log('pipeline pending queue created', memoKey.__id)
+      PENDING.set(memoKey, pending = new Map());
+    }
 
+    // Cache by shader structural hash
     const [vertex, fragment] = shader;
     const key = vertex.hash.toString() +'-'+ fragment.hash.toString();
 
@@ -91,21 +104,21 @@ export const useRenderPipelineAsync = (
       DEBUG && console.log('async pipeline cache hit', key)
       return cached;
     }
-    
-    let pending = PENDING.get(memoKey);
-    if (!pending) {
-      DEBUG && console.log('pipeline pending queue created', memoKey.__id)
-      PENDING.set(memoKey, pending = new Map());
-    }
 
+    // Mark current pipeline as stale (if any)
+    staleRef.current = true;
+
+    // Mark key as pending
     if (pending.has(key)) {
       pending.get(key)!.then((pipeline) => {
         setResolved(pipeline);
+        staleRef.current = false;
         return pipeline;
       });
       return null;
     }
 
+    // Make new pipeline async
     const promise = makeRenderPipelineAsync(
       device,
       renderContext,
@@ -115,9 +128,13 @@ export const useRenderPipelineAsync = (
     );
     promise.then((pipeline) => {
       DEBUG && console.log('async pipeline resolved', key)
-      pending.delete(key);
+
       cache.set(key, pipeline);
       setResolved(pipeline);
+
+      staleRef.current = false;
+      pending.delete(key);
+
       return pipeline;
     });
     pending.set(key, promise);
@@ -126,5 +143,6 @@ export const useRenderPipelineAsync = (
     return null;
   }, [memoKey, shader, samples]);
 
-  return immediate ?? resolved;
+  DEBUG && console.log('async pipeline got', (immediate ?? resolved))
+  return [immediate ?? resolved, staleRef.current];
 };

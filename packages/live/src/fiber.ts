@@ -4,8 +4,8 @@ import {
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
 
-import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME } from './builtin';
-import { discardState } from './hooks';
+import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME, SUSPEND } from './builtin';
+import { discardState, useOne } from './hooks';
 import { renderFibers, sliceNextFiber } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction } from './util';
 import { formatNode, formatNodeName } from './debug';
@@ -273,11 +273,13 @@ export const updateFiber = <F extends ArrowFunction>(
     const e = call!.args;
     const c = e as any as DeferredCall<any>;
     const cs = e as any as DeferredCall<any>[];
+
     const isArray = !!e && Array.isArray(e);
-    const fiberType = isArray ? Array : (c as any)?.f;
+    fiber.type = fiberType as any;
 
     if (isArray) reconcileFiberCalls(fiber, cs.map(call => morph(call as any)));
-    morphFiberCall(fiber, fiberType, c);
+    else morphFiberCall(fiber, c);
+
     return fiber;
   }
 
@@ -297,18 +299,18 @@ export const updateFiber = <F extends ArrowFunction>(
   }
   // Map reduce
   else if (fiberType === MAP_REDUCE) {
-    const [calls, map, reduce, done] = call!.args ?? EMPTY_ARRAY;
-    mapReduceFiberCalls(fiber, calls, map, reduce, done);
+    const [calls, map, reduce, done, fallback] = call!.args ?? EMPTY_ARRAY;
+    mapReduceFiberCalls(fiber, calls, map, reduce, done, fallback);
   }
   // Gather reduce
   else if (fiberType === GATHER) {
-    const [calls, done] = call!.args ?? EMPTY_ARRAY;
-    gatherFiberCalls(fiber, calls, done);
+    const [calls, done, fallback] = call!.args ?? EMPTY_ARRAY;
+    gatherFiberCalls(fiber, calls, done, fallback);
   }
   // Multi-gather reduce
   else if (fiberType === MULTI_GATHER) {
-    const [calls, done] = call!.args ?? EMPTY_ARRAY;
-    multiGatherFiberCalls(fiber, calls, done);
+    const [calls, done, fallback] = call!.args ?? EMPTY_ARRAY;
+    multiGatherFiberCalls(fiber, calls, done, fallback);
   }
   // Yeet value upstream
   else if (fiberType === YEET) {
@@ -456,8 +458,17 @@ export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
   mapper: (t: T) => R,
   reducer: (a: R, b: R) => R,
   next?: LiveFunction<any>,
+  fallback?: R,
 ) => {
-  const reduction = () => reduceFiberValues(fiber, reducer, true);
+  const reduction = () => {
+    const ref = useOne(() => ({current: fallback}));
+    const value = reduceFiberValues(fiber, reducer, true);
+
+    if ((value as any) === SUSPEND) return ref.current as any;
+    ref.current = value;
+
+    return value;
+  };
   return mountFiberReduction(fiber, calls, mapper, reduction, next);
 }
 
@@ -468,8 +479,16 @@ export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any>,
   next?: LiveFunction<any>,
+  fallback: T | T[] = [],
 ) => {
-  const reduction = () => gatherFiberValues(fiber, true);
+  const reduction = () => {
+    const ref = useOne(() => ({current: fallback}));
+    const value = gatherFiberValues(fiber, true);
+
+    if (value === SUSPEND) return ref.current;
+    ref.current = value;
+    return value;
+  };
   return mountFiberReduction(fiber, calls, undefined, reduction, next);
 }
 
@@ -478,8 +497,17 @@ export const multiGatherFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any>,
   next?: LiveFunction<any>,
+  fallback: T | T[] = [],
 ) => {
-  const reduction = () => multiGatherFiberValues(fiber, true);
+  const reduction = () => {
+    const ref = useOne(() => ({current: fallback}));
+    const value = multiGatherFiberValues(fiber, true);
+
+    if (value === SUSPEND) return ref.current;
+    ref.current = value;
+
+    return value;
+  };
   return mountFiberReduction(fiber, calls, undefined, reduction, next);
 }
 
@@ -488,7 +516,7 @@ export const reduceFiberValues = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   reducer: (a: R, b: R) => R,
   self: boolean = false,
-): R | undefined => {
+): R | SUSPEND | undefined => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
@@ -520,7 +548,7 @@ export const reduceFiberValues = <F extends ArrowFunction, R, T>(
 export const gatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,
-): T | T[] | undefined => {
+): T | T[] | SUSPEND | undefined => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
@@ -538,6 +566,8 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
         if (!m) continue;
 
         const value = gatherFiberValues(m);
+        if (value === SUSPEND) return SUSPEND;
+
         if (Array.isArray(value)) {
           let n = value.length;
           for (let i = 0; i < n; ++i) items.push(value[i] as T);
@@ -549,8 +579,11 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
     }
   }
   else if (mount) {
-    if (self) return yeeted.reduced = toArray<T>(gatherFiberValues(mount));
-    return yeeted.reduced = gatherFiberValues(mount);
+    const value = gatherFiberValues(mount);
+    if (value === SUSPEND) return SUSPEND;
+
+    if (self) return yeeted.reduced = toArray<T>(value);
+    return yeeted.reduced = value;
   }
   return [];
 }
@@ -560,7 +593,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
 export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,
-): Record<string, T | T[]> => {
+): Record<string, T | T[]> | SUSPEND => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
@@ -578,6 +611,8 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
         if (!m) continue;
 
         const value = multiGatherFiberValues(m);
+        if (value === SUSPEND) return SUSPEND;
+
         for (let k in value) {
           const v = value[k];
           let list = out[k] as T[];
@@ -594,20 +629,23 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
       return yeeted.reduced = out;
     }
   }
-  else if (mount) return yeeted.reduced = multiGatherFiberValues(mount) as any;
+  else if (mount) {
+    const value = multiGatherFiberValues(mount);
+    if (value === SUSPEND) return SUSPEND;
+    return yeeted.reduced = value as any;
+  }
   return {} as Record<string, T | T[]>;
 }
 
 // Morph one call on a fiber
 export const morphFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
-  fiberType: any,
   call?: DeferredCall<any> | null,
 ) => {
   const {mount} = fiber;
 
-  if (fiber.type && (fiber.type !== fiberType) && !((fiber.type as any).isLiveBuiltin)) {
-    if (call && mount && mount.context === fiber.context && !mount.next) {
+  if (call && mount && (mount.f !== call.f) && !(call.f.isLiveBuiltin)) {
+    if (mount.context === fiber.context && !mount.next) {
       // Discard all fiber state
       enterFiber(mount, 0);
       exitFiber(mount);
@@ -623,7 +661,6 @@ export const morphFiberCall = <F extends ArrowFunction>(
       mount.version = -1;
     }
   }
-  fiber.type = fiberType;
 
   mountFiberCall(fiber, call);
 }

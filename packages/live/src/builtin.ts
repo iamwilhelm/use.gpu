@@ -18,6 +18,7 @@ export const YEET         = () => {};
 export const PROVIDE      = () => {};
 export const CONSUME      = () => {};
 export const DEBUG        = () => {};
+export const SUSPEND      = () => {};
 
 (MORPH        as any).isLiveBuiltin = true;
 (DETACH       as any).isLiveBuiltin = true;
@@ -29,6 +30,7 @@ export const DEBUG        = () => {};
 (PROVIDE      as any).isLiveBuiltin = true;
 (CONSUME      as any).isLiveBuiltin = true;
 (DEBUG        as any).isLiveBuiltin = true;
+(SUSPEND      as any).isLiveBuiltin = true;
 
 (FRAGMENT     as any).isLiveInline = true;
 

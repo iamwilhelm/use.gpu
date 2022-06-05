@@ -8,8 +8,8 @@ import { useRouterContext } from '@use-gpu/components';
 const STYLE = {
   position: 'absolute',
 
-  left: 0,
-  //left: '50%',
+  //left: 0,
+  left: '50%',
   //marginLeft: '-100px',
 
   bottom: 0,

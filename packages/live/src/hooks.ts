@@ -40,16 +40,19 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
       case Hook.MEMO:
       case Hook.ONE:
       case Hook.CALLBACK:
+      case Hook.VERSION:
         useNoHook(type)();
         break;
       case Hook.RESOURCE:
         useNoResource();
         break;
       case Hook.CONTEXT:
-        useNoContext(state[i + 2]);
+        if (state[i + 1]) useNoContext(state[i + 2]);
+        else fiber.pointer += 3;
         break;
       case Hook.CONSUMER:
-        useNoConsumer(state[i + 2]);
+        if (state[i + 1]) useNoConsumer(state[i + 2]);
+        else fiber.pointer += 3;
         break;
     }
   }
@@ -361,6 +364,8 @@ export const useContext = <C>(
     if (initialValue === undefined) {
       throw new Error(`Required context '${displayName}' was used without being provided.`);
     }
+    state![i] = false;
+    state![i + 1] = context;
     return initialValue;
   }
 
@@ -427,6 +432,8 @@ export const useNoContext = <C>(
     if (host) host.undepend(fiber, root);
     state![i] = false;
   }
+
+  state![i + 1] = undefined;
 }
 
 // Don't use a consumer from the fiber
@@ -445,6 +452,8 @@ export const useNoConsumer = <C>(
     if (host) host.undepend(next, fiber);
     state![i] = false;
   }
+
+  state![i + 1] = undefined;
 }
 
 // Togglable hooks

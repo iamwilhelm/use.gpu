@@ -97,7 +97,7 @@ export const getFlexMinMax = (
 export const fitFlex = (
   els: LayoutElement[],
   into: AutoPoint,
-  fixed: [number | number, number | null],
+  fixed: AutoPoint,
   direction: Direction,
   gap: Point,
   alignX: Alignment,
@@ -130,7 +130,7 @@ export const fitFlex = (
   const sizes   = [] as Point[];
   const offsets = [] as Point[];
   const renders = [] as LayoutRenderer[];
-  const pickers = [] as LayoutPicker[];
+  const pickers = [] as (LayoutPicker | null | undefined)[];
 
   const main = [] as LayoutElement[];
   const mainSizes = [] as number[];
@@ -140,7 +140,7 @@ export const fitFlex = (
     sizes: Point[],
     offsets: [number, number, number][],
     renders: LayoutRenderer[],
-    pickers: LayoutPicker[],
+    pickers: (LayoutPicker | null | undefined)[],
   }[];
 
   let accumMain = 0;
@@ -175,7 +175,7 @@ export const fitFlex = (
     const crossSizes   = [] as Point[];
     const crossOffsets = [] as [number, number, number][];
     const crossRenders = [] as LayoutRenderer[];
-    const crossPickers = [] as LayoutPicker[];
+    const crossPickers = [] as (LayoutPicker | null | undefined)[];
 
     let maxSize = 0;
     for (let i = 0; i < n; ++i) {
@@ -186,8 +186,8 @@ export const fitFlex = (
       const mOff = !isX ? ml + mr : mt + mb;
       
       const into = (isX
-        ? [mainSizes[i] / (ratioX || 1) - mOn, containY != null ? containY - mOff : null]
-        : [containX != null ? containX - mOff : null, mainSizes[i] / (ratioY || 1) - mOn]) as AutoPoint;
+        ? [mainSizes[i] / (ratioX || 1), containY != null ? containY - mOff : null]
+        : [containX != null ? containX - mOff : null, mainSizes[i] / (ratioY || 1)]) as AutoPoint;
 
       const {render, pick, size: fitted} = fit(into);
 
@@ -286,7 +286,7 @@ export const fitFlex = (
     accumMain += gapMain;
 
     main.push(el);
-    mainSizes.push(size + mOn);
+    mainSizes.push(size);
   }
   reduceMain(true);
   reduceCross();

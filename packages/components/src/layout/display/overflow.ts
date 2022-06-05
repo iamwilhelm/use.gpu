@@ -14,7 +14,7 @@ import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';
 
 import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
-import { makeBoxLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
+import { makeBoxLayout, makeBoxPicker, memoFit, memoLayout, isHorizontal } from '../lib/util';
 import { parseOverflow } from '../parse';
 import { ScrollBar } from '../element/scrollbar';
 import { Block } from './block';
@@ -52,6 +52,11 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
   
   const x = useProp(props.x, parseOverflow);
   const y = useProp(props.y, parseOverflow);
+  
+  const isX = isHorizontal(direction);
+
+  const hasScrollX = x === 'scroll' || x === 'auto';
+  const hasScrollY = y === 'scroll' || y === 'auto';
 
   const api = useOne(() => {
     const scrollRef = [0, 0] as Point;
@@ -86,16 +91,28 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
         dy != null ? scrollRef[1] + dy : null,
       );
     };
+
+    const shouldScroll = () => {
+      const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
+      return [outerWidth < innerWidth, outerHeight < innerHeight];
+    };
     
-    const fitTo = (layout: Rectangle) => {
+    const fitTo = (layout: Rectangle, scrollBarWidth: number, scrollBarHeight: number) => {
+      const before = shouldScroll();
       const [l, t, r, b] = layout;
       sizeRef[0] = r - l;
       sizeRef[1] = b - t;
       boxRef[0] = l;
       boxRef[1] = t;
 
+      const after = shouldScroll();
+      sizeRef[0] = r - l - (after[1] ? scrollBarWidth : 0);
+      sizeRef[1] = b - t - (after[0] ? scrollBarHeight : 0);
+
       const [x, y] = scrollRef;
       scrollTo(x, y);
+      
+      return (isX && before[0] !== after[0]) || (!isX && before[1] !== after[1]);
     };
     
     const sizeTo = (size: Point) => {
@@ -114,10 +131,10 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
     const transform = bindBundle(getScrolledPosition, {getOffset: o});
     const inverse = bindBundle(getScrolledPosition, {getOffset: s});
 
-    return {clip, transform, inverse, sizeRef, scrollRef, fitTo, sizeTo, scrollTo, scrollBy};
+    return {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, fitTo, sizeTo, scrollTo, scrollBy};
   });
   
-  const {clip, transform, inverse, sizeRef, scrollRef, fitTo, sizeTo, scrollTo, scrollBy} = api;
+  const {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, fitTo, sizeTo, scrollTo, scrollBy} = api;
 
   useOne(() => scrollTo(scrollX, null), scrollX);
   useOne(() => scrollTo(null, scrollY), scrollY);
@@ -128,41 +145,68 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
       const sizing = getBlockMinMax(els, NO_FIXED, direction);
-      const [{margin, fit}, ...scrollBars] = els;
+      const [{margin, fit: fitBlock}, ...scrollBars] = els;
       const [ml, mt, mr, mb] = margin;
+
+      const scrollBarWidth  = hasScrollY ? scrollBars[hasScrollX ? 1 : 0].sizing[0] : 0;
+      const scrollBarHeight = hasScrollX ? scrollBars[0].sizing[1] : 0;
 
       return yeet({
         sizing,
         margin: NO_POINT4,
         stretch: true,
         fit: memoFit((into: AutoPoint) => {
+          const sizes   = [];
+          const offsets = [] as Point[];
+          const renders = [];
+          const pickers = [] as (LayoutPicker | null)[];
 
-          const resolved: AutoPoint = direction === 'x' ? [null, into[1]] : [into[0], null];
-          const {render, pick, size} = fit(resolved);
+          const fit = () => {
+            sizes.length = 0;
+            offsets.length = 0;
+            renders.length = 0;
+            pickers.length = 0;
 
-          const sizes   = [size];
-          const offsets = [[ml, mt]] as Point[];
-          const renders = [render];
-          const pickers = [pick] as (LayoutPicker | null)[];
+            const [shouldScrollX, shouldScrollY] = shouldScroll();
 
-          for (const {fit} of scrollBars) {
-            const {render, pick, size} = fit(into);
+            const resolved: AutoPoint = isX
+              ? [null, into[1] - (shouldScrollX ? scrollBarHeight : 0)]
+              : [into[0] - (shouldScrollY ? scrollBarWidth : 0), null];
+
+            const {render, pick, size} = fitBlock(resolved);
+
             sizes.push(size);
-            offsets.push([0, 0]);
+            offsets.push([ml, mt]) as Point[];
             renders.push(render);
-            pickers.push(null);
-          }
+            pickers.push(pick) as (LayoutPicker | null)[];
 
-          inspect({
-            layout: {
-              into,
-              size,
-              sizes,
-              offsets,
-            },
-          });
+            for (const {fit} of scrollBars) {
+              const {render, pick, size} = fit(into);
+              sizes.push(size);
+              offsets.push([0, 0]);
+              renders.push(render);
+              pickers.push(null);
+            }
 
-          sizeTo(size);
+            inspect({
+              layout: {
+                into,
+                size,
+                sizes,
+                offsets,
+              },
+            });
+
+            sizeTo(size);
+
+            const outer = size.slice();
+            if (shouldScrollY) outer[0] += scrollBarWidth;
+            if (shouldScrollX) outer[1] += scrollBarHeight;
+
+            return outer;
+          };
+          
+          const size = fit();
 
           return {
             size,
@@ -171,7 +215,8 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
               parentClip?: ShaderModule,
               parentTransform?: ShaderModule,
             ) => {
-              fitTo(box);
+              if (fitTo(box, scrollBarWidth, scrollBarHeight) && (hasScrollX || hasScrollY)) fit();
+              
               return [
                 ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
                 ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
@@ -184,8 +229,8 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
     }, [props, els]);
   };
 
-  const scrollBarX = x === 'scroll' || x === 'auto' ? extend(scrollBar, { direction: 'x', overflow: x, scrollRef, sizeRef }) : null;
-  const scrollBarY = y === 'scroll' || y === 'auto' ? extend(scrollBar, { direction: 'y', overflow: y, scrollRef, sizeRef }) : null;
+  const scrollBarX = hasScrollX ? extend(scrollBar, { direction: 'x', overflow: x, scrollRef, sizeRef }) : null;
+  const scrollBarY = hasScrollY ? extend(scrollBar, { direction: 'y', overflow: y, scrollRef, sizeRef }) : null;
 
   return children ? gather([
     use(Block, {contain: true, direction, children}),

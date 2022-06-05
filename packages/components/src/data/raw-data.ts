@@ -61,7 +61,6 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : 'f32';
 
     const {array, dims} = makeDataArray(f, l || 1);
-    if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
     const buffer = makeStorageBuffer(device, array.byteLength);
     const source = {
@@ -99,7 +98,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   const refresh = () => {
     let emitted = 0;
 
-    if (data) copyNumberArray(data, array);
+    if (data) copyNumberArray(data, array, dims);
     if (expr) emitted = emitIntoNumberArray(expr, array, dims);
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);

@@ -63,6 +63,7 @@
       "\\.(wgsl|glsl)$": "<rootDir>/test/fileTransformer.mjs"
     },
     "moduleNameMapper": {
+      "^@use-gpu/wgsl/(.*)$": "<rootDir>/packages/wgsl/src/$1",
       "^@use-gpu/(.*)$": "<rootDir>/packages/$1"
     },
     "modulePaths": [

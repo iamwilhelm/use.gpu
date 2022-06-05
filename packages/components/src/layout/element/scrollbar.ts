@@ -71,7 +71,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   const thumbTransform = useBoundShader(getScrolledPosition, OFFSET_BINDINGS, [shift]);
 
   return yeet({
-    sizing: NO_POINT4,
+    sizing: isX ? [0, size, 0, size] : [size, 0, size, 0],
     margin: NO_POINT4,
     absolute: true,
     fit: memoFit((into: AutoPoint) => {
@@ -97,7 +97,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         const showThumb = showTrack && f < 1;
 
         const yeets: UIAggregate[] = [];
-        if (showTrack) yeets.push({
+        if (false && showTrack) yeets.push({
           id: id.toString() + '-0',
           rectangle: trackBox,
           bounds: trackBox,

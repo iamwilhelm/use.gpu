@@ -61,7 +61,7 @@ export type LayoutPicker = (x: number, y: number, l: number, t: number, r: numbe
 export type LayoutFit = {
   size: Point,
   render: LayoutRenderer,
-  pick: LayoutPicker,
+  pick?: LayoutPicker | null,
   transform?: ShaderModule,
 };
 
@@ -90,7 +90,7 @@ export type InlineElement = {
   block?: LayoutFit,
   absolute?: boolean,
   render: InlineRenderer,
-  pick?: LayoutPicker,
+  pick?: LayoutPicker | null,
 };
 
 export type InlineLine = {

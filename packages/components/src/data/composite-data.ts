@@ -177,8 +177,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
       let {raw, fn} = makeDataAccessor(f, accessor);
 
-      const {array, dims} = makeDataArray(f, l);
-      if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
+      const {array, dims, to4} = makeDataArray(f, l);
 
       const buffer = makeStorageBuffer(device, array.byteLength);
       const source = {
@@ -190,7 +189,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       };
 
       const isIndex = accessorType === 'index';
-      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex};
+      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex, to4};
     });
 
     const fieldSources = fieldBuffers.map(f => f.source);
@@ -200,11 +199,12 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   
   // Refresh and upload data
   const refresh = () => {
-    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex} of fieldBuffers) if (raw || data) {
+    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex, to4} of fieldBuffers) if (raw || data) {
       const a = accessor as Accessor;
       const c = isIndex ? chunks : layout.indexed ?? chunks;
       const l = (!layout.indexed || isIndex) ? loops : undefined;
       const o = isIndex ? layout.offsets : undefined;
+
       if (composite) {
         if (raw) copyNumberArraysComposite(raw, array, dims, c, l, o);
         else if (data) copyDataArraysComposite(data, array, dims, a, c, l, o);

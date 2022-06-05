@@ -4,6 +4,7 @@ import { use, memo, useResource, useState } from '@use-gpu/live';
 import { EventProvider, MouseState, WheelState, KeyboardState } from '../providers/event-provider';
 
 const CAPTURE_EVENT = {capture: true};
+const NON_PASSIVE_EVENT = {capture: true, passive: false};
 
 export type DOMEventsProps = {
   element: HTMLElement,
@@ -196,6 +197,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onKeyDown = (e: KeyboardEvent) => onModifiers(e);
     const onKeyUp = (e: KeyboardEvent) => onModifiers(e);
 
+    //const onGlobalWheel = (e: WheelEvent) => e.preventDefault();
+    
     element.addEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
     element.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
     element.addEventListener('contextmenu', onContextMenu, CAPTURE_EVENT);
@@ -207,7 +210,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     document.addEventListener('keydown', onKeyDown, CAPTURE_EVENT);
     document.addEventListener('keyup', onKeyUp, CAPTURE_EVENT);
 
-    element.addEventListener('wheel', onWheel);
+    element.addEventListener('wheel', onWheel, CAPTURE_EVENT);
+    //document.addEventListener('wheel', onGlobalWheel, NON_PASSIVE_EVENT);
 
     dispose(() => {
       element.removeEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
@@ -221,7 +225,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       document.removeEventListener('keydown', onKeyDown, CAPTURE_EVENT);
       document.removeEventListener('keyup', onKeyUp, CAPTURE_EVENT);
 
-      element.removeEventListener('wheel', onWheel);
+      element.removeEventListener('wheel', onWheel, CAPTURE_EVENT);
+      //document.removeEventListener('wheel', onGlobalWheel, NON_PASSIVE_EVENT);
     });
   }, [element]);
 

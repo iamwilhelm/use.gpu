@@ -24,6 +24,7 @@ import { FALLBACK_MESSAGE } from './fallback';
 export const App: LC = () => {
   
   const root = document.querySelector('#use-gpu')!;
+  const inner = document.querySelector('#use-gpu .canvas')!;
 
   const router = useOne(() => (
     <Router>
@@ -64,7 +65,7 @@ export const App: LC = () => {
 
   const view = useMemo(() => (
     <WebGPU
-      fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
+      fallback={(error: Error) => <HTML container={inner}>{FALLBACK_MESSAGE(error) as any}</HTML>}
     >
       <AutoCanvas
         selector={'#use-gpu .canvas'}

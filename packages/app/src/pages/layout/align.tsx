@@ -37,27 +37,41 @@ export const LayoutAlignPage: LC = () => {
                 <Block margin={[10, 0, 10, 50]}>
 
                   <Label>Flex Start</Label>
-                  <Flex margin={10} gap={10} align="start"   anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Flex margin={10} gap={[10, 5]} align="start"   anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
                   <Label>Flex Center</Label>
-                  <Flex margin={10} gap={10} align="center"  anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Flex margin={10} gap={[10, 5]} align="center"  anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
                   <Label>Flex End</Label>
-                  <Flex margin={10} gap={10} align="end"     anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
+                  <Flex margin={10} gap={[10, 5]} align="end"     anchor="center" height={200} fill={[1, 1, 1, 0.1]}>{BOXES}</Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
                   <Label>Flex Justify</Label>
-                  <Flex wrap margin={10} gap={10} align="justify" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Flex wrap margin={10} gap={[10, 5]} align="justify" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
                   <Label>Flex Between</Label>
-                  <Flex wrap margin={10} gap={10} align="between" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Flex wrap margin={10} gap={[10, 5]} align="between" anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
                   <Label>Flex Evenly</Label>
-                  <Flex wrap margin={10} gap={10} align="evenly"  anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Flex wrap margin={10} gap={[10, 5]} align="evenly"  anchor="center" height={250} fill={[1, 1, 1, 0.1]}>{BOXES}{BOXES}</Flex>
+                  <Block fill={[1, 1, 1, 0.5]} height={2} />
+
+                  <Label>Flex Grow</Label>
+                  <Flex wrap margin={10} gap={[10, 5]} align="evenly"  anchor="center" height={250} fill={[1, 1, 1, 0.1]}>
+                    <Element width={200} height={50} grow={0} fill={FILL} />
+                    <Element width={200} height={50} grow={1} fill={FILL} />
+                    <Element width={200} height={50} grow={0} fill={FILL} />
+                    <Element width={200} height={50} grow={0} fill={FILL} />
+                    <Element width={200} height={50} grow={0} fill={FILL} />
+                    <Element width={200} height={50} grow={1} fill={FILL} />
+                    <Element width={200} height={50} grow={0} fill={FILL} />
+                    <Element width={200} height={50} grow={1} fill={FILL} />
+                    <Element width={200} height={50} grow={1} fill={FILL} />
+                  </Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
 

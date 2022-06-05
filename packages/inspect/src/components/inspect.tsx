@@ -56,9 +56,9 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     const el = document.querySelector('#use-gpu .canvas');
     if (!el || !open) return;
     
-    (el as any).style.marginLeft = '34%';
+    (el as any).style.left = '34%';
     return () => {
-      (el as any).style.marginLeft = '0';
+      (el as any).style.left = '0';
     };
   }, [open]);
 

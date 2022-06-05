@@ -62,7 +62,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
 
   // Refresh and upload data
   const refresh = () => {
-    if (data) copyNumberArray(data, array);
+    if (data) copyNumberArray(data, array, dims);
     if (expr && size.length) {
       emitIntoMultiNumberArray(expr, array, dims, size);
     }

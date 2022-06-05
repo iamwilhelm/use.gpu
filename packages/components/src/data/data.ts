@@ -47,7 +47,6 @@ export const Data: LiveComponent<DataProps> = (props) => {
       if (length == null) length = l;
 
       const {array, dims} = makeDataArray(f, length);
-      if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
       const buffer = makeStorageBuffer(device, array.byteLength);
       const source = {
@@ -67,7 +66,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
   // Refresh and upload data
   const refresh = () => {
     for (const {buffer, array, source, dims, accessor, raw} of fieldBuffers) if (raw || data) {
-      if (raw) copyNumberArray(raw, array);
+      if (raw) copyNumberArray(raw, array, dims);
       else if (data) copyDataArray(data, array, dims, accessor as Accessor);
 
       uploadBuffer(device, buffer, array.buffer);

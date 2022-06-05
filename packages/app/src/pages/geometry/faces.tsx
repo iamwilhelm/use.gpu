@@ -20,14 +20,14 @@ import {
 
 const convexDataFields = [
   // Accessor syntax
-  ['array<vec4<f32>>', (o: any) => o.positions],
+  ['array<vec3<f32>>', (o: any) => o.positions],
   // Shorthand => o.color
-  ['vec4<f32>', 'color'],
+  ['vec3<f32>', 'color'],
 ] as DataField[];
 
 const concaveDataFields = [
-  ['array<vec4<f32>>', (o: any) => o.positions],
-  ['vec4<f32>', 'color'],
+  ['array<vec3<f32>>', (o: any) => o.positions],
+  ['vec3<f32>', 'color'],
   // Indexed attribute - must be adjusted when aggregated.
   ['array<u32>', (o: any) => o.indices, 'index'],
   ['u32', 'lookup'],
@@ -41,7 +41,7 @@ const lineDataFields = [
 
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
-const randomColor = () => [Math.random(), Math.random(), Math.random(), 1];
+const randomColor = () => [Math.random(), Math.random(), Math.random()];
 const randomInt = (min: number, max: number) => min + Math.round(Math.random() * (max - min));
 const randomFloat = (min: number, max: number) => min + Math.random() * (max - min);
 
@@ -59,7 +59,6 @@ let convexFaceData = seq(20).map(i => {
       o[0] + circleX(j / n, r) * circleX(i / 20, 1),
       o[1] + circleY(j / n, r),
       o[2] + circleX(j / n, r) * circleY(i / 20, 1),
-      1,
     ]),
     color: randomColor(),
   };
@@ -77,7 +76,6 @@ let concaveFaceData = seq(20).map(i => {
       o[0] + circleX(j / n, r * modulate) * circleX(i / 20, 1),
       o[1] + circleY(j / n, r * modulate),
       o[2] + circleX(j / n, r * modulate) * circleY(i / 20, 1),
-    1,
     ];
   });
 

@@ -2,7 +2,6 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LambdaSource, Emitter } from '@use-gpu/core/types';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
-import { SampledData } from '../../data/sampled-data';
 import { DataContext } from '../../providers/data-provider';
 import { useBoundSource } from '../../hooks/useBoundSource';
 import { useDataBinding } from '../../hooks/useDataBinding';

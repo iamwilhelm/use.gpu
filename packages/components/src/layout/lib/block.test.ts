@@ -5,7 +5,6 @@ import { makeBoxLayout } from './util';
 
 describe('block layout', () => {
   
-  /*
   let ID = 0;
   const makeElement = (
     width: number,
@@ -25,43 +24,69 @@ describe('block layout', () => {
     };
   };
 
-  it("gets block min/max", () => {
+  it("gets block min/max without fixed", () => {
     const els = [
       makeElement(50, 50),
       makeElement(20, 20),
     ];
 
-    const sizingX = getBlockMinMax(els, 'x');
+    const sizingX = getBlockMinMax(els, [null, null], 'x');
     expect(sizingX).toEqual([70, 50, 70, 50]);
 
-    const sizingY = getBlockMinMax(els, 'y');
+    const sizingY = getBlockMinMax(els, [null, null], 'y');
     expect(sizingY).toEqual([50, 70, 50, 70]);
   });
 
-  it("gets block margin", () => {
+  it("gets block min/max with fixed", () => {
     const els = [
-      makeElement(50, 50, 10),
-      makeElement(20, 20, 20),
+      makeElement(50, 50),
+      makeElement(20, 20),
     ];
 
-    const sizingX = getBlockMargin(els, [0, 0, 0, 0], [0, 0, 0, 0], 'x');
-    expect(sizingX).toEqual([10, 0, 20, 0]);
+    const sizingX = getBlockMinMax(els, [800, 500], 'x');
+    expect(sizingX).toEqual([800, 500, 800, 500]);
 
-    const sizingY = getBlockMargin(els, [0, 0, 0, 0], [0, 0, 0, 0], 'y');
-    expect(sizingY).toEqual([0, 10, 0, 20]);
+    const sizingY = getBlockMinMax(els, [800, 500], 'y');
+    expect(sizingY).toEqual([800, 500, 800, 500]);
   });
-  
-  it("gets merged block margin", () => {
+
+  it("gets block margin with collapse", () => {
     const els = [
       makeElement(50, 50, 10),
       makeElement(20, 20, 20),
     ];
 
-    const sizingX = getBlockMargin(els, [-5, -10, -25, 5], [0, 0, 0, 0], 'x');
-    expect(sizingX).toEqual([5, -10, -5, 5]);
+    {
+      const sizingX = getBlockMargin(els, [0, 0, 0, 0], [0, 0, 0, 0], 'x', false);
+      expect(sizingX).toEqual([10, 0, 20, 0]);
 
-    const sizingY = getBlockMargin(els, [-5, -10, -25, 5], [0, 0, 0, 0], 'y');
-    expect(sizingY).toEqual([-5, 0, -25, 20]);
+      const sizingY = getBlockMargin(els, [0, 0, 0, 0], [0, 0, 0, 0], 'y', false);
+      expect(sizingY).toEqual([0, 10, 0, 20]);
+    }
+
+    {
+      const sizingX = getBlockMargin(els, [5, 3, 7, 10], [0, 0, 0, 0], 'x', false);
+      expect(sizingX).toEqual([10, 3, 20, 10]);
+
+      const sizingY = getBlockMargin(els, [5, 3, 7, 10], [0, 0, 0, 0], 'y', false);
+      expect(sizingY).toEqual([5, 10, 7, 20]);
+    }
+
+    {
+      const sizingX = getBlockMargin(els, [0, 0, 0, 0], [5, 3, 7, 10], 'x', false);
+      expect(sizingX).toEqual([5, 0, 13, 0]);
+
+      const sizingY = getBlockMargin(els, [0, 0, 0, 0], [5, 3, 7, 10], 'y', false);
+      expect(sizingY).toEqual([0, 7, 0, 10]);
+    }
+    
+    {
+      const sizingX = getBlockMargin(els, [-5, -10, -25, 5], [0, 0, 0, 0], 'x', false);
+      expect(sizingX).toEqual([5, -10, -5, 5]);
+
+      const sizingY = getBlockMargin(els, [-5, -10, -25, 5], [0, 0, 0, 0], 'y', false);
+      expect(sizingY).toEqual([-5, 0, -25, 20]);
+    }
   });
 
   it("fits block layout X", () => {
@@ -71,7 +96,7 @@ describe('block layout', () => {
     ];
 
     const size = [110, 80] as Point;
-    const {sizes, offsets, renders} = fitBlock(els, size, [0, 0], [0, 0, 0, 0], 'x');
+    const {sizes, offsets, renders} = fitBlock(els, size, [0, 0], [0, 0, 0, 0], 'x', false);
 
     expect(offsets).toEqual([[0, 10], [70, 20]]);
     expect(sizes).toEqual([[50, 50], [20, 20]]);
@@ -88,7 +113,7 @@ describe('block layout', () => {
     ];
 
     const size = [110, 80] as Point;
-    const {sizes, offsets, renders} = fitBlock(els, size, [0, 0], [0, 0, 0, 0], 'y');
+    const {sizes, offsets, renders} = fitBlock(els, size, [0, 0], [0, 0, 0, 0], 'y', false);
 
     expect(offsets).toEqual([[10, 0], [20, 70]]);
     expect(sizes).toEqual([[50, 50], [20, 20]]);
@@ -97,6 +122,5 @@ describe('block layout', () => {
     const result = makeBoxLayout(sizes, offsets, renders)(layout);
     expect((result as any)[0].layout).toEqual([20, 20, 70, 70]);
   });
-  */
 
 });

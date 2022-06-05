@@ -1,4 +1,5 @@
 import {
+  copyNumberArray,
   copyNumberArrays, copyNumberArrayChunked,
   copyNestedNumberArray,
   copyNumberArrayRepeatedRange,
@@ -10,6 +11,22 @@ import {
 
 describe('data', () => {
 
+  it('copies number array', () => {
+    const data = [0, 1, 2, 3, 4, 5, 6, 7];
+    const dst = [0, 0, 0, 0, 0, 0, 0, 0];
+
+    copyNumberArray(data, dst, 4);
+    expect(dst).toEqual(data);
+  });
+
+  it('copies vec3 number array', () => {
+    const data = [0, 1, 2, 3, 4, 5];
+    const dst = [0, 0, 0, 0, 0, 0, 0, 0];
+
+    copyNumberArray(data, dst, 3);
+    expect(dst).toEqual([0, 1, 2, 0, 3, 4, 5, 0]);
+  });
+  
   it('copies nested vec2 number array', () => {
     const data = [[1, 10], [2, 20], [3, 30]];
     const dst = [0, 0, 0, 0, 0, 0];
@@ -19,11 +36,20 @@ describe('data', () => {
     expect(dst).toEqual([1, 10, 2, 20, 3, 30]);
   });
   
+  it('copies nested vec3 number array', () => {
+    const data = [[1, 10, 4], [2, 20, 5], [3, 30, 6]];
+    const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const accessor = (o: any) => [o.x, o.y];
+
+    copyNestedNumberArray(data, dst, 3);
+    expect(dst).toEqual([1, 10, 4, 0, 2, 20, 5, 0, 3, 30, 6, 0]);
+  });
+
   it('copies multiple number arrays into one', () => {
     const src = [[1, 2, 3], [4], [5, 6]];
     const dst = [0, 0, 0, 0, 0, 0];
 
-    copyNumberArrays(src, dst);
+    copyNumberArrays(src, dst, 1);
     expect(dst).toEqual([1, 2, 3, 4, 5, 6]);
   });
   
@@ -37,10 +63,18 @@ describe('data', () => {
 
   it('copies multiple nested data arrays into one', () => {
     const src = [{xs: [[1, 1], [2, 2], [3, 3]]}, {xs: [[4, 4]]}, {xs: [[5, 5], [6, 6]]}];
-    const dst = [0, 0, 0, 0, 0, 0];
+    const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     copyDataArrays(src, dst, 2, (o: any) => o.xs);
     expect(dst).toEqual([1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6]);
+  });
+
+  it('copies multiple vec3 arrays into one', () => {
+    const src = [[1, 2, 3, 4, 5, 6], [7, 8, 9], [10, 11, 12, 13, 14, 15]];
+    const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    copyNumberArrays(src, dst, 3);
+    expect(dst).toEqual([1, 2, 3, 0, 4, 5, 6, 0, 7, 8, 9, 0, 10, 11, 12, 0, 13, 14, 15, 0]);
   });
 
   it('copies a vec2 value into a repeated array', () => {
@@ -59,6 +93,14 @@ describe('data', () => {
     expect(dst).toEqual([0, 0, 1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 1, 10, 0, 0]);
   });
 
+  it('copies a vec3 value into a repeated array with loop', () => {
+    const src = [1, 10, 2];
+    const dst = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    copyNumberArrayRepeatedRange(src, dst, 0, 4, 3, 3, true);
+    expect(dst).toEqual([0, 0, 0, 0, 1, 10, 2, 0, 1, 10, 2, 0, 1, 10, 2, 0, 1, 10, 2, 0, 1, 10, 2, 0, 1, 10, 2, 0, 0, 0, 0, 0]);
+  });
+  
   it('copies number array into repeated chunks', () => {
     const src = [1, 2, 3];
     const dst = [0, 0, 0, 0, 0, 0];

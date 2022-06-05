@@ -143,7 +143,7 @@ export const fitBlock = (
   const sizes = [] as Point[];
   const offsets = [] as Point[];
   const renders = [] as LayoutRenderer[];
-  const pickers = [] as LayoutPicker[];
+  const pickers = [] as (LayoutPicker | null | undefined)[];
 
   for (const el of els) if (!el.absolute && !el.stretch) {
     const {margin, fit, sizing} = el;

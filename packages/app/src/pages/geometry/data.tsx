@@ -16,8 +16,8 @@ import {
 // Line data fields
 
 const lineDataFields = [
-  ['array<vec4<f32>>', (o: any) => o.path],
-  ['vec4<f32>', 'color'],
+  ['array<vec3<f32>>', (o: any) => o.path],
+  ['vec3<f32>', 'color'],
   ['f32', 'width'],
 ] as DataField[];
 
@@ -25,6 +25,7 @@ const lineDataFields = [
 
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
+// Take random +/- X/Y/Z steps
 const vecSteps = [
   vec3.fromValues(1, 0, 0),
   vec3.fromValues(-1, 0, 0),
@@ -40,10 +41,10 @@ const lineData = seq(20).map((i) => ({
     let dir = Math.floor(Math.random() * 6);
     let next = vec3.clone(vecSteps[dir]);
     vec3.add(next, next, last as any);
-    arr.push([next[0], next[1], next[2], 1.0]);
+    arr.push([next[0], next[1], next[2]]);
     return arr;
   }, [] as number[][]),
-  color: [Math.random()*Math.random(), Math.random(), Math.random(), 1], 
+  color: [Math.random()*Math.random(), Math.random(), Math.random()], 
   width: Math.random() * 20 + 1,
   loop: false,
 }));
@@ -65,7 +66,7 @@ export const GeometryDataPage: LC = () => {
 
           <Data
             fields={[
-              ['vec4<f32>', [-5, -2.5, 0, 1, 5, -2.5, 0, 1, 0, -2.5, -5, 1, 0, -2.5, 5, 1]],
+              ['vec3<f32>', [-5, -2.5, 0, 5, -2.5, 0, 0, -2.5, -5, 0, -2.5, 5]],
               ['i32', [1, 2, 1, 2]],
             ]}
             render={(positions, segments) =>
@@ -96,7 +97,7 @@ export const GeometryDataPage: LC = () => {
           />
 
           <RawData
-            format='vec4<f32>'
+            format='vec3<f32>'
             length={100}
             live
             expr={(emit: Emitter, i: number) => {
@@ -105,7 +106,6 @@ export const GeometryDataPage: LC = () => {
                 Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
                 Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2,
                 Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2,
-                1,
               );
             }}
             render={(positions) =>

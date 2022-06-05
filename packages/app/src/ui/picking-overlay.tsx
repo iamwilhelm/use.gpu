@@ -18,8 +18,8 @@ export const PickingOverlay: LC = () => {
   const {pickingSource} = pickingContext;
   const colorizeShader = wgsl`
     // Picking buffer is int32, have to use direct texture load.
-    @link fn getSize() -> vec2<f32> {}
-    @link fn getPicking(uv: vec2<i32>, level: i32) -> vec4<u32> {}
+    @link fn getSize() -> vec2<f32>;
+    @link fn getPicking(uv: vec2<i32>, level: i32) -> vec4<u32>;
 
     fn main(uv: vec2<f32>) -> vec4<f32> {
       let iuv = vec2<i32>(uv * getSize());

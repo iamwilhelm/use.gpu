@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  TypedArray, ViewUniforms, DeepPartial, Prop,
+  TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformType,
   VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
@@ -42,7 +42,7 @@ export type TickLayerProps = {
   join?: 'miter' | 'round' | 'bevel',
 
   detail?: number,
-  count?: Prop<number>,
+  count?: Lazy<number>,
   mode?: RenderPassMode | string,
   id?: number,
 };

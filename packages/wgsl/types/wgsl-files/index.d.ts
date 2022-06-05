@@ -4,35 +4,6 @@ declare module '@use-gpu/wgsl' {
   export default WGSLModules;
 }
   
-declare module "@use-gpu/wgsl/clip/clip.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getCombinedClip: ParsedBundle;
-  export const getTransformedClip: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/clip/flip.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getFlippedPosition: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/clip/layout.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getShiftedRectangle: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/clip/scroll.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getScrolledPosition: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -197,6 +168,35 @@ declare module "@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/layout/clip.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getCombinedClip: ParsedBundle;
+  export const getTransformedClip: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/layout/layout.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLayoutPosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/layout/scroll.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getScrolledPosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/layout/shift.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getShiftedRectangle: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/mask/masked.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -277,77 +277,77 @@ declare module "@use-gpu/wgsl/plot/surface.wgsl" {
 declare module "@use-gpu/wgsl/render/fragment/mesh.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/fragment/pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/fragment/shaded.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/fragment/solid.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/fragment/ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/vertex/mesh-pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/vertex/mesh.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/vertex/virtual-pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/vertex/virtual-solid.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/render/vertex/virtual-ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  
+  export const main: ParsedBundle;
   export default __module;
 }
 

@@ -30,6 +30,7 @@ type GlyphControlsProps = {
     preprocess: boolean,
     postprocess: boolean,
     glyph: string,
+    orbit: boolean,
   }) => LiveElement<any>
 };
 

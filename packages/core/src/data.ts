@@ -10,7 +10,10 @@ const NO_ENDS = [] as [boolean, boolean][];
 
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
-  const dims = UNIFORM_DIMS[type];
+
+  let dims = UNIFORM_DIMS[type];
+  if (dims === 3) dims = 4; // vec3 is aligned as vec4, 4th component ignored by WGSL
+
   const array = new ctor(length * dims);
   return {array, dims};
 };
@@ -257,7 +260,7 @@ export const getChunkCount = (
 
 export const generateChunkSegments = (
   to: NumberArray,
-  lookup: NumberArray,
+  lookup: NumberArray | null | undefined,
   chunks: number[],
   loops: boolean[] = NO_LOOPS,
   starts: boolean[] | boolean = false,
@@ -296,7 +299,7 @@ export const generateChunkSegments = (
     }
     if (l) to[pos++] = 0;
 
-    for (let j = b; j < pos; ++j) lookup[j] = i;
+    if (lookup) for (let j = b; j < pos; ++j) lookup[j] = i;
   }
 
   while (pos < to.length) to[pos++] = 0;
@@ -357,7 +360,7 @@ export const generateChunkAnchors = (
 
 export const generateChunkFaces = (
   to: NumberArray,
-  lookup: NumberArray,
+  lookup: NumberArray | null | undefined,
   chunks: number[],
   loops: boolean[] = NO_LOOPS,
 ) => {
@@ -385,7 +388,7 @@ export const generateChunkFaces = (
       to[pos++] = 0;
     }
     
-    for (let j = b; j < pos; ++j) lookup[j] = i;
+    if (lookup) for (let j = b; j < pos; ++j) lookup[j] = i;
   }
 
   while (pos < to.length) to[pos++] = 0;

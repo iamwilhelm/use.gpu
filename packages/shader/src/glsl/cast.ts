@@ -13,6 +13,18 @@ const literal = (v: number, neg: boolean, isFloat: boolean) => {
   return Math.round(v).toString();
 };
 
+export const makeAutoSwizzle = (from: string, to: string) => {
+  const mf = from.match(/vec([0-9])/);
+  const mt = to.match(/vec([0-9])/);
+  
+  const nf = mf ? +mf[1] : 1;
+  const nt = mt ? +mt[1] : 1;
+
+  const prefix = 'xyzw'.slice(0, Math.min(nf, nt));
+  const suffix = '0001'.slice(prefix.length, nt);
+  return prefix + suffix;
+};
+
 export const makeCastAccessor = (
   name: string,
   accessor: string,
@@ -23,7 +35,7 @@ export const makeCastAccessor = (
 ) => {
   const symbols = args.map((t, i) => `${arg(i)}`);
 
-  const ret = makeSwizzle(from, to, swizzle, 'v');
+  const ret = makeSwizzle(from, to, 'v', swizzle);
 
   return `${to} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
   ${to} v = ${accessor}(${symbols.join(', ')});
@@ -35,16 +47,18 @@ export const makeCastAccessor = (
 export const makeSwizzle = (
   from: string,
   to: string,
-  swizzle: string | CastTo,
-  name: string,
+  name: string = 'v',
+  swizzle: string | CastTo | null = null,
 ) => {
+  const sz = (swizzle == null) ? makeAutoSwizzle(from, to) : swizzle;
+
   const isFloat = !!from.match(/^(float|vec2|vec3|vec4|double|dvec2|dvec3|dvec4)$/);
 
-  if (typeof swizzle === 'string' && swizzle.match(/^[xyzw]+$/)) {
-    return 'v.' + swizzle;
+  if (typeof sz === 'string' && sz.match(/^[xyzw]+$/)) {
+    return name + '.' + sz;
   }
 
-  const {basis, signs, gain} = parseSwizzle(swizzle);
+  const {basis, signs, gain} = parseSwizzle(sz);
   const out: string[] = basis.split('').map((v, i) => {
     const neg = !!(signs && signs[i] === '-');
     
@@ -52,7 +66,20 @@ export const makeSwizzle = (
     else return (neg ? '-' : '') + `${name}.${v}`;
   });
   
-  let ret = `${to}(${out.join(', ')})`;
+  const compact: string[] = [];
+  let compat = true;
+  for (let c of out) {
+    const simple = !!c.match(/^[^.]+\.[xyzw]$/);
+    if (simple && compat && compact.length) {
+      compact[compact.length - 1] += c.split('.')[1];
+    }
+    else {
+      compact.push(c);
+      compat = simple;
+    }
+  }
+
+  let ret = `${to}(${compact.join(', ')})`;
   if (gain != null) ret = `${ret} * ${literal(gain, false, isFloat)}`;
 
   return ret;

@@ -176,9 +176,9 @@ export type StorageSource = {
 
 export type LambdaSource<T = any> = {
   shader: T,
-  length?: number,
-  version?: number,
-  size?: number[],
+  length: number,
+  version: number,
+  size: number[],
 };
 
 export type TextureSource = {
@@ -257,16 +257,17 @@ export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
 export type ArrayLike = any[] | TypedArray;
 
 export type AccessorSpec = string | Accessor | ArrayLike;
-export type DataField = [string, AccessorSpec] | [string, AccessorSpec, boolean];
+export type AccessorType = 'position' | 'index';
+export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];
 export type DataBinding<T = any, S = any> = {
   uniform: UniformAttribute,
   storage?: StorageSource,
   texture?: TextureSource,
   lambda?: LambdaSource<S>,
-  constant?: Prop<T>,
+  constant?: Lazy<T>,
 };
 
-export type Prop<T> = T | (() => T) | {expr: () => T} | {current: T};
+export type Lazy<T> = T | (() => T) | {expr: () => T} | {current: T};
 
 export type AggregateBuffer = {
   buffer: GPUBuffer,

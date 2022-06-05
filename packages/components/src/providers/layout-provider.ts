@@ -1,10 +1,7 @@
 import { makeContext, useContext } from '@use-gpu/live';
 
 type Rectangle = [number, number, number, number];
-type LayoutProps = {
-  layout: Rectangle,
-  flipY: boolean,
-};
+type LayoutProps = Rectangle;
 
 export const LayoutContext = makeContext<LayoutProps>(undefined, 'LayoutContext');
 

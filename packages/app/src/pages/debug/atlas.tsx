@@ -51,7 +51,7 @@ export const DebugAtlasPage: LC = () => {
     </LinearRGB>
   );
   
-  const root = document.querySelector('#use-gpu');
+  const root = document.querySelector('#use-gpu .canvas');
   
   return (
     <GlyphControls

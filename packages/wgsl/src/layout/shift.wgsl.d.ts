@@ -1,4 +1,4 @@
-declare module "@use-gpu/wgsl/clip/layout.wgsl" {
+declare module "@use-gpu/wgsl/layout/shift.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getShiftedRectangle: ParsedBundle;

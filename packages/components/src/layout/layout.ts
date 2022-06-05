@@ -1,6 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Point } from '@use-gpu/core/types';
-import { LayoutElement, LayoutPicker, Placement } from './types';
+import { Point, Rectangle } from '@use-gpu/core/types';
+import { LayoutElement, LayoutPicker } from './types';
+import { Placement } from '../traits/types';
 
 import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
 import { DebugContext } from '../providers/debug-provider';
@@ -15,15 +16,13 @@ import { useProp } from '../traits/useProp';
 import { parsePlacement }  from '../traits/parse';
 
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { getFlippedPosition } from '@use-gpu/wgsl/clip/flip.wgsl';
-import { getScrolledPosition } from '@use-gpu/wgsl/clip/scroll.wgsl';
+import { getLayoutPosition } from '@use-gpu/wgsl/layout/layout.wgsl';
 
 import { makeBoxInspectLayout } from './lib/util';
 import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec2, vec3 } from 'gl-matrix';
 
-const FLIP_BINDINGS = bundleToAttributes(getFlippedPosition);
-const SHIFT_BINDINGS = bundleToAttributes(getScrolledPosition);
+const LAYOUT_BINDINGS = bundleToAttributes(getLayoutPosition);
 
 export type LayoutProps = {
   width?: number,
@@ -60,7 +59,7 @@ export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
   return gather(view, Resume(placement, inspect, hovered));
 }, 'Layout');
 
-const Resume = (placement: Placement, inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) => {
+const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: LayoutElement[]) => {
   const layout = useContext(LayoutContext);
   const {layout: {inspect: toggleInspect}} = useContext(DebugContext);
 
@@ -77,18 +76,17 @@ const Resume = (placement: Placement, inspect: Inspector, hovered: boolean) => (
   let transform = useContext(TransformContext);
 
   // Global X/Y flip
-  const flip = [0, 0] as Point;
-  if (l > r) flip[0] = l + r;
-  if (t > b) flip[1] = b + t;
-  transform = useBoundShader(getFlippedPosition, FLIP_BINDINGS, [flip]);
+  const flip = useOne(() => [0, 0] as Point);
+  flip[0] = (l > r) ? l + r : 0;
+  flip[1] = (t > b) ? b + t : 0;
 
   // Global X/Y shift
-  const shift = [
-    (placement[0] - 1.0) / 2 * into[0],
-    (placement[1] - 1.0) / 2 * into[1],
-  ];
-  const bound = useBoundShader(getScrolledPosition, SHIFT_BINDINGS, [shift]);
-  transform = transform ? chainTo(transform, bound) : bound;
+  const shift = useOne(() => [0, 0] as Point);
+  shift[0] = (placement[0] - 1.0) / 2 * into[0];
+  shift[1] = (placement[1] - 1.0) / 2 * into[1];
+
+  const bound = useBoundShader(getLayoutPosition, LAYOUT_BINDINGS, [flip, shift]);
+  transform = useMemo(() => transform ? chainTo(transform, bound) : bound, [transform, bound]);
 
   // Render children into root container
   const out = [] as LiveElement[];
@@ -101,7 +99,7 @@ const Resume = (placement: Placement, inspect: Inspector, hovered: boolean) => (
 
     const [w, h] = absolute ? into : size;
     const [ml, mt] = margin;
-    const layout = [left + ml, top + mt, left + ml + w, top + mt + h];
+    const layout = [left + ml, top + mt, left + ml + w, top + mt + h] as Rectangle;
     const el = render(layout, undefined, transform);
     
     sizes.push([w, h]);
@@ -129,10 +127,10 @@ const Resume = (placement: Placement, inspect: Inspector, hovered: boolean) => (
   if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0]));
 
   // Add scroll listener
-  out.push(keyed(Scroller, -2, pickers));
+  out.push(keyed(Scroller, -2, pickers, flip, shift));
   
   // Interactive inspect handler
-  if (toggleInspect) out.push(keyed(Inspect, -1, pickers));
+  if (toggleInspect) out.push(keyed(Inspect, -1, pickers, flip, shift));
 
   return fragment(out);
 };
@@ -145,7 +143,7 @@ const screenToView = (projectionMatrix: mat4, x: number, y: number) => {
   return [v[0], v[1]];
 };
 
-export const Scroller = (pickers: any[]) => {
+export const Scroller = (pickers: any[], flip: [number, number], shift: [number, number]) => {
   const { useWheel } = useContext(WheelContext);
   const { viewUniforms } = useContext(ViewContext);
   const {
@@ -158,11 +156,16 @@ export const Scroller = (pickers: any[]) => {
   const [px, py] = screenToView(matrix, wheel.x / width * dpi * 2.0 - 1.0, 1.0 - wheel.y / height * dpi * 2.0);
   
   useOne(() => {
-    const { x, y, moveX, moveY, stopped } = wheel;
+    const { moveX, moveY, stopped } = wheel;
     if (stopped) return;
 
+    let x = px - shift[0];
+    let y = py - shift[1];
+    if (flip[0]) x = flip[0] - x;
+    if (flip[1]) y = flip[1] - y;
+
     for (const picker of pickers) {
-      const picked = picker(px, py, true);
+      const picked = picker(x, y, true);
       if (picked) {
         const [id, rectangle, onScroll] = picked;
         if (onScroll) onScroll(moveX, moveY);
@@ -174,7 +177,7 @@ export const Scroller = (pickers: any[]) => {
   }, wheel);
 }
 
-export const Inspect = (pickers: any[]) => {
+export const Inspect = (pickers: any[], flip: [number, number], shift: [number, number]) => {
   const { id } = useFiber();
   const { useMouse } = useContext(MouseContext);
   const { viewUniforms } = useContext(ViewContext);
@@ -190,11 +193,15 @@ export const Inspect = (pickers: any[]) => {
   const [px, py] = screenToView(matrix, mouse.x / width * dpi * 2.0 - 1.0, 1.0 - mouse.y / height * dpi * 2.0);
 
   const picked = useOne(() => {
+    let x = px - shift[0];
+    let y = py - shift[1];
+    if (flip[0]) x = flip[0] - x;
+    if (flip[1]) y = flip[1] - y;
     for (const picker of pickers) {
-      const picked = picker(px, py);
+      const picked = picker(x, y);
       if (picked) return picked;
     }
-  }, [pickers]);
+  }, [pickers, flip, shift]);
 
   if (!picked) return null;
 

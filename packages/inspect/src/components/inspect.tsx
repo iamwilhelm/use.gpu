@@ -53,6 +53,16 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
   useLayoutEffect(() => {
+    const el = document.querySelector('#use-gpu .canvas');
+    if (!el || !open) return;
+    
+    (el as any).style.marginLeft = '34%';
+    return () => {
+      (el as any).style.marginLeft = '0';
+    };
+  }, [open]);
+
+  useLayoutEffect(() => {
     const setHovered = hoveredFiber?.__inspect?.setHovered;
     if (!setHovered) return;
     

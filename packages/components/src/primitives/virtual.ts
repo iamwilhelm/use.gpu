@@ -1,5 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { RenderPassMode, DeepPartial, Prop } from '@use-gpu/core/types';
+import { RenderPassMode, DeepPartial, Lazy } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { memo, use, fragment, useContext, useNoContext, useMemo, useNoMemo, useOne, useState, useResource, useConsoleLog } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -23,9 +23,6 @@ import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
 import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
 import instanceFragmentPick from '@use-gpu/wgsl/render/fragment/pick.wgsl';
 import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
-
-import instanceDrawWireframeStrip from '@use-gpu/wgsl/render/vertex/wireframe-strip.wgsl';
-import instanceDrawWireframeList from '@use-gpu/wgsl/render/vertex/wireframe-list.wgsl';
 
 import { render } from './render';
 
@@ -62,8 +59,8 @@ export type VirtualProps = {
   mode?: RenderPassMode | string,
   id?: number,
 
-  vertexCount: Prop<number>,
-  instanceCount: Prop<number>,
+  vertexCount: Lazy<number>,
+  instanceCount: Lazy<number>,
 
   getVertex: ShaderModule,
   getFragment: ShaderModule,
@@ -118,8 +115,10 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
 
   const renderContext = useContext(RenderContext);
-  const {renderContext: pickingContext} = useContext(PickingContext);
-  const resolvedContext = isPicking ? pickingContext : renderContext;
+  const pickingContext = useContext(PickingContext);
+  const resolvedContext = isPicking ? pickingContext?.renderContext : renderContext;
+  if (!resolvedContext) throw new Error("GPU picking is not available");
+
   const {colorInput, colorSpace} = resolvedContext;
 
   const [
@@ -133,8 +132,8 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     let fragmentShader: ShaderModule;
 
     let getVertex: ShaderModule = gV;
-    let vertexCount: Prop<number> = vC;
-    let instanceCount: Prop<number> = iC;
+    let vertexCount: Lazy<number> = vC;
+    let instanceCount: Lazy<number> = iC;
 
     if (isDebug) {
       [vertexShader, fragmentShader] = SOLID_RENDERER;

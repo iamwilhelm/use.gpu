@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { TypedArray, UniformAttribute } from '@use-gpu/core/types';
+import { TypedArray, UniformAttribute, TextureSource } from '@use-gpu/core/types';
 import {
   PICKING_FORMAT,
   PICKING_COLOR,
@@ -33,6 +33,7 @@ type OnPick = (index: number) => void;
 type PickingContextType = {
   renderContext: CanvasRenderingContextGPU,
   pickingTexture: GPUTexture,
+  pickingSource: TextureSource,
   captureTexture: () => void,
   sampleTexture: (x: number, y: number) => number[],
 };
@@ -82,9 +83,9 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
   );
 
   const pickingContext = useMemo(() => {
-    const {width: w, height: h} = renderContext;
-    const width = Math.round(w * resolution);
-    const height = Math.round(h * resolution);
+    const {width: w, height: h, pixelRatio: dpi} = renderContext;
+    const width = Math.round(w * resolution / dpi);
+    const height = Math.round(h * resolution / dpi);
     const samples = 1;
 
     const [pickingBuffer, bytesPerRow, itemsPerRow, itemDims] = makeTextureReadbackBuffer(device, width, height, pickingFormat);
@@ -133,8 +134,8 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
     const sampleTexture = (x: number, y: number): number[] => {
       if (!captured) return seq(itemDims).map(i => 0);
 
-      const xs = Math.round(x * resolution);
-      const ys = Math.round(y * resolution);
+      const xs = Math.round(x * resolution / dpi);
+      const ys = Math.round(y * resolution / dpi);
 
       const offset = (itemsPerRow * ys + xs) * itemDims;
       const index = seq(itemDims).map(i => captured![offset + i]);

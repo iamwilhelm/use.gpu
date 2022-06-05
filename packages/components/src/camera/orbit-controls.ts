@@ -27,7 +27,7 @@ export type OrbitControlsProps = {
   pitchSpeed?: number,
   moveSpeed?: number,
 
-  render: (phi: number, theta: number, radius: number) => LiveElement<any>,
+  render: (phi: number, theta: number, radius: number, target: vec3) => LiveElement<any>,
 };
 
 export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
@@ -50,7 +50,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   const [radius, setRadius]   = useDerivedState<number>(initialRadius, version);
   const [bearing, setBearing] = useDerivedState<number>(initialBearing, version);
   const [pitch, setPitch]     = useDerivedState<number>(initialPitch, version);
-  const [target, setTarget]   = useDerivedState<number>(initialTarget, version);
+  const [target, setTarget]   = useDerivedState<vec3>(initialTarget, version);
 
   const { useMouse } = useContext(MouseContext);
   const { useWheel } = useContext(WheelContext);

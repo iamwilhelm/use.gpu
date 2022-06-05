@@ -40,8 +40,15 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props) => {
 
   useResource((dispose) => {
     const resize = () => setSize(getCanvasSize(window, canvas))
+
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas.parentElement as any);
     window.addEventListener('resize', resize);
-    dispose(() => window.removeEventListener('resize', resize));
+
+    dispose(() => {
+      observer.disconnect();
+      window.removeEventListener('resize', resize);
+    });
   }, [canvas]);
 
   return render ? render(width, height, pixelRatio) : (children ?? null);

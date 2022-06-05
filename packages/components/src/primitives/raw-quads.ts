@@ -1,13 +1,12 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  TypedArray, ViewUniforms, DeepPartial, Prop,
+  TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, TextureSource, LambdaSource, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
-import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
@@ -41,7 +40,7 @@ export type RawQuadsProps = {
   texture?: TextureSource | LambdaSource | ShaderModule,
 
   alphaToCoverage?: boolean,
-  count?: Prop<number>,
+  count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,

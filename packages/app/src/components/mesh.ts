@@ -55,7 +55,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
-  const {renderContext} = usePickingContext(id, isPicking);
+  const {renderContext} = usePickingContext(isPicking);
   const {colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
 
   const vertexBuffers = useMemo(() =>

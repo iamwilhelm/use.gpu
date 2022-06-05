@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core/types';
-import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement } from '../types';
+import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker } from '../types';
 
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
@@ -9,8 +9,8 @@ import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from 
 import { useInspectable } from '../../hooks/useInspectable';
 import { useProp } from '../../traits/useProp';
 
-import { getScrolledPosition } from '@use-gpu/wgsl/clip/scroll.wgsl';
-import { getShiftedRectangle } from '@use-gpu/wgsl/clip/layout.wgsl';
+import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
+import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';
 
 import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
@@ -143,7 +143,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
           const sizes   = [size];
           const offsets = [[ml, mt]] as Point[];
           const renders = [render];
-          const pickers = [pick];
+          const pickers = [pick] as (LayoutPicker | null)[];
 
           for (const {fit} of scrollBars) {
             const {render, pick, size} = fit(into);

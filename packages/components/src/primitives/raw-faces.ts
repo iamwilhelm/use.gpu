@@ -1,13 +1,12 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  TypedArray, ViewUniforms, DeepPartial, Prop,
+  TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 
 import { ViewContext } from '../providers/view-provider';
-import { PickingContext, useNoPicking } from '../render/picking';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
@@ -38,7 +37,7 @@ export type RawFacesProps = {
   lookups?: ShaderSource,
 
   shaded?: boolean,
-  count?: Prop<number>,
+  count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
@@ -101,7 +100,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c, i, l]);
   const getFragment = shaded
     ? useBoundShader(getShadedFragment, FRAGMENT_BINDINGS, [m])
-    : useNoBoundShader() ?? getPassThruFragment;
+    : (useNoBoundShader() as any) ?? getPassThruFragment;
   
   return (
     use(Virtual, {

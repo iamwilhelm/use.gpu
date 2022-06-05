@@ -3,6 +3,7 @@ import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types
 import { getHash, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
 import { loadVirtualModule } from './shader';
+import { makeSwizzle } from './cast';
 import { PREFIX_VIRTUAL } from '../constants';
 
 const NO_SYMBOLS = [] as string[];
@@ -61,23 +62,23 @@ export const makeBindingAccessors = (
   ) => {
     const program: string[] = [];
 
-    for (const {uniform: {name, format, args}} of constants) {
-      program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, format, name, args));
+    for (const {uniform: {name, format: type, args}} of constants) {
+      program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, type, name, args));
     }
 
-    for (const {uniform: {name, format, args}, storage} of storages) {
-      const {volatile} = storage!;
+    for (const {uniform: {name, format: type, args}, storage} of storages) {
+      const {volatile, format} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
-      program.push(makeStorageAccessor(namespace, set, base, format, name));
+      program.push(makeStorageAccessor(namespace, set, base, type, format, name));
     }
 
-    for (const {uniform: {name, format, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute} = texture!;
+    for (const {uniform: {name, format: type, args}, texture} of textures) {
+      const {volatile, layout, variant, absolute, format} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       volatile ? volatileBase++ : bindingBase++;
-      program.push(makeTextureAccessor(namespace, set, base, format, name, layout, variant, absolute));
+      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute));
     }
 
     return program.join('\n');
@@ -140,15 +141,17 @@ export const makeStorageAccessor = (
   set: number | string,
   binding: number | string,
   type: string,
+  format: string,
   name: string,
   args: string[] = INT_ARG,
 ) => `
 layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}Type {
-  ${type} data[];
+  ${format} data[];
 } ${ns}${name}Storage;
 
 ${type} ${ns}${name}(int index) {
-  return ${ns}${name}Storage.data[index];
+  ${format} v = ${ns}${name}Storage.data[index];
+  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;
 
@@ -157,6 +160,7 @@ export const makeTextureAccessor = (
   set: number | string,
   binding: number,
   type: string,
+  format: string,
   name: string,
   layout: string,
   variant: string = 'sampler2D',
@@ -168,6 +172,7 @@ layout (set = ${set}, binding = ${binding + 1}) uniform sampler ${ns}${name}Samp
 
 ${type} ${ns}${name}(vec2 uv) {
   ${absolute ? `uv = uv / vec2(textureSize(${ns}${name}Texture));\n  ` : ''}
-  return texture(${variant}(${ns}${name}Texture, ${ns}${name}Sampler), uv);
+  ${format} v = texture(${variant}(${ns}${name}Texture, ${ns}${name}Sampler), uv);
+  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;

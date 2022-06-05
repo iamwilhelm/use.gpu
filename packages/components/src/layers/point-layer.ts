@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  TypedArray, ViewUniforms, DeepPartial, Prop,
+  TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
@@ -41,7 +41,7 @@ export type PointLayerProps = {
 
   shape?: PointShape,
 
-  count?: Prop<number>,
+  count?: Lazy<number>,
   mode?: RenderPassMode | string,
   id?: number,
 };

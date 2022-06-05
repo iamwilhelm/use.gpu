@@ -1,7 +1,7 @@
-import { TextureSource, Tuples, Point, Point4, Rectangle } from '@use-gpu/core/types';
+import { Tuples, Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { LiveElement, Key } from '@use-gpu/live/types';
 import { FontMetrics } from '@use-gpu/text/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
 import { Color, ColorLike } from '../traits/types';
 import { mat4 } from 'gl-matrix';
 
@@ -44,7 +44,7 @@ export type ElementTrait = {
 };
 
 export type ImageTrait = {
-  texture: TextureSource,
+  texture: ShaderSource,
   width: Dimension,
   height: Dimension,
   fit: Fit,
@@ -56,7 +56,7 @@ export type LayoutRenderer = (box: Rectangle, clip?: ShaderModule, transform?: S
 export type InlineRenderer = (lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule, version?: number) => LiveElement<any>;
 
 export type LayoutScroller = (x: number, y: number) => void;
-export type LayoutPicker = (x: number, y: number, ox: number, oy: number, scroll: boolean) => [number, Rectangle, LayoutScroller] | null;
+export type LayoutPicker = (x: number, y: number, l: number, t: number, r: number, b: number, scroll: boolean) => [number, Rectangle, LayoutScroller] | null;
 
 export type LayoutFit = {
   size: Point,
@@ -101,20 +101,28 @@ export type InlineLine = {
 };
 
 export type UIAggregate = {
-  id: number,
+  id: string | number,
   count: number,
 
   rectangles?: number[],
   colors?: number[],
   uvs?: number[],
   repeats?: number[],
+  borders?: number[],
+  strokes?: number[],
+  fills?: number[],
+  radiuses?: number[],
 
   rectangle?: number[],
   color?: number[],
   uv?: number[],
   repeat?: number,
+  border?: number[],
+  stroke?: number[],
+  fill?: number[],
+  radius?: number[],
 
-  texture?: TextureSource,
+  texture?: ShaderSource,
   clip?: ShaderModule,
   transform?: ShaderModule,
   bounds: Rectangle,

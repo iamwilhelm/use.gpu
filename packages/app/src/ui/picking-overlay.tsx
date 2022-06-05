@@ -7,20 +7,22 @@ import {
   useBoundSource, useDerivedSource,
 } from '@use-gpu/components';
 import { useContext } from '@use-gpu/live';
-import { wgsl, bindModule, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { wgsl, f32, bindModule, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 export const PickingOverlay: LC = () => {
 
+  const pickingContext = useContext(PickingContext);
+  if (!pickingContext) return null;
+
   // Display picking buffer with colorization shader
-  const scale = 0.5;
-  const {pickingSource} = useContext(PickingContext);
+  const {pickingSource} = pickingContext;
   const colorizeShader = wgsl`
     // Picking buffer is int32, have to use direct texture load.
     @link fn getSize() -> vec2<f32> {}
     @link fn getPicking(uv: vec2<i32>, level: i32) -> vec4<u32> {}
 
     fn main(uv: vec2<f32>) -> vec4<f32> {
-      let iuv = vec2<i32>(uv * getSize() / ${scale});
+      let iuv = vec2<i32>(uv * getSize());
       let pick = vec2<f32>(getPicking(iuv, 0).xy);
 
       // Pick value is (r, g) = (id, index) tuple
@@ -35,6 +37,8 @@ export const PickingOverlay: LC = () => {
   const getPicking = useBoundSource(GET_PICKING, pickingSource);
   const textureSource = useDerivedSource(bindModule(colorizeShader, {getPicking, getSize}), pickingSource);
 
+  const scale = 0.5;
+
   return (
     <Flat>
       <UI>
@@ -44,8 +48,8 @@ export const PickingOverlay: LC = () => {
           >
             <Block fill={[0, 0, 0, .5]} contain>
               <Block
-                width={textureSource.size[0] * scale}
-                height={textureSource.size[1] * scale}
+                width={textureSource.size[0] * scale / window.devicePixelRatio}
+                height={textureSource.size[1] * scale / window.devicePixelRatio}
                 image={{texture: textureSource}}
                 fill={[0, 0, 0, 1]}
               />

@@ -29,7 +29,7 @@ const concaveDataFields = [
   ['array<vec4<f32>>', (o: any) => o.positions],
   ['vec4<f32>', 'color'],
   // Indexed attribute - must be adjusted when aggregated.
-  ['array<u32>', (o: any) => o.indices, true],
+  ['array<u32>', (o: any) => o.indices, 'index'],
   ['u32', 'lookup'],
 ] as DataField[];
 

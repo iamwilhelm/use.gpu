@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
   TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode, DeepPartial, Prop, UseRenderingContextGPU,
+  VertexData, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU,
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
@@ -15,7 +15,7 @@ import {
   resolve,
 } from '@use-gpu/core';
 import { useLinkedShader } from '../hooks/useLinkedShader';
-import { useRenderPipelineAsync } from '../hooks/useRenderPipeline';
+import { useRenderPipelineAsync, setShaderLog, getShaderLog } from '../hooks/useRenderPipeline';
 import { useInspectable } from '../hooks/useInspectable'
 
 import keyBy from 'lodash/keyBy';
@@ -26,8 +26,8 @@ export type RenderProps = {
   mode?: RenderPassMode | string,
   id?: number,
 
-  vertexCount: Prop<number>,
-  instanceCount: Prop<number>,
+  vertexCount: Lazy<number>,
+  instanceCount: Lazy<number>,
 
   vertex: ParsedBundle,
   fragment: ParsedBundle,
@@ -170,3 +170,6 @@ export const render = (props: RenderProps) => {
     },
   });
 };
+
+setShaderLog(100);
+setTimeout(() => console.log(getShaderLog()), 2000);

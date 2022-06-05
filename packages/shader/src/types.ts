@@ -101,9 +101,9 @@ export type StorageSource = {
 
 export type LambdaSource<T = any> = {
   shader: T,
-  length?: number,
-  version?: number,
-  size?: number[],
+  length: number,
+  version: number,
+  size: number[],
 };
 
 export type TextureSource = {
@@ -119,7 +119,7 @@ export type TextureSource = {
   version: number,
 };
 
-export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | ShaderModule;
+export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;
 
 export type UniformAttribute = {
   name: string,

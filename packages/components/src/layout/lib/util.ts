@@ -6,7 +6,7 @@ import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimen
 import { yeet, fragment } from '@use-gpu/live';
 import { getHashValue } from '@use-gpu/state';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
-import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/clip/clip.wgsl';
+import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 import { INSPECT_STYLE } from './constants';
 
 export const isHorizontal = (d: Direction) => d === 'x' || d === 'lr' || d === 'rl';
@@ -15,7 +15,7 @@ export const isFlipped = (d: Direction) => d === 'rl' || d === 'bt';
 
 type Fitter<T> = (into: AutoPoint) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
-  let last: AutoPoint | null = null;
+  let last: AutoPoint | undefined;
   let value: T | null = null;
   return (into: AutoPoint) => {
     if (last && last[0] === into[0] && last[1] === into[1]) {
@@ -33,9 +33,9 @@ type Layout<T> = (
   transform?: ShaderModule,
 ) => T;
 export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
-  let lastBox: Rectangle | null = null;
-  let lastClip: ShaderModule | null = null;
-  let lastTransform: ShaderModule | null = null;
+  let lastBox: Rectangle | undefined;
+  let lastClip: ShaderModule | undefined;
+  let lastTransform: ShaderModule | undefined;
 
   const sameBox = (a: Rectangle, b: Rectangle) => {
     return (a[0] === b[0]) && (a[1] === b[1]) && (a[2] === b[2]) && (a[3] === b[3]);
@@ -64,9 +64,9 @@ type Inline<T> = (
   transform?: ShaderModule,
 ) => T;
 export const memoInline = <T>(f: Inline<T>): Inline<T> => {
-  let lastHash: number | null = null;
-  let lastClip: ShaderModule | null = null;
-  let lastTransform: ShaderModule | null = null;
+  let lastHash: number | undefined;
+  let lastClip: ShaderModule | undefined;
+  let lastTransform: ShaderModule | undefined;
 
   let value: T | null = null;
   return (
@@ -195,14 +195,12 @@ export const makeBoxInspectLayout = (
     id: next(),
     rectangle: box,
     uv: [0, 0, 1, 1],
-    fill: [0, 1, 1, .2],
-    stroke: [0.3, 0.9, 1, 1],
-    border: [2, 2, 2, 2],
     count: 1,
     repeat: 0,
     clip: parentClip,
     transform: parentTransform,
     bounds: box,
+    ...INSPECT_STYLE.parent,
   });
 
   const [left, top] = box;
@@ -224,13 +222,12 @@ export const makeBoxInspectLayout = (
       id: next(),
       rectangle: layout,
       uv: [0, 0, 1, 1],
-      fill: [.5, 1, .7, .2],
-      stroke: [.5, 1, .7, .5],
-      border: [1, 1, 1, 1],
       count: 1,
       repeat: 0,
       clip: xclip,
       transform: xform,
+      bounds: layout,
+      ...INSPECT_STYLE.child,
     });
   }
   
@@ -243,7 +240,7 @@ export const makeInlineLayout = (
   sizes: Point[],
   offsets: [number, number, number][],
   renders: InlineRenderer[],
-  key: number,
+  key?: number,
 ) => (
   box: Rectangle,
   clip?: ShaderModule,
@@ -254,6 +251,11 @@ export const makeInlineLayout = (
 
   let last: InlineRenderer | null = null;
   let lines: InlineLine[] = [];
+
+  let miniHash = makeMiniHash();
+  miniHash(key);
+  miniHash(left);
+  key = miniHash(top);
   
   const out: LiveElement<any>[] = [];
   const flush = (render: InlineRenderer) => {
@@ -298,13 +300,13 @@ export const makeInlineInspectLayout = (
   sizes: Point[],
   offsets: [number, number, number][],
   renders?: InlineRenderer[],
-  versionRef: ({current: number}),
+  key?: number,
 ) => (
   box: Rectangle,
   clip?: ShaderModule,
   transform?: ShaderModule,
 ) => {
-  let out = renders ? makeInlineLayout(ranges, sizes, offsets, renders, versionRef)(box, clip, transform) : [];
+  let out = renders ? makeInlineLayout(ranges, sizes, offsets, renders, key)(box, clip, transform) : [];
 
   let i = 0;
   const next = () => id.toString() + '-' + i++;
@@ -344,6 +346,7 @@ export const makeInlineInspectLayout = (
       repeat: 0,
       clip,
       transform,
+      bounds: layout,
       ...INSPECT_STYLE.child
     });
   }
@@ -432,3 +435,14 @@ export const intersectBounds = (a: Rectangle, b: Rectangle): Rectangle => {
     Math.min(ab, bb),
   ] as Rectangle;
 };
+
+const rot = (a: number, b: number) => ((a << b) | (a >>> (32 - b))) >>> 0;
+export const makeMiniHash = (key: number = 1) => (x?: number) => {
+  if (x != null) {
+    const i = Math.round(x);
+    const f = Math.round((i - x) * 0x7FFFFFFF);
+    key = rot(Math.imul(key, 0xc2b2ae35) ^ i, 5);
+    key = rot(Math.imul(key, 0x85ebca6b) ^ f, 11);
+  }
+  return key;
+}

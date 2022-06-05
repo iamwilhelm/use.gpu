@@ -6,7 +6,7 @@ import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
 import LRU from 'lru-cache';
 
-const DEBUG = true;
+const DEBUG = false;
 
 const NO_DEPS = [] as any[];
 const NO_LIBS = {} as Record<string, any>;
@@ -17,6 +17,8 @@ export const makePipelineCache = (options: Record<string, any> = {}) => new LRU<
   max: 100,
   ...options,
 });
+
+let SHADER_LOG: LRU<string, any> | null = null;
 
 const CACHE = new WeakMap<any, LRU<string, any>>();
 const PENDING = new WeakMap<any, Map<string, any>>();
@@ -52,6 +54,23 @@ export const useRenderPipeline = (
       return cached;
     }
 
+    {
+      const log = {
+        colorStates,
+        depthStencilState,
+        props,
+        vertex: {
+          hash: shader[0].hash,
+          code: shader[0].code,
+        },
+        fragment: {
+          hash: shader[1].hash,
+          code: shader[1].code,
+        },
+      };
+      if (SHADER_LOG) SHADER_LOG.set(key, log);
+    }
+
     // Make new pipeline
     const pipeline = makeRenderPipeline(
       device,
@@ -61,7 +80,8 @@ export const useRenderPipeline = (
       props,
     );
     cache.set(key, pipeline);
-    DEBUG && console.log('pipeline cache miss', key)
+    DEBUG && console.log('pipeline cache miss', key);
+
     return pipeline;
   }, [memoKey, shader, samples]);
 };
@@ -99,10 +119,27 @@ export const useRenderPipelineAsync = (
     const [vertex, fragment] = shader;
     const key = vertex.hash.toString() +'-'+ fragment.hash.toString();
 
-    const cached = cache.get(key);
+    const cached = cache!.get(key);
     if (cached) {
       DEBUG && console.log('async pipeline cache hit', key)
       return cached;
+    }
+
+    {
+      const log = {
+        colorStates,
+        depthStencilState,
+        props,
+        vertex: {
+          hash: shader[0].hash,
+          code: shader[0].code,
+        },
+        fragment: {
+          hash: shader[1].hash,
+          code: shader[1].code,
+        },
+      };
+      if (SHADER_LOG) SHADER_LOG.set(key, log);
     }
 
     // Mark current pipeline as stale (if any)
@@ -110,8 +147,8 @@ export const useRenderPipelineAsync = (
     DEBUG && console.log('async pipeline miss', key)
 
     // Mark key as pending
-    if (pending.has(key)) {
-      pending.get(key)!.then((pipeline) => {
+    if (pending!.has(key)) {
+      pending!.get(key)!.then((pipeline: GPURenderPipeline) => {
         staleRef.current = false;
         setResolved(pipeline);
         return pipeline;
@@ -127,18 +164,18 @@ export const useRenderPipelineAsync = (
       fragment,
       props,
     );
-    promise.then((pipeline) => {
+    promise.then((pipeline: GPURenderPipeline) => {
       DEBUG && console.log('async pipeline resolved', key)
 
-      cache.set(key, pipeline);
+      cache!.set(key, pipeline);
       staleRef.current = false;
-      pending.delete(key);
+      pending!.delete(key);
 
       setResolved(pipeline);
 
       return pipeline;
     });
-    pending.set(key, promise);
+    pending!.set(key, promise);
 
     return null;
   }, [memoKey, shader, samples]);
@@ -146,3 +183,9 @@ export const useRenderPipelineAsync = (
   DEBUG && console.log('async pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
   return [immediate ?? resolved, staleRef.current];
 };
+
+export const setShaderLog = (n: number) => SHADER_LOG = new LRU<string, any>({ max: n });
+export const getShaderLog = () => {
+  if (!SHADER_LOG) return [] as any;
+  return SHADER_LOG.values();
+}

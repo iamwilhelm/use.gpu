@@ -1,5 +1,5 @@
 import { Point, Rectangle } from '@use-gpu/core/types';
-import { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint, AutoRectangle } from '../types';
+import { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint, AutoRectangle, Direction } from '../types';
 import { evaluateDimension } from '../parse';
 import { fitBlock } from './block';
 
@@ -14,7 +14,7 @@ export const fitAbsoluteBox = (
   b?: string | number | null,
   w?: string | number | null,
   h?: string | number | null,
-  direction?: Direction,
+  direction: Direction = 'y',
   snap?: boolean,
 ) => {
   const [iw, ih] = into;
@@ -24,12 +24,12 @@ export const fitAbsoluteBox = (
   const fixed = [
     left != null && right != null ? right - left : null,
     top != null && bottom != null ? bottom - top : null,
-  ];
+  ] as AutoPoint;
 
   const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, NO_LAYOUT, direction, true, true);
   
-  if (left == null) left = right - size[0];
-  if (top == null) top = bottom - size[1];
+  if (left == null) left = right != null && size[0] != null ? right - size[0] : 0;
+  if (top == null) top = bottom != null && size[1] != null ? bottom - size[1] : 0;
 
   for (const o of offsets) {
     o[0] += left;

@@ -2,6 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Point4, Rectangle } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint, ImageTrait } from '../types';
+import { ColorLike } from '../../traits/types';
 
 import { use, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';

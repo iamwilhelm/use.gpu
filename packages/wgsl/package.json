@@ -23,26 +23,6 @@
   "types": "./types/wgsl-files/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./clip/clip.wgsl": {
-      "types": "./src/clip/clip.wgsl.d.ts",
-      "import": "./src/clip/clip.wgsl",
-      "require": "./src/clip/clip.wgsl"
-    },
-    "./clip/flip.wgsl": {
-      "types": "./src/clip/flip.wgsl.d.ts",
-      "import": "./src/clip/flip.wgsl",
-      "require": "./src/clip/flip.wgsl"
-    },
-    "./clip/layout.wgsl": {
-      "types": "./src/clip/layout.wgsl.d.ts",
-      "import": "./src/clip/layout.wgsl",
-      "require": "./src/clip/layout.wgsl"
-    },
-    "./clip/scroll.wgsl": {
-      "types": "./src/clip/scroll.wgsl.d.ts",
-      "import": "./src/clip/scroll.wgsl",
-      "require": "./src/clip/scroll.wgsl"
-    },
     "./fragment/pbr.wgsl": {
       "types": "./src/fragment/pbr.wgsl.d.ts",
       "import": "./src/fragment/pbr.wgsl",
@@ -152,6 +132,26 @@
       "types": "./src/instance/vertex/ui-rectangle.wgsl.d.ts",
       "import": "./src/instance/vertex/ui-rectangle.wgsl",
       "require": "./src/instance/vertex/ui-rectangle.wgsl"
+    },
+    "./layout/clip.wgsl": {
+      "types": "./src/layout/clip.wgsl.d.ts",
+      "import": "./src/layout/clip.wgsl",
+      "require": "./src/layout/clip.wgsl"
+    },
+    "./layout/layout.wgsl": {
+      "types": "./src/layout/layout.wgsl.d.ts",
+      "import": "./src/layout/layout.wgsl",
+      "require": "./src/layout/layout.wgsl"
+    },
+    "./layout/scroll.wgsl": {
+      "types": "./src/layout/scroll.wgsl.d.ts",
+      "import": "./src/layout/scroll.wgsl",
+      "require": "./src/layout/scroll.wgsl"
+    },
+    "./layout/shift.wgsl": {
+      "types": "./src/layout/shift.wgsl.d.ts",
+      "import": "./src/layout/shift.wgsl",
+      "require": "./src/layout/shift.wgsl"
     },
     "./mask/masked.wgsl": {
       "types": "./src/mask/masked.wgsl.d.ts",

@@ -47,8 +47,11 @@ export const checkStorageType = (
   link: StorageSource | null | undefined,
 ) => {
   const {name, format} = uniform;
-  //if (link && link.format !== format) throw new Error(`Invalid format ${link.format} bound for ${format} "${name}"`);
-  if (link && link.format !== format) console.warn(`Invalid format ${link.format} bound for ${format} "${name}"`);
+  if (link && link.format !== format) {
+    if (format.replace(/vec[0-9]/, '') !== link.format.replace(/vec[0-9]/, '')) {
+      console.warn(`Invalid format ${link.format} bound for ${format} "${name}"`);
+    }
+  }
 } 
 
 export const makeStorageAccessors = (

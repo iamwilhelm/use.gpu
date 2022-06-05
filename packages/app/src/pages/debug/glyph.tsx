@@ -1,6 +1,6 @@
 import { LC, PropsWithChildren } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { Rectangle, DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { Rectangle, DataField, Emitter, DataTexture, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React, { Morph } from '@use-gpu/live/jsx';
 import { memo, fragment } from '@use-gpu/live';
@@ -23,7 +23,7 @@ const DETAIL = 64;
 
 export const DebugGlyphPage: LC = () => {
 
-  const root = document.querySelector('#use-gpu');
+  const root = document.querySelector('#use-gpu .canvas');
 
   return (
     <GlyphControls
@@ -132,21 +132,21 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
     format: "rgba8unorm" as GPUTextureFormat,
     colorSpace: 'srgb',
     size: padded,
-  };
+  } as DataTexture;
 
   const sdfTexture = {
     data: sdfData,
     format: "rgba8unorm" as GPUTextureFormat,
     colorSpace: 'srgb',
     size: padded,
-  };
+  } as DataTexture;
 
   const gradientTexture = {
     data: gradientData,
     format: "rgba8unorm" as GPUTextureFormat,
     colorSpace: 'srgb',
     size: padded,
-  };
+  } as DataTexture;
 
   const s = Math.max(paddedWidth, paddedHeight);
   const sdf1 = makeSDFStage(s);

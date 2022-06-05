@@ -128,7 +128,7 @@ export const makeOrbitMatrix = (
   mat4.translate(matrix, matrix, vec3.fromValues(0, 0, -radius / (dolly || 1)));
   mat4.rotate(matrix, matrix, theta, vec3.fromValues(1, 0, 0));
   mat4.rotate(matrix, matrix, phi, vec3.fromValues(0, 1, 0));
-  mat4.translate(matrix, matrix, target);
+  mat4.translate(matrix, matrix, target as any as vec3);
   
   return matrix;
 }

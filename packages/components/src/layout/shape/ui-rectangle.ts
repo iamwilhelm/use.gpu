@@ -9,7 +9,8 @@ import { ImageTrait, Fit, Repeat, Anchor } from '../types';
 
 import { evaluateDimension, evaluateAnchor, parseAnchorXY } from '../parse';
 
-const UV_SQUARE = [0, 0, 1, 1];
+const UV_SQUARE = [0, 0, 1, 1] as Rectangle;
+const NO_RECTANGLE = [0, 0, 0, 0] as Rectangle;
 
 const REPEAT_FLAG = {
   'none': 0,
@@ -20,7 +21,7 @@ const REPEAT_FLAG = {
 
 export type UIRectangleProps = {
   id: number,
-  layout: Rectangle,
+  layout?: Rectangle,
 
   image?: Partial<ImageTrait>,
 
@@ -47,7 +48,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     transform,
   } = props;
 
-  let layout;
+  let layout: Rectangle = NO_RECTANGLE;
   if (props.layout) {
     layout = props.layout;
     useNoContext(LayoutContext);
@@ -59,11 +60,12 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
   return useMemo(() => {
     const sampledTexture = useMemo(() => {
       if (!image?.texture) return null;
-    
+
       const {texture, repeat} = image;
+      if (!('sampler' in texture)) return null;
+
       const addressModeU = repeat === 'x' || repeat === 'xy' ? 'repeat' : 'clamp-to-edge';
       const addressModeV = repeat === 'y' || repeat === 'xy' ? 'repeat' : 'clamp-to-edge';
-
       const sampler = texture.sampler !== null ? {
         minFilter: 'linear',
         magFilter: 'linear',
@@ -72,16 +74,16 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         addressModeV,
       } : null;
 
-      return {
-        ...texture,
-        sampler,
-      };
+      return {...texture, sampler};
     }, [image?.texture, image?.repeat]);
 
     if (sampledTexture) {
-      sampledTexture.texture = image!.texture!.texture;
-      sampledTexture.view = image!.texture!.view;
-      sampledTexture.size = image!.texture!.size;
+      // Update volatile texture
+      if ('texture' in image!.texture!) {
+        sampledTexture.texture = image!.texture!.texture;
+        sampledTexture.view    = image!.texture!.view;
+        sampledTexture.size    = image!.texture!.size;
+      }
     }
   
     let boxW = layout[2] - layout[0];
@@ -127,42 +129,45 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         repeat,
         align,
       } = image;
-      const {size} = texture;
 
       let uv = UV_SQUARE;
 
-      if (fit !== 'scale') {
+      if ('size' in texture && texture.size) {
+        const {size} = texture;
  
-        let w = (width != null ? evaluateDimension(width, size[0], false) : size[0])!;
-        let h = (height != null ? evaluateDimension(height, size[1], false) : size[1])!;
+        if (fit !== 'scale') {
+ 
+          let w = (width != null ? evaluateDimension(width, size[0], false) : size[0])!;
+          let h = (height != null ? evaluateDimension(height, size[1], false) : size[1])!;
 
-        if (fit === 'contain') {
-          let fitW = boxW / w;
-          let fitH = boxH / h;
-          let scale = Math.min(fitW, fitH);
-          w *= scale;
-          h *= scale;
+          if (fit === 'contain') {
+            let fitW = boxW / w;
+            let fitH = boxH / h;
+            let scale = Math.min(fitW, fitH);
+            w *= scale;
+            h *= scale;
+          }
+          else if (fit === 'cover') {
+            let fitW = boxW / w;
+            let fitH = boxH / h;
+            let scale = Math.max(fitW, fitH);
+            w *= scale;
+            h *= scale;
+          }
+
+          const [alignX, alignY] = parseAnchorXY(align);
+          let left   = evaluateAnchor(alignX) * (boxW - w);
+          let top    = evaluateAnchor(alignY) * (boxH - h);
+          let right  = boxW - (left + w);
+          let bottom = boxH - (top + h);
+
+          uv = [
+            -left / w,
+            -top / h,
+            1 + right / w,
+            1 + bottom / h,
+          ];
         }
-        else if (fit === 'cover') {
-          let fitW = boxW / w;
-          let fitH = boxH / h;
-          let scale = Math.max(fitW, fitH);
-          w *= scale;
-          h *= scale;
-        }
-
-        const [alignX, alignY] = parseAnchorXY(align);
-        let left   = evaluateAnchor(alignX) * (boxW - w);
-        let top    = evaluateAnchor(alignY) * (boxH - h);
-        let right  = boxW - (left + w);
-        let bottom = boxH - (top + h);
-
-        uv = [
-          -left / w,
-          -top / h,
-          1 + right / w,
-          1 + bottom / h,
-        ];
       }
 
       render = {
@@ -173,7 +178,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         stroke,
         fill,
       
-        texture: sampledTexture,
+        texture: sampledTexture ?? image?.texture,
         repeat: (repeat != null ? REPEAT_FLAG[repeat] : repeat) ?? 0,
         uv,
 

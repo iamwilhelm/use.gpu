@@ -3,6 +3,7 @@ import { TextureSource, UniformAttributeValue } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
 import { yeet, useMemo } from '@use-gpu/live';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { getBoundSource } from '../hooks/useBoundSource';
 

@@ -1,12 +1,16 @@
 import { LC, PropsWithChildren } from '@use-gpu/live/types';
+import { TextureSource } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
+import { provide } from '@use-gpu/live';
 import { useProp } from '../traits/useProp';
+import { ColorLike } from '../traits/types';
 import { parseColor } from '../traits/parse';
 import { makeContext, useContext } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useShaderRef } from '../hooks/useShaderRef';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr.wgsl';
 
 export const MaterialContext = makeContext<ShaderModule>(applyPBRMaterial, 'MaterialContext');

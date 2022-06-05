@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource, Point4, Rectangle } from '@use-gpu/core/types';
+import { TextureSource, Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { Direction, Overflow, Point, AutoPoint, UIAggregate } from '../types';
+import { Direction, OverflowMode, AutoPoint, UIAggregate } from '../types';
 import { ColorLike } from '../../traits/types';
 
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
@@ -10,15 +10,15 @@ import { evaluateDimension } from '../parse';
 import { isHorizontal, memoFit } from '../lib/util';
 import { useInspectHoverable } from '../../hooks/useInspectable';
 
-import { BoxTrait, ElementTrait } from '../types';
-import { useBoxTrait, useElementTrait } from '../traits';
+import { parseColor } from '../../traits/parse';
 import { INSPECT_STYLE } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import { useBoundShader } from '../../hooks/useBoundShader';
+import { useProp } from '../../traits/useProp';
 
-import { getScrolledPosition } from '@use-gpu/wgsl/clip/scroll.wgsl';
+import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 
 const OFFSET_BINDINGS = bundleToAttributes(getScrolledPosition);
 
@@ -29,7 +29,7 @@ export type ScrollBarProps = {
   track?: ColorLike,
   thumb?: ColorLike,
 
-  overflow?: Overflow,
+  overflow?: OverflowMode,
   scrollRef?: Point,
   sizeRef?: Point4,
   transform?: ShaderModule,
@@ -47,8 +47,6 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   const {
     direction = 'y',
     size = 10,
-    track = TRACK,
-    thumb = THUMB,
     
     overflow = 'scroll',
     scrollRef = NO_POINT,
@@ -57,10 +55,12 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   } = props;
 
   const {id} = useFiber();
+  const hovered = useInspectHoverable();
+
+  const track = useProp(props.track, parseColor, TRACK);
+  const thumb = useProp(props.thumb, parseColor, THUMB);
 
   const isX = isHorizontal(direction);
-
-  const hovered = useInspectHoverable();
 
   const shift = useMemo(() => isX
     ? () => [scrollRef[0] / sizeRef[2] * sizeRef[0], 0]
@@ -100,9 +100,10 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         if (showTrack) yeets.push({
           id: id.toString() + '-0',
           rectangle: trackBox,
+          bounds: trackBox,
           uv: [0, 0, 1, 1],
           fill:   track,
-          radius: [size/2, size/2, size/2, size/2],
+          radius: [size/2, size/2, size/2, size/2] as Rectangle,
           ...(hovered ? INSPECT_STYLE.parent : undefined),
 
           clip,
@@ -112,9 +113,10 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         if (showThumb) yeets.push({
           id: id.toString() + '-1',
           rectangle: thumbBox,
+          bounds: thumbBox,
           uv: [0, 0, 1, 1],
           fill:   thumb,
-          radius: [size/2, size/2, size/2, size/2],
+          radius: [size/2, size/2, size/2, size/2] as Rectangle,
           ...(hovered ? INSPECT_STYLE.parent : undefined),
 
           clip,

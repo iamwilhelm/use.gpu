@@ -17,7 +17,7 @@ import {
 
 const dataFields = [
   // Accessor syntax
-  ['array<vec4<f32>>', (o: any) => o.path],
+  ['array<vec3<f32>>', (o: any) => o.path],
   // Shorthand => o.color
   ['vec4<f32>', 'color'],
   ['f32', 'width'],
@@ -39,10 +39,10 @@ const circleY = (a: number, r: number) => Math.sin(a * Math.PI * 2) * r;
 const N = 32;
 
 let lineData = seq(9).map((i) => ({
-  // path: [[x, y, z, w], ...]
+  // path: [[x, y, z], ...]
   path: (
-    (i < 5) ? seq(10).map(j => [i / 5 - 1, j / 11 - 1, 0, 1]) :
-    seq(N).map(j => [.25 + (i%2)*.5 + circleX(j/N, .15), (i - 5) / 5 - 1 + circleY(j/N, .15), 0, 1])
+    (i < 5) ? seq(10).map(j => [i / 5 - 1, j / 11 - 1, 0]) :
+    seq(N).map(j => [.25 + (i%2)*.5 + circleX(j/N, .15), (i - 5) / 5 - 1 + circleY(j/N, .15), 0])
   ),
   // color: [r, g, b, a]
   color: randomColor(),
@@ -51,15 +51,15 @@ let lineData = seq(9).map((i) => ({
 }));
 
 let zigzagData = [{
-  path: seq(24).map(i => [i / 14 - 1 - .2, -.1, ((i % 2) - .5) * .1, 1]),
+  path: seq(24).map(i => [i / 14 - 1 - .2, -.1, ((i % 2) - .5) * .1]),
   color: randomColor(),
   width: 10,
 }];
 
 let arrowData = seq(9).map((i) => ({
   path: (
-    (i < 5) ? seq(10).map(j => [i / 5 - 1, j / 11, 0, 1]) :
-    seq(N).map(j => [.25 + (i%2)*.5 + circleX(j/N, .15), (i - 5) / 5 + circleY(j/N, .15), 0, 1])
+    (i < 5) ? seq(10).map(j => [i / 5 - 1, j / 11, 0]) :
+    seq(N).map(j => [.25 + (i%2)*.5 + circleX(j/N, .15), (i - 5) / 5 + circleY(j/N, .15), 0])
   ),
   color: randomColor(),
   width: Math.random() * (i >= 5 ? 3 : 30) + 5,

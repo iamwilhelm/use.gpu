@@ -9,7 +9,7 @@ import {
   bundleToAttribute,
   bundleToAttributes,
 
-  glsl,
+  glsl, float, int, uint,
 } from './shader';
 
 import {
@@ -67,7 +67,7 @@ export {
   bundleToAttribute,
   bundleToAttributes,
 
-  glsl,
+  glsl, float, int, uint,
 } from './shader';
 
 export {
@@ -121,7 +121,7 @@ export const GLSLLinker = {
   bindEntryPoint,
   bundleToAttribute,
   bundleToAttributes,
-  glsl,
+  glsl, float, int, uint,
 
   defineConstants,
 

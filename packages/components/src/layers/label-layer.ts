@@ -1,5 +1,5 @@
 import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, TextureSource, Atlas, Prop, RenderPassMode } from '@use-gpu/core/types';
+import { TypedArray, TextureSource, Atlas, Lazy, RenderPassMode } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 import { SDFGlyphData } from '../text/types';
 
@@ -44,7 +44,7 @@ export type LabelLayerProps = {
   flip?: [number, number],
   sdfRadius?: number,
   detail?: number,
-  count?: Prop<number>,
+  count?: Lazy<number>,
   mode?: RenderPassMode | string,
   id?: number,
 };

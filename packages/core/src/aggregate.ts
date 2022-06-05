@@ -60,7 +60,7 @@ export const updateAggregateSegments = (
 ) => {
   const {buffer, array, source, dims} = segments;
 
-  generateChunkSegments(array, chunks, loops);
+  generateChunkSegments(array, null, chunks, loops);
   uploadBuffer(device, buffer, array.buffer);
   source.length = count;
 

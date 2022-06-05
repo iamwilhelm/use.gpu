@@ -19,7 +19,7 @@ export type AbsoluteProps = Partial<ElementTrait> &
   right?: Dimension,
   bottom?: Dimension,
 
-  direction: Direction,
+  direction?: Direction,
 
   under?: boolean,
   snap?: boolean,

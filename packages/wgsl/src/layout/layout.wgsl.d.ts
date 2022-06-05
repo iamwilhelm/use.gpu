@@ -1,6 +1,6 @@
-declare module "@use-gpu/wgsl/render/fragment/ui.wgsl" {
+declare module "@use-gpu/wgsl/layout/layout.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
-  export const main: ParsedBundle;
+  export const getLayoutPosition: ParsedBundle;
   export default __module;
 }

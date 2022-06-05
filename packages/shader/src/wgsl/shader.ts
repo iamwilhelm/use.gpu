@@ -46,3 +46,10 @@ export const wgsl = (literals: TemplateStringsArray, ...tokens: string[]) => {
   const code = zip(literals, tokens).flat();
   return loadModuleWithCache(code.join(''));
 };
+
+export const f32 = (x: number) => {
+  const s = x.toString();
+  return (!s.match(/\./)) ? s + '.0' : s;  
+};
+export const u32 = (x: number) => Math.round(x).toString() + 'u';
+export const i32 = (x: number) => Math.round(x).toString();

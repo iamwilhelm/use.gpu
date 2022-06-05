@@ -20,7 +20,7 @@ export type EmbedProps = Partial<BoxTrait> &
   width?: Dimension,
   height?: Dimension,
   snap?: boolean,
-  render?: (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>,
+  render?: (key: number, layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>,
   children?: LiveElement<any>,
 };
 
@@ -32,7 +32,6 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
   } = props;
 
   const { margin, grow, shrink, inline } = useBoxTrait(props);
-  const { flipY } = useContext(LayoutContext);
 
   const width  = useProp(props.width,  parseDimension);
   const height = useProp(props.height, parseDimension);
@@ -73,12 +72,13 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
         size,
         render: memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => {
           const view = render
-            ? render(layout, clip, transform)
+            ? render(id, layout, clip, transform)
             : (
               provide(LayoutContext, layout,
                 provide(TransformContext, transform,
                   children
-                )
+                ),
+                id,
               )
             );
           return yeet(view);

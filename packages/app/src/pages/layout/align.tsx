@@ -74,7 +74,7 @@ export const LayoutAlignPage: LC = () => {
     </LinearRGB>
   );
 
-  const root = document.querySelector('#use-gpu');
+  const root = document.querySelector('#use-gpu .canvas');
 
   return (
     <LayoutControls

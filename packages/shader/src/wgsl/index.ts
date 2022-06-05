@@ -9,7 +9,7 @@ import {
   bundleToAttribute,
   bundleToAttributes,
 
-  wgsl,
+  wgsl, f32, i32, u32,
 } from './shader';
 
 import {
@@ -66,7 +66,7 @@ export {
   bundleToAttribute,
   bundleToAttributes,
 
-  wgsl,
+  wgsl, f32, i32, u32,
 } from './shader';
 
 export {
@@ -119,7 +119,7 @@ export const WGSLLinker = {
   bindEntryPoint,
   bundleToAttribute,
   bundleToAttributes,
-  wgsl,
+  wgsl, f32, i32, u32,
 
   defineConstants,
 

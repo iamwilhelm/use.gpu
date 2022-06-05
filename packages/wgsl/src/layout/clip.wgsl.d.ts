@@ -1,4 +1,4 @@
-declare module "@use-gpu/wgsl/clip/clip.wgsl" {
+declare module "@use-gpu/wgsl/layout/clip.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getCombinedClip: ParsedBundle;

@@ -104,11 +104,11 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     }, 0) as number;
 
     // Look for index field
-    const indexes = fs.filter(([,, isIndex]) => isIndex);
+    const indexes = fs.filter(([,, accessorType]) => accessorType === 'index');
     const [index] = indexes;
 
     // Look for first non-index composite field
-    const composites = fs.filter(([format,, isIndex]) => isComposite(format) && !isIndex);
+    const composites = fs.filter(([format,, accessorType]) => isComposite(format) && accessorType !== 'index');
     const [composite] = composites;
     if (!composite) {
       const length = data?.length ?? rawLength ?? 0;
@@ -168,7 +168,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
 
-    const fieldBuffers = fs.map(([format, accessor, isIndex]) => {
+    const fieldBuffers = fs.map(([format, accessor, accessorType]) => {
       const composite = isComposite(format);
       format = composite ? toSimple(format) : format;
 
@@ -189,6 +189,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         version: 0,
       };
 
+      const isIndex = accessorType === 'index';
       return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex};
     });
 

@@ -464,8 +464,8 @@ export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
     const ref = useOne(() => ({current: fallback}));
     const value = reduceFiberValues(fiber, reducer, true);
 
-    if ((value as any) === SUSPEND) return ref.current as any;
-    return ref.current = value;
+    if (value === SUSPEND) return ref.current as any;
+    return ref.current = (value as R);
   };
   return mountFiberReduction(fiber, calls, mapper, reduction, next);
 }
@@ -484,24 +484,24 @@ export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
     const value = gatherFiberValues(fiber, true);
 
     if (value === SUSPEND) return ref.current;
-    return ref.current = value;
+    return ref.current = (value as T[]);
   };
   return mountFiberReduction(fiber, calls, undefined, reduction, next);
 }
 
 // Multi-gather-reduce a fiber
-export const multiGatherFiberCalls = <F extends ArrowFunction, R, T>(
+export const multiGatherFiberCalls = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any>,
   next?: LiveFunction<any>,
-  fallback: T | T[] = [],
+  fallback: Record<string, T | T[]> = {},
 ) => {
   const reduction = () => {
     const ref = useOne(() => ({current: fallback}));
     const value = multiGatherFiberValues(fiber, true);
 
     if (value === SUSPEND) return ref.current;
-    return ref.current = value;
+    return ref.current = (value as Record<string, T | T[]>);
   };
   return mountFiberReduction(fiber, calls, undefined, reduction, next);
 }
@@ -511,7 +511,7 @@ export const reduceFiberValues = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   reducer: (a: R, b: R) => R,
   self: boolean = false,
-): R | SUSPEND | undefined => {
+): R | typeof SUSPEND | undefined => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
@@ -526,10 +526,15 @@ export const reduceFiberValues = <F extends ArrowFunction, R, T>(
       const n = mounts.size;
       const first = mounts.get(order[0]);
       let value = reduceFiberValues(first!, reducer);
+      if (value === SUSPEND) return yeeted.reduced = SUSPEND;
+
       if (n > 1) for (let i = 1; i < n; ++i) {
         const m = mounts.get(order[i]);
         if (!m) continue;
-        value = reducer(value!, reduceFiberValues(m, reducer)!);
+
+        const v = reduceFiberValues(m, reducer);
+        if (v === SUSPEND) return yeeted.reduced = SUSPEND;
+        value = reducer((value as R), (v as R)!);
       }
       return yeeted.reduced = value;
     }
@@ -543,7 +548,7 @@ export const reduceFiberValues = <F extends ArrowFunction, R, T>(
 export const gatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,
-): T | T[] | SUSPEND | undefined => {
+): T | T[] | typeof SUSPEND | undefined => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
@@ -561,7 +566,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
         if (!m) continue;
 
         const value = gatherFiberValues(m);
-        if (value === SUSPEND) return SUSPEND;
+        if (value === SUSPEND) return yeeted.reduced = SUSPEND;
 
         if (Array.isArray(value)) {
           let n = value.length;
@@ -575,10 +580,10 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   }
   else if (mount) {
     const value = gatherFiberValues(mount);
-    if (value === SUSPEND) return SUSPEND;
+    if (value === SUSPEND) return yeeted.reduced = SUSPEND;
 
-    if (self) return yeeted.reduced = toArray<T>(value);
-    return yeeted.reduced = value;
+    if (self) return yeeted.reduced = toArray<T>(value as T | T[]);
+    return yeeted.reduced = value as T | T[];
   }
   return [];
 }
@@ -588,7 +593,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
 export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,
-): Record<string, T | T[]> | SUSPEND => {
+): Record<string, T | T[]> | typeof SUSPEND => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
   if (!self) {
@@ -605,11 +610,11 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
         if (!m) continue;
 
         const value = multiGatherFiberValues(m);
-        if (value === SUSPEND) return SUSPEND;
+        if (value === SUSPEND) return yeeted.reduced = SUSPEND;
         if (value === undefined) debugger;
 
-        for (let k in value) {
-          const v = value[k];
+        for (let k in value as Record<string, T | T[]>) {
+          const v = (value as Record<string, T | T[]>)[k];
           let list = out[k] as T[];
           if (!list) list = out[k] = [];
 
@@ -626,7 +631,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   }
   else if (mount) {
     const value = multiGatherFiberValues(mount);
-    if (value === SUSPEND) return SUSPEND;
+    if (value === SUSPEND) return yeeted.reduced = SUSPEND;
     if (value === undefined) debugger;
     return yeeted.reduced = value as any;
   }

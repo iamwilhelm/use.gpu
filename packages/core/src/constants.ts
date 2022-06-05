@@ -74,18 +74,18 @@ export const VERTEX_TO_UNIFORM = {
   "snorm16x4": "#!UNIMPLEMENTED",
   "float16x2": "#!UNIMPLEMENTED",
   "float16x4": "#!UNIMPLEMENTED",
-  "float32": "float",
-  "float32x2": "vec2",
-  "float32x3": "vec3",
-  "float32x4": "vec4",
-  "uint32": "uint",
-  "uint32x2": "uvec2",
-  "uint32x3": "uvec3",
-  "uint32x4": "uvec4",
-  "sint32": "int",
-  "sint32x2": "ivec2",
-  "sint32x3": "ivec3",
-  "sint32x4": "ivec4",
+  "float32": "f32",
+  "float32x2": "vec2<f32>",
+  "float32x3": "vec3<f32>",
+  "float32x4": "vec4<f32>",
+  "uint32": "u32",
+  "uint32x2": "vec2<u32>",
+  "uint32x3": "vec3<u32>",
+  "uint32x4": "vec4<u32>",
+  "sint32": "i32",
+  "sint32x2": "vec2<i32>",
+  "sint32x3": "vec3<i32>",
+  "sint32x4": "vec4<i32>",
 };
 
 export const UNIFORM_SIZES = {
@@ -465,6 +465,62 @@ export const TEXTURE_ARRAY_TYPES = {
   "depth24plus-stencil8": Uint32Array,
   "depth32float": Uint32Array,
 } as Record<GPUTextureFormat, TypedArrayConstructor>;
+
+export const TEXTURE_SHADER_TYPES = {
+  // 8-bit formats
+  "r8unorm": 'f32',
+  "r8snorm": 'f32',
+  "r8uint": 'u32',  // u8
+  "r8sint": 'i32',  // i8
+
+  // 16-bit formats
+  "r16uint": 'u32',        // u16
+  "r16sint": 'i32',        // i16
+  "r16float": 'f32',       // f16
+  "rg8unorm": 'vec2<f32>',
+  "rg8snorm": 'vec2<f32>',
+  "rg8uint": 'vec2<u32>',  // u8
+  "rg8sint": 'vec2<i32>',  // i8
+
+  // 32-bit formats
+  "r32uint": 'u32',
+  "r32sint": 'i32',
+  "r32float": 'f32',
+  "rg16uint": 'vec2<u32>',        // u16
+  "rg16sint": 'vec2<i32>',        // i16
+  "rg16float": 'vec2<f32>',       // f32
+  "rgba8unorm": 'vec4<f32>', 
+  "rgba8unorm-srgb": 'vec4<f32>',
+  "rgba8snorm": 'vec4<f32>',
+  "rgba8uint": 'vec4<u32>',       // u8
+  "rgba8sint": 'vec4<i32>',       // i8
+  "bgra8unorm": 'vec4<f32>',
+  "bgra8unorm-srgb": 'vec4<f32>',
+  // Packed 32-bit formats
+  "rgb9e5ufloat": 'vec4<f32>',
+  "rgb10a2unorm": 'vec4<f32>',
+  "rg11b10ufloat": 'vec4<f32>',
+
+  // 64-bit formats
+  "rg32uint": 'vec2<u32>',
+  "rg32sint": 'vec2<i32>',
+  "rg32float": 'vec2<f32>',
+  "rgba16uint": 'vec4<u32>',
+  "rgba16sint": 'vec4<i32>',
+  "rgba16float": 'vec4<f32>',
+
+  // 128-bit formats
+  "rgba32uint": 'vec4<u32>',
+  "rgba32sint": 'vec4<i32>',
+  "rgba32float": 'vec4<f32>',
+
+  // Depth and stencil formats
+  "stencil8": 'u32',              // u8
+  "depth16unorm": 'f32',
+  "depth24plus": 'u32',
+  "depth24plus-stencil8": 'u32',
+  "depth32float": 'f32',
+} as Record<GPUTextureFormat, string>;
 
 // @ts-ignore
 export const VERTEX_ATTRIBUTE_SIZES = VERTEX_SIZES as {[t in GPUVertexFormat]: number};

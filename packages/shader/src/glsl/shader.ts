@@ -46,3 +46,10 @@ export const glsl = (literals: TemplateStringsArray, ...tokens: string[]) => {
   const code = zip(literals, tokens).flat();
   return loadModuleWithCache(code.join(''));
 };
+
+export const float = (x: number) => {
+  const s = x.toString();
+  return (!s.match(/\./)) ? s + '.0' : 0;  
+};
+export const uint = (x: number) => Math.round(x).toString();
+export const int = (x: number) => Math.round(x).toString();

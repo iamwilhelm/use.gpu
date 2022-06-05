@@ -6,7 +6,7 @@ import {
   DataBinding,
   StorageSource,
   TextureSource,
-  Prop,
+  Lazy,
 } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
@@ -15,7 +15,7 @@ import { getObjectKey, getHashValue } from '@use-gpu/state';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 
-export const resolve = <T>(x: Prop<T>): T => {
+export const resolve = <T>(x: Lazy<T>): T => {
   if (typeof x === 'function') return (x as any)();
   if (typeof x === 'object') {
     if ('expr' in x) return x.expr();

@@ -10,7 +10,7 @@ export const getBlockMinMax = (
   direction: Direction,
 ) => {
   if (fixed[0] != null && fixed[1] != null) {
-    return [fixed[0], fixed[1], fixed[0], fixed[1]];
+    return [fixed[0], fixed[1], fixed[0], fixed[1]] as Rectangle;
   }
 
   const isX = isHorizontal(direction);

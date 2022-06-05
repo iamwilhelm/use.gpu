@@ -1,7 +1,9 @@
 import { yeet, useContext } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
+import { ViewContext } from '../providers/view-provider';
 import { PickingContext } from './picking';
 
+/*
 export const ColorPass = () => {
   const renderContext = useContext(RenderContext);
   const {viewUniforms, viewDefs} = useContext(ViewContext);
@@ -26,3 +28,4 @@ export const GPUPickingPass = () => {
     },
   })
 };
+*/

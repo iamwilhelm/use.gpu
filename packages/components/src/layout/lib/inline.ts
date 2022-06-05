@@ -3,7 +3,7 @@ import { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPic
 
 import { makeTuples } from '@use-gpu/core';
 import { makeLayoutCursor, getAlignmentSpacing } from './cursor';
-import { isHorizontal } from './util';
+import { isHorizontal, makeMiniHash } from './util';
 
 const NO_RENDER = () => null;
 const NO_MARGIN: Point4 = [0, 0, 0, 0];
@@ -130,9 +130,7 @@ export const fitInline = (
   const pickers = [] as (LayoutPicker | null)[];
 
   // Text rendering is expensive
-  let key = 0;
-  const rot = (a: number, b: number) => ((a << b) | (a >>> (32 - b))) >>> 0;
-  const miniHash = (x: number) => key = rot(Math.imul(key, 0xc2b2ae35) ^ x, 5);
+  const miniHash = makeMiniHash();
 
   // Push all text spans into layout
   const cursor = makeLayoutCursor(wrap ? spaceMain || 0 : 0, align);
@@ -253,6 +251,6 @@ export const fitInline = (
     anchors,
     renders,
     pickers,
-    key,
+    key: miniHash(),
   };
 }

@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import {
-  TypedArray, ViewUniforms, DeepPartial, Prop,
+  TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
@@ -29,8 +29,9 @@ export type SurfaceLayerProps = {
 
   loopX?: boolean,
   loopY?: boolean,
+  shaded?: boolean,
 
-  size?: Prop<[number, number] | [number, number, number] | [number, number, number, number]>,
+  size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
   mode?: RenderPassMode | string,
   id?: number,
 };

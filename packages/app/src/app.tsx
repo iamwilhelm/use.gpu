@@ -67,7 +67,7 @@ export const App: LC = () => {
       fallback={(error: Error) => <HTML container={root}>{FALLBACK_MESSAGE(error) as any}</HTML>}
     >
       <AutoCanvas
-        selector={'#use-gpu'}
+        selector={'#use-gpu .canvas'}
         samples={4}
       >
         <FontLoader fonts={fonts}>

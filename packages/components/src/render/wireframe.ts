@@ -1,4 +1,4 @@
-import { Prop } from '@use-gpu/core/types';
+import { Lazy } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
@@ -13,8 +13,8 @@ const WIREFRAME_BINDINGS = bundleToAttributes(getWireframeListVertex);
 
 export const getWireframe = (
   getVertex: ShaderModule,
-  vertexCount: Prop<number>,
-  instanceCount: Prop<number>,
+  vertexCount: Lazy<number>,
+  instanceCount: Lazy<number>,
   topology: string,
 ) => {
   const i = instanceCount;

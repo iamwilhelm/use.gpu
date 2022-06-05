@@ -6,7 +6,7 @@ import {
 
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME, SUSPEND } from './builtin';
 import { discardState, useOne } from './hooks';
-import { renderFibers, sliceNextFiber } from './tree';
+import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction } from './util';
 import { formatNode, formatNodeName } from './debug';
 
@@ -465,9 +465,7 @@ export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
     const value = reduceFiberValues(fiber, reducer, true);
 
     if ((value as any) === SUSPEND) return ref.current as any;
-    ref.current = value;
-
-    return value;
+    return ref.current = value;
   };
   return mountFiberReduction(fiber, calls, mapper, reduction, next);
 }
@@ -486,8 +484,7 @@ export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
     const value = gatherFiberValues(fiber, true);
 
     if (value === SUSPEND) return ref.current;
-    ref.current = value;
-    return value;
+    return ref.current = value;
   };
   return mountFiberReduction(fiber, calls, undefined, reduction, next);
 }
@@ -504,9 +501,7 @@ export const multiGatherFiberCalls = <F extends ArrowFunction, R, T>(
     const value = multiGatherFiberValues(fiber, true);
 
     if (value === SUSPEND) return ref.current;
-    ref.current = value;
-
-    return value;
+    return ref.current = value;
   };
   return mountFiberReduction(fiber, calls, undefined, reduction, next);
 }
@@ -596,7 +591,6 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 ): Record<string, T | T[]> | SUSPEND => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
-
   if (!self) {
     if (fiber.next && fiber.f !== CONSUME) return multiGatherFiberValues(fiber.next) as any;
     if (yeeted.value !== undefined) return yeeted.value;
@@ -612,6 +606,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 
         const value = multiGatherFiberValues(m);
         if (value === SUSPEND) return SUSPEND;
+        if (value === undefined) debugger;
 
         for (let k in value) {
           const v = value[k];
@@ -632,6 +627,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   else if (mount) {
     const value = multiGatherFiberValues(mount);
     if (value === SUSPEND) return SUSPEND;
+    if (value === undefined) debugger;
     return yeeted.reduced = value as any;
   }
   return {} as Record<string, T | T[]>;

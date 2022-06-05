@@ -80,19 +80,15 @@ const Resume = (placement: Placement, inspect: Inspector, hovered: boolean) => (
   const flip = [0, 0] as Point;
   if (l > r) flip[0] = l + r;
   if (t > b) flip[1] = b + t;
-  if (flip[0] || flip[1]) transform = useBoundShader(getFlippedPosition, FLIP_BINDINGS, [flip]);
-  else useNoBoundShader();
+  transform = useBoundShader(getFlippedPosition, FLIP_BINDINGS, [flip]);
 
   // Global X/Y shift
-  if (placement[0] !== 1 && placement[1] !== 1) {
-    const shift = [
-      (placement[0] - 1.0) / 2 * into[0],
-      (placement[1] - 1.0) / 2 * into[1],
-    ];
-    const bound = useBoundShader(getScrolledPosition, SHIFT_BINDINGS, [shift]);
-    transform = transform ? chainTo(transform, bound) : bound;
-  }
-  else useNoBoundShader();
+  const shift = [
+    (placement[0] - 1.0) / 2 * into[0],
+    (placement[1] - 1.0) / 2 * into[1],
+  ];
+  const bound = useBoundShader(getScrolledPosition, SHIFT_BINDINGS, [shift]);
+  transform = transform ? chainTo(transform, bound) : bound;
 
   // Render children into root container
   const out = [] as LiveElement[];

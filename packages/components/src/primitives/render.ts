@@ -38,6 +38,13 @@ export type RenderProps = {
   deps: any[] | null,
 };
 
+const DEFAULT_DEFINES = {
+  '@group(VIEW)': '@group(0)',
+  '@binding(VIEW)': '@binding(0)',
+  '@group(VIRTUAL)': '@group(1)',
+  '@group(VOLATILE)': '@group(2)',
+};
+
 // Inlined into <Virtual>
 export const render = (props: RenderProps) => {
   const {
@@ -65,13 +72,13 @@ export const render = (props: RenderProps) => {
   // Render shader
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
 
-  const defines = useMemo(() => ({
+  const defines = useOne(() => (propDefines ? {
     '@group(VIEW)': '@group(0)',
     '@binding(VIEW)': '@binding(0)',
     '@group(VIRTUAL)': '@group(1)',
     '@group(VOLATILE)': '@group(2)',
     ...propDefines,
-  }), [propDefines]);
+  } : DEFAULT_DEFINES), propDefines);
 
   // Shaders
   const {
@@ -96,6 +103,11 @@ export const render = (props: RenderProps) => {
   );
 
   if (!pipeline) return;
+
+  if (stale) {
+    console.log('SUSPEND');
+    return yeet(SUSPEND);
+  }
   
   // Uniforms
   const uniform = useMemo(() => {
@@ -115,8 +127,6 @@ export const render = (props: RenderProps) => {
     makeVolatileUniforms(device, pipeline, volatiles, 2),
     [device, pipeline, uniforms, volatiles]
   );
-
-  if (stale) return yeet(SUSPEND);
 
   const fiber = useFiber();
 

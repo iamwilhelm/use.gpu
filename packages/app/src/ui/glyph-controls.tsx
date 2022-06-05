@@ -8,8 +8,8 @@ import { useRouterContext } from '@use-gpu/components';
 const STYLE = {
   position: 'absolute',
 
-  //left: 0,
-  left: '50%',
+  left: 0,
+  //left: '50%',
   //marginLeft: '-100px',
 
   bottom: 0,
@@ -72,7 +72,7 @@ export const GlyphControls: LC<GlyphControlsProps> = (props: GlyphControlsProps)
         ) : null}
         {has3D ? (
           <div>
-            <label><input type="checkbox" value={orbit} onChange={(e) => setOrbit(e.target.checked)} /> 3D View</label>
+            <label><input type="checkbox" checked={orbit} onChange={(e) => setOrbit(e.target.checked)} /> 3D View</label>
           </div>
         ) : null}
       </>)

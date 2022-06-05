@@ -6,7 +6,7 @@ import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
 import LRU from 'lru-cache';
 
-const DEBUG = false;
+const DEBUG = true;
 
 const NO_DEPS = [] as any[];
 const NO_LIBS = {} as Record<string, any>;
@@ -107,12 +107,13 @@ export const useRenderPipelineAsync = (
 
     // Mark current pipeline as stale (if any)
     staleRef.current = true;
+    DEBUG && console.log('async pipeline miss', key)
 
     // Mark key as pending
     if (pending.has(key)) {
       pending.get(key)!.then((pipeline) => {
-        setResolved(pipeline);
         staleRef.current = false;
+        setResolved(pipeline);
         return pipeline;
       });
       return null;
@@ -130,19 +131,18 @@ export const useRenderPipelineAsync = (
       DEBUG && console.log('async pipeline resolved', key)
 
       cache.set(key, pipeline);
-      setResolved(pipeline);
-
       staleRef.current = false;
       pending.delete(key);
+
+      setResolved(pipeline);
 
       return pipeline;
     });
     pending.set(key, promise);
 
-    DEBUG && console.log('async pipeline miss', key)
     return null;
   }, [memoKey, shader, samples]);
 
-  DEBUG && console.log('async pipeline got', (immediate ?? resolved))
+  DEBUG && console.log('async pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
   return [immediate ?? resolved, staleRef.current];
 };

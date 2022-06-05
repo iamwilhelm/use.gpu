@@ -49,7 +49,7 @@ export const DebugGlyphPage: LC = () => {
                     theta={theta}
                     target={target}
                     near={0.1}
-                    far={5000}
+                    far={20000}
                   >
                     <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
                   </OrbitCamera>

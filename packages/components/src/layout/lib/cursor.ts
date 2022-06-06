@@ -1,9 +1,54 @@
+import { Point } from '@use-gpu/core/types';
 import { Alignment } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
 import { evaluateAnchor } from '../parse';
 
-type Reduce = (
+// Alignment/justification spacing and indent
+export const getAlignmentSpacing = (
+  slack: number,
+  n: number,
+  hard: boolean,
+  align: Alignment,
+) => {
+  let gap = 0;
+  let lead = 0;
+
+  const isJustifyStart  = align === 'justify-start';
+  const isJustifyCenter = align === 'justify-center';
+  const isJustifyEnd    = align === 'justify-end';
+
+  const isJustify = align === 'justify' ||
+                    ((isJustifyStart || isJustifyCenter || isJustifyEnd) && !hard);
+  const isBetween = align === 'between';
+  const isEvenly  = align === 'evenly';
+
+  if (slack > 0) {
+    if (isEvenly || isBetween || isJustify) {
+      if (n === 1) {
+        lead = slack / 2;
+      }
+      else if (isEvenly) {
+        gap = Math.max(0, slack / (n + 1));
+        lead = gap;
+      }
+      else if (isBetween) {
+        gap = Math.max(0, slack / n);
+        lead = gap / 2;
+      }
+      else if (isJustify) {
+        gap = Math.max(0, slack / Math.max(1, n - 1));
+      }
+    }
+    else {
+      lead = evaluateAnchor(align) * slack;
+    }
+  }
+
+  return [gap, lead];
+};
+
+type InlineReduce = (
   start: number,
   end: number,
   gap: number,
@@ -16,7 +61,7 @@ type Reduce = (
   index: number,
 ) => void;
 
-type LayoutCursor = {
+type InlineCursor = {
   push: (
     advance: number,
     trim: number,
@@ -27,14 +72,14 @@ type LayoutCursor = {
     xHeight: number,
   ) => void;
   flush: (x: number) => void,
-  gather: (reduce: Reduce) => Float32Array,
+  gather: (reduce: InlineReduce) => Float32Array,
 };
 
 // Layout cursor for putting inline items on lines, with line wrapping, alignment and justification.
-export const makeLayoutCursor = (
+export const makeInlineCursor = (
   max: number,
   align: Alignment,
-): LayoutCursor => {
+): InlineCursor => {
 
   let spanCount = 0;
   let spanAdvance = 0;
@@ -121,7 +166,7 @@ export const makeLayoutCursor = (
     }
   };
   
-  const gather = (reduce: Reduce) => {
+  const gather = (reduce: InlineReduce) => {
     flush(2);
 
     const s = makeTuples(sizes, 2);
@@ -149,45 +194,146 @@ export const makeLayoutCursor = (
   return { push, flush, gather };
 }
 
-export const getAlignmentSpacing = (
-  slack: number,
-  n: number,
-  hard: boolean,
-  align: Alignment,
-) => {
-  let gap = 0;
-  let lead = 0;
+type FlexReduce = (
+  sizes: number[],
+  start: number,
+  end: number,
+  gap: number,
+  lead: number,
+) => void;
 
-  const isJustifyStart  = align === 'justify-start';
-  const isJustifyCenter = align === 'justify-center';
-  const isJustifyEnd    = align === 'justify-end';
-
-  const isJustify = align === 'justify' ||
-                    ((isJustifyStart || isJustifyCenter || isJustifyEnd) && !hard);
-  const isBetween = align === 'between';
-  const isEvenly  = align === 'evenly';
-
-  if (slack > 0) {
-    if (isEvenly || isBetween || isJustify) {
-      if (n === 1) {
-        lead = slack / 2;
-      }
-      else if (isEvenly) {
-        gap = Math.max(0, slack / (n + 1));
-        lead = gap;
-      }
-      else if (isBetween) {
-        gap = Math.max(0, slack / n);
-        lead = gap / 2;
-      }
-      else if (isJustify) {
-        gap = Math.max(0, slack / Math.max(1, n - 1));
-      }
-    }
-    else {
-      lead = evaluateAnchor(align) * slack;
-    }
-  }
-
-  return [gap, lead];
+type FlexCursor = {
+  push: (
+    main: number,
+    margin: number,
+    gap: number,
+    grow: number,
+    shrink: number,
+  ) => void;
+  flush: (x: number) => void,
+  gather: (reduce: FlexReduce) => number,
 };
+
+// Layout cursor for putting boxes on flex lines, with optional wrapping, grow/shrink, alignment and justification.
+export const makeFlexCursor = (
+  into: number | null,
+  align: Alignment,
+  wrap?: boolean,
+): FlexCursor => {
+
+  let spanMain = 0;
+  let spanTrim = 0;
+  let chunkMain = 0;
+
+  let start: number = 0;
+  let end: number = 0;
+
+  let rows: number[] = [];
+  let sizes: number[] = [];
+  let grows: number[] = [];
+  let shrinks: number[] = [];
+  let index = 0;
+
+  const push = (
+    main: number,
+    margin: number,
+    gap: number,
+    grow: number,
+    shrink: number,
+  ) => {
+    if (into != null && wrap && (spanMain + main + margin > into)) {
+      flush();
+      start = index;
+    }
+
+    end = index + 1;
+
+    spanMain += main + margin + gap;
+    spanTrim  = gap;
+
+    sizes.push(main);
+    grows.push(grow);
+    shrinks.push(shrink);
+
+    index++;
+  };
+
+  const flush = () => {
+    const n = end > start;
+    if (n) {
+      const spanSize = spanMain - spanTrim;
+      chunkMain = Math.max(chunkMain, spanSize);
+      if (Number.isNaN(chunkMain)) debugger;
+
+      rows.push(start, end, spanSize);
+    }
+
+    spanMain = 0;
+    spanTrim = 0;
+  };
+  
+  const gather = (reduce: FlexReduce): number => {
+    flush();
+
+    const r = makeTuples(rows, 3);
+    const l = r.length - 1;
+
+    r.iterate((
+      start: number,
+      end: number,
+      main: number,
+      index: number,
+    ) => {
+      let slack = (into ?? chunkMain) - main;
+      
+      if (slack > 0 && growRow(slack, grows, sizes, start, end)) slack = 0;
+      if (slack < 0 && shrinkRow(slack, shrinks, sizes, start, end)) slack = 0;
+      
+      const [gap, lead] = getAlignmentSpacing(slack, end - start, index === l, align);
+
+      reduce(sizes, start, end, gap, lead);
+    });
+    
+    return into ?? chunkMain;
+  };
+
+  return { push, flush, gather };
+}
+
+
+// Grow all applicable blocks in a row to add extra slack.
+export const growRow = (slack: number, grow: number[], sizes: number[], start: number, end: number) => {
+  let weight = 0;
+  for (let i = start; i < end; ++i) if (grow[i] > 0) weight += grow[i];
+
+  if (weight > 0) {
+    for (let i = start; i < end; ++i) if (grow[i] > 0) {
+      sizes[i] += slack * grow[i] / weight;
+    }
+    return true;
+  }
+  return false;
+}
+
+// Shrink all applicable blocks in a row to remove excess slack.
+export const shrinkRow = (slack: number, shrink: number[], sizes: number[], start: number, end: number): boolean => {
+  let weight = 0;
+  for (let i = start; i < end; ++i) if (shrink[i]) weight += shrink[i] * sizes[i];
+
+  if (weight > 0) {
+    let negative = 0;
+    for (let i = start; i < end; ++i) if (shrink[i] > 0 && sizes[i]) {
+      sizes[i] += slack * shrink[i] * sizes[i] / weight;
+      if (sizes[i] < 0) {
+        negative += sizes[i];
+        sizes[i] = 0;
+      }
+    }
+    if (negative) {
+      shrinkRow(negative, shrink, sizes, start, end);
+    }
+    return true;
+  }
+  return false;
+}
+

@@ -18,7 +18,7 @@ export const LayoutDisplayPage: LC = () => {
       <Pass>
         <UI>
           <Layout>
-            <Absolute fill={[1, 1, 1, .5]} />
+            <Absolute fill={[1, 1, 1, .5]} left={0} right={0} top={0} bottom={0} />
             <Flex width="100%" height="100%">
               <Block width="40%" contain>
                 <Block margin={10} padding={48} radius={5} fill={[0, 0, 0, .9]}>

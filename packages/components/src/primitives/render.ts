@@ -167,5 +167,5 @@ export const render = (props: RenderProps) => {
   });
 };
 
-setShaderLog(100);
-setTimeout(() => console.log(getShaderLog()), 2000);
+//setShaderLog(100);
+//setTimeout(() => console.log(getShaderLog().map(s => [s.vertex.hash, s.fragment.hash])), 2000);

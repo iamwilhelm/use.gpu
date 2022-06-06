@@ -46,7 +46,6 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : 'f32';
 
     const {array, dims} = makeDataArray(f, l || 1);
-    if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
     const buffer = makeStorageBuffer(device, array.byteLength);
     const source = {

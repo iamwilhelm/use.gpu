@@ -24,17 +24,27 @@ describe('block layout', () => {
     };
   };
 
-  it("gets block min/max without fixed", () => {
+  it("gets block min/max", () => {
     const els = [
       makeElement(50, 50),
       makeElement(20, 20),
     ];
 
-    const sizingX = getBlockMinMax(els, [null, null], 'x');
-    expect(sizingX).toEqual([70, 50, 70, 50]);
+    {
+      const sizingX = getBlockMinMax(els, [null, null], [0, 0, 0, 0], 'x');
+      expect(sizingX).toEqual([70, 50, 70, 50]);
 
-    const sizingY = getBlockMinMax(els, [null, null], 'y');
-    expect(sizingY).toEqual([50, 70, 50, 70]);
+      const sizingY = getBlockMinMax(els, [null, null], [0, 0, 0, 0], 'y');
+      expect(sizingY).toEqual([50, 70, 50, 70]);
+    }
+
+    {
+      const sizingX = getBlockMinMax(els, [null, null], [1, 2, 3, 4], 'x');
+      expect(sizingX).toEqual([74, 56, 74, 56]);
+
+      const sizingY = getBlockMinMax(els, [null, null], [1, 2, 3, 4], 'y');
+      expect(sizingY).toEqual([54, 76, 54, 76]);
+    }
   });
 
   it("gets block min/max with fixed", () => {
@@ -43,10 +53,10 @@ describe('block layout', () => {
       makeElement(20, 20),
     ];
 
-    const sizingX = getBlockMinMax(els, [800, 500], 'x');
+    const sizingX = getBlockMinMax(els, [800, 500], [0, 0, 0, 0], 'x');
     expect(sizingX).toEqual([800, 500, 800, 500]);
 
-    const sizingY = getBlockMinMax(els, [800, 500], 'y');
+    const sizingY = getBlockMinMax(els, [800, 500], [0, 0, 0, 0], 'y');
     expect(sizingY).toEqual([800, 500, 800, 500]);
   });
 

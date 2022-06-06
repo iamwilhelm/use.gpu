@@ -359,7 +359,7 @@ export const makeBoxPicker = (
   id: number,
   sizes: Point[],
   offsets: Point[],
-  pickers: (LayoutPicker | null)[],
+  pickers: (LayoutPicker | null | undefined)[],
   scrollPos?: Point,
   onScroll?: (dx: number, dy: number) => void,
 ) => (

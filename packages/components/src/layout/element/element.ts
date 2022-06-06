@@ -36,7 +36,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
   } = props;
 
   const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
-  const { margin, grow, shrink, inline } = useBoxTrait(props);
+  const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const w = typeof width === 'number' ? width : 0;
   const h = typeof height === 'number' ? height : 0;
@@ -55,6 +55,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     absolute,
     under,
     inline,
+    flex,
     fit: (into: AutoPoint) => {
       const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
       const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;

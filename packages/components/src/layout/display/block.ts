@@ -33,7 +33,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
   } = props;
 
   const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
-  const { margin: blockMargin, grow, shrink, inline } = useBoxTrait(props);
+  const { margin: blockMargin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionY);
   const padding = useProp(props.padding, parseMargin);
@@ -55,7 +55,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
 
       const fixed = [w, h] as [number | null, number | null];
 
-      const sizing = getBlockMinMax(els, fixed, direction);
+      const sizing = getBlockMinMax(els, fixed, padding, direction);
       const margin = getBlockMargin(els, blockMargin, padding, direction, contain);
 
       let ratioX = undefined;
@@ -63,12 +63,13 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false);
       if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
-      return yeet({
+      return yeet({        
         sizing,
         margin,
         grow,
         shrink,
         inline,
+        flex,
         ratioX,
         ratioY,
         fit: memoFit((into: AutoPoint) => {

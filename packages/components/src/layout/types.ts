@@ -9,7 +9,7 @@ export type AutoPoint = [number | null, number | null];
 export type AutoRectangle = [number | null, number | null, number | null, number | null];
 export type Gap = Point;
 export type Margin = Point4;
-export type Sizing = Point4;
+export type Sizing = [number | null, number | null, number, number];
 
 export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'between' | 'evenly';
 export type Anchor = 'start' | 'center' | 'end';
@@ -30,6 +30,7 @@ export type BoxTrait = {
   shrink: number,
   margin: MarginLike,
   inline: Base,
+  flex: Anchor,
 };
 
 export type ElementTrait = {
@@ -66,6 +67,8 @@ export type LayoutFit = {
 };
 
 export type LayoutElement = {
+  size?: AutoPoint,
+
   sizing: Sizing,
   margin: Margin,
 
@@ -78,6 +81,7 @@ export type LayoutElement = {
   under?: boolean,
   stretch?: boolean,
   inline?: Base,
+  flex?: Anchor,
 
   fit: (size: AutoPoint) => LayoutFit,
 };

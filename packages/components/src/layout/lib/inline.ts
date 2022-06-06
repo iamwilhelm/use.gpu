@@ -2,7 +2,7 @@ import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor, Base } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
-import { makeLayoutCursor, getAlignmentSpacing } from './cursor';
+import { makeInlineCursor, getAlignmentSpacing } from './cursor';
 import { isHorizontal, makeMiniHash } from './util';
 
 const NO_RENDER = () => null;
@@ -51,9 +51,7 @@ export const getInlineMinMax = (
   const isX = isHorizontal(direction);
 
   let allMinMain = 0;
-  let allMinCross = 0;
   let allMaxMain = 0;
-  let allMaxCross = 0;
 
   let i = 0;
   let caretMain = 0;
@@ -62,7 +60,6 @@ export const getInlineMinMax = (
   let lineHeight = 0;
   const perSpan = (advance: number, trim: number, hard: number) => {
     allMinMain = Math.max(allMinMain, advance - trim);
-    allMaxCross += lineHeight;
 
     caretMain += advance;
     if (hard) {
@@ -86,23 +83,24 @@ export const getInlineMinMax = (
 
       ++i;
     }
-    if (!wrap) allMinMain = allMaxMain;
   }
 
+  // Cover text rounding
+  allMaxMain = Math.max(allMaxMain, caretMain) + 1;
+  if (!wrap) allMinMain = allMaxMain;
+
   caretCross += lineHeight;
-  allMinCross = caretCross;
-  allMaxMain = Math.max(allMaxMain, caretMain);
+  let allCross = caretCross;
 
   if (snap) {
     allMinMain = Math.round(allMinMain);
-    allMinCross = Math.round(allMinCross);
     allMaxMain = Math.round(allMaxMain);
-    allMaxCross = Math.round(allMaxCross);
+    allCross = Math.round(allCross);
   }
 
   return isX
-    ? [allMinMain, allMinCross, allMaxMain, allMaxCross]
-    : [allMinCross, allMinMain, allMaxCross, allMaxMain];
+    ? [allMinMain, null, allMaxMain, allCross]
+    : [null, allMinMain, allCross, allMaxMain];
 }
 
 export const fitInline = (
@@ -136,7 +134,7 @@ export const fitInline = (
   const miniHash = makeMiniHash();
 
   // Push all text spans into layout
-  const cursor = makeLayoutCursor(wrap ? spaceMain || 0 : 0, align);
+  const cursor = makeInlineCursor(wrap ? spaceMain || 0 : 0, align);
 
   for (const el of els) {
     const {spans, block, margin, absolute, height: {lineHeight, ascent, descent, xHeight}} = el;

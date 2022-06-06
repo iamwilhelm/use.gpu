@@ -177,7 +177,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
 
       let {raw, fn} = makeDataAccessor(f, accessor);
 
-      const {array, dims, to4} = makeDataArray(f, l);
+      const {array, dims} = makeDataArray(f, l);
 
       const buffer = makeStorageBuffer(device, array.byteLength);
       const source = {
@@ -189,7 +189,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       };
 
       const isIndex = accessorType === 'index';
-      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex, to4};
+      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex};
     });
 
     const fieldSources = fieldBuffers.map(f => f.source);
@@ -199,7 +199,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   
   // Refresh and upload data
   const refresh = () => {
-    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex, to4} of fieldBuffers) if (raw || data) {
+    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex} of fieldBuffers) if (raw || data) {
       const a = accessor as Accessor;
       const c = isIndex ? chunks : layout.indexed ?? chunks;
       const l = (!layout.indexed || isIndex) ? loops : undefined;

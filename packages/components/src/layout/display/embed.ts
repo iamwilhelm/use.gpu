@@ -31,7 +31,7 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
     children,
   } = props;
 
-  const { margin, grow, shrink, inline } = useBoxTrait(props);
+  const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const width  = useProp(props.width,  parseDimension);
   const height = useProp(props.height, parseDimension);
@@ -51,11 +51,14 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
   if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
   return yeet({
+    size: [w, h],
+
     sizing,
     margin,
     grow,
     shrink,
     inline,
+    flex,
     ratioX,
     ratioY,
     absolute: true,

@@ -8,7 +8,7 @@ import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/text'
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 
-import { makeLayoutCursor } from '../../layout/lib/cursor';
+import { makeInlineCursor } from '../../layout/lib/cursor';
 import { DebugContext } from '../../providers/debug-provider';
 import { DeviceContext } from '../../providers/device-provider';
 import { FontContext } from './font-provider';
@@ -228,7 +228,7 @@ export const useSDFGlyphData = (
 
     // Push all text spans into layout
     const {ascent, lineHeight} = height;
-    const cursor = makeLayoutCursor(wrap, align);
+    const cursor = makeInlineCursor(wrap, align);
     spans.iterate((advance, trim, hard) => cursor.push(advance, trim, hard, lineHeight, 0, 0, 0));
 
     // Gather lines produced

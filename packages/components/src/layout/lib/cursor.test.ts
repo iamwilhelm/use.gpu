@@ -1,5 +1,5 @@
 import { makeTuples } from '@use-gpu/core';
-import { makeLayoutCursor } from './cursor';
+import { makeInlineCursor } from './cursor';
 
 describe('layout cursor', () => {
   
@@ -7,7 +7,7 @@ describe('layout cursor', () => {
   
   it('makes centered rows with hard breaks and multiple items', () => {
     
-    const cursor = makeLayoutCursor(0, 'center');
+    const cursor = makeInlineCursor(0, 'center');
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
@@ -29,7 +29,7 @@ describe('layout cursor', () => {
 
   it('makes centered rows with soft-wrapped breaks', () => {
     
-    const cursor = makeLayoutCursor(390, 'center');
+    const cursor = makeInlineCursor(390, 'center');
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(200, 10, 0, lineHeight, 0, 0, 0);
@@ -51,7 +51,7 @@ describe('layout cursor', () => {
   
   it('makes justified rows with soft-wrapped breaks', () => {
     
-    const cursor = makeLayoutCursor(390, 'justify');
+    const cursor = makeInlineCursor(390, 'justify');
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(200, 10, 0, lineHeight, 0, 0, 0);
@@ -73,7 +73,7 @@ describe('layout cursor', () => {
   
   it('makes right-justified rows with soft-wrapped breaks', () => {
     
-    const cursor = makeLayoutCursor(390, 'justify-end');
+    const cursor = makeInlineCursor(390, 'justify-end');
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(100, 10, 0, lineHeight, 0, 0, 0);
     cursor.push(200, 10, 0, lineHeight, 0, 0, 0);

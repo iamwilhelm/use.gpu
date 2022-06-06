@@ -7,6 +7,7 @@ const isNotAbsolute = (el: LayoutElement) => !el.absolute;
 export const getBlockMinMax = (
   els: LayoutElement[],
   fixed: [number | null, number | null],
+  padding: Margin,
   direction: Direction,
 ) => {
   if (fixed[0] != null && fixed[1] != null) {
@@ -14,9 +15,10 @@ export const getBlockMinMax = (
   }
 
   const isX = isHorizontal(direction);
-  
-  let allMinX = 0;
-  let allMinY = 0;
+  const [pl, pt, pr, pb] = padding;
+
+  let allMinX: number | null = 0;
+  let allMinY: number | null = 0;
   let allMaxX = 0;
   let allMaxY = 0;
 
@@ -29,16 +31,16 @@ export const getBlockMinMax = (
       const [minX, minY, maxX, maxY] = sizing;
       const [ml, mt, mr, mb] = margin;
     
-      allMinX = allMinX + minX;
-      allMinY = Math.max(allMinY, minY + mt + mb);
+      allMinX = allMinX != null && minX !== null ? allMinX + minX : null;
+      allMinY = allMinY != null && minY !== null ? Math.max(allMinY, minY + mt + mb) : null;
 
       allMaxX = allMaxX + maxX;
       allMaxY = Math.max(allMaxY, maxY + mt + mb);
 
       if (i !== 0) {
         m = mergeMargin(m, ml);
-        allMinX = allMinX + m;
-        allMaxX = allMaxX + m;
+        if (allMinX != null) allMinX = allMinX + m;
+        if (allMaxX != null) allMaxX = allMaxX + m;
       }
       m = mr;
       ++i;
@@ -49,16 +51,16 @@ export const getBlockMinMax = (
       const [minX, minY, maxX, maxY] = sizing;
       const [ml, mt, mr, mb] = margin;
 
-      allMinY = allMinY + minY;
-      allMinX = Math.max(allMinX, minX + ml + mr);
+      allMinY = allMinY != null && minY !== null ? allMinY + minY : null;
+      allMinX = allMinX != null && minX !== null ? Math.max(allMinX, minX + ml + mr) : null;
 
       allMaxY = allMaxY + maxY;
       allMaxX = Math.max(allMaxX, maxX + ml + mr);
 
       if (i !== 0) {
         m = mergeMargin(m, mt);
-        allMinY = allMinY + m;
-        allMaxY = allMaxY + m;
+        if (allMinY != null) allMinY = allMinY + m;
+        if (allMaxY != null) allMaxY = allMaxY + m;
       }
       m = mb;
       ++i;
@@ -74,7 +76,12 @@ export const getBlockMinMax = (
     allMaxY = fixed[1];
   }
 
-  return [allMinX, allMinY, allMaxX, allMaxY];
+  return [
+    allMinX != null ? allMinX + pl + pr : null,
+    allMinY != null ? allMinY + pt + pb : null,
+    allMaxX + pl + pt,
+    allMaxY + pt + pb,
+  ];
 }
 
 export const getBlockMargin = (
@@ -125,14 +132,15 @@ export const fitBlock = (
   let m = 0;
 
   // Resolved fit size
-  const resolved = [
-    (fixed[0] != null) ? (!isX && into[0] != null ? Math.min(fixed[0], into[0]) : fixed[0]) : into[0],
-    (fixed[1] != null) ? ( isX && into[1] != null ? Math.min(fixed[1], into[1]) : fixed[1]) : into[1],
-  ] as AutoPoint;
+  const resolved = fixed.slice();
 
   if (shrinkWrap) {
-    if (!isX && fixed[0] == null) resolved[0] = Math.min(into[0] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[0]), 0));
-    if ( isX && fixed[1] == null) resolved[1] = Math.min(into[1] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[1]), 0));
+    if (!isX && fixed[0] == null) resolved[0] = Math.min(into[0] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[2]), 0));
+    if ( isX && fixed[1] == null) resolved[1] = Math.min(into[1] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[3]), 0));
+  }
+  else {
+    if (!isX && fixed[0] == null && into[0] != null) resolved[0] = into[0];
+    if ( isX && fixed[1] == null && into[1] != null) resolved[1] = into[1];
   }
 
   const relativeFit = [
@@ -238,6 +246,8 @@ export const fitBlock = (
       offsets.push([ml, mt]);
     }
   }
+  
+  if (resolved[0] === 113) debugger;
 
   return {
     size: resolved,

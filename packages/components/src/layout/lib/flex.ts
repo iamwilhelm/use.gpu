@@ -1,7 +1,7 @@
 import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor } from '../types';
 
-import { getAlignmentSpacing } from './cursor';
+import { makeFlexCursor, getAlignmentSpacing } from './cursor';
 import { isHorizontal } from './util';
 import { evaluateAnchor } from '../parse';
 
@@ -14,66 +14,41 @@ export const getFlexMinMax = (
   snap: boolean,
 ) => {
   if (fixed[0] != null && fixed[1] != null) {
-    if (snap) [Math.round(fixed[0]), Math.round(fixed[1]), Math.round(fixed[0]), Math.round(fixed[1])];
+    if (snap) return [Math.round(fixed[0]), Math.round(fixed[1]), Math.round(fixed[0]), Math.round(fixed[1])];
     return [fixed[0], fixed[1], fixed[0], fixed[1]];
   }
 
   const isX = isHorizontal(direction);
   const [gapX, gapY] = gap;
 
-  let allMinX = 0;
-  let allMinY = 0;
-  let allMaxX = 0;
-  let allMaxY = 0;
+  let allMinMain = 0;
 
   let i = 0;
+  let caretMain = 0;
+  let caretCross = 0;
 
   const n = els.length;
-  if (isX) for (const {sizing, margin, absolute} of els) {
-    if (!absolute) {
-      const [minX, minY, maxX, maxY] = sizing;
-      const [ml, mt, mr, mb] = margin;
+  for (const {sizing, margin, absolute} of els) {
+    const [minX, minY, maxX, maxY] = sizing;
+    const [ml, mt, mr, mb] = margin;
 
-      const mx = ml + mr;
-      const my = mt + mb;
+    const mx = ml + mr;
+    const my = mt + mb;
 
-      if (wrap) {
-        allMinX = Math.max(allMinX, minX + mx);
-        allMaxY = allMaxY + maxY + my + gapY;
-      }
-      else {
-        allMinX = allMinX + minX + mx + gapX;
-        allMaxY = Math.max(allMaxY, maxY + my);
-      }
+    const advance = isX ? maxX + mx : maxY + my;
+    const trim = isX ? gapX : gapY;
+    caretMain += advance + trim;
+    caretCross = Math.max(caretCross, isX ? maxY + my : maxX + mx);
 
-      allMinY = Math.max(allMinY, minY + my);
-      allMaxX = allMaxX + maxX + mx + gapX;
-      ++i;
-    }
+    allMinMain = Math.max(allMinMain, advance);
   }
-  else for (const {sizing, margin, absolute} of els) {
-    if (!absolute) {
-      const [minX, minY, maxX, maxY] = sizing;
-      const [ml, mt, mr, mb] = margin;
+  const allMaxMain = caretMain - (isX ? gapX : gapY);
 
-      const mx = ml + mr;
-      const my = mt + mb;
+  let allMinX = isX ? allMinMain : null;
+  let allMinY = isX ? null : allMinMain;
 
-      if (wrap) {
-        allMinY = Math.max(allMinY, minY + my);
-        allMaxX = allMaxX + maxX + mx + gapX;
-      }
-      else {
-        allMinY = allMinY + minY + my + gapY;
-        allMaxX = Math.max(allMaxX, maxX + mx);
-      }
-
-      allMinX = Math.max(allMinX, minX + mx);
-      allMaxY = allMaxY + maxY + my + gapY;
-
-      ++i;
-    }
-  }
+  let allMaxX = isX ? allMaxMain : caretCross;
+  let allMaxY = isX ? caretCross : allMaxMain;
 
   if (fixed[0] != null) {
     allMinX = fixed[0];
@@ -85,10 +60,10 @@ export const getFlexMinMax = (
   }
 
   if (snap) {
-    allMinX = Math.round(allMinX);
-    allMinY = Math.round(allMinY);
-    allMaxX = Math.round(allMaxX);
-    allMaxY = Math.round(allMaxY);
+    if (allMinX != null) allMinX = Math.round(allMinX);
+    if (allMinY != null) allMinY = Math.round(allMinY);
+    if (allMaxX != null) allMaxX = Math.round(allMaxX);
+    if (allMaxY != null) allMaxY = Math.round(allMaxY);
   }
 
   return [allMinX, allMinY, allMaxX, allMaxY];
@@ -132,194 +107,87 @@ export const fitFlex = (
   const renders = [] as LayoutRenderer[];
   const pickers = [] as (LayoutPicker | null | undefined)[];
 
-  const main = [] as LayoutElement[];
-  const mainSizes = [] as number[];
-
-  const cross = [] as {
-    size: number,
-    sizes: Point[],
-    offsets: [number, number, number][],
-    renders: LayoutRenderer[],
-    pickers: (LayoutPicker | null | undefined)[],
-  }[];
-
-  let accumMain = 0;
-  let accumCross = 0;
-
-  let maxMain = 0;
-  let maxCross = 0;
-
-  // Lay out a full row of boxes
-  const reduceMain = (hard?: boolean) => {
-    const n = mainSizes.length;
-    if (!n) return;
-
-    // Extra space to be grown (+) or shrunk (-)
-    let slack = spaceMain != null ? spaceMain - accumMain + gapMain : 0;
-
-    // Grow/shrink row if applicable
-    if (slack > 0) {
-      if (growRow(slack, main, mainSizes)) slack = 0;
-    }
-    else if (slack < 0) {
-      if (shrinkRow(slack, main, mainSizes)) slack = 0;
-    }
-
-    // Spacing on main axis
-    let axisGap = 0;
-    let axisPos = 0;
-    if (slack > 0) [axisGap, axisPos] = getAlignmentSpacing(slack, n, !!hard, alignMain);
-    axisGap += gapMain;
-    
-    // Lay out a row of flexed boxes into their final size
-    const crossSizes   = [] as Point[];
-    const crossOffsets = [] as [number, number, number][];
-    const crossRenders = [] as LayoutRenderer[];
-    const crossPickers = [] as (LayoutPicker | null | undefined)[];
-
-    let maxSize = 0;
-    for (let i = 0; i < n; ++i) {
-      const {margin, sizing, fit, ratioX, ratioY} = main[i];
-      const [ml, mt, mr, mb] = margin;
-
-      const mOn  =  isX ? ml + mr : mt + mb;
-      const mOff = !isX ? ml + mr : mt + mb;
-
-      const into = (isX
-        ? [mainSizes[i] / (ratioX || 1), containY != null ? containY - mOff : null]
-        : [containX != null ? containX - mOff : null, mainSizes[i] / (ratioY || 1)]) as AutoPoint;
-
-      const {render, pick, size: fitted} = fit(into);
-
-      let [w, h] = fitted;
-      if (isX) w = mainSizes[i];
-      else h = mainSizes[i];
-
-      let s = isX ? w : h;
-      let c = isX ? h : w;
-      let mm = isX ? ml + mr : mt + mb;
-      let mc = isX ? mt + mb : ml + mr;
-      let hh = c + mc;
-
-      crossRenders.push(render);
-      crossPickers.push(pick);
-      crossOffsets.push(isX ? [ml + axisPos, mt, hh] : [ml, mt + axisPos, hh]);
-      axisPos += s + mm + axisGap;
-
-      if (snap) {
-        s = Math.round(s);
-        c = Math.round(c);
-      }
-
-      crossSizes.push(isX ? [s, h] : [w, s]);
-      maxSize = Math.max(maxSize, hh);
-    }
-
-    cross.push({
-      size: maxSize,
-      sizes: crossSizes,
-      offsets: crossOffsets,
-      renders: crossRenders,
-      pickers: crossPickers,
-    });
-    accumCross += maxSize;
-    maxCross = Math.max(accumCross, maxCross);
-    accumCross += gapCross;
-
-    accumMain = main.length = mainSizes.length = 0;
-  }
-
-  const reduceCross = () => {
-    const n = cross.length;
-    if (!n) return;
-
-    const slack = isCrossFixed ? Math.max(0, spaceCross - accumCross + gapCross) : 0;
-
-    let crossGap = 0;
-    let crossPos = 0;
-    if (slack > 0) [crossGap, crossPos] = getAlignmentSpacing(slack, n, false, alignCross);
-    crossGap += gapCross;
-
-    for (let i = 0; i < n; ++i) {
-      const {size, sizes: ss, offsets: os, renders: rs, pickers: ps} = cross[i];
-
-      const m = ss.length;
-      for (let j = 0; j < m; ++j) {
-        const lead = anchorRatio * (size - os[j][2]);
-        let [l, t] = os[j];
-
-        const o = crossPos + lead;
-        if (isX) t += o;
-        else l += o;
-
-        if (snap) {
-          l = Math.round(l);
-          t = Math.round(t);
-        }
-
-        sizes.push(ss[j]);
-        offsets.push([l, t]);
-        renders.push(rs[j]);
-        pickers.push(ps[j]);
-      }
-
-      crossPos += size + crossGap;
-    }
-
-    cross.length = 0;
-  };
-
+  const cursor = makeFlexCursor(spaceMain, alignMain, wrap);
+  
   for (const el of els) if (!el.absolute) {
     const {margin, sizing, fit, grow, shrink, ratioX, ratioY} = el;
     const [ml, mt, mr, mb] = margin;
 
-    let size = sizing[isX ? 0 : 1];
-    const mOn = isX ? ml + mr : mt + mb;
+    const m = isX ? ml + mr : mt + mb;
 
-    if (isX && ratioX != null && spaceMain != null) size = spaceMain * ratioX;
-    if (!isX && ratioY != null && spaceMain != null) size = spaceMain * ratioY;
-    if (snap) size = Math.round(size);
+    let basis: number | null = null;
+    if       (isX) { if (ratioX != null && spaceMain != null) basis = spaceMain * ratioX; }
+    else if (!isX) { if (ratioY != null && spaceMain != null) basis = spaceMain * ratioY; }
 
-    if (wrap && spaceMain && (accumMain + size + mOn > spaceMain)) reduceMain();
-    accumMain += size + mOn;
-    maxMain = Math.max(maxMain, accumMain);
-    accumMain += gapMain;
-
-    main.push(el);
-    mainSizes.push(size);
-  }
-  reduceMain(true);
-  reduceCross();
-
-  const w =  isX ? containX ?? maxMain : fixed[0] ?? maxCross;
-  const h = !isX ? containY ?? maxMain : fixed[1] ?? maxCross;
-
-  for (const el of els) if (el.absolute) {
-    const {margin, fit, under} = el;
-    const [ml, mt, mr, mb] = margin;
-
-    const size = [w, h] as Point;
-    if (isX) size[1] -= mt + mb;
-    else size[0] -= ml + mr;
-
-    const {render, pick, size: fitted} = fit(size);
-
-    if (under) {
-      sizes.unshift(fitted);
-      renders.unshift(render);
-      pickers.unshift(pick);
-      offsets.unshift([ml, mt]);
+    const driver = isX ? sizing[0] : sizing[1];
+    if (!basis) {
+      if (!driver) {
+        const into = [containX, containY] as AutoPoint;
+        const {size} = fit(into);
+        basis = size[isX ? 0 : 1];
+      }
+      else {
+        basis = isX ? sizing[2] : sizing[3];
+      }
     }
-    else {
-      sizes.push(fitted);
+
+    if (snap) basis = Math.round(basis);
+    cursor.push(basis!, m, gapMain, grow || 0, shrink || 0);
+  }
+  
+  let caretCross = 0;
+  const maxMain = cursor.gather((flexed, start, end, gap, lead) => {    
+    let caretMain = lead;
+    let maxCross = 0;
+
+    for (let i = start; i < end; ++i) {
+      const {margin, fit, ratioX, ratioY} = els[i];
+      const [ml, mt, mr, mb] = margin;
+
+      const mx = ml + mr;
+      const my = mt + mb;
+
+      const mainSize = flexed[i];      
+      const into = (isX
+        ? [mainSize, containY != null ? containY - my : null]
+        : [containX != null ? containX - mx : null, mainSize]
+      ) as AutoPoint;
+      if (ratioX != null && into[0] != null) into[0] /= ratioX;
+      if (ratioY != null && into[1] != null) into[1] /= ratioY;
+      const {size, render, pick} = fit(into);
+
+      maxCross = Math.max(maxCross, isX ? size[1] + my : size[0] + mx);
+      size[isX ? 0 : 1] = mainSize;
+
+      sizes.push(size);
+      offsets.push(isX ? [ml + caretMain, mt + caretCross] : [ml + caretCross, mt + caretMain]);
       renders.push(render);
       pickers.push(pick);
-      offsets.push([ml, mt]);
+
+      caretMain += mainSize + gapMain + gap + (isX ? mx : my);
     }
-  }
+
+    for (let i = start; i < end; ++i) {
+      const {flex, margin} = els[i];
+      const [ml, mt, mr, mb] = margin;
+      const m = isX ? ml + mr : mt + mb;
+
+      const resolvedAnchor = flex ?? anchor;
+      const [gap, lead] = getAlignmentSpacing(maxCross - sizes[i][isX ? 1 : 0] - m, 1, false, resolvedAnchor as any);
+      offsets[i][isX ? 1 : 0] += lead;
+    }
+    
+    caretCross += maxCross + gapCross;
+  });
+  caretCross -= gapCross;
+  
+  const size = [
+    isX ? (containX ?? maxMain) : caretCross,
+    isX ? caretCross : (containY ?? maxMain),
+  ] as Point;
 
   return {
-    size: [w, h],
+    size,
     sizes,
     offsets,
     renders,

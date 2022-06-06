@@ -186,7 +186,7 @@ fn trimAnchor(
   }
 
   return SolidVertex(
-    vec4<f32>(lineJoin, 1.0),
+    vec4<f32>(lineJoin, 1.0) * center4.w,
     color,
     uv,
     getLookup(cornerIndex),

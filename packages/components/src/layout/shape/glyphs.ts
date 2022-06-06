@@ -124,6 +124,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       id,
       rectangles,
       uvs,
+      // macOS-style font bleed
       border: [expand, Math.min(size / 32, 1.0) * 0.25, 0, 0],
       sdf: [radius, scale, size, 0],
       fill: color,

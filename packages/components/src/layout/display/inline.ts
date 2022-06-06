@@ -31,7 +31,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
     children,
   } = props;
 
-  const { margin, grow, shrink, inline } = useBoxTrait(props);
+  const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
   const padding = useProp(props.padding, parseMargin);
@@ -55,6 +55,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
         grow,
         shrink,
         inline,
+        flex,
         fit: memoFit((into: AutoPoint) => {
           const {size, sizes, ranges, offsets, anchors, renders, pickers, key} =
             fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
@@ -62,7 +63,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
           const blockSizes: Point[] = [];
           const blockOffsets: Point[] = [];
           const blockRenders: LayoutRenderer[] = [];
-          const blockPickers: LayoutPicker[] = [];
+          const blockPickers: (LayoutPicker | null | undefined)[] = [];
 
           let i = 0;
           for (const el of blockEls) {

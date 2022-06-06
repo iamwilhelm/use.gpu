@@ -1,7 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core/types';
-import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker } from '../types';
+import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
 
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
@@ -144,22 +144,22 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
-      const sizing = getBlockMinMax(els, NO_FIXED, direction);
+      const sizing = getBlockMinMax(els, NO_FIXED, [0, 0, 0, 0], direction);
       const [{margin, fit: fitBlock}, ...scrollBars] = els;
       const [ml, mt, mr, mb] = margin;
 
-      const scrollBarWidth  = hasScrollY ? scrollBars[hasScrollX ? 1 : 0].sizing[0] : 0;
-      const scrollBarHeight = hasScrollX ? scrollBars[0].sizing[1] : 0;
+      const scrollBarWidth  = hasScrollY ? scrollBars[hasScrollX ? 1 : 0].sizing[2] : 0;
+      const scrollBarHeight = hasScrollX ? scrollBars[0].sizing[3] : 0;
 
       return yeet({
         sizing,
         margin: NO_POINT4,
         stretch: true,
         fit: memoFit((into: AutoPoint) => {
-          const sizes   = [];
+          const sizes   = [] as Point[];
           const offsets = [] as Point[];
-          const renders = [];
-          const pickers = [] as (LayoutPicker | null)[];
+          const renders = [] as (LayoutRenderer[]);
+          const pickers = [] as (LayoutPicker | null | undefined)[];
 
           const fit = () => {
             sizes.length = 0;
@@ -170,15 +170,15 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
             const [shouldScrollX, shouldScrollY] = shouldScroll();
 
             const resolved: AutoPoint = isX
-              ? [null, into[1] - (shouldScrollX ? scrollBarHeight : 0)]
-              : [into[0] - (shouldScrollY ? scrollBarWidth : 0), null];
+              ? [null, into[1] != null ? into[1] - (shouldScrollX ? scrollBarHeight : 0) : null]
+              : [into[0] != null ? into[0] - (shouldScrollY ? scrollBarWidth : 0) : null, null];
 
             const {render, pick, size} = fitBlock(resolved);
 
             sizes.push(size);
-            offsets.push([ml, mt]) as Point[];
+            offsets.push([ml, mt]);
             renders.push(render);
-            pickers.push(pick) as (LayoutPicker | null)[];
+            pickers.push(pick);
 
             for (const {fit} of scrollBars) {
               const {render, pick, size} = fit(into);

@@ -110,5 +110,8 @@ export const resolveAbsoluteBox = (
   if (b != null && t == null && h == null) rect[1] = null;
   if (t != null && b == null && h == null) rect[2] = null;
 
+  if (l == null && r == null && w == null) rect[2] = null;
+  if (t == null && b == null && h == null) rect[3] = null;
+
   return rect;
 }

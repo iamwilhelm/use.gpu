@@ -25,11 +25,12 @@ const BOX_TRAIT = {
   grow: parseFloat,
   shrink: parseFloat,
   margin: parseMargin,
-  inline: parseBase,
+  inline: optional(parseBase),
+  flex: optional(parseAnchor),
 };
 
 const BOX_DEFAULTS = {
-  inline: 'center',
+  shrink: 1,
 };
 
 const IMAGE_TRAIT = {

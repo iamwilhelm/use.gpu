@@ -20,7 +20,7 @@ export const PAGES = [
   {path: "/geometry/faces", title: "Geometry - 3D Polygons"},
   {path: "/geometry/data", title: "Geometry - Data-driven Layers"},
   {path: "/layout/display", title: "Layout - Box model"},
-  {path: "/layout/align", title: "Layout - Align"},
+  {path: "/layout/align", title: "Layout - Alignment Tests"},
   {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
   {path: "/plot/simple", title: "Plot - Simple"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},

@@ -39,7 +39,6 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     var s = (d + expand / sdfConfig.y) / scale + 0.5 + bleed;
     sdf = SDF(s, s);
     
-//    if (texture.a == 0.0 && sdf.outer > 0.0) { sdf.outer = 0.5; }
     if (mode == -2) {
       fillColor = vec4<f32>(texture.rgb, fillColor.a);
     }

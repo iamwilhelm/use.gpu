@@ -1,6 +1,6 @@
 import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types';
 
-import { getHash, makeKey, getObjectKey, mixBits, scrambleBits } from '../util/hash';
+import { getHash, getHashValue, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
@@ -15,14 +15,17 @@ const LOAD_ARG = ['vec2<i32>', 'i32'];
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
-const getBindingKey = (b: DataBinding) =>
+const getTypeKey = (b: DataBinding) =>
   (+!!b.constant) +
   (+!!b.storage) * 2 +
   (+!!b.lambda) * 4 +
   (+!!b.texture) * 8 + 
   (+!!(b.storage?.volatile || b.texture?.volatile)) * 16;
 
-const getBindingsKey = (bs: DataBinding[]) => scrambleBits(bs.reduce((a, b) => mixBits(a, getBindingKey(b)), 0)) >>> 0;
+const getFormatKey = (b: DataBinding) => 
+  getHashValue(b.storage?.format ?? b.texture?.format);
+
+const getBindingsKey = (bs: DataBinding[]) => scrambleBits(bs.reduce((a, b) => mixBits(a, getTypeKey(b) ^ getFormatKey(b)), 0)) >>> 0;
 const getValueKey = (b: DataBinding) => getObjectKey(b.constant ?? b.storage ?? b.texture);
 
 export const makeBindingAccessors = (

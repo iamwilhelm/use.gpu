@@ -132,7 +132,7 @@ export const fitBlock = (
   let m = 0;
 
   // Resolved fit size
-  const resolved = fixed.slice();
+  const resolved = fixed.slice() as Point;
 
   if (shrinkWrap) {
     if (!isX && fixed[0] == null) resolved[0] = Math.min(into[0] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[2]), 0));

@@ -159,8 +159,6 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
           const pickers = [] as (LayoutPicker | null | undefined)[];
 
           const fit = () => {
-            console.log('fit');
-
             sizes.length = 0;
             offsets.length = 0;
             renders.length = 0;
@@ -196,7 +194,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
               },
             });
 
-            const outer = size.slice();
+            const outer = size.slice() as Point;
             if (shouldScrollY) outer[0] += scrollBarWidth;
             if (shouldScrollX) outer[1] += scrollBarHeight;
 

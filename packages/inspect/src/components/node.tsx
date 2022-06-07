@@ -40,7 +40,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   onMouseEnter,
   onMouseLeave,
 }, ref) => {
-  const {id, by, f, type, args, yeeted, __inspect} = fiber;
+  const {id, by, f, type, args, __inspect} = fiber;
 
   const yeet = type === YEET;
   const react = !!__inspect?.react;

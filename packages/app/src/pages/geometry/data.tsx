@@ -19,6 +19,7 @@ const lineDataFields = [
   ['array<vec3<f32>>', (o: any) => o.path],
   ['vec3<f32>', 'color'],
   ['f32', 'width'],
+  ['f32', 'zBias'],
 ] as DataField[];
 
 // Generate a line voxel grid 
@@ -46,6 +47,7 @@ const lineData = seq(20).map((i) => ({
   }, [] as number[][]),
   color: [Math.random()*Math.random(), Math.random(), Math.random()], 
   width: Math.random() * 20 + 1,
+  zBias: i / 100,
   loop: false,
 }));
 
@@ -84,12 +86,13 @@ export const GeometryDataPage: LC = () => {
             fields={lineDataFields}
             data={lineData}
             on={<LineSegments />}
-            render={(positions, colors, widths, segments) =>
+            render={(positions, colors, widths, zBiases, segments) =>
               <LineLayer
                 positions={positions}
                 colors={colors}
                 widths={widths}
                 segments={segments}
+                zBiases={zBiases}
                 join='round'
                 depth={0.9}
               />

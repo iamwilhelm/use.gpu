@@ -124,7 +124,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       offsets,
     },
   });
-  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0]));
+  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0], undefined, transform));
 
   // Add scroll listener
   out.push(keyed(Scroller, -2, pickers, flip, shift));

@@ -2,6 +2,7 @@ import { AggregateBuffer, UniformType } from './types';
 
 import { makeStorageBuffer, uploadBuffer } from './buffer';
 import {
+  alignSizeTo,
   makeDataArray,
   copyNumberArrayRange,
   copyNumberArrayRepeatedRange,
@@ -11,7 +12,6 @@ import {
 
 export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number): AggregateBuffer => {
   const {array, dims} = makeDataArray(format, length);
-  if (dims === 3) throw new Error("Dims must be 1, 2, or 4");
 
   const buffer = makeStorageBuffer(device, array.byteLength);
   const source = {

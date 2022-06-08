@@ -167,8 +167,6 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment, getId, isDebug, colorInput, colorSpace]);
   
-  console.log('--------')
-  
   // Inline the render fiber to avoid another memo()
   return render({
     vertexCount,

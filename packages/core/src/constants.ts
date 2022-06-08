@@ -180,6 +180,13 @@ export const UNIFORM_DIMS = {
   "mat3x4<f64>":  12,
   "mat4x3<f64>":  12,
   "mat4x4<f64>":  16,
+
+  // Virtual types
+  "u8": 1,
+  "i8": 1,
+  "u16": 1,
+  "i16": 1,
+  "vec3to4<f32>": 3,
 };
 
 export const UNIFORM_ARRAY_TYPES = {
@@ -227,6 +234,13 @@ export const UNIFORM_ARRAY_TYPES = {
   "mat3x4<f64>": Float64Array,
   "mat4x3<f64>": Float64Array,
   "mat4x4<f64>": Float64Array,
+
+  // Virtual types
+  "u8": Uint8Array,
+  "i8": Int8Array,
+  "u16": Uint16Array,
+  "i16": Int16Array,
+  "vec3to4<f32>": Float32Array,
 };
 
 export const TEXTURE_FORMAT_SIZES = {

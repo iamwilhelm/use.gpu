@@ -123,7 +123,7 @@ const makeUIAccumulator = (
   if (hasStroke) storage.strokes = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasFill) storage.fills = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasUV) storage.uvs = makeAggregateBuffer(device, 'vec4<f32>', count);
-  if (hasRepeat) storage.repeats = makeAggregateBuffer(device, 'i32', count);
+  if (hasRepeat) storage.repeats = makeAggregateBuffer(device, 'i8', count);
   if (hasSDF) storage.sdfs = makeAggregateBuffer(device, 'vec4<f32>', count);
 
   return (items: UIAggregate[]) => {

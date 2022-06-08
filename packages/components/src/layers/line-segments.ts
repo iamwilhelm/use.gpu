@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { StorageSource } from '@use-gpu/core/types';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
-import { getChunkCount, generateChunkSegments } from '@use-gpu/core';
+import { getChunkCount, generateChunkSegments, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 type LineSegmentsProps = {
@@ -22,7 +22,7 @@ export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
 
   // Make index data for line segments/anchor/trim data
   const [segmentBuffer, lookupBuffer] = useMemo(() => {
-    const segmentBuffer = new Int32Array(count);
+    const segmentBuffer = new Int8Array(alignSizeTo(count, 4));
     const lookupBuffer = new Uint32Array(count);
 
     generateChunkSegments(segmentBuffer, lookupBuffer, chunks, loops);
@@ -31,7 +31,7 @@ export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
   }, [chunks, loops, count]);
 
   // Bind as shader storage
-  const segments = useRawSource(segmentBuffer, 'i32');
+  const segments = useRawSource(segmentBuffer, 'i8');
   const lookups = useRawSource(lookupBuffer, 'u32');
 
   return render ? render(segments, lookups) : yeet([segments, lookups]);

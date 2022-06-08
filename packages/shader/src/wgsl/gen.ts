@@ -101,12 +101,12 @@ export const makeBindingAccessors = (
       else if (is8to32(format)) {
         const accessor = name + '8to32';
         program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
-        program.push(makeStorageAccessor(namespace, set, base, to32(format), to32(format), accessor));
+        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
       }
       else if (is16to32(format)) {
         const accessor = name + '16to32';
         program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
-        program.push(makeStorageAccessor(namespace, set, base, to32(format), to32(format), accessor));
+        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
       }
       else {
         program.push(makeStorageAccessor(namespace, set, base, type, format, name));
@@ -261,15 +261,15 @@ export const make8to32Accessor = (
   accessor: string,
 ) => `
 fn ${ns}${name}(i: u32) -> ${type} {
-  let b2 = i / 4u;
-  let f2 = i & 3u;
+  let b2 = i >> 2u;
+  let f4 = i & 3u;
 
-  let word = ${ns}${accessor}(b2);
+  let word = u32(${ns}${accessor}(b2));
   var v: ${format};
-  if (f2 == 3u) { v = ${format}(u32(word) >> 24u); }
-  if (f2 == 2u) { v = ${format}((u32(word) >> 16u) & 0xFFu); }
-  if (f2 == 1u) { v = ${format}((u32(word) >> 8u) & 0xFFu); }
-  else { v = ${format}(u32(word) & 0xFFu); }
+  if      (f4 == 3u) { v = ${format}((word >> 24u)); }
+  else if (f4 == 2u) { v = ${format}((word >> 16u) & 0xFFu); }
+  else if (f4 == 1u) { v = ${format}((word >> 8u) & 0xFFu); }
+  else               { v = ${format}((word & 0xFFu)); }
 
   return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
 }
@@ -283,13 +283,13 @@ export const make16to32Accessor = (
   accessor: string,
 ) => `
 fn ${ns}${name}(i: u32) -> ${type} {
-  let b2 = i / 2u;
+  let b2 = i >> 1u;
   let f2 = i & 1u;
 
-  let word = ${ns}${accessor}(b2);
+  let word = u32(${ns}${accessor}(b2));
   var v: ${format};
-  if (f2 == 1u) { v = ${format}(u32(word) >> 16u); }
-  else { v = ${format}(u32(word) & 0xFFFFu); }
+  if (f2 == 1u) { v = ${format}(word >> 16u); }
+  else { v = ${format}(word & 0xFFFFu); }
   
   return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
 }

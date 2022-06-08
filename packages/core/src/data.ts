@@ -10,12 +10,17 @@ const NO_ENDS = [] as [boolean, boolean][];
 
 const to4 = (dims: number) => dims === 3 ? 4 : dims;
 
+export const alignSizeTo = (n: number, s: number) => {
+  let f = n % s;
+  return f === 0 ? n : n + (s - f);
+};
+
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
 
   let dims = UNIFORM_DIMS[type];
 
-  const array = new ctor(length * to4(dims));
+  const array = new ctor(alignSizeTo(length * to4(dims), 4));
   return {array, dims};
 };
 

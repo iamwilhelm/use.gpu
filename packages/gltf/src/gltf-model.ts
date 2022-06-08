@@ -12,6 +12,8 @@ type GLTFModelProps = {
   nodes?: (number | string)[],
 };
 
+const NO_ROOTS: number[] = [];
+
 const toArray = (t?: T | T[] | null) => Array.isArray(t) ? t : t != null ? [t] : [];
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
@@ -23,7 +25,7 @@ export const GLTFModel: LC<GLTFModelProps> = (props) => {
     nodes: propNodes,
   } = props;
 
-  const roots = useMemo(() => {
+  return useMemo(() => {
     const {scenes, nodes} = gltf;
 
     const getNodeIndex = (id: number | string) => {
@@ -32,15 +34,15 @@ export const GLTFModel: LC<GLTFModelProps> = (props) => {
       return i >= 0 ? i : null;
     };
 
-    let roots;
-    if (propNode != null) return toArray(getNodeIndex(propNode));
-    if (propNodes != null) return propNodes.map(node => getNodeIndex(node)).filter(n => n != null);
+    let roots = NO_ROOTS;
+    if (propNode != null) roots = toArray(getNodeIndex(propNode));
+    else if (propNodes != null) root = propNodes.map(node => getNodeIndex(node)).filter(n => n != null);
+    else {
+      const s = propScene ?? gltf.scene;
+      if (s != null) roots = scenes[s]?.nodes ?? NO_ROOTS;
+      else roots = seq(nodes.length);
+    }
 
-    const s = propScene ?? gltf.scene;
-    if (s != null) return scenes[s]?.nodes ?? [];
-
-    return seq(nodes.length);
+    return Array.from(roots).map(root => use(GLTFNode, {gltf, node: root}));
   }, [gltf, propNode, propScene]);
-
-  return useOne(() => Array.from(roots).map(root => use(GLTFNode, {gltf, node: root})), roots);
 };

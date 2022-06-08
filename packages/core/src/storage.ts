@@ -46,10 +46,21 @@ export const checkStorageType = (
   uniform: UniformAttribute,
   link: StorageSource | null | undefined,
 ) => {
-  const {name, format} = uniform;
-  if (link && link.format !== format) {
-    if (format.replace(/vec[0-9]/, '') !== link.format.replace(/vec[0-9]/, '')) {
-      console.warn(`Invalid format ${link.format} bound for ${format} "${name}"`);
+  const {name, format: from} = uniform;
+  const to = link?.format;
+  if (link && from !== to) {
+    // Remove vec size to allow for automatic widening/narrowing
+    const fromVec = from.replace(/vec[0-9](to[0-9])?/, 'vec');
+    const toVec   =   to.replace(/vec[0-9](to[0-9])?/, 'vec'); 
+
+    if (fromVec !== toVec) {
+      // Remove bit size to allow for automatic widening/narrowing
+      const fromScalar = fromVec.replace(/([uif])([0-9]+)/, '$1__');
+      const toScalar   =   toVec.replace(/([uif])([0-9]+)/, '$1__');
+
+      if (fromScalar !== toScalar) {
+        console.warn(`Invalid format ${to} bound for ${from} "${name}" (${fromScalar} != ${toScalar})`);
+      }
     }
   }
 } 

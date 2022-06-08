@@ -105,18 +105,21 @@ export const render = (props: RenderProps) => {
   if (!pipeline) return;
   if (stale) return yeet(SUSPEND);
   
+  useMemo(() => console.log('new pipeline', pipeline, shader), pipeline);
+  
   // Uniforms
   const uniform = useMemo(() => {
     const defs = [viewDefs];
+    console.log('new uniforms', defs)
     return makeMultiUniforms(device, pipeline, defs as any, 0);
   }, [device, viewDefs, pipeline]);
 
   // Bound storage
   const force = !!volatiles.length;
-  const storage = useMemo(() =>
-    makeBoundUniforms(device, pipeline, uniforms, bindings, 1, force),
-    [device, pipeline, uniforms, bindings]
-  );
+  const storage = useMemo(() => {
+    console.log('new storage', bindings);
+    return makeBoundUniforms(device, pipeline, uniforms, bindings, 1, force);
+  }, [device, pipeline, uniforms, bindings]);
 
   // Volatile storage
   const volatile = useMemo(() =>

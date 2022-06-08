@@ -98,6 +98,7 @@ export const makeBoundUniforms = <T>(
     const uniformEntries = makeResourceEntries([{buffer}], entries.length);
     entries.push(...uniformEntries);
   }
+  console.log({entries})
 
   const bindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(set),

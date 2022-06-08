@@ -5,7 +5,7 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useMemo } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 
-import { FaceLayerProps, PBRMaterial, TransformContext, useBoundShader, useNoBoundShader } from '@use-gpu/components';
+import { FaceLayer, FaceLayerProps, PBRMaterial, TransformContext, useBoundShader, useNoBoundShader } from '@use-gpu/components';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
 import { useGLTFMaterial } from './gltf-material';
 
@@ -25,29 +25,28 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     transform,
   } = props;
 
-  const {bound: {accessors}} = gltf;
+  const {bound: {storage}} = gltf;
   const {attributes, indices, material, mode} = primitive;
   const {POSITION, NORMAL} = attributes;
 
-  const pbrMaterial = useGLTFMaterial(gltf, material);  
-  const render = null;
-
-  const mesh: Partial<FaceLayerProps> = {};
-  if (POSITION) mesh.positions = accessors[POSITION];
-  if (NORMAL) mesh.normals = accessors[NORMAL];
-  if (indices) mesh.indices = accessors[indices];
-  
+  const faces: Partial<FaceLayerProps> = {};
+  if (POSITION != null) faces.positions = storage[POSITION];
+  if (NORMAL   != null) faces.normals   = storage[NORMAL];
+  if (indices  != null) faces.indices   = storage[indices];
+    
+  const render = use(FaceLayer, faces);
 
   let view: LiveElement<any> = render;
   if (transform) {
-    const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, transform);
+    const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, [transform]);
     view = provide(TransformContext, xform, view);
   }
   else {
     useNoBoundShader();
   }
 
+  const pbrMaterial = useGLTFMaterial(gltf, material);  
   return (
-    use(PBRMaterial, pbrMaterial, view)
+    use(PBRMaterial, {...pbrMaterial, children: view})
   );
 };

@@ -3,10 +3,13 @@ import { GLTF, GLTFSceneData, GLTFNodeData, GLTFMeshData, GLTFMaterialData } fro
 import { toScene, toNode, toMesh, toMaterial } from './parse';
 
 import { use, gather, useContext, useOne } from '@use-gpu/live';
-import { DeviceContext, Fetch } from '@use-gpu/components';
+import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/components';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeCopyableTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture } from '@use-gpu/core';
 
 const GLTF_MAGIC = 0x46546C67;
+const STORAGE_ALIGNMENT = 256;
+const NO_BINDINGS: any[] = [];
 
 type GLTFDataProps = {
   url?: string,
@@ -91,9 +94,26 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         throw new Error('GLTF buffer without data');
       });
 
-      const bufferSources = gltf.bufferViews?.map(({buffer, byteOffset, byteLength}) => {
+      const bufferSources = gltf.bufferViews?.map(({buffer, byteOffset, byteLength, byteStride}, index) => {
+        if (byteStride != null && byteStride !== 1) throw new Error("byteStride != 1 not implemented");
+        
+        let gpuBuffer = gpuBuffers[buffer];
+        if (!gpuBuffer) return null;
+
+        if ((byteOffset % STORAGE_ALIGNMENT) !== 0) {
+          const i = bufferAssets.indexOf(buffers[buffer]);
+          const b = makeStorageBuffer(device, byteLength);
+
+          const arrayBuffer = bufferResources[i] as ArrayBuffer;
+          const arraySlice = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+
+          uploadBuffer(device, b, arraySlice);
+          gpuBuffer = b;
+          byteOffset = 0;
+        }
+
         const source = {
-          buffer: gpuBuffers[buffer],
+          buffer: gpuBuffer,
           format: '',
           length: 0,
           size: [0],
@@ -126,23 +146,40 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
           };
         }
       });
-      
-      gltf.bound = {
-        storage: gltf.accessors?.map(({bufferView, componentType, count, min, max, type}) => ({
-          ...bufferSources[bufferView],
-          format: accessorToType(type, componentType),
-          length: count,
-          size: [count],
-          min,
-          max,
-        })),
-        texture: gltf.textures?.map(({sampler, source}) => ({
-          ...imageTextures[source],
-          sampler: samplerToDescriptor(gltf.samplers[sampler]),
-        })),
-      };
 
-      return render(gltf);
+      const bound = {
+        storage: gltf.accessors?.map(({bufferView, componentType, count, min, max, type}) => {
+          const bufferSource = bufferSources[bufferView];
+          if (!bufferSource) return null;
+
+          const {byteLength, byteOffset} = bufferSources[bufferView];
+          const resource = bufferResources[gltf.bufferViews[bufferView].buffer];
+          const format = accessorToType(type, componentType);
+
+          return {
+            ...bufferSources[bufferView],
+            format: accessorToType(type, componentType),
+            length: count,
+            size: [count],
+            min,
+            max,
+          };
+        }) ?? NO_BINDINGS,
+        texture: gltf.textures?.map(({sampler, source}) => {
+          const imageSource = imageTextures[source];
+          if (!imageSource) return null;
+          
+          return {
+            ...imageTextures[source],
+            sampler: samplerToDescriptor(gltf.samplers[sampler]),
+          };
+        }) ?? NO_BINDINGS,
+      };
+      
+      return render({
+        ...gltf,
+        bound,
+      });
     };
 
     // Load external assets
@@ -232,7 +269,7 @@ const accessorToType = (boxType: string, componentType: string) => {
 
   if (boxType === 'SCALAR') return type;
   if (boxType === 'VEC2')   return `vec2<${type}>`;
-  if (boxType === 'VEC3')   return `vec3<${type}>`;
+  if (boxType === 'VEC3')   return `vec3to4<${type}>`;
   if (boxType === 'VEC4')   return `vec4<${type}>`;
   if (boxType === 'MAT2')   return `mat2x2<${type}>`;
   if (boxType === 'MAT3')   return `mat3x3<${type}>`;

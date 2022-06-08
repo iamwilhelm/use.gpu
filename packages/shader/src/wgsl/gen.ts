@@ -15,6 +15,14 @@ const LOAD_ARG = ['vec2<i32>', 'i32'];
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
+const is3to4 = (type: string) => type.match(/vec3to4</);
+const to3 = (type: string) => type.replace(/vec3to4</, 'vec3<');
+const to4 = (type: string) => type.replace(/vec3to4</, 'vec4<');
+
+const is8to32 = (type: string) => type.match(/^(u|i)8$/);
+const is16to32 = (type: string) => type.match(/^(u|i)16$/);
+const to32 = (type: string) => type.replace(/^([ui])[0-9]+/, '$132');
+
 const getTypeKey = (b: DataBinding) =>
   (+!!b.constant) +
   (+!!b.storage) * 2 +
@@ -84,7 +92,25 @@ export const makeBindingAccessors = (
       const {volatile, format} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
-      program.push(makeStorageAccessor(namespace, set, base, type, format, name));
+
+      if (is3to4(format)) {
+        const accessor = name + '3to4';
+        program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
+        program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor));
+      }
+      else if (is8to32(format)) {
+        const accessor = name + '8to32';
+        program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
+        program.push(makeStorageAccessor(namespace, set, base, to32(format), to32(format), accessor));
+      }
+      else if (is16to32(format)) {
+        const accessor = name + '16to32';
+        program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
+        program.push(makeStorageAccessor(namespace, set, base, to32(format), to32(format), accessor));
+      }
+      else {
+        program.push(makeStorageAccessor(namespace, set, base, type, format, name));
+      } 
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
@@ -163,7 +189,7 @@ export const makeStorageAccessor = (
 
 fn ${ns}${name}(index: u32) -> ${type} {
   ${format !== type ? 'let v =' : 'return'} ${ns}${name}Storage[index];
-${format !== type ? '  return ' + makeSwizzle(format, type, 'v') + ';\n' : ''
+${format !== type ? `  return ${makeSwizzle(format, type, 'v')};\n` : ''
 }}
 `;
 
@@ -199,6 +225,75 @@ ${hasCast ? '  return ' + makeSwizzle(shaderType, type, 'v') + ';\n' : ''
 }}
 `
 };
+
+export const makeVec3to4Accessor = (
+  ns: string,
+  type: string,
+  format: string,
+  name: string,
+  accessor: string,
+) => `
+fn ${ns}${name}(i: u32) -> ${type} {
+  let i3 = i * 3u;
+  let b = (i3 / 4u);
+
+  let b4 = (i3 / 4u) * 4u;
+  let f3 = i3 - b4;
+
+  let v1 = ${ns}${accessor}(b);
+  let v2 = ${ns}${accessor}(b + 1u);
+
+  var v: ${format};
+  if (f3 == 0u) { v = v1.xyz; }
+  else if (f3 == 1u) { v = v1.yzw; }
+  else if (f3 == 2u) { v = ${format}(v1.zw, v2.x); }
+  else { v = ${format}(v1.w, v2.xy); }
+  
+  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
+}
+`;
+
+export const make8to32Accessor = (
+  ns: string,
+  type: string,
+  format: string,
+  name: string,
+  accessor: string,
+) => `
+fn ${ns}${name}(i: u32) -> ${type} {
+  let b2 = i / 4u;
+  let f2 = i & 3u;
+
+  let word = ${ns}${accessor}(b2);
+  var v: ${format};
+  if (f2 == 3u) { v = ${format}(u32(word) >> 24u); }
+  if (f2 == 2u) { v = ${format}((u32(word) >> 16u) & 0xFFu); }
+  if (f2 == 1u) { v = ${format}((u32(word) >> 8u) & 0xFFu); }
+  else { v = ${format}(u32(word) & 0xFFu); }
+
+  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
+}
+`;
+
+export const make16to32Accessor = (
+  ns: string,
+  type: string,
+  format: string,
+  name: string,
+  accessor: string,
+) => `
+fn ${ns}${name}(i: u32) -> ${type} {
+  let b2 = i / 2u;
+  let f2 = i & 1u;
+
+  let word = ${ns}${accessor}(b2);
+  var v: ${format};
+  if (f2 == 1u) { v = ${format}(u32(word) >> 16u); }
+  else { v = ${format}(u32(word) & 0xFFFFu); }
+  
+  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
+}
+`;
 
 export const TEXTURE_SHADER_TYPES = {
   // 8-bit formats

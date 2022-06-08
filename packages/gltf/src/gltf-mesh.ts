@@ -19,9 +19,10 @@ export const GLTFMesh: LC<GLTFMeshProps> = (props) => {
     transform,
   } = props;
 
-  const {primitives} = gltf.meshes[mesh];
+  const {meshes} = gltf;
+  const {primitives} = meshes[mesh];
 
   return useMemo(() =>
     primitives.map(primitive => use(GLTFPrimitive, {gltf, primitive, transform})),
-    [primitives, transform]);
+    [gltf, primitives, transform]);
 };

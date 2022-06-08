@@ -23,7 +23,6 @@ export const useGLTFMaterial = (
   } = gltf.materials[material];
 
   const props: Partial<PBRMaterialProps> = {};
-  console.log('material', gltf.materials[material])
 
   if (pbrMetallicRoughness) {
     const {

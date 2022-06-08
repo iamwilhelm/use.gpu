@@ -100,7 +100,7 @@ export const useRenderPipelineAsync = (
   );
 
   const [resolved, setResolved] = useState<GPURenderPipeline | null>(null);
-  const staleRef = useOne(() => ({current: false}));
+  const staleRef = useOne(() => ({current: null}));
 
   const immediate = useMemo(() => {
     // Cache by unique render context
@@ -143,16 +143,19 @@ export const useRenderPipelineAsync = (
     }
 
     // Mark current pipeline as stale (if any)
-    staleRef.current = true;
+    const resolve = (pipeline: GPURenderPipeline) => {
+      if (staleRef.current === key) {
+        setResolved(pipeline);
+        staleRef.current = null;
+      }
+      return pipeline;
+    };
+    staleRef.current = key;
     DEBUG && console.log('async pipeline miss', key)
 
     // Mark key as pending
     if (pending!.has(key)) {
-      pending!.get(key)!.then((pipeline: GPURenderPipeline) => {
-        staleRef.current = false;
-        setResolved(pipeline);
-        return pipeline;
-      });
+      pending!.get(key)!.then((pipeline: GPURenderPipeline) => resolve(pipeline));
       return null;
     }
 
@@ -168,12 +171,9 @@ export const useRenderPipelineAsync = (
       DEBUG && console.log('async pipeline resolved', key)
 
       cache!.set(key, pipeline);
-      staleRef.current = false;
       pending!.delete(key);
 
-      setResolved(pipeline);
-
-      return pipeline;
+      return resolve(pipeline);
     });
     pending!.set(key, promise);
 
@@ -181,7 +181,7 @@ export const useRenderPipelineAsync = (
   }, [memoKey, shader, samples]);
 
   DEBUG && console.log('async pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
-  return [immediate ?? resolved, staleRef.current];
+  return [immediate ?? resolved, !!staleRef.current];
 };
 
 export const setShaderLog = (n: number) => SHADER_LOG = new LRU<string, any>({ max: n });

@@ -31,6 +31,8 @@ export const bindingsToLinks = (
 export const sourceToModule = <T>(
   source: ShaderModule | LambdaSource<T> | StorageSource | TextureSource | any,
 ): ShaderModule | null => {
+  if (source == null) return null;
+
   const s = source as any;
   if (s.shader) return s.shader as ShaderModule;
   else if (s.table || s.libs) return source as ShaderModule;

@@ -40,6 +40,25 @@ export const makeRenderTexture = (
   return texture;
 }
 
+export const makeCopyableTexture = (
+  device: GPUDevice,
+  width: number,
+  height: number,
+  format: GPUTextureFormat,
+  samples: number = 1
+): GPUTexture => {
+  const texture = device.createTexture({
+    // @ts-ignore
+    size: [width, height, 1],
+    sampleCount: samples,
+    format,
+    // @ts-ignore
+    usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+  });
+
+  return texture;
+}
+
 export const makeRenderableTexture = (
   device: GPUDevice,
   width: number,
@@ -120,7 +139,7 @@ export const makeDynamicTexture = (
 
 export const makeRawTexture = (
   device: GPUDevice,
-  dataTexture: DataTexture,
+  dataTexture: DataTexture | ExternalTexture,
 ) => {
   const {size, format} = dataTexture;
   const [w, h, d] = size as Point3;
@@ -184,6 +203,19 @@ export const uploadTexture = (
 
   // @ts-ignore
   device.queue.writeTexture(copy, data, layout, extent);
+}
+
+export const uploadExternalTexture = (
+  device: GPUDevice,
+  texture: GPUTexture,
+  source: any,
+  size: Point | Point3,
+): void => {
+
+  const [w, h, d] = size as Point3;
+  const extent = [w, h, d || 1];
+
+  device.queue.copyExternalImageToTexture({ source }, { texture }, extent);
 }
 
 export const resizeTextureSource = (

@@ -2163,11 +2163,6 @@
     "@webassemblyjs/wast-parser" "1.9.1"
     "@xtuc/long" "4.2.2"
 
-"@webgpu/glslang@^0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@webgpu/glslang/-/glslang-0.0.15.tgz#f5ccaf6015241e6175f4b90906b053f88483d1f2"
-  integrity sha512-niT+Prh3Aff8Uf1MVBVUsaNjFj9rJAKDXuoHIKiQbB+6IUP/3J3JIhBNyZ7lDhytvXxw6ppgnwKZdDJ08UMj4Q==
-
 "@webgpu/types@^0.1.9":
   version "0.1.13"
   resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.13.tgz#afb6ac170884b29bc8f05e68fac74835b92acb9f"

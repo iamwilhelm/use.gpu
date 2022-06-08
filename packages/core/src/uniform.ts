@@ -165,7 +165,11 @@ export const makeDataBindingsEntries = <T>(
   for (const b of bindings) {
     if (b.storage) {
       const {storage} = b;
-      entries.push({binding, resource: {buffer: storage.buffer}});
+      entries.push({binding, resource: {
+        buffer:     storage.buffer,
+        offset:     storage.byteOffset,
+        byteLength: storage.byteLength,
+      }});
       binding++;
     }
     else if (b.texture) {

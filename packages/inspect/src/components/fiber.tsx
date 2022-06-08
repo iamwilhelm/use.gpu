@@ -212,7 +212,6 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       }
       if (parent) {
         const container = parent.getBoundingClientRect();
-        console.log({container, rect})
 
         if (rect.left < container.left || rect.right > container.right) {
           parent.scrollLeft += rect.left - container.left - 50;
@@ -306,9 +305,9 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   let nextRender = null as React.ReactElement | null;
   if (next) {
     childRender = shouldRender ? (
-      <TreeIndent indent={indent + .5}>
+      <TreeIndent indent={indent + .5 + (continuation ? 1 : 0)}>
         <TreeLine>
-          <TreeIndent indent={-indent - .5}>
+          <TreeIndent indent={-indent - .5 - (continuation ? 1 : 0)}>
             {out}
           </TreeIndent>
         </TreeLine>
@@ -324,7 +323,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
         continuation
-        indent={indent - +!!out.length}
+        indent={indent - +!!out.length + (continuation ? 1 : 0)}
       />
     );
   }

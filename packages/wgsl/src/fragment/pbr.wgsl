@@ -89,7 +89,7 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   var G = smithGGXCorrelated(dotNL, dotNV, alpha);
   //float G2 = geometricGGX(dotNL, dotNV, alpha);
   
-  var Fd = albedo * fdBurley(dotNL, dotNV, dotLH, alpha);
+  var Fd = diffuseColor * fdBurley(dotNL, dotNV, dotLH, alpha);
   var Fs = F * D * G;
 
   var direct = (Fd + Fs) * radiance * dotNL;

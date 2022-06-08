@@ -38,25 +38,25 @@ export const App: LC = () => {
       family: 'Lato',
       weight: 400,
       style: 'normal',
-      src: '/Lato-Regular.ttf',
+      src: '/fonts/Lato-Regular.ttf',
     },
     {
       family: 'Lato',
       weight: 400,
       style: 'italic',
-      src: '/Lato-Italic.ttf',
+      src: '/fonts/Lato-Italic.ttf',
     },
     {
       family: 'Lato',
       weight: 500,
       style: 'normal',
-      src: '/Lato-Bold.ttf',
+      src: '/fonts/Lato-Bold.ttf',
     },
     {
       family: 'Noto Emoji',
       weight: 400,
       style: 'normal',
-      src: '/NotoColorEmoji.ttf',
+      src: '/fonts/NotoColorEmoji.ttf',
     },
   ]);
 

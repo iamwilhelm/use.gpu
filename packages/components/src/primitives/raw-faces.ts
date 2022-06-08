@@ -19,7 +19,6 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
-import { getShadedFragment } from '@use-gpu/wgsl/instance/fragment/shaded.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 export type RawFacesProps = {
@@ -46,7 +45,6 @@ export type RawFacesProps = {
 const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
-const FRAGMENT_BINDINGS = bundleToAttributes(getShadedFragment);
 
 const PIPELINE = {
   primitive: {
@@ -98,10 +96,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const defines = useOne(() => ({ HAS_INDICES: hasIndices }), hasIndices);
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c, i, l]);
-  const getFragment = shaded
-    ? useBoundShader(getShadedFragment, FRAGMENT_BINDINGS, [m])
-    : (useNoBoundShader() as any) ?? getPassThruFragment;
-  
+  const getFragment = shaded ? m : getPassThruFragment;
+
   return (
     use(Virtual, {
       vertexCount,

@@ -46,8 +46,7 @@ export const makePresentationContext = (
     device,
     format,
     usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST,
-    compositingAlphaMode: "opaque",
-    //viewFormats: [format, format + '-srgb'],
+    alphaMode: "premultiplied",
   };
 
   // @ts-ignore

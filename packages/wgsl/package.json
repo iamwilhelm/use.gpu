@@ -73,6 +73,11 @@
       "import": "./src/geometry/trim.wgsl",
       "require": "./src/geometry/trim.wgsl"
     },
+    "./instance/fragment/mapped.wgsl": {
+      "types": "./src/instance/fragment/mapped.wgsl.d.ts",
+      "import": "./src/instance/fragment/mapped.wgsl",
+      "require": "./src/instance/fragment/mapped.wgsl"
+    },
     "./instance/fragment/shaded.wgsl": {
       "types": "./src/instance/fragment/shaded.wgsl.d.ts",
       "import": "./src/instance/fragment/shaded.wgsl",

@@ -95,8 +95,11 @@ export type StorageSource = {
   format: any,
   length: number,
   size: number[],
-  volatile?: number,
   version: number,
+
+  volatile?: number,
+  byteOffset?: number,
+  byteLength?: number,
 };
 
 export type LambdaSource<T = any> = {

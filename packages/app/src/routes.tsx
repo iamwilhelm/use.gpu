@@ -2,6 +2,7 @@ import React from '@use-gpu/live/jsx';
 
 import { GeometryDataPage } from './pages/geometry/data';
 import { GeometryFacesPage } from './pages/geometry/faces';
+import { GeometryGLTFPage } from './pages/geometry/gltf';
 import { GeometryLinesPage } from './pages/geometry/lines';
 import { DebugAtlasPage } from './pages/debug/atlas';
 import { DebugGlyphPage } from './pages/debug/glyph';
@@ -19,6 +20,7 @@ export const PAGES = [
   {path: "/geometry/lines", title: "Geometry - 3D Lines and Arrows"},
   {path: "/geometry/faces", title: "Geometry - 3D Polygons"},
   {path: "/geometry/data", title: "Geometry - Data-driven Layers"},
+  {path: "/geometry/gltf", title: "Geometry - GLTF"},
   {path: "/layout/display", title: "Layout - Box model"},
   {path: "/layout/align", title: "Layout - Alignment Tests"},
   {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
@@ -33,6 +35,7 @@ export const PAGES = [
 export const makeRoutes = () => ({
   "/geometry/data":  { element: <GeometryDataPage /> },
   "/geometry/faces": { element: <GeometryFacesPage /> },
+  "/geometry/gltf":  { element: <GeometryGLTFPage /> },
   "/geometry/lines": { element: <GeometryLinesPage /> },
   "/layout/display": { element: <LayoutDisplayPage /> },
   "/layout/align":   { element: <LayoutAlignPage /> },

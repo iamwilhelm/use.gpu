@@ -170,8 +170,11 @@ export type StorageSource = {
   format: string,
   length: number,
   size: number[],
-  volatile?: number,
   version: number,
+
+  volatile?: number,
+  byteOffset?: number,
+  byteLength?: number,
 };
 
 export type LambdaSource<T = any> = {
@@ -197,6 +200,12 @@ export type TextureSource = {
 
 export type DataTexture = {
   data: TypedArray,
+  format: GPUTextureFormat,
+  size: [number, number] | [number, number, number],
+  colorSpace?: ColorSpace,
+};
+
+export type ExternalTexture = {
   format: GPUTextureFormat,
   size: [number, number] | [number, number, number],
   colorSpace?: ColorSpace,

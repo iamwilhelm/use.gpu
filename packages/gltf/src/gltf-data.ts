@@ -1,11 +1,15 @@
 import { LC, LiveElement } from '@use-gpu/live/types';
+import { StorageSource } from '@use-gpu/core/types';
 import { GLTF, GLTFSceneData, GLTFNodeData, GLTFMeshData, GLTFMaterialData } from './types';
 import { toScene, toNode, toMesh, toMaterial } from './parse';
 
-import { use, gather, useContext, useOne } from '@use-gpu/live';
+import { use, gather, useContext, useOne, useMemo } from '@use-gpu/live';
+
 import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/components';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { makeCopyableTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture } from '@use-gpu/core';
+import { makeCopyableTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
+
+import { generateTangents } from 'mikktspace';
 
 const GLTF_MAGIC = 0x46546C67;
 const STORAGE_ALIGNMENT = 256;
@@ -58,7 +62,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
       const buffers = (json?.buffers ?? []);
       const images  = (json?.images ?? []);
 
-      const bufferAssets  = buffers.filter(({uri}) => uri != null);
+      const bufferAssets = buffers.filter(({uri}) => uri != null);
       const imageAssets  = images.filter(({uri}) => uri != null);
 
       const scenes:    GLTFSceneData    = (json?.scenes    ?? []).map(toScene);
@@ -79,103 +83,155 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
   
     const Resume = (resources: (ArrayBuffer | Image)[]) => {
       const n = bufferAssets.length;
-      const bufferResources = resources.slice(0, n);
-      const imageResources = resources.slice(n);
 
-      const gpuBuffers: GPUBuffer[] = buffers.map((buffer) => {
-        const i = bufferAssets.indexOf(buffer);
-        if (i >= 0) {
-          if (!resources[i]) return null;
+      const bufferAssetIndices = buffers.map(b => bufferAssets.indexOf(b));
+      const imageAssetIndices = images.map(i => imageAssets.indexOf(i));
 
-          const b = makeStorageBuffer(device, buffer.byteLength);
-          uploadBuffer(device, b, bufferResources[i] as ArrayBuffer);
-          return b;
-        }
-        throw new Error('GLTF buffer without data');
-      });
+      // Gather raw arraybuffers / image resources
+      const [bufferResources, imageResources] = useOne(() => [
+        resources.slice(0, n),
+        resources.slice(n),
+      ], resources);
 
-      const bufferSources = gltf.bufferViews?.map(({buffer, byteOffset, byteLength, byteStride}, index) => {
-        if (byteStride != null && byteStride !== 1) throw new Error("byteStride != 1 not implemented");
-        
-        let gpuBuffer = gpuBuffers[buffer];
-        if (!gpuBuffer) return null;
+      const { accessors, bufferViews, samplers, textures } = gltf;
 
-        if ((byteOffset % STORAGE_ALIGNMENT) !== 0) {
-          const i = bufferAssets.indexOf(buffers[buffer]);
-          const b = makeStorageBuffer(device, byteLength);
+      // Upload all buffers as-is
+      const gpuBuffers = useMap(buffers,
+        (buffer, index) => {
+          const i = bufferAssetIndices[index];
+          if (i >= 0) {
+            if (!bufferResources[i]) return null;
 
-          const arrayBuffer = bufferResources[i] as ArrayBuffer;
-          const arraySlice = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+            const b = makeStorageBuffer(device, buffer.byteLength);
+            uploadBuffer(device, b, bufferResources[i] as ArrayBuffer);
+            return b;
+          }
+          else throw new Error('GLTF buffer without data');
+        },
+        (buffer, index) => bufferResources[bufferAssetIndices[index]],
+        [buffers]);
 
-          uploadBuffer(device, b, arraySlice);
-          gpuBuffer = b;
-          byteOffset = 0;
-        }
+      console.log({gpuBuffers, buffers, bufferAssets, bufferResources})
 
-        const source = {
-          buffer: gpuBuffer,
-          format: '',
-          length: 0,
-          size: [0],
-          version: 0,
+      // Convert bufferviews to storage source templates
+      const bufferSources = useMap(bufferViews,
+        ({buffer, byteOffset, byteLength, byteStride}, index) => {
+          if (byteStride != null && byteStride !== 1) throw new Error("byteStride != 1 not implemented");
+      
+          let gpuBuffer = gpuBuffers[buffer];
+          if (!gpuBuffer) return null;
 
-          byteOffset,
-          byteLength,
-        };
-        return source;
-      });
+          let arrayBuffer = bufferResources[bufferAssetIndices[buffer]];
 
-      const imageTextures = images.map((image) => {
-        const i = imageAssets.indexOf(image);
-        if (i >= 0) {
-          const bitmap = imageResources[i];
-          if (!bitmap) return null;
+          // If GLTF alignment is too loose, slice and re-upload.
+          if ((byteOffset % STORAGE_ALIGNMENT) !== 0) {
+            const b = makeStorageBuffer(device, byteLength);
 
-          const size = [bitmap.width, bitmap.height];
-          const format = 'rgba8unorm';
-          const colorSpace = 'native';
+            const arraySlice = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
 
-          const texture = makeCopyableTexture(device, bitmap.width, bitmap.height, format);
-          uploadExternalTexture(device, texture, bitmap, size);
+            uploadBuffer(device, b, arraySlice);
+            gpuBuffer = b;
+            byteOffset = 0;
+
+            arrayBuffer = arraySlice;
+          }
 
           return {
-            texture,
-            format,
-            size,
-            colorSpace,
-          };
-        }
-      });
+            buffer: gpuBuffer,
+            arrayBuffer,
 
-      const bound = {
-        storage: gltf.accessors?.map(({bufferView, componentType, count, min, max, type}) => {
+            format: '',
+            length: 0,
+            size: [0],
+            version: 0,
+
+            byteOffset,
+            byteLength,
+          };
+        },
+        ({buffer}, index) => gpuBuffers[buffer],
+        [bufferViews]);
+
+      // Convert accessors to storage sources
+      const storageSources = useMap(accessors,
+        ({bufferView, componentType, count, min, max, type}, index) => {
           const bufferSource = bufferSources[bufferView];
           if (!bufferSource) return null;
 
-          const {byteLength, byteOffset} = bufferSources[bufferView];
-          const resource = bufferResources[gltf.bufferViews[bufferView].buffer];
+          const {byteLength, byteOffset} = bufferSource;
           const format = accessorToType(type, componentType);
 
           return {
-            ...bufferSources[bufferView],
+            ...bufferSource,
             format: accessorToType(type, componentType),
             length: count,
             size: [count],
             min,
             max,
           };
-        }) ?? NO_BINDINGS,
-        texture: gltf.textures?.map(({sampler, source}) => {
-          const imageSource = imageTextures[source];
+        },
+        ({bufferView}) => bufferSources[bufferView],
+        [accessors]);
+
+      // Expose native typed arrays for further processing before upload
+      const typedData = useMap(storageSources,
+        (source, index) => {
+          if (!source) return null;
+
+          const ctor = UNIFORM_ARRAY_TYPES[source.format];
+          const {arrayBuffer} = source;
+          return arrayBuffer ? new ctor(arrayBuffer) : null;
+        },
+        (source) => source,
+        []);
+
+      // Convert images to external textures
+      const imageSources = useMap(images,
+        (image, index) => {
+          const i = imageAssetIndices[index];
+          if (i >= 0) {
+            const bitmap = imageResources[i];
+            if (!bitmap) return null;
+
+            const size = [bitmap.width, bitmap.height];
+            const format = 'rgba8unorm';
+            const colorSpace = 'native';
+
+            const texture = makeCopyableTexture(device, bitmap.width, bitmap.height, format);
+            uploadExternalTexture(device, texture, bitmap, size);
+
+            return {
+              texture,
+              format,
+              size,
+              colorSpace,
+              layout: 'texture_2d<f32>',
+            };
+          }
+        },
+        (image, index) => imageResources[imageAssetIndices[index]],
+        [images]);
+
+      // Convert textures to texture sources
+      const textureSources = useMap(textures,
+        ({sampler, source}, index) => {
+          const imageSource = imageSources[source];
           if (!imageSource) return null;
-          
-          return {
-            ...imageTextures[source],
-            sampler: samplerToDescriptor(gltf.samplers[sampler]),
-          };
-        }) ?? NO_BINDINGS,
-      };
       
+          return {
+            ...imageSource,
+            sampler: samplerToDescriptor(samplers[sampler]),
+          };
+        },
+        ({source}, index) => imageSources[source],
+        [textures]);
+
+      const bound = {
+        data: typedData,
+        storage: storageSources,
+        texture: textureSources,
+      };
+
       return render({
         ...gltf,
         bound,
@@ -221,30 +277,30 @@ const samplerToDescriptor = (sampler: any): GPUSamplerDescriptor => {
   const min =
     minFilter === 9728 ? 'nearest' :
     minFilter === 9729 ? 'linear'  :
-    minFilter === 9984 ? 'nearest' : undefined;
-    minFilter === 9985 ? 'linear'  : undefined;
-    minFilter === 9986 ? 'nearest' : undefined;
-    minFilter === 9987 ? 'linear'  : undefined;
+    minFilter === 9984 ? 'nearest' :
+    minFilter === 9985 ? 'linear'  :
+    minFilter === 9986 ? 'nearest' :
+    minFilter === 9987 ? 'linear'  : 'linear';
   
   const mag =
     magFilter === 9728 ? 'nearest' :
-    magFilter === 9729 ? 'linear'  : undefined;
+    magFilter === 9729 ? 'linear'  : 'linear';
 
   const mip =
-    minFilter === 9984 ? 'nearest' : undefined;
-    minFilter === 9985 ? 'nearest' : undefined;
-    minFilter === 9986 ? 'linear'  : undefined;
-    minFilter === 9987 ? 'linear'  : undefined;
+    minFilter === 9984 ? 'nearest' :
+    minFilter === 9985 ? 'nearest' :
+    minFilter === 9986 ? 'linear'  :
+    minFilter === 9987 ? 'linear'  : 'linear';
   
   const addressModeU =
     wrapS === 33071 ? 'clamp-to-edge' :
     wrapS === 33648 ? 'mirror-repeat' :
-    wrapS === 10497 ? 'repeat' : undefined;
+    wrapS === 10497 ? 'repeat' : 'repeat'
 
   const addressModeV =
     wrapT === 33071 ? 'clamp-to-edge' :
     wrapT === 33648 ? 'mirror-repeat' :
-    wrapT === 10497 ? 'repeat' : undefined;
+    wrapT === 10497 ? 'repeat' : 'repeat';
   
   return {
     minFilter: min,
@@ -276,4 +332,27 @@ const accessorToType = (boxType: string, componentType: string) => {
   if (boxType === 'MAT4')   return `mat4x4<${type}>`;
 
   throw new Error(`Unsupported GLTF accessor type ${boxType}`);
+};
+
+const NO_DEPS: any = [];
+const useMap = <A, B>(
+  args: A[] | null | undefined,
+  map: (a: A, i: number) => B,
+  key: (a: A, i: number) => any,
+  deps: any[] = NO_DEPS,
+): B[] | null => {
+  
+  const values = useMemo(() => args?.map(() => null), deps);
+  const keys = useMemo(() => args?.map(() => null), deps);
+
+  if (!values) return null;
+
+  const n = args.length;
+  for (let i = 0; i < n; ++i) {
+    const k = key(args[i], i);
+    if (k !== keys[i]) values[i] = map(args[i], i);
+  }
+  if (values.length !== n) values.length = n;
+
+  return values;
 };

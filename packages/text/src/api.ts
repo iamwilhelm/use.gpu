@@ -1,8 +1,6 @@
 import { Font, FontProps, FontMetrics, SpanMetrics, GlyphMetrics, RustTextAPI } from './types';
 import { getHashValue } from '@use-gpu/state';
-
-// @ts-ignore
-let UseRustText: typeof import('../pkg');
+import { UseRustText } from '../pkg';
 
 const DEFAULT_FONTS = {
   "0": {
@@ -13,12 +11,7 @@ const DEFAULT_FONTS = {
 } as Record<string, FontProps>;
 
 export const RustText = async (): Promise<RustTextAPI> => {
-  if (!UseRustText) {
-    // @ts-ignore
-    ({UseRustText} = await import('../pkg'));
-  }
 
-  // @ts-ignore
   const useRustText = UseRustText.new();
 
   let fontMap = new Map<number, FontProps>();
@@ -84,7 +77,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
   }
 
   const measureSpans = (fontStack: number[], text: Uint16Array, size: number): SpanMetrics => {
-    const s = useRustText.measure_spans(fontStack, text, size);
+    const s = useRustText.measure_spans(new Float64Array(fontStack), text, size);
     return {
       breaks: new Uint32Array(s.breaks.buffer),
       metrics: new Float32Array(s.metrics.buffer),
@@ -97,7 +90,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
   }
 
   const findGlyph = (fontId: number, char: string): number => {
-    const {glyphs} = useRustText.measure_spans([fontId], packString(char), 16);
+    const {glyphs} = useRustText.measure_spans(new Float64Array([fontId]), packString(char), 16);
     const array = new Uint32Array(glyphs.buffer);
     return array[1];
   };

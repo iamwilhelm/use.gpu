@@ -27,10 +27,9 @@ export const GeometryGLTFPage: LC = () => {
 
         <GLTFData
           url={url}
-          render={(gltf: GLTFData) => {
-            console.log('gltf data', gltf);
-            return <GLTFModel gltf={gltf} />;
-          }}
+          render={(gltf: GLTFData) =>
+            <GLTFModel gltf={gltf} />
+          }
         />
 
       </Pass>

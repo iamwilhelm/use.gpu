@@ -62,5 +62,8 @@ const hookToObject = (
   if (type === Hook.CONSUMER) {
     return {consumer: b?.displayName};
   }
+  if (type === Hook.VERSION) {
+    return {version: b, value: a};
+  }
   return null;
 }

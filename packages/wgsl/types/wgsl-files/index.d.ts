@@ -119,13 +119,6 @@ declare module "@use-gpu/wgsl/instance/interleave.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/vec3to4.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getVec3to4: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/instance/vertex/arrow.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -383,6 +376,13 @@ declare module "@use-gpu/wgsl/transform/cartesian.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const getCartesianPosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/normal.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getTransformedNormal: ParsedBundle;
   export default __module;
 }
 

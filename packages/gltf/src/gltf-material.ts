@@ -22,7 +22,10 @@ export const useGLTFMaterial = (
     doubleSided,
   } = gltf.materials[material];
 
-  const props: Partial<PBRMaterialProps> = {};
+  const props: Partial<PBRMaterialProps> = {
+    metalness: 0.0,
+    roughness: 0.5,
+  };
 
   if (pbrMetallicRoughness) {
     const {
@@ -33,8 +36,25 @@ export const useGLTFMaterial = (
       metallicRoughnessTexture,
     } = pbrMetallicRoughness;
 
-    if (baseColorFactor) props.albedo = baseColorFactor;
-    if (baseColorTexture) {
+    if (baseColorTexture != null) {
+      const map = gltf.bound.texture[baseColorTexture.index];
+      props.albedoMap = map;
+    }
+    if (baseColorFactor != null) {
+      props.albedo = baseColorFactor;
+    }
+
+    if (metallicRoughnessTexture != null) {
+      const map = gltf.bound.texture[metallicRoughnessTexture.index];
+      const gain = [1, metallicFactor ?? 1, roughnessFactor ?? 1, 1];
+      
+      props.metalnessRoughnessMap = map;
+    }
+    if (metallicFactor != null) {
+      props.metalness = metallicFactor;
+    }
+    if (roughnessFactor != null) {
+      props.roughness = roughnessFactor;
     }
   }
   

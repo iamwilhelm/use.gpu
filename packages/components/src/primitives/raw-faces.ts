@@ -24,11 +24,15 @@ import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
 export type RawFacesProps = {
   position?: number[] | TypedArray,
   normal?: number[] | TypedArray,
+  tangent?: number[] | TypedArray,
+  uv?: number[] | TypedArray,
   segment?: number,
   color?: number[] | TypedArray,
 
   positions?: ShaderSource,
   normals?: ShaderSource,
+  tangents?: ShaderSource,
+  uvs?: ShaderSource,
   segments?: ShaderSource,
   colors?: ShaderSource,
 
@@ -83,6 +87,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const p = useShaderRef(props.position, props.positions);
   const n = useShaderRef(props.normal, props.normals);
+  const t = useShaderRef(props.tangent, props.tangents);
+  const u = useShaderRef(props.uv, props.uvs);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
 
@@ -95,7 +101,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const hasIndices = !!props.indices;
   const defines = useOne(() => ({ HAS_INDICES: hasIndices }), hasIndices);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, g, c, i, l]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, t, u, g, c, i, l]);
   const getFragment = shaded ? m : getPassThruFragment;
 
   return (

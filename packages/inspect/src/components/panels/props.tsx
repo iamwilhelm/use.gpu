@@ -1,4 +1,5 @@
 import { LiveFiber } from '@use-gpu/live/types';
+import { TypedArray } from '@use-gpu/core/types';
 import { formatNode, formatValue, formatNodeName, YEET } from '@use-gpu/live';
 import { styled as _styled } from '@stitches/react';
 
@@ -120,8 +121,15 @@ export const inspectObject = (
   if (seen.has(object)) return '{Circular}';
   seen.add(object);
 
-  if (Array.isArray(object)) if (object.reduce((b, o) => b && typeof o === 'number', true)) {
-    return `[${object.join(', ')}]`;
+  if (Array.isArray(object)) {
+    if (object.reduce((b, o) => b && typeof o === 'number', true)) {
+      return `[${object.join(', ')}]`;
+    }
+    if (object.length > 100) object = object.slice(0, 100);
+  }
+  
+  if (object instanceof Float32Array) {
+    if (object.length > 100) object = object.slice(0, 100);
   }
 
   if (object instanceof Map) {

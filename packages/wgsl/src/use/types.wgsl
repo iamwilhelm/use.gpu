@@ -14,6 +14,7 @@
   position: vec4<f32>,
   world: vec4<f32>,
   normal: vec3<f32>,
+  tangent: vec3<f32>,
   color: vec4<f32>,
   uv: vec2<f32>,
 

@@ -1,9 +1,9 @@
 import { StorageSource, UniformType, TypedArray } from '@use-gpu/core/types';
 
-import { useContext, useOne, useMemo, useNoOne, useNoMemo, incrementVersion } from '@use-gpu/live';
+import { useContext, useOne, useMemo, useNoContext, useNoOne, useNoMemo, incrementVersion } from '@use-gpu/live';
 import { makeStorageBuffer, uploadBuffer, UNIFORM_DIMS } from '@use-gpu/core';
 import { DeviceContext } from '../providers/device-provider';
-import { useBufferedSize } from './useBufferedSize';
+import { useBufferedSize, useNoBufferedSize } from './useBufferedSize';
 
 // Turn a typed array into a storage source
 export const useRawSource = (array: TypedArray, format: UniformType, live: boolean = false) => {
@@ -40,3 +40,11 @@ export const useRawSource = (array: TypedArray, format: UniformType, live: boole
 
   return source;
 }
+
+export const useNoRawSource = () => {
+  useNoContext(DeviceContext);
+  useNoBufferedSize();
+  useNoOne();
+  useNoOne();
+  useNoMemo();
+};

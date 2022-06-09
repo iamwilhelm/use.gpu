@@ -2,7 +2,7 @@ import { LC, LiveElement } from '@use-gpu/live/types';
 import { GLTF } from './types';
 import { vec3, mat4, quat } from 'gl-matrix';
 
-import { use, gather, useMemo, useOne } from '@use-gpu/live';
+import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
 import { GLTFMesh } from './gltf-mesh';
 
 type GLTFNodeProps = {
@@ -11,7 +11,7 @@ type GLTFNodeProps = {
   matrix?: mat4,
 };
 
-export const GLTFNode: LC<GLTFNodeProps> = (props) => {
+export const GLTFNode: LC<GLTFNodeProps> = memo((props) => {
   const {
     gltf,
     node,
@@ -49,7 +49,7 @@ export const GLTFNode: LC<GLTFNodeProps> = (props) => {
   }
 
   return self;
-};
+}, 'GLTFNode');
 
 const makeComposeTransform = () => {
 

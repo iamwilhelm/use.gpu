@@ -36,19 +36,25 @@ type PBRMaterialProps = {
   albedoMap?: ShaderSource,
   metalnessMap?: ShaderSource,
   roughnessMap?: ShaderSource,
+
+  metalnessRoughnessMap?: ShaderSource,
   
   normalMap?: ShaderSource,
   occlusionMap?: ShaderSource,
 };
 
+const WHITE = [1, 1, 1, 1] as Point4;
+
 export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMaterialProps>) => {
   const {
-    metalness = 0.2,
-    roughness = 0.8,
+    // albedo
+    metalness = 0.0,
+    roughness = 0.5,
 
     albedoMap,
     metalnessMap,
     roughnessMap,
+    metalnessRoughnessMap,
 
     normalMap,
     occlusionMap,
@@ -56,13 +62,15 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     children,
   } = props;
 
-  const albedo = useProp(props.albedo, parseColor);
+  const albedo = useProp(props.albedo, parseColor, WHITE);
 
   const a = useShaderRef(albedo, albedoMap);
   const m = useShaderRef(metalness, metalnessMap);
   const r = useShaderRef(roughness, roughnessMap);
 
-  const applyMaterial = useBoundShader(applyPBRMaterial, PBR_BINDINGS, [a, m, r]);
+  const mr = useShaderRef(null, metalnessRoughnessMap);
+
+  const applyMaterial = useBoundShader(applyPBRMaterial, PBR_BINDINGS, [a, m, r, mr]);
 
   let getFragment: ShaderModule;
   if (normalMap || occlusionMap) {

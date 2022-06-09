@@ -29,7 +29,7 @@ export default {
     }),
   ],
   experiments: {
-    asyncWebAssembly: true,
+    syncWebAssembly: true,
   },
   module: {
     rules: [

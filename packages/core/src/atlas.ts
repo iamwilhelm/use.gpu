@@ -19,15 +19,19 @@ export const makeAtlasSource = (
   atlas: Atlas,
   format: GPUTextureFormat,
 ): TextureSource => {
-  const texture = makeDynamicTexture(device, atlas.width, atlas.height, 1, format);
+  const mips = Math.floor(Math.log2(Math.min(atlas.width, atlas.height))) + 1;
+  const texture = makeDynamicTexture(device, atlas.width, atlas.height, 1, format, 1, mips);
   const source = {
     texture,
-    view: makeTextureView(texture),
+    view: makeTextureView(texture, mips),
     sampler: {
       minFilter: 'linear',
       magFilter: 'linear',
+      mipmapFilter: 'linear',
+      maxAnisotropy: 16,
     } as GPUSamplerDescriptor,
     layout: 'texture_2d<f32>',
+    mips,
     absolute: true,
     format,
     colorSpace: 'srgb',
@@ -252,6 +256,7 @@ export const makeAtlas = (
 
   const debugPlacements = () => Array.from(map.keys()).map(k => map.get(k)!);
   const debugSlots = () => Array.from(slots.values()).map(s => s);
+  const debugUploads = () => self.uploads;
 
   const debugValidate = () => {
     const rects = debugPlacements();
@@ -294,8 +299,8 @@ export const makeAtlas = (
 
   const self = {
     place, map, expand,
-    width, height, version: 0,
-    debugPlacements, debugSlots, debugValidate,
+    width, height, version: 0, uploads: [],
+    debugPlacements, debugSlots, debugValidate, debugUploads,
   } as Atlas;
 
   return self;

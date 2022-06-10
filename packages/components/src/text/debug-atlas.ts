@@ -26,11 +26,18 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (
   }));
 };
 
-export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source}: DebugAtlasProps) => {
-  const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate} = atlas as any;  
-  const {id} = useFiber();
+const COLORS = [
+  [0, 1, 1, 1],
+  [1, 0, 1, 1],
+  [1, 1, 0, 1],
+  [0.5, 0.5, 1, 1],
+  [0.5, 1, 0.5, 1],
+  [1, .5, 0.5, 1],
+];
 
-  console.log('render debugatlas view', source)
+export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source}: DebugAtlasProps) => {
+  const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;  
+  const {id} = useFiber();
 
   const yeets = [];
   const pos = [] as number[];
@@ -105,11 +112,6 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     });
   }
 
-  console.log({
-    slots: debugSlots().length,
-    placements: debugPlacements().length,
-  })  
-
   for (const rect of debugPlacements()) {
     yeets.push({
       id: next(),
@@ -133,6 +135,25 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     count: 1,
     repeat: 3,
   });
+  
+  /*
+  let i = 0;
+  for (const rects of debugUploads()) {
+    for (const [l, t, r, b] of rects) {
+      yeets.push({
+        id: next(),
+        rectangle: fit([l + w, t, r + w, b]),
+        uv: [0, 0, 1, 1],
+        fill: [0, 0, 0, 0],
+        stroke: COLORS[i % COLORS.length],
+        border: [2, 2, 2, 2],
+        count: 1,
+        repeat: 0,
+      });
+    }
+    ++i;
+  }
+  */
   
   return yeet(yeets);
 }, 'DebugAtlasView');

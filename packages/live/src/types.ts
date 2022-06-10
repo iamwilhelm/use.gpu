@@ -74,6 +74,7 @@ export type Dispatcher = (as: Action<any>[]) => void;
 // Render callbacks
 export type OnFiber<T = any> = (fiber: LiveFiber<any>) => T;
 export type FiberSetter<T> = (fiber: LiveFiber<any>, t: T) => void;
+export type FiberGather<T> = (fiber: LiveFiber<any>, self?: boolean) => T;
 export type RenderCallbacks = {
   dispatch: OnFiber<void>,
   onRender: (fiber: LiveFiber<any>, allowSlice?: boolean) => boolean,
@@ -117,7 +118,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   context: FiberContext,
 
   // Yeeting state
-  yeeted: FiberYeet<any> | null,
+  yeeted: FiberYeet<any, any> | null,
 
   // Count number of runs for inspector
   runs: number,
@@ -137,13 +138,14 @@ export type ContextValues = Map<LiveContext<any>, any>;
 export type ContextRoots = Map<LiveContext<any>, LiveFiber<any>>;
 
 // Fiber yeet state
-export type FiberYeet<T> = {
+export type FiberYeet<A, B> = {
   id: number,
-  emit: FiberSetter<any>,
-  value?: T,
-  reduced?: T,
-  parent?: FiberYeet<T>,
+  emit: FiberSetter<A>,
+  gather: FiberGather<B>,
   root: LiveFiber<any>,
+  value?: A,
+  reduced?: B,
+  parent?: FiberYeet<A, B>,
 };
 
 // Priority queue

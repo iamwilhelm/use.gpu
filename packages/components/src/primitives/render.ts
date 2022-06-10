@@ -4,7 +4,7 @@ import {
   VertexData, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU,
 } from '@use-gpu/core/types';
 import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
-import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
+import { yeet, memo, suspend, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 
 import { DeviceContext } from '../providers/device-provider';
 import { ViewContext } from '../providers/view-provider';
@@ -103,7 +103,7 @@ export const render = (props: RenderProps) => {
   );
 
   if (!pipeline) return;
-  if (stale) return yeet(SUSPEND);
+  if (stale) return suspend();
   
   // Uniforms
   const uniform = useMemo(() => {

@@ -3,7 +3,7 @@ import { StorageSource } from '@use-gpu/core/types';
 import { GLTF, GLTFSceneData, GLTFNodeData, GLTFMeshData, GLTFMaterialData } from './types';
 import { toScene, toNode, toMesh, toMaterial } from './parse';
 
-import { use, gather, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
 
 import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/components';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
@@ -37,6 +37,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
   // Relative URL base for GLTF resources
   const base = props.base ?? new URL(props.url ?? ".", location.href).href;
 
+  // Resume after loading GLTF manifest
   const Resume = ([data]: any[]) => {
 
     // Extract JSON
@@ -81,6 +82,9 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
       return {gltf, buffers, images, bufferAssets, imageAssets};
     }, json);
   
+    console.log('----------- gltf', gltf);
+  
+    // Resume after loading resources
     const Resume = (resources: (ArrayBuffer | Image)[]) => {
       const n = bufferAssets.length;
 
@@ -110,8 +114,6 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         },
         (buffer, index) => bufferResources[bufferAssetIndices[index]],
         [buffers]);
-
-      console.log({gpuBuffers, buffers, bufferAssets, bufferResources})
 
       // Convert bufferviews to storage source templates
       const bufferSources = useMap(bufferViews,
@@ -179,8 +181,8 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
           if (!source) return null;
 
           const ctor = UNIFORM_ARRAY_TYPES[source.format];
-          const {arrayBuffer} = source;
-          return arrayBuffer ? new ctor(arrayBuffer) : null;
+          const {arrayBuffer, byteOffset, byteLength} = source;
+          return arrayBuffer ? new ctor(arrayBuffer.slice(byteOffset, byteLength)) : null;
         },
         (source) => source,
         []);
@@ -231,6 +233,13 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         storage: storageSources,
         texture: textureSources,
       };
+      
+      console.log('re-render gltf', gltf, bound);
+      console.log({
+        bufR: bufferResources.slice().filter(x => !!x),
+        imgR: imageResources.slice().filter(x => !!x),
+      })
+
 
       return render({
         ...gltf,
@@ -240,13 +249,13 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
     // Load external assets
     return bufferAssets.length + imageAssets.length ? (
-      gather([
-        bufferAssets.map(({uri}) => use(Fetch, {
+      gather(use(Throttle, [
+        ...bufferAssets.map(({uri}) => use(Fetch, {
           url: resolveURL(base, uri),
           type: 'arrayBuffer',
           loading: null,
         })),
-        imageAssets.map(({uri}) => use(Fetch, {
+        ...imageAssets.map(({uri}) => use(Fetch, {
           url: resolveURL(base, uri),
           type: 'blob',
           loading: null,
@@ -259,7 +268,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             });
           },
         }))
-      ], Resume)
+      ], 0), Resume)
     ) : use(Resume, []);
   };
 
@@ -333,6 +342,48 @@ const accessorToType = (boxType: string, componentType: string) => {
 
   throw new Error(`Unsupported GLTF accessor type ${boxType}`);
 };
+
+type Timeout = ReturnValue<typeof setTimeout>;
+
+// If model is partially loaded, wait to see if more textures arrive before rendering.
+const Throttle = <T>(children: LiveElement<any>, delay: number = 300) => {
+
+  let timer: Timeout | null = null;
+
+  const valueRef = useOne(() => ({current: null}));
+
+  return fence(children, (value: (T | null)[]) => {
+    valueRef.current = value;
+
+    const notNull = value.indexOf(null) < 0;
+    if (notNull) {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      return yeet(value);
+    }
+    
+    const entirelyNull = value.findIndex(v => v != null) < 0;
+    if (entirelyNull) {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      return yeet(value);
+    }
+
+    const [resolved, setResolved] = useState<T | null>(null);
+    if (resolved !== value && !timer) {
+      timer = setTimeout(() => {
+        timer = null;
+        setResolved(valueRef.current);
+      }, delay);
+    }
+
+    return resolved != null ? yeet(resolved) : suspend();
+  });
+}
 
 const NO_DEPS: any = [];
 const useMap = <A, B>(

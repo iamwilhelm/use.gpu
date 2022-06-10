@@ -212,7 +212,6 @@ export const makeTextureAccessor = (
 
   const shaderType = format ? TEXTURE_SHADER_TYPES[format] : type;
   const hasCast = shaderType !== type;
-  if (hasCast) debugger;
 
   return `
 @group(${set}) @binding(${binding}) var ${ns}${name}Texture: ${layout};
@@ -265,12 +264,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
   let f4 = i & 3u;
 
   let word = u32(${ns}${accessor}(b2));
-  var v: ${format};
-  if      (f4 == 3u) { v = ${format}((word >> 24u)); }
-  else if (f4 == 2u) { v = ${format}((word >> 16u) & 0xFFu); }
-  else if (f4 == 1u) { v = ${format}((word >> 8u) & 0xFFu); }
-  else               { v = ${format}((word & 0xFFu)); }
-
+  var v: ${format} = ${format}((word >> (f4 << 3u)) & 0xFFu);
   return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;
@@ -287,10 +281,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
   let f2 = i & 1u;
 
   let word = u32(${ns}${accessor}(b2));
-  var v: ${format};
-  if (f2 == 1u) { v = ${format}(word >> 16u); }
-  else { v = ${format}(word & 0xFFFFu); }
-  
+  var v: ${format} = ${format}((word >> (f2 << 4u)) & 0xFFFFu);  
   return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;

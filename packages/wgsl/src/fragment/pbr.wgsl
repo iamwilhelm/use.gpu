@@ -92,6 +92,6 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   var Fd = diffuseColor * fdBurley(dotNL, dotNV, dotLH, alpha);
   var Fs = F * D * G;
 
-  var direct = (Fd + Fs) * radiance * dotNL;
+  var direct = max(vec3<f32>(0.0), Fd + Fs) * radiance * dotNL;
   return direct;
 }

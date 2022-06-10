@@ -1,10 +1,10 @@
 import {
   HostInterface, LiveFiber, LiveFunction, LiveContext, LiveElement,
-  FiberYeet, FiberContext, ContextValues, ContextRoots,
+  FiberYeet, FiberGather, FiberContext, ContextValues, ContextRoots,
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
 
-import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, YEET, MORPH, PROVIDE, CONSUME, SUSPEND } from './builtin';
+import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CONSUME, SUSPEND } from './builtin';
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction } from './util';
@@ -151,15 +151,17 @@ export const makeResumeFiber = <F extends ArrowFunction>(
 }
 
 // Make fiber yeet state
-export const makeYeetState = <F extends ArrowFunction, A, B>(
+export const makeYeetState = <F extends ArrowFunction, A, B, C>(
   fiber: LiveFiber<F>,
   nextFiber: LiveFiber<F>,
+  gather: (f: LiveFiber<F>, self?: boolean) => C,
   map?: (a: A) => B,
-): FiberYeet<B> => ({
+): FiberYeet<any, C> => ({
   id: fiber.id,
   emit: map
     ? (fiber: LiveFiber<any>, v: A) => fiber.yeeted!.value = map(v)
     : (fiber: LiveFiber<any>, v: B) => fiber.yeeted!.value = v,
+  gather,
   value: undefined,
   reduced: undefined,
   parent: undefined,
@@ -312,6 +314,11 @@ export const updateFiber = <F extends ArrowFunction>(
     const [calls, done, fallback] = call!.args ?? EMPTY_ARRAY;
     multiGatherFiberCalls(fiber, calls, done, fallback);
   }
+  // Fence gathered reduction
+  else if (fiberType === FENCE) {
+    const [calls, done] = call!.args ?? EMPTY_ARRAY;
+    fenceFiberCalls(fiber, calls, done);
+  }
   // Yeet value upstream
   else if (fiberType === YEET) {
     if (!yeeted) throw new Error("Yeet without aggregator");
@@ -365,14 +372,15 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any>[] | LiveElement<any>,
   mapper: ((t: T) => R) | undefined,
-  reduction: () => R,
+  gather: FiberGather<R>,
   Next?: LiveFunction<any>,
+  fallback?: R,
 ) => {
   const {yeeted} = fiber;
   if (!fiber.next) {
-    const Resume = makeFiberContinuation(fiber, reduction);
+    const Resume = makeFiberContinuation(fiber, gather, fallback);
     fiber.next = makeResumeFiber(fiber, Resume);
-    fiber.yeeted = makeYeetState(fiber, fiber.next, mapper);
+    fiber.yeeted = makeYeetState(fiber, fiber.next, gather, mapper);
     fiber.path = [...fiber.path, 0];
   }
 
@@ -385,7 +393,8 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
 // Wrap a live function to act as a continuation of a prior fiber
 export const makeFiberContinuation = <F extends ArrowFunction, R>(
   fiber: LiveFiber<F>,
-  reduction: () => R,
+  gather: FiberGather<R | typeof SUSPEND>,
+  fallback?: R,
 ) => (
   Next?: LiveFunction<any>
 ) => {
@@ -393,8 +402,13 @@ export const makeFiberContinuation = <F extends ArrowFunction, R>(
   if (!next) return null;
   if (!Next) return null;
 
-  const value = reduction();
-  return Next(value);
+  const ref = useOne(() => ({current: fallback}));
+  const value = gather(fiber, true);
+  const nextValue = (value === SUSPEND)
+    ? ref.current as any
+    : ref.current = (value as R);
+
+  return Next(nextValue);
 }
 
 // Tag a component as imperative, always re-rendered from above even if props/state didn't change
@@ -451,6 +465,10 @@ export const reconcileFiberCalls = <F extends ArrowFunction>(
 
 }
 
+const toArray = <T>(x: T | T[] | undefined): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
+const NO_ARRAY: any[] = [];
+const NO_RECORD: Record<string, any> = {};
+
 // Map-reduce a fiber
 export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
@@ -460,33 +478,18 @@ export const mapReduceFiberCalls = <F extends ArrowFunction, R, T>(
   next?: LiveFunction<any>,
   fallback?: R,
 ) => {
-  const reduction = () => {
-    const ref = useOne(() => ({current: fallback}));
-    const value = reduceFiberValues(fiber, reducer, true);
-
-    if (value === SUSPEND) return ref.current as any;
-    return ref.current = (value as R);
-  };
-  return mountFiberReduction(fiber, calls, mapper, reduction, next);
+  const gather = reduceFiberValues(reducer);
+  return mountFiberReduction(fiber, calls, mapper, gather, next);
 }
-
-const toArray = <T>(x: T | T[] | undefined): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
 
 // Gather-reduce a fiber
 export const gatherFiberCalls = <F extends ArrowFunction, R, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any>,
   next?: LiveFunction<any>,
-  fallback: T | T[] = [],
+  fallback: T | T[] = NO_ARRAY,
 ) => {
-  const reduction = () => {
-    const ref = useOne(() => ({current: fallback}));
-    const value = gatherFiberValues(fiber, true);
-
-    if (value === SUSPEND) return ref.current;
-    return ref.current = (value as T[]);
-  };
-  return mountFiberReduction(fiber, calls, undefined, reduction, next);
+  return mountFiberReduction(fiber, calls, undefined, gatherFiberValues, next, fallback);
 }
 
 // Multi-gather-reduce a fiber
@@ -494,53 +497,64 @@ export const multiGatherFiberCalls = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any>,
   next?: LiveFunction<any>,
-  fallback: Record<string, T | T[]> = {},
+  fallback: Record<string, T | T[]> = NO_RECORD,
 ) => {
-  const reduction = () => {
-    const ref = useOne(() => ({current: fallback}));
-    const value = multiGatherFiberValues(fiber, true);
+  return mountFiberReduction(fiber, calls, undefined, multiGatherFiberValues, next, fallback);
+}
 
-    if (value === SUSPEND) return ref.current;
-    return ref.current = (value as Record<string, T | T[]>);
-  };
-  return mountFiberReduction(fiber, calls, undefined, reduction, next);
+// Fence a fiber reduction
+export const fenceFiberCalls = <F extends ArrowFunction, T>(
+  fiber: LiveFiber<F>,
+  calls: LiveElement<any>,
+  next?: LiveFunction<any>,
+) => {
+  const {yeeted} = fiber;
+  if (!yeeted) throw new Error("Cannot fence outside of yeet");
+
+  const {gather} = yeeted;
+  return mountFiberReduction(fiber, calls, undefined, gather, next, SUSPEND);
 }
 
 // Reduce yeeted values on a tree of fibers (values have already been mapped on emit)
-export const reduceFiberValues = <F extends ArrowFunction, R, T>(
-  fiber: LiveFiber<F>,
+export const reduceFiberValues = <R>(
   reducer: (a: R, b: R) => R,
-  self: boolean = false,
-): R | typeof SUSPEND | undefined => {
-  const {yeeted, mount, mounts, order} = fiber;
-  if (!yeeted) throw new Error("Reduce without aggregator");
+) => {
+  const reduce = <F extends ArrowFunction, T>(
+    fiber: LiveFiber<F>,
+    self: boolean = false,
+  ): R | typeof SUSPEND | undefined => {
+    const {yeeted, mount, mounts, order} = fiber;
+    if (!yeeted) throw new Error("Reduce without aggregator");
 
-  if (!self) {
-    if (fiber.next && fiber.f !== CONSUME) return reduceFiberValues(fiber.next, reducer);
-    if (yeeted.value !== undefined) return yeeted.value;
-  }
-
-  if (yeeted.reduced !== undefined) return yeeted.reduced;
-  if (mounts && order) {
-    if (mounts.size) {
-      const n = mounts.size;
-      const first = mounts.get(order[0]);
-      let value = reduceFiberValues(first!, reducer);
-      if (value === SUSPEND) return yeeted.reduced = SUSPEND;
-
-      if (n > 1) for (let i = 1; i < n; ++i) {
-        const m = mounts.get(order[i]);
-        if (!m) continue;
-
-        const v = reduceFiberValues(m, reducer);
-        if (v === SUSPEND) return yeeted.reduced = SUSPEND;
-        value = reducer((value as R), (v as R)!);
-      }
-      return yeeted.reduced = value;
+    if (!self) {
+      if (fiber.next && fiber.f !== CONSUME) return reduce(fiber.next);
+      if (yeeted.value !== undefined) return yeeted.value;
     }
-  }
-  else if (mount) return yeeted.reduced = reduceFiberValues(mount, reducer);
-  return undefined;
+
+    if (yeeted.reduced !== undefined) return yeeted.reduced;
+    if (mounts && order) {
+      if (mounts.size) {
+        const n = mounts.size;
+        const first = mounts.get(order[0]);
+        let value = reduce(first!);
+        if (value === SUSPEND) return yeeted.reduced = SUSPEND;
+
+        if (n > 1) for (let i = 1; i < n; ++i) {
+          const m = mounts.get(order[i]);
+          if (!m) continue;
+
+          const v = reduce(m);
+          if (v === SUSPEND) return yeeted.reduced = SUSPEND;
+          value = reducer((value as R), (v as R)!);
+        }
+        return yeeted.reduced = value;
+      }
+    }
+    else if (mount) return yeeted.reduced = reduce(mount);
+    return undefined;
+  };
+
+  return reduce;
 }
 
 // Gather yeeted values on a tree of fibers
@@ -632,7 +646,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   else if (mount) {
     const value = multiGatherFiberValues(mount);
     if (value === SUSPEND) return yeeted.reduced = SUSPEND;
-    if (value === undefined) debugger;
+    if (value != null && self) for (let k in (value as any)) (value as any)[k] = toArray((value as any)[k]);
     return yeeted.reduced = value as any;
   }
   return {} as Record<string, T | T[]>;

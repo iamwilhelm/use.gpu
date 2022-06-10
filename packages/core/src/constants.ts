@@ -138,27 +138,27 @@ export const UNIFORM_SIZES = {
 export const UNIFORM_DIMS = {
   "bool":         1,
   "vec2<bool>":   2,
-  "vec3<bool>":   3,
+  "vec3<bool>":   3.5,
   "vec4<bool>":   4,
 
   "u32":          1,
   "vec2<u32>":    2,
-  "vec3<u32>":    3,
+  "vec3<u32>":    3.5,
   "vec4<u32>":    4,
 
   "i32":          1,
   "vec2<i32>":    2,
-  "vec3<i32>":    3,
+  "vec3<i32>":    3.5,
   "vec4<i32>":    4,
 
   "f32":          1,
   "vec2<f32>":    2,
-  "vec3<f32>":    3,
+  "vec3<f32>":    3.5,
   "vec4<f32>":    4,
 
   "f64":          1,
   "vec2<f64>":    2,
-  "vec3<f64>":    3,
+  "vec3<f64>":    3.5,
   "vec4<f64>":    4,
 
   "mat2x2<f32>":  4,

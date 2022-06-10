@@ -2,8 +2,10 @@ import { LC, LiveElement } from '@use-gpu/live/types';
 import { UniformAttribute } from '@use-gpu/core/types';
 import { GLTF, GLTFPrimitiveData } from './types';
 
+import { flattenIndexedArray } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useMemo, useNoMemo } from '@use-gpu/live';
+import { generateTangents } from 'mikktspace';
 import { mat4 } from 'gl-matrix';
 
 import {
@@ -16,7 +18,6 @@ import {
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
 import { getTransformedNormal } from '@use-gpu/wgsl/transform/normal.wgsl'
 import { useGLTFMaterial } from './gltf-material';
-import { generateTangents } from 'mikktspace';
 
 const CARTESIAN_BINDINGS = bundleToAttributes(getCartesianPosition);
 const NORMAL_BINDINGS = bundleToAttributes(getTransformedNormal);
@@ -42,6 +43,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   const faces: Partial<FaceLayerProps> = {
     shaded: true,
     color: [1, 1, 1, 1],
+    unweldedTangents: true,
   };
 
   if (POSITION   != null) faces.positions = storage[POSITION];
@@ -50,12 +52,27 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   if (TEXCOORD_0 != null) faces.uvs       = storage[TEXCOORD_0];
   if (indices    != null) faces.indices   = storage[indices];
 
+  // Generate mikkTSpace tangents
   if (faces.positions && faces.normals && faces.uvs && !faces.tangents) {
-    const ps = gltf.bound.data[POSITION];
-    const ns = gltf.bound.data[NORMAL];
-    const ts = gltf.bound.data[TEXCOORD_0];
+    let ps = gltf.bound.data[POSITION];
+    let ns = gltf.bound.data[NORMAL];
+    let ts = gltf.bound.data[TEXCOORD_0];
+    
+    if (indices != null) {
+      // Unweld mesh
+      const inds = gltf.bound.data[indices];
+      ps = flattenIndexedArray(ps, inds, 3);
+      ns = flattenIndexedArray(ns, inds, 3);
+      ts = flattenIndexedArray(ts, inds, 2);
+    }
 
-    const tangents = useMemo(() => generateTangents(ps, ns, ts), [ps, ns, ts]);
+    const tangents = useMemo(() => {
+      const out = generateTangents(ps, ns, ts);
+      const n = out.length;
+      for (let i = 0; i < n; i += 4) out[i + 3] *= -1;
+      return out;
+    }, [ps, ns, ts]);
+
     faces.tangents = useRawSource(tangents, 'vec4<f32>');
   }
   else {
@@ -68,10 +85,15 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
   let view: LiveElement<any> = render;
   if (transform) {
+    const {normals, tangents} = faces;
+
+    // Apply matrix transform to positions and tangents
     const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, [transform]);
     view = provide(TransformContext, xform, view);
 
-    const {normals} = faces;
+    if (tangents) faces.tangents = useBoundShader(getTransformedNormal, NORMAL_BINDINGS, [transform, tangents]);
+    else useNoBoundShader();      
+
     if (normals) {
       const m = mat4.create();
       mat4.invert(m, transform);

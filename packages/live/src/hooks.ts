@@ -179,6 +179,8 @@ export const useState = <T>(
     value = (initialState instanceof Function) ? initialState() : initialState;
     setValue = host
       ? (value: Reducer<T>) => {
+          if (state![i - 1] !== Hook.STATE) return;
+
           const apply = () => {
             const prev = state![i];
 

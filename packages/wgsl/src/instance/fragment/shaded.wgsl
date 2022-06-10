@@ -15,20 +15,20 @@ use '@use-gpu/wgsl/material/pbr'::{ applyPBRMaterial as applyDefaultPBRMaterial 
 @export fn getShadedFragment(
   color: vec4<f32>,
   uv: vec2<f32>,
-  normal: vec3<f32>,
-  tangent: vec3<f32>,
-  position: vec3<f32>,
+  normal: vec4<f32>,
+  tangent: vec4<f32>,
+  position: vec4<f32>,
 ) -> vec4<f32> {
-  let viewPosition = getViewPosition().xyz;
-  let toView: vec3<f32> = viewPosition - position;
+  let viewPosition = getViewPosition();
+  let toView: vec3<f32> = viewPosition.xyz - position.xyz;
 
-  let N: vec3<f32> = normalize(normal);
+  let N: vec3<f32> = normalize(normal.xyz);
   let V: vec3<f32> = normalize(toView);
 
   let lightPosition = vec3<f32>(10.0, 30.0, 20.0);
   let lightColor = vec4<f32>(1.0, 1.0, 1.0, 1.0);
 
-  let toLight: vec3<f32> = lightPosition - position;
+  let toLight: vec3<f32> = lightPosition - position.xyz;
   let L: vec3<f32> = normalize(toLight);
 
   let direct = applyPBRMaterial(color, lightColor, uv, N, L, V);

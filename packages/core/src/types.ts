@@ -23,9 +23,9 @@ export type UseRenderingContextGPU = {
   colorInput: ColorSpace,
   colorStates: GPUColorTargetState[],
   colorAttachments: GPURenderPassColorAttachment[],
-  depthTexture: GPUTexture,
-  depthStencilState: GPUDepthStencilState,
-  depthStencilAttachment: GPURenderPassDepthStencilAttachment,
+  depthTexture: GPUTexture | null,
+  depthStencilState: GPUDepthStencilState | null,
+  depthStencilAttachment: GPURenderPassDepthStencilAttachment | null,
 
   swapView: (view?: GPUTextureView) => void,
 };
@@ -190,6 +190,7 @@ export type TextureSource = {
   sampler: GPUSampler | GPUSamplerDescriptor | null,
   layout: string,
   format: string,
+  mips?: number,
   variant?: string,
   absolute?: boolean,
   volatile?: number,
@@ -200,15 +201,17 @@ export type TextureSource = {
 
 export type DataTexture = {
   data: TypedArray,
-  format: GPUTextureFormat,
   size: [number, number] | [number, number, number],
+  format?: GPUTextureFormat,
   colorSpace?: ColorSpace,
+  layout?: string,
 };
 
 export type ExternalTexture = {
   format: GPUTextureFormat,
   size: [number, number] | [number, number, number],
   colorSpace?: ColorSpace,
+  layout?: string,
 };
 
 // Shaders

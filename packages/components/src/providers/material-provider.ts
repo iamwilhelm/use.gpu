@@ -41,6 +41,7 @@ type PBRMaterialProps = {
   
   normalMap?: ShaderSource,
   occlusionMap?: ShaderSource,
+  emissiveMap?: ShaderSource,
 };
 
 const WHITE = [1, 1, 1, 1] as Point4;
@@ -58,6 +59,7 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
 
     normalMap,
     occlusionMap,
+    emissiveMap,
 
     children,
   } = props;
@@ -73,8 +75,8 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   const applyMaterial = useBoundShader(applyPBRMaterial, PBR_BINDINGS, [a, m, r, mr]);
 
   let getFragment: ShaderModule;
-  if (normalMap || occlusionMap) {
-    getFragment = useBoundShader(getMappedFragment, MAPPED_BINDINGS, [applyMaterial]);
+  if (normalMap || occlusionMap || emissiveMap) {
+    getFragment = useBoundShader(getMappedFragment, MAPPED_BINDINGS, [applyMaterial, normalMap, occlusionMap, emissiveMap]);
   }
   else {
     getFragment = useBoundShader(getShadedFragment, SHADED_BINDINGS, [applyMaterial]);

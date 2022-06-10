@@ -11,13 +11,13 @@ fn main(
   @builtin(front_facing) frontFacing: bool,
   @location(0) fragColor: vec4<f32>,
   @location(1) fragUV: vec2<f32>,
-  @location(2) fragNormal: vec3<f32>,
-  @location(3) fragTangent: vec3<f32>,
-  @location(4) fragPosition: vec3<f32>,
+  @location(2) fragNormal: vec4<f32>,
+  @location(3) fragTangent: vec4<f32>,
+  @location(4) fragPosition: vec4<f32>,
 ) -> @location(0) vec4<f32> {
 
   var normal = fragNormal;
-  if (!frontFacing) { normal = -normal; }
+  //if (!frontFacing) { normal = -normal; }
 
   var outColor = fragColor;
   outColor = getFragment(outColor, fragUV, normal, fragTangent, fragPosition);

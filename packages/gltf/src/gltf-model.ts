@@ -34,6 +34,7 @@ export const GLTFModel: LC<GLTFModelProps> = memo((props) => {
       return i >= 0 ? i : null;
     };
 
+    // Find root nodes to render
     let roots = NO_ROOTS;
     if (propNode != null) roots = toArray(getNodeIndex(propNode));
     else if (propNodes != null) root = propNodes.map(node => getNodeIndex(node)).filter(n => n != null);
@@ -43,6 +44,7 @@ export const GLTFModel: LC<GLTFModelProps> = memo((props) => {
       else roots = seq(nodes.length);
     }
 
+    // Render as GLTFNode
     return Array.from(roots).map(root => use(GLTFNode, {gltf, node: root}));
   }, [gltf, propNode, propScene]);
 }, 'GLTFModel');

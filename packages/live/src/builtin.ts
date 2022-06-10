@@ -14,6 +14,7 @@ export const FRAGMENT     = () => {};
 export const MAP_REDUCE   = () => {};
 export const GATHER       = () => {};
 export const MULTI_GATHER = () => {};
+export const FENCE        = () => {};
 export const YEET         = () => {};
 export const PROVIDE      = () => {};
 export const CONSUME      = () => {};
@@ -26,6 +27,7 @@ export const SUSPEND      = () => {};
 (MAP_REDUCE   as any).isLiveBuiltin = true;
 (GATHER       as any).isLiveBuiltin = true;
 (MULTI_GATHER as any).isLiveBuiltin = true;
+(FENCE        as any).isLiveBuiltin = true;
 (YEET         as any).isLiveBuiltin = true;
 (PROVIDE      as any).isLiveBuiltin = true;
 (CONSUME      as any).isLiveBuiltin = true;
@@ -136,6 +138,13 @@ export const multiGather = <T>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key, by: getCurrentFiberID()} as any);
 
+// Fence gathered items from a subtree
+export const fence = <T>(
+  calls?: LiveNode<any>,
+  done?: LiveFunction<(r: T[]) => LiveElement<any>>,
+  key?: Key,
+): DeferredCall<() => void> => ({f: FENCE, args: [calls, done], key, by: getCurrentFiberID()} as any);
+
 // Yeet value(s) upstream
 export const yeet = <T>(
   value?: T,
@@ -160,6 +169,9 @@ export const consume = <T, C>(
 
 // Static component decorators
 export const imperative = makeImperativeFunction;
+
+// Sugar for suspended yeet
+export const suspend = () => yeet(SUSPEND);
 
 // Make live context for holding shared data for child nodes
 interface MakeContext<T> {

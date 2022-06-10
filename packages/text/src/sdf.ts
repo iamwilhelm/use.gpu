@@ -114,18 +114,16 @@ export const glyphToRGBA = (data: Uint8Array, w: number, h: number, pad: number 
   const hp = h + pad * 2;
   const out = new Uint8Array(wp * hp * 4);
 
-  //let b = 1;
   let i = 0;
   let j = (pad + pad * wp) * 4;
   for (let y = 0; y < h; ++y) {
     for (let x = 0; x < w; ++x) {
       const v = data[i++];
 
-      //b = 1 - b;
-      out[j++] = v; // && b;
-      out[j++] = v; // && b;
-      out[j++] = v; // && b;
-      out[j++] = v; // && b;
+      out[j++] = v;
+      out[j++] = v;
+      out[j++] = v;
+      out[j++] = v;
     }
     j += pad * 2 * 4;
   };

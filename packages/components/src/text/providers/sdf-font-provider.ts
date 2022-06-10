@@ -5,7 +5,7 @@ import { Alignment } from '../../layout/types';
 
 import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/text';
-import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping } from '@use-gpu/core';
+import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 
 import { makeInlineCursor } from '../../layout/lib/cursor';
@@ -83,6 +83,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   const glyphs = useMemo(() => new Map<number, CachedGlyph>(), opts);
   const atlas = useMemo(() => makeAtlas(width, height), opts);
   const sourceRef = useMemo(() => ({ current: makeAtlasSource(device, atlas, format) }), opts);
+  const bounds = useMemo(() => makeBoundsTracker());
 
   // Provide context to map glyphs on-demand
   const context = useMemo(() => {
@@ -114,9 +115,10 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, preprocess, postprocess));
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
-
+        
         try {
           mapping = atlas.place(key, width, height);
+          bounds.push(mapping);
         }
         catch (e) {
           mapping = [0, 0, 0, 0];
@@ -130,7 +132,8 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         // If atlas resized, resize the texture backing it
         const [sw, sh] = source.size;
         if (atlas.width !== sw && atlas.height !== sh) {
-          source = sourceRef.current = resizeTextureSource(device, source, atlas.width, atlas.height);
+          source = sourceRef.current = resizeTextureSource(device, source, atlas.width, atlas.height, 1, 'auto');
+          updateMipTextureChain(device, source, [[0, 0, atlas.width, atlas.height]]);
         }
 
         uploadAtlasMapping(
@@ -164,7 +167,17 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   return rustText ? (
     gather(
       provide(SDFFontContext, context, children),
-      (gathered: any) => then ? then(atlas, sourceRef.current, gathered) : null,
+      (gathered: any) => {
+        const source = sourceRef.current;
+
+        const rects = bounds.flush();
+        if (rects.length) {
+          atlas.uploads.push(rects);
+          updateMipTextureChain(device, source, rects);
+        }
+
+        return then ? then(atlas, source, gathered) : null;
+      },
     )
   ) : null;
 }, 'SDFFontProvider');
@@ -349,4 +362,51 @@ export const emitGlyphSpans = (
       sx = snap ? Math.round(x) : x;
     }
   }, start, end);
+};
+
+const makeBoundsTracker = () => {
+  const rects: Rectangle[] = [];
+  const log: Rectangle[][] = [];
+
+  const joinRectangles = (a: Rectangle, b: Rectangle): Rectangle => {
+    const [al, at, ar, ab] = a;
+    const [bl, bt, br, bb] = b;
+    return [
+      Math.min(al, bl),
+      Math.min(at, bt),
+      Math.max(ar, br),
+      Math.max(ab, bb),
+    ] as Rectangle;
+  };
+
+  const getArea = ([l, t, r, b]: Rectangle) => Math.abs(r - l) * Math.abs(b - t);
+
+  const push = (rect: Rectangle) => {
+    const area = getArea(rect);
+    const n = rects.length;
+
+    let max = 0.5;
+    let merge = -1;
+    let join = null as Rectangle | null;
+    for (let i = 0; i < n; ++i) {
+      const slot = rects[i];
+      const joined = joinRectangles(rect, slot);
+      const fit = (area + getArea(slot)) / getArea(joined);
+      if (fit > max) {
+        max = fit;
+        merge = i;
+        join = joined;
+      }
+    }
+    if (join) rects.splice(merge, 1, join);
+    else rects.push(rect);
+  };
+
+  const flush = () => {
+    const rs = rects.slice();
+    rects.length = 0;
+    return rs;
+  };
+
+  return {push, flush};
 };

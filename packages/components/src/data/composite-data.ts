@@ -63,7 +63,7 @@ const iterateChunks = (
   let {raw, length: l, fn} = makeDataAccessor(f, accessor);
 
   const push = (list: any, item?: any) => {
-    const n = (list.length || 0) / (typeof list[0] === 'number' ? dims : 1);
+    const n = (list.length || 0) / (typeof list[0] === 'number' ? Math.floor(dims) : 1);
     callback(n, item);
   }
 

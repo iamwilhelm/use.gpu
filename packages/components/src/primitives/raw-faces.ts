@@ -10,7 +10,7 @@ import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
+import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
@@ -39,6 +39,9 @@ export type RawFacesProps = {
   indices?: ShaderSource,
   lookups?: ShaderSource,
 
+  unweldedNormals?: boolean,
+  unweldedTangents?: boolean,
+
   shaded?: boolean,
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -63,6 +66,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     count = 1,
     mode = RenderPassMode.Opaque,
     id = 0,
+
+    unweldedNormals = false,
+    unweldedTangents = false,
   } = props;
 
   // Set up draw as:
@@ -99,7 +105,11 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const m = useMaterialContext();
 
   const hasIndices = !!props.indices;
-  const defines = useOne(() => ({ HAS_INDICES: hasIndices }), hasIndices);
+  const defines = useMemo(() => ({
+    HAS_INDICES: hasIndices,
+    UNWELDED_NORMALS: !!unweldedNormals,
+    UNWELDED_TANGENTS: !!unweldedTangents,
+  }), [hasIndices, unweldedNormals, unweldedTangents]);
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, t, u, g, c, i, l]);
   const getFragment = shaded ? m : getPassThruFragment;

@@ -24,7 +24,7 @@ export const useRawSource = (array: TypedArray, format: UniformType, live: boole
     useNoMemo();
     uploadBuffer(device, buffer, array.buffer);
 
-    source.length = array.length / UNIFORM_DIMS[format];
+    source.length = array.length / Math.floor(UNIFORM_DIMS[format]);
     source.size = [source.length];
     source.version = incrementVersion(source.version);
   }
@@ -32,7 +32,7 @@ export const useRawSource = (array: TypedArray, format: UniformType, live: boole
     useMemo(() => {
       uploadBuffer(device, buffer, array.buffer);
 
-      source.length = array.length / UNIFORM_DIMS[format];
+      source.length = array.length / Math.floor(UNIFORM_DIMS[format]);
       source.size = [source.length];
       source.version = incrementVersion(source.version);
     }, [array, buffer]);

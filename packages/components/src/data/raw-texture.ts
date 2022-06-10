@@ -8,6 +8,7 @@ import { makeSampler, makeRawTexture, makeTextureView, uploadDataTexture } from 
 
 export type RawTextureProps = {
   data?: DataTexture,
+  sampler?: GPUSamplerDescriptor,
   live?: boolean,
 
   render?: (source: TextureSource) => LiveElement<any>,
@@ -18,6 +19,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
 
   const {
     data,
+    sampler,
     render,
     live = false,
   } = props;
@@ -28,7 +30,12 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
   const source = useMemo(() => {
     if (!data) return null;
 
-    const {size, format, colorSpace} = data;
+    const {
+      size,
+      layout = 'texture_2d<f32>',
+      format = 'rgba8unorm',
+      colorSpace = 'native',
+    } = data;
     const texture = makeRawTexture(device, data);
     const source = {
       texture,
@@ -36,15 +43,16 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
       sampler: {
         minFilter: 'nearest',
         magFilter: 'nearest',
+        ...sampler,
       } as GPUSamplerDescriptor,
-      layout: 'texture_2d<f32>',
-      format,
       size,
+      layout,
+      format,
       colorSpace,
       version: 0,
     };
     return source;
-  }, [device, memoKey]);
+  }, [device, memoKey, sampler]);
 
   // Refresh and upload data
   const refresh = () => {

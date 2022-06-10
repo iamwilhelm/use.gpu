@@ -16,10 +16,10 @@ export const useGLTFMaterial = (
     normalTexture,
     occlusionTexture,
     emissiveTexture,
-    emissiveFactor,
-    alphaMode,
-    alphaCutoff,
-    doubleSided,
+    //emissiveFactor,
+    //alphaMode,
+    //alphaCutoff,
+    //doubleSided,
   } = gltf.materials[material];
 
   const props: Partial<PBRMaterialProps> = {
@@ -44,43 +44,34 @@ export const useGLTFMaterial = (
       props.albedo = baseColorFactor;
     }
 
-    if (metallicRoughnessTexture != null) {
-      const map = gltf.bound.texture[metallicRoughnessTexture.index];
-      const gain = [1, metallicFactor ?? 1, roughnessFactor ?? 1, 1];
-      
-      props.metalnessRoughnessMap = map;
-    }
     if (metallicFactor != null) {
       props.metalness = metallicFactor;
     }
     if (roughnessFactor != null) {
       props.roughness = roughnessFactor;
     }
+    if (metallicRoughnessTexture != null) {
+      const map = gltf.bound.texture[metallicRoughnessTexture.index];
+      props.metalnessRoughnessMap = map;
+      if (metallicFactor == null) props.metalness = 1.0;
+      if (roughnessFactor == null) props.roughness = 1.0;
+    }
+    
+    if (normalTexture != null) {
+      const map = gltf.bound.texture[normalTexture.index];
+      props.normalMap = map;
+    }
+
+    if (occlusionTexture != null) {
+      const map = gltf.bound.texture[occlusionTexture.index];
+      props.occlusionMap = map;
+    }
+
+    if (emissiveTexture != null) {
+      const map = gltf.bound.texture[emissiveTexture.index];
+      props.emissiveMap = map;
+    }
   }
   
   return props;
 };
-
-const useGLTFTexture = (
-  gltf: GLTF,
-  texture: number,
-) => {
-  const {sampler, source} = gltf.textures[texture];
-  const image = gltf.images[source];
-  
-};
-
-/*
-type PBRMaterialProps = {
-  albedo?: ColorLike,
-  metalness?: number,
-  roughness?: number,
-
-  normalMap?: TextureSource,
-  occlusionMap?: TextureSource,
-  
-  albedoMap?: TextureSource,
-  metalnessMap?: TextureSource,
-  roughnessMap?: TextureSource,
-};
-*/

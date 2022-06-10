@@ -2,8 +2,8 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 use '@use-gpu/wgsl/use/view'::{ viewUniforms };
 use '@use-gpu/wgsl/use/light-old'::{ lightUniforms };
 
-@group(1) @binding(0) var s: sampler;
-@group(1) @binding(1) var t: texture_2d<f32>;
+@group(1) @binding(0) var t: texture_2d<f32>;
+@group(1) @binding(1) var s: sampler;
 
 struct FragmentOutput {
   @location(0) outColor: vec4<f32>,

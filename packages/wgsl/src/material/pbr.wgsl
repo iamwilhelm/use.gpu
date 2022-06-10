@@ -17,8 +17,8 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
   var albedo: vec3<f32> = materialColor.rgb * getAlbedo(mapUV).rgb;
   
   var metalnessRoughness: vec4<f32> = getMetalnessRoughness(mapUV);
-  var metalness: f32 = getMetalness(mapUV) * metalnessRoughness.g;
-  var roughness: f32 = getRoughness(mapUV) * metalnessRoughness.b;
+  var roughness: f32 = getRoughness(mapUV) * metalnessRoughness.g;
+  var metalness: f32 = getMetalness(mapUV) * metalnessRoughness.b;
 
   return PBR(N, L, V, albedo, metalness, roughness) * lightColor.rgb;
 }

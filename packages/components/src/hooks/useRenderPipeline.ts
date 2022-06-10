@@ -125,8 +125,8 @@ export const useRenderPipelineAsync = (
       return cached;
     }
 
-    {
-      const log = {
+    if (SHADER_LOG) {
+      SHADER_LOG.set(key, {
         colorStates,
         depthStencilState,
         props,
@@ -138,8 +138,7 @@ export const useRenderPipelineAsync = (
           hash: shader[1].hash,
           code: shader[1].code,
         },
-      };
-      if (SHADER_LOG) SHADER_LOG.set(key, log);
+      });
     }
 
     // Mark current pipeline as stale (if any)

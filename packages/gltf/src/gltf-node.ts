@@ -44,8 +44,7 @@ export const GLTFNode: LC<GLTFNodeProps> = memo((props) => {
 
     if (self) out.push(self);
     out.push(children.map(node => use(GLTFNode, {gltf, node})));
-
-    return self;
+    return out;
   }
 
   return self;
@@ -66,7 +65,7 @@ const makeComposeTransform = () => {
     matrix?: TypedArray | null,
   ) => {
 
-    if (quaternion != null) quat.multiply(q, q, quaternion as any);
+    if (quaternion != null) quat.copy(q, quaternion as any);
 
     if (position != null) vec3.copy(p, position as any);
     else vec3.zero(p);

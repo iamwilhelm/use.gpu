@@ -133,7 +133,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         const [sw, sh] = source.size;
         if (atlas.width !== sw && atlas.height !== sh) {
           source = sourceRef.current = resizeTextureSource(device, source, atlas.width, atlas.height, 1, 'auto');
-          updateMipTextureChain(device, source, [[0, 0, atlas.width, atlas.height]]);
+          updateMipTextureChain(device, source, [[0, 0, sw, sh]]);
         }
 
         uploadAtlasMapping(

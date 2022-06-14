@@ -1,6 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { UniformAttributeValue } from '@use-gpu/core/types';
-import { AxesTrait, ObjectTrait, Swizzle } from '../types';
+import { Swizzle } from '../types';
 import { VectorLike } from '../../traits/types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
@@ -13,41 +13,67 @@ import { useShaderRef } from '../../hooks/useShaderRef';
 import { useBoundShader } from '../../hooks/useBoundShader';
 import { useCombinedTransform } from '../../hooks/useCombinedTransform';
 import { composeTransform } from '../util/compose';
+import { recenterAxis } from '../util/axis';
 import { swizzleMatrix } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../../traits/parse';
 import { useAxesTrait, useObjectTrait } from '../traits';
 
-import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
+import { getPolarPosition } from '@use-gpu/wgsl/transform/polar.wgsl';
 
-const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
+const POLAR_BINDINGS = bundleToAttributes(getPolarPosition);
 
-export type CartesianProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
+export type PolarProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
+  bend?: number,
+  helix?: number,
+
   children?: LiveElement<any>,
 };
 
-export const Cartesian: LiveComponent<CartesianProps> = (props) => {
+export const Polar: LiveComponent<PolarProps> = (props) => {
   const {
+    bend = 1,
+    helix = 0,
     children,
   } = props;
 
   const {range: g, axes: a} = useAxesTrait(props);
   const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
-  const matrix = useMemo(() => {
+  const [focus, aspect, matrix, range] = useMemo(() => {
     const x = g[0][0];
-    const y = g[1][0];
+    let   y = g[1][0];
     const z = g[2][0];
     const dx = (g[0][1] - x) || 1;
-    const dy = (g[1][1] - y) || 1;
+    let   dy = (g[1][1] - y) || 1;
     const dz = (g[2][1] - z) || 1;
+    const sx = s[0];
+    const sy = s[1];
+    const sz = s[2];
+
+    // Watch for negative scales
+    const idx = Math.sign(dx);
+
+    // Recenter viewport on origin the more it's bent
+    [y, dy] = recenterAxis(y, dy, bend);
+
+    // Adjust viewport range for polar transform.
+    // As the viewport goes polar, the X-range is interpolated to the Y-range instead,
+    // creating a square/circular viewport.
+    const ady = Math.abs(dy);
+    const fdx = dx + (ady * idx - dx) * bend;
+    const sdx = fdx / sx;
+    const sdy = dy  / sy;
+    
+    const aspect = Math.abs(sdx / sdy);
+    const focus = bend > 0 ? 1 / bend - 1 : 0;
 
     const matrix = mat4.create();
     mat4.set(matrix,
-      2/dx, 0, 0, 0,
-      0, 2/dy, 0, 0,
-      0, 0, 2/dz, 0,
+      2/fdx, 0, 0, 0,
+      0,  2/dy, 0, 0,
+      0,  0, 2/dz, 0,
 
       -(2*x+dx)/dx,
       -(2*y+dy)/dy,
@@ -67,16 +93,29 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
       mat4.multiply(matrix, t, matrix);
     }
 
-    return matrix;
-  }, [g, a, p, r, q, s]);
+    const range = g.slice();
+    if (bend > 0) {
+      const [from, to] = range[1];
+      const max = Math.max(Math.abs(from), Math.abs(to));
+      const min = Math.max(-focus / aspect, from);
+      range[1] = [min, max];
+    }
 
-  const ref = useShaderRef(matrix);
-  const bound = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [ref]);
+    return [focus, aspect, matrix, range];
+  }, [g, a, p, r, q, s, bend, helix]);
+
+  const b = useShaderRef(bend);
+  const f = useShaderRef(focus);
+  const c = useShaderRef(aspect);
+  const h = useShaderRef(helix);
+  const t = useShaderRef(matrix);
+  
+  const bound = useBoundShader(getPolarPosition, POLAR_BINDINGS, [b, f, c, h, t]);
   const transform = useCombinedTransform(bound);
 
   return (
     provide(TransformContext, transform,
-      provide(RangeContext, g, children ?? [])
+      provide(RangeContext, range, children ?? [])
     )
   );
 };

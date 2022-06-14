@@ -32,7 +32,8 @@ export const getCurrentFiberID = () => CURRENT_FIBER?.id;
 export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
   fiber = fiber ?? makeFiber(f, null);
 
-  if (f.length === 0) {
+  const length = getArgCount(f);
+  if (length === 0) {
     return () => {
       enterFiber(fiber!, base);
       const value = f();
@@ -40,7 +41,7 @@ export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, fiber?: LiveFi
       return value;
     }
   }
-  if (f.length === 1) {
+  if (length === 1) {
     return (arg: any) => {
       enterFiber(fiber!, base);
       const value = f(arg);
@@ -947,3 +948,13 @@ export const pingFiberCount = <F extends ArrowFunction>(fiber: LiveFiber<F>) => 
   fiber.runs = incrementVersion(fiber.runs);
 }
 
+// Get argument count for a function, including optional arguments.
+export const getArgCount = <F extends Function>(f: F) => {
+  let s = Function.toString.call(f).split(/\)|=>/)[0];
+  if (s == null) return 0;
+
+  s = s.replace(/\s+/g, '').replace(/^\(/, '').replace(/,$/, '');
+  if (s.length === 0) return 0;
+
+  return s.split(',').length;
+}

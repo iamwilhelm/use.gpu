@@ -197,7 +197,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
             const size = [bitmap.width, bitmap.height];
             const format = 'rgba8unorm';
-            const colorSpace = 'native';
+            const colorSpace = 'auto';
 
             const texture = makeCopyableTexture(device, bitmap.width, bitmap.height, format);
             uploadExternalTexture(device, texture, bitmap, size);

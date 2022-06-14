@@ -3,7 +3,7 @@ import { TypedArray, TextureSource, Atlas, Lazy, RenderPassMode } from '@use-gpu
 import { ShaderSource } from '@use-gpu/shader/types';
 import { SDFGlyphData } from '../text/types';
 
-import { use, keyed, wrap, memo, debug, fragment, useFiber, useOne, useState, useResource } from '@use-gpu/live';
+import { use, keyed, wrap, memo, debug, fragment, provide, useFiber, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { TransformContext, useTransformContext } from '../providers/transform-provider';
@@ -14,6 +14,7 @@ import { useFontFamily } from '../text/providers/font-provider';
 import { SDFFontProvider } from '../text/providers/sdf-font-provider';
 import { DebugAtlas } from '../text/debug-atlas';
 import { GlyphSource } from '../text/glyph-source';
+import { PanControls } from '../camera/pan-controls';
 import { RawLabels } from '../primitives/raw-labels';
 import { UI, Flat } from '../layout';
 
@@ -107,37 +108,46 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           const layouts = useRawSource(data.layouts, 'vec2<f32>');
           const uvs = useRawSource(data.uvs, 'vec4<f32>');
 
-          return fragment([
-            //debug(wrap(Flat, wrap(UI, use(DebugAtlas, {atlas, source})))),
-            use(RawLabels, {
-              indices,
-              rectangles,
-              layouts,
-              uvs,
-              sdf,
-              texture: source,
-          
-              position,
-              positions,
-              placement,
-              placements,
-              offset,
-              offsets,
-              size,
-              sizes,
-              depth,
-              depths,
-              color,
-              colors,
-              expand,
-              expands,
+          // Debug atlas
+          //return fragment([
+            /*
+            provide(TransformContext, null,
+              use(PanControls, {render: (x, y, zoom) =>
+                use(Flat, {
+                  x, y, zoom, children: wrap(UI, use(DebugAtlas, {atlas, source}))
+                })
+              })
+            ),
+            */
+          return use(RawLabels, {
+            indices,
+            rectangles,
+            layouts,
+            uvs,
+            sdf,
+            texture: source,
+        
+            position,
+            positions,
+            placement,
+            placements,
+            offset,
+            offsets,
+            size,
+            sizes,
+            depth,
+            depths,
+            color,
+            colors,
+            expand,
+            expands,
 
-              flip,
-              count,
-              mode,
-              id,
-            })
-          ]);
+            flip,
+            count,
+            mode,
+            id,
+          });
+          //]);
         },
     })
   );

@@ -43,7 +43,7 @@ use '@use-gpu/wgsl/material/pbr'::{ applyPBRMaterial as applyDefaultPBRMaterial 
 
   let lightPosition = vec3<f32>(10.0, 30.0, 20.0);
   let lightColor = vec4<f32>(1.0, 1.0, 1.0, 1.0);
-  let lightAmbient = 0.05;
+  let lightAmbient = 0.005;
 
   let toLight: vec3<f32> = lightPosition - position.xyz;
   let L: vec3<f32> = normalize(toLight);

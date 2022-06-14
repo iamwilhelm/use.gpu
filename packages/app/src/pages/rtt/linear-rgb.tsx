@@ -12,7 +12,7 @@ import {
 import { Mesh } from '../../components/mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
 
-export const LinearRGBPage: LC = () => {
+export const RTTLinearRGBPage: LC = () => {
   const mesh = makeMesh();
   const texture = makeTexture();
 

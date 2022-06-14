@@ -11,17 +11,28 @@ import {
   OrbitCamera, OrbitControls,
   Pick, Cursor, Line, Surface,
   Animation,
-  Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
+  Plot, Spherical, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
   LinearRGB,
 } from '@use-gpu/components';
 
-let t = 0;
+const π = Math.PI;
+const τ = π * 2;
+const EPS = 1e-3;
 
-export const PlotSimplePage: LC = () => {
+const numberFormatter = (x: number) => x.toFixed(2).replace(/\.0+$/, '');
+
+const thetaFormatter = (θ: number) => {
+  if (θ === 0) return '0';
+  const num = Math.abs(θ / π);
+  const denom = Math.abs(π / θ);
+  return `${θ < 0 ? '-' : ''}${num > 1 + EPS ? numberFormatter(num) : ''}π${denom > 1 + EPS ? '/' + numberFormatter(denom) : ''}`;
+};
+
+export const PlotSphericalPage: LC = () => {
   
   const view = (
     <Loop>
-      <Draw>
+      <LinearRGB>
         <Cursor cursor="move" />
         <Pass>
           <Plot>
@@ -30,29 +41,25 @@ export const PlotSimplePage: LC = () => {
               mirror
               delay={0}
               frames={[
-                [0, [[-3, 0], [0, 1], [0, 3]]],
-                [10, [[0, 3], [0, 1], [0, 3]]],
+                [0, 0],
+                [1, 0],
+                [10, 1],
+                [11, 1],
               ]}
-              prop='range'
+              prop='bend'
             >
-              <Cartesian
-                scale={[2, 1, 1]}
+              <Spherical
+                range={[[-τ/2, τ/2], [-τ/4, τ/4], [0, 2]]}
+                scale={[1.5, 1, 1]}
               >
                 <Grid
                   axes='xy'
                   width={2}
-                  first={{ detail: 3, divide: 5 }}
-                  second={{ detail: 3, divide: 5 }}
+                  first={{ detail: 32, unit: π, base: 2, divide: 8, end: true }}
+                  second={{ detail: 32, unit: π, base: 2, divide: 4, end: true }}
                   depth={0.5}
                   zBias={-1}
-                />
-                <Grid
-                  axes='xz'
-                  width={2}
-                  first={{ detail: 3, divide: 5 }}
-                  second={{ detail: 3, divide: 5 }}
-                  depth={0.5}
-                  zBias={-1}
+                  origin={[0, 0, 1]}
                 />
 
                 <Axis
@@ -60,10 +67,16 @@ export const PlotSimplePage: LC = () => {
                   width={5}
                   color={[0.75, 0.75, 0.75, 1]}
                   depth={0.5}
+                  detail={32}
+                  origin={[0, 0, 1]}
                 />
                 <Scale
-                  divide={5}
+                  unit={π}
+                  base={2}
+                  divide={4}
+                  end={true}
                   axis='x'
+                  origin={[0, 0, 1]}
                 >
                   <Tick
                     size={20}
@@ -79,6 +92,7 @@ export const PlotSimplePage: LC = () => {
                     offset={16}
                     expand={5}
                     depth={0.5}
+                    format={thetaFormatter}
                   />
                   <Label
                     placement='bottom'
@@ -87,6 +101,7 @@ export const PlotSimplePage: LC = () => {
                     offset={16}
                     expand={0}
                     depth={0.5}
+                    format={thetaFormatter}
                   />
                 </Scale>
 
@@ -94,48 +109,32 @@ export const PlotSimplePage: LC = () => {
                   axis='y'
                   width={5}
                   color={[0.75, 0.75, 0.75, 1]}
-                  detail={8}
+                  detail={32}
                   depth={0.5}
+                  origin={[0, 0, 1]}
                 />
-                <Axis
-                  axis='z'
-                  width={5}
-                  color={[0.75, 0.75, 0.75, 1]}
-                  detail={8}
-                  depth={0.5}
-                />
+
                 <Sampled
-                  axes='zx'
-                  format='vec4<f32>'
-                  size={[10, 20]}
-                  expr={(emit, z, x) => {
-                    const v = Math.cos(x) * Math.cos(z);
-                    emit(x, v * .4 + .5, z, 1);
+                  axes='x'
+                  format='vec3<f32>'
+                  size={[256]}
+                  expr={(emit, θ) => {
+                    const r = Math.cos(θ * 8);
+                    emit(θ, r, 1);
                   }}
                 >
-                  <Surface
-                    color={[0.1, 0.3, 1, 1]}
-                  />
                   <Line
-                    width={2}
-                    color={[0.5, 0.5, 1, 0.5]}
+                    width={4}
+                    color={0x3090FF}
                     depth={0.5}
                     zBias={1}
                   />
-                  <Transpose axes='yx'>
-                    <Line
-                      width={2}
-                      color={[0.5, 0.5, 1, 0.5]}
-                      depth={0.5}
-                      zBias={1}
-                    />
-                  </Transpose>
                 </Sampled>
-              </Cartesian>
+              </Spherical>
             </Animation>
           </Plot>
         </Pass>
-      </Draw>
+      </LinearRGB>
     </Loop>
   );
 

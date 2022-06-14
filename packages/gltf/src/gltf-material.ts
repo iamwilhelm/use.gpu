@@ -37,8 +37,11 @@ export const useGLTFMaterial = (
     } = pbrMetallicRoughness;
 
     if (baseColorTexture != null) {
-      const map = gltf.bound.texture[baseColorTexture.index];
-      props.albedoMap = map;
+      let map = gltf.bound.texture[baseColorTexture.index];
+      if (map) {
+        if (map.colorSpace === 'auto') map = {...map, colorSpace: 'srgb'};
+        props.albedoMap = map;
+      }
     }
     if (baseColorFactor != null) {
       props.albedo = baseColorFactor;
@@ -51,25 +54,37 @@ export const useGLTFMaterial = (
       props.roughness = roughnessFactor;
     }
     if (metallicRoughnessTexture != null) {
-      const map = gltf.bound.texture[metallicRoughnessTexture.index];
-      props.metalnessRoughnessMap = map;
-      if (metallicFactor == null) props.metalness = 1.0;
-      if (roughnessFactor == null) props.roughness = 1.0;
+      let map = gltf.bound.texture[metallicRoughnessTexture.index];
+      if (map) {
+        if (map.colorSpace === 'auto') map = {...map, colorSpace: 'native'};
+        props.metalnessRoughnessMap = map;
+        if (metallicFactor == null) props.metalness = 1.0;
+        if (roughnessFactor == null) props.roughness = 1.0;
+      }
     }
     
     if (normalTexture != null) {
-      const map = gltf.bound.texture[normalTexture.index];
-      props.normalMap = map;
+      let map = gltf.bound.texture[normalTexture.index];
+      if (map) {
+        if (map.colorSpace === 'auto') map = {...map, colorSpace: 'native'};
+        props.normalMap = map;
+      }
     }
 
     if (occlusionTexture != null) {
-      const map = gltf.bound.texture[occlusionTexture.index];
-      props.occlusionMap = map;
+      let map = gltf.bound.texture[occlusionTexture.index];
+      if (map) {
+        if (map.colorSpace === 'auto') map = {...map, colorSpace: 'native'};
+        props.occlusionMap = map;
+      }
     }
 
     if (emissiveTexture != null) {
-      const map = gltf.bound.texture[emissiveTexture.index];
-      props.emissiveMap = map;
+      let map = gltf.bound.texture[emissiveTexture.index];
+      if (map) {
+        if (map.colorSpace === 'auto') map = {...map, colorSpace: 'srgb'};
+        props.emissiveMap = map;
+      }
     }
   }
   

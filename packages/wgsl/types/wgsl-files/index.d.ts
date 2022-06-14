@@ -386,6 +386,20 @@ declare module "@use-gpu/wgsl/transform/normal.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/transform/polar.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getPolarPosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/spherical.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getSphericalPosition: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/use/color.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;

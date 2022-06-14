@@ -30,7 +30,7 @@ export type UseRenderingContextGPU = {
   swapView: (view?: GPUTextureView) => void,
 };
 
-export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking';
+export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';
 
 export type TypedArray =
   Int8Array |

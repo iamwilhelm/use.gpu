@@ -27,8 +27,6 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   var sdfRaw = 0.0;
   var mark = 0.0;
 
-  if (uv.x < clipUV.x || uv.y < clipUV.y || uv.x > clipUV.z || uv.y > clipUV.w) { discard; }
-
   if (mode == -1 || mode == -2) {
     // SDF Glyph
     let sdfRadius = sdfConfig.x;
@@ -77,6 +75,9 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     sdf.outer += bleed;
     sdf.inner += bleed;
   }
+
+  // Clipping this late because sooner than this causes issues in edge pixels
+  if (uv.x < clipUV.x || uv.y < clipUV.y || uv.x > clipUV.z || uv.y > clipUV.w) { discard; }
 
   var mask = clamp(sdf.outer, 0.0, 1.0);
 

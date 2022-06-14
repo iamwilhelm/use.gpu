@@ -10,7 +10,7 @@ import {
   LinearRGB, Feedback,
 } from '@use-gpu/components';
 
-export const FeedbackPage: LC = () => {
+export const RTTFeedbackPage: LC = () => {
   let t = 0;
   return (
     <Loop>

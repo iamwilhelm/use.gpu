@@ -74,9 +74,11 @@ export const useRenderPipeline = (
     // Make new pipeline
     const pipeline = makeRenderPipeline(
       device,
-      renderContext,
       vertex,
       fragment,
+      colorStates,
+      depthStencilState,
+      samples,
       props,
     );
     cache.set(key, pipeline);
@@ -161,9 +163,11 @@ export const useRenderPipelineAsync = (
     // Make new pipeline async
     const promise = makeRenderPipelineAsync(
       device,
-      renderContext,
       vertex,
       fragment,
+      colorStates,
+      depthStencilState,
+      samples,
       props,
     );
     promise.then((pipeline: GPURenderPipeline) => {

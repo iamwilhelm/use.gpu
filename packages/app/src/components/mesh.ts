@@ -96,9 +96,11 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
     return makeRenderPipeline(
       device,
-      renderContext,
       vertex,
       fragment,
+      colorStates,
+      depthStencilState,
+      samples,
       {
         primitive: {
           topology: "triangle-list",

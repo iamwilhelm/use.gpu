@@ -58,7 +58,8 @@ export const bindBundle = (
   const external: string[] = [];
   for (const k in links) if (links[k]) external.push(getBundleHash(links[k]!));
 
-  const unique = `@closure [${hash}] [${external.join(' ')}]`;
+  const defs = defines ? getHash(defines) : '';
+  const unique = `@closure [${hash}] [${external.join(' ')}] [${defs}]`;
   const rehash = getHash(unique);
 
   external.length = 0;

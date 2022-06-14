@@ -283,6 +283,16 @@
       "import": "./src/transform/normal.wgsl",
       "require": "./src/transform/normal.wgsl"
     },
+    "./transform/polar.wgsl": {
+      "types": "./src/transform/polar.wgsl.d.ts",
+      "import": "./src/transform/polar.wgsl",
+      "require": "./src/transform/polar.wgsl"
+    },
+    "./transform/spherical.wgsl": {
+      "types": "./src/transform/spherical.wgsl.d.ts",
+      "import": "./src/transform/spherical.wgsl",
+      "require": "./src/transform/spherical.wgsl"
+    },
     "./use/color.wgsl": {
       "types": "./src/use/color.wgsl.d.ts",
       "import": "./src/use/color.wgsl",

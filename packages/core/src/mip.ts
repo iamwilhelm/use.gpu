@@ -62,7 +62,7 @@ const makeMipMesh = (bounds: Rectangle[], size: Point): VertexData => {
 }
 
 const NO_CLEAR = [0, 0, 0, 0] as Rectangle;
-const MIP_PIPELINES = new WeakMap<GPUDevice, GPURenderPipeline>();
+const MIP_PIPELINES = new WeakMap<GPUDevice, Map<string, GPURenderPipeline>>();
 
 export const updateMipTextureChain = (
   device: GPUDevice,
@@ -71,6 +71,7 @@ export const updateMipTextureChain = (
 ) => {
   const {
     texture,
+    format,
     size,
     mips = 1,
   } = source;
@@ -82,9 +83,6 @@ export const updateMipTextureChain = (
 
   const mesh = makeMipMesh(bounds, size);
   const vertexBuffer = makeVertexBuffer(device, mesh.vertices[0]);
-  const vertex = makeShaderModule(MIP_SHADER, 'mip-v', 'vertexMain');
-  const fragment = makeShaderModule(MIP_SHADER, 'mip-f', 'fragmentMain');
-
   const sampler = makeSampler(device, {
     minFilter: 'linear',
     magFilter: 'linear',
@@ -96,22 +94,23 @@ export const updateMipTextureChain = (
     colorAttachments: [makeColorAttachment(views[i], null, NO_CLEAR, 'load')],
   } as GPURenderPassDescriptor));
 
-  const renderContext = {
-    device,
-    samples: 1,
-    colorStates: [makeColorState(source.format)],
-  } as any;
-
-  let pipeline = MIP_PIPELINES.get(device);
+  let cache = MIP_PIPELINES.get(device);
+  if (!cache) MIP_PIPELINES.set(device, cache = new Map());
+  
+  let pipeline = cache.get(format);
   if (!pipeline) {
-    pipeline = makeRenderPipeline(device, renderContext, vertex, fragment, {
+    const vertex = makeShaderModule(MIP_SHADER, 'mip-v', 'vertexMain');
+    const fragment = makeShaderModule(MIP_SHADER, 'mip-f', 'fragmentMain');
+    const colorStates = [makeColorState(format)];
+
+    pipeline = makeRenderPipeline(device, vertex, fragment, colorStates, undefined, 1, {
       primitive: {
         topology: "triangle-strip",
       },
       vertex:   {buffers: mesh.attributes},
       fragment: {},
     });
-    MIP_PIPELINES.set(device, pipeline);
+    cache.set(format, pipeline);
   }
 
   const bindGroups = seq(mips).map((mip: number) => makeTextureBinding(device, pipeline, sampler, views[mip]));

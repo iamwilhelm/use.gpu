@@ -22,6 +22,7 @@ export type FlatProps = {
 
   focus?: number,
   scale?: number | null,
+  relative?: boolean,
 
   near?: number,
   far?: number,
@@ -35,6 +36,7 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     y = 0,
     zoom = 1,
     scale = null,
+    relative = false,
     focus = DEFAULT_FLAT_CAMERA.focus,
     near = DEFAULT_FLAT_CAMERA.near,
     far = DEFAULT_FLAT_CAMERA.far,
@@ -54,14 +56,23 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     const w = Math.floor(width / ratio);
     const h = Math.floor(height / ratio);
 
-    const left = 0;
-    const top = 0;
-    const right = w;
-    const bottom = h;
+    let left, right, top, bottom;
+    if (relative) {
+      const a = width / height;
+      left = -a;
+      right = a;
+      top = 1;
+      bottom = -1;
+    }
+    else {
+      left = 0;
+      top = 0;
+      right = w;
+      bottom = h;
+    }
+
     const layout = [left, top, right, bottom] as Rectangle;
-
     const matrix = makeOrthogonalMatrix(left, right, bottom, top, near, far);
-
     return [layout, matrix, ratio, w, h];
   }, [scale, width, height, pixelRatio]);
 

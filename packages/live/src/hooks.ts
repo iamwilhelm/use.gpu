@@ -4,7 +4,7 @@ import {
   DeferredCall, HostInterface, Hook,
 } from './types';
 
-import { bind, bustFiberMemo, getCurrentFiber, getCurrentFiberID } from './fiber';
+import { bind, bustFiberMemo, getCurrentFiber, getCurrentFiberID, getArgCount } from './fiber';
 import { isSameDependencies, incrementVersion } from './util';
 import { formatNode } from './debug';
 
@@ -75,16 +75,6 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i] = undefined;
   state![i + 1] = undefined;
 };
-
-const getArgCount = <F extends Function>(f: F) => {
-  let s = Function.toString.call(f).split(/\)|=>/)[0];
-  if (s == null) return 0;
-
-  s = s.replace(/\s+/g, '').replace(/^\(/, '').replace(/,$/, '');
-  if (s.length === 0) return 0;
-
-  return s.split(',').length;
-}
 
 // Memoize a live function on all its arguments (shallow comparison per arg)
 // Unlike <Memo> this does not create a new sub-fiber

@@ -9,9 +9,11 @@ import { DebugGlyphPage } from './pages/debug/glyph';
 import { LayoutDisplayPage } from './pages/layout/display';
 import { LayoutAlignPage } from './pages/layout/align';
 import { MeshRawPage } from './pages/mesh/raw';
-import { LinearRGBPage } from './pages/rtt/linear-rgb';
-import { FeedbackPage } from './pages/rtt/feedback';
-import { PlotSimplePage } from './pages/plot/simple';
+import { PlotCartesianPage } from './pages/plot/cartesian';
+import { PlotPolarPage } from './pages/plot/polar';
+import { PlotSphericalPage } from './pages/plot/spherical';
+import { RTTLinearRGBPage } from './pages/rtt/linear-rgb';
+import { RTTFeedbackPage } from './pages/rtt/feedback';
 
 import { HomePage } from './pages/home';
 import { EmptyPage } from './pages/empty';
@@ -24,7 +26,9 @@ export const PAGES = [
   {path: "/layout/display", title: "Layout - Box model"},
   {path: "/layout/align", title: "Layout - Alignment Tests"},
   {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
-  {path: "/plot/simple", title: "Plot - Simple"},
+  {path: "/plot/cartesian", title: "Plot - XYZ"},
+  {path: "/plot/polar", title: "Plot - Polar"},
+  {path: "/plot/spherical", title: "Plot - Spherical"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
   {path: "/rtt/feedback", title: "RTT - Feedback"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
@@ -40,9 +44,11 @@ export const makeRoutes = () => ({
   "/layout/display": { element: <LayoutDisplayPage /> },
   "/layout/align":   { element: <LayoutAlignPage /> },
   "/mesh/raw":       { element: <MeshRawPage /> },
-  "/plot/simple":    { element: <PlotSimplePage /> },
-  "/rtt/linear-rgb": { element: <LinearRGBPage /> },
-  "/rtt/feedback":   { element: <FeedbackPage /> },
+  "/plot/cartesian": { element: <PlotCartesianPage /> },
+  "/plot/polar":     { element: <PlotPolarPage /> },
+  "/plot/spherical": { element: <PlotSphericalPage /> },
+  "/rtt/linear-rgb": { element: <RTTLinearRGBPage /> },
+  "/rtt/feedback":   { element: <RTTFeedbackPage /> },
   "/debug/atlas":    { element: <DebugAtlasPage /> },
   "/debug/glyph":    { element: <DebugGlyphPage /> },
 

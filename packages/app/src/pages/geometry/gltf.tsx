@@ -7,7 +7,7 @@ import { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Draw, Pass, Fetch,
+  LinearRGB, Pass, Fetch,
   CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
@@ -21,7 +21,7 @@ export const GeometryGLTFPage: LC = () => {
   const url = "/gltf/DamagedHelmet/DamagedHelmet.gltf";
 
   const view = (
-    <Draw>
+    <LinearRGB>
       <Cursor cursor='move' />
       <Pass>
 
@@ -33,7 +33,7 @@ export const GeometryGLTFPage: LC = () => {
         />
 
       </Pass>
-    </Draw>
+    </LinearRGB>
   );
 
   return (

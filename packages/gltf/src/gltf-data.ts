@@ -49,7 +49,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         if (typeof data === 'string') return JSON.parse(data);
 
         if (data instanceof ArrayBuffer) {
-          const u32 = new Uint32Array(data);
+          const u32 = new Uint32Array(data.slice(0, 4));
           if (u32[0] === GLTF_MAGIC) throw new Error("binary gltf unimplemented");
 
           return JSON.parse(new TextDecoder().decode(data));
@@ -84,8 +84,6 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
       return {gltf, buffers, images, bufferAssets, imageAssets};
     }, json);
-  
-    console.log('----------- gltf', gltf);
   
     // Resume after loading resources
     const Resume = (resources: (ArrayBuffer | ImageBitmap | null)[]) => {
@@ -160,7 +158,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
       // Convert accessors to storage sources
       const storageSources = useMap<GLTFAccessorData, GLTFStorageSource | null>(accessors,
         ({bufferView, componentType, count, min, max, type}, index) => {
-          const bufferSource = bufferSources[bufferView || -1];
+          const bufferSource = bufferSources[bufferView ?? -1];
           if (!bufferSource) return null;
 
           const {byteLength, byteOffset} = bufferSource;
@@ -175,7 +173,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             max,
           };
         },
-        ({bufferView}) => bufferSources[bufferView || -1],
+        ({bufferView}) => bufferSources[bufferView ?? -1],
         [accessors]);
 
       // Expose native typed arrays for further processing before upload
@@ -187,7 +185,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
           if (!ctor) return null;
 
           const {arrayBuffer, byteOffset, byteLength} = source;
-          return arrayBuffer && byteOffset ? new ctor(arrayBuffer.slice(byteOffset, byteLength)) : null;
+          return arrayBuffer ? new ctor(arrayBuffer.slice(byteOffset ?? 0, byteLength)) : null;
         },
         (source) => source,
         []);
@@ -261,11 +259,13 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
     // Load external assets
     return bufferAssets.length + imageAssets.length ? (
       gather(use(Throttle, [
+
         ...bufferAssets.map(({uri}) => uri ? use(Fetch, {
           url: resolveURL(base, uri),
           type: 'arrayBuffer',
           loading: null,
         }) : yeet(null)),
+
         ...imageAssets.map(({uri}) => uri ? use(Fetch, {
           url: resolveURL(base, uri),
           type: 'blob',
@@ -279,6 +279,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             });
           },
         }) : yeet(null))
+
       ], 0), Resume)
     ) : use(Resume, []);
   };

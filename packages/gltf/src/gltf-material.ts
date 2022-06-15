@@ -5,14 +5,20 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useMemo } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 
-import { PBRMaterialProps, useBoundShader, useShaderRef } from '@use-gpu/components';
+import { PBRMaterialProps, useBoundShader, useNativeColorTexture } from '@use-gpu/components';
 
 export const useGLTFMaterial = (
   gltf: GLTF,
   material?: number,
 ) => {
   if (!gltf.bound) throw new Error("GLTF bound data is missing. Load GLTF using <GLTFData>.");
-  if (material == null || !gltf.materials?.[material]) return {};
+  if (material == null || !gltf.materials?.[material]) {
+    useNativeColorTexture();
+    useNativeColorTexture();
+    useNativeColorTexture();
+//    useNativeColorTexture();
+    return {};
+  }
   
   const {
     pbrMetallicRoughness,
@@ -90,6 +96,11 @@ export const useGLTFMaterial = (
       }
     }
   }
-  
+    
+  props.albedoMap = useNativeColorTexture(props.albedoMap);
+  props.normalMap = useNativeColorTexture(props.normalMap);
+  props.occlusionMap = useNativeColorTexture(props.occlusionMap);
+  props.emissiveMap = useNativeColorTexture(props.emissiveMap);
+
   return props;
 };

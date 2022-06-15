@@ -84,7 +84,6 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   else {
     useNoMemo();
     useNoRawSource();
-    useNoMemo();
   }
 
   const render = use(FaceLayer, faces);

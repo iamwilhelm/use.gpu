@@ -48,6 +48,6 @@ export const GLTFModel: LC<GLTFModelProps> = memo((props: GLTFModelProps) => {
     }
 
     // Render as GLTFNode
-    return Array.from(roots).map(root => root ? use(GLTFNode, {gltf, node: root}) : null);
+    return Array.from(roots).map(root => root != null ? use(GLTFNode, {gltf, node: root}) : null);
   }, [gltf, propNode, propScene]);
 }, 'GLTFModel');

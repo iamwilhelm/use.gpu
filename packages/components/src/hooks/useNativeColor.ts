@@ -13,10 +13,10 @@ import { toLinear4, toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
 const TEXTURE_BINDING = bundleToAttribute(getUIFragment, 'getTexture');
 
 export const useNativeColorTexture = (texture?: ShaderSource) => {
-  if (!texture) {
+  if (!texture || texture.colorSpace == null || texture.colorSpace === 'native') {
     useNoContext(RenderContext);
     useNoMemo();
-    return null;
+    return texture;
   }
 
   const { colorSpace } = useContext(RenderContext);

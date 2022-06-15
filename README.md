@@ -13,6 +13,9 @@ This enables completely free-form tinkering for any graphics skill level.
 
 Use.GPU has an incremental architecture, which updates with minimal recomputation. This is done by embracing effect-based programming, with React-like memoization hooks. The result is a program that always has the same state you'd get if it was run entirely from scratch.
 
+_Why you might want this, see:_
+ - [The Case for Use.GPU](https://acko.net/blog/the-case-for-use-gpu/) - What's wrong with GPU programming and how to fix it
+
 _For background, see:_
  - [Climbing Mount Effect](https://acko.net/blog/climbing-mt-effect/) - Effect-based programming
  - [Reconcile All The Things](https://acko.net/blog/reconcile-all-the-things/) - Memoization and reconciliation

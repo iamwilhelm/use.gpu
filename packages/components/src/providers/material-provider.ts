@@ -20,15 +20,15 @@ export const MaterialContext = makeContext<ShaderModule>(getShadedFragment, 'Mat
 
 export const useMaterialContext = () => useContext(MaterialContext);
 
-type MaterialProps = {
-  material: ShaderModule,
-};
-
 const PBR_BINDINGS = bundleToAttributes(applyPBRMaterial);
 const MAPPED_BINDINGS = bundleToAttributes(getMappedFragment);
 const SHADED_BINDINGS = bundleToAttributes(getShadedFragment);
 
-type PBRMaterialProps = {
+export type MaterialProps = {
+  material: ShaderModule,
+};
+
+export type PBRMaterialProps = {
   albedo?: ColorLike,
   metalness?: number,
   roughness?: number,

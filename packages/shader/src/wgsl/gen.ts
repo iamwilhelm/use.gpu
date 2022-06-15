@@ -11,7 +11,6 @@ import { VIRTUAL_BINDGROUP, VOLATILE_BINDGROUP } from './constants';
 const INT_PARAMS = [{name: 'index', type: {name: 'u32'}}];
 const INT_ARG = ['u32'];
 const UV_ARG = ['vec2<f32>'];
-const LOAD_ARG = ['vec2<i32>', 'i32'];
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
@@ -114,11 +113,11 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute, sampler, format} = texture!;
+      const {volatile, layout, variant, absolute, sampler, format, args} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       if (sampler) volatile ? volatileBase++ : bindingBase++;
-      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute, !!sampler));
+      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute, !!sampler, args));
     }
 
     return program.join('\n');
@@ -204,7 +203,7 @@ export const makeTextureAccessor = (
   variant: string = 'textureSample',
   absolute: boolean = false,
   sampler: boolean = true,
-  args: string[] = (variant === 'textureLoad' ? LOAD_ARG : UV_ARG),
+  args: string[] = UV_ARG,
 ) => {
   const m = layout.match(/[0-9]/) ?? [2];
   const dims = +m[0];

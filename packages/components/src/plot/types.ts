@@ -49,7 +49,7 @@ export type GridTrait = {
 
 export type LabelTrait = {
   labels?: string[],
-  expr?: (v: number, i: number) => string,
+  format?: (v: number, i: number) => string,
   size: number,
   depth: number,
   expand: number,

@@ -37,7 +37,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
   const run = useMemo(() => {
     const f = async () => {
       const response = await fetch((url ?? request)!, options);
-      if (typeof response[type] === 'function') return response[type]();
+      if (type != null && typeof response[type] === 'function') return (response[type] as any)();
       return response;
     };
 

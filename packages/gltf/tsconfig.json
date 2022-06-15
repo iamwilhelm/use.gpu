@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.pkg.json",
   "references": [
-    { "path": "../state" }
+    { "path": "../state" },
+    { "path": "../core" },
+    { "path": "../live" },
+    { "path": "../components" },
   ],
   "compilerOptions": {
     "rootDir": "..",

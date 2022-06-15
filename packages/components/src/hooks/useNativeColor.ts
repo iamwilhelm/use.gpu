@@ -22,7 +22,7 @@ export const useNativeColorTexture = (texture?: ShaderSource) => {
   const { colorSpace } = useContext(RenderContext);
   const getTexture = useMemo(() => {
     const getTexture = getBoundSource(TEXTURE_BINDING, texture);
-    const {colorSpace: colorInput} = (texture as TextureSource);
+    const {colorSpace: colorInput} = (texture as TextureSource | LambdaSource);
     const convert = getNativeColor(colorInput, colorSpace);
     return convert ? chainTo(getTexture, convert) : getTexture;
   }, [texture, colorSpace]);
@@ -32,7 +32,7 @@ export const useNativeColorTexture = (texture?: ShaderSource) => {
 
 export const useNativeColor = (colorInput: ColorSpace, colorOutput: ColorSpace) => {
   return useMemo(() => getNativeColor(colorInput, colorOutput), [colorInput, colorOutput]);
-}
+};
 
 export const getNativeColor = (colorInput?: ColorSpace | null, colorOutput?: ColorSpace | null) => {
   if (colorInput === colorOutput) return null;
@@ -46,4 +46,4 @@ export const getNativeColor = (colorInput?: ColorSpace | null, colorOutput?: Col
   if (chain.length === 0) return null;
   if (chain.length === 1) return chain[0];
   return chain.reduce((a, b) => chainTo(a, b));
-}
+};

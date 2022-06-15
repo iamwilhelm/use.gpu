@@ -1,5 +1,5 @@
 import { mat4, vec3, quat } from 'gl-matrix';
-import { StorageSource, TextureSource } from '@use-gpu/shader/types';
+import { StorageSource, TextureSource, TypedArray } from '@use-gpu/core/types';
 
 export type GLTF<T = any> = {
   accessors?:   GLTFAccessorData<T>[],
@@ -9,14 +9,15 @@ export type GLTF<T = any> = {
   materials?:   GLTFMaterialData<T>[],
   meshes?:      GLTFMeshData<T>[],
   nodes?:       GLTFNodeData<T>[],
-  samples?:     GLTFSamplerData<T>[],
+  samplers?:    GLTFSamplerData<T>[],
   scenes?:      GLTFSceneData<T>[],
   textures?:    GLTFTextureData<T>[],
   scene?:       number,
 
   bound?: {
-    accessors?: StorageSource[],
-    textures?: TextureSource[],
+    data: TypedArray[],
+    storage: StorageSource[],
+    texture: TextureSource[],
   },
 };
 
@@ -58,7 +59,7 @@ export type GLTFPrimitiveData<T = any> = GLTFObject<T> & {
   indices?: number,
   material?: number,
   mode?: number,
-  targets?: GLTFTargetData<T>,
+  targets?: Record<string, number>[],
 };
 
 //////////////////////////////////////////////////
@@ -66,9 +67,9 @@ export type GLTFPrimitiveData<T = any> = GLTFObject<T> & {
 
 export type GLTFMaterialData<T = any> = GLTFObject<T> & {
   pbrMetallicRoughness?: GLTFMaterialPBR<T>,
-  normalTexture?: GLTFTextureInfo<T>,
-  occlusionTexture?: GLTFTextureInfo<T>,
-  emissiveTexture?: GLTFTextureInfo<T>,
+  normalTexture?: GLTFTextureInfoData<T>,
+  occlusionTexture?: GLTFTextureInfoData<T>,
+  emissiveTexture?: GLTFTextureInfoData<T>,
   emissiveFactor?: vec3,
   alphaMode?: string,
   alphaCutoff?: number,
@@ -77,17 +78,24 @@ export type GLTFMaterialData<T = any> = GLTFObject<T> & {
 
 export type GLTFMaterialPBR<T = any> = GLTFObject<T> & {
   baseColorFactor?: Float32Array,
-  baseColorTexture?: GLTFTextureInfo<T>,
+  baseColorTexture?: GLTFTextureInfoData<T>,
   metallicFactor?: number,
   roughnessFactor?: number,
-  metallicRoughnessTexture: GLTFTextureInfo<T>,
+  metallicRoughnessTexture: GLTFTextureInfoData<T>,
 };
 
-export type GLTFTextureInfo<T = any> = GLTFObject<T> & {
+export type GLTFTextureInfoData<T = any> = GLTFObject<T> & {
   index: number,
   scale?: number,
   strength?: number,
   texCoord?: number,
+};
+
+export type GLTFSamplerData<T = any> = GLTFObject<T> & {
+  magFilter?: number,
+  minFilter?: number,
+  wrapS?: number,
+  wrapT?: number,
 };
 
 //////////////////////////////////////////////////
@@ -114,6 +122,11 @@ export type GLTFImageData<T = any> = GLTFObject<T> & {
   uri?: string,
   mimeType?: string,
   bufferView?: number,
+};
+
+export type GLTFTextureData<T = any> = GLTFObject<T> & {
+  sampler?: number,
+  source?: number,
 };
 
 //////////////////////////////////////////////////

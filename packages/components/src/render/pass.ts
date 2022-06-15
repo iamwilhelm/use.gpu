@@ -55,7 +55,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
       const {colorAttachments, depthStencilAttachment} = context;
       const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments,
-        depthStencilAttachment,
+        depthStencilAttachment: depthStencilAttachment ?? undefined,
       };
 
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);

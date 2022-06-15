@@ -1,14 +1,13 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TypedArray, DataTexture, TextureSource, UniformType, Emitter } from '@use-gpu/core/types';
+import { Point, ColorSpace, TextureSource, UniformType, Emitter } from '@use-gpu/core/types';
 import { DeviceContext } from '../providers/device-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
-import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-import { yeet, memo, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
-import { makeSampler, makeRawTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
+import { use, yeet, gather, memo, useOne, useMemo, useContext } from '@use-gpu/live';
+import { makeCopyableTexture, makeTextureView, uploadExternalTexture } from '@use-gpu/core';
+import { Fetch } from './fetch';
 
 export type ImageTextureProps = {
   url?: string,
-  colorSpace?: string,
+  colorSpace?: ColorSpace,
   sampler?: GPUSamplerDescriptor,
   render?: (source: TextureSource) => LiveElement<any>,
 };
@@ -32,17 +31,16 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
         if (blob == null) return null;
 
         return createImageBitmap(blob, {
-          alpha: 'default',
+          premultiplyAlpha: 'default',
           colorSpaceConversion: 'none',
         });
       },
     })
   );
 
-  return gather(fetch, ([bitmap]: BitmapImage) => {
-    
+  return gather(fetch, ([bitmap]: ImageBitmap[]) => {
     const source = useOne(() => {
-      const size = [bitmap.width, bitmap.height];
+      const size = [bitmap.width, bitmap.height] as Point;
       const format = 'rgba8unorm';
 
       const texture = makeCopyableTexture(device, bitmap.width, bitmap.height, format);
@@ -60,11 +58,10 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
         format,
         size,
         colorSpace,
-        version: 0,
+        version: 1,
       };
     }, [bitmap, sampler]);
 
+    return useMemo(() => source ? (render ? render(source) : yeet(source)) : null, [render, source]);
   });
-
-  return useMemo(() => source ? (render ? render(source) : yeet(source)) : null, [render, source]);
 };

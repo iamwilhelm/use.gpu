@@ -1,10 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { UniformAttributeValue } from '@use-gpu/core/types';
-import { Swizzle } from '../types';
-import { VectorLike } from '../../traits/types';
+import { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
-import { makeRefBinding } from '@use-gpu/core';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 
 import { TransformContext } from '../../providers/transform-provider';

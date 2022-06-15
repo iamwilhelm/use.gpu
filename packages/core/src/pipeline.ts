@@ -25,7 +25,7 @@ export const makeRenderPipeline = (
   vertexShader: ShaderModuleDescriptor,
   fragmentShader: ShaderModuleDescriptor,
   colorStates: GPUColorTargetState[],
-  depthStencilState: GPUDepthStencilState | null,
+  depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
   descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
 ) => {
@@ -47,7 +47,7 @@ export const makeRenderPipelineAsync = (
   vertexShader: ShaderModuleDescriptor,
   fragmentShader: ShaderModuleDescriptor,
   colorStates: GPUColorTargetState[],
-  depthStencilState: GPUDepthStencilState | null,
+  depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
   descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
 ) => {

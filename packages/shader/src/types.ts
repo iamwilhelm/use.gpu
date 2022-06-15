@@ -1,6 +1,8 @@
 import { Tree, SyntaxNode } from '@lezer/common';
 import LRU from 'lru-cache';
 
+type ColorSpace = any;
+
 export type ASTParser<T extends SymbolTable = any> = {
   getSymbolTable: () => T,
   getShakeTable: (table?: T) => ShakeTable | undefined,
@@ -92,7 +94,7 @@ export type ShakeOp = [number, string[]];
 
 export type StorageSource = {
   buffer: GPUBuffer,
-  format: any,
+  format: string,
   length: number,
   size: number[],
   version: number,
@@ -100,13 +102,16 @@ export type StorageSource = {
   volatile?: number,
   byteOffset?: number,
   byteLength?: number,
+  colorSpace?: ColorSpace,
 };
 
 export type LambdaSource<T = any> = {
   shader: T,
   length: number,
-  version: number,
   size: number[],
+  version: number,
+
+  colorSpace?: ColorSpace,
 };
 
 export type TextureSource = {
@@ -114,13 +119,16 @@ export type TextureSource = {
   view?: GPUTextureView,
   sampler: GPUSampler | GPUSamplerDescriptor | null,
   layout: string,
-  format: any,
-  mips?: number,
-  variant?: string,
-  absolute?: boolean,
-  volatile?: number,
+  format: string,
   size: [number, number] | [number, number, number],
   version: number,
+
+  mips?: number,
+  variant?: string,
+  args?: string[],
+  absolute?: boolean,
+  volatile?: number,
+  colorSpace?: ColorSpace,
 };
 
 export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;

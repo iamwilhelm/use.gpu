@@ -1,5 +1,5 @@
 import { LC, PropsWithChildren, LiveElement } from '@use-gpu/live/types';
-import { GLTF, GLTFPrimitive } from './types';
+import { GLTF } from './types';
 
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useMemo } from '@use-gpu/live';
@@ -9,8 +9,11 @@ import { PBRMaterialProps, useBoundShader, useShaderRef } from '@use-gpu/compone
 
 export const useGLTFMaterial = (
   gltf: GLTF,
-  material: number,
+  material?: number,
 ) => {
+  if (!gltf.bound) throw new Error("GLTF bound data is missing. Load GLTF using <GLTFData>.");
+  if (material == null || !gltf.materials?.[material]) return {};
+  
   const {
     pbrMetallicRoughness,
     normalTexture,

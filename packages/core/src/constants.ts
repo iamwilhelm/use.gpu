@@ -1,19 +1,5 @@
 import {TypedArrayConstructor, UniformType} from './types';
 
-export const VALUE_TYPES = {
-  // GLSL
-  'float': Float32Array,
-  'double': Float64Array,
-  'int': Int32Array,
-  'uint': Uint32Array,
-
-  // WGSL
-  'f32': Float32Array,
-  'f64': Float64Array,
-  'i32': Int32Array,
-  'u32': Uint32Array,
-};
-
 export const TYPED_ARRAYS: TypedArrayConstructor[] = [
   Int8Array, Uint8Array,
   Int16Array, Uint16Array,
@@ -133,6 +119,32 @@ export const UNIFORM_SIZES = {
   "mat3x4<f64>": 96,
   "mat4x3<f64>": 96,
   "mat4x4<f64>": 128,
+
+  // Virtual types
+  "u8": 1,
+  "i8": 1,
+  "u16": 2,
+  "i16": 2,
+  "vec2<u8>": 2,
+  "vec2<i8>": 2,
+  "vec2<u16>": 4,
+  "vec2<i16>": 4,
+  "vec3<u8>": 3,
+  "vec3<i8>": 3,
+  "vec3<u16>": 6,
+  "vec3<i16>": 6,
+  "vec4<u8>": 4,
+  "vec4<i8>": 4,
+  "vec4<u16>": 8,
+  "vec4<i16>": 8,
+
+  "vec3to4<u8>": 3,
+  "vec3to4<i8>": 3,
+  "vec3to4<u16>": 6,
+  "vec3to4<i16>": 6,
+  "vec3to4<u32>": 12,
+  "vec3to4<i32>": 12,
+  "vec3to4<f32>": 12,
 };
 
 export const UNIFORM_DIMS = {
@@ -161,6 +173,26 @@ export const UNIFORM_DIMS = {
   "vec3<f64>":    3.5,
   "vec4<f64>":    4,
 
+  "mat2x2<u32>":  4,
+  "mat3x2<u32>":  6,
+  "mat2x3<u32>":  6,
+  "mat2x4<u32>":  8,
+  "mat4x2<u32>":  8,
+  "mat3x3<u32>":  9,
+  "mat3x4<u32>":  12,
+  "mat4x3<u32>":  12,
+  "mat4x4<u32>":  16,
+
+  "mat2x2<i32>":  4,
+  "mat3x2<i32>":  6,
+  "mat2x3<i32>":  6,
+  "mat2x4<i32>":  8,
+  "mat4x2<i32>":  8,
+  "mat3x3<i32>":  9,
+  "mat3x4<i32>":  12,
+  "mat4x3<i32>":  12,
+  "mat4x4<i32>":  16,
+
   "mat2x2<f32>":  4,
   "mat3x2<f32>":  6,
   "mat2x3<f32>":  6,
@@ -186,6 +218,25 @@ export const UNIFORM_DIMS = {
   "i8": 1,
   "u16": 1,
   "i16": 1,
+  "vec2<u8>": 2,
+  "vec2<i8>": 2,
+  "vec2<u16>": 2,
+  "vec2<i16>": 2,
+  "vec3<u8>": 3.5,
+  "vec3<i8>": 3.5,
+  "vec3<u16>": 3.5,
+  "vec3<i16>": 3.5,
+  "vec4<u8>": 4,
+  "vec4<i8>": 4,
+  "vec4<u16>": 4,
+  "vec4<i16>": 4,
+
+  "vec3to4<u8>": 3,
+  "vec3to4<i8>": 3,
+  "vec3to4<u16>": 3,
+  "vec3to4<i16>": 3,
+  "vec3to4<u32>": 3,
+  "vec3to4<i32>": 3,
   "vec3to4<f32>": 3,
 };
 
@@ -215,6 +266,26 @@ export const UNIFORM_ARRAY_TYPES = {
   "vec3<f64>":    Float64Array,
   "vec4<f64>":    Float64Array,
 
+  "mat2x2<u32>":  Uint32Array,
+  "mat3x2<u32>":  Uint32Array,
+  "mat2x3<u32>":  Uint32Array,
+  "mat2x4<u32>":  Uint32Array,
+  "mat4x2<u32>":  Uint32Array,
+  "mat3x3<u32>":  Uint32Array,
+  "mat3x4<u32>":  Uint32Array,
+  "mat4x3<u32>":  Uint32Array,
+  "mat4x4<u32>":  Uint32Array,
+
+  "mat2x2<i32>":  Int32Array,
+  "mat3x2<i32>":  Int32Array,
+  "mat2x3<i32>":  Int32Array,
+  "mat2x4<i32>":  Int32Array,
+  "mat4x2<i32>":  Int32Array,
+  "mat3x3<i32>":  Int32Array,
+  "mat3x4<i32>":  Int32Array,
+  "mat4x3<i32>":  Int32Array,
+  "mat4x4<i32>":  Int32Array,
+
   "mat2x2<f32>":  Float32Array,
   "mat3x2<f32>":  Float32Array,
   "mat2x3<f32>":  Float32Array,
@@ -240,6 +311,25 @@ export const UNIFORM_ARRAY_TYPES = {
   "i8": Int8Array,
   "u16": Uint16Array,
   "i16": Int16Array,
+  "vec2<u8>": Uint8Array,
+  "vec2<i8>": Int8Array,
+  "vec2<u16>": Uint16Array,
+  "vec2<i16>": Int16Array,
+  "vec3<u8>": Uint8Array,
+  "vec3<i8>": Int8Array,
+  "vec3<u16>": Uint16Array,
+  "vec3<i16>": Int16Array,
+  "vec4<u8>": Uint8Array,
+  "vec4<i8>": Int8Array,
+  "vec4<u16>": Uint16Array,
+  "vec4<i16>": Int16Array,
+
+  "vec3to4<u8>": Uint8Array,
+  "vec3to4<i8>": Int8Array,
+  "vec3to4<u16>": Uint16Array,
+  "vec3to4<i16>": Int16Array,
+  "vec3to4<u32>": Uint32Array,
+  "vec3to4<i32>": Int32Array,
   "vec3to4<f32>": Float32Array,
 };
 

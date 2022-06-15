@@ -1,6 +1,7 @@
 import { LC } from '@use-gpu/live/types';
 import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { GLTF } from '@use-gpu/gltf/types';
 
 import React from '@use-gpu/live/jsx';
 import { use } from '@use-gpu/live';
@@ -12,9 +13,7 @@ import {
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
 } from '@use-gpu/components';
-import {
-  GLTFData, GLTFModel,
-} from '@use-gpu/gltf';
+import { GLTFData, GLTFModel } from '@use-gpu/gltf';
 
 export const GeometryGLTFPage: LC = () => {
 
@@ -27,7 +26,7 @@ export const GeometryGLTFPage: LC = () => {
 
         <GLTFData
           url={url}
-          render={(gltf: GLTFData) =>
+          render={(gltf: GLTF) =>
             <GLTFModel gltf={gltf} />
           }
         />

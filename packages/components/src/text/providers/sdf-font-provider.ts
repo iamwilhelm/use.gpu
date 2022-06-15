@@ -7,11 +7,17 @@ import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState,
 import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/text';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
+import { getBoundShader } from '../../hooks/useBoundShader';
 import { makeInlineCursor } from '../../layout/lib/cursor';
 import { DebugContext } from '../../providers/debug-provider';
 import { DeviceContext } from '../../providers/device-provider';
 import { FontContext } from './font-provider';
+
+import { getLODBiasedTexture } from '@use-gpu/wgsl/fragment/lod-bias.wgsl';
+
+const LOD_BIAS_BINDINGS = bundleToAttributes(getLODBiasedTexture);
 
 export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFontContext');
 export const useSDFFontContext = () => useContext(SDFFontContext);
@@ -175,8 +181,21 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
           atlas.uploads.push(rects);
           updateMipTextureChain(device, source, rects);
         }
+        
+        const biasedSource = useOne(() => {
+          const biasable = {
+            ...source,
+            variant: 'textureSampleBias',
+            args: ['vec2<f32>', 'f32'],
+          };
+          const shader = {
+            ...getBoundShader(getLODBiasedTexture, LOD_BIAS_BINDINGS, [biasable, -0.5]),
+            colorSpace: 'srgb',
+          };
+          return shader;
+        }, source);
 
-        return then ? then(atlas, source, gathered) : null;
+        return then ? then(atlas, biasedSource, gathered) : null;
       },
     )
   ) : null;

@@ -23,9 +23,9 @@ export type UseRenderingContextGPU = {
   colorInput: ColorSpace,
   colorStates: GPUColorTargetState[],
   colorAttachments: GPURenderPassColorAttachment[],
-  depthTexture: GPUTexture | null,
-  depthStencilState: GPUDepthStencilState | null,
-  depthStencilAttachment: GPURenderPassDepthStencilAttachment | null,
+  depthTexture?: GPUTexture,
+  depthStencilState?: GPUDepthStencilState,
+  depthStencilAttachment?: GPURenderPassDepthStencilAttachment,
 
   swapView: (view?: GPUTextureView) => void,
 };
@@ -80,6 +80,26 @@ export type UniformType =
   | "vec3<f64>"
   | "vec4<f64>"
 
+  | "mat2x2<u32>"
+  | "mat3x2<u32>"
+  | "mat2x3<u32>"
+  | "mat2x4<u32>"
+  | "mat4x2<u32>"
+  | "mat3x3<u32>"
+  | "mat3x4<u32>"
+  | "mat4x3<u32>"
+  | "mat4x4<u32>"
+
+  | "mat2x2<i32>"
+  | "mat3x2<i32>"
+  | "mat2x3<i32>"
+  | "mat2x4<i32>"
+  | "mat4x2<i32>"
+  | "mat3x3<i32>"
+  | "mat3x4<i32>"
+  | "mat4x3<i32>"
+  | "mat4x4<i32>"
+
   | "mat2x2<f32>"
   | "mat3x2<f32>"
   | "mat2x3<f32>"
@@ -99,6 +119,31 @@ export type UniformType =
   | "mat3x4<f64>"
   | "mat4x3<f64>"
   | "mat4x4<f64>"
+
+  // Virtual types
+  | "u8"
+  | "i8"
+  | "u16"
+  | "i16"
+  | "vec2<u8>"
+  | "vec2<i8>"
+  | "vec2<u16>"
+  | "vec2<i16>"
+  | "vec3<u8>"
+  | "vec3<i8>"
+  | "vec3<u16>"
+  | "vec3<i16>"
+  | "vec4<u8>"
+  | "vec4<i8>"
+  | "vec4<u16>"
+  | "vec4<i16>"
+  | "vec3to4<u8>"
+  | "vec3to4<i8>"
+  | "vec3to4<u16>"
+  | "vec3to4<i16>"
+  | "vec3to4<u32>"
+  | "vec3to4<i32>"
+  | "vec3to4<f32>"
 ;
 
 // Vertex attributes
@@ -175,13 +220,16 @@ export type StorageSource = {
   volatile?: number,
   byteOffset?: number,
   byteLength?: number,
+  colorSpace?: ColorSpace,
 };
 
 export type LambdaSource<T = any> = {
   shader: T,
   length: number,
-  version: number,
   size: number[],
+  version: number,
+
+  colorSpace?: ColorSpace,
 };
 
 export type TextureSource = {
@@ -190,13 +238,15 @@ export type TextureSource = {
   sampler: GPUSampler | GPUSamplerDescriptor | null,
   layout: string,
   format: string,
+  size: [number, number] | [number, number, number],
+  version: number,
+
   mips?: number,
   variant?: string,
+  args?: string[],
   absolute?: boolean,
   volatile?: number,
   colorSpace?: ColorSpace,
-  size: [number, number] | [number, number, number],
-  version: number,
 };
 
 export type DataTexture = {
@@ -293,6 +343,7 @@ export type Atlas = {
   map: Map<number, Rectangle>,
   width: number,
   height: number,
+  uploads: Rectangle[][],
   version: number,
 };
 

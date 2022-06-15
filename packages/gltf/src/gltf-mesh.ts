@@ -1,5 +1,5 @@
 import { LC, LiveElement } from '@use-gpu/live/types';
-import { GLTF } from './types';
+import { GLTF, GLTFPrimitiveData } from './types';
 
 import { use, memo, useMemo } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
@@ -12,7 +12,7 @@ type GLTFMeshProps = {
   transform?: mat4,
 };
 
-export const GLTFMesh: LC<GLTFMeshProps> = memo((props) => {
+export const GLTFMesh: LC<GLTFMeshProps> = memo((props: GLTFMeshProps) => {
   const {
     gltf,
     mesh,
@@ -20,9 +20,12 @@ export const GLTFMesh: LC<GLTFMeshProps> = memo((props) => {
   } = props;
 
   const {meshes} = gltf;
+  if (!meshes) return null;
+
   const {primitives} = meshes[mesh];
+  if (!primitives) return null;
 
   return useMemo(() =>
-    primitives.map(primitive => use(GLTFPrimitive, {gltf, primitive, transform})),
+    primitives.map((primitive: GLTFPrimitiveData) => use(GLTFPrimitive, {gltf, primitive, transform})),
     [gltf, primitives, transform]);
 }, 'GLTFMesh');

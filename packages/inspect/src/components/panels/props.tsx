@@ -1,5 +1,4 @@
 import { LiveFiber } from '@use-gpu/live/types';
-import { TypedArray } from '@use-gpu/core/types';
 import { formatNode, formatValue, formatNodeName, YEET } from '@use-gpu/live';
 import { styled as _styled } from '@stitches/react';
 

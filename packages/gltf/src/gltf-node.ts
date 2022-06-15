@@ -1,4 +1,5 @@
 import { LC, LiveElement } from '@use-gpu/live/types';
+import { TypedArray } from '@use-gpu/core/types';
 import { GLTF } from './types';
 import { vec3, mat4, quat } from 'gl-matrix';
 
@@ -11,12 +12,13 @@ type GLTFNodeProps = {
   matrix?: mat4,
 };
 
-export const GLTFNode: LC<GLTFNodeProps> = memo((props) => {
+export const GLTFNode: LC<GLTFNodeProps> = memo((props: GLTFNodeProps) => {
   const {
     gltf,
     node,
     matrix: parentMatrix,
   } = props;
+  if (!gltf.nodes) return null;
 
   const {
     mesh,
@@ -40,10 +42,10 @@ export const GLTFNode: LC<GLTFNodeProps> = memo((props) => {
   ) : null;
 
   if (children) {
-    const out: LiveElement<any> = [];
+    const out: LiveElement<any>[] = [];
 
     if (self) out.push(self);
-    out.push(children.map(node => use(GLTFNode, {gltf, node})));
+    out.push(...Array.from(children).map((node: number) => use(GLTFNode, {gltf, node})));
     return out;
   }
 
@@ -59,10 +61,10 @@ const makeComposeTransform = () => {
 
   return (
     transform: mat4,
-    position?: TypedArray | null,
-    quaternion?: TypedArray | null,
-    scale?: TypedArray | null,
-    matrix?: TypedArray | null,
+    position?: vec3 | TypedArray | null,
+    quaternion?: quat | TypedArray | null,
+    scale?: vec3 | TypedArray | null,
+    matrix?: mat4 | TypedArray | null,
   ) => {
 
     if (quaternion != null) quat.copy(q, quaternion as any);

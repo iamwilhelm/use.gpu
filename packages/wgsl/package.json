@@ -23,6 +23,11 @@
   "types": "./types/wgsl-files/index.d.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./fragment/lod-bias.wgsl": {
+      "types": "./src/fragment/lod-bias.wgsl.d.ts",
+      "import": "./src/fragment/lod-bias.wgsl",
+      "require": "./src/fragment/lod-bias.wgsl"
+    },
     "./fragment/pbr.wgsl": {
       "types": "./src/fragment/pbr.wgsl.d.ts",
       "import": "./src/fragment/pbr.wgsl",

@@ -1,5 +1,6 @@
 import { LC, LiveElement } from '@use-gpu/live/types';
-import { GLTF } from './types';
+import { TypedArray } from '@use-gpu/core/types';
+import { GLTF, GLTFNodeData } from './types';
 
 import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
 import { GLTFNode } from './gltf-node';
@@ -14,10 +15,10 @@ type GLTFModelProps = {
 
 const NO_ROOTS: number[] = [];
 
-const toArray = (t?: T | T[] | null) => Array.isArray(t) ? t : t != null ? [t] : [];
+const toArray = <T>(t?: T | T[] | null) => Array.isArray(t) ? t : t != null ? [t] : [];
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
-export const GLTFModel: LC<GLTFModelProps> = memo((props) => {
+export const GLTFModel: LC<GLTFModelProps> = memo((props: GLTFModelProps) => {
   const {
     gltf,
     scene: propScene,
@@ -28,23 +29,25 @@ export const GLTFModel: LC<GLTFModelProps> = memo((props) => {
   return useMemo(() => {
     const {scenes, nodes} = gltf;
 
-    const getNodeIndex = (id: number | string) => {
+    const getNodeIndex = (id: number | string): number | null => {
       if (typeof id === 'number') return id;
-      const i = nodes.findIndex(({name}) => name === id);
+      if (!nodes) return null;
+
+      const i = nodes.findIndex(({name}: GLTFNodeData) => name === id);
       return i >= 0 ? i : null;
     };
 
     // Find root nodes to render
-    let roots = NO_ROOTS;
+    let roots = NO_ROOTS as (number | null)[] | TypedArray;
     if (propNode != null) roots = toArray(getNodeIndex(propNode));
-    else if (propNodes != null) root = propNodes.map(node => getNodeIndex(node)).filter(n => n != null);
+    else if (propNodes != null) roots = propNodes.map((node: number | string) => getNodeIndex(node)).filter((n: number | null) => n != null);
     else {
       const s = propScene ?? gltf.scene;
-      if (s != null) roots = scenes[s]?.nodes ?? NO_ROOTS;
-      else roots = seq(nodes.length);
+      if (s != null && scenes) roots = scenes[s]?.nodes ?? NO_ROOTS;
+      else roots = seq(nodes?.length || 0);
     }
 
     // Render as GLTFNode
-    return Array.from(roots).map(root => use(GLTFNode, {gltf, node: root}));
+    return Array.from(roots).map(root => root ? use(GLTFNode, {gltf, node: root}) : null);
   }, [gltf, propNode, propScene]);
 }, 'GLTFModel');

@@ -35,6 +35,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     primitive,
     transform,
   } = props;
+  if (!gltf.bound) throw new Error("GLTF bound data is missing. Load GLTF using <GLTFData>.");
 
   const {bound: {storage}} = gltf;
   const {attributes, indices, material, mode} = primitive;
@@ -66,13 +67,13 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     if (indices != null) {
       // Unweld mesh
       const inds = gltf.bound.data[indices];
-      ps = flattenIndexedArray(ps, inds, 3);
-      ns = flattenIndexedArray(ns, inds, 3);
-      ts = flattenIndexedArray(ts, inds, 2);
+      ps = flattenIndexedArray(ps as any, inds, 3);
+      ns = flattenIndexedArray(ns as any, inds, 3);
+      ts = flattenIndexedArray(ts as any, inds, 2);
     }
 
     const tangents = useMemo(() => {
-      const out = generateTangents(ps, ns, ts);
+      const out = generateTangents(ps as any, ns as any, ts as any);
       const n = out.length;
       for (let i = 0; i < n; i += 4) out[i + 3] *= -1;
       return out;

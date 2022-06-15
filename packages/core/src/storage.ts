@@ -48,7 +48,7 @@ export const checkStorageType = (
 ) => {
   const {name, format: from} = uniform;
   const to = link?.format;
-  if (link && from !== to) {
+  if (link && to && from !== to) {
     // Remove vec size to allow for automatic widening/narrowing
     const fromVec = from.replace(/vec[0-9](to[0-9])?/, 'vec');
     const toVec   =   to.replace(/vec[0-9](to[0-9])?/, 'vec'); 

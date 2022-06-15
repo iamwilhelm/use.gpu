@@ -102,7 +102,7 @@ export const useRenderPipelineAsync = (
   );
 
   const [resolved, setResolved] = useState<GPURenderPipeline | null>(null);
-  const staleRef = useOne(() => ({current: null}));
+  const staleRef = useOne(() => ({current: null as string | null}));
 
   const immediate = useMemo(() => {
     // Cache by unique render context

@@ -157,7 +157,7 @@ export const makeRawTexture = (
   const {size, format} = dataTexture;
   const [w, h, d] = size as Point3;
 
-  return makeSourceTexture(device, w, h, d || 1, format, 1, mipLevelCount);
+  return makeSourceTexture(device, w, h, d || 1, format ?? 'rgba8unorm', 1, mipLevelCount);
 }
 
 export const makeTextureDataLayout = (
@@ -185,7 +185,7 @@ export const uploadDataTexture = (
 ): void => {
   const {data, size, format} = dataTexture;
 
-  const layout = makeTextureDataLayout(size, format);  
+  const layout = makeTextureDataLayout(size, format ?? 'rgba8unorm');
   uploadTexture(device, texture, data, layout, size);
 }
 

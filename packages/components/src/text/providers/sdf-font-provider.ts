@@ -1,5 +1,6 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Atlas, Tuples, Rectangle, TextureSource } from '@use-gpu/core/types';
+import { Atlas, Tuples, Rectangle } from '@use-gpu/core/types';
+import { ShaderSource } from '@use-gpu/shader/types';
 import { FontMetrics, GlyphMetrics } from '@use-gpu/text/types';
 import { Alignment } from '../../layout/types';
 
@@ -22,13 +23,13 @@ const LOD_BIAS_BINDINGS = bundleToAttributes(getLODBiasedTexture);
 export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFontContext');
 export const useSDFFontContext = () => useContext(SDFFontContext);
 
-export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as TextureSource;
-export const SDF_FONT_DEBUG = 'SDF_FONT_DEBUG' as any as TextureSource;
+export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as ShaderSource;
+export const SDF_FONT_DEBUG = 'SDF_FONT_DEBUG' as any as ShaderSource;
 
 export type SDFFontContextProps = {
   __debug: {
     atlas: Atlas,
-    source: {current: TextureSource},
+    source: {current: ShaderSource},
   },
 
   getRadius: () => number,
@@ -42,7 +43,7 @@ export type SDFFontProviderProps = {
   radius?: number,
   pad?: number,
   children?: LiveElement<any>,
-  then?: (atlas: Atlas, source: TextureSource, gathered: any) => LiveElement<any>
+  then?: (atlas: Atlas, source: ShaderSource, gathered: any) => LiveElement<any>
 };
 
 const NO_MAPPING = [0, 0, 0, 0] as Rectangle;

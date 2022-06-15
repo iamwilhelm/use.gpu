@@ -99,10 +99,11 @@ This repo is split into the following sub-packages:
  - [`@use-gpu/wgsl-loader`](packages/wgsl-loader/README.md) - WGSL file bundler for webpack and node ✅
  - [`@use-gpu/glsl-loader`](packages/glsl-loader/README.md) - GLSL file bundler for webpack and node ✅
 
-**UI Components**
+**Component Library**
  - `@use-gpu/wgsl` - Supporting WGSL shaders ⏱
- - `@use-gpu/components` - Live components for WebGPU apps ⏱
- - `@use-gpu/app` - Testbed app ⚠️
+ - `@use-gpu/components` - Live components for WebGPU apps ⏱ (this will probably be split up later)
+ - `@use-gpu/gltf` - GLTF 2.0 loader ⏱
+ - `@use-gpu/app` - Testbed demo app ⚠️
 
 **Live**
  - `@use-gpu/live` - Memoized effect run-time (React without DOM / rendering) ✅

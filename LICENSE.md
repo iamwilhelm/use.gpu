@@ -1,6 +1,6 @@
-Live
+Live/Use.GPU
 
-Copyright (c) 2021 Steven Wittens
+Copyright (c) 2021-2022 Steven Wittens
 https://acko.net/
 
 Permission is hereby granted, free of charge, to any person
@@ -12,8 +12,11 @@ copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following
 conditions:
 
-The above copyright notice and this permission notice shall be
+- The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
+
+- This software may not be used as source material to train
+machine learning systems of any kind.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES

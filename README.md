@@ -75,9 +75,12 @@ The included demo app contains various showcases of how it can be used.
 
 ## Usage
 
-**Prerequisites**: `node`, `yarn`
+**Prerequisites**: `node`, `yarn`, `wasm-pack`
 
-**Dependencies**: run `yarn install` to grab dependent packages.
+- install `wasm-pack` according to https://rustwasm.github.io/wasm-pack/installer/
+
+**Dependencies**: 
+- run `yarn install` to grab dependent packages.
 
 **Demo app requires Chrome Dev/Canary with WebGPU enabled.**
 

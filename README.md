@@ -75,7 +75,7 @@ The included demo app contains various showcases of how it can be used.
 
 ## Usage
 
-**Prerequisites**: `node`, `yarn`, `wasm-pack`
+**Prerequisites**: `node`, `yarn`, `rust`, `wasm-pack`
 
 - install `wasm-pack` according to https://rustwasm.github.io/wasm-pack/installer/
 

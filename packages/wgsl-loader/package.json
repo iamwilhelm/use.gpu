@@ -21,7 +21,7 @@
     "types:watch": "yarn run types -- --watch",
     "build": "yarn run build:js && yarn run build:types && yarn run build:bin && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/wgsl-loader/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel scripts --out-dir ../../build/packages/wgsl-loader/scripts --extensions \".ts\"; babel node.ts --out-dir ../../build/packages/wgsl-loader --extensions \".ts\"",
+    "build:js": "babel src --out-dir ../../build/packages/wgsl-loader/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel scripts --out-dir ../../build/packages/wgsl-loader/scripts --extensions \".ts\"; babel node.ts --out-dir ../../build/packages/wgsl-loader --extensions \".ts\"; babel rollup.ts --out-dir ../../build/packages/wgsl-loader --extensions \".ts\"",
     "build:bin": "mkdir ../../build/packages/wgsl-loader/bin 2>/dev/null; cp bin/wgsl-tsgen ../../build/packages/wgsl-loader/bin",
     "build:pkg": "cp README.md package.json ../../build/packages/wgsl-loader"
   },

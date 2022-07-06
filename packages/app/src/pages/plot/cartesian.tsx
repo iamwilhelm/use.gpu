@@ -1,5 +1,4 @@
 import { LC } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import { use } from '@use-gpu/live';
@@ -13,7 +12,7 @@ import {
   Animation,
   Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
   LinearRGB,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 
 let t = 0;
 

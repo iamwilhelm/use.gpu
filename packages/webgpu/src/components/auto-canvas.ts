@@ -1,14 +1,13 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 
+import { use, useResource, useNoResource } from '@use-gpu/live';
+import { Picking } from '@use-gpu/workbench';
+import { CursorConsumer } from '@use-gpu/workbench';
+
+import { adoptOrMakeCanvas } from '../web';
 import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
 import { DOMEvents } from './dom-events';
-import { Picking } from '../render/picking';
-import { CursorConsumer } from '../consumers/cursor-consumer';
-
-import { use, useResource, useNoResource } from '@use-gpu/live';
-import { adoptCanvas } from '@use-gpu/webgpu';
 
 export type AutoCanvasProps = {
   canvas?: HTMLCanvasElement,
@@ -34,7 +33,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   let {canvas} = props;
   if (!canvas && props.selector) {
     canvas = useResource((dispose) => {
-      const [c, d] = adoptCanvas(props.selector!);
+      const [c, d] = adoptOrMakeCanvas(props.selector!);
       dispose(d);
       return c;
     }, [props.selector]);
@@ -65,7 +64,6 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
           children:
             picking
             ? use(Picking, {
-                canvas,
                 children: view,
               })
             : view

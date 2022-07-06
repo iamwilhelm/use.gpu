@@ -6,7 +6,7 @@
     { "path": "../webgpu" },
     { "path": "../wgsl" },
     { "path": "../shader" },
-    { "path": "../components" },
+    { "path": "../workbench" },
     { "path": "../gltf" },
     { "path": "../inspect" }
   ],

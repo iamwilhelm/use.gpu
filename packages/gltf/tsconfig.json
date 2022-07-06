@@ -4,7 +4,7 @@
     { "path": "../state" },
     { "path": "../core" },
     { "path": "../live" },
-    { "path": "../components" },
+    { "path": "../workbench" },
   ],
   "compilerOptions": {
     "rootDir": "..",

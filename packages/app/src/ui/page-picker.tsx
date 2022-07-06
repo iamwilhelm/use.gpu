@@ -2,7 +2,7 @@ import React from 'react';
 import { PAGES } from '../routes';
 import { use } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
-import { useRouterContext } from '@use-gpu/components';
+import { useRouterContext } from '@use-gpu/workbench';
 
 const ICON = (s: string) => <span className="m-icon">{s}</span>
 

@@ -8,7 +8,7 @@ npm install --save @use-gpu/wgsl-loader
 yarn add @use-gpu/wgsl-loader
 ```
 
-## WGSL loader for webpack and node
+## WGSL loader for webpack / node / rollup
 
 This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
 
@@ -20,6 +20,14 @@ For node, the included helper will use `require-hacker` to convert all `*.wgsl` 
 
 ```js
 import "@use-gpu/wgsl-loader/node";
+```
+
+#### Rollup.js
+
+For rollup, import:
+
+```js
+import rollupWGSL from "@use-gpu/wgsl-loader/rollup";
 ```
 
 #### Webpack Config

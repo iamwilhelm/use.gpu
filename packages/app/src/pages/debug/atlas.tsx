@@ -5,7 +5,7 @@ import {
   LinearRGB, Pass, PanControls,
   Flat, UI, Layout, Absolute, Inline, Text,
   DebugAtlas, RawTexture, DebugProvider,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 
 import { GlyphControls } from '../../ui/glyph-controls';
 

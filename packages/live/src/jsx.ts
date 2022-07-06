@@ -19,6 +19,8 @@ export const Provide = PROVIDE as AnyF;
 export const Yeet = YEET as AnyF;
 export const Morph = MORPH as AnyF;
 
+export const into = (children: any): any => children;
+
 export const React = {
   createElement: (type: ArrowFunction, props: any, ...children: any[]) => {
     const by = getCurrentFiberID();

@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core/types';
-import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@use-gpu/components';
+import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@use-gpu/workbench';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
@@ -8,7 +8,7 @@ import {
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
-import { useInspectable, useNativeColor } from '@use-gpu/components';
+import { useInspectable, useNativeColor } from '@use-gpu/workbench';
 
 import instanceDrawMesh from '@use-gpu/wgsl/render/vertex/mesh.wgsl';
 import instanceDrawMeshPick from '@use-gpu/wgsl/render/vertex/mesh-pick.wgsl';

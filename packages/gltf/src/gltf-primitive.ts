@@ -14,7 +14,7 @@ import {
   TransformContext,
   useBoundShader, useNoBoundShader,
   useRawSource, useNoRawSource,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
 import { getTransformedNormal } from '@use-gpu/wgsl/transform/normal.wgsl'
 import { useGLTFMaterial } from './gltf-material';

@@ -1,5 +1,4 @@
 import { LC } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
@@ -8,7 +7,7 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import {
   Loop, Draw, Pass, OrbitCamera, RawData, PointLayer, Raw,
   LinearRGB, Feedback,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 
 export const RTTFeedbackPage: LC = () => {
   let t = 0;

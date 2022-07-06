@@ -5,7 +5,7 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useMemo } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 
-import { PBRMaterialProps, useBoundShader, useNativeColorTexture } from '@use-gpu/components';
+import { PBRMaterialProps, useBoundShader, useNativeColorTexture } from '@use-gpu/workbench';
 
 export const useGLTFMaterial = (
   gltf: GLTF,

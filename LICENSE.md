@@ -1,4 +1,4 @@
-Live/Use.GPU
+Live/Use.GPU - MIT+NMLA
 
 Copyright (c) 2021-2022 Steven Wittens
 https://acko.net/
@@ -15,7 +15,7 @@ conditions:
 - The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
-- This software may not be used as source material to train
+- This Software may not be used as source material to train
 machine learning systems of any kind.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,

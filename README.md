@@ -41,11 +41,11 @@ On the surface, Use.GPU feels exactly like React, in that you can use `<JSX>` sy
   <Pass>
     <Data
       fields={[
-        ['vec4<f32>', [
-          -5, -2.5, 0, 1,
-          5, -2.5, 0, 1,
-          0, -2.5, -5, 1,
-          0, -2.5, 5, 1,
+        ['vec3<f32>', [
+          -5, -2.5, 0,
+          5, -2.5, 0,
+          0, -2.5, -5,
+          0, -2.5, 5,
         ]],
         ['i32', [1, 2, 1, 2]],
       ]}
@@ -77,10 +77,13 @@ The included demo app contains various showcases of how it can be used.
 
 **Prerequisites**: `node`, `yarn`, `rust`, `wasm-pack`
 
-- install `wasm-pack` according to https://rustwasm.github.io/wasm-pack/installer/
+- `node`: https://nodejs.org/en/
+- `yarn`: https://yarnpkg.com/getting-started/install
+- `rust`: https://www.rust-lang.org/tools/install
+- `wasm-pack`: https://rustwasm.github.io/wasm-pack/installer/
 
 **Dependencies**: 
-- run `yarn install` to grab dependent packages.
+- run `yarn install` to grab dependent packages, and run code generation for the lib.
 
 **Demo app requires Chrome Dev/Canary with WebGPU enabled.**
 
@@ -92,9 +95,15 @@ The included demo app contains various showcases of how it can be used.
 
 This repo is split into the following sub-packages:
 
+**Component Library**
+ - `@use-gpu/webgpu` - DOM/WebGPU shell ⏱
+ - `@use-gpu/workbench` - Live components for WebGPU ⏱
+ - `@use-gpu/wgsl` - Supporting WGSL shaders ⏱
+ - `@use-gpu/gltf` - GLTF 2.0 loader ⏱
+ - `@use-gpu/app` - Testbed demo app ⚠️
+
 **WebGPU**
  - `@use-gpu/core` - WebGPU helpers and types ⏱
- - `@use-gpu/webgpu` - DOM/Canvas WebGPU bindings ✅
  - `@use-gpu/text` - WASM/Rust library wrapping `ab_glyph` ✅
 
 **Shaders**
@@ -102,18 +111,12 @@ This repo is split into the following sub-packages:
  - [`@use-gpu/wgsl-loader`](packages/wgsl-loader/README.md) - WGSL file bundler for webpack and node ✅
  - [`@use-gpu/glsl-loader`](packages/glsl-loader/README.md) - GLSL file bundler for webpack and node ✅
 
-**Component Library**
- - `@use-gpu/wgsl` - Supporting WGSL shaders ⏱
- - `@use-gpu/components` - Live components for WebGPU apps ⏱ (this will probably be split up later)
- - `@use-gpu/gltf` - GLTF 2.0 loader ⏱
- - `@use-gpu/app` - Testbed demo app ⚠️
-
 **Live**
  - `@use-gpu/live` - Memoized effect run-time (React without DOM / rendering) ✅
  - `@use-gpu/inspect` - Debug inspector for Live ⏱
  - `@use-gpu/react` - Live/React interop ✅
  - `@use-gpu/state` - Patch/diff-based state management + hashing ✅
- 
+
 This is a work in progress. Stability:
 - ✅: Stable Beta
 - ⏱: Evolving Alpha

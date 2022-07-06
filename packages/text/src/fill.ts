@@ -1,5 +1,6 @@
 
 // Fill out colors in transparent areas
+// (separable version for EDT)
 export const fill = (
   data: Uint8Array,
   x0: number,

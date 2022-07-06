@@ -1,5 +1,4 @@
 import { LC } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode, Point4 } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
@@ -9,7 +8,7 @@ import {
   LinearRGB, Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
   PanControls,
   DebugProvider,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 
 const TRANSPARENT = [1, 1, 1, 0.1] as Point4;
 

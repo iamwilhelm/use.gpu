@@ -1,17 +1,11 @@
 import { LC } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
-import React from '@use-gpu/live/jsx';
+import React, { into } from '@use-gpu/live/jsx';
 import { useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
-
-import {
-  AutoCanvas, DebugProvider,
-  FontLoader,
-  Router, Routes,
-  WebGPU,
-} from '@use-gpu/components';
+import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
+import { DebugProvider, FontLoader, Router, Routes } from '@use-gpu/workbench';
 
 import { UseInspect } from '@use-gpu/inspect';
 import '@use-gpu/inspect/theme.css';
@@ -65,7 +59,7 @@ export const App: LC = () => {
 
   const view = useMemo(() => (
     <WebGPU
-      fallback={(error: Error) => <HTML container={inner}>{FALLBACK_MESSAGE(error) as any}</HTML>}
+      fallback={(error: Error) => <HTML container={inner}>{into(FALLBACK_MESSAGE(error))}</HTML>}
     >
       <AutoCanvas
         selector={'#use-gpu .canvas'}

@@ -5,7 +5,7 @@ import { toScene, toNode, toMesh, toMaterial } from './parse';
 
 import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
 
-import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/components';
+import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/workbench';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeCopyableTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
 

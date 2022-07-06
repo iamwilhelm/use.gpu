@@ -24,7 +24,6 @@ export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFo
 export const useSDFFontContext = () => useContext(SDFFontContext);
 
 export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as ShaderSource;
-export const SDF_FONT_DEBUG = 'SDF_FONT_DEBUG' as any as ShaderSource;
 
 export type SDFFontContextProps = {
   __debug: {

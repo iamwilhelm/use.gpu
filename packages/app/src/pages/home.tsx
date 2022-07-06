@@ -1,7 +1,8 @@
 import { LiveComponent } from '@use-gpu/live/types';
+
 import { use } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
-import { useRouterContext } from '@use-gpu/components';
+import { useRouterContext } from '@use-gpu/workbench';
 
 import React from 'react';
 import { styled } from '@stitches/react';

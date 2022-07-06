@@ -52,6 +52,7 @@ export const HTML = ({
     ReactDOM.render(React.createElement('div', {}, null), div);
   }
 
+  // Make React fibers inspectable in Live
   const f = fiber as any;
   const i = f.__inspect = f.__inspect ?? {};
   const r = i.react = i.react ?? {root: null};

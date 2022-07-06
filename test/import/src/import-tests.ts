@@ -1,6 +1,6 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { TypedArray } from '@use-gpu/core/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
+import { GPUDeviceMount } from '@use-gpu/webgpu/types';
 import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 
 import { use, renderSync } from '@use-gpu/live';
@@ -8,7 +8,7 @@ import { uploadBuffer } from '@use-gpu/core';
 import { mountGPUDevice } from '@use-gpu/webgpu';
 import { WGSLLinker } from '@use-gpu/shader';
 import { UseInspect } from '@use-gpu/inspect';
-import { Draw } from '@use-gpu/components';
+import { Draw, Pass, RawQuads } from '@use-gpu/workbench';
 
 import WGSLLoader from '@use-gpu/wgsl-loader';
 import { loadModule } from '@use-gpu/shader/wgsl';

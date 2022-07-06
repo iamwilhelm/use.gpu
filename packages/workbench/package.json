@@ -1,0 +1,697 @@
+{
+  "name": "@use-gpu/workbench",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@use-gpu/live": "*",
+    "@use-gpu/state": "*",
+    "@use-gpu/core": "*",
+    "@use-gpu/webgpu": "*",
+    "@use-gpu/shader": "*",
+    "@use-gpu/text": "*",
+    "@use-gpu/wgsl": "*"
+  },
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+    "build": "yarn run build:js && yarn run build:types && yarn run build:exports && yarn run build:pkg",
+    "build:exports": "ts-node ../../scripts/build-exports.ts",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir ../../build/packages/workbench/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:pkg": "cp package.json ../../build/packages/workbench"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./animate/animation": {
+      "types": "./src/animate/animation.d.ts",
+      "import": "./src/animate/animation.ts",
+      "require": "./src/animate/animation.ts"
+    },
+    "./camera/orbit-camera": {
+      "types": "./src/camera/orbit-camera.d.ts",
+      "import": "./src/camera/orbit-camera.ts",
+      "require": "./src/camera/orbit-camera.ts"
+    },
+    "./camera/orbit-controls": {
+      "types": "./src/camera/orbit-controls.d.ts",
+      "import": "./src/camera/orbit-controls.ts",
+      "require": "./src/camera/orbit-controls.ts"
+    },
+    "./camera/pan-controls": {
+      "types": "./src/camera/pan-controls.d.ts",
+      "import": "./src/camera/pan-controls.ts",
+      "require": "./src/camera/pan-controls.ts"
+    },
+    "./constants": {
+      "types": "./src/constants.d.ts",
+      "import": "./src/constants.ts",
+      "require": "./src/constants.ts"
+    },
+    "./consumers/cursor-consumer": {
+      "types": "./src/consumers/cursor-consumer.d.ts",
+      "import": "./src/consumers/cursor-consumer.ts",
+      "require": "./src/consumers/cursor-consumer.ts"
+    },
+    "./consumers/scroll-consumer": {
+      "types": "./src/consumers/scroll-consumer.d.ts",
+      "import": "./src/consumers/scroll-consumer.ts",
+      "require": "./src/consumers/scroll-consumer.ts"
+    },
+    "./data/array-data": {
+      "types": "./src/data/array-data.d.ts",
+      "import": "./src/data/array-data.ts",
+      "require": "./src/data/array-data.ts"
+    },
+    "./data/composite-data": {
+      "types": "./src/data/composite-data.d.ts",
+      "import": "./src/data/composite-data.ts",
+      "require": "./src/data/composite-data.ts"
+    },
+    "./data/data": {
+      "types": "./src/data/data.d.ts",
+      "import": "./src/data/data.ts",
+      "require": "./src/data/data.ts"
+    },
+    "./data/fetch": {
+      "types": "./src/data/fetch.d.ts",
+      "import": "./src/data/fetch.ts",
+      "require": "./src/data/fetch.ts"
+    },
+    "./data/image-texture": {
+      "types": "./src/data/image-texture.d.ts",
+      "import": "./src/data/image-texture.ts",
+      "require": "./src/data/image-texture.ts"
+    },
+    "./data/raw-data": {
+      "types": "./src/data/raw-data.d.ts",
+      "import": "./src/data/raw-data.ts",
+      "require": "./src/data/raw-data.ts"
+    },
+    "./data/raw-texture": {
+      "types": "./src/data/raw-texture.d.ts",
+      "import": "./src/data/raw-texture.ts",
+      "require": "./src/data/raw-texture.ts"
+    },
+    "./data/sampled-data": {
+      "types": "./src/data/sampled-data.d.ts",
+      "import": "./src/data/sampled-data.ts",
+      "require": "./src/data/sampled-data.ts"
+    },
+    "./hooks/useApplyTransform": {
+      "types": "./src/hooks/useApplyTransform.d.ts",
+      "import": "./src/hooks/useApplyTransform.ts",
+      "require": "./src/hooks/useApplyTransform.ts"
+    },
+    "./hooks/useBoundShader": {
+      "types": "./src/hooks/useBoundShader.d.ts",
+      "import": "./src/hooks/useBoundShader.ts",
+      "require": "./src/hooks/useBoundShader.ts"
+    },
+    "./hooks/useBoundSource": {
+      "types": "./src/hooks/useBoundSource.d.ts",
+      "import": "./src/hooks/useBoundSource.ts",
+      "require": "./src/hooks/useBoundSource.ts"
+    },
+    "./hooks/useBufferedSize": {
+      "types": "./src/hooks/useBufferedSize.d.ts",
+      "import": "./src/hooks/useBufferedSize.ts",
+      "require": "./src/hooks/useBufferedSize.ts"
+    },
+    "./hooks/useCombinedTransform": {
+      "types": "./src/hooks/useCombinedTransform.d.ts",
+      "import": "./src/hooks/useCombinedTransform.ts",
+      "require": "./src/hooks/useCombinedTransform.ts"
+    },
+    "./hooks/useDataBinding": {
+      "types": "./src/hooks/useDataBinding.d.ts",
+      "import": "./src/hooks/useDataBinding.ts",
+      "require": "./src/hooks/useDataBinding.ts"
+    },
+    "./hooks/useDerivedSource": {
+      "types": "./src/hooks/useDerivedSource.d.ts",
+      "import": "./src/hooks/useDerivedSource.ts",
+      "require": "./src/hooks/useDerivedSource.ts"
+    },
+    "./hooks/useDerivedState": {
+      "types": "./src/hooks/useDerivedState.d.ts",
+      "import": "./src/hooks/useDerivedState.ts",
+      "require": "./src/hooks/useDerivedState.ts"
+    },
+    "./hooks/useForceUpdate": {
+      "types": "./src/hooks/useForceUpdate.d.ts",
+      "import": "./src/hooks/useForceUpdate.ts",
+      "require": "./src/hooks/useForceUpdate.ts"
+    },
+    "./hooks/useInspectable": {
+      "types": "./src/hooks/useInspectable.d.ts",
+      "import": "./src/hooks/useInspectable.ts",
+      "require": "./src/hooks/useInspectable.ts"
+    },
+    "./hooks/useLinkedShader": {
+      "types": "./src/hooks/useLinkedShader.d.ts",
+      "import": "./src/hooks/useLinkedShader.ts",
+      "require": "./src/hooks/useLinkedShader.ts"
+    },
+    "./hooks/useMemoKey": {
+      "types": "./src/hooks/useMemoKey.d.ts",
+      "import": "./src/hooks/useMemoKey.ts",
+      "require": "./src/hooks/useMemoKey.ts"
+    },
+    "./hooks/useNativeColor": {
+      "types": "./src/hooks/useNativeColor.d.ts",
+      "import": "./src/hooks/useNativeColor.ts",
+      "require": "./src/hooks/useNativeColor.ts"
+    },
+    "./hooks/useRawSource": {
+      "types": "./src/hooks/useRawSource.d.ts",
+      "import": "./src/hooks/useRawSource.ts",
+      "require": "./src/hooks/useRawSource.ts"
+    },
+    "./hooks/useRenderPipeline": {
+      "types": "./src/hooks/useRenderPipeline.d.ts",
+      "import": "./src/hooks/useRenderPipeline.ts",
+      "require": "./src/hooks/useRenderPipeline.ts"
+    },
+    "./hooks/useShaderRef": {
+      "types": "./src/hooks/useShaderRef.d.ts",
+      "import": "./src/hooks/useShaderRef.ts",
+      "require": "./src/hooks/useShaderRef.ts"
+    },
+    "./interact/pick": {
+      "types": "./src/interact/pick.d.ts",
+      "import": "./src/interact/pick.ts",
+      "require": "./src/interact/pick.ts"
+    },
+    "./layers/arrow-layer": {
+      "types": "./src/layers/arrow-layer.d.ts",
+      "import": "./src/layers/arrow-layer.ts",
+      "require": "./src/layers/arrow-layer.ts"
+    },
+    "./layers/arrow-segments": {
+      "types": "./src/layers/arrow-segments.d.ts",
+      "import": "./src/layers/arrow-segments.ts",
+      "require": "./src/layers/arrow-segments.ts"
+    },
+    "./layers/face-layer": {
+      "types": "./src/layers/face-layer.d.ts",
+      "import": "./src/layers/face-layer.ts",
+      "require": "./src/layers/face-layer.ts"
+    },
+    "./layers/face-segments": {
+      "types": "./src/layers/face-segments.d.ts",
+      "import": "./src/layers/face-segments.ts",
+      "require": "./src/layers/face-segments.ts"
+    },
+    "./layers/label-layer": {
+      "types": "./src/layers/label-layer.d.ts",
+      "import": "./src/layers/label-layer.ts",
+      "require": "./src/layers/label-layer.ts"
+    },
+    "./layers/layers": {
+      "types": "./src/layers/layers.d.ts",
+      "import": "./src/layers/layers.ts",
+      "require": "./src/layers/layers.ts"
+    },
+    "./layers/line-layer": {
+      "types": "./src/layers/line-layer.d.ts",
+      "import": "./src/layers/line-layer.ts",
+      "require": "./src/layers/line-layer.ts"
+    },
+    "./layers/line-segments": {
+      "types": "./src/layers/line-segments.d.ts",
+      "import": "./src/layers/line-segments.ts",
+      "require": "./src/layers/line-segments.ts"
+    },
+    "./layers/parse": {
+      "types": "./src/layers/parse.d.ts",
+      "import": "./src/layers/parse.ts",
+      "require": "./src/layers/parse.ts"
+    },
+    "./layers/point-layer": {
+      "types": "./src/layers/point-layer.d.ts",
+      "import": "./src/layers/point-layer.ts",
+      "require": "./src/layers/point-layer.ts"
+    },
+    "./layers/surface-layer": {
+      "types": "./src/layers/surface-layer.d.ts",
+      "import": "./src/layers/surface-layer.ts",
+      "require": "./src/layers/surface-layer.ts"
+    },
+    "./layers/tick-layer": {
+      "types": "./src/layers/tick-layer.d.ts",
+      "import": "./src/layers/tick-layer.ts",
+      "require": "./src/layers/tick-layer.ts"
+    },
+    "./layers/types": {
+      "types": "./src/layers/types.d.ts",
+      "import": "./src/layers/types.ts",
+      "require": "./src/layers/types.ts"
+    },
+    "./layout/display/absolute": {
+      "types": "./src/layout/display/absolute.d.ts",
+      "import": "./src/layout/display/absolute.ts",
+      "require": "./src/layout/display/absolute.ts"
+    },
+    "./layout/display/block": {
+      "types": "./src/layout/display/block.d.ts",
+      "import": "./src/layout/display/block.ts",
+      "require": "./src/layout/display/block.ts"
+    },
+    "./layout/display/embed": {
+      "types": "./src/layout/display/embed.d.ts",
+      "import": "./src/layout/display/embed.ts",
+      "require": "./src/layout/display/embed.ts"
+    },
+    "./layout/display/flex": {
+      "types": "./src/layout/display/flex.d.ts",
+      "import": "./src/layout/display/flex.ts",
+      "require": "./src/layout/display/flex.ts"
+    },
+    "./layout/display/inline": {
+      "types": "./src/layout/display/inline.d.ts",
+      "import": "./src/layout/display/inline.ts",
+      "require": "./src/layout/display/inline.ts"
+    },
+    "./layout/display/overflow": {
+      "types": "./src/layout/display/overflow.d.ts",
+      "import": "./src/layout/display/overflow.ts",
+      "require": "./src/layout/display/overflow.ts"
+    },
+    "./layout/element/element": {
+      "types": "./src/layout/element/element.d.ts",
+      "import": "./src/layout/element/element.ts",
+      "require": "./src/layout/element/element.ts"
+    },
+    "./layout/element/scrollbar": {
+      "types": "./src/layout/element/scrollbar.d.ts",
+      "import": "./src/layout/element/scrollbar.ts",
+      "require": "./src/layout/element/scrollbar.ts"
+    },
+    "./layout/element/text": {
+      "types": "./src/layout/element/text.d.ts",
+      "import": "./src/layout/element/text.ts",
+      "require": "./src/layout/element/text.ts"
+    },
+    "./layout/flat": {
+      "types": "./src/layout/flat.d.ts",
+      "import": "./src/layout/flat.ts",
+      "require": "./src/layout/flat.ts"
+    },
+    "./layout/layout": {
+      "types": "./src/layout/layout.d.ts",
+      "import": "./src/layout/layout.ts",
+      "require": "./src/layout/layout.ts"
+    },
+    "./layout/parse": {
+      "types": "./src/layout/parse.d.ts",
+      "import": "./src/layout/parse.ts",
+      "require": "./src/layout/parse.ts"
+    },
+    "./layout/shape/glyphs": {
+      "types": "./src/layout/shape/glyphs.d.ts",
+      "import": "./src/layout/shape/glyphs.ts",
+      "require": "./src/layout/shape/glyphs.ts"
+    },
+    "./layout/shape/ui-rectangle": {
+      "types": "./src/layout/shape/ui-rectangle.d.ts",
+      "import": "./src/layout/shape/ui-rectangle.ts",
+      "require": "./src/layout/shape/ui-rectangle.ts"
+    },
+    "./layout/traits": {
+      "types": "./src/layout/traits.d.ts",
+      "import": "./src/layout/traits.ts",
+      "require": "./src/layout/traits.ts"
+    },
+    "./layout/types": {
+      "types": "./src/layout/types.d.ts",
+      "import": "./src/layout/types.ts",
+      "require": "./src/layout/types.ts"
+    },
+    "./layout/ui": {
+      "types": "./src/layout/ui.d.ts",
+      "import": "./src/layout/ui.ts",
+      "require": "./src/layout/ui.ts"
+    },
+    "./plot/parse": {
+      "types": "./src/plot/parse.d.ts",
+      "import": "./src/plot/parse.ts",
+      "require": "./src/plot/parse.ts"
+    },
+    "./plot/plot": {
+      "types": "./src/plot/plot.d.ts",
+      "import": "./src/plot/plot.ts",
+      "require": "./src/plot/plot.ts"
+    },
+    "./plot/shape/arrow": {
+      "types": "./src/plot/shape/arrow.d.ts",
+      "import": "./src/plot/shape/arrow.ts",
+      "require": "./src/plot/shape/arrow.ts"
+    },
+    "./plot/shape/axis": {
+      "types": "./src/plot/shape/axis.d.ts",
+      "import": "./src/plot/shape/axis.ts",
+      "require": "./src/plot/shape/axis.ts"
+    },
+    "./plot/shape/grid": {
+      "types": "./src/plot/shape/grid.d.ts",
+      "import": "./src/plot/shape/grid.ts",
+      "require": "./src/plot/shape/grid.ts"
+    },
+    "./plot/shape/label": {
+      "types": "./src/plot/shape/label.d.ts",
+      "import": "./src/plot/shape/label.ts",
+      "require": "./src/plot/shape/label.ts"
+    },
+    "./plot/shape/line": {
+      "types": "./src/plot/shape/line.d.ts",
+      "import": "./src/plot/shape/line.ts",
+      "require": "./src/plot/shape/line.ts"
+    },
+    "./plot/shape/point": {
+      "types": "./src/plot/shape/point.d.ts",
+      "import": "./src/plot/shape/point.ts",
+      "require": "./src/plot/shape/point.ts"
+    },
+    "./plot/shape/surface": {
+      "types": "./src/plot/shape/surface.d.ts",
+      "import": "./src/plot/shape/surface.ts",
+      "require": "./src/plot/shape/surface.ts"
+    },
+    "./plot/shape/tick": {
+      "types": "./src/plot/shape/tick.d.ts",
+      "import": "./src/plot/shape/tick.ts",
+      "require": "./src/plot/shape/tick.ts"
+    },
+    "./plot/source/sampled": {
+      "types": "./src/plot/source/sampled.d.ts",
+      "import": "./src/plot/source/sampled.ts",
+      "require": "./src/plot/source/sampled.ts"
+    },
+    "./plot/source/scale": {
+      "types": "./src/plot/source/scale.d.ts",
+      "import": "./src/plot/source/scale.ts",
+      "require": "./src/plot/source/scale.ts"
+    },
+    "./plot/source/transpose": {
+      "types": "./src/plot/source/transpose.d.ts",
+      "import": "./src/plot/source/transpose.ts",
+      "require": "./src/plot/source/transpose.ts"
+    },
+    "./plot/traits": {
+      "types": "./src/plot/traits.d.ts",
+      "import": "./src/plot/traits.ts",
+      "require": "./src/plot/traits.ts"
+    },
+    "./plot/types": {
+      "types": "./src/plot/types.d.ts",
+      "import": "./src/plot/types.ts",
+      "require": "./src/plot/types.ts"
+    },
+    "./plot/util/axis": {
+      "types": "./src/plot/util/axis.d.ts",
+      "import": "./src/plot/util/axis.ts",
+      "require": "./src/plot/util/axis.ts"
+    },
+    "./plot/util/compose": {
+      "types": "./src/plot/util/compose.d.ts",
+      "import": "./src/plot/util/compose.ts",
+      "require": "./src/plot/util/compose.ts"
+    },
+    "./plot/util/domain": {
+      "types": "./src/plot/util/domain.d.ts",
+      "import": "./src/plot/util/domain.ts",
+      "require": "./src/plot/util/domain.ts"
+    },
+    "./plot/util/format": {
+      "types": "./src/plot/util/format.d.ts",
+      "import": "./src/plot/util/format.ts",
+      "require": "./src/plot/util/format.ts"
+    },
+    "./plot/util/swizzle": {
+      "types": "./src/plot/util/swizzle.d.ts",
+      "import": "./src/plot/util/swizzle.ts",
+      "require": "./src/plot/util/swizzle.ts"
+    },
+    "./plot/view/cartesian": {
+      "types": "./src/plot/view/cartesian.d.ts",
+      "import": "./src/plot/view/cartesian.ts",
+      "require": "./src/plot/view/cartesian.ts"
+    },
+    "./plot/view/embedded": {
+      "types": "./src/plot/view/embedded.d.ts",
+      "import": "./src/plot/view/embedded.ts",
+      "require": "./src/plot/view/embedded.ts"
+    },
+    "./plot/view/polar": {
+      "types": "./src/plot/view/polar.d.ts",
+      "import": "./src/plot/view/polar.ts",
+      "require": "./src/plot/view/polar.ts"
+    },
+    "./plot/view/spherical": {
+      "types": "./src/plot/view/spherical.d.ts",
+      "import": "./src/plot/view/spherical.ts",
+      "require": "./src/plot/view/spherical.ts"
+    },
+    "./primitives/mesh/arrow": {
+      "types": "./src/primitives/mesh/arrow.d.ts",
+      "import": "./src/primitives/mesh/arrow.ts",
+      "require": "./src/primitives/mesh/arrow.ts"
+    },
+    "./primitives/raw-arrows": {
+      "types": "./src/primitives/raw-arrows.d.ts",
+      "import": "./src/primitives/raw-arrows.ts",
+      "require": "./src/primitives/raw-arrows.ts"
+    },
+    "./primitives/raw-faces": {
+      "types": "./src/primitives/raw-faces.d.ts",
+      "import": "./src/primitives/raw-faces.ts",
+      "require": "./src/primitives/raw-faces.ts"
+    },
+    "./primitives/raw-full-screen": {
+      "types": "./src/primitives/raw-full-screen.d.ts",
+      "import": "./src/primitives/raw-full-screen.ts",
+      "require": "./src/primitives/raw-full-screen.ts"
+    },
+    "./primitives/raw-labels": {
+      "types": "./src/primitives/raw-labels.d.ts",
+      "import": "./src/primitives/raw-labels.ts",
+      "require": "./src/primitives/raw-labels.ts"
+    },
+    "./primitives/raw-lines": {
+      "types": "./src/primitives/raw-lines.d.ts",
+      "import": "./src/primitives/raw-lines.ts",
+      "require": "./src/primitives/raw-lines.ts"
+    },
+    "./primitives/raw-quads": {
+      "types": "./src/primitives/raw-quads.d.ts",
+      "import": "./src/primitives/raw-quads.ts",
+      "require": "./src/primitives/raw-quads.ts"
+    },
+    "./primitives/render": {
+      "types": "./src/primitives/render.d.ts",
+      "import": "./src/primitives/render.ts",
+      "require": "./src/primitives/render.ts"
+    },
+    "./primitives/ui-rectangles": {
+      "types": "./src/primitives/ui-rectangles.d.ts",
+      "import": "./src/primitives/ui-rectangles.ts",
+      "require": "./src/primitives/ui-rectangles.ts"
+    },
+    "./primitives/virtual": {
+      "types": "./src/primitives/virtual.d.ts",
+      "import": "./src/primitives/virtual.ts",
+      "require": "./src/primitives/virtual.ts"
+    },
+    "./providers/data-provider": {
+      "types": "./src/providers/data-provider.d.ts",
+      "import": "./src/providers/data-provider.ts",
+      "require": "./src/providers/data-provider.ts"
+    },
+    "./providers/debug-provider": {
+      "types": "./src/providers/debug-provider.d.ts",
+      "import": "./src/providers/debug-provider.ts",
+      "require": "./src/providers/debug-provider.ts"
+    },
+    "./providers/device-provider": {
+      "types": "./src/providers/device-provider.d.ts",
+      "import": "./src/providers/device-provider.ts",
+      "require": "./src/providers/device-provider.ts"
+    },
+    "./providers/event-provider": {
+      "types": "./src/providers/event-provider.d.ts",
+      "import": "./src/providers/event-provider.ts",
+      "require": "./src/providers/event-provider.ts"
+    },
+    "./providers/feedback-provider": {
+      "types": "./src/providers/feedback-provider.d.ts",
+      "import": "./src/providers/feedback-provider.ts",
+      "require": "./src/providers/feedback-provider.ts"
+    },
+    "./providers/frame-provider": {
+      "types": "./src/providers/frame-provider.d.ts",
+      "import": "./src/providers/frame-provider.ts",
+      "require": "./src/providers/frame-provider.ts"
+    },
+    "./providers/layout-provider": {
+      "types": "./src/providers/layout-provider.d.ts",
+      "import": "./src/providers/layout-provider.ts",
+      "require": "./src/providers/layout-provider.ts"
+    },
+    "./providers/loop-provider": {
+      "types": "./src/providers/loop-provider.d.ts",
+      "import": "./src/providers/loop-provider.ts",
+      "require": "./src/providers/loop-provider.ts"
+    },
+    "./providers/material-provider": {
+      "types": "./src/providers/material-provider.d.ts",
+      "import": "./src/providers/material-provider.ts",
+      "require": "./src/providers/material-provider.ts"
+    },
+    "./providers/range-provider": {
+      "types": "./src/providers/range-provider.d.ts",
+      "import": "./src/providers/range-provider.ts",
+      "require": "./src/providers/range-provider.ts"
+    },
+    "./providers/render-provider": {
+      "types": "./src/providers/render-provider.d.ts",
+      "import": "./src/providers/render-provider.ts",
+      "require": "./src/providers/render-provider.ts"
+    },
+    "./providers/time-provider": {
+      "types": "./src/providers/time-provider.d.ts",
+      "import": "./src/providers/time-provider.ts",
+      "require": "./src/providers/time-provider.ts"
+    },
+    "./providers/transform-provider": {
+      "types": "./src/providers/transform-provider.d.ts",
+      "import": "./src/providers/transform-provider.ts",
+      "require": "./src/providers/transform-provider.ts"
+    },
+    "./providers/view-provider": {
+      "types": "./src/providers/view-provider.d.ts",
+      "import": "./src/providers/view-provider.ts",
+      "require": "./src/providers/view-provider.ts"
+    },
+    "./raw": {
+      "types": "./src/raw.d.ts",
+      "import": "./src/raw.ts",
+      "require": "./src/raw.ts"
+    },
+    "./render/draw": {
+      "types": "./src/render/draw.d.ts",
+      "import": "./src/render/draw.ts",
+      "require": "./src/render/draw.ts"
+    },
+    "./render/feedback": {
+      "types": "./src/render/feedback.d.ts",
+      "import": "./src/render/feedback.ts",
+      "require": "./src/render/feedback.ts"
+    },
+    "./render/linear-rgb": {
+      "types": "./src/render/linear-rgb.d.ts",
+      "import": "./src/render/linear-rgb.ts",
+      "require": "./src/render/linear-rgb.ts"
+    },
+    "./render/loop": {
+      "types": "./src/render/loop.d.ts",
+      "import": "./src/render/loop.ts",
+      "require": "./src/render/loop.ts"
+    },
+    "./render/pass": {
+      "types": "./src/render/pass.d.ts",
+      "import": "./src/render/pass.ts",
+      "require": "./src/render/pass.ts"
+    },
+    "./render/passes": {
+      "types": "./src/render/passes.d.ts",
+      "import": "./src/render/passes.ts",
+      "require": "./src/render/passes.ts"
+    },
+    "./render/picking": {
+      "types": "./src/render/picking.d.ts",
+      "import": "./src/render/picking.ts",
+      "require": "./src/render/picking.ts"
+    },
+    "./render/render-to-texture": {
+      "types": "./src/render/render-to-texture.d.ts",
+      "import": "./src/render/render-to-texture.ts",
+      "require": "./src/render/render-to-texture.ts"
+    },
+    "./render/wireframe": {
+      "types": "./src/render/wireframe.d.ts",
+      "import": "./src/render/wireframe.ts",
+      "require": "./src/render/wireframe.ts"
+    },
+    "./router/router": {
+      "types": "./src/router/router.d.ts",
+      "import": "./src/router/router.ts",
+      "require": "./src/router/router.ts"
+    },
+    "./router/routes": {
+      "types": "./src/router/routes.d.ts",
+      "import": "./src/router/routes.ts",
+      "require": "./src/router/routes.ts"
+    },
+    "./shader/texture-shader": {
+      "types": "./src/shader/texture-shader.d.ts",
+      "import": "./src/shader/texture-shader.ts",
+      "require": "./src/shader/texture-shader.ts"
+    },
+    "./text/debug-atlas": {
+      "types": "./src/text/debug-atlas.d.ts",
+      "import": "./src/text/debug-atlas.ts",
+      "require": "./src/text/debug-atlas.ts"
+    },
+    "./text/font-loader": {
+      "types": "./src/text/font-loader.d.ts",
+      "import": "./src/text/font-loader.ts",
+      "require": "./src/text/font-loader.ts"
+    },
+    "./text/glyph-source": {
+      "types": "./src/text/glyph-source.d.ts",
+      "import": "./src/text/glyph-source.ts",
+      "require": "./src/text/glyph-source.ts"
+    },
+    "./text/providers/font-provider": {
+      "types": "./src/text/providers/font-provider.d.ts",
+      "import": "./src/text/providers/font-provider.ts",
+      "require": "./src/text/providers/font-provider.ts"
+    },
+    "./text/providers/sdf-font-provider": {
+      "types": "./src/text/providers/sdf-font-provider.d.ts",
+      "import": "./src/text/providers/sdf-font-provider.ts",
+      "require": "./src/text/providers/sdf-font-provider.ts"
+    },
+    "./text/types": {
+      "types": "./src/text/types.d.ts",
+      "import": "./src/text/types.ts",
+      "require": "./src/text/types.ts"
+    },
+    "./traits/parse": {
+      "types": "./src/traits/parse.d.ts",
+      "import": "./src/traits/parse.ts",
+      "require": "./src/traits/parse.ts"
+    },
+    "./traits/types": {
+      "types": "./src/traits/types.d.ts",
+      "import": "./src/traits/types.ts",
+      "require": "./src/traits/types.ts"
+    },
+    "./traits/useProp": {
+      "types": "./src/traits/useProp.d.ts",
+      "import": "./src/traits/useProp.ts",
+      "require": "./src/traits/useProp.ts"
+    },
+    "./traits/useTrait": {
+      "types": "./src/traits/useTrait.d.ts",
+      "import": "./src/traits/useTrait.ts",
+      "require": "./src/traits/useTrait.ts"
+    }
+  }
+}

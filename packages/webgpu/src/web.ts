@@ -1,5 +1,6 @@
 import { GPUDeviceMount } from './types';
 
+// Mount GPU device using navigator context
 export const mountGPUDevice = async (
   requiredFeatures: GPUFeatureName[] = [],
   requiredLimits: Record<string, number> = {},
@@ -20,20 +21,7 @@ export const mountGPUDevice = async (
   return {adapter, device};
 }
 
-export const adoptCanvas = (selector: string): [HTMLCanvasElement, () => void] => {
-
-  const el = document.querySelector(selector);
-  if (!el) throw new Error(`Cannot find ${selector} in DOM`);
-
-  const {tagName} = el;
-  if (tagName === 'CANVAS') return [el as HTMLCanvasElement, () => {}];
-
-  const canvas = document.createElement('canvas');
-  el.appendChild(canvas);
-
-  return [canvas, () => el.removeChild(canvas)];
-}
-
+// Make WebGPU presentation context on a canvas
 export const makePresentationContext = (
   device: GPUDevice,
   canvas: HTMLCanvasElement,
@@ -54,4 +42,19 @@ export const makePresentationContext = (
 
   // @ts-ignore
   return gpuContext;
+}
+
+// Given a DOM selector, adopt a <canvas>, or create on inside any other tag.
+export const adoptOrMakeCanvas = (selector: string): [HTMLCanvasElement, () => void] => {
+
+  const el = document.querySelector(selector);
+  if (!el) throw new Error(`Cannot find ${selector} in DOM`);
+
+  const {tagName} = el;
+  if (tagName === 'CANVAS') return [el as HTMLCanvasElement, () => {}];
+
+  const canvas = document.createElement('canvas');
+  el.appendChild(canvas);
+
+  return [canvas, () => el.removeChild(canvas)];
 }

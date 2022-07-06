@@ -5,7 +5,7 @@ import {
   Flat, UI, Layout, Absolute, Block, Inline, Text,
   PickingContext,
   useBoundSource, useDerivedSource,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 import { useContext } from '@use-gpu/live';
 import { wgsl, f32, bindModule, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
@@ -29,7 +29,7 @@ export const PickingOverlay: LC = () => {
       let a = (pick.r / 16.0) % 1.0;
       let b = (pick.g / 16.0) % 1.0;
       let c = (pick.r + pick.g) / 256.0;
-      return vec4<f32>(a, c, b, 1.0);
+      return sqrt(vec4<f32>(a, c, b, 1.0));
     }
   `;
   const [GET_SIZE, GET_PICKING] = bundleToAttributes(colorizeShader);

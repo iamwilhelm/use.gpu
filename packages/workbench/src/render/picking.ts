@@ -1,6 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { TypedArray, UniformAttribute, TextureSource } from '@use-gpu/core/types';
+import { TypedArray, UniformAttribute, TextureSource, UseRenderingContextGPU } from '@use-gpu/core/types';
 import {
   PICKING_FORMAT,
   PICKING_COLOR,
@@ -31,7 +30,7 @@ const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n 
 type OnPick = (index: number) => void;
 
 type PickingContextType = {
-  renderContext: CanvasRenderingContextGPU,
+  renderContext: UseRenderingContextGPU,
   pickingTexture: GPUTexture,
   pickingSource: TextureSource,
   captureTexture: () => void,
@@ -164,7 +163,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
         colorAttachments,
         depthStencilAttachment,
         swapView,
-      } as CanvasRenderingContextGPU,
+      } as UseRenderingContextGPU,
       pickingTexture,
       pickingSource,
       captureTexture,

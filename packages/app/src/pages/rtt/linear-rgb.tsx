@@ -1,5 +1,4 @@
 import { LC } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
@@ -8,7 +7,7 @@ import {
   Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Text,
   OrbitCamera, OrbitControls,
   Pick, Cursor, LinearRGB,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 import { Mesh } from '../../components/mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
 

@@ -1,5 +1,4 @@
 import { LC, PropsWithChildren } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { Rectangle, DataField, Emitter, DataTexture, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React, { Morph } from '@use-gpu/live/jsx';
@@ -16,7 +15,7 @@ import {
   PanControls, LayoutContext,
   useDeviceContext, useFontContext, DebugProvider,
   OrbitCamera, OrbitControls,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 
 const SIZE = 64;
 const DETAIL = 64;

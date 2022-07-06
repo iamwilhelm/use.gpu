@@ -1,11 +1,10 @@
 import React from 'react';
-
 import { LC, LiveElement } from '@use-gpu/live/types';
-import { provide, wrap, useAsync, useOne } from '@use-gpu/live';
-import { mountGPUDevice } from '@use-gpu/webgpu';
 
-import { HTML } from '@use-gpu/react';
-import { DeviceContext } from '../providers/device-provider';
+import { provide, wrap, useAsync, useOne } from '@use-gpu/live';
+import { DeviceContext } from '@use-gpu/workbench';//'/providers/device-provider'
+
+import { mountGPUDevice } from '../web';
 
 type ErrorRenderer = (e: Error) => LiveElement<any>;
 

@@ -1,5 +1,4 @@
 import { LC } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
@@ -14,7 +13,7 @@ import {
   CompositeData, LineSegments, FaceSegments,
   OrbitCamera, OrbitControls,
   LineLayer, FaceLayer,
-} from '@use-gpu/components';
+} from '@use-gpu/workbench';
 
 // Convex and concave polygon data
 

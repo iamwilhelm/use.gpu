@@ -1,14 +1,11 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { CanvasRenderingContextGPU } from '@use-gpu/webgpu/types';
-import { ColorSpace } from '@use-gpu/core/types';
-import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLOR } from '../constants';
+import { UseRenderingContextGPU, ColorSpace } from '@use-gpu/core/types';
 
-import { EventProvider } from '../providers/event-provider';
-import { RenderContext } from '../providers/render-provider';
-import { LayoutContext } from '../providers/layout-provider';
-import { DeviceContext } from '../providers/device-provider';
+import { EventProvider } from '@use-gpu/workbench';//'/event-provider';
+import { RenderContext } from '@use-gpu/workbench';//'/providers/render-provider';
+import { LayoutContext } from '@use-gpu/workbench';//'/providers/layout-provider';
+import { DeviceContext } from '@use-gpu/workbench';//'/providers/device-provider';
 import { provide, use, imperative, useCallback, useContext, useMemo, useOne } from '@use-gpu/live';
-import { makePresentationContext } from '@use-gpu/webgpu';
 import {
   makeColorState,
   makeColorAttachment,
@@ -19,6 +16,9 @@ import {
   makeDepthStencilAttachment,
   BLEND_PREMULTIPLIED,
 } from '@use-gpu/core';
+
+import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLOR } from '../constants';
+import { makePresentationContext } from '../web';
 
 export type CanvasProps = {
   canvas: HTMLCanvasElement,
@@ -116,8 +116,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps
     depthStencilAttachment,
 
     swapView,
-    canvas,
-  } as CanvasRenderingContextGPU;
+  } as UseRenderingContextGPU;
 
   return (
     provide(RenderContext, renderContext,

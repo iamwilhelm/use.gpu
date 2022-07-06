@@ -1,5 +1,4 @@
 export * from './animate';
-export * from './canvas';
 export * from './camera';
 export * from './consumers';
 export * from './data';

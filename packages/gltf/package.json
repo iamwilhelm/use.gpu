@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@use-gpu/components": "*",
+    "@use-gpu/workbench": "*",
     "@use-gpu/core": "*",
     "@use-gpu/live": "*",
     "@use-gpu/shader": "*",

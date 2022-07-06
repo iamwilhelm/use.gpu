@@ -3,7 +3,7 @@ import { LC, LiveElement } from '@use-gpu/live/types';
 import { PAGES } from '../routes';
 import { use, fragment, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
-import { useRouterContext } from '@use-gpu/components';
+import { useRouterContext } from '@use-gpu/workbench';
 
 const STYLE = {
   position: 'absolute',

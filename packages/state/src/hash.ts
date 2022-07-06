@@ -14,7 +14,8 @@ export const getObjectKey = (v: any) => {
   return 0;
 }
 
-const HASH_KEY = 0xf1c3a587;
+let HASH_KEY = 0xf1c3a587;
+export const setGlobalHashKey = (k: number) => HASH_KEY = k;
 
 const C1 = 0xcc9e2d51;
 const C2 = 0x1b873593;

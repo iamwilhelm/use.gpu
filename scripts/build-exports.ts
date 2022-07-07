@@ -6,7 +6,6 @@ const PACKAGE_JSON = './package.json';
 
 const files = glob.sync('./src/**/*.@(ts|tsx)');
 const paths = files.filter(file => !file.match(/\.test\.|\/lib\/|\/index\./));
-console.log(files.length, paths.length)
 
 // Update exports in package.json
 try {
@@ -21,7 +20,6 @@ try {
     const types = name + '.d.ts';
 
     const target = BUILD_TARGET + types;
-    console.log(target)
 
     try {
       const stat = fs.statSync(target);
@@ -41,3 +39,6 @@ try {
 } catch (e) {
   console.log(e)
 }
+
+console.log("Added", paths.length, "exports to package.json");
+

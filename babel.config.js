@@ -1,10 +1,21 @@
 module.exports = {
   "presets": [
-    "@babel/preset-env",
+    ["@babel/preset-env", {
+      "targets": {
+        "chrome": 102,
+        "firefox": 102,
+      },
+      "modules": false,
+    }],
+    "@babel/preset-typescript",
     "@babel/preset-react",
-    "@babel/preset-typescript"
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties"
-  ]
+  ],
+  "env": {
+    "umd": {
+      "presets": ["@babel/preset-env"],
+    }
+  },
 }

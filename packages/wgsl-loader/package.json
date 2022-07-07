@@ -10,6 +10,12 @@
   "dependencies": {
     "require-hacker": "^3.0.1"
   },
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts",
+    "./rollup": "./src/rollup.ts",
+    "./webpack": "./src/webpack.ts"
+  },
   "bin": {
     "wgsl-tsgen": "./bin/wgsl-tsgen"
   },
@@ -19,11 +25,12 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "yarn run build:js && yarn run build:types && yarn run build:bin && yarn run build:pkg",
+    "build": "NPM_PACKAGE=wgsl-loader NODE_ENV=umd yarn run build:all",
+    "build:all": "yarn run build:babel && yarn run build:types && yarn run build:bin && yarn run build:pkg",
+    "build:babel": "babel src --out-dir ../../build/packages/$NPM_PACKAGE/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel scripts --out-dir ../../build/packages/$NPM_PACKAGE/scripts --extensions \".ts\"; babel *.ts --out-dir ../../build/packages/$NPM_PACKAGE --extensions \".ts\"",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/wgsl-loader/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel scripts --out-dir ../../build/packages/wgsl-loader/scripts --extensions \".ts\"; babel node.ts --out-dir ../../build/packages/wgsl-loader --extensions \".ts\"; babel rollup.ts --out-dir ../../build/packages/wgsl-loader --extensions \".ts\"",
-    "build:bin": "mkdir ../../build/packages/wgsl-loader/bin 2>/dev/null; cp bin/wgsl-tsgen ../../build/packages/wgsl-loader/bin",
-    "build:pkg": "cp README.md package.json ../../build/packages/wgsl-loader"
+    "build:bin": "mkdir ../../build/packages/$NPM_PACKAGE/bin 2>/dev/null; cp bin/wgsl-tsgen ../../build/packages/$NPM_PACKAGE/bin",
+    "build:pkg": "cp package.json ../../build/packages/$NPM_PACKAGE"
   },
   "devDependencies": {
     "@types/loader-utils": "^2.0.3",

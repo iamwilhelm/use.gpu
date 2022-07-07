@@ -25,12 +25,19 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "yarn run build:grammar && yarn run build:js && yarn run build:types && yarn run build:pkg",
+
+    "build": "NPM_PACKAGE=shader yarn run build:all",
+    "build:all": "yarn run build:grammar && yarn run build:js && yarn run build:types && yarn run build:pkg",
+
     "build:grammar": "yarn run build:grammar:glsl && yarn run build:grammar:wgsl",
     "build:grammar:glsl": "yarn run lezer-generator src/glsl/grammar/glsl.grammar -o src/glsl/grammar/glsl.js",
     "build:grammar:wgsl": "yarn run lezer-generator src/wgsl/grammar/wgsl.grammar -o src/wgsl/grammar/wgsl.js",
-    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/shader/src --extensions \".ts,.js\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel glsl.ts --out-dir ../../build/packages/shader --extensions \".ts\"; babel wgsl.ts --out-dir ../../build/packages/shader --extensions \".ts\"",
-    "build:pkg": "cp README.md package.json ../../build/packages/shader"
+
+    "build:js": "yarn run build:mjs && yarn run build:umd",
+    "build:mjs": "NODE_ENV=production yarn run build:babel; rm -rf ../../build/packages/$NPM_PACKAGE/mjs; mv ../../build/packages/$NPM_PACKAGE/src ../../build/packages/$NPM_PACKAGE/mjs",
+    "build:umd": "NODE_ENV=umd yarn run build:babel; rm -rf ../../build/packages/$NPM_PACKAGE/umd; mv ../../build/packages/$NPM_PACKAGE/src ../../build/packages/$NPM_PACKAGE/umd",
+    "build:babel": "babel src --out-dir ../../build/packages/$NPM_PACKAGE/src --extensions \".ts,.js\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/umd/; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/mjs/",
+    "build:pkg": "cp README.md package.json ../../build/packages/$NPM_PACKAGE"    
   }
 }

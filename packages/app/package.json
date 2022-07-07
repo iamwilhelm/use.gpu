@@ -24,7 +24,7 @@
     "types:watch": "yarn run types -- --watch",
     "build": "yarn run build:js && yarn run build:types && yarn run build:pkg",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/app/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:js": "babel src --out-dir ../../build/packages/app/src --extensions \".ts,.tsx,.js,.jsx\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
     "build:pkg": "cp package.json ../../build/packages/app"
   }
 }

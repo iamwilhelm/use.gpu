@@ -8,7 +8,7 @@ npm install --save @use-gpu/glsl-loader
 yarn add @use-gpu/glsl-loader
 ```
 
-## GLSL loader for webpack and node
+## GLSL loader for webpack / node / rollup
 
 This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
 
@@ -20,6 +20,18 @@ For node, the included helper will use `require-hacker` to convert all `*.glsl` 
 
 ```js
 import "@use-gpu/glsl-loader/node";
+```
+
+#### Rollup.js
+
+For rollup, import the plugin as:
+
+```js
+import rollupGLSL from "@use-gpu/glsl-loader/rollup";
+
+  // ...
+  plugins: [rollupGLSL()]
+  // ...
 ```
 
 #### Webpack Config

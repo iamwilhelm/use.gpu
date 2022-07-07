@@ -13,8 +13,6 @@ import { Draw, Pass, RawQuads } from '@use-gpu/workbench';
 import WGSLLoader from '@use-gpu/wgsl-loader';
 import { loadModule } from '@use-gpu/shader/wgsl';
 
-import WGSLModules from '@use-gpu/wgsl';
-
 import maskPoint from '@use-gpu/wgsl/mask/point.wgsl';
 import { circle } from '@use-gpu/wgsl/mask/point.wgsl';
 import instanceVertex from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
@@ -43,14 +41,13 @@ const testRender = () => {
 }
 
 const testWGSL = () => {
-  if (!WGSLModules['instance/vertex/quad']) return [false, 'cannot find /quad in modules'];
   if (!(maskPoint.module && maskPoint.libs)) return [false, 'cannot find maskpoint'];
   if (!(circle.module && circle.libs)) return [false, 'cannot find circle module'];
 
   if (!isModule(instanceVertex.libs['@use-gpu/wgsl/use/view']?.module)) return [false, 'cannot find use/view'];
   if (!isModule(instanceVertex.libs['@use-gpu/wgsl/use/types']?.module)) return [false, 'cannot find use/types'];
 
-  if (!isModule(loadModule(WGSLModules['instance/vertex/quad'], 'quad'))) return [false, 'cannot load /quad'];
+  if (!isModule(loadModule('fn main() -> f32 { return 0.0; }', 'test'))) return [false, 'cannot load test shader'];
 
   return [true];
 }

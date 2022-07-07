@@ -51,7 +51,7 @@ export const merge = <T>(a: T, b: Merge<T>): T => {
       return out as any as T;
     }
     else {
-      let obj: Record<string, any> = a;
+      let obj: Record<string, any> = a as any;
 
       const out = {} as Record<string, any>;
       for (let k in obj) {

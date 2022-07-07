@@ -24,10 +24,14 @@ import "@use-gpu/wgsl-loader/node";
 
 #### Rollup.js
 
-For rollup, import:
+For rollup, import the plugin as:
 
 ```js
 import rollupWGSL from "@use-gpu/wgsl-loader/rollup";
+
+  // ...
+  plugins: [rollupWGSL()]
+  // ...
 ```
 
 #### Webpack Config

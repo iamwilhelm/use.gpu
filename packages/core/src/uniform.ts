@@ -17,7 +17,7 @@ import { makeSampler, makeTextureView } from './texture';
 
 export const resolve = <T>(x: Lazy<T>): T => {
   if (typeof x === 'function') return (x as any)();
-  if (typeof x === 'object') {
+  if (typeof x === 'object' && x != null) {
     if ('expr' in x) return x.expr();
     if ('current' in x) return x.current;
   }

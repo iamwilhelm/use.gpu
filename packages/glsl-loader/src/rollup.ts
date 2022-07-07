@@ -1,13 +1,34 @@
-import { extname } from 'path';
+import { join, dirname, extname } from 'path';
+import { readFileSync } from 'fs';
 import { transpileGLSL } from './transpile';
 
-export default function rollupGLSL() {
+const rollupGLSL = () => {
   return {
-    name: '@use-gpu/glsl-loader',
-		transform(code: string, id: string) {
-			const ext = extname(id);
-      if (ext !== '.glsl') return null;
-      return transpileGLSL(code, id, true);
-    }
+    name: 'glsl-loader',
+    
+    resolveId: (filePath: string, importer: string) => {
+      console.log('resolveId', {filePath, importer})
+      var dir = importer == null
+        ? process.cwd()
+        : dirname(importer);
+
+      var fullPath = join(dir, filePath);
+
+      if (extname(filePath) === ".glsl") {
+        return fullPath;
+      }
+      return null;
+    },
+
+    load: (fullPath: string) => {
+      console.log('load', {fullPath})
+      if (extname(fullPath) === ".glsl") {
+        const code = readFileSync(fullPath, { encoding: "utf8" });
+        return transpileGLSL(code, fullPath, true);
+      }
+    },
   };
 }
+
+export { rollupGLSL };
+export default rollupGLSL;

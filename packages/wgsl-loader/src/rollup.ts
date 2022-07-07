@@ -4,9 +4,6 @@ import { transpileWGSL } from './transpile';
 
 type Opts = Record<string, any>;
 
-const INCLUDE_GLOB = ['**/*.wgsl'];
-const DEFAULT_EXTENSION  = 'wgsl';
-
 const rollupWGSL = () => {
 
   console.log('make wgsl rollup')
@@ -16,7 +13,7 @@ const rollupWGSL = () => {
     name: 'wgsl-loader',
     enforce: 'pre',
 
-    configResolved: function (resolvedConfig) {
+    configResolved: function (resolvedConfig: any) {
       console.log(config = resolvedConfig);
     },
 

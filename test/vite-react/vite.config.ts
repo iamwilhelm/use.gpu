@@ -6,8 +6,13 @@ console.log(rollupWGSL, rollupWGSL())
 
 export default defineConfig({
   esbuild: {
-    include: ['*.ts', '*.jsx', '*.tsx', '*.wgsl'],
-    loader: {'.wgsl': 'text'},
+    include: ['**/*.ts', '**/*.jsx', '**/*.tsx', '**/*.wgsl'],
+    loader: 'text',
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      loader: {'.wgsl': 'text'},
+    },
   },
   plugins: [rollupWGSL(), react()],
 })

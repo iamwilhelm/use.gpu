@@ -22,18 +22,6 @@ For node, the included helper will use `require-hacker` to convert all `*.glsl` 
 import "@use-gpu/glsl-loader/node";
 ```
 
-#### Rollup.js
-
-For rollup, import the plugin as:
-
-```js
-import rollupGLSL from "@use-gpu/glsl-loader/rollup";
-
-  // ...
-  plugins: [rollupGLSL()]
-  // ...
-```
-
 #### Webpack Config
 
 For webpack, it will emit ESM or CommonJS automatically:
@@ -51,6 +39,18 @@ For webpack, it will emit ESM or CommonJS automatically:
     ],
   },
 }
+```
+
+#### Rollup.js (alpha/experimental)
+
+For rollup, import the plugin as:
+
+```js
+import rollupGLSL from "@use-gpu/glsl-loader/rollup";
+
+  // ...
+  plugins: [rollupGLSL()]
+  // ...
 ```
 
 #### Import

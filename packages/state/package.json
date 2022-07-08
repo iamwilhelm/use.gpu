@@ -12,9 +12,14 @@
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
 
-    "build": "yarn run build:js && yarn run build:types && yarn run build:pkg",
-    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/state/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
-    "build:pkg": "cp package.json ../../build/packages/state"
+    "build": "NPM_PACKAGE=state yarn run build:all",
+    "build:all": "yarn run build:js && yarn run build:types && yarn run build:pkg",
+
+    "build:js": "yarn run build:mjs && yarn run build:umd",
+    "build:mjs": "NODE_ENV=production yarn run build:babel; rm -rf ../../build/packages/$NPM_PACKAGE/mjs; mv ../../build/packages/$NPM_PACKAGE/src ../../build/packages/$NPM_PACKAGE/mjs",
+    "build:umd": "NODE_ENV=umd yarn run build:babel; rm -rf ../../build/packages/$NPM_PACKAGE/umd; mv ../../build/packages/$NPM_PACKAGE/src ../../build/packages/$NPM_PACKAGE/umd",
+    "build:babel": "babel src --out-dir ../../build/packages/$NPM_PACKAGE/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/umd/; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/mjs/",
+    "build:pkg": "cp README.md package.json ../../build/packages/$NPM_PACKAGE"
   }
 }

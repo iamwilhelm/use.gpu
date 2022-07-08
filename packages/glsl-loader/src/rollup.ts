@@ -1,30 +1,27 @@
-import { join, dirname, extname } from 'path';
+import { resolve, dirname } from 'path';
 import { readFileSync } from 'fs';
 import { transpileGLSL } from './transpile';
+
+type Opts = Record<string, any>;
 
 const rollupGLSL = () => {
   return {
     name: 'glsl-loader',
-    
-    resolveId: (filePath: string, importer: string) => {
-      console.log('resolveId', {filePath, importer})
-      var dir = importer == null
-        ? process.cwd()
-        : dirname(importer);
+    enforce: 'pre',
 
-      var fullPath = join(dir, filePath);
-
-      if (extname(filePath) === ".glsl") {
-        return fullPath;
+    resolveId: function (source: string, importer: string) {
+      console.log('resolveId', {source, importer})
+      if (source.endsWith('.glsl')) {
+        if (source[0] === '.') return resolve(dirname(importer), source);
+        return source;
       }
-      return null;
     },
 
-    load: (fullPath: string) => {
+    load: function (fullPath: string) {
       console.log('load', {fullPath})
-      if (extname(fullPath) === ".glsl") {
+      if (fullPath.endsWith('.glsl')) {
         const code = readFileSync(fullPath, { encoding: "utf8" });
-        return transpileGLSL(code, fullPath, true);
+        return { code: transpileGLSL(code, fullPath, true), map: null };
       }
     },
   };

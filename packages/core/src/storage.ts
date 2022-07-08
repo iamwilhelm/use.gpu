@@ -64,29 +64,3 @@ export const checkStorageType = (
     }
   }
 } 
-
-export const makeStorageAccessors = (
-  uniforms: UniformAttribute[],
-  set: number = 0,
-  binding: number = 0,
-): Record<string, string> => {
-  const modules = {} as Record<string, string>;
-
-  for (const {name, format} of uniforms) {
-    modules[name] = makeStorageAccessor(set, binding, format, name);
-    binding++;
-  }
-
-  return modules;
-};
-
-export const makeStorageAccessor = (set: number, binding: number, type: string, name: string) => `
-layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${name}Type {
-  ${type} data[];
-} ${name}Storage;
-
-#pragma export
-${type} ${name}(int index) {
-  return ${name}Storage.data[index];
-}
-`;

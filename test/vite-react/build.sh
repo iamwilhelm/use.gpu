@@ -6,4 +6,5 @@ yarn install
 mkdir ./node_modules/@use-gpu 2>/dev/null;
 cp -r ../../../build/packages/* node_modules/@use-gpu
 cp ../vite.config.ts .
+cp ../tsconfig.json .
 cp ../src/* src

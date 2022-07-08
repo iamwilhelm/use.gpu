@@ -25,7 +25,7 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "NPM_PACKAGE=wgsl-loader NODE_ENV=umd yarn run build:all",
+    "build": "NPM_PACKAGE=wgsl-loader MODULE_ENV=umd yarn run build:all",
     "build:all": "yarn run build:babel && yarn run build:types && yarn run build:bin && yarn run build:pkg",
     "build:babel": "babel src --out-dir ../../build/packages/$NPM_PACKAGE/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel scripts --out-dir ../../build/packages/$NPM_PACKAGE/scripts --extensions \".ts\"; babel *.ts --out-dir ../../build/packages/$NPM_PACKAGE --extensions \".ts\"",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",

@@ -51,3 +51,11 @@ vec4<f32> cast() {
 }
 "
 `;
+
+exports[`cast swizzles 1`] = `
+"#version 450
+vec3 swizzle(vec3 a) {
+  return a.xyx;
+}
+"
+`;

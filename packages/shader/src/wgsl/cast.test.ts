@@ -6,7 +6,7 @@ describe('cast', () => {
   
   it('swizzles', () => {
 
-    const result = swizzleTo('vec3<f32>', 'xyx');    
+    const result = swizzleTo('vec3<f32>', 'vec3<f32>', 'xyx');    
     const recode = linkBundle(result);
     expect(recode).toMatchSnapshot();
 

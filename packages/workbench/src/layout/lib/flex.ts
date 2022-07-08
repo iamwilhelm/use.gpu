@@ -140,6 +140,8 @@ export const fitFlex = (
     let caretMain = lead;
     let maxCross = 0;
 
+    const cc = isSnap ? Math.round(caretCross) : caretCross;
+
     for (let i = start; i < end; ++i) {
       const {margin, fit, ratioX, ratioY} = els[i];
       const [ml, mt, mr, mb] = margin;
@@ -147,7 +149,9 @@ export const fitFlex = (
       const mx = ml + mr;
       const my = mt + mb;
 
-      const mainSize = flexed[i];      
+      let cm = isSnap ? Math.round(caretMain) : caretMain;
+      let mainSize = isSnap ? Math.round(flexed[i]) : flexed[i];
+
       const into = (isX
         ? [mainSize, containY != null ? containY - my : null]
         : [containX != null ? containX - mx : null, mainSize]
@@ -160,7 +164,7 @@ export const fitFlex = (
       size[isX ? 0 : 1] = mainSize;
 
       sizes.push(size);
-      offsets.push(isX ? [ml + caretMain, mt + caretCross] : [ml + caretCross, mt + caretMain]);
+      offsets.push(isX ? [ml + cm, mt + cc] : [ml + cc, mt + cm]);
       renders.push(render);
       pickers.push(pick);
 

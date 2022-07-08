@@ -362,10 +362,8 @@ Array [
     "func": Object {
       "attributes": Array [
         Object {
-          "args": Array [
-            "fragment",
-          ],
-          "name": "stage",
+          "args": undefined,
+          "name": "fragment",
         },
       ],
       "identifiers": Array [

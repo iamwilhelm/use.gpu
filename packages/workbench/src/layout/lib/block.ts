@@ -79,7 +79,7 @@ export const getBlockMinMax = (
   return [
     allMinX != null ? allMinX + pl + pr : null,
     allMinY != null ? allMinY + pt + pb : null,
-    allMaxX + pl + pt,
+    allMaxX + pl + pr,
     allMaxY + pt + pb,
   ];
 }

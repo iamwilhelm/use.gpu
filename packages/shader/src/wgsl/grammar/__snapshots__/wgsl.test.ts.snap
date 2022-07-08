@@ -105,7 +105,6 @@ Program                                                     ⮐ struct A {⮐   
     FunctionDeclaration                                     @fragment⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }
       AttributeList                                         @fragment
         Attribute                                           @fragment
-          Identifier                                        stage
           Identifier                                        fragment
       FunctionHeader                                        fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32>
         fn                                                  fn

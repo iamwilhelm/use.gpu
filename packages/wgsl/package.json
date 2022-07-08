@@ -14,7 +14,7 @@
     "build": "rm -rf ../../build/packages/wgsl; yarn run build:js && yarn run build:wgsl && yarn run build:types && yarn run build:pkg",
     "build:wgsl": "ts-node build",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "NODE_ENV=umd babel src/index.ts --out-dir ../../build/packages/wgsl/src --extensions \".ts\"",
+    "build:js": "MODULE_ENV=umd babel src/index.ts --out-dir ../../build/packages/wgsl/src --extensions \".ts\"",
     "build:pkg": "cp package.json ../../build/packages/wgsl && cp -r ../../build/packages/wgsl/src/* ../../build/packages/wgsl && (cd ../..; ts-node ./scripts/src-to-root @use-gpu/wgsl)"
   },
   "devDependencies": {

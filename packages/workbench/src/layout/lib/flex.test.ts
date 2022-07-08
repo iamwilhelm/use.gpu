@@ -35,10 +35,10 @@ describe('flex layout', () => {
     ];
 
     const sizingX = getFlexMinMax(els, [null, null], 'x', [0, 0], false, false);
-    expect(sizingX).toEqual([70, 50, 70, 50]);
+    expect(sizingX).toEqual([50, null, 70, 50]);
 
     const sizingY = getFlexMinMax(els, [null, null], 'y', [0, 0], false, false);
-    expect(sizingY).toEqual([50, 70, 50, 70]);
+    expect(sizingY).toEqual([null, 50, 50, 70]);
   });
 
   it("fits flex layout X", () => {
@@ -92,7 +92,7 @@ describe('flex layout', () => {
     expect((result as any)[0].layout).toEqual([20, 30, 95, 80]);
   });
 
-  fit("fits flex layout X with shrink", () => {
+  it("fits flex layout X with shrink", () => {
     const els = [
       makeElement(50, 50, 0, 1, 10),
       makeElement(20, 20, 0, 1, 20),

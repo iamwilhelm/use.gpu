@@ -46,6 +46,7 @@ export const PlotPolarPage: LC = () => {
               prop='bend'
             >
               <Polar
+                on="x"
                 range={[[-π, π], [0, 1]]}
                 scale={[1, 1/2, 1/2]}
               >

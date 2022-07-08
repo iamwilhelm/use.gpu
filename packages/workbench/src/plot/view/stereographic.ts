@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { AxesTrait, ObjectTrait, Axis, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
-import { bundleToAttributes, swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
+import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 
 import { TransformContext } from '../../providers/transform-provider';
 import { RangeContext } from '../../providers/range-provider';
@@ -17,36 +17,34 @@ import { mat4 } from 'gl-matrix';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../../traits/parse';
 import { useAxesTrait, useObjectTrait } from '../traits';
 
-import { getPolarPosition } from '@use-gpu/wgsl/transform/polar.wgsl';
+import { getStereographicPosition } from '@use-gpu/wgsl/transform/stereographic.wgsl';
 
-const POLAR_BINDINGS = bundleToAttributes(getPolarPosition);
+const STEREOGRAPHIC_BINDINGS = bundleToAttributes(getStereographicPosition);
 
-export type PolarProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
+export type StereographicProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
-  helix?: number,
   on?: Axis,
 
   children?: LiveElement<any>,
 };
 
-export const Polar: LiveComponent<PolarProps> = (props) => {
+export const Stereographic: LiveComponent<StereographicProps> = (props) => {
   const {
+    on = 'z',
     bend = 1,
-    helix = 0,
-    on = 'x',
     children,
   } = props;
 
   const {range: g, axes: a} = useAxesTrait(props);
   const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
-  const [focus, aspect, matrix, swizzle, range] = useMemo(() => {
+  const [matrix, swizzle] = useMemo(() => {
     const x = g[0][0];
-    let   y = g[1][0];
-    const z = g[2][0];
+    const y = g[1][0];
+    let   z = g[2][0];
     const dx = (g[0][1] - x) || 1;
-    let   dy = (g[1][1] - y) || 1;
-    const dz = (g[2][1] - z) || 1;
+    const dy = (g[1][1] - y) || 1;
+    let   dz = (g[2][1] - z) || 1;
 
     // Make scale adjustments relative to inverse swizzled output scale
     const inv = invertBasis(a);
@@ -54,28 +52,14 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
     const sy = s ? s[inv.indexOf('y')] : 1;
     const sz = s ? s[inv.indexOf('z')] : 1;
 
-    // Watch for negative scales
-    const idx = Math.sign(dx);
-
     // Recenter viewport on origin the more it's bent
-    [y, dy] = recenterAxis(y, dy, bend);
-
-    // Adjust viewport range for polar transform.
-    // As the viewport goes polar, the X-range is interpolated to the Y-range instead,
-    // creating a square/circular viewport.
-    const ady = Math.abs(dy);
-    const fdx = dx + (ady * idx - dx) * bend;
-    const sdx = fdx / sx;
-    const sdy = dy  / sy;
-    
-    const aspect = Math.abs(sdx / sdy);
-    const focus = bend > 0 ? 1 / bend - 1 : 0;
+    [z, dz] = recenterAxis(z, dz, bend, 0);
 
     const matrix = mat4.create();
     mat4.set(matrix,
-      2/fdx, 0, 0, 0,
-      0,  2/dy, 0, 0,
-      0,  0, 2/dz, 0,
+      2/dx, 0, 0, 0,
+      0, 2/dy, 0, 0,
+      0, 0, 2/dz, 0,
 
       -(2*x+dx)/dx,
       -(2*y+dy)/dy,
@@ -99,34 +83,21 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
 
     // Swizzle active polar axis
     let swizzle: string | null = null;
-    if (on !== 'x') {
-      const order = swizzle = toBasis(on);
+    if (on !== 'z') {
+      const order = swizzle = rotateBasis(toBasis(on), 2);
       const t = mat4.create();
-
       // Apply inverse polar basis as part of view matrix (right multiply)
       swizzleMatrix(t, invertBasis(order));
       mat4.multiply(matrix, matrix, t);
     }
 
-    // Adjust radial range
-    const range = g.slice();
-    if (bend > 0) {
-      const [from, to] = range[1];
-      const max = Math.max(Math.abs(from), Math.abs(to));
-      const min = Math.max(-focus / aspect, from);
-      range[1] = [min, max];
-    }
-
-    return [focus, aspect, matrix, swizzle, range];
-  }, [g, a, p, r, q, s, bend, helix, on]);
+    return [matrix, swizzle];
+  }, [g, a, p, r, q, s, bend]);
 
   const b = useShaderRef(bend);
-  const f = useShaderRef(focus);
-  const c = useShaderRef(aspect);
-  const h = useShaderRef(helix);
   const t = useShaderRef(matrix);
-
-  const bound = useBoundShader(getPolarPosition, POLAR_BINDINGS, [b, f, c, h, t]);
+  
+  const bound = useBoundShader(getStereographicPosition, STEREOGRAPHIC_BINDINGS, [b, t]);
 
   // Apply input basis as a cast
   const position = useMemo(() => {
@@ -138,7 +109,7 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
 
   return (
     provide(TransformContext, transform,
-      provide(RangeContext, range, children ?? [])
+      provide(RangeContext, g, children ?? [])
     )
   );
 };

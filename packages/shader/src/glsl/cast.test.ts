@@ -1,8 +1,16 @@
 import { loadModule } from './shader';
 import { linkBundle } from './link';
-import { castTo } from './cast';
+import { castTo, swizzleTo } from './cast';
 
 describe('cast', () => {
+  
+  it('swizzles', () => {
+
+    const result = swizzleTo('vec3', 'xyx');    
+    const recode = linkBundle(result);
+    expect(recode).toMatchSnapshot();
+
+  });
   
   it('casts', () => {
     

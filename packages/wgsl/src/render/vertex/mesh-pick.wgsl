@@ -6,7 +6,7 @@ struct VertexOutput {
   @location(1) @interpolate(flat) fragIndex: u32,
 };
 
-@stage(vertex)
+@vertex
 fn main(
   @builtin(instance_index) instanceIndex: u32,
   @location(0) position: vec4<f32>,

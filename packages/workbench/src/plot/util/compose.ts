@@ -1,13 +1,16 @@
 import { TypedArray } from '@use-gpu/core/types';
 import { vec3, mat4, quat } from 'gl-matrix';
 
+const π = Math.PI;
+
 const makeComposeTransform = () => {
 
-  //const euler     = new THREE.Euler();
   const q = quat.create();
   const p = vec3.create();
   const s = vec3.create();
   const t = mat4.create();
+
+  const qs = quat.create();
 
   return (
     transform: mat4,
@@ -16,13 +19,16 @@ const makeComposeTransform = () => {
     quaternion?: TypedArray | null,
     scale?: TypedArray | null,
     matrix?: TypedArray | null,
-    // eulerOrder = 'XYZ',
+    eulerOrder = 'xyz',
   ) => {
 
     if (rotation != null) {
-      quat.fromEuler(q, rotation[0], rotation[1], rotation[2]);
-      //eulerOrder = exports.swizzleToEulerOrder eulerOrder if eulerOrder instanceof Array
-      //euler.setFromVector3 rotation, eulerOrder
+      quat.identity(q);
+      for (let l of eulerOrder.split('')) {
+        if      (l === 'x') { quat.fromEuler(qs, rotation[0], 0, 0); quat.multiply(q, q, qs); }
+        else if (l === 'y') { quat.fromEuler(qs, 0, rotation[1], 0); quat.multiply(q, q, qs); }
+        else if (l === 'z') { quat.fromEuler(qs, 0, 0, rotation[2]); quat.multiply(q, q, qs); }
+      }
     } else quat.identity(q);
 
     if (quaternion != null) quat.multiply(q, q, quaternion as any);

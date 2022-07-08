@@ -1,6 +1,6 @@
 import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../types';
 import { loadVirtualModule } from './shader';
-import { getHash } from './hash';
+import { getHash, getHashValue } from './hash';
 import { toBundle, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CAST } from '../constants';
 
@@ -25,17 +25,59 @@ export type MakeCastAccessor = (
   swizzle: string | CastTo,
 ) => string;
 
-const SYMBOLS = ['cast', 'getValue'];
+export type MakeSwizzleAccessor = (
+  name: string,
+  from: string,
+  to: string,
+  swizzle: string | CastTo,
+) => string;
 
-const EXTERNALS = [{
+const SWIZZLE_SYMBOLS = ['swizzle'];
+
+const CAST_SYMBOLS = ['cast', 'getValue'];
+const CAST_EXTERNALS = [{
   func: {name: 'getValue'},
   flags: RF.External,
 }];
 
-const makeDeclarations = (type: any, parameters: any) => [{
-  func: {name: 'cast', type, parameters},
+const makeDeclarations = (name: string, type: any, parameters: any) => [{
+  func: {name, type, parameters},
   flags: RF.Exported,
 }];
+
+export const makeSwizzleTo = (
+  makeSwizzleAccessor: MakeSwizzleAccessor,
+) => (
+  from: string,
+  to: string,
+  swizzle: string | CastTo,
+): ParsedBundle => {
+  const entry = 'swizzle';
+
+  const id   = getHashValue(swizzle);
+  const code = `@swizzle [${from} ${to} ${id}]`;
+  const hash = getHash(code);
+  const key  = hash;
+
+  // Code generator
+  const render = (namespace: string, rename: Map<string, string>) => {
+    const name = rename.get(entry) ?? entry;
+    return makeSwizzleAccessor(name, from, to, swizzle);
+  }
+
+  const declarations = makeDeclarations(entry, to, [from]);
+
+  const module = loadVirtualModule(
+    { render },
+    { symbols: SWIZZLE_SYMBOLS, declarations },
+    entry,
+    hash,
+    code,
+    key,
+  );
+
+  return {module};
+}
 
 export const makeCastTo = (
   makeCastAccessor: MakeCastAccessor,
@@ -55,7 +97,8 @@ export const makeCastTo = (
   const hash = getBundleHash(bundle);
   const key  = getBundleKey(bundle);
 
-  const code   = `@cast [${name} ${format}] [${hash}]`;
+  const id     = getHashValue(swizzle);
+  const code   = `@cast [${name} ${format}] [${hash} ${id}]`;
   const rehash = getHash(code);
   const rekey  = getHash(`${rehash} ${key}`);
 
@@ -66,11 +109,11 @@ export const makeCastTo = (
     return makeCastAccessor(name, accessor, args ?? [], format, type, swizzle);
   }
 
-  const declarations = makeDeclarations(type, args);
+  const declarations = makeDeclarations(entry, type, args);
 
   const cast = loadVirtualModule(
     { render },
-    { symbols: SYMBOLS, declarations, externals: EXTERNALS },
+    { symbols: CAST_SYMBOLS, declarations, externals: CAST_EXTERNALS },
     entry,
     rehash,
     code,

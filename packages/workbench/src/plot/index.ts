@@ -15,4 +15,5 @@ export * from './view/cartesian';
 export * from './view/embedded';
 export * from './view/polar';
 export * from './view/spherical';
+export * from './view/stereographic';
 

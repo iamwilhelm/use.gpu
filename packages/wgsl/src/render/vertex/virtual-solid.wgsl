@@ -9,7 +9,7 @@ struct VertexOutput {
   @location(1) fragUV: vec2<f32>,
 };
 
-@stage(vertex)
+@vertex
 fn main(
   @builtin(vertex_index) vertexIndex: u32,
   @builtin(instance_index) instanceIndex: u32,

@@ -1,4 +1,4 @@
-@stage(fragment)
+@fragment
 fn main(
   @location(0) @interpolate(flat) fragId: u32,
   @location(1) @interpolate(flat) fragIndex: u32,

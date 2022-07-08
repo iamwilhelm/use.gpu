@@ -78,7 +78,7 @@ Program                                                     ⮐ @link fn main() 
 `;
 
 exports[`WGSL grammar snapshots parses a test program 6`] = `
-Program                                                     ⮐ struct A {⮐   @location(0) x: f32,⮐   @location(1) y: f32,⮐ }⮐ ⮐ @stage(fragment)⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }⮐ 
+Program                                                     ⮐ struct A {⮐   @location(0) x: f32,⮐   @location(1) y: f32,⮐ }⮐ ⮐ @fragment⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }⮐ 
   LocalDeclaration                                          ⮐ struct A {⮐   @location(0) x: f32,⮐   @location(1) y: f32,⮐ }
     StructDeclaration                                       ⮐ struct A {⮐   @location(0) x: f32,⮐   @location(1) y: f32,⮐ }
       AttributeList                                         
@@ -101,10 +101,10 @@ Program                                                     ⮐ struct A {⮐   
           Identifier                                        y
           TypeDeclaration                                   f32
             f32                                             f32
-  LocalDeclaration                                          @stage(fragment)⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }
-    FunctionDeclaration                                     @stage(fragment)⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }
-      AttributeList                                         @stage(fragment)
-        Attribute                                           @stage(fragment)
+  LocalDeclaration                                          @fragment⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }
+    FunctionDeclaration                                     @fragment⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }
+      AttributeList                                         @fragment
+        Attribute                                           @fragment
           Identifier                                        stage
           Identifier                                        fragment
       FunctionHeader                                        fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32>

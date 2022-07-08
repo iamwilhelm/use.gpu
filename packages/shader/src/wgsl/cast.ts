@@ -1,4 +1,4 @@
-import { makeCastTo, parseSwizzle, CastTo } from '../util/cast';
+import { makeCastTo, makeSwizzleTo, parseSwizzle, CastTo } from '../util/cast';
 import { bundleToAttribute } from './shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
@@ -40,6 +40,19 @@ export const makeCastAccessor = (
 
   return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${to} {
   let v = ${accessor}(${symbols.join(', ')});
+  return ${ret};
+}
+`;
+}
+
+export const makeSwizzleAccessor = (
+  name: string,
+  from: string,
+  to: string,
+  swizzle: string | CastTo,
+) => {
+  const ret = makeSwizzle(from, to, arg(0), swizzle);
+  return `fn ${name}(${arg(0)}: ${from}) -> ${to} {
   return ${ret};
 }
 `;
@@ -88,3 +101,4 @@ export const makeSwizzle = (
 }
 
 export const castTo = makeCastTo(makeCastAccessor, bundleToAttribute);
+export const swizzleTo = makeSwizzleTo(makeSwizzleAccessor);

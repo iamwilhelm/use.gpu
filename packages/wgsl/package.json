@@ -301,6 +301,11 @@
       "import": "./src/transform/spherical.wgsl",
       "require": "./src/transform/spherical.wgsl"
     },
+    "./transform/stereographic.wgsl": {
+      "types": "./src/transform/stereographic.wgsl.d.ts",
+      "import": "./src/transform/stereographic.wgsl",
+      "require": "./src/transform/stereographic.wgsl"
+    },
     "./use/color.wgsl": {
       "types": "./src/use/color.wgsl.d.ts",
       "import": "./src/use/color.wgsl",

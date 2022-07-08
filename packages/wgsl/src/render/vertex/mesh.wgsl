@@ -10,7 +10,7 @@ struct VertexOutput {
   @location(3) fragPosition: vec3<f32>,
 };
 
-@stage(vertex)
+@vertex
 fn main(
   @builtin(instance_index) instanceIndex: u32,
   @location(0) position: vec4<f32>,

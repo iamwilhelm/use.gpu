@@ -14,7 +14,7 @@ struct VertexOutput {
   @location(0) uv: vec2<f32>,
 };
 
-@stage(vertex)
+@vertex
 fn vertexMain(
   @location(0) uv: vec2<f32>,
 ) -> VertexOutput {
@@ -27,7 +27,7 @@ fn vertexMain(
 @group(0) @binding(0) var mipTexture: texture_2d<f32>;
 @group(0) @binding(1) var mipSampler: sampler;
 
-@stage(fragment)
+@fragment
 fn fragmentMain(
   @location(0) uv: vec2<f32>,
 ) -> @location(0) vec4<f32> {

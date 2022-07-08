@@ -55,12 +55,14 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
       1,
     );
 
+    // Swizzle output axes
     if (a !== 'xyzw') {
       const t = mat4.create();
       swizzleMatrix(t, a);
-      mat4.multiply(matrix, matrix, t);
+      mat4.multiply(matrix, t, matrix);
     }
 
+    // Then apply transform (so these are always relative to the world basis, not the internal basis)
     if (p || r || q || s) {
       const t = mat4.create();
       composeTransform(t, p, r, q, s);

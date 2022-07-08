@@ -6,7 +6,7 @@
   position: vec3<f32>,
 ) -> vec4<f32> { return color; }
 
-@stage(fragment)
+@fragment
 fn main(
   @builtin(front_facing) frontFacing: bool,
   @location(0) fragColor: vec4<f32>,

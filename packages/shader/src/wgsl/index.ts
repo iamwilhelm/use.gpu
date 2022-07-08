@@ -23,6 +23,7 @@ import {
 
 import {
   castTo,
+  swizzleTo,
 } from './cast';
 
 import {
@@ -80,6 +81,7 @@ export {
 
 export {
   castTo,
+  swizzleTo,
 } from './cast';
 
 export {
@@ -137,6 +139,7 @@ export const WGSLLinker = {
   castTo,
   chainTo,
   diffBy,
+  swizzleTo,
 
   makeASTParser,
   compressAST,

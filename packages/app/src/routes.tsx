@@ -12,6 +12,7 @@ import { MeshRawPage } from './pages/mesh/raw';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotPolarPage } from './pages/plot/polar';
 import { PlotSphericalPage } from './pages/plot/spherical';
+import { PlotStereographicPage } from './pages/plot/stereographic';
 import { RTTLinearRGBPage } from './pages/rtt/linear-rgb';
 import { RTTFeedbackPage } from './pages/rtt/feedback';
 
@@ -29,6 +30,7 @@ export const PAGES = [
   {path: "/plot/cartesian", title: "Plot - XYZ"},
   {path: "/plot/polar", title: "Plot - Polar"},
   {path: "/plot/spherical", title: "Plot - Spherical"},
+  {path: "/plot/stereographic", title: "Plot - Stereographic"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
   {path: "/rtt/feedback", title: "RTT - Feedback"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
@@ -37,20 +39,21 @@ export const PAGES = [
 ];
 
 export const makeRoutes = () => ({
-  "/geometry/data":  { element: <GeometryDataPage /> },
-  "/geometry/faces": { element: <GeometryFacesPage /> },
-  "/geometry/gltf":  { element: <GeometryGLTFPage /> },
-  "/geometry/lines": { element: <GeometryLinesPage /> },
-  "/layout/display": { element: <LayoutDisplayPage /> },
-  "/layout/align":   { element: <LayoutAlignPage /> },
-  "/mesh/raw":       { element: <MeshRawPage /> },
-  "/plot/cartesian": { element: <PlotCartesianPage /> },
-  "/plot/polar":     { element: <PlotPolarPage /> },
-  "/plot/spherical": { element: <PlotSphericalPage /> },
-  "/rtt/linear-rgb": { element: <RTTLinearRGBPage /> },
-  "/rtt/feedback":   { element: <RTTFeedbackPage /> },
-  "/debug/atlas":    { element: <DebugAtlasPage /> },
-  "/debug/glyph":    { element: <DebugGlyphPage /> },
+  "/geometry/data":      { element: <GeometryDataPage /> },
+  "/geometry/faces":     { element: <GeometryFacesPage /> },
+  "/geometry/gltf":      { element: <GeometryGLTFPage /> },
+  "/geometry/lines":     { element: <GeometryLinesPage /> },
+  "/layout/display":     { element: <LayoutDisplayPage /> },
+  "/layout/align":       { element: <LayoutAlignPage /> },
+  "/mesh/raw":           { element: <MeshRawPage /> },
+  "/plot/cartesian":     { element: <PlotCartesianPage /> },
+  "/plot/polar":         { element: <PlotPolarPage /> },
+  "/plot/spherical":     { element: <PlotSphericalPage /> },
+  "/plot/stereographic": { element: <PlotStereographicPage /> },
+  "/rtt/linear-rgb":     { element: <RTTLinearRGBPage /> },
+  "/rtt/feedback":       { element: <RTTFeedbackPage /> },
+  "/debug/atlas":        { element: <DebugAtlasPage /> },
+  "/debug/glyph":        { element: <DebugGlyphPage /> },
 
   "/": { element: <HomePage container={document.querySelector('#use-gpu')} /> },
   "*": { element: <EmptyPage /> },

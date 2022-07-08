@@ -403,6 +403,13 @@ declare module "@use-gpu/wgsl/transform/spherical.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/transform/stereographic.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getStereographicPosition: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/use/color.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;

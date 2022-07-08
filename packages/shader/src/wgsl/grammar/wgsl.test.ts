@@ -68,7 +68,7 @@ struct A {
   @location(1) y: f32,
 }
 
-@stage(fragment)
+@fragment
 fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {
 }
 `,

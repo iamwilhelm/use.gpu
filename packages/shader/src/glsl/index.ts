@@ -22,6 +22,7 @@ import {
 
 import {
   castTo,
+  swizzleTo,
 } from './cast';
 
 import {
@@ -80,6 +81,7 @@ export {
 
 export {
   castTo,
+  swizzleTo,
 } from './cast';
 
 export {
@@ -140,6 +142,7 @@ export const GLSLLinker = {
   castTo,
   chainTo,
   diffBy,
+  swizzleTo,
 
   makeASTParser,
   compressAST,

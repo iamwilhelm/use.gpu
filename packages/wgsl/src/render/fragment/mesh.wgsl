@@ -9,7 +9,7 @@ struct FragmentOutput {
   @location(0) outColor: vec4<f32>,
 };
 
-@stage(fragment)
+@fragment
 fn main(
   @location(0) fragColor: vec4<f32>,
   @location(1) fragUV: vec2<f32>,

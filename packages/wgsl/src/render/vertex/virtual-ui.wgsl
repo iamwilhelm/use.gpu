@@ -19,7 +19,7 @@ struct VertexOutput {
   @location(11) @interpolate(flat) fragFill: vec4<f32>,
 };
 
-@stage(vertex)
+@vertex
 fn main(
   @builtin(vertex_index) vertexIndex: u32,
   @builtin(instance_index) instanceIndex: u32,

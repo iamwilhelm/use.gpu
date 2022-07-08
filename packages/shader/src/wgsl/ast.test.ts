@@ -69,7 +69,7 @@ describe('ast', () => {
 
   it('gets test function declaration', () => {
     const code = `
-      @stage(fragment) fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {
+      @fragment fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {
         return foo(in1, in2);
       }
     `;

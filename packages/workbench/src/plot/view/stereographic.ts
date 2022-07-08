@@ -23,6 +23,7 @@ const STEREOGRAPHIC_BINDINGS = bundleToAttributes(getStereographicPosition);
 
 export type StereographicProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
+  normalize?: number | boolean,
   on?: Axis,
 
   children?: LiveElement<any>,
@@ -32,6 +33,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
   const {
     on = 'z',
     bend = 1,
+    normalize = 1,
     children,
   } = props;
 
@@ -53,7 +55,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
     const sz = s ? s[inv.indexOf('z')] : 1;
 
     // Recenter viewport on origin the more it's bent
-    [z, dz] = recenterAxis(z, dz, bend, 0);
+    [z, dz] = recenterAxis(z, dz, bend, 1);
 
     const matrix = mat4.create();
     mat4.set(matrix,
@@ -95,9 +97,10 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
   }, [g, a, p, r, q, s, bend]);
 
   const b = useShaderRef(bend);
+  const n = useShaderRef(+normalize);
   const t = useShaderRef(matrix);
   
-  const bound = useBoundShader(getStereographicPosition, STEREOGRAPHIC_BINDINGS, [b, t]);
+  const bound = useBoundShader(getStereographicPosition, STEREOGRAPHIC_BINDINGS, [b, n, t]);
 
   // Apply input basis as a cast
   const position = useMemo(() => {

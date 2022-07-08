@@ -14,6 +14,8 @@ import {
   LinearRGB,
 } from '@use-gpu/workbench';
 
+import { PlotControls } from '../../ui/plot-controls';
+
 const π = Math.PI;
 const τ = π*2;
 const EPS = 1e-3;
@@ -28,7 +30,15 @@ const thetaFormatter = (θ: number) => {
 };
 
 export const PlotStereographicPage: LC = () => {
-  const view = (
+  
+  const frames = [
+    [0, 0],
+    [1, 0],
+    [10, 1],
+    [11, 1],
+  ];
+
+  const view = (normalize: number) => (
     <Loop>
       <Draw>
         <Pass>
@@ -37,16 +47,12 @@ export const PlotStereographicPage: LC = () => {
               loop
               mirror
               delay={0}
-              frames={[
-                [0, 0],
-                [1, 0],
-                [10, 1],
-                [11, 1],
-              ]}
+              frames={frames}
               prop='bend'
             >
               <Stereographic
                 bend={0}
+                normalize={normalize}
                 range={[[-1, 1], [-1, 1], [-1, 1]]}
                 scale={[1, 1, 1]}
               >
@@ -133,6 +139,25 @@ export const PlotStereographicPage: LC = () => {
                     />
                   </Sampled>
                 </Spherical>
+                
+                <Spherical
+                  rotation={[45, 22.5, 0]}
+                  scale={[0.25, 0.25, 0.25]}
+                  range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
+                >
+
+                  <Grid
+                    axes='xy'
+                    origin={[0, 0, 1]}
+                    width={2}
+                    first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
+                    second={{ detail: 64, divide: 5 }}
+                    color={[0.25, 0.25, 0.25, 1]}
+                    depth={0.5}
+                    zBias={-1}
+                  />
+
+                </Spherical>
               </Stereographic>
             </Animation>
           </Plot>
@@ -141,19 +166,27 @@ export const PlotStereographicPage: LC = () => {
     </Loop>
   );
 
+  const root = document.querySelector('#use-gpu .canvas');
+
   return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
+    <PlotControls
+      container={root}
+      hasNormalize
+      render={({normalize}) => 
+        <OrbitControls
+          radius={5}
+          bearing={0.5}
+          pitch={0.3}
+          render={(radius: number, phi: number, theta: number) =>
+            <OrbitCamera
+              radius={radius}
+              phi={phi}
+              theta={theta}
+            >
+              {view(normalize)}
+            </OrbitCamera>
+          }
+        />
       }
     />
   );

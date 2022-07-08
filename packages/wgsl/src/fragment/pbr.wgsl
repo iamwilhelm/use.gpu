@@ -49,7 +49,7 @@ fn smithGGXCorrelated(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   var a2 = alpha * alpha;
   var GGXL = dotNV * sqrt((dotNL - a2 * dotNL) * dotNL + a2);
   var GGXV = dotNL * sqrt((dotNV - a2 * dotNV) * dotNV + a2);
-  return 0.5 / (GGXL + GGXV);
+  return 0.5 / (GGXL + GGXV + 0.00001);
 }
 
 fn G1X(dotNX: f32, k: f32) -> f32 {

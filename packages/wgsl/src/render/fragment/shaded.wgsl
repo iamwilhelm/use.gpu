@@ -17,7 +17,7 @@ fn main(
 ) -> @location(0) vec4<f32> {
 
   var normal = fragNormal;
-  //if (!frontFacing) { normal = -normal; }
+  if (!frontFacing) { normal = -normal; }
 
   var outColor = fragColor;
   outColor = getFragment(outColor, fragUV, normal, fragTangent, fragPosition);

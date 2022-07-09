@@ -1,20 +1,25 @@
 use '@use-gpu/wgsl/use/view'::{ getViewPosition };
-use '@use-gpu/wgsl/material/pbr'::{ applyPBRMaterial as applyDefaultPBRMaterial };
 
-@optional @link fn applyPBRMaterial(
-  materialColor: vec4<f32>,
-  lightColor: vec4<f32>,
-  mapUV: vec2<f32>,
+struct Params {};
+
+@link fn getMaterial(
+  materialColor: vec3<f32>,
+  mapUV: vec4<f32>,
+  mapST: vec4<f32>,
+) -> @infer Params {}
+
+@link fn applyLights(
   N: vec3<f32>,
-  L: vec3<f32>,
   V: vec3<f32>,
-) -> vec3<f32> {
-  return applyDefaultPBRMaterial(materialColor, lightColor, mapUV, N, L, V);
-}
+  position: vec3<f32>,
+  ao: f32,
+  @infer params: Params,
+) -> vec3<f32> {}
 
 @export fn getShadedFragment(
   color: vec4<f32>,
-  uv: vec2<f32>,
+  uv: vec4<f32>,
+  st: vec4<f32>,
   normal: vec4<f32>,
   tangent: vec4<f32>,
   position: vec4<f32>,
@@ -22,15 +27,12 @@ use '@use-gpu/wgsl/material/pbr'::{ applyPBRMaterial as applyDefaultPBRMaterial 
   let viewPosition = getViewPosition();
   let toView: vec3<f32> = viewPosition.xyz - position.xyz;
 
+  let params = getMaterial(color.rgb, uv, st);
+
   let N: vec3<f32> = normalize(normal.xyz);
   let V: vec3<f32> = normalize(toView);
 
-  let lightPosition = vec3<f32>(10.0, 30.0, 20.0);
-  let lightColor = vec4<f32>(1.0, 1.0, 1.0, 1.0);
+  let light = applyLights(N, V, position, 1.0, params);
 
-  let toLight: vec3<f32> = lightPosition - position.xyz;
-  let L: vec3<f32> = normalize(toLight);
-
-  let direct = applyPBRMaterial(color, lightColor, uv, N, L, V);
-  return vec4<f32>(direct * color.a, color.a);
+  return vec4<f32>(light * color.a, color.a);
 }

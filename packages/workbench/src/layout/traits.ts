@@ -1,7 +1,7 @@
 import { makeUseTrait, makeParseTrait } from '../traits/useTrait';
 import {
   optional,
-  parseFloat,
+  parseNumber,
   parseColor,
 } from '../traits/parse';
 import {
@@ -22,8 +22,8 @@ import {
 } from './types';
 
 const BOX_TRAIT = {
-  grow: parseFloat,
-  shrink: parseFloat,
+  grow: parseNumber,
+  shrink: parseNumber,
   margin: parseMargin,
   inline: optional(parseBase),
   flex: optional(parseAnchor),

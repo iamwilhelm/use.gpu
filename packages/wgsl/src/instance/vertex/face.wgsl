@@ -4,7 +4,8 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getNormal(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
 @optional @link fn getTangent(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 0.0, 1.0); };
-@optional @link fn getUV(i: u32) -> vec2<f32> { return vec2<f32>(0.5, 0.5); };
+@optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
+@optional @link fn getST(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
 @optional @link fn getSegment(i: u32) -> i32 { return -1; };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 
@@ -37,7 +38,8 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
-      vec2(NaN, NaN),
+      vec4(NaN, NaN, NaN, NaN),
+      vec4(NaN, NaN, NaN, NaN),
       0u,
     );
   }
@@ -59,6 +61,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
   var normal = getNormal(normalIndex);
   var tangent = getTangent(tangentIndex);
   var uv = getUV(cornerIndex);
+  var st = getST(cornerIndex);
 
   var position = worldToClip(world);
 
@@ -69,6 +72,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
     tangent,
     color,
     uv,
+    st,
     getLookup(cornerIndex),
   );
 }

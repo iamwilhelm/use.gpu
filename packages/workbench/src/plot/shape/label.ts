@@ -7,7 +7,6 @@ import { DataContext, ValuesContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import { LayoutContext } from '../../providers/layout-provider';
 import {
-  parseFloat,
   parsePosition4,
 } from '../../traits/parse';
 import {

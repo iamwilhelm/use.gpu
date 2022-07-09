@@ -21,7 +21,8 @@ use '@use-gpu/wgsl/use/view'::{ getViewSize };
   return SolidVertex(
     vec4<f32>(xy.x * 2.0 + 1.0, -(xy.y * 2.0 + 1.0), 0.5, 1.0),
     vec4<f32>(1.0, 1.0, 1.0, 1.0),
-    uv * 2.0,
+    vec4<f32>(uv * 2.0, 0.0, 0.0),
+    vec4<f32>(0.0),
     instanceIndex,
   );
 }

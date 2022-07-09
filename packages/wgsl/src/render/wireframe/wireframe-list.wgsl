@@ -46,7 +46,8 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
     return SolidVertex(
       vec4<f32>(NaN, NaN, NaN, NaN),
       vec4<f32>(NaN, NaN, NaN, NaN),
-      vec2<f32>(NaN, NaN),
+      vec4<f32>(NaN, NaN, NaN, NaN),
+      vec4<f32>(NaN, NaN, NaN, NaN),
       0u,
     );
   }
@@ -66,7 +67,8 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
   return SolidVertex(
     vec4<f32>(join, 1.0),
     vec4<f32>(1.0, 1.0, 1.0, 1.0),
-    vec2<f32>(0.0, 0.0),
+    vec4<f32>(0.0, 0.0, 0.0, 0.0),
+    vec4<f32>(0.0, 0.0, 0.0, 0.0),
     0u,
   );
 }

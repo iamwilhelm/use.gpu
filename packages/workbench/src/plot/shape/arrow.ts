@@ -12,7 +12,6 @@ import { useDerivedSource } from '../../hooks/useDerivedSource';
 import { useShaderRef } from '../../hooks/useShaderRef';
 import { DataContext } from '../../providers/data-provider';
 import {
-  parseFloat,
   parsePosition4,
 } from '../../traits/parse';
 import {

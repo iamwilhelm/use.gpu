@@ -6,10 +6,11 @@ use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,
   @location(0) fragColor: vec4<f32>,
-  @location(1) fragUV: vec2<f32>,
-  @location(2) fragNormal: vec4<f32>,
-  @location(3) fragTangent: vec4<f32>,
-  @location(4) fragPosition: vec4<f32>,
+  @location(1) fragUV: vec4<f32>,
+  @location(2) fragST: vec4<f32>,
+  @location(3) fragNormal: vec4<f32>,
+  @location(4) fragTangent: vec4<f32>,
+  @location(5) fragPosition: vec4<f32>,
 };
 
 @vertex
@@ -23,6 +24,7 @@ fn main(
     v.position,
     toColorSpace(v.color),
     v.uv,
+    v.st,
     v.normal,
     v.tangent,
     v.world,

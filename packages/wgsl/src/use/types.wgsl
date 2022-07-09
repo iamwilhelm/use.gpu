@@ -1,3 +1,20 @@
+@export struct Radiance {
+  light: vec3<f32>,
+  indirect: bool,
+};
+
+@export struct Light {
+  kind: i32,
+  position: vec4<f32>,
+  normal: vec4<f32>,
+  tangent: vec4<f32>,
+  size: vec4<f32>,
+  color: vec4<f32>,
+  intensity: f32,
+};
+
+////
+
 @export struct PickVertex {
   position: vec4<f32>,
   index: u32,
@@ -6,7 +23,8 @@
 @export struct SolidVertex {
   position: vec4<f32>,
   color: vec4<f32>,
-  uv: vec2<f32>,
+  uv: vec4<f32>,
+  st: vec4<f32>,
   index: u32,
 };
 
@@ -16,7 +34,8 @@
   normal: vec4<f32>,
   tangent: vec4<f32>,
   color: vec4<f32>,
-  uv: vec2<f32>,
+  uv: vec4<f32>,
+  st: vec4<f32>,
 
   index: u32,
 };

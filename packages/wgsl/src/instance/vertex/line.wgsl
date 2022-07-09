@@ -72,13 +72,17 @@ fn trimAnchor(
     return SolidVertex(
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
-      vec2(NaN, NaN),
+      vec4(NaN, NaN, NaN, NaN),
+      vec4(NaN, NaN, NaN, NaN),
       0u,
     );
   }
 
   var uv = vec2<f32>(ij);
   var xy = uv * 2.0 - 1.0;
+
+  let uv4 = vec4<f32>(uv, 0.0, 0.0);
+  let st4 = vec4<f32>(0.0);
 
   var cornerIndex: u32;
   var joinIndex: u32;
@@ -165,7 +169,8 @@ fn trimAnchor(
       return SolidVertex(
         vec4(NaN, NaN, NaN, NaN),
         vec4(NaN, NaN, NaN, NaN),
-        vec2(NaN, NaN),
+        vec4(NaN, NaN, NaN, NaN),
+        vec4(NaN, NaN, NaN, NaN),
         instanceIndex,
       );
     }
@@ -188,7 +193,8 @@ fn trimAnchor(
   return SolidVertex(
     vec4<f32>(lineJoin, 1.0) * center4.w,
     color,
-    uv,
+    uv4,
+    st4,
     getLookup(cornerIndex),
   );
 }

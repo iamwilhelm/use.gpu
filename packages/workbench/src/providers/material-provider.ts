@@ -2,30 +2,33 @@ import { LC, PropsWithChildren } from '@use-gpu/live/types';
 import { Point4 } from '@use-gpu/core/types';
 import { ShaderModule, ShaderSource } from '@use-gpu/shader/types';
 
-import { provide } from '@use-gpu/live';
+import { provide, useOne } from '@use-gpu/live';
 import { useProp } from '../traits/useProp';
 import { ColorLike } from '../traits/types';
 import { parseColor } from '../traits/parse';
 import { makeContext, useContext } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useShaderRef } from '../hooks/useShaderRef';
+import { useLightContext } from '../providers/light-provider';
 
 import { getShadedFragment } from '@use-gpu/wgsl/instance/fragment/shaded.wgsl';
 import { getMappedFragment } from '@use-gpu/wgsl/instance/fragment/mapped.wgsl';
-import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr.wgsl';
+import { getPBRMaterial } from '@use-gpu/wgsl/material/pbr-material.wgsl';
+import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 
 export const MaterialContext = makeContext<ShaderModule>(getShadedFragment, 'MaterialContext');
 
 export const useMaterialContext = () => useContext(MaterialContext);
 
-const PBR_BINDINGS = bundleToAttributes(applyPBRMaterial);
+const PBR_BINDINGS = bundleToAttributes(getPBRMaterial);
 const MAPPED_BINDINGS = bundleToAttributes(getMappedFragment);
 const SHADED_BINDINGS = bundleToAttributes(getShadedFragment);
 
 export type MaterialProps = {
-  material: ShaderModule,
+  getMaterial: ShaderModule,
+  applyMaterial: ShaderModule,
 };
 
 export type PBRMaterialProps = {
@@ -72,14 +75,17 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
 
   const mr = useShaderRef(null, metalnessRoughnessMap);
 
-  const applyMaterial = useBoundShader(applyPBRMaterial, PBR_BINDINGS, [a, m, r, mr]);
+  const applyLights = useLightContext();
+
+  const getMaterial = useBoundShader(getPBRMaterial, PBR_BINDINGS, [a, m, r, mr]);
+  const boundApplyLights = useOne(() => applyLights ? bindBundle(applyLights, {applyMaterial: applyPBRMaterial}) : null, applyLights);
 
   let getFragment: ShaderModule;
   if (normalMap || occlusionMap || emissiveMap) {
-    getFragment = useBoundShader(getMappedFragment, MAPPED_BINDINGS, [applyMaterial, normalMap, occlusionMap, emissiveMap]);
+    getFragment = useBoundShader(getMappedFragment, MAPPED_BINDINGS, [getMaterial, boundApplyLights, normalMap, occlusionMap, emissiveMap]);
   }
   else {
-    getFragment = useBoundShader(getShadedFragment, SHADED_BINDINGS, [applyMaterial]);
+    getFragment = useBoundShader(getShadedFragment, SHADED_BINDINGS, [getMaterial, boundApplyLights]);
   }
 
   return provide(MaterialContext, getFragment, children);

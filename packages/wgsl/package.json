@@ -186,10 +186,25 @@
       "import": "./src/mask/textured.wgsl",
       "require": "./src/mask/textured.wgsl"
     },
-    "./material/pbr.wgsl": {
-      "types": "./src/material/pbr.wgsl.d.ts",
-      "import": "./src/material/pbr.wgsl",
-      "require": "./src/material/pbr.wgsl"
+    "./material/light.wgsl": {
+      "types": "./src/material/light.wgsl.d.ts",
+      "import": "./src/material/light.wgsl",
+      "require": "./src/material/light.wgsl"
+    },
+    "./material/lit.wgsl": {
+      "types": "./src/material/lit.wgsl.d.ts",
+      "import": "./src/material/lit.wgsl",
+      "require": "./src/material/lit.wgsl"
+    },
+    "./material/pbr-apply.wgsl": {
+      "types": "./src/material/pbr-apply.wgsl.d.ts",
+      "import": "./src/material/pbr-apply.wgsl",
+      "require": "./src/material/pbr-apply.wgsl"
+    },
+    "./material/pbr-material.wgsl": {
+      "types": "./src/material/pbr-material.wgsl.d.ts",
+      "import": "./src/material/pbr-material.wgsl",
+      "require": "./src/material/pbr-material.wgsl"
     },
     "./plot/array.wgsl": {
       "types": "./src/plot/array.wgsl.d.ts",
@@ -320,11 +335,6 @@
       "types": "./src/use/light-old.wgsl.d.ts",
       "import": "./src/use/light-old.wgsl",
       "require": "./src/use/light-old.wgsl"
-    },
-    "./use/light.wgsl": {
-      "types": "./src/use/light.wgsl.d.ts",
-      "import": "./src/use/light.wgsl",
-      "require": "./src/use/light.wgsl"
     },
     "./use/types.wgsl": {
       "types": "./src/use/types.wgsl.d.ts",

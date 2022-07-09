@@ -66,7 +66,8 @@ let ARROW_ASPECT: f32 = 2.5;
     arrowRadius = getArrowCorrection(cap.w, center.w, depth);
   }
 
-  let uv = vec2<f32>(f32(anchorIndex), 0.0);
+  let uv = vec4<f32>(f32(anchorIndex), 0.0, 0.0, 0.0);
+  let st = uv;
 
   let orientedPos = m * vec4<f32>(vec3<f32>(meshPosition.x, meshPosition.yz * arrowRadius) * arrowSize, 1.0);
   let finalPos = vec4<f32>(orientedPos.xyz + startPos.xyz, 1.0);
@@ -76,6 +77,7 @@ let ARROW_ASPECT: f32 = 2.5;
     position,
     color,
     uv,
+    st,
     getLookup(anchorIndex),
   );
 }

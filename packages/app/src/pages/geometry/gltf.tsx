@@ -11,6 +11,7 @@ import {
   CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
+  Lights, PointLight,
 } from '@use-gpu/workbench';
 import { GLTFData, GLTFModel } from '@use-gpu/gltf';
 
@@ -22,14 +23,16 @@ export const GeometryGLTFPage: LC = () => {
     <LinearRGB>
       <Cursor cursor='move' />
       <Pass>
-
-        <GLTFData
-          url={url}
-          render={(gltf: GLTF) =>
-            <GLTFModel gltf={gltf} />
-          }
-        />
-
+        <Lights>
+          <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
+          <PointLight position={[-30, 10, 10]} color={[0, 0.5, 1.0]} />
+          <GLTFData
+            url={url}
+            render={(gltf: GLTF) =>
+              <GLTFModel gltf={gltf} />
+            }
+          />
+        </Lights>
       </Pass>
     </LinearRGB>
   );

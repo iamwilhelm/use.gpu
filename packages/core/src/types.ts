@@ -165,6 +165,7 @@ export type UniformAttribute = {
   name: string,
   format: UniformType,
   args?: UniformType[],
+  members?: UniformAttribute[],
 };
 
 export type UniformAttributeValue = UniformAttribute & {

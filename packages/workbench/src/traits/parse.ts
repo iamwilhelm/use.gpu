@@ -22,7 +22,7 @@ export const optional = <A, B>(parse: (t?: A) => B) => (t?: A): B | undefined =>
 
 export const makeParseObject = <T>(def: object) => (value?: T) => value ?? def;
 
-export const makeParseFloat = (def: number = 0, min?: number, max?: number) => (value?: number) => {
+export const makeParseNumber = (def: number = 0, min?: number, max?: number) => (value?: number) => {
   if (value != null) {
     if (min != null) value = Math.max(min, value);
     if (max != null) value = Math.min(max, value);
@@ -183,7 +183,7 @@ export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color 
 
 //////////////////
 
-export const parseFloat      = makeParseFloat();
+export const parseNumber     = makeParseNumber();
 export const parseInteger    = makeParseInt();
 export const parseBoolean    = makeParseBoolean();
 
@@ -191,7 +191,7 @@ export const parseString          = makeParseString();
 export const parseStringFormatter = makeParseStringFormatter();
 export const parseStringArray     = makeParseArray(NO_STRINGS, parseString);
 
-export const parseVector     = makeParseArray(NO_VECTOR, parseFloat);
+export const parseVector     = makeParseArray(NO_VECTOR, parseNumber);
 
 export const parseColor      = makeParseColor();
 export const parsePosition4  = makeParseVec4();

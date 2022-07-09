@@ -2,7 +2,7 @@ import { makeUseTrait } from '../traits/useTrait';
 import { useOne } from '@use-gpu/live';
 import { useProp } from '../traits/useProp';
 import {
-  parseFloat,
+  parseNumber,
   parseInteger,
   parseBoolean,
   parseString,
@@ -55,7 +55,7 @@ const WHITE = [1, 1, 1, 1];
 
 const ANCHOR_TRAIT = {
   placement:  parsePlacement,
-  offset:     parseFloat,
+  offset:     parseNumber,
 };
 
 const ANCHOR_DEFAULTS = {
@@ -64,7 +64,7 @@ const ANCHOR_DEFAULTS = {
 };
 
 const ARROW_TRAIT = {
-  size: parseFloat,
+  size: parseNumber,
   start: parseBoolean,
   end: parseBoolean,
   detail: parseDetail,
@@ -116,9 +116,9 @@ const GRID_DEFAULTS = {
 const LABEL_TRAIT = {
   labels:     optional(parseStringArray),
   format:     optional(parseStringFormatter),
-  size:       parseFloat,
-  depth:      parseFloat,
-  expand:     parseFloat,
+  size:       parseNumber,
+  depth:      parseNumber,
+  expand:     parseNumber,
 };
 
 const LABEL_DEFAULTS = {
@@ -126,12 +126,12 @@ const LABEL_DEFAULTS = {
 };
 
 const LINE_TRAIT = {
-  width:     parseFloat,
-  depth:     parseFloat,
+  width:     parseNumber,
+  depth:     parseNumber,
   join:      parseJoin,
   loop:      parseBoolean,
   dash:      parseVector,
-  proximity: parseFloat,
+  proximity: parseNumber,
 };
 
 const LINE_DEFAULTS = {
@@ -153,8 +153,8 @@ const OBJECT_TRAIT = {
 const OBJECT_DEFAULTS = {};
 
 const POINT_TRAIT = {
-  size:  parseFloat,
-  depth: parseFloat,
+  size:  parseNumber,
+  depth: parseNumber,
   shape: parsePointShape,
 };
 
@@ -168,7 +168,7 @@ const ROP_TRAIT = {
   blending: parseBlending,
   zWrite:   parseBoolean,
   zTest:    parseBoolean,
-  zBias:    parseFloat,
+  zBias:    parseNumber,
   zIndex:   parseInteger,
 };
 
@@ -182,13 +182,13 @@ const ROP_DEFAULTS = {
 
 const SCALE_TRAIT = {
   mode:   parseDomain,
-  divide: parseFloat,
-  unit:   parseFloat,
-  base:   parseFloat,
+  divide: parseNumber,
+  unit:   parseNumber,
+  base:   parseNumber,
   start:  parseBoolean,
   end:    parseBoolean,
   zero:   parseBoolean,
-  factor: parseFloat,
+  factor: parseNumber,
   nice:   parseBoolean,
 };
 
@@ -238,7 +238,7 @@ export const useColorTrait = (props: Partial<ColorTrait>): vec4 => {
 
   const vec = useOne(() => vec4.create());
   const c = useProp(color, parseColor);
-  const o = useProp(opacity, parseFloat);
+  const o = useProp(opacity, parseNumber);
 
   if (o === 1) return vec4.copy(vec, c);
   return vec4.set(vec, c[0], c[1], c[2], c[3] * o);

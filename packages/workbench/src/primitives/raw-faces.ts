@@ -26,6 +26,7 @@ export type RawFacesProps = {
   normal?: number[] | TypedArray,
   tangent?: number[] | TypedArray,
   uv?: number[] | TypedArray,
+  st?: number[] | TypedArray,
   segment?: number,
   color?: number[] | TypedArray,
 
@@ -33,6 +34,7 @@ export type RawFacesProps = {
   normals?: ShaderSource,
   tangents?: ShaderSource,
   uvs?: ShaderSource,
+  sts?: ShaderSource,
   segments?: ShaderSource,
   colors?: ShaderSource,
 
@@ -95,6 +97,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const n = useShaderRef(props.normal, props.normals);
   const t = useShaderRef(props.tangent, props.tangents);
   const u = useShaderRef(props.uv, props.uvs);
+  const s = useShaderRef(props.st, props.sts);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
 
@@ -111,7 +114,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     UNWELDED_TANGENTS: !!unweldedTangents,
   }), [hasIndices, unweldedNormals, unweldedTangents]);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, t, u, g, c, i, l]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, t, u, s, g, c, i, l]);
   const getFragment = shaded ? m : getPassThruFragment;
 
   return (

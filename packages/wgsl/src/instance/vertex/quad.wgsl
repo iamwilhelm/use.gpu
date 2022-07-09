@@ -14,7 +14,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   var rectangle = getRectangle(instanceIndex);
   var color = getColor(instanceIndex);
   var depth = getDepth(instanceIndex);
-  var uv4 = getUV(instanceIndex);
+  var rectangleUV = getUV(instanceIndex);
   var zBias = getZBias(instanceIndex);
 
   var center = worldToClip(position);
@@ -35,11 +35,11 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     var wh = (rectangle.zw - rectangle.xy) * pixelScale;
 
     xy = mix(ul, br, uv1);
-    uv = mix(uv4.xy, uv4.zw, uv1 + xy1 * bleed / wh);
+    uv = mix(rectangleUV.xy, rectangleUV.zw, uv1 + xy1 * bleed / wh);
   }
   else {
     xy = mix(rectangle.xy, rectangle.zw, uv1) * pixelScale;
-    uv = mix(uv4.xy, uv4.zw, uv1);
+    uv = mix(rectangleUV.xy, rectangleUV.zw, uv1);
   }
 
   // Attach to position
@@ -52,10 +52,14 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     center = applyZBias(center, size * zBias);
   }
 
+  let uv4 = vec4<f32>(uv, 0.0, 0.0);
+  let st4 = vec4<f32>(0.0);
+
   return SolidVertex(
     center,
     color,
-    uv,
+    uv4,
+    st4,
     instanceIndex,
   );
 }

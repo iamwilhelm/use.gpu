@@ -6,7 +6,8 @@ use '@use-gpu/wgsl/use/types'::{ SolidVertex };
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,
   @location(0) fragColor: vec4<f32>,
-  @location(1) fragUV: vec2<f32>,
+  @location(1) fragUV: vec4<f32>,
+  @location(2) fragST: vec4<f32>,
 };
 
 @vertex
@@ -20,5 +21,6 @@ fn main(
     v.position,
     toColorSpace(v.color),
     v.uv,
+    v.st,
   );
 }

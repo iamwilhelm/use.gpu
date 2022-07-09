@@ -61,11 +61,18 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   return G1X(dotNL, k) * G1X(dotNV, k);
 }
 
+@export struct PBRParams {
+  albedo: vec3<f32>,
+  metalness: f32,
+  roughness: f32,
+};
+
 // N, L, V must be normalized
 @export fn PBR(
   N: vec3<f32>,
   L: vec3<f32>,
   V: vec3<f32>,
+  radiance: vec3<f32>,
   albedo: vec3<f32>,
   metalness: f32,
   roughness: f32,
@@ -76,8 +83,6 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
 
   var alpha = roughness * roughness;
   var dotNV = saturate(dot(N, V));
-
-  var radiance = 3.1415;
 
   var H = normalize(V + L);
   var dotNL = saturate(dot(N, L));

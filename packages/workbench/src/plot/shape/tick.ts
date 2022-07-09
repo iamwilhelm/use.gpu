@@ -10,7 +10,7 @@ import { DataContext } from '../../providers/data-provider';
 import { RangeContext } from '../../providers/range-provider';
 import { useBoundSource } from '../../hooks/useBoundSource';
 import {
-  parseFloat,
+  parseNumber,
   parsePosition4,
 } from '../../traits/parse';
 import {
@@ -55,7 +55,7 @@ export const Tick: LiveComponent<TickProps> = (props) => {
   const color = useColorTrait(props);
   const {zBias} = useROPTrait(props);
 
-  const s = useProp(size, parseFloat);
+  const s = useProp(size, parseNumber);
   const d = useProp(detail, parseDetail);
   const o = useProp(offset, parsePosition4);
 

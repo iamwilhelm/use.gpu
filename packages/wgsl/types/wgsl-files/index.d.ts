@@ -10,6 +10,7 @@ declare module "@use-gpu/wgsl/fragment/lod-bias.wgsl" {
 declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
+  export const PBRParams: ParsedBundle;
   export const PBR: ParsedBundle;
   export default __module;
 }
@@ -240,10 +241,31 @@ declare module "@use-gpu/wgsl/mask/textured.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/material/pbr.wgsl" {
+declare module "@use-gpu/wgsl/material/light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const applyLight: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/lit.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const applyLights: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/pbr-apply.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const applyPBRMaterial: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/pbr-material.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getPBRMaterial: ParsedBundle;
   export default __module;
 }
 
@@ -438,16 +460,11 @@ declare module "@use-gpu/wgsl/use/light-old.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/use/light.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/use/types.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
+  export const Radiance: ParsedBundle;
+  export const Light: ParsedBundle;
   export const PickVertex: ParsedBundle;
   export const SolidVertex: ParsedBundle;
   export const ShadedVertex: ParsedBundle;

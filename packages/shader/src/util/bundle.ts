@@ -1,6 +1,7 @@
 import { UniformAttribute, ParsedBundle, ParsedModule, TypeLike, RefFlags as RF } from '../types';
 
-const NO_LIBS = {};
+const NO_LIBS: Record<string, any> = {};
+const NO_ARGS: any[] = [];
 
 export const getBundleKey = (bundle: ParsedBundle | ParsedModule) => {
   return (('module' in bundle) ? bundle.key ?? bundle.module.key : bundle.key) ?? getBundleHash(bundle);
@@ -74,13 +75,25 @@ export const makeBundleToAttribute = (
 
   const entry = name ?? bundle.entry ?? module.entry;
 
-  for (const fn of declarations) if (fn.func) {
-    const {func} = fn;
-    const {type, name, parameters} = func;
-    if (name === entry) {
-      return {name, format: toTypeString(type), args: toArgTypes(parameters)};
+  for (const d of declarations) {
+    if (d.func) {
+      const {type, name, parameters} = d.func;
+      if (name === entry) {
+        return {name, format: toTypeString(type), args: toArgTypes(parameters)};
+      }
+    }
+    if (d.struct) {
+      const {name, members} = d.struct;
+      if (name === entry) {
+        const ms = members?.map(({name, type}: any) => ({
+          name,
+          format: toTypeString(type),
+        }));
+        const args = ms?.map(({format}: any) => format);
+        return {name, format: name, args, members: ms};
+      }
     }
   }
 
-  return {name: name ?? 'main', format: 'void', args: []};
+  return {name: name ?? 'main', format: 'void', args: NO_ARGS};
 }

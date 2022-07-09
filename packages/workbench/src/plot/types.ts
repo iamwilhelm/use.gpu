@@ -1,13 +1,12 @@
 import { VectorLike, ColorLike } from '../traits/types';
+import { PointShape } from '../layers/types';
 
 export type Axis = 'x' | 'y' | 'z' | 'w';
 export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
-export type Dimension = string | number;
 export type Domain = 'linear' | 'log';
 export type Join = 'miter' | 'round' | 'bevel';
 export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom';
 export type Swizzle = string;
-export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
 
 export type AnchorTrait = {
   placement: Placement,

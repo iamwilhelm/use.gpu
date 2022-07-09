@@ -27,7 +27,7 @@ const POLAR_BINDINGS = bundleToAttributes(getSphericalPosition);
 export type SphericalProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   helix?: number,
-  on?: Axes,
+  on?: Swizzle,
 
   children?: LiveElement<any>,
 };

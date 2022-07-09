@@ -30,12 +30,12 @@ export const invertBasisSlow = (axes: string) => {
   return order.join('');
 };
 
-export const rotateBasisSlow = (axes: string) => axes.split('').map((x: string) => AXES[(AXES.indexOf(x) + 1) % 4]);
+export const rotateBasisSlow = (axes: string) => axes.split('').map((x: string) => AXES[(AXES.indexOf(x) + 1) % 4]).join('');
 
-export const rotateBasis = (axes: string, n: 3) => {
+export const rotateBasis = (axes: string, n: number) => {
   while (n < 0) n += 4;
   while (n > 3) n -= 4;
-  for (let i = 0; i < n; ++i) axes = ROTATE_BASIS[axis];
+  for (let i = 0; i < n; ++i) axes = ROTATE_BASIS[axes];
   return axes;
 }
 

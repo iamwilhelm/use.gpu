@@ -34,4 +34,5 @@ export const DirectionalLight = (props: DirectionalLightProps) => {
   }), [position, color, intensity]);
 
   useLightConsumer(light);
+  return null;
 };

@@ -1,4 +1,4 @@
-import { LC, PropsWithChildren } from '@use-gpu/live/types';
+import { LiveFiber, LC, PropsWithChildren } from '@use-gpu/live/types';
 import { TypedArray, StorageSource } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { Light } from './types';
@@ -11,7 +11,6 @@ import { bindBundle, bundleToAttribute, bundleToAttributes, getBundleKey } from 
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getBoundShader } from '../hooks/useBoundShader';
-import { getShaderRef } from '../hooks/useShaderRef';
 
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
 import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
@@ -23,13 +22,13 @@ const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
 const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 
 const LIGHT_ATTRIBUTE = bundleToAttribute(WGSLLight);
-const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.members);
+const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.members!);
 
 type LightsProps = {
   max?: number,
 };
 
-export const Lights: LC = (props: PropsWithChildren<object>) => {
+export const Lights: LC<LightsProps> = (props: PropsWithChildren<LightsProps>) => {
   const {
     max = 64,
     children,
@@ -75,7 +74,7 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
 
     // Group by transform
     const keyFor = (transform?: ShaderModule | null) => transform ? getBundleKey(transform) : '0';
-    const map = new Map<ShaderModule | null, Light[]>();
+    const map = new Map<string, Light[]>();
     for (const light of lights) {
       const key = keyFor(light.transform);
       let list = map.get(key);
@@ -85,7 +84,7 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
 
     // Emit light data
     let base = 0;
-    const render = Array.from(map.keys()).map((key: ShaderModule | null) => {
+    const render = Array.from(map.keys()).map((key: string) => {
       const lights = map.get(key)!;
       const b = base;
       base += lights.length;
@@ -94,6 +93,7 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
 
     return gather(render, () => {
       uploadBuffer(device, storage.buffer, data);
+      return null;
     });
   });
 };

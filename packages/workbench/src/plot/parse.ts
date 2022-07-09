@@ -1,5 +1,5 @@
 import { makeParseEnum, makeParseInt, makeParseVec2, makeParseArray } from '../traits/parse';
-import { Domain, PointShape }  from './types';
+import { Domain }  from './types';
 import { vec2 } from 'gl-matrix';
 
 const NO_RANGE = vec2.fromValues(-1, 1);
@@ -42,5 +42,3 @@ export const parseRanges = makeParseArray(NO_RANGES, parseRange);
 
 export const parseDetail = makeParseInt(1, 1, 1e8);
 export const parseDomain = makeParseEnum<Domain>(['linear', 'log']);
-
-export const parsePointShape = makeParseEnum<PointShape>(['circle', 'diamond', 'square', 'circleOutlined', 'diamondOutlined', 'squareOutlined']);

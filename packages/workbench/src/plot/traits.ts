@@ -27,10 +27,12 @@ import {
   parseAxis,
   parseDetail,
   parseDomain,
-  parsePointShape,
   parseRange,
   parseRanges,
 } from './parse';
+import {
+  parsePointShape,
+} from '../layers/parse';
 import {
   AnchorTrait,
   ArrowTrait,

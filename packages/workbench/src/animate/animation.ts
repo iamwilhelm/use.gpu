@@ -5,34 +5,7 @@ import { useOne, reactInterop } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
-type Ease = 'cosine' | 'linear' | 'zero' | 'auto' | 'bezier';
-
-type Keyframe<T> = 
-| [
-  number,
-  T,
-]
-| [
-  number,
-  T,
-  Ease,
-]
-| [
-  number,
-  T,
-  Ease,
-  [number, number] | null | undefined,
-  [number, number] | null | undefined,
-]
-| [
-  number,
-  T,
-  Ease,
-  [number, number] | null | undefined,
-  [number, number] | null | undefined,
-  T | null | undefined,
-  T | null | undefined,
-];
+import { Keyframe } from './types';
 
 export type AnimationProps<T> = {
   loop?: boolean,

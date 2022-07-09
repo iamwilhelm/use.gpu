@@ -67,10 +67,12 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     const tangents = useMemo(() => {
       if (indices != null) {
         // Unweld mesh
-        const inds = gltf.bound.data[indices];
-        ps = flattenIndexedArray(ps as any, inds, 3);
-        ns = flattenIndexedArray(ns as any, inds, 3);
-        ts = flattenIndexedArray(ts as any, inds, 2);
+        const inds = gltf.bound?.data?.[indices] as any;
+        if (inds) {
+          ps = flattenIndexedArray(ps as any, inds, 3);
+          ns = flattenIndexedArray(ns as any, inds, 3);
+          ts = flattenIndexedArray(ts as any, inds, 2);
+        }
       }
 
       const out = generateTangents(ps as any, ns as any, ts as any);

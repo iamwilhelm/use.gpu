@@ -23,17 +23,20 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
 
   let kind = light.kind;
   if (kind == 0) {
+    // Ambient
     return Radiance(vec3<f32>(radiance * ao), true);
   }
   else if (kind == 1) {
+    // Directional
     L = normalize(-light.normal.xyz);
     radiance *= 3.1415;
   }
   else if (kind == 2) {
+    // Point
     let s = light.size.x;
     let d = light.position.xyz - position;
     L = normalize(d);
-    //if (s >= 0.0) { radiance *= s*s / dot(d, d); }
+    if (s >= 0.0) { radiance *= s*s / dot(d, d); }
     radiance *= 3.1415;
   }
   else {

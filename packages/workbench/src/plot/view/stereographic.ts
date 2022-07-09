@@ -11,7 +11,7 @@ import { useBoundShader } from '../../hooks/useBoundShader';
 import { useCombinedTransform } from '../../hooks/useCombinedTransform';
 import { composeTransform } from '../util/compose';
 import { recenterAxis } from '../util/axis';
-import { swizzleMatrix, toBasis, invertBasis } from '../util/swizzle';
+import { swizzleMatrix, toBasis, rotateBasis, invertBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '../../traits/parse';

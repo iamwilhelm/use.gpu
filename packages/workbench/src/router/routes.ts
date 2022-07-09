@@ -1,6 +1,7 @@
 import { LiveFiber, LiveComponent, LiveNode, LiveElement, Task } from '@use-gpu/live/types';
 import { memo, morph, use, provide, makeContext, useContext, useOne, useMemo } from '@use-gpu/live';
-import { RouterContext, Route } from './router';
+import { RouterContext } from './router';
+import { Route } from './types';
 
 export type RouteState = {
   base: string,

@@ -233,7 +233,7 @@ export type UniformByteSetter = (view: DataView, offset: number, data: any) => v
 // Storage bindings
 export type StorageSource = {
   buffer: GPUBuffer,
-  format: string,
+  format: any,
   length: number,
   size: number[],
   version: number,

@@ -1,5 +1,6 @@
 import { LC } from '@use-gpu/live/types';
 import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { Keyframe } from '@use-gpu/workbench/types';
 
 import { use } from '@use-gpu/live';
 import React from '@use-gpu/live/jsx';
@@ -36,7 +37,7 @@ export const PlotStereographicPage: LC = () => {
     [1, 0],
     [10, 1],
     [11, 1],
-  ];
+  ] as Keyframe<number>[];
 
   const view = (normalize: number) => (
     <Loop>
@@ -183,7 +184,7 @@ export const PlotStereographicPage: LC = () => {
               phi={phi}
               theta={theta}
             >
-              {view(normalize)}
+              {view(+normalize)}
             </OrbitCamera>
           }
         />

@@ -32,6 +32,11 @@
       "import": "./src/animate/animation.ts",
       "require": "./src/animate/animation.ts"
     },
+    "./animate/types": {
+      "types": "./src/animate/types.d.ts",
+      "import": "./src/animate/types.ts",
+      "require": "./src/animate/types.ts"
+    },
     "./camera/orbit-camera": {
       "types": "./src/camera/orbit-camera.d.ts",
       "import": "./src/camera/orbit-camera.ts",
@@ -212,11 +217,6 @@
       "import": "./src/layers/label-layer.ts",
       "require": "./src/layers/label-layer.ts"
     },
-    "./layers/layers": {
-      "types": "./src/layers/layers.d.ts",
-      "import": "./src/layers/layers.ts",
-      "require": "./src/layers/layers.ts"
-    },
     "./layers/line-layer": {
       "types": "./src/layers/line-layer.d.ts",
       "import": "./src/layers/line-layer.ts",
@@ -251,6 +251,11 @@
       "types": "./src/layers/types.d.ts",
       "import": "./src/layers/types.ts",
       "require": "./src/layers/types.ts"
+    },
+    "./layers/virtual-layers": {
+      "types": "./src/layers/virtual-layers.d.ts",
+      "import": "./src/layers/virtual-layers.ts",
+      "require": "./src/layers/virtual-layers.ts"
     },
     "./layout/display/absolute": {
       "types": "./src/layout/display/absolute.d.ts",
@@ -336,6 +341,31 @@
       "types": "./src/layout/ui.d.ts",
       "import": "./src/layout/ui.ts",
       "require": "./src/layout/ui.ts"
+    },
+    "./light/ambient-light": {
+      "types": "./src/light/ambient-light.d.ts",
+      "import": "./src/light/ambient-light.ts",
+      "require": "./src/light/ambient-light.ts"
+    },
+    "./light/directional-light": {
+      "types": "./src/light/directional-light.d.ts",
+      "import": "./src/light/directional-light.ts",
+      "require": "./src/light/directional-light.ts"
+    },
+    "./light/lights": {
+      "types": "./src/light/lights.d.ts",
+      "import": "./src/light/lights.ts",
+      "require": "./src/light/lights.ts"
+    },
+    "./light/point-light": {
+      "types": "./src/light/point-light.d.ts",
+      "import": "./src/light/point-light.ts",
+      "require": "./src/light/point-light.ts"
+    },
+    "./light/types": {
+      "types": "./src/light/types.d.ts",
+      "import": "./src/light/types.ts",
+      "require": "./src/light/types.ts"
     },
     "./plot/parse": {
       "types": "./src/plot/parse.d.ts",
@@ -457,6 +487,11 @@
       "import": "./src/plot/view/spherical.ts",
       "require": "./src/plot/view/spherical.ts"
     },
+    "./plot/view/stereographic": {
+      "types": "./src/plot/view/stereographic.d.ts",
+      "import": "./src/plot/view/stereographic.ts",
+      "require": "./src/plot/view/stereographic.ts"
+    },
     "./primitives/mesh/arrow": {
       "types": "./src/primitives/mesh/arrow.d.ts",
       "import": "./src/primitives/mesh/arrow.ts",
@@ -541,6 +576,11 @@
       "types": "./src/providers/layout-provider.d.ts",
       "import": "./src/providers/layout-provider.ts",
       "require": "./src/providers/layout-provider.ts"
+    },
+    "./providers/light-provider": {
+      "types": "./src/providers/light-provider.d.ts",
+      "import": "./src/providers/light-provider.ts",
+      "require": "./src/providers/light-provider.ts"
     },
     "./providers/loop-provider": {
       "types": "./src/providers/loop-provider.d.ts",
@@ -637,6 +677,11 @@
       "import": "./src/router/routes.ts",
       "require": "./src/router/routes.ts"
     },
+    "./router/types": {
+      "types": "./src/router/types.d.ts",
+      "import": "./src/router/types.ts",
+      "require": "./src/router/types.ts"
+    },
     "./shader/texture-shader": {
       "types": "./src/shader/texture-shader.d.ts",
       "import": "./src/shader/texture-shader.ts",
@@ -691,6 +736,11 @@
       "types": "./src/traits/useTrait.d.ts",
       "import": "./src/traits/useTrait.ts",
       "require": "./src/traits/useTrait.ts"
+    },
+    "./types": {
+      "types": "./src/types.d.ts",
+      "import": "./src/types.ts",
+      "require": "./src/types.ts"
     }
   }
 }

@@ -30,4 +30,5 @@ export const AmbientLight = (props: AmbientLightProps) => {
   }), [color, intensity]);
 
   useLightConsumer(light);
+  return null;
 };

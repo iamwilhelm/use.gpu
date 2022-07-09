@@ -18,7 +18,7 @@ export const DEFAULT_LIGHT_CONTEXT = {
   },
 
   useMaterial: (applyMaterial: ShaderModule) =>
-    useOne(() => DEFAULT_LIGHT_CONTEXT.bindMaterial(getMaterial), getMaterial),
+    useOne(() => DEFAULT_LIGHT_CONTEXT.bindMaterial(applyMaterial), applyMaterial),
 };
 
 export const LightContext = makeContext<LightContextProps>(DEFAULT_LIGHT_CONTEXT, 'LightContext');

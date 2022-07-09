@@ -128,12 +128,16 @@ export const makeLinker = (
   const visible = new Set<string>();
   const fixed = new Map<string, string>();
 
+  // Track link signatures
+  const signatures = new Map<string, any>();
+  const infers = new Map<string, string>();
+
   let hasBoundVirtuals = false;
 
   for (const bundle of bundles) {
     const {module, defines} = bundle;
     const {name, code, tree, table, shake, virtual} = module;
-    const {globals, symbols, visibles, externals, modules} = table;
+    const {globals, symbols, visibles, externals, modules, exports: exp} = table;
 
     const key = getBundleKey(bundle);
     const importMap = imported.get(key);
@@ -142,10 +146,12 @@ export const makeLinker = (
     let optionals: Set<string> | null = null;
 
     // Namespace all non-global symbols outside main module
+    let scope = '';
     const rename = new Map<string, string>();
     if (key !== main) {
       const namespace = virtual?.namespace;
       const ns = reserveNamespace(key, namespaces, namespace);
+      scope = ns;
 
       if (symbols) for (const name of symbols) rename.set(name, ns + name);
       if (globals) for (const name of globals) {
@@ -154,6 +160,14 @@ export const makeLinker = (
       }
       if (visibles) for (const name of visibles) visible.add(rename.get(name)!);
       for (const name of rename.values()) exists.add(name);
+
+      // Gather all exported signatures for type inference
+      if (exp) for (const {flags, func} of exp) {
+        if (func && (flags & RF.Exported)) {
+          const {name} = func;
+          signatures.set(ns + name, func);
+        }
+      }
     }
 
     // Replace imported symbol names with target
@@ -170,12 +184,13 @@ export const makeLinker = (
         }
         else if (!visible.has(imp)) console.warn(`Import ${name} from '${module}' is private`);
         rename.set(name, imp);
+        infers.set(scope + name, imp);
       }
     }
 
     // Replace imported function prototype names with target
     if (externals) for (const {flags, func} of externals) if (func) {
-      const {name} = func;
+      const {name, inferred} = func;
       const key = importMap?.get(name);
       const ns = namespaces.get(key);
 
@@ -194,6 +209,23 @@ export const makeLinker = (
       }
       else if (!visible.has(imp)) console.warn(`Link ${name}:${resolved} is private`);
       rename.set(name, imp);
+
+      if (inferred) {
+        const sig = signatures.get(imp);
+        const {type, parameters} = sig;
+        for (const {name, at} of inferred) {
+          const resolved = at < 0 ? type : parameters[at];
+
+          let imp = ns + (resolved.type?.name ?? resolved.name);
+          let i = imp;
+          while (i = infers.get(imp)) { imp = i; console.log({imp, i}); }
+
+          rename.set(name, imp);
+          infers.set(ns + name, imp);
+
+          console.log({name, at, imp, sig})
+        }
+      }
     }
 
     // Copy over static renames
@@ -306,7 +338,7 @@ export const loadBundlesInOrder = timed('loadBundlesInOrder', (
 
     // Recurse into links
     if (externals) for (const {func, flags} of externals) if (func) {
-      const {name} = func;
+      const {name, inferred} = func;
       const chunk = links[name];
       if (!chunk) {
         if (flags & RF.Optional) {
@@ -334,6 +366,7 @@ export const loadBundlesInOrder = timed('loadBundlesInOrder', (
       let list = exported.get(key);
       if (!list) exported.set(key, list = new Set());
       list.add(symbol);
+      
     }
 
     // Build module-to-module dependency graph

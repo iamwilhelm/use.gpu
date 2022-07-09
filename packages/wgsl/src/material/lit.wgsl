@@ -1,8 +1,6 @@
 use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
 use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 
-struct Params {};
-
 @optional @link fn getLightCount() -> u32 { return 0u; }
 @optional @link fn getLight(index: u32) -> Light {
   return Light(
@@ -15,12 +13,13 @@ struct Params {};
   );
 }
 
+@infer type T;
 @link fn applyMaterial(
   N: vec3<f32>,
   L: vec3<f32>,
   V: vec3<f32>,
   radiance: vec3<f32>,
-  @infer params: Params,
+  @infer(T) params: T,
 ) -> vec3<f32> {}
 
 fn applyLight(
@@ -29,18 +28,21 @@ fn applyLight(
   light: Light,
   position: vec3<f32>,
   ao: f32,
-  @infer params: Params,
+  params: T,
 ) -> Radiance {
   var L: vec3<f32>;
-  let radiance: f32 = light.intensity * light.color.rgb;
+
+  var radiance = light.intensity * light.color.rgb;
+
+  let kind = light.kind;
   if (kind == 0) {
-    return Radiance(light.intensity * ao, true);
+    return Radiance(vec3<f32>(light.intensity * ao), true);
   }
   if (kind == 1) {
     L = normalize(-light.normal.xyz);
   }
   if (kind == 2) {
-    L = normalize(light.position - position);
+    L = normalize(light.position.xyz - position);
     radiance *= 3.1415;
   }
 
@@ -53,12 +55,12 @@ fn applyLight(
   V: vec3<f32>,
   position: vec3<f32>,
   ao: f32,
-  @infer params: Params,
+  params: T,
 ) -> vec3<f32> {
 
-  let radiance: vec3<f32> = vec3<f32>(0.0);
+  var radiance: vec3<f32> = vec3<f32>(0.0);
   let lightCount = getLightCount();
-  for (let i = 0u; i < lightCount; i++) {
+  for (var i = 0u; i < lightCount; i++) {
     let light = getLight(i);
     let r = applyLight(N, V, light, position, ao, params);
     radiance += r.light;

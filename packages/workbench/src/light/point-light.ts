@@ -6,7 +6,7 @@ import { use, provide, useConsumer, useOne, useMemo } from '@use-gpu/live';
 import { makeRefBinding } from '@use-gpu/core';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 
-import { useLightConsumer } from '../providers/light-provider';
+import { useLightConsumer } from './lights';
 import { useTransformContext } from '../providers/transform-provider';
 import { vec4 } from 'gl-matrix';
 

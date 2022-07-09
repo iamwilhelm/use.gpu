@@ -1,19 +1,18 @@
 use '@use-gpu/wgsl/use/view'::{ getViewPosition };
 
-struct Params {};
-
+@infer type T = T;
 @link fn getMaterial(
   materialColor: vec3<f32>,
   mapUV: vec4<f32>,
   mapST: vec4<f32>,
-) -> Params {}
+) -> @infer(T) T {}
 
 @link fn applyLights(
   N: vec3<f32>,
   V: vec3<f32>,
   position: vec3<f32>,
   ao: f32,
-  params: Params,
+  params: T,
 ) -> vec3<f32> {}
 
 @optional @link fn getNormal(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 0.0); };
@@ -48,7 +47,7 @@ struct Params {};
   let N: vec3<f32> = normalize(bumpNormal);
   let V: vec3<f32> = normalize(toView);
 
-  let light = emissive.xyz + applyLights(N, V, position, occlusion, params);
+  let light = emissive.xyz + applyLights(N, V, position.xyz, occlusion, params);
 
   return vec4<f32>(light * color.a, color.a);
 }

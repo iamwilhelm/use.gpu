@@ -184,6 +184,10 @@ export type UniformLayout = {
   offsets: number[],
 };
 
+export type ShaderStructType = {
+  module: {entry: string}
+};
+
 // Uniform bindings
 export type UniformPipe = {
   layout: UniformLayout,

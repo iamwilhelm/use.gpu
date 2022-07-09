@@ -1,4 +1,4 @@
-import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types';
+import { ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { getHash, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
@@ -70,6 +70,12 @@ export const makeBindingAccessors = (
       const {volatile, format} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
+
+      if (typeof format === 'object') {
+        throw new Error("Virtual struct types not supported in GLSL");
+        continue;
+      }
+
       program.push(makeStorageAccessor(namespace, set, base, type, format, name));
     }
 

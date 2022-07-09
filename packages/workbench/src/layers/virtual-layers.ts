@@ -46,7 +46,7 @@ const getItemSummary = (items: LayerAggregate[]) => {
   return {keys, count, memoKey};
 }
 
-export const Layers: LiveComponent<LayersProps> = (props) => {
+export const VirtualLayers: LiveComponent<LayersProps> = (props) => {
   const {children} = props;
   return multiGather(children, Resume);
 };

@@ -1,7 +1,7 @@
-import { ParsedBundle, ParsedModule, DataBinding, RefFlags as RF } from './types';
+import { ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { getHash, getHashValue, getObjectKey, mixBits, scrambleBits } from '../util/hash';
-import { getBundleHash } from '../util/bundle';
+import { getBundleHash, getBundleEntry, toModule } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
 import { makeSwizzle } from './cast';
@@ -60,6 +60,29 @@ export const makeBindingAccessors = (
     flags: 0,
   }));
 
+  // Handle struct types for storage
+  const libs: Record<string, ParsedBundle | ParsedModule> = {};
+  const modules = storages.map(({uniform, storage}) => {
+    const {format} = uniform;
+    const {format: type} = storage!;
+
+    if (typeof type === 'object') {
+      const module = toModule(type);
+      const entry = getBundleEntry(module);
+      if (entry != null) {
+        libs[module.name] = module;
+        return {
+          at: 0,
+          name: module.name,
+          imports: [{name: format, imported: entry}],
+          symbols: [format],
+        } as ModuleRef;
+      }
+    }
+
+    return null;
+  }).filter((m: any) => !!m) as ModuleRef[];
+
   // Hash + readable representation
   const readable = symbols.join(' ');
   const signature = getBindingsKey(bindings).toString(16);
@@ -92,24 +115,37 @@ export const makeBindingAccessors = (
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
 
-      if (is3to4(format)) {
-        const accessor = name + '3to4';
-        program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
-        program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor));
+      if (typeof format === 'object') {
+        const module = toModule(format);
+        const entry = getBundleEntry(module);
+        const t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
+
+        program.push(makeStorageAccessor(namespace, set, base, t, t, name));
+        continue;
       }
-      else if (is8to32(format)) {
-        const accessor = name + '8to32';
-        program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
-        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
+
+      if (typeof format === 'string') {
+        if (is3to4(format)) {
+          const accessor = name + '3to4';
+          program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
+          program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor));
+          continue;
+        }
+        else if (is8to32(format)) {
+          const accessor = name + '8to32';
+          program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
+          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
+          continue;
+        }
+        else if (is16to32(format)) {
+          const accessor = name + '16to32';
+          program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
+          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
+          continue;
+        }
       }
-      else if (is16to32(format)) {
-        const accessor = name + '16to32';
-        program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
-        program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
-      }
-      else {
-        program.push(makeStorageAccessor(namespace, set, base, type, format, name));
-      } 
+
+      program.push(makeStorageAccessor(namespace, set, base, type, format, name));
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
@@ -131,12 +167,18 @@ export const makeBindingAccessors = (
   }, {
     symbols,
     declarations,
+    modules: modules.length ? modules : undefined,
   }, undefined, hash, code, key);
 
+  const bundle = Object.keys(libs).length ? {
+    module: virtual,
+    libs,
+  } : virtual;
+
   const links: Record<string, ParsedBundle | ParsedModule> = {};
-  for (const binding of constants) links[binding.uniform.name] = virtual;
-  for (const binding of storages)  links[binding.uniform.name] = virtual;
-  for (const binding of textures)  links[binding.uniform.name] = virtual;
+  for (const binding of constants) links[binding.uniform.name] = bundle;
+  for (const binding of storages)  links[binding.uniform.name] = bundle;
+  for (const binding of textures)  links[binding.uniform.name] = bundle;
   for (const lambda  of lambdas)   links[lambda.uniform.name]  = lambda.lambda!.shader;
 
   return links;

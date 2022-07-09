@@ -1,19 +1,18 @@
 use '@use-gpu/wgsl/use/view'::{ getViewPosition };
 
-struct Params {};
-
+@infer type T = T;
 @link fn getMaterial(
   materialColor: vec3<f32>,
   mapUV: vec4<f32>,
   mapST: vec4<f32>,
-) -> @infer Params {}
+) -> @infer(T) T {}
 
 @link fn applyLights(
   N: vec3<f32>,
   V: vec3<f32>,
   position: vec3<f32>,
   ao: f32,
-  @infer params: Params,
+  params: T,
 ) -> vec3<f32> {}
 
 @export fn getShadedFragment(
@@ -32,7 +31,7 @@ struct Params {};
   let N: vec3<f32> = normalize(normal.xyz);
   let V: vec3<f32> = normalize(toView);
 
-  let light = applyLights(N, V, position, 1.0, params);
+  let light = applyLights(N, V, position.xyz, 1.0, params);
 
   return vec4<f32>(light * color.a, color.a);
 }

@@ -85,6 +85,7 @@ export enum RefFlags {
   External = 1 << 1,
   Optional = 1 << 2,
   Global   = 1 << 3,
+  Infer    = 1 << 4,
 };
 
 export type ShaderDefine = string | number | boolean | null | undefined;
@@ -94,7 +95,7 @@ export type ShakeOp = [number, string[]];
 
 export type StorageSource = {
   buffer: GPUBuffer,
-  format: string,
+  format: string | ShaderModule,
   length: number,
   size: number[],
   version: number,

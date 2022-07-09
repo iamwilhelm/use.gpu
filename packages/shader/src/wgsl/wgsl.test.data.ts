@@ -109,11 +109,11 @@ struct ViewUniforms {
 }
 
 @export fn clipToScreen3D(position: vec4<f32>) -> vec3<f32> {
-  return vec3(position.xy * viewUniforms.viewSize, position.z);
+  return vec3<f32>(position.xy * viewUniforms.viewSize, position.z);
 }
 
 @export fn screenToClip3D(position: vec4<f32>) -> vec3<f32> {
-  return vec3(position.xy * viewUniforms.viewResolution, position.z);
+  return vec3<f32>(position.xy * viewUniforms.viewResolution, position.z);
 }
 
 @export fn worldToClip3D(position: vec4<f32>) -> vec3<f32> {

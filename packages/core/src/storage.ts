@@ -32,6 +32,8 @@ export const makeStorageEntries = (
   return entries;
 };
 
+const toTypeName = (s: any) => s?.module?.entry ?? s;
+
 export const checkStorageTypes = (
   uniforms: UniformAttribute[],
   links: Record<string, StorageSource | null | undefined>,
@@ -48,10 +50,14 @@ export const checkStorageType = (
 ) => {
   const {name, format: from} = uniform;
   const to = link?.format;
-  if (link && to && from !== to) {
+
+  const f = toTypeName(from);
+  const t = toTypeName(to);
+  
+  if (link && t != null && f !== t) {
     // Remove vec size to allow for automatic widening/narrowing
-    const fromVec = from.replace(/vec[0-9](to[0-9])?/, 'vec');
-    const toVec   =   to.replace(/vec[0-9](to[0-9])?/, 'vec'); 
+    const fromVec = f.replace(/vec[0-9](to[0-9])?/, 'vec');
+    const toVec   = t.replace(/vec[0-9](to[0-9])?/, 'vec'); 
 
     if (fromVec !== toVec) {
       // Remove bit size to allow for automatic widening/narrowing

@@ -12,7 +12,7 @@ import {
   copyDataArraysComposite, copyNumberArraysComposite,
   copyDataArrayChunked, copyNumberArrayChunked,
   getChunkCount,
-  makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
+  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
 } from '@use-gpu/core';
 
 export type CompositeDataProps = {
@@ -56,9 +56,9 @@ const iterateChunks = (
   format = toSimple(format);
 
   // Prepare format appropriate accessor
-  if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
+  if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
   const f = format as any as UniformType;
-  const dims = UNIFORM_DIMS[f];
+  const dims = UNIFORM_ARRAY_DIMS[f];
 
   let {raw, length: l, fn} = makeDataAccessor(f, accessor);
 
@@ -172,7 +172,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       const composite = isComposite(format);
       format = composite ? toSimple(format) : format;
 
-      if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
+      if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
       let {raw, fn} = makeDataAccessor(f, accessor);

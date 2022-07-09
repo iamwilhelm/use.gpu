@@ -74,7 +74,7 @@ export const VERTEX_TO_UNIFORM = {
   "sint32x4": "vec4<i32>",
 };
 
-export const UNIFORM_SIZES = {
+export const UNIFORM_ATTRIBUTE_SIZES: {[t in UniformType]: number} = {
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3,
@@ -90,6 +90,11 @@ export const UNIFORM_SIZES = {
   "vec3<i32>":    12,
   "vec4<i32>":    16,
 
+  "f16":          2,
+  "vec2<f16>":    4,
+  "vec3<f16>":    6,
+  "vec4<f16>":    8,
+
   "f32":          4,
   "vec2<f32>":    8,
   "vec3<f32>":    12,
@@ -100,14 +105,24 @@ export const UNIFORM_SIZES = {
   "vec3<f64>":    24,
   "vec4<f64>":    32,
 
+  "mat2x2<f16>":  8,
+  "mat3x2<f16>":  12,
+  "mat2x3<f16>":  12,
+  "mat2x4<f16>":  16,
+  "mat4x2<f16>":  16,
+  "mat3x3<f16>":  24,
+  "mat3x4<f16>":  24,
+  "mat4x3<f16>":  32,
+  "mat4x4<f16>":  32,
+
   "mat2x2<f32>":  16,
   "mat3x2<f32>":  24,
   "mat2x3<f32>":  24,
   "mat2x4<f32>":  32,
   "mat4x2<f32>":  32,
-  "mat3x3<f32>":  36,
+  "mat3x3<f32>":  48,
   "mat3x4<f32>":  48,
-  "mat4x3<f32>":  48,
+  "mat4x3<f32>":  64,
   "mat4x4<f32>":  64,
 
   "mat2x2<f64>": 32,
@@ -115,9 +130,9 @@ export const UNIFORM_SIZES = {
   "mat2x3<f64>": 48,
   "mat2x4<f64>": 64,
   "mat4x2<f64>": 64,
-  "mat3x3<f64>": 72,
+  "mat3x3<f64>": 96,
   "mat3x4<f64>": 96,
-  "mat4x3<f64>": 96,
+  "mat4x3<f64>": 128,
   "mat4x4<f64>": 128,
 
   // Virtual types
@@ -147,7 +162,81 @@ export const UNIFORM_SIZES = {
   "vec3to4<f32>": 12,
 };
 
-export const UNIFORM_DIMS = {
+export const UNIFORM_ATTRIBUTE_ALIGNS: {[t in UniformType]: number} = {
+  ...UNIFORM_ATTRIBUTE_SIZES,
+
+  "bool":         0, // Not host-shareable
+  "vec2<bool>":   0, // Not host-shareable
+  "vec3<bool>":   0, // Not host-shareable
+  "vec4<bool>":   0, // Not host-shareable
+
+  "vec3<f16>":    8,
+
+  "vec3<u32>":    16,
+  "vec3<i32>":    16,
+  "vec3<f32>":    16,
+
+  "vec3<f64>":    32,
+  "vec4<f64>":    32,
+
+  "mat2x2<f16>":  4,
+  "mat3x2<f16>":  4,
+  "mat2x3<f16>":  8,
+  "mat2x4<f16>":  8,
+  "mat4x2<f16>":  4,
+  "mat3x3<f16>":  8,
+  "mat3x4<f16>":  8,
+  "mat4x3<f16>":  8,
+  "mat4x4<f16>":  8,
+
+  "mat2x2<f32>":  8,
+  "mat3x2<f32>":  8,
+  "mat2x3<f32>":  16,
+  "mat2x4<f32>":  16,
+  "mat4x2<f32>":  8,
+  "mat3x3<f32>":  16,
+  "mat3x4<f32>":  16,
+  "mat4x3<f32>":  16,
+  "mat4x4<f32>":  16,
+
+  "mat2x2<f64>": 16,
+  "mat3x2<f64>": 16,
+  "mat2x3<f64>": 32,
+  "mat2x4<f64>": 32,
+  "mat4x2<f64>": 16,
+  "mat3x3<f64>": 32,
+  "mat3x4<f64>": 32,
+  "mat4x3<f64>": 32,
+  "mat4x4<f64>": 32,
+
+  // Virtual types (not implemented for struct fields, only raw arrays)
+  "u8": 0,
+  "i8": 0,
+  "u16": 0,
+  "i16": 0,
+  "vec2<u8>": 0,
+  "vec2<i8>": 0,
+  "vec2<u16>": 0,
+  "vec2<i16>": 0,
+  "vec3<u8>": 0,
+  "vec3<i8>": 0,
+  "vec3<u16>": 0,
+  "vec3<i16>": 0,
+  "vec4<u8>": 0,
+  "vec4<i8>": 0,
+  "vec4<u16>": 0,
+  "vec4<i16>": 0,
+
+  "vec3to4<u8>": 0,
+  "vec3to4<i8>": 0,
+  "vec3to4<u16>": 0,
+  "vec3to4<i16>": 0,
+  "vec3to4<u32>": 0,
+  "vec3to4<i32>": 0,
+  "vec3to4<f32>": 0,
+};
+
+export const UNIFORM_ARRAY_DIMS = {
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3.5,
@@ -628,8 +717,6 @@ export const TEXTURE_SHADER_TYPES = {
 
 // @ts-ignore
 export const VERTEX_ATTRIBUTE_SIZES = VERTEX_SIZES as {[t in GPUVertexFormat]: number};
-
-export const UNIFORM_ATTRIBUTE_SIZES = UNIFORM_SIZES as {[t in UniformType]: number};
 
 // Standard blends
 export const BLEND_NONE = undefined;

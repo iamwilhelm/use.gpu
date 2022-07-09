@@ -5,7 +5,7 @@ import { ShaderSource } from '@use-gpu/shader/types';
 import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoNumberArray, 
-  makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
+  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -58,7 +58,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : 'f32';
+    const f = (format && (format in UNIFORM_ARRAY_DIMS)) ? format as UniformType : 'f32';
 
     const {array, dims} = makeDataArray(f, l || 1);
 

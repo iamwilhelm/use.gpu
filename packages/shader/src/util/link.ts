@@ -218,12 +218,10 @@ export const makeLinker = (
 
           let imp = ns + (resolved.type?.name ?? resolved.name);
           let i = imp;
-          while (i = infers.get(imp)) { imp = i; console.log({imp, i}); }
+          while (i = infers.get(imp)) { imp = i; }
 
           rename.set(name, imp);
           infers.set(ns + name, imp);
-
-          console.log({name, at, imp, sig})
         }
       }
     }

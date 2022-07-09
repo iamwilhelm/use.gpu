@@ -4,7 +4,7 @@ import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/t
 import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
-  makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
+  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -48,7 +48,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
 
   // Make data buffer
   const [buffer, array, source, dims] = useMemo(() => {
-    const f = (format && (format in UNIFORM_DIMS)) ? format as UniformType : 'f32';
+    const f = (format && (format in UNIFORM_ARRAY_DIMS)) ? format as UniformType : 'f32';
 
     const {array, dims} = makeDataArray(f, l || 1);
     if (dims === 3) throw new Error("Dims must be 1, 2, or 4");

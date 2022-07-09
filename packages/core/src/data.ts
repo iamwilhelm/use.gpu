@@ -1,5 +1,5 @@
 import { TypedArray, UniformType, UniformAttribute, EmitterExpression, Emitter, Accessor, AccessorSpec } from './types';
-import { UNIFORM_SIZES, UNIFORM_ARRAY_TYPES, UNIFORM_DIMS } from './constants';
+import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from './constants';
 
 import { vec4 } from 'gl-matrix';
 
@@ -15,8 +15,7 @@ export const alignSizeTo = (n: number, s: number) => {
 
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
-
-  let dims = UNIFORM_DIMS[type];
+  let dims = UNIFORM_ARRAY_DIMS[type];
 
   const array = new ctor(alignSizeTo(length * Math.ceil(dims), 4));
   return {array, dims};
@@ -46,7 +45,7 @@ export const makeDataEmitter = (to: NumberArray, dims: number): {
 export const makeDataAccessor = (format: UniformType, accessor: AccessorSpec) => {
   if (typeof accessor === 'object' &&
       accessor.length === +accessor.length) {
-    length = Math.floor(accessor.length / Math.floor(UNIFORM_DIMS[format]));
+    length = Math.floor(accessor.length / Math.floor(UNIFORM_ARRAY_DIMS[format]));
     return {raw: accessor as any[], length};
   }
   else if (typeof accessor === 'string') {

@@ -4,7 +4,7 @@ import { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@us
 import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
-  makeStorageBuffer, uploadBuffer, UNIFORM_DIMS,
+  makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -40,7 +40,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
     const fieldBuffers = fs.map(([format, accessor]) => {
-      if (!(format in UNIFORM_DIMS)) throw new Error(`Unknown data format "${format}"`);
+      if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
       let {raw, length, fn} = makeDataAccessor(f, accessor);

@@ -5,9 +5,10 @@ import { Light } from './types';
 import { LightContext, LightConsumer } from '../providers/light-provider';
 import { useDeviceContext } from '../providers/device-provider';
 
-import { consume, provide, keyed, makeContext, useContext, useConsumer, useMemo, useOne } from '@use-gpu/live';
+import { consume, provide, gather, keyed, makeContext, useContext, useConsumer, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
-import { makeUniformLayout, makeLayoutData, makeStorageBuffer } from '@use-gpu/core';
+import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
+import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getBoundShader } from '../hooks/useBoundShader';
 import { getShaderRef } from '../hooks/useShaderRef';
 
@@ -18,6 +19,7 @@ export const useLightConsumer = (light: Light) => useConsumer(LightConsumer, lig
 
 const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 const LIGHT_ATTRIBUTE = bundleToAttribute(WGSLLight);
+const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.members);
 
 type LightsProps = {
   max?: number,
@@ -30,11 +32,10 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
   } = props;
   
   const device = useDeviceContext();
-  const lightCount = useOne(() => ({current: 0}));
 
-  const [context, storage] = useMemo(() => {
-    const layout = makeUniformLayout(LIGHT_ATTRIBUTE.members);
-    const data = makeLayoutData(layout, max);
+  // Make light storage buffer
+  const [context, storage, data] = useMemo(() => {
+    const data = makeLayoutData(LIGHT_LAYOUT, max);
     const buffer = makeStorageBuffer(device, data);
 
     const storage = {
@@ -45,22 +46,23 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
       version: 1,
     } as any as StorageSource;
 
-    const applyLights = getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [lightCount, storage]);
+    const applyLights = getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [() => storage.length, storage]);
     const context = applyLights;
 
-    return [context, storage];
+    return [context, storage, data];
   }, [device, max]);
 
   const render = provide(LightContext, context, children);
 
+  // Gather live lights
   return consume(LightConsumer, render, (registry: Map<LiveFiber<any>, Light>) => {
-    let lights = registry.values();
+    let lights = Array.from(registry.values());
 
     if (lights.length > 0) lights = lights.slice(0, max);
-    lightCount.current = lights.length;
-    
-    const keyFor = (transform?: ShaderModule | null) => transform ? getBundleKey(transform) : '0';
+    storage.size[0] = storage.length = lights.length;
 
+    // Group by transform
+    const keyFor = (transform?: ShaderModule | null) => transform ? getBundleKey(transform) : '0';
     const map = new Map<ShaderModule | null, Light[]>();
     for (const light of lights) {
       const key = keyFor(light.transform);
@@ -69,16 +71,16 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
       list.push(light);
     }
 
-    console.log('gathered lights', lights, Array.from(map));
-
     let base = 0;
-    return Array.from(map.keys()).map((key: ShaderModule | null) => {
+    const render = Array.from(map.keys()).map((key: ShaderModule | null) => {
       const lights = map.get(key)!;
-      const [{transform}] = lights;
-
-      const o = base;
+      const b = base;
       base += lights.length;
-      return keyed(LightEmitter, key, {storage, lights, base});
+      return keyed(LightEmitter, key, {storage, lights, data, base: b});
+    });
+
+    return gather(render, () => {
+      uploadBuffer(device, storage.buffer, data);
     });
   });
 };
@@ -86,10 +88,22 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
 type LightEmitterProps = {
   storage: StorageSource,
   lights: Light[],
+  data: ArrayBuffer,
   base: number,
 };
 
 export const LightEmitter: LC<LightEmitterProps> = (props: LightEmitterProps) => {
-  const {storage, lights, base} = props;
+  const {storage, lights, data, base} = props;
+  const [{transform}] = lights;
+
+  const filler = useOne(() => makeLayoutFiller(LIGHT_LAYOUT, data), data);
+
+  let i = base;
+  for (const light of lights) filler.setItem(i++, light);
+
+  if (transform) {
+    console.warn('lights are being transformed');
+  }
+
   return null;
 };

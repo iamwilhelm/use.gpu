@@ -8,12 +8,13 @@ import {
   TextureSource,
   Lazy,
 } from './types';
-import { UNIFORM_ATTRIBUTE_SIZES } from './constants';
+import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
 import { getObjectKey, getHashValue } from '@use-gpu/state';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
+import { alignSizeTo } from './data';
 
 export const resolve = <T>(x: Lazy<T>): T => {
   if (typeof x === 'function') return (x as any)();
@@ -25,6 +26,7 @@ export const resolve = <T>(x: Lazy<T>): T => {
 };
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
+export const getUniformAttributeAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
 
 export const makeUniforms = (
@@ -198,7 +200,7 @@ export const makeUniformPipe = (
 ): UniformPipe => {
   const layout = makeUniformLayout(uniforms);
   const data = makeLayoutData(layout, count);
-  const fill = makeLayoutFiller(layout, data);
+  const {fill} = makeLayoutFiller(layout, data);
 
   return {layout, data, fill};
 }
@@ -209,7 +211,7 @@ export const makeMultiUniformPipe = (
 ): UniformPipe => {
   const layout = makeMultiUniformLayout(uniformGroups);
   const data = makeLayoutData(layout, count);
-  const fill = makeLayoutFiller(layout, data);
+  const {fill} = makeLayoutFiller(layout, data);
 
   return {layout, data, fill};
 }
@@ -234,19 +236,22 @@ export const makeUniformLayout = (
 ): UniformLayout => {
   const out = [] as any[];
 
+  let max = 0;
   let offset = base;
   for (const {name, format} of uniforms) {
     const s = getUniformAttributeSize(format);
-    const align = Math.min(s, 16);
+    const a = getUniformAttributeAlign(format);
+    if (a === 0) throw new Error(`Type ${format} is not host-shareable or unimplemented`);
 
-    const o = offset % align;
-    if (o) offset += align - o;
-    out.push({name, offset, format});
+    const o = alignSizeTo(offset, a);
+    out.push({name, offset: o, format});
+    max = Math.max(max, a);
 
-    offset += s;
+    offset = o + s;
   }
 
-  return {length: offset - base, attributes: out, offsets: [base]};
+  const s = alignSizeTo(offset, max);
+  return {length: s - base, attributes: out, offsets: [base]};
 };
 
 export const makeMultiUniformLayout = (
@@ -263,9 +268,8 @@ export const makeMultiUniformLayout = (
     out.push(...attributes);
     offsets.push(offset);
     offset += length;
-    
-    const d = offset % alignment;
-    offset += d ? alignment - d : 0;
+
+    offset = alignSizeTo(offset, alignment);
   }
 
   return {length: offset - base, attributes: out, offsets};
@@ -306,13 +310,15 @@ export const makeLayoutFiller = (
     }
   }
 
-  return (items: any) => {
+  const fill = (items: any) => {
     let index = 0;
     if (!Array.isArray(items)) setItem(index, items);
     else for (const item of items) {
       setItem(index++, item);
     }
-  }
+  };
+
+  return {fill, setItem};
 }
 
 const miniLRU = <T>(max: number) => {

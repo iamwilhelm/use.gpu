@@ -59,8 +59,10 @@ fn applyLight(
 ) -> vec3<f32> {
 
   var radiance: vec3<f32> = vec3<f32>(0.0);
+
   let lightCount = getLightCount();
-  for (var i = 0u; i < lightCount; i++) {
+  let n = min(lightCount, 2u);
+  for (var i = 0u; i < n; i++) {
     let light = getLight(i);
     let r = applyLight(N, V, light, position, ao, params);
     radiance += r.light;

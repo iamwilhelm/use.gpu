@@ -1,7 +1,7 @@
 import { StorageSource, UniformType, TypedArray } from '@use-gpu/core/types';
 
 import { useContext, useOne, useMemo, useNoContext, useNoOne, useNoMemo, incrementVersion } from '@use-gpu/live';
-import { makeStorageBuffer, uploadBuffer, UNIFORM_DIMS } from '@use-gpu/core';
+import { makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 import { DeviceContext } from '../providers/device-provider';
 import { useBufferedSize, useNoBufferedSize } from './useBufferedSize';
 
@@ -24,7 +24,7 @@ export const useRawSource = (array: TypedArray, format: UniformType, live: boole
     useNoMemo();
     uploadBuffer(device, buffer, array.buffer);
 
-    source.length = array.length / Math.floor(UNIFORM_DIMS[format]);
+    source.length = array.length / Math.floor(UNIFORM_ARRAY_DIMS[format]);
     source.size = [source.length];
     source.version = incrementVersion(source.version);
   }
@@ -32,7 +32,7 @@ export const useRawSource = (array: TypedArray, format: UniformType, live: boole
     useMemo(() => {
       uploadBuffer(device, buffer, array.buffer);
 
-      source.length = array.length / Math.floor(UNIFORM_DIMS[format]);
+      source.length = array.length / Math.floor(UNIFORM_ARRAY_DIMS[format]);
       source.size = [source.length];
       source.version = incrementVersion(source.version);
     }, [array, buffer]);

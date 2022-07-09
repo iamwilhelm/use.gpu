@@ -4,12 +4,13 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 @optional @link fn getLightCount() -> u32 { return 0u; }
 @optional @link fn getLight(index: u32) -> Light {
   return Light(
-    2, // Point
-    vec4<f32>(1.0, 0.0, 0.0, 0.0),
-    vec4<f32>(1.0, 0.0, 0.0, 0.0),
-    vec4<f32>(1.0, 0.0, 0.0, 0.0),
+    vec4<f32>(1.0, 1.0, 1.0, 0.0),
+    vec4<f32>(-1.0, -1.0, -1.0, 0.0),
+    vec4<f32>(0.0, 0.0, 0.0, 0.0),
+    vec4<f32>(0.0, 0.0, 0.0, 0.0),
     vec4<f32>(1.0, 1.0, 1.0, 1.0),
     1,
+    1, // Directional
   );
 }
 

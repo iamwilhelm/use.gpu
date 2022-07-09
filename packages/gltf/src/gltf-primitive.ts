@@ -4,7 +4,7 @@ import { GLTF, GLTFPrimitiveData } from './types';
 
 import { flattenIndexedArray } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { use, provide, useMemo, useNoMemo } from '@use-gpu/live';
+import { use, provide, useMemo, useNoMemo, useOne, useNoOne, useVersion, useNoVersion } from '@use-gpu/live';
 import { generateTangents } from 'mikktspace';
 import { mat4 } from 'gl-matrix';
 
@@ -63,7 +63,11 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     let ps = gltf.bound.data[POSITION];
     let ns = gltf.bound.data[NORMAL];
     let ts = gltf.bound.data[TEXCOORD_0];
-    
+
+    let vp = useVersion(ps);
+    let vn = useVersion(ps);
+    let vt = useVersion(ps);
+
     if (indices != null) {
       // Unweld mesh
       const inds = gltf.bound.data[indices];
@@ -72,17 +76,20 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
       ts = flattenIndexedArray(ts as any, inds, 2);
     }
 
-    const tangents = useMemo(() => {
+    const tangents = useOne(() => {
       const out = generateTangents(ps as any, ns as any, ts as any);
       const n = out.length;
       for (let i = 0; i < n; i += 4) out[i + 3] *= -1;
       return out;
-    }, [ps, ns, ts]);
+    }, vp + vn + vt);
 
     faces.tangents = useRawSource(tangents, 'vec4<f32>');
   }
   else {
-    useNoMemo();
+    useNoVersion();
+    useNoVersion();
+    useNoVersion();
+    useNoOne();
     useNoRawSource();
   }
 

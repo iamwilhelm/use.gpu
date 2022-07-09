@@ -60,6 +60,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         return null;
       }
     }, data);
+    if (!json) return null;
 
     // Parse JSON into native types
     const {gltf, buffers, images, bufferAssets, imageAssets} = useOne(() => {
@@ -154,7 +155,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         },
         ({buffer}, index) => gpuBuffers[buffer],
         [bufferViews]);
-
+      
       // Convert accessors to storage sources
       const storageSources = useMap<GLTFAccessorData, GLTFStorageSource | null>(accessors,
         ({bufferView, componentType, count, min, max, type}, index) => {
@@ -418,7 +419,10 @@ const useMap = <A, B>(
     if (a == null) values[i] = null;
     else {
       const k = key(a, i);
-      if (k !== keys[i]) values[i] = map(a, i);
+      if (k !== keys[i]) {
+        values[i] = map(a, i);
+        keys[i] = k;
+      }
     }
   }
   if (values.length !== n) values.length = n;

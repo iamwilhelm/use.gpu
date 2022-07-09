@@ -25,16 +25,19 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
   if (kind == 0) {
     return Radiance(vec3<f32>(radiance * ao), true);
   }
-  if (kind == 1) {
+  else if (kind == 1) {
     L = normalize(-light.normal.xyz);
     radiance *= 3.1415;
   }
-  if (kind == 2) {
+  else if (kind == 2) {
     let s = light.size.x;
     let d = light.position.xyz - position;
     L = normalize(d);
-    if (s >= 0.0) { radiance *= s*s / dot(d, d); }
+    //if (s >= 0.0) { radiance *= s*s / dot(d, d); }
     radiance *= 3.1415;
+  }
+  else {
+    return Radiance(vec3<f32>(0.0), false);
   }
 
   let direct = applyMaterial(N, L, V, radiance, params);

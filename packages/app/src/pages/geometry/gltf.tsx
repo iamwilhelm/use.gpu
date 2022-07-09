@@ -12,6 +12,7 @@ import {
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
   Lights, AmbientLight, DirectionalLight, PointLight,
+  Loop, Animation,
 } from '@use-gpu/workbench';
 import { GLTFData, GLTFModel } from '@use-gpu/gltf';
 
@@ -20,22 +21,52 @@ export const GeometryGLTFPage: LC = () => {
   const url = "/gltf/DamagedHelmet/DamagedHelmet.gltf";
 
   const view = (
-    <LinearRGB>
-      <Cursor cursor='move' />
-      <Pass>
-        <Lights>
-          <AmbientLight color={[1, 1, 1]} intensity={0.005} />
-          <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
-          <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
-          <GLTFData
-            url={url}
-            render={(gltf: GLTF) =>
-              <GLTFModel gltf={gltf} />
-            }
-          />
-        </Lights>
-      </Pass>
-    </LinearRGB>
+    <Loop>
+      <LinearRGB>
+        <Cursor cursor='move' />
+        <Pass>
+          <Lights>
+            <AmbientLight color={[1, 1, 1]} intensity={0.005} />
+
+            <Animation
+              loop
+              delay={0}
+              frames={[
+                [0, [30, 20, 10]],
+                [4, [20, 10, 40]],
+                [8, [10, 20, 20]],
+                [12, [30, 20, 10]],
+              ]}
+              prop='position'
+            >
+              <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} />
+            </Animation>
+
+            <Animation
+              loop
+              delay={0}
+              frames={[
+                [0, [10, 20, 30]],
+                [3, [20, 30, 10]],
+                [6, [30, 10, 20]],
+                [9, [10, 20, 30]],
+              ]}
+              prop='position'
+            >
+              <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
+            </Animation>
+          
+            <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
+            <GLTFData
+              url={url}
+              render={(gltf: GLTF) =>
+                <GLTFModel gltf={gltf} />
+              }
+            />
+          </Lights>
+        </Pass>
+      </LinearRGB>
+    </Loop>
   );
 
   return (

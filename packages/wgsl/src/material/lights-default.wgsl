@@ -25,10 +25,10 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
     vec4<f32>(0.0, 0.0, 0.0, 1.0),
     vec4<f32>(-0.267, -3*0.267, -2*0.267, 0.0),
     vec4<f32>(0.0),
+    vec4<f32>(-1.0, 0.0, 0.0, 0.0),
     vec4<f32>(1.0),
-    vec4<f32>(1.0),
-    1.0,
-    1,
+    50.0,
+    2,
   );
 
   return applyLight(N, V, light, position, ao, params).light;

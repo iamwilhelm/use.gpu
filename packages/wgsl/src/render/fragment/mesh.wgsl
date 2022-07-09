@@ -1,6 +1,12 @@
 use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 use '@use-gpu/wgsl/use/view'::{ viewUniforms };
-use '@use-gpu/wgsl/use/light-old'::{ lightUniforms };
+
+struct LightUniforms {
+  lightPosition: vec4<f32>,
+  lightColor: vec4<f32>,
+};
+
+@export @group(LIGHT) @binding(LIGHT) var<uniform> lightUniforms: LightUniforms;
 
 @group(1) @binding(0) var t: texture_2d<f32>;
 @group(1) @binding(1) var s: sampler;
@@ -31,7 +37,8 @@ fn main(
   var metalness: f32 = 0.2;
   var roughness: f32 = 0.8;
 
-  var color: vec3<f32> = PBR(N, L, V, albedo, metalness, roughness) * lightUniforms.lightColor.xyz;
+  var radiance: vec3<f32> = lightUniforms.lightColor.xyz * 3.1415;
+  var color: vec3<f32> = PBR(N, L, V, radiance, albedo, metalness, roughness);
   var outColor: vec4<f32> = vec4<f32>(color, inColor.a);
 
   return FragmentOutput(outColor);

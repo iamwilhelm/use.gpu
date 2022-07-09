@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core/types';
 import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@use-gpu/workbench';
-import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource, tagFunction } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
   makeRenderPipeline, makeShaderModule, makeShaderBinding, makeSampler, makeTextureBinding,
@@ -16,7 +16,10 @@ import instanceDrawMeshPick from '@use-gpu/wgsl/render/vertex/mesh-pick.wgsl';
 import instanceFragmentMesh from '@use-gpu/wgsl/render/fragment/mesh.wgsl';
 import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick.wgsl';
 
-const ID_BINDING = bundleToAttribute(instanceDrawMeshPick, 'getId');
+//
+// This component shows how to do "raw" rendering with Use.GPU,
+// without using any of the built-in components.
+//
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
   {
@@ -52,21 +55,25 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
   const device = useContext(DeviceContext);
   const {viewUniforms, viewDefs} = useContext(ViewContext);
-  
+
+  // Debug / Picking mode
   const isDebug = mode === RenderPassMode.Debug;
   const isPicking = mode === RenderPassMode.Picking;
   const {renderContext} = usePickingContext(isPicking);
   const {colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
 
+  // Vertex data
   const vertexBuffers = useMemo(() =>
     makeVertexBuffers(device, mesh.vertices), [device, mesh]);
 
+  // Texture data
   const sourceTexture = useMemo(() => {
     const t = makeRawTexture(device, texture);
     uploadDataTexture(device, t, texture);
     return t;
   }, [device, texture]);
 
+  // Defines
   const toColorSpace = useNativeColor(colorInput, colorSpace);
   const defines = {
     '@group(VIEW)': '@group(0)',
@@ -76,8 +83,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     'PICKING_ID': id,
   };
 
-  // Render shader
-  const vertexShader   = isPicking ? instanceDrawMeshPick     : instanceDrawMesh;
+  // Shader
+  const vertexShader   = isPicking ? instanceDrawMeshPick         : instanceDrawMesh;
   const fragmentShader = isPicking ? instanceFragmentPickGeometry : instanceFragmentMesh;
 
   const fiber = useFiber();
@@ -129,7 +136,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
   // Return a lambda back to parent(s)
   return yeet({
-    [mode]: tagFunction((passEncoder: GPURenderPassEncoder) => {
+    [mode]: (passEncoder: GPURenderPassEncoder) => {
       const l = blinkState ? 1 : 0.5;
 
       uniform.pipe.fill(viewUniforms);
@@ -141,6 +148,6 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
       if (sampled) passEncoder.setBindGroup(1, sampled);
       passEncoder.setVertexBuffer(0, vertexBuffers[0]);
       passEncoder.draw(mesh.count, 1, 0, 0);
-    })
+    }
   }); 
 }, 'Mesh');

@@ -36,7 +36,7 @@ fn applyLight(
 
   let kind = light.kind;
   if (kind == 0) {
-    return Radiance(vec3<f32>(light.intensity * ao), true);
+    return Radiance(vec3<f32>(radiance * ao), true);
   }
   if (kind == 1) {
     L = normalize(-light.normal.xyz);
@@ -61,8 +61,8 @@ fn applyLight(
   var radiance: vec3<f32> = vec3<f32>(0.0);
 
   let lightCount = getLightCount();
-  let n = min(lightCount, 2u);
-  for (var i = 0u; i < n; i++) {
+  let n = min(lightCount, 1024u);
+  for (var i = 0u; i < lightCount; i++) {
     let light = getLight(i);
     let r = applyLight(N, V, light, position, ao, params);
     radiance += r.light;

@@ -27,7 +27,7 @@ type LightsProps = {
 
 export const Lights: LC = (props: PropsWithChildren<object>) => {
   const {
-    max = 32,
+    max = 64,
     children,
   } = props;
   

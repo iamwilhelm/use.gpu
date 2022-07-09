@@ -13,30 +13,25 @@ import { vec4 } from 'gl-matrix';
 import { parseColor, parseNumber, parseMatrix, parsePosition } from '../traits/parse';
 import { useProp } from '../traits/useProp';
 
-export type PointLightProps = {
-  position?: VectorLike,
-  scale?: number,
+export type AmbientLightProps = {
   color?: ColorLike,
   intensity?: number,
 };
 
-export const PointLight = (props: PointLightProps) => {
+export const AmbientLight = (props: PointLightProps) => {
   
-  const position = useProp(props.position, parsePosition);
-  const scale = useProp(props.scale, parseNumber);
   const color = useProp(props.color, parseColor);
   const intensity = useProp(props.intensity, parseNumber, 1);
 
   const transform = useTransformContext();
 
   const light = useMemo(() => ({
-    kind: 2,
-    position,
-    scale: [scale, 0, 0, 0],
+    kind: 0,
+    position: [0, 0, 0, 0],
     color,
     intensity,
     transform,
-  }), [position, scale, color, intensity]);
+  }), [color, intensity]);
 
   useLightConsumer(light);
 };

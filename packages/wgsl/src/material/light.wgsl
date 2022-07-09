@@ -1,0 +1,38 @@
+use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
+
+@infer type T;
+@link fn applyMaterial(
+  N: vec3<f32>,
+  L: vec3<f32>,
+  V: vec3<f32>,
+  radiance: vec3<f32>,
+  @infer(T) params: T,
+) -> vec3<f32> {}
+
+@export fn applyLight(
+  N: vec3<f32>,
+  V: vec3<f32>,
+  light: Light,
+  position: vec3<f32>,
+  ao: f32,
+  params: T,
+) -> Radiance {
+  var L: vec3<f32>;
+
+  var radiance = light.intensity * light.color.rgb;
+
+  let kind = light.kind;
+  if (kind == 0) {
+    return Radiance(vec3<f32>(radiance * ao), true);
+  }
+  if (kind == 1) {
+    L = normalize(-light.normal.xyz);
+  }
+  if (kind == 2) {
+    L = normalize(light.position.xyz - position);
+    radiance *= 3.1415;
+  }
+
+  let direct = applyMaterial(N, L, V, radiance, params);
+  return Radiance(direct, false);
+}

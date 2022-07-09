@@ -221,7 +221,7 @@ export const makeLinker = (
           while (i = infers.get(imp)) { imp = i; }
 
           rename.set(name, imp);
-          infers.set(ns + name, imp);
+          infers.set(scope + name, imp);
         }
       }
     }
@@ -336,7 +336,7 @@ export const loadBundlesInOrder = timed('loadBundlesInOrder', (
 
     // Recurse into links
     if (externals) for (const {func, flags} of externals) if (func) {
-      const {name, inferred} = func;
+      const {name} = func;
       const chunk = links[name];
       if (!chunk) {
         if (flags & RF.Optional) {

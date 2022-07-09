@@ -191,15 +191,25 @@
       "import": "./src/material/light.wgsl",
       "require": "./src/material/light.wgsl"
     },
-    "./material/lit.wgsl": {
-      "types": "./src/material/lit.wgsl.d.ts",
-      "import": "./src/material/lit.wgsl",
-      "require": "./src/material/lit.wgsl"
+    "./material/lights-default.wgsl": {
+      "types": "./src/material/lights-default.wgsl.d.ts",
+      "import": "./src/material/lights-default.wgsl",
+      "require": "./src/material/lights-default.wgsl"
+    },
+    "./material/lights.wgsl": {
+      "types": "./src/material/lights.wgsl.d.ts",
+      "import": "./src/material/lights.wgsl",
+      "require": "./src/material/lights.wgsl"
     },
     "./material/pbr-apply.wgsl": {
       "types": "./src/material/pbr-apply.wgsl.d.ts",
       "import": "./src/material/pbr-apply.wgsl",
       "require": "./src/material/pbr-apply.wgsl"
+    },
+    "./material/pbr-default.wgsl": {
+      "types": "./src/material/pbr-default.wgsl.d.ts",
+      "import": "./src/material/pbr-default.wgsl",
+      "require": "./src/material/pbr-default.wgsl"
     },
     "./material/pbr-material.wgsl": {
       "types": "./src/material/pbr-material.wgsl.d.ts",

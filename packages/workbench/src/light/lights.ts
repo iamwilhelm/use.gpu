@@ -1,23 +1,27 @@
 import { LC, PropsWithChildren } from '@use-gpu/live/types';
 import { TypedArray, StorageSource } from '@use-gpu/core/types';
+import { ShaderModule } from '@use-gpu/shader/types';
 import { Light } from './types';
 
 import { LightContext, LightConsumer } from '../providers/light-provider';
 import { useDeviceContext } from '../providers/device-provider';
 
 import { consume, provide, gather, keyed, makeContext, useContext, useConsumer, useMemo, useOne } from '@use-gpu/live';
-import { bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getBoundShader } from '../hooks/useBoundShader';
 import { getShaderRef } from '../hooks/useShaderRef';
 
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
-import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lit.wgsl';
+import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
+import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
 
 export const useLightConsumer = (light: Light) => useConsumer(LightConsumer, light);
 
+const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
 const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
+
 const LIGHT_ATTRIBUTE = bundleToAttribute(WGSLLight);
 const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.members);
 
@@ -33,7 +37,7 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
   
   const device = useDeviceContext();
 
-  // Make light storage buffer
+  // Make light storage buffer + shader
   const [context, storage, data] = useMemo(() => {
     const data = makeLayoutData(LIGHT_LAYOUT, max);
     const buffer = makeStorageBuffer(device, data);
@@ -46,15 +50,23 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
       version: 1,
     } as any as StorageSource;
 
-    const applyLights = getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [() => storage.length, storage]);
-    const context = applyLights;
+    const bindMaterial = (applyMaterial: ShaderModule) => {
+      const applyLight = bindBundle(applyLightWGSL, {applyMaterial});
+      return getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [() => storage.length, storage, applyLight]);
+    };
+
+    const useMaterial = (applyMaterial: ShaderModule) =>
+      useMemo(() => bindMaterial(applyMaterial), [bindMaterial, applyMaterial]);
+
+    const context = {bindMaterial, useMaterial};
 
     return [context, storage, data];
   }, [device, max]);
 
+  // Provide light shader downstream
   const render = provide(LightContext, context, children);
 
-  // Gather live lights
+  // Gather lights from children
   return consume(LightConsumer, render, (registry: Map<LiveFiber<any>, Light>) => {
     let lights = Array.from(registry.values());
 
@@ -71,6 +83,7 @@ export const Lights: LC = (props: PropsWithChildren<object>) => {
       list.push(light);
     }
 
+    // Emit light data
     let base = 0;
     const render = Array.from(map.keys()).map((key: ShaderModule | null) => {
       const lights = map.get(key)!;

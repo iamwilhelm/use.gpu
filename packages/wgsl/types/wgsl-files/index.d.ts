@@ -248,7 +248,14 @@ declare module "@use-gpu/wgsl/material/light.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/material/lit.wgsl" {
+declare module "@use-gpu/wgsl/material/lights-default.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const applyLights: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/lights.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const applyLights: ParsedBundle;
@@ -259,6 +266,13 @@ declare module "@use-gpu/wgsl/material/pbr-apply.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
   export const applyPBRMaterial: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/pbr-default.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getDefaultPBRMaterial: ParsedBundle;
   export default __module;
 }
 

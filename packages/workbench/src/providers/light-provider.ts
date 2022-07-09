@@ -1,9 +1,27 @@
 import { ShaderModule } from '@use-gpu/shader/types';
-import { useContext, makeContext } from '@use-gpu/live';
 
-type LightContextProps = ShaderModule;
+import { useContext, useMemo, useOne, makeContext } from '@use-gpu/live';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 
-export const LightContext = makeContext<LightContextProps>(undefined, 'LightContext');
+import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
+import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights-default.wgsl';
+
+type LightContextProps = {
+  bindMaterial: (s: ShaderModule) => ShaderModule,
+  useMaterial: (s: ShaderModule) => ShaderModule,
+};
+
+export const DEFAULT_LIGHT_CONTEXT = {
+  bindMaterial: (applyMaterial: ShaderModule) => {
+    const applyLight = bindBundle(applyLightWGSL, {applyMaterial});
+    return bindBundle(applyLightsWGSL, {applyLight});
+  },
+
+  useMaterial: (applyMaterial: ShaderModule) =>
+    useOne(() => DEFAULT_LIGHT_CONTEXT.bindMaterial(getMaterial), getMaterial),
+};
+
+export const LightContext = makeContext<LightContextProps>(DEFAULT_LIGHT_CONTEXT, 'LightContext');
 
 export const LightConsumer = makeContext(undefined, 'LightConsumer');
 

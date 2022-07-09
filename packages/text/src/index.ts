@@ -1,2 +1,3 @@
 export * from './api';
-export * from './sdf';
+export { glyphToRGBA, glyphToSDF, makeSDFStage, paintSubpixelOffsets, rgbaToSDF, sdfToGradient } from './sdf';
+export * from './types';

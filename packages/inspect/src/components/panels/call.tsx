@@ -1,5 +1,5 @@
 import { LiveFiber, Hook } from '@use-gpu/live/types';
-import { formatNode, formatValue, STATE_SLOTS } from '@use-gpu/live';
+import { formatNode, formatValue } from '@use-gpu/live';
 
 import React, { useState } from 'react';
 import { Action } from '../types';
@@ -8,6 +8,8 @@ import { usePingContext } from '../ping';
 
 import { inspectObject } from './props';
 import chunk from 'lodash/chunk';
+
+const STATE_SLOTS = 3;
 
 type CallProps = {
   fiber: LiveFiber<any>,

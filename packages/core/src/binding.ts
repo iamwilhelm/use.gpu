@@ -5,10 +5,12 @@ import {
 import { checkStorageTypes, checkStorageType } from './storage';
 import partition from 'lodash/partition';
 
-// Parse a set of sources for a given set of uniforms/attributes
+/**
+ * Parse a set of shader sources for use with a given set of uniforms/attributes.
+ */
 export const makeShaderBindings = <T>(
   uniforms: (UniformAttribute | UniformAttributeValue)[],
-  sources: any[],
+  sources: (StorageSource | TextureSource | LambdaSource<T> | any)[],
 ): DataBinding<T>[] => {
   const n = uniforms.length;
   const out = [] as DataBinding<T>[];
@@ -20,7 +22,9 @@ export const makeShaderBindings = <T>(
   return out;
 }
 
-// Parse a source for a given uniform/attribute
+/**
+ * Parse a source for use with a given uniform/attribute.
+ */
 export const makeShaderBinding = <T>(
   uniform: UniformAttribute | UniformAttributeValue,
   source?: StorageSource | TextureSource | LambdaSource<T> | T | any,
@@ -47,7 +51,9 @@ export const makeShaderBinding = <T>(
   return {uniform, constant: source ?? (uniform as any).value};
 }
 
-// Bind a value ref for a given uniform/attribute
+/**
+ * Make a binding for a wrapped value (a ref) for use with a given uniform/attribute.
+ */
 export const makeRefBinding = <T>(
   uniform: UniformAttribute | UniformAttributeValue,
   value?: {current: T} | T,

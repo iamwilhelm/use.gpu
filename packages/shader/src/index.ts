@@ -5,3 +5,4 @@ export const GLSLLinker = GLSL;
 export const WGSLLinker = WGSL;
 
 export * from './util';
+export * from './types';

@@ -14,6 +14,7 @@ export * from './pipeline';
 export * from './storage';
 export * from './texture';
 export * from './tuple';
-export * from './types';
 export * from './uniform';
 export * from './view';
+
+export * from './types';

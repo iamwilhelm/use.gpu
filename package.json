@@ -35,6 +35,7 @@
     "style-loader": "^3.3.1",
     "ts-jest": "^27.0.0",
     "ts-node": "^10.7.0",
+    "typedoc": "^0.23.6",
     "typescript": "^4.7.0-dev.20220506",
     "webpack": "5.10.1",
     "webpack-cli": "^4.2.0",
@@ -46,11 +47,12 @@
     "last 1 firefox version"
   ],
   "scripts": {
-    "build": "yarn wsrun --serial run build && yarn run pkg",
+    "build+ci": "yarn run build && yarn run ci-test",
+    "build": "yarn wsrun --serial run build && yarn run docs && yarn run pkg",
     "clear": "rm -rf packages/text/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js",
     "ci-test": "CI=true yarn run jest && yarn run test:import && yarn run test:vite-react",
-    "build+ci": "yarn run build && yarn run ci-test",
-    "pkg": "ts-node scripts/mjs-umd.ts && ts-node scripts/package-sync.ts",
+    "docs": "typedoc",
+    "pkg": "echo @@@@ ts-node scripts/mjs-umd.ts && ts-node scripts/package-sync.ts",
     "publish": "yarn run build && yarn publish --ignore-scripts build/packages/shader --access public && yarn publish --ignore-scripts --access public build/packages/glsl-loader && yarn publish --ignore-scripts --access public build/packages/wgsl-loader",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "MODULE_ENV=umd jest --watch",

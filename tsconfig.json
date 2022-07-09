@@ -17,6 +17,11 @@
   ],
   "incremental": true,
   "files": [],
-  "include": [],
-  "exclude": ["**/node_modules"]
+  "exclude": [
+    "babel.config.*",
+    "*/coverage/*",
+    "**/*.test.ts",
+    "node_modules",
+    "build",
+  ]
 }

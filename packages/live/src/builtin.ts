@@ -6,7 +6,8 @@ import {
 } from './types';
 
 import { compareFibers } from './util';
-import { makeFiber, getCurrentFiberID, makeImperativeFunction } from './fiber';
+import { makeFiber, makeImperativeFunction } from './fiber';
+import { getCurrentFiberID } from './current';
 
 export const MORPH        = () => {};
 export const DETACH       = () => {};

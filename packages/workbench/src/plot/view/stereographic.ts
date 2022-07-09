@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { AxesTrait, ObjectTrait, Axis, Swizzle } from '../types';
+import { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
@@ -24,7 +24,7 @@ const STEREOGRAPHIC_BINDINGS = bundleToAttributes(getStereographicPosition);
 export type StereographicProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   normalize?: number | boolean,
-  on?: Axis,
+  on?: Axis4,
 
   children?: LiveElement<any>,
 };

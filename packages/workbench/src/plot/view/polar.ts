@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { AxesTrait, ObjectTrait, Axis, Swizzle } from '../types';
+import { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
@@ -24,7 +24,7 @@ const POLAR_BINDINGS = bundleToAttributes(getPolarPosition);
 export type PolarProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   helix?: number,
-  on?: Axis,
+  on?: Axis4,
 
   children?: LiveElement<any>,
 };

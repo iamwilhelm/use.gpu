@@ -1,7 +1,7 @@
 import { VectorLike, ColorLike } from '../traits/types';
 import { PointShape } from '../layers/types';
 
-export type Axis = 'x' | 'y' | 'z' | 'w';
+export type Axis4 = 'x' | 'y' | 'z' | 'w';
 export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
 export type Domain = 'linear' | 'log';
 export type Join = 'miter' | 'round' | 'bevel';
@@ -15,7 +15,7 @@ export type AnchorTrait = {
 
 export type AxisTrait = {
   range: VectorLike,
-  axis: Axis,
+  axis: Axis4,
 };
 
 export type AxesTrait = {

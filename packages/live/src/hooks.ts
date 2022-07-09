@@ -4,14 +4,15 @@ import {
   DeferredCall, HostInterface, Hook,
 } from './types';
 
-import { bind, bustFiberMemo, getCurrentFiber, getCurrentFiberID, getArgCount } from './fiber';
+import { bind, bustFiberMemo, getArgCount } from './fiber';
+import { getCurrentFiber } from './current';
 import { isSameDependencies, incrementVersion } from './util';
 import { formatNode } from './debug';
 
-export const NOP = () => {};
-export const NO_DEPS = [] as any[];
-export const NO_RESOURCE = {tag: null, value: null};
-export const STATE_SLOTS = 3;
+const NOP = () => {};
+const NO_DEPS = [] as any[];
+const NO_RESOURCE = {tag: null, value: null};
+const STATE_SLOTS = 3;
 
 export const reserveState = (slots: number) => slots * STATE_SLOTS;
 
@@ -59,13 +60,15 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
   state.length = pointer;
 }
 
+/**
+ * Return current fiber.
+ */
 export const useFiber = () => {
   const fiber = getCurrentFiber();
   if (!fiber) throw new Error("Hook called outside of rendering component");
   return fiber;
 }
-
-export const useConsoleLog = (value: any, name: string) => useOne(() => console.log(name, value), value);
+export const useNoFiber = () => {};
 
 export const useNoHook = (hookType: Hook) => () => {
   const fiber = useFiber();
@@ -76,8 +79,9 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i + 1] = undefined;
 };
 
-// Memoize a live function on all its arguments (shallow comparison per arg)
-// Unlike <Memo> this does not create a new sub-fiber
+/**
+ * Memoize a live function on all its arguments (shallow comparison per arg)
+ */
 export const memoArgs = <F extends Function>(
   f: LiveFunction<F>,
   name?: string,
@@ -109,7 +113,9 @@ export const memoArgs = <F extends Function>(
   }});
 };
 
-// Memoize a live function with 1 argument on its object props (shallow comparison per arg)
+/**
+ * Memoize a live function with 1 argument on its object props (shallow comparison per arg)
+ */
 export const memoProps = <F extends Function>(
   f: LiveFunction<F>,
   name?: string,
@@ -147,10 +153,14 @@ export const memoProps = <F extends Function>(
   return p;
 }
 
-// Shorthand
+/**
+ * Memoize a live component on its props (shallow comparison per arg)
+ */
 export const memo = memoProps;
 
-// Allocate state value and a setter for it, initializing with the given value or function
+/**
+ * Allocate a state value and a setter for it, initializing with the given value or function.
+ */
 export const useState = <T>(
   initialState: Initial<T>,
 ): [
@@ -186,7 +196,7 @@ export const useState = <T>(
             return false;
           };
 
-          if (fiber.id === getCurrentFiberID()) {
+          if (fiber === getCurrentFiber()) {
             if (apply()) {
               host!.visit(fiber);
             }
@@ -204,7 +214,9 @@ export const useState = <T>(
   return [value as unknown as T, setValue];
 }
 
-// Memoize a value with given dependencies
+/**
+ * Memoize a value with given dependencies
+ */
 export const useMemo = <T>(
   initialState: () => T,
   dependencies: any[] = NO_DEPS,
@@ -227,7 +239,9 @@ export const useMemo = <T>(
   return value as unknown as T;
 }
 
-// Memoize a value with one dependency
+/**
+ * Memoize a value with one dependency
+ */
 export const useOne = <T>(
   initialState: () => T,
   dependency: any = null,
@@ -250,7 +264,9 @@ export const useOne = <T>(
   return value as unknown as T;
 }
 
-// Memoize a function with given dependencies
+/**
+ * Memoize a function with given dependencies
+ */
 export const useCallback = <T extends Function>(
   initialValue: T,
   dependencies: any[] = NO_DEPS,
@@ -273,7 +289,9 @@ export const useCallback = <T extends Function>(
   return value as unknown as T;
 }
 
-// Version counter
+/**
+ * Incrementing version counter, +1 for every change.
+ */
 export const useVersion = <T>(nextValue: T) => {
   const fiber = useFiber();
 
@@ -290,7 +308,9 @@ export const useVersion = <T>(nextValue: T) => {
   return version;
 }
 
-// Bind immediately to a resource, with auto-cleanup on dep change or unmount
+/**
+ * Bind immediately to a resource, with auto-cleanup on dep change or unmount
+ */
 export const useResource = <R>(
   callback: (dispose: (f: Function) => void) => R,
   dependencies: any[] = NO_DEPS,
@@ -325,7 +345,9 @@ export const useResource = <R>(
   return state![i].value as R;
 }
 
-// Don't use a resource hook (clean up prior tag)
+/**
+ * Don't use a resource hook (clean up prior tag)
+ */
 export const useNoResource = () => {
   const fiber = useFiber();
 
@@ -342,7 +364,9 @@ export const useNoResource = () => {
   state![i + 1] = undefined;
 }
 
-// Grab a context from the fiber (optional mode)
+/**
+ * Grab a context from the fiber (optional mode)
+ */
 export const useContext = <C>(
   context: LiveContext<C>,
 ): C => {
@@ -374,7 +398,9 @@ export const useContext = <C>(
   return values.get(context).current ?? context.initialValue;
 }
 
-// Return a value to a consumer from the fiber
+/**
+ * Yield a value to a consumer from the fiber
+ */
 export const useConsumer = <C>(
   context: LiveContext<C>,
   value?: any,
@@ -407,7 +433,9 @@ export const useConsumer = <C>(
   registry.set(fiber, value);
 }
 
-// Don't use a context from the fiber
+/**
+ * Don't use a context from the fiber
+ */
 export const useNoContext = <C>(
   context: LiveContext<C>,
 ) => {
@@ -428,7 +456,9 @@ export const useNoContext = <C>(
   state![i + 1] = undefined;
 }
 
-// Don't use a consumer from the fiber
+/**
+ * Don't use a consumer from the fiber
+ */
 export const useNoConsumer = <C>(
   context: LiveContext<C>,
 ) => {
@@ -455,7 +485,15 @@ export const useNoOne = useNoHook(Hook.ONE);
 export const useNoCallback = useNoHook(Hook.CALLBACK);
 export const useNoVersion = useNoHook(Hook.VERSION);
 
-// Async wrapper
+/**
+ * On-change logger
+ */
+export const useLog = (value: any, name?: string) => useOne(() => console.log(value, name), value);
+export const useNoLog = useNoOne;
+
+/**
+ * Async wrapper
+ */
 export const useAsync = <T, E = Error>(f: () => Promise<T>, deps: any[] = NO_DEPS): [T | undefined, E | undefined] => {
   const [value, setValue] = useState<[T | undefined, E | undefined]>([undefined, undefined]);
 
@@ -469,6 +507,7 @@ export const useAsync = <T, E = Error>(f: () => Promise<T>, deps: any[] = NO_DEP
 
   return value;
 };
+
 export const useNoAsync = () => {
   useNoState();
   useNoResource();

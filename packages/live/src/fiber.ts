@@ -10,6 +10,8 @@ import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction } from './util';
 import { formatNode, formatNodeName } from './debug';
 
+import { setCurrentFiber } from './current';
+
 let ID = 0;
 let DEBUG = false;
 //setTimeout((() => DEBUG = false), 900);
@@ -22,11 +24,6 @@ const NO_CONTEXT = {
   values: new Map() as ContextValues,
   roots: new Map() as ContextRoots,
 };
-
-// Hide the fiber argument like in React
-export let CURRENT_FIBER = null as LiveFiber<any> | null;
-export const getCurrentFiber = () => CURRENT_FIBER!;
-export const getCurrentFiberID = () => CURRENT_FIBER?.id;
 
 // Prepare to call a live function with optional given persistent fiber
 export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, fiber?: LiveFiber<F> | null, base: number = 0) => {
@@ -60,7 +57,7 @@ export const bind = <F extends ArrowFunction>(f: LiveFunction<F>, fiber?: LiveFi
 // Enter/exit a fiber call
 let enter = 0; let exit = 0;
 export const enterFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>, base: number) => {
-  CURRENT_FIBER = fiber;
+  setCurrentFiber(fiber);
 
   // Reset state pointer
   fiber.pointer = base;
@@ -72,7 +69,7 @@ export const enterFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>, base: n
 
 export const exitFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   discardState(fiber);
-  CURRENT_FIBER = null;
+  setCurrentFiber(null);
 }
 
 // Make a fiber for a live function

@@ -1,6 +1,6 @@
 import { formatNodeName } from './debug';
 import { gather, provide, yeet, morph, FRAGMENT, GATHER, PROVIDE, YEET, MORPH } from './builtin';
-import { getCurrentFiberID } from './fiber';
+import { getCurrentFiberID } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 
 const NO_PROPS: any[] = [{}];

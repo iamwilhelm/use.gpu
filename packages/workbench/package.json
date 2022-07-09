@@ -22,7 +22,7 @@
     "build": "yarn run build:js && yarn run build:types && yarn run build:exports && yarn run build:pkg",
     "build:exports": "ts-node ../../scripts/build-exports.ts",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/workbench/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:js": "babel src --out-dir ../../build/packages/workbench/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel *.ts --out-dir ../../build/packages/workbench --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
     "build:pkg": "cp package.json ../../build/packages/workbench"
   },
   "exports": {

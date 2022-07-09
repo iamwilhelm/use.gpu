@@ -15,3 +15,5 @@ export * from './render';
 export * from './router';
 export * from './shader';
 export * from './text';
+
+export * from './types';

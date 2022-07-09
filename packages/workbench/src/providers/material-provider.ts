@@ -19,6 +19,7 @@ import { getPBRMaterial } from '@use-gpu/wgsl/material/pbr-material.wgsl';
 import { getDefaultPBRMaterial } from '@use-gpu/wgsl/material/pbr-default.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 
+// Default PBR shader with built-in light
 const applyLights = DEFAULT_LIGHT_CONTEXT.bindMaterial(applyPBRMaterial);
 const shadedFragment = bindBundle(getShadedFragment, {
   getMaterial: getDefaultPBRMaterial,

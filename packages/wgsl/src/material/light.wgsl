@@ -27,6 +27,7 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
   }
   if (kind == 1) {
     L = normalize(-light.normal.xyz);
+    radiance *= 3.1415;
   }
   if (kind == 2) {
     let s = light.size.x;

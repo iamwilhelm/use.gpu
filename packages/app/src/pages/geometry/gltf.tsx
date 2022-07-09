@@ -24,7 +24,7 @@ export const GeometryGLTFPage: LC = () => {
       <Cursor cursor='move' />
       <Pass>
         <Lights>
-          <AmbientLight color={[1, 1, 1]} intensity={0.01} />
+          <AmbientLight color={[1, 1, 1]} intensity={0.005} />
           <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
           <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
           <GLTFData

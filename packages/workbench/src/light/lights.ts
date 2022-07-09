@@ -115,7 +115,8 @@ export const LightEmitter: LC<LightEmitterProps> = (props: LightEmitterProps) =>
   for (const light of lights) filler.setItem(i++, light);
 
   if (transform) {
-    console.warn('lights are being transformed');
+    // TODO: dispatch compute to transform light positions/normals/tangents/sizes
+    console.warn('lights are being transformed - unimplemented');
   }
 
   return null;

@@ -29,7 +29,10 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
     L = normalize(-light.normal.xyz);
   }
   if (kind == 2) {
-    L = normalize(light.position.xyz - position);
+    let s = light.size.x;
+    let d = light.position.xyz - position;
+    L = normalize(d);
+    if (s >= 0.0) { radiance *= s*s / dot(d, d); }
     radiance *= 3.1415;
   }
 

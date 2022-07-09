@@ -323,6 +323,7 @@ declare module "@use-gpu/wgsl/plot/surface.wgsl" {
 declare module "@use-gpu/wgsl/render/fragment/mesh.wgsl" {
   type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
   const __module: ParsedBundle;
+  export const lightUniforms: ParsedBundle;
   export const main: ParsedBundle;
   export default __module;
 }
@@ -464,13 +465,6 @@ declare module "@use-gpu/wgsl/use/gamma.wgsl" {
   export const toGamma2: ParsedBundle;
   export const toGamma3: ParsedBundle;
   export const toGamma4: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/use/light-old.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
-  const __module: ParsedBundle;
-  export const lightUniforms: ParsedBundle;
   export default __module;
 }
 

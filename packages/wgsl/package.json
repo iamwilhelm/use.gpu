@@ -341,11 +341,6 @@
       "import": "./src/use/gamma.wgsl",
       "require": "./src/use/gamma.wgsl"
     },
-    "./use/light-old.wgsl": {
-      "types": "./src/use/light-old.wgsl.d.ts",
-      "import": "./src/use/light-old.wgsl",
-      "require": "./src/use/light-old.wgsl"
-    },
     "./use/types.wgsl": {
       "types": "./src/use/types.wgsl.d.ts",
       "import": "./src/use/types.wgsl",

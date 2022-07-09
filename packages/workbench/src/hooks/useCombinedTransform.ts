@@ -21,7 +21,7 @@ export const useCombinedTransform = (
     () => {
       if (!context) return shader;
       return shader
-        ? chainTo(shader, context.shader)
+        ? chainTo(shader, context)
         : context.shader;
     },
     version,

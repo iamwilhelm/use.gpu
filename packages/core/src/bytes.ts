@@ -57,6 +57,11 @@ export const UNIFORM_BYTE_SETTERS = {
   "vec3<i32>":        setInt32N(3),
   "vec4<i32>":        setInt32N(4),
 
+  "f16":              setUint16,
+  "vec2<f16>":        setUint16N(2),
+  "vec3<f16>":        setUint16N(3),
+  "vec4<f16>":        setUint16N(4),
+
   "f32":              setFloat32,
   "vec2<f32>":        setFloat32N(2),
   "vec3<f32>":        setFloat32N(3),
@@ -87,6 +92,16 @@ export const UNIFORM_BYTE_SETTERS = {
   "mat4x3<i32>":      setInt32N(12),
   "mat4x4<i32>":      setInt32N(16),
 
+  "mat2x2<f16>":      setUint16N(4),
+  "mat3x2<f16>":      setUint16N(6),
+  "mat2x3<f16>":      setUint16N(6),
+  "mat2x4<f16>":      setUint16N(8),
+  "mat4x2<f16>":      setUint16N(8),
+  "mat3x3<f16>":      setUint16N(9),
+  "mat3x4<f16>":      setUint16N(12),
+  "mat4x3<f16>":      setUint16N(12),
+  "mat4x4<f16>":      setUint16N(16),
+  
   "mat2x2<f32>":      setFloat32N(4),
   "mat3x2<f32>":      setFloat32N(6),
   "mat2x3<f32>":      setFloat32N(6),

@@ -2,7 +2,7 @@ import {
   UniformAllocation, VirtualAllocation, VolatileAllocation, ResourceAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,
-  UniformPipe, UniformByteSetter, UniformFiller,
+  UniformPipe, UniformByteSetter, UniformFiller, UniformSetter,
   DataBinding,
   StorageSource,
   TextureSource,
@@ -287,7 +287,10 @@ export const makeLayoutData = (
 export const makeLayoutFiller = (
   layout: UniformLayout,
   data: ArrayBuffer,
-): UniformFiller => {
+): {
+  fill: UniformFiller,
+  setItem: UniformSetter,
+} => {
   const {length, attributes} = layout;
 
   const map = new Map<string, UniformAttributeDescriptor>();

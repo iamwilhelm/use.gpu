@@ -70,6 +70,11 @@ export type UniformType =
   | "vec3<i32>"
   | "vec4<i32>"
 
+  | "f16"
+  | "vec2<f16>"
+  | "vec3<f16>"
+  | "vec4<f16>"
+
   | "f32"
   | "vec2<f32>"
   | "vec3<f32>"
@@ -99,6 +104,16 @@ export type UniformType =
   | "mat3x4<i32>"
   | "mat4x3<i32>"
   | "mat4x4<i32>"
+
+  | "mat2x2<f16>"
+  | "mat3x2<f16>"
+  | "mat2x3<f16>"
+  | "mat2x4<f16>"
+  | "mat4x2<f16>"
+  | "mat3x3<f16>"
+  | "mat3x4<f16>"
+  | "mat4x3<f16>"
+  | "mat4x4<f16>"
 
   | "mat2x2<f32>"
   | "mat3x2<f32>"
@@ -212,6 +227,7 @@ export type VolatileAllocation = {
 };
 
 export type UniformFiller = (items: any) => void;
+export type UniformSetter = (index: number, item: any) => void;
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 
 // Storage bindings

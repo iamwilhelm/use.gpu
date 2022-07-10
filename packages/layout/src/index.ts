@@ -1,3 +1,4 @@
+/** @module Layout */
 export * from './display/absolute';
 export * from './display/block';
 export * from './display/embed';

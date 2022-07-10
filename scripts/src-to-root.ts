@@ -2,19 +2,19 @@ import { statSync, readFileSync, writeFileSync } from 'fs';
 import glob from 'glob';
 import mapValues from 'lodash/mapValues';
 
-const packageName = process.argv[2];
-if (!packageName) process.exit();
+const pkg = process.argv[2];
+if (pkg == null) {
+  process.exit();
+}
 
-const {version} = JSON.parse(readFileSync('./package.json').toString());
+const {version} = JSON.parse(readFileSync('../../package.json').toString());
 const convert = (s: string) => s.replace(/(^|\.?\/)src\//, './');
 
-const files = glob.sync('./build/**/package.json');
+const files = glob.sync(`../../build/packages/${pkg}/package.json`);
 for (const file of files) {
   let data = readFileSync(file).toString();
   let json = JSON.parse(data);
   json.version = version;
-
-  if (json.name !== packageName) continue;
 
   if (json.main.match(/(^|\/)src\//)) {
     console.log(json.name, json.main, convert(json.main), file);

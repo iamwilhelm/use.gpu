@@ -11,7 +11,7 @@
     "rootDir": "..",
     "baseUrl": "src",
     "typeRoots": ["../../node_modules/@types"],
-    "outDir": "../../build/packages",
+    "outDir": "../../build/ts",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
   "include": ["src/**/*.ts", "types.ts"]

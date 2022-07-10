@@ -92,25 +92,43 @@ Shaders parsed at run-time will be cached on a least-recently-used basis, based 
 
 ## Syntax (WGSL)
 
-```glsl
+#### Linking
+
+```wgsl
 // Import symbols from a .wgsl file
 use "path/to/file"::{ symbol, … };
 use "path/to/file"::{ symbol as symbol, … };
 
-// Mark function as linked at runtime (function body is ignored).
-// Will be removed.
+// Function is linked at runtime. Function body is ignored.
+// Will be removed from output.
 @link fn func() { }
 
-// Mark declaration as exported (can be linked to)
+// Declaration is exported (can be linked to)
 @export fn func() { }
 
-// Mark function as linked at runtime but optional.
-// Given function body is used if not linked.
+// Function is linked at runtime but optional.
+// Function body is used if not linked.
 @link @optional fn func() -> f32 { return 1.0; }
 
-// Mark next declaration as global (don't namespace it)
+// Declaration is global (don't namespace it)
 @global fn func() -> f32 { return 1.0; }
 @global var name : i32;
+```
+
+#### Type Inference
+
+```wgsl
+// Inferred type T
+@infer type T;
+
+// Infer T from linked argument type or return type
+@link fn func(arg: @infer(T) T) -> f32 {}
+@link fn func() -> @infer(T) T {}
+
+// Inferred type T can be used throughout the .wgsl file
+fn other(arg: T) -> T {
+  // ...
+}
 ```
 
 ## Syntax (GLSL)
@@ -220,9 +238,9 @@ This means the linker sees all top-level declarations regardless of `#if`s, and 
 
 You can mark prototypes as `#pragma optional` if it is ok to leave them unlinked.
 
-**Does this work for WGSL?**
+**Which 'version' of WGSL is supported?**
 
-Yes! It provides best-effort compatibility with the current dialect of WGSL supported in the wild. If there are gaps in the grammar, let me know.
+Best-effort compatibility with the current dialect of WGSL supported in the wild. If there are gaps in the grammar, let me know.
 
 **Isn't it silly to ship and work with strings instead of byte code?**
 

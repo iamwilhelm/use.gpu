@@ -1,3 +1,4 @@
+/** @module Shader */
 import GLSL from './glsl';
 import WGSL from './wgsl';
 

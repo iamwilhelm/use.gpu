@@ -1,13 +1,11 @@
 {
   "name": "@use-gpu/wgsl-loader",
-  "version": "0.0.1",
+  "version": "0.5.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "peerDependencies": {
-    "@use-gpu/shader": "*"
-  },
   "dependencies": {
+    "@use-gpu/shader": "*",
     "require-hacker": "^3.0.1"
   },
   "exports": {
@@ -20,25 +18,16 @@
     "wgsl-tsgen": "./bin/wgsl-tsgen"
   },
   "scripts": {
+    "build": "NPM_PACKAGE=wgsl-loader ../../scripts/build-mjs-umd.sh",
     "test": "jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
-    "types:watch": "yarn run types -- --watch",
-    "build": "NPM_PACKAGE=wgsl-loader MODULE_ENV=umd yarn run build:all",
-    "build:all": "yarn run build:babel && yarn run build:types && yarn run build:bin && yarn run build:pkg",
-    "build:babel": "babel src --out-dir ../../build/packages/$NPM_PACKAGE/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel scripts --out-dir ../../build/packages/$NPM_PACKAGE/scripts --extensions \".ts\"; babel *.ts --out-dir ../../build/packages/$NPM_PACKAGE --extensions \".ts\"",
-    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:bin": "mkdir ../../build/packages/$NPM_PACKAGE/bin 2>/dev/null; cp bin/wgsl-tsgen ../../build/packages/$NPM_PACKAGE/bin",
-    "build:pkg": "cp package.json ../../build/packages/$NPM_PACKAGE"
+    "types:watch": "yarn run types -- --watch"
   },
   "devDependencies": {
     "@types/loader-utils": "^2.0.3",
     "@types/lodash": "^4.14.176",
     "@types/require-hacker": "^3.0.1"
-  },
-  "typedocOptions": {
-    "name": "wgsl-loader",
-    "readme": "./README.md"
-  }  
+  }
 }

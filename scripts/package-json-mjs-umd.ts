@@ -3,9 +3,13 @@ import glob from 'glob';
 
 // Replace single TS entry point with MJS/UMD main+module
 
-const {version} = JSON.parse(readFileSync('./package.json').toString());
+const pkg = process.env.NPM_PACKAGE;
+if (pkg == null) {
+  console.log("Can't build package.json - NPM_PACKAGE not set");
+  process.exit(1);
+}
 
-const files = glob.sync('./build/**/package.json');
+const files = glob.sync(`../../build/packages/${pkg}/package.json`);
 for (const file of files) {
   let data = readFileSync(file).toString();
   let json = JSON.parse(data);

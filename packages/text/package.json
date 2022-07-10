@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/text",
-  "version": "0.0.1",
+  "version": "0.5.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -13,20 +13,11 @@
   },
   "private": true,
   "scripts": {
+    "build": "NPM_PACKAGE=text ../../scripts/build-mjs-umd.sh",
     "test": "jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
-    "types:watch": "yarn run types -- --watch",
-
-    "build": "yarn run build:wasm && yarn run build:js && yarn run build:types && yarn run build:pkg",
-    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/text/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
-    "build:pkg": "cp package.json ../../build/packages/text",
-    "build:wasm": "cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/text/pkg/; cp -r pkg ../../build/packages/text/"
-  },
-  "typedocOptions": {
-    "name": "text",
-    "readme": "./README.md"
-  }  
+    "types:watch": "yarn run types -- --watch"
+  }
 }

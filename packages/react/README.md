@@ -1,6 +1,16 @@
-# Live / React interop
+# @use-gpu/react
 
-- `<HTML>` (Live -> React) - Embed React inside Live
+```
+npm install --save @use-gpu/react
+```
+
+```
+yarn add @use-gpu/react
+```
+
+# Live / React interface
+
+- `<HTML>` (Live -> React) - Embed React content inside Live
   - `container`: `string` | `HTMLElement` - Containing element (or CSS selector) to render into.
   - `children`: React.ReactNode - React children to render
 

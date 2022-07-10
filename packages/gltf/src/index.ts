@@ -1,3 +1,4 @@
+/** @module GLTF */
 export * from './gltf-data';
 export * from './gltf-material';
 export * from './gltf-mesh';

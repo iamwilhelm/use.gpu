@@ -1,3 +1,13 @@
+# @use-gpu/traits
+
+```
+npm install --save @use-gpu/text
+```
+
+```
+yarn add @use-gpu/text
+```
+
 # Live - Component Traits
 
 - Smart input parsers for 'common uncommon' types (enums, colors, vectors, quaternions, ...)

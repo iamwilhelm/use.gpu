@@ -1,23 +1,23 @@
 {
   "name": "@use-gpu/inspect",
-  "version": "0.0.1",
+  "version": "0.5.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
   "scripts": {
+    "build": "NPM_PACKAGE=inspect ../../scripts/build-mjs-umd.sh && yarn run build:css",
+    "build:css": "cp theme.css ../../build/packages/inspect",
     "test": "jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
-    "types:watch": "yarn run types -- --watch",
-    "build": "yarn run build:js && yarn run build:types && yarn run build:css && yarn run build:pkg",
-    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "babel src --out-dir ../../build/packages/inspect/src --extensions \".ts,.tsx\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
-    "build:pkg": "cp package.json ../../build/packages/inspect",
-    "build:css": "cp theme.css ../../build/packages/inspect"
+    "types:watch": "yarn run types -- --watch"
   },
   "dependencies": {
+    "@use-gpu/live": "*",
+    "@use-gpu/react": "*",
+    "@use-gpu/state": "*",
     "@radix-ui/react-slider": "^0.1.4",
     "@radix-ui/react-tabs": "^0.1.5",
     "@stitches/react": "^1.2.7"
@@ -30,9 +30,5 @@
   "peerDependencies": {
     "react": "*",
     "react-dom": "*"
-  },
-  "typedocOptions": {
-    "name": "inspect",
-    "readme": "./README.md"
   }
 }

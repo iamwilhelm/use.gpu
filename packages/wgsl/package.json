@@ -11,11 +11,11 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "rm -rf ../../build/packages/wgsl; yarn run build:js && yarn run build:wgsl && yarn run build:types && yarn run build:pkg",
+    "build": "rm -rf ../../build/packages/wgsl; rm -rf ../../ts/packages/wgsl; yarn run build:js && yarn run build:wgsl && yarn run build:types && yarn run build:pkg",
     "build:wgsl": "ts-node build",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
-    "build:js": "MODULE_ENV=umd babel src/index.ts --out-dir ../../build/packages/wgsl/src --extensions \".ts\"",
-    "build:pkg": "cp package.json ../../build/packages/wgsl && cp -r ../../build/packages/wgsl/src/* ../../build/packages/wgsl && (cd ../..; ts-node ./scripts/src-to-root @use-gpu/wgsl)"
+    "build:js": "MODULE_ENV=umd babel src/index.ts --out-dir ../../build/ts/wgsl/src --extensions \".ts\"; mkdir ../../build/packages/wgsl 2>/dev/null",
+    "build:pkg": "cp package.json ../../build/packages/wgsl && cp -r ../../build/ts/wgsl/* ../../build/packages/wgsl/ && cp -r ../../build/packages/wgsl/src/* ../../build/packages/wgsl && ts-node ../../scripts/src-to-root wgsl && rm -rf ../../build/packages/wgsl/src"
   },
   "devDependencies": {
     "glob": "^7.2.0"

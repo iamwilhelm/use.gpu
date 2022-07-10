@@ -1,3 +1,4 @@
+/** @module Plot */
 export * from './plot';
 
 export * from './source/scale';

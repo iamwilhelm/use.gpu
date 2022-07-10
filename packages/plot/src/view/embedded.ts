@@ -2,14 +2,13 @@ import { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live/typ
 import { Rectangle } from '@use-gpu/core/types'; 
 
 import { provide, useContext, useNoContext, useOne } from '@use-gpu/live';
-
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { TransformContext } from '@use-gpu/workbench/providers/transform-provider';
-import { LayoutContext } from '@use-gpu/workbench/providers/layout-provider';
+import {
+  TransformContext, LayoutContext,
+  useShaderRef, useBoundShader, useCombinedTransform,
+} from '@use-gpu/workbench';
+
 import { RangeContext } from '../providers/range-provider';
-import { useShaderRef } from '@use-gpu/workbench/hooks/useShaderRef';
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useCombinedTransform } from '@use-gpu/workbench/hooks/useCombinedTransform';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { mat4, vec3 } from 'gl-matrix';

@@ -1,8 +1,9 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ShaderSource } from '@use-gpu/shader/types';
+import { VectorLike } from '@use-gpu/traits/types';
 import { ColorTrait, PointTrait, ROPTrait } from '../types';
-import { VectorLike } from '@use-gpu/workbench/traits/types';
 
+import { PointLayer } from '@use-gpu/workbench';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 
 import { DataContext } from '../providers/data-provider';
@@ -12,8 +13,6 @@ import {
   useROPTrait,
 } from '../traits';
 import { vec4 } from 'gl-matrix';
-
-import { PointLayer } from '@use-gpu/workbench/layers/point-layer';
 
 export type PointProps =
   Partial<ColorTrait> &

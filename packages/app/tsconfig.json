@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.pkg.json",
   "references": [
     { "path": "../live" },
+    { "path": "../traits" },
     { "path": "../core" },
     { "path": "../webgpu" },
     { "path": "../wgsl" },

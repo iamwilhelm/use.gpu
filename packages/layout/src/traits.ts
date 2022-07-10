@@ -1,9 +1,10 @@
-import { makeUseTrait, makeParseTrait } from '@use-gpu/workbench/traits/useTrait';
 import {
+  makeUseTrait,
+  makeParseTrait,
   optional,
   parseNumber,
   parseColor,
-} from '@use-gpu/workbench/traits/parse';
+} from '@use-gpu/traits';
 import {
   parseAlignmentXY,
   parseAnchor,

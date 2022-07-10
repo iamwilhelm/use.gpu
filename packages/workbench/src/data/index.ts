@@ -5,3 +5,4 @@ export * from './image-texture';
 export * from './fetch';
 export * from './raw-data';
 export * from './raw-texture';
+export * from './sampled-data';

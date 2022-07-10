@@ -1,16 +1,15 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait } from '../types';
-import { VectorLike } from '../../traits/types';
+import { VectorLike } from '@use-gpu/traits/types';
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useRawSource } from '@use-gpu/workbench/hooks/useRawSource';
-import { useShaderRef } from '@use-gpu/workbench/hooks/useShaderRef';
+import {
+  useBoundShader, useBoundSource, useRawSource, useShaderRef,
+  LineLayer, ArrowLayer, useArrowSegments,
+} from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
-import {
-  parsePosition4,
-} from '@use-gpu/workbench/traits/parse';
+import { parsePosition4, useProp } from '@use-gpu/traits';
 import {
   parseDetail,
 } from '../parse';
@@ -21,13 +20,7 @@ import {
   useLineTrait,
   useROPTrait,
 } from '../traits';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
 import { vec4 } from 'gl-matrix';
-
-import { Data } from '@use-gpu/workbench/data/data';
-import { LineLayer } from '@use-gpu/workbench/layers/line-layer';
-import { ArrowLayer } from '@use-gpu/workbench/layers/arrow-layer';
-import { useArrowSegments } from '@use-gpu/workbench/layers/arrow-segments';
 
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';

@@ -3,11 +3,11 @@ import { ShaderModule } from '@use-gpu/shader/types';
 import { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core/types';
 import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
 
+import { useProp } from '@use-gpu/traits';
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
-import { useInspectable } from '@use-gpu/workbench/hooks/useInspectable';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
+import { useInspectable } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';

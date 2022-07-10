@@ -1,4 +1,4 @@
-import { makeParseEnum } from '../traits/parse';
+import { makeParseEnum } from '@use-gpu/traits';
 import { PointShape } from './types';
 
 export const parsePointShape = makeParseEnum<PointShape>([

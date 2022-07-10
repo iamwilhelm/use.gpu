@@ -1,11 +1,10 @@
 import { LC, PropsWithChildren } from '@use-gpu/live/types';
 import { Point4 } from '@use-gpu/core/types';
 import { ShaderModule, ShaderSource } from '@use-gpu/shader/types';
+import { ColorLike } from '@use-gpu/traits/types';
 
 import { provide, useOne } from '@use-gpu/live';
-import { useProp } from '../traits/useProp';
-import { ColorLike } from '../traits/types';
-import { parseColor } from '../traits/parse';
+import { parseColor, useProp } from '@use-gpu/traits';
 import { makeContext, useContext } from '@use-gpu/live';
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 

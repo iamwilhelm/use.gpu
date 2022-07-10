@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { StorageSource, Emitter } from '@use-gpu/core/types';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
-import { SampledData } from '@use-gpu/workbench/data/sampled-data';
+import { SampledData } from '@use-gpu/workbench';
 import { DataContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
 import { parseAxis } from '../parse';

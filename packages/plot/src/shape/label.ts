@@ -1,14 +1,14 @@
 import { LiveComponent } from '@use-gpu/live/types';
+import { VectorLike } from '@use-gpu/traits/types';
 import { AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait } from '../types';
-import { VectorLike } from '@use-gpu/workbench/traits/types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { DataContext, ValuesContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
-import { LayoutContext } from '@use-gpu/workbench/providers/layout-provider';
+import { LayoutContext, LabelLayer } from '@use-gpu/workbench';
 import {
   parsePosition4,
-} from '@use-gpu/workbench/traits/parse';
+} from '@use-gpu/traits';
 import {
   parseDetail,
 } from '../parse';
@@ -21,8 +21,6 @@ import {
 } from '../traits';
 import { formatNumber } from '../util/format';
 import { vec4 } from 'gl-matrix';
-
-import { LabelLayer } from '@use-gpu/workbench/layers/label-layer';
 
 export type LabelProps =
   Partial<AnchorTrait> &

@@ -1,20 +1,20 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
+import {
+  TransformContext,
+  useShaderRef, useBoundShader, useCombinedTransform,
+} from '@use-gpu/workbench';
 
-import { TransformContext } from '@use-gpu/workbench/providers/transform-provider';
 import { RangeContext } from '../providers/range-provider';
-import { useShaderRef } from '@use-gpu/workbench/hooks/useShaderRef';
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useCombinedTransform } from '@use-gpu/workbench/hooks/useCombinedTransform';
 import { composeTransform } from '../util/compose';
 import { recenterAxis } from '../util/axis';
 import { swizzleMatrix, toBasis, rotateBasis, invertBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/workbench/traits/parse';
 import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getStereographicPosition } from '@use-gpu/wgsl/transform/stereographic.wgsl';

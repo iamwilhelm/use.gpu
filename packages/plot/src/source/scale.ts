@@ -1,21 +1,18 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { StorageSource, LambdaSource, UniformType } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
+import { VectorLike } from '@use-gpu/traits/types';
 import { ScaleTrait, AxisTrait } from '../types';
-import { VectorLike } from '@use-gpu/workbench/traits/types';
 
+import { parsePosition4, useProp } from '@use-gpu/traits';
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { useRawSource, useBoundShader, useShaderRef } from '@use-gpu/workbench';
 
 import { DataContext, ValuesContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
-import { useRawSource } from '@use-gpu/workbench/hooks/useRawSource';
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useShaderRef } from '@use-gpu/workbench/hooks/useShaderRef';
 
-import { useProp } from '@use-gpu/workbench/traits/useProp';
 import { useScaleTrait, useAxisTrait } from '../traits';
-import { parsePosition4 } from '@use-gpu/workbench/traits/parse';
 import { logarithmic, linear } from '../util/domain';
 
 import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';

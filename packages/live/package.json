@@ -31,5 +31,9 @@
     "coveragePathIgnorePatterns": [
       "debug.ts"
     ]
+  },
+  "typedocOptions": {
+    "name": "live",
+    "readme": "./README.md"
   }
 }

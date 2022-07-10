@@ -16,6 +16,7 @@ module.exports = {
     "./packages/wgsl-loader/src/index.ts",
     "./packages/workbench/src/index.ts",
   ],
+  /*
   "pluginPages": {
     /*
     pages: [
@@ -26,8 +27,8 @@ module.exports = {
             { title: 'Some cool docs', source: 'some-cool-docs.md' },
         ] },
     ],
-    */
   },
+  */
   "name": "Use.GPU",
   "readme": "./md/root.md",
   "out": "docs",

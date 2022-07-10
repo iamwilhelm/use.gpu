@@ -1,5 +1,5 @@
-import { VectorLike, ColorLike } from '../traits/types';
-import { PointShape } from '../layers/types';
+import { VectorLike, ColorLike } from '@use-gpu/traits/types';
+import { PointShape } from '@use-gpu/workbench/types';
 
 export type Axis4 = 'x' | 'y' | 'z' | 'w';
 export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';

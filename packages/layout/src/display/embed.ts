@@ -3,14 +3,13 @@ import { AutoPoint, LayoutElement, Dimension, Margin } from '../types';
 import { Rectangle, Point, Point4 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
+import { useProp } from '@use-gpu/traits';
 import { use, memo, gather, provide, yeet, tagFunction, useContext, useFiber } from '@use-gpu/live';
-import { LayoutContext } from '@use-gpu/workbench/providers/layout-provider';
-import { TransformContext } from '@use-gpu/workbench/providers/transform-provider';
+import { LayoutContext, TransformContext } from '@use-gpu/workbench';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { memoFit, memoLayout } from '../lib/util';
 import { evaluateDimension } from '../parse';
 
-import { useProp } from '@use-gpu/workbench/traits/useProp';
 import { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { parseDimension, parseMargin } from '../parse';

@@ -1,19 +1,16 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Point, Rectangle } from '@use-gpu/core/types';
-import { Placement } from '@use-gpu/workbench/traits/types';
+import { Placement } from '@use-gpu/traits/types';
 import { LayoutElement, LayoutPicker } from './types';
 
+import { parsePlacement, useProp } from '@use-gpu/traits';
 import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
-import { DebugContext } from '@use-gpu/workbench/providers/debug-provider';
-import { LayoutContext } from '@use-gpu/workbench/providers/layout-provider';
-import { MouseContext, WheelContext } from '@use-gpu/workbench/providers/event-provider';
-import { ScrollContext } from '@use-gpu/workbench/consumers/scroll-consumer';
-import { ViewContext } from '@use-gpu/workbench/providers/view-provider';
-import { TransformContext } from '@use-gpu/workbench/providers/transform-provider';
-import { useInspectable, useInspectHoverable, useInspectorSelect, Inspector } from '@use-gpu/workbench/hooks/useInspectable';
-import { useBoundShader, useNoBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
-import { parsePlacement } from '@use-gpu/workbench/traits/parse';
+
+import {
+  DebugContext, LayoutContext, MouseContext, WheelContext, ScrollContext, ViewContext, TransformContext,
+  useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
+  useBoundShader, useNoBoundShader,
+} from '@use-gpu/workbench';
 
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import { getLayoutPosition } from '@use-gpu/wgsl/layout/layout.wgsl';

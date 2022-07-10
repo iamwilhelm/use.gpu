@@ -1,8 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { RustTextAPI, Font } from '@use-gpu/text/types';
 
+import { parseWeight } from '@use-gpu/traits';
 import { provide, useAsync, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';
-import { parseWeight } from '../../traits/parse';
 import { makeTuples } from '@use-gpu/core';
 import { RustText, packStrings } from '@use-gpu/text';
 

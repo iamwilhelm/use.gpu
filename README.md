@@ -75,6 +75,10 @@ The included demo app contains various showcases of how it can be used.
 
 ## Usage
 
+- `yarn start` - Run demo app at http://localhost:8777
+- `yarn build` - Build packages
+- `yarn test` - Run unit tests
+
 **Prerequisites**: `node`, `yarn`, `rust`, `wasm-pack`
 
 - `node`: https://nodejs.org/en/
@@ -86,36 +90,53 @@ The included demo app contains various showcases of how it can be used.
 - run `yarn install` to grab dependent packages, and run code generation for the lib.
 
 **Demo app requires Chrome Dev/Canary with WebGPU enabled.**
+- `chrome://flags/#enable-unsafe-webgpu`
 
-- `yarn start` - Run demo app at http://localhost:8777
-- `yarn build` - Build packages
-- `yarn test` - Run unit tests
-
-## Packages
+## Roadmap
 
 This repo is split into the following sub-packages:
 
-**Component Library**
- - `@use-gpu/webgpu` - DOM/WebGPU shell ⏱
- - `@use-gpu/workbench` - Live components for WebGPU ⏱
- - `@use-gpu/wgsl` - Supporting WGSL shaders ⏱
- - `@use-gpu/gltf` - GLTF 2.0 loader ⏱
- - `@use-gpu/app` - Testbed demo app ⚠️
+#### **Framework**
 
-**WebGPU**
- - `@use-gpu/core` - WebGPU helpers and types ⏱
- - `@use-gpu/text` - WASM/Rust library wrapping `ab_glyph` ✅
+- [`@use-gpu/live`](packages/live/README.md) - Effect run-time (React replacement) ✅
+- [`@use-gpu/react`](packages/react/README.md) - Live ↔︎ React interface ✅
+- [`@use-gpu/webgpu`](packages/webgpu/README.md) - WebGPU canvas ✅
+- [`@use-gpu/shader`](packages/shader/README.md) - WGSL shader linker and tree shaker ✅
 
-**Shaders**
- - [`@use-gpu/shader`](packages/shader/README.md) - WGSL/GLSL Shader linker and tree-shaker ✅
- - [`@use-gpu/wgsl-loader`](packages/wgsl-loader/README.md) - WGSL file bundler for webpack and node ✅
- - [`@use-gpu/glsl-loader`](packages/glsl-loader/README.md) - GLSL file bundler for webpack and node ✅
+#### **Components**
 
-**Live**
- - `@use-gpu/live` - Memoized effect run-time (React without DOM / rendering) ✅
- - `@use-gpu/inspect` - Debug inspector for Live ⏱
- - `@use-gpu/react` - Live/React interop ✅
- - `@use-gpu/state` - Patch/diff-based state management + hashing ✅
+- [`@use-gpu/gltf`](packages/gltf/README.md) - GLTF loader and scene graph ⏱
+- [`@use-gpu/layout`](packages/layout/README.md) - HTML-like layout ✅
+- [`@use-gpu/plot`](packages/plot/README.md) - 2D/3D plotting (axes, grids, curves, labels, transforms, …) ⏱
+- [`@use-gpu/workbench`](packages/workbench/README.md) ⏱
+  - `/animate` - Keyframe animation
+  - `/camera` - Views and controls
+  - `/data` - CPU → GPU data packing
+  - `/interact` - GPU UI picking
+  - `/layers` - Data-driven geometry
+  - `/light` - Light and environment
+  - `/material` - Physical materials
+  - `/router` - URL ↔︎ Page routing
+
+#### **Environment**
+
+- [`@use-gpu/workbench`](packages/workbench/README.md)
+  - `/consumers` - Context consumers
+  - `/hooks` - Reactive GPU API
+  - `/primitives` - Programmable geometry
+  - `/providers` - Context providers
+  - `/render` - Passes, render targets, buffers, etc.
+  - `/shader` - Run-time WGSL composition
+- [`@use-gpu/wgsl-loader`](packages/wgsl-loader/README.md) - WGSL file bundler for webpack and node ✅
+- [`@use-gpu/glsl-loader`](packages/glsl-loader/README.md) - GLSL file bundler for webpack and node ✅
+- [`@use-gpu/inspect`](packages/inspect/README.md) - Development inspector ✅
+- [`@use-gpu/app`](packages/app/README.md) - Testbed demo app ⚠️
+
+#### **Supporting Libraries**
+- [`@use-gpu/core`](packages/core/README.md) - Pure WebGPU + data helpers ✅
+- [`@use-gpu/state`](packages/state/README.md) - Minimal state management ✅
+- [`@use-gpu/text`](packages/text/README.md) - Rust/WASM ABGlyph wrapper ✅
+- [`@use-gpu/traits`](packages/traits/README.md) - Composable prop archetypes ✅
 
 This is a work in progress. Stability:
 - ✅: Stable Beta

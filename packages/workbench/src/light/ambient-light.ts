@@ -1,13 +1,11 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { ColorLike, VectorLike } from '../traits/types';
+import { ColorLike, VectorLike } from '@use-gpu/traits/types';
+import { parseColor, parseNumber, useProp } from '@use-gpu/traits';
 
 import { useMemo } from '@use-gpu/live';
 
 import { useLightConsumer } from './lights';
 import { useTransformContext } from '../providers/transform-provider';
-
-import { parseColor, parseNumber } from '../traits/parse';
-import { useProp } from '../traits/useProp';
 
 export type AmbientLightProps = {
   color?: ColorLike,

@@ -3,6 +3,7 @@ import { ShaderSource } from '@use-gpu/shader/types';
 import { ColorTrait, LineTrait, ROPTrait, SurfaceTrait } from '../types';
 
 import { use, useContext } from '@use-gpu/live';
+import { SurfaceLayer } from '@use-gpu/workbench';
 
 import { DataContext } from '../providers/data-provider';
 import {
@@ -10,8 +11,6 @@ import {
   useSurfaceTrait,
   useROPTrait,
 } from '../traits';
-
-import { SurfaceLayer } from '@use-gpu/workbench/layers/surface-layer';
 
 export type SurfaceProps =
   Partial<ColorTrait> &

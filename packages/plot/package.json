@@ -32,6 +32,9 @@
     "build:babel": "babel src --out-dir ../../build/packages/$NPM_PACKAGE/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel *.ts --out-dir ../../build/packages/$NPM_PACKAGE --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/umd/; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/mjs/; cp -r ../../build/packages/$NPM_PACKAGE/umd/* ../../build/packages/$NPM_PACKAGE/src/",
     "build:pkg": "cp README.md package.json ../../build/packages/$NPM_PACKAGE"
-
+  },
+  "typedocOptions": {
+    "name": "plot",
+    "readme": "./README.md"
   }
 }

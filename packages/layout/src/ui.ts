@@ -2,11 +2,12 @@ import { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live/types';
 import { AggregateBuffer, Atlas, Rectangle, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
 import { UIAggregate } from './types';
 
-import { DeviceContext } from '@use-gpu/workbench/providers/device-provider';
-import { DebugContext } from '@use-gpu/workbench/providers/debug-provider';
-import { SDFFontProvider, SDF_FONT_ATLAS } from '@use-gpu/workbench/text/providers/sdf-font-provider';
-import { ScrollConsumer } from '@use-gpu/workbench/consumers/scroll-consumer';
-import { useBufferedSize } from '@use-gpu/workbench/hooks/useBufferedSize';
+import {
+  DeviceContext, DebugContext,
+  SDFFontProvider, ScrollConsumer, SDF_FONT_ATLAS, 
+  useBufferedSize,
+  UIRectangles,
+} from '@use-gpu/workbench';
 import { use, keyed, wrap, fragment, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { getNumberHash, getObjectKey } from '@use-gpu/state';
 import {
@@ -15,8 +16,6 @@ import {
   updateAggregateSegments,
 } from '@use-gpu/core';
 import { overlapBounds, joinBounds } from './lib/util';
-
-import { UIRectangles } from '@use-gpu/workbench/primitives/ui-rectangles';
 
 export type UIProps = {
   children: LiveElement<any>,

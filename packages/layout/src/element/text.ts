@@ -5,7 +5,7 @@ import { Base, InlineLine } from '../types';
 
 import { keyed, yeet, useFiber } from '@use-gpu/live';
 
-import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench/text/providers/font-provider';
+import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench';
 import { Glyphs } from '../shape/glyphs';
 import { memoInline } from '../lib/util';
 

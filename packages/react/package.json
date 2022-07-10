@@ -26,5 +26,9 @@
     "coveragePathIgnorePatterns": [
       "debug.ts"
     ]
-  }
+  },
+  "typedocOptions": {
+    "name": "react",
+    "readme": "./README.md"
+  }  
 }

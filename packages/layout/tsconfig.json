@@ -4,6 +4,7 @@
     { "path": "../state" },
     { "path": "../core" },
     { "path": "../live" },
+    { "path": "../traits" },
     { "path": "../workbench" },
   ],
   "compilerOptions": {
@@ -11,7 +12,7 @@
     "baseUrl": "src",
     "typeRoots": ["../../node_modules/@types"],
     "outDir": "../../build/packages",
-    "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
   },
   "include": ["src/**/*.ts", "types.ts"]
 }

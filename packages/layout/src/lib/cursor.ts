@@ -2,7 +2,7 @@ import { Point } from '@use-gpu/core/types';
 import { Alignment } from '@use-gpu/workbench/types';
 
 import { makeTuples } from '@use-gpu/core';
-import { getAlignmentSpacing } from '@use-gpu/workbench/text/cursor';
+import { getAlignmentSpacing } from '@use-gpu/workbench';
 
 type FlexReduce = (
   sizes: number[],

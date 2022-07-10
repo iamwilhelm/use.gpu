@@ -1,7 +1,7 @@
 import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { LayoutElement, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor } from '../types';
 
-import { getAlignmentAnchor, getAlignmentSpacing } from '@use-gpu/workbench/text/cursor';
+import { getAlignmentAnchor, getAlignmentSpacing } from '@use-gpu/workbench';
 import { makeFlexCursor } from './cursor';
 import { isHorizontal } from './util';
 

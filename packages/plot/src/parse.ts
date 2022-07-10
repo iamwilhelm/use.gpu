@@ -1,4 +1,4 @@
-import { makeParseEnum, makeParseInt, makeParseVec2, makeParseArray } from '@use-gpu/workbench/traits/parse';
+import { makeParseEnum, makeParseInt, makeParseVec2, makeParseArray } from '@use-gpu/traits';
 import { Domain }  from './types';
 import { vec2 } from 'gl-matrix';
 

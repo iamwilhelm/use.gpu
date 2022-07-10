@@ -1,24 +1,22 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { UniformAttributeValue } from '@use-gpu/core/types';
 import { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale, useProp } from '@use-gpu/traits';
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
+import {
+  TransformContext,
+  useShaderRef, useBoundShader, useCombinedTransform,
+} from '@use-gpu/workbench';
 
-import { TransformContext } from '@use-gpu/workbench/providers/transform-provider';
 import { RangeContext } from '../providers/range-provider';
-import { useShaderRef } from '@use-gpu/workbench/hooks/useShaderRef';
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useCombinedTransform } from '@use-gpu/workbench/hooks/useCombinedTransform';
 import { composeTransform } from '../util/compose';
 import { recenterAxis } from '../util/axis';
 import { swizzleMatrix, invertBasis, toBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/workbench/traits/parse';
 import { useAxesTrait, useObjectTrait } from '../traits';
 import { parseAxes } from '../parse';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
 
 import { getSphericalPosition } from '@use-gpu/wgsl/transform/spherical.wgsl';
 

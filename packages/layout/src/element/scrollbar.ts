@@ -1,22 +1,21 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { TextureSource, Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
+import { ColorLike } from '@use-gpu/traits/types';
 import { Direction, OverflowMode, AutoPoint, UIAggregate } from '../types';
-import { ColorLike } from '@use-gpu/workbench/traits/types';
 
+import { parseColor, useProp } from '@use-gpu/traits';
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { evaluateDimension } from '../parse';
 import { isHorizontal, memoFit } from '../lib/util';
-import { useInspectHoverable } from '@use-gpu/workbench/hooks/useInspectable';
+import { useInspectHoverable } from '@use-gpu/workbench';
 
-import { parseColor } from '@use-gpu/workbench/traits/parse';
 import { INSPECT_STYLE } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
+import { useBoundShader } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 

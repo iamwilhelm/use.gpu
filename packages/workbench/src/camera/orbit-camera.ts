@@ -1,5 +1,7 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { VectorLike } from '@use-gpu/traits/types';
 
+import { parsePosition, useProp } from '@use-gpu/traits';
 import { provide, use, useContext, useOne } from '@use-gpu/live';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
@@ -7,9 +9,6 @@ import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
-import { VectorLike } from '../traits/types';
-import { useProp } from '../traits/useProp';
-import { parsePosition } from '../traits/parse';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,

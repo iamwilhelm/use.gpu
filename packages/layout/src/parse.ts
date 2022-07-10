@@ -1,6 +1,6 @@
 import { TextureSource } from '@use-gpu/core/types';
 import { Alignment, AlignmentLike, Anchor, AnchorLike, Base, Dimension, Direction, Fit, Gap, GapLike, Margin, MarginLike, OverflowMode, Repeat } from './types';
-import { makeParseEnum, makeParseObject } from '@use-gpu/workbench/traits/parse';
+import { makeParseEnum, makeParseObject } from '@use-gpu/traits';
  
 const explode = new Proxy({}, {get: () => { throw new Error('Invalid texture source'); }}) as any as TextureSource;
 

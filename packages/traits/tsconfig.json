@@ -1,11 +1,7 @@
 {
   "extends": "../../tsconfig.pkg.json",
   "references": [
-    { "path": "../state" },
-    { "path": "../core" },
-    { "path": "../live" },
-    { "path": "../traits" },
-    { "path": "../workbench" },
+    { "path": "../live" }
   ],
   "compilerOptions": {
     "rootDir": "..",

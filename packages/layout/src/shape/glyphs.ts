@@ -5,7 +5,7 @@ import { FontMetrics } from '@use-gpu/text/types';
 import { InlineLine } from '../types';
 
 import { use, yeet, useContext, useMemo } from '@use-gpu/live';
-import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '@use-gpu/workbench/text/providers/sdf-font-provider';
+import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '@use-gpu/workbench';
 import { evaluateDimension } from '../parse';
 
 const BLACK = [0, 0, 0, 1];

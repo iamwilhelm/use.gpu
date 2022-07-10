@@ -1,19 +1,14 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ShaderSource } from '@use-gpu/shader/types';
+import { VectorLike } from '@use-gpu/traits/types';
 import { ArrowTrait, ColorTrait, LineTrait, ROPTrait } from '../types';
-import { VectorLike } from '@use-gpu/workbench/traits/types';
 
+import { useProp, parsePosition4 } from '@use-gpu/traits';
+import { useBoundShader, useBoundSource, useDerivedSource, useShaderRef, ArrowLayer } from '@use-gpu/workbench';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useBoundSource } from '@use-gpu/workbench/hooks/useBoundSource';
-import { useDerivedSource } from '@use-gpu/workbench/hooks/useDerivedSource';
-import { useShaderRef } from '@use-gpu/workbench/hooks/useShaderRef';
 import { DataContext } from '../providers/data-provider';
-import {
-  parsePosition4,
-} from '@use-gpu/workbench/traits/parse';
 import {
   parseDetail,
 } from '../parse';
@@ -23,14 +18,11 @@ import {
   useLineTrait,
   useROPTrait,
 } from '../traits';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
 import { vec4 } from 'gl-matrix';
 
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 import { getLineAnchor } from '@use-gpu/wgsl/geometry/anchor.wgsl';
 import { getLineTrim } from '@use-gpu/wgsl/geometry/trim.wgsl';
-
-import { ArrowLayer } from '@use-gpu/workbench/layers/arrow-layer';
 
 const LINE_ATTRIBUTES = bundleToAttributes(getLineSegment);
 const ARROW_ATTRIBUTES = bundleToAttributes(getLineAnchor);

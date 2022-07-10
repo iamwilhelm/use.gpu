@@ -4,6 +4,7 @@
     { "path": "./packages/state" },
     { "path": "./packages/glsl" },
     { "path": "./packages/live" },
+    { "path": "./packages/traits" },
     { "path": "./packages/core" },
     { "path": "./packages/shader" },
     { "path": "./packages/glsl-loader" },

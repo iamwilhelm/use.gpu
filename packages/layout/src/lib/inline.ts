@@ -2,7 +2,7 @@ import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor, Base } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
-import { makeInlineCursor, getAlignmentSpacing } from '@use-gpu/workbench/text/cursor';
+import { makeInlineCursor, getAlignmentSpacing } from '@use-gpu/workbench';
 import { isHorizontal, makeMiniHash } from './util';
 
 const NO_RENDER = () => null;

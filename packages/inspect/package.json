@@ -30,5 +30,9 @@
   "peerDependencies": {
     "react": "*",
     "react-dom": "*"
+  },
+  "typedocOptions": {
+    "name": "inspect",
+    "readme": "./README.md"
   }
 }

@@ -24,5 +24,9 @@
     "build:js": "babel src --out-dir ../../build/packages/text/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
     "build:pkg": "cp package.json ../../build/packages/text",
     "build:wasm": "cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/text/pkg/; cp -r pkg ../../build/packages/text/"
-  }
+  },
+  "typedocOptions": {
+    "name": "text",
+    "readme": "./README.md"
+  }  
 }

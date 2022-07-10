@@ -2,13 +2,12 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { LambdaSource, Emitter } from '@use-gpu/core/types';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
+import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
+import { useBoundSource, useDataBinding, useDerivedSource } from '@use-gpu/workbench';
+
 import { DataContext } from '../providers/data-provider';
-import { useBoundSource } from '@use-gpu/workbench/hooks/useBoundSource';
-import { useDataBinding } from '@use-gpu/workbench/hooks/useDataBinding';
-import { useDerivedSource } from '@use-gpu/workbench/hooks/useDerivedSource';
 import { parseAxes, parseAxis } from '../parse';
 
-import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
 import plotArray, { packIndex, unpackIndex } from '@use-gpu/wgsl/plot/array.wgsl';
 
 const SIZE_BINDING = bundleToAttribute(plotArray, 'getSize');

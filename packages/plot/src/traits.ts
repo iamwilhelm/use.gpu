@@ -1,7 +1,7 @@
 import { useOne } from '@use-gpu/live';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
-import { makeUseTrait } from '@use-gpu/workbench/traits/useTrait';
 import {
+  makeUseTrait,
+  useProp,
   parseNumber,
   parseInteger,
   parseBoolean,
@@ -21,7 +21,7 @@ import {
   parsePlacement,
   parseWeight,
   optional,
-} from '@use-gpu/workbench/traits/parse';
+} from '@use-gpu/traits';
 import {
   parseAxes,
   parseAxis,
@@ -32,7 +32,7 @@ import {
 } from './parse';
 import {
   parsePointShape,
-} from '@use-gpu/workbench/layers/parse';
+} from '@use-gpu/workbench';
 import {
   AnchorTrait,
   ArrowTrait,

@@ -19,11 +19,15 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "yarn run build:js && yarn run build:types && yarn run build:exports && yarn run build:pkg",
+    "build": "rm -rf ../../build/packages/workbench; yarn run build:js && yarn run build:types && yarn run build:exports && yarn run build:pkg",
     "build:exports": "ts-node ../../scripts/build-exports.ts",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir ../../build/packages/workbench/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel *.ts --out-dir ../../build/packages/workbench --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
-    "build:pkg": "cp package.json ../../build/packages/workbench"
+    "build:pkg": "cp README.md package.json ../../build/packages/workbench"
+  },
+  "typedocOptions": {
+    "name": "workbench",
+    "readme": "./README.md"
   },
   "exports": {
     ".": "./src/index.ts",
@@ -506,26 +510,6 @@
       "types": "./src/text/types.d.ts",
       "import": "./src/text/types.ts",
       "require": "./src/text/types.ts"
-    },
-    "./traits/parse": {
-      "types": "./src/traits/parse.d.ts",
-      "import": "./src/traits/parse.ts",
-      "require": "./src/traits/parse.ts"
-    },
-    "./traits/types": {
-      "types": "./src/traits/types.d.ts",
-      "import": "./src/traits/types.ts",
-      "require": "./src/traits/types.ts"
-    },
-    "./traits/useProp": {
-      "types": "./src/traits/useProp.d.ts",
-      "import": "./src/traits/useProp.ts",
-      "require": "./src/traits/useProp.ts"
-    },
-    "./traits/useTrait": {
-      "types": "./src/traits/useTrait.d.ts",
-      "import": "./src/traits/useTrait.ts",
-      "require": "./src/traits/useTrait.ts"
     },
     "./types": {
       "types": "./src/types.d.ts",

@@ -1,13 +1,20 @@
 {
-  "name": "@use-gpu/state",
+  "name": "@use-gpu/traits",
   "version": "0.0.1",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "private": true,
+  "dependencies": {
+    "gl-matrix": "^3.3.0",
+    "@use-gpu/live": "*"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./types": "./src/types.ts"
+  },
+  "typedocOptions": {
+    "name": "Traits"
   },
   "scripts": {
     "test": "jest --watch",
@@ -16,7 +23,7 @@
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
 
-    "build": "NPM_PACKAGE=state yarn run build:all",
+    "build": "NPM_PACKAGE=traits yarn run build:all",
     "build:all": "yarn run build:js && yarn run build:types && yarn run build:pkg",
 
     "build:js": "yarn run build:mjs && yarn run build:umd",
@@ -27,7 +34,7 @@
     "build:pkg": "cp README.md package.json ../../build/packages/$NPM_PACKAGE"
   },
   "typedocOptions": {
-    "name": "state",
+    "name": "traits",
     "readme": "./README.md"
   }  
 }

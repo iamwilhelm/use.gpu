@@ -1,18 +1,15 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { UniformAttribute } from '@use-gpu/core/types';
+import { VectorLike } from '@use-gpu/traits/types';
 import { ColorTrait, LineTrait, ROPTrait } from '../types';
-import { VectorLike } from '@use-gpu/workbench/traits/types';
 
+import { parseNumber, parsePosition4, useProp } from '@use-gpu/traits';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { diffBy } from '@use-gpu/shader/wgsl';
+import { useBoundSource, TickLayer } from '@use-gpu/workbench';
 
 import { DataContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
-import { useBoundSource } from '@use-gpu/workbench/hooks/useBoundSource';
-import {
-  parseNumber,
-  parsePosition4,
-} from '@use-gpu/workbench/traits/parse';
 import {
   parseDetail,
 } from '../parse';
@@ -21,10 +18,7 @@ import {
   useLineTrait,
   useROPTrait,
 } from '../traits';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
 import { vec4 } from 'gl-matrix';
-
-import { TickLayer } from '@use-gpu/workbench/layers/tick-layer';
 
 export type TickProps =
   Partial<ColorTrait> &

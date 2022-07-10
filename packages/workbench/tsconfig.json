@@ -4,6 +4,7 @@
     { "path": "../wgsl" },
     { "path": "../state" },
     { "path": "../live" },
+    { "path": "../traits" },
     { "path": "../core" },
     { "path": "../shader" },
     { "path": "../text" },

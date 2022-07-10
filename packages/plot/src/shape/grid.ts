@@ -1,17 +1,16 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } from '../types';
-import { VectorLike } from '@use-gpu/workbench/traits/types';
+import { VectorLike } from '@use-gpu/traits/types';
 
+import { parsePosition4, useProp } from '@use-gpu/traits';
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { useBoundShader } from '@use-gpu/workbench/hooks/useBoundShader';
-import { useRawSource } from '@use-gpu/workbench/hooks/useRawSource';
-import { useShaderRef } from '@use-gpu/workbench/hooks/useShaderRef';
+import {
+  useBoundShader, useRawSource, useShaderRef,
+  Data, LineLayer,
+} from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
-import {
-  parsePosition4,
-} from '@use-gpu/workbench/traits/parse';
 import {
   parseDetail,
   parseAxis,
@@ -23,12 +22,9 @@ import {
   useROPTrait,
   useScaleTrait,
 } from '../traits';
-import { useProp } from '@use-gpu/workbench/traits/useProp';
 import { vec4 } from 'gl-matrix';
 
 import { logarithmic, linear } from '../util/domain';
-import { Data } from '@use-gpu/workbench/data/data';
-import { LineLayer } from '@use-gpu/workbench/layers/line-layer';
 
 import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';

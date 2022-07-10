@@ -1,6 +1,6 @@
 import { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live/types';
 import { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
-import { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, LayerType } from './types';
+import { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { use, keyed, fragment, multiGather, useContext, useOne, useMemo } from '@use-gpu/live';
@@ -143,6 +143,6 @@ const makeLineAccumulator = (
 };
 
 const AGGREGATORS = {
-  [LayerType.Line]: makeLineAccumulator,
-  [LayerType.Point]: makePointAccumulator,
+  'line': makeLineAccumulator,
+  'point': makePointAccumulator,
 } as Record<string, LayerAggregator>;

@@ -3,7 +3,7 @@ import { TextureSource, Rectangle, Point4 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
 import { use, yeet, memo, useContext, useMemo, useNoContext } from '@use-gpu/live';
-import { LayerType, LayoutContext, getAlignmentAnchor } from '@use-gpu/workbench';
+import { LayoutContext, getAlignmentAnchor } from '@use-gpu/workbench';
 import { ImageTrait, Fit, Repeat, Anchor } from '../types';
 
 import { evaluateDimension, parseAnchorXY } from '../parse';

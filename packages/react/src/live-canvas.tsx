@@ -8,6 +8,11 @@ export type LiveCanvasProps = {
   render: (canvas: HTMLCanvasElement) => LiveElement<any>,
 };
 
+/**
+ * Render <canvas> for Live. Acts as a portal from React to Live.
+ *
+ * @category React Component
+ */
 export const LiveCanvas: React.FC<LiveCanvasProps> = ({style, render}) => {
   const el = useRef<HTMLCanvasElement>(null);
   const fiber = useRef<LiveFiber<any>>();

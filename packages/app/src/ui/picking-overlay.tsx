@@ -2,12 +2,15 @@ import React from '@use-gpu/live/jsx';
 import { LC } from '@use-gpu/live/types';
 
 import {
-  Flat, UI, Layout, Absolute, Block, Inline, Text,
+  Flat,
   PickingContext,
-  useBoundSource, useDerivedSource,
+  useBoundShader, useDerivedSource,
 } from '@use-gpu/workbench';
+import {
+  UI, Layout, Absolute, Block, Inline, Text,
+} from '@use-gpu/layout';
 import { useContext } from '@use-gpu/live';
-import { wgsl, f32, bindModule, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { wgsl, bindModule, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 export const PickingOverlay: LC = () => {
 
@@ -32,10 +35,9 @@ export const PickingOverlay: LC = () => {
       return sqrt(vec4<f32>(a, c, b, 1.0));
     }
   `;
-  const [GET_SIZE, GET_PICKING] = bundleToAttributes(colorizeShader);
-  const getSize = useBoundSource(GET_SIZE, () => pickingSource.size);
-  const getPicking = useBoundSource(GET_PICKING, pickingSource);
-  const textureSource = useDerivedSource(bindModule(colorizeShader, {getPicking, getSize}), pickingSource);
+  const BINDINGS = bundleToAttributes(colorizeShader);
+  const boundShader = useBoundShader(colorizeShader, BINDINGS, [() => pickingSource.size, pickingSource]);
+  const textureSource = useDerivedSource(boundShader, pickingSource);
 
   const scale = 0.5;
 

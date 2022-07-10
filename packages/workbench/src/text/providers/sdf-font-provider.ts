@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 import { Atlas, Tuples, Rectangle } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 import { FontMetrics, GlyphMetrics } from '@use-gpu/text/types';
-import { Alignment } from '../../layout/types';
+import { Alignment } from '../types';
 
 import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/text';
@@ -11,7 +11,7 @@ import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { getBoundShader } from '../../hooks/useBoundShader';
-import { makeInlineCursor } from '../../layout/lib/cursor';
+import { makeInlineCursor } from '../cursor';
 import { DebugContext } from '../../providers/debug-provider';
 import { DeviceContext } from '../../providers/device-provider';
 import { FontContext } from './font-provider';

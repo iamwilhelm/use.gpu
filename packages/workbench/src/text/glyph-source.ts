@@ -1,13 +1,12 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { Rectangle, StorageSource } from '@use-gpu/core/types';
-import { Alignment } from '../layout/types';
 
 import { memo, yeet, useContext, useOne } from '@use-gpu/live';
 import { makeTuples } from '@use-gpu/core';
 
 import { useFontFamily, useFontText, useFontHeight } from './providers/font-provider';
 import { useSDFGlyphData } from './providers/sdf-font-provider';
-import { SDFGlyphData } from './types';
+import { SDFGlyphData, Alignment } from './types';
 
 type GlyphSourceProps = {
   family?: string,

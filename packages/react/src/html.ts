@@ -10,6 +10,11 @@ export type HTMLProps = {
   children?: React.ReactNode,
 };
 
+/**
+ * Render HTML. Acts as a portal from Live to React.
+ *
+ * @category Live Components
+ */
 export const HTML = ({
   container,
   style,

@@ -4,10 +4,13 @@ import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, Rend
 import React from '@use-gpu/live/jsx';
 
 import {
-  Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Text,
+  Draw, Pass, Flat,
   OrbitCamera, OrbitControls,
   Pick, Cursor, LinearRGB,
 } from '@use-gpu/workbench';
+import {
+  UI, Layout, Absolute, Block, Flex, Inline, Text
+} from '@use-gpu/layout';
 import { Mesh } from '../../components/mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
 

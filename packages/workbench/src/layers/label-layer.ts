@@ -16,7 +16,6 @@ import { DebugAtlas } from '../text/debug-atlas';
 import { GlyphSource } from '../text/glyph-source';
 import { PanControls } from '../camera/pan-controls';
 import { RawLabels } from '../primitives/raw-labels';
-import { UI, Flat } from '../layout';
 
 export type LabelLayerProps = {
   position?: number[] | TypedArray,
@@ -108,17 +107,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           const layouts = useRawSource(data.layouts, 'vec2<f32>');
           const uvs = useRawSource(data.uvs, 'vec4<f32>');
 
-          // Debug atlas
-          //return fragment([
-            /*
-            provide(TransformContext, null,
-              use(PanControls, {render: (x, y, zoom) =>
-                use(Flat, {
-                  x, y, zoom, children: wrap(UI, use(DebugAtlas, {atlas, source}))
-                })
-              })
-            ),
-            */
           return use(RawLabels, {
             indices,
             rectangles,

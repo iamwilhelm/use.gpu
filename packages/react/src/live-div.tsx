@@ -8,6 +8,11 @@ export type LiveDivProps = {
   render: (div: HTMLDivElement) => LiveElement<any>,
 };
 
+/**
+ * Render <div> for Live. Acts as a portal from React to Live.
+ *
+ * @category React Component
+ */
 export const LiveDiv: React.FC<LiveDivProps> = ({style, render}) => {
   const el = useRef<HTMLDivElement>(null);
   const fiber = useRef<LiveFiber<any>>();

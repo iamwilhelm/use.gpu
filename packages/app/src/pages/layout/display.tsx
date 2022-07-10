@@ -5,10 +5,13 @@ import React from '@use-gpu/live/jsx';
 import { LayoutControls } from '../../ui/layout-controls';
 
 import {
-  LinearRGB, Draw, Pass, Flat, UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
+  LinearRGB, Draw, Pass, Flat,
   PanControls,
   DebugProvider,
 } from '@use-gpu/workbench';
+import {
+  UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
+} from '@use-gpu/layout';
 
 export const LayoutDisplayPage: LC = () => {
 

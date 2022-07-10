@@ -8,11 +8,13 @@ import {
   Loop, Draw, Pass, Flat,
   ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, Line, Surface,
+  Pick, Cursor,
   Animation,
-  Plot, Spherical, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
   LinearRGB,
 } from '@use-gpu/workbench';
+import {
+  Plot, Spherical, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+} from '@use-gpu/plot';
 
 const π = Math.PI;
 const τ = π * 2;

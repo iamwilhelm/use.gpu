@@ -14,7 +14,7 @@ export default {
   },
   resolve: {
     modules: ['node_modules'],
-    extensions: ['.ts', '.tsx', '.js', '.json', '.glsl']
+    extensions: ['.ts', '.tsx', '.js', '.json', '.wgsl']
   },
   module: {
     rules: [

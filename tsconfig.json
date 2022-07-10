@@ -12,6 +12,8 @@
     { "path": "./packages/text" },
     { "path": "./packages/workbench" },
     { "path": "./packages/gltf" },
+    { "path": "./packages/plot" },
+    { "path": "./packages/layout" },
     { "path": "./packages/inspect" },
     { "path": "./packages/app" }
   ],

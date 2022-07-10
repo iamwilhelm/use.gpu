@@ -2,10 +2,12 @@ import { LC } from '@use-gpu/live/types';
 import React, { Gather, Yeet } from '@use-gpu/live/jsx';
 
 import {
-  LinearRGB, Pass, PanControls,
-  Flat, UI, Layout, Absolute, Inline, Text,
+  LinearRGB, Pass, PanControls, Flat,
   DebugAtlas, RawTexture, DebugProvider,
 } from '@use-gpu/workbench';
+import {
+  UI, Layout, Absolute, Inline, Text,
+} from '@use-gpu/layout';
 
 import { GlyphControls } from '../../ui/glyph-controls';
 

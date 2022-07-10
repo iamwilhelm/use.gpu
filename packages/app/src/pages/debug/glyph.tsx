@@ -10,12 +10,16 @@ import { GlyphControls } from '../../ui/glyph-controls';
 import { vec3 } from 'gl-matrix';
 
 import {
-  LinearRGB, Draw, Pass, Flat, UI, Layout, Block, Inline, Text, Flex, Embed, RawTexture,
-  Embedded, Axis, Grid, Scale, Tick, Point, Arrow, Sampled,
-  PanControls, LayoutContext,
-  useDeviceContext, useFontContext, DebugProvider,
-  OrbitCamera, OrbitControls,
+  LinearRGB, Draw, Pass, Flat, RawTexture,
+  OrbitCamera, OrbitControls, PanControls,
+  useDeviceContext, useFontContext, LayoutContext, DebugProvider,
 } from '@use-gpu/workbench';
+import {
+  UI, Layout, Block, Inline, Text, Flex, Embed,
+} from '@use-gpu/layout';
+import {
+  Embedded, Axis, Grid, Scale, Tick, Point, Arrow, Sampled,
+} from '@use-gpu/plot';
 
 const SIZE = 64;
 const DETAIL = 64;

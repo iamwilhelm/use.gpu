@@ -6,7 +6,7 @@ import { Light } from './types';
 import { LightContext, LightConsumer } from '../providers/light-provider';
 import { useDeviceContext } from '../providers/device-provider';
 
-import { consume, provide, gather, keyed, makeContext, useContext, useConsumer, useMemo, useOne } from '@use-gpu/live';
+import { consume, provide, gather, keyed, makeContext, consumeValues, useContext, useConsumer, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -67,7 +67,7 @@ export const Lights: LC<LightsProps> = (props: PropsWithChildren<LightsProps>) =
 
   // Gather lights from children
   return consume(LightConsumer, render, (registry: Map<LiveFiber<any>, Light>) => {
-    let lights = Array.from(registry.values());
+    let lights = consumeValues(registry);
 
     if (lights.length > 0) lights = lights.slice(0, max);
     storage.size[0] = storage.length = lights.length;

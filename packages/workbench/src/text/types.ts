@@ -1,6 +1,8 @@
 import { TypedArray } from '@use-gpu/core/types';
 import { FontProps } from '@use-gpu/text/types';
 
+export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'between' | 'evenly';
+
 export type FontSource = FontProps & {
   src: string,
 };

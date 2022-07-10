@@ -8,12 +8,13 @@ import {
   Loop, Draw, Pass, Flat,
   ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, Line, Surface,
+  Pick, Cursor,
   Animation,
-  Plot, Polar, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
   LinearRGB,
 } from '@use-gpu/workbench';
-
+import {
+  Plot, Polar, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+} from '@use-gpu/plot';
 const π = Math.PI;
 const EPS = 1e-3;
 

@@ -1,0 +1,37 @@
+{
+  "name": "@use-gpu/layout",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@use-gpu/workbench": "*",
+    "@use-gpu/core": "*",
+    "@use-gpu/live": "*",
+    "@use-gpu/shader": "*",
+    "mikktspace": "^1.1.1"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "test": "jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch",
+
+    "build": "NPM_PACKAGE=layout yarn run build:all",
+    "build:all": "yarn run build:js && yarn run build:types && yarn run build:pkg",
+
+    "build:js": "yarn run build:mjs && yarn run build:umd",
+    "build:mjs": "MODULE_ENV=production yarn run build:babel; rm -rf ../../build/packages/$NPM_PACKAGE/mjs; mv ../../build/packages/$NPM_PACKAGE/src ../../build/packages/$NPM_PACKAGE/mjs",
+    "build:umd": "MODULE_ENV=umd yarn run build:babel; rm -rf ../../build/packages/$NPM_PACKAGE/umd; mv ../../build/packages/$NPM_PACKAGE/src ../../build/packages/$NPM_PACKAGE/umd",
+    "build:babel": "babel src --out-dir ../../build/packages/$NPM_PACKAGE/src --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"; babel *.ts --out-dir ../../build/packages/$NPM_PACKAGE --extensions \".ts\" --ignore \"src/**/__mocks__/**/*.js\" --ignore \"src/**/*.test.ts\"",
+    "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/umd/; cp -r ../../build/packages/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/mjs/; cp -r ../../build/packages/$NPM_PACKAGE/umd/* ../../build/packages/$NPM_PACKAGE/src/",
+    "build:pkg": "cp README.md package.json ../../build/packages/$NPM_PACKAGE"
+
+  }
+}

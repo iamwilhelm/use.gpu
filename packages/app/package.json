@@ -8,7 +8,9 @@
   "dependencies": {
     "@types/earcut": "^2.1.1",
     "@use-gpu/core": "*",
+    "@use-gpu/layout": "*",
     "@use-gpu/live": "*",
+    "@use-gpu/plot": "*",
     "@use-gpu/shader": "*",
     "@use-gpu/state": "*",
     "@use-gpu/webgpu": "*",

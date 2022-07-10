@@ -9,7 +9,6 @@ import {
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
-import { DataContext } from '../providers/data-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';

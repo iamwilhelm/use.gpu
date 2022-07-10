@@ -8,11 +8,13 @@ import {
   Loop, Draw, Pass, Flat,
   ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, Line, Surface,
+  Pick, Cursor,
   Animation,
-  Plot, Cartesian, Axis, Grid, Scale, Tick, Label, Sampled, Transpose,
   LinearRGB,
 } from '@use-gpu/workbench';
+import {
+  Plot, Cartesian, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
+} from '@use-gpu/plot';
 
 let t = 0;
 

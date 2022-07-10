@@ -37,6 +37,11 @@
       "import": "./src/animate/types.ts",
       "require": "./src/animate/types.ts"
     },
+    "./camera/flat": {
+      "types": "./src/camera/flat.d.ts",
+      "import": "./src/camera/flat.ts",
+      "require": "./src/camera/flat.ts"
+    },
     "./camera/orbit-camera": {
       "types": "./src/camera/orbit-camera.d.ts",
       "import": "./src/camera/orbit-camera.ts",
@@ -257,91 +262,6 @@
       "import": "./src/layers/virtual-layers.ts",
       "require": "./src/layers/virtual-layers.ts"
     },
-    "./layout/display/absolute": {
-      "types": "./src/layout/display/absolute.d.ts",
-      "import": "./src/layout/display/absolute.ts",
-      "require": "./src/layout/display/absolute.ts"
-    },
-    "./layout/display/block": {
-      "types": "./src/layout/display/block.d.ts",
-      "import": "./src/layout/display/block.ts",
-      "require": "./src/layout/display/block.ts"
-    },
-    "./layout/display/embed": {
-      "types": "./src/layout/display/embed.d.ts",
-      "import": "./src/layout/display/embed.ts",
-      "require": "./src/layout/display/embed.ts"
-    },
-    "./layout/display/flex": {
-      "types": "./src/layout/display/flex.d.ts",
-      "import": "./src/layout/display/flex.ts",
-      "require": "./src/layout/display/flex.ts"
-    },
-    "./layout/display/inline": {
-      "types": "./src/layout/display/inline.d.ts",
-      "import": "./src/layout/display/inline.ts",
-      "require": "./src/layout/display/inline.ts"
-    },
-    "./layout/display/overflow": {
-      "types": "./src/layout/display/overflow.d.ts",
-      "import": "./src/layout/display/overflow.ts",
-      "require": "./src/layout/display/overflow.ts"
-    },
-    "./layout/element/element": {
-      "types": "./src/layout/element/element.d.ts",
-      "import": "./src/layout/element/element.ts",
-      "require": "./src/layout/element/element.ts"
-    },
-    "./layout/element/scrollbar": {
-      "types": "./src/layout/element/scrollbar.d.ts",
-      "import": "./src/layout/element/scrollbar.ts",
-      "require": "./src/layout/element/scrollbar.ts"
-    },
-    "./layout/element/text": {
-      "types": "./src/layout/element/text.d.ts",
-      "import": "./src/layout/element/text.ts",
-      "require": "./src/layout/element/text.ts"
-    },
-    "./layout/flat": {
-      "types": "./src/layout/flat.d.ts",
-      "import": "./src/layout/flat.ts",
-      "require": "./src/layout/flat.ts"
-    },
-    "./layout/layout": {
-      "types": "./src/layout/layout.d.ts",
-      "import": "./src/layout/layout.ts",
-      "require": "./src/layout/layout.ts"
-    },
-    "./layout/parse": {
-      "types": "./src/layout/parse.d.ts",
-      "import": "./src/layout/parse.ts",
-      "require": "./src/layout/parse.ts"
-    },
-    "./layout/shape/glyphs": {
-      "types": "./src/layout/shape/glyphs.d.ts",
-      "import": "./src/layout/shape/glyphs.ts",
-      "require": "./src/layout/shape/glyphs.ts"
-    },
-    "./layout/shape/ui-rectangle": {
-      "types": "./src/layout/shape/ui-rectangle.d.ts",
-      "import": "./src/layout/shape/ui-rectangle.ts",
-      "require": "./src/layout/shape/ui-rectangle.ts"
-    },
-    "./layout/traits": {
-      "types": "./src/layout/traits.d.ts",
-      "import": "./src/layout/traits.ts",
-      "require": "./src/layout/traits.ts"
-    },
-    "./layout/types": {
-      "types": "./src/layout/types.d.ts",
-      "import": "./src/layout/types.ts",
-      "require": "./src/layout/types.ts"
-    },
-    "./layout/ui": {
-      "types": "./src/layout/ui.d.ts",
-      "import": "./src/layout/ui.ts",
-      "require": "./src/layout/ui.ts"
-    },
     "./light/ambient-light": {
       "types": "./src/light/ambient-light.d.ts",
       "import": "./src/light/ambient-light.ts",
@@ -366,131 +286,6 @@
       "types": "./src/light/types.d.ts",
       "import": "./src/light/types.ts",
       "require": "./src/light/types.ts"
-    },
-    "./plot/parse": {
-      "types": "./src/plot/parse.d.ts",
-      "import": "./src/plot/parse.ts",
-      "require": "./src/plot/parse.ts"
-    },
-    "./plot/plot": {
-      "types": "./src/plot/plot.d.ts",
-      "import": "./src/plot/plot.ts",
-      "require": "./src/plot/plot.ts"
-    },
-    "./plot/shape/arrow": {
-      "types": "./src/plot/shape/arrow.d.ts",
-      "import": "./src/plot/shape/arrow.ts",
-      "require": "./src/plot/shape/arrow.ts"
-    },
-    "./plot/shape/axis": {
-      "types": "./src/plot/shape/axis.d.ts",
-      "import": "./src/plot/shape/axis.ts",
-      "require": "./src/plot/shape/axis.ts"
-    },
-    "./plot/shape/grid": {
-      "types": "./src/plot/shape/grid.d.ts",
-      "import": "./src/plot/shape/grid.ts",
-      "require": "./src/plot/shape/grid.ts"
-    },
-    "./plot/shape/label": {
-      "types": "./src/plot/shape/label.d.ts",
-      "import": "./src/plot/shape/label.ts",
-      "require": "./src/plot/shape/label.ts"
-    },
-    "./plot/shape/line": {
-      "types": "./src/plot/shape/line.d.ts",
-      "import": "./src/plot/shape/line.ts",
-      "require": "./src/plot/shape/line.ts"
-    },
-    "./plot/shape/point": {
-      "types": "./src/plot/shape/point.d.ts",
-      "import": "./src/plot/shape/point.ts",
-      "require": "./src/plot/shape/point.ts"
-    },
-    "./plot/shape/surface": {
-      "types": "./src/plot/shape/surface.d.ts",
-      "import": "./src/plot/shape/surface.ts",
-      "require": "./src/plot/shape/surface.ts"
-    },
-    "./plot/shape/tick": {
-      "types": "./src/plot/shape/tick.d.ts",
-      "import": "./src/plot/shape/tick.ts",
-      "require": "./src/plot/shape/tick.ts"
-    },
-    "./plot/source/sampled": {
-      "types": "./src/plot/source/sampled.d.ts",
-      "import": "./src/plot/source/sampled.ts",
-      "require": "./src/plot/source/sampled.ts"
-    },
-    "./plot/source/scale": {
-      "types": "./src/plot/source/scale.d.ts",
-      "import": "./src/plot/source/scale.ts",
-      "require": "./src/plot/source/scale.ts"
-    },
-    "./plot/source/transpose": {
-      "types": "./src/plot/source/transpose.d.ts",
-      "import": "./src/plot/source/transpose.ts",
-      "require": "./src/plot/source/transpose.ts"
-    },
-    "./plot/traits": {
-      "types": "./src/plot/traits.d.ts",
-      "import": "./src/plot/traits.ts",
-      "require": "./src/plot/traits.ts"
-    },
-    "./plot/types": {
-      "types": "./src/plot/types.d.ts",
-      "import": "./src/plot/types.ts",
-      "require": "./src/plot/types.ts"
-    },
-    "./plot/util/axis": {
-      "types": "./src/plot/util/axis.d.ts",
-      "import": "./src/plot/util/axis.ts",
-      "require": "./src/plot/util/axis.ts"
-    },
-    "./plot/util/compose": {
-      "types": "./src/plot/util/compose.d.ts",
-      "import": "./src/plot/util/compose.ts",
-      "require": "./src/plot/util/compose.ts"
-    },
-    "./plot/util/domain": {
-      "types": "./src/plot/util/domain.d.ts",
-      "import": "./src/plot/util/domain.ts",
-      "require": "./src/plot/util/domain.ts"
-    },
-    "./plot/util/format": {
-      "types": "./src/plot/util/format.d.ts",
-      "import": "./src/plot/util/format.ts",
-      "require": "./src/plot/util/format.ts"
-    },
-    "./plot/util/swizzle": {
-      "types": "./src/plot/util/swizzle.d.ts",
-      "import": "./src/plot/util/swizzle.ts",
-      "require": "./src/plot/util/swizzle.ts"
-    },
-    "./plot/view/cartesian": {
-      "types": "./src/plot/view/cartesian.d.ts",
-      "import": "./src/plot/view/cartesian.ts",
-      "require": "./src/plot/view/cartesian.ts"
-    },
-    "./plot/view/embedded": {
-      "types": "./src/plot/view/embedded.d.ts",
-      "import": "./src/plot/view/embedded.ts",
-      "require": "./src/plot/view/embedded.ts"
-    },
-    "./plot/view/polar": {
-      "types": "./src/plot/view/polar.d.ts",
-      "import": "./src/plot/view/polar.ts",
-      "require": "./src/plot/view/polar.ts"
-    },
-    "./plot/view/spherical": {
-      "types": "./src/plot/view/spherical.d.ts",
-      "import": "./src/plot/view/spherical.ts",
-      "require": "./src/plot/view/spherical.ts"
-    },
-    "./plot/view/stereographic": {
-      "types": "./src/plot/view/stereographic.d.ts",
-      "import": "./src/plot/view/stereographic.ts",
-      "require": "./src/plot/view/stereographic.ts"
     },
     "./primitives/mesh/arrow": {
       "types": "./src/primitives/mesh/arrow.d.ts",
@@ -542,11 +337,6 @@
       "import": "./src/primitives/virtual.ts",
       "require": "./src/primitives/virtual.ts"
     },
-    "./providers/data-provider": {
-      "types": "./src/providers/data-provider.d.ts",
-      "import": "./src/providers/data-provider.ts",
-      "require": "./src/providers/data-provider.ts"
-    },
     "./providers/debug-provider": {
       "types": "./src/providers/debug-provider.d.ts",
       "import": "./src/providers/debug-provider.ts",
@@ -591,11 +381,6 @@
       "types": "./src/providers/material-provider.d.ts",
       "import": "./src/providers/material-provider.ts",
       "require": "./src/providers/material-provider.ts"
-    },
-    "./providers/range-provider": {
-      "types": "./src/providers/range-provider.d.ts",
-      "import": "./src/providers/range-provider.ts",
-      "require": "./src/providers/range-provider.ts"
     },
     "./providers/render-provider": {
       "types": "./src/providers/render-provider.d.ts",
@@ -686,6 +471,11 @@
       "types": "./src/shader/texture-shader.d.ts",
       "import": "./src/shader/texture-shader.ts",
       "require": "./src/shader/texture-shader.ts"
+    },
+    "./text/cursor": {
+      "types": "./src/text/cursor.d.ts",
+      "import": "./src/text/cursor.ts",
+      "require": "./src/text/cursor.ts"
     },
     "./text/debug-atlas": {
       "types": "./src/text/debug-atlas.d.ts",

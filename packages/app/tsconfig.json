@@ -7,6 +7,8 @@
     { "path": "../wgsl" },
     { "path": "../shader" },
     { "path": "../workbench" },
+    { "path": "../layout" },
+    { "path": "../plot" },
     { "path": "../gltf" },
     { "path": "../inspect" }
   ],

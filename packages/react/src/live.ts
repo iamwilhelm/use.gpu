@@ -7,6 +7,11 @@ export type LiveProps = {
   children: LiveElement<any>,
 };
 
+/**
+ * Naked portal from React to Live.
+ *
+ * @category React Component
+ */
 export const Live: React.FC<LiveProps> = ({children}) => {
   const fiber = useRef<LiveFiber<any>>();
 

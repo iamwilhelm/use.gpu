@@ -1,18 +1,18 @@
 # @use-gpu/wgsl-loader
 
-```
+```sh
 npm install --save @use-gpu/wgsl-loader
 ```
 
-```
+```sh
 yarn add @use-gpu/wgsl-loader
 ```
 
-## WGSL loader for webpack / node / rollup
+# Loader - WGSL (webpack / node / rollup)
 
 This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
 
-### Usage
+## Usage
 
 #### Node.js
 
@@ -47,10 +47,6 @@ For rollup, import the plugin as:
 
 ```js
 import rollupWGSL from "@use-gpu/wgsl-loader/rollup";
-
-  // ...
-  plugins: [rollupWGSL()]
-  // ...
 ```
 
 #### Import
@@ -70,11 +66,11 @@ import { symbol } from './shader.wgsl';
 
 You will get the same `ParsedBundle`, but with `entry` set to the imported symbol name.
 
-### Typescript
+## Typescript
 
 To allow shader imports to type check, create a `wgsl-files.d.ts` with:
 
-```
+```ts
 declare module '*.wgsl' {
   type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -84,11 +80,15 @@ declare module '*.wgsl' {
 
 To make named imports `import { x } from ...` pass the type checker, you need to generate a custom .d.ts:
 
-```
+```sh
 npm run wgsl-tsgen [--base-dir dir] [file or *.wgsl]
 ```
 
-```
+```sh
 yarn run wgsl-tsgen [--base-dir dir] [file or *.wgsl]
 ```
+
+## Colofon
+
+Made by [Steven Wittens](https://acko.net). Part of `@use-gpu`.
 

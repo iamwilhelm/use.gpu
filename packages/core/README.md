@@ -1,14 +1,14 @@
 # @use-gpu/core
 
-```
+```sh
 npm install --save @use-gpu/core
 ```
 
-```
+```sh
 yarn add @use-gpu/core
 ```
 
-# Use.GPU Core
+# Use.GPU - Core
 
 This package contains various (non-reactive) helper functions for driving WebGPU.
 
@@ -22,4 +22,8 @@ This package contains various (non-reactive) helper functions for driving WebGPU
 - MIP resizing
 - Storage and uniforms
 - Texture atlas
+
+## Colofon
+
+Made by [Steven Wittens](https://acko.net). Part of `@use-gpu`.
 

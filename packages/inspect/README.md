@@ -1,14 +1,14 @@
 # @use-gpu/inspect
 
-```
+```sh
 npm install --save @use-gpu/inspect
 ```
 
-```
+```sh
 yarn add @use-gpu/inspect
 ```
 
-## Use.GPU Live Inspector
+# Use.GPU - Live Inspector
 
 Wrap your app's contents in `<UseInspect>`:
 
@@ -46,3 +46,8 @@ export const App: LC = () => {
   );
 }
 ```
+
+## Colofon
+
+Made by [Steven Wittens](https://acko.net). Part of `@use-gpu`.
+

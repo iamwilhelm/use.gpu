@@ -1,6 +1,6 @@
 module.exports = {
-  "categorizeByGroup": true,
-  "categoryOrder": ["Live Components", "React Components", "Component", "Components", "Traits", "Providers", "*"],
+  "categorizeByGroup": false,
+  "categoryOrder": ["React Components", "Live Components", "Component", "Components", "Traits", "Providers", "*"],
   "entryPoints": [
     "./packages/core",
     "./packages/gltf",

@@ -11,7 +11,7 @@ export type LiveCanvasProps = {
 /**
  * Render <canvas> for Live. Acts as a portal from React to Live.
  *
- * @category React Component
+ * @category React Components
  */
 export const LiveCanvas: React.FC<LiveCanvasProps> = ({style, render}) => {
   const el = useRef<HTMLCanvasElement>(null);

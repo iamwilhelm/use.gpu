@@ -1,52 +1,52 @@
 # @use-gpu/live
 
-```
+```sh
 npm install --save @use-gpu/live
 ```
 
-```
+```sh
 yarn add @use-gpu/live
 ```
 
 # Live - Reactive Effect Run-time
 
-Live is a reimplementation of the kernel of the React run-time, i.e. the &lt;Component> tree and the hook system.
+Live is a reimplementation of the React `<Component>` tree and the hook system. It allows you to use popular reactive patterns to write code beyond UI widgets.
+
+It's built to serve as the reactive core of Use.GPU, but there is nothing GPU- or graphics-specific about it.
 
 Unlike React, Live does not produce an output DOM. Components can only render other components, or yield values back to parents.
 
-Live is built as the reactive core of Use.GPU, but there is nothing GPU- or graphics-specific about it.
-
-Live is designed to play nice with real React, but is a clean reimplementation from scratch.
+Live is designed to play nice with real React, but shares no code with it.
 
 Non-React extensions:
 - Continuations - Parents run more code after children have rendered
 - Yeet-Reduce - Parents gather values from a tree of children
 - Context Consumers - Context Providers in reverse
+- Morph - Parents can change Component type without unmounting all children
+- Detach - Parent can render children independently, outside main render flow
 
 ## Usage Cheat Sheet
 
 These examples assume you are familiar with React 17-style functional components.
 
 ```tsx
-// This allows <JSX> to be used while pretending to be React
+// This allows Live <JSX> to be used, by pretending to be React.
+// You can't mix React and Live <JSX> in the same file.
 import React from '@use-gpu/live/jsx';
 
 // Main render entry point
 import { render } from '@use-gpu/live';
 import { App } from './app';
 
-// e.g. onLoad
-() => {
-  render(<App />);
-}
+// e.g. on DOM load
+render(<App />);
 ```
 
-Here, `App` is a `LiveComponent` (`LC`), which is like a React `FunctionComponent` (`FC`), with the same hooks API:
+Here, `App` is a `LiveComponent` (`LC`). This is just like a React `FunctionComponent` (`FC`), with the same hooks API:
 
 ```tsx
 import React from '@use-gpu/live/jsx';
-import { LC } from '@use-gpu/live/types';
-import { useState } from '@use-gpu/live';
+import { LC, useState } from '@use-gpu/live';
 
 import { OtherComponent } from './other-component';
 
@@ -69,7 +69,7 @@ export const OtherComponent: LC<Props> = (props: Props) => {
 };
 ```
 
-There is also a `children` prop, exactly like in React, as well as `key` for arrays.
+There is also a `children` prop, as well as `key` for items in arrays.
 
 ## Hooks
 
@@ -79,8 +79,8 @@ There is also a `children` prop, exactly like in React, as well as `key` for arr
 - `useOne` is shorthand for a `useMemo` with only 0-1 dependency (not an array)
 - `useRef` doesn't exist, use `useOne(() => ({current: ref}))`
 
-- `useResource` is a sync `useEffect` + `useMemo`
 - `useEffect` and `useLayoutEffect` don't exist, use `useResource`
+- `useResource` is a sync `useEffect` + `useMemo`
 
 ```tsx
   const t = useResource((dispose) => {
@@ -170,7 +170,7 @@ Whenever the yielded `values` change, the continuation is re-run.
 
 Live also has a native non-JSX syntax, which is ergonomic in use, unlike `React.createElement`.
 
-This is useful e.g. when mixing React code with Live code in the same file.
+This is useful e.g. when mixing React code with Live code in the same file, while using JSX for React.
 
 ```tsx
 import { use, wrap, yeet, gather } from '@use-gpu/live';
@@ -211,3 +211,8 @@ In native syntax, live components are not limited to a single `props` argument, 
 - The JSX API does not cover 100% of the Native API yet
 - `@use-gpu/react` contains extra React interoperability components
 - `@use-gpu/inspect` is an interactive inspector/debugger for Live, built using React
+
+## Colofon
+
+Made by [Steven Wittens](https://acko.net). Part of `@use-gpu`.
+

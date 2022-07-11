@@ -21,5 +21,6 @@
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
     "build": "NPM_PACKAGE=core ../../scripts/build-mjs-umd.sh"
-  }
+  },
+  "keywords": ["use-gpu", "use-gpu-library"]
 }

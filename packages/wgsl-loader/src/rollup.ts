@@ -1,37 +1,32 @@
-import { resolve, dirname } from 'path';
-import { statSync, readFileSync } from 'fs';
+import { createFilter } from 'rollup-pluginutils';
 import { transpileWGSL } from './transpile';
+import MagicString from 'magic-string';
 
-type Opts = Record<string, any>;
+export const wgsl = (userOptions = {}) => {
+  const options = Object.assign(
+      {
+          include: [
+              '**/*.wgsl'
+          ]
+      },
+      userOptions
+  );
 
-const rollupWGSL = () => {
-  return {
-    name: 'wgsl-loader',
-    enforce: 'pre',
+  const filter = createFilter(options.include, options.exclude);
 
-    resolveId: function (source: string, importer: string) {
-      if (source.endsWith('.wgsl')) {
-        if (source[0] === '.') return resolve(dirname(importer), source);
-        
-        const npm = 'node_modules/' + source;
-        try {
-          statSync(npm);
-          return npm;
-        } catch (e) {};
+	return {
+		name: '@use-gpu/wgsl-loader',
 
-        return source;
-      }
-    },
+		transform(source, id) {
+			if (!filter(id)) return;
 
-    load: function (fullPath: string) {
-      if (fullPath.endsWith('.wgsl')) {
-        fullPath = fullPath.replace(/^\/@fs\//, '');
-        const code = readFileSync(fullPath, { encoding: "utf8" });
-        return { code: transpileWGSL(code, fullPath, true), map: null };
-      }
-    },
-  };
+			const code = transpileWGSL(code, source, true);
+			const magicString = new MagicString(code);
+
+			let result = { code: magicString.toString() };
+      return { code: result, map: { mappings: '' }};
+		}
+	};
 }
 
-export { rollupWGSL };
-export default rollupWGSL;
+export default wgsl;

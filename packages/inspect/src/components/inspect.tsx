@@ -176,7 +176,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     }
   };
 
-  return (<>
+  return (<div className="LiveInspect">
     {open ? (
       <PingProvider fiber={fiber}>  
         <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
@@ -200,5 +200,5 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     <InspectToggle onClick={toggleOpen}>
       <Button>{open ? ICON("close") : ICON("bug_report")}</Button>
     </InspectToggle>
-  </>);
+  </div>);
 }

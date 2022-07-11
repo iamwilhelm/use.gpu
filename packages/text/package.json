@@ -13,11 +13,15 @@
   },
   "private": true,
   "scripts": {
-    "build": "NPM_PACKAGE=text ../../scripts/build-mjs-umd.sh",
+    "build": "yarn run build:wasm && yarn run build:js && yarn run build:pkg",
+    "build:js": "NPM_PACKAGE=text ../../scripts/build-mjs-umd.sh",
+    "build:wasm": "rm -rf pkg; cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/text/pkg/",
+    "build:pkg": "cp -r pkg ../../build/packages/text/",
     "test": "jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch"
-  }
+  },
+  "keywords": ["use-gpu", "use-gpu-library"]
 }

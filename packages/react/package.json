@@ -20,5 +20,6 @@
     "coveragePathIgnorePatterns": [
       "debug.ts"
     ]
-  }
+  },
+  "keywords": ["use-gpu", "use-gpu-live"]
 }

@@ -1,13 +1,17 @@
 # @use-gpu/plot
 
-```
+```sh
 npm install --save @use-gpu/plot
 ```
 
-```
+```sh
 yarn add @use-gpu/plot
 ```
 
-# Use.GPU Plot - Graphing and Transforms
+# Use.GPU - Graphing and Transforms
 
+
+## Colofon
+
+Made by [Steven Wittens](https://acko.net). Part of `@use-gpu`.
 

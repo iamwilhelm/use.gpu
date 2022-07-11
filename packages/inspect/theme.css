@@ -1,75 +1,65 @@
-* {
+.LiveInspect * {
   box-sizing: border-box;
 }
 
-html {
-  --background: #000;
+.LiveInspect {
+  --LiveInspect-background: #000;
 
-  --backgroundEmpty: #222;
-  --backgroundInactive: #444;
-  --backgroundHover: #555;
-  --backgroundActive: #666;
+  --LiveInspect-backgroundEmpty: #222;
+  --LiveInspect-backgroundInactive: #444;
+  --LiveInspect-backgroundHover: #555;
+  --LiveInspect-backgroundActive: #666;
 
-  --trackBackground: #666;
-  --trackActive: #aaa;
+  --LiveInspect-trackBackground: #666;
+  --LiveInspect-trackActive: #aaa;
 
-  --thumbBackground: #999;
-  --thumbHover: #aaa;
-  --thumbActive: #bbb;
+  --LiveInspect-thumbBackground: #999;
+  --LiveInspect-thumbHover: #aaa;
+  --LiveInspect-thumbActive: #bbb;
 
-  --focusShadow: rgba(0, 0, 0, .25);
-  --borderThin: #444;
+  --LiveInspect-focusShadow: rgba(0, 0, 0, .25);
+  --LiveInspect-borderThin: #444;
 
-  --shim: rgba(0, 0, 0, 0.85);
-  --shimGray: rgba(255, 255, 255, 0.1);
+  --LiveInspect-shim: rgba(0, 0, 0, 0.85);
+  --LiveInspect-shimGray: rgba(255, 255, 255, 0.1);
 
-  --colorLinkText: rgba(190, 210, 255, 1);
+  --LiveInspect-colorLinkText: rgba(190, 210, 255, 1);
 
-  --colorTextMuted: rgba(128, 128, 128, 1);
-  --colorTextSemi: rgba(255, 255, 255, .65);
-  --colorText: #ddd;
-  --colorTextHover: #eee;
-  --colorTextActive: #fff;
-  --colorTextOn: rgba(70, 180, 220, 1.0);
+  --LiveInspect-colorTextMuted: rgba(128, 128, 128, 1);
+  --LiveInspect-colorTextSemi: rgba(255, 255, 255, .65);
+  --LiveInspect-colorText: #ddd;
+  --LiveInspect-colorTextHover: #eee;
+  --LiveInspect-colorTextActive: #fff;
+  --LiveInspect-colorTextOn: rgba(70, 180, 220, 1.0);
 
-  --colorTextLevel1: rgba(255, 255, 255, 1.0);
-  --colorTextLevel2: rgba(255, 255, 255, 0.93);
-  --colorTextLevel3: rgba(255, 255, 255, 0.88);
-  --colorTextLevel4: rgba(255, 255, 255, 0.82);
-  --colorTextLevel5: rgba(255, 255, 255, 0.76);
-  --colorTextLevel6: rgba(255, 255, 255, 0.71);
-  --colorTextLevel7: rgba(255, 255, 255, 0.63);
-  --colorTextLevel8: rgba(255, 255, 255, 0.54);
-  --colorTextLevel9: rgba(255, 255, 255, 0.43);
-  --colorTextLevel10: rgba(255, 255, 255, 0.31);
+  --LiveInspect-colorTextLevel1: rgba(255, 255, 255, 1.0);
+  --LiveInspect-colorTextLevel2: rgba(255, 255, 255, 0.93);
+  --LiveInspect-colorTextLevel3: rgba(255, 255, 255, 0.88);
+  --LiveInspect-colorTextLevel4: rgba(255, 255, 255, 0.82);
+  --LiveInspect-colorTextLevel5: rgba(255, 255, 255, 0.76);
+  --LiveInspect-colorTextLevel6: rgba(255, 255, 255, 0.71);
+  --LiveInspect-colorTextLevel7: rgba(255, 255, 255, 0.63);
+  --LiveInspect-colorTextLevel8: rgba(255, 255, 255, 0.54);
+  --LiveInspect-colorTextLevel9: rgba(255, 255, 255, 0.43);
+  --LiveInspect-colorTextLevel10: rgba(255, 255, 255, 0.31);
 
-  /*
-  --colorTextLevel1: rgba(255, 255, 255, 1);
-  --colorTextLevel2: rgba(239, 239, 239, 1);
-  --colorTextLevel3: rgba(226, 226, 226, 1);
-  --colorTextLevel4: rgba(211, 211, 211, 1);
-  --colorTextLevel5: rgba(196, 196, 196, 1);
-  --colorTextLevel6: rgba(181, 181, 181, 1);
-  --colorTextLevel7: rgba(160, 160, 160, 1);
-  --colorTextLevel8: rgba(137, 137, 137, 1);
-  --colorTextLevel9: rgba(112, 112, 112, 1);
-  --colorTextLevel10: rgba(80, 80, 80, 1);
-  */
-}
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
 
-html > body {
   font: 14px/20px Lato, sans-serif;
-  background: var(--background);
-  color: var(--colorText);
+  color: var(--LiveInspect-colorText);
 }
 
-div[role="tablist"] {
+.LiveInspect div[role="tablist"] {
   height: 40px;
-  border-bottom: 2px solid var(--backgroundInactive);
+  border-bottom: 2px solid var(--LiveInspect-backgroundInactive);
   margin-bottom: 10px;
 }
 
-button[role="tab"] {
+.LiveInspect button[role="tab"] {
   background: none;
   font: inherit;
   color: inherit;
@@ -80,21 +70,21 @@ button[role="tab"] {
   margin-bottom: -2px;
   border-bottom: 2px solid transparent;
 }
-button[role="tab"]:hover {
-  border-bottom: 2px solid var(--backgroundHover);  
+.LiveInspect button[role="tab"]:hover {
+  border-bottom: 2px solid var(--LiveInspect-backgroundHover);  
 }
-button[role="tab"][data-state="active"] {
+.LiveInspect button[role="tab"][data-state="active"] {
   font-weight: bold;
-  color: var(--colorTextActive);
-  border-bottom: 2px solid var(--backgroundActive);  
+  color: var(--LiveInspect-colorTextActive);
+  border-bottom: 2px solid var(--LiveInspect-backgroundActive);  
 }
 
-html > body ::-webkit-scrollbar-track {
+html > body .LiveInspect ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, .1);
   border-radius: 0;
 }
 
-html > body ::-webkit-scrollbar-thumb {
+html > body .LiveInspect ::-webkit-scrollbar-thumb {
   cursor: pointer;
   border-radius: 5px;
   background: rgba(128, 128, 128, .4);
@@ -102,17 +92,17 @@ html > body ::-webkit-scrollbar-thumb {
   transition: background .2s ease;
 }
 
-html > body ::-webkit-scrollbar-thumb:hover {
+html > body .LiveInspect ::-webkit-scrollbar-thumb:hover {
   background: rgba(128, 128, 128, .6);
 }
 
-html > body ::-webkit-scrollbar {
+html > body .LiveInspect ::-webkit-scrollbar {
   -webkit-appearance: none;
   width: 6px;
   height: 6px;
 }
 
-.cover-parent {
+.LiveInspect .cover-parent {
   position: absolute;
   left: 0;
   top: 0;
@@ -120,14 +110,14 @@ html > body ::-webkit-scrollbar {
   bottom: 0;
 }
 
-label {
+.LiveInspect label {
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
 }
 
-button.round {
+.LiveInspect button.round {
   border-radius: 100%;
   width: 32px;
   height: 32px;
@@ -136,10 +126,10 @@ button.round {
   border: 0;
   color: #fff;
 }
-button.round:hover {
+.LiveInspect button.round:hover {
   background: #aaa;
 } 
-button.round .m-icon {
+.LiveInspect button.round .m-icon {
   vertical-align: middle;
 }
 
@@ -161,53 +151,53 @@ button.round .m-icon {
   100% { background: rgba(0, 0, 0, 0.0); }
 }
 
-div.fiber-tree-label {
+.LiveInspect div.fiber-tree-label {
   position: relative;
   z-Index: 1;
   
   transition: 0.25s ease-in-out color;
 }
 
-div.fiber-tree-label.depth--1 { color: var(--colorTextLevel8); }
-div.fiber-tree-label.depth-0 { color: var(--colorTextLevel1); }
-div.fiber-tree-label.depth-1 { color: var(--colorTextLevel3); }
-div.fiber-tree-label.depth-2 { color: var(--colorTextLevel5); }
-div.fiber-tree-label.depth-3 { color: var(--colorTextLevel7); }
-div.fiber-tree-label.depth-4 { color: var(--colorTextLevel8); }
+.LiveInspect div.fiber-tree-label.depth--1 { color: var(--LiveInspect-colorTextLevel8); }
+.LiveInspect div.fiber-tree-label.depth-0 { color: var(--LiveInspect-colorTextLevel1); }
+.LiveInspect div.fiber-tree-label.depth-1 { color: var(--LiveInspect-colorTextLevel3); }
+.LiveInspect div.fiber-tree-label.depth-2 { color: var(--LiveInspect-colorTextLevel5); }
+.LiveInspect div.fiber-tree-label.depth-3 { color: var(--LiveInspect-colorTextLevel7); }
+.LiveInspect div.fiber-tree-label.depth-4 { color: var(--LiveInspect-colorTextLevel8); }
 
-div.fiber-tree-label.builtin.depth--1 { color: var(--colorTextLevel10); }
-div.fiber-tree-label.builtin.depth-0 { color: var(--colorTextLevel8); }
-div.fiber-tree-label.builtin.depth-1 { color: var(--colorTextLevel9); }
-div.fiber-tree-label.builtin.depth-2 { color: var(--colorTextLevel10); }
-div.fiber-tree-label.builtin.depth-3 { color: var(--colorTextLevel10); }
-div.fiber-tree-label.builtin.depth-4 { color: var(--colorTextLevel10); }
+.LiveInspect div.fiber-tree-label.builtin.depth--1 { color: var(--LiveInspect-colorTextLevel10); }
+.LiveInspect div.fiber-tree-label.builtin.depth-0 { color: var(--LiveInspect-colorTextLevel8); }
+.LiveInspect div.fiber-tree-label.builtin.depth-1 { color: var(--LiveInspect-colorTextLevel9); }
+.LiveInspect div.fiber-tree-label.builtin.depth-2 { color: var(--LiveInspect-colorTextLevel10); }
+.LiveInspect div.fiber-tree-label.builtin.depth-3 { color: var(--LiveInspect-colorTextLevel10); }
+.LiveInspect div.fiber-tree-label.builtin.depth-4 { color: var(--LiveInspect-colorTextLevel10); }
 
-div.fiber-tree-label.selected.selected,
-div.fiber-tree-label.hovered.hovered,
-div.fiber-tree-label.by.by,
-div.fiber-tree-label.parents.parents,
-div.fiber-tree-label.depends.depends,
-div.fiber-tree-label.precedes.precedes { color: var(--colorTextLevel1); }
+.LiveInspect div.fiber-tree-label.selected.selected,
+.LiveInspect div.fiber-tree-label.hovered.hovered,
+.LiveInspect div.fiber-tree-label.by.by,
+.LiveInspect div.fiber-tree-label.parents.parents,
+.LiveInspect div.fiber-tree-label.depends.depends,
+.LiveInspect div.fiber-tree-label.precedes.precedes { color: var(--LiveInspect-colorTextLevel1); }
 
-div.fiber-tree-label.builtin.parents, div.fiber-tree-label.builtin.precedes {
-  color: var(--colorTextLevel3);
+.LiveInspect div.fiber-tree-label.builtin.parents, div.fiber-tree-label.builtin.precedes {
+  color: var(--LiveInspect-colorTextLevel3);
   transition: none;
 }
   
-div.fiber-tree-node {
+.LiveInspect div.fiber-tree-node {
   white-space: nowrap;
   margin: -2px -5px;
   padding: 2px 5px;
   position: relative;
 }
 
-div.fiber-tree-node.mounted,
-div.fiber-tree-node.pinged {
+.LiveInspect div.fiber-tree-node.mounted,
+.LiveInspect div.fiber-tree-node.pinged {
   background: rgba(0, 0, 0, 1.0);
 }
 
-div.fiber-tree-node.mounted.cold,
-div.fiber-tree-node.pinged.cold {
+.LiveInspect div.fiber-tree-node.mounted.cold,
+.LiveInspect div.fiber-tree-node.pinged.cold {
   background: rgba(0, 0, 0, 0.0);
 
   animation-name: shadeAnimation;
@@ -215,73 +205,73 @@ div.fiber-tree-node.pinged.cold {
   animation-iteration-count: 1;
 }
 
-div.fiber-tree-node.selected {
+.LiveInspect div.fiber-tree-node.selected {
   z-index: 2;
 }
 
-div.fiber-tree-node.hovered {
+.LiveInspect div.fiber-tree-node.hovered {
   z-index: 3;
 }
   
-div.fiber-tree-node.builtin {
-  color: var(--colorTextMuted);
+.LiveInspect div.fiber-tree-node.builtin {
+  color: var(--LiveInspect-colorTextMuted);
 }
 
 
-div.fiber-tree-highlight.selected {
+.LiveInspect div.fiber-tree-highlight.selected {
   background: rgba(50, 130, 200, 1.0);
 }
-div.fiber-tree-highlight.hovered {
+.LiveInspect div.fiber-tree-highlight.hovered {
   background: rgba(70, 180, 220, 1.0);
 }
-div.fiber-tree-highlight.by {
+.LiveInspect div.fiber-tree-highlight.by {
   background: rgba(30, 120, 180, 1.0);
 }
-div.fiber-tree-highlight.parents {
+.LiveInspect div.fiber-tree-highlight.parents {
   background: rgba(30, 120, 180, 1.0);
 }
-div.fiber-tree-highlight.depends {
+.LiveInspect div.fiber-tree-highlight.depends {
   background: rgba(75, 70, 200, 1.0);
 }
-div.fiber-tree-highlight.precedes {
+.LiveInspect div.fiber-tree-highlight.precedes {
   background: rgba(75, 70, 200, 1.0);
 }
-div.fiber-tree-highlight.staticMount {
+.LiveInspect div.fiber-tree-highlight.staticMount {
   background: rgba(120, 120, 120, 1.0);
 }
-div.fiber-tree-highlight.staticPing {
+.LiveInspect div.fiber-tree-highlight.staticPing {
   background: rgba(10, 170, 85, 1.0);
 }
   
-div.fiber-tree-ping {
+.LiveInspect div.fiber-tree-ping {
   transition: 0.25s ease-in-out opacity;
 }
-div.fiber-tree-ping.hovering {
+.LiveInspect div.fiber-tree-ping.hovering {
   opacity: 0.65;
 }
-div.fiber-tree-ping.cold {
+.LiveInspect div.fiber-tree-ping.cold {
   animation-duration: 1.0s;
   animation-iteration-count: 1;
 }
 
-div.fiber-tree-ping.mounted {
+.LiveInspect div.fiber-tree-ping.mounted {
   background: rgba(120, 120, 120, 0.9);
 }
     
-div.fiber-tree-ping.mounted.cold {
+.LiveInspect div.fiber-tree-ping.mounted.cold {
   background: rgba(120, 120, 120, 0.0);
   animation-name: mountAnimation;
 }
 
-div.fiber-tree-ping.pinged {
+.LiveInspect div.fiber-tree-ping.pinged {
   background: rgba(10, 170, 85, 0.9);
 }
 
-div.fiber-tree-ping.pinged.cold {
+.LiveInspect div.fiber-tree-ping.pinged.cold {
   background: rgba(10, 170, 85, 0.0);
   animation-name: pingAnimation;
 }
 
-a, a:hover, a:visited, a:active {
-  color: var(--colorLinkText);
+.LiveInspect a, .LiveInspect a:hover, .LiveInspect a:visited, .LiveInspect a:active {
+  color: var(--LiveInspect-colorLinkText);
 }

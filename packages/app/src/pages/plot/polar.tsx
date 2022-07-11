@@ -9,7 +9,7 @@ import {
   ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
-  Animation,
+  Animate,
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
@@ -34,11 +34,11 @@ export const PlotPolarPage: LC = () => {
       <Draw>
         <Pass>
           <Plot>
-            <Animation
+            <Animate
               loop
               mirror
               delay={0}
-              frames={[
+              keyframes={[
                 [0, 0],
                 [1, 0],
                 [10, 1],
@@ -126,7 +126,7 @@ export const PlotPolarPage: LC = () => {
                   />
                 </Sampled>
               </Polar>
-            </Animation>
+            </Animate>
           </Plot>
         </Pass>
       </Draw>

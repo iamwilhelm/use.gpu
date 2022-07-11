@@ -1,10 +1,10 @@
 # @use-gpu/traits
 
-```
+```sh
 npm install --save @use-gpu/text
 ```
 
-```
+```sh
 yarn add @use-gpu/text
 ```
 
@@ -57,7 +57,7 @@ type StyleTrait = {
 
 #### Component
 
-```
+```sh
 import { StyleTrait, useStyleTrait } from './traits';
 
 type ComponentProps = Partial<StyleTrait> * {
@@ -93,3 +93,9 @@ const STYLE_DEFAULTS = {
 
 export const useStyleTrait = makeUseTrait<ScaleTrait>(STYLE_TRAIT, STYLE_DEFAULTS);
 ```
+
+
+## Colofon
+
+Made by [Steven Wittens](https://acko.net). Part of `@use-gpu`.
+

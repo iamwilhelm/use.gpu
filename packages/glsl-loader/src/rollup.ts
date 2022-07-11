@@ -1,31 +1,32 @@
-import { resolve, dirname } from 'path';
-import { readFileSync } from 'fs';
+import { createFilter } from 'rollup-pluginutils';
 import { transpileGLSL } from './transpile';
+import MagicString from 'magic-string';
 
-type Opts = Record<string, any>;
+export const glsl = (userOptions = {}) => {
+  const options = Object.assign(
+      {
+          include: [
+              '**/*.glsl'
+          ]
+      },
+      userOptions
+  );
 
-const rollupGLSL = () => {
-  return {
-    name: 'glsl-loader',
-    enforce: 'pre',
+  const filter = createFilter(options.include, options.exclude);
 
-    resolveId: function (source: string, importer: string) {
-      console.log('resolveId', {source, importer})
-      if (source.endsWith('.glsl')) {
-        if (source[0] === '.') return resolve(dirname(importer), source);
-        return source;
-      }
-    },
+	return {
+		name: '@use-gpu/glsl-loader',
 
-    load: function (fullPath: string) {
-      console.log('load', {fullPath})
-      if (fullPath.endsWith('.glsl')) {
-        const code = readFileSync(fullPath, { encoding: "utf8" });
-        return { code: transpileGLSL(code, fullPath, true), map: null };
-      }
-    },
-  };
+		transform(source, id) {
+			if (!filter(id)) return;
+
+			const code = transpileGLSL(code, source, true);
+			const magicString = new MagicString(code);
+
+			let result = { code: magicString.toString() };
+      return { code: result, map: { mappings: '' }};
+		}
+	};
 }
 
-export { rollupGLSL };
-export default rollupGLSL;
+export default glsl;

@@ -29,7 +29,7 @@ export const StyledSlider = styled(SliderPrimitive.Root, {
 });
 
 const StyledTrack = styled(SliderPrimitive.Track, {
-  backgroundColor: 'var(--trackBackground)',
+  backgroundColor: 'var(--LiveInspect-trackBackground)',
   position: 'relative',
   flexGrow: 1,
   borderRadius: '5px',
@@ -40,7 +40,7 @@ const StyledTrack = styled(SliderPrimitive.Track, {
 
 const StyledRange = styled(SliderPrimitive.Range, {
   position: 'absolute',
-  backgroundColor: 'var(--trackFill)',
+  backgroundColor: 'var(--LiveInspect-trackFill)',
   borderRadius: '9999px',
   height: '100%',
 });
@@ -50,11 +50,11 @@ const StyledThumb = styled(SliderPrimitive.Thumb, {
   display: 'block',
   width: 20,
   height: 20,
-  backgroundColor: 'var(--thumbBackground)',
-  boxShadow: `0 2px 10px var(--focusShadow)`,
+  backgroundColor: 'var(--LiveInspect-thumbBackground)',
+  boxShadow: `0 2px 10px var(--LiveInspect-focusShadow)`,
   borderRadius: 10,
-  '&:hover': { backgroundColor: 'var(--thumbHover)'},
-  '&:focus': { boxShadow: `0 0 0 5px var(--focusShadow)` },
+  '&:hover': { backgroundColor: 'var(--LiveInspect-thumbHover)'},
+  '&:focus': { boxShadow: `0 0 0 5px var(--LiveInspect-focusShadow)` },
 });
 
 export const DetailSlider: React.FC<DetailProps> = (props: DetailProps) => {

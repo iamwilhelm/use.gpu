@@ -10,7 +10,7 @@ import {
   ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
-  Animation,
+  Animate,
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
@@ -46,11 +46,11 @@ export const PlotStereographicPage: LC = () => {
       <Draw>
         <Pass>
           <Plot>
-            <Animation
+            <Animate
               loop
               mirror
               delay={0}
-              frames={frames}
+              keyframes={frames}
               prop='bend'
             >
               <Stereographic
@@ -162,7 +162,7 @@ export const PlotStereographicPage: LC = () => {
 
                 </Spherical>
               </Stereographic>
-            </Animation>
+            </Animate>
           </Plot>
         </Pass>
       </Draw>

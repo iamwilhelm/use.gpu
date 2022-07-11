@@ -12,7 +12,7 @@ import {
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
   Lights, AmbientLight, DirectionalLight, PointLight,
-  Loop, Animation,
+  Loop, Animate,
 } from '@use-gpu/workbench';
 import { GLTFData, GLTFModel } from '@use-gpu/gltf';
 
@@ -28,10 +28,10 @@ export const GeometryGLTFPage: LC = () => {
           <Lights>
             <AmbientLight color={[1, 1, 1]} intensity={0.005} />
 
-            <Animation
+            <Animate
               loop
               delay={0}
-              frames={[
+              keyframes={[
                 [0, [30, 20, 10]],
                 [4, [20, 10, 40]],
                 [8, [10, 20, 20]],
@@ -40,12 +40,12 @@ export const GeometryGLTFPage: LC = () => {
               prop='position'
             >
               <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} size={40} />
-            </Animation>
+            </Animate>
 
-            <Animation
+            <Animate
               loop
               delay={0}
-              frames={[
+              keyframes={[
                 [0, [10, 20, 30]],
                 [3, [20, 30, 10]],
                 [6, [30, 10, 20]],
@@ -54,7 +54,7 @@ export const GeometryGLTFPage: LC = () => {
               prop='position'
             >
               <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
-            </Animation>
+            </Animate>
           
             <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
             <GLTFData

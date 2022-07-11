@@ -9,7 +9,7 @@ import {
   ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
-  Animation,
+  Animate,
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
@@ -26,11 +26,11 @@ export const PlotCartesianPage: LC = () => {
         <Cursor cursor="move" />
         <Pass>
           <Plot>
-            <Animation
+            <Animate
               loop
               mirror
               delay={0}
-              frames={[
+              keyframes={[
                 [0, [[-3, 0], [0, 1], [0, 3]]],
                 [10, [[0, 3], [0, 1], [0, 3]]],
               ]}
@@ -133,7 +133,7 @@ export const PlotCartesianPage: LC = () => {
                   </Transpose>
                 </Sampled>
               </Cartesian>
-            </Animation>
+            </Animate>
           </Plot>
         </Pass>
       </LinearRGB>

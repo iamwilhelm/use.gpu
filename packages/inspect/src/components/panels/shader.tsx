@@ -26,9 +26,9 @@ const StyledEditor = styled('div', {
 
 const StyledGutter = styled('div', {
   padding: '0 5px',
-  borderRight: '1px solid var(--borderThin)',
+  borderRight: '1px solid var(--LiveInspect-borderThin)',
   textAlign: 'right',
-  color: 'var(--colorTextMuted)',
+  color: 'var(--LiveInspect-colorTextMuted)',
   fontSize: '0.9em',
 });
 

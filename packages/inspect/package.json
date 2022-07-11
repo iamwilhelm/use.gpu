@@ -30,5 +30,6 @@
   "peerDependencies": {
     "react": "*",
     "react-dom": "*"
-  }
+  },
+  "keywords": ["use-gpu", "use-gpu-components"]
 }

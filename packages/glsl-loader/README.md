@@ -1,18 +1,18 @@
 # @use-gpu/glsl-loader
 
-```
+```sh
 npm install --save @use-gpu/glsl-loader
 ```
 
-```
+```sh
 yarn add @use-gpu/glsl-loader
 ```
 
-## GLSL loader for webpack / node / rollup
+# Loader - GLSL (webpack / node / rollup)
 
 This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
 
-### Usage
+## Usage
 
 #### Node.js
 
@@ -47,10 +47,6 @@ For rollup, import the plugin as:
 
 ```js
 import rollupGLSL from "@use-gpu/glsl-loader/rollup";
-
-  // ...
-  plugins: [rollupGLSL()]
-  // ...
 ```
 
 #### Import
@@ -70,11 +66,11 @@ import { symbol } from './shader.glsl';
 
 You will get the same `ParsedBundle`, but with `entry` set to the imported symbol name.
 
-### Typescript
+## Typescript
 
 To allow shader imports to type check, create a `glsl-files.d.ts` with:
 
-```
+```ts
 declare module '*.glsl' {
   type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
   const __module: ParsedBundle;
@@ -84,11 +80,15 @@ declare module '*.glsl' {
 
 To make named imports `import { x } from ...` pass the type checker, you need to generate a custom .d.ts:
 
-```
+```sh
 npm run glsl-tsgen [--base-dir dir] [file or *.glsl]
 ```
 
-```
+```sh
 yarn run glsl-tsgen [--base-dir dir] [file or *.glsl]
 ```
+
+## Colofon
+
+Made by [Steven Wittens](https://acko.net). Part of `@use-gpu`.
 

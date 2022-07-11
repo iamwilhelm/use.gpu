@@ -20,5 +20,6 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch"
-  }
+  },
+  "keywords": ["use-gpu", "use-gpu-components"]
 }

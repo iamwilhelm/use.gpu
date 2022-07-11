@@ -1,16 +1,16 @@
 # @use-gpu/shader
 
-```
+```sh
 npm install --save @use-gpu/shader
 ```
 
-```
+```sh
 yarn add @use-gpu/shader
 ```
 
-## WGSL / GLSL Linker and Tree Shaker
+# WGSL / GLSL Linker and Tree Shaker
 
-`@use-gpu/shader` is a Typescript library to link together **snippets of shader code**, while removing dead code, very quickly. It supports both WGSL and GLSL, but it will only link code within a single language.
+A Typescript library to link together **snippets of shader code**, while removing dead code, very quickly. It supports both WGSL and GLSL, but it will only link code within a single language.
 
 It enables two kinds of imports to be used:
 

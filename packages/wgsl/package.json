@@ -21,6 +21,7 @@
     "glob": "^7.2.0"
   },
   "types": "types/wgsl-files/index.d.ts",
+  "keywords": ["use-gpu", "use-gpu-library"],
   "exports": {
     ".": {
       "types": "./types/wgsl-files/index.d.ts",

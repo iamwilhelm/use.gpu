@@ -2,7 +2,7 @@
 
 This package hosts a demo app used to showcase and debug Use.GPU.
 
-To run it, **don't `yarn install` it**. Instead just run the following commands in the `use-gpu` repo '/' root:
+**To open it, run the following commands in the `use-gpu` repo '/' root:**
 
 ## Usage
 

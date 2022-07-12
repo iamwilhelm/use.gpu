@@ -31,5 +31,8 @@
     "react": "*",
     "react-dom": "*"
   },
-  "keywords": ["use-gpu", "use-gpu-components"]
+  "keywords": [
+    "use-gpu",
+    "use-gpu-components"
+  ]
 }

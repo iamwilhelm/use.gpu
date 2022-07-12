@@ -1,5 +1,8 @@
 {
   "extends": "./tsconfig.pkg.json",
+  "compilerOptions": {
+    "types": ["@webgpu/types", "jest", "node"]
+  },
   "references": [
     { "path": "./packages/state" },
     { "path": "./packages/glsl" },

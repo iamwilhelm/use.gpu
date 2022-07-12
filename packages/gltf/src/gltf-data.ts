@@ -18,7 +18,7 @@ const NO_SAMPLER: any = {};
 
 type GLTFStorageSource = StorageSource & { arrayBuffer: ArrayBuffer | null };
 
-type GLTFDataProps = {
+export type GLTFDataProps = {
   url?: string,
   data?: ArrayBuffer | string | Record<string, any>,
   base?: string,
@@ -26,7 +26,7 @@ type GLTFDataProps = {
   render?: (gltf: GLTF) => LiveElement<any>,
 };
 
-export const resolveURL = (base: string, url: string) => new URL(url, base).href;
+const resolveURL = (base: string, url: string) => new URL(url, base).href;
 
 export const GLTFData: LC<GLTFDataProps> = (props) => {
   const device = useContext(DeviceContext);

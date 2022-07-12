@@ -30,20 +30,22 @@
     "babel-loader": "^8.2.2",
     "css-loader": "^6.0.0",
     "eslint": "^7.5.0",
+    "getdocs-ts": "^0.1.2",
     "jest": "^27.2.0",
+    "magic-string": "^0.26.2",
     "raw-loader": "^4.0.2",
+    "rollup-pluginutils": "^2.8.2",
     "style-loader": "^3.3.1",
     "ts-jest": "^27.0.0",
     "ts-node": "^10.7.0",
-    "typedoc": "^0.23.7",
-    "typescript": "^4.7.0-dev.20220506",
+    "typescript": "^4.8.0-dev.20220709",
     "webpack": "5.10.1",
     "webpack-cli": "^4.2.0",
     "webpack-dev-server": "^3.11.0",
     "wsrun": "^5.2.4"
   },
   "ext": {
-    "typescript": "^4.8.0-dev.20220709"
+    "typescript": "^4.7.0-dev.20220506"
   },
   "browserslist": [
     "last 1 chrome version",
@@ -54,7 +56,7 @@
     "build": "yarn wsrun --stages run build && yarn run docs",
     "clear": "rm -rf packages/text/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js",
     "ci-test": "CI=true yarn run jest && yarn run test:import && yarn run test:vite-react",
-    "docs": "yarn run typedoc --json build/docs.json",
+    "docs": "ts-node ./scripts/getdocs.ts",
     "publish": "yarn run build && yarn publish --ignore-scripts build/packages/shader --access public && yarn publish --ignore-scripts --access public build/packages/glsl-loader && yarn publish --ignore-scripts --access public build/packages/wgsl-loader",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "MODULE_ENV=umd jest --watch",

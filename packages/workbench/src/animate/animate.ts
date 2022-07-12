@@ -25,7 +25,7 @@ export type AnimateProps<T> = {
   render?: (value: any) => LiveElement<any>,
 };
 
-const evaluateKeyframes = (keyframes: Keyframe<T>[], time: number, ease: string) => {
+const evaluateKeyframes = <T>(keyframes: Keyframe<T>[], time: number, ease: string) => {
   const [a, b] = getActiveKeyframes(keyframes, time);
   const [start] = a;
   const [end] = b;
@@ -153,12 +153,12 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   let time = Math.max(0, (elapsed - started) / 1000 - delay);
   let [t, max] = getLoopedTime(time, duration, pause, repeat, mirror);
 
-  const values = mapValues(script, (keyframes: KeyFrame<T>[]) => evaluateKeyframes(keyframes, t, ease));
+  const values = mapValues(script, (keyframes: Keyframe<T>[]) => evaluateKeyframes(keyframes, t, ease));
 
   if (time < max) useAnimationFrame();
   else useNoAnimationFrame();
 
-  if (render) return tracks ? render(values) : render(values[prop]);
+  if (render) return tracks ? render(values) : (prop ? render(values[prop]) : null);
   if (children) {
     const list = Array.isArray(children) ? children.slice() : [children];
     for (const k in values) list.map(injectProp(k, values[k]));

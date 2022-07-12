@@ -24,5 +24,8 @@
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch"
   },
-  "keywords": ["use-gpu", "use-gpu-components"]
+  "keywords": [
+    "use-gpu",
+    "use-gpu-components"
+  ]
 }

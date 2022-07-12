@@ -80,4 +80,4 @@ const makeComposeTransform = () => {
   }
 }
 
-export const composeTransform = makeComposeTransform();
+const composeTransform = makeComposeTransform();

@@ -23,5 +23,8 @@
       "debug.ts"
     ]
   },
-  "keywords": ["use-gpu", "use-gpu-live"]
+  "keywords": [
+    "use-gpu",
+    "use-gpu-live"
+  ]
 }

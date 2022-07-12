@@ -17,5 +17,8 @@
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch"
   },
-  "keywords": ["use-gpu", "use-gpu-live"]
+  "keywords": [
+    "use-gpu",
+    "use-gpu-live"
+  ]
 }

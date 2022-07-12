@@ -5,9 +5,10 @@ import MagicString from 'magic-string';
 export const glsl = (userOptions = {}) => {
   const options = Object.assign(
       {
+          exclude: [],
           include: [
               '**/*.glsl'
-          ]
+          ],
       },
       userOptions
   );
@@ -17,10 +18,10 @@ export const glsl = (userOptions = {}) => {
 	return {
 		name: '@use-gpu/glsl-loader',
 
-		transform(source, id) {
+		transform(source: string, id: string) {
 			if (!filter(id)) return;
 
-			const code = transpileGLSL(code, source, true);
+			const code = transpileGLSL(source, id, true);
 			const magicString = new MagicString(code);
 
 			let result = { code: magicString.toString() };

@@ -5,6 +5,7 @@ import MagicString from 'magic-string';
 export const wgsl = (userOptions = {}) => {
   const options = Object.assign(
       {
+          exclude: [],
           include: [
               '**/*.wgsl'
           ]
@@ -17,10 +18,10 @@ export const wgsl = (userOptions = {}) => {
 	return {
 		name: '@use-gpu/wgsl-loader',
 
-		transform(source, id) {
+		transform(source: string, id: string) {
 			if (!filter(id)) return;
 
-			const code = transpileWGSL(code, source, true);
+			const code = transpileWGSL(source, id, true);
 			const magicString = new MagicString(code);
 
 			let result = { code: magicString.toString() };

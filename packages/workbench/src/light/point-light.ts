@@ -14,7 +14,7 @@ export type PointLightProps = {
   intensity?: number,
 };
 
-export const PointLight = (props: PointLightProps) => {
+export const PointLight: LiveComponent<PointLightProps> = (props: PointLightProps) => {
   
   const position = useProp(props.position, parsePosition);
   const size = useProp(props.size, parseNumber, -1);

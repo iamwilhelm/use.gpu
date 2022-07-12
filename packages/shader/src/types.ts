@@ -3,12 +3,12 @@ import LRU from 'lru-cache';
 
 type ColorSpace = any;
 
-export type ASTParser<T extends SymbolTable = any> = {
+export type ASTParser<T extends SymbolTableT = any> = {
   getSymbolTable: () => T,
   getShakeTable: (table?: T) => ShakeTable | undefined,
 };
 
-export type SymbolTable = {
+export type SymbolTableT = {
   symbols?: string[],
 };
 
@@ -18,11 +18,11 @@ export type TypeLike = {
   args?: TypeLike[],
 };
 
-export type ParsedModuleCache<T extends SymbolTable = any> = LRU<string, ParsedModule<T>>;
+export type ParsedModuleCache<T extends SymbolTableT = any> = LRU<string, ParsedModule<T>>;
 
-export type ShaderModule<T extends SymbolTable = any> = ParsedBundle<T> | ParsedModule<T>;
+export type ShaderModule<T extends SymbolTableT = any> = ParsedBundle<T> | ParsedModule<T>;
 
-export type ParsedBundle<T extends SymbolTable = any> = {
+export type ParsedBundle<T extends SymbolTableT = any> = {
   module: ParsedModule<T>,
   libs?: Record<string, ShaderModule<T>>,
   links?: Record<string, ShaderModule<T>>,
@@ -34,7 +34,7 @@ export type ParsedBundle<T extends SymbolTable = any> = {
   virtuals?: ParsedModule<T>[],
 };
 
-export type ParsedModule<T extends SymbolTable = any> = {
+export type ParsedModule<T extends SymbolTableT = any> = {
   name: string,
   code: string,
   hash: string,
@@ -48,7 +48,7 @@ export type ParsedModule<T extends SymbolTable = any> = {
   key?: string,
 };
 
-export type VirtualTable<T extends SymbolTable = any> = {
+export type VirtualTable<T extends SymbolTableT = any> = {
   render: VirtualRender,
   uniforms?: DataBinding<T>[],
   storages?: DataBinding<T>[],
@@ -58,7 +58,7 @@ export type VirtualTable<T extends SymbolTable = any> = {
   namespace?: string,
 };
 
-export type DataBinding<T extends SymbolTable = any> = {
+export type DataBinding<T extends SymbolTableT = any> = {
   uniform: UniformAttribute,
   storage?: StorageSource,
   texture?: TextureSource,

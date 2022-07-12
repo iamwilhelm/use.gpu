@@ -1,5 +1,5 @@
 import { Tree } from '@lezer/common';
-import { ASTParser, VirtualTable, SymbolTable, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
+import { ASTParser, VirtualTable, SymbolTableT, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
 import { getHash } from './hash';
 import { decompressAST } from './tree';
 import { PREFIX_VIRTUAL } from '../constants';
@@ -9,7 +9,7 @@ const EMPTY_TABLE = {} as any;
 
 // Parse a code module into its in-memory representation
 // (AST + symbol table)
-export const makeLoadModule = <T extends SymbolTable = any>(
+export const makeLoadModule = <T extends SymbolTableT = any>(
   parseShader: (code: string) => Tree,
   makeASTParser: (code: string, tree: Tree, name?: string) => ASTParser<T>,
   compressAST: (code: string, tree: Tree) => CompressedNode[],
@@ -63,7 +63,7 @@ export const loadStaticModule = (code: string, name: string, entry?: string) => 
 }
 
 // Load a virtual (generated) module
-export const loadVirtualModule = <T extends SymbolTable = any>(
+export const loadVirtualModule = <T extends SymbolTableT = any>(
   virtual: VirtualTable,
   initTable: Partial<T> = EMPTY_TABLE,
   entry?: string,

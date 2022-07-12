@@ -1,4 +1,4 @@
-import { ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
+import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { getHash, getHashValue, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash, getBundleEntry, toModule } from '../util/bundle';
@@ -37,7 +37,7 @@ const getValueKey = (b: DataBinding) => getObjectKey(b.constant ?? b.storage ?? 
 
 export const makeBindingAccessors = (
   bindings: DataBinding[],
-): Record<string, ParsedBundle | ParsedModule> => {
+): Record<string, ShaderModule> => {
 
   // Extract uniforms by type
   const lambdas = bindings.filter(({lambda}) => lambda != null);
@@ -61,7 +61,7 @@ export const makeBindingAccessors = (
   }));
 
   // Handle struct types for storage
-  const libs: Record<string, ParsedBundle | ParsedModule> = {};
+  const libs: Record<string, ShaderModule> = {};
   const modules = storages.map(({uniform, storage}) => {
     const {format} = uniform;
     const {format: type} = storage!;
@@ -175,7 +175,7 @@ export const makeBindingAccessors = (
     libs,
   } : virtual;
 
-  const links: Record<string, ParsedBundle | ParsedModule> = {};
+  const links: Record<string, ShaderModule> = {};
   for (const binding of constants) links[binding.uniform.name] = bundle;
   for (const binding of storages)  links[binding.uniform.name] = bundle;
   for (const binding of textures)  links[binding.uniform.name] = bundle;

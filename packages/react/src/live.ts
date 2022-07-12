@@ -10,11 +10,11 @@ export type LiveProps = {
 /**
  * Naked portal from React to Live.
  */
-export const Live: React.FC<LiveProps> = ({children}) => {
+export const Live: React.FunctionComponent<LiveProps> = ({children}) => {
   const fiber = useRef<LiveFiber<any>>();
 
-  const resolved = useMemo(() => resolveRootNode(children), [children]);
-  fiber.current = renderLive(resolved, fiber.current);
+  const rootNode = useMemo(() => resolveRootNode(children), [children]);
+  fiber.current = renderLive(rootNode, fiber.current);
 
   return null;
 };

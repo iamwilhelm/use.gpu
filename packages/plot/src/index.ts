@@ -1,4 +1,3 @@
-/** @module Plot */
 export * from './plot';
 
 export * from './source/scale';
@@ -18,3 +17,5 @@ export * from './view/polar';
 export * from './view/spherical';
 export * from './view/stereographic';
 
+export * from './traits';
+export * from './types';

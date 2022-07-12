@@ -1,4 +1,4 @@
-import { ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
+import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
 import { getHash, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
@@ -18,7 +18,7 @@ export const makeBindingAccessors = (
   bindings: DataBinding[],
   bindingSet: number | string = 0,
   volatileSet: number | string = 0,
-): Record<string, ParsedBundle | ParsedModule> => {
+): Record<string, ShaderModule> => {
 
   // Extract uniforms
   const lambdas = bindings.filter(({lambda}) => lambda != null);
@@ -100,7 +100,7 @@ export const makeBindingAccessors = (
     declarations,
   }, undefined, hash, code, key);
 
-  const links: Record<string, ParsedBundle | ParsedModule> = {};
+  const links: Record<string, ShaderModule> = {};
   for (const binding of constants) links[binding.uniform.name] = virtual;
   for (const binding of storages)  links[binding.uniform.name] = virtual;
   for (const binding of textures)  links[binding.uniform.name] = virtual;

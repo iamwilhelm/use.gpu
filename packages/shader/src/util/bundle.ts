@@ -1,22 +1,22 @@
-import { UniformAttribute, ParsedBundle, ParsedModule, TypeLike, RefFlags as RF } from '../types';
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, RefFlags as RF } from '../types';
 
 const NO_LIBS: Record<string, any> = {};
 const NO_ARGS: any[] = [];
 
-export const getBundleKey = (bundle: ParsedBundle | ParsedModule) => {
+export const getBundleKey = (bundle: ShaderModule) => {
   return (('module' in bundle) ? bundle.key ?? bundle.module.key : bundle.key) ?? getBundleHash(bundle);
 };
 
-export const getBundleHash = (bundle: ParsedBundle | ParsedModule) => {
+export const getBundleHash = (bundle: ShaderModule) => {
   return ('module' in bundle) ? bundle.hash ?? bundle.module.hash : bundle.hash;
 };
 
-export const getBundleEntry = (bundle: ParsedBundle | ParsedModule) => {
+export const getBundleEntry = (bundle: ShaderModule) => {
   return ('module' in bundle) ? bundle.entry ?? bundle.module.entry : bundle.entry;
 };
 
 // Force module/bundle to bundle
-export const toBundle = (bundle: ParsedBundle | ParsedModule): ParsedBundle => {
+export const toBundle = (bundle: ShaderModule): ParsedBundle => {
   if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");
 
   if ('table' in bundle) return {
@@ -27,7 +27,7 @@ export const toBundle = (bundle: ParsedBundle | ParsedModule): ParsedBundle => {
 }
 
 // Force module/bundle to module
-export const toModule = (bundle: ParsedBundle | ParsedModule) => {
+export const toModule = (bundle: ShaderModule) => {
   if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");
 
   if ('table' in bundle) return bundle as ParsedModule;
@@ -45,7 +45,7 @@ export const makeBundleToAttributes = (
   toTypeString: ToTypeString,
   toArgTypes: ToArgTypes,
 ) => (
-  bundle: ParsedBundle | ParsedModule,
+  bundle: ShaderModule,
 ): UniformAttribute[] => {
   const module = toModule(bundle);
   const {table: {declarations}} = module;
@@ -67,7 +67,7 @@ export const makeBundleToAttribute = (
   toTypeString: ToTypeString,
   toArgTypes: ToArgTypes,
 ) => (
-  bundle: ParsedBundle | ParsedModule,
+  bundle: ShaderModule,
   name?: string,
 ): UniformAttribute => {
   const module = toModule(bundle);

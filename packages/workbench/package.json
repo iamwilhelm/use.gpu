@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/workbench",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",

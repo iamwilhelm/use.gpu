@@ -40,26 +40,26 @@ export const SUSPEND      = () => {};
 // Inline render ops
 type UseArgs<F> = F extends ArrowFunction ? Parameters<F> : any[];
 
-interface Use<F extends Function> {
+interface Use<F extends ArrowFunction> {
   (f: LiveFunction<F>): DeferredCall<F>;
   (f: LiveFunction<F>, ...args: UseArgs<F>): DeferredCall<F>;
 };
 
 /** Use a call to a Live function */
-export const use: Use<any> = <F extends Function>(
+export const use: Use<any> = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   ...args: UseArgs<F>
 ): DeferredCall<F> => ({f, args, key: undefined, by: getCurrentFiberID()} as any);
 
 /** Use a keyed call to a Live function */
-export const keyed = <F extends Function>(
+export const keyed = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   key?: Key,
   ...args: UseArgs<F>
 ): DeferredCall<F> => ({f, args, key, by: getCurrentFiberID()} as any);
 
 /** Use a call to a Live Component with only a children prop */
-export const wrap = <F extends Function>(
+export const wrap = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   children: any,
 ): DeferredCall<F> => ({f, args: [{children}], key: undefined, by: getCurrentFiberID()} as any);
@@ -92,7 +92,7 @@ export const morph = (
 ): DeferredCall<() => void> => ({f: MORPH, args: calls as any, key, by: getCurrentFiberID()} as any);
 
 /** Detach the rendering of a Live subtree */
-export const detach = <F extends Function>(
+export const detach = <F extends ArrowFunction>(
   call: DeferredCall<F>,
   callback: (render: () => void, fiber: LiveFiber<F>) => void,
   key?: Key,

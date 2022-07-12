@@ -8,7 +8,7 @@ import { useFontFamily, useFontText, useFontHeight } from './providers/font-prov
 import { useSDFGlyphData } from './providers/sdf-font-provider';
 import { SDFGlyphData, Alignment } from './types';
 
-type GlyphSourceProps = {
+export type GlyphSourceProps = {
   family?: string,
   weight?: string | number,
   style?: string,

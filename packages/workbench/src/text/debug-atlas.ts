@@ -6,7 +6,7 @@ import { TextureSource } from '@use-gpu/core';
 import { SDFFontContext, SDF_FONT_ATLAS } from './providers/sdf-font-provider';
 import { CompositeData } from '../data';
 
-type DebugAtlasProps = {
+export type DebugAtlasProps = {
   atlas: Atlas,
   source: TextureSource,
   version: number,

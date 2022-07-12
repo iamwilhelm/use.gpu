@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/app",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -25,5 +25,9 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch"
-  }
+  },
+  "keywords": [
+    "use-gpu",
+    "use-gpu-dev"
+  ]
 }

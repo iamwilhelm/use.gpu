@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/shader",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -13,6 +13,7 @@
     "./wgsl/types": "./src/wgsl/types.ts"
   },
   "dependencies": {
+    "@use-gpu/core": "*",
     "@lezer/common": "^0.15.11",
     "@lezer/generator": "^0.15.4",
     "@lezer/lr": "^0.15.8",

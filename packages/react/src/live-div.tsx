@@ -5,20 +5,25 @@ import { render as renderLive, resolveRootNode } from '@use-gpu/live';
 
 export type LiveDivProps = {
   style?: Record<string, any>,
-  render: (div: HTMLDivElement) => LiveElement<any>,
+  render?: (div: HTMLDivElement) => LiveElement<any>,
+  children?: (div: HTMLDivElement) => LiveElement<any>,
 };
 
 /**
- * Render <div> for Live. Acts as a portal from React to Live.
+ * Render a `<div>`. Portal from React to Live.
  */
-export const LiveDiv: React.FC<LiveDivProps> = ({style, render}) => {
+export const LiveDiv: React.FunctionComponent<LiveDivProps> = ({style, render, children}) => {
   const el = useRef<HTMLDivElement>(null);
   const fiber = useRef<LiveFiber<any>>();
 
   useLayoutEffect(() => {
     if (el.current) {
-      const children = resolveRootNode(render(el.current));
-      fiber.current = renderLive(children, fiber.current);
+      const content = (render ?? children);
+      if (!content) return;
+      
+      const element = (typeof content === 'function') ? content(el.current) : content;
+      const rootNode = resolveRootNode(element);
+      fiber.current = renderLive(rootNode, fiber.current);
     }
   }, [render]);
 

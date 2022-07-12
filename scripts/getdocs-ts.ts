@@ -188,6 +188,11 @@ class Context {
     if (type.flags & TypeFlags.Never) return {type: "never"}
 
     if (type.flags & TypeFlags.Enum) return {type: "enum"}
+    if (type.flags & TypeFlags.Substitution) {
+      //console.log((type as any).baseType);
+      //console.log((type as any).substitute);
+      return {type: (type as any).baseType.symbol.escapedName};
+    }
 
     if (type.flags & TypeFlags.UnionOrIntersection) {
       let types = (type as UnionOrIntersectionType).types, decl
@@ -287,6 +292,7 @@ class Context {
       let pos = getLineAndCharacterOfPosition(maybeD.getSourceFile(), maybeD.pos)
       maybePath = ` at ${this.nodePath(maybeD)}:${pos.line - 1}:${pos.character - 1}`
     }
+    
     throw new Error(`Unsupported type ${this.tc.typeToString(type)} with flags ${type.flags}${maybePath}`)
   }
 
@@ -454,7 +460,9 @@ class Context {
         ...cx.getType(type, param)
       }
 
-      if (decl) this.addSourceData([decl], result, !(getCombinedModifierFlags(decl) & (ModifierFlags.Public | ModifierFlags.Readonly)))
+      //if (decl) this.addSourceData([decl], result, !(getCombinedModifierFlags(decl) & (ModifierFlags.Public | ModifierFlags.Readonly)))
+      if (decl) this.addSourceData([decl], result, true)
+
       let deflt: Node = decl && (decl as any).initializer
       if (deflt) result.default = deflt.getSourceFile().text.slice(deflt.pos, deflt.end).trim()
       if (deflt || optional) result.optional = true
@@ -679,6 +687,7 @@ function stripComment(lines: string[]) {
 
   while (lines.length && !lines[lines.length - 1]) lines.pop()
   while (lines.length && !lines[0]) lines.shift()
+
   return lines.join("\n")
 }
 

@@ -17,7 +17,7 @@ export type AnimateProps<T> = {
   delay?: number,
   pause?: number,
 
-  tracks?: Record<string, Keyframe<T>>[],
+  tracks?: Record<string, Keyframe<T>[]>,
   keyframes?: Keyframe<T>[],
   prop?: string,
 
@@ -142,7 +142,10 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     delta,
   } = useTimeContext();
 
-  const script = useMemo(() => tracks || (keyframes && prop ? {[prop]: key} : null), [tracks, keyframes, prop]);
+  const script = useMemo(() => (
+    tracks ??
+    ((keyframes && prop) ? {[prop]: keyframes} : null)
+  ), [tracks, keyframes, prop]);
   if (!script) return null;
 
   const started = useOne(() => elapsed, script);

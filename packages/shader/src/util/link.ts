@@ -1,5 +1,5 @@
 import { Tree } from '@lezer/common';
-import { ParsedBundle, ParsedModule, ParsedModuleCache, ShaderDefine, ImportRef, RefFlags as RF } from '../types';
+import { ShaderModule, ParsedBundle, ParsedModule, ParsedModuleCache, ShaderDefine, ImportRef, RefFlags as RF } from '../types';
 import { VIRTUAL_BINDINGS } from '../constants';
 
 import { bindBundle, bindModule } from './bind';
@@ -10,7 +10,7 @@ import mapValues from 'lodash/mapValues';
 
 export type Linker = (
   source: ParsedBundle,
-  libraries?: Record<string, ParsedBundle | ParsedModule>,
+  libraries?: Record<string, ShaderModule>,
 ) => string;
 
 export type LoadModuleWithCache = (
@@ -38,7 +38,7 @@ export type RewriteUsingAST = (
   optionals?: Set<string> | null,
 ) => string;
 
-const NO_LIBS: Record<string, ParsedBundle | ParsedModule> = {};
+const NO_LIBS: Record<string, ShaderModule> = {};
 
 // Link a source module with static modules and dynamic links.
 export const makeLinkCode = (
@@ -60,7 +60,7 @@ export const makeLinkCode = (
       code != null
       ? loadModuleWithCache(code, name.split(':')[0], undefined, cache)
       : null
-    ) as ParsedBundle | ParsedModule | null
+    ) as ShaderModule | null
   ) as any;
 
   const bundle = bindModule(main, parsedLinks, defines);
@@ -71,8 +71,8 @@ export const makeLinkCode = (
 export const makeLinkBundle = (
   linker: Linker,
 ) => timed('linkBundle', (
-  source: ParsedBundle | ParsedModule,
-  links?: Record<string, ParsedBundle | ParsedModule | null>,
+  source: ShaderModule,
+  links?: Record<string, ShaderModule | null>,
   defines?: Record<string, ShaderDefine> | null,
 ) => {
   let bundle = toBundle(source);
@@ -86,8 +86,8 @@ export const makeLinkModule = (
   linker: Linker,
 ) => timed('linkBundle', (
   source: ParsedModule,
-  libraries: Record<string, ParsedBundle | ParsedModule> = NO_LIBS,
-  links?: Record<string, ParsedBundle | ParsedModule | null>,
+  libraries: Record<string, ShaderModule> = NO_LIBS,
+  links?: Record<string, ShaderModule | null>,
   defines?: Record<string, ShaderDefine> | null,
 ) => {
   let bundle = toBundle(source);
@@ -103,8 +103,8 @@ export const makeLinker = (
   defineConstants: DefineConstants,
   rewriteUsingAST: RewriteUsingAST,
 ) => (
-  source: ParsedBundle | ParsedModule,
-  libraries: Record<string, ParsedBundle | ParsedModule> = NO_LIBS,
+  source: ShaderModule,
+  libraries: Record<string, ShaderModule> = NO_LIBS,
 ) => {
   const bundle = toBundle(source);
   const main = getBundleKey(source);
@@ -289,7 +289,7 @@ export const loadBundlesInOrder = timed('loadBundlesInOrder', (
   const key = getBundleKey(bundle);
 
   // Traverse graph starting from source
-  const queue = [{key, name, chunk: bundle as ParsedBundle | ParsedModule}];
+  const queue = [{key, name, chunk: bundle as ShaderModule}];
   seen.add(key);
 
   const getContext = (m: ParsedModule) => {

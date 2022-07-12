@@ -10,10 +10,10 @@ export type HTMLProps = {
 };
 
 // Show up in docs as LC
-type LiveComponent<T> = any;
+type LiveComponent<T> = (props: T) => null;
 
 /**
- * Render HTML. Acts as a portal from Live to React.
+ * Render HTML. Portal from Live to React.
  */
 export const HTML: LiveComponent<HTMLProps> = ({
   container,

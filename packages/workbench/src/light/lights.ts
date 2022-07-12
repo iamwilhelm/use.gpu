@@ -98,7 +98,7 @@ export const Lights: LC<LightsProps> = (props: PropsWithChildren<LightsProps>) =
   });
 };
 
-type LightEmitterProps = {
+export type LightEmitterProps = {
   storage: StorageSource,
   lights: Light[],
   data: ArrayBuffer,

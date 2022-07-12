@@ -1,4 +1,3 @@
-/** @module Layout */
 export * from './display/absolute';
 export * from './display/block';
 export * from './display/embed';
@@ -13,3 +12,6 @@ export * from './shape/ui-rectangle';
 
 export * from './layout';
 export * from './ui';
+
+export * from './traits';
+export * from './types';

@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
-import { render as renderLive, resolveRootNode } from '@use-gpu/live';
 import { LiveFiber, LiveElement } from '@use-gpu/live/types';
+import { render as renderLive, resolveRootNode } from '@use-gpu/live';
 
 export type LiveCanvasProps = {
   style?: Record<string, any>,
@@ -10,8 +10,6 @@ export type LiveCanvasProps = {
 
 /**
  * Render <canvas> for Live. Acts as a portal from React to Live.
- *
- * @category React Components
  */
 export const LiveCanvas: React.FC<LiveCanvasProps> = ({style, render}) => {
   const el = useRef<HTMLCanvasElement>(null);

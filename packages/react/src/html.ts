@@ -1,4 +1,3 @@
-import { LiveComponent } from '@use-gpu/live/types';
 import { useFiber, useResource, useNoResource } from '@use-gpu/live';
 
 import React from 'react';
@@ -7,15 +6,16 @@ import ReactDOM from 'react-dom';
 export type HTMLProps = {
   container?: Element | null,
   style?: Record<string, any>,
-  children?: React.ReactNode,
+  children?: JSX.Element,
 };
+
+// Show up in docs as LC
+type LiveComponent<T> = any;
 
 /**
  * Render HTML. Acts as a portal from Live to React.
- *
- * @category Live Components
  */
-export const HTML = ({
+export const HTML: LiveComponent<HTMLProps> = ({
   container,
   style,
   children,

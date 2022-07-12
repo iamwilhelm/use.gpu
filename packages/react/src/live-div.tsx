@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
-import { render as renderLive, resolveRootNode } from '@use-gpu/live';
 import { LiveFiber, LiveElement } from '@use-gpu/live/types';
+import { render as renderLive, resolveRootNode } from '@use-gpu/live';
 
 export type LiveDivProps = {
   style?: Record<string, any>,
@@ -10,8 +10,6 @@ export type LiveDivProps = {
 
 /**
  * Render <div> for Live. Acts as a portal from React to Live.
- *
- * @category React Components
  */
 export const LiveDiv: React.FC<LiveDivProps> = ({style, render}) => {
   const el = useRef<HTMLDivElement>(null);

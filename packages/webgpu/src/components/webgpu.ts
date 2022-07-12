@@ -6,9 +6,9 @@ import { DeviceContext } from '@use-gpu/workbench';//'/providers/device-provider
 
 import { mountGPUDevice } from '../web';
 
-type ErrorRenderer = (e: Error) => LiveElement<any>;
+export type ErrorRenderer = (e: Error) => LiveElement<any>;
 
-type WebGPUProps = {
+export type WebGPUProps = {
   fallback: LiveElement<any> | ErrorRenderer,
 };
 

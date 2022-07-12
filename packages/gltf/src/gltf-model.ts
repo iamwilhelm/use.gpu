@@ -5,7 +5,7 @@ import { GLTF, GLTFNodeData } from './types';
 import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
 import { GLTFNode } from './gltf-node';
 
-type GLTFModelProps = {
+export type GLTFModelProps = {
   gltf: GLTF,
 
   scene?: number,

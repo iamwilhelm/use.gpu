@@ -4,7 +4,7 @@ import { use, useResource, useNoResource } from '@use-gpu/live';
 import { Picking } from '@use-gpu/workbench';
 import { CursorConsumer } from '@use-gpu/workbench';
 
-import { adoptOrMakeCanvas } from '../web';
+import { makeOrAdoptCanvas } from '../web';
 import { AutoSize } from './auto-size';
 import { Canvas } from './canvas';
 import { DOMEvents } from './dom-events';
@@ -33,7 +33,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   let {canvas} = props;
   if (!canvas && props.selector) {
     canvas = useResource((dispose) => {
-      const [c, d] = adoptOrMakeCanvas(props.selector!);
+      const [c, d] = makeOrAdoptCanvas(props.selector!);
       dispose(d);
       return c;
     }, [props.selector]);

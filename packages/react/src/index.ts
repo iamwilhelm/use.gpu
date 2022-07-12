@@ -1,4 +1,3 @@
-/** @module React */
 export * from './html';
 export * from './live';
 export * from './live-div';

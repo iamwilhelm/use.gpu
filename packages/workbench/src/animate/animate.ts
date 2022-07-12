@@ -114,7 +114,8 @@ const injectProp = (prop: string, value: any) => (call: LiveElement<any>): LiveE
   return c;
 };
 
-type NestedNumberArray = (number | NestedNumberArray)[];
+// causes typescript docgen to crash if defined as recursive
+type NestedNumberArray = any[];
 type Numberish = number | TypedArray | NestedNumberArray;
 
 export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Numberish>(props: AnimateProps<T>) => {

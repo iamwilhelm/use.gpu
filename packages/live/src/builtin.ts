@@ -174,7 +174,7 @@ export const imperative = makeImperativeFunction;
 /** Yeet a suspend symbol */
 export const suspend = () => yeet(SUSPEND);
 
-interface MakeContext<T> {
+export interface MakeContext<T> {
   <T>(i: T, d?: string): LiveContext<T>;
   <T>(i: undefined, d?: string): LiveContext<T>;
   <T>(i: null, d?: string): LiveContext<T | null>;

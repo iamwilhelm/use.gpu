@@ -45,7 +45,7 @@ export const makePresentationContext = (
 }
 
 // Given a DOM selector, adopt a <canvas>, or create on inside any other tag.
-export const adoptOrMakeCanvas = (selector: string): [HTMLCanvasElement, () => void] => {
+export const makeOrAdoptCanvas = (selector: string): [HTMLCanvasElement, () => void] => {
 
   const el = document.querySelector(selector);
   if (!el) throw new Error(`Cannot find ${selector} in DOM`);

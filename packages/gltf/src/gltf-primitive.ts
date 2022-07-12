@@ -22,7 +22,7 @@ import { useGLTFMaterial } from './gltf-material';
 const CARTESIAN_BINDINGS = bundleToAttributes(getCartesianPosition);
 const NORMAL_BINDINGS = bundleToAttributes(getTransformedNormal);
 
-type GLTFPrimitiveProps = {
+export type GLTFPrimitiveProps = {
   gltf: GLTF,
   primitive: GLTFPrimitiveData,
 

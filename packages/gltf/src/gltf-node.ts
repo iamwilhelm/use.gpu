@@ -6,7 +6,7 @@ import { vec3, mat4, quat } from 'gl-matrix';
 import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
 import { GLTFMesh } from './gltf-mesh';
 
-type GLTFNodeProps = {
+export type GLTFNodeProps = {
   gltf: GLTF,
   node: number,
   matrix?: mat4,

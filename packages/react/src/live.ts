@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useMemo, useRef } from 'react';
 
-import { render as renderLive, use, morph, resolveRootNode } from '@use-gpu/live';
 import { LiveFiber, LiveElement } from '@use-gpu/live/types';
+import { render as renderLive, use, morph, resolveRootNode } from '@use-gpu/live';
 
 export type LiveProps = {
   children: LiveElement<any>,
@@ -9,8 +9,6 @@ export type LiveProps = {
 
 /**
  * Naked portal from React to Live.
- *
- * @category React Components
  */
 export const Live: React.FC<LiveProps> = ({children}) => {
   const fiber = useRef<LiveFiber<any>>();

@@ -5,7 +5,7 @@ import { use, memo, useMemo } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 import { GLTFPrimitive } from './gltf-primitive';
 
-type GLTFMeshProps = {
+export type GLTFMeshProps = {
   gltf: GLTF,
   mesh: number,
 

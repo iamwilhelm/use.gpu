@@ -515,6 +515,7 @@ export const useNoAsync = () => {
 
 // Cleanup effect tracker
 // Calls previous cleanup before accepting new one
+/** @hidden */
 export const makeResourceTag = () => {
   let cleanup = undefined as Task | undefined;
 

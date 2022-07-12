@@ -12,7 +12,7 @@ yarn add @use-gpu/react
 
 ## `<HTML>` (Live → React)
   
-Embed React content inside Live
+Embed React content inside Live, to render HTML. Portal from Live to React.
 
   - `container`: `string` | `HTMLElement` - Containing element (or CSS selector) to render into.
   - `children`: React.ReactNode - React children to render
@@ -28,7 +28,7 @@ import { HTML } from '@use-gpu/react';
 
 ## `<LiveCanvas>` (React → Live)
   
-Embed Live Canvas inside React
+Embed Live `<canvas>` inside React. Portal from React to Live.
 
   - `children`: (canvas: HTMLCanvasElement) => LiveElement - Live children to render
 
@@ -48,7 +48,7 @@ import { WebGPU, AutoCanvas } from '@use-gpu/webgpu';
 
 ## `<Live>` (React → Live)
   
-Run bare Live fiber inside React
+Run bare Live fiber inside React. Portal from React to Live.
 
   - `children`: LiveElement - Live root to render
 

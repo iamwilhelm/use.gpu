@@ -9,17 +9,29 @@ import { compareFibers } from './util';
 import { makeFiber, makeImperativeFunction } from './fiber';
 import { getCurrentFiberID } from './current';
 
+/** @hidden */
 export const MORPH        = () => {};
+/** @hidden */
 export const DETACH       = () => {};
+/** @hidden */
 export const FRAGMENT     = () => {};
+/** @hidden */
 export const MAP_REDUCE   = () => {};
+/** @hidden */
 export const GATHER       = () => {};
+/** @hidden */
 export const MULTI_GATHER = () => {};
+/** @hidden */
 export const FENCE        = () => {};
+/** @hidden */
 export const YEET         = () => {};
+/** @hidden */
 export const PROVIDE      = () => {};
+/** @hidden */
 export const CONSUME      = () => {};
+/** @hidden */
 export const DEBUG        = () => {};
+/** @hidden */
 export const SUSPEND      = () => {};
 
 (MORPH        as any).isLiveBuiltin = true;
@@ -175,16 +187,17 @@ export const imperative = makeImperativeFunction;
 export const suspend = () => yeet(SUSPEND);
 
 export interface MakeContext<T> {
-  <T>(i: T, d?: string): LiveContext<T>;
-  <T>(i: undefined, d?: string): LiveContext<T>;
-  <T>(i: null, d?: string): LiveContext<T | null>;
+  <T>(initialValue: T, displayName?: string): LiveContext<T>;
+  <T>(initialValue: undefined, displayName?: string): LiveContext<T>;
+  <T>(initialValue: null, displayName?: string): LiveContext<T | null>;
 };
 
-/** Make Live context for holding shared value for child nodes */
+/** Make Live context for holding shared value for child nodes (defaulted, required or optional) */
 export const makeContext: MakeContext<unknown> = <T>(initialValue?: T | null, displayName?: string) => ({
   initialValue,
   displayName,
 });
+/** @hidden */
 export const createContext = makeContext;
 
 /** Flatten a consumed value registry into an ordered array. */

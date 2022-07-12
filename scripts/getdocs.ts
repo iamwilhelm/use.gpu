@@ -6,7 +6,7 @@ import glob from 'glob';
 const OUTPUT_FILE = './build/docs.json';
 
 const DOCS_REPO = '../use.gpu-site';
-const DOCS_FILE = '../use.gpu-site/docs/docs.json';
+const DOCS_FILE = '../use.gpu-site/docs/ts-docs.json';
 const DOCS_PKG  = '../use.gpu-site/docs/packages';
 
 let packages = ['core', 'gltf', 'inspect', 'layout', 'live', 'plot', 'react', 'state', 'text', 'traits', 'webgpu', 'workbench'];

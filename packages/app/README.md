@@ -2,7 +2,7 @@
 
 This package hosts a demo app used to showcase and debug Use.GPU.
 
-**To open it, run the following commands in the `use-gpu` repo '/' root:**
+**To open it, run the following commands in the `use-gpu` repo root:**
 
 ## Usage
 

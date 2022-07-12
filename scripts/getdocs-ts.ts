@@ -1,3 +1,5 @@
+// Forked from getdocs-ts to fix gaps in coverage
+
 import {
   getCombinedModifierFlags, findConfigFile, createCompilerHost, getParsedCommandLineOfConfigFile, createProgram, sys,
   getEffectiveConstraintOfTypeParameter,

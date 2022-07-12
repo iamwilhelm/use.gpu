@@ -1,4 +1,3 @@
-/** @module Live */
 export * from './builtin';
 export * from './debug';
 export { reactInterop } from './fiber';

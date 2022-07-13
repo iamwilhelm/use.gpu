@@ -46,7 +46,7 @@ const DEFAULT_DEFINES = {
 };
 
 // Inlined into <Virtual>
-export const render = (props: RenderProps) => {
+export const drawCall = (props: RenderProps) => {
   const {
     vertexCount,
     instanceCount,

@@ -4,6 +4,6 @@ export * from './raw-full-screen';
 export * from './raw-labels';
 export * from './raw-lines';
 export * from './raw-quads';
-export * from './render';
+export * from './draw-call';
 export * from './ui-rectangles';
 export * from './virtual';

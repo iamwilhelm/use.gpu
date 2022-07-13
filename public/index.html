@@ -90,6 +90,33 @@
       position: relative;
       top: 3px;
     }
+    
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font: 14px/20px Lato, sans-serif;
+    }    
+    a, a:hover, a:visited, a:active {
+      color: rgba(190, 210, 255, 1);
+    }
+    
+    button.round {
+      border-radius: 100%;
+      width: 32px;
+      height: 32px;
+      line-height: 20px;
+      background: #888;
+      border: 0;
+      color: #fff;
+    }
+    button.round:hover {
+      background: #aaa;
+    } 
+    button.round .m-icon {
+      vertical-align: middle;
+    }
+    
   </style>
   <body>
     <div id="use-gpu">

@@ -24,7 +24,7 @@ import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
 import instanceFragmentPick from '@use-gpu/wgsl/render/fragment/pick.wgsl';
 import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
 
-import { render } from './render';
+import { drawCall } from './draw-call';
 
 const PICK_RENDERER = [
   instanceDrawVirtualPick,
@@ -168,7 +168,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
   }, [vertexShader, fragmentShader, getVertex, getFragment, getId, isDebug, colorInput, colorSpace]);
   
   // Inline the render fiber to avoid another memo()
-  return render({
+  return drawCall({
     vertexCount,
     instanceCount,
     vertex: v,

@@ -42,6 +42,8 @@
   --LiveInspect-colorTextLevel8: rgba(255, 255, 255, 0.54);
   --LiveInspect-colorTextLevel9: rgba(255, 255, 255, 0.43);
   --LiveInspect-colorTextLevel10: rgba(255, 255, 255, 0.31);
+  font: 14px/20px Lato, sans-serif;
+  color: var(--LiveInspect-colorText);
 
   position: absolute;
   left: 0;
@@ -115,22 +117,6 @@ html > body .LiveInspect ::-webkit-scrollbar {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-}
-
-.LiveInspect button.round {
-  border-radius: 100%;
-  width: 32px;
-  height: 32px;
-  line-height: 20px;
-  background: #888;
-  border: 0;
-  color: #fff;
-}
-.LiveInspect button.round:hover {
-  background: #aaa;
-} 
-.LiveInspect button.round .m-icon {
-  vertical-align: middle;
 }
 
 /* Fiber tree (optimized) */

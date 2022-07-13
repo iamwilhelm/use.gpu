@@ -5,7 +5,7 @@ import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkSegments, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
-type ArrowSegmentsProps = {
+export type ArrowSegmentsProps = {
   chunks?: number[],
   loops?: boolean[],
   starts?: boolean[],

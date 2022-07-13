@@ -5,7 +5,7 @@ import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkSegments, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
-type LineSegmentsProps = {
+export type LineSegmentsProps = {
   chunks?: number[],
   loops?: boolean[],
 

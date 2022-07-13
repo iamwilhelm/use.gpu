@@ -29,7 +29,7 @@ const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n 
 
 type OnPick = (index: number) => void;
 
-type PickingContextType = {
+export type PickingContextProps = {
   renderContext: UseRenderingContextGPU,
   pickingTexture: GPUTexture,
   pickingSource: TextureSource,
@@ -37,7 +37,7 @@ type PickingContextType = {
   sampleTexture: (x: number, y: number) => number[],
 };
 
-export const PickingContext = makeContext<PickingContextType>(null, 'PickingContext');
+export const PickingContext = makeContext<PickingContextProps>(null, 'PickingContext');
 
 export const usePickingContext = (isPicking: boolean = true) => {
   const renderContext = useContext(RenderContext);

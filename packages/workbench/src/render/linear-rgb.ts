@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource } from '@use-gpu/core/types';
+import { TextureSource, ColorSpace } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 
 import { use, useOne } from '@use-gpu/live';
@@ -8,7 +8,23 @@ import { Pass } from './pass';
 import { RenderToTexture, RenderToTextureProps } from './render-to-texture';
 import { RawFullScreen } from '../primitives';
 
-type LinearRGBProps = Omit<RenderToTextureProps, "format" | "colorSpace">;
+//export type LinearRGBProps = Omit<RenderToTextureProps, "format" | "colorSpace">;
+export type LinearRGBProps = {
+  width?: number,
+  height?: number,
+  live?: boolean,
+  history?: number,
+  sampler?: Partial<GPUSamplerDescriptor>,
+  //format?: GPUTextureFormat,
+  depthStencil?: GPUTextureFormat | null,
+  backgroundColor?: GPUColor,
+  //colorSpace?: ColorSpace,
+  colorInput?: ColorSpace,
+  samples?: number,
+
+  children?: LiveElement<any>,
+  then?: (texture: TextureSource) => LiveElement<any>,
+};
 
 export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => ( 
   use(RenderToTexture, {

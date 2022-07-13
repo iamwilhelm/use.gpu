@@ -1,6 +1,6 @@
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
-type FrameContextProps = {
+export type FrameContextProps = {
   current: number,
 };
 

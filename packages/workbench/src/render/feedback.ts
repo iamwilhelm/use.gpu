@@ -8,7 +8,7 @@ import { useFeedbackContext } from '../providers/feedback-provider';
 import { useBoundSource } from '../hooks/useBoundSource';
 import { RawFullScreen } from '../primitives';
 
-type FeedbackProps = {
+export type FeedbackProps = {
   shader?: ShaderModule,
 };
 

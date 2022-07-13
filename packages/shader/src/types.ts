@@ -145,4 +145,4 @@ export type UniformAttributeValue = UniformAttribute & {
   value: any,
 };
 
-export type VirtualRender = (namespace: string, rename: Map<string, string>, base: number) => string;
+export type VirtualRender = (namespace: string, rename: Map<string, string>, virtualBase?: number, volatileBase?: number) => string;

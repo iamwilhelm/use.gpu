@@ -24,7 +24,7 @@ const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 const LIGHT_ATTRIBUTE = bundleToAttribute(WGSLLight);
 const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.members!);
 
-type LightsProps = {
+export type LightsProps = {
   max?: number,
 };
 

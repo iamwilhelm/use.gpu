@@ -1,4 +1,3 @@
-/** @module Workbench */
 export * from './animate';
 export * from './camera';
 export * from './consumers';

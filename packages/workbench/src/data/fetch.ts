@@ -3,9 +3,9 @@ import { yeet, useAsync, useMemo, useOne } from '@use-gpu/live';
 
 const SLOW = 0;
 
-type FetchAPIOptions = Parameters<typeof fetch>[1];
+export type FetchAPIOptions = Parameters<typeof fetch>[1];
 
-type FetchProps<T> = {
+export type FetchProps<T> = {
   url?: string,
   request?: Request,
   options?: FetchAPIOptions,

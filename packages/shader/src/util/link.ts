@@ -5,7 +5,6 @@ import { VIRTUAL_BINDINGS } from '../constants';
 import { bindBundle, bindModule } from './bind';
 import { toBundle, getBundleKey } from './bundle';
 import { resolveShakeOps } from './shake';
-import { timed } from './timed';
 import mapValues from 'lodash/mapValues';
 
 export type Linker = (
@@ -45,7 +44,7 @@ export const makeLinkCode = (
   linker: Linker,
   loadModuleWithCache: LoadModuleWithCache,
   defaultCache: ParsedModuleCache,
-) => timed('linkCode', (
+) => (
   code: string,
   libraries: Record<string, string> = {},
   links?: Record<string, string | null> | null,
@@ -65,12 +64,12 @@ export const makeLinkCode = (
 
   const bundle = bindModule(main, parsedLinks, defines);
   return linker(bundle, parsedLibraries);
-});
+};
 
 // Link a bundle of parsed module + libs, dynamic links
 export const makeLinkBundle = (
   linker: Linker,
-) => timed('linkBundle', (
+) => (
   source: ShaderModule,
   links?: Record<string, ShaderModule | null>,
   defines?: Record<string, ShaderDefine> | null,
@@ -79,12 +78,12 @@ export const makeLinkBundle = (
   if (links || defines) bundle = bindBundle(bundle, links, defines);
 
   return linker(bundle);
-});
+};
 
 // Link a bundle of parsed module + libs, dynamic links
 export const makeLinkModule = (
   linker: Linker,
-) => timed('linkBundle', (
+) => (
   source: ParsedModule,
   libraries: Record<string, ShaderModule> = NO_LIBS,
   links?: Record<string, ShaderModule | null>,
@@ -94,7 +93,7 @@ export const makeLinkModule = (
   if (links || defines) bundle = bindBundle(bundle, links, defines);
 
   return linker(bundle, libraries);
-});
+};
 
 // Make a shader linker with injectable language rules
 export const makeLinker = (
@@ -172,7 +171,7 @@ export const makeLinker = (
 
     // Replace imported symbol names with target
     if (modules) for (const {name: module, imports} of modules) {
-      const key = importMap!.get(module);
+      const key = importMap!.get(module)!;
       const ns = namespaces.get(key);
 
       for (const {name, imported} of imports) {
@@ -191,7 +190,7 @@ export const makeLinker = (
     // Replace imported function prototype names with target
     if (externals) for (const {flags, func} of externals) if (func) {
       const {name, inferred} = func;
-      const key = importMap?.get(name);
+      const key = importMap?.get(name)!;
       const ns = namespaces.get(key);
 
       const resolved = aliasMap?.get(name) ?? name;
@@ -265,9 +264,9 @@ export const makeLinker = (
 
 // Load all references from a tree of bundles
 // while gathering info about what's exported (for tree shaking).
-export const loadBundlesInOrder = timed('loadBundlesInOrder', (
+export const loadBundlesInOrder = (
   bundle: ParsedBundle,
-  libraries: Record<string, ParsedModule> = {},
+  libraries: Record<string, ShaderModule> = {},
 ): {
   bundles: ParsedBundle[]
   exported: Map<string, Set<string>>,
@@ -388,7 +387,7 @@ export const loadBundlesInOrder = timed('loadBundlesInOrder', (
     imported,
     aliased,
   };
-});
+};
 
 
 // Generate a new namespace

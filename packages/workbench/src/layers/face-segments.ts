@@ -5,7 +5,7 @@ import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkFaces } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
-type FaceSegmentsProps = {
+export type FaceSegmentsProps = {
   chunks?: number[],
   loops?: boolean[],
 

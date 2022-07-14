@@ -295,8 +295,8 @@ Link packaged bundle of module + libs.
 
 ```ts
 (
-  bundle: ParsedBundle,
-  links: Record<string, ParsedBundle> = {},
+  bundle: ParsedBundle | ParsedModule,
+  links: Record<string, ParsedBundle | ParsedModule> = {},
   defines: Record<string, string | number | boolean | null | undefined> = {},
 ) => string;
 ```
@@ -312,22 +312,31 @@ Replace the global `#version 450` preamble with another string.
 
 ### Bind
 
-Link modules/bundles together into a new bundle at run-time. i.e.:
+Bind modules/bundles together into a new bundle at run-time.
 
-`linkBundle(bindBundle(bundle, {links}))` is equivalent to `linkBundle(bundle, {links})`.
+```tsx
+const bound = bindBundle(bundle, {links});
+```
 
 This is a fast operation which only affects the top-level module in a bundle.
 
-Provide a unique `key` to ensure deterministic output.
+The resulting bundle acts as a closure. You can then link or rebind it:
+
+```tsx
+// Link it into a shader
+linkBundle(mainBundle, {getData: bound});
+
+// Bind it and make new module
+const otherBound = bindBundle(otherBundle, {getData: bound});
+```
 
 #### `bindBundle(...)`
 
 ```ts
 (
   bundle: ShaderModule,
-  links: Record<string, ParsedModule | ParsedBundle> = {},
+  links: Record<string, ShaderModule> = {},
   defines?: Record<string, ShaderDefine> | null,
-  key?: string | number,
 ) => ParsedBundle;
 ```
 
@@ -336,10 +345,9 @@ Provide a unique `key` to ensure deterministic output.
 ```ts
 (
   main: ParsedModule,
-  libs: Record<string, ParsedModule | ParsedBundle> = {},
-  links: Record<string, ParsedModule | ParsedBundle> = {},
+  libs: Record<string, ShaderModule> = {},
+  links: Record<string, ShaderModule> = {},
   defines?: Record<string, ShaderDefine> | null,
-  key?: string | number,
 ) => ParsedBundle;
 ```
 
@@ -376,28 +384,6 @@ Load a module from the given cache, or parse it if missing.
 #### `makeModuleCache(...)`
 
 Wrapper around npm `LRU`.
-
-
-### Type Summary
-
-```ts
-export type ParsedModule = {
-  name: string,
-  code: string,
-  table: SymbolTable,
-  tree?: Tree,
-  shake?: ShakeTable,
-  entry?: string,
-};
-
-export type ParsedBundle = {
-  module: ParsedModule,
-  libs: Record<string, ParsedBundle>,
-  entry?: string,
-};
-
-export type ParsedModuleCache = LRU<string, ParsedModule>;
-```
 
 
 ## Colofon

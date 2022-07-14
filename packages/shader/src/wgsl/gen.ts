@@ -1,6 +1,6 @@
 import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
-import { toHash, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
+import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash, getBundleEntry, toModule } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
@@ -89,11 +89,11 @@ export const makeBindingAccessors = (
   const external = lambdas.map(l => getBundleHash(l.lambda!.shader));
   const unique = `@access [${signature}] [${external}] [${readable}] [${types.join(' ')}]`;
 
-  const hash = toHash(unique);
-  const code = `@access [${readable}] [${hash}]`;
+  const hash = toMurmur53(unique);
+  const code = `@access [${readable}] [${formatMurmur53(hash)}]`;
 
   const keyed = bindings.reduce((a, s) => mixBits(a, getValueKey(s)), 0);
-  const key   = toHash(`${hash} ${keyed}`);
+  const key   = toMurmur53(`${formatMurmur53(hash)} ${keyed}`);
 
   // Code generator
   const render = (

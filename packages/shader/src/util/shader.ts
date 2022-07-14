@@ -1,6 +1,6 @@
 import { Tree } from '@lezer/common';
 import { ASTParser, VirtualTable, SymbolTableT, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
-import { toHash } from './hash';
+import { formatMurmur53, toMurmur53 } from './hash';
 import { decompressAST } from './tree';
 import { PREFIX_VIRTUAL } from '../constants';
 
@@ -28,7 +28,7 @@ export const makeLoadModule = <T extends SymbolTableT = any>(
   const shake = astParser.getShakeTable(table);
 
   if (compressed) tree = decompressAST(compressAST(code, tree));
-  const hash = toHash(code);
+  const hash = toMurmur53(code);
 
   return bindEntryPoint({name, code, hash, table, shake, tree}, entry);
 }
@@ -45,7 +45,7 @@ export const makeLoadModuleWithCache = (
 ): ParsedModule => {
   if (!cache) return loadModule(code, name, entry, true);
 
-  const hash = toHash(code);
+  const hash = toMurmur53(code);
   const cached = cache.get(hash);
   if (cached) {
     return bindEntryPoint(cached, entry);
@@ -58,7 +58,7 @@ export const makeLoadModuleWithCache = (
 
 // Load a static (inert) module
 export const loadStaticModule = (code: string, name: string, entry?: string) => {
-  const hash = toHash([code, entry]);
+  const hash = toMurmur53([code, entry]);
   return ({ name, code, hash, table: EMPTY_TABLE });
 }
 
@@ -67,17 +67,17 @@ export const loadVirtualModule = <T extends SymbolTableT = any>(
   virtual: VirtualTable,
   initTable: Partial<T> = EMPTY_TABLE,
   entry?: string,
-  hash?: string,
+  hash?: number,
   code?: string,
-  key?: string,
+  key?: number,
 ) => {
   let symbols = initTable.symbols ?? EMPTY_LIST;
 
   code = code ?? `@virtual [${symbols.join(' ')}]`;
-  hash = hash ?? toHash(code);
+  hash = hash ?? toMurmur53(code);
   key  = key  ?? hash;
 
-  const name = `${PREFIX_VIRTUAL}${key.slice(0, 6)}`;
+  const name = `${PREFIX_VIRTUAL}${formatMurmur53(key).slice(0, 6)}`;
 
   const table = {
     symbols,
@@ -95,6 +95,6 @@ export const bindEntryPoint = (module: ParsedModule, entry?: string) => {
   if (entry == null && table.symbols?.includes('main')) entry = 'main';
   if (entry == null) return module;
 
-  const structural = toHash([hash, entry]);
+  const structural = toMurmur53([hash, entry]);
   return {...module, entry, hash: structural, key: hash};
 };

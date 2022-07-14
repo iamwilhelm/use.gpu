@@ -1,7 +1,9 @@
 import { ShaderModuleDescriptor } from '@use-gpu/core/types';
 import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
 
-import { resolveBindings, linkBundle, toHash, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
+import { toHash } from '@use-gpu/state';
+import { resolveBindings, linkBundle, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
+import { formatMurmur53, mixBits53, toMurmur53 } from '@use-gpu/state';
 import { makeShaderModule } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
 import { useInspectable } from './useInspectable'
@@ -31,15 +33,18 @@ export const useLinkedShader = (
   const inspect = useInspectable();
 
   // Get hash for defines, shader code, shader instance
-  const pHash = toHash(deps);
-  const dHash = toHash(defines);
+  const pHash = toMurmur53(deps);
+  const dHash = toMurmur53(defines);
   const vHash = getBundleHash(vertex);
   const fHash = getBundleHash(fragment);
   const vKey  = getBundleKey(vertex);
   const fKey  = getBundleKey(fragment);
 
-  const instanceKey   = vHash + fHash + vKey  + fKey  + dHash + pHash;
-  const structuralKey = vHash + fHash + dHash + pHash;
+  const shaderKey     = mixBits53(vHash, fHash);
+  const defKey        = mixBits53(dHash, pHash);
+  const boundKey      = mixBits53(vKey, fKey);
+  const structuralKey = mixBits53(shaderKey, defKey);
+  const instanceKey   = mixBits53(structuralKey, boundKey);
 
   // If structural key hasn't changed, we don't need updated modules
   let lazy = true;
@@ -57,8 +62,8 @@ export const useLinkedShader = (
 
   // Link final WGSL if code structure changed.
   const shader = useOne(() => {
-    const vKey = vHash +'-'+ dHash;
-    const fKey = fHash +'-'+ dHash;
+    const vKey = formatMurmur53(vHash) +'-'+ formatMurmur53(dHash);
+    const fKey = formatMurmur53(fHash) +'-'+ formatMurmur53(dHash);
 
     let vertex = CACHE.get(vKey);
     if (vertex == null) {

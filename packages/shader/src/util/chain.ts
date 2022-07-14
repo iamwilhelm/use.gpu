@@ -1,6 +1,6 @@
 import { UniformAttribute, ShaderModule, ParsedBundle, RefFlags as RF } from '../types';
 import { loadVirtualModule } from './shader';
-import { toHash } from './hash';
+import { toMurmur53, scrambleBits53, mixBits53 } from './hash';
 import { toBundle, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CHAIN } from '../constants';
 
@@ -67,9 +67,9 @@ export const makeChainTo = (
   const k1 = getBundleKey(fBundle);
   const k2 = getBundleKey(tBundle);
 
-  const code    = `@chain [${entry}] [${h1}] [${h2}]`;
-  const rehash  = toHash(code);
-  const rekey   = toHash(`${rehash} ${k1} ${k2}`);
+  const code    = `@chain [${entry}]`;
+  const rehash  = scrambleBits53(mixBits53(toMurmur53(code), mixBits53(h1, h2)));
+  const rekey   = scrambleBits53(mixBits53(rehash, mixBits53(k1, k2)));
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {

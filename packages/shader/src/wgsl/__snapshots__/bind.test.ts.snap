@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bind bind produces a bound bundle 1`] = `"fudfa4mqou"`;
+exports[`bind bind produces a bound bundle 1`] = `7689438517184070`;
 
 exports[`bind binds an external 1`] = `
 "let TEST = true;

@@ -18,7 +18,7 @@ export type TypeLike = {
   args?: TypeLike[],
 };
 
-export type ParsedModuleCache<T extends SymbolTableT = any> = LRU<string, ParsedModule<T>>;
+export type ParsedModuleCache<T extends SymbolTableT = any> = LRU<number, ParsedModule<T>>;
 
 export type ShaderModule<T extends SymbolTableT = any> = ParsedBundle<T> | ParsedModule<T>;
 
@@ -28,8 +28,8 @@ export type ParsedBundle<T extends SymbolTableT = any> = {
   links?: Record<string, ShaderModule<T>>,
   entry?: string,
 
-  hash?: string,
-  key?: string,
+  hash?: number,
+  key?: number,
   defines?: Record<string, any>,
   virtuals?: ParsedModule<T>[],
 };
@@ -37,15 +37,14 @@ export type ParsedBundle<T extends SymbolTableT = any> = {
 export type ParsedModule<T extends SymbolTableT = any> = {
   name: string,
   code: string,
-  hash: string,
+  hash: number,
   table: T,
 
   tree?: Tree,
   shake?: ShakeTable,
   virtual?: VirtualTable<T>,
   entry?: string,
-
-  key?: string,
+  key?: number,
 };
 
 export type VirtualTable<T extends SymbolTableT = any> = {

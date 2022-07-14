@@ -30,11 +30,11 @@ export const toUint53 = (a: number, b: number) => {
   return a + ((b & 0x1fffff) * 0x100000000);
 }
 
-export const formatHash53 = (uint: number) => {
+export const formatMurmur53 = (uint: number) => {
   return uint.toString(36).slice(-10);
 }
 
-export const toHash = <T>(t: T) => formatHash53(toMurmur53(t));
+export const toHash = <T>(t: T) => formatMurmur53(toMurmur53(t));
 
 export const toMurmur53 = (s: any) => {
   if (typeof s === 'string') return getStringHash(s);
@@ -212,6 +212,10 @@ const stringToMurmur53 = (s: string, seed: number = 0) => {
   return toUint53(a, b);
 }
 
+/** Hash an integer directly */
+export const hashBits53 = (x: number) => scrambleBits53(mixBits53(HASH_KEY + 65535, x));
+
+/** Murmur3 32-bit hash mixing function */
 export const mixBits = (x: number, d: number) => {
   d = mul(d, C1);
   d = rot(d, 15);
@@ -224,6 +228,7 @@ export const mixBits = (x: number, d: number) => {
   return x;
 };
 
+/** Murmur3 32-bit hash whitening function */
 export const scrambleBits = (x: number, n: number = 0) => {
   x ^= n;
   
@@ -236,6 +241,7 @@ export const scrambleBits = (x: number, n: number = 0) => {
   return x;
 };
 
+/** Custom Murmur53 53-bit hash mixing function */
 export const mixBits53 = (x: number, d: number) => {
   let a = x >>> 0;
   let b = Math.floor(x / 0x100000000);
@@ -262,6 +268,7 @@ export const mixBits53 = (x: number, d: number) => {
   return toUint53(a, b);
 };
 
+/** Custom Murmur53 53-bit hash whitening function */
 export const scrambleBits53 = (x: number, n: number = 0) => {
   let a = x >>> 0;
   let b = Math.floor(x / 0x100000000);

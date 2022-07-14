@@ -3,11 +3,11 @@ import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, R
 const NO_LIBS: Record<string, any> = {};
 const NO_ARGS: any[] = [];
 
-export const getBundleKey = (bundle: ShaderModule) => {
+export const getBundleKey = (bundle: ShaderModule): number => {
   return (('module' in bundle) ? bundle.key ?? bundle.module.key : bundle.key) ?? getBundleHash(bundle);
 };
 
-export const getBundleHash = (bundle: ShaderModule) => {
+export const getBundleHash = (bundle: ShaderModule): number => {
   return ('module' in bundle) ? bundle.hash ?? bundle.module.hash : bundle.hash;
 };
 

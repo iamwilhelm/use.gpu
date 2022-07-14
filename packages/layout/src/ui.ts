@@ -9,7 +9,8 @@ import {
   UIRectangles,
 } from '@use-gpu/workbench';
 import { use, keyed, wrap, fragment, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
-import { getNumberHash, getObjectKey } from '@use-gpu/state';
+import { hashBits53, getObjectKey } from '@use-gpu/state';
+import { getBundleKey } from '@use-gpu/shader';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -150,9 +151,9 @@ const makeUIAccumulator = (
 
 const getItemTypeKey = (item: UIAggregate) =>
   (item as any).f ? -1 :
-  getNumberHash(getObjectKey(item.texture)) ^
-  getNumberHash(getObjectKey(item.transform)) ^
-  getNumberHash(getObjectKey(item.clip));
+  hashBits53(getObjectKey(item.texture)) ^
+  hashBits53(getBundleKey(item.transform)) ^
+  hashBits53(getBundleKey(item.clip));
 
 type Partition = {
   key: number,

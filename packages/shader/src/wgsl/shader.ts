@@ -14,7 +14,7 @@ import zip from 'lodash/zip';
 export { loadStaticModule, loadVirtualModule, bindEntryPoint } from '../util/shader';
 
 // LRU cache for parsed shader code
-export const makeModuleCache = (options: Record<string, any> = {}) => new LRU<string, ParsedModule>({
+export const makeModuleCache = (options: Record<string, any> = {}) => new LRU<number, ParsedModule>({
   max: 100,
   ...options,
 });

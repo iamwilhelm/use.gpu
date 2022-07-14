@@ -120,7 +120,7 @@ export const makeLinker = (
   if (def.length) program.push(def);
 
   // Namespace by module key
-  const namespaces = new Map<string, string>();
+  const namespaces = new Map<number, string>();
 
   // Track symbols in global namespace 
   const exists = new Set<string>();
@@ -269,17 +269,17 @@ export const loadBundlesInOrder = (
   libraries: Record<string, ShaderModule> = {},
 ): {
   bundles: ParsedBundle[]
-  exported: Map<string, Set<string>>,
-  imported: Map<string, Map<string, string>>,
-  aliased: Map<string, Map<string, string>>,
+  exported: Map<number, Set<string>>,
+  imported: Map<number, Map<string, number>>,
+  aliased: Map<number, Map<string, string>>,
 } => {
-  const graph = new Map<string, string[]>();
-  const seen  = new Set<string>();
-  const hoist = new Set<string>();
+  const graph = new Map<number, number[]>();
+  const seen  = new Set<number>();
+  const hoist = new Set<number>();
 
-  const exported = new Map<string, Set<string>>();
-  const imported = new Map<string, Map<string, string>>();
-  const aliased  = new Map<string, Map<string, string>>();
+  const exported = new Map<number, Set<string>>();
+  const imported = new Map<number, Map<string, number>>();
+  const aliased  = new Map<number, Map<string, string>>();
 
   const out: ParsedBundle[] = [];
 
@@ -305,13 +305,13 @@ export const loadBundlesInOrder = (
     const bundle = toBundle(chunk);
     const {module, libs, links: linkDefs} = bundle;
     const {table: {modules, externals}} = module;
-    const deps = [] as string[];
+    const deps = [] as number[];
 
     const [links, aliases] = parseLinkAliases(linkDefs);
 
     // Static renames and imports for this module instance
     let aliasMap: Map<string, string> | null = null;
-    let importMap: Map<string, string> | null = null;
+    let importMap: Map<string, number> | null = null;
 
     // Recurse into imports
     if (modules) for (const {at, name, imports} of modules) {
@@ -403,12 +403,12 @@ export const reserveNamespace = (
 
 // Get depth for each item in a graph, so its dependencies resolve correctly
 export const getGraphOrder = (
-  graph: Map<string, string[]>,
-  name: string,
+  graph: Map<number, number[]>,
+  name: number,
   depth: number = 0,
 ) => {
   const queue = [{name, depth: 0, path: [name]}];
-  const depths = new Map<string, number>();
+  const depths = new Map<number, number>();
 
   while (queue.length) {
     const {name, depth, path} = queue.shift()!;

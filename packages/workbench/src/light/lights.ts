@@ -73,8 +73,8 @@ export const Lights: LC<LightsProps> = (props: PropsWithChildren<LightsProps>) =
     storage.size[0] = storage.length = lights.length;
 
     // Group by transform
-    const keyFor = (transform?: ShaderModule | null) => transform ? getBundleKey(transform) : '0';
-    const map = new Map<string, Light[]>();
+    const keyFor = (transform?: ShaderModule | null) => transform ? getBundleKey(transform) : 0;
+    const map = new Map<number, Light[]>();
     for (const light of lights) {
       const key = keyFor(light.transform);
       let list = map.get(key);
@@ -84,7 +84,7 @@ export const Lights: LC<LightsProps> = (props: PropsWithChildren<LightsProps>) =
 
     // Emit light data
     let base = 0;
-    const render = Array.from(map.keys()).map((key: string) => {
+    const render = Array.from(map.keys()).map((key: number) => {
       const lights = map.get(key)!;
       const b = base;
       base += lights.length;

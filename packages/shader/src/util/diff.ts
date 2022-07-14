@@ -1,6 +1,6 @@
 import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
 import { loadVirtualModule } from './shader';
-import { toHash } from './hash';
+import { formatMurmur53, toMurmur53 } from './hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CAST } from '../constants';
 
@@ -49,9 +49,9 @@ export const makeDiffBy = (
   const getSizes = sizes.map((s, i) => `getSize${i}`);
   symbols.push(...getSizes);
 
-  const code   = `@diff [${getSizes.join(' ')}] [${hash}]`;
-  const rehash = toHash(code);
-  const rekey  = toHash(`${rehash} ${key}`);
+  const code   = `@diff [${getSizes.join(' ')}] [${formatMurmur53(hash)}]`;
+  const rehash = toMurmur53(code);
+  const rekey  = toMurmur53(`${formatMurmur53(rehash)} ${formatMurmur53(key)}`);
 
   const externals = [
     ...EXTERNALS,

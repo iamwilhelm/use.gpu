@@ -1,7 +1,7 @@
 import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding } from '../types';
 
 import { parseLinkAliases } from '../util/link';
-import { toHash, makeKey } from '../util/hash';
+import { toHash, formatMurmur53, toMurmur53, scrambleBits53, mixBits53 } from '../util/hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
 import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
@@ -55,17 +55,17 @@ export const bindBundle = (
   const hash = getBundleHash(bundle);
   const key = getBundleKey(bundle);
 
-  const external: string[] = [];
-  for (const k in links) if (links[k]) external.push(getBundleHash(links[k]!));
+  let external: number = 0;
+  for (const k in links) if (links[k]) external = mixBits53(external, getBundleHash(links[k]!));
 
-  const defs = defines ? toHash(defines) : '';
-  const unique = `@closure [${hash}] [${external.join(' ')}] [${defs}]`;
-  const rehash = toHash(unique);
+  const defs = defines ? toMurmur53(defines) : '';
+  const code = `@closure`;
+  const rehash = scrambleBits53(mixBits53(hash, mixBits53(external, toMurmur53(defs))));
 
-  external.length = 0;
-  for (const k in links) if (links[k]) external.push(getBundleKey(links[k]!));
-  const rekey  = toHash(`${key} ${external.join(' ')}`);
-  
+  external = 0;
+  for (const k in links) if (links[k]) external = mixBits53(external, getBundleKey(links[k]!));
+  const rekey = scrambleBits53(mixBits53(key, external));
+
   const relinks = bundle.links ? {
     ...bundle.links,
   } : {} ?? undefined;
@@ -118,7 +118,7 @@ export const makeResolveBindings = (
   const allBindings  = [] as DataBinding[];
   const allVolatiles = [] as DataBinding[];
 
-  const seen = new Set<string>();
+  const seen = new Set<number>();
   DEBUG && console.log('------------')
 
   const addBinding = (b: DataBinding, slots: number) => {

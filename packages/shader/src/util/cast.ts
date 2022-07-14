@@ -1,6 +1,6 @@
 import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../types';
 import { loadVirtualModule } from './shader';
-import { toHash, toMurmur53 } from './hash';
+import { toMurmur53, scrambleBits53, mixBits53 } from './hash';
 import { toBundle, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CAST } from '../constants';
 
@@ -54,9 +54,10 @@ export const makeSwizzleTo = (
 ): ParsedBundle => {
   const entry = 'swizzle';
 
-  const id   = toMurmur53(swizzle);
-  const code = `@swizzle [${from} ${to} ${id}]`;
-  const hash = toHash(code);
+  const id = mixBits53(toMurmur53(swizzle), mixBits53(toMurmur53(from), toMurmur53(to)));
+
+  const code = `@swizzle`;
+  const hash = scrambleBits53(mixBits53(toMurmur53(code), id));
   const key  = hash;
 
   // Code generator
@@ -98,9 +99,9 @@ export const makeCastTo = (
   const key  = getBundleKey(bundle);
 
   const id     = toMurmur53(swizzle);
-  const code   = `@cast [${name} ${format}] [${hash} ${id}]`;
-  const rehash = toHash(code);
-  const rekey  = toHash(`${rehash} ${key}`);
+  const code   = `@cast [${name} ${format}]`;
+  const rehash = scrambleBits53(mixBits53(toMurmur53(code), mixBits53(hash, id)));
+  const rekey  = scrambleBits53(mixBits53(rehash, key));
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {

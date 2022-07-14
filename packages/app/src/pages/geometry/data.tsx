@@ -1,5 +1,5 @@
 import { LC } from '@use-gpu/live/types';
-import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { DataField, Emit, RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
 import { use } from '@use-gpu/live';
@@ -102,7 +102,7 @@ export const GeometryDataPage: LC = () => {
             format='vec3<f32>'
             length={100}
             live
-            expr={(emit: Emitter, i: number) => {
+            expr={(emit: Emit, i: number) => {
               const s = ((i*i + i) % 13133.371) % 1000;
               emit(
                 Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,

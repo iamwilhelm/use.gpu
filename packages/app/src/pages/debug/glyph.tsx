@@ -1,5 +1,5 @@
 import { LC, PropsWithChildren } from '@use-gpu/live/types';
-import { Rectangle, DataField, Emitter, DataTexture, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { Rectangle, Emit, DataTexture } from '@use-gpu/core/types';
 
 import React, { Morph } from '@use-gpu/live/jsx';
 import { memo, fragment } from '@use-gpu/live';
@@ -191,7 +191,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   };
 
   const gridEmitter = ({xs, ys, width, height}: DebugImage) =>
-    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+    (emit: Emit, x: number, y: number, i: number, j: number) => {
       const index = i + j * paddedWidth;
       const dx = xs[index];
       const dy = ys[index];
@@ -199,7 +199,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
     };
 
   const pointEmitter = ({xs, ys, width, height}: DebugImage) =>
-    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+    (emit: Emit, x: number, y: number, i: number, j: number) => {
       const index = i + j * paddedWidth;
       const dx = xs[index];
       const dy = ys[index];
@@ -207,7 +207,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
     };
 
   const shiftedPointEmitter = ({xs, ys, width, height}: DebugImage) =>
-    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+    (emit: Emit, x: number, y: number, i: number, j: number) => {
       const index = i + j * paddedWidth;
       const dx = xs[index];
       const dy = ys[index];
@@ -217,7 +217,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
     };
 
   const arrowEmitter = ({xs, ys, width, height}: DebugImage) =>
-    (emit: Emitter, x: number, y: number, i: number, j: number) => {
+    (emit: Emit, x: number, y: number, i: number, j: number) => {
       const index = i + j * paddedWidth;
       const dx = xs[index];
       const dy = ys[index];

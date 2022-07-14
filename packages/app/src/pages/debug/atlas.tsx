@@ -17,7 +17,12 @@ export const DebugAtlasPage: LC = () => {
     <LinearRGB>
       <Pass>
         <UI>
-          <Gather>
+          <Gather then={
+            (layout: any) => [
+              <Yeet>{layout}</Yeet>,
+              <DebugAtlas />,
+            ]
+          }>
             <Layout>
               <Absolute
                 left={10}
@@ -43,10 +48,6 @@ export const DebugAtlasPage: LC = () => {
                 </Inline>
               </Absolute>
             </Layout>
-            {(layout: any) => [
-              <Yeet>{layout}</Yeet>,
-              <DebugAtlas />,
-            ]}
           </Gather>
         </UI>
       </Pass>

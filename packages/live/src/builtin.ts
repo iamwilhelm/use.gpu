@@ -133,30 +133,30 @@ export const mapReduce = <R, T>(
   calls?: LiveNode<any>,
   map?: (t: T) => R,
   reduce?: (a: R, b: R) => R,
-  done?: LiveFunction<(r: R) => LiveElement<any>>,
+  then?: LiveFunction<(r: R) => LiveElement<any>>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, done], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, then], key, by: getCurrentFiberID()} as any);
 
 /** Gather items from a subtree, into a flat array */
 export const gather = <T>(
   calls?: LiveNode<any>,
-  done?: LiveFunction<(r: T[]) => LiveElement<any>>,
+  then?: LiveFunction<(r: T[]) => LiveElement<any>>,
   key?: Key,
-): DeferredCall<() => void> => ({f: GATHER, args: [calls, done], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: GATHER, args: [calls, then], key, by: getCurrentFiberID()} as any);
 
 /** Multi-gather items from a subtree, by object key */
 export const multiGather = <T>(
   calls?: LiveNode<any>,
-  done?: LiveFunction<(r: Record<string, T[]>) => LiveElement<any>>,
+  then?: LiveFunction<(r: Record<string, T[]>) => LiveElement<any>>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, done], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, then], key, by: getCurrentFiberID()} as any);
 
 /** Fence gathered items from a subtree */
 export const fence = <T>(
   calls?: LiveNode<any>,
-  done?: LiveFunction<(r: T[]) => LiveElement<any>>,
+  then?: LiveFunction<(r: T[]) => LiveElement<any>>,
   key?: Key,
-): DeferredCall<() => void> => ({f: FENCE, args: [calls, done], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: FENCE, args: [calls, then], key, by: getCurrentFiberID()} as any);
 
 /** Yeet value(s) upstream */
 export const yeet = <T>(
@@ -176,9 +176,9 @@ export const provide = <T, C>(
 export const consume = <T, C>(
   context: LiveContext<C>,
   calls?: LiveNode<any>,
-  done?: LiveFunction<(r: T) => void>,
+  then?: LiveFunction<(r: T) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, done], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, then], key, by: getCurrentFiberID()} as any);
 
 /** Component has side-effects */
 export const imperative = makeImperativeFunction;

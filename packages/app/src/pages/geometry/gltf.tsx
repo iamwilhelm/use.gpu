@@ -1,5 +1,4 @@
 import { LC } from '@use-gpu/live/types';
-import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
 import { GLTF } from '@use-gpu/gltf/types';
 
 import React from '@use-gpu/live/jsx';
@@ -71,7 +70,7 @@ export const GeometryGLTFPage: LC = () => {
 
   return (
     <OrbitControls
-      radius={5}
+      radius={3}
       bearing={0.5}
       pitch={0.3}
       render={(radius: number, phi: number, theta: number) =>

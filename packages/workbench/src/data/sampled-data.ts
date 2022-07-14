@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/types';
+import { TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core/types';
 
 import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
@@ -8,6 +8,7 @@ import {
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
+import { useTimeContext } from '../providers/time-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -18,7 +19,7 @@ export type SampledDataProps = {
 
   sparse?: boolean,
   centered?: boolean[] | boolean,
-  expr?: (emit: Emitter, ...args: number[]) => void,
+  expr?: Emitter,
   items?: number,
 
   format?: string,
@@ -29,6 +30,7 @@ export type SampledDataProps = {
 
 export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   const device = useContext(DeviceContext);
+  const time = useTimeContext();
 
   const {
     range,
@@ -78,8 +80,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         let step = (max - min) / (size[0] - 1 + c);
         if (c) min += step / 2;
 
-        sampled = (emit: Emitter, i: number, n: number) =>
-          expr(emit, min + i * step, i);
+        sampled = (emit: Emit, i: number, n: number) =>
+          expr(emit, min + i * step, i, time);
       }
       else if (n === 2) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -92,13 +94,14 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
 
-        sampled = (emit: Emitter, i: number, j: number) =>
+        sampled = (emit: Emit, i: number, j: number) =>
           expr(
             emit,
             minX + i * stepX,
             minY + j * stepY,
             i,
             j,
+            time,
           );
       }
       else if (n === 3) {
@@ -116,7 +119,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
 
-        sampled = (emit: Emitter, i: number, j: number, k: number) =>
+        sampled = (emit: Emit, i: number, j: number, k: number) =>
           expr(
             emit,
             minX + i * stepX,
@@ -125,6 +128,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             i,
             j,
             k,
+            time,
           );
       }
       else if (n === 4) {
@@ -146,7 +150,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cz) minZ += stepZ / 2;
         if (cw) minW += stepW / 2;
 
-        sampled = (emit: Emitter, i: number, j: number, k: number, l: number) =>
+        sampled = (emit: Emit, i: number, j: number, k: number, l: number) =>
           expr(
             emit,
             minX + i * stepX,
@@ -157,6 +161,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             j,
             k,
             l,
+            time,
           );
       }
       else {
@@ -171,8 +176,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       uploadBuffer(device, buffer, array.buffer);
     }
 
-    source.length = sparse ? emitted / items : length;
-    source.size = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
+    source.length  = !sparse ? length : emitted;
+    source.size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
     source.version = incrementVersion(source.version);
   };
 

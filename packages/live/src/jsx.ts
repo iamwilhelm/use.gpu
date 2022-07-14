@@ -30,7 +30,7 @@ export const React = {
         return children;
       }
       if (type === GATHER) {
-        return gather(children[0], children[1], props?.key);
+        return gather(toChildren(children), props?.then, props?.key);
       }
       if (type === PROVIDE) {
         return provide(props.context, props.value, toChildren(children), props?.key);

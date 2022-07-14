@@ -1,5 +1,5 @@
 import { LC } from '@use-gpu/live/types';
-import { DataField, Emitter, StorageSource, ViewUniforms, UniformAttribute, RenderPassMode } from '@use-gpu/core/types';
+import { RenderPassMode } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
 

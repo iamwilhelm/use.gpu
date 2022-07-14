@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { LambdaSource, Emitter } from '@use-gpu/core/types';
+import { LambdaSource } from '@use-gpu/core/types';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
 import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';

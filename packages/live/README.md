@@ -135,8 +135,10 @@ If `defaultValue` is `null`, the context value has type `T | null` and is option
 
 Components can render a `Gather` to continue after their children are rendered.
 
+Values yielded by those children are gathered up incrementally, in tree order.
+
 Gather takes two children:
-- the tree to be rendered, where values are yeeted back upwards
+- the tree of children to be rendered
 - a continuation `(value: T[]) => JSX.Element` that receives gathered values
 
 Any child can yeet a value, or an array of values:
@@ -145,26 +147,35 @@ Any child can yeet a value, or an array of values:
 return <Yeet>{value}</Yeet>
 ```
 
-Yeeted values are reduced in tree order. The parent then looks like:
+The parent then looks like:
 
 ```tsx
 import React, { Gather } from '@use-gpu/live/jsx';
 
 export const Component: LC = () => {
+  const then = (values: any[]) => {
+    // ...
+  };
+
   return (
-    <Gather>
-      <Components />
-      {(values: any[]) => [
-        // ...
-      ]}
+    <Gather then={then}>
+      <Component />
+      <Component />
     </Gather>
   );
 };
 ```
 
-A continuation is similar to a classic render prop, except that it acts as a fully fledged component: it can e.g. use hooks, and appears as a separate node in the component tree.
-
 Whenever the yielded `values` change, the continuation is re-run.
+
+A continuation (aka a `then` prop) is similar to a classic `render` prop, except that it is run after children are done. The difference is that it acts as a fully fledged component: you can e.g. use hooks, and it appears as a separate `Resume(Component)` node in the component tree.
+
+#### Render vs Yield
+
+A nice pattern is to make a component's `render` prop optional. If absent, the component will then `@{<Yeet>}` the result instead. This allows the `render` prop to handle the common case, while also allowing the component to be part of a `@{<Gather>}` for more complex use:
+
+```tsx
+<Component render={()}>
 
 ## Native Syntax
 

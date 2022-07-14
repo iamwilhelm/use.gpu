@@ -1,4 +1,4 @@
-import { TypedArray, UniformType, UniformAttribute, EmitterExpression, Emitter, Accessor, AccessorSpec } from './types';
+import { TypedArray, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec } from './types';
 import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from './constants';
 
 import { vec4 } from 'gl-matrix';
@@ -22,7 +22,7 @@ export const makeDataArray = (type: UniformType, length: number) => {
 };
 
 export const makeDataEmitter = (to: NumberArray, dims: number): {
-  emit: Emitter,
+  emit: Emit,
   emitted: () => number,
 } => {
   let i = 0;
@@ -58,14 +58,14 @@ export const makeDataAccessor = (format: UniformType, accessor: AccessorSpec) =>
   else throw new Error(`Invalid accessor ${accessor}`);
 }
 
-export const emitIntoNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number) => {
+export const emitIntoNumberArray = <T>(expr: Emitter, to: NumberArray, dims: number, props?: T) => {
   const {emit, emitted} = makeDataEmitter(to, dims);
   const n = to.length / Math.ceil(dims);
-  for (let i = 0; i < n; i++) expr(emit, i, n);
+  for (let i = 0; i < n; i++) expr(emit, i, n, props);
   return emitted();
 }
 
-export const emitIntoMultiNumberArray = (expr: EmitterExpression, to: NumberArray, dims: number, size: number[]) => {
+export const emitIntoMultiNumberArray = <T>(expr: Emitter, to: NumberArray, dims: number, size: number[], props?: T) => {
   const n = size.length;
 
   const index = size.map(_ => 0);
@@ -80,34 +80,34 @@ export const emitIntoMultiNumberArray = (expr: EmitterExpression, to: NumberArra
     }
   };
 
-  let nest: EmitterExpression;
+  let nest: Emitter;
   if (n === 1) {
-    nest = (emit: Emitter) => {
-      expr(emit, index[0], size);
+    nest = (emit: Emit) => {
+      expr(emit, index[0], size[0], props);
       increment();
     };
   }
   else if (n === 2) {
-    nest = (emit: Emitter) => {
-      expr(emit, index[0], index[1], size);
+    nest = (emit: Emit) => {
+      expr(emit, index[0], index[1], size[0], size[1], props);
       increment();
     };
   }
   else if (n === 3 || n === 3.5) {
-    nest = (emit: Emitter) => {
-      expr(emit, index[0], index[1], index[2], size);
+    nest = (emit: Emit) => {
+      expr(emit, index[0], index[1], index[2], size[0], size[1], size[2], props);
       increment();
     };
   }
   else if (n === 4) {
-    nest = (emit: Emitter) => {
-      expr(emit, index[0], index[1], index[2], index[3], size);
+    nest = (emit: Emit) => {
+      expr(emit, index[0], index[1], index[2], index[3], size[0], size[1], size[2], size[3], props);
       increment();
     };
   }
   else {
-    nest = (emit: Emitter) => {
-      expr(emit, ...index, size);
+    nest = (emit: Emit) => {
+      expr(emit, ...index, ...size, props);
       increment();
     };
   }

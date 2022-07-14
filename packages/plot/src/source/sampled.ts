@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { StorageSource, Emitter } from '@use-gpu/core/types';
+import { StorageSource, Emit } from '@use-gpu/core/types';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
 import { SampledData } from '@use-gpu/workbench';
@@ -16,7 +16,7 @@ export type SampledProps = {
 
   sparse?: boolean,
   centered?: boolean[] | boolean,
-  expr?: (emit: Emitter, ...args: number[]) => void,
+  expr?: (emit: Emit, ...args: number[]) => void,
   items?: number,
 
   format?: string,

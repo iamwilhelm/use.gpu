@@ -333,14 +333,22 @@ export type Tuples<N extends number, T = number> = {
   length: number,
 };
 
-export type Emitter = (...args: number[]) => void;
+export interface Emitter<T = any> {
+  (emit: Emit, i: number, n: number, props: T): any;
+  (emit: Emit, i: number, j: number, w: number, h: number, props: T): any;
+  (emit: Emit, i: number, j: number, k: number, w: number, h: number, d: number, props: T): any;
+  (emit: Emit, i: number, j: number, k: number, l: number, w: number, h: number, d: number, q: number, props: T): any;
+  (emit: Emit, ...args: any[]): any;
+};
+
+export type Emit = (...args: number[]) => void;
 export type Accessor = (o: any) => any;
-export type EmitterExpression = (emit: Emitter, ...args: any[]) => any;
+
 
 export type ArrayLike = any[] | TypedArray;
 
 export type AccessorSpec = string | Accessor | ArrayLike;
-export type AccessorType = 'position' | 'index';
+export type AccessorType = 'index';
 export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];
 export type DataBinding<T = any, S = any> = {
   uniform: UniformAttribute,

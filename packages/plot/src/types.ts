@@ -105,5 +105,12 @@ export type DomainOptions = {
 export type SurfaceTrait = {
   loopX: boolean,
   loopY: boolean,
+  shaded: boolean,
 };
 
+export type VolumeTrait = {
+  loopX: boolean,
+  loopY: boolean,
+  loopZ: boolean,
+  shaded: boolean,
+};

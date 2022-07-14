@@ -218,6 +218,20 @@ const SURFACE_DEFAULTS = {
   shaded: true,
 };
 
+const VOLUME_TRAIT = {
+  loopX: parseBoolean,
+  loopY: parseBoolean,
+  loopZ: parseBoolean,
+  shaded: parseBoolean,
+};
+
+const VOLUME_DEFAULTS = {
+  loopX: false,
+  loopY: false,
+  loopZ: false,
+  shaded: true,
+};
+
 /** @category Traits */
 export const useAnchorTrait  = makeUseTrait<AnchorTrait>(ANCHOR_TRAIT, ANCHOR_DEFAULTS);
 /** @category Traits */
@@ -244,6 +258,8 @@ export const useROPTrait     = makeUseTrait<ROPTrait>(ROP_TRAIT, ROP_DEFAULTS);
 export const useScaleTrait   = makeUseTrait<ScaleTrait>(SCALE_TRAIT, SCALE_DEFAULTS);
 /** @category Traits */
 export const useSurfaceTrait = makeUseTrait<SurfaceTrait>(SURFACE_TRAIT, SURFACE_DEFAULTS);
+/** @category Traits */
+export const useVolumeTrait = makeUseTrait<SurfaceTrait>(VOLUME_TRAIT, VOLUME_DEFAULTS);
 
 /** @category Traits */
 export const useColorTrait = (props: Partial<ColorTrait>): vec4 => {

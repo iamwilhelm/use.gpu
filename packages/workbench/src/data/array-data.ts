@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TypedArray, StorageSource, UniformType, Emitter } from '@use-gpu/core/types';
+import { TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core/types';
 
 import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
@@ -8,15 +8,19 @@ import {
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
+import { useTimeContext } from '../providers/time-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type ArrayDataProps = {
   size: number[],
+
+  sparse?: boolean,
   data?: number[] | TypedArray,
-  expr?: (emit: Emitter, ...args: number[]) => void,
+  expr?: Emitter,
   items?: number,
+
   format?: string,
   live?: boolean,
 
@@ -25,6 +29,7 @@ export type ArrayDataProps = {
 
 export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   const device = useContext(DeviceContext);
+  const time = useTimeContext();
 
   const {
     format,
@@ -33,6 +38,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     expr,
     items = 1,
     render,
+    sparse = false,
     live = false,
   } = props;
 
@@ -61,16 +67,17 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
 
   // Refresh and upload data
   const refresh = () => {
+    let emitted = 0;
     if (data) copyNumberArray(data, array, dims);
     if (expr && size.length) {
-      emitIntoMultiNumberArray(expr, array, dims, size);
+      emitted = emitIntoMultiNumberArray(expr, array, dims, size, time);
     }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }
 
-    source.length = length;
-    source.size = items > 1 ? [items, ...size] : size;
+    source.length  = !sparse ? length : emitted;
+    source.size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
     source.version = incrementVersion(source.version);
   };
 

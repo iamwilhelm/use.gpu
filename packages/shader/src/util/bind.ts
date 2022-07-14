@@ -1,7 +1,7 @@
 import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding } from '../types';
 
 import { parseLinkAliases } from '../util/link';
-import { getHash, makeKey } from '../util/hash';
+import { toHash, makeKey } from '../util/hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
 import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
@@ -58,13 +58,13 @@ export const bindBundle = (
   const external: string[] = [];
   for (const k in links) if (links[k]) external.push(getBundleHash(links[k]!));
 
-  const defs = defines ? getHash(defines) : '';
+  const defs = defines ? toHash(defines) : '';
   const unique = `@closure [${hash}] [${external.join(' ')}] [${defs}]`;
-  const rehash = getHash(unique);
+  const rehash = toHash(unique);
 
   external.length = 0;
   for (const k in links) if (links[k]) external.push(getBundleKey(links[k]!));
-  const rekey  = getHash(`${key} ${external.join(' ')}`);
+  const rekey  = toHash(`${key} ${external.join(' ')}`);
   
   const relinks = bundle.links ? {
     ...bundle.links,

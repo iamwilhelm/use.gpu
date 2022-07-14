@@ -1,6 +1,6 @@
 import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
-import { getHash, getHashValue, getObjectKey, mixBits, scrambleBits } from '../util/hash';
+import { toHash, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash, getBundleEntry, toModule } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
@@ -30,7 +30,7 @@ const getTypeKey = (b: DataBinding) =>
   (+!!(b.storage?.volatile || b.texture?.volatile)) * 16;
 
 const getFormatKey = (b: DataBinding) => 
-  getHashValue(b.storage?.format ?? b.texture?.format);
+  toMurmur53(b.storage?.format ?? b.texture?.format);
 
 const getBindingsKey = (bs: DataBinding[]) => scrambleBits(bs.reduce((a, b) => mixBits(a, getTypeKey(b) ^ getFormatKey(b)), 0)) >>> 0;
 const getValueKey = (b: DataBinding) => getObjectKey(b.constant ?? b.storage ?? b.texture);
@@ -89,11 +89,11 @@ export const makeBindingAccessors = (
   const external = lambdas.map(l => getBundleHash(l.lambda!.shader));
   const unique = `@access [${signature}] [${external}] [${readable}] [${types.join(' ')}]`;
 
-  const hash = getHash(unique);
+  const hash = toHash(unique);
   const code = `@access [${readable}] [${hash}]`;
 
   const keyed = bindings.reduce((a, s) => mixBits(a, getValueKey(s)), 0);
-  const key   = getHash(`${hash} ${keyed}`);
+  const key   = toHash(`${hash} ${keyed}`);
 
   // Code generator
   const render = (

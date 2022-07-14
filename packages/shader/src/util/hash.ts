@@ -30,13 +30,13 @@ export const toUint53 = (a: number, b: number) => {
   return a + ((b & 0x1fffff) * 0x100000000);
 }
 
-export const formatHash = (uint: number) => {
+export const formatHash53 = (uint: number) => {
   return uint.toString(36).slice(-10);
 }
 
-export const getHash = <T>(t: T) => formatHash(getHashValue(t));
+export const toHash = <T>(t: T) => formatHash53(toMurmur53(t));
 
-export const getHashValue = (s: any) => {
+export const toMurmur53 = (s: any) => {
   if (typeof s === 'string') return getStringHash(s);
   if (typeof s === 'number') return getNumberHash(s);
   if (typeof s === 'boolean') return getBooleanHash(s);
@@ -49,12 +49,12 @@ export const getHashValue = (s: any) => {
   return scrambleBits53(mixBits53(HASH_KEY, -1));
 }
 
-export const getStringHash  = (s: string) => stringToMurmur53(s, HASH_KEY + 15);
+const getStringHash  = (s: string) => stringToMurmur53(s, HASH_KEY + 15);
 
 const f64 = new Float64Array(1);
 const uint32 = new Uint32Array(f64.buffer);
-export const getNumberHash = (n: number) => scrambleBits53(getNumberHashRaw(n));
-export const getNumberHashRaw = (n: number) => {
+const getNumberHash = (n: number) => scrambleBits53(getNumberHashInner(n));
+const getNumberHashInner = (n: number) => {
   f64[0] = n;
   let k = HASH_KEY + 63;
   k = mixBits53(k, uint32[0]);
@@ -62,22 +62,22 @@ export const getNumberHashRaw = (n: number) => {
   return k;
 }
 
-export const getBooleanHash = (b: boolean) => scrambleBits53(mixBits53(HASH_KEY + 255, +b));
+const getBooleanHash = (b: boolean) => scrambleBits53(mixBits53(HASH_KEY + 255, +b));
 
-export const getArrayHash = (t: any[]) => {
+const getArrayHash = (t: any[]) => {
   let h = mixBits53(HASH_KEY + 1023, 0);
   for (let v of t) {
-    h = mixBits53(h, getHashValue(v));
+    h = mixBits53(h, toMurmur53(v));
   }
   return scrambleBits53(h, t.length);
 }
 
-export const getObjectHash = (t: Record<string, any>) => {
+const getObjectHash = (t: Record<string, any>) => {
   let i = 0;
   let h = mixBits53(HASH_KEY + 4095, 0);
   for (let k in t) {
-    h = mixBits53(h, getHashValue(k));
-    h = mixBits53(h, getHashValue(t[k]));
+    h = mixBits53(h, toMurmur53(k));
+    h = mixBits53(h, toMurmur53(t[k]));
     ++i;
   }
   return scrambleBits53(h, i);
@@ -99,7 +99,7 @@ const isTypedArray = (() => {
   return (obj: any) => obj instanceof TypedArray;
 })();
   
-export const getTypedArrayHash = (t: TypedArray) => {
+const getTypedArrayHash = (t: TypedArray) => {
   let h = mixBits53(HASH_KEY + 16383, 0);
 
   if (
@@ -111,14 +111,105 @@ export const getTypedArrayHash = (t: TypedArray) => {
     t instanceof Uint32Array ||
     t instanceof Uint8ClampedArray
   ) {
-    h = arrayToMurmur53(t, h);
+    h = integerArrayToMurmur53(t, h);
   }
   else {
     let n = t.length;
-    for (let i = 0; i < n; ++i) h = mixBits53(h, getNumberHashRaw(t[i]));
+    for (let i = 0; i < n; ++i) h = mixBits53(h, getNumberHashInner(t[i]));
   }
 
   return scrambleBits53(h);
+}
+
+const integerArrayToMurmur53 = (list: number[] | TypedArray, seed: number = 0) => {
+  const n = list.length;
+  
+  let a = seed;
+  let b = seed ^ C4;
+
+  for (let i = 0; i < n; ++i) {
+    let d = list[i];
+    let d1 = add(rot(d, 16), b);
+    let d2 = add(d, a);
+
+    d1 = mul(d1, C1);
+    d1 = rot(d1, 15);
+    d1 = mul(d1, C2);
+
+    a ^= d1;
+    a = rot(a, 13);
+    a = add(mul(a, 5), C3);
+
+    d2 = mul(d2, C1);
+    d2 = rot(d2, 15);
+    d2 = mul(d2, C2);
+
+    b ^= d2;
+    b = rot(b, 13);
+    b = add(mul(b, 5), C3);
+  }
+
+  a ^= n;
+  b ^= n;
+
+  a ^= a >>> 16;
+  a = mul(a, C4);
+  a ^= a >>> 13;
+  a = mul(a, C5);
+  a ^= a >>> 16;
+  
+  b ^= b >>> 16;
+  b = mul(b, C4);
+  b ^= b >>> 13;
+  b = mul(b, C5);
+  b ^= b >>> 16;
+
+  return toUint53(a, b);
+}
+
+const stringToMurmur53 = (s: string, seed: number = 0) => {
+  const n = s.length;
+  let a = seed;
+  let b = seed ^ C4;
+
+  for (let i = 0; i < n; ++i) {
+    let d = s.charCodeAt(i);
+    let d1 = add(rot(d, 16), b);
+    let d2 = add(d, a);
+
+    d1 = mul(d1, C1);
+    d1 = rot(d1, 15);
+    d1 = mul(d1, C2);
+
+    a ^= d1;
+    a = rot(a, 13);
+    a = add(mul(a, 5), C3);
+
+    d2 = mul(d2, C1);
+    d2 = rot(d2, 15);
+    d2 = mul(d2, C2);
+
+    b ^= d2;
+    b = rot(b, 13);
+    b = add(mul(b, 5), C3);
+  }
+
+  a ^= n;
+  b ^= n;
+
+  a ^= a >>> 16;
+  a = mul(a, C4);
+  a ^= a >>> 13;
+  a = mul(a, C5);
+  a ^= a >>> 16;
+  
+  b ^= b >>> 16;
+  b = mul(b, C4);
+  b ^= b >>> 13;
+  b = mul(b, C5);
+  b ^= b >>> 16;
+
+  return toUint53(a, b);
 }
 
 export const mixBits = (x: number, d: number) => {
@@ -193,95 +284,3 @@ export const scrambleBits53 = (x: number, n: number = 0) => {
   return toUint53(a, b);
 };
 
-export const arrayToMurmur53 = (list: number[] | TypedArray, seed: number = 0) => {
-  const n = list.length;
-  
-  let a = seed;
-  let b = seed ^ C4;
-
-  for (let i = 0; i < n; ++i) {
-    let d = list[i];
-    let d1 = add(rot(d, 16), b);
-    let d2 = add(d, a);
-
-    d1 = mul(d1, C1);
-    d1 = rot(d1, 15);
-    d1 = mul(d1, C2);
-
-    a ^= d1;
-    a = rot(a, 13);
-    a = add(mul(a, 5), C3);
-
-    d2 = mul(d2, C1);
-    d2 = rot(d2, 15);
-    d2 = mul(d2, C2);
-
-    b ^= d2;
-    b = rot(b, 13);
-    b = add(mul(b, 5), C3);
-  }
-
-  a ^= n;
-  b ^= n;
-
-  a ^= a >>> 16;
-  a = mul(a, C4);
-  a ^= a >>> 13;
-  a = mul(a, C5);
-  a ^= a >>> 16;
-  
-  b ^= b >>> 16;
-  b = mul(b, C4);
-  b ^= b >>> 13;
-  b = mul(b, C5);
-  b ^= b >>> 16;
-
-  return toUint53(a, b);
-}
-
-export const stringToMurmur53 = (s: string, seed: number = 0) => {
-  const n = s.length;
-  let a = seed;
-  let b = seed ^ C4;
-
-  for (let i = 0; i < n; ++i) {
-    let d = s.charCodeAt(i);
-    let d1 = add(rot(d, 16), b);
-    let d2 = add(d, a);
-
-    d1 = mul(d1, C1);
-    d1 = rot(d1, 15);
-    d1 = mul(d1, C2);
-
-    a ^= d1;
-    a = rot(a, 13);
-    a = add(mul(a, 5), C3);
-
-    d2 = mul(d2, C1);
-    d2 = rot(d2, 15);
-    d2 = mul(d2, C2);
-
-    b ^= d2;
-    b = rot(b, 13);
-    b = add(mul(b, 5), C3);
-  }
-
-  a ^= n;
-  b ^= n;
-
-  a ^= a >>> 16;
-  a = mul(a, C4);
-  a ^= a >>> 13;
-  a = mul(a, C5);
-  a ^= a >>> 16;
-  
-  b ^= b >>> 16;
-  b = mul(b, C4);
-  b ^= b >>> 13;
-  b = mul(b, C5);
-  b ^= b >>> 16;
-
-  return toUint53(a, b);
-}
-
-export const toMurmur53 = stringToMurmur53;

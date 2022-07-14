@@ -1,5 +1,5 @@
 import { Font, FontProps, FontMetrics, SpanMetrics, GlyphMetrics, RustTextAPI } from './types';
-import { getHashValue } from '@use-gpu/state';
+import { toMurmur53 } from '@use-gpu/state';
 import { UseRustText } from '../pkg';
 
 const DEFAULT_FONTS = {
@@ -18,7 +18,7 @@ export const RustText = async (): Promise<RustTextAPI> => {
   for (let k in DEFAULT_FONTS) fontMap.set(+k, DEFAULT_FONTS[k]);
 
   const setFonts = (fonts: Font[]) => {
-    const keys = fonts.map(getHashValue);
+    const keys = fonts.map(toMurmur53);
 
     const remove = new Set<number>(fontMap.keys());
     remove.delete(0);

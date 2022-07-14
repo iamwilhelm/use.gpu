@@ -1,6 +1,6 @@
 import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../types';
 import { loadVirtualModule } from './shader';
-import { getHash, getHashValue } from './hash';
+import { toHash, toMurmur53 } from './hash';
 import { toBundle, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CAST } from '../constants';
 
@@ -54,9 +54,9 @@ export const makeSwizzleTo = (
 ): ParsedBundle => {
   const entry = 'swizzle';
 
-  const id   = getHashValue(swizzle);
+  const id   = toMurmur53(swizzle);
   const code = `@swizzle [${from} ${to} ${id}]`;
-  const hash = getHash(code);
+  const hash = toHash(code);
   const key  = hash;
 
   // Code generator
@@ -97,10 +97,10 @@ export const makeCastTo = (
   const hash = getBundleHash(bundle);
   const key  = getBundleKey(bundle);
 
-  const id     = getHashValue(swizzle);
+  const id     = toMurmur53(swizzle);
   const code   = `@cast [${name} ${format}] [${hash} ${id}]`;
-  const rehash = getHash(code);
-  const rekey  = getHash(`${rehash} ${key}`);
+  const rehash = toHash(code);
+  const rekey  = toHash(`${rehash} ${key}`);
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {

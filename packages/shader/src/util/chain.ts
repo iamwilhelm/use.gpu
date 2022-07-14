@@ -1,6 +1,6 @@
 import { UniformAttribute, ShaderModule, ParsedBundle, RefFlags as RF } from '../types';
 import { loadVirtualModule } from './shader';
-import { getHash } from './hash';
+import { toHash } from './hash';
 import { toBundle, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CHAIN } from '../constants';
 
@@ -68,8 +68,8 @@ export const makeChainTo = (
   const k2 = getBundleKey(tBundle);
 
   const code    = `@chain [${entry}] [${h1}] [${h2}]`;
-  const rehash  = getHash(code);
-  const rekey   = getHash(`${rehash} ${k1} ${k2}`);
+  const rehash  = toHash(code);
+  const rekey   = toHash(`${rehash} ${k1} ${k2}`);
 
   // Code generator
   const render = (namespace: string, rename: Map<string, string>) => {

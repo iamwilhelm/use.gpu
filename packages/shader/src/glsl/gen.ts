@@ -1,6 +1,6 @@
 import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFlags as RF } from './types';
 
-import { getHash, getObjectKey, mixBits, scrambleBits } from '../util/hash';
+import { toHash, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
 import { loadVirtualModule } from './shader';
 import { makeSwizzle } from './cast';
@@ -47,11 +47,11 @@ export const makeBindingAccessors = (
   const external = lambdas.map(l => getBundleHash(l.lambda!.shader));
   const unique = `@access [${signature}] [${external}] [${readable}] [${types.join(' ')}]`;
 
-  const hash = getHash(unique);
+  const hash = toHash(unique);
   const code = `@access [${readable}] [${hash}]`;
 
   const keyed = bindings.reduce((a, s) => mixBits(a, getValueKey(s)), 0);
-  const key   = getHash(`${hash} ${keyed}`);
+  const key   = toHash(`${hash} ${keyed}`);
 
   // Code generator
   const render = (

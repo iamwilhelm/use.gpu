@@ -17,7 +17,7 @@
     "build:js": "NPM_PACKAGE=text ../../scripts/build-mjs-umd.sh",
     "build:wasm": "rm -rf pkg; cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/text/pkg/",
     "build:pkg": "cp -r pkg ../../build/packages/text/",
-    "test": "jest --watch",
+    "test": "MODULE_ENV=umd jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",

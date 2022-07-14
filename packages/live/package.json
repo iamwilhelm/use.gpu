@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "NPM_PACKAGE=live ../../scripts/build-mjs-umd.sh",
-    "test": "jest --watch",
+    "test": "MODULE_ENV=umd jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "jest --collect-coverage",
     "types": "tsc --noEmit",

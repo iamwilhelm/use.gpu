@@ -4,7 +4,7 @@ import { Point, Point4, Rectangle } from '@use-gpu/core/types';
 import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
 import { yeet, fragment } from '@use-gpu/live';
-import { getHashValue } from '@use-gpu/state';
+import { toMurmur53 } from '@use-gpu/state';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 import { INSPECT_STYLE } from './constants';
@@ -75,7 +75,7 @@ export const memoInline = <T>(f: Inline<T>): Inline<T> => {
     transform?: ShaderModule,
     version?: number,
   ) => {
-    const hash = version ?? getHashValue(lines);
+    const hash = version ?? toMurmur53(lines);
     if (lastHash && lastHash === hash && lastClip === clip && lastTransform === transform) {
       return value!;
     }

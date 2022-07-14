@@ -1,6 +1,6 @@
 import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
 import { loadVirtualModule } from './shader';
-import { getHash } from './hash';
+import { toHash } from './hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from './bundle';
 import { PREFIX_CAST } from '../constants';
 
@@ -50,8 +50,8 @@ export const makeDiffBy = (
   symbols.push(...getSizes);
 
   const code   = `@diff [${getSizes.join(' ')}] [${hash}]`;
-  const rehash = getHash(code);
-  const rekey  = getHash(`${rehash} ${key}`);
+  const rehash = toHash(code);
+  const rekey  = toHash(`${rehash} ${key}`);
 
   const externals = [
     ...EXTERNALS,

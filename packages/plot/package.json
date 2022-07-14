@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "NPM_PACKAGE=plot ../../scripts/build-mjs-umd.sh",
-    "test": "jest --watch",
+    "test": "MODULE_ENV=umd jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",

@@ -1,7 +1,7 @@
 import { ShaderModuleDescriptor } from '@use-gpu/core/types';
 import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
 
-import { resolveBindings, linkBundle, getHash, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
+import { resolveBindings, linkBundle, toHash, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderModule } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
 import { useInspectable } from './useInspectable'
@@ -31,8 +31,8 @@ export const useLinkedShader = (
   const inspect = useInspectable();
 
   // Get hash for defines, shader code, shader instance
-  const pHash = getHash(deps);
-  const dHash = getHash(defines);
+  const pHash = toHash(deps);
+  const dHash = toHash(defines);
   const vHash = getBundleHash(vertex);
   const fHash = getBundleHash(fragment);
   const vKey  = getBundleKey(vertex);

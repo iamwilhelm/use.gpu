@@ -15,7 +15,7 @@
     "./types": "./src/types.ts"
   },
   "scripts": {
-    "test": "jest --watch",
+    "test": "MODULE_ENV=umd jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",

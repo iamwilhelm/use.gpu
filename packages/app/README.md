@@ -9,9 +9,9 @@ This package is **not installable**. It hosts a demo app used to showcase and de
 - **Chrome**: enable `chrome://flags/#enable-unsafe-webgpu`.
 - **Firefox**: enable `dom.webgpu.enabled`
 
-**To open it, run the following commands in the `use-gpu` repo root:**
-
 ## Usage
+
+**To open it, run the following commands in the `use-gpu` repo root:**
 
 - `yarn start` - Run demo app at [http://localhost:8777](http://localhost:8777)
 - `yarn build` - Build packages

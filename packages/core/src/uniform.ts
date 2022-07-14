@@ -11,7 +11,7 @@ import {
 import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
-import { getObjectKey, getHashValue } from '@use-gpu/state';
+import { getObjectKey, toMurmur53 } from '@use-gpu/state';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 import { alignSizeTo } from './data';
@@ -138,7 +138,7 @@ export const makeVolatileUniforms = <T>(
       ids.push(getObjectKey(v));
     }
 
-    const key = getHashValue(ids);
+    const key = toMurmur53(ids);
     const cached = cache.get(key);
     if (cached) {
       return cached;

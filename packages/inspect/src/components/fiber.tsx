@@ -1,9 +1,10 @@
 import { LiveFiber } from '@use-gpu/live/types';
 import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
+import { Cursor } from '@use-gpu/state/types';
 
 import React, { memo, useMemo, useLayoutEffect, useRef } from 'react';
 
-import { useRefineCursor, Cursor } from './cursor';
+import { useRefineCursor } from '@use-gpu/state';
 import { usePingContext } from './ping';
 import { Node } from './node';
 import { ReactNode } from './react-node';

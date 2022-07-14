@@ -73,15 +73,15 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
 
     if (expr && size.length) {
       const n = size.length;
-      let sampled;
+      let sampled: Emitter<any>;
       if (n === 1) {
         const c = +!!(centered === true || (centered as any)[0]);
         let [min, max] = range[0];
         let step = (max - min) / (size[0] - 1 + c);
         if (c) min += step / 2;
 
-        sampled = (emit: Emit, i: number, n: number) =>
-          expr(emit, min + i * step, i, time);
+        sampled = (<T>(emit: Emit, i: number, n: number, t: T) =>
+          expr(emit, min + i * step, i, t)) as any;
       }
       else if (n === 2) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -94,15 +94,15 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
 
-        sampled = (emit: Emit, i: number, j: number) =>
+        sampled = (<T>(emit: Emit, i: number, j: number, w: number, h: number, t: T) =>
           expr(
             emit,
             minX + i * stepX,
             minY + j * stepY,
             i,
             j,
-            time,
-          );
+            t,
+          )) as any;
       }
       else if (n === 3) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -119,7 +119,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
 
-        sampled = (emit: Emit, i: number, j: number, k: number) =>
+        sampled = (<T>(emit: Emit, i: number, j: number, k: number, w: number, h: number, d: number, t: T) =>
           expr(
             emit,
             minX + i * stepX,
@@ -128,8 +128,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             i,
             j,
             k,
-            time,
-          );
+            t,
+          )) as any;
       }
       else if (n === 4) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -150,7 +150,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cz) minZ += stepZ / 2;
         if (cw) minW += stepW / 2;
 
-        sampled = (emit: Emit, i: number, j: number, k: number, l: number) =>
+        sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, w: number, h: number, d: number, q: number, t: T) =>
           expr(
             emit,
             minX + i * stepX,
@@ -161,15 +161,15 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
             j,
             k,
             l,
-            time,
-          );
+            t,
+          )) as any;
       }
       else {
         throw new Error("Cannot sample across more than 4 dimensions");
       }
 
       if (sampled) {
-        emitted = emitIntoMultiNumberArray(sampled, array, dims, size);
+        emitted = emitIntoMultiNumberArray(sampled, array, dims, size, time);
       }
     }
     if (expr) {

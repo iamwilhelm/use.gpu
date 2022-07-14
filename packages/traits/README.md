@@ -37,7 +37,7 @@ const parsers = {...};
 const defaults = {...};
 
 // Outside a component
-const useTrait = makeUseTrait(parsers, defaults)`;
+const useTrait = makeUseTrait(parsers, defaults);
 
 // Inside a component
 const {field} = useTrait(props);
@@ -57,10 +57,10 @@ type StyleTrait = {
 
 #### Component
 
-```sh
+```tsx
 import { StyleTrait, useStyleTrait } from './traits';
 
-type ComponentProps = Partial<StyleTrait> * {
+type ComponentProps = Partial<StyleTrait> & {
   //...
 };
   

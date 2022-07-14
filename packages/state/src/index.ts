@@ -1,4 +1,4 @@
-/** @module State */
+export * from './cursor';
 export * from './hash';
-export * from './state';
+export * from './patch';
 export * from './types';

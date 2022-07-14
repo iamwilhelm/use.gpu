@@ -1,4 +1,4 @@
-# Use.gpu
+# Use.GPU
 
 Use.GPU is a set of **reactive, declarative WebGPU legos**. It lets you compose arbitrary graphics pipelines on the fly, thanks to a built-in shader linker and binding generator.
 
@@ -13,6 +13,8 @@ This enables completely free-form tinkering for any graphics skill level.
 
 Use.GPU has an incremental architecture, which updates with minimal recomputation. This is done by embracing effect-based programming, with React-like memoization hooks. The result is a program that always has the same state you'd get if it was run entirely from scratch.
 
+**WebGPU is not yet available in mainline browsers, which means you need e.g. Google Chrome Dev to run the example app. You will need to turn on the `chrome://flags/#enable-unsafe-webgpu` flag.**
+
 **Questions? Join Use.GPU Discord**: https://discord.gg/WxtZ28aUC3
 
 ## Background
@@ -25,8 +27,6 @@ _For background, see:_
  - [Reconcile All The Things](https://acko.net/blog/reconcile-all-the-things/) - Memoization and reconciliation
  - [Live - Headless React](https://acko.net/blog/live-headless-react/) - Live run-time and WebGPU
  - [Frickin' Shaders with Frickin' Laser Beams](https://acko.net/blog/frickin-shaders-with-frickin-laser-beams/) - Shader closures and linker
-
-**WebGPU is not yet available in mainline browsers, which means you need e.g. Google Chrome Dev to run the example app. You will need to turn on the `chrome://flags/#enable-unsafe-webgpu` flag.**
 
 ![public/cube.png](public/cube.png)
 
@@ -96,18 +96,14 @@ The included demo app contains various showcases of how it can be used.
 
 This repo is split into the following sub-packages:
 
-#### **Framework**
-
-- [`@use-gpu/live`](packages/live/README.md) - Effect run-time (React replacement) ✅
-- [`@use-gpu/react`](packages/react/README.md) - Live ↔︎ React interface ✅
-- [`@use-gpu/webgpu`](packages/webgpu/README.md) - WebGPU canvas ✅
-- [`@use-gpu/shader`](packages/shader/README.md) - WGSL shader linker and tree shaker ✅
-
 #### **Components**
 
 - [`@use-gpu/gltf`](packages/gltf/README.md) - GLTF loader and scene graph ⏱
+- [`@use-gpu/inspect`](packages/inspect/README.md) - Development inspector ✅
 - [`@use-gpu/layout`](packages/layout/README.md) - HTML-like layout ✅
 - [`@use-gpu/plot`](packages/plot/README.md) - 2D/3D plotting (axes, grids, curves, labels, transforms, …) ⏱
+- [`@use-gpu/react`](packages/react/README.md) - Live ↔︎ React interface ✅
+- [`@use-gpu/webgpu`](packages/webgpu/README.md) - WebGPU canvas ✅
 - [`@use-gpu/workbench`](packages/workbench/README.md) ⏱
   - `/animate` - Keyframe animation
   - `/camera` - Views and controls
@@ -116,27 +112,34 @@ This repo is split into the following sub-packages:
   - `/layers` - Data-driven geometry
   - `/light` - Light and environment
   - `/material` - Physical materials
+  - `/primitives` - Programmable geometry
+  - `/render` - Passes, render targets, buffers, etc.
   - `/router` - URL ↔︎ Page routing
+  - `/shader` - Run-time WGSL composition
 
-#### **Environment**
-
-- [`@use-gpu/workbench`](packages/workbench/README.md)
   - `/consumers` - Context consumers
   - `/hooks` - Reactive GPU API
-  - `/primitives` - Programmable geometry
   - `/providers` - Context providers
-  - `/render` - Passes, render targets, buffers, etc.
-  - `/shader` - Run-time WGSL composition
+
+#### **Libraries**
+- [`@use-gpu/core`](packages/core/README.md) - Pure WebGPU + data helpers ✅
+- [`@use-gpu/shader`](packages/shader/README.md) - WGSL shader linker and tree shaker ✅
+- [`@use-gpu/text`](packages/text/README.md) - Rust/WASM ABGlyph wrapper ✅
+- [`@use-gpu/wgsl`](packages/wgsl/README.md) - .WGSL standard library for Use.GPU ✅
+
+#### **Live**
+- [`@use-gpu/live`](packages/live/README.md) - Effect run-time (React replacement) ✅
+- [`@use-gpu/state`](packages/state/README.md) - Minimal state management ✅
+- [`@use-gpu/traits`](packages/traits/README.md) - Composable prop archetypes ✅
+
+#### **Loaders**
 - [`@use-gpu/wgsl-loader`](packages/wgsl-loader/README.md) - WGSL file bundler for webpack and node ✅
 - [`@use-gpu/glsl-loader`](packages/glsl-loader/README.md) - GLSL file bundler for webpack and node ✅
-- [`@use-gpu/inspect`](packages/inspect/README.md) - Development inspector ✅
+
+#### **Development**
+
 - [`@use-gpu/app`](packages/app/README.md) - Testbed demo app ⚠️
 
-#### **Supporting Libraries**
-- [`@use-gpu/core`](packages/core/README.md) - Pure WebGPU + data helpers ✅
-- [`@use-gpu/state`](packages/state/README.md) - Minimal state management ✅
-- [`@use-gpu/text`](packages/text/README.md) - Rust/WASM ABGlyph wrapper ✅
-- [`@use-gpu/traits`](packages/traits/README.md) - Composable prop archetypes ✅
 
 This is a work in progress. Stability:
 - ✅: Stable Beta

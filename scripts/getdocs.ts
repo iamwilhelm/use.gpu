@@ -53,4 +53,6 @@ try {
     writeFileSync(target, readFileSync(file));
   }
 } catch (e) {
+  console.error(e);
+  process.exit(1)
 }

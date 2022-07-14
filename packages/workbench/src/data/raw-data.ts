@@ -106,7 +106,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     }
 
     source.length  = !sparse ? count : emitted;
-    source.size    = !sparse ? (items > 1 ? [items, count] : count) : [items, emitted / items];
+    source.size    = !sparse ? (items > 1 ? [items, count] : [count]) : [items, emitted / items];
     source.version = incrementVersion(source.version);
 
     if (sources) {

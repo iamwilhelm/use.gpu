@@ -1,6 +1,13 @@
 # Use.GPU Test Bed App
 
-This package hosts a demo app used to showcase and debug Use.GPU.
+This package is **not installable**. It hosts a demo app used to showcase and debug Use.GPU.
+
+<span className="warning-box">
+  <span className="m-icon m-icon-outlined" title="Warning">warning_amber</span>WebGPU is <a href="https://caniuse.com/webgpu">only available for developers</a>, locked behind a browser flag. A dev build of Chrome or Firefox is recommended.</a>.
+</span>
+
+- **Chrome**: enable `chrome://flags/#enable-unsafe-webgpu`.
+- **Firefox**: enable `dom.webgpu.enabled`
 
 **To open it, run the following commands in the `use-gpu` repo root:**
 
@@ -19,7 +26,3 @@ This package hosts a demo app used to showcase and debug Use.GPU.
 
 **Dependencies**: 
 - run `yarn install` to grab dependent packages, and run code generation for the lib.
-
-**Demo app requires Chrome Dev/Canary with WebGPU enabled.**
-- `chrome://flags/#enable-unsafe-webgpu`
-

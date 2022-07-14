@@ -334,10 +334,14 @@ export type Tuples<N extends number, T = number> = {
 };
 
 export interface Emitter<T = any> {
-  (emit: Emit, i: number, n: number, props: T): any;
-  (emit: Emit, i: number, j: number, w: number, h: number, props: T): any;
-  (emit: Emit, i: number, j: number, k: number, w: number, h: number, d: number, props: T): any;
-  (emit: Emit, i: number, j: number, k: number, l: number, w: number, h: number, d: number, q: number, props: T): any;
+  (emit: Emit, i: number, props?: T): any;
+  (emit: Emit, i: number, j: number, props?: T): any;
+  (emit: Emit, i: number, j: number, k: number, props?: T): any;
+  (emit: Emit, i: number, j: number, k: number, l: number, props?: T): any;
+  (emit: Emit, i: number, j: number, k: number, l: number, m: number, props?: T): any;
+  (emit: Emit, i: number, j: number, k: number, l: number, m: number, n: number, props?: T): any;
+  (emit: Emit, i: number, j: number, k: number, l: number, m: number, n: number, o: number, props?: T): any;
+  (emit: Emit, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, props?: T): any;
   (emit: Emit, ...args: any[]): any;
 };
 

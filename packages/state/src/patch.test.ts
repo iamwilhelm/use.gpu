@@ -1,4 +1,4 @@
-import { patch, $set, $apply, $patch } from './state';
+import { patch, $set, $apply, $patch } from './patch';
 
 describe('patch', () => {
   

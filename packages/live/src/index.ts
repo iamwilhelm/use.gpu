@@ -40,4 +40,10 @@ export {
   traverseFiber,
 } from './tree';
 export * from './types';
-export * from './util';
+export {
+  incrementVersion,
+  isSameDependencies,
+  isSubNode,
+  compareFibers,
+  tagFunction,
+} from './util';

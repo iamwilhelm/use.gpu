@@ -77,7 +77,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
   // Make de-interleaving shader
   let sources: LambdaSource[] | undefined;
-  if (split) {
+  if (interleaved) {
     const binding = useOne(() => ({name: 'getData', format: format as any as UniformType}), format);
     const getData = useBoundSource(binding, source);
     sources = useMemo(() => (

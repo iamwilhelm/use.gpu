@@ -57,26 +57,26 @@ interface Use<F extends ArrowFunction> {
   (f: LiveFunction<F>, ...args: UseArgs<F>): DeferredCall<F>;
 };
 
-/** Use a call to a Live function */
+/** Use a call to a Live function, reconciled by numeric index. */
 export const use: Use<any> = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   ...args: UseArgs<F>
 ): DeferredCall<F> => ({f, args, key: undefined, by: getCurrentFiberID()} as any);
 
-/** Use a keyed call to a Live function */
+/** Use a keyed call to a Live function, reconciled by key. */
 export const keyed = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   key?: Key,
   ...args: UseArgs<F>
 ): DeferredCall<F> => ({f, args, key, by: getCurrentFiberID()} as any);
 
-/** Use a call to a Live Component with only a children prop */
+/** Use a call to a Live Component with only a children prop. */
 export const wrap = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   children: any,
 ): DeferredCall<F> => ({f, args: [{children}], key: undefined, by: getCurrentFiberID()} as any);
 
-/** Add arguments to an existing call or calls */
+/** Add arguments to an existing call or calls. */
 export const extend = (
   calls: LiveNode<any>,
   props: Record<string, any>,
@@ -97,20 +97,29 @@ export const extend = (
   return ({...calls, args: [props] } as any);
 }
 
-/** Morph a call to a Live function */
+/** Morph a call to a Live function.
+
+Morphing will change a component's type, without forcibly unmounting its children.
+
+Children are still reconciled as usual, and only stay if re-rendered by the new parent.
+
+The parent that is being morphed still loses all its own state.
+*/
 export const morph = (
   calls: LiveNode<any>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MORPH, args: calls as any, key, by: getCurrentFiberID()} as any);
 
-/** Detach the rendering of a Live subtree */
+/** Detach the rendering of a Live subtree.
+
+The callback is invoked with a render function, which it can call repeatedly to render the detached fiber. */
 export const detach = <F extends ArrowFunction>(
   call: DeferredCall<F>,
   callback: (render: () => void, fiber: LiveFiber<F>) => void,
   key?: Key,
 ): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key, by: getCurrentFiberID()} as any);
 
-/** Reconcile an array of Live calls */
+/** Holds an array of Live calls to reconcile. */
 export const fragment = (
   calls: LiveNode<any>,
   key?: Key,
@@ -119,7 +128,7 @@ export const fragment = (
   return [calls] as any;
 }
 
-/** Wrap a fragment in a debug node to mark it */
+/** Wrap a fragment in a debug node to mark it. */
 export const debug = (
   calls: LiveNode<any>,
   key?: Key,
@@ -128,7 +137,7 @@ export const debug = (
   return ({f: DEBUG, args: [calls], key} as any);
 }
 
-/** Reduce values from a subtree, using the given `map(...)` and `reduce(...)` */
+/** Reduce values from a subtree, using the given `map(...)` and `reduce(...)`. */
 export const mapReduce = <R, T>(
   calls?: LiveNode<any>,
   map?: (t: T) => R,
@@ -137,34 +146,34 @@ export const mapReduce = <R, T>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, then], key, by: getCurrentFiberID()} as any);
 
-/** Gather items from a subtree, into a flat array */
+/** Gather items from a subtree, into a flat array. */
 export const gather = <T>(
   calls?: LiveNode<any>,
   then?: LiveFunction<(r: T[]) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: GATHER, args: [calls, then], key, by: getCurrentFiberID()} as any);
 
-/** Multi-gather items from a subtree, by object key */
+/** Multi-gather items from a subtree, by object key. */
 export const multiGather = <T>(
   calls?: LiveNode<any>,
   then?: LiveFunction<(r: Record<string, T[]>) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, then], key, by: getCurrentFiberID()} as any);
 
-/** Fence gathered items from a subtree */
+/** Fence gathered items from a subtree. */
 export const fence = <T>(
   calls?: LiveNode<any>,
   then?: LiveFunction<(r: T[]) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: FENCE, args: [calls, then], key, by: getCurrentFiberID()} as any);
 
-/** Yeet value(s) upstream */
+/** Yeet value(s) upstream. */
 export const yeet = <T>(
   value?: T,
   key?: Key,
 ): DeferredCall<() => void> => ({f: YEET, arg: value, key, by: getCurrentFiberID()} as any);
 
-/** Provide a value for a Live context */
+/** Provide a value for a Live context. */
 export const provide = <T, C>(
   context: LiveContext<C>,
   value: T,
@@ -172,7 +181,7 @@ export const provide = <T, C>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls], key, by: getCurrentFiberID()} as any);
 
-/** Consume values from a co-context */
+/** Consume values from a consumer context. */
 export const consume = <T, C>(
   context: LiveContext<C>,
   calls?: LiveNode<any>,
@@ -180,10 +189,10 @@ export const consume = <T, C>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, then], key, by: getCurrentFiberID()} as any);
 
-/** Component has side-effects */
+/** Component has side-effects, and will re-render even if props object is identical. */
 export const imperative = makeImperativeFunction;
 
-/** Yeet a suspend symbol */
+/** Yeet a suspend symbol. */
 export const suspend = () => yeet(SUSPEND);
 
 export interface MakeContext<T> {
@@ -192,7 +201,7 @@ export interface MakeContext<T> {
   <T>(initialValue: null, displayName?: string): LiveContext<T | null>;
 };
 
-/** Make Live context for holding shared value for child nodes (defaulted, required or optional) */
+/** Make Live context for holding shared value for child nodes (defaulted, required or optional). */
 export const makeContext: MakeContext<unknown> = <T>(initialValue?: T | null, displayName?: string) => ({
   initialValue,
   displayName,
@@ -214,7 +223,7 @@ export const consumeValues = <T>(registry: Map<LiveFiber<any>, T>): T[] => {
   return keys.map(k => registry.get(k)!);
 }
 
-/** Get last node of consumed value registry */
+/** Get last node of consumed value registry. */
 export const consumeTail = <T>(
   registry: Map<LiveFiber<any>, T>,
 ): [LiveFiber<any>, T] => {
@@ -222,8 +231,8 @@ export const consumeTail = <T>(
   return entries[entries.length - 1];
 }
 
-/** Get last value yielded from consumed value registry */
-export const consumeTailValue = <T>(
+/** Get last value yielded from consumed value registry. */
+export const consumeValue = <T>(
   registry: Map<LiveFiber<any>, T>,
 ): T => consumeTail(registry)?.[1];
 

@@ -243,7 +243,8 @@ export const pingFiber = <F extends ArrowFunction>(
   if (host?.__ping) host.__ping(fiber, active);
 }
 
-// React element interop
+/** React element interop
+    @hidden */
 export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {
@@ -410,9 +411,12 @@ export const makeFiberContinuation = <F extends ArrowFunction, R>(
 }
 
 // Tag a component as imperative, always re-rendered from above even if props/state didn't change
-export const makeImperativeFunction = (c: LiveFunction<any>, displayName?: string): LiveFunction<any> => {
-  (c as any).isImperativeFunction = true;
-  tagFunction(c, displayName);
+export const makeImperativeFunction = (
+  component: LiveFunction<any>,
+  displayName?: string,
+): LiveFunction<any> => {
+  (component as any).isImperativeFunction = true;
+  tagFunction(component, displayName);
   return c;
 }
 

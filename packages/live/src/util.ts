@@ -3,10 +3,10 @@ import { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types
 const RAF = typeof window !== 'undefined' ? window.requestAnimationFrame : setTimeout;
 const NO_DEPS = [] as any[];
 
-// Cyclic version number that skips 0
+/** Cyclic 32-bit version number that skips 0 */
 export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
 
-// Schedules actions to be run immediately after the current thread completes
+/** Schedules actions to be run immediately after the current thread completes */
 export const makeActionScheduler = () => {
   const queue = [] as Action<any>[];
 
@@ -36,7 +36,7 @@ export const makeActionScheduler = () => {
   return {bind, schedule, flush};
 }
 
-// Tracks long-range dependencies for contexts
+/** Tracks long-range dependencies for contexts */
 export const makeDependencyTracker = () => {
   // Used in forward direction
   const dependencies = new WeakMap<LiveFiber<any>, Set<LiveFiber<any>>>();
@@ -85,7 +85,7 @@ export const makeDependencyTracker = () => {
 }
 
 
-// Schedules actions to be run when an object is disposed of
+/** Schedules actions to be run when an object is disposed of */
 export const makeDisposalTracker = () => {
   const disposal = new WeakMap<LiveFiber<any>, Task[]>();
 
@@ -114,7 +114,7 @@ export const makeDisposalTracker = () => {
   return {track, untrack, dispose};
 }
 
-// Schedules callback(s) on next paint
+/** Schedules callback(s) on next paint */
 export const makePaintRequester = (raf: any = RAF) => {
   let pending = false;
   const queue: Task[] = [];
@@ -136,7 +136,7 @@ export const makePaintRequester = (raf: any = RAF) => {
   }
 }
 
-// Compares dependency arrays
+/** Compare dependency arrays */
 export const isSameDependencies = (
   prev: any[] | undefined,
   next: any[] | undefined,
@@ -157,7 +157,7 @@ export const isSameDependencies = (
   return valid;
 }
 
-// Checks if B is a subnode of A
+/** Check if B is a subnode of A */
 export const isSubNode = (a: LiveFiber<any>, b: LiveFiber<any>) => {
   const ak = a.path;
   const bk = b.path;
@@ -171,7 +171,7 @@ export const isSubNode = (a: LiveFiber<any>, b: LiveFiber<any>) => {
   return (bk.length > ak.length) || (b.depth > a.depth);
 }
 
-// Sorting comparison of two fibers in depth-first tree order
+/** Compare of two fibers in depth-first tree order */
 export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
   const ak = a.path;
   const bk = b.path;
@@ -206,6 +206,7 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
   return (ak.length - bk.length) || (a.depth - b.depth);
 }
 
+/** Tag an anonymous function with a random number ID. */
 export const tagFunction = <F extends ArrowFunction>(f: F, name?: string) => {
   (f as any).displayName = name ?? `${Math.floor(Math.random() * 10000)}`;
   return f;

@@ -1,18 +1,28 @@
-import { loadModule, compressAST } from '@use-gpu/shader/glsl';
+import { Tree } from '@lezer/common';
+import { ParsedModule, CompressedNode } from '../types';
 
 const stringify = (s: any) => JSON.stringify(s);
 
-export const transpileGLSL = (source: string, resourcePath: string, esModule: boolean = true) => {
+export const makeTranspile = (
+  type: string,
+  extension: string,
+  loadModule: (code: string, name?: string, entry?: string, compressed?: boolean) => ParsedModule,
+  compressAST: (s: string, tree: Tree) => CompressedNode[],
+) => (
+  source: string,
+  resourcePath: string,
+  esModule: boolean = true,
+) => {
 
   const makeImport = (symbol: string, from: string) => esModule
     ? `import ${symbol} from ${stringify(from)};`
     : `const ${symbol} = require(${stringify(from)});`;
   const preamble = [
-    makeImport('{decompressAST}', '@use-gpu/shader/glsl'),
+    makeImport('{decompressAST}', '@use-gpu/shader/' + type.toLowerCase()),
   ].join("\n");
 
   // Parse module source code
-  const name = resourcePath.split('/').pop()!.replace(/\.glsl$/, '');
+  const name = resourcePath.split('/').pop()!.replace(new RegExp('\\.' + extension + '$'), '');
   const module = loadModule(source, name);
 
   // Emit module data
@@ -31,7 +41,7 @@ export const transpileGLSL = (source: string, resourcePath: string, esModule: bo
   const imports = [] as string[];
   const markers = [] as string[];
   if (table.modules) for (const {name} of table.modules) {
-    imports.push(makeImport(`m${i}`, name + '.glsl'));
+    imports.push(makeImport(`m${i}`, name + '.' + extension));
     markers.push(`${stringify(name)}: m${i}`);
     ++i;
   }
@@ -65,7 +75,7 @@ exports.default = __default;
     `const getSymbol = (entry) => ({module: bindEntryPoint(data, entry), libs});`,
     exportDefault,
     ...exportSymbols,
-    '/* __GLSL_LOADER_GENERATED */',
+    '/* __' + type.toUpperCase() + '_LOADER_GENERATED */',
   ].join("\n");
 
   return output;

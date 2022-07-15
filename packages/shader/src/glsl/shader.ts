@@ -4,6 +4,7 @@ import { ParsedModule, ParsedModuleCache, ShaderDefine } from './types';
 import { makeLoadModule, makeLoadModuleWithCache } from '../util/shader';
 import { makeBundleToAttribute, makeBundleToAttributes } from '../util/bundle';
 import { decompressAST } from '../util/tree';
+import { makeTranspile } from '../util/transpile';
 
 import { makeASTParser, compressAST } from './ast';
 import { toTypeString, toTypeArgs } from './type';
@@ -40,6 +41,9 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
 
 export const bundleToAttribute = makeBundleToAttribute(toTypeString, toTypeArgs);
 export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArgs);
+
+// ES/CommonJS Transpiler
+export const transpileGLSL = makeTranspile('glsl', 'glsl', loadModule, compressAST);
 
 // Templated literal syntax: glsl`...`
 export const glsl = (literals: TemplateStringsArray, ...tokens: string[]) => {

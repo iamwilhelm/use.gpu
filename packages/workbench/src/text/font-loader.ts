@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Font } from '@use-gpu/text/types';
+import { Font } from '@use-gpu/glyph/types';
 import { FontSource } from './types';
 
 import { use, gather, keyed, yeet, useOne } from '@use-gpu/live';

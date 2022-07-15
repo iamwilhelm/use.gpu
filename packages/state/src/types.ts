@@ -4,6 +4,8 @@ export type Update<T = any> = T
   | {$merge: Merge<T>}
   | {$apply: (t: T) => T}
   | {$patch: (t: T) => Update<T>}
+  | {$nop: true}
+  | {$delete: true}
   | DeepUpdate<T>
   | undefined;
 

@@ -49,6 +49,7 @@ export type LabelLayerProps = {
   id?: number,
 };
 
+/** Draws flat text labels. */
 export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLayerProps) => {
   const {
     position,

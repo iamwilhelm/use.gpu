@@ -1,5 +1,5 @@
 {
-  "name": "@use-gpu/text",
+  "name": "@use-gpu/glyph",
   "version": "0.6.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
@@ -14,9 +14,9 @@
   "private": true,
   "scripts": {
     "build": "yarn run build:wasm && yarn run build:js && yarn run build:pkg",
-    "build:js": "NPM_PACKAGE=text ../../scripts/build-mjs-umd.sh",
-    "build:wasm": "rm -rf pkg; cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/text/pkg/",
-    "build:pkg": "cp -r pkg ../../build/packages/text/",
+    "build:js": "NPM_PACKAGE=glyph ../../scripts/build-mjs-umd.sh",
+    "build:wasm": "rm -rf pkg; cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/glyph/pkg/",
+    "build:pkg": "cp -r pkg ../../build/packages/glyph/",
     "test": "MODULE_ENV=umd jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",

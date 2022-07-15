@@ -152,8 +152,8 @@ const makeUIAccumulator = (
 const getItemTypeKey = (item: UIAggregate) =>
   (item as any).f ? -1 :
   hashBits53(getObjectKey(item.texture)) ^
-  hashBits53(getBundleKey(item.transform)) ^
-  hashBits53(getBundleKey(item.clip));
+  hashBits53(item.transform ? getBundleKey(item.transform) : 0) ^
+  hashBits53(item.clip ? getBundleKey(item.clip) : 0);
 
 type Partition = {
   key: number,

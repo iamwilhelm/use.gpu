@@ -6,8 +6,8 @@ describe('refineCursor', () => {
   
   const makeUpdateState = (UPDATE: any = null) => [
     () => UPDATE,
-    (update: any) => UPDATE = update,
-  ];
+    (update: any) => { UPDATE = update },
+  ] as [() => any, (update: any) => void];
   
   it('refines a cursor', () => {
 
@@ -28,7 +28,7 @@ describe('refineCursor', () => {
     const [hello, updateHello] = cursor('obj', 'hello');
     expect(hello).toEqual(state.obj.hello);
 
-    const $op = t => t + ' !!!';
+    const $op = (t: string) => t + ' !!!';
     updateHello($apply($op));
     expect(getUpdate()).toEqual({ obj: { hello: { $apply: $op }}});
 

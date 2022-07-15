@@ -38,6 +38,7 @@ export type SurfaceLayerProps = {
 
 const [SIZE_BINDING, POSITION_BINDING] = bundleToAttributes(getSurfaceIndex);
 
+/** Draws 2D surfaces across the X and Y data dimension. */
 export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: SurfaceLayerProps) => {
   const {
     position,

@@ -35,7 +35,7 @@ export const RTTFeedbackPage: LC = () => {
               format='vec4<f32>'
               length={100}
               items={2}
-              split
+              interleaved
               live
               expr={(emit: Emit, i: number) => {
                 const s = ((i*i + i) % 13133.371) % 1000;

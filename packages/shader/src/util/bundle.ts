@@ -17,6 +17,8 @@ export const getBundleEntry = (bundle: ShaderModule) => {
 
 // Force module/bundle to bundle
 export const toBundle = (bundle: ShaderModule): ParsedBundle => {
+  if (bundle === undefined) throw new Error("Bundle is undefined");
+  if (bundle === null) throw new Error("Bundle is null");
   if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");
 
   if ('table' in bundle) return {
@@ -28,6 +30,8 @@ export const toBundle = (bundle: ShaderModule): ParsedBundle => {
 
 // Force module/bundle to module
 export const toModule = (bundle: ShaderModule) => {
+  if (bundle === undefined) throw new Error("Bundle is undefined");
+  if (bundle === null) throw new Error("Bundle is null");
   if (typeof bundle === 'string') throw new Error("Bundle is a string instead of an object");
 
   if ('table' in bundle) return bundle as ParsedModule;

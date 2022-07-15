@@ -49,6 +49,7 @@ export type TickLayerProps = {
 
 const TICK_BINDINGS = bundleToAttributes(getTickPosition);
 
+/** Draws tick marks on a scale, oriented along to the local transform at each point. */
 export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerProps) => {
   const {
     position,

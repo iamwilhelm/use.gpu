@@ -2,10 +2,10 @@
 let KEY = 0;
 const KEYS = new WeakMap<object, number>();
 
-/** Get new unique key. */
+/** Get new unique key */
 export const makeKey = (): number => ++KEY;
 
-/** Get unique key for object. */
+/** Get unique key for object */
 export const getObjectKey = (v: any) => {
   if (v && typeof v === 'object') {
     const c = KEYS.get(v);
@@ -18,7 +18,7 @@ export const getObjectKey = (v: any) => {
   return 0;
 }
 
-/** Set global hashing key. Default `0xf1c3a587`. */
+/** Set global hashing key. Default `0xf1c3a587` */
 export const setGlobalHashKey = (k?: number) => HASH_KEY = (k ?? DEFAULT_HASH_KEY);
 const DEFAULT_HASH_KEY = 0xf1c3a587;
 let HASH_KEY = DEFAULT_HASH_KEY;

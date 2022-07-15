@@ -24,12 +24,17 @@ expect(patch(value, update)).toEqual({hello: 'world', value: 2});
 ```
 
 The default behavior is:
-- merge properties from `update` into `value` recursively
-- treat arrays as values
+- Merge object properties from `update` into `value` recursively.
+- Treat arrays as values, do not recurse, only replace them as a whole.
 
 To adjust the behavior, e.g. to replace an object instead of merging it, use the included `$ops` helpers:
 
-@refs{^\$}
+- `@{$apply}`
+- `@{$delete}`
+- `@{$merge}`
+- `@{$nop}`
+- `@{$patch}`
+- `@{$set}`
 
 e.g.
 
@@ -42,10 +47,13 @@ expect(patch(values, update)).toEqual({ hello: { title: 'world' }, value: 2});
 
 ## Hashing
 
-- `@{getHashValue}` will return a hashed 53-bit `number` for any JS value. Object identity does not matter.
-- `@{getHash}` does the same, but returns a base36-formatted string.
+- `@{toHash}` will hash any JS value to a 10-digit base 64 string.
+- `@{toMurmur53}` will hashed any JS value to a 53-bit `number`.
 
-- `@{getObjectKey}` assigns a unique, incrementing 53-bit ID to each unique object, by tracking them in a `WeakMap`.
+## Keys
+
+- `@{getObjectKey}` assigns a unique, incrementing 53-bit ID to each unique object (uses a `WeakMap`).
+- `@{makeKey}` return a new unique ID from the same set.
 
 ## Colofon
 

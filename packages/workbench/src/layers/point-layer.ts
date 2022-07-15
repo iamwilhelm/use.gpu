@@ -48,6 +48,7 @@ export type PointLayerProps = {
 
 const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttributeValue;
 
+/** Draws 2D points with choice of shape. */
 export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLayerProps) => {
   const {
     position,

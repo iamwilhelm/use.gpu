@@ -1,7 +1,10 @@
+import * as WGSL from '../build/packages/shader/wgsl.js';
 import path from 'path';
 
+const {transpileWGSL} = WGSL;
+
 export const process = (src, filename, config, options) => {
-  return 'module.exports = ' + JSON.stringify(src) + ';';
+  return transpileWGSL(src, filename, false);
 };
 
 export default {process};

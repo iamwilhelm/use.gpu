@@ -1,5 +1,5 @@
 import { createFilter } from 'rollup-pluginutils';
-import { transpileWGSL } from './transpile';
+import { transpileWGSL } from '@use-gpu/shader/wgsl';
 import MagicString from 'magic-string';
 
 export const wgsl = (userOptions = {}) => {

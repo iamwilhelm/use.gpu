@@ -1,5 +1,5 @@
 import { createFilter } from 'rollup-pluginutils';
-import { transpileGLSL } from './transpile';
+import { transpileGLSL } from '@use-gpu/shader/glsl';
 import MagicString from 'magic-string';
 
 export const glsl = (userOptions = {}) => {

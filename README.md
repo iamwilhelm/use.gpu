@@ -1,10 +1,18 @@
 # Use.GPU
 
-Use.GPU is a set of **reactive, declarative WebGPU legos**. It lets you compose arbitrary graphics pipelines on the fly, thanks to a built-in shader linker and binding generator.
+A set of **declarative, reactive WebGPU legos**. Compose graphs, meshes and shaders on the fly.
+
+It's a **stand-alone Typescript+Rust/WASM library** with its own React-like run-time. If you're familiar with React, you will feel right at home.
+
+It has a built-in **shader linker and binding generator**, which means a lot of the tedium of raw GPU programming is eliminated, without compromising on flexibility.
+
+--
 
 Use.GPU is in the **alpha stage**. Don't expect production-quality code or docs.
 
-It offers components at different levels of abstraction:
+--
+
+The library offers components at different levels of abstraction:
 - All-in 2D/3D plotting (axes, grids, curves, labels, ...)
 - Data-driven geometry layers (lines, points, text, ...)
 - Raw rendering tools (passes, render-to-texture, ...)

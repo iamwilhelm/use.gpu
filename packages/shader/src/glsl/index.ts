@@ -2,6 +2,7 @@ import {
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
+  transpileGLSL,
   bindEntryPoint,
   defineConstants,
   makeModuleCache,
@@ -17,6 +18,7 @@ import {
   bindModule,
   bindingsToLinks,
   bindingToModule,
+  sourceToModule,
   resolveBindings,
 } from './bind';
 
@@ -57,6 +59,7 @@ export {
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
+  transpileGLSL,
   bindEntryPoint,
   defineConstants,
   makeModuleCache,
@@ -72,6 +75,7 @@ export {
   bindModule,
   bindingsToLinks,
   bindingToModule,
+  sourceToModule,
   resolveBindings,
 } from './bind';
 
@@ -112,6 +116,7 @@ export const GLSLLinker = {
   loadModule,
   loadModuleWithCache,
   loadStaticModule,
+  transpileGLSL,
   bindEntryPoint,
   bundleToAttribute,
   bundleToAttributes,
@@ -129,6 +134,7 @@ export const GLSLLinker = {
   bindModule,
   bindingsToLinks,
   bindingToModule,
+  sourceToModule,
   resolveBindings,
 
   castTo,

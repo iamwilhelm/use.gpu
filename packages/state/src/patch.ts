@@ -3,111 +3,124 @@ import { Update, Merge } from './types';
 const $DELETE = {$delete: true};
 const $NOP = {$nop: true};
 
-/**
- * Set or replace a value without merging.
- *
- * ```tsx
- * import { $set } from "@use-gpu/state";
- *
- * expect(patch({
- *   hello: {text: 'world', bar: 2},
- *   foo: 1,
- * }, {
- *   hello: $set({text: 'test'}),
- * })).toEqual({
- *   hello: {text: 'test'},
- *   foo: 1,
- * });
- * ```
- */
+/** Set or replace a value without merging.
+
+```tsx
+import { $set } from "@use-gpu/state";
+
+const value = {
+  hello: {text: 'world', bar: 2},
+  foo: 1,
+};
+
+const update = {
+  hello: $set({text: 'test'}),
+};
+
+expect(patch(value, update)).toEqual({
+  hello: {text: 'test'},
+  foo: 1,
+});
+```
+*/
 export const $set = <T>($set: T) => ({$set});
 
-/**
- * Merge two values. This is the default behavior for objects, so exists mostly for clarity.
- *
- * ```tsx
- * import { $merge } from "@use-gpu/state";
- *
- * expect(patch({
- *   hello: {text: 'world', bar: 2},
- *   foo: 1,
- * }, {
- *   hello: $merge({text: 'test'}),
- * })).toEqual({
- *   hello: {text: 'test', bar: 2},
- *   foo: 1,
- * });
- * ```
- */
+/** Merge two values. This is the default behavior for objects, so exists mostly for clarity.
+
+```tsx
+import { $merge } from "@use-gpu/state";
+
+const value = {
+  hello: {text: 'world', bar: 2},
+  foo: 1,
+};
+const update = {
+  hello: $merge({text: 'test'}),
+};
+
+expect(patch(value, update)).toEqual({
+  hello: {text: 'test', bar: 2},
+  foo: 1,
+});
+```
+*/
 export const $merge = <T>($merge: T) => ({$merge});
 
-/**
- * Delete a value.
- *
- * ```tsx
- * import { $delete } from "@use-gpu/state";
- *
- * expect(patch({
- *   hello: {text: 'world', bar: 2},
- *   foo: 1,
- * }, {
- *   hello: $delete(),
- * })).toEqual({
- *   foo: 1,
- * });
- * ```
- */
+/** Delete a value.
+
+```tsx
+import { $delete } from "@use-gpu/state";
+
+const value = {
+  hello: {text: 'world', bar: 2},
+  foo: 1,
+};
+
+const update = {
+  foo: $delete(),
+};
+
+expect(patch(value, update)).toEqual({
+  hello: {text: 'world', bar: 2},
+});
+```
+*/
 export const $delete = <T>() => $DELETE;
 
 /** No-op */
 export const $nop = <T>() => $NOP;
 
-/**
- * Apply a function to a value.
- *
- * ```tsx
- * import { $delete } from "@use-gpu/state";
- *
- * expect(patch({
- *   hello: {text: 'world', bar: 2},
- *   foo: 1,
- * }, {
- *   hello: $apply(text => text + ' !!!'),
- * })).toEqual({
- *   hello: {text: 'world !!!', bar: 2},
- *   foo: 1,
- * });
- * ```
- */
+/** Apply a function to a value.
+
+```tsx
+import { $apply } from "@use-gpu/state";
+
+const value = {
+  hello: {text: 'world', bar: 2},
+  foo: 1,
+};
+
+const update = {
+  hello: {text: $apply(text => text + ' !!!') },
+};
+
+expect(patch(value, update)).toEqual({
+  hello: {text: 'world !!!', bar: 2},
+  foo: 1,
+});
+```
+*/
 export const $apply = <T>($apply: (t: T) => T) => ({$apply});
 
-/**
- * Apply a function that returns another patch to a value.
- *
- * ```tsx
- * import { $delete } from "@use-gpu/state";
- *
- * expect(patch({
- *   hello: {text: 'world', bar: 2, other: 1},
- *   foo: 1,
- * }, {
- *   hello: $patch(({text}) => ({
- *     text: $apply(text => text.length + ' !!!'),
- *     bar: $delete(),
- *   })),
- * })).toEqual({
- *   hello: {text: '5 !!!', other: 1},
- *   foo: 1,
- * });
- * ```
- */
+/** Apply a function that returns another patch to apply.
+
+```tsx
+import { $patch, $apply, $delete } from "@use-gpu/state";
+
+const value = {
+  hello: {text: 'world', bar: 2, other: 1},
+  foo: 1,
+};
+
+const update = {
+  hello: $patch(({other}) => ({
+    text: $apply(text => other + ' !!!'),
+    bar: $delete(),
+  })),
+};
+
+expect(patch(value, update)).toEqual({
+  hello: {text: '1 !!!', other: 1},
+  foo: 1,
+});
+```
+*/
 export const $patch = <T>($patch: (t: T) => Update<T>) => ({$patch});
 
-/**
- * Patch value A with patch B.
- *
- * Supported operators: $set, $merge, $delete, $nop, $apply, $patch.
- */
+/** Patch value A with update B.
+
+Supported operators: $set, $merge, $delete, $nop, $apply, $patch.
+*/
 export const patch = <T>(a: T, b: Update<T>): T => {
   if (b && typeof b === 'object') {
     if ('$nop' in b) return a;

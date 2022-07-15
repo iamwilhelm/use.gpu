@@ -13,7 +13,7 @@
     { "path": "./packages/glsl-loader" },
     { "path": "./packages/webgpu" },
     { "path": "./packages/react" },
-    { "path": "./packages/text" },
+    { "path": "./packages/glyph" },
     { "path": "./packages/workbench" },
     { "path": "./packages/gltf" },
     { "path": "./packages/plot" },
@@ -29,5 +29,8 @@
     "**/*.test.ts",
     "node_modules",
     "build",
-  ]
+  ],
+  "ts-node": {
+      "esm": true
+  }
 }

@@ -54,7 +54,7 @@
   "scripts": {
     "build+ci": "yarn run build && yarn run ci-test",
     "build": "yarn wsrun --stages run build && yarn run docs",
-    "clear": "rm -rf packages/text/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js",
+    "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js",
     "ci-test": "CI=true yarn run jest && yarn run test:import && yarn run test:vite-react",
     "docs": "ts-node ./scripts/getdocs.ts",
     "publish": "yarn run build && yarn publish --ignore-scripts build/packages/shader --access public && yarn publish --ignore-scripts --access public build/packages/glsl-loader && yarn publish --ignore-scripts --access public build/packages/wgsl-loader",
@@ -65,13 +65,13 @@
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/wgsl; yarn run build); (cd packages/text; yarn run build:wasm)"
+    "postinstall": "(cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm)"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "jsdom",
     "transform": {
-      "\\.jsx?$": "babel-jest",
+      "\\.[jt]sx?$": "babel-jest",
       "\\.(wgsl|glsl)$": "<rootDir>/test/fileTransformer.mjs"
     },
     "moduleNameMapper": {
@@ -79,7 +79,7 @@
       "^@use-gpu/(.*)$": "<rootDir>/packages/$1"
     },
     "modulePaths": [
-      "<rootDir>/src"
+      "<rootDir>/packages"
     ],
     "modulePathIgnorePatterns": [
       "<rootDir>/build"
@@ -115,7 +115,7 @@
     "packages/glsl-loader",
     "packages/wgsl-loader",
     "packages/react",
-    "packages/text",
+    "packages/glyph",
     "packages/workbench",
     "packages/webgpu",
     "packages/gltf",

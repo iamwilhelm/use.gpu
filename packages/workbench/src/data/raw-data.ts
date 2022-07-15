@@ -30,7 +30,7 @@ export type RawDataProps = {
   sparse?: boolean,
   expr?: (emit: Emit, i: number, n: number) => void,
   items?: number,
-  split?: boolean,
+  interleaved?: boolean,
 
   format?: string,
   live?: boolean,
@@ -48,7 +48,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     data, expr,
     render,
     items = 1,
-    split = false,
+    interleaved = false,
     sparse = false,
     live = false,
   } = props;

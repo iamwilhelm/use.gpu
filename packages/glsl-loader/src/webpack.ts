@@ -1,6 +1,6 @@
 import { getOptions } from 'loader-utils';
 import { validate } from 'schema-utils';
-import { transpileGLSL } from './transpile';
+import { transpileGLSL } from '@use-gpu/shader/glsl';
 
 const LOADER_NAME = 'GLSL Loader';
 

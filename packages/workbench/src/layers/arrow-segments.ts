@@ -14,6 +14,7 @@ export type ArrowSegmentsProps = {
   render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource, lookups: StorageSource) => LiveElement<any>,
 };
 
+/** Produces `segments`, `anchors`, `trims` composite data for `@{ArrowLayer}`. */
 export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
   props: ArrowSegmentsProps,
 ) => {

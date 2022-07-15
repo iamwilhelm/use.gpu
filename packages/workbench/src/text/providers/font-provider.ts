@@ -1,10 +1,10 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { RustTextAPI, Font } from '@use-gpu/text/types';
+import { RustTextAPI, Font } from '@use-gpu/glyph/types';
 
 import { parseWeight } from '@use-gpu/traits';
 import { provide, useAsync, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';
 import { makeTuples } from '@use-gpu/core';
-import { RustText, packStrings } from '@use-gpu/text';
+import { RustText, packStrings } from '@use-gpu/glyph';
 
 export const FontContext = makeContext<RustTextAPI>(undefined, 'FontContext');
 export const useFontContext = () => useContext(FontContext);

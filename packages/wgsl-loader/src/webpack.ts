@@ -1,6 +1,6 @@
 import { getOptions } from 'loader-utils';
 import { validate } from 'schema-utils';
-import { transpileWGSL } from './transpile';
+import { transpileWGSL } from '@use-gpu/shader/wgsl';
 
 const LOADER_NAME = 'WGSL Loader';
 

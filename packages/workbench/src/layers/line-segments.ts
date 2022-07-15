@@ -12,6 +12,7 @@ export type LineSegmentsProps = {
   render?: (segments: StorageSource, lookups: StorageSource) => LiveElement<any>,
 };
 
+/** Produces `segments` composite data for `@{LineLayer}`. */
 export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
   props: LineSegmentsProps,
 ) => {

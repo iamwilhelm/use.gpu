@@ -7,7 +7,7 @@
     { "path": "../traits" },
     { "path": "../core" },
     { "path": "../shader" },
-    { "path": "../text" },
+    { "path": "../glyph" },
     { "path": "../webgpu" },
     { "path": "../react" },
   ],

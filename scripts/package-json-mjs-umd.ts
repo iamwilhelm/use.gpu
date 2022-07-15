@@ -46,6 +46,13 @@ for (const file of files) {
         ts = ts.replace(/\.\/src\//g, './mjs/');
         writeFileSync(dts, ts);
       }  
+
+      const jsRoots = glob.sync(file.replace(/\/package\.json$/, '/*.js'));
+      for (const js of jsRoots) {
+        let ts = readFileSync(js).toString();
+        ts = ts.replace(/\.\/src\//g, './umd/');
+        writeFileSync(js, ts);
+      }  
     } catch (e) {};
 
   }

@@ -21,14 +21,18 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { getSurfaceIndex, getSurfaceNormal } from '@use-gpu/wgsl/plot/surface.wgsl';
 
 export type DualContourLayerProps = {
-  position?: number[] | TypedArray,
+  positions: number[] | TypedArray,
+  value?: number[] | TypedArray,
   color?: number[] | TypedArray,
 
   positions?: ShaderSource,
+  values?: ShaderSource,
   colors?: ShaderSource,
 
+  level?: number,
   loopX?: boolean,
   loopY?: boolean,
+  loopZ?: boolean,
   shaded?: boolean,
 
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
@@ -38,10 +42,13 @@ export type DualContourLayerProps = {
 
 const [SIZE_BINDING, POSITION_BINDING] = bundleToAttributes(getSurfaceIndex);
 
+/** @hidden */
 export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((props: DualContourLayerProps) => {
   const {
     position,
     positions,
+    value,
+    values,
     color,
     colors,
 
@@ -55,16 +62,16 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   } = props;
 
   const sizeExpr = useMemo(() => () =>
-    (props.positions as any)?.size ?? resolve(size),
-    [props.positions, size]);
+    (props.value as any)?.size ?? resolve(size),
+    [props.values, size]);
   const boundSize = useBoundSource(SIZE_BINDING, sizeExpr);
 
   const countExpr = useOne(() => () => {
     const s = resolve(sizeExpr);
-    return ((s[0] || 1) - +!loopX) * ((s[1] || 1) - +!loopY) * (s[2] || 1) * (s[3] || 1) * 2;
+    return ((s[0] || 1) - +!loopX) * ((s[1] || 1) - +!loopY) * ((s[2] || 1) - +!loopZ) * (s[3] || 1);
   }, sizeExpr);
 
-  const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY}), [loopX, loopY]);
+  const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY, LOOP_Z: !!loopZ}), [loopX, loopY, loopZ]);
   const indices = useBoundShader(getSurfaceIndex, [SIZE_BINDING], [boundSize], defines);
 
   const p = useShaderRef(props.position, props.positions);

@@ -12,6 +12,7 @@ export type FaceSegmentsProps = {
   render?: (segments: StorageSource, lookups: StorageSource) => LiveElement<any>,
 };
 
+/** Produces `segments` and `lookups` composite data for `@{FaceLayer}`. */
 export const FaceSegments: LiveComponent<FaceSegmentsProps> = memo((
   props: FaceSegmentsProps,
 ) => {

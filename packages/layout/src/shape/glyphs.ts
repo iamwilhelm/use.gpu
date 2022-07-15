@@ -1,7 +1,7 @@
 import { LiveComponent } from '@use-gpu/live/types';
 import { TextureSource, Tuples, Point4 } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
-import { FontMetrics } from '@use-gpu/text/types';
+import { FontMetrics } from '@use-gpu/glyph/types';
 import { InlineLine } from '../types';
 
 import { use, yeet, useContext, useMemo } from '@use-gpu/live';

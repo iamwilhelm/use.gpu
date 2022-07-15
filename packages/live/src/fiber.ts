@@ -560,7 +560,7 @@ export const reduceFiberValues = <R>(
 }
 
 // Gather yeeted values on a tree of fibers
-// (recursive flatMap with optional array wrapper at leafs)
+// (recursive flatMap with array wrapper at leafs)
 export const gatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,

@@ -21,7 +21,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { getSurfaceIndex, getSurfaceNormal } from '@use-gpu/wgsl/plot/surface.wgsl';
 
 export type DualContourLayerProps = {
-  positions: number[] | TypedArray,
+  position: number[] | TypedArray,
   value?: number[] | TypedArray,
   color?: number[] | TypedArray,
 
@@ -54,6 +54,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
     loopX = false,
     loopY = false,
+    loopZ = false,
     shaded = true,
 
     size,

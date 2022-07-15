@@ -18,7 +18,7 @@ export const makeTranspile = (
     ? `import ${symbol} from ${stringify(from)};`
     : `const ${symbol} = require(${stringify(from)});`;
   const preamble = [
-    makeImport('{decompressAST}', '@use-gpu/shader/' + type.toLowerCase()),
+    makeImport('{decompressAST, bindEntryPoint}', '@use-gpu/shader/' + type.toLowerCase()),
   ].join("\n");
 
   // Parse module source code

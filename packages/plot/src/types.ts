@@ -1,11 +1,7 @@
-import { VectorLike, ColorLike } from '@use-gpu/traits/types';
+import { VectorLike, ColorLike, Placement, Blending, Domain, Join } from '@use-gpu/traits/types';
 import { PointShape } from '@use-gpu/workbench/types';
 
 export type Axis4 = 'x' | 'y' | 'z' | 'w';
-export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
-export type Domain = 'linear' | 'log';
-export type Join = 'miter' | 'round' | 'bevel';
-export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom';
 export type Swizzle = string;
 
 export type AnchorTrait = {

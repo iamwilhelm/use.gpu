@@ -8,7 +8,7 @@ import {
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
-import { useTimeContext } from '../providers/time-provider';
+import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -24,13 +24,13 @@ export type SampledDataProps = {
 
   format?: string,
   live?: boolean,
+  time?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
 };
 
 export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   const device = useContext(DeviceContext);
-  const time = useTimeContext();
 
   const {
     range,
@@ -42,6 +42,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     sparse = false,
     centered = false,
     live = false,
+    time = false,
   } = props;
 
   const t = Math.max(1, Math.round(items) || 0);
@@ -66,6 +67,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
   }, [device, format, l]);
+
+  const clock = time ? useTimeContext() : useNoTimeContext();
 
   // Refresh and upload data
   const refresh = () => {
@@ -169,7 +172,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       }
 
       if (sampled) {
-        emitted = emitIntoMultiNumberArray(sampled, array, dims, size, time!);
+        emitted = emitIntoMultiNumberArray(sampled, array, dims, size, clock!);
       }
     }
     if (expr) {

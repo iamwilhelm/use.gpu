@@ -6,7 +6,7 @@ import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/
 import { useBoundSource, useDataBinding, useDerivedSource } from '@use-gpu/workbench';
 
 import { DataContext } from '../providers/data-provider';
-import { parseAxes, parseAxis } from '../parse';
+import { parseAxes, parseAxis } from '@use-gpu/traits';
 
 import plotArray, { packIndex, unpackIndex } from '@use-gpu/wgsl/plot/array.wgsl';
 

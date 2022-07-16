@@ -8,6 +8,7 @@ import {
   TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
+import { parseAxes } from '@use-gpu/traits';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -16,7 +17,6 @@ import { swizzleMatrix, invertBasis, toBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
 import { useAxesTrait, useObjectTrait } from '../traits';
-import { parseAxes } from '../parse';
 
 import { getSphericalPosition } from '@use-gpu/wgsl/transform/spherical.wgsl';
 

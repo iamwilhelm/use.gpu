@@ -10,9 +10,6 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { DataContext } from '../providers/data-provider';
 import {
-  parseDetail,
-} from '../parse';
-import {
   useArrowTrait,
   useColorTrait,
   useLineTrait,

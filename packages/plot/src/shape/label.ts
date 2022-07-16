@@ -7,12 +7,6 @@ import { DataContext, ValuesContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
 import { LayoutContext, LabelLayer } from '@use-gpu/workbench';
 import {
-  parsePosition4,
-} from '@use-gpu/traits';
-import {
-  parseDetail,
-} from '../parse';
-import {
   useAnchorTrait,
   useColorTrait,
   useFontTrait,

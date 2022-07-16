@@ -34,6 +34,7 @@ export type RawDataProps = {
 
   format?: string,
   live?: boolean,
+  time?: boolean,
 
   render?: (...source: ShaderSource[]) => LiveElement<any>,
   children?: LiveElement<any>,
@@ -50,6 +51,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     interleaved = false,
     sparse = false,
     live = false,
+    time = false,
   } = props;
 
   const t = Math.max(1, Math.round(items) || 0);
@@ -95,14 +97,14 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   }
 
   // Provide time for expr
-  const time = expr ? useTimeContext() : useNoTimeContext();
+  const clock = time && expr ? useTimeContext() : useNoTimeContext();
 
   // Refresh and upload data
   const refresh = () => {
     let emitted = 0;
 
     if (data) copyNumberArray(data, array, dims);
-    if (expr) emitted = emitIntoNumberArray(expr, array, dims, time!);
+    if (expr) emitted = emitIntoNumberArray(expr, array, dims, clock!);
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }

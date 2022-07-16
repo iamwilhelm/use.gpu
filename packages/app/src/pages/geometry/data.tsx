@@ -98,6 +98,7 @@ export const GeometryDataPage: LC = () => {
             format='vec3<f32>'
             length={100}
             live
+            time
             expr={(emit: Emit, i: number, n: number, time: Time) => {
               const s = ((i*i + i) % 13133.371) % 1000;
               const t = time.elapsed / 1000;

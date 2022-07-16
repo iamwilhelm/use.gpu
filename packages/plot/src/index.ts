@@ -9,7 +9,7 @@ export * from './source/transpose';
 export * from './shape/arrow';
 export * from './shape/axis';
 export * from './shape/grid';
-//export * from './shape/implicit-surface';
+export * from './shape/implicit-surface';
 export * from './shape/label';
 export * from './shape/line';
 export * from './shape/tick';

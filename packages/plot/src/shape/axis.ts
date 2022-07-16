@@ -7,12 +7,10 @@ import {
   useBoundShader, useBoundSource, useRawSource, useShaderRef,
   LineLayer, ArrowLayer, useArrowSegments,
 } from '@use-gpu/workbench';
+import { parseIntegerPositive } from '@use-gpu/traits';
 
 import { RangeContext } from '../providers/range-provider';
 import { parsePosition4, useProp } from '@use-gpu/traits';
-import {
-  parseDetail,
-} from '../parse';
 import {
   useAxisTrait,
   useArrowTrait,
@@ -51,7 +49,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const {zBias} = useROPTrait(props);
 
   const p = useProp(origin, parsePosition4);
-  const d = useProp(detail, parseDetail);
+  const d = useProp(detail, parseIntegerPositive);
 
   const parentRange = useContext(RangeContext);
   const r = range ?? parentRange[axis];

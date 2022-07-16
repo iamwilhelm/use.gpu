@@ -23,6 +23,7 @@ export type ArrayDataProps = {
 
   format?: string,
   live?: boolean,
+  time?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
 };
@@ -39,6 +40,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     render,
     sparse = false,
     live = false,
+    time = false,
   } = props;
 
   const t = Math.max(1, Math.round(items) || 0);
@@ -65,14 +67,14 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   }, [device, format, l]);
 
   // Provide time for expr
-  const time = expr ? useTimeContext() : useNoTimeContext();
+  const clock = time && expr ? useTimeContext() : useNoTimeContext();
 
   // Refresh and upload data
   const refresh = () => {
     let emitted = 0;
     if (data) copyNumberArray(data, array, dims);
     if (expr && size.length) {
-      emitted = emitIntoMultiNumberArray(expr, array, dims, size, time!);
+      emitted = emitIntoMultiNumberArray(expr, array, dims, size, clock!);
     }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);

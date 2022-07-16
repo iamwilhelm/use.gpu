@@ -3,16 +3,13 @@ import { UniformAttribute } from '@use-gpu/core/types';
 import { VectorLike } from '@use-gpu/traits/types';
 import { ColorTrait, LineTrait, ROPTrait } from '../types';
 
-import { parseNumber, parsePosition4, useProp } from '@use-gpu/traits';
+import { parseNumber, parsePosition4, parseIntegerPositive, useProp } from '@use-gpu/traits';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { diffBy } from '@use-gpu/shader/wgsl';
 import { useBoundSource, TickLayer } from '@use-gpu/workbench';
 
 import { DataContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
-import {
-  parseDetail,
-} from '../parse';
 import {
   useColorTrait,
   useLineTrait,
@@ -50,7 +47,7 @@ export const Tick: LiveComponent<TickProps> = (props) => {
   const {zBias} = useROPTrait(props);
 
   const s = useProp(size, parseNumber);
-  const d = useProp(detail, parseDetail);
+  const d = useProp(detail, parsePosition4);
   const o = useProp(offset, parsePosition4);
 
   const getPosition = useBoundSource(GET_POSITION, positions);

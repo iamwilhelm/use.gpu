@@ -22,6 +22,7 @@ export type UseTrait<I, O> = (props?: Partial<I>) => O;
 export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
 export type Join = 'miter' | 'round' | 'bevel';
 export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+export type Domain = 'linear' | 'log';
 
 export type Color = [number, number, number, number];
 export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;

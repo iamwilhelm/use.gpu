@@ -5,7 +5,7 @@ import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } 
 import { SampledData } from '@use-gpu/workbench';
 import { DataContext } from '../providers/data-provider';
 import { RangeContext } from '../providers/range-provider';
-import { parseAxis } from '../parse';
+import { parseAxis } from '@use-gpu/traits';
 
 export type SampledProps = {
   axis?: string,
@@ -21,6 +21,7 @@ export type SampledProps = {
 
   format?: string,
   live?: boolean,
+  time?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
   children?: LiveElement<any>,
@@ -38,9 +39,12 @@ export const Sampled: LiveComponent<SampledProps> = (props) => {
 
   const parentRange = useContext(RangeContext);
   const resolvedRange = outerRange ?? parentRange;
-  
-  const basis = (axis ?? axes).split('').map(parseAxis);
-  const range = basis.map(i => resolvedRange[i]);
+
+  const a = axis ?? axes;
+  const range = useMemo(() => {
+    const basis = a.split('').map(parseAxis);
+    return basis.map(i => resolvedRange[i]);
+  }, [resolvedRange, a]);
 
   return (
     gather(

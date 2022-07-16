@@ -12,9 +12,9 @@ import {
 
 import { RangeContext } from '../providers/range-provider';
 import {
-  parseDetail,
+  parseIntegerPositive,
   parseAxis,
-} from '../parse';
+} from '@use-gpu/traits';
 import {
   useColorTrait,
   useGridTrait,
@@ -57,8 +57,8 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const first = useScaleTrait(props.first ?? NO_SCALE_PROPS);
   const second = useScaleTrait(props.second ?? NO_SCALE_PROPS);
 
-  const firstDetail = useProp(props.first?.detail, parseDetail);
-  const secondDetail = useProp(props.second?.detail, parseDetail);
+  const firstDetail = useProp(props.first?.detail, parseIntegerPositive);
+  const secondDetail = useProp(props.second?.detail, parseIntegerPositive);
 
   const p = useProp(origin, parsePosition4);
 

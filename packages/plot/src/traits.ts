@@ -20,16 +20,14 @@ import {
   parseBlending,
   parsePlacement,
   parseWeight,
-  optional,
-} from '@use-gpu/traits';
-import {
-  parseAxes,
-  parseAxis,
-  parseDetail,
-  parseDomain,
   parseRange,
   parseRanges,
-} from './parse';
+  parseAxes,
+  parseAxis,
+  parseIntegerPositive,
+  parseDomain,
+  optional,
+} from '@use-gpu/traits';
 import {
   parsePointShape,
 } from '@use-gpu/workbench';
@@ -69,7 +67,7 @@ const ARROW_TRAIT = {
   size: parseNumber,
   start: parseBoolean,
   end: parseBoolean,
-  detail: parseDetail,
+  detail: parseIntegerPositive,
 };
 
 const ARROW_DEFAULTS = {

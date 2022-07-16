@@ -5,6 +5,7 @@ import {
   VertexData, RenderPassMode,
 } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
+import { VectorLike } from '@use-gpu/traits/types';
 
 import { RawFaces } from '../primitives/raw-faces';
 
@@ -21,15 +22,12 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { getSurfaceIndex, getSurfaceNormal } from '@use-gpu/wgsl/plot/surface.wgsl';
 
 export type DualContourLayerProps = {
-  position: number[] | TypedArray,
-  value?: number[] | TypedArray,
   color?: number[] | TypedArray,
 
-  positions?: ShaderSource,
+  range: VectorLike[],
   values?: ShaderSource,
-  colors?: ShaderSource,
-
   level?: number,
+
   loopX?: boolean,
   loopY?: boolean,
   loopZ?: boolean,
@@ -45,12 +43,11 @@ const [SIZE_BINDING, POSITION_BINDING] = bundleToAttributes(getSurfaceIndex);
 /** @hidden */
 export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((props: DualContourLayerProps) => {
   const {
-    position,
-    positions,
-    value,
-    values,
     color,
-    colors,
+
+    range,
+    values,
+    level,
 
     loopX = false,
     loopY = false,
@@ -63,7 +60,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   } = props;
 
   const sizeExpr = useMemo(() => () =>
-    (props.value as any)?.size ?? resolve(size),
+    (props.values as any)?.size ?? resolve(size),
     [props.values, size]);
   const boundSize = useBoundSource(SIZE_BINDING, sizeExpr);
 
@@ -72,6 +69,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     return ((s[0] || 1) - +!loopX) * ((s[1] || 1) - +!loopY) * ((s[2] || 1) - +!loopZ) * (s[3] || 1);
   }, sizeExpr);
 
+
   const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY, LOOP_Z: !!loopZ}), [loopX, loopY, loopZ]);
   const indices = useBoundShader(getSurfaceIndex, [SIZE_BINDING], [boundSize], defines);
 
@@ -79,6 +77,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const xf = useApplyTransform(p);
   const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, xf], defines);
 
+  return null;
   return use(RawFaces, {
     position,
     positions,
@@ -93,4 +92,4 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     mode,
     id,
   });
-}, 'SurfaceLayer');
+}, 'DualContourLayer');

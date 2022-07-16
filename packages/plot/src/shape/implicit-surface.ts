@@ -3,7 +3,7 @@ import { ShaderSource } from '@use-gpu/shader/types';
 import { ColorTrait, LineTrait, ROPTrait, VolumeTrait } from '../types';
 
 import { use, useContext } from '@use-gpu/live';
-import { ImplicitSurfaceLayer } from '@use-gpu/workbench';
+import { DualContourLayer } from '@use-gpu/workbench';
 
 import { DataContext } from '../providers/data-provider';
 import {
@@ -16,23 +16,19 @@ export type ImplicitSurfaceProps =
   Partial<ColorTrait> &
   Partial<ROPTrait> &
   Partial<VolumeTrait> & {
-  colors?: ShaderSource,
 };
 
 export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = (props: ImplicitSurfaceProps) => {
-  const {colors} = props;
-
-  const positions = useContext(DataContext) ?? undefined;
+  const values = useContext(DataContext) ?? undefined;
 
   const {loopX, loopY, loopZ, shaded} = useVolumeTrait(props);
   const color = useColorTrait(props);
   const rop = useROPTrait(props);
 
   return (
-    use(ImplicitSurfaceLayer, {
-      positions,
+    use(DualContourLayer, {
+      values,
       color,
-      colors,
       loopX,
       loopY,
       loopZ,

@@ -1,5 +1,5 @@
 import { ArrowFunction } from '@use-gpu/live/types';
-import { TypedArray, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike } from './types';
+import { TypedArray, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike, Domain } from './types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
@@ -12,6 +12,12 @@ const GRAY = [0.5, 0.5, 0.5, 1] as Color;
 
 const NO_VECTOR: number[] = [];
 const NO_STRINGS: string[] = [];
+
+const NO_RANGE = vec2.fromValues(-1, 1);
+const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
+
+const AXIS_NUMBERS = {'x': 0, 'y': 1, 'z': 2, 'w': 3} as Record<string, number>;
+const AXIS_LETTERS = ['x', 'y', 'z', 'w'];
 
 ///////////////////////////
 
@@ -128,6 +134,32 @@ export const makeParseStringFormatter = (
   };
 };
 
+export const makeParseAxis = (def: number) => (s?: string) => {
+  if (s != null) return AXIS_NUMBERS[s] ?? def;
+  return def;
+};
+
+export const makeParseBasis = (defaults: string) => {
+  const axes = defaults.split('');
+  const order = [0, 1, 2, 3];
+
+  const getOrder = (s: string) => {
+    order.sort((a, b) => {
+      const ai = s.indexOf(axes[a]);
+      const bi = s.indexOf(axes[b]);
+      if (ai >= 0 && bi >= 0) return ai - bi;
+      if (ai < 0 && bi < 0) return a - b;
+      return (ai < 0) ? 1 : -1;
+    });
+    return order.map(x => AXIS_LETTERS[x]).join('');
+  };
+
+  return (s?: string) => {
+    if (s != null) return getOrder(s);
+    return defaults;
+  }
+};
+
 const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
 const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
 const strToFloat = (s: string) => s.match('%') ? +s / 100 : +s;
@@ -186,6 +218,8 @@ export const parseNumber     = makeParseNumber();
 export const parseInteger    = makeParseInt();
 export const parseBoolean    = makeParseBoolean();
 
+export const parseIntegerPositive = makeParseInt(1, 1, 1e15);
+
 export const parseString          = makeParseString();
 export const parseStringFormatter = makeParseStringFormatter();
 export const parseStringArray     = makeParseArray(NO_STRINGS, parseString);
@@ -227,3 +261,13 @@ export const parseWeight = makeParseMapOrValue({
   'extra-bold': 800,
   'ultra-bold': 900,
 }, 'normal');
+
+export const parseAxes   = makeParseBasis('xyzw');
+
+export const parseAxis   = makeParseAxis(0);
+
+export const parseRange  = makeParseVec2(NO_RANGE);
+
+export const parseRanges = makeParseArray(NO_RANGES, parseRange);
+
+export const parseDomain = makeParseEnum<Domain>(['linear', 'log']);

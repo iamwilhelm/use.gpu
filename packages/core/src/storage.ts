@@ -55,9 +55,9 @@ export const checkStorageType = (
   const t = toTypeName(to);
   
   if (link && t != null && f !== t) {
-    // Remove vec size to allow for automatic widening/narrowing
-    const fromVec = f.replace(/vec[0-9](to[0-9])?/, 'vec');
-    const toVec   = t.replace(/vec[0-9](to[0-9])?/, 'vec'); 
+    // Remove vec<..> to allow for automatic widening/narrowing
+    const fromVec = f.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, '');
+    const toVec   = t.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, ''); 
 
     if (fromVec !== toVec) {
       // Remove bit size to allow for automatic widening/narrowing

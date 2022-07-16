@@ -29,7 +29,6 @@ export type RawFullScreenProps = {
 };
 
 const ZERO = [0, 0, 0, 1];
-const NONE = [] as any[];
 
 const FRAGMENT_BINDINGS = bundleToAttributes(getTextureFragment);
 
@@ -65,9 +64,6 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
 
     getVertex,
     getFragment,
-
-    defines: NONE,
-    deps: NONE,
 
     pipeline,
     mode,

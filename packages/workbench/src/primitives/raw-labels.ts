@@ -146,7 +146,6 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     getFragment,
 
     defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
-    deps: null,
 
     renderer: 'ui',
     pipeline,

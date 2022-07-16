@@ -123,7 +123,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     getFragment,
 
     defines,
-    deps: [j],
 
     pipeline,
     mode,

@@ -140,7 +140,6 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     getFragment,
 
     defines,
-    deps: null,
 
     renderer: 'ui',
     pipeline,

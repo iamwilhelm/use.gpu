@@ -35,7 +35,6 @@ export type RenderProps = {
   renderContext: UseRenderingContextGPU,
 
   defines: Record<string, any>,
-  deps: any[] | null,
 };
 
 const DEFAULT_DEFINES = {
@@ -57,7 +56,6 @@ export const drawCall = (props: RenderProps) => {
 
     pipeline: propPipeline,
     defines: propDefines,
-    deps = null,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
@@ -88,11 +86,8 @@ export const drawCall = (props: RenderProps) => {
     constants,
     volatiles,
   } = useLinkedShader(
-    vertexShader,
-    fragmentShader,
+    [vertexShader, fragmentShader],
     defines,
-    deps,
-    1,
   );
   
   // Rendering pipeline

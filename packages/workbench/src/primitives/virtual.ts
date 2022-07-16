@@ -67,7 +67,6 @@ export type VirtualProps = {
 
   renderer?: VirtualRenderer | string,
   defines: Record<string, any>,
-  deps: any[] | null,
 };
 
 const DEBUG_BINDING = { name: 'getInstanceSize', format: 'u32', value: 0, args: [] };
@@ -101,7 +100,6 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     defines,
 
     renderer = SOLID_RENDERER,
-    deps = null,
     mode = RenderPassMode.Opaque,
     id = 0,
   } = props;
@@ -174,7 +172,6 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     vertex: v,
     fragment: f,
     defines,
-    deps,
     pipeline,
     renderContext: resolvedContext,
     mode: m,

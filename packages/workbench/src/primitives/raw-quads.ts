@@ -130,7 +130,6 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     getFragment,
 
     defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
-    deps: null,
 
     pipeline,
     mode,

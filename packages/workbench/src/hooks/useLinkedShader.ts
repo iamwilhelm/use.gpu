@@ -9,7 +9,6 @@ import { useFiber, useMemo, useOne } from '@use-gpu/live';
 import { useInspectable } from './useInspectable'
 import LRU from 'lru-cache';
 
-const NO_DEPS = [] as any[];
 const NO_LIBS = {} as Record<string, any>;
 
 type RenderShader = [ShaderModuleDescriptor, ShaderModuleDescriptor];
@@ -22,38 +21,28 @@ export const makeShaderCache = (options: Record<number, any> = {}) => new LRU<st
 const CACHE = new LRU<string, any>();
 
 export const useLinkedShader = (
-  vertex: ParsedBundle,
-  fragment: ParsedBundle,
+  stages: ParsedBundle[],
   defines: Record<string, ShaderDefine> | null | undefined,
-  deps: any[] | null = null,
-  base: number = 0,
-  key?: number | string,
 ) => {
   const fiber = useFiber();
   const inspect = useInspectable();
 
   // Get hash for defines, shader code, shader instance
-  const pHash = toMurmur53(deps);
-  const dHash = toMurmur53(defines);
-  const vHash = getBundleHash(vertex);
-  const fHash = getBundleHash(fragment);
-  const vKey  = getBundleKey(vertex);
-  const fKey  = getBundleKey(fragment);
+  const defKey  = toMurmur53(defines);
 
-  const shaderKey     = mixBits53(vHash, fHash);
-  const defKey        = mixBits53(dHash, pHash);
-  const boundKey      = mixBits53(vKey, fKey);
-  const structuralKey = mixBits53(shaderKey, defKey);
-  const instanceKey   = mixBits53(structuralKey, boundKey);
+  const codeKey = stages.reduce((hash, module) => mixBits53(hash, getBundleHash(module)), 0);
+  const dataKey = stages.reduce((hash, module) => mixBits53(hash, getBundleKey(module)), 0);
+
+  const structuralKey = mixBits53(codeKey, defKey);
+  const instanceKey   = mixBits53(structuralKey, dataKey);
 
   // If structural key hasn't changed, we don't need updated modules
   let lazy = true;
   useOne(() => { lazy = false }, structuralKey);
 
-  // Resolve bindings between vertex and fragment if instance key changed
-  const s = [vertex, fragment] as [ParsedBundle, ParsedBundle];
+  // Resolve bindings across stages if instance key changed
   const {modules, uniforms, bindings, volatiles} = useOne(() =>
-    resolveBindings(s, defines, lazy),
+    resolveBindings(stages, defines, lazy),
     instanceKey
   );
 
@@ -62,26 +51,27 @@ export const useLinkedShader = (
 
   // Link final WGSL if code structure changed.
   const shader = useOne(() => {
-    const vKey = formatMurmur53(vHash) +'-'+ formatMurmur53(dHash);
-    const fKey = formatMurmur53(fHash) +'-'+ formatMurmur53(dHash);
+    const isCompute = modules.length === 1;
+    const suffix = formatMurmur53(defKey);
 
-    let vertex = CACHE.get(vKey);
-    if (vertex == null) {
-      const v = linkBundle(modules[0], NO_LIBS, defines);
-      vertex = makeShaderModule(v, vKey);
-      CACHE.set(vKey, vertex);
+    const out: ShaderModuleDescriptor[] = [];
+    for (const module of modules) {
+      const codeKey = getBundleHash(module);
+      const key = `${formatMurmur53(codeKey)}-{suffix}`;
+
+      let result = CACHE.get(key);
+      if (result == null) {
+        const linked = linkBundle(module, NO_LIBS, defines);
+        result = makeShaderModule(linked, key);
+        CACHE.set(key, result);
+      }
+      out.push(result);
     }
 
-    let fragment = CACHE.get(fKey);
-    if (fragment == null) {
-      const f = linkBundle(modules[1], NO_LIBS, defines);
-      fragment = makeShaderModule(f, fKey);
-      CACHE.set(fKey, fragment);
-    }
-    
     inspect({
-      vertex,
-      fragment,
+      compute:   isCompute ? out[0] : null,
+      vertex:   !isCompute ? out[0] : null,
+      fragment: !isCompute ? out[1] : null,
       uniforms,
       bindings,
       volatiles,
@@ -91,7 +81,7 @@ export const useLinkedShader = (
     ref.uniforms = uniforms;
     ref.bindings = bindings;
 
-    return [vertex, fragment] as [ShaderModuleDescriptor, ShaderModuleDescriptor];
+    return out;
   }, structuralKey);
 
   // Update uniform constant values in-place

@@ -18,7 +18,16 @@ import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick.wgs
 
 //
 // This component shows how to do "raw" rendering with Use.GPU,
-// without using any of the built-in components.
+// without using any of the built-in components or binding gen,
+// but while still fully supporting GPU Picking and color spaces.
+//
+// It is mainly intended as an anti-example.
+//
+// This demonstrates:
+// - How much boilerplate raw WebGPU requires, even with the @use-gpu/core helpers.
+// - The No-API nature of Use.GPU. There is no magic sauce locked away inside the standard components.
+// - How to use vertex buffers, if you wanted them.
+// - How even the bind-group assignments are customizable, if you need to.
 //
 
 export const MESH_UNIFORM_DEFS: UniformAttribute[] = [

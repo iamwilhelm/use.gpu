@@ -109,6 +109,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     return () => { host.__highlight = () => {}; }
   }, [host, fibers]);
 
+  let computeTab: React.ReactNode;
   let vertexTab: React.ReactNode;
   let fragmentTab: React.ReactNode;
   let layoutTab: React.ReactNode;
@@ -116,7 +117,10 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   if (selectedFiber) {
     const inspect = selectedFiber.__inspect;
     if (inspect) {
-      const {vertex, fragment, layout, render} = inspect;
+      const {compute, vertex, fragment, layout, render} = inspect;
+      if (compute) {
+        computeTab = <Shader type="compute" fiber={selectedFiber} />;
+      }
       if (vertex) {
         vertexTab = <Shader type="vertex" fiber={selectedFiber} />;
       }
@@ -156,6 +160,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
         <Tabs.List>
           <Tabs.Trigger value="props">Props</Tabs.Trigger>
           <Tabs.Trigger value="fiber">Fiber</Tabs.Trigger>
+          {computeTab ? <Tabs.Trigger value="compute">Compute</Tabs.Trigger> : null}
           {vertexTab ? <Tabs.Trigger value="vertex">Vertex</Tabs.Trigger> : null}
           {fragmentTab ? <Tabs.Trigger value="fragment">Fragment</Tabs.Trigger> : null}
           {layoutTab ? <Tabs.Trigger value="layout">Layout</Tabs.Trigger> : null}
@@ -163,6 +168,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
         </Tabs.List>
         <Tabs.Content value="props">{selectedFiber ? <Props fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
         <Tabs.Content value="fiber">{selectedFiber ? <Call fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
+        {computeTab ? <Tabs.Content value="compute">{computeTab}</Tabs.Content> : null }
         {vertexTab ? <Tabs.Content value="vertex">{vertexTab}</Tabs.Content> : null }
         {fragmentTab ? <Tabs.Content value="fragment">{fragmentTab}</Tabs.Content> : null }
         {layoutTab ? <Tabs.Content value="layout">{layoutTab}</Tabs.Content> : null }

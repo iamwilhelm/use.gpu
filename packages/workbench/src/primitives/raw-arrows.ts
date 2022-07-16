@@ -60,7 +60,6 @@ const PIPELINE = {
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
 const DEFINES: Record<string, any> = {};
-const NO_DEPS: any[] = [];
 
 export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsProps) => {
   const {
@@ -104,7 +103,6 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
       getFragment,
 
       defines: DEFINES,
-      deps: NO_DEPS,
 
       pipeline,
       mode,

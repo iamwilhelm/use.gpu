@@ -146,8 +146,8 @@ export const useRenderPipelineAsync = (
     // Mark current pipeline as stale (if any)
     const resolve = (pipeline: GPURenderPipeline) => {
       if (staleRef.current === key) {
-        setResolved(pipeline);
         staleRef.current = null;
+        setResolved(pipeline);
       }
       return pipeline;
     };

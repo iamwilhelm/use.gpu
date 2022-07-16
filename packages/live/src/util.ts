@@ -1,39 +1,40 @@
 import { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types';
 
-const RAF = typeof window !== 'undefined' ? window.requestAnimationFrame : setTimeout;
 const NO_DEPS = [] as any[];
 
 /** Cyclic 32-bit version number that skips 0 */
 export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
 
-/** Schedules actions to be run immediately after the current thread completes */
-export const makeActionScheduler = () => {
+/** Schedules actions to be run immediately after the current thread completes.
+Notifies the bound listener once after running all actions. */
+export const makeActionScheduler = (
+  request: (flush: ArrowFunction) => void,
+  onFlush: (as: Action<any>[]) => void,
+) => {
   const queue = [] as Action<any>[];
 
-  let timer = null as any;
-  let onUpdate = null as any;
-
-  const bind = (f: Dispatcher) => onUpdate = f;
+  let pending = false;
 
   const schedule = (fiber: LiveFiber<any>, task: Task) => {
     queue.push({fiber, task});
-    if (!timer) timer = setTimeout(flush, 0);
-  };
-
-  const flush = () => {
-    if (timer) clearTimeout(timer);
-
-    const q = queue.slice();
-    queue.length = 0;
-    timer = null;
-
-    for (const {task} of q) task();
-    if (onUpdate) {
-      onUpdate(q);
+    if (!pending) {
+      pending = true;
+      request(flush);
     }
   };
 
-  return {bind, schedule, flush};
+  const flush = () => {
+    if (!queue.length) return;
+
+    const q = queue.slice();
+    queue.length = 0;
+    pending = false;
+
+    for (const {task} of q) task();
+    onFlush(q);
+  };
+
+  return {schedule, flush};
 }
 
 /** Tracks long-range dependencies for contexts */
@@ -114,27 +115,8 @@ export const makeDisposalTracker = () => {
   return {track, untrack, dispose};
 }
 
-/** Schedules callback(s) on next paint */
-export const makePaintRequester = (raf: any = RAF) => {
-  let pending = false;
-  const queue: Task[] = [];
-
-  const flush = () => {
-    const q = queue.slice();
-    queue.length = 0;
-    pending = false;
-
-    for (const t of q) t();
-  }
-
-  return (t: Task) => {
-    if (!pending) {
-      pending = true;
-      raf(flush);
-    }
-    queue.push(t);
-  }
-}
+/** Node-friendly RAF wrapper */
+export const getOnPaint = () => typeof window !== 'undefined' ? window.requestAnimationFrame : setTimeout;
 
 /** Compare dependency arrays */
 export const isSameDependencies = (

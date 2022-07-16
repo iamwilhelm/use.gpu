@@ -36,7 +36,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     pitch: initialPitch = 0,
     version = 0,
 
-    radiusSpeed  = 1/100,
+    radiusSpeed  = 1/2,
     bearingSpeed = 5,
     pitchSpeed   = 5,
     moveSpeed    = 1,
@@ -88,9 +88,9 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   }, mouse);
 
   useOne(() => {
-    const {moveY} = wheel;
+    const {spinY} = wheel;
     const speedY = radiusSpeed;
-    if (moveY) setRadius((radius: number) => radius * (1 + moveY * speedY));
+    if (spinY) setRadius((radius: number) => radius * Math.pow(2, spinY * speedY));
   }, wheel);
 
   return useMemo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);

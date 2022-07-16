@@ -6,6 +6,10 @@ import { EventProvider, MouseState, WheelState, KeyboardState } from '@use-gpu/w
 const CAPTURE_EVENT = {capture: true};
 const NON_PASSIVE_EVENT = {capture: true, passive: false};
 
+const WHEEL_STEP = 120;
+const PIXEL_STEP = 10;
+const DELTA_MULTIPLIER = [1, 4, 80];
+
 export type DOMEventsProps = {
   element: HTMLElement,
   children: LiveElement<any>,
@@ -39,6 +43,8 @@ const makeWheelState = () => ({
   y: 0,
   moveX: 0,
   moveY: 0,
+  spinX: 0,
+  spinY: 0,
   stopped: false,
 } as WheelState);
 
@@ -84,11 +90,47 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       });
     };
 
-    const onWheel = (e: WheelEvent) => {
-      const {deltaMode, deltaX, deltaY, clientX, clientY} = e;
-      let f = 1;
-      if (deltaMode === 1) f = 10;
-      if (deltaMode === 2) f = 30;
+    // Special Firefox-only event. Prefer if available.
+    const onDOMWheel = (e: any) => {
+      element.removeEventListener('wheel', onWheel, CAPTURE_EVENT);
+      onWheel(e);
+    };
+
+    const onWheel = (e: any) => {
+      const {
+        deltaMode, deltaX, deltaY,
+        clientX, clientY,
+        wheelDelta, wheelDeltaX, wheelDeltaY,
+      } = (e as any);
+
+      let moveX = 0;
+      let moveY = 0;
+      let spinX = 0;
+      let spinY = 0;
+
+      // Wheel -> Spin
+      if ('detail'      in event) { spinY =  event.detail; }
+      if ('wheelDelta'  in event) { spinY = -event.wheelDelta  / WHEEL_STEP; }
+      if ('wheelDeltaX' in event) { spinX = -event.wheelDeltaX / WHEEL_STEP; }
+      if ('wheelDeltaY' in event) { spinY = -event.wheelDeltaY / WHEEL_STEP; }
+
+      if ('axis' in event && event.axis === event.HORIZONTAL_AXIS) {
+        spinX = spinY;
+        spinY = 0;
+      }
+
+      // Spin -> Move
+      moveX = spinX * PIXEL_STEP;
+      moveY = spinY * PIXEL_STEP;
+
+      // Wheel -> Move
+      const multiplier = DELTA_MULTIPLIER[event.deltaMode || 0];
+      if ('deltaX' in event) { moveX = event.deltaX * multiplier; }
+      if ('deltaY' in event) { moveY = event.deltaY * multiplier; }
+
+      // Move -> Spin
+      spinX ||= Math.sign(moveX);
+      spinY ||= Math.sign(moveY);
 
       const {left, top} = element.getBoundingClientRect();
       const x = clientX - left;
@@ -97,8 +139,10 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       setWheel((state) => ({
         x,
         y,
-        moveX: deltaX * f,
-        moveY: deltaY * f,
+        moveX,
+        moveY,
+        spinX,
+        spinY,
         stopped: false,
       }));
 
@@ -210,8 +254,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     document.addEventListener('keydown', onKeyDown, CAPTURE_EVENT);
     document.addEventListener('keyup', onKeyUp, CAPTURE_EVENT);
 
+    element.addEventListener('DOMMouseScroll', onDOMWheel, CAPTURE_EVENT);
     element.addEventListener('wheel', onWheel, CAPTURE_EVENT);
-    //document.addEventListener('wheel', onGlobalWheel, NON_PASSIVE_EVENT);
 
     dispose(() => {
       element.removeEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
@@ -225,8 +269,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       document.removeEventListener('keydown', onKeyDown, CAPTURE_EVENT);
       document.removeEventListener('keyup', onKeyUp, CAPTURE_EVENT);
 
+      element.removeEventListener('DOMMouseScroll', onDOMWheel, CAPTURE_EVENT);
       element.removeEventListener('wheel', onWheel, CAPTURE_EVENT);
-      //document.removeEventListener('wheel', onGlobalWheel, NON_PASSIVE_EVENT);
     });
   }, [element]);
 

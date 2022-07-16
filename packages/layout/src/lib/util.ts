@@ -446,3 +446,56 @@ export const makeMiniHash = (key: number = 1) => (x?: number) => {
   }
   return key;
 }
+
+// Alignment to relative anchor position [0...1]
+export const getAlignmentAnchor = (x: Alignment): number => {
+  const isStart = (x === 'start' || x === 'justify-start');
+  const isEnd = (x === 'end' || x === 'justify-end');
+
+  const align = isStart ? 0 : isEnd ? 1 : 0.5;
+  return align;
+}
+
+// Alignment/justification spacing and indent
+export const getAlignmentSpacing = (
+  slack: number,
+  n: number,
+  hard: boolean,
+  align: Alignment,
+) => {
+  let gap = 0;
+  let lead = 0;
+
+  const isJustifyStart  = align === 'justify-start';
+  const isJustifyCenter = align === 'justify-center';
+  const isJustifyEnd    = align === 'justify-end';
+
+  const isJustify = align === 'justify' ||
+                    ((isJustifyStart || isJustifyCenter || isJustifyEnd) && !hard);
+  const isBetween = align === 'between';
+  const isEvenly  = align === 'evenly';
+
+  if (slack > 0) {
+    if (isEvenly || isBetween || isJustify) {
+      if (n === 1) {
+        lead = slack / 2;
+      }
+      else if (isEvenly) {
+        gap = Math.max(0, slack / (n + 1));
+        lead = gap;
+      }
+      else if (isBetween) {
+        gap = Math.max(0, slack / n);
+        lead = gap / 2;
+      }
+      else if (isJustify) {
+        gap = Math.max(0, slack / Math.max(1, n - 1));
+      }
+    }
+    else {
+      lead = getAlignmentAnchor(align) * slack;
+    }
+  }
+
+  return [gap, lead];
+};

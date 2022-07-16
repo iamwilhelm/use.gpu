@@ -37,7 +37,6 @@ use 'path/to/color'::{ getColor };
 vec4 getColor();
 ```
 
-
 This allows you to split up and organize your WGSL / GLSL code as you see fit, as well as create dynamic shader permutations. It also lets you bind shaders at run-time without immediate linking, thus providing an equivalent of WGSL / GLSL closures.
 
 `@use-gpu/shader` supports GLSL 4.5 and WGSL 0.x (provisional). It uses custom [Lezer grammars](https://lezer.codemirror.net/) for the parsing.
@@ -66,7 +65,7 @@ All dependencies will be parsed at build-time and deduplicated, using the normal
 
 #### Closures
 
-You can bind shaders to each other using `bindBundle`. This returns a new module instead of immediately producing the linked shader code. The result acts as a GLSL closure that you can use as a first-class value in your program:
+Bind shaders to each other using `bindBundle`. This returns a new module instead of immediately producing the linked shader code. The result acts as a GLSL closure that you can use as a first-class value in your program:
 
 ```ts
 const bound = bindBundle(bundle, {moduleA, moduleB});
@@ -74,9 +73,42 @@ const bound = bindBundle(bundle, {moduleA, moduleB});
 
 The `bound` module can be passed around, and used as a new link to bind to another module recursively. This is highly useful to e.g. abstract over data sources or decorate shaders with new behavior.
 
+#### Template literals
+
+Use `wgsl` or `glsl` template literals to embed shaders inline:
+
+```tsx
+import { wgsl } from '@use-gpu/shader/wgsl`;
+
+const wgslModule = wgsl`
+  fn main() {}
+`;
+```
+
+```tsx
+import { glsl } from '@use-gpu/shader/glsl`;
+
+const glslModule = glsl`
+  void main() {}
+`;
+```
+
+This is equivalent to a `loadModuleWithCache` call, so recent modules are cached by text hash. The default entry point is `main`.
+
+Use `f32(x)`, `u32(x)` and `i32(x)` to format JS numbers correctly as WGSL strings (and `float`, ``uint`, `int` for GLSL):
+
+```tsx
+import { wgsl, u32 } from '@use-gpu/shader/wgsl`;
+
+const module = wgsl`
+  fn main()  -> u32 { return ${u32(1)}; } // "1u"
+  fn other() -> f32 { return ${f32(1)}; } // "1.0"
+`;
+```
+
 #### Strings
 
-You can also skip the bundler and work with raw strings. In this case it is up to you to gather all the associated module code:
+You can skip the bundler and work with raw strings. In this case it is up to you to gather all the associated module code:
 
 ```ts
 import { linkCode } from '@use-gpu/shader/wgsl';
@@ -89,6 +121,8 @@ const linked = linkCode(moduleC, {moduleA, moduleB});
 ```
 
 Shaders parsed at run-time will be cached on a least-recently-used basis, based on content hash.
+
+```
 
 ## Syntax (WGSL)
 
@@ -216,7 +250,7 @@ void main() {
 }
 ```
 
-You can import named symbols from `.glsl` files in JS/TS, and use them directly as links:
+Import named symbols from `.glsl` files in JS/TS, and use them directly as links:
 
 ```ts
 import mainShader from 'path/to/main.glsl';
@@ -236,7 +270,7 @@ No. It ignores and passes through all other `#directives`. This is done to avoid
 
 This means the linker sees all top-level declarations regardless of `#if`s, and resolves all imports.
 
-You can mark prototypes as `#pragma optional` if it is ok to leave them unlinked.
+Mark prototypes as `#pragma optional` if it is ok to leave them unlinked.
 
 **Which 'version' of WGSL is supported?**
 
@@ -320,7 +354,7 @@ const bound = bindBundle(bundle, {links});
 
 This is a fast operation which only affects the top-level module in a bundle.
 
-The resulting bundle acts as a closure. You can then link or rebind it:
+The resulting bundle acts as a closure. Then link or rebind it:
 
 ```tsx
 // Link it into a shader

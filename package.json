@@ -61,7 +61,6 @@
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "MODULE_ENV=umd jest --watch",
     "test:import": "(cd test/import; yarn run test)",
-    "test:vite-react": "(cd test/vite-react; yarn run test)",
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",

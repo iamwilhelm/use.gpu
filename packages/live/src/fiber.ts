@@ -8,13 +8,11 @@ import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_RED
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction } from './util';
-import { formatNode, formatNodeName } from './debug';
+import { formatNode, formatNodeName, LOGGING } from './debug';
 
 import { setCurrentFiber } from './current';
 
 let ID = 0;
-let DEBUG = false;
-//setTimeout((() => DEBUG = false), 900);
 
 const NO_FIBER = () => () => {};
 const NOP = () => {};
@@ -194,10 +192,11 @@ export const renderFiber = <F extends ArrowFunction>(
   else if ((f as any) === CONSUME) return consumeFiber(fiber);
   else if ((f as any) === DETACH)  return detachFiber(fiber);
 
+  const LOG = LOGGING.fiber;
+  LOG && console.log('Rendering', formatNode(fiber));
+
   const {bound, args, yeeted} = fiber;
   let element: LiveElement<any>;
-
-  DEBUG && console.log('Rendering', formatNode(fiber));
 
   // Disposed fiber, ignore
   if (!bound) return;
@@ -417,7 +416,7 @@ export const makeImperativeFunction = (
 ): LiveFunction<any> => {
   (component as any).isImperativeFunction = true;
   tagFunction(component, displayName);
-  return c;
+  return component;
 }
 
 // Reconcile multiple calls on a fiber
@@ -627,7 +626,6 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 
         const value = multiGatherFiberValues(m);
         if (value === SUSPEND) return yeeted.reduced = SUSPEND;
-        if (value === undefined) debugger;
 
         for (let k in value as Record<string, T | T[]>) {
           const v = (value as Record<string, T | T[]>)[k];
@@ -830,6 +828,7 @@ export const updateMount = <P extends ArrowFunction>(
   newMount?: DeferredCall<any> | null,
   key?: Key,
 ): LiveFiber<any> | null | false => {
+  const LOG = LOGGING.fiber;
   const {host} = parent;
 
   let from = mount?.f;
@@ -844,13 +843,13 @@ export const updateMount = <P extends ArrowFunction>(
   const replace = update && from !== to;
 
   if ((!to && from) || replace) {
-    DEBUG && console.log('Unmounting', key, formatNode(mount!));
+    LOG && console.log('Unmounting', key, formatNode(mount!));
     if (host) host.__stats.unmounts++;
     if (!replace) return null;
   }
 
   if ((to && !from) || replace) {
-    DEBUG && console.log('Mounting', key, formatNode(newMount!));
+    LOG && console.log('Mounting', key, formatNode(newMount!));
     if (host) host.__stats.mounts++;
     // Destroy yeet caches because trail of contexts downwards starts empty
     bustFiberYeet(parent, true);
@@ -863,11 +862,11 @@ export const updateMount = <P extends ArrowFunction>(
     const args = aas !== undefined ? aas : (aa !== undefined ? [aa] : undefined);
 
     if (mount!.args === args && !to?.isImperativeFunction) {
-      DEBUG && console.log('Skipping', key, formatNode(newMount!));
+      LOG && console.log('Skipping', key, formatNode(newMount!));
       return false;
     }
 
-    DEBUG && console.log('Updating', key, formatNode(newMount!));
+    LOG && console.log('Updating', key, formatNode(newMount!));
     if (host) host.__stats.updates++;
 
     mount!.args = args;
@@ -903,9 +902,10 @@ export const visitYeetRoot = <F extends ArrowFunction>(
 ) => {
   const {host, yeeted} = fiber;
   if (fiber.type === YEET && yeeted) {
+    const LOG = LOGGING.fiber;
     const {root} = yeeted;
 
-    DEBUG && console.log('Reduce', formatNode(fiber), '->', formatNode(root));
+    LOG && console.log('Reduce', formatNode(fiber), '->', formatNode(root));
     bustFiberMemo(root);
     if (host) host.visit(root);
   }
@@ -938,7 +938,9 @@ export const bustFiberDeps = <F extends ArrowFunction>(
   // Bust far caches
   const {host} = fiber;
   if (host) for (let sub of host.traceDown(fiber)) {
-    DEBUG && console.log('Invalidating Node', formatNode(sub));
+    const LOG = LOGGING.fiber;
+    LOG && console.log('Invalidating Node', formatNode(sub));
+
     host.visit(sub);
     bustFiberMemo(sub);
   }

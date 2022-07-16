@@ -39,7 +39,7 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props) => {
   }
 
   useResource((dispose) => {
-    const resize = () => setSize(getCanvasSize(window, canvas))
+    const resize = () => setSize(getCanvasSize(window, canvas));
 
     const observer = new ResizeObserver(resize);
     observer.observe(canvas.parentElement as any);

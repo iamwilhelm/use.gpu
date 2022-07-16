@@ -60,6 +60,8 @@ export type WheelState = {
   y: number,
   moveX: number,
   moveY: number,
+  spinX: number,
+  spinY: number,
   stopped: boolean,
 };
 

@@ -3,6 +3,25 @@ import { reactInterop } from './fiber';
 
 const {prototype: {hasOwnProperty}} = Object;
 
+export type LoggingOptions = {
+  dispatch: boolean,
+  fiber: boolean,
+};
+
+export const LOGGING = {
+  dispatch: false,
+  fiber: false,
+};
+
+/** Turn on logging for the Live run-time. Very chatty.
+
+- `dispatch`: All dispatches to roots and sub-roots.
+- `fiber`: All updates to individual fibers.
+*/
+export const setLogging = (options: LoggingOptions) => {
+  for (let k in options) LOGGING[k] = options[k];
+};
+
 export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   const {mount, mounts, next} = root;
   let out = [];

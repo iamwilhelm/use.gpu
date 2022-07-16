@@ -8,7 +8,7 @@ import {
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
-import { useTimeContext } from '../providers/time-provider';
+import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -29,7 +29,6 @@ export type ArrayDataProps = {
 
 export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   const device = useContext(DeviceContext);
-  const time = useTimeContext();
 
   const {
     format,
@@ -65,12 +64,15 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
   }, [device, format, l]);
 
+  // Provide time for expr
+  const time = expr ? useTimeContext() : useNoTimeContext();
+
   // Refresh and upload data
   const refresh = () => {
     let emitted = 0;
     if (data) copyNumberArray(data, array, dims);
     if (expr && size.length) {
-      emitted = emitIntoMultiNumberArray(expr, array, dims, size, time);
+      emitted = emitIntoMultiNumberArray(expr, array, dims, size, time!);
     }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);

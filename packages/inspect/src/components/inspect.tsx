@@ -35,8 +35,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const selectedCursor = useUpdateState<SelectState>(null);
   const depthCursor = useUpdateState<number>(10);
   const hoveredCursor = useUpdateState<HoverState>(() => ({
-		fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
-	}));
+    fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
+  }));
   
   const [inspect, setInspect] = useState<boolean>(false);
   const toggleInspect = () => {

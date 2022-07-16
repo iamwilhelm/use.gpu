@@ -6,3 +6,4 @@ export * from './fetch';
 export * from './raw-data';
 export * from './raw-texture';
 export * from './sampled-data';
+export * from './struct-data';

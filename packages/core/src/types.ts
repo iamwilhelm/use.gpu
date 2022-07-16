@@ -227,7 +227,8 @@ export type VolatileAllocation = {
 };
 
 export type UniformFiller = (items: any) => void;
-export type UniformSetter = (index: number, item: any) => void;
+export type UniformDataSetter = (index: number, item: any) => void;
+export type UniformValueSetter = (index: number, field: number, value: any) => void;
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 
 // Storage bindings

@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { StorageSource, LambdaSource, TypedArray, UniformType, Emit } from '@use-gpu/core/types';
+import { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 
 import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
@@ -11,7 +11,7 @@ import {
 import { DeviceContext } from '../providers/device-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-import { useTimeContext } from '../providers/time-provider';
+import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { getBoundShader } from '../hooks/useBoundShader';
@@ -28,7 +28,7 @@ export type RawDataProps = {
   data?: number[] | TypedArray,
 
   sparse?: boolean,
-  expr?: (emit: Emit, i: number, n: number) => void,
+  expr?: Emitter,
   items?: number,
   interleaved?: boolean,
 
@@ -41,7 +41,6 @@ export type RawDataProps = {
 
 export const RawData: LiveComponent<RawDataProps> = (props) => {
   const device = useContext(DeviceContext);
-  const time = useTimeContext();
 
   const {
     format, length,
@@ -95,12 +94,15 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     useNoMemo();
   }
 
+  // Provide time for expr
+  const time = expr ? useTimeContext() : useNoTimeContext();
+
   // Refresh and upload data
   const refresh = () => {
     let emitted = 0;
 
     if (data) copyNumberArray(data, array, dims);
-    if (expr) emitted = emitIntoNumberArray(expr, array, dims, time);
+    if (expr) emitted = emitIntoNumberArray(expr, array, dims, time!);
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
     }

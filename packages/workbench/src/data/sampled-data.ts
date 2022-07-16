@@ -169,7 +169,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       }
 
       if (sampled) {
-        emitted = emitIntoMultiNumberArray(sampled, array, dims, size, time);
+        emitted = emitIntoMultiNumberArray(sampled, array, dims, size, time!);
       }
     }
     if (expr) {

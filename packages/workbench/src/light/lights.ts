@@ -112,7 +112,7 @@ export const LightEmitter: LC<LightEmitterProps> = (props: LightEmitterProps) =>
   const filler = useOne(() => makeLayoutFiller(LIGHT_LAYOUT, data), data);
 
   let i = base;
-  for (const light of lights) filler.setItem(i++, light);
+  for (const light of lights) filler.setData(i++, light);
 
   if (transform) {
     // TODO: dispatch compute to transform light positions/normals/tangents/sizes

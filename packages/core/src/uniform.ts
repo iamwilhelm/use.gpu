@@ -2,7 +2,7 @@ import {
   UniformAllocation, VirtualAllocation, VolatileAllocation, ResourceAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,
-  UniformPipe, UniformByteSetter, UniformFiller, UniformSetter,
+  UniformPipe, UniformByteSetter, UniformFiller, UniformDataSetter, UniformValueSetter,
   DataBinding,
   StorageSource,
   TextureSource,
@@ -289,7 +289,8 @@ export const makeLayoutFiller = (
   data: ArrayBuffer,
 ): {
   fill: UniformFiller,
-  setItem: UniformSetter,
+  setData: UniformDataSetter,
+  setValues: UniformValueSetter,
 } => {
   const {length, attributes} = layout;
 
@@ -298,7 +299,20 @@ export const makeLayoutFiller = (
 
   const dataView = new DataView(data);
 
-  const setItem = (index: number, item: any) => {
+  const setValue = (index: number, field: number, value: any) => {
+    const base = index * length;
+    const attr = attributes[field];
+    if (!attr) return;
+
+    const {offset, format} = attr;
+    const setter = getUniformByteSetter(format);
+
+    const o = value;
+    const v = resolve(o);
+    if (v != null) setter(dataView, base + offset, v);
+  }
+
+  const setData = (index: number, item: any) => {
     const base = index * length;
     for (let k in item) {
       const attr = map.get(k);
@@ -315,13 +329,14 @@ export const makeLayoutFiller = (
 
   const fill = (items: any) => {
     let index = 0;
-    if (!Array.isArray(items)) setItem(index, items);
+    if (!Array.isArray(items)) setData(index++, items);
     else for (const item of items) {
-      setItem(index++, item);
+      setData(index++, item);
     }
+    return index;
   };
 
-  return {fill, setItem};
+  return {fill, setData, setValue};
 }
 
 const miniLRU = <T>(max: number) => {

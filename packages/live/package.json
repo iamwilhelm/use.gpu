@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "build": "NPM_PACKAGE=live ../../scripts/build-mjs-cjs.sh",
     "test": "MODULE_ENV=cjs jest --watch",

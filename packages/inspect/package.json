@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "build": "NPM_PACKAGE=inspect ../../scripts/build-mjs-cjs.sh && yarn run build:css",
     "build:css": "cp theme.css ../../build/packages/inspect",

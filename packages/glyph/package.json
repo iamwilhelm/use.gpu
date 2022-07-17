@@ -7,7 +7,6 @@
   "dependencies": {
     "@use-gpu/state": "*"
   },
-  "private": true,
   "scripts": {
     "build": "yarn run build:wasm && yarn run build:js && yarn run build:pkg",
     "build:js": "NPM_PACKAGE=glyph ../../scripts/build-mjs-cjs.sh",

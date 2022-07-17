@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "private": true,
   "dependencies": {
     "@use-gpu/state": "*",
     "gl-matrix": "^3.3.0",

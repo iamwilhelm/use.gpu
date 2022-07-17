@@ -1,3 +1,12 @@
+0.6.0
+- Add simple type inference via `@infer`
+- Add struct types for storage
+- Remove `/types` export
+
+0.5.0
+- Add `vec3to4` polyfill for storage
+- Add `u8`/`u16`/`i8`/`i16` polyfill for storage
+
 0.4.0
 - Add WGSL support at `@use-gpu/shader/wgsl`
 

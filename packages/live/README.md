@@ -19,11 +19,12 @@ It's built to serve as the reactive core of Use.GPU, but there is nothing GPU- o
 Live is designed to play nice with real React, but shares no code with it.
 
 **Non-React extensions:**
-- Continuations - Parents run more code after children have rendered
-- Yeet-Reduce - Parents gather values from a tree of children
-- Context Captures - Context Providers in reverse
-- Morph - Parents can change Component type without unmounting all children
-- Detach - Parent can render children independently, outside main render flow
+- **Continuations** - Parents run more code after children have rendered
+- **Yeet-Reduce** - Parents gather values from a tree of children
+- **Context Captures** - Context providers in reverse
+- **No-Hooks** - Place in `else` statements to us `if` with hooks safely.
+- **Morph** - Parents can change Component type without unmounting all children
+- **Detach** - Parent can render children independently, outside main render flow
 
 ## Usage Cheat Sheet
 
@@ -91,7 +92,7 @@ There is also a `children` prop, as well as `key` for items in arrays.
   }, [...dependencies]);
 ```
 
-## Context Providers
+## Context providers
 
 #### Make a context
 
@@ -105,7 +106,7 @@ const displayName = 'MyContext';
 const MyContext = makeContext<ContextValue>(defaultValue, displayName);
 ```
 
-#### Optional vs Required
+#### Optional vs required
 
 If `defaultValue` is `undefined`, the context is **required**.
 Its value has type `T`, and will throw an exception if used while missing.
@@ -129,7 +130,7 @@ import { useContext } from '@use-gpu/live';
 const value = useContext(MyContext);
 ```
 
-## Context Captures
+## Context captures
 
 This is the reverse of a context provider: it captures values from specific children across an entire sub-tree.
 
@@ -207,13 +208,9 @@ Whenever the yielded `values` change, the continuation is re-run.
 
 #### Render vs Yield
 
-A nice pattern is to make a component's `render` prop optional. If absent, the component will then `@{<Yeet>}` the result instead. This allows the `render` prop to handle the common case, while also allowing the component to be part of a `@{<Gather>}` for more complex use:
+A nice pattern is to make a component's `render` prop optional. If absent, the component will then `@{<Yeet>}` the result instead. This allows the `render` prop to handle the common case, while also allowing the component to be part of a `@{<Gather>}` for more complex use.
 
-```tsx
-<Component render={()}>
-```
-
-## Native Syntax
+## Native syntax
 
 Live also has a native non-JSX syntax, which is ergonomic in use, unlike `React.createElement`.
 

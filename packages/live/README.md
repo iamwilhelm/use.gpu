@@ -20,8 +20,8 @@ Live is designed to play nice with real React, but shares no code with it.
 
 **Non-React extensions:**
 - **Continuations** - Parents run more code after children have rendered
-- **Yeet-Reduce** - Parents gather values from a tree of children
-- **Context Captures** - Context providers in reverse
+- **Context captures** - Context providers in reverse. Parents gathers values from a tree of children.
+- **Yeet-Reduce** - Captures but with incremental map-reduce across the tree.
 - **No-Hooks** - Place in `else` statements to us `if` with hooks safely.
 - **Morph** - Parents can change Component type without unmounting all children
 - **Detach** - Parent can render children independently, outside main render flow
@@ -91,6 +91,21 @@ There is also a `children` prop, as well as `key` for items in arrays.
     return thing;
   }, [...dependencies]);
 ```
+
+## No-Hooks
+
+Every built-in `useHook` has a no-op `useNoHook`. You can safely write e.g.:
+
+```tsx
+if (condition) {
+  useMemo(...)
+}
+else {
+  useNoMemo();
+}
+```
+
+No hooks will discard prior state, unsubscribe from contexts, and so on.
 
 ## Context providers
 

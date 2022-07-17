@@ -21,7 +21,7 @@ Live is designed to play nice with real React, but shares no code with it.
 **Non-React extensions:**
 - Continuations - Parents run more code after children have rendered
 - Yeet-Reduce - Parents gather values from a tree of children
-- Context Consumers - Context Providers in reverse
+- Context Captures - Context Providers in reverse
 - Morph - Parents can change Component type without unmounting all children
 - Detach - Parent can render children independently, outside main render flow
 
@@ -75,9 +75,7 @@ There is also a `children` prop, as well as `key` for items in arrays.
 
 **TL;DR**
 - `useCallback`, `useContext`, `useMemo`, `useState` work like in React
-
 - `useOne` is shorthand for a `useMemo` with only 0-1 dependency (not an array)
-- `useRef` doesn't exist, use `useOne(() => ({current: ref}))`
 
 - `useEffect` and `useLayoutEffect` don't exist, use `useResource`
 - `useResource` is a sync `useEffect` + `useMemo`
@@ -133,7 +131,7 @@ const value = useContext(MyContext);
 
 ## Context Captures
 
-This is the reverse of a context provider: it collects values from children across a tree.
+This is the reverse of a context provider: it captures values from specific children across an entire sub-tree.
 
 #### Make a capture
 
@@ -146,34 +144,35 @@ const displayName = 'MyContext';
 const MyContext = makeCapture<ContextValue>(displayName);
 ```
 
-#### Capture values
-
-```tsx
-import React, { Capture } from '@use-gpu/live/jsx';
-import { LiveCapture } from '@use-gpu/live/types';
-import { captureValues } from '@use-gpu/live';
-
-<Capture context={MyContext} then={(map: LiveCapture<T>) => {
-  const values: T[] = captureValues(map);
-}>...</Capture>
-```
-
-The `LiveCapture<T>` maps mounted components to values `T`. The helper `captureValues` will return the values in tree order.
-
-To retrieve the last value only, use `captureTail`.
-
 #### Pass value to a capture
 
 ```tsx
 import { useCapture } from '@use-gpu/live';
 
+// In a child
 useCapture(MyCapture, value);
 ```
 
+#### Retrieve captured values
+
+```tsx
+import React, { Capture } from '@use-gpu/live/jsx';
+import { LiveMap } from '@use-gpu/live/types';
+import { captureValues } from '@use-gpu/live';
+
+<Capture context={MyContext} then={(map: LiveMap<T>) => {
+  const values: T[] = captureValues(map);
+}>...</Capture>
+```
+
+The `LiveMap<T>` maps mounted components to values `T`. The helper `captureValues` will return the values in tree order.
+
+A continuation (aka a `then` prop) is similar to a classic `render` prop, except that it is run after children are done. Another difference is that it acts as a fully fledged component: you can e.g. use hooks, and it appears as a separate `Resume(Component)` node in the component tree.
+
 ## Gather / Yeet
 
-Components can render a `Gather` to continue after their children are rendered.
-Values yielded by those children are gathered up incrementally, in tree order.
+A component can render a `Gather` to continue after its children are rendered.
+Values yielded by those children are gathered up incrementally, and reduced in tree order.
 
 Gather takes two children:
 - the tree of children to be rendered
@@ -205,8 +204,6 @@ export const Component: LC = () => {
 ```
 
 Whenever the yielded `values` change, the continuation is re-run.
-
-A continuation (aka a `then` prop) is similar to a classic `render` prop, except that it is run after children are done. The difference is that it acts as a fully fledged component: you can e.g. use hooks, and it appears as a separate `Resume(Component)` node in the component tree.
 
 #### Render vs Yield
 

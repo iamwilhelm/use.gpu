@@ -12,6 +12,9 @@ export default {
     modules: ['node_modules'],
     extensions: ['.ts', '.tsx', '.js', '.json', '.wgsl']
   },
+  experiments: {
+    syncWebAssembly: true,
+  },
   module: {
     rules: [
       {

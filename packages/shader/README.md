@@ -14,7 +14,8 @@ A Typescript library to link together **snippets of shader code**, while removin
 
 It enables two kinds of imports to be used:
 
- - **Static - Symbol Import**  (functions, declarations and types)
+**Static - Symbol Import**  (functions, declarations and types)
+
 ```wgsl
 // WGSL
 use 'path/to/color'::{ getColor };
@@ -25,7 +26,7 @@ use 'path/to/color'::{ getColor };
 #pragma import { getColor } from 'path/to/color'
 ```
 
- - **Dynamic - Function Prototype** - Defined at run-time
+**Dynamic - Function Prototype** - Defined at run-time
 
 ```wgsl
 // WGSL

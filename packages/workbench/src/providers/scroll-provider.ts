@@ -1,7 +1,7 @@
 import { LC } from '@use-gpu/live/types';
 import { capture, yeet, makeCapture, useCapture, useFiber } from '@use-gpu/live';
 
-export const ScrollSignal = makeCapture('ScrollSignal');
+export const ScrollSignal = makeCapture<null>('ScrollSignal');
 
 export const ScrollProvider: LC = (props) => {
   const {children} = props;
@@ -11,4 +11,4 @@ export const ScrollProvider: LC = (props) => {
 
 const Resume = () => yeet();
 
-export const useScrollSignal = () => useCapture(ScrollSignal);
+export const useScrollSignal = () => useCapture(ScrollSignal, null);

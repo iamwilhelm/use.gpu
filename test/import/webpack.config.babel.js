@@ -4,7 +4,7 @@ export default {
   mode: 'development',
   entry: {
     app: {
-      import: './src/import-tests.ts',
+      import: './src/entry-webpack.ts',
     }
   },
   output: {
@@ -15,6 +15,9 @@ export default {
   resolve: {
     modules: ['node_modules'],
     extensions: ['.ts', '.tsx', '.js', '.json', '.wgsl']
+  },
+  experiments: {
+    syncWebAssembly: true,
   },
   module: {
     rules: [

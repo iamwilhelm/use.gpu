@@ -5,7 +5,7 @@ const {NODE_ENV} = process.env;
 const isDevelopment = NODE_ENV === 'development';
 
 export default {
-  mode: 'development',
+  mode: isDevelopment ? 'development' : 'production',
   entry: {
     app: {
       import: './packages/app/src/index.tsx',
@@ -23,8 +23,8 @@ export default {
   plugins: [
     new WasmPackPlugin({
       crateDirectory: path.resolve(__dirname, 'rust/use-gpu-text'),
-      outDir: "../../packages/text/pkg",
-      outName: "use-gpu-text",
+      outDir: "../../packages/glyph/pkg",
+      outName: "use_gpu_text",
       forceMode: "production",
     }),
   ],

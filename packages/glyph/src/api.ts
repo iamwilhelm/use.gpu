@@ -10,7 +10,7 @@ const DEFAULT_FONTS = {
   },
 } as Record<string, FontProps>;
 
-export const RustText = async (): Promise<RustTextAPI> => {
+export const RustText = (): RustTextAPI => {
 
   const useRustText = UseRustText.new();
 

@@ -403,7 +403,7 @@ export const useContext = <C>(
  */
 export const useCapture = <C>(
   context: LiveCapture<C>,
-  value?: any,
+  value: C,
 ) => {
   const fiber = useFiber();
 

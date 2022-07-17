@@ -1,5 +1,5 @@
 import { formatNodeName } from './debug';
-import { capture, gather, morph, provide, yeet, CAPTURE, FRAGMENT, GATHER, MAP_REDUCE, MULTI_GATHER, PROVIDE, YEET, MORPH } from './builtin';
+import { capture, gather, multiGather, mapReduce, morph, provide, yeet, CAPTURE, FRAGMENT, GATHER, MAP_REDUCE, MULTI_GATHER, PROVIDE, YEET, MORPH } from './builtin';
 import { getCurrentFiberID } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 
@@ -15,6 +15,8 @@ type AnyF = (...args: any[]) => any;
 
 export const Fragment = FRAGMENT as AnyF;
 export const Gather = GATHER as AnyF;
+export const MultiGather = MULTI_GATHER as AnyF;
+export const MapReduce = MAP_REDUCE as AnyF;
 export const Provide = PROVIDE as AnyF;
 export const Capture = CAPTURE as AnyF;
 export const Yeet = YEET as AnyF;
@@ -32,6 +34,12 @@ export const React = {
       }
       if (type === GATHER) {
         return gather(toChildren(children), props?.then, props?.key);
+      }
+      if (type === MULTI_GATHER) {
+        return multiGather(toChildren(children), props?.then, props?.key);
+      }
+      if (type === MAP_REDUCE) {
+        return mapReduce(toChildren(children), props?.map, props?.reduce, props?.then, props?.key);
       }
       if (type === PROVIDE) {
         return provide(props.context, props.value, toChildren(children), props?.key);

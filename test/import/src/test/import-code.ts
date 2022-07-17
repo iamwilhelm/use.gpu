@@ -5,10 +5,8 @@ import { ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
 
 import { use, renderSync } from '@use-gpu/live';
 import { uploadBuffer } from '@use-gpu/core';
-import { mountGPUDevice } from '@use-gpu/webgpu';
 import { WGSLLinker } from '@use-gpu/shader';
 import { UseInspect } from '@use-gpu/inspect';
-import { Draw, Pass, RawQuads } from '@use-gpu/workbench';
 
 import WGSLLoader from '@use-gpu/wgsl-loader';
 import { loadModule } from '@use-gpu/shader/wgsl';
@@ -64,4 +62,3 @@ if (!ok) {
   console.error('failed during wgsl test', error);
   process.exit(1);
 }
-

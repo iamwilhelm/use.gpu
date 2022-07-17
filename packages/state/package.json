@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "private": true,
   "peerDependencies": {
     "react": "*"
   },

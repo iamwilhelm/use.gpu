@@ -4,7 +4,6 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "private": true,
   "scripts": {
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",

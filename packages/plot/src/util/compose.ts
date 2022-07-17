@@ -1,4 +1,4 @@
-import { TypedArray } from '@use-gpu/core/types';
+import type { TypedArray } from '@use-gpu/core';
 import { vec3, mat4, quat } from 'gl-matrix';
 
 const π = Math.PI;

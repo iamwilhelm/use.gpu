@@ -1,4 +1,4 @@
-import { LiveComponent, LiveNode, PropsWithChildren } from '@use-gpu/live/types';
+import type { LiveComponent, LiveNode, PropsWithChildren } from '@use-gpu/live';
 import { makeContext, memo, provide, use, useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { Routes } from './routes';
 import { QueryParams, Route, RouterState, RouterLink, RouterAPI } from './types';

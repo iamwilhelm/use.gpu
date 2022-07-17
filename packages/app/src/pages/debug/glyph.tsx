@@ -1,11 +1,11 @@
-import { LC, PropsWithChildren } from '@use-gpu/live/types';
-import { Rectangle, Emit, DataTexture } from '@use-gpu/core/types';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { Rectangle, Emit, DataTexture } from '@use-gpu/core';
+import type { Image } from '@use-gpu/glyph';
 
-import React, { Morph } from '@use-gpu/live/jsx';
+import React, { Morph } from '@use-gpu/live';
 import { memo, fragment } from '@use-gpu/live';
 import { makeRawTexture } from '@use-gpu/core';
 import { glyphToRGBA, glyphToSDF, sdfToGradient, makeSDFStage, paintSubpixelOffsets } from '@use-gpu/glyph';
-import { Image } from '@use-gpu/glyph/types';
 import { GlyphControls } from '../../ui/glyph-controls';
 import { vec3 } from 'gl-matrix';
 

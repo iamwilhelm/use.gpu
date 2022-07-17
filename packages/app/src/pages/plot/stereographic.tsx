@@ -1,8 +1,7 @@
-import { LC } from '@use-gpu/live/types';
-import { Keyframe } from '@use-gpu/workbench/types';
+import type { LC } from '@use-gpu/live';
+import type { Keyframe } from '@use-gpu/workbench';
 
-import { use } from '@use-gpu/live';
-import React from '@use-gpu/live/jsx';
+import React, { use } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,

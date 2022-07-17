@@ -1,6 +1,6 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { UniformAttribute } from '@use-gpu/core/types';
-import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { UniformAttribute } from '@use-gpu/core';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { use, useMemo } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';

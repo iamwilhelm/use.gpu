@@ -1,4 +1,4 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import type { LiveComponent } from '@use-gpu/live';
 
 import { use } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';

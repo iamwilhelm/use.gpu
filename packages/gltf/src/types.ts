@@ -1,5 +1,5 @@
+import type { StorageSource, TextureSource, TypedArray } from '@use-gpu/core';
 import { mat4, vec3, quat } from 'gl-matrix';
-import { StorageSource, TextureSource, TypedArray } from '@use-gpu/core/types';
 
 export type GLTF<T = any> = {
   accessors?:   GLTFAccessorData<T>[],

@@ -1,4 +1,4 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { use, useResource, useNoResource } from '@use-gpu/live';
 import { Picking } from '@use-gpu/workbench';

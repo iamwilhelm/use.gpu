@@ -1,4 +1,4 @@
-import {TypedArrayConstructor, UniformType} from './types';
+import type {TypedArrayConstructor, UniformType} from './types';
 
 export const TYPED_ARRAYS: TypedArrayConstructor[] = [
   Int8Array, Uint8Array,

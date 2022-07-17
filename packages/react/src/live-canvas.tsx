@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
-import { LiveFiber, LiveElement } from '@use-gpu/live/types';
+import type { LiveFiber, LiveElement } from '@use-gpu/live';
 import { render as renderLive, resolveRootNode } from '@use-gpu/live';
 
 export type LiveCanvasProps = {

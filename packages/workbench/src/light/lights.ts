@@ -1,7 +1,7 @@
-import { LiveFiber, LiveMap, LC, PropsWithChildren } from '@use-gpu/live/types';
-import { TypedArray, StorageSource } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { Light } from './types';
+import type { LiveFiber, LiveMap, LC, PropsWithChildren } from '@use-gpu/live';
+import type { TypedArray, StorageSource } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Light } from './types';
 
 import { LightContext } from '../providers/light-provider';
 import { useDeviceContext } from '../providers/device-provider';

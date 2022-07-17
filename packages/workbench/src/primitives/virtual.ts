@@ -1,6 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { RenderPassMode, DeepPartial, Lazy } from '@use-gpu/core/types';
-import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { RenderPassMode, DeepPartial, Lazy } from '@use-gpu/core';
+import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { memo, use, fragment, useContext, useNoContext, useMemo, useNoMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 
@@ -74,14 +74,14 @@ const ID_BINDING = { name: 'getId', format: 'u32', value: 0, args: [] };
 
 export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
   const {
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 
-  if (id && mode !== RenderPassMode.Picking) {
+  if (id && mode !== 'picking') {
     return fragment([
       use(Variant, {...props, id: 0}),
-      use(Variant, {...props, mode: RenderPassMode.Picking}),
+      use(Variant, {...props, mode: 'picking'}),
     ]);
   }
   
@@ -100,16 +100,16 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     defines,
 
     renderer = SOLID_RENDERER,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 
   let m = mode;
   const hovered = useInspectHoverable();
-  if (hovered) m = RenderPassMode.Debug;
+  if (hovered) m = 'debug';
 
-  const isDebug = m === RenderPassMode.Debug;
-  const isPicking = m === RenderPassMode.Picking;
+  const isDebug = m === 'debug';
+  const isPicking = m === 'picking';
   const topology = pipeline.primitive?.topology ?? 'triangle-list';
 
   const renderContext = useContext(RenderContext);

@@ -1,7 +1,7 @@
 import { statSync, readFileSync, writeFileSync } from 'fs';
 import glob from 'glob';
 
-// Replace single TS entry point with MJS/UMD main+module
+// Replace single TS entry point with MJS/CJS main+module
 
 const pkg = process.env.NPM_PACKAGE;
 if (pkg == null) {
@@ -19,7 +19,7 @@ for (const file of files) {
     const mjs = file.replace(/\/package\.json$/, '/mjs');
     try {
       let stat = statSync(mjs);
-      json.main = './umd/index.js';
+      json.main = './cjs/index.js';
       json.module = './mjs/index.js';
 
       if (json.exports) {
@@ -29,7 +29,7 @@ for (const file of files) {
           return {
             types: value.replace('./src/', './mjs/').replace(/\.js$/, '.d.ts'),
             import: value.replace('./src/', './mjs/'),
-            require: value.replace('./src/', './umd/'),
+            require: value.replace('./src/', './cjs/'),
           };
         }
         for (let k in json.exports) {
@@ -50,7 +50,7 @@ for (const file of files) {
       const jsRoots = glob.sync(file.replace(/\/package\.json$/, '/*.js'));
       for (const js of jsRoots) {
         let ts = readFileSync(js).toString();
-        ts = ts.replace(/\.\/src\//g, './umd/');
+        ts = ts.replace(/\.\/src\//g, './cjs/');
         writeFileSync(js, ts);
       }  
     } catch (e) {};

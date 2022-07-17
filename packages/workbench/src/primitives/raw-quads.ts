@@ -1,10 +1,10 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, TextureSource, LambdaSource, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
+} from '@use-gpu/core';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
@@ -92,7 +92,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const {
     pipeline: propPipeline,
     alphaToCoverage = true,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
     count = 1,
   } = props;
@@ -114,7 +114,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const z = useShaderRef(props.zBias, props.zBiases);
   const u = useShaderRef(props.uv, props.uvs);
 
-  const m = (mode !== RenderPassMode.Debug) ? (props.masks ?? props.mask) : null;
+  const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   const t = props.texture;
   
   const xf = useApplyTransform(p);

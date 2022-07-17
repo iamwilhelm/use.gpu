@@ -71,7 +71,7 @@ try {
 const makeTSModule = (file: string, symbols?: string[]) => {
   const pattern = file.replace('./src/', '@use-gpu/wgsl/');
   return `declare module ${escape(pattern)} {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   ${(symbols ?? []).map(s => `export const ${s}: ParsedBundle;`).join("\n  ")}
   export default __module;

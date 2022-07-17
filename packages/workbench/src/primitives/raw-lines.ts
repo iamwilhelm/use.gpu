@@ -1,10 +1,10 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderSource } from '@use-gpu/shader/types';
+  VertexData,
+} from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
@@ -12,7 +12,7 @@ import { Virtual } from './virtual';
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { resolve, makeShaderBindings } from '@use-gpu/core';
+import { RenderPassMode, resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -76,7 +76,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const {
     pipeline: propPipeline,
     count = 2,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 

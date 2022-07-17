@@ -1,5 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core/types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core';
+
 import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@use-gpu/workbench';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
@@ -55,7 +56,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const {
     mesh,
     texture,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
     blink,
   } = props;
@@ -66,8 +67,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const {viewUniforms, viewDefs} = useContext(ViewContext);
 
   // Debug / Picking mode
-  const isDebug = mode === RenderPassMode.Debug;
-  const isPicking = mode === RenderPassMode.Picking;
+  const isDebug = mode === 'debug';
+  const isPicking = mode === 'picking';
   const {renderContext} = usePickingContext(isPicking);
   const {colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
 
@@ -104,8 +105,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     const vertexLinked = linkBundle(vertexShader, {toColorSpace}, defines);
     const fragmentLinked = linkBundle(fragmentShader, {toColorSpace}, defines);
 
-    const vertex = makeShaderModule(vertexLinked, vertexShader.hash);
-    const fragment = makeShaderModule(fragmentLinked, fragmentShader.hash);
+    const vertex = makeShaderModule(vertexLinked, vertexShader.hash ?? 0);
+    const fragment = makeShaderModule(fragmentLinked, fragmentShader.hash ?? 0);
     
     inspect({vertex});
     inspect({fragment});

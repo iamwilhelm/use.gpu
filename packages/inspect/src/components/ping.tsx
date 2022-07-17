@@ -1,4 +1,4 @@
-import { LiveFiber, ArrowFunction } from '@use-gpu/live/types';
+import type { LiveFiber, ArrowFunction } from '@use-gpu/live';
 import { formatNodeName, incrementVersion } from '@use-gpu/live';
 
 import React, { memo, createContext, useCallback, useContext, useLayoutEffect, useMemo, useState } from 'react';

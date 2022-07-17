@@ -1,5 +1,5 @@
-import { Lazy } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { Lazy } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';

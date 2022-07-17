@@ -1,4 +1,4 @@
-import { LiveFiber, LiveComponent, LiveNode, LiveElement, Task } from '@use-gpu/live/types';
+import type { LiveFiber, LiveComponent, LiveNode, LiveElement, Task } from '@use-gpu/live';
 import { memo, morph, use, provide, makeContext, useContext, useOne, useMemo } from '@use-gpu/live';
 import { RouterContext } from './router';
 import { Route } from './types';

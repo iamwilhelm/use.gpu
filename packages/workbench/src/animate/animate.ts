@@ -1,12 +1,12 @@
-import { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live/types';
-import { TypedArray } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live';
+import type { TypedArray } from '@use-gpu/core';
+import type { Keyframe } from './types';
 
 import { useMemo, useOne, reactInterop } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
 import mapValues from 'lodash/mapValues';
-import { Keyframe } from './types';
 
 export type AnimateProps<T> = {
   loop?: boolean,

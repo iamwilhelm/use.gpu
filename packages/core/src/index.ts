@@ -1,4 +1,3 @@
-/** @module Core */
 export * from './aggregate';
 export * from './atlas';
 export * from './attribute';

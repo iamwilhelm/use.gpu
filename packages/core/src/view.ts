@@ -1,6 +1,6 @@
-import { mat4, vec3, vec4 } from 'gl-matrix';
+import type { UniformAttribute, UniformType } from './types';
 
-import { UniformAttribute, UniformType } from './types';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 
 export const VIEW_UNIFORMS: UniformAttribute[] = [
   {

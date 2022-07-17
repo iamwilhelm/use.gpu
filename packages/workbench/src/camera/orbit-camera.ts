@@ -1,9 +1,9 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { VectorLike } from '@use-gpu/traits/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { VectorLike } from '@use-gpu/traits';
+import { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
 import { provide, use, useContext, useOne } from '@use-gpu/live';
-import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';

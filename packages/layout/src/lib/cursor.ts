@@ -1,5 +1,5 @@
-import { Point } from '@use-gpu/core/types';
-import { Alignment } from '../types';
+import type { Point } from '@use-gpu/core';
+import type { Alignment } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
 import { getAlignmentSpacing } from './util';

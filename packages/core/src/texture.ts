@@ -1,4 +1,4 @@
-import { DataTexture, ExternalTexture, DataBinding, TextureSource } from './types';
+import type { DataTexture, ExternalTexture, DataBinding, TextureSource } from './types';
 import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
 
 type Point = [number, number];

@@ -23,3 +23,17 @@ for (const file of files) {
   data = JSON.stringify(json, null, 2);
   writeFileSync(file, data);
 }
+
+const targets = [
+  ...glob.sync(`../../build/packages/${pkg}/package.json`),
+];
+for (const file of targets) {
+  let data = readFileSync(file).toString();
+  let json = JSON.parse(data);
+
+  delete json.scripts;
+  delete json.jest;
+
+  data = JSON.stringify(json, null, 2);
+  writeFileSync(file, data);
+}

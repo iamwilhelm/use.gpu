@@ -13,8 +13,8 @@
     "@use-gpu/live": "*"
   },
   "scripts": {
-    "build": "NPM_PACKAGE=react ../../scripts/build-mjs-umd.sh",
-    "test": "MODULE_ENV=umd jest --watch",
+    "build": "NPM_PACKAGE=react ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "jest --collect-coverage",
     "types": "tsc --noEmit",

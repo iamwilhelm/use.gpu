@@ -1,9 +1,9 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU,
-} from '@use-gpu/core/types';
-import { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader/types';
+} from '@use-gpu/core';
+import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, suspend, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -56,11 +56,11 @@ export const drawCall = (props: RenderProps) => {
 
     pipeline: propPipeline,
     defines: propDefines,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 
-  const isPicking = mode === RenderPassMode.Picking;
+  const isPicking = mode === 'picking';
   const inspect = useInspectable();
 
   // Render set up

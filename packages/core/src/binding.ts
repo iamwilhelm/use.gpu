@@ -1,4 +1,4 @@
-import {
+import type {
   UniformType, UniformAttribute, UniformAttributeValue,
   ShaderModuleDescriptor, StorageSource, DataBinding, TextureSource, LambdaSource,
 } from './types';

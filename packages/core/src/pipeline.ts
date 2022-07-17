@@ -1,4 +1,4 @@
-import {
+import type {
   TypedArray, DeepPartial, UseRenderingContextGPU,
   ShaderModuleDescriptor, ShaderStageDescriptor,
 } from './types';
@@ -7,7 +7,7 @@ import { patch } from '@use-gpu/state';
 
 export const makeShaderModule = (
   code: TypedArray | string,
-  hash: string,
+  hash: string | number,
   entryPoint: string = 'main'
 ): ShaderModuleDescriptor => ({code, hash, entryPoint});
 

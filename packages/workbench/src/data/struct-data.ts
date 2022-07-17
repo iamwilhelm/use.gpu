@@ -1,6 +1,6 @@
-import { LiveElement, LC, PropsWithChildren } from '@use-gpu/live/types';
-import { TypedArray, StorageSource, Emit, Time } from '@use-gpu/core/types';
-import { ShaderModule, ShaderSource } from '@use-gpu/shader/types';
+import type { LiveElement, LC, PropsWithChildren } from '@use-gpu/live';
+import type { TypedArray, StorageSource, Emit, Time } from '@use-gpu/core';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
 

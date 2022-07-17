@@ -1,7 +1,7 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { memo, provide, makeContext, useMemo } from '@use-gpu/live';
-import { ViewUniforms, UniformAttribute } from '@use-gpu/core/types';
 import { VIEW_UNIFORMS } from '@use-gpu/core';
 
 import { mat4 } from 'gl-matrix';

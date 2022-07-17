@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderSource } from '@use-gpu/shader/types';
+import type { UniformAttribute, ShaderSource } from '@use-gpu/shader';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { useOne } from '@use-gpu/live';
 

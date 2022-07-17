@@ -1,4 +1,4 @@
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { useContext, useMemo, useOne, makeContext, makeCapture } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';

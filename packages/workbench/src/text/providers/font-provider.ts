@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { RustTextAPI, Font } from '@use-gpu/glyph/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { RustTextAPI, Font } from '@use-gpu/glyph';
 
 import { parseWeight } from '@use-gpu/traits';
 import { provide, useAsync, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';

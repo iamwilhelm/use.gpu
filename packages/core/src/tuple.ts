@@ -1,4 +1,4 @@
-import { TypedArray, Tuples } from './types';
+import type { TypedArray, Tuples } from './types';
 
 export const makeTuples = <N extends number, T = number>(array: TypedArray | T[], dims: N): Tuples<N, T> => {
   const n = array.length / dims;

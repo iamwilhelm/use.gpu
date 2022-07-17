@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live/types';
-import { Rectangle } from '@use-gpu/core/types'; 
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import type { Rectangle } from '@use-gpu/core'; 
 
 import { provide, useContext, useNoContext, useOne } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';

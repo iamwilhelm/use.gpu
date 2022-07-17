@@ -1,7 +1,7 @@
-import { LC, PropsWithChildren } from '@use-gpu/live/types';
-import { Point4 } from '@use-gpu/core/types';
-import { ShaderModule, ShaderSource } from '@use-gpu/shader/types';
-import { ColorLike } from '@use-gpu/traits/types';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { Point4 } from '@use-gpu/core';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
+import type { ColorLike } from '@use-gpu/traits';
 
 import { provide, useOne } from '@use-gpu/live';
 import { parseColor, useProp } from '@use-gpu/traits';

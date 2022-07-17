@@ -1,4 +1,4 @@
-import { StorageSource, UniformAttribute, DataBinding } from './types';
+import type { StorageSource, UniformAttribute, DataBinding } from './types';
 
 export const makeStorageBinding = (
   device: GPUDevice,

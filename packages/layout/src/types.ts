@@ -1,8 +1,8 @@
-import { Tuples, Point, Point4, Rectangle } from '@use-gpu/core/types';
-import { LiveElement, Key } from '@use-gpu/live/types';
-import { FontMetrics } from '@use-gpu/glyph/types';
-import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
-import { Color, ColorLike } from '@use-gpu/traits/types';
+import type { Tuples, Point, Point4, Rectangle } from '@use-gpu/core';
+import type { LiveElement, Key } from '@use-gpu/live';
+import type { FontMetrics } from '@use-gpu/glyph';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
+import type { Color, ColorLike } from '@use-gpu/traits';
 import { mat4 } from 'gl-matrix';
 
 export type AutoPoint = [number | null, number | null];

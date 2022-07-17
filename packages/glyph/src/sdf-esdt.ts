@@ -1,6 +1,6 @@
+import type { Image } from './types';
 import { glyphToSDF as glyphToSDFv1 } from './sdf'; 
 import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage, isBlack, isWhite, isSolid, sqr } from './sdf';
-import { Image } from './types';
 
 // Convert grayscale or color glyph to SDF using subpixel distance transform
 export const glyphToESDT = (

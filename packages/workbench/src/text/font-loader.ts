@@ -1,6 +1,6 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Font } from '@use-gpu/glyph/types';
-import { FontSource } from './types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { Font } from '@use-gpu/glyph';
+import type { FontSource } from './types';
 
 import { use, gather, keyed, yeet, useOne } from '@use-gpu/live';
 import { toHash } from '@use-gpu/state';
@@ -14,15 +14,18 @@ export type FontLoaderProps = {
 
 export const FontLoader: LiveComponent<FontLoaderProps> = ({fonts, children}) => {
 
-  const resources = useOne(() => fonts.map((source: FontSource) =>
-    keyed(Fetch, toHash(source), {
-      url: source.src,
-      type: 'arrayBuffer',
-      render: (buffer: ArrayBuffer) => yeet({props: source, buffer}),
-    })
-  ), fonts);
+  const resources = useOne(() => fonts
+    .filter((s: FontSource) => !!s.src)
+    .map((source: FontSource) =>
+      keyed(Fetch, toHash(source), {
+        url: source.src,
+        type: 'arrayBuffer',
+        render: (buffer: ArrayBuffer) => yeet({props: source, buffer}),
+      })
+    ),
+    fonts);
 
-  return gather(resources, (fonts: Font[]) =>
-    use(FontProvider, { fonts, children })
-  );
+  return gather(resources, (fonts: Font[]) => {
+    return use(FontProvider, { fonts, children })
+  });
 };

@@ -1,8 +1,8 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource, Point, Point4, Rectangle } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { ColorLike } from '@use-gpu/traits/types';
-import { Direction, OverflowMode, AutoPoint, UIAggregate } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { TextureSource, Point, Point4, Rectangle } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { ColorLike } from '@use-gpu/traits';
+import type { Direction, OverflowMode, AutoPoint, UIAggregate } from '../types';
 
 import { parseColor, useProp } from '@use-gpu/traits';
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';

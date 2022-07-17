@@ -1,4 +1,4 @@
-import { ArrowFunction } from '@use-gpu/live/types';
+import type { ArrowFunction } from '@use-gpu/live';
 import { useOne } from '@use-gpu/live';
 import { useProp, getProp } from './useProp';
 import { PropDef, PropDefTypes, UseTrait } from './types'; 

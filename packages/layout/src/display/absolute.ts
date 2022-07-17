@@ -1,12 +1,12 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { AutoPoint, Dimension, Direction, LayoutElement } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { AutoPoint, Dimension, Direction, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
 import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
-import { ElementTrait } from '../types';
+import type { ElementTrait } from '../types';
 import { useElementTrait } from '../traits';
 import { useImplicitElement } from '../element/element';
 

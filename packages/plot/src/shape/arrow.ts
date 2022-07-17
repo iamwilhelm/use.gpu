@@ -1,7 +1,7 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { ShaderSource } from '@use-gpu/shader/types';
-import { VectorLike } from '@use-gpu/traits/types';
-import { ArrowTrait, ColorTrait, LineTrait, ROPTrait } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { ShaderSource } from '@use-gpu/shader';
+import type { VectorLike } from '@use-gpu/traits';
+import type { ArrowTrait, ColorTrait, LineTrait, ROPTrait } from '../types';
 
 import { useProp, parsePosition4 } from '@use-gpu/traits';
 import { useBoundShader, useBoundSource, useLambdaSource, useShaderRef, ArrowLayer } from '@use-gpu/workbench';

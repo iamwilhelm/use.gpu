@@ -1,3 +1,8 @@
+import type {
+  BoxTrait,
+  ElementTrait,
+  ImageTrait,
+} from './types';
 import {
   makeUseTrait,
   makeParseTrait,
@@ -16,11 +21,6 @@ import {
   parseRepeat,
   parseTexture,
 } from './parse';
-import {
-  BoxTrait,
-  ElementTrait,
-  ImageTrait,
-} from './types';
 
 const BOX_TRAIT = {
   grow: parseNumber,

@@ -1,6 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait } from '../types';
-import { VectorLike } from '@use-gpu/traits/types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { VectorLike } from '@use-gpu/traits';
+import type { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait } from '../types';
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import {

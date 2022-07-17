@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { TextureSource } from '@use-gpu/core';
 import { provide, makeContext, useContext } from '@use-gpu/live';
 
 export const FeedbackContext = makeContext<TextureSource>(undefined, 'FeedbackContext');

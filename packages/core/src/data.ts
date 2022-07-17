@@ -1,4 +1,4 @@
-import { TypedArray, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec } from './types';
+import type { TypedArray, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec } from './types';
 import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from './constants';
 
 import { vec4 } from 'gl-matrix';

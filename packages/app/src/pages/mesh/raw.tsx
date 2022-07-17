@@ -1,7 +1,6 @@
-import { LC } from '@use-gpu/live/types';
-import { RenderPassMode } from '@use-gpu/core/types';
+import type { LC } from '@use-gpu/live';
 
-import React from '@use-gpu/live/jsx';
+import React from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,
@@ -24,7 +23,7 @@ export const MeshRawPage: LC = (props) => {
         <Pick
           render={({id, hovered, presses}) => [
             <Mesh texture={texture} mesh={mesh} blink={presses.left} />,
-            <Mesh id={id} texture={texture} mesh={mesh} mode={RenderPassMode.Picking} />,
+            <Mesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
             hovered ? <Cursor cursor='pointer' /> : null,
           ]}
         />

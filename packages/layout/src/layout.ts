@@ -1,7 +1,7 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Point, Rectangle } from '@use-gpu/core/types';
-import { Placement } from '@use-gpu/traits/types';
-import { LayoutElement, LayoutPicker } from './types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { Point, Rectangle } from '@use-gpu/core';
+import type { Placement } from '@use-gpu/traits';
+import type { LayoutElement, LayoutPicker } from './types';
 
 import { parsePlacement, useProp } from '@use-gpu/traits';
 import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne } from '@use-gpu/live';

@@ -1,6 +1,6 @@
-import { DeepPartial, StorageSource, LambdaSource, TypedArray } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { LC, PropsWithChildren } from '@use-gpu/live/types';
+import type { DeepPartial, StorageSource, LambdaSource, TypedArray } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import { provide, memo, makeContext, useContext, useMemo } from '@use-gpu/live';
 import { patch } from '@use-gpu/state';

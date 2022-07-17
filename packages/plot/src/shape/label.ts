@@ -1,6 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { VectorLike } from '@use-gpu/traits/types';
-import { AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { VectorLike } from '@use-gpu/traits';
+import type { AnchorTrait, ColorTrait, FontTrait, LabelTrait, ROPTrait } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { DataContext, ValuesContext } from '../providers/data-provider';

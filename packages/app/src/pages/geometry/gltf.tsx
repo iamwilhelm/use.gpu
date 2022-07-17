@@ -1,8 +1,7 @@
-import { LC } from '@use-gpu/live/types';
-import { GLTF } from '@use-gpu/gltf/types';
+import type { LC } from '@use-gpu/live';
+import type { GLTF } from '@use-gpu/gltf';
 
-import React from '@use-gpu/live/jsx';
-import { use } from '@use-gpu/live';
+import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {

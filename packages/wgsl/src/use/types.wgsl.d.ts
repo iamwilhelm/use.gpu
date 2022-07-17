@@ -1,5 +1,5 @@
 declare module "@use-gpu/wgsl/use/types.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader/wgsl/types').ParsedBundle;
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const Radiance: ParsedBundle;
   export const Light: ParsedBundle;

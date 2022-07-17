@@ -42,7 +42,7 @@ for (const {pattern, arg} of globs) {
     const name = abs.replace(prefix, '').replace(/^\//, '');
 
     out.push(`declare module '${name}' {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   ${symbols.join("\n  ")}
   export default __module;

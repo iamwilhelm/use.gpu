@@ -1,10 +1,10 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderSource } from '@use-gpu/shader/types';
+} from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { RawFaces } from '../primitives/raw-faces';
 
@@ -51,7 +51,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     shaded = true,
 
     size,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 

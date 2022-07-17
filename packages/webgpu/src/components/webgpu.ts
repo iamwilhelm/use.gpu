@@ -1,5 +1,5 @@
 import React from 'react';
-import { LC, LiveElement } from '@use-gpu/live/types';
+import type { LC, LiveElement } from '@use-gpu/live';
 
 import { provide, wrap, useAsync, useOne } from '@use-gpu/live';
 import { DeviceContext } from '@use-gpu/workbench';//'/providers/device-provider'

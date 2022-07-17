@@ -6,9 +6,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "NPM_PACKAGE=inspect ../../scripts/build-mjs-umd.sh && yarn run build:css",
+    "build": "NPM_PACKAGE=inspect ../../scripts/build-mjs-cjs.sh && yarn run build:css",
     "build:css": "cp theme.css ../../build/packages/inspect",
-    "test": "MODULE_ENV=umd jest --watch",
+    "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",

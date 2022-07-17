@@ -1,7 +1,6 @@
-import { LC, LiveElement } from '@use-gpu/live/types';
-import { Point, StorageSource, TextureSource, TypedArray, UniformType } from '@use-gpu/core/types';
-import { GLTF, GLTFAccessorData, GLTFBufferData, GLTFBufferViewData, GLTFImageData, GLTFNodeData, GLTFMeshData, GLTFMaterialData, GLTFSceneData, GLTFTextureData } from './types';
-import { toScene, toNode, toMesh, toMaterial } from './parse';
+import type { LC, LiveElement } from '@use-gpu/live';
+import type { Point, StorageSource, TextureSource, TypedArray, UniformType } from '@use-gpu/core';
+import type { GLTF, GLTFAccessorData, GLTFBufferData, GLTFBufferViewData, GLTFImageData, GLTFNodeData, GLTFMeshData, GLTFMaterialData, GLTFSceneData, GLTFTextureData } from './types';
 
 import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
 
@@ -9,6 +8,7 @@ import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/workbench';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeCopyableTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
 
+import { toScene, toNode, toMesh, toMaterial } from './parse';
 import { generateTangents } from 'mikktspace';
 
 const GLTF_MAGIC = 0x46546C67;

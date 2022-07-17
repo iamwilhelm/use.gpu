@@ -1,5 +1,6 @@
-import { LC, PropsWithChildren, LiveFiber, LiveElement } from '@use-gpu/live/types';
-import { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core/types';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement } from '@use-gpu/live';
+import type { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core';
+
 import { use, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
@@ -36,10 +37,10 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     const renderContext = useContext(RenderContext);
     const pickingContext = useContext(PickingContext);
 
-    const opaques = toArray(rs[RenderPassMode.Opaque]);
-    const transparents = toArray(rs[RenderPassMode.Transparent]);
-    const debugs = toArray(rs[RenderPassMode.Debug]);
-    const pickings = toArray(rs[RenderPassMode.Picking]);
+    const opaques = toArray(rs['opaque']);
+    const transparents = toArray(rs['transparent']);
+    const debugs = toArray(rs['debug']);
+    const pickings = toArray(rs['picking']);
 
     const visibles: RenderToPass[] = [];
     if (opaque) visibles.push(...opaques);

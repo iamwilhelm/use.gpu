@@ -1,4 +1,4 @@
-import {
+import type {
   UniformAllocation, VirtualAllocation, VolatileAllocation, ResourceAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,

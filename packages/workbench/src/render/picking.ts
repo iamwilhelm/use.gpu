@@ -1,5 +1,6 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TypedArray, UniformAttribute, TextureSource, UseRenderingContextGPU } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { TypedArray, UniformAttribute, TextureSource, UseRenderingContextGPU } from '@use-gpu/core';
+
 import {
   PICKING_FORMAT,
   PICKING_COLOR,

@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { PickingUniforms } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { PickingUniforms } from '@use-gpu/core';
 
 import { memo, provide, makeContext, useContext, useMemo, useOne, useResource, useState, incrementVersion } from '@use-gpu/live';
 import { makeIdAllocator, PICKING_UNIFORMS } from '@use-gpu/core';

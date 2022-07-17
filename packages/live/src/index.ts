@@ -1,3 +1,5 @@
+import _JSX from './jsx';
+
 export * from './builtin';
 export * from './debug';
 export { reactInterop } from './fiber';
@@ -50,3 +52,7 @@ export {
   compareFibers,
   tagFunction,
 } from './util';
+
+export * from './jsx';
+export const JSX = _JSX;
+export default _JSX;

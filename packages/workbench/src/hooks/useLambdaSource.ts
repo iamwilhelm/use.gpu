@@ -1,6 +1,6 @@
-import { LambdaSource, StorageSource, Lazy } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { ArrowFunction } from '@use-gpu/live/types';
+import type { LambdaSource, StorageSource, Lazy } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { ArrowFunction } from '@use-gpu/live';
 
 import { resolve } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';

@@ -31,7 +31,7 @@ import {
 import {
   parsePointShape,
 } from '@use-gpu/workbench';
-import {
+import type {
   AnchorTrait,
   ArrowTrait,
   AxesTrait,

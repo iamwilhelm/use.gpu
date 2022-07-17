@@ -1,4 +1,4 @@
-import { ArrowFunction } from '@use-gpu/live/types';
+import type { ArrowFunction } from '@use-gpu/live';
 
 export type TypedArray =
   Int8Array |

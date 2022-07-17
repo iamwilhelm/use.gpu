@@ -1,4 +1,4 @@
-import { Image } from './types';
+import type { Image } from './types';
 import { glyphToEDT } from './sdf-edt'; 
 import { glyphToESDT } from './sdf-esdt';
 import { fill } from './fill';

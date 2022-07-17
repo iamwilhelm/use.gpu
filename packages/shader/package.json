@@ -6,11 +6,8 @@
   "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
-    "./types": "./src/types.ts",
     "./glsl": "./src/glsl/index.ts",
-    "./glsl/types": "./src/glsl/types.ts",
-    "./wgsl": "./src/wgsl/index.ts",
-    "./wgsl/types": "./src/wgsl/types.ts"
+    "./wgsl": "./src/wgsl/index.ts"
   },
   "dependencies": {
     "@lezer/common": "^0.15.11",
@@ -20,8 +17,8 @@
     "lodash": "^4.17.21"
   },
   "scripts": {
-    "build": "NPM_PACKAGE=shader ../../scripts/build-mjs-umd.sh",
-    "test": "MODULE_ENV=umd jest --watch",
+    "build": "NPM_PACKAGE=shader ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",

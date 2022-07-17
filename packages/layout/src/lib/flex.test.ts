@@ -1,5 +1,6 @@
-import { Rectangle, Point } from '@use-gpu/core/types';
-import { Margin, Sizing } from '../types';
+import type { Rectangle, Point } from '@use-gpu/core';
+import type { Margin, Sizing } from '../types';
+
 import { getFlexMinMax, fitFlex } from './flex';
 import { makeBoxLayout } from './util';
 

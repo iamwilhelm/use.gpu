@@ -1,5 +1,5 @@
-import { LC } from '@use-gpu/live/types';
-import React, { Gather, Yeet } from '@use-gpu/live/jsx';
+import type { LC } from '@use-gpu/live';
+import React, { Gather, Yeet } from '@use-gpu/live';
 
 import {
   LinearRGB, Pass, PanControls, Flat,

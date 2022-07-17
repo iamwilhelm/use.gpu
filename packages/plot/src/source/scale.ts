@@ -1,8 +1,8 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { StorageSource, LambdaSource, UniformType } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { VectorLike } from '@use-gpu/traits/types';
-import { ScaleTrait, AxisTrait } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { StorageSource, LambdaSource, UniformType } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { VectorLike } from '@use-gpu/traits';
+import type { ScaleTrait, AxisTrait } from '../types';
 
 import { parsePosition4, useProp } from '@use-gpu/traits';
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';

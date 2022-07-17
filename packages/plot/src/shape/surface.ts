@@ -1,6 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { ShaderSource } from '@use-gpu/shader/types';
-import { ColorTrait, LineTrait, ROPTrait, SurfaceTrait } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { ShaderSource } from '@use-gpu/shader';
+import type { ColorTrait, LineTrait, ROPTrait, SurfaceTrait } from '../types';
 
 import { use, useContext } from '@use-gpu/live';
 import { SurfaceLayer } from '@use-gpu/workbench';

@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
 
 import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {

@@ -1,5 +1,5 @@
-import { ArrowFunction } from '@use-gpu/live/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { ArrowFunction } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { useOne, useVersion } from '@use-gpu/live';
 import { useTransformContext } from '../providers/transform-provider';

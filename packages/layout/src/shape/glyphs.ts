@@ -1,8 +1,8 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { TextureSource, Tuples, Point4 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { FontMetrics } from '@use-gpu/glyph/types';
-import { InlineLine } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { TextureSource, Tuples, Point4 } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { FontMetrics } from '@use-gpu/glyph';
+import type { InlineLine } from '../types';
 
 import { use, yeet, useContext, useMemo } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '@use-gpu/workbench';

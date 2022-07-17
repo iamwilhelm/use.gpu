@@ -1,14 +1,12 @@
-import { LiveFiber } from '@use-gpu/live/types';
+import type { LiveFiber } from '@use-gpu/live';
+import type { Action } from './types';
+
 import { formatValue, formatNodeName, YEET } from '@use-gpu/live';
 import { styled, keyframes } from "@stitches/react";
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
-import { Action } from './types';
 import { usePingContext } from './ping';
-import { SVGAtom } from './svg-atom';
-
-const ICON = (s: string) => <span className="m-icon">{s}</span>
-const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
+import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGDashboard } from './svg';
 
 type NodeProps = {
   fiber: LiveFiber<any>,
@@ -45,10 +43,12 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   const yeet = type === YEET;
   const react = !!__inspect?.react;
 
-  const suffix1 = yeet ? ICONSMALL("switch_left") : null;
-  const suffix2 = react ? <SVGAtom /> : null;
-  const suffix4 = __inspect?.layout ? ICONSMALL("space_dashboard") : null;
-  const suffix3 = !suffix4 && __inspect?.setHovered ? ICONSMALL("view_in_ar") : null;
+  const suffix1 = yeet ? <SVGYeet key="yeet" /> : null;
+  const suffix2 = react ? <SVGAtom key="atom" /> : null;
+  const suffix3 = !__inspect?.layout && __inspect?.setHovered ? <SVGHighlightElement key="layout" /> : null;
+  const suffix4 = __inspect?.layout ? <SVGDashboard key="dash" /> : null;
+
+  const icons = [suffix1, suffix2, suffix3, suffix4].filter(x => !!x);
 
   const [version, pinged] = usePingContext(fiber);
 
@@ -86,7 +86,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
     >
       <div className={"fiber-tree-ping cover-parent " + className} />
       <div className={"fiber-tree-highlight cover-parent " + className} />
-      <div className={"fiber-tree-label " + className}>{name}{suffix1}{suffix2}{suffix3}{suffix4}</div>
+      <div className={"fiber-tree-label " + className}>{name}<IconRow>{icons}</IconRow></div>
     </div>
   );
 });

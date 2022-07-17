@@ -1,10 +1,10 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, TextureSource, LambdaSource, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+} from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
@@ -44,7 +44,7 @@ const PIPELINE = {
 export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: RawFullScreenProps) => {
   const {
     pipeline: propPipeline,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 

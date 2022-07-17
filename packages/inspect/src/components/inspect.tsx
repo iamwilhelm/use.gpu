@@ -1,7 +1,8 @@
-import { LiveFiber } from '@use-gpu/live/types';
+import type { LiveFiber } from '@use-gpu/live';
+import type { ExpandState, SelectState, HoverState, PingState } from './types';
+
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState } from '@use-gpu/state';
-import { ExpandState, SelectState, HoverState, PingState } from './types';
 
 import React, { memo, useLayoutEffect, useEffect, useMemo, useState } from 'react';
 import { Node } from './node';
@@ -17,10 +18,9 @@ import {
 } from './layout';
 import { PingProvider } from './ping';
 import { DetailSlider } from './detail';
+import { SVGInspect, SVGPickElement, SVGClose } from './svg';
 
 import * as Tabs from '@radix-ui/react-tabs';
-
-const ICON = (s: string) => <span className="m-icon">{s}</span>
 
 type InspectFiber = Record<string, any>;
 type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
@@ -141,7 +141,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       <TreeControls>
         <DetailSlider value={depthLimit} onChange={setDepthLimit} />
         <Spacer />
-        <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}>{ICON('ads_click')}</SmallButton>
+        <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}><SVGPickElement /></SmallButton>
       </TreeControls>
       <FiberTree
         fiber={fiber}
@@ -206,7 +206,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       </PingProvider>
     ) : null}
     <InspectToggle onClick={toggleOpen}>
-      <Button>{open ? ICON("close") : ICON("bug_report")}</Button>
+      <Button>{open ? <SVGClose /> : <SVGInspect />}</Button>
     </InspectToggle>
   </div>);
 }

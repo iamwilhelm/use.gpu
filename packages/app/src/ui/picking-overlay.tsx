@@ -1,5 +1,5 @@
-import React from '@use-gpu/live/jsx';
-import { LC } from '@use-gpu/live/types';
+import type { LC } from '@use-gpu/live';
+import React from '@use-gpu/live';
 
 import {
   Flat,

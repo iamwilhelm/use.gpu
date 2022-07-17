@@ -1,6 +1,6 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { Point, Point4 } from '@use-gpu/core/types';
-import { LayoutElement, AutoPoint, Dimension, Direction, MarginLike, Margin } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { Point, Point4 } from '@use-gpu/core';
+import type { LayoutElement, AutoPoint, Dimension, Direction, MarginLike, Margin } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
@@ -8,7 +8,7 @@ import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { isHorizontal, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
-import { BoxTrait, ElementTrait } from '../types';
+import type { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';

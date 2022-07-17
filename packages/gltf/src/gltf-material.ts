@@ -1,5 +1,5 @@
-import { LC, PropsWithChildren, LiveElement } from '@use-gpu/live/types';
-import { GLTF } from './types';
+import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
+import type { GLTF } from './types';
 
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useMemo } from '@use-gpu/live';

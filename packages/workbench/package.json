@@ -14,8 +14,8 @@
     "@use-gpu/wgsl": "*"
   },
   "scripts": {
-    "build": "NPM_PACKAGE=workbench ../../scripts/build-mjs-umd.sh",
-    "test": "MODULE_ENV=umd jest --watch",
+    "build": "NPM_PACKAGE=workbench ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",

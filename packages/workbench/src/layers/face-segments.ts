@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { StorageSource } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { StorageSource } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
 import { getChunkCount, generateChunkFaces } from '@use-gpu/core';

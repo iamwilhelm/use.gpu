@@ -1,10 +1,10 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, TextureSource, LambdaSource, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderSource, ShaderModule } from '@use-gpu/shader/types';
+} from '@use-gpu/core';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
@@ -101,7 +101,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const {
     pipeline: propPipeline,
     alphaToCoverage = true,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
     count = 1,
   } = props;

@@ -1,4 +1,4 @@
-import { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types';
+import type { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types';
 
 const NO_DEPS = [] as any[];
 

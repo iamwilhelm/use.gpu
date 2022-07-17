@@ -1,10 +1,10 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderSource } from '@use-gpu/shader/types';
+} from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
@@ -66,7 +66,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     pipeline: propPipeline,
     detail = 12,
     count = 1,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
   

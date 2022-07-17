@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { Cursor } from '@use-gpu/state/types';
-import { ExpandState } from './types';
+import type { Cursor } from '@use-gpu/state';
+import type { ExpandState } from './types';
 
 import { useRefineCursor, useUpdateState } from '@use-gpu/state';
 

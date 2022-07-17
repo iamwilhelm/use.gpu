@@ -1,4 +1,4 @@
-import { DomainOptions } from '../types';
+import type { DomainOptions } from '../types';
 
 // Generate equally spaced ticks in a range at sensible positions.
 //

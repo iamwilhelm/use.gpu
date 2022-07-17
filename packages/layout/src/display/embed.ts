@@ -1,7 +1,7 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { AutoPoint, LayoutElement, Dimension, Margin } from '../types';
-import { Rectangle, Point, Point4 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { Rectangle, Point, Point4 } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { AutoPoint, LayoutElement, Dimension, Margin } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { use, memo, gather, provide, yeet, tagFunction, useContext, useFiber } from '@use-gpu/live';
@@ -10,7 +10,7 @@ import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { memoFit, memoLayout } from '../lib/util';
 import { evaluateDimension } from '../parse';
 
-import { BoxTrait, ElementTrait } from '../types';
+import type { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { parseDimension, parseMargin } from '../parse';
 

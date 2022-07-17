@@ -1,5 +1,5 @@
-import { TypedArray } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { TypedArray } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 export type Light = {
   kind: number,

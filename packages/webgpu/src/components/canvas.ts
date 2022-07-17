@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { UseRenderingContextGPU, ColorSpace } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { UseRenderingContextGPU, ColorSpace } from '@use-gpu/core';
 
 import { EventProvider } from '@use-gpu/workbench';//'/event-provider';
 import { RenderContext } from '@use-gpu/workbench';//'/providers/render-provider';

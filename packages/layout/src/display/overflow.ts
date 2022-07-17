@@ -1,7 +1,7 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core/types';
-import { AutoPoint, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core';
+import type { AutoPoint, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';

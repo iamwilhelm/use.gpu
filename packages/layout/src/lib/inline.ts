@@ -1,5 +1,5 @@
-import { Point, Point4, Rectangle } from '@use-gpu/core/types';
-import { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor, Base } from '../types';
+import type { Point, Point4, Rectangle } from '@use-gpu/core';
+import type { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor, Base } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
 import { makeInlineCursor } from './cursor';

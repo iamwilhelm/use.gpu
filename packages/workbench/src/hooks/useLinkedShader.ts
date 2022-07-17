@@ -1,5 +1,5 @@
-import { ShaderModuleDescriptor } from '@use-gpu/core/types';
-import { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader/types';
+import type { ShaderModuleDescriptor } from '@use-gpu/core';
+import type { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader';
 
 import { toHash } from '@use-gpu/state';
 import { resolveBindings, linkBundle, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';

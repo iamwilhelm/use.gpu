@@ -1,6 +1,6 @@
-import { LC, LiveElement } from '@use-gpu/live/types';
-import { UniformAttribute } from '@use-gpu/core/types';
-import { GLTF, GLTFPrimitiveData } from './types';
+import type { LC, LiveElement } from '@use-gpu/live';
+import type { UniformAttribute } from '@use-gpu/core';
+import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { flattenIndexedArray } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';

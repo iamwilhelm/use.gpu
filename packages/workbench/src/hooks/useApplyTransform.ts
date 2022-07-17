@@ -1,5 +1,5 @@
-import { StorageSource, LambdaSource, TextureSource, UniformAttributeValue, TypedArray } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { StorageSource, LambdaSource, TextureSource, UniformAttributeValue, TypedArray } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { useOne, useVersion } from '@use-gpu/live';
 import { useTransformContext } from '../providers/transform-provider';

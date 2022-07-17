@@ -1,4 +1,4 @@
-import { LiveComponent } from '@use-gpu/live/types';
+import type { LiveComponent } from '@use-gpu/live';
 import { use } from '@use-gpu/live';
 
 import { Draw, Pass } from '@use-gpu/workbench';

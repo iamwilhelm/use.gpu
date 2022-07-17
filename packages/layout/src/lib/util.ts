@@ -1,7 +1,7 @@
-import { LiveElement } from '@use-gpu/live/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { Point, Point4, Rectangle } from '@use-gpu/core/types';
-import { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
+import type { LiveElement } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Point, Point4, Rectangle } from '@use-gpu/core';
+import type { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
 import { yeet, fragment } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';

@@ -1,4 +1,4 @@
-import { Key, Action, Task, LiveFiber, LiveElement, LiveNode, LivePure, DeferredCall, DeferredCallInterop, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction, ReactElementInterop } from './types';
+import type { Key, Action, Task, LiveFiber, LiveElement, LiveNode, LivePure, DeferredCall, DeferredCallInterop, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction, ReactElementInterop } from './types';
 
 import { makeFiber, renderFiber, updateFiber, disposeFiber, reactInterop } from './fiber';
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, getOnPaint } from './util';

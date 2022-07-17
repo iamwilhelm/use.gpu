@@ -3,7 +3,7 @@ name = "use-gpu-text"
 version = "0.1.0"
 authors = ["Steven Wittens <steven@acko.net>"]
 description = "Rust-side of @use-gpu/text"
-license = "../../LICENSE.md"
+license = "./LICENSE.md"
 repository = ""
 edition = "2018"
 

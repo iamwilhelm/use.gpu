@@ -1,7 +1,7 @@
-import { LC } from '@use-gpu/live/types';
-import { Point4 } from '@use-gpu/core/types';
+import type { LC } from '@use-gpu/live';
+import type { Point4 } from '@use-gpu/core';
 
-import React from '@use-gpu/live/jsx';
+import React from '@use-gpu/live';
 import { LayoutControls } from '../../ui/layout-controls';
 
 import {

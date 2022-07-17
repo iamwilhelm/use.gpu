@@ -1,4 +1,4 @@
-import { LiveFiber, LiveComponent, LiveElement, LiveMap } from '@use-gpu/live/types';
+import type { LiveFiber, LiveComponent, LiveElement, LiveMap } from '@use-gpu/live';
 
 import { memo, capture, makeCapture, useCapture, useOne, useMemo, captureTail } from '@use-gpu/live';
 

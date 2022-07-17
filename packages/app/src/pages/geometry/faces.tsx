@@ -1,8 +1,7 @@
-import { LC } from '@use-gpu/live/types';
-import { DataField } from '@use-gpu/core/types';
+import type { LC } from '@use-gpu/live';
+import type { DataField } from '@use-gpu/core';
 
-import React from '@use-gpu/live/jsx';
-import { use } from '@use-gpu/live';
+import React, { use } from '@use-gpu/live';
 
 import { PickingOverlay } from '../../ui/picking-overlay';
 import earcut from 'earcut';

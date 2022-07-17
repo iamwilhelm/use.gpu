@@ -1,4 +1,5 @@
-import { LiveFiber, LC, PropsWithChildren, LiveElement, Task, DeferredCall } from '@use-gpu/live/types';
+import type { LiveFiber, LC, PropsWithChildren, LiveElement, Task, DeferredCall } from '@use-gpu/live';
+
 import {
   gather, provide, yeet,
   makeContext, useContext, useNoContext,

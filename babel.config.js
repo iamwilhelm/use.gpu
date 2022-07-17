@@ -5,7 +5,7 @@ module.exports = {
         "chrome": 102,
         "firefox": 102,
       },
-      "modules": process.env.MODULE_ENV === 'umd' ? 'commonjs' : false,
+      "modules": process.env.MODULE_ENV === 'cjs' ? 'commonjs' : false,
     }],
     "@babel/preset-typescript",
     "@babel/preset-react",

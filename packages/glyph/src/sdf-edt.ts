@@ -1,5 +1,5 @@
+import type { Image } from './types';
 import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage } from './sdf';
-import { Image } from './types';
 
 // Convert grayscale glyph to SDF using pixel-based distance transform
 export const glyphToEDT = (

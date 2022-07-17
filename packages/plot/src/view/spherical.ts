@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { AxesTrait, ObjectTrait, Swizzle } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale, useProp } from '@use-gpu/traits';
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';

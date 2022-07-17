@@ -1,5 +1,5 @@
-import { LC, LiveElement } from '@use-gpu/live/types';
-import { GLTF, GLTFPrimitiveData } from './types';
+import type { LC, LiveElement } from '@use-gpu/live';
+import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { use, memo, useMemo } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';

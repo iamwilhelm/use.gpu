@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useMemo, useRef } from 'react';
 
-import { LiveFiber, LiveElement } from '@use-gpu/live/types';
+import type { LiveFiber, LiveElement } from '@use-gpu/live';
 import { render as renderLive, use, morph, resolveRootNode } from '@use-gpu/live';
 
 export type LiveProps = {

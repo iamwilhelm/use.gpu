@@ -1,4 +1,4 @@
-import { LiveFiber } from '@use-gpu/live/types';
+import type { LiveFiber } from '@use-gpu/live';
 
 import React, { useState } from 'react';
 import { DOMMock, SplitRow, Label, Spacer } from '../layout';

@@ -1,7 +1,7 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { UniformAttribute } from '@use-gpu/core/types';
-import { VectorLike } from '@use-gpu/traits/types';
-import { ColorTrait, LineTrait, ROPTrait } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { UniformAttribute } from '@use-gpu/core';
+import type { VectorLike } from '@use-gpu/traits';
+import type { ColorTrait, LineTrait, ROPTrait } from '../types';
 
 import { parseNumber, parsePosition4, parseIntegerPositive, useProp } from '@use-gpu/traits';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';

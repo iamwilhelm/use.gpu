@@ -1,5 +1,5 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { Rectangle, StorageSource } from '@use-gpu/core/types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { Rectangle, StorageSource } from '@use-gpu/core';
 
 import { memo, yeet, useContext, useOne } from '@use-gpu/live';
 import { makeTuples } from '@use-gpu/core';

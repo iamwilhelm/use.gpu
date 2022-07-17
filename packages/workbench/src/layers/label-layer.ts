@@ -1,7 +1,7 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { TypedArray, TextureSource, Atlas, Lazy, RenderPassMode } from '@use-gpu/core/types';
-import { ShaderSource } from '@use-gpu/shader/types';
-import { SDFGlyphData } from '../text/types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { TypedArray, TextureSource, Atlas, Lazy, RenderPassMode } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
+import type { SDFGlyphData } from '../text/types';
 
 import { use, keyed, wrap, memo, debug, fragment, provide, useFiber, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
@@ -78,7 +78,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
     sdfRadius,
     detail,
     count,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 

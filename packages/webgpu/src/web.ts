@@ -1,4 +1,4 @@
-import { GPUDeviceMount } from './types';
+import type { GPUDeviceMount } from './types';
 
 // Mount GPU device using navigator context
 export const mountGPUDevice = async (

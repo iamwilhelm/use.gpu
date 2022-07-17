@@ -1,4 +1,4 @@
-import { GLTFSceneData, GLTFNodeData, GLTFMeshData, GLTFMaterialData, GLTFMaterialPBR } from './types';
+import type { GLTFSceneData, GLTFNodeData, GLTFMeshData, GLTFMaterialData, GLTFMaterialPBR } from './types';
 import { mat4, vec3, vec4, quat } from 'gl-matrix';
 
 export const toScene = <T = any>(t: any): GLTFSceneData<T> => {

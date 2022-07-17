@@ -1,6 +1,6 @@
-import { LC, LiveElement } from '@use-gpu/live/types';
-import { TypedArray } from '@use-gpu/core/types';
-import { GLTF } from './types';
+import type { LC, LiveElement } from '@use-gpu/live';
+import type { TypedArray } from '@use-gpu/core';
+import type { GLTF } from './types';
 import { vec3, mat4, quat } from 'gl-matrix';
 
 import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';

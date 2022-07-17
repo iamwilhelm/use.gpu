@@ -1,5 +1,5 @@
-import { ArrowFunction } from '@use-gpu/live/types';
-import { TypedArray, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike, Domain } from './types';
+import type { ArrowFunction } from '@use-gpu/live';
+import type { TypedArray, Join, Blending, Color, Placement, ColorLike, VectorLike, ArrayLike, Domain } from './types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 
 const NO_VEC2 = vec2.fromValues(0, 0);

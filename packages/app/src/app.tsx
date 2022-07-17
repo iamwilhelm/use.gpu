@@ -1,7 +1,6 @@
-import { LC } from '@use-gpu/live/types';
+import type { LC } from '@use-gpu/live';
 
-import React, { into } from '@use-gpu/live/jsx';
-import { useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import React, { into, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
 import { DebugProvider, FontLoader, Router, Routes } from '@use-gpu/workbench';

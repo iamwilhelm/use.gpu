@@ -1,10 +1,10 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformType,
   VertexData, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderSource } from '@use-gpu/shader/types';
+} from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { RawLines } from '../primitives/raw-lines';
 
@@ -74,7 +74,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
 
     count = 1,
     detail = 1,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 

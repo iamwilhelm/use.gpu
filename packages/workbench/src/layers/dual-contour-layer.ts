@@ -1,11 +1,11 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import {
+import type { LiveComponent } from '@use-gpu/live';
+import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
-} from '@use-gpu/core/types';
-import { ShaderSource } from '@use-gpu/shader/types';
-import { VectorLike } from '@use-gpu/traits/types';
+} from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
+import type { VectorLike } from '@use-gpu/traits';
 
 import { RawFaces } from '../primitives/raw-faces';
 
@@ -56,7 +56,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     shaded = true,
 
     size,
-    mode = RenderPassMode.Opaque,
+    mode = 'opaque',
     id = 0,
   } = props;
 

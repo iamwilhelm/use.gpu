@@ -393,9 +393,4 @@ export type Atlas = {
 
 // Passes
 
-export enum RenderPassMode {
-  Opaque = 'o',
-  Transparent = 't',
-  Picking = 'p',
-  Debug = 'd',
-};
+export type RenderPassMode = 'opaque' | 'transparent' | 'picking' | 'debug';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { LC, LiveElement } from '@use-gpu/live/types';
+import type { LC, LiveElement } from '@use-gpu/live';
+
 import { PAGES } from '../routes';
 import { use, fragment, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';

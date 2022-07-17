@@ -1,5 +1,6 @@
-import { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live/types';
-import { ColorSpace, TextureSource } from '@use-gpu/core/types';
+import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
+import type { ColorSpace, TextureSource } from '@use-gpu/core';
+
 import { use, provide, gather, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';

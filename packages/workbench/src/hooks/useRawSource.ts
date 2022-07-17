@@ -1,4 +1,4 @@
-import { StorageSource, UniformType, TypedArray } from '@use-gpu/core/types';
+import type { StorageSource, UniformType, TypedArray } from '@use-gpu/core';
 
 import { useContext, useOne, useMemo, useNoContext, useNoOne, useNoMemo, incrementVersion } from '@use-gpu/live';
 import { makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';

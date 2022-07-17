@@ -1,7 +1,7 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { UniformAttributeValue } from '@use-gpu/core/types';
-import { VectorLike } from '@use-gpu/traits/types';
-import { AxesTrait, ObjectTrait, Swizzle } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { UniformAttributeValue } from '@use-gpu/core';
+import type { VectorLike } from '@use-gpu/traits';
+import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';

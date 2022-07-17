@@ -1,4 +1,4 @@
-import { Rectangle, Point, Point3, TextureSource, VertexData } from './types';
+import type { Rectangle, Point, Point3, TextureSource, VertexData } from './types';
 
 import { makeVertexAttributeLayout } from './attribute';
 import { makeColorAttachment, makeColorState } from './color';

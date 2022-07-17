@@ -1,4 +1,4 @@
-import { DeferredCall, LiveElement, LiveFiber } from './types';
+import type { DeferredCall, LiveElement, LiveFiber } from './types';
 import { reactInterop } from './fiber';
 
 const {prototype: {hasOwnProperty}} = Object;

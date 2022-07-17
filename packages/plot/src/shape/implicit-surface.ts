@@ -1,6 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { ShaderSource } from '@use-gpu/shader/types';
-import { ColorTrait, LineTrait, ROPTrait, VolumeTrait } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { ShaderSource } from '@use-gpu/shader';
+import type { ColorTrait, LineTrait, ROPTrait, VolumeTrait } from '../types';
 
 import { use, useContext } from '@use-gpu/live';
 import { DualContourLayer } from '@use-gpu/workbench';

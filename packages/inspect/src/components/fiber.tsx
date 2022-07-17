@@ -1,6 +1,6 @@
-import { LiveFiber } from '@use-gpu/live/types';
+import type { LiveFiber } from '@use-gpu/live';
+import type { Cursor } from '@use-gpu/state';
 import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
-import { Cursor } from '@use-gpu/state/types';
 
 import React, { memo, useMemo, useLayoutEffect, useRef } from 'react';
 
@@ -13,8 +13,7 @@ import { ExpandState, SelectState, HoverState, Action } from './types';
 import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
 
-const ICON = (s: string) => <span className="m-icon">{s}</span>
-const ICONSMALL = (s: string) => <span className="m-icon m-icon-small">{s}</span>
+import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed } from './svg';
 
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
@@ -340,8 +339,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   
   // Expandable node
   if (out.length) {
-    const openIcon = continuation ? 'arrow_downward' : undefined;
-    const closedIcon = continuation ? 'subdirectory_arrow_right' : undefined;
+    const openIcon = continuation ? <SVGNextOpen /> : undefined;
+    const closedIcon = continuation ? <SVGNextClosed /> : undefined;
     return (
       <Expandable
         id={id}
@@ -362,7 +361,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   }
 
   // Leaf node
-  const continuationIcon = ICONSMALL('subdirectory_arrow_right');
+  const continuationIcon = <IconItem><SVGNextClosed /></IconItem>;
   return (<>
     <TreeRow indent={indent + 1}>
       {continuation ? <Muted>{continuationIcon}</Muted> : null}
@@ -376,10 +375,10 @@ export const TreeExpand: React.FC<TreeExpandProps> = ({
   expand,
   onToggle,
   children,
-  openIcon = 'expand_more',
-  closedIcon = 'chevron_right',
+  openIcon = <SVGChevronDown />,
+  closedIcon = <SVGChevronRight />,
 }) => {
-  const icon = expand !== false ? ICON(openIcon) : ICON(closedIcon) ;
+  const icon = <IconItem>{expand !== false ? openIcon : closedIcon}</IconItem>;
 
   return (<>
     <TreeRow>

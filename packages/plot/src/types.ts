@@ -1,5 +1,5 @@
-import { VectorLike, ColorLike, Placement, Blending, Domain, Join } from '@use-gpu/traits/types';
-import { PointShape } from '@use-gpu/workbench/types';
+import type { VectorLike, ColorLike, Placement, Blending, Domain, Join } from '@use-gpu/traits';
+import type { PointShape } from '@use-gpu/workbench';
 
 export type Axis4 = 'x' | 'y' | 'z' | 'w';
 export type Swizzle = string;

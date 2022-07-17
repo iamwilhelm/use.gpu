@@ -1,7 +1,7 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { Point4 } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { Base, InlineLine } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { Point4 } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Base, InlineLine } from '../types';
 
 import { keyed, yeet, useFiber } from '@use-gpu/live';
 

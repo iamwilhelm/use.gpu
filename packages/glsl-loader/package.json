@@ -18,8 +18,8 @@
     "glsl-tsgen": "./bin/glsl-tsgen"
   },
   "scripts": {
-    "build": "NPM_PACKAGE=glsl-loader ../../scripts/build-mjs-umd.sh",
-    "test": "MODULE_ENV=umd jest --watch",
+    "build": "NPM_PACKAGE=glsl-loader ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",

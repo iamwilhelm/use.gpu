@@ -1,8 +1,7 @@
-import { LC } from '@use-gpu/live/types';
-import { DataField, Emit, RenderPassMode, Time } from '@use-gpu/core/types';
+import type { LC } from '@use-gpu/live';
+import type { DataField, Emit, RenderPassMode, Time } from '@use-gpu/core';
 
-import React from '@use-gpu/live/jsx';
-import { use } from '@use-gpu/live';
+import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
@@ -114,7 +113,7 @@ export const GeometryDataPage: LC = () => {
                 shape='diamondOutlined'
                 size={20}
                 depth={1}
-                mode={RenderPassMode.Transparent}
+                mode={'transparent'}
               />
             }
           />

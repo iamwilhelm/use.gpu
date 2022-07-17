@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { VectorLike } from '@use-gpu/traits/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { VectorLike } from '@use-gpu/traits';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
 import { useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';

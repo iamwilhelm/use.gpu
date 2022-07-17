@@ -1,5 +1,6 @@
-import { Point, Rectangle } from '@use-gpu/core/types';
-import { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint, AutoRectangle, Direction } from '../types';
+import type { Point, Rectangle } from '@use-gpu/core';
+import type { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint, AutoRectangle, Direction } from '../types';
+
 import { evaluateDimension } from '../parse';
 import { fitBlock } from './block';
 

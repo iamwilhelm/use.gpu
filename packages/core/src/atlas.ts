@@ -1,5 +1,6 @@
+import type { Atlas, TextureSource } from './types';
+
 import { makeTextureDataLayout, makeDynamicTexture, makeTextureView, uploadTexture } from './texture';
-import { Atlas, TextureSource } from './types';
 import uniq from 'lodash/uniq';
 
 type Rectangle = [number, number, number, number];

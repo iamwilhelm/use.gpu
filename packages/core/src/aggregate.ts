@@ -1,4 +1,4 @@
-import { AggregateBuffer, UniformType } from './types';
+import type { AggregateBuffer, UniformType } from './types';
 
 import { makeStorageBuffer, uploadBuffer } from './buffer';
 import {

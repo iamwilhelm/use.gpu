@@ -10,17 +10,13 @@
     "gl-matrix": "^3.3.0",
     "lodash": "^4.17.21"
   },
-  "exports": {
-    ".": "./src/index.ts",
-    "./types": "./src/types.ts"
-  },
   "scripts": {
-    "test": "MODULE_ENV=umd jest --watch",
+    "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "NPM_PACKAGE=core ../../scripts/build-mjs-umd.sh"
+    "build": "NPM_PACKAGE=core ../../scripts/build-mjs-cjs.sh"
   },
   "keywords": [
     "use-gpu",

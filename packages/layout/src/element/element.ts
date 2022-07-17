@@ -1,14 +1,14 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource, Point4, Rectangle } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { ColorLike } from '@use-gpu/traits/types';
-import { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint, ImageTrait } from '../types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { TextureSource, Point4, Rectangle } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { ColorLike } from '@use-gpu/traits';
+import type { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint, ImageTrait } from '../types';
 
 import { use, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';
 import { useInspectHoverable } from '@use-gpu/workbench';
 
-import { BoxTrait, ElementTrait } from '../types';
+import type { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { INSPECT_STYLE } from '../lib/constants';
 import { memoLayout } from '../lib/util';

@@ -1,6 +1,6 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time } from '@use-gpu/core/types';
-import { ShaderSource } from '@use-gpu/shader/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {

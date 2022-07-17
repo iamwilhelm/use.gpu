@@ -1,4 +1,4 @@
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { ShaderModule } from '@use-gpu/shader';
 import { makeContext, useContext } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 

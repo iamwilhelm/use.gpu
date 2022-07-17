@@ -1,4 +1,4 @@
-import { LiveFiber } from '@use-gpu/live/types';
+import type { LiveFiber } from '@use-gpu/live';
 import { makeContext, useContext, useFiber, useNoContext } from '@use-gpu/live';
 
 type LoopContextProps = {

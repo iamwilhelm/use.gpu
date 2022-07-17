@@ -1,6 +1,6 @@
-import { LambdaSource, StorageSource, UniformType } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { ArrowFunction } from '@use-gpu/live/types';
+import type { LambdaSource, StorageSource, UniformType } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { ArrowFunction } from '@use-gpu/live';
 
 import { adjustSize } from './useBufferedSize';
 

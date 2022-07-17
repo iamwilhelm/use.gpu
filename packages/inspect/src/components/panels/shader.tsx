@@ -1,9 +1,10 @@
-import { LiveFiber } from '@use-gpu/live/types';
+import type { LiveFiber } from '@use-gpu/live';
+import type { Action } from '../types';
+
 import { formatNode, formatValue } from '@use-gpu/live';
 import { styled as _styled } from '@stitches/react';
 
 import React, { Fragment, useState } from 'react';
-import { Action } from '../types';
 import { SplitRow, Label, Selectable, Spacer } from '../layout';
 
 import { inspectObject } from './props';

@@ -1,8 +1,9 @@
-import { LiveFiber, Hook } from '@use-gpu/live/types';
+import type { LiveFiber } from '@use-gpu/live';
+import type { Action } from '../types';
 import { formatNode, formatValue } from '@use-gpu/live';
 
+import { Hook } from '@use-gpu/live';
 import React, { useState } from 'react';
-import { Action } from '../types';
 import { SplitRow, Label, Spacer } from '../layout';
 import { usePingContext } from '../ping';
 

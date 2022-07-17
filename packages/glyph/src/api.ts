@@ -1,4 +1,4 @@
-import { Font, FontProps, FontMetrics, SpanMetrics, GlyphMetrics, RustTextAPI } from './types';
+import type { Font, FontProps, FontMetrics, SpanMetrics, GlyphMetrics, RustTextAPI } from './types';
 import { toMurmur53 } from '@use-gpu/state';
 import { UseRustText } from '../pkg/use_gpu_text.js';
 
@@ -44,7 +44,7 @@ export const RustText = (): RustTextAPI => {
     let max = 0;
 
     const {
-      family = '',
+      family = 'sans-serif',
       weight = 400,
       style = 'normal',
     } = font;

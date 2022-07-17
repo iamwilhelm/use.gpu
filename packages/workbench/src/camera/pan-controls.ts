@@ -1,4 +1,4 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';

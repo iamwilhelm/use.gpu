@@ -1,4 +1,4 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import { useResource, useState } from '@use-gpu/live';
 
 export type AutoSizeProps = {

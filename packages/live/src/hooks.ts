@@ -1,8 +1,9 @@
-import {
+import type {
   Initial, Setter, Reducer, Key, Task,
   LiveFunction, LiveFiber, LiveContext, LiveCapture,
-  DeferredCall, HostInterface, Hook, RefObject, MutableRefObject,
+  DeferredCall, HostInterface, RefObject, MutableRefObject,
 } from './types';
+import { Hook } from './types';
 
 import { bind, bustFiberMemo, getArgCount } from './fiber';
 import { getCurrentFiber } from './current';
@@ -65,7 +66,7 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
  */
 export const useFiber = () => {
   const fiber = getCurrentFiber();
-  if (!fiber) throw new Error("Hook called outside of rendering component");
+  if (!fiber) throw new Error("Live Hook called outside of rendering cycle.\n\nMake sure you are not accidentally running two copies of the Live run-time side-by-side.");
   return fiber;
 }
 export const useNoFiber = () => {};

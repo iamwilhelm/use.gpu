@@ -1,4 +1,4 @@
-import {
+import type {
   HostInterface, LiveFiber, LiveFunction, LiveContext, LiveElement,
   FiberYeet, FiberGather, FiberContext, ContextValues, ContextRoots,
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,

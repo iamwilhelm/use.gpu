@@ -17,8 +17,6 @@ for (const file of files) {
   json.version = version;
 
   if (json.main.match(/(^|\/)src\//)) {
-    console.log(json.name, json.main, convert(json.main), file);
-
     json.main = convert(json.main);
     if (json.types) json.types = convert(json.types);
 

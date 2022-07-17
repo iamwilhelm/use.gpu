@@ -1,5 +1,5 @@
-import { UniformAttribute, UniformAttributeValue } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { UniformAttribute, UniformAttributeValue } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { useOne, useMemo, useNoMemo } from '@use-gpu/live';
 import { makeShaderBindings } from '@use-gpu/core';

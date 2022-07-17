@@ -1,6 +1,6 @@
-import { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live/types';
-import { AggregateBuffer, Atlas, Rectangle, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core/types';
-import { UIAggregate } from './types';
+import type { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live';
+import type { AggregateBuffer, Atlas, Rectangle, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
+import type { UIAggregate } from './types';
 
 import {
   DeviceContext, DebugContext,

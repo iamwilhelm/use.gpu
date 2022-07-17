@@ -1,5 +1,5 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { ViewUniforms, Rectangle } from '@use-gpu/core/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { ViewUniforms, Rectangle } from '@use-gpu/core';
 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';

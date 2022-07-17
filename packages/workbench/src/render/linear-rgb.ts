@@ -1,6 +1,6 @@
-import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { TextureSource, ColorSpace } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { TextureSource, ColorSpace } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { use, useOne } from '@use-gpu/live';
 import { Draw } from './draw';

@@ -1,7 +1,7 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { ShaderSource } from '@use-gpu/shader/types';
-import { VectorLike } from '@use-gpu/traits/types';
-import { ColorTrait, LineTrait, ROPTrait } from '../types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { ShaderSource } from '@use-gpu/shader';
+import type { VectorLike } from '@use-gpu/traits';
+import type { ColorTrait, LineTrait, ROPTrait } from '../types';
 
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';

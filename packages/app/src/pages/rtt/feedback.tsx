@@ -1,7 +1,8 @@
-import { LC } from '@use-gpu/live/types';
-import { Emit, RenderPassMode } from '@use-gpu/core/types';
+import type { LC } from '@use-gpu/live';
+import type { Emit } from '@use-gpu/core';
+import { RenderPassMode } from '@use-gpu/core';
 
-import React from '@use-gpu/live/jsx';
+import React from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
@@ -58,7 +59,7 @@ export const RTTFeedbackPage: LC = () => {
                   shape='circle'
                   size={20}
                   depth={1}
-                  mode={RenderPassMode.Transparent}
+                  mode={'transparent'}
                 />
               )}
             />

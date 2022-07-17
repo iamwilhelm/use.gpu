@@ -1,8 +1,7 @@
-import { LC } from '@use-gpu/live/types';
-import { Emit, StorageSource } from '@use-gpu/core/types';
+import type { LC } from '@use-gpu/live';
+import type { Emit, StorageSource } from '@use-gpu/core';
 
-import { use } from '@use-gpu/live';
-import React from '@use-gpu/live/jsx';
+import React, { use } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,

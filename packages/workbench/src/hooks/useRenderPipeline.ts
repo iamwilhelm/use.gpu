@@ -1,4 +1,4 @@
-import { UseRenderingContextGPU, ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core/types';
+import type { UseRenderingContextGPU, ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core';
 
 import { makeRenderPipeline, makeRenderPipelineAsync } from '@use-gpu/core';
 import { useContext, useMemo, useOne, useState } from '@use-gpu/live';

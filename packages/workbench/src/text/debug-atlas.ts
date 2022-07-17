@@ -1,5 +1,6 @@
-import { LiveComponent } from '@use-gpu/live/types';
-import { Atlas, Rectangle } from '@use-gpu/core/types';
+import type { LiveComponent } from '@use-gpu/live';
+import type { Atlas, Rectangle } from '@use-gpu/core';
+
 import { debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } from '@use-gpu/live';
 import { TextureSource } from '@use-gpu/core';
 

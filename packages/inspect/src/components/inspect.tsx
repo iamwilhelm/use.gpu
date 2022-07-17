@@ -18,7 +18,7 @@ import {
 } from './layout';
 import { PingProvider } from './ping';
 import { DetailSlider } from './detail';
-import { SVGInspect, SVGPickElement, SVGClose } from './svg';
+import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
 
 import * as Tabs from '@radix-ui/react-tabs';
 
@@ -141,7 +141,9 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       <TreeControls>
         <DetailSlider value={depthLimit} onChange={setDepthLimit} />
         <Spacer />
-        <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}><SVGPickElement /></SmallButton>
+        <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}>
+          <IconItem height={24} top={1}><SVGPickElement size={24} /></IconItem>
+        </SmallButton>
       </TreeControls>
       <FiberTree
         fiber={fiber}
@@ -206,7 +208,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       </PingProvider>
     ) : null}
     <InspectToggle onClick={toggleOpen}>
-      <Button>{open ? <SVGClose /> : <SVGInspect />}</Button>
+      <Button>{open ? <SVGClose /> : <div style={{margin: -4}}><SVGInspect size={24} /></div>}</Button>
     </InspectToggle>
   </div>);
 }

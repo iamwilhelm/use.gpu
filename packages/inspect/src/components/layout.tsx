@@ -33,7 +33,7 @@ export const SmallButton = styled('button', {
     color: 'var(--LiveInspect-colorTextMuted)',
   },
   '&.active': {
-    background: 'var(--LiveInspect-backgroundActive)',
+    background: 'var(--LiveInspect-backgroundOn)',
     color: 'var(--LiveInspect-colorTextOn)',
   },
 });

@@ -1,11 +1,13 @@
 import React, { PropsWithChildren } from 'react';
 
 type IconRowProps = {
-  height: number,
+  height?: number,
+  gap?: number,
+  top?: number | null,
 }
 
-export const IconItem = ({height = 16, gap = 2, children}: PropsWithChildren<IconRowProps>) => {
-  return <div style={{display: 'inline-block', height, position: 'relative', marginLeft: gap, marginRight: gap, top: 3/16 * height}}>{children}</div>;
+export const IconItem = ({height = 16, gap = 2, top = null, children}: PropsWithChildren<IconRowProps>) => {
+  return <div style={{display: 'inline-block', height, position: 'relative', marginLeft: gap, marginRight: gap, top: top ?? (3/16 * height)}}>{children}</div>;
 };
 
 export const IconRow = ({height = 16, gap = 4, children}: PropsWithChildren<IconRowProps>) => {
@@ -124,11 +126,12 @@ export const SVGAtom = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGInspect = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGInspect = ({color = '#fff', size = 16}) => (
+  <div style={{display: 'inline-block', width: size, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
+      height={size}
     >
     <path d="M15.3,13.5l-4.7-4.7c0.4-0.8,0.7-1.7,0.7-2.6c0-3-2.4-5.4-5.4-5.4c-3,0-5.4,2.4-5.4,5.4c0,3,2.4,5.4,5.4,5.4
     	c1.1,0,2.1-0.3,3-0.9l4.6,4.6L15.3,13.5z M2.2,6.1C2.2,4,3.9,2.3,6,2.3c2.1,0,3.8,1.7,3.8,3.8C9.9,8.3,8.1,10,6,10
@@ -181,11 +184,12 @@ export const SVGDashboard = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGPickElement = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGPickElement = ({color = '#fff', size = 16}) => (
+  <div style={{display: 'inline-block', width: size, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
+      height={size}
     >
     <g>
     	<path d="M7.1,12.8c-0.4-0.1-0.7-0.2-1.1-0.3C3.8,11.8,2.3,9.3,2.8,7c0.5-2.6,2.7-4.3,5.4-4.2c2.3,0.1,4.4,2.1,4.6,4.4

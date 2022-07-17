@@ -9,6 +9,7 @@
   --LiveInspect-backgroundInactive: #444;
   --LiveInspect-backgroundHover: #555;
   --LiveInspect-backgroundActive: #666;
+  --LiveInspect-backgroundOn: rgba(70, 180, 220, 1.0);
 
   --LiveInspect-trackBackground: #666;
   --LiveInspect-trackActive: #aaa;
@@ -30,7 +31,7 @@
   --LiveInspect-colorText: #ddd;
   --LiveInspect-colorTextHover: #eee;
   --LiveInspect-colorTextActive: #fff;
-  --LiveInspect-colorTextOn: rgba(70, 180, 220, 1.0);
+  --LiveInspect-colorTextOn: #fff;
 
   --LiveInspect-colorTextLevel1: rgba(255, 255, 255, 1.0);
   --LiveInspect-colorTextLevel2: rgba(255, 255, 255, 0.93);

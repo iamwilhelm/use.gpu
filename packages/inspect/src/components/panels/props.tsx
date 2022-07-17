@@ -7,10 +7,9 @@ import { styled as _styled } from '@stitches/react';
 import React, { useState } from 'react';
 import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from '../layout';
 import { usePingContext } from '../ping';
+import { IconItem, SVGChevronDown, SVGChevronRight } from '../svg';
 
 const styled: any = _styled;
-
-const ICON = (s: string) => <span className="m-icon">{s}</span>
 
 type PropsProps = {
   fiber: LiveFiber<any>,
@@ -168,7 +167,7 @@ export const inspectObject = (
     const expandable = typeof object[k] === 'object' && object[k];
     const expanded = !!state[key];
 
-    const icon = expanded !== false ? ICON('expand_more') : ICON('chevron_right') ;
+    const icon = <IconItem height={16} top={2}>{expanded !== false ? <SVGChevronDown /> : <SVGChevronRight />}</IconItem>;
     const prefix = expandable ? icon : '';
     
     const onClick = expandable ? (e: any) => {

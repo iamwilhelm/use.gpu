@@ -44,7 +44,7 @@ export const RustText = (): RustTextAPI => {
     let max = 0;
 
     const {
-      family = 'sans-serif',
+      family = '',
       weight = 400,
       style = 'normal',
     } = font;

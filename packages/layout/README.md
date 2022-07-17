@@ -12,6 +12,35 @@ yarn add @use-gpu/layout
 
 Absolute, Block, Flex, Inline, Overflow.
 
+## Example
+
+How to center text inside a centered box. Yes, horizontally and vertically. Wow.
+
+```tsx
+return (
+  <Flat>
+
+    <Draw>
+      <Pass>
+        <UI>
+          
+          <Flex width="100%" height="100%" align="center">
+            <Flex width={500} height={150} fill="#3090ff" align="center">
+
+              <Inline>
+                <Text weight="black" size={48} color={[1, 1, 1, 1]}>-~ Use.GPU ~-</Text>
+              </Inline>
+
+            </Flex>
+          </Flex>
+
+        </UI>            
+      </Pass>
+    </Draw>
+
+  </Flat>
+);
+```
 
 ## Colofon
 

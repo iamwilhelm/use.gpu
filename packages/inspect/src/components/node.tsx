@@ -43,10 +43,10 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   const yeet = type === YEET;
   const react = !!__inspect?.react;
 
-  const suffix1 = yeet ? <SVGYeet key="yeet" /> : null;
-  const suffix2 = react ? <SVGAtom key="atom" /> : null;
-  const suffix3 = !__inspect?.layout && __inspect?.setHovered ? <SVGHighlightElement key="layout" /> : null;
-  const suffix4 = __inspect?.layout ? <SVGDashboard key="dash" /> : null;
+  const suffix1 = yeet ? <SVGYeet key="yeet" title="Yeet" /> : null;
+  const suffix2 = react ? <SVGAtom key="atom" title="React" /> : null;
+  const suffix3 = !__inspect?.layout && __inspect?.setHovered ? <SVGHighlightElement key="layout" title="Highlight" /> : null;
+  const suffix4 = __inspect?.layout ? <SVGDashboard key="dash" title="Layout" /> : null;
 
   const icons = [suffix1, suffix2, suffix3, suffix4].filter(x => !!x);
 

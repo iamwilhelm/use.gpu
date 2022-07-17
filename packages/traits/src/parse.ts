@@ -259,7 +259,8 @@ export const parseWeight = makeParseMapOrValue({
   'semi-bold': 600,
   'bold': 700,
   'extra-bold': 800,
-  'ultra-bold': 900,
+  'black': 900,
+  'extra-black': 900,
 }, 'normal');
 
 export const parseAxes   = makeParseBasis('xyzw');

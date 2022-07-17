@@ -11,13 +11,15 @@ export const IconItem = ({height = 16, gap = 2, top = null, children}: PropsWith
 };
 
 export const IconRow = ({height = 16, gap = 4, children}: PropsWithChildren<IconRowProps>) => {
-  const render = children.length ? children.flatMap((c, i) => [<span key={i.toString()} style={{paddingLeft: gap}} />, c]) : children;
+  if (!children) return null;
+
+  const render = Array.isArray(children) ? children.flatMap((c, i) => [<span key={i.toString()} style={{paddingLeft: gap}} />, c]) : children;
   
   return <div style={{display: 'inline-block', height, position: 'relative', top: 3/16 * height}}>{render}</div>;
 };
 
-export const SVGNextDown = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGNextDown = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
       viewBox="0 0 16 16"
@@ -46,8 +48,8 @@ export const SVGNextDown = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGChevronDown = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGChevronDown = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
       viewBox="0 0 16 16"
@@ -57,8 +59,8 @@ export const SVGChevronDown = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGChevronRight = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGChevronRight = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
       viewBox="0 0 16 16"
@@ -68,8 +70,8 @@ export const SVGChevronRight = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGNextOpen = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGNextOpen = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
       viewBox="0 0 16 16"
@@ -80,8 +82,8 @@ export const SVGNextOpen = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGNextClosed = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGNextClosed = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
       viewBox="0 0 16 16"
@@ -96,8 +98,8 @@ export const SVGNextClosed = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGAtom = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGAtom = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
       viewBox="0 0 16 16"
@@ -126,8 +128,8 @@ export const SVGAtom = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGInspect = ({color = '#fff', size = 16}) => (
-  <div style={{display: 'inline-block', width: size, height: 0}}>
+export const SVGInspect = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: size, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
@@ -142,11 +144,12 @@ export const SVGInspect = ({color = '#fff', size = 16}) => (
   </div>
 );
 
-export const SVGClose = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGClose = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
+      height={size}
     >
     <rect x="6.6" y="1" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -3.3137 8)" width="2.8" height="14.1"/>
     <rect x="6.6" y="1" transform="matrix(0.7071 0.7071 -0.7071 0.7071 8 -3.3137)" width="2.8" height="14.1"/>
@@ -155,11 +158,12 @@ export const SVGClose = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGYeet = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGYeet = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
+      height={size}
     >
     <g>
     <path d="M9,2.6c1.8,1.8,3.6,3.6,5.3,5.3c-1.8,1.8-3.5,3.6-5.3,5.4C9,9.8,9,6.2,9,2.6z"/>
@@ -171,11 +175,12 @@ export const SVGYeet = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGDashboard = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGDashboard = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
+      height={size}
     >
     <rect x="2" y="2" width="4" height="12"/>
     <rect x="8" y="2" width="6" height="4"/>
@@ -184,8 +189,8 @@ export const SVGDashboard = ({color = '#fff'}) => (
   </div>
 );
 
-export const SVGPickElement = ({color = '#fff', size = 16}) => (
-  <div style={{display: 'inline-block', width: size, height: 0}}>
+export const SVGPickElement = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: size, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
@@ -204,11 +209,12 @@ export const SVGPickElement = ({color = '#fff', size = 16}) => (
   </div>
 );
 
-export const SVGHighlightElement = ({color = '#fff'}) => (
-  <div style={{display: 'inline-block', width: 16, height: 0}}>
+export const SVGHighlightElement = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"
       style={{fill: 'currentColor'}}
   	  viewBox="0 0 16 16"
+      height={size}
     >
     <g>
     	<path d="M12.9,8c0,0.7,0,1.4,0,2.1c0,0.5-0.2,0.8-0.6,1c-1.2,0.7-2.6,1.4-3.8,2.1c-0.3,0.2-0.7,0.2-1,0c-1.2-0.7-2.6-1.4-3.8-2.1

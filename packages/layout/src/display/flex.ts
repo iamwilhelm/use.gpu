@@ -101,5 +101,5 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
   };
 
   const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
-  return children ? gather(children, Resume) : null;
+  return c ? gather(c, Resume) : null;
 }, 'Flex');

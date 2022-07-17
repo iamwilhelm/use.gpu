@@ -1,7 +1,9 @@
-import path from 'path';
+const path = require('path');
 
-export default {
-  mode: 'development',
+const env = process.env.NODE_ENV ?? 'development';
+
+module.exports =  {
+  mode: env,
   entry: './src/index.tsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -26,8 +28,13 @@ export default {
         test: /\.wgsl$/i,
         use: ['@use-gpu/wgsl-loader'],
       },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
+  devtool: env === 'development' ? 'eval-source-map' : false,
   devServer: {
     publicPath: '/dist/',
     contentBase: path.join(__dirname, 'public'),

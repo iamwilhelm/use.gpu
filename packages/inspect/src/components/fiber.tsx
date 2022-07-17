@@ -46,8 +46,8 @@ type FiberReactNodeProps = {
 type TreeExpandProps = {
   expand: boolean,
   onToggle: (e: any) => void,
-  openIcon?: string,
-  closedIcon?: string,
+  openIcon?: any,
+  closedIcon?: any,
 }
 
 // Get rendered-by depth by tracing `by` props up the tree

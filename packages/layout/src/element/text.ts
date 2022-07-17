@@ -3,6 +3,7 @@ import type { Point4 } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Base, InlineLine } from '../types';
 
+import { useProp, parseColor, parseNumber } from '@use-gpu/traits';
 import { keyed, yeet, useFiber } from '@use-gpu/live';
 
 import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench';
@@ -20,6 +21,7 @@ export type TextProps = {
   fill?: Point4,
   */
   
+  opacity?: number,
   color?: Point4,
   expand?: number,
 
@@ -46,7 +48,6 @@ export const Text: LiveComponent<TextProps> = (props) => {
     family,
     style,
     weight,
-    color = BLACK,
     lineHeight,
     detail,
     inline,
@@ -63,6 +64,9 @@ export const Text: LiveComponent<TextProps> = (props) => {
   const {spans, glyphs, breaks} = useFontText(font, strings, size);
   const height = useFontHeight(font, size, lineHeight);
 
+  const color = useProp(props.color, parseColor, BLACK);
+  const opacity = useProp(props.opacity, parseNumber, 1);
+
   const {id} = useFiber();
   return yeet({
     spans,
@@ -73,6 +77,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
         id,
         font,
         color,
+        opacity,
         size,
         detail,
         spans,

@@ -1,16 +1,19 @@
-import React, { LC } from '@use-gpu/live';
+import React, { LC, useFiber } from '@use-gpu/live';
 
 import { HTML } from '@use-gpu/react';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
-import { PanControls, Flat, Draw, Pass } from '@use-gpu/workbench';
-import { UI, Layout, Flex, Inline, Text } from '@use-gpu/layout';
+import { DebugProvider, FontLoader, PanControls, Flat, Draw, Pass } from '@use-gpu/workbench';
+import { UI, Layout, Flex, Block, Inline, Text } from '@use-gpu/layout';
+
+import { UseInspect } from '@use-gpu/inspect';
+import '@use-gpu/inspect/theme.css';
 
 import { makeFallback } from './fallback';
 
 const FONTS = [
   {
     family: 'Lato',
-    weight: 400,
+    weight: 'black',
     style: 'normal',
     src: '/Lato-Black.ttf',
   },
@@ -20,43 +23,68 @@ export const App: LC = () => {
   
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;
-  
+
+  // This is for the UseInspect inspector only
+  const fiber = useFiber();
+
   return (
-    <WebGPU
-      fallback={(error: Error) => <HTML container={inner}>{makeFallback(error)}</HTML>}
-    >
-      <AutoCanvas
-        selector={'#use-gpu .canvas'}
-        samples={4}
+    <UseInspect fiber={fiber} context={DebugProvider}>
+
+      {/* WebGPU Canvas with a font */}
+      <WebGPU
+        fallback={(error: Error) => <HTML container={inner}>{makeFallback(error)}</HTML>}
       >
-        <FontLoader fonts={FONTS}>
+        <AutoCanvas
+          selector={'#use-gpu .canvas'}
+          samples={4}
+        >
+          <FontLoader fonts={FONTS}>
       
-          <PanControls
-            render={(x, y, zoom) =>
-              <Flat x={x} y={y} zoom={zoom}>
+            {/* 2D pan controls + view */}
+            <PanControls
+              render={(x, y, zoom) =>
+                <Flat x={x} y={y} zoom={zoom}>
 
-                <Draw>
-                  <Pass>
-                    <UI>
+                  {/* Render pass */}
+                  <Draw>
+                    <Pass>
 
-                      <Layout>
-                        <Flex width="100%" height="100%" align="center">
-                          <Flex width="300" height="150" fill="#3090ff">
-                            <Inline><Text weight="black" size={72} color="#ffffff">-*~&lt; Use.GPU &gt;~*-</Text></Inline>
+                      {/* 2D Layout */}
+                      <UI>
+                        <Layout>
+          
+                          {/* Flex box */}
+                          <Flex width="100%" height="100%" align="center">
+                            <Flex width={500} height={150} fill="#3090ff" align="center" direction="y">
+                              <Inline align="center">
+                                <Text weight="black" size={48} color="#ffffff">-~ Use.GPU ~-</Text>
+                              </Inline>
+                              <Inline align="center">
+                                <Text weight="black" size={16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
+                              </Inline>
+                              <Inline align="center">
+                                <Text weight="black" height={2} size={1} color="#ffffff" opacity={0.5}>Zoom Me</Text>
+                              </Inline>
+                              <Inline align="center" snap={false}>
+                                <Text weight="black" height={1} size={1/16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
+                              </Inline>
+                            </Flex>
                           </Flex>
-                        </Flex>
-                      </Layout>
 
-                    </UI>            
-                  </Pass>
-                </Draw>
+                        </Layout>
+                      </UI>            
 
-              </Flat>
-            }
-          />
+                    </Pass>
+                  </Draw>
 
-        </FontLoader>      
-      </AutoCanvas>
-    </WebGPU>
+                </Flat>
+              }
+            />
+
+          </FontLoader>      
+        </AutoCanvas>
+      </WebGPU>
+
+    </UseInspect>
   );
 };

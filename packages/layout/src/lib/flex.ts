@@ -106,6 +106,9 @@ export const fitFlex = (
   const renders = [] as LayoutRenderer[];
   const pickers = [] as (LayoutPicker | null | undefined)[];
 
+  const rowIndex = [] as number[];
+  const flowEls = [] as LayoutElement[];
+
   const cursor = makeFlexCursor(spaceMain, alignMain, wrap);
   
   for (const el of els) if (!el.absolute) {
@@ -132,9 +135,11 @@ export const fitFlex = (
 
     if (snap) basis = Math.round(basis);
     cursor.push(basis!, m, gapMain, grow || 0, shrink || 0);
+    flowEls.push(el);
   }
   
   let caretCross = 0;
+  let crossIndex = 0;
   const maxMain = cursor.gather((flexed, start, end, gap, lead) => {    
     let caretMain = lead;
     let maxCross = 0;
@@ -142,7 +147,7 @@ export const fitFlex = (
     const cc = isSnap ? Math.round(caretCross) : caretCross;
 
     for (let i = start; i < end; ++i) {
-      const {margin, fit, ratioX, ratioY} = els[i];
+      const {margin, fit, ratioX, ratioY} = flowEls[i];
       const [ml, mt, mr, mb] = margin;
 
       const mx = ml + mr;
@@ -171,23 +176,63 @@ export const fitFlex = (
     }
 
     for (let i = start; i < end; ++i) {
-      const {flex, margin} = els[i];
+      const {flex, margin} = flowEls[i];
       const [ml, mt, mr, mb] = margin;
       const m = isX ? ml + mr : mt + mb;
 
       const resolvedAnchor = flex ?? anchor;
       const [gap, lead] = getAlignmentSpacing(maxCross - sizes[i][isX ? 1 : 0] - m, 1, false, resolvedAnchor as any);
       offsets[i][isX ? 1 : 0] += lead;
+
+      rowIndex[i] = crossIndex;
     }
     
     caretCross += maxCross + gapCross;
+    crossIndex++;
   });
   caretCross -= gapCross;
-  
+
+  if (spaceCross != null) {
+    const crossSlack = Math.max(0, spaceCross - caretCross);
+    if (crossSlack) {
+      const [gap, lead] = getAlignmentSpacing(crossSlack, crossIndex, false, alignCross);
+
+      let i = 0;
+      for (let offset of offsets) {
+        offset[isX ? 1 : 0] += rowIndex[i++] * gap + lead;
+      }
+    }
+    caretCross = spaceCross;
+  }
+
   const size = [
     isX ? (containX ?? maxMain) : caretCross,
     isX ? caretCross : (containY ?? maxMain),
   ] as Point;
+
+  for (const el of els) if (el.absolute) {
+    const {margin, fit, under} = el;
+    const [ml, mt, mr, mb] = margin;
+
+    const into = size.slice() as Point;
+    into[0] -= ml + mr;
+    into[1] -= mt + mb;
+
+    const {render, pick, size: fitted} = fit(into);
+    
+    if (under) {
+      sizes.unshift(fitted);
+      renders.unshift(render);
+      pickers.unshift(pick);
+      offsets.unshift([ml, mt]);
+    }
+    else {
+      sizes.push(fitted);
+      renders.push(render);
+      pickers.push(pick);
+      offsets.push([ml, mt]);
+    }
+  }
 
   return {
     size,

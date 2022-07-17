@@ -34,7 +34,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
   const debug = useOne(() => ({layout: {inspect: layout}}), layout);
 
   return fragment([
-    use(provider, {debug, children}),
+    provider ? use(provider, {debug, children}) : children,
     active ? use(HTML, {
       container,
       style: STYLE,

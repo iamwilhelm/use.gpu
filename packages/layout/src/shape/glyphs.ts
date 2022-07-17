@@ -14,6 +14,7 @@ export type GlyphsProps = {
   id: number,
 
   color?: Point4,
+  opacity?: number,
   size?: number,
   detail?: number,
   expand?: number,
@@ -34,6 +35,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   const {
     id,
     color = BLACK,
+    opacity = 1,
     detail,
     expand = 0,
     size = 16,
@@ -56,6 +58,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     const adjust = size / (detail ?? size);
     const radius = getRadius();
     const scale = getScale(detail ?? size) * adjust;
+
+    const fill = color.slice();
+    fill[3] *= opacity;
   
     const rectangles = [] as number[];
     const uvs = [] as number[];
@@ -127,7 +132,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       // macOS-style font bleed
       border: [expand, Math.min(size / 32, 1.0) * 0.25, 0, 0],
       sdf: [radius, scale, size, 0],
-      fill: color,
+      fill,
       texture: SDF_FONT_ATLAS,
       count,
       clip,

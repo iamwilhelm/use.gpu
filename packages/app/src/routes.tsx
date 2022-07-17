@@ -10,7 +10,7 @@ import { LayoutDisplayPage } from './pages/layout/display';
 import { LayoutAlignPage } from './pages/layout/align';
 import { MeshRawPage } from './pages/mesh/raw';
 import { PlotCartesianPage } from './pages/plot/cartesian';
-import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
+//import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
 import { PlotSphericalPage } from './pages/plot/spherical';
 import { PlotStereographicPage } from './pages/plot/stereographic';
@@ -32,7 +32,7 @@ export const PAGES = [
   {path: "/plot/polar", title: "Plot - Polar"},
   {path: "/plot/spherical", title: "Plot - Spherical"},
   {path: "/plot/stereographic", title: "Plot - Stereographic"},
-  {path: "/plot/implicit-surface", title: "Plot - Implicit Surface"},
+//  {path: "/plot/implicit-surface", title: "Plot - Implicit Surface"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
   {path: "/rtt/feedback", title: "RTT - Feedback"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
@@ -52,7 +52,7 @@ export const makeRoutes = () => ({
   "/plot/polar":            { element: <PlotPolarPage /> },
   "/plot/spherical":        { element: <PlotSphericalPage /> },
   "/plot/stereographic":    { element: <PlotStereographicPage /> },
-  "/plot/implicit-surface": { element: <PlotImplicitSurfacePage /> },
+//  "/plot/implicit-surface": { element: <PlotImplicitSurfacePage /> },
   "/rtt/linear-rgb":        { element: <RTTLinearRGBPage /> },
   "/rtt/feedback":          { element: <RTTFeedbackPage /> },
   "/debug/atlas":           { element: <DebugAtlasPage /> },

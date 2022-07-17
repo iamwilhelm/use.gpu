@@ -21,6 +21,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 
 import { getSurfaceIndex, getSurfaceNormal } from '@use-gpu/wgsl/plot/surface.wgsl';
 
+/** @hidden */
 export type DualContourLayerProps = {
   color?: number[] | TypedArray,
 
@@ -43,6 +44,7 @@ const [SIZE_BINDING, POSITION_BINDING] = bundleToAttributes(getSurfaceIndex);
 
 /** @hidden */
 export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((props: DualContourLayerProps) => {
+  /*
   const {
     color,
 
@@ -77,6 +79,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   //const xf = useApplyTransform(p);
   //const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, xf], defines);
+  */
 
   return null;
 }, 'DualContourLayer');

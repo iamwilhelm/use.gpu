@@ -12,12 +12,14 @@ import {
   useROPTrait,
 } from '../traits';
 
+/** @hidden */
 export type ImplicitSurfaceProps =
   Partial<ColorTrait> &
   Partial<ROPTrait> &
   Partial<VolumeTrait> & {
 };
 
+/** @hidden */
 export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = (props: ImplicitSurfaceProps) => {
   const values = useContext(DataContext) ?? undefined;
 

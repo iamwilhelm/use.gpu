@@ -57,7 +57,7 @@
     "clear": "rm -rf packages/glyph/pkg rust/use-gpu-text/pkg packages/shader/glsl/grammar/glsl.js packages/shader/glsl/grammar/glsl.terms.js packages/shader/wgsl/grammar/wgsl.js packages/shader/wgsl/grammar/wgsl.terms.js",
     "ci-test": "CI=true yarn run jest && yarn run test:import && yarn run test:vite-react",
     "docs": "ts-node ./scripts/getdocs.ts",
-    "publish": "yarn run build && yarn publish --ignore-scripts build/packages/shader --access public && yarn publish --ignore-scripts --access public build/packages/glsl-loader && yarn publish --ignore-scripts --access public build/packages/wgsl-loader",
+    "publish": "./scripts/npm-publish.sh",
     "start": "NODE_ENV=development ts-node node_modules/.bin/webpack serve",
     "test": "MODULE_ENV=cjs jest --watch",
     "test:import": "(cd test/import; yarn run test)",

@@ -28,4 +28,11 @@ export default {
       },
     ],
   },
+  devServer: {
+    publicPath: '/dist/',
+    contentBase: path.join(__dirname, 'public'),
+    compress: true,
+    port: 8080,
+    historyApiFallback: true,
+  }
 };

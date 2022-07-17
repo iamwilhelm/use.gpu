@@ -245,6 +245,11 @@
       "import": "./src/plot/surface.wgsl",
       "require": "./src/plot/surface.wgsl"
     },
+    "./plot/volume.wgsl": {
+      "types": "./src/plot/volume.wgsl.d.ts",
+      "import": "./src/plot/volume.wgsl",
+      "require": "./src/plot/volume.wgsl"
+    },
     "./render/fragment/mesh.wgsl": {
       "types": "./src/render/fragment/mesh.wgsl.d.ts",
       "import": "./src/render/fragment/mesh.wgsl",

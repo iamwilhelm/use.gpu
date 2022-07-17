@@ -1,12 +1,12 @@
-import { LiveFiber, LC, PropsWithChildren } from '@use-gpu/live/types';
+import { LiveFiber, LiveMap, LC, PropsWithChildren } from '@use-gpu/live/types';
 import { TypedArray, StorageSource } from '@use-gpu/core/types';
 import { ShaderModule } from '@use-gpu/shader/types';
 import { Light } from './types';
 
-import { LightContext, LightConsumer } from '../providers/light-provider';
+import { LightContext } from '../providers/light-provider';
 import { useDeviceContext } from '../providers/device-provider';
 
-import { consume, provide, gather, keyed, makeContext, consumeValues, useContext, useConsumer, useMemo, useOne } from '@use-gpu/live';
+import { capture, provide, gather, keyed, makeCapture, captureValues, useCapture, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -16,7 +16,9 @@ import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
 import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
 import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
 
-export const useLightConsumer = (light: Light) => useConsumer(LightConsumer, light);
+export const LightCapture = makeCapture<Light>('LightCapture');
+
+export const useLightCapture = (light: Light) => useCapture(LightCapture, light);
 
 const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
 const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
@@ -66,26 +68,26 @@ export const Lights: LC<LightsProps> = (props: PropsWithChildren<LightsProps>) =
   const render = provide(LightContext, context, children);
 
   // Gather lights from children
-  return consume(LightConsumer, render, (registry: Map<LiveFiber<any>, Light>) => {
-    let lights = consumeValues(registry);
+  return capture(LightCapture, render, (map: LiveMap<Light>) => {
+    let lights = captureValues(map);
 
     if (lights.length > 0) lights = lights.slice(0, max);
     storage.size[0] = storage.length = lights.length;
 
     // Group by transform
     const keyFor = (transform?: ShaderModule | null) => transform ? getBundleKey(transform) : 0;
-    const map = new Map<number, Light[]>();
+    const grouped = new Map<number, Light[]>();
     for (const light of lights) {
       const key = keyFor(light.transform);
-      let list = map.get(key);
-      if (!list) map.set(key, list = []);
+      let list = grouped.get(key);
+      if (!list) grouped.set(key, list = []);
       list.push(light);
     }
 
     // Emit light data
     let base = 0;
-    const render = Array.from(map.keys()).map((key: number) => {
-      const lights = map.get(key)!;
+    const render = Array.from(grouped.keys()).map((key: number) => {
+      const lights = grouped.get(key)!;
       const b = base;
       base += lights.length;
       return keyed(LightEmitter, key, {storage, lights, data, base: b});

@@ -1,12 +1,10 @@
-import { LiveFiber, LC, PropsWithChildren } from '@use-gpu/live/types';
-import { TypedArray, StorageSource } from '@use-gpu/core/types';
-import { ShaderModule } from '@use-gpu/shader/types';
-import { Light } from './types';
+import { LiveElement, LC, PropsWithChildren } from '@use-gpu/live/types';
+import { TypedArray, StorageSource, Emit, Time } from '@use-gpu/core/types';
+import { ShaderModule, ShaderSource } from '@use-gpu/shader/types';
 
-import { LightContext, LightConsumer } from '../providers/light-provider';
 import { useDeviceContext } from '../providers/device-provider';
 
-import { yeet, useMemo, useOne } from '@use-gpu/live';
+import { yeet, useMemo, useNoMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { incrementVersion } from '@use-gpu/live';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
@@ -15,14 +13,12 @@ import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
-type EmitAny = (...args: any[]) => void;
-
 export type StructDataProps = {
   length?: number,
   data?: any[],
 
   sparse?: boolean,
-  expr?: (emit: EmitAny, i: number, n: number) => void,
+  expr?: (emit: Emit, i: number, n: number, t?: Time) => void,
 
   format: ShaderModule,
   live?: boolean,

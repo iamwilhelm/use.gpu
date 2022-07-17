@@ -1,6 +1,5 @@
 import { LC } from '@use-gpu/live/types';
-import { DataField, Emit, RenderPassMode } from '@use-gpu/core/types';
-import { Time } from '@use-gpu/workbench/types';
+import { DataField, Emit, RenderPassMode, Time } from '@use-gpu/core/types';
 
 import React from '@use-gpu/live/jsx';
 import { use } from '@use-gpu/live';

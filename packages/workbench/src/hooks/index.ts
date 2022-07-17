@@ -4,7 +4,7 @@ export * from './useBoundSource';
 export * from './useBufferedSize';
 export * from './useCombinedTransform';
 export * from './useDataBinding';
-export * from './useDerivedSource';
+export * from './useLambdaSource';
 export * from './useForceUpdate';
 export * from './useInspectable';
 export * from './useLinkedShader';

@@ -2,7 +2,7 @@ import { LiveComponent, LiveElement } from '@use-gpu/live/types';
 
 import { use, useResource, useNoResource } from '@use-gpu/live';
 import { Picking } from '@use-gpu/workbench';
-import { CursorConsumer } from '@use-gpu/workbench';
+import { CursorProvider } from '@use-gpu/workbench';
 
 import { makeOrAdoptCanvas } from '../web';
 import { AutoSize } from './auto-size';
@@ -47,7 +47,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
     use(DOMEvents, {
       element: canvas,
       children:
-        use(CursorConsumer, {
+        use(CursorProvider, {
           element: canvas,
           children,
         })

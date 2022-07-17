@@ -1,5 +1,5 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
-import { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter } from '@use-gpu/core/types';
+import { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time } from '@use-gpu/core/types';
 import { ShaderSource } from '@use-gpu/shader/types';
 
 import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
@@ -28,7 +28,7 @@ export type RawDataProps = {
   data?: number[] | TypedArray,
 
   sparse?: boolean,
-  expr?: Emitter,
+  expr?: Emitter<Time>,
   items?: number,
   interleaved?: boolean,
 

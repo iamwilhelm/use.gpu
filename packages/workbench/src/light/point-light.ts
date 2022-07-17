@@ -4,7 +4,7 @@ import { parseColor, parseNumber, parseMatrix, parsePosition, useProp } from '@u
 
 import { useMemo } from '@use-gpu/live';
 
-import { useLightConsumer } from './lights';
+import { useLightCapture } from './lights';
 import { useTransformContext } from '../providers/transform-provider';
 
 export type PointLightProps = {
@@ -32,6 +32,6 @@ export const PointLight: LiveComponent<PointLightProps> = (props: PointLightProp
     transform,
   }), [position, size, color, intensity]);
 
-  useLightConsumer(light);
+  useLightCapture(light);
   return null;
 };

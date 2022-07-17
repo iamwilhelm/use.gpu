@@ -61,8 +61,8 @@ const hookToObject = (
   if (type === Hook.CONTEXT) {
     return {context: b?.displayName};
   }
-  if (type === Hook.CONSUMER) {
-    return {consumer: b?.displayName};
+  if (type === Hook.CAPTURE) {
+    return {capture: b?.displayName};
   }
   if (type === Hook.VERSION) {
     return {version: b, value: a};

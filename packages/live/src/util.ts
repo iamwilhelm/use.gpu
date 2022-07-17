@@ -9,9 +9,9 @@ export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
 Notifies the bound listener once after running all actions. */
 export const makeActionScheduler = (
   request: (flush: ArrowFunction) => void,
-  onFlush: (as: Action<any>[]) => void,
+  onFlush: (as: Action[]) => void,
 ) => {
-  const queue = [] as Action<any>[];
+  const queue = [] as Action[];
 
   let pending = false;
 

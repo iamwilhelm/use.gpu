@@ -10,6 +10,8 @@ export type PropsWithChildren<P> = P & { children?: string | LiveNode<any> };
 export type LiveComponent<P = object> = (props: PropsWithChildren<P>) => any;
 export type Component<P = object> = LiveComponent<P>;
 export type LC<P = object> = LiveComponent<P>;
+export type RefObject<T> = { current: T | null };
+export interface MutableRefObject<T> { current: T; };
 
 export type ReactElementInterop = {
   type: any,
@@ -58,18 +60,17 @@ export enum Hook {
   CALLBACK = 3,
   RESOURCE = 4,
   CONTEXT = 5,
-  CONSUMER = 6,
+  CAPTURE = 6,
   VERSION = 7,
-  MAP = 8,
 };
 
 // Deferred actions
 export type Task = () => void;
-export type Action<F extends Function> = {
-  fiber: LiveFiber<F>,
+export type Action = {
+  fiber: LiveFiber<any>,
   task: Task,
 };
-export type Dispatcher = (as: Action<any>[]) => void;
+export type Dispatcher = (as: Action[]) => void;
 
 // Render callbacks
 export type OnFiber<T = any> = (fiber: LiveFiber<any>) => T;
@@ -83,7 +84,9 @@ export type RenderCallbacks = {
 };
 
 // User=defined context
-export type LiveContext<T> = { initialValue?: T, displayName?: string };
+export type LiveContext<T> = { initialValue?: T, displayName?: string, context?: true, capture?: false };
+export type LiveCapture<T> = { displayName?: string, capture?: true, context?: false };
+export type LiveMap<T> = Map<LiveFiber<any>, T>;
 
 // Fiber data structure
 export type LiveFiber<F extends Function> = FunctionCall<F> & {
@@ -134,8 +137,8 @@ export type FiberContext = {
   roots: ContextRoots,
 };
 
-export type ContextValues = Map<LiveContext<any>, any>;
-export type ContextRoots = Map<LiveContext<any>, LiveFiber<any>>;
+export type ContextValues = Map<LiveContext<any> | LiveCapture<any>, any>;
+export type ContextRoots = Map<LiveContext<any> | LiveCapture<any>, LiveFiber<any>>;
 
 // Fiber yeet state
 export type FiberYeet<A, B> = {

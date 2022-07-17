@@ -1,13 +1,8 @@
 import { LiveComponent, LiveElement } from '@use-gpu/live/types';
+import { Time } from '@use-gpu/core/types';
 import { provide, makeContext, useContext, useNoContext } from '@use-gpu/live';
 
-export type Time = TimeContextProps;
-
-export type TimeContextProps = {
-  timestamp: number,
-  elapsed: number,
-  delta: number,
-};
+export type TimeContextProps = Time;
 
 export const TimeContext = makeContext<TimeContextProps>({
   timestamp: 0,

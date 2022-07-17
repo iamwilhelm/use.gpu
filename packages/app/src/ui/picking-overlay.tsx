@@ -4,7 +4,7 @@ import { LC } from '@use-gpu/live/types';
 import {
   Flat,
   PickingContext,
-  useBoundShader, useDerivedSource,
+  useBoundShader, useLambdaSource,
 } from '@use-gpu/workbench';
 import {
   UI, Layout, Absolute, Block, Inline, Text,
@@ -37,7 +37,7 @@ export const PickingOverlay: LC = () => {
   `;
   const BINDINGS = bundleToAttributes(colorizeShader);
   const boundShader = useBoundShader(colorizeShader, BINDINGS, [() => pickingSource.size, pickingSource]);
-  const textureSource = useDerivedSource(boundShader, pickingSource);
+  const textureSource = useLambdaSource(boundShader, pickingSource);
 
   const scale = 0.5;
 

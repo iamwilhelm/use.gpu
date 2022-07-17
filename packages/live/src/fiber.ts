@@ -4,7 +4,7 @@ import {
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
 
-import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CONSUME, SUSPEND } from './builtin';
+import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND } from './builtin';
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction } from './util';
@@ -189,7 +189,7 @@ export const renderFiber = <F extends ArrowFunction>(
   // These built-ins that are explicitly mounted as sub-fibers,
   // so as to not collide with the parent state.
   if      ((f as any) === PROVIDE) return provideFiber(fiber);
-  else if ((f as any) === CONSUME) return consumeFiber(fiber);
+  else if ((f as any) === CAPTURE) return captureFiber(fiber);
   else if ((f as any) === DETACH)  return detachFiber(fiber);
 
   const LOG = LOGGING.fiber;
@@ -528,7 +528,7 @@ export const reduceFiberValues = <R>(
     if (!yeeted) throw new Error("Reduce without aggregator");
 
     if (!self) {
-      if (fiber.next && fiber.f !== CONSUME) return reduce(fiber.next);
+      if (fiber.next && fiber.f !== CAPTURE) return reduce(fiber.next);
       if (yeeted.value !== undefined) return yeeted.value;
     }
 
@@ -568,7 +568,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   if (!yeeted) throw new Error("Reduce without aggregator");
 
   if (!self) {
-    if (fiber.next && fiber.f !== CONSUME) return gatherFiberValues(fiber.next);
+    if (fiber.next && fiber.f !== CAPTURE) return gatherFiberValues(fiber.next);
     if (yeeted.value !== undefined) return yeeted.value;
   }
 
@@ -612,7 +612,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
   if (!self) {
-    if (fiber.next && fiber.f !== CONSUME) return multiGatherFiberValues(fiber.next) as any;
+    if (fiber.next && fiber.f !== CAPTURE) return multiGatherFiberValues(fiber.next) as any;
     if (yeeted.value !== undefined) return yeeted.value;
   }
 
@@ -709,6 +709,8 @@ export const provideFiber = <F extends ArrowFunction>(
   let {context: {roots, values}, args: [context, value, calls]} = fiber;
 
   if (roots.get(context) !== fiber) {
+    if (context.capture) throw new Error(`Cannot use capture ${context.displayName} as a context`);
+
     fiber.context = makeContextState(fiber, fiber.context, context, value);
     pingFiber(fiber);
 
@@ -739,20 +741,22 @@ export const provideFiber = <F extends ArrowFunction>(
   inlineFiberCall(fiber, calls);
 }
 
-// Consume values from a co-context on a fiber
-export const consumeFiber = <F extends ArrowFunction>(
+// Capture values from a co-context on a fiber
+export const captureFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   if (!fiber.args) return;
-  let {args: [context, calls, Next]} = fiber;
+  let {args: [capture, calls, Next]} = fiber;
 
   bustFiberDeps(fiber);
   pingFiber(fiber);
 
   if (!fiber.next) {
+    if (capture.context) throw new Error(`Cannot use context ${capture.displayName} as a capture`);
+
     const registry = new Map<LiveFiber<any>, any>();
     const reduction = () => registry;
-    fiber.context = makeContextState(fiber, fiber.context, context, registry);
+    fiber.context = makeContextState(fiber, fiber.context, capture, registry);
 
     const resume = makeFiberContinuation(fiber, reduction);
     fiber.next = makeResumeFiber(fiber, resume);
@@ -834,7 +838,7 @@ export const updateMount = <P extends ArrowFunction>(
   let from = mount?.f;
   let to = newMount?.f;
 
-  if ((from === to) && (from === PROVIDE || from === CONSUME)) {
+  if ((from === to) && (from === PROVIDE || from === CAPTURE)) {
     from = mount?.args?.[0] as any;
     to = newMount?.args?.[0] as any;
   }

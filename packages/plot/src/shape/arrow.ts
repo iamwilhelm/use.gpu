@@ -4,7 +4,7 @@ import { VectorLike } from '@use-gpu/traits/types';
 import { ArrowTrait, ColorTrait, LineTrait, ROPTrait } from '../types';
 
 import { useProp, parsePosition4 } from '@use-gpu/traits';
-import { useBoundShader, useBoundSource, useDerivedSource, useShaderRef, ArrowLayer } from '@use-gpu/workbench';
+import { useBoundShader, useBoundSource, useLambdaSource, useShaderRef, ArrowLayer } from '@use-gpu/workbench';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 

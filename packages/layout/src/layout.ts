@@ -4,10 +4,11 @@ import { Placement } from '@use-gpu/traits/types';
 import { LayoutElement, LayoutPicker } from './types';
 
 import { parsePlacement, useProp } from '@use-gpu/traits';
-import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useConsumer, useFiber, useMemo, useOne } from '@use-gpu/live';
+import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne } from '@use-gpu/live';
 
 import {
-  DebugContext, LayoutContext, MouseContext, WheelContext, ScrollContext, ViewContext, TransformContext,
+  DebugContext, MouseContext, WheelContext, ViewContext,
+  LayoutContext, useTransformContext, useScrollSignal,
   useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
   useBoundShader, useNoBoundShader,
 } from '@use-gpu/workbench';
@@ -70,7 +71,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   const sizes: Point[] = [];
   const offsets: Point[] = [];
 
-  let transform = useContext(TransformContext);
+  let transform = useTransformContext();
 
   // Global X/Y flip
   const flip = useOne(() => [0, 0] as Point);
@@ -167,7 +168,7 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
         const [id, rectangle, onScroll] = picked;
         if (onScroll) onScroll(moveX, moveY);
 
-        useConsumer(ScrollContext);
+        useScrollSignal();
         return;
       }
     }

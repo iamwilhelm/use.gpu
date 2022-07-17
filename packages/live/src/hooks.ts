@@ -1,7 +1,7 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveFiber, LiveContext,
-  DeferredCall, HostInterface, Hook,
+  LiveFunction, LiveFiber, LiveContext, LiveCapture,
+  DeferredCall, HostInterface, Hook, RefObject, MutableRefObject,
 } from './types';
 
 import { bind, bustFiberMemo, getArgCount } from './fiber';
@@ -51,8 +51,8 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
         if (state[i + 1]) useNoContext(state[i + 2]);
         else fiber.pointer += 3;
         break;
-      case Hook.CONSUMER:
-        if (state[i + 1]) useNoConsumer(state[i + 2]);
+      case Hook.CAPTURE:
+        if (state[i + 1]) useNoCapture(state[i + 2]);
         else fiber.pointer += 3;
         break;
     }
@@ -399,18 +399,18 @@ export const useContext = <C>(
 }
 
 /**
- * Yield a value to a consumer from the fiber
+ * Yield a value to a capture from the fiber
  */
-export const useConsumer = <C>(
-  context: LiveContext<C>,
+export const useCapture = <C>(
+  context: LiveCapture<C>,
   value?: any,
 ) => {
   const fiber = useFiber();
 
-  const i = pushState(fiber, Hook.CONSUMER);
+  const i = pushState(fiber, Hook.CAPTURE);
   const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context);
-  if (!root || !root.next) throw new Error(`Consumer '${context.displayName}' was used without being consumed.`);
+  if (!root || !root.next) throw new Error(`Context '${context.displayName}' was used without being captured.`);
 
   const {next} = root;
   if (host) {
@@ -457,16 +457,16 @@ export const useNoContext = <C>(
 }
 
 /**
- * Don't use a consumer from the fiber
+ * Don't use a capture from the fiber
  */
-export const useNoConsumer = <C>(
-  context: LiveContext<C>,
+export const useNoCapture = <C>(
+  context: LiveCapture<C>,
 ) => {
   const fiber = useFiber();
 
-  const i = pushState(fiber, Hook.CONSUMER);
+  const i = pushState(fiber, Hook.CAPTURE);
   const {state, host, context: {values, roots}} = fiber;
-  if (!context) throw new Error(`Consumer is undefined.`);
+  if (!context) throw new Error(`Capture is undefined.`);
 
   const root = roots.get(context)!;
   const next = root.next;
@@ -512,6 +512,17 @@ export const useNoAsync = () => {
   useNoState();
   useNoResource();
 };
+
+/**
+ * Ref emulator
+ */
+interface UseRef {
+  <T>(current?: T | null): RefObject<T>;
+  <T>(current?: T): MutableRefObject<T>;
+  <T = undefined>(): MutableRefObject<T | undefined>;
+}
+export const useRef: UseRef = (<T>(current?: T | null) => useOne(() => ({current}))) as any;
+export const useNoRef = useNoOne;
 
 // Cleanup effect tracker
 // Calls previous cleanup before accepting new one

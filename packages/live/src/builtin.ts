@@ -1,6 +1,6 @@
 import {
   Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveComponent, LiveFiber, LiveContext, LiveElement, LiveNode,
+  LiveFunction, LiveComponent, LiveFiber, LiveCapture, LiveContext, LiveElement, LiveMap, LiveNode,
   FunctionCall, DeferredCall, HostInterface, ArrowFunction,
   ReactElementInterop,
 } from './types';
@@ -28,7 +28,7 @@ export const YEET         = () => {};
 /** @hidden */
 export const PROVIDE      = () => {};
 /** @hidden */
-export const CONSUME      = () => {};
+export const CAPTURE      = () => {};
 /** @hidden */
 export const DEBUG        = () => {};
 /** @hidden */
@@ -43,7 +43,7 @@ export const SUSPEND      = () => {};
 (FENCE        as any).isLiveBuiltin = true;
 (YEET         as any).isLiveBuiltin = true;
 (PROVIDE      as any).isLiveBuiltin = true;
-(CONSUME      as any).isLiveBuiltin = true;
+(CAPTURE      as any).isLiveBuiltin = true;
 (DEBUG        as any).isLiveBuiltin = true;
 (SUSPEND      as any).isLiveBuiltin = true;
 
@@ -181,13 +181,13 @@ export const provide = <T, C>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: PROVIDE, args: [context, value, calls], key, by: getCurrentFiberID()} as any);
 
-/** Consume values from a consumer context. */
-export const consume = <T, C>(
-  context: LiveContext<C>,
+/** Capture values from a Live context. */
+export const capture = <T, C>(
+  context: LiveCapture<C>,
   calls?: LiveNode<any>,
   then?: LiveFunction<(r: T) => void>,
   key?: Key,
-): DeferredCall<() => void> => ({f: CONSUME, args: [context, calls, then], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: CAPTURE, args: [context, calls, then], key, by: getCurrentFiberID()} as any);
 
 /** Component has side-effects, and will re-render even if props object is identical. */
 export const imperative = makeImperativeFunction;
@@ -205,41 +205,43 @@ export interface MakeContext<T> {
 export const makeContext: MakeContext<unknown> = <T>(initialValue?: T | null, displayName?: string) => ({
   initialValue,
   displayName,
+  context: true,
 });
-/** @hidden */
-export const createContext = makeContext;
 
-/** Flatten a consumed value registry into an ordered array. */
-export const consumeFibers = <T>(registry: Map<LiveFiber<any>, T>): [LiveFiber<any>, T][] => {
-  const entries = Array.from(registry.entries());
+/** Make Live capture for holding shared value for child nodes (defaulted, required or optional). */
+export const makeCapture = <T>(displayName?: string): LiveCapture<T> => ({
+  displayName,
+  capture: true,
+});
+
+/** Flatten a captured value map into an ordered array. */
+export const captureFibers = <T>(map: Map<LiveFiber<any>, T>): [LiveFiber<any>, T][] => {
+  const entries = Array.from(map.entries());
   entries.sort((a, b) => compareFibers(a[0], b[0]));
   return entries;
 }
 
-/** Flatten a consumed value registry into an ordered array. */
-export const consumeValues = <T>(registry: Map<LiveFiber<any>, T>): T[] => {
-  const keys = Array.from(registry.keys());
+/** Flatten a captured value map into an ordered array. */
+export const captureValues = <T>(
+  map: LiveMap<T>,
+): T[] => {
+  const keys = Array.from(map.keys());
   keys.sort((a, b) => compareFibers(a, b));
-  return keys.map(k => registry.get(k)!);
+  return keys.map(k => map.get(k)!);
 }
 
-/** Get last node of consumed value registry. */
-export const consumeTail = <T>(
-  registry: Map<LiveFiber<any>, T>,
-): [LiveFiber<any>, T] => {
-  const entries = consumeFibers(registry);
-  return entries[entries.length - 1];
+/** Get last node of captured value map. */
+export const captureLastFiber = <T>(
+  map: LiveMap<T>,
+): [LiveFiber<any>, T] | null => {
+  const keys = Array.from(map.keys());
+  keys.sort((a, b) => compareFibers(a, b));
+  
+  const key = keys[keys.length - 1];
+  return key ? [key, map.get(key)!] : null;
 }
 
-/** Get last value yielded from consumed value registry. */
-export const consumeValue = <T>(
-  registry: Map<LiveFiber<any>, T>,
-): T => consumeTail(registry)?.[1];
-
-/** Iterate over consumed value registry in order. */
-export const forFibers = <T>(
-  registry: Map<LiveFiber<any>, T>,
-  callback: (f: LiveFiber<any>, v: T) => void,
-) => {
-  for (const [f, v] of consumeFibers(registry)) callback(f, v);
-}
+/** Get last value yielded from captured value map. */
+export const captureTail = <T>(
+  map: LiveMap<T>
+): T | null => captureLastFiber(map)?.[1] ?? null;

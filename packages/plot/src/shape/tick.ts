@@ -47,7 +47,7 @@ export const Tick: LiveComponent<TickProps> = (props) => {
   const {zBias} = useROPTrait(props);
 
   const s = useProp(size, parseNumber);
-  const d = useProp(detail, parsePosition4);
+  const d = useProp(detail, parseIntegerPositive);
   const o = useProp(offset, parsePosition4);
 
   const getPosition = useBoundSource(GET_POSITION, positions);

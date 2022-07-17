@@ -334,7 +334,12 @@ export type Tuples<N extends number, T = number> = {
   length: number,
 };
 
-export interface Emitter<T = any> {
+export interface Emitter<T = Time> {
+  (emit: Emit, ...args: any[]): any;
+}
+
+/*
+export interface Emitter<T = Time> {
   (emit: Emit, i: number, props?: T): any;
   (emit: Emit, i: number, j: number, props?: T): any;
   (emit: Emit, i: number, j: number, k: number, props?: T): any;
@@ -345,10 +350,15 @@ export interface Emitter<T = any> {
   (emit: Emit, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, props?: T): any;
   (emit: Emit, ...args: any[]): any;
 };
+*/
 
 export type Emit = (...args: number[]) => void;
 export type Accessor = (o: any) => any;
-
+export type Time = {
+  timestamp: number,
+  elapsed: number,
+  delta: number,
+};
 
 export type ArrayLike = any[] | TypedArray;
 

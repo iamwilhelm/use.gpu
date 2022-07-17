@@ -8,10 +8,11 @@ export type LoggingOptions = {
   fiber: boolean,
 };
 
+/** @hidden */
 export const LOGGING = {
   dispatch: false,
   fiber: false,
-};
+} as Record<string, boolean>;
 
 /** Turn on logging for the Live run-time. Very chatty.
 
@@ -19,7 +20,7 @@ export const LOGGING = {
 - `fiber`: All updates to individual fibers.
 */
 export const setLogging = (options: LoggingOptions) => {
-  for (let k in options) LOGGING[k] = options[k];
+  for (let k in options) LOGGING[k] = (options as any)[k];
 };
 
 export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
@@ -60,10 +61,10 @@ export const formatNodeName = <F extends Function>(_node: LiveElement<F>): strin
     const value = formatValue(context.displayName);
     return `Provide(${value})`;
   }
-  else if (name === 'CONSUME' && args) {
+  else if (name === 'CAPTURE' && args) {
     const [context] = args;
     const value = formatValue(context.displayName);
-    return `Consume(${value})`;
+    return `Capture(${value})`;
   }
   else if (name === 'DETACH' && args) {
     const [call] = args;

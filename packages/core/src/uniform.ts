@@ -290,7 +290,7 @@ export const makeLayoutFiller = (
 ): {
   fill: UniformFiller,
   setData: UniformDataSetter,
-  setValues: UniformValueSetter,
+  setValue: UniformValueSetter,
 } => {
   const {length, attributes} = layout;
 

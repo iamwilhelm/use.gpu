@@ -3,7 +3,7 @@ import { LambdaSource } from '@use-gpu/core/types';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
 import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
-import { useBoundSource, useDataBinding, useDerivedSource } from '@use-gpu/workbench';
+import { useBoundSource, useDataBinding, useLambdaSource } from '@use-gpu/workbench';
 
 import { DataContext } from '../providers/data-provider';
 import { parseAxes, parseAxis } from '@use-gpu/traits';
@@ -56,7 +56,7 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
     };
   }, [data, swizzle]);
 
-  const source = useDerivedSource(getDataOut, getSourceProps);
+  const source = useLambdaSource(getDataOut, getSourceProps);
 
   return useMemo(() => {
     if (render == null && children === undefined) return yeet(source);

@@ -100,14 +100,14 @@ export const renderWithDispatch = (
     LOG && console.log('Rendering Root', formatNode(node));
 
     // Set up batched flush for all actions
-    const flush = (as: Action<any>[]) => {
+    const flush = (as: Action[]) => {
       const fibers = dedupe(as.map(({fiber}) => fiber));
 
       LOG && console.log('----------------------------');
       LOG && console.log('Dispatch to Roots', fibers.map(formatNode), +new Date() - START, 'ms');
       if (!fibers.length) debugger;
 
-      if (fibers.length) renderFibers(host, fibers);
+      if (fibers.length) renderFibers(host!, fibers);
     };
 
     // Make new root
@@ -176,8 +176,8 @@ export const traverseFiber = (fiber: LiveFiber<any>, f: (f: LiveFiber<any>) => v
 const onPaint = getOnPaint();
 
 // Render sync/async/onPaint
-export const renderSync = renderWithDispatch<LiveFiber<any>>();
-export const renderAsync = renderWithDispatch<void>((t: Task) => { setTimeout(t, 0); });
-export const renderOnPaint = renderWithDispatch<void>((t: Task) => { onPaint(t); });
+export const renderSync = renderWithDispatch();
+export const renderAsync = renderWithDispatch((t: Task) => { setTimeout(t, 0); });
+export const renderOnPaint = renderWithDispatch((t: Task) => { onPaint(t); });
 
 export const render = renderSync;

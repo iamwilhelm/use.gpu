@@ -26,6 +26,7 @@ export type DualContourLayerProps = {
 
   range: VectorLike[],
   values?: ShaderSource,
+  normals?: ShaderSource,
   level?: number,
 
   loopX?: boolean,
@@ -69,27 +70,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     return ((s[0] || 1) - +!loopX) * ((s[1] || 1) - +!loopY) * ((s[2] || 1) - +!loopZ) * (s[3] || 1);
   }, sizeExpr);
 
-
   const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY, LOOP_Z: !!loopZ}), [loopX, loopY, loopZ]);
   const indices = useBoundShader(getSurfaceIndex, [SIZE_BINDING], [boundSize], defines);
 
-  const p = useShaderRef(props.position, props.positions);
-  const xf = useApplyTransform(p);
-  const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, xf], defines);
+  const v = useShaderRef(null, props.values);
+
+  //const xf = useApplyTransform(p);
+  //const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, xf], defines);
 
   return null;
-  return use(RawFaces, {
-    position,
-    positions,
-    color,
-    colors,
-
-    indices,
-    normals,
-
-    shaded,
-    count: countExpr,
-    mode,
-    id,
-  });
 }, 'DualContourLayer');

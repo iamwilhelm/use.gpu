@@ -98,8 +98,9 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
 
     const onWheel = (e: any) => {
       const {
-        deltaMode, deltaX, deltaY,
         clientX, clientY,
+        deltaMode, deltaX, deltaY,
+        detail, axis, HORIZONTAL_AXIS,
         wheelDelta, wheelDeltaX, wheelDeltaY,
       } = (e as any);
 
@@ -109,12 +110,12 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       let spinY = 0;
 
       // Wheel -> Spin
-      if ('detail'      in event) { spinY =  event.detail; }
-      if ('wheelDelta'  in event) { spinY = -event.wheelDelta  / WHEEL_STEP; }
-      if ('wheelDeltaX' in event) { spinX = -event.wheelDeltaX / WHEEL_STEP; }
-      if ('wheelDeltaY' in event) { spinY = -event.wheelDeltaY / WHEEL_STEP; }
+      if ('detail'      in e) { spinY =  detail; }
+      if ('wheelDelta'  in e) { spinY = -wheelDelta  / WHEEL_STEP; }
+      if ('wheelDeltaX' in e) { spinX = -wheelDeltaX / WHEEL_STEP; }
+      if ('wheelDeltaY' in e) { spinY = -wheelDeltaY / WHEEL_STEP; }
 
-      if ('axis' in event && event.axis === event.HORIZONTAL_AXIS) {
+      if (axis != null && axis === e) {
         spinX = spinY;
         spinY = 0;
       }
@@ -124,9 +125,9 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       moveY = spinY * PIXEL_STEP;
 
       // Wheel -> Move
-      const multiplier = DELTA_MULTIPLIER[event.deltaMode || 0];
-      if ('deltaX' in event) { moveX = event.deltaX * multiplier; }
-      if ('deltaY' in event) { moveY = event.deltaY * multiplier; }
+      const multiplier = DELTA_MULTIPLIER[deltaMode || 0];
+      if ('deltaX' in e) { moveX = deltaX * multiplier; }
+      if ('deltaY' in e) { moveY = deltaY * multiplier; }
 
       // Move -> Spin
       spinX ||= Math.sign(moveX);

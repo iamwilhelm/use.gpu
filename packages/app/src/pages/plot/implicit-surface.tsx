@@ -1,5 +1,5 @@
 import { LC } from '@use-gpu/live/types';
-import { Emitter, StorageSource } from '@use-gpu/core/types';
+import { Emit, StorageSource } from '@use-gpu/core/types';
 
 import { use } from '@use-gpu/live';
 import React from '@use-gpu/live/jsx';
@@ -19,10 +19,10 @@ import {
 
 let t = 0;
 
-const EXPR_POSITION = (emit: Emitter, x: number, y: number, z: number) => {
+const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number) => {
   emit(x, y, z);
 }
-const EXPR_VALUE = (emit: Emitter, x: number, y: number, z: number) => {
+const EXPR_VALUE = (emit: Emit, x: number, y: number, z: number) => {
   emit(Math.cos(x) * Math.cos(y) * Math.cos(z));
 }
 

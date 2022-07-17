@@ -4,7 +4,7 @@ import { parseColor, parseNumber, parsePosition, useProp } from '@use-gpu/traits
 
 import { useMemo } from '@use-gpu/live';
 
-import { useLightConsumer } from './lights';
+import { useLightCapture } from './lights';
 import { useTransformContext } from '../providers/transform-provider';
 
 export type DirectionalLightProps = {
@@ -31,6 +31,6 @@ export const DirectionalLight = (props: DirectionalLightProps) => {
     transform,
   }), [position, color, intensity]);
 
-  useLightConsumer(light);
+  useLightCapture(light);
   return null;
 };

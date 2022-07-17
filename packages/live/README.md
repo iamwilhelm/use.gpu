@@ -10,15 +10,15 @@ yarn add @use-gpu/live
 
 # Live - Reactive Effect Run-time
 
-Live is a reimplementation of the React `<Component>` tree and the hook system. It allows you to use popular reactive patterns to write code beyond UI widgets.
+Live is a reimplementation of the **React `<Component>` tree** and its hook system. It allows you to use popular reactive patterns to write code beyond UI widgets.
+
+Unlike React, Live **does not produce an output DOM**. Components can only render other components, or yield values back to parents.
 
 It's built to serve as the reactive core of Use.GPU, but there is nothing GPU- or graphics-specific about it.
 
-Unlike React, Live does not produce an output DOM. Components can only render other components, or yield values back to parents.
-
 Live is designed to play nice with real React, but shares no code with it.
 
-Non-React extensions:
+**Non-React extensions:**
 - Continuations - Parents run more code after children have rendered
 - Yeet-Reduce - Parents gather values from a tree of children
 - Context Consumers - Context Providers in reverse
@@ -93,23 +93,27 @@ There is also a `children` prop, as well as `key` for items in arrays.
   }, [...dependencies]);
 ```
 
-## Contexts
+## Context Providers
 
 #### Make a context
 
 ```tsx
 import { makeContext } from '@use-gpu/live';
 
-type ContextValue = {
-  foo: number,
-};
+type ContextValue = { foo: number };
+const defaultValue = { foo: 1 };
+const displayName = 'MyContext';
 
-const defaultValue = {
-  foo: 1,
-};
-
-const MyContext = makeContext<ContextValue>(defaultValue, 'MyContext');
+const MyContext = makeContext<ContextValue>(defaultValue, displayName);
 ```
+
+#### Optional vs Required
+
+If `defaultValue` is `undefined`, the context is **required**.
+Its value has type `T`, and will throw an exception if used while missing.
+
+If `defaultValue` is `null`, the context is **optional**.
+Its value has type `T | null` and can be used without being provided.
 
 #### Provide a context
 
@@ -119,22 +123,56 @@ import React, { Provide } from '@use-gpu/live/jsx';
 <Provide context={MyContext} value={value}>...</Provide>
 ```
 
-#### Use a context
+#### Use a value from a context
 
 ```tsx
-import React, { Provide } from '@use-gpu/live/jsx';
-import { provide } from '@use-gpu/live';
+import { useContext } from '@use-gpu/live';
+
+const value = useContext(MyContext);
 ```
 
-#### Optional vs Required
+## Context Captures
 
-If `defaultValue` is `undefined`, the context is required, has type `T`, and will throw an exception if used while missing.
-If `defaultValue` is `null`, the context value has type `T | null` and is optional.
+This is the reverse of a context provider: it collects values from children across a tree.
+
+#### Make a capture
+
+```tsx
+import { makeCapture } from '@use-gpu/live';
+
+type ContextValue = { foo: number };
+const displayName = 'MyContext';
+
+const MyContext = makeCapture<ContextValue>(displayName);
+```
+
+#### Capture values
+
+```tsx
+import React, { Capture } from '@use-gpu/live/jsx';
+import { LiveCapture } from '@use-gpu/live/types';
+import { captureValues } from '@use-gpu/live';
+
+<Capture context={MyContext} then={(map: LiveCapture<T>) => {
+  const values: T[] = captureValues(map);
+}>...</Capture>
+```
+
+The `LiveCapture<T>` maps mounted components to values `T`. The helper `captureValues` will return the values in tree order.
+
+To retrieve the last value only, use `captureTail`.
+
+#### Pass value to a capture
+
+```tsx
+import { useCapture } from '@use-gpu/live';
+
+useCapture(MyCapture, value);
+```
 
 ## Gather / Yeet
 
 Components can render a `Gather` to continue after their children are rendered.
-
 Values yielded by those children are gathered up incrementally, in tree order.
 
 Gather takes two children:
@@ -176,6 +214,7 @@ A nice pattern is to make a component's `render` prop optional. If absent, the c
 
 ```tsx
 <Component render={()}>
+```
 
 ## Native Syntax
 
@@ -209,10 +248,10 @@ provide(MyContext, value, children)
 yeet(value)
 
 // <Gather>
-//   <From />
+//   <Child />
 //   {(value) => { }}
 // </Gather>
-gather(use(From), (value) => { })
+gather(use(Child), (value) => { })
 ```
 
 In native syntax, live components are not limited to a single `props` argument, but can have any number, including 0. The wider type is `LiveFunction` instead of `LiveComponent`.

@@ -5,13 +5,12 @@ import { ArrowFunction } from '@use-gpu/live/types';
 import { resolve } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';
 
-type InputSource = LambdaSource | StorageSource;
 type GetProps = {
   length?: Lazy<number>,
   size?: Lazy<number[]>,
 };
 
-export const useDerivedSource = (shader: ShaderModule, getProps: GetProps) => {
+export const useLambdaSource = (shader: ShaderModule, getProps: GetProps) => {
   return useMemo(() =>
     new Proxy({
       shader,

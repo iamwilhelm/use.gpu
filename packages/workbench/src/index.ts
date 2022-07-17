@@ -1,6 +1,5 @@
 export * from './animate';
 export * from './camera';
-export * from './consumers';
 export * from './data';
 export * from './hooks';
 export * from './layers';

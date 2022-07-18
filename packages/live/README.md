@@ -8,6 +8,8 @@ npm install --save @use-gpu/live
 yarn add @use-gpu/live
 ```
 
+**Docs**: https://usegpu.live/docs/reference-live-@use-gpu-live
+
 # Live - Reactive Effect Run-time
 
 Live is a **reimplementation of the React `<Component>` tree** and its hook system. It allows you to use popular reactive patterns to write code beyond UI widgets.

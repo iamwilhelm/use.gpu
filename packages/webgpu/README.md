@@ -8,6 +8,8 @@ npm install --save @use-gpu/webgpu
 yarn add @use-gpu/webgpu
 ```
 
+**Docs**: https://usegpu.live/docs/reference-components-@use-gpu-webgpu
+
 # Use.GPU - WebGPU / Canvas
 
 

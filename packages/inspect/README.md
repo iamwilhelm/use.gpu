@@ -8,6 +8,8 @@ npm install --save @use-gpu/inspect
 yarn add @use-gpu/inspect
 ```
 
+**Docs**: https://usegpu.live/docs/reference-components-@use-gpu-inspect
+
 # Use.GPU - Live Inspector
 
 Wrap your app's contents in `<UseInspect>`:

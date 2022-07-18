@@ -8,6 +8,8 @@ npm install --save @use-gpu/layout
 yarn add @use-gpu/layout
 ```
 
+**Docs**: https://usegpu.live/docs/reference-components-@use-gpu-layout
+
 # Use.GPU - 2D Layout 
 
 Absolute, Block, Flex, Inline, Overflow.

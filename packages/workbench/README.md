@@ -8,6 +8,8 @@ npm install --save @use-gpu/workbench
 yarn add @use-gpu/workbench
 ```
 
+**Docs**: https://usegpu.live/docs/reference-components-@use-gpu-workbench
+
 # Use.GPU - Reactive Rendering
 
 Foundational set of Live components.

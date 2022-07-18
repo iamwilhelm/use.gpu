@@ -8,6 +8,8 @@ npm install --save @use-gpu/plot
 yarn add @use-gpu/plot
 ```
 
+**Docs**: https://usegpu.live/docs/reference-components-@use-gpu-plot
+
 # Use.GPU - Graphing and Transforms
 
 

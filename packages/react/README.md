@@ -8,6 +8,8 @@ npm install --save @use-gpu/react
 yarn add @use-gpu/react
 ```
 
+**Docs**: https://usegpu.live/docs/reference-components-@use-gpu-react
+
 # Live - React interface
 
 ## `<HTML>` (Live → React)

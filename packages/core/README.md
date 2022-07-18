@@ -8,6 +8,8 @@ npm install --save @use-gpu/core
 yarn add @use-gpu/core
 ```
 
+**Docs**: https://usegpu.live/docs/reference-library-@use-gpu-core
+
 # Use.GPU - Core
 
 This package contains various (non-reactive) helper functions for driving WebGPU.

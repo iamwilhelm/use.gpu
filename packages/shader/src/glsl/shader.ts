@@ -47,7 +47,11 @@ export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArg
 /** ES/CommonJS Transpiler */
 export const transpileGLSL = makeTranspile('glsl', 'glsl', loadModule, compressAST);
 
-/** Templated literal syntax: glsl`...` */
+/** Templated literal syntax:
+
+```tsx
+glsl`...`
+``` */
 export const glsl = (literals: TemplateStringsArray, ...tokens: string[]) => {
   const code = zip(literals, tokens).flat();
   return loadModuleWithCache(code.join(''));

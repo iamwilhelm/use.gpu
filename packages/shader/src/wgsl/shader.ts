@@ -47,7 +47,11 @@ export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArg
 /** ES/CommonJS Transpiler */
 export const transpileWGSL = makeTranspile('wgsl', 'wgsl', loadModule, compressAST);
 
-/** Templated literal syntax: wgsl`...` */
+/** Templated literal syntax:
+
+```tsx
+wgsl`...`
+``` */
 export const wgsl = (literals: TemplateStringsArray, ...tokens: string[]) => {
   const code = zip(literals, tokens).flat();
   return loadModuleWithCache(code.join(''));

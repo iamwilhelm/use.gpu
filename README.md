@@ -6,6 +6,8 @@ It's a **stand-alone Typescript+Rust/WASM library** with its own React-like run-
 
 It has a built-in **shader linker and binding generator**, which means a lot of the tedium of raw GPU programming is eliminated, without compromising on flexibility.
 
+- [**Documentation**](https://usegpu.live)
+
 --
 
 Use.GPU is in the **alpha stage**. Don't expect production-quality code or docs.
@@ -24,62 +26,6 @@ Use.GPU has an incremental architecture, which updates with minimal recomputatio
 **WebGPU is not yet available in mainline browsers, which means you need e.g. Google Chrome Dev to run the example app. You will need to turn on the `chrome://flags/#enable-unsafe-webgpu` flag.**
 
 **Questions? Join Use.GPU Discord**: https://discord.gg/WxtZ28aUC3
-
-## Background
-
-_Why you might want this, see:_
- - [The Case for Use.GPU](https://acko.net/blog/the-case-for-use-gpu/) - What's wrong with GPU programming and how to fix it
-
-_For background, see:_
- - [Climbing Mount Effect](https://acko.net/blog/climbing-mt-effect/) - Effect-based programming
- - [Reconcile All The Things](https://acko.net/blog/reconcile-all-the-things/) - Memoization and reconciliation
- - [Live - Headless React](https://acko.net/blog/live-headless-react/) - Live run-time and WebGPU
- - [Frickin' Shaders with Frickin' Laser Beams](https://acko.net/blog/frickin-shaders-with-frickin-laser-beams/) - Shader closures and linker
-
-![public/cube.png](public/cube.png)
-
-## Example - JSX
-
-On the surface, Use.GPU feels exactly like React, in that you can use `<JSX>` syntax to compose its functional components. React aficionados will be right at home:
-
-([full example](packages/app/src/pages/geometry/data.tsx))
-
-```jsx
-<Draw>
-  <Pass>
-    <Data
-      fields={[
-        ['vec3<f32>', [
-          -5, -2.5, 0,
-          5, -2.5, 0,
-          0, -2.5, -5,
-          0, -2.5, 5,
-        ]],
-        ['i32', [1, 2, 1, 2]],
-      ]}
-      render={([positions, segments]) =>
-        <LineLayer
-          positions={positions}
-          segments={segments}
-          width={5}
-          depth={1}
-          color={[0.125, 0.25, 0.5, 1]}
-        />
-      }
-    />
-  </Pass>
-</Draw>
-```
-
-This will:
-- draw a frame
-- consisting of 1 render pass
-- using data uploaded to the GPU
-- rendered as line segments
-
-Use.GPU has wrappers like `<WebGPU>` and `<AutoCanvas>` to set up a drawing environment, as well as a camera to define the view.
-
-The included demo app contains various showcases of how it can be used.
 
 ## Usage
 

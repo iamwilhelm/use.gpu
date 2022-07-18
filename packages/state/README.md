@@ -17,7 +17,7 @@ Helper library with:
 - JS-value patching
 - JS-value hashing
 
-(not Live / React-specific).
+(not Live / React-specific)
 
 ## Cursors
 
@@ -54,7 +54,7 @@ const cursor = useUpdateState({...});
 const [state, updateState] = cursor;
 ```
 
-To do a lookup `state.foo.bar`, you refine the cursor:
+To do a lookup `state.foo.size`, you refine the cursor:
 
 ```tsx
 const [size, updateSize] = refineCursor(cursor)('foo', 'size');
@@ -62,12 +62,25 @@ const [size, updateSize] = refineCursor(cursor)('foo', 'size');
 
 When you call `updateSize(5)`, this is equivalent to `updateState({foo: {size: 5}})`.
 
-This works as expected, because `useUpdateState` will apply this change to the original state.
-
-The argument to `updateState` is an `@{Update}`, which is like merging on steroids.
+This works as expected, because `useUpdateState` will merge this change into the original state. The argument to `updateState` is an `@{Update}`, which is like merging on steroids.
 
 The merging behavior of an `@{Update}` can be precisely controlled, at the individual field level.
 
+### Defaults
+
+`refineCursor` can accept defaults as a 2nd argument. When it traverses the original value, if it encounters a missing field, it will fill in the one from the default.
+
+When it then applies an update, it will first patch in the defaults, and then make a change. This ensures clean partial patches of missing nested fields.
+
+### Hook
+
+There is a `useRefineCursor` hook which is memoized and allows for repeated lookups into the same state:
+
+```tsx
+const useStateCursor = useRefineCursor(cursor);
+const [size, updateSize] = useStateCursor('foo', 'size');
+const [title, updateTitle] = useStateCursor('foo', 'title');
+```
 
 ## Patching
 
@@ -107,7 +120,7 @@ expect(patch(values, update)).toEqual({ hello: { title: 'world' }, value: 2});
 You can use `$apply` to make custom patching ops, e.g. to append an item to a list:
 
 ```tsx
-const $append = <T>(item: T) => $apply((list: T) => [...list, item]);
+const $append = <T>(item: T) => $apply((list: T[]) => [...list, item]);
   
 updateList($append(item));
 ```
@@ -115,12 +128,12 @@ updateList($append(item));
 ## Hashing
 
 - `@{toHash}` will hash any JS value to a 10-digit base 64 string.
-- `@{toMurmur53}` will hashed any JS value to a 53-bit `number`.
+- `@{toMurmur53}` will hash any JS value to a 53-bit `number`.
 
 ## Keys
 
 - `@{getObjectKey}` assigns a unique, incrementing 53-bit ID to each unique object (uses a `WeakMap`).
-- `@{makeKey}` return a new unique ID from the same set.
+- `@{makeKey}` returns a new unique ID from the same set.
 
 ## Colofon
 

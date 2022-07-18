@@ -78,7 +78,7 @@ This repo is split into the following sub-packages:
 #### **Libraries**
 - [`@use-gpu/core`](packages/core/README.md) - Pure WebGPU + data helpers ✅
 - [`@use-gpu/shader`](packages/shader/README.md) - WGSL shader linker and tree shaker ✅
-- [`@use-gpu/text`](packages/text/README.md) - Rust/WASM ABGlyph wrapper ✅
+- [`@use-gpu/glyph`](packages/glyph/README.md) - Rust/WASM ABGlyph wrapper ✅
 - [`@use-gpu/wgsl`](packages/wgsl/README.md) - .WGSL standard library for Use.GPU ✅
 
 #### **Live**

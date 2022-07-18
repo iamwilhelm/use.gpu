@@ -8,11 +8,11 @@ It has a built-in **shader linker and binding generator**, which means a lot of 
 
 - [**Documentation**](https://usegpu.live)
 
---
+----
 
 Use.GPU is in the **alpha stage**. Don't expect production-quality code or docs.
 
---
+----
 
 The library offers components at different levels of abstraction:
 - All-in 2D/3D plotting (axes, grids, curves, labels, ...)

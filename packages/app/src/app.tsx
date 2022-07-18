@@ -20,7 +20,7 @@ export const App: LC = () => {
 
   const router = useOne(() => (
     <Router>
-      <Routes routes={makeRoutes()} />
+      <Routes routes={makeRoutes()} morph />
       <Routes routes={makePicker(root)} />
     </Router>
   ), root);

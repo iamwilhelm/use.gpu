@@ -362,6 +362,7 @@ export const makeBoxPicker = (
   pickers: (LayoutPicker | null | undefined)[],
   scrollPos?: Point,
   onScroll?: (dx: number, dy: number) => void,
+  pickable: boolean = true,
 ) => (
   x: number,
   y: number,
@@ -402,7 +403,7 @@ export const makeBoxPicker = (
     if (sub) return sub;
   }
 
-  return (!scroll || onScroll) ? [id, [l, t, r, b], onScroll] : null;
+  return pickable && (!scroll || onScroll) ? [id, [l, t, r, b], onScroll] : null;
 };
 
 export const intersectRange = (minA: number, maxA: number, minB: number, maxB: number) => !(minA >= maxB || minB >= maxA);

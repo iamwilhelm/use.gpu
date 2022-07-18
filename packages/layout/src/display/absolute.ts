@@ -61,7 +61,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
         return {
           size,
           render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
-          pick: makeBoxPicker(id, sizes, offsets, pickers),
+          pick: makeBoxPicker(id, sizes, offsets, pickers, undefined, undefined, false),
         };
       };
 

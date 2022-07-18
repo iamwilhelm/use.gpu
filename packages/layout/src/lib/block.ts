@@ -1,5 +1,5 @@
 import type { Point, Point4, Rectangle } from '@use-gpu/core';
-import type { AutoPoint, Direction, LayoutElement, LayoutRenderer, LayoutPicker, Margin } from '../types';
+import type { FitInto, AutoPoint, Direction, LayoutElement, LayoutRenderer, LayoutPicker, Margin } from '../types';
 
 import { isHorizontal, mergeMargin } from './util';
 
@@ -115,7 +115,7 @@ export const getBlockMargin = (
 
 export const fitBlock = (
   els: LayoutElement[],
-  into: AutoPoint,
+  into: FitInto,
   fixed: AutoPoint,
   padding: Point4,
   direction: Direction,
@@ -143,11 +143,13 @@ export const fitBlock = (
     if (!isX && fixed[0] == null && into[0] != null) resolved[0] = into[0];
     if ( isX && fixed[1] == null && into[1] != null) resolved[1] = into[1];
   }
-
+  
   const relativeFit = [
      isX ? null : resolved[0] != null ? resolved[0] - (pl + pr) : null,
     !isX ? null : resolved[1] != null ? resolved[1] - (pt + pb) : null,
-  ] as AutoPoint;
+    (fixed[0] ?? into[2]) - (pl + pr),
+    (fixed[1] ?? into[3]) - (pt + pb),
+  ] as FitInto;
 
   const sizes = [] as Point[];
   const offsets = [] as Point[];
@@ -158,13 +160,15 @@ export const fitBlock = (
     const {margin, fit} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = relativeFit.slice() as AutoPoint;
+    const size = relativeFit.slice() as FitInto;
     if (isX) {
       if (size[1] != null) size[1] -= mt + mb;
     }
     else {
       if (size[0] != null) size[0] -= ml + mr;
     }
+    size[2] -= ml + mr
+    size[3] -= mt + mb;
 
     const {render, pick, size: fitted} = fit(size);
 
@@ -200,9 +204,11 @@ export const fitBlock = (
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = resolved.slice() as Point;
+    const size = [...resolved, resolved[0] ?? into[2], resolved[1] ?? into[3]] as FitInto;
     if (size[0] != null) size[0] -= ml + mr;
     if (size[1] != null) size[1] -= mt + mb;
+    size[2] -= ml + mr;
+    size[3] -= mt + mb;
 
     const {render, pick, size: fitted} = fit(size);
 
@@ -228,9 +234,11 @@ export const fitBlock = (
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = resolved.slice() as Point;
+    const size = [resolved[0]!, resolved[1]!, 0, 0] as Point4;
     size[0] -= ml + mr;
     size[1] -= mt + mb;
+    size[2] = size[0];
+    size[3] = size[1];
 
     const {render, pick, size: fitted} = fit(size);
     
@@ -248,8 +256,6 @@ export const fitBlock = (
     }
   }
   
-  if (resolved[0] === 113) debugger;
-
   return {
     size: resolved,
     sizes,

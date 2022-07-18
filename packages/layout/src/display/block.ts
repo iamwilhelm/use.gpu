@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Point, Point4 } from '@use-gpu/core';
-import type { LayoutElement, AutoPoint, Dimension, Direction, MarginLike, Margin } from '../types';
+import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
@@ -63,18 +63,9 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false);
       if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
-      return yeet({        
-        sizing,
-        margin,
-        grow,
-        shrink,
-        inline,
-        flex,
-        ratioX,
-        ratioY,
-        fit: memoFit((into: AutoPoint) => {
-          const w = width != null ? evaluateDimension(width, into[0], snap) : null;
-          const h = height != null ? evaluateDimension(height, into[1], snap) : null;
+      const fit = (into: FitInto) => {
+          const w = width != null ? evaluateDimension(width, into[2], snap) : null;
+          const h = height != null ? evaluateDimension(height, into[3], snap) : null;
           const fixed = [
             width != null ? w : null,
             height != null ? h : null,
@@ -85,6 +76,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
           inspect({
             layout: {
               into,
+              fixed,
               size,
               sizes,
               offsets,
@@ -96,7 +88,19 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
             render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
             pick: makeBoxPicker(id, sizes, offsets, pickers),
           };
-        })
+        };
+
+      return yeet({        
+        sizing,
+        margin,
+        grow,
+        shrink,
+        inline,
+        flex,
+        ratioX,
+        ratioY,
+        fit: memoFit(fit),
+        prefit: memoFit(fit),
       });
     }, [props, els, hovered]);
   };

@@ -1,5 +1,5 @@
 import type { Point, Point4, Rectangle } from '@use-gpu/core';
-import type { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor, Base } from '../types';
+import type { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, FitInto, Margin, Alignment, Anchor, Base } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
 import { makeInlineCursor } from './cursor';
@@ -10,7 +10,7 @@ const NO_MARGIN: Point4 = [0, 0, 0, 0];
 
 export const resolveInlineBlockElements = (els: (InlineElement | LayoutElement)[], direction: Direction) => {
 
-  const into = [null, null] as AutoPoint;
+  const into = [null, null, 0, 0] as FitInto;
 
   const isX = isHorizontal(direction);
 
@@ -105,7 +105,7 @@ export const getInlineMinMax = (
 
 export const fitInline = (
   els: InlineElement[],
-  into: AutoPoint,
+  into: FitInto,
   direction: Direction,
   align: Alignment,
   anchor: Base,

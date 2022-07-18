@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Rectangle, Point, Point4 } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { AutoPoint, LayoutElement, Dimension, Margin } from '../types';
+import type { FitInto, LayoutElement, Dimension, Margin } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { use, memo, gather, provide, yeet, tagFunction, useContext, useFiber } from '@use-gpu/live';
@@ -49,21 +49,9 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
   if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false);
   if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
-  return yeet({
-    size: [w, h],
-
-    sizing,
-    margin,
-    grow,
-    shrink,
-    inline,
-    flex,
-    ratioX,
-    ratioY,
-    absolute: true,
-    fit: memoFit((into: AutoPoint) => {
-      const w = width != null ? evaluateDimension(width, into[0], snap) : null;
-      const h = height != null ? evaluateDimension(height, into[1], snap) : null;
+  const fit = (into: FitInto) => {
+      const w = width != null ? evaluateDimension(width, into[2], snap) : null;
+      const h = height != null ? evaluateDimension(height, into[3], snap) : null;
 
       const size = [
         w ?? into[0],
@@ -86,6 +74,21 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
           return yeet(view);
         }),
       };
-    }),
+    };
+
+  return yeet({
+    size: [w, h],
+
+    sizing,
+    margin,
+    grow,
+    shrink,
+    inline,
+    flex,
+    ratioX,
+    ratioY,
+    absolute: true,
+    fit: memoFit(fit),
+    prefit: memoFit(fit),
   });
 }, 'Embed');

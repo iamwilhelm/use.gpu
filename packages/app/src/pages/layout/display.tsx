@@ -19,6 +19,7 @@ export const LayoutDisplayPage: LC = () => {
       <Pass>
         <UI>
           <Layout>
+
             <Absolute fill={[1, 1, 1, .5]} left={0} right={0} top={0} bottom={0} />
             <Flex width="100%" height="100%">
               <Block width="40%" contain>
@@ -116,8 +117,19 @@ export const LayoutDisplayPage: LC = () => {
                   </Block>
                 </Overflow>
               </Block>
-
             </Flex>
+                      
+            <Absolute bottom={10} height={40} left={0} right={0}>
+              <Flex width="100%" height="100%" align="center">
+                <Flex align="center">
+                  <Block fill={[0, 0, 0, .95]} padding={[20, 10]} radius={4}>
+                    <Inline>
+                      <Text color="rgba(192, 192, 192, 0.8)">Sit amet nostrum labore</Text>
+                    </Inline>
+                  </Block>
+                </Flex>
+              </Flex>
+            </Absolute>
           </Layout>
         </UI>
       </Pass>

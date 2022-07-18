@@ -57,7 +57,7 @@ export const useLinkedShader = (
     const out: ShaderModuleDescriptor[] = [];
     for (const module of modules) {
       const codeKey = getBundleHash(module);
-      const key = `${formatMurmur53(codeKey)}-{suffix}`;
+      const key = `${formatMurmur53(codeKey)}-${suffix}`;
 
       let result = CACHE.get(key);
       if (result == null) {

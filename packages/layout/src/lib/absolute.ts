@@ -1,14 +1,15 @@
 import type { Point, Rectangle } from '@use-gpu/core';
-import type { LayoutElement, LayoutRenderer, LayoutPicker, AutoPoint, AutoRectangle, Direction } from '../types';
+import type { LayoutElement, LayoutRenderer, LayoutPicker, FitInto, AutoPoint, AutoRectangle, Direction } from '../types';
 
 import { evaluateDimension } from '../parse';
 import { fitBlock } from './block';
+import { isHorizontal } from './util';
 
 const NO_LAYOUT = [0, 0, 0, 0] as Rectangle;
 
 export const fitAbsoluteBox = (
   els: LayoutElement[],
-  into: AutoPoint,
+  into: FitInto,
   l?: string | number | null,
   t?: string | number | null,
   r?: string | number | null,
@@ -18,8 +19,8 @@ export const fitAbsoluteBox = (
   direction: Direction = 'y',
   snap?: boolean,
 ) => {
-  const [iw, ih] = into;
-  const box = resolveAbsoluteBox([0, 0, iw ?? 0, ih ?? 0], l, t, r, b, w, h, snap);
+  const [iw, ih, fw, fh] = into;
+  const box = resolveAbsoluteBox([0, 0, iw ?? fw, ih ?? fh], l, t, r, b, w, h, snap);
   let [left, top, right, bottom] = box;
 
   const fixed = [
@@ -27,7 +28,10 @@ export const fitAbsoluteBox = (
     top != null && bottom != null ? bottom - top : null,
   ] as AutoPoint;
 
-  const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, NO_LAYOUT, direction, true, true);
+  const isX = isHorizontal(direction);
+  const shrinkWrap = isX ? fixed[0] === null : fixed[1] === null;
+
+  const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, NO_LAYOUT, direction, true, shrinkWrap);
   
   if (left == null) left = right != null && size[0] != null ? right - size[0] : 0;
   if (top == null) top = bottom != null && size[1] != null ? bottom - size[1] : 0;

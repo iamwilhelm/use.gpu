@@ -1,7 +1,7 @@
 import type { LiveElement } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Point, Point4, Rectangle } from '@use-gpu/core';
-import type { AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
+import type { FitInto, AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
 import { yeet, fragment } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';
@@ -13,12 +13,16 @@ export const isHorizontal = (d: Direction) => d === 'x' || d === 'lr' || d === '
 export const isVertical = (d: Direction) => d === 'y' || d === 'tb' || d === 'bt';
 export const isFlipped = (d: Direction) => d === 'rl' || d === 'bt';
 
-type Fitter<T> = (into: AutoPoint) => T;
+const sameBox = (a: [any, any, any, any], b: [any, any, any, any]) => {
+  return (a[0] === b[0]) && (a[1] === b[1]) && (a[2] === b[2]) && (a[3] === b[3]);
+};
+
+type Fitter<T> = (into: FitInto) => T;
 export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
-  let last: AutoPoint | undefined;
+  let last: FitInto | undefined;
   let value: T | null = null;
-  return (into: AutoPoint) => {
-    if (last && last[0] === into[0] && last[1] === into[1]) {
+  return (into: FitInto) => {
+    if (last && sameBox(last, into)) {
       return value!;
     }
     value = f(into);
@@ -36,10 +40,6 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
   let lastBox: Rectangle | undefined;
   let lastClip: ShaderModule | undefined;
   let lastTransform: ShaderModule | undefined;
-
-  const sameBox = (a: Rectangle, b: Rectangle) => {
-    return (a[0] === b[0]) && (a[1] === b[1]) && (a[2] === b[2]) && (a[3] === b[3]);
-  }
 
   let value: T | null = null;
   return (

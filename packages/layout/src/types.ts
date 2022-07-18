@@ -20,6 +20,8 @@ export type Fit = 'contain' | 'cover' | 'scale' | 'none';
 export type OverflowMode = 'visible' | 'scroll' | 'hidden' | 'auto';
 export type Repeat = 'x' | 'y' | 'xy' | 'none';
 
+export type FitInto = [number | null, number | null, number, number];
+
 export type MarginLike = number | number[];
 export type GapLike = number | number[];
 export type AlignmentLike = Alignment | Alignment[];
@@ -83,7 +85,8 @@ export type LayoutElement = {
   inline?: Base,
   flex?: Anchor,
 
-  fit: (size: AutoPoint) => LayoutFit,
+  fit: (size: FitInto) => LayoutFit,
+  prefit: (size: FitInto) => LayoutFit,
 };
 
 export type InlineElement = {

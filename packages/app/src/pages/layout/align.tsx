@@ -32,6 +32,7 @@ export const LayoutAlignPage: LC = () => {
       <Pass>
         <UI>
           <Layout>
+
             <Absolute left={0} right={0} top={0} bottom={0}>
               <Overflow y="scroll">
 
@@ -107,7 +108,7 @@ export const LayoutAlignPage: LC = () => {
 
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
                 
-                  <Label>Flex / Block / Inline X</Label>
+                  <Label>Flex / Block X / Inline</Label>
                   <Flex margin={10}>
                     <Element width={200} height={50} grow={0} fill={FILL} />
                     <Block padding={10} fill={[0, 0, 0, .3]}>
@@ -117,7 +118,7 @@ export const LayoutAlignPage: LC = () => {
                   </Flex>
                   <Block fill={[1, 1, 1, 0.5]} height={2} />
 
-                  <Label>Flex / Block / Inline Y</Label>
+                  <Label>Flex / Block Y / Inline</Label>
                   <Flex margin={10} direction='y'>
                     <Element width={200} height={50} grow={0} fill={FILL} />
                     <Block padding={10} fill={[0, 0, 0, .3]}>
@@ -130,6 +131,7 @@ export const LayoutAlignPage: LC = () => {
 
               </Overflow>
             </Absolute>
+
           </Layout>
         </UI>
       </Pass>

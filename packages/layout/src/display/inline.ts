@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Point, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { InlineElement, LayoutPicker, LayoutRenderer, AutoPoint, Direction, Alignment, Base, MarginLike } from '../types';
+import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Base, MarginLike } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
@@ -50,14 +50,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
 
       const sizing = getInlineMinMax(inlineEls, direction, wrap, snap);
 
-      return yeet({
-        sizing,
-        margin,
-        grow,
-        shrink,
-        inline,
-        flex,
-        fit: memoFit((into: AutoPoint) => {
+      const fit = (into: FitInto) => {
           const {size, sizes, ranges, offsets, anchors, renders, pickers, key} =
             fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
 
@@ -110,7 +103,17 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
             }),
             pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),
           };
-        })
+        };
+
+      return yeet({
+        sizing,
+        margin,
+        grow,
+        shrink,
+        inline,
+        flex,
+        fit: memoFit(fit),
+        prefit: memoFit(fit),
       });
     }, [props, els, hovered]);
   };

@@ -2,27 +2,40 @@ import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makePa
 
 it("schedules actions", () => {
   let run = {a: 0, b: 0} as Record<string, number>;
-  let flushed = [] as any[];
 
   let fiber = {} as any;
 
-  const scheduler = makeActionScheduler();
-  scheduler.bind((as: any[]) => flushed = as);
+  let flushed = 0;
+  let flush = () => {};
+  let actions: any[] = [];
+
+  const dispatch = (f: any) => { 
+    flushed++;
+    flush = f;
+  };
+
+  const capture = (as: any[]) => {
+    actions = as;
+  };
+
+  const scheduler = makeActionScheduler(dispatch, capture);
 
   scheduler.schedule(fiber, () => run.a++);
   scheduler.schedule(fiber, () => run.b++);
-
-  scheduler.flush();
-
-  expect(run.a).toBe(1);
-  expect(run.b).toBe(1);
-  expect(flushed.length).toBe(2);
-
-  scheduler.flush();
+  flush();
 
   expect(run.a).toBe(1);
   expect(run.b).toBe(1);
-  expect(flushed.length).toBe(0);
+  expect(flushed).toBe(1);
+  expect(actions.length).toBe(2);
+
+  flush();
+
+  actions = [];
+  expect(run.a).toBe(1);
+  expect(run.b).toBe(1);
+  expect(flushed).toBe(1);
+  expect(actions.length).toBe(0);
 })
 
 it("tracks disposal actions", () => {
@@ -66,27 +79,6 @@ it("tracks dependencies", () => {
   expect(visit.size).toBe(1);
   expect(visit.has(fiber2)).toBe(true);
 
-});
-
-it("requests paints", (done) => {
-  let run = {a: 0, b: 0} as Record<string, number>;
-  let requested = 0;
-
-  const raf = (f: any) => {
-    requested++;
-    setTimeout(f, 10);
-  };
-  const request = makePaintRequester(raf);
-  
-  request(() => run.a++);
-  request(() => run.b++);
-
-  setTimeout(() => {
-    expect(requested).toBe(1);
-    expect(run.a).toBe(1);
-    expect(run.b).toBe(1);
-    done();
-  }, 30);
 });
 
 it("resolves node ancestry", () => {

@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TextureSource, Point, Point4, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
-import type { Direction, OverflowMode, AutoPoint, UIAggregate } from '../types';
+import type { Direction, OverflowMode, FitInto, UIAggregate } from '../types';
 
 import { parseColor, useProp } from '@use-gpu/traits';
 import { keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
@@ -69,72 +69,74 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
 
   const thumbTransform = useBoundShader(getScrolledPosition, OFFSET_BINDINGS, [shift]);
 
+  const fit = (into: FitInto) => {
+    let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => {
+      const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
+
+      const w = isX ? outerWidth : size;
+      const h = isX ? size : outerHeight;
+
+      const [l, t, r, b] = layout;        
+      const ll = isX ? l : r - w;
+      const tt = isX ? b - h : t;
+
+      const f = Math.min(1, isX ? outerWidth / innerWidth : outerHeight / innerHeight);
+      const rr = isX ? l + (r - l) * f : r;
+      const bb = isX ? b : t + (b - t) * f;
+
+      const trackBox = [ll, tt, r, b] as Rectangle;
+      const thumbBox = [ll, tt, rr, bb] as Rectangle;
+
+      const showTrack = overflow === 'scroll' || f < 1;
+      const showThumb = showTrack && f < 1;
+
+      const yeets: UIAggregate[] = [];
+      if (false && showTrack) yeets.push({
+        id: id.toString() + '-0',
+        rectangle: trackBox,
+        bounds: trackBox,
+        uv: [0, 0, 1, 1],
+        fill:   track,
+        radius: [size/2, size/2, size/2, size/2] as Rectangle,
+        ...(hovered ? INSPECT_STYLE.parent : undefined),
+
+        clip,
+        transform,
+        count: 1,
+      });
+      if (showThumb) yeets.push({
+        id: id.toString() + '-1',
+        rectangle: thumbBox,
+        bounds: thumbBox,
+        uv: [0, 0, 1, 1],
+        fill:   thumb,
+        radius: [size/2, size/2, size/2, size/2] as Rectangle,
+        ...(hovered ? INSPECT_STYLE.parent : undefined),
+
+        clip,
+        transform: transform ? chainTo(transform, thumbTransform) : thumbTransform,
+        count: 1,
+      });
+      return yeet(yeets);
+    };
+
+    return {
+      size: into,
+      render,
+      /*
+      pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {
+        if (x < l || x > r || y < t || y > b) return null;
+        return !scroll ? [id, [l, t, r, b]] : null;
+      },
+      */
+    };
+  };
+
   return yeet({
     sizing: isX ? [0, size, 0, size] : [size, 0, size, 0],
     margin: NO_POINT4,
     absolute: true,
-    fit: memoFit((into: AutoPoint) => {
-
-      let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => {
-        const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
-
-        const w = isX ? outerWidth : size;
-        const h = isX ? size : outerHeight;
-
-        const [l, t, r, b] = layout;        
-        const ll = isX ? l : r - w;
-        const tt = isX ? b - h : t;
-
-        const f = Math.min(1, isX ? outerWidth / innerWidth : outerHeight / innerHeight);
-        const rr = isX ? l + (r - l) * f : r;
-        const bb = isX ? b : t + (b - t) * f;
-
-        const trackBox = [ll, tt, r, b] as Rectangle;
-        const thumbBox = [ll, tt, rr, bb] as Rectangle;
-
-        const showTrack = overflow === 'scroll' || f < 1;
-        const showThumb = showTrack && f < 1;
-
-        const yeets: UIAggregate[] = [];
-        if (false && showTrack) yeets.push({
-          id: id.toString() + '-0',
-          rectangle: trackBox,
-          bounds: trackBox,
-          uv: [0, 0, 1, 1],
-          fill:   track,
-          radius: [size/2, size/2, size/2, size/2] as Rectangle,
-          ...(hovered ? INSPECT_STYLE.parent : undefined),
-
-          clip,
-          transform,
-          count: 1,
-        });
-        if (showThumb) yeets.push({
-          id: id.toString() + '-1',
-          rectangle: thumbBox,
-          bounds: thumbBox,
-          uv: [0, 0, 1, 1],
-          fill:   thumb,
-          radius: [size/2, size/2, size/2, size/2] as Rectangle,
-          ...(hovered ? INSPECT_STYLE.parent : undefined),
-
-          clip,
-          transform: transform ? chainTo(transform, thumbTransform) : thumbTransform,
-          count: 1,
-        });
-        return yeet(yeets);
-      };
-
-      return {
-        size: into,
-        render,
-        /*
-        pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {
-          if (x < l || x > r || y < t || y > b) return null;
-          return !scroll ? [id, [l, t, r, b]] : null;
-        },
-        */
-      };
-    }),
+    fit: memoFit(fit),
+    prefit: memoFit(fit),
   });
 };

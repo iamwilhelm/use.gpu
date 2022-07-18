@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { Point, Rectangle } from '@use-gpu/core';
+import type { Point, Point4, Rectangle } from '@use-gpu/core';
 import type { Placement } from '@use-gpu/traits';
-import type { LayoutElement, LayoutPicker } from './types';
+import type { FitInto, LayoutElement, LayoutPicker } from './types';
 
 import { parsePlacement, useProp } from '@use-gpu/traits';
 import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne } from '@use-gpu/live';
@@ -64,7 +64,9 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   const [l, t, r, b] = layout;
   const left = Math.min(l, r);
   const top = Math.min(t, b);
-  const into = [Math.abs(r - l), Math.abs(b - t)] as Point;
+  const w = Math.abs(r - l);
+  const h = Math.abs(b - t);
+  const into = [w, h, w, h] as Point4;
 
   const {id} = useFiber();  
   const pickers: any[] = [];

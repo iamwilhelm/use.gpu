@@ -47,6 +47,37 @@ export const Element: LiveComponent<ElementProps> = (props) => {
 
   const hovered = useInspectHoverable();
 
+  const fit = (into: AutoPoint) => {
+    const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
+    const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
+    const size = [w ?? 0, h ?? 0];
+
+    let render = memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
+      keyed(UIRectangle, id, {
+        id,
+        layout,
+
+        stroke: hovered ? INSPECT_STYLE.parent.stroke : stroke ?? TRANSPARENT,
+        fill:   hovered ? INSPECT_STYLE.parent.fill : fill ?? TRANSPARENT,
+        border: hovered ? INSPECT_STYLE.parent.border : border ?? TRANSPARENT,
+        radius,
+
+        image,
+        clip,
+        transform,
+      })
+    ));
+
+    return {
+      size,
+      render,
+      pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {
+        if (x < l || x > r || y < t || y > b) return null;
+        return !scroll ? [id, [l, t, r, b]] : null;
+      },
+    };
+  };
+
   return yeet({
     sizing,
     margin,
@@ -56,36 +87,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     under,
     inline,
     flex,
-    fit: (into: AutoPoint) => {
-      const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
-      const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
-      const size = [w ?? 0, h ?? 0];
-
-      let render = memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
-        keyed(UIRectangle, id, {
-          id,
-          layout,
-
-          stroke: hovered ? INSPECT_STYLE.parent.stroke : stroke ?? TRANSPARENT,
-          fill:   hovered ? INSPECT_STYLE.parent.fill : fill ?? TRANSPARENT,
-          border: hovered ? INSPECT_STYLE.parent.border : border ?? TRANSPARENT,
-          radius,
-
-          image,
-          clip,
-          transform,
-        })
-      ));
-
-      return {
-        size,
-        render,
-        pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {
-          if (x < l || x > r || y < t || y > b) return null;
-          return !scroll ? [id, [l, t, r, b]] : null;
-        },
-      };
-    },
+    fit,
   });
 };
 

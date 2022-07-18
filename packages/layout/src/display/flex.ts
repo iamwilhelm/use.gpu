@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, AutoPoint } from '../types';
+import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { use, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
@@ -63,18 +63,9 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
       if (typeof width  === 'string') ratioX = evaluateDimension(width,  1, false) ?? 1;
       if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false) ?? 1;
 
-      return yeet({
-        sizing,
-        margin,
-        grow,
-        shrink,
-        inline,
-        flex,
-        ratioX,
-        ratioY,
-        fit: memoFit((into: AutoPoint) => {
-          const w = width  != null ? evaluateDimension(width, into[0], snap) : null;
-          const h = height != null ? evaluateDimension(height, into[1], snap) : null;
+      const fit = (into: FitInto) => {
+          const w = width  != null ? evaluateDimension(width, into[2], snap) : null;
+          const h = height != null ? evaluateDimension(height, into[3], snap) : null;
           const fixed = [w, h] as [number | number, number | null];
 
           const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);
@@ -82,6 +73,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
           inspect({
             layout: {
               into,
+              fixed,
               size,
               sizes,
               offsets,
@@ -95,7 +87,19 @@ export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
           };
 
           return self;
-        }),
+        };
+
+      return yeet({
+        sizing,
+        margin,
+        grow,
+        shrink,
+        inline,
+        flex,
+        ratioX,
+        ratioY,
+        fit: memoFit(fit),
+        prefit: memoFit(fit),
       });
     }, [props, els, hovered]);
   };

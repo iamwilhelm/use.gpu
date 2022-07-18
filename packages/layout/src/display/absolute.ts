@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { AutoPoint, Dimension, Direction, LayoutElement } from '../types';
+import type { FitInto, Dimension, Direction, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
@@ -46,29 +46,32 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
+      const fit = (into: FitInto) => {
+        const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, direction, snap);
+
+        inspect({
+          layout: {
+            into,
+            size,
+            sizes,
+            offsets,
+          },
+        });
+  
+        return {
+          size,
+          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
+          pick: makeBoxPicker(id, sizes, offsets, pickers),
+        };
+      };
+
       return yeet({
         sizing: NO_POINT4,
         margin: NO_POINT4,
         absolute: true,
         under,
-        fit: memoFit((into: AutoPoint) => {
-          const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, direction, snap);
-
-          inspect({
-            layout: {
-              into,
-              size,
-              sizes,
-              offsets,
-            },
-          });
-    
-          return {
-            size,
-            render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
-            pick: makeBoxPicker(id, sizes, offsets, pickers),
-          };
-        }),
+        fit: memoFit(fit),
+        prefit: memoFit(fit),
       });
     }, [props, els, hovered]);
   };

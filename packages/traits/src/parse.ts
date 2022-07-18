@@ -197,9 +197,9 @@ export const makeParseColor = (def: Color = GRAY) => (color?: ColorLike): Color 
       }
     }
     if (c[0] === 'r') {
-      const cs = c.split(',').map(strToFloat);
-      if (c[3] === 'a') return [cs[0], cs[1], cs[2], cs[3]];
-      else return [cs[0], cs[1], cs[2], 1];
+      const cs = c.split('(')[1].split(')')[0].split(',').map(strToFloat);
+      if (c[3] === 'a') return [cs[0] / 255, cs[1] / 255, cs[2] / 255, cs[3]];
+      else return [cs[0] / 255, cs[1] / 255, cs[2] / 255, 1];
     }
   }
   if (c.rgba ?? c.rgb) {

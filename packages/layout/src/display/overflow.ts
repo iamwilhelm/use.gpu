@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core';
-import type { AutoPoint, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
+import type { FitInto, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
@@ -148,11 +148,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
       const scrollBarWidth  = hasScrollY ? scrollBars[hasScrollX ? 1 : 0].sizing[2] : 0;
       const scrollBarHeight = hasScrollX ? scrollBars[0].sizing[3] : 0;
 
-      return yeet({
-        sizing,
-        margin: NO_POINT4,
-        stretch: true,
-        fit: memoFit((into: AutoPoint) => {
+      const fit = (into: FitInto) => {
           const sizes   = [] as Point[];
           const offsets = [] as Point[];
           const renders = [] as (LayoutRenderer[]);
@@ -166,9 +162,12 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
             const [shouldScrollX, shouldScrollY] = shouldScroll();
 
-            const resolved: AutoPoint = isX
-              ? [null, into[1] != null ? into[1] - (shouldScrollX ? scrollBarHeight : 0) : null]
-              : [into[0] != null ? into[0] - (shouldScrollY ? scrollBarWidth : 0) : null, null];
+            const padX = (shouldScrollY ? scrollBarWidth  : 0);
+            const padY = (shouldScrollX ? scrollBarHeight : 0);
+
+            const resolved: FitInto = isX
+              ? [null, into[1] != null ? into[1] - padX : null, into[2] - padX, into[3] - padY]
+              : [into[0] != null ? into[0] - padX : null, null, into[2] - padX, into[3] - padY];
 
             const {render, pick, size} = fitBlock(resolved);
 
@@ -223,7 +222,14 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
             }),
             pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
           };
-        }),
+        };
+
+      return yeet({
+        sizing,
+        margin: NO_POINT4,
+        stretch: true,
+        fit: memoFit(fit),
+        prefit: memoFit(fit),
       });
     }, [props, els]);
   };

@@ -1,5 +1,5 @@
 import type { Point, Point4, Rectangle } from '@use-gpu/core';
-import type { LayoutElement, LayoutRenderer, LayoutPicker, Direction, AutoPoint, Margin, Alignment, Anchor } from '../types';
+import type { LayoutElement, LayoutRenderer, LayoutPicker, Direction, FitInto, AutoPoint, Margin, Alignment, Anchor } from '../types';
 
 import { makeFlexCursor } from './cursor';
 import { isHorizontal, getAlignmentAnchor, getAlignmentSpacing } from './util';
@@ -70,7 +70,7 @@ export const getFlexMinMax = (
 
 export const fitFlex = (
   els: LayoutElement[],
-  into: AutoPoint,
+  into: FitInto,
   fixed: AutoPoint,
   direction: Direction,
   gap: Point,
@@ -112,7 +112,7 @@ export const fitFlex = (
   const cursor = makeFlexCursor(spaceMain, alignMain, wrap);
   
   for (const el of els) if (!el.absolute) {
-    const {margin, sizing, fit, grow, shrink, ratioX, ratioY} = el;
+    const {margin, sizing, prefit, grow, shrink, ratioX, ratioY} = el;
     const [ml, mt, mr, mb] = margin;
 
     const m = isX ? ml + mr : mt + mb;
@@ -124,8 +124,13 @@ export const fitFlex = (
     const driver = isX ? sizing[0] : sizing[1];
     if (!basis) {
       if (!driver) {
-        const into = [containX, containY] as AutoPoint;
-        const {size} = fit(into);
+        const into = [
+          isX ? null : containX,
+          !isX ? null : containY,
+          containX,
+          containY,
+        ] as FitInto;
+        const {size} = prefit(into);
         basis = size[isX ? 0 : 1];
       }
       else {
@@ -156,13 +161,15 @@ export const fitFlex = (
       let cm = isSnap ? Math.round(caretMain) : caretMain;
       let mainSize = isSnap ? Math.round(flexed[i]) : flexed[i];
 
-      const into = (isX
-        ? [mainSize, containY != null ? containY - my : null]
-        : [containX != null ? containX - mx : null, mainSize]
-      ) as AutoPoint;
-      if (ratioX != null && into[0] != null) into[0] /= ratioX;
-      if (ratioY != null && into[1] != null) into[1] /= ratioY;
-      const {size, render, pick} = fit(into);
+      const intoX = containX != null ? containX - mx : null;
+      const intoY = containY != null ? containY - my : null;
+      const flex = (isX
+        ? [mainSize, intoY, mainSize, intoY ?? into[3]]
+        : [intoX, mainSize, intoX ?? into[2], mainSize]
+      ) as FitInto;
+      if (ratioX != null) flex[2] /= ratioX;
+      if (ratioY != null) flex[3] /= ratioY;
+      const {size, render, pick} = fit(flex);
 
       maxCross = Math.max(maxCross, isX ? size[1] + my : size[0] + mx);
       size[isX ? 0 : 1] = mainSize;
@@ -214,11 +221,13 @@ export const fitFlex = (
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const into = size.slice() as Point;
-    into[0] -= ml + mr;
-    into[1] -= mt + mb;
+    const absolute = [size[0], size[1], 0, 0] as Point4;
+    absolute[0] -= ml + mr;
+    absolute[1] -= mt + mb;
+    absolute[2] = absolute[0];
+    absolute[3] = absolute[1];
 
-    const {render, pick, size: fitted} = fit(into);
+    const {render, pick, size: fitted} = fit(absolute);
     
     if (under) {
       sizes.unshift(fitted);

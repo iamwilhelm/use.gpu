@@ -1,6 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { Point4 } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
+import type { ColorLike } from '@use-gpu/traits';
 import type { Base, InlineLine } from '../types';
 
 import { useProp, parseColor, parseNumber } from '@use-gpu/traits';
@@ -22,7 +23,7 @@ export type TextProps = {
   */
   
   opacity?: number,
-  color?: Point4,
+  color?: ColorLike,
   expand?: number,
 
   family?: string,

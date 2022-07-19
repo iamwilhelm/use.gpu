@@ -10,8 +10,10 @@ yarn add @use-gpu/glyph
 
 **Docs**: https://usegpu.live/docs/reference-library-@use-gpu-glyph
 
-# Use.GPU - Font glyph renderer (rust/wasm ab_glyph wrapper)
+# Use.GPU - SDF + Font glyph renderer
 
+- rust/wasm `ab_glyph` wrapper
+- subpixel distance transform in TS
 
 ## Colofon
 

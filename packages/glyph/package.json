@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/glyph",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -10,7 +10,7 @@
   "scripts": {
     "build": "yarn run build:wasm && yarn run build:js && yarn run build:pkg",
     "build:js": "NPM_PACKAGE=glyph ../../scripts/build-mjs-cjs.sh",
-    "build:wasm": "rm -rf pkg; cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/glyph/pkg/",
+    "build:wasm": "rm -rf pkg; cd ../../rust/use-gpu-text; wasm-pack build; cp -r pkg ../../packages/glyph/pkg/; rm ../../packages/glyph/pkg/.gitignore",
     "build:pkg": "cp -r pkg ../../build/packages/glyph/",
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",

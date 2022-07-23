@@ -67,7 +67,7 @@ type ComponentProps = Partial<StyleTrait> & {
 };
   
 const Component: FC<ComponentProps> = (props: ComponentProps) => {
-  const {size, filled, color} = useStyleTrait(props);
+  const {size, rounded, color} = useStyleTrait(props);
   // ...
 };
 ```
@@ -93,7 +93,7 @@ const STYLE_DEFAULTS = {
   rounded: true,
 };
 
-export const useStyleTrait = makeUseTrait<ScaleTrait>(STYLE_TRAIT, STYLE_DEFAULTS);
+export const useStyleTrait = makeUseTrait<StyleTrait>(STYLE_TRAIT, STYLE_DEFAULTS);
 ```
 
 

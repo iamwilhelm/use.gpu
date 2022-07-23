@@ -27,7 +27,7 @@ Use.GPU has an incremental architecture, which updates with minimal recomputatio
 
 **Questions? Join Use.GPU Discord**: https://discord.gg/WxtZ28aUC3
 
-## Usage
+## Repo Tools
 
 - `yarn start` - Run demo app at http://localhost:8777
 - `yarn build` - Build packages

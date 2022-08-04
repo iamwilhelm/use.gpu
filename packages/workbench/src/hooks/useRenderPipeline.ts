@@ -40,7 +40,7 @@ export const useRenderPipeline = (
     // Cache by unique render context
     let cache = CACHE.get(memoKey);
     if (!cache) {
-      DEBUG && console.log('pipeline cache created', memoKey.__id)
+      DEBUG && console.log('render pipeline cache created', memoKey.__id)
       CACHE.set(memoKey, cache = makePipelineCache());
     }
 
@@ -50,7 +50,7 @@ export const useRenderPipeline = (
 
     const cached = cache.get(key);
     if (cached) {
-      DEBUG && console.log('pipeline cache hit', key)
+      DEBUG && console.log('render pipeline cache hit', key)
       return cached;
     }
 
@@ -82,7 +82,7 @@ export const useRenderPipeline = (
       props,
     );
     cache.set(key, pipeline);
-    DEBUG && console.log('pipeline cache miss', key);
+    DEBUG && console.log('render pipeline cache miss', key);
 
     return pipeline;
   }, [memoKey, shader, samples]);
@@ -109,11 +109,11 @@ export const useRenderPipelineAsync = (
     let cache = CACHE.get(memoKey);
     let pending = PENDING.get(memoKey);
     if (!cache) {
-      DEBUG && console.log('pipeline cache created', memoKey.__id)
+      DEBUG && console.log('async render pipeline cache created', memoKey.__id)
       CACHE.set(memoKey, cache = makePipelineCache());
     }
     if (!pending) {
-      DEBUG && console.log('pipeline pending queue created', memoKey.__id)
+      DEBUG && console.log('async render pipeline pending queue created', memoKey.__id)
       PENDING.set(memoKey, pending = new Map());
     }
 
@@ -123,7 +123,7 @@ export const useRenderPipelineAsync = (
 
     const cached = cache!.get(key);
     if (cached) {
-      DEBUG && console.log('async pipeline cache hit', key)
+      DEBUG && console.log('async render pipeline cache hit', key)
       return cached;
     }
 
@@ -152,7 +152,7 @@ export const useRenderPipelineAsync = (
       return pipeline;
     };
     staleRef.current = key;
-    DEBUG && console.log('async pipeline miss', key)
+    DEBUG && console.log('async render pipeline miss', key)
 
     // Mark key as pending
     if (pending!.has(key)) {
@@ -171,7 +171,7 @@ export const useRenderPipelineAsync = (
       props,
     );
     promise.then((pipeline: GPURenderPipeline) => {
-      DEBUG && console.log('async pipeline resolved', key)
+      DEBUG && console.log('async render pipeline resolved', key)
 
       cache!.set(key, pipeline);
       pending!.delete(key);
@@ -183,7 +183,7 @@ export const useRenderPipelineAsync = (
     return null;
   }, [memoKey, shader, samples]);
 
-  DEBUG && console.log('async pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
+  DEBUG && console.log('async render pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
   return [immediate ?? resolved, !!staleRef.current];
 };
 

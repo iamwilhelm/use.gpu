@@ -14,7 +14,7 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 
 @optional @link fn getLookup(i: u32) -> u32 { return i; };
   
-let ARROW_ASPECT: f32 = 2.5;
+const ARROW_ASPECT: f32 = 2.5;
 
 @export fn getArrowVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
   var NaN: f32 = bitcast<f32>(0xffffffffu);

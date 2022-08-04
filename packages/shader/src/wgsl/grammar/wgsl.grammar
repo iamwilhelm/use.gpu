@@ -50,7 +50,7 @@ GlobalVariableDeclaration {
 }
 
 GlobalConstantDeclaration {
-  EmptyToken k<'let'> VariableIdentifier assign Value<constExpression> |
+  EmptyToken k<'const'> VariableIdentifier assign Value<constExpression> |
   AttributeList k<'override'> VariableIdentifier (assign Value<expression>)?
 }
 

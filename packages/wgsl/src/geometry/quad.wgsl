@@ -1,4 +1,4 @@
-let QUAD: array<vec2<u32>, 4> = array<vec2<u32>, 4>(
+const QUAD: array<vec2<u32>, 4> = array<vec2<u32>, 4>(
   vec2<u32>(0u, 0u),
   vec2<u32>(1u, 0u),
   vec2<u32>(0u, 1u),

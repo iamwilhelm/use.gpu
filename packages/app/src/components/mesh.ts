@@ -5,7 +5,7 @@ import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
-  makeRenderPipeline, makeShaderModule, makeShaderBinding, makeSampler, makeTextureBinding,
+  makeRenderPipeline, makeShaderModuleDescriptor, makeShaderBinding, makeSampler, makeTextureBinding,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
 import { linkBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
@@ -105,8 +105,8 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     const vertexLinked = linkBundle(vertexShader, {toColorSpace}, defines);
     const fragmentLinked = linkBundle(fragmentShader, {toColorSpace}, defines);
 
-    const vertex = makeShaderModule(vertexLinked, vertexShader.hash ?? 0);
-    const fragment = makeShaderModule(fragmentLinked, fragmentShader.hash ?? 0);
+    const vertex = makeShaderModuleDescriptor(vertexLinked, vertexShader.hash ?? 0);
+    const fragment = makeShaderModuleDescriptor(fragmentLinked, fragmentShader.hash ?? 0);
     
     inspect({vertex});
     inspect({fragment});

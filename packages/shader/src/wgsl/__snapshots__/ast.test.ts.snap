@@ -37,7 +37,7 @@ Object {
       "symbol": "QUAD",
     },
     Object {
-      "at": 135,
+      "at": 137,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -75,7 +75,7 @@ Object {
       "symbol": "getQuadIndex",
     },
     Object {
-      "at": 213,
+      "at": 215,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -115,7 +115,7 @@ Object {
   ],
   "exports": Array [
     Object {
-      "at": 135,
+      "at": 137,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -153,7 +153,7 @@ Object {
       "symbol": "getQuadIndex",
     },
     Object {
-      "at": 213,
+      "at": 215,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -971,14 +971,14 @@ Array [
     ],
   ],
   Array [
-    135,
+    137,
     Array [
       "getQuadIndex",
       "getQuadUV",
     ],
   ],
   Array [
-    213,
+    215,
     Array [
       "getQuadUV",
     ],
@@ -1286,12 +1286,12 @@ Object {
           "name": "i32",
         },
       },
-      "at": 68,
+      "at": 70,
       "flags": 0,
       "symbol": "integer",
     },
     Object {
-      "at": 94,
+      "at": 96,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -1306,7 +1306,7 @@ Object {
       "symbol": "b",
     },
     Object {
-      "at": 125,
+      "at": 127,
       "flags": 0,
       "struct": Object {
         "attributes": Array [
@@ -1348,7 +1348,7 @@ Object {
       "symbol": "light",
     },
     Object {
-      "at": 220,
+      "at": 222,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -1381,7 +1381,7 @@ Object {
       "symbol": "QUAD",
     },
     Object {
-      "at": 397,
+      "at": 401,
       "flags": 6,
       "func": Object {
         "attributes": Array [
@@ -1407,7 +1407,7 @@ Object {
       "symbol": "getInt",
     },
     Object {
-      "at": 442,
+      "at": 446,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -1430,7 +1430,7 @@ Object {
   ],
   "exports": Array [
     Object {
-      "at": 442,
+      "at": 446,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -1453,7 +1453,7 @@ Object {
   ],
   "externals": Array [
     Object {
-      "at": 397,
+      "at": 401,
       "flags": 6,
       "func": Object {
         "attributes": Array [
@@ -1782,12 +1782,12 @@ Array [
         "name": "i32",
       },
     },
-    "at": 58,
+    "at": 60,
     "flags": 0,
     "symbol": "integer",
   },
   Object {
-    "at": 84,
+    "at": 86,
     "constant": Object {
       "attributes": undefined,
       "identifiers": Array [],
@@ -3685,13 +3685,13 @@ Array [
     ],
   ],
   Array [
-    20,
+    22,
     Array [
       "getA",
     ],
   ],
   Array [
-    62,
+    64,
     Array [
       "getB",
     ],
@@ -3701,7 +3701,7 @@ Array [
 
 exports[`ast shakes simple program 2`] = `
 "
-let x: f32 = 1.0;
+const x: f32 = 1.0;
 
 fn getA() -> f32 {
   return x;

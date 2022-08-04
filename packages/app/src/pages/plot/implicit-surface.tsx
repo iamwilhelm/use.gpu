@@ -22,7 +22,7 @@ const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number) => {
   emit(x, y, z);
 }
 const EXPR_VALUE = (emit: Emit, x: number, y: number, z: number) => {
-  emit(Math.cos(x) * Math.cos(y) * Math.cos(z));
+  emit(Math.cos(x * 2) * Math.cos(y * 2) * Math.cos(z * 2));
 }
 
 export const PlotImplicitSurfacePage: LC = () => {
@@ -34,7 +34,7 @@ export const PlotImplicitSurfacePage: LC = () => {
         <Pass>
           <Plot>
             <Cartesian
-              range={[[0, 3], [0, 1], [0, 1]]}
+              range={[[-3, 3], [-1, 1], [-1, 1]]}
               scale={[2, 1, 1]}
             >
               <Grid
@@ -77,13 +77,13 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Sampled
                 axes='xyz'
                 format='vec3<f32>'
-                size={[8, 8, 8]}
+                size={[12, 12, 12]}
                 expr={EXPR_POSITION}
                 render={(positions: StorageSource) => (
                   <Sampled
                     axes='xyz'
                     format='f32'
-                    size={[8, 8, 8]}
+                    size={[12, 12, 12]}
                     expr={EXPR_VALUE}
                     render={(values: StorageSource) => [
                       <DualContourLayer

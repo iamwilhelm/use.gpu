@@ -4,7 +4,7 @@ import type { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader';
 import { toHash } from '@use-gpu/state';
 import { resolveBindings, linkBundle, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
 import { formatMurmur53, mixBits53, toMurmur53 } from '@use-gpu/state';
-import { makeShaderModule } from '@use-gpu/core';
+import { makeShaderModuleDescriptor } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
 import { useInspectable } from './useInspectable'
 import LRU from 'lru-cache';
@@ -62,7 +62,7 @@ export const useLinkedShader = (
       let result = CACHE.get(key);
       if (result == null) {
         const linked = linkBundle(module, NO_LIBS, defines);
-        result = makeShaderModule(linked, key);
+        result = makeShaderModuleDescriptor(linked, key);
         CACHE.set(key, result);
       }
       out.push(result);

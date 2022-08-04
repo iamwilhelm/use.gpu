@@ -1,7 +1,7 @@
 // https://www.shadertoy.com/view/XlKSDR
 
-let PI = 3.141592;
-let F_DIELECTRIC = 0.04;
+const PI = 3.141592;
+const F_DIELECTRIC = 0.04;
 
 fn saturate(x: f32) -> f32 {
   return max(x, 0.0);

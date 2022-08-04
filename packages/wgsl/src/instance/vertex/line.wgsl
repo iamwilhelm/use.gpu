@@ -16,7 +16,7 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 
 @optional @link fn getLookup(i: u32) -> u32 { return i; };
 
-let ARROW_ASPECT: f32 = 2.5;
+const ARROW_ASPECT: f32 = 2.5;
 
 fn getAnchorDistance(anchor: vec3<f32>, tangent: vec3<f32>, center: vec3<f32>) -> f32 {
   var diff = center - anchor;

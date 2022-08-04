@@ -3,7 +3,7 @@
 exports[`bind bind produces a bound bundle 1`] = `7689438517184070`;
 
 exports[`bind binds an external 1`] = `
-"let TEST = true;
+"const TEST = true;
 
     fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
@@ -18,7 +18,7 @@ exports[`bind binds an external 1`] = `
 `;
 
 exports[`bind binds an external 2`] = `
-"let TEST = true;
+"const TEST = true;
 
     fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
@@ -33,7 +33,7 @@ exports[`bind binds an external 2`] = `
 `;
 
 exports[`bind binds an external 3`] = `
-"let TEST = true;
+"const TEST = true;
 
     fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     

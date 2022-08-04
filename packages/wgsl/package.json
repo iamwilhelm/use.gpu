@@ -29,6 +29,11 @@
       "types": "./types/wgsl-files/index.d.ts",
       "default": "./src/index.ts"
     },
+    "./contour/scan.wgsl": {
+      "types": "./src/contour/scan.wgsl.d.ts",
+      "import": "./src/contour/scan.wgsl",
+      "require": "./src/contour/scan.wgsl"
+    },
     "./fragment/lod-bias.wgsl": {
       "types": "./src/fragment/lod-bias.wgsl.d.ts",
       "import": "./src/fragment/lod-bias.wgsl",
@@ -113,6 +118,11 @@
       "types": "./src/instance/vertex/arrow.wgsl.d.ts",
       "import": "./src/instance/vertex/arrow.wgsl",
       "require": "./src/instance/vertex/arrow.wgsl"
+    },
+    "./instance/vertex/dual-contour.wgsl": {
+      "types": "./src/instance/vertex/dual-contour.wgsl.d.ts",
+      "import": "./src/instance/vertex/dual-contour.wgsl",
+      "require": "./src/instance/vertex/dual-contour.wgsl"
     },
     "./instance/vertex/face.wgsl": {
       "types": "./src/instance/vertex/face.wgsl.d.ts",

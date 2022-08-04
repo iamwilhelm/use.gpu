@@ -2,7 +2,7 @@
 @link fn getScaleDirection(i: u32) -> i32;
 @link fn getScaleOrigin(i: u32) -> vec4<f32>;
 
-let STEP = vec2<f32>(0.0, 1.0);
+const STEP = vec2<f32>(0.0, 1.0);
 
 @export fn getScalePosition(index: u32) -> vec4<f32> {
   

@@ -3,7 +3,7 @@
 @link fn getGridMin(i: u32) -> vec4<f32>;
 @link fn getGridMax(i: u32) -> vec4<f32>;
 
-let STEP = vec2<f32>(0.0, 1.0);
+const STEP = vec2<f32>(0.0, 1.0);
 
 @export fn getGridPosition(index: u32) -> vec4<f32> {
   let n = u32(LINE_DETAIL + 1);

@@ -114,8 +114,8 @@ describe("link", () => {
   
   it("tree shakes constants", () => {
     const sub = `
-    let colorUsed = vec4<f32>(0.0, 0.1, 0.2, 0.0);
-    let colorNotUsed = vec4<f32>(0.0, 0.1, 0.2, 1.0);
+    const colorUsed = vec4<f32>(0.0, 0.1, 0.2, 0.0);
+    const colorNotUsed = vec4<f32>(0.0, 0.1, 0.2, 1.0);
 
     @export fn getColor() -> vec4<f32> {
       return colorUsed;

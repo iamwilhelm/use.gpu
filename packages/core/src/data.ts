@@ -13,11 +13,17 @@ export const alignSizeTo = (n: number, s: number) => {
   return f === 0 ? n : n + (s - f);
 };
 
+export const getDataArrayConstructor = (type: UniformType) => UNIFORM_ARRAY_TYPES[type];
+
+export const getDataArrayByteLength = (type: UniformType, length: number) => {
+  const dims = UNIFORM_ARRAY_DIMS[type];
+  return alignSizeTo(length * Math.ceil(dims), 4);
+};
+
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
-  let dims = UNIFORM_ARRAY_DIMS[type];
-
-  const array = new ctor(alignSizeTo(length * Math.ceil(dims), 4));
+  const dims = UNIFORM_ARRAY_DIMS[type];
+  const array = new ctor(getDataArrayByteLength(type, length));
   return {array, dims};
 };
 

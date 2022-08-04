@@ -34,17 +34,23 @@ export const makeTypedBuffer = (
   return buffer;
 }
 
-export const makeVertexBuffers = (device: GPUDevice, datas: TypedArray[]): GPUBuffer[] =>
-  datas.map((data: TypedArray) => makeVertexBuffer(device, data));
+export const makeDataBuffer = (device: GPUDevice, data: BufferArray, flags?: GPUBufferUsageFlags): GPUBuffer =>
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.COPY_DST | (flags || 0));
 
-export const makeVertexBuffer = (device: GPUDevice, data: TypedArray): GPUBuffer =>
-  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.VERTEX, data);
+export const makeVertexBuffers = (device: GPUDevice, datas: TypedArray[], flags?: GPUBufferUsageFlags): GPUBuffer[] =>
+  datas.map((data: TypedArray) => makeVertexBuffer(device, data, flags));
 
-export const makeUniformBuffer = (device: GPUDevice, data: BufferArray): GPUBuffer =>
-  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+export const makeVertexBuffer = (device: GPUDevice, data: TypedArray, flags?: GPUBufferUsageFlags): GPUBuffer =>
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.VERTEX | (flags || 0), data);
 
-export const makeStorageBuffer = (device: GPUDevice, data: BufferArray): GPUBuffer =>
-  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
+export const makeUniformBuffer = (device: GPUDevice, data: BufferArray, flags?: GPUBufferUsageFlags): GPUBuffer =>
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST | (flags || 0));
+
+export const makeStorageBuffer = (device: GPUDevice, data: BufferArray, flags?: GPUBufferUsageFlags): GPUBuffer =>
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | (flags || 0));
+
+export const makeIndirectBuffer = (device: GPUDevice, data: BufferArray, flags?: GPUBufferUsageFlags): GPUBuffer =>
+  makeTypedBuffer(device, getByteSize(data), GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST | (flags || 0));
 
 export const makeTextureReadbackBuffer = (
   device: GPUDevice,

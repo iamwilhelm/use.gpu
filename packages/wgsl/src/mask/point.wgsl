@@ -1,4 +1,4 @@
-let OUTLINE = 0.4;
+const OUTLINE = 0.4;
 
 fn getUVScale(uv: vec2<f32>) -> f32 {
   var dx = dpdx(uv);

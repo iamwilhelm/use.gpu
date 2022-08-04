@@ -1,3 +1,6 @@
+0.7.0
+- Update WGSL grammar for global `const`
+
 0.6.0
 - Add simple type inference via `@infer`
 - Add struct types for storage

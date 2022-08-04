@@ -4,7 +4,7 @@ import type { ArrowTrait, AxisTrait, LineTrait, ColorTrait, ROPTrait } from '../
 
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
-  useBoundShader, useBoundSource, useRawSource, useShaderRef,
+  useBoundShader, useBoundSource, useShaderRef,
   LineLayer, ArrowLayer, useArrowSegments,
 } from '@use-gpu/workbench';
 import { parseIntegerPositive } from '@use-gpu/traits';

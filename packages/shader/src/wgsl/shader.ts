@@ -34,7 +34,7 @@ export const loadModuleWithCache = makeLoadModuleWithCache(loadModule, DEFAULT_C
 /** Make WGSL constant definitions */
 export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
   const out = [];
-  for (let k in defs) if (k[0] !== '@' && defs[k] != null) out.push(`let ${k} = ${defs[k]};`);
+  for (let k in defs) if (k[0] !== '@' && defs[k] != null) out.push(`const ${k} = ${defs[k]};`);
   return out.join("\n");
 }
 

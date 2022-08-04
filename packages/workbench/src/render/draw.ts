@@ -29,9 +29,13 @@ const Resume = (ts: Task[]) => {
 
   usePerFrame();
 
-  for (let task of ts) task();
+  const children: LiveElement<any> = [];
+  for (const task of ts) {
+    const c = task();
+    if (c) children.push(c);
+  }
 
   if (pickingContext) pickingContext.captureTexture();
 
-  return null;
+  return children.length ? children : null;
 };

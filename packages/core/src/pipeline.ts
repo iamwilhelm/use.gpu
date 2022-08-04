@@ -5,7 +5,7 @@ import type {
 
 import { patch } from '@use-gpu/state';
 
-export const makeShaderModule = (
+export const makeShaderModuleDescriptor = (
   code: TypedArray | string,
   hash: string | number,
   entryPoint: string = 'main'
@@ -62,4 +62,26 @@ export const makeRenderPipelineAsync = (
   } as any, descriptor) as any as GPURenderPipelineDescriptor;
 
   return device.createRenderPipelineAsync(pipelineDescriptor);
+}
+
+export const makeComputePipeline = (
+  device: GPUDevice,
+  shader: ShaderModuleDescriptor,
+) => {
+  const pipelineDescriptor: GPUComputePipelineDescriptor = {
+    layout: 'auto',
+    compute: makeShaderStage(device, shader),
+  };
+  return device.createComputePipeline(pipelineDescriptor);
+}
+
+export const makeComputePipelineAsync = (
+  device: GPUDevice,
+  shader: ShaderModuleDescriptor,
+) => {
+  const pipelineDescriptor: GPUComputePipelineDescriptor = {
+    layout: 'auto',
+    compute: makeShaderStage(device, shader),
+  };
+  return device.createComputePipelineAsync(pipelineDescriptor);
 }

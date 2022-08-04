@@ -66,7 +66,7 @@ fn main(
 
   "@use-gpu/wgsl/geometry/quad": `
 
-let QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
+const QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
   vec2<i32>(0, 0),
   vec2<i32>(1, 0),
   vec2<i32>(0, 1),

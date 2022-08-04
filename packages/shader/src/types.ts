@@ -100,6 +100,7 @@ export type StorageSource = {
   version: number,
 
   volatile?: number,
+  readWrite?: boolean,
   byteOffset?: number,
   byteLength?: number,
   colorSpace?: ColorSpace,

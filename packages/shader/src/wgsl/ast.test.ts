@@ -44,7 +44,7 @@ describe('ast', () => {
     const code = `
       var x: f32;
       var y: f32;
-      let a: i32 = 3;
+      const a: i32 = 3;
       type integer = i32;
       override b: i32;
     `;
@@ -99,7 +99,7 @@ describe('ast', () => {
 
   it('gets test declarations with array', () => {
     const code = `
-      let QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
+      const QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
         vec2<i32>(0, 0),
         vec2<i32>(1, 0),
         vec2<i32>(0, 1),
@@ -118,7 +118,7 @@ describe('ast', () => {
     const code = `
       @exported var x: f32;
       var y: f32;
-      let a: i32 = 3;
+      const a: i32 = 3;
       type integer = i32;
       override b: i32;
 
@@ -127,7 +127,7 @@ describe('ast', () => {
         @annotate position: vec3<f32>,
       }
 
-      let QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
+      const QUAD: array<vec2<i32>, 4> = array<vec2<i32>, 4>(
         vec2<i32>(0, 0),
         vec2<i32>(1, 0),
         vec2<i32>(0, 1),
@@ -393,7 +393,7 @@ fn main(
   
   it('shakes simple program', () => {
     const code = `
-let x: f32 = 1.0;
+const x: f32 = 1.0;
 
 @export fn getA() -> f32 {
   return x;

@@ -3,7 +3,7 @@ import type { Rectangle, Point, Point3, TextureSource, VertexData } from './type
 import { makeVertexAttributeLayout } from './attribute';
 import { makeColorAttachment, makeColorState } from './color';
 import { makeVertexBuffer } from './buffer';
-import { makeRenderPipeline, makeShaderModule } from './pipeline';
+import { makeRenderPipeline, makeShaderModuleDescriptor } from './pipeline';
 import { makeTextureBinding, makeTextureView, makeSampler } from './texture';
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
@@ -97,8 +97,8 @@ export const updateMipTextureChain = (
   
   let pipeline = cache.get(format);
   if (!pipeline) {
-    const vertex = makeShaderModule(MIP_SHADER, 'mip-v', 'vertexMain');
-    const fragment = makeShaderModule(MIP_SHADER, 'mip-f', 'fragmentMain');
+    const vertex = makeShaderModuleDescriptor(MIP_SHADER, 'mip-v', 'vertexMain');
+    const fragment = makeShaderModuleDescriptor(MIP_SHADER, 'mip-f', 'fragmentMain');
     const colorStates = [makeColorState(format as GPUTextureFormat)];
 
     pipeline = makeRenderPipeline(device, vertex, fragment, colorStates, undefined, 1, {

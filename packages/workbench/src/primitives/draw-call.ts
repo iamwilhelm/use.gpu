@@ -4,7 +4,7 @@ import type {
   VertexData, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU,
 } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
-import { yeet, memo, suspend, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, suspend, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 
 import { DeviceContext } from '../providers/device-provider';
 import { ViewContext } from '../providers/view-provider';
@@ -117,8 +117,6 @@ export const drawCall = (props: RenderProps) => {
     makeVolatileUniforms(device, pipeline, volatiles, 2),
     [device, pipeline, uniforms, volatiles]
   );
-
-  const fiber = useFiber();
 
   const inspected = inspect({
     render: {

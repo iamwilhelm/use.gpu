@@ -124,7 +124,7 @@ export const makeVolatileUniforms = <T>(
     else if (b.texture?.volatile) depth = Math.max(depth, +b.texture.volatile);
   }
 
-  const cache = miniLRU<GPUBindGroup>(depth + 1);
+  const cache = miniLRU<GPUBindGroup>(depth);
 
   const ids: number[] = [];
   const bindGroup = () => {
@@ -168,9 +168,9 @@ export const makeDataBindingsEntries = <T>(
     if (b.storage) {
       const {storage} = b;
       entries.push({binding, resource: {
-        buffer:     storage.buffer,
-        offset:     storage.byteOffset,
-        byteLength: storage.byteLength,
+        buffer: storage.buffer,
+        offset: storage.byteOffset,
+        size:   storage.byteLength,
       }});
       binding++;
     }

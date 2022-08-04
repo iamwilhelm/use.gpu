@@ -165,7 +165,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     format,
     colorSpace,
     size: [width, height] as [number, number],
-    volatile: history,
+    volatile: history ? history + 1 : 0,
     version: 0,
   }), [targetTexture, width, height, format, history, sampler]);
 
@@ -177,18 +177,30 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     format,
     colorSpace,
     size: [width, height] as [number, number],
-    volatile: history,
+    volatile: history ? history + 1 : 0,
     version: 0,
   } : null, [targetTexture, width, height, format, history, sampler]);
 
   const Done = (ts: Task[]) => {
     usePerFrame();
 
-    for (let task of ts) task();
+    const children: LiveElement<any> = [];
+    for (const task of ts) {
+      const c = task();
+      if (c) children.push(c);
+    }
+
     source.version = incrementVersion(source.version);
-    
-    if (!then) return null;    
-    return provide(FrameContext, {current: source.version}, then(source));
+
+    if (then) {
+      const c = then(source);
+      if (c) children.push(
+        provide(FrameContext, {current: source.version}, then(source))
+      );
+    }
+
+    if (!children.length) return null;
+    return children;
   };
 
   const view = history ? provide(FeedbackContext, feedback, children) : children;

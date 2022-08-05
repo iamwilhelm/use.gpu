@@ -1,8 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type {
-  TypedArray, ViewUniforms, UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU,
-} from '@use-gpu/core';
+import type { TypedArray, ViewUniforms, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, suspend, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 
@@ -26,8 +23,8 @@ export type RenderProps = {
   mode?: RenderPassMode | string,
   id?: number,
 
-  vertexCount: Lazy<number>,
-  instanceCount: Lazy<number>,
+  vertexCount?: Lazy<number>,
+  instanceCount?: Lazy<number>,
   indirect?: StorageSource,
 
   vertex: ParsedBundle,
@@ -73,10 +70,7 @@ export const drawCall = (props: RenderProps) => {
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
 
   const defines = useOne(() => (propDefines ? {
-    '@group(VIEW)': '@group(0)',
-    '@binding(VIEW)': '@binding(0)',
-    '@group(VIRTUAL)': '@group(1)',
-    '@group(VOLATILE)': '@group(2)',
+    ...DEFAULT_DEFINES,
     ...propDefines,
   } : DEFAULT_DEFINES), propDefines);
 
@@ -132,8 +126,8 @@ export const drawCall = (props: RenderProps) => {
   // Return a lambda back to parent(s)
   return yeet({
     [mode]: (passEncoder: GPURenderPassEncoder, countGeometry: (v: number, t: number) => void) => {
-      const v = resolve(vertexCount);
-      const i = resolve(instanceCount);
+      const v = resolve(vertexCount || 0);
+      const i = resolve(instanceCount || 0);
 
       const t = isStrip ? (v - 2) * i : Math.floor(v * i / 3);
 

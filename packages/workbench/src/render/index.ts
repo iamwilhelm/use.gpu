@@ -4,5 +4,4 @@ export * from './linear-rgb';
 export * from './loop';
 export * from './pass';
 export * from './picking';
-export * from './readback';
 export * from './render-to-texture';

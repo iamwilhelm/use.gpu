@@ -36,7 +36,7 @@ export const makeStorageEntries = (
   return entries;
 };
 
-const toTypeName = (s: any) => s?.module?.entry ?? s;
+const toTypeName = (s: any) => s?.module?.entry ?? s?.entry ?? s;
 
 export const checkStorageTypes = (
   uniforms: UniformAttribute[],
@@ -55,20 +55,32 @@ export const checkStorageType = (
   const {name, format: from} = uniform;
   const to = link?.format;
 
-  const f = toTypeName(from);
-  const t = toTypeName(to);
+  const fromName = toTypeName(from);
+  const toName = toTypeName(to);
+  
+  let f = fromName;
+  let t = toName;
   
   if (link && t != null && f !== t) {
-    // Remove vec<..> to allow for automatic widening/narrowing
-    const fromVec = f.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, '');
-    const toVec   = t.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, ''); 
+    // Remove array<atomic<..>>
+    f = f.replace(/array?/, '').replace(/^<|>$/g, '');
+    f = f.replace(/atomic?/, '').replace(/^<|>$/g, '');
+    t = t.replace(/array?/, '').replace(/^<|>$/g, ''); 
+    t = t.replace(/atomic?/, '').replace(/^<|>$/g, ''); 
 
-    if (fromVec !== toVec) {
+    // Remove vec<..> to allow for automatic widening/narrowing
+    f = f.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, '');
+    t = t.replace(/vec[0-9](to[0-9])?/, '').replace(/^<|>$/g, ''); 
+
+    if (f !== t) {
       // Remove bit size to allow for automatic widening/narrowing
-      const fromScalar = fromVec.replace(/([uif])([0-9]+)/, '$1__');
-      const toScalar   =   toVec.replace(/([uif])([0-9]+)/, '$1__');
+      const fromScalar = f.replace(/([uif])([0-9]+)/, '$1__');
+      const toScalar   = t.replace(/([uif])([0-9]+)/, '$1__');
 
       if (fromScalar !== toScalar) {
+        // uppercase = struct type, allow any (u)int
+        if (fromName.match(/[A-Z]/) && toName.match(/^[ui]/)) return;
+
         console.warn(`Invalid format ${to} bound for ${from} "${name}" (${fromScalar} != ${toScalar})`);
       }
     }

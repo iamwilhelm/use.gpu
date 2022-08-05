@@ -55,6 +55,7 @@ export const useScratchSource = (
       size: [0],
       version: 0,
       readWrite,
+      volatile: 1,
     } as StorageSource;
 
     allocate(reserve);

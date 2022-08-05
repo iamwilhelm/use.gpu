@@ -81,10 +81,9 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
 
   return (<>
     {uniforms || bindings ? (<>
-      <div><b>Bindings</b></div>
-      {uniforms ? inspectObject(toObject(uniforms), state, toggleState, 'u') : null}
-      {bindings ? inspectObject(toObject(bindings), state, toggleState, 'b') : null}
-      {volatiles ? inspectObject(toObject(volatiles), state, toggleState, 'v') : null}
+      {uniforms  ? <><div><b>Constants</b></div>{inspectObject(toObject(uniforms), state, toggleState, 'u')}</> : null}
+      {bindings  ? <><div><b>Bindings</b></div>{inspectObject(toObject(bindings), state, toggleState, 'b')}</> : null}
+      {volatiles ? <><div><b>Volatiles</b></div>{inspectObject(toObject(volatiles), state, toggleState, 'v')}</> : null}
       <Spacer />
     </>) : null}
     <div><b>Shader</b> (<code>{shader.hash}</code>)</div>

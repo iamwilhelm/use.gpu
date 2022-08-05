@@ -8,10 +8,10 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
 
 import { Virtual } from '../primitives/virtual';
-import { Readback } from '../render/readback';
+import { Readback } from '../primitives/readback';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, yeet, debug, fragment, useMemo, useOne } from '@use-gpu/live';
+import { use, memo, yeet, debug, fragment, useMemo, useOne, useVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import {
   resolve,
@@ -22,6 +22,7 @@ import {
 import { useDeviceContext } from '../providers/device-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useRawSource } from '../hooks/useRawSource';
+import { useDerivedSource } from '../hooks/useDerivedSource';
 import { useScratchSource } from '../hooks/useScratchSource';
 import { useBoundSource } from '../hooks/useBoundSource';
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -35,8 +36,13 @@ import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
 import { main as fitContour } from '@use-gpu/wgsl/contour/fit.wgsl';
 import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour.wgsl';
 
+import { Dispatch } from '../primitives/dispatch';
+
 const READ_WRITE_SOURCE = { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC };
 const INDIRECT_SOURCE   = { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC };
+
+const INDIRECT_OFFSET_1 = { byteOffset: 16 };
+const READ_ONLY_SOURCE = { readWrite: false };
 
 export type DualContourLayerProps = {
   color?: number[] | TypedArray,
@@ -97,35 +103,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     return (s[0] || 1) * (s[1] || 1) * (s[2] || 1) * (s[3] || 1);
   }, sizeExpr);
 
-  const s = useShaderRef(sizeExpr);
-  const l = useShaderRef(level);
   const v = useShaderRef(null, values);
   const n = useShaderRef(null, normals);
+  const s = useShaderRef(sizeExpr);
+  const l = useShaderRef(level);
 
   const c = useShaderRef(color);
   const z = useShaderRef(zBias);
-
-  const indirectDraw = useOne(() => new Uint32Array(8));
-  const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
-
-  const [edgeStorage,   allocateEdges]    = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [cellStorage,   allocateCells]    = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [indexStorage,  allocateIndices]  = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [maskStorage,   allocateMask]     = useScratchSource('u32', READ_WRITE_SOURCE);
-  const [vertexStorage, allocateVertices] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
-
-  const d = resolve(countExpr);
-  allocateEdges(d * 3);
-  allocateCells(d);
-  allocateIndices(d);
-  allocateMask(d);
-  allocateVertices(d);
-  
-  const boundScan = useBoundShader(scanVolume, SCAN_BINDINGS, [v, s, l]);
-  const boundFit = useBoundShader(scanVolume, FIT_BINDINGS, [v, s, l, n]);
-
-
-
 
   const rangeMin = useOne(() => range.map(([min]) => min), range);
   const rangeMax = useOne(() => range.map(([,max]) => max), range);
@@ -135,115 +119,104 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   const xf = useTransformContext();
 
-  const edgesReadout = useOne(() => ({...edgeStorage, readWrite: false}), edgeStorage);
-  const boundVertex = useBoundShader(getDualContourVertex, VERTEX_BINDINGS, [edgesReadout, xf, sizeExpr, min, max, c, z]);
+  const indirectDraw = useOne(() => new Uint32Array(8));
+  const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
 
+  const [edgeStorage,   allocateEdges]    = useScratchSource('u32', READ_WRITE_SOURCE);
+  const [cellStorage,   allocateCells]    = useScratchSource('u32', READ_WRITE_SOURCE);
+  const [markStorage,   allocateMarks]    = useScratchSource('u32', READ_WRITE_SOURCE);
+  const [indexStorage,  allocateIndices]  = useScratchSource('u32', READ_WRITE_SOURCE);
+  const [vertexStorage, allocateVertices] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
 
+  const indirectNextStorage = useDerivedSource(indirectStorage, INDIRECT_OFFSET_1);
+  const edgeReadout = useDerivedSource(edgeStorage, READ_ONLY_SOURCE);
+  const indexReadout = useDerivedSource(indexStorage, READ_ONLY_SOURCE);
+  const vertexReadout = useDerivedSource(vertexStorage, READ_ONLY_SOURCE);
 
+  const d = resolve(countExpr);
+  allocateEdges(d * 3);
+  allocateCells(d);
+  allocateMarks(d);
+  allocateIndices(d);
+  allocateVertices(d);
+  
+  const boundScan = useBoundShader(
+    scanVolume,
+    SCAN_BINDINGS,
+    [
+      indirectStorage, edgeStorage, cellStorage, markStorage, indexStorage,
+      v, s, l,
+    ]);
 
-  // Dispatch set up
-  const defines = {
-    '@group(DATA)': '@group(0)',
-    '@group(VIRTUAL)': '@group(1)',
-    '@group(VOLATILE)': '@group(2)',
+  const boundFit = useBoundShader(
+    fitContour,
+    FIT_BINDINGS,
+    [
+      cellStorage, vertexStorage,
+      v, n, s, l,
+    ]);
+
+  const boundVertex = useBoundShader(
+    getDualContourVertex,
+    VERTEX_BINDINGS, [
+      edgeReadout, indexReadout, vertexReadout,
+      xf, s, c, z, min, max,
+    ]);
+
+  const sourceVersion = useVersion(values) + useVersion(normals);
+  const shouldDispatch = () => sourceVersion + values.version + (normals?.version ?? 0);
+
+  const edgePassSize = () => {
+    const s = resolve(sizeExpr);
+    const d = resolve(countExpr);
+    allocateEdges(d * 3);
+    allocateCells(d);
+    allocateMarks(d);
+    allocateIndices(d);
+    allocateVertices(d);
+
+    return [s[0] - 1, (s[1] - 1) || 1, (s[2] - 1) || 1];
   };
 
-  const {shader: [module], constants, uniforms, bindings, volatiles} = useLinkedShader([boundScan], defines);
-
   const device = useDeviceContext();
-  const pipeline = useComputePipeline(module);
-
-  // Bound storage
-  const force = !!volatiles.length;
-  const storage = useMemo(() =>
-    makeBoundUniforms(device, pipeline, uniforms, bindings, 1, force),
-    [device, pipeline, uniforms, bindings]);
-
-  // Volatile storage
-  const volatile = useMemo(() =>
-    makeVolatileUniforms(device, pipeline, volatiles, 2),
-    [device, pipeline, uniforms, volatiles]
-  );
-
-  // Data binding for scan pass
-  const scanData = useMemo(() =>
-    makeStorageBinding(device, pipeline, {
-      i: indirectStorage,
-
-      a: edgeStorage,
-      b: cellStorage,
-      c: maskStorage,
-      d: indexStorage,
-    }),
-    [device, pipeline, indirectStorage, edgeStorage, cellStorage, maskStorage, indexStorage]
-  );
-
-  const fitData = useMemo(() =>
-    makeStorageBinding(device, pipeline, {
-      i: indirectStorage,
-
-      a: cellStorage,
-      b: vertexStorage,
-    }),
-    [device, pipeline, indirectStorage, cellStorage, vertexStorage]
-  );
-
-  const inspect = useInspectable();
-  const inspected = inspect({
-    render: {
-      dispatchCount: 0,
-    },
-  });
-
-  let sourceVersion = 0;
   const generationRef = useOne(() => ({current: 1}));
 
-  const compute = yeet({
-    compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
-      if (sourceVersion === values.version) return;
-      sourceVersion = values.version;
+  const dispatchEdgePass = () => {
+    const {current: generation} = generationRef;
 
-      const s = resolve(sizeExpr);
-      const d = resolve(countExpr);
-      allocateEdges(d * 3);
-      allocateCells(d);
-      allocateIndices(d);
-      allocateMask(d);
-      allocateVertices(d);
+    // Build final draw call for geometry
+    // -> Make list of active edges (1 edge = 1 final quad)
+    indirectDraw[0] = 4; // vertexCount
+    indirectDraw[1] = 0; // instanceCount = nextEdge (atomic add)
+    // indirectDraw[2] = 0
+    // indirectDraw[3] = 0
 
-      inspected.render.dispatchCount = d;
-      countDispatch(d);
+    // Build vertex dispatch
+    // -> Make list of active vertices (adjacent to an active edge)
+    // -> Use atomic per-cell mask to handle overlap
+    // -> Use generation number to avoid clearing mask
+    // -> Make map of cell (i,j,k) to vertex index for reverse lookup
+    indirectDraw[4] = 0; // dispatchX = nextVertex
+    indirectDraw[5] = 1;
+    indirectDraw[6] = 1;
+    indirectDraw[7] = generation;
+    generationRef.current++;
 
-      const {current: generation} = generationRef;
-      
-      // Pass 1 - Assign active edges to instances
-      //        - Assign unique index to each adjacent vertex
-      indirectDraw[0] = 4; // vertexCount
-      indirectDraw[1] = 0; // instanceCount = nextEdge (atomic add)
-
-      // Pass 2 - Get position for active vertices
-      indirectDraw[4] = 0; // dispatchX = nextVertex
-      indirectDraw[7] = generation;
-      generationRef.current++;
-
-      uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
-
-      if (storage.pipe && storage.buffer) {
-        storage.pipe.fill(constants);
-        uploadBuffer(device, storage.buffer, storage.pipe.data);
-      }
-
-      passEncoder.setPipeline(pipeline);
-      passEncoder.setBindGroup(0, scanData);
-      if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
-      if (volatile.bindGroup) passEncoder.setBindGroup(2, volatile.bindGroup());
-
-      passEncoder.dispatchWorkgroups(s[0] - 1, (s[1] - 1) || 1, (s[2] - 1) || 1);
-    },
-  });
+    uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
+  };
 
   return [
-    compute,
+    use(Dispatch, {
+      shader: boundScan,
+      size: edgePassSize,
+      shouldDispatch,
+      onDispatch: dispatchEdgePass,
+    }),
+    use(Dispatch, {
+      shader: boundFit,
+      indirect: indirectNextStorage,
+      shouldDispatch,
+    }),
     use(Virtual, {
       indirect: indirectStorage,
       getVertex: boundVertex,
@@ -251,14 +224,26 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       mode,
       id,
     }),
+
+    /*
+    use(Readback, { source: vertexStorage, then: (data) => {
+      console.log(data);
+      return debug(fragment([]));
+    } }),
+    use(Readback, { source: indirectStorage, then: (data) => {
+      console.log(data);
+      return debug(fragment([]));
+    } }),
     use(Readback, { source: cellStorage, then: (data) => {
       console.log(data);
       return debug(fragment([]));
     } }),
-    use(Readback, { source: maskStorage, then: (data) => {
+    use(Readback, { source: edgeStorage, then: (data) => {
       console.log(data);
       return debug(fragment([]));
     } }),
+    /*
+    */
   ];
   /*
   const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY, LOOP_Z: !!loopZ}), [loopX, loopY, loopZ]);

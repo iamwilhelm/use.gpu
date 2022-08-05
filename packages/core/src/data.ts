@@ -17,8 +17,7 @@ export const getDataArrayConstructor = (type: UniformType) => UNIFORM_ARRAY_TYPE
 
 export const getDataArrayByteLength = (type: UniformType, length: number) => {
   const size = UNIFORM_ATTRIBUTE_SIZES[type];
-  const dims = UNIFORM_ARRAY_DIMS[type];
-  return size * alignSizeTo(length * Math.ceil(dims), 4);
+  return alignSizeTo(length * size, 4);
 };
 
 export const makeDataArray = (type: UniformType, length: number) => {

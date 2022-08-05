@@ -23,7 +23,7 @@ const is16to32 = (type: string) => type.match(/^(u|i)16$/);
 const to32 = (type: string) => type.replace(/^([ui])[0-9]+/, '$132');
 
 const needsCast = (from: string, to: string) => {
-  if (from.match(/[A-Z]/)) return true;
+  if (from.match(/[A-Z]/)) return false;
   return from.replace(/[^0-9]+/, '') != to.replace(/[^0-9]+/, '');
 };
 
@@ -71,15 +71,21 @@ export const makeBindingAccessors = (
     const {format} = uniform;
     const {format: type} = storage!;
 
-    if (typeof type === 'object') {
-      const module = toModule(type);
-      const entry = getBundleEntry(module);
+    const object = (
+      typeof type === 'object' ? type :
+      typeof format === 'object' ? format :
+      null
+    );
+
+    if (object) {
+      const entry = getBundleEntry(object);
       if (entry != null) {
+        const module = toModule(object);
         libs[module.name] = module;
         return {
           at: 0,
           name: module.name,
-          imports: [{name: format, imported: entry}],
+          imports: [{name: entry, imported: entry}],
           symbols: [format],
         } as ModuleRef;
       }
@@ -120,12 +126,18 @@ export const makeBindingAccessors = (
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
 
-      if (typeof format === 'object') {
-        const module = toModule(format);
-        const entry = getBundleEntry(module);
-        const t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
+      const object = (
+        typeof type === 'object' ? type :
+        typeof format === 'object' ? format :
+        null
+      );
 
-        program.push(makeStorageAccessor(namespace, set, base, t, t, name, readWrite));
+      if (object) {
+        const entry = getBundleEntry(object);
+        const t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
+        if (t === 'unknown') debugger;
+
+        program.push(makeStorageAccessor(namespace, set, base, t, t, name, readWrite, args));
         continue;
       }
 

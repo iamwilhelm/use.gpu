@@ -181,8 +181,8 @@ export type VertexAttribute = {
 // Uniform buffers
 export type UniformAttribute = {
   name: string,
-  format: UniformType,
-  args?: UniformType[],
+  format: UniformType | ShaderStructType,
+  args?: (UniformType | ShaderStructType)[] | null,
   members?: UniformAttribute[],
 };
 

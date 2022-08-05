@@ -46,7 +46,7 @@ This allows you to split up and organize your WGSL / GLSL code as you see fit, a
 
 #### Bundler
 
-When combined with `@use-gpu/wgsl-loader` or `@use-gpu/glsl-loader` (webpack or node), you can import a tree of `.wgsl` / `.glsl` modules directly in JS/TS as a pre-packaged bundle:
+When combined with `@use-gpu/wgsl-loader` or `@use-gpu/glsl-loader`, you can import a tree of `.wgsl` / `.glsl` modules directly in JS/TS as a pre-packaged bundle:
 
 ```ts
 // WGSL in JS/TS
@@ -146,6 +146,9 @@ use "path/to/file"::{ symbol as symbol, … };
 // Function is linked at runtime but optional.
 // Function body is used if not linked.
 @link @optional fn func() -> f32 { return 1.0; }
+
+// Storage binding is linked at runtime
+@link var<storage> storageVar: array<f32>;
 
 // Declaration is global (don't namespace it)
 @global fn func() -> f32 { return 1.0; }

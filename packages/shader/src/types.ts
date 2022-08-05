@@ -137,7 +137,7 @@ export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureS
 export type UniformAttribute = {
   name: string,
   format: any,
-  args?: any[],
+  args?: any[] | null,
   members?: UniformAttribute[],
 };
 

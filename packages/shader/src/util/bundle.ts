@@ -55,11 +55,10 @@ export const makeBundleToAttributes = (
   const {table: {declarations}} = module;
 
   const out: UniformAttribute[] = [];
-  for (const fn of declarations) if (fn.func) {
-    const {func, flags} = fn;
+  for (const {func, flags, variable} of declarations) if (func ?? variable) {
     if (flags & RF.External) {
-      const {type, name, parameters} = func;
-      out.push({name, format: toTypeString(type), args: toArgTypes(parameters)});
+      const {type, name, parameters} = func ?? variable;
+      out.push({name, format: toTypeString(type), args: func ? toArgTypes(parameters) : null});
     }
   }
 

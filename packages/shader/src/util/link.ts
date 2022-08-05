@@ -188,8 +188,8 @@ export const makeLinker = (
     }
 
     // Replace imported function prototype names with target
-    if (externals) for (const {flags, func} of externals) if (func) {
-      const {name, inferred} = func;
+    if (externals) for (const {flags, func, variable} of externals) if (func ?? variable) {
+      const {name, inferred} = func ?? variable;
       const key = importMap?.get(name)!;
       const ns = namespaces.get(key);
 
@@ -334,14 +334,14 @@ export const loadBundlesInOrder = (
     }
 
     // Recurse into links
-    if (externals) for (const {func, flags} of externals) if (func) {
-      const {name} = func;
+    if (externals) for (const {flags, func, variable} of externals) if (func ?? variable) {
+      const {name} = func ?? variable;
       const chunk = links[name];
       if (!chunk) {
         if (flags & RF.Optional) {
           continue;
         }
-        throw new Error(`Unlinked function '${name}' in ${getContext(module)}`);
+        throw new Error(`Unlinked function/variable '${name}' in ${getContext(module)}`);
       }
 
       const key = getBundleKey(chunk);
@@ -363,7 +363,6 @@ export const loadBundlesInOrder = (
       let list = exported.get(key);
       if (!list) exported.set(key, list = new Set());
       list.add(symbol);
-      
     }
 
     // Build module-to-module dependency graph

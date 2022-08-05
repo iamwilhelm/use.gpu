@@ -4,7 +4,6 @@
 @external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
 
 unit { globalDirective* globalDeclaration* }
-EmptyToken { }
 
 k<term> { @specialize[@name={term}]<Identifier, term> }
 t<term> { @specialize[@name={term}]<Identifier, term> }
@@ -50,7 +49,7 @@ GlobalVariableDeclaration {
 }
 
 GlobalConstantDeclaration {
-  EmptyToken k<'const'> VariableIdentifier assign Value<constExpression> |
+  AttributeList k<'const'> VariableIdentifier assign Value<constExpression> |
   AttributeList k<'override'> VariableIdentifier (assign Value<expression>)?
 }
 
@@ -117,10 +116,10 @@ compoundAssignmentOperator {
 incrementStatement { lhsExpression Inc }
 decrementStatement { lhsExpression Dec }
 
-ifStatement { k<'if'> parenExpression CompoundStatement (k<'else'> elseStatement)? }
+ifStatement { k<'if'> expression CompoundStatement (k<'else'> elseStatement)? }
 elseStatement { CompoundStatement | ifStatement }
 
-switchStatement { k<'switch'> parenExpression '{' switchBody+ '}' }
+switchStatement { k<'switch'> expression '{' switchBody+ '}' }
 switchBody {
   k<'case'> caseSelectors colon '{' caseBody? '}' |
   k<'default'> colon '{' caseBody? '}'

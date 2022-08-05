@@ -262,6 +262,73 @@ Array [
 ]
 `;
 
+exports[`ast gets linked var/const declarations 1`] = `
+Array [
+  Object {
+    "at": 7,
+    "flags": 2,
+    "symbol": "x",
+    "variable": Object {
+      "attributes": Array [
+        Object {
+          "args": undefined,
+          "name": "link",
+        },
+      ],
+      "identifiers": Array [],
+      "name": "x",
+      "qual": undefined,
+      "type": Object {
+        "args": undefined,
+        "name": "f32",
+      },
+      "value": undefined,
+    },
+  },
+  Object {
+    "at": 31,
+    "flags": 2,
+    "symbol": "y",
+    "variable": Object {
+      "attributes": Array [
+        Object {
+          "args": undefined,
+          "name": "link",
+        },
+      ],
+      "identifiers": Array [],
+      "name": "y",
+      "qual": undefined,
+      "type": Object {
+        "args": undefined,
+        "name": "f32",
+      },
+      "value": undefined,
+    },
+  },
+  Object {
+    "at": 55,
+    "constant": Object {
+      "attributes": Array [
+        Object {
+          "args": undefined,
+          "name": "link",
+        },
+      ],
+      "identifiers": Array [],
+      "name": "a",
+      "type": Object {
+        "args": undefined,
+        "name": "i32",
+      },
+      "value": "3",
+    },
+    "flags": 2,
+    "symbol": "a",
+  },
+]
+`;
+
 exports[`ast gets quad vertex declarations 1`] = `
 Array [
   Object {

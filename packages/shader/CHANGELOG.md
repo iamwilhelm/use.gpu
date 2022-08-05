@@ -1,5 +1,8 @@
 0.7.0
-- Update WGSL grammar for global `const`
+- WGSL grammar: change global `let` to `const`
+- WGSL grammar: add optional parentheses in `if`, `switch`, ...
+- Allow `@link` on variable declarations
+- Storage binding without getter when `args` = `null`
 
 0.6.0
 - Add simple type inference via `@infer`

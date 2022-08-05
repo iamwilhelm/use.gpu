@@ -40,6 +40,20 @@ describe('ast', () => {
     expect(imports).toMatchSnapshot();
   });
 
+  it('gets linked var/const declarations', () => {
+    const code = `
+      @link var x: f32;
+      @link var y: f32;
+      @link const a: i32 = 3;
+    `;
+
+    const tree = parseShader(code);
+    const {getDeclarations} = makeGuardedParser(code, tree);
+
+    const declarations = getDeclarations();
+    expect(declarations).toMatchSnapshot();
+  });
+
   it('gets test var/const declarations', () => {
     const code = `
       var x: f32;

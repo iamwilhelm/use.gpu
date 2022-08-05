@@ -22,6 +22,11 @@ const is8to32 = (type: string) => type.match(/^(u|i)8$/);
 const is16to32 = (type: string) => type.match(/^(u|i)16$/);
 const to32 = (type: string) => type.replace(/^([ui])[0-9]+/, '$132');
 
+const needsCast = (from: string, to: string) => {
+  if (from.match(/[A-Z]/)) return true;
+  return from.replace(/[^0-9]+/, '') != to.replace(/[^0-9]+/, '');
+};
+
 const getTypeKey = (b: DataBinding) =>
   (+!!b.constant) +
   (+!!b.storage) * 2 +
@@ -111,7 +116,7 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format: type, args}, storage} of storages) {
-      const {volatile, format} = storage!;
+      const {volatile, format, readWrite} = storage!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
 
@@ -120,7 +125,7 @@ export const makeBindingAccessors = (
         const entry = getBundleEntry(module);
         const t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
 
-        program.push(makeStorageAccessor(namespace, set, base, t, t, name));
+        program.push(makeStorageAccessor(namespace, set, base, t, t, name, readWrite));
         continue;
       }
 
@@ -128,24 +133,24 @@ export const makeBindingAccessors = (
         if (is3to4(format)) {
           const accessor = name + '3to4';
           program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
-          program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor));
+          program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor, readWrite));
           continue;
         }
         else if (is8to32(format)) {
           const accessor = name + '8to32';
           program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
-          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
+          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
           continue;
         }
         else if (is16to32(format)) {
           const accessor = name + '16to32';
           program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
-          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor));
+          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
           continue;
         }
       }
 
-      program.push(makeStorageAccessor(namespace, set, base, type, format, name));
+      program.push(makeStorageAccessor(namespace, set, base, type, format, name, readWrite, args));
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
@@ -225,14 +230,25 @@ export const makeStorageAccessor = (
   type: string,
   format: string,
   name: string,
-) => `
-@group(${set}) @binding(${binding}) var<storage> ${ns}${name}Storage: array<${format}>;
+  readWrite?: boolean,
+  args: string[] | null = INT_ARG,
+) => {
+  const access = readWrite ? 'storage, read_write' : 'storage';
+  
+  if (args === null) {
+    return `@group(${set}) @binding(${binding}) var<${access}> ${ns}${name}: ${type};\n`;
+  }
+
+  const hasCast = needsCast(format, type);
+  return `
+@group(${set}) @binding(${binding}) var<${access}> ${ns}${name}Storage: array<${format}>;
 
 fn ${ns}${name}(index: u32) -> ${type} {
-  ${format !== type ? 'let v =' : 'return'} ${ns}${name}Storage[index];
-${format !== type ? `  return ${makeSwizzle(format, type, 'v')};\n` : ''
+  ${hasCast ? 'let v =' : 'return'} ${ns}${name}Storage[index];
+${hasCast ? `  return ${makeSwizzle(format, type, 'v')};\n` : ''
 }}
 `;
+}
 
 export const makeTextureAccessor = (
   ns: string,
@@ -252,7 +268,7 @@ export const makeTextureAccessor = (
   const dimsCast = dims === 1 ? 'f32' : `vec${dims}<f32>`;
 
   const shaderType = format ? TEXTURE_SHADER_TYPES[format] : type;
-  const hasCast = shaderType !== type;
+  const hasCast = needsCast(shaderType, type);
 
   return `
 @group(${set}) @binding(${binding}) var ${ns}${name}Texture: ${layout};
@@ -289,7 +305,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
   else if (f3 == 2u) { v = ${format}(v1.zw, v2.x); }
   else { v = ${format}(v1.w, v2.xy); }
   
-  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
+  return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;
 
@@ -306,7 +322,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
 
   let word = u32(${ns}${accessor}(b2));
   var v: ${format} = ${format}((word >> (f4 << 3u)) & 0xFFu);
-  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
+  return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;
 
@@ -323,7 +339,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
 
   let word = u32(${ns}${accessor}(b2));
   var v: ${format} = ${format}((word >> (f2 << 4u)) & 0xFFFFu);  
-  return ${format !== type ? makeSwizzle(format, type, 'v') : 'v'};
+  return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;
 

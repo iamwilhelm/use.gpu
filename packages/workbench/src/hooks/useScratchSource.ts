@@ -21,7 +21,6 @@ type ScratchSourceOptions = {
 export const useScratchSource = (
   inputSource: InputSource,
   format: UniformType,
-  stride: number = 1,
   options: RawSourceOptions = NO_OPTIONS,
 ) => {
   const {
@@ -34,31 +33,32 @@ export const useScratchSource = (
 
   return useMemo(() => {
     const f = (format && (format in UNIFORM_ARRAY_DIMS)) ? format as UniformType : 'f32';
-    let alloc = reserve;
+    let alloc = 0;
 
-    const allocate = () => {
-      const s = resolve(inputSource.size);
-      const l = s.reduce((a, b) => a * b, 1);
+    const allocate = (
+      length?: number,
+    ) => {
+      const size = resolve(inputSource.size)
+      const l = length ?? size.reduce((a, b) => a * b, 1);
 
       const newAlloc = adjustSize(l, alloc);
 
       if (alloc !== newAlloc) {
         alloc = newAlloc;
-
-        const byteLength = getDataArrayByteLength(f, newAlloc || 1);
+        const byteLength = getDataArrayByteLength(f, alloc || 1);
         source.buffer = makeDataBuffer(device, byteLength, flags);
       }
 
       source.length = l;
-      source.size = s;
+      source.size = length ? [length] : size;
       source.version = incrementVersion(source.version);
     };
 
     const source = {
       buffer: null as any,
       format: f,
-      length: inputSource.length ?? 0,
-      size: inputSource.size ?? [0],
+      length: 0,
+      size: [0],
       version: 0,
       readWrite,
     } as StorageSource;

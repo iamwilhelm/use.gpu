@@ -19,9 +19,9 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
   const device = useDeviceContext();
 
   const storages = [
-    useScratchSource(source, source.format, 1, READBACK_SOURCE),
-    useScratchSource(source, source.format, 1, READBACK_SOURCE),
-    useScratchSource(source, source.format, 1, READBACK_SOURCE),
+    useScratchSource(source, source.format, READBACK_SOURCE),
+    useScratchSource(source, source.format, READBACK_SOURCE),
+    useScratchSource(source, source.format, READBACK_SOURCE),
   ];
 
   const mapped = useOne(() => [false, false, false]);
@@ -31,10 +31,9 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
     post: () => {
       const i = requested = mapped.indexOf(false);
       if (i >= 0) {
-        console.log('render', i)
         const [storage, allocate] = storages[i];
         const byteLength = getDataArrayByteLength(source.format, source.length);
-        allocate(byteLength);
+        allocate(source.length);
 
         const commandEncoder = device.createCommandEncoder();
         commandEncoder.copyBufferToBuffer(source.buffer, 0, storage.buffer, 0, byteLength);
@@ -44,14 +43,11 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
     readback: async () => {
       const i = requested;
       if (i >= 0) {
-        console.log('readback', i)
         const [storage] = storages[i];
         const {buffer} = storage;
 
         mapped[i] = true;
         await buffer.mapAsync(GPUMapMode.READ);
-
-        console.log('resolved', i)
 
         const ctor = getDataArrayConstructor(source.format);
         const array = new ctor(buffer.getMappedRange());

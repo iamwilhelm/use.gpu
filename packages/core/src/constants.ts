@@ -155,6 +155,9 @@ export const UNIFORM_ATTRIBUTE_SIZES: {[t in UniformType]: number} = {
   "mat4x3<f64>": 128,
   "mat4x4<f64>": 128,
 
+  "atomic<u32>": 4,
+  "atomic<i32>": 4,
+
   // Virtual types
   "u8": 1,
   "i8": 1,
@@ -248,6 +251,9 @@ export const UNIFORM_ATTRIBUTE_ALIGNS: {[t in UniformType]: number} = {
   "mat3x4<f64>": 32,
   "mat4x3<f64>": 32,
   "mat4x4<f64>": 32,
+
+  "atomic<u32>": 4,
+  "atomic<i32>": 4,
 
   // Virtual types (not implemented for struct fields, only raw arrays)
   "u8": 0,
@@ -357,6 +363,9 @@ export const UNIFORM_ARRAY_DIMS = {
   "mat4x3<f64>":  12,
   "mat4x4<f64>":  16,
 
+  "atomic<u32>": 1,
+  "atomic<i32>": 1,
+
   // Virtual types
   "u8": 1,
   "i8": 1,
@@ -464,6 +473,9 @@ export const UNIFORM_ARRAY_TYPES = {
   "mat3x4<f64>": Float64Array,
   "mat4x3<f64>": Float64Array,
   "mat4x4<f64>": Float64Array,
+
+  "atomic<u32>": Uint32Array,
+  "atomic<i32>": Int32Array,
 
   // Virtual types
   "u8": Uint8Array,

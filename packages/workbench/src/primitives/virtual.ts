@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { RenderPassMode, DeepPartial, Lazy } from '@use-gpu/core';
+import type { RenderPassMode, DeepPartial, Lazy, StorageSource } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { memo, use, fragment, useContext, useNoContext, useMemo, useNoMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -59,11 +59,12 @@ export type VirtualProps = {
   mode?: RenderPassMode | string,
   id?: number,
 
-  vertexCount: Lazy<number>,
-  instanceCount: Lazy<number>,
+  vertexCount?: Lazy<number>,
+  instanceCount?: Lazy<number>,
+  indirect?: StorageSource, 
 
-  getVertex: ShaderModule,
-  getFragment: ShaderModule,
+  getVertex?: ShaderModule,
+  getFragment?: ShaderModule,
 
   renderer?: VirtualRenderer | string,
   defines: Record<string, any>,
@@ -91,8 +92,9 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
 export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
   let {
     getVertex: gV,
-    vertexCount: vC,
-    instanceCount: iC,
+    vertexCount: vC = 0,
+    instanceCount: iC = 0,
+    indirect,
 
     getFragment,
 
@@ -169,6 +171,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
   return drawCall({
     vertexCount,
     instanceCount,
+    indirect,
     vertex: v,
     fragment: f,
     defines,

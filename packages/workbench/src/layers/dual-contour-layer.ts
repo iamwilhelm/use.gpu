@@ -35,8 +35,7 @@ import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
 import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour.wgsl';
 
 const READ_WRITE_SOURCE = { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC };
-const INDIRECT_SOURCE   = { readWrite: true, flags: GPUBufferUsage.INDIRECT };
-const READBACK_SOURCE   = { flags: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ };
+const INDIRECT_SOURCE   = { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC };
 
 /** @hidden */
 export type DualContourLayerProps = {
@@ -102,14 +101,18 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const c = useShaderRef(color);
   const z = useShaderRef(zBias);
 
-  const indirectDraw = useOne(() => new Uint32Array(4));
+  const indirectDraw = useOne(() => new Uint32Array(8));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
 
-  const atomicCounter = useOne(() => new Uint32Array(1));
-  const atomicStorage = useRawSource(atomicCounter, 'atomic<u32>', READ_WRITE_SOURCE);
+  const [edgeStorage,   allocateEdges]    = useScratchSource(props.values, 'u32', READ_WRITE_SOURCE);
+  const [vertexStorage, allocateVertices] = useScratchSource(props.values, 'u32', READ_WRITE_SOURCE);
+  const [indexStorage,  allocateIndices]  = useScratchSource(props.values, 'u32', READ_WRITE_SOURCE);
 
-  const [edgesStorage, allocateEdges] = useScratchSource(props.values, 'u32', 3, READ_WRITE_SOURCE);
-
+  const d = resolve(countExpr);
+  allocateEdges(d * 3);
+  allocateVertices(d);
+  allocateIndices(d);
+  
   const boundScan = useBoundShader(scanVolume, SCAN_BINDINGS, [v, l]);
 
 
@@ -123,7 +126,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   const xf = useTransformContext();
 
-  const edgesReadout = useOne(() => ({...edgesStorage, readWrite: false}), edgesStorage);
+  const edgesReadout = useOne(() => ({...edgeStorage, readWrite: false}), edgeStorage);
   const boundVertex = useBoundShader(getDualContourVertex, VERTEX_BINDINGS, [edgesReadout, xf, sizeExpr, min, max, c, z]);
 
 
@@ -156,10 +159,12 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   // Uniforms
   const data = useMemo(() =>
     makeStorageBinding(device, pipeline, {
-      a: edgesStorage,
-      b: atomicStorage,
+      a: edgeStorage,
+      b: vertexStorage,
+      c: indexStorage,
+      d: indirectStorage,
     }),
-    [device, pipeline, edgesStorage, atomicStorage]
+    [device, pipeline, edgeStorage, vertexStorage, indexStorage, indirectStorage]
   );
 
   const inspect = useInspectable();
@@ -168,21 +173,32 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       dispatchCount: 0,
     },
   });
-  
-  let once = false;
-  let mapped = false;
+
+  let sourceVersion = 0;
+  const generationRef = useOne(() => ({current: 1}));
 
   const compute = yeet({
     compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
-      const s = resolve(sizeExpr);
+      if (sourceVersion === values.version) return;
+      sourceVersion = values.version;
 
+      const s = resolve(sizeExpr);
       const d = resolve(countExpr);
+      allocateEdges(d * 3);
+      allocateVertices(d);
+      allocateIndices(d);
+
       inspected.render.dispatchCount = d;
       countDispatch(d);
 
-      atomicCounter[0] = 0;
-      uploadBuffer(device, atomicStorage.buffer, atomicCounter.buffer);
-      allocateEdges();
+      const {current: generation} = generationRef;
+      indirectDraw[0] = 4;
+      indirectDraw[1] = 0;
+      indirectDraw[4] = 0;
+      indirectDraw[5] = generation;
+      generationRef.current++;
+
+      uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
 
       if (storage.pipe && storage.buffer) {
         storage.pipe.fill(constants);
@@ -201,14 +217,27 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   return [
     compute,
     use(Virtual, {
-      vertexCount: 4,
-      instanceCount: resolve(sizeExpr).reduce((a, b) => a * b, 1),
+      indirect: indirectStorage,
       getVertex: boundVertex,
       pipeline: PIPELINE,
       mode,
       id,
     }),
-    use(Readback, { source: edgesStorage, then: (data) => {
+    /*
+    use(Readback, { source: indirectStorage, then: (data) => {
+      console.log(data);
+      return debug(fragment([]));
+    } }),
+    use(Readback, { source: edgeStorage, then: (data) => {
+      console.log(data);
+      return debug(fragment([]));
+    } }),
+    use(Readback, { source: vertexStorage, then: (data) => {
+      console.log(data);
+      return debug(fragment([]));
+    } }),
+    */
+    use(Readback, { source: indexStorage, then: (data) => {
       console.log(data);
       return debug(fragment([]));
     } }),

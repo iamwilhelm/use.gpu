@@ -22,7 +22,10 @@ const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number) => {
   emit(x, y, z);
 }
 const EXPR_VALUE = (emit: Emit, x: number, y: number, z: number) => {
-  emit(Math.cos(x * 2) * Math.cos(y * 2) * Math.cos(z * 2));
+	x = x * 2 + 0.01;
+	y = y * 2 + 0.03;
+	z = z * 2 + 0.05;
+  emit(Math.sin(x)*Math.cos(y) + Math.sin(y)*Math.cos(z) + Math.sin(z)*Math.cos(x));
 }
 
 export const PlotImplicitSurfacePage: LC = () => {
@@ -77,13 +80,13 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Sampled
                 axes='xyz'
                 format='vec3<f32>'
-                size={[12, 12, 12]}
+                size={[24, 12, 12]}
                 expr={EXPR_POSITION}
                 render={(positions: StorageSource) => (
                   <Sampled
                     axes='xyz'
                     format='f32'
-                    size={[12, 12, 12]}
+                    size={[24, 12, 12]}
                     expr={EXPR_VALUE}
                     render={(values: StorageSource) => [
                       <DualContourLayer

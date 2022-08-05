@@ -1,5 +1,5 @@
 import type { TypedArray, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec } from './types';
-import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from './constants';
+import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
 
 import { vec4 } from 'gl-matrix';
 
@@ -16,14 +16,16 @@ export const alignSizeTo = (n: number, s: number) => {
 export const getDataArrayConstructor = (type: UniformType) => UNIFORM_ARRAY_TYPES[type];
 
 export const getDataArrayByteLength = (type: UniformType, length: number) => {
+  const size = UNIFORM_ATTRIBUTE_SIZES[type];
   const dims = UNIFORM_ARRAY_DIMS[type];
-  return alignSizeTo(length * Math.ceil(dims), 4);
+  return size * alignSizeTo(length * Math.ceil(dims), 4);
 };
 
 export const makeDataArray = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
   const dims = UNIFORM_ARRAY_DIMS[type];
-  const array = new ctor(getDataArrayByteLength(type, length));
+  const n = alignSizeTo(length * Math.ceil(dims), 4);
+  const array = new ctor(n);
   return {array, dims};
 };
 

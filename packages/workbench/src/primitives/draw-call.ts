@@ -28,6 +28,7 @@ export type RenderProps = {
 
   vertexCount: Lazy<number>,
   instanceCount: Lazy<number>,
+  indirect?: StorageSource,
 
   vertex: ParsedBundle,
   fragment: ParsedBundle,
@@ -49,6 +50,7 @@ export const drawCall = (props: RenderProps) => {
   const {
     vertexCount,
     instanceCount,
+    indirect,
     vertex: vertexShader,
     fragment: fragmentShader,
 
@@ -154,7 +156,8 @@ export const drawCall = (props: RenderProps) => {
       if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
       if (volatile.bindGroup) passEncoder.setBindGroup(2, volatile.bindGroup());
 
-      passEncoder.draw(v, i, 0, 0);
+      if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
+      else passEncoder.draw(v, i, 0, 0);
     },
   });
 };

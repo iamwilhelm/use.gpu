@@ -23,8 +23,12 @@ export const makeStorageEntries = (
   for (const k in links) {
     const link = links[k];
     if (link) {
-      const {buffer} = link;
-      entries.push({binding, resource: {buffer}});
+      const {buffer, byteOffset, byteLength} = link;
+      entries.push({binding, resource: {
+        buffer,
+        offset: byteOffset,
+        size:   byteLength,
+      }});
       binding++;
     }
   }

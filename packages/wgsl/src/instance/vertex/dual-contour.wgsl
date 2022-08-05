@@ -33,15 +33,15 @@ fn unpackEdgeId(id: u32) -> vec4<u32> {
 
   var gridVertexIndex = edgeIndex.xyz;
   if (edgeIndex.a == 1u) {
-    gridVertexIndex += vec3<u32>(0u, ij);
+    gridVertexIndex -= vec3<u32>(0u, ij);
     color = mix(color, vec4<f32>(1.0, 0.0, 0.0, 1.0), 0.5);
   }
   else if (edgeIndex.a == 2u) {
-    gridVertexIndex += vec3<u32>(ij.x, 0u, ij.y);
+    gridVertexIndex -= vec3<u32>(ij.x, 0u, ij.y);
     color = mix(color, vec4<f32>(0.0, 1.0, 0.0, 1.0), 0.5);
   }
   else if (edgeIndex.a == 3u) {
-    gridVertexIndex += vec3<u32>(ij, 0u);
+    gridVertexIndex -= vec3<u32>(ij, 0u);
     color = mix(color, vec4<f32>(0.0, 0.0, 1.0, 1.0), 0.5);
   }
 

@@ -134,6 +134,9 @@ export type UniformType =
   | "mat3x4<f64>"
   | "mat4x3<f64>"
   | "mat4x4<f64>"
+  
+  | "atomic<u32>"
+  | "atomic<i32>"
 
   // Virtual types
   | "u8"

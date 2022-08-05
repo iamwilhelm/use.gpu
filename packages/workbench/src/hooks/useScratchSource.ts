@@ -10,8 +10,6 @@ import { useDeviceContext } from '../providers/device-provider';
 
 const NO_OPTIONS: ScratchSourceOptions = {};
 
-type InputSource = LambdaSource | StorageSource;
-
 type ScratchSourceOptions = {
   flags?: GPUFlagsConstant,
   readWrite?: boolean,
@@ -19,7 +17,6 @@ type ScratchSourceOptions = {
 };
 
 export const useScratchSource = (
-  inputSource: InputSource,
   format: UniformType,
   options: RawSourceOptions = NO_OPTIONS,
 ) => {
@@ -36,12 +33,9 @@ export const useScratchSource = (
     let alloc = 0;
 
     const allocate = (
-      length?: number,
+      length: number,
     ) => {
-      const size = resolve(inputSource.size)
-      const l = length ?? size.reduce((a, b) => a * b, 1);
-
-      const newAlloc = adjustSize(l, alloc);
+      const newAlloc = adjustSize(length, alloc);
 
       if (alloc !== newAlloc) {
         alloc = newAlloc;
@@ -49,8 +43,8 @@ export const useScratchSource = (
         source.buffer = makeDataBuffer(device, byteLength, flags);
       }
 
-      source.length = l;
-      source.size = length ? [length] : size;
+      source.length = length;
+      source.size = [length];
       source.version = incrementVersion(source.version);
     };
 
@@ -66,5 +60,5 @@ export const useScratchSource = (
     allocate(reserve);
 
     return [source, allocate] as [StorageSource, Task];
-  }, [device, inputSource, format, readWrite, flags]);
+  }, [device, format, readWrite, flags]);
 };

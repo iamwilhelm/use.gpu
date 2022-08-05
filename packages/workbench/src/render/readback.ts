@@ -19,9 +19,9 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
   const device = useDeviceContext();
 
   const storages = [
-    useScratchSource(source, source.format, READBACK_SOURCE),
-    useScratchSource(source, source.format, READBACK_SOURCE),
-    useScratchSource(source, source.format, READBACK_SOURCE),
+    useScratchSource(source.format, READBACK_SOURCE),
+    useScratchSource(source.format, READBACK_SOURCE),
+    useScratchSource(source.format, READBACK_SOURCE),
   ];
 
   const mapped = useOne(() => [false, false, false]);

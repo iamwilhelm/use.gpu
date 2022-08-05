@@ -89,7 +89,7 @@ export const dispatch = (props: RenderProps) => {
   return yeet({
     compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
       const s = resolve(size);
-			const d = size.reduce((a, b) => a * (b || 1), 1);
+      const d = size.reduce((a, b) => a * (b || 1), 1);
 
       inspected.render.dispatchCount = d;
       countDispatch(d);

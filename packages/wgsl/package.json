@@ -29,6 +29,11 @@
       "types": "./types/wgsl-files/index.d.ts",
       "default": "./src/index.ts"
     },
+    "./contour/fit.wgsl": {
+      "types": "./src/contour/fit.wgsl.d.ts",
+      "import": "./src/contour/fit.wgsl",
+      "require": "./src/contour/fit.wgsl"
+    },
     "./contour/scan.wgsl": {
       "types": "./src/contour/scan.wgsl.d.ts",
       "import": "./src/contour/scan.wgsl",
@@ -348,6 +353,11 @@
       "types": "./src/transform/stereographic.wgsl.d.ts",
       "import": "./src/transform/stereographic.wgsl",
       "require": "./src/transform/stereographic.wgsl"
+    },
+    "./use/array.wgsl": {
+      "types": "./src/use/array.wgsl.d.ts",
+      "import": "./src/use/array.wgsl",
+      "require": "./src/use/array.wgsl"
     },
     "./use/color.wgsl": {
       "types": "./src/use/color.wgsl.d.ts",

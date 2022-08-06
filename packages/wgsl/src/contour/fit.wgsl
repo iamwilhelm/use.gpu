@@ -2,6 +2,7 @@ use '@use-gpu/wgsl/use/array'::{ sizeToModulus3, packIndex3, unpackIndex3 };
 
 @link var<storage, read_write> activeCells: array<u32>;
 @link var<storage, read_write> vertexPositions: array<vec4<f32>>;
+@link var<storage, read_write> vertexNormals: array<vec4<f32>>;
 
 @link fn getValueData(i: u32) -> f32 {};
 @link fn getNormalData(i: u32) -> vec3<f32> {};
@@ -43,7 +44,7 @@ fn getZeroLevel(a: f32, b: f32) -> f32 {
   let p101 = getValueData(i101) - level;
   let p111 = getValueData(i111) - level;
 
-  let n000 = getNormalData(i000);
+  let n000 = getNormalData(i000).xyz;
 
   var p = vec3<f32>(0.0);
   var w = 0.0;
@@ -133,4 +134,5 @@ fn getZeroLevel(a: f32, b: f32) -> f32 {
   }
 
   vertexPositions[index] = vec4<f32>(cellOrigin + p / w, 1.0);
+  vertexNormals[index] = vec4<f32>(normalize(n000), 1.0);
 }

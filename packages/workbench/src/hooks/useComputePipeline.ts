@@ -13,7 +13,7 @@ const NO_LIBS = {} as Record<string, any>;
 
 type ComputeShader = ShaderModuleDescriptor;
 
-export const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string, any>({
+const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string, any>({
   max: 100,
   ...options,
 });
@@ -147,8 +147,10 @@ export const useComputePipelineAsync = (
   return [immediate ?? resolved, !!staleRef.current];
 };
 
+/*
 export const setShaderLog = (n: number) => SHADER_LOG = new LRU<string, any>({ max: n });
 export const getShaderLog = () => {
   if (!SHADER_LOG) return [] as any;
   return SHADER_LOG.values();
 }
+*/

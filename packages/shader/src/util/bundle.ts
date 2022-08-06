@@ -67,6 +67,7 @@ export const makeDeclarationToAttribute = (
     const args = ms?.map(({format}: any) => format);
     return {name, format: name, args, members: ms};
   }
+  throw new Error(`Cannot convert declaration to attribute: ${JSON.stringify(d)}`);
 }
 
 // Replace custom types with a reference to the bundle
@@ -140,6 +141,6 @@ export const makeBundleToAttribute = (
       }
     }
 
-    return {name: name ?? 'main', format: 'void', args: NO_ARGS};
+    throw new Error(`Unknown attribute ${entry}`);
   };
 };

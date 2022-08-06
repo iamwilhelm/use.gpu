@@ -41,6 +41,11 @@ const SHADED_RENDERER = [
   instanceFragmentShaded,
 ] as VirtualRenderer;
 
+const NORMAL_RENDERER = [
+  instanceDrawVirtualShaded,
+  instanceFragmentShaded,
+] as VirtualRenderer;
+
 const UI_RENDERER = [
   instanceDrawVirtualUI,
   instanceFragmentUI,
@@ -49,6 +54,7 @@ const UI_RENDERER = [
 const BUILTIN = {
   solid: SOLID_RENDERER,
   shaded: SHADED_RENDERER,
+  normal: NORMAL_RENDERER,
   ui: UI_RENDERER,
 } as Record<string, VirtualRenderer>;
 

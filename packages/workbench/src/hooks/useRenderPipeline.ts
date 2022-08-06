@@ -13,7 +13,7 @@ const NO_LIBS = {} as Record<string, any>;
 
 type RenderShader = [ShaderModuleDescriptor, ShaderModuleDescriptor];
 
-export const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string, any>({
+const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string, any>({
   max: 100,
   ...options,
 });

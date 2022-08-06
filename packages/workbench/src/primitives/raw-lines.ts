@@ -16,6 +16,7 @@ import { RenderPassMode, resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useDataLength } from '../hooks/useDataBinding';
 
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -95,7 +96,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   // Set up draw
   const vertexCount = 2 + tris;
-  const instanceCount = useCallback(() => (((props.positions as any)?.length ?? resolve(count)) || 2) - 1, [props.positions, count]);
+  const instanceCount = useDataLength(count, props.positions, -1);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 

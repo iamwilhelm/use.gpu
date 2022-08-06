@@ -10,26 +10,22 @@ import type { VectorLike } from '@use-gpu/traits';
 import { Virtual } from '../primitives/virtual';
 import { Readback } from '../primitives/readback';
 
-import { patch } from '@use-gpu/state';
 import { use, memo, yeet, debug, fragment, useMemo, useOne, useVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import {
-  resolve,
-  uploadBuffer,
-  makeBoundUniforms, makeVolatileUniforms, makeStorageBinding,
-} from '@use-gpu/core';
+import { resolve, uploadBuffer } from '@use-gpu/core';
+
+import { useBoundShader } from '../hooks/useBoundShader';
+import { useComputePipeline } from '../hooks/useComputePipeline';
+import { useDataSize } from '../hooks/useDataBinding';
+import { useDerivedSource } from '../hooks/useDerivedSource';
+import { useRawSource } from '../hooks/useRawSource';
+import { useScratchSource } from '../hooks/useScratchSource';
+import { useShaderRef } from '../hooks/useShaderRef';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { useShaderRef } from '../hooks/useShaderRef';
-import { useRawSource } from '../hooks/useRawSource';
-import { useDerivedSource } from '../hooks/useDerivedSource';
-import { useScratchSource } from '../hooks/useScratchSource';
-import { useBoundSource } from '../hooks/useBoundSource';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useMaterialContext } from '../providers/material-provider';
 import { useTransformContext } from '../providers/transform-provider';
 
-import { useLinkedShader } from '../hooks/useLinkedShader';
-import { useComputePipeline } from '../hooks/useComputePipeline';
 import { useInspectable } from '../hooks/useInspectable'
 
 import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
@@ -70,10 +66,10 @@ const VERTEX_BINDINGS = bundleToAttributes(getDualContourVertex);
 const PIPELINE = {
   primitive: {
     topology: 'triangle-strip',
+    cullMode: 'back',
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
-/** @hidden */
 export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((props: DualContourLayerProps) => {
   const {
     color,
@@ -89,23 +85,15 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     shaded = true,
     zBias = 0,
 
-    size,
     mode = 'opaque',
     id = 0,
   } = props;
 
-  const sizeExpr = useMemo(() => () =>
-    (props.values as any)?.size ?? resolve(size),
-    [props.values, size]);
-
-  const countExpr = useOne(() => () => {
-    const s = resolve(sizeExpr);
-    return (s[0] || 1) * (s[1] || 1) * (s[2] || 1) * (s[3] || 1);
-  }, sizeExpr);
+  const size = useDataSize(props.size, props.values);
 
   const v = useShaderRef(null, values);
   const n = useShaderRef(null, normals);
-  const s = useShaderRef(sizeExpr);
+  const s = useShaderRef(size);
   const l = useShaderRef(level);
 
   const c = useShaderRef(color);
@@ -119,7 +107,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   const xf = useTransformContext();
 
-  const indirectDraw = useOne(() => new Uint32Array(8));
+  const indirectDraw    = useOne(() => new Uint32Array(8));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
 
   const [edgeStorage,   allocateEdges]    = useScratchSource('u32', READ_WRITE_SOURCE);
@@ -127,18 +115,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const [markStorage,   allocateMarks]    = useScratchSource('u32', READ_WRITE_SOURCE);
   const [indexStorage,  allocateIndices]  = useScratchSource('u32', READ_WRITE_SOURCE);
   const [vertexStorage, allocateVertices] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
+  const [normalStorage, allocateNormals]  = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
 
   const indirectNextStorage = useDerivedSource(indirectStorage, INDIRECT_OFFSET_1);
-  const edgeReadout = useDerivedSource(edgeStorage, READ_ONLY_SOURCE);
-  const indexReadout = useDerivedSource(indexStorage, READ_ONLY_SOURCE);
-  const vertexReadout = useDerivedSource(vertexStorage, READ_ONLY_SOURCE);
-
-  const d = resolve(countExpr);
-  allocateEdges(d * 3);
-  allocateCells(d);
-  allocateMarks(d);
-  allocateIndices(d);
-  allocateVertices(d);
+  const edgeReadout         = useDerivedSource(edgeStorage, READ_ONLY_SOURCE);
+  const indexReadout        = useDerivedSource(indexStorage, READ_ONLY_SOURCE);
+  const vertexReadout       = useDerivedSource(vertexStorage, READ_ONLY_SOURCE);
+  const normalReadout       = useDerivedSource(normalStorage, READ_ONLY_SOURCE);
   
   const boundScan = useBoundShader(
     scanVolume,
@@ -152,14 +135,14 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     fitContour,
     FIT_BINDINGS,
     [
-      cellStorage, vertexStorage,
+      cellStorage, vertexStorage, normalStorage,
       v, n, s, l,
     ]);
 
   const boundVertex = useBoundShader(
     getDualContourVertex,
     VERTEX_BINDINGS, [
-      edgeReadout, indexReadout, vertexReadout,
+      edgeReadout, indexReadout, vertexReadout, normalReadout,
       xf, s, c, z, min, max,
     ]);
 
@@ -167,13 +150,15 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const shouldDispatch = () => sourceVersion + values.version + (normals?.version ?? 0);
 
   const edgePassSize = () => {
-    const s = resolve(sizeExpr);
-    const d = resolve(countExpr);
+    const s = resolve(size);
+    const d = (s[0] || 1) * (s[1] || 1) * (s[2] || 1);
+
     allocateEdges(d * 3);
     allocateCells(d);
     allocateMarks(d);
     allocateIndices(d);
     allocateVertices(d);
+    allocateNormals(d);
 
     return [s[0] - 1, (s[1] - 1) || 1, (s[2] - 1) || 1];
   };
@@ -205,6 +190,9 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
   };
 
+  const m = useMaterialContext();
+  const getFragment = shaded ? m : getPassThruFragment;
+
   return [
     use(Dispatch, {
       shader: boundScan,
@@ -220,16 +208,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     use(Virtual, {
       indirect: indirectStorage,
       getVertex: boundVertex,
+      getFragment,
       pipeline: PIPELINE,
+      renderer: shaded ? 'shaded' : 'solid',
       mode,
       id,
     }),
-
     /*
-    use(Readback, { source: vertexStorage, then: (data) => {
-      console.log(data);
-      return debug(fragment([]));
-    } }),
     use(Readback, { source: indirectStorage, then: (data) => {
       console.log(data);
       return debug(fragment([]));

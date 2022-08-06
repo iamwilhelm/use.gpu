@@ -16,6 +16,7 @@ import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useDataLength } from '../hooks/useDataBinding';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
@@ -107,7 +108,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => ((props.indices as any)?.length ?? resolve(count)), [props.indices, count]);
+  const instanceCount = useDataLength(count, props.indices);
 
   const pipeline = useMemo(() =>
     patch(alphaToCoverage

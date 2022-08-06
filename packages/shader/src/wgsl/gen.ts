@@ -118,7 +118,7 @@ export const makeBindingAccessors = (
     const volatileSet = getBindingArgument(rename.get(VOLATILE_BINDGROUP));
 
     for (const {uniform: {name, format: type, args}} of constants) {
-      program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, type, name, args));
+      program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, type, name, args as any));
     }
 
     for (const {uniform: {name, format: type, args}, storage} of storages) {
@@ -162,7 +162,7 @@ export const makeBindingAccessors = (
         }
       }
 
-      program.push(makeStorageAccessor(namespace, set, base, type, format, name, readWrite, args));
+      program.push(makeStorageAccessor(namespace, set, base, type, format as string, name, readWrite, args));
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {

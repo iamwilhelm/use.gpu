@@ -14,6 +14,13 @@ declare module "@use-gpu/wgsl/contour/scan.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/contour/types.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const IndirectDrawMeta: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/fragment/lod-bias.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -102,10 +109,17 @@ declare module "@use-gpu/wgsl/geometry/trim.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/fragment/mapped.wgsl" {
+declare module "@use-gpu/wgsl/instance/fragment/normal-map.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getMappedFragment: ParsedBundle;
+  export const getNormalMapFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/fragment/normal.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getNormalFragment: ParsedBundle;
   export default __module;
 }
 

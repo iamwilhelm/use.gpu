@@ -37,7 +37,7 @@ const EXPR_VALUE = (emit: Emit, x: number, y: number, z: number, i: number, j: n
 
 const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, i: number, j: number, k: number, time: Time) => {
   const t = time.elapsed / 1000;
-  const e = 1e-5;
+  const e = 1e-3;
 
   const v  = f(x, y, z, t);
   const vx = f(x + e, y, z, t);
@@ -47,9 +47,8 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, i: number, j: 
   const nx = (vx - v) / e;
   const ny = (vy - v) / e;
   const nz = (vz - v) / e;
-  const nl = 1/Math.sqrt(nx * nx + ny * ny + nz * nz);
-  
-  emit(nx * nl, ny * nl, nz * nl);
+
+  emit(nx, ny, nz);
 };
 
 export const PlotImplicitSurfacePage: LC = () => {
@@ -61,8 +60,8 @@ export const PlotImplicitSurfacePage: LC = () => {
         <Pass>
           <Plot>
             <Cartesian
-              range={[[-3, 3], [-1, 1], [-1, 1]]}
-              scale={[2, 1, 1]}
+              range={[[-3, 3], [-1, 1], [-3, 3]]}
+              scale={[3, 1, 3]}
             >
               <Grid
                 axes='xy'
@@ -104,31 +103,31 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Sampled
                 axes='xyz'
                 format='vec3<f32>'
-                size={[24, 12, 12]}
+                size={[36, 12, 36]}
                 expr={EXPR_POSITION}
                 time
-                live
+                xlive
                 render={(positions: StorageSource) => (
                   <Sampled
                     axes='xyz'
                     format='f32'
-                    size={[24, 12, 12]}
+                    size={[36, 12, 36]}
                     expr={EXPR_VALUE}
                     time
-                    live
+                    xlive
                     render={(values: StorageSource) => (
                       <Sampled
                         axes='xyz'
-                        format='f32'
-                        size={[24, 12, 12]}
+                        format='vec3<f32>'
+                        size={[36, 12, 36]}
                         expr={EXPR_NORMAL}
                         time
-                        live
+                        xlive
                         render={(normals: StorageSource) => [
                           <DualContourLayer
                             values={values}
                             normals={normals}
-                            range={[[-3, 3], [-1, 1], [-1, 1]]}
+                            range={[[-3, 3], [-1, 1], [-3, 3]]}
                             color={[0.7, 0.0, 0.5, 1.0]}
                           />,
                           /*

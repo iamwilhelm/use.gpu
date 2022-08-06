@@ -39,6 +39,11 @@
       "import": "./src/contour/scan.wgsl",
       "require": "./src/contour/scan.wgsl"
     },
+    "./contour/types.wgsl": {
+      "types": "./src/contour/types.wgsl.d.ts",
+      "import": "./src/contour/types.wgsl",
+      "require": "./src/contour/types.wgsl"
+    },
     "./fragment/lod-bias.wgsl": {
       "types": "./src/fragment/lod-bias.wgsl.d.ts",
       "import": "./src/fragment/lod-bias.wgsl",
@@ -94,10 +99,15 @@
       "import": "./src/geometry/trim.wgsl",
       "require": "./src/geometry/trim.wgsl"
     },
-    "./instance/fragment/mapped.wgsl": {
-      "types": "./src/instance/fragment/mapped.wgsl.d.ts",
-      "import": "./src/instance/fragment/mapped.wgsl",
-      "require": "./src/instance/fragment/mapped.wgsl"
+    "./instance/fragment/normal-map.wgsl": {
+      "types": "./src/instance/fragment/normal-map.wgsl.d.ts",
+      "import": "./src/instance/fragment/normal-map.wgsl",
+      "require": "./src/instance/fragment/normal-map.wgsl"
+    },
+    "./instance/fragment/normal.wgsl": {
+      "types": "./src/instance/fragment/normal.wgsl.d.ts",
+      "import": "./src/instance/fragment/normal.wgsl",
+      "require": "./src/instance/fragment/normal.wgsl"
     },
     "./instance/fragment/shaded.wgsl": {
       "types": "./src/instance/fragment/shaded.wgsl.d.ts",

@@ -20,6 +20,7 @@ import { useRawSource } from '../hooks/useRawSource';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useDataLength } from '../hooks/useDataBinding';
 
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -75,7 +76,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   // Set up draw
   const vertexCount = mesh.count;
-  const instanceCount = useCallback(() => ((props.anchors as any)?.length ?? resolve(count)), [props.anchors, count]);
+  const instanceCount = useDataLength(count, props.anchors);
   
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 

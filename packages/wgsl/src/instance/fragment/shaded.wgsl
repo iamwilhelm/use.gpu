@@ -15,6 +15,9 @@ use '@use-gpu/wgsl/use/view'::{ getViewPosition };
   params: T,
 ) -> vec3<f32> {}
 
+@optional @link fn getOcclusion(uv: vec2<f32>) -> f32 { return 1.0; };
+@optional @link fn getEmissive(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.0); };
+
 @export fn getShadedFragment(
   color: vec4<f32>,
   uv: vec4<f32>,
@@ -26,12 +29,15 @@ use '@use-gpu/wgsl/use/view'::{ getViewPosition };
   let viewPosition = getViewPosition();
   let toView: vec3<f32> = viewPosition.xyz - position.xyz;
 
-  let params = getMaterial(color.rgb, uv, st);
-
   let N: vec3<f32> = normalize(normal.xyz);
   let V: vec3<f32> = normalize(toView);
 
-  let light = applyLights(N, V, position.xyz, 1.0, params);
+  let emissive = getEmissive(uv.xy);
+  let occlusion = getOcclusion(uv.xy);
+  let params = getMaterial(color.rgb, uv, st);
+  let light = emissive.xyz + applyLights(N, V, position.xyz, occlusion, params);
+
+  //return vec4<f32>(N * .5 + .5, 1.0); 
 
   return vec4<f32>(light * color.a, color.a);
 }

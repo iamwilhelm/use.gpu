@@ -34,7 +34,7 @@ fn appendVertex(i: u32) {
 
 // Pack edge ID into 32-bit uint
 fn packEdgeId(index: vec3<u32>, axis: u32) -> u32 {
-  let shifted = vec4<u32>(index, axis) << vec4<u32>(0u, 10u, 20u, 30u);
+  let shifted = vec4<u32>(index, axis) << vec4<u32>(0u, 9u, 18u, 27u);
   return shifted.x | shifted.y | shifted.z | shifted.w;
 }
 
@@ -56,7 +56,9 @@ fn packEdgeId(index: vec3<u32>, axis: u32) -> u32 {
   let check = globalId.yzx * globalId.zxy;
   if (check.x > 0u) {
     if (px * p < 0.0) {
-      appendEdge(packEdgeId(globalId, 1u));
+      var axis = 1u;
+      if (px < p) { axis = 2u; }
+      appendEdge(packEdgeId(globalId, axis));
 
       appendVertex(base - packIndex3(vec3<u32>(0u, 1u, 1u), modulus));
       appendVertex(base - packIndex3(vec3<u32>(0u, 1u, 0u), modulus));
@@ -66,7 +68,9 @@ fn packEdgeId(index: vec3<u32>, axis: u32) -> u32 {
   }
   if (check.y > 0u) {
     if (py * p < 0.0) {
-      appendEdge(packEdgeId(globalId, 2u));
+      var axis = 3u;
+      if (py < p) { axis = 4u; }
+      appendEdge(packEdgeId(globalId, axis));
 
       appendVertex(base - packIndex3(vec3<u32>(1u, 0u, 1u), modulus));
       appendVertex(base - packIndex3(vec3<u32>(1u, 0u, 0u), modulus));
@@ -76,7 +80,9 @@ fn packEdgeId(index: vec3<u32>, axis: u32) -> u32 {
   }
   if (check.z > 0u) {
     if (pz * p < 0.0) {
-      appendEdge(packEdgeId(globalId, 3u));
+      var axis = 5u;
+      if (pz < p) { axis = 6u; }
+      appendEdge(packEdgeId(globalId, axis));
 
       appendVertex(base - packIndex3(vec3<u32>(1u, 1u, 0u), modulus));
       appendVertex(base - packIndex3(vec3<u32>(1u, 0u, 0u), modulus));

@@ -16,7 +16,7 @@ export const useGLTFMaterial = (
     useNativeColorTexture();
     useNativeColorTexture();
     useNativeColorTexture();
-//    useNativeColorTexture();
+    useNativeColorTexture();
     return {};
   }
   

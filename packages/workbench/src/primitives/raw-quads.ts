@@ -16,6 +16,7 @@ import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useDataLength } from '../hooks/useDataBinding';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedFragment } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -98,7 +99,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => ((props.positions as any)?.length ?? resolve(count)), [props.positions, count]);
+  const instanceCount = useDataLength(count, props.positions);
 
   const pipeline = useMemo(() =>
     patch(alphaToCoverage

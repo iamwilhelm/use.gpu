@@ -16,6 +16,7 @@ import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useTransformContext } from '../providers/transform-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useDataLength } from '../hooks/useDataBinding';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 
 import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
@@ -101,7 +102,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   } = props;
 
   const vertexCount = 4;
-  const instanceCount = useCallback(() => ((props.rectangles as any)?.length ?? resolve(count)), [props.rectangles, count]);
+  const instanceCount = useDataLength(count, props.rectangles);
 
   const pipeline = useMemo(() =>
     patch(alphaToCoverage

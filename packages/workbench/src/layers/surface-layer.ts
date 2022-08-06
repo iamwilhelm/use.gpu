@@ -31,6 +31,7 @@ export type SurfaceLayerProps = {
   loopY?: boolean,
   shaded?: boolean,
 
+  cullMode?: GPUCullMode,
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
   mode?: RenderPassMode | string,
   id?: number,
@@ -49,6 +50,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     loopX = false,
     loopY = false,
     shaded = true,
+    cullMode = 'none',
 
     size,
     mode = 'opaque',
@@ -60,6 +62,8 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     [props.positions, size]);
   const boundSize = useBoundSource(SIZE_BINDING, sizeExpr);
 
+  const pipeline = useOne(() => ({primitive: {cullMode}}), cullMode);
+
   const countExpr = useOne(() => () => {
     const s = resolve(sizeExpr);
     return ((s[0] || 1) - +!loopX) * ((s[1] || 1) - +!loopY) * (s[2] || 1) * (s[3] || 1) * 2;
@@ -69,8 +73,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   const indices = useBoundShader(getSurfaceIndex, [SIZE_BINDING], [boundSize], defines);
 
   const p = useShaderRef(props.position, props.positions);
-  const xf = useApplyTransform(p);
-  const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, xf], defines);
+  const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, p], defines);
 
   return use(RawFaces, {
     position,
@@ -83,6 +86,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
 
     shaded,
     count: countExpr,
+    pipeline,
     mode,
     id,
   });

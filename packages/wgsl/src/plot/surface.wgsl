@@ -32,7 +32,7 @@ use '@use-gpu/wgsl/use/array'::{ sizeToModulus3, packIndex3, unpackIndex3 }
   let size = getSize(0u);
   let modulus = sizeToModulus3(size);
 
-  let xyd = unpackIndex(index, modulus);
+  let xyd = unpackIndex3(index, modulus);
   
   let left   = packIndex3(offsetIndex(xyd, size, vec2<i32>(-1, 0)), modulus);
   let right  = packIndex3(offsetIndex(xyd, size, vec2<i32>(1, 0)), modulus);

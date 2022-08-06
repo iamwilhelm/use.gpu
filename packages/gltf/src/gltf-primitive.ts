@@ -4,23 +4,23 @@ import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { flattenIndexedArray } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { use, provide, useMemo, useNoMemo, useVersion, useNoVersion } from '@use-gpu/live';
+import { use, provide, useOne, useNoOne, useMemo, useNoMemo, useVersion, useNoVersion } from '@use-gpu/live';
 import { generateTangents } from 'mikktspace';
-import { mat4 } from 'gl-matrix';
+import { mat3, mat4 } from 'gl-matrix';
 
 import {
   FaceLayer, FaceLayerProps,
   PBRMaterial,
-  TransformContext,
+  TransformContext, DifferentialContext,
   useBoundShader, useNoBoundShader,
   useRawSource, useNoRawSource,
 } from '@use-gpu/workbench';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
-import { getTransformedNormal } from '@use-gpu/wgsl/transform/normal.wgsl'
+import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
 import { useGLTFMaterial } from './gltf-material';
 
 const CARTESIAN_BINDINGS = bundleToAttributes(getCartesianPosition);
-const NORMAL_BINDINGS = bundleToAttributes(getTransformedNormal);
+const NORMAL_BINDINGS = bundleToAttributes(getMatrixDifferential);
 
 export type GLTFPrimitiveProps = {
   gltf: GLTF,
@@ -94,25 +94,16 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   if (transform) {
     const {normals, tangents} = faces;
 
-    // Apply matrix transform to positions and tangents
+    const contravariant = useOne(() => mat3.normalFromMat4(mat3.create(), transform), transform);
+
+    // Apply matrix transform
     const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, [transform]);
-    view = provide(TransformContext, xform, view);
+    const dform = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [transform, contravariant]);
 
-    if (tangents) faces.tangents = useBoundShader(getTransformedNormal, NORMAL_BINDINGS, [transform, tangents]);
-    else useNoBoundShader();      
-
-    if (normals) {
-      const m = mat4.create();
-      mat4.invert(m, transform);
-      mat4.transpose(m, m);
-
-      faces.normals = useBoundShader(getTransformedNormal, NORMAL_BINDINGS, [m, normals]);
-    }
-    else {
-      useNoBoundShader();      
-    }
+    view = provide(TransformContext, xform, provide(DifferentialContext, dform, view));
   }
   else {
+    useNoOne();
     useNoBoundShader();
     useNoBoundShader();
   }

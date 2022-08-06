@@ -482,10 +482,31 @@ declare module "@use-gpu/wgsl/transform/cartesian.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/transform/normal.wgsl" {
+declare module "@use-gpu/wgsl/transform/diff-chain.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getTransformedNormal: ParsedBundle;
+  export const getChainDifferential: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/diff-epsilon.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getEpsilonDifferential: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/diff-matrix.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getNullDifferential: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/diff-null.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getMatrixDifferential: ParsedBundle;
   export default __module;
 }
 

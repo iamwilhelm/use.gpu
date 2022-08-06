@@ -1,6 +1,9 @@
 use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
 use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
 
+@optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p; };
+@optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
+
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getNormal(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
 @optional @link fn getTangent(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 0.0, 1.0); };
@@ -56,20 +59,24 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
   if (UNWELDED_NORMALS) { normalIndex = unweldedIndex; }
   if (UNWELDED_TANGENTS) { tangentIndex = unweldedIndex; }
 
-  var color = getColor(cornerIndex);
-  var world = getPosition(cornerIndex);
+  var vertex = getPosition(cornerIndex);
   var normal = getNormal(normalIndex);
   var tangent = getTangent(tangentIndex);
+  var color = getColor(cornerIndex);
   var uv = getUV(cornerIndex);
   var st = getST(cornerIndex);
+
+  var world = transformPosition(vertex);
+  var worldNormal = transformDifferential(normal, vertex, true);
+  var worldTangent = transformDifferential(tangent, vertex, false);
 
   var position = worldToClip(world);
 
   return ShadedVertex(
     position,
     world,
-    normal,
-    tangent,
+    worldNormal,
+    worldTangent,
     color,
     uv,
     st,

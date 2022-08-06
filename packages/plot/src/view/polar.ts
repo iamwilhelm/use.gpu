@@ -5,7 +5,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext,
+  TransformContext, DifferentialContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
@@ -40,7 +40,7 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
   const {range: g, axes: a} = useAxesTrait(props);
   const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
-  const [focus, aspect, matrix, swizzle, range] = useMemo(() => {
+  const [focus, aspect, matrix, swizzle, range, epsilon] = useMemo(() => {
     const x = g[0][0];
     let   y = g[1][0];
     const z = g[2][0];
@@ -53,6 +53,9 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
     const sx = s ? s[inv.indexOf('x')] : 1;
     const sy = s ? s[inv.indexOf('y')] : 1;
     const sz = s ? s[inv.indexOf('z')] : 1;
+
+    // Epsilon for differential transport
+    const epsilon = (Math.abs(dx) + Math.abs(dy) + Math.abs(dz)) / 3000;
 
     // Watch for negative scales
     const idx = Math.sign(dx);
@@ -117,28 +120,32 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
       range[1] = [min, max];
     }
 
-    return [focus, aspect, matrix, swizzle, range];
+    return [focus, aspect, matrix, swizzle, range, epsilon];
   }, [g, a, p, r, q, s, bend, helix, on]);
+
+  const t = useShaderRef(matrix);
 
   const b = useShaderRef(bend);
   const f = useShaderRef(focus);
   const c = useShaderRef(aspect);
   const h = useShaderRef(helix);
-  const t = useShaderRef(matrix);
+  const e = useShaderRef(epsilon);
 
-  const bound = useBoundShader(getPolarPosition, POLAR_BINDINGS, [b, f, c, h, t]);
+  const bound = useBoundShader(getPolarPosition, POLAR_BINDINGS, [t, b, f, c, h]);
 
   // Apply input basis as a cast
-  const position = useMemo(() => {
+  const xform = useMemo(() => {
     if (!swizzle) return bound;
     return chainTo(swizzleTo('vec4<f32>', 'vec4<f32>', swizzle), bound);
   }, [bound, swizzle]);
 
-  const transform = useCombinedTransform(position);
+  const [transform, differential] = useCombinedTransform(xform, null, e);
 
   return (
     provide(TransformContext, transform,
-      provide(RangeContext, range, children ?? [])
+      provide(DifferentialContext, differential,
+        provide(RangeContext, range, children ?? [])
+      )
     )
   );
 };

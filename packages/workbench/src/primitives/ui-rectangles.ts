@@ -13,7 +13,7 @@ import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useMemo } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
-import { useTransformContext } from '../providers/transform-provider';
+import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
@@ -120,8 +120,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const p = useShaderRef(props.repeat, props.repeats);
   const d = useShaderRef(props.sdf, props.sdfs);
 
-  const parent = useTransformContext();
-  const x = props.transform || parent;
+  const [x] = useCombinedTransform(props.transform);
   const c = props.clip;
   const t = useNativeColorTexture(props.texture);
 

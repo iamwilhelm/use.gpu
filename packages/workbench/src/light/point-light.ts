@@ -5,7 +5,7 @@ import { parseColor, parseNumber, parseMatrix, parsePosition, useProp } from '@u
 import { useMemo } from '@use-gpu/live';
 
 import { useLightCapture } from './lights';
-import { useTransformContext } from '../providers/transform-provider';
+import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
 
 export type PointLightProps = {
   position?: VectorLike,
@@ -22,6 +22,7 @@ export const PointLight: LiveComponent<PointLightProps> = (props: PointLightProp
   const intensity = useProp(props.intensity, parseNumber, 1);
 
   const transform = useTransformContext();
+  const differential = useDifferentialContext();
 
   const light = useMemo(() => ({
     kind: 2,
@@ -30,7 +31,8 @@ export const PointLight: LiveComponent<PointLightProps> = (props: PointLightProp
     color,
     intensity,
     transform,
-  }), [position, size, color, intensity]);
+    differential,
+  }), [position, size, color, intensity, transform, differential]);
 
   useLightCapture(light);
   return null;

@@ -40,11 +40,13 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
 
   const ref = useShaderRef(matrix);
   const bound = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [ref]);
-  const transform = useCombinedTransform(bound);
+  const [transform, differential] = useCombinedTransform(bound, null);
 
   return (
     provide(TransformContext, transform,
-      provide(RangeContext, range, children ?? [])
+      provide(DifferentialContext, differential,
+        provide(RangeContext, range, children ?? [])
+      )
     )
   );
 };

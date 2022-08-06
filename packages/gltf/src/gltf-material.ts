@@ -76,7 +76,7 @@ export const useGLTFMaterial = (
       let map = gltf.bound.texture[normalTexture.index];
       if (map) {
         if (map.colorSpace === 'auto') map = {...map, colorSpace: 'native'};
-        props.normalMap = map;
+        //props.normalMap = map;
       }
     }
 

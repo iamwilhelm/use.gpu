@@ -359,10 +359,25 @@
       "import": "./src/transform/cartesian.wgsl",
       "require": "./src/transform/cartesian.wgsl"
     },
-    "./transform/normal.wgsl": {
-      "types": "./src/transform/normal.wgsl.d.ts",
-      "import": "./src/transform/normal.wgsl",
-      "require": "./src/transform/normal.wgsl"
+    "./transform/diff-chain.wgsl": {
+      "types": "./src/transform/diff-chain.wgsl.d.ts",
+      "import": "./src/transform/diff-chain.wgsl",
+      "require": "./src/transform/diff-chain.wgsl"
+    },
+    "./transform/diff-epsilon.wgsl": {
+      "types": "./src/transform/diff-epsilon.wgsl.d.ts",
+      "import": "./src/transform/diff-epsilon.wgsl",
+      "require": "./src/transform/diff-epsilon.wgsl"
+    },
+    "./transform/diff-matrix.wgsl": {
+      "types": "./src/transform/diff-matrix.wgsl.d.ts",
+      "import": "./src/transform/diff-matrix.wgsl",
+      "require": "./src/transform/diff-matrix.wgsl"
+    },
+    "./transform/diff-null.wgsl": {
+      "types": "./src/transform/diff-null.wgsl.d.ts",
+      "import": "./src/transform/diff-null.wgsl",
+      "require": "./src/transform/diff-null.wgsl"
     },
     "./transform/polar.wgsl": {
       "types": "./src/transform/polar.wgsl.d.ts",

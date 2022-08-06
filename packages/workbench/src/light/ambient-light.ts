@@ -5,7 +5,7 @@ import { parseColor, parseNumber, useProp } from '@use-gpu/traits';
 import { useMemo } from '@use-gpu/live';
 
 import { useLightCapture } from './lights';
-import { useTransformContext } from '../providers/transform-provider';
+import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
 
 export type AmbientLightProps = {
   color?: ColorLike,
@@ -18,6 +18,7 @@ export const AmbientLight = (props: AmbientLightProps) => {
   const intensity = useProp(props.intensity, parseNumber, 1);
 
   const transform = useTransformContext();
+  const differential = useDifferentialContext();
 
   const light = useMemo(() => ({
     kind: 0,
@@ -25,7 +26,8 @@ export const AmbientLight = (props: AmbientLightProps) => {
     color,
     intensity,
     transform,
-  }), [color, intensity]);
+    differential,
+  }), [color, intensity, transform, differential]);
 
   useLightCapture(light);
   return null;

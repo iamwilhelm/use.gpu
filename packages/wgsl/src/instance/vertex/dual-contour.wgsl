@@ -9,7 +9,9 @@ use '@use-gpu/wgsl/geometry/normal'::{ getOrthoVector };
 @link fn getVertexPosition(i: u32) -> vec4<f32> { };
 @link fn getVertexNormal(i: u32) -> vec4<f32> { };
 
-@link fn transformPosition(p: vec4<f32>) -> vec4<f32>;
+@optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p };
+@optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
+
 @link fn getVolumeSize(i: u32) -> vec3<u32> { };
 
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
@@ -92,20 +94,14 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
   let index = getVertexIndex(packIndex3(gridIndex, modulus));
 
   let vertex = getVertexPosition(index).xyz;
-  let normal = getVertexNormal(index).xyz;
+  let normal = getVertexNormal(index);
 
   let uv3 = (vertex - padding) / (vec3<f32>(gridSize - 1u) - padding * 2);
   let object = mix(rangeMin, rangeMax, uv3);
-  let world = transformPosition(vec4<f32>(object, 1.0));
+  let object4 = vec4<f32>(object, 1.0);
 
-  let eps = (rangeMax - rangeMin) * 0.001;
-  let tangent = getOrthoVector(normal);
-  let bitangent = cross(normal, tangent);
-  let ot = transformPosition(vec4<f32>(object + tangent * eps, 1.0));
-  let ob = transformPosition(vec4<f32>(object + bitangent * eps, 1.0));
-  let dt = (ot - world).xyz;
-  let db = (ob - world).xyz;
-  let worldNormal = vec4<f32>(normalize(cross(dt, db)), 1.0);
+  let world = transformPosition(object4);
+  let worldNormal = transformDifferential(normal, object4, true);
 
   var center = worldToClip(world);
   if (zBias != 0.0) {

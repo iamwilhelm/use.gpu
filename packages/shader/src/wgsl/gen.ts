@@ -303,9 +303,9 @@ export const makeVec3to4Accessor = (
 ) => `
 fn ${ns}${name}(i: u32) -> ${type} {
   let i3 = i * 3u;
-  let b = (i3 / 4u);
+  let b = i3 / 4u;
 
-  let b4 = (i3 / 4u) * 4u;
+  let b4 = b * 4u;
   let f3 = i3 - b4;
 
   let v1 = ${ns}${accessor}(b);

@@ -6,7 +6,6 @@ import type { SDFGlyphData } from '../text/types';
 import { use, keyed, wrap, memo, debug, fragment, provide, useFiber, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
-import { TransformContext, useTransformContext } from '../providers/transform-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useRawSource } from '../hooks/useRawSource';
 

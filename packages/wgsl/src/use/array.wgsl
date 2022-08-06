@@ -1,5 +1,5 @@
 @export fn sizeToModulus2(size: vec4<u32>) -> vec2<u32> {
-  return vec3<u32>(size.x, 0xffffffffu);
+  return vec2<u32>(size.x, 0xffffffffu);
 }
 
 @export fn sizeToModulus3(size: vec4<u32>) -> vec3<u32> {
@@ -10,11 +10,11 @@
 @export fn sizeToModulus4(size: vec4<u32>) -> vec4<u32> {
   let s1 = size.x * size.y;
   let s2 = s1 * size.z;
-  return vec3<u32>(size.x, s1, s2, 0xffffffffu);
+  return vec4<u32>(size.x, s1, s2, 0xffffffffu);
 }
 
 @export fn packIndex2(v: vec2<u32>, modulus: vec2<u32>) -> u32 {
-  return dot(v, vec3<u32>(1u, modulus.x));
+  return dot(v, vec2<u32>(1u, modulus.x));
 }
 
 @export fn packIndex3(v: vec3<u32>, modulus: vec3<u32>) -> u32 {

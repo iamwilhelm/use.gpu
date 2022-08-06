@@ -7,20 +7,22 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext,
+  TransformContext, DifferentialContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
 import { swizzleMatrix } from '../util/swizzle';
-import { mat4 } from 'gl-matrix';
+import { mat3, mat4 } from 'gl-matrix';
 
 import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
+import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
 const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
+const NORMAL_BINDINGS = bundleToAttributes(getMatrixDifferential);
 
 export type CartesianProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   children?: LiveElement<any>,
@@ -34,7 +36,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   const {range: g, axes: a} = useAxesTrait(props);
   const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
-  const matrix = useMemo(() => {
+  const [matrix, normalMatrix] = useMemo(() => {
     const x = g[0][0];
     const y = g[1][0];
     const z = g[2][0];
@@ -68,16 +70,24 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
       mat4.multiply(matrix, t, matrix);
     }
 
-    return matrix;
+    const normalMatrix = mat3.normalFromMat4(mat3.create(), matrix);
+
+    return [matrix, normalMatrix];
   }, [g, a, p, r, q, s]);
 
-  const ref = useShaderRef(matrix);
-  const bound = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [ref]);
-  const transform = useCombinedTransform(bound);
+  const matrixRef = useShaderRef(matrix);
+  const normalMatrixRef = useShaderRef(normalMatrix);
+
+  const boundPosition = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrixRef]);
+  const boundDifferential = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrixRef, normalMatrixRef]);
+
+  const [transform, differential] = useCombinedTransform(boundPosition, boundDifferential);
 
   return (
     provide(TransformContext, transform,
-      provide(RangeContext, g, children ?? [])
+      provide(DifferentialContext, differential,
+        provide(RangeContext, g, children ?? [])
+      )
     )
   );
 };

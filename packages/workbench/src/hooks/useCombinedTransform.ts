@@ -1,23 +1,37 @@
-import type { ArrowFunction } from '@use-gpu/live';
+import type { Lazy } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
 import { useOne, useVersion } from '@use-gpu/live';
-import { useTransformContext } from '../providers/transform-provider';
-import { chainTo } from '@use-gpu/shader/wgsl';
-import { vec4 } from 'gl-matrix';
+import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
+import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
+import { getBoundShader } from '../hooks/useBoundShader';
+
+import { getChainDifferential } from '@use-gpu/wgsl/transform/diff-chain.wgsl';
+import { getEpsilonDifferential } from '@use-gpu/wgsl/transform/diff-epsilon.wgsl';
+
+const CHAIN_BINDINGS = bundleToAttributes(getChainDifferential);
+const EPSILON_BINDINGS = bundleToAttributes(getEpsilonDifferential);
 
 export const useCombinedTransform = (
-  shader?: ShaderModule | null,
+  position?: ShaderModule | null,
+  differential?: ShaderModule | null,
+  epsilon?: Lazy<number>,
 ) => {
-  const context = useTransformContext();
-  const version = useVersion(context) + useVersion(shader);
+  const transformCtx = useTransformContext();
+  const differentialCtx = useDifferentialContext();
 
-  return useOne(
-    () => {
-      return context && shader
-        ? chainTo(shader, context)
-        : context ?? shader;
-    },
-    version,
-  );
+  const version = useVersion(transformCtx) + useVersion(differentialCtx) + useVersion(position) + useVersion(differential);
+
+  return useOne(() => {
+    if (position == null) return [transformCtx, differentialCtx];
+    
+    const combinedPos  = transformCtx ? chainTo(position, transformCtx) : position;
+    const combinedDiff = epsilon
+      ? getBoundShader(getEpsilonDifferential, EPSILON_BINDINGS, [combinedPos, epsilon])
+      : differentialCtx && differential
+        ? getBoundShader(getChainDifferential, CHAIN_BINDINGS, [position, differential, differentialCtx])
+        : differentialCtx ?? differential;
+
+    return [combinedPos, combinedDiff];
+  }, version);
 };

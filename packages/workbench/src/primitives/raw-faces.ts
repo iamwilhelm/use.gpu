@@ -14,7 +14,7 @@ import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
-import { useApplyTransform } from '../hooks/useApplyTransform';
+import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 
@@ -105,7 +105,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const i = useShaderRef(null, props.indices);
   const l = useShaderRef(null, props.lookups);
 
-  const xf = useApplyTransform(p);
+  const [xf, xd] = useCombinedTransform();
   const m = useMaterialContext();
 
   const hasIndices = !!props.indices;
@@ -115,7 +115,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     UNWELDED_TANGENTS: !!unweldedTangents,
   }), [hasIndices, unweldedNormals, unweldedTangents]);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, n, t, u, s, g, c, i, l]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, p, n, t, u, s, g, c, i, l]);
   const getFragment = shaded ? m : getPassThruFragment;
 
   return (

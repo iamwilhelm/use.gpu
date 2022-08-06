@@ -5,7 +5,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext,
+  TransformContext, DifferentialContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
@@ -40,7 +40,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
   const {range: g, axes: a} = useAxesTrait(props);
   const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
-  const [matrix, swizzle] = useMemo(() => {
+  const [matrix, swizzle, epsilon] = useMemo(() => {
     const x = g[0][0];
     const y = g[1][0];
     let   z = g[2][0];
@@ -53,6 +53,9 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
     const sx = s ? s[inv.indexOf('x')] : 1;
     const sy = s ? s[inv.indexOf('y')] : 1;
     const sz = s ? s[inv.indexOf('z')] : 1;
+
+    // Epsilon for differential transport
+    const epsilon = (Math.abs(dx) + Math.abs(dy) + Math.abs(dz)) / 3000;
 
     // Recenter viewport on origin the more it's bent
     [z, dz] = recenterAxis(z, dz, bend, 1);
@@ -93,26 +96,30 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
       mat4.multiply(matrix, matrix, t);
     }
 
-    return [matrix, swizzle];
+    return [matrix, swizzle, epsilon];
   }, [g, a, p, r, q, s, bend]);
 
-  const b = useShaderRef(bend);
-  const n = useShaderRef(+normalize);
   const t = useShaderRef(matrix);
+
+  const b = useShaderRef(bend);
+  const o = useShaderRef(+normalize);
+  const e = useShaderRef(epsilon);
   
-  const bound = useBoundShader(getStereographicPosition, STEREOGRAPHIC_BINDINGS, [b, n, t]);
+  const bound = useBoundShader(getStereographicPosition, STEREOGRAPHIC_BINDINGS, [t, b, o]);
 
   // Apply input basis as a cast
-  const position = useMemo(() => {
+  const xform = useMemo(() => {
     if (!swizzle) return bound;
     return chainTo(swizzleTo('vec4<f32>', 'vec4<f32>', swizzle), bound);
   }, [bound, swizzle]);
 
-  const transform = useCombinedTransform(position);
+  const [transform, differential] = useCombinedTransform(xform, null, e);
 
   return (
     provide(TransformContext, transform,
-      provide(RangeContext, g, children ?? [])
+      provide(DifferentialContext, differential,
+        provide(RangeContext, g, children ?? [])
+      )
     )
   );
 };

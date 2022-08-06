@@ -109,7 +109,7 @@ export type LightEmitterProps = {
 
 export const LightEmitter: LC<LightEmitterProps> = (props: LightEmitterProps) => {
   const {storage, lights, data, base} = props;
-  const [{transform}] = lights;
+  const [{transform, differential}] = lights;
 
   const filler = useOne(() => makeLayoutFiller(LIGHT_LAYOUT, data), data);
 

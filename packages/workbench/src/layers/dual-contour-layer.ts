@@ -25,7 +25,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useMaterialContext } from '../providers/material-provider';
-import { useTransformContext } from '../providers/transform-provider';
+import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
 
 import { useInspectable } from '../hooks/useInspectable'
 
@@ -116,6 +116,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const max = useShaderRef(rangeMax);
 
   const xf = useTransformContext();
+  const xd = useDifferentialContext();
   const m = useMaterialContext();
 
   const getMaterialFragment = shaded ? m : getPassThruFragment;
@@ -157,7 +158,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     getDualContourVertex,
     VERTEX_BINDINGS, [
       edgeReadout, indexReadout, vertexReadout, normalReadout,
-      xf, s, c, z, p, min, max,
+      xf, xd, s, c, z, p, min, max,
     ]);
 
   const boundFragment = padding

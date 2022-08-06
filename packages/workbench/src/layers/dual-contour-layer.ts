@@ -10,11 +10,12 @@ import type { VectorLike } from '@use-gpu/traits';
 import { Virtual } from '../primitives/virtual';
 import { Readback } from '../primitives/readback';
 
+import { patch } from '@use-gpu/state';
 import { use, memo, yeet, debug, fragment, useMemo, useOne, useVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, uploadBuffer } from '@use-gpu/core';
 
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useComputePipeline } from '../hooks/useComputePipeline';
 import { useDataSize } from '../hooks/useDataBinding';
 import { useDerivedSource } from '../hooks/useDerivedSource';
@@ -30,6 +31,8 @@ import { useInspectable } from '../hooks/useInspectable'
 
 import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
 import { main as fitContour } from '@use-gpu/wgsl/contour/fit.wgsl';
+import { getClippedSolidFragment } from '@use-gpu/wgsl/contour/clip-solid.wgsl';
+import { getClippedShadedFragment } from '@use-gpu/wgsl/contour/clip-shaded.wgsl';
 import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour.wgsl';
 
 import { Dispatch } from '../primitives/dispatch';
@@ -47,6 +50,7 @@ export type DualContourLayerProps = {
   values: ShaderSource,
   normals?: ShaderSource,
   level?: number,
+  padding?: number,
 
   loopX?: boolean,
   loopY?: boolean,
@@ -55,6 +59,7 @@ export type DualContourLayerProps = {
   zBias?: number,
 
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
+  cullMode?: GPUCullMode,
   mode?: RenderPassMode | string,
   id?: number,
 };
@@ -63,10 +68,12 @@ const SCAN_BINDINGS = bundleToAttributes(scanVolume);
 const FIT_BINDINGS = bundleToAttributes(fitContour);
 const VERTEX_BINDINGS = bundleToAttributes(getDualContourVertex);
 
+const CLIP_SOLID_BINDINGS = bundleToAttributes(getClippedSolidFragment);
+const CLIP_SHADED_BINDINGS = bundleToAttributes(getClippedShadedFragment);
+
 const PIPELINE = {
   primitive: {
     topology: 'triangle-strip',
-    cullMode: 'back',
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
@@ -78,6 +85,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     values,
     normals,
     level,
+    padding,
 
     loopX = false,
     loopY = false,
@@ -85,6 +93,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     shaded = true,
     zBias = 0,
 
+    cullMode = 'none',
     mode = 'opaque',
     id = 0,
   } = props;
@@ -95,6 +104,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const n = useShaderRef(null, normals);
   const s = useShaderRef(size);
   const l = useShaderRef(level);
+  const p = useShaderRef(padding);
 
   const c = useShaderRef(color);
   const z = useShaderRef(zBias);
@@ -106,6 +116,10 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const max = useShaderRef(rangeMax);
 
   const xf = useTransformContext();
+  const m = useMaterialContext();
+
+  const getMaterialFragment = shaded ? m : getPassThruFragment;
+  const getClippedFragment = shaded ? getClippedShadedFragment : getClippedSolidFragment;
 
   const indirectDraw    = useOne(() => new Uint32Array(8));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
@@ -143,8 +157,14 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     getDualContourVertex,
     VERTEX_BINDINGS, [
       edgeReadout, indexReadout, vertexReadout, normalReadout,
-      xf, s, c, z, min, max,
+      xf, s, c, z, p, min, max,
     ]);
+
+  const boundFragment = padding
+    ? shaded 
+      ? useBoundShader(getClippedShadedFragment, CLIP_SHADED_BINDINGS, [getMaterialFragment])
+      : useBoundShader(getClippedSolidFragment, CLIP_SOLID_BINDINGS, [getMaterialFragment])
+    : (useNoBoundShader(), getMaterialFragment);
 
   const sourceVersion = useVersion(values) + useVersion(normals);
   const shouldDispatch = () => sourceVersion + values.version + (normals?.version ?? 0);
@@ -190,8 +210,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
   };
 
-  const m = useMaterialContext();
-  const getFragment = shaded ? m : getPassThruFragment;
+  const pipeline = useOne(() => patch(PIPELINE, { primitive: { cullMode }}), cullMode);
 
   return [
     use(Dispatch, {
@@ -208,8 +227,8 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     use(Virtual, {
       indirect: indirectStorage,
       getVertex: boundVertex,
-      getFragment,
-      pipeline: PIPELINE,
+      getFragment: boundFragment,
+      pipeline,
       renderer: shaded ? 'shaded' : 'solid',
       mode,
       id,

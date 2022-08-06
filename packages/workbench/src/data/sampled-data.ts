@@ -17,6 +17,7 @@ export type SampledDataProps = {
   range: [number, number][],
   size: number[],
 
+  pad?: number,
   sparse?: boolean,
   centered?: boolean[] | boolean,
   expr?: Emitter,
@@ -24,6 +25,7 @@ export type SampledDataProps = {
 
   format?: string,
   live?: boolean,
+  index?: boolean,
   time?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,
@@ -39,14 +41,17 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     expr,
     items = 1,
     render,
+    pad = 0,
     sparse = false,
     centered = false,
     live = false,
+    index = false,
     time = false,
   } = props;
 
   const t = Math.max(1, Math.round(items) || 0);
-  const length = t * (size.length ? size.reduce((a, b) => a * b, 1) : 1);
+  const s = size.map(n => n + pad * 2);
+  const length = t * (s.length ? s.reduce((a, b) => a * b, 1) : 1);
   const l = useBufferedSize(length);
 
   // Make data buffer
@@ -82,9 +87,16 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         let [min, max] = range[0];
         let step = (max - min) / (size[0] - 1 + c);
         if (c) min += step / 2;
+        min -= step * pad;
 
-        sampled = (<T>(emit: Emit, i: number, n: number, t: T) =>
-          expr(emit, min + i * step, i, t)) as any;
+        if (index) {
+          sampled = (<T>(emit: Emit, i: number, t: T) =>
+            expr(emit, min + (i - pad) * step, i - pad, t)) as any;
+        }
+        else {
+          sampled = (<T>(emit: Emit, i: number, t: T) =>
+            expr(emit, min + (i - pad) * step, t)) as any;
+        }
       }
       else if (n === 2) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -96,16 +108,29 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         let stepY = (maxY - minY) / (size[1] - 1 + cy);
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
+        minX -= stepX * pad;
+        minY -= stepY * pad;
 
-        sampled = (<T>(emit: Emit, i: number, j: number, w: number, h: number, t: T) =>
-          expr(
-            emit,
-            minX + i * stepX,
-            minY + j * stepY,
-            i,
-            j,
-            t,
-          )) as any;
+        if (index) {
+          sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
+            expr(
+              emit,
+              minX + (i - pad) * stepX,
+              minY + (j - pad) * stepY,
+              i - pad,
+              j - pad,
+              t,
+            )) as any;
+        }
+        else {
+          sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
+            expr(
+              emit,
+              minX + (i - pad) * stepX,
+              minY + (j - pad) * stepY,
+              t,
+            )) as any;
+        }
       }
       else if (n === 3) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -121,18 +146,33 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
+        minX -= stepX * pad;
+        minY -= stepY * pad;
+        minZ -= stepZ * pad;
 
-        sampled = (<T>(emit: Emit, i: number, j: number, k: number, w: number, h: number, d: number, t: T) =>
-          expr(
-            emit,
-            minX + i * stepX,
-            minY + j * stepY,
-            minZ + k * stepZ,
-            i,
-            j,
-            k,
-            t,
-          )) as any;
+        if (index) {
+          sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
+            expr(
+              emit,
+              minX + (i - pad) * stepX,
+              minY + (j - pad) * stepY,
+              minZ + (k - pad) * stepZ,
+              i - pad,
+              j - pad,
+              k - pad,
+              t,
+            )) as any;
+        }
+        else {
+          sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
+            expr(
+              emit,
+              minX + (i - pad) * stepX,
+              minY + (j - pad) * stepY,
+              minZ + (k - pad) * stepZ,
+              t,
+            )) as any;
+        }
       }
       else if (n === 4) {
         const cx = +!!(centered === true || (centered as any)[0]);
@@ -152,27 +192,44 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
         if (cw) minW += stepW / 2;
+        minX -= stepX * pad;
+        minY -= stepY * pad;
+        minZ -= stepZ * pad;
+        minW -= stepW * pad;
 
-        sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, w: number, h: number, d: number, q: number, t: T) =>
-          expr(
-            emit,
-            minX + i * stepX,
-            minY + j * stepY,
-            minZ + k * stepZ,
-            minW + l * stepW,
-            i,
-            j,
-            k,
-            l,
-            t,
-          )) as any;
+        if (index) {
+          sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
+            expr(
+              emit,
+              minX + (i - pad) * stepX,
+              minY + (j - pad) * stepY,
+              minZ + (k - pad) * stepZ,
+              minW + (l - pad) * stepW,
+              i - pad,
+              j - pad,
+              k - pad,
+              l - pad,
+              t,
+            )) as any;
+        }
+        else {
+          sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
+            expr(
+              emit,
+              minX + (i - pad) * stepX,
+              minY + (j - pad) * stepY,
+              minZ + (k - pad) * stepZ,
+              minW + (l - pad) * stepW,
+              t,
+            )) as any;
+        }
       }
       else {
         throw new Error("Cannot sample across more than 4 dimensions");
       }
 
       if (sampled) {
-        emitted = emitIntoMultiNumberArray(sampled, array, dims, size, clock!);
+        emitted = emitIntoMultiNumberArray(sampled, array, dims, s, clock!);
       }
     }
     if (expr) {
@@ -180,7 +237,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     }
 
     source.length  = !sparse ? length : emitted;
-    source.size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
+    source.size    = !sparse ? (items > 1 ? [items, ...s] : s) : [items, emitted / items];
     source.version = incrementVersion(source.version);
   };
 

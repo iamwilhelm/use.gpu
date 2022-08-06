@@ -18,24 +18,29 @@ import {
 
 let t = 0;
 
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
 const f = (x: number, y: number, z: number, t: number) => {
-  x = x * 2 + t;
+  x = x * 2;
   y = y * 2;
   z = z * 2;
-  return Math.sin(x)*Math.cos(y) + Math.sin(y)*Math.cos(z) + Math.sin(z)*Math.cos(x);
+  const f = Math.cos(t * .5) * .5 + .5;
+  const swirl = Math.sin(x)*Math.cos(y) + Math.sin(y)*Math.cos(z) + Math.sin(z)*Math.cos(x);
+  const grid = Math.cos(x) + Math.cos(y) + Math.cos(z);
+  return lerp(swirl, grid, f);
 }
 
-const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number, i: number, j: number, k: number, time: Time) => {
+const EXPR_POSITION = (emit: Emit, x: number, y: number, z: number, time: Time) => {
   const t = time.elapsed / 1000;
   emit(x, y, z, t);
 }
 
-const EXPR_VALUE = (emit: Emit, x: number, y: number, z: number, i: number, j: number, k: number, time: Time) => {
+const EXPR_VALUE = (emit: Emit, x: number, y: number, z: number, time: Time) => {
   const t = time.elapsed / 1000;
   emit(f(x, y, z, t));
 }
 
-const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, i: number, j: number, k: number, time: Time) => {
+const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) => {
   const t = time.elapsed / 1000;
   const e = 1e-3;
 
@@ -74,6 +79,7 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Grid
                 axes='xz'
                 width={2}
+                origin={[-3, -2, -3]}
                 first={{ detail: 3, divide: 5 }}
                 second={{ detail: 3, divide: 5 }}
                 depth={0.5}
@@ -83,6 +89,7 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Axis
                 axis='x'
                 width={5}
+                origin={[0, -2, 0]}
                 color={[0.75, 0.75, 0.75, 1]}
                 depth={0.5}
               />
@@ -96,6 +103,7 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Axis
                 axis='z'
                 width={5}
+                origin={[0, -2, 0]}
                 color={[0.75, 0.75, 0.75, 1]}
                 detail={8}
                 depth={0.5}
@@ -104,31 +112,35 @@ export const PlotImplicitSurfacePage: LC = () => {
                 axes='xyz'
                 format='vec3<f32>'
                 size={[36, 24, 36]}
+                padding={1}
                 expr={EXPR_POSITION}
                 time
-                xlive
+                live
                 render={(positions: StorageSource) => (
                   <Sampled
                     axes='xyz'
                     format='f32'
                     size={[36, 24, 36]}
+                    padding={1}
                     expr={EXPR_VALUE}
                     time
-                    xlive
+                    live
                     render={(values: StorageSource) => (
                       <Sampled
                         axes='xyz'
                         format='vec3<f32>'
                         size={[36, 24, 36]}
+                        padding={1}
                         expr={EXPR_NORMAL}
                         time
-                        xlive
+                        live
                         render={(normals: StorageSource) => [
                           <DualContourLayer
                             values={values}
                             normals={normals}
+                            padding={1}
                             range={[[-3, 3], [-2, 2], [-3, 3]]}
-                            color={[0.7, 0.0, 0.5, 1.0]}
+                            color={[0.4, 1.0, 0.6, 1.0]}
                           />,
                           /*
                           <PointLayer

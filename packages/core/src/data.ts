@@ -68,7 +68,7 @@ export const makeDataAccessor = (format: UniformType, accessor: AccessorSpec) =>
 export const emitIntoNumberArray = <T>(expr: Emitter, to: NumberArray, dims: number, props?: T) => {
   const {emit, emitted} = makeDataEmitter(to, dims);
   const n = to.length / Math.ceil(dims);
-  for (let i = 0; i < n; i++) expr(emit, i, n, props);
+  for (let i = 0; i < n; i++) expr(emit, i, props);
   return emitted();
 }
 
@@ -90,31 +90,31 @@ export const emitIntoMultiNumberArray = <T>(expr: Emitter, to: NumberArray, dims
   let nest: Emitter;
   if (n === 1) {
     nest = (emit: Emit) => {
-      expr(emit, index[0], size[0], props);
+      expr(emit, index[0], props);
       increment();
     };
   }
   else if (n === 2) {
     nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], size[0], size[1], props);
+      expr(emit, index[0], index[1], props);
       increment();
     };
   }
   else if (n === 3 || n === 3.5) {
     nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], index[2], size[0], size[1], size[2], props);
+      expr(emit, index[0], index[1], index[2], props);
       increment();
     };
   }
   else if (n === 4) {
     nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], index[2], index[3], size[0], size[1], size[2], size[3], props);
+      expr(emit, index[0], index[1], index[2], index[3], props);
       increment();
     };
   }
   else {
     nest = (emit: Emit) => {
-      expr(emit, ...index, ...size, props);
+      expr(emit, ...index, props);
       increment();
     };
   }

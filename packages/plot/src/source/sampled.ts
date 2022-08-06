@@ -14,6 +14,7 @@ export type SampledProps = {
   range?: [number, number][],
   size: number[],
 
+  pad?: number,
   sparse?: boolean,
   centered?: boolean[] | boolean,
   expr?: (emit: Emit, ...args: number[]) => void,
@@ -21,6 +22,7 @@ export type SampledProps = {
 
   format?: string,
   live?: boolean,
+  index?: boolean,
   time?: boolean,
 
   render?: (source: StorageSource) => LiveElement<any>,

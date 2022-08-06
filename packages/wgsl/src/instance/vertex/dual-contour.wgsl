@@ -14,6 +14,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadIndex };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
+@optional @link fn getPadding(i: u32) -> f32 { return 0u; };
 @optional @link fn getRangeMin(i: u32) -> vec3<f32> { return vec3<f32>(-1.0, -1.0, -1.0); };
 @optional @link fn getRangeMax(i: u32) -> vec3<f32> { return vec3<f32>(1.0, 1.0, 1.0); };
 
@@ -31,6 +32,7 @@ fn unpackEdgeId(id: u32) -> vec4<u32> {
   var color = getColor(instanceIndex);
   let zBias = getZBias(instanceIndex);
 
+  let padding = getPadding(instanceIndex);
   let rangeMin = getRangeMin(instanceIndex);
   let rangeMax = getRangeMax(instanceIndex);
 
@@ -68,7 +70,7 @@ fn unpackEdgeId(id: u32) -> vec4<u32> {
   let vertex = getVertexPosition(index).xyz;
   let normal = getVertexNormal(index);
 
-  let uv3 = vertex / (vec3<f32>(gridSize - 1u));
+  let uv3 = (vertex - padding) / (vec3<f32>(gridSize - 1u) - padding * 2);
   let object = mix(rangeMin, rangeMax, uv3);
   let world = transformPosition(vec4<f32>(object, 1.0));
 
@@ -79,8 +81,11 @@ fn unpackEdgeId(id: u32) -> vec4<u32> {
     center = applyZBias(center, size * zBias);
   }
 
+  let clip = min(uv3, 1.0 - uv3);
+  let boxClip = min(min(clip.x, clip.y), clip.z);
+
   let tangent = vec4<f32>(0.0, 0.0, 0.0, 0.0);
-  let uv4 = vec4<f32>(uv3, 0.0);
+  let uv4 = vec4<f32>(uv3, boxClip);
   let st4 = vec4<f32>(0.0);
 
   return ShadedVertex(

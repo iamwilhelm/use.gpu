@@ -243,6 +243,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
         items={2}
         sparse
         centered
+        index
         expr={arrowEmitter({
           xs: image.xi,
           ys: image.yi,
@@ -260,6 +261,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
         items={2}
         sparse
         centered
+        index
         expr={arrowEmitter({
           xs: image.xo,
           ys: image.yo,
@@ -302,6 +304,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={1}
                         sparse
                         centered
+                        index
                         expr={gridEmitter(outerField)}
                       >
                         <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} zBias={ZBIAS_DATA} />
@@ -314,6 +317,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={1}
                         sparse
                         centered
+                        index
                         expr={pointEmitter(outerField)}
                       >
                         <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
@@ -326,6 +330,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={1}
                         sparse
                         centered
+                        index
                         expr={pointEmitter(innerField)}
                       >
                         <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
@@ -338,6 +343,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={2}
                         sparse
                         centered
+                        index
                         expr={arrowEmitter(preprocess ? innerField : outerField)}
                       >
                         <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={ZBIAS_DATA} />
@@ -354,6 +360,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={1}
                         sparse
                         centered
+                        index
                         expr={shiftedPointEmitter(outer2Field)}
                       >
                         <Point size={0.5} depth={1} color={0x4080ff} zBias={ZBIAS_DATA} />
@@ -366,6 +373,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={1}
                         sparse
                         centered
+                        index
                         expr={shiftedPointEmitter(inner2Field)}
                       >
                         <Point size={0.5} depth={1} color={0x40c0ff} zBias={ZBIAS_DATA} />
@@ -378,6 +386,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={2}
                         sparse
                         centered
+                        index
                         expr={arrowEmitter(outer2Field)}
                       >
                         <Arrow width={3} depth={0.05} color={0x4080ff} detail={4} zBias={ZBIAS_DATA} />
@@ -390,6 +399,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         items={2}
                         sparse
                         centered
+                        index
                         expr={arrowEmitter(inner2Field)}
                       >
                         <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={ZBIAS_DATA} />

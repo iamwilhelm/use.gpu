@@ -89,6 +89,11 @@
       "import": "./src/geometry/line.wgsl",
       "require": "./src/geometry/line.wgsl"
     },
+    "./geometry/normal.wgsl": {
+      "types": "./src/geometry/normal.wgsl.d.ts",
+      "import": "./src/geometry/normal.wgsl",
+      "require": "./src/geometry/normal.wgsl"
+    },
     "./geometry/quad.wgsl": {
       "types": "./src/geometry/quad.wgsl.d.ts",
       "import": "./src/geometry/quad.wgsl",

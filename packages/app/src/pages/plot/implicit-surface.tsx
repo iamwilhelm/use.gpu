@@ -13,10 +13,11 @@ import {
   DualContourLayer, PointLayer,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Sampled,
+  Plot, Cartesian, Polar, Axis, Grid, Sampled,
 } from '@use-gpu/plot';
 
 let t = 0;
+let π = Math.PI;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -64,99 +65,103 @@ export const PlotImplicitSurfacePage: LC = () => {
         <Cursor cursor="move" />
         <Pass>
           <Plot>
-            <Cartesian
-              range={[[-3, 3], [-2, 2], [-3, 3]]}
-              scale={[3, 2, 3]}
-            >
-              <Grid
-                axes='xy'
-                width={2}
-                first={{ detail: 3, divide: 5 }}
-                second={{ detail: 3, divide: 5 }}
-                depth={0.5}
-                zBias={-1}
-              />
-              <Grid
-                axes='xz'
-                width={2}
-                origin={[-3, -2, -3]}
-                first={{ detail: 3, divide: 5 }}
-                second={{ detail: 3, divide: 5 }}
-                depth={0.5}
-                zBias={-1}
-              />
+            <Animate prop='bend' keyframes={[[0, 0], [23, 1.0]]} pause={1} mirror>
+              <Polar
+                bend={0.5}
+                range={[[-π, π], [1, 5], [-3, 3]]}
+                scale={[3, 2, 3]}
+              >
+                <Grid
+                  axes='xy'
+                  width={2}
+                  first={{ detail: 3, divide: 5 }}
+                  second={{ detail: 32, divide: 5 }}
+                  depth={0.5}
+                  zBias={-1}
+                />
+                <Grid
+                  axes='xz'
+                  width={2}
+                  origin={[-3, 0, -3]}
+                  first={{ detail: 3, divide: 5 }}
+                  second={{ detail: 32, divide: 5 }}
+                  depth={0.5}
+                  zBias={-1}
+                />
 
-              <Axis
-                axis='x'
-                width={5}
-                origin={[0, -2, 0]}
-                color={[0.75, 0.75, 0.75, 1]}
-                depth={0.5}
-              />
-              <Axis
-                axis='y'
-                width={5}
-                color={[0.75, 0.75, 0.75, 1]}
-                detail={8}
-                depth={0.5}
-              />
-              <Axis
-                axis='z'
-                width={5}
-                origin={[0, -2, 0]}
-                color={[0.75, 0.75, 0.75, 1]}
-                detail={8}
-                depth={0.5}
-              />
-              <Sampled
-                axes='xyz'
-                format='vec3<f32>'
-                size={[36, 24, 36]}
-                padding={1}
-                expr={EXPR_POSITION}
-                time
-                live
-                render={(positions: StorageSource) => (
-                  <Sampled
-                    axes='xyz'
-                    format='f32'
-                    size={[36, 24, 36]}
-                    padding={1}
-                    expr={EXPR_VALUE}
-                    time
-                    live
-                    render={(values: StorageSource) => (
-                      <Sampled
-                        axes='xyz'
-                        format='vec3<f32>'
-                        size={[36, 24, 36]}
-                        padding={1}
-                        expr={EXPR_NORMAL}
-                        time
-                        live
-                        render={(normals: StorageSource) => [
-                          <DualContourLayer
-                            values={values}
-                            normals={normals}
-                            padding={1}
-                            range={[[-3, 3], [-2, 2], [-3, 3]]}
-                            color={[0.4, 1.0, 0.6, 1.0]}
-                          />,
-                          /*
-                          <PointLayer
-                            positions={positions}
-                            colors={values}
-                            size={3}
-                            depth={1}
-                          />,
-                          */
-                        ]}
-                      />  
-                    )}
-                  />
-                )}
-              />
-            </Cartesian>
+                <Axis
+                  axis='x'
+                  detail={32}
+                  width={5}
+                  origin={[0, 0, 0]}
+                  color={[0.75, 0.75, 0.75, 1]}
+                  depth={0.5}
+                />
+                <Axis
+                  axis='y'
+                  width={5}
+                  color={[0.75, 0.75, 0.75, 1]}
+                  detail={8}
+                  depth={0.5}
+                />
+                <Axis
+                  axis='z'
+                  width={5}
+                  origin={[0, 0, 0]}
+                  color={[0.75, 0.75, 0.75, 1]}
+                  detail={8}
+                  depth={0.5}
+                />
+                <Sampled
+                  axes='xyz'
+                  format='vec3<f32>'
+                  size={[36, 24, 36]}
+                  padding={1}
+                  expr={EXPR_POSITION}
+                  time
+                  live
+                  render={(positions: StorageSource) => (
+                    <Sampled
+                      axes='xyz'
+                      format='f32'
+                      size={[36, 24, 36]}
+                      padding={1}
+                      expr={EXPR_VALUE}
+                      time
+                      live
+                      render={(values: StorageSource) => (
+                        <Sampled
+                          axes='xyz'
+                          format='vec3<f32>'
+                          size={[36, 24, 36]}
+                          padding={1}
+                          expr={EXPR_NORMAL}
+                          time
+                          live
+                          render={(normals: StorageSource) => [
+                            <DualContourLayer
+                              values={values}
+                              normals={normals}
+                              padding={1}
+                              range={[[-π, π], [1, 5], [-3, 3]]}
+                              color={[0.4, 1.0, 0.6, 1.0]}
+                            />,
+                            /*
+                            <PointLayer
+                              positions={positions}
+                              colors={values}
+                              size={3}
+                              depth={1}
+                            />,
+                            */
+                          ]}
+                        />  
+                      )}
+                    />
+                  )}
+                />
+              </Polar>
+            </Animate>
           </Plot>
         </Pass>
       </LinearRGB>

@@ -2,6 +2,7 @@ use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
 use '@use-gpu/wgsl/use/array'::{ sizeToModulus3, packIndex3 };
 use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveScale, getViewScale, applyZBias }; 
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadIndex };
+use '@use-gpu/wgsl/geometry/normal'::{ getOrthoVector };
 
 @link fn getEdgeId(i: u32) -> u32 { };
 @link fn getVertexIndex(i: u32) -> u32 { };
@@ -20,6 +21,29 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadIndex };
 
 fn unpackEdgeId(id: u32) -> vec4<u32> {
   return (vec4<u32>(id) >> vec4<u32>(0u, 9u, 18u, 27u)) & vec4<u32>(0x1FFu);
+}
+
+fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
+  
+  let a00 = m[0][0];
+  let a01 = m[0][1];
+  let a02 = m[0][2];
+  let a10 = m[1][0];
+  let a11 = m[1][1];
+  let a12 = m[1][2];
+  let a20 = m[2][0];
+  let a21 = m[2][1];
+  let a22 = m[2][2];
+
+  let b01 = a22 * a11 - a12 * a21;
+  let b11 = -a22 * a10 + a12 * a20;
+  let b21 = a21 * a10 - a11 * a20;
+
+  let det = a00 * b01 + a01 * b11 + a02 * b21;
+
+  return mat3x3<f32>(vec3<f32>(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11)) / det,
+                     vec3<f32>(b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10)) / det,
+                     vec3<f32>(b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det);
 }
 
 @export fn getDualContourVertex(vertexIndex: u32, instanceIndex: u32) -> ShadedVertex {
@@ -68,11 +92,20 @@ fn unpackEdgeId(id: u32) -> vec4<u32> {
   let index = getVertexIndex(packIndex3(gridIndex, modulus));
 
   let vertex = getVertexPosition(index).xyz;
-  let normal = getVertexNormal(index);
+  let normal = getVertexNormal(index).xyz;
 
   let uv3 = (vertex - padding) / (vec3<f32>(gridSize - 1u) - padding * 2);
   let object = mix(rangeMin, rangeMax, uv3);
   let world = transformPosition(vec4<f32>(object, 1.0));
+
+  let eps = (rangeMax - rangeMin) * 0.001;
+  let tangent = getOrthoVector(normal);
+  let bitangent = cross(normal, tangent);
+  let ot = transformPosition(vec4<f32>(object + tangent * eps, 1.0));
+  let ob = transformPosition(vec4<f32>(object + bitangent * eps, 1.0));
+  let dt = (ot - world).xyz;
+  let db = (ob - world).xyz;
+  let worldNormal = vec4<f32>(normalize(cross(dt, db)), 1.0);
 
   var center = worldToClip(world);
   if (zBias != 0.0) {
@@ -84,15 +117,15 @@ fn unpackEdgeId(id: u32) -> vec4<u32> {
   let clip = min(uv3, 1.0 - uv3);
   let boxClip = min(min(clip.x, clip.y), clip.z);
 
-  let tangent = vec4<f32>(0.0, 0.0, 0.0, 0.0);
+  let tangent4 = vec4<f32>(0.0, 0.0, 0.0, 0.0);
   let uv4 = vec4<f32>(uv3, boxClip);
   let st4 = vec4<f32>(0.0);
 
   return ShadedVertex(
     center,
     world,
-    normal,
-    tangent,
+    worldNormal,
+    tangent4,
     color,
     uv4,
     st4,

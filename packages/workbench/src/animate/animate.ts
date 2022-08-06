@@ -51,7 +51,7 @@ const evaluateKeyframes = <T>(keyframes: Keyframe<T>[], time: number, ease: stri
 const getActiveKeyframes = <T>(keyframes: Keyframe<T>[], time: number) => {
   const n = keyframes.length;
   let i = 0;
-  for (; i < n - 1; ++i) {
+  for (; i < n - 2; ++i) {
     if (time < keyframes[i + 1][0]) break;
   }
   return [keyframes[i], keyframes[i + 1]];

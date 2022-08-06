@@ -234,29 +234,10 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       id,
     }),
     /*
-    use(Readback, { source: indirectStorage, then: (data) => {
-      console.log(data);
-      return debug(fragment([]));
-    } }),
-    use(Readback, { source: cellStorage, then: (data) => {
-      console.log(data);
-      return debug(fragment([]));
-    } }),
     use(Readback, { source: edgeStorage, then: (data) => {
       console.log(data);
       return debug(fragment([]));
     } }),
-    /*
     */
   ];
-  /*
-  const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY, LOOP_Z: !!loopZ}), [loopX, loopY, loopZ]);
-  const indices = useBoundShader(getSurfaceIndex, [SIZE_BINDING], [boundSize], defines);
-
-  const v = useShaderRef(null, props.values);
-
-  //const xf = useApplyTransform(p);
-  //const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, xf], defines);
-
-  */
 }, 'DualContourLayer');

@@ -44,95 +44,142 @@ fn getZeroLevel(a: f32, b: f32) -> f32 {
   let p101 = getValueData(i101) - level;
   let p111 = getValueData(i111) - level;
 
-  let n000 = getNormalData(i000).xyz;
-
   var p = vec3<f32>(0.0);
+  var n = vec3<f32>(0.0);
   var w = 0.0;
   
   if (p000 * p100 < 0.0) {
     var f = getZeroLevel(p000, p100);
-    var m = vec3<f32>(f, 0.0, 0.0);
-    p += m;
+
+    let n000 = getNormalData(i000).xyz;
+    let n100 = getNormalData(i100).xyz;
+
+    p += vec3<f32>(f, 0.0, 0.0);
+    n += mix(n000, n100, f);
     w += 1.0;
   }
 
   if (p000 * p010 < 0.0) {
     var f = getZeroLevel(p000, p010);
-    var m = vec3<f32>(0.0, f, 0.0);
-    p += m;
+
+    let n000 = getNormalData(i000).xyz;
+    let n010 = getNormalData(i010).xyz;
+
+    p += vec3<f32>(0.0, f, 0.0);
+    n += mix(n000, n010, f);
     w += 1.0;
   }
 
   if (p000 * p001 < 0.0) {
     var f = getZeroLevel(p000, p001);
-    var m = vec3<f32>(0.0, 0.0, f);
-    p += m;
+
+    let n000 = getNormalData(i000).xyz;
+    let n001 = getNormalData(i001).xyz;
+
+    p += vec3<f32>(0.0, 0.0, f);
+    n += mix(n000, n001, f);
     w += 1.0;
   }
 
   if (p100 * p110 < 0.0) {
     var f = getZeroLevel(p100, p110);
-    var m = vec3<f32>(1.0, f, 0.0);
-    p += m;
+
+    let n100 = getNormalData(i100).xyz;
+    let n110 = getNormalData(i110).xyz;
+
+    p += vec3<f32>(1.0, f, 0.0);
+    n += mix(n100, n110, f);
     w += 1.0;
   }
 
   if (p100 * p101 < 0.0) {
     var f = getZeroLevel(p100, p101);
-    var m = vec3<f32>(1.0, 0.0, f);
-    p += m;
+
+    let n100 = getNormalData(i100).xyz;
+    let n101 = getNormalData(i101).xyz;
+
+    p += vec3<f32>(1.0, 0.0, f);
+    n += mix(n100, n101, f);
     w += 1.0;
   }
 
   if (p010 * p110 < 0.0) {
     var f = getZeroLevel(p010, p110);
-    var m = vec3<f32>(f, 1.0, 0.0);
-    p += m;
+
+    let n010 = getNormalData(i010).xyz;
+    let n110 = getNormalData(i110).xyz;
+
+    p += vec3<f32>(f, 1.0, 0.0);
+    n += mix(n010, n110, f);
     w += 1.0;
   }
 
   if (p010 * p011 < 0.0) {
     var f = getZeroLevel(p010, p011);
-    var m = vec3<f32>(0.0, 1.0, f);
-    p += m;
+
+    let n010 = getNormalData(i010).xyz;
+    let n011 = getNormalData(i011).xyz;
+
+    p += vec3<f32>(0.0, 1.0, f);
+    n += mix(n010, n011, f);
     w += 1.0;
   }
 
   if (p001 * p101 < 0.0) {
     var f = getZeroLevel(p001, p101);
-    var m = vec3<f32>(f, 0.0, 1.0);
-    p += m;
+
+    let n001 = getNormalData(i001).xyz;
+    let n101 = getNormalData(i101).xyz;
+
+    p += vec3<f32>(f, 0.0, 1.0);
+    n += mix(n001, n101, f);
     w += 1.0;
   }
 
   if (p001 * p011 < 0.0) {
     var f = getZeroLevel(p001, p011);
-    var m = vec3<f32>(0.0, f, 1.0);
-    p += m;
+
+    let n001 = getNormalData(i001).xyz;
+    let n011 = getNormalData(i011).xyz;
+
+    p += vec3<f32>(0.0, f, 1.0);
+    n += mix(n001, n011, f);
     w += 1.0;
   }
 
   if (p011 * p111 < 0.0) {
     var f = getZeroLevel(p011, p111);
-    var m = vec3<f32>(f, 1.0, 1.0);
-    p += m;
+
+    let n011 = getNormalData(i011).xyz;
+    let n111 = getNormalData(i111).xyz;
+
+    p += vec3<f32>(f, 1.0, 1.0);
+    n += mix(n011, n111, f);
     w += 1.0;
   }
 
   if (p101 * p111 < 0.0) {
     var f = getZeroLevel(p101, p111);
-    var m = vec3<f32>(1.0, f, 1.0);
-    p += m;
+
+    let n101 = getNormalData(i101).xyz;
+    let n111 = getNormalData(i111).xyz;
+
+    p += vec3<f32>(1.0, f, 1.0);
+    n += mix(n101, n111, f);
     w += 1.0;
   }
 
   if (p110 * p111 < 0.0) {
     var f = getZeroLevel(p110, p111);
-    var m = vec3<f32>(1.0, 1.0, f);
-    p += m;
+
+    let n110 = getNormalData(i110).xyz;
+    let n111 = getNormalData(i111).xyz;
+
+    p += vec3<f32>(1.0, 1.0, f);
+    n += mix(n110, n111, f);
     w += 1.0;
   }
 
   vertexPositions[index] = vec4<f32>(cellOrigin + p / w, 1.0);
-  vertexNormals[index] = vec4<f32>(normalize(n000), 1.0);
+  vertexNormals[index] = vec4<f32>(normalize(n), 1.0);
 }

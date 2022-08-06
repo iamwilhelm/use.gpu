@@ -31,5 +31,5 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
     1,
   );
 
-  return applyLight(N, V, light, position, ao, params).light;
+  return 0.05 * ao * params.albedo + applyLight(N, V, light, position, ao, params).light;
 }

@@ -24,7 +24,7 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
   let kind = light.kind;
   if (kind == 0) {
     // Ambient
-    return Radiance(vec3<f32>(radiance * ao), true);
+    return Radiance(radiance * ao * params.albedo, true);
   }
   else if (kind == 1) {
     // Directional

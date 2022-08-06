@@ -60,8 +60,8 @@ export const PlotImplicitSurfacePage: LC = () => {
         <Pass>
           <Plot>
             <Cartesian
-              range={[[-3, 3], [-1, 1], [-3, 3]]}
-              scale={[3, 1, 3]}
+              range={[[-3, 3], [-2, 2], [-3, 3]]}
+              scale={[3, 2, 3]}
             >
               <Grid
                 axes='xy'
@@ -103,7 +103,7 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Sampled
                 axes='xyz'
                 format='vec3<f32>'
-                size={[36, 12, 36]}
+                size={[36, 24, 36]}
                 expr={EXPR_POSITION}
                 time
                 xlive
@@ -111,7 +111,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                   <Sampled
                     axes='xyz'
                     format='f32'
-                    size={[36, 12, 36]}
+                    size={[36, 24, 36]}
                     expr={EXPR_VALUE}
                     time
                     xlive
@@ -119,7 +119,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                       <Sampled
                         axes='xyz'
                         format='vec3<f32>'
-                        size={[36, 12, 36]}
+                        size={[36, 24, 36]}
                         expr={EXPR_NORMAL}
                         time
                         xlive
@@ -127,7 +127,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                           <DualContourLayer
                             values={values}
                             normals={normals}
-                            range={[[-3, 3], [-1, 1], [-3, 3]]}
+                            range={[[-3, 3], [-2, 2], [-3, 3]]}
                             color={[0.7, 0.0, 0.5, 1.0]}
                           />,
                           /*

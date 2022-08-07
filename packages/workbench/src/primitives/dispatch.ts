@@ -26,7 +26,7 @@ export type DispatchProps = {
   onDispatch?: () => void,
 };
 
-const NO_SIZE = [0];
+const NO_SIZE = [1];
 
 const DEFAULT_DEFINES = {
   '@group(VIRTUAL)': '@group(0)',
@@ -34,13 +34,14 @@ const DEFAULT_DEFINES = {
 };
 
 export const Dispatch = (props: RenderProps) => {
-  return dispatch(props);
+  // Return a lambda back to parent(s)
+  return yeet(dispatch(props));
 };
 
 // Inlined into <Component>
 export const dispatch = (props: RenderProps) => {
   const {
-    size,
+    size = NO_SIZE,
     indirect,
     shader: computeShader,
     defines: propDefines,
@@ -96,8 +97,7 @@ export const dispatch = (props: RenderProps) => {
   
   let dispatchVersion = null;
 
-  // Return a lambda back to parent(s)
-  return yeet({
+  return {
     compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
       if (shouldDispatch) {
         const d = shouldDispatch();
@@ -128,5 +128,5 @@ export const dispatch = (props: RenderProps) => {
       if (indirect) passEncoder.dispatchWorkgroupsIndirect(indirect.buffer, indirect.byteOffset ?? 0);
       else passEncoder.dispatchWorkgroups(s[0], s[1] || 1, s[2] || 1);
     },
-  });
+  };
 };

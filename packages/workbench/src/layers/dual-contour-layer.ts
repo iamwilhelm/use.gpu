@@ -30,7 +30,8 @@ import { useTransformContext, useDifferentialContext } from '../providers/transf
 import { useInspectable } from '../hooks/useInspectable'
 
 import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
-import { main as fitContour } from '@use-gpu/wgsl/contour/fit.wgsl';
+import { main as fitContourLinear } from '@use-gpu/wgsl/contour/fit-linear.wgsl';
+import { main as fitContourQuadratic } from '@use-gpu/wgsl/contour/fit-quadratic.wgsl';
 import { getClippedSolidFragment } from '@use-gpu/wgsl/contour/clip-solid.wgsl';
 import { getClippedShadedFragment } from '@use-gpu/wgsl/contour/clip-shaded.wgsl';
 import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour.wgsl';
@@ -51,6 +52,7 @@ export type DualContourLayerProps = {
   normals?: ShaderSource,
   level?: number,
   padding?: number,
+  method?: string,
 
   loopX?: boolean,
   loopY?: boolean,
@@ -65,7 +67,7 @@ export type DualContourLayerProps = {
 };
 
 const SCAN_BINDINGS = bundleToAttributes(scanVolume);
-const FIT_BINDINGS = bundleToAttributes(fitContour);
+const FIT_BINDINGS = bundleToAttributes(fitContourLinear);
 const VERTEX_BINDINGS = bundleToAttributes(getDualContourVertex);
 
 const CLIP_SOLID_BINDINGS = bundleToAttributes(getClippedSolidFragment);
@@ -86,6 +88,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     normals,
     level,
     padding,
+    method = 'linear',
 
     loopX = false,
     loopY = false,
@@ -146,6 +149,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       v, s, l,
     ]);
 
+  const fitContour = method === 'quadratic' ? fitContourQuadratic : fitContourLinear;
   const boundFit = useBoundShader(
     fitContour,
     FIT_BINDINGS,
@@ -158,7 +162,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     getDualContourVertex,
     VERTEX_BINDINGS, [
       edgeReadout, indexReadout, vertexReadout, normalReadout,
-      xf, xd, s, c, z, p, min, max,
+      xf, xd, s, p, c, z, min, max,
     ]);
 
   const boundFragment = padding
@@ -172,16 +176,22 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   const edgePassSize = () => {
     const s = resolve(size);
-    const d = (s[0] || 1) * (s[1] || 1) * (s[2] || 1);
+    const sx = s[0] || 1;
+    const sy = s[1] || 1;
+    const sz = s[2] || 1;
+    
+    const d = sx * sy * sz;
 
     allocateEdges(d * 3);
     allocateCells(d);
     allocateMarks(d);
     allocateIndices(d);
     allocateVertices(d);
-    allocateNormals(d);
 
-    return [s[0] - 1, (s[1] - 1) || 1, (s[2] - 1) || 1];
+    if (method === 'quadratic') allocateNormals(d * 3);
+    else allocateNormals(d);
+
+    return [sx - 1, sy - 1, sz - 1];
   };
 
   const device = useDeviceContext();
@@ -212,6 +222,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   };
 
   const pipeline = useOne(() => patch(PIPELINE, { primitive: { cullMode }}), cullMode);
+  const defines = useOne(() => ({ isQuadratic: method === 'quadratic' }), method);
 
   return [
     use(Dispatch, {
@@ -230,6 +241,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       getVertex: boundVertex,
       getFragment: boundFragment,
       pipeline,
+      defines,
       renderer: shaded ? 'shaded' : 'solid',
       mode,
       id,

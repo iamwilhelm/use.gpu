@@ -34,13 +34,15 @@ export const makeDataEmitter = (to: NumberArray, dims: number): {
 } => {
   let i = 0;
   const emitted = () => i / Math.ceil(dims);
+  const reset = () => i = 0;
 
-  if (dims === 1)   return {emitted, emit: (a: number) => { to[i++] = a; }};
-  if (dims === 2)   return {emitted, emit: (a: number, b: number) => { to[i++] = a; to[i++] = b; }};
-  if (dims === 3)   return {emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; }};
-  if (dims === 3.5) return {emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; i++; }}; // !
-  if (dims === 4)   return {emitted, emit: (a: number, b: number, c: number, d: number) => { to[i++] = a; to[i++] = b; to[i++] = c; to[i++] = d; }};
+  if (dims === 1)   return {reset, emitted, emit: (a: number) => { to[i++] = a; }};
+  if (dims === 2)   return {reset, emitted, emit: (a: number, b: number) => { to[i++] = a; to[i++] = b; }};
+  if (dims === 3)   return {reset, emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; }};
+  if (dims === 3.5) return {reset, emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; i++; }}; // !
+  if (dims === 4)   return {reset, emitted, emit: (a: number, b: number, c: number, d: number) => { to[i++] = a; to[i++] = b; to[i++] = c; to[i++] = d; }};
   return {
+    reset,
     emitted,
     emit: (...args: number[]) => {
       const n = args.length;

@@ -4,13 +4,13 @@ use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 
 @link fn getVertex(v: u32, i: u32) -> SolidVertex {};
-@link fn getInstanceSize() -> u32 {};
+@link fn getInstanceSize(i: u32) -> u32 {};
 
 @export fn getWireframeStripVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
   var ij = getQuadIndex(vertexIndex);
   var xy = vec2<f32>(ij) * 2.0 - 1.0;
 
-  var n = getInstanceSize();
+  var n = getInstanceSize(0u);
   var f = instanceIndex % n;
   var i = instanceIndex / n;
 

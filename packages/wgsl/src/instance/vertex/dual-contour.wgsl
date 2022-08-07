@@ -13,11 +13,11 @@ use '@use-gpu/wgsl/geometry/normal'::{ getOrthoVector };
 @optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
 
 @link fn getVolumeSize(i: u32) -> vec3<u32> { };
+@link fn getPadding(i: u32) -> f32 { return 0u; };
 
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
-@optional @link fn getPadding(i: u32) -> f32 { return 0u; };
 @optional @link fn getRangeMin(i: u32) -> vec3<f32> { return vec3<f32>(-1.0, -1.0, -1.0); };
 @optional @link fn getRangeMax(i: u32) -> vec3<f32> { return vec3<f32>(1.0, 1.0, 1.0); };
 
@@ -62,41 +62,50 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
   let rangeMin = getRangeMin(instanceIndex);
   let rangeMax = getRangeMax(instanceIndex);
 
-  let ij = getQuadIndex(vertexIndex);
+  var ij = getQuadIndex(vertexIndex);
 
   var gridIndex = edgeIndex.xyz;
+  let parity = (gridIndex & vec3<u32>(1u));
+  var normalIndex: u32 = 0u;
+
   if (edgeIndex.a == 1u) {
-    gridIndex -= vec3<u32>(0u, ij);
-    //color = mix(color, vec4<f32>(1.0, 0.0, 0.0, 1.0), 0.15);
+    if ((parity.y ^ parity.z) != 0u) { gridIndex -= vec3<u32>(0u, ij.y, 1u - ij.x); }
+    else { gridIndex -= vec3<u32>(0u, ij); }
   }
   else if (edgeIndex.a == 2u) {
-    gridIndex -= vec3<u32>(0u, ij.yx);
-    //color = mix(color, vec4<f32>(1.0, 0.0, 0.0, 1.0), 0.15);
+    if ((parity.y ^ parity.z) != 0u) { gridIndex -= vec3<u32>(0u, 1u - ij.x, ij.y); }
+    else { gridIndex -= vec3<u32>(0u, ij.yx); }
   }
   else if (edgeIndex.a == 3u) {
-    gridIndex -= vec3<u32>(ij.y, 0u, ij.x);
-    //color = mix(color, vec4<f32>(0.0, 1.0, 0.0, 1.0), 0.15);
+    normalIndex = 1u;
+    if ((parity.x ^ parity.z) != 0u) { gridIndex -= vec3<u32>(1u - ij.x, 0u, ij.y); }
+    else { gridIndex -= vec3<u32>(ij.y, 0u, ij.x); }
   }
   else if (edgeIndex.a == 4u) {
-    gridIndex -= vec3<u32>(ij.x, 0u, ij.y);
-    //color = mix(color, vec4<f32>(0.0, 1.0, 0.0, 1.0), 0.15);
+    normalIndex = 1u;
+    if ((parity.x ^ parity.z) != 0u) { gridIndex -= vec3<u32>(ij.y, 0u, 1u - ij.x); }
+    else { gridIndex -= vec3<u32>(ij.x, 0u, ij.y); }
   }
   else if (edgeIndex.a == 5u) {
-    gridIndex -= vec3<u32>(ij, 0u);
-    //color = mix(color, vec4<f32>(0.0, 0.0, 1.0, 1.0), 0.15);
+    normalIndex = 2u;
+    if ((parity.x ^ parity.y) != 0u) { gridIndex -= vec3<u32>(ij.y, 1u - ij.x, 0u); }
+    else { gridIndex -= vec3<u32>(ij, 0u); }
   }
   else if (edgeIndex.a == 6u) {
-    gridIndex -= vec3<u32>(ij.yx, 0u);
-    //color = mix(color, vec4<f32>(0.0, 0.0, 1.0, 1.0), 0.15);
+    normalIndex = 2u;
+    if ((parity.x ^ parity.y) != 0u) { gridIndex -= vec3<u32>(1u - ij.x, ij.y, 0u); }
+    else { gridIndex -= vec3<u32>(ij.yx, 0u); }
   }
   
   let modulus = sizeToModulus3(vec4<u32>(gridSize, 1u));
   let index = getVertexIndex(packIndex3(gridIndex, modulus));
 
   let vertex = getVertexPosition(index).xyz;
-  let normal = getVertexNormal(index);
+  var normal: vec4<f32>;
+  if (isQuadratic) { normal = getVertexNormal(index * 3 + normalIndex); }
+  else { normal = getVertexNormal(index); }
 
-  let uv3 = (vertex - padding) / (vec3<f32>(gridSize - 1u) - padding * 2);
+  let uv3 = (vertex - padding) / (vec3<f32>(gridSize - 1u) - padding * 2.0);
   let object = mix(rangeMin, rangeMax, uv3);
   let object4 = vec4<f32>(object, 1.0);
 

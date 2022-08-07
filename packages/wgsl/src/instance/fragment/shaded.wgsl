@@ -37,6 +37,8 @@ use '@use-gpu/wgsl/use/view'::{ getViewPosition };
   let params = getMaterial(color.rgb, uv, st);
   let light = emissive.xyz + applyLights(N, V, position.xyz, occlusion, params);
 
+  //return vec4<f32>(color.xyz, 1.0);
+  //return vec4<f32>(mix(color.xyz, N * .5 + .5, .5), 1.0); 
   //return vec4<f32>(N * .5 + .5, 1.0); 
 
   return vec4<f32>(light * color.a, color.a);

@@ -42,6 +42,11 @@ const DEFAULT_DEFINES = {
   '@group(VOLATILE)': '@group(2)',
 };
 
+export const DrawCall = (props: RenderProps) => {
+  // Return a lambda back to parent(s)
+  return yeet(drawCall(props));
+};
+
 // Inlined into <Virtual>
 export const drawCall = (props: RenderProps) => {
   const {
@@ -123,8 +128,7 @@ export const drawCall = (props: RenderProps) => {
   
   const isStrip = topology === 'triangle-strip';
 
-  // Return a lambda back to parent(s)
-  return yeet({
+  return {
     [mode]: (passEncoder: GPURenderPassEncoder, countGeometry: (v: number, t: number) => void) => {
       const v = resolve(vertexCount || 0);
       const i = resolve(instanceCount || 0);
@@ -153,7 +157,7 @@ export const drawCall = (props: RenderProps) => {
       if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
       else passEncoder.draw(v, i, 0, 0);
     },
-  });
+  };
 };
 
 //setShaderLog(100);

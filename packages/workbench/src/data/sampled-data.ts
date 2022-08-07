@@ -17,7 +17,7 @@ export type SampledDataProps = {
   range: [number, number][],
   size: number[],
 
-  pad?: number,
+  padding?: number,
   sparse?: boolean,
   centered?: boolean[] | boolean,
   expr?: Emitter,
@@ -41,7 +41,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     expr,
     items = 1,
     render,
-    pad = 0,
+    padding = 0,
     sparse = false,
     centered = false,
     live = false,
@@ -50,7 +50,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   } = props;
 
   const t = Math.max(1, Math.round(items) || 0);
-  const s = size.map(n => n + pad * 2);
+  const s = size.map(n => n + padding * 2);
   const length = t * (s.length ? s.reduce((a, b) => a * b, 1) : 1);
   const l = useBufferedSize(length);
 
@@ -87,15 +87,15 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         let [min, max] = range[0];
         let step = (max - min) / (size[0] - 1 + c);
         if (c) min += step / 2;
-        min -= step * pad;
+        min -= step * padding;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + (i - pad) * step, i - pad, t)) as any;
+            expr(emit, min + (i - padding) * step, i - padding, t)) as any;
         }
         else {
           sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + (i - pad) * step, t)) as any;
+            expr(emit, min + (i - padding) * step, t)) as any;
         }
       }
       else if (n === 2) {
@@ -108,17 +108,17 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         let stepY = (maxY - minY) / (size[1] - 1 + cy);
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
-        minX -= stepX * pad;
-        minY -= stepY * pad;
+        minX -= stepX * padding;
+        minY -= stepY * padding;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
             expr(
               emit,
-              minX + (i - pad) * stepX,
-              minY + (j - pad) * stepY,
-              i - pad,
-              j - pad,
+              minX + (i - padding) * stepX,
+              minY + (j - padding) * stepY,
+              i - padding,
+              j - padding,
               t,
             )) as any;
         }
@@ -126,8 +126,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
             expr(
               emit,
-              minX + (i - pad) * stepX,
-              minY + (j - pad) * stepY,
+              minX + (i - padding) * stepX,
+              minY + (j - padding) * stepY,
               t,
             )) as any;
         }
@@ -146,20 +146,20 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cx) minX += stepX / 2;
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
-        minX -= stepX * pad;
-        minY -= stepY * pad;
-        minZ -= stepZ * pad;
+        minX -= stepX * padding;
+        minY -= stepY * padding;
+        minZ -= stepZ * padding;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
             expr(
               emit,
-              minX + (i - pad) * stepX,
-              minY + (j - pad) * stepY,
-              minZ + (k - pad) * stepZ,
-              i - pad,
-              j - pad,
-              k - pad,
+              minX + (i - padding) * stepX,
+              minY + (j - padding) * stepY,
+              minZ + (k - padding) * stepZ,
+              i - padding,
+              j - padding,
+              k - padding,
               t,
             )) as any;
         }
@@ -167,9 +167,9 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
             expr(
               emit,
-              minX + (i - pad) * stepX,
-              minY + (j - pad) * stepY,
-              minZ + (k - pad) * stepZ,
+              minX + (i - padding) * stepX,
+              minY + (j - padding) * stepY,
+              minZ + (k - padding) * stepZ,
               t,
             )) as any;
         }
@@ -192,23 +192,23 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
         if (cy) minY += stepY / 2;
         if (cz) minZ += stepZ / 2;
         if (cw) minW += stepW / 2;
-        minX -= stepX * pad;
-        minY -= stepY * pad;
-        minZ -= stepZ * pad;
-        minW -= stepW * pad;
+        minX -= stepX * padding;
+        minY -= stepY * padding;
+        minZ -= stepZ * padding;
+        minW -= stepW * padding;
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
             expr(
               emit,
-              minX + (i - pad) * stepX,
-              minY + (j - pad) * stepY,
-              minZ + (k - pad) * stepZ,
-              minW + (l - pad) * stepW,
-              i - pad,
-              j - pad,
-              k - pad,
-              l - pad,
+              minX + (i - padding) * stepX,
+              minY + (j - padding) * stepY,
+              minZ + (k - padding) * stepZ,
+              minW + (l - padding) * stepW,
+              i - padding,
+              j - padding,
+              k - padding,
+              l - padding,
               t,
             )) as any;
         }
@@ -216,10 +216,10 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
             expr(
               emit,
-              minX + (i - pad) * stepX,
-              minY + (j - pad) * stepY,
-              minZ + (k - pad) * stepZ,
-              minW + (l - pad) * stepW,
+              minX + (i - padding) * stepX,
+              minY + (j - padding) * stepY,
+              minZ + (k - padding) * stepZ,
+              minW + (l - padding) * stepW,
               t,
             )) as any;
         }

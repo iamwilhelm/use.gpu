@@ -25,7 +25,13 @@ const f = (x: number, y: number, z: number, t: number) => {
   x = x * 2;
   y = y * 2;
   z = z * 2;
+  
+
+  //return Math.max(Math.abs(x), Math.abs(y) - Math.cos(t / 3), Math.abs(z*.99)) - 5.02 - Math.cos(t / 5);
+  //return Math.sqrt(x*x + (y-1)*(y-1) + z*z) - 4.0 - Math.cos(t / 5);
+
   const f = Math.cos(t * .5) * .5 + .5;
+
   const swirl = Math.sin(x)*Math.cos(y) + Math.sin(y)*Math.cos(z) + Math.sin(z)*Math.cos(x);
   const grid = Math.cos(x) + Math.cos(y) + Math.cos(z);
   return lerp(swirl, grid, f);
@@ -45,16 +51,24 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
   const t = time.elapsed / 1000;
   const e = 1e-3;
 
+  /*
   const v  = f(x, y, z, t);
   const vx = f(x + e, y, z, t);
   const vy = f(x, y + e, z, t);
   const vz = f(x, y, z + e, t);
   
-  const nx = (vx - v) / e;
-  const ny = (vy - v) / e;
-  const nz = (vz - v) / e;
+  const nx = vx - v;
+  const ny = vy - v;
+  const nz = vz - v;
+  */
 
-  emit(nx, ny, nz);
+  const nx = f(x + e, y, z, t) - f(x - e, y, z, t);
+  const ny = f(x, y + e, z, t) - f(x, y - e, z, t);
+  const nz = f(x, y, z + e, t) - f(x, y, z - e, t);
+
+  const nl = 1/Math.sqrt(nx*nx + ny*ny + nz*nz);
+
+  emit(nx*nl, ny*nl, nz*nl);
 };
 
 export const PlotImplicitSurfacePage: LC = () => {
@@ -67,9 +81,9 @@ export const PlotImplicitSurfacePage: LC = () => {
           <Plot>
             <Animate prop='bend' keyframes={[[0, 0], [23, 1.0]]} pause={1} mirror>
               <Polar
-                bend={0.5}
-                range={[[-π, π], [1, 5], [-3, 3]]}
-                scale={[3, 2, 3]}
+                bend={0}
+                range={[[-π, π], [1, 5], [-π, π]]}
+                scale={[π, 2, π]}
               >
                 <Grid
                   axes='xy'
@@ -142,14 +156,15 @@ export const PlotImplicitSurfacePage: LC = () => {
                             <DualContourLayer
                               values={values}
                               normals={normals}
+                              method="linear"
                               padding={1}
-                              range={[[-π, π], [1, 5], [-3, 3]]}
+                              range={[[-π, π], [1, 5], [-π, π]]}
                               color={[0.4, 1.0, 0.6, 1.0]}
                             />,
                             /*
                             <PointLayer
                               positions={positions}
-                              colors={values}
+                              colors={normals}
                               size={3}
                               depth={1}
                             />,

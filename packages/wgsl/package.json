@@ -39,15 +39,25 @@
       "import": "./src/contour/clip-solid.wgsl",
       "require": "./src/contour/clip-solid.wgsl"
     },
-    "./contour/fit.wgsl": {
-      "types": "./src/contour/fit.wgsl.d.ts",
-      "import": "./src/contour/fit.wgsl",
-      "require": "./src/contour/fit.wgsl"
+    "./contour/fit-linear.wgsl": {
+      "types": "./src/contour/fit-linear.wgsl.d.ts",
+      "import": "./src/contour/fit-linear.wgsl",
+      "require": "./src/contour/fit-linear.wgsl"
+    },
+    "./contour/fit-quadratic.wgsl": {
+      "types": "./src/contour/fit-quadratic.wgsl.d.ts",
+      "import": "./src/contour/fit-quadratic.wgsl",
+      "require": "./src/contour/fit-quadratic.wgsl"
     },
     "./contour/scan.wgsl": {
       "types": "./src/contour/scan.wgsl.d.ts",
       "import": "./src/contour/scan.wgsl",
       "require": "./src/contour/scan.wgsl"
+    },
+    "./contour/solve.wgsl": {
+      "types": "./src/contour/solve.wgsl.d.ts",
+      "import": "./src/contour/solve.wgsl",
+      "require": "./src/contour/solve.wgsl"
     },
     "./contour/types.wgsl": {
       "types": "./src/contour/types.wgsl.d.ts",
@@ -344,6 +354,11 @@
       "import": "./src/render/vertex/virtual-ui.wgsl",
       "require": "./src/render/vertex/virtual-ui.wgsl"
     },
+    "./render/wireframe/wireframe-indirect.wgsl": {
+      "types": "./src/render/wireframe/wireframe-indirect.wgsl.d.ts",
+      "import": "./src/render/wireframe/wireframe-indirect.wgsl",
+      "require": "./src/render/wireframe/wireframe-indirect.wgsl"
+    },
     "./render/wireframe/wireframe-list.wgsl": {
       "types": "./src/render/wireframe/wireframe-list.wgsl.d.ts",
       "import": "./src/render/wireframe/wireframe-list.wgsl",
@@ -373,11 +388,6 @@
       "types": "./src/transform/diff-matrix.wgsl.d.ts",
       "import": "./src/transform/diff-matrix.wgsl",
       "require": "./src/transform/diff-matrix.wgsl"
-    },
-    "./transform/diff-null.wgsl": {
-      "types": "./src/transform/diff-null.wgsl.d.ts",
-      "import": "./src/transform/diff-null.wgsl",
-      "require": "./src/transform/diff-null.wgsl"
     },
     "./transform/polar.wgsl": {
       "types": "./src/transform/polar.wgsl.d.ts",

@@ -14,7 +14,14 @@ declare module "@use-gpu/wgsl/contour/clip-solid.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/contour/fit.wgsl" {
+declare module "@use-gpu/wgsl/contour/fit-linear.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/contour/fit-quadratic.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
@@ -25,6 +32,13 @@ declare module "@use-gpu/wgsl/contour/scan.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/contour/solve.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const approx3x3: ParsedBundle;
   export default __module;
 }
 
@@ -461,6 +475,13 @@ declare module "@use-gpu/wgsl/render/vertex/virtual-ui.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/wireframe/wireframe-indirect.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/render/wireframe/wireframe-list.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -497,13 +518,6 @@ declare module "@use-gpu/wgsl/transform/diff-epsilon.wgsl" {
 }
 
 declare module "@use-gpu/wgsl/transform/diff-matrix.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getNullDifferential: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/transform/diff-null.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getMatrixDifferential: ParsedBundle;

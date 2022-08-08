@@ -64,6 +64,10 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
       ) : null;
       if (buffers) buffers.push(buffer);
 
+      let i = 0;
+      if (buffers) for (const b of buffers) b.label = 'history-' + ++i;
+      buffer.label = 'target';
+
       const counter = { current: 0 };
       return [buffer, buffers, counter];
     },
@@ -72,25 +76,27 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
 
   const targetBuffer = buffer;
 
-  const swapView = useCallback(() => {
-    if (!history) return;
-
-    const {current: index} = counter;
-    const n = buffers!.length;
-
-    source.buffer = buffers[index];
-
-    for (let i = 0; i < history; i++) {
-      const j = (index + n - i - 1) % n;
-      sources[i].buffer = buffers![j];
-    }
-
-    counter.current = (index + 1) % n;
-  }, [buffers]);
-
   const [source, sources] = useMemo(() => {
     const size = [width, height, depth] as [number, number, number];
     const volatile = history ? history + 1 : 0;
+
+    const swap = () => {
+      if (!history) return;
+
+      const {current: index} = counter;
+      const n = buffers!.length;
+
+      source.buffer = buffers[index];
+      source.bump = Math.random();
+
+      for (let i = 0; i < history; i++) {
+        const j = (index + n - i - 1) % n;
+        sources[i].buffer = buffers![j];
+        sources[i].bump = Math.random();
+      }
+
+      counter.current = (index + 1) % n;
+    };
 
     const makeSource = (readWrite: boolean) => ({
       buffer: targetBuffer,
@@ -105,12 +111,12 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
     const sources = history ? seq(history).map(() => makeSource(false)) : null;
 
     const source = makeSource(true);
-    source.swap = swapView;
+    source.swap = swap;
     source.history = sources;
     source.readWrite = true;
 
     return [source, sources];
-  }, [targetBuffer, width, height, depth, format, history, swapView]);
+  }, [targetBuffer, width, height, depth, format, history]);
 
   const content = render ? render(source) : children;
   if (!content) return yeet(source);

@@ -5,7 +5,6 @@ import { use, provide, gather, useCallback, useContext, useFiber, useMemo, useOn
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
-import { FeedbackContext } from '../providers/feedback-provider';
 import { FrameContext, usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 
 import {
@@ -127,43 +126,6 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     },
     [device, width, height, depthStencil, samples]
   );
-  
-  const swapView = useCallback(() => {
-    if (!history) return;
-    const {current: index} = counter;
-    const n = bufferViews!.length;
-
-    const texture = bufferTextures![index];
-    const view = bufferViews![index];
-
-    if (resolveTexture) colorAttachments[0].resolveTarget = view;
-    else colorAttachments[0].view = view;
-
-    source.texture = texture;
-    source.view = view;
-
-    for (let i = 0; i < history; i++) {
-      const j = (index + n - i - 1) % n;
-      sources[i].texture = bufferTextures![j];
-      sources[i].view = bufferViews![j];
-    }
-
-    counter.current = (index + 1) % n;
-  }, [bufferViews]);
-
-  const rttContext = useMemo(() => ({
-    ...renderContext,
-    width,
-    height,
-    colorSpace,
-    colorInput,
-    colorStates,
-    colorAttachments,
-    depthTexture,
-    depthStencilState,
-    depthStencilAttachment,
-    swapView,
-  }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment, swapView]);
 
   const [source, sources] = useMemo(() => {
     const view = makeTextureView(targetTexture);
@@ -171,6 +133,29 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     const volatile = history ? history + 1 : 0;
     const layout = 'texture_2d<f32>';
 
+    const swap = () => {
+      if (!history) return;
+      const {current: index} = counter;
+      const n = bufferViews!.length;
+
+      const texture = bufferTextures![index];
+      const view = bufferViews![index];
+
+      if (resolveTexture) colorAttachments[0].resolveTarget = view;
+      else colorAttachments[0].view = view;
+
+      source.texture = texture;
+      source.view = view;
+
+      for (let i = 0; i < history; i++) {
+        const j = (index + n - i - 1) % n;
+        sources[i].texture = bufferTextures![j];
+        sources[i].view = bufferViews![j];
+      }
+
+      counter.current = (index + 1) % n;
+    };
+    
     const makeSource = () => ({
       texture: targetTexture,
       view,
@@ -186,11 +171,26 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     const sources = history ? seq(history).map(makeSource) : null;
 
     const source = makeSource(true);
-    source.swap = swapView;
+    source.swap = swap;
     source.history = sources;
 
     return [source, sources];
   }, [targetTexture, width, height, format, history, sampler]);
+
+  const rttContext = useMemo(() => ({
+    ...renderContext,
+    width,
+    height,
+    colorSpace,
+    colorInput,
+    colorStates,
+    colorAttachments,
+    depthTexture,
+    depthStencilState,
+    depthStencilAttachment,
+    swapView: source.swap,
+    history: sources,
+  }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment, swapView, sources]);
 
   const Done = (ts: Task[]) => {
     usePerFrame();

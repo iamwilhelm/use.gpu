@@ -11,12 +11,15 @@ fn main(
 ) {
   let modulus = sizeToModulus2(vec4<u32>(numWorkgroups, 1u));
 
+  let ixy = vec2<i32>(globalId.xy);
+  let size = vec2<i32>(numWorkgroups.xy);
+
   let center = packIndex2(globalId.xy, modulus);
 
-  let left   = packIndex2(wrapIndex2(globalId.xy, numWorkgroups.xy, vec2<i32>(-1, 0)), modulus);
-  let right  = packIndex2(wrapIndex2(globalId.xy, numWorkgroups.xy, vec2<i32>( 1, 0)), modulus);
-  let top    = packIndex2(wrapIndex2(globalId.xy, numWorkgroups.xy, vec2<i32>(0, -1)), modulus);
-  let bottom = packIndex2(wrapIndex2(globalId.xy, numWorkgroups.xy, vec2<i32>(0,  1)), modulus);
+  let left   = packIndex2(wrapIndex2(ixy + vec2<i32>(-1, 0), size), modulus);
+  let right  = packIndex2(wrapIndex2(ixy + vec2<i32>( 1, 0), size), modulus);
+  let top    = packIndex2(wrapIndex2(ixy + vec2<i32>(0, -1), size), modulus);
+  let bottom = packIndex2(wrapIndex2(ixy + vec2<i32>(0,  1), size), modulus);
 
   let ux1 = velocityBuffer[left].x;
   let ux2 = velocityBuffer[right].x;
@@ -25,6 +28,6 @@ fn main(
   let vy2 = velocityBuffer[bottom].y;
 
   let div = -((ux2 - ux1) + (vy2 - vy1)) * .5;
-
+  
   divergenceBuffer[center] = div;
 }

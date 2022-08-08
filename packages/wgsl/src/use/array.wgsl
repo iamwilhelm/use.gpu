@@ -37,23 +37,23 @@
   return (i % modulus) / vec4<u32>(1u, modulus.xyz);
 }
 
-@export fn wrapIndex2(index: vec2<u32>, size: vec2<u32>, offset: vec2<i32>) -> vec2<u32> {
-  var signed = vec2<i32>(index) + offset;
-  signed = select(signed, signed + vec2<i32>(size), signed < vec2<i32>(0));
-  signed = select(signed, signed - vec2<i32>(size), signed >= vec2<i32>(size));
+@export fn wrapIndex2(index: vec2<i32>, size: vec2<i32>) -> vec2<u32> {
+  var signed = index;
+  signed = select(signed, signed + size, signed < vec2<i32>(0));
+  signed = select(signed, signed - size, signed >= size);
   return vec2<u32>(signed);
 }
 
-@export fn wrapIndex3(index: vec3<u32>, size: vec3<u32>, offset: vec3<i32>) -> vec3<u32> {
-  var signed = vec3<i32>(index) + offset;
-  signed = select(signed, signed + vec3<i32>(size), signed < vec3<i32>(0));
-  signed = select(signed, signed - vec3<i32>(size), signed >= vec3<i32>(size));
+@export fn wrapIndex3(index: vec3<i32>, size: vec3<i32>) -> vec3<u32> {
+  var signed = index;
+  signed = select(signed, signed + size, signed < vec3<i32>(0));
+  signed = select(signed, signed - size, signed >= size);
   return vec3<u32>(signed);
 }
 
-@export fn wrapIndex4(index: vec4<u32>, size: vec4<u32>, offset: vec4<i32>) -> vec4<u32> {
-  var signed = vec4<i32>(index) + offset;
-  signed = select(signed, signed + vec4<i32>(size), signed < vec4<i32>(0));
-  signed = select(signed, signed - vec4<i32>(size), signed >= vec4<i32>(size));
+@export fn wrapIndex4(index: vec4<i32>, size: vec4<i32>) -> vec4<u32> {
+  var signed = index;
+  signed = select(signed, signed + size, signed < vec4<i32>(0));
+  signed = select(signed, signed - size, signed >= size);
   return vec4<u32>(signed);
 }

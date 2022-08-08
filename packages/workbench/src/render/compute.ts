@@ -1,3 +1,4 @@
+
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, Task } from '@use-gpu/live';
 
 import { use, yeet, memo, provide, multiGather, useContext, useMemo } from '@use-gpu/live';
@@ -8,7 +9,6 @@ import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 
 export type ComputeProps = {
-  target?: StorageSource,
   live?: boolean,
   render?: () => LiveElement<any>,
 };
@@ -32,13 +32,11 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
   const {
     live = false,
     picking = true,
-    target,
     children,
     render,
   } = props;
 
   const inspect = useInspectable();
-  const context = target ? (useNoComputeContext(), target) : useComputeContext();
 
   if (live) usePerFrame();
   else useNoPerFrame();
@@ -99,8 +97,8 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
     return deferred.length ? use(Await, {all: deferred}) : null;
   };
 
-  const content = children ?? (render ? render() : null);
-  const view = target ? provide(ComputeContext, target, content) : content;
+  const content = render ? render() : children;
+  if (!content) return null;
 
-  return multiGather(view, Resume);
+  return multiGather(content, Resume);
 }, 'Compute');

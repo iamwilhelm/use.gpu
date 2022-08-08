@@ -6,6 +6,7 @@ import { yeet, useMemo, useOne, useRef } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { getBoundShader } from '../hooks/useBoundShader';
+import { getDerivedSource } from '../hooks/useDerivedSource';
 
 import { useComputeContext } from '../providers/compute-provider';
 import { useFeedbackContext, useNoFeedbackContext } from '../providers/feedback-provider';
@@ -43,7 +44,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     const sz = resolve(size) ?? target.size;
 
     const f = feedback ? (typeof history === 'number' ? feedback.slice(0, history) : feedback) : NO_SOURCES;    
-    const s = (source ? [source] : NO_SOURCES).map(s => ({...s, readWrite: false}));
+    const s = (source ? [source] : NO_SOURCES).map(s => getDerivedSource(s, {readWrite: false}));
 
     const attr = bundleToAttributes(shader);
     const args = [...sources, ...s, target, ...f];

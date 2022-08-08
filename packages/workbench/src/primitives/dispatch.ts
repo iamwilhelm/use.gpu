@@ -3,6 +3,8 @@ import type { TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy } fro
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, suspend, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 
+import uniq from 'lodash/uniq';
+
 import { DeviceContext } from '../providers/device-provider';
 
 import {
@@ -97,36 +99,49 @@ export const dispatch = (props: RenderProps) => {
   
   let dispatchVersion = null;
 
-  return {
-    compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
-      if (shouldDispatch) {
+  let compute = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
+    onDispatch && onDispatch();
+
+    const s = resolve(size ?? NO_SIZE);
+    const d = s.reduce((a, b) => a * (b || 1), 1);
+
+    inspected.render.dispatchCount = d;
+    inspected.render.dispatchVersion = dispatchVersion;
+    countDispatch(d);
+    
+    const bs = [];
+    for (const b of bindings) if (b.storage) bs.push(b.storage.bump + b.storage.format);
+    for (const b of volatiles) if (b.storage) bs.push(b.storage.bump + b.storage.format);
+    const us = uniq(bs);
+    if (bs.length !== us.length) debugger;
+
+    if (storage.pipe && storage.buffer) {
+      storage.pipe.fill(constants);
+      uploadBuffer(device, storage.buffer, storage.pipe.data);
+    }
+
+    passEncoder.setPipeline(pipeline);
+    if (storage.bindGroup) passEncoder.setBindGroup(0, storage.bindGroup);
+    if (volatile.bindGroup) passEncoder.setBindGroup(1, volatile.bindGroup());
+
+    if (indirect) passEncoder.dispatchWorkgroupsIndirect(indirect.buffer, indirect.byteOffset ?? 0);
+    else passEncoder.dispatchWorkgroups(s[0], s[1] || 1, s[2] || 1);
+  };
+  
+  if (shouldDispatch) {
+    return {
+      compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
         const d = shouldDispatch();
         if (d === false) return;
         if (typeof d === 'number') {
           if (dispatchVersion === d) return;
           dispatchVersion = d;
         }
-      }
-      onDispatch && onDispatch();
-
-      const s = resolve(size ?? NO_SIZE);
-      const d = s.reduce((a, b) => a * (b || 1), 1);
-
-      inspected.render.dispatchCount = d;
-      inspected.render.dispatchVersion = dispatchVersion;
-      countDispatch(d);
-
-      if (storage.pipe && storage.buffer) {
-        storage.pipe.fill(constants);
-        uploadBuffer(device, storage.buffer, storage.pipe.data);
-      }
-
-      passEncoder.setPipeline(pipeline);
-      if (storage.bindGroup) passEncoder.setBindGroup(0, storage.bindGroup);
-      if (volatile.bindGroup) passEncoder.setBindGroup(1, volatile.bindGroup());
-
-      if (indirect) passEncoder.dispatchWorkgroupsIndirect(indirect.buffer, indirect.byteOffset ?? 0);
-      else passEncoder.dispatchWorkgroups(s[0], s[1] || 1, s[2] || 1);
-    },
-  };
+        
+        return compute(passEncoder, countDispatch);
+      },
+    };
+  }
+ 
+  return {compute};
 };

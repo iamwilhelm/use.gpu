@@ -5,4 +5,5 @@ export * from './linear-rgb';
 export * from './loop';
 export * from './pass';
 export * from './picking';
+export * from './stage';
 export * from './render-to-texture';

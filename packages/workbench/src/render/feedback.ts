@@ -4,7 +4,7 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { use, useMemo } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';
-import { useFeedbackContext } from '../providers/feedback-provider';
+import { useRenderContext } from '../providers/render-provider';
 import { useBoundSource } from '../hooks/useBoundSource';
 import { RawFullScreen } from '../primitives';
 
@@ -15,12 +15,14 @@ export type FeedbackProps = {
 const FEEDBACK_BINDING = {name: 'getFeedback', format: 'vec4<f32>', args: ['vec2<f32>']} as UniformAttribute;
 
 export const Feedback: LiveComponent<FeedbackProps> = ({shader}: FeedbackProps) => {
-  const [texture] = useFeedbackContext();
-  const source = useBoundSource(FEEDBACK_BINDING, texture);
+  const {history} = useRenderContext();
+  if (!history) throw new Error("Can't render feedback. Render context has no history.");
+
+  const source = useBoundSource(FEEDBACK_BINDING, history[0]);
 
   return useMemo(() => (
     use(RawFullScreen, {
       texture: shader ? bindBundle(shader, {getFeedback: source}) : source,
     })
-  ), [shader, texture]);
+  ), [shader, source]);
 }

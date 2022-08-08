@@ -31,6 +31,7 @@ export const makeDataArray = (type: UniformType, length: number) => {
 export const makeDataEmitter = (to: NumberArray, dims: number): {
   emit: Emit,
   emitted: () => number,
+  reset: () => void,
 } => {
   let i = 0;
   const emitted = () => i / Math.ceil(dims);

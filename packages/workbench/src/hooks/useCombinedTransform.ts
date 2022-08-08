@@ -1,5 +1,5 @@
 import type { Lazy } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useOne, useVersion } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
@@ -15,7 +15,7 @@ const EPSILON_BINDINGS = bundleToAttributes(getEpsilonDifferential);
 export const useCombinedTransform = (
   position?: ShaderModule | null,
   differential?: ShaderModule | null,
-  epsilon?: Lazy<number>,
+  epsilon?: ShaderSource | Lazy<number>,
 ) => {
   const transformCtx = useTransformContext();
   const differentialCtx = useDifferentialContext();

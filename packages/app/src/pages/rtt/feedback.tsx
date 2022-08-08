@@ -1,24 +1,18 @@
 import type { LC } from '@use-gpu/live';
-import type { Emit } from '@use-gpu/core';
+import type { Emit, Time } from '@use-gpu/core';
 import { RenderPassMode } from '@use-gpu/core';
 
 import React from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
-  Loop, Draw, Pass, OrbitCamera, RawData, PointLayer, Raw,
+  Loop, Draw, Pass, OrbitCamera, RawData, PointLayer,
   LinearRGB, Feedback,
 } from '@use-gpu/workbench';
 
 export const RTTFeedbackPage: LC = () => {
-  let t = 0;
   return (
     <Loop>
-      <Raw>
-        {() => {
-          t = t + 1/60;
-        }}
-      </Raw>
       <LinearRGB history={1} sampler={{minFilter: 'linear', magFilter: 'linear'}}>
         <Pass>
           <OrbitCamera scale={1080}>
@@ -38,7 +32,9 @@ export const RTTFeedbackPage: LC = () => {
               items={2}
               interleaved
               live
-              expr={(emit: Emit, i: number) => {
+              time
+              expr={(emit: Emit, i: number, time: Time) => {
+                const t = time.elapsed / 1000;
                 const s = ((i*i + i) % 13133.371) % 1000;
 
                 const x = Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2;

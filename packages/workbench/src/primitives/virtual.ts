@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { RenderPassMode, DeepPartial, Lazy, StorageSource } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
-import { memo, use, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne } from '@use-gpu/live';
+import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';

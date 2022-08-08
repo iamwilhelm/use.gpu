@@ -161,7 +161,8 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     }
     
     const proto = x.__proto__ !== Object.prototype ? x.__proto__.constructor.name : '';
-    return proto + '{' + out.join(', ') + '}';
+    const label = x.label;
+    return proto + (label?.length ? ':' + label : '') + '{' + out.join(', ') + '}';
   }
   return formatShortValue(x, seen);
 }

@@ -1,3 +1,4 @@
+export * from './compute';
 export * from './draw';
 export * from './feedback';
 export * from './linear-rgb';

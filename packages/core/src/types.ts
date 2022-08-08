@@ -275,6 +275,16 @@ export type TextureSource = {
   colorSpace?: ColorSpace,
 };
 
+export type StorageTarget = StorageSource & {
+  history?: StorageSource[],
+  swap: () => void,
+};
+
+export type TextureTarget = TextureSource & {
+  history?: TextureSource[],
+  swap: () => void,
+};
+
 export type DataTexture = {
   data: TypedArray,
   size: [number, number] | [number, number, number],

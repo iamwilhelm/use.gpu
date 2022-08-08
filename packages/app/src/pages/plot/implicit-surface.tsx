@@ -1,5 +1,5 @@
 import type { LC } from '@use-gpu/live';
-import type { Emit, StorageSource } from '@use-gpu/core';
+import type { Emit, StorageSource, Time } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
 
@@ -83,7 +83,7 @@ export const PlotImplicitSurfacePage: LC = () => {
               <Polar
                 bend={0}
                 range={[[-π, π], [1, 5], [-π, π]]}
-                scale={[π, 2, π]}
+                scale={[π/2, 1, π/2]}
               >
                 <Grid
                   axes='xy'

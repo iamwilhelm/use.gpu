@@ -15,7 +15,7 @@ export type FeedbackProps = {
 const FEEDBACK_BINDING = {name: 'getFeedback', format: 'vec4<f32>', args: ['vec2<f32>']} as UniformAttribute;
 
 export const Feedback: LiveComponent<FeedbackProps> = ({shader}: FeedbackProps) => {
-  const texture = useFeedbackContext();
+  const [texture] = useFeedbackContext();
   const source = useBoundSource(FEEDBACK_BINDING, texture);
 
   return useMemo(() => (

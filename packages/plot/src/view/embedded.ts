@@ -4,7 +4,7 @@ import type { Rectangle } from '@use-gpu/core';
 import { provide, useContext, useNoContext, useOne } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext, LayoutContext,
+  TransformContext, DifferentialContext, LayoutContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 

@@ -7,9 +7,10 @@
 
   --LiveInspect-backgroundEmpty: #222;
   --LiveInspect-backgroundInactive: #444;
-  --LiveInspect-backgroundHover: #555;
-  --LiveInspect-backgroundActive: #666;
+  --LiveInspect-backgroundHover: #666;
+  --LiveInspect-backgroundActive: #555;
   --LiveInspect-backgroundOn: rgba(70, 180, 220, 1.0);
+  --LiveInspect-backgroundOnActive: rgba(60, 160, 200, 1.0);
 
   --LiveInspect-trackBackground: #666;
   --LiveInspect-trackActive: #aaa;

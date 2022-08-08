@@ -16,6 +16,7 @@ import { PlotSphericalPage } from './pages/plot/spherical';
 import { PlotStereographicPage } from './pages/plot/stereographic';
 import { RTTLinearRGBPage } from './pages/rtt/linear-rgb';
 import { RTTFeedbackPage } from './pages/rtt/feedback';
+import { RTTComputePage } from './pages/rtt/compute';
 
 import { HomePage } from './pages/home';
 import { EmptyPage } from './pages/empty';
@@ -35,6 +36,7 @@ export const PAGES = [
   {path: "/plot/implicit-surface", title: "Plot - Implicit Surface"},
   {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
   {path: "/rtt/feedback", title: "RTT - Feedback"},
+  {path: "/rtt/compute", title: "RTT - Compute"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
   {path: "/debug/glyph", title: "Debug - Glyph SDF"},
   {path: "/", title: "Index"},
@@ -55,6 +57,7 @@ export const makeRoutes = () => ({
   "/plot/implicit-surface": { element: <PlotImplicitSurfacePage /> },
   "/rtt/linear-rgb":        { element: <RTTLinearRGBPage /> },
   "/rtt/feedback":          { element: <RTTFeedbackPage /> },
+  "/rtt/compute":           { element: <RTTComputePage /> },
   "/debug/atlas":           { element: <DebugAtlasPage /> },
   "/debug/glyph":           { element: <DebugGlyphPage /> },
 

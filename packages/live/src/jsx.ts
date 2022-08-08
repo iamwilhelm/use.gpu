@@ -31,26 +31,27 @@ export const React = {
         return children;
       }
       if (type === GATHER) {
-        return gather(toChildren(children), props?.then, props?.key);
+        return gather(toChildren(props.children ?? children), props?.then, props?.key);
       }
       if (type === MULTI_GATHER) {
-        return multiGather(toChildren(children), props?.then, props?.key);
+        return multiGather(toChildren(props.children ?? children), props?.then, props?.key);
       }
       if (type === MAP_REDUCE) {
-        return mapReduce(toChildren(children), props?.map, props?.reduce, props?.then, props?.key);
+        return mapReduce(toChildren(props.children ?? children), props?.map, props?.reduce, props?.then, props?.key);
       }
       if (type === PROVIDE) {
-        return provide(props.context, props.value, toChildren(children), props?.key);
+        return provide(props.context, props.value, toChildren(props.children ?? children), props?.key);
       }
       if (type === CAPTURE) {
-        return capture(props.context, toChildren(children), props.then, props?.key);
+        return capture(props.context, toChildren(props.children ?? children), props.then, props?.key);
       }
       if (type === YEET) {
-        return yeet(children[0], props?.key);
+        return yeet((props.children ?? children)[0], props?.key);
       }
       if (type === MORPH) {
-        if (children.length === 1) return morph(children[0]);
-        return children.map(morph);
+        const c = props.children ?? children;
+        if (c.length === 1) return morph(c[0]);
+        return c.map(morph);
       }
       throw new Error("Builtin `${formatNodeName({f: type})}` unsupported in JSX. Use raw function syntax instead.");
     }

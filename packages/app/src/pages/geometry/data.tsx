@@ -49,8 +49,6 @@ const lineData = seq(20).map((i) => ({
   loop: false,
 }));
 
-let t = 0;
-
 export const GeometryDataPage: LC = () => {
 
   const view = (

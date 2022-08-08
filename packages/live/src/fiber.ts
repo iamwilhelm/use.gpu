@@ -319,7 +319,7 @@ export const updateFiber = <F extends ArrowFunction>(
   }
   // Yeet value upstream
   else if (fiberType === YEET) {
-    if (!yeeted) throw new Error("Yeet without aggregator");
+    if (!yeeted) throw new Error("Yeet without aggregator in " + formatNode(fiber));
     bustFiberYeet(fiber);
     visitYeetRoot(fiber);
 

@@ -43,7 +43,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
   const inspect = useInspectable();
 
-  const Resume = (rs: Record<string, (ComputeToPass | RenderToPass | CommandToEncoder)[]>) => {
+  const Resume = (rs: Record<string, (ComputeToPass | RenderToPass | CommandToEncoder | Task)[]>) => {
     const device = useContext(DeviceContext);
     const renderContext = useContext(RenderContext);
     const pickingContext = useContext(PickingContext);

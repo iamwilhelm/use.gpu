@@ -5,7 +5,7 @@ use '@use-gpu/use/array'::{ sizeToModulus4, packIndex4, unpackIndex4 }
 @optional @link fn getPosition(index: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 
 @export fn getVolumeGradient(index: u32) -> vec3<f32> {
-  let size = getSize(0u);
+  let size = getSize();
   let modulus = sizeToModulus4(size);
 
   let xyzd = unpackIndex4(index, modulus);

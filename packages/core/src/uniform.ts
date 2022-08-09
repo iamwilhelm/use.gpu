@@ -177,14 +177,14 @@ export const makeDataBindingsEntries = <T>(
     else if (b.texture) {
       const {texture} = b;
       const {texture: t, view, sampler} = texture;
+      const hasSampler = sampler && b.uniform.args !== null;
 
       const textureResource = view ?? makeTextureView(t);
-      const samplerResource = sampler ? ((sampler instanceof GPUSampler) ? sampler : makeSampler(device, sampler)) : null;
-
       entries.push({binding, resource: textureResource});
       binding++;
 
-      if (sampler) {
+      if (hasSampler) {
+        const samplerResource = (sampler instanceof GPUSampler) ? sampler : makeSampler(device, sampler);
         entries.push({binding, resource: samplerResource});
         binding++;
       }

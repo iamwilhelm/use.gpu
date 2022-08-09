@@ -1,7 +1,7 @@
 
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, Task } from '@use-gpu/live';
 
-import { use, yeet, memo, provide, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { use, yeet, memo, provide, multiGather, useContext, useMemo, setLogging } from '@use-gpu/live';
 import { DeviceContext } from '../providers/device-provider';
 import { ComputeContext, useComputeContext, useNoComputeContext } from '../providers/compute-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
@@ -57,6 +57,7 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
       countDispatch: ComputeCounter,
     ) => {
       const passEncoder = commandEncoder.beginComputePass();
+      let i = 0;
       for (const r of rs) r(passEncoder, countDispatch);
       passEncoder.end();
     };

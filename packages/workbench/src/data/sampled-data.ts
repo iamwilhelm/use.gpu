@@ -91,11 +91,11 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
 
         if (index) {
           sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + (i - padding) * step, i - padding, t)) as any;
+            expr(emit, min + i * step, i - padding, t)) as any;
         }
         else {
           sampled = (<T>(emit: Emit, i: number, t: T) =>
-            expr(emit, min + (i - padding) * step, t)) as any;
+            expr(emit, min + i * step, i - padding, t)) as any;
         }
       }
       else if (n === 2) {
@@ -115,8 +115,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
             expr(
               emit,
-              minX + (i - padding) * stepX,
-              minY + (j - padding) * stepY,
+              minX + i * stepX,
+              minY + j * stepY,
               i - padding,
               j - padding,
               t,
@@ -126,8 +126,8 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, t: T) =>
             expr(
               emit,
-              minX + (i - padding) * stepX,
-              minY + (j - padding) * stepY,
+              minX + i * stepX,
+              minY + j * stepY,
               t,
             )) as any;
         }
@@ -154,9 +154,9 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
             expr(
               emit,
-              minX + (i - padding) * stepX,
-              minY + (j - padding) * stepY,
-              minZ + (k - padding) * stepZ,
+              minX + i * stepX,
+              minY + j * stepY,
+              minZ + k * stepZ,
               i - padding,
               j - padding,
               k - padding,
@@ -167,9 +167,9 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, t: T) =>
             expr(
               emit,
-              minX + (i - padding) * stepX,
-              minY + (j - padding) * stepY,
-              minZ + (k - padding) * stepZ,
+              minX + i * stepX,
+              minY + j * stepY,
+              minZ + k * stepZ,
               t,
             )) as any;
         }
@@ -201,10 +201,10 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
             expr(
               emit,
-              minX + (i - padding) * stepX,
-              minY + (j - padding) * stepY,
-              minZ + (k - padding) * stepZ,
-              minW + (l - padding) * stepW,
+              minX + i * stepX,
+              minY + j * stepY,
+              minZ + k * stepZ,
+              minW + l * stepW,
               i - padding,
               j - padding,
               k - padding,
@@ -216,10 +216,10 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
           sampled = (<T>(emit: Emit, i: number, j: number, k: number, l: number, t: T) =>
             expr(
               emit,
-              minX + (i - padding) * stepX,
-              minY + (j - padding) * stepY,
-              minZ + (k - padding) * stepZ,
-              minW + (l - padding) * stepW,
+              minX + i * stepX,
+              minY + j * stepY,
+              minZ + k * stepZ,
+              minW + l * stepW,
               t,
             )) as any;
         }

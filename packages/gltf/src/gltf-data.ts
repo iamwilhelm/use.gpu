@@ -369,6 +369,7 @@ const Throttle = <T>(children: LiveElement<any>, delay: number = 300) => {
   return fence(children, (value: (T | null)[]) => {
     valueRef.current = value;
 
+    // If everything is loaded, resolve immediately
     const notNull = value.indexOf(null) < 0;
     if (notNull) {
       if (timer) {
@@ -377,7 +378,8 @@ const Throttle = <T>(children: LiveElement<any>, delay: number = 300) => {
       }
       return yeet(value);
     }
-    
+
+    // If nothing is loaded, resolve immediately
     const entirelyNull = value.findIndex(v => v != null) < 0;
     if (entirelyNull) {
       if (timer) {
@@ -387,6 +389,7 @@ const Throttle = <T>(children: LiveElement<any>, delay: number = 300) => {
       return yeet(value);
     }
 
+    // Wait before resolving
     const [resolved, setResolved] = useState<(T | null)[] | null>(null);
     if (resolved !== value && !timer) {
       timer = setTimeout(() => {

@@ -147,7 +147,6 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
       sampler: null,
       layout: 'texture_2d<u32>',
       variant: 'textureLoad',
-      args: ['vec2<i32>', 'i32'],
       format: pickingFormat,
       size: [width, height],
       colorSpace: 'picking',

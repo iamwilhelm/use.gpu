@@ -195,9 +195,7 @@ export const imperative = makeImperativeFunction;
 /** Yeet a suspend symbol. */
 export const suspend = () => yeet(SUSPEND);
 
-/** LOL.
-
-Look, _you_ go try to make JSX.Element polymorphic. */
+/** LOL. Look, _you_ go try to make JSX.Element polymorphic. */
 export const into = (children: any): any => children;
 
 export interface MakeContext<T> {

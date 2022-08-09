@@ -1,30 +1,33 @@
 use '@use-gpu/wgsl/use/array'::{ sizeToModulus3, packIndex3, unpackIndex3 };
+use './types'::{ IndirectDrawMeta };
 use './solve'::{ approx3x3 };
 
+@link var<storage, read_write> indirectDraw: IndirectDrawMeta;
 @link var<storage, read_write> activeCells: array<u32>;
 @link var<storage, read_write> vertexPositions: array<vec4<f32>>;
 @link var<storage, read_write> vertexNormals: array<vec4<f32>>;
 
 @link fn getValueData(i: u32) -> f32 {};
 @link fn getNormalData(i: u32) -> vec3<f32> {};
-@link fn getVolumeSize(i: u32) -> vec3<u32> {};
-@optional @link fn getVolumeLevel(i: u32) -> f32 { return 0.0; };
+@link fn getVolumeSize() -> vec3<u32> {};
+@optional @link fn getVolumeLevel() -> f32 { return 0.0; };
 
 fn getZeroLevel(a: f32, b: f32) -> f32 {
   return -a / (b - a);
 };
 
-@compute @workgroup_size(1)
+@compute @workgroup_size(64)
 @export fn main(
   @builtin(global_invocation_id) globalId: vec3<u32>,
 ) {
-  let level = getVolumeLevel(0u);
-  let size = getVolumeSize(0u);
-  let modulus = sizeToModulus3(vec4<u32>(size, 1u));
+  let size = getVolumeSize();
+  let level = getVolumeLevel();
+  let modulus = sizeToModulus3(size);
 
   let index = globalId.x;
-  let cellIndex = activeCells[index];
+  if (index >= indirectDraw.nextVertexIndex) { return; }
 
+  let cellIndex = activeCells[index];
   let cellOrigin = vec3<f32>(unpackIndex3(cellIndex, modulus));
 
   let i000 = cellIndex;

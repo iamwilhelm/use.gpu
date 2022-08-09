@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
-import { memo, provide, makeContext, useMemo } from '@use-gpu/live';
+import { memo, provide, makeContext, useContext, useNoContext, useMemo } from '@use-gpu/live';
 import { VIEW_UNIFORMS } from '@use-gpu/core';
 
 import { mat4 } from 'gl-matrix';
@@ -38,3 +38,6 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewP
   const context = useMemo(() => ({viewDefs, viewUniforms}), [viewDefs, viewUniforms]);
   return provide(ViewContext, context, children);
 }, 'ViewProvider');
+
+export const useViewContext = () => useContext(ViewContext);
+export const useNoViewContext = () => useNoContext(ViewContext);

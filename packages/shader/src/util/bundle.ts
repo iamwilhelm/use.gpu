@@ -51,21 +51,21 @@ export const makeDeclarationToAttribute = (
   d: any,
 ) => {
   if (d.func) {
-    const {type, name, parameters} = d.func;
-    return {name, format: toTypeString(type), args: toArgTypes(parameters)};
+    const {type, name, parameters, attributes} = d.func;
+    return {name, format: toTypeString(type), args: toArgTypes(parameters), attr: attributes};
   }
   if (d.variable) {
-    const {type, name, parameters} = d.variable;
-    return {name, format: toTypeString(type), args: null};
+    const {type, name, parameters, attributes} = d.variable;
+    return {name, format: toTypeString(type), args: null, attr: attributes};
   }
   if (d.struct) {
-    const {name, members} = d.struct;
+    const {name, members, attributes} = d.struct;
     const ms = members?.map(({name, type}: any) => ({
       name,
       format: toTypeString(type),
     }));
     const args = ms?.map(({format}: any) => format);
-    return {name, format: name, args, members: ms};
+    return {name, format: name, args, members: ms, attr: attributes};
   }
   throw new Error(`Cannot convert declaration to attribute: ${JSON.stringify(d)}`);
 }

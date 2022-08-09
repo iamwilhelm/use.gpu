@@ -1,15 +1,15 @@
 use '@use-gpu/wgsl/use/array'::{ sizeToModulus3, packIndex3 };
-use './types'::{ IndirectDrawMeta };
+use './types'::{ IndirectDrawMetaAtomic };
 
-@link var<storage, read_write> indirectDraw: IndirectDrawMeta;
+@link var<storage, read_write> indirectDraw: IndirectDrawMetaAtomic;
 @link var<storage, read_write> activeEdges: array<u32>;
 @link var<storage, read_write> activeCells: array<u32>;
 @link var<storage, read_write> markedCells: array<atomic<u32>>;
 @link var<storage, read_write> vertexIndices: array<u32>;
 
 @link fn getValueData(i: u32) -> f32 {};
-@link fn getVolumeSize(i: u32) -> vec3<u32> {};
-@optional @link fn getVolumeLevel(i: u32) -> f32 { return 0.0; };
+@link fn getVolumeSize() -> vec3<u32> {};
+@optional @link fn getVolumeLevel() -> f32 { return 0.0; };
 
 // Append any X/Y/Z edge that crosses the level set
 fn appendEdge(id: u32) {
@@ -29,6 +29,10 @@ fn appendVertex(i: u32) {
     let nextCell = atomicAdd(&indirectDraw.nextVertexIndex, 1u);
     activeCells[nextCell] = i;
     vertexIndices[i] = nextCell;
+
+    // Store dispatch count for next pass
+    let dispatchCount = (nextCell / 64u) + 1u;
+    atomicMax(&indirectDraw.dispatchCount, dispatchCount);
   }
 }
 
@@ -38,13 +42,15 @@ fn packEdgeId(index: vec3<u32>, axis: u32) -> u32 {
   return shifted.x | shifted.y | shifted.z | shifted.w;
 }
 
-@compute @workgroup_size(1)
+@compute @workgroup_size(4, 4, 4)
 @export fn main(
   @builtin(global_invocation_id) globalId: vec3<u32>,
 ) {
-  let level = getVolumeLevel(0u);
-  let size = getVolumeSize(0u);
-  let modulus = sizeToModulus3(vec4<u32>(size, 1u));
+  let size = getVolumeSize();
+  if (any(globalId >= size)) { return; }
+
+  let level = getVolumeLevel();
+  let modulus = sizeToModulus3(size);
 
   let base = packIndex3(globalId, modulus);
 

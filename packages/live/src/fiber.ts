@@ -510,9 +510,7 @@ export const fenceFiberCalls = <F extends ArrowFunction, T>(
   next?: LiveFunction<any>,
 ) => {
   const {yeeted} = fiber;
-  if (!yeeted) throw new Error("Cannot fence outside of yeet");
-
-  const {gather} = yeeted;
+  const gather = yeeted?.gather ?? NOP;
   return mountFiberReduction(fiber, calls, undefined, gather, next, SUSPEND);
 }
 

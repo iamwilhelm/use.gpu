@@ -2,7 +2,8 @@
 - WGSL grammar: change global `let` to `const`
 - WGSL grammar: add optional parentheses in `if`, `switch`, ...
 - Allow `@link` on variable declarations
-- Storage binding without getter when `args` = `null`
+- Storage/texture binding without getter when `args` = `null`
+- Storage/uniform getters without `index: u32`.
 
 0.6.0
 - Add simple type inference via `@infer`

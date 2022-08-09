@@ -11,6 +11,7 @@ export * from './loop-provider';
 export * from './material-provider';
 export * from './render-provider';
 export * from './scroll-provider';
+export * from './suspense-provider';
 export * from './time-provider';
 export * from './transform-provider';
 export * from './view-provider';

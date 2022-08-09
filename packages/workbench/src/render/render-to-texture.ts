@@ -190,7 +190,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     depthStencilAttachment,
     swapView: source.swap,
     history: sources,
-  }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment, swapView, sources]);
+  }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment, source, sources]);
 
   const Done = (ts: Task[]) => {
     usePerFrame();

@@ -1,5 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import { yeet, useAsync, useMemo, useOne } from '@use-gpu/live';
+import { yeet, suspend, useAsync, useMemo, useOne } from '@use-gpu/live';
+import { useSuspenseContext } from '../providers/suspense-provider';
 
 const SLOW = 0;
 
@@ -34,6 +35,8 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
     slow = SLOW,
   } = props;
 
+  const suspense = useSuspenseContext();
+
   const run = useMemo(() => {
     const f = async () => {
       const response = await fetch((url ?? request)!, options);
@@ -48,7 +51,7 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
   const [resolved, error] = useAsync(run, [run]);
   const result = resolved !== undefined ? resolved : (error !== undefined ? fallback : loading);
   
-  return result !== undefined ? (render ? render(result) : yeet(result)) : null;
+  return result !== undefined ? (render ? render(result) : yeet(result)) : (suspense ? suspend() : null);
 };
 
 const delay = <T>(promise: Promise<T>, time: number = 0) =>

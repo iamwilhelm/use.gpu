@@ -26,9 +26,7 @@ const f = (x: number, y: number, z: number, t: number) => {
   y = y * 2;
   z = z * 2;
   
-
-  //return Math.max(Math.abs(x), Math.abs(y) - Math.cos(t / 3), Math.abs(z*.99)) - 5.02 - Math.cos(t / 5);
-  //return Math.sqrt(x*x + (y-1)*(y-1) + z*z) - 4.0 - Math.cos(t / 5);
+  //return Math.max(Math.abs(x)/1.5, Math.abs(y - 6)*2 - Math.cos(t / 3) * .5, Math.abs(z*.59)) - 3.02 - Math.cos(t / 5)*.65;
 
   const f = Math.cos(t * .5) * .5 + .5;
 
@@ -51,7 +49,6 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
   const t = time.elapsed / 1000;
   const e = 1e-3;
 
-  /*
   const v  = f(x, y, z, t);
   const vx = f(x + e, y, z, t);
   const vy = f(x, y + e, z, t);
@@ -60,11 +57,6 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
   const nx = vx - v;
   const ny = vy - v;
   const nz = vz - v;
-  */
-
-  const nx = f(x + e, y, z, t) - f(x - e, y, z, t);
-  const ny = f(x, y + e, z, t) - f(x, y - e, z, t);
-  const nz = f(x, y, z + e, t) - f(x, y, z - e, t);
 
   const nl = 1/Math.sqrt(nx*nx + ny*ny + nz*nz);
 
@@ -88,7 +80,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                 <Grid
                   axes='xy'
                   width={2}
-                  first={{ detail: 3, divide: 5 }}
+                  first={{ unit: π, base: 2, detail: 3, divide: 5 }}
                   second={{ detail: 32, divide: 5 }}
                   depth={0.5}
                   zBias={-1}
@@ -97,7 +89,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                   axes='xz'
                   width={2}
                   origin={[-3, 0, -3]}
-                  first={{ detail: 3, divide: 5 }}
+                  first={{ unit: π, base: 2, detail: 3, divide: 5 }}
                   second={{ detail: 32, divide: 5 }}
                   depth={0.5}
                   zBias={-1}

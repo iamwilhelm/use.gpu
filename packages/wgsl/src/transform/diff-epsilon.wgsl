@@ -1,10 +1,10 @@
 use '@use-gpu/wgsl/geometry/normal'::{ getOrthoVector };
 
 @link fn transformPosition(position: vec4<f32>) -> vec4<f32>;
-@optional @link fn getEpsilon(i: u32) -> f32 { return 0.001; };
+@optional @link fn getEpsilon() -> f32 { return 0.001; };
 
 @export fn getEpsilonDifferential(vector: vec4<f32>, origin: vec4<f32>, contravariant: bool) -> vec4<f32> {
-  let e = getEpsilon(0u);
+  let e = getEpsilon();
 
   if (contravariant) {
     let nt = getOrthoVector(vector.xyz);

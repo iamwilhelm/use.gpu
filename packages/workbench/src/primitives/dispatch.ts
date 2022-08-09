@@ -1,11 +1,12 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
-import { yeet, memo, suspend, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 
 import uniq from 'lodash/uniq';
 
-import { DeviceContext } from '../providers/device-provider';
+import { useDeviceContext } from '../providers/device-provider';
+import { useSuspenseContext } from '../providers/suspense-provider';
 
 import {
   makeBoundUniforms, makeVolatileUniforms,
@@ -29,6 +30,7 @@ export type DispatchProps = {
 };
 
 const NO_SIZE = [1];
+const NO_CALL: Record<string, ArrowFunction> = {};
 
 const DEFAULT_DEFINES = {
   '@group(VIRTUAL)': '@group(0)',
@@ -54,7 +56,8 @@ export const dispatch = (props: RenderProps) => {
   const inspect = useInspectable();
 
   // Dispatch set up
-  const device = useContext(DeviceContext);
+  const device = useDeviceContext();
+  const suspense = useSuspenseContext();
   const defines = useOne(() => (propDefines ? {
     ...DEFAULT_DEFINES,
     ...propDefines,
@@ -73,10 +76,10 @@ export const dispatch = (props: RenderProps) => {
   );
   
   // Rendering pipeline
-  const [pipeline, stale] = useComputePipelineAsync(module);
+  const [pipeline, isStale] = useComputePipelineAsync(module);
 
-  if (!pipeline) return;
-  if (stale) return suspend();
+  if (!pipeline) return suspense ? SUSPEND : NO_CALL;
+  if (isStale) return SUSPEND;
 
   // Bound storage
   const force = !!volatiles.length;
@@ -108,12 +111,13 @@ export const dispatch = (props: RenderProps) => {
     inspected.render.dispatchCount = d;
     inspected.render.dispatchVersion = dispatchVersion;
     countDispatch(d);
-    
+
+    /*
     const bs = [];
-    for (const b of bindings) if (b.storage) bs.push(b.storage.bump + b.storage.format);
-    for (const b of volatiles) if (b.storage) bs.push(b.storage.bump + b.storage.format);
-    const us = uniq(bs);
-    if (bs.length !== us.length) debugger;
+    for (const b of bindings) if (b.storage) bs.push(b.storage.version);
+    for (const b of volatiles) if (b.storage) bs.push(b.storage.version);
+    console.log('dispatch', computeShader.module.name, bs)
+    */
 
     if (storage.pipe && storage.buffer) {
       storage.pipe.fill(constants);

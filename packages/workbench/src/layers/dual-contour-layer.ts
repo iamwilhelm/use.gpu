@@ -125,7 +125,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const getMaterialFragment = shaded ? m : getPassThruFragment;
   const getClippedFragment = shaded ? getClippedShadedFragment : getClippedSolidFragment;
 
-  const indirectDraw    = useOne(() => new Uint32Array(8));
+  const indirectDraw    = useOne(() => new Uint32Array(12));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
 
   const [edgeStorage,   allocateEdges]    = useScratchSource('u32', READ_WRITE_SOURCE);
@@ -135,11 +135,12 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const [vertexStorage, allocateVertices] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
   const [normalStorage, allocateNormals]  = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
 
-  const indirectNextStorage = useDerivedSource(indirectStorage, INDIRECT_OFFSET_1);
-  const edgeReadout         = useDerivedSource(edgeStorage, READ_ONLY_SOURCE);
-  const indexReadout        = useDerivedSource(indexStorage, READ_ONLY_SOURCE);
-  const vertexReadout       = useDerivedSource(vertexStorage, READ_ONLY_SOURCE);
-  const normalReadout       = useDerivedSource(normalStorage, READ_ONLY_SOURCE);
+  const indirectReadout1 = useDerivedSource(indirectStorage, READ_ONLY_SOURCE);
+  const indirectReadout2 = useDerivedSource(indirectStorage, INDIRECT_OFFSET_1);
+  const edgeReadout      = useDerivedSource(edgeStorage, READ_ONLY_SOURCE);
+  const indexReadout     = useDerivedSource(indexStorage, READ_ONLY_SOURCE);
+  const vertexReadout    = useDerivedSource(vertexStorage, READ_ONLY_SOURCE);
+  const normalReadout    = useDerivedSource(normalStorage, READ_ONLY_SOURCE);
   
   const boundScan = useBoundShader(
     scanVolume,
@@ -154,7 +155,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     fitContour,
     FIT_BINDINGS,
     [
-      cellStorage, vertexStorage, normalStorage,
+      indirectReadout1, cellStorage, vertexStorage, normalStorage,
       v, n, s, l,
     ]);
 
@@ -191,7 +192,11 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     if (method === 'quadratic') allocateNormals(d * 3);
     else allocateNormals(d);
 
-    return [sx - 1, sy - 1, sz - 1];
+    return [
+      Math.ceil((sx - 1) / 4),
+      Math.ceil((sy - 1) / 4),
+      Math.ceil((sz - 1) / 4),
+    ];
   };
 
   const device = useDeviceContext();
@@ -212,10 +217,12 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     // -> Use atomic per-cell mask to handle overlap
     // -> Use generation number to avoid clearing mask
     // -> Make map of cell (i,j,k) to vertex index for reverse lookup
-    indirectDraw[4] = 0; // dispatchX = nextVertex
+    indirectDraw[4] = 0; // dispatchX = ceil(nextVertex / 64)
     indirectDraw[5] = 1;
     indirectDraw[6] = 1;
     indirectDraw[7] = generation;
+
+    indirectDraw[8] = 0; // nextVertex
     generationRef.current++;
 
     uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
@@ -233,7 +240,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     }),
     use(Dispatch, {
       shader: boundFit,
-      indirect: indirectNextStorage,
+      indirect: indirectReadout2,
       shouldDispatch,
     }),
     use(Virtual, {

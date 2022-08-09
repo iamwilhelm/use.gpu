@@ -97,7 +97,7 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
     else { gridIndex -= vec3<u32>(ij.yx, 0u); }
   }
   
-  let modulus = sizeToModulus3(vec4<u32>(gridSize, 1u));
+  let modulus = sizeToModulus3(gridSize);
   let index = getVertexIndex(packIndex3(gridIndex, modulus));
 
   let vertex = getVertexPosition(index).xyz;

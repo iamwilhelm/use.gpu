@@ -49,6 +49,7 @@ import {
 } from './ast';
 
 import {
+  getBundleEntry,
   getBundleHash,
   getBundleKey,
 } from '../util/bundle';
@@ -104,6 +105,7 @@ export {
 } from './ast';
 
 export {
+  getBundleEntry,
   getBundleHash,
   getBundleKey,
 } from '../util/bundle';
@@ -143,6 +145,7 @@ export const WGSLLinker = {
 
   makeModuleCache,
 
+  getBundleEntry,
   getBundleHash,
   getBundleKey,
 };

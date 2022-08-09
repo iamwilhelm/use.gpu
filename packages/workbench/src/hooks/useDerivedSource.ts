@@ -7,7 +7,7 @@ export const useDerivedSource = (
   source: StorageSource,
   override: Record<string, any>,
 ) => {
-  return useOne(() => getDerivedSource(source), source);
+  return useOne(() => getDerivedSource(source, override), source);
 };
 
 export const getDerivedSource = (

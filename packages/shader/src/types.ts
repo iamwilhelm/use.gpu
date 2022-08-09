@@ -126,7 +126,6 @@ export type TextureSource = {
 
   mips?: number,
   variant?: string,
-  args?: string[],
   absolute?: boolean,
   volatile?: number,
   colorSpace?: ColorSpace,
@@ -139,7 +138,10 @@ export type UniformAttribute = {
   format: any,
   args?: any[] | null,
   members?: UniformAttribute[],
+  attr?: UniformShaderAttribute[],
 };
+
+export type UniformShaderAttribute = { name: string, args: string[] };
 
 export type UniformAttributeValue = UniformAttribute & {
   value: any,

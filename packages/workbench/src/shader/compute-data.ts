@@ -2,7 +2,7 @@ import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live'
 import type { StorageTarget } from '@use-gpu/core';
 
 import { getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';
-import { use, wrap, provide, gather, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { use, wrap, provide, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { FeedbackContext } from '../providers/feedback-provider';
@@ -87,13 +87,14 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
       const n = buffers!.length;
 
       source.buffer = buffers[index];
-      source.bump = Math.random();
 
-      for (let i = 0; i < history; i++) {
+      for (let i = history - 1; i >= 0; i--) {
         const j = (index + n - i - 1) % n;
         sources[i].buffer = buffers![j];
-        sources[i].bump = Math.random();
+        sources[i].version = i ? sources[i - 1].version : source.version;
       }
+
+      source.version = incrementVersion(source.version);
 
       counter.current = (index + 1) % n;
     };
@@ -118,10 +119,11 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
     return [source, sources];
   }, [targetBuffer, width, height, depth, format, history]);
 
-  const content = render ? render(source) : children;
-  if (!content) return yeet(source);
+  if (!(render ?? children)) return yeet(source);
 
-  return (
-    provide(ComputeContext, source, content)
-  );
+  const content = render ? render(source) : children;
+  const view = provide(ComputeContext, source, content);
+
+  if (then) return fence(view, () => then(source));
+  return view;
 }

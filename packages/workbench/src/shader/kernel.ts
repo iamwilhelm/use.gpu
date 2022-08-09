@@ -4,7 +4,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 
 import { yeet, useMemo, useOne, useRef } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bundleToAttribute, bundleToAttributes, getBundleEntry } from '@use-gpu/shader/wgsl';
 import { getBoundShader } from '../hooks/useBoundShader';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 
@@ -40,17 +40,31 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
   const target = useComputeContext();
   const feedback = history ? target.history : null;
 
-  const [dispatchKernel, s] = useMemo(() => {
-    const sz = resolve(size) ?? target.size;
+  const [dispatchKernel, dispatchSize] = useMemo(() => {
+    const entry = getBundleEntry(shader);
+    const symbol = bundleToAttribute(shader, entry);
+
+    const workgroupAttr = symbol.attr.find(({name}) => name === 'workgroup_size')?.args ?? [];
+    const workgroupSize = workgroupAttr.map(s => parseInt(s) || 1);
+
+    const dataSize = () => resolve(size) ?? target.size;
+    const dispatchSize = () => {
+      const [w, h, d] = dataSize();
+      return [
+        Math.ceil(w / (workgroupSize[0] || 1)),
+        Math.ceil(h / (workgroupSize[1] || 1)),
+        Math.ceil(d / (workgroupSize[2] || 1)),
+      ];
+    };
 
     const f = feedback ? (typeof history === 'number' ? feedback.slice(0, history) : feedback) : NO_SOURCES;    
-    const s = (source ? [source] : NO_SOURCES).map(s => getDerivedSource(s, {readWrite: false}));
+    const s = (source ? [source] : NO_SOURCES).map(s => (s?.buffer) ? getDerivedSource(s, {readWrite: false}) : s);
 
-    const attr = bundleToAttributes(shader);
-    const args = [...sources, ...s, target, ...f];
+    const bindings = bundleToAttributes(shader);
+    const args = [dataSize, ...sources, ...s, target, ...f];
 
-    const kernel = getBoundShader(shader, attr, args);
-    return [kernel, sz];
+    const kernel = getBoundShader(shader, bindings, args);
+    return [kernel, dispatchSize];
   }, [shader, target, source, sources, feedback, history]);
 
   let first = useRef(true);
@@ -67,7 +81,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
 
   return yeet(dispatch({
     shader: dispatchKernel,
-    size: s,
+    size: dispatchSize,
     shouldDispatch,
     onDispatch,
   }));

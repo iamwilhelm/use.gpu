@@ -1,10 +1,11 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { TypedArray, ViewUniforms, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
-import { yeet, memo, suspend, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 
-import { DeviceContext } from '../providers/device-provider';
-import { ViewContext } from '../providers/view-provider';
+import { useDeviceContext } from '../providers/device-provider';
+import { useViewContext } from '../providers/view-provider';
+import { useSuspenseContext } from '../providers/suspense-provider';
 
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
@@ -47,6 +48,8 @@ export const DrawCall = (props: RenderProps) => {
   return yeet(drawCall(props));
 };
 
+const NO_CALL: Record<string, ArrowFunction> = {};
+
 // Inlined into <Virtual>
 export const drawCall = (props: RenderProps) => {
   const {
@@ -68,8 +71,9 @@ export const drawCall = (props: RenderProps) => {
   const inspect = useInspectable();
 
   // Render set up
-  const device = useContext(DeviceContext);
-  const {viewUniforms, viewDefs} = useContext(ViewContext);
+  const device = useDeviceContext();
+  const {viewUniforms, viewDefs} = useViewContext();
+  const suspense = useSuspenseContext();
 
   // Render shader
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
@@ -92,14 +96,14 @@ export const drawCall = (props: RenderProps) => {
   );
   
   // Rendering pipeline
-  const [pipeline, stale] = useRenderPipelineAsync(
+  const [pipeline, isStale] = useRenderPipelineAsync(
     renderContext,
     shader as any,
     propPipeline,
   );
 
-  if (!pipeline) return;
-  if (stale) return suspend();
+  if (!pipeline) return suspense ? SUSPEND : NO_CALL;
+  if (isStale) return SUSPEND;
   
   // Uniforms
   const uniform = useMemo(() => {

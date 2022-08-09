@@ -166,10 +166,10 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute, sampler, format, args} = texture!;
+      const {volatile, layout, variant, absolute, sampler, format} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
-      if (sampler) volatile ? volatileBase++ : bindingBase++;
+      if (sampler && args !== null) volatile ? volatileBase++ : bindingBase++;
       program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute, !!sampler, args));
     }
 
@@ -228,12 +228,15 @@ export const makeUniformFieldAccessor = (
   ns: string,
   type: string,
   name: string,
-  args: string[] = INT_ARG,
-) => `
+  args: string[] | null = INT_ARG,
+) => {
+  if (args == null) throw new Error("Constants cannot be bound directly to storage/textures");
+  return `
 fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   return ${uniform}Uniform.${ns}${name};
 }
 `;
+};
 
 export const makeStorageAccessor = (
   ns: string,
@@ -255,8 +258,8 @@ export const makeStorageAccessor = (
   return `
 @group(${set}) @binding(${binding}) var<${access}> ${ns}${name}Storage: array<${format}>;
 
-fn ${ns}${name}(index: u32) -> ${type} {
-  ${hasCast ? 'let v =' : 'return'} ${ns}${name}Storage[index];
+fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
+  ${hasCast ? 'let v =' : 'return'} ${ns}${name}Storage[${args.length ? arg(0) : '0u'}];
 ${hasCast ? `  return ${makeSwizzle(format, type, 'v')};\n` : ''
 }}
 `;
@@ -273,8 +276,12 @@ export const makeTextureAccessor = (
   variant: string = 'textureSample',
   absolute: boolean = false,
   sampler: boolean = true,
-  args: string[] = UV_ARG,
+  args: string[] | null = UV_ARG,
 ) => {
+  if (args === null) {
+    return `@group(${set}) @binding(${binding}) var ${ns}${name}: ${type};\n`;
+  }
+
   const m = layout.match(/[0-9]/) ?? [2];
   const dims = +m[0];
   const dimsCast = dims === 1 ? 'f32' : `vec${dims}<f32>`;

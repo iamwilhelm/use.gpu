@@ -8,7 +8,7 @@ import { yeet, memo, useMemo, useNoMemo, useContext, useNoContext, incrementVers
 import { makeSampler, makeRawTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
 
 export type RawTextureProps = {
-  data?: DataTexture,
+  data: DataTexture,
   sampler?: GPUSamplerDescriptor,
   live?: boolean,
 
@@ -29,8 +29,6 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
 
   // Make source texture from data
   const source = useMemo(() => {
-    if (!data) return null;
-
     const {
       size,
       layout = 'texture_2d<f32>',
@@ -75,5 +73,5 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
     refresh();
   }
 
-  return useMemo(() => source ? (render ? render(source) : yeet(source)) : null, [render, source]);
+  return useMemo(() => render ? render(source) : yeet(source), [render, source]);
 };

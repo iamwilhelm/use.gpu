@@ -147,8 +147,6 @@ export const fitBlock = (
     if (!isX && !resolved[0]) resolved[0] = els.reduce((a, b) => Math.max(a, b.sizing[2] + pl + pr), 0);
   }
 
-  console.log({fixed, into, direction})
-
   const relativeFit = [
      isX ? null : resolved[0] != null ? resolved[0] - (pl + pr) : null,
     !isX ? null : resolved[1] != null ? resolved[1] - (pt + pb) : null,

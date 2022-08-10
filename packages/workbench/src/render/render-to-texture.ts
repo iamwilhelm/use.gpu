@@ -1,4 +1,4 @@
-import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
+import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { ColorSpace, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, gather, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
@@ -90,7 +90,7 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
       ) : null;
       if (buffers) buffers.push(resolve ?? render);      
 
-      const views = buffers ? buffers.map(b => makeTextureView(b)) : null;
+      const views = buffers ? buffers.map(b => makeTextureView(b)) : undefined;
 
       const counter = { current: 0 };
 
@@ -149,8 +149,8 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
 
       for (let i = 0; i < history; i++) {
         const j = (index + n - i - 1) % n;
-        sources[i].texture = bufferTextures![j];
-        sources[i].view = bufferViews![j];
+        sources![i].texture = bufferTextures![j];
+        sources![i].view = bufferViews![j];
       }
 
       counter.current = (index + 1) % n;
@@ -168,11 +168,11 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
       version: 0,
     }) as TextureTarget;
 
-    const sources = history ? seq(history).map(makeSource) : null;
+    const sources = history ? seq(history).map(makeSource) : undefined;
 
-    const source = makeSource(true);
+    const source = makeSource();
+    if (sources) source.history = sources;
     source.swap = swap;
-    source.history = sources;
 
     return [source, sources];
   }, [targetTexture, width, height, format, history, sampler]);
@@ -188,11 +188,11 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
     depthTexture,
     depthStencilState,
     depthStencilAttachment,
-    swapView: source.swap,
+    swap: source.swap,
     history: sources,
   }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment, source, sources]);
 
-  const Done = (ts: Task[]) => {
+  const Done = (ts: ArrowFunction[]) => {
     usePerFrame();
 
     const children: LiveElement<any> = [];

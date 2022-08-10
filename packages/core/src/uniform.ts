@@ -239,6 +239,8 @@ export const makeUniformLayout = (
   let max = 0;
   let offset = base;
   for (const {name, format} of uniforms) {
+    if (typeof format === 'object') throw new Error(`Struct cannot be used as uniform member types`);
+
     const s = getUniformAttributeSize(format);
     const a = getUniformAttributeAlign(format);
     if (a === 0) throw new Error(`Type ${format} is not host-shareable or unimplemented`);

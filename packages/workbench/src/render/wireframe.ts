@@ -52,7 +52,7 @@ export const getWireframe = (
 export const getWireframeIndirect = (
   device: GPUDevice,
   getVertex: ShaderModule,
-  indirect: ShaderModule,
+  indirect: StorageSource,
   topology: string,
 ) => {
   const isTriangleStrip = topology === 'triangle-strip';
@@ -82,6 +82,4 @@ export const getWireframeIndirect = (
     wireframeCommand: boundDispatch,
     wireframeIndirect: destination, 
   };
-
-  return bound;
 }

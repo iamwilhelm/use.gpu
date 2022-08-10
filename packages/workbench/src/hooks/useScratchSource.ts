@@ -1,6 +1,6 @@
-import type { LambdaSource, StorageSource, UniformType, Task } from '@use-gpu/core';
+import type { LambdaSource, StorageSource, UniformType } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { ArrowFunction } from '@use-gpu/live';
+import type { ArrowFunction, Task } from '@use-gpu/live';
 
 import { useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { resolve, makeDataBuffer, getDataArrayByteLength, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
@@ -18,7 +18,7 @@ type ScratchSourceOptions = {
 
 export const useScratchSource = (
   format: UniformType,
-  options: RawSourceOptions = NO_OPTIONS,
+  options: ScratchSourceOptions = NO_OPTIONS,
 ) => {
   const {
     readWrite = false,
@@ -60,6 +60,6 @@ export const useScratchSource = (
 
     allocate(reserve);
 
-    return [source, allocate] as [StorageSource, Task];
+    return [source, allocate] as [StorageSource, (x: number) => void];
   }, [device, format, readWrite, flags]);
 };

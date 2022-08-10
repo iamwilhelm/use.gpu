@@ -1,4 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { StorageSource, TypedArray } from '@use-gpu/core';
 
 import { use, memo, yeet, useMemo, useOne } from '@use-gpu/live';
 import { getDataArrayByteLength, getDataArrayConstructor } from '@use-gpu/core';

@@ -1,4 +1,4 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
 import type { TypedArray, ViewUniforms, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
@@ -19,7 +19,7 @@ import { useInspectable } from '../hooks/useInspectable'
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
-export type RenderProps = {
+export type DrawCallProps = {
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
   id?: number,
@@ -33,7 +33,7 @@ export type RenderProps = {
   
   renderContext: UseRenderingContextGPU,
 
-  defines: Record<string, any>,
+  defines?: Record<string, any>,
 };
 
 const DEFAULT_DEFINES = {
@@ -43,7 +43,7 @@ const DEFAULT_DEFINES = {
   '@group(VOLATILE)': '@group(2)',
 };
 
-export const DrawCall = (props: RenderProps) => {
+export const DrawCall = (props: DrawCallProps) => {
   // Return a lambda back to parent(s)
   return yeet(drawCall(props));
 };
@@ -51,7 +51,7 @@ export const DrawCall = (props: RenderProps) => {
 const NO_CALL: Record<string, ArrowFunction> = {};
 
 // Inlined into <Virtual>
-export const drawCall = (props: RenderProps) => {
+export const drawCall = (props: DrawCallProps) => {
   const {
     vertexCount,
     instanceCount,

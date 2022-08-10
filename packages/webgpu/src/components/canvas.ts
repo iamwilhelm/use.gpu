@@ -90,7 +90,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps
     [device, canvas, format, width, height],
   );
   
-  const swapView = useCallback((view?: GPUTextureView) => {
+  const swap = useCallback((view?: GPUTextureView) => {
     view = view ?? gpuContext
       .getCurrentTexture()
       .createView();
@@ -115,7 +115,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps
     depthStencilState,
     depthStencilAttachment,
 
-    swapView,
+    swap,
   } as UseRenderingContextGPU;
 
   return (

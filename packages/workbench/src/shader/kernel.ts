@@ -1,6 +1,6 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, Ref } from '@use-gpu/live';
 import type { StorageSource, Lazy, UniformAttributeValue } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
+import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { yeet, useMemo, useOne, useRef } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -16,8 +16,9 @@ import { dispatch } from '../primitives/dispatch';
 
 export type KernelProps = {
   shader: ShaderModule,
-  source?: StorageSource,
-  sources?: StorageSource[],
+  source?: ShaderSource,
+  sources?: ShaderSource[],
+  args?: (Lazy<any> | Ref<any>)[],
   size?: Lazy<number[]>,
   initial?: boolean,
   history?: boolean,
@@ -31,6 +32,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     shader,
     source,
     sources = NO_SOURCES,
+    args = NO_SOURCES,
     size,
     initial,
     history,
@@ -44,7 +46,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     const entry = getBundleEntry(shader);
     const symbol = bundleToAttribute(shader, entry);
 
-    const workgroupAttr = symbol.attr.find(({name}) => name === 'workgroup_size')?.args ?? [];
+    const workgroupAttr = symbol.attr?.find(({name}) => name === 'workgroup_size')?.args ?? [];
     const workgroupSize = workgroupAttr.map(s => parseInt(s) || 1);
 
     const dataSize = () => resolve(size) ?? target.size;
@@ -58,14 +60,15 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     };
 
     const f = feedback ? (typeof history === 'number' ? feedback.slice(0, history) : feedback) : NO_SOURCES;    
-    const s = (source ? [source] : NO_SOURCES).map(s => (s?.buffer) ? getDerivedSource(s, {readWrite: false}) : s);
+    const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
+      ? getDerivedSource(s as any, {readWrite: false}) : s);
 
     const bindings = bundleToAttributes(shader);
-    const args = [dataSize, ...sources, ...s, target, ...f];
+    const values = [dataSize, ...args, ...sources, ...s, target, ...f];
 
-    const kernel = getBoundShader(shader, bindings, args);
+    const kernel = getBoundShader(shader, bindings, values);
     return [kernel, dispatchSize];
-  }, [shader, target, source, sources, feedback, history]);
+  }, [shader, target, source, sources, args, feedback, history]);
 
   let first = useRef(true);
   useOne(() => { first.current = true; }, target);

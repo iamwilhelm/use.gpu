@@ -13,11 +13,10 @@ fn main(
   @builtin(global_invocation_id) globalId: vec3<u32>,
 ) {
   let size = getSize();
-  let modulus = sizeToModulus2(size);
-
   if (any(globalId.xy >= size)) { return; }
   let fragmentId = globalId.xy;
 
+  let modulus = sizeToModulus2(size);
   let center = packIndex2(fragmentId, modulus);
 
   let pn = velocityBufferInPn[center];

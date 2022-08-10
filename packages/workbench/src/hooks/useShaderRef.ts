@@ -22,3 +22,12 @@ export const useShaderRef = <T>(value?: T, source?: ShaderSource) => {
   ref.current = value;
   return ref;
 };
+
+export const useShaderRefs = <T>(...values: T[]) => {
+  let i = 0;
+
+  const refs = useOne(() => values.map((current: T) => ({current})), values.length);
+  for (const ref of refs) ref.current = values[i++];
+
+  return refs;
+};

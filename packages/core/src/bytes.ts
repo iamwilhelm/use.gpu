@@ -177,6 +177,10 @@ export const UNIFORM_BYTE_SETTERS = {
   "mat4x3<f64>":      setFloat64Nx3(12),
   "mat4x4<f64>":      setFloat64N(16),
 
+  "atomic<u32>":      setUint32,
+  "atomic<i32>":      setInt32,
+  "atomic<f32>":      setFloat32,
+
   // Virtual types
   "u8": setUint8,
   "i8": setInt8,

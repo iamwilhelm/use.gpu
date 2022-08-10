@@ -45,6 +45,7 @@ declare module "@use-gpu/wgsl/contour/solve.wgsl" {
 declare module "@use-gpu/wgsl/contour/types.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
+  export const IndirectDrawMetaAtomic: ParsedBundle;
   export const IndirectDrawMeta: ParsedBundle;
   export default __module;
 }
@@ -557,6 +558,18 @@ declare module "@use-gpu/wgsl/use/array.wgsl" {
   export const unpackIndex2: ParsedBundle;
   export const unpackIndex3: ParsedBundle;
   export const unpackIndex4: ParsedBundle;
+  export const clipIndex2: ParsedBundle;
+  export const clipIndex3: ParsedBundle;
+  export const clipIndex4: ParsedBundle;
+  export const wrapIndex2: ParsedBundle;
+  export const wrapIndex3: ParsedBundle;
+  export const wrapIndex4: ParsedBundle;
+  export const wrapIndex2i: ParsedBundle;
+  export const wrapIndex3i: ParsedBundle;
+  export const wrapIndex4i: ParsedBundle;
+  export const clampIndex2: ParsedBundle;
+  export const clampIndex3: ParsedBundle;
+  export const clampIndex4: ParsedBundle;
   export default __module;
 }
 

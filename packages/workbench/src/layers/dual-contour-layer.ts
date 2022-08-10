@@ -2,7 +2,7 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode,
+  VertexData, RenderPassMode, StorageSource,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
@@ -35,6 +35,7 @@ import { main as fitContourQuadratic } from '@use-gpu/wgsl/contour/fit-quadratic
 import { getClippedSolidFragment } from '@use-gpu/wgsl/contour/clip-solid.wgsl';
 import { getClippedShadedFragment } from '@use-gpu/wgsl/contour/clip-shaded.wgsl';
 import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour.wgsl';
+import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 import { Dispatch } from '../primitives/dispatch';
 
@@ -59,6 +60,7 @@ export type DualContourLayerProps = {
   loopZ?: boolean,
   shaded?: boolean,
   zBias?: number,
+  live?: boolean,
 
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
   cullMode?: GPUCullMode,
@@ -95,6 +97,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     loopZ = false,
     shaded = true,
     zBias = 0,
+    live = false,
 
     cullMode = 'none',
     mode = 'opaque',
@@ -173,7 +176,11 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     : (useNoBoundShader(), getMaterialFragment);
 
   const sourceVersion = useVersion(values) + useVersion(normals);
-  const shouldDispatch = () => sourceVersion + values.version + (normals?.version ?? 0);
+  const shouldDispatch = !live ? () => (
+    sourceVersion +
+    ((values as StorageSource).version ?? 0) +
+    ((normals as StorageSource)?.version ?? 0)
+  ) : null;
 
   const edgePassSize = () => {
     const s = resolve(size);

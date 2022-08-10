@@ -1,14 +1,8 @@
-import type { StorageSource } from '@use-gpu/core';
+import type { StorageTarget } from '@use-gpu/core';
 
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
-export type ComputeContextProps = {
-  width: number,
-  height: number,
-  depth: number,
-  target: StorageSource,
-  swapView: () => void,
-};
+export type ComputeContextProps = StorageTarget;
 
 export const ComputeContext = makeContext<ComputeContextProps>(undefined, 'ComputeContext');
 

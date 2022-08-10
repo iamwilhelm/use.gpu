@@ -143,29 +143,33 @@ export const mapReduce = <R, T>(
   map?: (t: T) => R,
   reduce?: (a: R, b: R) => R,
   then?: LiveFunction<(r: R) => LiveElement<any>>,
+  fallback?: LiveElement<any>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, then], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, then, fallback], key, by: getCurrentFiberID()} as any);
 
 /** Gather items from a subtree, into a flat array. */
 export const gather = <T>(
   calls?: LiveNode<any>,
   then?: LiveFunction<(r: T[]) => LiveElement<any>>,
+  fallback?: LiveElement<any>,
   key?: Key,
-): DeferredCall<() => void> => ({f: GATHER, args: [calls, then], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: GATHER, args: [calls, then, fallback], key, by: getCurrentFiberID()} as any);
 
 /** Multi-gather items from a subtree, by object key. */
 export const multiGather = <T>(
   calls?: LiveNode<any>,
   then?: LiveFunction<(r: Record<string, T[]>) => LiveElement<any>>,
+  fallback?: LiveElement<any>,
   key?: Key,
-): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, then], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, then, fallback], key, by: getCurrentFiberID()} as any);
 
 /** Fence gathered items from a subtree. */
 export const fence = <T>(
   calls?: LiveNode<any>,
   then?: LiveFunction<(r: T[]) => LiveElement<any>>,
+  fallback?: LiveElement<any>,
   key?: Key,
-): DeferredCall<() => void> => ({f: FENCE, args: [calls, then], key, by: getCurrentFiberID()} as any);
+): DeferredCall<() => void> => ({f: FENCE, args: [calls, then, fallback], key, by: getCurrentFiberID()} as any);
 
 /** Yeet value(s) upstream. */
 export const yeet = <T>(

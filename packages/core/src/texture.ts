@@ -26,7 +26,7 @@ export const makeTexture = (
   width: number,
   height: number,
   format: GPUTextureFormat,
-  usage: GPUTextureUsage,
+  usage: number,
   sampleCount: number = 1,
   mipLevelCount: number = 1,
 ): GPUTexture => {

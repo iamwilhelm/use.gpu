@@ -10,6 +10,7 @@ export type PropsWithChildren<P> = P & { children?: string | LiveNode<any> };
 export type LiveComponent<P = object> = (props: PropsWithChildren<P>) => any;
 export type Component<P = object> = LiveComponent<P>;
 export type LC<P = object> = LiveComponent<P>;
+export type Ref<T> = { current: T; };
 export type RefObject<T> = { current: T | null };
 export interface MutableRefObject<T> { current: T; };
 

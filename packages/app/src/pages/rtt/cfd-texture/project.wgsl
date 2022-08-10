@@ -30,6 +30,7 @@ fn main(
 
   sample.x -= .5 * (p2 - p1);
   sample.y -= .5 * (p4 - p3);
+  sample.z *= 0.99999;
 
   textureStore(velocityTextureOut, center, sample);
 }

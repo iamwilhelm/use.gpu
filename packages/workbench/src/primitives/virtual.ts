@@ -141,7 +141,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     let vertexShader: ShaderModule;
     let fragmentShader: ShaderModule;
 
-    let getVertex: ShaderModule = gV;
+    let getVertex: ShaderModule | null = gV ?? null;
     let wireframeCommand: ShaderModule | null = null;
     let wireframeIndirect: StorageSource | null = null;
 
@@ -150,10 +150,12 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
 
     if (isDebug) {
       [vertexShader, fragmentShader] = SOLID_RENDERER;
-      if (indirect) {
-        ({getVertex, wireframeCommand, wireframeIndirect} = getWireframeIndirect(device, gV, indirect, topology));
-      } else  {
-        ({getVertex, vertexCount, instanceCount} = getWireframe(gV, vC, iC, topology));
+      if (gV) {
+        if (indirect) {
+          ({getVertex, wireframeCommand, wireframeIndirect} = getWireframeIndirect(device, gV, indirect, topology));
+        } else  {
+          ({getVertex, vertexCount, instanceCount} = getWireframe(gV, vC, iC, topology));
+        }
       }
     }
     else if (isPicking) {
@@ -176,7 +178,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     const links = {
       getId,
       getVertex,
-      getFragment: isDebug ? null : getFragment,
+      getFragment: isDebug ? null : (getFragment ?? null),
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);

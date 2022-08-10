@@ -84,7 +84,7 @@ export const LayoutDisplayPage: LC = () => {
                       <Element margin={[5, 0]} radius={100} width={24} height={24} fill={[0.5, 0.5, 0.5, 0.75]} />
                       <Text size={16} color={[1, 1, 1, 1]} lineHeight={24}>{"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud "}</Text>
                       <Block radius={100} fill={[0.2, 0.5, 0.8, 1.0]} padding={[6, 2]} margin={[0, 1, 0, 0]}>
-                        <Inline><Text size={14} color={[1, 1, 1, 1]}>Aute Cupiditat</Text></Inline>
+                        <Inline><Text size={14} color={[1, 1, 1, 1]}>Aute Cupiditat Aliquip</Text></Inline>
                       </Block>
                       <Text size={16} color={[1, 1, 1, 1]} lineHeight={24}>{" exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}</Text>
                     </Inline>

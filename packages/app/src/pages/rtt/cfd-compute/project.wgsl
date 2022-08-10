@@ -12,11 +12,10 @@ fn main(
   @builtin(global_invocation_id) globalId: vec3<u32>,
 ) {
   let size = getSize();
-  let modulus = sizeToModulus2(size);
-
   if (any(globalId.xy >= size)) { return; }
   let fragmentId = globalId.xy;
 
+  let modulus = sizeToModulus2(size);
   let center = packIndex2(fragmentId, modulus);
 
   let left   = packIndex2(wrapIndex2(vec2<i32>(fragmentId) + vec2<i32>(-1, 0), size), modulus);
@@ -33,6 +32,7 @@ fn main(
 
   sample.x -= .5 * (p2 - p1);
   sample.y -= .5 * (p4 - p3);
+  sample.z *= 0.99999;
 
   velocityBufferOut[center] = sample;
 }

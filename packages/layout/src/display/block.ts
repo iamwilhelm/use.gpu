@@ -64,31 +64,31 @@ export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
       if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
       const fit = (into: FitInto) => {
-          const w = width != null ? evaluateDimension(width, into[2], snap) : null;
-          const h = height != null ? evaluateDimension(height, into[3], snap) : null;
-          const fixed = [
-            width != null ? w : null,
-            height != null ? h : null,
-          ] as [number | number, number | null];
+        const w = width != null ? evaluateDimension(width, into[2], snap) : null;
+        const h = height != null ? evaluateDimension(height, into[3], snap) : null;
+        const fixed = [
+          width != null ? w : null,
+          height != null ? h : null,
+        ] as [number | number, number | null];
 
-          const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
+        const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
 
-          inspect({
-            layout: {
-              into,
-              fixed,
-              size,
-              sizes,
-              offsets,
-            },
-          });
-
-          return {
+        inspect({
+          layout: {
+            into,
+            fixed,
             size,
-            render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
-            pick: makeBoxPicker(id, sizes, offsets, pickers),
-          };
+            sizes,
+            offsets,
+          },
+        });
+
+        return {
+          size,
+          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
+          pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
+      };
 
       return yeet({        
         sizing,

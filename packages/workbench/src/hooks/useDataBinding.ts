@@ -1,3 +1,4 @@
+import type { Lazy } from '@use-gpu/core';
 import type { UniformAttribute, ShaderSource } from '@use-gpu/shader';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
@@ -44,5 +45,5 @@ export const useDataLength = (
   length?: Lazy<number> | null,
   source?: ShaderSource | null,
   offset: number = 0,
-): Lazy<number[]> =>
+): Lazy<number> =>
   useMemo(() => () => Math.max(0, ((source as any)?.length ?? resolve(length) ?? 0) + offset), [length, source]);

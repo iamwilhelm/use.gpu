@@ -1,4 +1,4 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
 import type { TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
@@ -21,11 +21,11 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
 export type DispatchProps = {
-  size?: Lazy<number[] | TypedArray>,
+  size?: Lazy<number[]>,
   shader: ParsedBundle,
-  defines: Record<string, any>,
+  defines?: Record<string, any>,
   indirect?: StorageSource,
-  shouldDispatch?: () => boolean | number,
+  shouldDispatch?: () => boolean | number | undefined,
   onDispatch?: () => void,
 };
 
@@ -37,13 +37,13 @@ const DEFAULT_DEFINES = {
   '@group(VOLATILE)': '@group(1)',
 };
 
-export const Dispatch = (props: RenderProps) => {
+export const Dispatch = (props: DispatchProps) => {
   // Return a lambda back to parent(s)
   return yeet(dispatch(props));
 };
 
 // Inlined into <Component>
-export const dispatch = (props: RenderProps) => {
+export const dispatch = (props: DispatchProps) => {
   const {
     size = NO_SIZE,
     indirect,
@@ -100,13 +100,13 @@ export const dispatch = (props: RenderProps) => {
     },
   });
   
-  let dispatchVersion = null;
+  let dispatchVersion: number | null = null;
 
   let compute = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
     onDispatch && onDispatch();
 
     const s = resolve(size ?? NO_SIZE);
-    const d = s.reduce((a, b) => a * (b || 1), 1);
+    const d = s.reduce((a: number, b: number) => a * (b || 1), 1);
 
     inspected.render.dispatchCount = d;
     inspected.render.dispatchVersion = dispatchVersion;

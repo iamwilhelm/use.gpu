@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, Task } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core';
 
 import { use, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
@@ -19,20 +19,9 @@ export type RenderToPass = (passEncoder: GPURenderPassEncoder, countGeometry: Re
 type ComputeCounter = (d: number) => void;
 export type ComputeToPass = (passEncoder: GPUComputePassEncoder, countDispatch: ComputeCounter) => void;
 
-export type CommandToEncoder = () => GPUCommandEncoder;
+export type CommandToBuffer = () => GPUCommandBuffer;
 
-const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
-
-type PassDescriptor = {
-  pre: CommandToEncoder[],
-  compute: ComputeToPass[],
-  opaque: RenderToPass[],
-  transparent: RenderToPass[],
-  debug: RenderToPass[],
-  picking: RenderToPass[],
-  post: CommandToEncoder[],
-  readback: Task[],
-};
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : []; 
 
 export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) => {
   const {
@@ -43,20 +32,20 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
   const inspect = useInspectable();
 
-  const Resume = (rs: Record<string, (ComputeToPass | RenderToPass | CommandToEncoder | Task)[]>) => {
+  const Resume = (rs: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) => {
     const device = useContext(DeviceContext);
     const renderContext = useContext(RenderContext);
     const pickingContext = useContext(PickingContext);
 
-    const computes     = toArray(rs['compute']);
-    const opaques      = toArray(rs['opaque']);
-    const transparents = toArray(rs['transparent']);
-    const debugs       = toArray(rs['debug']);
-    const pickings     = toArray(rs['picking']);
+    const computes     = toArray(rs['compute']     as ComputeToPass[]);
+    const opaques      = toArray(rs['opaque']      as RenderToPass[]);
+    const transparents = toArray(rs['transparent'] as RenderToPass[]);
+    const debugs       = toArray(rs['debug']       as RenderToPass[]);
+    const pickings     = toArray(rs['picking']     as RenderToPass[]);
 
-    const pre  = toArray(rs['pre']);
-    const post = toArray(rs['post']);
-    const readback = toArray(rs['readback']);
+    const pre      = toArray(rs['pre']      as CommandToBuffer[]);
+    const post     = toArray(rs['post']     as CommandToBuffer[]);
+    const readback = toArray(rs['readback'] as ArrowFunction[]);
 
     const visibles: RenderToPass[] = [];
     visibles.push(...opaques);
@@ -98,7 +87,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
       const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
       const countDispatch = (d: number) => { ds += d; };
 
-      const queue: GPUCommandEncoder[] = []
+      const queue: GPUCommandBuffer[] = []
       for (const f of pre) {
         const q = f();
         if (q) queue.push(q);
@@ -106,13 +95,13 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
       const commandEncoder = device.createCommandEncoder();
       if (computes.length) computeToContext(commandEncoder, computes, countDispatch);
-      renderContext.swapView();
+      renderContext.swap();
       renderToContext(commandEncoder, renderContext, visibles, countGeometry);
 
       const shouldUpdatePicking = picking && pickingContext && pickings.length;
       if (shouldUpdatePicking) {
         const {renderContext} = pickingContext!;
-        renderContext.swapView();
+        renderContext.swap();
         renderToContext(commandEncoder, renderContext, pickings, countGeometry);
       }
 
@@ -125,7 +114,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
       device.queue.submit(queue);
 
-      const deferred: Promise<LiveElement<any>> = [];
+      const deferred: Promise<LiveElement<any>>[] = [];
       for (const f of readback) {
         const d = f();
         if (d) deferred.push(d);

@@ -10,11 +10,10 @@ fn main(
   @builtin(global_invocation_id) globalId: vec3<u32>,
 ) {
   let size = getSize();
-  let modulus = sizeToModulus2(size);
-
   if (any(globalId.xy >= size)) { return; }
   let fragmentId = globalId.xy;
 
+  let modulus = sizeToModulus2(size);
   let index = packIndex2(fragmentId, modulus);
   let uv = (vec2<f32>(fragmentId) + 0.5) / vec2<f32>(size);
 

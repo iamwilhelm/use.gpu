@@ -14,7 +14,7 @@ export const Await: LiveComponent<AwaitProps<unknown>> = <T>(props: AwaitProps<T
   const run = useOne(() => (
     all
     ? () => Promise.all(all)
-    : () => promise
+    : () => promise ?? Promise.resolve()
   ), all ?? promise);
 
   const [value, error] = useAsync(run);

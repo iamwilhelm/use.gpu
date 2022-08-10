@@ -1,5 +1,5 @@
 import { formatNodeName } from './debug';
-import { capture, gather, multiGather, mapReduce, morph, provide, yeet, CAPTURE, FRAGMENT, GATHER, MAP_REDUCE, MULTI_GATHER, PROVIDE, YEET, MORPH, SUSPEND } from './builtin';
+import { capture, gather, multiGather, mapReduce, morph, provide, yeet, CAPTURE, FRAGMENT, FENCE, GATHER, MAP_REDUCE, MULTI_GATHER, PROVIDE, YEET, MORPH, SUSPEND } from './builtin';
 import { getCurrentFiberID } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 
@@ -14,6 +14,7 @@ const toChildren = <T>(t: T[]): T[] | T | undefined => {
 type AnyF = (...args: any[]) => any;
 
 export const Fragment = FRAGMENT as AnyF;
+export const Fence = FENCE as AnyF;
 export const Gather = GATHER as AnyF;
 export const MultiGather = MULTI_GATHER as AnyF;
 export const MapReduce = MAP_REDUCE as AnyF;
@@ -31,14 +32,17 @@ export const React = {
       if (type === FRAGMENT) {
         return children;
       }
+      if (type === FENCE) {
+        return fence(toChildren(props?.children ?? children), props?.then, props?.fallback, props?.key);
+      }
       if (type === GATHER) {
-        return gather(toChildren(props?.children ?? children), props?.then, props?.key);
+        return gather(toChildren(props?.children ?? children), props?.then, props?.fallback, props?.key);
       }
       if (type === MULTI_GATHER) {
-        return multiGather(toChildren(props?.children ?? children), props?.then, props?.key);
+        return multiGather(toChildren(props?.children ?? children), props?.then, props?.fallback, props?.key);
       }
       if (type === MAP_REDUCE) {
-        return mapReduce(toChildren(props?.children ?? children), props?.map, props?.reduce, props?.then, props?.key);
+        return mapReduce(toChildren(props?.children ?? children), props?.map, props?.reduce, props?.then, props?.fallback, props?.key);
       }
       if (type === PROVIDE) {
         return provide(props?.context, props?.value, toChildren(props?.children ?? children), props?.key);

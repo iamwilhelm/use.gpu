@@ -10,4 +10,5 @@ export type Light = {
   color?: TypedArray | number[],
   intensity?: number,
   transform?: ShaderModule | null,
+  differential?: ShaderModule | null,
 };

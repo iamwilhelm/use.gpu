@@ -3,7 +3,7 @@ import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
 export type TransformContextProps = ShaderModule | null;
-export type DifferentialContext = ShaderModule | null;
+export type DifferentialContextProps = ShaderModule | null;
 
 const DEFAULT_TRANSFORM = null;
 

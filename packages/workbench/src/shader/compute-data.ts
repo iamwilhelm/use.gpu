@@ -1,5 +1,5 @@
 import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
-import type { StorageTarget } from '@use-gpu/core';
+import type { StorageTarget, UniformType } from '@use-gpu/core';
 
 import { getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';
 import { use, wrap, provide, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
@@ -21,6 +21,8 @@ import {
   BLEND_PREMULTIPLIED,
 } from '@use-gpu/core';
 
+const NOP = () => {};
+
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
 export type ComputeDataProps = {
@@ -29,6 +31,7 @@ export type ComputeDataProps = {
   depth?: number,
   history?: number,
   format?: UniformType,
+  resolution?: number,
 
   children?: LiveElement<any>,
   render?: (source: StorageTarget) => LiveElement<any>,
@@ -61,7 +64,7 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
       
       const buffers = history > 0 ? seq(history).map(() =>
         makeDataBuffer(device, byteLength, flags)
-      ) : null;
+      ) : undefined;
       if (buffers) buffers.push(buffer);
 
       let i = 0;
@@ -86,12 +89,12 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
       const {current: index} = counter;
       const n = buffers!.length;
 
-      source.buffer = buffers[index];
+      source.buffer = buffers![index];
 
       for (let i = history - 1; i >= 0; i--) {
         const j = (index + n - i - 1) % n;
-        sources[i].buffer = buffers![j];
-        sources[i].version = i ? sources[i - 1].version : source.version;
+        sources![i].buffer = buffers![j];
+        sources![i].version = i ? sources![i - 1].version : source.version;
       }
 
       source.version = incrementVersion(source.version);
@@ -107,9 +110,10 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
       volatile,
       version: 0,
       readWrite: false,
+      swap: NOP,
     }) as StorageTarget;
 
-    const sources = history ? seq(history).map(() => makeSource(false)) : null;
+    const sources = history ? seq(history).map(() => makeSource(false)) : undefined;
 
     const source = makeSource(true);
     source.swap = swap;

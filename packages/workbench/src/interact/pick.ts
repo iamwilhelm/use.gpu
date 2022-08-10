@@ -24,6 +24,8 @@ export type PickState = {
 };
 
 export type PickProps = {
+  all?: boolean,
+  move?: boolean,
   capture?: boolean,
   render?: (state: PickState) => LiveElement<any>,
   children?: LiveElement<any>,
@@ -35,6 +37,8 @@ export type PickProps = {
 }
 
 export const Pick: LiveComponent<PickProps> = ({
+  all,
+  move,
   capture,
   render,
   children,
@@ -48,8 +52,8 @@ export const Pick: LiveComponent<PickProps> = ({
   const { useMouse, beginCapture, endCapture } = useContext(MouseContext);
 
   const id = useId();
-  const mouse = useMouse(id);
-  const { mouse: {x, y}, hovered, captured, pressed, presses, clicks, index } = mouse;
+  const mouse = useMouse(all ? undefined : id);
+  const { mouse: {x, y, moveX, moveY}, hovered, captured, pressed, presses, clicks, index } = mouse;
 
   const mouseRef = useOne(() => ({current: mouse}));
   mouseRef.current = mouse;
@@ -118,9 +122,15 @@ export const Pick: LiveComponent<PickProps> = ({
 
   const count = presses.left + clicks.left + presses.middle + clicks.middle + presses.right + clicks.right;
 
+  const px = move ? x : 0;
+  const py = move ? y : 0;
+
+  const dx = move ? moveX : 0;
+  const dy = move ? moveY : 0;
+
   return useMemo(() =>
-    render ? render({id, index, hovered, pressed, presses, clicks}) : (children ? extend(children, {id}) : null),
-    [render, children, id, index, hovered, pressed, count]
+    render ? render({id, index, hovered, pressed, presses, clicks, x: px, y: py, moveX: dx, moveY: dy}) : (children ? extend(children, {id}) : null),
+    [render, children, id, index, hovered, pressed, count, px, py]
   );
 };
 

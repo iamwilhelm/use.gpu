@@ -1,10 +1,11 @@
 import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
 import type { ColorSpace, TextureTarget } from '@use-gpu/core';
 
-import { use, provide, gather, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { use, provide, gather, yeet, fence, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
+import { ComputeContext } from '../providers/compute-provider';
 
 import {
   makeStorageTexture,
@@ -42,7 +43,6 @@ export const TextureData: LiveComponent<TextureDataProps> = (props) => {
     format = PRESENTATION_FORMAT,
     history = 0,
     sampler = NO_SAMPLER,
-    backgroundColor = EMPTY_COLOR,
     colorSpace = COLOR_SPACE,
     children,
     render,
@@ -70,7 +70,7 @@ export const TextureData: LiveComponent<TextureDataProps> = (props) => {
       ) : null;
       if (buffers) buffers.push(buffer);      
 
-      const views = buffers ? buffers.map(b => makeTextureView(b)) : null;
+      const views = buffers ? buffers.map(b => makeTextureView(b)) : undefined;
 
       const counter = { current: 0 };
 
@@ -102,8 +102,8 @@ export const TextureData: LiveComponent<TextureDataProps> = (props) => {
 
       for (let i = 0; i < history; i++) {
         const j = (index + n - i - 1) % n;
-        sources[i].texture = bufferTextures![j];
-        sources[i].view = bufferViews![j];
+        sources![i].texture = bufferTextures![j];
+        sources![i].view = bufferViews![j];
       }
 
       counter.current = (index + 1) % n;
@@ -122,11 +122,11 @@ export const TextureData: LiveComponent<TextureDataProps> = (props) => {
       version: 0,
     }) as TextureTarget;
 
-    const sources = history ? seq(history).map(makeSource) : null;
+    const sources = history ? seq(history).map(makeSource) : undefined;
 
-    const source = makeSource(true);
+    const source = makeSource();
+    if (sources) source.history = sources;
     source.swap = swap;
-    source.history = sources;
 
     return [source, sources];
   }, [targetTexture, width, height, format, history, sampler]);

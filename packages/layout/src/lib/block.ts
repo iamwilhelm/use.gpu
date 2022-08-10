@@ -134,7 +134,7 @@ export const fitBlock = (
 
   // Resolved fit size
   const resolved = fixed.slice() as Point;
-
+  
   if (shrinkWrap) {
     if (!isX && fixed[0] == null) resolved[0] = Math.min(into[0] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[2]), 0));
     if ( isX && fixed[1] == null) resolved[1] = Math.min(into[1] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[3]), 0));
@@ -142,8 +142,13 @@ export const fitBlock = (
   else {
     if (!isX && fixed[0] == null && into[0] != null) resolved[0] = into[0];
     if ( isX && fixed[1] == null && into[1] != null) resolved[1] = into[1];
+
+    if ( isX && !resolved[1]) resolved[1] = els.reduce((a, b) => Math.max(a, b.sizing[3] + pt + pb), 0);
+    if (!isX && !resolved[0]) resolved[0] = els.reduce((a, b) => Math.max(a, b.sizing[2] + pl + pr), 0);
   }
-  
+
+  console.log({fixed, into, direction})
+
   const relativeFit = [
      isX ? null : resolved[0] != null ? resolved[0] - (pl + pr) : null,
     !isX ? null : resolved[1] != null ? resolved[1] - (pt + pb) : null,

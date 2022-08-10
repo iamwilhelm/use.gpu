@@ -27,7 +27,8 @@ export type UseRenderingContextGPU = {
   depthStencilState?: GPUDepthStencilState,
   depthStencilAttachment?: GPURenderPassDepthStencilAttachment,
 
-  swapView: (view?: GPUTextureView) => void,
+  swap: (view?: GPUTextureView) => void,
+  history?: TextureTarget[],
 };
 
 export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';

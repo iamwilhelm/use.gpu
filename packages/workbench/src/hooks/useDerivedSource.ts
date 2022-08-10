@@ -16,7 +16,7 @@ export const getDerivedSource = (
 ) => {
   return new Proxy(source, {
     get: (target, s) => {
-      if (Object.hasOwn(override, s)) return resolve(override[s]);
+      if (Object.hasOwn(override, s)) return resolve((override as any)[s]);
       return (target as any)[s];
     },
   }) as StorageSource;

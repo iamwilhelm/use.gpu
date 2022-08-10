@@ -1,4 +1,4 @@
-import type { LiveFiber, LC, PropsWithChildren, LiveElement, Task, DeferredCall } from '@use-gpu/live';
+import type { LiveFiber, LC, PropsWithChildren, LiveElement, ArrowFunction, DeferredCall } from '@use-gpu/live';
 
 import {
   gather, provide, yeet,
@@ -24,7 +24,7 @@ export const Draw: LC<DrawProps> = (props: PropsWithChildren<DrawProps>): Deferr
   return gather(children ?? (render ? render() : null), Resume);
 };
 
-const Resume = (ts: Task[]) => {
+const Resume = (ts: ArrowFunction[]) => {
   const pickingContext = useContext(PickingContext);
 
   usePerFrame();

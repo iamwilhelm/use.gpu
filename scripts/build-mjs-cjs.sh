@@ -25,12 +25,12 @@ mkdir ../../build/packages/$NPM_PACKAGE 2>/dev/null
 mkdir ../../build/packages/$NPM_PACKAGE/mjs 2>/dev/null
 mkdir ../../build/packages/$NPM_PACKAGE/cjs 2>/dev/null
 
-MODULE_ENV=mjs babel src --out-dir ../../build/ts/$NPM_PACKAGE/src --extensions ".ts,.tsx,.js,.jsx" --ignore "src/**/__mocks__/**/*.js" --ignore "src/**/*.test.ts" 1>/dev/null
+MODULE_ENV=mjs babel src --out-dir ../../build/ts/$NPM_PACKAGE/src --extensions ".ts,.tsx,.js,.jsx" --ignore "src/**/__mocks__/**/*.js" --ignore "src/**/*.test.ts" --ignore "src/**/*.d.ts" 1>/dev/null
 exit_on_error $? babel
 
-if test -n "$(find . -maxdepth 1 -name '*.ts' -print -quit)"
+if test -n "$(find . -maxdepth 1 -name '*.ts' -print -quit 2>/dev/null)"
 then
-  MODULE_ENV=mjs babel *.ts --out-dir ../../build/ts/$NPM_PACKAGE --extensions ".ts" --ignore "src/**/__mocks__/**/*.js" --ignore "src/**/*.test.ts" 1>/dev/null
+  MODULE_ENV=mjs babel *.ts --out-dir ../../build/ts/$NPM_PACKAGE --extensions ".ts" 1>/dev/null
   exit_on_error $? babel
 fi
 
@@ -39,10 +39,25 @@ cp -r ../../build/ts/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/mjs/
 MODULE_ENV=cjs babel src --out-dir ../../build/ts/$NPM_PACKAGE/src --extensions ".ts,.tsx,.js,.jsx" --ignore "src/**/__mocks__/**/*.js" --ignore "src/**/*.test.ts" 1>/dev/null
 exit_on_error $? babel
   
-if test -n "$(find . -maxdepth 1 -name '*.ts' -print -quit)"
+if test -n "$(find . -maxdepth 1 -name '*.ts' -print -quit 2>/dev/null)"
 then
-  MODULE_ENV=cjs babel *.ts --out-dir ../../build/ts/$NPM_PACKAGE --extensions ".ts" --ignore "src/**/__mocks__/**/*.js" --ignore "src/**/*.test.ts" 1>/dev/null
+  MODULE_ENV=cjs babel *.ts --out-dir ../../build/ts/$NPM_PACKAGE --extensions ".ts" 1>/dev/null
   exit_on_error $? babel
+fi
+
+if test -n "$(find scripts -maxdepth 1 -name '*.ts' -print -quit 2>/dev/null)"
+then
+  MODULE_ENV=cjs babel ./scripts/*.ts --out-dir ../../build/ts/$NPM_PACKAGE/scripts --extensions ".ts" 1>/dev/null
+  exit_on_error $? babel
+
+  mkdir ../../build/packages/$NPM_PACKAGE/scripts 2>/dev/null
+  cp -r ../../build/ts/$NPM_PACKAGE/scripts/* ../../build/packages/$NPM_PACKAGE/scripts/
+fi
+
+if test -n "$(find bin -maxdepth 1 -print -quit 2>/dev/null)"
+then
+  mkdir ../../build/packages/$NPM_PACKAGE/bin 2>/dev/null
+  cp -r ./bin/* ../../build/packages/$NPM_PACKAGE/bin/
 fi
 
 cp -r ../../build/ts/$NPM_PACKAGE/src/* ../../build/packages/$NPM_PACKAGE/cjs/

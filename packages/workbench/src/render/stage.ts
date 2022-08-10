@@ -1,5 +1,5 @@
-
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, Task } from '@use-gpu/live';
+import type { StorageTarget, TextureTarget } from '@use-gpu/core';
 
 import { use, yeet, memo, provide, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { DeviceContext } from '../providers/device-provider';
@@ -9,7 +9,7 @@ import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 
 export type StageProps = {
-  target: StorageTarget,
+  target: StorageTarget | TextureTarget,
   live?: boolean,
   render?: () => LiveElement<any>,
 };

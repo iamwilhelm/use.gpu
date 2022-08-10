@@ -1,5 +1,5 @@
 
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, Task } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 
 import { use, yeet, memo, provide, multiGather, useContext, useMemo, setLogging } from '@use-gpu/live';
 import { DeviceContext } from '../providers/device-provider';
@@ -14,24 +14,16 @@ export type ComputeProps = {
 };
 
 type ComputeCounter = (d: number) => void;
-export type ComputeToPass = (passEncoder: GPUComputePassEncoder, countDispatch: ComputeCounter) => void;
+type ComputeToPass = (passEncoder: GPUComputePassEncoder, countDispatch: ComputeCounter) => void;
 
-export type CommandToEncoder = () => GPUCommandEncoder;
+type CommandToBuffer = () => GPUCommandBuffer;
 
-const toArray = <T>(x: T | T[]): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
-
-type PassDescriptor = {
-  pre: CommandToEncoder[],
-  compute: ComputeToPass[],
-  post: CommandToEncoder[],
-  readback: Task[],
-};
+const toArray = <T>(x: T[]): T[] => Array.isArray(x) ? x : [];
 
 /** Combination of `<Draw>` + `<Pass>` that only does compute shaders */
 export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeProps>) => {
   const {
     live = false,
-    picking = true,
     children,
     render,
   } = props;
@@ -41,15 +33,15 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
   if (live) usePerFrame();
   else useNoPerFrame();
 
-  const Resume = (rs: Record<string, (ComputeToPass | CommandToEncoder | Task)[]>) => {
+  const Resume = (rs: Record<string, (ComputeToPass | CommandToBuffer | ArrowFunction)[]>) => {
     const device = useContext(DeviceContext);
 
     usePerFrame();
 
-    const computes = toArray(rs['compute']);
-    const pre      = toArray(rs['pre']);
-    const post     = toArray(rs['post']);
-    const readback = toArray(rs['readback']);
+    const computes = toArray(rs['compute'] as ComputeToPass[]);
+    const pre      = toArray(rs['pre'] as CommandToBuffer[]);
+    const post     = toArray(rs['post'] as CommandToBuffer[]);
+    const readback = toArray(rs['readback'] as ArrowFunction[]);
 
     const computeToContext = (
       commandEncoder: GPUCommandEncoder,
@@ -66,7 +58,7 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
 
     const countDispatch = (d: number) => { ds += d; };
 
-    const queue: GPUCommandEncoder[] = []
+    const queue: GPUCommandBuffer[] = []
     for (const f of pre) {
       const q = f();
       if (q) queue.push(q);
@@ -83,7 +75,7 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
 
     device.queue.submit(queue);
 
-    const deferred: Promise<LiveElement<any>> = [];
+    const deferred: Promise<LiveElement<any>>[] = [];
     for (const f of readback) {
       const d = f();
       if (d) deferred.push(d);

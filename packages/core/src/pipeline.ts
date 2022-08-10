@@ -69,6 +69,7 @@ export const makeComputePipeline = (
   shader: ShaderModuleDescriptor,
 ) => {
   const pipelineDescriptor: GPUComputePipelineDescriptor = {
+    // @ts-ignore
     layout: 'auto',
     compute: makeShaderStage(device, shader),
   };
@@ -80,6 +81,7 @@ export const makeComputePipelineAsync = (
   shader: ShaderModuleDescriptor,
 ) => {
   const pipelineDescriptor: GPUComputePipelineDescriptor = {
+    // @ts-ignore
     layout: 'auto',
     compute: makeShaderStage(device, shader),
   };

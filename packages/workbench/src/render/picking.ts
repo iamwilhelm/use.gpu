@@ -127,7 +127,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
       updated = false;
     }
 
-    const swapView = () => {
+    const swap = () => {
       updated = true;
     };
 
@@ -162,7 +162,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
         colorStates,
         colorAttachments,
         depthStencilAttachment,
-        swapView,
+        swap,
       } as UseRenderingContextGPU,
       pickingTexture,
       pickingSource,

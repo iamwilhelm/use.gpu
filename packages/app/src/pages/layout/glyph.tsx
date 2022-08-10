@@ -26,7 +26,7 @@ const DETAIL = 64;
 const ZBIAS_DATA = 2;
 const ZBIAS_GRID = 1;
 
-export const DebugGlyphPage: LC = () => {
+export const LayoutGlyphPage: LC = () => {
 
   const root = document.querySelector('#use-gpu .canvas');
 

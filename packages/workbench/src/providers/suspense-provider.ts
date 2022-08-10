@@ -1,5 +1,5 @@
-import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import { fence, provide, makeContext, useContext, useNoContext, SUSPEND } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
+import { yeet, fence, provide, makeContext, useContext, useNoContext, SUSPEND } from '@use-gpu/live';
 
 type SuspenseContextProps = boolean;
 
@@ -17,7 +17,7 @@ export const Suspense: LiveComponent<SuspenseProps> = (props: PropsWithChildren<
   const view = provide(SuspenseContext, true, props.children);
   if (fallback) {
     return fence(view, (values: any) => {
-      if (values === SUSPEND) return yeet(fallback);
+      if (values === SUSPEND) return fallback;
       return yeet(values);
     }, SUSPEND);
   }

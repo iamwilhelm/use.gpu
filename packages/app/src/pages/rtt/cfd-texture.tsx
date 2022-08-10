@@ -70,9 +70,9 @@ const DebugField = ({field, gain}: {field: TextureTarget, gain?: number}) => {
 };
 
 const PushVelocity = ({
-  field, x, y, moveX, moveY, pressed, velocity
+  field, x, y, moveX, moveY,
 }: {
-  field: StorageTarget, x: number, y: number, moveX: number, moveY: number, pressed: {left: boolean}
+  field: TextureTarget, x: number, y: number, moveX: number, moveY: number,
 }) => {
   const [xy, moveXY] = useShaderRefs([x / 2, y / 2], [moveX, moveY]);
 

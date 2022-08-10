@@ -20,6 +20,10 @@ export type PickState = {
     middle: number,
     right: number,
   },
+  x: number,
+  y: number,
+  moveX: number,
+  moveY: number,
   index: number,
 };
 

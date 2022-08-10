@@ -508,7 +508,7 @@ export const fenceFiberCalls = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any>,
   next?: LiveFunction<any>,
-  fallback: T | typeof SUSPEND = undefined,
+  fallback?: T | typeof SUSPEND,
 ) => {
   const {yeeted} = fiber;
   const gather = yeeted?.gather ?? NOP;

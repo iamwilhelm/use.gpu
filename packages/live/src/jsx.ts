@@ -1,5 +1,8 @@
 import { formatNodeName } from './debug';
-import { capture, gather, multiGather, mapReduce, morph, provide, yeet, CAPTURE, FRAGMENT, FENCE, GATHER, MAP_REDUCE, MULTI_GATHER, PROVIDE, YEET, MORPH, SUSPEND } from './builtin';
+import {
+  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet,
+  CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, SUSPEND, FRAGMENT,
+} from './builtin';
 import { getCurrentFiberID } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 

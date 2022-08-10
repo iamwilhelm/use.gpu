@@ -22,6 +22,8 @@ import { main as projectVelocity }  from './cfd-texture/project.wgsl';
 import { main as advectVelocity }   from './cfd-texture/advect.wgsl';
 import { main as advectMcCormack }  from './cfd-texture/mccormack.wgsl';
 
+import { CFDControls } from '../../ui/cfd-controls';
+
 const colorizeShader = wgsl`
   @link var velocityField: texture_2d<f32>;
 
@@ -51,10 +53,110 @@ const debugShader = wgsl`
   }
 `;
 
-const BINDINGS = bundleToAttributes(debugShader);
+const COLOR_BINDINGS = bundleToAttributes(colorizeShader);
+const DEBUG_BINDINGS = bundleToAttributes(debugShader);
+
+export const RTTCFDTexturePage: LC = () => {
+
+  const advectForwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: 1.0});
+  const advectBackwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: -1.0});
+
+  const root = document.querySelector('#use-gpu .canvas');
+
+  return (
+    <CFDControls
+      container={root}
+      hasInspect
+      render={({inspect}) =>
+
+        <Gather
+          children={[
+            // Velocity + density field
+            <TextureData
+              format="rgba32float"
+              history={3}
+              resolution={1/2}
+            />,
+            // Divergence
+            <TextureData
+              format="r32float"
+              resolution={1/2}
+            />,
+            // Pressure
+            <TextureData
+              format="r32float"
+              history={1}
+              resolution={1/2}
+            />
+          ]}
+          then={([
+            velocity,
+            divergence,
+            pressure,
+          ]: TextureTarget[]) => (<>
+
+            <Pick all move render={(pick) => <PushVelocity field={velocity} {...pick} />} />
+            <Loop live>
+
+              <Compute>
+                <Suspense>
+                  <Stage target={divergence}>
+                    <Kernel shader={updateDivergence} source={velocity} />
+                  </Stage>
+                  <Stage target={pressure}>
+                    <Iterate count={40}>
+                      <Kernel shader={updatePressure} source={divergence} history swap />
+                    </Iterate>
+                  </Stage>
+                  <Stage target={velocity}>
+                    <Kernel shader={generateInitial} initial args={[() => Math.random()]} />
+                    <Kernel shader={projectVelocity} source={pressure} history swap />
+                    <Kernel shader={advectForwards}  history swap />
+                    <Kernel shader={advectBackwards} history swap />
+                    <Kernel shader={advectMcCormack} history swap />
+                  </Stage>
+                </Suspense>
+              </Compute>
+
+              <Flat>
+                <Draw>
+                  <Pass>
+
+                    <VisualizeField field={velocity} />
+
+                    {inspect ? (
+                      <UI>
+                        <Layout>
+                          <Absolute left={0} top={0}>
+                            <Block direction="x">
+                              <Block border={1} padding={1} stroke='#444' fill="#000">
+                                <DebugField field={divergence} gain={300} />
+                                <Inline align="center"><Text lineHeight={28} color="#ccc">Divergence</Text></Inline>
+                              </Block>
+                              <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
+                                <DebugField field={pressure} gain={3} />
+                                <Inline align="center"><Text lineHeight={28} color="#ccc">Pressure</Text></Inline>
+                              </Block>
+                            </Block>
+                          </Absolute>
+                        </Layout>
+                      </UI>
+                    ) : null}
+
+                  </Pass>
+                </Draw>
+              </Flat>
+
+            </Loop>
+          </>)}
+
+      />
+    } />
+  );
+};
 
 const VisualizeField = ({field}: {field: TextureTarget}) => {
-  const boundShader = useBoundShader(colorizeShader, BINDINGS, [field]);
+  const boundShader = useBoundShader(colorizeShader, COLOR_BINDINGS, [field]);
   const textureSource = useLambdaSource(boundShader, field);
   return (
     <RawFullScreen texture={textureSource} />
@@ -62,7 +164,7 @@ const VisualizeField = ({field}: {field: TextureTarget}) => {
 };
 
 const DebugField = ({field, gain}: {field: TextureTarget, gain?: number}) => {
-  const boundShader = useBoundShader(debugShader, BINDINGS, [field, gain || 1]);
+  const boundShader = useBoundShader(debugShader, DEBUG_BINDINGS, [field, gain || 1]);
   const textureSource = useLambdaSource(boundShader, field);
   return (
     <Element width={field.size[0] / 2} height={field.size[1] / 2} image={{texture: textureSource}} />
@@ -82,93 +184,5 @@ const PushVelocity = ({
         <Kernel shader={pushVelocity} args={[xy, moveXY]} swap history />
       </Stage>
     </Compute>
-  );
-};
-
-export const RTTCFDTexturePage: LC = () => {
-
-  const advectForwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: 1.0});
-  const advectBackwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: -1.0});
-
-  return (
-    <Gather
-      children={[
-        // Velocity + density field
-        <TextureData
-          format="rgba32float"
-          history={3}
-          resolution={1/2}
-        />,
-        // Divergence
-        <TextureData
-          format="r32float"
-          resolution={1/2}
-        />,
-        // Pressure
-        <TextureData
-          format="r32float"
-          history={1}
-          resolution={1/2}
-        />
-      ]}
-      then={([
-        velocity,
-        divergence,
-        pressure,
-      ]: TextureTarget[]) => (<>
-
-        <Pick all move render={(pick) => <PushVelocity field={velocity} {...pick} />} />
-        <Loop live>
-
-          <Compute>
-            <Suspense>
-              <Stage target={divergence}>
-                <Kernel shader={updateDivergence} source={velocity} />
-              </Stage>
-              <Stage target={pressure}>
-                <Iterate count={40}>
-                  <Kernel shader={updatePressure} source={divergence} history swap />
-                </Iterate>
-              </Stage>
-              <Stage target={velocity}>
-                <Kernel shader={generateInitial} initial args={[() => Math.random()]} />
-                <Kernel shader={projectVelocity} source={pressure} history swap />
-                <Kernel shader={advectForwards}  history swap />
-                <Kernel shader={advectBackwards} history swap />
-                <Kernel shader={advectMcCormack} history swap />
-              </Stage>
-            </Suspense>
-          </Compute>
-          
-          <Flat>
-            <Draw>
-              <Pass>
-
-                <VisualizeField field={velocity} />
-
-                <UI>
-                  <Layout>
-                    <Absolute left={0} bottom={0}>
-                      <Block direction="x">
-                        <Block border={1} padding={1} stroke='#444' fill="#000">
-                          <DebugField field={divergence} gain={300} />
-                          <Inline align="center"><Text lineHeight={28} color="#ccc">Divergence</Text></Inline>
-                        </Block>
-                        <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
-                          <DebugField field={pressure} gain={3} />
-                          <Inline align="center"><Text lineHeight={28} color="#ccc">Pressure</Text></Inline>
-                        </Block>
-                      </Block>
-                    </Absolute>
-                  </Layout>
-                </UI>
-
-              </Pass>
-            </Draw>
-          </Flat>
-
-        </Loop>
-      </>)}
-    />
   );
 };

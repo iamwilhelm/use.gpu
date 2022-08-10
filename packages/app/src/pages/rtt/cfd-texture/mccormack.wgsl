@@ -2,6 +2,8 @@ use '@use-gpu/wgsl/use/array'::{ wrapIndex2i };
 
 @link fn getSize() -> vec2<u32> {};
 
+@link var curlTexture: texture_2d<f32>;
+
 @link var velocityTextureOut: texture_storage_2d<rgba32float, write>;
 @link var velocityTextureInPnHat: texture_2d<f32>;
 @link var velocityTextureInPn1Hat: texture_2d<f32>;
@@ -40,6 +42,23 @@ fn main(
   var pmin = min(min(tl, tr), min(bl, br));
   var pmax = max(max(tl, tr), max(bl, br));
 
-  let value = max(pmin, min(pmax, pn1));
+  let il = wrapIndex2i(vec2<i32>(ij) + vec2<i32>(-1, 0), size);
+  let ir = wrapIndex2i(vec2<i32>(ij) + vec2<i32>( 1, 0), size);
+  let it = wrapIndex2i(vec2<i32>(ij) + vec2<i32>(0, -1), size);
+  let ib = wrapIndex2i(vec2<i32>(ij) + vec2<i32>(0,  1), size);
+
+  let cc = textureLoad(curlTexture, ij, 0).x;
+  let cl = textureLoad(curlTexture, il, 0).x;
+  let cr = textureLoad(curlTexture, ir, 0).x;
+  let ct = textureLoad(curlTexture, it, 0).x;
+  let cb = textureLoad(curlTexture, ib, 0).x;
+
+  let cx = (abs(cr) - abs(cl));
+  let cy = (abs(cb) - abs(ct));
+  let cn = normalize(vec2<f32>(cx, cy) + 0.001);
+  
+  var value = max(pmin, min(pmax, pn1));
+  value = vec4<f32>(value.xy + vec2<f32>(-cn.y, cn.x) * vec2<f32>(cc) * 0.01, value.zw);
+
   textureStore(velocityTextureOut, center, value);
 }

@@ -2,6 +2,8 @@ use '@use-gpu/wgsl/use/array'::{ sizeToModulus2, packIndex2, wrapIndex2 };
 
 @link fn getSize() -> vec2<u32> {};
 
+@link var<storage> curlBuffer: array<f32>;
+
 @link var<storage, read_write> velocityBufferOut: array<vec4<f32>>;
 
 @link var<storage> velocityBufferInPnHat: array<vec4<f32>>;
@@ -35,9 +37,26 @@ fn main(
 
   let pn1 = pn1hat + 0.5*(pn - pnhat);
 
-  var pmin = min(min(tl, tr), min(bl, br));
-  var pmax = max(max(tl, tr), max(bl, br));
+  let pmin = min(min(tl, tr), min(bl, br));
+  let pmax = max(max(tl, tr), max(bl, br));
 
-  let value = max(pmin, min(pmax, pn1));
+  let left   = packIndex2(wrapIndex2(vec2<i32>(ij) + vec2<i32>(-1, 0), size), modulus);
+  let right  = packIndex2(wrapIndex2(vec2<i32>(ij) + vec2<i32>( 1, 0), size), modulus);
+  let top    = packIndex2(wrapIndex2(vec2<i32>(ij) + vec2<i32>(0, -1), size), modulus);
+  let bottom = packIndex2(wrapIndex2(vec2<i32>(ij) + vec2<i32>(0,  1), size), modulus);
+
+  let cc = curlBuffer[center];
+  let cl = curlBuffer[left];
+  let cr = curlBuffer[right];
+  let ct = curlBuffer[top];
+  let cb = curlBuffer[bottom];
+
+  let cx = (abs(cr) - abs(cl));
+  let cy = (abs(cb) - abs(ct));
+  let cn = normalize(vec2<f32>(cx, cy) + 0.001);
+  
+  var value = max(pmin, min(pmax, pn1));
+  value = vec4<f32>(value.xy + vec2<f32>(-cn.y, cn.x) * vec2<f32>(cc) * 0.01, value.zw);
+
   velocityBufferOut[center] = value;
 }

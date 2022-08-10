@@ -1,3 +1,4 @@
+import type { Lazy } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import { useOne, useNoOne } from '@use-gpu/live';
 
@@ -23,10 +24,14 @@ export const useShaderRef = <T>(value?: T, source?: ShaderSource) => {
   return ref;
 };
 
-export const useShaderRefs = <T>(...values: T[]) => {
+export const useShaderRefs = <T>(...values: (Lazy<T> | T)[]): Lazy<T>[] => {
   let i = 0;
 
-  const refs = useOne(() => values.map((current: T) => ({current})), values.length);
+  const refs = useOne(() => values.map((current: T) => 
+    typeof current === 'function' ? current :
+    current.current != null ? current :
+    {current}
+  ), values.length);
   for (const ref of refs) ref.current = values[i++];
 
   return refs;

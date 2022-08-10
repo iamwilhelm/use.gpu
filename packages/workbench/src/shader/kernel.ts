@@ -7,6 +7,7 @@ import { resolve } from '@use-gpu/core';
 import { bundleToAttribute, bundleToAttributes, getBundleEntry } from '@use-gpu/shader/wgsl';
 import { getBoundShader } from '../hooks/useBoundShader';
 import { getDerivedSource } from '../hooks/useDerivedSource';
+import { useShaderRefs } from '../hooks/useShaderRef';
 
 import { useComputeContext } from '../providers/compute-provider';
 import { useFeedbackContext, useNoFeedbackContext } from '../providers/feedback-provider';
@@ -21,7 +22,7 @@ export type KernelProps = {
   args?: (Lazy<any> | Ref<any>)[],
   size?: Lazy<number[]>,
   initial?: boolean,
-  history?: boolean,
+  history?: boolean | number,
   swap?: boolean,
 };
 
@@ -39,8 +40,8 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     swap,
   } = props;
 
-  const target = useComputeContext();
-  const feedback = history ? target.history : null;
+  const targets = useComputeContext();
+  const argRefs = useShaderRefs(...args);
 
   const [dispatchKernel, dispatchSize] = useMemo(() => {
     const entry = getBundleEntry(shader);
@@ -49,7 +50,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     const workgroupAttr = symbol.attr?.find(({name}) => name === 'workgroup_size')?.args ?? [];
     const workgroupSize = workgroupAttr.map(s => parseInt(s) || 1);
 
-    const dataSize = () => resolve(size) ?? target.size;
+    const dataSize = () => resolve(size) ?? targets[0]?.size;
     const dispatchSize = () => {
       const [w, h, d] = dataSize();
       return [
@@ -59,19 +60,23 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
       ];
     };
 
-    const f = feedback ? (typeof history === 'number' ? feedback.slice(0, history) : feedback) : NO_SOURCES;    
+    const f = history ? targets.flatMap(
+      t => typeof history === 'number'
+      ? t?.history.slice(0, history)
+      : t?.history
+    ) : [];
     const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
       ? getDerivedSource(s as any, {readWrite: false}) : s);
 
     const bindings = bundleToAttributes(shader);
-    const values = [dataSize, ...args, ...sources, ...s, target, ...f];
+    const values = [dataSize, ...argRefs, ...sources, ...s, ...targets, ...f];
 
     const kernel = getBoundShader(shader, bindings, values);
     return [kernel, dispatchSize];
-  }, [shader, target, source, sources, args, feedback, history]);
+  }, [shader, targets, source, sources, argRefs, history]);
 
   let first = useRef(true);
-  useOne(() => { first.current = true; }, target);
+  useMemo(() => { first.current = true; }, targets);
 
   const shouldDispatch = initial ? () => {
     if (!first.current) return false;
@@ -79,7 +84,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
   } : undefined;
 
   const onDispatch = () => {
-    if (swap && target.swap) target.swap();
+    if (swap) for (const t of targets) if (t.swap) t.swap();
   };
 
   return yeet(dispatch({

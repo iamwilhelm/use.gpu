@@ -16,7 +16,7 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { main as generateInitial }  from './cfd-texture/initial.wgsl';
 import { main as pushVelocity }     from './cfd-texture/push.wgsl';
-import { main as updateDivergence } from './cfd-texture/divergence.wgsl';
+import { main as updateDivCurl }    from './cfd-texture/divergence-curl.wgsl';
 import { main as updatePressure }   from './cfd-texture/pressure.wgsl';
 import { main as projectVelocity }  from './cfd-texture/project.wgsl';
 import { main as advectVelocity }   from './cfd-texture/advect.wgsl';
@@ -54,7 +54,7 @@ const debugShader = wgsl`
     let gain = getGain();
     let size = vec2<f32>(textureDimensions(velocityField));
     let value = textureLoad(velocityField, vec2<i32>(floor(uv * size)), 0).x * gain;
-    return vec4<f32>(value, max(value * .2, -value * .3), -value, 1.0);
+    return sqrt(vec4<f32>(value, max(value * .1, max(0.0, -value * .3)), max(0.0, -value), 1.0));
   }
 `;
 
@@ -87,6 +87,11 @@ export const RTTCFDTexturePage: LC = () => {
               format="r32float"
               resolution={1/2}
             />,
+            // Curl
+            <TextureData
+              format="r32float"
+              resolution={1/2}
+            />,
             // Pressure
             <TextureData
               format="r32float"
@@ -97,16 +102,24 @@ export const RTTCFDTexturePage: LC = () => {
           then={([
             velocity,
             divergence,
+            curl,
             pressure,
           ]: TextureTarget[]) => (<>
 
-            <Pick all move render={(pick) => <PushVelocity field={velocity} {...pick} />} />
+            <Pick all move render={({x, y, moveX, moveY}) => (
+              <Compute>
+                <Stage target={velocity}>
+                  <Kernel shader={pushVelocity} args={[[x / 2, y / 2], [moveX, moveY]]} swap history />
+                </Stage>
+              </Compute>
+            )} />
+
             <Loop live>
 
               <Compute>
                 <Suspense>
-                  <Stage target={divergence}>
-                    <Kernel shader={updateDivergence} source={velocity} />
+                  <Stage targets={[divergence, curl]}>
+                    <Kernel shader={updateDivCurl} source={velocity} />
                   </Stage>
                   <Stage target={pressure}>
                     <Iterate count={50}>
@@ -114,11 +127,11 @@ export const RTTCFDTexturePage: LC = () => {
                     </Iterate>
                   </Stage>
                   <Stage target={velocity}>
-                    <Kernel shader={generateInitial} initial args={[() => Math.random()]} />
+                    <Kernel shader={generateInitial} initial args={[Math.random()]} />
                     <Kernel shader={projectVelocity} source={pressure} history swap />
                     <Kernel shader={advectForwards}  history swap />
                     <Kernel shader={advectBackwards} history swap />
-                    <Kernel shader={advectMcCormack} history swap />
+                    <Kernel shader={advectMcCormack} source={curl} history swap />
                   </Stage>
                 </Suspense>
               </Compute>
@@ -137,6 +150,10 @@ export const RTTCFDTexturePage: LC = () => {
                               <Block border={1} padding={1} stroke='#444' fill="#000">
                                 <DebugField field={divergence} gain={300} />
                                 <Inline align="center"><Text lineHeight={28} color="#ccc">Divergence</Text></Inline>
+                              </Block>
+                              <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
+                                <DebugField field={curl} gain={10} />
+                                <Inline align="center"><Text lineHeight={28} color="#ccc">Curl</Text></Inline>
                               </Block>
                               <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
                                 <DebugField field={pressure} gain={3} />
@@ -173,21 +190,5 @@ const DebugField = ({field, gain}: {field: TextureTarget, gain?: number}) => {
   const textureSource = useLambdaSource(boundShader, field);
   return (
     <Element width={field.size[0] / 2} height={field.size[1] / 2} image={{texture: textureSource}} />
-  );
-};
-
-const PushVelocity = ({
-  field, x, y, moveX, moveY,
-}: {
-  field: TextureTarget, x: number, y: number, moveX: number, moveY: number,
-}) => {
-  const [xy, moveXY] = useShaderRefs([x / 2, y / 2], [moveX, moveY]);
-
-  return (
-    <Compute>
-      <Stage target={field}>
-        <Kernel shader={pushVelocity} args={[xy, moveXY]} swap history />
-      </Stage>
-    </Compute>
   );
 };

@@ -8,8 +8,11 @@ import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 
+const NO_TARGETS: any[] = [];
+
 export type StageProps = {
-  target: StorageTarget | TextureTarget,
+  target?: StorageTarget | TextureTarget,
+  targets?: (StorageTarget | TextureTarget)[],
   live?: boolean,
   render?: () => LiveElement<any>,
 };
@@ -18,6 +21,7 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
   const {
     live = false,
     target,
+    targets,
     children,
     render,
   } = props;
@@ -26,6 +30,8 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
 
   const content = render ? render() : children;
   if (!content) return null;
+  
+  const context = useMemo(() => targets ?? (target ? [target] : []), [target, ...(targets ?? NO_TARGETS)]);
 
-  return provide(ComputeContext, target, content);
+  return provide(ComputeContext, context, content);
 }, 'Stage');

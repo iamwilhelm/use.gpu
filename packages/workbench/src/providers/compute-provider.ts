@@ -2,7 +2,7 @@ import type { StorageTarget } from '@use-gpu/core';
 
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
-export type ComputeContextProps = StorageTarget;
+export type ComputeContextProps = (StorageTarget | TextureTarget)[];
 
 export const ComputeContext = makeContext<ComputeContextProps>(undefined, 'ComputeContext');
 

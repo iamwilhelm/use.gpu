@@ -29,6 +29,7 @@ fn main(
   let ff = xy - xyi;
   let ij = vec2<i32>(xyi);
 
+
   let itl = wrapIndex2i(ij                  , size);
   let itr = wrapIndex2i(ij + vec2<i32>(1, 0), size);
   let ibl = wrapIndex2i(ij + vec2<i32>(0, 1), size);
@@ -41,6 +42,8 @@ fn main(
 
   var pmin = min(min(tl, tr), min(bl, br));
   var pmax = max(max(tl, tr), max(bl, br));
+  var value = max(pmin, min(pmax, pn1));
+
 
   let il = wrapIndex2i(vec2<i32>(ij) + vec2<i32>(-1, 0), size);
   let ir = wrapIndex2i(vec2<i32>(ij) + vec2<i32>( 1, 0), size);
@@ -56,9 +59,8 @@ fn main(
   let cx = (abs(cr) - abs(cl));
   let cy = (abs(cb) - abs(ct));
   let cn = normalize(vec2<f32>(cx, cy) + 0.001);
-  
-  var value = max(pmin, min(pmax, pn1));
-  value = vec4<f32>(value.xy + vec2<f32>(-cn.y, cn.x) * vec2<f32>(cc) * 0.01, value.zw);
+  value = vec4<f32>(value.xy + vec2<f32>(-cn.y, cn.x) * vec2<f32>(cc) * 0.003, value.zw);
+
 
   textureStore(velocityTextureOut, center, value);
 }

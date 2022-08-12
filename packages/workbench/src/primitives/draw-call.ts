@@ -1,5 +1,5 @@
 import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { TypedArray, ViewUniforms, StorageSource, RenderPassMode, DeepPartial, Lazy, UseRenderingContextGPU } from '@use-gpu/core';
+import type { TypedArray, ViewUniforms, StorageSource, RenderPassMode, DeepPartial, Lazy, UseGPURenderContext } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 
@@ -31,7 +31,7 @@ export type DrawCallProps = {
   vertex: ParsedBundle,
   fragment: ParsedBundle,
   
-  renderContext: UseRenderingContextGPU,
+  renderContext: UseGPURenderContext,
 
   defines?: Record<string, any>,
 };

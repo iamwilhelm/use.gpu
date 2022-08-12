@@ -15,7 +15,8 @@ export type FeedbackProps = {
 const FEEDBACK_BINDING = {name: 'getFeedback', format: 'vec4<f32>', args: ['vec2<f32>']} as UniformAttribute;
 
 export const Feedback: LiveComponent<FeedbackProps> = ({shader}: FeedbackProps) => {
-  const {history} = useRenderContext();
+  const context = useRenderContext();
+  const history = context.source?.history;
   if (!history) throw new Error("Can't render feedback. Render context has no history.");
 
   const source = useBoundSource(FEEDBACK_BINDING, history[0]);

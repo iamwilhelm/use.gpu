@@ -30,6 +30,7 @@ fn main(
   let ff = xy - xyi;
   let ij = vec2<i32>(xyi);
 
+
   let tl = velocityBufferInPn[packIndex2(wrapIndex2(ij + vec2<i32>(0, 0), size), modulus)];
   let tr = velocityBufferInPn[packIndex2(wrapIndex2(ij + vec2<i32>(1, 0), size), modulus)];
   let bl = velocityBufferInPn[packIndex2(wrapIndex2(ij + vec2<i32>(0, 1), size), modulus)];
@@ -39,6 +40,8 @@ fn main(
 
   let pmin = min(min(tl, tr), min(bl, br));
   let pmax = max(max(tl, tr), max(bl, br));
+  var value = max(pmin, min(pmax, pn1));
+
 
   let left   = packIndex2(wrapIndex2(vec2<i32>(ij) + vec2<i32>(-1, 0), size), modulus);
   let right  = packIndex2(wrapIndex2(vec2<i32>(ij) + vec2<i32>( 1, 0), size), modulus);
@@ -54,9 +57,8 @@ fn main(
   let cx = (abs(cr) - abs(cl));
   let cy = (abs(cb) - abs(ct));
   let cn = normalize(vec2<f32>(cx, cy) + 0.001);
-  
-  var value = max(pmin, min(pmax, pn1));
-  value = vec4<f32>(value.xy + vec2<f32>(-cn.y, cn.x) * vec2<f32>(cc) * 0.01, value.zw);
+  value = vec4<f32>(value.xy + vec2<f32>(-cn.y, cn.x) * vec2<f32>(cc) * 0.003, value.zw);
+
 
   velocityBufferOut[center] = value;
 }

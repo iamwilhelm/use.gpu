@@ -1,5 +1,5 @@
 import type {
-  TypedArray, DeepPartial, UseRenderingContextGPU,
+  TypedArray, DeepPartial, UseGPURenderContext,
   ShaderModuleDescriptor, ShaderStageDescriptor,
 } from './types';
 

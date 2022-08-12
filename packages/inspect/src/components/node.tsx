@@ -6,6 +6,7 @@ import { styled, keyframes } from "@stitches/react";
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { usePingContext } from './ping';
+import { Muted } from './layout';
 import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGDashboard } from './svg';
 
 type NodeProps = {
@@ -86,7 +87,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
     >
       <div className={"fiber-tree-ping cover-parent " + className} />
       <div className={"fiber-tree-highlight cover-parent " + className} />
-      <div className={"fiber-tree-label " + className}>{name}<IconRow>{icons}</IconRow></div>
+      <div className={"fiber-tree-label " + className}>{name} <Muted>({fiber.runs})</Muted><IconRow>{icons}</IconRow></div>
     </div>
   );
 });

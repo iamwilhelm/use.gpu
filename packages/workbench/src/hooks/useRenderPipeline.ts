@@ -1,4 +1,4 @@
-import type { UseRenderingContextGPU, ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core';
+import type { UseGPURenderContext, ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core';
 
 import { makeRenderPipeline, makeRenderPipelineAsync } from '@use-gpu/core';
 import { useContext, useMemo, useOne, useState } from '@use-gpu/live';
@@ -24,7 +24,7 @@ const CACHE = new WeakMap<any, LRU<string, any>>();
 const PENDING = new WeakMap<any, Map<string, any>>();
 
 export const useRenderPipeline = (
-  renderContext: UseRenderingContextGPU,
+  renderContext: UseGPURenderContext,
   shader: RenderShader,
   props: DeepPartial<GPURenderPipelineDescriptor>,
 ) => {
@@ -89,7 +89,7 @@ export const useRenderPipeline = (
 };
 
 export const useRenderPipelineAsync = (
-  renderContext: UseRenderingContextGPU,
+  renderContext: UseGPURenderContext,
   shader: RenderShader,
   props: DeepPartial<GPURenderPipelineDescriptor>,
 ) => {

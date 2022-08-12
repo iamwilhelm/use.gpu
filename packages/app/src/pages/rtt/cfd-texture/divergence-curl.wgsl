@@ -10,7 +10,6 @@ use '@use-gpu/wgsl/use/array'::{ wrapIndex2i };
 @compute @workgroup_size(8, 8)
 fn main(
   @builtin(global_invocation_id) globalId: vec3<u32>,
-  @builtin(num_workgroups) numWorkgroups: vec3<u32>,
 ) {
   let size = getSize();
 

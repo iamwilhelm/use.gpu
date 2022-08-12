@@ -11,7 +11,7 @@ export type DeepPartial<T> = T | {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
 
-export type UseRenderingContextGPU = {
+export type UseGPURenderContext = {
   width: number,
   height: number,
   pixelRatio: number,
@@ -28,7 +28,7 @@ export type UseRenderingContextGPU = {
   depthStencilAttachment?: GPURenderPassDepthStencilAttachment,
 
   swap: (view?: GPUTextureView) => void,
-  history?: TextureTarget[],
+  source?: TextureTarget,
 };
 
 export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';

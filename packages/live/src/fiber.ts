@@ -7,7 +7,7 @@ import type {
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, QUOTE, UNQUOTE } from './builtin';
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
-import { isSameDependencies, incrementVersion, tagFunction } from './util';
+import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
 import { formatNode, formatNodeName, LOGGING } from './debug';
 
 import { setCurrentFiber } from './current';
@@ -173,11 +173,9 @@ export const makeQuoteState = <F extends ArrowFunction, A, B, C>(
   fiber: LiveFiber<F>,
   nextFiber: LiveFiber<F>,
 ): FiberQuote<any> => ({
-  id: fiber.id,
   root,
   from: fiber,
   to: nextFiber,
-  arg: 0,
 });
 
 // Make fiber context state
@@ -397,9 +395,24 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   {
     const mount = mounts.get(key);
     const nextMount = updateMount(fiber, mount, call as any, key);
+
     if (nextMount !== false) {
-      if (nextMount) mounts.set(key, nextMount);
-      else mounts.delete(key);
+      if (nextMount) {
+        if (nextMount !== mount) {
+          const i = order.findIndex((key) => compareFibers(mounts.get(key), nextMount) > 0);
+          if (i === -1) order.push(key);
+          else order.splice(i, 0, key);
+
+          mounts.set(key, nextMount);
+        }
+      }
+      else {
+        if (nextMount !== mount) {
+          mounts.delete(key);
+          order.splice(order.indexOf(key), 1);
+        }
+      }
+
       flushMount(nextMount, mount, fenced);
     }
   }
@@ -532,7 +545,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   if (!fiber.unquote) throw new Error("Can't unquote outside of quote");
   
   const {id, unquote} = fiber;
-  const {root, from, to, arg} = unquote;
+  const {root, from, to} = unquote;
 
   const key = fiber.id;
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? fragment();
@@ -784,7 +797,12 @@ export const morphFiberCall = <F extends ArrowFunction>(
   const {mount} = fiber;
 
   if (call && mount && (mount.f !== call.f) && !(call.f.isLiveBuiltin)) {
-    if (mount.context === fiber.context && !mount.next && (!mount.quote || mount.quote.id !== mount.id)) {
+    if (
+      mount.context === fiber.context &&
+      !mount.next &&
+      (!mount.quote || mount.quote.from !== mount) &&
+      (!mount.unquote || mount.unquote.to !== mount)
+    ) {
       // Discard all fiber state
       enterFiber(mount, 0);
       exitFiber(mount);
@@ -929,6 +947,7 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
 
   disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
+
   if (quote && quote.root !== fiber && quote.from === fiber) {
     const {to} = quote;
     reconcileFiberCall(to, null, id, true);

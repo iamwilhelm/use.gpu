@@ -50,6 +50,10 @@ export const InspectContainer = styled('div', {
   userSelect: 'none',
 });
 
+export const OptionsContainer = styled('div', {
+  margin: '8px 0',
+});
+
 export const Selectable = styled('div', {
   userSelect: 'text',
 });

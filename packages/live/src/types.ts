@@ -158,11 +158,9 @@ export type FiberYeet<A, B> = {
 
 // Fiber quote state
 export type FiberQuote<T> = {
-  id: number,
   root: LiveFiber<T>,
   from: LiveFiber<T>,
   to: LiveFiber<T>,
-  arg: number,
 };
 
 // Priority queue

@@ -20,6 +20,7 @@ type NodeProps = {
   precedes?: boolean,
   parents?: boolean,
   depth?: number,
+  runCount?: boolean,
   onClick?: Action,
   onMouseEnter?: Action,
   onMouseLeave?: Action,
@@ -35,6 +36,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   precedes,
   parents,
   depth,
+  runCount,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -76,6 +78,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   }, [onClick]);
 
   const name = formatNodeName(fiber);
+  const label = runCount && (name !== ' ') ? <>{name} <Muted>({fiber.runs})</Muted></> : name;
 
   return (
     <div
@@ -87,7 +90,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
     >
       <div className={"fiber-tree-ping cover-parent " + className} />
       <div className={"fiber-tree-highlight cover-parent " + className} />
-      <div className={"fiber-tree-label " + className}>{name} <Muted>({fiber.runs})</Muted><IconRow>{icons}</IconRow></div>
+      <div className={"fiber-tree-label " + className}>{label}<IconRow>{icons}</IconRow></div>
     </div>
   );
 });

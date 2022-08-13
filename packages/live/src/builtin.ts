@@ -202,14 +202,12 @@ export const capture = <T, C>(
 /** Quote a subtree and reconcile it separately. */
 export const quote = <T>(
   calls?: LiveNode<any>,
-  then?: LiveFunction<(r: T) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: QUOTE, args: calls, key, by: getCurrentFiberID()} as any);
 
 /** Escape from quote. */
 export const unquote = <T>(
   calls?: LiveNode<any>,
-  then?: LiveFunction<(r: T) => LiveElement<any>>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: UNQUOTE, args: calls, key, by: getCurrentFiberID()} as any);
 

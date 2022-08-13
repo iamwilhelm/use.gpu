@@ -713,7 +713,7 @@ it("renders quote/unquote pairs", () => {
   expect(formatTree(result)).toMatchSnapshot();
 });
 
-fit("optimizes root quote/unquote pair", () => {
+it("optimizes root quote/unquote pair", () => {
   
   const Root = () => {
     return quote(unquote(use(First, quote(use(Second, unquote(use(First, quote(use(Second)))))))));

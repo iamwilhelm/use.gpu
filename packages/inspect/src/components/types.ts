@@ -11,5 +11,9 @@ export type HoverState = {
   by: LiveFiber<any> | null,
   depth: number,
 };
+export type OptionState = {
+  depth: number,
+  counts: number,
+};
 
 export type Action = () => void;

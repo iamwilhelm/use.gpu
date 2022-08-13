@@ -19,6 +19,7 @@ type FiberTreeProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
   depthLimit: number,
+  runCounts: boolean,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
@@ -32,6 +33,7 @@ type FiberNodeProps = {
   hoveredCursor: Cursor<HoverState>,
   indent?: number,
   depthLimit?: number,
+  runCounts?: boolean,
   continuation?: boolean,
   siblings?: boolean,
 }
@@ -135,6 +137,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   fiber,
   fibers,
   depthLimit,
+  runCounts,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -147,6 +150,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
           fiber={fiber}
           fibers={fibers}
           depthLimit={depthLimit}
+          runCounts={runCounts}
           expandCursor={expandCursor}
           selectedCursor={selectedCursor}
           hoveredCursor={hoveredCursor}
@@ -162,6 +166,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   fiber,
   fibers,
   depthLimit = Infinity,
+  runCounts = false,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -255,6 +260,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       precedes={precedes}
       depends={depends}
       depth={styleDepth}
+      runCount={runCounts}
       onClick={select}
       onMouseEnter={hover}
       onMouseLeave={unhover}
@@ -271,6 +277,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         fiber={mount}
         fibers={fibers}
         depthLimit={depthLimit}
+        runCounts={runCounts}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -290,6 +297,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             fiber={sub}
             fibers={fibers}
             depthLimit={depthLimit}
+            runCounts={runCounts}
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
@@ -339,6 +347,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         fiber={next}
         fibers={fibers}
         depthLimit={depthLimit}
+        runCounts={runCounts}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}

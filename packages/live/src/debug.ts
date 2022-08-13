@@ -23,19 +23,36 @@ export const setLogging = (options: LoggingOptions) => {
   for (let k in options) LOGGING[k] = (options as any)[k];
 };
 
+export const formatSnapshot = (arg: any) => {
+  const args = Array.isArray(arg) ? arg : (arg !== undefined ? [arg] : []);
+  return args.map(formatSnapshotArg).join(' ');
+}
+
+export const formatSnapshotArg = (arg: any) => {
+  if (Array.isArray(arg)) return '[' + arg.map(formatSnapshotArg) + ']';
+  if (typeof arg === 'object' && arg) {
+    if (arg.f && arg.args && arg.by) {
+      return '<' + formatNodeName(arg) +'> ' + formatSnapshot(arg.args ?? arg.arg);
+    }
+    return '{' + Object.keys(arg).map(k => `${k}={${formatSnapshotArg(arg[k])}}`) + '}';
+  }
+  return `${arg}`;
+}
+
 export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
-  const {mount, mounts, next} = root;
+  const {mount, mounts, order, next} = root;
   let out = [];
 
   const prefix = '  '.repeat(depth);
-  out.push(prefix + '<' + formatNodeName(root) + '> ' + JSON.stringify(root.args));
+  
+  out.push(prefix + '<' + formatNodeName(root) +'> '+ formatSnapshot(root.args));
 
   if (mount) {
     out.push(formatTree(mount, depth + 1));
   }
 
   if (mounts) {
-    for (const key of mounts.keys()) {
+    for (const key of order) {
       const sub = mounts.get(key);
       if (sub) out.push(formatTree(sub, depth + 1));
     }

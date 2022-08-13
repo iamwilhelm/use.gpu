@@ -5,6 +5,7 @@ import { GeometryFacesPage } from './pages/geometry/faces';
 import { GeometryGLTFPage } from './pages/geometry/gltf';
 import { GeometryLinesPage } from './pages/geometry/lines';
 import { DebugAtlasPage } from './pages/debug/atlas';
+import { DebugQuotePage } from './pages/debug/quote';
 import { LayoutDisplayPage } from './pages/layout/display';
 import { LayoutGlyphPage } from './pages/layout/glyph';
 import { LayoutAlignPage } from './pages/layout/align';
@@ -41,6 +42,7 @@ export const PAGES = [
   {path: "/rtt/cfd-compute", title: "RTT - Fluid Dynamics (w/ Storage)"},
   {path: "/rtt/cfd-texture", title: "RTT - Fluid Dynamics (w/ Texture)"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
+  {path: "/debug/quote", title: "Debug - Quoting"},
   {path: "/", title: "Index"},
 ];
 
@@ -63,6 +65,7 @@ export const makeRoutes = () => ({
   "/rtt/cfd-compute":       { element: <RTTCFDComputePage /> },
   "/rtt/cfd-texture":       { element: <RTTCFDTexturePage /> },
   "/debug/atlas":           { element: <DebugAtlasPage /> },
+  "/debug/quote":           { element: <DebugQuotePage /> },
 
   "/": { element: <HomePage container={document.querySelector('#use-gpu')} /> },
   "*": { element: <EmptyPage /> },

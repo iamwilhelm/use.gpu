@@ -1,8 +1,8 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { ExpandState, SelectState, HoverState, PingState } from './types';
+import type { ExpandState, SelectState, HoverState, OptionState, PingState } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
-import { useUpdateState } from '@use-gpu/state';
+import { useUpdateState, useRefineCursor } from '@use-gpu/state';
 
 import React, { memo, useLayoutEffect, useEffect, useMemo, useState } from 'react';
 import { Node } from './node';
@@ -18,6 +18,7 @@ import {
 } from './layout';
 import { PingProvider } from './ping';
 import { DetailSlider } from './detail';
+import { Options } from './options';
 import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
 
 import * as Tabs from '@radix-ui/react-tabs';
@@ -33,7 +34,10 @@ type InspectProps = {
 export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
-  const depthCursor = useUpdateState<number>(10);
+  const optionCursor = useUpdateState<OptionState>({
+    depth: 10,
+    counts: false,
+  });
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
   }));
@@ -51,7 +55,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
 
   const fibers = new Map<number, LiveFiber<any>>();
   const [selectedFiber, setSelected] = selectedCursor;
-  const [depthLimit, setDepthLimit] = depthCursor;
+  const [depthLimit, setDepthLimit] = useRefineCursor(optionCursor)('depth');
+  const [runCounts, setRunCounts] = useRefineCursor(optionCursor)('counts');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
   useLayoutEffect(() => {
@@ -140,6 +145,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     <InsetColumnFull>
       <TreeControls>
         <DetailSlider value={depthLimit} onChange={setDepthLimit} />
+        <Options cursor={optionCursor} />
         <Spacer />
         <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}>
           <IconItem height={24} top={1}><SVGPickElement size={24} /></IconItem>
@@ -149,6 +155,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
         fiber={fiber}
         fibers={fibers}
         depthLimit={depthLimit}
+        runCounts={runCounts}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}

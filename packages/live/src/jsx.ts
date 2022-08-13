@@ -1,7 +1,7 @@
 import { formatNodeName } from './debug';
 import {
-  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet,
-  CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, SUSPEND, FRAGMENT,
+  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quote, unquote,
+  CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, SUSPEND, FRAGMENT, QUOTE, UNQUOTE,
 } from './builtin';
 import { getCurrentFiberID } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
@@ -26,6 +26,8 @@ export const Capture = CAPTURE as AnyF;
 export const Yeet = YEET as AnyF;
 export const Morph = MORPH as AnyF;
 export const Suspend = SUSPEND as AnyF;
+export const Quote = QUOTE as AnyF;
+export const Unquote = UNQUOTE as AnyF;
 
 export const React = {
   createElement: (type: ArrowFunction, props: any, ...children: any[]) => {
@@ -58,6 +60,12 @@ export const React = {
       }
       if (type === SUSPEND) {
         return yeet(SUSPEND, props?.key);
+      }
+      if (type === QUOTE) {
+        return quote(toChildren(props?.children ?? children), props?.key);
+      }
+      if (type === UNQUOTE) {
+        return unquote(toChildren(props?.children ?? children), props?.key);
       }
       if (type === MORPH) {
         const c = props?.children ?? children;

@@ -1,59 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`gathers yeeted values 1`] = `
-"<Root> []
-  <Yeet> [1]
-  <Value> []
-  <Yeet> [3]
-  <Resume(Root)> [null]
-    <Node> [[1,2,3]]"
+"<Root> 
+  <Yeet> 1
+  <Value> 
+  <Yeet> 3
+  <Resume(Root)> values => (0, _builtin.use)(Node, values)
+    <Node> [1,2,3]"
 `;
 
 exports[`optimizes root quote/unquote pair 1`] = `
-"<Root> []
-  <First> [{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":1},\\"by\\":1}],\\"by\\":1},\\"by\\":1}],\\"by\\":1},\\"by\\":1}]
-    <First> [{\\"args\\":{\\"args\\":[],\\"by\\":1},\\"by\\":1}]
-  <Reconcile(Root)> [{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":1},\\"by\\":1}],\\"by\\":1},\\"by\\":1}],\\"by\\":1},\\"by\\":1}],\\"by\\":1},\\"by\\":1}]
-    <Second> [{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":1},\\"by\\":1}],\\"by\\":1},\\"by\\":1}]
-      <Second> []"
+"<Root> 
+  <First> <Quote> <Second> <Unquote> <First> <Quote> <Second> 
+    <First> <Quote> <Second> 
+  <Reconcile(Root)> <Unquote> <First> <Quote> <Second> <Unquote> <First> <Quote> <Second> 
+    <Second> <Unquote> <First> <Quote> <Second> 
+      <Second> "
 `;
 
 exports[`renders quote/unquote pairs 1`] = `
-"<Root> []
-  <First> [{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63}]
-    <Quote> {\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63}],\\"by\\":63}
-      <First> [{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}]
-        <First> [{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}]
-          <First> [{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}]
-    <Reconcile(First)> [{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63}]
-      <Second> [{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63}]
-        <Second> [{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}]
-          <Second> [{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63},\\"by\\":63},\\"by\\":63}],\\"by\\":63},\\"by\\":63}]
-            <Unquote> {\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":63},\\"by\\":63}],\\"by\\":63}],\\"by\\":63}
-              <Second> []"
+"<Root> 
+  <First> <Quote> <Second> <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+    <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+      <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+        <First> <First> <Quote> <Second> 
+          <First> <Quote> <Second> 
+    <Reconcile(First)> <Second> <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+      <Second> <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+        <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+          <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+            <Unquote> <First> <First> <Quote> <Second> 
+              <Second> "
 `;
 
 exports[`renders quoted tree 1`] = `
-"<Root> []
-  <Node> []
-  <Quote> {\\"args\\":[],\\"by\\":44}
-    <Reconcile(Quote)> [{\\"args\\":[],\\"by\\":44}]
-      <Tree> []
-        <Node> [{\\"args\\":[{\\"args\\":[],\\"by\\":49}],\\"by\\":49}]
-          <Node> [{\\"args\\":[],\\"by\\":49}]
-            <Node> []
-  <Node> []"
+"<Root> 
+  <Node> 
+  <Quote> <Tree> 
+    <Reconcile(Quote)> <Tree> 
+      <Tree> 
+        <Node> <Node> <Node> 
+          <Node> <Node> 
+            <Node> 
+  <Node> "
 `;
 
 exports[`renders quoted/unquoted trees 1`] = `
-"<Root> []
-  <Quote> {\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53}
-    <First> [{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}]
-      <First> [{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}],\\"by\\":53}]
-        <First> [{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}]
-    <Reconcile(Quote)> [{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53}]
-      <Second> [{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53}]
-        <Second> [{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}],\\"by\\":53},\\"by\\":53}]
-          <Second> [{\\"args\\":{\\"args\\":[{\\"args\\":[{\\"args\\":{\\"args\\":[],\\"by\\":53},\\"by\\":53}],\\"by\\":53}],\\"by\\":53},\\"by\\":53}]
-            <Second> []"
+"<Root> 
+  <Quote> <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+    <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+      <First> <First> <Quote> <Second> 
+        <First> <Quote> <Second> 
+    <Reconcile(Quote)> <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+      <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+        <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+          <Second> <Unquote> <First> <First> <Quote> <Second> 
+            <Second> "
 `;

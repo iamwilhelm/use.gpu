@@ -124,6 +124,10 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   // Yeeting state
   yeeted: FiberYeet<any, any> | null,
 
+  // Quoting state
+  quote: FiberQuote<any> | null,
+  unquote: FiberQuote<any> | null,
+
   // Count number of runs for inspector
   runs: number,
 
@@ -150,6 +154,15 @@ export type FiberYeet<A, B> = {
   value?: A,
   reduced?: B,
   parent?: FiberYeet<A, B>,
+};
+
+// Fiber quote state
+export type FiberQuote<T> = {
+  id: number,
+  root: LiveFiber<T>,
+  from: LiveFiber<T>,
+  to: LiveFiber<T>,
+  arg: number,
 };
 
 // Priority queue

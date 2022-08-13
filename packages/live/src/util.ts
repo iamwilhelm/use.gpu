@@ -193,4 +193,3 @@ export const tagFunction = <F extends ArrowFunction>(f: F, name?: string) => {
   (f as any).displayName = name ?? `${Math.floor(Math.random() * 10000)}`;
   return f;
 }
-

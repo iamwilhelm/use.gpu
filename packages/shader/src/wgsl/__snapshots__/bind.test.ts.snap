@@ -67,8 +67,8 @@ fn _VT_1_getColor(a: i32) -> vec4<f32> {
 
 @group(0) @binding(0) var<storage> _VT_1_getSizeStorage: array<vec2<f32>>;
 
-fn _VT_1_getSize(index: u32) -> vec2<f32> {
-  return _VT_1_getSizeStorage[index];
+fn _VT_1_getSize(a: i32) -> vec2<f32> {
+  return _VT_1_getSizeStorage[a];
 }
 
 

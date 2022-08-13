@@ -28,10 +28,10 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
   let out = [];
 
   const prefix = '  '.repeat(depth);
-  out.push(prefix + formatNode(root));
+  out.push(prefix + '<' + formatNodeName(root) + '> ' + JSON.stringify(root.args));
 
   if (mount) {
-    out.push(formatTree(mount, depth + +!!mounts));
+    out.push(formatTree(mount, depth + 1));
   }
 
   if (mounts) {
@@ -85,6 +85,12 @@ export const formatNodeName = <F extends Function>(_node: LiveElement<F>): strin
   }
   else if (name === 'YEET') {
     name = `Yeet`;
+  }
+  else if (name === 'QUOTE') {
+    name = `Quote`;
+  }
+  else if (name === 'UNQUOTE') {
+    name = `Unquote`;
   }
   else if (name === 'MORPH') {
     name = `Morph`;

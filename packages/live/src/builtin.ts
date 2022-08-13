@@ -33,6 +33,10 @@ export const CAPTURE      = () => {};
 export const DEBUG        = () => {};
 /** @hidden */
 export const SUSPEND      = () => {};
+/** @hidden */
+export const QUOTE        = () => {};
+/** @hidden */
+export const UNQUOTE      = () => {};
 
 (MORPH        as any).isLiveBuiltin = true;
 (DETACH       as any).isLiveBuiltin = true;
@@ -46,6 +50,8 @@ export const SUSPEND      = () => {};
 (CAPTURE      as any).isLiveBuiltin = true;
 (DEBUG        as any).isLiveBuiltin = true;
 (SUSPEND      as any).isLiveBuiltin = true;
+(QUOTE        as any).isLiveBuiltin = true;
+(UNQUOTE      as any).isLiveBuiltin = true;
 
 (FRAGMENT     as any).isLiveInline = true;
 
@@ -192,6 +198,20 @@ export const capture = <T, C>(
   then?: LiveFunction<(r: T) => void>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: CAPTURE, args: [context, calls, then], key, by: getCurrentFiberID()} as any);
+
+/** Quote a subtree and reconcile it separately. */
+export const quote = <T>(
+  calls?: LiveNode<any>,
+  then?: LiveFunction<(r: T) => LiveElement<any>>,
+  key?: Key,
+): DeferredCall<() => void> => ({f: QUOTE, args: calls, key, by: getCurrentFiberID()} as any);
+
+/** Escape from quote. */
+export const unquote = <T>(
+  calls?: LiveNode<any>,
+  then?: LiveFunction<(r: T) => LiveElement<any>>,
+  key?: Key,
+): DeferredCall<() => void> => ({f: UNQUOTE, args: calls, key, by: getCurrentFiberID()} as any);
 
 /** Component has side-effects, and will re-render even if props object is identical. */
 export const imperative = makeImperativeFunction;

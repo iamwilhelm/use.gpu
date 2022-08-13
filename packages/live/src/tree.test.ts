@@ -1,8 +1,9 @@
 import type { LiveFiber, Task } from './types';
-import { use, keyed, detach, provide, PROVIDE, makeContext } from './builtin';
+import { use, keyed, detach, provide, gather, reconcile, yeet, quote, unquote, PROVIDE, makeContext } from './builtin';
 import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext } from './hooks';
 import { renderSync } from './tree';
+import { formatTree } from './debug';
 
 it("mounts", () => {
 
@@ -604,4 +605,128 @@ it("does not update context if value is the same", () => {
   expect(rendered.node).toBe(1);
   expect(rendered.value).toBe(0);
 
+});
+
+it("gathers yeeted values", () => {
+  
+  const Root = () => {
+    return gather([
+      yeet(1),
+      use(Value),
+      yeet(3),
+    ], (values: number[]) => use(Node, values));
+  };
+
+  const Value = () => {
+    return yeet(2);
+  };
+
+  const Node = () => {};
+  
+  const result = renderSync(use(Root));
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  if (flush) flush();
+  
+  expect(formatTree(result)).toMatchSnapshot();
+});
+
+it("renders quoted tree", () => {
+  
+  const Root = () => {
+    return [
+      use(Node),
+      quote(use(Tree)),
+      use(Node),
+    ];
+  };
+
+  const Tree = () => use(Node, use(Node, use(Node)));
+
+  const Node = (children) => {
+    return children;
+  };
+  
+  const result = renderSync(use(Root));
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  if (flush) flush();
+  
+  expect(formatTree(result)).toMatchSnapshot();
+});
+
+it("renders quoted/unquoted trees", () => {
+  
+  const Root = () => {
+    return [
+      quote(
+        use(Second,
+          use(Second,
+            unquote(use(First, quote(use(Second, unquote(use(First, use(First, quote(use(Second)))))))))
+          )
+        )
+      ),
+    ];
+  };
+
+  const First = (children) => children;
+  const Second = (children) => children;
+  
+  const result = renderSync(use(Root));
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  if (flush) flush();
+  
+  expect(formatTree(result)).toMatchSnapshot();
+});
+
+it("renders quote/unquote pairs", () => {
+  
+  const Root = () => {
+    return use(First,
+      quote(
+        use(Second,
+          use(Second,
+            unquote(quote(use(Second, unquote(
+              use(First, quote(unquote(use(First, use(First, quote(
+                use(Second)
+              ))))))
+            ))))
+          )
+        )
+      ),
+    );
+  };
+
+  const First = (children) => children;
+  const Second = (children) => children;
+  
+  const result = renderSync(use(Root));
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  if (flush) flush();
+  
+  expect(formatTree(result)).toMatchSnapshot();
+});
+
+fit("optimizes root quote/unquote pair", () => {
+  
+  const Root = () => {
+    return quote(unquote(use(First, quote(use(Second, unquote(use(First, quote(use(Second)))))))));
+  };
+
+  const First = (children) => children;
+  const Second = (children) => children;
+  
+  const result = renderSync(use(Root));
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  if (flush) flush();
+  
+  expect(formatTree(result)).toMatchSnapshot();
 });

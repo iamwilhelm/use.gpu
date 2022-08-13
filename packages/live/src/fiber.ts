@@ -929,8 +929,13 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
 
   disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
-  if (unquote) {
-    
+  if (quote && quote.root !== fiber && quote.from === fiber) {
+    const {to} = quote;
+    reconcileFiberCall(to, null, id, true);
+  }
+  if (unquote && unquote.to === fiber) {
+    const {from} = unquote;
+    reconcileFiberCall(from, null, id, true);    
   }
 
   bustFiberYeet(fiber);

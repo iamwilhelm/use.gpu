@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
 
-import { provide, yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, quote, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
@@ -78,11 +78,11 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     }
     if (data || expr) {
       uploadBuffer(device, buffer, array.buffer);
+      source.version = incrementVersion(source.version);
     }
 
     source.length  = !sparse ? length : emitted;
     source.size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
-    source.version = incrementVersion(source.version);
   };
 
   if (!live) {
@@ -97,7 +97,8 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     refresh();
   }
 
-  return useMemo(() => {
-    return render ? render(source) : yeet(source);
-  }, [render, source]);
+  return useMemo(() => [
+    quote(yeet()),
+    render ? render(source) : yeet(source),
+  ], [render, source]);
 };

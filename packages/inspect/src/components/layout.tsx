@@ -145,6 +145,15 @@ export const PanelFull = styled(Panel, {
   overflow: 'auto',
 });
 
+export const PanelAbsolute = styled(Panel, {
+  overflow: 'auto',
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  right: 0,
+  bottom: 0,
+});
+
 export const Inset = styled('div', {
   padding: '20px',
 });

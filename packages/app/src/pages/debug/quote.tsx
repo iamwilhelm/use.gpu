@@ -1,5 +1,5 @@
 import type { LC } from '@use-gpu/live';
-import React, { Gather, Yeet, Quote, Unquote } from '@use-gpu/live';
+import React, { Gather, Yeet, Reconcile, Quote, Unquote } from '@use-gpu/live';
 
 import {
   Draw, LinearRGB, Pass, PanControls, Flat,
@@ -15,18 +15,21 @@ export const DebugQuotePage: LC = () => {
   ''
   );
   
-  const Foo = () => {};
+  const Foo = ({children}) => <>{children}</>;
   
   return (
-    <Quote><Unquote>
-      <Draw>
-        <Quote>
-          <Foo />
-          <Unquote>
-            <Pass />
-          </Unquote>
-        </Quote>
-      </Draw>
-    </Unquote></Quote>
+    <Reconcile>
+      <Flat>
+        <Draw>
+          <Quote>
+            <Foo>
+              <Unquote>
+                <Pass />
+              </Unquote>
+            </Foo>
+          </Quote>
+        </Draw>
+      </Flat>
+    </Reconcile>
   )
 };

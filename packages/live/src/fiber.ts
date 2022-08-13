@@ -4,7 +4,7 @@ import type {
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
 
-import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, QUOTE, UNQUOTE } from './builtin';
+import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, RECONCILE, QUOTE, UNQUOTE } from './builtin';
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
@@ -135,6 +135,7 @@ export const makeNextFiber = <F extends ArrowFunction>(
 
   const n = formatNodeName(fiber);
   name = name ?? (n.match(/^[A-Za-z]+\(/) ? n.slice(n.indexOf('(') + 1, -1) : n);
+  if (name === prefix) name = '…';
   Next.displayName = `${prefix}(${name})`;
 
   const nextFiber = makeSubFiber(fiber, use(Next), fiber.id, 1);
@@ -331,12 +332,17 @@ export const updateFiber = <F extends ArrowFunction>(
     const [calls, then, fallback] = call!.args ?? EMPTY_ARRAY;
     fenceFiberCalls(fiber, calls, then, fallback);
   }
-  // Reconcile quoted calls in a continuation
+  // Reconcile to a separate subtree
+  else if (fiberType === RECONCILE) {
+    const calls = call!.args ?? EMPTY_ARRAY;
+    mountFiberReconciler(fiber, calls);
+  }
+  // Enter quoted calls
   else if (fiberType === QUOTE) {
     const calls = call!.args ?? EMPTY_ARRAY;
     mountFiberQuote(fiber, calls);
   }
-  // Reconcile quoted calls in a continuation
+  // Escape from quoted calls
   else if (fiberType === UNQUOTE) {
     const calls = call!.args ?? EMPTY_ARRAY;
     mountFiberUnquote(fiber, calls);
@@ -503,37 +509,43 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   mountFiberContinuation(fiber, use(fiber.next.f, Next), 1);
 }
 
+const Reconcile = () => {};
+
 // Mount quoted calls on a fiber's continuation
-export const mountFiberQuote = <F extends ArrowFunction>(
+export const mountFiberReconciler = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any> | LiveElement<any>[],
 ) => {
   if (!fiber.quote) {
-    const Reconcile = makeFiberReconciliation(fiber);
     fiber.next = makeNextFiber(fiber, Reconcile, 'Reconcile');
     fiber.quote = makeQuoteState(fiber, fiber, fiber.next);
     fiber.next.unquote = fiber.quote;
   }
 
+  if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
+  else mountFiberCall(fiber, calls as any);
+}
+
+// Mount quoted calls on a fiber's continuation
+export const mountFiberQuote = <F extends ArrowFunction>(
+  fiber: LiveFiber<F>,
+  calls: LiveElement<any> | LiveElement<any>[],
+) => {
+  if (!fiber.quote) throw new Error("Can't quote outside of reconciler");
+
   const key = fiber.id;
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? fragment();
-
   const {quote: {root, from, to}} = fiber;
 
-  if (root === fiber) {
-    mountFiberContinuation(fiber, use(fiber.next.f, calls));
-  }
-  else {
-    reconcileFiberCall(to, call, key, true);
+  reconcileFiberCall(to, call, key, true);
 
-    const mount = to.mounts.get(key)!;
-    if (from !== fiber || mount.unquote !== fiber.quote) {
-      fiber.quote = makeQuoteState(root, fiber, mount);
-      mount.unquote = fiber.quote;
+  const mount = to.mounts.get(key)!;
+  if (from !== fiber || mount.unquote !== fiber.quote) {
+    const quote = makeQuoteState(root, fiber, mount);
+    mount.unquote = quote;
 
-      mount.path = fiber.path;
-      mount.depth = fiber.depth + 1;
-    }
+    mount.path = fiber.path;
+    mount.depth = fiber.depth + 1;
   }
 }
 
@@ -554,8 +566,8 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
 
   const mount = from.mounts.get(key)!;
   if (to !== fiber || mount.quote !== fiber.unquote) {
-    fiber.unquote = makeQuoteState(root, mount, fiber);
-    mount.quote = fiber.unquote;
+    const unquote = makeQuoteState(root, mount, fiber);
+    mount.quote = unquote;
 
     mount.path = fiber.path;
     mount.depth = fiber.depth + 1;

@@ -99,11 +99,11 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
     }
     if (data || expr) {
       uploadBuffer(device, source.buffer, array);
+      source.version = incrementVersion(source.version);
     }
 
     source.length  = !sparse ? count : emitted;
     source.size    = [source.length]
-    source.version = incrementVersion(source.version);
   };
 
   if (!live) {
@@ -118,5 +118,7 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
     refresh();
   }
 
-  return useMemo(() => render ? render(source) : yeet(source), [render, source]);
+  const signal = useOne(() => quote(yeet()), source.version);
+  const view = useMemo(() => render ? render(source) : yeet(source), [render, source]);
+  return [signal, view];
 };

@@ -13,7 +13,7 @@ import { ExpandState, SelectState, HoverState, Action } from './types';
 import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
 
-import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGDashboard } from './svg';
+import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard } from './svg';
 
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
@@ -108,10 +108,22 @@ export const FiberLegend: React.FC = () => {
         />
         <span>Dependency</span>
       </TreeLegendItem>
+      <TreeLegendItem>
+        <Node
+          fiber={fiber}
+          quoted={true}
+        />
+        <span>Portal</span>
+      </TreeLegendItem>
 
       <TreeLegendItem>
         <IconItem gap={-5} top={-2}><SVGYeet /></IconItem>
         <span>Yeet</span>
+      </TreeLegendItem>
+
+      <TreeLegendItem>
+        <IconItem gap={-5} top={-2}><SVGQuote /></IconItem>
+        <span>Quote</span>
       </TreeLegendItem>
 
       <TreeLegendItem>
@@ -143,22 +155,20 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   hoveredCursor,
 }) => {
 
-  return (
-    <SplitColumnFull>
-      <TreeWrapper>
-        <FiberNode
-          fiber={fiber}
-          fibers={fibers}
-          depthLimit={depthLimit}
-          runCounts={runCounts}
-          expandCursor={expandCursor}
-          selectedCursor={selectedCursor}
-          hoveredCursor={hoveredCursor}
-        />
-      </TreeWrapper>
-      <FiberLegend />
-    </SplitColumnFull>
-  );
+  return (<div style={{minWidth: 'fit-content'}}>
+    <TreeWrapper>
+      <FiberNode
+        fiber={fiber}
+        fibers={fibers}
+        depthLimit={depthLimit}
+        runCounts={runCounts}
+        expandCursor={expandCursor}
+        selectedCursor={selectedCursor}
+        hoveredCursor={hoveredCursor}
+      />
+    </TreeWrapper>
+    <FiberLegend />
+  </div>);
 }
 
 // One node in the tree
@@ -188,6 +198,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const parents  = hoverState.fiber?.by === fiber.id;
   const depends  = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
   const precedes = hoverState.precs.indexOf(fiber) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
+  const quoted   = hoverState.fiber?.quote?.to === fiber;
+  const unquoted = hoverState.fiber?.unquote?.from === fiber;
 
   // Resolve depth-highlighting
   const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;
@@ -259,6 +271,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       parents={parents}
       precedes={precedes}
       depends={depends}
+      quoted={quoted}
+      unquoted={unquoted}
       depth={styleDepth}
       runCount={runCounts}
       onClick={select}

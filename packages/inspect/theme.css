@@ -212,17 +212,14 @@ html > body .LiveInspect ::-webkit-scrollbar {
 .LiveInspect div.fiber-tree-highlight.hovered {
   background: rgba(70, 180, 220, 1.0);
 }
-.LiveInspect div.fiber-tree-highlight.by {
+.LiveInspect div.fiber-tree-highlight.by, .LiveInspect div.fiber-tree-highlight.parents {
   background: rgba(30, 120, 180, 1.0);
 }
-.LiveInspect div.fiber-tree-highlight.parents {
-  background: rgba(30, 120, 180, 1.0);
-}
-.LiveInspect div.fiber-tree-highlight.depends {
+.LiveInspect div.fiber-tree-highlight.depends, .LiveInspect div.fiber-tree-highlight.precedes {
   background: rgba(75, 70, 200, 1.0);
 }
-.LiveInspect div.fiber-tree-highlight.precedes {
-  background: rgba(75, 70, 200, 1.0);
+.LiveInspect div.fiber-tree-highlight.quoted, .LiveInspect div.fiber-tree-highlight.unquoted {
+  background: rgba(0, 70, 200, 1.0);
 }
 .LiveInspect div.fiber-tree-highlight.staticMount {
   background: rgba(120, 120, 120, 1.0);
@@ -234,7 +231,8 @@ html > body .LiveInspect ::-webkit-scrollbar {
 .LiveInspect div.fiber-tree-ping {
   transition: 0.25s ease-in-out opacity;
 }
-.LiveInspect div.fiber-tree-ping.hovering {
+.LiveInspect div.fiber-tree-ping.hovering,
+.LiveInspect div.fiber-tree-highlight.selected.hovering:not(.hovered):not(.by):not(.depends):not(.precedes):not(.quoted):not(.unquoted) {
   opacity: 0.65;
 }
 .LiveInspect div.fiber-tree-ping.cold {

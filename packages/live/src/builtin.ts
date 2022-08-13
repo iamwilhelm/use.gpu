@@ -34,6 +34,8 @@ export const DEBUG        = () => {};
 /** @hidden */
 export const SUSPEND      = () => {};
 /** @hidden */
+export const RECONCILE    = () => {};
+/** @hidden */
 export const QUOTE        = () => {};
 /** @hidden */
 export const UNQUOTE      = () => {};
@@ -50,6 +52,7 @@ export const UNQUOTE      = () => {};
 (CAPTURE      as any).isLiveBuiltin = true;
 (DEBUG        as any).isLiveBuiltin = true;
 (SUSPEND      as any).isLiveBuiltin = true;
+(RECONCILE    as any).isLiveBuiltin = true;
 (QUOTE        as any).isLiveBuiltin = true;
 (UNQUOTE      as any).isLiveBuiltin = true;
 
@@ -199,7 +202,13 @@ export const capture = <T, C>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: CAPTURE, args: [context, calls, then], key, by: getCurrentFiberID()} as any);
 
-/** Quote a subtree and reconcile it separately. */
+/** Reconcile quoted calls to a separate tree. */
+export const reconcile = <T>(
+  calls?: LiveNode<any>,
+  key?: Key,
+): DeferredCall<() => void> => ({f: RECONCILE, args: calls, key, by: getCurrentFiberID()} as any);
+
+/** Quote a subtree and reconcile it. */
 export const quote = <T>(
   calls?: LiveNode<any>,
   key?: Key,

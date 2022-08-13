@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { provide, yeet, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { provide, yeet, quote, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
@@ -134,6 +134,10 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     refresh();
   }
 
-  if (sources) return useMemo(() => render ? render(...sources!) : yeet(sources!), [render, sources]);
-  return useMemo(() => render ? render(source) : yeet(source), [render, source]);
+  const signal = useOne(() => quote(yeet()), source.version);
+  const view = sources
+    ? useMemo(() => render ? render(...sources!) : yeet(sources!), [render, sources])
+    : useMemo(() => render ? render(source) : yeet(source), [render, source]);
+
+  return [signal, view];
 };

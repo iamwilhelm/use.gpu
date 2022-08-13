@@ -1,13 +1,13 @@
 import type { LiveFiber } from '@use-gpu/live';
 import type { Action } from './types';
 
-import { formatValue, formatNodeName, YEET } from '@use-gpu/live';
+import { formatValue, formatNodeName, YEET, QUOTE } from '@use-gpu/live';
 import { styled, keyframes } from "@stitches/react";
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { usePingContext } from './ping';
 import { Muted } from './layout';
-import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGDashboard } from './svg';
+import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard } from './svg';
 
 type NodeProps = {
   fiber: LiveFiber<any>,
@@ -34,6 +34,8 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   hovered,
   depends,
   precedes,
+  quoted,
+  unquoted,
   parents,
   depth,
   runCount,
@@ -43,6 +45,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
 }, ref) => {
   const {id, by, f, type, args, __inspect} = fiber;
 
+  const quote = type === QUOTE;
   const yeet = type === YEET;
   const react = !!__inspect?.react;
 
@@ -50,8 +53,9 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   const suffix2 = react ? <SVGAtom key="atom" title="React" /> : null;
   const suffix3 = !__inspect?.layout && __inspect?.setHovered ? <SVGHighlightElement key="layout" title="Highlight" /> : null;
   const suffix4 = __inspect?.layout ? <SVGDashboard key="dash" title="Layout" /> : null;
+  const suffix5 = quote ? <SVGQuote key="quote" title="Quote" /> : null;
 
-  const icons = [suffix1, suffix2, suffix3, suffix4].filter(x => !!x);
+  const icons = [suffix1, suffix2, suffix3, suffix4, suffix5].filter(x => !!x);
 
   const [version, pinged] = usePingContext(fiber);
 
@@ -63,6 +67,8 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   if (staticMount) classes.push('staticMount');
   if (depends) classes.push('depends');
   if (precedes) classes.push('precedes');
+  if (quoted) classes.push('quoted');
+  if (unquoted) classes.push('unquoted');
   if (parents) classes.push('parents');
   if (hovered !== -1) classes.push('hovering');
   if (hovered === id) classes.push('hovered');

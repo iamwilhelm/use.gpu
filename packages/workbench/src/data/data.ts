@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core';
 
-import { yeet, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { yeet, quote, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
@@ -90,5 +90,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
     refresh();
   }
 
-  return useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
+  const signal = useOne(() => quote(yeet()), source.version);
+  const view = useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
+  return [signal, view];
 };

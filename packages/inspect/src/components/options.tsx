@@ -10,10 +10,16 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
   
   const useCursor = useRefineCursor(props.cursor);
   const [runCounts, setRunCounts] = useCursor('counts');
+  const [fullSize, setFullSize] = useCursor('fullSize');
   
   return (
     <OptionsContainer>
-      <label><input type="checkbox" checked={runCounts} onChange={(e) => setRunCounts(e.target.checked)} /> Runs</label>
+      <div>
+        <label><input type="checkbox" checked={runCounts} onChange={(e) => setRunCounts(e.target.checked)} /> Show Runs</label>
+      </div>
+      <div>
+        <label><input type="checkbox" checked={fullSize} onChange={(e) => setFullSize(e.target.checked)} /> Big View</label>
+      </div>
     </OptionsContainer>
   );
 };

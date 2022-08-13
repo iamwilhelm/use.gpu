@@ -175,6 +175,25 @@ export const SVGYeet = ({color = '#fff', title = "", size = 16}) => (
   </div>
 );
 
+export const SVGQuote = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
+    <svg version="1.1" id="Layer_1" x="0px" y="0px"
+      style={{fill: 'currentColor'}}
+      viewBox="0 0 16 16"
+      height={size}
+    >
+  	<path d="M1.2,8C3.1,9.9,4,10.8,6,12.8c0-0.1,0-0.3,0-0.4c0,0,0,0,0,0c0-0.5,0-1,0-1.5L3.1,7.9L6,5.1C6,5,6,4.9,6,4.8
+  		c0-0.4,0-0.9,0-1.3c0-0.1,0-0.3,0-0.4C4,5.1,3.2,6,1.2,8z"/>
+  	<path d="M14.8,7.9C12.9,6,12,5.1,10,3.1c0,0.1,0,0.3,0,0.4c0,0,0,0,0,0c0,0.5,0,1,0,1.5l2.9,2.9L10,10.8c0,0.1,0,0.2,0,0.3
+  		c0,0.4,0,0.9,0,1.3c0,0.1,0,0.3,0,0.4C12,10.8,12.8,9.8,14.8,7.9z"/>
+  	<g>
+  		<rect x="8.8" y="7.4" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -2.9059 8.9846)" width="1.2" height="1.2"/>
+  		<rect x="6" y="7.4" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -3.7215 7.0154)" width="1.2" height="1.2"/>
+  	</g>
+    </svg>
+  </div>
+);
+
 export const SVGDashboard = ({color = '#fff', title = "", size = 16}) => (
   <div title={title} style={{display: 'inline-block', width: 16, height: 0}}>
     <svg version="1.1" id="Layer_1" x="0px" y="0px"

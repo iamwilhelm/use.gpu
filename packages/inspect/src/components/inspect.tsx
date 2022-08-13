@@ -14,7 +14,7 @@ import { Shader } from './panels/shader';
 import { Layout } from './panels/layout';
 import {
   InspectContainer, InspectToggle, Button, SmallButton, TreeControls, Spacer,
-  SplitRow, RowPanel, Panel, PanelFull, PanelScrollable, Inset, InsetColumnFull,
+  SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 import { PingProvider } from './ping';
 import { DetailSlider } from './detail';
@@ -37,6 +37,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const optionCursor = useUpdateState<OptionState>({
     depth: 10,
     counts: false,
+    fullSize: false,
   });
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
@@ -56,7 +57,8 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const fibers = new Map<number, LiveFiber<any>>();
   const [selectedFiber, setSelected] = selectedCursor;
   const [depthLimit, setDepthLimit] = useRefineCursor(optionCursor)('depth');
-  const [runCounts, setRunCounts] = useRefineCursor(optionCursor)('counts');
+  const [runCounts] = useRefineCursor(optionCursor)('counts');
+  const [fullSize] = useRefineCursor(optionCursor)('fullSize');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
   useLayoutEffect(() => {
@@ -197,20 +199,22 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     {open ? (
       <PingProvider fiber={fiber}>  
         <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
-          <SplitRow>
-            <RowPanel style={{width: '34%'}}>
-              <PanelFull onClick={() => setSelected(null)} className="tree-scroller">
+          <div style={fullSize
+              ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
+              : {display: 'flex', height: '100%'}}>
+            <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
+              <PanelAbsolute onClick={() => setSelected(null)} className="tree-scroller">
                 {tree}
-              </PanelFull>
+              </PanelAbsolute>
             </RowPanel>
             {selectedFiber ? (
-              <RowPanel style={{width: '66%'}}>
+              <RowPanel style={fullSize ? {position: 'relative', maxHeight: '30%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
                 <PanelScrollable>
                   {props}
                 </PanelScrollable>
               </RowPanel>
             ) : null}
-          </SplitRow>
+          </div>
         </InspectContainer>
       </PingProvider>
     ) : null}

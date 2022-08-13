@@ -5,7 +5,7 @@ import { DeviceContext } from '../providers/device-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { yeet, extend, gather, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { yeet, extend, quote, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor,
   copyDataArray, copyNumberArray,
@@ -221,7 +221,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       source.version = incrementVersion(source.version);
     }
   };
-  
+
   if (!live) {
     useNoPerFrame();
     useNoAnimationFrame();
@@ -233,17 +233,21 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     useNoMemo();
     refresh()
   }
-  
+
+  const signal = useOne(() => quote(yeet()), fieldSources[0]?.version);
+
   if (on) {
     useNoMemo();
 
     const els = extend(on, layout);
     return gather(els, (sources: StorageSource[]) => {
       const s = [...fieldSources, ...sources];
-      return useMemo(() => render ? render(...s) : yeet(s), [render, fieldSources, sources]);
+      const view = useMemo(() => render ? render(...s) : yeet(s), [render, ...s]);
+      return [signal, view];
     });
   }
   else {
-    return useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
+    const view = useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
+    return [signal, view];
   }
 };

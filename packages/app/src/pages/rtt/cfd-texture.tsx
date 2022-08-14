@@ -33,13 +33,13 @@ const colorizeShader = wgsl`
     let value = textureLoad(velocityField, vec2<i32>(floor(uv * size)), 0);
     let tone = normalize(vec3<f32>(0.5 + value.xy, 1.0));
     let color = vec3<f32>(
-      tone.x * tone.x * tone.z + tone.y * tone.y * tone.y,
       tone.y * tone.z,
-      tone.z + tone.y * tone.y
+      tone.z + tone.y * tone.y,
+      tone.x * tone.x * tone.z + tone.y * tone.y * tone.y,
     ) * value.z;
 
     let b = color.b;
-    let boost = vec3<f32>(b*b*b*.25, b*b*.25 + b*.125, 0.0);
+    let boost = vec3<f32>(b*b*.25 + b*.125, 0.0, b*b*b*.25);
     let mapped = (1.0 - 1.0 / (max(vec3<f32>(0.0), (color + boost*0.5) * 2.0) + 1.0));
 
     return vec4<f32>(mapped, 1.0);

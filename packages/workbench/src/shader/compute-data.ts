@@ -1,5 +1,5 @@
 import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
-import type { StorageTarget, UniformType } from '@use-gpu/core';
+import type { StorageSource, StorageTarget, UniformType } from '@use-gpu/core';
 
 import { getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';
 import { use, wrap, provide, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';

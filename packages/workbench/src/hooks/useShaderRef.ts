@@ -27,7 +27,7 @@ export const useShaderRef = <T>(value?: T, source?: ShaderSource) => {
 export const useShaderRefs = <T>(...values: (Lazy<T> | T)[]): Lazy<T>[] => {
   let i = 0;
 
-  const refs = useOne(() => values.map((current: T) => 
+  const refs = useOne(() => values.map((current: any) => 
     typeof current === 'function' ? current :
     current.current != null ? current :
     {current}

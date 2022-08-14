@@ -52,7 +52,7 @@ export const React = {
           return mapReduce(toChildren(props?.children ?? children), props?.map, props?.reduce, props?.then, props?.fallback, props?.key);
 
         case RECONCILE:
-          return reconcile(toChildren(props?.children ?? children), props?.then, props?.key);
+          return reconcile(toChildren(props?.children ?? children), props?.key);
 
         case PROVIDE:
           return provide(props?.context, props?.value, toChildren(props?.children ?? children), props?.key);

@@ -1,16 +1,17 @@
 import React from 'react';
 import { useRefineCursor, Cursor } from '@use-gpu/state';
 import { OptionsContainer } from './layout';
+import { OptionState } from './types';
 
 export type OptionsProps = {
-  cursor: Cursor,
+  cursor: Cursor<OptionState>,
 };
 
 export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
   
   const useCursor = useRefineCursor(props.cursor);
-  const [runCounts, setRunCounts] = useCursor('counts');
-  const [fullSize, setFullSize] = useCursor('fullSize');
+  const [runCounts, setRunCounts] = useCursor<boolean>('counts');
+  const [fullSize, setFullSize] = useCursor<boolean>('fullSize');
   
   return (
     <OptionsContainer>

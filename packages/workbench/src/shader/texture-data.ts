@@ -1,5 +1,5 @@
 import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
-import type { ColorSpace, TextureTarget } from '@use-gpu/core';
+import type { ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, gather, yeet, fence, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';

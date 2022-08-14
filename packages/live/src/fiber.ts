@@ -16,6 +16,7 @@ let ID = 0;
 
 const NO_FIBER = () => () => {};
 const NOP = () => {};
+const EMPTY_FRAGMENT = {f: FRAGMENT, args: []};
 const EMPTY_ARRAY = [] as any[];
 const ROOT_PATH = [0] as Key[];
 const NO_CONTEXT = {
@@ -125,7 +126,7 @@ export const makeSubFiber = <F extends ArrowFunction>(
 export const makeNextFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   Next: LiveFunction<any>,
-  prefix?: string = 'Next',
+  prefix: string = 'Next',
   name?: string,
 ): LiveFiber<any> => {
 
@@ -388,8 +389,8 @@ export const mountFiberCall = <F extends ArrowFunction>(
 // Reconcile one call on a fiber as part of an incremental mapped set
 export const reconcileFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
-  call?: DeferredCall<any> | null,
-  key?: Key,
+  call: DeferredCall<any> | null | undefined,
+  key: Key,
   fenced?: boolean,
   path?: Key[],
   depth?: number,
@@ -401,7 +402,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   if (!order)  order  = fiber.order  = [];
   if (!seen)   seen   = fiber.seen   = new Set();
 
-  call = reactInterop(call, fiber);
+  call = reactInterop(call, fiber) as DeferredCall<any> | null;
   if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
 
   {
@@ -409,22 +410,22 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
     const nextMount = updateMount(fiber, mount, call as any, key);
 
     if (nextMount !== false) {
-      if (path != null) nextMount.path = path;
-      if (depth != null) nextMount.depth = depth;
-
       if (nextMount) {
+        if (path != null) nextMount.path = path;
+        if (depth != null) nextMount.depth = depth;
+
         if (nextMount !== mount) {
-          const i = order.findIndex((key) => compareFibers(mounts.get(key), nextMount) > 0);
-          if (i === -1) order.push(key);
-          else order.splice(i, 0, key);
+          const i = order!.findIndex((key) => compareFibers(mounts!.get(key)!, nextMount) > 0);
+          if (i === -1) order!.push(key);
+          else order!.splice(i, 0, key);
 
           mounts.set(key, nextMount);
         }
       }
       else {
         if (nextMount !== mount) {
-          mounts.delete(key);
-          order.splice(order.indexOf(key), 1);
+          mounts!.delete(key);
+          order!.splice(order!.indexOf(key), 1);
         }
       }
 
@@ -543,13 +544,13 @@ export const mountFiberQuote = <F extends ArrowFunction>(
   if (!fiber.quote) throw new Error("Can't quote outside of reconciler in " + formatNode(fiber));
 
   const key = fiber.id;
-  const call = Array.isArray(calls) ? fragment(calls) : calls ?? fragment();
+  const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   const {quote: {root, to}} = fiber;
 
-  reconcileFiberCall(to, call, key, true, fiber.path, fiber.depth + 1);
+  reconcileFiberCall(to, call as any, key, true, fiber.path, fiber.depth + 1);
 
-  const mount = to.mounts.get(key)!;
-  if (mount.unquote.from !== fiber) {
+  const mount = to.mounts!.get(key)!;
+  if (mount.unquote?.from !== fiber) {
     const quote = makeQuoteState(root, fiber, mount);
     mount.unquote = quote;
   }
@@ -566,12 +567,12 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   const {root, from} = unquote;
 
   const key = fiber.id;
-  const call = Array.isArray(calls) ? fragment(calls) : calls ?? fragment();
+  const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
 
-  reconcileFiberCall(from, call, key, true, fiber.path, fiber.depth + 1);
+  reconcileFiberCall(from, call as any, key, true, fiber.path, fiber.depth + 1);
 
-  const mount = from.mounts.get(key)!;
-  if (mount.quote.to !== fiber) {
+  const mount = from.mounts!.get(key)!;
+  if (mount.quote?.to !== fiber) {
     const unquote = makeQuoteState(root, mount, fiber);
     mount.quote = unquote;
   }
@@ -964,12 +965,12 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
   if (next) disposeFiber(next);
 
   if (fiber.type === QUOTE) {
-    const {to} = quote;
+    const {to} = quote!;
     reconcileFiberCall(to, null, id, true);
     pingFiber(to);
   }
   if (fiber.type === UNQUOTE) {
-    const {from} = unquote;
+    const {from} = unquote!;
     reconcileFiberCall(from, null, id, true);    
     pingFiber(from);
   }

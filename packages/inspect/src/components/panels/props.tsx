@@ -59,6 +59,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
       props = {map, reduce, children};
     }
     else if (f.name === 'CAPTURE') {
+      const [context] = args;
       props = {context};
     }
     else if (f.name === 'PROVIDE') {

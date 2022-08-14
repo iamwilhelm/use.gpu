@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core';
+import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
@@ -53,7 +53,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
     const renderToContext = (
       commandEncoder: GPUCommandEncoder,
-      context: UseRenderingContextGPU,
+      context: UseGPURenderContext,
       rs: RenderToPass[],
       countGeometry: RenderCounter,
     ) => {
@@ -113,7 +113,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
       device.queue.submit(queue);
 
-      const deferred: Promise<LiveElement>[] | null = null;
+      let deferred: Promise<LiveElement>[] | null = null;
       for (const f of readback) {
         const d = f();
         if (d) {

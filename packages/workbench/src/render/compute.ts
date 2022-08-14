@@ -2,8 +2,8 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 
 import { use, yeet, quote, memo, provide, multiGather, useContext, useMemo, setLogging } from '@use-gpu/live';
-import { DeviceContext } from '../providers/device-provider';
-import { ComputeContext, useComputeContext, useNoComputeContext } from '../providers/compute-provider';
+import { useDeviceContext } from '../providers/device-provider';
+import { useComputeContext } from '../providers/compute-provider';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 
@@ -30,7 +30,8 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
   const inspect = useInspectable();
 
   const Resume = (rs: Record<string, (ComputeToPass | CommandToBuffer | ArrowFunction)[]>) => {
-    const device = useContext(DeviceContext);
+    const device = useDeviceContext();
+    const context = useComputeContext();
 
     const computes = toArray(rs['compute'] as ComputeToPass[]);
     const pre      = toArray(rs['pre'] as CommandToBuffer[]);
@@ -70,7 +71,7 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
 
       device.queue.submit(queue);
 
-      const deferred: Promise<LiveElement>[] | null = null;
+      let deferred: Promise<LiveElement>[] | null = null;
       for (const f of readback) {
         const d = f();
         if (d) {
@@ -91,11 +92,10 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
     const view = immediate ? run() : quote(yeet(run));
     if (!then) return view;
 
+    const source = context;
     const children: LiveElement = [view];
-    const c = then(source);
-    if (c) children.push(
-      immediate ? provide(FrameContext, {current: source.version}, c) : c
-    );
+    const c = then();
+    if (c) children.push(c);
     return children.length > 1 ? children : children[0];
   };
 

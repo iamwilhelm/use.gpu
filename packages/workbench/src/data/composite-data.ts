@@ -240,7 +240,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     return gather(els, (sources: StorageSource[]) => {
       const s = [...fieldSources, ...sources];
       const view = useMemo(() => render ? render(...s) : yeet(s), [render, ...s]);
-      return [signal, view];
+      return [trigger, view];
     });
   }
   else {

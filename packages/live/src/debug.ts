@@ -23,12 +23,12 @@ export const setLogging = (options: LoggingOptions) => {
   for (let k in options) LOGGING[k] = (options as any)[k];
 };
 
-export const formatSnapshot = (arg: any) => {
+export const formatSnapshot = (arg: any): string => {
   const args = Array.isArray(arg) ? arg : (arg !== undefined ? [arg] : []);
   return args.map(formatSnapshotArg).join(' ');
 }
 
-export const formatSnapshotArg = (arg: any) => {
+export const formatSnapshotArg = (arg: any): string => {
   if (Array.isArray(arg)) return '[' + arg.map(formatSnapshotArg) + ']';
   if (typeof arg === 'object' && arg) {
     if (arg.f && arg.args && arg.by) {
@@ -51,7 +51,7 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
     out.push(formatTree(mount, depth + 1));
   }
 
-  if (mounts) {
+  if (mounts && order) {
     for (const key of order) {
       const sub = mounts.get(key);
       if (sub) out.push(formatTree(sub, depth + 1));

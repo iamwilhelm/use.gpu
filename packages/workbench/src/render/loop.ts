@@ -8,6 +8,7 @@ import { LoopContext } from '../providers/loop-provider';
 const NOP = () => {};
 
 export type LoopProps = {
+  live?: boolean,
   children?: LiveElement,
 };
 
@@ -18,9 +19,7 @@ export type LoopRef = {
     elapsed: number,
     start: number,
   },
-  frame: {
-    current: number,
-  },
+  frame: number,
   loop: {
     request?: (fiber?: LiveFiber<any>) => void,
   },
@@ -37,8 +36,8 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
       timestamp: -Infinity,
       elapsed: 0,
       delta: 0,
-      frame: 0,
     },
+    frame: 0,
     loop: {
       request: () => {},
     },
@@ -54,7 +53,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     let fibers: LiveFiber<any>[] = [];
 
     const render = (timestamp: number) => {
-      time.frame++;
+      ref.frame++;
       pending = false;
 
       if (time.timestamp === -Infinity) time.start = timestamp;
@@ -84,7 +83,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
   request!();
 
   const Dispatch = useCallback(tagFunction(() => {
-    const {time, loop, render, children} = ref;
+    const {time, loop, children} = ref;
 
     usePerFrame();
 
@@ -93,7 +92,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
     const t = {...time};
     return (
-      provide(FrameContext, time.frame,
+      provide(FrameContext, ref.frame,
         provide(TimeContext, t, view)
       )
     );

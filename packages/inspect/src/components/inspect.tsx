@@ -54,11 +54,13 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);
 
+  const useOption = useRefineCursor(optionCursor);
+
   const fibers = new Map<number, LiveFiber<any>>();
   const [selectedFiber, setSelected] = selectedCursor;
-  const [depthLimit, setDepthLimit] = useRefineCursor(optionCursor)('depth');
-  const [runCounts] = useRefineCursor(optionCursor)('counts');
-  const [fullSize] = useRefineCursor(optionCursor)('fullSize');
+  const [depthLimit, setDepthLimit] = useOption<number>('depth');
+  const [runCounts] = useOption<boolean>('counts');
+  const [fullSize] = useOption<boolean>('fullSize');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
   useLayoutEffect(() => {

@@ -56,7 +56,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
             texture
           );
 
-          return then ? [view, then(source)] : view;
+          return then ? [view, then(texture)] : view;
         },
       })
   );

@@ -1,4 +1,4 @@
-import type { StorageTarget } from '@use-gpu/core';
+import type { StorageTarget, TextureTarget } from '@use-gpu/core';
 
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 

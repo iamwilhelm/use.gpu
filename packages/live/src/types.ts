@@ -157,7 +157,7 @@ export type FiberYeet<A, B> = {
 };
 
 // Fiber quote state
-export type FiberQuote<T> = {
+export type FiberQuote<T extends ArrowFunction> = {
   root: LiveFiber<T>,
   from: LiveFiber<T>,
   to: LiveFiber<T>,

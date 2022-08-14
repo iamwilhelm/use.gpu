@@ -18,6 +18,8 @@ type NodeProps = {
   hovered?: number,
   depends?: boolean,
   precedes?: boolean,
+  quoted?: boolean,
+  unquoted?: boolean,
   parents?: boolean,
   depth?: number,
   runCount?: boolean,

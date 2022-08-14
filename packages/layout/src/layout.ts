@@ -4,11 +4,11 @@ import type { Placement } from '@use-gpu/traits';
 import type { FitInto, LayoutElement, LayoutPicker } from './types';
 
 import { parsePlacement, useProp } from '@use-gpu/traits';
-import { memo, yeet, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne } from '@use-gpu/live';
+import { memo, quote, yeet, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 
 import {
   DebugContext, MouseContext, WheelContext, ViewContext,
-  LayoutContext, useTransformContext, useScrollSignal,
+  LayoutContext, useTransformContext,
   useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
   useBoundShader, useNoBoundShader,
 } from '@use-gpu/workbench';
@@ -21,6 +21,7 @@ import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec2, vec3 } from 'gl-matrix';
 
 const LAYOUT_BINDINGS = bundleToAttributes(getLayoutPosition);
+const NOP = () => {};
 
 export type LayoutProps = {
   width?: number,
@@ -154,7 +155,10 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
 
   const { wheel } = useWheel();
   const [px, py] = screenToView(matrix, wheel.x / width * dpi * 2.0 - 1.0, 1.0 - wheel.y / height * dpi * 2.0);
-  
+
+  const versionRef = useOne(() => ({current: 0}));
+  let version = versionRef.current;
+
   useOne(() => {
     const { moveX, moveY, stopped } = wheel;
     if (stopped) return;
@@ -169,12 +173,13 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
       if (picked) {
         const [id, rectangle, onScroll] = picked;
         if (onScroll) onScroll(moveX, moveY);
-
-        useScrollSignal();
+        version = versionRef.current = incrementVersion(versionRef.current);
         return;
       }
     }
   }, wheel);
+
+  return useOne(() => quote(yeet(NOP)), version);
 }
 
 export const Inspect = (pickers: any[], flip: [number, number], shift: [number, number]) => {

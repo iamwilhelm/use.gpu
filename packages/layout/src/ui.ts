@@ -4,7 +4,7 @@ import type { UIAggregate } from './types';
 
 import {
   DeviceContext, DebugContext,
-  SDFFontProvider, ScrollProvider, SDF_FONT_ATLAS, 
+  SDFFontProvider, SDF_FONT_ATLAS, 
   useBufferedSize,
   UIRectangles,
 } from '@use-gpu/workbench';
@@ -41,12 +41,10 @@ export const UI: LiveComponent<UIProps> = (props) => {
   const {children} = props;
 
   return (
-    wrap(ScrollProvider, 
-      use(SDFFontProvider, {
-        children,
-        then: Resume,
-      })
-    )
+    use(SDFFontProvider, {
+      children,
+      then: Resume,
+    })
   );
 };
 
@@ -73,7 +71,6 @@ const Resume = (
     if ((layer[0] as any)?.f) return (layer as any);
     return keyed(Layer, layer[0]?.id, layer);
   });
-  els.push(yeet([]));
 
   return fragment(els);
 };

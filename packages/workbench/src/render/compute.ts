@@ -3,13 +3,11 @@ import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } fro
 
 import { use, yeet, quote, memo, provide, multiGather, useContext, useMemo, setLogging } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
-import { useComputeContext } from '../providers/compute-provider';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 
 export type ComputeProps = {
   immediate?: boolean,
-  then?: () => LiveElement,
 };
 
 type ComputeCounter = (d: number) => void;
@@ -31,11 +29,10 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
 
   const Resume = (rs: Record<string, (ComputeToPass | CommandToBuffer | ArrowFunction)[]>) => {
     const device = useDeviceContext();
-    const context = useComputeContext();
 
     const computes = toArray(rs['compute'] as ComputeToPass[]);
 
-    const nested   = toArray(rs['']         as CommandToBuffer[]);
+    const nested   = toArray(rs['']         as ArrowFunction[]);
     const post     = toArray(rs['post']     as CommandToBuffer[]);
     const readback = toArray(rs['readback'] as ArrowFunction[]);
 
@@ -95,14 +92,7 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
       return deferred ? use(Await, {all: deferred}) : null;
     };
 
-    const view = immediate ? run() : quote(yeet(run));
-    if (!then) return view;
-
-    const source = context;
-    const children: LiveElement = [view];
-    const c = then();
-    if (c) children.push(c);
-    return children.length > 1 ? children : children[0];
+    return immediate ? run() : quote(yeet(run));
   };
 
   if (!children) return null;

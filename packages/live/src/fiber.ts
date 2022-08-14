@@ -766,7 +766,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   if (!self) {
     if (fiber.next && fiber.f !== CAPTURE) return multiGatherFiberValues(fiber.next) as any;
     if (yeeted.value !== undefined) {
-      if (typeof yeeted.value === 'function' || Array.isArray(yeeted.value)) return {'' : yeeted.value};
+      if (typeof yeeted.value === 'function' || Array.isArray(yeeted.value)) return {'': yeeted.value};
       return yeeted.value;
     }
   }

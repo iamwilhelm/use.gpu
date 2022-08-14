@@ -41,7 +41,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     const debugs       = toArray(rs['debug']       as RenderToPass[]);
     const pickings     = toArray(rs['picking']     as RenderToPass[]);
 
-    const nested   = toArray(rs['']         as CommandToBuffer[]);
+    const nested   = toArray(rs['']         as ArrowFunction[]);
     const post     = toArray(rs['post']     as CommandToBuffer[]);
     const readback = toArray(rs['readback'] as ArrowFunction[]);
 

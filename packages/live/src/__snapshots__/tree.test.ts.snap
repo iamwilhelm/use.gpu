@@ -9,15 +9,6 @@ exports[`gathers yeeted values 1`] = `
     <Node> [1,2,3]"
 `;
 
-exports[`optimizes root quote/unquote pair 1`] = `
-"<Root> 
-  <First> <Quote> <Second> <Unquote> <First> <Quote> <Second> 
-    <First> <Quote> <Second> 
-  <Reconcile(Root)> <Unquote> <First> <Quote> <Second> <Unquote> <First> <Quote> <Second> 
-    <Second> <Unquote> <First> <Quote> <Second> 
-      <Second> "
-`;
-
 exports[`renders quote/unquote pairs 1`] = `
 "<Root> 
   <First> <Quote> <Second> <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
@@ -25,33 +16,34 @@ exports[`renders quote/unquote pairs 1`] = `
       <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
         <First> <First> <Quote> <Second> 
           <First> <Quote> <Second> 
-    <Reconcile(First)> <Second> <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
-      <Second> <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
-        <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
-          <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
-            <Unquote> <First> <First> <Quote> <Second> 
-              <Second> "
+  <Reconcile(Root)> 
+    <Second> <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+      <Second> <Unquote> <Quote> <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+        <Second> <Unquote> <First> <Quote> <Unquote> <First> <First> <Quote> <Second> 
+          <Unquote> <First> <First> <Quote> <Second> 
+            <Second> "
 `;
 
 exports[`renders quoted tree 1`] = `
 "<Root> 
   <Node> 
   <Quote> <Tree> 
-    <Reconcile(Quote)> <Tree> 
-      <Tree> 
-        <Node> <Node> <Node> 
-          <Node> <Node> 
-            <Node> 
-  <Node> "
+  <Node> 
+  <Reconcile(Root)> 
+    <Tree> 
+      <Node> <Node> <Node> 
+        <Node> <Node> 
+          <Node> "
 `;
 
 exports[`renders quoted/unquoted trees 1`] = `
 "<Root> 
-  <Quote> <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
-    <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
-      <First> <First> <Quote> <Second> 
-        <First> <Quote> <Second> 
-    <Reconcile(Quote)> <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+  <Reconcile> <Quote> <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+    <Quote> <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+      <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
+        <First> <First> <Quote> <Second> 
+          <First> <Quote> <Second> 
+    <Reconcile(…)> 
       <Second> <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
         <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
           <Second> <Unquote> <First> <First> <Quote> <Second> 

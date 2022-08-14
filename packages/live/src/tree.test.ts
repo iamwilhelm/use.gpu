@@ -1,5 +1,5 @@
 import type { LiveFiber, Task } from './types';
-import { use, keyed, detach, provide, gather, reconcile, yeet, quote, unquote, PROVIDE, makeContext } from './builtin';
+import { use, keyed, detach, provide, gather, yeet, reconcile, quote, unquote, PROVIDE, makeContext } from './builtin';
 import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext } from './hooks';
 import { renderSync } from './tree';
@@ -635,11 +635,11 @@ it("gathers yeeted values", () => {
 it("renders quoted tree", () => {
   
   const Root = () => {
-    return [
+    return reconcile([
       use(Node),
       quote(use(Tree)),
       use(Node),
-    ];
+    ]);
   };
 
   const Tree = () => use(Node, use(Node, use(Node)));
@@ -661,13 +661,13 @@ it("renders quoted/unquoted trees", () => {
   
   const Root = () => {
     return [
-      quote(
+      reconcile(quote(
         use(Second,
           use(Second,
             unquote(use(First, quote(use(Second, unquote(use(First, use(First, quote(use(Second)))))))))
           )
         )
-      ),
+      )),
     ];
   };
 
@@ -686,7 +686,7 @@ it("renders quoted/unquoted trees", () => {
 it("renders quote/unquote pairs", () => {
   
   const Root = () => {
-    return use(First,
+    return reconcile(use(First,
       quote(
         use(Second,
           use(Second,
@@ -697,26 +697,8 @@ it("renders quote/unquote pairs", () => {
             ))))
           )
         )
-      ),
+      )),
     );
-  };
-
-  const First = (children) => children;
-  const Second = (children) => children;
-  
-  const result = renderSync(use(Root));
-  if (!result.host) return;
-
-  const {host: {flush}} = result;
-  if (flush) flush();
-  
-  expect(formatTree(result)).toMatchSnapshot();
-});
-
-it("optimizes root quote/unquote pair", () => {
-  
-  const Root = () => {
-    return quote(unquote(use(First, quote(use(Second, unquote(use(First, quote(use(Second)))))))));
   };
 
   const First = (children) => children;

@@ -33,24 +33,24 @@ export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
 
   const {
     target,
-    resolution = 1,
     children,
     then,
   } = props;
 
   const renderContext = target ? (useNoContext(RenderContext), target) : useContext(RenderContext);
   const {source} = renderContext;
+  if (!source) throw new Error("No render target provided or in use");
 
   const Done = () => {
     const run = () => {
-      source.version = incrementVersion(source.version);
+      source!.version = incrementVersion(source!.version);
     };
 
     const view = quote(yeet(run));
     if (!then) return view;
 
     const children: LiveElement = [view];
-    const c = then(source);
+    const c = then(source!);
     if (c) children.push(c);
     return children.length > 1 ? children : children[0];
   };

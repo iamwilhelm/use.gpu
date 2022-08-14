@@ -61,9 +61,11 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     };
 
     const f = history ? targets.flatMap(
-      t => typeof history === 'number'
-      ? t?.history.slice(0, history)
-      : t?.history
+      t => (
+        typeof history === 'number'
+        ? t?.history?.slice(0, history)
+        : t?.history
+      ) as StorageSource[] | null
     ) : [];
     const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
       ? getDerivedSource(s as any, {readWrite: false}) : s);

@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { Gather, Yeet, Reconcile, Quote, Unquote } from '@use-gpu/live';
 
 import {
@@ -15,7 +15,7 @@ export const DebugQuotePage: LC = () => {
   ''
   );
   
-  const Foo = ({children}) => <>{children}</>;
+  const Foo = ({children}: PropsWithChildren<object>) => <>{children}</>;
   
   return (
     <Reconcile>

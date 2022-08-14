@@ -26,7 +26,6 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
   const {
     picking = true,
     children,
-    render,
   } = props;
 
   const inspect = useInspectable();

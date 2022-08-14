@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core';
 
-import { use, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { use, yeet, quote, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { PickingContext } from './picking';
@@ -10,7 +10,6 @@ import { Await } from './await';
 
 export type PassProps = {
   picking?: boolean,
-  render?: () => LiveElement<any>,
 };
 
 type RenderCounter = (v: number, t: number) => void;
@@ -79,7 +78,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
       passEncoder.end();
     };
 
-    return yeet(() => {
+    return quote(yeet(() => {
       let vs = 0;
       let ts = 0;
       let ds = 0;
@@ -129,8 +128,8 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
       });
 
       return deferred.length ? use(Await, {all: deferred}) : null;
-    });
+    }));
   };
 
-  return multiGather(children ?? (render ? render() : null), Resume);
+  return multiGather(children, Resume);
 }, 'Pass');

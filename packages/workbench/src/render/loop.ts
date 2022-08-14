@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveFiber, Task } from '@use-gpu/live';
-import { use, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
+import { use, quote, yeet, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
 
 import { FrameContext, usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
@@ -10,7 +10,6 @@ const NOP = () => {};
 export type LoopProps = {
   live?: boolean,
   children?: LiveElement<any>,
-  render?: () => LiveElement<any>,
 };
 
 export type LoopRef = {
@@ -27,13 +26,11 @@ export type LoopRef = {
     request?: (fiber?: LiveFiber<any>) => void,
   },
   children?: LiveElement<any>,
-  render?: () => LiveElement<any>,
-
   dispatch?: () => void,
 };
 
 export const Loop: LiveComponent<LoopProps> = (props) => {
-  const {live, children, render} = props;
+  const {live, children} = props;
 
   if (!live) usePerFrame();
   else useNoPerFrame();
@@ -52,11 +49,9 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
       request: () => {},
     },
     children,
-    render,
   }));
 
   ref.children = children;
-  ref.render = render;
 
   const request = useResource((dispose) => {
     const {time, frame, loop} = ref;
@@ -96,10 +91,16 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
   const Dispatch = useCallback(tagFunction(() => {
     const {time, frame, loop, render, children} = ref;
+
+    const view = useOne(() => {
+      const signal = quote(yeet());
+      return Array.isArray(children) ? [signal, ...children] : [signal, children];
+    }, children);
+
     return (
       provide(LoopContext, loop,
         provide(FrameContext, {...frame},
-          provide(TimeContext, {...time}, render ? render() : children ?? null)
+          provide(TimeContext, {...time}, view)
         )
       )
     );

@@ -1032,7 +1032,7 @@ export const updateMount = <P extends ArrowFunction>(
     const aa = newMount?.arg;
     const args = aas !== undefined ? aas : (aa !== undefined ? [aa] : undefined);
 
-    if (mount!.args === args && !to?.isImperativeFunction) {
+    if (mount!.args === args && !to?.isImperativeFunction && !(to === YEET && !args) && !(to === QUOTE)) {
       LOG && console.log('Skipping', key, formatNode(newMount!));
       return false;
     }

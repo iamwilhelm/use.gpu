@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/traits';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
-import { provide, use, useContext, useOne } from '@use-gpu/live';
+import { provide, use, quote, yeet, useContext, useOne } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
@@ -92,7 +92,8 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const frame = useOne(() => ({ current: 0 }));
   frame.current++;
 
-  return (
+  return [
+    quote(yeet()),
     provide(FrameContext, {...frame},
       use(ViewProvider, {
         defs: VIEW_UNIFORMS,
@@ -100,5 +101,5 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
         children: provide(LayoutContext, layout, children),
       })
     )
-  );
+  ];
 };

@@ -114,7 +114,7 @@ export const RTTCFDComputePage: LC = () => {
           ]: StorageTarget[]) => (<>
 
             <Pick all move render={({x, y, moveX, moveY}) => (
-              <Compute>
+              <Compute immediate>
                 <Stage target={velocity}>
                   <Kernel shader={pushVelocity} args={[[x / 2, y / 2], [moveX, moveY]]} />
                 </Stage>

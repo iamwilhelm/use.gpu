@@ -1,16 +1,14 @@
 
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 
-import { use, yeet, memo, provide, multiGather, useContext, useMemo, setLogging } from '@use-gpu/live';
+import { use, yeet, quote, memo, provide, multiGather, useContext, useMemo, setLogging } from '@use-gpu/live';
 import { DeviceContext } from '../providers/device-provider';
 import { ComputeContext, useComputeContext, useNoComputeContext } from '../providers/compute-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 
 export type ComputeProps = {
-  live?: boolean,
-  render?: () => LiveElement<any>,
+  immediate?: boolean,
 };
 
 type ComputeCounter = (d: number) => void;
@@ -23,20 +21,14 @@ const toArray = <T>(x: T[]): T[] => Array.isArray(x) ? x : [];
 /** Combination of `<Draw>` + `<Pass>` that only does compute shaders */
 export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeProps>) => {
   const {
-    live = false,
+    immediate,
     children,
-    render,
   } = props;
 
   const inspect = useInspectable();
 
-  if (live) usePerFrame();
-  else useNoPerFrame();
-
   const Resume = (rs: Record<string, (ComputeToPass | CommandToBuffer | ArrowFunction)[]>) => {
     const device = useContext(DeviceContext);
-
-    usePerFrame();
 
     const computes = toArray(rs['compute'] as ComputeToPass[]);
     const pre      = toArray(rs['pre'] as CommandToBuffer[]);
@@ -54,44 +46,47 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
       passEncoder.end();
     };
 
-    let ds = 0;
+    const run = () => {
+      let ds = 0;
 
-    const countDispatch = (d: number) => { ds += d; };
+      const countDispatch = (d: number) => { ds += d; };
 
-    const queue: GPUCommandBuffer[] = []
-    for (const f of pre) {
-      const q = f();
-      if (q) queue.push(q);
-    }
+      const queue: GPUCommandBuffer[] = []
+      for (const f of pre) {
+        const q = f();
+        if (q) queue.push(q);
+      }
 
-    const commandEncoder = device.createCommandEncoder();
-    if (computes.length) computeToContext(commandEncoder, computes, countDispatch);
-    queue.push(commandEncoder.finish());
+      const commandEncoder = device.createCommandEncoder();
+      if (computes.length) computeToContext(commandEncoder, computes, countDispatch);
+      queue.push(commandEncoder.finish());
 
-    for (const f of post) {
-      const q = f();
-      if (q) queue.push(q);
-    }
+      for (const f of post) {
+        const q = f();
+        if (q) queue.push(q);
+      }
 
-    device.queue.submit(queue);
+      device.queue.submit(queue);
 
-    const deferred: Promise<LiveElement<any>>[] = [];
-    for (const f of readback) {
-      const d = f();
-      if (d) deferred.push(d);
-    }
+      const deferred: Promise<LiveElement<any>>[] = [];
+      for (const f of readback) {
+        const d = f();
+        if (d) deferred.push(d);
+      }
 
-    inspect({
-      render: {
-        dispatchCount: ds,
-      },
-    });
+      inspect({
+        render: {
+          dispatchCount: ds,
+        },
+      });
 
-    return deferred.length ? use(Await, {all: deferred}) : null;
+      return deferred.length ? use(Await, {all: deferred}) : null;
+    };
+
+    return immediate ? run() : quote(yeet(run));
   };
 
-  const content = render ? render() : children;
-  if (!content) return null;
+  if (!children) return null;
 
-  return multiGather(content, Resume);
+  return multiGather(children, Resume);
 }, 'Compute');

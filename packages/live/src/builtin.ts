@@ -61,6 +61,9 @@ export const SIGNAL       = () => {};
 
 (FRAGMENT     as any).isLiveInline = true;
 
+/** @hidden */
+export const EMPTY_FRAGMENT = {f: FRAGMENT, args: []};
+
 // Inline render ops
 type UseArgs<F> = F extends ArrowFunction ? Parameters<F> : any[];
 

@@ -4,7 +4,7 @@ import type {
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
 
-import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, RECONCILE, QUOTE, UNQUOTE, SIGNAL } from './builtin';
+import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, RECONCILE, QUOTE, UNQUOTE, SIGNAL, EMPTY_FRAGMENT } from './builtin';
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
@@ -16,7 +16,6 @@ let ID = 0;
 
 const NO_FIBER = () => () => {};
 const NOP = () => {};
-const EMPTY_FRAGMENT = {f: FRAGMENT, args: []};
 const EMPTY_ARRAY = [] as any[];
 const ROOT_PATH = [0] as Key[];
 const NO_CONTEXT = {
@@ -766,7 +765,10 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   if (!yeeted) throw new Error("Reduce without aggregator");
   if (!self) {
     if (fiber.next && fiber.f !== CAPTURE) return multiGatherFiberValues(fiber.next) as any;
-    if (yeeted.value !== undefined) return yeeted.value;
+    if (yeeted.value !== undefined) {
+      if (typeof yeeted.value === 'function' || Array.isArray(yeeted.value)) return {'' : yeeted.value};
+      return yeeted.value;
+    }
   }
 
   if (yeeted.reduced !== undefined) return yeeted.reduced;

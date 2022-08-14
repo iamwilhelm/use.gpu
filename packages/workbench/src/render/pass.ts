@@ -41,7 +41,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     const debugs       = toArray(rs['debug']       as RenderToPass[]);
     const pickings     = toArray(rs['picking']     as RenderToPass[]);
 
-    const pre      = toArray(rs['pre']      as CommandToBuffer[]);
+    const nested   = toArray(rs['']         as CommandToBuffer[]);
     const post     = toArray(rs['post']     as CommandToBuffer[]);
     const readback = toArray(rs['readback'] as ArrowFunction[]);
 
@@ -85,11 +85,17 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
       const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
       const countDispatch = (d: number) => { ds += d; };
 
-      const queue: GPUCommandBuffer[] = []
-      for (const f of pre) {
-        const q = f();
-        if (q) queue.push(q);
+      let deferred: Promise<LiveElement>[] | null = null;
+
+      for (const f of nested) {
+        const d = f();
+        if (d) {
+          if (!deferred) deferred = [];
+          deferred.push(d);
+        }
       }
+
+      const queue: GPUCommandBuffer[] = []
 
       const commandEncoder = device.createCommandEncoder();
       if (computes.length) computeToContext(commandEncoder, computes, countDispatch);
@@ -112,7 +118,6 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
       device.queue.submit(queue);
 
-      let deferred: Promise<LiveElement>[] | null = null;
       for (const f of readback) {
         const d = f();
         if (d) {

@@ -25,6 +25,7 @@ Live is designed to play nice with real React, but shares no code with it.
 - **Continuations** - Parents can run more code after children have rendered.
 - **Context captures** - Context providers in reverse. Parent gathers values sparsely from a sub-tree.
 - **Yeet-Reduce** - Gather values with incremental map-reduce along an entire sub-tree.
+- **Quote and Reconcile** - Reconcile components into new sub-trees incrementally (aka `react-react`).
 - **Morph** - Parents can change Component type without unmounting all children.
 - **Detach** - Parent can decide when to dispatch render to children.
 

@@ -299,7 +299,10 @@ export const updateFiber = <F extends ArrowFunction>(
   }
 
   // If fiber type changed, remount everything
-  if (fiber.type && fiberType !== fiber.type) disposeFiberState(fiber);
+  if (fiber.type && fiberType !== fiber.type) {
+    console.log('dispose update', fiber.id, fiber.type, fiberType)
+    disposeFiberState(fiber);
+  }
   fiber.type = fiberType as any;
 
   // Reconcile literal array
@@ -531,7 +534,7 @@ export const mountFiberQuote = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any> | LiveElement<any>[],
 ) => {
-  if (!fiber.quote) throw new Error("Can't quote outside of reconciler");
+  if (!fiber.quote) throw new Error("Can't quote outside of reconciler in " + formatNode(fiber));
 
   const key = fiber.id;
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? fragment();
@@ -554,7 +557,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   calls: LiveElement<any> | LiveElement<any>[],
 ) => {
-  if (!fiber.unquote) throw new Error("Can't unquote outside of quote");
+  if (!fiber.unquote) throw new Error("Can't unquote outside of quote in " + formatNode(fiber));
   
   const {id, unquote} = fiber;
   const {root, from, to} = unquote;
@@ -844,7 +847,10 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : (element as any)?.f;
 
-  if (fiber.type && fiber.type !== fiberType) disposeFiberState(fiber);
+  if (fiber.type && fiber.type !== fiberType) {
+    console.log('dispose inline', fiber.id, fiber.type, fiberType)
+    disposeFiberState(fiber);
+  }
   fiber.type = fiberType;
 
   if (isArray) reconcileFiberCalls(fiber, element as any);
@@ -956,6 +962,7 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
 // Dispose of a fiber's mounted sub-fibers
 export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   const {id, next, quote, unquote} = fiber;
+  console.log('disposeFiberState', fiber.id)
 
   disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
@@ -973,8 +980,6 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
   visitYeetRoot(fiber);
 
   fiber.next = null;
-  fiber.quote = null;
-  fiber.unquote = null;
 }
 
 // Dispose of a fiber's mounted sub-fibers

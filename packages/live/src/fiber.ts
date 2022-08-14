@@ -299,10 +299,7 @@ export const updateFiber = <F extends ArrowFunction>(
   }
 
   // If fiber type changed, remount everything
-  if (fiber.type && fiberType !== fiber.type) {
-    console.log('dispose update', fiber.id, fiber.type, fiberType)
-    disposeFiberState(fiber);
-  }
+  if (fiber.type && fiberType !== fiber.type) disposeFiberState(fiber);
   fiber.type = fiberType as any;
 
   // Reconcile literal array
@@ -847,10 +844,7 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : (element as any)?.f;
 
-  if (fiber.type && fiber.type !== fiberType) {
-    console.log('dispose inline', fiber.id, fiber.type, fiberType)
-    disposeFiberState(fiber);
-  }
+  if (fiber.type && fiber.type !== fiberType) disposeFiberState(fiber);
   fiber.type = fiberType;
 
   if (isArray) reconcileFiberCalls(fiber, element as any);
@@ -962,18 +956,19 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
 // Dispose of a fiber's mounted sub-fibers
 export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   const {id, next, quote, unquote} = fiber;
-  console.log('disposeFiberState', fiber.id)
 
   disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
 
-  if (quote && quote.root !== fiber && quote.from === fiber) {
+  if (fiber.type === QUOTE) {
     const {to} = quote;
     reconcileFiberCall(to, null, id, true);
+    pingFiber(to);
   }
-  if (unquote && unquote.to === fiber) {
+  if (fiber.type === UNQUOTE) {
     const {from} = unquote;
     reconcileFiberCall(from, null, id, true);    
+    pingFiber(from);
   }
 
   bustFiberYeet(fiber);

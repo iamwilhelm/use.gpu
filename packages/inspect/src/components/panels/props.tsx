@@ -52,7 +52,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
 
   if (args !== undefined) {
     if (f.name === 'YEET') {
-      props = {yeet: args[0]};
+      props = {};
     }
     if (f.name === 'MAP_REDUCE') {
       const [children, map, reduce] = args;
@@ -79,7 +79,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
 
   let yt = yeeted?.value != null ? (<>
     <div><b>Yeeted</b></div>
-    <div>{inspectObject(yeeted?.value, state, toggleState, '')}</div>
+    <div>{inspectObject({value: yeeted?.value}, state, toggleState, '')}</div>
   </>) : null;
 
   let showProps = f !== YEET;

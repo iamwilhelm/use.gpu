@@ -115,7 +115,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
 
   const [transform, differential] = useCombinedTransform(xform, null, e);
 
-  const rangeMemo = useOne(() => range, JSON.stringify(range));
+  const rangeMemo = useOne(() => g, JSON.stringify(g));
 
   return [
     signal(),

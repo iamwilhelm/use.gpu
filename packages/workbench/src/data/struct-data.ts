@@ -4,7 +4,7 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
 
-import { yeet, useMemo, useNoMemo, useOne } from '@use-gpu/live';
+import { yeet, signal, useMemo, useNoMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { incrementVersion } from '@use-gpu/live';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';

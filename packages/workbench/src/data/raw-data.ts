@@ -9,7 +9,6 @@ import {
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -36,8 +35,8 @@ export type RawDataProps = {
   live?: boolean,
   time?: boolean,
 
-  render?: (...source: ShaderSource[]) => LiveElement<any>,
-  children?: LiveElement<any>,
+  render?: (...source: ShaderSource[]) => LiveElement,
+  children?: LiveElement,
 };
 
 export const RawData: LiveComponent<RawDataProps> = (props) => {
@@ -123,12 +122,10 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   };
 
   if (!live) {
-    useNoPerFrame();
     useNoAnimationFrame();
     useMemo(refresh, [device, buffer, array, data, expr, count, dims]);
   }
   else {
-    usePerFrame();
     useAnimationFrame();
     useNoMemo();
     refresh();
@@ -138,6 +135,5 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   const view = sources
     ? useMemo(() => render ? render(...sources!) : yeet(sources!), [render, sources])
     : useMemo(() => render ? render(source) : yeet(source), [render, source]);
-
   return [signal, view];
 };

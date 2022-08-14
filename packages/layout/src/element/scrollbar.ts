@@ -33,7 +33,7 @@ export type ScrollBarProps = {
   sizeRef?: Point4,
   transform?: ShaderModule,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 const NO_POINT: Point = [0, 0];
@@ -70,7 +70,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   const thumbTransform = useBoundShader(getScrolledPosition, OFFSET_BINDINGS, [shift]);
 
   const fit = (into: FitInto) => {
-    let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => {
+    let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement => {
       const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
 
       const w = isX ? outerWidth : size;

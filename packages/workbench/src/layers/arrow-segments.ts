@@ -11,7 +11,7 @@ export type ArrowSegmentsProps = {
   starts?: boolean[],
   ends?: boolean[],
 
-  render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource, lookups: StorageSource) => LiveElement<any>,
+  render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource, lookups: StorageSource) => LiveElement,
 };
 
 /** Produces `segments`, `anchors`, `trims` composite data for `@{ArrowLayer}`. */

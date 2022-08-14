@@ -11,7 +11,7 @@ const READBACK_SOURCE = { flags: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_RE
 
 export type ReadbackProps = {
   source: StorageSource,
-  then?: (data: TypedArray) => LiveElement<any>,
+  then?: (data: TypedArray) => LiveElement,
 };
 
 export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps) => {

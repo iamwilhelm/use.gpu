@@ -25,8 +25,8 @@ export type SampledProps = {
   index?: boolean,
   time?: boolean,
 
-  render?: (source: StorageSource) => LiveElement<any>,
-  children?: LiveElement<any>,
+  render?: (source: StorageSource) => LiveElement,
+  children?: LiveElement,
 };
 
 export const Sampled: LiveComponent<SampledProps> = (props) => {

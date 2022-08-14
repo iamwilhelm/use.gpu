@@ -9,7 +9,7 @@ export type FaceSegmentsProps = {
   chunks?: number[],
   loops?: boolean[],
 
-  render?: (segments: StorageSource, lookups: StorageSource) => LiveElement<any>,
+  render?: (segments: StorageSource, lookups: StorageSource) => LiveElement,
 };
 
 /** Produces `segments` and `lookups` composite data for `@{FaceLayer}`. */

@@ -9,7 +9,6 @@ import {
 
 import { DeviceContext } from '../providers/device-provider';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
@@ -25,7 +24,7 @@ export type ArrayDataProps = {
   live?: boolean,
   time?: boolean,
 
-  render?: (source: StorageSource) => LiveElement<any>,
+  render?: (source: StorageSource) => LiveElement,
 };
 
 export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
@@ -86,19 +85,16 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   };
 
   if (!live) {
-    useNoPerFrame();
     useNoAnimationFrame();
     useMemo(refresh, [device, buffer, array, data, expr, dims, length, items]);
   }
   else {
-    usePerFrame();
     useAnimationFrame();
     useNoMemo();
     refresh();
   }
 
-  return useMemo(() => [
-    quote(yeet()),
-    render ? render(source) : yeet(source),
-  ], [render, source]);
+  const signal = useOne(() => quote(yeet()), source.version);
+  const view = useMemo(() => render ? render(source) : yeet(source), [render, source]);
+  return [signal, view];
 };

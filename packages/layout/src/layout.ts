@@ -28,8 +28,8 @@ export type LayoutProps = {
   height?: number,
   placement?: Placement,
   inspect?: boolean,
-  render?: () => LiveElement<any>,
-  children?: LiveElement<any>,
+  render?: () => LiveElement,
+  children?: LiveElement,
 };
 
 const DEFAULT_PLACEMENT = vec2.fromValues(1, 1);

@@ -5,7 +5,7 @@ import { render as renderLive, use, morph, resolveRootNode } from '@use-gpu/live
 
 export type LiveProps = {
   /** Live child to render (must be 1) */
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 /**

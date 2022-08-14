@@ -9,7 +9,7 @@ export const useSuspenseContext = () => useContext(SuspenseContext);
 export const useNoSuspenseContext = () => useNoContext(SuspenseContext);
 
 type SuspenseProps = {
-  fallback?: LiveElement<any>,
+  fallback?: LiveElement,
 };
 
 export const Suspense: LiveComponent<SuspenseProps> = (props: PropsWithChildren<SuspenseProps>) => {

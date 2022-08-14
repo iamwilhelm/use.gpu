@@ -9,7 +9,6 @@ import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { incrementVersion } from '@use-gpu/live';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
@@ -23,8 +22,8 @@ export type StructDataProps = {
   format: ShaderModule,
   live?: boolean,
 
-  render?: (...source: ShaderSource[]) => LiveElement<any>,
-  children?: LiveElement<any>,
+  render?: (...source: ShaderSource[]) => LiveElement,
+  children?: LiveElement,
 };
 
 export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructDataProps>) => {
@@ -107,12 +106,10 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
   };
 
   if (!live) {
-    useNoPerFrame();
     useNoAnimationFrame();
     useMemo(refresh, [device, source, array, data, expr, count]);
   }
   else {
-    usePerFrame();
     useAnimationFrame();
     useNoMemo();
     refresh();

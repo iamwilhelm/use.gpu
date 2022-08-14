@@ -24,7 +24,7 @@ type CFDControlsProps = {
   container?: Element | null,
   render?: ({inspect}: {
     inspect: boolean,
-  }) => LiveElement<any>
+  }) => LiveElement
 };
 
 export const CFDControls: LC<CFDControlsProps> = (props: CFDControlsProps) => {

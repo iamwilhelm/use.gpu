@@ -8,7 +8,7 @@ import {
   useBufferedSize,
   UIRectangles,
 } from '@use-gpu/workbench';
-import { use, keyed, wrap, fragment, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, fragment, quote, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { hashBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
@@ -19,7 +19,7 @@ import {
 import { overlapBounds, joinBounds } from './lib/util';
 
 export type UIProps = {
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 const allCount = (a: number, b: UIAggregate): number => a + b.count + ((b as any).isLoop ? 3 : 0);
@@ -67,10 +67,11 @@ const Resume = (
 
   const layers = partitioner.resolve();
 
-  const els = layers.flatMap((layer, i): LiveElement<any> => {
+  const els = layers.flatMap((layer, i): LiveElement => {
     if ((layer[0] as any)?.f) return (layer as any);
     return keyed(Layer, layer[0]?.id, layer);
   });
+  els.push(quote(yeet()));
 
   return fragment(els);
 };

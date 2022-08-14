@@ -89,7 +89,7 @@ export const wrap = <F extends ArrowFunction>(
 export const extend = (
   calls: LiveNode<any>,
   props: Record<string, any>,
-): LiveElement<any> => {
+): LiveElement => {
   if (typeof calls === 'string') return null;
   if (typeof calls === 'function') return null;
   if (!calls) return calls;
@@ -151,7 +151,7 @@ export const mapReduce = <R, T>(
   calls?: LiveNode<any>,
   map?: (t: T) => R,
   reduce?: (a: R, b: R) => R,
-  then?: LiveFunction<(r: R) => LiveElement<any>>,
+  then?: LiveFunction<(r: R) => LiveElement>,
   fallback?: R,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MAP_REDUCE, args: [calls, map, reduce, then, fallback], key, by: getCurrentFiberID()} as any);
@@ -159,7 +159,7 @@ export const mapReduce = <R, T>(
 /** Gather items from a subtree, into a flat array. */
 export const gather = <T>(
   calls?: LiveNode<any>,
-  then?: LiveFunction<(r: T[]) => LiveElement<any>>,
+  then?: LiveFunction<(r: T[]) => LiveElement>,
   fallback?: T[],
   key?: Key,
 ): DeferredCall<() => void> => ({f: GATHER, args: [calls, then, fallback], key, by: getCurrentFiberID()} as any);
@@ -167,7 +167,7 @@ export const gather = <T>(
 /** Multi-gather items from a subtree, by object key. */
 export const multiGather = <T>(
   calls?: LiveNode<any>,
-  then?: LiveFunction<(r: Record<string, T[]>) => LiveElement<any>>,
+  then?: LiveFunction<(r: Record<string, T[]>) => LiveElement>,
   fallback?: Record<string, T[]>,
   key?: Key,
 ): DeferredCall<() => void> => ({f: MULTI_GATHER, args: [calls, then, fallback], key, by: getCurrentFiberID()} as any);
@@ -175,7 +175,7 @@ export const multiGather = <T>(
 /** Fence gathered items from a subtree. */
 export const fence = <T>(
   calls?: LiveNode<any>,
-  then?: LiveFunction<(r: T) => LiveElement<any>>,
+  then?: LiveFunction<(r: T) => LiveElement>,
   fallback?: T,
   key?: Key,
 ): DeferredCall<() => void> => ({f: FENCE, args: [calls, then, fallback], key, by: getCurrentFiberID()} as any);

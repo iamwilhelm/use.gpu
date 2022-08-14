@@ -17,7 +17,7 @@ export type FetchProps<T> = {
   fallback?: T,
   slow?: number,
 
-  render?: (t: T) => LiveElement<any>,
+  render?: (t: T) => LiveElement,
   then?: (t: T) => any,
 };
 

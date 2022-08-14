@@ -6,10 +6,10 @@ import { Queue, DeviceContext } from '@use-gpu/workbench';//'/providers/device-p
 
 import { mountGPUDevice } from '../web';
 
-export type ErrorRenderer = (e: Error) => LiveElement<any>;
+export type ErrorRenderer = (e: Error) => LiveElement;
 
 export type WebGPUProps = {
-  fallback: LiveElement<any> | ErrorRenderer,
+  fallback: LiveElement | ErrorRenderer,
 };
 
 export const WebGPU: LC<WebGPUProps> = ({fallback, children}) => {

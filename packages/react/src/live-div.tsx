@@ -7,9 +7,9 @@ export type LiveDivProps = {
   /** CSS styles to apply to the `<div>` */
   style?: Record<string, any>,
   /** Render prop for Live contents */
-  render?: (div: HTMLDivElement) => LiveElement<any>,
+  render?: (div: HTMLDivElement) => LiveElement,
   /** Render prop for Live contents (alternative) */
-  children?: (div: HTMLDivElement) => LiveElement<any>,
+  children?: (div: HTMLDivElement) => LiveElement,
 };
 
 /**

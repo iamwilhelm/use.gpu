@@ -14,7 +14,7 @@ const SIZE_BINDING = bundleToAttribute(plotArray, 'getSize');
 
 export type TransposeProps = {
   axes?: string,
-  render?: (source: LambdaSource) => LiveElement<any>,
+  render?: (source: LambdaSource) => LiveElement,
 };
 
 export const Transpose: LiveComponent<TransposeProps> = (props) => {

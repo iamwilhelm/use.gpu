@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 export type PlotProps = {
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Plot: LiveComponent<PlotProps> = (props) => {

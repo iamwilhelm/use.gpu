@@ -112,7 +112,7 @@ export const makeBoxLayout = (
   parentTransform?: ShaderModule,
 ) => {
   const [left, top, right, bottom] = box;
-  const out = [] as LiveElement<any>[];
+  const out = [] as LiveElement[];
   const n = sizes.length;
 
   if (update) update(box);
@@ -257,7 +257,7 @@ export const makeInlineLayout = (
   miniHash(left);
   key = miniHash(top);
   
-  const out: LiveElement<any>[] = [];
+  const out: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
     const el = render(lines, clip, transform, key);
     if (Array.isArray(el)) out.push(...(el as any[]));

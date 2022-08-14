@@ -19,7 +19,7 @@ export type AutoCanvasProps = {
   samples?: number,
 
   picking?: boolean,
-  children: LiveElement<any>,
+  children: LiveElement,
 }
 
 export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {

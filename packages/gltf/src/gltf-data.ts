@@ -23,7 +23,7 @@ export type GLTFDataProps = {
   data?: ArrayBuffer | string | Record<string, any>,
   base?: string,
   
-  render?: (gltf: GLTF) => LiveElement<any>,
+  render?: (gltf: GLTF) => LiveElement,
 };
 
 const resolveURL = (base: string, url: string) => new URL(url, base).href;
@@ -360,7 +360,7 @@ const accessorToType = (boxType: string, componentType: number): UniformType => 
 type Timeout = ReturnType<typeof setTimeout>;
 
 // If model is partially loaded, wait to see if more textures arrive before rendering.
-const Throttle = <T>(children: LiveElement<any>, delay: number = 300) => {
+const Throttle = <T>(children: LiveElement, delay: number = 300) => {
 
   let timer: Timeout | null = null;
 

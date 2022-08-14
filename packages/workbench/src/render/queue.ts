@@ -5,12 +5,11 @@ import {
   makeContext, useContext, useNoContext,
 } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { PickingContext } from './picking';
 
 export type QueueProps = {
   live?: boolean,
-  render?: () => LiveElement<any>,
+  render?: () => LiveElement,
 };
 
 export const Queue: LC<QueueProps> = (props: PropsWithChildren<QueueProps>): DeferredCall<any> => {
@@ -19,7 +18,7 @@ export const Queue: LC<QueueProps> = (props: PropsWithChildren<QueueProps>): Def
 };
 
 const Resume = (ts: ArrowFunction[]) => {
-  const children: LiveElement<any> = [];
+  const children: LiveElement = [];
   for (const task of ts) {
     const c = task();
     if (c) children.push(c);

@@ -15,7 +15,7 @@ import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
 
 export type LayersProps = {
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 const allCount = (a: number, b: LayerAggregate): number => a + b.count + ((b as any).loop ? 3 : 0);

@@ -11,7 +11,7 @@ export const useFontContext = () => useContext(FontContext);
 
 export type FontProviderProps = {
   fonts: Font[],
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 export const FontProvider: LiveComponent<FontProviderProps> = ({fonts, children}) => {

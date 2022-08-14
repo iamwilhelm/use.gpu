@@ -22,7 +22,7 @@ export type InlineProps = Partial<BoxTrait> & {
 
   wrap?: boolean,
   snap?: boolean,
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {

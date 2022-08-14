@@ -9,6 +9,7 @@ import { Await } from './await';
 
 export type ComputeProps = {
   immediate?: boolean,
+  then?: () => LiveElement,
 };
 
 type ComputeCounter = (d: number) => void;
@@ -18,11 +19,12 @@ type CommandToBuffer = () => GPUCommandBuffer;
 
 const toArray = <T>(x: T[]): T[] => Array.isArray(x) ? x : [];
 
-/** Combination of `<Draw>` + `<Pass>` that only does compute shaders */
+/** Simpler version of `<Pass>` that only does compute shaders */
 export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeProps>) => {
   const {
     immediate,
     children,
+    then,
   } = props;
 
   const inspect = useInspectable();
@@ -68,10 +70,13 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
 
       device.queue.submit(queue);
 
-      const deferred: Promise<LiveElement<any>>[] = [];
+      const deferred: Promise<LiveElement>[] | null = null;
       for (const f of readback) {
         const d = f();
-        if (d) deferred.push(d);
+        if (d) {
+          if (!deferred) deferred = [];
+          deferred.push(d);
+        }
       }
 
       inspect({
@@ -80,10 +85,18 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
         },
       });
 
-      return deferred.length ? use(Await, {all: deferred}) : null;
+      return deferred ? use(Await, {all: deferred}) : null;
     };
 
-    return immediate ? run() : quote(yeet(run));
+    const view = immediate ? run() : quote(yeet(run));
+    if (!then) return view;
+
+    const children: LiveElement = [view];
+    const c = then(source);
+    if (c) children.push(
+      immediate ? provide(FrameContext, {current: source.version}, c) : c
+    );
+    return children.length > 1 ? children : children[0];
   };
 
   if (!children) return null;

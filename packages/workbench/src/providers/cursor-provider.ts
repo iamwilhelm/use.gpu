@@ -10,7 +10,7 @@ export type CursorProps = {
 
 export type CursorProviderProps = {
   element: HTMLElement,
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 export const CursorProvider: LiveComponent<CursorProviderProps> = (props) => {

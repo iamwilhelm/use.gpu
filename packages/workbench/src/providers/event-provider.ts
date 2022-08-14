@@ -42,7 +42,7 @@ export type EventProviderProps = {
   mouse: MouseState,
   wheel: WheelState,
   keyboard: KeyboardState,
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 export type MouseState = {

@@ -24,7 +24,7 @@ type PlotControlsProps = {
   container?: Element | null,
   render?: ({normalize}: {
     normalize: boolean,
-  }) => LiveElement<any>
+  }) => LiveElement
 };
 
 export const PlotControls: LC<PlotControlsProps> = (props: PlotControlsProps) => {

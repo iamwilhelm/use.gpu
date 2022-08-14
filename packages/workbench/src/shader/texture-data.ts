@@ -26,9 +26,9 @@ export type TextureDataProps = {
   samples?: number,
   resolution?: number,
 
-  children?: LiveElement<any>,
-  render?: (texture: TextureTarget) => LiveElement<any>,
-  then?: (texture: TextureTarget) => LiveElement<any>,
+  children?: LiveElement,
+  render?: (texture: TextureTarget) => LiveElement,
+  then?: (texture: TextureTarget) => LiveElement,
 };
 
 export const TextureData: LiveComponent<TextureDataProps> = (props) => {
@@ -120,13 +120,13 @@ export const TextureData: LiveComponent<TextureDataProps> = (props) => {
       size,
       volatile,
       version: 0,
-    }) as TextureTarget;
+    }) as TextureSource;
 
     const sources = history ? seq(history).map(makeSource) : undefined;
 
-    const source = makeSource();
-    if (sources) source.history = sources;
+    const source = makeSource() as any as TextureTarget;
     source.swap = swap;
+    source.history = sources;
 
     return [source, sources];
   }, [targetTexture, width, height, format, history, sampler]);

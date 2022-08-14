@@ -3,8 +3,8 @@ import { useResource, useState } from '@use-gpu/live';
 
 export type AutoSizeProps = {
   canvas: HTMLCanvasElement,
-  render?: (width: number, height: number, pixelRatio: number) => LiveElement<any>,
-  children?: LiveElement<any>,
+  render?: (width: number, height: number, pixelRatio: number) => LiveElement,
+  children?: LiveElement,
 }
 
 const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number, number] => {

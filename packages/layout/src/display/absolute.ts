@@ -23,7 +23,7 @@ export type AbsoluteProps = Partial<ElementTrait> &
 
   under?: boolean,
   snap?: boolean,
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps) => {

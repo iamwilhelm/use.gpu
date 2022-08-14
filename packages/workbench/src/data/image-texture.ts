@@ -10,7 +10,7 @@ export type ImageTextureProps = {
   url?: string,
   colorSpace?: ColorSpace,
   sampler?: GPUSamplerDescriptor,
-  render?: (source: TextureSource) => LiveElement<any>,
+  render?: (source: TextureSource) => LiveElement,
 };
 
 export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {

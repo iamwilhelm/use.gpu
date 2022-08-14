@@ -1,15 +1,14 @@
 import type { LiveComponent, LiveElement, LiveFiber, Task } from '@use-gpu/live';
 import { use, quote, yeet, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
 
-import { FrameContext, usePerFrame, useNoPerFrame } from '../providers/frame-provider';
+import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
 import { LoopContext } from '../providers/loop-provider';
 
 const NOP = () => {};
 
 export type LoopProps = {
-  live?: boolean,
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export type LoopRef = {
@@ -25,15 +24,12 @@ export type LoopRef = {
   loop: {
     request?: (fiber?: LiveFiber<any>) => void,
   },
-  children?: LiveElement<any>,
+  children?: LiveElement,
   dispatch?: () => void,
 };
 
 export const Loop: LiveComponent<LoopProps> = (props) => {
   const {live, children} = props;
-
-  if (!live) usePerFrame();
-  else useNoPerFrame();
 
   const ref: LoopRef = useOne(() => ({
     time: {
@@ -41,9 +37,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
       timestamp: -Infinity,
       elapsed: 0,
       delta: 0,
-    },
-    frame: {
-      current: 0,
+      frame: 0,
     },
     loop: {
       request: () => {},
@@ -60,7 +54,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     let fibers: LiveFiber<any>[] = [];
 
     const render = (timestamp: number) => {
-      frame.current++;
+      time.frame++;
       pending = false;
 
       if (time.timestamp === -Infinity) time.start = timestamp;
@@ -90,17 +84,20 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
   request!();
 
   const Dispatch = useCallback(tagFunction(() => {
-    const {time, frame, loop, render, children} = ref;
+    const {time, loop, render, children} = ref;
+
+    usePerFrame();
 
     const view = useOne(() => {
       const signal = quote(yeet());
       return Array.isArray(children) ? [signal, ...children] : [signal, children];
     }, children);
 
+    const t = {...time};
     return (
-      provide(LoopContext, loop,
-        provide(FrameContext, {...frame},
-          provide(TimeContext, {...time}, view)
+      provide(FrameContext, time.frame,
+        provide(TimeContext, t,
+          provide(LoopContext, loop, view)
         )
       )
     );

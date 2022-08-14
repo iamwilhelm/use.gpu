@@ -23,7 +23,7 @@ export type BlockProps =
   snap?: boolean,
   contain?: boolean,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {

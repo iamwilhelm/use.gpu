@@ -41,8 +41,8 @@ export type SDFFontProviderProps = {
   height?: number,
   radius?: number,
   pad?: number,
-  children?: LiveElement<any>,
-  then?: (atlas: Atlas, source: ShaderSource, gathered: any) => LiveElement<any>
+  children?: LiveElement,
+  then?: (atlas: Atlas, source: ShaderSource, gathered: any) => LiveElement
 };
 
 const NO_MAPPING = [0, 0, 0, 0] as Rectangle;

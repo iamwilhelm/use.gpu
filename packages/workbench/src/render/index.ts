@@ -7,4 +7,5 @@ export * from './pass';
 export * from './picking';
 export * from './queue';
 export * from './stage';
+export * from './render-target';
 export * from './render-to-texture';

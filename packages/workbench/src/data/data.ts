@@ -8,7 +8,6 @@ import {
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
@@ -18,7 +17,7 @@ export type DataProps = {
   fields?: DataField[],
   live?: boolean,
 
-  render?: (...sources: StorageSource[]) => LiveElement<any>,
+  render?: (...sources: StorageSource[]) => LiveElement,
 };
 
 const NO_FIELDS = [] as DataField[];
@@ -79,18 +78,15 @@ export const Data: LiveComponent<DataProps> = (props) => {
   };
 
   if (!live) {
-    useNoPerFrame();
     useNoAnimationFrame();
     useMemo(refresh, [device, data, fieldBuffers, length]);
   }
   else {
-    usePerFrame();
     useAnimationFrame();
-    useNoMemo();
     refresh();
   }
 
-  const signal = useOne(() => quote(yeet()), source.version);
+  const signal = useOne(() => quote(yeet()), fieldSources[0]?.version);
   const view = useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
   return [signal, view];
 };

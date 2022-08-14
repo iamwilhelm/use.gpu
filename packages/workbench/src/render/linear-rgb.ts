@@ -1,14 +1,14 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TextureSource, ColorSpace } from '@use-gpu/core';
+import type { UseGPURenderContext, TextureSource, ColorSpace } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
-import { use, useOne } from '@use-gpu/live';
+import { gather, use, useOne } from '@use-gpu/live';
 import { Draw } from './draw';
 import { Pass } from './pass';
-import { RenderToTexture, RenderToTextureProps } from './render-to-texture';
+import { RenderTarget } from './render-target';
+import { RenderToTexture } from './render-to-texture';
 import { RawFullScreen } from '../primitives';
 
-//export type LinearRGBProps = Omit<RenderToTextureProps, "format" | "colorSpace">;
 export type LinearRGBProps = {
   width?: number,
   height?: number,
@@ -22,29 +22,42 @@ export type LinearRGBProps = {
   colorInput?: ColorSpace,
   samples?: number,
 
-  children?: LiveElement<any>,
-  then?: (texture: TextureSource) => LiveElement<any>,
+  children?: LiveElement,
+  then?: (texture: TextureSource) => LiveElement,
 };
 
-export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => ( 
-  use(RenderToTexture, {
-    ...props,
-    format: "rgba16float",
-    colorSpace: 'linear',
-    then: (texture: TextureSource) => 
-      useOne(() =>
-        use(Draw, {
-          children:
-            use(Pass, {
-              picking: false,
+export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => {
+  const {then, children, ...rest} = props;
+  
+  return gather(
+    use(RenderTarget, {
+      ...rest,
+      format: "rgba16float",
+      colorSpace: 'linear',
+    }),
+    ([target]: UseGPURenderContext[]) =>
+      use(RenderToTexture, {
+        target,
+        children,
+        then: (texture: TextureSource) => {
+          const {then} = props;
+
+          const view = useOne(() =>
+            use(Draw, {
               children:
-                use(RawFullScreen, {
-                  texture,
+                use(Pass, {
+                  picking: false,
+                  children:
+                    use(RawFullScreen, {
+                      texture,
+                    }),
                 }),
             }),
-        }),
-        texture
-      )
-  })
-);
+            texture
+          );
 
+          return then ? [view, then(source)] : view;
+        },
+      })
+  );
+};

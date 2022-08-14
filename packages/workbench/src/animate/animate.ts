@@ -21,8 +21,8 @@ export type AnimateProps<T> = {
   keyframes?: Keyframe<T>[],
   prop?: string,
 
-  children?: LiveElement<any>,
-  render?: (value: any) => LiveElement<any>,
+  children?: LiveElement,
+  render?: (value: any) => LiveElement,
 };
 
 const evaluateKeyframes = <T>(keyframes: Keyframe<T>[], time: number, ease: string) => {
@@ -95,12 +95,12 @@ const interpolateValue: Interpolator = <T>(a: any, b: any, t: number) => {
   return a;
 };
 
-const injectProp = (prop: string, value: any) => (call: LiveElement<any>): LiveElement<any> => {
+const injectProp = (prop: string, value: any) => (call: LiveElement): LiveElement => {
   if (typeof call === 'string') return null;
   if (!call) return call;
 
   const c = reactInterop(call);
-  if (Array.isArray(c)) return c.map(injectProp(prop, value)) as any as LiveElement<any>;
+  if (Array.isArray(c)) return c.map(injectProp(prop, value)) as any as LiveElement;
   if (c?.args) {
     const [props] = c.args;
     if (props) {

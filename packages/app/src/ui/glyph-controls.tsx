@@ -32,7 +32,7 @@ type GlyphControlsProps = {
     postprocess: boolean,
     glyph: string,
     orbit: boolean,
-  }) => LiveElement<any>
+  }) => LiveElement
 };
 
 export const GlyphControls: LC<GlyphControlsProps> = (props: GlyphControlsProps) => {

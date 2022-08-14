@@ -30,7 +30,7 @@ export type ViewContextProps = {
 export type ViewProviderProps = {
   defs: UniformAttribute[],
   uniforms: ViewUniforms,
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewProviderProps) => {

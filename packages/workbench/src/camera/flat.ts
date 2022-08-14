@@ -1,11 +1,11 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ViewUniforms, Rectangle } from '@use-gpu/core';
 
-import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, quote, yeet, provide, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
-import { RenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
+import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
 import { mat4, vec3 } from 'gl-matrix';
 
@@ -27,7 +27,7 @@ export type FlatProps = {
   near?: number,
   far?: number,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Flat: LiveComponent<FlatProps> = (props) => {
@@ -48,6 +48,8 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     height,
     pixelRatio,
   } = useContext(RenderContext);
+
+  usePerFrame();
 
   const [layout, matrix, ratio, w, h] = useMemo(() => {
     const unit = scale != null ? height / pixelRatio / scale : 1;
@@ -108,17 +110,17 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.viewWorldDepth.current = [focus * viewHeight / 2.0, viewHeight / (far - near) / 2.0];
   uniforms.viewPixelRatio.current = ratio;
 
-  usePerFrame();
-  const frame = useOne(() => ({ current: 0 }));
-  frame.current++;
+  const frame = useOne(() => ({current: 0}));
+  frame.current = incrementVersion(frame.current);
 
-  return (
-    provide(FrameContext, {...frame},
+  return [
+    quote(yeet()),
+    provide(FrameContext, frame.current, 
       use(ViewProvider, {
         defs: VIEW_UNIFORMS,
         uniforms,
         children: provide(LayoutContext, layout, children),
       })
-    )
-  );
+    ),
+  ];
 };

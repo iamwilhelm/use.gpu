@@ -90,7 +90,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
   const render = use(FaceLayer, faces);
 
-  let view: LiveElement<any> = render;
+  let view: LiveElement = render;
   if (transform) {
     const {normals, tangents} = faces;
 

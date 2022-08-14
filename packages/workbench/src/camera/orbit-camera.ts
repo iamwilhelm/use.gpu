@@ -3,12 +3,12 @@ import type { VectorLike } from '@use-gpu/traits';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
-import { provide, use, quote, yeet, useContext, useOne } from '@use-gpu/live';
+import { provide, use, quote, yeet, useContext, useOne, incrementVersion } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
+import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
-import { FrameContext, usePerFrame } from '../providers/frame-provider';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
@@ -37,7 +37,7 @@ export type OrbitCameraProps = {
   focus?: number,
   scale?: number | null,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 let t = 0;
@@ -88,18 +88,17 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.viewWorldDepth.current = [focus * Math.tan(fov / 2), 1];
   uniforms.viewPixelRatio.current = pixelRatio * unit;
 
-  usePerFrame();
-  const frame = useOne(() => ({ current: 0 }));
-  frame.current++;
+  const frame = useOne(() => ({current: 0}));
+  frame.current = incrementVersion(frame.current);
 
   return [
     quote(yeet()),
-    provide(FrameContext, {...frame},
+    provide(FrameContext, frame.current, 
       use(ViewProvider, {
         defs: VIEW_UNIFORMS,
         uniforms,
         children: provide(LayoutContext, layout, children),
       })
-    )
+    ),
   ];
 };

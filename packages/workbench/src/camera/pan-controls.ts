@@ -19,7 +19,7 @@ export type PanControlsProps = {
   centered?: boolean,
   version?: number,
 
-  render: (x: number, y: number, zoom: number) => LiveElement<any>,
+  render: (x: number, y: number, zoom: number) => LiveElement,
 };
 
 const DEFAULT_ANCHOR = [0.5, 0.5];

@@ -7,7 +7,6 @@ import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { FeedbackContext } from '../providers/feedback-provider';
 import { ComputeContext } from '../providers/compute-provider';
-import { FrameContext, usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
 import {
@@ -33,9 +32,9 @@ export type ComputeDataProps = {
   format?: UniformType,
   resolution?: number,
 
-  children?: LiveElement<any>,
-  render?: (source: StorageTarget) => LiveElement<any>,
-  then?: (source: StorageTarget) => LiveElement<any>,
+  children?: LiveElement,
+  render?: (source: StorageTarget) => LiveElement,
+  then?: (source: StorageTarget) => LiveElement,
 };
 
 export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
@@ -109,16 +108,14 @@ export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
       size,
       volatile,
       version: 0,
-      readWrite: false,
-      swap: NOP,
-    }) as StorageTarget;
+      readWrite,
+    }) as StorageSource;
 
     const sources = history ? seq(history).map(() => makeSource(false)) : undefined;
 
-    const source = makeSource(true);
+    const source = makeSource(true) as any as StorageTarget;
     source.swap = swap;
     source.history = sources;
-    source.readWrite = true;
 
     return [source, sources];
   }, [targetBuffer, width, height, depth, format, history]);

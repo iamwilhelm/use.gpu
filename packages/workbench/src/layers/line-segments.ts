@@ -9,7 +9,7 @@ export type LineSegmentsProps = {
   chunks?: number[],
   loops?: boolean[],
 
-  render?: (segments: StorageSource, lookups: StorageSource) => LiveElement<any>,
+  render?: (segments: StorageSource, lookups: StorageSource) => LiveElement,
 };
 
 /** Produces `segments` composite data for `@{LineLayer}`. */

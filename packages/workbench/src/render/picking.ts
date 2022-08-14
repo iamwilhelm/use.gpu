@@ -9,7 +9,7 @@ import {
 
 import { DeviceContext, RenderContext } from '../providers';
 import {
-  memo, use, provide, makeContext,
+  memo, use, provide, quote, yeet, makeContext,
   useMemo, useOne, useNoOne, useResource,
   useContext, useNoContext,
 } from '@use-gpu/live';
@@ -55,7 +55,7 @@ export type PickingProps = {
   depthStencilFormat?: GPUTextureFormat,
   resolution?: number,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 }
 
 const NOP = () => {};
@@ -173,5 +173,10 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
     return context;
   }, [device, renderContext, colorStates, depthStencilState, resolution]);
 
-  return provide(PickingContext, pickingContext, children);
+  return [
+    provide(PickingContext, pickingContext, children),
+    quote(yeet(() => {
+      pickingContext.captureTexture();
+    })),
+  ];
 };

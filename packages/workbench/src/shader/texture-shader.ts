@@ -14,7 +14,7 @@ import { toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
 export type TextureShaderProps = {
   shader?: ShaderModule,
   texture?: TextureSource,
-  render?: (source: ShaderModule) => LiveElement<any>,
+  render?: (source: ShaderModule) => LiveElement,
 };
 
 const TEXTURE_BINDING = { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [0, 0, 0, 0] } as UniformAttributeValue;

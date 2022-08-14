@@ -26,7 +26,7 @@ export type FlexProps =
 
   wrap?: boolean,
   snap?: boolean,
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {

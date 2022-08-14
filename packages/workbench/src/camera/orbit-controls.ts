@@ -26,7 +26,7 @@ export type OrbitControlsProps = {
   pitchSpeed?: number,
   moveSpeed?: number,
 
-  render: (phi: number, theta: number, radius: number, target: vec3) => LiveElement<any>,
+  render: (phi: number, theta: number, radius: number, target: vec3) => LiveElement,
 };
 
 export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {

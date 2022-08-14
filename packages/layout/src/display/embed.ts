@@ -19,8 +19,8 @@ export type EmbedProps = Partial<BoxTrait> &
   width?: Dimension,
   height?: Dimension,
   snap?: boolean,
-  render?: (key: number, layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement<any>,
-  children?: LiveElement<any>,
+  render?: (key: number, layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement,
+  children?: LiveElement,
 };
 
 export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {

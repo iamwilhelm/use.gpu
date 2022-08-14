@@ -6,7 +6,7 @@ import { resolve } from '@use-gpu/core';
 
 export type IterateProps = {
   count: Lazy<number>,
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Iterate: LiveComponent<IterateProps> = (props) => {

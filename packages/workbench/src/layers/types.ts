@@ -12,7 +12,7 @@ export type LayerAggregator = (
 ) => (
   items: LayerAggregate[],
   count: number,
-) => LiveElement<any>;
+) => LiveElement;
 
 export type PointAggregate = {
   id: number,

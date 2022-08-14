@@ -113,10 +113,13 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
       device.queue.submit(queue);
 
-      const deferred: Promise<LiveElement<any>>[] = [];
+      const deferred: Promise<LiveElement>[] | null = null;
       for (const f of readback) {
         const d = f();
-        if (d) deferred.push(d);
+        if (d) {
+          if (!deferred) deferred = [];
+          deferred.push(d);
+        }
       }
 
       inspect({
@@ -127,7 +130,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
         },
       });
 
-      return deferred.length ? use(Await, {all: deferred}) : null;
+      return deferred ? use(Await, {all: deferred}) : null;
     }));
   };
 

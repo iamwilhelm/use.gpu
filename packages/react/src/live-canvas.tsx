@@ -7,9 +7,9 @@ export type LiveCanvasProps = {
   /** CSS styles to apply to the `<canvas>` */
   style?: Record<string, any>,
   /** Render prop for Live contents */
-  render?: (canvas: HTMLCanvasElement) => LiveElement<any>,
+  render?: (canvas: HTMLCanvasElement) => LiveElement,
   /** Render prop for Live contents (alternative) */
-  children?: (canvas: HTMLCanvasElement) => LiveElement<any>,
+  children?: (canvas: HTMLCanvasElement) => LiveElement,
 };
 
 /**

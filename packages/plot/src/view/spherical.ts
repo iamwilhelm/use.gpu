@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale, useProp } from '@use-gpu/traits';
-import { use, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, quote, yeet, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext, DifferentialContext,
@@ -27,7 +27,7 @@ export type SphericalProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   helix?: number,
   on?: Swizzle,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Spherical: LiveComponent<SphericalProps> = (props) => {
@@ -154,11 +154,14 @@ export const Spherical: LiveComponent<SphericalProps> = (props) => {
 
   const [transform, differential] = useCombinedTransform(xform, null, e);
 
-  return (
+  const rangeMemo = useOne(() => range, JSON.stringify(range));
+
+  return [
+    quote(yeet()),
     provide(TransformContext, transform,
       provide(DifferentialContext, differential,
-        provide(RangeContext, range, children ?? [])
+        provide(RangeContext, rangeMemo, children ?? [])
       )
     )
-  );
+  ];
 };

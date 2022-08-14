@@ -31,7 +31,7 @@ export type CanvasProps = {
   samples?: number,
   pixelRatio?: number,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 }
 
 const getPixelRatio = () => typeof window !== 'undefined' ? window.devicePixelRatio : 1;

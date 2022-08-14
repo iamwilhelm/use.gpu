@@ -23,8 +23,8 @@ const SCALE_BINDINGS = bundleToAttributes(getScalePosition);
 
 export type ScaleProps = Partial<ScaleTrait> & Partial<AxisTrait> & {
   origin?: VectorLike,
-  render?: (positions: LambdaSource, values: Float32Array) => LiveElement<any>,
-  children?: LiveElement<any>,
+  render?: (positions: LambdaSource, values: Float32Array) => LiveElement,
+  children?: LiveElement,
 };
 
 export const Scale: LiveComponent<ScaleProps> = (props) => {

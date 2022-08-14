@@ -10,7 +10,7 @@ import { FontProvider } from './providers/font-provider';
 
 export type FontLoaderProps = {
   fonts: FontSource[],
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 export const FontLoader: LiveComponent<FontLoaderProps> = ({fonts, children}) => {

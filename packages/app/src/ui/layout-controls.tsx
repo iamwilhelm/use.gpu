@@ -21,7 +21,7 @@ const STYLE = {
 
 type LayoutControlsProps = {
   container?: Element | null,
-  render?: (mode: string) => LiveElement<any>,
+  render?: (mode: string) => LiveElement,
 };
 
 export const LayoutControls: LC<LayoutControlsProps> = (props: LayoutControlsProps) => {

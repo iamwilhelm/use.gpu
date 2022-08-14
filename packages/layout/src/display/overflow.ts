@@ -35,10 +35,10 @@ export type OverflowProps = {
   scrollX?: number,
   scrollY?: number,
 
-  scrollBar?: LiveElement<any>,
+  scrollBar?: LiveElement,
   
   direction?: Direction,
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps) => {

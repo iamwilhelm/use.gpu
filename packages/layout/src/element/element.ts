@@ -21,7 +21,7 @@ export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & {
   absolute?: boolean,
   under?: boolean,
 
-  children?: LiveElement<any>,
+  children?: LiveElement,
 };
 
 const TRANSPARENT: Point4 = [0, 0, 0, 0];
@@ -52,7 +52,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
     const size = [w ?? 0, h ?? 0];
 
-    let render = memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement<any> => (
+    let render = memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement => (
       keyed(UIRectangle, id, {
         id,
         layout,

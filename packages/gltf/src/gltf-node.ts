@@ -42,7 +42,7 @@ export const GLTFNode: LC<GLTFNodeProps> = memo((props: GLTFNodeProps) => {
   ) : null;
 
   if (children) {
-    const out: LiveElement<any>[] = [];
+    const out: LiveElement[] = [];
 
     if (self) out.push(self);
     out.push(...Array.from(children).map((node: number) => use(GLTFNode, {gltf, node})));

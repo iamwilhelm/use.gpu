@@ -12,7 +12,7 @@ const DELTA_MULTIPLIER = [1, 4, 80];
 
 export type DOMEventsProps = {
   element: HTMLElement,
-  children: LiveElement<any>,
+  children: LiveElement,
 };
 
 const toButton = (button: number) => {

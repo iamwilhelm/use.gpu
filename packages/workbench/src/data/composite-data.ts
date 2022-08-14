@@ -2,7 +2,6 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TypedArray, StorageSource, UniformType, Accessor, DataField, ChunkLayout } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
-import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { yeet, extend, quote, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
@@ -26,9 +25,9 @@ export type CompositeDataProps = {
   start?: <T>(t: T[]) => boolean,
   end?: <T>(t: T[]) => boolean,
   
-  on?: LiveElement<any>,
+  on?: LiveElement,
 
-  render?: (...sources: StorageSource[]) => LiveElement<any>,
+  render?: (...sources: StorageSource[]) => LiveElement,
 };
 
 const NO_FIELDS = [] as DataField[];
@@ -223,12 +222,10 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   };
 
   if (!live) {
-    useNoPerFrame();
     useNoAnimationFrame();
     useMemo(refresh, [device, data, fieldBuffers, count]);
   }
   else {
-    usePerFrame();
     useAnimationFrame();
     useNoMemo();
     refresh()

@@ -5,7 +5,7 @@ import { useAsync, useOne } from '@use-gpu/live';
 type AwaitProps<T> = {
   promise?: Promise<any>,
   all?: Promise<any>[],
-  then?: (value: T | null, error: Error | null) => LiveElement<any>,
+  then?: (value: T | null, error: Error | null) => LiveElement,
 };
 
 export const Await: LiveComponent<AwaitProps<unknown>> = <T>(props: AwaitProps<T>) => {

@@ -4,7 +4,7 @@ import type { Placement } from '@use-gpu/traits';
 import type { FitInto, LayoutElement, LayoutPicker } from './types';
 
 import { parsePlacement, useProp } from '@use-gpu/traits';
-import { memo, quote, yeet, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
+import { memo, signal, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 
 import {
   DebugContext, MouseContext, WheelContext, ViewContext,
@@ -21,7 +21,6 @@ import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec2, vec3 } from 'gl-matrix';
 
 const LAYOUT_BINDINGS = bundleToAttributes(getLayoutPosition);
-const NOP = () => {};
 
 export type LayoutProps = {
   width?: number,
@@ -179,7 +178,7 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
     }
   }, wheel);
 
-  return useOne(() => quote(yeet(NOP)), version);
+  return useOne(() => signal(), version);
 }
 
 export const Inspect = (pickers: any[], flip: [number, number], shift: [number, number]) => {

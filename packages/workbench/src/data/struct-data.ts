@@ -115,7 +115,7 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
     refresh();
   }
 
-  const signal = useOne(() => quote(yeet()), source.version);
+  const trigger = useOne(() => signal(), source.version);
   const view = useMemo(() => render ? render(source) : yeet(source), [render, source]);
-  return [signal, view];
+  return [trigger, view];
 };

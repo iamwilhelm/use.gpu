@@ -39,6 +39,8 @@ export const RECONCILE    = () => {};
 export const QUOTE        = () => {};
 /** @hidden */
 export const UNQUOTE      = () => {};
+/** @hidden */
+export const SIGNAL       = () => {};
 
 (MORPH        as any).isLiveBuiltin = true;
 (DETACH       as any).isLiveBuiltin = true;
@@ -55,6 +57,7 @@ export const UNQUOTE      = () => {};
 (RECONCILE    as any).isLiveBuiltin = true;
 (QUOTE        as any).isLiveBuiltin = true;
 (UNQUOTE      as any).isLiveBuiltin = true;
+(SIGNAL       as any).isLiveBuiltin = true;
 
 (FRAGMENT     as any).isLiveInline = true;
 
@@ -224,7 +227,10 @@ export const unquote = <T>(
 export const imperative = makeImperativeFunction;
 
 /** Yeet a suspend symbol. */
-export const suspend = () => yeet(SUSPEND);
+export const suspend = (key?: Key) => yeet(SUSPEND, key);
+
+/** Yeet a fast signal() signal. */
+export const signal = (key?: Key) => ({f: SIGNAL, args: null, key, by: getCurrentFiberID()} as any);
 
 /** LOL. Look, _you_ go try to make JSX.Element polymorphic. */
 export const into = (children: any): any => children;

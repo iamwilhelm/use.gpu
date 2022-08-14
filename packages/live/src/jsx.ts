@@ -1,7 +1,7 @@
 import { formatNodeName } from './debug';
 import {
-  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quote, unquote, reconcile,
-  CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, SUSPEND, FRAGMENT, QUOTE, UNQUOTE, RECONCILE,
+  capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quote, unquote, reconcile, suspend, signal,
+  CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, FRAGMENT, QUOTE, UNQUOTE, RECONCILE, SUSPEND, SIGNAL,
 } from './builtin';
 import { getCurrentFiberID } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
@@ -63,8 +63,11 @@ export const React = {
         case YEET:
           return yeet((props?.children ?? children)[0], props?.key);
 
+        case SIGNAL:
+          return signal(props?.key);
+
         case SUSPEND:
-          return yeet(SUSPEND, props?.key);
+          return suspend(props?.key);
 
         case QUOTE:
           return quote(toChildren(props?.children ?? children), props?.key);
@@ -76,7 +79,7 @@ export const React = {
           const c = props?.children ?? children;
           if (c.length === 1) return morph(c[0]);
           return c.map(morph);
-        
+
         default:
           throw new Error("Builtin `${formatNodeName({f: type})}` unsupported in JSX. Use raw function syntax instead.");
       }

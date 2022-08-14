@@ -112,6 +112,9 @@ export const formatNodeName = <F extends Function>(_node: LiveElement<F>): strin
   else if (name === 'UNQUOTE') {
     name = `Unquote`;
   }
+  else if (name === 'SIGNAL') {
+    name = `Signal`;
+  }
   else if (name === 'MORPH') {
     name = `Morph`;
   }

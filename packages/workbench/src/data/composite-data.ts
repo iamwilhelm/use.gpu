@@ -231,7 +231,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     refresh()
   }
 
-  const signal = useOne(() => quote(yeet()), fieldSources[0]?.version);
+  const trigger = useOne(() => signal(), fieldSources[0]?.version);
 
   if (on) {
     useNoMemo();
@@ -245,6 +245,6 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   }
   else {
     const view = useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
-    return [signal, view];
+    return [trigger, view];
   }
 };

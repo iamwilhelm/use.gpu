@@ -86,7 +86,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
     refresh();
   }
 
-  const signal = useOne(() => quote(yeet()), fieldSources[0]?.version);
+  const trigger = useOne(() => signal(), fieldSources[0]?.version);
   const view = useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
-  return [signal, view];
+  return [trigger, view];
 };

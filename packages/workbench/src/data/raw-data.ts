@@ -131,9 +131,9 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     refresh();
   }
 
-  const signal = useOne(() => quote(yeet()), source.version);
+  const trigger = useOne(() => signal(), source.version);
   const view = sources
     ? useMemo(() => render ? render(...sources!) : yeet(sources!), [render, sources])
     : useMemo(() => render ? render(source) : yeet(source), [render, source]);
-  return [signal, view];
+  return [trigger, view];
 };

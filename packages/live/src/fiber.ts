@@ -4,7 +4,7 @@ import type {
   OnFiber, DeferredCall, DeferredCallInterop, Key, ArrowFunction,
 } from './types';
 
-import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, RECONCILE, QUOTE, UNQUOTE } from './builtin';
+import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, RECONCILE, QUOTE, UNQUOTE, SIGNAL } from './builtin';
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
@@ -59,10 +59,6 @@ export const enterFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>, base: n
 
   // Reset state pointer
   fiber.pointer = base;
-
-  // Reset yeet value
-  //const {yeeted} = fiber;
-  //if (yeeted) yeeted.value = undefined;
 }
 
 export const exitFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
@@ -337,6 +333,14 @@ export const updateFiber = <F extends ArrowFunction>(
     const calls = call!.args ?? EMPTY_ARRAY;
     mountFiberReconciler(fiber, calls);
   }
+  // Signal quoted reduction directly
+  else if (fiberType === SIGNAL) {
+    if (fiber.quote) {
+      const {quote: {to}} = fiber;
+      bustFiberYeet(to, true);
+      visitYeetRoot(to, true);
+    }
+  }
   // Enter quoted calls
   else if (fiberType === QUOTE) {
     const calls = call!.args ?? EMPTY_ARRAY;
@@ -540,12 +544,12 @@ export const mountFiberQuote = <F extends ArrowFunction>(
 
   const key = fiber.id;
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? fragment();
-  const {quote: {root, from, to}} = fiber;
+  const {quote: {root, to}} = fiber;
 
   reconcileFiberCall(to, call, key, true, fiber.path, fiber.depth + 1);
 
   const mount = to.mounts.get(key)!;
-  if (from !== fiber || mount.unquote !== fiber.quote) {
+  if (mount.unquote.from !== fiber) {
     const quote = makeQuoteState(root, fiber, mount);
     mount.unquote = quote;
   }
@@ -559,7 +563,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   if (!fiber.unquote) throw new Error("Can't unquote outside of quote in " + formatNode(fiber));
   
   const {id, unquote} = fiber;
-  const {root, from, to} = unquote;
+  const {root, from} = unquote;
 
   const key = fiber.id;
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? fragment();
@@ -567,7 +571,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   reconcileFiberCall(from, call, key, true, fiber.path, fiber.depth + 1);
 
   const mount = from.mounts.get(key)!;
-  if (to !== fiber || mount.quote !== fiber.unquote) {
+  if (mount.quote.to !== fiber) {
     const unquote = makeQuoteState(root, mount, fiber);
     mount.quote = unquote;
   }
@@ -818,7 +822,7 @@ export const morphFiberCall = <F extends ArrowFunction>(
       enterFiber(mount, 0);
       exitFiber(mount);
       bustFiberYeet(mount, true);
-      visitYeetRoot(mount);
+      visitYeetRoot(mount, true);
 
       // Change type in place while keeping existing mounts
       mount.type = null;
@@ -1030,7 +1034,7 @@ export const updateMount = <P extends ArrowFunction>(
     const aa = newMount?.arg;
     const args = aas !== undefined ? aas : (aa !== undefined ? [aa] : undefined);
 
-    if (mount!.args === args && !to?.isImperativeFunction && !(to === YEET && !args)) {
+    if (mount!.args === args && !to?.isImperativeFunction && !(to === YEET && !args) && !(to === SIGNAL)) {
       LOG && console.log('Skipping', key, formatNode(newMount!));
       return false;
     }
@@ -1069,9 +1073,10 @@ export const flushMount = <F extends ArrowFunction>(
 // Ensure a re-render of the associated yeet root
 export const visitYeetRoot = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
+  force?: boolean,
 ) => {
   const {host, yeeted} = fiber;
-  if (fiber.type === YEET && yeeted) {
+  if (yeeted && (fiber.type === YEET || force)) {
     const LOG = LOGGING.fiber;
     const {root} = yeeted;
 
@@ -1084,7 +1089,7 @@ export const visitYeetRoot = <F extends ArrowFunction>(
 // Remove a cached yeeted value and all upstream reductions
 export const bustFiberYeet = <F extends ArrowFunction>(fiber: LiveFiber<F>, force?: boolean) => {
   const {type, yeeted} = fiber;
-  if ((fiber.type === YEET && yeeted) || (yeeted && force)) {
+  if (yeeted && (fiber.type === YEET || force)) {
     let yt = yeeted;
     yt.value = undefined;
 

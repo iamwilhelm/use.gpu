@@ -4,7 +4,7 @@ import type { VectorLike } from '@use-gpu/traits';
 import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
-import { use, provide, quote, yeet, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext, DifferentialContext,
@@ -84,7 +84,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   const [transform, differential] = useCombinedTransform(boundPosition, boundDifferential);
 
   return [
-    quote(yeet()),
+    signal(),
     provide(TransformContext, transform,
       provide(DifferentialContext, differential,
         provide(RangeContext, g, children ?? [])

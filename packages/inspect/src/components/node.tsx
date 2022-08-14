@@ -1,7 +1,7 @@
 import type { LiveFiber } from '@use-gpu/live';
 import type { Action } from './types';
 
-import { formatValue, formatNodeName, YEET, QUOTE } from '@use-gpu/live';
+import { formatValue, formatNodeName, YEET, QUOTE, SIGNAL } from '@use-gpu/live';
 import { styled, keyframes } from "@stitches/react";
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
@@ -45,7 +45,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
 }, ref) => {
   const {id, by, f, type, args, __inspect} = fiber;
 
-  const quote = type === QUOTE;
+  const quote = type === QUOTE || type === SIGNAL;
   const yeet = type === YEET;
   const react = !!__inspect?.react;
 

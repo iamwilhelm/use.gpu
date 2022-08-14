@@ -6,7 +6,7 @@ import type { Light } from './types';
 import { LightContext } from '../providers/light-provider';
 import { useDeviceContext } from '../providers/device-provider';
 
-import { capture, provide, gather, keyed, quote, yeet, makeCapture, captureValues, useCapture, useMemo, useOne } from '@use-gpu/live';
+import { capture, provide, gather, keyed, signal, makeCapture, captureValues, useCapture, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
@@ -121,5 +121,5 @@ export const LightEmitter: LC<LightEmitterProps> = (props: LightEmitterProps) =>
     console.warn('lights are being transformed - unimplemented');
   }
 
-  return quote(yeet());
+  return signal();
 };

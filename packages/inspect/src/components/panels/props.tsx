@@ -42,7 +42,7 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   }));
 
   if (arg !== undefined) {
-    if (name === 'YEET') {
+    if (f.name === 'YEET') {
       props = {yeet: arg};
     }
     else {
@@ -51,18 +51,25 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   }
 
   if (args !== undefined) {
-    if (name === 'YEET') {
+    if (f.name === 'YEET') {
       props = {yeet: args[0]};
     }
-    if (name === 'MAP_REDUCE') {
-      const [, map, reduce] = args;
-      props = {map, reduce};
+    if (f.name === 'MAP_REDUCE') {
+      const [children, map, reduce] = args;
+      props = {map, reduce, children};
     }
-    else if (name === 'PROVIDE') {
+    else if (f.name === 'CAPTURE') {
+      props = {context};
+    }
+    else if (f.name === 'PROVIDE') {
       const [context, value] = args;
       props = {context, value};
     }
-    else if (name === 'GATHER') {
+    else if (f.name === 'GATHER') {
+      const [children, then, fallback] = args;
+      props = {children, then, fallback};
+    }
+    else if (f.name === 'SIGNAL') {
     }
     else {
       if (args.length === 1 && typeof args[0] === 'object') props = args[0];

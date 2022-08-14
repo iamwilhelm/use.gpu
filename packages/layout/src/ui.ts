@@ -8,7 +8,7 @@ import {
   useBufferedSize,
   UIRectangles,
 } from '@use-gpu/workbench';
-import { use, keyed, wrap, fragment, quote, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, fragment, signal, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { hashBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
@@ -71,7 +71,7 @@ const Resume = (
     if ((layer[0] as any)?.f) return (layer as any);
     return keyed(Layer, layer[0]?.id, layer);
   });
-  els.push(quote(yeet()));
+  els.push(signal());
 
   return fragment(els);
 };

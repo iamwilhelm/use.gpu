@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveFiber, Task } from '@use-gpu/live';
-import { use, quote, yeet, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
+import { use, signal, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
 
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
@@ -88,17 +88,13 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
     usePerFrame();
 
-    const view = useOne(() => {
-      const signal = quote(yeet());
-      return Array.isArray(children) ? [signal, ...children] : [signal, children];
-    }, children);
+    const trigger = signal();
+    const view = [trigger, provide(LoopContext, loop, children)];
 
     const t = {...time};
     return (
       provide(FrameContext, time.frame,
-        provide(TimeContext, t,
-          provide(LoopContext, loop, view)
-        )
+        provide(TimeContext, t, view)
       )
     );
   }, 'Dispatch'));

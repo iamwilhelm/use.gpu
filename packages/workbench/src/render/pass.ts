@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { UseRenderingContextGPU, RenderPassMode } from '@use-gpu/core';
 
-import { use, yeet, quote, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { PickingContext } from './picking';

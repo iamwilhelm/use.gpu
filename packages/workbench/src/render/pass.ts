@@ -22,6 +22,12 @@ export type CommandToBuffer = () => GPUCommandBuffer;
 
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : []; 
 
+/** Classic render pass.
+
+Draws all opaque calls, then all transparent calls. Will dispatch compute before, and post/readback after.
+
+Nested render passes are rendered before this one.
+*/
 export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) => {
   const {
     picking = true,

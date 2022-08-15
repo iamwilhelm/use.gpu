@@ -26,6 +26,7 @@ export type LinearRGBProps = {
   then?: (texture: TextureSource) => LiveElement,
 };
 
+/** Sets up a Linear RGB render target and automatically renders it to the screen as sRGB. */
 export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => {
   const {then, children, ...rest} = props;
   

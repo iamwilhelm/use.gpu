@@ -40,6 +40,10 @@ export type RenderTargetProps = {
   then?: (target: TextureTarget) => LiveElement,
 };
 
+/** Off-screen render target.
+
+Place `@{<Pass>}` directly inside, or leave empty to use yielded target with `@{<RenderToTexture>}`.
+*/
 export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);

@@ -27,6 +27,7 @@ export type LoopRef = {
   dispatch?: () => void,
 };
 
+/** Provides `useAnimationFrame` and clock to allow for controlled looping and animation. */
 export const Loop: LiveComponent<LoopProps> = (props) => {
   const {live, children} = props;
 

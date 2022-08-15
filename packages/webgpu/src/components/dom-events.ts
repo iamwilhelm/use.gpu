@@ -179,7 +179,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onTouchStart = (e: TouchEvent) => {
       const {targetTouches: [touch]} = e as any;
       const {clientX, clientY} = touch;
-      onButtons(1, 1);
+      onButtons(1, 0);
+      onMove(clientX, clientY);
       onMove(clientX, clientY);
       e.preventDefault();
       e.stopPropagation();
@@ -195,7 +196,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
 
     const onTouchEnd = (e: TouchEvent) => {
       const {targetTouches: [touch]} = e as any;
-      if (!touch.length) onButtons(0, 1);
+      if (!touch?.length) onButtons(0, 0);
       e.preventDefault();
       e.stopPropagation();
     }

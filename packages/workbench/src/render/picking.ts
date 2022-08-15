@@ -60,6 +60,7 @@ export type PickingProps = {
 
 const NOP = () => {};
 
+/** Global picking provider. Provides a screen-sized render target that contains object ID + item index. */
 export const Picking: LiveComponent<PickingProps> = (props) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);

@@ -17,12 +17,16 @@ type CommandToBuffer = () => GPUCommandBuffer;
 
 const toArray = <T>(x: T[]): T[] => Array.isArray(x) ? x : [];
 
-/** Simpler version of `<Pass>` that only does compute shaders */
+/** Compute-only pass
+
+Will dispatch compute before, and post/readback after.
+
+Nested passes are dispatched before this one.
+*/
 export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeProps>) => {
   const {
     immediate,
     children,
-    then,
   } = props;
 
   const inspect = useInspectable();

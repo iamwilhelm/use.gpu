@@ -13,20 +13,30 @@ import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provid
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type ArrayDataProps = {
+  /** Input size up to [width, height, depth, layers] */
   size: number[],
 
-  sparse?: boolean,
-  data?: number[] | TypedArray,
-  expr?: Emitter,
-  items?: number,
-
+  /** WGSL type per sample */
   format?: string,
-  live?: boolean,
-  time?: boolean,
 
+  /** Input data */
+  data?: number[] | TypedArray,
+  /** Input emitter expression */
+  expr?: Emitter,
+  /** Emit N items per `expr` call. Output size is `[items, ...size]` if > 1. */
+  items?: number,
+  /** Emit 0 or N items per `expr` call. Output size is `[N]` or `[items, N]`. */
+  sparse?: boolean,
+  /** Add current `TimeContext` to the `expr` arguments. */
+  time?: boolean,
+  /** Resample `data` or `expr` on every animation frame. */
+  live?: boolean,
+
+  /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
 };
 
+/** Up-to-4D array of a WGSL type. Reads input `data` or samples a given `expr`. */
 export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
   const device = useContext(DeviceContext);
 

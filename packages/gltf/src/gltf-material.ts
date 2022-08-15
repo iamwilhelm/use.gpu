@@ -7,6 +7,10 @@ import { mat4 } from 'gl-matrix';
 
 import { PBRMaterialProps, useBoundShader, useNativeColorTexture } from '@use-gpu/workbench';
 
+type Props = PBRMaterialProps & {
+  doubleSided: boolean,
+};
+
 export const useGLTFMaterial = (
   gltf: GLTF,
   material?: number,
@@ -28,10 +32,10 @@ export const useGLTFMaterial = (
     //emissiveFactor,
     //alphaMode,
     //alphaCutoff,
-    //doubleSided,
+    doubleSided,
   } = gltf.materials[material];
 
-  const props: Partial<PBRMaterialProps> = {
+  const props: Partial<Props> = {
     metalness: 0.0,
     roughness: 0.5,
   };
@@ -101,6 +105,7 @@ export const useGLTFMaterial = (
   props.normalMap = useNativeColorTexture(props.normalMap);
   props.occlusionMap = useNativeColorTexture(props.occlusionMap);
   props.emissiveMap = useNativeColorTexture(props.emissiveMap);
+  props.doubleSided = !!doubleSided;
 
   return props;
 };

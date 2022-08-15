@@ -7,13 +7,18 @@ import { yeet, signal, memo, useOne, useMemo, useNoMemo, useContext, useNoContex
 import { makeSampler, makeRawTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
 
 export type RawTextureProps = {
+  /** Texture data */
   data: DataTexture,
+  /** Texture sampler */
   sampler?: GPUSamplerDescriptor,
+  /** Resample data every animation frame */
   live?: boolean,
 
+  /** Leave empty to yeet source(s) instead. */
   render?: (source: TextureSource) => LiveElement,
 };
 
+/** Use numeric texture data as a 2D texture. */
 export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
   const device = useContext(DeviceContext);
 

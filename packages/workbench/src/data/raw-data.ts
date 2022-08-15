@@ -23,22 +23,33 @@ const INTERLEAVE_BINDINGS = bundleToAttributes(getIndex);
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
 export type RawDataProps = {
+  /** Set/override input length */
   length?: number,
-  data?: number[] | TypedArray,
 
-  sparse?: boolean,
-  expr?: Emitter<Time>,
-  items?: number,
-  interleaved?: boolean,
-
+  /** WGSL format per sample */
   format?: string,
+  
+  /** Input data */
+  data?: number[] | TypedArray,
+  /** Input emitter expression */
+  expr?: Emitter<Time>,
+  /** Emit N items per expr call. Output size is `[items, N]` if items > 1. */
+  items?: number,
+  /** Emit 0 or N items per expr call. Output size is `[N]` or `[items, N]`. */
+  sparse?: boolean,
+  /** Resample `data` on every animation frame. */
   live?: boolean,
+  /** Add current `TimeContext` to the `expr` arguments. */
   time?: boolean,
 
+  /** Split output into 1 source per item. */
+  interleaved?: boolean,
+
+  /** Leave empty to yeet source(s) instead. */
   render?: (...source: ShaderSource[]) => LiveElement,
-  children?: LiveElement,
 };
 
+/** 1D array of a WGSL type. Reads input `data` or samples a given `expr` of WGSL type `format`. */
 export const RawData: LiveComponent<RawDataProps> = (props) => {
   const device = useContext(DeviceContext);
 

@@ -58,7 +58,7 @@ const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
 const PIPELINE = {
   primitive: {
     topology: 'triangle-list',
-    cullMode: 'back',
+    cullMode: 'none',
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 

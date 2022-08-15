@@ -7,7 +7,9 @@ import { getDataArrayByteLength, getDataArrayConstructor } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { useScratchSource } from '../hooks/useScratchSource';
 
-const READBACK_SOURCE = { flags: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ };
+const hasWebGPU = typeof GPUBufferUsage !== 'undefined';
+
+const READBACK_SOURCE = hasWebGPU ? { flags: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ } : {};
 
 export type ReadbackProps = {
   source: StorageSource,

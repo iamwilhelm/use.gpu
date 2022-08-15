@@ -1,5 +1,6 @@
 import type { LC } from '@use-gpu/live';
 import type { Emit, StorageSource, Time } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import React, { use } from '@use-gpu/live';
 
@@ -8,13 +9,15 @@ import {
   ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
-  Animate,
+  Animate, Keyframe,
   LinearRGB,
-  DualContourLayer, PointLayer,
+  DualContourLayer, PointLayer, DataShader,
 } from '@use-gpu/workbench';
 import {
   Plot, Cartesian, Polar, Axis, Grid, Sampled,
 } from '@use-gpu/plot';
+import { wgsl } from '@use-gpu/shader/wgsl';
+import { SurfaceControls } from '../../ui/surface-controls';
 
 let t = 0;
 let π = Math.PI;
@@ -65,114 +68,135 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
 
 export const PlotImplicitSurfacePage: LC = () => {
   
-  const view = (
-    <Loop>
-      <LinearRGB>
-        <Cursor cursor="move" />
-        <Pass>
-          <Plot>
-            <Animate prop='bend' keyframes={[[0, 0], [23, 1.0]]} pause={1} mirror>
-              <Polar
-                bend={0}
-                range={[[-π, π], [1, 5], [-π, π]]}
-                scale={[π/2, 1, π/2]}
-              >
-                <Grid
-                  axes='xy'
-                  width={2}
-                  first={{ unit: π, base: 2, detail: 3, divide: 5 }}
-                  second={{ detail: 32, divide: 5 }}
-                  depth={0.5}
-                  zBias={-1}
-                />
-                <Grid
-                  axes='xz'
-                  width={2}
-                  origin={[-3, 0, -3]}
-                  first={{ unit: π, base: 2, detail: 3, divide: 5 }}
-                  second={{ detail: 32, divide: 5 }}
-                  depth={0.5}
-                  zBias={-1}
-                />
+  const colorizeShader = wgsl`
+    @link fn getSample(i: u32) -> f32 {};
 
-                <Axis
-                  axis='x'
-                  detail={32}
-                  width={5}
-                  origin={[0, 0, 0]}
-                  color={[0.75, 0.75, 0.75, 1]}
-                  depth={0.5}
-                />
-                <Axis
-                  axis='y'
-                  width={5}
-                  color={[0.75, 0.75, 0.75, 1]}
-                  detail={8}
-                  depth={0.5}
-                />
-                <Axis
-                  axis='z'
-                  width={5}
-                  origin={[0, 0, 0]}
-                  color={[0.75, 0.75, 0.75, 1]}
-                  detail={8}
-                  depth={0.5}
-                />
-                <Sampled
-                  axes='xyz'
-                  format='vec3<f32>'
-                  size={[36, 24, 36]}
-                  padding={1}
-                  expr={EXPR_POSITION}
-                  time
-                  live
-                  render={(positions: StorageSource) => (
+    fn main(i: u32) -> vec4<f32> {
+      let sample = getSample(i);
+      return vec4<f32>(sample, max(0.0, sample * .2) + max(0.0, -sample * .3), -sample, 1.0);
+    }
+  `;
+
+  const root = document.querySelector('#use-gpu .canvas');
+  const keyframes = [[0, 0], [23, 1.0]] as Keyframe<number>[];
+
+  const view = (
+    <SurfaceControls
+      container={root}
+      hasInspect
+      render={({inspect, mode, level}) =>
+        <Loop>
+          <LinearRGB>
+            <Cursor cursor="move" />
+            <Pass>
+              <Plot>
+                <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
+                  <Polar
+                    bend={0}
+                    range={[[-π, π], [1, 5], [-π, π]]}
+                    scale={[π/2, 1, π/2]}
+                  >
+                    <Grid
+                      axes='xy'
+                      width={2}
+                      first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                      second={{ detail: 32, divide: 5, end: true }}
+                      depth={0.5}
+                      zBias={-1}
+                    />
+                    <Grid
+                      axes='xz'
+                      width={2}
+                      first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                      second={{ unit: π, base: 2, detail: 32, divide: 5, end: true }}
+                      depth={0.5}
+                      zBias={-1}
+                    />
+
+                    <Axis
+                      axis='x'
+                      detail={32}
+                      width={5}
+                      color={[0.75, 0.75, 0.75, 1]}
+                      depth={0.5}
+                    />
+                    <Axis
+                      axis='y'
+                      width={5}
+                      color={[0.75, 0.75, 0.75, 1]}
+                      detail={8}
+                      depth={0.5}
+                    />
+                    <Axis
+                      axis='z'
+                      width={5}
+                      color={[0.75, 0.75, 0.75, 1]}
+                      detail={8}
+                      depth={0.5}
+                    />
                     <Sampled
                       axes='xyz'
-                      format='f32'
+                      format='vec3<f32>'
                       size={[36, 24, 36]}
                       padding={1}
-                      expr={EXPR_VALUE}
+                      expr={EXPR_POSITION}
                       time
                       live
-                      render={(values: StorageSource) => (
+                      render={(positions: StorageSource) => (
                         <Sampled
                           axes='xyz'
-                          format='vec3<f32>'
+                          format='f32'
                           size={[36, 24, 36]}
                           padding={1}
-                          expr={EXPR_NORMAL}
+                          expr={EXPR_VALUE}
                           time
                           live
-                          render={(normals: StorageSource) => [
-                            <DualContourLayer
-                              values={values}
-                              normals={normals}
-                              method="linear"
+                          render={(values: StorageSource) => (
+                            <Sampled
+                              axes='xyz'
+                              format='vec3<f32>'
+                              size={[36, 24, 36]}
                               padding={1}
-                              range={[[-π, π], [1, 5], [-π, π]]}
-                              color={[0.4, 1.0, 0.6, 1.0]}
-                            />,
-                            /*
-                            <PointLayer
-                              positions={positions}
-                              colors={normals}
-                              size={3}
-                              depth={1}
-                            />,
-                            */
-                          ]}
-                        />  
+                              expr={EXPR_NORMAL}
+                              time
+                              live
+                              render={(normals: StorageSource) => [
+                                <DualContourLayer
+                                  values={values}
+                                  normals={normals}
+                                  level={level}
+                                  method="linear"
+                                  padding={1}
+                                  range={[[-π, π], [1, 5], [-π, π]]}
+                                  color={[0.8, 0.8, 1.0, 1.0]}
+                                />,
+                                inspect ? (
+                                  <DataShader
+                                    shader={colorizeShader}
+                                    source={values}
+                                    render={(colorizedValues: ShaderModule) => (
+                                      <PointLayer
+                                        positions={positions}
+                                        colors={mode === 'normal' ? normals : colorizedValues}
+                                        size={3}
+                                        depth={1}
+                                      />
+                                    )}
+                                  />
+                                ) : null
+                              ]}
+                            />  
+                          )}
+                        />
                       )}
                     />
-                  )}
-                />
-              </Polar>
-            </Animate>
-          </Plot>
-        </Pass>
-      </LinearRGB>
-    </Loop>
+                  </Polar>
+                </Animate>
+              </Plot>
+            </Pass>
+          </LinearRGB>
+        </Loop>
+    } />
   );
 
   return (

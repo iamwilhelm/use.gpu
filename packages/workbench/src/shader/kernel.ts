@@ -28,6 +28,7 @@ export type KernelProps = {
 
 const NO_SOURCES: StorageSource[] = [];
 
+/** Runs a compute kernel on the current compute context. */
 export const Kernel: LiveComponent<KernelProps> = (props) => {
   const {
     shader,

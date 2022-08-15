@@ -7,8 +7,6 @@ import { bindBundle } from '@use-gpu/shader/wgsl';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { getBoundSource } from '../hooks/useBoundSource';
 
-import { RenderContext } from '../providers/render-provider';
-
 import { toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
 
 export type TextureShaderProps = {
@@ -19,6 +17,10 @@ export type TextureShaderProps = {
 
 const TEXTURE_BINDING = { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [0, 0, 0, 0] } as UniformAttributeValue;
 
+/** Texture shader for custom UV sampling of an input texture.
+
+Provides a `@link fn getTexture(uv: vec2<f32>) -> vec4<f32>`.
+*/
 export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
   const {
     shader,

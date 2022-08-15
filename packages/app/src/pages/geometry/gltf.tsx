@@ -32,7 +32,7 @@ export const GeometryGLTFPage: LC = () => {
               keyframes={[
                 [0, [30, 20, 10]],
                 [4, [20, 10, 40]],
-                [8, [10, 20, 20]],
+                [8, [-5, 20, 20]],
                 [12, [30, 20, 10]],
               ]}
               prop='position'
@@ -46,8 +46,8 @@ export const GeometryGLTFPage: LC = () => {
               keyframes={[
                 [0, [10, 20, 30]],
                 [3, [20, 30, 10]],
-                [6, [30, 10, 20]],
-                [9, [10, 20, 30]],
+                [6, [40, 10, 20]],
+                [9, [10, 20, 40]],
               ]}
               prop='position'
             >

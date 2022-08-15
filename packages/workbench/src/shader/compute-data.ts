@@ -37,6 +37,7 @@ export type ComputeDataProps = {
   then?: (source: StorageTarget) => LiveElement,
 };
 
+/** Read-write GPU storage buffer for compute. Will perform frame-buffer flipping with N frames of history. */
 export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);

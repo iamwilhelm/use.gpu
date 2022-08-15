@@ -16,6 +16,7 @@ export type StageProps = {
   render?: () => LiveElement,
 };
 
+/** Set the target (`@{ComputeContext}) for compute kernels (`@{<Kernel>}`) inside. */
 export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>) => {
   const {
     live = false,

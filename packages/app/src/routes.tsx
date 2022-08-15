@@ -42,7 +42,7 @@ export const PAGES = [
   {path: "/rtt/cfd-compute", title: "RTT - Fluid Dynamics (Storage)"},
   {path: "/rtt/cfd-texture", title: "RTT - Fluid Dynamics (Texture)"},
   {path: "/debug/atlas", title: "Debug - Text Atlas"},
-  {path: "/debug/quote", title: "Debug - Quoting"},
+  //{path: "/debug/quote", title: "Debug - Quoting"},
   {path: "/", title: "Index"},
 ];
 

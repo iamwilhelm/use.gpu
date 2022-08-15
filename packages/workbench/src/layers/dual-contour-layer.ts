@@ -39,8 +39,10 @@ import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 import { Dispatch } from '../primitives/dispatch';
 
-const READ_WRITE_SOURCE = { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC };
-const INDIRECT_SOURCE   = { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC };
+const hasWebGPU = typeof GPUBufferUsage !== 'undefined';
+
+const READ_WRITE_SOURCE = hasWebGPU ? { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC } : {};
+const INDIRECT_SOURCE   = hasWebGPU ? { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC } : {};
 
 const INDIRECT_OFFSET_1 = { byteOffset: 16 };
 const READ_ONLY_SOURCE = { readWrite: false };

@@ -7,9 +7,13 @@ import { makeCopyableTexture, makeTextureView, uploadExternalTexture } from '@us
 import { Fetch } from './fetch';
 
 export type ImageTextureProps = {
+  /** URL to image */
   url?: string,
+  /** Color space to tag texture as. Does not convert input data. */
   colorSpace?: ColorSpace,
+  /** Texture sampler */
   sampler?: GPUSamplerDescriptor,
+  /** Leave empty to yeet texture instead. */
   render?: (source: TextureSource) => LiveElement,
 };
 

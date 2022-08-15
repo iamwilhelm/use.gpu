@@ -16,17 +16,24 @@ import {
 } from '@use-gpu/core';
 
 export type CompositeDataProps = {
-  length?: number,
-  data?: any[],
+  /** Input data, array of structs of values/arrays */
+  data?: (Record<string, any>)[],
+  /** WGSL schema of input data */
   fields?: DataField[],
+  /** Resample `data` on every animation frame. */
   live?: boolean,
 
+  /** Per item `isLoop` accessor */
   loop?: <T>(t: T[]) => boolean,
+  /** Per item `hasStart` accessor */
   start?: <T>(t: T[]) => boolean,
+  /** Per item `hasEnd` accessor */
   end?: <T>(t: T[]) => boolean,
   
+  /** Segment decorator(s) */
   on?: LiveElement,
 
+  /** Receive 1 source per field, in struct-of-array format. Leave empty to yeet sources instead. */
   render?: (...sources: StorageSource[]) => LiveElement,
 };
 
@@ -75,6 +82,7 @@ const iterateChunks = (
   }
 }
 
+/** Compose array-of-structs with fields `T | T[]` into struct-of-array data. */
 export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
   const device = useContext(DeviceContext);
 

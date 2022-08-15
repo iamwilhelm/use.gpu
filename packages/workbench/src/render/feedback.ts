@@ -14,6 +14,7 @@ export type FeedbackProps = {
 
 const FEEDBACK_BINDING = {name: 'getFeedback', format: 'vec4<f32>', args: ['vec2<f32>']} as UniformAttribute;
 
+/** Render last frame from the current render target, with an optional shader applied. */
 export const Feedback: LiveComponent<FeedbackProps> = ({shader}: FeedbackProps) => {
   const context = useRenderContext();
   const history = context.source?.history;

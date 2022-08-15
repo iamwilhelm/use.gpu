@@ -9,6 +9,7 @@ export type IterateProps = {
   children?: LiveElement,
 };
 
+/** Iteration combinator for multi-gathered lambdas */
 export const Iterate: LiveComponent<IterateProps> = (props) => {
   const {
     count,

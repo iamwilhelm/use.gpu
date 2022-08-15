@@ -13,6 +13,7 @@ import { main as makeWireframeIndirectCommand } from '@use-gpu/wgsl/render/wiref
 const WIREFRAME_BINDINGS = bundleToAttributes(getWireframeListVertex);
 const INDIRECT_BINDINGS = bundleToAttributes(makeWireframeIndirectCommand);
 
+/** Produce a wireframe vertex shader for a given solid vertex shader. */
 export const getWireframe = (
   getVertex: ShaderModule,
   vertexCount: Lazy<number>,
@@ -49,6 +50,7 @@ export const getWireframe = (
   };
 }
 
+/** Produce an indirect wireframe vertex shader for a given solid vertex shader + indirect draw call. */
 export const getWireframeIndirect = (
   device: GPUDevice,
   getVertex: ShaderModule,
@@ -69,6 +71,7 @@ export const getWireframeIndirect = (
     readWrite: true,
   } as StorageSource;
 
+  // Offset must be % 256
   const instanceSize = {...destination, byteOffset: 256, readWrite: false};
   const defines = {isTriangleStrip};
 

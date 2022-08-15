@@ -28,6 +28,7 @@ export type RenderToTextureProps = {
   then?: (texture: TextureTarget) => LiveElement,
 };
 
+/** Render to a given off-screen target, or the current target (if inside a `@{<RenderTarget>}`). */
 export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
   const device = useContext(DeviceContext);
 

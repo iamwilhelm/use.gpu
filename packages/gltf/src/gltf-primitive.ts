@@ -41,13 +41,15 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   const {attributes, indices, material, mode} = primitive;
   const {POSITION, NORMAL, TANGENT, TEXCOORD_0} = attributes;
 
+  const pbrMaterial = useGLTFMaterial(gltf, material);  
+
   const faces: Partial<FaceLayerProps> = {
     shaded: true,
     color: [1, 1, 1, 1],
     unweldedTangents: true,
     pipeline: {
       primitive: {
-        cullMode: 'back',
+        cullMode: pbrMaterial.doubleSided ? 'none' : 'back',
       },
     },
   };
@@ -108,7 +110,6 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     useNoBoundShader();
   }
 
-  const pbrMaterial = useGLTFMaterial(gltf, material);  
   return (
     use(PBRMaterial, {...pbrMaterial, children: view})
   );

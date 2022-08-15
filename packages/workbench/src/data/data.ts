@@ -12,16 +12,20 @@ import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provid
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type DataProps = {
-  length?: number,
+  /** Input data, array of structs */
   data?: any[],
+  /** WGSL schema of input data */
   fields?: DataField[],
+  /** Resample `data` on every animation frame. */
   live?: boolean,
 
+  /** Receive 1 source per field, in struct-of-array format. Leave empty to yeet sources instead. */
   render?: (...sources: StorageSource[]) => LiveElement,
 };
 
 const NO_FIELDS = [] as DataField[];
 
+/** Compose array-of-structs into struct-of-array data. */
 export const Data: LiveComponent<DataProps> = (props) => {
   const device = useContext(DeviceContext);
 

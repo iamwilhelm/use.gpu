@@ -31,6 +31,7 @@ export type TextureDataProps = {
   then?: (texture: TextureTarget) => LiveElement,
 };
 
+/** Read-write GPU texture buffer for compute. Will perform frame-buffer flipping with N frames of history. */
 export const TextureData: LiveComponent<TextureDataProps> = (props) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);

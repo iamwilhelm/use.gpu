@@ -13,23 +13,36 @@ import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provid
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type SampledDataProps = {
-  range: [number, number][],
+  /** Sample count up to [width, height, depth, layers] */
   size: number[],
 
-  padding?: number,
-  sparse?: boolean,
-  centered?: boolean[] | boolean,
-  expr?: Emitter,
-  items?: number,
-
+  /** WGSL type per sample */
   format?: string,
-  live?: boolean,
-  index?: boolean,
-  time?: boolean,
 
+  /** Input emitter expression */
+  expr?: Emitter,
+  /** Input range to sample on each axis */
+  range: [number, number][],
+  /** Extra padding samples to add outside the input range. */
+  padding?: number,
+  /** Emit N items per `expr` call. Output size is `[items, ...size]` if > 1. */
+  items?: number,
+  /** Emit 0 or N items per `expr` call. Output size is `[N]` or `[items, N]`. */
+  sparse?: boolean,
+  /** Add current indices `i`, `j`, `k`, `l` to the `expr` arguments. */
+  index?: boolean,
+  /** Add current `TimeContext` to the `expr` arguments. */
+  time?: boolean,
+  /** Use centered samples (0.5, 1.5, ..., N-0.5) instead of edge-to-edge samples (0, 1, ..., N). */
+  centered?: boolean[] | boolean,
+  /** Resample `data` or `expr` on every animation frame. */
+  live?: boolean,
+
+  /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
 };
 
+/** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
 export const SampledData: LiveComponent<SampledDataProps> = (props) => {
   const device = useContext(DeviceContext);
 

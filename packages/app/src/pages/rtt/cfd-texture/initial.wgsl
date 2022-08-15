@@ -42,6 +42,6 @@ fn main(
   let edge = min(uv, 1.0 - uv);
   let velocity = vec2<f32>(-uvRepeat.y, uvRepeat.x) / (1.0 + dot(uv, uv)) * edge.x * edge.y * 30.0 + vec2<f32>(dx + .1, dy) * .35;
 
-  textureStore(velocityTexture, center, vec4<f32>(velocity, c, 1.0));
+  textureStore(velocityTexture, center, vec4<f32>(velocity, c, 0.0));
 }
 

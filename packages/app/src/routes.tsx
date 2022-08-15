@@ -9,6 +9,7 @@ import { DebugQuotePage } from './pages/debug/quote';
 import { LayoutDisplayPage } from './pages/layout/display';
 import { LayoutGlyphPage } from './pages/layout/glyph';
 import { LayoutAlignPage } from './pages/layout/align';
+import { MapWebMercatorPage } from './pages/map/webmercator';
 import { MeshRawPage } from './pages/mesh/raw';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
@@ -31,6 +32,7 @@ export const PAGES = [
   {path: "/layout/display", title: "Layout - Box model"},
   {path: "/layout/glyph", title: "Layout - Glyph Subpixel SDF"},
   {path: "/layout/align", title: "Layout - Alignment Tests"},
+  {path: "/map/webmercator", title: "Map - WebMercator"},
   {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
   {path: "/plot/cartesian", title: "Plot - XYZ"},
   {path: "/plot/polar", title: "Plot - Polar"},
@@ -54,6 +56,7 @@ export const makeRoutes = () => ({
   "/layout/display":        { element: <LayoutDisplayPage /> },
   "/layout/glyph":          { element: <LayoutGlyphPage /> },
   "/layout/align":          { element: <LayoutAlignPage /> },
+  "/map/webmercator":       { element: <MapWebMercatorPage /> },
   "/mesh/raw":              { element: <MeshRawPage /> },
   "/plot/cartesian":        { element: <PlotCartesianPage /> },
   "/plot/polar":            { element: <PlotPolarPage /> },

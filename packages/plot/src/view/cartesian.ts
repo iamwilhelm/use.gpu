@@ -34,7 +34,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   } = props;
 
   const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
   const [matrix, normalMatrix] = useMemo(() => {
     const x = g[0][0];
@@ -69,11 +69,14 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
       composeTransform(t, p, r, q, s);
       mat4.multiply(matrix, t, matrix);
     }
+    if (m) {
+      mat4.multiply(matrix, m, matrix);
+    }
 
     const normalMatrix = mat3.normalFromMat4(mat3.create(), matrix);
 
     return [matrix, normalMatrix];
-  }, [g, a, p, r, q, s]);
+  }, [g, a, p, r, q, s, m]);
 
   const matrixRef = useShaderRef(matrix);
   const normalMatrixRef = useShaderRef(normalMatrix);

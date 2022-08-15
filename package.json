@@ -120,6 +120,7 @@
     "packages/gltf",
     "packages/plot",
     "packages/layout",
+    "packages/map",
     "packages/inspect",
     "packages/app"
   ]

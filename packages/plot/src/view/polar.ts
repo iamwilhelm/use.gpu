@@ -38,7 +38,7 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
   } = props;
 
   const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
   const [focus, aspect, matrix, swizzle, range, epsilon] = useMemo(() => {
     const x = g[0][0];
@@ -98,6 +98,9 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
       const t = mat4.create();
       composeTransform(t, p, r, q, s);
       mat4.multiply(matrix, t, matrix);
+    }
+    if (m) {
+      mat4.multiply(matrix, m, matrix);
     }
 
     // Swizzle active polar axis

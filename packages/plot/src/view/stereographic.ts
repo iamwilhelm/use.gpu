@@ -10,8 +10,8 @@ import {
 } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
-import { composeTransform } from '../util/compose';
 import { recenterAxis } from '../util/axis';
+import { composeTransform } from '../util/compose';
 import { swizzleMatrix, toBasis, rotateBasis, invertBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
@@ -38,7 +38,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
   } = props;
 
   const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
   const [matrix, swizzle, epsilon] = useMemo(() => {
     const x = g[0][0];
@@ -47,12 +47,6 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
     const dx = (g[0][1] - x) || 1;
     const dy = (g[1][1] - y) || 1;
     let   dz = (g[2][1] - z) || 1;
-
-    // Make scale adjustments relative to inverse swizzled output scale
-    const inv = invertBasis(a);
-    const sx = s ? s[inv.indexOf('x')] : 1;
-    const sy = s ? s[inv.indexOf('y')] : 1;
-    const sz = s ? s[inv.indexOf('z')] : 1;
 
     // Epsilon for differential transport
     const epsilon = (Math.abs(dx) + Math.abs(dy) + Math.abs(dz)) / 3000;
@@ -84,6 +78,9 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
       const t = mat4.create();
       composeTransform(t, p, r, q, s);
       mat4.multiply(matrix, t, matrix);
+    }
+    if (m) {
+      mat4.multiply(matrix, m, matrix);
     }
 
     // Swizzle active polar axis

@@ -404,6 +404,11 @@
       "import": "./src/transform/stereographic.wgsl",
       "require": "./src/transform/stereographic.wgsl"
     },
+    "./transform/webmercator.wgsl": {
+      "types": "./src/transform/webmercator.wgsl.d.ts",
+      "import": "./src/transform/webmercator.wgsl",
+      "require": "./src/transform/webmercator.wgsl"
+    },
     "./use/array.wgsl": {
       "types": "./src/use/array.wgsl.d.ts",
       "import": "./src/use/array.wgsl",

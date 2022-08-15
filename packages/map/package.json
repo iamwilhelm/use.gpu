@@ -1,0 +1,26 @@
+{
+  "name": "@use-gpu/map",
+  "version": "0.7.0",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "dependencies": {
+    "@use-gpu/workbench": "*",
+    "@use-gpu/core": "*",
+    "@use-gpu/live": "*",
+    "@use-gpu/shader": "*",
+    "mikktspace": "^1.1.1"
+  },
+  "scripts": {
+    "build": "NPM_PACKAGE=map ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch"
+  },
+  "keywords": [
+    "use-gpu",
+    "use-gpu-components"
+  ]
+}

@@ -546,6 +546,13 @@ declare module "@use-gpu/wgsl/transform/stereographic.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/transform/webmercator.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getWebMercatorPosition: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/use/array.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;

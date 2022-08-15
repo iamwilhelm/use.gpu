@@ -39,7 +39,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props) => {
 
   const on = useProp(props.on, parseAxes);
   const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaterion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
 
   const [focus, aspectX, aspectY, scaleY, matrix, swizzle, range, epsilon] = useMemo(() => {
     const x = g[0][0];
@@ -111,10 +111,13 @@ export const Spherical: LiveComponent<SphericalProps> = (props) => {
       composeTransform(t, p, r, q, s);
       mat4.multiply(matrix, t, matrix);
     }
+    if (m) {
+      mat4.multiply(matrix, m, matrix);
+    }
 
     // Swizzle active spherical axes
     let swizzle: string | null = null;
-    if (on.slice(0, 2) !== 'xy') {
+    if (on.slice(0, 3) !== 'xyz') {
       const order = swizzle = on;
       const t = mat4.create();
 

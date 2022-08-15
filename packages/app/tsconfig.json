@@ -10,6 +10,7 @@
     { "path": "../workbench" },
     { "path": "../layout" },
     { "path": "../plot" },
+    { "path": "../map" },
     { "path": "../gltf" },
     { "path": "../glyph" },
     { "path": "../inspect" }

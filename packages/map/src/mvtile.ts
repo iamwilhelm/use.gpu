@@ -111,6 +111,7 @@ export const MVTile: LiveComponent<MVTileProps> = (props) => {
       else if (t === 3) {
         const geometry = feature.asPolygons();
         for (const polygon of geometry) {
+
           const positions = polygon.map((ring) => ring.map(toPoint));
           for (const poly of positions) poly.pop();
 
@@ -120,8 +121,8 @@ export const MVTile: LiveComponent<MVTileProps> = (props) => {
           shapes.push({
             x: 'x',
             type: 'line',
-            count: positions.flat().length,
-            positions: positions.flat(2),
+            count: data.vertices.length / 4,
+            positions: data.vertices,
             segments: positions.flatMap((path) => path.map((_, i) => i === 0 ? 1 : i === path.length - 1 ? 2 : 3)),
             color: style.stroke,
             width: 4,
@@ -129,8 +130,8 @@ export const MVTile: LiveComponent<MVTileProps> = (props) => {
 
           shapes.push({
             type,
-            count: data.vertices.flat().length / 4,
-            positions: data.vertices.flat(),
+            count: data.vertices.length / 4,
+            positions: data.vertices,
             indices: triangles,
             color: style.fill,
             size: style.size,

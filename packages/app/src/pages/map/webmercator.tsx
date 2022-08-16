@@ -38,8 +38,8 @@ export const MapWebMercatorPage: LC = () => {
   
   const tracks = {
     zoom: [
-      [0, 1],
-      [10, 2.5],
+      [ 0, 1],
+      [10, 4.5],
       [20, 5],
       [30, 2.5],
       [40, 5],
@@ -47,7 +47,7 @@ export const MapWebMercatorPage: LC = () => {
       [60, 1],
     ],
     long: [
-      [0, 0],
+      [ 0, 0],
       [10, 0],
       [20, 0],
       [30, 50],
@@ -56,7 +56,7 @@ export const MapWebMercatorPage: LC = () => {
       [60, 0],
     ],
     lat: [
-      [0, 0],
+      [ 0, 0],
       [10, 30],
       [20, 30],
       [30, 30],
@@ -65,7 +65,7 @@ export const MapWebMercatorPage: LC = () => {
       [60, 0],
     ],
     bend: [
-      [0, 0],
+      [ 0, 0],
       [10, 0],
       [20, 1],
       [30, 1],

@@ -95,7 +95,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
       if (zoom > minLevel && upLoaded < upCount) {
         if (cache.has(upKey)) {
           if (!seen.has(upKey)) {
-            out.push(keyed(MVTile, upKey, {tiles, key: upKey, tesselate}));
+            out.push(keyed(MVTile, upKey, {tiles, key: upKey, tesselate: tesselate + 1}));
             seen.add(upKey);
           }
           out.push(keyed(MVTile, key, {tiles, key, tesselate, hide: true}));

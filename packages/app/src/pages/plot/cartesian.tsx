@@ -143,11 +143,12 @@ export const PlotCartesianPage: LC = () => {
       radius={5}
       bearing={0.5}
       pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
+      render={(radius: number, phi: number, theta: number, target: number[]) =>
         <OrbitCamera
           radius={radius}
           phi={phi}
           theta={theta}
+          target={target}
         >
           {view}
         </OrbitCamera>

@@ -89,7 +89,7 @@ export const MapWebMercatorPage: LC = () => {
             <Animate
               loop
               delay={1}
-              speed={1/20}
+              speed={2}
               tracks={tracks}
               duration={65}
             >
@@ -119,6 +119,7 @@ export const MapWebMercatorPage: LC = () => {
                 scale={[3, 3, 3]}
                 centered
               >
+              {/*
                 <Grid
                   axes='xy'
                   origin={[0, 0, 0]}
@@ -185,7 +186,7 @@ export const MapWebMercatorPage: LC = () => {
                   depth={0.5}
                   zBias={-1}
                 />
-
+                */}
               </WebMercator>
             </Animate>
           </Plot>
@@ -206,11 +207,12 @@ export const MapWebMercatorPage: LC = () => {
           radius={5}
           bearing={0.5}
           pitch={0.3}
-          render={(radius: number, phi: number, theta: number) =>
+          render={(radius: number, phi: number, theta: number, target: number[]) =>
             <OrbitCamera
               radius={radius}
               phi={phi}
               theta={theta}
+              target={target}
             >
               {view()}
             </OrbitCamera>

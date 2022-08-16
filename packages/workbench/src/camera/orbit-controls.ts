@@ -4,7 +4,7 @@ import type { VectorLike } from '@use-gpu/traits';
 import { parsePosition, useProp } from '@use-gpu/traits';
 import { useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { makeOrbitMatrix } from '@use-gpu/core';
-import { MouseContext, WheelContext } from '../providers/event-provider';
+import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { useDerivedState } from '../hooks/useDerivedState';
 import { mat4, vec3 } from 'gl-matrix';
@@ -53,11 +53,28 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
 
   const { useMouse } = useContext(MouseContext);
   const { useWheel } = useContext(WheelContext);
+  const { useKeyboard } = useContext(KeyboardContext);
+
   const layout = useContext(LayoutContext);
 
   const { mouse } = useMouse();
   const { wheel } = useWheel();
+  const { keyboard } = useKeyboard();
+
   const size = Math.min(Math.abs(layout[2] - layout[0]), Math.abs(layout[3] - layout[1]));
+
+  const handleMove = (moveX: number, moveY: number) => {
+    const m = makeOrbitMatrix(radius, bearing, pitch, [0, 0, 0], 1);
+    m[12] = m[13] = m[14] = 0;
+    mat4.invert(m, m);
+
+    const speed = moveSpeed * radius / size;
+    const move = vec3.fromValues(moveX * speed, -moveY * speed, 0);
+    vec3.transformMat4(move, move, m);
+
+    vec3.add(move, move, target);
+    setTarget(move);
+  }
 
   useOne(() => {
     const { x, y, moveX, moveY, buttons } = mouse;
@@ -71,26 +88,23 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
         setPitch((theta: number) => clamp(theta + moveY * speedY, -π/2, π/2));
       }
     }
-    if (buttons.right) {
+    if (buttons.right || keyboard.modifiers.shift) {
       if (moveX || moveY) {
-        const m = makeOrbitMatrix(radius, bearing, pitch, [0, 0, 0], 1);
-        m[12] = m[13] = m[14] = 0;
-        mat4.invert(m, m);
-
-        const speed = moveSpeed * radius;
-        const move = vec3.fromValues(moveX * speed, -moveY * speed, 0);
-        vec3.transformMat4(move, move, m);
-
-        vec3.add(move, move, target);
-        setTarget(move);
+        handleMove(moveX, moveY);
       }
     }
   }, mouse);
 
   useOne(() => {
-    const {spinY} = wheel;
+    const {moveX, moveY, spinY} = wheel;
     const speedY = radiusSpeed;
-    if (spinY) setRadius((radius: number) => radius * Math.pow(2, spinY * speedY));
+
+    if (keyboard.modifiers.shift) {
+      if (moveX || moveY) {
+        handleMove(-moveX, -moveY);
+      }
+    }
+    else if (spinY) setRadius((radius: number) => radius * Math.pow(2, spinY * speedY));
   }, wheel);
 
   return useMemo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);

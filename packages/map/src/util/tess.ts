@@ -14,8 +14,26 @@ const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
 const getZeroLevel = (a, b) => -a / (b - a);
 
+export const cutPolygons = (
+  polygons: XY[][][],
+  nx: number,
+  ny: number,
+  d: number,
+  dbg?: boolean,
+) => {
+  const getValue   = ([x, y]: XY) =>  nx * x + ny * y - d;
+  const getTangent = ([x, y]: XY) => -ny * x + nx * y;
+  const out: XY[][][] = [];
+  for (const rings of polygons) {
+    if (dbg && rings.some(r => r.some(p => p[0] === 0 || p[1] === 1))) debugger;
+    const cut = cutPolygonWith(rings, getValue, getTangent);
+    if (cut) out.push(...cut);
+  }
+  return out;
+};
+
 export const cutPolygon = (
-  rings: XY[],
+  rings: XY[][],
   nx: number,
   ny: number,
   d: number,
@@ -26,7 +44,7 @@ export const cutPolygon = (
 };
 
 export const cutPolygonWith = (
-  rings: XY[],
+  rings: XY[][],
   getValue: Field,
   getTangent: Field,
 ) => {
@@ -67,7 +85,7 @@ export const cutPolygonWith = (
 }
 
 export const cutRing = (
-  ring: XY,
+  ring: XY[],
   nx: number,
   ny: number,
   d: number,
@@ -77,7 +95,7 @@ export const cutRing = (
 }
 
 export const cutRingWith = (
-  ring: XY,
+  ring: XY[],
   getValue: Field,
 ) => {
   const n = ring.length;
@@ -119,6 +137,9 @@ export const cutRingWith = (
           if (last) cut.unshift(last);
           if (!out.length || getRingArea(cut)) out.push(cut);
           last = null;
+        }
+        if (vb === 0 && i === 0) {
+          last = a;
         }
       }
       else if (vb === 0) {

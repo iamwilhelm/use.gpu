@@ -1,6 +1,6 @@
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
-type TileSource = (x: number, y: number, zoom: number) => string | Uint8Array | ArrayBuffer;
+type TileSource = (x: number, y: number, zoom: number) => string;
 
 type TileContextProps = Record<string, TileSource>;
 

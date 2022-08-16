@@ -40,7 +40,7 @@ export const MapWebMercatorPage: LC = () => {
     zoom: [
       [0, 1],
       [10, 2.5],
-      [20, 2.5],
+      [20, 5],
       [30, 2.5],
       [40, 5],
       [50, 5],

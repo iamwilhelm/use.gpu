@@ -1,9 +1,14 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
-import { use, keyed } from '@use-gpu/live';
+import { use, keyed, memo, useAsync, useCallback, useOne } from '@use-gpu/live';
 import { useLayoutContext } from '@use-gpu/workbench';
 import { useRangeContext } from '@use-gpu/plot';
+
+import { useTileContext } from './providers/tile-provider';
 import { MVTile } from './mvtile';
+import LRU from 'lru-cache';
+
+import { VectorTile } from 'mapbox-vector-tile';
 
 export type MVTilesProps = {
   detail?: number,
@@ -16,6 +21,8 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
     detail = 2,
     children,
   } = props;
+
+  const cache = useOne(() => new LRU({ max: 200 }));
 
   const layout = useLayoutContext();
   let [[minX, maxX], [minY, maxY]] = useRangeContext();
@@ -41,16 +48,29 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
   
   const w = maxIX - minIX;
   const h = maxIY - minIY;
-  console.log(w * h);
-  if (w * h > 50) debugger;
-  
+
   for (let x = minIX; x < maxIX; ++x) {
     for (let y = minIY; y < maxIY; ++y) {
-      out.push(keyed(MVTile, (zoom << 20) + (y << 10) + x, {x, y, zoom}));
+      const key = (zoom << 20) + (y << 10) + x;
+      out.push(keyed(Tile, key, {key, cache, x, y, zoom}));
     }
   }
-  
-  return out.slice(0, 16);
+
+  return out;  
 };
 
+const Tile: LiveComponent<TileProps> = memo((props) => {
+  const {key, cache, x, y, zoom} = props;
+  const {getMVT} = useTileContext();
+
+  const url = getMVT(x, y, zoom);
+  const run = useCallback(async () => cache.get(key) ?? fetch(url).then(res => res.arrayBuffer()).then(ab => {
+    const mvt = new VectorTile(new Uint8Array(ab));
+    cache.set(key, mvt);
+    return mvt;
+  }), [key]);
+
+  const [mvt] = useAsync(run);
+  return mvt ? use(MVTile, {...props, mvt}) : null;
+}, 'MVTile');
 

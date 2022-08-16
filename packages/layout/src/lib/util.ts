@@ -256,7 +256,7 @@ export const makeInlineLayout = (
   miniHash(key);
   miniHash(left);
   key = miniHash(top);
-  
+
   const out: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
     const el = render(lines, clip, transform, key);

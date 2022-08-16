@@ -10,6 +10,7 @@ const limitLat = 85.05113;
 @optional @link fn getWebMercatorZoom() -> f32 { return 0.0; };
 @optional @link fn getWebMercatorRadius() -> f32 { return 0.0; };
 @optional @link fn getWebMercatorCentered() -> f32 { return 0.0; };
+@optional @link fn getWebMercatorNative() -> f32 { return 0.0; };
 
 @export fn getWebMercatorPosition(position: vec4<f32>) -> vec4<f32> {
   let mercatorBend = getWebMercatorBend();
@@ -17,48 +18,54 @@ const limitLat = 85.05113;
   let mercatorOrigin = getWebMercatorOrigin();
   let mercatorZoom = getWebMercatorZoom();
   let mercatorCentered = getWebMercatorCentered();
+  let mercatorNative = getWebMercatorNative();
 
   let matrix = getTransformMatrix();
 
-  let phi = toRad * position.x; // longitude
-  let theta = toRad * position.y; // latitude
-  let radius = (mercatorRadius + position.z) / mercatorRadius;
-
   let o = mercatorOrigin;
-  let f = mercatorBend;
+  var f = mercatorBend;
   let z = mercatorZoom;
+  let n = mercatorNative;
   
   var transformed: vec3<f32>;
-  if (f < 1.0) {
-    /*
-    if (abs(position.y) >= limitLat) {
-      var NaN: f32 = bitcast<f32>(0xffffffffu);
-      return vec4<f32>(NaN, NaN, NaN, NaN);
-    }
-    */
 
-    var proj = vec2<f32>(phi, log(tan(PI4 + theta / 2.0)));
+  var phi: f32; // longitude
+  var theta: f32; // latitude
+  var y: f32; // y
+  
+  if (f == 0.0) { f = 0.001; };
+  if (f == 1.0) { f = 0.999; };
+  
+  if (n > 0.0) {
+    let rads = position.xy * PI;
+    y = rads.y;
+    phi = rads.x;
+    theta = (atan(exp(y)) - PI4) * 2.0;
+  }
+  else {
+    phi = toRad * position.x;
+    theta = toRad * position.y;
+    y = log(tan(PI4 + theta / 2.0));
+  }
+  let radius = (mercatorRadius + position.z) / mercatorRadius;
+
+  if (f < 1.0) {
+    var proj = vec2<f32>(phi, y);
 
     if (f > 0.0) {
-      transformed = toSphericalBend(
-        vec3<f32>(
-          mix(vec2<f32>(phi, theta), proj, 1.0 - f),
-          radius,
-        ),
-        o,
-        z,
-        f
-      );
+      let mixed = vec3<f32>(mix(vec2<f32>(phi, theta), proj, 1.0 - f), radius);
+      transformed = toSphericalBend(mixed, o, z, f);
+
       if (mercatorCentered > 0.0) {
-        transformed -= toSphericalBend(
-          vec3<f32>(
-            mix(vec2<f32>(o.x * PI, o.z), vec2<f32>(o.x * PI, o.y * PI), 1.0 - f),
+        let mixed = vec3<f32>(
+            mix(
+              vec2<f32>(o.x * PI, o.z),
+              vec2<f32>(o.x * PI, o.y * PI),
+              1.0 - f
+            ),
             radius,
-          ),
-          o,
-          z,
-          f
-        );
+          );
+        transformed -= toSphericalBend(mixed, o, z, f);
       }
     }
     else {
@@ -73,12 +80,7 @@ const limitLat = 85.05113;
     }
   }
 
-  transformed = rotateToCenter(
-    transformed,
-    o,
-    z,
-    f
-  );
+  transformed = rotateToCenter(transformed, o, z, f);
 
   return matrix * vec4<f32>(transformed, 1.0);
 }

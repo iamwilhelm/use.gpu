@@ -901,7 +901,7 @@ export const copyDataArraysComposite = (
 export const copyNumberArrayCompositeRange = (
   from: (NumberArray[] | NumberArray), to: NumberArray,
   fromIndex: number, toIndex: number,
-  dims: number, count: number, loop: boolean = false,
+  dims: number, count: number, loop: boolean = false, offset: number = 0,
 ) => {
   let pos = toIndex;
 
@@ -917,12 +917,12 @@ export const copyNumberArrayCompositeRange = (
     const src = from as NumberArray;
 
     if (loop) {
-      copyNumberArrayRange(src, to, fromIndex + range3 - dims3, pos, dims, dims);
-      copyNumberArrayRange(src, to, fromIndex, pos + dims4, range3, dims);
-      copyNumberArrayRange(src, to, fromIndex, pos + range4 + dims4, dims * 2, dims);
+      copyNumberArrayRange(src, to, fromIndex + range3 - dims3, pos, dims, dims, offset);
+      copyNumberArrayRange(src, to, fromIndex, pos + dims4, range3, dims, offset);
+      copyNumberArrayRange(src, to, fromIndex, pos + range4 + dims4, dims * 2, dims, offset);
     }
     else {
-      copyNumberArrayRange(src, to, fromIndex, pos, range3, dims);
+      copyNumberArrayRange(src, to, fromIndex, pos, range3, dims, offset);
     }
   }
   else {
@@ -930,12 +930,12 @@ export const copyNumberArrayCompositeRange = (
     const src = from as NumberArray[];
 
     if (loop) {
-      copyNestedNumberArrayRange(src, to, fromIndex + count - 1, pos, 1, dims);
-      copyNestedNumberArrayRange(src, to, fromIndex, pos + dims4, count, dims);
-      copyNestedNumberArrayRange(src, to, fromIndex, pos + range4 + dims4, 2, dims);
+      copyNestedNumberArrayRange(src, to, fromIndex + count - 1, pos, 1, dims, offset);
+      copyNestedNumberArrayRange(src, to, fromIndex, pos + dims4, count, dims, offset);
+      copyNestedNumberArrayRange(src, to, fromIndex, pos + range4 + dims4, 2, dims, offset);
     }
     else {
-      copyNestedNumberArrayRange(src, to, fromIndex, pos, count, dims);
+      copyNestedNumberArrayRange(src, to, fromIndex, pos, count, dims, offset);
     }
   }
 }

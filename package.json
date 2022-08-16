@@ -28,6 +28,7 @@
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "css-loader": "^6.0.0",
+    "dotenv": "^16.0.1",
     "eslint": "^7.5.0",
     "getdocs-ts": "^0.1.2",
     "jest": "^27.2.0",
@@ -41,6 +42,7 @@
     "webpack": "^5.73.0",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^3.11.0",
+    "webpack-dotenv-plugin": "^2.1.0",
     "wsrun": "^5.2.4"
   },
   "ext": {

@@ -5,9 +5,8 @@ import React, { use } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,
-  ArrayData, RawData, PointLayer,
+  RawData, PointLayer,
   OrbitCamera, OrbitControls,
-  Pick, Cursor,
   Animate,
   LinearRGB,
 } from '@use-gpu/workbench';
@@ -15,7 +14,7 @@ import {
   Plot, Spherical, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 import {
-  WebMercator
+  WebMercator, MVT, MapboxProvider,
 } from '@use-gpu/map';
 
 import { PlotControls } from '../../ui/plot-controls';
@@ -35,12 +34,14 @@ const thetaFormatter = (θ: number) => {
 
 export const MapWebMercatorPage: LC = () => {
   
+  const accessToken = process.env.MAPBOX_TOKEN;
+  
   const tracks = {
     zoom: [
       [0, 1],
-      [10, 2],
-      [20, 2],
-      [30, 2],
+      [10, 2.5],
+      [20, 2.5],
+      [30, 2.5],
       [40, 5],
       [50, 5],
       [60, 1],
@@ -59,8 +60,8 @@ export const MapWebMercatorPage: LC = () => {
       [10, 30],
       [20, 30],
       [30, 30],
-      [40, 30],
-      [50, 30],
+      [40, -30],
+      [50, -30],
       [60, 0],
     ],
     bend: [
@@ -76,33 +77,50 @@ export const MapWebMercatorPage: LC = () => {
 
   const view = () => (
     <Loop>
-      <Draw>
+      <LinearRGB>
         <Pass>
+          {/*
           <RawData format="vec3<f32>" data={[0, 0, 0]} length={1} render={
             (data) => <PointLayer positions={data} color={[1, 1, 1, 1]} size={20} />
           } />
+          */}
 
           <Plot>
             <Animate
               loop
+              delay={1}
               tracks={tracks}
               duration={65}
             >
               <WebMercator
+                native
                 centered
                 bend={1}
-                range={[[-1, 1], [-1/2, 1/2]]}
+                xrange={[[-1, 1], [-2/3, 2/3]]}
                 long={90}
                 lat={20}
-                zoom={1.5}
-                scale={[1, 1, 1]}
+                zoom={1}
+                scale={[3, 3, 3]}
+              >
+                <MapboxProvider accessToken={accessToken}>
+                  <MVT x={2} y={1} zoom={2} />
+                </MapboxProvider>
+              </WebMercator>
+              <WebMercator
+                centered
+                bend={1}
+                xrange={[[-1, 1], [-2/3, 2/3]]}
+                long={90}
+                lat={20}
+                zoom={1}
+                scale={[3, 3, 3]}
               >
                 <Grid
                   axes='xy'
                   origin={[0, 0, 0]}
                   width={2}
-                  first={{ unit: 360, base: 2, detail: 16, divide: 8, end: true }}
-                  second={{ unit: 360, base: 2, detail: 16, divide: 8, end: true }}
+                  first={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
+                  second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
                   depth={0.5}
                   zBias={-1}
                 />
@@ -175,8 +193,8 @@ export const MapWebMercatorPage: LC = () => {
                   axes='xy'
                   origin={[0, 0, 1]}
                   width={2}
-                  first={{ unit: 360, base: 2, detail: 16, divide: 8, end: true }}
-                  second={{ unit: 360, base: 2, detail: 16, divide: 8, end: true }}
+                  first={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
+                  second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
                   color={[0.25, 0.25, 0.25, 1]}
                   depth={0.5}
                   zBias={-1}
@@ -186,7 +204,7 @@ export const MapWebMercatorPage: LC = () => {
             </Animate>
           </Plot>
         </Pass>
-      </Draw>
+      </LinearRGB>
     </Loop>
   );
 

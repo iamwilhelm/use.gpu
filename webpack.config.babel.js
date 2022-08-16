@@ -1,8 +1,14 @@
 import path from 'path';
+import dotenv from 'dotenv';
 import WasmPackPlugin from '@wasm-tool/wasm-pack-plugin';
+import DotenvPlugin from 'webpack-dotenv-plugin';
 
 const {NODE_ENV} = process.env;
 const isDevelopment = NODE_ENV === 'development';
+
+dotenv.config({
+  path: '.env.local',
+});
 
 export default {
   mode: isDevelopment ? 'development' : 'production',
@@ -26,6 +32,11 @@ export default {
       outDir: "../../packages/glyph/pkg",
       outName: "use_gpu_text",
       forceMode: "production",
+    }),
+    new DotenvPlugin({
+        path: '.env.local',
+        sample: '.env.local.example',
+        allowEmptyValues: true,
     }),
   ],
   experiments: {

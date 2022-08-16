@@ -47,6 +47,24 @@ export type LineAggregate = {
   depth?: number,
 };
 
+export type FaceAggregate = {
+  id: number,
+  count: number,
+
+  positions?: number[],
+  indices?: number[],
+  colors?: number[],
+  sizes?: number[],
+  depths?: number[],
+
+  position?: number[],
+  index?: number[],
+  color?: number[],
+  size?: number[],
+  depth?: number,
+};
+
 export type LayerAggregate =
   | PointAggregate
-  | LineAggregate;
+  | LineAggregate
+  | FaceAggregate;

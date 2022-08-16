@@ -7,7 +7,6 @@ import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext, DifferentialContext,
-  useLayoutContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
@@ -19,12 +18,11 @@ import {
 import { mat4 } from 'gl-matrix';
 
 import { useGeographicTrait } from '../traits';
+import { EARTH_CIRCUMFERENCE, toRad } from '../util/tiles';
 
 import { getWebMercatorPosition } from '@use-gpu/wgsl/transform/webmercator.wgsl';
 
 const π = Math.PI;
-const toRad = π / 180;
-
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
 const MERCATOR_BINDINGS = bundleToAttributes(getWebMercatorPosition);
@@ -33,6 +31,7 @@ export type WebMercatorProps = Partial<AxesTrait> & Partial<GeographicTrait> & P
   bend?: number,
   on?: Swizzle,
   centered?: boolean,
+  native?: boolean,
 
   children?: LiveElement,
 };
@@ -42,12 +41,10 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
     on = 'xyz',
     bend = 1,
     centered = false,
-    radius = 40_075_017,
+    native = false,
+    radius = EARTH_CIRCUMFERENCE,
     children,
   } = props;
-
-  const layout = useLayoutContext;
-  const flipY = layout[1] > layout[3];
 
   const {axes: a, range: g} = useAxesTrait(props);
   const {long, lat, zoom} = useGeographicTrait(props);
@@ -56,11 +53,9 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
   const [matrix, swizzle, origin, range, epsilon] = useMemo(() => {
     const matrix = mat4.create();
 
-    // Get X/Y/Z/W scale
+    // Get X/Y scale
     const dx = (g[0][1] - g[0][0]) / 2;
     const dy = (g[1][1] - g[1][0]) / 2;
-    const dz = (g[2][2] - g[2][0]) / 2;
-    const dw = (g[3][2] - g[3][0]) / 2;
 
     // Get 2D bounding box
     const [ox, oy] = projectMercator([long, lat]);
@@ -76,8 +71,8 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
     const bottom = Math.min(1, origin[1] + span * g[1][1]);
 
     // Unproject and set lat/long range + conformal Z
-    const tl = unprojectMercator([left, top]);
-    const br = unprojectMercator([right, bottom]);
+    const tl = native ? [left, top] : unprojectMercator([left, top]);
+    const br = native ? [right, bottom] : unprojectMercator([right, bottom]);
 
     let range = [[tl[0], br[0]], [tl[1], br[1]], [span*g[2][0], span*g[2][1]], g[3]];
 
@@ -107,7 +102,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
     }
 
     return [matrix, swizzle, origin, range, epsilon];
-  }, [long, lat, zoom, a, g, p, r, q, s, bend]);
+  }, [long, lat, zoom, native, a, g, p, r, q, s, bend]);
 
   const t = useShaderRef(matrix);
 
@@ -116,9 +111,10 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
   const z = useShaderRef(zoom);
   const d = useShaderRef(radius);
   const c = useShaderRef(centered);
+  const n = useShaderRef(native);
   const e = useShaderRef(epsilon);
   
-  const bound = useBoundShader(getWebMercatorPosition, MERCATOR_BINDINGS, [t, b, o, z, d, c]);
+  const bound = useBoundShader(getWebMercatorPosition, MERCATOR_BINDINGS, [t, b, o, z, d, c, n]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

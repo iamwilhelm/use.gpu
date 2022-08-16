@@ -1,24 +1,30 @@
 import type { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live';
 import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
-import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate } from './types';
+import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, FaceAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
-import { use, keyed, fragment, multiGather, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, signal, gather, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
+  updateAggregateIndex,
   updateAggregateSegments,
+  updateAggregateFaces,
 } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
+import { FaceLayer } from './face-layer';
 import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
 
 export type LayersProps = {
+  items?: LayerAggregate,
   children: LiveElement,
 };
 
 const allCount = (a: number, b: LayerAggregate): number => a + b.count + ((b as any).loop ? 3 : 0);
+
+const allIndices = (a: number, b: LayerAggregate): number => a + ((b as any).indices?.length || 0);
 
 const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
   for (let k in b) a.add(k);
@@ -41,38 +47,63 @@ const gatherItemChunks = (items: LayerAggregate[]) => {
 const getItemSummary = (items: LayerAggregate[]) => {
   const keys = items.reduce(allKeys, new Set());
   const count = items.reduce(allCount, 0);
+  const indices = items.reduce(allIndices, 0);
   const memoKey = Array.from(keys).join('/');
 
-  return {keys, count, memoKey};
+  return {keys, count, indices, memoKey};
 }
 
 /** Aggregate (point and line) geometry from children to produce merged layers. */
-export const VirtualLayers: LiveComponent<LayersProps> = (props) => {
-  const {children} = props;
-  return multiGather(children, Resume);
+export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props) => {
+  const {items, children} = props;
+  return items ? Resume(items) : gather(children, Resume);
 };
 
-const Resume = (aggregates: Record<string, LayerAggregate[]>) => 
-  fragment(Object.keys(AGGREGATORS).map((type: string) => {
+const Resume = (
+  items: (LayerAggregate | null)[],
+) => {
+  const aggregates: Record<string, LayerAggregate> = {
+    point: [],
+    line: [],
+    face: [],
+    label: [],
+  };
+
+  for (let item of items) if (item) {
+    aggregates[item.type].push(item);
+  }
+  
+  const els: LiveElement = [];
+
+  for (const type in aggregates) {
+    const items = aggregates[type];
+    if (!items.length) continue;
+
     const makeAggregator = AGGREGATORS[type]!;
-    return aggregates[type] ? keyed(Layer, type, makeAggregator, aggregates[type]) : null;
-  }));
+    els.push(keyed(Layer, type, makeAggregator, aggregates[type]));
+  }
+
+  els.push(signal());
+
+  return els;
+};
 
 const Layer: LiveFunction<any> = (
   makeAggregator: LayerAggregator,
   items: LayerAggregate[],
 ) => {
   const device = useContext(DeviceContext);
-  const {keys, count, memoKey} = getItemSummary(items);
+  const {keys, count, indices, memoKey} = getItemSummary(items);
 
-  const alloc = useBufferedSize(count);
+  const allocCount = useBufferedSize(count);
+  const allocIndices = useBufferedSize(indices);
 
   const render = useMemo(() =>
-    makeAggregator(device, items, keys, alloc),
-    [memoKey, alloc]
+    makeAggregator(device, items, keys, allocCount, allocIndices),
+    [memoKey, allocCount, allocIndices]
   );
   
-  return render(items, count);
+  return render(items, count, indices);
 };
 
 const makePointAccumulator = (
@@ -132,7 +163,7 @@ const makeLineAccumulator = (
     const {chunks, loops} = gatherItemChunks(items);
 
     if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
-    else props.segments = updateAggregateSegments(device, storage.segments, chunks, loops, count);
+    else props.segments = updateAggregateFaces(device, storage.segments, chunks, loops, count);
 
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
@@ -143,7 +174,65 @@ const makeLineAccumulator = (
   };
 };
 
+const makeFaceAccumulator = (
+  device: GPUDevice,
+  items: LineAggregate[],
+  keys: Set<string>,
+  allocCount: number,
+  allocIndices: number,
+) => {
+  const storage = {} as Record<string, AggregateBuffer>;
+
+  const hasPosition = keys.has('positions') || keys.has('position');
+  const hasIndex = keys.has('indices') || keys.has('index');
+  const hasSegment = keys.has('segments') || keys.has('segment');
+  const hasColor = keys.has('colors') || keys.has('color');
+  const hasSize = keys.has('sizes') || keys.has('size');
+  const hasDepth = keys.has('depths') || keys.has('depth');
+
+  storage.segments = makeAggregateBuffer(device, 'i32', allocCount);
+  storage.indices = makeAggregateBuffer(device, 'u32', allocIndices);
+
+  if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
+  if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
+  if (hasDepth) storage.depth = makeAggregateBuffer(device, 'f32', allocCount);
+
+  return (items: FaceAggregate[], count: number, indices: number) => {
+    const props = {count, join: 'miter'} as Record<string, any>;
+
+    const {chunks, loops} = gatherItemChunks(items);
+    const offsets = accumulate(chunks);
+
+    if (hasIndex) {
+      props.indices = updateAggregateIndex(device, storage.indices, items, indices, offsets, 'index', 'indices');
+    }
+    else {
+      if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
+      else props.segments = updateAggregateSegments(device, storage.segments, chunks, loops, count);
+    }
+
+    if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
+    if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
+    if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
+
+    return use(FaceLayer, props);
+  };
+};
+
 const AGGREGATORS = {
+  'face': makeFaceAccumulator,
   'line': makeLineAccumulator,
   'point': makePointAccumulator,
+  'label': () => () => {},
 } as Record<string, LayerAggregator>;
+
+const accumulate = (xs: number[]): number[] => {
+  let out: number[] = [];
+  let n = xs.length;
+  let accum = 0;
+  for (let i = 0; i < n; ++i) {
+    out.push(accum);
+    accum += xs[i];
+  }
+  return out;
+}

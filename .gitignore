@@ -10,3 +10,4 @@ test/import/node_modules
 test/import/dist
 test/import/yarn.lock
 packages/glyph/pkg
+.env.local

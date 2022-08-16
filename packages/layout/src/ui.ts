@@ -14,7 +14,6 @@ import { getBundleKey } from '@use-gpu/shader';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
-  updateAggregateSegments,
 } from '@use-gpu/core';
 import { overlapBounds, joinBounds } from './lib/util';
 

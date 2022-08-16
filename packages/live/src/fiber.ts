@@ -80,7 +80,7 @@ export const makeFiber = <F extends ArrowFunction>(
 
   const id = ++ID;
 
-  const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted} : null;
+  const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, up: parent.yeeted} : null;
   const quote = parent?.quote ?? null;
   const unquote = parent?.unquote ?? null;
   const context = parent?.context ?? NO_CONTEXT;
@@ -162,6 +162,7 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
   reduced: undefined,
   parent: undefined,
   root: nextFiber,
+  up: fiber.yeeted,
 });
 
 // Make fiber quote state
@@ -961,7 +962,7 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
 
 // Dispose of a fiber's mounted sub-fibers
 export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
-  const {id, next, quote, unquote} = fiber;
+  const {id, next, quote, unquote, yeeted} = fiber;
 
   disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
@@ -977,8 +978,11 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
     pingFiber(from);
   }
 
-  bustFiberYeet(fiber);
-  visitYeetRoot(fiber);
+  if (yeeted) {
+    bustFiberYeet(fiber, true);
+    visitYeetRoot(fiber);
+    fiber.yeeted = fiber.yeeted.up;
+  }
 
   fiber.next = null;
 }

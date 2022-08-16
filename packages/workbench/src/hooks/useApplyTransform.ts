@@ -5,6 +5,7 @@ import { useOne, useVersion } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { chainTo, sourceToModule, bindingToModule } from '@use-gpu/shader/wgsl';
 import { useTransformContext } from '../providers/transform-provider';
+import { useScissorContext } from '../providers/scissor-provider';
 
 const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'], value: [0, 0, 0, 0] } as UniformAttributeValue;
 
@@ -12,13 +13,17 @@ export const useApplyTransform = (
   positions?: StorageSource | LambdaSource | TextureSource | ShaderModule | TypedArray | number[] | {current: any},
 ) => {
   const transform = useTransformContext();
+  const scissor = useScissorContext();
   const version = useVersion(positions) + useVersion(transform);
 
   return useOne(() => {
-    if (transform == null) return positions;
-    if (positions == null) return transform;
-    
+    if (positions == null) return [null, null];
+    if (transform == null && scissor == null) return [positions, null];
+
     const getPosition = sourceToModule(positions) ?? bindingToModule(makeShaderBinding(TRANSFORM_BINDING, positions));
-    return chainTo(getPosition, transform);
+    return [
+      transform ? chainTo(getPosition, transform) : getPosition,
+      scissor ? chainTo(getPosition, scissor) : null,
+    ];
   }, version);
 };

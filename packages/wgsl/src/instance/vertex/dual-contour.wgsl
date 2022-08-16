@@ -121,6 +121,9 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
 
   let clip = min(uv3, 1.0 - uv3);
   let boxClip = min(min(clip.x, clip.y), clip.z);
+  
+  // TODO
+  let scissor = vec4<f32>(1.0);
 
   let tangent4 = vec4<f32>(0.0, 0.0, 0.0, 0.0);
   let uv4 = vec4<f32>(uv3, boxClip);
@@ -134,6 +137,7 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
     color,
     uv4,
     st4,
+    scissor,
     instanceIndex,
  );
 }

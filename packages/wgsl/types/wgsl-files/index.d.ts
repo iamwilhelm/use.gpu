@@ -65,6 +65,13 @@ declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/fragment/scissor.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const isScissored: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/fragment/sdf-2d.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -529,6 +536,13 @@ declare module "@use-gpu/wgsl/transform/polar.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getPolarPosition: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/scissor.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getScissorLevel: ParsedBundle;
   export default __module;
 }
 

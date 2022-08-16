@@ -210,6 +210,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       e.stopPropagation();
 
       element.removeEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
+      document.addEventListener('mouseenter', onMouseMove, CAPTURE_EVENT);
       document.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
       document.addEventListener('mouseup', onMouseUp, CAPTURE_EVENT);
     };

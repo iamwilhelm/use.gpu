@@ -23,6 +23,7 @@ use '@use-gpu/wgsl/use/view'::{ getViewSize };
     vec4<f32>(1.0, 1.0, 1.0, 1.0),
     vec4<f32>(uv * 2.0, 0.0, 0.0),
     vec4<f32>(0.0),
+    vec4<f32>(1.0),
     instanceIndex,
   );
 }

@@ -89,11 +89,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const segments = LINE_JOIN_SIZE[j];
   const tris = (1+segments) * 2;
 
-  const defines = useOne(() => ({
-    LINE_JOIN_STYLE: style,
-    LINE_JOIN_SIZE: segments,
-  }), j);
-
   // Set up draw
   const vertexCount = 2 + tris;
   const instanceCount = useDataLength(count, props.positions, -1);
@@ -111,10 +106,16 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   
   const l = useShaderRef(null, props.lookups);
 
-  const xf = useApplyTransform(p);
+  const [xf, scissor] = useApplyTransform(p);
 
-  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, g, c, w, d, z, t, e, l]);
+  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
   const getFragment = getPassThruFragment;
+
+  const defines = useOne(() => ({
+    HAS_SCISSOR: !!scissor,
+    LINE_JOIN_STYLE: style,
+    LINE_JOIN_SIZE: segments,
+  }), j);
   
   return use(Virtual, {
     vertexCount,

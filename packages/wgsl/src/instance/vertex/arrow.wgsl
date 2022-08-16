@@ -7,6 +7,8 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 @optional @link fn getAnchor(i: u32) -> vec4<u32> { return vec4<u32>(0u, 1u, 0u, 0u); };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
+@optional @link fn getScissor(i: u32) -> vec4<f32> { return vec4<f32>(1.0); };
+
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
 @optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
@@ -31,6 +33,8 @@ const ARROW_ASPECT: f32 = 2.5;
   let size = getSize(anchorIndex);
   let width = getWidth(anchorIndex);
   let depth = getDepth(anchorIndex);
+
+  let scissor = getScissor(anchorIndex);
 
   let startPos = getPosition(anchorIndex);
   let nextPos = getPosition(nextIndex);
@@ -78,6 +82,7 @@ const ARROW_ASPECT: f32 = 2.5;
     color,
     uv,
     st,
+    scissor,
     getLookup(anchorIndex),
   );
 }

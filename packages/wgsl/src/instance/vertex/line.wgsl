@@ -5,6 +5,8 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
+@optional @link fn getScissor(i: u32) -> vec4<f32> { return vec4<f32>(1.0); };
+
 @optional @link fn getSegment(i: u32) -> i32 { return 0; };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
@@ -74,6 +76,7 @@ fn trimAnchor(
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
+      vec4(NaN, NaN, NaN, NaN),
       0u,
     );
   }
@@ -107,6 +110,8 @@ fn trimAnchor(
   var centerPos = getPosition(cornerIndex);
   var beforePos = centerPos;
   var afterPos = centerPos;
+
+  var scissor = getScissor(cornerIndex);
 
   if (segment != 1) { beforePos = getPosition(cornerIndex - 1u); }
   else { trimMode = trimMode & 1; }
@@ -171,6 +176,7 @@ fn trimAnchor(
         vec4(NaN, NaN, NaN, NaN),
         vec4(NaN, NaN, NaN, NaN),
         vec4(NaN, NaN, NaN, NaN),
+        vec4(NaN, NaN, NaN, NaN),
         instanceIndex,
       );
     }
@@ -195,6 +201,7 @@ fn trimAnchor(
     color,
     uv4,
     st4,
+    scissor,
     getLookup(cornerIndex),
   );
 }

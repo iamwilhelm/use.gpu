@@ -3,6 +3,8 @@ use '@use-gpu/wgsl/use/view'::{ getViewResolution, worldToClip, getPerspectiveSc
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
+@optional @link fn getScissor(i: u32) -> vec4<f32> { return vec4<f32>(1.0); };
+
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(-1.0, -1.0, 1.0, 1.0); };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
@@ -10,7 +12,9 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
 
 @export fn getQuadVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
+
   var position = getPosition(instanceIndex);
+  var scissor = getScissor(instanceIndex);
   var rectangle = getRectangle(instanceIndex);
   var color = getColor(instanceIndex);
   var depth = getDepth(instanceIndex);
@@ -60,6 +64,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     color,
     uv4,
     st4,
+    scissor,
     instanceIndex,
   );
 }

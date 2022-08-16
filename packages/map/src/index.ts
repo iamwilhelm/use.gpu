@@ -1,5 +1,4 @@
 export * from './map';
-export * from './mvtile';
 export * from './mvtiles';
 
 export * from './providers/mapbox-provider';

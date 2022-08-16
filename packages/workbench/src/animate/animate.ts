@@ -17,6 +17,7 @@ export type AnimateProps<T> = {
   delay?: number,
   pause?: number,
   duration?: number,
+  speed?: number,
 
   tracks?: Record<string, Keyframe<T>[]>,
   keyframes?: Keyframe<T>[],
@@ -128,6 +129,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
 
     delay = 0,
     pause = 0,
+    speed = 1,
     duration = null,
 
     tracks,
@@ -157,7 +159,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     return tracks.reduce((length, keyframes) => Math.max(length, keyframes[keyframes.length - 1][0]), 0)
   }, [script, duration]);
 
-  let time = Math.max(0, (elapsed - started) / 1000 - delay);
+  let time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
   let [t, max] = getLoopedTime(time, d, pause, repeat, mirror);
 
   const values = mapValues(script, (keyframes: Keyframe<T>[]) => evaluateKeyframes(keyframes, t, ease));

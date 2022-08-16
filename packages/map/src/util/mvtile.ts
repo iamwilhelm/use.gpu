@@ -1,43 +1,26 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { MVTStyleContextProps } from '../providers/mvt-style-provider';
 
-import { gather, use, yeet, useOne } from '@use-gpu/live';
-import { Fetch, VirtualLayers, useLayoutContext } from '@use-gpu/workbench';
+import { gather, use, yeet, useMemo, useOne } from '@use-gpu/live';
 import earcut from 'earcut';
 
-import { useMVTStyleContext } from './providers/mvt-style-provider';
-
-export type MVTileProps = {
-  x: number,
-  y: number,
-  zoom: number,
-  
-  mvt: VectorTile,
-
-  children?: LiveElement,
-};
-
 const FEATURE_TYPES = ['', 'point', 'line', 'face'];
-const DEFAULT_CLASSES = ['', 'point', 'border', 'face'];
+const DEFAULT_CLASSES = ['', 'point', 'line', 'face'];
 
-export const MVTile: LiveComponent<MVTileProps> = (props) => {
-
-  const {x, y, zoom, mvt} = props;
-  
-  const layout = useLayoutContext();
-  const flipY = layout[1] > layout[3] ? -1 : 1;
-
+export const getMVTShapes = (
+  x: number, y: number, zoom: number,
+  mvt: VectorTile,
+  styles: MVTStyleContextProps,
+  flipY: boolean,
+) => {
   const z = Math.pow(2, zoom);
-  const iz = 1 / Math.pow(2, zoom);
-
-  if (x >= z || y >= z) debugger;
+  const iz = 1 / z
 
   const ox = x * iz;
-  const oy = y * iz;
-  
-  const styles = useMVTStyleContext();
-  
+  const oy = y * iz;  
+
   const {layers} = mvt;
-  
+
   const shapes: any[] = [];
 
   for (const k in layers) {
@@ -46,15 +29,15 @@ export const MVTile: LiveComponent<MVTileProps> = (props) => {
     for (let i = 0; i < length; ++i) {
       const feature = layer.feature(i);
       const {type: t, properties, extent} = feature;
-      
+    
       const type = FEATURE_TYPES[t];
       const klass = properties.class;
-      
+    
       const style = styles[klass] ?? styles.default;
 
       const toPoint = ({x, y}) => [
         ( ox + iz * x / extent) * 2 - 1,
-        ((oy + iz * y / extent) * 2 - 1) * flipY,
+        ((oy + iz * y / extent) * 2 - 1) * (flipY ? -1 : 1),
         0,
         1,
       ];
@@ -119,7 +102,6 @@ export const MVTile: LiveComponent<MVTileProps> = (props) => {
           const triangles = earcut(data.vertices, data.holes, data.dimensions);
 
           shapes.push({
-            x: 'x',
             type: 'line',
             count: data.vertices.length / 4,
             positions: data.vertices,
@@ -141,9 +123,6 @@ export const MVTile: LiveComponent<MVTileProps> = (props) => {
 
     }
   }
-  
-  return use(VirtualLayers, { items: shapes });
+
+  return shapes;    
 };
-
-
-

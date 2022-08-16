@@ -118,10 +118,14 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   const t = props.texture;
   
-  const xf = useApplyTransform(p);
+  const [xf, scissor] = useApplyTransform(p);
   
-  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, r, c, d, z, u]);
+  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, scissor, r, c, d, z, u]);
   const getFragment = useBoundShader(getMaskedFragment, FRAGMENT_BINDINGS, [m, t]);
+
+  const defines = useOne(() => (
+    patch(alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {HAS_SCISSOR: !!scissor})
+  ), scissor);
 
   return use(Virtual, {
     vertexCount,
@@ -130,7 +134,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     getVertex,
     getFragment,
 
-    defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
+    defines,
 
     pipeline,
     mode,

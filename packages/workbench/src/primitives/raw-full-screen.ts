@@ -32,6 +32,8 @@ const ZERO = [0, 0, 0, 1];
 
 const FRAGMENT_BINDINGS = bundleToAttributes(getTextureFragment);
 
+const DEFINES = { HAS_SCISSOR: false };
+
 const PIPELINE = {
   primitive: {
     topology: 'triangle-list',
@@ -65,6 +67,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
     getVertex,
     getFragment,
 
+    defines: DEFINES,
     pipeline,
     mode,
     id,

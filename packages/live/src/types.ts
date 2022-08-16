@@ -154,6 +154,7 @@ export type FiberYeet<A, B> = {
   value?: A,
   reduced?: B,
   parent?: FiberYeet<A, B>,
+  up?: FiberYeet<any, any>,
 };
 
 // Fiber quote state

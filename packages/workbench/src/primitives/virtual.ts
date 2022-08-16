@@ -27,7 +27,7 @@ import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
 import { Dispatch } from './dispatch';
 import { DrawCall, drawCall } from './draw-call';
 
-const PICK_RENDERER = [
+const PICKING_RENDERER = [
   instanceDrawVirtualPick,
   instanceFragmentPick,
 ] as VirtualRenderer;
@@ -159,7 +159,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
       }
     }
     else if (isPicking) {
-      [vertexShader, fragmentShader] = PICK_RENDERER;
+      [vertexShader, fragmentShader] = PICKING_RENDERER;
     }
     else {
       let r: VirtualRenderer | undefined;

@@ -1,3 +1,4 @@
+export * from './scissor-provider';
 export * from './compute-provider';
 export * from './cursor-provider';
 export * from './debug-provider';

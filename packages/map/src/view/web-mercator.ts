@@ -6,7 +6,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext, DifferentialContext,
+  Scissor, TransformContext, DifferentialContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
@@ -32,6 +32,7 @@ export type WebMercatorProps = Partial<AxesTrait> & Partial<GeographicTrait> & P
   on?: Swizzle,
   centered?: boolean,
   native?: boolean,
+  scissor?: boolean,
 
   children?: LiveElement,
 };
@@ -43,6 +44,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
     centered = false,
     native = false,
     radius = EARTH_CIRCUMFERENCE,
+    scissor = false,
     children,
   } = props;
 
@@ -104,6 +106,8 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
     return [matrix, swizzle, origin, range, epsilon];
   }, [long, lat, zoom, native, a, g, p, r, q, s, bend]);
 
+  const rangeMemo = useOne(() => range, JSON.stringify(range));
+
   const t = useShaderRef(matrix);
 
   const b = useShaderRef(bend);
@@ -124,13 +128,13 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
 
   const [transform, differential] = useCombinedTransform(xform, null, e);
 
-  const rangeMemo = useOne(() => range, JSON.stringify(range));
+  const view = scissor ? use(Scissor, {range: rangeMemo, children}) : children;
 
   return [
     signal(),
     provide(TransformContext, transform,
       provide(DifferentialContext, differential,
-        provide(RangeContext, rangeMemo, children ?? [])
+        provide(RangeContext, rangeMemo, view)
       )
     )
   ];

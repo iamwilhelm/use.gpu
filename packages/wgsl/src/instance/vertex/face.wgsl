@@ -3,6 +3,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
 
 @optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p; };
 @optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
+@optional @link fn scissorPosition(p: vec4<f32>) -> vec4<f32> { return vec4<f32>(1.0); };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getNormal(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
@@ -43,6 +44,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
       vec4(NaN, NaN, NaN, NaN),
+      vec4(NaN, NaN, NaN, NaN),
       0u,
     );
   }
@@ -66,6 +68,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
   var uv = getUV(cornerIndex);
   var st = getST(cornerIndex);
 
+  var scissor = scissorPosition(vertex);
   var world = transformPosition(vertex);
   var worldNormal = transformDifferential(normal, vertex, true);
   var worldTangent = transformDifferential(tangent, vertex, false);
@@ -80,6 +83,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
     color,
     uv,
     st,
+    scissor,
     getLookup(cornerIndex),
   );
 }

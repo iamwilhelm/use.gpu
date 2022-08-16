@@ -60,8 +60,6 @@ const PIPELINE = {
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
 
-const DEFINES: Record<string, any> = {};
-
 export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsProps) => {
   const {
     pipeline: propPipeline,
@@ -90,10 +88,12 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const l = useShaderRef(null, props.lookups);
   
   const g = useRawSource(mesh.vertices[0], 'vec4<f32>');
-  const xf = useApplyTransform(p);
+  const [xf, scissor] = useApplyTransform(p);
 
-  const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, c, e, w, d, l]);
+  const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);
   const getFragment = getPassThruFragment;
+
+  const defines = useOne(() => ({ HAS_SCISSOR: !!scissor }), scissor);
 
   return (
      use(Virtual, {
@@ -103,7 +103,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
       getVertex,
       getFragment,
 
-      defines: DEFINES,
+      defines,
 
       pipeline,
       mode,

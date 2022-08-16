@@ -131,7 +131,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const f = useShaderRef(props.color, props.colors);
   const e = useShaderRef(props.expand, props.expands);
 
-  const xf = useApplyTransform(p);
+  const [xf, scissor] = useApplyTransform(p);
   const q  = useShaderRef(props.flip);
 
   const t = props.texture;

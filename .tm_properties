@@ -1,0 +1,2 @@
+excludeDirectoriesInFileChooser  = "{build}"
+excludeDirectoriesInFolderSearch = "{build,node_modules}"

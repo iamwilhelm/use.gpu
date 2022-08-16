@@ -56,7 +56,7 @@ const getItemSummary = (items: LayerAggregate[]) => {
 /** Aggregate (point and line) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props) => {
   const {items, children} = props;
-  return items ? Resume(items) : gather(children, Resume);
+  return items ? Resume(items) : children ? gather(children, Resume) : null;
 };
 
 const Resume = (

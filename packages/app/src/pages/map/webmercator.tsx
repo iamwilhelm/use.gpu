@@ -39,7 +39,7 @@ export const MapWebMercatorPage: LC = () => {
   const tracks = {
     zoom: [
       [ 0, 1],
-      [10, 4.5],
+      [10, 6.5],
       [20, 5],
       [30, 2.5],
       [40, 5],
@@ -89,31 +89,33 @@ export const MapWebMercatorPage: LC = () => {
             <Animate
               loop
               delay={1}
+              speed={2}
               tracks={tracks}
               duration={65}
             >
               <WebMercator
-                native
-                centered
                 bend={1}
                 xrange={[[-1, 1], [-2/3, 2/3]]}
                 long={90}
                 lat={20}
                 zoom={1}
                 scale={[3, 3, 3]}
+                centered
+                scissor
+                native
               >
                 <MapboxProvider accessToken={accessToken}>
                   <MVTiles />
                 </MapboxProvider>
               </WebMercator>
               <WebMercator
-                centered
                 bend={1}
                 xrange={[[-1, 1], [-2/3, 2/3]]}
                 long={90}
                 lat={20}
                 zoom={1}
                 scale={[3, 3, 3]}
+                centered
               >
                 <Grid
                   axes='xy'

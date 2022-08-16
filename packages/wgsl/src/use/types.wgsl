@@ -17,6 +17,7 @@
 
 @export struct PickVertex {
   position: vec4<f32>,
+  scissor: vec4<f32>,
   index: u32,
 };
 
@@ -25,6 +26,7 @@
   color: vec4<f32>,
   uv: vec4<f32>,
   st: vec4<f32>,
+  scissor: vec4<f32>,
   index: u32,
 };
 
@@ -36,6 +38,7 @@
   color: vec4<f32>,
   uv: vec4<f32>,
   st: vec4<f32>,
+  scissor: vec4<f32>,
 
   index: u32,
 };

@@ -1,20 +1,38 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
-import { use, keyed, memo, useAsync, useCallback, useOne, useNoAsync } from '@use-gpu/live';
-import { useLayoutContext } from '@use-gpu/workbench';
+import { gather, use, keyed, yeet, memo, useAsync, useCallback, useOne, useMemo } from '@use-gpu/live';
+import { VirtualLayers, useLayoutContext, useForceUpdate } from '@use-gpu/workbench';
 import { useRangeContext } from '@use-gpu/plot';
 
 import { useTileContext } from './providers/tile-provider';
-import { MVTile } from './mvtile';
+import { MVTStyleContextProps, useMVTStyleContext } from './providers/mvt-style-provider';
+
+import { getMVTShapes } from './util/mvtile';
 import LRU from 'lru-cache';
 
 import { VectorTile } from 'mapbox-vector-tile';
 
 const getKey = (x: number, y: number, zoom: number) => (zoom << 20) + (y << 10) + (x << 0);
+const parseKey = (v: number) => [v & 0x3FF, (v >> 10) & 0x3FF, (v >> 20) & 0x3FF];
+
+const getUpKey = (x: number, y: number, zoom: number) => getKey(x >> 1, y >> 1, zoom - 1);
+const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) => getKey((x << 1) + dx, (y << 1) + dy, zoom - 1);
 
 export type MVTilesProps = {
   detail?: number,
   children?: LiveElement,
+};
+
+export type MVTileProps = {
+  tiles: {
+    cache: LRU<any>,
+    loaded: Map<number, number>,
+    flipY: boolean,
+    styles: MVTStyleContextProps,
+    forceUpdate: () => {},
+  },
+  key: number,
+  hide?: boolean,
 };
 
 export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
@@ -24,18 +42,19 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
     children,
   } = props;
 
-  const cache = useOne(() => new LRU({ max: 200 }));
-  const loaded = useOne(() => new Map<number, number>());
-
-  useOne(() => console.log(loaded))
+  const [version, forceUpdate] = useForceUpdate();
 
   const layout = useLayoutContext();
+  const styles = useMVTStyleContext();
   let [[minX, maxX], [minY, maxY]] = useRangeContext();
 
   const flipY = layout[1] > layout[3];
-  if (flipY) {
-    [minY, maxY] = [-maxY, -minY];
-  }
+  if (flipY) [minY, maxY] = [-maxY, -minY];
+
+  const cache = useOne(() => new LRU({ max: 200 }), styles);
+  const loaded = useOne(() => new Map<number, number>(), styles);
+  const tiles = useMemo(() => ({cache, loaded, flipY, styles, forceUpdate}), [flipY, styles]);
+  const seen = useOne(() => new Set<number>());
 
   const dx = Math.abs(maxX - minX) / 2;
   const dy = Math.abs(maxY - minY) / 2;
@@ -54,68 +73,65 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
   const w = maxIX - minIX;
   const h = maxIY - minIY;
 
+  seen.clear();
+
   for (let x = minIX; x < maxIX; x++) {
     const edgeX = x === minIX;
     const upX = (x === minIX || x === maxIX - 1) ? 1 : 2;
 
     for (let y = minIY; y < maxIY; y++) {
-      const upY = (y === minIY || y === maxIY - 1) ? 1 : 2;
       const edgeY = y === minIY;
+      const upY = (y === minIY || y === maxIY - 1) ? 1 : 2;
       
-      const up = upX * upY;
       const key = getKey(x, y, zoom);
+      const upKey = getUpKey(x, y, zoom);
+      
+      const upCount = upX * upY;
+      const upLoaded = loaded.get(upKey) || 0;
 
-      out.push(keyed(Tile, key, {cache, loaded, x, y, zoom, up, edgeX, edgeY}));
+      if (zoom > minLevel && upLoaded < upCount) {
+        if (cache.has(upKey)) {
+          if (!seen.has(upKey)) {
+            out.push(keyed(MVTile, upKey, {tiles, key: upKey}));
+            seen.add(upKey);
+          }
+          out.push(keyed(MVTile, key, {tiles, key, hide: true}));
+          continue;
+        }
+      }
+      out.push(keyed(MVTile, key, {tiles, key}));
     }
   }
 
-  return out;  
+  return gather(out, (items: any) => use(VirtualLayers, { items }));  
 };
 
-const Tile: LiveComponent<TileProps> = memo((props) => {
-  const {cache, loaded, x, y, zoom, up, edgeX, edgeY} = props;
+const MVTile: LiveComponent<TileProps> = memo((props) => {
+  const {tiles: {cache, loaded, flipY, styles, forceUpdate}, key, hide} = props;
   const {getMVT} = useTileContext();
 
-  const key = getKey(x, y, zoom);
-  const upKey = getKey(x >> 1, y >> 1, zoom - 1);
+  const [x, y, zoom] = parseKey(key);
+  const upKey = getUpKey(x, y, zoom);
 
-  const key1 = getKey(x & ~1, y & ~1, zoom);
-  const key2 = key1 + 1;
-  const key3 = key1 + (1<<10);
-  const key4 = key1 + (1<<10) + 1;
+  const run = useCallback(async () => (
+    cache.get(key) ?? fetch(getMVT(x, y, zoom))
+      .then(res => res.arrayBuffer())
+      .then(ab => {
+        const mvt = new VectorTile(new Uint8Array(ab));
+        const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY);
 
-  const run = useCallback(async () => cache.get(key) ?? fetch(getMVT(x, y, zoom)).then(res => res.arrayBuffer()).then(ab => {
-    const mvt = new VectorTile(new Uint8Array(ab));
-    cache.set(key, mvt);
-    loaded.set(key, (loaded.get(key) || 0) + 1);
-    return mvt;
-  }), [key, {getMVT}]);
+        cache.set(key, shapes);
+        loaded.set(upKey, (loaded.get(upKey) || 0) + 1);
+        forceUpdate();
 
-  let mvt: any;
-  if (!cache.get(key)) {
-    [mvt] = useAsync(run);
-  }
-  else {
-    useNoAsync();
-    mvt = cache.get(key);
-  }
-  
-  if ((
-    (loaded.get(key1)||0) +
-    (loaded.get(key2)||0) +
-    (loaded.get(key3)||0) +
-    (loaded.get(key4)||0)
-  ) < up) {
-    if (loaded.get(upKey)) {
-      if ((((x & 1) === 0) || edgeX) && (((y & 1) === 0) || edgeY)) {
-        mvt = cache.get(upKey);
-        return MVTile({x: x >> 1, y: y >> 1, zoom: zoom - 1, mvt});
-      }
-      else {
-        mvt = null;
-      }
-    }
-  }
-  
-  return mvt ? MVTile({...props, mvt}) : null;
+        return shapes;
+      })
+      .catch(e => console.error(e))
+  ), [key, styles, flipY]);
+
+  let s: any;
+  let [shapes] = useAsync(run);
+  if (!shapes && (s = cache.get(key))) shapes = s;
+
+  return !hide ? yeet(shapes) : null;
 }, 'MVTile');

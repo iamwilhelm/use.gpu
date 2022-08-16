@@ -74,6 +74,11 @@
       "import": "./src/fragment/pbr.wgsl",
       "require": "./src/fragment/pbr.wgsl"
     },
+    "./fragment/scissor.wgsl": {
+      "types": "./src/fragment/scissor.wgsl.d.ts",
+      "import": "./src/fragment/scissor.wgsl",
+      "require": "./src/fragment/scissor.wgsl"
+    },
     "./fragment/sdf-2d.wgsl": {
       "types": "./src/fragment/sdf-2d.wgsl.d.ts",
       "import": "./src/fragment/sdf-2d.wgsl",
@@ -393,6 +398,11 @@
       "types": "./src/transform/polar.wgsl.d.ts",
       "import": "./src/transform/polar.wgsl",
       "require": "./src/transform/polar.wgsl"
+    },
+    "./transform/scissor.wgsl": {
+      "types": "./src/transform/scissor.wgsl.d.ts",
+      "import": "./src/transform/scissor.wgsl",
+      "require": "./src/transform/scissor.wgsl"
     },
     "./transform/spherical.wgsl": {
       "types": "./src/transform/spherical.wgsl.d.ts",

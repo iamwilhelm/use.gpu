@@ -14,6 +14,7 @@ import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttribute, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
+import { useScissorContext } from '../providers/scissor-provider';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
@@ -106,17 +107,19 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const l = useShaderRef(null, props.lookups);
 
   const [xf, xd] = useCombinedTransform();
-  const m = useMaterialContext();
+  const scissor = useScissorContext();
+  const material = useMaterialContext();
 
   const hasIndices = !!props.indices;
   const defines = useMemo(() => ({
     HAS_INDICES: hasIndices,
+    HAS_SCISSOR: !!scissor,
     UNWELDED_NORMALS: !!unweldedNormals,
     UNWELDED_TANGENTS: !!unweldedTangents,
   }), [hasIndices, unweldedNormals, unweldedTangents]);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, p, n, t, u, s, g, c, i, l]);
-  const getFragment = shaded ? m : getPassThruFragment;
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, i, l]);
+  const getFragment = shaded ? material : getPassThruFragment;
 
   return (
     use(Virtual, {

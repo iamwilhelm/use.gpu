@@ -20,7 +20,7 @@ import { mat4 } from 'gl-matrix';
 import { useGeographicTrait } from '../traits';
 import { EARTH_CIRCUMFERENCE, toRad } from '../util/tiles';
 
-import { getWebMercatorPosition } from '@use-gpu/wgsl/transform/webmercator.wgsl';
+import { getWebMercatorPosition } from '@use-gpu/wgsl/transform/web-mercator.wgsl';
 
 const π = Math.PI;
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;

@@ -404,10 +404,10 @@
       "import": "./src/transform/stereographic.wgsl",
       "require": "./src/transform/stereographic.wgsl"
     },
-    "./transform/webmercator.wgsl": {
-      "types": "./src/transform/webmercator.wgsl.d.ts",
-      "import": "./src/transform/webmercator.wgsl",
-      "require": "./src/transform/webmercator.wgsl"
+    "./transform/web-mercator.wgsl": {
+      "types": "./src/transform/web-mercator.wgsl.d.ts",
+      "import": "./src/transform/web-mercator.wgsl",
+      "require": "./src/transform/web-mercator.wgsl"
     },
     "./use/array.wgsl": {
       "types": "./src/use/array.wgsl.d.ts",

@@ -14,7 +14,7 @@ import {
   Plot, Spherical, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 import {
-  WebMercator, MVT, MapboxProvider,
+  WebMercator, MVTiles, MapboxProvider,
 } from '@use-gpu/map';
 
 import { PlotControls } from '../../ui/plot-controls';
@@ -103,7 +103,7 @@ export const MapWebMercatorPage: LC = () => {
                 scale={[3, 3, 3]}
               >
                 <MapboxProvider accessToken={accessToken}>
-                  <MVT x={2} y={1} zoom={2} />
+                  <MVTiles />
                 </MapboxProvider>
               </WebMercator>
               <WebMercator
@@ -170,24 +170,6 @@ export const MapWebMercatorPage: LC = () => {
                     depth={0.5}
                   />
                 </Scale>
-                
-                <Sampled
-                  axes='x'
-                  format='vec3<f32>'
-                  size={[1024]}
-                  expr={(emit, t) => {
-                    const θ = t * π / 180;
-                    const r = Math.cos(θ * 4 + Math.sin(θ * 3) * .5) * .4 - Math.sin(θ * 5) * .5;
-                    emit(t, r * 45, 1);
-                  }}
-                >
-                  <Line
-                    width={4}
-                    color={0x3090FF}
-                    depth={0.5}
-                    zBias={1}
-                  />
-                </Sampled>
                 
                 <Grid
                   axes='xy'

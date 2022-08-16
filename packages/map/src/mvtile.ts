@@ -8,7 +8,7 @@ import earcut from 'earcut';
 import { useTileContext } from './providers/tile-provider';
 import { useMVTStyleContext } from './providers/mvt-style-provider';
 
-export type MVTProps = {
+export type MVTileProps = {
   x: number,
   y: number,
   zoom: number,
@@ -21,16 +21,20 @@ export type MVTProps = {
 const FEATURE_TYPES = ['', 'point', 'line', 'face'];
 const DEFAULT_CLASSES = ['', 'point', 'border', 'face'];
 
-export const MVT: LiveComponent<MVTProps> = (props) => {
+export const MVTile: LiveComponent<MVTileProps> = (props) => {
 
   const {x, y, zoom, native} = props;
   
   const layout = useLayoutContext();
   const flipY = layout[1] > layout[3] ? -1 : 1;
 
-  const z = 1 / Math.pow(2, zoom);
-  const ox = x * z;
-  const oy = y * z;
+  const z = Math.pow(2, zoom);
+  const iz = 1 / Math.pow(2, zoom);
+
+  if (x >= z || y >= z) debugger;
+
+  const ox = x * iz;
+  const oy = y * iz;
   
   const styles = useMVTStyleContext();
   const {getMVT} = useTileContext();
@@ -41,11 +45,6 @@ export const MVT: LiveComponent<MVTProps> = (props) => {
     
     const shapes: any[] = [];
 
-    let minX = 0;
-    let minY = 0;
-    let maxX = 0;
-    let maxY = 0;
-
     for (const k in layers) {
       const layer = layers[k];
       const {length} = layer;
@@ -53,26 +52,14 @@ export const MVT: LiveComponent<MVTProps> = (props) => {
         const feature = layer.feature(i);
         const {type: t, properties, extent} = feature;
         
-        {
-          const [a, b, c, d] = feature.bbox();
-          minX = Math.min(minX, a);
-          minY = Math.min(minY, b);
-          maxX = Math.max(maxX, c);
-          maxY = Math.max(maxY, d);
-        }
-        
         const type = FEATURE_TYPES[t];
         const klass = properties.class;
         
-        if (!klass) {
-        }
-        
         const style = styles[klass] ?? styles.default;
-        console.log({type, class: klass, properties})
 
         const toPoint = ({x, y}) => [
-          (ox + z * x / extent) * 2 - 1,
-          ((oy + z * y / extent) * 2 - 1) * flipY,
+          ( ox + iz * x / extent) * 2 - 1,
+          ((oy + iz * y / extent) * 2 - 1) * flipY,
           0,
           1,
         ];
@@ -159,7 +146,6 @@ export const MVT: LiveComponent<MVTProps> = (props) => {
       }
     }
     
-    console.log({minX, minY, maxX, maxY})
     return use(VirtualLayers, { items: shapes });
   };
 
@@ -171,7 +157,8 @@ export const MVT: LiveComponent<MVTProps> = (props) => {
         try {
           return useOne(() => render(new VectorTile(new Uint8Array(buffer))), buffer);
         } catch (e) {
-          throw new Error("Unable to parse .mvt - " + e.stack);
+          return null;
+          //throw new Error("Unable to parse .mvt - " + e.stack);
         }
       },
     });

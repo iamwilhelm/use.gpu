@@ -2,6 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { MVTStyleContextProps } from '../providers/mvt-style-provider';
 
 import { gather, use, yeet, useMemo, useOne } from '@use-gpu/live';
+import { cutPolygon } from './tess';
 import earcut from 'earcut';
 
 const FEATURE_TYPES = ['', 'point', 'line', 'face'];
@@ -12,6 +13,7 @@ export const getMVTShapes = (
   mvt: VectorTile,
   styles: MVTStyleContextProps,
   flipY: boolean,
+  tesselate: number = 0,
 ) => {
   const z = Math.pow(2, zoom);
   const iz = 1 / z
@@ -35,7 +37,9 @@ export const getMVTShapes = (
     
       const style = styles[klass] ?? styles.default;
 
-      const toPoint = ({x, y}) => [
+      const toPoint = ({x, y}) => [x, y];
+
+      const toPoint4 = ([x, y]) => [
         ( ox + iz * x / extent) * 2 - 1,
         ((oy + iz * y / extent) * 2 - 1) * (flipY ? -1 : 1),
         0,
@@ -92,20 +96,55 @@ export const getMVTShapes = (
         }
       }
       else if (t === 3) {
-        const geometry = feature.asPolygons();
+        let geometry = feature.asPolygons().map(polygon => polygon.map((ring) => {
+          const out = ring.map(toPoint);
+          out.pop();
+          return out;
+        }));
+
+        if (tesselate > 0) {
+          const t = 1 << zoom;
+          const g = extent;
+
+          for (let i = 0; i < tesselate; ++i) {
+            const z = 1 / (1 << (i + 1));
+            {
+              const o: XY[][] = [];
+              geometry.forEach((polygon) => {
+                const l = cutPolygon(polygon,  1,  0,  (2 * i + 1) * z * g);
+                const r = cutPolygon(polygon, -1,  0, -(2 * i + 1) * z * g);
+                if (l?.length) o.push(...l);
+                if (r?.length) o.push(...r);
+              });
+              geometry = o;
+            }
+            {
+              const o: XY[][] = [];
+              geometry.forEach((polygon) => {
+                const t = cutPolygon(polygon,  0,  1,  (2 * i + 1) * z * g);
+                const b = cutPolygon(polygon,  0, -1, -(2 * i + 1) * z * g);
+                if (t?.length) o.push(...t);
+                if (b?.length) o.push(...b);
+              });
+              geometry = o;
+            }
+          }
+        }
+
         for (const polygon of geometry) {
+          const polygon4 = polygon.map(ring => ring.map((p, i) => toPoint4(p)));
 
-          const positions = polygon.map((ring) => ring.map(toPoint));
-          for (const poly of positions) poly.pop();
+          const data = earcut.flatten(polygon4);
+          if (!data.vertices.length) continue;
 
-          const data = earcut.flatten(positions);
           const triangles = earcut(data.vertices, data.holes, data.dimensions);
+          if (!triangles.length) continue;
 
           shapes.push({
             type: 'line',
             count: data.vertices.length / 4,
             positions: data.vertices,
-            segments: positions.flatMap((path) => path.map((_, i) => i === 0 ? 1 : i === path.length - 1 ? 2 : 3)),
+            segments: polygon.flatMap((path) => path.map((_, i) => i === 0 ? 1 : i === path.length - 1 ? 2 : 3)),
             color: style.stroke,
             width: 4,
           });

@@ -14,7 +14,7 @@ export const useApplyTransform = (
 ) => {
   const transform = useTransformContext();
   const scissor = useScissorContext();
-  const version = useVersion(positions) + useVersion(transform);
+  const version = useVersion(positions) + useVersion(transform) + useVersion(scissor);
 
   return useOne(() => {
     if (positions == null) return [null, null];

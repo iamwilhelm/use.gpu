@@ -33,6 +33,7 @@
     "getdocs-ts": "^0.1.2",
     "jest": "^27.2.0",
     "magic-string": "^0.26.2",
+    "node-fetch": "^3.2.10",
     "raw-loader": "^4.0.2",
     "rollup-pluginutils": "^2.8.2",
     "style-loader": "^3.3.1",

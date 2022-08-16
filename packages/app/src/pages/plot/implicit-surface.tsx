@@ -22,7 +22,7 @@ import { SurfaceControls } from '../../ui/surface-controls';
 let t = 0;
 let π = Math.PI;
 
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
 const f = (x: number, y: number, z: number, t: number) => {
   x = x * 2;

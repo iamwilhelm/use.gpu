@@ -8,8 +8,7 @@ export type MapboxProviderProps = {
   style?: string,
 };
 
-const makeMVTSource = (username, style, accessToken) => (x, y, zoom) =>
-  `https://api.mapbox.com/v4/${username}.${style}/${zoom}/${x}/${y}.mvt?access_token=${accessToken}`;
+const makeMVTSource = (username, style, accessToken) => (x, y, zoom) => `https://api.mapbox.com/v4/${username}.${style}/${zoom}/${x}/${y}.mvt?access_token=${accessToken}`;
 
 export const MapboxProvider: LC<MapboxProviderProps> = (props: PropsWithChildren<MapboxProviderProps>) => {
   const {

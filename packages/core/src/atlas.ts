@@ -12,7 +12,7 @@ type Bins = Map<number, Set<Slot>>;
 
 const EMPTY: any[] = [];
 const sqr = (x: number) => x * x;
-const lerp = (a: number, b: number, t: number) => a * t + b * (1 - t);
+const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 export const makeAtlasSource = (
@@ -189,7 +189,7 @@ export const makeAtlas = (
     const f1 = x <= near ? x / near : x / full;
 
     // Must not exceed far, with penalty for overhang, unless far is close to full
-    const f2 = lerp(x <= far ? x / far : 0.5 + (x - far) / (full - far) / 2, 1.0, far / full);
+    const f2 = lerp(x <= far ? x / far : (0.5 + (x - far) / (full - far) / 2), 1.0, far / full);
 
     return f1 * f2;
   };

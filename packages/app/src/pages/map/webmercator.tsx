@@ -14,7 +14,7 @@ import {
   Plot, Spherical, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
 import {
-  WebMercator, MVTiles, MapboxProvider,
+  WebMercator, MVTiles, MapboxProvider, MapTileProvider,
 } from '@use-gpu/map';
 
 import { PlotControls } from '../../ui/plot-controls';
@@ -39,9 +39,9 @@ export const MapWebMercatorPage: LC = () => {
   const tracks = {
     zoom: [
       [ 0, 1],
-      [10, 6.5],
-      [20, 5],
-      [30, 2.5],
+      [10, 3],
+      [20, 3],
+      [30, 3],
       [40, 5],
       [50, 5],
       [60, 1],
@@ -89,7 +89,7 @@ export const MapWebMercatorPage: LC = () => {
             <Animate
               loop
               delay={1}
-              speed={2}
+              speed={1/20}
               tracks={tracks}
               duration={65}
             >
@@ -104,9 +104,11 @@ export const MapWebMercatorPage: LC = () => {
                 scissor
                 native
               >
-                <MapboxProvider accessToken={accessToken}>
+                <MapTileProvider>
+                {/*<MapboxProvider accessToken={accessToken}>*/}
                   <MVTiles />
-                </MapboxProvider>
+                {/*</MapboxProvider>*/}
+                </MapTileProvider>
               </WebMercator>
               <WebMercator
                 bend={1}

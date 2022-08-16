@@ -3,6 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import { provide, makeContext, useContext, useNoContext, useOne } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useShaderRefs } from '../hooks/useShaderRef';
 
 import { getScissorLevel } from '@use-gpu/wgsl/transform/scissor.wgsl';
 
@@ -25,7 +26,7 @@ export const Scissor: LC<ScissorProps> = (props: PropsWithChildren<ScissorProps>
   const min = useOne(() => range.map(r => r[0]), range);
   const max = useOne(() => range.map(r => r[1]), range);
 
-  const bound = useBoundShader(getScissorLevel, SCISSOR_BINDINGS, [min, max]);
+  const bound = useBoundShader(getScissorLevel, SCISSOR_BINDINGS, useShaderRefs(min, max));
 
   return provide(ScissorContext, bound, children);
 };

@@ -33,6 +33,7 @@ export type MVTileProps = {
   },
   key: number,
   hide?: boolean,
+  tesselate?: number,
 };
 
 export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
@@ -74,6 +75,8 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
   const h = maxIY - minIY;
 
   seen.clear();
+  
+  const tesselate = 4 - zoom;
 
   for (let x = minIX; x < maxIX; x++) {
     const edgeX = x === minIX;
@@ -92,14 +95,14 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
       if (zoom > minLevel && upLoaded < upCount) {
         if (cache.has(upKey)) {
           if (!seen.has(upKey)) {
-            out.push(keyed(MVTile, upKey, {tiles, key: upKey}));
+            out.push(keyed(MVTile, upKey, {tiles, key: upKey, tesselate}));
             seen.add(upKey);
           }
-          out.push(keyed(MVTile, key, {tiles, key, hide: true}));
+          out.push(keyed(MVTile, key, {tiles, key, tesselate, hide: true}));
           continue;
         }
       }
-      out.push(keyed(MVTile, key, {tiles, key}));
+      out.push(keyed(MVTile, key, {tiles, key, tesselate}));
     }
   }
 
@@ -107,7 +110,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
 };
 
 const MVTile: LiveComponent<TileProps> = memo((props) => {
-  const {tiles: {cache, loaded, flipY, styles, forceUpdate}, key, hide} = props;
+  const {tiles: {cache, loaded, flipY, styles, forceUpdate}, key, hide, tesselate} = props;
   const {getMVT} = useTileContext();
 
   const [x, y, zoom] = parseKey(key);
@@ -118,7 +121,7 @@ const MVTile: LiveComponent<TileProps> = memo((props) => {
       .then(res => res.arrayBuffer())
       .then(ab => {
         const mvt = new VectorTile(new Uint8Array(ab));
-        const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY);
+        const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY, tesselate);
 
         cache.set(key, shapes);
         loaded.set(upKey, (loaded.get(upKey) || 0) + 1);

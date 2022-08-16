@@ -10,7 +10,7 @@ import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
+import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { RenderPassMode, resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -111,11 +111,11 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
   const getFragment = getPassThruFragment;
 
-  const defines = useOne(() => ({
+  const defines = useMemo(() => ({
     HAS_SCISSOR: !!scissor,
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
-  }), j);
+  }), [j, scissor]);
   
   return use(Virtual, {
     vertexCount,

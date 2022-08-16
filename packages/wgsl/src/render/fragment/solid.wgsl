@@ -9,7 +9,7 @@ fn main(
   @location(2) fragST: vec4<f32>,  
   @location(3) fragScissor: vec4<f32>,  
 ) -> @location(0) vec4<f32> {
-  var outColor = fragColor * vec4<f32>(fragScissor.xy, 1.0, 1.0);
+  var outColor = fragColor;
   outColor = getFragment(outColor, fragUV, fragST);
 
   if (HAS_SCISSOR) { if (isScissored(fragScissor)) { discard; }}

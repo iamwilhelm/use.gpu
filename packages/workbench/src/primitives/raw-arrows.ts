@@ -93,7 +93,10 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);
   const getFragment = getPassThruFragment;
 
-  const defines = useOne(() => ({ HAS_SCISSOR: !!scissor }), scissor);
+  const defines = useOne(() => ({
+    HAS_ALPHA_TO_COVERAGE: false,
+    HAS_SCISSOR: !!scissor,
+  }), scissor);
 
   return (
      use(Virtual, {

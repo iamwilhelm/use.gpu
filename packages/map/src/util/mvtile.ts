@@ -130,22 +130,21 @@ export const getMVTShapes = (
     }
 
   };
+
+  const toPoint4 = ([x, y]) => [
+    (( ox + iz * x) * 2 - 1),
+    (((oy + iz * y) * 2 - 1) * (flipY ? -1 : 1)),
+    0,
+    1,
+  ];
+  const style = styles['background'];
+  if (style) {
+    addPolygon([[[[0, 0], [1, 0], [1, 1], [0, 1]]]], {}, style, 1, toPoint4);
+  }
   
   for (const k in layers) {
     const layer = layers[k];
     const {length, extent, name} = layer;
-    const style = styles[name + '/background'];
-
-    const toPoint4 = ([x, y]) => [
-      (( ox + iz * (x / extent)) * 2 - 1),
-      (((oy + iz * (y / extent)) * 2 - 1) * (flipY ? -1 : 1)),
-      0,
-      1,
-    ];
-
-    if (style) {
-      addPolygon([[[[0, 0], [extent, 0], [extent, extent], [0, extent]]]], {}, style, extent, toPoint4);
-    }
     
     //console.log("layer", name, layer, length)
 

@@ -96,7 +96,7 @@ export const MapWebMercatorPage: LC = () => {
             <Animate
               loop
               delay={1}
-              speed={2}
+              speed={1/20}
               tracks={tracks}
               duration={75}
             >

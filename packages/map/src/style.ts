@@ -18,7 +18,7 @@ export const DEFAULT_STYLE_SHEET = {
       zBias: 2,
     },
   },
-  'admin/background': {
+  background: {
     face: {
       fill: parseColor('#0a0a10'),
       zBias: -50,

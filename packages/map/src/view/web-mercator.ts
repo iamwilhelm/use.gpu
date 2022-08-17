@@ -103,11 +103,12 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
       mat4.multiply(matrix, matrix, t);
       range = range.map((_, i) => range[order[i]]);
     }
-
+    
     return [matrix, swizzle, origin, range, epsilon];
   }, [long, lat, zoom, native, a, g, p, r, q, s, bend]);
 
   const rangeMemo = useOne(() => range, JSON.stringify(range));
+  const scissorRange = useOne(() => [range[0], range[1], range[2], [0, 2]], rangeMemo);
 
   const t = useShaderRef(matrix);
 
@@ -129,7 +130,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
 
   const [transform, differential] = useCombinedTransform(xform, null, e);
 
-  const view = scissor ? use(Scissor, {range: rangeMemo, loop: MERCATOR_LOOP, children}) : children;
+  const view = scissor ? use(Scissor, {range: scissorRange, loop: MERCATOR_LOOP, children}) : children;
 
   return [
     signal(),

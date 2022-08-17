@@ -117,6 +117,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const defines = useMemo(() => ({
     HAS_INDICES: hasIndices,
     HAS_SCISSOR: !!scissor,
+    HAS_ALPHA_TO_COVERAGE: false,
     UNWELDED_NORMALS: !!unweldedNormals,
     UNWELDED_TANGENTS: !!unweldedTangents,
   }), [hasIndices, unweldedNormals, unweldedTangents]);

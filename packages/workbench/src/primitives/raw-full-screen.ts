@@ -32,7 +32,10 @@ const ZERO = [0, 0, 0, 1];
 
 const FRAGMENT_BINDINGS = bundleToAttributes(getTextureFragment);
 
-const DEFINES = { HAS_SCISSOR: false };
+const DEFINES = {
+  HAS_ALPHA_TO_COVERAGE: false,
+  HAS_SCISSOR: false,
+};
 
 const PIPELINE = {
   primitive: {

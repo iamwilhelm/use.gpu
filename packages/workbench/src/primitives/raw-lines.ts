@@ -112,6 +112,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const getFragment = getPassThruFragment;
 
   const defines = useMemo(() => ({
+    HAS_ALPHA_TO_COVERAGE: false,
     HAS_SCISSOR: !!scissor,
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,

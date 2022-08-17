@@ -8,9 +8,9 @@
   let sloop = getScissorLoop();
 
   if (HAS_SCISSOR_LOOP) {
-    smin = select(smin, smin + sloop, smin <= -sloop);
+    smin = select(smin, smin + sloop, smin < -sloop);
     smin = select(smin, smin - sloop, smin > sloop);
-    smax = select(smax, smax + sloop, smax <= -sloop);
+    smax = select(smax, smax + sloop, smax < -sloop);
     smax = select(smax, smax - sloop, smax > sloop);
   }
 
@@ -18,9 +18,9 @@
   var pmax = smax - position;
 
   if (HAS_SCISSOR_LOOP) {
-    pmin = select(pmin, pmin + sloop, pmin <= -sloop);
+    pmin = select(pmin, pmin + sloop, pmin < -sloop);
     pmin = select(pmin, pmin - sloop, pmin > sloop);
-    pmax = select(pmax, pmax + sloop, pmax <= -sloop);
+    pmax = select(pmax, pmax + sloop, pmax < -sloop);
     pmax = select(pmax, pmax - sloop, pmax > sloop);
   }
 

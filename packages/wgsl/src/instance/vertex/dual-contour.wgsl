@@ -102,7 +102,7 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
 
   let vertex = getVertexPosition(index).xyz;
   var normal: vec4<f32>;
-  if (isQuadratic) { normal = getVertexNormal(index * 3 + normalIndex); }
+  if (IS_QUADRATIC) { normal = getVertexNormal(index * 3 + normalIndex); }
   else { normal = getVertexNormal(index); }
 
   let uv3 = (vertex - padding) / (vec3<f32>(gridSize - 1u) - padding * 2.0);

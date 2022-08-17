@@ -1,4 +1,4 @@
-use '@use-gpu/wgsl/fragment/scissor':: { isScissored };
+use '@use-gpu/wgsl/fragment/scissor':: { scissorFragment };
 
 @optional @link fn getFragment(color: vec4<f32>, uv: vec4<f32>, st: vec4<f32>) -> vec4<f32> { return color; }
 
@@ -12,10 +12,10 @@ fn main(
   var outColor = fragColor;
   outColor = getFragment(outColor, fragUV, fragST);
 
-  if (HAS_SCISSOR) { if (isScissored(fragScissor)) { discard; } }
-  //if (HAS_SCISSOR) { if (isScissored(fragScissor)) {
+  if (HAS_SCISSOR) { outColor = scissorFragment(outColor, fragScissor); }
+  //if (HAS_SCISSOR) {
   //  outColor = vec4<f32>(outColor.xyz * fragScissor.xyz, outColor.a);
-  //}}
+  //}
   if (outColor.a <= 0.0) { discard; }
 
   return outColor;

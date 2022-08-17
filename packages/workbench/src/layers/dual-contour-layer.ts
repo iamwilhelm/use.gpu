@@ -72,11 +72,40 @@ const SCAN_BINDINGS = bundleToAttributes(scanVolume);
 const FIT_BINDINGS = bundleToAttributes(fitContourLinear);
 const VERTEX_BINDINGS = bundleToAttributes(getDualContourVertex);
 
+const DEFINES_ALPHA = {
+  HAS_ALPHA_TO_COVERAGE: false,
+};
+
+const DEFINES_ALPHA_TO_COVERAGE = {
+  HAS_ALPHA_TO_COVERAGE: true,
+};
+
+const PIPELINE_ALPHA = {
+  primitive: {
+    topology: 'triangle-strip',
+  },
+} as DeepPartial<GPURenderPipelineDescriptor>;
+
+const PIPELINE_ALPHA_TO_COVERAGE = {
+  fragment: {
+    targets: {
+      0: { blend: {$set: undefined}, },
+    },
+  },
+  multisample: {
+    alphaToCoverageEnabled: true,
+  },
+  primitive: {
+    topology: 'triangle-strip',
+  },
+} as DeepPartial<GPURenderPipelineDescriptor>;
+
 const PIPELINE = {
   primitive: {
     topology: 'triangle-strip',
   },
 } as DeepPartial<GPURenderPipelineDescriptor>;
+
 
 export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((props: DualContourLayerProps) => {
   const {
@@ -96,6 +125,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     zBias = 0,
     live = false,
 
+    alphaToCoverage = true,
     cullMode = 'none',
     mode = 'opaque',
     id = 0,
@@ -225,8 +255,20 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
   };
 
-  const pipeline = useOne(() => patch(PIPELINE, { primitive: { cullMode }}), cullMode);
-  const defines = useOne(() => ({ HAS_SCISSOR: !!padding, isQuadratic: method === 'quadratic' }), method);
+  const pipeline = useMemo(() =>
+    patch(alphaToCoverage
+      ? PIPELINE_ALPHA_TO_COVERAGE
+      : PIPELINE_ALPHA,
+      { primitive: { cullMode } },
+    ),
+    [alphaToCoverage, cullMode]);
+
+  const defines = useMemo(() => (
+    patch(alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {
+      HAS_SCISSOR: !!padding,
+      IS_QUADRATIC: method === 'quadratic',
+    })
+  ), [padding, method]);
 
   const view = [
     use(Dispatch, {

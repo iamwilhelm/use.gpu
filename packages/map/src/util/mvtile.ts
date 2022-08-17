@@ -93,6 +93,7 @@ export const getMVTShapes = (
           indices: triangles,
           color: style.face.fill,
           zBias: style.face.zBias,
+          cullMode: 'back',
         });
       }
     }

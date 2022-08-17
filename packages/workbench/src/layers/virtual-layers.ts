@@ -222,7 +222,7 @@ const makeFaceAccumulator = (
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
 
-    if (hasCullMode) props.cullMode = items[0]?.cullMode;
+    if (hasCullMode) props.pipeline = {primitive: {cullMode: items[0]?.cullMode}};
 
     return use(FaceLayer, props);
   };

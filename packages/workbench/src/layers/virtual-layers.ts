@@ -3,7 +3,7 @@ import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@u
 import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, FaceAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
-import { use, keyed, signal, gather, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, signal, gather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -54,10 +54,10 @@ const getItemSummary = (items: LayerAggregate[]) => {
 }
 
 /** Aggregate (point and line) geometry from children to produce merged layers. */
-export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props) => {
+export const VirtualLayers: LiveComponent<VirtualLayersProps> = memo((props) => {
   const {items, children} = props;
   return items ? Resume(items) : children ? gather(children, Resume) : null;
-};
+}, 'VirtualLayers');
 
 const Resume = (
   items: (LayerAggregate | null)[],
@@ -118,11 +118,13 @@ const makePointAccumulator = (
   const hasColor = keys.has('colors') || keys.has('color');
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasDepth = keys.has('depths') || keys.has('depth');
+  const hasZBias = keys.has('zBiases') || keys.has('zBias');
 
   if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', alloc);
   if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', alloc);
   if (hasSize) storage.sizes = makeAggregateBuffer(device, 'f32', alloc);
-  if (hasDepth) storage.depth = makeAggregateBuffer(device, 'f32', alloc);
+  if (hasDepth) storage.depths = makeAggregateBuffer(device, 'f32', alloc);
+  if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', alloc);
 
   return (items: PointAggregate[], count: number) => {
     const props = {count, shape: 'circle'} as Record<string, any>;
@@ -130,7 +132,8 @@ const makePointAccumulator = (
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
     if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
-    if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');
+    if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');
+    if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
 
     return use(PointLayer, props);
   };
@@ -147,15 +150,17 @@ const makeLineAccumulator = (
   const hasPosition = keys.has('positions') || keys.has('position');
   const hasSegment = keys.has('segments') || keys.has('segment');
   const hasColor = keys.has('colors') || keys.has('color');
-  const hasSize = keys.has('sizes') || keys.has('size');
+  const hasWidth = keys.has('widths') || keys.has('width');
   const hasDepth = keys.has('depths') || keys.has('depth');
+  const hasZBias = keys.has('zBiases') || keys.has('zBias');
 
   storage.segments = makeAggregateBuffer(device, 'i32', alloc);
 
   if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', alloc);
   if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', alloc);
-  if (hasSize) storage.sizes = makeAggregateBuffer(device, 'f32', alloc);
+  if (hasWidth) storage.widths = makeAggregateBuffer(device, 'f32', alloc);
   if (hasDepth) storage.depth = makeAggregateBuffer(device, 'f32', alloc);
+  if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', alloc);
 
   return (items: LineAggregate[], count: number) => {
     const props = {count, join: 'miter'} as Record<string, any>;
@@ -167,8 +172,9 @@ const makeLineAccumulator = (
 
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
-    if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
+    if (hasWidth) props.widths = updateAggregateBuffer(device, storage.widths, items, count, 'width', 'widths');
     if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
+    if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
 
     return use(LineLayer, props);
   };
@@ -188,14 +194,14 @@ const makeFaceAccumulator = (
   const hasSegment = keys.has('segments') || keys.has('segment');
   const hasColor = keys.has('colors') || keys.has('color');
   const hasSize = keys.has('sizes') || keys.has('size');
-  const hasDepth = keys.has('depths') || keys.has('depth');
+  const hasZBias = keys.has('zBiases') || keys.has('zBias');
 
   storage.segments = makeAggregateBuffer(device, 'i32', allocCount);
   storage.indices = makeAggregateBuffer(device, 'u32', allocIndices);
 
   if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
   if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
-  if (hasDepth) storage.depth = makeAggregateBuffer(device, 'f32', allocCount);
+  if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', allocCount);
 
   return (items: FaceAggregate[], count: number, indices: number) => {
     const props = {count, join: 'miter'} as Record<string, any>;
@@ -213,7 +219,7 @@ const makeFaceAccumulator = (
 
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
-    if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
+    if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
 
     return use(FaceLayer, props);
   };

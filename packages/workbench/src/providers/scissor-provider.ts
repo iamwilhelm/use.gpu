@@ -21,8 +21,10 @@ export const ScissorContext = makeContext<ScissorContextProps>(null, 'ScissorCon
 export const useScissorContext = () => useContext<ScissorContextProps | null>(ScissorContext);
 export const useNoScissorContext = () => useNoContext(ScissorContext);
 
+const NO_LOOP = [0, 0, 0, 0];
+
 export const Scissor: LC<ScissorProps> = (props: PropsWithChildren<ScissorProps>) => {
-  const {range, loop = [0, 0, 0, 0], children} = props;
+  const {range, loop = NO_LOOP, children} = props;
 
   const min = useOne(() => range.map(r => r[0]), range);
   const max = useOne(() => range.map(r => r[1]), range);
@@ -32,6 +34,7 @@ export const Scissor: LC<ScissorProps> = (props: PropsWithChildren<ScissorProps>
   }), loop);
 
   const bound = useBoundShader(getScissorLevel, SCISSOR_BINDINGS, useShaderRefs(min, max, loop), defines);
+  useOne(() => console.log('defines changed'), loop);
 
   return provide(ScissorContext, bound, children);
 };

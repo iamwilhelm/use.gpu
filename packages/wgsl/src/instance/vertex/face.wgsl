@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
-use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
+use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 
 @optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p; };
 @optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
@@ -12,6 +12,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
 @optional @link fn getST(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
 @optional @link fn getSegment(i: u32) -> i32 { return -1; };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
+@optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
 @optional @link fn getIndex(i: u32) -> u32 { return 0u; };
 @optional @link fn getLookup(i: u32) -> u32 { return i; };
@@ -65,6 +66,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
   var normal = getNormal(normalIndex);
   var tangent = getTangent(tangentIndex);
   var color = getColor(cornerIndex);
+  var zBias = getZBias(cornerIndex);
   var uv = getUV(cornerIndex);
   var st = getST(cornerIndex);
 
@@ -74,6 +76,11 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewPosition };
   var worldTangent = transformDifferential(tangent, vertex, false);
 
   var position = worldToClip(world);
+
+  if (zBias != 0.0) {
+    var vr = getViewResolution();
+    position = applyZBias(position, vr.y * zBias);
+  }
 
   return ShadedVertex(
     position,

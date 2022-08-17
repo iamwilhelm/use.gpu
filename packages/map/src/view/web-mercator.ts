@@ -26,6 +26,7 @@ const π = Math.PI;
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
 const MERCATOR_BINDINGS = bundleToAttributes(getWebMercatorPosition);
+const MERCATOR_LOOP = [2, 0, 0, 0];
 
 export type WebMercatorProps = Partial<AxesTrait> & Partial<GeographicTrait> & Partial<ObjectTrait> & {
   bend?: number,
@@ -128,7 +129,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
 
   const [transform, differential] = useCombinedTransform(xform, null, e);
 
-  const view = scissor ? use(Scissor, {range: rangeMemo, loop: [2, 0, 0, 0], children}) : children;
+  const view = scissor ? use(Scissor, {range: rangeMemo, loop: MERCATOR_LOOP, children}) : children;
 
   return [
     signal(),

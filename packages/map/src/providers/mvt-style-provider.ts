@@ -5,6 +5,8 @@ import { patch } from '@use-gpu/state';
 import { parseNumber, parseColor } from '@use-gpu/traits';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
+import { DEFAULT_STYLE_SHEET } from '../style';
+
 export type MVTStyle = {
   stroke?: ColorLike,
   fill?: ColorLike,
@@ -32,6 +34,7 @@ const DEFAULT_STYLE: MVTStyle = {
   fill: [0.5, 0.5, 0.5, 1],
   stroke: [1, 1, 1, 1],
   depth: 0.5,
+  zBias: 0,
   line: {
     width: 2,
   },
@@ -48,9 +51,11 @@ const DEFAULT_STYLE: MVTStyle = {
   },
 };
 
-export const MVTStyleContext = makeContext<MVTStyleContextProps>({
+for (let k in DEFAULT_STYLE_SHEET) DEFAULT_STYLE_SHEET[k] = patch(DEFAULT_STYLE_SHEET[k], {$apply: x => patch(DEFAULT_STYLE, x)});
+
+export const MVTStyleContext = makeContext<MVTStyleContextProps>(patch({
   default: DEFAULT_STYLE,
-}, 'MVTStyleContext');
+}, DEFAULT_STYLE_SHEET), 'MVTStyleContext');
 
 export const useMVTStyleContext = () => useContext(MVTStyleContext);
 export const useNoMVTStyleContext = () => useNoContext(MVTStyleContext);

@@ -30,6 +30,7 @@ export type RawFacesProps = {
   st?: number[] | TypedArray,
   segment?: number,
   color?: number[] | TypedArray,
+  zBias?: number,
 
   positions?: ShaderSource,
   normals?: ShaderSource,
@@ -38,6 +39,7 @@ export type RawFacesProps = {
   sts?: ShaderSource,
   segments?: ShaderSource,
   colors?: ShaderSource,
+  zBiases?: ShaderSource,
 
   indices?: ShaderSource,
   lookups?: ShaderSource,
@@ -102,6 +104,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const s = useShaderRef(props.st, props.sts);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
+  const z = useShaderRef(props.zBias, props.zBiases);
 
   const i = useShaderRef(null, props.indices);
   const l = useShaderRef(null, props.lookups);
@@ -118,7 +121,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     UNWELDED_TANGENTS: !!unweldedTangents,
   }), [hasIndices, unweldedNormals, unweldedTangents]);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, i, l]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, l]);
   const getFragment = shaded ? material : getPassThruFragment;
 
   return (

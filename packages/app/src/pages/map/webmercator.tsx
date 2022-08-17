@@ -32,6 +32,8 @@ const thetaFormatter = (θ: number) => {
   return `${θ < 0 ? '-' : ''}${num > 1 + EPS ? numberFormatter(num) : ''}π${denom > 1 + EPS ? '/' + numberFormatter(denom) : ''}`;
 };
 
+const USE_MAPBOX = false;
+
 export const MapWebMercatorPage: LC = () => {
   
   const accessToken = process.env.MAPBOX_TOKEN;
@@ -52,8 +54,8 @@ export const MapWebMercatorPage: LC = () => {
       [10, 0],
       [20, 0],
       [30, 50],
-      [40, 50],
-      [50, 90],
+      [40, 70],
+      [50, 120],
       [60, 360],
       [60, 0],
       [70, 0],
@@ -63,9 +65,9 @@ export const MapWebMercatorPage: LC = () => {
       [10, 30],
       [20, 30],
       [30, 30],
-      [40, -30],
-      [50, 0],
-      [60, 50],
+      [40, 20],
+      [50, -30],
+      [60, 30],
       [70, 0],
     ],
     bend: [
@@ -100,7 +102,7 @@ export const MapWebMercatorPage: LC = () => {
             >
               <WebMercator
                 bend={1}
-                range={[[-1, 1], [-2/3, 2/3]]}
+                range={[[-1.5, 1.5], [-.5 - 2/3, .5 + 2/3]]}
                 long={90}
                 lat={20}
                 zoom={1}
@@ -109,12 +111,15 @@ export const MapWebMercatorPage: LC = () => {
                 scissor
                 native
               >
-                {/*<MapboxProvider accessToken={accessToken}>
-                  <MVTiles />
-                </MapboxProvider>*/}
-                <MapTileProvider>
-                  <MVTiles />
-                </MapTileProvider>
+                {USE_MAPBOX ? (
+                  <MapboxProvider accessToken={accessToken}>
+                    <MVTiles />
+                  </MapboxProvider>
+                ) : (
+                  <MapTileProvider>
+                    <MVTiles detail={2} />
+                  </MapTileProvider>
+                )}
               </WebMercator>
               <WebMercator
                 bend={1}
@@ -131,7 +136,7 @@ export const MapWebMercatorPage: LC = () => {
                   width={2}
                   first={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
                   second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
-                  color={[0.25, 0.25, 0.25, 0.5]}
+                  color={[0.75, 0.75, 0.75, 0.125]}
                   depth={0.5}
                   zBias={10}
                 />

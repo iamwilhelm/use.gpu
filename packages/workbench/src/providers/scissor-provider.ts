@@ -34,7 +34,6 @@ export const Scissor: LC<ScissorProps> = (props: PropsWithChildren<ScissorProps>
   }), loop);
 
   const bound = useBoundShader(getScissorLevel, SCISSOR_BINDINGS, useShaderRefs(min, max, loop), defines);
-  useOne(() => console.log('defines changed'), loop);
 
   return provide(ScissorContext, bound, children);
 };

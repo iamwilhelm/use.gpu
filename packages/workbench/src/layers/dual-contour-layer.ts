@@ -32,8 +32,6 @@ import { useInspectable } from '../hooks/useInspectable'
 import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
 import { main as fitContourLinear } from '@use-gpu/wgsl/contour/fit-linear.wgsl';
 import { main as fitContourQuadratic } from '@use-gpu/wgsl/contour/fit-quadratic.wgsl';
-import { getClippedSolidFragment } from '@use-gpu/wgsl/contour/clip-solid.wgsl';
-import { getClippedShadedFragment } from '@use-gpu/wgsl/contour/clip-shaded.wgsl';
 import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour.wgsl';
 import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
@@ -73,9 +71,6 @@ export type DualContourLayerProps = {
 const SCAN_BINDINGS = bundleToAttributes(scanVolume);
 const FIT_BINDINGS = bundleToAttributes(fitContourLinear);
 const VERTEX_BINDINGS = bundleToAttributes(getDualContourVertex);
-
-const CLIP_SOLID_BINDINGS = bundleToAttributes(getClippedSolidFragment);
-const CLIP_SHADED_BINDINGS = bundleToAttributes(getClippedShadedFragment);
 
 const PIPELINE = {
   primitive: {
@@ -128,7 +123,6 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const m = useMaterialContext();
 
   const getMaterialFragment = shaded ? m : getPassThruFragment;
-  const getClippedFragment = shaded ? getClippedShadedFragment : getClippedSolidFragment;
 
   const indirectDraw    = useOne(() => new Uint32Array(12));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
@@ -170,12 +164,6 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       edgeReadout, indexReadout, vertexReadout, normalReadout,
       xf, xd, s, p, c, z, min, max,
     ]);
-
-  const boundFragment = padding
-    ? shaded 
-      ? useBoundShader(getClippedShadedFragment, CLIP_SHADED_BINDINGS, [getMaterialFragment])
-      : useBoundShader(getClippedSolidFragment, CLIP_SOLID_BINDINGS, [getMaterialFragment])
-    : (useNoBoundShader(), getMaterialFragment);
 
   const sourceVersion = useVersion(values) + useVersion(normals);
   const shouldDispatch = !live ? () => (
@@ -238,9 +226,9 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   };
 
   const pipeline = useOne(() => patch(PIPELINE, { primitive: { cullMode }}), cullMode);
-  const defines = useOne(() => ({ isQuadratic: method === 'quadratic' }), method);
+  const defines = useOne(() => ({ HAS_SCISSOR: !!padding, isQuadratic: method === 'quadratic' }), method);
 
-  return [
+  const view = [
     use(Dispatch, {
       shader: boundScan,
       size: edgePassSize,
@@ -255,7 +243,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     use(Virtual, {
       indirect: indirectStorage,
       getVertex: boundVertex,
-      getFragment: boundFragment,
+      getFragment: getMaterialFragment,
       pipeline,
       defines,
       renderer: shaded ? 'shaded' : 'solid',
@@ -269,4 +257,6 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     } }),
     */
   ];
+
+  return view;
 }, 'DualContourLayer');

@@ -119,14 +119,11 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
     center = applyZBias(center, size * zBias);
   }
 
-  let clip = min(uv3, 1.0 - uv3);
-  let boxClip = min(min(clip.x, clip.y), clip.z);
-  
-  // TODO
-  let scissor = vec4<f32>(1.0);
+  let scissor3 = min(uv3, 1.0 - uv3);
+  let scissor = vec4<f32>(scissor3, 1.0);
 
   let tangent4 = vec4<f32>(0.0, 0.0, 0.0, 0.0);
-  let uv4 = vec4<f32>(uv3, boxClip);
+  let uv4 = vec4<f32>(uv3, 0.0);
   let st4 = vec4<f32>(0.0);
 
   return ShadedVertex(

@@ -11,10 +11,10 @@ import {
   Pick, Cursor,
   Animate, Keyframe,
   LinearRGB,
-  DualContourLayer, PointLayer, DataShader,
+  PointLayer, DataShader,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Polar, Axis, Grid, Sampled,
+  Plot, Cartesian, Polar, Axis, Grid, Sampled, ImplicitSurface,
 } from '@use-gpu/plot';
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { SurfaceControls } from '../../ui/surface-controls';
@@ -145,48 +145,46 @@ export const PlotImplicitSurfacePage: LC = () => {
                       render={(positions: StorageSource) => (
                         <Sampled
                           axes='xyz'
-                          format='f32'
+                          format='vec3<f32>'
                           size={[36, 24, 36]}
                           padding={1}
-                          expr={EXPR_VALUE}
+                          expr={EXPR_NORMAL}
                           time
                           live
-                          render={(values: StorageSource) => (
-                            <Sampled
-                              axes='xyz'
-                              format='vec3<f32>'
-                              size={[36, 24, 36]}
-                              padding={1}
-                              expr={EXPR_NORMAL}
-                              time
-                              live
-                              render={(normals: StorageSource) => [
-                                <DualContourLayer
-                                  values={values}
-                                  normals={normals}
-                                  level={level}
-                                  method="linear"
-                                  padding={1}
-                                  range={[[-π, π], [1, 5], [-π, π]]}
-                                  color={[0.8, 0.8, 1.0, 1.0]}
-                                />,
-                                inspect ? (
-                                  <DataShader
-                                    shader={colorizeShader}
-                                    source={values}
-                                    render={(colorizedValues: ShaderModule) => (
-                                      <PointLayer
-                                        positions={positions}
-                                        colors={mode === 'normal' ? normals : colorizedValues}
-                                        size={3}
-                                        depth={1}
-                                      />
-                                    )}
-                                  />
-                                ) : null
-                              ]}
-                            />  
-                          )}
+                          render={(normals: StorageSource) =>
+		                        <Sampled
+		                          axes='xyz'
+		                          format='f32'
+		                          size={[36, 24, 36]}
+		                          padding={1}
+		                          expr={EXPR_VALUE}
+		                          time
+		                          live
+		                        >
+                              <ImplicitSurface
+                                normals={normals}
+                                level={level}
+                                method="linear"
+                                padding={1}
+                                range={[[-π, π], [1, 5], [-π, π]]}
+                                color={[0.8, 0.8, 1.0, 1.0]}
+                              />
+                              {inspect ? (
+                                <DataShader
+                                  shader={colorizeShader}
+                                  source={values}
+                                  render={(colorizedValues: ShaderModule) => (
+                                    <PointLayer
+                                      positions={positions}
+                                      colors={mode === 'normal' ? normals : colorizedValues}
+                                      size={3}
+                                      depth={1}
+                                    />
+                                  )}
+                                />
+                              ) : null}
+														</Sampled>
+                          }
                         />
                       )}
                     />

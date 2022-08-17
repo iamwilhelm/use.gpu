@@ -33,6 +33,8 @@ Use.GPU has an incremental architecture, which updates with minimal recomputatio
 - `yarn build` - Build packages
 - `yarn test` - Run unit tests
 
+**Node v18 is currently not supported due to conflicts with `ts-node`. Use v16 or below.**
+
 **Prerequisites**: `node`, `yarn`, `rust`, `wasm-pack`
 
 - `node`: https://nodejs.org/en/

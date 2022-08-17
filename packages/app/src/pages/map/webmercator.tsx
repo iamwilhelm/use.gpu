@@ -117,7 +117,7 @@ export const MapWebMercatorPage: LC = () => {
                   </MapboxProvider>
                 ) : (
                   <MapTileProvider>
-                    <MVTiles detail={2} />
+                    <MVTiles detail={3} />
                   </MapTileProvider>
                 )}
               </WebMercator>
@@ -213,6 +213,7 @@ export const MapWebMercatorPage: LC = () => {
               phi={phi}
               theta={theta}
               target={target}
+							scale={1440}
             >
               {view()}
             </OrbitCamera>

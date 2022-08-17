@@ -5,9 +5,9 @@ export const DEFAULT_STYLE_SHEET = {
     face: {
       stroke: parseColor('#a0a7ff'),
       fill: parseColor('#30407f'),
-      width: 4,
+      width: 3,
       depth: 0.5,
-      zBias: 0,
+      zBias: 3,
     }
   },
   admin: {
@@ -15,7 +15,7 @@ export const DEFAULT_STYLE_SHEET = {
       color: parseColor('#8087ff'),
       width: 2,
       depth: 0.5,
-      zBias: 0,
+      zBias: 2,
     },
   },
   'admin/background': {

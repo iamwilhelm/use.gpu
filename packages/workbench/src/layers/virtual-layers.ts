@@ -163,7 +163,7 @@ const makeLineAccumulator = (
   if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', alloc);
 
   return (items: LineAggregate[], count: number) => {
-    const props = {count, join: 'miter'} as Record<string, any>;
+    const props = {count, join: 'bevel'} as Record<string, any>;
 
     const {chunks, loops} = gatherItemChunks(items);
 
@@ -204,7 +204,7 @@ const makeFaceAccumulator = (
   if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', allocCount);
 
   return (items: FaceAggregate[], count: number, indices: number) => {
-    const props = {count, join: 'miter'} as Record<string, any>;
+    const props = {count} as Record<string, any>;
 
     const {chunks, loops} = gatherItemChunks(items);
     const offsets = accumulate(chunks);

@@ -80,7 +80,7 @@ export const makeFiber = <F extends ArrowFunction>(
 
   const id = ++ID;
 
-  const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, up: parent.yeeted} : null;
+  const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, up: null} : null;
   const quote = parent?.quote ?? null;
   const unquote = parent?.unquote ?? null;
   const context = parent?.context ?? NO_CONTEXT;
@@ -981,7 +981,7 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
   if (yeeted) {
     bustFiberYeet(fiber, true);
     visitYeetRoot(fiber);
-    fiber.yeeted = fiber.yeeted.up;
+    if (yeeted.up) fiber.yeeted = yeeted.up;
   }
 
   fiber.next = null;

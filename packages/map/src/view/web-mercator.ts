@@ -128,7 +128,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
 
   const [transform, differential] = useCombinedTransform(xform, null, e);
 
-  const view = scissor ? use(Scissor, {range: rangeMemo, children}) : children;
+  const view = scissor ? use(Scissor, {range: rangeMemo, loop: [2, 0, 0, 0], children}) : children;
 
   return [
     signal(),

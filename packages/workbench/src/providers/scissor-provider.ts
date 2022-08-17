@@ -13,6 +13,7 @@ export type ScissorContextProps = [number, number][];
 
 export type ScissorProps = {
   range: [number, number][],
+  loop?: number[],
 };
 
 export const ScissorContext = makeContext<ScissorContextProps>(null, 'ScissorContext');
@@ -21,12 +22,16 @@ export const useScissorContext = () => useContext<ScissorContextProps | null>(Sc
 export const useNoScissorContext = () => useNoContext(ScissorContext);
 
 export const Scissor: LC<ScissorProps> = (props: PropsWithChildren<ScissorProps>) => {
-  const {range, children} = props;
+  const {range, loop = [0, 0, 0, 0], children} = props;
 
   const min = useOne(() => range.map(r => r[0]), range);
   const max = useOne(() => range.map(r => r[1]), range);
 
-  const bound = useBoundShader(getScissorLevel, SCISSOR_BINDINGS, useShaderRefs(min, max));
+  const defines = useOne(() => ({
+    HAS_SCISSOR_LOOP: loop.some(x => !!x),
+  }), loop);
+
+  const bound = useBoundShader(getScissorLevel, SCISSOR_BINDINGS, useShaderRefs(min, max, loop), defines);
 
   return provide(ScissorContext, bound, children);
 };

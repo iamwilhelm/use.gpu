@@ -104,10 +104,12 @@ export const getMVTShapes = (
           return out;
         }));
 
+        /*
         geometry = cutPolygons(geometry, 1, 0, 0);
         geometry = cutPolygons(geometry, 0, 1, 0);
         geometry = cutPolygons(geometry, -1, 0, -extent);
         geometry = cutPolygons(geometry, 0, -1, -extent);
+        */
 
         const gg = geometry;
         if (tesselate > 0) geometry = tesselateGeometry(geometry, [0, 0, extent, extent], tesselate);
@@ -122,8 +124,8 @@ export const getMVTShapes = (
             segments: polygon.flatMap((path) => path.map((p, i) => {
               const next = path[i + 1] ?? path[i + 1 - path.length];
               return (
-                (p[0] === 0 && next[0] === 0) || (p[0] === extent && next[0] === extent) ||
-                (p[1] === 0 && next[1] === 0) || (p[1] === extent && next[1] === extent) ? 0 :
+                (p[0] <= 0 && next[0] <= 0) || (p[0] >= extent && next[0] >= extent) ||
+                (p[1] <= 0 && next[1] <= 0) || (p[1] >= extent && next[1] >= extent) ? 0 :
                 i === 0 ? 1 :
                 i === path.length - 1 ? 2 :
                 3
@@ -170,8 +172,8 @@ const tesselateGeometry = (polygons: XY[][][], [l, t, r, b]: Point4, limit: numb
 
   polygons.forEach((polygon) => {
     const o = x;
-    const l = cutPolygon(polygon,  1,  0,  o);
-    const r = cutPolygon(polygon, -1,  0, -o);
+    const l = cutPolygon(polygon, -1,  0, -o);
+    const r = cutPolygon(polygon,  1,  0,  o);
     if (l?.length) ll.push(...l);
     if (r?.length) rr.push(...r);
   });
@@ -183,15 +185,15 @@ const tesselateGeometry = (polygons: XY[][][], [l, t, r, b]: Point4, limit: numb
 
   ll.forEach((polygon) => {
     const o = y;
-    const t = cutPolygon(polygon, 0,  1,  o);
-    const b = cutPolygon(polygon, 0, -1, -o);
+    const t = cutPolygon(polygon, 0, -1, -o);
+    const b = cutPolygon(polygon, 0,  1,  o);
     if (t?.length) tl.push(...t);
     if (b?.length) bl.push(...b);
   });
   rr.forEach((polygon) => {
     const o = y;
-    const t = cutPolygon(polygon, 0,  1,  o);
-    const b = cutPolygon(polygon, 0, -1, -o);
+    const t = cutPolygon(polygon, 0, -1, -o);
+    const b = cutPolygon(polygon, 0,  1,  o);
     if (t?.length) tr.push(...t);
     if (b?.length) br.push(...b);
   });
@@ -199,11 +201,12 @@ const tesselateGeometry = (polygons: XY[][][], [l, t, r, b]: Point4, limit: numb
   depth++;
   if (depth < limit) {
     return [
-      ...tesselateGeometry(tl, [l, x, t, y], limit, depth),
-      ...tesselateGeometry(tr, [x, r, t, y], limit, depth),
-      ...tesselateGeometry(bl, [l, x, y, b], limit, depth),
-      ...tesselateGeometry(br, [x, r, y, b], limit, depth),
+      ...tesselateGeometry(tl, [l, t, x, y], limit, depth),
+      ...tesselateGeometry(tr, [x, t, r, y], limit, depth),
+      ...tesselateGeometry(bl, [l, y, x, b], limit, depth),
+      ...tesselateGeometry(br, [x, y, r, b], limit, depth),
     ];
   }
+
   return [...tl, ...tr, ...bl, ...br];
 };

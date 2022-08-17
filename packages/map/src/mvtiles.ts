@@ -76,7 +76,8 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
 
   seen.clear();
   
-  const tesselate = 4 - zoom;
+  const tesselate = 5 - zoom;
+  const gz = 1 << (zoom);
 
   for (let x = minIX; x < maxIX; x++) {
     const edgeX = x === minIX;
@@ -85,12 +86,16 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
     for (let y = minIY; y < maxIY; y++) {
       const edgeY = y === minIY;
       const upY = (y === minIY || y === maxIY - 1) ? 1 : 2;
+
+      const xx = x < 0 ? x + gz : x >= gz ? x - gz : x;
+      const yy = y < 0 ? y + gz : y >= gz ? y - gz : y;
+
+      const key = getKey(xx, yy, zoom);
+      if (seen.has(key)) continue;
       
-      const key = getKey(x, y, zoom);
-      const upKey = getUpKey(x, y, zoom);
-      
-      const upCount = upX * upY;
+      const upKey = getUpKey(xx, yy, zoom);
       const upLoaded = loaded.get(upKey) || 0;
+      const upCount = upX * upY;
 
       if (zoom > minLevel && upLoaded < upCount) {
         if (cache.has(upKey)) {
@@ -99,10 +104,12 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
             seen.add(upKey);
           }
           out.push(keyed(MVTile, key, {tiles, key, tesselate, hide: true}));
+          seen.add(key);
           continue;
         }
       }
       out.push(keyed(MVTile, key, {tiles, key, tesselate}));
+      seen.add(key);
     }
   }
 

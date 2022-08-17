@@ -28,7 +28,9 @@ export type AnimateProps<T> = {
 };
 
 const evaluateKeyframes = <T>(keyframes: Keyframe<T>[], time: number, ease: string) => {
-  const [a, b] = getActiveKeyframes(keyframes, time);
+  let [a, b] = getActiveKeyframes(keyframes, time);
+  if (!b) b = a;
+
   const [start] = a;
   const [end] = b;
 

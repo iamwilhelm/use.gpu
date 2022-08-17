@@ -38,40 +38,45 @@ export const MapWebMercatorPage: LC = () => {
   
   const tracks = {
     zoom: [
-      [ 0, 1],
-      [10, 3],
-      [20, 3],
-      [30, 3],
-      [40, 5],
-      [50, 5],
-      [60, 1],
+      [ 0, 2],
+      [10, 2],
+      //[20, 3],
+      //[30, 3],
+      //[40, 5],
+      //[50, 5],
+      [60, 2],
+      [70, 2],
     ],
     long: [
       [ 0, 0],
       [10, 0],
-      [20, 0],
-      [30, 50],
-      [40, 50],
-      [50, 0],
+      //[20, 0],
+      //[30, 50],
+      //[40, 50],
+      //[50, 90],
+      [60, 360],
       [60, 0],
+      [70, 0],
     ],
     lat: [
       [ 0, 0],
       [10, 30],
       [20, 30],
       [30, 30],
-      [40, -30],
-      [50, -30],
-      [60, 0],
+      //[40, -30],
+      //[50, 30],
+      [60, -30],
+      [70, 0],
     ],
     bend: [
       [ 0, 0],
       [10, 0],
       [20, 1],
       [30, 1],
-      [40, 1],
-      [50, 1],
-      [60, 0],
+      //[40, 1],
+      //[50, 1],
+      [60, 1],
+      [70, 0],
     ],
   } as Tracks;
 
@@ -91,11 +96,11 @@ export const MapWebMercatorPage: LC = () => {
               delay={1}
               speed={2}
               tracks={tracks}
-              duration={65}
+              duration={75}
             >
               <WebMercator
                 bend={1}
-                xrange={[[-1, 1], [-2/3, 2/3]]}
+                range={[[-1, 1], [-2/3, 2/3]]}
                 long={90}
                 lat={20}
                 zoom={1}
@@ -112,22 +117,22 @@ export const MapWebMercatorPage: LC = () => {
               </WebMercator>
               <WebMercator
                 bend={1}
-                xrange={[[-1, 1], [-2/3, 2/3]]}
+                range={[[-1, 1], [-2/3, 2/3]]}
                 long={90}
                 lat={20}
                 zoom={1}
                 scale={[3, 3, 3]}
                 centered
               >
-              {/*
                 <Grid
                   axes='xy'
                   origin={[0, 0, 0]}
                   width={2}
                   first={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
                   second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
+                  color={[0.25, 0.25, 0.25, 0.5]}
                   depth={0.5}
-                  zBias={-1}
+                  zBias={5}
                 />
 
                 <Axis
@@ -176,17 +181,6 @@ export const MapWebMercatorPage: LC = () => {
                   />
                 </Scale>
                 
-                <Grid
-                  axes='xy'
-                  origin={[0, 0, 1]}
-                  width={2}
-                  first={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
-                  second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
-                  color={[0.25, 0.25, 0.25, 1]}
-                  depth={0.5}
-                  zBias={-1}
-                />
-                */}
               </WebMercator>
             </Animate>
           </Plot>

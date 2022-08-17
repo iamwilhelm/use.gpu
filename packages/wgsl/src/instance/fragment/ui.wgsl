@@ -11,7 +11,7 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   sdfConfig: vec4<f32>,
   repeat: i32,
   mode: i32,
-  layout: vec4<f32>,
+  shape: vec4<f32>,
   radius: vec4<f32>,
   border: vec4<f32>,
   stroke: vec4<f32>,
@@ -65,10 +65,10 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
     // Get appropriate SDF
     if (mode == 0) {
       if (fillColor.a <= 0.0) { discard; }
-      sdf = getBoxSDF(layout.xy, uv, scale);
+      sdf = getBoxSDF(shape.xy, uv, scale);
     }
-    else if (mode == 1) { sdf = getBorderBoxSDF(layout.xy, border, uv, scale); }
-    else { sdf = getRoundedBorderBoxSDF(layout.xy, border, radius, uv, scale); }
+    else if (mode == 1) { sdf = getBorderBoxSDF(shape.xy, border, uv, scale); }
+    else { sdf = getRoundedBorderBoxSDF(shape.xy, border, radius, uv, scale); }
 
     // Bleed by 0.5px to account for filter radius
     let bleed = 0.5;

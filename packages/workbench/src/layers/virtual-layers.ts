@@ -132,7 +132,7 @@ const makePointAccumulator = (
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
     if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
-    if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');
+    if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depths, items, count, 'depth', 'depths');
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
 
     return use(PointLayer, props);
@@ -159,7 +159,7 @@ const makeLineAccumulator = (
   if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', alloc);
   if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', alloc);
   if (hasWidth) storage.widths = makeAggregateBuffer(device, 'f32', alloc);
-  if (hasDepth) storage.depth = makeAggregateBuffer(device, 'f32', alloc);
+  if (hasDepth) storage.depths = makeAggregateBuffer(device, 'f32', alloc);
   if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', alloc);
 
   return (items: LineAggregate[], count: number) => {
@@ -173,7 +173,7 @@ const makeLineAccumulator = (
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
     if (hasWidth) props.widths = updateAggregateBuffer(device, storage.widths, items, count, 'width', 'widths');
-    if (hasDepth) props.depth = updateAggregateBuffer(device, storage.depth, items, count, 'depth', 'depths');    
+    if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depths, items, count, 'depth', 'depths');    
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
 
     return use(LineLayer, props);

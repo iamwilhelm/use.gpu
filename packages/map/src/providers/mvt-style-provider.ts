@@ -1,5 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorLike } from '@use-gpu/traits';
+import type { MVTStyleProperties } from '../types';
 
 import { patch } from '@use-gpu/state';
 import { parseNumber, parseColor } from '@use-gpu/traits';
@@ -7,40 +8,28 @@ import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
 import { DEFAULT_STYLE_SHEET } from '../style';
 
-export type MVTStyle = {
-  stroke?: ColorLike,
-  fill?: ColorLike,
-  depth?: number,
+export type MVTStyleContextProps = Record<string, MVTStyleProperties>;
 
-  line: {
-    width?: number,
-  },
-  point?: {
-    shape?: any,
-    size?: number,
-  },
-  font?: {
-    family?: string,
-    style?: string,
-    weight?: string | number,
-    lineHeight?: number,
-    size?: number,
-  },  
-};
-
-export type MVTStyleContextProps = Record<string, MVTStyle>;
-
-const DEFAULT_STYLE: MVTStyle = {
-  fill: [0.5, 0.5, 0.5, 1],
-  stroke: [1, 1, 1, 1],
-  depth: 0.5,
-  zBias: 0,
-  line: {
+const DEFAULT_STYLE: MVTStyleProperties = {
+  face: {
+    fill: [0.5, 0.5, 0.5, 1],
+    stroke: [1, 1, 1, 1],
     width: 2,
+    depth: 0.5,
+    zBias: 0,
+  },
+  line: {
+    color: [1, 1, 1, 1],
+    width: 2,
+    depth: 0.5,
+    zBias: 2,
   },
   point: {
+    color: [1, 1, 1, 1],
     shape: 'circle',
     size: 5,
+    depth: 0.5,
+    zBias: 5,
   },
   font: {
     family: 'sans-serif',
@@ -70,10 +59,11 @@ export const MVTStyle: LiveComponent<MVTStyleProps> = (props) => {
 
   const context = useOne(() => {
     const parseStyle = (style: any, def: any) => {
-      const {fill, stroke} = style;
       const out = patch(def, style);
-      if (fill) out.fill = parseColor(fill);
-      if (stroke) out.stroke = parseColor(stroke);
+      if (style.face.fill) out.face.fill = parseColor(style.face.fill);
+      if (style.face.stroke) out.face.stroke = parseColor(style.face.stroke);
+      if (style.point.color) out.point.color = parseColor(style.point.color);
+      if (style.line.color) out.line.color = parseColor(style.line.color);
       return out;
     };
     

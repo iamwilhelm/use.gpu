@@ -51,50 +51,50 @@
 
 @export fn wrapIndex2(index: vec2<i32>, size: vec2<u32>) -> vec2<u32> {
   let s = vec2<i32>(size);
-  var signed = index;
-  signed = select(signed, signed + s, signed < vec2<i32>(0));
-  signed = select(signed, signed - s, signed >= s);
-  return vec2<u32>(signed);
+  var signedIndex = index;
+  signedIndex = select(signedIndex, signedIndex + s, signedIndex < vec2<i32>(0));
+  signedIndex = select(signedIndex, signedIndex - s, signedIndex >= s);
+  return vec2<u32>(signedIndex);
 }
 
 @export fn wrapIndex3(index: vec3<i32>, size: vec3<u32>) -> vec3<u32> {
   let s = vec3<i32>(size);
-  var signed = index;
-  signed = select(signed, signed + s, signed < vec3<i32>(0));
-  signed = select(signed, signed - s, signed >= s);
-  return vec3<u32>(signed);
+  var signedIndex = index;
+  signedIndex = select(signedIndex, signedIndex + s, signedIndex < vec3<i32>(0));
+  signedIndex = select(signedIndex, signedIndex - s, signedIndex >= s);
+  return vec3<u32>(signedIndex);
 }
 
 @export fn wrapIndex4(index: vec4<i32>, size: vec4<u32>) -> vec4<u32> {
   let s = vec4<i32>(size);
-  var signed = index;
-  signed = select(signed, signed + s, signed < vec4<i32>(0));
-  signed = select(signed, signed - s, signed >= s);
-  return vec4<u32>(signed);
+  var signedIndex = index;
+  signedIndex = select(signedIndex, signedIndex + s, signedIndex < vec4<i32>(0));
+  signedIndex = select(signedIndex, signedIndex - s, signedIndex >= s);
+  return vec4<u32>(signedIndex);
 }
 
 @export fn wrapIndex2i(index: vec2<i32>, size: vec2<u32>) -> vec2<i32> {
   let s = vec2<i32>(size);
-  var signed = index;
-  signed = select(signed, signed + s, signed < vec2<i32>(0));
-  signed = select(signed, signed - s, signed >= s);
-  return signed;
+  var signedIndex = index;
+  signedIndex = select(signedIndex, signedIndex + s, signedIndex < vec2<i32>(0));
+  signedIndex = select(signedIndex, signedIndex - s, signedIndex >= s);
+  return signedIndex;
 }
 
 @export fn wrapIndex3i(index: vec3<i32>, size: vec3<u32>) -> vec3<i32> {
   let s = vec3<i32>(size);
-  var signed = index;
-  signed = select(signed, signed + s, signed < vec3<i32>(0));
-  signed = select(signed, signed - s, signed >= s);
-  return signed;
+  var signedIndex = index;
+  signedIndex = select(signedIndex, signedIndex + s, signedIndex < vec3<i32>(0));
+  signedIndex = select(signedIndex, signedIndex - s, signedIndex >= s);
+  return signedIndex;
 }
 
 @export fn wrapIndex4i(index: vec4<i32>, size: vec4<u32>) -> vec4<i32> {
   let s = vec4<i32>(size);
-  var signed = index;
-  signed = select(signed, signed + s, signed < vec4<i32>(0));
-  signed = select(signed, signed - s, signed >= s);
-  return signed;
+  var signedIndex = index;
+  signedIndex = select(signedIndex, signedIndex + s, signedIndex < vec4<i32>(0));
+  signedIndex = select(signedIndex, signedIndex - s, signedIndex >= s);
+  return signedIndex;
 }
 
 @export fn clampIndex2(index: vec2<i32>, size: vec2<u32>) -> vec2<u32> {

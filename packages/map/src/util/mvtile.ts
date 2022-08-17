@@ -35,7 +35,7 @@ export const getMVTShapes = (
         type: 'label',
         position: positions,
         text: properties.name,
-        color: style.fill,
+        color: style.point.color,
       });
     }
     else {
@@ -43,7 +43,7 @@ export const getMVTShapes = (
         type: 'point',
         count,
         positions,
-        color: style.fill,
+        color: style.point.color,
         size: style.point.size,
       });
     }
@@ -58,7 +58,7 @@ export const getMVTShapes = (
         type: 'label',
         positions,
         text: properties.name,
-        color: style.fill,
+        color: style.line.color,
       });
     }
     else {
@@ -67,8 +67,10 @@ export const getMVTShapes = (
         count,
         positions,
         segments: geometry.flatMap((path) => path.map((_, i) => i === 0 ? 1 : i === path.length - 1 ? 2 : 3)),
-        color: style.stroke,
+        color: style.line.color,
         width: style.line.width,
+        depth: style.line.depth,
+        zBias: style.line.zBias,
       });
     }
   }
@@ -77,7 +79,7 @@ export const getMVTShapes = (
     const originalGeometry = geometry;
     if (tesselate > 0) geometry = tesselateGeometry(geometry, [0, 0, extent, extent], tesselate);
 
-    if (style.fill) {
+    if (style.face.fill) {
       for (const polygon of geometry) {
         const polygon4 = polygon.map(ring => ring.map((p, i) => toPoint4(p)));
 
@@ -92,20 +94,19 @@ export const getMVTShapes = (
           count: data.vertices.length / 4,
           positions: data.vertices,
           indices: triangles,
-          color: style.fill,
-          zBias: style.zBias,
+          color: style.face.fill,
+          zBias: style.face.zBias,
         });
       }
     }
 
-    if (style.stroke) {
+    if (style.face.stroke) {
       originalGeometry.map(polygon => polygon.map((ring) => {
         ring.push(ring[0]);
       }));
 
       for (const polygon of originalGeometry) {
         const polygon4 = polygon.flatMap(ring => ring.flatMap((p, i) => toPoint4(p)));
-
         shapes.push({
           type: 'line',
           count: polygon4.length / 4,
@@ -120,9 +121,10 @@ export const getMVTShapes = (
               3
             );
           })),
-          color: style.stroke,
-          width: style.line.width,
-          zBias: style.zBias + style.line.width,
+          color: style.face.stroke,
+          width: style.face.width,
+          depth: style.face.depth,
+          zBias: style.face.zBias + style.face.width,
         });
       }
     }

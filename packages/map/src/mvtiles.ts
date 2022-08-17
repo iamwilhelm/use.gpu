@@ -18,7 +18,7 @@ const parseKey = (v: number) => [v & 0x3FF, (v >> 10) & 0x3FF, (v >> 20) & 0x3FF
 const getUpKey = (x: number, y: number, zoom: number) => getKey(x >> 1, y >> 1, zoom - 1);
 const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) => getKey((x << 1) + dx, (y << 1) + dy, zoom - 1);
 
-const URLS = new Set();
+//const URLS = new Set();
 
 export type MVTilesProps = {
   detail?: number,
@@ -129,14 +129,14 @@ const MVTile: LiveComponent<TileProps> = memo((props) => {
     cache.get(key) ?? fetch(getMVT(x, y, zoom))
       .then(res => res.arrayBuffer())
       .then(ab => {
-        URLS.add(getMVT(x, y, zoom).split('?')[0]);
+        //URLS.add(getMVT(x, y, zoom).split('?')[0]);
         const mvt = new VectorTile(new Uint8Array(ab));
         const shapes = getMVTShapes(x, y, zoom, mvt, styles, flipY, tesselate);
 
         cache.set(key, shapes);
         loaded.set(upKey, (loaded.get(upKey) || 0) + 1);
         forceUpdate();
-        console.log({URLS: JSON.stringify(Array.from(URLS))})
+        //console.log({URLS: JSON.stringify(Array.from(URLS))})
 
         return shapes;
       })

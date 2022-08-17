@@ -54,7 +54,7 @@
   repeat: i32,
 
   mode: i32,
-  layout: vec4<f32>,
+  shape: vec4<f32>,
   radius: vec4<f32>,
   border: vec4<f32>,
   stroke: vec4<f32>,

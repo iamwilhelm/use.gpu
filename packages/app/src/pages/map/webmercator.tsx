@@ -38,22 +38,22 @@ export const MapWebMercatorPage: LC = () => {
   
   const tracks = {
     zoom: [
-      [ 0, 2],
+      [ 0, 1],
       [10, 2],
-      //[20, 3],
-      //[30, 3],
-      //[40, 5],
-      //[50, 5],
+      [20, 3],
+      [30, 3],
+      [40, 5],
+      [50, 5],
       [60, 2],
-      [70, 2],
+      [70, 1],
     ],
     long: [
       [ 0, 0],
       [10, 0],
-      //[20, 0],
-      //[30, 50],
-      //[40, 50],
-      //[50, 90],
+      [20, 0],
+      [30, 50],
+      [40, 50],
+      [50, 90],
       [60, 360],
       [60, 0],
       [70, 0],
@@ -63,9 +63,9 @@ export const MapWebMercatorPage: LC = () => {
       [10, 30],
       [20, 30],
       [30, 30],
-      //[40, -30],
-      //[50, 30],
-      [60, -30],
+      [40, -30],
+      [50, 0],
+      [60, 50],
       [70, 0],
     ],
     bend: [
@@ -73,8 +73,8 @@ export const MapWebMercatorPage: LC = () => {
       [10, 0],
       [20, 1],
       [30, 1],
-      //[40, 1],
-      //[50, 1],
+      [40, 1],
+      [50, 1],
       [60, 1],
       [70, 0],
     ],
@@ -109,10 +109,11 @@ export const MapWebMercatorPage: LC = () => {
                 scissor
                 native
               >
-                <MapTileProvider>
-                {/*<MapboxProvider accessToken={accessToken}>*/}
+                {/*<MapboxProvider accessToken={accessToken}>
                   <MVTiles />
-                {/*</MapboxProvider>*/}
+                </MapboxProvider>*/}
+                <MapTileProvider>
+                  <MVTiles />
                 </MapTileProvider>
               </WebMercator>
               <WebMercator
@@ -132,7 +133,7 @@ export const MapWebMercatorPage: LC = () => {
                   second={{ unit: 360, base: 2, detail: 48, divide: 8, end: true }}
                   color={[0.25, 0.25, 0.25, 0.5]}
                   depth={0.5}
-                  zBias={5}
+                  zBias={10}
                 />
 
                 <Axis

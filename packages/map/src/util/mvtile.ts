@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { MVTStyleContextProps } from '../providers/mvt-style-provider';
 
 import { gather, use, yeet, useMemo, useOne } from '@use-gpu/live';
-import { cutPolygon, cutPolygons } from './tess';
+import { cutPolygon, cutPolygons, getRingArea } from './tess';
 import earcut from 'earcut';
 
 type Point4 = [number, number, number, number];
@@ -42,8 +42,8 @@ export const getMVTShapes = (
       const toPoint = ({x, y}) => [x, y];
 
       const toPoint4 = ([x, y]) => [
-        ( ox + iz * x / extent) * 2 - 1,
-        ((oy + iz * y / extent) * 2 - 1) * (flipY ? -1 : 1),
+        (( ox + iz * (x / extent)) * 2 - 1),
+        (((oy + iz * (y / extent)) * 2 - 1) * (flipY ? -1 : 1)),
         0,
         1,
       ];
@@ -98,44 +98,18 @@ export const getMVTShapes = (
         }
       }
       else if (t === 3) {
+
         let geometry = feature.asPolygons().map(polygon => polygon.map((ring) => {
-          const out = ring.map(toPoint);
-          out.pop();
-          return out;
+          const r = ring.map(toPoint); r.pop(); return r;
         }));
 
-        /*
         geometry = cutPolygons(geometry, 1, 0, 0);
         geometry = cutPolygons(geometry, 0, 1, 0);
         geometry = cutPolygons(geometry, -1, 0, -extent);
         geometry = cutPolygons(geometry, 0, -1, -extent);
-        */
-
-        const gg = geometry;
+      
+        const originalGeometry = geometry;
         if (tesselate > 0) geometry = tesselateGeometry(geometry, [0, 0, extent, extent], tesselate);
-
-        for (const polygon of gg) {
-          const polygon4 = polygon.flatMap(ring => ring.flatMap((p, i) => toPoint4(p)));
-
-          shapes.push({
-            type: 'line',
-            count: polygon4.length / 4,
-            positions: polygon4,
-            segments: polygon.flatMap((path) => path.map((p, i) => {
-              const next = path[i + 1] ?? path[i + 1 - path.length];
-              return (
-                (p[0] <= 0 && next[0] <= 0) || (p[0] >= extent && next[0] >= extent) ||
-                (p[1] <= 0 && next[1] <= 0) || (p[1] >= extent && next[1] >= extent) ? 0 :
-                i === 0 ? 1 :
-                i === path.length - 1 ? 2 :
-                3
-              );
-            })),
-            color: style.stroke,
-            width: 4,
-          });
-
-        }
 
         for (const polygon of geometry) {
           const polygon4 = polygon.map(ring => ring.map((p, i) => toPoint4(p)));
@@ -155,6 +129,33 @@ export const getMVTShapes = (
             size: style.size,
           });
         }
+        
+        originalGeometry.map(polygon => polygon.map((ring) => {
+          ring.push(ring[0]);
+        }));
+
+        for (const polygon of originalGeometry) {
+          const polygon4 = polygon.flatMap(ring => ring.flatMap((p, i) => toPoint4(p)));
+
+          shapes.push({
+            type: 'line',
+            count: polygon4.length / 4,
+            positions: polygon4,
+            segments: polygon.flatMap((path) => path.map((p, i) => {
+              const next = path[i + 1] ?? path[i + 1 - path.length];
+              return (
+                (p[0] <= 0 && next[0] <= 0) || (p[0] >= extent && next[0] >= extent) ||
+                (p[1] <= 0 && next[1] <= 0) || (p[1] >= extent && next[1] >= extent) ? 0 :
+                i === 0 ? 1 :
+                i === path.length - 1 ? 2 :
+                3
+              );
+            })),
+            color: style.stroke,
+            width: 5,
+          });
+        }
+        
       }
 
     }
@@ -167,36 +168,13 @@ const tesselateGeometry = (polygons: XY[][][], [l, t, r, b]: Point4, limit: numb
   const x = (l + r) / 2;
   const y = (t + b) / 2;
   
-  const ll: XY[][][] = [];
-  const rr: XY[][][] = [];
+  const ll: XY[][][] = cutPolygons(polygons, -1, 0, -x);
+  const rr: XY[][][] = cutPolygons(polygons,  1, 0,  x);
 
-  polygons.forEach((polygon) => {
-    const o = x;
-    const l = cutPolygon(polygon, -1,  0, -o);
-    const r = cutPolygon(polygon,  1,  0,  o);
-    if (l?.length) ll.push(...l);
-    if (r?.length) rr.push(...r);
-  });
-
-  const tl: XY[][][] = [];
-  const tr: XY[][][] = [];
-  const bl: XY[][][] = [];
-  const br: XY[][][] = [];
-
-  ll.forEach((polygon) => {
-    const o = y;
-    const t = cutPolygon(polygon, 0, -1, -o);
-    const b = cutPolygon(polygon, 0,  1,  o);
-    if (t?.length) tl.push(...t);
-    if (b?.length) bl.push(...b);
-  });
-  rr.forEach((polygon) => {
-    const o = y;
-    const t = cutPolygon(polygon, 0, -1, -o);
-    const b = cutPolygon(polygon, 0,  1,  o);
-    if (t?.length) tr.push(...t);
-    if (b?.length) br.push(...b);
-  });
+  const tl: XY[][][] = cutPolygons(ll, 0, -1, -y);
+  const tr: XY[][][] = cutPolygons(rr, 0, -1, -y);
+  const bl: XY[][][] = cutPolygons(ll, 0,  1,  y);
+  const br: XY[][][] = cutPolygons(rr, 0,  1,  y);
 
   depth++;
   if (depth < limit) {

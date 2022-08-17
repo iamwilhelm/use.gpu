@@ -452,6 +452,96 @@ Array [
 ]
 `;
 
+exports[`tesselate cut polygon beside hole 1`] = `
+Array [
+  Array [
+    1116,
+    -25,
+    -5,
+    -5,
+  ],
+]
+`;
+
+exports[`tesselate cut polygon beside hole 2`] = `
+Array [
+  Array [
+    Array [
+      Array [
+        12,
+        10,
+      ],
+      Array [
+        50,
+        10,
+      ],
+      Array [
+        40,
+        40,
+      ],
+      Array [
+        12,
+        49,
+      ],
+    ],
+    Array [
+      Array [
+        20,
+        20,
+      ],
+      Array [
+        20,
+        25,
+      ],
+      Array [
+        25,
+        25,
+      ],
+      Array [
+        25,
+        20,
+      ],
+    ],
+    Array [
+      Array [
+        18,
+        20,
+      ],
+      Array [
+        18,
+        25,
+      ],
+      Array [
+        19,
+        25,
+      ],
+      Array [
+        19,
+        20,
+      ],
+    ],
+    Array [
+      Array [
+        16,
+        20,
+      ],
+      Array [
+        16,
+        25,
+      ],
+      Array [
+        17,
+        25,
+      ],
+      Array [
+        17,
+        20,
+      ],
+    ],
+  ],
+]
+`;
+
 exports[`tesselate cuts U 1`] = `
 Array [
   Array [

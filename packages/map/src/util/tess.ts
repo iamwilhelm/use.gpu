@@ -19,13 +19,11 @@ export const cutPolygons = (
   nx: number,
   ny: number,
   d: number,
-  dbg?: boolean,
 ) => {
   const getValue   = ([x, y]: XY) =>  nx * x + ny * y - d;
   const getTangent = ([x, y]: XY) => -ny * x + nx * y;
   const out: XY[][][] = [];
   for (const rings of polygons) {
-    if (dbg && rings.some(r => r.some(p => p[0] === 0 || p[1] === 1))) debugger;
     const cut = cutPolygonWith(rings, getValue, getTangent);
     if (cut) out.push(...cut);
   }
@@ -69,10 +67,11 @@ export const cutPolygonWith = (
   if (cut.length === 0) return null;
 
   const holes = whole;
+  const areas = holes.map(getRingArea);
 
   const out = assembleCutRingWith(cut, getTangent).map(r => [r]);
-  nextHole: for (const h of holes) {
-    for (const polygon of out) {
+  for (const h of holes) {
+    nextHole: for (const polygon of out) {
       const [exterior] = polygon;
       if (pointInRing(exterior, h[0])) {
         polygon.push(h);
@@ -154,7 +153,10 @@ export const cutRingWith = (
   if (last) out[0] = [last, ...ring.slice(pos), ...(out[0] ?? [])];
   if (out[0] && !getRingArea(out[0])) out.shift();
   else if (out.length === 0 && ring.length) {
-    if (getValue(ring[0]) > 0) return ring;
+    let i = 0;
+    let r = null;
+    while ((r = ring[i]) && getValue(r) === 0) { i++ };
+    if (ring[i] && getValue(ring[i]) > 0) return ring;
   }
 
   return out.length ? out : null;

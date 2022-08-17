@@ -12,10 +12,10 @@ fn main(
   var outColor = fragColor;
   outColor = getFragment(outColor, fragUV, fragST);
 
-  if (HAS_SCISSOR) { if (isScissored(fragScissor)) {
-    //discard;
-    outColor = vec4<f32>(outColor.xyz * fragScissor.xyz, outColor.a);
-  }}
+  if (HAS_SCISSOR) { if (isScissored(fragScissor)) { discard; } }
+  //if (HAS_SCISSOR) { if (isScissored(fragScissor)) {
+  //  outColor = vec4<f32>(outColor.xyz * fragScissor.xyz, outColor.a);
+  //}}
   if (outColor.a <= 0.0) { discard; }
 
   return outColor;

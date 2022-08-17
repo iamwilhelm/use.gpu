@@ -345,6 +345,46 @@ describe("tesselate", () => {
 
   });
   
+  fit('cut polygon beside hole', () => {
+    const rings = [
+      [
+        [10, 10],
+        [50, 10],
+        [40, 40],
+        [10, 50],
+      ],
+      [
+        [20, 20],
+        [20, 25],
+        [25, 25],
+        [25, 20],
+      ],
+      [
+        [18, 20],
+        [18, 25],
+        [19, 25],
+        [19, 20],
+      ],
+      [
+        [16, 20],
+        [16, 25],
+        [17, 25],
+        [17, 20],
+      ],
+    ];
+    
+    const nx = 1;
+    const ny = 0;
+    const d = 12;
+    
+    const polygons = cutPolygon(rings, nx, ny, d);
+    console.log(polygons[0], polygons[1])
+
+    expect(polygons.map(polygon => polygon.map(getRingArea))).toMatchSnapshot();
+    expect(polygons).toMatchSnapshot();
+
+  });
+  
   it('point in ring', () => {
     const ring = [
       [1, 1],

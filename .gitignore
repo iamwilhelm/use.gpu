@@ -10,4 +10,5 @@ test/import/node_modules
 test/import/dist
 test/import/yarn.lock
 packages/glyph/pkg
+scripts/fetch-tiles.mjs
 .env.local

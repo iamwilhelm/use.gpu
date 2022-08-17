@@ -7,9 +7,6 @@ import earcut from 'earcut';
 
 type Point4 = [number, number, number, number];
 
-const FEATURE_TYPES = ['', 'point', 'line', 'face'];
-const DEFAULT_CLASSES = ['', 'point', 'line', 'face'];
-
 export const getMVTShapes = (
   x: number, y: number, zoom: number,
   mvt: VectorTile,
@@ -132,14 +129,14 @@ export const getMVTShapes = (
   };
 
   const toPoint4 = ([x, y]) => [
-    (( ox + iz * x) * 2 - 1),
-    (((oy + iz * y) * 2 - 1) * (flipY ? -1 : 1)),
+    (( ox + iz * x/256) * 2 - 1),
+    (((oy + iz * y/256) * 2 - 1) * (flipY ? -1 : 1)),
     0,
     1,
   ];
   const style = styles['background'];
   if (style) {
-    addPolygon([[[[0, 0], [1, 0], [1, 1], [0, 1]]]], {}, style, 1, toPoint4);
+    addPolygon([[[[0, 0], [256, 0], [256, 256], [0, 256]]]], {}, style, 256, toPoint4);
   }
   
   for (const k in layers) {
@@ -152,11 +149,9 @@ export const getMVTShapes = (
       const feature = layer.feature(i);
       const {type: t, properties, extent} = feature;
     
-      const type = FEATURE_TYPES[t];
       const klass = properties.class;
     
       const style = styles[name + '/'+ klass] ?? styles[name] ?? styles[klass] ?? styles.default;
-      //if (type === 'face') console.log({klass, type})
 
       const toPoint = ({x, y}) => [x, y];
       const toPoint4 = ([x, y]) => [

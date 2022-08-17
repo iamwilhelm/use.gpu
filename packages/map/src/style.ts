@@ -21,7 +21,7 @@ export const DEFAULT_STYLE_SHEET = {
   background: {
     face: {
       fill: parseColor('#0a0a10'),
-      zBias: -50,
+      zBias: -100,
     }
   },
 };

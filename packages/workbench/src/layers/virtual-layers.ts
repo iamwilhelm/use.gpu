@@ -72,7 +72,7 @@ const Resume = (
   for (let item of items) if (item) {
     aggregates[item.type].push(item);
   }
-  
+
   const els: LiveElement = [];
 
   for (const type in aggregates) {
@@ -195,6 +195,7 @@ const makeFaceAccumulator = (
   const hasColor = keys.has('colors') || keys.has('color');
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasZBias = keys.has('zBiases') || keys.has('zBias');
+  const hasCullMode = keys.has('cullMode');
 
   storage.segments = makeAggregateBuffer(device, 'i32', allocCount);
   storage.indices = makeAggregateBuffer(device, 'u32', allocIndices);
@@ -220,6 +221,8 @@ const makeFaceAccumulator = (
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
+
+    if (hasCullMode) props.cullMode = items[0]?.cullMode;
 
     return use(FaceLayer, props);
   };

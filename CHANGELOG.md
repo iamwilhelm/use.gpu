@@ -6,4 +6,6 @@
 - `@use-gpu/shader`: Track upstream WGSL grammar changes.
 - `@use-gpu/shader`: Direct `@link`ing of storage/texture bindings without getter.
 - `@use-gpu/shader`: Storage/uniform getters without `index: u32`.
+- `@use-gpu/map`: Initial alpha for maps: mercator projection, vector tile rendering.
+
 

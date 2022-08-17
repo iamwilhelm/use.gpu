@@ -29,16 +29,6 @@
       "types": "./types/wgsl-files/index.d.ts",
       "default": "./src/index.ts"
     },
-    "./contour/clip-shaded.wgsl": {
-      "types": "./src/contour/clip-shaded.wgsl.d.ts",
-      "import": "./src/contour/clip-shaded.wgsl",
-      "require": "./src/contour/clip-shaded.wgsl"
-    },
-    "./contour/clip-solid.wgsl": {
-      "types": "./src/contour/clip-solid.wgsl.d.ts",
-      "import": "./src/contour/clip-solid.wgsl",
-      "require": "./src/contour/clip-solid.wgsl"
-    },
     "./contour/fit-linear.wgsl": {
       "types": "./src/contour/fit-linear.wgsl.d.ts",
       "import": "./src/contour/fit-linear.wgsl",

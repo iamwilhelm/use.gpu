@@ -213,7 +213,7 @@ export const MapWebMercatorPage: LC = () => {
               phi={phi}
               theta={theta}
               target={target}
-							scale={1440}
+              scale={1440}
             >
               {view()}
             </OrbitCamera>

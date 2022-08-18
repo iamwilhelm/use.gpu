@@ -5,6 +5,14 @@ import { renderFibers } from './tree';
 
 const MARKER = 'Live/HMR-v1';
 
+/** Hot-reload an App root with a webpack-compatible module interface.
+
+Will discard all prior state and do a full re-render.
+```
+const App = () => { ... };
+export default hot(App, module);
+```
+*/
 export const hot = (fn: LiveFunction<any>, mod: any) => {
 
   const fibers: Set<LiveFiber<any>> = new Set();

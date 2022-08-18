@@ -2,7 +2,6 @@ import type { ShaderModuleDescriptor } from '@use-gpu/core';
 
 import { makeComputePipeline, makeComputePipelineAsync } from '@use-gpu/core';
 import { useContext, useMemo, useOne, useState } from '@use-gpu/live';
-import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
 import LRU from 'lru-cache';
 
@@ -140,7 +139,7 @@ export const useComputePipelineAsync = (
     pending!.set(key, promise);
 
     return null;
-  }, [memoKey, shader]);
+  }, [device, shader]);
 
   DEBUG && console.log('async pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader.hash, shader.hash);
   return [immediate ?? resolved, !!staleRef.current];

@@ -70,7 +70,7 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
     vec4<f32>(1.0),
     vec4<f32>(0.0),
     vec4<f32>(0.0),
-    vec4<f32>(0.0),
+    vec4<f32>(1.0),
     0u,
   );
 }

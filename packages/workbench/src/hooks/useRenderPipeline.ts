@@ -39,7 +39,7 @@ export const useRenderPipeline = (
     // Cache by unique render context
     let cache = CACHE.get(device);
     if (!cache) {
-      DEBUG && console.log('render pipeline cache created')
+      DEBUG && console.log('render pipeline cache created');
       CACHE.set(device, cache = makePipelineCache());
     }
 
@@ -49,7 +49,7 @@ export const useRenderPipeline = (
 
     const cached = cache.get(key);
     if (cached) {
-      DEBUG && console.log('render pipeline cache hit', key)
+      DEBUG && console.log('render pipeline cache hit', key);
       return cached;
     }
 
@@ -106,11 +106,11 @@ export const useRenderPipelineAsync = (
     let cache = CACHE.get(device);
     let pending = PENDING.get(device);
     if (!cache) {
-      DEBUG && console.log('async render pipeline cache created')
+      DEBUG && console.log('async render pipeline cache created');
       CACHE.set(device, cache = makePipelineCache());
     }
     if (!pending) {
-      DEBUG && console.log('async render pipeline pending queue created')
+      DEBUG && console.log('async render pipeline pending queue created');
       PENDING.set(device, pending = new Map());
     }
 
@@ -120,7 +120,7 @@ export const useRenderPipelineAsync = (
 
     const cached = cache!.get(key);
     if (cached) {
-      DEBUG && console.log('async render pipeline cache hit', key)
+      DEBUG && console.log('async render pipeline cache hit', key);
       return cached;
     }
 
@@ -149,7 +149,7 @@ export const useRenderPipelineAsync = (
       return pipeline;
     };
     staleRef.current = key;
-    DEBUG && console.log('async render pipeline miss', key)
+    DEBUG && console.log('async render pipeline miss', key);
 
     // Mark key as pending
     if (pending!.has(key)) {
@@ -168,7 +168,7 @@ export const useRenderPipelineAsync = (
       props,
     );
     promise.then((pipeline: GPURenderPipeline) => {
-      DEBUG && console.log('async render pipeline resolved', key)
+      DEBUG && console.log('async render pipeline resolved', key);
 
       cache!.set(key, pipeline);
       pending!.delete(key);

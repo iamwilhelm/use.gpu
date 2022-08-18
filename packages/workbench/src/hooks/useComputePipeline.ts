@@ -32,7 +32,7 @@ export const useComputePipeline = (
     // Cache by unique device context
     let cache = CACHE.get(memoKey);
     if (!cache) {
-      DEBUG && console.log('compute pipeline cache created')
+      DEBUG && console.log('compute pipeline cache created');
       CACHE.set(memoKey, cache = makePipelineCache());
     }
 
@@ -41,7 +41,7 @@ export const useComputePipeline = (
 
     const cached = cache.get(key);
     if (cached) {
-      DEBUG && console.log('compute pipeline cache hit', key)
+      DEBUG && console.log('compute pipeline cache hit', key);
       return cached;
     }
 
@@ -80,11 +80,11 @@ export const useComputePipelineAsync = (
     let cache = CACHE.get(device);
     let pending = PENDING.get(device);
     if (!cache) {
-      DEBUG && console.log('async compute pipeline cache created')
+      DEBUG && console.log('async compute pipeline cache created');
       CACHE.set(device, cache = makePipelineCache());
     }
     if (!pending) {
-      DEBUG && console.log('async compute pipeline pending queue created')
+      DEBUG && console.log('async compute pipeline pending queue created');
       PENDING.set(device, pending = new Map());
     }
 
@@ -115,7 +115,7 @@ export const useComputePipelineAsync = (
       return pipeline;
     };
     staleRef.current = key;
-    DEBUG && console.log('async compute pipeline miss', key)
+    DEBUG && console.log('async compute pipeline miss', key);
 
     // Mark key as pending
     if (pending!.has(key)) {
@@ -129,7 +129,7 @@ export const useComputePipelineAsync = (
       shader,
     );
     promise.then((pipeline: GPUComputePipeline) => {
-      DEBUG && console.log('async compute pipeline resolved', key)
+      DEBUG && console.log('async compute pipeline resolved', key);
 
       cache!.set(key, pipeline);
       pending!.delete(key);

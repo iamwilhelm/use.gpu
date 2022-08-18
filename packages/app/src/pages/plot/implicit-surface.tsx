@@ -160,30 +160,31 @@ export const PlotImplicitSurfacePage: LC = () => {
                               expr={EXPR_VALUE}
                               time
                               live
-                            >
-                              <ImplicitSurface
-                                normals={normals}
-                                level={level}
-                                method="linear"
-                                padding={1}
-                                range={[[-π, π], [1, 5], [-π, π]]}
-                                color={[0.8, 0.8, 1.0, 1.0]}
-                              />
-                              {inspect ? (
-                                <DataShader
-                                  shader={colorizeShader}
-                                  source={values}
-                                  render={(colorizedValues: ShaderModule) => (
-                                    <PointLayer
-                                      positions={positions}
-                                      colors={mode === 'normal' ? normals : colorizedValues}
-                                      size={3}
-                                      depth={1}
-                                    />
-                                  )}
-                                />
-                              ) : null}
-                            </Sampled>
+                              render={(values: StorageSource) => [
+                                <ImplicitSurface
+                                  normals={normals}
+                                  level={level}
+                                  method="linear"
+                                  padding={1}
+                                  range={[[-π, π], [1, 5], [-π, π]]}
+                                  color={[0.8, 0.8, 1.0, 1.0]}
+                                />,
+                                inspect ? (
+                                  <DataShader
+                                    shader={colorizeShader}
+                                    source={values}
+                                    render={(colorizedValues: ShaderModule) => (
+                                      <PointLayer
+                                        positions={positions}
+                                        colors={mode === 'normal' ? normals : colorizedValues}
+                                        size={3}
+                                        depth={1}
+                                      />
+                                    )}
+                                  />
+                                ) : null,
+                              ]}
+                            />
                           }
                         />
                       )}

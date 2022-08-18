@@ -53,6 +53,7 @@ export {
   tagFunction,
 } from './util';
 
+export * from './hmr';
 export * from './jsx';
 export const JSX = _JSX;
 export default _JSX;

@@ -1,6 +1,6 @@
 import type { LC } from '@use-gpu/live';
 
-import React, { into, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import React, { hot, into, useFiber, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
 import { DebugProvider, FontLoader, Router, Routes } from '@use-gpu/workbench';
@@ -13,7 +13,26 @@ import { makePicker } from './ui/page-picker';
 
 import { FALLBACK_MESSAGE } from './fallback';
 
-export const App: LC = () => {
+// Toggle inspector with ctrl/cmd-I.
+// Trigger re-render with ctrl/cmd-J.
+const useInspector = () => {
+  const [version, setVersion] = useState<number>(0);
+  const [inspect, setInspect] = useState<boolean>(true);
+
+  useResource((dispose) => {
+    const keydown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'i') setInspect((s) => !s);
+      if ((e.ctrlKey || e.metaKey) && e.key === 'j') setVersion((s) => s + 1);
+    }
+
+    window.addEventListener('keydown', keydown);
+    dispose(() => window.addEventListener('keydown', keydown));
+  });
+
+  return inspect;
+};
+
+export const App: LC = hot(() => {
   
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;
@@ -80,23 +99,6 @@ export const App: LC = () => {
       {view}
     </UseInspect>
   )
-};
+}, module);
 
-// Toggle inspector with ctrl/cmd-I.
-// Trigger re-render with ctrl/cmd-J.
-const useInspector = () => {
-  const [version, setVersion] = useState<number>(0);
-  const [inspect, setInspect] = useState<boolean>(true);
-
-  useResource((dispose) => {
-    const keydown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'i') setInspect((s) => !s);
-      if ((e.ctrlKey || e.metaKey) && e.key === 'j') setVersion((s) => s + 1);
-    }
-
-    window.addEventListener('keydown', keydown);
-    dispose(() => window.addEventListener('keydown', keydown));
-  });
-
-  return inspect;
-}
+App.displayName = 'App';

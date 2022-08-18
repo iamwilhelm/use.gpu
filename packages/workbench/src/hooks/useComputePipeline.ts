@@ -72,22 +72,21 @@ export const useComputePipelineAsync = (
   shader: ComputeShader,
 ) => {
   const device = useContext(DeviceContext);
-  const memoKey = device;
 
   const [resolved, setResolved] = useState<GPUComputePipeline | null>(null);
   const staleRef = useOne(() => ({current: null as string | null}));
 
   const immediate = useMemo(() => {
     // Cache by unique device context
-    let cache = CACHE.get(memoKey);
-    let pending = PENDING.get(memoKey);
+    let cache = CACHE.get(device);
+    let pending = PENDING.get(device);
     if (!cache) {
       DEBUG && console.log('async compute pipeline cache created')
-      CACHE.set(memoKey, cache = makePipelineCache());
+      CACHE.set(device, cache = makePipelineCache());
     }
     if (!pending) {
       DEBUG && console.log('async compute pipeline pending queue created')
-      PENDING.set(memoKey, pending = new Map());
+      PENDING.set(device, pending = new Map());
     }
 
     // Cache by shader structural hash

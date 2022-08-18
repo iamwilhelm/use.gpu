@@ -152,15 +152,15 @@ export const PlotImplicitSurfacePage: LC = () => {
                           time
                           live
                           render={(normals: StorageSource) =>
-		                        <Sampled
-		                          axes='xyz'
-		                          format='f32'
-		                          size={[36, 24, 36]}
-		                          padding={1}
-		                          expr={EXPR_VALUE}
-		                          time
-		                          live
-		                        >
+                            <Sampled
+                              axes='xyz'
+                              format='f32'
+                              size={[36, 24, 36]}
+                              padding={1}
+                              expr={EXPR_VALUE}
+                              time
+                              live
+                            >
                               <ImplicitSurface
                                 normals={normals}
                                 level={level}
@@ -183,7 +183,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                                   )}
                                 />
                               ) : null}
-														</Sampled>
+                            </Sampled>
                           }
                         />
                       )}

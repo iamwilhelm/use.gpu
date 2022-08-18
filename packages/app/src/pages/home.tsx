@@ -7,7 +7,7 @@ import { useRouterContext } from '@use-gpu/workbench';
 import React from 'react';
 import { styled } from '@stitches/react';
 
-import { PAGES } from '../routes';
+import { makePages } from '../routes';
 
 export const Title = styled('h1', {
   margin: 0,
@@ -36,6 +36,8 @@ const PANEL_STYLE = {
 export const HomePage: LiveComponent<HomePageProps> = (props) => {
   const {container} = props;
   const {linkTo} = useRouterContext();
+
+  const PAGES = makePages();
 
   return (
     use(HTML, {

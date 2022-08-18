@@ -24,7 +24,7 @@ import { RTTCFDTexturePage } from './pages/rtt/cfd-texture';
 import { HomePage } from './pages/home';
 import { EmptyPage } from './pages/empty';
 
-export const PAGES = [
+export const makePages = () => [
   {path: "/geometry/lines", title: "Geometry - 3D Lines and Arrows"},
   {path: "/geometry/faces", title: "Geometry - 3D Polygons"},
   {path: "/geometry/data", title: "Geometry - Data-driven Layers"},
@@ -73,3 +73,4 @@ export const makeRoutes = () => ({
   "/": { element: <HomePage container={document.querySelector('#use-gpu')} /> },
   "*": { element: <EmptyPage /> },
 });
+

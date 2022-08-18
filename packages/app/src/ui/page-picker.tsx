@@ -1,5 +1,5 @@
 import React from 'react';
-import { PAGES } from '../routes';
+import { makePages } from '../routes';
 import { use } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 import { useRouterContext } from '@use-gpu/workbench';
@@ -38,7 +38,7 @@ export const PagePicker = (container: Element) => {
         <button className="round" onClick={handleCode}>{icon}</button>
         <div style={{width: 16}} />
         <select onChange={handleChange} value={path}>
-          {PAGES.map(({title, path}) => (
+          {makePages().map(({title, path}) => (
             <option key={path} value={path}>{title}</option>
           ))}
         </select>

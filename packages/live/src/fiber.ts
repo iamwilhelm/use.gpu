@@ -296,7 +296,7 @@ export const updateFiber = <F extends ArrowFunction>(
   }
 
   // If fiber type changed, remount everything
-  if (fiber.type && fiberType !== fiber.type) disposeFiberState(fiber);
+  if (fiber.type && fiber.type !== fiberType) disposeFiberState(fiber);
   fiber.type = fiberType as any;
 
   // Reconcile literal array

@@ -13,14 +13,15 @@ dotenv.config({
 export default {
   mode: isDevelopment ? 'development' : 'production',
   entry: {
-    app: {
-      import: './packages/app/src/index.tsx',
-    }
+    use: isDevelopment ? [
+      './packages/app/src/index.tsx',
+      'webpack-dev-server/client/index.js?hot=true&live-reload=true'
+    ] : ['./packages/app/src/index.tsx'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
-    filename: 'use.bundle.js',
+    filename: '[name].bundle.js',
   },
   resolve: {
     modules: ['node_modules'],
@@ -34,9 +35,9 @@ export default {
       forceMode: "production",
     }),
     new DotenvPlugin({
-        path: '.env.local',
-        sample: '.env.local.example',
-        allowEmptyValues: true,
+      path: '.env.local',
+      sample: '.env.local.example',
+      allowEmptyValues: true,
     }),
   ],
   experiments: {
@@ -71,5 +72,6 @@ export default {
     host: '0.0.0.0',
     port: 8777,
     historyApiFallback: true,
+    hot: true,
   }
 };

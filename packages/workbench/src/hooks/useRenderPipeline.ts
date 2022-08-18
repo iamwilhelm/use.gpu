@@ -2,6 +2,7 @@ import type { UseGPURenderContext, ShaderModuleDescriptor, DeepPartial } from '@
 
 import { makeRenderPipeline, makeRenderPipelineAsync } from '@use-gpu/core';
 import { useContext, useMemo, useOne, useState } from '@use-gpu/live';
+import { toMurmur53 } from '@use-gpu/state';
 import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
 import LRU from 'lru-cache';
@@ -32,21 +33,19 @@ export const useRenderPipeline = (
   const {colorStates, depthStencilState, samples} = renderContext;
 
   // Memo key for unique render context
-  const memoKey = useMemoKey(
-    [device, colorStates, depthStencilState, props]
-  );
+  const pipelineKey = toMurmur53([colorStates, depthStencilState, samples, props]);
 
   return useMemo(() => {
     // Cache by unique render context
-    let cache = CACHE.get(memoKey);
+    let cache = CACHE.get(device);
     if (!cache) {
-      DEBUG && console.log('render pipeline cache created', memoKey.__id)
-      CACHE.set(memoKey, cache = makePipelineCache());
+      DEBUG && console.log('render pipeline cache created')
+      CACHE.set(device, cache = makePipelineCache());
     }
 
     // Cache by shader structural hash
     const [vertex, fragment] = shader;
-    const key = vertex.hash.toString() + fragment.hash.toString();
+    const key = pipelineKey.toString() +'/'+ vertex.hash.toString() +'-'+ fragment.hash.toString();
 
     const cached = cache.get(key);
     if (cached) {
@@ -85,7 +84,7 @@ export const useRenderPipeline = (
     DEBUG && console.log('render pipeline cache miss', key);
 
     return pipeline;
-  }, [memoKey, shader, samples]);
+  }, [device, pipelineKey]);
 };
 
 export const useRenderPipelineAsync = (
@@ -97,29 +96,27 @@ export const useRenderPipelineAsync = (
   const {colorStates, depthStencilState, samples} = renderContext;
 
   // Memo key for unique render context
-  const memoKey = useMemoKey(
-    [device, colorStates, depthStencilState, props]
-  );
+  const pipelineKey = toMurmur53([colorStates, depthStencilState, samples, props]);
 
   const [resolved, setResolved] = useState<GPURenderPipeline | null>(null);
   const staleRef = useOne(() => ({current: null as string | null}));
 
   const immediate = useMemo(() => {
     // Cache by unique render context
-    let cache = CACHE.get(memoKey);
-    let pending = PENDING.get(memoKey);
+    let cache = CACHE.get(device);
+    let pending = PENDING.get(device);
     if (!cache) {
-      DEBUG && console.log('async render pipeline cache created', memoKey.__id)
-      CACHE.set(memoKey, cache = makePipelineCache());
+      DEBUG && console.log('async render pipeline cache created')
+      CACHE.set(device, cache = makePipelineCache());
     }
     if (!pending) {
-      DEBUG && console.log('async render pipeline pending queue created', memoKey.__id)
-      PENDING.set(memoKey, pending = new Map());
+      DEBUG && console.log('async render pipeline pending queue created')
+      PENDING.set(device, pending = new Map());
     }
 
     // Cache by shader structural hash
     const [vertex, fragment] = shader;
-    const key = vertex.hash.toString() +'-'+ fragment.hash.toString();
+    const key = pipelineKey.toString() +'/'+ vertex.hash.toString() +'-'+ fragment.hash.toString();
 
     const cached = cache!.get(key);
     if (cached) {
@@ -181,7 +178,7 @@ export const useRenderPipelineAsync = (
     pending!.set(key, promise);
 
     return null;
-  }, [memoKey, shader, samples]);
+  }, [device, pipelineKey]);
 
   DEBUG && console.log('async render pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
   return [immediate ?? resolved, !!staleRef.current];

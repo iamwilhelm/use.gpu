@@ -84,7 +84,7 @@ export const useRenderPipeline = (
     DEBUG && console.log('render pipeline cache miss', key);
 
     return pipeline;
-  }, [device, pipelineKey]);
+  }, [device, pipelineKey, shader[0].hash, shader[1].hash]);
 };
 
 export const useRenderPipelineAsync = (
@@ -178,7 +178,7 @@ export const useRenderPipelineAsync = (
     pending!.set(key, promise);
 
     return null;
-  }, [device, pipelineKey]);
+  }, [device, pipelineKey, shader[0].hash, shader[1].hash]);
 
   DEBUG && console.log('async render pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
   return [immediate ?? resolved, !!staleRef.current];

@@ -64,7 +64,7 @@ export const useComputePipeline = (
     DEBUG && console.log('compute pipeline cache miss', key);
 
     return pipeline;
-  }, [device, shader]);
+  }, [device, shader.hash]);
 };
 
 export const useComputePipelineAsync = (

@@ -18,7 +18,7 @@ export const Router: LiveComponent<RouterProps> = memo(({
   children,
 }: PropsWithChildren<RouterProps>) => {
 
-  const src = useOne(() => source ?? makeBrowserHistory(base), source);
+  const src = useOne(() => source ?? makeBrowserHistory(base), source ?? base);
 
   const [state, setState] = useState<RouterState>({
     path: src.path(),
@@ -74,7 +74,7 @@ export const makeBrowserHistory = (base: string = '') => {
 
   // Normalize to `/foo/bar/`
   base = base.replace(/^\/|\/$/g, '');
-  base = '/' + base + base.length ? '/' : '';
+  base = '/' + base + (base.length ? '/' : '');
 
   // Initialize from #!/ in URL for static SPA.
   if (location.hash.match(/^#!\//)) {
@@ -121,7 +121,6 @@ export const makeBrowserHistory = (base: string = '') => {
     },
 
     linkTo: (path: string, query?: QueryParams | string) => {
-      debugger;
       const href = makeRelativeURL(base, path, query);
       const onClick = (e: any) => {
         if (e?.ctrlKey || e?.button !== 0) return;

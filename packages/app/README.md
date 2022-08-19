@@ -6,8 +6,8 @@ This package is **not installable**. It hosts a demo app used to showcase and de
   <span className="m-icon m-icon-outlined" title="Warning">warning_amber</span>WebGPU is <a href="https://caniuse.com/webgpu">only available for developers</a>, locked behind a browser flag. A dev build of Chrome or Firefox is recommended.</a>.
 </span>
 
-- **Chrome**: enable `chrome://flags/#enable-unsafe-webgpu`.
-- **Firefox**: enable `dom.webgpu.enabled`
+- **Chrome**: enable `enable-unsafe-webgpu` in `chrome://flags`.
+- **Firefox**: enable `dom.webgpu.enabled` in `about:config`.
 
 ## Usage
 

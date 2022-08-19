@@ -54,6 +54,8 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
   return result !== undefined ? (render ? render(result) : yeet(result)) : (suspense ? suspend() : null);
 };
 
+Fetch.displayName = 'Fetch';
+
 const delay = <T>(promise: Promise<T>, time: number = 0) =>
   promise.then((value: T) =>
     new Promise((resolve) =>

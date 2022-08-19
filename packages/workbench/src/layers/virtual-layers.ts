@@ -17,8 +17,8 @@ import { FaceLayer } from './face-layer';
 import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
 
-export type LayersProps = {
-  items?: LayerAggregate,
+export type VirtualLayersProps = {
+  items?: LayerAggregate[],
   children: LiveElement,
 };
 
@@ -54,7 +54,7 @@ const getItemSummary = (items: LayerAggregate[]) => {
 }
 
 /** Aggregate (point and line) geometry from children to produce merged layers. */
-export const VirtualLayers: LiveComponent<VirtualLayersProps> = memo((props) => {
+export const VirtualLayers: LiveComponent<VirtualLayersProps> = memo((props: VirtualLayersProps) => {
   const {items, children} = props;
   return items ? Resume(items) : children ? gather(children, Resume) : null;
 }, 'VirtualLayers');
@@ -62,7 +62,7 @@ export const VirtualLayers: LiveComponent<VirtualLayersProps> = memo((props) => 
 const Resume = (
   items: (LayerAggregate | null)[],
 ) => {
-  const aggregates: Record<string, LayerAggregate> = {
+  const aggregates: Record<string, LayerAggregate[]> = {
     point: [],
     line: [],
     face: [],
@@ -73,7 +73,7 @@ const Resume = (
     aggregates[item.type].push(item);
   }
 
-  const els: LiveElement = [];
+  const els: LiveElement[] = [];
 
   for (const type in aggregates) {
     const items = aggregates[type];

@@ -14,10 +14,14 @@ export type ObjectTrait = {
   matrix: VectorLike,
 };
 
+export type MVTStyleSheet = Record<string, MVTStyleProperties>;
+
 export type MVTStyleProperties = {
   face: {
     stroke?: ColorLike,
     fill?: ColorLike,
+    width?: number,
+    depth?: number,
     zBias?: any,
   },
   line: {
@@ -28,8 +32,9 @@ export type MVTStyleProperties = {
   },
   point?: {
     color?: ColorLike,
-    size?: number,
     shape?: any,
+    size?: number,
+    depth?: number,
     zBias?: any,
   },
   font?: {

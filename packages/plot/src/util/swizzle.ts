@@ -20,6 +20,10 @@ export const toBasis = (axes: string) => {
   return parseAxes(axes);
 };
 
+export const toOrder = (basis: string) => {
+  return basis.split('').map(s => AXES.indexOf(s));
+};
+
 export const invertBasisSlow = (axes: string) => {
   const order = AXES.slice();
   let i = 0;

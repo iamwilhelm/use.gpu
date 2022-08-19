@@ -1,4 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import { provide, makeContext, useContext, useNoContext, useOne } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
@@ -9,7 +10,7 @@ import { getScissorLevel } from '@use-gpu/wgsl/transform/scissor.wgsl';
 
 const SCISSOR_BINDINGS = bundleToAttributes(getScissorLevel);
 
-export type ScissorContextProps = [number, number][];
+export type ScissorContextProps = ShaderModule;
 
 export type ScissorProps = {
   range: [number, number][],

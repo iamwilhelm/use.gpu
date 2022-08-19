@@ -39,7 +39,7 @@ export const hot = (fn: LiveFunction<any>, mod: any) => {
     invalidate();
   }
   else {
-    dispose((data) => {
+    dispose((data: any) => {
       data.marker = MARKER;
       data.fibers = Array.from(fibers);
     });

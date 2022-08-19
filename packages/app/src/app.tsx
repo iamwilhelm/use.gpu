@@ -13,6 +13,9 @@ import { makePicker } from './ui/page-picker';
 
 import { FALLBACK_MESSAGE } from './fallback';
 
+// @ts-ignore
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 // Toggle inspector with ctrl/cmd-I.
 // Trigger re-render with ctrl/cmd-J.
 const useInspector = () => {
@@ -34,11 +37,13 @@ const useInspector = () => {
 
 export const App: LC = hot(() => {
   
+  const base = isDevelopment ? '/' : '/demo/';
+  
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;
 
   const router = useOne(() => (
-    <Router>
+    <Router base={base}>
       <Routes routes={makeRoutes()} morph />
       <Routes routes={makePicker(root)} />
     </Router>
@@ -49,25 +54,25 @@ export const App: LC = hot(() => {
       family: 'Lato',
       weight: 400,
       style: 'normal',
-      src: '/fonts/Lato-Regular.ttf',
+      src: base + 'fonts/Lato-Regular.ttf',
     },
     {
       family: 'Lato',
       weight: 400,
       style: 'italic',
-      src: '/fonts/Lato-Italic.ttf',
+      src: base + 'fonts/Lato-Italic.ttf',
     },
     {
       family: 'Lato',
       weight: 500,
       style: 'normal',
-      src: '/fonts/Lato-Bold.ttf',
+      src: base + 'fonts/Lato-Bold.ttf',
     },
     {
       family: 'Noto Emoji',
       weight: 400,
       style: 'normal',
-      src: '/fonts/NotoColorEmoji.ttf',
+      src: base + 'fonts/NotoColorEmoji.ttf',
     },
   ]);
 
@@ -99,6 +104,7 @@ export const App: LC = hot(() => {
       {view}
     </UseInspect>
   )
+  // @ts-ignore
 }, module);
 
 App.displayName = 'App';

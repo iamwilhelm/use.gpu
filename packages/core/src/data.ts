@@ -506,7 +506,7 @@ export const generateChunkFaces = (
 export const copyNumberArrayRepeatedRange = (
   from: NumberArray | number, to: NumberArray,
   fromIndex: number, toIndex: number,
-  dims: number, count: number, loop: boolean = false,
+  dims: number, count: number, loop: boolean = false, offset: number = 0,
 ) => {
   let pos = toIndex;
   const read = fromIndex;
@@ -516,41 +516,41 @@ export const copyNumberArrayRepeatedRange = (
 
   if (typeof from === 'number' && dims === 1) {
     for (let j = 0; j < count; ++j) {
-      to[pos++] = from;
+      to[pos++] = from + offset;
     }
   }
   else if (dims === 1) {
     for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read];
+      to[pos++] = array[read] + offset;
     }
   }
   else if (dims === 2) {
     for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read];
-      to[pos++] = array[read + 1];
+      to[pos++] = array[read] + offset;
+      to[pos++] = array[read + 1] + offset;
     }
   }
   else if (dims === 3) {
     for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read];
-      to[pos++] = array[read + 1];
-      to[pos++] = array[read + 2];
+      to[pos++] = array[read] + offset;
+      to[pos++] = array[read + 1] + offset;
+      to[pos++] = array[read + 2] + offset;
     }
   }
   else if (dims === 3.5) {
     for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read];
-      to[pos++] = array[read + 1];
-      to[pos++] = array[read + 2];
+      to[pos++] = array[read] + offset;
+      to[pos++] = array[read + 1] + offset;
+      to[pos++] = array[read + 2] + offset;
       pos++; // !
     }
   }
   else if (dims === 4) {
     for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read];
-      to[pos++] = array[read + 1];
-      to[pos++] = array[read + 2];
-      to[pos++] = array[read + 3];
+      to[pos++] = array[read] + offset;
+      to[pos++] = array[read + 1] + offset;
+      to[pos++] = array[read + 2] + offset;
+      to[pos++] = array[read + 3] + offset;
     }
   }
   else {
@@ -558,7 +558,7 @@ export const copyNumberArrayRepeatedRange = (
     console.warn('Dims > 4 not supported');
     for (let j = 0; j < count; ++j) {
       for (let k = 0; k < dims; ++k) {
-        to[pos++] = array[read + k];
+        to[pos++] = array[read + k] + offset;
       }
     }
   }

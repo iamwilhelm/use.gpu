@@ -53,12 +53,12 @@ const FRAGMENT_BINDINGS = bundleToAttributes(getMaskedFragment);
 const DEFINES_ALPHA = {
   HAS_EDGE_BLEED: true,
   HAS_ALPHA_TO_COVERAGE: false,
-};
+} as Record<string, any>;
 
 const DEFINES_ALPHA_TO_COVERAGE = {
   HAS_EDGE_BLEED: true,
   HAS_ALPHA_TO_COVERAGE: true,
-};
+} as Record<string, any>;
 
 const PIPELINE_ALPHA = {
   primitive: {

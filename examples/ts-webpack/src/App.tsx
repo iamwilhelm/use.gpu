@@ -1,4 +1,4 @@
-import React, { LC, useFiber } from '@use-gpu/live';
+import React, { LC, hot, useFiber } from '@use-gpu/live';
 
 import { HTML } from '@use-gpu/react';
 import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
@@ -19,8 +19,8 @@ const FONTS = [
   },
 ];
 
-export const App: LC = () => {
-  
+export const App: LC = hot(() => {
+
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;
 
@@ -87,4 +87,4 @@ export const App: LC = () => {
 
     </UseInspect>
   );
-};
+}, module);

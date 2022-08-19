@@ -1,18 +1,9 @@
 type XY = [number, number];
 type Field = ([x, y]: XY) => number;
 
-const partition = <T>(list: T[], predicate: (t: T) => boolean): [T[], T[]] => {
-  const a: T[] = [];
-  const b: T[] = [];
-  for (const v of list) {
-    if (predicate(v)) a.push(v);
-    else b.push(v);
-  }
-};
-
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
-const getZeroLevel = (a, b) => -a / (b - a);
+const getZeroLevel = (a: number, b: number) => -a / (b - a);
 
 export const cutPolygons = (
   polygons: XY[][][],
@@ -52,7 +43,7 @@ export const cutPolygonWith = (
   let cuts = 0;
   for (const r of rings) if (r.length) {
     const cr = cutRingWith(r, getValue);
-    if (cr === r) whole.push(r);
+    if (cr?.[0] === r) whole.push(r);
     else if (cr === null) {
       cuts++;
       continue;
@@ -117,7 +108,7 @@ export const cutRingWith = (
       const p = [
         Math.round(lerp(a[0], b[0], f)),
         Math.round(lerp(a[1], b[1], f)),
-      ];
+      ] as XY;
       if (va > 0) {
         const cut = ring.slice(pos, i + 1);
         if (last) cut.unshift(last);
@@ -156,7 +147,7 @@ export const cutRingWith = (
     let i = 0;
     let r = null;
     while ((r = ring[i]) && getValue(r) === 0) { i++ };
-    if (ring[i] && getValue(ring[i]) > 0) return ring;
+    if (ring[i] && getValue(ring[i]) > 0) return [ring];
   }
 
   return out.length ? out : null;
@@ -173,7 +164,7 @@ export const assembleCutRing = (
 
 export const assembleCutRingWith = (
   segments: XY[][],
-  getTangent: (x: number, y: number) => number,
+  getTangent: Field,
 ) => {
   
   const score = segments.map(seg => {
@@ -244,11 +235,11 @@ export const pointInPolygon = (
   point: XY,
 ) => {
   if (!rings.length) return false;
-  if (!pointInRing(rings[0])) return false;
+  if (!pointInRing(rings[0], point)) return false;
 
   let n = rings.length;
   for (let i = 1; i < n; ++i) {
-    if (pointInRing(rings[i])) return false;
+    if (pointInRing(rings[i], point)) return false;
   }
   return true;
 }

@@ -2,9 +2,9 @@ import path from 'path';
 import dotenv from 'dotenv';
 import WasmPackPlugin from '@wasm-tool/wasm-pack-plugin';
 import DotenvPlugin from 'webpack-dotenv-plugin';
+import TerserPlugin from 'terser-webpack-plugin';
 
-const {NODE_ENV} = process.env;
-const isDevelopment = NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 dotenv.config({
   path: '.env.local',
@@ -13,6 +13,7 @@ dotenv.config({
 export default {
   mode: isDevelopment ? 'development' : 'production',
   entry: {
+    // Hot reload client
     use: isDevelopment ? [
       './packages/app/src/index.tsx',
       'webpack-dev-server/client/index.js?hot=true&live-reload=true'
@@ -20,7 +21,7 @@ export default {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/dist/',
+    publicPath: isDevelopment ? '/dist/' : '/demo/dist/',
     filename: '[name].bundle.js',
   },
   resolve: {
@@ -42,6 +43,17 @@ export default {
   ],
   experiments: {
     syncWebAssembly: true,
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          // Ensure components remain readable in inspector
+          keep_fnames: true,
+        },
+      }),
+    ],
   },
   module: {
     rules: [

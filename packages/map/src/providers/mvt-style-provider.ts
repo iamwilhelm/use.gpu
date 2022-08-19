@@ -4,7 +4,7 @@ import type { MVTStyleProperties } from '../types';
 
 import { patch } from '@use-gpu/state';
 import { parseNumber, parseColor } from '@use-gpu/traits';
-import { makeContext, useContext, useNoContext } from '@use-gpu/live';
+import { provide, makeContext, useContext, useNoContext, useOne } from '@use-gpu/live';
 
 import { DEFAULT_STYLE_SHEET } from '../style';
 
@@ -40,17 +40,20 @@ const DEFAULT_STYLE: MVTStyleProperties = {
   },
 };
 
-for (let k in DEFAULT_STYLE_SHEET) DEFAULT_STYLE_SHEET[k] = patch(DEFAULT_STYLE_SHEET[k], {$apply: x => patch(DEFAULT_STYLE, x)});
+for (let k in DEFAULT_STYLE_SHEET) {
+  // @ts-ignore
+  DEFAULT_STYLE_SHEET[k] = patch(DEFAULT_STYLE_SHEET[k], {$apply: x => patch(DEFAULT_STYLE, x)});
+}
 
 export const MVTStyleContext = makeContext<MVTStyleContextProps>(patch({
   default: DEFAULT_STYLE,
-}, DEFAULT_STYLE_SHEET), 'MVTStyleContext');
+} as MVTStyleContextProps, DEFAULT_STYLE_SHEET), 'MVTStyleContext');
 
-export const useMVTStyleContext = () => useContext(MVTStyleContext);
+export const useMVTStyleContext = () => useContext<MVTStyleContextProps>(MVTStyleContext);
 export const useNoMVTStyleContext = () => useNoContext(MVTStyleContext);
 
 export type MVTStyleProps = {
-  styles?: MVTStyleContextProps,
+  styles: MVTStyleContextProps,
   children?: LiveElement,
 };
 

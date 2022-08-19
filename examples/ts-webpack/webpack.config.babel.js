@@ -1,10 +1,16 @@
 const path = require('path');
 
 const env = process.env.NODE_ENV ?? 'development';
+const isDevelopment = env === 'development';
 
 module.exports =  {
   mode: env,
-  entry: './src/index.tsx',
+  entry: isDevelopment
+    ? [
+      './src/index.tsx',
+      'webpack-dev-server/client/index.js?hot=true&live-reload=true',
+    ]
+    : './src/index.tsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/dist/',
@@ -41,5 +47,6 @@ module.exports =  {
     compress: true,
     port: 8080,
     historyApiFallback: true,
+    hot: isDevelopment,
   }
 };

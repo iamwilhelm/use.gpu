@@ -162,7 +162,7 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
   reduced: undefined,
   parent: undefined,
   root: nextFiber,
-  up: fiber.yeeted,
+  up: fiber.yeeted ?? undefined,
 });
 
 // Make fiber quote state

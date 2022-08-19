@@ -8,11 +8,17 @@ export const RouterContext = makeContext<RouterAPI>(undefined, 'RouterContext');
 export type RouterProps = {
   source?: any,
   routes?: Record<string, Route>,
+  base?: string, 
 };
 
-export const Router: LiveComponent<RouterProps> = memo(({source, routes, children}: PropsWithChildren<RouterProps>) => {
+export const Router: LiveComponent<RouterProps> = memo(({
+  source,
+  routes,
+  base,
+  children,
+}: PropsWithChildren<RouterProps>) => {
 
-  const src = useOne(() => source ?? makeBrowserHistory(), source);
+  const src = useOne(() => source ?? makeBrowserHistory(base), source);
 
   const [state, setState] = useState<RouterState>({
     path: src.path(),
@@ -47,7 +53,8 @@ export const Router: LiveComponent<RouterProps> = memo(({source, routes, childre
 
 export const useRouterContext = () => useContext(RouterContext);
 
-export const makeRelativeURL = (path: string, query?: QueryParams | string) => {
+export const makeRelativeURL = (base: string, path: string, query?: QueryParams | string) => {
+  path = base + path.replace(/^\//, '');
   if (typeof query === 'string') {
     if (query.length) return path + '?' + query.replace(/^\?/, '');
     return path;
@@ -62,8 +69,18 @@ export const makeRelativeURL = (path: string, query?: QueryParams | string) => {
   return path;
 };
 
-export const makeBrowserHistory = () => {
+export const makeBrowserHistory = (base: string = '') => {
   const {history, location} = window;
+
+  // Normalize to `/foo/bar/`
+  base = base.replace(/^\/|\/$/g, '');
+  base = '/' + base + base.length ? '/' : '';
+
+  // Initialize from #!/ in URL for static SPA.
+  if (location.hash.match(/^#!\//)) {
+    const [path, query] = location.hash.slice(2).split('?');
+    history.replaceState({path, query}, document.title, makeRelativeURL(base, path, query));
+  }
 
   const notifyPopState = () => {
     window.dispatchEvent(new PopStateEvent('popstate'));
@@ -77,6 +94,7 @@ export const makeBrowserHistory = () => {
     },
 
     path: () => {
+      if (location.pathname.indexOf(base) === 0) return '/' + location.pathname.slice(base.length);
       return location.pathname;
     },
     
@@ -94,16 +112,17 @@ export const makeBrowserHistory = () => {
     forward: () => history.forward(),
     go: (n: number) => history.go(n),
     push: (path: string, query?: QueryParams | string) => {
-      history.pushState({path, query}, document.title, makeRelativeURL(path, query));
+      history.pushState({path, query}, document.title, makeRelativeURL(base, path, query));
       notifyPopState();
     },
     replace: (path: string, query?: QueryParams | string) => {
-      history.replaceState({path, query}, document.title, makeRelativeURL(path, query));
+      history.replaceState({path, query}, document.title, makeRelativeURL(base, path, query));
       notifyPopState();
     },
 
     linkTo: (path: string, query?: QueryParams | string) => {
-      const href = makeRelativeURL(path, query);
+      debugger;
+      const href = makeRelativeURL(base, path, query);
       const onClick = (e: any) => {
         if (e?.ctrlKey || e?.button !== 0) return;
 

@@ -21,17 +21,18 @@ const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) 
 //const URLS = new Set();
 
 export type MVTilesProps = {
+  minLevel?: number,
   detail?: number,
   children?: LiveElement,
 };
 
 export type MVTileProps = {
   tiles: {
-    cache: LRU<any>,
+    cache: LRU<any, any>,
     loaded: Map<number, number>,
     flipY: boolean,
     styles: MVTStyleContextProps,
-    forceUpdate: () => {},
+    forceUpdate: () => void,
   },
   key: number,
   hide?: boolean,
@@ -118,7 +119,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
   return useOne(() => gather(out, (items: any) => use(VirtualLayers, { items })));
 };
 
-const MVTile: LiveComponent<TileProps> = memo((props) => {
+const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
   const {tiles: {cache, loaded, flipY, styles, forceUpdate}, key, hide, tesselate} = props;
   const {getMVT} = useTileContext();
 

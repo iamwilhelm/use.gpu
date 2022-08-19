@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { AxesTrait, ObjectTrait, Axes, Swizzle } from '@use-gpu/plot';
+import type { AxesTrait, ObjectTrait, Swizzle } from '@use-gpu/plot';
 import type { GeographicTrait } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
@@ -12,7 +12,7 @@ import {
 
 import {
   RangeContext,
-  composeTransform, swizzleMatrix, toBasis, rotateBasis, invertBasis,
+  composeTransform, swizzleMatrix, toBasis, toOrder, rotateBasis, invertBasis,
   useAxesTrait, useObjectTrait,
 } from '@use-gpu/plot';
 import { mat4 } from 'gl-matrix';
@@ -34,6 +34,7 @@ export type WebMercatorProps = Partial<AxesTrait> & Partial<GeographicTrait> & P
   centered?: boolean,
   native?: boolean,
   scissor?: boolean,
+  radius?: number,
 
   children?: LiveElement,
 };
@@ -101,7 +102,9 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
       // Apply inverse spherical basis as part of view matrix (right multiply)
       swizzleMatrix(t, order);
       mat4.multiply(matrix, matrix, t);
-      range = range.map((_, i) => range[order[i]]);
+      
+      const orderIndices = toOrder(order);
+      range = range.map((_, i) => range[orderIndices[i]]);
     }
     
     return [matrix, swizzle, origin, range, epsilon];

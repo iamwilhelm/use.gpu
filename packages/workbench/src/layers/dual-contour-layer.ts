@@ -63,6 +63,7 @@ export type DualContourLayerProps = {
   live?: boolean,
 
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
+  alphaToCoverage?: boolean,
   cullMode?: GPUCullMode,
   mode?: RenderPassMode | string,
   id?: number,
@@ -74,11 +75,11 @@ const VERTEX_BINDINGS = bundleToAttributes(getDualContourVertex);
 
 const DEFINES_ALPHA = {
   HAS_ALPHA_TO_COVERAGE: false,
-};
+} as Record<string, any>;
 
 const DEFINES_ALPHA_TO_COVERAGE = {
   HAS_ALPHA_TO_COVERAGE: true,
-};
+} as Record<string, any>;
 
 const PIPELINE_ALPHA = {
   primitive: {

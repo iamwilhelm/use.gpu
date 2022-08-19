@@ -32,6 +32,6 @@
     "build",
   ],
   "ts-node": {
-      "esm": true
+    "esm": true
   }
 }

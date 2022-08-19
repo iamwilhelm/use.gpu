@@ -10,6 +10,7 @@
     "@use-gpu/live": "*",
     "@use-gpu/shader": "*",
     "@use-gpu/workbench": "*",
+    "@use-gpu/plot": "*",
     "earcut": "^2.2.4",
     "mapbox-vector-tile": "^0.3.0",
     "mikktspace": "^1.1.1"

@@ -7,6 +7,7 @@ It's a **stand-alone Typescript+Rust/WASM library** with its own React-like run-
 It has a built-in **shader linker and binding generator**, which means a lot of the tedium of raw GPU programming is eliminated, without compromising on flexibility.
 
 - [**Documentation**](https://usegpu.live)
+- [**Demos**](https://usegpu.live/demo/index.html)
 
 ----
 

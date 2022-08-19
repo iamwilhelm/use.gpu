@@ -30,6 +30,7 @@
     "@use-gpu/layout": "*",
     "@use-gpu/live": "*",
     "@use-gpu/react": "*",
+    "@use-gpu/inspect": "*",
     "@use-gpu/workbench": "*",
     "@use-gpu/webgpu": "*",
     "@use-gpu/wgsl-loader": "*"

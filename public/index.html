@@ -54,31 +54,31 @@
       font-family: 'Fira Code';
       font-style: normal;
       font-weight: 400;
-      src: url(./fonts/FiraCode-Regular.otf) format('opentype');
+      src: url(/fonts/FiraCode-Regular.otf) format('opentype');
     }
     @font-face {
       font-family: 'Lato';
       font-style: normal;
       font-weight: 400;
-      src: url(./fonts/Lato-Regular.ttf) format('truetype');
+      src: url(/fonts/Lato-Regular.ttf) format('truetype');
     }
     @font-face {
       font-family: 'Lato';
       font-style: normal;
       font-weight: 700;
-      src: url(./fonts/Lato-Bold.ttf) format('truetype');
+      src: url(/fonts/Lato-Bold.ttf) format('truetype');
     }
     @font-face {
       font-family: 'Lato';
       font-style: italic;
       font-weight: 400;
-      src: url(./fonts/Lato-Italic.ttf) format('truetype');
+      src: url(/fonts/Lato-Italic.ttf) format('truetype');
     }
     @font-face {
       font-family: 'Material Icons';
       font-style: normal;
       font-weight: 400;
-      src: url(./fonts/MaterialIcons-Regular.ttf) format('truetype');
+      src: url(/fonts/MaterialIcons-Regular.ttf) format('truetype');
     }
     .m-icon {
       font-family: 'Material Icons';
@@ -143,5 +143,10 @@
       <div class="canvas"></div>
     </div>
   </body>
-  <script src="./dist/use.bundle.js"></script>
+  <script>
+    const s = document.createElement('script');
+    if (location.href.match(/\/demo/)) s.src = "/demo/dist/use.bundle.js";
+    else s.src = "/dist/use.bundle.js";
+    document.body.appendChild(s);
+  </script>
 </html>

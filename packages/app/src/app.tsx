@@ -37,7 +37,7 @@ const useInspector = () => {
 
 export const App: LC = hot(() => {
   
-  const base = false && isDevelopment ? '/' : '/demo/';
+  const base = isDevelopment ? '/' : '/demo/';
   
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;

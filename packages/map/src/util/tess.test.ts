@@ -345,7 +345,7 @@ describe("tesselate", () => {
 
   });
   
-  fit('cut polygon beside hole', () => {
+  it('cut polygon beside hole', () => {
     const rings = [
       [
         [10, 10],
@@ -378,7 +378,6 @@ describe("tesselate", () => {
     const d = 12;
     
     const polygons = cutPolygon(rings, nx, ny, d);
-    console.log(polygons[0], polygons[1])
 
     expect(polygons.map(polygon => polygon.map(getRingArea))).toMatchSnapshot();
     expect(polygons).toMatchSnapshot();

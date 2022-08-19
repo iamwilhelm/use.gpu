@@ -8,6 +8,7 @@ yarn publish --ignore-scripts --access public build/packages/glyph
 yarn publish --ignore-scripts --access public build/packages/inspect
 yarn publish --ignore-scripts --access public build/packages/layout
 yarn publish --ignore-scripts --access public build/packages/live
+yarn publish --ignore-scripts --access public build/packages/map
 yarn publish --ignore-scripts --access public build/packages/plot
 yarn publish --ignore-scripts --access public build/packages/react
 yarn publish --ignore-scripts --access public build/packages/shader

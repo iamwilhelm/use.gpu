@@ -26,7 +26,7 @@ export const PagePicker = (container: Element) => {
   const icon = ICON("code");
   const handleCode = () => {
     const route = location.pathname;
-    const url = `https://gitlab.com/unconed/use.gpu/-/blob/master/packages/app/src/pages${location.pathname}.tsx`;
+    const url = `https://gitlab.com/unconed/use.gpu/-/blob/master/packages/app/src/pages${location.pathname.replace(/^\/demo/, '')}.tsx`;
     window.open(url);
   };
 

@@ -8,11 +8,12 @@ export type LayerAggregator = (
   device: GPUDevice,
   items: LayerAggregate[],
   keys: Set<string>,
-  points: number,
-  indices: number,
+  count: number,
+  indices?: number,
 ) => (
   items: LayerAggregate[],
   count: number,
+  indices?: number,
 ) => LiveElement;
 
 export type PointAggregate = {

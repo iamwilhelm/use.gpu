@@ -166,7 +166,6 @@ export const PlotImplicitSurfacePage: LC = () => {
                                   level={level}
                                   method="linear"
                                   padding={1}
-                                  range={[[-π, π], [1, 5], [-π, π]]}
                                   color={[0.8, 0.8, 1.0, 1.0]}
                                 />,
                                 inspect ? (

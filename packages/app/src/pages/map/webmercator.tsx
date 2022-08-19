@@ -19,6 +19,8 @@ import {
 
 import { PlotControls } from '../../ui/plot-controls';
 
+import { vec3 } from 'gl-matrix';
+
 const π = Math.PI;
 const τ = π*2;
 const EPS = 1e-3;
@@ -36,6 +38,7 @@ const USE_MAPBOX = false;
 
 export const MapWebMercatorPage: LC = () => {
   
+  // @ts-ignore
   const accessToken = process.env.MAPBOX_TOKEN;
   
   const tracks = {
@@ -207,7 +210,7 @@ export const MapWebMercatorPage: LC = () => {
           radius={5}
           bearing={0.5}
           pitch={0.3}
-          render={(radius: number, phi: number, theta: number, target: number[]) =>
+          render={(radius: number, phi: number, theta: number, target: vec3) =>
             <OrbitCamera
               radius={radius}
               phi={phi}

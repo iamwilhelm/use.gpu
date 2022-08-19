@@ -13,6 +13,7 @@ import {
 import {
   Plot, Cartesian, Axis, Grid, Label, Line, Sampled, Scale, Surface, Tick, Transpose,
 } from '@use-gpu/plot';
+import { vec3 } from 'gl-matrix';
 
 let t = 0;
 
@@ -143,7 +144,7 @@ export const PlotCartesianPage: LC = () => {
       radius={5}
       bearing={0.5}
       pitch={0.3}
-      render={(radius: number, phi: number, theta: number, target: number[]) =>
+      render={(radius: number, phi: number, theta: number, target: vec3) =>
         <OrbitCamera
           radius={radius}
           phi={phi}

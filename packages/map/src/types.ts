@@ -2,7 +2,8 @@ import type { VectorLike, ColorLike, Placement, Blending, Domain, Join } from '@
 import type { PointShape } from '@use-gpu/workbench';
 
 export type GeographicTrait = {
-  origin: VectorLike,
+  long: number,
+  lat: number,
   zoom: number,
 };
 

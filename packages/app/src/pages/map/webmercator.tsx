@@ -36,7 +36,13 @@ const thetaFormatter = (θ: number) => {
 
 const USE_MAPBOX = false;
 
+// @ts-ignore
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 export const MapWebMercatorPage: LC = () => {
+
+  const base = isDevelopment ? '/' : '/demo/';
+  const url = base + "tiles/:zoom-:x-:y.mvt";
   
   // @ts-ignore
   const accessToken = process.env.MAPBOX_TOKEN;
@@ -119,7 +125,7 @@ export const MapWebMercatorPage: LC = () => {
                     <MVTiles />
                   </MapboxProvider>
                 ) : (
-                  <MapTileProvider>
+                  <MapTileProvider url={url}>
                     <MVTiles detail={3} />
                   </MapTileProvider>
                 )}

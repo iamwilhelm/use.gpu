@@ -14,9 +14,13 @@ import {
 } from '@use-gpu/workbench';
 import { GLTFData, GLTFModel } from '@use-gpu/gltf';
 
+// @ts-ignore
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 export const GeometryGLTFPage: LC = () => {
 
-  const url = "/gltf/DamagedHelmet/DamagedHelmet.gltf";
+  const base = isDevelopment ? '/' : '/demo/';
+  const url = base + "gltf/DamagedHelmet/DamagedHelmet.gltf";
 
   const view = (
     <Loop>

@@ -7,6 +7,7 @@
   "dependencies": {
     "@use-gpu/live": "*",
     "@use-gpu/state": "*",
+    "@use-gpu/traits": "*",
     "@use-gpu/core": "*",
     "@use-gpu/shader": "*",
     "@use-gpu/glyph": "*",

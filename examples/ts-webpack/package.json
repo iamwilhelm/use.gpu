@@ -31,6 +31,7 @@
     "@use-gpu/live": "*",
     "@use-gpu/react": "*",
     "@use-gpu/inspect": "*",
+    "@use-gpu/traits": "*",
     "@use-gpu/workbench": "*",
     "@use-gpu/webgpu": "*",
     "@use-gpu/wgsl-loader": "*"

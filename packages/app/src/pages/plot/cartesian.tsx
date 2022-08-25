@@ -45,6 +45,7 @@ export const PlotCartesianPage: LC = () => {
                   second={{ detail: 3, divide: 5 }}
                   depth={0.5}
                   zBias={-1}
+                  auto
                 />
                 <Grid
                   axes='xz'
@@ -53,6 +54,15 @@ export const PlotCartesianPage: LC = () => {
                   second={{ detail: 3, divide: 5 }}
                   depth={0.5}
                   zBias={-1}
+                />
+                <Grid
+                  axes='yz'
+                  width={2}
+                  first={{ detail: 3, divide: 5 }}
+                  second={{ detail: 3, divide: 5 }}
+                  depth={0.5}
+                  zBias={-1}
+                  auto
                 />
 
                 <Axis

@@ -1,16 +1,16 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
-import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } from '../types';
+import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle, Point4 } from '../types';
 
 import { parsePosition4, useProp } from '@use-gpu/traits';
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import {
-  useBoundShader, useRawSource, useShaderRef,
+  useBoundShader, useViewContext, useRawSource, useShaderRef, useTransformContext, useNoTransformContext,
   Data, LineLayer,
 } from '@use-gpu/workbench';
 
-import { RangeContext } from '../providers/range-provider';
+import { useRangeContext } from '../providers/range-provider';
 import {
   parseIntegerPositive,
   parseAxis,
@@ -27,9 +27,13 @@ import { vec4 } from 'gl-matrix';
 import { logarithmic, linear } from '../util/domain';
 
 import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
+import { getGridAutoPosition } from '@use-gpu/wgsl/plot/grid-auto.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 
 const GRID_BINDINGS = bundleToAttributes(getGridPosition);
+const GRID_AUTO_BINDINGS = bundleToAttributes(getGridAutoPosition);
+
+const NO_POINT4: Point4 = [0, 0, 0, 0];
 
 export type GridProps =
   Partial<GridTrait> &
@@ -39,13 +43,14 @@ export type GridProps =
   first?: Partial<ScaleTrait> & { detail?: number },
   second?: Partial<ScaleTrait> & { detail?: number },
   origin?: VectorLike,
+  auto?: boolean,
 };
 
 const NO_SCALE_PROPS: Partial<ScaleTrait> = {};
 
 export const Grid: LiveComponent<GridProps> = (props) => {
   const {
-    origin,
+    auto = false,
   } = props;
 
   const {axes, range} = useGridTrait(props);
@@ -60,9 +65,10 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const firstDetail = useProp(props.first?.detail, parseIntegerPositive);
   const secondDetail = useProp(props.second?.detail, parseIntegerPositive);
 
-  const p = useProp(origin, parsePosition4);
+  const origin = useProp(props.origin, parsePosition4);
 
-  const parentRange = useContext(RangeContext);
+  const parentRange = useRangeContext();
+  const xform = auto ? useTransformContext() : useNoTransformContext();
 
   const getGrid = (options: ScaleTrait, detail: number, index: number, other: number) => {
     const main  = parseAxis(axes[index]);
@@ -80,11 +86,35 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     const data = useRawSource(values, 'f32');
     const n = values.length * (detail + 1);
 
-    const min = vec4.clone(p as any);
+    const orig = vec4.clone(origin);
+
+    let autoBound: ShaderModule | null = null;
+    if (auto) {
+      const autoBase = NO_POINT4.slice();
+      const autoShift = NO_POINT4.slice();
+
+      orig.forEach((_, i) => {
+        // Pin to minimum
+        orig[i] = parentRange[i][0];
+
+        if (i === main || i === cross) {
+          autoBase[i] = (parentRange[i][0] + parentRange[i][1]) / 2;
+          autoShift[i] = 0;
+        }
+        else {
+          autoBase[i] = orig[i];
+          autoShift[i] = parentRange[i][1] - parentRange[i][0];
+        }
+      });
+
+      autoBound = useBoundShader(getGridAutoPosition, GRID_AUTO_BINDINGS, [xform, autoBase, autoShift]);
+    }
+
+    const min = vec4.clone(orig as any);
     min[main] = 0;
     min[cross] = r2[0];
 
-    const max = vec4.clone(p as any);
+    const max = vec4.clone(orig as any);
     max[main] = 0;
     max[cross] = r2[1];
 
@@ -93,7 +123,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     const m2 = useShaderRef(max);
 
     const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-    const bound = useBoundShader(getGridPosition, GRID_BINDINGS, [data, a, m1, m2], defines);
+    const bound = useBoundShader(getGridPosition, GRID_BINDINGS, [data, a, m1, m2, autoBound], defines);
 
     // Expose position source
     const source = useMemo(() => ({
@@ -116,7 +146,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   // const firstLoop = loop || props.first?.loop;
   // const secondLoop = loop || props.second?.loop;
 
-  return [
+  const view = [
     props.first !== null ? use(LineLayer, {
       positions: firstPositions,
       segments: getLineSegment,
@@ -138,5 +168,6 @@ export const Grid: LiveComponent<GridProps> = (props) => {
       zBias,
     }) : null,
   ];
-};
 
+  return view;
+};

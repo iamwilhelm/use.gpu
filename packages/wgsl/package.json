@@ -274,6 +274,11 @@
       "import": "./src/plot/axis.wgsl",
       "require": "./src/plot/axis.wgsl"
     },
+    "./plot/grid-auto.wgsl": {
+      "types": "./src/plot/grid-auto.wgsl.d.ts",
+      "import": "./src/plot/grid-auto.wgsl",
+      "require": "./src/plot/grid-auto.wgsl"
+    },
     "./plot/grid.wgsl": {
       "types": "./src/plot/grid.wgsl.d.ts",
       "import": "./src/plot/grid.wgsl",

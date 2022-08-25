@@ -88,3 +88,5 @@ export const App: LC = hot(() => {
     </UseInspect>
   );
 }, module);
+
+App.displayName = 'App';

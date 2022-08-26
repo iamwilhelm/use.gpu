@@ -59,7 +59,7 @@ export const PlotCartesianPage: LC = () => {
                   axes='yz'
                   width={2}
                   first={{ detail: 3, divide: 5 }}
-                  second={{ detail: 3, divide: 5 }}
+                  second={{ detail: 3, divide: 5, end: true }}
                   depth={0.5}
                   zBias={-1}
                   auto

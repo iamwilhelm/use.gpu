@@ -1,6 +1,8 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
-import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle, Point4 } from '../types';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Point4 } from '@use-gpu/core';
+import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } from '../types';
 
 import { parsePosition4, useProp } from '@use-gpu/traits';
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';

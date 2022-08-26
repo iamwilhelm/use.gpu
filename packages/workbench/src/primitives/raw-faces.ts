@@ -78,22 +78,23 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   } = props;
 
   // Set up draw as:
-  // - pre-indexed triangles
-  // - segmented triangle fans (convex faces)
-  // - individual tris
+  // - individual tris (none)
+  // - segmented triangle fans (convex faces) (segments)
+  // - pre-indexed triangles (indices)
+  // - pre-indexed segmented triangle fans (indices + segments)
   const vertexCount = 3;
   const instanceCount = useCallback(() => {
-    const indices = (props.indices as any)?.length;
     const segments = (props.segments as any)?.length;
+    const indices = (props.indices as any)?.length;
     const positions = (props.positions as any)?.length;
 
-    if (indices != null) return indices / 3;
     if (segments != null) return segments - 2;
+    if (indices != null) return indices / 3;
     if (positions != null && !props.indices) return positions / 3;
 
     const c = resolve(count) || 0;
-    return (props.segments != null) ? c - 2 : c;
-  }, [props.positions, props.segments, count]);
+    return (props.segments != null) ? Math.max(0, c - 2) : c;
+  }, [props.positions, props.indices, props.segments, count]);
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
@@ -114,8 +115,10 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const material = useMaterialContext();
 
   const hasIndices = !!props.indices;
+  const hasSegments = !!props.segments;
   const defines = useMemo(() => ({
     HAS_INDICES: hasIndices,
+    HAS_SEGMENTS: hasSegments,
     HAS_SCISSOR: !!scissor,
     HAS_ALPHA_TO_COVERAGE: false,
     UNWELDED_NORMALS: !!unweldedNormals,

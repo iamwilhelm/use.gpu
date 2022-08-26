@@ -25,7 +25,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   
   var cornerIndex: u32;
   var unweldedIndex: u32;
-  if (HAS_INDICES) {
+  if (HAS_INDICES && !HAS_SEGMENTS) {
     // Indexed geometry
     cornerIndex = getIndex(index);
     unweldedIndex = index;
@@ -54,7 +54,9 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
     if (vertexIndex == 0u) { cornerIndex = instanceIndex - u32(segment - 1); }
     else if (vertexIndex == 1u) { cornerIndex = instanceIndex + 1u; }
     else { cornerIndex = instanceIndex + 2u; }
+
     unweldedIndex = cornerIndex;
+    if (HAS_INDICES) { cornerIndex = getIndex(cornerIndex); }
   }
 
   var normalIndex = cornerIndex;

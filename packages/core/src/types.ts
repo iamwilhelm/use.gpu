@@ -380,7 +380,7 @@ export type Time = {
 export type ArrayLike = any[] | TypedArray;
 
 export type AccessorSpec = string | Accessor | ArrayLike;
-export type AccessorType = 'index';
+export type AccessorType = 'index' | 'unwelded';
 export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];
 export type DataBinding<T = any, S = any> = {
   uniform: UniformAttribute,

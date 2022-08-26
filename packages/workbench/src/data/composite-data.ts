@@ -116,11 +116,11 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     const [index] = indexes;
 
     // Look for first non-index composite field
-    const composites = fs.filter(([format,, accessorType]) => isComposite(format) && accessorType !== 'index');
+    const composites = fs.filter(([format,, accessorType]) => isComposite(format));
     const [composite] = composites;
     if (!composite) {
       const length = data?.length ?? rawLength ?? 0;
-      return {chunks: [length], loops: undefined, starts: undefined, ends: undefined, count: length};
+      return {chunks: [length], loops: undefined, starts: undefined, ends: undefined, dataCount: length, indexCount: length};
     }
 
     // Gather chunk sizes and chunk metadata
@@ -156,22 +156,26 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     const chunks = indexChunks ?? dataChunks;
     const indexed = indexChunks && dataChunks;
 
-    const count = getChunkCount(chunks, loops);
+    const dataCount = getChunkCount(dataChunks, loops);
+    const indexCount = indexChunks ? getChunkCount(indexChunks, loops) : 0;
     const offsets = indexed && accumulate(indexed);
 
     return {
       chunks,
+      indexed,
       loops,
       starts,
       ends,
-      count,
-      indexed,
       offsets,
+      dataCount,
+      indexCount,
     };
   }, [data, fs]);
 
-  const {chunks, loops, starts, ends, count} = layout;
-  const l = useBufferedSize(count);
+  const {chunks, indexed, loops, starts, ends, dataCount, indexCount} = layout;
+
+  const lData = useBufferedSize(dataCount);
+  const lIndex = useBufferedSize(indexCount);
 
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
@@ -180,11 +184,15 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       const composite = isComposite(format);
       format = composite ? toSimple(format) : format;
 
+      const isIndex = accessorType === 'index';
+      const isUnwelded = accessorType === 'unwelded';
+
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
       let {raw, fn} = makeDataAccessor(f, accessor);
 
+      const l = isIndex || isUnwelded ? lIndex : lData;
       const {array, dims} = makeDataArray(f, l);
 
       const buffer = makeStorageBuffer(device, array.byteLength);
@@ -196,21 +204,20 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         version: 0,
       };
 
-      const isIndex = accessorType === 'index';
-      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex};
+      return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex, isUnwelded};
     });
 
     const fieldSources = fieldBuffers.map(f => f.source);
 
     return [fieldBuffers, fieldSources];
-  }, [device, fs, l]);
+  }, [device, fs, lData, lIndex]);
   
   // Refresh and upload data
   const refresh = () => {
-    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex} of fieldBuffers) if (raw || data) {
+    for (const {buffer, array, source, dims, accessor, raw, composite, isIndex, isUnwelded} of fieldBuffers) if (raw || data) {
       const a = accessor as Accessor;
-      const c = isIndex ? chunks : layout.indexed ?? chunks;
-      const l = (!layout.indexed || isIndex) ? loops : undefined;
+      const c = isIndex || isUnwelded ? chunks : indexed ?? chunks;
+      const l = (!indexed || isIndex) ? loops : undefined;
       const o = isIndex ? layout.offsets : undefined;
 
       if (composite) {
@@ -223,15 +230,15 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       }
       uploadBuffer(device, buffer, array.buffer);
 
-      source.length = count;
-      source.size[0] = count;
+      source.length  = isIndex || isUnwelded ? indexCount : dataCount;
+      source.size[0] = source.length;
       source.version = incrementVersion(source.version);
     }
   };
 
   if (!live) {
     useNoAnimationFrame();
-    useMemo(refresh, [device, data, fieldBuffers, count]);
+    useMemo(refresh, [device, data, fieldBuffers, dataCount, indexCount]);
   }
   else {
     useAnimationFrame();

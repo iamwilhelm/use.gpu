@@ -8,6 +8,7 @@ export type Light = {
   tangent?: TypedArray | number[],
   size?: TypedArray | number[],
   color?: TypedArray | number[],
+  opts?: TypedArray | number[],
   intensity?: number,
   transform?: ShaderModule | null,
   differential?: ShaderModule | null,

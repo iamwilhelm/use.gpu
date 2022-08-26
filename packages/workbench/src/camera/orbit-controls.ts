@@ -88,7 +88,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
         setPitch((theta: number) => clamp(theta + moveY * speedY, -π/2, π/2));
       }
     }
-    if (buttons.right || keyboard.modifiers.shift) {
+    if (buttons.right || (buttons.left && keyboard.modifiers.shift)) {
       if (moveX || moveY) {
         handleMove(-moveX, -moveY);
       }

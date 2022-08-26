@@ -7,22 +7,27 @@ import { useMemo } from '@use-gpu/live';
 import { useLightCapture } from './lights';
 import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
 
+import { vec3 } from 'gl-matrix';
+
 export type HemisphereLightProps = {
   position?: VectorLike,
   scale?: number,
   horizon?: ColorLike,
   zenith?: ColorLike,
   intensity?: number,
+  bleed?: number,
 };
 
-const DEFAULT_DIRECTION = [0, 1, 0, 1];
+const DEFAULT_DIRECTION = vec3.fromValues(0, 1, 0);
 
 export const HemisphereLight = (props: HemisphereLightProps) => {
   
   const position = useProp(props.position, parsePosition, DEFAULT_DIRECTION);
-  const horizon = useProp(props.horizon, parseColor, [.100, .125, 1, 1]);
-  const zenith = useProp(props.zenith, parseColor, [.2, .25, 1, 1]);
+  const horizon = useProp(props.horizon, parseColor, [1, 1, 1, 1]);
+  const zenith = useProp(props.zenith, parseColor, [.5, .5, .5, 1]);
+
   const intensity = useProp(props.intensity, parseNumber, 1);
+  const bleed = useProp(props.bleed, parseNumber, 0.25);
 
   const transform = useTransformContext();
   const differential = useDifferentialContext();
@@ -30,7 +35,7 @@ export const HemisphereLight = (props: HemisphereLightProps) => {
   const light = useMemo(() => ({
     kind: 3,
     position,
-    normal: [-position[0], -position[1], -position[2], 0],
+    normal: [-position[0], -position[1], -position[2], bleed],
     color: zenith,
     opts: horizon,
     intensity,

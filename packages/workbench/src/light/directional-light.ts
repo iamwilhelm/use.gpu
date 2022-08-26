@@ -7,13 +7,15 @@ import { useMemo } from '@use-gpu/live';
 import { useLightCapture } from './lights';
 import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
 
+import { vec3 } from 'gl-matrix';
+
 export type DirectionalLightProps = {
   position?: VectorLike,
   color?: ColorLike,
   intensity?: number,
 };
 
-const DEFAULT_DIRECTION = [1, 3, 2, 1];
+const DEFAULT_DIRECTION = vec3.fromValues(1, 3, 2);
 
 export const DirectionalLight = (props: DirectionalLightProps) => {
   

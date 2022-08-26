@@ -90,7 +90,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     }
     if (buttons.right || keyboard.modifiers.shift) {
       if (moveX || moveY) {
-        handleMove(moveX, moveY);
+        handleMove(-moveX, -moveY);
       }
     }
   }, mouse);
@@ -101,7 +101,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
 
     if (keyboard.modifiers.shift) {
       if (moveX || moveY) {
-        handleMove(-moveX, -moveY);
+        handleMove(moveX, moveY);
       }
     }
     else if (spinY) setRadius((radius: number) => radius * Math.pow(2, spinY * speedY));

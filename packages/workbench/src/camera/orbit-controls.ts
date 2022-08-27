@@ -26,7 +26,8 @@ export type OrbitControlsProps = {
   pitchSpeed?: number,
   moveSpeed?: number,
 
-  render: (phi: number, theta: number, radius: number, target: vec3) => LiveElement,
+  active?: boolean,
+  render: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
 };
 
 export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
@@ -41,6 +42,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     pitchSpeed   = 5,
     moveSpeed    = 1,
     
+    active = true,
     render,
   } = props;
 
@@ -77,7 +79,8 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   }
 
   useOne(() => {
-    const { x, y, moveX, moveY, buttons } = mouse;
+    const { x, y, moveX, moveY, buttons, stopped } = mouse;
+    if (!active || stopped) return;
 
     const speedX = bearingSpeed / size;
     const speedY = pitchSpeed   / size;
@@ -96,8 +99,9 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
   }, mouse);
 
   useOne(() => {
-    const {moveX, moveY, spinY} = wheel;
+    const {moveX, moveY, spinY, stop, stopped} = wheel;
     const speedY = radiusSpeed;
+    if (!active || stopped) return;
 
     if (keyboard.modifiers.shift) {
       if (moveX || moveY) {
@@ -105,6 +109,8 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
       }
     }
     else if (spinY) setRadius((radius: number) => radius * Math.pow(2, spinY * speedY));
+
+    stop();
   }, wheel);
 
   return useMemo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);

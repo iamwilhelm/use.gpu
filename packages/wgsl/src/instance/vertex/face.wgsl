@@ -61,16 +61,22 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 
   var normalIndex = cornerIndex;
   var tangentIndex = cornerIndex;
+  var uvIndex = cornerIndex;
+  var lookupIndex = cornerIndex;
   if (UNWELDED_NORMALS) { normalIndex = unweldedIndex; }
   if (UNWELDED_TANGENTS) { tangentIndex = unweldedIndex; }
+  if (UNWELDED_UVS) { uvIndex = unweldedIndex; }
+  if (UNWELDED_LOOKUPS) { lookupIndex = unweldedIndex; }
 
   var vertex = getPosition(cornerIndex);
   var normal = getNormal(normalIndex);
   var tangent = getTangent(tangentIndex);
+  var uv = getUV(uvIndex);
+  var st = getST(uvIndex);
+  var lookup = getLookup(lookupIndex);
+
   var color = getColor(cornerIndex);
   var zBias = getZBias(cornerIndex);
-  var uv = getUV(cornerIndex);
-  var st = getST(cornerIndex);
 
   var scissor = scissorPosition(vertex);
   var world = transformPosition(vertex);
@@ -93,6 +99,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
     uv,
     st,
     scissor,
-    getLookup(cornerIndex),
+    lookup,
   );
 }

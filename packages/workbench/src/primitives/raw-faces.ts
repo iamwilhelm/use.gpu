@@ -46,6 +46,8 @@ export type RawFacesProps = {
 
   unweldedNormals?: boolean,
   unweldedTangents?: boolean,
+  unweldedUVs?: boolean,
+  unweldedLookups?: boolean,
 
   shaded?: boolean,
   count?: Lazy<number>,
@@ -75,6 +77,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
     unweldedNormals = false,
     unweldedTangents = false,
+    unweldedUVs = false,
+    unweldedLookups = false,
   } = props;
 
   // Set up draw as:
@@ -123,7 +127,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     HAS_ALPHA_TO_COVERAGE: false,
     UNWELDED_NORMALS: !!unweldedNormals,
     UNWELDED_TANGENTS: !!unweldedTangents,
-  }), [hasIndices, unweldedNormals, unweldedTangents]);
+    UNWELDED_UVS: !!unweldedUVs,
+    UNWELDED_LOOKUPS: !!unweldedLookups,
+  }), [hasIndices, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, l]);
   const getFragment = shaded ? material : getPassThruFragment;

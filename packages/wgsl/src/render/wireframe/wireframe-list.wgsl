@@ -59,10 +59,10 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 
   var join: vec3<f32>;
   if (ij.x > 0u) {
-    join = getLineJoin(left, right, other, (f32(ij.x) - 1.0) / 2.0, xy.y, 2.0, 3, 2);
+    join = getLineJoin(left, right, other, f32(ij.x) - 1.0, xy.y, 2.0, 3, 0);
   }
   else {
-    join = getLineJoin(other, left, right, 1.0, xy.y, 2.0, 3, 2);
+    join = getLineJoin(other, left, right, 1.0, xy.y, 2.0, 3, 0);
   }
 
   return SolidVertex(

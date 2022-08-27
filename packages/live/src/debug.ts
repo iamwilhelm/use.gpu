@@ -150,13 +150,17 @@ export const formatNode = <F extends Function>(_node: LiveElement<F>): string =>
       }
       else {
         if (Array.isArray(node.args)) {
-          args.push(...node.args?.map(x => formatValue(x)));
+          let list = node.args;
+          if (list.length > 100) list = list.slice(0, 100);
+          args.push(...list.map(x => formatValue(x)));
         }
       }
     }
     else {
       if (Array.isArray(node.args)) {
-        args.push(...node.args?.map(x => formatValue(x)));
+        let list = node.args;
+        if (list.length > 100) list = list.slice(0, 100);
+        args.push(...list.map(x => formatValue(x)));
       }
     }
   }
@@ -172,10 +176,15 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     seen.set(x, true);
 
     const out = [];
-    for (const k in x) if (hasOwnProperty.call(x, k)) {
-      out.push(`${formatShortValue(x[k], seen)}`);
+    let n = Math.min(x.length, 100);
+    for (let i = 0; i < n; ++i) {
+      out.push(`${formatShortValue(x[i], seen)}`);
     }
+    if (x.length > 100) out.push('…');
     return '[' + out.join(', ') + ']';
+  }
+  if (object.constructor.name.match(/Array/)) {
+    if (object.length > 100) object = object.slice(0, 100);
   }
   if (typeof x === 'object') {
     if (seen.get(x)) return '[Repeated]';
@@ -198,7 +207,14 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
 
 export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return '' + x;
-  if (Array.isArray(x)) return '[' + x.map((x) => formatShortValue(x, seen)).join(', ') + ']';
+  if (Array.isArray(x)) {
+    let extra = '';
+    if (x.length > 100) {
+      x = x.slice(0, 100);
+      extra = ', …';
+    }
+    return '[' + x.map((x: any) => formatShortValue(x, seen)).join(', ') + extra + ']';
+  }
   if (typeof x === 'boolean') return x ? 'true' : 'false';
   if (typeof x === 'number') return formatNumber(x, 5);
   if (typeof x === 'symbol') return '(symbol)';

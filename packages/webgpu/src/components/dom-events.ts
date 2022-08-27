@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
-import { use, memo, useResource, useState } from '@use-gpu/live';
+import { use, memo, useMemo, useResource, useState } from '@use-gpu/live';
 import { EventProvider, MouseState, WheelState, KeyboardState } from '@use-gpu/workbench';//'/providers/event-provider';
 
 const CAPTURE_EVENT = {capture: true};
@@ -19,7 +19,7 @@ const toButton = (button: number) => {
   if (button === 0) return 'left';
   if (button === 1) return 'middle';
   if (button === 2) return 'right';
-  return 'none';
+  return null;
 };
 
 const toButtons = (buttons: number) => ({
@@ -55,6 +55,8 @@ const makeKeyboardState = () => ({
     shift: false,
     meta: false,
   },
+  keys: {},
+  key: null,
   stopped: false,
 } as KeyboardState);
 
@@ -62,6 +64,12 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
   const [mouse, setMouse] = useState<MouseState>(makeMouseState);
   const [wheel, setWheel] = useState<WheelState>(makeWheelState);
   const [keyboard, setKeyboard] = useState<KeyboardState>(makeKeyboardState);
+
+  const pointerLock = useMemo(() => ({
+    hasLock: document.pointerLockElement === element,
+    beginLock: () => element.requestPointerLock(),
+    endLock: () => document.exitPointerLock(),
+  }), [element, document.pointerLockElement]);
 
   useResource((dispose) => {
 
@@ -85,6 +93,38 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
             shift: e.shiftKey,
             meta:  e.metaKey,
           },
+          stopped: false,
+        };
+      });
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      onModifiers(event);
+      setKeyboard((state) => {
+        const k = event.key.toLowerCase();
+        return {
+          ...state,
+          keys: {
+            ...state.keys,
+            [k]: true,
+          },
+          key: k,
+          stopped: false,
+        };
+      });
+    };
+
+    const onKeyUp = (event: KeyboardEvent) => {
+      onModifiers(event);
+      setKeyboard((state) => {
+        const k = event.key.toLowerCase();
+        return {
+          ...state,
+          keys: {
+            ...state.keys,
+            [k]: false,
+          },
+          key: k,
           stopped: false,
         };
       });
@@ -154,7 +194,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       e.stopPropagation();
     };
 
-    const onMove = (clientX: number, clientY: number) => {
+    const onMove = (clientX: number, clientY: number, moveX?: number, moveY?: number) => {
       const {left, top} = element.getBoundingClientRect();
       const x = clientX - left;
       const y = clientY - top;
@@ -162,8 +202,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
         ...state,
         x,
         y,
-        moveX: x - state.x,
-        moveY: y - state.y,
+        moveX: moveX ?? x - state.x,
+        moveY: moveY ?? y - state.y,
         stopped: false,
       }));
     };
@@ -216,8 +256,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      const {clientX, clientY} = e;
-      onMove(clientX, clientY);
+      const {clientX, clientY, movementX, movementY} = e;
+      onMove(clientX, clientY, movementX, movementY);
       onModifiers(e);
       e.preventDefault();
       e.stopPropagation();
@@ -241,9 +281,17 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       e.preventDefault();
       e.stopPropagation();
     };
-
-    const onKeyDown = (e: KeyboardEvent) => onModifiers(e);
-    const onKeyUp = (e: KeyboardEvent) => onModifiers(e);
+    
+    const onWindowBlur = () => {
+      setKeyboard((state) => {
+        return {
+          ...state,
+          keys: {},
+          key: null,
+          stopped: true,
+        };
+      });
+    };
 
     //const onGlobalWheel = (e: WheelEvent) => e.preventDefault();
 
@@ -260,6 +308,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
 
     element.addEventListener('DOMMouseScroll', onDOMWheel, CAPTURE_EVENT);
     element.addEventListener('wheel', onWheel, CAPTURE_EVENT);
+
+    window.addEventListener('blur', onWindowBlur, CAPTURE_EVENT);
 
     dispose(() => {
       document.removeEventListener('mouseenter', onMouseUp, CAPTURE_EVENT);
@@ -279,8 +329,10 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
 
       element.removeEventListener('DOMMouseScroll', onDOMWheel, CAPTURE_EVENT);
       element.removeEventListener('wheel', onWheel, CAPTURE_EVENT);
+
+      window.removeEventListener('blur', onWindowBlur, CAPTURE_EVENT);
     });
   }, [element]);
 
-  return use(EventProvider, { mouse, wheel, keyboard, children });
+  return use(EventProvider, { mouse, wheel, keyboard, pointerLock, children });
 }, 'DOMEvents');

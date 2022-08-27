@@ -129,10 +129,10 @@ export const inspectObject = (
   seen.add(object);
 
   if (Array.isArray(object)) {
-    if (object.reduce((b, o) => b && typeof o === 'number', true)) {
+    if (object.length > 100) object = object.slice(0, 100);
+    if (object.reduce((b: boolean, o: any) => b && typeof o === 'number', true)) {
       return `[${object.join(', ')}]`;
     }
-    if (object.length > 100) object = object.slice(0, 100);
   }
   
   if (object instanceof Float32Array) {

@@ -35,7 +35,7 @@ export const getWireframe = (
     instanceSize = edges;
   }
   else /*if (topology === 'triangle-list')*/ {
-    vertexCount = 18;
+    vertexCount = 12;
     instanceCount = () => resolve(v) * resolve(i);
     instanceSize = () => resolve(v);
   }

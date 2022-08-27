@@ -1,5 +1,3 @@
-use '@use-gpu/wgsl/use/view'::{ getViewPosition };
-
 @link fn getFragment(
   color: vec4<f32>,
   uv: vec4<f32>,

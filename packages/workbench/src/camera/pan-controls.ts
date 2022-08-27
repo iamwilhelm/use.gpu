@@ -74,9 +74,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const { keyboard } = useKeyboard();
 
   useOne(() => {
-    if (!active) return;
-
-    const { moveX, moveY, buttons } = mouse;
+    const { moveX, moveY, buttons, stopped } = mouse;
+    if (!active || stopped) return;
 
     if (buttons.left) {
       if (moveX || moveY) {
@@ -87,9 +86,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   }, mouse);
 
   useOne(() => {
-    if (!active) return;
-
-    const {moveX, moveY, stop} = wheel;
+    const {moveX, moveY, stop, stopped} = wheel;
+    if (!active || stopped) return;
     
     if (keyboard.modifiers.shift) {
       if (moveX || moveY) {

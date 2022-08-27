@@ -178,7 +178,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     const links = {
       getId,
       getVertex,
-      getFragment: isDebug ? null : (getFragment ?? null),
+      getFragment: isDebug || isPicking ? null : (getFragment ?? null),
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);

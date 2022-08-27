@@ -42,6 +42,12 @@ export const makeAtlasSource = (
   return source;
 }
 
+/**
+ * Tight 2D packing texture atlas.
+ *
+ * For optimal performance, feed items that are sorted large to small, e.g. first Y then X.
+ * Will still produce high quality packing otherwise, but performance will degrade significantly.
+ */
 export const makeAtlas = (
   width: number,
   height: number,
@@ -56,13 +62,16 @@ export const makeAtlas = (
   const bs: Bins = new Map();
   const slots: Bin = new Set();
 
+  // Place 1 rectnagle
   const place = (key: number, w: number, h: number): Rectangle => {
     if (map.get(key)) throw new Error("key mapped already: " + key);
     self.version = self.version + 1;
 
+    // Snap to minimum modulus
     const cw = Math.ceil(w / snap) * snap;
     const ch = Math.ceil(h / snap) * snap;
 
+    // If no next slot, expand and retry
     const slot = getNextAvailable(cw, ch, true);
     if (!slot) {
       expand();
@@ -72,27 +81,33 @@ export const makeAtlas = (
     const [x, y] = slot;
     const rect = [x, y, x + w, y + h] as Rectangle;
 
+    // Clip out occupied area from slots
     if (snap) {
       const clip = [x, y, x + cw, y + ch] as Rectangle;
       clipRectangle(clip);
     }
     else clipRectangle(rect);
+
     map.set(key, rect);
     return rect;
   };
-  
+
+  // Expand atlas by doubling width or height
   const expand = () => {
+    // First height, then width
     const w = width !== height ? width * 2 : width;
     const h = width !== height ? height : height * 2;
-    
+
     if (w > maxWidth || h > maxHeight) {
       throw new Error(`Atlas is full and can't expand any more (${maxWidth}x${maxHeight})`);
     }
 
+    // Make slot(s) for newly added area
     const slot = [0, 0, w, h, w, h, w, h, 1] as Slot;
     const splits = subtractSlot(slot, [0, 0, width, height] as Rectangle);
     for (const s of splits) addSlot(s);
 
+    // Extend existing slots that touch the old border
     const r = rs.get(width);
     const b = bs.get(height);
     const expandX = r ? Array.from(r.values()) : EMPTY;
@@ -111,15 +126,19 @@ export const makeAtlas = (
     self.height = height = h;
   };
 
+  // Lazily allocate bin for a particular coordinate
   const getBin = (xs: Bins, x: number) => {
     let vs = xs.get(x);
     if (!vs) xs.set(x, vs = new Set<Slot>());
     return vs;
   }
 
+  // Add a new slot to the available space
   const addSlot = (slot: Slot) => {
     const [l, t, r, b] = slot;
 
+    // Check if it is made redundant by another slot
+    // Check if it makes another slot redundant
     {
       const lsb = ls.get(l);
       const rsb = rs.get(r);
@@ -143,7 +162,7 @@ export const makeAtlas = (
         if (containsRectangle(s, slot)) return;
         if (containsRectangle(slot, s)) remove.push(s);
       }
-    
+
       for (const s of remove) removeSlot(s);
     }
 
@@ -194,12 +213,13 @@ export const makeAtlas = (
     return f1 * f2;
   };
 
+  // Get highest scoring slot of at least given size
   const getNextAvailable = (w: number, h: number, debug: boolean = false) => {
     let slot: Slot | null = null;
     let max = 0;
 
     for (const s of slots.values()) {
-      const [l, t, r, b, nearX, nearY, farX, farY, corner] = s;
+      const [l, t, r, b] = s;
       
       const x = l;
       const y = t;
@@ -207,6 +227,8 @@ export const makeAtlas = (
       const ch = b - t;
 
       if (w <= cw && h <= ch) {
+        const [,,,, nearX, nearY, farX, farY, corner] = s;
+
         const fx = slotFit(w, nearX, farX, cw);
         const fy = slotFit(h, nearY, farY, ch);
 
@@ -230,7 +252,8 @@ export const makeAtlas = (
     checks: 0,
     clips: 0,
   };
-  
+
+  // Clip the given rectangle from all available slots
   const clipRectangle = (other: Rectangle) => {
     const add = [] as Slot[];
     const remove = [] as Slot[];

@@ -14,6 +14,9 @@ export type RawTextureProps = {
   /** Resample data every animation frame */
   live?: boolean,
 
+  /** Sample in absolute pixels instead of relative UVs */
+  absolute?: boolean,
+
   /** Leave empty to yeet source(s) instead. */
   render?: (source: TextureSource) => LiveElement,
 };
@@ -26,6 +29,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
     data,
     sampler,
     render,
+    absolute = false,
     live = false,
   } = props;
 
@@ -52,10 +56,11 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
       layout,
       format,
       colorSpace,
+      absolute,
       version: 0,
     };
     return source;
-  }, [device, memoKey, sampler]);
+  }, [device, memoKey, sampler, absolute]);
 
   // Refresh and upload data
   const refresh = () => {

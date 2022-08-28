@@ -183,12 +183,13 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
     if (x.length > 100) out.push('…');
     return '[' + out.join(', ') + ']';
   }
-  if (object.constructor.name.match(/Array/)) {
-    if (object.length > 100) object = object.slice(0, 100);
-  }
   if (typeof x === 'object') {
     if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
+
+    if (x.constructor.name.match(/Array/)) {
+      if (x.length > 100) x = x.slice(0, 100);
+    }
 
     const signature = Object.keys(x).join('/');
     if (signature === 'f/args/key/by' || signature === 'f/arg/key/by') return formatNode(x);
@@ -226,6 +227,10 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
     return `${name}(…) ` + truncate(body, 40);
   }
   if (typeof x === 'object') {
+    if (x.constructor.name.match(/Array/)) {
+      if (x.length > 100) x = x.slice(0, 100);
+    }
+
     const signature = Object.keys(x).join('/');
     if (signature === 'f/args/key' || signature === 'f/arg/key') return `<${formatNodeName(x)} …/>`;
 

@@ -135,10 +135,6 @@ export const inspectObject = (
     }
   }
   
-  if (object instanceof Float32Array) {
-    if (object.length > 100) object = object.slice(0, 100);
-  }
-
   if (object instanceof Map) {
     const o = {} as Record<string, any>;
     let i = 0;
@@ -170,6 +166,10 @@ export const inspectObject = (
     }
   }
 
+  if (object?.constructor?.name?.match(/Array/)) {
+    if (object.length > 100) object = object.slice(0, 100);
+  }
+
   const fields = Object.keys(object).map((k: string) => {
     const key = path +'/'+ k;
     const expandable = typeof object[k] === 'object' && object[k];
@@ -192,10 +192,12 @@ export const inspectObject = (
       <TreeIndent indent={1}>{inspectObject(object[k], state, toggleState, key, seen, depth + 1)}</TreeIndent>
     ) : null;
 
-    const proto = object[k]?.__proto__ !== Object.prototype
+    let proto = object[k]?.__proto__ !== Object.prototype
       ? object[k]?.__proto__?.constructor?.name ??
         object[k]?.__proto__?.displayName
       : null;
+
+    if (object.length) proto += '(' + object.length + ')';
 
     const showFull = typeof object[k] === 'object' && depth < 20;
     if (showFull && expanded) {

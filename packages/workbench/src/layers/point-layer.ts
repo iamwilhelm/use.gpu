@@ -10,9 +10,10 @@ import { RawQuads } from '../primitives/raw-quads';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingToModule, castTo } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingToModule, bundleToAttributes, castTo } from '@use-gpu/shader/wgsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
+import { useBoundShader } from '../hooks/useBoundShader';
 
 import { circle, diamond, square, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/wgsl/mask/point.wgsl';
 import { PointShape } from './types';
@@ -40,6 +41,7 @@ export type PointLayerProps = {
   zBiases?: ShaderSource,
 
   shape?: PointShape,
+  stroke?: number,
 
   count?: Lazy<number>,
   mode?: RenderPassMode | string,
@@ -47,6 +49,7 @@ export type PointLayerProps = {
 };
 
 const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttributeValue;
+const MASK_BINDINGS = bundleToAttributes(circleOutlined);
 
 /** Draws 2D points with choice of shape. */
 export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLayerProps) => {
@@ -63,6 +66,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     zBiases,
 
     count,
+    stroke = 0,
     shape = 'circle',
     mode = 'opaque',
     id = 0,
@@ -78,7 +82,8 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
       gain: 0.5,
     });
   }, s);
-  const masks = (MASK_SHADER as any)[shape] ?? MASK_SHADER.circle;
+  const mask = (MASK_SHADER as any)[shape] ?? MASK_SHADER.circle;
+  const boundMask = useBoundShader(mask, MASK_BINDINGS, [stroke]);
 
   return use(RawQuads, {
     position,
@@ -91,7 +96,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     zBiases,
 
     rectangles,
-    masks,
+    masks: boundMask,
 
     count,
     mode,

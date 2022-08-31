@@ -9,7 +9,7 @@ export type UseInspectProps = {
   fiber: LiveFiber<any>,
   active?: boolean,
   provider: LiveComponent<any>,
-  container: Element,
+  container?: Element,
 };
 
 const STYLE = {
@@ -36,7 +36,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
   return fragment([
     provider ? use(provider, {debug, children}) : children,
     active ? use(HTML, {
-      container,
+      container: container ?? document.body,
       style: STYLE,
       children: <Inspect fiber={fiber} onInspect={handleInspect} />,
     }) : null

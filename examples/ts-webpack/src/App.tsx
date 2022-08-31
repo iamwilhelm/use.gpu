@@ -8,7 +8,7 @@ import { UI, Layout, Flex, Block, Inline, Text } from '@use-gpu/layout';
 import { UseInspect } from '@use-gpu/inspect';
 import '@use-gpu/inspect/theme.css';
 
-import { makeFallback } from './fallback';
+import { makeFallback } from './Fallback';
 
 const FONTS = [
   {

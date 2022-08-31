@@ -7,7 +7,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Loop, Draw, Pass,
   CompositeData, Data, RawData, Raw, LineSegments,
-  OrbitCamera, OrbitControls,
+  OrbitCamera, OrbitControls, FPSControls,
   Cursor, PointLayer, LineLayer,
 } from '@use-gpu/workbench';
 
@@ -52,7 +52,6 @@ const lineData = seq(20).map((i) => ({
 export const GeometryDataPage: LC = () => {
 
   const view = (
-    <Loop>
       <Draw>
         <Cursor cursor='move' />
         <Pass>
@@ -97,7 +96,7 @@ export const GeometryDataPage: LC = () => {
             time
             expr={(emit: Emit, i: number, time: Time) => {
               const s = ((i*i + i) % 13133.371) % 1000;
-              const t = time.elapsed / 1000;
+              const t = time.elapsed / 2000;
               emit(
                 Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
                 Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2,
@@ -109,7 +108,7 @@ export const GeometryDataPage: LC = () => {
                 positions={positions}
                 colors={positions}
                 shape='diamondOutlined'
-                size={20}
+                size={50}
                 depth={1}
                 mode={'transparent'}
               />
@@ -117,24 +116,27 @@ export const GeometryDataPage: LC = () => {
           />
         </Pass>
       </Draw>
-    </Loop>
   );
 
   return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-          scale={1080}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
+    <Loop>
+      <FPSControls
+        position={[0.5, 0.5, 3.5]}
+        bearing={0.1}
+        pitch={0.1}
+        moveSpeed={8}
+        render={(phi: number, theta: number, target: vec3) =>
+          <OrbitCamera
+            radius={0}
+            phi={phi}
+            theta={theta}
+            target={target}
+            scale={1080}
+          >
+            {view}
+          </OrbitCamera>
+        }
+      />
+    </Loop>
   );
 };

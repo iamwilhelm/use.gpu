@@ -1,12 +1,18 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Font } from '@use-gpu/glyph';
-import type { FontSource } from './types';
 
 import { use, gather, keyed, yeet, useOne } from '@use-gpu/live';
 import { toHash } from '@use-gpu/state';
 import { parseWeight } from '@use-gpu/traits';
 import { Fetch } from '../data';
 import { FontProvider } from './providers/font-provider';
+
+export type FontSource = {
+  family: string,
+  weight: string | number,
+  style: string,
+  src: string,
+};
 
 export type FontLoaderProps = {
   fonts: FontSource[],

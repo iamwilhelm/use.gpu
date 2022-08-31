@@ -28,7 +28,7 @@ export const App: LC = hot(() => {
   const fiber = useFiber();
 
   return (
-    <UseInspect fiber={fiber} context={DebugProvider}>
+    <UseInspect fiber={fiber} provider={DebugProvider}>
 
       {/* WebGPU Canvas with a font */}
       <WebGPU
@@ -63,10 +63,10 @@ export const App: LC = hot(() => {
                                 <Text weight="black" size={16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
                               </Inline>
                               <Inline align="center">
-                                <Text weight="black" height={2} size={1} color="#ffffff" opacity={0.5}>Zoom Me</Text>
+                                <Text weight="black" lineHeight={2} size={1} color="#ffffff" opacity={0.5}>Zoom Me</Text>
                               </Inline>
                               <Inline align="center" snap={false}>
-                                <Text weight="black" height={1} size={1/16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
+                                <Text weight="black" lineHeight={1} size={1/16} color="#ffffff" opacity={0.5}>Zoom Me</Text>
                               </Inline>
                             </Flex>
                           </Flex>

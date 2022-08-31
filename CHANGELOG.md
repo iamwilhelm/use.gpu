@@ -1,3 +1,10 @@
+0.8.0
+- `@use-gpu/plot`: Use `<Grid auto>` to snap grids to far side of range.
+- `@use-gpu/workbench`: Allow `<FaceLayer>` to be used with indexed positions and segments
+- `@use-gpu/workbench`: Add `<HemisphereLight>` with adjustable zenith, horizon and bleed/overextension
+- `@use-gpu/workbench`: Add `unwelded` indexing mode to `<CompositeData>` and more unwelded options to `<FaceLayer>`
+- `@use-gpu/workbench`: Add `stroke` to `<PointLayer>` to allow for thin outlined shapes
+
 0.7.0
 - `@use-gpu/live`: Reconciling + quote/unquote as native ops.
 - `@use-gpu/live`: Hot module reload (beta).

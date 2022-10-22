@@ -51,14 +51,6 @@ declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/fragment/scissor.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const scissorFragment: ParsedBundle;
-  export const isScissored: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/fragment/sdf-2d.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -139,20 +131,6 @@ declare module "@use-gpu/wgsl/geometry/trim.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/fragment/normal-map.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getNormalMapFragment: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/fragment/normal.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getNormalFragment: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/instance/fragment/shaded.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -178,6 +156,20 @@ declare module "@use-gpu/wgsl/instance/interleave.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getIndex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/surface/material.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getMaterialSurface: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/surface/normal-map.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getNormalMapSurface: ParsedBundle;
   export default __module;
 }
 
@@ -276,14 +268,14 @@ declare module "@use-gpu/wgsl/layout/shift.wgsl" {
 declare module "@use-gpu/wgsl/mask/masked.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getMaskedFragment: ParsedBundle;
+  export const getMaskedColor: ParsedBundle;
   export default __module;
 }
 
 declare module "@use-gpu/wgsl/mask/passthru.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getPassThruFragment: ParsedBundle;
+  export const getPassThruColor: ParsedBundle;
   export default __module;
 }
 
@@ -299,10 +291,18 @@ declare module "@use-gpu/wgsl/mask/point.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/mask/scissor.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getScissorColor: ParsedBundle;
+  export const isScissored: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/mask/textured.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getTextureFragment: ParsedBundle;
+  export const getTextureColor: ParsedBundle;
   export default __module;
 }
 
@@ -612,12 +612,12 @@ declare module "@use-gpu/wgsl/use/gamma.wgsl" {
 declare module "@use-gpu/wgsl/use/types.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const Radiance: ParsedBundle;
   export const Light: ParsedBundle;
   export const PickVertex: ParsedBundle;
   export const SolidVertex: ParsedBundle;
   export const ShadedVertex: ParsedBundle;
   export const UIVertex: ParsedBundle;
+  export const SurfaceFragment: ParsedBundle;
   export const MeshVertex: ParsedBundle;
   export default __module;
 }

@@ -6,17 +6,13 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
   N: vec3<f32>,
   V: vec3<f32>,
   light: Light,
-  position: vec3<f32>,
-  ao: f32,
-  @infer(T) params: T,
-) -> Radiance {}
+  @infer(T) surface: T,
+) -> f32 {}
 
 @export fn applyLights(
   N: vec3<f32>,
   V: vec3<f32>,
-  position: vec3<f32>,
-  ao: f32,
-  params: T,
+  surface: T,
 ) -> vec3<f32> {
 
   var radiance: vec3<f32> = vec3<f32>(0.0);
@@ -32,5 +28,5 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
     1,
   );
 
-  return 0.05 * ao * params.albedo + applyLight(N, V, light, position, ao, params).light;
+  return 0.05 * ao * params.albedo + applyLight(N, V, light, surface);
 }

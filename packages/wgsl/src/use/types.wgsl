@@ -1,8 +1,3 @@
-@export struct Radiance {
-  light: vec3<f32>,
-  indirect: bool,
-};
-
 @export struct Light {
   position: vec4<f32>,
   normal: vec4<f32>,
@@ -62,6 +57,18 @@
   fill: vec4<f32>,
 
   index: u32,
+};
+
+////
+
+@export struct SurfaceFragment {
+  position: vec4<f32>,
+  normal: vec4<f32>,
+  albedo: vec4<f32>,
+  emissive: vec4<f32>,
+  material: vec4<f32>,
+  occlusion: f32,
+  depth: f32,
 };
 
 ////

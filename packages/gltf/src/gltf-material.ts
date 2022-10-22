@@ -29,7 +29,7 @@ export const useGLTFMaterial = (
     normalTexture,
     occlusionTexture,
     emissiveTexture,
-    //emissiveFactor,
+    emissiveFactor,
     //alphaMode,
     //alphaCutoff,
     doubleSided,
@@ -80,7 +80,7 @@ export const useGLTFMaterial = (
       let map = gltf.bound.texture[normalTexture.index];
       if (map) {
         if (map.colorSpace === 'auto') map = {...map, colorSpace: 'native'};
-        //props.normalMap = map;
+        props.normalMap = map;
       }
     }
 
@@ -92,6 +92,9 @@ export const useGLTFMaterial = (
       }
     }
 
+    if (emissiveFactor != null) {
+      props.emissive = emissiveFactor;
+    }
     if (emissiveTexture != null) {
       let map = gltf.bound.texture[emissiveTexture.index];
       if (map) {

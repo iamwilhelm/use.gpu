@@ -19,7 +19,7 @@ import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
-import { getMaskedFragment } from '@use-gpu/wgsl/mask/masked.wgsl';
+import { getMaskedColor } from '@use-gpu/wgsl/mask/masked.wgsl';
 
 export type RawQuadsProps = {
   position?: number[] | TypedArray,
@@ -48,7 +48,7 @@ export type RawQuadsProps = {
 };
 
 const VERTEX_BINDINGS = bundleToAttributes(getQuadVertex);
-const FRAGMENT_BINDINGS = bundleToAttributes(getMaskedFragment);
+const FRAGMENT_BINDINGS = bundleToAttributes(getMaskedColor);
 
 const DEFINES_ALPHA = {
   HAS_EDGE_BLEED: true,
@@ -121,7 +121,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const [xf, scissor] = useApplyTransform(p);
   
   const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, scissor, r, c, d, z, u]);
-  const getFragment = useBoundShader(getMaskedFragment, FRAGMENT_BINDINGS, [m, t]);
+  const getFragment = useBoundShader(getMaskedColor, FRAGMENT_BINDINGS, [m, t]);
 
   const defines = useOne(() => (
     patch(alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {HAS_SCISSOR: !!scissor})

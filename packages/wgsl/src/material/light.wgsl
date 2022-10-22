@@ -1,22 +1,18 @@
-use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
+use '@use-gpu/wgsl/use/types'::{ Light, SurfaceFragment };
 
-@infer type T;
 @link fn applyMaterial(
   N: vec3<f32>,
   L: vec3<f32>,
   V: vec3<f32>,
-  radiance: vec3<f32>,
-  @infer(T) params: T,
+  surface: SurfaceFragment,
 ) -> vec3<f32> {}
 
 @export fn applyLight(
   N: vec3<f32>,
   V: vec3<f32>,
   light: Light,
-  position: vec3<f32>,
-  ao: f32,
-  params: T,
-) -> Radiance {
+  surface: SurfaceFragment,
+) -> vec3<f32> {
   var L: vec3<f32>;
 
   var radiance = vec3<f32>(light.intensity);
@@ -25,7 +21,7 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
   if (kind == 0) {
     // Ambient
     radiance *= light.color.rgb;
-    return Radiance(radiance * ao * params.albedo, true);
+    return radiance * surface.occlusion * surface.albedo.rgb;
   }
   else if (kind == 1) {
     // Directional
@@ -35,7 +31,7 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
   else if (kind == 2) {
     // Point
     let s = light.size.x;
-    let d = light.position.xyz - position;
+    let d = light.position.xyz - surface.position.xyz;
     L = normalize(d);
     if (s >= 0.0) { radiance *= s*s / dot(d, d); }
     radiance *= light.color.rgb * 3.1415;
@@ -50,9 +46,9 @@ use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
     radiance *= color * 3.1415;
   }
   else {
-    return Radiance(vec3<f32>(0.0), false);
+    return vec3<f32>(0.0);
   }
 
-  let direct = applyMaterial(N, L, V, radiance, params);
-  return Radiance(direct, false);
+  let direct = radiance * applyMaterial(N, L, V, surface);
+  return direct;
 }

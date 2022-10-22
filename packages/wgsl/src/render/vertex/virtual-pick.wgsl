@@ -1,7 +1,7 @@
 use '@use-gpu/wgsl/use/types'::{ PickVertex };
 
 @link fn getVertex(v: u32, i: u32) -> PickVertex {};
-@optional @link fn getId() -> u32 { return 0u; };
+@optional @link fn getPicking() -> u32 { return 0u; };
 
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,
@@ -19,7 +19,7 @@ fn main(
 
   return VertexOutput(
     v.position,
-    getId(),
+    getPicking(),
     v.index,
     v.scissor,
   );

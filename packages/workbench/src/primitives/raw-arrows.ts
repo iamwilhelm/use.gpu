@@ -23,7 +23,7 @@ import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
-import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
+import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 export type RawArrowsProps = {
   anchor?: number[] | TypedArray,
@@ -91,7 +91,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const [xf, scissor] = useApplyTransform(p);
 
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);
-  const getFragment = getPassThruFragment;
+  const getFragment = getPassThruColor;
 
   const defines = useOne(() => ({
     HAS_ALPHA_TO_COVERAGE: false,

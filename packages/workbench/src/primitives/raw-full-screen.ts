@@ -18,7 +18,7 @@ import { useBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 
 import { getFullScreenVertex } from '@use-gpu/wgsl/instance/vertex/full-screen.wgsl';
-import { getTextureFragment } from '@use-gpu/wgsl/mask/textured.wgsl';
+import { getTextureColor } from '@use-gpu/wgsl/mask/textured.wgsl';
 
 export type RawFullScreenProps = {
   texture?: TextureSource | LambdaSource | ShaderModule,
@@ -30,7 +30,7 @@ export type RawFullScreenProps = {
 
 const ZERO = [0, 0, 0, 1];
 
-const FRAGMENT_BINDINGS = bundleToAttributes(getTextureFragment);
+const FRAGMENT_BINDINGS = bundleToAttributes(getTextureColor);
 
 const DEFINES = {
   HAS_ALPHA_TO_COVERAGE: false,
@@ -61,7 +61,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
   const t = useNativeColorTexture(props.texture);
 
   const getVertex = getFullScreenVertex;
-  const getFragment = useBoundShader(getTextureFragment, FRAGMENT_BINDINGS, [t]);
+  const getFragment = useBoundShader(getTextureColor, FRAGMENT_BINDINGS, [t]);
 
   return use(Virtual, {
     vertexCount,

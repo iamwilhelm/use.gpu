@@ -42,11 +42,6 @@ const SHADED_RENDERER = [
   instanceFragmentShaded,
 ] as VirtualRenderer;
 
-const NORMAL_RENDERER = [
-  instanceDrawVirtualShaded,
-  instanceFragmentShaded,
-] as VirtualRenderer;
-
 const UI_RENDERER = [
   instanceDrawVirtualUI,
   instanceFragmentUI,
@@ -55,7 +50,6 @@ const UI_RENDERER = [
 const BUILTIN = {
   solid: SOLID_RENDERER,
   shaded: SHADED_RENDERER,
-  normal: NORMAL_RENDERER,
   ui: UI_RENDERER,
 } as Record<string, VirtualRenderer>;
 
@@ -72,6 +66,10 @@ export type VirtualProps = {
 
   getVertex?: ShaderModule,
   getFragment?: ShaderModule,
+  getPicking?: ShaderModule,
+  getSurface?: ShaderModule,
+  getScissor?: ShaderModule,
+  getLight?: ShaderModule,
 
   renderer?: VirtualRenderer | string,
   defines: Record<string, any>,
@@ -103,7 +101,11 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     instanceCount: iC = 0,
     indirect,
 
-    getFragment,
+    getFragment: gF,
+    getPicking: gP,
+    getSurface: gS,
+    getScissor: gC,
+    getLight: gL,
 
     pipeline,
     defines,
@@ -129,6 +131,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
 
   const {colorInput, colorSpace} = resolvedContext;
 
+  // Get vertex and fragment shader for renderer
   const [
     vertexShader,
     fragmentShader,
@@ -149,6 +152,7 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     let instanceCount: Lazy<number> = iC;
 
     if (isDebug) {
+      // Decorate vertex shader with wireframe
       [vertexShader, fragmentShader] = SOLID_RENDERER;
       if (gV) {
         if (indirect) {
@@ -171,20 +175,28 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     return [vertexShader, fragmentShader, getVertex, vertexCount, instanceCount, wireframeCommand, wireframeIndirect];
   }, [gV, vC, iC, indirect, m, topology]);
 
-  const getId = useOne(() => isPicking ? bindingToModule({uniform: ID_BINDING, constant: id}) : null, id);
+  const getPicking = useOne(() => gP ?? (isPicking ? bindingToModule({uniform: ID_BINDING, constant: id}) : null), id);
+  const getFragment = gF;
+  const getSurface = gS;
+  const getScissor = gC;
+  const getLight =  gL;
 
   // Binds links into shader
   const [v, f] = useMemo(() => {
     const links = {
-      getId,
       getVertex,
-      getFragment: isDebug || isPicking ? null : (getFragment ?? null),
+      getPicking,
+      getFragment,
+      getSurface,
+      getScissor,
+      getLight,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
+    console.log({links, renderer})
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment, getId, isDebug, colorInput, colorSpace]);
+  }, [vertexShader, fragmentShader, getVertex, getFragment, getPicking, getSurface, getScissor, getLight, isDebug, colorInput, colorSpace]);
 
   // Inline the render fiber to avoid another memo()
   const call = {

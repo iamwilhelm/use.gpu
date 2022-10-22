@@ -1,13 +1,16 @@
-use '@use-gpu/wgsl/fragment/scissor':: { scissorFragment };
+@infer type T;
 
-@optional @link fn getFragment(
+@link fn getSurface(
   color: vec4<f32>,
   uv: vec4<f32>,
   st: vec4<f32>,
-  normal: vec3<f32>,
-  tangent: vec3<f32>,
-  position: vec3<f32>,
-) -> vec4<f32> { return color; }
+  normal: vec4<f32>,
+  tangent: vec4<f32>,
+  position: vec4<f32>,
+) -> @infer(T) T {}
+
+@optional @link fn getLight(surface: T) -> vec4<f32> { return surface.albedo; }
+@optional @link fn getScissor(color: vec4<f32>, scissor: vec4<f32>) -> vec4<f32> { return color; }
 
 @fragment
 fn main(
@@ -25,9 +28,11 @@ fn main(
   if (!frontFacing) { normal = -normal; }
 
   var outColor = fragColor;
-  outColor = getFragment(outColor, fragUV, fragST, normal, fragTangent, fragPosition);
 
-  if (HAS_SCISSOR) { outColor = scissorFragment(outColor, fragScissor); }
+  let surface = getSurface(outColor, fragUV, fragST, normal, fragTangent, fragPosition);
+  outColor = getLight(surface);
+
+  if (HAS_SCISSOR) { outColor = getScissor(outColor, fragScissor); }
   if (outColor.a <= 0.0) { discard; }
 
   return outColor;

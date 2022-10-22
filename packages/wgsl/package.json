@@ -64,11 +64,6 @@
       "import": "./src/fragment/pbr.wgsl",
       "require": "./src/fragment/pbr.wgsl"
     },
-    "./fragment/scissor.wgsl": {
-      "types": "./src/fragment/scissor.wgsl.d.ts",
-      "import": "./src/fragment/scissor.wgsl",
-      "require": "./src/fragment/scissor.wgsl"
-    },
     "./fragment/sdf-2d.wgsl": {
       "types": "./src/fragment/sdf-2d.wgsl.d.ts",
       "import": "./src/fragment/sdf-2d.wgsl",
@@ -119,16 +114,6 @@
       "import": "./src/geometry/trim.wgsl",
       "require": "./src/geometry/trim.wgsl"
     },
-    "./instance/fragment/normal-map.wgsl": {
-      "types": "./src/instance/fragment/normal-map.wgsl.d.ts",
-      "import": "./src/instance/fragment/normal-map.wgsl",
-      "require": "./src/instance/fragment/normal-map.wgsl"
-    },
-    "./instance/fragment/normal.wgsl": {
-      "types": "./src/instance/fragment/normal.wgsl.d.ts",
-      "import": "./src/instance/fragment/normal.wgsl",
-      "require": "./src/instance/fragment/normal.wgsl"
-    },
     "./instance/fragment/shaded.wgsl": {
       "types": "./src/instance/fragment/shaded.wgsl.d.ts",
       "import": "./src/instance/fragment/shaded.wgsl",
@@ -148,6 +133,16 @@
       "types": "./src/instance/interleave.wgsl.d.ts",
       "import": "./src/instance/interleave.wgsl",
       "require": "./src/instance/interleave.wgsl"
+    },
+    "./instance/surface/material.wgsl": {
+      "types": "./src/instance/surface/material.wgsl.d.ts",
+      "import": "./src/instance/surface/material.wgsl",
+      "require": "./src/instance/surface/material.wgsl"
+    },
+    "./instance/surface/normal-map.wgsl": {
+      "types": "./src/instance/surface/normal-map.wgsl.d.ts",
+      "import": "./src/instance/surface/normal-map.wgsl",
+      "require": "./src/instance/surface/normal-map.wgsl"
     },
     "./instance/vertex/arrow.wgsl": {
       "types": "./src/instance/vertex/arrow.wgsl.d.ts",
@@ -228,6 +223,11 @@
       "types": "./src/mask/point.wgsl.d.ts",
       "import": "./src/mask/point.wgsl",
       "require": "./src/mask/point.wgsl"
+    },
+    "./mask/scissor.wgsl": {
+      "types": "./src/mask/scissor.wgsl.d.ts",
+      "import": "./src/mask/scissor.wgsl",
+      "require": "./src/mask/scissor.wgsl"
     },
     "./mask/textured.wgsl": {
       "types": "./src/mask/textured.wgsl.d.ts",

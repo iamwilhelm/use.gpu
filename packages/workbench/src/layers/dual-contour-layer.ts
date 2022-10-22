@@ -33,7 +33,8 @@ import { main as scanVolume } from '@use-gpu/wgsl/contour/scan.wgsl';
 import { main as fitContourLinear } from '@use-gpu/wgsl/contour/fit-linear.wgsl';
 import { main as fitContourQuadratic } from '@use-gpu/wgsl/contour/fit-quadratic.wgsl';
 import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour.wgsl';
-import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
+import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
+import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
 import { Dispatch } from '../primitives/dispatch';
 
@@ -151,9 +152,12 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   const xf = useTransformContext();
   const xd = useDifferentialContext();
-  const m = useMaterialContext();
+  const material = useMaterialContext();
 
-  const getMaterialFragment = shaded ? m : getPassThruFragment;
+  const getScissor = padding ? getScissorColor : null;
+  const getFragment = !shaded ? getPassThruColor : null;
+  const getSurface = shaded ? material.getSurface : null;
+  const getLight = shaded ? material.getLight : null;
 
   const indirectDraw    = useOne(() => new Uint32Array(12));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
@@ -285,8 +289,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     }),
     use(Virtual, {
       indirect: indirectStorage,
+
       getVertex: boundVertex,
-      getFragment: getMaterialFragment,
+      getScissor,
+      getFragment,
+      getSurface,
+      getLight,
+
       pipeline,
       defines,
       renderer: shaded ? 'shaded' : 'solid',

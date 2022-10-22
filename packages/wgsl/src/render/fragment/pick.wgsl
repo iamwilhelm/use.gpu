@@ -1,4 +1,4 @@
-use '@use-gpu/wgsl/fragment/scissor':: { isScissored };
+use '@use-gpu/wgsl/mask/scissor':: { isScissored };
 
 @fragment
 fn main(

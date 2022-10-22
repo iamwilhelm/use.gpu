@@ -20,7 +20,8 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
-import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
+import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
+import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
 export type RawFacesProps = {
   position?: number[] | TypedArray,
@@ -132,7 +133,10 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   }), [hasIndices, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, l]);
-  const getFragment = shaded ? material : getPassThruFragment;
+  const getScissor = scissor ? getScissorColor : null;
+  const getFragment = !shaded ? getPassThruColor : null;
+  const getSurface = shaded ? material.getSurface : null;
+  const getLight = shaded ? material.getLight : null;
 
   return (
     use(Virtual, {
@@ -140,7 +144,10 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
       instanceCount,
 
       getVertex,
+      getScissor,
       getFragment,
+      getSurface,
+      getLight,
 
       defines,
 

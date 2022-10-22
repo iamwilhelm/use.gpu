@@ -19,7 +19,7 @@ import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
-import { getPassThruFragment } from '@use-gpu/wgsl/mask/passthru.wgsl';
+import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 export type RawLinesProps = {
   position?: number[] | TypedArray,
@@ -109,7 +109,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const [xf, scissor] = useApplyTransform(p);
 
   const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
-  const getFragment = getPassThruFragment;
+  const getFragment = getPassThruColor;
 
   const defines = useMemo(() => ({
     HAS_ALPHA_TO_COVERAGE: false,

@@ -1,4 +1,4 @@
-@export fn scissorFragment(outColor: vec4<f32>, min4: vec4<f32>) -> vec4<f32> {
+@export fn getScissorColor(color: vec4<f32>, min4: vec4<f32>) -> vec4<f32> {
   let min2 = min(min4.xy, min4.zw);
   let m = min(min2.x, min2.y);
   
@@ -8,10 +8,10 @@
 
   let alpha = clamp(m / l, 0.0, 1.0);
   if (HAS_ALPHA_TO_COVERAGE) {
-    return vec4<f32>(outColor.xyz, outColor.a * alpha);
+    return vec4<f32>(color.xyz, color.a * alpha);
   }
   else {
-    return outColor * alpha;
+    return color * alpha;
   }
 }
 

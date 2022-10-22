@@ -410,4 +410,4 @@ export type Atlas = {
 
 // Passes
 
-export type RenderPassMode = 'opaque' | 'transparent' | 'picking' | 'debug';
+export type RenderPassMode = 'opaque' | 'transparent' | 'picking' | 'debug' | 'shadow';

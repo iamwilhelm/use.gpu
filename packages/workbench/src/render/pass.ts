@@ -20,7 +20,8 @@ export type ComputeToPass = (passEncoder: GPUComputePassEncoder, countDispatch: 
 
 export type CommandToBuffer = () => GPUCommandBuffer;
 
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : []; 
+const NO_OPS: any[] = [];
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
 
 /** Classic render pass.
 
@@ -46,6 +47,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     const transparents = toArray(rs['transparent'] as RenderToPass[]);
     const debugs       = toArray(rs['debug']       as RenderToPass[]);
     const pickings     = toArray(rs['picking']     as RenderToPass[]);
+    const shadows      = toArray(rs['shadow']      as RenderToPass[]);
 
     const nested   = toArray(rs['']         as ArrowFunction[]);
     const post     = toArray(rs['post']     as CommandToBuffer[]);
@@ -105,6 +107,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
       const commandEncoder = device.createCommandEncoder();
       if (computes.length) computeToContext(commandEncoder, computes, countDispatch);
+
       renderContext.swap();
       renderToContext(commandEncoder, renderContext, visibles, countGeometry);
 

@@ -4,7 +4,7 @@ import type { DataField } from '@use-gpu/core';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Draw, Pass,
+  Draw, Pass2,
   Cursor,
   CompositeData, LineSegments, ArrowSegments,
   OrbitCamera, OrbitControls,
@@ -70,7 +70,7 @@ export const GeometryLinesPage: LC = () => {
 
   const view = (
     <Draw>
-      <Pass>
+      <Pass2>
         <CompositeData
           fields={dataFields}
           data={lineData}
@@ -109,9 +109,11 @@ export const GeometryLinesPage: LC = () => {
           loop={isLoop}
           start={isStart}
           end={isEnd}
-          on={<ArrowSegments />}
+          //on={<ArrowSegments />}
+          on={<LineSegments />}
           render={(positions, colors, widths, segments, anchors, trims) =>
-            <ArrowLayer
+            //<ArrowLayer
+            <LineLayer
               positions={positions}
               colors={colors}
               widths={widths}
@@ -122,7 +124,7 @@ export const GeometryLinesPage: LC = () => {
             />
           }
         />
-      </Pass>
+      </Pass2>
     </Draw>
   );
 

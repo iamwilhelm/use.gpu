@@ -1,5 +1,3 @@
-export * from './dispatch';
-export * from './draw-call';
 export * from './raw-arrows';
 export * from './raw-faces';
 export * from './raw-full-screen';
@@ -9,3 +7,4 @@ export * from './raw-quads';
 export * from './ui-rectangles';
 export * from './readback';
 export * from './virtual';
+export * from './virtual2';

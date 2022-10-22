@@ -7,7 +7,7 @@ import type {
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual } from './virtual';
+import { Virtual2 } from './virtual2';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
@@ -43,6 +43,7 @@ export type RawLinesProps = {
   lookups?: ShaderSource,
 
   join?: 'miter' | 'round' | 'bevel',
+  shadow?: boolean,
 
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -76,6 +77,7 @@ const PIPELINE = {
 export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps) => {
   const {
     pipeline: propPipeline,
+    shadow = true,
     count = 2,
     mode = 'opaque',
     id = 0,
@@ -110,23 +112,24 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
   const getFragment = getPassThruColor;
+  const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
 
   const defines = useMemo(() => ({
-    HAS_ALPHA_TO_COVERAGE: false,
     HAS_SCISSOR: !!scissor,
+    HAS_SHADOW: !!shadow,
+    HAS_ALPHA_TO_COVERAGE: false,
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
-  }), [j, scissor]);
+  }), [j, scissor, shadow]);
   
-  return use(Virtual, {
+  return use(Virtual2, {
     vertexCount,
     instanceCount,
 
-    getVertex,
-    getFragment,
-
+    links,
     defines,
 
+    renderer: 'solid',
     pipeline,
     mode,
     id,

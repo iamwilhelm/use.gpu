@@ -13,7 +13,7 @@ import { useComputeContext } from '../providers/compute-provider';
 import { useFeedbackContext, useNoFeedbackContext } from '../providers/feedback-provider';
 import { RenderContext } from '../providers/render-provider';
 
-import { dispatch } from '../primitives/dispatch';
+import { dispatch } from '../render/command/dispatch';
 
 export type KernelProps = {
   shader: ShaderModule,

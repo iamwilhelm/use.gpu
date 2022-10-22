@@ -36,7 +36,7 @@ import { getDualContourVertex } from '@use-gpu/wgsl/instance/vertex/dual-contour
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
-import { Dispatch } from '../primitives/dispatch';
+import { Dispatch } from '../render/command/dispatch';
 
 const hasWebGPU = typeof GPUBufferUsage !== 'undefined';
 

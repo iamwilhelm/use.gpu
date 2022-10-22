@@ -3,18 +3,18 @@ import type { TypedArray, ViewUniforms, StorageSource, RenderPassMode, DeepParti
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 
-import { useDeviceContext } from '../providers/device-provider';
-import { useViewContext } from '../providers/view-provider';
-import { useSuspenseContext } from '../providers/suspense-provider';
+import { useDeviceContext } from '../../providers/device-provider';
+import { useViewContext } from '../../providers/view-provider';
+import { useSuspenseContext } from '../../providers/suspense-provider';
 
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
   uploadBuffer,
   resolve,
 } from '@use-gpu/core';
-import { useLinkedShader } from '../hooks/useLinkedShader';
-import { useRenderPipelineAsync, setShaderLog, getShaderLog } from '../hooks/useRenderPipeline';
-import { useInspectable } from '../hooks/useInspectable'
+import { useLinkedShader } from '../../hooks/useLinkedShader';
+import { useRenderPipelineAsync, setShaderLog, getShaderLog } from '../../hooks/useRenderPipeline';
+import { useInspectable } from '../../hooks/useInspectable'
 
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
@@ -22,7 +22,6 @@ import mapValues from 'lodash/mapValues';
 export type DrawCallProps = {
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
-  id?: number,
 
   vertexCount?: Lazy<number>,
   instanceCount?: Lazy<number>,
@@ -64,10 +63,8 @@ export const drawCall = (props: DrawCallProps) => {
     pipeline: propPipeline,
     defines: propDefines,
     mode = 'opaque',
-    id = 0,
   } = props;
 
-  const isPicking = mode === 'picking';
   const inspect = useInspectable();
 
   // Render set up

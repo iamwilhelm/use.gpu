@@ -5,17 +5,17 @@ import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useRes
 
 import uniq from 'lodash/uniq';
 
-import { useDeviceContext } from '../providers/device-provider';
-import { useSuspenseContext } from '../providers/suspense-provider';
+import { useDeviceContext } from '../../providers/device-provider';
+import { useSuspenseContext } from '../../providers/suspense-provider';
 
 import {
   makeBoundUniforms, makeVolatileUniforms,
   uploadBuffer,
   resolve,
 } from '@use-gpu/core';
-import { useLinkedShader } from '../hooks/useLinkedShader';
-import { useComputePipelineAsync } from '../hooks/useComputePipeline';
-import { useInspectable } from '../hooks/useInspectable'
+import { useLinkedShader } from '../../hooks/useLinkedShader';
+import { useComputePipelineAsync } from '../../hooks/useComputePipeline';
+import { useInspectable } from '../../hooks/useInspectable'
 
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';

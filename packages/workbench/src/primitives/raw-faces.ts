@@ -51,6 +51,8 @@ export type RawFacesProps = {
   unweldedLookups?: boolean,
 
   shaded?: boolean,
+  shadow?: boolean,
+
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
@@ -72,6 +74,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const {
     pipeline: propPipeline,
     shaded = false,
+    shadow = true,
     count = 1,
     mode = 'opaque',
     id = 0,
@@ -122,15 +125,16 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const hasIndices = !!props.indices;
   const hasSegments = !!props.segments;
   const defines = useMemo(() => ({
+    HAS_SCISSOR: !!scissor,
+    HAS_SHADOW: shadow,
     HAS_INDICES: hasIndices,
     HAS_SEGMENTS: hasSegments,
-    HAS_SCISSOR: !!scissor,
     HAS_ALPHA_TO_COVERAGE: false,
     UNWELDED_NORMALS: !!unweldedNormals,
     UNWELDED_TANGENTS: !!unweldedTangents,
     UNWELDED_UVS: !!unweldedUVs,
     UNWELDED_LOOKUPS: !!unweldedLookups,
-  }), [hasIndices, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
+  }), [scissor, shadow, hasIndices, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, l]);
   const getScissor = scissor ? getScissorColor : null;

@@ -1,12 +1,15 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { RenderPassMode, DeepPartial, Lazy, StorageSource } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
-import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne } from '@use-gpu/live';
+import type { VirtualDraw } from '../render/pass2';
+import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { getWireframe, getWireframeIndirect } from '../render/wireframe';
 import { useInspectHoverable } from '../hooks/useInspectable';
+
+import { usePassContext } from '../providers/pass-provider';
 
 import { DeviceContext } from '../providers/device-provider';
 import { ViewContext } from '../providers/view-provider';
@@ -24,8 +27,8 @@ import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
 import instanceFragmentPick from '@use-gpu/wgsl/render/fragment/pick.wgsl';
 import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
 
-import { Dispatch } from '../render/command/dispatch';
-import { DrawCall, drawCall } from '../render/command/draw-call';
+import { Dispatch } from './dispatch';
+import { DrawCall, drawCall } from './draw-call';
 
 const PICKING_RENDERER = [
   instanceDrawVirtualPick,
@@ -55,46 +58,29 @@ const BUILTIN = {
 
 type VirtualRenderer = [ParsedBundle, ParsedBundle];
 
-export type VirtualProps = {
-  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode | string,
-  id?: number,
+export type Virtual2Props = VirtualDraw;
 
-  vertexCount?: Lazy<number>,
-  instanceCount?: Lazy<number>,
-  indirect?: StorageSource, 
+export const Virtual2: LiveComponent<Virtual2Props> = memo((props: Virtual2Props) => {
+  const {useVariants, getRenderer} = usePassContext();
 
-  getVertex?: ShaderModule,
-  getFragment?: ShaderModule,
-  getPicking?: ShaderModule,
-  getSurface?: ShaderModule,
-  getScissor?: ShaderModule,
-  getLight?: ShaderModule,
+  const hovered = useInspectHoverable();
+  const variants = useVariants(props, hovered);
 
-  renderer?: VirtualRenderer | string,
-  defines: Record<string, any>,
-};
-
-const DEBUG_BINDING = { name: 'getInstanceSize', format: 'u32', value: 0, args: [] };
-const ID_BINDING = { name: 'getId', format: 'u32', value: 0, args: [] };
-
-export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
-  const {
-    mode = 'opaque',
-    id = 0,
-  } = props;
-
-  if (id && mode !== 'picking') {
-    return fragment([
-      use(Variant, {...props, id: 0}),
-      use(Variant, {...props, mode: 'picking'}),
-    ]);
+  if (Array.isArray(variants)) {
+    if (variants.length === 1) {
+      const [component] = variants;
+      return use(component, props);
+    }
+    return variants.map(component => use(component, props));
   }
-  
-  return Variant(props);
-}, 'Virtual'); 
+  else {
+    const component = variants;
+    return component(props);
+  }
+}, 'Virtual2');
 
-export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
+export const Variant2: LiveComponent<Variant2Props> = (props: Variant2Props) => {
+  /*
   let {
     getVertex: gV,
     vertexCount: vC = 0,
@@ -111,13 +97,10 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
     defines,
 
     renderer = SOLID_RENDERER,
-    mode = 'opaque',
     id = 0,
-  } = props;
+  } = props?.virtual ?? props;
 
-  let m = mode;
-  const hovered = useInspectHoverable();
-  if (hovered) m = 'debug';
+  let mode = props.mode ?? props?.virtual.mode ?? 'opaque';
 
   const isDebug = m === 'debug';
   const isPicking = m === 'picking';
@@ -218,4 +201,5 @@ export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
   }
 
   return yeet(drawCall(call));
+  */
 };

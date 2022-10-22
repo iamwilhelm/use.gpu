@@ -11,10 +11,13 @@ import { Await } from './await';
 
 import { SolidRender } from './forward/solid';
 import { DebugRender } from './forward/debug';
+import { UIRender } from './forward/ui';
+import { PickingRender } from './forward/picking';
 
 import { ColorPass } from './pass/color-pass';
 import { ComputePass } from './pass/compute-pass';
 import { ReadbackPass } from './pass/readback-pass';
+import { PickingPass } from './pass/picking-pass';
 
 export type PassProps = {
   mode?: 'forward' | 'deferred',
@@ -95,13 +98,12 @@ export const Pass2: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =
   const Resume = (calls: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) =>
     useMemo(() => {
       const props = {calls};
-      const nested = calls[''];
 
       return [
-        nested?.length ? nested.map(f => f()) : null,
         calls.compute ? use(ComputePass, props) : null,
         use(ColorPass, props),
         calls.post || calls.readback ? use(ReadbackPass, props) : null,
+        picking && calls.picking ? use(PickingPass, props) : null,
       ];
     }, [context, calls]);
 
@@ -113,12 +115,12 @@ export const getForwardRenderer = () => {
     modes: {
       shadow: null,
       debug: DebugRender,
-      picking: null,
+      picking: PickingRender,
     },
     renderers: {
       solid: SolidRender,
       shaded: null,
-      ui: null,
+      ui: UIRender,
     }
   }
 };

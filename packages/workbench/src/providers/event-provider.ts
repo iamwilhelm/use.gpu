@@ -3,7 +3,7 @@ import type { PickingUniforms } from '@use-gpu/core';
 
 import { memo, provide, makeContext, useContext, useMemo, useOne, useResource, useState, incrementVersion } from '@use-gpu/live';
 import { makeIdAllocator, PICKING_UNIFORMS } from '@use-gpu/core';
-import { PickingContext } from '../render/picking';
+import { PickingContext } from '../providers/picking-provider';
 import { RenderContext } from '../providers/render-provider';
 
 const CAPTURE_EVENT = {capture: true};

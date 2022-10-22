@@ -4,7 +4,7 @@ import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
-import { PickingContext } from './picking';
+import { PickingContext } from '../providers/picking-provider';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 

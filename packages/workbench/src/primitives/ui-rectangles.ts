@@ -7,11 +7,11 @@ import type {
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual } from './virtual';
+import { Virtual2 } from './virtual2';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useCallback, useMemo } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -128,19 +128,18 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
 
   const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x, c]);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
+  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
 
   let defines = alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA;
   if (debugContours) {
     defines = {...defines, DEBUG_SDF: true};
   }
 
-  return use(Virtual, {
+  return use(Virtual2, {
     vertexCount,
     instanceCount,
 
-    getVertex,
-    getFragment,
-
+    links,
     defines,
 
     renderer: 'ui',

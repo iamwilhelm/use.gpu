@@ -11,7 +11,7 @@ import { Virtual2 } from './virtual2';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { RenderPassMode, resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -43,7 +43,6 @@ export type RawLinesProps = {
   lookups?: ShaderSource,
 
   join?: 'miter' | 'round' | 'bevel',
-  shadow?: boolean,
 
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -77,7 +76,6 @@ const PIPELINE = {
 export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps) => {
   const {
     pipeline: propPipeline,
-    shadow = true,
     count = 2,
     mode = 'opaque',
     id = 0,
@@ -112,15 +110,15 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
   const getFragment = getPassThruColor;
-  const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
+  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
 
   const defines = useMemo(() => ({
+    HAS_SHADOW: false,
     HAS_SCISSOR: !!scissor,
-    HAS_SHADOW: !!shadow,
     HAS_ALPHA_TO_COVERAGE: false,
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
-  }), [j, scissor, shadow]);
+  }), [j, scissor]);
   
   return use(Virtual2, {
     vertexCount,

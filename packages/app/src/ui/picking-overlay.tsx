@@ -1,5 +1,5 @@
 import type { LC } from '@use-gpu/live';
-import React from '@use-gpu/live';
+import React, { useOne } from '@use-gpu/live';
 
 import {
   Flat,
@@ -35,9 +35,13 @@ export const PickingOverlay: LC = () => {
       return sqrt(vec4<f32>(a, c, b, 1.0));
     }
   `;
+  
+  const size = useOne(() => () => pickingSource.size, pickingSource);
+  
   const BINDINGS = bundleToAttributes(colorizeShader);
-  const boundShader = useBoundShader(colorizeShader, BINDINGS, [() => pickingSource.size, pickingSource]);
+  const boundShader = useBoundShader(colorizeShader, BINDINGS, [size, pickingSource]);
   const textureSource = useLambdaSource(boundShader, pickingSource);
+  console.log({pickingSource})
 
   const scale = 0.5;
 

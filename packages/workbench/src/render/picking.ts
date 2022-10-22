@@ -7,11 +7,11 @@ import {
   DEPTH_STENCIL_FORMAT,
 } from '../constants';
 
-import { DeviceContext, RenderContext } from '../providers';
+import { DeviceContext, RenderContext, PickingContext } from '../providers';
 import {
   memo, use, provide, quote, yeet, makeContext,
   useMemo, useOne, useNoOne, useResource,
-  useContext, useNoContext,
+  useContext, useNoContext, incrementVersion,
 } from '@use-gpu/live';
 import {
   makeColorState,
@@ -29,25 +29,6 @@ import {
 const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 type OnPick = (index: number) => void;
-
-export type PickingContextProps = {
-  renderContext: UseGPURenderContext,
-  pickingTexture: GPUTexture,
-  pickingSource: TextureSource,
-  captureTexture: () => void,
-  sampleTexture: (x: number, y: number) => number[],
-};
-
-export const PickingContext = makeContext<PickingContextProps>(null, 'PickingContext');
-
-export const usePickingContext = (isPicking: boolean = true) => {
-  const renderContext = useContext(RenderContext);
-
-  const pickingContext = isPicking ? useContext(PickingContext) : useNoContext(PickingContext);  
-  const resolvedContext = pickingContext?.renderContext ?? renderContext;
-
-  return {renderContext: resolvedContext};
-}
 
 export type PickingProps = {
   pickingFormat?: GPUTextureFormat, 
@@ -130,6 +111,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
 
     const swap = () => {
       updated = true;
+      pickingSource.version = incrementVersion(pickingSource.version);
     };
 
     const sampleTexture = (x: number, y: number): number[] => {
@@ -152,6 +134,7 @@ export const Picking: LiveComponent<PickingProps> = (props) => {
       size: [width, height],
       colorSpace: 'picking',
       version: 0,
+      id: Math.floor(Math.random() * 1000),
     };
 
     const context = {

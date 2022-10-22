@@ -7,11 +7,11 @@ import type {
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual } from './virtual';
+import { Virtual2 } from './virtual2';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 
 import { makeArrow } from './mesh/arrow';
@@ -92,6 +92,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);
   const getFragment = getPassThruColor;
+  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
 
   const defines = useOne(() => ({
     HAS_ALPHA_TO_COVERAGE: false,
@@ -99,15 +100,14 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   }), scissor);
 
   return (
-     use(Virtual, {
+     use(Virtual2, {
       vertexCount,
       instanceCount,
 
-      getVertex,
-      getFragment,
-
+      links,
       defines,
 
+      renderer: 'solid',
       pipeline,
       mode,
       id,

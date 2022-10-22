@@ -109,11 +109,9 @@ export const GeometryLinesPage: LC = () => {
           loop={isLoop}
           start={isStart}
           end={isEnd}
-          //on={<ArrowSegments />}
-          on={<LineSegments />}
+          on={<ArrowSegments />}
           render={(positions, colors, widths, segments, anchors, trims) =>
-            //<ArrowLayer
-            <LineLayer
+            <ArrowLayer
               positions={positions}
               colors={colors}
               widths={widths}

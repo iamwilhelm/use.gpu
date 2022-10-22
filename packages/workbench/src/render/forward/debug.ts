@@ -27,7 +27,6 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
 
     links: {
       getVertex: gV,
-      getFragment,
     },
 
     pipeline,
@@ -57,14 +56,11 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
       ({getVertex, vertexCount, instanceCount} = getWireframe(gV, vC, iC, topology));
     }
 
-    const links = {
-      getVertex,
-      getFragment,
-    };
+    const links = {getVertex};
     const v = bindBundle(vertexShader, links, undefined);
-    const f = bindBundle(fragmentShader, links, undefined);
+    const f = fragmentShader;
     return [v, f, vertexCount, instanceCount, wireframeCommand, wireframeIndirect];
-  }, [vertexShader, fragmentShader, gV, getFragment]);
+  }, [vertexShader, fragmentShader, gV]);
 
   // Inline the render fiber to avoid another memo()
   const call = {

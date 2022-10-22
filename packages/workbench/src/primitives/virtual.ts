@@ -11,7 +11,7 @@ import { useInspectHoverable } from '../hooks/useInspectable';
 import { DeviceContext } from '../providers/device-provider';
 import { ViewContext } from '../providers/view-provider';
 import { RenderContext } from '../providers/render-provider';
-import { PickingContext } from '../render/picking';
+import { PickingContext } from '../providers/picking-provider';
 import { getNativeColor } from '../hooks/useNativeColor';
 
 import instanceDrawVirtualShaded from '@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl';
@@ -95,6 +95,8 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
 }, 'Virtual'); 
 
 export const Variant: LiveComponent<VirtualProps> = (props: VirtualProps) => {
+  return null;
+
   let {
     getVertex: gV,
     vertexCount: vC = 0,

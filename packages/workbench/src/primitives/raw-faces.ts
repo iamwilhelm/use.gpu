@@ -7,7 +7,7 @@ import type {
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual } from './virtual';
+import { Virtual2 } from './virtual2';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
@@ -138,23 +138,27 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, l]);
   const getScissor = scissor ? getScissorColor : null;
-  const getFragment = !shaded ? getPassThruColor : null;
-  const getSurface = shaded ? material.getSurface : null;
-  const getLight = shaded ? material.getLight : null;
+  
+  const links = useMemo(() => {
+    return shaded
+    ? {
+      getVertex,
+      getScissor,
+      ...material,
+    } : {
+      getVertex,
+      getScissor,
+      getFragment: getPassThruColor,
+    }
+  }, [getVertex, getScissor]);
 
   return (
-    use(Virtual, {
+    use(Virtual2, {
       vertexCount,
       instanceCount,
 
-      getVertex,
-      getScissor,
-      getFragment,
-      getSurface,
-      getLight,
-
+      links,
       defines,
-
       renderer: shaded ? 'shaded' : 'solid',
 
       pipeline,

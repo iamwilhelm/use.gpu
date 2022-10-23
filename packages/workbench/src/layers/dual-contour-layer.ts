@@ -117,7 +117,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     values,
     normals,
     level,
-    padding,
+    padding = 0,
     method = 'linear',
 
     loopX = false,

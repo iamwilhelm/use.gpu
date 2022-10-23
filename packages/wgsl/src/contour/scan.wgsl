@@ -47,7 +47,7 @@ fn packEdgeId(index: vec3<u32>, axis: u32) -> u32 {
   @builtin(global_invocation_id) globalId: vec3<u32>,
 ) {
   let size = getVolumeSize();
-  if (any(globalId >= size)) { return; }
+  if (any(globalId >= (size - 1u))) { return; }
 
   let level = getVolumeLevel();
   let modulus = sizeToModulus3(size);

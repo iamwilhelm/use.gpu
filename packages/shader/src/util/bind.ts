@@ -11,13 +11,6 @@ import { timed } from './timed';
 const NO_SYMBOLS = [] as any[];
 const DEBUG = false;
 
-export type BindBundle2 = (
-  bundle: ShaderModule,
-  links?: Record<string, ShaderModule | null>,
-  defines?: Record<string, ShaderDefine> | null,
-  key?: string | number,
-) => string;
-
 export type BindBundle = (
   bundle: ShaderModule,
   linkDefs?: Record<string, ShaderModule | null>,
@@ -55,16 +48,18 @@ export const bindBundle = (
   const hash = getBundleHash(bundle);
   const key = getBundleKey(bundle);
 
+  // External hash
   let external: number = 0;
   for (const k in links) if (links[k]) external = mixBits53(external, getBundleHash(links[k]!));
 
-  const defs = defines ? toMurmur53(defines) : '';
+  const defs = defines ? toMurmur53(defines) : 0;
   const code = `@closure`;
-  const rehash = scrambleBits53(mixBits53(hash, mixBits53(external, toMurmur53(defs))));
+  const rehash = scrambleBits53(mixBits53(hash, mixBits53(external, defs)));
 
+  // External key
   external = 0;
   for (const k in links) if (links[k]) external = mixBits53(external, getBundleKey(links[k]!));
-  const rekey = scrambleBits53(mixBits53(key, external));
+  const rekey = scrambleBits53(mixBits53(key, mixBits53(external, defs)));
 
   const relinks = bundle.links ? {
     ...bundle.links,

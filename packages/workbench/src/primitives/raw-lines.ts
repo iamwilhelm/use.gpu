@@ -7,7 +7,7 @@ import type {
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual2 } from './virtual2';
+import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
@@ -120,7 +120,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     LINE_JOIN_SIZE: segments,
   }), [j, scissor]);
   
-  return use(Virtual2, {
+  return use(Virtual, {
     vertexCount,
     instanceCount,
 

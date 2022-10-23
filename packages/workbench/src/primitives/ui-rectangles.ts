@@ -7,7 +7,7 @@ import type {
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual2 } from './virtual2';
+import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
@@ -135,7 +135,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     defines = {...defines, DEBUG_SDF: true};
   }
 
-  return use(Virtual2, {
+  return use(Virtual, {
     vertexCount,
     instanceCount,
 

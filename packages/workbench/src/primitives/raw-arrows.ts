@@ -7,7 +7,7 @@ import type {
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual2 } from './virtual2';
+import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
@@ -100,7 +100,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   }), scissor);
 
   return (
-     use(Virtual2, {
+     use(Virtual, {
       vertexCount,
       instanceCount,
 

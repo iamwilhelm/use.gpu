@@ -11,7 +11,7 @@ import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useOne } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -62,15 +62,16 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
 
   const getVertex = getFullScreenVertex;
   const getFragment = useBoundShader(getTextureColor, FRAGMENT_BINDINGS, [t]);
+  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
 
   return use(Virtual, {
     vertexCount,
     instanceCount,
 
-    getVertex,
-    getFragment,
-
+    links,
     defines: DEFINES,
+
+    renderer: 'solid',
     pipeline,
     mode,
     id,

@@ -7,7 +7,7 @@ import { PickingOverlay } from '../../ui/picking-overlay';
 import earcut from 'earcut';
 
 import {
-  Draw, Pass2,
+  Draw, Pass,
   Cursor, Pick, Raw,
   CompositeData, LineSegments, FaceSegments,
   OrbitCamera, OrbitControls,
@@ -98,7 +98,7 @@ export const GeometryFacesPage: LC = () => {
   // Render polygons
   const view = (
     <Draw>
-      <Pass2>
+      <Pass>
         <CompositeData
           fields={convexDataFields}
           data={convexFaceData}
@@ -183,7 +183,7 @@ export const GeometryFacesPage: LC = () => {
         />
 
         <PickingOverlay />
-      </Pass2>
+      </Pass>
     </Draw>
   );
 

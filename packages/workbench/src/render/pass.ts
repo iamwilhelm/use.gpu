@@ -1,14 +1,28 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
 
-import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { use, quote, yeet, memo, provide, multiGather, useContext, useMemo, useOne } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
+import { PassContext } from '../providers/pass-provider';
 import { DeviceContext } from '../providers/device-provider';
-import { PickingContext } from '../providers/picking-provider';
+import { PickingContext } from './picking';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 
+import { DebugRender } from './forward/debug';
+import { ShadedRender } from './forward/shaded';
+import { SolidRender } from './forward/solid';
+import { PickingRender } from './forward/picking';
+import { UIRender } from './forward/ui';
+
+import { ColorPass } from './pass/color-pass';
+import { ComputePass } from './pass/compute-pass';
+import { PickingPass } from './pass/picking-pass';
+import { ReadbackPass } from './pass/readback-pass';
+
 export type PassProps = {
+  mode?: 'forward' | 'deferred',
+  shadows?: boolean,
   picking?: boolean,
 };
 
@@ -20,132 +34,98 @@ export type ComputeToPass = (passEncoder: GPUComputePassEncoder, countDispatch: 
 
 export type CommandToBuffer = () => GPUCommandBuffer;
 
-const NO_OPS: any[] = [];
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+export type VirtualDraw = {
+  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
+  defines: Record<string, any>,
+  mode?: RenderPassMode | string,
+  id?: number,
 
-/** Classic render pass.
+  vertexCount?: Lazy<number>,
+  instanceCount?: Lazy<number>,
+  indirect?: StorageSource, 
 
-Draws all opaque calls, then all transparent calls. Will dispatch compute before, and post/readback after.
+  renderer?: string,
+  links?: Record<string, ShaderModule>,
+};
 
-Nested render passes are rendered before this one.
-*/
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : [];
+
+const HOVERED_VARIANT = 'debug';
+
 export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) => {
   const {
+    mode = 'forward',
+    shadows = false,
     picking = true,
     children,
   } = props;
 
   const inspect = useInspectable();
 
-  const Resume = (rs: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) => {
-    const device = useContext(DeviceContext);
-    const renderContext = useContext(RenderContext);
-    const pickingContext = useContext(PickingContext);
+  const context = useMemo(() => {
+    const components = mode === 'deferred'
+      ? getDeferredRenderer()
+      : getForwardRenderer();
 
-    const computes     = toArray(rs['compute']     as ComputeToPass[]);
-    const opaques      = toArray(rs['opaque']      as RenderToPass[]);
-    const transparents = toArray(rs['transparent'] as RenderToPass[]);
-    const debugs       = toArray(rs['debug']       as RenderToPass[]);
-    const pickings     = toArray(rs['picking']     as RenderToPass[]);
-    const shadows      = toArray(rs['shadow']      as RenderToPass[]);
+    const getRenderer = (mode, renderer = null) =>
+      components.modes[mode] ?? components.renderers[renderer];
 
-    const nested   = toArray(rs['']         as ArrowFunction[]);
-    const post     = toArray(rs['post']     as CommandToBuffer[]);
-    const readback = toArray(rs['readback'] as ArrowFunction[]);
+    const getVariants = (!shadows && !picking)
+       ? (virtual, hovered) => hovered ? [getRenderer(HOVERED_VARIANT)] : getRenderer(virtual.mode, virtual.renderer)
 
-    const visibles: RenderToPass[] = [];
-    visibles.push(...opaques);
-    visibles.push(...transparents);
-    visibles.push(...debugs);
+       : (virtual, hovered) => {
+          const {id, mode, renderer, defines} = virtual;
+          if (hovered) return [getRenderer(HOVERED_VARIANT)];
 
-    const renderToContext = (
-      commandEncoder: GPUCommandEncoder,
-      context: UseGPURenderContext,
-      rs: RenderToPass[],
-      countGeometry: RenderCounter,
-    ) => {
-      const {colorAttachments, depthStencilAttachment} = context;
-      const renderPassDescriptor: GPURenderPassDescriptor = {
-        colorAttachments,
-        depthStencilAttachment: depthStencilAttachment ?? undefined,
-      };
+          const variants = [];
+          if (shadows && mode !== 'shadow' && defines?.HAS_SHADOW) {
+            variants.push('shadow');
+          }
+          if (picking && mode !== 'picking' && id) {
+            variants.push('picking');
+          }
+          if (variants.length === 0) return getRenderer(mode, renderer);
 
-      const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-      for (const r of rs) r(passEncoder, countGeometry);
-      passEncoder.end();
-    };
+          variants.push(mode);
+          return variants.map(mode => getRenderer(mode, renderer));
+        };
+    
+    const useVariants = (virtual, hovered) => 
+      useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
-    const computeToContext = (
-      commandEncoder: GPUCommandEncoder,
-      rs: ComputeToPass[],
-      countDispatch: ComputeCounter,
-    ) => {
-      const passEncoder = commandEncoder.beginComputePass();
-      for (const r of rs) r(passEncoder, countDispatch);
-      passEncoder.end();
-    };
+    return {getVariants, useVariants};
+  }, [shadows, picking, mode]);
 
-    return quote(yeet(() => {
-      let vs = 0;
-      let ts = 0;
-      let ds = 0;
+  const Resume = (calls: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) =>
+    useMemo(() => {
+      const props = {calls};
 
-      const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
-      const countDispatch = (d: number) => { ds += d; };
+      return [
+        calls.compute ? use(ComputePass, props) : null,
+        use(ColorPass, props),
+        calls.post || calls.readback ? use(ReadbackPass, props) : null,
+        picking && calls.picking ? use(PickingPass, props) : null,
+      ];
+    }, [context, calls]);
 
-      let deferred: Promise<LiveElement>[] | null = null;
-
-      for (const f of nested) {
-        const d = f();
-        if (d) {
-          if (!deferred) deferred = [];
-          deferred.push(d);
-        }
-      }
-
-      const queue: GPUCommandBuffer[] = []
-
-      const commandEncoder = device.createCommandEncoder();
-      if (computes.length) computeToContext(commandEncoder, computes, countDispatch);
-
-      renderContext.swap();
-      renderToContext(commandEncoder, renderContext, visibles, countGeometry);
-
-      const shouldUpdatePicking = picking && pickingContext && pickings.length;
-      if (shouldUpdatePicking) {
-        const {renderContext} = pickingContext!;
-        renderContext.swap();
-        renderToContext(commandEncoder, renderContext, pickings, countGeometry);
-      }
-
-      queue.push(commandEncoder.finish());
-
-      for (const f of post) {
-        const q = f();
-        if (q) queue.push(q);
-      }
-
-      device.queue.submit(queue);
-
-      for (const f of readback) {
-        const d = f();
-        if (d) {
-          if (!deferred) deferred = [];
-          deferred.push(d);
-        }
-      }
-
-      inspect({
-        render: {
-          vertexCount: vs,
-          triangleCount: ts,
-          dispatchCount: ds,
-        },
-      });
-
-      return deferred ? use(Await, {all: deferred}) : null;
-    }));
-  };
-
-  return multiGather(children, Resume);
+  return multiGather(provide(PassContext, context, children), Resume);
 }, 'Pass');
+
+export const getForwardRenderer = () => {
+  return {
+    modes: {
+      shadow: null,
+      debug: DebugRender,
+      picking: PickingRender,
+    },
+    renderers: {
+      solid: SolidRender,
+      shaded: ShadedRender,
+      ui: UIRender,
+    }
+  }
+};
+
+export const getDeferredRenderer = () => {
+  throw new Error();
+};

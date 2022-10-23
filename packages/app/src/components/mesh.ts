@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core';
 
-import { ViewContext, DeviceContext, PickingContext, usePickingContext } from '@use-gpu/workbench';
+import { useViewContext, useDeviceContext, useRenderContext, usePickingContext } from '@use-gpu/workbench';
 import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
@@ -63,14 +63,16 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
 
   const blinkState = !!((blink || 0) % 2);
 
-  const device = useContext(DeviceContext);
-  const {viewUniforms, viewDefs} = useContext(ViewContext);
+  const device = useDeviceContext();
+  const {viewUniforms, viewDefs} = useViewContext();
 
   // Debug / Picking mode
   const isDebug = mode === 'debug';
   const isPicking = mode === 'picking';
-  const {renderContext} = usePickingContext(isPicking);
-  const {colorStates, depthStencilState, colorInput, colorSpace, samples} = renderContext;
+
+  const renderContext = useRenderContext();
+  const {renderContext: pickingContext} = usePickingContext();
+  const {colorStates, depthStencilState, colorInput, colorSpace, samples} = isPicking ? pickingContext : renderContext;
 
   // Vertex data
   const vertexBuffers = useMemo(() =>

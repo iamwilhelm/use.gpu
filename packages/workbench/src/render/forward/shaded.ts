@@ -11,12 +11,12 @@ import { getNativeColor } from '../../hooks/useNativeColor';
 import { DeviceContext } from '../../providers/device-provider';
 import { RenderContext } from '../../providers/render-provider';
 
-import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
-import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
+import instanceDrawVirtualShaded from '@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl';
+import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
 
-export type SolidRenderProps = VirtualDraw;
+export type ShadedRenderProps = VirtualDraw;
 
-export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderProps) => {
+export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRenderProps) => {
   let {
     vertexCount,
     instanceCount,
@@ -24,7 +24,8 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
 
     links: {
       getVertex,
-      getFragment,
+      getSurface,
+      getLight,
     },
 
     pipeline,
@@ -36,20 +37,21 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
   const renderContext = useContext(RenderContext);
   const {colorInput, colorSpace} = renderContext;
 
-  const vertexShader = instanceDrawVirtualSolid;
-  const fragmentShader = instanceFragmentSolid;
+  const vertexShader = instanceDrawVirtualShaded;
+  const fragmentShader = instanceFragmentShaded;
 
   // Binds links into shader
   const [v, f] = useMemo(() => {
     const links = {
       getVertex,
-      getFragment,
+      getSurface,
+      getLight,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment, colorInput, colorSpace]);
+  }, [vertexShader, fragmentShader, getVertex, getSurface, getLight, colorInput, colorSpace]);
 
   // Inline the render fiber to avoid another memo()
   const call = {

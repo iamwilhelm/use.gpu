@@ -38,7 +38,7 @@ fn main(
   var roughness: f32 = 0.8;
 
   var radiance: vec3<f32> = lightUniforms.lightColor.xyz * 3.1415;
-  var color: vec3<f32> = PBR(N, L, V, radiance, albedo, metalness, roughness);
+  var color: vec3<f32> = radiance * PBR(N, L, V, albedo, metalness, roughness);
   var outColor: vec4<f32> = vec4<f32>(color, inColor.a);
 
   return FragmentOutput(outColor);

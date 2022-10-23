@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { ComputeToPass } from '../pass2';
+import type { ComputeToPass } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { RenderContext } from '../../providers/render-provider';

@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass2';
+import type { VirtualDraw } from '../render/pass';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';

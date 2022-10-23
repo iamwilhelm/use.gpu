@@ -11,7 +11,7 @@ import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useOne, useMemo } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -126,16 +126,16 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const defines = useOne(() => (
     patch(alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {HAS_SCISSOR: !!scissor})
   ), scissor);
+  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
 
   return use(Virtual, {
     vertexCount,
     instanceCount,
 
-    getVertex,
-    getFragment,
-
+    links,
     defines,
 
+    renderer: 'solid',
     pipeline,
     mode,
     id,

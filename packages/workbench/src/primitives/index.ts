@@ -7,4 +7,3 @@ export * from './raw-quads';
 export * from './ui-rectangles';
 export * from './readback';
 export * from './virtual';
-export * from './virtual2';

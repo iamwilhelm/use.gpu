@@ -7,7 +7,7 @@ import type {
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { ViewContext } from '../providers/view-provider';
-import { Virtual2 } from './virtual2';
+import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
@@ -150,10 +150,10 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
       getScissor,
       getFragment: getPassThruColor,
     }
-  }, [getVertex, getScissor]);
+  }, [getVertex, getScissor, material]);
 
   return (
-    use(Virtual2, {
+    use(Virtual, {
       vertexCount,
       instanceCount,
 

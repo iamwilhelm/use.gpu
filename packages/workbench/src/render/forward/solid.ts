@@ -25,6 +25,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     links: {
       getVertex,
       getFragment,
+      getScissor,
     },
 
     pipeline,
@@ -44,6 +45,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     const links = {
       getVertex,
       getFragment,
+      getScissor,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);

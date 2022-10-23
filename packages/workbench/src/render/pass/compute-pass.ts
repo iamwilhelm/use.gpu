@@ -29,15 +29,15 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 
-  const computes = toArray(rs['compute'] as ComputeToPass[]);
+  const computes = toArray(calls['compute'] as ComputeToPass[]);
 
   const computeToContext = (
     commandEncoder: GPUCommandEncoder,
-    rs: ComputeToPass[],
+    calls: ComputeToPass[],
     countDispatch: ComputeCounter,
   ) => {
     const passEncoder = commandEncoder.beginComputePass();
-    for (const r of rs) r(passEncoder, countDispatch);
+    for (const f of calls) f(passEncoder, countDispatch);
     passEncoder.end();
   };
 
@@ -56,8 +56,7 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
 
     inspect({
       render: {
-        vertexCount: vs,
-        triangleCount: ts,
+        dispatchCount: ds,
       },
     });
 

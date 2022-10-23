@@ -154,11 +154,6 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const xd = useDifferentialContext();
   const material = useMaterialContext();
 
-  const getScissor = padding ? getScissorColor : null;
-  const getFragment = !shaded ? getPassThruColor : null;
-  const getSurface = shaded ? material.getSurface : null;
-  const getLight = shaded ? material.getLight : null;
-
   const indirectDraw    = useOne(() => new Uint32Array(12));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
 
@@ -193,12 +188,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       v, n, s, l,
     ]);
 
-  const boundVertex = useBoundShader(
+  const getVertex = useBoundShader(
     getDualContourVertex,
     VERTEX_BINDINGS, [
       edgeReadout, indexReadout, vertexReadout, normalReadout,
       xf, xd, s, p, c, z, min, max,
     ]);
+  const getScissor = !!padding ? getScissorColor : null;
 
   const sourceVersion = useVersion(values) + useVersion(normals);
   const shouldDispatch = !live ? () => (
@@ -260,6 +256,19 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
   };
 
+  const links = useMemo(() => {
+    return shaded
+    ? {
+      getVertex,
+      getScissor,
+      ...material,
+    } : {
+      getVertex,
+      getScissor,
+      getFragment: getPassThruColor,
+    }
+  }, [getVertex, getScissor, material]);
+
   const pipeline = useMemo(() =>
     patch(alphaToCoverage
       ? PIPELINE_ALPHA_TO_COVERAGE
@@ -290,14 +299,10 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     use(Virtual, {
       indirect: indirectStorage,
 
-      getVertex: boundVertex,
-      getScissor,
-      getFragment,
-      getSurface,
-      getLight,
+      links,
+      defines,
 
       pipeline,
-      defines,
       renderer: shaded ? 'shaded' : 'solid',
       mode,
       id,

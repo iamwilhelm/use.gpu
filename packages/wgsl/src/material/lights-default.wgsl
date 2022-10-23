@@ -1,4 +1,4 @@
-use '@use-gpu/wgsl/use/types'::{ Light, Radiance };
+use '@use-gpu/wgsl/use/types'::{ Light };
 use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 
 @infer type T;
@@ -28,5 +28,5 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
     1,
   );
 
-  return 0.05 * ao * params.albedo + applyLight(N, V, light, surface);
+  return 0.05 * surface.occlusion * surface.albedo.rgb + applyLight(N, V, light, surface);
 }

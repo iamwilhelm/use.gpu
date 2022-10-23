@@ -142,7 +142,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
           updateMipTextureChain(device, source, [[0, 0, sw, sh]]);
         }
 
-        console.log({mapping});
         uploadAtlasMapping(
           device,
           source.texture,

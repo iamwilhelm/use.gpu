@@ -81,9 +81,9 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   const albedo = useProp(props.albedo, parseColor, WHITE);
 
   const a = useShaderRef(albedo);
-  const e = useShaderRef(emissive ?? BLACK);
-  const m = useShaderRef(metalness ?? 0);
-  const r = useShaderRef(roughness ?? 1);
+  const e = useShaderRef(emissive  ?? (emissiveMap ? WHITE : BLACK));
+  const m = useShaderRef(metalness ?? (metalnessRoughnessMap ? 1 : 0.0));
+  const r = useShaderRef(roughness ?? (metalnessRoughnessMap ? 1 : 0.5));
 
   let am  = useShaderRef(null, albedoMap);
   let em  = useShaderRef(null, emissiveMap);

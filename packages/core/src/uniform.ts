@@ -258,6 +258,27 @@ export const makeResourceEntries = (
   return entries;
 };
 
+export const makePackedLayout = (
+  uniforms: UniformAttribute[],
+  align: number = 1,
+): UniformLayout => {
+  const out = [] as any[];
+
+  let offset = 0;
+  for (const {name, format} of uniforms) {
+    if (typeof format === 'object') throw new Error(`Struct cannot be used as uniform member types`);
+
+    const s = getUniformAttributeSize(format);
+    const o = alignSizeTo(offset, align);
+    out.push({name, offset: o, format});
+
+    offset = o + s;
+  }
+
+  const s = alignSizeTo(offset, align);
+  return {length: s, attributes: out, offsets: [0]};
+};
+
 export const makeUniformLayout = (
   uniforms: UniformAttribute[],
   base: number = 0,

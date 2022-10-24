@@ -11,6 +11,7 @@ import { LayoutGlyphPage } from './pages/layout/glyph';
 import { LayoutAlignPage } from './pages/layout/align';
 import { MapWebMercatorPage } from './pages/map/webmercator';
 import { MeshRawPage } from './pages/mesh/raw';
+import { MeshInterleavedPage } from './pages/mesh/interleaved';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
@@ -33,7 +34,8 @@ export const makePages = () => [
   {path: "/layout/glyph", title: "Layout - Glyph Subpixel SDF"},
   {path: "/layout/align", title: "Layout - Alignment Tests"},
   {path: "/map/webmercator", title: "Map - WebMercator"},
-  {path: "/mesh/raw", title: "Mesh - Direct Rendering"},
+  {path: "/mesh/raw", title: "Mesh - Raw Rendering"},
+  {path: "/mesh/interleaved", title: "Mesh - Native Components"},
   {path: "/plot/cartesian", title: "Plot - XYZ"},
   {path: "/plot/polar", title: "Plot - Polar"},
   {path: "/plot/spherical", title: "Plot - Spherical"},
@@ -58,6 +60,7 @@ export const makeRoutes = () => ({
   "/layout/align":          { element: <LayoutAlignPage /> },
   "/map/webmercator":       { element: <MapWebMercatorPage /> },
   "/mesh/raw":              { element: <MeshRawPage /> },
+  "/mesh/interleaved":      { element: <MeshInterleavedPage /> },
   "/plot/cartesian":        { element: <PlotCartesianPage /> },
   "/plot/polar":            { element: <PlotPolarPage /> },
   "/plot/spherical":        { element: <PlotSphericalPage /> },

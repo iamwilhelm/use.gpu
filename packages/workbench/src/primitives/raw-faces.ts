@@ -119,7 +119,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const [xf, xd] = useCombinedTransform();
   const scissor = useScissorContext();
-  const material = useMaterialContext();
+  
+  const renderer = shaded ? 'shaded' : 'solid';
+  const material = useMaterialContext()[renderer];
 
   const hasIndices = !!props.indices;
   const hasSegments = !!props.segments;
@@ -148,6 +150,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
       getVertex,
       getScissor,
       getFragment: getPassThruColor,
+      ...material,
     }
   }, [getVertex, getScissor, material]);
 
@@ -158,7 +161,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
       links,
       defines,
-      renderer: shaded ? 'shaded' : 'solid',
+      renderer,
 
       pipeline,
       mode,

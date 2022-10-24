@@ -152,7 +152,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   const xf = useTransformContext();
   const xd = useDifferentialContext();
-  const material = useMaterialContext();
+  const {shaded: material} = useMaterialContext();
 
   const indirectDraw    = useOne(() => new Uint32Array(12));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);

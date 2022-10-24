@@ -11,10 +11,10 @@ import {
 import { linkBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { useInspectable, useNativeColor } from '@use-gpu/workbench';
 
-import instanceDrawMesh from '@use-gpu/wgsl/render/vertex/mesh.wgsl';
-import instanceDrawMeshPick from '@use-gpu/wgsl/render/vertex/mesh-pick.wgsl';
+import instanceDrawMesh from '@use-gpu/wgsl/app/vertex/mesh.wgsl';
+import instanceDrawMeshPick from '@use-gpu/wgsl/app/vertex/mesh-pick.wgsl';
 
-import instanceFragmentMesh from '@use-gpu/wgsl/render/fragment/mesh.wgsl';
+import instanceFragmentMesh from '@use-gpu/wgsl/app/fragment/mesh.wgsl';
 import instanceFragmentPickGeometry from '@use-gpu/wgsl/render/fragment/pick.wgsl';
 
 //

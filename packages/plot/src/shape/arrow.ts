@@ -3,7 +3,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
 import type { ArrowTrait, ColorTrait, LineTrait, ROPTrait } from '../types';
 
-import { useProp, parsePosition4 } from '@use-gpu/traits';
+import { useProp, parseVec4 } from '@use-gpu/traits';
 import { useBoundShader, useBoundSource, useLambdaSource, useShaderRef, ArrowLayer } from '@use-gpu/workbench';
 import { use, provide, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';

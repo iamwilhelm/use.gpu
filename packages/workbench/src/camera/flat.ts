@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ViewUniforms, Rectangle } from '@use-gpu/core';
 
-import { use, signal, provide, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
+import { use, provide, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -113,14 +113,11 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);
 
-  return [
-    signal(),
-    provide(FrameContext, frame.current, 
-      use(ViewProvider, {
-        defs: VIEW_UNIFORMS,
-        uniforms,
-        children: provide(LayoutContext, layout, children),
-      })
-    ),
-  ];
+  return provide(FrameContext, frame.current, 
+    use(ViewProvider, {
+      defs: VIEW_UNIFORMS,
+      uniforms,
+      children: provide(LayoutContext, layout, children),
+    })
+  );
 };

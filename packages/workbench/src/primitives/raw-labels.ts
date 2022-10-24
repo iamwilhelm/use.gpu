@@ -6,7 +6,6 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';

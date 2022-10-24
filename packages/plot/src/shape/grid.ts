@@ -4,7 +4,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { Point4 } from '@use-gpu/core';
 import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } from '../types';
 
-import { parsePosition4, useProp } from '@use-gpu/traits';
+import { parseVec4, useProp } from '@use-gpu/traits';
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import {
@@ -67,7 +67,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const firstDetail = useProp(props.first?.detail, parseIntegerPositive);
   const secondDetail = useProp(props.second?.detail, parseIntegerPositive);
 
-  const origin = useProp(props.origin, parsePosition4);
+  const origin = useProp(props.origin, parseVec4);
 
   const parentRange = useRangeContext();
   const xform = auto ? useTransformContext() : useNoTransformContext();

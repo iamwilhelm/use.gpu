@@ -1,3 +1,4 @@
+import type { VectorLike } from '@use-gpu/traits';
 import type { TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
@@ -12,4 +13,12 @@ export type Light = {
   intensity?: number,
   transform?: ShaderModule | null,
   differential?: ShaderModule | null,
+  shadowMap?: ShadowMapLike | null,
+};
+
+export type ShadowMapLike = {
+  size?: VectorLike,
+  depth?: VectorLike,
+  span?: VectorLike,
+  up?: VectorLike,
 };

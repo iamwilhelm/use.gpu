@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/traits';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
-import { provide, use, signal, useContext, useOne, incrementVersion } from '@use-gpu/live';
+import { provide, use, useContext, useOne, incrementVersion } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
@@ -69,8 +69,8 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const uniforms = useOne(() => ({
     projectionMatrix: { current: null },
     viewMatrix: { current: null },
-    viewNearFar: { current: null },
     viewPosition: { current: null },
+    viewNearFar: { current: null },
     viewResolution: { current: null },
     viewSize: { current: null },
     viewWorldDepth: { current: null },
@@ -91,14 +91,11 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);
 
-  return [
-    signal(),
-    provide(FrameContext, frame.current, 
-      use(ViewProvider, {
-        defs: VIEW_UNIFORMS,
-        uniforms,
-        children: provide(LayoutContext, layout, children),
-      })
-    ),
-  ];
+  return provide(FrameContext, frame.current, 
+    use(ViewProvider, {
+      defs: VIEW_UNIFORMS,
+      uniforms,
+      children: provide(LayoutContext, layout, children),
+    })
+  );
 };

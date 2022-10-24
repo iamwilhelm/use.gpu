@@ -1,8 +1,9 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
-import { memo, provide, makeContext, useContext, useNoContext, useMemo } from '@use-gpu/live';
-import { VIEW_UNIFORMS } from '@use-gpu/core';
+import { memo, provide, signal, makeContext, useContext, useNoContext, useMemo } from '@use-gpu/live';
+import { VIEW_UNIFORMS, makeSharedUniforms, uploadBuffer } from '@use-gpu/core';
+import { useDeviceContext } from '../providers/device-provider';
 
 import { mat4 } from 'gl-matrix';
 
@@ -18,13 +19,13 @@ const VIEW_UNIFORM_DEFAULTS = {
 };
 
 export const ViewContext = makeContext<ViewContextProps>({
-  viewUniforms: VIEW_UNIFORM_DEFAULTS,
-  viewDefs: VIEW_UNIFORMS,
+  defs: VIEW_UNIFORMS,
+  uniforms: VIEW_UNIFORM_DEFAULTS,
 } as any as ViewContextProps, 'ViewContext');
 
 export type ViewContextProps = {
-  viewUniforms: ViewUniforms,
-  viewDefs: UniformAttribute[],
+  defs: UniformAttribute[],
+  uniforms: ViewUniforms,
 };
 
 export type ViewProviderProps = {
@@ -34,9 +35,28 @@ export type ViewProviderProps = {
 };
 
 export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewProviderProps) => {
-  const {defs: viewDefs, uniforms: viewUniforms, children} = props;
-  const context = useMemo(() => ({viewDefs, viewUniforms}), [viewDefs, viewUniforms]);
-  return provide(ViewContext, context, children);
+  const {defs, uniforms, children} = props;
+
+  const device = useDeviceContext();
+
+  const binding = useMemo(() =>
+    makeSharedUniforms(device, [defs]),
+    [device, defs]);
+
+  const {bind, buffer, pipe} = binding;
+  pipe.fill(uniforms);
+  uploadBuffer(device, buffer, pipe.data);
+
+  const context = useMemo(() => ({
+    bind,
+    defs,
+    uniforms,
+  }), [bind, defs, uniforms]);
+
+  return [
+    signal(),
+    provide(ViewContext, context, children),
+  ];
 }, 'ViewProvider');
 
 export const useViewContext = () => useContext(ViewContext);

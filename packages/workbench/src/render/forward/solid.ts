@@ -8,8 +8,10 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { drawCall } from '../command/draw-call';
 import { getNativeColor } from '../../hooks/useNativeColor';
 
-import { DeviceContext } from '../../providers/device-provider';
-import { RenderContext } from '../../providers/render-provider';
+import { useDeviceContext } from '../../providers/device-provider';
+import { useRenderContext } from '../../providers/render-provider';
+import { usePassContext } from '../../providers/pass-provider';
+import { useViewContext } from '../../providers/view-provider';
 
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
 import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
@@ -33,9 +35,12 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     mode = 'opaque',
   } = props;
 
-  const device = useContext(DeviceContext);
-  const renderContext = useContext(RenderContext);
+  const device = useDeviceContext();
+  const renderContext = useRenderContext();
+  const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
+
+  const {bind: globalBinding} = useViewContext();
 
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;
@@ -63,6 +68,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     defines,
     pipeline,
     renderContext,
+    globalBinding,
     mode,
   };
 

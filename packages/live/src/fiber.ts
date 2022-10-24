@@ -680,8 +680,10 @@ export const reduceFiberValues = <R>(
     const {yeeted, mount, mounts, order} = fiber;
     if (!yeeted) throw new Error("Reduce without aggregator");
 
+    let isFork = fiber.f === CAPTURE;
+
     if (!self) {
-      if (fiber.next && fiber.f !== CAPTURE) return reduce(fiber.next);
+      if (fiber.next && !isFork) return reduce(fiber.next);
       if (yeeted.value !== undefined) return yeeted.value;
     }
 

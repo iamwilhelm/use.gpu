@@ -1,10 +1,8 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
 import type { CommandToBuffer } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
-import { RenderContext } from '../../providers/render-provider';
-import { DeviceContext } from '../../providers/device-provider';
+import { useDeviceContext } from '../../providers/device-provider';
 import { Await } from '../await';
 
 export type ReadbackPassProps = {
@@ -26,13 +24,12 @@ export const ReadbackPass: LC<ReadbackPassProps> = memo((props: PropsWithChildre
     calls,
   } = props;
 
-  const device = useContext(DeviceContext);
+  const device = useDeviceContext();
 
   const post     = toArray(rs['post']     as CommandToBuffer[]);
   const readback = toArray(rs['readback'] as ArrowFunction[]);
 
   return quote(yeet(() => {
-    let deferred: Promise<LiveElement>[] | null = null;
 
     const queue: GPUCommandBuffer[] = []
     for (const f of post) {
@@ -41,6 +38,7 @@ export const ReadbackPass: LC<ReadbackPassProps> = memo((props: PropsWithChildre
     }
     device.queue.submit(queue);
 
+    let deferred: Promise<LiveElement>[] | null = null;
     for (const f of readback) {
       const d = f();
       if (d) {

@@ -99,6 +99,7 @@ export const GeometryFacesPage: LC = () => {
   const view = (
     <Draw>
       <Pass>
+
         <CompositeData
           fields={convexDataFields}
           data={convexFaceData}

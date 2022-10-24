@@ -9,7 +9,7 @@ import {
   parseStringArray,
   parseStringFormatter,
   parseVector,
-  parsePosition4,
+  parseVec4,
   parsePosition,
   parseRotation,
   parseQuaternion,

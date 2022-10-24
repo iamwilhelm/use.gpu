@@ -64,7 +64,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const blinkState = !!((blink || 0) % 2);
 
   const device = useDeviceContext();
-  const {viewUniforms, viewDefs} = useViewContext();
+  const {uniforms: viewUniforms, defs: viewDefs} = useViewContext();
 
   // Debug / Picking mode
   const isDebug = mode === 'debug';

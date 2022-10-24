@@ -127,5 +127,6 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   if (DEBUG_SDF) {
     return vec4<f32>(mix(color.rgb, vec3<f32>(mark), 0.5), color.a);
   }
+  
   return color;
 }

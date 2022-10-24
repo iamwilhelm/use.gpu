@@ -1,42 +1,37 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { RenderToPass } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
-
-import { usePickingContext } from '../../providers/picking-provider';
+import { useRenderContext } from '../../providers/render-provider';
 import { useDeviceContext } from '../../providers/device-provider';
-
 import { useInspectable } from '../../hooks/useInspectable'
 
-export type PickingPassProps = {
-  globalBinding?: UniformPipe,
-  swap?: boolean,
+export type ShadowPassProps = {
   calls: {
-    picking?: RenderToPass[],
+    opaque?: RenderToPass[],
+    transparent?: RenderToPass[],
+    debug?: RenderToPass[],
   },
 };
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
 
-/** Picking render pass.
+/** Shadow render pass.
 
-Draws all pickable objects as object ID / vertex ID pairs.
+Draws all shadow calls.
 */
-export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<PickingPassProps>) => {
+export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<ShadowPassProps>) => {
   const {
-    swap = true,
     calls,
   } = props;
 
   const inspect = useInspectable();
 
   const device = useDeviceContext();
-  const pickingContext = usePickingContext();
+  const renderContext = useRenderContext();
 
-  const {renderContext} = pickingContext;
-
-  const pickings = toArray(calls['picking'] as RenderToPass[]);
+  const shadows = toArray(calls['shadow'] as RenderToPass[]);
 
   const renderToContext = (
     commandEncoder: GPUCommandEncoder,
@@ -61,15 +56,12 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
-    const shouldUpdatePicking = pickings.length;
-    if (shouldUpdatePicking) {
-      const commandEncoder = device.createCommandEncoder();
-      if (swap) renderContext.swap();
-      renderToContext(commandEncoder, renderContext, pickings, countGeometry);
+    const commandEncoder = device.createCommandEncoder();
+    renderContext.swap();
+    renderToContext(commandEncoder, renderContext, visibles, countGeometry);
 
-      const command = commandEncoder.finish();
-      device.queue.submit([command]);
-    }
+    const command = commandEncoder.finish();
+    device.queue.submit([command]);
 
     inspect({
       render: {
@@ -81,4 +73,4 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     return null;
   }));
 
-}, 'PickingPass');
+}, 'ShadowPass');

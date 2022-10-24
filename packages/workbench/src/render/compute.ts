@@ -1,29 +1,45 @@
-
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
+import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
+import type { VirtualDraw } from './pass';
 
-import { use, yeet, quote, memo, provide, multiGather, useContext, useMemo, setLogging } from '@use-gpu/live';
-import { useDeviceContext } from '../providers/device-provider';
+import { use, quote, yeet, memo, provide, multiGather, useContext, useMemo, useOne } from '@use-gpu/live';
+import { RenderContext } from '../providers/render-provider';
+import { PassContext } from '../providers/pass-provider';
+import { DeviceContext } from '../providers/device-provider';
+import { PickingContext } from './picking';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
+
+import { DebugRender } from './forward/debug';
+import { ShadedRender } from './forward/shaded';
+import { SolidRender } from './forward/solid';
+import { PickingRender } from './forward/picking';
+import { UIRender } from './forward/ui';
+
+import { ColorPass } from './pass/color-pass';
+import { ComputePass } from './pass/compute-pass';
+import { PickingPass } from './pass/picking-pass';
+import { ReadbackPass } from './pass/readback-pass';
 
 export type ComputeProps = {
   immediate?: boolean,
 };
 
-type ComputeCounter = (d: number) => void;
-type ComputeToPass = (passEncoder: GPUComputePassEncoder, countDispatch: ComputeCounter) => void;
+export type VirtualDraw = {
+  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
+  defines: Record<string, any>,
+  mode?: RenderPassMode | string,
+  id?: number,
 
-type CommandToBuffer = () => GPUCommandBuffer;
+  vertexCount?: Lazy<number>,
+  instanceCount?: Lazy<number>,
+  indirect?: StorageSource, 
 
-const toArray = <T>(x: T[]): T[] => Array.isArray(x) ? x : [];
+  renderer?: string,
+  links?: Record<string, ShaderModule>,
+};
 
-/** Compute-only pass
-
-Will dispatch compute before, and post/readback after.
-
-Nested passes are dispatched before this one.
-*/
-export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeProps>) => {
+export const Compute: LC<ComputePropsProps> = memo((props: PropsWithChildren<ComputePropsProps>) => {
   const {
     immediate,
     children,
@@ -31,75 +47,11 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
 
   const inspect = useInspectable();
 
-  const Resume = (rs: Record<string, (ComputeToPass | CommandToBuffer | ArrowFunction)[]>) => {
-    const device = useDeviceContext();
-
-    const computes = toArray(rs['compute'] as ComputeToPass[]);
-
-    const nested   = toArray(rs['']         as ArrowFunction[]);
-    const post     = toArray(rs['post']     as CommandToBuffer[]);
-    const readback = toArray(rs['readback'] as ArrowFunction[]);
-
-    const computeToContext = (
-      commandEncoder: GPUCommandEncoder,
-      rs: ComputeToPass[],
-      countDispatch: ComputeCounter,
-    ) => {
-      const passEncoder = commandEncoder.beginComputePass();
-      let i = 0;
-      for (const r of rs) r(passEncoder, countDispatch);
-      passEncoder.end();
-    };
-
-    const run = () => {
-      let ds = 0;
-
-      const countDispatch = (d: number) => { ds += d; };
-
-      let deferred: Promise<LiveElement>[] | null = null;
-
-      for (const f of nested) {
-        const d = f();
-        if (d) {
-          if (!deferred) deferred = [];
-          deferred.push(d);
-        }
-      }
-
-      const queue: GPUCommandBuffer[] = []
-
-      const commandEncoder = device.createCommandEncoder();
-      if (computes.length) computeToContext(commandEncoder, computes, countDispatch);
-      queue.push(commandEncoder.finish());
-
-      for (const f of post) {
-        const q = f();
-        if (q) queue.push(q);
-      }
-
-      device.queue.submit(queue);
-
-      for (const f of readback) {
-        const d = f();
-        if (d) {
-          if (!deferred) deferred = [];
-          deferred.push(d);
-        }
-      }
-
-      inspect({
-        render: {
-          dispatchCount: ds,
-        },
-      });
-
-      return deferred ? use(Await, {all: deferred}) : null;
-    };
-
-    return immediate ? run() : quote(yeet(run));
-  };
-
-  if (!children) return null;
+  const Resume = (calls: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) =>
+    useOne(() => [
+      calls.compute ? use(ComputePass, {calls}) : null,
+      calls.post || calls.readback ? use(ReadbackPass, {calls}) : null,
+    ], calls);
 
   return multiGather(children, Resume);
-}, 'Compute');
+}, 'Pass');

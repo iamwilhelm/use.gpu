@@ -227,7 +227,9 @@ export const parseStringArray     = makeParseArray(NO_STRINGS, parseString);
 export const parseVector     = makeParseArray(NO_VECTOR, parseNumber);
 
 export const parseColor      = makeParseColor();
-export const parsePosition4  = makeParseVec4();
+export const parseVec4       = makeParseVec4();
+export const parseVec3       = makeParseVec3();
+export const parseVec2       = makeParseVec2();
 
 export const parsePosition   = makeParseVec3();
 export const parseRotation   = makeParseVec3();

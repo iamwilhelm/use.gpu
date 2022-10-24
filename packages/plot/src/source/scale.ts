@@ -4,7 +4,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
 import type { ScaleTrait, AxisTrait } from '../types';
 
-import { parsePosition4, useProp } from '@use-gpu/traits';
+import { parseVec4, useProp } from '@use-gpu/traits';
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useRawSource, useBoundShader, useShaderRef } from '@use-gpu/workbench';
@@ -40,7 +40,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
 
   const parentRange = useContext(RangeContext);
   const r = range ?? parentRange[axis];
-  const p = useProp(origin, parsePosition4);
+  const p = useProp(origin, parseVec4);
 
   // Generate tick scale
   const newValues = useMemo(() => {

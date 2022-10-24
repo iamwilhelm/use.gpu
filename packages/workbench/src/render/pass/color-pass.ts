@@ -1,12 +1,15 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
 import type { RenderToPass } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
-import { RenderContext } from '../../providers/render-provider';
-import { DeviceContext } from '../../providers/device-provider';
+
+import { useRenderContext } from '../../providers/render-provider';
+import { useDeviceContext } from '../../providers/device-provider';
+
 import { useInspectable } from '../../hooks/useInspectable'
 
 export type ColorPassProps = {
+  globalBinding: UniformPipe,
   calls: {
     opaque?: RenderToPass[],
     transparent?: RenderToPass[],
@@ -28,8 +31,8 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
 
   const inspect = useInspectable();
 
-  const device = useContext(DeviceContext);
-  const renderContext = useContext(RenderContext);
+  const device = useDeviceContext();
+  const renderContext = useRenderContext();
 
   const opaques      = toArray(calls['opaque']      as RenderToPass[]);
   const transparents = toArray(calls['transparent'] as RenderToPass[]);

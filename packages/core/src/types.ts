@@ -233,6 +233,12 @@ export type VolatileAllocation = {
   bindGroup?: () => GPUBindGroup,
 };
 
+export type SharedAllocation = {
+  pipe: UniformPipe,
+  buffer: GPUBuffer,
+  bind: (pipeline: GPUPipeline) => GPUBindGroup,
+};
+
 export type UniformFiller = (items: any) => void;
 export type UniformDataSetter = (index: number, item: any) => void;
 export type UniformValueSetter = (index: number, field: number, value: any) => void;

@@ -1,12 +1,11 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
+import type { RenderPassMode } from '@use-gpu/core';
 
 import { use, quote, yeet, memo, provide, multiGather, useContext, useMemo, useOne } from '@use-gpu/live';
-import { RenderContext } from '../providers/render-provider';
 import { PassContext } from '../providers/pass-provider';
-import { DeviceContext } from '../providers/device-provider';
-import { PickingContext } from './picking';
+import { useDeviceContext } from '../providers/device-provider';
 import { useInspectable } from '../hooks/useInspectable'
+
 import { Await } from './await';
 
 import { DebugRender } from './forward/debug';
@@ -24,6 +23,11 @@ export type PassProps = {
   mode?: 'forward' | 'deferred',
   shadows?: boolean,
   picking?: boolean,
+  
+  components?: {
+    modes: Record<string, LiveComponent<any>>,
+    renderers: Record<string, LiveComponent<any>>,
+  },
 };
 
 type RenderCounter = (v: number, t: number) => void;
@@ -48,8 +52,6 @@ export type VirtualDraw = {
   links?: Record<string, ShaderModule>,
 };
 
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : [];
-
 const HOVERED_VARIANT = 'debug';
 
 export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) => {
@@ -61,7 +63,9 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
   } = props;
 
   const inspect = useInspectable();
+  const device = useDeviceContext();
 
+  // Provide draw call variants for sub-passes
   const context = useMemo(() => {
     const components = mode === 'deferred'
       ? getDeferredRenderer()
@@ -102,6 +106,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
 
       return [
         calls.compute ? use(ComputePass, props) : null,
+        calls.shadow ? use(ShadowPass, props) : null,
         use(ColorPass, props),
         calls.post || calls.readback ? use(ReadbackPass, props) : null,
         picking && calls.picking ? use(PickingPass, props) : null,

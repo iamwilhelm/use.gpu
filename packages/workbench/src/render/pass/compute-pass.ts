@@ -2,11 +2,11 @@ import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } fro
 import type { ComputeToPass } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
-import { RenderContext } from '../../providers/render-provider';
-import { DeviceContext } from '../../providers/device-provider';
+import { useDeviceContext } from '../../providers/device-provider';
 import { useInspectable } from '../../hooks/useInspectable'
 
 export type ComputePassProps = {
+  immediate?: boolean,
   calls: {
     compute?: ComputeToPass[],
   },
@@ -17,17 +17,17 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 /** Compute pass.
 
-Executes all compute calls
+Executes all compute calls. Can optionally run immediately instead of per-frame.
 */
 export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<ComputePassProps>) => {
   const {
+    immediate,
     calls,
   } = props;
 
   const inspect = useInspectable();
 
-  const device = useContext(DeviceContext);
-  const renderContext = useContext(RenderContext);
+  const device = useDeviceContext();
 
   const computes = toArray(calls['compute'] as ComputeToPass[]);
 
@@ -41,7 +41,7 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
     passEncoder.end();
   };
 
-  return quote(yeet(() => {
+  const run = () => {
     let ds = 0;
     
     const countDispatch = (d: number) => { ds += d; };
@@ -61,6 +61,8 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
     });
 
     return null;
-  }));
+  };
+
+  return immediate ? run() : quote(yeet(run));
 
 }, 'ComputePass');

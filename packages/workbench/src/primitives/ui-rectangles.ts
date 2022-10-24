@@ -6,7 +6,6 @@ import type {
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { ViewContext } from '../providers/view-provider';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
@@ -98,7 +97,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     pipeline: propPipeline,
     debugContours = false,
     alphaToCoverage = false,
-    mode = 'opaque',
+    mode = 'transparent',
     id = 0,
     count = 1,
   } = props;

@@ -145,7 +145,7 @@ const screenToView = (projectionMatrix: mat4, x: number, y: number) => {
 
 export const Scroller = (pickers: any[], flip: [number, number], shift: [number, number]) => {
   const { useWheel } = useContext(WheelContext);
-  const { viewUniforms } = useContext(ViewContext);
+  const { uniforms: viewUniforms } = useContext(ViewContext);
   const {
     viewPixelRatio: { current: dpi },
     viewSize: { current: [width, height] },
@@ -184,7 +184,7 @@ export const Scroller = (pickers: any[], flip: [number, number], shift: [number,
 export const Inspect = (pickers: any[], flip: [number, number], shift: [number, number]) => {
   const { id } = useFiber();
   const { useMouse } = useContext(MouseContext);
-  const { viewUniforms } = useContext(ViewContext);
+  const { uniforms: viewUniforms } = useContext(ViewContext);
   const {
     viewPixelRatio: { current: dpi },
     viewSize: { current: [width, height] },

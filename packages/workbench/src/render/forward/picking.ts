@@ -8,8 +8,10 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { drawCall } from '../command/draw-call';
 import { getNativeColor } from '../../hooks/useNativeColor';
 
-import { DeviceContext } from '../../providers/device-provider';
-import { PickingContext } from '../../providers/picking-provider';
+import { useDeviceContext } from '../../providers/device-provider';
+import { usePickingContext } from '../../providers/picking-provider';
+import { usePassContext } from '../../providers/pass-provider';
+import { useViewContext } from '../../providers/view-provider';
 
 import instanceDrawVirtualPicking from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
 import instanceFragmentPicking from '@use-gpu/wgsl/render/fragment/pick.wgsl';
@@ -34,9 +36,11 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     id = 0,
   } = props;
 
-  const device = useContext(DeviceContext);
-  const {renderContext} = useContext(PickingContext);
+  const device = useDeviceContext();
+  const {renderContext} = usePickingContext();
+  const passContext = usePassContext();
 
+  const {bind: globalBinding} = useViewContext();
   const vertexShader = instanceDrawVirtualPicking;
   const fragmentShader = instanceFragmentPicking;
 
@@ -62,6 +66,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     defines,
     pipeline,
     renderContext,
+    globalBinding,
     mode: 'picking',
   };
 

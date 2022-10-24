@@ -10,7 +10,7 @@ import {
 import { parseIntegerPositive } from '@use-gpu/traits';
 
 import { RangeContext } from '../providers/range-provider';
-import { parsePosition4, useProp } from '@use-gpu/traits';
+import { parseVec4, useProp } from '@use-gpu/traits';
 import {
   useAxisTrait,
   useArrowTrait,
@@ -48,7 +48,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const color = useColorTrait(props);
   const {zBias} = useROPTrait(props);
 
-  const p = useProp(origin, parsePosition4);
+  const p = useProp(origin, parseVec4);
   const d = useProp(detail, parseIntegerPositive);
 
   const parentRange = useContext(RangeContext);

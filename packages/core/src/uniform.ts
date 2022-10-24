@@ -1,5 +1,5 @@
 import type {
-  UniformAllocation, VirtualAllocation, VolatileAllocation, ResourceAllocation,
+  UniformAllocation, VirtualAllocation, VolatileAllocation, SharedAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller, UniformDataSetter, UniformValueSetter,
@@ -28,6 +28,34 @@ export const resolve = <T>(x: Lazy<T>): T => {
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformAttributeAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
+
+export const makeSharedUniforms = (
+  device: GPUDevice,
+  uniformGroups: UniformAttribute[][],
+): SharedAllocation => {
+  const pipe = makeMultiUniformPipe(uniformGroups);
+  const buffer = makeUniformBuffer(device, pipe.data);
+
+  const {layout: {offsets}} = pipe;
+  const bindings = offsets.map((offset) => ({buffer, offset}));
+
+  const label = uniformGroups.flatMap(uniforms => uniforms.map(u => u.name)).join(' ');
+  const entries = makeResourceEntries(bindings);
+
+  const bind = (
+    pipeline: GPURenderPipeline | GPUComputePipeline,
+    set: number = 0,
+  ): VirtualAllocation => {
+    const bindGroup = device.createBindGroup({
+      label,
+      layout: pipeline.getBindGroupLayout(set),
+      entries,
+    });
+    return {bindGroup};
+  }
+
+  return {pipe, buffer, bind};
+}
 
 export const makeUniforms = (
   device: GPUDevice,

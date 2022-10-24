@@ -1,14 +1,14 @@
 import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { TypedArray, ViewUniforms, StorageSource, RenderPassMode, DeepPartial, Lazy, UseGPURenderContext } from '@use-gpu/core';
+import type { TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 
 import { useDeviceContext } from '../../providers/device-provider';
-import { useViewContext } from '../../providers/view-provider';
 import { useSuspenseContext } from '../../providers/suspense-provider';
 
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
+  VIEW_UNIFORMS,
   uploadBuffer,
   resolve,
 } from '@use-gpu/core';
@@ -30,6 +30,9 @@ export type DrawCallProps = {
   vertex: ParsedBundle,
   fragment: ParsedBundle,
   
+  globalBinding?: (pipeline: GPUPipeline) => VolatileAllocation,
+  globalDefs?: UniformAttribute[],
+  globalUniforms?: Record<string, Lazy<any>>,
   renderContext: UseGPURenderContext,
 
   defines?: Record<string, any>,
@@ -58,6 +61,9 @@ export const drawCall = (props: DrawCallProps) => {
     vertex: vertexShader,
     fragment: fragmentShader,
 
+    globalBinding,
+    globalDefs,
+    globalUniforms,
     renderContext,
 
     pipeline: propPipeline,
@@ -69,7 +75,6 @@ export const drawCall = (props: DrawCallProps) => {
 
   // Render set up
   const device = useDeviceContext();
-  const {viewUniforms, viewDefs} = useViewContext();
   const suspense = useSuspenseContext();
 
   // Render shader
@@ -91,7 +96,7 @@ export const drawCall = (props: DrawCallProps) => {
     [vertexShader, fragmentShader],
     defines,
   );
-  
+
   // Rendering pipeline
   const [pipeline, isStale] = useRenderPipelineAsync(
     renderContext,
@@ -104,9 +109,9 @@ export const drawCall = (props: DrawCallProps) => {
   
   // Uniforms
   const uniform = useMemo(() => {
-    const defs = [viewDefs];
-    return makeMultiUniforms(device, pipeline, defs as any, 0);
-  }, [device, viewDefs, pipeline]);
+    if (globalBinding) return globalBinding(pipeline);
+    return makeMultiUniforms(device, pipeline, globalDefs ?? [VIEW_UNIFORMS], 0);
+  }, [device, pipeline, globalBinding, globalDefs]);
 
   // Bound storage
   const force = !!volatiles.length;
@@ -129,6 +134,10 @@ export const drawCall = (props: DrawCallProps) => {
   
   const isStrip = topology === 'triangle-strip';
 
+  if (!uniform) throw new Error();
+
+  const isVolatileGlobal = typeof uniform?.bindGroup === 'function';
+
   return {
     [mode]: (passEncoder: GPURenderPassEncoder, countGeometry: (v: number, t: number) => void) => {
       const v = resolve(vertexCount || 0);
@@ -142,16 +151,21 @@ export const drawCall = (props: DrawCallProps) => {
 
       countGeometry(v * i, t);
 
-      uniform.pipe.fill(viewUniforms);
-      uploadBuffer(device, uniform.buffer, uniform.pipe.data);
+      passEncoder.setPipeline(pipeline);
+
+      if (globalUniforms) {
+        uniform.pipe.fill(globalUniforms);
+        uploadBuffer(device, uniform.buffer, uniform.pipe.data);
+      }
+
+      if (isVolatileGlobal) passEncoder.setBindGroup(0, uniform.bindGroup());
+      passEncoder.setBindGroup(0, uniform.bindGroup);
 
       if (storage.pipe && storage.buffer) {
         storage.pipe.fill(constants);
         uploadBuffer(device, storage.buffer, storage.pipe.data);
       }
 
-      passEncoder.setPipeline(pipeline);
-      passEncoder.setBindGroup(0, uniform.bindGroup);
       if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
       if (volatile.bindGroup) passEncoder.setBindGroup(2, volatile.bindGroup());
 

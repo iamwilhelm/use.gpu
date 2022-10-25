@@ -53,7 +53,7 @@ const getItemSummary = (items: LayerAggregate[]) => {
   return {keys, count, indices, memoKey};
 }
 
-/** Aggregate (point and line) geometry from children to produce merged layers. */
+/** Aggregate (point / line / face) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = memo((props: VirtualLayersProps) => {
   const {items, children} = props;
   return items ? Resume(items) : children ? gather(children, Resume) : null;
@@ -119,12 +119,16 @@ const makePointAccumulator = (
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasDepth = keys.has('depths') || keys.has('depth');
   const hasZBias = keys.has('zBiases') || keys.has('zBias');
+  const hasID = keys.has('id') || keys.has('ids');
+  const hasLookup = keys.has('lookup') || keys.has('lookups');
 
   if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', alloc);
   if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', alloc);
   if (hasSize) storage.sizes = makeAggregateBuffer(device, 'f32', alloc);
   if (hasDepth) storage.depths = makeAggregateBuffer(device, 'f32', alloc);
   if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', alloc);
+  if (hasID) storage.ids = makeAggregateBuffer(device, 'u32', allocCount);
+  if (hasLookup) storage.ids = makeAggregateBuffer(device, 'u32', allocCount);
 
   return (items: PointAggregate[], count: number) => {
     const props = {count, shape: 'circle'} as Record<string, any>;
@@ -134,6 +138,8 @@ const makePointAccumulator = (
     if (hasSize) props.sizes = updateAggregateBuffer(device, storage.sizes, items, count, 'size', 'sizes');
     if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depths, items, count, 'depth', 'depths');
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
+    if (hasID) storage.ids = updateAggregateBuffer(device, storage.ids, items, count, 'id', 'ids');
+    if (hasLookup) storage.ids = updateAggregateBuffer(device, storage.lookups, items, count, 'lookup', 'lookups');
 
     return use(PointLayer, props);
   };
@@ -153,6 +159,8 @@ const makeLineAccumulator = (
   const hasWidth = keys.has('widths') || keys.has('width');
   const hasDepth = keys.has('depths') || keys.has('depth');
   const hasZBias = keys.has('zBiases') || keys.has('zBias');
+  const hasID = keys.has('id') || keys.has('ids');
+  const hasLookup = keys.has('lookup') || keys.has('lookups');
 
   storage.segments = makeAggregateBuffer(device, 'i32', alloc);
 
@@ -161,6 +169,8 @@ const makeLineAccumulator = (
   if (hasWidth) storage.widths = makeAggregateBuffer(device, 'f32', alloc);
   if (hasDepth) storage.depths = makeAggregateBuffer(device, 'f32', alloc);
   if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', alloc);
+  if (hasID) storage.ids = makeAggregateBuffer(device, 'u32', allocCount);
+  if (hasLookup) storage.ids = makeAggregateBuffer(device, 'u32', allocCount);
 
   return (items: LineAggregate[], count: number) => {
     const props = {count, join: 'bevel'} as Record<string, any>;
@@ -175,6 +185,8 @@ const makeLineAccumulator = (
     if (hasWidth) props.widths = updateAggregateBuffer(device, storage.widths, items, count, 'width', 'widths');
     if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depths, items, count, 'depth', 'depths');    
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
+    if (hasID) storage.ids = updateAggregateBuffer(device, storage.ids, items, count, 'id', 'ids');
+    if (hasLookup) storage.ids = updateAggregateBuffer(device, storage.lookups, items, count, 'lookup', 'lookups');
 
     return use(LineLayer, props);
   };
@@ -195,14 +207,18 @@ const makeFaceAccumulator = (
   const hasColor = keys.has('colors') || keys.has('color');
   const hasSize = keys.has('sizes') || keys.has('size');
   const hasZBias = keys.has('zBiases') || keys.has('zBias');
+  const hasID = keys.has('id') || keys.has('ids');
+  const hasLookup = keys.has('lookup') || keys.has('lookups');
   const hasCullMode = keys.has('cullMode');
 
-  storage.segments = makeAggregateBuffer(device, 'i32', allocCount);
-  storage.indices = makeAggregateBuffer(device, 'u32', allocIndices);
+  if (hasIndex) storage.indices = makeAggregateBuffer(device, 'u32', allocIndices);
+  else storage.segments = makeAggregateBuffer(device, 'i32', allocCount);
 
   if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
   if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
   if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', allocCount);
+  if (hasID) storage.ids = makeAggregateBuffer(device, 'u32', allocCount);
+  if (hasLookup) storage.ids = makeAggregateBuffer(device, 'u32', allocCount);
 
   return (items: FaceAggregate[], count: number, indices: number) => {
     const props = {count} as Record<string, any>;
@@ -221,6 +237,8 @@ const makeFaceAccumulator = (
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
+    if (hasID) storage.ids = updateAggregateBuffer(device, storage.ids, items, count, 'id', 'ids');
+    if (hasLookup) storage.ids = updateAggregateBuffer(device, storage.lookups, items, count, 'lookup', 'lookups');
 
     if (hasCullMode) props.pipeline = {primitive: {cullMode: items[0]?.cullMode}};
 

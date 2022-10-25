@@ -92,7 +92,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
           family,
           weight,
           style,
-          strings: labels ?? (label != null ? [label] : []),
+          strings,
           size: detail,
         }),
       then:

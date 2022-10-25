@@ -4,7 +4,7 @@ import type { UIAggregate } from './types';
 
 import {
   DeviceContext, DebugContext,
-  SDFFontProvider, SDF_FONT_ATLAS, 
+  SDFFontProvider, 
   useBufferedSize,
   UIRectangles,
 } from '@use-gpu/workbench';
@@ -55,12 +55,6 @@ const Resume = (
   const partitioner = makePartitioner();
 
   for (let item of items) if (item) {
-    if (item.texture === SDF_FONT_ATLAS) {
-      item = {
-        ...item,
-        texture: source,
-      };
-    }
     partitioner.push(item);
   }
 

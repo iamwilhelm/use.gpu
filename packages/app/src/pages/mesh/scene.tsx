@@ -7,6 +7,7 @@ import {
   InterleavedData, PBRMaterial, RawTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
+  Scene, Node,
   Lights, PointLight,
 } from '@use-gpu/workbench';
 
@@ -31,38 +32,44 @@ export const MeshScenePage: LC = (props) => {
       <Pass>
         <Lights>
           <PointLight position={[-2.5, 3, 2, 1]} intensity={4} />
-      
-          <InterleavedData
-            fields={MESH_FIELDS}
-            data={meshVertexArray}
-            render={(positions, normals, colors, uvs) => (
 
-              <RawTexture
-                data={dataTexture}
-                render={(texture) => (
+          <Scene>
+            <Node>
 
-                  <Pick
-                    render={({id, hovered, presses}) =>
-                      <PBRMaterial albedoMap={texture} albedo={presses.left % 2 ? COLOR_ON : COLOR_OFF}>
-                        <FaceLayer
-                          id={id}
-                          positions={positions}
-                          normals={normals}
-                          colors={colors}
-                          uvs={uvs}
-                          shaded
-                        />
-                        {hovered ? <Cursor cursor='pointer' /> : null}
-                      </PBRMaterial>
-                    }
+              <InterleavedData
+                fields={MESH_FIELDS}
+                data={meshVertexArray}
+                render={(positions, normals, colors, uvs) => (
 
+                  <RawTexture
+                    data={dataTexture}
+                    render={(texture) => (
+
+                      <Pick
+                        render={({id, hovered, presses}) =>
+                          <PBRMaterial albedoMap={texture} albedo={presses.left % 2 ? COLOR_ON : COLOR_OFF}>
+                            <FaceLayer
+                              id={id}
+                              positions={positions}
+                              normals={normals}
+                              colors={colors}
+                              uvs={uvs}
+                              shaded
+                            />
+                            {hovered ? <Cursor cursor='pointer' /> : null}
+                          </PBRMaterial>
+                        }
+
+                      />
+                    )}
                   />
+
                 )}
               />
+      
+            </Node>
+          </Scene>
 
-            )}
-          />
-        
         </Lights>
       </Pass>
     </Draw>

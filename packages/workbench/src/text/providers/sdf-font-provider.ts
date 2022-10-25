@@ -23,17 +23,15 @@ const LOD_BIAS_BINDINGS = bundleToAttributes(getLODBiasedTexture);
 export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFontContext');
 export const useSDFFontContext = () => useContext(SDFFontContext);
 
-export const SDF_FONT_ATLAS = 'SDF_FONT_ATLAS' as any as ShaderSource;
-
 export type SDFFontContextProps = {
   __debug: {
     atlas: Atlas,
-    source: {current: ShaderSource},
   },
 
   getRadius: () => number,
   getScale: (size: number) => number,
   getGlyph: (font: number, id: number, size: number) => CachedGlyph,
+  getTexture: () => ShaderSource,
 };
 
 export type SDFFontProviderProps = {
@@ -84,12 +82,27 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
 
   // Allocate font atlas + backing texture
   const format = "rgba8unorm" as GPUTextureFormat;
+  const [glyphs, atlas, source, biasable, biasedSource] = useMemo(() => {
+    const glyphs   = new Map<number, CachedGlyph>();
+    const atlas    = makeAtlas(width, height);
+    const source   = makeAtlasSource(device, atlas, format, 1);
+    const biasable = {
+      ...source,
+      variant: 'textureSampleBias',
+      args: ['vec2<f32>', 'f32'],
+    };
 
-  const opts = [subpixel, preprocess, postprocess];
-  const glyphs = useMemo(() => new Map<number, CachedGlyph>(), opts);
-  const atlas = useMemo(() => makeAtlas(width, height), opts);
-  const sourceRef = useMemo(() => ({ current: makeAtlasSource(device, atlas, format) }), opts);
+    const biasedSource = {
+      ...getBoundShader(getLODBiasedTexture, LOD_BIAS_BINDINGS, [biasable, -0.5]),
+      colorSpace: 'srgb',
+    };
+
+    return [glyphs, atlas, source, biasable, biasedSource];
+  }, [width, height, radius, pad, subpixel, preprocess, postprocess]);
+
   const bounds = useMemo(() => makeBoundsTracker());
+
+  // Read-out with LOD bias for sharper SDFs
 
   // Provide context to map glyphs on-demand
   const context = useMemo(() => {
@@ -97,6 +110,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
 
     const getRadius = () => radius;
     const getScale = (size: number) => size / getNearestScale(size);
+    const getTexture = () => biasedSource;
 
     const getGlyph = (font: number, id: number, size: number): CachedGlyph => {
       const scale = getNearestScale(size);
@@ -106,7 +120,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       if (cache) return cache;
 
       // Measure glyph and get image
-      let {current: source} = sourceRef;
       let glyph = rustText.measureGlyph(font, id, scale);
       let mapping: Rectangle = NO_MAPPING;
 
@@ -138,7 +151,12 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         // If atlas resized, resize the texture backing it
         const [sw, sh] = source.size;
         if (atlas.width !== sw || atlas.height !== sh) {
-          source = sourceRef.current = resizeTextureSource(device, source, atlas.width, atlas.height, 1, 'auto');
+          const newSource = resizeTextureSource(device, source, atlas.width, atlas.height, 1, 'auto');
+          biasable.texture = source.texture = newSource.texture;
+          biasable.view    = source.view    = newSource.view;
+          biasable.length  = source.length  = newSource.length;
+          biasable.size    = source.size    = newSource.size;
+
           updateMipTextureChain(device, source, [[0, 0, sw, sh]]);
         }
 
@@ -161,39 +179,25 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
     return {
       __debug: {
         atlas,
-        sourceRef,
+        source,
       },
 
       getRadius,
       getScale,
       getGlyph,
+      getTexture,
     };
-  }, [rustText, atlas]);
+  }, [rustText, atlas, source]);
 
   return rustText ? (
     gather(
       provide(SDFFontContext, context, children),
       (gathered: any) => {
-        const source = sourceRef.current;
-
         const rects = bounds.flush();
         if (rects.length) {
           atlas.uploads.push(rects);
           updateMipTextureChain(device, source, rects);
         }
-        
-        const biasedSource = useOne(() => {
-          const biasable = {
-            ...source,
-            variant: 'textureSampleBias',
-            args: ['vec2<f32>', 'f32'],
-          };
-          const shader = {
-            ...getBoundShader(getLODBiasedTexture, LOD_BIAS_BINDINGS, [biasable, -0.5]),
-            colorSpace: 'srgb',
-          };
-          return shader;
-        }, source);
 
         return then ? then(atlas, biasedSource, gathered) : null;
       },

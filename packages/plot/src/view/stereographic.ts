@@ -74,13 +74,13 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
     }
 
     // Then apply transform (so these are always relative to the world basis, not the internal basis)
+    if (m) {
+      mat4.multiply(matrix, m, matrix);
+    }
     if (p || r || q || s) {
       const t = mat4.create();
       composeTransform(t, p, r, q, s);
       mat4.multiply(matrix, t, matrix);
-    }
-    if (m) {
-      mat4.multiply(matrix, m, matrix);
     }
 
     // Swizzle active polar axis

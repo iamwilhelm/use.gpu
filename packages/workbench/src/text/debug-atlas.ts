@@ -4,7 +4,7 @@ import type { Atlas, Rectangle } from '@use-gpu/core';
 import { debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } from '@use-gpu/live';
 import { TextureSource } from '@use-gpu/core';
 
-import { SDFFontContext, SDF_FONT_ATLAS } from './providers/sdf-font-provider';
+import { SDFFontContext } from './providers/sdf-font-provider';
 
 export type DebugAtlasProps = {
   atlas: Atlas,
@@ -14,9 +14,9 @@ export type DebugAtlasProps = {
 
 export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (props: Partial<DebugAtlasProps> = {}) => {
   let {atlas, source} = props;
-  console.log({props, atlas, source})
   if (!atlas && !source) {
-    ({__debug: {atlas, sourceRef: {current: source}}} = useContext(SDFFontContext) as any);
+    let getTexture;
+    ({__debug: {atlas, source}} = useContext(SDFFontContext) as any);
   }
   else useNoContext(SDFFontContext);
 
@@ -131,7 +131,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     rectangle: [width, 0, 500 + width, 500],
     uv: [0, 0, w, h],
     radius: [0, 0, 0, 0],
-    texture: source ?? SDF_FONT_ATLAS,
+    texture: source,
     fill: [0, 0, 0, 1],
     count: 1,
     repeat: 3,

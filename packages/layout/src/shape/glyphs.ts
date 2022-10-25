@@ -5,7 +5,7 @@ import type { FontMetrics } from '@use-gpu/glyph';
 import type { InlineLine } from '../types';
 
 import { use, yeet, useContext, useMemo } from '@use-gpu/live';
-import { SDFFontProvider, useSDFFontContext, SDF_FONT_ATLAS } from '@use-gpu/workbench';
+import { SDFFontProvider, useSDFFontContext } from '@use-gpu/workbench';
 import { evaluateDimension } from '../parse';
 
 const BLACK = [0, 0, 0, 1];
@@ -52,12 +52,15 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     transform,
   } = props;
 
-  const { getGlyph, getScale, getRadius } = useSDFFontContext();
+  const sdfFont = useSDFFontContext();
 
   return useMemo(() => {
+    const { getGlyph, getScale, getRadius, getTexture } = sdfFont;
+    
     const adjust = size / (detail ?? size);
     const radius = getRadius();
     const scale = getScale(detail ?? size) * adjust;
+    const texture = getTexture();
 
     const fill = color.slice();
     fill[3] *= opacity;
@@ -133,7 +136,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       border: [expand, Math.min(size / 32, 1.0) * 0.25, 0, 0],
       sdf: [radius, scale, size, 0],
       fill,
-      texture: SDF_FONT_ATLAS,
+      texture,
       count,
       clip,
       transform,
@@ -141,5 +144,5 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     } : null;
 
     return yeet(render);
-  }, [props, getGlyph, getScale, getRadius]);
+  }, [props, sdfFont]);
 };

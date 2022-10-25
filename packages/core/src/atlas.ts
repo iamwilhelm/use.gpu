@@ -19,6 +19,7 @@ export const makeAtlasSource = (
   device: GPUDevice,
   atlas: Atlas,
   format: GPUTextureFormat,
+  volatile?: number,
 ): TextureSource => {
   const mips = Math.floor(Math.log2(Math.min(atlas.width, atlas.height))) + 1;
   const texture = makeDynamicTexture(device, atlas.width, atlas.height, 1, format, 1, mips);
@@ -34,6 +35,7 @@ export const makeAtlasSource = (
     layout: 'texture_2d<f32>',
     mips,
     absolute: true,
+    volatile,
     format,
     colorSpace: 'srgb',
     size: [atlas.width, atlas.height],

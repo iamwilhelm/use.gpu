@@ -35,7 +35,6 @@
   uv: vec4<f32>,
   st: vec4<f32>,
   scissor: vec4<f32>,
-
   index: u32,
 };
 
@@ -55,7 +54,6 @@
   border: vec4<f32>,
   stroke: vec4<f32>,
   fill: vec4<f32>,
-
   index: u32,
 };
 

@@ -2,9 +2,9 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip };
 
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,
-  @location(0) @interpolate(flat) fragId: u32,
-  @location(1) @interpolate(flat) fragIndex: u32,
-  @location(2) fragScissor: vec4<f32>,
+  @location(0) fragScissor: vec4<f32>,
+  @location(1) @interpolate(flat) fragId: u32,
+  @location(2) @interpolate(flat) fragIndex: u32,
 };
 
 @vertex
@@ -21,8 +21,8 @@ fn main(
   
   return VertexOutput(
     outPosition,
+    vec4<f32>(0.0),
     u32(PICKING_ID),
     fragIndex,
-    vec4<f32>(0.0),
   );
 }

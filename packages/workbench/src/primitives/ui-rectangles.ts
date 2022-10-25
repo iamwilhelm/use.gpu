@@ -17,6 +17,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
+import { usePickingShader } from '../providers/picking-provider';
 
 import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
@@ -126,8 +127,11 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const t = useNativeColorTexture(props.texture);
 
   const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x, c]);
+  const getPicking = usePickingShader(props);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
-  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
+
+  const links = useOne(() => ({getVertex, getFragment, getPicking}),
+    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
   let defines = alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA;
   if (debugContours) {
@@ -144,6 +148,5 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     renderer: 'ui',
     pipeline,
     mode,
-    id,
   });
 }, 'UIRectangles');

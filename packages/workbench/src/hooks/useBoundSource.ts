@@ -14,7 +14,7 @@ export const useBoundSource = <T = any>(
   def: UniformAttribute | UniformAttributeValue,
   source: ShaderSource | T,
 ) => {
-  return useMemo(() => getBoundSource(def, source), [source, def]);
+  return useMemo(() => getBoundSource(def, source), [def, source]);
 }
 
 // Turn a shader source/constant/lambda into a virtual shader module

@@ -12,6 +12,7 @@ import { LayoutAlignPage } from './pages/layout/align';
 import { MapWebMercatorPage } from './pages/map/webmercator';
 import { MeshRawPage } from './pages/mesh/raw';
 import { MeshInterleavedPage } from './pages/mesh/interleaved';
+import { MeshScenePage } from './pages/mesh/scene';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
@@ -36,6 +37,7 @@ export const makePages = () => [
   {path: "/map/webmercator", title: "Map - WebMercator"},
   {path: "/mesh/raw", title: "Mesh - Raw Rendering"},
   {path: "/mesh/interleaved", title: "Mesh - Native Components"},
+  {path: "/mesh/scene", title: "Mesh - Scene"},
   {path: "/plot/cartesian", title: "Plot - XYZ"},
   {path: "/plot/polar", title: "Plot - Polar"},
   {path: "/plot/spherical", title: "Plot - Spherical"},
@@ -61,6 +63,7 @@ export const makeRoutes = () => ({
   "/map/webmercator":       { element: <MapWebMercatorPage /> },
   "/mesh/raw":              { element: <MeshRawPage /> },
   "/mesh/interleaved":      { element: <MeshInterleavedPage /> },
+  "/mesh/scene":            { element: <MeshScenePage /> },
   "/plot/cartesian":        { element: <PlotCartesianPage /> },
   "/plot/polar":            { element: <PlotPolarPage /> },
   "/plot/spherical":        { element: <PlotSphericalPage /> },

@@ -16,6 +16,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
+import { usePickingShader } from '../providers/picking-provider';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
@@ -53,11 +54,15 @@ export type RawLabelsProps = {
   texture?: TextureSource | LambdaSource | ShaderModule,
   flip?: [number, number],
 
+  lookups?: ShaderSource,
+  ids?:     ShaderSource,
+  lookup?:  number,
+  id?:      number,
+
   alphaToCoverage?: boolean,
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
-  id?: number,
 };
 
 const VERTEX_BINDINGS = bundleToAttributes(getLabelVertex);
@@ -136,8 +141,10 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const t = props.texture;
 
   const getVertex = useBoundShader(getLabelVertex, VERTEX_BINDINGS, [i, r, u, l, a, xf, c, o, z, d, f, e, q]);
+  const getPicking = usePickingShader(props);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
-  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
+  const links = useOne(() => ({getVertex, getFragment, getPicking}),
+    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
   return use(Virtual, {
     vertexCount,
@@ -149,6 +156,5 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     renderer: 'ui',
     pipeline,
     mode,
-    id,
   });
 }, 'RawLabels');

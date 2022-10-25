@@ -33,7 +33,6 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
 
     pipeline,
     defines,
-    id = 0,
   } = props;
 
   const device = useDeviceContext();
@@ -46,15 +45,14 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
 
   // Binds links into shader
   const [v, f] = useMemo(() => {
-    const getId = bindingToModule({uniform: ID_BINDING, constant: id});
     const links = {
       getVertex,
-      getPicking: getPicking ?? getId,
+      getPicking,
     };
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getPicking, id]);
+  }, [vertexShader, fragmentShader, getVertex, getPicking]);
 
   // Inline the render fiber to avoid another memo()
   const call = {

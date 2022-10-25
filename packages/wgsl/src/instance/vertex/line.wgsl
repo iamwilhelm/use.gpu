@@ -16,8 +16,6 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 @optional @link fn getTrim(i: u32) -> vec4<u32> { return vec4<u32>(0u, 0u, 0u, 0u); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
 
-@optional @link fn getLookup(i: u32) -> u32 { return i; };
-
 const ARROW_ASPECT: f32 = 2.5;
 
 fn getAnchorDistance(anchor: vec3<f32>, tangent: vec3<f32>, center: vec3<f32>) -> f32 {
@@ -98,20 +96,20 @@ fn trimAnchor(
     cornerIndex = instanceIndex + 1u;
   }
 
-  var trim = getTrim(instanceIndex);
+  let trim = getTrim(instanceIndex);
   var trimMode = i32(trim.z);
 
-  var segment = getSegment(cornerIndex);
-  var color = getColor(cornerIndex);
+  let segment = getSegment(cornerIndex);
+  let color = getColor(cornerIndex);
   var width = getWidth(cornerIndex);
-  var depth = getDepth(cornerIndex);
-  var zBias = getZBias(cornerIndex);
-
+  let depth = getDepth(cornerIndex);
+  let zBias = getZBias(cornerIndex);
+  
   var centerPos = getPosition(cornerIndex);
   var beforePos = centerPos;
   var afterPos = centerPos;
 
-  var scissor = getScissor(cornerIndex);
+  let scissor = getScissor(cornerIndex);
 
   if (segment != 1) { beforePos = getPosition(cornerIndex - 1u); }
   else { trimMode = trimMode & 1; }
@@ -202,6 +200,6 @@ fn trimAnchor(
     uv4,
     st4,
     scissor,
-    getLookup(cornerIndex),
+    cornerIndex,
   );
 }

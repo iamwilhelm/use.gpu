@@ -16,6 +16,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
+import { usePickingShader } from '../providers/picking-provider';
 
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -40,6 +41,9 @@ export type RawLinesProps = {
   sizes?: ShaderSource,
 
   lookups?: ShaderSource,
+  ids?:     ShaderSource,
+  lookup?:  number,
+  id?:      number,
 
   join?: 'miter' | 'round' | 'bevel',
 
@@ -77,7 +81,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     pipeline: propPipeline,
     count = 2,
     mode = 'opaque',
-    id = 0,
   } = props;
 
   // Customize line shader
@@ -108,8 +111,11 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const [xf, scissor] = useApplyTransform(p);
 
   const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
+  const getPicking = usePickingShader(props);
   const getFragment = getPassThruColor;
-  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
+
+  const links = useOne(() => ({getVertex, getFragment, getPicking}),
+    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
   const defines = useMemo(() => ({
     HAS_SHADOW: false,
@@ -129,6 +135,5 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     renderer: 'solid',
     pipeline,
     mode,
-    id,
   });
 }, 'RawLines');

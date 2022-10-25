@@ -470,6 +470,13 @@ declare module "@use-gpu/wgsl/render/fragment/ui.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/pick.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getPickingID: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/render/vertex/virtual-pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;

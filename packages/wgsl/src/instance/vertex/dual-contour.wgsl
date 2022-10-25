@@ -135,6 +135,6 @@ fn inverseMat3x3(m: mat3x3<f32>) -> mat3x3<f32> {
     uv4,
     st4,
     scissor,
-    instanceIndex,
+    edgeId,
  );
 }

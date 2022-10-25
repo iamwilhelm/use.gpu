@@ -15,7 +15,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
 @optional @link fn getIndex(i: u32) -> u32 { return 0u; };
-@optional @link fn getLookup(i: u32) -> u32 { return i; };
 
 @export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> ShadedVertex {
   let NaN: f32 = bitcast<f32>(0xffffffffu);
@@ -63,6 +62,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   var tangentIndex = cornerIndex;
   var uvIndex = cornerIndex;
   var lookupIndex = cornerIndex;
+
   if (UNWELDED_NORMALS) { normalIndex = unweldedIndex; }
   if (UNWELDED_TANGENTS) { tangentIndex = unweldedIndex; }
   if (UNWELDED_UVS) { uvIndex = unweldedIndex; }
@@ -73,7 +73,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   var tangent = getTangent(tangentIndex);
   var uv = getUV(uvIndex);
   var st = getST(uvIndex);
-  var lookup = getLookup(lookupIndex);
 
   var color = getColor(cornerIndex);
   var zBias = getZBias(cornerIndex);
@@ -99,6 +98,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
     uv,
     st,
     scissor,
-    lookup,
+    lookupIndex,
   );
 }

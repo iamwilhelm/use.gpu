@@ -16,6 +16,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
+import { usePickingShader } from '../providers/picking-provider';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedColor } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -37,6 +38,7 @@ export type RawQuadsProps = {
   masks?: ShaderSource,
   uvs?: ShaderSource,
 
+  lookups?: ShaderSource,
   texture?: TextureSource | LambdaSource | ShaderModule,
 
   alphaToCoverage?: boolean,
@@ -114,18 +116,23 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const z = useShaderRef(props.zBias, props.zBiases);
   const u = useShaderRef(props.uv, props.uvs);
 
+  const l = useShaderRef(null, props.lookups);
+
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   const t = props.texture;
   
   const [xf, scissor] = useApplyTransform(p);
   
-  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, scissor, r, c, d, z, u]);
+  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, scissor, r, c, d, z, u, l]);
+  const getPicking = usePickingShader(props);
   const getFragment = useBoundShader(getMaskedColor, FRAGMENT_BINDINGS, [m, t]);
 
   const defines = useOne(() => (
     patch(alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {HAS_SCISSOR: !!scissor})
   ), scissor);
-  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
+
+  const links = useOne(() => ({getVertex, getFragment, getPicking}),
+    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
   return use(Virtual, {
     vertexCount,
@@ -137,6 +144,5 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     renderer: 'solid',
     pipeline,
     mode,
-    id,
   });
 }, 'RawQuads');

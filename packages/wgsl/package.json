@@ -349,6 +349,11 @@
       "import": "./src/render/fragment/ui.wgsl",
       "require": "./src/render/fragment/ui.wgsl"
     },
+    "./render/pick.wgsl": {
+      "types": "./src/render/pick.wgsl.d.ts",
+      "import": "./src/render/pick.wgsl",
+      "require": "./src/render/pick.wgsl"
+    },
     "./render/vertex/virtual-pick.wgsl": {
       "types": "./src/render/vertex/virtual-pick.wgsl.d.ts",
       "import": "./src/render/vertex/virtual-pick.wgsl",

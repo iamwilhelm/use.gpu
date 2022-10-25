@@ -10,10 +10,11 @@ import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
-import { bundleToAttribute, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
 import { useScissorContext } from '../providers/scissor-provider';
+import { usePickingShader } from '../providers/picking-provider';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
@@ -42,7 +43,11 @@ export type RawFacesProps = {
   zBiases?: ShaderSource,
 
   indices?: ShaderSource,
+
   lookups?: ShaderSource,
+  ids?:     ShaderSource,
+  lookup?:  number,
+  id?:      number,
 
   unweldedNormals?: boolean,
   unweldedTangents?: boolean,
@@ -55,7 +60,6 @@ export type RawFacesProps = {
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
-  id?: number,
 };
 
 const ZERO = [0, 0, 0, 1];
@@ -76,7 +80,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     shadow = true,
     count = 1,
     mode = 'opaque',
-    id = 0,
 
     unweldedNormals = false,
     unweldedTangents = false,
@@ -115,7 +118,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const z = useShaderRef(props.zBias, props.zBiases);
 
   const i = useShaderRef(null, props.indices);
-  const l = useShaderRef(null, props.lookups);
+
+  const lookups = useShaderRef(null, props.lookups);
+  const ids = useShaderRef(null, props.ids);
 
   const [xf, xd] = useCombinedTransform();
   const scissor = useScissorContext();
@@ -137,22 +142,25 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     UNWELDED_LOOKUPS: !!unweldedLookups,
   }), [scissor, shadow, hasIndices, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, l]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i]);
+  const getPicking = usePickingShader(props);
   const getScissor = scissor ? getScissorColor : null;
-  
+
   const links = useMemo(() => {
     return shaded
     ? {
       getVertex,
       getScissor,
+      getPicking,
       ...material,
     } : {
       getVertex,
       getScissor,
+      getPicking,
       getFragment: getPassThruColor,
       ...material,
     }
-  }, [getVertex, getScissor, material]);
+  }, [getVertex, getPicking, getScissor, material]);
 
   return (
     use(Virtual, {
@@ -165,7 +173,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
       pipeline,
       mode,
-      id,
     })
   );
 }, 'RawFaces');

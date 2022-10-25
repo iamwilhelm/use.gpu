@@ -20,6 +20,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
+import { usePickingShader } from '../providers/picking-provider';
 
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -39,14 +40,16 @@ export type RawArrowsProps = {
   widths?:    ShaderSource,
   depths?:    ShaderSource,
 
-  lookups?:   ShaderSource,
+  lookups?: ShaderSource,
+  ids?:     ShaderSource,
+  lookup?:  number,
+  id?:      number,
 
   detail?: number,
 
   count?: number,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode,
-  id?: number,
 };
 
 const ZERO = [0, 0, 0, 1];
@@ -90,8 +93,11 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const [xf, scissor] = useApplyTransform(p);
 
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);
+  const getPicking = usePickingShader(props);
   const getFragment = getPassThruColor;
-  const links = useOne(() => ({getVertex, getFragment}), getBundleKey(getVertex) + getBundleKey(getFragment));
+
+  const links = useOne(() => ({getVertex, getFragment, getPicking}),
+    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
   const defines = useOne(() => ({
     HAS_ALPHA_TO_COVERAGE: false,
@@ -109,7 +115,6 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
       renderer: 'solid',
       pipeline,
       mode,
-      id,
     })
   );
 }, 'RawArrows');

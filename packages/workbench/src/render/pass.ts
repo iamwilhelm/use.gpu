@@ -78,14 +78,14 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
        ? (virtual, hovered) => hovered ? [getRenderer(HOVERED_VARIANT)] : getRenderer(virtual.mode, virtual.renderer)
 
        : (virtual, hovered) => {
-          const {id, mode, renderer, defines} = virtual;
+          const {id, mode, renderer, links, defines} = virtual;
           if (hovered) return [getRenderer(HOVERED_VARIANT)];
 
           const variants = [];
           if (shadows && mode !== 'shadow' && defines?.HAS_SHADOW) {
             variants.push('shadow');
           }
-          if (picking && mode !== 'picking' && id) {
+          if (picking && mode !== 'picking' && links?.getPicking) {
             variants.push('picking');
           }
           if (variants.length === 0) return getRenderer(mode, renderer);
@@ -93,7 +93,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
           variants.push(mode);
           return variants.map(mode => getRenderer(mode, renderer));
         };
-    
+
     const useVariants = (virtual, hovered) => 
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 

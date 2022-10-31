@@ -69,7 +69,6 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       const fieldBuffers = fs.map(([format, accessor], i) => {
         if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
         const f = format as any as UniformType;
-
         const {array, dims} = makeDataArray(f, bufferLength);
 
         if (prevBuffers) {
@@ -123,7 +122,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
 
       for (const {array, dims, accessor} of fieldBuffers) {
         const v = data[accessor];
-        if (v != null) copyNumberArrayRange(v, array, 0, instance * dims, dims);
+        if (v != null) copyNumberArrayRange(v, array, 0, instance * Math.ceil(dims), Math.ceil(dims), dims);
       }
     }
     if (needsRefresh) ranges = [[0, size]];
@@ -131,7 +130,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     // Upload changed ranges
     if (ranges.length) {
       for (const {buffer, array, dims} of fieldBuffers) {
-        const stride = dims * (array.byteLength / array.length);
+        const stride = Math.ceil(dims) * (array.byteLength / array.length);
         for (const [from, to] of ranges) {
           uploadBufferRange(device, buffer, array.buffer, from * stride, (to - from) * stride);
         }

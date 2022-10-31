@@ -3,7 +3,7 @@ import type { Point4 } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 
-import { provide, yeet, useMemo, useOne } from '@use-gpu/live';
+import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 import { parseColor, useProp } from '@use-gpu/traits';
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
@@ -111,5 +111,5 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   }), [getSurface, getLight]);
 
   const view = render ? render(context) : children;
-  return render ?? children ? provide(MaterialContext, context, view) : yeet(context);
+  return render ?? children ? provide(MaterialContext, context, [signal(), view]) : yeet(context);
 }

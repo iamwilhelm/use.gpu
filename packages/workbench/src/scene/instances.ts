@@ -9,10 +9,9 @@ import { getBundleKey, bundleToAttributes, bindEntryPoint } from '@use-gpu/shade
 import { FaceLayer } from '../layers/face-layer';
 import { InstanceProvider } from '../providers/instance-provider';
 import { TransformContext, DifferentialContext } from '../providers/transform-provider';
-import { MaterialContext } from '../providers/material-provider';
 import { useMatrixContext, MatrixContext } from '../providers/matrix-provider';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { getBoundShader } from '../hooks/useBoundShader';
 
 import { loadInstance } from '@use-gpu/wgsl/transform/instance.wgsl';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
@@ -27,7 +26,6 @@ const NORMAL_BINDINGS   = bundleToAttributes(getMatrixDifferential);
 
 export type InstanceInfo = {
   mesh: Record<string, ShaderSource>,
-  material: Record<string, Record<string, ShaderSource>>,
 };
 
 export type InstancesProps = InstanceInfo & {
@@ -44,34 +42,34 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
   const {
     index,
     mesh,
-    material,
     render,
   } = props;
 
-  const Resume = useCallback((indexSource, fieldSources) => {
-    const [matrices, normalMatrices] = fieldSources;
+  const Resume = useCallback((instances, fieldSources) => {
+    
+    const [view, boundPosition, boundDifferential] = useMemo(() => {
 
-    const instances = indexSource;
+      const [matrices, normalMatrices] = fieldSources;
 
-    const load = useBoundShader(loadInstance, INSTANCE_BINDINGS, [matrices, normalMatrices]);
-    const matrix = bindEntryPoint(load, 'getTransformMatrix');
-    const normalMatrix = bindEntryPoint(load, 'getNormalMatrix');
+      const load = getBoundShader(loadInstance, INSTANCE_BINDINGS, [matrices, normalMatrices]);
+      const matrix = bindEntryPoint(load, 'getTransformMatrix');
+      const normalMatrix = bindEntryPoint(load, 'getNormalMatrix');
 
-    const boundPosition = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrix]);
-    const boundDifferential = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrix, normalMatrix]);
+      const boundPosition = getBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrix]);
+      const boundDifferential = getBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrix, normalMatrix]);
+
+      const view = use(FaceLayer, {...mesh, instances, load});
+      return [view, boundPosition, boundDifferential];
+    }, [instances, fieldSources]);
 
     const [transform, differential] = useCombinedTransform(boundPosition, boundDifferential);
 
     return (
-      provide(MaterialContext, material, 
-        provide(TransformContext, transform,
-          provide(DifferentialContext, differential,
-            use(FaceLayer, {...mesh, instances, load})
-          )
-        )
+      provide(TransformContext, transform,
+        provide(DifferentialContext, differential, view)
       )
     );
-  }, [mesh, material]);
+  }, [mesh]);
 
   return use(InstanceData, {
     index,

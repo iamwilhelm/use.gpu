@@ -61,12 +61,11 @@ export const MeshInstancePage: LC = (props) => {
         />,
         <RawTexture
           data={dataTexture}
-          render={(texture) => <PBRMaterial albedoMap={texture} />}
         />,
       ]}
       then={([
         positions, normals, colors, uvs,
-        material,
+        texture,
       ]) => {
         const mesh = {
           positions,
@@ -85,25 +84,27 @@ export const MeshInstancePage: LC = (props) => {
                   <PointLight position={[-2.5, 3, 2, 1]} intensity={4} />
 
                   <Scene>
+                    <PBRMaterial
+                      albedoMap={texture}
+                    >
+                      <Instances
+                        mesh={mesh}
+                        render={(Instance) => (<>
+                          <Animate prop="position" keyframes={KEYFRAMES} loop>
+                            <Node rotation={[30, - 30, -30]}>
+                              <Instance />
+                            </Node>
+                          </Animate>
 
-                    <Instances
-                      mesh={mesh}
-                      material={material}
-                      render={(Instance) => (<>
-                        <Animate prop="position" keyframes={KEYFRAMES} loop>
-                          <Node rotation={[30, - 30, -30]}>
-                            <Instance />
-                          </Node>
-                        </Animate>
-
-                        <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
-                          <Node rotation={[30, - 30, -30]}>
-                            <Instance />
-                          </Node>
-                        </Animate>                      
-                      </>)}
-                    />
-
+                          <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
+                            <Node rotation={[30, - 30, -30]}>
+                              <Instance />
+                            </Node>
+                          </Animate>                      
+                        </>)}
+                      />
+                    </PBRMaterial>
+                    
                   </Scene>
                 </Lights>
               </Pass>

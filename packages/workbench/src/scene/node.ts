@@ -1,8 +1,10 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ObjectTrait } from './types';
-import { memo, provide } from '@use-gpu/live';
+import { memo, provide, useOne } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 
+import { useObjectTrait } from './traits';
+import { composeTransform } from './lib/compose';
 import { useMatrixContext, MatrixContext } from '../providers/matrix-provider';
 
 export type NodeProps = Partial<ObjectTrait> & {
@@ -12,6 +14,7 @@ export type NodeProps = Partial<ObjectTrait> & {
 export const Node: LiveComponent<NodeProps> = (props: PropsWithChildren<NodeProps>) => {
   const parent = useMatrixContext();
   const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {children} = props;
 
   const combined = useOne(() => {
     const matrix = mat4.create();

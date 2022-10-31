@@ -3,6 +3,7 @@ export * from './composite-data';
 export * from './data';
 export * from './fetch';
 export * from './image-texture';
+export * from './instance-data';
 export * from './interleaved-data';
 export * from './raw-data';
 export * from './raw-texture';

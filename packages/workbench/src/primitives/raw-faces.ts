@@ -9,7 +9,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
@@ -48,6 +48,9 @@ export type RawFacesProps = {
   ids?:     ShaderSource,
   lookup?:  number,
   id?:      number,
+
+  instances?: ShaderSource,
+  load?: ShaderSource,
 
   unweldedNormals?: boolean,
   unweldedTangents?: boolean,
@@ -106,6 +109,19 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     return (props.segments != null) ? Math.max(0, c - 2) : c;
   }, [props.positions, props.indices, props.segments, count]);
 
+  // Instanced draw
+  const hasInstances = !!props.instances;
+  let instanceSize = null;
+  let totalCount = null;
+  if (hasInstances) {
+    instanceSize = useOne(() => hasInstances ? instanceCount : null, hasInstances);
+    totalCount = useCallback(() => (props.instances as any)?.length * resolve(instanceCount), [props.instances, instanceCount]);
+  }
+  else {
+    useNoOne();
+    useNoCallback();
+  }
+
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const p = useShaderRef(props.position, props.positions);
@@ -118,6 +134,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const z = useShaderRef(props.zBias, props.zBiases);
 
   const i = useShaderRef(null, props.indices);
+  const j = useShaderRef(null, props.instances);
+  const k = useShaderRef(instanceSize);
+  const l = useShaderRef(null, props.load);
 
   const lookups = useShaderRef(null, props.lookups);
   const ids = useShaderRef(null, props.ids);
@@ -135,14 +154,15 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     HAS_SHADOW: shadow,
     HAS_INDICES: hasIndices,
     HAS_SEGMENTS: hasSegments,
+    HAS_INSTANCES: hasInstances,
     HAS_ALPHA_TO_COVERAGE: false,
     UNWELDED_NORMALS: !!unweldedNormals,
     UNWELDED_TANGENTS: !!unweldedTangents,
     UNWELDED_UVS: !!unweldedUVs,
     UNWELDED_LOOKUPS: !!unweldedLookups,
-  }), [scissor, shadow, hasIndices, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
+  }), [scissor, shadow, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i]);
+  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, j, k, l]);
   const getPicking = usePickingShader(props);
   const getScissor = scissor ? getScissorColor : null;
 
@@ -165,7 +185,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   return (
     use(Virtual, {
       vertexCount,
-      instanceCount,
+      instanceCount: totalCount ?? instanceCount,
 
       links,
       defines,

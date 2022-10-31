@@ -3,7 +3,7 @@ import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@u
 import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, FaceAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
-import { use, keyed, signal, gather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, signal, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -18,7 +18,7 @@ import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
 
 export type VirtualLayersProps = {
-  items?: LayerAggregate[],
+  items?: Record<string, LayerAggregate[]>,
   children: LiveElement,
 };
 
@@ -56,23 +56,12 @@ const getItemSummary = (items: LayerAggregate[]) => {
 /** Aggregate (point / line / face) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = memo((props: VirtualLayersProps) => {
   const {items, children} = props;
-  return items ? Resume(items) : children ? gather(children, Resume) : null;
+  return items ? Resume(items) : children ? multiGather(children, Resume) : null;
 }, 'VirtualLayers');
 
 const Resume = (
-  items: (LayerAggregate | null)[],
+  aggregates: Record<string, LayerAggregate[]>,
 ) => {
-  const aggregates: Record<string, LayerAggregate[]> = {
-    point: [],
-    line: [],
-    face: [],
-    label: [],
-  };
-
-  for (let item of items) if (item) {
-    aggregates[item.type].push(item);
-  }
-
   const els: LiveElement[] = [];
 
   for (const type in aggregates) {

@@ -1,9 +1,9 @@
-import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Point4 } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 
-import { provide, useMemo, useOne } from '@use-gpu/live';
+import { provide, yeet, useMemo, useOne } from '@use-gpu/live';
 import { parseColor, useProp } from '@use-gpu/traits';
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
@@ -39,6 +39,8 @@ export type PBRMaterialProps = {
   emissiveMap?: ShaderSource,
   occlusionMap?: ShaderSource,
   normalMap?: ShaderSource,
+
+  render?: (material: Record<string, Record<string, ShaderSource>>) => LiveElement,
 };
 
 const WHITE = [1, 1, 1, 1] as Point4;
@@ -57,6 +59,7 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     metalnessRoughnessMap,
     normalMap,
 
+    render,
     children,
   } = props;
 
@@ -72,7 +75,7 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   let om  = useShaderRef(null, occlusionMap);
   let mrm = useShaderRef(null, metalnessRoughnessMap);
 
-  const defines = useOne(() => ({
+  const defines = useMemo(() => ({
     HAS_ALBEDO_MAP: !!albedoMap,
     HAS_COLOR_MAP: !!albedoMap,
     HAS_EMISSIVE_MAP: !!emissiveMap,
@@ -107,5 +110,6 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     },
   }), [getSurface, getLight]);
 
-  return provide(MaterialContext, context, children);
+  const view = render ? render(context) : children;
+  return render ?? children ? provide(MaterialContext, context, view) : yeet(context);
 }

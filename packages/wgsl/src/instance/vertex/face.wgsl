@@ -16,12 +16,28 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 
 @optional @link fn getIndex(i: u32) -> u32 { return 0u; };
 
-@export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> ShadedVertex {
+@optional @link fn getInstance(i: u32) -> u32 { return 0u; };
+@optional @link fn getInstanceSize() -> u32 { return 0u; };
+@optional @link fn loadInstance(i: u32) { };
+
+@export fn getFaceVertex(vertexIndex: u32, globalInstanceIndex: u32) -> ShadedVertex {
   let NaN: f32 = bitcast<f32>(0xffffffffu);
+
+  var instanceIndex: u32;
+  if (HAS_INSTANCES) {
+    let size = getInstanceSize();
+    let index = getInstance(globalInstanceIndex / size);
+    instanceIndex = globalInstanceIndex % size;
+
+    loadInstance(index);
+  }
+  else {
+    instanceIndex = globalInstanceIndex;
+  }
 
   let segment = getSegment(instanceIndex);
   let index = instanceIndex * 3u + vertexIndex;
-  
+
   var cornerIndex: u32;
   var unweldedIndex: u32;
   if (HAS_INDICES && !HAS_SEGMENTS) {

@@ -9,7 +9,7 @@ export * from './forward/ui';
 export * from './linear-rgb';
 export * from './loop';
 export * from './pass';
-export * from './picking';
+export * from './picking-target';
 export * from './queue';
 export * from './stage';
 export * from './render-target';

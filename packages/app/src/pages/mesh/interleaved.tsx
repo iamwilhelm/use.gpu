@@ -22,25 +22,25 @@ const MESH_FIELDS = [
 const COLOR_ON = [1, 1, 1, 1];
 const COLOR_OFF = [0.5, 0.5, 0.5, 1.0];
 
-// This is a reimplementation of app/components/mesh using use.gpu components
+// This is a reimplementation of app/components/mesh using standard use.gpu components
 export const MeshInterleavedPage: LC = (props) => {
   const dataTexture = makeTexture();
 
   const view = (
-    <Draw>
-      <Cursor cursor='move' />
-      <Pass>
-        <Lights>
-          <PointLight position={[-2.5, 3, 2, 1]} intensity={4} />
-      
-          <InterleavedData
-            fields={MESH_FIELDS}
-            data={meshVertexArray}
-            render={(positions, normals, colors, uvs) => (
+    <InterleavedData
+      fields={MESH_FIELDS}
+      data={meshVertexArray}
+      render={(positions, normals, colors, uvs) => (
 
-              <RawTexture
-                data={dataTexture}
-                render={(texture) => (
+        <RawTexture
+          data={dataTexture}
+          render={(texture) => (
+
+            <Draw>
+              <Cursor cursor='move' />
+              <Pass>
+                <Lights>
+                  <PointLight position={[-2.5, 3, 2, 1]} intensity={4} />
 
                   <Pick
                     render={({id, hovered, presses}) =>
@@ -58,15 +58,16 @@ export const MeshInterleavedPage: LC = (props) => {
                     }
 
                   />
-                )}
-              />
-
-            )}
-          />
         
-        </Lights>
-      </Pass>
-    </Draw>
+                </Lights>
+              </Pass>
+            </Draw>
+
+          )}
+        />
+
+      )}
+    />
   );
 
   return (

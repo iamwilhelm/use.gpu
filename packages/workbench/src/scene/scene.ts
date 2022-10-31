@@ -1,6 +1,6 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ObjectTrait } from './types';
-import { memo, provide } from '@use-gpu/live';
+import { memo, provide, useOne } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 
 import { useMatrixContext, useNoMatrixContext, MatrixContext } from '../providers/matrix-provider';

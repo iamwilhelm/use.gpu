@@ -409,6 +409,11 @@
       "import": "./src/transform/diff-matrix.wgsl",
       "require": "./src/transform/diff-matrix.wgsl"
     },
+    "./transform/instance.wgsl": {
+      "types": "./src/transform/instance.wgsl.d.ts",
+      "import": "./src/transform/instance.wgsl",
+      "require": "./src/transform/instance.wgsl"
+    },
     "./transform/polar.wgsl": {
       "types": "./src/transform/polar.wgsl.d.ts",
       "import": "./src/transform/polar.wgsl",

@@ -22,6 +22,8 @@ export const MeshRawPage: LC = (props) => {
       <Pass>
         <Pick
           render={({id, hovered, presses}) => [
+            // <Mesh> is a fully hand-coded component, intended as an anti-example
+            // of how to integrate fully custom rendering code
             <Mesh texture={texture} mesh={mesh} blink={presses.left} />,
             <Mesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
             hovered ? <Cursor cursor='pointer' /> : null,

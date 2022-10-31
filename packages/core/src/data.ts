@@ -214,9 +214,9 @@ export const copyNumberArrayRange = (
   if (dims === 3.5) {
     const n = length;
     for (let i = 0, j = 0; i < n;) {
-      to[toIndex + j++] = from[fromIndex + i++];
-      to[toIndex + j++] = from[fromIndex + i++];
-      to[toIndex + j++] = from[fromIndex + i++];
+      to[toIndex + j++] = from[fromIndex + i++] + offset;
+      to[toIndex + j++] = from[fromIndex + i++] + offset;
+      to[toIndex + j++] = from[fromIndex + i++] + offset;
       j++;
     }
   }

@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { use, useResource, useNoResource } from '@use-gpu/live';
-import { Picking } from '@use-gpu/workbench';
+import { PickingTarget } from '@use-gpu/workbench';
 import { CursorProvider } from '@use-gpu/workbench';
 
 import { makeOrAdoptCanvas } from '../web';
@@ -63,7 +63,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
           canvas,
           children:
             picking
-            ? use(Picking, {
+            ? use(PickingTarget, {
                 children: view,
               })
             : view

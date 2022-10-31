@@ -94,8 +94,6 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
   let view: LiveElement = render;
   if (transform) {
-    const {normals, tangents} = faces;
-
     const contravariant = useOne(() => mat3.normalFromMat4(mat3.create(), transform), transform);
 
     // Apply matrix transform

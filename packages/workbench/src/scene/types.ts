@@ -1,4 +1,5 @@
 import type { VectorLike } from '@use-gpu/traits';
+import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 export type ObjectTrait = {
   position: VectorLike,
@@ -6,4 +7,10 @@ export type ObjectTrait = {
   quaternion: VectorLike,
   rotation: VectorLike,
   matrix: VectorLike,
+};
+
+export type InstanceAggregate = {
+  instance: number,
+  mesh: Record<string, ShaderSource>,
+  material: Record<string, Record<string, ShaderSource>>,
 };

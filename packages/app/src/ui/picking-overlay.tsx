@@ -41,7 +41,6 @@ export const PickingOverlay: LC = () => {
   const BINDINGS = bundleToAttributes(colorizeShader);
   const boundShader = useBoundShader(colorizeShader, BINDINGS, [size, pickingSource]);
   const textureSource = useLambdaSource(boundShader, pickingSource);
-  console.log({pickingSource})
 
   const scale = 0.5;
 

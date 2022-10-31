@@ -88,3 +88,14 @@ export const uploadBuffer = (
   // @ts-ignore
   device.queue.writeBuffer(buffer, 0, data, 0, data.byteLength);
 }
+
+export const uploadBufferRange = (
+  device: GPUDevice,
+  buffer: GPUBuffer,
+  data: ArrayBuffer,
+  from: number,
+  length: number,
+): void => {
+  // @ts-ignore
+  device.queue.writeBuffer(buffer, from, data, from, length);
+}

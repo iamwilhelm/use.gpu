@@ -26,7 +26,12 @@ export const getMVTShapes = (
 
   const {layers} = mvt;
 
-  const shapes: any[] = [];
+  const shapes = {
+    point: [],
+    line: [],
+    face: [],
+    label: [],
+  };
   
   const addPoint = (
     geometry: Vec2[],
@@ -38,16 +43,14 @@ export const getMVTShapes = (
     const count = positions.length / 4;
     if (style.point) {
       if (properties.name) {
-        shapes.push({
-          type: 'label',
+        shapes.label.push({
           position: positions,
           text: properties.name,
           color: style.point.color,
         });
       }
       else {
-        shapes.push({
-          type: 'point',
+        shapes.point.push({
           count,
           positions,
           color: style.point.color,
@@ -67,16 +70,14 @@ export const getMVTShapes = (
     const count = geometry.reduce((a, b) => a + b.length, 0);
 
     if (properties.name) {
-      shapes.push({
-        type: 'label',
+      shapes.label.push({
         positions,
         text: properties.name,
         color: style.line.color,
       });
     }
     else {
-      shapes.push({
-        type: 'line',
+      shapes.line.push({
         count,
         positions,
         segments: geometry.flatMap((path) => path.map((_, i) => i === 0 ? 1 : i === path.length - 1 ? 2 : 3)),
@@ -108,8 +109,7 @@ export const getMVTShapes = (
         const triangles = earcut(data.vertices, data.holes, data.dimensions);
         if (!triangles.length) continue;
 
-        shapes.push({
-          type: 'face',
+        shapes.face.push({
           count: data.vertices.length / 4,
           positions: data.vertices,
           indices: triangles,
@@ -127,8 +127,7 @@ export const getMVTShapes = (
 
       for (const polygon of originalGeometry) {
         const polygon4 = polygon.flatMap((ring: XY[]) => ring.flatMap((p: XY, i: number) => toPoint4(p)));
-        shapes.push({
-          type: 'line',
+        shapes.line.push({
           count: polygon4.length / 4,
           positions: polygon4,
           segments: polygon.flatMap((path: XY[]) => path.map((p: XY, i: number) => {

@@ -20,7 +20,7 @@ export const PickingContext = makeContext<PickingContextProps>(undefined, 'Picki
 export const usePickingContext = () => useContext<PickingContextProps>(PickingContext);
 export const useNoPickingContext = () => useNoContext(PickingContext);
 
-type PickingSource = {
+export type PickingSource = {
   id?: number,
   lookup?: number,
   ids?: ShaderSource,
@@ -28,4 +28,4 @@ type PickingSource = {
 }
 
 export const usePickingShader = ({id, ids, lookup, lookups}: PickingSource) => 
-  id ?? ids ? useBoundShader(getPickingID, PICKING_BINDINGS, [id ?? ids, lookups]) : useNoBoundShader();
+  id ?? ids ? useBoundShader(getPickingID, PICKING_BINDINGS, [id ?? ids, lookup ?? lookups]) : useNoBoundShader();

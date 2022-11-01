@@ -58,14 +58,12 @@ const VERTEX_BINDINGS = bundleToAttributes(getUIRectangleVertex);
 const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
 
 const DEFINES_ALPHA = {
-  HAS_SCISSOR: false,
   HAS_EDGE_BLEED: true,
   HAS_ALPHA_TO_COVERAGE: false,
   DEBUG_SDF: false,
 };
 
 const DEFINES_ALPHA_TO_COVERAGE = {
-  HAS_SCISSOR: false,
   HAS_EDGE_BLEED: true,
   HAS_ALPHA_TO_COVERAGE: true,
   DEBUG_SDF: false,

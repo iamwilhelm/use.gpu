@@ -5,6 +5,7 @@
 - `@use-gpu/workbench`: Add `unwelded` indexing mode to `<CompositeData>` and more unwelded options to `<FaceLayer>`
 - `@use-gpu/workbench`: Add `stroke` to `<PointLayer>` to allow for thin outlined shapes
 - `@use-gpu/workbench`: Refactor `<Pass>`/`<Virtual>` to allow for swappable render passes
+- `@use-gpu/workbench`: Add shared global bindings to `<DrawCall>` and `<Pass>` from `<ViewProvider>`
 - `@use-gpu/workbench`: Add basic `<Scene>`/`<Node>`/`<Primitive>` components for a classic matrix tree
 - `@use-gpu/workbench`: Add `<Instances>`/`<InstanceData>` components for instanced mesh rendering
 - `@use-gpu/workbench`: Add `<InterleavedData>` to read e.g. packed vertex attributes

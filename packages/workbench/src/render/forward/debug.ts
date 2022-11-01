@@ -66,6 +66,13 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     return [v, f, vertexCount, instanceCount, wireframeCommand, wireframeIndirect];
   }, [vertexShader, fragmentShader, gV]);
 
+  if (defines.HAS_SCISSOR == null) {
+    defines = {
+      ...defines,
+      HAS_SCISSOR: false,
+    }
+  }
+
   // Inline the render fiber to avoid another memo()
   const call = {
     vertexCount,

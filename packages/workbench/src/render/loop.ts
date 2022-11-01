@@ -24,7 +24,7 @@ export type LoopRef = {
     request?: (fiber?: LiveFiber<any>) => void,
   },
   children?: LiveElement,
-  dispatch?: () => void,
+  run?: () => void,
 };
 
 /** Provides `useAnimationFrame` and clock to allow for controlled looping and animation. */
@@ -66,8 +66,8 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
       for (const fiber of fibers) fiber.host?.schedule(fiber, NOP);
       fibers.length = 0;
 
-      const {dispatch} = ref;
-      if (dispatch) dispatch();
+      const {run} = ref;
+      if (run) run();
       if (running) request();
     };
 
@@ -83,7 +83,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
   request!();
 
-  const Dispatch = useCallback(tagFunction(() => {
+  const Run = useCallback(tagFunction(() => {
     const {time, loop, children} = ref;
 
     usePerFrame();
@@ -97,7 +97,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
         provide(TimeContext, t, view)
       )
     );
-  }, 'Dispatch'));
+  }, 'Run'));
 
-  return detach(use(Dispatch), (render: Task) => ref.dispatch = render);
+  return detach(use(Run), (render: Task) => ref.run = render);
 }

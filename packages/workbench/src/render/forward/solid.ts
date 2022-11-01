@@ -51,7 +51,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     const links = {
       getVertex,
       getFragment,
-      getScissor: defines.HAS_SCISSOR ? getScissorColor : null,
+      getScissor: defines?.HAS_SCISSOR ? getScissorColor : null,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);

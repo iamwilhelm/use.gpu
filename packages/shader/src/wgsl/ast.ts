@@ -442,6 +442,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       else if (constant?.identifiers) constant.identifiers = constant.identifiers.filter(s => scope.has(s));
     }
 
+    const linkable = {} as Record<string, true>;
+    for (const {symbol} of externals) linkable[symbol] = true;
+
     return {
       symbols: orNone(symbols),
       visibles: orNone(visibles),
@@ -451,6 +454,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       exports: orNone(exported),
 
       declarations: orNone(declarations),
+      linkable: externals.length ? linkable : undefined,
     };
   }
 

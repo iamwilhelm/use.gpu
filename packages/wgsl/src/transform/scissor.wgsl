@@ -3,6 +3,7 @@
 @optional @link fn getScissorLoop() -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
 
 @export fn getScissorLevel(position: vec4<f32>) -> vec4<f32> {
+
   var smin = getScissorMin();
   var smax = getScissorMax();
   let sloop = getScissorLoop();

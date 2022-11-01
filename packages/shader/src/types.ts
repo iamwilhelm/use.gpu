@@ -10,6 +10,7 @@ export type ASTParser<T extends SymbolTableT = any> = {
 
 export type SymbolTableT = {
   symbols?: string[],
+  linkable?: Record<string, true>,
 };
 
 export type TypeLike = {
@@ -127,6 +128,7 @@ export type TextureSource = {
   mips?: number,
   variant?: string,
   absolute?: boolean,
+  comparison?: boolean,
   volatile?: number,
   colorSpace?: ColorSpace,
 };

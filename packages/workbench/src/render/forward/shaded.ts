@@ -16,6 +16,8 @@ import { useViewContext } from '../../providers/view-provider';
 import instanceDrawVirtualShaded from '@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl';
 import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
 
+import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
+
 export type ShadedRenderProps = VirtualDraw;
 
 export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRenderProps) => {
@@ -26,7 +28,6 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
 
     links: {
       getVertex,
-      getScissor,
       getSurface,
       getLight,
     },
@@ -41,7 +42,8 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
   const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
 
-  const {bind: globalBinding} = useViewContext();
+  const {layout: globalLayout} = useViewContext();
+
   const vertexShader = instanceDrawVirtualShaded;
   const fragmentShader = instanceFragmentShaded;
 
@@ -51,7 +53,7 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
       getVertex,
       getSurface,
       getLight,
-      getScissor,
+      getScissor: defines.HAS_SCISSOR ? getScissorColor : null,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);
@@ -69,7 +71,7 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     defines,
     pipeline,
     renderContext,
-    globalBinding,
+    globalLayout,
     mode,
   };
 

@@ -366,7 +366,7 @@ export const useNoResource = () => {
 }
 
 /**
- * Grab a context from the fiber (optional mode)
+ * Grab a context from the fiber
  */
 export const useContext = <C>(
   context: LiveContext<C>,
@@ -478,6 +478,35 @@ export const useNoCapture = <C>(
 
   state![i + 1] = undefined;
 }
+
+/**
+ * Detect context on a fiber without depending on it
+ */
+export const useHasContext = <C>(
+  context: LiveContext<C>,
+): C => {
+  const fiber = useFiber();
+
+  const {context: {roots}} = fiber;
+  const root = roots.get(context);
+  return !!root;
+}
+
+/**
+ * Detect context on a fiber without depending on it
+ */
+export const useHasCapture = <C>(
+  capture: LiveCapture<C>,
+): C => {
+  const fiber = useFiber();
+
+  const {context: {roots}} = fiber;
+  const root = roots.get(capture);
+  return !!root;
+}
+
+export const useNoHasContext = () => {};
+export const useNoHasCapture = () => {};
 
 // Togglable hooks
 export const useNoState = useNoHook(Hook.STATE);

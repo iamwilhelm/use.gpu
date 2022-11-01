@@ -2,6 +2,7 @@ export * from './aggregate';
 export * from './atlas';
 export * from './attribute';
 export * from './binding';
+export * from './bindgroup';
 export * from './buffer';
 export * from './bytes';
 export * from './color';

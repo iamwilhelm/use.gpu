@@ -12,9 +12,12 @@ import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
 import { getObjectKey, toMurmur53 } from '@use-gpu/state';
+import { makeBindGroupLayout } from './bindgroup';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 import { alignSizeTo } from './data';
+
+const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
 
 export const resolve = <T>(x: Lazy<T>): T => {
   if (typeof x === 'function') return (x as any)();
@@ -33,6 +36,9 @@ export const makeSharedUniforms = (
   device: GPUDevice,
   uniformGroups: UniformAttribute[][],
 ): SharedAllocation => {
+  const group = uniformGroups.map((_, binding) => ({binding, visibility: VISIBILITY_ALL, buffer: {}}));
+  const layout = makeBindGroupLayout(device, group);
+
   const pipe = makeMultiUniformPipe(uniformGroups);
   const buffer = makeUniformBuffer(device, pipe.data);
 
@@ -42,19 +48,13 @@ export const makeSharedUniforms = (
   const label = uniformGroups.flatMap(uniforms => uniforms.map(u => u.name)).join(' ');
   const entries = makeResourceEntries(bindings);
 
-  const bind = (
-    pipeline: GPURenderPipeline | GPUComputePipeline,
-    set: number = 0,
-  ): VirtualAllocation => {
-    const bindGroup = device.createBindGroup({
-      label,
-      layout: pipeline.getBindGroupLayout(set),
-      entries,
-    });
-    return {bindGroup};
-  }
+  const bindGroup = device.createBindGroup({
+    label,
+    layout,
+    entries,
+  });
 
-  return {pipe, buffer, bind};
+  return {pipe, buffer, layout, bindGroup};
 }
 
 export const makeUniforms = (

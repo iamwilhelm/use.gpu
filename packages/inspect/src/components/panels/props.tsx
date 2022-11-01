@@ -206,7 +206,7 @@ export const inspectObject = (
           <TreeRow>
             <SplitRow>
               <Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
-              <div>{proto}</div>
+              <div>{proto ?? ''}</div>
             </SplitRow>
           </TreeRow>
           <div>{full}</div>

@@ -42,6 +42,7 @@ export type SymbolTable = {
   symbols?: string[],
   visibles?: string[],
   globals?: string[],
+  linkable?: Record<string, true>,
 };
 
 export type ModuleRef = {

@@ -21,7 +21,6 @@ import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
-import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
 export type RawFacesProps = {
   position?: number[] | TypedArray,
@@ -164,23 +163,20 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, j, k, l]);
   const getPicking = usePickingShader(props);
-  const getScissor = scissor ? getScissorColor : null;
 
   const links = useMemo(() => {
     return shaded
     ? {
       getVertex,
-      getScissor,
       getPicking,
       ...material,
     } : {
       getVertex,
-      getScissor,
       getPicking,
       getFragment: getPassThruColor,
       ...material,
     }
-  }, [getVertex, getPicking, getScissor, material]);
+  }, [getVertex, getPicking, material]);
 
   return (
     use(Virtual, {

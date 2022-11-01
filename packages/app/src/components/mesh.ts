@@ -64,7 +64,7 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const blinkState = !!((blink || 0) % 2);
 
   const device = useDeviceContext();
-  const {uniforms: viewUniforms, defs: viewDefs} = useViewContext();
+  const {bind: unbind, uniforms: viewUniforms, defs: viewDefs} = useViewContext();
 
   // Debug / Picking mode
   const isDebug = mode === 'debug';
@@ -160,6 +160,9 @@ export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
       if (sampled) passEncoder.setBindGroup(1, sampled);
       passEncoder.setVertexBuffer(0, vertexBuffers[0]);
       passEncoder.draw(mesh.count, 1, 0, 0);
+
+      // Restore bind group 0
+      unbind(passEncoder);
     }
   }); 
 }, 'Mesh');

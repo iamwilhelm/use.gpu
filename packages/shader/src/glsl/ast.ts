@@ -386,13 +386,19 @@ export const makeASTParser = (code: string, tree: Tree) => {
       ref.identifiers = ref.identifiers.filter(s => scope.has(s));
     }
 
+    const linkable = {} as Record<string, true>;
+    for (const {symbol} of externals) linkable[symbol] = true;
+
     return {
       symbols: orNone(symbols),
       visibles: orNone(visibles),
       globals: orNone(globals),
-      externals: orNone(externals),
       modules: orNone(modules),
+      externals: orNone(externals),
+      exports: orNone(exported),
+
       declarations: orNone(refs),
+      linkable: externals.length ? linkable : undefined,
     };
   }
 

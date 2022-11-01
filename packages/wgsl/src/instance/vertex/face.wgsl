@@ -3,7 +3,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 
 @optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p; };
 @optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
-@optional @link fn scissorPosition(p: vec4<f32>) -> vec4<f32> { return vec4<f32>(1.0); };
+@optional @link fn getScissor(pos: vec4<f32>) -> vec4<f32> { return vec4<f32>(1.0); };
 
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getNormal(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
@@ -84,19 +84,20 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   if (UNWELDED_UVS) { uvIndex = unweldedIndex; }
   if (UNWELDED_LOOKUPS) { lookupIndex = unweldedIndex; }
 
-  var vertex = getPosition(cornerIndex);
-  var normal = getNormal(normalIndex);
-  var tangent = getTangent(tangentIndex);
-  var uv = getUV(uvIndex);
-  var st = getST(uvIndex);
+  let vertex = getPosition(cornerIndex);
+  let normal = getNormal(normalIndex);
+  let tangent = getTangent(tangentIndex);
+  let uv = getUV(uvIndex);
+  let st = getST(uvIndex);
 
-  var color = getColor(cornerIndex);
-  var zBias = getZBias(cornerIndex);
+  let color = getColor(cornerIndex);
+  let zBias = getZBias(cornerIndex);
 
-  var scissor = scissorPosition(vertex);
-  var world = transformPosition(vertex);
-  var worldNormal = transformDifferential(normal, vertex, true);
-  var worldTangent = transformDifferential(tangent, vertex, false);
+  let scissor = getScissor(vertex);
+
+  let world = transformPosition(vertex);
+  let worldNormal = transformDifferential(normal, vertex, true);
+  let worldTangent = transformDifferential(tangent, vertex, false);
 
   var position = worldToClip(world);
 

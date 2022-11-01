@@ -39,7 +39,8 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
   const {renderContext} = usePickingContext();
   const passContext = usePassContext();
 
-  const {bind: globalBinding} = useViewContext();
+  const {layout: globalLayout} = useViewContext();
+
   const vertexShader = instanceDrawVirtualPicking;
   const fragmentShader = instanceFragmentPicking;
 
@@ -50,7 +51,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
       getPicking,
     };
     const v = bindBundle(vertexShader, links, undefined);
-    const f = bindBundle(fragmentShader, links, undefined);
+    const f = fragmentShader;
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getPicking]);
 
@@ -64,7 +65,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     defines,
     pipeline,
     renderContext,
-    globalBinding,
+    globalLayout,
     mode: 'picking',
   };
 

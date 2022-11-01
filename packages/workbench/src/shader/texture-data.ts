@@ -25,6 +25,7 @@ export type TextureDataProps = {
   colorSpace?: ColorSpace,
   samples?: number,
   resolution?: number,
+  filterable?: boolean,
 
   children?: LiveElement,
   render?: (texture: TextureTarget) => LiveElement,
@@ -43,6 +44,7 @@ export const TextureData: LiveComponent<TextureDataProps> = (props) => {
     samples = 1,
     format = PRESENTATION_FORMAT,
     history = 0,
+    filterable = false,
     sampler = NO_SAMPLER,
     colorSpace = COLOR_SPACE,
     children,
@@ -87,8 +89,10 @@ export const TextureData: LiveComponent<TextureDataProps> = (props) => {
     const size = [width, height] as [number, number];
     const volatile = history ? history + 1 : 0;
     const layout = 'texture_2d<f32>';
-    
-    const variant = (format.match(/32float$/)) ? 'UNSUPPORTED' : 'textureSampleLevel';
+
+    const variant = filterable
+      ? (format.match(/32float$/) ? 'UNSUPPORTED' : 'textureSample')
+      : 'textureLoad';
 
     const swap = () => {
       if (!history) return;

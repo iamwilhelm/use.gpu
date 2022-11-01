@@ -90,6 +90,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const l = useShaderRef(null, props.lookups);
   
   const g = useRawSource(mesh.vertices[0], 'vec4<f32>');
+
   const [xf, scissor] = useApplyTransform(p);
 
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);

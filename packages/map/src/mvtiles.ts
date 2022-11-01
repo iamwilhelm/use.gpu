@@ -116,7 +116,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
     }
   }
 
-  return useOne(() => gather(out, (items: any) => use(VirtualLayers, { items })));
+  return useOne(() => use(VirtualLayers, { children: out }));
 };
 
 const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {

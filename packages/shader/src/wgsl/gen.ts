@@ -166,11 +166,11 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute, sampler, format} = texture!;
+      const {volatile, layout, variant, absolute, sampler, comparison, format} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       if (sampler && args !== null) volatile ? volatileBase++ : bindingBase++;
-      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute, !!sampler, args));
+      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute, !!sampler, !!comparison, args));
     }
 
     return program.join('\n');
@@ -276,6 +276,7 @@ export const makeTextureAccessor = (
   variant: string = 'textureSample',
   absolute: boolean = false,
   sampler: boolean = true,
+  comparison: boolean = false,
   args: string[] | null = UV_ARG,
 ) => {
   if (args === null) {
@@ -291,7 +292,7 @@ export const makeTextureAccessor = (
 
   return `
 @group(${set}) @binding(${binding}) var ${ns}${name}Texture: ${layout};
-${sampler ? `@group(${set}) @binding(${binding + 1}) var ${ns}${name}Sampler: sampler;\n` : ''}
+${sampler ? `@group(${set}) @binding(${binding + 1}) var ${ns}${name}Sampler: ${comparison ? 'sampler_comparison' : 'sampler'};\n` : ''}
 fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   ${absolute ?
     `let relUV = ${arg(0)} / ${dimsCast}(textureDimensions(${ns}${name}Texture));\n  ` : ``

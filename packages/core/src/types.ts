@@ -223,21 +223,22 @@ export type UniformAllocation = {
   bindGroup: GPUBindGroup,
 };
 
-export type ResourceAllocation = {
+export type SharedAllocation = {
+  pipe: UniformPipe,
+  buffer: GPUBuffer,
+  layout: GPUBindGroupLayout,
   bindGroup: GPUBindGroup,
 };
 
-export type VirtualAllocation = Partial<UniformAllocation>;
+export type ResourceAllocation = {
+  bindGroup: GPUBindGroup,
+};
 
 export type VolatileAllocation = {
   bindGroup?: () => GPUBindGroup,
 };
 
-export type SharedAllocation = {
-  pipe: UniformPipe,
-  buffer: GPUBuffer,
-  bind: (pipeline: GPUPipeline) => GPUBindGroup,
-};
+export type VirtualAllocation = Partial<UniformAllocation>;
 
 export type UniformFiller = (items: any) => void;
 export type UniformDataSetter = (index: number, item: any) => void;
@@ -280,6 +281,7 @@ export type TextureSource = {
   mips?: number,
   variant?: string,
   absolute?: boolean,
+  comparison?: boolean,
   volatile?: number,
   colorSpace?: ColorSpace,
 };

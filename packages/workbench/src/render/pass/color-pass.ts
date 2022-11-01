@@ -5,11 +5,11 @@ import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-g
 
 import { useRenderContext } from '../../providers/render-provider';
 import { useDeviceContext } from '../../providers/device-provider';
+import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
 export type ColorPassProps = {
-  globalBinding: UniformPipe,
   calls: {
     opaque?: RenderToPass[],
     transparent?: RenderToPass[],
@@ -33,6 +33,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
+  const {bind} = useViewContext();
 
   const opaques      = toArray(calls['opaque']      as RenderToPass[]);
   const transparents = toArray(calls['transparent'] as RenderToPass[]);
@@ -56,6 +57,8 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     };
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+    bind(passEncoder);
+
     for (const f of calls) f(passEncoder, countGeometry);
     passEncoder.end();
   };

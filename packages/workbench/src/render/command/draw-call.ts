@@ -13,6 +13,7 @@ import {
   resolve,
 } from '@use-gpu/core';
 import { useLinkedShader } from '../../hooks/useLinkedShader';
+import { usePipelineLayout, useNoPipelineLayout } from '../../hooks/usePipelineLayout';
 import { useRenderPipelineAsync, setShaderLog, getShaderLog } from '../../hooks/useRenderPipeline';
 import { useInspectable } from '../../hooks/useInspectable'
 
@@ -30,9 +31,12 @@ export type DrawCallProps = {
   vertex: ParsedBundle,
   fragment: ParsedBundle,
   
+  layout?: GPUBindGroupLayout,
+
   globalBinding?: (pipeline: GPUPipeline) => VolatileAllocation,
   globalDefs?: UniformAttribute[],
   globalUniforms?: Record<string, Lazy<any>>,
+
   renderContext: UseGPURenderContext,
 
   defines?: Record<string, any>,
@@ -61,9 +65,12 @@ export const drawCall = (props: DrawCallProps) => {
     vertex: vertexShader,
     fragment: fragmentShader,
 
+    globalLayout,
+
     globalBinding,
     globalDefs,
     globalUniforms,
+
     renderContext,
 
     pipeline: propPipeline,
@@ -92,16 +99,24 @@ export const drawCall = (props: DrawCallProps) => {
     bindings,
     constants,
     volatiles,
+    entries,
   } = useLinkedShader(
     [vertexShader, fragmentShader],
     defines,
   );
 
+  // Pipeline layout with global bind group
+  const layout = globalLayout
+  ? usePipelineLayout(device, entries, globalLayout)
+  : useNoPipelineLayout();
+
   // Rendering pipeline
   const [pipeline, isStale] = useRenderPipelineAsync(
+    device,
     renderContext,
     shader as any,
     propPipeline,
+    layout,
   );
 
   if (!pipeline) return suspense ? SUSPEND : NO_CALL;
@@ -109,6 +124,7 @@ export const drawCall = (props: DrawCallProps) => {
   
   // Uniforms
   const uniform = useMemo(() => {
+    if (globalLayout) return null;
     if (globalBinding) return globalBinding(pipeline);
     return makeMultiUniforms(device, pipeline, globalDefs ?? [VIEW_UNIFORMS], 0);
   }, [device, pipeline, globalBinding, globalDefs]);
@@ -134,8 +150,6 @@ export const drawCall = (props: DrawCallProps) => {
   
   const isStrip = topology === 'triangle-strip';
 
-  if (!uniform) throw new Error();
-
   const isVolatileGlobal = typeof uniform?.bindGroup === 'function';
 
   return {
@@ -153,13 +167,15 @@ export const drawCall = (props: DrawCallProps) => {
 
       passEncoder.setPipeline(pipeline);
 
-      if (globalUniforms) {
-        uniform.pipe.fill(globalUniforms);
-        uploadBuffer(device, uniform.buffer, uniform.pipe.data);
-      }
+      if (uniform) {
+        if (globalUniforms) {
+          uniform.pipe.fill(globalUniforms);
+          uploadBuffer(device, uniform.buffer, uniform.pipe.data);
+        }
 
-      if (isVolatileGlobal) passEncoder.setBindGroup(0, uniform.bindGroup());
-      passEncoder.setBindGroup(0, uniform.bindGroup);
+        if (isVolatileGlobal) passEncoder.setBindGroup(0, uniform.bindGroup());
+        else passEncoder.setBindGroup(0, uniform.bindGroup);
+      }
 
       if (storage.pipe && storage.buffer) {
         storage.pipe.fill(constants);

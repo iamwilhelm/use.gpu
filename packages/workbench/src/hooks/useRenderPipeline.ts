@@ -1,7 +1,7 @@
 import type { UseGPURenderContext, ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core';
 
 import { makeRenderPipeline, makeRenderPipelineAsync } from '@use-gpu/core';
-import { useContext, useMemo, useOne, useState } from '@use-gpu/live';
+import { useMemo, useOne, useState } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';
 import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
@@ -25,11 +25,12 @@ const CACHE = new WeakMap<any, LRU<string, any>>();
 const PENDING = new WeakMap<any, Map<string, any>>();
 
 export const useRenderPipeline = (
+  device: GPUDevice,
   renderContext: UseGPURenderContext,
   shader: RenderShader,
   props: DeepPartial<GPURenderPipelineDescriptor>,
+  layout?: GPUPipelineLayout,
 ) => {
-  const device = useContext(DeviceContext);
   const {colorStates, depthStencilState, samples} = renderContext;
 
   // Memo key for unique render context
@@ -79,6 +80,7 @@ export const useRenderPipeline = (
       depthStencilState,
       samples,
       props,
+      layout,
     );
     cache.set(key, pipeline);
     DEBUG && console.log('render pipeline cache miss', key);
@@ -88,11 +90,12 @@ export const useRenderPipeline = (
 };
 
 export const useRenderPipelineAsync = (
+  device: GPUDevice,
   renderContext: UseGPURenderContext,
   shader: RenderShader,
   props: DeepPartial<GPURenderPipelineDescriptor>,
+  layout?: GPUPipelineLayout,
 ) => {
-  const device = useContext(DeviceContext);
   const {colorStates, depthStencilState, samples} = renderContext;
 
   // Memo key for unique render context
@@ -166,6 +169,7 @@ export const useRenderPipelineAsync = (
       depthStencilState,
       samples,
       props,
+      layout,
     );
     promise.then((pipeline: GPURenderPipeline) => {
       DEBUG && console.log('async render pipeline resolved', key);

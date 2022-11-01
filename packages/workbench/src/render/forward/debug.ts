@@ -40,7 +40,8 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
   const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
 
-  const {bind: globalBinding} = useViewContext();
+  const {layout: globalLayout} = useViewContext();
+
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;
 
@@ -75,7 +76,7 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     defines,
     pipeline,
     renderContext,
-    globalBinding,
+    globalLayout,
     mode: 'debug',
   };
 

@@ -20,4 +20,3 @@
   let m = min(min2.x, min2.y);
   return m < 0.0;
 }
-

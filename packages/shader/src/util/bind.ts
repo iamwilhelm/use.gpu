@@ -71,8 +71,13 @@ export const bindBundle = (
   } : defines ?? bundle.defines ?? undefined;
 
   const revirtuals = bundle.virtuals ? bundle.virtuals.slice() : [];
-  if (links) for (const k in links) if (links[k]) {
+
+  const {module: {table: {linkable}}} = bundle;
+  if (links && linkable) for (const k in links) if (links[k]) {
     const chunk = links[k] as any;
+
+    // Ensure link exists in module
+    if (!linkable[k]) continue;
 
     // Copy bundle's sub-virtuals
     if (chunk.virtuals) revirtuals.push(...chunk.virtuals);
@@ -108,15 +113,18 @@ export const makeResolveBindings = (
   uniforms: DataBinding[],
   bindings: DataBinding[],
   volatiles: DataBinding[],
+  visibilities: Map<DataBinding, GPUShaderStageFlags>,
 } => {
   const allUniforms  = [] as DataBinding[];
   const allBindings  = [] as DataBinding[];
   const allVolatiles = [] as DataBinding[];
 
+  const allVisibilities = new Map<DataBinding, GPUShaderStageFlags>();
+
   const seen = new Set<number>();
   DEBUG && console.log('------------')
 
-  const addBinding = (b: DataBinding, slots: number) => {
+  const addBinding = (b: DataBinding, slots: number, visibility: GPUShaderStageFlags) => {
     const s = (b.storage ?? b.texture) as any;
     if (s && s.volatile) {
       allVolatiles.push(b);
@@ -126,19 +134,42 @@ export const makeResolveBindings = (
       allBindings.push(b);
       bindingBase += slots;
     }
+    addVisibility(b, visibility);
   }
 
+  const addVisibility = (b: DataBinding, visibility: GPUShaderStageFlags) => {
+    allVisibilities.set(b, (allVisibilities.get(b) || 0) | visibility);
+  }
+  
   // Gather all namespaced uniforms and bindings from all virtual modules.
   // Assign base offset to each virtual module in-place.
   let bindingBase = 0;
   let volatileBase = 0;
   let index = 0;
+  let stage = 0;
   for (const {virtuals} of modules) {
+    const visibles = new Set<number>();
+    const visibility = modules.length === 2
+      ? (stage ? GPUShaderStage.FRAGMENT : GPUShaderStage.VERTEX)
+      : GPUShaderStage.COMPUTE;
+
     if (virtuals) for (const m of virtuals) {
       const key = getBundleKey(m);
 
-      if (seen.has(key)) continue;
+      if (seen.has(key)) {
+        if (visibles.has(key)) continue;
+        visibles.add(key);
+
+        if (m.virtual) {
+          const {storages, textures} = m.virtual;
+          if (storages) for (const b of storages) addVisibility(b, visibility);
+          if (textures) for (const b of textures) addVisibility(b, visibility);
+        }        
+
+        continue;
+      }
       seen.add(key);
+      visibles.add(key);
 
       DEBUG && console.log('virtual', m.code, m.hash, m.key);
 
@@ -154,10 +185,11 @@ export const makeResolveBindings = (
         }
 
         if (uniforms) for (const u of uniforms) allUniforms.push(namespaceBinding(namespace, u));
-        if (storages) for (const b of storages) addBinding(b, 1);
-        if (textures) for (const b of textures) addBinding(b, 1 + +!!(b.texture!.sampler && (b.uniform!.args !== null)));
+        if (storages) for (const b of storages) addBinding(b, 1, visibility);
+        if (textures) for (const b of textures) addBinding(b, 1 + +!!(b.texture!.sampler && (b.uniform!.args !== null)), visibility);
       }
     };
+    stage++;
   }
 
   let out = modules;
@@ -196,12 +228,15 @@ export const makeResolveBindings = (
       };
     });
   }
+  
+  DEBUG && console.log('visibility', allVisibilities);
 
   return {
     modules: out,
     uniforms: allUniforms,
     bindings: allBindings,
     volatiles: allVolatiles,
+    visibilities: allVisibilities,
   };
 });
 

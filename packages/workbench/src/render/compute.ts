@@ -49,7 +49,7 @@ export const Compute: LC<ComputePropsProps> = memo((props: PropsWithChildren<Com
 
   const Resume = (calls: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) =>
     useOne(() => [
-      calls.compute ? use(ComputePass, {calls}) : null,
+      calls.compute ? use(ComputePass, {immediate, calls}) : null,
       calls.post || calls.readback ? use(ReadbackPass, {calls}) : null,
     ], calls);
 

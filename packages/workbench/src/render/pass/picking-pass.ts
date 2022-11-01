@@ -5,11 +5,11 @@ import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-g
 
 import { usePickingContext } from '../../providers/picking-provider';
 import { useDeviceContext } from '../../providers/device-provider';
+import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
 export type PickingPassProps = {
-  globalBinding?: UniformPipe,
   swap?: boolean,
   calls: {
     picking?: RenderToPass[],
@@ -33,6 +33,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
 
   const device = useDeviceContext();
   const pickingContext = usePickingContext();
+  const {bind} = useViewContext();
 
   const {renderContext} = pickingContext;
 
@@ -51,6 +52,8 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     };
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+    bind(passEncoder);
+
     for (const f of calls) f(passEncoder, countGeometry);
     passEncoder.end();
   };

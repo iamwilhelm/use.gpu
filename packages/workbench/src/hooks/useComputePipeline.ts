@@ -1,8 +1,7 @@
 import type { ShaderModuleDescriptor } from '@use-gpu/core';
 
 import { makeComputePipeline, makeComputePipelineAsync } from '@use-gpu/core';
-import { useContext, useMemo, useOne, useState } from '@use-gpu/live';
-import { DeviceContext } from '../providers/device-provider';
+import { useMemo, useOne, useState } from '@use-gpu/live';
 import LRU from 'lru-cache';
 
 const DEBUG = false;
@@ -23,9 +22,10 @@ const CACHE = new WeakMap<any, LRU<string, any>>();
 const PENDING = new WeakMap<any, Map<string, any>>();
 
 export const useComputePipeline = (
+  device: GPUDevice,
   shader: ComputeShader,
+  layout?: GPUPipelineLayout,
 ) => {
-  const device = useContext(DeviceContext);
   const memoKey = device;
 
   return useMemo(() => {
@@ -59,6 +59,7 @@ export const useComputePipeline = (
     const pipeline = makeComputePipeline(
       device,
       shader,
+      layout,
     );
     cache.set(key, pipeline);
     DEBUG && console.log('compute pipeline cache miss', key);
@@ -68,10 +69,10 @@ export const useComputePipeline = (
 };
 
 export const useComputePipelineAsync = (
+  device: GPUDevice,
   shader: ComputeShader,
+  layout?: GPUPipelineLayout,
 ) => {
-  const device = useContext(DeviceContext);
-
   const [resolved, setResolved] = useState<GPUComputePipeline | null>(null);
   const staleRef = useOne(() => ({current: null as string | null}));
 
@@ -127,6 +128,7 @@ export const useComputePipelineAsync = (
     const promise = makeComputePipelineAsync(
       device,
       shader,
+      layout,
     );
     promise.then((pipeline: GPUComputePipeline) => {
       DEBUG && console.log('async compute pipeline resolved', key);

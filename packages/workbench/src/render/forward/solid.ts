@@ -16,6 +16,8 @@ import { useViewContext } from '../../providers/view-provider';
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
 import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
 
+import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
+
 export type SolidRenderProps = VirtualDraw;
 
 export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderProps) => {
@@ -27,7 +29,6 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     links: {
       getVertex,
       getFragment,
-      getScissor,
     },
 
     pipeline,
@@ -40,7 +41,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
   const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
 
-  const {bind: globalBinding} = useViewContext();
+  const {layout: globalLayout} = useViewContext();
 
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;
@@ -50,7 +51,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     const links = {
       getVertex,
       getFragment,
-      getScissor,
+      getScissor: defines.HAS_SCISSOR ? getScissorColor : null,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);
@@ -68,7 +69,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     defines,
     pipeline,
     renderContext,
-    globalBinding,
+    globalLayout,
     mode,
   };
 

@@ -28,9 +28,10 @@ export const makeRenderPipeline = (
   depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
   descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
+  layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
-    layout: 'auto',
+    layout: layout ?? 'auto',
     depthStencil: depthStencilState,
     multisample: { count: samples },
     vertex: makeShaderStage(device, vertexShader),
@@ -50,9 +51,10 @@ export const makeRenderPipelineAsync = (
   depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
   descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
+  layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
-    layout: 'auto',
+    layout: layout ?? 'auto',
     depthStencil: depthStencilState,
     multisample: { count: samples },
     vertex: makeShaderStage(device, vertexShader),
@@ -67,10 +69,10 @@ export const makeRenderPipelineAsync = (
 export const makeComputePipeline = (
   device: GPUDevice,
   shader: ShaderModuleDescriptor,
+  layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPUComputePipelineDescriptor = {
-    // @ts-ignore
-    layout: 'auto',
+    layout: layout ?? 'auto',
     compute: makeShaderStage(device, shader),
   };
   return device.createComputePipeline(pipelineDescriptor);
@@ -79,11 +81,21 @@ export const makeComputePipeline = (
 export const makeComputePipelineAsync = (
   device: GPUDevice,
   shader: ShaderModuleDescriptor,
+  layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPUComputePipelineDescriptor = {
-    // @ts-ignore
-    layout: 'auto',
+    layout: layout ?? 'auto',
     compute: makeShaderStage(device, shader),
   };
   return device.createComputePipelineAsync(pipelineDescriptor);
 }
+
+export const makePipelineLayout = (
+  device: GPUDevice,
+  bindGroupLayouts: GPUBindGroupLayout[],
+) => {
+  return device.createPipelineLayout({
+    bindGroupLayouts,
+  });
+}
+

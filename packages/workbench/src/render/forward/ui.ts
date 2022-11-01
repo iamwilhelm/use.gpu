@@ -39,7 +39,8 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
   const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
 
-  const {bind: globalBinding} = useViewContext();
+  const {layout: globalLayout} = useViewContext();
+
   const vertexShader = instanceDrawVirtualUI;
   const fragmentShader = instanceFragmentUI;
 
@@ -65,7 +66,7 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
     defines,
     pipeline,
     renderContext,
-    globalBinding,
+    globalLayout,
     mode,
   };
 

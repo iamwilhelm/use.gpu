@@ -2,8 +2,11 @@ import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } fro
 import type { RenderToPass } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+
 import { useRenderContext } from '../../providers/render-provider';
 import { useDeviceContext } from '../../providers/device-provider';
+import { useViewContext } from '../../providers/view-provider';
+
 import { useInspectable } from '../../hooks/useInspectable'
 
 export type ShadowPassProps = {
@@ -30,6 +33,7 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
+  const {bind} = useViewContext();
 
   const shadows = toArray(calls['shadow'] as RenderToPass[]);
 
@@ -46,6 +50,8 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
     };
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+    bind(passEncoder);
+
     for (const f of calls) f(passEncoder, countGeometry);
     passEncoder.end();
   };

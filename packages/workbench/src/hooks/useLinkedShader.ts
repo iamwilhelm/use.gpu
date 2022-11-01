@@ -4,7 +4,7 @@ import type { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader';
 import { toHash } from '@use-gpu/state';
 import { resolveBindings, linkBundle, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
 import { formatMurmur53, mixBits53, toMurmur53 } from '@use-gpu/state';
-import { makeShaderModuleDescriptor } from '@use-gpu/core';
+import { makeShaderModuleDescriptor, makeBindGroupLayoutEntries, makeUniformLayoutEntry } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
 import { useInspectable } from './useInspectable'
 import LRU from 'lru-cache';
@@ -13,12 +13,8 @@ const NO_LIBS = {} as Record<string, any>;
 
 type RenderShader = [ShaderModuleDescriptor, ShaderModuleDescriptor];
 
-export const makeShaderCache = (options: Record<number, any> = {}) => new LRU<string, any>({
-  max: 100,
-  ...options,
-});
-
-const CACHE = new LRU<string, any>();
+const MODULE_CACHE = new LRU<string, any>();
+const LAYOUT_CACHE = new LRU<number, any>();
 
 export const useLinkedShader = (
   stages: ParsedBundle[],
@@ -41,13 +37,39 @@ export const useLinkedShader = (
   useOne(() => { lazy = false }, structuralKey);
 
   // Resolve bindings across stages if instance key changed
-  const {modules, uniforms, bindings, volatiles} = useOne(() =>
+  const {modules, uniforms, bindings, volatiles, visibilities} = useOne(() =>
     resolveBindings(stages, defines, lazy),
     instanceKey
   );
 
+  // Generate bind group layout
+  const entries = useOne(() => {
+    const cached = LAYOUT_CACHE.get(codeKey);
+    if (cached) return cached;
+
+    const visibility = modules.length === 2
+      ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT
+      : GPUShaderStage.COMPUTE;
+
+    const bindingsEntries  = makeBindGroupLayoutEntries(bindings, visibilities);
+    const volatilesEntries = makeBindGroupLayoutEntries(volatiles, visibilities);
+    const uniformEntry     = makeUniformLayoutEntry(uniforms, visibility, bindingsEntries.length);
+
+    const entries = [];
+    entries.push(uniformEntry ? [...bindingsEntries, uniformEntry] : bindingsEntries);
+    if (volatilesEntries.length) entries.push(volatilesEntries);
+
+    LAYOUT_CACHE.set(codeKey, entries);
+    return entries;
+  }, codeKey);
+
   // Keep static set of uniforms/bindings to avoid recreating descriptors unless necessary
-  const ref = useOne(() => ({ uniforms, bindings, constants: {} as Record<string, any> }));
+  const ref = useOne(() => ({
+    uniforms,
+    bindings,
+    constants: {} as Record<string, any>,
+    entries,
+  }));
 
   // Link final WGSL if code structure changed.
   const shader = useOne(() => {
@@ -59,11 +81,11 @@ export const useLinkedShader = (
       const codeKey = getBundleHash(module);
       const key = `${formatMurmur53(codeKey)}-${suffix}`;
 
-      let result = CACHE.get(key);
+      let result = MODULE_CACHE.get(key);
       if (result == null) {
         const linked = linkBundle(module, NO_LIBS, defines);
         result = makeShaderModuleDescriptor(linked, key);
-        CACHE.set(key, result);
+        MODULE_CACHE.set(key, result);
       }
       out.push(result);
     }
@@ -77,9 +99,10 @@ export const useLinkedShader = (
       volatiles,
     });
 
-    // Replace uniforms/bindings as structure changed
+    // Replace uniforms/bindings/entries as structure changed
     ref.uniforms = uniforms;
     ref.bindings = bindings;
+    ref.entries  = entries;
 
     return out;
   }, structuralKey);

@@ -4,14 +4,14 @@ import React, { memo } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat, Animate,
-  InterleavedData, PBRMaterial, RawTexture,
+  InterleavedData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
   Scene, Node, Primitive,
   Lights, PointLight,
 } from '@use-gpu/workbench';
 
-import { meshVertexArray, makeTexture } from '../../meshes/cube';
+import { meshVertexArray } from '../../meshes/cube';
 
 const MESH_FIELDS = [
   ['vec4<f32>', 'position'],
@@ -51,16 +51,14 @@ const Mesh = memo(({mesh, texture}) => {
 
 // This uses a typical scene-graph arrangement to transform the mesh
 export const MeshScenePage: LC = (props) => {
-  const dataTexture = makeTexture();
-
   const view = (
     <InterleavedData
       fields={MESH_FIELDS}
       data={meshVertexArray}
       render={(positions, normals, colors, uvs) => (
 
-        <RawTexture
-          data={dataTexture}
+        <ImageTexture
+          url="/textures/test.png"
           render={(texture) => (
 
             <Loop>

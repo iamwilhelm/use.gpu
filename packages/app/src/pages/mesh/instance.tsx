@@ -4,7 +4,7 @@ import React, { Gather, memo } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat, Animate,
-  InterleavedData, PBRMaterial, RawTexture,
+  InterleavedData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
   Scene, Node, Instances,
@@ -59,9 +59,9 @@ export const MeshInstancePage: LC = (props) => {
           fields={MESH_FIELDS}
           data={meshVertexArray}
         />,
-        <RawTexture
-          data={dataTexture}
-        />,
+        <ImageTexture
+          url="/textures/test.png"
+        />
       ]}
       then={([
         positions, normals, colors, uvs,

@@ -44,6 +44,8 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
   );
 
   return gather(fetch, ([bitmap]: ImageBitmap[]) => {
+    if (!bitmap) return null;
+
     const source = useOne(() => {
       const size = [bitmap.width, bitmap.height] as Point;
       const format = 'rgba8unorm';

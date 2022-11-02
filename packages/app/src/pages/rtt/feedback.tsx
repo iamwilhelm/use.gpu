@@ -14,8 +14,8 @@ export const RTTFeedbackPage: LC = () => {
   return (
     <Loop>
       <LinearRGB history={1} sampler={{minFilter: 'linear', magFilter: 'linear'}}>
-        <Pass>
-          <OrbitCamera scale={1080}>
+        <OrbitCamera scale={1080}>
+          <Pass>
             <Feedback shader={
               wgsl`
                 @link fn getFeedback(uv: vec2<f32>) -> vec4<f32> {}
@@ -60,8 +60,8 @@ export const RTTFeedbackPage: LC = () => {
               )}
             />
 
-          </OrbitCamera>
-        </Pass>
+          </Pass>
+        </OrbitCamera>
       </LinearRGB>
     </Loop>
   );

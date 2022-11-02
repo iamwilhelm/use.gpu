@@ -10,6 +10,7 @@ export * from './constants';
 export * from './data';
 export * from './depth';
 export * from './id';
+export * from './lazy';
 export * from './mip';
 export * from './pipeline';
 export * from './storage';

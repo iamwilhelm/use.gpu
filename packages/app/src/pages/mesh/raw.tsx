@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import React from '@use-gpu/live';
 
@@ -16,37 +16,40 @@ export const MeshRawPage: LC = (props) => {
   const mesh = makeMesh();
   const texture = makeTexture();
 
-  const view = (
+  return (
     <Draw>
       <Cursor cursor='move' />
-      <Pass>
-        <Pick
-          render={({id, hovered, presses}) => [
-            // <RawMesh> is a fully hand-coded component, intended as an anti-example
-            // of how to integrate fully custom rendering code with classic vertex attributes.
-            <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
-            <RawMesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
-            hovered ? <Cursor cursor='pointer' /> : null,
-          ]}
-        />
-      </Pass>
+      <Camera>
+        <Pass>
+          <Pick
+            render={({id, hovered, presses}) => [
+              // <RawMesh> is a fully hand-coded component, intended as an anti-example
+              // of how to integrate fully custom rendering code with classic vertex attributes.
+              <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
+              <RawMesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
+              hovered ? <Cursor cursor='pointer' /> : null,
+            ]}
+          />
+        </Pass>
+      </Camera>
     </Draw>
   );
-
-  return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
-  );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={5}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        target={target}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

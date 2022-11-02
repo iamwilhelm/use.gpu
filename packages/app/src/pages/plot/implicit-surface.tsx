@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Emit, StorageSource, Time } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
@@ -80,7 +80,7 @@ export const PlotImplicitSurfacePage: LC = () => {
   const root = document.querySelector('#use-gpu .canvas');
   const keyframes = [[0, 0], [23, 1.0]] as Keyframe<number>[];
 
-  const view = (
+  return (
     <SurfaceControls
       container={root}
       hasInspect
@@ -88,129 +88,132 @@ export const PlotImplicitSurfacePage: LC = () => {
         <Loop>
           <LinearRGB>
             <Cursor cursor="move" />
-            <Pass>
-              <Plot>
-                <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
-                  <Polar
-                    bend={0}
-                    range={[[-π, π], [1, 5], [-π, π]]}
-                    scale={[π/2, 1, π/2]}
-                  >
-                    <Grid
-                      axes='xy'
-                      width={2}
-                      first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                      second={{ detail: 32, divide: 5, end: true }}
-                      depth={0.5}
-                      zBias={-1}
-                    />
-                    <Grid
-                      axes='xz'
-                      width={2}
-                      first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                      second={{ unit: π, base: 2, detail: 32, divide: 5, end: true }}
-                      depth={0.5}
-                      zBias={-1}
-                    />
+            <Camera>
+              <Pass>
+                <Plot>
+                  <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
+                    <Polar
+                      bend={0}
+                      range={[[-π, π], [1, 5], [-π, π]]}
+                      scale={[π/2, 1, π/2]}
+                    >
+                      <Grid
+                        axes='xy'
+                        width={2}
+                        first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                        second={{ detail: 32, divide: 5, end: true }}
+                        depth={0.5}
+                        zBias={-1}
+                      />
+                      <Grid
+                        axes='xz'
+                        width={2}
+                        first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                        second={{ unit: π, base: 2, detail: 32, divide: 5, end: true }}
+                        depth={0.5}
+                        zBias={-1}
+                      />
 
-                    <Axis
-                      axis='x'
-                      detail={32}
-                      width={5}
-                      color={[0.75, 0.75, 0.75, 1]}
-                      depth={0.5}
-                    />
-                    <Axis
-                      axis='y'
-                      width={5}
-                      color={[0.75, 0.75, 0.75, 1]}
-                      detail={8}
-                      depth={0.5}
-                    />
-                    <Axis
-                      axis='z'
-                      width={5}
-                      color={[0.75, 0.75, 0.75, 1]}
-                      detail={8}
-                      depth={0.5}
-                    />
-                    <Sampled
-                      axes='xyz'
-                      format='vec3<f32>'
-                      size={[36, 24, 36]}
-                      padding={1}
-                      expr={EXPR_POSITION}
-                      time
-                      live
-                      render={(positions: StorageSource) => (
-                        <Sampled
-                          axes='xyz'
-                          format='vec3<f32>'
-                          size={[36, 24, 36]}
-                          padding={1}
-                          expr={EXPR_NORMAL}
-                          time
-                          live
-                          render={(normals: StorageSource) =>
-                            <Sampled
-                              axes='xyz'
-                              format='f32'
-                              size={[36, 24, 36]}
-                              padding={1}
-                              expr={EXPR_VALUE}
-                              time
-                              live
-                              render={(values: StorageSource) => [
-                                <ImplicitSurface
-                                  normals={normals}
-                                  level={level}
-                                  method="linear"
-                                  padding={1}
-                                  color={[0.8, 0.8, 1.0, 1.0]}
-                                />,
-                                inspect ? (
-                                  <DataShader
-                                    shader={colorizeShader}
-                                    source={values}
-                                    render={(colorizedValues: ShaderModule) => (
-                                      <PointLayer
-                                        positions={positions}
-                                        colors={mode === 'normal' ? normals : colorizedValues}
-                                        size={3}
-                                        depth={1}
-                                      />
-                                    )}
-                                  />
-                                ) : null,
-                              ]}
-                            />
-                          }
-                        />
-                      )}
-                    />
-                  </Polar>
-                </Animate>
-              </Plot>
-            </Pass>
+                      <Axis
+                        axis='x'
+                        detail={32}
+                        width={5}
+                        color={[0.75, 0.75, 0.75, 1]}
+                        depth={0.5}
+                      />
+                      <Axis
+                        axis='y'
+                        width={5}
+                        color={[0.75, 0.75, 0.75, 1]}
+                        detail={8}
+                        depth={0.5}
+                      />
+                      <Axis
+                        axis='z'
+                        width={5}
+                        color={[0.75, 0.75, 0.75, 1]}
+                        detail={8}
+                        depth={0.5}
+                      />
+                      <Sampled
+                        axes='xyz'
+                        format='vec3<f32>'
+                        size={[36, 24, 36]}
+                        padding={1}
+                        expr={EXPR_POSITION}
+                        time
+                        live
+                        render={(positions: StorageSource) => (
+                          <Sampled
+                            axes='xyz'
+                            format='vec3<f32>'
+                            size={[36, 24, 36]}
+                            padding={1}
+                            expr={EXPR_NORMAL}
+                            time
+                            live
+                            render={(normals: StorageSource) =>
+                              <Sampled
+                                axes='xyz'
+                                format='f32'
+                                size={[36, 24, 36]}
+                                padding={1}
+                                expr={EXPR_VALUE}
+                                time
+                                live
+                                render={(values: StorageSource) => [
+                                  <ImplicitSurface
+                                    normals={normals}
+                                    level={level}
+                                    method="linear"
+                                    padding={1}
+                                    color={[0.8, 0.8, 1.0, 1.0]}
+                                  />,
+                                  inspect ? (
+                                    <DataShader
+                                      shader={colorizeShader}
+                                      source={values}
+                                      render={(colorizedValues: ShaderModule) => (
+                                        <PointLayer
+                                          positions={positions}
+                                          colors={mode === 'normal' ? normals : colorizedValues}
+                                          size={3}
+                                          depth={1}
+                                        />
+                                      )}
+                                    />
+                                  ) : null,
+                                ]}
+                              />
+                            }
+                          />
+                        )}
+                      />
+                    </Polar>
+                  </Animate>
+                </Plot>
+              </Pass>
+            </Camera>
           </LinearRGB>
         </Loop>
     } />
   );
-
-  return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
-  );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={5}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        target={target}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

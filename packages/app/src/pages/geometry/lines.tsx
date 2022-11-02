@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataField } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
@@ -68,80 +68,81 @@ let arrowData = seq(9).map((i) => ({
 
 export const GeometryLinesPage: LC = () => {
 
-  const view = (
+  return (
     <Draw>
-      <Pass>
-        <CompositeData
-          fields={dataFields}
-          data={lineData}
-          loop={isLoop}
-          on={<LineSegments />}
-          render={(positions, colors, widths, segments) =>
-            <LineLayer
-              positions={positions}
-              colors={colors}
-              widths={widths}
-              segments={segments}
-              depth={0.5}
-            />
-          }
-        />
+      <Camera>
+        <Pass>
+          <CompositeData
+            fields={dataFields}
+            data={lineData}
+            loop={isLoop}
+            on={<LineSegments />}
+            render={(positions, colors, widths, segments) =>
+              <LineLayer
+                positions={positions}
+                colors={colors}
+                widths={widths}
+                segments={segments}
+                depth={0.5}
+              />
+            }
+          />
 
-        <CompositeData
-          fields={dataFields}
-          data={zigzagData}
-          on={<LineSegments />}
-          render={(positions, colors, widths, segments) =>
-            <LineLayer
-              positions={positions}
-              colors={colors}
-              widths={widths}
-              segments={segments}
-              depth={0.5}
-              join='round'
-            />
-          }
-        />
+          <CompositeData
+            fields={dataFields}
+            data={zigzagData}
+            on={<LineSegments />}
+            render={(positions, colors, widths, segments) =>
+              <LineLayer
+                positions={positions}
+                colors={colors}
+                widths={widths}
+                segments={segments}
+                depth={0.5}
+                join='round'
+              />
+            }
+          />
 
-        <CompositeData
-          fields={dataFields}
-          data={arrowData}
-          loop={isLoop}
-          start={isStart}
-          end={isEnd}
-          on={<ArrowSegments />}
-          render={(positions, colors, widths, segments, anchors, trims) =>
-            <ArrowLayer
-              positions={positions}
-              colors={colors}
-              widths={widths}
-              segments={segments}
-              anchors={anchors}
-              trims={trims}
-              depth={0.5}
-            />
-          }
-        />
-      </Pass>
+          <CompositeData
+            fields={dataFields}
+            data={arrowData}
+            loop={isLoop}
+            start={isStart}
+            end={isEnd}
+            on={<ArrowSegments />}
+            render={(positions, colors, widths, segments, anchors, trims) =>
+              <ArrowLayer
+                positions={positions}
+                colors={colors}
+                widths={widths}
+                segments={segments}
+                anchors={anchors}
+                trims={trims}
+                depth={0.5}
+              />
+            }
+          />
+        </Pass>
+      </Camera>
     </Draw>
   );
-
-  return [
-    <OrbitControls
-      radius={3}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-          scale={2160}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />,
-    <Cursor cursor='move' />
-  ];
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={3}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        scale={2160}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

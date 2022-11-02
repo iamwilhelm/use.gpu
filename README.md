@@ -55,12 +55,13 @@ This repo is split into the following sub-packages:
 
 #### **Components**
 
-- [`@use-gpu/gltf`](packages/gltf/README.md) - GLTF loader and scene graph ⏱
+- [`@use-gpu/gltf`](packages/gltf/README.md) - GLTF loader and bindings ⏱
 - [`@use-gpu/inspect`](packages/inspect/README.md) - Development inspector ✅
 - [`@use-gpu/layout`](packages/layout/README.md) - HTML-like layout ✅
 - [`@use-gpu/plot`](packages/plot/README.md) - 2D/3D plotting (axes, grids, curves, labels, transforms, …) ⏱
 - [`@use-gpu/map`](packages/map/README.md) - Maps with 2D vector tiles ⏱
 - [`@use-gpu/react`](packages/react/README.md) - Live ↔︎ React interface ✅
+- [`@use-gpu/scene`](packages/scene/README.md) - Classic scene tree with instancing ✅
 - [`@use-gpu/webgpu`](packages/webgpu/README.md) - WebGPU canvas ✅
 - [`@use-gpu/workbench`](packages/workbench/README.md) ⏱
   - `/animate` - Keyframe animation

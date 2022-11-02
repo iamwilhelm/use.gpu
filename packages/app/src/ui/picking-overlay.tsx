@@ -45,24 +45,22 @@ export const PickingOverlay: LC = () => {
   const scale = 0.5;
 
   return (
-    <Flat>
-      <UI>
-        <Layout>
-          <Absolute
-            right={0}
-          >
-            <Block fill={[0, 0, 0, .5]} contain>
-              <Block
-                width={textureSource.size[0] * scale / window.devicePixelRatio}
-                height={textureSource.size[1] * scale / window.devicePixelRatio}
-                image={{texture: textureSource}}
-                fill={[0, 0, 0, 1]}
-              />
-              <Inline align="center" margin={[0, 5]}><Text color={[1, 1, 1, 1]} size={24}>GPU Picking Buffer</Text></Inline>
-            </Block>
-          </Absolute>
-        </Layout>
-      </UI>
-    </Flat>
+    <UI>
+      <Layout>
+        <Absolute
+          right={0}
+        >
+          <Block fill={[0, 0, 0, .5]} contain>
+            <Block
+              width={textureSource.size[0] * scale / window.devicePixelRatio}
+              height={textureSource.size[1] * scale / window.devicePixelRatio}
+              image={{texture: textureSource}}
+              fill={[0, 0, 0, 1]}
+            />
+            <Inline align="center" margin={[0, 5]}><Text color={[1, 1, 1, 1]} size={24}>GPU Picking Buffer</Text></Inline>
+          </Block>
+        </Absolute>
+      </Layout>
+    </UI>
   );
 }

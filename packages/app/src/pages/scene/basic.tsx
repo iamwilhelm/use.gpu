@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 
@@ -48,7 +48,7 @@ const PickableMesh = memo(({id, mesh, texture}) => {
 export const SceneBasicPage: LC = (props) => {
   const geometry = useOne(() => makeBoxGeometry());
 
-  const view = (
+  return (
     <Gather
       children={[
         <GeometryData geometry={geometry} />,
@@ -61,48 +61,51 @@ export const SceneBasicPage: LC = (props) => {
         <Loop>
           <Draw>
             <Cursor cursor='move' />
-            <Pass>
-              <Lights>
-                <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
+            <Camera>
+              <Pass>
+                <Lights>
+                  <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
 
-                <Scene>
+                  <Scene>
 
-                  <Animate prop="position" keyframes={KEYFRAMES} loop>
-                    <Node rotation={[30, - 30, -30]}>
-                      <PickableMesh mesh={mesh} texture={texture} />
-                    </Node>
-                  </Animate>
+                    <Animate prop="position" keyframes={KEYFRAMES} loop>
+                      <Node rotation={[30, - 30, -30]}>
+                        <PickableMesh mesh={mesh} texture={texture} />
+                      </Node>
+                    </Animate>
 
-                  <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
-                    <Node rotation={[30, - 30, -30]}>
-                      <PickableMesh mesh={mesh} texture={texture} />
-                    </Node>
-                  </Animate>
+                    <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
+                      <Node rotation={[30, - 30, -30]}>
+                        <PickableMesh mesh={mesh} texture={texture} />
+                      </Node>
+                    </Animate>
 
-                </Scene>
+                  </Scene>
 
-              </Lights>
-            </Pass>
+                </Lights>
+              </Pass>
+            </Camera>
           </Draw>
         </Loop>
       )}
     />
   );
-
-  return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
-  );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={5}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        target={target}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

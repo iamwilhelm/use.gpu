@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { use } from '@use-gpu/live';
@@ -42,127 +42,129 @@ export const PlotStereographicPage: LC = () => {
   const view = (normalize: number) => (
     <Loop>
       <Draw>
-        <Pass>
-          <Plot>
-            <Animate
-              loop
-              mirror
-              delay={0}
-              keyframes={frames}
-              prop='bend'
-            >
-              <Stereographic
-                bend={0}
-                normalize={normalize}
-                range={[[-1, 1], [-1, 1], [-1, 1]]}
-                scale={[1, 1, 1]}
+        <Camera>
+          <Pass>
+            <Plot>
+              <Animate
+                loop
+                mirror
+                delay={0}
+                keyframes={frames}
+                prop='bend'
               >
-                <Spherical
-                  rotation={[45, 22.5, 0]}
-                  range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
+                <Stereographic
+                  bend={0}
+                  normalize={normalize}
+                  range={[[-1, 1], [-1, 1], [-1, 1]]}
+                  scale={[1, 1, 1]}
                 >
-
-                  <Grid
-                    axes='xy'
-                    origin={[0, 0, 1]}
-                    width={2}
-                    first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
-                    second={{ detail: 64, divide: 5 }}
-                    depth={0.5}
-                    zBias={-1}
-                  />
-
-                  <Axis
-                    axis='x'
-                    origin={[0, 0, 1]}
-                    width={5}
-                    color={[0.75, 0.75, 0.75, 1]}
-                    depth={0.5}
-                    detail={64}
-                  />
-                  <Scale
-                    origin={[0, 0, 1]}
-                    unit={π}
-                    base={2}
-                    divide={4}
-                    axis='x'
+                  <Spherical
+                    rotation={[45, 22.5, 0]}
+                    range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
                   >
-                    <Tick
-                      size={20}
+
+                    <Grid
+                      axes='xy'
+                      origin={[0, 0, 1]}
+                      width={2}
+                      first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
+                      second={{ detail: 64, divide: 5 }}
+                      depth={0.5}
+                      zBias={-1}
+                    />
+
+                    <Axis
+                      axis='x'
+                      origin={[0, 0, 1]}
                       width={5}
-                      offset={[0, 1, 0]}
                       color={[0.75, 0.75, 0.75, 1]}
                       depth={0.5}
+                      detail={64}
                     />
-                    <Label
-                      placement='bottom'
-                      color='#80808080'
-                      size={24}
-                      offset={16}
-                      expand={5}
-                      depth={0.5}
-                      format={thetaFormatter}
-                    />
-                    <Label
-                      placement='bottom'
-                      color='#ffffff'
-                      size={24}
-                      offset={16}
-                      expand={0}
-                      depth={0.5}
-                      format={thetaFormatter}
-                    />
-                  </Scale>
+                    <Scale
+                      origin={[0, 0, 1]}
+                      unit={π}
+                      base={2}
+                      divide={4}
+                      axis='x'
+                    >
+                      <Tick
+                        size={20}
+                        width={5}
+                        offset={[0, 1, 0]}
+                        color={[0.75, 0.75, 0.75, 1]}
+                        depth={0.5}
+                      />
+                      <Label
+                        placement='bottom'
+                        color='#80808080'
+                        size={24}
+                        offset={16}
+                        expand={5}
+                        depth={0.5}
+                        format={thetaFormatter}
+                      />
+                      <Label
+                        placement='bottom'
+                        color='#ffffff'
+                        size={24}
+                        offset={16}
+                        expand={0}
+                        depth={0.5}
+                        format={thetaFormatter}
+                      />
+                    </Scale>
 
-                  <Axis
-                    axis='y'
-                    origin={[0, 0, 1]}
-                    width={5}
-                    color={[0.75, 0.75, 0.75, 1]}
-                    detail={32}
-                    depth={0.5}
-                  />
-
-                  <Sampled
-                    axes='x'
-                    format='vec3<f32>'
-                    size={[1024]}
-                    expr={(emit, θ) => {
-                      const r = Math.cos(θ * 4 + Math.sin(θ * 3) * .5) * .4 - Math.sin(θ * 5) * .5;
-                      emit(θ, r, 1);
-                    }}
-                  >
-                    <Line
-                      width={4}
-                      color={0x3090FF}
+                    <Axis
+                      axis='y'
+                      origin={[0, 0, 1]}
+                      width={5}
+                      color={[0.75, 0.75, 0.75, 1]}
+                      detail={32}
                       depth={0.5}
-                      zBias={1}
                     />
-                  </Sampled>
-                </Spherical>
+
+                    <Sampled
+                      axes='x'
+                      format='vec3<f32>'
+                      size={[1024]}
+                      expr={(emit, θ) => {
+                        const r = Math.cos(θ * 4 + Math.sin(θ * 3) * .5) * .4 - Math.sin(θ * 5) * .5;
+                        emit(θ, r, 1);
+                      }}
+                    >
+                      <Line
+                        width={4}
+                        color={0x3090FF}
+                        depth={0.5}
+                        zBias={1}
+                      />
+                    </Sampled>
+                  </Spherical>
                 
-                <Spherical
-                  rotation={[45, 22.5, 0]}
-                  scale={[0.25, 0.25, 0.25]}
-                  range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
-                >
+                  <Spherical
+                    rotation={[45, 22.5, 0]}
+                    scale={[0.25, 0.25, 0.25]}
+                    range={[[-π, π], [-τ/4, τ/4], [-1, 1]]}
+                  >
 
-                  <Grid
-                    axes='xy'
-                    origin={[0, 0, 1]}
-                    width={2}
-                    first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
-                    second={{ detail: 64, divide: 5 }}
-                    color={[0.25, 0.25, 0.25, 1]}
-                    depth={0.5}
-                    zBias={-1}
-                  />
+                    <Grid
+                      axes='xy'
+                      origin={[0, 0, 1]}
+                      width={2}
+                      first={{ unit: π, base: 2, detail: 64, divide: 8, end: true }}
+                      second={{ detail: 64, divide: 5 }}
+                      color={[0.25, 0.25, 0.25, 1]}
+                      depth={0.5}
+                      zBias={-1}
+                    />
 
-                </Spherical>
-              </Stereographic>
-            </Animate>
-          </Plot>
-        </Pass>
+                  </Spherical>
+                </Stereographic>
+              </Animate>
+            </Plot>
+          </Pass>
+        </Camera>
       </Draw>
     </Loop>
   );
@@ -174,21 +176,26 @@ export const PlotStereographicPage: LC = () => {
       container={root}
       hasNormalize
       render={({normalize}) => 
-        <OrbitControls
-          radius={5}
-          bearing={0.5}
-          pitch={0.3}
-          render={(radius: number, phi: number, theta: number) =>
-            <OrbitCamera
-              radius={radius}
-              phi={phi}
-              theta={theta}
-            >
-              {view(+normalize)}
-            </OrbitCamera>
-          }
-        />
+        view(+normalize)
       }
     />
   );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={5}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        target={target}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

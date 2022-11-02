@@ -34,7 +34,7 @@ export const useRenderPipeline = (
   const {colorStates, depthStencilState, samples} = renderContext;
 
   // Memo key for unique render context
-  const pipelineKey = toMurmur53([colorStates, depthStencilState, samples, props]);
+  const pipelineKey = toMurmur53([colorStates, depthStencilState, samples, props, !!layout]);
 
   return useMemo(() => {
     // Cache by unique render context
@@ -99,7 +99,7 @@ export const useRenderPipelineAsync = (
   const {colorStates, depthStencilState, samples} = renderContext;
 
   // Memo key for unique render context
-  const pipelineKey = toMurmur53([colorStates, depthStencilState, samples, props]);
+  const pipelineKey = toMurmur53([colorStates, depthStencilState, samples, props, !!layout]);
 
   const [resolved, setResolved] = useState<GPURenderPipeline | null>(null);
   const staleRef = useOne(() => ({current: null as string | null}));

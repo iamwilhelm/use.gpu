@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataField } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
@@ -7,7 +7,7 @@ import { PickingOverlay } from '../../ui/picking-overlay';
 import earcut from 'earcut';
 
 import {
-  Draw, Pass,
+  Draw, Pass, Flat,
   Cursor, Pick, Raw,
   CompositeData, LineSegments, FaceSegments,
   OrbitCamera, OrbitControls,
@@ -98,111 +98,121 @@ export const GeometryFacesPage: LC = () => {
   // Render polygons
   const view = (
     <Draw>
-      <Pass>
+      <Camera>
+        <Pass>
 
-        <CompositeData
-          fields={convexDataFields}
-          data={convexFaceData}
-          on={<FaceSegments />}
-          render={(positions, colors, segments, lookups) =>
-            <Pick
-              onMouseOver={(mouse, index) => console.log('round', {mouse, index})}
-              render={({id, hovered, index}) => [
-                hovered ? <Cursor cursor='default' /> : null,
-                <FaceLayer
-                  id={id}
-                  positions={positions}
-                  segments={segments}
-                  colors={colors}
-                  lookups={lookups}
-                />,
-                hovered ? (
-                  <CompositeData
-                    fields={convexDataFields}
-                    data={convexFaceData.slice(index, index + 1)}
-                    on={<FaceSegments />}
-                    render={(positions, colors, segments) =>
-                      <FaceLayer
-                        positions={positions}
-                        segments={segments}
-                        color={[1, 1, 1, 1]}
-                      />
-                    }
-                  />
-                ) : null
-              ]}
-            />
-          }
-        />
+          <CompositeData
+            fields={convexDataFields}
+            data={convexFaceData}
+            on={<FaceSegments />}
+            render={(positions, colors, segments, lookups) =>
+              <Pick
+                onMouseOver={(mouse, index) => console.log('round', {mouse, index})}
+                render={({id, hovered, index}) => [
+                  hovered ? <Cursor cursor='default' /> : null,
+                  <FaceLayer
+                    id={id}
+                    positions={positions}
+                    segments={segments}
+                    colors={colors}
+                    lookups={lookups}
+                  />,
+                  hovered ? (
+                    <CompositeData
+                      fields={convexDataFields}
+                      data={convexFaceData.slice(index, index + 1)}
+                      on={<FaceSegments />}
+                      render={(positions, colors, segments) =>
+                        <FaceLayer
+                          positions={positions}
+                          segments={segments}
+                          color={[1, 1, 1, 1]}
+                        />
+                      }
+                    />
+                  ) : null
+                ]}
+              />
+            }
+          />
 
-        <CompositeData
-          fields={concaveDataFields}
-          data={concaveFaceData}
-          render={(positions, colors, indices, lookups) =>
-            <Pick
-              onMouseOver={(mouse, index) => console.log('spiky', {mouse, index})}
-              render={({id, hovered, index}) => [
-                hovered ? <Cursor cursor='default' /> : null,
-                <FaceLayer
-                  id={id}
-                  positions={positions}
-                  indices={indices}
-                  colors={colors}
-                  lookups={lookups}
-                />,
-                hovered ? (
-                  <CompositeData
-                    fields={concaveDataFields}
-                    data={concaveFaceData.slice(index, index + 1)}
-                    render={(positions, colors, indices) =>
-                      <FaceLayer
-                        positions={positions}
-                        indices={indices}
-                        color={[1, 1, 1, 1]}
-                      />
-                    }
-                  />
-                ) : null
-              ]}
-            />
-          }
-        />
+          <CompositeData
+            fields={concaveDataFields}
+            data={concaveFaceData}
+            render={(positions, colors, indices, lookups) =>
+              <Pick
+                onMouseOver={(mouse, index) => console.log('spiky', {mouse, index})}
+                render={({id, hovered, index}) => [
+                  hovered ? <Cursor cursor='default' /> : null,
+                  <FaceLayer
+                    id={id}
+                    positions={positions}
+                    indices={indices}
+                    colors={colors}
+                    lookups={lookups}
+                  />,
+                  hovered ? (
+                    <CompositeData
+                      fields={concaveDataFields}
+                      data={concaveFaceData.slice(index, index + 1)}
+                      render={(positions, colors, indices) =>
+                        <FaceLayer
+                          positions={positions}
+                          indices={indices}
+                          color={[1, 1, 1, 1]}
+                        />
+                      }
+                    />
+                  ) : null
+                ]}
+              />
+            }
+          />
 
-        <CompositeData
-          fields={lineDataFields}
-          data={lineData}
-          on={<LineSegments />}
-          render={(positions, segments) =>
-            <LineLayer
-              positions={positions}
-              color={[1, 1, 1, .2]}
-              width={3}
-              segments={segments}
-              depth={0.5}
-            />
-          }
-        />
+          <CompositeData
+            fields={lineDataFields}
+            data={lineData}
+            on={<LineSegments />}
+            render={(positions, segments) =>
+              <LineLayer
+                positions={positions}
+                color={[1, 1, 1, .2]}
+                width={3}
+                segments={segments}
+                depth={0.5}
+              />
+            }
+          />
+        </Pass>
+      </Camera>
 
-        <PickingOverlay />
-      </Pass>
+      <Flat>
+        <Pass overlay>
+          <PickingOverlay />
+        </Pass>
+      </Flat>
     </Draw>
   );
 
   return [
     <Cursor cursor='move' />,
-    <OrbitControls
-      radius={3}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />,
+    view,
   ];
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={3}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

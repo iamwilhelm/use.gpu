@@ -2,12 +2,15 @@ import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, Unif
 import type { RenderToPass } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { proxy } from '@use-gpu/core';
 
 import { useRenderContext } from '../../providers/render-provider';
 import { useDeviceContext } from '../../providers/device-provider';
 import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
+
+import { getRenderPassDescriptor } from '../pass';
 
 export type ColorPassProps = {
   calls: {
@@ -26,6 +29,8 @@ Draws all opaque calls, then all transparent calls, then all debug wireframes.
 */
 export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<ColorPassProps>) => {
   const {
+    overlay = false,
+    merge = false,
     calls,
   } = props;
 
@@ -44,24 +49,9 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
   visibles.push(...transparents);
   visibles.push(...debugs);
 
-  const renderToContext = (
-    commandEncoder: GPUCommandEncoder,
-    context: UseGPURenderContext,
-    calls: RenderToPass[],
-    countGeometry: RenderCounter,
-  ) => {
-    const {colorAttachments, depthStencilAttachment} = context;
-    const renderPassDescriptor: GPURenderPassDescriptor = {
-      colorAttachments,
-      depthStencilAttachment: depthStencilAttachment ?? undefined,
-    };
-
-    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-    bind(passEncoder);
-
-    for (const f of calls) f(passEncoder, countGeometry);
-    passEncoder.end();
-  };
+  const renderPassDescriptor = useMemo(() =>
+    getRenderPassDescriptor(renderContext, overlay, merge),
+    [renderContext, overlay, merge]);
 
   return quote(yeet(() => {
     let vs = 0;
@@ -70,8 +60,13 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
     const commandEncoder = device.createCommandEncoder();
-    renderContext.swap();
-    renderToContext(commandEncoder, renderContext, visibles, countGeometry);
+    if (!overlay && !merge) renderContext.swap();
+
+    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+    bind(passEncoder);
+
+    for (const f of visibles) f(passEncoder, countGeometry);
+    passEncoder.end();
 
     const command = commandEncoder.finish();
     device.queue.submit([command]);

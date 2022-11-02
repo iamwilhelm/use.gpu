@@ -9,6 +9,8 @@ import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
+import { getRenderPassDescriptor } from '../pass';
+
 export type PickingPassProps = {
   swap?: boolean,
   calls: {
@@ -25,7 +27,8 @@ Draws all pickable objects as object ID / vertex ID pairs.
 */
 export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<PickingPassProps>) => {
   const {
-    swap = true,
+    overlay = false,
+    merge = false,
     calls,
   } = props;
 
@@ -39,24 +42,9 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
 
   const pickings = toArray(calls['picking'] as RenderToPass[]);
 
-  const renderToContext = (
-    commandEncoder: GPUCommandEncoder,
-    context: UseGPURenderContext,
-    calls: RenderToPass[],
-    countGeometry: RenderCounter,
-  ) => {
-    const {colorAttachments, depthStencilAttachment} = context;
-    const renderPassDescriptor: GPURenderPassDescriptor = {
-      colorAttachments,
-      depthStencilAttachment: depthStencilAttachment ?? undefined,
-    };
-
-    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-    bind(passEncoder);
-
-    for (const f of calls) f(passEncoder, countGeometry);
-    passEncoder.end();
-  };
+  const renderPassDescriptor = useMemo(() =>
+    getRenderPassDescriptor(renderContext, overlay, merge),
+    [renderContext, overlay, merge]);
 
   return quote(yeet(() => {
     let vs = 0;
@@ -67,8 +55,13 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     const shouldUpdatePicking = pickings.length;
     if (shouldUpdatePicking) {
       const commandEncoder = device.createCommandEncoder();
-      if (swap) renderContext.swap();
-      renderToContext(commandEncoder, renderContext, pickings, countGeometry);
+      if (!overlay && !merge) renderContext.swap();
+
+      const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+      bind(passEncoder);
+
+      for (const f of pickings) f(passEncoder, countGeometry);
+      passEncoder.end();
 
       const command = commandEncoder.finish();
       device.queue.submit([command]);

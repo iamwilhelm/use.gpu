@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 
@@ -41,7 +41,7 @@ const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ 
 export const SceneShadowPage: LC = (props) => {
   const geometry = useOne(() => makeBoxGeometry());
 
-  const view = (
+  return (
     <Gather
       children={[
         <GeometryData geometry={geometry} />,
@@ -54,59 +54,62 @@ export const SceneShadowPage: LC = (props) => {
         <Loop>
           <Draw>
             <Cursor cursor='move' />
-            <Pass>
-              <Lights>
-                <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
+            <Camera>
+              <Pass>
+                <Lights>
+                  <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
 
-                <Scene>
-                  <PBRMaterial
-                    albedoMap={texture}
-                  >
-                    <Instances
-                      mesh={mesh}
-                      shaded
-                      render={(Instance) => (<>
+                  <Scene>
+                    <PBRMaterial
+                      albedoMap={texture}
+                    >
+                      <Instances
+                        mesh={mesh}
+                        shaded
+                        render={(Instance) => (<>
 
-                        <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
-                          <Node>
-                            {seq(20).map(i => (
-                              <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
-                                <Instance
-                                  rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
-                                  scale={[0.2, 0.2, 0.2]}
-                                />
-                              </Animate>
-                            ))}
-                          </Node>
-                        </Animate>
+                          <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
+                            <Node>
+                              {seq(20).map(i => (
+                                <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
+                                  <Instance
+                                    rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
+                                    scale={[0.2, 0.2, 0.2]}
+                                  />
+                                </Animate>
+                              ))}
+                            </Node>
+                          </Animate>
 
-                      </>)}
-                    />
-                  </PBRMaterial>
+                        </>)}
+                      />
+                    </PBRMaterial>
                   
-                </Scene>
-              </Lights>
-            </Pass>
+                  </Scene>
+                </Lights>
+              </Pass>
+            </Camera>
           </Draw>
         </Loop>
       )}
     />
   );
-
-  return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
-  );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={5}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        target={target}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

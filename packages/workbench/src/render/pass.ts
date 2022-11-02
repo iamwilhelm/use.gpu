@@ -1,7 +1,9 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { RenderPassMode } from '@use-gpu/core';
+import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
 
-import { use, quote, yeet, memo, provide, multiGather, useContext, useMemo, useOne } from '@use-gpu/live';
+import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
+import { proxy } from '@use-gpu/core';
+
 import { PassContext } from '../providers/pass-provider';
 import { useDeviceContext } from '../providers/device-provider';
 import { useInspectable } from '../hooks/useInspectable'
@@ -68,7 +70,7 @@ export type VirtualDraw = {
   instanceCount?: Lazy<number>,
   indirect?: StorageSource, 
 
-  passes?: LiveComponent<PassCallProps>[],
+  passes?: LiveElement[],
   renderer?: string,
   links?: Record<string, ShaderModule>,
 };
@@ -80,6 +82,10 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     mode = 'forward',
     shadows = false,
     picking = true,
+
+    overlay = false,
+    merge = false,
+
     passes,
     children,
   } = props;
@@ -126,18 +132,21 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     useMemo(() => {
       const props = {calls};
 
+      if (overlay) props.overlay = true;
+      if (merge) props.merge = true;
+
       if (passes) {
-        return passes.map(Component => use(Component, props));
+        return passes.map(element => extend(element, props));
       }
 
       return [
         calls.compute ? use(ComputePass, props) : null,
-        calls.shadow ? use(ShadowPass, props) : null,
+        shadows && calls.shadow ? use(ShadowPass, props) : null,
         use(ColorPass, props),
         calls.post || calls.readback ? use(ReadbackPass, props) : null,
         picking && calls.picking ? use(PickingPass, props) : null,
       ];
-    }, [context, calls, passes]);
+    }, [context, calls, passes, overlay, merge]);
 
   return multiGather(provide(PassContext, context, children), Resume);
 }, 'Pass');
@@ -160,3 +169,30 @@ export const getForwardRenderer = () => {
 export const getDeferredRenderer = () => {
   throw new Error();
 };
+
+export const getRenderPassDescriptor = (
+  renderContext: UseGPURenderContext,
+  overlay?: boolean,
+  merge?: boolean,
+) => {
+  let {colorAttachments, depthStencilAttachment} = renderContext;
+
+  if (overlay || merge) {
+    colorAttachments = colorAttachments.map(a => proxy(a, {loadOp: 'load'}));
+  }
+  if (merge && depthStencilAttachment) {
+    const {depthLoadOp, stencilLoadOp} = depthStencilAttachment;
+    const override: Record<string, any> = {};
+
+    if (depthLoadOp) override.depthLoadOp = 'load';
+    if (stencilLoadOp) override.stencilLoadOp = 'load';
+    depthStencilAttachment = proxy(a, override);
+  }
+
+  const renderPassDescriptor: GPURenderPassDescriptor = {
+    colorAttachments,
+    depthStencilAttachment: depthStencilAttachment ?? undefined,
+  };
+
+  return renderPassDescriptor;
+}

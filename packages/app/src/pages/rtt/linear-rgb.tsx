@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React from '@use-gpu/live';
 
 import {
@@ -16,18 +16,22 @@ export const RTTLinearRGBPage: LC = () => {
   const mesh = makeMesh();
   const texture = makeTexture();
 
-  const view = (
+  return (
     <LinearRGB>
       <Cursor cursor='move' />
-      <Pass>
-        <Pick
-          render={({id, hovered, presses}) => [
-            <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
-            <RawMesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
-            hovered ? <Cursor cursor='pointer' /> : null,
-          ]}
-        />
-        <Flat>
+      <Camera>
+        <Pass>
+          <Pick
+            render={({id, hovered, presses}) => [
+              <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
+              <RawMesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
+              hovered ? <Cursor cursor='pointer' /> : null,
+            ]}
+          />
+        </Pass>
+      </Camera>
+      <Flat>
+        <Pass overlay>
           <UI>
             <Layout>
               <Absolute
@@ -54,25 +58,25 @@ export const RTTLinearRGBPage: LC = () => {
               </Absolute>
             </Layout>
           </UI>
-        </Flat>
-      </Pass>
+        </Pass>
+      </Flat>
     </LinearRGB>
   );
-
-  return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
-  );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={5}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

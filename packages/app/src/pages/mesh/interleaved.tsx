@@ -1,6 +1,6 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 
-import React from '@use-gpu/live';
+import React, { Gather } from '@use-gpu/live';
 
 import {
   Loop, Draw, Pass, Flat,
@@ -26,64 +26,67 @@ const COLOR_OFF = [0.5, 0.5, 0.5, 1.0];
 export const MeshInterleavedPage: LC = (props) => {
   const dataTexture = makeTexture();
 
-  const view = (
-    <InterleavedData
-      fields={MESH_FIELDS}
-      data={meshVertexArray}
-      render={(positions, normals, colors, uvs) => (
-
+  return (
+    <Gather
+      children={[
+        <InterleavedData
+          fields={MESH_FIELDS}
+          data={meshVertexArray}
+        />,
         <RawTexture
           data={dataTexture}
-          render={(texture) => (
-
-            <Draw>
-              <Cursor cursor='move' />
-              <Pass>
-                <Lights>
-                  <PointLight position={[-2.5, 3, 2, 1]} intensity={4} />
-
-                  <Pick
-                    render={({id, hovered, presses}) =>
-                      <PBRMaterial albedoMap={texture} albedo={presses.left % 2 ? COLOR_ON : COLOR_OFF}>
-                        <FaceLayer
-                          id={id}
-                          positions={positions}
-                          normals={normals}
-                          colors={colors}
-                          uvs={uvs}
-                          shaded
-                        />
-                        {hovered ? <Cursor cursor='pointer' /> : null}
-                      </PBRMaterial>
-                    }
-
-                  />
-        
-                </Lights>
-              </Pass>
-            </Draw>
-
-          )}
         />
+      ]}
+      then={([
+        positions, normals, colors, uvs,
+        texture,
+      ]) => (
+        <Draw>
+          <Cursor cursor='move' />
+          <Camera>
+            <Pass>
+              <Lights>
+                <PointLight position={[-2.5, 3, 2, 1]} intensity={4} />
 
+                <Pick
+                  render={({id, hovered, presses}) =>
+                    <PBRMaterial albedoMap={texture} albedo={presses.left % 2 ? COLOR_ON : COLOR_OFF}>
+                      <FaceLayer
+                        id={id}
+                        positions={positions}
+                        normals={normals}
+                        colors={colors}
+                        uvs={uvs}
+                        shaded
+                      />
+                      {hovered ? <Cursor cursor='pointer' /> : null}
+                    </PBRMaterial>
+                  }
+                />
+  
+              </Lights>
+            </Pass>
+          </Camera>
+        </Draw>
       )}
     />
   );
-
-  return (
-    <OrbitControls
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
-  );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={5}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        target={target}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

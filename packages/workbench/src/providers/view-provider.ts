@@ -4,7 +4,6 @@ import type { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 import { memo, provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useHasContext, useMemo, useFiber } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeSharedUniforms, uploadBuffer, makeBindGroupLayout } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
-import { PassContext } from '../providers/pass-provider';
 
 import { mat4 } from 'gl-matrix';
 
@@ -34,9 +33,6 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewP
   const fiber = useFiber();
   const device = useDeviceContext();
 
-  const hasPass = useHasContext(PassContext);
-  const unbind = hasPass ? useViewContext().bind : useNoViewContext();
-
   const binding = useMemo(() =>
     makeSharedUniforms(device, [defs]),
     [device, defs]);
@@ -45,9 +41,7 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewP
   pipe.fill(uniforms);
   uploadBuffer(device, buffer, pipe.data);
 
-  const bind = useCallback((passEncoder: GPURenderPassEncoder, _: any, overrideView?: boolean) => {
-    if (overrideView) return;
-
+  const bind = useCallback((passEncoder: GPURenderPassEncoder) => {
     passEncoder.setBindGroup(0, bindGroup);
   });
 
@@ -58,25 +52,9 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewP
     uniforms,
   }), [bindGroup, layout, defs, uniforms]);
 
-  const [pre, post] = useMemo(() => [
-    hasPass ? yeet({
-      opaque: bind,
-      transparent: bind,
-      picking: bind,
-      debug: bind,
-    }) : signal(),
-    hasPass ? yeet({
-      opaque: unbind,
-      transparent: unbind,
-      picking: unbind,
-      debug: unbind,
-    }) : null,
-  ], [hasPass, bind, unbind])
-
   return [
-    pre,
+    signal(),
     provide(ViewContext, context, children),
-    post,
   ];
 }, 'ViewProvider');
 

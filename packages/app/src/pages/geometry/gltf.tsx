@@ -1,4 +1,4 @@
-import type { LC } from '@use-gpu/live';
+import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { GLTF } from '@use-gpu/gltf';
 
 import React, { use } from '@use-gpu/live';
@@ -22,72 +22,74 @@ export const GeometryGLTFPage: LC = () => {
   const base = isDevelopment ? '/' : '/demo/';
   const url = base + "gltf/DamagedHelmet/DamagedHelmet.gltf";
 
-  const view = (
+  return (
     <Loop>
       <LinearRGB>
         <Cursor cursor='move' />
-        <Pass>
-          <Lights>
-            <AmbientLight color={[1, 1, 1]} intensity={0.005} />
+        <Camera>
+          <Pass>
+            <Lights>
+              <AmbientLight color={[1, 1, 1]} intensity={0.005} />
 
-            <Animate
-              loop
-              delay={0}
-              keyframes={[
-                [0, [30, 20, 10]],
-                [4, [20, 10, 40]],
-                [8, [-5, 20, 20]],
-                [12, [30, 20, 10]],
-              ]}
-              prop='position'
-            >
-              <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} size={40} />
-            </Animate>
+              <Animate
+                loop
+                delay={0}
+                keyframes={[
+                  [0, [30, 20, 10]],
+                  [4, [20, 10, 40]],
+                  [8, [-5, 20, 20]],
+                  [12, [30, 20, 10]],
+                ]}
+                prop='position'
+              >
+                <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} size={40} />
+              </Animate>
 
-            <Animate
-              loop
-              delay={0}
-              keyframes={[
-                [0, [10, 20, 30]],
-                [3, [20, 30, 10]],
-                [6, [40, 10, 20]],
-                [9, [10, 20, 40]],
-              ]}
-              prop='position'
-            >
-              <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
-            </Animate>
+              <Animate
+                loop
+                delay={0}
+                keyframes={[
+                  [0, [10, 20, 30]],
+                  [3, [20, 30, 10]],
+                  [6, [40, 10, 20]],
+                  [9, [10, 20, 40]],
+                ]}
+                prop='position'
+              >
+                <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
+              </Animate>
           
-            <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
-            <HemisphereLight intensity={0.5} />
+              <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
+              <HemisphereLight intensity={0.5} />
             
-            <GLTFData
-              url={url}
-              render={(gltf: GLTF) =>
-                <GLTFModel gltf={gltf} />
-              }
-            />
-          </Lights>
-        </Pass>
+              <GLTFData
+                url={url}
+                render={(gltf: GLTF) =>
+                  <GLTFModel gltf={gltf} />
+                }
+              />
+            </Lights>
+          </Pass>
+        </Camera>
       </LinearRGB>
     </Loop>
   );
-
-  return (
-    <OrbitControls
-      radius={3}
-      bearing={0.5}
-      pitch={0.3}
-      render={(radius: number, phi: number, theta: number) =>
-        <OrbitCamera
-          radius={radius}
-          phi={phi}
-          theta={theta}
-          scale={1080}
-        >
-          {view}
-        </OrbitCamera>
-      }
-    />
-  );
 };
+
+const Camera = ({children}: PropsWithChildren<object>) => (
+  <OrbitControls
+    radius={3}
+    bearing={0.5}
+    pitch={0.3}
+    render={(radius: number, phi: number, theta: number) =>
+      <OrbitCamera
+        radius={radius}
+        phi={phi}
+        theta={theta}
+        scale={1080}
+      >
+        {children}
+      </OrbitCamera>
+    }
+  />
+);

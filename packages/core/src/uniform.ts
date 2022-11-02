@@ -16,17 +16,9 @@ import { makeBindGroupLayout } from './bindgroup';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 import { alignSizeTo } from './data';
+import { resolve } from './lazy';
 
 const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
-
-export const resolve = <T>(x: Lazy<T>): T => {
-  if (typeof x === 'function') return (x as any)();
-  if (typeof x === 'object' && x != null) {
-    if ('expr' in x) return x.expr();
-    if ('current' in x) return x.current;
-  }
-  return x;
-};
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformAttributeAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];

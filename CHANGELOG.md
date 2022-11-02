@@ -1,15 +1,17 @@
 0.8.0
-- `@use-gpu/plot`: Use `<Grid auto>` to snap grids to far side of range.
+- `@use-gpu/plot`: Add `<Grid auto>` to snap grids to far side of range.
+- `@use-gpu/scene`: Add basic `<Scene>`/`<Node>`/`<Primitive>` components for a classic matrix tree
+- `@use-gpu/scene`: Add `<Instances>` component for instanced mesh rendering
+- `@use-gpu/workbench`: Add `<InstanceData>` component for gathering instance data
+- `@use-gpu/workbench`: Add `<InterleavedData>` to read packed vertex attributes
+- `@use-gpu/workbench`: Add `<GeometryData>` to read flat, typed vertex attributes
 - `@use-gpu/workbench`: Allow `<FaceLayer>` to be used with indexed positions and segments
 - `@use-gpu/workbench`: Add `<HemisphereLight>` with adjustable zenith, horizon and bleed/overextension
 - `@use-gpu/workbench`: Add `unwelded` indexing mode to `<CompositeData>` and more unwelded options to `<FaceLayer>`
 - `@use-gpu/workbench`: Add `stroke` to `<PointLayer>` to allow for thin outlined shapes
 - `@use-gpu/workbench`: Refactor `<Pass>`/`<Virtual>` to allow for swappable render passes
 - `@use-gpu/workbench`: Add shared global bindings to `<DrawCall>` and `<Pass>` from `<ViewProvider>`
-- `@use-gpu/workbench`: Add basic `<Scene>`/`<Node>`/`<Primitive>` components for a classic matrix tree
-- `@use-gpu/workbench`: Add `<Instances>`/`<InstanceData>` components for instanced mesh rendering
-- `@use-gpu/workbench`: Add `<InterleavedData>` to read e.g. packed vertex attributes
-- `@use-gpu/workbench`: Rename `<ComputeData>`/`<TextureData>` to `<ComputeTarget>`/`<TextureTarget>`
+- `@use-gpu/workbench`: Rename `<ComputeData>`/`<TextureData>` to `<ComputeBuffer>`/`<TextureBuffer>`
 
 0.7.0
 - `@use-gpu/live`: Reconciling + quote/unquote as native ops.

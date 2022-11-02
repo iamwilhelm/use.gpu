@@ -11,7 +11,7 @@ import { useDeviceContext } from '../providers/device-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
 export type InstanceDataProps = {
-  index?: 'u16' | 'u32',
+  format?: 'u16' | 'u32',
   fields: DataField[],
   alloc?: number,
 
@@ -22,7 +22,7 @@ export type InstanceDataProps = {
 export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
   const {
     fields: fs,
-    index = 'u16',
+    format = 'u16',
     alloc = 64,
     then,
     render,
@@ -93,12 +93,12 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
 
       let indexBuffer, indexSource;
       {
-        if (index !== 'u16' && index !== 'u32') throw new Error(`Unknown index format "${index}"`);
-        const {array, dims} = makeDataArray(index, bufferLength);
+        if (format !== 'u16' && format !== 'u32') throw new Error(`Unknown index format "${format}"`);
+        const {array, dims} = makeDataArray(format, bufferLength);
         const buffer = makeStorageBuffer(device, array.byteLength);
         const source = indexSource = {
           buffer,
-          format: index,
+          format,
           length: 0,
           size: [0],
           version: 0,

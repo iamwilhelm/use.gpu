@@ -10,7 +10,7 @@
     "coverage": "echo 'jest --collect-coverage' disabled",
     "types": "tsc --noEmit",
     "types:watch": "yarn run types -- --watch",
-    "build": "rm -rf ../../build/packages/wgsl; rm -rf ../../ts/packages/wgsl; yarn run build:js && yarn run build:wgsl && yarn run build:types && yarn run build:pkg && echo '\\xE2\\x9C\\x85' ",
+    "build": "rm -rf ../../build/packages/wgsl; rm -rf ../../build/ts/wgsl; yarn run build:js && yarn run build:wgsl && yarn run build:types && yarn run build:pkg && echo '\\xE2\\x9C\\x85' ",
     "build:wgsl": "ts-node build",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "MODULE_ENV=cjs babel src/index.ts --out-dir ../../build/ts/wgsl/src --extensions \".ts\"; mkdir ../../build/packages/wgsl 2>/dev/null",

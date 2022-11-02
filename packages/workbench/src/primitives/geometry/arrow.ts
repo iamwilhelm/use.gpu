@@ -1,23 +1,22 @@
-import type { VertexData } from '@use-gpu/core';
+import type { MeshData } from '@use-gpu/core';
 import { makeVertexAttributeLayout } from '@use-gpu/core';
 
 const τ = Math.PI * 2;
 
-export const makeArrow = (detail: number, width?: number): VertexData => {
-  const vertices   = [makeArrowVertexArray(detail, width)];
-  const attributes = [arrowAttributes];
+export const makeArrowGeometry = (
+  detail: number = 8,
+  width: number = 2.5
+): MeshData => {
+  const positions = makeArrowVertices(detail, width);
 
-  return {vertices, attributes, count: vertices[0].length / 4};
+  return {
+    attributes: {positions},
+    formats: {positions: 'vec4<f32>'},
+    count: positions.length / 4,
+  };
 }
 
-export const arrowAttributes = makeVertexAttributeLayout([
-  // @ts-ignore
-  { name: 'position', format: 'float32x4' },
-  // @ts-ignore
-  // { name: 'normal', format: 'float32x4' },
-]);
-
-export const makeArrowVertexArray = (detail: number, width: number = 2.5) => {
+const makeArrowVertices = (detail: number, width: number = 2.5) => {
   const tris = detail + (detail - 2);
 
   const ring = [] as [number, number, number, number][];

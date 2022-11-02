@@ -484,7 +484,7 @@ export const useNoCapture = <C>(
  */
 export const useHasContext = <C>(
   context: LiveContext<C>,
-): C => {
+): boolean => {
   const fiber = useFiber();
 
   const {context: {roots}} = fiber;
@@ -497,7 +497,7 @@ export const useHasContext = <C>(
  */
 export const useHasCapture = <C>(
   capture: LiveCapture<C>,
-): C => {
+): boolean => {
   const fiber = useFiber();
 
   const {context: {roots}} = fiber;

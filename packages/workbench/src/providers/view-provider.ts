@@ -45,7 +45,9 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewP
   pipe.fill(uniforms);
   uploadBuffer(device, buffer, pipe.data);
 
-  const bind = useCallback((passEncoder: GPURenderPassEncoder) => {
+  const bind = useCallback((passEncoder: GPURenderPassEncoder, _: any, overrideView?: boolean) => {
+    if (overrideView) return;
+
     passEncoder.setBindGroup(0, bindGroup);
   });
 

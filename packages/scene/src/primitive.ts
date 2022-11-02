@@ -3,12 +3,12 @@ import { memo, provide, useOne } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { mat3, mat4 } from 'gl-matrix';
 
-import { TransformContext, DifferentialContext } from '../providers/transform-provider';
-import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader } from '../hooks/useBoundShader';
-import { useCombinedTransform } from '../hooks/useCombinedTransform';
+import {
+  TransformContext, DifferentialContext,
+  useShaderRef, useBoundShader, useCombinedTransform,
+ } from '@use-gpu/workbench';
 
-import { useMatrixContext, MatrixContext } from '../providers/matrix-provider';
+import { useMatrixContext, MatrixContext } from './providers/matrix-provider';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';

@@ -5,7 +5,7 @@ import { mat4 } from 'gl-matrix';
 
 import { useObjectTrait } from './traits';
 import { composeTransform } from './lib/compose';
-import { useMatrixContext, MatrixContext } from '../providers/matrix-provider';
+import { useMatrixContext, MatrixContext } from './providers/matrix-provider';
 
 export type NodeProps = Partial<ObjectTrait> & {
   _?: number,

@@ -9,7 +9,7 @@ import {
 import {
   UI, Layout, Absolute, Block, Flex, Inline, Text
 } from '@use-gpu/layout';
-import { Mesh } from '../../components/mesh';
+import { RawMesh } from '../mesh/components/raw-mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
 
 export const RTTLinearRGBPage: LC = () => {
@@ -22,8 +22,8 @@ export const RTTLinearRGBPage: LC = () => {
       <Pass>
         <Pick
           render={({id, hovered, presses}) => [
-            <Mesh texture={texture} mesh={mesh} blink={presses.left} />,
-            <Mesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
+            <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
+            <RawMesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
             hovered ? <Cursor cursor='pointer' /> : null,
           ]}
         />

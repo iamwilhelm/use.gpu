@@ -12,8 +12,9 @@ import { LayoutAlignPage } from './pages/layout/align';
 import { MapWebMercatorPage } from './pages/map/webmercator';
 import { MeshRawPage } from './pages/mesh/raw';
 import { MeshInterleavedPage } from './pages/mesh/interleaved';
-import { MeshScenePage } from './pages/mesh/scene';
-import { MeshInstancePage } from './pages/mesh/instance';
+import { SceneBasicPage } from './pages/scene/basic';
+import { SceneInstancesPage } from './pages/scene/instances';
+import { SceneShadowPage } from './pages/scene/shadow';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
@@ -28,58 +29,37 @@ import { HomePage } from './pages/home';
 import { EmptyPage } from './pages/empty';
 
 export const makePages = () => [
-  {path: "/geometry/lines", title: "Geometry - 3D Lines and Arrows"},
-  {path: "/geometry/faces", title: "Geometry - 3D Polygons"},
-  {path: "/geometry/data", title: "Geometry - Data-driven Layers"},
-  {path: "/geometry/gltf", title: "Geometry - GLTF"},
-  {path: "/layout/display", title: "Layout - Box model"},
-  {path: "/layout/glyph", title: "Layout - Glyph Subpixel SDF"},
-  {path: "/layout/align", title: "Layout - Alignment Tests"},
-  {path: "/map/webmercator", title: "Map - WebMercator"},
-  {path: "/mesh/raw", title: "Mesh - Raw Rendering"},
-  {path: "/mesh/interleaved", title: "Mesh - Native Components"},
-  {path: "/mesh/scene", title: "Mesh - Scene"},
-  {path: "/mesh/instance", title: "Mesh - Instance"},
-  {path: "/plot/cartesian", title: "Plot - XYZ"},
-  {path: "/plot/polar", title: "Plot - Polar"},
-  {path: "/plot/spherical", title: "Plot - Spherical"},
-  {path: "/plot/stereographic", title: "Plot - Stereographic"},
-  {path: "/plot/implicit-surface", title: "Plot - Implicit Surface"},
-  {path: "/rtt/linear-rgb", title: "RTT - Linear RGB"},
-  {path: "/rtt/feedback", title: "RTT - Feedback"},
-  {path: "/rtt/cfd-compute", title: "RTT - Fluid Dynamics (Compute I)"},
-  {path: "/rtt/cfd-texture", title: "RTT - Fluid Dynamics (Compute II)"},
-  {path: "/debug/atlas", title: "Debug - Text Atlas"},
+  {path: "/geometry/lines",        title: "Geometry - 3D Lines and Arrows",    element: <GeometryLinesPage />},
+  {path: "/geometry/faces",        title: "Geometry - 3D Polygons",            element: <GeometryFacesPage />},
+  {path: "/geometry/data",         title: "Geometry - Data-driven Layers",     element: <GeometryDataPage />},
+  {path: "/geometry/gltf",         title: "Geometry - GLTF",                   element: <GeometryGLTFPage />},
+  {path: "/layout/display",        title: "Layout - Box model",                element: <LayoutDisplayPage />},
+  {path: "/layout/glyph",          title: "Layout - Glyph Subpixel SDF",       element: <LayoutGlyphPage />},
+  {path: "/layout/align",          title: "Layout - Alignment Tests",          element: <LayoutAlignPage />},
+  {path: "/map/webmercator",       title: "Map - WebMercator",                 element: <MapWebMercatorPage />},
+  {path: "/scene/basic",           title: "Scene - Basic",                     element: <SceneBasicPage />},
+  {path: "/scene/instances",       title: "Scene - Instances",                 element: <SceneInstancesPage />},
+  {path: "/scene/shadow",          title: "Scene - Shadow",                    element: <SceneShadowPage />},
+  {path: "/plot/cartesian",        title: "Plot - XYZ",                        element: <PlotCartesianPage />},
+  {path: "/plot/polar",            title: "Plot - Polar",                      element: <PlotPolarPage />},
+  {path: "/plot/spherical",        title: "Plot - Spherical",                  element: <PlotSphericalPage />},
+  {path: "/plot/stereographic",    title: "Plot - Stereographic",              element: <PlotStereographicPage />},
+  {path: "/plot/implicit-surface", title: "Plot - Implicit Surface",           element: <PlotImplicitSurfacePage />},
+  {path: "/rtt/linear-rgb",        title: "RTT - Linear RGB",                  element: <RTTLinearRGBPage />},
+  {path: "/rtt/feedback",          title: "RTT - Feedback",                    element: <RTTFeedbackPage />},
+  {path: "/rtt/cfd-compute",       title: "RTT - Fluid Dynamics (Compute I)",  element: <RTTCFDComputePage />},  
+  {path: "/rtt/cfd-texture",       title: "RTT - Fluid Dynamics (Compute II)", element: <RTTCFDTexturePage />},   
+  {path: "/mesh/raw",              title: "Raw Mesh - DIY Rendering",          element: <MeshRawPage />},
+  {path: "/mesh/interleaved",      title: "Raw Mesh - Native Components",      element: <MeshInterleavedPage />},
+  {path: "/debug/atlas",           title: "Debug - Text Atlas",                element: <DebugAtlasPage />},
+
   //{path: "/debug/quote", title: "Debug - Quoting"},
-  {path: "/", title: "Index"},
+  {path: "/", title: "Index", element: <HomePage container={document.querySelector('#use-gpu')} />},
 ];
 
 export const makeRoutes = () => ({
-  "/geometry/data":         { element: <GeometryDataPage /> },
-  "/geometry/faces":        { element: <GeometryFacesPage /> },
-  "/geometry/gltf":         { element: <GeometryGLTFPage /> },
-  "/geometry/lines":        { element: <GeometryLinesPage /> },
-  "/layout/display":        { element: <LayoutDisplayPage /> },
-  "/layout/glyph":          { element: <LayoutGlyphPage /> },
-  "/layout/align":          { element: <LayoutAlignPage /> },
-  "/map/webmercator":       { element: <MapWebMercatorPage /> },
-  "/mesh/raw":              { element: <MeshRawPage /> },
-  "/mesh/interleaved":      { element: <MeshInterleavedPage /> },
-  "/mesh/scene":            { element: <MeshScenePage /> },
-  "/mesh/instance":         { element: <MeshInstancePage /> },
-  "/plot/cartesian":        { element: <PlotCartesianPage /> },
-  "/plot/polar":            { element: <PlotPolarPage /> },
-  "/plot/spherical":        { element: <PlotSphericalPage /> },
-  "/plot/stereographic":    { element: <PlotStereographicPage /> },
-  "/plot/implicit-surface": { element: <PlotImplicitSurfacePage /> },
-  "/rtt/linear-rgb":        { element: <RTTLinearRGBPage /> },
-  "/rtt/feedback":          { element: <RTTFeedbackPage /> },
-  "/rtt/cfd-compute":       { element: <RTTCFDComputePage /> },
-  "/rtt/cfd-texture":       { element: <RTTCFDTexturePage /> },
-  "/debug/atlas":           { element: <DebugAtlasPage /> },
-  "/debug/quote":           { element: <DebugQuotePage /> },
-
-  "/": { element: <HomePage container={document.querySelector('#use-gpu')} /> },
+  ...makePages().reduce((out, {path, element}) => (out[path] = {element}, out), {} as Record<string, any>),
   "*": { element: <EmptyPage /> },
 });
 
+console.log(makeRoutes())

@@ -9,6 +9,7 @@
     "@use-gpu/core": "*",
     "@use-gpu/live": "*",
     "@use-gpu/shader": "*",
+    "@use-gpu/state": "*",
     "mikktspace": "^1.1.1"
   },
   "scripts": {

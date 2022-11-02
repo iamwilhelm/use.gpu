@@ -121,6 +121,7 @@
     "packages/react",
     "packages/glyph",
     "packages/workbench",
+    "packages/scene",
     "packages/webgpu",
     "packages/gltf",
     "packages/plot",

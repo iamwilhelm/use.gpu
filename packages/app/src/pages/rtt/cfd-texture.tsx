@@ -6,7 +6,7 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
   Loop, Flat, Draw, Pass, OrbitCamera, RawData, PointLayer, Pick,
-  TextureData, Compute, Stage, Iterate, Kernel, Suspense, RawFullScreen,
+  TextureBuffer, Compute, Stage, Iterate, Kernel, Suspense, RawFullScreen,
   useBoundShader, useLambdaSource, useShaderRefs,
 } from '@use-gpu/workbench';
 import {
@@ -77,23 +77,23 @@ export const RTTCFDTexturePage: LC = () => {
         <Gather
           children={[
             // Velocity + density field
-            <TextureData
+            <TextureBuffer
               format="rgba32float"
               history={3}
               resolution={1/2}
             />,
             // Divergence
-            <TextureData
+            <TextureBuffer
               format="r32float"
               resolution={1/2}
             />,
             // Curl
-            <TextureData
+            <TextureBuffer
               format="r32float"
               resolution={1/2}
             />,
             // Pressure
-            <TextureData
+            <TextureBuffer
               format="r32float"
               history={1}
               resolution={1/2}

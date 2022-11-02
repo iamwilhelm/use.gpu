@@ -44,7 +44,7 @@ export const MESH_UNIFORM_DEFS: UniformAttribute[] = [
 
 const LIGHT = [-2.5, 3, 2, 1];
 
-export type MeshProps = {
+export type RawMeshProps = {
   mesh: VertexData,
   texture: DataTexture,
   mode?: RenderPassMode,
@@ -52,7 +52,7 @@ export type MeshProps = {
   blink?: number,
 };
 
-export const Mesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
+export const RawMesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   const {
     mesh,
     texture,

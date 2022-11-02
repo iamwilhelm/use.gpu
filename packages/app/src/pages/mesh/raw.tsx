@@ -9,7 +9,7 @@ import {
   Pick, Cursor, PointLayer, LineLayer,
   RenderToTexture,
 } from '@use-gpu/workbench';
-import { Mesh } from '../../components/mesh';
+import { RawMesh } from './components/raw-mesh';
 import { makeMesh, makeTexture } from '../../meshes/cube';
 
 export const MeshRawPage: LC = (props) => {
@@ -22,10 +22,10 @@ export const MeshRawPage: LC = (props) => {
       <Pass>
         <Pick
           render={({id, hovered, presses}) => [
-            // <Mesh> is a fully hand-coded component, intended as an anti-example
-            // of how to integrate fully custom rendering code
-            <Mesh texture={texture} mesh={mesh} blink={presses.left} />,
-            <Mesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
+            // <RawMesh> is a fully hand-coded component, intended as an anti-example
+            // of how to integrate fully custom rendering code with classic vertex attributes.
+            <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,
+            <RawMesh id={id} texture={texture} mesh={mesh} mode={'picking'} />,
             hovered ? <Cursor cursor='pointer' /> : null,
           ]}
         />

@@ -15,6 +15,7 @@
     { "path": "./packages/react" },
     { "path": "./packages/glyph" },
     { "path": "./packages/workbench" },
+    { "path": "./packages/scene" },
     { "path": "./packages/gltf" },
     { "path": "./packages/plot" },
     { "path": "./packages/layout" },

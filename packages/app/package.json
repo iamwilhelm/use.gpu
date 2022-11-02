@@ -11,6 +11,7 @@
     "@use-gpu/layout": "*",
     "@use-gpu/live": "*",
     "@use-gpu/plot": "*",
+    "@use-gpu/scene": "*",
     "@use-gpu/shader": "*",
     "@use-gpu/state": "*",
     "@use-gpu/webgpu": "*",

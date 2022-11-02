@@ -13,7 +13,7 @@ import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 
-import { makeArrow } from './mesh/arrow';
+import { makeArrowGeometry } from './geometry/arrow';
 import { RawData } from '../data/raw-data';
 import { useRawSource } from '../hooks/useRawSource';
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -72,10 +72,10 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   } = props;
   
   const det = Math.max(4, detail);
-  const mesh = useOne(() => makeArrow(det), det);
+  const geometry = useOne(() => makeArrowGeometry(det), det);
 
   // Set up draw
-  const vertexCount = mesh.count;
+  const vertexCount = geometry.count;
   const instanceCount = useDataLength(count, props.anchors);
   
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
@@ -89,7 +89,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   const l = useShaderRef(null, props.lookups);
   
-  const g = useRawSource(mesh.vertices[0], 'vec4<f32>');
+  const g = useRawSource(geometry.attributes.positions, 'vec4<f32>');
 
   const [xf, scissor] = useApplyTransform(p);
 

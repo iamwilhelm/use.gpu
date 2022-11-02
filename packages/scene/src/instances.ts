@@ -5,14 +5,16 @@ import type { ObjectTrait } from './types';
 import { use, memo, provide, yeet, useCallback, useMemo, useOne, tagFunction } from '@use-gpu/live';
 import { bundleToAttributes, bindEntryPoint } from '@use-gpu/shader/wgsl';
 
-import { FaceLayer } from '../layers/face-layer';
-import { InstanceProvider } from '../providers/instance-provider';
-import { TransformContext, DifferentialContext } from '../providers/transform-provider';
-import { useMatrixContext, MatrixContext } from '../providers/matrix-provider';
+import {
+  FaceLayer,
+  InstanceData,
+  TransformContext,
+  DifferentialContext,
+  useCombinedTransform,
+  getBoundShader,
+} from '@use-gpu/workbench';
 
-import { useCombinedTransform } from '../hooks/useCombinedTransform';
-import { getBoundShader } from '../hooks/useBoundShader';
-import { InstanceData } from '../data/instance-data';
+import { useMatrixContext, MatrixContext } from './providers/matrix-provider';
 
 import { useObjectTrait } from './traits';
 import { composeTransform } from './lib/compose';
@@ -27,12 +29,10 @@ const INSTANCE_BINDINGS = bundleToAttributes(loadInstance);
 const MATRIX_BINDINGS   = bundleToAttributes(getCartesianPosition);
 const NORMAL_BINDINGS   = bundleToAttributes(getMatrixDifferential);
 
-export type InstanceInfo = {
-  mesh: Record<string, ShaderSource>,
-};
-
 export type InstancesProps = InstanceInfo & {
-  index?: 'u16' | 'u32',
+  mesh: Record<string, ShaderSource>,
+  shaded?: boolean,
+  format?: 'u16' | 'u32',
   render?: (Instance: LiveComponent) => LiveElement,
 };
 
@@ -44,7 +44,8 @@ const INSTANCE_FIELDS = [
 export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildren<InstancesProps>) => {
   const {
     mesh,
-    index,
+    shaded,
+    format,
     render,
   } = props;
 
@@ -61,7 +62,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
       const boundPosition = getBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrix]);
       const boundDifferential = getBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrix, normalMatrix]);
 
-      const view = use(FaceLayer, {...mesh, instances, load});
+      const view = use(FaceLayer, {...mesh, instances, load, shaded});
       return [view, boundPosition, boundDifferential];
     }, [instances, fieldSources]);
 
@@ -75,7 +76,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
   }, [mesh]);
 
   return use(InstanceData, {
-    index,
+    format,
     fields: INSTANCE_FIELDS,
     render: (useInstance) => {
       const Instance = useMemo(() => makeInstance(props, useInstance), [props, useInstance]);

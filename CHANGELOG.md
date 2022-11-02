@@ -9,6 +9,7 @@
 - `@use-gpu/workbench`: Add basic `<Scene>`/`<Node>`/`<Primitive>` components for a classic matrix tree
 - `@use-gpu/workbench`: Add `<Instances>`/`<InstanceData>` components for instanced mesh rendering
 - `@use-gpu/workbench`: Add `<InterleavedData>` to read e.g. packed vertex attributes
+- `@use-gpu/workbench`: Rename `<ComputeData>`/`<TextureData>` to `<ComputeTarget>`/`<TextureTarget>`
 
 0.7.0
 - `@use-gpu/live`: Reconciling + quote/unquote as native ops.

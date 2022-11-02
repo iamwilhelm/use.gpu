@@ -3,7 +3,7 @@ import type { ObjectTrait } from './types';
 import { memo, provide, useOne } from '@use-gpu/live';
 import { mat4 } from 'gl-matrix';
 
-import { useMatrixContext, useNoMatrixContext, MatrixContext } from '../providers/matrix-provider';
+import { useMatrixContext, useNoMatrixContext, MatrixContext } from './providers/matrix-provider';
 
 export type SceneProps = {
   inherit?: boolean,

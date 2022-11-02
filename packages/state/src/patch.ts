@@ -5,7 +5,7 @@ const $NOP = {$nop: true};
 
 const isTypedArray = (() => {
   const TypedArray = Object.getPrototypeOf(Uint8Array);
-  return (obj) => obj instanceof TypedArray;
+  return (obj: any) => obj instanceof TypedArray;
 })();
 
 /** Set or replace a value without merging.
@@ -124,7 +124,7 @@ export const $patch = <T>($patch: (t: T) => Update<T>) => ({$patch});
 
 const $maybeSet = <T>(v: T): Update<T> => {
   if (!v || typeof v !== 'object' || Array.isArray(v) || isTypedArray(v)) return v;
-  return $set(v);
+  return $set(v) as any;
 };
 
 /** Patch value A with update B.
@@ -224,7 +224,7 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
   if (Array.isArray(b) || isTypedArray(b)) return $maybeSet(a) as any;
 
   if (typeof b === 'object') {
-    let update: Record<string, any> = b;
+    let update: Record<string, any> = b as any;
     if (typeof a !== 'object' || a == null) return $maybeSet(a);
 
     const out = {} as Record<string, any>;

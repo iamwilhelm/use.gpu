@@ -165,12 +165,23 @@ export type UniformType =
   | "vec3to4<f32>"
 ;
 
-// Vertex attributes
+// Simple backing-agnostic mesh geometry
+export type MeshGeometry = {
+  count: number,
+  attributes: {
+    [s: string]: TypedArray,
+  },
+  formats: {
+    [s: string]: UniformType,
+  },
+};
+
+// Classic vertex attributes
 export type VertexData = {
   count: number,
   vertices: TypedArray[],
   attributes: GPUVertexBufferLayout[],
-  index?: TypedArray,
+  indices?: TypedArray,
   indexFormat?: GPUIndexFormat,
 };
 

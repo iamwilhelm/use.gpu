@@ -2220,6 +2220,41 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
+"@use-gpu/core@*":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@use-gpu/core/-/core-0.7.0.tgz#a5e8884f2170af633abf7790c975e749d8c36d16"
+  integrity sha512-6j3HjAnJOLbHFo2UQZTD7WgzaYUhj6oOwPxK0RC2DyTLXAaMIlIYdcksAD0uTZZB9HUMXUqUhag2GuKH4yqo9w==
+  dependencies:
+    "@use-gpu/state" "*"
+    gl-matrix "^3.3.0"
+    lodash "^4.17.21"
+
+"@use-gpu/live@*":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@use-gpu/live/-/live-0.7.0.tgz#12af297a5a842be0a0b764d0b9d3a52a1b85c71d"
+  integrity sha512-HaR/rb9eZPNXixr11hyfliMIpSs20KCQ0h4l/yY204SHBQE+mUCtcCLfQn8k9oqW73Zj7SBbyWYZHhilCdPDfA==
+
+"@use-gpu/webgpu@*":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@use-gpu/webgpu/-/webgpu-0.7.0.tgz#c0eb9ef5886c7cfb0ebe15e0ff5217b7cc3b8bc4"
+  integrity sha512-Z15oQpf7ZeEtP7tz3LEEBLGnkIPjnehS1Qod0k1HyBRsbBIc6QZjkU6Jv09EEa8IgsboonIstbAyZVa6aaEnbg==
+  dependencies:
+    "@use-gpu/core" "*"
+    "@use-gpu/live" "*"
+    "@use-gpu/workbench" "*"
+
+"@use-gpu/workbench@*":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@use-gpu/workbench/-/workbench-0.7.0.tgz#cfc94aafc06131c3b7ea699d64f492572367b8cf"
+  integrity sha512-+u4tiV1n4Rgwj1o+7hAkBrIDYaQbP3iNxbTnvKupE/3kPrE47hjazOxOToR9YHEqGi/iSS55+WFBFsL4H49Gsg==
+  dependencies:
+    "@use-gpu/core" "*"
+    "@use-gpu/glyph" "*"
+    "@use-gpu/live" "*"
+    "@use-gpu/shader" "*"
+    "@use-gpu/state" "*"
+    "@use-gpu/wgsl" "*"
+
 "@wasm-tool/wasm-pack-plugin@^1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@wasm-tool/wasm-pack-plugin/-/wasm-pack-plugin-1.6.0.tgz#a2dbec777b317b04f72e13f0080a3f483cd89809"

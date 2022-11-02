@@ -8,6 +8,7 @@
     { "path": "../wgsl" },
     { "path": "../shader" },
     { "path": "../workbench" },
+    { "path": "../scene" },
     { "path": "../layout" },
     { "path": "../plot" },
     { "path": "../map" },

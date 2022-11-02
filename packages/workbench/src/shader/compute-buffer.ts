@@ -24,7 +24,7 @@ const NOP = () => {};
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
-export type ComputeDataProps = {
+export type ComputeBufferProps = {
   width?: number,
   height?: number,
   depth?: number,
@@ -38,7 +38,7 @@ export type ComputeDataProps = {
 };
 
 /** Read-write GPU storage buffer for compute. Will perform frame-buffer flipping with N frames of history. */
-export const ComputeData: LiveComponent<ComputeDataProps> = (props) => {
+export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

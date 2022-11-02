@@ -66,7 +66,7 @@ export const useUpdateState = <T>(initialState: InitialState<T>, useStateHook: U
   const [state, setState] = useStateHook(initialState);
 
   const updateState = useCallback((update: Update<T>) =>
-    setState((s) => patch(s, update)),
+    setState((s: T) => patch(s, update)),
     []);
 
   // eslint-disable-next-line

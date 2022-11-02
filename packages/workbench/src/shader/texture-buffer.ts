@@ -16,7 +16,7 @@ const seq = (n: number, start: number = 0, step: number = 1) => Array.from({leng
 
 const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 
-export type TextureDataProps = {
+export type TextureBufferProps = {
   width?: number,
   height?: number,
   history?: number,
@@ -33,7 +33,7 @@ export type TextureDataProps = {
 };
 
 /** Read-write GPU texture buffer for compute. Will perform frame-buffer flipping with N frames of history. */
-export const TextureData: LiveComponent<TextureDataProps> = (props) => {
+export const TextureBuffer: LiveComponent<TextureBufferProps> = (props) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

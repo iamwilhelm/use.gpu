@@ -52,7 +52,7 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     bind(passEncoder);
 
-    for (const f of calls) f(passEncoder, countGeometry);
+    for (const f of calls) f(passEncoder, countGeometry, true);
     passEncoder.end();
   };
 

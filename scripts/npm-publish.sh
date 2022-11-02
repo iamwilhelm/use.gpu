@@ -11,6 +11,7 @@ yarn publish --ignore-scripts --access public build/packages/live
 yarn publish --ignore-scripts --access public build/packages/map
 yarn publish --ignore-scripts --access public build/packages/plot
 yarn publish --ignore-scripts --access public build/packages/react
+yarn publish --ignore-scripts --access public build/packages/scene
 yarn publish --ignore-scripts --access public build/packages/shader
 yarn publish --ignore-scripts --access public build/packages/state
 yarn publish --ignore-scripts --access public build/packages/traits

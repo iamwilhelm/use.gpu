@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
-import { useMemo, useOne, reactInterop } from '@use-gpu/live';
+import { extend, useMemo, useOne } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
@@ -99,25 +99,6 @@ const interpolateValue: Interpolator = <T>(a: any, b: any, t: number) => {
   return a;
 };
 
-const injectProp = (prop: string, value: any) => (call: LiveElement): LiveElement => {
-  if (typeof call === 'string') return null;
-  if (!call) return call;
-
-  const c = reactInterop(call);
-  if (Array.isArray(c)) return c.map(injectProp(prop, value)) as any as LiveElement;
-  if (c?.args) {
-    const [props] = c.args;
-    if (props) {
-      c.args = [{
-        ...props,
-        [prop]: value,
-      }];
-    }
-  }
-
-  return c;
-};
-
 // causes typescript docgen to crash if defined as recursive
 type NestedNumberArray = any[];
 type Numberish = number | TypedArray | NestedNumberArray;
@@ -170,11 +151,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
   else useNoAnimationFrame();
 
   if (render) return tracks ? render(values) : (prop ? render(values[prop]) : null);
-  if (children) {
-    const list = Array.isArray(children) ? children.slice() : [children];
-    for (const k in values) list.map(injectProp(k, values[k]));
-    return list;
-  }
+  if (children) return extend(children, values);
 
   return children ?? null;
 };

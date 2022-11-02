@@ -23,13 +23,14 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 @export fn getFaceVertex(vertexIndex: u32, globalInstanceIndex: u32) -> ShadedVertex {
   let NaN: f32 = bitcast<f32>(0xffffffffu);
 
+  var resolvedIndex: u32;
   var instanceIndex: u32;
   if (HAS_INSTANCES) {
     let size = getInstanceSize();
-    let index = getInstance(globalInstanceIndex / size);
+    resolvedIndex = getInstance(globalInstanceIndex / size);
     instanceIndex = globalInstanceIndex % size;
 
-    loadInstance(index);
+    loadInstance(resolvedIndex);
   }
   else {
     instanceIndex = globalInstanceIndex;

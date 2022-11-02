@@ -23,13 +23,24 @@ const MESH_FIELDS = [
 const COLOR_ON = [1, 1, 1, 1];
 const COLOR_OFF = [0.5, 0.5, 0.5, 1.0];
 
-const KEYFRAMES = [
+const POSITION_KEYFRAMES = [
   [ 0, [-3,  0, 0]],
   [10, [ 0, -3, 0]],
   [20, [ 3,  0, 0]],
   [30, [ 0,  3, 0]],
   [40, [-3,  0, 0]],
 ];
+
+const ROTATION_KEYFRAMES = [
+  [ 0, [0,   0, 0]],
+  [ 6, [0, 360, 0]],
+  [ 8, [0, 360, 0]],
+  [ 8, [0,   0, 0]],
+  [14, [360, 0, 0]],
+  [16, [360, 0, 0]],
+];
+
+const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 const Mesh = memo(({mesh, texture}) => {
   return (
@@ -90,17 +101,20 @@ export const MeshInstancePage: LC = (props) => {
                       <Instances
                         mesh={mesh}
                         render={(Instance) => (<>
-                          <Animate prop="position" keyframes={KEYFRAMES} loop>
-                            <Node rotation={[30, - 30, -30]}>
-                              <Instance />
+
+                          <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
+                            <Node>
+                              {seq(20).map(i => (
+                                <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
+                                  <Instance
+                                    rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
+                                    scale={[0.2, 0.2, 0.2]}
+                                  />
+                                </Animate>
+                              ))}
                             </Node>
                           </Animate>
 
-                          <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
-                            <Node rotation={[30, - 30, -30]}>
-                              <Instance />
-                            </Node>
-                          </Animate>                      
                         </>)}
                       />
                     </PBRMaterial>

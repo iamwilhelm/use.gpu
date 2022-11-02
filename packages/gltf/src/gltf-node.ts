@@ -16,7 +16,7 @@ export const GLTFNode: LC<GLTFNodeProps> = memo((props: GLTFNodeProps) => {
   const {
     gltf,
     node,
-    matrix: parentMatrix,
+    matrix: parent,
   } = props;
   if (!gltf.nodes) return null;
 
@@ -30,10 +30,11 @@ export const GLTFNode: LC<GLTFNodeProps> = memo((props: GLTFNodeProps) => {
   } = gltf.nodes[node];
 
   const transform = useMemo(() => {
-    if (!(matrix || translation || rotation || scale)) return parentMatrix;
+    if (!(matrix || translation || rotation || scale)) return parent;
 
     const transform = mat4.create();
     composeTransform(transform, translation, rotation, scale, matrix);
+    if (parent) mat4.multiply(transform, parent, transform);
     return transform;
   }, [matrix, translation, rotation, scale]);
 

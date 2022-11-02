@@ -31,12 +31,31 @@ export type PassProps = {
 };
 
 type RenderCounter = (v: number, t: number) => void;
-export type RenderToPass = (passEncoder: GPURenderPassEncoder, countGeometry: RenderCounter) => void;
+export type RenderToPass = (
+  passEncoder: GPURenderPassEncoder,
+  countGeometry: RenderCounter,
+) => void;
 
 type ComputeCounter = (d: number) => void;
-export type ComputeToPass = (passEncoder: GPUComputePassEncoder, countDispatch: ComputeCounter) => void;
+export type ComputeToPass = (
+  passEncoder: GPUComputePassEncoder,
+  countDispatch: ComputeCounter,
+) => void;
 
 export type CommandToBuffer = () => GPUCommandBuffer;
+
+export type PassCallProps = {
+  calls: {
+    compute?: ComputeToPass[],
+    opaque?: RenderToPass[],
+    transparent?: RenderToPass[],
+    debug?: RenderToPass[],
+    picking?: RenderToPass[],
+    shadow?: RenderToPass[],
+    post?: CommandToBuffer[],
+    readback?: ArrowFunction[],
+  },
+}
 
 export type VirtualDraw = {
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
@@ -48,6 +67,7 @@ export type VirtualDraw = {
   instanceCount?: Lazy<number>,
   indirect?: StorageSource, 
 
+  passes?: LiveComponent<PassCallProps>[],
   renderer?: string,
   links?: Record<string, ShaderModule>,
 };
@@ -59,6 +79,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     mode = 'forward',
     shadows = false,
     picking = true,
+    passes,
     children,
   } = props;
 
@@ -74,7 +95,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     const getRenderer = (mode, renderer = null) =>
       components.modes[mode] ?? components.renderers[renderer];
 
-    const getVariants = (!shadows && !picking)
+    const getVariants = (!shadows && !picking && !passes)
        ? (virtual, hovered) => hovered ? [getRenderer(HOVERED_VARIANT)] : getRenderer(virtual.mode, virtual.renderer)
 
        : (virtual, hovered) => {
@@ -104,6 +125,10 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     useMemo(() => {
       const props = {calls};
 
+      if (passes) {
+        return passes.map(Component => use(Component, props));
+      }
+
       return [
         calls.compute ? use(ComputePass, props) : null,
         calls.shadow ? use(ShadowPass, props) : null,
@@ -111,7 +136,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
         calls.post || calls.readback ? use(ReadbackPass, props) : null,
         picking && calls.picking ? use(PickingPass, props) : null,
       ];
-    }, [context, calls]);
+    }, [context, calls, passes]);
 
   return multiGather(provide(PassContext, context, children), Resume);
 }, 'Pass');

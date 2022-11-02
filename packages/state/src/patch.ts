@@ -28,7 +28,7 @@ expect(patch(value, update)).toEqual({
 });
 ```
 */
-export const $set = <T>($set: T) => ({$set});
+export const $set = <T>($set: T): Update<T> => ({$set});
 
 /** Merge two values. This is the default behavior for objects, so exists mostly for clarity.
 
@@ -49,7 +49,7 @@ expect(patch(value, update)).toEqual({
 });
 ```
 */
-export const $merge = <T>($merge: T) => ({$merge});
+export const $merge = <T>($merge: T): Update<T> => ({$merge});
 
 /** Delete a value.
 
@@ -70,10 +70,10 @@ expect(patch(value, update)).toEqual({
 });
 ```
 */
-export const $delete = <T>() => $DELETE;
+export const $delete = (): Update<any> => $DELETE;
 
 /** No-op */
-export const $nop = <T>() => $NOP;
+export const $nop = (): Update<any> => $NOP;
 
 /** Apply a function to a value.
 
@@ -122,7 +122,7 @@ expect(patch(value, update)).toEqual({
 */
 export const $patch = <T>($patch: (t: T) => Update<T>) => ({$patch});
 
-const $maybeSet = (v) => {
+const $maybeSet = <T>(v: T): Update<T> => {
   if (!v || typeof v !== 'object' || Array.isArray(v) || isTypedArray(v)) return v;
   return $set(v);
 };
@@ -138,17 +138,17 @@ export const patch = <T>(a: T, b: Update<T>): T => {
     if ('$apply' in b) return b.$apply(a);
     if ('$patch' in b) return patch(a, b.$patch(a));
     if ('$merge' in b) return merge(a, b.$merge);
-    if ('$delete' in b) return undefined as any as T;
+    if ('$delete' in b) return undefined as any;
   }
   return merge(a, b);
 }
 
 const merge = <T>(a: T, b: Merge<T>): T => {
-  if (typeof b === 'boolean') return b as any as T;
-  if (typeof b === 'number') return b as any as T;
-  if (typeof b === 'string') return b as any as T;
-  if (Array.isArray(b) || isTypedArray(b)) return b as any as T;
-  if (b === null) return b as any as T;
+  if (typeof b === 'boolean') return b as any;
+  if (typeof b === 'number') return b as any;
+  if (typeof b === 'string') return b as any;
+  if (Array.isArray(b) || isTypedArray(b)) return b as any;
+  if (b === null) return b as any;
   if (b === undefined) return a;
 
   if (typeof b === 'object') {
@@ -202,7 +202,7 @@ const merge = <T>(a: T, b: Merge<T>): T => {
 
 Supported operators: $set, $merge, $delete, $nop, $apply, $patch.
 */
-export const revise = <T>(a: T, b: Update<T>): T => {
+export const revise = <T>(a: T, b: Update<T>): Update<T> => {
   if (b && typeof b === 'object') {
     if ('$nop' in b) return $nop();
     if ('$set' in b) return $maybeSet(a);
@@ -215,13 +215,13 @@ export const revise = <T>(a: T, b: Update<T>): T => {
 }
 
 const pick = <T>(a: T, b: Update<T>): Update<T> => {
-  if (typeof a === 'boolean') return a as any as Update<T>;
-  if (typeof a === 'number') return a as any as Update<T>;
-  if (typeof a === 'string') return a as any as Update<T>;
-  if (a === null) return a as any as Update<T>;
+  if (typeof a === 'boolean') return a as any;
+  if (typeof a === 'number') return a as any;
+  if (typeof a === 'string') return a as any;
+  if (a === null) return a as any;
   if (a === undefined) return $DELETE;
 
-  if (Array.isArray(b) || isTypedArray(b)) return $maybeSet(a as any as Update<T>);
+  if (Array.isArray(b) || isTypedArray(b)) return $maybeSet(a) as any;
 
   if (typeof b === 'object') {
     let update: Record<string, any> = b;
@@ -254,7 +254,7 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
       }
     }
 
-    return out as any as Update<T>;
+    return out as any;
   }
 
   throw new Error(`Unsupported revise "${a}" vs "${b}"`);
@@ -265,11 +265,11 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
 export const diff = <T>(a: T, b: T): Update<T> => {
   if (a === b) return undefined;
 
-  if (typeof b === 'boolean') return b as any as Update<T>;
-  if (typeof b === 'number') return b as any as Update<T>;
-  if (typeof b === 'string') return b as any as Update<T>;
-  if (Array.isArray(b) || isTypedArray(b)) return b as any as Update<T>;
-  if (b === null) return b as any as Update<T>;
+  if (typeof b === 'boolean') return b as any;
+  if (typeof b === 'number') return b as any;
+  if (typeof b === 'string') return b as any;
+  if (Array.isArray(b) || isTypedArray(b)) return b as any;
+  if (b === null) return b as any;
   if (b === undefined) return $DELETE;
 
   if (typeof b === 'object') {
@@ -293,7 +293,7 @@ export const diff = <T>(a: T, b: T): Update<T> => {
       const v = bb[k];
       out[k] = v && typeof v === 'object' && !Array.isArray(v) ? $set(v) : v;
     }
-    return out as any as Update<T>;
+    return out as any;
   }
 
   throw new Error(`Unsupported diff "${a}" vs "${b}"`);
@@ -301,8 +301,8 @@ export const diff = <T>(a: T, b: T): Update<T> => {
 
 /** Get keys with non-no-op changes
 */
-export const getUpdateKeys = <T>(update: T): Update<T> => {
-  const keys = [];
+export const getUpdateKeys = <T>(update: T): string[] => {
+  const keys: string[] = [];
 
   const recurse = (b: Update<T>, path: string | null) => {
     if (b && typeof b === 'object') {

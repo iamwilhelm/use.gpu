@@ -1,23 +1,26 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
-import type { InstanceAggregate } from './types';
+import type { ObjectTrait } from './types';
 
 import { use, memo, provide, yeet, useCallback, useMemo, useOne, tagFunction } from '@use-gpu/live';
-import { hashBits53, getObjectKey } from '@use-gpu/state';
-import { getBundleKey, bundleToAttributes, bindEntryPoint } from '@use-gpu/shader/wgsl';
+import { bundleToAttributes, bindEntryPoint } from '@use-gpu/shader/wgsl';
 
 import { FaceLayer } from '../layers/face-layer';
 import { InstanceProvider } from '../providers/instance-provider';
 import { TransformContext, DifferentialContext } from '../providers/transform-provider';
 import { useMatrixContext, MatrixContext } from '../providers/matrix-provider';
+
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { getBoundShader } from '../hooks/useBoundShader';
+import { InstanceData } from '../data/instance-data';
+
+import { useObjectTrait } from './traits';
+import { composeTransform } from './lib/compose';
 
 import { loadInstance } from '@use-gpu/wgsl/transform/instance.wgsl';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
-import { InstanceData } from '../data/instance-data';
 import { mat3, mat4 } from 'gl-matrix';
 
 const INSTANCE_BINDINGS = bundleToAttributes(loadInstance);
@@ -40,8 +43,8 @@ const INSTANCE_FIELDS = [
 
 export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildren<InstancesProps>) => {
   const {
-    index,
     mesh,
+    index,
     render,
   } = props;
 
@@ -85,14 +88,34 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
 const makeInstance = (
   instance: InstanceInfo,
   useInstance: () => [number, (data: Record<string, any>) => void],
-) => tagFunction(() => {
-  const matrix = useMatrixContext();
+) => tagFunction((props: Partial<ObjectTrait>) => {
+  const parent = useMatrixContext();
   const updateInstance = useInstance();
 
+  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const [matrix, normalMatrix] = useOne(() => [
+    mat4.create(),
+    mat3.create(),
+  ]);
+
   useOne(() => {
-    const normalMatrix = mat3.normalFromMat4(mat3.create(), matrix);
+    if (m) {
+      mat4.copy(matrix, m);
+      if (p || r || q || s) {
+        const t = mat4.create();
+        composeTransform(t, p, r, q, s);
+        mat4.multiply(matrix, matrix, t);
+      }
+    }
+    else if (p || r || q || s) {
+      composeTransform(matrix, p, r, q, s);
+    }
+
+    mat4.multiply(matrix, parent, matrix);
+    mat3.normalFromMat4(normalMatrix, matrix);
+
     updateInstance({matrix, normalMatrix});
-  }, matrix);
+  }, [p, s, q, r, m]);
 
   return yeet();
 }, 'Instance');

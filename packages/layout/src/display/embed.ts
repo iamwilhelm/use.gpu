@@ -50,31 +50,29 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
   if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
   const fit = (into: FitInto) => {
-      const w = width != null ? evaluateDimension(width, into[2], snap) : null;
-      const h = height != null ? evaluateDimension(height, into[3], snap) : null;
+    const w = width != null ? evaluateDimension(width, into[2], snap) : null;
+    const h = height != null ? evaluateDimension(height, into[3], snap) : null;
 
-      const size = [
-        w ?? into[0],
-        h ?? into[1],
-      ] as [number, number];
+    const size = [
+      w ?? into[0],
+      h ?? into[1],
+    ] as [number, number];
 
-      return {
-        size,
-        render: memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => {
-          const view = render
-            ? render(id, layout, clip, transform)
-            : (
-              provide(LayoutContext, layout,
-                provide(TransformContext, transform,
-                  children
-                ),
-                id,
-              )
-            );
-          return yeet(view);
-        }),
-      };
+    return {
+      size,
+      render: memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => {
+        const view = render
+          ? render(id, layout, clip, transform)
+          : (
+            provide(LayoutContext, layout,
+              provide(TransformContext, {transform}, children),
+              id,
+            )
+          );
+        return yeet(view);
+      }),
     };
+  };
 
   return yeet({
     size: [w, h],

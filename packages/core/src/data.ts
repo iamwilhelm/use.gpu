@@ -1,4 +1,4 @@
-import type { TypedArray, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec } from './types';
+import type { TypedArray, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec, DataBoundingBox, DataBounds } from './types';
 import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
 
 import { vec4 } from 'gl-matrix';
@@ -1048,7 +1048,7 @@ export const copyNumberArrayCompositeRange = (
   }
 }
 
-export const getBoundingBox = (data: NumberArray, dims: number) => {
+export const getBoundingBox = (data: NumberArray, dims: number): DataBoundingBox => {
   const n = data.length / dims;
   
   if (dims === 1) {
@@ -1156,7 +1156,7 @@ export const getBoundingBox = (data: NumberArray, dims: number) => {
   return [min, max];
 };
 
-export const extendBoundingBox = (box: number[][], data: NumberArray, dims: number) => {
+export const extendBoundingBox = (box: DataBoundingBox, data: NumberArray, dims: number) => {
   const n = data.length / dims;
   const [min, max] = box;
   
@@ -1234,7 +1234,7 @@ export const extendBoundingBox = (box: number[][], data: NumberArray, dims: numb
   return;
 };
 
-export const toBoundingSphere = (box: number[][]) => {
+export const toDataBounds = (box: DataBoundingBox): DataBounds => {
   const [min, max] = box;
   const dims = min.length;
 
@@ -1242,6 +1242,8 @@ export const toBoundingSphere = (box: number[][]) => {
     return {
       center: [(min[0] + max[0]) / 2],
       radius: (max[0] - min[0]) / 2,
+      min,
+      max,
     };
   }
 
@@ -1253,7 +1255,7 @@ export const toBoundingSphere = (box: number[][]) => {
     const dy = (max[1] - min[1]) / 2;
     const d = Math.sqrt(dx*dx + dy*dy);
     
-    return {center: [cx, cy], radius: d};
+    return {center: [cx, cy], radius: d, min, max};
   }
 
   if (dims === 3) {
@@ -1266,7 +1268,7 @@ export const toBoundingSphere = (box: number[][]) => {
     const dz = (max[2] - min[2]) / 2;
     const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
     
-    return {center: [cx, cy, cz], radius: d};
+    return {center: [cx, cy, cz], radius: d, min, max};
   }
 
   if (dims === 4) {
@@ -1281,7 +1283,7 @@ export const toBoundingSphere = (box: number[][]) => {
     const dw = (max[3] - min[3]) / 2;
     const d = Math.sqrt(dx*dx + dy*dy + dz*dz + dw*dw);
     
-    return {center: [cx, cy, cz, cw], radius: d};
+    return {center: [cx, cy, cz, cw], radius: d, min, max};
   }
 
   return {
@@ -1292,6 +1294,8 @@ export const toBoundingSphere = (box: number[][]) => {
       .map((v: number) => v * v)
       .reduce((a: number, b: number) => a + b, 0)
     ),
+    min,
+    max,
   };
 };
 

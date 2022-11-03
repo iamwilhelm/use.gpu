@@ -1,8 +1,8 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { ViewUniforms, UniformAttribute } from '@use-gpu/core';
+import type { DataBounds, ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
-import { memo, provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useHasContext, useMemo, useFiber } from '@use-gpu/live';
-import { VIEW_UNIFORMS, makeSharedUniforms, uploadBuffer, makeBindGroupLayout } from '@use-gpu/core';
+import { provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useMemo, useRef } from '@use-gpu/live';
+import { VIEW_UNIFORMS, makeSharedUniforms, uploadBuffer, makeBindGroupLayout, distanceToFrustum } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 
 import { mat4 } from 'gl-matrix';
@@ -11,6 +11,7 @@ export const ViewContext = makeContext<ViewContextProps>({
   defs: [],
   uniforms: [],
   layout: null,
+  cull: () => true,
   bind: () => {},
 }, 'ViewContext');
 
@@ -19,6 +20,7 @@ export type ViewContextProps = {
   uniforms: ViewUniforms,
   layout: GPUPipelineLayout,
   bind: (passEncoder: GPURenderPassEncoder) => void,
+  cull: (bounds: DataBounds) => number | false,
 };
 
 export type ViewProviderProps = {
@@ -27,10 +29,11 @@ export type ViewProviderProps = {
   children?: LiveElement,
 };
 
-export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewProviderProps) => {
+const sqr = (x: number) => x * x;
+
+export const ViewProvider: LiveComponent<ViewProviderProps> = (props: ViewProviderProps) => {
   const {defs, uniforms, children} = props;
 
-  const fiber = useFiber();
   const device = useDeviceContext();
 
   const binding = useMemo(() =>
@@ -43,10 +46,26 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewP
 
   const bind = useCallback((passEncoder: GPURenderPassEncoder) => {
     passEncoder.setBindGroup(0, bindGroup);
-  });
+  }, [bindGroup]);
+
+  const {projectionViewFrustum, viewPosition} = uniforms;
+
+  const cull = useCallback((bounds: DataBounds) => {
+    const {center, radius} = bounds;
+    const {current: frustum} = projectionViewFrustum;
+
+    const [x, y, z] = center;
+    const d = distanceToFrustum(frustum, x, y, z);
+
+    if (d < -radius) return false;
+
+    const {current: position} = viewPosition;
+    return sqr(position[0] - x) + sqr(position[1] - y) + sqr(position[2] - z);
+  }, [uniforms]);
 
   const context = useMemo(() => ({
     bind,
+    cull,
     layout,
     defs,
     uniforms,
@@ -56,7 +75,7 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = memo((props: ViewP
     signal(),
     provide(ViewContext, context, children),
   ];
-}, 'ViewProvider');
+};
 
 export const useViewContext = () => useContext(ViewContext);
 export const useNoViewContext = () => useNoContext(ViewContext);

@@ -29,11 +29,13 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
     calls,
   } = props;
 
+  return;
+
   const inspect = useInspectable();
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const {bind} = useViewContext();
+  const {cull, bind} = useViewContext();
 
   const shadows = toArray(calls['shadow'] as RenderToPass[]);
 
@@ -52,7 +54,7 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     bind(passEncoder);
 
-    for (const f of calls) f(passEncoder, countGeometry, true);
+    for (const f of calls) f(passEncoder, cull, countGeometry, true);
     passEncoder.end();
   };
 

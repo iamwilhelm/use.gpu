@@ -7,7 +7,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext, DifferentialContext,
+  TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
@@ -84,14 +84,12 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   const boundPosition = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrixRef]);
   const boundDifferential = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrixRef, normalMatrixRef]);
 
-  const [transform, differential] = useCombinedTransform(boundPosition, boundDifferential);
+  const context = useCombinedTransform(boundPosition, boundDifferential);
 
   return [
     signal(),
-    provide(TransformContext, transform,
-      provide(DifferentialContext, differential,
-        provide(RangeContext, g, children ?? [])
-      )
+    provide(TransformContext, context,
+      provide(RangeContext, g, children ?? [])
     )
   ];
 };

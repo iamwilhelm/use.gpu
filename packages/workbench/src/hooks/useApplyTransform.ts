@@ -12,7 +12,7 @@ const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u3
 export const useApplyTransform = (
   positions?: StorageSource | LambdaSource | TextureSource | ShaderModule | TypedArray | number[] | {current: any},
 ) => {
-  const transform = useTransformContext();
+  const {transform} = useTransformContext();
   const scissor = useScissorContext();
   const version = useVersion(positions) + useVersion(transform) + useVersion(scissor);
 

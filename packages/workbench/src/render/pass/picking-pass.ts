@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { RenderToPass } from '../pass';
+import type { Renderable } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 
@@ -9,12 +9,12 @@ import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
-import { getRenderPassDescriptor } from '../pass';
+import { getRenderPassDescriptor, getDrawOrder } from './util';
 
 export type PickingPassProps = {
   swap?: boolean,
   calls: {
-    picking?: RenderToPass[],
+    picking?: Renderable[],
   },
 };
 
@@ -36,15 +36,25 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
 
   const device = useDeviceContext();
   const pickingContext = usePickingContext();
-  const {bind} = useViewContext();
+  const {cull, bind} = useViewContext();
 
   const {renderContext} = pickingContext;
 
-  const pickings = toArray(calls['picking'] as RenderToPass[]);
+  const pickings  = toArray(calls['picking'] as RenderToPass[]);
 
   const renderPassDescriptor = useMemo(() =>
     getRenderPassDescriptor(renderContext, overlay, merge),
     [renderContext, overlay, merge]);
+
+  const drawToPass = (
+    calls: Renderable[],
+    passEncoder: GPURenderPassEncoder,
+    countGeometry: (v: number, t: number) => void,
+    sign: number = 1,
+  ) => {
+    const order = getDrawOrder(cull, calls, sign);
+    for (const i of order) calls[i].draw(passEncoder, countGeometry);
+  };
 
   return quote(yeet(() => {
     let vs = 0;
@@ -52,25 +62,23 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
-    const shouldUpdatePicking = pickings.length;
-    if (shouldUpdatePicking) {
-      const commandEncoder = device.createCommandEncoder();
-      if (!overlay && !merge) renderContext.swap();
+    const commandEncoder = device.createCommandEncoder();
+    if (!overlay && !merge) renderContext.swap();
 
-      const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-      bind(passEncoder);
+    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+    bind(passEncoder);
 
-      for (const f of pickings) f(passEncoder, countGeometry);
-      passEncoder.end();
+    drawToPass(pickings, passEncoder, countGeometry);
 
-      const command = commandEncoder.finish();
-      device.queue.submit([command]);
-    }
+    passEncoder.end();
+
+    const command = commandEncoder.finish();
+    device.queue.submit([command]);
 
     inspect({
       render: {
-        vertexCount: vs,
-        triangleCount: ts,
+        vertices: vs,
+        triangles: ts,
       },
     });
 

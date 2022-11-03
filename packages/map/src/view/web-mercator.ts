@@ -6,7 +6,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
-  Scissor, TransformContext, DifferentialContext,
+  Scissor, TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
@@ -131,16 +131,14 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
     return chainTo(swizzleTo('vec4<f32>', 'vec4<f32>', swizzle), bound);
   }, [bound, swizzle]);
 
-  const [transform, differential] = useCombinedTransform(xform, null, e);
+  const context = useCombinedTransform(xform, null, null, e);
 
   const view = scissor ? use(Scissor, {range: scissorRange, loop: MERCATOR_LOOP, children}) : children;
 
   return [
     signal(),
-    provide(TransformContext, transform,
-      provide(DifferentialContext, differential,
-        provide(RangeContext, rangeMemo, view)
-      )
+    provide(TransformContext, context,
+      provide(RangeContext, rangeMemo, view)
     )
   ];
 };

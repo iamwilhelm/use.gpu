@@ -105,7 +105,6 @@ export const makeBoxLayout = (
   clip?: ShaderModule,
   transform?: ShaderModule,
   inverse?: ShaderModule,
-  update?: (r: Rectangle) => void,
 ) => (
   box: Rectangle,
   parentClip?: ShaderModule,
@@ -114,8 +113,6 @@ export const makeBoxLayout = (
   const [left, top, right, bottom] = box;
   const out = [] as LiveElement[];
   const n = sizes.length;
-
-  if (update) update(box);
 
   const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
   const xclip = parentClip ? (
@@ -166,13 +163,12 @@ export const makeBoxInspectLayout = (
   clip?: ShaderModule,
   transform?: ShaderModule,
   inverse?: ShaderModule,
-  update?: (r: Rectangle) => void,
 ) => (
   box: Rectangle,
   parentClip?: ShaderModule,
   parentTransform?: ShaderModule,
 ) => {
-  let out = renders ? makeBoxLayout(sizes, offsets, renders, clip, transform, inverse, update)(box, parentClip, parentTransform) : [];
+  let out = renders ? makeBoxLayout(sizes, offsets, renders, clip, transform, inverse)(box, parentClip, parentTransform) : [];
   
   const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
   const xclip = parentClip ? (

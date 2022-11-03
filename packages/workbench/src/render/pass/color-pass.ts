@@ -1,8 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { RenderToPass } from '../pass';
+import type { Renderable } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
-import { proxy } from '@use-gpu/core';
 
 import { useRenderContext } from '../../providers/render-provider';
 import { useDeviceContext } from '../../providers/device-provider';
@@ -10,13 +9,13 @@ import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
-import { getRenderPassDescriptor } from '../pass';
+import { getRenderPassDescriptor, getDrawOrder } from './util';
 
 export type ColorPassProps = {
   calls: {
-    opaque?: RenderToPass[],
-    transparent?: RenderToPass[],
-    debug?: RenderToPass[],
+    opaque?: Renderable[],
+    transparent?: Renderable[],
+    debug?: Renderable[],
   },
 };
 
@@ -38,20 +37,25 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const {bind} = useViewContext();
+  const {cull, bind} = useViewContext();
 
-  const opaques      = toArray(calls['opaque']      as RenderToPass[]);
-  const transparents = toArray(calls['transparent'] as RenderToPass[]);
-  const debugs       = toArray(calls['debug']       as RenderToPass[]);
-
-  const visibles: RenderToPass[] = [];
-  visibles.push(...opaques);
-  visibles.push(...transparents);
-  visibles.push(...debugs);
+  const opaques      = toArray(calls['opaque']      as Renderable[]);
+  const transparents = toArray(calls['transparent'] as Renderable[]);
+  const debugs       = toArray(calls['debug']       as Renderable[]);
 
   const renderPassDescriptor = useMemo(() =>
     getRenderPassDescriptor(renderContext, overlay, merge),
     [renderContext, overlay, merge]);
+
+  const drawToPass = (
+    calls: Renderable[],
+    passEncoder: GPURenderPassEncoder,
+    countGeometry: (v: number, t: number) => void,
+    sign: number = 1,
+  ) => {
+    const order = getDrawOrder(cull, calls, sign);
+    for (const i of order) calls[i].draw(passEncoder, countGeometry);
+  };
 
   return quote(yeet(() => {
     let vs = 0;
@@ -65,7 +69,10 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     bind(passEncoder);
 
-    for (const f of visibles) f(passEncoder, countGeometry);
+    drawToPass(opaques, passEncoder, countGeometry);
+    drawToPass(transparents, passEncoder, countGeometry, -1);
+    drawToPass(debugs, passEncoder, countGeometry);
+
     passEncoder.end();
 
     const command = commandEncoder.finish();
@@ -73,8 +80,8 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
 
     inspect({
       render: {
-        vertexCount: vs,
-        triangleCount: ts,
+        vertices: vs,
+        triangles: ts,
       },
     });
 

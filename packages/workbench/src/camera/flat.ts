@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ViewUniforms, Rectangle } from '@use-gpu/core';
 
 import { use, provide, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
-import { VIEW_UNIFORMS, makeOrthogonalMatrix } from '@use-gpu/core';
+import { VIEW_UNIFORMS, makeOrthogonalMatrix, makeFrustumPlanes } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { RenderContext } from '../providers/render-provider';
@@ -80,6 +80,8 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
 
   const uniforms = useOne(() => ({
     projectionMatrix: { current: null },
+    projectionViewMatrix: { current: null },
+    projectionViewFrustum: { current: null },
     viewMatrix: { current: mat4.create() },
     viewPosition: { current: null },
     viewNearFar: { current: null },
@@ -109,6 +111,10 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.viewSize.current = [ width, height ];
   uniforms.viewWorldDepth.current = [focus * viewHeight / 2.0, viewHeight / (far - near) / 2.0];
   uniforms.viewPixelRatio.current = ratio;
+
+  const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
+  projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
+  projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);
 
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);

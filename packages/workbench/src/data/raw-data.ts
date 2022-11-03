@@ -6,6 +6,7 @@ import { provide, yeet, signal, useMemo, useNoMemo, useOne, useNoOne, useContext
 import {
   makeDataArray, copyNumberArray, emitIntoNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  getBoundingBox, toDataBounds,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -37,6 +38,8 @@ export type RawDataProps = {
   items?: number,
   /** Emit 0 or N items per expr call. Output size is `[N]` or `[items, N]`. */
   sparse?: boolean,
+  /** Calculate data bounds for culling (when used as position data) */
+  bounds?: boolean,
   /** Resample `data` on every animation frame. */
   live?: boolean,
   /** Add current `TimeContext` to the `expr` arguments. */
@@ -49,6 +52,8 @@ export type RawDataProps = {
   render?: (...source: ShaderSource[]) => LiveElement,
 };
 
+const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
+
 /** 1D array of a WGSL type. Reads input `data` or samples a given `expr` of WGSL type `format`. */
 export const RawData: LiveComponent<RawDataProps> = (props) => {
   const device = useContext(DeviceContext);
@@ -60,6 +65,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     items = 1,
     interleaved = false,
     sparse = false,
+    bounds = false,
     live = false,
     time = false,
   } = props;
@@ -81,6 +87,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
       length: 0,
       size: [0],
       version: 0,
+      bounds: bounds ? {...NO_BOUNDS} : undefined,
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
@@ -97,6 +104,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
         length: 0,
         size: [0],
         version: 0,
+        bounds: source.bounds,
       }))
     ), [t, getData]);
   }
@@ -122,6 +130,15 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     source.length  = !sparse ? count : emitted;
     source.size    = !sparse ? (items > 1 ? [items, count] : [count]) : [items, emitted / items];
     source.version = incrementVersion(source.version);
+
+    const {bounds} = source;
+    if (bounds) {
+      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+      bounds.center = center;
+      bounds.radius = radius;
+      bounds.min = min;
+      bounds.max = max;
+    }
 
     if (sources) {
       for (const s of sources) {

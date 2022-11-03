@@ -1,10 +1,11 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
+import type { DataBounds, TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
 
 import { provide, yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  getBoundingBox, toDataBounds,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -27,6 +28,8 @@ export type ArrayDataProps = {
   items?: number,
   /** Emit 0 or N items per `expr` call. Output size is `[N]` or `[items, N]`. */
   sparse?: boolean,
+  /** Calculate data bounds for culling (when used as position data) */
+  bounds?: boolean,
   /** Add current `TimeContext` to the `expr` arguments. */
   time?: boolean,
   /** Resample `data` or `expr` on every animation frame. */
@@ -35,6 +38,8 @@ export type ArrayDataProps = {
   /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
 };
+
+const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Reads input `data` or samples a given `expr`. */
 export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
@@ -48,6 +53,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     items = 1,
     render,
     sparse = false,
+    bounds = false,
     live = false,
     time = false,
   } = props;
@@ -70,6 +76,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
       length,
       size,
       version: 0,
+      bounds: bounds ? {...NO_BOUNDS} : undefined,
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
@@ -92,6 +99,15 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
 
     source.length  = !sparse ? length : emitted;
     source.size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
+
+    const {bounds} = source;
+    if (bounds) {
+      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+      bounds.center = center;
+      bounds.radius = radius;
+      bounds.min = min;
+      bounds.max = max;
+    }
   };
 
   if (!live) {

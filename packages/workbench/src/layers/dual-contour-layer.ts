@@ -11,7 +11,7 @@ import { Virtual } from '../primitives/virtual';
 import { Readback } from '../primitives/readback';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, yeet, debug, fragment, useMemo, useOne, useVersion } from '@use-gpu/live';
+import { use, memo, yeet, debug, fragment, useMemo, useOne, useVersion, incrementVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, uploadBuffer } from '@use-gpu/core';
 
@@ -25,7 +25,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { useMaterialContext } from '../providers/material-provider';
-import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
+import { useTransformContext } from '../providers/transform-provider';
 
 import { useInspectable } from '../hooks/useInspectable'
 
@@ -150,8 +150,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const min = useShaderRef(rangeMin);
   const max = useShaderRef(rangeMax);
 
-  const xf = useTransformContext();
-  const xd = useDifferentialContext();
+  const {transform: xf, differential: xd} = useTransformContext();
   const {shaded: material} = useMaterialContext();
 
   const indirectDraw    = useOne(() => new Uint32Array(12));
@@ -251,7 +250,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     indirectDraw[7] = generation;
 
     indirectDraw[8] = 0; // nextVertex
-    generationRef.current++;
+    generationRef.current = incrementVersion(generationRef.current);
 
     uploadBuffer(device, indirectStorage.buffer, indirectDraw.buffer);
   };

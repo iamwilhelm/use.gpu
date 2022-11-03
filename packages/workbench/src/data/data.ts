@@ -1,10 +1,11 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, Accessor, DataField } from '@use-gpu/core';
+import type { TypedArray, StorageSource, UniformType, Accessor, DataField, DataBounds } from '@use-gpu/core';
 
 import { yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, makeDataAccessor, copyDataArray, copyNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  getBoundingBox, toDataBounds,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -24,6 +25,7 @@ export type DataProps = {
 };
 
 const NO_FIELDS = [] as DataField[];
+const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Compose array-of-structs into struct-of-array data. */
 export const Data: LiveComponent<DataProps> = (props) => {
@@ -42,9 +44,12 @@ export const Data: LiveComponent<DataProps> = (props) => {
 
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
-    const fieldBuffers = fs.map(([format, accessor]) => {
+    const fieldBuffers = fs.map(([format, accessor, accessorType]) => {
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
+
+      const isPosition = accessorType === 'position';
+      const bounds = isPosition ? {...NO_BOUNDS} : undefined;
 
       let {raw, length, fn} = makeDataAccessor(f, accessor);
       if (length == null) length = l;
@@ -58,6 +63,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
         length: 0,
         size: [0],
         version: 0,
+        bounds,
       };
 
       return {buffer, array, source, dims, accessor, raw};
@@ -78,6 +84,15 @@ export const Data: LiveComponent<DataProps> = (props) => {
       source.length  = length;
       source.size[0] = length;
       source.version = incrementVersion(source.version);
+
+      const {bounds} = source;
+      if (bounds) {
+        const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+        bounds.center = center;
+        bounds.radius = radius;
+        bounds.min = min;
+        bounds.max = max;
+      }
     }
   };
 

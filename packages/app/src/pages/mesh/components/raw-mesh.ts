@@ -147,22 +147,25 @@ export const RawMesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
   }, [device, viewDefs, isPicking, pipeline]);
 
   // Return a lambda back to parent(s)
+  const draw = (passEncoder: GPURenderPassEncoder) => {
+    const l = blinkState ? 1 : 0.5;
+
+    uniform.pipe.fill(viewUniforms);
+    uniform.pipe.fill({ lightPosition: LIGHT, lightColor: [l, l, l, 1] });
+    uploadBuffer(device, uniform.buffer, uniform.pipe.data);
+
+    passEncoder.setPipeline(pipeline);
+    passEncoder.setBindGroup(0, uniform.bindGroup);
+    if (sampled) passEncoder.setBindGroup(1, sampled);
+    passEncoder.setVertexBuffer(0, vertexBuffers[0]);
+    passEncoder.draw(mesh.count, 1, 0, 0);
+
+    // Restore bind group 0
+    unbind(passEncoder);
+  };
+
   return yeet({
-    [mode]: (passEncoder: GPURenderPassEncoder) => {
-      const l = blinkState ? 1 : 0.5;
-
-      uniform.pipe.fill(viewUniforms);
-      uniform.pipe.fill({ lightPosition: LIGHT, lightColor: [l, l, l, 1] });
-      uploadBuffer(device, uniform.buffer, uniform.pipe.data);
-
-      passEncoder.setPipeline(pipeline);
-      passEncoder.setBindGroup(0, uniform.bindGroup);
-      if (sampled) passEncoder.setBindGroup(1, sampled);
-      passEncoder.setVertexBuffer(0, vertexBuffers[0]);
-      passEncoder.draw(mesh.count, 1, 0, 0);
-
-      // Restore bind group 0
-      unbind(passEncoder);
-    }
+    // Optionally pass `bounds` of type Lazy<DataBounds> to enable culling
+    [mode]: {draw}
   }); 
 }, 'Mesh');

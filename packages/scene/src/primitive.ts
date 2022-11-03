@@ -1,7 +1,9 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import { memo, provide, useOne } from '@use-gpu/live';
+import type { DataBounds } from '@use-gpu/core';
+
+import { memo, provide, useCallback, useOne } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { mat3, mat4 } from 'gl-matrix';
+import { vec3, mat3, mat4 } from 'gl-matrix';
 
 import {
   TransformContext, DifferentialContext,
@@ -24,19 +26,30 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
   const {children} = props;
 
   const matrix = useMatrixContext();
-  const normalMatrix = useOne(() => mat3.normalFromMat4(mat3.create(), matrix), matrix);
+  const [normalMatrix, matrixScale] = useOne(() => {
+    const s = mat4.getScaling(vec3.create(), matrix);
+    const normalMatrix = mat3.normalFromMat4(mat3.create(), matrix);
+    const matrixScale = Math.max(Math.abs(s[0]), Math.abs(s[1]), Math.abs(s[2]));
+    return [normalMatrix, matrixScale];
+  }, matrix);
 
   const matrixRef = useShaderRef(matrix);
   const normalMatrixRef = useShaderRef(normalMatrix);
+  const matrixScaleRef = useShaderRef(matrixScale);
 
   const boundPosition = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrixRef]);
   const boundDifferential = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrixRef, normalMatrixRef]);
 
-  const [transform, differential] = useCombinedTransform(boundPosition, boundDifferential);
+  const cullBounds = useOne(() => ({ center: [], radius: 0 }));
+  const getBounds = useCallback((bounds: DataBounds) => {
+    vec3.transformMat4(cullBounds.center, bounds.center, matrixRef.current);
+    cullBounds.radius = matrixScale * bounds.radius;
+    return cullBounds;
+  });
+
+  const context = useCombinedTransform(boundPosition, boundDifferential, getBounds);
 
   return (
-    provide(TransformContext, transform,
-      provide(DifferentialContext, differential, children)
-    )
+    provide(TransformContext, context, children)
   );
 }, 'Primitive');

@@ -5,7 +5,7 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale,
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext, DifferentialContext,
+  TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 import { parseAxes } from '@use-gpu/traits';
@@ -155,16 +155,14 @@ export const Spherical: LiveComponent<SphericalProps> = (props) => {
     return chainTo(swizzleTo('vec4<f32>', 'vec4<f32>', swizzle), bound);
   }, [bound, swizzle]);
 
-  const [transform, differential] = useCombinedTransform(xform, null, e);
+  const context = useCombinedTransform(xform, null, null, e);
 
   const rangeMemo = useOne(() => range, JSON.stringify(range));
 
   return [
     signal(),
-    provide(TransformContext, transform,
-      provide(DifferentialContext, differential,
-        provide(RangeContext, rangeMemo, children ?? [])
-      )
+    provide(TransformContext, context,
+      provide(RangeContext, rangeMemo, children ?? [])
     )
   ];
 };

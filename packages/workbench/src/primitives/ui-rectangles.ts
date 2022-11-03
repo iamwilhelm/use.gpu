@@ -120,11 +120,11 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const p = useShaderRef(props.repeat, props.repeats);
   const d = useShaderRef(props.sdf, props.sdfs);
 
-  const [x] = useCombinedTransform(props.transform);
+  const {transform: xf} = useCombinedTransform(props.transform);
   const c = props.clip;
   const t = useNativeColorTexture(props.texture);
 
-  const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, x, c]);
+  const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, xf, c]);
   const getPicking = usePickingShader(props);
   const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
 

@@ -6,7 +6,7 @@ import { parseColor, parseNumber, parsePosition, parseVec2, parseVec3, useProp }
 import { useMemo, useOne } from '@use-gpu/live';
 
 import { useLightCapture } from './lights';
-import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
+import { useTransformContext } from '../providers/transform-provider';
 
 import { mat4, vec3 } from 'gl-matrix';
 
@@ -72,8 +72,7 @@ export const DirectionalLight = (props: DirectionalLightProps) => {
     return [tangent, shadow];
   }, [normal, shadowMap]);
 
-  const transform = useTransformContext();
-  const differential = useDifferentialContext();
+  const {transform, differential} = useTransformContext();
 
   const light = useMemo(() => ({
     kind: 1,

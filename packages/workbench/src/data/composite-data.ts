@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, Accessor, DataField, ChunkLayout } from '@use-gpu/core';
+import type { TypedArray, StorageSource, UniformType, Accessor, DataField, DataBounds, ChunkLayout } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -13,6 +13,7 @@ import {
   copyDataArrayChunked, copyNumberArrayChunked,
   getChunkCount,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  getBoundingBox, toDataBounds,
 } from '@use-gpu/core';
 
 export type CompositeDataProps = {
@@ -38,6 +39,7 @@ export type CompositeDataProps = {
 };
 
 const NO_FIELDS = [] as DataField[];
+const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 const isComposite = (format: string) => !!format.match(/^array</);
 const toSimple = (format: string) => format.slice(6, -1);
@@ -184,8 +186,11 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       const composite = isComposite(format);
       format = composite ? toSimple(format) : format;
 
+      const isPosition = accessorType === 'position';
       const isIndex = accessorType === 'index';
       const isUnwelded = accessorType === 'unwelded';
+
+      const bounds = isPosition ? {...NO_BOUNDS} : undefined;
 
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
@@ -202,6 +207,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         length: 0,
         size: [0],
         version: 0,
+        bounds,
       };
 
       return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex, isUnwelded};
@@ -233,6 +239,15 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       source.length  = isIndex || isUnwelded ? indexCount : dataCount;
       source.size[0] = source.length;
       source.version = incrementVersion(source.version);
+
+      const {bounds} = source;
+      if (bounds) {
+        const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+        bounds.center = center;
+        bounds.radius = radius;
+        bounds.min = min;
+        bounds.max = max;
+      }
     }
   };
 

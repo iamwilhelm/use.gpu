@@ -9,7 +9,6 @@ import {
   FaceLayer,
   InstanceData,
   TransformContext,
-  DifferentialContext,
   useCombinedTransform,
   getBoundShader,
 } from '@use-gpu/workbench';
@@ -66,12 +65,10 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
       return [view, boundPosition, boundDifferential];
     }, [instances, fieldSources]);
 
-    const [transform, differential] = useCombinedTransform(boundPosition, boundDifferential);
+    const context = useCombinedTransform(boundPosition, boundDifferential);
 
     return (
-      provide(TransformContext, transform,
-        provide(DifferentialContext, differential, view)
-      )
+      provide(TransformContext, context, view)
     );
   }, [mesh]);
 

@@ -15,6 +15,7 @@ import {
   copyDataArrayChunked, copyNumberArrayChunked,
   getChunkCount,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  getBoundingBox, toDataBounds,
 } from '@use-gpu/core';
 
 export type InterleavedDataProps = {
@@ -40,6 +41,7 @@ export type InterleavedDataProps = {
 };
 
 const NO_FIELDS = [] as DataField[];
+const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Convert an interleaved, flat array-of-structs with fields `T` into struct-of-array data. */
 export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
@@ -75,9 +77,12 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
 
-    const fieldBuffers = fs.map(([format], i) => {
+    const fieldBuffers = fs.map(([format,, accessorType], i) => {
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
+
+      const isPosition = accessorType === 'position';
+      const bounds = isPosition ? {...NO_BOUNDS} : undefined;
 
       const {array, dims} = makeDataArray(f, bufferLength);
 
@@ -88,6 +93,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
         length: 0,
         size: [0],
         version: 0,
+        bounds,
       };
 
       const offset = layout.attributes[i].offset / bytesPerElement;
@@ -119,6 +125,15 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
       source.length  = dataCount;
       source.size[0] = source.length;
       source.version = incrementVersion(source.version);
+
+      const {bounds} = source;
+      if (bounds) {
+        const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+        bounds.center = center;
+        bounds.radius = radius;
+        bounds.min = min;
+        bounds.max = max;
+      }
     }
   };
 

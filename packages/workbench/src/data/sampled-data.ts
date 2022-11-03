@@ -1,10 +1,11 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
+import type { DataBounds, TypedArray, StorageSource, UniformType, Emit, Emitter } from '@use-gpu/core';
 
 import { provide, yeet, signal, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
 import {
   makeDataArray, copyNumberArray, emitIntoMultiNumberArray, 
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
+  getBoundingBox, toDataBounds,
 } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
@@ -29,18 +30,22 @@ export type SampledDataProps = {
   items?: number,
   /** Emit 0 or N items per `expr` call. Output size is `[N]` or `[items, N]`. */
   sparse?: boolean,
+  /** Use centered samples (0.5, 1.5, ..., N-0.5) instead of edge-to-edge samples (0, 1, ..., N). */
+  centered?: boolean[] | boolean,
+  /** Calculate data bounds for culling (when used as position data) */
+  bounds?: boolean,
   /** Add current indices `i`, `j`, `k`, `l` to the `expr` arguments. */
   index?: boolean,
   /** Add current `TimeContext` to the `expr` arguments. */
   time?: boolean,
-  /** Use centered samples (0.5, 1.5, ..., N-0.5) instead of edge-to-edge samples (0, 1, ..., N). */
-  centered?: boolean[] | boolean,
   /** Resample `data` or `expr` on every animation frame. */
   live?: boolean,
 
   /** Leave empty to yeet source instead. */
   render?: (source: StorageSource) => LiveElement,
 };
+
+const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Up-to-4D array of a WGSL type. Samples a given `expr` on the given `range`. */
 export const SampledData: LiveComponent<SampledDataProps> = (props) => {
@@ -56,6 +61,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     padding = 0,
     sparse = false,
     centered = false,
+    bounds = false,
     live = false,
     index = false,
     time = false,
@@ -80,6 +86,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       length: 0,
       size: [],
       version: 0,
+      bounds: bounds ? {...NO_BOUNDS} : undefined,
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
@@ -251,6 +258,15 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
 
     source.length  = !sparse ? length : emitted;
     source.size    = !sparse ? (items > 1 ? [items, ...s] : s) : [items, emitted / items];
+
+    const {bounds} = source;
+    if (bounds) {
+      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+      bounds.center = center;
+      bounds.radius = radius;
+      bounds.min = min;
+      bounds.max = max;
+    }
   };
 
   if (!live) {

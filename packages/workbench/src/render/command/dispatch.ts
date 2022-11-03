@@ -95,8 +95,8 @@ export const dispatch = (props: DispatchProps) => {
 
   const inspected = inspect({
     render: {
-      dispatchCount: 0,
-      dispatchVersion: null,
+      dispatches: 0,
+      version: null,
     },
   });
   
@@ -108,8 +108,8 @@ export const dispatch = (props: DispatchProps) => {
     const s = resolve(size ?? NO_SIZE);
     const d = s.reduce((a: number, b: number) => a * (b || 1), 1);
 
-    inspected.render.dispatchCount = d;
-    inspected.render.dispatchVersion = dispatchVersion;
+    inspected.render.dispatches = d;
+    inspected.render.version = dispatchVersion;
     countDispatch(d);
 
     /*

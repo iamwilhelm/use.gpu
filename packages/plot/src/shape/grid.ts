@@ -70,7 +70,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const origin = useProp(props.origin, parseVec4);
 
   const parentRange = useRangeContext();
-  const xform = auto ? useTransformContext() : useNoTransformContext();
+  const xform = auto ? useTransformContext().transform : useNoTransformContext();
 
   const getGrid = (options: ScaleTrait, detail: number, index: number, other: number) => {
     const main  = parseAxis(axes[index]);

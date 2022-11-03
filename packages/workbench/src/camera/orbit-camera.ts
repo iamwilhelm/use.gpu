@@ -4,11 +4,12 @@ import { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
 import { provide, use, useContext, useOne, incrementVersion } from '@use-gpu/live';
-import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition } from '@use-gpu/core';
+import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition, makeFrustumPlanes } from '@use-gpu/core';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
+import { mat4 } from 'gl-matrix';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
@@ -68,6 +69,8 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
 
   const uniforms = useOne(() => ({
     projectionMatrix: { current: null },
+    projectionViewMatrix: { current: null },
+    projectionViewFrustum: { current: null },
     viewMatrix: { current: null },
     viewPosition: { current: null },
     viewNearFar: { current: null },
@@ -87,6 +90,10 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.viewSize.current = [ width, height ];
   uniforms.viewWorldDepth.current = [focus * Math.tan(fov / 2), 1];
   uniforms.viewPixelRatio.current = pixelRatio * unit;
+
+  const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
+  projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
+  projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);
 
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);

@@ -17,7 +17,13 @@ export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDa
   } = props;
 
   const fields = useOne(() =>
-    Object.keys(attributes).map(k => [formats[k], attributes[k]]),
+    Object.keys(attributes).map(k => [
+      formats[k],
+      attributes[k],
+      k === 'positions' ? 'position' :
+      k === 'indices' ? 'index' : 
+      null,
+    ]),
     attributes
   );
 

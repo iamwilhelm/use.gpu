@@ -8,6 +8,10 @@ export const VIEW_UNIFORMS: UniformAttribute[] = [
     format: 'mat4x4<f32>',
   },
   {
+    name: 'projectionViewMatrix',
+    format: 'mat4x4<f32>',
+  },
+  {
     name: 'viewMatrix',
     format: 'mat4x4<f32>',
   },
@@ -166,3 +170,31 @@ export const makePanPosition = (x: number, y: number, zoom: number, dolly: numbe
     z,
   ];
 }
+
+export const makeFrustumPlanes = (m: mat4): vec4[] => {
+  const out = [];
+
+  out.push(vec4.fromValues(m[3] - m[0], m[7] - m[4], m[11] - m[8], m[15] - m[12]));
+  out.push(vec4.fromValues(m[3] + m[0], m[7] + m[4], m[11] + m[8], m[15] + m[12]));
+
+  out.push(vec4.fromValues(m[3] - m[1], m[7] - m[5], m[11] - m[9], m[15] - m[13]));
+  out.push(vec4.fromValues(m[3] + m[1], m[7] + m[5], m[11] + m[9], m[15] + m[13]));
+
+  out.push(vec4.fromValues(m[3] - m[2], m[7] - m[6], m[11] - m[10], m[15] - m[14]));
+  out.push(vec4.fromValues(       m[2],        m[6],         m[10],         m[14]));
+
+  for (const v of out) vec4.scale(v, v, 1/Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
+
+  return out;
+};
+
+export const distanceToFrustum = (frustum: vec4[], x: number, y: number, z: number): number => {
+  let min = Infinity;
+  for (const v of frustum) {
+    const d = v[0]*x + v[1]*y + v[2]*z + v[3];
+    min = Math.min(min, d);
+  }
+  return min;
+};
+
+

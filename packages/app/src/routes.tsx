@@ -61,5 +61,3 @@ export const makeRoutes = () => ({
   ...makePages().reduce((out, {path, element}) => (out[path] = {element}, out), {} as Record<string, any>),
   "*": { element: <EmptyPage /> },
 });
-
-console.log(makeRoutes())

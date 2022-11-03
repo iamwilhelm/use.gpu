@@ -4,7 +4,7 @@ import type { Rectangle } from '@use-gpu/core';
 import { provide, useContext, useNoContext, useOne } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext, DifferentialContext, LayoutContext,
+  TransformContext, LayoutContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
@@ -40,13 +40,11 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
 
   const ref = useShaderRef(matrix);
   const bound = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [ref]);
-  const [transform, differential] = useCombinedTransform(bound, null);
+  const context = useCombinedTransform(bound);
 
   return (
-    provide(TransformContext, transform,
-      provide(DifferentialContext, differential,
-        provide(RangeContext, range, children ?? [])
-      )
+    provide(TransformContext, context,
+      provide(RangeContext, range, children ?? [])
     )
   );
 };

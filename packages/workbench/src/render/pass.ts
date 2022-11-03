@@ -1,5 +1,6 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
+import type { DataBounds, UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
+import type { AggregatedCalls } from './pass/types';
 
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
 import { proxy } from '@use-gpu/core';
@@ -26,53 +27,11 @@ export type PassProps = {
   shadows?: boolean,
   picking?: boolean,
   
+  passes?: LiveElement[],
   components?: {
     modes: Record<string, LiveComponent<any>>,
     renderers: Record<string, LiveComponent<any>>,
   },
-};
-
-type RenderCounter = (v: number, t: number) => void;
-export type RenderToPass = (
-  passEncoder: GPURenderPassEncoder,
-  countGeometry: RenderCounter,
-  overrideView?: boolean,
-) => void;
-
-type ComputeCounter = (d: number) => void;
-export type ComputeToPass = (
-  passEncoder: GPUComputePassEncoder,
-  countDispatch: ComputeCounter,
-) => void;
-
-export type CommandToBuffer = () => GPUCommandBuffer;
-
-export type PassCallProps = {
-  calls: {
-    compute?: ComputeToPass[],
-    opaque?: RenderToPass[],
-    transparent?: RenderToPass[],
-    debug?: RenderToPass[],
-    picking?: RenderToPass[],
-    shadow?: RenderToPass[],
-    post?: CommandToBuffer[],
-    readback?: ArrowFunction[],
-  },
-}
-
-export type VirtualDraw = {
-  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
-  defines: Record<string, any>,
-  mode?: RenderPassMode | string,
-  id?: number,
-
-  vertexCount?: Lazy<number>,
-  instanceCount?: Lazy<number>,
-  indirect?: StorageSource, 
-
-  passes?: LiveElement[],
-  renderer?: string,
-  links?: Record<string, ShaderModule>,
 };
 
 const HOVERED_VARIANT = 'debug';
@@ -128,7 +87,9 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     return {getVariants, useVariants};
   }, [shadows, picking, mode]);
 
-  const Resume = (calls: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) =>
+  const Resume = (
+    calls: AggregatedCalls,
+  ) =>
     useMemo(() => {
       const props = {calls};
 
@@ -170,29 +131,3 @@ export const getDeferredRenderer = () => {
   throw new Error();
 };
 
-export const getRenderPassDescriptor = (
-  renderContext: UseGPURenderContext,
-  overlay?: boolean,
-  merge?: boolean,
-) => {
-  let {colorAttachments, depthStencilAttachment} = renderContext;
-
-  if (overlay || merge) {
-    colorAttachments = colorAttachments.map(a => proxy(a, {loadOp: 'load'}));
-  }
-  if (merge && depthStencilAttachment) {
-    const {depthLoadOp, stencilLoadOp} = depthStencilAttachment;
-    const override: Record<string, any> = {};
-
-    if (depthLoadOp) override.depthLoadOp = 'load';
-    if (stencilLoadOp) override.stencilLoadOp = 'load';
-    depthStencilAttachment = proxy(a, override);
-  }
-
-  const renderPassDescriptor: GPURenderPassDescriptor = {
-    colorAttachments,
-    depthStencilAttachment: depthStencilAttachment ?? undefined,
-  };
-
-  return renderPassDescriptor;
-}

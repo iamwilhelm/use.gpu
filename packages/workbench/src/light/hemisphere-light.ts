@@ -5,7 +5,7 @@ import { parseColor, parseNumber, parsePosition, useProp } from '@use-gpu/traits
 import { useMemo } from '@use-gpu/live';
 
 import { useLightCapture } from './lights';
-import { useTransformContext, useDifferentialContext } from '../providers/transform-provider';
+import { useTransformContext } from '../providers/transform-provider';
 
 import { vec3 } from 'gl-matrix';
 
@@ -29,8 +29,7 @@ export const HemisphereLight = (props: HemisphereLightProps) => {
   const intensity = useProp(props.intensity, parseNumber, 1);
   const bleed = useProp(props.bleed, parseNumber, 0.25);
 
-  const transform = useTransformContext();
-  const differential = useDifferentialContext();
+  const {transform, differential} = useTransformContext();
 
   const light = useMemo(() => ({
     kind: 3,

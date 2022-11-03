@@ -11,7 +11,7 @@ import { RawLines } from '../primitives/raw-lines';
 import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
-import { TransformContext, useTransformContext, useDifferentialContext } from '../providers/transform-provider';
+import { TransformContext, useTransformContext, DEFAULT_TRANSFORM } from '../providers/transform-provider';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
@@ -87,8 +87,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
   const t = useShaderRef(tangent, tangents);
   const b = useShaderRef(base, bases);
 
-  const xf = useTransformContext();
-  const xd = useDifferentialContext();
+  const {transform: xf, differential: xd} = useTransformContext();
 
   const c = useCallback(() => ((positions as any)?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
 
@@ -96,7 +95,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
   const bound = useBoundShader(getTickPosition, TICK_BINDINGS, [xf, xd, p, o, d, s, t, b], defines);
 
   return (
-    provide(TransformContext, null,
+    provide(TransformContext, DEFAULT_TRANSFORM,
       use(RawLines, {
         positions: bound,
         segments: getLineSegment,

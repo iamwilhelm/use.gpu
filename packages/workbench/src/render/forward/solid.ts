@@ -24,6 +24,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
   let {
     vertexCount,
     instanceCount,
+    bounds,
     indirect,
 
     links: {
@@ -63,7 +64,9 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
   const call = {
     vertexCount,
     instanceCount,
+    bounds,
     indirect,
+
     vertex: v,
     fragment: f,
     defines,

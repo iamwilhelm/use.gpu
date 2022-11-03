@@ -1,17 +1,19 @@
 import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
+import type { DataBounds, TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
+import type { Culler } from '../pass';
+
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
-
-import { useDeviceContext } from '../../providers/device-provider';
-import { useSuspenseContext } from '../../providers/suspense-provider';
-
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
   VIEW_UNIFORMS,
   uploadBuffer,
   resolve,
 } from '@use-gpu/core';
+
+import { useDeviceContext } from '../../providers/device-provider';
+import { useSuspenseContext } from '../../providers/suspense-provider';
+
 import { useLinkedShader } from '../../hooks/useLinkedShader';
 import { usePipelineLayout, useNoPipelineLayout } from '../../hooks/usePipelineLayout';
 import { useRenderPipelineAsync, setShaderLog, getShaderLog } from '../../hooks/useRenderPipeline';
@@ -26,6 +28,7 @@ export type DrawCallProps = {
 
   vertexCount?: Lazy<number>,
   instanceCount?: Lazy<number>,
+  bounds?: Lazy<DataBounds>,
   indirect?: StorageSource,
 
   vertex: ParsedBundle,
@@ -61,6 +64,7 @@ export const drawCall = (props: DrawCallProps) => {
   const {
     vertexCount,
     instanceCount,
+    bounds,
     indirect,
     vertex: vertexShader,
     fragment: fragmentShader,
@@ -143,8 +147,9 @@ export const drawCall = (props: DrawCallProps) => {
 
   const inspected = inspect({
     render: {
-      vertexCount: 0,
-      instanceCount: 0,
+      vertices: 0,
+      instances: 0,
+      triangles: 0,
     },
   });
   
@@ -152,43 +157,46 @@ export const drawCall = (props: DrawCallProps) => {
 
   const isVolatileGlobal = typeof uniform?.bindGroup === 'function';
 
-  return {
-    [mode]: (passEncoder: GPURenderPassEncoder, countGeometry: (v: number, t: number) => void) => {
-      const v = resolve(vertexCount || 0);
-      const i = resolve(instanceCount || 0);
+  const draw = (
+    passEncoder: GPURenderPassEncoder,
+    countGeometry: (v: number, t: number) => void,
+  ) => {
+    const v = resolve(vertexCount || 0);
+    const i = resolve(instanceCount || 0);
 
-      const t = isStrip ? (v - 2) * i : Math.floor(v * i / 3);
+    const t = isStrip ? (v - 2) * i : Math.floor(v * i / 3);
 
-      inspected.render.vertexCount = v;
-      inspected.render.instanceCount = i;
-      inspected.render.triangleCount = t;
+    inspected.render.vertices = v;
+    inspected.render.instances = i;
+    inspected.render.triangles = t;
 
-      countGeometry(v * i, t);
+    countGeometry(v * i, t);
 
-      passEncoder.setPipeline(pipeline);
+    passEncoder.setPipeline(pipeline);
 
-      if (uniform) {
-        if (globalUniforms) {
-          uniform.pipe.fill(globalUniforms);
-          uploadBuffer(device, uniform.buffer, uniform.pipe.data);
-        }
-
-        if (isVolatileGlobal) passEncoder.setBindGroup(0, uniform.bindGroup());
-        else passEncoder.setBindGroup(0, uniform.bindGroup);
+    if (uniform) {
+      if (globalUniforms) {
+        uniform.pipe.fill(globalUniforms);
+        uploadBuffer(device, uniform.buffer, uniform.pipe.data);
       }
 
-      if (storage.pipe && storage.buffer) {
-        storage.pipe.fill(constants);
-        uploadBuffer(device, storage.buffer, storage.pipe.data);
-      }
+      if (isVolatileGlobal) passEncoder.setBindGroup(0, uniform.bindGroup());
+      else passEncoder.setBindGroup(0, uniform.bindGroup);
+    }
 
-      if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
-      if (volatile.bindGroup) passEncoder.setBindGroup(2, volatile.bindGroup());
+    if (storage.pipe && storage.buffer) {
+      storage.pipe.fill(constants);
+      uploadBuffer(device, storage.buffer, storage.pipe.data);
+    }
 
-      if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
-      else passEncoder.draw(v, i, 0, 0);
-    },
+    if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
+    if (volatile.bindGroup) passEncoder.setBindGroup(2, volatile.bindGroup());
+
+    if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
+    else passEncoder.draw(v, i, 0, 0);
   };
+
+  return {[mode]: {draw, bounds}};
 };
 
 //setShaderLog(100);

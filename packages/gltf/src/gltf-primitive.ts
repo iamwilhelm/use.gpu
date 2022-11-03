@@ -14,6 +14,7 @@ import {
   TransformContext, DifferentialContext,
   useBoundShader, useNoBoundShader,
   useRawSource, useNoRawSource,
+  useShaderRef, useNoShaderRef,
 } from '@use-gpu/workbench';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
@@ -96,11 +97,15 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   if (transform) {
     const contravariant = useOne(() => mat3.normalFromMat4(mat3.create(), transform), transform);
 
-    // Apply matrix transform
-    const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, [transform]);
-    const dform = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [transform, contravariant]);
+    const t = useShaderRef(transform);
+    const c = useShaderRef(contravariant);
 
-    view = provide(TransformContext, xform, provide(DifferentialContext, dform, view));
+    // Apply matrix transform
+    const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, [t]);
+    const dform = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [t, c]);
+    const context = useOne(() => ({transform: xform, differential: dform}));
+
+    view = provide(TransformContext, context, view);
   }
   else {
     useNoOne();

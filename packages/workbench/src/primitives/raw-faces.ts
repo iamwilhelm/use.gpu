@@ -140,9 +140,17 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const lookups = useShaderRef(null, props.lookups);
   const ids = useShaderRef(null, props.ids);
 
-  const [xf, xd] = useCombinedTransform();
+  const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
-  
+
+  let bounds: Lazy<DataBounds> | null = null;
+  if (props.positions?.bounds && getBounds) {
+    bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
+  }
+  else {
+    useNoCallback();
+  }
+
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
 
@@ -182,6 +190,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     use(Virtual, {
       vertexCount,
       instanceCount: totalCount ?? instanceCount,
+      bounds,
 
       links,
       defines,

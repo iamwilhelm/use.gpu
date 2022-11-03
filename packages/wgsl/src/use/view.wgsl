@@ -1,5 +1,6 @@
 struct ViewUniforms {
   projectionMatrix: mat4x4<f32>,
+  projectionViewMatrix: mat4x4<f32>,
   viewMatrix: mat4x4<f32>,
   viewPosition: vec4<f32>,
   viewNearFar: vec2<f32>,

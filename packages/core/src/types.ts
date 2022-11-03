@@ -256,6 +256,14 @@ export type UniformDataSetter = (index: number, item: any) => void;
 export type UniformValueSetter = (index: number, field: number, value: any) => void;
 export type UniformByteSetter = (view: DataView, offset: number, data: any) => void;
 
+export type DataBoundingBox = [number[], number[]];
+export type DataBounds = {
+  center: number[],
+  radius: number,
+  min?: number[],
+  max?: number[],
+};
+
 // Storage bindings
 export type StorageSource = {
   buffer: GPUBuffer,
@@ -264,6 +272,7 @@ export type StorageSource = {
   size: number[],
   version: number,
 
+  bounds?: DataBounds,
   volatile?: number,
   readWrite?: boolean,
   byteOffset?: number,
@@ -277,6 +286,7 @@ export type LambdaSource<T = any> = {
   size: number[],
   version: number,
 
+  bounds?: DataBounds,
   colorSpace?: ColorSpace,
 };
 
@@ -337,6 +347,8 @@ export type ShaderStageDescriptor = {
 // Projection pipeline
 export type ViewUniforms = {
   projectionMatrix: { current: mat4 },
+  projectionViewMatrix: { current: mat4 },
+  projectionViewFrustum: { current: vec4[] },
   viewMatrix: { current: mat4 },
   viewPosition: { current: vec3 | [number, number, number] | number[] },
   viewNearFar: { current: vec2 | [number, number] | number[] },

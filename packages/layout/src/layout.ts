@@ -73,7 +73,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   const sizes: Point[] = [];
   const offsets: Point[] = [];
 
-  let transform = useTransformContext();
+  let {transform} = useTransformContext();
 
   // Global X/Y flip
   const flip = useOne(() => [0, 0] as Point);

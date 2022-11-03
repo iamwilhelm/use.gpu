@@ -1,5 +1,5 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { RenderToPass } from '../pass';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
+import type { Renderable } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 
@@ -9,11 +9,11 @@ import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
+import { getRenderPassDescriptor, getDrawOrder } from './util';
+
 export type ShadowPassProps = {
   calls: {
-    opaque?: RenderToPass[],
-    transparent?: RenderToPass[],
-    debug?: RenderToPass[],
+    opaque?: Renderable[],
   },
 };
 
@@ -22,14 +22,12 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 
 /** Shadow render pass.
 
-Draws all shadow calls.
+Draws all opaque calls to multiple shadow maps.
 */
 export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<ShadowPassProps>) => {
   const {
     calls,
   } = props;
-
-  return;
 
   const inspect = useInspectable();
 
@@ -37,25 +35,20 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   const renderContext = useRenderContext();
   const {cull, bind} = useViewContext();
 
-  const shadows = toArray(calls['shadow'] as RenderToPass[]);
+  const opaques = toArray(calls['opaque']      as Renderable[]);
 
-  const renderToContext = (
-    commandEncoder: GPUCommandEncoder,
-    context: UseGPURenderContext,
-    calls: RenderToPass[],
-    countGeometry: RenderCounter,
+  const renderPassDescriptor = useMemo(() =>
+    getRenderPassDescriptor(renderContext, overlay, merge),
+    [renderContext, overlay, merge]);
+
+  const drawToPass = (
+    calls: Renderable[],
+    passEncoder: GPURenderPassEncoder,
+    countGeometry: (v: number, t: number) => void,
+    sign: number = 1,
   ) => {
-    const {colorAttachments, depthStencilAttachment} = context;
-    const renderPassDescriptor: GPURenderPassDescriptor = {
-      colorAttachments,
-      depthStencilAttachment: depthStencilAttachment ?? undefined,
-    };
-
-    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-    bind(passEncoder);
-
-    for (const f of calls) f(passEncoder, cull, countGeometry, true);
-    passEncoder.end();
+    let order = getDrawOrder(cull, calls, sign);
+    for (const i of order) calls[i].draw(passEncoder, countGeometry);
   };
 
   return quote(yeet(() => {
@@ -65,16 +58,22 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
     const commandEncoder = device.createCommandEncoder();
-    renderContext.swap();
-    renderToContext(commandEncoder, renderContext, visibles, countGeometry);
+    if (!overlay && !merge) renderContext.swap();
+
+    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+    bind(passEncoder);
+
+    drawToPass(opaques, passEncoder, countGeometry);
+
+    passEncoder.end();
 
     const command = commandEncoder.finish();
     device.queue.submit([command]);
 
     inspect({
       render: {
-        vertexCount: vs,
-        triangleCount: ts,
+        vertices: vs,
+        triangles: ts,
       },
     });
 

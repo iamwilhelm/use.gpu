@@ -6,11 +6,9 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { vec3, mat3, mat4 } from 'gl-matrix';
 
 import {
-  TransformContext, DifferentialContext,
+  TransformContext, useMatrixContext,
   useShaderRef, useBoundShader, useCombinedTransform,
  } from '@use-gpu/workbench';
-
-import { useMatrixContext, MatrixContext } from './providers/matrix-provider';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
@@ -26,6 +24,8 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
   const {children} = props;
 
   const matrix = useMatrixContext();
+  if (!matrix) return children;
+
   const [normalMatrix, matrixScale] = useOne(() => {
     const normalMatrix = mat3.normalFromMat4(mat3.create(), matrix);
 

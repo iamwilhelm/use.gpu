@@ -23,13 +23,13 @@ export const makePlaneGeometry = (
     let yy = 0;
     let zz = 0;
 
-    if      (first === 'x') xx = x * width;
-    else if (first === 'y') yy = x * width;
-    else if (first === 'z') zz = x * width;
+    if      (first === 'x') xx = x * width / 2;
+    else if (first === 'y') yy = x * width / 2;
+    else if (first === 'z') zz = x * width / 2;
 
-    if      (second === 'x') xx = y * height;
-    else if (second === 'y') yy = y * height;
-    else if (second === 'z') zz = y * height;
+    if      (second === 'x') xx = y * height / 2;
+    else if (second === 'y') yy = y * height / 2;
+    else if (second === 'z') zz = y * height / 2;
 
     positionEmitter(xx, yy, zz, 1);
   };
@@ -40,17 +40,17 @@ export const makePlaneGeometry = (
   const emitUV = (x: number, y: number) =>
     uvEmitter(x, y, 0, 0);
 
-  emitPosition(0, 0);
-  emitPosition(0, 1);
-  emitPosition(1, 0);
+  emitPosition(-1,-1);
+  emitPosition(-1, 1);
+  emitPosition( 1,-1);
 
-  emitPosition(1, 0);
-  emitPosition(0, 1);
-  emitPosition(1, 1);
+  emitPosition( 1,-1);
+  emitPosition(-1, 1);
+  emitPosition( 1, 1);
 
   const nx = +axes.indexOf('x') === -1;
-  const ny = +axes.indexOf('x') === -1;
-  const nz = +axes.indexOf('x') === -1;
+  const ny = +axes.indexOf('y') === -1;
+  const nz = +axes.indexOf('z') === -1;
   for (let i = 0; i < 6; ++i) emitNormal(nx, ny, nz);
 
   emitUV(0, 0);

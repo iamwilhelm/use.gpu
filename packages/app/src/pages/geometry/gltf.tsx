@@ -12,7 +12,9 @@ import {
   Lights, AmbientLight, DirectionalLight, PointLight, HemisphereLight,
   Loop, Animate,
 } from '@use-gpu/workbench';
+
 import { GLTFData, GLTFModel } from '@use-gpu/gltf';
+import { Scene, Node } from '@use-gpu/scene';
 
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -62,12 +64,16 @@ export const GeometryGLTFPage: LC = () => {
               <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
               <HemisphereLight intensity={0.5} />
             
-              <GLTFData
-                url={url}
-                render={(gltf: GLTF) =>
-                  <GLTFModel gltf={gltf} />
-                }
-              />
+              <Scene>
+                <Node position={[0, -0.1, 0]}>
+                  <GLTFData
+                    url={url}
+                    render={(gltf: GLTF) =>
+                      <GLTFModel gltf={gltf} />
+                    }
+                  />
+                </Node>
+              </Scene>
             </Lights>
           </Pass>
         </Camera>

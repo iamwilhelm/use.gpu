@@ -3,17 +3,17 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat, Animate,
+  Loop, Draw, Pass, Flat, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
-  Lights, PointLight,
+  Lights, DirectionalLight, AmbientLight,
 
-  makeBoxGeometry,
+  makeBoxGeometry, makePlaneGeometry,
 } from '@use-gpu/workbench';
 
 import {
-  Scene, Node, Instances,
+  Scene, Node, Mesh, Instances,
 } from '@use-gpu/scene';
 
 const COLOR_ON = [1, 1, 1, 1];
@@ -39,58 +39,61 @@ const ROTATION_KEYFRAMES = [
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 export const SceneShadowPage: LC = (props) => {
-  const geometry = useOne(() => makeBoxGeometry());
+  const boxGeometry = useOne(() => makeBoxGeometry(2));
+  const planeGeometry = useOne(() => makePlaneGeometry(100, 100, 'xz'));
 
   return (
     <Gather
       children={[
-        <GeometryData geometry={geometry} />,
+        <GeometryData geometry={boxGeometry} />,
+        <GeometryData geometry={planeGeometry} />,
         <ImageTexture url="/textures/test.png" />,
       ]}
       then={([
-        mesh,
+        boxMesh,
+        planeMesh,
         texture,
       ]) => (
-        <Loop>
-          <Draw>
-            <Cursor cursor='move' />
-            <Camera>
-              <Pass>
-                <Lights>
-                  <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
+        <LinearRGB>
+          <Loop>
+            <Draw>
+              <Cursor cursor='move' />
+              <Camera>
+                <Pass>
+                  <Lights>
+                    <AmbientLight intensity={1} />
+                    <DirectionalLight position={[-2.5, 3, 2, 1]} intensity={8} />
 
-                  <Scene>
-                    <PBRMaterial
-                      albedoMap={texture}
-                    >
-                      <Instances
-                        mesh={mesh}
-                        shaded
-                        render={(Instance) => (<>
+                    <Scene>
 
-                          <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
-                            <Node>
-                              {seq(20).map(i => (
-                                <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
-                                  <Instance
-                                    rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
-                                    scale={[0.2, 0.2, 0.2]}
-                                  />
-                                </Animate>
-                              ))}
-                            </Node>
-                          </Animate>
+                      <Node position={[0, -4, 0]}>
+                        <PBRMaterial albedo={0x808080} roughness={0.7}>
+                          <Mesh
+                            mesh={planeMesh}
+                            shaded
+                          />
+                        </PBRMaterial>
+                      </Node>
 
-                        </>)}
-                      />
-                    </PBRMaterial>
+                      <PBRMaterial albedoMap={texture} roughness={0.5}>
+                        <Instances
+                          mesh={boxMesh}
+                          shaded
+                          render={(Instance) => (<>
+                            <Instance position={[0, -3, 0]} />
+                            <Instance position={[-3, -2, -2]} scale={[2, 2, 2]} />
+                            <Instance position={[0, -3, 0]} />
+                          </>)}
+                        />
+                      </PBRMaterial>
                   
-                  </Scene>
-                </Lights>
-              </Pass>
-            </Camera>
-          </Draw>
-        </Loop>
+                    </Scene>
+                  </Lights>
+                </Pass>
+              </Camera>
+            </Draw>
+          </Loop>
+        </LinearRGB>
       )}
     />
   );
@@ -98,9 +101,9 @@ export const SceneShadowPage: LC = (props) => {
 
 const Camera = ({children}: PropsWithChildren<object>) => (
   <OrbitControls
-    radius={5}
-    bearing={0.5}
-    pitch={0.3}
+    radius={9}
+    bearing={-1.8}
+    pitch={0.4}
     render={(radius: number, phi: number, theta: number, target: vec3) =>
       <OrbitCamera
         radius={radius}

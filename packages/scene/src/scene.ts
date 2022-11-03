@@ -1,9 +1,10 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ObjectTrait } from './types';
-import { memo, provide, useOne } from '@use-gpu/live';
-import { mat4 } from 'gl-matrix';
 
-import { useMatrixContext, useNoMatrixContext, MatrixContext } from './providers/matrix-provider';
+import { memo, provide, useOne } from '@use-gpu/live';
+import { useMatrixContext, useNoMatrixContext, MatrixContext } from '@use-gpu/workbench';
+
+import { mat4 } from 'gl-matrix';
 
 export type SceneProps = {
   inherit?: boolean,
@@ -16,7 +17,5 @@ export const Scene: LiveComponent<SceneProps> = (props: PropsWithChildren<SceneP
   } = props;
 
   const parent = inherit ? useMatrixContext() : useNoMatrixContext();
-  const combined = useOne(() => parent ?? mat4.create(), parent);
-  
-  return provide(MatrixContext, combined, children);
+  return provide(MatrixContext, parent, children);
 };

@@ -12,10 +12,11 @@ import { useInspectable } from '../../hooks/useInspectable'
 import { getRenderPassDescriptor, getDrawOrder } from './util';
 
 export type PickingPassProps = {
-  swap?: boolean,
   calls: {
     picking?: Renderable[],
   },
+  overlay?: boolean,
+  merge?: boolean,
 };
 
 const NO_OPS: any[] = [];

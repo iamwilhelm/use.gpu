@@ -6,10 +6,10 @@ import { useDeviceContext } from '../../providers/device-provider';
 import { useInspectable } from '../../hooks/useInspectable'
 
 export type ComputePassProps = {
-  immediate?: boolean,
   calls: {
     compute?: ComputeToPass[],
   },
+  immediate?: boolean,
 };
 
 const NO_OPS: any[] = [];

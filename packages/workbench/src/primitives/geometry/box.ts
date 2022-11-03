@@ -17,7 +17,7 @@ export const makeBoxGeometry = (
   const {emit: uvEmitter} = makeDataEmitter(uvs, 4);
 
   const emitPosition = (x: number, y: number, z: number) =>
-    positionEmitter(x * sizeX, y * sizeY, z * sizeZ, 1);
+    positionEmitter(x * sizeX / 2, y * sizeY / 2, z * sizeZ / 2, 1);
 
   const emitNormal = (x: number, y: number, z: number) =>
     normalEmitter(x, y, z, 0);
@@ -25,96 +25,96 @@ export const makeBoxGeometry = (
   const emitUV = (x: number, y: number) =>
     uvEmitter(x, y, 0, 0);
 
-  emitPosition(1, -1, 1);
-  emitPosition(-1, -1, 1);
-  emitPosition(-1, -1, -1);
-  emitPosition(1, -1, -1);
-  emitPosition(1, -1, 1);
-  emitPosition(-1, -1, -1);
-
-  emitPosition(1, 1, 1);
-  emitPosition(1, -1, 1);
-  emitPosition(1, -1, -1);
   emitPosition(1, 1, -1);
-  emitPosition(1, 1, 1);
-  emitPosition(1, -1, -1);
-
-  emitPosition(-1, 1, 1);
-  emitPosition(1, 1, 1);
-  emitPosition(1, 1, -1);
-  emitPosition(-1, 1, -1);
-  emitPosition(-1, 1, 1);
-  emitPosition(1, 1, -1);
-
-  emitPosition(-1, -1, 1);
-  emitPosition(-1, 1, 1);
-  emitPosition(-1, 1, -1);
-  emitPosition(-1, -1, -1);
-  emitPosition(-1, -1, 1);
-  emitPosition(-1, 1, -1);
-
-  emitPosition(1, 1, 1);
-  emitPosition(-1, 1, 1);
-  emitPosition(-1, -1, 1);
-  emitPosition(-1, -1, 1);
-  emitPosition(1, -1, 1);
-  emitPosition(1, 1, 1);
-
-  emitPosition(1, -1, -1);
   emitPosition(-1, -1, -1);
   emitPosition(-1, 1, -1);
-  emitPosition(1, 1, -1);
   emitPosition(1, -1, -1);
+  emitPosition(-1, -1, -1);
+  emitPosition(1, 1, -1);
+
+  emitPosition(1, 1, 1);
+  emitPosition(1, -1, -1);
+  emitPosition(1, 1, -1);
+  emitPosition(1, -1, 1);
+  emitPosition(1, -1, -1);
+  emitPosition(1, 1, 1);
+
+  emitPosition(-1, 1, 1);
+  emitPosition(1, -1, 1);
+  emitPosition(1, 1, 1);
+  emitPosition(-1, -1, 1);
+  emitPosition(1, -1, 1);
+  emitPosition(-1, 1, 1);
+
   emitPosition(-1, 1, -1);
+  emitPosition(-1, -1, 1);
+  emitPosition(-1, 1, 1);
+  emitPosition(-1, -1, -1);
+  emitPosition(-1, -1, 1);
+  emitPosition(-1, 1, -1);
+
+  emitPosition(1, 1, 1);
+  emitPosition(-1, 1, -1);
+  emitPosition(-1, 1, 1);
+  emitPosition(-1, 1, -1);
+  emitPosition(1, 1, 1);
+  emitPosition(1, 1, -1);
+
+  emitPosition(1, -1, -1);
+  emitPosition(-1, -1, 1);
+  emitPosition(-1, -1, -1);
+  emitPosition(1, -1, 1);
+  emitPosition(-1, -1, 1);
+  emitPosition(1, -1, -1);
   
-  for (let i = 0; i < 6; ++i) emitNormal( 0,-1, 0);
-  for (let i = 0; i < 6; ++i) emitNormal( 1, 0, 0);
-  for (let i = 0; i < 6; ++i) emitNormal( 0, 1, 0);
-  for (let i = 0; i < 6; ++i) emitNormal(-1, 0, 0);
-  for (let i = 0; i < 6; ++i) emitNormal( 0, 0, 1);
   for (let i = 0; i < 6; ++i) emitNormal( 0, 0,-1);
+  for (let i = 0; i < 6; ++i) emitNormal( 1, 0, 0);
+  for (let i = 0; i < 6; ++i) emitNormal( 0, 0, 1);
+  for (let i = 0; i < 6; ++i) emitNormal(-1, 0, 0);
+  for (let i = 0; i < 6; ++i) emitNormal( 0, 1, 0);
+  for (let i = 0; i < 6; ++i) emitNormal( 0,-1, 0);
 
-  emitUV(0, 1);
+  emitUV(0, 0);
   emitUV(1, 1);
   emitUV(1, 0);
-  emitUV(0, 0);
-  emitUV(0, 1);
-  emitUV(1, 0);
-
   emitUV(0, 1);
   emitUV(1, 1);
-  emitUV(1, 0);
   emitUV(0, 0);
-  emitUV(0, 1);
-  emitUV(1, 0);
 
-  emitUV(0, 1);
+  emitUV(0, 0);
   emitUV(1, 1);
   emitUV(1, 0);
-  emitUV(0, 0);
-  emitUV(0, 1);
-  emitUV(1, 0);
-
   emitUV(0, 1);
   emitUV(1, 1);
-  emitUV(1, 0);
   emitUV(0, 0);
-  emitUV(0, 1);
-  emitUV(1, 0);
 
-  emitUV(0, 1);
+  emitUV(0, 0);
   emitUV(1, 1);
   emitUV(1, 0);
+  emitUV(0, 1);
+  emitUV(1, 1);
+  emitUV(0, 0);
+
+  emitUV(0, 0);
+  emitUV(1, 1);
   emitUV(1, 0);
+  emitUV(0, 1);
+  emitUV(1, 1);
+  emitUV(0, 0);
+
+  emitUV(0, 0);
+  emitUV(1, 1);
+  emitUV(1, 0);
+  emitUV(1, 1);
   emitUV(0, 0);
   emitUV(0, 1);
 
-  emitUV(0, 1);
+  emitUV(0, 0);
   emitUV(1, 1);
   emitUV(1, 0);
-  emitUV(0, 0);
   emitUV(0, 1);
-  emitUV(1, 0);
+  emitUV(1, 1);
+  emitUV(0, 0);
 
   return {
     count,

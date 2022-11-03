@@ -1,11 +1,11 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ObjectTrait } from './types';
 import { memo, provide, useOne } from '@use-gpu/live';
+import { useMatrixContext, MatrixContext } from '@use-gpu/workbench';
 import { mat4 } from 'gl-matrix';
 
 import { useObjectTrait } from './traits';
 import { composeTransform } from './lib/compose';
-import { useMatrixContext, MatrixContext } from './providers/matrix-provider';
 
 export type NodeProps = Partial<ObjectTrait> & {
   _?: number,
@@ -31,7 +31,7 @@ export const Node: LiveComponent<NodeProps> = (props: PropsWithChildren<NodeProp
       composeTransform(matrix, p, r, q, s);
     }
 
-    mat4.multiply(matrix, parent, matrix);
+    if (parent) mat4.multiply(matrix, parent, matrix);
 
     return matrix;
   }, [p, s, q, r, m]);

@@ -17,6 +17,8 @@ export type ColorPassProps = {
     transparent?: Renderable[],
     debug?: Renderable[],
   },
+  overlay?: boolean,
+  merge?: boolean,
 };
 
 const NO_OPS: any[] = [];

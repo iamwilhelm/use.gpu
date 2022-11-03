@@ -20,7 +20,7 @@ export type ViewContextProps = {
   uniforms: ViewUniforms,
   layout: GPUPipelineLayout,
   bind: (passEncoder: GPURenderPassEncoder) => void,
-  cull: (bounds: DataBounds) => number | false,
+  cull: (bounds: DataBounds) => number | boolean,
 };
 
 export type ViewProviderProps = {

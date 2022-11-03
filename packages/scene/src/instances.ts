@@ -9,11 +9,11 @@ import {
   FaceLayer,
   InstanceData,
   TransformContext,
+  MatrixContext,
+  useMatrixContext,
   useCombinedTransform,
   getBoundShader,
 } from '@use-gpu/workbench';
-
-import { useMatrixContext, MatrixContext } from './providers/matrix-provider';
 
 import { useObjectTrait } from './traits';
 import { composeTransform } from './lib/compose';
@@ -109,7 +109,7 @@ const makeInstance = (
       composeTransform(matrix, p, r, q, s);
     }
 
-    mat4.multiply(matrix, parent, matrix);
+    if (parent) mat4.multiply(matrix, parent, matrix);
     mat3.normalFromMat4(normalMatrix, matrix);
 
     updateInstance({matrix, normalMatrix});

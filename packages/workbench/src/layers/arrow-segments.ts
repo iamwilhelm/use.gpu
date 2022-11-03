@@ -35,16 +35,16 @@ export const useArrowSegments = (
   const count = getChunkCount(chunks, loops);
 
   // Make index data for line segments/anchor/trim data
-  const [segmentBuffer, anchorBuffer, trimBuffer, lookupBuffer] = useMemo(() => {
+  const [segmentBuffer, anchorBuffer, trimBuffer, lookupBuffer, anchorCount] = useMemo(() => {
     const segmentBuffer = new Int8Array(alignSizeTo(count, 4));
     const anchorBuffer = new Uint32Array(count * 4);
     const trimBuffer = new Uint32Array(count * 4);
     const lookupBuffer = new Uint32Array(count);
 
     generateChunkSegments(segmentBuffer, lookupBuffer, chunks, loops, starts, ends);
-    generateChunkAnchors(anchorBuffer, trimBuffer, chunks, loops, starts, ends);
+    const anchorCount = generateChunkAnchors(anchorBuffer, trimBuffer, chunks, loops, starts, ends);
 
-    return [segmentBuffer, anchorBuffer, trimBuffer, lookupBuffer];
+    return [segmentBuffer, anchorBuffer, trimBuffer, lookupBuffer, anchorCount];
   }, [chunks, loops, starts, ends, count]);
 
   // Bind as shader storage
@@ -52,6 +52,9 @@ export const useArrowSegments = (
   const anchors = useRawSource(anchorBuffer, 'vec4<u32>');
   const trims = useRawSource(trimBuffer, 'vec4<u32>');
   const lookups = useRawSource(lookupBuffer, 'u32');
+
+  anchors.length = anchorCount;
+  anchors.size[0] = anchorCount;
   
   return {segments, anchors, trims, lookups};
 }

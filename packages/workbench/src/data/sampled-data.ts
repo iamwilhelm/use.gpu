@@ -32,8 +32,6 @@ export type SampledDataProps = {
   sparse?: boolean,
   /** Use centered samples (0.5, 1.5, ..., N-0.5) instead of edge-to-edge samples (0, 1, ..., N). */
   centered?: boolean[] | boolean,
-  /** Calculate data bounds for culling (when used as position data) */
-  bounds?: boolean,
   /** Add current indices `i`, `j`, `k`, `l` to the `expr` arguments. */
   index?: boolean,
   /** Add current `TimeContext` to the `expr` arguments. */
@@ -61,7 +59,6 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     padding = 0,
     sparse = false,
     centered = false,
-    bounds = false,
     live = false,
     index = false,
     time = false,
@@ -86,7 +83,7 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
       length: 0,
       size: [],
       version: 0,
-      bounds: bounds ? {...NO_BOUNDS} : undefined,
+      bounds: {...NO_BOUNDS},
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
@@ -260,13 +257,11 @@ export const SampledData: LiveComponent<SampledDataProps> = (props) => {
     source.size    = !sparse ? (items > 1 ? [items, ...s] : s) : [items, emitted / items];
 
     const {bounds} = source;
-    if (bounds) {
-      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-      bounds.center = center;
-      bounds.radius = radius;
-      bounds.min = min;
-      bounds.max = max;
-    }
+    const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+    bounds.center = center;
+    bounds.radius = radius;
+    bounds.min = min;
+    bounds.max = max;
   };
 
   if (!live) {

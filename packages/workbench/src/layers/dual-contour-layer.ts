@@ -11,9 +11,9 @@ import { Virtual } from '../primitives/virtual';
 import { Readback } from '../primitives/readback';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, yeet, debug, fragment, useMemo, useOne, useVersion, incrementVersion } from '@use-gpu/live';
+import { use, memo, yeet, debug, fragment, useCallback, useMemo, useOne, useVersion, useNoCallback, incrementVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { resolve, uploadBuffer } from '@use-gpu/core';
+import { resolve, uploadBuffer, toDataBounds } from '@use-gpu/core';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useComputePipeline } from '../hooks/useComputePipeline';
@@ -150,8 +150,24 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const min = useShaderRef(rangeMin);
   const max = useShaderRef(rangeMax);
 
-  const {transform: xf, differential: xd} = useTransformContext();
+  const {transform: xf, differential: xd, bounds: getBounds} = useTransformContext();
   const {shaded: material} = useMaterialContext();
+
+  const rangeBounds = useOne(() => {
+    const min = range.map(r => r[0]);
+    const max = range.map(r => r[1]);
+    return toDataBounds([min, max]);
+  }, range);
+
+  const rangeBoundsRef = useShaderRef(rangeBounds);
+
+  let bounds: Lazy<DataBounds> | null = null;
+  if (getBounds) {
+    bounds = useCallback(() => getBounds(rangeBoundsRef.current), [getBounds]);
+  }
+  else {
+    useNoCallback();
+  }
 
   const indirectDraw    = useOne(() => new Uint32Array(12));
   const indirectStorage = useRawSource(indirectDraw, 'u32', INDIRECT_SOURCE);
@@ -296,6 +312,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       shouldDispatch,
     }),
     use(Virtual, {
+      bounds,
       indirect: indirectStorage,
 
       links,

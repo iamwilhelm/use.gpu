@@ -35,7 +35,7 @@ export const useCombinedTransform = (
       : differentialCtx && differential
         ? getBoundShader(getChainDifferential, DIFF_CHAIN_BINDINGS, [transform, differential, differentialCtx])
         : differentialCtx ?? differential;
-    const combinedBounds = boundsCtx ? (b: DataBounds) => boundsCtx(bounds(b)) : bounds;
+    const combinedBounds = boundsCtx ? (bounds ? (b: DataBounds) => boundsCtx(bounds(b)) : null) : bounds;
 
     return {
       transform: combinedPos,

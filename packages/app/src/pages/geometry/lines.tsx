@@ -2,6 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataField } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
+import { vec3 } from 'gl-matrix';
 
 import {
   Draw, Pass,
@@ -15,7 +16,7 @@ import {
 
 const dataFields = [
   // Accessor syntax
-  ['array<vec3<f32>>', (o: any) => o.path],
+  ['array<vec3<f32>>', (o: any) => o.path, 'position'],
   // Shorthand => o.color
   ['vec4<f32>', 'color'],
   ['f32', 'width'],
@@ -134,11 +135,12 @@ const Camera = ({children}: PropsWithChildren<object>) => (
     radius={3}
     bearing={0.5}
     pitch={0.3}
-    render={(radius: number, phi: number, theta: number) =>
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
       <OrbitCamera
         radius={radius}
         phi={phi}
         theta={theta}
+        target={target}
         scale={2160}
       >
         {children}

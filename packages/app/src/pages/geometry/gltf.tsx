@@ -81,11 +81,12 @@ const Camera = ({children}: PropsWithChildren<object>) => (
     radius={3}
     bearing={0.5}
     pitch={0.3}
-    render={(radius: number, phi: number, theta: number) =>
+    render={(radius: number, phi: number, theta: number, target: vec3) =>
       <OrbitCamera
         radius={radius}
         phi={phi}
         theta={theta}
+        target={target}
         scale={1080}
       >
         {children}

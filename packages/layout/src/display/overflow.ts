@@ -59,10 +59,15 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
   const hasScrollY = y === 'scroll' || y === 'auto';
 
   const api = useOne(() => {
+    // Scroll distance
     const scrollRef = [0, 0] as Point;
+    // Inverted scroll distance
     const offsetRef = [0, 0] as Point;
+    // Size of scroll area + content (outer w/h, inner w/h)
     const sizeRef = [0, 0, 0, 0] as Point4;
+    // Visible viewport in content coordinates
     const clipRef = [0, 0, 0, 0] as Point4;
+    // Top-left position of outer box
     const boxRef = [0, 0] as Point;
 
     const scrollTo = (x?: number | null, y?: number | null) => {
@@ -127,6 +132,13 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
 
     const transform = bindBundle(getScrolledPosition, {getOffset: o});
     const inverse = bindBundle(getScrolledPosition, {getOffset: s});
+
+    const cullBounds = { center: [], radius: 0 };
+    const getBounds = (bounds: DataBounds) => {
+      vec3.transformMat4(cullBounds.center, bounds.center, matrixRef.current);
+      cullBounds.radius = matrixScale * bounds.radius;
+      return cullBounds;
+    };
 
     return {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, fitTo, scrollTo, scrollBy};
   });

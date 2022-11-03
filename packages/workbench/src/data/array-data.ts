@@ -28,8 +28,6 @@ export type ArrayDataProps = {
   items?: number,
   /** Emit 0 or N items per `expr` call. Output size is `[N]` or `[items, N]`. */
   sparse?: boolean,
-  /** Calculate data bounds for culling (when used as position data) */
-  bounds?: boolean,
   /** Add current `TimeContext` to the `expr` arguments. */
   time?: boolean,
   /** Resample `data` or `expr` on every animation frame. */
@@ -53,7 +51,6 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     items = 1,
     render,
     sparse = false,
-    bounds = false,
     live = false,
     time = false,
   } = props;
@@ -76,7 +73,7 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
       length,
       size,
       version: 0,
-      bounds: bounds ? {...NO_BOUNDS} : undefined,
+      bounds: {...NO_BOUNDS},
     };
 
     return [buffer, array, source, dims] as [GPUBuffer, TypedArray, StorageSource, number];
@@ -101,13 +98,11 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
     source.size    = !sparse ? (items > 1 ? [items, ...size] : size) : [items, emitted / items];
 
     const {bounds} = source;
-    if (bounds) {
-      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-      bounds.center = center;
-      bounds.radius = radius;
-      bounds.min = min;
-      bounds.max = max;
-    }
+    const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+    bounds.center = center;
+    bounds.radius = radius;
+    bounds.min = min;
+    bounds.max = max;
   };
 
   if (!live) {

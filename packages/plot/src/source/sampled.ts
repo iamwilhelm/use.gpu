@@ -16,7 +16,6 @@ export type SampledProps = {
 
   padding?: number,
   sparse?: boolean,
-  bounds?: boolean,
   centered?: boolean[] | boolean,
   expr?: (emit: Emit, ...args: any[]) => void,
   items?: number,
@@ -34,7 +33,6 @@ export const Sampled: LiveComponent<SampledProps> = (props) => {
   const {
     axis,
     axes = 'xyzw',
-    bounds,
     render,
     range: outerRange,
     children,
@@ -52,7 +50,7 @@ export const Sampled: LiveComponent<SampledProps> = (props) => {
 
   return (
     gather(
-      use(SampledData, {...rest, range, bounds}),
+      use(SampledData, {...rest, range}),
       tagFunction(([source]: StorageSource[]) =>
         useMemo(() => {
           if (render == null && children === undefined) return yeet(source);

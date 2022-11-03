@@ -573,6 +573,8 @@ export const generateChunkAnchors = (
       anchors[o++] = both;
     }
   }
+
+  return o / 4;
 }
 
 export const generateChunkFaces = (

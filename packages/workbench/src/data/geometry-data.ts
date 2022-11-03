@@ -20,9 +20,6 @@ export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDa
     Object.keys(attributes).map(k => [
       formats[k],
       attributes[k],
-      k === 'positions' ? 'position' :
-      k === 'indices' ? 'index' : 
-      null,
     ]),
     attributes
   );

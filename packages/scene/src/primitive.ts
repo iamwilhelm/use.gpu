@@ -27,9 +27,11 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
 
   const matrix = useMatrixContext();
   const [normalMatrix, matrixScale] = useOne(() => {
-    const s = mat4.getScaling(vec3.create(), matrix);
     const normalMatrix = mat3.normalFromMat4(mat3.create(), matrix);
+
+    const s = mat4.getScaling(vec3.create(), matrix);
     const matrixScale = Math.max(Math.abs(s[0]), Math.abs(s[1]), Math.abs(s[2]));
+
     return [normalMatrix, matrixScale];
   }, matrix);
 
@@ -40,10 +42,10 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
   const boundPosition = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrixRef]);
   const boundDifferential = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrixRef, normalMatrixRef]);
 
-  const cullBounds = useOne(() => ({ center: [], radius: 0 }));
+  const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
   const getBounds = useCallback((bounds: DataBounds) => {
     vec3.transformMat4(cullBounds.center, bounds.center, matrixRef.current);
-    cullBounds.radius = matrixScale * bounds.radius;
+    cullBounds.radius = matrixScaleRef.current * bounds.radius;
     return cullBounds;
   });
 

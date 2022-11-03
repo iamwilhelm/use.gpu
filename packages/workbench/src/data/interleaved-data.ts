@@ -81,9 +81,6 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
-      const isPosition = accessorType === 'position';
-      const bounds = isPosition ? {...NO_BOUNDS} : undefined;
-
       const {array, dims} = makeDataArray(f, bufferLength);
 
       const buffer = makeStorageBuffer(device, array.byteLength);
@@ -93,7 +90,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
         length: 0,
         size: [0],
         version: 0,
-        bounds,
+        bounds: {...NO_BOUNDS},
       };
 
       const offset = layout.attributes[i].offset / bytesPerElement;
@@ -127,13 +124,11 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
       source.version = incrementVersion(source.version);
 
       const {bounds} = source;
-      if (bounds) {
-        const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-        bounds.center = center;
-        bounds.radius = radius;
-        bounds.min = min;
-        bounds.max = max;
-      }
+      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+      bounds.center = center;
+      bounds.radius = radius;
+      bounds.min = min;
+      bounds.max = max;
     }
   };
 

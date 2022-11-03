@@ -2,7 +2,7 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode,
+  VertexData, RenderPassMode, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
@@ -144,7 +144,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const scissor = useScissorContext();
 
   let bounds: Lazy<DataBounds> | null = null;
-  if (props.positions?.bounds && getBounds) {
+  if (getBounds && props.positions?.bounds) {
     bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
   }
   else {

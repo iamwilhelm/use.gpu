@@ -1,15 +1,15 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type {
-  TypedArray, ViewUniforms, DeepPartial,
+  TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode,
+  VertexData, RenderPassMode, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useCallback, useOne } from '@use-gpu/live';
+import { use, yeet, memo, useCallback, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 
@@ -77,7 +77,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   // Set up draw
   const vertexCount = geometry.count;
   const instanceCount = useDataLength(count, props.anchors);
-  
+
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const a = useShaderRef(props.anchor, props.anchors);
@@ -91,7 +91,15 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   
   const g = useRawSource(geometry.attributes.positions, 'vec4<f32>');
 
-  const [xf, scissor] = useApplyTransform(p);
+  const [xf, scissor, getBounds] = useApplyTransform(p);
+
+  let bounds: Lazy<DataBounds> | null = null;
+  if (getBounds && props.positions?.bounds) {
+    bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
+  }
+  else {
+    useNoCallback();
+  }
 
   const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);
   const getPicking = usePickingShader(props);
@@ -109,6 +117,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
      use(Virtual, {
       vertexCount,
       instanceCount,
+      bounds,
 
       links,
       defines,

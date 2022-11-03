@@ -53,7 +53,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     countGeometry: (v: number, t: number) => void,
     sign: number = 1,
   ) => {
-    const order = getDrawOrder(cull, calls, sign);
+    let order = getDrawOrder(cull, calls, sign);
     for (const i of order) calls[i].draw(passEncoder, countGeometry);
   };
 

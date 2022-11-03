@@ -260,8 +260,8 @@ export type DataBoundingBox = [number[], number[]];
 export type DataBounds = {
   center: number[],
   radius: number,
-  min?: number[],
-  max?: number[],
+  min: number[],
+  max: number[],
 };
 
 // Storage bindings

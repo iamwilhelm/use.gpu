@@ -186,11 +186,8 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       const composite = isComposite(format);
       format = composite ? toSimple(format) : format;
 
-      const isPosition = accessorType === 'position';
       const isIndex = accessorType === 'index';
       const isUnwelded = accessorType === 'unwelded';
-
-      const bounds = isPosition ? {...NO_BOUNDS} : undefined;
 
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
@@ -207,7 +204,7 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
         length: 0,
         size: [0],
         version: 0,
-        bounds,
+        bounds: {...NO_BOUNDS},
       };
 
       return {buffer, array, source, dims, accessor: fn, raw, composite, isIndex, isUnwelded};
@@ -241,13 +238,11 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       source.version = incrementVersion(source.version);
 
       const {bounds} = source;
-      if (bounds) {
-        const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-        bounds.center = center;
-        bounds.radius = radius;
-        bounds.min = min;
-        bounds.max = max;
-      }
+      const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
+      bounds.center = center;
+      bounds.radius = radius;
+      bounds.min = min;
+      bounds.max = max;
     }
   };
 

@@ -2,14 +2,14 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, LambdaSource, RenderPassMode,
+  VertexData, TextureSource, LambdaSource, RenderPassMode, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { use, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -135,8 +135,19 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const f = useShaderRef(props.color, props.colors);
   const e = useShaderRef(props.expand, props.expands);
 
-  const [xf, scissor] = useApplyTransform(p);
   const q  = useShaderRef(props.flip);
+
+  const [xf, scissor, getBounds] = useApplyTransform(p);
+
+  let bounds: Lazy<DataBounds> | null = null;
+  if (getBounds && props.positions?.bounds) {
+    bounds = useCallback(() => {
+      return getBounds(props.positions!.bounds);
+    }, [props.positions, getBounds]);
+  }
+  else {
+    useNoCallback();
+  }
 
   const t = props.texture;
 
@@ -149,6 +160,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   return use(Virtual, {
     vertexCount,
     instanceCount,
+    bounds,
 
     links,
     defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,

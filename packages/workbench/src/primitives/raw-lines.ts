@@ -2,14 +2,14 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData,
+  VertexData, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { RenderPassMode, resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -108,7 +108,15 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   
   const l = useShaderRef(null, props.lookups);
 
-  const [xf, scissor] = useApplyTransform(p);
+  const [xf, scissor, getBounds] = useApplyTransform(p);
+
+  let bounds: Lazy<DataBounds> | null = null;
+  if (getBounds && props.positions?.bounds) {
+    bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
+  }
+  else {
+    useNoCallback();
+  }
 
   const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
   const getPicking = usePickingShader(props);
@@ -128,6 +136,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   return use(Virtual, {
     vertexCount,
     instanceCount,
+    bounds,
 
     links,
     defines,

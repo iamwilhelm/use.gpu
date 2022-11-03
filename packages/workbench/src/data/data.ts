@@ -48,9 +48,6 @@ export const Data: LiveComponent<DataProps> = (props) => {
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 
-      const isPosition = accessorType === 'position';
-      const bounds = isPosition ? {...NO_BOUNDS} : undefined;
-
       let {raw, length, fn} = makeDataAccessor(f, accessor);
       if (length == null) length = l;
 
@@ -63,7 +60,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
         length: 0,
         size: [0],
         version: 0,
-        bounds,
+        bounds: {...NO_BOUNDS},
       };
 
       return {buffer, array, source, dims, accessor, raw};

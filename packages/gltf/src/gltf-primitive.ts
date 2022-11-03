@@ -4,9 +4,9 @@ import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { flattenIndexedArray } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { use, provide, useOne, useNoOne, useMemo, useNoMemo, useVersion, useNoVersion } from '@use-gpu/live';
+import { use, provide, useCallback, useOne, useNoOne, useMemo, useNoMemo, useVersion, useNoCallback, useNoVersion } from '@use-gpu/live';
 import { generateTangents } from 'mikktspace';
-import { mat3, mat4 } from 'gl-matrix';
+import { vec3, mat3, mat4 } from 'gl-matrix';
 
 import {
   FaceLayer, FaceLayerProps,
@@ -95,22 +95,44 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
   let view: LiveElement = render;
   if (transform) {
-    const contravariant = useOne(() => mat3.normalFromMat4(mat3.create(), transform), transform);
+    const [normalMatrix, matrixScale] = useOne(() => {
+      const normalMatrix = mat3.normalFromMat4(mat3.create(), transform);
+
+      const s = mat4.getScaling(vec3.create(), transform);
+      const matrixScale = Math.max(Math.abs(s[0]), Math.abs(s[1]), Math.abs(s[2]));
+
+      return [normalMatrix, matrixScale];
+    }, transform);
 
     const t = useShaderRef(transform);
-    const c = useShaderRef(contravariant);
+    const c = useShaderRef(normalMatrix);
+    const s = useShaderRef(matrixScale);
 
     // Apply matrix transform
     const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, [t]);
     const dform = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [t, c]);
-    const context = useOne(() => ({transform: xform, differential: dform}));
+
+    const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
+    const getBounds = useCallback((bounds: DataBounds) => {
+      vec3.transformMat4(cullBounds.center, bounds.center, t.current);
+      cullBounds.radius = s.current * bounds.radius;
+      return cullBounds;
+    });
+
+    const context = useOne(() => ({transform: xform, differential: dform, bounds: getBounds}));
 
     view = provide(TransformContext, context, view);
   }
   else {
     useNoOne();
+    useNoShaderRef();
+    useNoShaderRef();
+    useNoShaderRef();
     useNoBoundShader();
     useNoBoundShader();
+    useNoOne();
+    useNoCallback();
+    useNoOne();
   }
 
   return (

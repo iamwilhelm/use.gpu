@@ -54,7 +54,7 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = (props: ViewProvid
     const {center, radius} = bounds;
     const {current: frustum} = projectionViewFrustum;
 
-    const [x, y, z] = center;
+    const [x, y, z = 0] = center;
     const d = distanceToFrustum(frustum, x, y, z);
 
     if (d < -radius) return false;

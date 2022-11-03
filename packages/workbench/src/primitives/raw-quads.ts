@@ -2,14 +2,14 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, LambdaSource, RenderPassMode,
+  VertexData, TextureSource, LambdaSource, RenderPassMode, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, useCallback, useOne, useMemo } from '@use-gpu/live';
+import { use, memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
@@ -121,8 +121,16 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   const t = props.texture;
   
-  const [xf, scissor] = useApplyTransform(p);
-  
+  const [xf, scissor, getBounds] = useApplyTransform(p);
+
+  let bounds: Lazy<DataBounds> | null = null;
+  if (getBounds && props.positions?.bounds) {
+    bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
+  }
+  else {
+    useNoCallback();
+  }
+
   const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, scissor, r, c, d, z, u, l]);
   const getPicking = usePickingShader(props);
   const getFragment = useBoundShader(getMaskedColor, FRAGMENT_BINDINGS, [m, t]);
@@ -137,6 +145,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   return use(Virtual, {
     vertexCount,
     instanceCount,
+    bounds,
 
     links,
     defines,

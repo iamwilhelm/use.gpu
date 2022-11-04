@@ -115,5 +115,5 @@ const makeInstance = (
     updateInstance({matrix, normalMatrix});
   }, [p, s, q, r, m]);
 
-  return yeet();
+  return null;
 }, 'Instance');

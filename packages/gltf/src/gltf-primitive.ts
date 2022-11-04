@@ -12,6 +12,7 @@ import {
   FaceLayer, FaceLayerProps,
   PBRMaterial,
   TransformContext, DifferentialContext,
+  useBoundSource, useNoBoundSource,
   useBoundShader, useNoBoundShader,
   useRawSource, useNoRawSource,
   useShaderRef, useNoShaderRef,
@@ -20,7 +21,7 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
 import { useGLTFMaterial } from './gltf-material';
 
-const CARTESIAN_BINDINGS = bundleToAttributes(getCartesianPosition);
+const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
 const NORMAL_BINDINGS = bundleToAttributes(getMatrixDifferential);
 
 export type GLTFPrimitiveProps = {
@@ -109,8 +110,9 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     const s = useShaderRef(matrixScale);
 
     // Apply matrix transform
-    const xform = useBoundShader(getCartesianPosition, CARTESIAN_BINDINGS, [t]);
-    const dform = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [t, c]);
+    const m     = useBoundSource(MATRIX_BINDINGS[0], t);
+    const xform = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [m]);
+    const dform = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [m, c]);
 
     const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
     const getBounds = useCallback((bounds: DataBounds) => {

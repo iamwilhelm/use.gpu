@@ -126,6 +126,7 @@ export const makeNextFiber = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   Next: LiveFunction<any>,
   prefix: string = 'Next',
+  reyeet?: boolean,
   name?: string,
 ): LiveFiber<any> => {
 
@@ -138,7 +139,7 @@ export const makeNextFiber = <F extends ArrowFunction>(
 
   // Adopt existing yeet context
   // which will be overwritten.
-  if (fiber.yeeted) {
+  if (reyeet && fiber.yeeted) {
     nextFiber.yeeted = fiber.yeeted;
     nextFiber.yeeted.id = nextFiber.id;
   }
@@ -508,7 +509,7 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
 ) => {
   if (!fiber.next) {
     const Resume = makeFiberReduction(fiber, gather, fallback);
-    fiber.next = makeNextFiber(fiber, Resume, 'Resume');
+    fiber.next = makeNextFiber(fiber, Resume, 'Resume', true);
     fiber.yeeted = makeYeetState(fiber, fiber.next, gather, mapper);
     fiber.path = [...fiber.path, 0];
   }
@@ -680,7 +681,7 @@ export const reduceFiberValues = <R>(
     const {yeeted, mount, mounts, order} = fiber;
     if (!yeeted) throw new Error("Reduce without aggregator");
 
-    let isFork = fiber.f === CAPTURE;
+    let isFork = fiber.f === CAPTURE || fiber.f === RECONCILE;
 
     if (!self) {
       if (fiber.next && !isFork) return reduce(fiber.next);
@@ -703,10 +704,20 @@ export const reduceFiberValues = <R>(
           if (v === SUSPEND) return yeeted.reduced = SUSPEND;
           value = reducer((value as R), (v as R)!);
         }
-        return yeeted.reduced = value;
+
+        let reduced = value;
+        if (isFork) reduced = reducer(reduced, reduce(fiber.next));
+        return yeeted.reduced = reduced;
       }
     }
-    else if (mount) return yeeted.reduced = reduce(mount);
+    else if (mount) {
+      let reduced = reduce(mount);
+      if (isFork) reduced = reducer(reduced, reduce(fiber.next));
+      return yeeted.reduced = reduced;
+    }
+    else if (isFork) {
+      return yeeted.reduced = reduce(fiber.next);
+    }
     return undefined;
   };
 
@@ -722,8 +733,10 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
+  let isFork = fiber.f === CAPTURE || fiber.f === RECONCILE;
+
   if (!self) {
-    if (fiber.next && fiber.f !== CAPTURE) return gatherFiberValues(fiber.next);
+    if (fiber.next && !isFork) return gatherFiberValues(fiber.next);
     if (yeeted.value !== undefined) return yeeted.value;
   }
 
@@ -745,6 +758,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
         else items.push(value as T);
       }
 
+      if (isFork) items.push(...gatherFiberValues(fiber.next));
       return yeeted.reduced = items;
     }
   }
@@ -752,8 +766,17 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
     const value = gatherFiberValues(mount);
     if (value === SUSPEND) return yeeted.reduced = SUSPEND;
 
+    if (isFork) {
+      let reduced = toArray<T>(value as T | T[]).slice();
+      reduced.push(...gatherFiberValues(fiber.next));
+      return yeeted.reduced = reduced;
+    }
+
     if (self) return yeeted.reduced = toArray<T>(value as T | T[]);
     return yeeted.reduced = value as T | T[];
+  }
+  else if (isFork) {
+    return yeeted.reduced = gatherFiberValues(fiber.next);
   }
   return [];
 }
@@ -766,8 +789,11 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 ): Record<string, T | T[]> | typeof SUSPEND => {
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
+
+  let isFork = fiber.f === CAPTURE || fiber.f === RECONCILE;
+
   if (!self) {
-    if (fiber.next && fiber.f !== CAPTURE) return multiGatherFiberValues(fiber.next) as any;
+    if (fiber.next && !isFork) return multiGatherFiberValues(fiber.next) as any;
     if (yeeted.value !== undefined) {
       if (typeof yeeted.value === 'function' || Array.isArray(yeeted.value)) return {'': yeeted.value};
       return yeeted.value;
@@ -777,37 +803,56 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   if (yeeted.reduced !== undefined) return yeeted.reduced;
   if (mounts && order) {
     if (mounts.size) {
-      const out = {} as Record<string, T | T[]>;
+      const out = {} as Record<string, T[]>;
+
       for (let k of order) {
         const m = mounts.get(k);
         if (!m) continue;
 
         const value = multiGatherFiberValues(m);
         if (value === SUSPEND) return yeeted.reduced = SUSPEND;
-
-        for (let k in value as Record<string, T | T[]>) {
-          const v = (value as Record<string, T | T[]>)[k];
-          let list = out[k] as T[];
-          if (!list) list = out[k] = [];
-
-          if (Array.isArray(v)) {
-            let n = v.length;
-            for (let i = 0; i < n; ++i) list.push(v[i] as T);
-          }
-          else list.push(v as T);
-        }
+        multiGatherMergeInto(out, value);
+      }
+      
+      if (isFork) {
+        const value = multiGatherFiberValues(fiber.next);
+        multiGatherMergeInto(out, value);
       }
 
       return yeeted.reduced = out;
     }
   }
   else if (mount) {
-    const value = multiGatherFiberValues(mount);
-    if (value === SUSPEND) return yeeted.reduced = SUSPEND;
-    if (value != null && self) for (let k in (value as any)) (value as any)[k] = toArray((value as any)[k]);
-    return yeeted.reduced = value as any;
+    let out = multiGatherFiberValues(mount);
+    if (out === SUSPEND) return yeeted.reduced = SUSPEND;
+    if (out != null && (self || isFork)) for (let k in (out as any)) (out as any)[k] = toArray((out as any)[k]);
+
+    if (isFork) {
+      out = {...out};
+      const value = multiGatherFiberValues(fiber.next);
+      multiGatherMergeInto(out, value);
+    }
+
+    return yeeted.reduced = out as any;
+  }
+  else if (isFork) {
+    return multiGatherFiberValues(fiber.next);
   }
   return {} as Record<string, T | T[]>;
+}
+
+const multiGatherMergeInto = <T>(a: Record<string, T[]>, b: Record<string, T | T[]>) => {
+  for (let k in b as Record<string, T | T[]>) {
+    const v = (b as Record<string, T | T[]>)[k];
+    let list = a[k] as T[];
+    if (!list) list = a[k] = [];
+
+    if (Array.isArray(v)) {
+      let n = v.length;
+      for (let i = 0; i < n; ++i) list.push(v[i] as T);
+    }
+    else list.push(v as T);
+  }
 }
 
 // Morph one call on a fiber

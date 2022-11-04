@@ -19,6 +19,7 @@ import { alignSizeTo } from './data';
 import { resolve } from './lazy';
 
 const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
+const NO_BINDINGS = {} as any;
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformAttributeAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
@@ -102,7 +103,7 @@ export const makeBoundUniforms = <T>(
   const hasBindings = !!bindings.length;
   const hasUniforms = !!uniforms.length;
 
-  if (!hasBindings && !hasUniforms && !force) return {};
+  if (!hasBindings && !hasUniforms && !force) return NO_BINDINGS;
 
   const entries = [] as GPUBindGroupEntry[];
   let pipe, buffer;
@@ -136,12 +137,42 @@ export const makeVolatileUniforms = <T>(
   set: number = 0,
 ): VolatileAllocation => {
   const hasBindings = !!bindings.length;
-  if (!hasBindings) return {};
+  if (!hasBindings) return NO_BINDINGS;
 
-  let depth = 1;
+  let depths = [];
   for (const b of bindings) {
-    if (b.storage?.volatile) depth = Math.max(depth, +b.storage.volatile);
-    else if (b.texture?.volatile) depth = Math.max(depth, +b.texture.volatile);
+    if (b.storage?.volatile) depths.push(+b.storage.volatile);
+    else if (b.texture?.volatile) depths.push(+b.texture.volatile);
+  }
+  let depth = depths.length > 1 ? lcm(depths) : depths[0];
+  
+  if (depth === 1) {
+    let lastVersion = -1;
+    let cached = null;
+  
+    const bindGroup = () => {
+
+      let version = 0;
+      for (const b of bindings) {
+        if (b.texture) version += b.texture.version;
+        else if (b.storage) version += b.storage.version;
+      }
+
+      if (version === lastVersion && cached) return cached;
+
+      const entries = bindings.length ? makeDataBindingsEntries(device, bindings, 0) : [];
+      const bindGroup = device.createBindGroup({
+        layout: pipeline.getBindGroupLayout(set),
+        entries,
+      });
+
+      cached = bindGroup;
+      lastVersion = version;
+
+      return bindGroup;
+    };
+
+    return {bindGroup};
   }
 
   const cache = miniLRU<GPUBindGroup>(depth);
@@ -403,4 +434,17 @@ const miniLRU = <T>(max: number) => {
       h = (h + 1) % max;
     },
   };
+}
+
+const lcm = (xs: number[]) => xs.reduce(mul) / xs.reduce(gcd);
+const mul = (a: number, b: number) => a * b;
+const gcd = (a: number, b: number) => {
+  let max = Math.max(a, b);
+  let min = Math.min(a, b);
+  while (min) {
+    let mod = max % min;
+    max = min;
+    min = mod;
+  }
+  return max;
 }

@@ -4,7 +4,7 @@ export * from './builtin';
 export * from './debug';
 export { reactInterop } from './fiber';
 export {
-  useAsync,
+  useAwait,
   useFiber,
   useCallback,
   useContext,

@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveFiber, LiveElement, Task } from '@use-gpu/live';
 
-import { useAsync, useOne } from '@use-gpu/live';
+import { useAwait, useOne } from '@use-gpu/live';
 
 type AwaitProps<T> = {
   promise?: Promise<LiveElement>,
@@ -11,13 +11,11 @@ type AwaitProps<T> = {
 export const Await: LiveComponent<AwaitProps<unknown>> = <T>(props: AwaitProps<T>) => {
   const {all, promise} = props;
 
-  const run = useOne(() => (
-    all
+  const run = all
     ? () => Promise.all(all)
-    : () => promise ?? Promise.resolve()
-  ), all ?? promise);
+    : () => promise ?? Promise.resolve();
 
-  const [value, error] = useAsync<LiveElement | undefined | void>(run);
+  const [value, error] = useAwait<LiveElement | undefined | void>(run, all ?? promise);
   return value;
 }
 

@@ -5,28 +5,32 @@ import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo
 import { resolve } from '@use-gpu/core';
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
-import { drawCall } from '../command/draw-call';
-import { getNativeColor } from '../../hooks/useNativeColor';
+import { drawCall } from '../../command/draw-call';
+import { getNativeColor } from '../../../hooks/useNativeColor';
 
-import { useDeviceContext } from '../../providers/device-provider';
-import { useRenderContext } from '../../providers/render-provider';
-import { usePassContext } from '../../providers/pass-provider';
-import { useViewContext } from '../../providers/view-provider';
+import { useDeviceContext } from '../../../providers/device-provider';
+import { useRenderContext } from '../../../providers/render-provider';
+import { usePassContext } from '../../../providers/pass-provider';
+import { useViewContext } from '../../../providers/view-provider';
 
-import instanceDrawVirtualUI from '@use-gpu/wgsl/render/vertex/virtual-ui.wgsl';
-import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
+import instanceDrawVirtualShaded from '@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl';
+import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
 
-export type UIRenderProps = VirtualDraw;
+import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
-export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => {
+export type ShadedRenderProps = VirtualDraw;
+
+export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRenderProps) => {
   let {
     vertexCount,
     instanceCount,
+    bounds,
     indirect,
 
     links: {
       getVertex,
-      getFragment,
+      getSurface,
+      getLight,
     },
 
     pipeline,
@@ -41,26 +45,30 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
 
   const {layout: globalLayout} = useViewContext();
 
-  const vertexShader = instanceDrawVirtualUI;
-  const fragmentShader = instanceFragmentUI;
+  const vertexShader = instanceDrawVirtualShaded;
+  const fragmentShader = instanceFragmentShaded;
 
   // Binds links into shader
   const [v, f] = useMemo(() => {
     const links = {
       getVertex,
-      getFragment,
+      getSurface,
+      getLight,
+      getScissor: defines?.HAS_SCISSOR ? getScissorColor : null,
       toColorSpace: getNativeColor(colorInput, colorSpace),
     };
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment, colorInput, colorSpace]);
+  }, [vertexShader, fragmentShader, getVertex, getSurface, getLight, colorInput, colorSpace]);
 
   // Inline the render fiber to avoid another memo()
   const call = {
     vertexCount,
     instanceCount,
+    bounds,
     indirect,
+
     vertex: v,
     fragment: f,
     defines,

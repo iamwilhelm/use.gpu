@@ -8,6 +8,7 @@ import {
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
   Lights, DirectionalLight, AmbientLight,
+  Shared,
 
   makeBoxGeometry, makePlaneGeometry,
 } from '@use-gpu/workbench';
@@ -60,6 +61,7 @@ export const SceneShadowPage: LC = (props) => {
               <Cursor cursor='move' />
               <Camera>
                 <Pass>
+                  <Shared />
                   <Lights>
                     <AmbientLight intensity={1} />
                     <DirectionalLight position={[-2.5, 3, 2, 1]} intensity={8} />
@@ -82,7 +84,7 @@ export const SceneShadowPage: LC = (props) => {
                           render={(Instance) => (<>
                             <Instance position={[0, -3, 0]} />
                             <Instance position={[-3, -2, -2]} scale={[2, 2, 2]} />
-                            <Instance position={[0, -3, 0]} />
+                            <Instance position={[2, -3, 4]} rotation={[0, 30, 0]} />
                           </>)}
                         />
                       </PBRMaterial>

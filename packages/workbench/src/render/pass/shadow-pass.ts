@@ -35,11 +35,11 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   const renderContext = useRenderContext();
   const {cull, bind} = useViewContext();
 
-  const opaques = toArray(calls['opaque']      as Renderable[]);
+  const opaques = toArray(calls['opaque'] as Renderable[]);
 
   const renderPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(renderContext, overlay, merge),
-    [renderContext, overlay, merge]);
+    getRenderPassDescriptor(renderContext),
+    [renderContext]);
 
   const drawToPass = (
     calls: Renderable[],

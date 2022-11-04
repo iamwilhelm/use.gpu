@@ -1,7 +1,7 @@
 import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
 import type { DataBounds, TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
-import type { Culler } from '../pass';
+import type { Culler } from '../pass/types';
 
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 import {

@@ -5,13 +5,13 @@ import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo
 import { resolve } from '@use-gpu/core';
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
-import { drawCall } from '../command/draw-call';
-import { getNativeColor } from '../../hooks/useNativeColor';
+import { drawCall } from '../../command/draw-call';
+import { getNativeColor } from '../../../hooks/useNativeColor';
 
-import { useDeviceContext } from '../../providers/device-provider';
-import { useRenderContext } from '../../providers/render-provider';
-import { usePassContext } from '../../providers/pass-provider';
-import { useViewContext } from '../../providers/view-provider';
+import { useDeviceContext } from '../../../providers/device-provider';
+import { useRenderContext } from '../../../providers/render-provider';
+import { usePassContext } from '../../../providers/pass-provider';
+import { useViewContext } from '../../../providers/view-provider';
 
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
 import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';

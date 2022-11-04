@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
-import { gather, use, keyed, yeet, memo, useAsync, useCallback, useOne, useMemo } from '@use-gpu/live';
+import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo } from '@use-gpu/live';
 import { VirtualLayers, useLayoutContext, useForceUpdate } from '@use-gpu/workbench';
 import { useRangeContext } from '@use-gpu/plot';
 
@@ -145,7 +145,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
   ), [key, styles, flipY]);
 
   let s: any;
-  let [shapes] = useAsync(run);
+  let [shapes] = useAwait(run);
   if (!shapes && (s = cache.get(key))) shapes = s;
 
   return !hide ? yeet(shapes) : null;

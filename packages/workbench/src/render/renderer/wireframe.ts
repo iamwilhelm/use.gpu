@@ -4,7 +4,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeDataBuffer } from '@use-gpu/core';
 import { useMemo, useNoMemo } from '@use-gpu/live';
-import { getBoundShader } from '../hooks/useBoundShader';
+import { getBoundShader } from '../../hooks/useBoundShader';
 
 import { getWireframeListVertex } from '@use-gpu/wgsl/render/wireframe/wireframe-list.wgsl';
 import { getWireframeStripVertex } from '@use-gpu/wgsl/render/wireframe/wireframe-strip.wgsl';

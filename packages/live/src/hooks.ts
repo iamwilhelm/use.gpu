@@ -524,7 +524,7 @@ export const useNoLog = useNoOne;
 /**
  * Async wrapper
  */
-export const useAsync = <T, E = Error>(f: () => Promise<T>, deps: any[] = NO_DEPS): [T | undefined, E | undefined] => {
+export const useAwait = <T, E = Error>(f: () => Promise<T>, deps: any[] = NO_DEPS): [T | undefined, E | undefined] => {
   const [value, setValue] = useState<[T | undefined, E | undefined]>([undefined, undefined]);
 
   const ref = useResource((dispose) => {

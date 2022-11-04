@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { RustTextAPI, Font } from '@use-gpu/glyph';
 
 import { parseWeight } from '@use-gpu/traits';
-import { provide, useAsync, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';
+import { provide, useAwait, makeContext, useContext, useMemo, useOne } from '@use-gpu/live';
 import { makeTuples } from '@use-gpu/core';
 import { RustText, packStrings } from '@use-gpu/glyph';
 

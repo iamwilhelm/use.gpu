@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { TypedArray, StorageSource, UniformType, DataField } from '@use-gpu/core';
-import { provide, fence, yeet, makeContext, useContext, useNoContext, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
+import { capture, yeet, makeContext, useCapture, useContext, useNoContext, useMemo, useOne, useRef, useResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
   makeIdAllocator,
   makeDataArray, copyNumberArrayRange,
@@ -30,10 +30,13 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
   } = props;
 
   const device = useDeviceContext();
-  const ids = useOne(() => makeIdAllocator(0));
+  const versionRef = useRef(0);
 
-  const queue = useOne(() => []);
-  const versionRef = useOne(() => ({current: 0}));
+  const [ids, queue, InstanceCapture] = useOne(() => [
+    makeIdAllocator(0),
+    [],
+    makeCapture('InstanceCapture'),
+  ]);
 
   // Provide hook to reserve and update an instance
   const useInstance = useMemo(() => {
@@ -49,6 +52,8 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
         return id;
       });
 
+      useCapture(InstanceCapture, null);
+
       return useOne(() => makeUpdateInstance(instance), makeUpdateInstance);
     };
 
@@ -56,7 +61,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
   }, [device, fs]);
 
   // Produce instance sources
-  const Resume = (fenced: any) => {    
+  const Resume = () => {    
     const size = Math.max(alloc, ids.max());
     const bufferLength = useBufferedSize(size);
 
@@ -153,11 +158,8 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       indexSource.version = version;
     }, version);
 
-    return [
-      Object.keys(fenced).length ? yeet(fenced) : null,
-      then ? then(indexSource, fieldSources) : null,
-    ];
+    return then ? then(indexSource, fieldSources) : null;
   };
 
-  return fence(render ? render(useInstance) : null, Resume);
+  return render ? capture(InstanceCapture, render(useInstance), Resume) : null;
 };

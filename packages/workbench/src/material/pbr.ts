@@ -8,6 +8,7 @@ import { parseColor, useProp } from '@use-gpu/traits';
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
@@ -70,7 +71,9 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   const m = useShaderRef(metalness ?? (metalnessRoughnessMap ? 1 : 0.0));
   const r = useShaderRef(roughness ?? (metalnessRoughnessMap ? 1 : 0.5));
 
-  let am  = useShaderRef(null, albedoMap);
+  const t = useNativeColorTexture(albedoMap);
+
+  let am  = useShaderRef(null, t);
   let em  = useShaderRef(null, emissiveMap);
   let om  = useShaderRef(null, occlusionMap);
   let mrm = useShaderRef(null, metalnessRoughnessMap);

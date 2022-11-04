@@ -8,6 +8,7 @@ import { parseColor, useProp } from '@use-gpu/traits';
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
@@ -39,8 +40,10 @@ export const BasicMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBR
 
   const color = useProp(props.color, parseColor, WHITE);
 
+  const t = useNativeColorTexture(colorMap);
+
   const c = useShaderRef(color);
-  let cm = useShaderRef(null, colorMap);
+  let cm = useShaderRef(null, t);
 
   const defines = useOne(() => ({
     HAS_COLOR_MAP: !!colorMap,

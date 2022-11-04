@@ -1,5 +1,6 @@
 0.8.0
 - `@use-gpu/app`: Added examples: scene, instancing, shadow, image textures
+- `@use-gpu/live`: Allow `<Capture>`/`<Reconcile>` continuation to participate in yeets
 - `@use-gpu/plot`: Add `<Grid auto>` to snap grids to far side of range.
 - `@use-gpu/scene`: Add basic `<Scene>`/`<Node>`/`<Primitive>` components for a classic matrix tree
 - `@use-gpu/scene`: Add `<Instances>` component for instanced mesh rendering

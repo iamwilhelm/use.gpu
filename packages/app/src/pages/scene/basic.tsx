@@ -3,7 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat, Animate,
+  Loop, Draw, Pass, Flat, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
@@ -46,7 +46,7 @@ const PickableMesh = memo(({id, mesh, texture}) => {
 
 // This uses a typical scene-graph arrangement with an image texture
 export const SceneBasicPage: LC = (props) => {
-  const geometry = useOne(() => makeBoxGeometry());
+  const geometry = useOne(() => makeBoxGeometry(2));
 
   return (
     <Gather
@@ -58,35 +58,37 @@ export const SceneBasicPage: LC = (props) => {
         mesh,
         texture,
       ]) => (
-        <Loop>
-          <Draw>
-            <Cursor cursor='move' />
-            <Camera>
-              <Pass>
-                <Lights>
-                  <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
+        <LinearRGB>
+          <Loop>
+            <Draw>
+              <Cursor cursor='move' />
+              <Camera>
+                <Pass>
+                  <Lights>
+                    <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
 
-                  <Scene>
+                    <Scene>
 
-                    <Animate prop="position" keyframes={KEYFRAMES} loop>
-                      <Node rotation={[30, - 30, -30]}>
-                        <PickableMesh mesh={mesh} texture={texture} />
-                      </Node>
-                    </Animate>
+                      <Animate prop="position" keyframes={KEYFRAMES} loop>
+                        <Node rotation={[30, - 30, -30]}>
+                          <PickableMesh mesh={mesh} texture={texture} />
+                        </Node>
+                      </Animate>
 
-                    <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
-                      <Node rotation={[30, - 30, -30]}>
-                        <PickableMesh mesh={mesh} texture={texture} />
-                      </Node>
-                    </Animate>
+                      <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
+                        <Node rotation={[30, - 30, -30]}>
+                          <PickableMesh mesh={mesh} texture={texture} />
+                        </Node>
+                      </Animate>
 
-                  </Scene>
+                    </Scene>
 
-                </Lights>
-              </Pass>
-            </Camera>
-          </Draw>
-        </Loop>
+                  </Lights>
+                </Pass>
+              </Camera>
+            </Draw>
+          </Loop>
+        </LinearRGB>
       )}
     />
   );

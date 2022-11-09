@@ -31,7 +31,7 @@ export default {
   plugins: [
     new WasmPackPlugin({
       crateDirectory: path.resolve(__dirname, 'rust/use-gpu-text'),
-      outDir: "../../packages/glyph/pkg",
+      outDir: "./packages/glyph/pkg",
       outName: "use_gpu_text",
       forceMode: "production",
     }),

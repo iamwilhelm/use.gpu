@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/glyph",
-  "version": "0.8.0-dev",
+  "version": "0.8.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",

@@ -1,14 +1,10 @@
 import path from 'path';
-import dotenv from 'dotenv';
+import fs from 'fs';
 import WasmPackPlugin from '@wasm-tool/wasm-pack-plugin';
 import DotenvPlugin from 'webpack-dotenv-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-
-dotenv.config({
-  path: '.env.local',
-});
 
 export default {
   mode: isDevelopment ? 'development' : 'production',

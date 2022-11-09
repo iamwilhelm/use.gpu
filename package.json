@@ -69,7 +69,7 @@
     "lint": "eslint packages/**/src --ext ts",
     "types": "yarn wsrun run types",
     "coverage": "yarn wsrun run coverage",
-    "postinstall": "(cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm)"
+    "postinstall": "(cd packages/wgsl; yarn run build); (cd packages/glyph; yarn run build:wasm); (cp -n .env.local.example .env.local || true)"
   },
   "jest": {
     "preset": "ts-jest",

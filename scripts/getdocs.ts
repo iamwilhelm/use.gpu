@@ -9,6 +9,12 @@ const DOCS_REPO = '../use.gpu-site';
 const DOCS_FILE = '../use.gpu-site/docs/ts-docs.json';
 const DOCS_PKG  = '../use.gpu-site/docs/packages';
 
+try {
+  statSync(DOCS_REPO);
+} catch (e) {
+  process.exit(0);
+}
+
 let packages = ['core', 'gltf', 'glyph', 'inspect', 'layout', 'live', 'plot', 'map', 'react', 'state', 'traits', 'webgpu', 'workbench'];
 let files = [
   ...packages.map(pkg => [pkg, [`./packages/${pkg}/src/index.ts`]]),

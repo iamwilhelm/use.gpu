@@ -137,7 +137,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
 
         // If atlas resized, resize the texture backing it
         const [sw, sh] = source.size;
-        if (atlas.width !== sw && atlas.height !== sh) {
+        if (atlas.width !== sw || atlas.height !== sh) {
           source = sourceRef.current = resizeTextureSource(device, source, atlas.width, atlas.height, 1, 'auto');
           updateMipTextureChain(device, source, [[0, 0, sw, sh]]);
         }

@@ -9,6 +9,12 @@ const DOCS_REPO = '../use.gpu-site';
 const DOCS_FILE = '../use.gpu-site/docs/ts-docs.json';
 const DOCS_PKG  = '../use.gpu-site/docs/packages';
 
+try {
+  statSync(DOCS_REPO);
+} catch (e) {
+  process.exit(0);
+}
+
 let packages = [
   'core',
   'gltf',

@@ -34,7 +34,11 @@ Use.GPU has an incremental architecture, which updates with minimal recomputatio
 - `yarn build` - Build packages
 - `yarn test` - Run unit tests
 
-**Node v18 is currently not supported due to conflicts with `ts-node`. Use v16 or below.**
+**Quick Start**:
+
+This repo includes a configuration for [Gitpod](https://www.gitpod.io/), which is a cloud dev environment similar to Github Codespaces. Gitpod provides a free tier of service and can be launched directly from the Gitlab UI. The Gitpod environment is preconfigured with all necessary dependencies, and will automatically run the demo app when launched.
+
+* In Gitlab, use the dropdown next to "Web IDE", near the Clone button, to select Gitpod.
 
 **Prerequisites**: `node`, `yarn`, `rust`, `wasm-pack`
 
@@ -42,6 +46,8 @@ Use.GPU has an incremental architecture, which updates with minimal recomputatio
 - `yarn`: https://yarnpkg.com/getting-started/install
 - `rust`: https://www.rust-lang.org/tools/install
 - `wasm-pack`: https://rustwasm.github.io/wasm-pack/installer/
+
+**Node v18 is currently not supported due to conflicts with `ts-node`. Use v16 or below.**
 
 **Dependencies**: 
 - run `yarn install` to grab dependent packages, and run code generation for the lib.

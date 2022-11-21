@@ -6,7 +6,7 @@ import { provide, capture, yeet, makeCapture, useCallback, useCapture, useMemo, 
 import {
   makeIdAllocator,
   makeUniformLayout, makeLayoutData, makeLayoutFiller,
-  makeStorageBuffer, uploadBufferRange,
+  makeStorageBuffer, uploadBuffer, uploadBufferRange,
   makeAtlas, makeTexture,
 } from '@use-gpu/core';
 import { mixBits53 } from '@use-gpu/state';
@@ -23,7 +23,7 @@ export const SHADOW_FORMAT = "depth32float";
 
 const LIGHT_ATTRIBUTE = bundleToAttribute(WGSLLight);
 const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.members!);
-const LIGHT_BYTE_OFFSET = 4;
+const LIGHT_BYTE_OFFSET = 16;
 
 const makeAtlasPage = () => makeAtlas(
   SHADOW_PAGE,
@@ -105,15 +105,15 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       shadowKey = mixBits53(mixBits53(mixBits53(shadowKey, key), w), h);
     }
 
-    const lightCount = Math.max(alloc, lights.size);
-    const size = useBufferedSize(lightCount);
+    const lightCount = lights.size;
+    const size = useBufferedSize(Math.max(alloc, lightCount + 1));
     const device = useDeviceContext();
 
     const prevDataRef = useRef(null);
 
     // Make light storage buffer
     const [storage, data, filler] = useMemo(() => {
-      const data = makeLayoutData(LIGHT_LAYOUT, size + 1);
+      const data = makeLayoutData(LIGHT_LAYOUT, size);
       const buffer = makeStorageBuffer(device, data);
 
       const {current: prevData} = prevDataRef;
@@ -222,22 +222,22 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       filler.setData(index, lights.get(id));
     }
-    if (needsRefresh) ranges = [[0, size]];
+    if (needsRefresh) ranges = [[0, size - 1]];
 
     // Upload changed ranges
     if (ranges.length) {
       const {buffer} = storage;
 
       count[0] = lightCount;
-      uploadBufferRange(device, buffer, count.buffer, 0, LIGHT_BYTE_OFFSET);
+      uploadBuffer(device, buffer, count.buffer);
 
       const stride = LIGHT_LAYOUT.length;
       for (const [from, to] of ranges) {
-        uploadBufferRange(device, buffer, data, LIGHT_BYTE_OFFSET + from * stride, (to - from) * stride);
+        uploadBufferRange(device, buffer, data, from * stride, (to - from) * stride, LIGHT_BYTE_OFFSET);
       }
     }
-
-    storage.size[0] = storage.length = lightCount;
+    
+    storage.size[0] = storage.length = lightCount + 1;
     storage.version = texture.version = incrementVersion(storage.version);
 
     queue.length = 0;
@@ -250,7 +250,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
         storage,
         texture,
       },
-    }), []);
+    }), [storage, texture]);
   };
 
   return capture(LightCapture, render(useLight), Resume);

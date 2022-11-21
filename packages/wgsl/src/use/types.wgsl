@@ -4,6 +4,7 @@
   normal: vec4<f32>,
   color: vec4<f32>,
   opts: vec4<f32>,
+
   intensity: f32,
   kind: i32,
 

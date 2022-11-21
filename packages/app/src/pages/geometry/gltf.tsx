@@ -43,7 +43,7 @@ export const GeometryGLTFPage: LC = () => {
               ]}
               prop='position'
             >
-              <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} size={40} />
+              <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} intensity={40*40} />
             </Animate>
 
             <Animate

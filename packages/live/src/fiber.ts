@@ -156,8 +156,8 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
 ): FiberYeet<any, C> => ({
   id: fiber.id,
   emit: map
-    ? (fiber: LiveFiber<any>, v: A) => fiber.yeeted!.value = map(v)
-    : (fiber: LiveFiber<any>, v: B) => fiber.yeeted!.value = v,
+    ? (fiber: LiveFiber<any>, v: A) => fiber.yeeted!.reduced = map(fiber.yeeted!.value = v)
+    : (fiber: LiveFiber<any>, v: B) => fiber.yeeted!.value = fiber.yeeted!.reduced = v,
   gather,
   value: undefined,
   reduced: undefined,
@@ -227,7 +227,7 @@ export const renderFiber = <F extends ArrowFunction>(
 
   // Early exit if memoized and same result
   if (fiber.memo != null) {
-    const canExitEarly = fiber.type !== YEET && !fiber.next;
+    const canExitEarly = !fiber.next;
     if (fiber.version !== fiber.memo) {
       fiber.memo = fiber.version;
       bustFiberDeps(fiber);
@@ -356,12 +356,15 @@ export const updateFiber = <F extends ArrowFunction>(
   // Yeet value upstream
   else if (fiberType === YEET) {
     if (!yeeted) throw new Error("Yeet without aggregator in " + formatNode(fiber));
-    bustFiberYeet(fiber);
-    visitYeetRoot(fiber);
 
     const value = call?.arg !== undefined ? call!.arg : call!.args?.[0];
-    if (value !== undefined) yeeted.emit(fiber, value);
-    else fiber.yeeted!.value = undefined;
+    if (fiber.yeeted!.value !== value) {
+      bustFiberYeet(fiber);
+      visitYeetRoot(fiber);
+
+      if (value !== undefined) yeeted.emit(fiber, value);
+      else fiber.yeeted!.value = undefined;
+    }
   }
   // Mount normal node (may still be built-in)
   else {
@@ -685,7 +688,6 @@ export const reduceFiberValues = <R>(
 
     if (!self) {
       if (fiber.next && !isFork) return reduce(fiber.next);
-      if (yeeted.value !== undefined) return yeeted.value;
     }
 
     if (yeeted.reduced !== undefined) return yeeted.reduced;
@@ -737,7 +739,6 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
 
   if (!self) {
     if (fiber.next && !isFork) return gatherFiberValues(fiber.next);
-    if (yeeted.value !== undefined) return yeeted.value;
   }
 
   if (yeeted.reduced !== undefined) return yeeted.reduced;
@@ -794,10 +795,6 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 
   if (!self) {
     if (fiber.next && !isFork) return multiGatherFiberValues(fiber.next) as any;
-    if (yeeted.value !== undefined) {
-      if (typeof yeeted.value === 'function' || Array.isArray(yeeted.value)) return {'': yeeted.value};
-      return yeeted.value;
-    }
   }
 
   if (yeeted.reduced !== undefined) return yeeted.reduced;

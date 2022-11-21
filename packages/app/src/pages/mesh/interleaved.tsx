@@ -7,7 +7,7 @@ import {
   InterleavedData, PBRMaterial, RawTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
-  Lights, PointLight,
+  PointLight,
 } from '@use-gpu/workbench';
 
 import { meshVertexArray, makeTexture } from '../../meshes/cube';
@@ -44,27 +44,24 @@ export const MeshInterleavedPage: LC = (props) => {
         <Draw>
           <Cursor cursor='move' />
           <Camera>
-            <Pass>
-              <Lights>
-                <PointLight position={[-2.5, 3, 2, 1]} intensity={4} />
+            <Pass lights>
+              <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
 
-                <Pick
-                  render={({id, hovered, presses}) =>
-                    <PBRMaterial albedoMap={texture} albedo={presses.left % 2 ? COLOR_ON : COLOR_OFF}>
-                      <FaceLayer
-                        id={id}
-                        positions={positions}
-                        normals={normals}
-                        colors={colors}
-                        uvs={uvs}
-                        shaded
-                      />
-                      {hovered ? <Cursor cursor='pointer' /> : null}
-                    </PBRMaterial>
-                  }
-                />
-  
-              </Lights>
+              <Pick
+                render={({id, hovered, presses}) =>
+                  <PBRMaterial albedoMap={texture} albedo={presses.left % 2 ? COLOR_ON : COLOR_OFF}>
+                    <FaceLayer
+                      id={id}
+                      positions={positions}
+                      normals={normals}
+                      colors={colors}
+                      uvs={uvs}
+                      shaded
+                    />
+                    {hovered ? <Cursor cursor='pointer' /> : null}
+                  </PBRMaterial>
+                }
+              />
             </Pass>
           </Camera>
         </Draw>

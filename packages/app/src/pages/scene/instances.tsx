@@ -7,7 +7,7 @@ import {
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
-  Lights, PointLight,
+  PointLight,
 
   makeBoxGeometry,
 } from '@use-gpu/workbench';
@@ -56,19 +56,32 @@ export const SceneInstancesPage: LC = (props) => {
             <Draw>
               <Cursor cursor='move' />
               <Camera>
-                <Pass>
-                  <Lights>
-                    <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
+                <Pass lights>
+                  <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
-                    <Scene>
-                      <PBRMaterial
-                        albedoMap={texture}
-                      >
-                        <Instances
-                          mesh={mesh}
-                          shaded
-                          render={(Instance) => (<>
+                  <Scene>
+                    <PBRMaterial
+                      albedoMap={texture}
+                    >
+                      <Instances
+                        mesh={mesh}
+                        shaded
+                        render={(Instance) => (<>
 
+                          <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
+                            <Node>
+                              {seq(20).map(i => (
+                                <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
+                                  <Instance
+                                    rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
+                                    scale={[0.2, 0.2, 0.2]}
+                                  />
+                                </Animate>
+                              ))}
+                            </Node>
+                          </Animate>
+                          
+                          <Node rotation={[90, 90, 0]} scale={[0.7, 0.7, 0.7]}>
                             <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
                               <Node>
                                 {seq(20).map(i => (
@@ -81,28 +94,13 @@ export const SceneInstancesPage: LC = (props) => {
                                 ))}
                               </Node>
                             </Animate>
-                            
-                            <Node rotation={[90, 90, 0]} scale={[0.7, 0.7, 0.7]}>
-                              <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
-                                <Node>
-                                  {seq(20).map(i => (
-                                    <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
-                                      <Instance
-                                        rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
-                                        scale={[0.2, 0.2, 0.2]}
-                                      />
-                                    </Animate>
-                                  ))}
-                                </Node>
-                              </Animate>
-                            </Node>
+                          </Node>
 
-                          </>)}
-                        />
-                      </PBRMaterial>
-                  
-                    </Scene>
-                  </Lights>
+                        </>)}
+                      />
+                    </PBRMaterial>
+                
+                  </Scene>
                 </Pass>
               </Camera>
             </Draw>

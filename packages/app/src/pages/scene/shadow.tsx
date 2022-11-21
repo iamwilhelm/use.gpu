@@ -57,7 +57,7 @@ export const SceneShadowPage: LC = (props) => {
         planeMesh,
         texture,
       ]) => (
-        /*<LinearRGB>*/
+        <LinearRGB>
           <Loop>
             <Draw>
               <Cursor cursor='move' />
@@ -94,7 +94,7 @@ export const SceneShadowPage: LC = (props) => {
               </Camera>
             </Draw>
           </Loop>
-        /*</LinearRGB>*/
+        </LinearRGB>
       )}
     />
   );

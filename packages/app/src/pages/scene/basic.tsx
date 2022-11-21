@@ -7,7 +7,7 @@ import {
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
-  Lights, PointLight,
+  PointLight,
   
   makeBoxGeometry,
 } from '@use-gpu/workbench';
@@ -63,27 +63,25 @@ export const SceneBasicPage: LC = (props) => {
             <Draw>
               <Cursor cursor='move' />
               <Camera>
-                <Pass>
-                  <Lights>
-                    <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
+                <Pass lights>
+                  <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
-                    <Scene>
+                  <Scene>
 
-                      <Animate prop="position" keyframes={KEYFRAMES} loop>
-                        <Node rotation={[30, - 30, -30]}>
-                          <PickableMesh mesh={mesh} texture={texture} />
-                        </Node>
-                      </Animate>
+                    <Animate prop="position" keyframes={KEYFRAMES} loop>
+                      <Node rotation={[30, - 30, -30]}>
+                        <PickableMesh mesh={mesh} texture={texture} />
+                      </Node>
+                    </Animate>
 
-                      <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
-                        <Node rotation={[30, - 30, -30]}>
-                          <PickableMesh mesh={mesh} texture={texture} />
-                        </Node>
-                      </Animate>
+                    <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
+                      <Node rotation={[30, - 30, -30]}>
+                        <PickableMesh mesh={mesh} texture={texture} />
+                      </Node>
+                    </Animate>
 
-                    </Scene>
+                  </Scene>
 
-                  </Lights>
                 </Pass>
               </Camera>
             </Draw>

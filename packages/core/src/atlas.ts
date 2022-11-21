@@ -1,6 +1,6 @@
 import type { Atlas, TextureSource } from './types';
 
-import { makeTextureDataLayout, makeDynamicTexture, makeTextureView, uploadTexture } from './texture';
+import { makeTextureDataLayout, makeMippableTexture, makeTextureView, uploadTexture } from './texture';
 import uniq from 'lodash/uniq';
 
 type Rectangle = [number, number, number, number];
@@ -22,7 +22,7 @@ export const makeAtlasSource = (
   volatile?: number,
 ): TextureSource => {
   const mips = Math.floor(Math.log2(Math.min(atlas.width, atlas.height))) + 1;
-  const texture = makeDynamicTexture(device, atlas.width, atlas.height, 1, format, 1, mips);
+  const texture = makeMippableTexture(device, atlas.width, atlas.height, 1, format, 1, mips);
   const source = {
     texture,
     view: makeTextureView(texture, mips),

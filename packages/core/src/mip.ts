@@ -111,7 +111,7 @@ export const updateMipTextureChain = (
     cache.set(format, pipeline);
   }
 
-  const bindGroups = seq(mips).map((mip: number) => makeTextureBinding(device, pipeline!, sampler, views[mip]));
+  const bindGroups = seq(mips).map((mip: number) => makeTextureBinding(device, pipeline!, views[mip], sampler));
 
   const commandEncoder = device.createCommandEncoder();
   for (let i = 1; i < mips; ++i) {

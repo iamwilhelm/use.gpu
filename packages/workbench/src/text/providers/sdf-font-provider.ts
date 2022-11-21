@@ -194,9 +194,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       provide(SDFFontContext, context, children),
       (gathered: any) => {
         const rects = bounds.flush();
-        if (rects.length) {
-          updateMipTextureChain(device, source, rects);
-        }
+        if (rects.length) updateMipTextureChain(device, source, rects);
 
         return then ? then(atlas, biasedSource, gathered) : null;
       },

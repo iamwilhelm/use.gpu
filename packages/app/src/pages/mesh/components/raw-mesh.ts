@@ -140,7 +140,7 @@ export const RawMesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
     let sampled;
     if (!isPicking) {
       const sampler = makeSampler(device, { });
-      sampled = makeTextureBinding(device, pipeline, sampler, sourceTexture, 1);
+      sampled = makeTextureBinding(device, pipeline, sourceTexture, sampler, 1);
     }
 
     return [uniform, sampled];

@@ -48,7 +48,7 @@ export const makeTexture = (
   return texture;
 }
 
-export const makeSourceTexture = (
+export const makeMippableTexture = (
   device: GPUDevice,
   width: number,
   height: number,
@@ -58,7 +58,7 @@ export const makeSourceTexture = (
   mipLevelCount: number = 1,
   dimension: GPUTextureDimension = '2d',
 ): GPUTexture => {
-  const usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
+  const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST;
   return makeTexture(device, width, height, depth, format, usage, sampleCount, mipLevelCount, dimension);
 }
 
@@ -232,7 +232,7 @@ export const resizeTextureSource = (
   const {format} = source;
 
   const ms = mips === 'auto' ? Math.floor(Math.log2(Math.min(width, height))) + 1 : mips;
-  const newTexture = makeDynamicTexture(device, width, height, depth, format as any, 1, ms, dimension);
+  const newTexture = makeMippableTexture(device, width, height, depth, format as any, 1, ms, dimension);
 
   const src = {
     texture: source.texture,
@@ -264,8 +264,8 @@ export const resizeTextureSource = (
 export const makeTextureBinding = (
   device: GPUDevice,
   pipeline: GPURenderPipeline | GPUComputePipeline,
-  sampler: GPUSampler,
   texture: GPUTexture | GPUTextureView,
+  sampler: GPUSampler,
   set: number = 0,
 ): GPUBindGroup => {
   const view = (texture instanceof GPUTexture) ? makeTextureView(texture) : texture;

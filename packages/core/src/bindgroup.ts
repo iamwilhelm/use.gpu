@@ -11,7 +11,7 @@ const BINDING_TEXTURE_TYPES = {
   'texture_depth_multisampled_2d': { viewDimension: '2d', sampleType: 'depth', multisampled: true },
 
   'texture_2d_array':         { viewDimension: '2d-array' },
-  'texture_depth_2d_array':   { viewDimension: '2d-array' },
+  'texture_depth_2d_array':   { viewDimension: '2d-array', sampleType: 'depth' },
 
   'texture_cube':       { viewDimension: 'cube' },
   'texture_depth_cube': { viewDimension: 'cube', sampleType: 'depth' },
@@ -59,12 +59,13 @@ const parseTextureType = (format: string, variant: string | null) => {
 
 export const makeBindGroupLayoutEntries = (
   bindings: DataBinding[],
-  visibilities: Map<DataBinding, GPUShaderStageFlags>,
+  visibilities: GPUShaderStageFlags | Map<DataBinding, GPUShaderStageFlags>,
   binding: number = 0,
 ): GPUBindGroupLayoutEntry[] => {
   const out = [];
   for (let b of bindings) {
-    const l = makeBindingLayoutEntry(b, visibilities.get(b), out.length + binding);
+    const v = typeof visibilities === 'number' ? visibilities : visibilities.get(b);
+    const l = makeBindingLayoutEntry(b, v, out.length + binding);
     if (Array.isArray(l)) out.push(...l);
     else out.push(l);
   }
@@ -117,13 +118,25 @@ export const makeBindGroupLayout = (
   });
 }
 
+export const makeBindGroup = (
+  device: GPUDevice,
+  layout: GPUBindGroupLayout,
+  entries: GPUBindGroupEntry[],
+) => {
+  return device.createBindGroup({
+    layout,
+    entries,
+  });
+}
+
 export const getMinBindingSize = (format: string | any) => {
   if (typeof format === 'string') {
     format = format.replace(/^array<([^>]+)>$/, '$1');
+    format = format.replace(/^vec3to4</, 'vec4<');
     format = format.replace(/^(u|i)(8|16)$/, 'u32');
     const size = (UNIFORM_ATTRIBUTE_SIZES as any)[format] ?? 0;
     const align = (UNIFORM_ATTRIBUTE_ALIGNS as any)[format] ?? 0;
-    return Math.ceil(size / align) * align;
+    return align ? Math.ceil(size / align) * align : size;
   }
   if (!format) return 0;
 

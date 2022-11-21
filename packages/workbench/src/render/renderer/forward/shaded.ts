@@ -10,8 +10,8 @@ import { getNativeColor } from '../../../hooks/useNativeColor';
 
 import { useDeviceContext } from '../../../providers/device-provider';
 import { useRenderContext } from '../../../providers/render-provider';
-import { usePassContext } from '../../../providers/pass-provider';
 import { useViewContext } from '../../../providers/view-provider';
+import { usePassContext } from '../../../providers/pass-provider';
 
 import instanceDrawVirtualShaded from '@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl';
 import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
@@ -40,10 +40,10 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
 
   const {layout: globalLayout} = useViewContext();
+  const {layout: passLayout} = usePassContext();
 
   const vertexShader = instanceDrawVirtualShaded;
   const fragmentShader = instanceFragmentShaded;
@@ -74,7 +74,9 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     defines,
     pipeline,
     renderContext,
+
     globalLayout,
+    passLayout,
     mode,
   };
 

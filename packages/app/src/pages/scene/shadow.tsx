@@ -37,6 +37,8 @@ const ROTATION_KEYFRAMES = [
   [16, [360, 0, 0]],
 ];
 
+const SHADOW_MAP = {size: [1024, 1024]};
+
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 export const SceneShadowPage: LC = (props) => {
@@ -55,47 +57,44 @@ export const SceneShadowPage: LC = (props) => {
         planeMesh,
         texture,
       ]) => (
-        <LinearRGB>
+        /*<LinearRGB>*/
           <Loop>
             <Draw>
               <Cursor cursor='move' />
               <Camera>
-                <Pass>
-                  <Shared />
-                  <Lights>
-                    <AmbientLight intensity={1} />
-                    <DirectionalLight position={[-2.5, 3, 2, 1]} intensity={8} />
+                <Pass lights shadows>
+                  <AmbientLight intensity={1} />
+                  <DirectionalLight position={[-2.5, 3, 2, 1]} intensity={8} shadowMap={SHADOW_MAP} />
 
-                    <Scene>
+                  <Scene>
 
-                      <Node position={[0, -4, 0]}>
-                        <PBRMaterial albedo={0x808080} roughness={0.7}>
-                          <Mesh
-                            mesh={planeMesh}
-                            shaded
-                          />
-                        </PBRMaterial>
-                      </Node>
-
-                      <PBRMaterial albedoMap={texture} roughness={0.5}>
-                        <Instances
-                          mesh={boxMesh}
+                    <Node position={[0, -4, 0]}>
+                      <PBRMaterial albedo={0x808080} roughness={0.7}>
+                        <Mesh
+                          mesh={planeMesh}
                           shaded
-                          render={(Instance) => (<>
-                            <Instance position={[0, -3, 0]} />
-                            <Instance position={[-3, -2, -2]} scale={[2, 2, 2]} />
-                            <Instance position={[2, -3, 4]} rotation={[0, 30, 0]} />
-                          </>)}
                         />
                       </PBRMaterial>
-                  
-                    </Scene>
-                  </Lights>
+                    </Node>
+
+                    <PBRMaterial albedoMap={texture} roughness={0.5}>
+                      <Instances
+                        mesh={boxMesh}
+                        shaded
+                        render={(Instance) => (<>
+                          <Instance position={[0, -3, 0]} />
+                          <Instance position={[-3, -2, -2]} scale={[2, 2, 2]} />
+                          <Instance position={[2, -3, 4]} rotation={[0, 30, 0]} />
+                        </>)}
+                      />
+                    </PBRMaterial>
+                
+                  </Scene>
                 </Pass>
               </Camera>
             </Draw>
           </Loop>
-        </LinearRGB>
+        /*</LinearRGB>*/
       )}
     />
   );

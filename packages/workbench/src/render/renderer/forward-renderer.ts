@@ -1,17 +1,25 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { DataBounds, UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
+import type { DataBounds, UseGPURenderContext, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 import type { AggregatedCalls } from './pass/types';
+import type { UseLight } from './light-data';
 
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
-import { proxy } from '@use-gpu/core';
+import { bindBundle, bundleToAttributes, bindEntryPoint, getBundleKey } from '@use-gpu/shader/wgsl';
+import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeStorageEntries, makeTextureEntries, makeTextureView } from '@use-gpu/core';
 
+import { LightContext } from '../../providers/light-provider';
 import { PassContext } from '../../providers/pass-provider';
 import { useDeviceContext } from '../../providers/device-provider';
 import { useInspectable } from '../../hooks/useInspectable'
+import { getBoundShader } from '../../hooks/useBoundShader';
 
 import { Await } from './await';
 
+import { LightData } from './light-data';
+
 import { DebugRender } from './forward/debug';
+import { DepthRender } from './forward/depth';
 import { ShadedRender } from './forward/shaded';
 import { SolidRender } from './forward/solid';
 import { PickingRender } from './forward/picking';
@@ -21,6 +29,17 @@ import { ColorPass } from '../pass/color-pass';
 import { ComputePass } from '../pass/compute-pass';
 import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
+
+import lightUniforms from '@use-gpu/wgsl/use/light.wgsl';
+import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
+import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
+import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
+
+const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
+const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
+
+const getLightCount = bindEntryPoint(lightUniforms, 'getLightCount');
+const getLight = bindEntryPoint(lightUniforms, 'getLight');
 
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,
@@ -41,7 +60,7 @@ export type ForwardRendererProps = {
 export const getComponents = ({modes = {}, renders = {}}: RenderComponents) => {
   return {
     modes: {
-      shadow: null,
+      shadow: DepthRender,
       debug: DebugRender,
       picking: PickingRender,
       ...modes,
@@ -73,8 +92,35 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
   const inspect = useInspectable();
   const device = useDeviceContext();
 
-  // Provide draw call variants for sub-passes
   const context = useMemo(() => {
+
+    // Prepare shared bind group for forward lighting
+    const entries = [];
+    if (lights) {
+      entries.push({binding: 0, visibility: GPUShaderStage.FRAGMENT, buffer: {type: 'read-only-storage'}});
+      if (shadows) {
+        entries.push({binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {viewDimension: '2d-array', sampleType: 'depth'}});
+        entries.push({binding: 2, visibility: GPUShaderStage.FRAGMENT, sampler: {type: 'comparison'}});
+      }
+    }
+
+    const layout = lights ? makeBindGroupLayout(device, entries) : null;
+    const bind = lights ? (storage: StorageSource, texture: TextureSource) => {
+      const bindings = [];
+      if (lights) {
+        bindings.push({storage});
+        if (shadows) bindings.push({texture});
+      }
+
+      const entries = makeDataBindingsEntries(device, bindings);
+      const bindGroup = makeBindGroup(device, layout, entries);
+
+      return (passEncoder: RenderPassEncoder) => {
+        passEncoder.setBindGroup(1, bindGroup);
+      };
+    } : null;
+
+    // Provide draw call variants for sub-passes
     const components = getComponents(props.components ?? {});
 
     const getRender = (mode, render = null) =>
@@ -103,8 +149,8 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     const useVariants = (virtual, hovered) => 
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
-    return {getVariants, useVariants};
-  }, [shadows, picking]);
+    return {useVariants, layout, bind};
+  }, [lights, shadows, picking]);
 
   const Resume = (
     calls: AggregatedCalls,
@@ -118,7 +164,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       if (passes) {
         return passes.map(element => extend(element, props));
       }
-
+      
       return [
         calls.compute ? use(ComputePass, props) : null,
         shadows && calls.shadow ? use(ShadowPass, props) : null,
@@ -128,5 +174,25 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       ];
     }, [context, calls, passes, overlay, merge]);
 
-  return multiGather(provide(PassContext, context, children), Resume);
+  const view = lights ? use(LightData, {
+    render: (
+      useLight: UseLight,
+    ) => {
+      const context = useMemo(() => {
+        const bindMaterial = (applyMaterial: ShaderModule) => {
+          const applyLight = bindBundle(applyLightWGSL, {applyMaterial});
+          return getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [getLightCount, getLight, applyLight]);
+        };
+
+        const useMaterial = (applyMaterial: ShaderModule) =>
+          useMemo(() => bindMaterial(applyMaterial), [bindMaterial, applyMaterial]);
+
+        return {useLight, useMaterial};
+      }, [useLight]);
+
+      return provide(LightContext, context, children);
+    },
+  }) : children;
+
+  return provide(PassContext, context, multiGather(view, Resume));
 }, 'ForwardRenderer');

@@ -3,17 +3,17 @@ import type { TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
 export type Light = {
-  kind: number,
+  into?: TypedArray | number[],
   position?: TypedArray | number[],
   normal?: TypedArray | number[],
-  tangent?: TypedArray | number[],
-  size?: TypedArray | number[],
   color?: TypedArray | number[],
   opts?: TypedArray | number[],
   intensity?: number,
-  transform?: ShaderModule | null,
-  differential?: ShaderModule | null,
-  shadowMap?: ShadowMapLike | null,
+  kind: number,
+  
+  shadow?: ShadowMapLike | null,
+  shadowMap?: number,
+  shadowUV?: TypedArray | number[],
 };
 
 export type ShadowMapLike = {

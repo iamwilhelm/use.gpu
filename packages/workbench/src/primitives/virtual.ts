@@ -8,7 +8,7 @@ import { usePassContext } from '../providers/pass-provider';
 export type VirtualProps = VirtualDraw;
 
 export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) => {
-  const {useVariants, getRenderer} = usePassContext();
+  const {useVariants} = usePassContext();
 
   const hovered = useInspectHoverable();
   const variants = useVariants(props, hovered);

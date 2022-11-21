@@ -34,7 +34,7 @@ export type DrawCallProps = {
   vertex: ParsedBundle,
   fragment: ParsedBundle,
   
-  layout?: GPUBindGroupLayout,
+  globalLayout?: GPUBindGroupLayout,
 
   globalBinding?: (pipeline: GPUPipeline) => VolatileAllocation,
   globalDefs?: UniformAttribute[],
@@ -45,11 +45,17 @@ export type DrawCallProps = {
   defines?: Record<string, any>,
 };
 
-const DEFAULT_DEFINES = {
+const GLOBAL_DEFINES = {
   '@group(VIEW)': '@group(0)',
-  '@binding(VIEW)': '@binding(0)',
   '@group(VIRTUAL)': '@group(1)',
   '@group(VOLATILE)': '@group(2)',
+};
+
+const PASS_DEFINES = {
+  '@group(VIEW)': '@group(0)',
+  '@group(LIGHT)': '@group(1)',
+  '@group(VIRTUAL)': '@group(2)',
+  '@group(VOLATILE)': '@group(3)',
 };
 
 export const DrawCall = (props: DrawCallProps) => {
@@ -70,6 +76,7 @@ export const drawCall = (props: DrawCallProps) => {
     fragment: fragmentShader,
 
     globalLayout,
+    passLayout,
 
     globalBinding,
     globalDefs,
@@ -92,9 +99,9 @@ export const drawCall = (props: DrawCallProps) => {
   const topology = propPipeline.primitive?.topology ?? 'triangle-list';
 
   const defines = useOne(() => (propDefines ? {
-    ...DEFAULT_DEFINES,
+    ...(passLayout ? PASS_DEFINES : GLOBAL_DEFINES),
     ...propDefines,
-  } : DEFAULT_DEFINES), propDefines);
+  } : (passLayout ? PASS_DEFINES : GLOBAL_DEFINES)), propDefines);
 
   // Shaders
   const {
@@ -109,9 +116,9 @@ export const drawCall = (props: DrawCallProps) => {
     defines,
   );
 
-  // Pipeline layout with global bind group
+  // Pipeline layout with global bind group and optional pass-specific bind group
   const layout = globalLayout
-  ? usePipelineLayout(device, entries, globalLayout)
+  ? usePipelineLayout(device, entries, globalLayout, passLayout)
   : useNoPipelineLayout();
 
   // Rendering pipeline
@@ -125,24 +132,26 @@ export const drawCall = (props: DrawCallProps) => {
 
   if (!pipeline) return suspense ? SUSPEND : NO_CALL;
   if (isStale) return SUSPEND;
+
+  const base = 1 + !!passLayout;
   
   // Uniforms
   const uniform = useMemo(() => {
     if (globalLayout) return null;
     if (globalBinding) return globalBinding(pipeline);
     return makeMultiUniforms(device, pipeline, globalDefs ?? [VIEW_UNIFORMS], 0);
-  }, [device, pipeline, globalBinding, globalDefs]);
+  }, [device, pipeline, globalLayout, globalBinding, globalDefs]);
 
   // Bound storage
   const force = !!volatiles.length;
   const storage = useMemo(() =>
-    makeBoundUniforms(device, pipeline, uniforms, bindings, 1, force),
-    [device, pipeline, uniforms, bindings]);
+    makeBoundUniforms(device, pipeline, uniforms, bindings, base, force),
+    [device, pipeline, uniforms, bindings, base]);
 
   // Volatile storage
   const volatile = useMemo(() =>
-    makeVolatileUniforms(device, pipeline, volatiles, 2),
-    [device, pipeline, uniforms, volatiles]
+    makeVolatileUniforms(device, pipeline, volatiles, base + 1),
+    [device, pipeline, uniforms, volatiles, base]
   );
 
   const inspected = inspect({
@@ -189,8 +198,8 @@ export const drawCall = (props: DrawCallProps) => {
       uploadBuffer(device, storage.buffer, storage.pipe.data);
     }
 
-    if (storage.bindGroup) passEncoder.setBindGroup(1, storage.bindGroup);
-    if (volatile.bindGroup) passEncoder.setBindGroup(2, volatile.bindGroup());
+    if (storage.bindGroup) passEncoder.setBindGroup(base, storage.bindGroup);
+    if (volatile.bindGroup) passEncoder.setBindGroup(base + 1, volatile.bindGroup());
 
     if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
     else passEncoder.draw(v, i, 0, 0);

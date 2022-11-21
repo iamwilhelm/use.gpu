@@ -442,6 +442,13 @@ declare module "@use-gpu/wgsl/plot/volume.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/fragment/depth.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/render/fragment/pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -474,6 +481,13 @@ declare module "@use-gpu/wgsl/render/pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getPickingID: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/virtual-depth.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
   export default __module;
 }
 
@@ -643,6 +657,15 @@ declare module "@use-gpu/wgsl/use/gamma.wgsl" {
   export const toGamma2: ParsedBundle;
   export const toGamma3: ParsedBundle;
   export const toGamma4: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/use/light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const lightUniforms: ParsedBundle;
+  export const getLightCount: ParsedBundle;
+  export const getLight: ParsedBundle;
   export default __module;
 }
 

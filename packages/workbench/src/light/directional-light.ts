@@ -1,12 +1,11 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
 import type { ShadowMapProps } from './types';
+
 import { optional, parseColor, parseNumber, parsePosition, parseVec2, parseVec3, useProp } from '@use-gpu/traits';
+import { memo, useMemo, useOne } from '@use-gpu/live';
 
-import { useMemo, useOne } from '@use-gpu/live';
-
-import { useLightCapture } from './lights';
-import { useTransformContext } from '../providers/transform-provider';
+import { useLightContext } from '../providers/light-provider';
 import { useMatrixContext } from '../providers/matrix-provider';
 
 import { mat4, vec3, vec4 } from 'gl-matrix';
@@ -30,7 +29,7 @@ const DEFAULT_SHADOW_MAP = {
 
 const parseOptionalPosition = optional(parsePosition);
 
-export const DirectionalLight = (props: DirectionalLightProps) => {
+export const DirectionalLight = memo((props: DirectionalLightProps) => {
   
   const position = useProp(props.position, parsePosition, DEFAULT_DIRECTION);
   const direction = useProp(props.direction, parseOptionalPosition);
@@ -39,15 +38,14 @@ export const DirectionalLight = (props: DirectionalLightProps) => {
   const intensity = useProp(props.intensity, parseNumber, 1);
 
   const normal = useOne(() =>
-    direction ?? [-position[0], -position[1], -position[2]],
+    direction ?? vec4.fromValues(-position[0], -position[1], -position[2], 0),
     direction ?? position
   );
-  
-  const {shadowMap} = props;
 
+  const {shadowMap} = props;
   const parent = useMatrixContext();
 
-  const [tangent, shadow] = useMemo(() => {
+  const [into, shadow] = useMemo(() => {
     if (!shadowMap) return [null, null];
 
     const size  = parseVec2(shadowMap.size,  DEFAULT_SHADOW_MAP.size);
@@ -71,44 +69,40 @@ export const DirectionalLight = (props: DirectionalLightProps) => {
 
     if (parent) mat4.multiply(matrix, parent, matrix);
 
-    const shadow = {
-      size,
-      depth,
-      matrix,
-    };
-    return [tangent, shadow];
-  }, [normal, shadowMap, parent]);
+    mat4.invert(matrix, matrix);
 
-  const {transform, differential} = useTransformContext();
+    const [w, h] = span;
+    mat4.scale(matrix, matrix, [w/2, h/2, 1]);
+
+    const shadow = {size, depth};
+    return [matrix, shadow];
+  }, [position, normal, shadowMap, parent]);
 
   const light = useMemo(() => {
-    let p, n, t;
+    let p, n;
     if (parent) {
       p = vec4.clone(position);
       n = vec4.clone(normal);
-      t = vec4.clone(tangent);
       p[3] = 1;
       n[3] = 0;
-      t[3] = 0;
 
       vec4.transformMat4(p, parent);
       vec4.transformMat4(n, parent);
-      vec4.transformMat4(t, parent);
     }
-    
+
     return {
       kind: 1,
+      into,
       position: p ?? position,
       normal: n ?? normal,
-      tangent: t ?? tangent,
       color,
       intensity,
-      transform,
-      differential,
       shadow,
     };
-  }, [position, normal, tangent, color, intensity, transform, differential, shadow, parent]);
+  }, [position, normal, color, intensity, shadow, parent]);
 
-  useLightCapture(light);
+  const {useLight} = useLightContext();
+  useLight(light);
+
   return null;
-};
+}, 'DirectionalLight');

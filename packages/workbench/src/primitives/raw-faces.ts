@@ -20,7 +20,6 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
-import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 export type RawFacesProps = {
   position?: number[] | TypedArray,
@@ -181,7 +180,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     } : {
       getVertex,
       getPicking,
-      getFragment: getPassThruColor,
       ...material,
     }
   }, [getVertex, getPicking, material]);

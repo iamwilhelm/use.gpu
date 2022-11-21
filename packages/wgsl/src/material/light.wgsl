@@ -30,10 +30,9 @@ use '@use-gpu/wgsl/use/types'::{ Light, SurfaceFragment };
   }
   else if (kind == 2) {
     // Point
-    let s = light.size.x;
     let d = light.position.xyz - surface.position.xyz;
     L = normalize(d);
-    if (s >= 0.0) { radiance *= s*s / dot(d, d); }
+    radiance /= dot(d, d);
     radiance *= light.color.rgb * 3.1415;
   }
   else if (kind == 3) {

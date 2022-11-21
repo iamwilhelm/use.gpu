@@ -8,7 +8,8 @@ import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop
 
 const NO_PROPS: any[] = [{}];
 
-const toChildren = <T>(t: T[]): T[] | T | undefined => {
+const toChildren = <T>(t: T | T[]): T | T[] | undefined => {
+  if (!Array.isArray(t) && t) return t;
   if (t.length === 1) return t[0];
   if (t.length) return t;
   return undefined;

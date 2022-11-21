@@ -3,8 +3,9 @@ import type { VirtualDraw } from '../primitives/virtual2';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
 export type PassContextProps = {
-  getVariants: (virtual: VirtualDraw) => null | LiveComponent | LiveComponent[],
   useVariants: (virtual: VirtualDraw) => null | LiveComponent | LiveComponent[],
+  layout?: GPUBindGroupLayout,
+  bind?: (...args: any[]) => (passEncoder: GPURenderPassEncoder) => void,
 };
 
 export const PassContext = makeContext<PassContextProps>(undefined, 'PassContext');

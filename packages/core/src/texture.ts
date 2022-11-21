@@ -15,24 +15,29 @@ export const makeTextureView = (
   texture: GPUTexture,
   mipLevelCount: number = 1,
   baseMipLevel: number = 0,
+  dimension: GPUTextureDimension = '2d',
 ) =>
   texture.createView({
     mipLevelCount,
     baseMipLevel,
+    dimension,
   });
 
 export const makeTexture = (
   device: GPUDevice,
   width: number,
   height: number,
+  depth: number,
   format: GPUTextureFormat,
   usage: number,
   sampleCount: number = 1,
   mipLevelCount: number = 1,
+  dimension: GPUTextureDimension = '2d',
 ): GPUTexture => {
   const texture = device.createTexture({
     // @ts-ignore
-    size: [width, height, 1],
+    size: [width, height, depth],
+    dimension,
     sampleCount,
     mipLevelCount,
     format,
@@ -51,12 +56,13 @@ export const makeSourceTexture = (
   format: GPUTextureFormat,
   sampleCount: number = 1,
   mipLevelCount: number = 1,
+  dimension: GPUTextureDimension = '2d',
 ): GPUTexture => {
   const usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
-  return makeTexture(device, width, height, format, usage, sampleCount, mipLevelCount);
+  return makeTexture(device, width, height, depth, format, usage, sampleCount, mipLevelCount, dimension);
 }
 
-export const makeRenderTexture = (
+export const makeTargetTexture = (
   device: GPUDevice,
   width: number,
   height: number,
@@ -65,7 +71,7 @@ export const makeRenderTexture = (
   mipLevelCount: number = 1,
 ): GPUTexture => {
   const usage = GPUTextureUsage.RENDER_ATTACHMENT;
-  return makeTexture(device, width, height, format, usage, sampleCount, mipLevelCount);
+  return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
 }
 
 export const makeStorageTexture = (
@@ -77,7 +83,7 @@ export const makeStorageTexture = (
   mipLevelCount: number = 1,
 ): GPUTexture => {
   const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING;
-  return makeTexture(device, width, height, format, usage, sampleCount, mipLevelCount);
+  return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
 }
 
 export const makeRenderableTexture = (
@@ -89,7 +95,7 @@ export const makeRenderableTexture = (
   mipLevelCount: number = 1,
 ): GPUTexture => {
   const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING;
-  return makeTexture(device, width, height, format, usage, sampleCount, mipLevelCount);
+  return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
 }
 
 export const makeCopyableTexture = (
@@ -101,7 +107,7 @@ export const makeCopyableTexture = (
   mipLevelCount: number = 1,
 ): GPUTexture => {
   const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
-  return makeTexture(device, width, height, format, usage, sampleCount, mipLevelCount);
+  return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
 }
 
 export const makeReadbackTexture = (
@@ -113,7 +119,7 @@ export const makeReadbackTexture = (
   mipLevelCount: number = 1,
 ): GPUTexture => {
   const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC;
-  return makeTexture(device, width, height, format, usage, sampleCount, mipLevelCount);
+  return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
 }
 
 export const makeDynamicTexture = (
@@ -124,9 +130,10 @@ export const makeDynamicTexture = (
   format: GPUTextureFormat,
   sampleCount: number = 1,
   mipLevelCount: number = 1,
+  dimension: GPUTextureDimension = '2d',
 ): GPUTexture => {
-  const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
-  return makeTexture(device, width, height, format, usage, sampleCount, mipLevelCount);
+  const usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
+  return makeTexture(device, width, height, depth, format, usage, sampleCount, mipLevelCount, dimension);
 }
 
 export const makeRawTexture = (
@@ -183,9 +190,9 @@ export const uploadTexture = (
   const [x, y, z] = offset as Point3;
   const origin = { x, y, z: z || 0 };
 
-  const [width, height, d] = size as Point3;
+  const [width, height, depth] = size as Point3;
   // @ts-ignore
-  const extent = [width, height, d || 1];
+  const extent = [width, height, depth || 1];
 
   const copy = {
     texture,
@@ -220,11 +227,12 @@ export const resizeTextureSource = (
   mips: 'auto' | number = 1,
   mipLevel: GPUIntegerCoordinate = 0,
   aspect: GPUTextureAspect = "all",
+  dimension: GPUTextureDimension = '2d',
 ) => {
   const {format} = source;
 
   const ms = mips === 'auto' ? Math.floor(Math.log2(Math.min(width, height))) + 1 : mips;
-  const newTexture = makeDynamicTexture(device, width, height, depth, format as any, 1, ms);
+  const newTexture = makeDynamicTexture(device, width, height, depth, format as any, 1, ms, dimension);
 
   const src = {
     texture: source.texture,
@@ -297,10 +305,10 @@ export const makeTextureEntries = (
   for (const [sampler, texture] of textures) {
     const view = (texture instanceof GPUTexture) ? makeTextureView(texture) : texture;
 
-    entries.push({binding, resource: sampler});
+    entries.push({binding, resource: view});
     binding++;
 
-    entries.push({binding, resource: view});
+    entries.push({binding, resource: sampler});
     binding++;
   }
 

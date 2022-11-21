@@ -21,7 +21,6 @@ export * from './renderer/forward/picking';
 export * from './renderer/forward/shaded';
 export * from './renderer/forward/solid';
 export * from './renderer/forward/ui';
-export * from './shared';
 export * from './stage';
 export * from './render-target';
 export * from './render-to-texture';

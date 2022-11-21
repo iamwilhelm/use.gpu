@@ -59,6 +59,7 @@ export const BasicMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBR
       getFragment,
     },
     shaded: {
+      getFragment,
       getSurface,
       getLight,
     },

@@ -329,6 +329,11 @@
       "import": "./src/plot/volume.wgsl",
       "require": "./src/plot/volume.wgsl"
     },
+    "./render/fragment/depth.wgsl": {
+      "types": "./src/render/fragment/depth.wgsl.d.ts",
+      "import": "./src/render/fragment/depth.wgsl",
+      "require": "./src/render/fragment/depth.wgsl"
+    },
     "./render/fragment/pick.wgsl": {
       "types": "./src/render/fragment/pick.wgsl.d.ts",
       "import": "./src/render/fragment/pick.wgsl",
@@ -353,6 +358,11 @@
       "types": "./src/render/pick.wgsl.d.ts",
       "import": "./src/render/pick.wgsl",
       "require": "./src/render/pick.wgsl"
+    },
+    "./render/vertex/virtual-depth.wgsl": {
+      "types": "./src/render/vertex/virtual-depth.wgsl.d.ts",
+      "import": "./src/render/vertex/virtual-depth.wgsl",
+      "require": "./src/render/vertex/virtual-depth.wgsl"
     },
     "./render/vertex/virtual-pick.wgsl": {
       "types": "./src/render/vertex/virtual-pick.wgsl.d.ts",
@@ -453,6 +463,11 @@
       "types": "./src/use/gamma.wgsl.d.ts",
       "import": "./src/use/gamma.wgsl",
       "require": "./src/use/gamma.wgsl"
+    },
+    "./use/light.wgsl": {
+      "types": "./src/use/light.wgsl.d.ts",
+      "import": "./src/use/light.wgsl",
+      "require": "./src/use/light.wgsl"
     },
     "./use/types.wgsl": {
       "types": "./src/use/types.wgsl.d.ts",

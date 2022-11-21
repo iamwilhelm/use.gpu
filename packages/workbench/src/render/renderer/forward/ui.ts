@@ -10,8 +10,8 @@ import { getNativeColor } from '../../../hooks/useNativeColor';
 
 import { useDeviceContext } from '../../../providers/device-provider';
 import { useRenderContext } from '../../../providers/render-provider';
-import { usePassContext } from '../../../providers/pass-provider';
 import { useViewContext } from '../../../providers/view-provider';
+import { usePassContext } from '../../../providers/pass-provider';
 
 import instanceDrawVirtualUI from '@use-gpu/wgsl/render/vertex/virtual-ui.wgsl';
 import instanceFragmentUI from '@use-gpu/wgsl/render/fragment/ui.wgsl';
@@ -36,10 +36,10 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
 
   const {layout: globalLayout} = useViewContext();
+  const {layout: passLayout} = usePassContext();
 
   const vertexShader = instanceDrawVirtualUI;
   const fragmentShader = instanceFragmentUI;
@@ -67,6 +67,7 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
     pipeline,
     renderContext,
     globalLayout,
+    passLayout,
     mode,
   };
 

@@ -1,4 +1,23 @@
-import type { StorageSource, UniformAttribute, DataBinding } from './types';
+import type { SharedAllocation, StorageSource, UniformAttribute, DataBinding } from './types';
+import { makeBindGroupLayout } from './bindgroup';
+
+const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
+
+export const makeSharedStorage = (
+  device: GPUDevice,
+  sources: StorageSource[],
+): SharedAllocation => {
+  const group = sources.map((_, binding) => ({binding, visibility: VISIBILITY_ALL, buffer: {type: 'read-only-storage'}}));
+  const layout = makeBindGroupLayout(device, group);
+
+  const entries = makeStorageEntries(sources);
+  const bindGroup = device.createBindGroup({
+    layout,
+    entries,
+  });
+
+  return {layout, bindGroup};
+}
 
 export const makeStorageBinding = (
   device: GPUDevice,
@@ -6,7 +25,10 @@ export const makeStorageBinding = (
   links: Record<string, StorageSource | null | undefined>,
   set: number = 0,
 ): GPUBindGroup => {
-  const entries = makeStorageEntries(links);
+  const sources = [];
+  for (const k in links) if (links[k]) source.push(links[k]);
+
+  const entries = makeStorageEntries(sources);
   const bindGroup = device.createBindGroup({
     layout: pipeline.getBindGroupLayout(set),
     entries,
@@ -15,22 +37,19 @@ export const makeStorageBinding = (
 }
 
 export const makeStorageEntries = (
-  links: Record<string, StorageSource | null | undefined>,
+  sources: StorageSource[],
   binding: number = 0
 ): GPUBindGroupEntry[] => {
   const entries = [] as any[];
 
-  for (const k in links) {
-    const link = links[k];
-    if (link) {
-      const {buffer, byteOffset, byteLength} = link;
-      entries.push({binding, resource: {
-        buffer,
-        offset: byteOffset,
-        size:   byteLength,
-      }});
-      binding++;
-    }
+  for (const source of sources) {
+    const {buffer, byteOffset, byteLength} = source;
+    entries.push({binding, resource: {
+      buffer,
+      offset: byteOffset,
+      size:   byteLength,
+    }});
+    binding++;
   }
 
   return entries;

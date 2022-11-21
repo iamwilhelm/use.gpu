@@ -1,12 +1,14 @@
 @export struct Light {
+  into: mat4x4<f32>,
   position: vec4<f32>,
   normal: vec4<f32>,
-  tangent: vec4<f32>,
-  size: vec4<f32>,
   color: vec4<f32>,
   opts: vec4<f32>,
   intensity: f32,
   kind: i32,
+
+  shadowMap: i32,
+  shadowUV: vec4<f32>,
 };
 
 ////

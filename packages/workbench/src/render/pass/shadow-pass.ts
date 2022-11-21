@@ -1,14 +1,14 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { Renderable } from '../pass';
+import type { LightEnv, Renderable } from '../pass';
 
 import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
 
-import { useRenderContext } from '../../providers/render-provider';
 import { useDeviceContext } from '../../providers/device-provider';
 import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
+import { SHADOW_FORMAT, SHADOW_PAGE } from '../renderer/light-data';
 import { getRenderPassDescriptor, getDrawOrder } from './util';
 
 export type ShadowPassProps = {
@@ -32,14 +32,29 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   const inspect = useInspectable();
 
   const device = useDeviceContext();
-  const renderContext = useRenderContext();
-  const {cull, bind} = useViewContext();
+  const {bind: bindGlobal, cull} = useViewContext();
 
   const opaques = toArray(calls['opaque'] as Renderable[]);
+  const [light] = toArray(calls['light']  as LightEnv[]);
+  if (!light) return;
 
-  const renderPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(renderContext),
-    [renderContext]);
+  const {lights, shadows, texture} = light;
+
+  const [
+    depthStencilState,
+    depthStencilAttachment,
+    renderPassDescriptor,
+  ] = useMemo(() => {
+    const depthStencilState = makeDepthStencilState(SHADOW_FORMAT);
+    const attachment = makeDepthStencilAttachment(texture, SHADOW_FORMAT);
+
+    const descriptor = {
+      colorAttachments: [],
+      depthStencilAttachment: attachment,
+    };
+    
+    return [texture, attachment, descriptor];
+  }, [device, texture]);
 
   const drawToPass = (
     calls: Renderable[],
@@ -61,7 +76,8 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
     if (!overlay && !merge) renderContext.swap();
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-    bind(passEncoder);
+    bindGlobal(passEncoder);
+    bindPass(passEncoder);
 
     drawToPass(opaques, passEncoder, countGeometry);
 

@@ -234,9 +234,14 @@ export type UniformAllocation = {
   bindGroup: GPUBindGroup,
 };
 
-export type SharedAllocation = {
+export type GlobalAllocation = {
   pipe: UniformPipe,
   buffer: GPUBuffer,
+  layout: GPUBindGroupLayout,
+  bindGroup: GPUBindGroup,
+};
+
+export type SharedAllocation = {
   layout: GPUBindGroupLayout,
   bindGroup: GPUBindGroup,
 };

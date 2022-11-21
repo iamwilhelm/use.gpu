@@ -9,7 +9,7 @@ import {
   CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
-  Lights, AmbientLight, DirectionalLight, PointLight, HemisphereLight,
+  AmbientLight, DirectionalLight, PointLight, HemisphereLight,
   Loop, Animate,
 } from '@use-gpu/workbench';
 
@@ -29,52 +29,50 @@ export const GeometryGLTFPage: LC = () => {
       <LinearRGB>
         <Cursor cursor='move' />
         <Camera>
-          <Pass>
-            <Lights>
-              <AmbientLight color={[1, 1, 1]} intensity={0.005} />
+          <Pass lights>
+            <AmbientLight color={[1, 1, 1]} intensity={0.005} />
 
-              <Animate
-                loop
-                delay={0}
-                keyframes={[
-                  [0, [30, 20, 10]],
-                  [4, [20, 10, 40]],
-                  [8, [-5, 20, 20]],
-                  [12, [30, 20, 10]],
-                ]}
-                prop='position'
-              >
-                <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} size={40} />
-              </Animate>
+            <Animate
+              loop
+              delay={0}
+              keyframes={[
+                [0, [30, 20, 10]],
+                [4, [20, 10, 40]],
+                [8, [-5, 20, 20]],
+                [12, [30, 20, 10]],
+              ]}
+              prop='position'
+            >
+              <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} size={40} />
+            </Animate>
 
-              <Animate
-                loop
-                delay={0}
-                keyframes={[
-                  [0, [10, 20, 30]],
-                  [3, [20, 30, 10]],
-                  [6, [40, 10, 20]],
-                  [9, [10, 20, 40]],
-                ]}
-                prop='position'
-              >
-                <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
-              </Animate>
+            <Animate
+              loop
+              delay={0}
+              keyframes={[
+                [0, [10, 20, 30]],
+                [3, [20, 30, 10]],
+                [6, [40, 10, 20]],
+                [9, [10, 20, 40]],
+              ]}
+              prop='position'
+            >
+              <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
+            </Animate>
+        
+            <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
+            <HemisphereLight intensity={0.5} />
           
-              <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
-              <HemisphereLight intensity={0.5} />
-            
-              <Scene>
-                <Node position={[0, -0.1, 0]}>
-                  <GLTFData
-                    url={url}
-                    render={(gltf: GLTF) =>
-                      <GLTFModel gltf={gltf} />
-                    }
-                  />
-                </Node>
-              </Scene>
-            </Lights>
+            <Scene>
+              <Node position={[0, -0.1, 0]}>
+                <GLTFData
+                  url={url}
+                  render={(gltf: GLTF) =>
+                    <GLTFModel gltf={gltf} />
+                  }
+                />
+              </Node>
+            </Scene>
           </Pass>
         </Camera>
       </LinearRGB>

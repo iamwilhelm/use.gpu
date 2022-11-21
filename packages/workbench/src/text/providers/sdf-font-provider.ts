@@ -195,7 +195,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       (gathered: any) => {
         const rects = bounds.flush();
         if (rects.length) {
-          atlas.uploads.push(rects);
           updateMipTextureChain(device, source, rects);
         }
 

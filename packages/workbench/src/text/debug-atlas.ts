@@ -137,24 +137,5 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     repeat: 3,
   });
   
-  /*
-  let i = 0;
-  for (const rects of debugUploads()) {
-    for (const [l, t, r, b] of rects) {
-      yeets.push({
-        id: next(),
-        rectangle: fit([l + w, t, r + w, b]),
-        uv: [0, 0, 1, 1],
-        fill: [0, 0, 0, 0],
-        stroke: COLORS[i % COLORS.length],
-        border: [2, 2, 2, 2],
-        count: 1,
-        repeat: 0,
-      });
-    }
-    ++i;
-  }
-  */
-  
   return yeet(yeets);
 }, 'DebugAtlasView');

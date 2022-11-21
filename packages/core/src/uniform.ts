@@ -1,5 +1,5 @@
 import type {
-  UniformAllocation, VirtualAllocation, VolatileAllocation, SharedAllocation,
+  UniformAllocation, VirtualAllocation, VolatileAllocation, GlobalAllocation, SharedAllocation,
   UniformAttribute, UniformAttributeDescriptor,
   UniformLayout, UniformType,
   UniformPipe, UniformByteSetter, UniformFiller, UniformDataSetter, UniformValueSetter,
@@ -12,7 +12,7 @@ import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
 import { getObjectKey, toMurmur53 } from '@use-gpu/state';
-import { makeBindGroupLayout } from './bindgroup';
+import { makeBindGroupLayout, makeBindGroupLayoutEntries } from './bindgroup';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler, makeTextureView } from './texture';
 import { alignSizeTo } from './data';
@@ -25,10 +25,10 @@ export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_
 export const getUniformAttributeAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];
 
-export const makeSharedUniforms = (
+export const makeGlobalUniforms = (
   device: GPUDevice,
   uniformGroups: UniformAttribute[][],
-): SharedAllocation => {
+): GlobalAllocation => {
   const group = uniformGroups.map((_, binding) => ({binding, visibility: VISIBILITY_ALL, buffer: {}}));
   const layout = makeBindGroupLayout(device, group);
 
@@ -208,6 +208,15 @@ export const makeVolatileUniforms = <T>(
   return {bindGroup};
 }
 
+const getTextureDimension = (layout: string) => {
+  if (!layout) return undefined;
+
+  const type = layout.match(/[1-3]d|_cube/)[0];
+  if (!type) return undefined;
+
+  return layout.match(/array/) ? type + '-array' : type;
+};
+
 export const makeDataBindingsEntries = <T>(
   device: GPUDevice,
   bindings: DataBinding<T>[],
@@ -227,10 +236,10 @@ export const makeDataBindingsEntries = <T>(
     }
     else if (b.texture) {
       const {texture} = b;
-      const {texture: t, view, sampler} = texture;
-      const hasSampler = sampler && b.uniform.args !== null;
+      const {texture: t, view, sampler, layout} = texture;
+      const hasSampler = sampler && b.uniform?.args !== null;
 
-      const textureResource = view ?? makeTextureView(t);
+      const textureResource = view ?? makeTextureView(t, 1, 0, getTextureDimension(layout));
       entries.push({binding, resource: textureResource});
       binding++;
 

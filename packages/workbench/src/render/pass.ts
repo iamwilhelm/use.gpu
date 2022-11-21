@@ -16,7 +16,7 @@ export type PassProps = {
 export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) => {
   const {
     mode = 'forward',
-    lights = true,
+    lights = false,
     shadows = false,
     picking = true,
 

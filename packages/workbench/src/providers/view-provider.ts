@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataBounds, ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useMemo, useRef } from '@use-gpu/live';
-import { VIEW_UNIFORMS, makeSharedUniforms, uploadBuffer, makeBindGroupLayout, distanceToFrustum } from '@use-gpu/core';
+import { VIEW_UNIFORMS, makeGlobalUniforms, uploadBuffer, makeBindGroupLayout, distanceToFrustum } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 
 import { mat4 } from 'gl-matrix';
@@ -37,7 +37,7 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = (props: ViewProvid
   const device = useDeviceContext();
 
   const binding = useMemo(() =>
-    makeSharedUniforms(device, [defs]),
+    makeGlobalUniforms(device, [defs]),
     [device, defs]);
 
   const {bindGroup, layout, buffer, pipe} = binding;

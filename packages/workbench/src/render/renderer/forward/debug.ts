@@ -11,8 +11,8 @@ import { getWireframe, getWireframeIndirect } from '../wireframe';
 
 import { useDeviceContext } from '../../../providers/device-provider';
 import { useRenderContext } from '../../../providers/render-provider';
-import { usePassContext } from '../../../providers/pass-provider';
 import { useViewContext } from '../../../providers/view-provider';
+import { usePassContext } from '../../../providers/pass-provider';
 
 import instanceDrawVirtualSolid from '@use-gpu/wgsl/render/vertex/virtual-solid.wgsl';
 import instanceFragmentSolid from '@use-gpu/wgsl/render/fragment/solid.wgsl';
@@ -37,10 +37,10 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const passContext = usePassContext();
   const {colorInput, colorSpace} = renderContext;
 
   const {layout: globalLayout} = useViewContext();
+  const {layout: passLayout} = usePassContext();
 
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;
@@ -84,6 +84,7 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     pipeline,
     renderContext,
     globalLayout,
+    passLayout,
     mode: 'debug',
   };
 

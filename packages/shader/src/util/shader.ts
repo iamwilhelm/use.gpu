@@ -1,5 +1,5 @@
 import { Tree } from '@lezer/common';
-import { ASTParser, VirtualTable, SymbolTableT, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
+import { ASTParser, VirtualTable, SymbolTableT, ParsedBundle, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
 import { formatMurmur53, toMurmur53 } from './hash';
 import { decompressAST } from './tree';
 import { PREFIX_VIRTUAL } from '../constants';
@@ -87,14 +87,18 @@ export const loadVirtualModule = <T extends SymbolTableT = any>(
   return { name, code, hash, table, entry, virtual, key };
 }
 
-// Set entry point of a module, returns new module.
+// Set entry point of a module, returns new bundle/module.
 // Is the same instance as the original (key = old key/hash), so it merges with copies of itself.
 // But is structurally different (hash = new key), so differences in links are reflected in the shader hash.
-export const bindEntryPoint = (module: ParsedModule, entry?: string) => {
-  const {key, hash, table} = module;
+export const bindEntryPoint = <T extends ParsedBundle | ParsedModule>(bundle: T, entry?: string): T => {
+  let {key, hash, module, table} = bundle as any;
+
+  table = table ?? module?.table;
+  hash = hash ?? module?.hash;
+
   if (entry == null && table.symbols?.includes('main')) entry = 'main';
-  if (entry == null) return module;
+  if (entry == null) return bundle;
 
   const structural = toMurmur53([hash, entry]);
-  return {...module, entry, hash: structural, key: key ?? hash};
+  return {...bundle, entry, hash: structural, key: key ?? hash};
 };

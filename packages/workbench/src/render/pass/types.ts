@@ -1,6 +1,13 @@
-import type { DataBounds, DeepPartial, Lazy, RenderPassMode } from '@use-gpu/core';
+import type { DataBounds, DeepPartial, Lazy, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
+import type { Light } from '../../lights/types';
 
 export type Culler = (bounds: DataBounds) => number | boolean;
+export type LightEnv = {
+  lights: Light[],
+  shadows: Light[],
+  storage: StorageSource,
+  texture: TextureSource,
+};
 
 export type Renderable = {
   draw: RenderToPass,

@@ -9,7 +9,7 @@ import { provide, use, imperative, useCallback, useContext, useMemo, useOne } fr
 import {
   makeColorState,
   makeColorAttachment,
-  makeRenderTexture,
+  makeTargetTexture,
   makeReadbackTexture,
   makeDepthTexture,
   makeDepthStencilState,
@@ -56,7 +56,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps
 
   const renderTexture = useMemo(() =>
     samples > 1
-    ? makeRenderTexture(
+    ? makeTargetTexture(
         device,
         width,
         height,

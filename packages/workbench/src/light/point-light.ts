@@ -2,37 +2,42 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
 import { parseColor, parseNumber, parseMatrix, parsePosition, useProp } from '@use-gpu/traits';
 
-import { useMemo } from '@use-gpu/live';
+import { memo, useMemo } from '@use-gpu/live';
 
-import { useLightCapture } from './lights';
-import { useTransformContext } from '../providers/transform-provider';
+import { useLightContext } from '../providers/light-provider';
+import { useMatrixContext } from '../providers/matrix-provider';
+
+import { vec3, vec4 } from 'gl-matrix';
 
 export type PointLightProps = {
   position?: VectorLike,
-  size?: number,
   color?: ColorLike,
   intensity?: number,
 };
 
-export const PointLight: LiveComponent<PointLightProps> = (props: PointLightProps) => {
+export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLightProps) => {
   
   const position = useProp(props.position, parsePosition);
-  const size = useProp(props.size, parseNumber, -1);
   const color = useProp(props.color, parseColor);
   const intensity = useProp(props.intensity, parseNumber, 1);
 
-  const {transform, differential} = useTransformContext();
+  const parent = useMatrixContext();
 
-  const light = useMemo(() => ({
-    kind: 2,
-    position,
-    size: [size, 0, 0, 0],
-    color,
-    intensity,
-    transform,
-    differential,
-  }), [position, size, color, intensity, transform, differential]);
+  const light = useMemo(() => {
+    const p = vec4.clone(position);
+    if (parent) vec3.transformMat4(p, p, parent);
+    p[3] = 1;
 
-  useLightCapture(light);
+    return {
+      kind: 2,
+      position: p,
+      color,
+      intensity,
+    };
+  }, [position, color, intensity, parent]);
+
+  const {useLight} = useLightContext();
+  useLight(light);
+
   return null;
-};
+}, 'PointLight');

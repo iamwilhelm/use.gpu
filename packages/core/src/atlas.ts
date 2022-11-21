@@ -282,7 +282,6 @@ export const makeAtlas = (
 
   const debugPlacements = () => Array.from(map.keys()).map(k => map.get(k)!);
   const debugSlots = () => Array.from(slots.values()).map(s => s);
-  const debugUploads = () => self.uploads;
 
   const debugValidate = () => {
     const rects = debugPlacements();
@@ -325,8 +324,8 @@ export const makeAtlas = (
 
   const self = {
     place, map, expand,
-    width, height, version: 0, uploads: [],
-    debugPlacements, debugSlots, debugValidate, debugUploads,
+    width, height, version: 0,
+    debugPlacements, debugSlots, debugValidate,
   } as Atlas;
 
   return self;

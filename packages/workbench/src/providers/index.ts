@@ -10,6 +10,7 @@ export * from './light-provider';
 export * from './loop-provider';
 export * from './material-provider';
 export * from './matrix-provider';
+export * from './pass-provider';
 export * from './picking-provider';
 export * from './render-provider';
 export * from './scissor-provider';

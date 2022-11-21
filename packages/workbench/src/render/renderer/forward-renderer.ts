@@ -29,6 +29,7 @@ import { ColorPass } from '../pass/color-pass';
 import { ComputePass } from '../pass/compute-pass';
 import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
+import { ShadowPass } from '../pass/shadow-pass';
 
 import lightUniforms from '@use-gpu/wgsl/use/light.wgsl';
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';

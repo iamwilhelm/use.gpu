@@ -4,7 +4,7 @@ import type { Light } from '../../lights/types';
 export type Culler = (bounds: DataBounds) => number | boolean;
 export type LightEnv = {
   lights: Light[],
-  shadows: Light[],
+  maps: Light[],
   storage: StorageSource,
   texture: TextureSource,
 };

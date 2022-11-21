@@ -15,6 +15,16 @@ export type ComputePassProps = {
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
 
+const computeToContext = (
+  commandEncoder: GPUCommandEncoder,
+  calls: ComputeToPass[],
+  countDispatch: ComputeCounter,
+) => {
+  const passEncoder = commandEncoder.beginComputePass();
+  for (const f of calls) f(passEncoder, countDispatch);
+  passEncoder.end();
+};
+
 /** Compute pass.
 
 Executes all compute calls. Can optionally run immediately instead of per-frame.
@@ -30,16 +40,6 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
   const device = useDeviceContext();
 
   const computes = toArray(calls['compute'] as ComputeToPass[]);
-
-  const computeToContext = (
-    commandEncoder: GPUCommandEncoder,
-    calls: ComputeToPass[],
-    countDispatch: ComputeCounter,
-  ) => {
-    const passEncoder = commandEncoder.beginComputePass();
-    for (const f of calls) f(passEncoder, countDispatch);
-    passEncoder.end();
-  };
 
   const run = () => {
     let ds = 0;

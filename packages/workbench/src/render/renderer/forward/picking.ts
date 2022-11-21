@@ -6,7 +6,6 @@ import { resolve } from '@use-gpu/core';
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
 import { drawCall } from '../../command/draw-call';
-import { getNativeColor } from '../../../hooks/useNativeColor';
 
 import { useDeviceContext } from '../../../providers/device-provider';
 import { usePickingContext } from '../../../providers/picking-provider';

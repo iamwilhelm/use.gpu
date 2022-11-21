@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { Renderable } from '../pass';
+import type { Culler, Renderable } from '../pass';
 
-import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { use, quote, yeet, memo, useMemo } from '@use-gpu/live';
 
 import { usePickingContext } from '../../providers/picking-provider';
 import { useDeviceContext } from '../../providers/device-provider';
@@ -21,6 +21,17 @@ export type PickingPassProps = {
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+
+const drawToPass = (
+  cull: Culler,
+  calls: Renderable[],
+  passEncoder: GPURenderPassEncoder,
+  countGeometry: (v: number, t: number) => void,
+  sign: number = 1,
+) => {
+  const order = getDrawOrder(cull, calls, sign);
+  for (const i of order) calls[i].draw(passEncoder, countGeometry);
+};
 
 /** Picking render pass.
 
@@ -47,16 +58,6 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     getRenderPassDescriptor(renderContext, overlay, merge),
     [renderContext, overlay, merge]);
 
-  const drawToPass = (
-    calls: Renderable[],
-    passEncoder: GPURenderPassEncoder,
-    countGeometry: (v: number, t: number) => void,
-    sign: number = 1,
-  ) => {
-    const order = getDrawOrder(cull, calls, sign);
-    for (const i of order) calls[i].draw(passEncoder, countGeometry);
-  };
-
   return quote(yeet(() => {
     let vs = 0;
     let ts = 0;
@@ -69,7 +70,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     bind(passEncoder);
 
-    drawToPass(pickings, passEncoder, countGeometry);
+    drawToPass(cull, pickings, passEncoder, countGeometry);
 
     passEncoder.end();
 

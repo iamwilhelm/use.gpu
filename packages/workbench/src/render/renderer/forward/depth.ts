@@ -3,10 +3,10 @@ import type { VirtualDraw } from '../render/pass';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
+import { patch, $apply } from '@use-gpu/state';
 import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
 import { drawCall } from '../../command/draw-call';
-import { getNativeColor } from '../../../hooks/useNativeColor';
 
 import { useDeviceContext } from '../../../providers/device-provider';
 import { useRenderContext } from '../../../providers/render-provider';
@@ -31,19 +31,22 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
       getFragment,
     },
 
-    pipeline,
+    propPipeline,
     defines,
-    mode = 'opaque',
   } = props;
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const {colorInput, colorSpace} = renderContext;
 
   const {layout: globalLayout} = useViewContext();
 
   const vertexShader = instanceDrawVirtualDepth;
   const fragmentShader = instanceFragmentDepth;
+
+  const pipeline = useOne(() => patch(propPipeline, {
+    multisample: { count: 1 },
+    fragment: { targets: [] },
+  }), propPipeline);
 
   // Binds links into shader
   const [v, f] = useMemo(() => {
@@ -55,7 +58,7 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment, colorInput, colorSpace]);
+  }, [vertexShader, fragmentShader, getVertex, getFragment]);
 
   // Inline the render fiber to avoid another memo()
   const call = {
@@ -70,7 +73,7 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
     pipeline,
     renderContext,
     globalLayout,
-    mode,
+    mode: 'shadow',
   };
 
   return yeet(drawCall(call));

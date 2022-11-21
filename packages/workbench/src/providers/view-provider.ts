@@ -2,8 +2,9 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { DataBounds, ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useMemo, useRef } from '@use-gpu/live';
-import { VIEW_UNIFORMS, makeGlobalUniforms, uploadBuffer, makeBindGroupLayout, distanceToFrustum } from '@use-gpu/core';
+import { VIEW_UNIFORMS, makeGlobalUniforms, uploadBuffer, makeBindGroupLayout } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
+import { useFrustumCuller } from '../hooks/useFrustumCuller';
 
 import { mat4 } from 'gl-matrix';
 
@@ -29,8 +30,6 @@ export type ViewProviderProps = {
   children?: LiveElement,
 };
 
-const sqr = (x: number) => x * x;
-
 export const ViewProvider: LiveComponent<ViewProviderProps> = (props: ViewProviderProps) => {
   const {defs, uniforms, children} = props;
 
@@ -49,19 +48,7 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = (props: ViewProvid
   }, [bindGroup]);
 
   const {projectionViewFrustum, viewPosition} = uniforms;
-
-  const cull = useCallback((bounds: DataBounds) => {
-    const {center, radius} = bounds;
-    const {current: frustum} = projectionViewFrustum;
-
-    const [x, y, z = 0] = center;
-    const d = distanceToFrustum(frustum, x, y, z);
-
-    if (d < -radius) return false;
-
-    const {current: position} = viewPosition;
-    return sqr(position[0] - x) + sqr(position[1] - y) + sqr(position[2] - z);
-  }, [uniforms]);
+  const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
 
   const context = useMemo(() => ({
     bind,

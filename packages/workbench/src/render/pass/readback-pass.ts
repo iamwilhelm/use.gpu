@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { CommandToBuffer } from '../pass';
 
-import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { use, quote, yeet, memo, useMemo } from '@use-gpu/live';
 import { useDeviceContext } from '../../providers/device-provider';
 import { Await } from '../await';
 

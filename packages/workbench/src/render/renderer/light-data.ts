@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TextureSource } from '@use-gpu/core';
 import type { Light } from './types';
 
-import { provide, capture, yeet, makeCapture, useCallback, useCapture, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
+import { provide, capture, yeet, signal, makeCapture, useCallback, useCapture, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
 import {
   makeIdAllocator,
   makeUniformLayout, makeLayoutData, makeLayoutFiller,
@@ -51,7 +51,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     render,
   } = props;
 
-  const [ids, queue, changed, lights, shadows, count] = useOne(() => [
+  const [ids, queue, changed, lights, maps, count] = useOne(() => [
     makeIdAllocator(0),
     [],
     new Set<number>,
@@ -66,7 +66,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       dispose(() => {
         ids.release(id);
         lights.delete(id);
-        shadows.delete(id);
+        maps.delete(id);
       });
       return id;
     });
@@ -85,22 +85,22 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       if (lights.has(id)) {
         const {shadow, shadowMap, shadowUV} = lights.get(id);
         if (shadow) {
-          data = {shadowMap, shadowUV, ...data};
-          shadows.set(id, data);
+          data = {id, shadowMap, shadowUV, ...data};
+          maps.set(id, data);
         }
-        else if (shadows.has(id)) {
-          shadows.delete(id);
+        else if (maps.has(id)) {
+          maps.delete(id);
         }
       }
-      lights.set(id, data);
+      lights.set(id, {id, shadowMap: -1, ...data});
     }
 
     // Check if light / shadow configuration changed
     let lightKey = 0;
     let shadowKey = 0;
     for (const key of lights.keys()) lightKey = mixBits53(lightKey, key);
-    for (const key of shadows.keys()) {
-      const {shadow} = shadows.get(key);
+    for (const key of maps.keys()) {
+      const {shadow} = maps.get(key);
       const {size: [w, h]} = shadow;
       shadowKey = mixBits53(mixBits53(mixBits53(shadowKey, key), w), h);
     }
@@ -243,14 +243,19 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     queue.length = 0;
     changed.clear();
 
-    return useMemo(() => yeet({
+    const env = useMemo(() => yeet({
       light: {
         lights,
-        shadows,
+        maps,
         storage,
         texture,
       },
     }), [storage, texture]);
+
+    return [
+      signal(),
+      env,
+    ];
   };
 
   return capture(LightCapture, render(useLight), Resume);

@@ -37,7 +37,6 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const {colorInput, colorSpace} = renderContext;
 
   const {layout: globalLayout} = useViewContext();
   const {layout: passLayout} = usePassContext();

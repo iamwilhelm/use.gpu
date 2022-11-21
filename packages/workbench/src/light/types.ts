@@ -12,6 +12,9 @@ export type Light = {
   kind: number,
   
   shadow?: ShadowMapLike | null,
+  
+  id?: number,
+  shadowType?: 'ortho',
   shadowMap?: number,
   shadowUV?: TypedArray | number[],
 };

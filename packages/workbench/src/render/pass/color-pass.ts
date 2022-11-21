@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { LightEnv, Renderable } from '../pass';
+import type { Culler, LightEnv, Renderable } from '../pass';
 
-import { use, quote, yeet, memo, multiGather, useContext, useMemo, useOne } from '@use-gpu/live';
+import { use, quote, yeet, memo, useMemo, useOne } from '@use-gpu/live';
 
 import { useRenderContext } from '../../providers/render-provider';
 import { useDeviceContext } from '../../providers/device-provider';
@@ -24,6 +24,17 @@ export type ColorPassProps = {
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+
+const drawToPass = (
+  cull: Culler,
+  calls: Renderable[],
+  passEncoder: GPURenderPassEncoder,
+  countGeometry: (v: number, t: number) => void,
+  sign: number = 1,
+) => {
+  const order = getDrawOrder(cull, calls, sign);
+  for (const i of order) calls[i].draw(passEncoder, countGeometry);
+};
 
 /** Color render pass.
 
@@ -59,16 +70,6 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     getRenderPassDescriptor(renderContext, overlay, merge),
     [renderContext, overlay, merge]);
 
-  const drawToPass = (
-    calls: Renderable[],
-    passEncoder: GPURenderPassEncoder,
-    countGeometry: (v: number, t: number) => void,
-    sign: number = 1,
-  ) => {
-    let order = getDrawOrder(cull, calls, sign);
-    for (const i of order) calls[i].draw(passEncoder, countGeometry);
-  };
-
   return quote(yeet(() => {
     let vs = 0;
     let ts = 0;
@@ -82,9 +83,9 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     bindGlobal(passEncoder);
     bindPass(passEncoder);
 
-    drawToPass(opaques, passEncoder, countGeometry);
-    drawToPass(transparents, passEncoder, countGeometry, -1);
-    drawToPass(debugs, passEncoder, countGeometry);
+    drawToPass(cull, opaques, passEncoder, countGeometry);
+    drawToPass(cull, transparents, passEncoder, countGeometry, -1);
+    drawToPass(cull, debugs, passEncoder, countGeometry);
 
     passEncoder.end();
 

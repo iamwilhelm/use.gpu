@@ -48,33 +48,34 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
   const [into, shadow] = useMemo(() => {
     if (!shadowMap) return [null, null];
 
-    const size  = parseVec2(shadowMap.size,  DEFAULT_SHADOW_MAP.size);
-    const depth = parseVec2(shadowMap.depth, DEFAULT_SHADOW_MAP.depth);
-    const span  = parseVec2(shadowMap.span,  DEFAULT_SHADOW_MAP.span);
-    const up    = parseVec3(shadowMap.up,    DEFAULT_SHADOW_MAP.up);
+    const size  = parseVec2(shadowMap.size  ?? DEFAULT_SHADOW_MAP.size);
+    const depth = parseVec2(shadowMap.depth ?? DEFAULT_SHADOW_MAP.depth);
+    const span  = parseVec2(shadowMap.span  ?? DEFAULT_SHADOW_MAP.span);
+    const up    = parseVec3(shadowMap.up    ?? DEFAULT_SHADOW_MAP.up);
 
     const matrix = mat4.create();
     
     const tangent = vec3.create();
     const bitangent = vec3.create();
+    vec3.normalize(normal, normal);
     vec3.cross(tangent, normal, up);
     vec3.normalize(tangent, tangent);
     vec3.cross(bitangent, normal, tangent);
-    matrix.set(
+    mat4.set(matrix,
       tangent[0], tangent[1], tangent[2], 0.0,
       bitangent[0], bitangent[1], bitangent[2], 0.0,
       normal[0], normal[1], normal[2], 0.0,
       position[0], position[1], position[2], 1.0,
     );
 
+    const [w, h] = span;
+    mat4.scale(matrix, matrix, [w/2, h/2, 1]);
+
     if (parent) mat4.multiply(matrix, parent, matrix);
 
     mat4.invert(matrix, matrix);
 
-    const [w, h] = span;
-    mat4.scale(matrix, matrix, [w/2, h/2, 1]);
-
-    const shadow = {size, depth};
+    const shadow = {size, depth, type: 'ortho'};
     return [matrix, shadow];
   }, [position, normal, shadowMap, parent]);
 

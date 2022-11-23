@@ -28,7 +28,7 @@ export const LiveDiv: React.FunctionComponent<LiveDivProps> = ({style, render, c
       const rootNode = resolveRootNode(element);
       fiber.current = renderLive(rootNode, fiber.current);
     }
-  }, [render]);
+  });
 
   return <div ref={el} style={style} />;
 };

@@ -39,7 +39,7 @@ const parseTextureType = (format: string, variant: string | null) => {
   const [layout, type] = format.split(/[<>,]/);
   if (layout in BINDING_TEXTURE_TYPES) {
     const props = BINDING_TEXTURE_TYPES[layout];
-    if ('sampleType' in props) return props;
+    if ('sampleType' in props) return {texture: props};
 
     if (type[0] in BINDING_SAMPLE_TYPES) {
       let sampleType = BINDING_SAMPLE_TYPES[type[0]];

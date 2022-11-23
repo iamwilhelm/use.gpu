@@ -93,6 +93,9 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     device.queue.submit([command]);
 
     inspect({
+      output: {
+        color: renderContext.source,
+      },
       render: {
         vertices: vs,
         triangles: ts,

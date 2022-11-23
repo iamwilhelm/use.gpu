@@ -83,9 +83,9 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     // Update light data in-place
     for (let {id, data} of queue) {
       if (lights.has(id)) {
-        const {shadow, shadowMap, shadowUV} = lights.get(id);
+        const {shadow, shadowMap, shadowUV, shadowDepth} = lights.get(id);
         if (shadow) {
-          data = {id, shadowMap, shadowUV, ...data};
+          data = {id, shadowMap, shadowUV, shadowDepth, ...data};
           maps.set(id, data);
         }
         else if (maps.has(id)) {
@@ -147,7 +147,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
         const light = lights.get(key);
         const {shadow} = light;
         if (shadow) {
-          const {size: [w, h]} = shadow;
+          const {size: [w, h], depth: [near, far]} = shadow;
           
           let mapping;
           try {
@@ -161,7 +161,8 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
           const page = atlases.length - 1;
 
           light.shadowMap = page;
-          light.shadowUV = mapping;
+          light.shadowUV = mapping.map(x => x / 4096);
+          light.shadowDepth = [far, near];
         }
       }
 
@@ -181,11 +182,12 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       const source = {
         texture,
-        sampler: { compare: 'greater' },
+        sampler: { compare: 'greater', minFilter: 'linear', magFilter: 'linear' },
         layout: "texture_depth_2d_array",
         format: SHADOW_FORMAT,
         length: SHADOW_PAGE * SHADOW_PAGE * pages,
         size: [SHADOW_PAGE, SHADOW_PAGE, pages],
+        comparison: true,
         version: 0,
       } as TextureSource;
       

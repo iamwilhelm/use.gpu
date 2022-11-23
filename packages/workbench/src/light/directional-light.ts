@@ -27,6 +27,10 @@ const DEFAULT_SHADOW_MAP = {
   up: [0, 1, 0],
 };
 
+const REVERSE_Z = mat4.create();
+mat4.translate(REVERSE_Z, REVERSE_Z, vec3.fromValues(0, 0, 0.5));
+mat4.scale(REVERSE_Z, REVERSE_Z, vec3.fromValues(1, 1, -0.5));
+
 const parseOptionalPosition = optional(parsePosition);
 
 export const DirectionalLight = memo((props: DirectionalLightProps) => {
@@ -54,9 +58,9 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
     const up    = parseVec3(shadowMap.up    ?? DEFAULT_SHADOW_MAP.up);
 
     const matrix = mat4.create();
-    
     const tangent = vec3.create();
     const bitangent = vec3.create();
+
     vec3.normalize(normal, normal);
     vec3.cross(tangent, normal, up);
     vec3.normalize(tangent, tangent);
@@ -69,11 +73,14 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
     );
 
     const [w, h] = span;
-    mat4.scale(matrix, matrix, [w/2, h/2, 1]);
+    const [near, far] = depth;
+    mat4.scale(matrix, matrix, [w/2, h/2, far - near]);
 
     if (parent) mat4.multiply(matrix, parent, matrix);
 
     mat4.invert(matrix, matrix);
+    matrix[14] -= near / (far - near);
+    mat4.multiply(matrix, REVERSE_Z, matrix);
 
     const shadow = {size, depth, type: 'ortho'};
     return [matrix, shadow];

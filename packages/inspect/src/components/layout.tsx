@@ -230,7 +230,11 @@ export const TreeRow: React.FC<TreeIndentProps> = ({ indent, children }) => (
 );
 
 export const TreeRowOmitted: React.FC<TreeIndentProps> = ({ indent, children }) => (
-  <TreeRowOmittedChunk />
+  <TreeRowOmittedChunk css={{
+    paddingLeft: indent ? `${indent * 20}px` : 0,
+  }}>
+    {children}
+  </TreeRowOmittedChunk>
 );
 
 export const TreeIndent: React.FC<TreeIndentProps> = ({ indent, children }) => (

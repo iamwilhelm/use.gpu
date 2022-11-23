@@ -97,8 +97,10 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   let scissor = getScissor(vertex);
 
   let world = transformPosition(vertex);
-  let worldNormal = transformDifferential(normal, vertex, true);
+  var worldNormal = transformDifferential(normal, vertex, true);
   let worldTangent = transformDifferential(tangent, vertex, false);
+
+  worldNormal = vec4<f32>(normalize(worldNormal.xyz), worldNormal.w);
 
   var position = worldToClip(world);
 

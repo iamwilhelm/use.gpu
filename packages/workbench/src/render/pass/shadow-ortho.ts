@@ -3,7 +3,7 @@ import type { LightEnv, Renderable } from '../pass';
 import type { Light } from '../../light/types';
 import { mat4 } from 'gl-matrix';
 
-import { use, quote, yeet, memo, useMemo, useOne } from '@use-gpu/live';
+import { use, quote, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
 import {
   makeDepthStencilState, makeDepthStencilAttachment, makeFrustumPlanes,
   makeGlobalUniforms, makeOrthogonalMatrix, uploadBuffer,
@@ -24,6 +24,7 @@ export type ShadowOrthoPassProps = {
   },
   map: Light,
   descriptor: GPURenderPassDescriptor,
+  texture: GPUTexture,
 };
 
 const NO_OPS: any[] = [];
@@ -49,6 +50,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     calls,
     map,
     descriptor,
+    texture,
   } = props;
 
   const inspect = useInspectable();
@@ -66,7 +68,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
   const uniforms = useOne(() => ({
     ...viewUniforms,
-    projectionMatrix: { current: mat4.create() },
+    projectionMatrix: { current: mat4.fromValues(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1) },
     projectionViewMatrix: { current: mat4.create() },
     projectionViewFrustum: { current: null },
     viewMatrix: { current: mat4.create() },
@@ -79,7 +81,8 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   }), viewUniforms) as any as ViewUniforms;
 
   const {viewPosition, projectionViewFrustum} = uniforms;
-  const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
+  //const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
+  const cull = () => true;
 
   const {
     into,
@@ -91,14 +94,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     shadowUV,
   } = map;
 
-  const left   = -width/2;
-  const top    = -height/2;
-  const right  = width/2;
-  const bottom = height/2;
-  const matrix = makeOrthogonalMatrix(left, right, bottom, top, near, far);
-  uniforms.projectionMatrix.current = matrix;
-
-  return quote(yeet(() => {
+  const draw = quote(yeet(() => {
     let vs = 0;
     let ts = 0;
 
@@ -122,6 +118,11 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     const commandEncoder = device.createCommandEncoder();
 
     const passEncoder = commandEncoder.beginRenderPass(descriptor);
+    passEncoder.setViewport(
+      shadowUV[0] * SHADOW_PAGE,
+      shadowUV[1] * SHADOW_PAGE,
+      shadowUV[2] * SHADOW_PAGE,
+      shadowUV[3] * SHADOW_PAGE, 0, 1);
     passEncoder.setBindGroup(0, bindGroup);
 
     drawToPass(cull, shadows, passEncoder, countGeometry);
@@ -132,6 +133,9 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     device.queue.submit([command]);
 
     inspect({
+      output: {
+        depth: texture,
+      },
       render: {
         vertices: vs,
         triangles: ts,
@@ -141,4 +145,5 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     return null;
   }));
 
+  return draw;
 }, 'ShadowOrthoPass');

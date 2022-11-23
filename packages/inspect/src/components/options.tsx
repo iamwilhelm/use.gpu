@@ -12,6 +12,7 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
   const useCursor = useRefineCursor(props.cursor);
   const [runCounts, setRunCounts] = useCursor<boolean>('counts');
   const [fullSize, setFullSize] = useCursor<boolean>('fullSize');
+  const [builtins, setBuiltins] = useCursor<boolean>('builtins');
   
   return (
     <OptionsContainer>
@@ -20,6 +21,9 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
       </div>
       <div>
         <label><input type="checkbox" checked={fullSize} onChange={(e) => setFullSize(e.target.checked)} /> Big View</label>
+      </div>
+      <div>
+        <label><input type="checkbox" checked={builtins} onChange={(e) => setBuiltins(e.target.checked)} /> Show Builtins</label>
       </div>
     </OptionsContainer>
   );

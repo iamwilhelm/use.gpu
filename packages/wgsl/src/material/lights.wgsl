@@ -1,6 +1,14 @@
 use '@use-gpu/wgsl/use/types'::{ Light };
 use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 
+@infer type T;
+@link fn applyLight(
+  N: vec3<f32>,
+  V: vec3<f32>,
+  light: Light,
+  @infer(T) surface: T,
+) -> vec3<f32> {}
+
 @optional @link fn getLightCount() -> u32 { return 0u; }
 @optional @link fn getLight(index: u32) -> Light {
   return Light(
@@ -16,15 +24,7 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
   );
 }
 
-@infer type T;
-@link fn applyLight(
-  N: vec3<f32>,
-  V: vec3<f32>,
-  light: Light,
-  @infer(T) surface: T,
-) -> vec3<f32> {}
-
-@optional @link fn sampleShadowLevel(index: u32, uv: vec2<f32>, level: f32) -> f32 { return 1.0; }
+@optional @link fn sampleShadow(uv: vec2<f32>, index: u32, level: f32) -> f32 { return 1.0; }
 
 @export fn applyLights(
   N: vec3<f32>,
@@ -42,13 +42,17 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
 
     if (light.shadowMap >= 0) {
       let index = u32(light.shadowMap);
-      let pos = light.into * surface.position;
-      let uv = pos.xy * .5 + .5;//, vec2<f32>(0.0), vec2<f32>(1.0);
+
+      let pos = light.into * vec4<f32>(surface.position.xyz + surface.normal.xyz / 16.0, 1.0);
+      let n = dot(surface.normal.xyz, light.normal.xyz);
+      let slope = (1.0 - abs(n));
+
+      let uv = clamp(pos.xy * .5 + .5, vec2<f32>(0.0), vec2<f32>(1.0));
+      let uvm = mix(light.shadowUV.xy, light.shadowUV.zw, uv);
+      let s = sampleShadow(uvm, index, pos.z + slope / 8192.0);
+      
       if (abs(pos.x) < 1 && abs(pos.y) < 1) {
-        f *= vec3<f32>(uv.xy, 1.0);
-      }
-      else {
-        f *= 0.5;
+        f *= s;
       }
     }
     

@@ -12,6 +12,7 @@ import { Call } from './panels/call';
 import { Geometry } from './panels/geometry';
 import { Shader } from './panels/shader';
 import { Layout } from './panels/layout';
+import { Output } from './panels/output';
 import {
   InspectContainer, InspectToggle, Button, SmallButton, TreeControls, Spacer,
   SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
@@ -38,6 +39,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     depth: 10,
     counts: false,
     fullSize: false,
+    builtins: false,
   });
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
@@ -61,6 +63,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const [depthLimit, setDepthLimit] = useOption<number>('depth');
   const [runCounts] = useOption<boolean>('counts');
   const [fullSize] = useOption<boolean>('fullSize');
+  const [builtins] = useOption<boolean>('builtins');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
   useLayoutEffect(() => {
@@ -123,10 +126,11 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   let fragmentTab: React.ReactNode;
   let layoutTab: React.ReactNode;
   let geometryTab: React.ReactNode;
+  let outputTab: React.ReactNode;
   if (selectedFiber) {
     const inspect = selectedFiber.__inspect;
     if (inspect) {
-      const {compute, vertex, fragment, layout, render} = inspect;
+      const {compute, vertex, fragment, layout, render, output} = inspect;
       if (compute) {
         computeTab = <Shader type="compute" fiber={selectedFiber} />;
       }
@@ -141,6 +145,9 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       }
       if (render) {
         geometryTab = <Geometry fiber={selectedFiber} />;
+      }
+      if (output) {
+        outputTab = <Output fiber={selectedFiber} />;
       }
     }
   }
@@ -160,6 +167,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
         fibers={fibers}
         depthLimit={depthLimit}
         runCounts={runCounts}
+        builtins={builtins}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -178,6 +186,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
           {fragmentTab ? <Tabs.Trigger value="fragment">Fragment</Tabs.Trigger> : null}
           {layoutTab ? <Tabs.Trigger value="layout">Layout</Tabs.Trigger> : null}
           {geometryTab ? <Tabs.Trigger value="geometry">Geometry</Tabs.Trigger> : null}
+          {outputTab ? <Tabs.Trigger value="output">Output</Tabs.Trigger> : null}
         </Tabs.List>
         <Tabs.Content value="props">{selectedFiber ? <Props fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
         <Tabs.Content value="fiber">{selectedFiber ? <Call fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
@@ -186,6 +195,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
         {fragmentTab ? <Tabs.Content value="fragment">{fragmentTab}</Tabs.Content> : null }
         {layoutTab ? <Tabs.Content value="layout">{layoutTab}</Tabs.Content> : null }
         {geometryTab ? <Tabs.Content value="geometry">{geometryTab}</Tabs.Content> : null }
+        {outputTab ? <Tabs.Content value="output">{outputTab}</Tabs.Content> : null }
       </Tabs.Root>
     </Inset>
   );

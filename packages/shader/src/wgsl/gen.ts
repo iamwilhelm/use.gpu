@@ -412,9 +412,9 @@ export const TEXTURE_SHADER_TYPES = {
   "rgba32float": 'vec4<f32>',
 
   // Depth and stencil formats
-  "stencil8": 'vec4<u32>',              // u8
-  "depth16unorm": 'vec4<f32>',
-  "depth24plus": 'vec4<u32>',
-  "depth24plus-stencil8": 'vec4<u32>',
-  "depth32float": 'vec4<f32>',
+  "stencil8": 'f32',              // u8
+  "depth16unorm": 'f32',
+  "depth24plus": 'f32',
+  "depth24plus-stencil8": 'f32',
+  "depth32float": 'f32',
 } as Record<string, string>;

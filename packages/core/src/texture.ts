@@ -144,7 +144,7 @@ export const makeRawTexture = (
   const {size, format} = dataTexture;
   const [w, h, d] = size as Point3;
 
-  return makeSourceTexture(device, w, h, d || 1, format ?? 'rgba8unorm', 1, mipLevelCount);
+  return makeDynamicTexture(device, w, h, d || 1, format ?? 'rgba8unorm', 1, mipLevelCount);
 }
 
 export const makeTextureDataLayout = (

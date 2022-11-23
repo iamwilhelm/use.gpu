@@ -15,11 +15,13 @@ export type FontSource = {
 };
 
 export type FontLoaderProps = {
-  fonts: FontSource[],
+  fonts?: FontSource[],
   children: LiveElement,
 };
 
-export const FontLoader: LiveComponent<FontLoaderProps> = ({fonts, children}) => {
+const NO_FONTS: FontSource[] = [];
+
+export const FontLoader: LiveComponent<FontLoaderProps> = ({fonts = NO_FONTS, children}) => {
 
   const resources = useOne(() => fonts
     .filter((s: FontSource) => !!s.src)

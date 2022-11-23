@@ -41,6 +41,7 @@ const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 
 const getLightCount = bindEntryPoint(lightUniforms, 'getLightCount');
 const getLight = bindEntryPoint(lightUniforms, 'getLight');
+const sampleShadow = bindEntryPoint(lightUniforms, 'sampleShadow');
 
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,
@@ -132,7 +133,6 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
 
        : (virtual, hovered) => {
           const {id, mode, renderer, links, defines} = virtual;
-          if (hovered) return [getRender(HOVERED_VARIANT)];
 
           const variants = [];
           if (shadows && mode !== 'shadow' && defines?.HAS_SHADOW) {
@@ -141,9 +141,9 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
           if (picking && mode !== 'picking' && links?.getPicking) {
             variants.push('picking');
           }
-          if (variants.length === 0) return getRender(mode, renderer);
+          if (variants.length === 0) return getRender(hovered ? HOVERED_VARIANT : mode, renderer);
 
-          variants.push(mode);
+          variants.push(hovered ? HOVERED_VARIANT : mode);
           return variants.map(mode => getRender(mode, renderer));
         };
 
@@ -182,7 +182,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       const context = useMemo(() => {
         const bindMaterial = (applyMaterial: ShaderModule) => {
           const applyLight = bindBundle(applyLightWGSL, {applyMaterial});
-          return getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [getLightCount, getLight, applyLight]);
+          return getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [applyLight, getLightCount, getLight, sampleShadow]);
         };
 
         const useMaterial = (applyMaterial: ShaderModule) =>

@@ -85,15 +85,15 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     const speedX = bearingSpeed / size;
     const speedY = pitchSpeed   / size;
 
-    if (buttons.left) {
-      if (moveX || moveY) {
-        setBearing((phi: number) => phi + moveX * speedX);
-        setPitch((theta: number) => clamp(theta + moveY * speedY, -π/2, π/2));
-      }
-    }
     if (buttons.right || (buttons.left && keyboard.modifiers.shift)) {
       if (moveX || moveY) {
         handleMove(-moveX, -moveY);
+      }
+    }
+    else if (buttons.left) {
+      if (moveX || moveY) {
+        setBearing((phi: number) => phi + moveX * speedX);
+        setPitch((theta: number) => clamp(theta + moveY * speedY, -π/2, π/2));
       }
     }
   }, mouse);

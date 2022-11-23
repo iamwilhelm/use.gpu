@@ -50,7 +50,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
   const pickingContext = usePickingContext();
   const {cull, bind} = useViewContext();
 
-  const {renderContext} = pickingContext;
+  const {renderContext, pickingSource} = pickingContext;
 
   const pickings  = toArray(calls['picking'] as RenderToPass[]);
 
@@ -78,6 +78,9 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     device.queue.submit([command]);
 
     inspect({
+      output: {
+        picking: pickingSource,
+      },
       render: {
         vertices: vs,
         triangles: ts,

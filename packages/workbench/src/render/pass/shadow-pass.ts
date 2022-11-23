@@ -60,7 +60,7 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   const out: LiveElement[] = [];
   for (const map of maps.values()) {
     const Component = (map.shadow.type === 'ortho') ? ShadowOrthoPass : null;
-    if (Component) out.push(keyed(Component, map.id, {calls, map, descriptor}));
+    if (Component) out.push(keyed(Component, map.id, {calls, map, descriptor, texture}));
   }
   return out;
 }, 'ShadowPass');

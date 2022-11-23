@@ -20,6 +20,7 @@ type FiberTreeProps = {
   fibers: Map<number, LiveFiber<any>>,
   depthLimit: number,
   runCounts: boolean,
+  builtins: boolean,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
@@ -34,6 +35,7 @@ type FiberNodeProps = {
   indent?: number,
   depthLimit?: number,
   runCounts?: boolean,
+  builtins?: boolean,
   continuation?: boolean,
   siblings?: boolean,
 }
@@ -150,6 +152,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   fibers,
   depthLimit,
   runCounts,
+  builtins,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -162,6 +165,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         fibers={fibers}
         depthLimit={depthLimit}
         runCounts={runCounts}
+        builtins={builtins}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -177,6 +181,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   fibers,
   depthLimit = Infinity,
   runCounts = false,
+  builtins = false,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -207,7 +212,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const styleDepth = hoverState.fiber ? (subnode ? Math.max(-1, renderDepth - hoverState.depth) : -1) : 0;
 
   // Resolve node omission
-  const shouldRender = renderDepth < depthLimit;
+  const shouldRender = (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
+  const shouldAbsolute =!shouldRender && (parents || depends || precedes || quoted || unquoted);
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 
   // Make click/hover handlers
@@ -262,7 +268,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   }, [selected]);
 
   // Render node itself
-  const nodeRender = shouldRender ? (
+  let nodeRender = (shouldRender || shouldAbsolute) ? (
     <Node
       key={id}
       fiber={fiber}
@@ -275,12 +281,14 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       unquoted={unquoted}
       depth={styleDepth}
       runCount={runCounts}
+      builtins={builtins}
       onClick={select}
       onMouseEnter={hover}
       onMouseLeave={unhover}
       ref={rowRef}
     />
   ) : null;
+  if (shouldAbsolute) nodeRender = <div style={{position: 'absolute'}}>{nodeRender}</div>;
 
   // Render single child   
   if (mount) {
@@ -292,6 +300,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         fibers={fibers}
         depthLimit={depthLimit}
         runCounts={runCounts}
+        builtins={builtins}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -312,6 +321,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             fibers={fibers}
             depthLimit={depthLimit}
             runCounts={runCounts}
+            builtins={builtins}
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
@@ -362,6 +372,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         fibers={fibers}
         depthLimit={depthLimit}
         runCounts={runCounts}
+        builtins={builtins}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -374,7 +385,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   // Compact omitted row
   if (!shouldRender) {
     return (<>
-      <TreeRowOmitted indent={indent} />
+      <TreeRowOmitted indent={indent + 1}>{nodeRender}</TreeRowOmitted>
       {childRender}
       {nextRender}
     </>);

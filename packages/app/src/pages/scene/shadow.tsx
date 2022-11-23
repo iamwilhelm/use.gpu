@@ -38,8 +38,9 @@ const ROTATION_KEYFRAMES = [
 ];
 
 const SHADOW_MAP = {
-  size: [1024, 1024],
-  span: [100, 100],
+  size: [2048, 2048],
+  span: [50, 50],
+  depth: [0, 250],
 };
 
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
@@ -67,7 +68,7 @@ export const SceneShadowPage: LC = (props) => {
               <Camera>
                 <Pass lights shadows>
                   <AmbientLight intensity={1} />
-                  <DirectionalLight position={[-1, 1, 1, 1]} intensity={8} shadowMap={SHADOW_MAP} />
+                  <DirectionalLight position={[-10, 10, 10, 1]} intensity={6} shadowMap={SHADOW_MAP} />
 
                   <Scene>
 

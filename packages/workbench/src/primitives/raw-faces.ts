@@ -57,6 +57,7 @@ export type RawFacesProps = {
 
   shaded?: boolean,
   shadow?: boolean,
+  side?: 'front' | 'back' | 'both',
 
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
@@ -67,12 +68,16 @@ const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
 
-const PIPELINE = {
+const getPipeline = (side: 'front' | 'back' | 'both') => ({
   primitive: {
     topology: 'triangle-list',
-    cullMode: 'none',
+    cullMode: {
+      front: 'back',
+      back: 'front',
+      both: 'none',
+    }[side],
   },
-} as DeepPartial<GPURenderPipelineDescriptor>;
+} as DeepPartial<GPURenderPipelineDescriptor>);
 
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
@@ -81,6 +86,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     shadow = true,
     count = 1,
     mode = 'opaque',
+    side = 'front',
 
     unweldedNormals = false,
     unweldedTangents = false,
@@ -120,7 +126,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     useNoCallback();
   }
 
-  const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
+  const pipeline = useMemo(() => patch(getPipeline(side), propPipeline), [side, propPipeline]);
 
   const p = useShaderRef(props.position, props.positions);
   const n = useShaderRef(props.normal, props.normals);

@@ -5,8 +5,7 @@ import { makeColorAttachment, makeColorState } from './color';
 import { makeVertexBuffer } from './buffer';
 import { makeRenderPipeline, makeShaderModuleDescriptor } from './pipeline';
 import { makeTextureBinding, makeTextureView, makeSampler } from './texture';
-
-const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
+import { seq } from './tuple';
 
 const MIP_SHADER = `
 struct VertexOutput {

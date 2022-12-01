@@ -58,6 +58,7 @@ export const makeMippableTexture = (
   mipLevelCount: number = 1,
   dimension: GPUTextureDimension = '2d',
 ): GPUTexture => {
+  if (width * height * depth === 0) throw new Error("Can't create zero-sized texture");
   const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC | GPUTextureUsage.COPY_DST;
   return makeTexture(device, width, height, depth, format, usage, sampleCount, mipLevelCount, dimension);
 }

@@ -65,7 +65,7 @@ export type DualContourLayerProps = {
 
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
   alphaToCoverage?: boolean,
-  cullMode?: GPUCullMode,
+  side?: 'front' | 'back' | 'both',
   mode?: RenderPassMode | string,
   id?: number,
 };
@@ -128,7 +128,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     live = false,
 
     alphaToCoverage = true,
-    cullMode = 'none',
+    side = 'both',
     mode = 'opaque',
     id = 0,
   } = props;
@@ -288,9 +288,13 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     patch(alphaToCoverage
       ? PIPELINE_ALPHA_TO_COVERAGE
       : PIPELINE_ALPHA,
-      { primitive: { cullMode } },
+      { primitive: { cullMode: {
+        front: 'back',
+        back: 'front',
+        both: 'none',
+      }[side] } },
     ),
-    [alphaToCoverage, cullMode]);
+    [alphaToCoverage, side]);
 
   const defines = useMemo(() => (
     patch(alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {

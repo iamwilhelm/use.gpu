@@ -10,6 +10,7 @@ export type MeshProps = {
   id?: number,
   mesh: Record<string, ShaderSource>,
   shaded?: boolean,
+  side?: 'front' | 'back' | 'both',
 };
 
 export const Mesh: LiveComponent<MeshProps> = memo((props: PropsWithChildren<MeshProps>) => {

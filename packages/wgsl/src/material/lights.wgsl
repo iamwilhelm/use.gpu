@@ -19,12 +19,14 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
     vec4<f32>(1.0, 1.0, 1.0, 1.0),
     1,
     1,  // Directional
+
     -1, // Shadow Map (none)
-    vec4<f32>(0.0)
+    0,
+    vec2<f32>(0.0),
+    vec2<f32>(0.0),
+    vec4<f32>(0.0),
   );
 }
-
-@optional @link fn sampleShadow(uv: vec2<f32>, index: u32, level: f32) -> f32 { return 1.0; }
 
 @export fn applyLights(
   N: vec3<f32>,
@@ -40,22 +42,6 @@ use '@use-gpu/wgsl/fragment/pbr'::{ PBR };
     let light = getLight(i);
     var f = vec3<f32>(1.0);
 
-    if (light.shadowMap >= 0) {
-      let index = u32(light.shadowMap);
-
-      let pos = light.into * vec4<f32>(surface.position.xyz + surface.normal.xyz / 16.0, 1.0);
-      let n = dot(surface.normal.xyz, light.normal.xyz);
-      let slope = (1.0 - abs(n));
-
-      let uv = clamp(pos.xy * .5 + .5, vec2<f32>(0.0), vec2<f32>(1.0));
-      let uvm = mix(light.shadowUV.xy, light.shadowUV.zw, uv);
-      let s = sampleShadow(uvm, index, pos.z + slope / 8192.0);
-      
-      if (abs(pos.x) < 1 && abs(pos.y) < 1) {
-        f *= s;
-      }
-    }
-    
     let r = applyLight(N, V, light, surface);
     radiance += r * f;
   }

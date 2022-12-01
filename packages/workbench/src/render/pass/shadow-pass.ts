@@ -2,7 +2,7 @@ import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, Unif
 import type { LightEnv, Renderable } from '../pass';
 
 import { keyed, memo, useMemo } from '@use-gpu/live';
-import { VIEW_UNIFORMS, makeDepthStencilState, makeDepthStencilAttachment, makeGlobalUniforms, uploadBuffer } from '@use-gpu/core';
+import { makeDepthStencilAttachments } from '@use-gpu/core';
 
 import { useDeviceContext } from '../../providers/device-provider';
 import { useViewContext } from '../../providers/view-provider';
@@ -13,6 +13,7 @@ import { SHADOW_FORMAT, SHADOW_PAGE } from '../renderer/light-data';
 import { getRenderPassDescriptor, getDrawOrder } from './util';
 
 import { ShadowOrthoPass } from './shadow-ortho';
+import { ShadowOmniPass } from './shadow-omni';
 
 export type ShadowPassProps = {
   calls: {
@@ -22,7 +23,12 @@ export type ShadowPassProps = {
 };
 
 const NO_OPS: any[] = [];
-const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
+const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
+
+const SHADOW_TYPES = {
+  ortho: ShadowOrthoPass,
+  omni: ShadowOmniPass,
+} as Record<string, LiveComponent>;
 
 /** Shadow render pass.
 
@@ -41,26 +47,28 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
 
   const {maps, texture} = light;
 
-  const [
-    depthStencilState,
-    depthStencilAttachment,
-    descriptor,
-  ] = useMemo(() => {
-    const depthStencilState = makeDepthStencilState(SHADOW_FORMAT);
-    const attachment = makeDepthStencilAttachment(texture.texture, SHADOW_FORMAT);
+  const descriptors = useMemo(() => {
+    const layers = texture.size[2];
 
-    const descriptor = {
+    const attachments = makeDepthStencilAttachments(texture.texture, SHADOW_FORMAT, layers, 0.0, 'load');
+    const descriptors = attachments.map(depthStencilAttachment => ({
       colorAttachments: [],
-      depthStencilAttachment: attachment,
-    };
+      depthStencilAttachment,
+    }));
 
-    return [texture, attachment, descriptor];
+    return descriptors;
   }, [device, texture]);
+
+  inspect({
+    output: {
+      depth: texture,
+    },
+  });
 
   const out: LiveElement[] = [];
   for (const map of maps.values()) {
-    const Component = (map.shadow.type === 'ortho') ? ShadowOrthoPass : null;
-    if (Component) out.push(keyed(Component, map.id, {calls, map, descriptor, texture}));
+    const Component = SHADOW_TYPES[map.shadow.type];
+    if (Component) out.push(keyed(Component, map.id, {calls, map, descriptors, texture}));
   }
   return out;
 }, 'ShadowPass');

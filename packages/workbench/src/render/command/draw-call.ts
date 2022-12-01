@@ -96,7 +96,7 @@ export const drawCall = (props: DrawCallProps) => {
   const suspense = useSuspenseContext();
 
   // Render shader
-  const topology = propPipeline.primitive?.topology ?? 'triangle-list';
+  const topology = propPipeline?.primitive?.topology ?? 'triangle-list';
 
   const defines = useOne(() => (propDefines ? {
     ...(passLayout ? PASS_DEFINES : GLOBAL_DEFINES),

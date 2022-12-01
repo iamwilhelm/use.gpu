@@ -9,17 +9,6 @@ import { FeedbackContext } from '../providers/feedback-provider';
 import { ComputeContext } from '../providers/compute-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
-import {
-  makeColorState,
-  makeColorAttachment,
-  makeRenderableTexture,
-  makeDepthTexture,
-  makeDepthStencilState,
-  makeDepthStencilAttachment,
-  makeTextureView,
-  BLEND_PREMULTIPLIED,
-} from '@use-gpu/core';
-
 const NOP = () => {};
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);

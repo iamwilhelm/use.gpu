@@ -186,12 +186,11 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
     colorInput,
     colorStates,
     colorAttachments,
-    depthTexture,
     depthStencilState,
     depthStencilAttachment,
     swap: source.swap,
     source: source,
-  }), [renderContext, width, height, colorStates, colorAttachments, depthTexture, depthStencilState, depthStencilAttachment, source, sources]);
+  }), [renderContext, width, height, colorStates, colorAttachments, depthStencilState, depthStencilAttachment, source, sources]);
 
   if (!(render ?? children)) return yeet(rttContext);
 

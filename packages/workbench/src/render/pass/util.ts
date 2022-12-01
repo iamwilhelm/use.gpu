@@ -1,5 +1,6 @@
-import { Culler, Renderable } from './types';
+import type { Culler, Renderable } from './types';
 import { resolve, proxy } from '@use-gpu/core';
+import { mat4, vec3 } from 'gl-matrix';
 
 export const getRenderPassDescriptor = (
   renderContext: UseGPURenderContext,
@@ -52,3 +53,20 @@ export const getDrawOrder = (cull: Culler, calls: Renderable[], sign: number = 1
 
   return order;
 };
+
+export const drawToPass = (
+  cull: Culler,
+  calls: Renderable[],
+  passEncoder: GPURenderPassEncoder,
+  countGeometry: (v: number, t: number) => void,
+  sign: number = 1,
+) => {
+  const order = getDrawOrder(cull, calls, sign);
+  for (const i of order) calls[i].draw(passEncoder, countGeometry);
+};
+
+const REVERSE_Z = mat4.create();
+mat4.translate(REVERSE_Z, REVERSE_Z, vec3.fromValues(0, 0, 1));
+mat4.scale(REVERSE_Z, REVERSE_Z, vec3.fromValues(1, 1, -1));
+
+export const reverseZ = (a: mat4, b: mat4) => mat4.multiply(a, REVERSE_Z, b);

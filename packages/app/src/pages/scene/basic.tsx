@@ -46,7 +46,7 @@ const PickableMesh = memo(({id, mesh, texture}) => {
 
 // This uses a typical scene-graph arrangement with an image texture
 export const SceneBasicPage: LC = (props) => {
-  const geometry = useOne(() => makeBoxGeometry(2));
+  const geometry = useOne(() => makeBoxGeometry({ width: 2 }));
 
   return (
     <Gather

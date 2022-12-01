@@ -63,7 +63,7 @@ export const Data: LiveComponent<DataProps> = (props) => {
         bounds: {...NO_BOUNDS},
       };
 
-      return {buffer, array, source, dims, accessor, raw};
+      return {buffer, array, source, dims, accessor: fn, raw};
     });
     const fieldSources = fieldBuffers.map(f => f.source);
     return [fieldBuffers, fieldSources];

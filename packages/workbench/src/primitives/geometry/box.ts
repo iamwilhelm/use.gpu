@@ -1,11 +1,19 @@
-import type { MeshData } from '@use-gpu/core';
+import type { Geometry } from '@use-gpu/core';
 import { makeDataEmitter } from '@use-gpu/core';
 
-export const makeBoxGeometry = (
-  sizeX: number = 1,
-  sizeY: number = sizeX,
-  sizeZ: number = sizeX,
-) => {
+type BoxGeometryProps = {
+  width?: number,
+  height?: number,
+  depth?: number,
+  tile?: [number, number],
+};
+
+export const makeBoxGeometry = ({
+  width = 1,
+  height = width,
+  depth = width,
+  tile = [1, 1],
+}: BoxGeometryProps = {}): Geometry => {
   const count = 36;
 
   const positions = new Float32Array(count * 4);
@@ -17,13 +25,13 @@ export const makeBoxGeometry = (
   const {emit: uvEmitter} = makeDataEmitter(uvs, 4);
 
   const emitPosition = (x: number, y: number, z: number) =>
-    positionEmitter(x * sizeX / 2, y * sizeY / 2, z * sizeZ / 2, 1);
+    positionEmitter(x * width / 2, y * height / 2, z * depth / 2, 1);
 
   const emitNormal = (x: number, y: number, z: number) =>
     normalEmitter(x, y, z, 0);
 
   const emitUV = (x: number, y: number) =>
-    uvEmitter(x, y, 0, 0);
+    uvEmitter(x * tile[0], y * tile[1], 0, 0);
 
   emitPosition(1, 1, -1);
   emitPosition(-1, -1, -1);

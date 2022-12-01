@@ -12,16 +12,21 @@ export type Light = {
   kind: number,
   
   shadow?: ShadowMapLike | null,
-  
+};
+
+export type BoundLight = Light & {
   id?: number,
   shadowType?: 'ortho',
   shadowMap?: number,
   shadowUV?: TypedArray | number[],
+  shadowBias?: TypedArray | number[],
 };
 
 export type ShadowMapLike = {
   size?: VectorLike,
   depth?: VectorLike,
+  bias?: VectorLike,
   span?: VectorLike,
   up?: VectorLike,
+  blur?: number,
 };

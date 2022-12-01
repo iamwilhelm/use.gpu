@@ -41,14 +41,14 @@ const parseTextureType = (format: string, variant: string | null) => {
     const props = BINDING_TEXTURE_TYPES[layout];
     if ('sampleType' in props) return {texture: props};
 
-    if (type[0] in BINDING_SAMPLE_TYPES) {
+    if (type && (type[0] in BINDING_SAMPLE_TYPES)) {
       let sampleType = BINDING_SAMPLE_TYPES[type[0]];
       if (sampleType === 'float' && (variant && !variant.match(/^textureSample/))) {
         sampleType = 'unfilterable-float';
       }
       return {texture: {...props, sampleType}};
     }
-    throw new Error(`Unknown texture sample type "${type}"`);
+    throw new Error(`Unknown texture sample type "${format}"`);
   }
   if (layout in BINDING_STORAGE_TEXTURE_TYPES) {
     const props = BINDING_STORAGE_TEXTURE_TYPES[layout];

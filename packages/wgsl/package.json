@@ -44,6 +44,11 @@
       "import": "./src/app/vertex/mesh.wgsl",
       "require": "./src/app/vertex/mesh.wgsl"
     },
+    "./codec/octahedral.wgsl": {
+      "types": "./src/codec/octahedral.wgsl.d.ts",
+      "import": "./src/codec/octahedral.wgsl",
+      "require": "./src/codec/octahedral.wgsl"
+    },
     "./contour/fit-linear.wgsl": {
       "types": "./src/contour/fit-linear.wgsl.d.ts",
       "import": "./src/contour/fit-linear.wgsl",
@@ -334,6 +339,11 @@
       "import": "./src/render/fragment/depth.wgsl",
       "require": "./src/render/fragment/depth.wgsl"
     },
+    "./render/fragment/frag-depth.wgsl": {
+      "types": "./src/render/fragment/frag-depth.wgsl.d.ts",
+      "import": "./src/render/fragment/frag-depth.wgsl",
+      "require": "./src/render/fragment/frag-depth.wgsl"
+    },
     "./render/fragment/pick.wgsl": {
       "types": "./src/render/fragment/pick.wgsl.d.ts",
       "import": "./src/render/fragment/pick.wgsl",
@@ -358,6 +368,11 @@
       "types": "./src/render/pick.wgsl.d.ts",
       "import": "./src/render/pick.wgsl",
       "require": "./src/render/pick.wgsl"
+    },
+    "./render/sample/cube-to-omni.wgsl": {
+      "types": "./src/render/sample/cube-to-omni.wgsl.d.ts",
+      "import": "./src/render/sample/cube-to-omni.wgsl",
+      "require": "./src/render/sample/cube-to-omni.wgsl"
     },
     "./render/vertex/virtual-depth.wgsl": {
       "types": "./src/render/vertex/virtual-depth.wgsl.d.ts",
@@ -468,6 +483,11 @@
       "types": "./src/use/light.wgsl.d.ts",
       "import": "./src/use/light.wgsl",
       "require": "./src/use/light.wgsl"
+    },
+    "./use/shadow.wgsl": {
+      "types": "./src/use/shadow.wgsl.d.ts",
+      "import": "./src/use/shadow.wgsl",
+      "require": "./src/use/shadow.wgsl"
     },
     "./use/types.wgsl": {
       "types": "./src/use/types.wgsl.d.ts",

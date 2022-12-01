@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { Culler, LightEnv, Renderable } from '../pass';
+import type { Culler, LightEnv, Renderable } from './types';
 
 import { use, quote, yeet, memo, useMemo, useOne } from '@use-gpu/live';
 
@@ -10,7 +10,7 @@ import { usePassContext } from '../../providers/pass-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
-import { getRenderPassDescriptor, getDrawOrder } from './util';
+import { getRenderPassDescriptor, drawToPass } from './util';
 
 export type ColorPassProps = {
   calls: {
@@ -24,17 +24,6 @@ export type ColorPassProps = {
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
-
-const drawToPass = (
-  cull: Culler,
-  calls: Renderable[],
-  passEncoder: GPURenderPassEncoder,
-  countGeometry: (v: number, t: number) => void,
-  sign: number = 1,
-) => {
-  const order = getDrawOrder(cull, calls, sign);
-  for (const i of order) calls[i].draw(passEncoder, countGeometry);
-};
 
 /** Color render pass.
 

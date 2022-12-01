@@ -7,10 +7,9 @@ import {
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
-  Lights, DirectionalLight, AmbientLight,
-  Shared,
-
-  makeBoxGeometry, makePlaneGeometry,
+  Lights, DirectionalLight, PointLight, AmbientLight,
+  Data, PointLayer,
+  makeBoxGeometry, makePlaneGeometry, makeSphereGeometry,
 } from '@use-gpu/workbench';
 
 import {
@@ -37,28 +36,66 @@ const ROTATION_KEYFRAMES = [
   [16, [360, 0, 0]],
 ];
 
-const SHADOW_MAP = {
+const SHADOW_MAP_DIRECTIONAL = {
   size: [2048, 2048],
   span: [50, 50],
   depth: [0, 250],
+  bias: [1/2048, 1/32],
+  blur: 4,
+};
+
+const SHADOW_MAP_POINT = {
+  size: [2048, 2048],
+  depth: [0.1, 50],
+  bias: [1, 1/32],
+  blur: 4,
 };
 
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
+const sampler = {
+  addressModeU: 'repeat',
+  addressModeV: 'repeat',
+};
+
+const boxGeometry = makeBoxGeometry({ width: 2 });
+const planeGeometry = makePlaneGeometry({ width: 100, height: 100, axes: 'xz' });
+const sphereGeometry = makeSphereGeometry({ tile: [6, 3] });
+
+const lightFields = [
+  ['vec4<f32>', 'position'],
+  ['vec4<f32>', 'color'],
+];
+
+const lightData = [
+  {
+    position: [-10, 20, 15, 1],
+    color: [1, 1, 1, 1],
+  },
+  {
+    position: [-15, 20, -5, 1],
+    color: [0.8, 0.4, 0.8, 1],
+  },
+  {
+    position: [2, 4.5, 2.5, 1],
+    color: [0.3, 0.8, 1.0, 1],
+  },
+];
+
 export const SceneShadowPage: LC = (props) => {
-  const boxGeometry = useOne(() => makeBoxGeometry(2));
-  const planeGeometry = useOne(() => makePlaneGeometry(100, 100, 'xz'));
 
   return (
     <Gather
       children={[
         <GeometryData geometry={boxGeometry} />,
         <GeometryData geometry={planeGeometry} />,
-        <ImageTexture url="/textures/test.png" />,
+        <GeometryData geometry={sphereGeometry} />,
+        <ImageTexture url="/textures/test.png" sampler={sampler} />,
       ]}
       then={([
         boxMesh,
         planeMesh,
+        sphereMesh,
         texture,
       ]) => (
         <LinearRGB>
@@ -68,7 +105,17 @@ export const SceneShadowPage: LC = (props) => {
               <Camera>
                 <Pass lights shadows>
                   <AmbientLight intensity={1} />
-                  <DirectionalLight position={[-10, 10, 10, 1]} intensity={6} shadowMap={SHADOW_MAP} />
+                  <DirectionalLight position={lightData[0].position} intensity={3}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
+                  <DirectionalLight position={lightData[1].position} intensity={1}   color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
+                  <PointLight       position={lightData[2].position} intensity={200} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} />
+
+                  <Data
+                    fields={lightFields}
+                    data={lightData}
+                    render={(positions: StorageSource, colors: StorageSource) => (
+                      <PointLayer positions={positions} colors={colors} size={50} depth={0.5} />
+                    )}
+                  />
 
                   <Scene>
 
@@ -76,6 +123,7 @@ export const SceneShadowPage: LC = (props) => {
                       <PBRMaterial albedo={0x808080} roughness={0.7}>
                         <Mesh
                           mesh={planeMesh}
+                          side="both"
                           shaded
                         />
                       </PBRMaterial>
@@ -89,6 +137,27 @@ export const SceneShadowPage: LC = (props) => {
                           <Instance position={[0, -3, 0]} />
                           <Instance position={[-3, -2, -2]} scale={[2, 2, 2]} />
                           <Instance position={[2, -3, 4]} rotation={[0, 30, 0]} />
+                          <Instance position={[-2, -3.333, 5]} scale={[2/3, 2/3, 2/3]} rotation={[0, -50, 0]} />
+                        </>)}
+                      />
+                      <Instances
+                        mesh={sphereMesh}
+                        shaded
+                        render={(Instance) => (<>
+                          <Instance position={[8.5, -1.5, 1.2]} scale={[0.31, 0.31, 0.31]} />
+                          <Instance position={[8.5, -1, 2.2]} scale={[0.31, 0.31, 0.31]} />
+                          <Instance position={[7.5, 1.5, .2]} scale={[0.31, 0.31, 0.31]} />
+
+                          <Instance position={[8, 0, 2.8]} scale={[0.5, 0.5, 0.5]} />
+                          <Instance position={[7, 0, 3.1]} scale={[0.5, 0.5, 0.5]} />
+                          <Instance position={[6, 0, 2.9]} scale={[0.5, 0.5, 0.5]} />
+                          <Instance position={[5, 0, 1.2]} scale={[1, 1, 1]} />
+
+                          <Instance position={[-3, 0, 2.1]} scale={[0.5, 0.5, 0.5]} />
+                          <Instance position={[-4, 0, 1.9]} scale={[0.5, 0.5, 0.5]} />
+                          <Instance position={[-5, 0, 2.2]} scale={[0.5, 0.5, 0.5]} />
+                          <Instance position={[-6, 0, 1.8]} scale={[0.5, 0.5, 0.5]} />
+                          <Instance position={[-7, 0, 2]} scale={[0.5, 0.5, 0.5]} />
                         </>)}
                       />
                     </PBRMaterial>

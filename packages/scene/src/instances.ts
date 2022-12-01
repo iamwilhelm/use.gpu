@@ -31,6 +31,7 @@ const NORMAL_BINDINGS   = bundleToAttributes(getMatrixDifferential);
 export type InstancesProps = InstanceInfo & {
   mesh: Record<string, ShaderSource>,
   shaded?: boolean,
+  side?: 'front' | 'back' | 'both',
   format?: 'u16' | 'u32',
   render?: (Instance: LiveComponent) => LiveElement,
 };
@@ -44,6 +45,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
   const {
     mesh,
     shaded,
+    side,
     format,
     render,
   } = props;
@@ -61,7 +63,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
       const boundPosition = getBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrix]);
       const boundDifferential = getBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrix, normalMatrix]);
 
-      const view = use(FaceLayer, {...mesh, instances, load, shaded});
+      const view = use(FaceLayer, {...mesh, instances, load, shaded, side});
       return [view, boundPosition, boundDifferential];
     }, [instances, fieldSources]);
 

@@ -9,7 +9,7 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { drawCall } from '../../command/draw-call';
 
 import { useDeviceContext } from '../../../providers/device-provider';
-import { useRenderContext } from '../../../providers/render-provider';
+import { usePassContext } from '../../../providers/pass-provider';
 import { useViewContext } from '../../../providers/view-provider';
 
 import instanceDrawVirtualDepth from '@use-gpu/wgsl/render/vertex/virtual-depth.wgsl';
@@ -36,7 +36,7 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
   } = props;
 
   const device = useDeviceContext();
-  const renderContext = useRenderContext();
+  const {renderContexts: {depth: renderContext}} = usePassContext();
 
   const {layout: globalLayout} = useViewContext();
 

@@ -9,7 +9,7 @@ import { useViewContext } from '../../providers/view-provider';
 
 import { useInspectable } from '../../hooks/useInspectable'
 
-import { getRenderPassDescriptor, getDrawOrder } from './util';
+import { getRenderPassDescriptor, drawToPass } from './util';
 
 export type PickingPassProps = {
   calls: {
@@ -21,17 +21,6 @@ export type PickingPassProps = {
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
-
-const drawToPass = (
-  cull: Culler,
-  calls: Renderable[],
-  passEncoder: GPURenderPassEncoder,
-  countGeometry: (v: number, t: number) => void,
-  sign: number = 1,
-) => {
-  const order = getDrawOrder(cull, calls, sign);
-  for (const i of order) calls[i].draw(passEncoder, countGeometry);
-};
 
 /** Picking render pass.
 

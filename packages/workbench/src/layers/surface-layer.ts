@@ -31,8 +31,8 @@ export type SurfaceLayerProps = {
   loopY?: boolean,
   shaded?: boolean,
 
-  cullMode?: GPUCullMode,
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
+  side?: 'front' | 'back' | 'both',
   mode?: RenderPassMode | string,
   id?: number,
 };
@@ -50,7 +50,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     loopX = false,
     loopY = false,
     shaded = true,
-    cullMode = 'none',
+    side = 'both',
 
     size,
     mode = 'opaque',
@@ -61,8 +61,6 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     (props.positions as any)?.size ?? resolve(size),
     [props.positions, size]);
   const boundSize = useBoundSource(SIZE_BINDING, sizeExpr);
-
-  const pipeline = useOne(() => ({primitive: {cullMode}}), cullMode);
 
   const countExpr = useOne(() => () => {
     const s = resolve(sizeExpr);
@@ -85,8 +83,8 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     normals,
 
     shaded,
+    side,
     count: countExpr,
-    pipeline,
     mode,
     id,
   });

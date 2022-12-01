@@ -7,7 +7,7 @@ import { useProp } from '@use-gpu/traits';
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
-import { useInspectable } from '@use-gpu/workbench';
+import { useForceUpdate, useInspectable } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';
@@ -49,7 +49,9 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
     direction = 'y',
     children,
   } = props;
-  
+
+  const [version, forceUpdate] = useForceUpdate();
+
   const x = useProp(props.x, parseOverflow);
   const y = useProp(props.y, parseOverflow);
   
@@ -102,7 +104,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
       return [outerWidth < innerWidth, outerHeight < innerHeight];
     };
     
-    const fitTo = (layout: Rectangle, size: Point, scrollBarWidth: number, scrollBarHeight: number) => {
+    const updateScrollRange = (layout: Rectangle, size: Point, scrollBarWidth: number, scrollBarHeight: number) => {
       const before = shouldScroll();
       const [l, t, r, b] = layout;
       boxRef[0] = l;
@@ -140,10 +142,10 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
       return cullBounds;
     };
 
-    return {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, fitTo, scrollTo, scrollBy};
+    return {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, updateScrollRange, scrollTo, scrollBy};
   });
   
-  const {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, fitTo, scrollTo, scrollBy} = api;
+  const {clip, transform, inverse, sizeRef, scrollRef, shouldScroll, updateScrollRange, scrollTo, scrollBy} = api;
 
   useOne(() => scrollTo(scrollX, null), scrollX);
   useOne(() => scrollTo(null, scrollY), scrollY);
@@ -160,90 +162,92 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
       const scrollBarWidth  = hasScrollY ? scrollBars[hasScrollX ? 1 : 0].sizing[2] : 0;
       const scrollBarHeight = hasScrollX ? scrollBars[0].sizing[3] : 0;
 
-      const fit = (into: FitInto) => {
-          const sizes   = [] as Point[];
-          const offsets = [] as Point[];
-          const renders = [] as (LayoutRenderer[]);
-          const pickers = [] as (LayoutPicker | null | undefined)[];
-
-          const fit = () => {
-            sizes.length = 0;
-            offsets.length = 0;
-            renders.length = 0;
-            pickers.length = 0;
-
-            const [shouldScrollX, shouldScrollY] = shouldScroll();
-
-            const padX = (shouldScrollY ? scrollBarWidth  : 0);
-            const padY = (shouldScrollX ? scrollBarHeight : 0);
-
-            const resolved: FitInto = isX
-              ? [null, into[1] != null ? into[1] - padX : null, into[2] - padX, into[3] - padY]
-              : [into[0] != null ? into[0] - padX : null, null, into[2] - padX, into[3] - padY];
-
-            const {render, pick, size} = fitBlock(resolved);
-
-            sizes.push(size);
-            offsets.push([ml, mt]);
-            renders.push(render);
-            pickers.push(pick);
-
-            for (const {fit} of scrollBars) {
-              const {render, pick, size} = fit(into);
-              sizes.push(size);
-              offsets.push([0, 0]);
-              renders.push(render);
-              pickers.push(null);
-            }
-
-            inspect({
-              layout: {
-                into,
-                size,
-                sizes,
-                offsets,
-              },
-            });
-
-            const outer = size.slice() as Point;
-            if (shouldScrollY) outer[0] += scrollBarWidth;
-            if (shouldScrollX) outer[1] += scrollBarHeight;
-
-            return [outer, size];
-          };
+      const fitInto = (into: FitInto) => {
+        const sizes   = [] as Point[];
+        const offsets = [] as Point[];
+        const renders = [] as (LayoutRenderer[]);
+        const pickers = [] as (LayoutPicker | null | undefined)[];
           
-          const [outer, size] = fit();
-
-          return {
-            size: outer,
-            render: memoLayout((
-              box: Rectangle,
-              parentClip?: ShaderModule,
-              parentTransform?: ShaderModule,
-            ) => {
-
-              // If scrollbar must appear/disappear, re-fit.
-              if (fitTo(box, size, scrollBarWidth, scrollBarHeight) && (hasScrollX || hasScrollY)) {
-                fitTo(box, fit()[1], scrollBarWidth, scrollBarHeight);
-              }
-
-              return [
-                ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
-                ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
-              ];
-            }),
-            pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
-          };
+        const fit = () => {
+          sizes.length = 0;
+          offsets.length = 0;
+          renders.length = 0;
+          pickers.length = 0;
+          
+          const [shouldScrollX, shouldScrollY] = shouldScroll();
+          
+          const padX = (shouldScrollY ? scrollBarWidth  : 0);
+          const padY = (shouldScrollX ? scrollBarHeight : 0);
+          
+          const resolved: FitInto = isX
+            ? [null, into[1] != null ? into[1] - padX : null, into[2] - padX, into[3] - padY]
+            : [into[0] != null ? into[0] - padX : null, null, into[2] - padX, into[3] - padY];
+          
+          const {render, pick, size} = fitBlock(resolved);
+          
+          sizes.push(size);
+          offsets.push([ml, mt]);
+          renders.push(render);
+          pickers.push(pick);
+          
+          for (const {fit} of scrollBars) {
+            const {render, pick, size} = fit(into);
+            sizes.push(size);
+            offsets.push([0, 0]);
+            renders.push(render);
+            pickers.push(null);
+          }
+          
+          inspect({
+            layout: {
+              into,
+              size,
+              sizes,
+              offsets,
+            },
+          });
+          
+          const outer = size.slice() as Point;
+          if (shouldScrollY) outer[0] += scrollBarWidth;
+          if (shouldScrollX) outer[1] += scrollBarHeight;
+          
+          return [outer, size];
         };
+        
+        const [outer, size] = fit();
+          
+        return {
+          size: outer,
+          render: memoLayout((
+            box: Rectangle,
+            parentClip?: ShaderModule,
+            parentTransform?: ShaderModule,
+          ) => {
+          
+            // If scrollbar must appear/disappear, re-fit.
+            if (updateScrollRange(box, size, scrollBarWidth, scrollBarHeight) && (hasScrollX || hasScrollY)) {
+              const [o, s] = fit();
+              updateScrollRange(box, s, scrollBarWidth, scrollBarHeight);
+              if (o[0] !== outer[0] || o[1] !== outer[1]) forceUpdate();
+            }
+          
+            return [
+              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
+              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
+            ];
+          }),
+          pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),
+        };
+      };
 
       return yeet({
         sizing,
         margin: NO_POINT4,
         stretch: true,
-        fit: memoFit(fit),
-        prefit: memoFit(fit),
+        fit: memoFit(fitInto),
+        prefit: memoFit(fitInto),
       });
-    }, [props, els]);
+    }, [props, els, version]);
   };
 
   const scrollBarX = hasScrollX ? extend(scrollBar, { direction: 'x', overflow: x, scrollRef, sizeRef }) : null;

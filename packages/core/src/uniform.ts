@@ -211,7 +211,7 @@ export const makeVolatileUniforms = <T>(
 const getTextureDimension = (layout: string) => {
   if (!layout) return undefined;
 
-  const type = layout.match(/[1-3]d|_cube/)[0];
+  const type = layout.match(/[1-3]d|cube/)[0];
   if (!type) return undefined;
 
   return layout.match(/array/) ? type + '-array' : type;

@@ -1,12 +1,12 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
+import type { TextureSource } from '@use-gpu/core';
 import type { LightEnv, Renderable } from '../pass';
 import type { Light } from '../../light/types';
 import { mat4 } from 'gl-matrix';
 
 import { use, quote, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
 import {
-  makeDepthStencilState, makeDepthStencilAttachment, makeFrustumPlanes,
-  makeGlobalUniforms, makeOrthogonalMatrix, uploadBuffer,
+  makeFrustumPlanes, makeGlobalUniforms, makeOrthogonalMatrix, uploadBuffer,
 } from '@use-gpu/core';
 
 import { useDeviceContext } from '../../providers/device-provider';
@@ -16,40 +16,31 @@ import { useFrustumCuller } from '../../hooks/useFrustumCuller'
 import { useInspectable } from '../../hooks/useInspectable'
 
 import { SHADOW_FORMAT, SHADOW_PAGE } from '../renderer/light-data';
-import { getRenderPassDescriptor, getDrawOrder } from './util';
+import { drawToPass } from './util';
+
+import { useShadowBlit } from './shadow-blit';
 
 export type ShadowOrthoPassProps = {
   calls: {
     shadow?: Renderable[],
   },
   map: Light,
-  descriptor: GPURenderPassDescriptor,
-  texture: GPUTexture,
+  descriptors: GPURenderPassDescriptor[],
+  texture: TextureSource,
 };
 
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
 
-const drawToPass = (
-  cull: Culler,
-  calls: Renderable[],
-  passEncoder: GPURenderPassEncoder,
-  countGeometry: (v: number, t: number) => void,
-  sign: number = 1,
-) => {
-  const order = getDrawOrder(cull, calls, sign);
-  for (const i of order) calls[i].draw(passEncoder, countGeometry);
-};
+/** Orthographic shadow render pass.
 
-/** Shadow render pass.
-
-Draws all opaque calls to multiple shadow maps.
+Draws all shadow calls to an orthographic shadow map.
 */
 export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithChildren<ShadowOrthoPassProps>) => {
   const {
     calls,
     map,
-    descriptor,
+    descriptors,
     texture,
   } = props;
 
@@ -81,8 +72,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   }), viewUniforms) as any as ViewUniforms;
 
   const {viewPosition, projectionViewFrustum} = uniforms;
-  //const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
-  const cull = () => true;
+  const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
 
   const {
     into,
@@ -91,8 +81,17 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
       depth: [near, far],
       size: [width, height],
     },
+    shadowMap,
     shadowUV,
   } = map;
+
+  uniforms.viewNearFar.current = [ near, far ];
+  uniforms.viewResolution.current = [ 1 / width, 1 / height ];
+  uniforms.viewSize.current = [ width, height ];
+  uniforms.viewWorldDepth.current = [1, 1];
+  uniforms.viewPixelRatio.current = 1;
+
+  const clear = useShadowBlit(descriptors[shadowMap], shadowUV);
 
   const draw = quote(yeet(() => {
     let vs = 0;
@@ -102,11 +101,6 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
     uniforms.viewMatrix.current = into;
     uniforms.viewPosition.current = position;
-    uniforms.viewNearFar.current = [ near, far ];
-    uniforms.viewResolution.current = [ 1 / width, 1 / height ];
-    uniforms.viewSize.current = [ width, height ];
-    uniforms.viewWorldDepth.current = [1, 1];
-    uniforms.viewPixelRatio.current = 1;
 
     const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
     projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
@@ -117,12 +111,16 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
     const commandEncoder = device.createCommandEncoder();
 
-    const passEncoder = commandEncoder.beginRenderPass(descriptor);
-    passEncoder.setViewport(
-      shadowUV[0] * SHADOW_PAGE,
-      shadowUV[1] * SHADOW_PAGE,
-      shadowUV[2] * SHADOW_PAGE,
-      shadowUV[3] * SHADOW_PAGE, 0, 1);
+    clear(commandEncoder);
+
+    const x = shadowUV[0] * SHADOW_PAGE;
+    const y = shadowUV[1] * SHADOW_PAGE;
+    const w = (shadowUV[2] - shadowUV[0]) * SHADOW_PAGE;
+    const h = (shadowUV[3] - shadowUV[1]) * SHADOW_PAGE;
+
+    const passEncoder = commandEncoder.beginRenderPass(descriptors[shadowMap]);
+    passEncoder.setViewport(x, y, w, h, 0, 1);
+    passEncoder.setScissorRect(x, y, w, h);
     passEncoder.setBindGroup(0, bindGroup);
 
     drawToPass(cull, shadows, passEncoder, countGeometry);

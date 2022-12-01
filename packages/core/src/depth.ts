@@ -1,4 +1,5 @@
 import { makeTargetTexture } from './texture';
+import { seq } from './tuple';
 
 export const makeDepthTexture = (
   device: GPUDevice,
@@ -44,6 +45,40 @@ export const makeDepthStencilAttachment = (
       depthClearValue,
       depthLoadOp,
       depthStoreOp,
-    };  
+    };
+  }
+}
+
+export const makeDepthStencilAttachments = (
+  depthTexture: GPUTexture,
+  depthFormat: GPUTextureFormat,
+  depthLayers: number,
+  depthClearValue: number = 0.0,
+  depthLoadOp: GPULoadOp = 'clear',
+  depthStoreOp: GPUStoreOp = 'store',
+  stencilClearValue: number = 0,
+  stencilLoadOp: GPULoadOp = 'clear',
+  stencilStoreOp: GPUStoreOp = 'store',
+): GPURenderPassDepthStencilAttachment => {
+  const hasStencil = depthFormat.match(/stencil/);
+  
+  if (hasStencil) {
+    return seq(depthLayers).map(i => ({
+      view: depthTexture.createView({baseArrayLayer: i, arrayLayerCount: 1}),
+      depthClearValue,
+      depthLoadOp,
+      depthStoreOp,
+      stencilClearValue,
+      stencilLoadOp,
+      stencilStoreOp,
+    }));
+  }
+  else {
+    return seq(depthLayers).map(i => ({
+      view: depthTexture.createView({baseArrayLayer: i, arrayLayerCount: 1}),
+      depthClearValue,
+      depthLoadOp,
+      depthStoreOp,
+    }));
   }
 }

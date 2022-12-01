@@ -9,7 +9,9 @@
   kind: i32,
 
   shadowMap: i32,
+  shadowBlur: i32,
   shadowDepth: vec2<f32>,
+  shadowBias: vec2<f32>,
   shadowUV: vec4<f32>,
 };
 

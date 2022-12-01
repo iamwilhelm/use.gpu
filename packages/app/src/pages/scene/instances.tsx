@@ -39,7 +39,7 @@ const ROTATION_KEYFRAMES = [
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
 export const SceneInstancesPage: LC = (props) => {
-  const geometry = useOne(() => makeBoxGeometry(2));
+  const geometry = useOne(() => makeBoxGeometry({ width: 2 }));
 
   return (
     <Gather

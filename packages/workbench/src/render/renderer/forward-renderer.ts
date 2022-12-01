@@ -1,22 +1,23 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { DataBounds, UseGPURenderContext, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
+import type { DataBounds, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { AggregatedCalls } from './pass/types';
 import type { UseLight } from './light-data';
 
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttributes, bindEntryPoint, getBundleKey } from '@use-gpu/shader/wgsl';
-import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeTextureView } from '@use-gpu/core';
+import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState, makeTextureView } from '@use-gpu/core';
 
 import { LightContext } from '../../providers/light-provider';
 import { PassContext } from '../../providers/pass-provider';
 import { useDeviceContext } from '../../providers/device-provider';
+import { useRenderContext } from '../../providers/render-provider';
+import { usePickingContext, useNoPickingContext } from '../../providers/picking-provider';
 import { useInspectable } from '../../hooks/useInspectable'
-import { getBoundShader } from '../../hooks/useBoundShader';
 
 import { Await } from './await';
 
-import { LightData } from './light-data';
+import { LightData, SHADOW_FORMAT, SHADOW_PAGE } from './light-data';
 
 import { DebugRender } from './forward/debug';
 import { DepthRender } from './forward/depth';
@@ -32,6 +33,7 @@ import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
 
 import lightUniforms from '@use-gpu/wgsl/use/light.wgsl';
+import shadowBindings from '@use-gpu/wgsl/use/shadow.wgsl';
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
 import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
 import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
@@ -41,7 +43,7 @@ const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 
 const getLightCount = bindEntryPoint(lightUniforms, 'getLightCount');
 const getLight = bindEntryPoint(lightUniforms, 'getLight');
-const sampleShadow = bindEntryPoint(lightUniforms, 'sampleShadow');
+const sampleShadow = bindEntryPoint(shadowBindings, 'sampleShadow');
 
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,
@@ -94,7 +96,29 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
   const inspect = useInspectable();
   const device = useDeviceContext();
 
+  const renderContext = useRenderContext();
+  const pickingContext = picking ? usePickingContext() : useNoPickingContext();
+  const {gpuContext} = renderContext;
+
   const context = useMemo(() => {
+
+    // Provide render context for depth-only shadow passes
+    const depthContext = {
+      ...renderContext,
+      pixelRatio: 1,
+      samples: 1,
+      colorSpace: 'native',
+      colorInput: 'native',
+      colorStates: [],
+      colorAttachments: [],
+      depthStencilState: makeDepthStencilState(SHADOW_FORMAT),
+      swap: () => {},
+    };
+
+    const renderContexts = {
+      depth: depthContext,
+      picking: pickingContext?.renderContext,
+    };
 
     // Prepare shared bind group for forward lighting
     const entries = [];
@@ -150,9 +174,10 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     const useVariants = (virtual, hovered) => 
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
-    return {useVariants, layout, bind};
-  }, [lights, shadows, picking]);
+    return {useVariants, renderContexts, layout, bind};
+  }, [lights, shadows, picking, device, gpuContext, pickingContext]);
 
+  // Pass aggregrated calls to pass runners
   const Resume = (
     calls: AggregatedCalls,
   ) =>
@@ -175,14 +200,18 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       ];
     }, [context, calls, passes, overlay, merge]);
 
+  // Provide forward-lit material
   const view = lights ? use(LightData, {
     render: (
       useLight: UseLight,
     ) => {
       const context = useMemo(() => {
         const bindMaterial = (applyMaterial: ShaderModule) => {
-          const applyLight = bindBundle(applyLightWGSL, {applyMaterial});
-          return getBoundShader(applyLightsWGSL, LIGHTS_BINDINGS, [applyLight, getLightCount, getLight, sampleShadow]);
+          const applyLight = bindBundle(applyLightWGSL, {
+            applyMaterial,
+            sampleShadow: shadows ? sampleShadow : null,
+          }, {SHADOW_PAGE});
+          return bindBundle(applyLightsWGSL, {applyLight, getLightCount, getLight});
         };
 
         const useMaterial = (applyMaterial: ShaderModule) =>

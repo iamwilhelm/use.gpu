@@ -25,6 +25,9 @@ use '@use-gpu/wgsl/use/types'::{ Light };
     2.0,
     1,
     -1,
+    0,
+    vec2<f32>(0.0),
+    vec2<f32>(0.0),
     vec4<f32>(0.0),
   );
 

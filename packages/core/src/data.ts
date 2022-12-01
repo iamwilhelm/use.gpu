@@ -1,9 +1,8 @@
 import type { TypedArray, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec, DataBoundingBox, DataBounds } from './types';
 import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
+import { seq } from './tuple';
 
 import { vec4 } from 'gl-matrix';
-
-const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
 type NumberArray = TypedArray | number[];
 

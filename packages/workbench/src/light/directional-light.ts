@@ -25,11 +25,10 @@ const DEFAULT_SHADOW_MAP = {
   depth: [0.1, 1000],
   span: [1000, 1000],
   up: [0, 1, 0],
-};
 
-const REVERSE_Z = mat4.create();
-mat4.translate(REVERSE_Z, REVERSE_Z, vec3.fromValues(0, 0, 0.5));
-mat4.scale(REVERSE_Z, REVERSE_Z, vec3.fromValues(1, 1, -0.5));
+  bias: [1/4096, 1/32],
+  blur: 4,
+};
 
 const parseOptionalPosition = optional(parsePosition);
 
@@ -37,7 +36,6 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
   
   const position = useProp(props.position, parsePosition, DEFAULT_DIRECTION);
   const direction = useProp(props.direction, parseOptionalPosition);
-
   const color = useProp(props.color, parseColor);
   const intensity = useProp(props.intensity, parseNumber, 1);
 
@@ -54,8 +52,10 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
 
     const size  = parseVec2(shadowMap.size  ?? DEFAULT_SHADOW_MAP.size);
     const depth = parseVec2(shadowMap.depth ?? DEFAULT_SHADOW_MAP.depth);
+    const bias  = parseVec2(shadowMap.bias  ?? DEFAULT_SHADOW_MAP.bias);
     const span  = parseVec2(shadowMap.span  ?? DEFAULT_SHADOW_MAP.span);
     const up    = parseVec3(shadowMap.up    ?? DEFAULT_SHADOW_MAP.up);
+    const blur  = parseFloat(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);
 
     const matrix = mat4.create();
     const tangent = vec3.create();
@@ -74,15 +74,14 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
 
     const [w, h] = span;
     const [near, far] = depth;
-    mat4.scale(matrix, matrix, [w/2, h/2, far - near]);
+    mat4.scale(matrix, matrix, [w/2, h/2, near - far]);
 
     if (parent) mat4.multiply(matrix, parent, matrix);
 
     mat4.invert(matrix, matrix);
-    matrix[14] -= near / (far - near);
-    mat4.multiply(matrix, REVERSE_Z, matrix);
+    matrix[14] += far / (far - near);
 
-    const shadow = {size, depth, type: 'ortho'};
+    const shadow = {type: 'ortho', size, depth, bias, blur};
     return [matrix, shadow];
   }, [position, normal, shadowMap, parent]);
 

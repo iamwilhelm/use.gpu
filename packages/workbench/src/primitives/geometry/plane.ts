@@ -1,11 +1,19 @@
-import type { MeshData } from '@use-gpu/core';
+import type { Geometry } from '@use-gpu/core';
 import { makeDataEmitter } from '@use-gpu/core';
 
-export const makePlaneGeometry = (
-  width: number = 1,
-  height: number = width,
-  axes: string = 'xy',
-) => {
+type PlaneGeometryProps = {
+  width?: number,
+  height?: number,
+  axes?: string,
+  tile?: [number, number],
+};
+
+export const makePlaneGeometry = ({
+  width = 1,
+  height = width,
+  axes = 'xy',
+  tile = [1, 1],
+}: PlaneGeometryProps = {}): Geometry => {
   const count = 6;
 
   const positions = new Float32Array(count * 4);
@@ -38,7 +46,7 @@ export const makePlaneGeometry = (
     normalEmitter(x, y, z, 0);
 
   const emitUV = (x: number, y: number) =>
-    uvEmitter(x, y, 0, 0);
+    uvEmitter(x * tile[0], y * tile[1], 0, 0);
 
   emitPosition(-1,-1);
   emitPosition(-1, 1);

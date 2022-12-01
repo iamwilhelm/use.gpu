@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TextureSource } from '@use-gpu/core';
-import type { Light } from './types';
+import type { Light, BoundLight } from './types';
 
 import { provide, capture, yeet, signal, makeCapture, useCallback, useCapture, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
 import {
@@ -55,8 +55,8 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     makeIdAllocator(0),
     [],
     new Set<number>,
-    new Map<number, Light>,
-    new Map<number, Light>,
+    new Map<number, BoundLight>,
+    new Map<number, BoundLight>,
     new Uint32Array(1),
   ]);
 
@@ -83,16 +83,24 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     // Update light data in-place
     for (let {id, data} of queue) {
       if (lights.has(id)) {
-        const {shadow, shadowMap, shadowUV, shadowDepth} = lights.get(id);
+        const {shadow} = light;
+        const {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur} = lights.get(id);
         if (shadow) {
-          data = {id, shadowMap, shadowUV, shadowDepth, ...data};
+          data = {id, shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur, ...data};
           maps.set(id, data);
         }
         else if (maps.has(id)) {
           maps.delete(id);
         }
       }
-      lights.set(id, {id, shadowMap: -1, ...data});
+      else if (data.shadow) {
+        data = {id, shadowMap: -1, ...data};
+        lights.set(id, data);
+        maps.set(id, data);
+      }
+      else {
+        lights.set(id, {id, shadowMap: -1, ...data});
+      }
     }
 
     // Check if light / shadow configuration changed
@@ -147,7 +155,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
         const light = lights.get(key);
         const {shadow} = light;
         if (shadow) {
-          const {size: [w, h], depth: [near, far]} = shadow;
+          const {size: [w, h], depth: [near, far], bias, blur} = shadow;
           
           let mapping;
           try {
@@ -160,24 +168,41 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
           }
           const page = atlases.length - 1;
 
+          const nf = 1 / (near - far);
           light.shadowMap = page;
-          light.shadowUV = mapping.map(x => x / 4096);
-          light.shadowDepth = [far, near];
+          light.shadowUV = mapping.map(x => x / SHADOW_PAGE);
+          light.shadowDepth = [far * nf + 1, -far * near * nf];
+          light.shadowBias = bias;
+          light.shadowBlur = blur;
         }
       }
 
       const pages = atlases.length;
 
-      const texture = makeTexture(
-        device,
-        SHADOW_PAGE,
-        SHADOW_PAGE,
-        pages,
-        SHADOW_FORMAT,
-        GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
-        1,
-        1,
-        '2d',
+      const texture = pages ? (
+        makeTexture(
+          device,
+          SHADOW_PAGE,
+          SHADOW_PAGE,
+          pages,
+          SHADOW_FORMAT,
+          GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
+          1,
+          1,
+          '2d',
+        )
+      ) : (
+        makeTexture(
+          device,
+          1,
+          1,
+          1,
+          SHADOW_FORMAT,
+          GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
+          1,
+          1,
+          '2d',
+        )
       );
 
       const source = {

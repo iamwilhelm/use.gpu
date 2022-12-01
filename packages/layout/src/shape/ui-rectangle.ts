@@ -69,8 +69,6 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         minFilter: 'linear',
         magFilter: 'linear',
         ...texture.sampler,
-        addressModeU,
-        addressModeV,
       } : null;
 
       return {...texture, sampler};

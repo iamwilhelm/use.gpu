@@ -22,6 +22,14 @@ declare module "@use-gpu/wgsl/app/vertex/mesh.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/codec/octahedral.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const encodeOctahedral: ParsedBundle;
+  export const decodeOctahedral: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/contour/fit-linear.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -449,6 +457,13 @@ declare module "@use-gpu/wgsl/render/fragment/depth.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/fragment/frag-depth.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/render/fragment/pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -481,6 +496,13 @@ declare module "@use-gpu/wgsl/render/pick.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getPickingID: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/sample/cube-to-omni.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getCubeToOmniSample: ParsedBundle;
   export default __module;
 }
 
@@ -663,9 +685,15 @@ declare module "@use-gpu/wgsl/use/gamma.wgsl" {
 declare module "@use-gpu/wgsl/use/light.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const lightUniforms: ParsedBundle;
   export const getLightCount: ParsedBundle;
   export const getLight: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/use/shadow.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const sampleShadow: ParsedBundle;
   export default __module;
 }
 

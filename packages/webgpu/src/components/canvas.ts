@@ -111,7 +111,6 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps
     colorInput,
     colorStates,
     colorAttachments,
-    depthTexture,
     depthStencilState,
     depthStencilAttachment,
 

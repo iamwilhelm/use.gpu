@@ -23,7 +23,6 @@ export type UseGPURenderContext = {
   colorInput: ColorSpace,
   colorStates: GPUColorTargetState[],
   colorAttachments: GPURenderPassColorAttachment[],
-  depthTexture?: GPUTexture,
   depthStencilState?: GPUDepthStencilState,
   depthStencilAttachment?: GPURenderPassDepthStencilAttachment,
 

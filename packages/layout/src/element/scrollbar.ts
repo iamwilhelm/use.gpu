@@ -91,7 +91,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
       const showThumb = showTrack && f < 1;
 
       const yeets: UIAggregate[] = [];
-      if (false && showTrack) yeets.push({
+      if (showTrack) yeets.push({
         id: id.toString() + '-0',
         rectangle: trackBox,
         bounds: trackBox,
@@ -121,7 +121,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
     };
 
     return {
-      size: into,
+      size: [into[2], into[3]],
       render,
       /*
       pick: (x: number, y: number, l: number, t: number, r: number, b: number, scroll?: boolean) => {

@@ -8,7 +8,7 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { drawCall } from '../../command/draw-call';
 
 import { useDeviceContext } from '../../../providers/device-provider';
-import { usePickingContext } from '../../../providers/picking-provider';
+import { usePassContext } from '../../../providers/pass-provider';
 import { useViewContext } from '../../../providers/view-provider';
 
 import instanceDrawVirtualPicking from '@use-gpu/wgsl/render/vertex/virtual-pick.wgsl';
@@ -34,7 +34,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
   } = props;
 
   const device = useDeviceContext();
-  const {renderContext} = usePickingContext();
+  const {renderContexts: {picking: renderContext}} = usePickingContext();
 
   const {layout: globalLayout} = useViewContext();
 

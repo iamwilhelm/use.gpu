@@ -74,6 +74,16 @@
       "import": "./src/contour/types.wgsl",
       "require": "./src/contour/types.wgsl"
     },
+    "./fragment/aces.wgsl": {
+      "types": "./src/fragment/aces.wgsl.d.ts",
+      "import": "./src/fragment/aces.wgsl",
+      "require": "./src/fragment/aces.wgsl"
+    },
+    "./fragment/gain.wgsl": {
+      "types": "./src/fragment/gain.wgsl.d.ts",
+      "import": "./src/fragment/gain.wgsl",
+      "require": "./src/fragment/gain.wgsl"
+    },
     "./fragment/lod-bias.wgsl": {
       "types": "./src/fragment/lod-bias.wgsl.d.ts",
       "import": "./src/fragment/lod-bias.wgsl",
@@ -133,6 +143,11 @@
       "types": "./src/geometry/trim.wgsl.d.ts",
       "import": "./src/geometry/trim.wgsl",
       "require": "./src/geometry/trim.wgsl"
+    },
+    "./instance/fragment/light.wgsl": {
+      "types": "./src/instance/fragment/light.wgsl.d.ts",
+      "import": "./src/instance/fragment/light.wgsl",
+      "require": "./src/instance/fragment/light.wgsl"
     },
     "./instance/fragment/shaded.wgsl": {
       "types": "./src/instance/fragment/shaded.wgsl.d.ts",
@@ -198,6 +213,11 @@
       "types": "./src/instance/vertex/label.wgsl.d.ts",
       "import": "./src/instance/vertex/label.wgsl",
       "require": "./src/instance/vertex/label.wgsl"
+    },
+    "./instance/vertex/light.wgsl": {
+      "types": "./src/instance/vertex/light.wgsl.d.ts",
+      "import": "./src/instance/vertex/light.wgsl",
+      "require": "./src/instance/vertex/light.wgsl"
     },
     "./instance/vertex/line.wgsl": {
       "types": "./src/instance/vertex/line.wgsl.d.ts",
@@ -334,6 +354,21 @@
       "import": "./src/plot/volume.wgsl",
       "require": "./src/plot/volume.wgsl"
     },
+    "./render/fragment/deferred-light.wgsl": {
+      "types": "./src/render/fragment/deferred-light.wgsl.d.ts",
+      "import": "./src/render/fragment/deferred-light.wgsl",
+      "require": "./src/render/fragment/deferred-light.wgsl"
+    },
+    "./render/fragment/deferred-shaded.wgsl": {
+      "types": "./src/render/fragment/deferred-shaded.wgsl.d.ts",
+      "import": "./src/render/fragment/deferred-shaded.wgsl",
+      "require": "./src/render/fragment/deferred-shaded.wgsl"
+    },
+    "./render/fragment/deferred-solid.wgsl": {
+      "types": "./src/render/fragment/deferred-solid.wgsl.d.ts",
+      "import": "./src/render/fragment/deferred-solid.wgsl",
+      "require": "./src/render/fragment/deferred-solid.wgsl"
+    },
     "./render/fragment/depth.wgsl": {
       "types": "./src/render/fragment/depth.wgsl.d.ts",
       "import": "./src/render/fragment/depth.wgsl",
@@ -378,6 +413,11 @@
       "types": "./src/render/vertex/virtual-depth.wgsl.d.ts",
       "import": "./src/render/vertex/virtual-depth.wgsl",
       "require": "./src/render/vertex/virtual-depth.wgsl"
+    },
+    "./render/vertex/virtual-light.wgsl": {
+      "types": "./src/render/vertex/virtual-light.wgsl.d.ts",
+      "import": "./src/render/vertex/virtual-light.wgsl",
+      "require": "./src/render/vertex/virtual-light.wgsl"
     },
     "./render/vertex/virtual-pick.wgsl": {
       "types": "./src/render/vertex/virtual-pick.wgsl.d.ts",

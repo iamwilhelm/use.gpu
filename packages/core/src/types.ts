@@ -23,11 +23,13 @@ export type UseGPURenderContext = {
   colorInput: ColorSpace,
   colorStates: GPUColorTargetState[],
   colorAttachments: GPURenderPassColorAttachment[],
+  depthTexture?: GPUTexture,
   depthStencilState?: GPUDepthStencilState,
   depthStencilAttachment?: GPURenderPassDepthStencilAttachment,
 
   swap: (view?: GPUTextureView) => void,
   source?: TextureTarget,
+  sources?: TextureTarget[],
 };
 
 export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';
@@ -353,6 +355,7 @@ export type ViewUniforms = {
   projectionMatrix: { current: mat4 },
   projectionViewMatrix: { current: mat4 },
   projectionViewFrustum: { current: vec4[] },
+  inverseProjectionViewMatrix: { current: mat4 },
   viewMatrix: { current: mat4 },
   viewPosition: { current: vec3 | [number, number, number] | number[] },
   viewNearFar: { current: vec2 | [number, number] | number[] },

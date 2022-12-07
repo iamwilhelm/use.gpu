@@ -27,6 +27,7 @@ declare module "@use-gpu/wgsl/codec/octahedral.wgsl" {
   const __module: ParsedBundle;
   export const encodeOctahedral: ParsedBundle;
   export const decodeOctahedral: ParsedBundle;
+  export const wrapOctahedral: ParsedBundle;
   export default __module;
 }
 
@@ -63,6 +64,20 @@ declare module "@use-gpu/wgsl/contour/types.wgsl" {
   const __module: ParsedBundle;
   export const IndirectDrawMetaAtomic: ParsedBundle;
   export const IndirectDrawMeta: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/fragment/aces.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const tonemapACES: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/fragment/gain.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const gainColor: ParsedBundle;
   export default __module;
 }
 
@@ -161,6 +176,13 @@ declare module "@use-gpu/wgsl/geometry/trim.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/fragment/light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLightFragment: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/fragment/shaded.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -249,6 +271,13 @@ declare module "@use-gpu/wgsl/instance/vertex/label.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getLabelVertex: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/instance/vertex/light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getLightVertex: ParsedBundle;
   export default __module;
 }
 
@@ -450,6 +479,27 @@ declare module "@use-gpu/wgsl/plot/volume.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/render/fragment/deferred-light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/fragment/deferred-shaded.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/fragment/deferred-solid.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/render/fragment/depth.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -507,6 +557,13 @@ declare module "@use-gpu/wgsl/render/sample/cube-to-omni.wgsl" {
 }
 
 declare module "@use-gpu/wgsl/render/vertex/virtual-depth.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/vertex/virtual-light.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
@@ -702,6 +759,7 @@ declare module "@use-gpu/wgsl/use/types.wgsl" {
   const __module: ParsedBundle;
   export const Light: ParsedBundle;
   export const PickVertex: ParsedBundle;
+  export const LightVertex: ParsedBundle;
   export const SolidVertex: ParsedBundle;
   export const ShadedVertex: ParsedBundle;
   export const UIVertex: ParsedBundle;
@@ -722,7 +780,8 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const worldToView: ParsedBundle;
   export const viewToClip: ParsedBundle;
   export const worldToClip: ParsedBundle;
-  export const toClip3D: ParsedBundle;
+  export const clipToWorld: ParsedBundle;
+  export const clipToWorld3D: ParsedBundle;
   export const worldToClip3D: ParsedBundle;
   export const clip3DToScreen: ParsedBundle;
   export const screenToClip3D: ParsedBundle;

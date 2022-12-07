@@ -20,12 +20,13 @@ export const makeSphereGeometry = ({
   detail: [detailAxis, detailAround] = [16, 32],
   tile = [1, 1],
 }: SphereGeometryProps = {}): Geometry => {
-  const count = (detailAxis + 1) * (detailAround + 1);
+  const verts = (detailAxis + 1) * (detailAround + 1);
   const tris = detailAxis * detailAround * 2;
+  const count = tris * 3;
 
-  const positions = new Float32Array(count * 4);
-  const normals = new Float32Array(count * 4);
-  const uvs = new Float32Array(count * 4);
+  const positions = new Float32Array(verts * 4);
+  const normals = new Float32Array(verts * 4);
+  const uvs = new Float32Array(verts * 4);
   const indices = new Uint16Array(tris * 3);
 
   const {emit: positionEmitter} = makeDataEmitter(positions, 4);
@@ -34,9 +35,9 @@ export const makeSphereGeometry = ({
   const {emit: indexEmitter} = makeDataEmitter(indices, 1);
 
   const emitPosition = (x: number, y: number, z: number) => {
-    if      (axis === 'x') positionEmitter(z, x, y, 1.0);
-    else if (axis === 'y') positionEmitter(y, z, x, 1.0);
-    else if (axis === 'z') positionEmitter(x, y, z, 1.0);
+    if      (axis === 'x') positionEmitter(z * width / 2, x * height / 2, y * depth / 2, 1.0);
+    else if (axis === 'y') positionEmitter(y * width / 2, z * height / 2, x * depth / 2, 1.0);
+    else if (axis === 'z') positionEmitter(x * width / 2, y * height / 2, z * depth / 2, 1.0);
   };
 
   const emitNormal = (x: number, y: number, z: number) => {

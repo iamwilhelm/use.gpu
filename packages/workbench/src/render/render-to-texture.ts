@@ -2,14 +2,13 @@ import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction } from '@use-
 import type { UseGPURenderContext, ColorSpace, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, fence, quote, yeet, useCallback, useContext, useFiber, useMemo, useOne, useNoContext, incrementVersion } from '@use-gpu/live';
-import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 
 import {
   makeColorState,
   makeColorAttachment,
-  makeRenderableTexture,
+  makeTargetTexture,
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,

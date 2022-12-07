@@ -11,7 +11,7 @@ import {
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../../providers/device-provider';
-import { useRenderContext } from '../../providers/render-provider';
+import { usePassContext } from '../../providers/pass-provider';
 import { useViewContext } from '../../providers/view-provider';
 
 import { useFrustumCuller } from '../../hooks/useFrustumCuller';
@@ -24,7 +24,7 @@ import { drawToPass, reverseZ } from './util';
 
 import { getCubeToOmniSample } from '@use-gpu/wgsl/render/sample/cube-to-omni.wgsl';
 
-import { useShadowBlit } from './shadow-blit';
+import { useDepthBlit } from './depth-blit';
 
 const SAMPLE_BINDINGS = bundleToAttributes(getCubeToOmniSample);
 
@@ -94,8 +94,8 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
 
   const inspect = useInspectable();
 
-  const renderContext = useRenderContext();
   const device = useDeviceContext();
+  const {renderContexts: {depth: renderContext}} = usePassContext();
   const {defs, uniforms: viewUniforms} = useViewContext();
 
   const shadows = toArray(calls['shadow'] as Renderable[]);
@@ -193,7 +193,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   const scaleRef = useShaderRef([width / (width - border * 2), height / (height - border * 2)]);
 
   const getSample = useBoundShader(getCubeToOmniSample, SAMPLE_BINDINGS, [cubeSource, scaleRef]);
-  const blit = useShadowBlit(shadowMapDescriptors[shadowMap], shadowUV, getSample);
+  const blit = useDepthBlit(renderContext, shadowMapDescriptors[shadowMap], shadowUV, SHADOW_PAGE, getSample);
 
   return quote(yeet(() => {
     let vs = 0;

@@ -13,6 +13,9 @@ import { useInspectable } from '../../hooks/useInspectable'
 import { getRenderPassDescriptor, drawToPass } from './util';
 
 export type ColorPassProps = {
+  env: {
+    light?: LightEnv,
+  },
   calls: {
     opaque?: Renderable[],
     transparent?: Renderable[],
@@ -34,6 +37,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     overlay = false,
     merge = false,
     calls,
+    env: {light},
   } = props;
 
   const inspect = useInspectable();
@@ -46,8 +50,6 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
   const opaques      = toArray(calls['opaque']      as Renderable[]);
   const transparents = toArray(calls['transparent'] as Renderable[]);
   const debugs       = toArray(calls['debug']       as Renderable[]);
-
-  const [light]      = toArray(calls['light']       as LightEnv[]);
 
   const bindPass = useOne(() => {
     if (!light || !makeBindPass) return () => {};

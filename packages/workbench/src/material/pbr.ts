@@ -95,7 +95,7 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
 
   const {useMaterial} = useLightContext();
   const applyLights = useMaterial(applyPBRMaterial);
-  const getLight = useBoundShader(getShadedFragment, SHADED_BINDINGS, [applyLights]);
+  const getLight = applyLights ? useBoundShader(getShadedFragment, SHADED_BINDINGS, [applyLights]) : useNoBoundShader();
 
   const getFragment = useBoundShader(getBasicMaterial, BASIC_BINDINGS, [albedo, albedoMap], defines);
 

@@ -9,7 +9,9 @@ import { useMatrixContext } from '../providers/matrix-provider';
 
 import { vec3, vec4 } from 'gl-matrix';
 
-export type HemisphereLightProps = {
+import { DOME_LIGHT } from './types';
+
+export type DomeLightProps = {
   direction?: VectorLike,
   horizon?: ColorLike,
   zenith?: ColorLike,
@@ -17,9 +19,9 @@ export type HemisphereLightProps = {
   bleed?: number,
 };
 
-const DEFAULT_DIRECTION = vec3.fromValues(0, 1, 0);
+const DEFAULT_DIRECTION = vec3.fromValues(0, -1, 0);
 
-export const HemisphereLight = memo((props: HemisphereLightProps) => {
+export const DomeLight = memo((props: DomeLightProps) => {
   
   const direction = useProp(props.direction, parsePosition, DEFAULT_DIRECTION);
   const horizon = useProp(props.horizon, parseColor, [1, 1, 1, 1]);
@@ -39,7 +41,7 @@ export const HemisphereLight = memo((props: HemisphereLightProps) => {
     normal[3] = bleed;
 
     return {
-      kind: 3,
+      kind: DOME_LIGHT,
       normal,
       color: zenith,
       opts: horizon,
@@ -51,4 +53,4 @@ export const HemisphereLight = memo((props: HemisphereLightProps) => {
   useLight(light);
 
   return null;
-}, 'HemisphereLight');
+}, 'DomeLight');

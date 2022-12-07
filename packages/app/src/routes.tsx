@@ -15,6 +15,7 @@ import { MeshInterleavedPage } from './pages/mesh/interleaved';
 import { SceneBasicPage } from './pages/scene/basic';
 import { SceneInstancesPage } from './pages/scene/instances';
 import { SceneShadowPage } from './pages/scene/shadow';
+import { SceneDeferredPage } from './pages/scene/deferred';
 import { PlotCartesianPage } from './pages/plot/cartesian';
 import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
@@ -40,6 +41,7 @@ export const makePages = () => [
   {path: "/scene/basic",           title: "Scene - Basic",                     element: <SceneBasicPage />},
   {path: "/scene/instances",       title: "Scene - Instances",                 element: <SceneInstancesPage />},
   {path: "/scene/shadow",          title: "Scene - Shadow",                    element: <SceneShadowPage />},
+  {path: "/scene/deferred",        title: "Scene - Deferred",                  element: <SceneDeferredPage />},
   {path: "/plot/cartesian",        title: "Plot - XYZ",                        element: <PlotCartesianPage />},
   {path: "/plot/polar",            title: "Plot - Polar",                      element: <PlotPolarPage />},
   {path: "/plot/spherical",        title: "Plot - Spherical",                  element: <PlotSphericalPage />},

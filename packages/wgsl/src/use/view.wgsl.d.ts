@@ -10,7 +10,8 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const worldToView: ParsedBundle;
   export const viewToClip: ParsedBundle;
   export const worldToClip: ParsedBundle;
-  export const toClip3D: ParsedBundle;
+  export const clipToWorld: ParsedBundle;
+  export const clipToWorld3D: ParsedBundle;
   export const worldToClip3D: ParsedBundle;
   export const clip3DToScreen: ParsedBundle;
   export const screenToClip3D: ParsedBundle;

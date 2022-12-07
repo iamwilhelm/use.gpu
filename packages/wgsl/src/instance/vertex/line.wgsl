@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToView, viewToClip, toClip3D, clipLineIntoView, getPerspectiveScale, applyZBias3 };
+use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToView, viewToClip, to3D, clipLineIntoView, getPerspectiveScale, applyZBias3 };
 use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
@@ -155,8 +155,8 @@ fn trimAnchor(
   var clipBeforeV = clipLineIntoView(beforePos, centerPos);
   var clipAfterV  = clipLineIntoView(afterPos, centerPos);
 
-  var before = toClip3D(viewToClip(clipBeforeV));
-  var after  = toClip3D(viewToClip(clipAfterV));
+  var before = to3D(viewToClip(clipBeforeV));
+  var after  = to3D(viewToClip(clipAfterV));
 
   var centerV = worldToView(centerPos);
   var center4 = viewToClip(centerV);
@@ -181,7 +181,7 @@ fn trimAnchor(
     center4 = viewToClip(centerV);
   }
 
-  var center = toClip3D(center4);
+  var center = to3D(center4);
 
   // Lerp between fixed size and full perspective
   var pixelScale = getPerspectiveScale(center4.w, depth);

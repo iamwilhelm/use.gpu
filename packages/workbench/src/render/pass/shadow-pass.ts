@@ -16,8 +16,10 @@ import { ShadowOrthoPass } from './shadow-ortho';
 import { ShadowOmniPass } from './shadow-omni';
 
 export type ShadowPassProps = {
+  env: {
+    light: LightEnv,
+  },
   calls: {
-    light?: LightEnv[],
     shadow?: Renderable[],
   },
 };
@@ -37,15 +39,13 @@ Draws all shadow calls to multiple shadow maps.
 export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<ShadowPassProps>) => {
   const {
     calls,
+    env: {light},
   } = props;
 
   const inspect = useInspectable();
-
   const device = useDeviceContext();
-  const [light] = toArray(calls['light'] as LightEnv[]);
-  if (!light) return;
 
-  const {maps, texture} = light;
+  const {shadows, texture} = light;
 
   const descriptors = useMemo(() => {
     const layers = texture.size[2];
@@ -66,7 +66,7 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   });
 
   const out: LiveElement[] = [];
-  for (const map of maps.values()) {
+  for (const map of shadows.values()) {
     const Component = SHADOW_TYPES[map.shadow.type];
     if (Component) out.push(keyed(Component, map.id, {calls, map, descriptors, texture}));
   }

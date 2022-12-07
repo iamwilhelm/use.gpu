@@ -12,6 +12,10 @@ export const VIEW_UNIFORMS: UniformAttribute[] = [
     format: 'mat4x4<f32>',
   },
   {
+    name: 'inverseProjectionViewMatrix',
+    format: 'mat4x4<f32>',
+  },
+  {
     name: 'viewMatrix',
     format: 'mat4x4<f32>',
   },

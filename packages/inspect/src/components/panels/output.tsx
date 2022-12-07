@@ -215,11 +215,37 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
 
   const colorViews = useOne(() => {
     const out: LiveElement[] = [];
-    if (!color) return out;
 
-    for (const texture of toArray(color)) {
-      out.push(makeView(texture));
+    for (const t of [...toArray(color), ...toArray(depth)]) {
+      const {layout, format} = t;
+
+      if (layout.match(/depth/) || format.match(/depth/)) {
+        if (layout.match(/cube_array/)) {
+          throw new Error("TODO");
+        }
+        else if (layout.match(/cube/)) {
+          let texture = getBoundShader(depthCubeShader, DEPTH_CUBE_BINDINGS, [decodeOctahedral, t]);
+          texture = getLambdaSource(texture, t);
+          out.push(makeView(texture));
+        }
+        else if (layout.match(/array/)) {
+          const [,, depth] = size;
+          for (let i = 0; i < depth; ++i) {
+            let texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, t]);
+            texture = getBoundShader(depthShader, DEPTH_BINDINGS, [texture]);
+            texture = getLambdaSource(texture, t);
+            out.push(makeView(texture));
+          }
+        }
+        else {
+          let texture = getBoundShader(depthShader, DEPTH_BINDINGS, [t]);
+          texture = getLambdaSource(texture, t);
+          out.push(makeView(texture));
+        }
+      }
+      else out.push(makeView(t));
     }
+
     return out;
   }, color);
 
@@ -236,43 +262,10 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
     return out;
   }, picking);
 
-  const depthViews = useOne(() => {
-    const out: LiveElement[] = [];
-    for (let t of toArray(depth)) {
-      const {size, layout} = t;
-      t = {...t, comparison: false, sampler: {}};
-
-      if (layout.match(/cube_array/)) {
-        throw new Error("TODO");
-      }
-      else if (layout.match(/cube/)) {
-        let texture = getBoundShader(depthCubeShader, DEPTH_CUBE_BINDINGS, [decodeOctahedral, t]);
-        texture = getLambdaSource(texture, t);
-        out.push(makeView(texture));
-      }
-      else if (layout.match(/array/)) {
-        const [,, depth] = size;
-        for (let i = 0; i < depth; ++i) {
-          let texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, t]);
-          texture = getBoundShader(depthShader, DEPTH_BINDINGS, [texture]);
-          texture = getLambdaSource(texture, t);
-          out.push(makeView(texture));
-        }
-      }
-      else {
-        texture = getBoundShader(depthShader, DEPTH_BINDINGS, [t]);
-        texture = getLambdaSource(texture, t);
-        out.push(makeView(t));
-      }
-    }
-    return out;
-  }, depth);
-
   const view: LiveElement[] = useMemo(() => [
     ...colorViews,
     ...pickingViews,
-    ...depthViews,
-  ], [colorViews, pickingViews, depthViews]);
+  ], [colorViews, pickingViews]);
 
   return view;
 }, 'TextureViews');

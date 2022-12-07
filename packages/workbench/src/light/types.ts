@@ -2,6 +2,11 @@ import type { VectorLike } from '@use-gpu/traits';
 import type { TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
+export const AMBIENT_LIGHT = 0;
+export const DIRECTIONAL_LIGHT = 1;
+export const POINT_LIGHT = 2;
+export const DOME_LIGHT = 3;
+
 export type Light = {
   into?: TypedArray | number[],
   position?: TypedArray | number[],

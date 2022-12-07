@@ -139,7 +139,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral };
     }
   }
   else if (kind == 3) {
-    // Hemisphere
+    // Dome
     L = normalize(-light.normal.xyz);
     let f = clamp(dot(L, N), 0.0, 1.0);
     let color = mix(light.opts.rgb, light.color.rgb, f);

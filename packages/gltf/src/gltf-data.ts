@@ -6,7 +6,7 @@ import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, use
 
 import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/workbench';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { makeCopyableTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
+import { makeDestinationTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
 
 import { toScene, toNode, toMesh, toMaterial } from './parse';
 import { generateTangents } from 'mikktspace';
@@ -202,7 +202,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             const format = 'rgba8unorm';
             const colorSpace = 'auto';
 
-            const texture = makeCopyableTexture(device, bitmap.width, bitmap.height, format);
+            const texture = makeDestinationTexture(device, bitmap.width, bitmap.height, format);
             uploadExternalTexture(device, texture, bitmap, size);
 
             return {

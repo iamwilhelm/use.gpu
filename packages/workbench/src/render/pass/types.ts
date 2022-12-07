@@ -3,8 +3,10 @@ import type { Light } from '../../lights/types';
 
 export type Culler = (bounds: DataBounds) => number | boolean;
 export type LightEnv = {
-  lights: Light[],
-  maps: Light[],
+  lights: Map<number, BoundLight>,
+  shadows: Map<number, BoundLight>,
+  order: number[],
+  subranges: Map<number, [number, number]>,
   storage: StorageSource,
   texture: TextureSource,
 };
@@ -29,11 +31,14 @@ export type ComputeToPass = (
 export type CommandToBuffer = () => GPUCommandBuffer;
 
 export type AggregatedCalls = {
+  env?: any[],
+
   compute?: ComputeToPass[],
   opaque?: Renderable[],
   transparent?: Renderable[],
   debug?: Renderable[],
   picking?: Renderable[],
+  light?: Renderable[],
   shadow?: Renderable[],
   post?: CommandToBuffer[],
   readback?: ArrowFunction[],

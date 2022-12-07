@@ -6,10 +6,12 @@ import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } f
 import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 
+import { useInspectable } from '../hooks/useInspectable';
+
 import {
   makeColorState,
   makeColorAttachment,
-  makeRenderableTexture,
+  makeTargetTexture,
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
@@ -24,7 +26,6 @@ const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 export type RenderTargetProps = {
   width?: number,
   height?: number,
-  live?: boolean,
   history?: number,
   sampler?: Partial<GPUSamplerDescriptor>,
   format?: GPUTextureFormat,
@@ -48,6 +49,8 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 
+  const inspect = useInspectable();
+
   const {
     resolution = 1,
     width = Math.floor(renderContext.width * resolution),
@@ -68,7 +71,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
   const [renderTexture, resolveTexture, bufferTextures, bufferViews, counter] = useMemo(
     () => {
       const render =
-        makeRenderableTexture(
+        makeTargetTexture(
           device,
           width,
           height,
@@ -77,7 +80,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
         );
 
       const resolve = samples > 1 ?
-        makeRenderableTexture(
+        makeTargetTexture(
           device,
           width,
           height,
@@ -85,7 +88,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
         ) : null;
 
       const buffers = history > 0 ? seq(history).map(() =>
-        makeRenderableTexture(
+        makeTargetTexture(
           device,
           width,
           height,
@@ -182,15 +185,28 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
     ...renderContext,
     width,
     height,
+    samples,
     colorSpace,
     colorInput,
     colorStates,
     colorAttachments,
+    depthTexture,
     depthStencilState,
     depthStencilAttachment,
     swap: source.swap,
     source: source,
   }), [renderContext, width, height, colorStates, colorAttachments, depthStencilState, depthStencilAttachment, source, sources]);
+
+  const inspectable = useMemo(() => [
+    source,
+    ...(sources ?? []),
+  ], [source, sources]);
+
+  inspect({
+    output: {
+      color: inspectable,
+    },
+  });
 
   if (!(render ?? children)) return yeet(rttContext);
 

@@ -71,6 +71,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
     projectionMatrix: { current: null },
     projectionViewMatrix: { current: null },
     projectionViewFrustum: { current: null },
+    inverseProjectionViewMatrix: { current: mat4.create() },
     viewMatrix: { current: null },
     viewPosition: { current: null },
     viewNearFar: { current: null },
@@ -91,9 +92,16 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.viewWorldDepth.current = [focus * Math.tan(fov / 2), 1];
   uniforms.viewPixelRatio.current = pixelRatio * unit;
 
-  const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
+  const {
+    inverseProjectionViewMatrix,
+    projectionMatrix,
+    projectionViewMatrix,
+    projectionViewFrustum,
+    viewMatrix,
+  } = uniforms;
   projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
   projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);
+  mat4.invert(inverseProjectionViewMatrix.current, projectionViewMatrix.current);
 
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);

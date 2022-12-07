@@ -1,3 +1,4 @@
+import type { UseGPURenderContext } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { Renderable } from './types';
 
@@ -17,14 +18,15 @@ import { drawCall } from '../command/draw-call';
 
 const countGeometry = () => {};
 
-export const useShadowBlit = (
+export const useDepthBlit = (
+  renderContext: UseGPURenderContext,
   descriptor: GPURenderPassDescriptor,
-  uv: TypedArray | number[],
+  uv?: TypedArray | number[],
+  scale: number = 1,
 
-  getSample: ShaderSource,
+  getSample: ShaderSource | null = null,
 ) => {
   const device = useDeviceContext();
-  const {renderContexts: {depth: renderContext}} = usePassContext();
 
   const [vertex, fragment] = useOne(() => {
     const vertexShader = bindBundle(instanceDrawVirtualDepth, {getVertex: getFullScreenVertex});
@@ -33,18 +35,23 @@ export const useShadowBlit = (
     return [vertexShader, fragmentShader];
   }, getSample);
 
-  const blitRef = useRef<Renderable>();
+  const blitRef = useRef();
 
   const draw = useCallback((commandEncoder: GPUCommandEncoder) => {
     const passEncoder = commandEncoder.beginRenderPass(descriptor);
 
-    const x = uv[0] * SHADOW_PAGE;
-    const y = uv[1] * SHADOW_PAGE;
-    const w = (uv[2] - uv[0]) * SHADOW_PAGE;
-    const h = (uv[3] - uv[1]) * SHADOW_PAGE;
+    if (uv) {
+      const x = uv[0] * scale;
+      const y = uv[1] * scale;
+      const w = (uv[2] - uv[0]) * scale;
+      const h = (uv[3] - uv[1]) * scale;
 
-    passEncoder.setViewport(x, y, w, h, 0, 1);
-    blitRef.current?.opaque?.draw(passEncoder, countGeometry);
+      passEncoder.setViewport(x, y, w, h, 0, 1);
+    }
+
+    const {current: blit} = blitRef;
+    blit?.draw && blit.draw(passEncoder, countGeometry);
+
     passEncoder.end();
   }, [uv, descriptor]);
 
@@ -54,6 +61,7 @@ export const useShadowBlit = (
     vertex,
     fragment,
     renderContext,
+    mode: null,
   });
 
   return draw;

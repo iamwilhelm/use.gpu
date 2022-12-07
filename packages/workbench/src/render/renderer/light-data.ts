@@ -7,7 +7,7 @@ import {
   makeIdAllocator,
   makeUniformLayout, makeLayoutData, makeLayoutFiller,
   makeStorageBuffer, uploadBuffer, uploadBufferRange,
-  makeAtlas, makeTexture,
+  makeAtlas, makeTexture, seq,
 } from '@use-gpu/core';
 import { mixBits53 } from '@use-gpu/state';
 import { bindBundle, bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
@@ -39,9 +39,10 @@ export type UseLight = (l: Light) => void;
 export type LightDataProps = {
   alloc?: number,
   render?: (
-    storage: StorageSource,
-    texture: TextureSource,
     useLight: (l: Light) => void,
+  ) => LiveElement,
+  then?: (
+    env: LightEnv,
   ) => LiveElement,
 };
 
@@ -49,6 +50,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
   const {
     alloc = 1,
     render,
+    then,
   } = props;
 
   const [ids, queue, changed, lights, maps, count] = useOne(() => [
@@ -82,24 +84,28 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
     // Update light data in-place
     for (let {id, data} of queue) {
+      const {shadow} = data;
+
       if (lights.has(id)) {
-        const {shadow} = light;
-        const {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur} = lights.get(id);
         if (shadow) {
+          const {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur} = lights.get(id);
           data = {id, shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur, ...data};
+          lights.set(id, data);
           maps.set(id, data);
+          continue;
         }
-        else if (maps.has(id)) {
-          maps.delete(id);
+        else {
+          if (maps.has(id)) maps.delete(id);
         }
       }
-      else if (data.shadow) {
-        data = {id, shadowMap: -1, ...data};
+      
+      data = {id, shadowMap: -1, ...data};
+      if (shadow) {
         lights.set(id, data);
         maps.set(id, data);
       }
       else {
-        lights.set(id, {id, shadowMap: -1, ...data});
+        lights.set(id, data);
       }
     }
 
@@ -222,14 +228,30 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     let needsRefresh = prevDataRef.current !== data;
     prevDataRef.current = data;
 
-    // Compact light IDs into contiguous indices
-    const indices = useOne(() => {
+    // Compact light IDs into contiguous indices, ordered by light kind,
+    // and calculate subranges by kind.
+    const [indices, order, subranges] = useOne(() => {
       needsRefresh = true;
 
+      const keys = [...lights.keys()];
+      const order = seq(keys.length);
+      const kinds = keys.map(k => lights.get(k).kind);
+      order.sort((a, b) => kinds[a] - kinds[b]);
+
       const map = new Map<number, number>();
-      let i = 0;
-      for (const key of lights.keys()) map.set(key, i++);
-      return map;
+      const subranges = new Map<number, [number, number]>();
+
+      let j = 0;
+      for (const i of order) {
+        map.set(keys[i], j);
+
+        const kind = kinds[i];
+        if (!subranges.has(kind)) subranges.set(kind, [j, j + 1]);
+        else subranges.get(kind)[1] = j + 1;
+
+        ++j;
+      }
+      return [map, order, subranges];
     }, lightKey);
 
     // Order changed lights by index
@@ -270,18 +292,22 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     queue.length = 0;
     changed.clear();
 
-    const env = useMemo(() => yeet({
-      light: {
+    const ret = useMemo(() => {
+      const env = {
         lights,
-        maps,
+        shadows: maps,
         storage,
         texture,
-      },
-    }), [storage, texture]);
+
+        order,
+        subranges,
+      };
+      return then ? then(env) : yeet(env);
+    }, [storage, texture, order, subranges, then]);
 
     return [
       signal(),
-      env,
+      ret,
     ];
   };
 

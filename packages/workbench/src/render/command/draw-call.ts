@@ -24,7 +24,7 @@ import mapValues from 'lodash/mapValues';
 
 export type DrawCallProps = {
   pipeline: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode | string,
+  mode?: RenderPassMode | string | null,
 
   vertexCount?: Lazy<number>,
   instanceCount?: Lazy<number>,
@@ -41,6 +41,9 @@ export type DrawCallProps = {
   globalUniforms?: Record<string, Lazy<any>>,
 
   renderContext: UseGPURenderContext,
+
+  shouldDispatch?: () => boolean | number | undefined,
+  onDispatch?: () => void,
 
   defines?: Record<string, any>,
 };
@@ -83,6 +86,9 @@ export const drawCall = (props: DrawCallProps) => {
     globalUniforms,
 
     renderContext,
+
+    shouldDispatch,
+    onDispatch,
 
     pipeline: propPipeline,
     defines: propDefines,
@@ -163,13 +169,16 @@ export const drawCall = (props: DrawCallProps) => {
   });
   
   const isStrip = topology === 'triangle-strip';
-
   const isVolatileGlobal = typeof uniform?.bindGroup === 'function';
 
-  const draw = (
+  let dispatchVersion: number | null = null;
+
+  const inner = (
     passEncoder: GPURenderPassEncoder,
     countGeometry: (v: number, t: number) => void,
   ) => {
+    onDispatch && onDispatch();
+
     const v = resolve(vertexCount || 0);
     const i = resolve(instanceCount || 0);
 
@@ -205,7 +214,21 @@ export const drawCall = (props: DrawCallProps) => {
     else passEncoder.draw(v, i, 0, 0);
   };
 
-  return {[mode]: {draw, bounds}};
+  let draw = inner;
+  if (shouldDispatch) {
+    draw = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
+      const d = shouldDispatch();
+      if (d === false) return;
+      if (typeof d === 'number') {
+        if (dispatchVersion === d) return;
+        dispatchVersion = d;
+      }
+      
+      return inner(passEncoder, countDispatch);
+    };
+  }
+
+  return mode ? {[mode]: {draw, bounds}} : {draw};
 };
 
 //setShaderLog(100);

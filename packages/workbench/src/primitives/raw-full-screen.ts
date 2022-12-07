@@ -22,6 +22,7 @@ import { getTextureColor } from '@use-gpu/wgsl/mask/textured.wgsl';
 
 export type RawFullScreenProps = {
   texture?: TextureSource | LambdaSource | ShaderModule,
+  filter?: ShaderModule,
 
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode,
@@ -58,7 +59,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
 
   const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
-  const t = useNativeColorTexture(props.texture);
+  const t = useNativeColorTexture(props.texture, props.filter);
 
   const getVertex = getFullScreenVertex;
   const getPicking = usePickingShader({id});

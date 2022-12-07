@@ -10,6 +10,8 @@ import { useMatrixContext } from '../providers/matrix-provider';
 
 import { mat4, vec3, vec4 } from 'gl-matrix';
 
+import { DIRECTIONAL_LIGHT } from './types';
+
 export type DirectionalLightProps = {
   position?: VectorLike,
   direction?: VectorLike,
@@ -98,7 +100,7 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
     }
 
     return {
-      kind: 1,
+      kind: DIRECTIONAL_LIGHT,
       into,
       position: p ?? position,
       normal: n ?? normal,

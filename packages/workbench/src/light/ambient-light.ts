@@ -5,6 +5,10 @@ import { parseColor, parseNumber, useProp } from '@use-gpu/traits';
 import { memo, useMemo } from '@use-gpu/live';
 import { useLightContext } from '../providers/light-provider';
 
+import { AMBIENT_LIGHT } from './types';
+
+const WHITE = [1, 1, 1, 1];
+
 export type AmbientLightProps = {
   color?: ColorLike,
   intensity?: number,
@@ -12,11 +16,11 @@ export type AmbientLightProps = {
 
 export const AmbientLight = memo((props: AmbientLightProps) => {
   
-  const color = useProp(props.color, parseColor);
+  const color = useProp(props.color, parseColor, WHITE);
   const intensity = useProp(props.intensity, parseNumber, 1);
 
   const light = useMemo(() => ({
-    kind: 0,
+    kind: AMBIENT_LIGHT,
     color,
     intensity,
   }), [color, intensity]);

@@ -358,7 +358,7 @@ export const updateFiber = <F extends ArrowFunction>(
     if (!yeeted) throw new Error("Yeet without aggregator in " + formatNode(fiber));
 
     const value = call?.arg !== undefined ? call!.arg : call!.args?.[0];
-    if (fiber.yeeted!.value !== value) {
+    if (value === undefined || (fiber.yeeted!.value !== value)) {
       bustFiberYeet(fiber);
       visitYeetRoot(fiber);
 

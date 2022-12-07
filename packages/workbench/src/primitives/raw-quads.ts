@@ -17,6 +17,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
+import { useRenderContext } from '../providers/render-provider';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedColor } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -102,12 +103,14 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const vertexCount = 4;
   const instanceCount = useDataLength(count, props.positions);
 
+  const {samples} = useRenderContext();
+
   const pipeline = useMemo(() =>
-    patch(alphaToCoverage
+    patch(alphaToCoverage && (samples > 1)
       ? PIPELINE_ALPHA_TO_COVERAGE
       : PIPELINE_ALPHA,
     propPipeline),
-    [propPipeline, alphaToCoverage]);
+    [propPipeline, samples, alphaToCoverage]);
 
   const p = useShaderRef(props.position, props.positions);
   const r = useShaderRef(props.rectangle, props.rectangles);

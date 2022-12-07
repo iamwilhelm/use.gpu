@@ -9,7 +9,7 @@ import {
   CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
-  AmbientLight, DirectionalLight, PointLight, HemisphereLight,
+  AmbientLight, DirectionalLight, PointLight, DomeLight,
   Loop, Animate,
 } from '@use-gpu/workbench';
 
@@ -61,7 +61,7 @@ export const GeometryGLTFPage: LC = () => {
             </Animate>
         
             <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
-            <HemisphereLight intensity={0.5} />
+            <DomeLight intensity={0.5} />
           
             <Scene>
               <Node position={[0, -0.1, 0]}>

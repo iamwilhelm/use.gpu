@@ -3,7 +3,7 @@ import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
 import { use, yeet, gather, memo, useOne, useMemo, useContext } from '@use-gpu/live';
-import { makeCopyableTexture, makeTextureView, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
+import { makeDestinationTexture, makeTextureView, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
 import { Fetch } from './fetch';
 
 export type ImageTextureProps = {
@@ -70,7 +70,7 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
         mip ? countMips(width, height) : 1
       );
 
-      const texture = makeCopyableTexture(device, width, height, format, 1, mips);
+      const texture = makeDestinationTexture(device, width, height, format, 1, mips);
       uploadExternalTexture(device, texture, bitmap, size);
 
       const source = {

@@ -3,6 +3,7 @@ export * from './command/dispatch';
 export * from './command/draw-call';
 export * from './compute';
 export * from './draw';
+export * from './gbuffer';
 export * from './linear-rgb';
 export * from './loop';
 export * from './pass';

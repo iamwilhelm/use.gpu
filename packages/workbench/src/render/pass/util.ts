@@ -9,7 +9,7 @@ export const getRenderPassDescriptor = (
 ) => {
   let {colorAttachments, depthStencilAttachment} = renderContext;
 
-  if (overlay || merge) {
+  if (overlay) {
     colorAttachments = colorAttachments.map(a => proxy(a, {loadOp: 'load'}));
   }
   if (merge && depthStencilAttachment) {
@@ -18,7 +18,7 @@ export const getRenderPassDescriptor = (
 
     if (depthLoadOp) override.depthLoadOp = 'load';
     if (stencilLoadOp) override.stencilLoadOp = 'load';
-    depthStencilAttachment = proxy(a, override);
+    depthStencilAttachment = proxy(depthStencilAttachment, override);
   }
 
   const renderPassDescriptor: GPURenderPassDescriptor = {
@@ -35,7 +35,14 @@ export const getDrawOrder = (cull: Culler, calls: Renderable[], sign: number = 1
   const depths = [];
 
   for (const {draw, bounds} of calls) {
-    const depth = bounds ? cull(resolve(bounds)) : true;
+    let depth;
+    if (bounds) {
+      const {center, radius} = resolve(bounds);
+      depth = cull(center, radius);
+    }
+    else {
+      depth = true;
+    }
     depths.push(depth);
     
     if (depth !== false) order.push(i);

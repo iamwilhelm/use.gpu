@@ -3,7 +3,7 @@ import type { StorageTarget, TextureTarget } from '@use-gpu/core';
 
 import { use, yeet, memo, provide, multiGather, useContext, useMemo } from '@use-gpu/live';
 import { DeviceContext } from '../providers/device-provider';
-import { ComputeContext, useComputeContext, useNoComputeContext } from '../providers/compute-provider';
+import { ComputeContext } from '../providers/compute-provider';
 import { useInspectable } from '../hooks/useInspectable'
 import { Await } from './await';
 

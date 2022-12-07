@@ -1,6 +1,7 @@
 struct ViewUniforms {
   projectionMatrix: mat4x4<f32>,
   projectionViewMatrix: mat4x4<f32>,
+  inverseProjectionViewMatrix: mat4x4<f32>,
   viewMatrix: mat4x4<f32>,
   viewPosition: vec4<f32>,
   viewNearFar: vec2<f32>,
@@ -17,8 +18,8 @@ struct ViewUniforms {
 @export fn getViewSize() -> vec2<f32> { return viewUniforms.viewSize; }
 @export fn getViewNearFar() -> vec2<f32> { return viewUniforms.viewNearFar; }
 
-@export fn to3D(position: vec4<f32>) -> vec4<f32> {
-  return vec4<f32>(position.xyz, 1.0);
+@export fn to3D(position: vec4<f32>) -> vec3<f32> {
+  return position.xyz / position.w;
 }
 
 @export fn worldToView(position: vec4<f32>) -> vec4<f32> {
@@ -30,15 +31,19 @@ struct ViewUniforms {
 }
 
 @export fn worldToClip(position: vec4<f32>) -> vec4<f32> {
-  return viewToClip(worldToView(position));
+  return viewUniforms.projectionViewMatrix * position;
 }
 
-@export fn toClip3D(position: vec4<f32>) -> vec3<f32> {
-  return position.xyz / position.w;
+@export fn clipToWorld(position: vec4<f32>) -> vec4<f32> {
+  return viewUniforms.inverseProjectionViewMatrix * position;
+}
+
+@export fn clipToWorld3D(position: vec4<f32>) -> vec4<f32> {
+  return to3D(clipToWorld(position));
 }
 
 @export fn worldToClip3D(position: vec4<f32>) -> vec3<f32> {
-  return toClip3D(worldToClip(position));
+  return to3D(worldToClip(position));
 }
 
 @export fn clip3DToScreen(position: vec3<f32>) -> vec2<f32> {

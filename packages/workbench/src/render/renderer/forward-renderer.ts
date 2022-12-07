@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { DataBounds, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { AggregatedCalls } from './pass/types';
+import type { AggregatedCalls, LightEnv } from './pass/types';
 import type { UseLight } from './light-data';
 
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
@@ -40,6 +40,8 @@ import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wg
 
 const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
 const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
+
+const NO_ENV: Record<string, any> = {};
 
 const getLightCount = bindEntryPoint(lightUniforms, 'getLightCount');
 const getLight = bindEntryPoint(lightUniforms, 'getLight');
@@ -98,7 +100,6 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
 
   const renderContext = useRenderContext();
   const pickingContext = picking ? usePickingContext() : useNoPickingContext();
-  const {gpuContext} = renderContext;
 
   const context = useMemo(() => {
 
@@ -159,7 +160,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
           const {id, mode, renderer, links, defines} = virtual;
 
           const variants = [];
-          if (shadows && mode !== 'shadow' && defines?.HAS_SHADOW) {
+          if (shadows && mode === 'opaque' && defines?.HAS_SHADOW) {
             variants.push('shadow');
           }
           if (picking && mode !== 'picking' && links?.getPicking) {
@@ -175,14 +176,19 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
     return {useVariants, renderContexts, layout, bind};
-  }, [lights, shadows, picking, device, gpuContext, pickingContext]);
+  }, [lights, shadows, picking, device, renderContext, pickingContext]);
 
   // Pass aggregrated calls to pass runners
   const Resume = (
     calls: AggregatedCalls,
   ) =>
     useMemo(() => {
-      const props = {calls};
+      const env = (calls.env ?? []).reduce((env, data) => {
+        for (let k in data) env[k] = data[k];
+        return env;
+      }, {});
+
+      const props = {calls, env};
 
       if (overlay) props.overlay = true;
       if (merge) props.merge = true;
@@ -198,7 +204,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
         calls.post || calls.readback ? use(ReadbackPass, props) : null,
         picking && calls.picking ? use(PickingPass, props) : null,
       ];
-    }, [context, calls, passes, overlay, merge]);
+    }, [calls, passes, overlay, merge]);
 
   // Provide forward-lit material
   const view = lights ? use(LightData, {
@@ -222,6 +228,8 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
 
       return provide(LightContext, context, children);
     },
+    then: (light: LightEnv) => 
+      yeet({ env: { light }}),
   }) : children;
 
   return provide(PassContext, context, multiGather(view, Resume));

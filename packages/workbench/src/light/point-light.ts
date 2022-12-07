@@ -9,6 +9,8 @@ import { useMatrixContext } from '../providers/matrix-provider';
 
 import { mat4, vec3, vec4 } from 'gl-matrix';
 
+import { POINT_LIGHT } from './types';
+
 export type PointLightProps = {
   position?: VectorLike,
   color?: ColorLike,
@@ -57,7 +59,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
     p[3] = 1;
 
     return {
-      kind: 2,
+      kind: POINT_LIGHT,
       into,
       position: p,
       color,

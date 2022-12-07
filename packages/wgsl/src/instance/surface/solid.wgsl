@@ -20,8 +20,8 @@ use '@use-gpu/wgsl/use/types'::{ SurfaceFragment };
   return SurfaceFragment(
     position,
     normal,
-    albedo,
     vec4<f32>(0.0),
+    albedo,
     vec4<f32>(0.0, 0.0, 0.0, 1.0),
     1.0,
     0.0,

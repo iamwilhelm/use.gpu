@@ -82,6 +82,7 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     projectionMatrix: { current: null },
     projectionViewMatrix: { current: null },
     projectionViewFrustum: { current: null },
+    inverseProjectionViewMatrix: { current: mat4.create() },
     viewMatrix: { current: mat4.create() },
     viewPosition: { current: null },
     viewNearFar: { current: null },
@@ -112,9 +113,16 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   uniforms.viewWorldDepth.current = [focus * viewHeight / 2.0, viewHeight / (far - near) / 2.0];
   uniforms.viewPixelRatio.current = ratio;
 
-  const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
+  const {
+    inverseProjectionViewMatrix,
+    projectionMatrix,
+    projectionViewMatrix,
+    projectionViewFrustum,
+    viewMatrix,
+  } = uniforms;
   projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
   projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);
+  mat4.invert(inverseProjectionViewMatrix.current, projectionViewMatrix.current);
 
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);

@@ -2,12 +2,22 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext, TextureSource, ColorSpace } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
-import { gather, use, useOne } from '@use-gpu/live';
+import { gather, use, useMemo } from '@use-gpu/live';
+import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
+
 import { Draw } from './draw';
 import { Pass } from './pass';
 import { RenderTarget } from './render-target';
 import { RenderToTexture } from './render-to-texture';
 import { RawFullScreen } from '../primitives';
+
+import { useBoundShader } from '../hooks/useBoundShader';
+import { useShaderRef } from '../hooks/useShaderRef';
+
+import { gainColor } from '@use-gpu/wgsl/fragment/gain.wgsl';
+import { tonemapACES } from '@use-gpu/wgsl/fragment/aces.wgsl';
+
+const GAIN_BINDINGS = bundleToAttributes(gainColor);
 
 export type LinearRGBProps = {
   width?: number,
@@ -15,12 +25,14 @@ export type LinearRGBProps = {
   live?: boolean,
   history?: number,
   sampler?: Partial<GPUSamplerDescriptor>,
-  //format?: GPUTextureFormat,
+
   depthStencil?: GPUTextureFormat | null,
   backgroundColor?: GPUColor,
-  //colorSpace?: ColorSpace,
+
   colorInput?: ColorSpace,
   samples?: number,
+  tonemap?: 'aces' | 'linear',
+  gain?: number,
 
   children?: LiveElement,
   then?: (texture: TextureSource) => LiveElement,
@@ -28,8 +40,15 @@ export type LinearRGBProps = {
 
 /** Sets up a Linear RGB render target and automatically renders it to the screen as sRGB. */
 export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => {
-  const {then, children, ...rest} = props;
-  
+  const {
+    tonemap = 'linear',
+    exposure = 'fixed',
+    gain = 1,
+    then,
+    children,
+    ...rest
+  } = props;
+
   return gather(
     use(RenderTarget, {
       ...rest,
@@ -43,7 +62,11 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
         then: (texture: TextureSource) => {
           const {then} = props;
 
-          const view = useOne(() =>
+          const g = useShaderRef(gain);
+          let filter = useBoundShader(gainColor, GAIN_BINDINGS, [g]);
+          if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
+
+          const view = useMemo(() =>
             use(Draw, {
               children:
                 use(Pass, {
@@ -51,10 +74,11 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
                   children:
                     use(RawFullScreen, {
                       texture,
+                      filter,
                     }),
                 }),
             }),
-            texture
+            [texture, filter]
           );
 
           return then ? [view, then(texture)] : view;

@@ -1,5 +1,6 @@
 @export struct Light {
   into: mat4x4<f32>,
+
   position: vec4<f32>,
   normal: vec4<f32>,
   color: vec4<f32>,
@@ -20,6 +21,12 @@
 @export struct PickVertex {
   position: vec4<f32>,
   scissor: vec4<f32>,
+  index: u32,
+};
+
+@export struct LightVertex {
+  position: vec4<f32>,
+  color: vec4<f32>,
   index: u32,
 };
 

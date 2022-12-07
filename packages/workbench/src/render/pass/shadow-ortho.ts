@@ -10,6 +10,7 @@ import {
 } from '@use-gpu/core';
 
 import { useDeviceContext } from '../../providers/device-provider';
+import { usePassContext } from '../../providers/pass-provider';
 import { useViewContext } from '../../providers/view-provider';
 
 import { useFrustumCuller } from '../../hooks/useFrustumCuller'
@@ -18,7 +19,7 @@ import { useInspectable } from '../../hooks/useInspectable'
 import { SHADOW_FORMAT, SHADOW_PAGE } from '../renderer/light-data';
 import { drawToPass } from './util';
 
-import { useShadowBlit } from './shadow-blit';
+import { useDepthBlit } from './depth-blit';
 
 export type ShadowOrthoPassProps = {
   calls: {
@@ -47,6 +48,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   const inspect = useInspectable();
 
   const device = useDeviceContext();
+  const {renderContexts: {depth: renderContext}} = usePassContext();
   const {defs, uniforms: viewUniforms} = useViewContext();
 
   const shadows = toArray(calls['shadow'] as Renderable[]);
@@ -91,7 +93,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   uniforms.viewWorldDepth.current = [1, 1];
   uniforms.viewPixelRatio.current = 1;
 
-  const clear = useShadowBlit(descriptors[shadowMap], shadowUV);
+  const clear = useDepthBlit(renderContext, descriptors[shadowMap], shadowUV, SHADOW_PAGE);
 
   const draw = quote(yeet(() => {
     let vs = 0;
@@ -131,9 +133,6 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     device.queue.submit([command]);
 
     inspect({
-      output: {
-        depth: texture,
-      },
       render: {
         vertices: vs,
         triangles: ts,

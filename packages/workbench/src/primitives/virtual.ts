@@ -20,7 +20,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     }
     return variants.map(component => use(component, props));
   }
-  else {
+  else if (variants) {
     const component = variants;
     return component(props);
   }

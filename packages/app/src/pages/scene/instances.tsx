@@ -6,8 +6,8 @@ import {
   Loop, Draw, Pass, Flat, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
-  Pick, Cursor, FaceLayer,
-  PointLight,
+  Pick, Cursor,
+  PointLight, AmbientLight,
 
   makeBoxGeometry,
 } from '@use-gpu/workbench';
@@ -51,12 +51,13 @@ export const SceneInstancesPage: LC = (props) => {
         mesh,
         texture,
       ]) => (
-        <LinearRGB>
+        <LinearRGB tonemap="aces">
           <Loop>
             <Draw>
               <Cursor cursor='move' />
               <Camera>
                 <Pass lights>
+                  <AmbientLight intensity={0.2} />
                   <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
                   <Scene>

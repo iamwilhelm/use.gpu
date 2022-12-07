@@ -1,6 +1,6 @@
 use '@use-gpu/wgsl/use/types'::{ UIVertex };
 use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
-use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, toClip3D, getViewResolution, getViewSize }; 
+use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolution, getViewSize }; 
 
 @optional @link fn getRectangle(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 @optional @link fn getRadius(i: u32)    -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
@@ -91,7 +91,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, toClip3D, getViewRes
 
   var center4  = worldToClip(applyTransform(position));
 
-  var center  = toClip3D(center4);
+  var center  = to3D(center4);
   var centerX = worldToClip3D(applyTransform(posFlipX));
   var centerY = worldToClip3D(applyTransform(posFlipY));
 

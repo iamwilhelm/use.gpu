@@ -619,6 +619,20 @@ declare module "@use-gpu/wgsl/render/wireframe/wireframe-strip.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/shadow/directional.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const applyDirectionalShadow: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/shadow/point.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const applyPointShadow: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/transform/cartesian.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;

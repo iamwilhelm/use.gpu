@@ -454,6 +454,16 @@
       "import": "./src/render/wireframe/wireframe-strip.wgsl",
       "require": "./src/render/wireframe/wireframe-strip.wgsl"
     },
+    "./shadow/directional.wgsl": {
+      "types": "./src/shadow/directional.wgsl.d.ts",
+      "import": "./src/shadow/directional.wgsl",
+      "require": "./src/shadow/directional.wgsl"
+    },
+    "./shadow/point.wgsl": {
+      "types": "./src/shadow/point.wgsl.d.ts",
+      "import": "./src/shadow/point.wgsl",
+      "require": "./src/shadow/point.wgsl"
+    },
     "./transform/cartesian.wgsl": {
       "types": "./src/transform/cartesian.wgsl.d.ts",
       "import": "./src/transform/cartesian.wgsl",

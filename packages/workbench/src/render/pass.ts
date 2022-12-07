@@ -3,8 +3,8 @@ import type { UseGPURenderContext } from '@use-gpu/core';
 
 import { use, gather, memo } from '@use-gpu/live';
 
-import { ForwardRenderer } from './renderer/forward-renderer';
-import { DeferredRenderer } from './renderer/deferred-renderer';
+import { ForwardRenderer } from './forward-renderer';
+import { DeferredRenderer } from './deferred-renderer';
 import { GBuffer } from './gbuffer';
 
 export type PassProps = {

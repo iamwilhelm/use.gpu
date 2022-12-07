@@ -45,7 +45,7 @@ export const MeshInterleavedPage: LC = (props) => {
           <Cursor cursor='move' />
           <Camera>
             <Pass lights>
-              <PointLight position={[-2.5, 3, 2, 1]} intensity={8} />
+              <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
               <Pick
                 render={({id, hovered, presses}) =>

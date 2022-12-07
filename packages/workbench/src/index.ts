@@ -1,5 +1,6 @@
 export * from './animate';
 export * from './camera';
+export * from './compute';
 export * from './data';
 export * from './hooks';
 export * from './layers';
@@ -8,6 +9,7 @@ export * from './interact';
 export * from './material';
 export * from './primitives';
 export * from './providers';
+export * from './queue';
 export * from './raw';
 export * from './render';
 export * from './router';

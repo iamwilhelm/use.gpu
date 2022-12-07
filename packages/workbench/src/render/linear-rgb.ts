@@ -5,7 +5,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import { gather, use, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 
-import { Draw } from './draw';
+import { Draw } from '../queue/draw';
 import { Pass } from './pass';
 import { RenderTarget } from './render-target';
 import { RenderToTexture } from './render-to-texture';

@@ -33,8 +33,9 @@ import { DeferredSolidRender } from './deferred/solid';
 import { LightRender } from './light/light';
 import { LightData, SHADOW_FORMAT, SHADOW_PAGE } from './light/light-data';
 
-import { DeferredPass } from '../pass/deferred-pass';
 import { ComputePass } from '../pass/compute-pass';
+import { DeferredPass } from '../pass/deferred-pass';
+import { DispatchPass } from '../pass/dispatch-pass';
 import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
@@ -192,6 +193,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
       }
       
       return [
+        calls.dispatch ? use(DispatchPass, props) : null,
         calls.compute ? use(ComputePass, props) : null,
         shadows && calls.shadow ? use(ShadowPass, props) : null,
         use(DeferredPass, props),

@@ -26,6 +26,7 @@ import { UIRender } from './forward/ui';
 
 import { ColorPass } from '../pass/color-pass';
 import { ComputePass } from '../pass/compute-pass';
+import { DispatchPass } from '../pass/dispatch-pass';
 import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
@@ -200,6 +201,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       }
       
       return [
+        calls.dispatch ? use(DispatchPass, props) : null,
         calls.compute ? use(ComputePass, props) : null,
         shadows && calls.shadow ? use(ShadowPass, props) : null,
         use(ColorPass, props),

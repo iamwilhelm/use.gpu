@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { ComputeToPass } from '../pass';
 
-import { use, quote, yeet, memo, multiGather, useContext, useMemo } from '@use-gpu/live';
+import { quote, yeet, memo } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
 import { useInspectable } from '../hooks/useInspectable'
 

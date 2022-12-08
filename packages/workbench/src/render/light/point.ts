@@ -119,7 +119,7 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   }, [lights, getInstance, getOutside, getInside, instances, outsides, insides]);
 
   return [
-    yeet({'compute': onDispatch}),
+    yeet({'dispatch': onDispatch}),
     stencil ? use(LightDraw, sphere.count, instanceCountRef, 0, stencilLinks, STENCIL_PIPELINE, 'stencil') : null,
     use(LightDraw,
       sphere.count, outsideCountRef, 0, outsideLinks,

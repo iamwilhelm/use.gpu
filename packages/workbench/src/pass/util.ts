@@ -4,9 +4,11 @@ import { mat4, vec3 } from 'gl-matrix';
 
 export const getRenderPassDescriptor = (
   renderContext: UseGPURenderContext,
-  overlay?: boolean,
-  merge?: boolean,
-  stencil?: boolean,
+  {overlay, merge, stencil}: {
+    overlay?: boolean,
+    merge?: boolean,
+    stencil?: boolean,
+  }
 ) => {
   let {colorAttachments, depthStencilAttachment} = renderContext;
 
@@ -21,8 +23,9 @@ export const getRenderPassDescriptor = (
     const {depthLoadOp, stencilLoadOp} = depthStencilAttachment;
     const override: Record<string, any> = {};
 
-    if (depthLoadOp) override.depthLoadOp = 'load';
+    if (depthLoadOp) override.depthLoadOp = merge || stencil ? 'load' : 'clear';
     if (stencilLoadOp) override.stencilLoadOp = stencil ? 'clear' : 'load';
+
     depthStencilAttachment = proxy(depthStencilAttachment, override);
   }
 

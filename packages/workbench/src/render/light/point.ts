@@ -16,6 +16,7 @@ import { useDeviceContext } from '../../providers/device-provider';
 import { useViewContext } from '../../providers/view-provider';
 
 import { makeSphereGeometry } from '../../primitives/geometry/sphere';
+import { forMeshTriangles } from '../../primitives/geometry/util';
 
 import { getLightVertex } from '@use-gpu/wgsl/instance/vertex/light.wgsl';
 import { getLightFragment } from '@use-gpu/wgsl/instance/fragment/light.wgsl';
@@ -48,7 +49,18 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   const device = useDeviceContext();
   const {cull, uniforms: viewUniforms} = useViewContext();
 
-  const sphere = useOne(() => makeSphereGeometry({ width: 2, detail: [4, 8] }));
+  const sphere = useOne(() => makeSphereGeometry({ width: 2, detail: [6, 12] }));
+  const getScale = useOne(() => {
+    let l = Infinity;
+    forMeshTriangles(sphere, (a: vec3, b: vec3, c: vec3) => {
+      vec3.add(a, a, b);
+      vec3.add(a, a, c);
+      vec3.scale(a, a, 1/3);
+      l = Math.min(l, vec3.length(a));
+    });
+    return 1 / l;
+  });
+
   const getPosition = useRawSource(sphere.attributes.positions, 'vec4<f32>');
   const getIndex = useRawSource(sphere.attributes.indices, 'u16');
 
@@ -61,12 +73,13 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   const getOutside = useRawSource(outsides, 'u16');
   const getInside = useRawSource(insides, 'u16');
 
-  const getOutsideVertex = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getOutside, getPosition, getIndex], GEOMETRY_DEFS);
-  const getInsideVertex  = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
+  const getInstanceVertex = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getInstance, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getOutsideVertex  = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getOutside, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getInsideVertex   = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
 
   const getFragment = useBoundShader(getLightFragment, FRAGMENT_BINDINGS, [...gbuffer, getLight, applyLight]);
 
-  const stencilLinks = useMemo(() => ({getVertex: getOutsideVertex}), [getOutsideVertex, getFragment]);
+  const stencilLinks = useMemo(() => ({getVertex: getInstanceVertex}), [getInstanceVertex, getFragment]);
   const outsideLinks = useMemo(() => ({getVertex: getOutsideVertex, getFragment}), [getOutsideVertex, getFragment]);
   const insideLinks  = useMemo(() => ({getVertex: getInsideVertex,  getFragment}), [getInsideVertex,  getFragment]);
 
@@ -85,7 +98,8 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
     for (let i = start; i < end; ++i) {
       const light = lights.get(order[i]);
       const {position, intensity, cutoff} = light;
-      const radius = Math.sqrt(intensity * 3.1415 / cutoff);
+      const radius = Math.sqrt(intensity * 3.1415 / cutoff) * getScale;
+
       if (cull(position, radius)) {
         vec3.sub(v3, position, viewPosition);
 

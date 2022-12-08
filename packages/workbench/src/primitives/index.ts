@@ -2,6 +2,7 @@ export * from './geometry/arrow';
 export * from './geometry/box';
 export * from './geometry/plane';
 export * from './geometry/sphere';
+export * from './geometry/util';
 
 export * from './raw-arrows';
 export * from './raw-faces';

@@ -7,6 +7,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @optional @link fn getInstance(index: u32) -> u32 { return index; };
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0); };
 @optional @link fn getIndex(index: u32) -> u32 { return index; };
+@optional @link fn getScale() -> f32 { return 1.0; };
 
 @export fn getLightVertex(vertexIndex: u32, instanceIndex: u32) -> LightVertex {
   let NaN: f32 = bitcast<f32>(0xffffffffu);
@@ -25,7 +26,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     var world: vec4<f32>;
     if (light.kind == 3) {
       let sphere = getPosition(getIndex(vertexIndex));
-      let scale = sqrt(light.intensity * 3.1415 / light.cutoff);
+      let scale = sqrt(light.intensity * 3.1415 / light.cutoff) * getScale();
       world = vec4<f32>(light.position.xyz + sphere.xyz * scale, 1.0);
     }
 

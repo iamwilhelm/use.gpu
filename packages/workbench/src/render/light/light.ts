@@ -85,7 +85,7 @@ export const GEOMETRY_PIPELINE = {
     cullMode: 'back',
   },
   depthStencil: {
-    depthCompare: 'greater',
+    depthCompare: 'greater-equal',
     depthWriteEnabled: false,
   },
   fragment: {
@@ -102,11 +102,11 @@ export const STENCIL_PIPELINE = {
     cullMode: 'front',
   },
   depthStencil: {
-    depthCompare: 'always',
+    depthCompare: 'less',
     depthWriteEnabled: false,
     stencilBack: {
-      compare: "never",
-      passOp: "increment-clamp",
+      compare: 'always',
+      passOp: 'increment-clamp',
     },
   },
   fragment: $delete(),
@@ -120,7 +120,7 @@ export const FULLSCREEN_STENCIL_PIPELINE = {
     depthCompare: 'always',
     depthWriteEnabled: false,
     stencilFront: {
-      compare: 'greater',
+      compare: 'less',
     },
   },
   fragment: {
@@ -140,7 +140,7 @@ export const GEOMETRY_STENCIL_PIPELINE = {
     depthCompare: 'greater',
     depthWriteEnabled: false,
     stencilFront: {
-      compare: 'greater',
+      compare: 'less',
     },
   },
   fragment: {
@@ -176,9 +176,9 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
   } = props;
 
   const {renderContexts: {gbuffer}} = usePassContext();
-  const {sources} = gbuffer;
+  const {depthStencilState, sources} = gbuffer;
 
-  const stencil = !!sources[4].format.match(/stencil/);
+  const stencil = !!depthStencilState.format.match(/stencil/);
 
   const applyLight = useOne(() => {
     const applyDirectionalShadow = shadows ? bindBundle(applyDirectionalShadowWGSL, {sampleShadow}) : null;

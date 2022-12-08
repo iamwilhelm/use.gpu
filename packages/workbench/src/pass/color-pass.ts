@@ -58,7 +58,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
   }, light);
 
   const renderPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(renderContext, overlay, merge),
+    getRenderPassDescriptor(renderContext, {overlay, merge}),
     [renderContext, overlay, merge]);
 
   return quote(yeet(() => {

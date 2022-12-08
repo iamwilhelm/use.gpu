@@ -67,16 +67,24 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
   }, light);
 
   const deferredPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(gbuffer, false, merge),
+    getRenderPassDescriptor(gbuffer, {
+      overlay: false,
+      merge,
+    }),
     [gbuffer, merge]);
 
   const stencilPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(gbuffer, true, true, true),
-    [gbuffer, merge]);
+    getRenderPassDescriptor(renderContext, {
+      stencil: true,
+    }),
+    [renderContext]);
 
   const renderPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(renderContext, overlay, true),
-    [renderContext, overlay, merge]);
+    getRenderPassDescriptor(renderContext, {
+      overlay,
+      merge: true,
+    }),
+    [renderContext, overlay]);
   
   return quote(yeet(() => {
     let vs = 0;
@@ -100,17 +108,6 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       [width, height, 1]
     );
 
-    {
-      const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-      bindGlobal(passEncoder);
-      bindPass(passEncoder);
-
-      drawToPass(cull, lights, passEncoder, countGeometry);
-      drawToPass(cull, transparents, passEncoder, countGeometry, -1);
-      drawToPass(cull, debugs, passEncoder, countGeometry);
-      passEncoder.end();
-    }
-
     if (stencils.length) {
       const passEncoder = commandEncoder.beginRenderPass(stencilPassDescriptor);
       bindGlobal(passEncoder);
@@ -120,7 +117,6 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       passEncoder.end();
     }
 
-    /*
     {
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
       bindGlobal(passEncoder);
@@ -131,7 +127,6 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       drawToPass(cull, debugs, passEncoder, countGeometry);
       passEncoder.end();
     }
-    */
 
     const command = commandEncoder.finish();
     device.queue.submit([command]);

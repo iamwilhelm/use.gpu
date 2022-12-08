@@ -25,22 +25,23 @@ use '@use-gpu/wgsl/use/types'::{ Light, SurfaceFragment };
 ) -> vec3<f32> {
   var L: vec3<f32>;
 
-  var radiance = vec3<f32>(light.intensity);
+  var intensity: f32 = light.intensity * 3.1415;
+  var radiance: vec3<f32>;
 
   let kind = light.kind;
   if (kind == 0) {
     // Ambient
-    radiance *= light.color.rgb;
-    return radiance * surface.occlusion * surface.albedo.rgb;
+    return (surface.occlusion * light.intensity) * surface.albedo.rgb * light.color.rgb;
   }
   else if (kind == 1) {
     // Directional
     L = normalize(-light.normal.xyz);
-    radiance *= light.color.rgb * 3.1415;
 
     if (light.shadowMap >= 0) {
-      radiance *= applyDirectionalShadow(light, surface);
+      intensity *= applyDirectionalShadow(light, surface);
     }
+
+    radiance = light.color.rgb * intensity;
   }
   else if (kind == 2) {
     // Dome
@@ -49,17 +50,23 @@ use '@use-gpu/wgsl/use/types'::{ Light, SurfaceFragment };
     let color = mix(light.opts.rgb, light.color.rgb, f);
     let bleed = light.normal.w;
     if (bleed > 0.0) { L = mix(L, N, bleed); };
-    radiance *= color * 3.1415;
+
+    radiance = color * intensity;
   }
   else if (kind == 3) {
     // Point
     let d = light.position.xyz - surface.position.xyz;
     L = normalize(d);
-    radiance /= dot(d, d);
-    radiance *= light.color.rgb * 3.1415;
 
-    if (light.shadowMap >= 0) {
-      radiance *= applyPointShadow(light, surface);
+    var r = intensity / dot(d, d) - light.cutoff;
+    if (r > 0.0) {
+      if (light.shadowMap >= 0) {
+        r *= applyPointShadow(light, surface);
+      }
+      radiance = light.color.rgb * r;
+    }
+    else {
+      return vec3<f32>(0.0);
     }
   }
   else {

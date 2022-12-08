@@ -126,7 +126,7 @@ const stencilShader = wgsl`
     let iuv = vec2<i32>(uv * getSize());
     let stencil = getStencil(iuv, 0).x;
 
-    let a = (f32(stencil) / 255.0) % 1.0;
+    let a = (f32(stencil) / 256.0) % 1.0;
     let b = (f32(stencil) / 64.0) % 1.0;
     let c = (f32(stencil) / 16.0) % 1.0;
     return sqrt(vec4<f32>(a, c, b, 1.0));
@@ -220,8 +220,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
 
   const makeView = (texture: TextureSource | LambdaSource) => {
     const {size: [w, h]} = texture;
-    const width = w > h ? 512 : w/h * 512;
-    const height = w > h ? h/w * 512 : 512;
+    const width = w > h ? 512 : Math.round(w/h * 512);
+    const height = w > h ? Math.round(h/w * 512) : 512;
 
     return (
       use(Block, {
@@ -248,43 +248,47 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
     const out: LiveElement[] = [];
 
     for (let t of [...toArray(color), ...toArray(depth)]) {
-      const {layout, format, size} = t;
+      const {layout, format, size, aspect = 'all'} = t;
 
       if (layout.match(/depth/) || format.match(/depth/)) {
         t = {...t, comparison: false, sampler: {}, aspect: 'depth-only'};
 
-        if (layout.match(/cube_array/)) {
-          throw new Error("TODO");
-        }
-        else if (layout.match(/cube/)) {
-          let texture = getBoundShader(depthCubeShader, DEPTH_CUBE_BINDINGS, [decodeOctahedral, t]);
-          texture = getLambdaSource(texture, t);
-          texture.format = t.format;
-          texture.layout = t.layout;
-          out.push(makeView(texture));
-        }
-        else if (layout.match(/array/)) {
-          const [,, depth] = size;
-          for (let i = 0; i < depth; ++i) {
-            let texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, t]);
-            texture = getBoundShader(depthShader, DEPTH_BINDINGS, [texture]);
+        if (aspect !== 'stencil-only') {
+          if (layout.match(/cube_array/)) {
+            throw new Error("TODO");
+          }
+          else if (layout.match(/cube/)) {
+            let texture = getBoundShader(depthCubeShader, DEPTH_CUBE_BINDINGS, [decodeOctahedral, t]);
+            texture = getLambdaSource(texture, t);
+            texture.format = t.format;
+            texture.layout = t.layout;
+            out.push(makeView(texture));
+          }
+          else if (layout.match(/array/)) {
+            const [,, depth] = size;
+            for (let i = 0; i < depth; ++i) {
+              let texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, t]);
+              texture = getBoundShader(depthShader, DEPTH_BINDINGS, [texture]);
+              texture = getLambdaSource(texture, t);
+              texture.format = t.format;
+              texture.layout = t.layout;
+              out.push(makeView(texture));
+            }
+          }
+          else {
+            let texture = getBoundShader(depthShader, DEPTH_BINDINGS, [t]);
             texture = getLambdaSource(texture, t);
             texture.format = t.format;
             texture.layout = t.layout;
             out.push(makeView(texture));
           }
         }
-        else {
-          let texture = getBoundShader(depthShader, DEPTH_BINDINGS, [t]);
-          texture = getLambdaSource(texture, t);
-          texture.format = t.format;
-          texture.layout = t.layout;
-          out.push(makeView(texture));
-        }
       }
-      else out.push(makeView(t));
+      else {
+        out.push(makeView(t));
+      }
 
-      if (format.match(/stencil/)) {
+      if (format.match(/stencil/) && aspect !== 'depth-only') {
         t = {
           ...t,
           sampler: undefined,

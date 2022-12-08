@@ -1,5 +1,5 @@
 import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { UseGPURenderContext, ColorSpace, TextureTarget } from '@use-gpu/core';
+import type { UseGPURenderContext, ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, gather, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
@@ -130,7 +130,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
     [device, width, height, depthStencil, samples]
   );
 
-  const [source, sources] = useMemo(() => {
+  const [source, sources, depth] = useMemo(() => {
     const view = targetTexture.createView();
     const size = [width, height] as [number, number];
     const volatile = history ? history + 1 : 0;
@@ -177,8 +177,17 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
     source.history = sources;
     source.swap = swap;
 
-    return [source, sources];
-  }, [targetTexture, width, height, format, history, sampler]);
+    const depth = depthStencil ? {
+      texture: depthTexture,
+      sampler: {},
+      layout: 'texture_depth_2d',
+      format: depthStencil,
+      size,
+      version: 0,
+    } as TextureSource : null;
+
+    return [source, sources, depth];
+  }, [targetTexture, depthTexture, width, height, format, history, sampler, depthStencil]);
 
   const rttContext = useMemo(() => ({
     ...renderContext,
@@ -199,7 +208,8 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
   const inspectable = useMemo(() => [
     source,
     ...(sources ?? []),
-  ], [source, sources]);
+    ...(depth ? [depth] : []),
+  ], [source, sources, depth]);
 
   inspect({
     output: {

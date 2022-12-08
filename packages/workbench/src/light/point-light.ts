@@ -31,7 +31,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
   const position = useProp(props.position, parsePosition);
   const color = useProp(props.color, parseColor);
   const intensity = useProp(props.intensity, parseNumber, 1);
-  const cutoff = Math.sqrt(useProp(props.cutoff, parseNumber, 1/64));
+  const cutoff = Math.pow(useProp(props.cutoff, parseNumber, 0.01), 1/2.2);
 
   const {shadowMap} = props;
   const parent = useMatrixContext();

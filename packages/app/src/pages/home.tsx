@@ -26,9 +26,9 @@ const PANEL_STYLE = {
   left: '50%',
   top: '50%',
   width: '400px',
-  height: '500px',
+  height: '600px',
   marginLeft: '-200px',
-  marginTop: '-250px',
+  marginTop: '-300px',
   background: 'rgba(0, 0, 0, .75)',
   zIndex: 1,
 };

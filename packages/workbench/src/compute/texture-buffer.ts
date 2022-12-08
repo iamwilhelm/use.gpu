@@ -7,10 +7,7 @@ import { RenderContext } from '../providers/render-provider';
 import { DeviceContext } from '../providers/device-provider';
 import { ComputeContext } from '../providers/compute-provider';
 
-import {
-  makeStorageTexture,
-  makeTextureView,
-} from '@use-gpu/core';
+import { makeStorageTexture } from '@use-gpu/core';
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
@@ -73,7 +70,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props) => {
       ) : null;
       if (buffers) buffers.push(buffer);      
 
-      const views = buffers ? buffers.map(b => makeTextureView(b)) : undefined;
+      const views = buffers ? buffers.map(b => b.createView()) : undefined;
 
       const counter = { current: 0 };
 
@@ -85,7 +82,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props) => {
   const targetTexture = bufferTexture;
 
   const [source, sources] = useMemo(() => {
-    const view = makeTextureView(targetTexture);
+    const view = targetTexture.createView();
     const size = [width, height] as [number, number];
     const volatile = history ? history + 1 : 0;
     const layout = 'texture_2d<f32>';

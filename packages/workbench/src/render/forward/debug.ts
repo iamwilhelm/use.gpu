@@ -63,7 +63,7 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     const v = bindBundle(vertexShader, links, undefined);
     const f = fragmentShader;
     return [v, f, vertexCount, instanceCount, wireframeCommand, wireframeIndirect];
-  }, [vertexShader, fragmentShader, gV]);
+  }, [device, vertexShader, fragmentShader, gV]);
 
   if (defines.HAS_SCISSOR == null) {
     defines = {

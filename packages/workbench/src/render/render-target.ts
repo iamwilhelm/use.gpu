@@ -15,7 +15,6 @@ import {
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
-  makeTextureView,
   BLEND_PREMULTIPLIED,
 } from '@use-gpu/core';
 
@@ -97,7 +96,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
       ) : null;
       if (buffers) buffers.push(resolve ?? render);      
 
-      const views = buffers ? buffers.map(b => makeTextureView(b)) : undefined;
+      const views = buffers ? buffers.map(b => b.createView()) : undefined;
 
       const counter = { current: 0 };
 
@@ -132,7 +131,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
   );
 
   const [source, sources] = useMemo(() => {
-    const view = makeTextureView(targetTexture);
+    const view = targetTexture.createView();
     const size = [width, height] as [number, number];
     const volatile = history ? history + 1 : 0;
     const layout = 'texture_2d<f32>';

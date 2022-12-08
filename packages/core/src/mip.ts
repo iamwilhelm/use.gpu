@@ -4,7 +4,7 @@ import { makeVertexAttributeLayout } from './attribute';
 import { makeColorAttachment, makeColorState } from './color';
 import { makeVertexBuffer } from './buffer';
 import { makeRenderPipeline, makeShaderModuleDescriptor } from './pipeline';
-import { makeTextureBinding, makeTextureView, makeSampler } from './texture';
+import { makeTextureBinding, makeSampler } from './texture';
 import { seq } from './tuple';
 
 const MIP_SHADER = `
@@ -85,7 +85,7 @@ export const updateMipTextureChain = (
     magFilter: 'linear',
   });
 
-  const views = seq(mips).map((mip: number) => makeTextureView(texture, 1, mip));
+  const views = seq(mips).map((mip: number) => texture.createView({mipLevelCount: 1, baseMipLevel: mip}));
   
   const renderPassDescriptors = seq(mips).map(i => ({
     colorAttachments: [makeColorAttachment(views[i], null, NO_CLEAR, 'load')],

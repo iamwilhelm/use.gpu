@@ -13,7 +13,7 @@ import { ExpandState, SelectState, HoverState, Action } from './types';
 import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
 
-import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard } from './svg';
+import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
 
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
@@ -131,6 +131,11 @@ export const FiberLegend: React.FC = () => {
       <TreeLegendItem>
         <IconItem gap={-5} top={-2}><SVGHighlightElement /></IconItem>
         <span>Highlight</span>
+      </TreeLegendItem>
+
+      <TreeLegendItem>
+        <IconItem gap={-5} top={-2}><SVGViewOutput /></IconItem>
+        <span>Output</span>
       </TreeLegendItem>
 
       <TreeLegendItem>

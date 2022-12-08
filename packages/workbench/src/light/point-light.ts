@@ -15,6 +15,7 @@ export type PointLightProps = {
   position?: VectorLike,
   color?: ColorLike,
   intensity?: number,
+  cutoff?: number,
 };
 
 const DEFAULT_SHADOW_MAP = {
@@ -30,6 +31,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
   const position = useProp(props.position, parsePosition);
   const color = useProp(props.color, parseColor);
   const intensity = useProp(props.intensity, parseNumber, 1);
+  const cutoff = Math.sqrt(useProp(props.cutoff, parseNumber, 1/64));
 
   const {shadowMap} = props;
   const parent = useMatrixContext();
@@ -63,6 +65,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
       into,
       position: p,
       color,
+      cutoff,
       intensity,
       shadow,
     };

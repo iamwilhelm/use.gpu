@@ -1,6 +1,6 @@
 import type { Atlas, TextureSource } from './types';
 
-import { makeTextureDataLayout, makeMippableTexture, makeTextureView, uploadTexture } from './texture';
+import { makeTextureDataLayout, makeMippableTexture, uploadTexture } from './texture';
 import uniq from 'lodash/uniq';
 
 type Rectangle = [number, number, number, number];
@@ -25,7 +25,7 @@ export const makeAtlasSource = (
   const texture = makeMippableTexture(device, atlas.width, atlas.height, 1, format, 1, mips);
   const source = {
     texture,
-    view: makeTextureView(texture, mips),
+    view: texture.createView({mipLevelCount: mips}),
     sampler: {
       minFilter: 'linear',
       magFilter: 'linear',

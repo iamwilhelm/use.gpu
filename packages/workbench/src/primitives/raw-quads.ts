@@ -139,7 +139,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const getFragment = useBoundShader(getMaskedColor, FRAGMENT_BINDINGS, [m, t]);
 
   const defines = useOne(() => (
-    patch(alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {HAS_SCISSOR: !!scissor})
+    patch(alphaToCoverage && (samples > 1) ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA, {HAS_SCISSOR: !!scissor})
   ), scissor);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),

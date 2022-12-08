@@ -144,6 +144,11 @@
       "import": "./src/geometry/trim.wgsl",
       "require": "./src/geometry/trim.wgsl"
     },
+    "./instance/fragment/emissive.wgsl": {
+      "types": "./src/instance/fragment/emissive.wgsl.d.ts",
+      "import": "./src/instance/fragment/emissive.wgsl",
+      "require": "./src/instance/fragment/emissive.wgsl"
+    },
     "./instance/fragment/light.wgsl": {
       "types": "./src/instance/fragment/light.wgsl.d.ts",
       "import": "./src/instance/fragment/light.wgsl",

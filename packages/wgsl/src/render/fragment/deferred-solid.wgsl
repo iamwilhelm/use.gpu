@@ -32,7 +32,7 @@ fn main(
   }
 
   return GBufferSample(
-    vec4<f32>(0.0, 0.0, 0.0, 1.0),
+    vec4<f32>(0.0),
     vec4<f32>(encodeOctahedral(vec3<f32>(0.0, 0.0, -1.0)), 0.0, 0.0),
     vec4<f32>(0.0),
     vec4<f32>(outColor.rgb, 1.0),

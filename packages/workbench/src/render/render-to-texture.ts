@@ -12,7 +12,6 @@ import {
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
-  makeTextureView,
   BLEND_PREMULTIPLIED,
 } from '@use-gpu/core';
 

@@ -4,7 +4,7 @@ import type { TypedArray, DataTexture, TextureSource } from '@use-gpu/core';
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { yeet, signal, memo, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
-import { makeSampler, makeRawTexture, makeTextureView, uploadDataTexture } from '@use-gpu/core';
+import { makeSampler, makeRawTexture, uploadDataTexture } from '@use-gpu/core';
 
 export type RawTextureProps = {
   /** Texture data */
@@ -46,7 +46,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
     const texture = makeRawTexture(device, data);
     const source = {
       texture,
-      view: makeTextureView(texture),
+      view: texture.createView(),
       sampler: {
         minFilter: 'nearest',
         magFilter: 'nearest',

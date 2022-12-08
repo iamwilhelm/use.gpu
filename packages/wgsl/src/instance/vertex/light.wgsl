@@ -5,27 +5,31 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @link fn getLight(i: u32) -> Light;
 
 @optional @link fn getInstance(index: u32) -> u32 { return index; };
-@optional @link fn getPosition(i: u32) -> vec4<f32>;
+@optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0); };
 @optional @link fn getIndex(index: u32) -> u32 { return index; };
 
 @export fn getLightVertex(vertexIndex: u32, instanceIndex: u32) -> LightVertex {
   let NaN: f32 = bitcast<f32>(0xffffffffu);
 
-  var vertex: vec4<f32>;
-  if (IS_FULLSCREEN) {
-    var uv = getQuadUV(vertexIndex);
-    var xy = uv * 2.0 - 1.0;
-    vertex = vec4<f32>(xy.x * 2.0 + 1.0, -(xy.y * 2.0 + 1.0), 0.0001, 1.0);
-  } else {
-    vertex = getPosition(getIndex(vertexIndex));
-  }
-
   let instance = getInstance(instanceIndex);
-  let light = getLight(instance);
 
-  let scale = light.intensity * 0.1;
-  let world = vec4<f32>(light.position.xyz + vertex.xyz * scale, 1.0);
-  let position = worldToClip(world);
+  if (IS_FULLSCREEN) {
+    let uv = getQuadUV(vertexIndex);
+    let xy = uv * 2.0 - 1.0;
+    let vertex = vec4<f32>(xy * 2.0 + 1.0, 0.5, 1.0);
 
-  return LightVertex(position, light.color, instance);
+    return LightVertex(vertex, instance);
+  } else {
+    let light = getLight(instance);
+
+    var world: vec4<f32>;
+    if (light.kind == 2) {
+      let sphere = getPosition(getIndex(vertexIndex));
+      let scale = sqrt(light.intensity * 3.1415 / light.cutoff);
+      world = vec4<f32>(light.position.xyz + sphere.xyz * scale, 1.0);
+    }
+
+    let position = worldToClip(world);
+    return LightVertex(position, instance);
+  }
 }

@@ -261,3 +261,18 @@ export const SVGHighlightElement = ({color = '#fff', title = "", size = 16}) => 
   </div>
 );
 
+export const SVGViewOutput = ({color = '#fff', title = "", size = 16}) => (
+  <div title={title} style={{display: 'inline-block', width: size, height: 0}}>
+    <svg version="1.1" id="Layer_1" x="0px" y="0px"
+      style={{fill: 'currentColor'}}
+      viewBox="0 0 16 16"
+      height={size}
+    >
+    <g>
+      <path d="M8,12.2c-3.7,0-6.9-2.3-6.9-4.2c0-1.9,3.1-4.2,6.9-4.2c3.7,0,6.9,2.3,6.9,4.2C14.9,9.9,11.7,12.2,8,12.2z M8,5.2
+      	C4.9,5.2,2.5,7.1,2.5,8c0,0.8,2.4,2.8,5.5,2.8c3.2,0,5.5-2,5.5-2.8C13.5,7.2,11.2,5.2,8,5.2z"/>
+      <circle cx="8" cy="8" r="2.7"/>
+    </g>
+    </svg>
+  </div>
+);

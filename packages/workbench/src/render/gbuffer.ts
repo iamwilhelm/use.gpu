@@ -49,14 +49,15 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
     1,
   )), [device, width, height, formats]);
 
-  const colorStates = useOne(() => formats.slice(0, 3).map(format => makeColorState(format)), formats);
-  const colorAttachments = useOne(() => renderTextures.slice(0, 3).map(texture => makeColorAttachment(texture, null)), renderTextures);
+  const colorStates = useOne(() => formats.slice(0, 4).map(format => makeColorState(format)), formats);
+  const colorAttachments = useOne(() => renderTextures.slice(0, 4).map(texture => makeColorAttachment(texture, null)), renderTextures);
 
   const sources = useMemo(() => {
     const makeSource = (texture: GPUTexture, i: number) => ({
       texture,
       sampler: {},
       layout: formats[i].match(/depth/) ? 'texture_depth_2d' : 'texture_2d<f32>',
+      aspect: formats[i].match(/depth/) ? 'depth-only' : 'all',
       format: formats[i],
       colorSpace: 'linear',
       size: [width, height],

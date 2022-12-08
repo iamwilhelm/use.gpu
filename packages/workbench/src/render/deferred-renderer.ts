@@ -7,7 +7,7 @@ import type { UseLight } from './light-data';
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne, useRef } from '@use-gpu/live';
 import { bindBundle, bundleToAttributes, bindEntryPoint, getBundleKey } from '@use-gpu/shader/wgsl';
 import {
-  makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState, makeTextureView,
+  makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState,
   makeColorState, makeTargetTexture,
 } from '@use-gpu/core';
 
@@ -23,6 +23,8 @@ import { Await } from '../queue/await';
 import { DebugRender } from './forward/debug';
 import { DepthRender } from './forward/depth';
 import { PickingRender } from './forward/picking';
+import { ShadedRender } from './forward/shaded';
+import { SolidRender } from './forward/solid';
 import { UIRender } from './forward/ui';
 
 import { DeferredShadedRender } from './deferred/shaded';
@@ -39,7 +41,7 @@ import { ShadowPass } from '../pass/shadow-pass';
 
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,
-  renders: Record<string, LiveComponent<any>>,
+  renders: Record<string, Record<string, LiveComponent<any>>>,
 };
 
 export type DeferredRendererProps = {
@@ -62,8 +64,8 @@ const getComponents = ({modes = {}, renders = {}}: RenderComponents) => {
       ...modes,
     },
     renders: {
-      solid: DeferredSolidRender,
-      shaded: DeferredShadedRender,
+      solid: {opaque: DeferredSolidRender, transparent: SolidRender},
+      shaded: {opaque: DeferredShadedRender, transparent: ShadedRender},
       ui: null,
       ...renders,
     }
@@ -143,7 +145,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
     const components = getComponents(props.components ?? {});
 
     const getRender = (mode, render = null) =>
-      components.modes[mode] ?? components.renders[render];
+      components.modes[mode] ?? components.renders[render][mode];
 
     const getVariants = (!shadows && !picking && !passes)
        ? (virtual, hovered) => hovered ? [getRender(HOVERED_VARIANT)] : getRender(virtual.mode, virtual.renderer)
@@ -175,7 +177,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
     calls: AggregatedCalls,
   ) =>
     useMemo(() => {
-      const env = calls.env.reduce((env, data) => {
+      const env = (calls.env ?? []).reduce((env, data) => {
         for (let k in data) env[k] = data[k];
         return env;
       }, {});

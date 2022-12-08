@@ -11,18 +11,6 @@ export const makeSampler = (
   descriptor?: Partial<GPUSamplerDescriptor>,
 ) => device.createSampler(descriptor);
 
-export const makeTextureView = (
-  texture: GPUTexture,
-  mipLevelCount: number = 1,
-  baseMipLevel: number = 0,
-  dimension: GPUTextureDimension = '2d',
-) =>
-  texture.createView({
-    mipLevelCount,
-    baseMipLevel,
-    dimension,
-  });
-
 export const makeTexture = (
   device: GPUDevice,
   width: number,
@@ -245,7 +233,7 @@ export const resizeTextureSource = (
   return {
     ...source,
     texture: newTexture,
-    view: makeTextureView(newTexture, ms),
+    view: newTexture.createView({mipLevelCount: ms}),
     size: [width, height, depth] as [number, number, number],
     version: 1,
   };
@@ -258,7 +246,7 @@ export const makeTextureBinding = (
   sampler: GPUSampler,
   set: number = 0,
 ): GPUBindGroup => {
-  const view = (texture instanceof GPUTexture) ? makeTextureView(texture) : texture;
+  const view = (texture instanceof GPUTexture) ? texture.createView() : texture;
 
   const entries = [
     {binding: 0, resource: view},
@@ -293,7 +281,7 @@ export const makeTextureEntries = (
   const entries = [] as any[];
 
   for (const [sampler, texture] of textures) {
-    const view = (texture instanceof GPUTexture) ? makeTextureView(texture) : texture;
+    const view = (texture instanceof GPUTexture) ? texture.createView() : texture;
 
     entries.push({binding, resource: view});
     binding++;

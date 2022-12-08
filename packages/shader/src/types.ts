@@ -131,6 +131,7 @@ export type TextureSource = {
   comparison?: boolean,
   volatile?: number,
   colorSpace?: ColorSpace,
+  aspect?: GPUTextureAspect,
 };
 
 export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;

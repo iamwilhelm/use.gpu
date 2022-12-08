@@ -4,7 +4,7 @@ import type { VirtualDraw } from '../pass';
 import type { BoundLight } from '../../light/types';
 
 import { memo, use, yeet, keyed, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
-import { resolve, uploadBuffer } from '@use-gpu/core';
+import { resolve, uploadBuffer, BLEND_ADDITIVE } from '@use-gpu/core';
 import { bindBundle, bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { drawCall } from '../../queue/draw-call';
@@ -19,8 +19,11 @@ import { usePassContext } from '../../providers/pass-provider';
 
 import { makeSphereGeometry } from '../../primitives/geometry/sphere';
 
-import { POINT_LIGHT } from '../../light/types';
+import { AMBIENT_LIGHT, DIRECTIONAL_LIGHT, POINT_LIGHT, DOME_LIGHT } from '../../light/types';
 import { SHADOW_PAGE } from './light-data';
+
+import { EmissiveLightRender } from './emissive';
+import { FullscreenLightRender } from './fullscreen';
 import { PointLightRender } from './point';
 
 import lightUniforms from '@use-gpu/wgsl/use/light.wgsl';
@@ -60,6 +63,23 @@ export type LightKindProps = {
   applyLight: ShaderModule,
 };
 
+export const FULLSCREEN_PIPELINE = {
+  primitive: {
+    cullMode: 'none',
+  },
+  depthStencil: {
+    depthCompare: 'always',
+    depthWriteEnabled: false,
+  },
+  fragment: {
+    targets: {
+      0: {
+        blend: BLEND_ADDITIVE,
+      },
+    },
+  },
+};
+
 export const GEOMETRY_PIPELINE = {
   primitive: {
     cullMode: 'front',
@@ -68,15 +88,29 @@ export const GEOMETRY_PIPELINE = {
     depthCompare: 'less',
     depthWriteEnabled: false,
   },
+  fragment: {
+    targets: {
+      0: {
+        blend: BLEND_ADDITIVE,
+      },
+    },
+  },
+};
+
+export const FULLSCREEN_DEFS = {
+  IS_FULLSCREEN: true,
 };
 
 export const GEOMETRY_DEFS = {
   IS_FULLSCREEN: false,
 };
 
-export const FULLSCREEN_DEFS = {
-  IS_FULLSCREEN: true,
-};
+const LIGHT_RENDERERS = {
+  [AMBIENT_LIGHT]: FullscreenLightRender,
+  [DIRECTIONAL_LIGHT]: FullscreenLightRender,
+  [POINT_LIGHT]: PointLightRender,
+  [DOME_LIGHT]: FullscreenLightRender,
+} as Record<number, LiveComponent>;
 
 export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRenderProps) => {
   let {
@@ -100,16 +134,23 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
     }, {SHADOW_PAGE});
   }, shadows);
 
-  return [...subranges.keys()].map(kind => {
+  const out = [...subranges.keys()].map(kind => {
     const [start, end] = subranges.get(kind);
-    if (kind === POINT_LIGHT) return keyed(PointLightRender, kind, {lights, shadows, order, start, end, gbuffer: sources, getLight, applyLight});
-    return null;
+    const props = {lights, order, start, end, gbuffer: sources, getLight, applyLight};
+
+    const Component = LIGHT_RENDERERS[kind];
+    return Component ? keyed(Component, kind, props) : null;
   });
+
+  out.push(keyed(EmissiveLightRender, -1, {gbuffer: sources, getLight}));
+
+  return out;
 }, 'LightRender');
 
 export const useLightRender = (
   vertexCount: Lazy<number>,
   instanceCount: Lazy<number>,
+  firstInstance: Lazy<number>,
   links: Record<string, ShaderModule>,
   pipeline?: Partial<GPURenderPipelineDescriptor>,
   onDispatch?: () => void,
@@ -134,6 +175,7 @@ export const useLightRender = (
   return drawCall({
     vertexCount,
     instanceCount,
+    firstInstance,
 
     vertex: v,
     fragment: f,

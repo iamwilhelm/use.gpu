@@ -7,7 +7,7 @@ import { styled, keyframes } from "@stitches/react";
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
 import { usePingContext } from './ping';
 import { Muted } from './layout';
-import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard } from './svg';
+import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
 
 type NodeProps = {
   fiber: LiveFiber<any>,
@@ -50,14 +50,17 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   const quote = type === QUOTE || type === SIGNAL;
   const yeet = type === YEET;
   const react = !!__inspect?.react;
+  const output = !!__inspect?.output;
+  const layout = !!__inspect?.layout;
 
   const suffix1 = yeet ? <SVGYeet key="yeet" title="Yeet" /> : null;
   const suffix2 = react ? <SVGAtom key="atom" title="React" /> : null;
-  const suffix3 = !__inspect?.layout && __inspect?.setHovered ? <SVGHighlightElement key="layout" title="Highlight" /> : null;
-  const suffix4 = __inspect?.layout ? <SVGDashboard key="dash" title="Layout" /> : null;
+  const suffix3 = !layout && __inspect?.setHovered ? <SVGHighlightElement key="layout" title="Highlight" /> : null;
+  const suffix4 = layout ? <SVGDashboard key="dash" title="Layout" /> : null;
   const suffix5 = quote ? <SVGQuote key="quote" title="Quote" /> : null;
+  const suffix6 = output ? <SVGViewOutput key="output" title="Output" /> : null;
 
-  const icons = [suffix1, suffix2, suffix3, suffix4, suffix5].filter(x => !!x);
+  const icons = [suffix1, suffix2, suffix3, suffix4, suffix5, suffix6].filter(x => !!x);
 
   const [version, pinged] = usePingContext(fiber);
 

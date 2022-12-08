@@ -17,12 +17,9 @@ import { useViewContext } from '../../providers/view-provider';
 
 import { makeSphereGeometry } from '../../primitives/geometry/sphere';
 
-import { SHADOW_PAGE } from '../light-data';
-
 import { getLightVertex } from '@use-gpu/wgsl/instance/vertex/light.wgsl';
 import { getLightFragment } from '@use-gpu/wgsl/instance/fragment/light.wgsl';
 
-import { POINT_LIGHT } from '../../light/types';
 import { GEOMETRY_PIPELINE, GEOMETRY_DEFS, useLightRender } from './light';
 
 const VERTEX_BINDINGS = bundleToAttributes(getLightVertex);
@@ -31,7 +28,6 @@ const FRAGMENT_BINDINGS = bundleToAttributes(getLightFragment);
 export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKindProps) => {
   const {
     lights,
-    shadows,
     order,
     start,
     end,
@@ -58,8 +54,6 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
 
   const countRef = useRef(0);
-  const callRef = useRef();
-  const bounds = {center: null, radius: null} as any;
 
   const onDispatch = useCallback(() => {
     let count = 0;
@@ -67,7 +61,7 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
       const light = lights.get(order[i]);
       const {position, intensity} = light;
 
-      const radius = intensity * 0.1;
+      const radius = intensity * 0.5;
       if (cull(position, radius)) indices[count++] = i;
     }
     countRef.current = count;
@@ -75,5 +69,5 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
     uploadBuffer(device, getInstance.buffer, indices.buffer);
   }, [lights, indices]);
 
-  return yeet(useLightRender(sphere.count, countRef, links, GEOMETRY_PIPELINE, onDispatch));
+  return yeet(useLightRender(sphere.count, countRef, 0, links, GEOMETRY_PIPELINE, onDispatch));
 }

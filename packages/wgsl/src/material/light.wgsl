@@ -43,6 +43,15 @@ use '@use-gpu/wgsl/use/types'::{ Light, SurfaceFragment };
     }
   }
   else if (kind == 2) {
+    // Dome
+    L = normalize(-light.normal.xyz);
+    let f = clamp(dot(L, N), 0.0, 1.0);
+    let color = mix(light.opts.rgb, light.color.rgb, f);
+    let bleed = light.normal.w;
+    if (bleed > 0.0) { L = mix(L, N, bleed); };
+    radiance *= color * 3.1415;
+  }
+  else if (kind == 3) {
     // Point
     let d = light.position.xyz - surface.position.xyz;
     L = normalize(d);
@@ -52,15 +61,6 @@ use '@use-gpu/wgsl/use/types'::{ Light, SurfaceFragment };
     if (light.shadowMap >= 0) {
       radiance *= applyPointShadow(light, surface);
     }
-  }
-  else if (kind == 3) {
-    // Dome
-    L = normalize(-light.normal.xyz);
-    let f = clamp(dot(L, N), 0.0, 1.0);
-    let color = mix(light.opts.rgb, light.color.rgb, f);
-    let bleed = light.normal.w;
-    if (bleed > 0.0) { L = mix(L, N, bleed); };
-    radiance *= color * 3.1415;
   }
   else {
     return vec3<f32>(0.0);

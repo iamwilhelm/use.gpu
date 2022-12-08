@@ -828,3 +828,16 @@ export const BLEND_PREMULTIPLIED = {
     dstFactor: "one-minus-src-alpha",      
   },
 } as any as GPUBlendState;
+
+export const BLEND_ADDITIVE = {
+  color: {
+    operation: "add",
+    srcFactor: "one",
+    dstFactor: "one",
+  },
+  alpha: {
+    operation: "add",
+    srcFactor: "one",
+    dstFactor: "one",
+  },
+} as any as GPUBlendState;

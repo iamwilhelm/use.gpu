@@ -7,6 +7,7 @@
   opts: vec4<f32>,
 
   intensity: f32,
+  cutoff: f32,
   kind: i32,
 
   shadowMap: i32,
@@ -26,7 +27,6 @@
 
 @export struct LightVertex {
   position: vec4<f32>,
-  color: vec4<f32>,
   index: u32,
 };
 

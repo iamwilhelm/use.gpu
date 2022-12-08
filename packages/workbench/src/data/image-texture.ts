@@ -75,7 +75,7 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
 
       const source = {
         texture,
-        view: makeTextureView(texture),
+        view: texture.createView(),
         sampler: {
           minFilter: 'linear',
           magFilter: 'linear',
@@ -84,13 +84,14 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
           ...sampler,
         } as GPUSamplerDescriptor,
         layout: 'texture_2d<f32>',
+        mips,
         format,
         size,
         colorSpace: cs,
         version: 1,
       };
 
-      //updateMipTextureChain(device, source);
+      updateMipTextureChain(device, source);
 
       return source;
     }, [bitmap, sampler]);

@@ -39,8 +39,6 @@ export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (p
     mode = 'opaque',
   } = props;
 
-  if (mode === 'transparent') return ForwardShadedRender(props);
-
   const device = useDeviceContext();
   const renderContext = useRenderContext();
   const {colorInput, colorSpace} = renderContext;
@@ -64,6 +62,8 @@ export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (p
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getSurface, colorInput, colorSpace]);
 
+  const defs = useOne(() => ({...defines, HAS_ALPHA_TO_COVERAGE: true}), defines);
+
   // Inline the render fiber to avoid another memo()
   const call = {
     vertexCount,
@@ -73,7 +73,7 @@ export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (p
 
     vertex: v,
     fragment: f,
-    defines,
+    defines: defs,
     pipeline,
     renderContext: gbuffer,
 

@@ -14,7 +14,7 @@ import { UNIFORM_BYTE_SETTERS } from './bytes';
 import { getObjectKey, toMurmur53 } from '@use-gpu/state';
 import { makeBindGroupLayout, makeBindGroupLayoutEntries } from './bindgroup';
 import { makeUniformBuffer } from './buffer';
-import { makeSampler, makeTextureView } from './texture';
+import { makeSampler } from './texture';
 import { alignSizeTo } from './data';
 import { resolve } from './lazy';
 
@@ -236,10 +236,15 @@ export const makeDataBindingsEntries = <T>(
     }
     else if (b.texture) {
       const {texture} = b;
-      const {texture: t, view, sampler, layout} = texture;
+      const {texture: t, view, sampler, layout, aspect} = texture;
       const hasSampler = sampler && b.uniform?.args !== null;
 
-      const textureResource = view ?? makeTextureView(t, 1, 0, getTextureDimension(layout));
+      const textureResource = view ?? t.createView({
+        mipLevelCount: 1,
+        baseMipLevel: 0,
+        dimension: getTextureDimension(layout),
+        aspect,
+      });
       entries.push({binding, resource: textureResource});
       binding++;
 

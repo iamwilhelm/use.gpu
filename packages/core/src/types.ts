@@ -311,6 +311,7 @@ export type TextureSource = {
   comparison?: boolean,
   volatile?: number,
   colorSpace?: ColorSpace,
+  aspect?: GPUTextureAspect,
 };
 
 export type StorageTarget = StorageSource & {

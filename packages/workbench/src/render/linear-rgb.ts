@@ -34,6 +34,8 @@ export type LinearRGBProps = {
   tonemap?: 'aces' | 'linear',
   gain?: number,
 
+  overlay?: boolean,
+
   children?: LiveElement,
   then?: (texture: TextureSource) => LiveElement,
 };
@@ -44,6 +46,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
     tonemap = 'linear',
     exposure = 'fixed',
     gain = 1,
+    overlay = false,
     then,
     children,
     ...rest
@@ -63,7 +66,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
           const {then} = props;
 
           const g = useShaderRef(gain);
-          let filter = useBoundShader(gainColor, GAIN_BINDINGS, [g]);
+          let filter = useBoundShader(gainColor, GAIN_BINDINGS, [g], {IS_OPAQUE: !overlay});
           if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
 
           const view = useMemo(() =>

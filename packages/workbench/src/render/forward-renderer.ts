@@ -6,7 +6,7 @@ import type { UseLight } from './light-data';
 
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttributes, bindEntryPoint, getBundleKey } from '@use-gpu/shader/wgsl';
-import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState, makeTextureView } from '@use-gpu/core';
+import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState } from '@use-gpu/core';
 
 import { LightContext } from '../providers/light-provider';
 import { PassContext } from '../providers/pass-provider';

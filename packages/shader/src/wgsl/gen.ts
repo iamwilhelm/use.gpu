@@ -417,4 +417,5 @@ export const TEXTURE_SHADER_TYPES = {
   "depth24plus": 'f32',
   "depth24plus-stencil8": 'f32',
   "depth32float": 'f32',
+  "depth32float-stencil8": 'f32',
 } as Record<string, string>;

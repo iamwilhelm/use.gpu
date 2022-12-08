@@ -28,6 +28,8 @@ export type DrawCallProps = {
 
   vertexCount?: Lazy<number>,
   instanceCount?: Lazy<number>,
+  firstVertex?: Lazy<number>,
+  firstInstance?: Lazy<number>,
   bounds?: Lazy<DataBounds>,
   indirect?: StorageSource,
 
@@ -73,6 +75,8 @@ export const drawCall = (props: DrawCallProps) => {
   const {
     vertexCount,
     instanceCount,
+    firstVertex,
+    firstInstance,
     bounds,
     indirect,
     vertex: vertexShader,
@@ -104,10 +108,10 @@ export const drawCall = (props: DrawCallProps) => {
   // Render shader
   const topology = propPipeline?.primitive?.topology ?? 'triangle-list';
 
-  const defines = useOne(() => (propDefines ? {
+  const defines = useMemo(() => (propDefines ? {
     ...(passLayout ? PASS_DEFINES : GLOBAL_DEFINES),
     ...propDefines,
-  } : (passLayout ? PASS_DEFINES : GLOBAL_DEFINES)), propDefines);
+  } : (passLayout ? PASS_DEFINES : GLOBAL_DEFINES)), [propDefines, passLayout]);
 
   // Shaders
   const {
@@ -181,6 +185,8 @@ export const drawCall = (props: DrawCallProps) => {
 
     const v = resolve(vertexCount || 0);
     const i = resolve(instanceCount || 0);
+    const fv = resolve(firstVertex || 0);
+    const fi = resolve(firstInstance || 0);
 
     const t = isStrip ? (v - 2) * i : Math.floor(v * i / 3);
 
@@ -211,7 +217,7 @@ export const drawCall = (props: DrawCallProps) => {
     if (volatile.bindGroup) passEncoder.setBindGroup(base + 1, volatile.bindGroup());
 
     if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
-    else passEncoder.draw(v, i, 0, 0);
+    else passEncoder.draw(v, i, fv, fi);
   };
 
   let draw = inner;

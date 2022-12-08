@@ -84,10 +84,10 @@ export const SceneDeferredPage: LC = (props) => {
               <Cursor cursor='move' />
               <Camera>
                 <Pass lights shadows mode="deferred">
-                  <AmbientLight intensity={1} />
-                  <DirectionalLight position={lightData[0].position} intensity={3}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
-                  <DirectionalLight position={lightData[1].position} intensity={1}   color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
-                  <PointLight       position={lightData[2].position} intensity={200} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} />
+                  <AmbientLight intensity={0.25} />
+                  <DirectionalLight position={lightData[0].position} intensity={1}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
+                  <DirectionalLight position={lightData[1].position} intensity={0.5} color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
+                  <PointLight       position={lightData[2].position} intensity={100} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} />
 
                   <Scene>
 
@@ -140,7 +140,7 @@ export const SceneDeferredPage: LC = (props) => {
                     fields={lightFields}
                     data={lightData}
                     render={(positions: StorageSource, colors: StorageSource) => (
-                      <PointLayer positions={positions} colors={colors} size={50} depth={0.5} />
+                      <PointLayer positions={positions} colors={colors} size={50} depth={0.5} xmode="transparent" />
                     )}
                   />
 

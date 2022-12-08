@@ -190,7 +190,7 @@ const Inner: LiveComponent<ViewProps> = memo(({canvas, color, picking, depth}) =
               wrap(UI,
                 wrap(Layout,
                   wrap(Absolute, use(Overflow, {
-                    x: 'scroll',
+                    x: 'auto',
                     direction: 'x',
                     children: use(TextureViews, {color, picking, depth}),
                   }))))))))
@@ -216,10 +216,12 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
   const colorViews = useOne(() => {
     const out: LiveElement[] = [];
 
-    for (const t of [...toArray(color), ...toArray(depth)]) {
-      const {layout, format} = t;
+    for (let t of [...toArray(color), ...toArray(depth)]) {
+      const {layout, format, size} = t;
 
       if (layout.match(/depth/) || format.match(/depth/)) {
+        t = {...t, comparison: false, sampler: {}};
+
         if (layout.match(/cube_array/)) {
           throw new Error("TODO");
         }

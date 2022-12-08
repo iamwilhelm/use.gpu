@@ -1,14 +1,5 @@
 use '@use-gpu/wgsl/use/view':: { getViewResolution };
 
-/*
-@infer type T;
-  N: vec3<f32>,
-  V: vec3<f32>,
-  light: Light,
-  @infer(T) surface: T,
-) -> vec3<f32> {}
-*/
-
 @link fn getFragment(uv: vec2<f32>) -> vec4<f32>;
 
 @fragment

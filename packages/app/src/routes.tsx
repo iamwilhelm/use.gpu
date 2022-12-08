@@ -41,7 +41,7 @@ export const makePages = () => [
   {path: "/scene/basic",           title: "Scene - Basic",                     element: <SceneBasicPage />},
   {path: "/scene/instances",       title: "Scene - Instances",                 element: <SceneInstancesPage />},
   {path: "/scene/shadow",          title: "Scene - Shadow",                    element: <SceneShadowPage />},
-  {path: "/scene/deferred",        title: "Scene - Deferred",                  element: <SceneDeferredPage />},
+  {path: "/scene/deferred",        title: "Scene - Deferred Renderer",         element: <SceneDeferredPage />},
   {path: "/plot/cartesian",        title: "Plot - XYZ",                        element: <PlotCartesianPage />},
   {path: "/plot/polar",            title: "Plot - Polar",                      element: <PlotPolarPage />},
   {path: "/plot/spherical",        title: "Plot - Spherical",                  element: <PlotSphericalPage />},

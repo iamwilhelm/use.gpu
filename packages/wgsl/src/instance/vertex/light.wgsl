@@ -23,7 +23,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     let light = getLight(instance);
 
     var world: vec4<f32>;
-    if (light.kind == 2) {
+    if (light.kind == 3) {
       let sphere = getPosition(getIndex(vertexIndex));
       let scale = sqrt(light.intensity * 3.1415 / light.cutoff);
       world = vec4<f32>(light.position.xyz + sphere.xyz * scale, 1.0);

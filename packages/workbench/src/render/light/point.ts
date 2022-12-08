@@ -59,9 +59,8 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
     let count = 0;
     for (let i = start; i < end; ++i) {
       const light = lights.get(order[i]);
-      const {position, intensity} = light;
-
-      const radius = intensity * 0.5;
+      const {position, intensity, cutoff} = light;
+      const radius = Math.sqrt(intensity * 3.1415 / cutoff);
       if (cull(position, radius)) indices[count++] = i;
     }
     countRef.current = count;

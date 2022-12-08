@@ -213,7 +213,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
     });
   };
 
-  const colorViews = useOne(() => {
+  const colorViews = useMemo(() => {
     const out: LiveElement[] = [];
 
     for (let t of [...toArray(color), ...toArray(depth)]) {
@@ -249,7 +249,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
     }
 
     return out;
-  }, color);
+  }, [color, depth]);
 
   const pickingViews = useOne(() => {
     const out: LiveElement[] = [];

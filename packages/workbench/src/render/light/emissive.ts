@@ -9,7 +9,7 @@ import { useBoundShader } from '../../hooks/useBoundShader';
 import { getLightVertex } from '@use-gpu/wgsl/instance/vertex/light.wgsl';
 import { getEmissiveFragment } from '@use-gpu/wgsl/instance/fragment/emissive.wgsl';
 
-import { FULLSCREEN_PIPELINE, FULLSCREEN_DEFS, useLightRender } from './light';
+import { FULLSCREEN_PIPELINE, FULLSCREEN_DEFS, useLightDraw } from './light';
 
 const VERTEX_BINDINGS = bundleToAttributes(getLightVertex);
 const FRAGMENT_BINDINGS = bundleToAttributes(getEmissiveFragment);
@@ -25,5 +25,5 @@ export const EmissiveLightRender: LiveComponent<LightKindProps> = (props: LightK
 
   const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
 
-  return yeet(useLightRender(3, 1, 0, links, FULLSCREEN_PIPELINE));
+  return yeet(useLightDraw(3, 1, 0, links, FULLSCREEN_PIPELINE));
 }

@@ -78,15 +78,17 @@ export const SceneDeferredPage: LC = (props) => {
         sphereMesh,
         texture,
       ]) => (
-        <LinearRGB tonemap="aces" gain={1} samples={1}>
+        <LinearRGB tonemap="aces" gain={1} samples={1} depthStencil="depth32float-stencil8">
           <Loop>
             <Draw>
               <Cursor cursor='move' />
               <Camera>
                 <Pass lights shadows mode="deferred">
+                  {/*
                   <AmbientLight intensity={0.25} />
                   <DirectionalLight position={lightData[0].position} intensity={1}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
                   <DirectionalLight position={lightData[1].position} intensity={0.5} color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
+                  */}
                   <PointLight       position={lightData[2].position} intensity={100} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} />
 
                   <Scene>

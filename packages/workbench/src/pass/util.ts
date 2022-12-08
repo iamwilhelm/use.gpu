@@ -6,18 +6,23 @@ export const getRenderPassDescriptor = (
   renderContext: UseGPURenderContext,
   overlay?: boolean,
   merge?: boolean,
+  stencil?: boolean,
 ) => {
   let {colorAttachments, depthStencilAttachment} = renderContext;
 
-  if (overlay) {
+  if (stencil) {
+    colorAttachments = [];
+  }
+  else if (overlay) {
     colorAttachments = colorAttachments.map(a => proxy(a, {loadOp: 'load'}));
   }
-  if (merge && depthStencilAttachment) {
+
+  if ((merge || stencil) && depthStencilAttachment) {
     const {depthLoadOp, stencilLoadOp} = depthStencilAttachment;
     const override: Record<string, any> = {};
 
     if (depthLoadOp) override.depthLoadOp = 'load';
-    if (stencilLoadOp) override.stencilLoadOp = 'load';
+    if (stencilLoadOp) override.stencilLoadOp = stencil ? 'clear' : 'load';
     depthStencilAttachment = proxy(depthStencilAttachment, override);
   }
 

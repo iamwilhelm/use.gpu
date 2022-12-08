@@ -6,6 +6,7 @@ import type { BoundLight } from '../../light/types';
 import { memo, use, yeet, keyed, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
 import { resolve, uploadBuffer, BLEND_ADDITIVE } from '@use-gpu/core';
 import { bindBundle, bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { $delete } from '@use-gpu/state';
 
 import { drawCall } from '../../queue/draw-call';
 import { useBufferedSize } from '../../hooks/useBufferedSize';
@@ -32,7 +33,6 @@ import shadowBindings from '@use-gpu/wgsl/use/shadow.wgsl';
 import instanceDrawVirtualLight from '@use-gpu/wgsl/render/vertex/virtual-light.wgsl';
 import instanceFragmentLight from '@use-gpu/wgsl/render/fragment/deferred-light.wgsl';
 
-import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
 import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
 import { applyPBRMaterial as applyMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
@@ -82,11 +82,66 @@ export const FULLSCREEN_PIPELINE = {
 
 export const GEOMETRY_PIPELINE = {
   primitive: {
+    cullMode: 'back',
+  },
+  depthStencil: {
+    depthCompare: 'greater',
+    depthWriteEnabled: false,
+  },
+  fragment: {
+    targets: {
+      0: {
+        blend: BLEND_ADDITIVE,
+      },
+    },
+  },
+};
+
+export const STENCIL_PIPELINE = {
+  primitive: {
     cullMode: 'front',
   },
   depthStencil: {
-    depthCompare: 'less',
+    depthCompare: 'always',
     depthWriteEnabled: false,
+    stencilBack: {
+      compare: "never",
+      passOp: "increment-clamp",
+    },
+  },
+  fragment: $delete(),
+};
+
+export const FULLSCREEN_STENCIL_PIPELINE = {
+  primitive: {
+    cullMode: 'none',
+  },
+  depthStencil: {
+    depthCompare: 'always',
+    depthWriteEnabled: false,
+    stencilFront: {
+      compare: 'greater',
+    },
+  },
+  fragment: {
+    targets: {
+      0: {
+        blend: BLEND_ADDITIVE,
+      },
+    },
+  },
+};
+
+export const GEOMETRY_STENCIL_PIPELINE = {
+  primitive: {
+    cullMode: 'back',
+  },
+  depthStencil: {
+    depthCompare: 'greater',
+    depthWriteEnabled: false,
+    stencilFront: {
+      compare: 'greater',
+    },
   },
   fragment: {
     targets: {
@@ -108,8 +163,8 @@ export const GEOMETRY_DEFS = {
 const LIGHT_RENDERERS = {
   [AMBIENT_LIGHT]: FullscreenLightRender,
   [DIRECTIONAL_LIGHT]: FullscreenLightRender,
-  [POINT_LIGHT]: PointLightRender,
   [DOME_LIGHT]: FullscreenLightRender,
+  [POINT_LIGHT]: PointLightRender,
 } as Record<number, LiveComponent>;
 
 export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRenderProps) => {
@@ -122,6 +177,8 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
 
   const {renderContexts: {gbuffer}} = usePassContext();
   const {sources} = gbuffer;
+
+  const stencil = !!sources[4].format.match(/stencil/);
 
   const applyLight = useOne(() => {
     const applyDirectionalShadow = shadows ? bindBundle(applyDirectionalShadowWGSL, {sampleShadow}) : null;
@@ -136,7 +193,7 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
 
   const out = [...subranges.keys()].map(kind => {
     const [start, end] = subranges.get(kind);
-    const props = {lights, order, start, end, gbuffer: sources, getLight, applyLight};
+    const props = {lights, order, start, end, stencil, gbuffer: sources, getLight, applyLight};
 
     const Component = LIGHT_RENDERERS[kind];
     return Component ? keyed(Component, kind, props) : null;
@@ -147,13 +204,22 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
   return out;
 }, 'LightRender');
 
-export const useLightRender = (
+export const LightDraw = (
   vertexCount: Lazy<number>,
   instanceCount: Lazy<number>,
   firstInstance: Lazy<number>,
   links: Record<string, ShaderModule>,
   pipeline?: Partial<GPURenderPipelineDescriptor>,
-  onDispatch?: () => void,
+  mode?: string,
+) => yeet(useLightDraw(vertexCount, instanceCount, firstInstance, links, pipeline, mode));
+
+export const useLightDraw = (
+  vertexCount: Lazy<number>,
+  instanceCount: Lazy<number>,
+  firstInstance: Lazy<number>,
+  links: Record<string, ShaderModule>,
+  pipeline?: Partial<GPURenderPipelineDescriptor>,
+  mode = 'light',
 ) => {
   const device = useDeviceContext();
   const renderContext = useRenderContext();
@@ -168,7 +234,7 @@ export const useLightRender = (
 
   const [v, f] = useMemo(() => {
     const v = bindBundle(vertexShader, links, undefined);
-    const f = bindBundle(fragmentShader, links, undefined);
+    const f = links.getFragment ? bindBundle(fragmentShader, links, undefined) : null;
     return [v, f];
   }, [vertexShader, fragmentShader, links]);
 
@@ -185,7 +251,6 @@ export const useLightRender = (
     passLayout,
     pipeline,
 
-    onDispatch,
-    mode: 'light',
+    mode,
   });
 }

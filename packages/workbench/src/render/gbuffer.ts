@@ -56,8 +56,8 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
     const makeSource = (texture: GPUTexture, i: number) => ({
       texture,
       sampler: {},
-      layout: formats[i].match(/depth/) ? 'texture_depth_2d' : 'texture_2d<f32>',
-      aspect: formats[i].match(/depth/) ? 'depth-only' : 'all',
+      layout: i === 4 ? 'texture_depth_2d' : 'texture_2d<f32>',
+      aspect: i === 4 ? 'depth-only' : 'all',
       format: formats[i],
       colorSpace: 'linear',
       size: [width, height],

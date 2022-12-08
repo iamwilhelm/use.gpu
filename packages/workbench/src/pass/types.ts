@@ -38,6 +38,7 @@ export type AggregatedCalls = {
   transparent?: Renderable[],
   debug?: Renderable[],
   picking?: Renderable[],
+  stencil?: Renderable[],
   light?: Renderable[],
   shadow?: Renderable[],
   post?: CommandToBuffer[],

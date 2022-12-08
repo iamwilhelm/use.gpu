@@ -23,7 +23,7 @@ export const makeShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescr
 export const makeRenderPipeline = (
   device: GPUDevice,
   vertexShader: ShaderModuleDescriptor,
-  fragmentShader: ShaderModuleDescriptor,
+  fragmentShader: ShaderModuleDescriptor | null,
   colorStates: GPUColorTargetState[],
   depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
@@ -35,9 +35,9 @@ export const makeRenderPipeline = (
     depthStencil: depthStencilState,
     multisample: { count: samples },
     vertex: makeShaderStage(device, vertexShader),
-    fragment: makeShaderStage(device, fragmentShader, {
+    fragment: fragmentShader ? makeShaderStage(device, fragmentShader, {
       targets: colorStates,
-    }),
+    }) : undefined,
   } as any, descriptor) as any as GPURenderPipelineDescriptor;
 
   return device.createRenderPipeline(pipelineDescriptor);
@@ -46,7 +46,7 @@ export const makeRenderPipeline = (
 export const makeRenderPipelineAsync = (
   device: GPUDevice,
   vertexShader: ShaderModuleDescriptor,
-  fragmentShader: ShaderModuleDescriptor,
+  fragmentShader: ShaderModuleDescriptor | null,
   colorStates: GPUColorTargetState[],
   depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
@@ -58,9 +58,9 @@ export const makeRenderPipelineAsync = (
     depthStencil: depthStencilState,
     multisample: { count: samples },
     vertex: makeShaderStage(device, vertexShader),
-    fragment: makeShaderStage(device, fragmentShader, {
+    fragment: fragmentShader ? makeShaderStage(device, fragmentShader, {
       targets: colorStates,
-    }),
+    }) : undefined,
   } as any, descriptor) as any as GPURenderPipelineDescriptor;
 
   return device.createRenderPipelineAsync(pipelineDescriptor);

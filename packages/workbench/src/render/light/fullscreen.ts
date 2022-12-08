@@ -9,7 +9,7 @@ import { useBoundShader } from '../../hooks/useBoundShader';
 import { getLightVertex } from '@use-gpu/wgsl/instance/vertex/light.wgsl';
 import { getLightFragment } from '@use-gpu/wgsl/instance/fragment/light.wgsl';
 
-import { FULLSCREEN_PIPELINE, FULLSCREEN_DEFS, useLightRender } from './light';
+import { FULLSCREEN_PIPELINE, FULLSCREEN_DEFS, useLightDraw } from './light';
 
 const VERTEX_BINDINGS = bundleToAttributes(getLightVertex);
 const FRAGMENT_BINDINGS = bundleToAttributes(getLightFragment);
@@ -29,5 +29,5 @@ export const FullscreenLightRender: LiveComponent<LightKindProps> = (props: Ligh
 
   const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
 
-  return yeet(useLightRender(3, end - start, start, links, FULLSCREEN_PIPELINE));
+  return yeet(useLightDraw(3, end - start, start, links, FULLSCREEN_PIPELINE));
 }

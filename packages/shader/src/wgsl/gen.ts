@@ -166,11 +166,11 @@ export const makeBindingAccessors = (
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
-      const {volatile, layout, variant, absolute, sampler, comparison, format} = texture!;
+      const {volatile, layout, variant, absolute, sampler, comparison, format, aspect} = texture!;
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       if (sampler && args !== null) volatile ? volatileBase++ : bindingBase++;
-      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, absolute, !!sampler, !!comparison, args));
+      program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, aspect, absolute, !!sampler, !!comparison, args));
     }
 
     return program.join('\n');
@@ -274,6 +274,7 @@ export const makeTextureAccessor = (
   name: string,
   layout: string,
   variant: string = 'textureSample',
+  aspect: string = 'all',
   absolute: boolean = false,
   sampler: boolean = true,
   comparison: boolean = false,
@@ -287,7 +288,13 @@ export const makeTextureAccessor = (
   const dims = +m[0];
   const dimsCast = dims === 1 ? 'f32' : `vec${dims}<f32>`;
 
-  const shaderType = format ? TEXTURE_SHADER_TYPES[format] : type;
+  const shaderType = (
+    aspect === 'stencil-only' ? 'vec4<u32>' :
+    aspect === 'depth-only' ? 'f32' :
+    format ? TEXTURE_SHADER_TYPES[format] : type
+  );
+  if (!shaderType) throw new Error(`Cannot determine shader type for texture format '${format}' with aspect '${aspect}'`);
+
   const hasCast = needsCast(shaderType, type);
 
   return `
@@ -412,10 +419,8 @@ export const TEXTURE_SHADER_TYPES = {
   "rgba32float": 'vec4<f32>',
 
   // Depth and stencil formats
-  "stencil8": 'f32',              // u8
+  "stencil8": 'u32',              // u8
   "depth16unorm": 'f32',
   "depth24plus": 'f32',
-  "depth24plus-stencil8": 'f32',
   "depth32float": 'f32',
-  "depth32float-stencil8": 'f32',
 } as Record<string, string>;

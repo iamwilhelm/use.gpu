@@ -7,7 +7,7 @@ import { LiveCanvas } from '@use-gpu/react';
 import { wgsl, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { Draw, Pass, Flat, FontLoader, Queue, DeviceContext, getBoundShader, getLambdaSource } from '@use-gpu/workbench';
 import { AutoCanvas } from '@use-gpu/webgpu';
-import { UI, Layout, Flex, Block, Overflow, Absolute } from '@use-gpu/layout';
+import { UI, Layout, Flex, Block, Inline, Text, Overflow, Absolute } from '@use-gpu/layout';
 
 import { styled as _styled } from '@stitches/react';
 
@@ -98,7 +98,7 @@ const depthCubeShader = wgsl`
     }
     let border = clamp(50.0 * (max(abs(b.x), abs(b.y)) - 0.9), 0.0, 1.0);
     
-    let depth = t.x;
+    let depth = -log(t.x);
     return mix(vec4<f32>(fract(depth), fract(depth * 16.0) * .75, fract(depth * 256.0), 1.0), vec4<f32>(tint, 1.0), border * 0.5);
   }
 `;
@@ -118,17 +118,34 @@ const pickingShader = wgsl`
   }
 `;
 
+const stencilShader = wgsl`
+  @link fn getSize() -> vec2<f32>;
+  @link fn getStencil(uv: vec2<i32>, level: i32) -> vec4<u32>;
+
+  fn main(uv: vec2<f32>) -> vec4<f32> {
+    let iuv = vec2<i32>(uv * getSize());
+    let stencil = getStencil(iuv, 0).x;
+
+    let a = (f32(stencil) / 255.0) % 1.0;
+    let b = (f32(stencil) / 64.0) % 1.0;
+    let c = (f32(stencil) / 16.0) % 1.0;
+    return sqrt(vec4<f32>(a, c, b, 1.0));
+  }
+`;
+
 const depthShader = wgsl`
   @link fn getTexture(uv: vec2<f32>) -> vec4<f32>;
 
   fn main(uv: vec2<f32>) -> vec4<f32> {
     let depth = getTexture(uv).x;
-    return vec4<f32>(depth, fract(depth * 16.0) * .75, fract(depth * 256.0), 1.0);
+    let d = -log(depth);
+    return vec4<f32>(fract(d), fract(d * 16.0) * .75, fract(d * 256.0), 1.0);
   }
 `;
 
 const ARRAY_BINDINGS = bundleToAttributes(arrayShader);
 const PICKING_BINDINGS = bundleToAttributes(pickingShader);
+const STENCIL_BINDINGS = bundleToAttributes(stencilShader);
 const DEPTH_BINDINGS = bundleToAttributes(depthShader);
 const DEPTH_CUBE_BINDINGS = bundleToAttributes(depthCubeShader);
 
@@ -154,7 +171,7 @@ export const Output: React.FC<OutputProps> = ({fiber}) => {
   const device = fiber.context.values.get(DeviceContext)?.current;
 
   return (
-    <div style={{height: 522, position: 'relative'}}>
+    <div style={{height: 546, position: 'relative'}}>
       <LiveCanvas>
         {(canvas: HTMLCanvasElement) => use(View, {canvas, device, color, picking, depth})}
       </LiveCanvas>
@@ -206,11 +223,25 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
     const width = w > h ? 512 : w/h * 512;
     const height = w > h ? h/w * 512 : 512;
 
-    return use(Block, {
-      width, height,
-      fill: [0, 0, 0, .5],
-      image: {texture, fit: 'contain', align: 'center', repeat: 'none'},
-    });
+    return (
+      use(Block, {
+        children: [
+          use(Block, {
+            width, height,
+            fill: [0, 0, 0, .5],
+            image: {texture, fit: 'contain', align: 'center', repeat: 'none'},
+          }),
+          use(Inline, {
+            children: use(Text, {
+              color: 0xffffff,
+              lineHeight: 24,
+              size: 16,
+              children: `${texture.layout} – ${texture.format}`,
+            })
+          })
+        ]
+      })
+    )
   };
 
   const colorViews = useMemo(() => {
@@ -220,7 +251,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
       const {layout, format, size} = t;
 
       if (layout.match(/depth/) || format.match(/depth/)) {
-        t = {...t, comparison: false, sampler: {}};
+        t = {...t, comparison: false, sampler: {}, aspect: 'depth-only'};
 
         if (layout.match(/cube_array/)) {
           throw new Error("TODO");
@@ -228,6 +259,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
         else if (layout.match(/cube/)) {
           let texture = getBoundShader(depthCubeShader, DEPTH_CUBE_BINDINGS, [decodeOctahedral, t]);
           texture = getLambdaSource(texture, t);
+          texture.format = t.format;
+          texture.layout = t.layout;
           out.push(makeView(texture));
         }
         else if (layout.match(/array/)) {
@@ -236,16 +269,36 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
             let texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, t]);
             texture = getBoundShader(depthShader, DEPTH_BINDINGS, [texture]);
             texture = getLambdaSource(texture, t);
+            texture.format = t.format;
+            texture.layout = t.layout;
             out.push(makeView(texture));
           }
         }
         else {
           let texture = getBoundShader(depthShader, DEPTH_BINDINGS, [t]);
           texture = getLambdaSource(texture, t);
+          texture.format = t.format;
+          texture.layout = t.layout;
           out.push(makeView(texture));
         }
       }
       else out.push(makeView(t));
+
+      if (format.match(/stencil/)) {
+        t = {
+          ...t,
+          sampler: undefined,
+          layout: 'texture_2d<u32>',
+          variant: 'textureLoad',
+          aspect: 'stencil-only',
+        };
+
+        let texture = getBoundShader(stencilShader, STENCIL_BINDINGS, [() => size, t]);
+        texture = getLambdaSource(texture, t);
+        texture.format = t.format;
+        texture.layout = t.layout;
+        out.push(makeView(texture));
+      }
     }
 
     return out;

@@ -51,7 +51,7 @@ const sampleShadow = bindEntryPoint(shadowBindings, 'sampleShadow');
 
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,
-  renders: Record<string, LiveComponent<any>>,
+  renders: Record<string, Record<string, LiveComponent<any>>>,
 };
 
 export type ForwardRendererProps = {
@@ -74,9 +74,9 @@ const getComponents = ({modes = {}, renders = {}}: RenderComponents) => {
       ...modes,
     },
     renders: {
-      solid: SolidRender,
-      shaded: ShadedRender,
-      ui: UIRender,
+      solid: {opaque: SolidRender, transparent: SolidRender},
+      shaded: {opaque: ShadedRender, transparent: ShadedRender},
+      ui: {opaque: UIRender, transparent: UIRender},
       ...renders,
     }
   }
@@ -153,7 +153,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     const components = getComponents(props.components ?? {});
 
     const getRender = (mode, render = null) =>
-      components.modes[mode] ?? components.renders[render];
+      components.modes[mode] ?? components.renders[render][mode];
 
     const getVariants = (!shadows && !picking && !passes)
        ? (virtual, hovered) => hovered ? [getRender(HOVERED_VARIANT)] : getRender(virtual.mode, virtual.renderer)
@@ -168,7 +168,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
           if (picking && mode !== 'picking' && links?.getPicking) {
             variants.push('picking');
           }
-          if (variants.length === 0) return getRender(hovered ? HOVERED_VARIANT : mode, renderer);
+          if (variants.length === 0) return hovered ? [getRender(HOVERED_VARIANT, renderer)] : getRender(mode, renderer);
 
           variants.push(hovered ? HOVERED_VARIANT : mode);
           return variants.map(mode => getRender(mode, renderer));

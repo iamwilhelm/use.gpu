@@ -196,6 +196,8 @@ export const drawCall = (props: DrawCallProps) => {
 
     countGeometry(v * i, t);
 
+    if (!indirect && (v * i) === 0) return;
+
     passEncoder.setPipeline(pipeline);
 
     if (uniform) {

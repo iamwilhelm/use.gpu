@@ -12,7 +12,7 @@ const DEBUG = false;
 const NO_DEPS = [] as any[];
 const NO_LIBS = {} as Record<string, any>;
 
-type RenderShader = [ShaderModuleDescriptor, ShaderModuleDescriptor];
+type RenderShader = [ShaderModuleDescriptor, ShaderModuleDescriptor | null];
 
 const makePipelineCache = (options: Record<string, any> = {}) => new LRU<string, any>({
   max: 100,
@@ -46,7 +46,7 @@ export const useRenderPipeline = (
 
     // Cache by shader structural hash
     const [vertex, fragment] = shader;
-    const key = pipelineKey.toString() +'/'+ vertex.hash.toString() +'-'+ fragment.hash.toString();
+    const key = pipelineKey.toString() +'/'+ vertex.hash.toString() +'-'+ (fragment ? fragment.hash.toString() : 0);
 
     const cached = cache.get(key);
     if (cached) {
@@ -63,10 +63,10 @@ export const useRenderPipeline = (
           hash: shader[0].hash,
           code: shader[0].code,
         },
-        fragment: {
+        fragment: shader[1] ? {
           hash: shader[1].hash,
           code: shader[1].code,
-        },
+        } : null,
       };
       if (SHADER_LOG) SHADER_LOG.set(key, log);
     }
@@ -86,7 +86,7 @@ export const useRenderPipeline = (
     DEBUG && console.log('render pipeline cache miss', key);
 
     return pipeline;
-  }, [device, pipelineKey, shader[0].hash, shader[1].hash]);
+  }, [device, pipelineKey, shader[0].hash, shader[1] ? shader[1].hash : 0]);
 };
 
 export const useRenderPipelineAsync = (
@@ -119,7 +119,7 @@ export const useRenderPipelineAsync = (
 
     // Cache by shader structural hash
     const [vertex, fragment] = shader;
-    const key = pipelineKey.toString() +'/'+ vertex.hash.toString() +'-'+ fragment.hash.toString();
+    const key = pipelineKey.toString() +'/'+ vertex.hash.toString() +'-'+ (fragment ? fragment.hash.toString() : 0);
 
     const cached = cache!.get(key);
     if (cached) {
@@ -136,10 +136,10 @@ export const useRenderPipelineAsync = (
           hash: shader[0].hash,
           code: shader[0].code,
         },
-        fragment: {
+        fragment: shader[1] ? {
           hash: shader[1].hash,
           code: shader[1].code,
-        },
+        } : null,
       });
     }
 
@@ -182,9 +182,9 @@ export const useRenderPipelineAsync = (
     pending!.set(key, promise);
 
     return null;
-  }, [device, pipelineKey, shader[0].hash, shader[1].hash]);
+  }, [device, pipelineKey, shader[0].hash, shader[1] ? shader[1].hash : 0]);
 
-  DEBUG && console.log('async render pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1].hash);
+  DEBUG && console.log('async render pipeline got', (immediate ?? resolved), 'stale =', staleRef.current, shader[0].hash, shader[1] ? shader[1].hash : 0);
   return [immediate ?? resolved, !!staleRef.current];
 };
 

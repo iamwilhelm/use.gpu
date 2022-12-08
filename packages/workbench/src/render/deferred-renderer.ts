@@ -148,7 +148,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
       components.modes[mode] ?? components.renders[render][mode];
 
     const getVariants = (!shadows && !picking && !passes)
-       ? (virtual, hovered) => hovered ? [getRender(HOVERED_VARIANT)] : getRender(virtual.mode, virtual.renderer)
+       ? (virtual, hovered) => hovered ? [getRender(HOVERED_VARIANT, renderer)] : getRender(virtual.mode, virtual.renderer)
 
        : (virtual, hovered) => {
           const {id, mode, renderer, links, defines} = virtual;
@@ -160,7 +160,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
           if (picking && mode !== 'picking' && links?.getPicking) {
             variants.push('picking');
           }
-          if (variants.length === 0) return getRender(hovered ? HOVERED_VARIANT : mode, renderer);
+          if (variants.length === 0) return hovered ? [getRender(HOVERED_VARIANT, renderer)] : getRender(mode, renderer);
 
           variants.push(hovered ? HOVERED_VARIANT : mode);
           return variants.map(mode => getRender(mode, renderer));

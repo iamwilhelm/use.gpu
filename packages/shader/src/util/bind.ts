@@ -105,7 +105,7 @@ export const makeResolveBindings = (
   makeUniformBlock: MakeUniformBlock,
   getVirtualBindGroup: (defines?: Record<string, ShaderDefine>) => string | number,
 ) => timed('resolveBindings', (
-  modules: ParsedBundle[],
+  modules: (ParsedBundle | null)[],
   defines?: Record<string, ShaderDefine>,
   lazy?: boolean,
 ): {
@@ -147,7 +147,9 @@ export const makeResolveBindings = (
   let volatileBase = 0;
   let index = 0;
   let stage = 0;
-  for (const {virtuals} of modules) {
+  for (const m of modules) if (m) {
+    const {virtuals} = m;
+
     const visibles = new Set<number>();
     const visibility = modules.length === 2
       ? (stage ? GPUShaderStage.FRAGMENT : GPUShaderStage.VERTEX)
@@ -204,6 +206,8 @@ export const makeResolveBindings = (
 
     // Append to modules
     out = modules.map((m: ShaderModule) => {
+      if (!m) return null;
+
       const bundle = toBundle(m);
 
       const {module, libs} = bundle;

@@ -23,6 +23,8 @@ export type DeferredPassProps = {
     opaque?: Renderable[],
     transparent?: Renderable[],
     debug?: Renderable[],
+    stencil?: Renderable[],
+    light?: Renderable[],
   },
   overlay?: boolean,
   merge?: boolean,
@@ -55,6 +57,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
   const transparents = toArray(calls['transparent'] as Renderable[]);
   const debugs       = toArray(calls['debug']       as Renderable[]);
 
+  const stencils     = toArray(calls['stencil']     as Renderable[]);
   const lights       = toArray(calls['light']       as Renderable[]);
 
   const bindPass = useOne(() => {
@@ -65,6 +68,10 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
 
   const deferredPassDescriptor = useMemo(() =>
     getRenderPassDescriptor(gbuffer, false, merge),
+    [gbuffer, merge]);
+
+  const stencilPassDescriptor = useMemo(() =>
+    getRenderPassDescriptor(gbuffer, true, true, true),
     [gbuffer, merge]);
 
   const renderPassDescriptor = useMemo(() =>
@@ -87,7 +94,11 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       passEncoder.end();
     }
 
-    commandEncoder.copyTextureToTexture({texture: depthTexture}, {texture: gbuffer.sources[4].texture}, [width, height, 1]);
+    commandEncoder.copyTextureToTexture(
+      {texture: depthTexture},
+      {texture: gbuffer.sources[4].texture},
+      [width, height, 1]
+    );
 
     {
       const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
@@ -99,6 +110,28 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       drawToPass(cull, debugs, passEncoder, countGeometry);
       passEncoder.end();
     }
+
+    if (stencils.length) {
+      const passEncoder = commandEncoder.beginRenderPass(stencilPassDescriptor);
+      bindGlobal(passEncoder);
+      bindPass(passEncoder);
+
+      drawToPass(cull, stencils, passEncoder, countGeometry);
+      passEncoder.end();
+    }
+
+    /*
+    {
+      const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
+      bindGlobal(passEncoder);
+      bindPass(passEncoder);
+
+      drawToPass(cull, lights, passEncoder, countGeometry);
+      drawToPass(cull, transparents, passEncoder, countGeometry, -1);
+      drawToPass(cull, debugs, passEncoder, countGeometry);
+      passEncoder.end();
+    }
+    */
 
     const command = commandEncoder.finish();
     device.queue.submit([command]);

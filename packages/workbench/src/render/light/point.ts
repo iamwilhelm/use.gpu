@@ -4,7 +4,7 @@ import type { VirtualDraw } from '../pass';
 import type { LightKindProps } from './light';
 import type { BoundLight } from '../../light/types';
 
-import { yeet, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
+import { use, yeet, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
 import { uploadBuffer } from '@use-gpu/core';
 import { bindBundle, bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
@@ -20,7 +20,14 @@ import { makeSphereGeometry } from '../../primitives/geometry/sphere';
 import { getLightVertex } from '@use-gpu/wgsl/instance/vertex/light.wgsl';
 import { getLightFragment } from '@use-gpu/wgsl/instance/fragment/light.wgsl';
 
-import { GEOMETRY_PIPELINE, GEOMETRY_DEFS, useLightRender } from './light';
+import { vec3 } from 'gl-matrix';
+
+import {
+  GEOMETRY_PIPELINE, GEOMETRY_DEFS,
+  FULLSCREEN_PIPELINE, FULLSCREEN_DEFS,
+  FULLSCREEN_STENCIL_PIPELINE, GEOMETRY_STENCIL_PIPELINE, STENCIL_PIPELINE,
+  LightDraw,
+} from './light';
 
 const VERTEX_BINDINGS = bundleToAttributes(getLightVertex);
 const FRAGMENT_BINDINGS = bundleToAttributes(getLightFragment);
@@ -32,41 +39,78 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
     start,
     end,
     gbuffer,
+    stencil,
 
     getLight,
     applyLight,
   } = props;
 
   const device = useDeviceContext();
-  const {cull} = useViewContext();
+  const {cull, uniforms: viewUniforms} = useViewContext();
 
   const sphere = useOne(() => makeSphereGeometry({ width: 2, detail: [4, 8] }));
   const getPosition = useRawSource(sphere.attributes.positions, 'vec4<f32>');
   const getIndex = useRawSource(sphere.attributes.indices, 'u16');
 
   const size = useBufferedSize(end - start);
-  const indices = useOne(() => new Uint16Array(size), size);
-  const getInstance = useRawSource(indices, 'u16');
+  const instances = useOne(() => new Uint16Array(size), size);
+  const outsides = useOne(() => new Uint16Array(size), size);
+  const insides = useOne(() => new Uint16Array(size), size);
 
-  const getVertex = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getInstance, getPosition, getIndex], GEOMETRY_DEFS);
+  const getInstance = useRawSource(instances, 'u16');
+  const getOutside = useRawSource(outsides, 'u16');
+  const getInside = useRawSource(insides, 'u16');
+
+  const getOutsideVertex = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getOutside, getPosition, getIndex], GEOMETRY_DEFS);
+  const getInsideVertex  = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
+
   const getFragment = useBoundShader(getLightFragment, FRAGMENT_BINDINGS, [...gbuffer, getLight, applyLight]);
 
-  const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
+  const stencilLinks = useMemo(() => ({getVertex: getOutsideVertex}), [getOutsideVertex, getFragment]);
+  const outsideLinks = useMemo(() => ({getVertex: getOutsideVertex, getFragment}), [getOutsideVertex, getFragment]);
+  const insideLinks  = useMemo(() => ({getVertex: getInsideVertex,  getFragment}), [getInsideVertex,  getFragment]);
 
-  const countRef = useRef(0);
+  const instanceCountRef = useRef(0);
+  const outsideCountRef = useRef(0);
+  const insideCountRef = useRef(0);
 
   const onDispatch = useCallback(() => {
-    let count = 0;
+    const {viewPosition: {current: viewPosition}} = viewUniforms;
+    const v3 = vec3.create();
+
+    let instanceCount = 0;
+    let outsideCount = 0;
+    let insideCount = 0;
+
     for (let i = start; i < end; ++i) {
       const light = lights.get(order[i]);
       const {position, intensity, cutoff} = light;
       const radius = Math.sqrt(intensity * 3.1415 / cutoff);
-      if (cull(position, radius)) indices[count++] = i;
+      if (cull(position, radius)) {
+        vec3.sub(v3, position, viewPosition);
+
+        instances[instanceCount++] = i;
+        if (vec3.length(v3) > radius) outsides[outsideCount++] = i;
+        else insides[insideCount++] = i;
+      }
     }
-    countRef.current = count;
 
-    uploadBuffer(device, getInstance.buffer, indices.buffer);
-  }, [lights, indices]);
+    instanceCountRef.current = instanceCount;
+    outsideCountRef.current = outsideCount;
+    insideCountRef.current = insideCount;
 
-  return yeet(useLightRender(sphere.count, countRef, 0, links, GEOMETRY_PIPELINE, onDispatch));
+    uploadBuffer(device, getInstance.buffer, instances.buffer);
+    uploadBuffer(device, getOutside.buffer, outsides.buffer);
+    uploadBuffer(device, getInside.buffer, insides.buffer);
+  }, [lights, getInstance, getOutside, getInside, instances, outsides, insides]);
+
+  return [
+    yeet({'compute': onDispatch}),
+    stencil ? use(LightDraw, sphere.count, instanceCountRef, 0, stencilLinks, STENCIL_PIPELINE, 'stencil') : null,
+    use(LightDraw,
+      sphere.count, outsideCountRef, 0, outsideLinks,
+      stencil ? GEOMETRY_STENCIL_PIPELINE : GEOMETRY_PIPELINE),
+    use(LightDraw, 3, insideCountRef, 0, insideLinks,
+      stencil ? FULLSCREEN_STENCIL_PIPELINE : FULLSCREEN_PIPELINE),
+  ];
 }

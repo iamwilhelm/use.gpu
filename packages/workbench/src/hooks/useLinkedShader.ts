@@ -26,8 +26,8 @@ export const useLinkedShader = (
   // Get hash for defines, shader code, shader instance
   const defKey  = toMurmur53(defines);
 
-  const codeKey = stages.reduce((hash, module) => mixBits53(hash, getBundleHash(module)), 0);
-  const dataKey = stages.reduce((hash, module) => mixBits53(hash, getBundleKey(module)), 0);
+  const codeKey = stages.reduce((hash, module) => mixBits53(hash, module ? getBundleHash(module) : 0), 0);
+  const dataKey = stages.reduce((hash, module) => mixBits53(hash, module ? getBundleKey(module) : 0), 0);
 
   const structuralKey = mixBits53(codeKey, defKey);
   const instanceKey   = mixBits53(structuralKey, dataKey);
@@ -77,7 +77,7 @@ export const useLinkedShader = (
     const suffix = formatMurmur53(defKey);
 
     const out: ShaderModuleDescriptor[] = [];
-    for (const module of modules) {
+    for (const module of modules) if (module) {
       const codeKey = getBundleHash(module);
       const key = `${formatMurmur53(codeKey)}-${suffix}`;
 

@@ -20,7 +20,7 @@ import { usePassContext } from '../../providers/pass-provider';
 
 import { makeSphereGeometry } from '../../primitives/geometry/sphere';
 
-import { AMBIENT_LIGHT, DIRECTIONAL_LIGHT, POINT_LIGHT, DOME_LIGHT } from '../../light/types';
+import { AMBIENT_LIGHT, DIRECTIONAL_LIGHT, DOME_LIGHT, POINT_LIGHT } from '../../light/types';
 import { SHADOW_PAGE } from './light-data';
 
 import { EmissiveLightRender } from './emissive';

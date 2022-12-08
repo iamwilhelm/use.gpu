@@ -18,6 +18,8 @@ import { useBufferedSize } from '../../hooks/useBufferedSize';
 
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
 
+import { POINT_LIGHT } from '../../light/types';
+
 export const SHADOW_PAGE = 4096;
 export const SHADOW_FORMAT = "depth32float";
 
@@ -38,6 +40,7 @@ export type UseLight = (l: Light) => void;
 
 export type LightDataProps = {
   alloc?: number,
+  deferred?: boolean,
   render?: (
     useLight: (l: Light) => void,
   ) => LiveElement,
@@ -49,6 +52,7 @@ export type LightDataProps = {
 export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) => {
   const {
     alloc = 1,
+    deferred = false,
     render,
     then,
   } = props;
@@ -277,7 +281,14 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     if (ranges.length) {
       const {buffer} = storage;
 
-      count[0] = lightCount;
+      // Don't count point lights if deferred rendering
+      if (deferred && subranges.has(POINT_LIGHT)) {
+        count[0] = subranges.get(POINT_LIGHT)[0];
+      }
+      else {
+        count[0] = lightCount;
+      }
+
       uploadBuffer(device, buffer, count.buffer);
 
       const stride = LIGHT_LAYOUT.length;

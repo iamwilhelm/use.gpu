@@ -140,7 +140,7 @@ export const SceneDeferredPage: LC = (props) => {
                     fields={lightFields}
                     data={lightData}
                     render={(positions: StorageSource, colors: StorageSource) => (
-                      <PointLayer positions={positions} colors={colors} size={50} depth={0.5} xmode="transparent" />
+                      <PointLayer positions={positions} colors={colors} size={50} depth={0.5} mode="transparent" />
                     )}
                   />
 

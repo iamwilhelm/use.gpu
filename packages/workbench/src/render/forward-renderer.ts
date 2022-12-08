@@ -5,7 +5,7 @@ import type { AggregatedCalls, LightEnv } from './pass/types';
 import type { UseLight } from './light-data';
 
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
-import { bindBundle, bundleToAttributes, bindEntryPoint, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState } from '@use-gpu/core';
 
 import { LightContext } from '../providers/light-provider';
@@ -33,9 +33,9 @@ import { ShadowPass } from '../pass/shadow-pass';
 
 import { LightData, SHADOW_FORMAT, SHADOW_PAGE } from './light/light-data';
 
-import lightUniforms from '@use-gpu/wgsl/use/light.wgsl';
-import shadowBindings from '@use-gpu/wgsl/use/shadow.wgsl';
-import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
+import { getLight, getLightCount } from '@use-gpu/wgsl/use/light.wgsl';
+import { sampleShadow } from '@use-gpu/wgsl/use/shadow.wgsl';
+
 import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
 import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
 import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
@@ -45,10 +45,6 @@ const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
 const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 
 const NO_ENV: Record<string, any> = {};
-
-const getLightCount = bindEntryPoint(lightUniforms, 'getLightCount');
-const getLight = bindEntryPoint(lightUniforms, 'getLight');
-const sampleShadow = bindEntryPoint(shadowBindings, 'sampleShadow');
 
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,

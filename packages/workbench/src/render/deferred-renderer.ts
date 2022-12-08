@@ -40,6 +40,17 @@ import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
 
+import { getLight, getLightCount } from '@use-gpu/wgsl/use/light.wgsl';
+import { sampleShadow } from '@use-gpu/wgsl/use/shadow.wgsl';
+
+import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
+import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
+import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
+import { applyPointShadow as applyPointShadowWGSL } from '@use-gpu/wgsl/shadow/point.wgsl';
+
+const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
+const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
+
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,
   renders: Record<string, Record<string, LiveComponent<any>>>,
@@ -204,11 +215,28 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
 
   // Provide no lit material
   const view = lights ? use(LightData, {
+    deferred: true,
     render: (
       useLight: UseLight,
     ) => {
       const context = useMemo(() => {
-        const useMaterial = () => {};
+        const bindMaterial = (applyMaterial: ShaderModule) => {
+
+          const applyDirectionalShadow = shadows ? bindBundle(applyDirectionalShadowWGSL, {sampleShadow}) : null;
+          const applyPointShadow = shadows ? bindBundle(applyPointShadowWGSL, {sampleShadow}) : null;
+
+          const applyLight = bindBundle(applyLightWGSL, {
+            applyMaterial,
+            applyDirectionalShadow,
+            applyPointShadow,
+          }, {SHADOW_PAGE});
+
+          return bindBundle(applyLightsWGSL, {applyLight, getLightCount, getLight});
+        };
+
+        const useMaterial = (applyMaterial: ShaderModule) =>
+          useMemo(() => bindMaterial(applyMaterial), [bindMaterial, applyMaterial]);
+
         return {useLight, useMaterial};
       }, [useLight]);
 

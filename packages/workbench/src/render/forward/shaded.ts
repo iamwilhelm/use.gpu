@@ -26,6 +26,8 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     links: {
       getVertex,
@@ -68,6 +70,8 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     vertex: v,
     fragment: f,

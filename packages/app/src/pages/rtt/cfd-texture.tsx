@@ -24,6 +24,23 @@ import { main as advectMcCormack }  from './cfd-texture/mccormack.wgsl';
 
 import { CFDControls } from '../../ui/cfd-controls';
 
+// This is a compute-shader + textures implementation of fluid dynamics,
+// which uses float32 textures for storage. This tends to be more efficient
+// than a raw array, as textures are laid out in a cache-efficient format.
+//
+// Notable differences with render passes:
+// - compute is dispatched one workgroup size at a time and may go out of bounds
+// - compute can output data to any number of targets
+// - compute writes out results manually
+// - pixels are addressed using absolute coordinates [0...N] rather than UV [0...1]
+//
+// When sampling from a texture, you can however use e.g. `textureSampleLevel(…)` to
+// sample using UV coordinates.
+//
+// However, as float32 is not a filterable format, here we still have to manually
+// load 2x2 samples in the shaders to get bilinear filtering. 
+//
+
 const colorizeShader = wgsl`
   @link var velocityField: texture_2d<f32>;
 
@@ -109,7 +126,7 @@ export const RTTCFDTexturePage: LC = () => {
             <Pick all move render={({x, y, moveX, moveY}) => (
               <Compute immediate>
                 <Stage target={velocity}>
-                  <Kernel shader={pushVelocity} args={[[x / 2, y / 2], [moveX, moveY]]} swap history />
+                  <Kernel shader={pushVelocity} args={[[x / 2, y / 2], [moveX, moveY]]} history />
                 </Stage>
               </Compute>
             )} />
@@ -123,15 +140,15 @@ export const RTTCFDTexturePage: LC = () => {
                   </Stage>
                   <Stage target={pressure}>
                     <Iterate count={50}>
-                      <Kernel shader={updatePressure} source={divergence} history swap />
+                      <Kernel shader={updatePressure} source={divergence} history />
                     </Iterate>
                   </Stage>
                   <Stage target={velocity}>
                     <Kernel shader={generateInitial} initial args={[Math.random()]} />
-                    <Kernel shader={projectVelocity} source={pressure} history swap />
-                    <Kernel shader={advectForwards}  history swap />
-                    <Kernel shader={advectBackwards} history swap />
-                    <Kernel shader={advectMcCormack} source={curl} history swap />
+                    <Kernel shader={projectVelocity} source={pressure} history />
+                    <Kernel shader={advectForwards}  history />
+                    <Kernel shader={advectBackwards} history />
+                    <Kernel shader={advectMcCormack} source={curl} history />
                   </Stage>
                 </Suspense>
               </Compute>

@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DataField, Emit, RenderPassMode, Time } from '@use-gpu/core';
+import type { DataField, Emit, Time } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';

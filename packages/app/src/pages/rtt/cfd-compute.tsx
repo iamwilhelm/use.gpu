@@ -24,6 +24,20 @@ import { main as advectMcCormack }  from './cfd-compute/mccormack.wgsl';
 
 import { CFDControls } from '../../ui/cfd-controls';
 
+//
+// A pure compute-shader implementation of fluid dynamics,
+// which uses raw arrays as storage rather than textures.
+//
+// Notable differences with render passes:
+// - compute is dispatched one workgroup size at a time and may go out of bounds
+// - compute can output data to any number of targets
+// - compute writes out results manually
+// - pixels are addressed using absolute coordinates [0...N] rather than UV [0...1]
+//
+// As compute buffers are flat 1D arrays, we have to manually serialize (X,Y) coordinates
+// to/from a linear index.
+//
+
 const colorizeShader = wgsl`
   @link fn getSample(i: u32) -> vec4<f32> {};
   @link fn getSize() -> vec4<u32> {};
@@ -130,15 +144,15 @@ export const RTTCFDComputePage: LC = () => {
                   </Stage>
                   <Stage target={pressure}>
                     <Iterate count={50}>
-                      <Kernel shader={updatePressure} source={divergence} history swap />
+                      <Kernel shader={updatePressure} source={divergence} history />
                     </Iterate>
                   </Stage>
                   <Stage target={velocity}>
                     <Kernel shader={generateInitial} initial args={[Math.random()]} />
-                    <Kernel shader={projectVelocity} source={pressure} history swap />
-                    <Kernel shader={advectForwards}  history swap />
-                    <Kernel shader={advectBackwards} history swap />
-                    <Kernel shader={advectMcCormack} source={curl} history swap />
+                    <Kernel shader={projectVelocity} source={pressure} history />
+                    <Kernel shader={advectForwards}  history />
+                    <Kernel shader={advectBackwards} history />
+                    <Kernel shader={advectMcCormack} source={curl} history />
                   </Stage>
                 </Suspense>
               </Compute>

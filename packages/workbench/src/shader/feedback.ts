@@ -5,26 +5,38 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import { use, useMemo } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 import { useRenderContext } from '../providers/render-provider';
-import { useBoundSource } from '../hooks/useBoundSource';
+import { getBoundSource } from '../hooks/useBoundSource';
 import { RawFullScreen } from '../primitives';
 
 export type FeedbackProps = {
   shader?: ShaderModule,
 };
 
-const FEEDBACK_BINDING = {name: 'getFeedback', format: 'vec4<f32>', args: ['vec2<f32>']} as UniformAttribute;
+const TEXTURE_BINDING = {name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>']} as UniformAttribute;
+const TEXTURE_SIZE_BINDING = { name: 'getTextureSize', format: 'vec2<f32>', args: [], value: [0, 0] } as UniformAttributeValue;
 
-/** Render last frame from the current render target, with an optional shader applied. */
+/** Render last frame from the current render target, with an optional shader applied.
+
+Provides:
+- `@link getTextureSize(uv: vec2<f32>) -> vec2<f32>`
+- `@link getTexture(uv: vec2<f32>) -> vec4<f32>`
+*/
 export const Feedback: LiveComponent<FeedbackProps> = ({shader}: FeedbackProps) => {
-  const context = useRenderContext();
-  const history = context.source?.history;
+  const {source, width, height} = useRenderContext();
+  const history = source?.history;
   if (!history) throw new Error("Can't render feedback. Render context has no history.");
 
-  const source = useBoundSource(FEEDBACK_BINDING, history[0]);
+  return useMemo(() => {
+    const getTexture     = getBoundSource(TEXTURE_BINDING, history[0]);
+    const getTextureSize = getBoundSource(TEXTURE_SIZE_BINDING, () => [width, height]);
 
-  return useMemo(() => (
-    use(RawFullScreen, {
-      texture: shader ? bindBundle(shader, {getFeedback: source}) : source,
-    })
-  ), [shader, source]);
+    const t = shader ? bindBundle(shader, {
+      getTexture,
+      getTextureSize,
+    }) : getTexture;
+    
+    return use(RawFullScreen, {
+      texture: t,
+    });
+  }, [shader, history, width, height]);
 }

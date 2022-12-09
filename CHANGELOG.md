@@ -1,22 +1,26 @@
 0.8.0
-- `@use-gpu/app`: Added examples: scene, instancing, shadow, image textures
+- `@use-gpu/app`: Added examples: scene, instancing, shadow, image textures, multiscale RTT
 - `@use-gpu/live`: Allow `<Capture>`/`<Reconcile>` continuation to participate in yeets
 - `@use-gpu/live`: Rename `useAsync` to `useAwait`
 - `@use-gpu/live`: Components that yeet identical values repeatedly no longer trigger a re-gather
-- `@use-gpu/plot`: Add `<Grid auto>` to snap grids to far side of range.
+- `@use-gpu/live`: JSX children do not have to be arrays
+- `@use-gpu/plot`: Add `<Grid auto>` to snap grids to far side of range
 - `@use-gpu/scene`: Add basic `<Scene>`/`<Node>`/`<Primitive>` components for a classic matrix tree
 - `@use-gpu/scene`: Add `<Instances>` component for instanced mesh rendering
 - `@use-gpu/workbench`: Refactor `<Pass>`/`<Virtual>` to allow for swappable render passes
 - `@use-gpu/workbench`: Add visibility culling with draw call ordering to `<Pass>` via view and transform context
 - `@use-gpu/workbench`: Add shared global bindings to `<DrawCall>` and `<Pass>` via view context
+- `@use-gpu/workbench`: Split `<Pass>` into `<ForwardRenderer>` and add a `<DeferredRenderer>`
+- `@use-gpu/workbench`: Replace explicit `<Lights>` with implicit `<LightData>`, which is now owned by the renderer
 - `@use-gpu/workbench`: Allow `<FaceLayer>` to be used with indexed positions and segments
 - `@use-gpu/workbench`: Add `<InstanceData>` component for gathering instance data
 - `@use-gpu/workbench`: Add `<InterleavedData>` to read packed vertex attributes
-- `@use-gpu/workbench`: Add `<GeometryData>` to read flat vertex attributes
-- `@use-gpu/workbench`: Add `<HemisphereLight>` with adjustable zenith, horizon and bleed/overextension
+- `@use-gpu/workbench`: Add `<GeometryData>` to read prefab geometry, with helpers like `makeSphereGeometry`
+- `@use-gpu/workbench`: Add `<DomeLight>` with adjustable zenith, horizon and bleed/overextension
 - `@use-gpu/workbench`: Add `unwelded` indexing mode to `<CompositeData>` and more unwelded options to `<FaceLayer>`
 - `@use-gpu/workbench`: Add `stroke` to `<PointLayer>` to allow for thin outlined shapes
 - `@use-gpu/workbench`: Rename `<ComputeData>`/`<TextureData>` to `<ComputeBuffer>`/`<TextureBuffer>`
+- `@use-gpu/workbench`: Replace `<Feedback>` with a more generic `<FullScreen>` similar to `<Kernel>`
 
 0.7.0
 - `@use-gpu/live`: Reconciling + quote/unquote as native ops.

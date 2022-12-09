@@ -1,13 +1,12 @@
 import type { LC } from '@use-gpu/live';
 import type { Emit, Time } from '@use-gpu/core';
-import { RenderPassMode } from '@use-gpu/core';
 
 import React from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
   Loop, Draw, Pass, OrbitCamera, RawData, PointLayer,
-  LinearRGB, Feedback,
+  LinearRGB, FullScreen,
 } from '@use-gpu/workbench';
 
 export const RTTFeedbackPage: LC = () => {
@@ -16,12 +15,12 @@ export const RTTFeedbackPage: LC = () => {
       <LinearRGB history={1} sampler={{minFilter: 'linear', magFilter: 'linear'}}>
         <OrbitCamera scale={1080}>
           <Pass>
-            <Feedback shader={
+            <FullScreen shader={
               wgsl`
-                @link fn getFeedback(uv: vec2<f32>) -> vec4<f32> {}
+                @link fn getTexture(uv: vec2<f32>) -> vec4<f32> {}
                 @export fn main(uv: vec2<f32>) -> vec4<f32> {
                   let advectedUV = (uv - 0.5) * 0.99 + 0.5;
-                  return getFeedback(advectedUV);
+                  return getTexture(advectedUV);
                 }
               `
             }/>

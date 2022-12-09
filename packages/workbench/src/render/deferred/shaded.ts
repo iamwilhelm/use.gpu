@@ -28,6 +28,8 @@ export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (p
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     links: {
       getVertex,
@@ -70,6 +72,8 @@ export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (p
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     vertex: v,
     fragment: f,

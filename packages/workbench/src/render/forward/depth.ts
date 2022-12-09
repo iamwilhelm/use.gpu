@@ -25,6 +25,8 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     links: {
       getVertex,
@@ -66,6 +68,8 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     vertex: v,
     fragment: f,

@@ -23,6 +23,8 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     vertexCount,
     instanceCount,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     links: {
       getVertex,
@@ -57,6 +59,8 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     vertexCount,
     instanceCount,
     indirect,
+    shouldDispatch,
+    onDispatch,
     vertex: v,
     fragment: f,
     defines,

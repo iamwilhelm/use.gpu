@@ -23,6 +23,7 @@ import { PlotSphericalPage } from './pages/plot/spherical';
 import { PlotStereographicPage } from './pages/plot/stereographic';
 import { RTTLinearRGBPage } from './pages/rtt/linear-rgb';
 import { RTTFeedbackPage } from './pages/rtt/feedback';
+import { RTTMultiscalePage } from './pages/rtt/multiscale';
 import { RTTCFDComputePage } from './pages/rtt/cfd-compute';
 import { RTTCFDTexturePage } from './pages/rtt/cfd-texture';
 
@@ -49,6 +50,7 @@ export const makePages = () => [
   {path: "/plot/implicit-surface", title: "Plot - Implicit Surface",           element: <PlotImplicitSurfacePage />},
   {path: "/rtt/linear-rgb",        title: "RTT - Linear RGB",                  element: <RTTLinearRGBPage />},
   {path: "/rtt/feedback",          title: "RTT - Feedback",                    element: <RTTFeedbackPage />},
+  {path: "/rtt/multiscale",        title: "RTT - Multiscale",                  element: <RTTMultiscalePage />},
   {path: "/rtt/cfd-compute",       title: "RTT - Fluid Dynamics (Compute I)",  element: <RTTCFDComputePage />},  
   {path: "/rtt/cfd-texture",       title: "RTT - Fluid Dynamics (Compute II)", element: <RTTCFDTexturePage />},   
   {path: "/mesh/raw",              title: "Raw Mesh - DIY Rendering",          element: <MeshRawPage />},

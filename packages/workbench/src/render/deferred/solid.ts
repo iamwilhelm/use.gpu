@@ -28,6 +28,8 @@ export const DeferredSolidRender: LiveComponent<DeferredSolidRenderProps> = (pro
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     links: {
       getVertex,
@@ -70,6 +72,8 @@ export const DeferredSolidRender: LiveComponent<DeferredSolidRenderProps> = (pro
     instanceCount,
     bounds,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     vertex: v,
     fragment: f,

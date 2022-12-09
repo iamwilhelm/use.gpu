@@ -3,7 +3,7 @@ import type {
   ShaderModuleDescriptor, ShaderStageDescriptor,
 } from './types';
 
-import { patch } from '@use-gpu/state';
+import { patch, $delete } from '@use-gpu/state';
 
 export const makeShaderModuleDescriptor = (
   code: TypedArray | string,
@@ -40,6 +40,8 @@ export const makeRenderPipeline = (
     }) : undefined,
   } as any, descriptor) as any as GPURenderPipelineDescriptor;
 
+  if (!depthStencilState) delete pipelineDescriptor.depthStencil;
+
   return device.createRenderPipeline(pipelineDescriptor);
 }
 
@@ -62,6 +64,8 @@ export const makeRenderPipelineAsync = (
       targets: colorStates,
     }) : undefined,
   } as any, descriptor) as any as GPURenderPipelineDescriptor;
+
+  if (!depthStencilState) delete pipelineDescriptor.depthStencil;
 
   return device.createRenderPipelineAsync(pipelineDescriptor);
 }

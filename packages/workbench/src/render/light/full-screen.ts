@@ -14,7 +14,7 @@ import { FULLSCREEN_PIPELINE, FULLSCREEN_DEFS, useLightDraw } from './light';
 const VERTEX_BINDINGS = bundleToAttributes(getLightVertex);
 const FRAGMENT_BINDINGS = bundleToAttributes(getLightFragment);
 
-export const FullscreenLightRender: LiveComponent<LightKindProps> = (props: LightKindProps) => {
+export const FullScreenLightRender: LiveComponent<LightKindProps> = (props: LightKindProps) => {
   const {
     start,
     end,

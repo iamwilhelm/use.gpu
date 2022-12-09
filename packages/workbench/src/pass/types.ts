@@ -56,6 +56,9 @@ export type VirtualDraw = {
   bounds?: Lazy<DataBounds>,
   indirect?: StorageSource,
 
+  shouldDispatch?: () => boolean | number | undefined,
+  onDispatch?: () => void,
+
   renderer?: string,
   links?: Record<string, ShaderModule>,
 };

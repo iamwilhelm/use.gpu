@@ -107,7 +107,8 @@ export const makeBundleToAttributes = (
     const out: UniformAttribute[] = [];
     for (const d of declarations) if (d.func ?? d.variable) {
       if (d.flags & RF.External) {
-        out.push(resolveBundleType(bundle, toAttribute(d)));
+        const attr = toAttribute(d);
+        if (!bundle.links?.[attr.name]) out.push(resolveBundleType(bundle, attr));
       }
     }
 

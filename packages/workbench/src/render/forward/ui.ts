@@ -23,6 +23,8 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
     vertexCount,
     instanceCount,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     links: {
       getVertex,
@@ -61,6 +63,8 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
     vertexCount,
     instanceCount,
     indirect,
+    shouldDispatch,
+    onDispatch,
     vertex: v,
     fragment: f,
     defines,

@@ -24,7 +24,7 @@ import { AMBIENT_LIGHT, DIRECTIONAL_LIGHT, DOME_LIGHT, POINT_LIGHT } from '../..
 import { SHADOW_PAGE } from './light-data';
 
 import { EmissiveLightRender } from './emissive';
-import { FullscreenLightRender } from './fullscreen';
+import { FullScreenLightRender } from './full-screen';
 import { PointLightRender } from './point';
 
 import lightUniforms from '@use-gpu/wgsl/use/light.wgsl';
@@ -161,9 +161,9 @@ export const GEOMETRY_DEFS = {
 };
 
 const LIGHT_RENDERERS = {
-  [AMBIENT_LIGHT]: FullscreenLightRender,
-  [DIRECTIONAL_LIGHT]: FullscreenLightRender,
-  [DOME_LIGHT]: FullscreenLightRender,
+  [AMBIENT_LIGHT]: FullScreenLightRender,
+  [DIRECTIONAL_LIGHT]: FullScreenLightRender,
+  [DOME_LIGHT]: FullScreenLightRender,
   [POINT_LIGHT]: PointLightRender,
 } as Record<number, LiveComponent>;
 

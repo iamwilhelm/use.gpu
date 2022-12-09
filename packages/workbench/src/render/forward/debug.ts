@@ -24,6 +24,8 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     vertexCount: vC = 0,
     instanceCount: iC = 0,
     indirect,
+    shouldDispatch,
+    onDispatch,
 
     links: {
       getVertex: gV,
@@ -77,6 +79,8 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     vertexCount,
     instanceCount,
     indirect: wireframeIndirect,
+    shouldDispatch,
+    onDispatch,
     vertex: v,
     fragment: f,
     defines,

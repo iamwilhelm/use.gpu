@@ -11,7 +11,7 @@ import { makeStorageTexture } from '@use-gpu/core';
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
-const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
+const DEFAULT_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 
 export type TextureBufferProps = {
   width?: number,
@@ -42,7 +42,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props) => {
     format = PRESENTATION_FORMAT,
     history = 0,
     filterable = false,
-    sampler = NO_SAMPLER,
+    sampler = DEFAULT_SAMPLER,
     colorSpace = COLOR_SPACE,
     children,
     render,

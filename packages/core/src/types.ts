@@ -1,4 +1,4 @@
-import { vec2, vec3, mat4 } from 'gl-matrix';
+import { vec2, vec3, vec4, mat4 } from 'gl-matrix';
 
 export type Point = [number, number];
 export type Point3 = [number, number, number];
@@ -443,7 +443,6 @@ export type Atlas = {
   map: Map<number, Rectangle>,
   width: number,
   height: number,
-  uploads: Rectangle[][],
   version: number,
 };
 

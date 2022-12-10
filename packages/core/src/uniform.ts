@@ -148,7 +148,7 @@ export const makeVolatileUniforms = <T>(
   
   if (depth === 1) {
     let lastVersion = -1;
-    let cached = null;
+    let cached: GPUBindGroup | null = null;
   
     const bindGroup = () => {
 
@@ -208,13 +208,13 @@ export const makeVolatileUniforms = <T>(
   return {bindGroup};
 }
 
-const getTextureDimension = (layout: string) => {
+const getTextureDimension = (layout: string): GPUTextureViewDimension | undefined => {
   if (!layout) return undefined;
 
-  const type = layout.match(/[1-3]d|cube/)[0];
+  const type = layout.match(/[1-3]d|cube/)?.[0];
   if (!type) return undefined;
 
-  return layout.match(/array/) ? type + '-array' : type;
+  return (layout.match(/array/) ? type + '-array' : type) as GPUTextureViewDimension;
 };
 
 export const makeDataBindingsEntries = <T>(

@@ -33,7 +33,7 @@ const BINDING_SAMPLE_TYPES = {
   f: 'float',
   u: 'uint',
   i: 'sint',
-};
+} as Record<string, GPUTextureSampleType>;
 
 const parseTextureType = (format: string, variant: string | null) => {
   const [layout, type] = format.split(/[<>,]/);
@@ -44,7 +44,7 @@ const parseTextureType = (format: string, variant: string | null) => {
     if (type && (type[0] in BINDING_SAMPLE_TYPES)) {
       let sampleType = BINDING_SAMPLE_TYPES[type[0]];
       if (sampleType === 'float' && (variant && !variant.match(/^textureSample/))) {
-        sampleType = 'unfilterable-float';
+        sampleType = 'unfilterable-float' as GPUTextureSampleType;
       }
       return {texture: {...props, sampleType}};
     }
@@ -52,7 +52,7 @@ const parseTextureType = (format: string, variant: string | null) => {
   }
   if (layout in BINDING_STORAGE_TEXTURE_TYPES) {
     const props = BINDING_STORAGE_TEXTURE_TYPES[layout];
-    return {storageTexture: {...props, format: type}};
+    return {storageTexture: {...props, format: type as GPUTextureFormat}};
   }
   throw new Error(`Unknown texture layout "${layout}"`);
 };
@@ -64,7 +64,7 @@ export const makeBindGroupLayoutEntries = (
 ): GPUBindGroupLayoutEntry[] => {
   const out = [];
   for (let b of bindings) {
-    const v = typeof visibilities === 'number' ? visibilities : visibilities.get(b);
+    const v = typeof visibilities === 'number' ? visibilities : (visibilities.get(b) || 7);
     const l = makeBindingLayoutEntry(b, v, out.length + binding);
     if (Array.isArray(l)) out.push(...l);
     else out.push(l);
@@ -85,19 +85,21 @@ export const makeBindingLayoutEntry = (
   if (b.texture) {
     const hasSampler = !!(b.texture!.sampler && (b.uniform!.args !== null));
 
-    const textureType = b.uniform.args ? b.texture.layout : b.uniform.format;
+    const textureType = b.uniform.args ? b.texture.layout : (b.uniform.format as string);
     const textureVariant = b.texture.variant ?? (b.uniform.args ? null : 'textureLoad');
+
     const props = parseTextureType(textureType, textureVariant);
 
     const texture = {binding, visibility, ...props};
 
     if (hasSampler) {
-      const type = texture.texture?.comparison ? 'comparison' : 'filtering';
+      const type = (b.texture!.comparison ? 'comparison' : 'filtering') as GPUSamplerBindingType;
       const sampler = {binding: binding + 1, visibility, sampler: {type}};
       return [texture, sampler];
     }
     return texture;
   }
+  throw new Error(`Cannot generate bind group layout entry for binding '${b.uniform.name}'`);
 };
 
 export const makeUniformLayoutEntry = (
@@ -142,10 +144,10 @@ export const getMinBindingSize = (format: string | any) => {
 
   const {module} = format;
   const {entry, table: {declarations}} = module;
-  const {struct} = declarations.find(d => d.struct?.name === entry);
+  const {struct} = declarations.find((d: any) => d.struct?.name === entry);
   if (!struct) return 0;
 
-  const members = struct.members.map(m => ({name: m.name, format: toTypeString(m.type)}));
+  const members = struct.members.map((m: any) => ({name: m.name, format: toTypeString(m.type)}));
   const layout = makeUniformLayout(members);
   return layout.length;
 };
@@ -153,7 +155,7 @@ export const getMinBindingSize = (format: string | any) => {
 export const toTypeString = (t: any | string): string => {
   if (typeof t === 'object') {
     if (t.type) return toTypeString(t.type);
-    if (t.args) return `${t.name}<${t.args.map(t => toTypeString(t)).join(',')}>`;
+    if (t.args) return `${t.name}<${t.args.map((t: any) => toTypeString(t)).join(',')}>`;
     else return t.name;
   }
   return t;

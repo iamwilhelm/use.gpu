@@ -7,7 +7,7 @@ export const makeSharedStorage = (
   device: GPUDevice,
   sources: StorageSource[],
 ): SharedAllocation => {
-  const group = sources.map((_, binding) => ({binding, visibility: VISIBILITY_ALL, buffer: {type: 'read-only-storage'}}));
+  const group = sources.map((_, binding) => ({binding, visibility: VISIBILITY_ALL, buffer: {type: 'read-only-storage' as GPUBufferBindingType}}));
   const layout = makeBindGroupLayout(device, group);
 
   const entries = makeStorageEntries(sources);
@@ -25,8 +25,8 @@ export const makeStorageBinding = (
   links: Record<string, StorageSource | null | undefined>,
   set: number = 0,
 ): GPUBindGroup => {
-  const sources = [];
-  for (const k in links) if (links[k]) source.push(links[k]);
+  const sources = [] as StorageSource[];
+  for (const k in links) if (links[k]) sources.push(links[k]!);
 
   const entries = makeStorageEntries(sources);
   const bindGroup = device.createBindGroup({
@@ -40,7 +40,7 @@ export const makeStorageEntries = (
   sources: StorageSource[],
   binding: number = 0
 ): GPUBindGroupEntry[] => {
-  const entries = [] as any[];
+  const entries = [] as GPUBindGroupEntry[];
 
   for (const source of sources) {
     const {buffer, byteOffset, byteLength} = source;

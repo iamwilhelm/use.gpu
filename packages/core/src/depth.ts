@@ -59,7 +59,7 @@ export const makeDepthStencilAttachments = (
   stencilClearValue: number = 0,
   stencilLoadOp: GPULoadOp = 'clear',
   stencilStoreOp: GPUStoreOp = 'store',
-): GPURenderPassDepthStencilAttachment => {
+): GPURenderPassDepthStencilAttachment[] => {
   const hasStencil = depthFormat.match(/stencil/);
   
   if (hasStencil) {

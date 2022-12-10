@@ -9,7 +9,7 @@ export const resolve = <T>(x: Lazy<T>): T => {
   return x;
 };
 
-export const proxy = <T>(target: T, override: Record<string, any>) => {
+export const proxy = <T extends object>(target: T, override: Record<string, any>) => {
   return new Proxy(target, {
     get: (target, s) => {
       if (Object.hasOwn(override, s)) return resolve((override as any)[s]);

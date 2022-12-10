@@ -225,7 +225,7 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
 
   if (typeof b === 'object') {
     let update: Record<string, any> = b as any;
-    if (typeof a !== 'object' || a == null) return $maybeSet(a);
+    if (typeof a !== 'object' || a == null) return $maybeSet(a as T);
 
     const out = {} as Record<string, any>;
 
@@ -274,8 +274,8 @@ export const diff = <T>(a: T, b: T): Update<T> => {
 
   if (typeof b === 'object') {
     let bb: Record<string, any> = b;
-    if (typeof a !== 'object' || a == null) return $maybeSet(b);
-    if (Array.isArray(a) || isTypedArray(a)) return $maybeSet(b);
+    if (typeof a !== 'object' || a == null) return $maybeSet(b as T);
+    if (Array.isArray(a) || isTypedArray(a)) return $maybeSet(b as T);
 
     let aa: Record<string, any> = a as any;
 
@@ -307,11 +307,11 @@ export const getUpdateKeys = <T>(update: T): string[] => {
   const recurse = (b: Update<T>, path: string | null) => {
     if (b && typeof b === 'object') {
       if ('$nop' in b) return;
-      if ('$set' in b) return keys.push(path);
-      if ('$apply' in b) return keys.push(path);
-      if ('$patch' in b) return keys.push(path);
+      if ('$set' in b) return keys.push(path ?? '');
+      if ('$apply' in b) return keys.push(path ?? '');
+      if ('$patch' in b) return keys.push(path ?? '');
       if ('$merge' in b) return pick(b.$merge, path);
-      if ('$delete' in b) return keys.push(path);
+      if ('$delete' in b) return keys.push(path ?? '');
     }
     return pick(b, path);
   };
@@ -319,17 +319,17 @@ export const getUpdateKeys = <T>(update: T): string[] => {
   const pick = (b: Update<T>, path: string | null) => {
     if (b && typeof b === 'object') {
       if (Array.isArray(b) || isTypedArray(b)) {
-        return keys.push(path);
+        return keys.push(path ?? '');
       }
       for (let k in b) {
-        recurse(b[k], path != null ? path + '.' + k : k);
+        recurse((b as any)[k], path != null ? path + '.' + k : k);
       }
     }
     else if (b !== undefined) {
-      keys.push(path);
+      keys.push(path ?? '');
     }
   }
   
-  recurse(update);
+  recurse(update, null);
   return keys;
 }

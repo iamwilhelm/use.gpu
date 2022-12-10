@@ -9,9 +9,11 @@ import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop
 const NO_PROPS: any[] = [{}];
 
 const toChildren = <T>(t: T | T[]): T | T[] | undefined => {
-  if (!Array.isArray(t) && t) return t;
-  if (t.length === 1) return t[0];
-  if (t.length) return t;
+  if (Array.isArray(t)) {
+    if (t.length === 1) return t[0];
+    if (t.length) return t;
+  }
+  if (t) return t;
   return undefined;
 };
 

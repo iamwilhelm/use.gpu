@@ -684,7 +684,7 @@ export const reduceFiberValues = <R>(
     const {yeeted, mount, mounts, order} = fiber;
     if (!yeeted) throw new Error("Reduce without aggregator");
 
-    let isFork = fiber.f === CAPTURE || fiber.f === RECONCILE;
+    let isFork = (fiber.f === CAPTURE || fiber.f === RECONCILE) && fiber.next;
 
     if (!self) {
       if (fiber.next && !isFork) return reduce(fiber.next);
@@ -707,18 +707,31 @@ export const reduceFiberValues = <R>(
           value = reducer((value as R), (v as R)!);
         }
 
-        let reduced = value;
-        if (isFork) reduced = reducer(reduced, reduce(fiber.next));
+        let reduced = value as any;
+        if (isFork) {
+          let fork = reduce(fiber.next!);
+          if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
+
+          reduced = (reduced && fork) ? reducer(reduced, fork as any) : (reduced ?? fork);
+        }
         return yeeted.reduced = reduced;
       }
     }
     else if (mount) {
-      let reduced = reduce(mount);
-      if (isFork) reduced = reducer(reduced, reduce(fiber.next));
+      let value = reduce(mount);
+      if (value === SUSPEND) return yeeted.reduced = SUSPEND;
+
+      let reduced = value as any;
+      if (isFork) {
+        let fork = reduce(fiber.next!);
+        if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
+
+        reduced = reduced && fork ? reducer(reduced, fork as any) : (reduced ?? fork);
+      }
       return yeeted.reduced = reduced;
     }
     else if (isFork) {
-      return yeeted.reduced = reduce(fiber.next);
+      return yeeted.reduced = reduce(fiber.next!);
     }
     return undefined;
   };
@@ -735,7 +748,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = fiber.f === CAPTURE || fiber.f === RECONCILE;
+  let isFork = (fiber.f === CAPTURE || fiber.f === RECONCILE) && fiber.next;
 
   if (!self) {
     if (fiber.next && !isFork) return gatherFiberValues(fiber.next);
@@ -759,7 +772,12 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
         else items.push(value as T);
       }
 
-      if (isFork) items.push(...gatherFiberValues(fiber.next));
+      if (isFork) {
+        let fork = gatherFiberValues(fiber.next!);
+        if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
+
+        if (fork) items.push(...toArray<T>(fork as any));
+      }
       return yeeted.reduced = items;
     }
   }
@@ -768,8 +786,11 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
     if (value === SUSPEND) return yeeted.reduced = SUSPEND;
 
     if (isFork) {
-      let reduced = toArray<T>(value as T | T[]).slice();
-      reduced.push(...gatherFiberValues(fiber.next));
+      let reduced = value ? toArray<T>(value as T | T[]).slice() : [];
+      let fork = gatherFiberValues(fiber.next!);
+      if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
+
+      reduced.push(...toArray<T>(fork as any));
       return yeeted.reduced = reduced;
     }
 
@@ -777,7 +798,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
     return yeeted.reduced = value as T | T[];
   }
   else if (isFork) {
-    return yeeted.reduced = gatherFiberValues(fiber.next);
+    return yeeted.reduced = gatherFiberValues(fiber.next!);
   }
   return [];
 }
@@ -791,7 +812,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = fiber.f === CAPTURE || fiber.f === RECONCILE;
+  let isFork = (fiber.f === CAPTURE || fiber.f === RECONCILE) && fiber.next;
 
   if (!self) {
     if (fiber.next && !isFork) return multiGatherFiberValues(fiber.next) as any;
@@ -808,12 +829,15 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 
         const value = multiGatherFiberValues(m);
         if (value === SUSPEND) return yeeted.reduced = SUSPEND;
-        multiGatherMergeInto(out, value);
+
+        multiGatherMergeInto(out, value as any);
       }
       
       if (isFork) {
-        const value = multiGatherFiberValues(fiber.next);
-        multiGatherMergeInto(out, value);
+        const fork = multiGatherFiberValues(fiber.next!);
+        if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
+
+        multiGatherMergeInto(out, fork as any);
       }
 
       return yeeted.reduced = out;
@@ -826,14 +850,16 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 
     if (isFork) {
       out = {...out};
-      const value = multiGatherFiberValues(fiber.next);
-      multiGatherMergeInto(out, value);
+      const fork = multiGatherFiberValues(fiber.next!);
+      if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
+
+      multiGatherMergeInto(out as any, fork as any);
     }
 
     return yeeted.reduced = out as any;
   }
   else if (isFork) {
-    return multiGatherFiberValues(fiber.next);
+    return multiGatherFiberValues(fiber.next!);
   }
   return {} as Record<string, T | T[]>;
 }

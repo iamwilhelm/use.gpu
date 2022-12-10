@@ -387,7 +387,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     }
 
     const linkable = {} as Record<string, true>;
-    for (const {symbol} of externals) linkable[symbol] = true;
+    for (const {symbols} of externals) for (const symbol of symbols) linkable[symbol] = true;
 
     return {
       symbols: orNone(symbols),

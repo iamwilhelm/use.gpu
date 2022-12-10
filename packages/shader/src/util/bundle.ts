@@ -108,7 +108,7 @@ export const makeBundleToAttributes = (
     for (const d of declarations) if (d.func ?? d.variable) {
       if (d.flags & RF.External) {
         const attr = toAttribute(d);
-        if (!bundle.links?.[attr.name]) out.push(resolveBundleType(bundle, attr));
+        if (!(bundle as any).links?.[attr.name]) out.push(resolveBundleType(bundle, attr));
       }
     }
 

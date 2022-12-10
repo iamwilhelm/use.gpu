@@ -193,6 +193,7 @@ Object {
   ],
   "externals": undefined,
   "globals": undefined,
+  "linkable": undefined,
   "modules": undefined,
   "symbols": Array [
     "QUAD",
@@ -963,6 +964,12 @@ Object {
     },
   ],
   "globals": undefined,
+  "linkable": Object {
+    "getColor": true,
+    "getDepth": true,
+    "getPosition": true,
+    "getSize": true,
+  },
   "modules": Array [
     Object {
       "at": 0,
@@ -1547,6 +1554,9 @@ Object {
     },
   ],
   "globals": undefined,
+  "linkable": Object {
+    "getInt": true,
+  },
   "modules": undefined,
   "symbols": Array [
     "x",
@@ -2125,6 +2135,7 @@ Object {
   ],
   "externals": undefined,
   "globals": undefined,
+  "linkable": undefined,
   "modules": undefined,
   "symbols": Array [
     "SolidVertex",
@@ -3363,6 +3374,7 @@ Object {
   ],
   "externals": undefined,
   "globals": undefined,
+  "linkable": undefined,
   "modules": undefined,
   "symbols": Array [
     "ViewUniforms",

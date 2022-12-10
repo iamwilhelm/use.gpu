@@ -77,7 +77,8 @@ export const bindBundle = (
     const chunk = links[k] as any;
 
     // Ensure link exists in module
-    if (!linkable[k]) continue;
+    let check = k.indexOf(':') > 0 ? k.split(':')[0] : k;
+    if (!linkable[check]) continue;
 
     // Copy bundle's sub-virtuals
     if (chunk.virtuals) revirtuals.push(...chunk.virtuals);
@@ -109,7 +110,7 @@ export const makeResolveBindings = (
   defines?: Record<string, ShaderDefine>,
   lazy?: boolean,
 ): {
-  modules: ParsedBundle[],
+  modules: (ParsedBundle | null)[],
   uniforms: DataBinding[],
   bindings: DataBinding[],
   volatiles: DataBinding[],
@@ -205,7 +206,7 @@ export const makeResolveBindings = (
     const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDINGS, imports: NO_SYMBOLS};
 
     // Append to modules
-    out = modules.map((m: ShaderModule) => {
+    out = modules.map((m: ParsedBundle | null) => {
       if (!m) return null;
 
       const bundle = toBundle(m);

@@ -15,7 +15,7 @@ export const Await: LiveComponent<AwaitProps<unknown>> = <T>(props: AwaitProps<T
     ? () => Promise.all(all)
     : () => promise ?? Promise.resolve();
 
-  const [value, error] = useAwait<LiveElement | undefined | void>(run, all ?? promise);
+  const [value, error] = useAwait<LiveElement | undefined | void>(run, all ?? [promise]);
   return value;
 }
 

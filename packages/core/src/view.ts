@@ -149,14 +149,15 @@ export const makeOrbitPosition = (
   theta: number,
   target: number[] | vec3 | vec4 = NO_TARGET,
   dolly: number = 1,
-): number[] => {
+): vec4 => {
   const ct = Math.cos(theta);
   radius /= Math.max(1e-5, dolly);
-  return [
+  return vec4.fromValues(
     -Math.sin(phi) * ct * radius + (target[0] || 0),
     Math.sin(theta) * radius + (target[1] || 0),
     Math.cos(phi) * ct * radius + (target[2] || 0),
-  ];
+    1,
+  );
 }
 
 export const makePanMatrix = (x: number, y: number, zoom: number, dolly: number): mat4 => {
@@ -166,13 +167,9 @@ export const makePanMatrix = (x: number, y: number, zoom: number, dolly: number)
   return matrix;
 }
 
-export const makePanPosition = (x: number, y: number, zoom: number, dolly: number): number[] => {
+export const makePanPosition = (x: number, y: number, zoom: number, dolly: number): vec4 => {
   const z = 1 - 1 / Math.max(1e-5, dolly);
-  return [
-    x,
-    y,
-    z,
-  ];
+  return vec4.fromValues(x, y, z, 1);
 }
 
 export const makeFrustumPlanes = (m: mat4): vec4[] => {
@@ -200,5 +197,3 @@ export const distanceToFrustum = (frustum: vec4[], x: number, y: number, z: numb
   }
   return min;
 };
-
-

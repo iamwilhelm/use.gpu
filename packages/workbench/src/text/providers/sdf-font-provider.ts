@@ -154,7 +154,6 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
           const newSource = resizeTextureSource(device, source, atlas.width, atlas.height, 1, 'auto');
           biasable.texture = source.texture = newSource.texture;
           biasable.view    = source.view    = newSource.view;
-          biasable.length  = source.length  = newSource.length;
           biasable.size    = source.size    = newSource.size;
 
           updateMipTextureChain(device, source, [[0, 0, sw, sh]]);

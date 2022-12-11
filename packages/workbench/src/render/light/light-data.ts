@@ -1,6 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TextureSource } from '@use-gpu/core';
-import type { Light, BoundLight } from './types';
+import type { Light, BoundLight } from '../../light/types';
+import type { LightEnv } from '../../pass/types';
 
 import { provide, capture, yeet, signal, makeCapture, useCallback, useCapture, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
 import {
@@ -19,6 +20,10 @@ import { useBufferedSize } from '../../hooks/useBufferedSize';
 import { Light as WGSLLight } from '@use-gpu/wgsl/use/types.wgsl';
 
 import { POINT_LIGHT } from '../../light/types';
+
+import { vec2, vec4 } from 'gl-matrix';
+
+type Queued = {id: number, data: Light};
 
 export const SHADOW_PAGE = 4096;
 export const SHADOW_FORMAT = "depth32float";
@@ -59,7 +64,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
   const [ids, queue, changed, lights, maps, count] = useOne(() => [
     makeIdAllocator(0),
-    [],
+    [] as Queued[],
     new Set<number>,
     new Map<number, BoundLight>,
     new Map<number, BoundLight>,
@@ -92,10 +97,10 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       if (lights.has(id)) {
         if (shadow) {
-          const {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur} = lights.get(id);
-          data = {id, shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur, ...data};
-          lights.set(id, data);
-          maps.set(id, data);
+          const {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur} = lights.get(id)!;
+          const d = {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur, ...data};
+          lights.set(id, d);
+          maps.set(id, d);
           continue;
         }
         else {
@@ -103,13 +108,13 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
         }
       }
       
-      data = {id, shadowMap: -1, ...data};
+      const d = {shadowMap: -1, ...data};
       if (shadow) {
-        lights.set(id, data);
-        maps.set(id, data);
+        lights.set(id, d);
+        maps.set(id, d);
       }
       else {
-        lights.set(id, data);
+        lights.set(id, d);
       }
     }
 
@@ -118,8 +123,8 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     let shadowKey = 0;
     for (const key of lights.keys()) lightKey = mixBits53(lightKey, key);
     for (const key of maps.keys()) {
-      const {shadow} = maps.get(key);
-      const {size: [w, h]} = shadow;
+      const {shadow} = maps.get(key)!;
+      const {size: [w, h]} = shadow!;
       shadowKey = mixBits53(mixBits53(mixBits53(shadowKey, key), w), h);
     }
 
@@ -127,7 +132,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     const size = useBufferedSize(Math.max(alloc, lightCount + 1));
     const device = useDeviceContext();
 
-    const prevDataRef = useRef(null);
+    const prevDataRef = useRef<ArrayBuffer | null>(null);
 
     // Make light storage buffer
     const [storage, data, filler] = useMemo(() => {
@@ -162,7 +167,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       let [atlas] = atlases;
 
       for (const key of lights.keys()) {
-        const light = lights.get(key);
+        const light = lights.get(key)!;
         const {shadow} = light;
         if (shadow) {
           const {size: [w, h], depth: [near, far], bias, blur} = shadow;
@@ -180,8 +185,8 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
           const nf = 1 / (near - far);
           light.shadowMap = page;
-          light.shadowUV = mapping.map(x => x / SHADOW_PAGE);
-          light.shadowDepth = [far * nf + 1, -far * near * nf];
+          light.shadowUV = (vec4.fromValues as any)(...mapping.map(x => x / SHADOW_PAGE));
+          light.shadowDepth = vec2.fromValues(far * nf + 1, -far * near * nf);
           light.shadowBias = bias;
           light.shadowBlur = blur;
         }
@@ -239,7 +244,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       const keys = [...lights.keys()];
       const order = seq(keys.length);
-      const kinds = keys.map(k => lights.get(k).kind);
+      const kinds = keys.map(k => lights.get(k)!.kind);
       order.sort((a, b) => kinds[a] - kinds[b]);
 
       const map = new Map<number, number>();
@@ -251,7 +256,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
         const kind = kinds[i];
         if (!subranges.has(kind)) subranges.set(kind, [j, j + 1]);
-        else subranges.get(kind)[1] = j + 1;
+        else subranges.get(kind)![1] = j + 1;
 
         ++j;
       }
@@ -260,14 +265,14 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
     // Order changed lights by index
     const ids = [...changed.values()];
-    ids.sort((a, b) => indices.get(a) - indices.get(b));
+    ids.sort((a, b) => indices.get(a)! - indices.get(b)!);
 
     // Update data sparsely while calculating upload ranges
     let ranges = [];
-    let range = null;
+    let range: [number, number] | null = null;
     let index = 0;
     for (const id of ids) {
-      const index = indices.get(id);
+      const index = indices.get(id)!;
 
       if (!range) ranges.push(range = [index, index + 1]);
       else if (range[1] === index) range[1]++;
@@ -283,7 +288,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       // Don't count point lights if deferred rendering
       if (deferred && subranges.has(POINT_LIGHT)) {
-        count[0] = subranges.get(POINT_LIGHT)[0];
+        count[0] = subranges.get(POINT_LIGHT)![0];
       }
       else {
         count[0] = lightCount;
@@ -319,5 +324,5 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     ];
   };
 
-  return capture(LightCapture, render(useLight), Resume);
+  return render ? capture(LightCapture, render(useLight), Resume) : null;
 };

@@ -1,4 +1,6 @@
+import type { UseGPURenderContext } from '@use-gpu/core';
 import type { Culler, Renderable } from './types';
+
 import { resolve, proxy } from '@use-gpu/core';
 import { mat4, vec3 } from 'gl-matrix';
 
@@ -16,7 +18,7 @@ export const getRenderPassDescriptor = (
     colorAttachments = [];
   }
   else if (overlay) {
-    colorAttachments = colorAttachments.map(a => proxy(a, {loadOp: 'load'}));
+    colorAttachments = colorAttachments.map((a: GPURenderPassColorAttachment) => proxy(a, {loadOp: 'load'}));
   }
 
   if ((merge || stencil) && depthStencilAttachment) {
@@ -39,27 +41,27 @@ export const getRenderPassDescriptor = (
 
 export const getDrawOrder = (cull: Culler, calls: Renderable[], sign: number = 1) => {
   let i = 0;
-  const order = [];
-  const depths = [];
+  const order: number[] = [];
+  const depths: (number | boolean)[] = [];
 
   for (const {draw, bounds} of calls) {
-    let depth;
+    let depth: number | boolean;
     if (bounds) {
       const {center, radius} = resolve(bounds);
-      depth = cull(center, radius);
+      depth = cull(center as any as vec3, radius);
     }
     else {
       depth = true;
     }
     depths.push(depth);
-    
+
     if (depth !== false) order.push(i);
     i++;
   }
 
   order.sort((a, b) => {
-    const da = depths[a];
-    const db = depths[b];
+    const da = depths[a] as number | true;
+    const db = depths[b] as number | true;
     if (da === db) return a - b;
     if (da === true) return 1;
     if (db === true) return -1;

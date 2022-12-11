@@ -5,7 +5,7 @@ import React from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
-  Loop, Draw, Pass, OrbitCamera, RawData, PointLayer,
+  Loop, Pass, OrbitCamera, RawData, PointLayer,
   LinearRGB, FullScreen,
 } from '@use-gpu/workbench';
 

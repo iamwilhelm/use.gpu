@@ -5,7 +5,7 @@ import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Draw, Pass,
+  Pass,
   Cursor,
   CompositeData, LineSegments, ArrowSegments,
   OrbitCamera, OrbitControls,
@@ -70,63 +70,61 @@ let arrowData = seq(9).map((i) => ({
 export const GeometryLinesPage: LC = () => {
 
   return (
-    <Draw>
-      <Camera>
-        <Pass>
-          <CompositeData
-            fields={dataFields}
-            data={lineData}
-            loop={isLoop}
-            on={<LineSegments />}
-            render={(positions, colors, widths, segments) =>
-              <LineLayer
-                positions={positions}
-                colors={colors}
-                widths={widths}
-                segments={segments}
-                depth={0.5}
-              />
-            }
-          />
+    <Camera>
+      <Pass>
+        <CompositeData
+          fields={dataFields}
+          data={lineData}
+          loop={isLoop}
+          on={<LineSegments />}
+          render={(positions, colors, widths, segments) =>
+            <LineLayer
+              positions={positions}
+              colors={colors}
+              widths={widths}
+              segments={segments}
+              depth={0.5}
+            />
+          }
+        />
 
-          <CompositeData
-            fields={dataFields}
-            data={zigzagData}
-            on={<LineSegments />}
-            render={(positions, colors, widths, segments) =>
-              <LineLayer
-                positions={positions}
-                colors={colors}
-                widths={widths}
-                segments={segments}
-                depth={0.5}
-                join='round'
-              />
-            }
-          />
+        <CompositeData
+          fields={dataFields}
+          data={zigzagData}
+          on={<LineSegments />}
+          render={(positions, colors, widths, segments) =>
+            <LineLayer
+              positions={positions}
+              colors={colors}
+              widths={widths}
+              segments={segments}
+              depth={0.5}
+              join='round'
+            />
+          }
+        />
 
-          <CompositeData
-            fields={dataFields}
-            data={arrowData}
-            loop={isLoop}
-            start={isStart}
-            end={isEnd}
-            on={<ArrowSegments />}
-            render={(positions, colors, widths, segments, anchors, trims) =>
-              <ArrowLayer
-                positions={positions}
-                colors={colors}
-                widths={widths}
-                segments={segments}
-                anchors={anchors}
-                trims={trims}
-                depth={0.5}
-              />
-            }
-          />
-        </Pass>
-      </Camera>
-    </Draw>
+        <CompositeData
+          fields={dataFields}
+          data={arrowData}
+          loop={isLoop}
+          start={isStart}
+          end={isEnd}
+          on={<ArrowSegments />}
+          render={(positions, colors, widths, segments, anchors, trims) =>
+            <ArrowLayer
+              positions={positions}
+              colors={colors}
+              widths={widths}
+              segments={segments}
+              anchors={anchors}
+              trims={trims}
+              depth={0.5}
+            />
+          }
+        />
+      </Pass>
+    </Camera>
   );
 };
 

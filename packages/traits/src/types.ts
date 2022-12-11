@@ -1,4 +1,5 @@
 import type { ArrowFunction } from '@use-gpu/live';
+import { vec4 } from 'gl-matrix';
 
 export type TypedArray =
   Int8Array |
@@ -24,7 +25,7 @@ export type Join = 'miter' | 'round' | 'bevel';
 export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 export type Domain = 'linear' | 'log';
 
-export type Color = [number, number, number, number];
+export type Color = vec4;
 export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;
 
 export type VectorLike = TypedArray | number[];

@@ -8,6 +8,7 @@
 - `@use-gpu/scene`: Add basic `<Scene>`/`<Node>`/`<Primitive>` components for a classic matrix tree
 - `@use-gpu/scene`: Add `<Instances>` component for instanced mesh rendering
 - `@use-gpu/workbench`: Refactor `<Pass>`/`<Virtual>` to allow for swappable render passes
+- `@use-gpu/workbench`: Remove `<Draw>` as it was no longer doing anything.
 - `@use-gpu/workbench`: Add visibility culling with draw call ordering to `<Pass>` via view and transform context
 - `@use-gpu/workbench`: Add shared global bindings to `<DrawCall>` and `<Pass>` via view context
 - `@use-gpu/workbench`: Split `<Pass>` into `<ForwardRenderer>` and add a `<DeferredRenderer>`

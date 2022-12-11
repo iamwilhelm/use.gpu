@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { Culler, Renderable } from '../pass';
 
 import { use, quote, yeet, memo, useMemo } from '@use-gpu/live';
@@ -41,10 +41,10 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
 
   const {renderContext, pickingSource} = pickingContext;
 
-  const pickings  = toArray(calls['picking'] as RenderToPass[]);
+  const pickings  = toArray(calls['picking'] as Renderable[]);
 
   const renderPassDescriptor = useMemo(() =>
-    getRenderPassDescriptor(renderContext, overlay, merge),
+    getRenderPassDescriptor(renderContext, {overlay, merge}),
     [renderContext, overlay, merge]);
 
   return quote(yeet(() => {

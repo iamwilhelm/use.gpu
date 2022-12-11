@@ -1,4 +1,4 @@
-import type { Lazy } from '@use-gpu/core';
+import type { Lazy, DataBounds } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useMemo } from '@use-gpu/live';
@@ -6,11 +6,9 @@ import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import { useTransformContext } from '../providers/transform-provider';
 import { getBoundShader } from '../hooks/useBoundShader';
 
-import { getChainTransform } from '@use-gpu/wgsl/transform/chain.wgsl';
 import { getChainDifferential } from '@use-gpu/wgsl/transform/diff-chain.wgsl';
 import { getEpsilonDifferential } from '@use-gpu/wgsl/transform/diff-epsilon.wgsl';
 
-const CHAIN_BINDINGS = bundleToAttributes(getChainDifferential);
 const DIFF_CHAIN_BINDINGS = bundleToAttributes(getChainDifferential);
 const DIFF_EPSILON_BINDINGS = bundleToAttributes(getEpsilonDifferential);
 

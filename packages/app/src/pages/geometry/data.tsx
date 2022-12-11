@@ -5,7 +5,7 @@ import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Draw, Pass,
+  Loop, Pass,
   CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls, FPSControls,
   Cursor, PointLayer, LineLayer,
@@ -53,73 +53,71 @@ export const GeometryDataPage: LC = () => {
 
   return (
     <Loop>
-      <Draw>
-        <Cursor cursor='move' />
-        
-        <Camera>
-          <Pass>
+      <Cursor cursor='move' />
+      
+      <Camera>
+        <Pass>
 
-            <Data
-              fields={[
-                ['vec3<f32>', [-5, -2.5, 0, 5, -2.5, 0, 0, -2.5, -5, 0, -2.5, 5]],
-                ['i32', [1, 2, 1, 2]],
-              ]}
-              render={(positions, segments) =>
-                <LineLayer
-                  positions={positions}
-                  segments={segments}
-                  width={5}
-                  depth={1}
-                  color={[0.125, 0.25, 0.5, 1]}
-                />
-              }
-            />
+          <Data
+            fields={[
+              ['vec3<f32>', [-5, -2.5, 0, 5, -2.5, 0, 0, -2.5, -5, 0, -2.5, 5]],
+              ['i32', [1, 2, 1, 2]],
+            ]}
+            render={(positions, segments) =>
+              <LineLayer
+                positions={positions}
+                segments={segments}
+                width={5}
+                depth={1}
+                color={[0.125, 0.25, 0.5, 1]}
+              />
+            }
+          />
 
-            <CompositeData
-              fields={lineDataFields}
-              data={lineData}
-              on={<LineSegments />}
-              render={(positions, colors, widths, zBiases, segments) =>
-                <LineLayer
-                  positions={positions}
-                  colors={colors}
-                  widths={widths}
-                  segments={segments}
-                  zBiases={zBiases}
-                  join='round'
-                  depth={0.9}
-                />
-              }
-            />
+          <CompositeData
+            fields={lineDataFields}
+            data={lineData}
+            on={<LineSegments />}
+            render={(positions, colors, widths, zBiases, segments) =>
+              <LineLayer
+                positions={positions}
+                colors={colors}
+                widths={widths}
+                segments={segments}
+                zBiases={zBiases}
+                join='round'
+                depth={0.9}
+              />
+            }
+          />
 
-            <RawData
-              format='vec3<f32>'
-              length={100}
-              live
-              time
-              expr={(emit: Emit, i: number, time: Time) => {
-                const s = ((i*i + i) % 13133.371) % 1000;
-                const t = time.elapsed / 2000;
-                emit(
-                  Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
-                  Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2,
-                  Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2,
-                );
-              }}
-              render={(positions) =>
-                <PointLayer
-                  positions={positions}
-                  colors={positions}
-                  shape='diamondOutlined'
-                  size={50}
-                  depth={1}
-                  mode={'transparent'}
-                />
-              }
-            />
-          </Pass>
-        </Camera>
-      </Draw>
+          <RawData
+            format='vec3<f32>'
+            length={100}
+            live
+            time
+            expr={(emit: Emit, i: number, time: Time) => {
+              const s = ((i*i + i) % 13133.371) % 1000;
+              const t = time.elapsed / 2000;
+              emit(
+                Math.cos(t * 1.31 + Math.sin((t + s) * 0.31) + s) * 2,
+                Math.sin(t * 1.113 + Math.sin((t - s) * 0.414) - s) * 2,
+                Math.cos(t * 0.981 + Math.cos((t + s*s) * 0.515) + s*s) * 2,
+              );
+            }}
+            render={(positions) =>
+              <PointLayer
+                positions={positions}
+                colors={positions}
+                shape='diamondOutlined'
+                size={50}
+                depth={1}
+                mode={'transparent'}
+              />
+            }
+          />
+        </Pass>
+      </Camera>
     </Loop>
   );
 };

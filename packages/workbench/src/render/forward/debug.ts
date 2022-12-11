@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass';
+import type { VirtualDraw } from '../../pass/types';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -24,8 +24,6 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     vertexCount: vC = 0,
     instanceCount: iC = 0,
     indirect,
-    shouldDispatch,
-    onDispatch,
 
     links: {
       getVertex: gV,
@@ -33,9 +31,10 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
 
     pipeline,
     defines,
+    ...rest
   } = props;
 
-  const topology = pipeline.primitive?.topology ?? 'triangle-list';
+  const topology = (pipeline as any)?.primitive?.topology ?? 'triangle-list';
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
@@ -67,23 +66,17 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
     return [v, f, vertexCount, instanceCount, wireframeCommand, wireframeIndirect];
   }, [device, vertexShader, fragmentShader, gV]);
 
-  if (defines.HAS_SCISSOR == null) {
-    defines = {
-      ...defines,
-      HAS_SCISSOR: false,
-    }
-  }
+  const defs = useOne(() => ({...defines, HAS_SCISSOR: !!defines.HAS_SCISSOR}), defines);
 
-  // Inline the render fiber to avoid another memo()
+  // Inline the render fiber
   const call = {
+    ...rest,
     vertexCount,
     instanceCount,
     indirect: wireframeIndirect,
-    shouldDispatch,
-    onDispatch,
     vertex: v,
     fragment: f,
-    defines,
+    defines: defs,
     pipeline,
     renderContext,
     globalLayout,

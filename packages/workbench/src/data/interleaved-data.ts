@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, StorageSource, UniformType, Accessor, DataField, ChunkLayout } from '@use-gpu/core';
+import type { TypedArray, StorageSource, UniformType, Accessor, DataField, DataBounds, ChunkLayout } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
@@ -20,9 +20,9 @@ import {
 
 export type InterleavedDataProps = {
   /** Input data, array of structs of values/arrays */
-  data?: (Record<string, any>)[],
+  data?: TypedArray,
   /** WGSL schema of input data */
-  fields?: DataField[],
+  fields?: [UniformType, string][],
   /** Resample `data` on every animation frame. */
   live?: boolean,
 
@@ -40,7 +40,7 @@ export type InterleavedDataProps = {
   render?: (...sources: StorageSource[]) => LiveElement,
 };
 
-const NO_FIELDS = [] as DataField[];
+const NO_FIELDS = [] as [UniformType, string][];
 const NO_BOUNDS = {center: [], radius: 0, min: [], max: []} as DataBounds;
 
 /** Convert an interleaved, flat array-of-structs with fields `T` into struct-of-array data. */
@@ -77,7 +77,7 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
   // Make data buffers
   const [fieldBuffers, fieldSources] = useMemo(() => {
 
-    const fieldBuffers = fs.map(([format,, accessorType], i) => {
+    const fieldBuffers = fs.map(([format], i) => {
       if (!(format in UNIFORM_ARRAY_DIMS)) throw new Error(`Unknown data format "${format}"`);
       const f = format as any as UniformType;
 

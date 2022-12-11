@@ -5,7 +5,7 @@ import React from '@use-gpu/live';
 import { LayoutControls } from '../../ui/layout-controls';
 
 import {
-  LinearRGB, Draw, Pass, Flat,
+  LinearRGB, Pass, Flat,
   PanControls,
   DebugProvider,
 } from '@use-gpu/workbench';

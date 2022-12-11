@@ -17,6 +17,9 @@
     "@use-gpu/live": "*",
     "@use-gpu/react": "*",
     "@use-gpu/state": "*",
+    "@use-gpu/core": "*",
+    "@use-gpu/workbench": "*",
+    "@use-gpu/layout": "*",
     "@radix-ui/react-slider": "^0.1.4",
     "@radix-ui/react-tabs": "^0.1.5",
     "@stitches/react": "^1.2.7"

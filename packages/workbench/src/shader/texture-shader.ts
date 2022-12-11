@@ -1,51 +1,66 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TextureSource, UniformAttributeValue } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
+import type { TextureSource, Lazy } from '@use-gpu/core';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { yeet, useMemo } from '@use-gpu/live';
-import { bindBundle } from '@use-gpu/shader/wgsl';
-import { useNativeColorTexture } from '../hooks/useNativeColor';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { useShaderRefs } from '../hooks/useShaderRef';
+import { getDerivedSource } from '../hooks/useDerivedSource';
 import { getBoundSource } from '../hooks/useBoundSource';
-
-import { useRenderContext } from '../providers/render-provider';
-
-import { toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
+import { getBoundShader } from '../hooks/useBoundShader';
 
 export type TextureShaderProps = {
-  shader?: ShaderModule,
-  texture?: TextureSource,
+  texture: TextureSource,
+  shader: ShaderModule,
+
+  source?: ShaderSource,
+  sources?: ShaderSource[],
+  args?: Lazy<any>[],
+
   render?: (source: ShaderModule) => LiveElement,
 };
 
-const TEXTURE_BINDING = { name: 'getTexture', format: 'vec4<f32>', args: ['vec2<f32>'], value: [0, 0, 0, 0] } as UniformAttributeValue;
-const TEXTURE_SIZE_BINDING = { name: 'getTextureSize', format: 'vec2<f32>', args: [], value: [0, 0] } as UniformAttributeValue;
-const TARGET_SIZE_BINDING = { name: 'getTargetSize', format: 'vec2<f32>', args: [], value: [0, 0] } as UniformAttributeValue;
+const NO_SOURCES: ShaderSource[] = [];
 
 /** Texture shader for custom UV sampling of a 2D input texture.
 
-Provides a `@link fn getTexture(uv: vec2<f32>) -> vec4<f32>` to sample the given texture.
+Provides:
+- `@optional @link fn getTextureSize() -> vec2<f32>`
+- `@optional @link fn getTexture(uv: vec2<f32>) -> vec4<f32>`
+
+Unnamed arguments are linked in the order of: args, sources, source.
 */
 export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
   const {
-    shader,
     texture,
+    shader,
+    source,
+    sources = NO_SOURCES,
+    args = NO_SOURCES,
     render,
   } = props;
 
-  const inputTexture = useNativeColorTexture(texture);
-  const renderContext = useRenderContext();
+  const argRefs = useShaderRefs(...args);
 
   const getTexture = useMemo(() => {
-    const getTexture     = getBoundSource(TEXTURE_BINDING, texture);
-    const getTextureSize = getBoundSource(TEXTURE_SIZE_BINDING, () => texture.size);
-    const getTargetSize  = getBoundSource(TARGET_SIZE_BINDING, () => [renderContext.width, renderContext.height]);
+    const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
+      ? getDerivedSource(s as any, {readWrite: false}) : s);
 
-    return shader ? bindBundle(shader, {
-      getTexture,
-      getTextureSize,
-      getTargetSize,
-    }) : getTexture;
-  }, [shader, texture, renderContext]);
+    const bindings = bundleToAttributes(shader);
+    const links = {
+      getTexture: texture,
+      getTextureSize: () => texture.size,
+    } as Record<string, any>;
+
+    const allArgs = [...argRefs, ...sources, ...s];
+
+    const values = bindings.map(b => {
+      let k = b.name;
+      return links[k] ? links[k] : allArgs.shift();
+    });
+
+    return getBoundShader(shader, bindings, values);
+  }, [shader, texture, args, source, sources]);
 
   return useMemo(() => render ? render(getTexture) : yeet(getTexture), [render, getTexture]);
 };

@@ -33,10 +33,10 @@ export const DomeLight = memo((props: DomeLightProps) => {
   const parent = useMatrixContext();
 
   const light = useMemo(() => {
-    const normal = vec4.clone(direction);
+    const normal = vec4.clone(direction as any as vec4);
     if (parent) {
       normal[3] = 0;
-      vec3.transformMat4(normal, normal, parent);
+      vec4.transformMat4(normal, normal, parent);
     }
     normal[3] = bleed;
 

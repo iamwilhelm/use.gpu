@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { ComputeToPass } from '../pass';
+import type { ComputeToPass, ComputeCounter } from './types';
 
 import { quote, yeet, memo } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';

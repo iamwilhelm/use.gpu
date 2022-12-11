@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass';
+import type { VirtualDraw } from '../../pass/types';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -20,19 +20,11 @@ const ID_BINDING = { name: 'getId', format: 'u32', value: 0, args: [] };
 
 export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingRenderProps) => {
   let {
-    vertexCount,
-    instanceCount,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
     links: {
       getVertex,
       getPicking,
     },
-
-    pipeline,
-    defines,
+    ...rest
   } = props;
 
   const device = useDeviceContext();
@@ -54,17 +46,11 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getPicking]);
 
-  // Inline the render fiber to avoid another memo()
+  // Inline the render fiber
   const call = {
-    vertexCount,
-    instanceCount,
-    indirect,
-    shouldDispatch,
-    onDispatch,
+    ...rest,
     vertex: v,
     fragment: f,
-    defines,
-    pipeline,
     renderContext,
     globalLayout,
     mode: 'picking',

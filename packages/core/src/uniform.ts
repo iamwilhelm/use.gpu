@@ -219,7 +219,7 @@ const getTextureDimension = (layout: string): GPUTextureViewDimension | undefine
 
 export const makeDataBindingsEntries = <T>(
   device: GPUDevice,
-  bindings: DataBinding<T>[],
+  bindings: DataBinding<T>[] | Omit<DataBinding<T>, 'uniform'>[],
   binding: number = 0,
 ): GPUBindGroupEntry[] => {
   const entries = [] as any[];
@@ -237,7 +237,7 @@ export const makeDataBindingsEntries = <T>(
     else if (b.texture) {
       const {texture} = b;
       const {texture: t, view, sampler, layout, aspect} = texture;
-      const hasSampler = sampler && b.uniform?.args !== null;
+      const hasSampler = sampler && (b as any).uniform?.args !== null;
 
       const textureResource = view ?? t.createView({
         mipLevelCount: 1,

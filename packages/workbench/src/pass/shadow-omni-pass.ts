@@ -1,7 +1,7 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { TextureSource } from '@use-gpu/core';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement } from '@use-gpu/live';
+import type { TextureSource, ViewUniforms } from '@use-gpu/core';
 import type { LightEnv, Renderable } from '../pass';
-import type { Light } from '../light/types';
+import type { BoundLight } from '../light/types';
 import { mat4, vec3 } from 'gl-matrix';
 
 import { use, quote, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
@@ -32,7 +32,7 @@ export type ShadowOmniPassProps = {
   calls: {
     shadow?: Renderable[],
   },
-  map: Light,
+  map: BoundLight,
   descriptors: GPURenderPassDescriptor[],
   texture: TextureSource,
 };
@@ -126,14 +126,16 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   const {
     into,
     position,
-    shadow: {
-      depth, depth: [near, far],
-      size, size: [width, height],
-    },
+    shadow,
     shadowMap,
     shadowUV,
     shadowBlur,
   } = map;
+  
+  const {
+    depth, depth: [near, far],
+    size, size: [width, height],
+  } = shadow!;
 
   const [cubeTexture, cubeSource, cubeDescriptors] = useMemo(() => {
     const s = Math.round(Math.max(width, height) * .5);
@@ -181,19 +183,19 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
 
   const frustums = useOne(() => matrices.map(makeFrustumPlanes), matrices);
 
-  uniforms.viewMatrix.current = into;
-  uniforms.viewPosition.current = position;
+  uniforms.viewMatrix.current = into!;
+  uniforms.viewPosition.current = position!;
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
   uniforms.viewWorldDepth.current = [1, 1];
   uniforms.viewPixelRatio.current = 1;
 
-  const border = Math.max(1, Math.min(4, shadowBlur));
+  const border = Math.max(1, Math.min(4, shadowBlur || 1));
   const scaleRef = useShaderRef([width / (width - border * 2), height / (height - border * 2)]);
 
   const getSample = useBoundShader(getCubeToOmniSample, SAMPLE_BINDINGS, [cubeSource, scaleRef]);
-  const blit = useDepthBlit(renderContext, shadowMapDescriptors[shadowMap], shadowUV, SHADOW_PAGE, getSample);
+  const blit = useDepthBlit(renderContext, shadowMapDescriptors[shadowMap!], shadowUV!, SHADOW_PAGE, getSample);
 
   return quote(yeet(() => {
     let vs = 0;

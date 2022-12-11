@@ -41,7 +41,7 @@ export type PBRMaterialProps = {
   occlusionMap?: ShaderSource,
   normalMap?: ShaderSource,
 
-  render?: (material: Record<string, Record<string, ShaderSource>>) => LiveElement,
+  render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };
 
 const WHITE = [1, 1, 1, 1] as Point4;

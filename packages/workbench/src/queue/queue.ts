@@ -5,7 +5,6 @@ import {
   makeContext, useContext, useNoContext,
 } from '@use-gpu/live';
 import { RenderContext } from '../providers/render-provider';
-import { PickingContext } from './picking';
 
 export type QueueProps = {
   live?: boolean,

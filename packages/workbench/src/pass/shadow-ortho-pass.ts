@@ -1,7 +1,7 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
-import type { TextureSource } from '@use-gpu/core';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement } from '@use-gpu/live';
+import type { TextureSource, ViewUniforms } from '@use-gpu/core';
 import type { LightEnv, Renderable } from '../pass';
-import type { Light } from '../light/types';
+import type { BoundLight } from '../light/types';
 import { mat4 } from 'gl-matrix';
 
 import { use, quote, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
@@ -25,7 +25,7 @@ export type ShadowOrthoPassProps = {
   calls: {
     shadow?: Renderable[],
   },
-  map: Light,
+  map: BoundLight,
   descriptors: GPURenderPassDescriptor[],
   texture: TextureSource,
 };
@@ -79,13 +79,15 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   const {
     into,
     position,
-    shadow: {
-      depth: [near, far],
-      size: [width, height],
-    },
+    shadow,
     shadowMap,
     shadowUV,
   } = map;
+
+  const {
+    depth: [near, far],
+    size: [width, height],
+  } = shadow!;
 
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
@@ -93,7 +95,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   uniforms.viewWorldDepth.current = [1, 1];
   uniforms.viewPixelRatio.current = 1;
 
-  const clear = useDepthBlit(renderContext, descriptors[shadowMap], shadowUV, SHADOW_PAGE);
+  const clear = useDepthBlit(renderContext, descriptors[shadowMap!], shadowUV!, SHADOW_PAGE);
 
   const draw = quote(yeet(() => {
     let vs = 0;
@@ -101,8 +103,8 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
-    uniforms.viewMatrix.current = into;
-    uniforms.viewPosition.current = position;
+    uniforms.viewMatrix.current = into!;
+    uniforms.viewPosition.current = position!;
 
     const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
     projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
@@ -115,12 +117,12 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
     clear(commandEncoder);
 
-    const x = shadowUV[0] * SHADOW_PAGE;
-    const y = shadowUV[1] * SHADOW_PAGE;
-    const w = (shadowUV[2] - shadowUV[0]) * SHADOW_PAGE;
-    const h = (shadowUV[3] - shadowUV[1]) * SHADOW_PAGE;
+    const x = shadowUV![0] * SHADOW_PAGE;
+    const y = shadowUV![1] * SHADOW_PAGE;
+    const w = (shadowUV![2] - shadowUV![0]) * SHADOW_PAGE;
+    const h = (shadowUV![3] - shadowUV![1]) * SHADOW_PAGE;
 
-    const passEncoder = commandEncoder.beginRenderPass(descriptors[shadowMap]);
+    const passEncoder = commandEncoder.beginRenderPass(descriptors[shadowMap!]);
     passEncoder.setViewport(x, y, w, h, 0, 1);
     passEncoder.setScissorRect(x, y, w, h);
     passEncoder.setBindGroup(0, bindGroup);

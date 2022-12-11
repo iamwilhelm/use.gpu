@@ -26,7 +26,7 @@ export const DEFAULT_MATERIAL_CONTEXT = {
   },
 };
 
-export type MaterialContextProps = Record<string, Record<string, ShaderModule>>;
+export type MaterialContextProps = Record<string, Record<string, ShaderModule | null | undefined>>;
 
 export const MaterialContext = makeContext<MaterialContextProps>(DEFAULT_MATERIAL_CONTEXT, 'MaterialContext');
 

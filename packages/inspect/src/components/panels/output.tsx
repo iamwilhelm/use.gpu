@@ -5,7 +5,7 @@ import type { Action } from '../types';
 import { memo, use, wrap, provide, signal, useFiber, useMemo, useOne, makeContext } from '@use-gpu/live';
 import { LiveCanvas } from '@use-gpu/react';
 import { wgsl, bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { Draw, Pass, Flat, FontLoader, Queue, DeviceContext, getBoundShader, getLambdaSource } from '@use-gpu/workbench';
+import { Pass, Flat, FontLoader, Queue, DeviceContext, getBoundShader, getLambdaSource } from '@use-gpu/workbench';
 import { AutoCanvas } from '@use-gpu/webgpu';
 import { UI, Layout, Flex, Block, Inline, Text, Overflow, Absolute } from '@use-gpu/layout';
 

@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass';
+import type { VirtualDraw } from '../pass/types';
 import { memo, use, useMemo } from '@use-gpu/live';
 
 import { useInspectHoverable } from '../hooks/useInspectable';

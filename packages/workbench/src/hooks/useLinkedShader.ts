@@ -17,7 +17,7 @@ const MODULE_CACHE = new LRU<string, any>();
 const LAYOUT_CACHE = new LRU<number, any>();
 
 export const useLinkedShader = (
-  stages: ParsedBundle[],
+  stages: (ParsedBundle | null | undefined)[],
   defines: Record<string, ShaderDefine> | null | undefined,
 ) => {
   const fiber = useFiber();

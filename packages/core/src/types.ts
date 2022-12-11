@@ -167,7 +167,7 @@ export type UniformType =
 ;
 
 // Simple backing-agnostic mesh geometry
-export type MeshGeometry = {
+export type Geometry = {
   count: number,
   attributes: {
     [s: string]: TypedArray,
@@ -358,11 +358,11 @@ export type ViewUniforms = {
   projectionViewFrustum: { current: vec4[] },
   inverseProjectionViewMatrix: { current: mat4 },
   viewMatrix: { current: mat4 },
-  viewPosition: { current: vec3 | [number, number, number] | number[] },
-  viewNearFar: { current: vec2 | [number, number] | number[] },
-  viewResolution: { current: vec2 | [number, number] | number[] },
-  viewSize: { current: vec2 | [number, number] | number[] },
-  viewWorldDepth: { current: vec2 | [number, number] | number[] },
+  viewPosition: { current: vec4 },
+  viewNearFar: { current: vec2 },
+  viewResolution: { current: vec2 },
+  viewSize: { current: vec2 },
+  viewWorldDepth: { current: vec2 },
   viewPixelRatio: { current: number },
 };
 

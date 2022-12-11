@@ -7,7 +7,7 @@ export type TransformContextProps = {
   transform: ShaderModule | null,
   differential: ShaderModule | null,
   bounds: (bounds: DataBounds) => DataBounds,
-} | null;
+};
 
 export const DEFAULT_TRANSFORM = {transform: null, differential: null, bounds: (b: DataBounds) => b};
 

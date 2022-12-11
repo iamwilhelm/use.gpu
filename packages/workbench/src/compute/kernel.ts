@@ -19,7 +19,7 @@ export type KernelProps = {
   shader: ShaderModule,
   source?: ShaderSource,
   sources?: ShaderSource[],
-  args?: (Lazy<any> | Ref<any>)[],
+  args?: Lazy<any>[],
   initial?: boolean,
   history?: boolean | number,
   size?: Lazy<number[]>,

@@ -1,4 +1,4 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TypedArray, StorageSource, UniformType, DataField } from '@use-gpu/core';
 import { capture, yeet, makeContext, useCapture, useContext, useNoContext, useMemo, useOne, useRef, useResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
@@ -10,12 +10,21 @@ import {
 import { useDeviceContext } from '../providers/device-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
+type Queued = {instance: number, data: Record<string, any>};
+type FieldBuffer = {
+  buffer: GPUBuffer,
+  array: TypedArray,
+  source: StorageSource,
+  dims: number,
+  accessor: string,
+};
+
 export type InstanceDataProps = {
   format?: 'u16' | 'u32',
-  fields: DataField[],
+  fields: [string, string][],
   alloc?: number,
 
-  render?: (useInstance: () => [number, (data: Record<string, any>) => void]) => LiveElement,
+  render?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
   then?: (...sources: StorageSource[]) => LiveElement,
 };
 
@@ -34,7 +43,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
 
   const [ids, queue, InstanceCapture] = useOne(() => [
     makeIdAllocator(0),
-    [],
+    [] as Queued[],
     makeCapture('InstanceCapture'),
   ]);
 
@@ -65,7 +74,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
     const size = Math.max(alloc, ids.max());
     const bufferLength = useBufferedSize(size);
 
-    const prevBuffersRef = useRef(null);
+    const prevBuffersRef = useRef(null as FieldBuffer[] | null);
 
     // Make/resize data buffers + index buffer
     const [fieldBuffers, fieldSources, indexBuffer, indexSource] = useMemo(() => {
@@ -158,7 +167,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       indexSource.version = version;
     }, version);
 
-    return then ? then(indexSource, fieldSources) : null;
+    return then ? then(indexSource, ...fieldSources) : null;
   };
 
   return render ? capture(InstanceCapture, render(useInstance), Resume) : null;

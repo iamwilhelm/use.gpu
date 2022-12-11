@@ -1,8 +1,8 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, LiveComponent, ArrowFunction } from '@use-gpu/live';
 import type { DataBounds, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { AggregatedCalls, LightEnv } from './pass/types';
-import type { UseLight } from './light-data';
+import type { AggregatedCalls, LightEnv, VirtualDraw } from '../pass/types';
+import type { UseLight } from './light/light-data';
 
 import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
@@ -14,8 +14,6 @@ import { useDeviceContext } from '../providers/device-provider';
 import { useRenderContext } from '../providers/render-provider';
 import { usePickingContext, useNoPickingContext } from '../providers/picking-provider';
 import { useInspectable } from '../hooks/useInspectable'
-
-import { Await } from './await';
 
 import { DebugRender } from './forward/debug';
 import { DepthRender } from './forward/depth';
@@ -62,7 +60,7 @@ export type ForwardRendererProps = {
   components?: RenderComponents,
 };
 
-const getComponents = ({modes = {}, renders = {}}: RenderComponents) => {
+const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): RenderComponents => {
   return {
     modes: {
       shadow: DepthRender,
@@ -121,7 +119,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     };
 
     // Prepare shared bind group for forward lighting
-    const entries = [];
+    const entries: GPUBindGroupLayoutEntry[] = [];
     if (lights) {
       entries.push({binding: 0, visibility: GPUShaderStage.FRAGMENT, buffer: {type: 'read-only-storage'}});
       if (shadows) {
@@ -139,9 +137,9 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       }
 
       const entries = makeDataBindingsEntries(device, bindings);
-      const bindGroup = makeBindGroup(device, layout, entries);
+      const bindGroup = makeBindGroup(device, layout!, entries);
 
-      return (passEncoder: RenderPassEncoder) => {
+      return (passEncoder: GPURenderPassEncoder) => {
         passEncoder.setBindGroup(1, bindGroup);
       };
     } : null;
@@ -149,14 +147,14 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     // Provide draw call variants for sub-passes
     const components = getComponents(props.components ?? {});
 
-    const getRender = (mode, render = null) =>
-      components.modes[mode] ?? components.renders[render][mode];
+    const getRender = (mode: string, render: string | null = null) =>
+      components.modes[mode] ?? components.renders[render!][mode];
 
     const getVariants = (!shadows && !picking && !passes)
-       ? (virtual, hovered) => hovered ? [getRender(HOVERED_VARIANT)] : getRender(virtual.mode, virtual.renderer)
+       ? (virtual: VirtualDraw, hovered: boolean) => hovered ? [getRender(HOVERED_VARIANT)] : getRender(virtual.mode, virtual.renderer)
 
-       : (virtual, hovered) => {
-          const {id, mode, renderer, links, defines} = virtual;
+       : (virtual: VirtualDraw, hovered: boolean) => {
+          const {mode, renderer, links, defines} = virtual;
 
           const variants = [];
           if (shadows && mode === 'opaque' && defines?.HAS_SHADOW) {
@@ -165,13 +163,13 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
           if (picking && mode !== 'picking' && links?.getPicking) {
             variants.push('picking');
           }
-          if (variants.length === 0) return hovered ? [getRender(HOVERED_VARIANT, renderer)] : getRender(mode, renderer);
+          if (variants.length === 0) return hovered ? [getRender(HOVERED_VARIANT)] : getRender(mode, renderer);
 
           variants.push(hovered ? HOVERED_VARIANT : mode);
           return variants.map(mode => getRender(mode, renderer));
         };
 
-    const useVariants = (virtual, hovered) => 
+    const useVariants = (virtual: VirtualDraw, hovered: boolean) => 
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
     return {useVariants, renderContexts, layout, bind};
@@ -182,12 +180,12 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     calls: AggregatedCalls,
   ) =>
     useMemo(() => {
-      const env = (calls.env ?? []).reduce((env, data) => {
+      const env = (calls.env ?? []).reduce((env: Record<string, any>, data: Record<string, any>) => {
         for (let k in data) env[k] = data[k];
         return env;
       }, {});
 
-      const props = {calls, env};
+      const props: Record<string, any> = {calls, env};
 
       if (overlay) props.overlay = true;
       if (merge) props.merge = true;

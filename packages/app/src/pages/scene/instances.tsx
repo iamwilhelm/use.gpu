@@ -3,7 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat, Animate, LinearRGB,
+  Loop, Pass, Flat, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
@@ -53,22 +53,35 @@ export const SceneInstancesPage: LC = (props) => {
       ]) => (
         <LinearRGB tonemap="aces">
           <Loop>
-            <Draw>
-              <Cursor cursor='move' />
-              <Camera>
-                <Pass lights>
-                  <AmbientLight intensity={0.2} />
-                  <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
+            <Cursor cursor='move' />
+            <Camera>
+              <Pass lights>
+                <AmbientLight intensity={0.2} />
+                <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
-                  <Scene>
-                    <PBRMaterial
-                      albedoMap={texture}
-                    >
-                      <Instances
-                        mesh={mesh}
-                        shaded
-                        render={(Instance) => (<>
+                <Scene>
+                  <PBRMaterial
+                    albedoMap={texture}
+                  >
+                    <Instances
+                      mesh={mesh}
+                      shaded
+                      render={(Instance) => (<>
 
+                        <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
+                          <Node>
+                            {seq(20).map(i => (
+                              <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
+                                <Instance
+                                  rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
+                                  scale={[0.2, 0.2, 0.2]}
+                                />
+                              </Animate>
+                            ))}
+                          </Node>
+                        </Animate>
+                        
+                        <Node rotation={[90, 90, 0]} scale={[0.7, 0.7, 0.7]}>
                           <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
                             <Node>
                               {seq(20).map(i => (
@@ -81,30 +94,15 @@ export const SceneInstancesPage: LC = (props) => {
                               ))}
                             </Node>
                           </Animate>
-                          
-                          <Node rotation={[90, 90, 0]} scale={[0.7, 0.7, 0.7]}>
-                            <Animate prop="rotation" keyframes={ROTATION_KEYFRAMES} loop ease="cosine">
-                              <Node>
-                                {seq(20).map(i => (
-                                  <Animate prop="position" keyframes={POSITION_KEYFRAMES} loop delay={-i * 2} ease="linear">
-                                    <Instance
-                                      rotation={[Math.random()*360, Math.random()*360, Math.random()*360]}
-                                      scale={[0.2, 0.2, 0.2]}
-                                    />
-                                  </Animate>
-                                ))}
-                              </Node>
-                            </Animate>
-                          </Node>
+                        </Node>
 
-                        </>)}
-                      />
-                    </PBRMaterial>
-                
-                  </Scene>
-                </Pass>
-              </Camera>
-            </Draw>
+                      </>)}
+                    />
+                  </PBRMaterial>
+              
+                </Scene>
+              </Pass>
+            </Camera>
           </Loop>
         </LinearRGB>
       )}

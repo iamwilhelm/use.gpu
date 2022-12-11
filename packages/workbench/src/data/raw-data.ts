@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time } from '@use-gpu/core';
+import type { StorageSource, LambdaSource, TypedArray, UniformType, Emit, Emitter, Time, DataBounds } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, signal, useMemo, useNoMemo, useOne, useNoOne, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
@@ -130,10 +130,10 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
 
     const {bounds} = source;
     const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-    bounds.center = center;
-    bounds.radius = radius;
-    bounds.min = min;
-    bounds.max = max;
+    bounds!.center = center;
+    bounds!.radius = radius;
+    bounds!.min = min;
+    bounds!.max = max;
 
     if (sources) {
       for (const s of sources) {

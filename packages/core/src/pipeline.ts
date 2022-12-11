@@ -1,7 +1,8 @@
 import type {
-  TypedArray, DeepPartial, UseGPURenderContext,
+  TypedArray, UseGPURenderContext,
   ShaderModuleDescriptor, ShaderStageDescriptor,
 } from './types';
+import type { Update } from '@use-gpu/state';
 
 import { patch, $delete } from '@use-gpu/state';
 
@@ -27,7 +28,7 @@ export const makeRenderPipeline = (
   colorStates: GPUColorTargetState[],
   depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
-  descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
+  descriptor: Update<GPURenderPipelineDescriptor> = {},
   layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
@@ -52,7 +53,7 @@ export const makeRenderPipelineAsync = (
   colorStates: GPUColorTargetState[],
   depthStencilState: GPUDepthStencilState | undefined,
   samples: number,
-  descriptor: DeepPartial<GPURenderPipelineDescriptor> = {},
+  descriptor: Update<GPURenderPipelineDescriptor> = {},
   layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({

@@ -1,5 +1,4 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { ComputeToPass } from '../pass';
 
 import { use, quote, yeet, memo, useContext, useMemo } from '@use-gpu/live';
 import { useInspectable } from '../hooks/useInspectable'
@@ -19,13 +18,12 @@ Executes all dispatch calls.
 */
 export const DispatchPass: LC<DispatchPassProps> = memo((props: PropsWithChildren<DispatchPassProps>) => {
   const {
-    immediate,
     calls,
   } = props;
 
   const inspect = useInspectable();
 
-  const dispatches = toArray(calls['dispatch'] as ComputeToPass[]);
+  const dispatches = toArray(calls['dispatch'] as ArrowFunction[]);
 
   const run = () => {
     let ds = 0;

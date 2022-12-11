@@ -5,7 +5,7 @@ import React, { Gather, use, useMemo } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
-  Loop, Flat, Draw, Pass, OrbitCamera, RawData, PointLayer, Pick,
+  Loop, Flat, Pass, OrbitCamera, RawData, PointLayer, Pick,
   TextureBuffer, Compute, Stage, Iterate, Kernel, Suspense, RawFullScreen,
   useBoundShader, useLambdaSource, useShaderRefs,
 } from '@use-gpu/workbench';
@@ -154,36 +154,34 @@ export const RTTCFDTexturePage: LC = () => {
               </Compute>
 
               <Flat>
-                <Draw>
-                  <Pass>
+                <Pass>
 
-                    <VisualizeField field={velocity} />
+                  <VisualizeField field={velocity} />
 
-                    {inspect ? (
-                      <UI>
-                        <Layout>
-                          <Absolute left={0} top={0}>
-                            <Block direction="x">
-                              <Block border={1} padding={1} stroke='#444' fill="#000">
-                                <DebugField field={divergence} gain={300} />
-                                <Inline align="center"><Text lineHeight={28} color="#ccc">Divergence</Text></Inline>
-                              </Block>
-                              <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
-                                <DebugField field={curl} gain={10} />
-                                <Inline align="center"><Text lineHeight={28} color="#ccc">Curl</Text></Inline>
-                              </Block>
-                              <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
-                                <DebugField field={pressure} gain={3} />
-                                <Inline align="center"><Text lineHeight={28} color="#ccc">Pressure</Text></Inline>
-                              </Block>
+                  {inspect ? (
+                    <UI>
+                      <Layout>
+                        <Absolute left={0} top={0}>
+                          <Block direction="x">
+                            <Block border={1} padding={1} stroke='#444' fill="#000">
+                              <DebugField field={divergence} gain={300} />
+                              <Inline align="center"><Text lineHeight={28} color="#ccc">Divergence</Text></Inline>
                             </Block>
-                          </Absolute>
-                        </Layout>
-                      </UI>
-                    ) : null}
+                            <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
+                              <DebugField field={curl} gain={10} />
+                              <Inline align="center"><Text lineHeight={28} color="#ccc">Curl</Text></Inline>
+                            </Block>
+                            <Block border={[0, 1, 1, 1]} padding={1} stroke='#444' fill="#000">
+                              <DebugField field={pressure} gain={3} />
+                              <Inline align="center"><Text lineHeight={28} color="#ccc">Pressure</Text></Inline>
+                            </Block>
+                          </Block>
+                        </Absolute>
+                      </Layout>
+                    </UI>
+                  ) : null}
 
-                  </Pass>
-                </Draw>
+                </Pass>
               </Flat>
 
             </Loop>

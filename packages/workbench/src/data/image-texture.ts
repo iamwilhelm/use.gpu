@@ -3,7 +3,7 @@ import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
 import { use, yeet, gather, memo, useOne, useMemo, useContext } from '@use-gpu/live';
-import { makeDestinationTexture, makeTextureView, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
+import { makeDestinationTexture, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
 import { Fetch } from './fetch';
 
 export type ImageTextureProps = {
@@ -58,7 +58,7 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
       const {width, height} = bitmap;
       const size = [width, height] as Point;
 
-      let format = 'rgba8unorm';
+      let format: GPUTextureFormat = 'rgba8unorm';
       let cs = colorSpace;
       if (colorSpace === 'srgb') {
         format = 'rgba8unorm-srgb';

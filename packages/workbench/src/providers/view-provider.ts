@@ -6,22 +6,24 @@ import { VIEW_UNIFORMS, makeGlobalUniforms, uploadBuffer, makeBindGroupLayout } 
 import { useDeviceContext } from '../providers/device-provider';
 import { useFrustumCuller } from '../hooks/useFrustumCuller';
 
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
-export const ViewContext = makeContext<ViewContextProps>({
-  defs: [],
-  uniforms: [],
-  layout: null,
+const DEFAULT_VIEW_CONTEXT = {
+  defs: [] as any,
+  uniforms: [] as any,
+  layout: null as any,
   cull: () => true,
-  bind: () => {},
-}, 'ViewContext');
+  bind: (() => {}) as any,
+} as ViewContextProps;
+
+export const ViewContext = makeContext<ViewContextProps>(DEFAULT_VIEW_CONTEXT, 'ViewContext');
 
 export type ViewContextProps = {
   defs: UniformAttribute[],
   uniforms: ViewUniforms,
-  layout: GPUPipelineLayout,
+  layout?: GPUBindGroupLayout,
   bind: (passEncoder: GPURenderPassEncoder) => void,
-  cull: (bounds: DataBounds) => number | boolean,
+  cull: (center: vec3 | number[], radius: number) => number | boolean,
 };
 
 export type ViewProviderProps = {

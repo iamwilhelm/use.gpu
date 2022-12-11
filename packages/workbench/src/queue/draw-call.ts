@@ -1,6 +1,7 @@
 import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { DataBounds, TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
+import type { DataBounds, TypedArray, StorageSource, RenderPassMode, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
+import type { Update } from '@use-gpu/state';
 import type { Culler } from '../pass/types';
 
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
@@ -23,7 +24,7 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
 export type DrawCallProps = {
-  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
+  pipeline?: Update<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string | null,
 
   vertexCount?: Lazy<number>,
@@ -31,15 +32,16 @@ export type DrawCallProps = {
   firstVertex?: Lazy<number>,
   firstInstance?: Lazy<number>,
   bounds?: Lazy<DataBounds>,
-  indirect?: StorageSource,
+  indirect?: StorageSource | null,
 
   vertex: ParsedBundle,
-  fragment: ParsedBundle,
+  fragment?: ParsedBundle | null,
   
   globalLayout?: GPUBindGroupLayout,
+  passLayout?: GPUBindGroupLayout,
 
-  globalBinding?: (pipeline: GPUPipeline) => VolatileAllocation,
-  globalDefs?: UniformAttribute[],
+  globalBinding?: (pipeline: GPURenderPipeline) => VolatileAllocation,
+  globalDefs?: UniformAttribute[][],
   globalUniforms?: Record<string, Lazy<any>>,
 
   renderContext: UseGPURenderContext,
@@ -106,7 +108,7 @@ export const drawCall = (props: DrawCallProps) => {
   const suspense = useSuspenseContext();
 
   // Render shader
-  const topology = propPipeline?.primitive?.topology ?? 'triangle-list';
+  const topology = (propPipeline as any)?.primitive?.topology ?? 'triangle-list';
 
   const defines = useMemo(() => (propDefines ? {
     ...(passLayout ? PASS_DEFINES : GLOBAL_DEFINES),
@@ -137,13 +139,13 @@ export const drawCall = (props: DrawCallProps) => {
     renderContext,
     shader as any,
     propPipeline,
-    layout,
+    layout as any,
   );
 
   if (!pipeline) return suspense ? SUSPEND : NO_CALL;
   if (isStale) return SUSPEND;
 
-  const base = 1 + !!passLayout;
+  const base = 1 + +!!passLayout;
   
   // Uniforms
   const uniform = useMemo(() => {
@@ -202,12 +204,12 @@ export const drawCall = (props: DrawCallProps) => {
 
     if (uniform) {
       if (globalUniforms) {
-        uniform.pipe.fill(globalUniforms);
-        uploadBuffer(device, uniform.buffer, uniform.pipe.data);
+        (uniform as any).pipe.fill(globalUniforms);
+        uploadBuffer(device, (uniform as any).buffer, (uniform as any).pipe.data);
       }
 
-      if (isVolatileGlobal) passEncoder.setBindGroup(0, uniform.bindGroup());
-      else passEncoder.setBindGroup(0, uniform.bindGroup);
+      if (isVolatileGlobal) passEncoder.setBindGroup(0, (uniform as any).bindGroup());
+      else passEncoder.setBindGroup(0, (uniform as any).bindGroup);
     }
 
     if (storage.pipe && storage.buffer) {
@@ -224,7 +226,10 @@ export const drawCall = (props: DrawCallProps) => {
 
   let draw = inner;
   if (shouldDispatch) {
-    draw = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
+    draw = (
+      passEncoder: GPURenderPassEncoder,
+      countGeometry: (v: number, t: number) => void,
+    ) => {
       const d = shouldDispatch();
       if (d === false) return;
       if (typeof d === 'number') {
@@ -232,7 +237,7 @@ export const drawCall = (props: DrawCallProps) => {
         dispatchVersion = d;
       }
       
-      return inner(passEncoder, countDispatch);
+      return inner(passEncoder, countGeometry);
     };
   }
 

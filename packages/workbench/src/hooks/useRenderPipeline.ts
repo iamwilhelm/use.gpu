@@ -1,4 +1,5 @@
 import type { UseGPURenderContext, ShaderModuleDescriptor, DeepPartial } from '@use-gpu/core';
+import type { Update } from '@use-gpu/state';
 
 import { makeRenderPipeline, makeRenderPipelineAsync } from '@use-gpu/core';
 import { useMemo, useOne, useState } from '@use-gpu/live';
@@ -28,7 +29,7 @@ export const useRenderPipeline = (
   device: GPUDevice,
   renderContext: UseGPURenderContext,
   shader: RenderShader,
-  props: DeepPartial<GPURenderPipelineDescriptor>,
+  props?: DeepPartial<GPURenderPipelineDescriptor>,
   layout?: GPUPipelineLayout,
 ) => {
   const {colorStates, depthStencilState, samples} = renderContext;
@@ -93,7 +94,7 @@ export const useRenderPipelineAsync = (
   device: GPUDevice,
   renderContext: UseGPURenderContext,
   shader: RenderShader,
-  props: DeepPartial<GPURenderPipelineDescriptor>,
+  props?: Update<GPURenderPipelineDescriptor>,
   layout?: GPUPipelineLayout,
 ) => {
   const {colorStates, depthStencilState, samples} = renderContext;

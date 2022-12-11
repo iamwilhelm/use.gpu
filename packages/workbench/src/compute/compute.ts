@@ -1,14 +1,8 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { UseGPURenderContext, RenderPassMode } from '@use-gpu/core';
-import type { VirtualDraw } from './pass';
+import type { LC, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
+import type { AggregatedCalls } from '../pass/types';
 
-import { use, quote, yeet, memo, provide, multiGather, useContext, useMemo, useOne } from '@use-gpu/live';
-import { RenderContext } from '../providers/render-provider';
-import { PassContext } from '../providers/pass-provider';
-import { DeviceContext } from '../providers/device-provider';
-import { PickingContext } from './picking';
+import { use, memo, multiGather, useOne } from '@use-gpu/live';
 import { useInspectable } from '../hooks/useInspectable'
-import { Await } from './await';
 
 import { ComputePass } from '../pass/compute-pass';
 import { ReadbackPass } from '../pass/readback-pass';
@@ -17,21 +11,7 @@ export type ComputeProps = {
   immediate?: boolean,
 };
 
-export type VirtualDraw = {
-  pipeline: DeepPartial<GPURenderPipelineDescriptor>,
-  defines: Record<string, any>,
-  mode?: RenderPassMode | string,
-  id?: number,
-
-  vertexCount?: Lazy<number>,
-  instanceCount?: Lazy<number>,
-  indirect?: StorageSource, 
-
-  renderer?: string,
-  links?: Record<string, ShaderModule>,
-};
-
-export const Compute: LC<ComputePropsProps> = memo((props: PropsWithChildren<ComputePropsProps>) => {
+export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeProps>) => {
   const {
     immediate,
     children,
@@ -39,7 +19,7 @@ export const Compute: LC<ComputePropsProps> = memo((props: PropsWithChildren<Com
 
   const inspect = useInspectable();
 
-  const Resume = (calls: Record<string, (ComputeToPass | RenderToPass | CommandToBuffer | ArrowFunction)[]>) =>
+  const Resume = (calls: AggregatedCalls) =>
     useOne(() => [
       calls.compute ? use(ComputePass, {immediate, calls}) : null,
       calls.post || calls.readback ? use(ReadbackPass, {calls}) : null,

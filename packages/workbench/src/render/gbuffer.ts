@@ -1,8 +1,8 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { DataBounds, RenderPassMode, StorageSource, TextureSource, TextureTarget, UseGPURenderContext } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { AggregatedCalls } from './pass/types';
-import type { UseLight } from './light-data';
+import type { AggregatedCalls } from '../pass/types';
+import type { UseLight } from './light/light-data';
 
 import { yeet, memo, provide, fence, useMemo, useOne } from '@use-gpu/live';
 import { DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
@@ -30,7 +30,10 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
   const {width, height, samples} = renderContext;
   if (samples > 1) throw new Error("GBuffer cannot be multisampled");
 
-  const {depthStencilState: {format}} = renderContext;
+  const {depthStencilState} = renderContext;
+  if (!depthStencilState) throw new Error("GBuffer render target must have depth");
+
+  const {format} = depthStencilState;
 
   // Set up GBuffer
   const formats = useMemo(() => [
@@ -39,7 +42,7 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
     'rgba8unorm',
     device.features.has('rg11b10ufloat-renderable') ? 'rg11b10ufloat' : 'rgb10a2unorm',
     format,
-  ], [device, format]);
+  ] as GPUTextureFormat[], [device, format]);
 
   const renderTextures = useMemo(() => formats.map(format => makeTargetTexture(
     device,
@@ -82,9 +85,9 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
     },
   });
 
-  if (!(render ?? children)) return yeet(context);
+  if (!render) return yeet(context);
 
   const view = render ? render(context) : null;
-  if (then) return fence(view, () => then(source));
+  if (then) return fence(view, () => then(sources));
   return view;
 }, 'GBuffer');

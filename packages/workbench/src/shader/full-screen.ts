@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { UniformAttribute } from '@use-gpu/core';
+import type { TextureSource, Lazy } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { use, useMemo } from '@use-gpu/live';
@@ -17,7 +17,7 @@ export type FullScreenProps = {
 
   source?: ShaderSource,
   sources?: ShaderSource[],
-  args?: (Lazy<any> | Ref<any>)[],
+  args?: Lazy<any>[],
 
   initial?: boolean,
   history?: boolean | number,
@@ -28,8 +28,8 @@ const NO_SOURCES: ShaderSource[] = [];
 /** Render texture to the current render target, with an optional shader applied.
 
 Provides:
-- `@optional @link getTargetSize(uv: vec2<f32>) -> vec2<f32>`
-- `@optional @link getTextureSize(uv: vec2<f32>) -> vec2<f32>`
+- `@optional @link getTargetSize() -> vec2<f32>`
+- `@optional @link getTextureSize() -> vec2<f32>`
 - `@optional @link getTexture(uv: vec2<f32>) -> vec4<f32>`
 
 Unnamed arguments are linked in the order of: args, sources, source, history.
@@ -49,13 +49,13 @@ export const FullScreen: LiveComponent<FullScreenProps> = (props: FullScreenProp
   const argRefs = useShaderRefs(...args);
 
   return useMemo(() => {
-    let t = texture;
+    let t = texture as any;
 
     if (shader) {
       const f = history ? (typeof history === 'number'
-        ? target.history?.slice(0, history)
-        : target.history ?? NO_SOURCES
-      ) : NO_SOURCES;
+        ? target.source?.history?.slice(0, history)
+        : target.source?.history
+      ) ?? NO_SOURCES : NO_SOURCES;
       const s = (source ? [source] : NO_SOURCES).map(s => ((s as any)?.buffer)
         ? getDerivedSource(s as any, {readWrite: false}) : s);
 
@@ -64,7 +64,7 @@ export const FullScreen: LiveComponent<FullScreenProps> = (props: FullScreenProp
         getTexture: texture ?? target.source?.history?.[0],
         getTextureSize: () => texture?.size ?? [target.width, target.height],
         getTargetSize: () => [target.width, target.height],
-      };
+      } as Record<string, any>;
 
       const allArgs = [...argRefs, ...sources, ...s, ...f];
 
@@ -80,5 +80,5 @@ export const FullScreen: LiveComponent<FullScreenProps> = (props: FullScreenProp
       texture: t,
       initial,
     });
-  }, [shader, texture, target, initial, history, source, sources]);
+  }, [shader, texture, target, initial, history, args, source, sources]);
 }

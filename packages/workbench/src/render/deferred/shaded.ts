@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass';
+import type { VirtualDraw } from '../../pass/types';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -18,27 +18,16 @@ import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/deferred-shade
 
 import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
-import { ShadedRender as ForwardShadedRender } from '../forward/shaded';
-
 export type DeferredShadedRenderProps = VirtualDraw;
 
 export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (props: DeferredShadedRenderProps) => {
   let {
-    vertexCount,
-    instanceCount,
-    bounds,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
     links: {
       getVertex,
       getSurface,
     },
-
-    pipeline,
     defines,
-    mode = 'opaque',
+    ...rest
   } = props;
 
   const device = useDeviceContext();
@@ -66,23 +55,14 @@ export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (p
 
   const defs = useOne(() => ({...defines, HAS_ALPHA_TO_COVERAGE: true}), defines);
 
-  // Inline the render fiber to avoid another memo()
+  // Inline the render fiber
   const call = {
-    vertexCount,
-    instanceCount,
-    bounds,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
+    ...rest,
     vertex: v,
     fragment: f,
     defines: defs,
-    pipeline,
     renderContext: gbuffer,
-
     globalLayout,
-    mode,
   };
 
   return yeet(drawCall(call));

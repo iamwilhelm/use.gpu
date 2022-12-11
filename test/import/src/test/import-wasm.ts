@@ -1,4 +1,4 @@
-import { Draw, Pass, RawQuads } from '@use-gpu/workbench';
+import { Pass, RawQuads } from '@use-gpu/workbench';
 import { RustText } from '@use-gpu/glyph';
 import { mountGPUDevice } from '@use-gpu/webgpu';
 

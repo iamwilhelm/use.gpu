@@ -50,7 +50,6 @@ export type RawLinesProps = {
   count?: Lazy<number>,
   pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
   mode?: RenderPassMode | string,
-  id?: number,
 };
 
 const ZERO = [0, 0, 0, 1];
@@ -111,8 +110,8 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const [xf, scissor, getBounds] = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
-  if (getBounds && props.positions?.bounds) {
-    bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
+  if (getBounds && (props.positions as any)?.bounds) {
+    bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
   }
   else {
     useNoCallback();

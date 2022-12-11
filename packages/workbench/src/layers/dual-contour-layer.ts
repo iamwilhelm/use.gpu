@@ -1,8 +1,8 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, Ref } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode, StorageSource,
+  VertexData, RenderPassMode, StorageSource, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
@@ -11,7 +11,7 @@ import { Virtual } from '../primitives/virtual';
 import { Readback } from '../primitives/readback';
 
 import { patch } from '@use-gpu/state';
-import { use, memo, yeet, debug, fragment, useCallback, useMemo, useOne, useVersion, useNoCallback, incrementVersion } from '@use-gpu/live';
+import { use, memo, yeet, debug, fragment, useCallback, useMemo, useOne, useRef, useVersion, useNoCallback, incrementVersion } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, uploadBuffer, toDataBounds } from '@use-gpu/core';
 
@@ -159,11 +159,11 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     return toDataBounds([min, max]);
   }, range);
 
-  const rangeBoundsRef = useShaderRef(rangeBounds);
+  const rangeBoundsRef = useRef(rangeBounds);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds) {
-    bounds = useCallback(() => getBounds(rangeBoundsRef.current), [getBounds]);
+    bounds = useCallback(() => getBounds(rangeBoundsRef.current!), [getBounds]);
   }
   else {
     useNoCallback();
@@ -289,9 +289,9 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
       ? PIPELINE_ALPHA_TO_COVERAGE
       : PIPELINE_ALPHA,
       { primitive: { cullMode: {
-        front: 'back',
-        back: 'front',
-        both: 'none',
+        front: 'back' as GPUCullMode,
+        back: 'front' as GPUCullMode,
+        both: 'none' as GPUCullMode,
       }[side] } },
     ),
     [alphaToCoverage, side]);

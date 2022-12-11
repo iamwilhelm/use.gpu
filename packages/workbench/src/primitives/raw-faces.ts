@@ -149,8 +149,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const scissor = useScissorContext();
 
   let bounds: Lazy<DataBounds> | null = null;
-  if (getBounds && props.positions?.bounds) {
-    bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
+  if (getBounds && (props.positions as any)?.bounds) {
+    bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
   }
   else {
     useNoCallback();

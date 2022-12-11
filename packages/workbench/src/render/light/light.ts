@@ -1,6 +1,8 @@
-import type { LiveComponent, LiveElement, Lazy, TextureSource } from '@use-gpu/live';
-import type { ShaderModule } from '@use-gpu/shader/wgsl';
-import type { VirtualDraw } from '../pass';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Lazy, TextureSource } from '@use-gpu/core';
+import type { Update } from '@use-gpu/state';
+import type { VirtualDraw } from '../../pass/types';
 import type { BoundLight } from '../../light/types';
 
 import { memo, use, yeet, keyed, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
@@ -51,9 +53,10 @@ export type LightRenderProps = {
 
 export type LightKindProps = {
   gbuffer: TextureSource[],
+  stencil: boolean,
+  shadows: boolean,
 
   lights: Map<number, BoundLight>,
-  shadows: boolean,
 
   order: number[],
   start: number,
@@ -78,7 +81,7 @@ export const FULLSCREEN_PIPELINE = {
       },
     },
   },
-};
+} as Update<GPURenderPipelineDescriptor>;
 
 export const GEOMETRY_PIPELINE = {
   primitive: {
@@ -95,7 +98,7 @@ export const GEOMETRY_PIPELINE = {
       },
     },
   },
-};
+} as Update<GPURenderPipelineDescriptor>;
 
 export const STENCIL_PIPELINE = {
   primitive: {
@@ -110,7 +113,7 @@ export const STENCIL_PIPELINE = {
     },
   },
   fragment: $delete(),
-};
+} as Update<GPURenderPipelineDescriptor>;
 
 export const FULLSCREEN_STENCIL_PIPELINE = {
   primitive: {
@@ -130,7 +133,7 @@ export const FULLSCREEN_STENCIL_PIPELINE = {
       },
     },
   },
-};
+} as Update<GPURenderPipelineDescriptor>;
 
 export const GEOMETRY_STENCIL_PIPELINE = {
   primitive: {
@@ -150,7 +153,7 @@ export const GEOMETRY_STENCIL_PIPELINE = {
       },
     },
   },
-};
+} as Update<GPURenderPipelineDescriptor>;
 
 export const FULLSCREEN_DEFS = {
   IS_FULLSCREEN: true,
@@ -165,7 +168,7 @@ const LIGHT_RENDERERS = {
   [DIRECTIONAL_LIGHT]: FullScreenLightRender,
   [DOME_LIGHT]: FullScreenLightRender,
   [POINT_LIGHT]: PointLightRender,
-} as Record<number, LiveComponent>;
+} as Record<number, LiveComponent<any>>;
 
 export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRenderProps) => {
   let {
@@ -178,7 +181,7 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
   const {renderContexts: {gbuffer}} = usePassContext();
   const {depthStencilState, sources} = gbuffer;
 
-  const stencil = !!depthStencilState.format.match(/stencil/);
+  const stencil = !!depthStencilState?.format.match(/stencil/);
 
   const applyLight = useOne(() => {
     const applyDirectionalShadow = shadows ? bindBundle(applyDirectionalShadowWGSL, {sampleShadow}) : null;
@@ -192,14 +195,14 @@ export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRe
   }, shadows);
 
   const out = [...subranges.keys()].map(kind => {
-    const [start, end] = subranges.get(kind);
-    const props = {lights, order, start, end, stencil, gbuffer: sources, getLight, applyLight};
+    const [start, end] = subranges.get(kind)!;
+    const props = {lights, order, start, end, stencil, gbuffer: sources!, getLight, applyLight};
 
     const Component = LIGHT_RENDERERS[kind];
     return Component ? keyed(Component, kind, props) : null;
   });
 
-  out.push(keyed(EmissiveLightRender, -1, {gbuffer: sources, getLight}));
+  out.push(keyed(EmissiveLightRender, -1, {gbuffer: sources!, getLight}));
 
   return out;
 }, 'LightRender');
@@ -209,7 +212,7 @@ export const LightDraw = (
   instanceCount: Lazy<number>,
   firstInstance: Lazy<number>,
   links: Record<string, ShaderModule>,
-  pipeline?: Partial<GPURenderPipelineDescriptor>,
+  pipeline?: Update<GPURenderPipelineDescriptor>,
   mode?: string,
 ) => yeet(useLightDraw(vertexCount, instanceCount, firstInstance, links, pipeline, mode));
 
@@ -218,7 +221,7 @@ export const useLightDraw = (
   instanceCount: Lazy<number>,
   firstInstance: Lazy<number>,
   links: Record<string, ShaderModule>,
-  pipeline?: Partial<GPURenderPipelineDescriptor>,
+  pipeline?: Update<GPURenderPipelineDescriptor>,
   mode = 'light',
 ) => {
   const device = useDeviceContext();

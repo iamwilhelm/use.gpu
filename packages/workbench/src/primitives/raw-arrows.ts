@@ -94,8 +94,8 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const [xf, scissor, getBounds] = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
-  if (getBounds && props.positions?.bounds) {
-    bounds = useCallback(() => getBounds(props.positions!.bounds), [props.positions, getBounds]);
+  if (getBounds && (props.positions as any)?.bounds) {
+    bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
   }
   else {
     useNoCallback();

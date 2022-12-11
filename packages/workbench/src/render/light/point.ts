@@ -1,6 +1,5 @@
-import type { LiveComponent, LiveElement, Lazy, TextureSource } from '@use-gpu/live';
-import type { ShaderModule } from '@use-gpu/shader/wgsl';
-import type { VirtualDraw } from '../pass';
+import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
 import type { LightKindProps } from './light';
 import type { BoundLight } from '../../light/types';
 
@@ -96,12 +95,12 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
     let insideCount = 0;
 
     for (let i = start; i < end; ++i) {
-      const light = lights.get(order[i]);
+      const light = lights.get(order[i])!;
       const {position, intensity, cutoff} = light;
-      const radius = Math.sqrt(intensity * 3.1415 / cutoff) * getScale;
+      const radius = Math.sqrt(intensity! * 3.1415 / (cutoff || 1)) * getScale;
 
-      if (cull(position, radius)) {
-        vec3.sub(v3, position, viewPosition);
+      if (cull(position!, radius)) {
+        vec3.sub(v3, position! as vec3, viewPosition as vec3);
 
         instances[instanceCount++] = i;
         if (vec3.length(v3) > radius) outsides[outsideCount++] = i;

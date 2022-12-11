@@ -2,7 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React from '@use-gpu/live';
 
 import {
-  Draw, Pass, Flat,
+  Pass, Flat,
   OrbitCamera, OrbitControls,
   Pick, Cursor, LinearRGB,
 } from '@use-gpu/workbench';

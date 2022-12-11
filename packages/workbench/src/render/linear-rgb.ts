@@ -5,7 +5,6 @@ import type { ShaderModule } from '@use-gpu/shader';
 import { gather, use, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 
-import { Draw } from '../queue/draw';
 import { Pass } from './pass';
 import { RenderTarget } from './render-target';
 import { RenderToTexture } from './render-to-texture';
@@ -44,7 +43,6 @@ export type LinearRGBProps = {
 export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => {
   const {
     tonemap = 'linear',
-    exposure = 'fixed',
     gain = 1,
     overlay = false,
     then,
@@ -70,15 +68,12 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
           if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
 
           const view = useMemo(() =>
-            use(Draw, {
+            use(Pass, {
+              picking: false,
               children:
-                use(Pass, {
-                  picking: false,
-                  children:
-                    use(RawFullScreen, {
-                      texture,
-                      filter,
-                    }),
+                use(RawFullScreen, {
+                  texture,
+                  filter,
                 }),
             }),
             [texture, filter]

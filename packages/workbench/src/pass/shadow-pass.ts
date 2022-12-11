@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveComponent, LiveElement } from '@use-gpu/live';
 import type { LightEnv, Renderable } from '../pass';
 
 import { keyed, memo, useMemo } from '@use-gpu/live';
@@ -30,7 +30,7 @@ const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS;
 const SHADOW_TYPES = {
   ortho: ShadowOrthoPass,
   omni: ShadowOmniPass,
-} as Record<string, LiveComponent>;
+} as Record<string, LiveComponent<any>>;
 
 /** Shadow render pass.
 
@@ -50,7 +50,7 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   const descriptors = useMemo(() => {
     const layers = texture.size[2];
 
-    const attachments = makeDepthStencilAttachments(texture.texture, SHADOW_FORMAT, layers, 0.0, 'load');
+    const attachments = makeDepthStencilAttachments(texture.texture, SHADOW_FORMAT, layers || 1, 0.0, 'load');
     const descriptors = attachments.map(depthStencilAttachment => ({
       colorAttachments: [],
       depthStencilAttachment,
@@ -67,7 +67,7 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
 
   const out: LiveElement[] = [];
   for (const map of shadows.values()) {
-    const Component = SHADOW_TYPES[map.shadow.type];
+    const Component = SHADOW_TYPES[map.shadow!.type];
     if (Component) out.push(keyed(Component, map.id, {calls, map, descriptors, texture}));
   }
   return out;

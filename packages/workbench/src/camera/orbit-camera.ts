@@ -9,7 +9,7 @@ import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { RenderContext } from '../providers/render-provider';
 import { ViewProvider } from '../providers/view-provider';
-import { mat4 } from 'gl-matrix';
+import { vec2, mat4 } from 'gl-matrix';
 
 const DEFAULT_ORBIT_CAMERA = {
   phi: 0,
@@ -86,10 +86,10 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   uniforms.projectionMatrix.current = makeProjectionMatrix(width, height, fov, near, far, radius, dolly);
   uniforms.viewMatrix.current = makeOrbitMatrix(radius, phi, theta, target, dolly);
   uniforms.viewPosition.current = makeOrbitPosition(radius, phi, theta, target, dolly);
-  uniforms.viewNearFar.current = [ near, far ];
-  uniforms.viewResolution.current = [ 1 / width, 1 / height ];
-  uniforms.viewSize.current = [ width, height ];
-  uniforms.viewWorldDepth.current = [focus * Math.tan(fov / 2), 1];
+  uniforms.viewNearFar.current = vec2.fromValues(near, far);
+  uniforms.viewResolution.current = vec2.fromValues(1 / width, 1 / height);
+  uniforms.viewSize.current = vec2.fromValues(width, height);
+  uniforms.viewWorldDepth.current = vec2.fromValues(focus * Math.tan(fov / 2), 1);
   uniforms.viewPixelRatio.current = pixelRatio * unit;
 
   const {

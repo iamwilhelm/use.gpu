@@ -4,6 +4,8 @@
     { "path": "../live" },
     { "path": "../state" },
     { "path": "../react" },
+    { "path": "../core" },
+    { "path": "../workbench" },
   ],
   "compilerOptions": {
     "rootDir": "..",

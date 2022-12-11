@@ -1,4 +1,5 @@
 import type { UseGPURenderContext, TextureSource } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';

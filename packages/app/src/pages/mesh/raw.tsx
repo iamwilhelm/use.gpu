@@ -3,7 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat,
+  Loop, Pass, Flat,
   Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Pick, Cursor, PointLayer, LineLayer,
@@ -17,7 +17,7 @@ export const MeshRawPage: LC = (props) => {
   const texture = makeTexture();
 
   return (
-    <Draw>
+    <>
       <Cursor cursor='move' />
       <Camera>
         <Pass>
@@ -32,7 +32,7 @@ export const MeshRawPage: LC = (props) => {
           />
         </Pass>
       </Camera>
-    </Draw>
+    </>
   );
 };
 

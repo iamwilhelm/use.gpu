@@ -140,9 +140,9 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const [xf, scissor, getBounds] = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
-  if (getBounds && props.positions?.bounds) {
+  if (getBounds && (props.positions as any)?.bounds) {
     bounds = useCallback(() => {
-      return getBounds(props.positions!.bounds);
+      return getBounds((props.positions! as any).bounds);
     }, [props.positions, getBounds]);
   }
   else {

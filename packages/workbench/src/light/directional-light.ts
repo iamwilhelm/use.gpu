@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
-import type { ShadowMapProps } from './types';
+import type { ShadowMapLike } from './types';
 
 import { optional, parseColor, parseNumber, parsePosition, parseVec2, parseVec3, useProp } from '@use-gpu/traits';
 import { memo, useMemo, useOne } from '@use-gpu/live';
@@ -42,7 +42,7 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
   const intensity = useProp(props.intensity, parseNumber, 1);
 
   const normal = useOne(() =>
-    direction ?? vec4.fromValues(-position[0], -position[1], -position[2], 0),
+    direction ? vec4.clone(direction as any as vec4) : vec4.fromValues(-position[0], -position[1], -position[2], 0),
     direction ?? position
   );
 
@@ -57,16 +57,16 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
     const bias  = parseVec2(shadowMap.bias  ?? DEFAULT_SHADOW_MAP.bias);
     const span  = parseVec2(shadowMap.span  ?? DEFAULT_SHADOW_MAP.span);
     const up    = parseVec3(shadowMap.up    ?? DEFAULT_SHADOW_MAP.up);
-    const blur  = parseFloat(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);
+    const blur  = parseNumber(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);
 
     const matrix = mat4.create();
     const tangent = vec3.create();
     const bitangent = vec3.create();
 
-    vec3.normalize(normal, normal);
-    vec3.cross(tangent, normal, up);
+    vec3.normalize(normal as vec3, normal as vec3);
+    vec3.cross(tangent, normal as vec3, up);
     vec3.normalize(tangent, tangent);
-    vec3.cross(bitangent, normal, tangent);
+    vec3.cross(bitangent, normal as vec3, tangent);
     mat4.set(matrix,
       tangent[0], tangent[1], tangent[2], 0.0,
       bitangent[0], bitangent[1], bitangent[2], 0.0,
@@ -88,22 +88,21 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
   }, [position, normal, shadowMap, parent]);
 
   const light = useMemo(() => {
-    let p, n;
-    if (parent) {
-      p = vec4.clone(position);
-      n = vec4.clone(normal);
-      p[3] = 1;
-      n[3] = 0;
+    let p = vec4.clone(position as any as vec4);
+    let n = vec4.clone(normal as any as vec4);
+    p[3] = 1;
+    n[3] = 0;
 
-      vec4.transformMat4(p, parent);
-      vec4.transformMat4(n, parent);
+    if (parent) {
+      vec4.transformMat4(p, p, parent);
+      vec4.transformMat4(n, n, parent);
     }
 
     return {
       kind: DIRECTIONAL_LIGHT,
       into,
-      position: p ?? position,
-      normal: n ?? normal,
+      position: p,
+      normal: n,
       color,
       intensity,
       shadow,

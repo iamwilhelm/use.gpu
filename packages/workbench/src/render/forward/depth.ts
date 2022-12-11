@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass';
+import type { VirtualDraw } from '../../pass/types';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -21,20 +21,13 @@ export type DepthRenderProps = VirtualDraw;
 
 export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderProps) => {
   let {
-    vertexCount,
-    instanceCount,
-    bounds,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
     links: {
       getVertex,
       getFragment,
     },
-
-    propPipeline,
     defines,
+    pipeline: propPipeline,
+    ...rest
   } = props;
 
   const device = useDeviceContext();
@@ -62,15 +55,9 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment]);
 
-  // Inline the render fiber to avoid another memo()
+  // Inline the render fiber
   const call = {
-    vertexCount,
-    instanceCount,
-    bounds,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
+    ...rest,
     vertex: v,
     fragment: f,
     defines,

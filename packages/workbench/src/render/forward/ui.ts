@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass';
+import type { VirtualDraw } from '../../pass/types';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -20,20 +20,11 @@ export type UIRenderProps = VirtualDraw;
 
 export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => {
   let {
-    vertexCount,
-    instanceCount,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
     links: {
       getVertex,
       getFragment,
     },
-
-    pipeline,
-    defines,
-    mode = 'opaque',
+    ...rest
   } = props;
 
   const device = useDeviceContext();
@@ -58,21 +49,14 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getFragment, colorInput, colorSpace]);
 
-  // Inline the render fiber to avoid another memo()
+  // Inline the render fiber
   const call = {
-    vertexCount,
-    instanceCount,
-    indirect,
-    shouldDispatch,
-    onDispatch,
+    ...rest,
     vertex: v,
     fragment: f,
-    defines,
-    pipeline,
     renderContext,
     globalLayout,
     passLayout,
-    mode,
   };
 
   return yeet(drawCall(call));

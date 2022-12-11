@@ -3,7 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { Gather } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat,
+  Loop, Pass, Flat,
   InterleavedData, PBRMaterial, RawTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor, FaceLayer,
@@ -41,7 +41,7 @@ export const MeshInterleavedPage: LC = (props) => {
         positions, normals, colors, uvs,
         texture,
       ]) => (
-        <Draw>
+        <>
           <Cursor cursor='move' />
           <Camera>
             <Pass lights>
@@ -64,7 +64,7 @@ export const MeshInterleavedPage: LC = (props) => {
               />
             </Pass>
           </Camera>
-        </Draw>
+        </>
       )}
     />
   );

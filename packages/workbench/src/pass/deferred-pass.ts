@@ -1,9 +1,7 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { Culler, LightEnv, Renderable } from './types';
 
 import { use, quote, yeet, memo, gather, useMemo, useOne } from '@use-gpu/live';
-
-import { LightRender } from '../renderer/deferred/light';
 
 import { useRenderContext } from '../providers/render-provider';
 import { useDeviceContext } from '../providers/device-provider';
@@ -33,9 +31,9 @@ export type DeferredPassProps = {
 const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
 
-/** Color render pass.
+/** Deferred render pass.
 
-Draws all opaque calls, then all transparent calls, then all debug wireframes.
+Draws all opaque calls to gbuffer, then stencils lights, then draws lights, then all transparent calls, then all debug wireframes.
 */
 export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildren<DeferredPassProps>) => {
   const {
@@ -52,6 +50,8 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
   const {width, height, depthTexture} = renderContext;
   const {bind: bindGlobal, cull} = useViewContext();
   const {bind: makeBindPass, renderContexts: {gbuffer}} = usePassContext();
+
+  if (!depthTexture) throw new Error("Deferred renderer requires a depth buffer");
 
   const opaques      = toArray(calls['opaque']      as Renderable[]);
   const transparents = toArray(calls['transparent'] as Renderable[]);
@@ -104,7 +104,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
 
     commandEncoder.copyTextureToTexture(
       {texture: depthTexture},
-      {texture: gbuffer.sources[4].texture},
+      {texture: gbuffer.sources![4].texture},
       [width, height, 1]
     );
 

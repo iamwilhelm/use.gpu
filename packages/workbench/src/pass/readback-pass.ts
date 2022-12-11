@@ -26,8 +26,8 @@ export const ReadbackPass: LC<ReadbackPassProps> = memo((props: PropsWithChildre
 
   const device = useDeviceContext();
 
-  const post     = toArray(rs['post']     as CommandToBuffer[]);
-  const readback = toArray(rs['readback'] as ArrowFunction[]);
+  const post     = toArray(calls['post']     as CommandToBuffer[]);
+  const readback = toArray(calls['readback'] as ArrowFunction[]);
 
   return quote(yeet(() => {
 

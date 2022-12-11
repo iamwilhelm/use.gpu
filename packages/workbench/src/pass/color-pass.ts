@@ -1,4 +1,4 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction, UniformPipe } from '@use-gpu/live';
+import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
 import type { Culler, LightEnv, Renderable } from './types';
 
 import { use, quote, yeet, memo, useMemo, useOne } from '@use-gpu/live';

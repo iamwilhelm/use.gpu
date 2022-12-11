@@ -10,7 +10,7 @@ import { GlyphControls } from '../../ui/glyph-controls';
 import { vec3 } from 'gl-matrix';
 
 import {
-  LinearRGB, Draw, Pass, Flat, RawTexture,
+  LinearRGB, Pass, Flat, RawTexture,
   OrbitCamera, OrbitControls, PanControls,
   useDeviceContext, useFontContext, LayoutContext, DebugProvider,
 } from '@use-gpu/workbench';

@@ -4,7 +4,7 @@ import type { Tracks } from '@use-gpu/workbench';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat,
+  Loop, Pass, Flat,
   RawData, PointLayer,
   Cursor, OrbitCamera, OrbitControls,
   Animate,

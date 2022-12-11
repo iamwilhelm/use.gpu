@@ -6,8 +6,9 @@ import { memo, useMemo } from '@use-gpu/live';
 import { useLightContext } from '../providers/light-provider';
 
 import { AMBIENT_LIGHT } from './types';
+import { vec4 } from 'gl-matrix';
 
-const WHITE = [1, 1, 1, 1];
+const WHITE = vec4.fromValues(1, 1, 1, 1);
 
 export type AmbientLightProps = {
   color?: ColorLike,

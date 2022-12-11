@@ -1,7 +1,8 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
-import { parseColor, parseNumber, parseMatrix, parsePosition, parseVec2, useProp } from '@use-gpu/traits';
+import type { ShadowMapLike } from './types';
 
+import { parseColor, parseNumber, parseMatrix, parsePosition, parseVec2, useProp } from '@use-gpu/traits';
 import { memo, useMemo } from '@use-gpu/live';
 
 import { useLightContext } from '../providers/light-provider';
@@ -16,6 +17,7 @@ export type PointLightProps = {
   color?: ColorLike,
   intensity?: number,
   cutoff?: number,
+  shadowMap?: ShadowMapLike,
 };
 
 const DEFAULT_SHADOW_MAP = {
@@ -42,7 +44,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
     const size  = parseVec2(shadowMap.size  ?? DEFAULT_SHADOW_MAP.size);
     const depth = parseVec2(shadowMap.depth ?? DEFAULT_SHADOW_MAP.depth);
     const bias  = parseVec2(shadowMap.bias  ?? DEFAULT_SHADOW_MAP.bias);
-    const blur  = parseFloat(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);
+    const blur  = parseNumber(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);
 
     const matrix = mat4.create();
     mat4.fromTranslation(matrix, position);
@@ -56,8 +58,8 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
   }, [position, shadowMap, parent]);
 
   const light = useMemo(() => {
-    const p = vec4.clone(position);
-    if (parent) vec3.transformMat4(p, p, parent);
+    const p = vec4.clone(position as any as vec4);
+    if (parent) vec3.transformMat4(p as vec3, p as vec3, parent);
     p[3] = 1;
 
     return {

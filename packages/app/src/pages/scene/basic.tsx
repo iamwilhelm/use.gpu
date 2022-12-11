@@ -3,7 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 
 import {
-  Loop, Draw, Pass, Flat, Animate, LinearRGB,
+  Loop, Pass, Flat, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
@@ -60,32 +60,30 @@ export const SceneBasicPage: LC = (props) => {
       ]) => (
         <LinearRGB tonemap="aces">
           <Loop>
-            <Draw>
-              <Cursor cursor='move' />
-              <Camera>
-                <Pass lights>
-                  <AmbientLight intensity={0.2} />
-                  <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
+            <Cursor cursor='move' />
+            <Camera>
+              <Pass lights>
+                <AmbientLight intensity={0.2} />
+                <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
-                  <Scene>
+                <Scene>
 
-                    <Animate prop="position" keyframes={KEYFRAMES} loop>
-                      <Node rotation={[30, - 30, -30]}>
-                        <PickableMesh mesh={mesh} texture={texture} />
-                      </Node>
-                    </Animate>
+                  <Animate prop="position" keyframes={KEYFRAMES} loop>
+                    <Node rotation={[30, - 30, -30]}>
+                      <PickableMesh mesh={mesh} texture={texture} />
+                    </Node>
+                  </Animate>
 
-                    <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
-                      <Node rotation={[30, - 30, -30]}>
-                        <PickableMesh mesh={mesh} texture={texture} />
-                      </Node>
-                    </Animate>
+                  <Animate prop="position" keyframes={KEYFRAMES} loop delay={-20}>
+                    <Node rotation={[30, - 30, -30]}>
+                      <PickableMesh mesh={mesh} texture={texture} />
+                    </Node>
+                  </Animate>
 
-                  </Scene>
+                </Scene>
 
-                </Pass>
-              </Camera>
-            </Draw>
+              </Pass>
+            </Camera>
           </Loop>
         </LinearRGB>
       )}

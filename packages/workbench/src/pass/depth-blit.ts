@@ -1,14 +1,14 @@
-import type { UseGPURenderContext } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { TypedArray, UseGPURenderContext } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 import type { Renderable } from './types';
 
-import { useCallback, useOne, useRef } from '@use-gpu/live';
+import { useCallback, useOne, useRef, SUSPEND } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { usePassContext } from '../providers/pass-provider';
 
-import { SHADOW_PAGE } from '../renderer/light-data';
+import { SHADOW_PAGE } from '../render/light/light-data';
 
 import { getFullScreenVertex } from '@use-gpu/wgsl/instance/vertex/full-screen.wgsl';
 import instanceDrawVirtualDepth from '@use-gpu/wgsl/render/vertex/virtual-depth.wgsl';
@@ -24,7 +24,7 @@ export const useDepthBlit = (
   uv?: TypedArray | number[],
   scale: number = 1,
 
-  getSample: ShaderSource | null = null,
+  getSample: ShaderModule | null = null,
 ) => {
   const device = useDeviceContext();
 
@@ -35,7 +35,7 @@ export const useDepthBlit = (
     return [vertexShader, fragmentShader];
   }, getSample);
 
-  const blitRef = useRef();
+  const blitRef = useRef<Renderable | typeof SUSPEND | null>(null);
 
   const draw = useCallback((commandEncoder: GPUCommandEncoder) => {
     const passEncoder = commandEncoder.beginRenderPass(descriptor);
@@ -50,7 +50,7 @@ export const useDepthBlit = (
     }
 
     const {current: blit} = blitRef;
-    blit?.draw && blit.draw(passEncoder, countGeometry);
+    (blit as any)?.draw && (blit as any).draw(passEncoder, countGeometry);
 
     passEncoder.end();
   }, [uv, descriptor]);
@@ -62,7 +62,7 @@ export const useDepthBlit = (
     fragment,
     renderContext,
     mode: null,
-  });
+  }) as any;
 
   return draw;
 };

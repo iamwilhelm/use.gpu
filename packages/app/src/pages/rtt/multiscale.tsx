@@ -6,7 +6,7 @@ import React, { Gather, useRef } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
-  Loop, Draw, Pass, Flat, Pick,
+  Loop, Pass, Flat, Pick,
   RawTexture, RenderTarget, RenderToTexture, FullScreen,
 } from '@use-gpu/workbench';
 import {

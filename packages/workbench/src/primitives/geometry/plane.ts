@@ -56,9 +56,9 @@ export const makePlaneGeometry = ({
   emitPosition(-1, 1);
   emitPosition( 1, 1);
 
-  const nx = +axes.indexOf('x') === -1;
-  const ny = +axes.indexOf('y') === -1;
-  const nz = +axes.indexOf('z') === -1;
+  const nx = +(axes.indexOf('x') === -1);
+  const ny = +(axes.indexOf('y') === -1);
+  const nz = +(axes.indexOf('z') === -1);
   for (let i = 0; i < 6; ++i) emitNormal(nx, ny, nz);
 
   emitUV(0, 0);

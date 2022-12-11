@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { VirtualDraw } from '../render/pass';
+import type { VirtualDraw } from '../../pass/types';
 
 import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
@@ -22,22 +22,13 @@ export type ShadedRenderProps = VirtualDraw;
 
 export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRenderProps) => {
   let {
-    vertexCount,
-    instanceCount,
-    bounds,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
     links: {
       getVertex,
       getSurface,
       getLight,
     },
-
-    pipeline,
     defines,
-    mode = 'opaque',
+    ...rest
   } = props;
 
   const device = useDeviceContext();
@@ -64,24 +55,15 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getSurface, getLight, colorInput, colorSpace]);
 
-  // Inline the render fiber to avoid another memo()
+  // Inline the render fiber
   const call = {
-    vertexCount,
-    instanceCount,
-    bounds,
-    indirect,
-    shouldDispatch,
-    onDispatch,
-
+    ...rest,
     vertex: v,
     fragment: f,
     defines,
-    pipeline,
     renderContext,
-
     globalLayout,
     passLayout,
-    mode,
   };
 
   return yeet(drawCall(call));

@@ -99,10 +99,10 @@ export const ArrayData: LiveComponent<ArrayDataProps> = (props) => {
 
     const {bounds} = source;
     const {center, radius, min, max} = toDataBounds(getBoundingBox(array, Math.ceil(dims)));
-    bounds.center = center;
-    bounds.radius = radius;
-    bounds.min = min;
-    bounds.max = max;
+    bounds!.center = center;
+    bounds!.radius = radius;
+    bounds!.min = min;
+    bounds!.max = max;
   };
 
   if (!live) {

@@ -8,8 +8,5 @@ export type EmptyPageProps = {
 };
 
 export const EmptyPage: LiveComponent<EmptyPageProps> = (props) => {
-
-  return (
-    use(Pass, {}),
-  );
+  return use(Pass, {});
 };

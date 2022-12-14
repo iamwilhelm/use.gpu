@@ -15,7 +15,7 @@ const DIFF_EPSILON_BINDINGS = bundleToAttributes(getEpsilonDifferential);
 export const useCombinedTransform = (
   transform?: ShaderModule | null,
   differential?: ShaderModule | null,
-  bounds?: (bounds: DataBounds) => DataBounds,
+  bounds?: ((bounds: DataBounds) => DataBounds) | null,
   epsilon?: ShaderSource | Lazy<number>,
 ) => {
   const {

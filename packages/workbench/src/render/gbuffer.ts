@@ -1,11 +1,7 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { DataBounds, RenderPassMode, StorageSource, TextureSource, TextureTarget, UseGPURenderContext } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
-import type { AggregatedCalls } from '../pass/types';
-import type { UseLight } from './light/light-data';
+import type { TextureTarget, UseGPURenderContext } from '@use-gpu/core';
 
 import { yeet, memo, provide, fence, useMemo, useOne } from '@use-gpu/live';
-import { DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
 import {
   makeColorAttachment, makeColorState, makeDepthTexture, makeDepthStencilAttachment, makeDepthStencilState, makeTargetTexture,
 } from '@use-gpu/core';

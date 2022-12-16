@@ -4,11 +4,9 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { AggregatedCalls, LightEnv, VirtualDraw } from '../pass/types';
 import type { UseLight } from './light/light-data';
 
-import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne } from '@use-gpu/live';
-import { bindBundle, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { use, yeet, memo, provide, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
 import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState } from '@use-gpu/core';
 
-import { LightContext } from '../providers/light-provider';
 import { PassContext } from '../providers/pass-provider';
 import { useDeviceContext } from '../providers/device-provider';
 import { useRenderContext } from '../providers/render-provider';
@@ -29,18 +27,8 @@ import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
 
-import { LightData, SHADOW_FORMAT, SHADOW_PAGE } from './light/light-data';
-
-import { getLight, getLightCount } from '@use-gpu/wgsl/use/light.wgsl';
-import { sampleShadow } from '@use-gpu/wgsl/use/shadow.wgsl';
-
-import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
-import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
-import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
-import { applyPointShadow as applyPointShadowWGSL } from '@use-gpu/wgsl/shadow/point.wgsl';
-
-const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
-const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
+import { SHADOW_FORMAT } from './light/light-data';
+import { LightMaterial } from './light/light-material';
 
 const NO_ENV: Record<string, any> = {};
 
@@ -205,33 +193,8 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     }, [calls, passes, overlay, merge]);
 
   // Provide forward-lit material
-  const view = lights ? use(LightData, {
-    render: (
-      useLight: UseLight,
-    ) => {
-      const context = useMemo(() => {
-        const bindMaterial = (applyMaterial: ShaderModule) => {
-
-          const applyDirectionalShadow = shadows ? bindBundle(applyDirectionalShadowWGSL, {sampleShadow}) : null;
-          const applyPointShadow = shadows ? bindBundle(applyPointShadowWGSL, {sampleShadow}) : null;
-
-          const applyLight = bindBundle(applyLightWGSL, {
-            applyMaterial,
-            applyDirectionalShadow,
-            applyPointShadow,
-          }, {SHADOW_PAGE});
-
-          return bindBundle(applyLightsWGSL, {applyLight, getLightCount, getLight});
-        };
-
-        const useMaterial = (applyMaterial: ShaderModule) =>
-          useMemo(() => bindMaterial(applyMaterial), [bindMaterial, applyMaterial]);
-
-        return {useLight, useMaterial};
-      }, [useLight]);
-
-      return provide(LightContext, context, children);
-    },
+  const view = lights ? use(LightMaterial, {
+    children,
     then: (light: LightEnv) => 
       useOne(() => yeet({ env: { light }}), light),
   }) : children;

@@ -4,14 +4,11 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { AggregatedCalls, LightEnv, VirtualDraw } from '../pass/types';
 import type { UseLight } from './light/light-data';
 
-import { use, quote, yeet, memo, provide, multiGather, extend, useContext, useMemo, useOne, useRef } from '@use-gpu/live';
-import { bindBundle, bundleToAttributes, bindEntryPoint, getBundleKey } from '@use-gpu/shader/wgsl';
+import { use, yeet, memo, provide, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
 import {
   makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState,
-  makeColorState, makeTargetTexture,
 } from '@use-gpu/core';
 
-import { LightContext } from '../providers/light-provider';
 import { PassContext } from '../providers/pass-provider';
 import { useDeviceContext } from '../providers/device-provider';
 import { useRenderContext } from '../providers/render-provider';
@@ -30,7 +27,8 @@ import { DeferredSolidRender } from './deferred/solid';
 import { DeferredUIRender } from './deferred/ui';
 
 import { LightRender } from './light/light';
-import { LightData, SHADOW_FORMAT, SHADOW_PAGE } from './light/light-data';
+import { LightMaterial } from './light/light-material';
+import { SHADOW_FORMAT } from './light/light-data';
 
 import { ComputePass } from '../pass/compute-pass';
 import { DeferredPass } from '../pass/deferred-pass';
@@ -38,17 +36,6 @@ import { DispatchPass } from '../pass/dispatch-pass';
 import { PickingPass } from '../pass/picking-pass';
 import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
-
-import { getLight, getLightCount } from '@use-gpu/wgsl/use/light.wgsl';
-import { sampleShadow } from '@use-gpu/wgsl/use/shadow.wgsl';
-
-import { applyLight as applyLightWGSL } from '@use-gpu/wgsl/material/light.wgsl';
-import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wgsl';
-import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
-import { applyPointShadow as applyPointShadowWGSL } from '@use-gpu/wgsl/shadow/point.wgsl';
-
-const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
-const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 
 type RenderComponents = {
   modes: Record<string, LiveComponent<any>>,
@@ -207,41 +194,15 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
       ];
     }, [context, calls, passes, overlay, merge]);
 
-  // Provide forward-lit material
-  const view = use(LightData, {
-    deferred: true,
-    render: (
-      useLight: UseLight,
-    ) => {
-      const context = useMemo(() => {
-        const bindMaterial = (applyMaterial: ShaderModule) => {
-
-          const applyDirectionalShadow = shadows ? bindBundle(applyDirectionalShadowWGSL, {sampleShadow}) : null;
-          const applyPointShadow = shadows ? bindBundle(applyPointShadowWGSL, {sampleShadow}) : null;
-
-          const applyLight = bindBundle(applyLightWGSL, {
-            applyMaterial,
-            applyDirectionalShadow,
-            applyPointShadow,
-          }, {SHADOW_PAGE});
-
-          return bindBundle(applyLightsWGSL, {applyLight, getLightCount, getLight});
-        };
-
-        const useMaterial = (applyMaterial: ShaderModule) =>
-          useMemo(() => bindMaterial(applyMaterial), [bindMaterial, applyMaterial]);
-
-        return {useLight, useMaterial};
-      }, [useLight]);
-
-      return provide(LightContext, context, children);
-    },
-    then: (light: LightEnv) =>
+  // Provide forward-lit material + deferred light renderer
+  const view = lights ? use(LightMaterial, {
+    children,
+    then: (light: LightEnv) => 
       useMemo(() => [
-        use(LightRender, {...light, shadows}),
         yeet({ env: { light }}),
+        use(LightRender, {...light, shadows}),
       ], [light, shadows]),
-  });
+  }) : children;
 
   return provide(PassContext, context, multiGather(view, Resume));
 }, 'DeferredRenderer');

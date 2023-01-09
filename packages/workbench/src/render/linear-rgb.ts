@@ -69,6 +69,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
 
           const view = useMemo(() =>
             use(Pass, {
+              mode: 'fullscreen',
               picking: false,
               children:
                 use(RawFullScreen, {

@@ -99,7 +99,7 @@ impl UseRustText {
         let font = FontArc::try_from_vec(ttf).unwrap();
         self.font_map.insert(k, font);
 
-    	let js_value = serde_wasm_bindgen::to_value(&key)?;
+        let js_value = serde_wasm_bindgen::to_value(&key)?;
         Ok(js_value)
     }
 
@@ -107,7 +107,7 @@ impl UseRustText {
         let k = key as u64;
         self.font_map.remove(&k);
 
-    	let js_value = serde_wasm_bindgen::to_value(&key)?;
+        let js_value = serde_wasm_bindgen::to_value(&key)?;
         Ok(js_value)
     }
 
@@ -141,12 +141,11 @@ impl UseRustText {
             x_height,
             em_unit,
         };
-    	let js_value = serde_wasm_bindgen::to_value(&layout)?;
+        let js_value = serde_wasm_bindgen::to_value(&layout)?;
         Ok(js_value)
     }
 
     pub fn measure_spans(&mut self, stack: Vec<f64>, utf16: Vec<u16>, size: f32) -> Result<JsValue, JsValue> {
-        let text = String::from_utf16_lossy(&utf16);
 
         let fonts: Vec<PxScaleFont<&FontArc>> = stack.iter().map(|k| {
             let key = *k as u64;
@@ -157,77 +156,80 @@ impl UseRustText {
             return font;
         }).collect();
 
-        let break_iter = LineBreakIterator::new(&text);
-        let mut char_iter = text.char_indices();
-
         let mut breaks = Vec::<u8>::new();
         let mut metrics = Vec::<u8>::new();
         let mut glyphs = Vec::<u8>::new();
 
-        let mut last_glyph_id = GlyphId(0);
-        let mut i = 0;
-        break_iter.for_each(|(offset, hard)| {
-            let mut advance = 0.0;
-            let mut trim = 0.0;
+        if (utf16.len() > 0) {
+            let text = String::from_utf16_lossy(&utf16);
+            let break_iter = LineBreakIterator::new(&text);
+            let mut char_iter = text.char_indices();
 
-            while let Some((byte_index, c)) = char_iter.next() {
-                if c == 0 as char {
-                    breaks.extend_from_slice(&mut u32::to_ne_bytes(i as u32));
-                    metrics.extend_from_slice(&mut f32::to_ne_bytes(advance));
-                    metrics.extend_from_slice(&mut f32::to_ne_bytes(trim));
-                    metrics.extend_from_slice(&mut f32::to_ne_bytes(2.0));
-                    advance = 0.0;
-                    trim = 0.0;
-                    last_glyph_id = GlyphId(0);
-                    continue;
-                }
-                
-                let found = fonts.iter().enumerate().filter_map(|(i, font)| {
-                    let glyph_id = font.glyph_id(c);
-                    match glyph_id { GlyphId(g) => if g > 0 { Some((font, glyph_id, i)) } else { None } }
-                }).next();
+            let mut last_glyph_id = GlyphId(0);
+            let mut i = 0;
+            break_iter.for_each(|(offset, hard)| {
+                let mut advance = 0.0;
+                let mut trim = 0.0;
 
-                match found {
-                    Some((font, glyph_id, index)) => {
-                        let h_advance = font.h_advance(glyph_id);
-                        advance += h_advance;
-
-                        if c.is_whitespace() {
-                            trim += h_advance;
-                        }
-                        else {
-                            trim = 0.0;
-                        }
-
-                        let kerning = font.kern(last_glyph_id, glyph_id);
-                        advance += kerning;
-                        last_glyph_id = glyph_id;
-
-                        match glyph_id {
-                            GlyphId(id) => {
-                                glyphs.extend_from_slice(&mut i32::to_ne_bytes(index as i32));
-                                glyphs.extend_from_slice(&mut i32::to_ne_bytes(id as i32));
-                                glyphs.extend_from_slice(&mut i32::to_ne_bytes(c.is_whitespace() as i32));
-                                glyphs.extend_from_slice(&mut i32::to_ne_bytes((kerning * 65536.0) as i32));
-                            }
-                        }
-
-                        i += 1;
+                while let Some((byte_index, c)) = char_iter.next() {
+                    if c == 0 as char {
+                        breaks.extend_from_slice(&mut u32::to_ne_bytes(i as u32));
+                        metrics.extend_from_slice(&mut f32::to_ne_bytes(advance));
+                        metrics.extend_from_slice(&mut f32::to_ne_bytes(trim));
+                        metrics.extend_from_slice(&mut f32::to_ne_bytes(2.0));
+                        advance = 0.0;
+                        trim = 0.0;
+                        last_glyph_id = GlyphId(0);
+                        continue;
                     }
-                    None => {}
+                
+                    let found = fonts.iter().enumerate().filter_map(|(i, font)| {
+                        let glyph_id = font.glyph_id(c);
+                        match glyph_id { GlyphId(g) => if g > 0 { Some((font, glyph_id, i)) } else { None } }
+                    }).next();
+
+                    match found {
+                        Some((font, glyph_id, index)) => {
+                            let h_advance = font.h_advance(glyph_id);
+                            advance += h_advance;
+
+                            if c.is_whitespace() {
+                                trim += h_advance;
+                            }
+                            else {
+                                trim = 0.0;
+                            }
+
+                            let kerning = font.kern(last_glyph_id, glyph_id);
+                            advance += kerning;
+                            last_glyph_id = glyph_id;
+
+                            match glyph_id {
+                                GlyphId(id) => {
+                                    glyphs.extend_from_slice(&mut i32::to_ne_bytes(index as i32));
+                                    glyphs.extend_from_slice(&mut i32::to_ne_bytes(id as i32));
+                                    glyphs.extend_from_slice(&mut i32::to_ne_bytes(c.is_whitespace() as i32));
+                                    glyphs.extend_from_slice(&mut i32::to_ne_bytes((kerning * 65536.0) as i32));
+                                }
+                            }
+
+                            i += 1;
+                        }
+                        None => {}
+                    }
+
+                    if byte_index + c.len_utf8() == offset { break; }                        
                 }
 
-                if byte_index + c.len_utf8() == offset { break; }                        
-            }
+                breaks.extend_from_slice(&mut u32::to_ne_bytes(i as u32));
+                metrics.extend_from_slice(&mut f32::to_ne_bytes(advance));
+                metrics.extend_from_slice(&mut f32::to_ne_bytes(trim));
+                metrics.extend_from_slice(&mut f32::to_ne_bytes(if hard { 1.0 } else { 0.0 }));
+            });
+        }
 
-            breaks.extend_from_slice(&mut u32::to_ne_bytes(i as u32));
-            metrics.extend_from_slice(&mut f32::to_ne_bytes(advance));
-            metrics.extend_from_slice(&mut f32::to_ne_bytes(trim));
-            metrics.extend_from_slice(&mut f32::to_ne_bytes(if hard { 1.0 } else { 0.0 }));
-        });
-        
         let value = SpanMetrics { breaks, metrics, glyphs };
-    	let js_value = serde_wasm_bindgen::to_value(&value)?;
+        let js_value = serde_wasm_bindgen::to_value(&value)?;
         Ok(js_value)
     }
 
@@ -349,7 +351,7 @@ impl UseRustText {
         }
         
 
-    	let js_value = serde_wasm_bindgen::to_value(&value)?;
+        let js_value = serde_wasm_bindgen::to_value(&value)?;
         Ok(js_value)
     }
 }

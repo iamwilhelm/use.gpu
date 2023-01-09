@@ -15,12 +15,12 @@ import {
 
 //
 // Classic render-to-texture feedback effect with blur pyramid.
-// This uses normal render targets and render passes rather than compute kernels and dispatches.
+// This uses plain render targets and render passes rather than compute kernels and dispatches.
 //
 // Notable differences with compute kernels:
-// - render passes do not have a workgroup size and never go out of bounds
 // - render passes can only output to one target at a time
 // - render shaders return results rather than writing them out manually
+// - render shaders do not have a workgroup size and never go out of bounds
 // - pixels are addressed using UV coordinates [0...1] rather than [0...N]
 //
 // Based on http://webglplayground.net/?gallery=reaction-diffusion by Felix Woitzel (@Flexi23)
@@ -257,7 +257,7 @@ export const RTTMultiscalePage: LC = () => {
               mouseRef.current = [x, y];
             }} />
             <RenderToTexture target={feedbackTarget}>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen
                   shader={feedbackShader}
                   sources={[
@@ -275,46 +275,46 @@ export const RTTMultiscalePage: LC = () => {
             </RenderToTexture>
 
             <RenderToTexture target={blurTarget1}>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurXShader} texture={feedbackTarget.source} />
               </Pass>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurYShader} />
               </Pass>
             </RenderToTexture>
 
             <RenderToTexture target={blurTarget2}>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen texture={blurTarget1.source} />
               </Pass>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurXShader} />
               </Pass>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurYShader} />
               </Pass>
             </RenderToTexture>
 
             <RenderToTexture target={blurTarget3}>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen texture={blurTarget2.source} />
               </Pass>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurXShader} />
               </Pass>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurYShader} />
               </Pass>
             </RenderToTexture>
 
             <RenderToTexture target={blurTarget4}>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen texture={blurTarget3.source} />
               </Pass>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurXShader} />
               </Pass>
-              <Pass>
+              <Pass mode="fullscreen">
                 <FullScreen shader={blurYShader} />
               </Pass>
             </RenderToTexture>

@@ -146,9 +146,8 @@ export const PickingTarget: LiveComponent<PickingProps> = (props) => {
         colorAttachments,
         depthStencilAttachment,
         swap,
+        source: pickingSource,
       } as UseGPURenderContext,
-      pickingTexture,
-      pickingSource,
       captureTexture,
       sampleTexture,
     };

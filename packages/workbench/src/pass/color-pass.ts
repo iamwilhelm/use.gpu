@@ -52,9 +52,8 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
   const debugs       = toArray(calls['debug']       as Renderable[]);
 
   const bindPass = useOne(() => {
-    if (!light || !makeBindPass) return () => {};
-    const {storage, texture} = light;
-    return makeBindPass(storage, texture); 
+    if (!makeBindPass) return () => {};
+    return makeBindPass(light?.storage, light?.texture); 
   }, light);
 
   const renderPassDescriptor = useMemo(() =>

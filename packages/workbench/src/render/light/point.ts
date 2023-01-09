@@ -5,7 +5,7 @@ import type { BoundLight } from '../../light/types';
 
 import { use, yeet, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
 import { uploadBuffer } from '@use-gpu/core';
-import { bindBundle, bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBufferedSize } from '../../hooks/useBufferedSize';
 import { useBoundShader } from '../../hooks/useBoundShader';

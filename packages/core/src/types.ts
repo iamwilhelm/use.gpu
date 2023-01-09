@@ -27,7 +27,7 @@ export type UseGPURenderContext = {
   depthStencilState?: GPUDepthStencilState,
   depthStencilAttachment?: GPURenderPassDepthStencilAttachment,
 
-  swap: (view?: GPUTextureView) => void,
+  swap?: (view?: GPUTextureView) => void,
   source?: TextureTarget,
   sources?: TextureTarget[],
 };

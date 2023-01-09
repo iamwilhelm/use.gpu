@@ -6,7 +6,7 @@ import {
   Loop, Pass, Flat, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
-  Pick, Cursor,
+  Cursor,
   PointLight, AmbientLight,
 
   makeBoxGeometry,

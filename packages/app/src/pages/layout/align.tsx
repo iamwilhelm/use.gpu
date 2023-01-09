@@ -12,8 +12,9 @@ import {
 import {
   UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
 } from '@use-gpu/layout';
-const TRANSPARENT = [1, 1, 1, 0.1] as Point4;
 
+const TRANSPARENT = [1, 1, 1, 0.1] as Point4;
+const BACKGROUND = [0.01, 0.02, 0.1, 1.0] as Point4;
 const FILL = [0.4, 0.7, 1, 0.5] as Point4;
 
 export const LayoutAlignPage: LC = () => {
@@ -28,7 +29,7 @@ export const LayoutAlignPage: LC = () => {
   </>)
 
   const view = (
-    <LinearRGB>
+    <LinearRGB backgroundColor={BACKGROUND}>
       <Pass>
         <UI>
           <Layout>

@@ -1,59 +1,41 @@
-import type { LC, PropsWithChildren, LiveFiber, LiveElement, LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { DataBounds, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader';
-import type { AggregatedCalls, LightEnv, VirtualDraw } from '../pass/types';
-import type { UseLight } from './light/light-data';
+import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
+import type { UseGPURenderContext } from '@use-gpu/core';
+import type { LightEnv, RenderComponents } from '../pass/types';
 
-import { use, yeet, memo, provide, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
-import { makeBindGroupLayout, makeBindGroup, makeDataBindingsEntries, makeDepthStencilState } from '@use-gpu/core';
-
-import { PassContext } from '../providers/pass-provider';
-import { useDeviceContext } from '../providers/device-provider';
-import { useRenderContext } from '../providers/render-provider';
-import { usePickingContext, useNoPickingContext } from '../providers/picking-provider';
-import { useInspectable } from '../hooks/useInspectable'
+import { use, yeet, memo, useOne } from '@use-gpu/live';
 
 import { DebugRender } from './forward/debug';
-import { DepthRender } from './forward/depth';
 import { ShadedRender } from './forward/shaded';
+import { ShadowRender } from './forward/shadow';
 import { SolidRender } from './forward/solid';
 import { PickingRender } from './forward/picking';
 import { UIRender } from './forward/ui';
 
 import { ColorPass } from '../pass/color-pass';
-import { ComputePass } from '../pass/compute-pass';
-import { DispatchPass } from '../pass/dispatch-pass';
-import { PickingPass } from '../pass/picking-pass';
-import { ReadbackPass } from '../pass/readback-pass';
-import { ShadowPass } from '../pass/shadow-pass';
 
-import { SHADOW_FORMAT } from './light/light-data';
+import { Renderer } from './renderer';
 import { LightMaterial } from './light/light-material';
 
-const NO_ENV: Record<string, any> = {};
-
-type RenderComponents = {
-  modes: Record<string, LiveComponent<any>>,
-  renders: Record<string, Record<string, LiveComponent<any>>>,
-};
+const DEFAULT_PASSES = [
+  use(ColorPass, {}),
+];
 
 export type ForwardRendererProps = {
   lights?: boolean,
-  shadows?: boolean,
-  picking?: boolean,
   overlay?: boolean,
   merge?: boolean,
-  
+
   passes?: LiveElement[],
+  buffers?: Record<string, UseGPURenderContext[]>,
   components?: RenderComponents,
 };
 
 const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): RenderComponents => {
   return {
     modes: {
-      shadow: DepthRender,
       debug: DebugRender,
       picking: PickingRender,
+      shadow: ShadowRender,
       ...modes,
     },
     renders: {
@@ -65,139 +47,27 @@ const getComponents = ({modes = {}, renders = {}}: Partial<RenderComponents>): R
   }
 };
 
-const HOVERED_VARIANT = 'debug';
-
 export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithChildren<ForwardRendererProps>) => {
   const {
-    lights = true,
-    shadows = false,
-    picking = true,
-
+    lights = false,
     overlay = false,
     merge = false,
+    passes = DEFAULT_PASSES,
 
-    passes,
+    buffers,
     children,
   } = props;
 
-  const inspect = useInspectable();
-  const device = useDeviceContext();
-
-  const renderContext = useRenderContext();
-  const pickingContext = picking ? usePickingContext() : useNoPickingContext();
-
-  const context = useMemo(() => {
-
-    // Provide render context for depth-only shadow passes
-    const depthContext = {
-      ...renderContext,
-      pixelRatio: 1,
-      samples: 1,
-      colorSpace: 'native',
-      colorInput: 'native',
-      colorStates: [],
-      colorAttachments: [],
-      depthStencilState: makeDepthStencilState(SHADOW_FORMAT),
-      swap: () => {},
-    };
-
-    const renderContexts = {
-      depth: depthContext,
-      picking: pickingContext?.renderContext,
-    };
-
-    // Prepare shared bind group for forward lighting
-    const entries: GPUBindGroupLayoutEntry[] = [];
-    if (lights) {
-      entries.push({binding: 0, visibility: GPUShaderStage.FRAGMENT, buffer: {type: 'read-only-storage'}});
-      if (shadows) {
-        entries.push({binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {viewDimension: '2d-array', sampleType: 'depth'}});
-        entries.push({binding: 2, visibility: GPUShaderStage.FRAGMENT, sampler: {type: 'comparison'}});
-      }
-    }
-
-    const layout = lights ? makeBindGroupLayout(device, entries) : null;
-    const bind = lights ? (storage: StorageSource, texture: TextureSource) => {
-      const bindings = [];
-      if (lights) {
-        bindings.push({storage});
-        if (shadows) bindings.push({texture});
-      }
-
-      const entries = makeDataBindingsEntries(device, bindings);
-      const bindGroup = makeBindGroup(device, layout!, entries);
-
-      return (passEncoder: GPURenderPassEncoder) => {
-        passEncoder.setBindGroup(1, bindGroup);
-      };
-    } : null;
-
-    // Provide draw call variants for sub-passes
-    const components = getComponents(props.components ?? {});
-
-    const getRender = (mode: string, render: string | null = null) =>
-      components.modes[mode] ?? components.renders[render!][mode];
-
-    const getVariants = (!shadows && !picking && !passes)
-       ? (virtual: VirtualDraw, hovered: boolean) => hovered ? [getRender(HOVERED_VARIANT)] : getRender(virtual.mode, virtual.renderer)
-
-       : (virtual: VirtualDraw, hovered: boolean) => {
-          const {mode, renderer, links, defines} = virtual;
-
-          const variants = [];
-          if (shadows && mode === 'opaque' && defines?.HAS_SHADOW) {
-            variants.push('shadow');
-          }
-          if (picking && mode !== 'picking' && links?.getPicking) {
-            variants.push('picking');
-          }
-          if (variants.length === 0) return hovered ? [getRender(HOVERED_VARIANT)] : getRender(mode, renderer);
-
-          variants.push(hovered ? HOVERED_VARIANT : mode);
-          return variants.map(mode => getRender(mode, renderer));
-        };
-
-    const useVariants = (virtual: VirtualDraw, hovered: boolean) => 
-      useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
-
-    return {useVariants, renderContexts, layout, bind};
-  }, [lights, shadows, picking, device, renderContext, pickingContext]);
-
-  // Pass aggregrated calls to pass runners
-  const Resume = (
-    calls: AggregatedCalls,
-  ) =>
-    useMemo(() => {
-      const env = (calls.env ?? []).reduce((env: Record<string, any>, data: Record<string, any>) => {
-        for (let k in data) env[k] = data[k];
-        return env;
-      }, {});
-
-      const props: Record<string, any> = {calls, env};
-
-      if (overlay) props.overlay = true;
-      if (merge) props.merge = true;
-
-      if (passes) {
-        return passes.map(element => extend(element, props));
-      }
-      
-      return [
-        calls.dispatch ? use(DispatchPass, props) : null,
-        calls.compute ? use(ComputePass, props) : null,
-        shadows && calls.shadow ? use(ShadowPass, props) : null,
-        use(ColorPass, props),
-        calls.post || calls.readback ? use(ReadbackPass, props) : null,
-        picking && calls.picking ? use(PickingPass, props) : null,
-      ];
-    }, [calls, passes, overlay, merge]);
+  const shadows = !!buffers.shadow;
+  const components = useOne(() => getComponents(props.components ?? {}), props.components);
 
   // Provide forward-lit material
   const view = lights ? use(LightMaterial, {
+    shadows,
     children,
     then: (light: LightEnv) => 
       useOne(() => yeet({ env: { light }}), light),
   }) : children;
 
-  return provide(PassContext, context, multiGather(view, Resume));
+  return Renderer({ buffers, children: view, components, passes, lights, overlay, merge });
 }, 'ForwardRenderer');

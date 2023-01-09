@@ -5,7 +5,6 @@ import type { Update } from '@use-gpu/state';
 import type { BoundLight } from '../light/types';
 import { vec3 } from 'gl-matrix';
 
-export type Culler = (center: vec3, radius: number) => number | boolean;
 export type LightEnv = {
   lights: Map<number, BoundLight>,
   shadows: Map<number, BoundLight>,
@@ -15,9 +14,16 @@ export type LightEnv = {
   texture: TextureSource,
 };
 
+export type Culler = (center: vec3, radius: number) => number | boolean;
+
 export type Renderable = {
   draw: RenderToPass,
   bounds?: Lazy<DataBounds>,
+};
+
+export type RenderComponents = {
+  modes: Record<string, LiveComponent<any>>,
+  renders: Record<string, Record<string, LiveComponent<any>>>,
 };
 
 export type RenderCounter = (v: number, t: number) => void;

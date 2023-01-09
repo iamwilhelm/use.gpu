@@ -35,7 +35,7 @@ export const DeferredSolidRender: LiveComponent<DeferredSolidRenderProps> = (pro
   const {colorInput, colorSpace} = renderContext;
 
   const {layout: globalLayout} = useViewContext();
-  const {renderContexts: {gbuffer}} = usePassContext();
+  const {buffers: {gbuffer: [gbuffer]}} = usePassContext();
 
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;

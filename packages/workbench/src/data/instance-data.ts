@@ -167,7 +167,7 @@ export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {
       indexSource.version = version;
     }, version);
 
-    return then ? then(indexSource, ...fieldSources) : null;
+    return then ? then(indexSource, fieldSources) : null;
   };
 
   return render ? capture(InstanceCapture, render(useInstance), Resume) : null;

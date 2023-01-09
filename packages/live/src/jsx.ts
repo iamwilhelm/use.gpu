@@ -13,7 +13,7 @@ const toChildren = <T>(t: T | T[]): T | T[] | undefined => {
     if (t.length === 1) return t[0];
     if (t.length) return t;
   }
-  if (t) return t;
+  else if (t != null) return t;
   return undefined;
 };
 

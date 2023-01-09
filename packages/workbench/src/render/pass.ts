@@ -1,14 +1,19 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext } from '@use-gpu/core';
 
-import { use, gather, memo } from '@use-gpu/live';
+import { use, multiGather, memo, useMemo } from '@use-gpu/live';
 
+import { FullScreenRenderer } from './full-screen-renderer';
 import { ForwardRenderer } from './forward-renderer';
 import { DeferredRenderer } from './deferred-renderer';
-import { GBuffer } from './gbuffer';
+
+import { GBuffer } from './buffer/gbuffer';
+import { PickingBuffer } from './buffer/picking-buffer';
+import { ShadowBuffer } from './buffer/shadow-buffer';
 
 export type PassProps = {
-  mode?: 'forward' | 'deferred',
+  mode?: 'forward' | 'deferred' | 'fullscreen',
+
   shadows?: boolean,
   lights?: boolean,
   picking?: boolean,
@@ -21,7 +26,7 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     mode = 'forward',
     lights = false,
     shadows = false,
-    picking = true,
+    picking = false,
 
     overlay = false,
     merge = false,
@@ -29,14 +34,32 @@ export const Pass: LC<PassProps> = memo((props: PropsWithChildren<PassProps>) =>
     children,
   } = props;
 
+  if (mode === 'fullscreen') {
+    return use(FullScreenRenderer, {
+      overlay,
+      merge,
+      children,
+    });
+  }
   if (mode === 'forward') {
-    return use(ForwardRenderer, {lights, shadows, picking, overlay, merge, children});
+    const buffers = useMemo(() => [
+      shadows ? use(ShadowBuffer, {}) : null,
+      picking ? use(PickingBuffer, {}) : null,
+    ], [shadows, picking]);
+    return multiGather(buffers, (buffers: Record<string, UseGPURenderContext[]>) =>
+      use(ForwardRenderer, {buffers, lights, overlay, merge, children})
+    );
   }
   if (mode === 'deferred') {
-    return use(GBuffer, {
-      render: (gbuffer: UseGPURenderContext) =>
-        use(DeferredRenderer, {gbuffer, shadows, picking, overlay, merge, children})
-    });
+    const buffers = useMemo(() => [
+      use(GBuffer),
+      shadows ? use(ShadowBuffer, {}) : null,
+      picking ? use(PickingBuffer, {}) : null,
+    ], [shadows, picking]);
+
+    return multiGather(buffers, (buffers: Record<string, UseGPURenderContext[]>) =>
+      use(DeferredRenderer, {buffers, overlay, merge, children})
+    );
   }
 
   return null;

@@ -49,7 +49,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
   const renderContext = useRenderContext();
   const {width, height, depthTexture} = renderContext;
   const {bind: bindGlobal, cull} = useViewContext();
-  const {bind: makeBindPass, renderContexts: {gbuffer}} = usePassContext();
+  const {bind: makeBindPass, buffers: {gbuffer: [gbuffer]}} = usePassContext();
 
   if (!depthTexture) throw new Error("Deferred renderer requires a depth buffer");
 

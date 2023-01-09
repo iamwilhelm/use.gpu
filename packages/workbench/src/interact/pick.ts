@@ -62,6 +62,9 @@ export const Pick: LiveComponent<PickProps> = ({
   const mouseRef = useOne(() => ({current: mouse}));
   mouseRef.current = mouse;
 
+  const countRef = useOne(() => ({current: 0}));
+  countRef.current++;
+
   if (onMouseMove) {
     useMemo(() => {
       if (hovered || captured) {
@@ -132,9 +135,11 @@ export const Pick: LiveComponent<PickProps> = ({
   const dx = move ? moveX : 0;
   const dy = move ? moveY : 0;
 
+  if (move && countRef.current === 1) return null; 
+
   return useMemo(() =>
     render ? render({id, index, hovered, pressed, presses, clicks, x: px, y: py, moveX: dx, moveY: dy}) : (children ? extend(children, {id}) : null),
-    [render, children, id, index, hovered, pressed, count, px, py]
+    [render, children, id, index, hovered, pressed, count, px, py, dx, dy]
   );
 };
 

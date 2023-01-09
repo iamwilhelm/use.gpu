@@ -96,9 +96,9 @@ let lineData = seq(22).map((i) => (
 export const GeometryFacesPage: LC = () => {
 
   // Render polygons
-  const view = (
+  const view = (<>
     <Camera>
-      <Pass>
+      <Pass picking>
 
         <CompositeData
           fields={convexDataFields}
@@ -115,6 +115,7 @@ export const GeometryFacesPage: LC = () => {
                   segments={segments}
                   colors={colors}
                   lookups={lookups}
+                  side="both"
                 />,
                 hovered ? (
                   <CompositeData
@@ -126,6 +127,8 @@ export const GeometryFacesPage: LC = () => {
                         positions={positions}
                         segments={segments}
                         color={[1, 1, 1, 1]}
+                        side="both"
+                        zBias={1}
                       />
                     }
                   />
@@ -149,6 +152,7 @@ export const GeometryFacesPage: LC = () => {
                   indices={indices}
                   colors={colors}
                   lookups={lookups}
+                  side="both"
                 />,
                 hovered ? (
                   <CompositeData
@@ -159,6 +163,8 @@ export const GeometryFacesPage: LC = () => {
                         positions={positions}
                         indices={indices}
                         color={[1, 1, 1, 1]}
+                        side="both"
+                        zBias={1}
                       />
                     }
                   />
@@ -190,7 +196,7 @@ export const GeometryFacesPage: LC = () => {
         <PickingOverlay />
       </Pass>
     </Flat>
-  );
+  </>);
 
   return [
     <Cursor cursor='move' />,

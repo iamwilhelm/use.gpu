@@ -6,23 +6,16 @@ import {
   makeColorAttachment, makeColorState, makeDepthTexture, makeDepthStencilAttachment, makeDepthStencilState, makeTargetTexture,
 } from '@use-gpu/core';
 
-import { useDeviceContext } from '../providers/device-provider';
-import { RenderContext, useRenderContext } from '../providers/render-provider';
+import { useDeviceContext } from '../../providers/device-provider';
+import { useRenderContext } from '../../providers/render-provider';
+import { useInspectable } from '../../hooks/useInspectable';
 
-import { useInspectable } from '../hooks/useInspectable';
-
-export type GBufferProps = {
-  render?: (gbufferContext: UseGPURenderContext) => LiveElement,
-  then?: (targets: TextureTarget[]) => LiveElement,
-};
-
-export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferProps>) => {
+export const GBuffer: LC = memo((props: PropsWithChildren<object>) => {
   const device = useDeviceContext();
   const renderContext = useRenderContext();
 
   const inspect = useInspectable();
 
-  const {render, then} = props;
   const {width, height, samples} = renderContext;
   if (samples > 1) throw new Error("GBuffer cannot be multisampled");
 
@@ -30,15 +23,16 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
   if (!depthStencilState) throw new Error("GBuffer render target must have depth");
 
   const {format} = depthStencilState;
+  const hasFloat = device.features.has('rg11b10ufloat-renderable');
 
-  // Set up GBuffer
+  // Set up GBuffer layout
   const formats = useMemo(() => [
     'rgba8unorm',
     'rgba16float', 
     'rgba8unorm',
-    device.features.has('rg11b10ufloat-renderable') ? 'rg11b10ufloat' : 'rgb10a2unorm',
+    hasFloat ? 'rg11b10ufloat' : 'rgb10a2unorm',
     format,
-  ] as GPUTextureFormat[], [device, format]);
+  ] as GPUTextureFormat[], [hasFloat, format]);
 
   const renderTextures = useMemo(() => formats.map(format => makeTargetTexture(
     device,
@@ -61,7 +55,6 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
       colorSpace: 'linear',
       size: [width, height],
       version: 0,
-      swap: () => {},
     }) as TextureTarget;
 
     return renderTextures.map(makeSource);
@@ -72,7 +65,6 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
     colorStates,
     colorAttachments,
     sources,
-    swap: () => {},
   }), [renderContext, colorStates, colorAttachments, sources]);
 
   inspect({
@@ -81,9 +73,5 @@ export const GBuffer: LC<GBufferProps> = memo((props: PropsWithChildren<GBufferP
     },
   });
 
-  if (!render) return yeet(context);
-
-  const view = render ? render(context) : null;
-  if (then) return fence(view, () => then(sources));
-  return view;
+  return yeet({ gbuffer: context });
 }, 'GBuffer');

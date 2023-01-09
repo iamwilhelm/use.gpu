@@ -202,15 +202,14 @@ const Inner: LiveComponent<ViewProps> = memo(({canvas, color, picking, depth}) =
     children: [
       wrap(FontLoader,
         wrap(Flat,
-          wrap(Draw,
-            wrap(Pass,
-              wrap(UI,
-                wrap(Layout,
-                  wrap(Absolute, use(Overflow, {
-                    x: 'auto',
-                    direction: 'x',
-                    children: use(TextureViews, {color, picking, depth}),
-                  }))))))))
+          wrap(Pass,
+            wrap(UI,
+              wrap(Layout,
+                wrap(Absolute, use(Overflow, {
+                  x: 'auto',
+                  direction: 'x',
+                  children: use(TextureViews, {color, picking, depth}),
+                })))))))
     ]
   })
 ), 'Inner');

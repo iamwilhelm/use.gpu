@@ -18,7 +18,7 @@ export const PickingOverlay: LC = () => {
   if (!pickingContext) return null;
 
   // Display picking buffer with colorization shader
-  const {pickingSource} = pickingContext;
+  const {renderContext: {source}} = pickingContext;
   const colorizeShader = wgsl`
     // Picking buffer is int32, have to use direct texture load.
     @link fn getSize() -> vec2<f32>;
@@ -36,13 +36,14 @@ export const PickingOverlay: LC = () => {
     }
   `;
   
-  const size = useOne(() => () => pickingSource.size, pickingSource);
-  
+  const size = useOne(() => () => source.size, source);
+
   const BINDINGS = bundleToAttributes(colorizeShader);
-  const boundShader = useBoundShader(colorizeShader, BINDINGS, [size, pickingSource]);
-  const textureSource = useLambdaSource(boundShader, pickingSource);
+  const boundShader = useBoundShader(colorizeShader, BINDINGS, [size, source]);
+  const textureSource = useLambdaSource(boundShader, source);
 
   const scale = 0.5;
+  console.log(textureSource.size)
 
   return (
     <UI>
@@ -52,12 +53,12 @@ export const PickingOverlay: LC = () => {
         >
           <Block fill={[0, 0, 0, .5]} contain>
             <Block
-              width={textureSource.size[0] * scale / window.devicePixelRatio}
-              height={textureSource.size[1] * scale / window.devicePixelRatio}
-              image={{texture: textureSource}}
+              width={textureSource.size[0] * scale}
+              height={textureSource.size[1] * scale}
+              image={{texture: textureSource, fit: 'scale'}}
               fill={[0, 0, 0, 1]}
             />
-            <Inline align="center" margin={[0, 5]}><Text color={[1, 1, 1, 1]} size={24}>GPU Picking Buffer</Text></Inline>
+            <Inline align="center" margin={[0, 5]}><Text color={[1, 1, 1, 1]} size={18}>GPU Picking Buffer</Text></Inline>
           </Block>
         </Absolute>
       </Layout>

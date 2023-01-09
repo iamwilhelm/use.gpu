@@ -48,7 +48,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
   const inspect = useInspectable();
 
   const device = useDeviceContext();
-  const {renderContexts: {depth: renderContext}} = usePassContext();
+  const {buffers: {shadow: [renderContext]}} = usePassContext();
   const {defs, uniforms: viewUniforms} = useViewContext();
 
   const shadows = toArray(calls['shadow'] as Renderable[]);

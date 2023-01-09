@@ -62,7 +62,7 @@ export const SceneBasicPage: LC = (props) => {
           <Loop>
             <Cursor cursor='move' />
             <Camera>
-              <Pass lights>
+              <Pass picking lights>
                 <AmbientLight intensity={0.2} />
                 <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 

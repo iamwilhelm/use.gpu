@@ -17,9 +17,9 @@ import instanceFragmentDepth from '@use-gpu/wgsl/render/fragment/depth.wgsl';
 
 import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
-export type DepthRenderProps = VirtualDraw;
+export type ShadowRenderProps = VirtualDraw;
 
-export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderProps) => {
+export const ShadowRender: LiveComponent<ShadowRenderProps> = (props: ShadowRenderProps) => {
   let {
     links: {
       getVertex,
@@ -31,7 +31,7 @@ export const DepthRender: LiveComponent<DepthRenderProps> = (props: DepthRenderP
   } = props;
 
   const device = useDeviceContext();
-  const {renderContexts: {depth: renderContext}} = usePassContext();
+  const {buffers: {shadow: [renderContext]}} = usePassContext();
 
   const {layout: globalLayout} = useViewContext();
 

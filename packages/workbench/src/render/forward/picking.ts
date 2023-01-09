@@ -28,7 +28,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
   } = props;
 
   const device = useDeviceContext();
-  const {renderContexts: {picking: renderContext}} = usePassContext();
+  const {buffers: {picking: [renderContext]}} = usePassContext();
 
   const {layout: globalLayout} = useViewContext();
 

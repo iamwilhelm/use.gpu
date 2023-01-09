@@ -35,7 +35,7 @@ export const DeferredShadedRender: LiveComponent<DeferredShadedRenderProps> = (p
   const {colorInput, colorSpace} = renderContext;
 
   const {layout: globalLayout} = useViewContext();
-  const {renderContexts: {gbuffer}} = usePassContext();
+  const {buffers: {gbuffer: [gbuffer]}} = usePassContext();
 
   const vertexShader = instanceDrawVirtualShaded;
   const fragmentShader = instanceFragmentShaded;

@@ -10,8 +10,6 @@ const PICKING_BINDINGS = bundleToAttributes(getPickingID);
 
 export type PickingContextProps = {
   renderContext: UseGPURenderContext,
-  pickingTexture: GPUTexture,
-  pickingSource: TextureSource,
   captureTexture: () => void,
   sampleTexture: (x: number, y: number) => number[],
 };

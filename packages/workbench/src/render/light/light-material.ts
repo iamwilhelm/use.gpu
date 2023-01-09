@@ -6,7 +6,7 @@ import type { UseLight } from './light/light-data';
 import { use, yeet, provide, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 
-import { LightContext } from '../providers/light-provider';
+import { LightContext } from '../../providers/light-provider';
 import { LightData, SHADOW_PAGE } from './light-data';
 
 import { getLight, getLightCount } from '@use-gpu/wgsl/use/light.wgsl';
@@ -21,12 +21,14 @@ const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
 const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
 
 export type LightMaterialProps = {
+  shadows?: boolean,
   children?: LiveElement,
   then?: (light: LightEnv) => LiveElement,
 };
 
 export const LightMaterial: LC<LightMaterialProps> = (props: PropsWithChildren<LightMaterialProps>) => {
   const {
+    shadows,
     children,
     then,
   } = props;
@@ -55,7 +57,7 @@ export const LightMaterial: LC<LightMaterialProps> = (props: PropsWithChildren<L
           useMemo(() => bindMaterial(applyMaterial), [bindMaterial, applyMaterial]);
 
         return {useLight, useMaterial};
-      }, [useLight]);
+      }, [useLight, shadows]);
 
       return provide(LightContext, context, children);
     },

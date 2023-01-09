@@ -20,7 +20,7 @@ export const MeshRawPage: LC = (props) => {
     <>
       <Cursor cursor='move' />
       <Camera>
-        <Pass>
+        <Pass picking>
           <Pick
             render={({id, hovered, presses}) => [
               // <RawMesh> is a fully hand-coded component, intended as an anti-example

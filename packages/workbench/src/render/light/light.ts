@@ -7,7 +7,7 @@ import type { BoundLight } from '../../light/types';
 
 import { memo, use, yeet, keyed, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
 import { resolve, uploadBuffer, BLEND_ADDITIVE } from '@use-gpu/core';
-import { bindBundle, bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { $delete } from '@use-gpu/state';
 
 import { drawCall } from '../../queue/draw-call';
@@ -20,8 +20,6 @@ import { useRenderContext } from '../../providers/render-provider';
 import { useViewContext } from '../../providers/view-provider';
 import { usePassContext } from '../../providers/pass-provider';
 
-import { makeSphereGeometry } from '../../primitives/geometry/sphere';
-
 import { AMBIENT_LIGHT, DIRECTIONAL_LIGHT, DOME_LIGHT, POINT_LIGHT } from '../../light/types';
 import { SHADOW_PAGE } from './light-data';
 
@@ -29,8 +27,8 @@ import { EmissiveLightRender } from './emissive';
 import { FullScreenLightRender } from './full-screen';
 import { PointLightRender } from './point';
 
-import lightUniforms from '@use-gpu/wgsl/use/light.wgsl';
-import shadowBindings from '@use-gpu/wgsl/use/shadow.wgsl';
+import { getLight } from '@use-gpu/wgsl/use/light.wgsl';
+import { sampleShadow } from '@use-gpu/wgsl/use/shadow.wgsl';
 
 import instanceDrawVirtualLight from '@use-gpu/wgsl/render/vertex/virtual-light.wgsl';
 import instanceFragmentLight from '@use-gpu/wgsl/render/fragment/deferred-light.wgsl';
@@ -40,13 +38,8 @@ import { applyPBRMaterial as applyMaterial } from '@use-gpu/wgsl/material/pbr-ap
 import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
 import { applyPointShadow as applyPointShadowWGSL } from '@use-gpu/wgsl/shadow/point.wgsl';
 
-const getLight = bindEntryPoint(lightUniforms, 'getLight');
-const sampleShadow = bindEntryPoint(shadowBindings, 'sampleShadow');
-
 export type LightRenderProps = {
   lights: Map<number, BoundLight>,
-  shadows: boolean,
-
   order: number[],
   subranges: Map<number, [number, number]>,
 };
@@ -173,14 +166,14 @@ const LIGHT_RENDERERS = {
 export const LightRender: LiveComponent<LightRenderProps> = memo((props: LightRenderProps) => {
   let {
     lights,
-    shadows,
     order,
     subranges,
   } = props;
 
-  const {renderContexts: {gbuffer}} = usePassContext();
+  const {buffers: {gbuffer: [gbuffer], shadow: [shadow]}} = usePassContext();
   const {depthStencilState, sources} = gbuffer;
 
+  const shadows = !!shadow;
   const stencil = !!depthStencilState?.format.match(/stencil/);
 
   const applyLight = useOne(() => {
@@ -228,7 +221,7 @@ export const useLightDraw = (
   const renderContext = useRenderContext();
 
   const {layout: globalLayout, uniforms: viewUniforms} = useViewContext();
-  const {layout: passLayout, renderContexts: {gbuffer}} = usePassContext();
+  const {layout: passLayout, buffers: {gbuffer: [gbuffer]}} = usePassContext();
 
   const {sources} = gbuffer;
 

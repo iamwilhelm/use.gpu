@@ -2,7 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Emit, StorageSource, Time } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
-import React, { use } from '@use-gpu/live';
+import React, { Provide, Gather } from '@use-gpu/live';
 
 import {
   Loop, Pass, Flat,
@@ -14,7 +14,7 @@ import {
   PointLayer, DataShader,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Polar, Axis, Grid, Sampled, ImplicitSurface,
+  Plot, Cartesian, Polar, Axis, Grid, Sampled, ImplicitSurface, DataContext,
 } from '@use-gpu/plot';
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { SurfaceControls } from '../../ui/surface-controls';
@@ -66,14 +66,16 @@ const EXPR_NORMAL = (emit: Emit, x: number, y: number, z: number, time: Time) =>
   emit(nx*nl, ny*nl, nz*nl);
 };
 
+const BACKGROUND = [0, 0, 0.09, 1];
+
 export const PlotImplicitSurfacePage: LC = () => {
   
   const colorizeShader = wgsl`
-    @link fn getSample(i: u32) -> f32 {};
+    @link fn getData(i: u32) -> f32 {};
 
     fn main(i: u32) -> vec4<f32> {
-      let sample = getSample(i);
-      return vec4<f32>(sample, max(0.0, sample * .2) + max(0.0, -sample * .3), -sample, 1.0);
+      let sample = getData(i);
+      return vec4<f32>(max(0.0, sample), max(0.0, sample * .2) + max(0.0, -sample * .3), max(0.0, -sample), 1.0);
     }
   `;
 
@@ -86,7 +88,7 @@ export const PlotImplicitSurfacePage: LC = () => {
       hasInspect
       render={({inspect, mode, level}) =>
         <Loop>
-          <LinearRGB>
+          <LinearRGB backgroundColor={BACKGROUND} tonemap="aces">
             <Cursor cursor="move" />
             <Camera>
               <Pass>
@@ -135,15 +137,17 @@ export const PlotImplicitSurfacePage: LC = () => {
                         detail={8}
                         depth={0.5}
                       />
-                      <Sampled
-                        axes='xyz'
-                        format='vec3<f32>'
-                        size={[36, 24, 36]}
-                        padding={1}
-                        expr={EXPR_POSITION}
-                        time
-                        live
-                        render={(positions: StorageSource) => (
+                      <Gather
+                        children={<>
+                          <Sampled
+                            axes='xyz'
+                            format='vec3<f32>'
+                            size={[36, 24, 36]}
+                            padding={1}
+                            expr={EXPR_POSITION}
+                            time
+                            live
+                          />
                           <Sampled
                             axes='xyz'
                             format='vec3<f32>'
@@ -152,42 +156,44 @@ export const PlotImplicitSurfacePage: LC = () => {
                             expr={EXPR_NORMAL}
                             time
                             live
-                            render={(normals: StorageSource) =>
-                              <Sampled
-                                axes='xyz'
-                                format='f32'
-                                size={[36, 24, 36]}
-                                padding={1}
-                                expr={EXPR_VALUE}
-                                time
-                                live
-                                render={(values: StorageSource) => [
-                                  <ImplicitSurface
-                                    normals={normals}
-                                    level={level}
-                                    method="linear"
-                                    padding={1}
-                                    color={[0.8, 0.8, 1.0, 1.0]}
-                                  />,
-                                  inspect ? (
-                                    <DataShader
-                                      shader={colorizeShader}
-                                      source={values}
-                                      render={(colorizedValues: ShaderModule) => (
-                                        <PointLayer
-                                          positions={positions}
-                                          colors={mode === 'normal' ? normals : colorizedValues}
-                                          size={3}
-                                          depth={1}
-                                        />
-                                      )}
-                                    />
-                                  ) : null,
-                                ]}
-                              />
-                            }
                           />
-                        )}
+                          <Sampled
+                            axes='xyz'
+                            format='f32'
+                            size={[36, 24, 36]}
+                            padding={1}
+                            expr={EXPR_VALUE}
+                            time
+                            live
+                          />
+                        </>}
+                        then={
+                          ([positions, normals, values]: StorageSource[]) => <>
+                            <Provide context={DataContext} value={values}>
+                              <ImplicitSurface
+                                normals={normals}
+                                level={level}
+                                method="linear"
+                                padding={1}
+                                color={[0.8, 0.8, 1.0, 1.0]}
+                              />
+                            </Provide>
+                            {inspect ? (
+                              <DataShader
+                                shader={colorizeShader}
+                                source={values}
+                                render={(colorizedValues: ShaderModule) => (
+                                  <PointLayer
+                                    positions={positions}
+                                    colors={mode === 'normal' ? normals : colorizedValues}
+                                    size={3}
+                                    depth={1}
+                                  />
+                                )}
+                              />
+                            ) : null}
+                          </>
+                        }
                       />
                     </Polar>
                   </Animate>

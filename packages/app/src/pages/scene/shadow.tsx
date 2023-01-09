@@ -89,7 +89,7 @@ export const SceneShadowPage: LC = (props) => {
                 <DirectionalLight position={lightData[1].position} intensity={0.5} color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
                 <PointLight       position={lightData[2].position} intensity={100} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} />
 
-                <AxisHelper width={5} depth={1} />
+                <AxisHelper width={5} depth={0.5} />
 
                 <Scene>
 

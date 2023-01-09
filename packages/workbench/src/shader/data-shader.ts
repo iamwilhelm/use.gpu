@@ -46,7 +46,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
 
     const bindings = bundleToAttributes(shader);
     const links = {
-      getData: s,
+      getData: s[0],
       getDataSize: () => source.size,
     } as Record<string, any>;
 

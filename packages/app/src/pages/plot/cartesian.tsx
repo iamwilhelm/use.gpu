@@ -17,11 +17,13 @@ import { vec3 } from 'gl-matrix';
 
 let t = 0;
 
+const BACKGROUND = [0, 0, 0.09, 1];
+
 export const PlotCartesianPage: LC = () => {
   
   return (
     <Loop>
-      <LinearRGB>
+      <LinearRGB backgroundColor={BACKGROUND}>
         <Cursor cursor="move" />
         <Camera>
           <Pass>

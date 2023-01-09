@@ -230,7 +230,8 @@ const compositeShader = wgsl`
 `
 
 export const RTTMultiscalePage: LC = () => {
-  const mouseRef = useRef([window.innerWidth / 2, window.innerHeight / 2]);
+  const dpi = window.devicePixelRatio;
+  const mouseRef = useRef([window.innerWidth / 2 * dpi, window.innerHeight / 2 * dpi]);
   const getRandomSeed = () => [Math.random(), Math.random(), Math.random(), Math.random()];
   
   return (
@@ -254,7 +255,7 @@ export const RTTMultiscalePage: LC = () => {
         <Flat>
           <Loop live>
             <Pick all move render={({x, y}) => {
-              mouseRef.current = [x, y];
+              mouseRef.current = [x * dpi, y * dpi];
             }} />
             <RenderToTexture target={feedbackTarget}>
               <Pass mode="fullscreen">

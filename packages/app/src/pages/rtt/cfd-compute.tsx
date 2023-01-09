@@ -84,6 +84,8 @@ const DEBUG_BINDINGS = bundleToAttributes(debugShader);
 
 export const RTTCFDComputePage: LC = () => {
 
+  const dpi = window.devicePixelRatio;
+
   const advectForwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: 1.0});
   const advectBackwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: -1.0});
 
@@ -130,7 +132,7 @@ export const RTTCFDComputePage: LC = () => {
             <Pick all move render={({x, y, moveX, moveY}) => (
               <Compute immediate>
                 <Stage target={velocity}>
-                  <Kernel shader={pushVelocity} args={[[x / 2, y / 2], [moveX, moveY]]} />
+                  <Kernel shader={pushVelocity} args={[[x / 2 * dpi, y / 2 * dpi], [moveX, moveY]]} history />
                 </Stage>
               </Compute>
             )} />
@@ -204,9 +206,10 @@ const VisualizeField = ({field}: {field: StorageTarget}) => {
 };
 
 const DebugField = ({field, gain}: {field: StorageTarget, gain: number}) => {
+  const dpi = window.devicePixelRatio;
   const boundShader = useBoundShader(debugShader, DEBUG_BINDINGS, [field, () => field.size, gain || 1]);
   const textureSource = useLambdaSource(boundShader, field);
   return (
-    <Element width={field.size[0] / 2} height={field.size[1] / 2} image={{texture: textureSource}} />
+    <Element width={field.size[0] / 2 / dpi} height={field.size[1] / 2 / dpi} image={{texture: textureSource, fit: 'scale'}} />
   );
 };

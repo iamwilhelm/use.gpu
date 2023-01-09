@@ -14,7 +14,7 @@ import {
 } from '@use-gpu/layout';
 
 const TRANSPARENT = [1, 1, 1, 0.1] as Point4;
-const BACKGROUND = [0.01, 0.02, 0.1, 1.0] as Point4;
+const BACKGROUND = [0.0, 0.0, 0.09, 1.0] as Point4;
 const FILL = [0.4, 0.7, 1, 0.5] as Point4;
 
 export const LayoutAlignPage: LC = () => {
@@ -101,7 +101,7 @@ export const LayoutAlignPage: LC = () => {
                   <Block margin={10} direction='x'>
                     <Block direction='y'>
                       <Element width={200} height={50} grow={0} fill={FILL} />
-                      <Block padding={10} fill={[0, 0, 0, .3]}>
+                      <Block padding={10} fill={[0, 0, 0, .5]}>
                         <Inline align="center"><Text color={[1, 1, 1, 1]}>Minim veniam</Text></Inline>
                       </Block>
                     </Block>
@@ -109,14 +109,14 @@ export const LayoutAlignPage: LC = () => {
                     <Block width={10} />
 
                     <Block direction='y'>
-                      <Block padding={10} fill={[0, 0, 0, .3]}>
+                      <Block padding={10} fill={[0, 0, 0, .5]}>
                         <Inline align="center"><Text color={[1, 1, 1, 1]}>Sint occaecat</Text></Inline>
                       </Block>
                       <Element height={50} grow={0} fill={FILL} />
-                      <Block padding={10} fill={[0, 0, 0, .3]}>
+                      <Block padding={10} fill={[0, 0, 0, .5]}>
                         <Inline align="center"><Text color={[1, 1, 1, 1]}>Laboris nisi ut aliquip consequat</Text></Inline>
                       </Block>
-                      <Block padding={10} fill={[0, 0, 0, .3]}>
+                      <Block padding={10} fill={[0, 0, 0, .5]}>
                         <Inline align="center"><Text color={[1, 1, 1, 1]}>Commodo ut</Text></Inline>
                       </Block>
                     </Block>
@@ -127,7 +127,7 @@ export const LayoutAlignPage: LC = () => {
                   <Label>Absolute / Block / Inline</Label>
                   <Block height={48} margin={10}>
                     <Absolute direction='y'>
-                      <Block padding={10} fill={[0, 0, 0, .3]}>
+                      <Block padding={10} fill={[0, 0, 0, .5]}>
                         <Inline><Text color={[1, 1, 1, 1]}>Lorem ipsum</Text></Inline>
                       </Block>
                     </Absolute>
@@ -138,7 +138,7 @@ export const LayoutAlignPage: LC = () => {
                   <Label>Flex / Block X / Inline</Label>
                   <Flex margin={10}>
                     <Element width={200} height={50} grow={0} fill={FILL} />
-                    <Block padding={10} fill={[0, 0, 0, .3]}>
+                    <Block padding={10} fill={[0, 0, 0, .5]}>
                       <Inline><Text color={[1, 1, 1, 1]}>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text></Inline>
                     </Block>
                     <Element width={200} height={50} grow={0} fill={FILL} />
@@ -148,11 +148,11 @@ export const LayoutAlignPage: LC = () => {
                   <Label>Flex / Block Y / Inline</Label>
                   <Flex margin={10} direction='y'>
                     <Element width={200} height={50} grow={0} fill={FILL} />
-                    <Block padding={10} fill={[0, 0, 0, .3]}>
+                    <Block padding={10} fill={[0, 0, 0, .5]}>
                       <Inline><Text color={[1, 1, 1, 1]}>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Text></Inline>
                     </Block>
                     <Element width={200} height={50} grow={0} fill={FILL} />
-                    <Block padding={10} fill={[0, 0, 0, .3]}>
+                    <Block padding={10} fill={[0, 0, 0, .5]}>
                       <Inline align="center"><Text color={[1, 1, 1, 1]}>Ullamco commodo proident</Text></Inline>
                     </Block>
                     <Element width={200} height={50} grow={0} fill={FILL} />

@@ -9,6 +9,7 @@ import {
   Cursor,
   Lights, DirectionalLight, PointLight, AmbientLight,
   Data, PointLayer,
+  AxisHelper,
   makeBoxGeometry, makePlaneGeometry, makeSphereGeometry,
 } from '@use-gpu/workbench';
 
@@ -87,6 +88,8 @@ export const SceneDeferredPage: LC = (props) => {
                 <DirectionalLight position={lightData[0].position} intensity={1}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
                 <DirectionalLight position={lightData[1].position} intensity={0.5} color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
                 <PointLight       position={lightData[2].position} intensity={100} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} />
+
+                <AxisHelper width={5} depth={0.5} />
 
                 <Scene>
 

@@ -63,7 +63,7 @@ export const Pick: LiveComponent<PickProps> = ({
   mouseRef.current = mouse;
 
   const countRef = useOne(() => ({current: 0}));
-  countRef.current++;
+  useMemo(() => countRef.current++, [x, y]);
 
   if (onMouseMove) {
     useMemo(() => {

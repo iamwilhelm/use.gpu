@@ -61,7 +61,7 @@ export const DebugAxesPage: LC = (props) => {
             <Loop>
               <Cursor cursor='move' />
               <Camera>
-                <Pass picking lights>
+                <Pass lights>
                   <AmbientLight intensity={0.2} />
                   <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 

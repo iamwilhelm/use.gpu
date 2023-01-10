@@ -50,7 +50,7 @@ export const makePages = () => [
   {path: "/plot/implicit-surface", title: "Plot - Implicit Surface",           element: <PlotImplicitSurfacePage />},
   {path: "/rtt/linear-rgb",        title: "RTT - Linear RGB",                  element: <RTTLinearRGBPage />},
   {path: "/rtt/feedback",          title: "RTT - Feedback",                    element: <RTTFeedbackPage />},
-  {path: "/rtt/multiscale",        title: "RTT - Multiscale",                  element: <RTTMultiscalePage />},
+  {path: "/rtt/multiscale",        title: "RTT - Multiscale R-D",              element: <RTTMultiscalePage />},
   {path: "/rtt/cfd-compute",       title: "RTT - Fluid Dynamics (Compute I)",  element: <RTTCFDComputePage />},  
   {path: "/rtt/cfd-texture",       title: "RTT - Fluid Dynamics (Compute II)", element: <RTTCFDTexturePage />},   
   {path: "/mesh/raw",              title: "Raw Mesh - DIY Rendering",          element: <MeshRawPage />},

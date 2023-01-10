@@ -35,9 +35,9 @@ const LINEAR_SAMPLER = {
 };
 
 const makeNoiseData = (size: number) => {
-  const data = new Uint8Array(NOISE_SIZE * NOISE_SIZE * 4);
+  const data = new Uint8Array(size * size * 4);
 
-  let n = NOISE_SIZE * NOISE_SIZE;
+  let n = size * size;
   for (let i = 0, j = 0; i < n; ++i) {
     data[j++] = Math.random() * 255;
     data[j++] = Math.random() * 255;
@@ -48,11 +48,11 @@ const makeNoiseData = (size: number) => {
   return {
     data,
     format: "rgba8unorm",
-    size: [NOISE_SIZE, NOISE_SIZE],
+    size: [size, size],
   };
 };
 
-const noiseData = makeNoiseData(256);
+const noiseData = makeNoiseData(1024);
 
 const initializeShader = wgsl`
   @link fn getTargetSize() -> vec2<f32>;

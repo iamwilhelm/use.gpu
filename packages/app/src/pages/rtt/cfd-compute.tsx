@@ -132,7 +132,7 @@ export const RTTCFDComputePage: LC = () => {
             <Pick all move render={({x, y, moveX, moveY}) => (
               <Compute immediate>
                 <Stage target={velocity}>
-                  <Kernel shader={pushVelocity} args={[[x / 2 * dpi, y / 2 * dpi], [moveX, moveY]]} history />
+                  <Kernel shader={pushVelocity} args={[[x / 2 * dpi, y / 2 * dpi], [moveX, moveY]]} swap={false} />
                 </Stage>
               </Compute>
             )} />

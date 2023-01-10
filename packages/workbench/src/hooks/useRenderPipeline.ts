@@ -2,7 +2,7 @@ import type { UseGPURenderContext, ShaderModuleDescriptor, DeepPartial } from '@
 import type { Update } from '@use-gpu/state';
 
 import { makeRenderPipeline, makeRenderPipelineAsync } from '@use-gpu/core';
-import { useMemo, useOne, useState } from '@use-gpu/live';
+import { useMemo, useNoMemo, useOne, useNoOne, useState, useNoState } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';
 import { useMemoKey } from './useMemoKey';
 import { DeviceContext } from '../providers/device-provider';
@@ -89,6 +89,8 @@ export const useRenderPipeline = (
     return pipeline;
   }, [device, pipelineKey, shader[0].hash, shader[1] ? shader[1].hash : 0]);
 };
+
+export const useNoRenderPipeline = useNoMemo;
 
 export const useRenderPipelineAsync = (
   device: GPUDevice,
@@ -189,8 +191,14 @@ export const useRenderPipelineAsync = (
   return [immediate ?? resolved, !!staleRef.current];
 };
 
+export const useNoRenderPipelineAsync = () => {
+  useNoState();
+  useNoOne();
+  useNoMemo();
+};
+
 export const setShaderLog = (n: number) => SHADER_LOG = new LRU<string, any>({ max: n });
 export const getShaderLog = () => {
   if (!SHADER_LOG) return [] as any;
   return SHADER_LOG.values();
-}
+};

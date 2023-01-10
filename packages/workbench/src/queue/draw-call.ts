@@ -4,7 +4,8 @@ import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import type { Update } from '@use-gpu/state';
 import type { Culler } from '../pass/types';
 
-import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
+import { yeet, memo, useMemo, useOne, useNoOne, useState, SUSPEND } from '@use-gpu/live';
+import { patch, $apply } from '@use-gpu/state';
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
   VIEW_UNIFORMS,
@@ -17,7 +18,7 @@ import { useSuspenseContext } from '../providers/suspense-provider';
 
 import { useLinkedShader } from '../hooks/useLinkedShader';
 import { usePipelineLayout, useNoPipelineLayout } from '../hooks/usePipelineLayout';
-import { useRenderPipelineAsync, setShaderLog, getShaderLog } from '../hooks/useRenderPipeline';
+import { useRenderPipelineAsync, useNoRenderPipelineAsync, setShaderLog, getShaderLog } from '../hooks/useRenderPipeline';
 import { useInspectable } from '../hooks/useInspectable'
 
 import keyBy from 'lodash/keyBy';
@@ -134,7 +135,7 @@ export const drawCall = (props: DrawCallProps) => {
   : useNoPipelineLayout();
 
   // Rendering pipeline
-  const [pipeline, isStale] = useRenderPipelineAsync(
+  let [pipeline, isStale] = useRenderPipelineAsync(
     device,
     renderContext,
     shader as any,
@@ -142,7 +143,34 @@ export const drawCall = (props: DrawCallProps) => {
     layout as any,
   );
 
-  if (!pipeline) return suspense ? SUSPEND : NO_CALL;
+  // Flip pipeline winding order for mirrored passes (e.g. cubemap or reflection)
+  const cullMode = propPipeline?.primitive?.cullMode;
+  const needsFlip = cullMode === 'front' || cullMode === 'back';
+
+  let pipelineFlipped = pipeline;
+  if (needsFlip) {
+    const propPipelineFlipped = useOne(() => patch(propPipeline, {
+      primitive: {
+        frontFace: $apply((s?: string) => s === 'cw' ? 'ccw' : 'cw'),
+      },
+    }), propPipeline);
+
+    const [pipeline, isStaleFlipped] = useRenderPipelineAsync(
+      device,
+      renderContext,
+      shader as any,
+      propPipelineFlipped,
+      layout as any,
+    );
+    pipelineFlipped = pipeline;
+    isStale = isStale || isStaleFlipped;
+  }
+  else {
+    useNoOne();
+    useNoRenderPipelineAsync();
+  }
+
+  if (!pipeline || !pipelineFlipped) return suspense ? SUSPEND : NO_CALL;
   if (isStale) return SUSPEND;
 
   const base = 1 + +!!passLayout;
@@ -182,6 +210,7 @@ export const drawCall = (props: DrawCallProps) => {
   const inner = (
     passEncoder: GPURenderPassEncoder,
     countGeometry: (v: number, t: number) => void,
+    flip?: boolean,
   ) => {
     onDispatch && onDispatch();
 
@@ -200,7 +229,7 @@ export const drawCall = (props: DrawCallProps) => {
 
     if (!indirect && (v * i) === 0) return;
 
-    passEncoder.setPipeline(pipeline);
+    passEncoder.setPipeline(flip ? pipelineFlipped : pipeline);
 
     if (uniform) {
       if (globalUniforms) {
@@ -229,6 +258,7 @@ export const drawCall = (props: DrawCallProps) => {
     draw = (
       passEncoder: GPURenderPassEncoder,
       countGeometry: (v: number, t: number) => void,
+      flip?: boolean,
     ) => {
       const d = shouldDispatch();
       if (d === false) return;
@@ -237,7 +267,7 @@ export const drawCall = (props: DrawCallProps) => {
         dispatchVersion = d;
       }
       
-      return inner(passEncoder, countGeometry);
+      return inner(passEncoder, countGeometry, flip);
     };
   }
 

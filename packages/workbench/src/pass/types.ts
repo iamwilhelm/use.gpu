@@ -30,6 +30,7 @@ export type RenderCounter = (v: number, t: number) => void;
 export type RenderToPass = (
   passEncoder: GPURenderPassEncoder,
   countGeometry: RenderCounter,
+  flip?: boolean,
 ) => void;
 
 export type ComputeCounter = (d: number) => void;

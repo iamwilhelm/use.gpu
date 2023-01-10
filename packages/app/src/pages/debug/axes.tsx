@@ -41,7 +41,7 @@ export const DebugAxesPage: LC = (props) => {
     <Gather
       children={[
         <GeometryData geometry={geometry} />,
-        <ImageCubeTexture mip={false} urls={[
+        <ImageCubeTexture urls={[
           "/textures/cube/uv/px.png",
           "/textures/cube/uv/nx.png",
           "/textures/cube/uv/py.png",
@@ -65,7 +65,7 @@ export const DebugAxesPage: LC = (props) => {
                   <AmbientLight intensity={0.2} />
                   <PointLight position={[-2.5, 3, 2, 1]} intensity={32} />
 
-                  <AxisHelper size={5} width={3} />
+                  <AxisHelper size={2} width={3} />
 
                   <Scene>
                     <ShaderFlatMaterial fragment={fragment}>

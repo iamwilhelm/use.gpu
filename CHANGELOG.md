@@ -10,6 +10,7 @@
 - `@use-gpu/workbench`: Refactor `<Pass>`/`<Virtual>` to allow for swappable render passes
 - `@use-gpu/workbench`: Remove `<Draw>` as it was no longer doing anything.
 - `@use-gpu/workbench`: Add visibility culling with draw call ordering to `<Pass>` via view and transform context
+- `@use-gpu/workbench`: Add shadow maps for directional and point lights
 - `@use-gpu/workbench`: Add shared global bindings to `<DrawCall>` and `<Pass>` via view context
 - `@use-gpu/workbench`: Split `<Pass>` into `<ForwardRenderer>` and add a `<DeferredRenderer>`
 - `@use-gpu/workbench`: Replace explicit `<Lights>` with implicit `<LightData>`, which is now owned by the renderer
@@ -22,7 +23,8 @@
 - `@use-gpu/workbench`: Add `stroke` to `<PointLayer>` to allow for thin outlined shapes
 - `@use-gpu/workbench`: Rename `<ComputeData>`/`<TextureData>` to `<ComputeBuffer>`/`<TextureBuffer>`
 - `@use-gpu/workbench`: Replace `<Feedback>` with a more generic `<FullScreen>` similar to `<Kernel>`
-- `@use-gpu/workbench`: Add `<ShaderFlatMaterial>` and `<ShaderLitMaterial>` to make it easier to make custom materials
+- `@use-gpu/workbench`: Add `<ShaderFlatMaterial>` and `<ShaderLitMaterial>` for custom materials
+- `@use-gpu/workbench`: Add `<ImageCubeTexture>` for loading cube maps
 
 0.7.0
 - `@use-gpu/live`: Reconciling + quote/unquote as native ops.

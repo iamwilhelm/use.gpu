@@ -89,7 +89,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
         layout: 'texture_cube<f32>',
         mips,
         format,
-        size,
+        size: [width, height, 6],
         colorSpace: cs,
         version: 1,
       };

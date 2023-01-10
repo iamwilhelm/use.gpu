@@ -51,8 +51,11 @@ export const makeSphereGeometry = ({
   const emitUV = (x: number, y: number) =>
     uvEmitter(x * tile[0], y * tile[1], 0, 0);
 
-  const emitUVW = (x: number, y: number, z: number) =>
-    uvEmitter(x * tile[0], y * tile[1], z * ((tile as any)[2] ?? 1), 0);
+  const emitUVW = (x: number, y: number, z: number) => {
+    if      (axis === 'x') uvEmitter(z * tile[0], x * tile[1], y * ((tile as any)[2] ?? 1), 0.0);
+    else if (axis === 'y') uvEmitter(y * tile[0], z * tile[1], x * ((tile as any)[2] ?? 1), 0.0);
+    else if (axis === 'z') uvEmitter(x * tile[0], y * tile[1], z * ((tile as any)[2] ?? 1), 0.0);
+  };
 
   const emitIndex = (x: number, y: number) => {
     indexEmitter(x + y * (detailAround + 1));

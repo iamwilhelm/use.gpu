@@ -5,7 +5,7 @@ import { GeometryFacesPage } from './pages/geometry/faces';
 import { GeometryGLTFPage } from './pages/geometry/gltf';
 import { GeometryLinesPage } from './pages/geometry/lines';
 import { DebugAtlasPage } from './pages/debug/atlas';
-import { DebugQuotePage } from './pages/debug/quote';
+import { DebugAxesPage } from './pages/debug/axes';
 import { LayoutDisplayPage } from './pages/layout/display';
 import { LayoutGlyphPage } from './pages/layout/glyph';
 import { LayoutAlignPage } from './pages/layout/align';
@@ -56,8 +56,8 @@ export const makePages = () => [
   {path: "/mesh/raw",              title: "Raw Mesh - DIY Rendering",          element: <MeshRawPage />},
   {path: "/mesh/interleaved",      title: "Raw Mesh - Native Components",      element: <MeshInterleavedPage />},
   {path: "/debug/atlas",           title: "Debug - Text Atlas",                element: <DebugAtlasPage />},
+  {path: "/debug/axes",            title: "Debug - Axes",                      element: <DebugAxesPage />},
 
-  //{path: "/debug/quote", title: "Debug - Quoting"},
   {path: "/", title: "Index", element: <HomePage container={document.querySelector('#use-gpu')} />},
 ];
 

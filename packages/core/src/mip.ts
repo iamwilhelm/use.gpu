@@ -63,10 +63,21 @@ const makeMipMesh = (bounds: Rectangle[], size: Point | Point3): VertexData => {
 const NO_CLEAR = [0, 0, 0, 0] as Rectangle;
 const MIP_PIPELINES = new WeakMap<GPUDevice, Map<string, GPURenderPipeline>>();
 
+export const updateMipCubeTextureChain = (
+  device: GPUDevice,
+  source: TextureSource,
+  bounds: (Rectangle[] | null) = null,
+) => {
+  const {size} = source;
+  const [,, depth] = size;
+  seq(depth).map((layer: number) => updateMipTextureChain(device, source, bounds, layer));
+}
+
 export const updateMipTextureChain = (
   device: GPUDevice,
   source: TextureSource,
   bounds: (Rectangle[] | null) = null,
+  layer: number = 0,
 ) => {
   const {
     texture,
@@ -85,7 +96,12 @@ export const updateMipTextureChain = (
     magFilter: 'linear',
   });
 
-  const views = seq(mips).map((mip: number) => texture.createView({mipLevelCount: 1, baseMipLevel: mip}));
+  const views = seq(mips).map((mip: number) => texture.createView({
+    mipLevelCount: 1,
+    arrayLayerCount: 1,
+    baseMipLevel: mip,
+    baseArrayLayer: layer,
+  }));
   
   const renderPassDescriptors = seq(mips).map(i => ({
     colorAttachments: [makeColorAttachment(views[i], null, NO_CLEAR, 'load')],

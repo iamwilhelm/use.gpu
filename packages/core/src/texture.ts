@@ -38,7 +38,7 @@ export const makeTexture = (
   return texture;
 }
 
-export const makeMippableTexture = (
+export const makeDynamicTexture = (
   device: GPUDevice,
   width: number,
   height: number,
@@ -76,18 +76,6 @@ export const makeStorageTexture = (
   return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
 }
 
-export const makeDestinationTexture = (
-  device: GPUDevice,
-  width: number,
-  height: number,
-  format: GPUTextureFormat,
-  sampleCount: number = 1,
-  mipLevelCount: number = 1,
-): GPUTexture => {
-  const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST;
-  return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
-}
-
 export const makeReadbackTexture = (
   device: GPUDevice,
   width: number,
@@ -98,20 +86,6 @@ export const makeReadbackTexture = (
 ): GPUTexture => {
   const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC;
   return makeTexture(device, width, height, 1, format, usage, sampleCount, mipLevelCount);
-}
-
-export const makeDynamicTexture = (
-  device: GPUDevice,
-  width: number,
-  height: number,
-  depth: number,
-  format: GPUTextureFormat,
-  sampleCount: number = 1,
-  mipLevelCount: number = 1,
-  dimension: GPUTextureDimension = '2d',
-): GPUTexture => {
-  const usage = GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
-  return makeTexture(device, width, height, depth, format, usage, sampleCount, mipLevelCount, dimension);
 }
 
 export const makeRawTexture = (
@@ -188,12 +162,14 @@ export const uploadExternalTexture = (
   texture: GPUTexture,
   source: any,
   size: Point | Point3,
+  to?: Point | Point3,
 ): void => {
 
   const [w, h, d] = size as Point3;
   const extent = [w, h, d || 1];
+  const origin = to ?? [0, 0, 0];
 
-  device.queue.copyExternalImageToTexture({ source }, { texture }, extent);
+  device.queue.copyExternalImageToTexture({ source }, { texture, origin }, extent);
 }
 
 export const resizeTextureSource = (
@@ -210,7 +186,7 @@ export const resizeTextureSource = (
   const {format} = source;
 
   const ms = mips === 'auto' ? Math.floor(Math.log2(Math.min(width, height))) + 1 : mips;
-  const newTexture = makeMippableTexture(device, width, height, depth, format as any, 1, ms, dimension);
+  const newTexture = makeDynamicTexture(device, width, height, depth, format as any, 1, ms, dimension);
 
   const src = {
     texture: source.texture,

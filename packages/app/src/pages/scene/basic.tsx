@@ -42,7 +42,7 @@ const PickableMesh = memo(({id, mesh, texture}) => {
       }
     />
   );
-}, 'Mesh');
+}, 'PickableMesh');
 
 // This uses a typical scene-graph arrangement with an image texture
 export const SceneBasicPage: LC = (props) => {

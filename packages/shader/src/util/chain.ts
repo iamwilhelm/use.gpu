@@ -57,8 +57,8 @@ export const makeChainTo = (
   const args = fromArgs;
   const check = toArgs;
 
-  if (check?.length !== 1 || check[0] !== fromFormat) {
-    throw new Error(`Cannot chain output ${fromFormat} of ${fromName} to args (${check?.join(', ')}) of ${toName}`);
+  if (check?.length !== 1 || (check[0] !== (fromFormat.entry ?? fromFormat))) {
+    throw new Error(`Cannot chain output ${fromFormat.entry ?? fromFormat} of ${fromName} to args (${check?.join(', ')}) of ${toName}`);
   }
 
   const h1 = getBundleHash(fBundle);
@@ -83,7 +83,7 @@ export const makeChainTo = (
 
   const chain = loadVirtualModule(
     { render },
-    { symbols: SYMBOLS, declarations, externals: EXTERNALS },
+    { symbols: SYMBOLS, declarations, exports: declarations, externals: EXTERNALS },
     entry,
     rehash,
     code,

@@ -8,8 +8,9 @@ export type SphereGeometryProps = {
   height?: number,
   depth?: number,
   axis?: string,
+  uvw?: boolean,
   detail?: [number, number],
-  tile?: [number, number],
+  tile?: [number, number] | [number, number, number],
 };
 
 export const makeSphereGeometry = ({
@@ -17,8 +18,9 @@ export const makeSphereGeometry = ({
   height = width,
   depth = height,
   axis = 'y',
+  uvw = false,
   detail: [detailAxis, detailAround] = [16, 32],
-  tile = [1, 1],
+  tile = [1, 1, 1],
 }: SphereGeometryProps = {}): Geometry => {
   const verts = (detailAxis + 1) * (detailAround + 1);
   const tris = detailAxis * detailAround * 2;
@@ -49,6 +51,9 @@ export const makeSphereGeometry = ({
   const emitUV = (x: number, y: number) =>
     uvEmitter(x * tile[0], y * tile[1], 0, 0);
 
+  const emitUVW = (x: number, y: number, z: number) =>
+    uvEmitter(x * tile[0], y * tile[1], z * ((tile as any)[2] ?? 1), 0);
+
   const emitIndex = (x: number, y: number) => {
     indexEmitter(x + y * (detailAround + 1));
   };
@@ -68,7 +73,7 @@ export const makeSphereGeometry = ({
       const s = Math.sin(phi);
       emitPosition(c * ct, s * ct, st);
       emitNormal(c * ct, s * ct, st);
-      emitUV(u, 1-v);
+      uvw ? emitUVW(c * ct, s * ct, st) : emitUV(u, 1 - v);
     }
   }
 

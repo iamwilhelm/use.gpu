@@ -11,18 +11,18 @@ export type AxisHelperProps = {
 };
 
 const COLORS = new Float32Array([
-  1, 0, 0, 1,
-  1, 0, 0, 1,
-  0, 1, 0, 1,
-  0, 1, 0, 1,
-  0, 0, 1, 1,
-  0, 0, 1, 1,
+  1, 0.2, 0.2, 1,
+  1, 0.2, 0.2, 1,
+  0.2, 1, 0.2, 1,
+  0.2, 1, 0.2, 1,
+  0.2, 0.2, 1, 1,
+  0.2, 0.2, 1, 1,
 ]);
 
 const CHUNKS = [2, 2, 2];
 const ENDS   = [true, true, true];
 
-/** Draws XYZ axis helper. */
+/** Draws XYZ axis helper gizmo. */
 export const AxisHelper: LiveComponent<AxisHelperProps> = memo((props: AxisHelperProps) => {
   const {
     width = 1,
@@ -31,12 +31,12 @@ export const AxisHelper: LiveComponent<AxisHelperProps> = memo((props: AxisHelpe
   } = props;
 
   const vertices = useOne(() => new Float32Array([
-    0, 0, 0, 1,
-    size, 0, 0, 1,
-    0, 0, 0, 1,
-    0, size, 0, 1,
-    0, 0, 0, 1,
-    0, 0, size, 1,
+       0,    0,    0, 1,
+    size,    0,    0, 1,
+       0,    0,    0, 1,
+       0, size,    0, 1,
+       0,    0,    0, 1,
+       0,    0, size, 1,
   ]), size);
 
   const positions = useRawSource(vertices, 'vec4<f32>');

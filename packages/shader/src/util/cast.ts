@@ -114,7 +114,7 @@ export const makeCastTo = (
 
   const cast = loadVirtualModule(
     { render },
-    { symbols: CAST_SYMBOLS, declarations, externals: CAST_EXTERNALS },
+    { symbols: CAST_SYMBOLS, declarations, exports: declarations, externals: CAST_EXTERNALS },
     entry,
     rehash,
     code,

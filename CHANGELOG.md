@@ -22,6 +22,7 @@
 - `@use-gpu/workbench`: Add `stroke` to `<PointLayer>` to allow for thin outlined shapes
 - `@use-gpu/workbench`: Rename `<ComputeData>`/`<TextureData>` to `<ComputeBuffer>`/`<TextureBuffer>`
 - `@use-gpu/workbench`: Replace `<Feedback>` with a more generic `<FullScreen>` similar to `<Kernel>`
+- `@use-gpu/workbench`: Add `<ShaderFlatMaterial>` and `<ShaderLitMaterial>` to make it easier to make custom materials
 
 0.7.0
 - `@use-gpu/live`: Reconciling + quote/unquote as native ops.

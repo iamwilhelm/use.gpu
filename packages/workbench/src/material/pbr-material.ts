@@ -5,29 +5,26 @@ import type { ColorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 import { parseColor, useProp } from '@use-gpu/traits';
-import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useLightContext } from '../providers/light-provider';
-import { MaterialContext } from '../providers/material-provider';
 
 import { getPBRMaterial } from '@use-gpu/wgsl/material/pbr-material.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 
-import { getShadedFragment } from '@use-gpu/wgsl/instance/fragment/shaded.wgsl';
 import { getMaterialSurface } from '@use-gpu/wgsl/instance/surface/material.wgsl';
 import { getNormalMapSurface } from '@use-gpu/wgsl/instance/surface/normal-map.wgsl';
-
 import { getBasicMaterial } from '@use-gpu/wgsl/material/basic-material.wgsl';
 
-const BASIC_BINDINGS = bundleToAttributes(getBasicMaterial);
+import { ShaderLitMaterial } from './shader-lit-material';
 
 const PBR_BINDINGS = bundleToAttributes(getPBRMaterial);
 const SURFACE_BINDINGS = bundleToAttributes(getMaterialSurface);
 const NORMAL_MAP_BINDINGS = bundleToAttributes(getNormalMapSurface);
-const SHADED_BINDINGS = bundleToAttributes(getShadedFragment);
+
+const BASIC_BINDINGS = bundleToAttributes(getBasicMaterial);
 
 export type PBRMaterialProps = {
   albedo?: ColorLike,
@@ -93,27 +90,17 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
 
   const boundSurface = useBoundShader(getMaterialSurface, SURFACE_BINDINGS, [getMaterial]);
 
-  const {useMaterial} = useLightContext();
-  const applyLights = useMaterial(applyPBRMaterial);
-  const getLight = applyLights ? useBoundShader(getShadedFragment, SHADED_BINDINGS, [applyLights]) : useNoBoundShader();
-
-  const getFragment = useBoundShader(getBasicMaterial, BASIC_BINDINGS, [albedo, albedoMap], defines);
-
   let getSurface = boundSurface;
   if (normalMap) getSurface = useBoundShader(getNormalMapSurface, NORMAL_MAP_BINDINGS, [boundSurface, normalMap]);
   else useNoBoundShader();
 
-  const context = useMemo(() => ({
-    solid: {
-      getFragment,
-    },
-    shaded: {
-      getFragment,
-      getSurface,
-      getLight,
-    },
-  }), [getSurface, getLight]);
+  const getFragment = useBoundShader(getBasicMaterial, BASIC_BINDINGS, [albedo, albedoMap], defines);
 
-  const view = render ? render(context) : children;
-  return render ?? children ? provide(MaterialContext, context, [signal(), view]) : yeet(context);
+  return ShaderLitMaterial({
+    fragment: getFragment,
+    surface: getSurface,
+    apply: applyPBRMaterial,
+    render,
+    children,
+  });
 }

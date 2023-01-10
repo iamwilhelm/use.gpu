@@ -3,12 +3,12 @@ import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { use, yeet, gather, memo, useMemo } from '@use-gpu/live';
-import { makeDynamicTexture, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
+import { makeDynamicTexture, uploadExternalTexture, updateMipCubeTextureChain } from '@use-gpu/core';
 import { Fetch } from './fetch';
 
-export type ImageTextureProps = {
-  /** URL to image */
-  url: string,
+export type ImageCubeTextureProps = {
+  /** URLs to 6 images (+x, -x, +y, -y, +z, -z) */
+  urls: string[],
   /** Color space to tag texture as. Does not convert input data. */
   colorSpace?: ColorSpace,
   /** MIPs */
@@ -24,18 +24,18 @@ const countMips = (width: number, height: number): number => {
   return Math.floor(Math.log2(max));
 }
 
-export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
+export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) => {
   const device = useDeviceContext();
 
   const {
-    url,
+    urls,
     sampler,
     mip = true,
     colorSpace = 'srgb',
     render,
   } = props;
 
-  const fetch = (
+  const fetch = urls.map((url: string) =>
     use(Fetch, {
       url,
       type: 'blob',
@@ -51,11 +51,11 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
     })
   );
 
-  return gather(fetch, ([bitmap]: ImageBitmap[]) => {
-    if (!bitmap) return null;
+  return gather(fetch, (bitmaps: ImageBitmap[]) => {
+    if (bitmaps.filter(x => !!x).length !== 6) return null;
 
     const source = useMemo(() => {
-      const {width, height} = bitmap;
+      const [{width, height}] = bitmaps;
       const size = [width, height] as Point;
 
       let format: GPUTextureFormat = 'rgba8unorm';
@@ -70,12 +70,15 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
         mip ? countMips(width, height) : 1
       );
 
-      const texture = makeDynamicTexture(device, width, height, 1, format, 1, mips);
-      uploadExternalTexture(device, texture, bitmap, size);
+      const texture = makeDynamicTexture(device, width, height, 6, format, 1, mips);
+      bitmaps.forEach((bitmap: ImageBitmap, i: number) =>
+        uploadExternalTexture(device, texture, bitmap, size, [0, 0, i]));
 
       const source = {
         texture,
-        view: texture.createView(),
+        view: texture.createView({
+          dimension: 'cube',
+        }),
         sampler: {
           minFilter: 'linear',
           magFilter: 'linear',
@@ -83,7 +86,7 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
           maxAnisotropy: 4,
           ...sampler,
         } as GPUSamplerDescriptor,
-        layout: 'texture_2d<f32>',
+        layout: 'texture_cube<f32>',
         mips,
         format,
         size,
@@ -91,10 +94,10 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
         version: 1,
       };
 
-      updateMipTextureChain(device, source);
+      updateMipCubeTextureChain(device, source);
 
       return source;
-    }, [bitmap, sampler]);
+    }, [bitmaps, sampler]);
 
     return useMemo(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
   });

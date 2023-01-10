@@ -5,14 +5,16 @@ type BoxGeometryProps = {
   width?: number,
   height?: number,
   depth?: number,
-  tile?: [number, number],
+  uvw?: boolean,
+  tile?: [number, number] | [number, number, number],
 };
 
 export const makeBoxGeometry = ({
   width = 1,
   height = width,
   depth = width,
-  tile = [1, 1],
+  uvw = false,
+  tile = [1, 1, 1],
 }: BoxGeometryProps = {}): Geometry => {
   const count = 36;
 
@@ -33,6 +35,9 @@ export const makeBoxGeometry = ({
   const emitUV = (x: number, y: number) =>
     uvEmitter(x * tile[0], y * tile[1], 0, 0);
 
+  const emitUVW = (x: number, y: number, z: number) =>
+    uvEmitter(x * tile[0], y * tile[1], z * ((tile as any)[2] ?? 1), 0);
+
   emitPosition(1, 1, -1);
   emitPosition(-1, -1, -1);
   emitPosition(-1, 1, -1);
@@ -74,7 +79,7 @@ export const makeBoxGeometry = ({
   emitPosition(1, -1, 1);
   emitPosition(-1, -1, 1);
   emitPosition(1, -1, -1);
-  
+
   for (let i = 0; i < 6; ++i) emitNormal( 0, 0,-1);
   for (let i = 0; i < 6; ++i) emitNormal( 1, 0, 0);
   for (let i = 0; i < 6; ++i) emitNormal( 0, 0, 1);
@@ -82,47 +87,92 @@ export const makeBoxGeometry = ({
   for (let i = 0; i < 6; ++i) emitNormal( 0, 1, 0);
   for (let i = 0; i < 6; ++i) emitNormal( 0,-1, 0);
 
-  emitUV(0, 0);
-  emitUV(1, 1);
-  emitUV(1, 0);
-  emitUV(0, 1);
-  emitUV(1, 1);
-  emitUV(0, 0);
+  if (uvw) {
+    emitUVW(1, 1, -1);
+    emitUVW(-1, -1, -1);
+    emitUVW(-1, 1, -1);
+    emitUVW(1, -1, -1);
+    emitUVW(-1, -1, -1);
+    emitUVW(1, 1, -1);
 
-  emitUV(0, 0);
-  emitUV(1, 1);
-  emitUV(1, 0);
-  emitUV(0, 1);
-  emitUV(1, 1);
-  emitUV(0, 0);
+    emitUVW(1, 1, 1);
+    emitUVW(1, -1, -1);
+    emitUVW(1, 1, -1);
+    emitUVW(1, -1, 1);
+    emitUVW(1, -1, -1);
+    emitUVW(1, 1, 1);
 
-  emitUV(0, 0);
-  emitUV(1, 1);
-  emitUV(1, 0);
-  emitUV(0, 1);
-  emitUV(1, 1);
-  emitUV(0, 0);
+    emitUVW(-1, 1, 1);
+    emitUVW(1, -1, 1);
+    emitUVW(1, 1, 1);
+    emitUVW(-1, -1, 1);
+    emitUVW(1, -1, 1);
+    emitUVW(-1, 1, 1);
 
-  emitUV(0, 0);
-  emitUV(1, 1);
-  emitUV(1, 0);
-  emitUV(0, 1);
-  emitUV(1, 1);
-  emitUV(0, 0);
+    emitUVW(-1, 1, -1);
+    emitUVW(-1, -1, 1);
+    emitUVW(-1, 1, 1);
+    emitUVW(-1, -1, -1);
+    emitUVW(-1, -1, 1);
+    emitUVW(-1, 1, -1);
 
-  emitUV(0, 0);
-  emitUV(1, 1);
-  emitUV(1, 0);
-  emitUV(1, 1);
-  emitUV(0, 0);
-  emitUV(0, 1);
+    emitUVW(1, 1, 1);
+    emitUVW(-1, 1, -1);
+    emitUVW(-1, 1, 1);
+    emitUVW(-1, 1, -1);
+    emitUVW(1, 1, 1);
+    emitUVW(1, 1, -1);
 
-  emitUV(0, 0);
-  emitUV(1, 1);
-  emitUV(1, 0);
-  emitUV(0, 1);
-  emitUV(1, 1);
-  emitUV(0, 0);
+    emitUVW(1, -1, -1);
+    emitUVW(-1, -1, 1);
+    emitUVW(-1, -1, -1);
+    emitUVW(1, -1, 1);
+    emitUVW(-1, -1, 1);
+    emitUVW(1, -1, -1);
+  }
+  else {
+    emitUV(0, 0);
+    emitUV(1, 1);
+    emitUV(1, 0);
+    emitUV(0, 1);
+    emitUV(1, 1);
+    emitUV(0, 0);
+
+    emitUV(0, 0);
+    emitUV(1, 1);
+    emitUV(1, 0);
+    emitUV(0, 1);
+    emitUV(1, 1);
+    emitUV(0, 0);
+
+    emitUV(0, 0);
+    emitUV(1, 1);
+    emitUV(1, 0);
+    emitUV(0, 1);
+    emitUV(1, 1);
+    emitUV(0, 0);
+
+    emitUV(0, 0);
+    emitUV(1, 1);
+    emitUV(1, 0);
+    emitUV(0, 1);
+    emitUV(1, 1);
+    emitUV(0, 0);
+
+    emitUV(0, 0);
+    emitUV(1, 1);
+    emitUV(1, 0);
+    emitUV(1, 1);
+    emitUV(0, 0);
+    emitUV(0, 1);
+
+    emitUV(0, 0);
+    emitUV(1, 1);
+    emitUV(1, 0);
+    emitUV(0, 1);
+    emitUV(1, 1);
+    emitUV(0, 0);
+  }
 
   return {
     count,

@@ -13,12 +13,13 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
 
+import { ShaderFlatMaterial } from './shader-flat-material';
+
 import { getBasicMaterial } from '@use-gpu/wgsl/material/basic-material.wgsl';
 import { getSolidSurface } from '@use-gpu/wgsl/instance/surface/solid.wgsl';
 import { getSolidFragment } from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
 
 const BASIC_BINDINGS = bundleToAttributes(getBasicMaterial);
-const SURFACE_BINDINGS = bundleToAttributes(getSolidSurface);
 
 export type BasicMaterialProps = {
   color?: ColorLike,
@@ -51,20 +52,9 @@ export const BasicMaterial: LC<BasicMaterialProps> = (props: PropsWithChildren<B
 
   const getFragment = useBoundShader(getBasicMaterial, BASIC_BINDINGS, [c, cm], defines);
 
-  const getSurface = useBoundShader(getSolidSurface, SURFACE_BINDINGS, [getFragment]);
-  const getLight = getSolidFragment;
-
-  const context = useMemo(() => ({
-    solid: {
-      getFragment,
-    },
-    shaded: {
-      getFragment,
-      getSurface,
-      getLight,
-    },
-  }), [getSurface, getLight]);
-
-  const view = render ? render(context) : children;
-  return render ?? children ? provide(MaterialContext, context, [signal, view]) : yeet(context);
+  return ShaderFlatMaterial({
+    shader: getFragment,
+    render,
+    children,
+  });
 }

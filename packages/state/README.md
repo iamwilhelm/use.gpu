@@ -14,7 +14,7 @@ yarn add @use-gpu/state
 
 Helper library with:
 - Cursor-based state
-- JS-value patching
+- JS-value patching, diffing, reversing
 - JS-value hashing
 
 (not Live / React-specific)
@@ -84,7 +84,7 @@ const [title, updateTitle] = useStateCursor('foo', 'title');
 
 ## Patching
 
-`@{patch}` will apply an update to deeply nested state, by returning a new immutable object, without modifying the original.
+`@{patch}` will apply an `update` to deeply nested state, by returning a new immutable object, without modifying the original.
 
 ```tsx
 const value  = {hello: 'text', value: 2};
@@ -97,7 +97,7 @@ The default behavior is:
 - Merge object properties from `update` into `value` recursively.
 - Treat arrays as values, do not recurse, only replace them as a whole.
 
-To adjust the behavior, e.g. to replace an object instead of merging it, use the included `$ops` helpers:
+To adjust the behavior, e.g. to replace an object instead of merging it, use the included `$op` helpers:
 
 - `@{$apply}`
 - `@{$delete}`
@@ -120,10 +120,41 @@ expect(patch(values, update)).toEqual({ hello: { title: 'world' }, value: 2});
 You can use `$apply` to make custom patching ops, e.g. to append an item to a list:
 
 ```tsx
-const $append = <T>(item: T) => $apply((list: T[]) => [...list, item]);
+const $push = <T>(item: T) => $apply((list: T[]) => [...list, item]);
   
-updateList($append(item));
+updateList($push(item));
 ```
+
+## Diff 
+
+`@{diff}` is a complement to `@{patch}`.
+
+Given two values `A` and `B`, it will return an `update` so that:
+
+```tsx
+const update = diff(A, B);
+expect(patch(A, update)).toEqual(B);
+```
+
+...equals the value B (though not the same objects as B).
+
+## Revise
+
+`@{revise}` is the upside-down complement to `@{patch}`.
+
+Given a value `A`, and an `update`, it will **patch the `update`** so that:
+
+```tsx
+const B = patch(A, update);
+const revised = revise(A, update);
+expect(patch(B, revised)).toEqual(A);
+```
+
+...applying the `revised` update will reverse the original `update`.
+
+This can be used to build an automatic undo/redo system that works with any `$op`.
+
+Use `@{getUpdateKeys}` to check whether a revised update is actually effectful or consists solely of `$nop`.
 
 ## Hashing
 

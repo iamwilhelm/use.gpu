@@ -65,7 +65,7 @@ import { Scene, Node, Mesh, Primitive } from '@use-gpu/scene';
       )}
     >
     
-    {/* <Primiive> produces a TransformContext for use by layers inside */}
+    {/* <Primitive> produces a TransformContext for use by layers inside */}
     <Primitive>
       <PointLayer {...} />
     </Primitive>

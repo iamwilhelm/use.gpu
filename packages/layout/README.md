@@ -22,23 +22,21 @@ How to center text inside a centered box. Yes, horizontally and vertically. Wow.
 return (
   <Flat>
 
-    <Draw>
-      <Pass>
-        <UI>
-          
-          <Flex width="100%" height="100%" align="center">
-            <Flex width={500} height={150} fill="#3090ff" align="center">
+    <Pass>
+      <UI>
 
-              <Inline>
-                <Text weight="black" size={48} color={[1, 1, 1, 1]}>-~ Use.GPU ~-</Text>
-              </Inline>
+        <Flex width="100%" height="100%" align="center">
+          <Flex width={500} height={150} fill="#3090ff" align="center">
 
-            </Flex>
+            <Inline>
+              <Text weight="black" size={48} color={[1, 1, 1, 1]}>-~ Use.GPU ~-</Text>
+            </Inline>
+
           </Flex>
+        </Flex>
 
-        </UI>            
-      </Pass>
-    </Draw>
+      </UI>
+    </Pass>
 
   </Flat>
 );

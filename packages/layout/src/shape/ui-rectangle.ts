@@ -128,8 +128,8 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
       } = image;
 
       let uv = UV_SQUARE;
-      if (texture.size) {
-        const {size} = texture;
+      if ((texture as any).size) {
+        const {size} = texture as any;
  
         if (fit !== 'scale') {
  

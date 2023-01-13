@@ -1,7 +1,10 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { TextureSource } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
 import { bundleToAttributes, wgsl } from '@use-gpu/shader/wgsl';
+import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat, Animate, LinearRGB,
@@ -53,6 +56,9 @@ export const DebugAxesPage: LC = (props) => {
       then={([
         mesh,
         texture,
+      ]: [
+        Record<string, ShaderSource>,
+        TextureSource,
       ]) => {
         const fragment = useBoundShader(cubeMaterial, MATERIAL_BINDINGS, [texture]);
 
@@ -83,7 +89,7 @@ export const DebugAxesPage: LC = (props) => {
   );
 };
 
-const Camera = ({children}: PropsWithChildren<object>) => (
+const Camera: LC = ({children}: PropsWithChildren<object>) => (
   <OrbitControls
     radius={5}
     bearing={0.5}

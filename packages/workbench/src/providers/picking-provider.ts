@@ -1,4 +1,4 @@
-import type { UseGPURenderContext, TextureSource } from '@use-gpu/core';
+import type { OffscreenTarget, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
@@ -9,7 +9,7 @@ import { getPickingID } from '@use-gpu/wgsl/render/pick.wgsl';
 const PICKING_BINDINGS = bundleToAttributes(getPickingID);
 
 export type PickingContextProps = {
-  renderContext: UseGPURenderContext,
+  renderContext: OffscreenTarget,
   captureTexture: () => void,
   sampleTexture: (x: number, y: number) => number[],
 };

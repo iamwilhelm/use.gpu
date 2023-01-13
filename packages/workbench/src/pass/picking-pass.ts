@@ -54,7 +54,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
     const commandEncoder = device.createCommandEncoder();
-    if (!overlay && !merge) renderContext.swap();
+    if (!overlay && !merge) renderContext.swap?.();
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     bind(passEncoder);

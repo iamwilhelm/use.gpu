@@ -16,7 +16,7 @@ export const useCombinedTransform = (
   transform?: ShaderModule | null,
   differential?: ShaderModule | null,
   bounds?: ((bounds: DataBounds) => DataBounds) | null,
-  epsilon?: ShaderSource | Lazy<number>,
+  epsilon?: ShaderSource | Lazy<number> | null,
 ) => {
   const {
     transform: transformCtx,

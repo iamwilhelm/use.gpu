@@ -1,5 +1,5 @@
 import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { UseGPURenderContext, ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
+import type { OffscreenTarget, ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, gather, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 import { PRESENTATION_FORMAT, DEPTH_STENCIL_FORMAT, COLOR_SPACE, EMPTY_COLOR } from '../constants';
@@ -36,7 +36,7 @@ export type RenderTargetProps = {
   resolution?: number,
 
   children?: LiveElement,
-  render?: (rttContext: UseGPURenderContext) => LiveElement,
+  render?: (rttContext: OffscreenTarget) => LiveElement,
   then?: (target: TextureTarget) => LiveElement,
 };
 

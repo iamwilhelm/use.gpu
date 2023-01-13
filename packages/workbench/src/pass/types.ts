@@ -1,5 +1,5 @@
 import type { DataBounds, Lazy, RenderPassMode, StorageSource, TextureSource } from '@use-gpu/core';
-import type { ArrowFunction } from '@use-gpu/live';
+import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Update } from '@use-gpu/state';
 import type { BoundLight } from '../light/types';

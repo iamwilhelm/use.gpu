@@ -96,7 +96,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         rectangle: trackBox,
         bounds: trackBox,
         uv: [0, 0, 1, 1],
-        fill:   track,
+        fill:   track as any,
         radius: [size/2, size/2, size/2, size/2] as Rectangle,
         ...(hovered ? INSPECT_STYLE.parent : undefined),
 
@@ -109,7 +109,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         rectangle: thumbBox,
         bounds: thumbBox,
         uv: [0, 0, 1, 1],
-        fill:   thumb,
+        fill:   thumb as any,
         radius: [size/2, size/2, size/2, size/2] as Rectangle,
         ...(hovered ? INSPECT_STYLE.parent : undefined),
 

@@ -5,6 +5,8 @@
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "dependencies": {
+    "@use-gpu/state": "*",
+    "@use-gpu/traits": "*",
     "@use-gpu/workbench": "*",
     "@use-gpu/core": "*",
     "@use-gpu/live": "*",

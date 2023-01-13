@@ -1,6 +1,6 @@
 import type { LC } from '@use-gpu/live';
-import type { Emit, Time } from '@use-gpu/core';
-import type { ShaderModule } from '@use-gpu/shader/wgsl';
+import type { DataTexture, TextureSource, OffscreenTarget } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
 
 import React, { Gather, useRef } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
@@ -27,7 +27,7 @@ import {
 //
 
 const NOISE_SIZE = 1024;
-const LINEAR_SAMPLER = {
+const LINEAR_SAMPLER: GPUSamplerDescriptor = {
   minFilter: 'linear',
   magFilter: 'linear',
   addressModeU: 'repeat',
@@ -49,7 +49,7 @@ const makeNoiseData = (size: number) => {
     data,
     format: "rgba8unorm",
     size: [size, size],
-  };
+  } as DataTexture;
 };
 
 const noiseData = makeNoiseData(1024);
@@ -112,14 +112,15 @@ const feedbackShader = wgsl`
   @link fn getTextureSize() -> vec2<f32>;
   @link fn getTexture(uv: vec2<f32>) -> vec4<f32>;
 
+  @link fn getRandomSeed() -> vec4<f32>;
+  @link fn getMouse() -> vec2<f32>;
+
   @link fn getBlur1(uv: vec2<f32>) -> vec4<f32>;
   @link fn getBlur2(uv: vec2<f32>) -> vec4<f32>;
   @link fn getBlur3(uv: vec2<f32>) -> vec4<f32>;
   @link fn getBlur4(uv: vec2<f32>) -> vec4<f32>;
 
   @link fn getNoise(uv: vec2<f32>) -> vec4<f32>;
-  @link fn getRandomSeed() -> vec4<f32>;
-  @link fn getMouse() -> vec2<f32>;
 
   @export fn main(pixel: vec2<f32>) -> vec4<f32> {
     var color = vec4<f32>(0.0, 0.0, 0.0, 1.0);
@@ -251,24 +252,34 @@ export const RTTMultiscalePage: LC = () => {
         blurTarget2,
         blurTarget3,
         blurTarget4,
+      ]: [
+        TextureSource,
+        OffscreenTarget,
+        OffscreenTarget,
+        OffscreenTarget,
+        OffscreenTarget,
+        OffscreenTarget,
       ]) => (
         <Flat>
           <Loop live>
             <Pick all move render={({x, y}) => {
               mouseRef.current = [x * dpi, y * dpi];
+              return null;
             }} />
             <RenderToTexture target={feedbackTarget}>
               <Pass mode="fullscreen">
                 <FullScreen
                   shader={feedbackShader}
+                  args={[
+                    getRandomSeed,
+                    mouseRef,
+                  ]}
                   sources={[
                     blurTarget1.source,
                     blurTarget2.source,
                     blurTarget3.source,
                     blurTarget4.source,
                     noiseTexture,
-                    getRandomSeed,
-                    mouseRef,
                   ]}
                 />
                 <FullScreen shader={initializeShader} texture={noiseTexture} initial />

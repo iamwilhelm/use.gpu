@@ -6,6 +6,8 @@
     { "path": "../react" },
     { "path": "../core" },
     { "path": "../workbench" },
+    { "path": "../webgpu" },
+    { "path": "../layout" },
   ],
   "compilerOptions": {
     "rootDir": "..",

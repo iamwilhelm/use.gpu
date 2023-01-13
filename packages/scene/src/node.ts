@@ -20,7 +20,7 @@ export const Node: LiveComponent<NodeProps> = (props: PropsWithChildren<NodeProp
     const matrix = mat4.create();
 
     if (m) {
-      mat4.multiply(matrix, m);
+      mat4.copy(matrix, m);
       if (p || r || q || s) {
         const t = mat4.create();
         composeTransform(t, p, r, q, s);

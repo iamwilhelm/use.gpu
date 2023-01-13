@@ -1,7 +1,7 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Point4 } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
-import type { ColorLike } from '@use-gpu/traits';
+import type { ColorLike, VectorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 import { parseColor, useProp } from '@use-gpu/traits';
@@ -30,7 +30,7 @@ export type PBRMaterialProps = {
   albedo?: ColorLike,
   metalness?: number,
   roughness?: number,
-  emissive?: number,
+  emissive?: VectorLike,
 
   albedoMap?: ShaderSource,
   metalnessRoughnessMap?: ShaderSource,  

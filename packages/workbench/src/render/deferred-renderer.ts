@@ -25,14 +25,14 @@ const DEFAULT_PASSES = [
   use(DeferredPass, {}),
 ];
 
+const NO_BUFFERS: Record<string, UseGPURenderContext[]> = {};
+
 export type DeferredRendererProps = {
-  shadows?: boolean,
-  picking?: boolean,
   overlay?: boolean,
   merge?: boolean,
 
-  passes?: LiveElement[],
   buffers?: Record<string, UseGPURenderContext[]>,
+  passes?: LiveElement[],
   components?: RenderComponents,
 };
 
@@ -60,8 +60,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
     overlay = false,
     merge = false,
     passes = DEFAULT_PASSES,
-
-    buffers,
+    buffers = NO_BUFFERS,
     children,
   } = props;
 

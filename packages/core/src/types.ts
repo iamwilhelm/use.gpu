@@ -32,6 +32,10 @@ export type UseGPURenderContext = {
   sources?: TextureTarget[],
 };
 
+export type OffscreenTarget = UseGPURenderContext & {
+  source: TextureTarget,
+};
+
 export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';
 
 export type TypedArray =

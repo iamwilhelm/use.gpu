@@ -160,7 +160,7 @@ impl UseRustText {
         let mut metrics = Vec::<u8>::new();
         let mut glyphs = Vec::<u8>::new();
 
-        if (utf16.len() > 0) {
+        if utf16.len() > 0 {
             let text = String::from_utf16_lossy(&utf16);
             let break_iter = LineBreakIterator::new(&text);
             let mut char_iter = text.char_indices();

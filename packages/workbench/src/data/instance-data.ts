@@ -25,7 +25,7 @@ export type InstanceDataProps = {
   alloc?: number,
 
   render?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
-  then?: (...sources: StorageSource[]) => LiveElement,
+  then?: (indices: StorageSource, data: StorageSource[]) => LiveElement,
 };
 
 export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {

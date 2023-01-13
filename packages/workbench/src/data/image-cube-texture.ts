@@ -92,7 +92,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
         size: [width, height, 6],
         colorSpace: cs,
         version: 1,
-      };
+      } as TextureSource;
 
       updateMipCubeTextureChain(device, source);
 

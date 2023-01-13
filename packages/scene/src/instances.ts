@@ -1,5 +1,6 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 import type { ObjectTrait } from './types';
 
 import { use, memo, provide, yeet, useCallback, useMemo, useOne, tagFunction } from '@use-gpu/live';
@@ -28,13 +29,15 @@ const INSTANCE_BINDINGS = bundleToAttributes(loadInstance);
 const MATRIX_BINDINGS   = bundleToAttributes(getCartesianPosition);
 const NORMAL_BINDINGS   = bundleToAttributes(getMatrixDifferential);
 
-export type InstancesProps = InstanceInfo & {
+export type InstancesProps = {
   mesh: Record<string, ShaderSource>,
   shaded?: boolean,
   side?: 'front' | 'back' | 'both',
   format?: 'u16' | 'u32',
-  render?: (Instance: LiveComponent) => LiveElement,
+  render?: (Instance: LiveComponent<InstanceProps>) => LiveElement,
 };
+
+export type InstanceProps = Partial<ObjectTrait>;
 
 const INSTANCE_FIELDS = [
   ['mat4x4<f32>', 'matrix'],
@@ -50,7 +53,7 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
     render,
   } = props;
 
-  const Resume = useCallback((instances, fieldSources) => {
+  const Resume = useCallback((instances: StorageSource, fieldSources: StorageSource[]) => {
     
     const [view, boundPosition, boundDifferential] = useMemo(() => {
 
@@ -77,17 +80,16 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
   return use(InstanceData, {
     format,
     fields: INSTANCE_FIELDS,
-    render: (useInstance) => {
-      const Instance = useMemo(() => makeInstance(props, useInstance), [props, useInstance]);
-      return render(Instance);
+    render: (useInstance: () => (data: Record<string, any>) => void) => {
+      const Instance = useOne(() => makeInstance(useInstance), useInstance);
+      return render ? render(Instance as any) : null;
     },
     then: Resume,
   })
 };
 
 const makeInstance = (
-  instance: InstanceInfo,
-  useInstance: () => [number, (data: Record<string, any>) => void],
+  useInstance: () => (data: Record<string, any>) => void,
 ) => tagFunction((props: Partial<ObjectTrait>) => {
   const parent = useMatrixContext();
   const updateInstance = useInstance();

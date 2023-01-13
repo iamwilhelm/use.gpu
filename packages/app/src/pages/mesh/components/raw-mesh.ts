@@ -52,7 +52,7 @@ export type RawMeshProps = {
   blink?: number,
 };
 
-export const RawMesh: LiveComponent<MeshProps> = memo((props: MeshProps) => {
+export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) => {
   const {
     mesh,
     texture,

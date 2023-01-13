@@ -16,6 +16,7 @@ import { getSolidFragment } from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
 const SURFACE_BINDINGS = bundleToAttributes(getSolidSurface);
 
 export type ShaderFlatMaterialProps = {
+  /** Flat shader, for both lit and unlit passes (e.g. shadow map) */
   fragment: ShaderModule,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };

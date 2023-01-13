@@ -45,8 +45,8 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
 
   const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
   const getBounds = useCallback((bounds: DataBounds) => {
-    vec3.transformMat4(cullBounds.center, bounds.center, matrixRef.current);
-    cullBounds.radius = matrixScaleRef.current * bounds.radius;
+    vec3.transformMat4(cullBounds.center as any, bounds.center as any, (matrixRef as any).current);
+    cullBounds.radius = (matrixScaleRef as any).current * bounds.radius;
     return cullBounds;
   });
 

@@ -20,13 +20,15 @@ const DEFAULT_PASSES = [
   use(ColorPass, {}),
 ];
 
+const NO_BUFFERS: Record<string, UseGPURenderContext[]> = {};
+
 export type ForwardRendererProps = {
   lights?: boolean,
   overlay?: boolean,
   merge?: boolean,
 
-  passes?: LiveElement[],
   buffers?: Record<string, UseGPURenderContext[]>,
+  passes?: LiveElement[],
   components?: RenderComponents,
 };
 
@@ -53,8 +55,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     overlay = false,
     merge = false,
     passes = DEFAULT_PASSES,
-
-    buffers,
+    buffers = NO_BUFFERS,
     children,
   } = props;
 

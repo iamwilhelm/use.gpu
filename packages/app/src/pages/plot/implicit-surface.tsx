@@ -3,6 +3,7 @@ import type { Emit, StorageSource, Time } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
 import React, { Provide, Gather } from '@use-gpu/live';
+import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat,

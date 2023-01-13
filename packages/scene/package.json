@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/scene",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -11,7 +11,7 @@
     "@use-gpu/shader": "*"
   },
   "scripts": {
-    "build": "NPM_PACKAGE=state ../../scripts/build-mjs-cjs.sh",
+    "build": "NPM_PACKAGE=scene ../../scripts/build-mjs-cjs.sh",
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",

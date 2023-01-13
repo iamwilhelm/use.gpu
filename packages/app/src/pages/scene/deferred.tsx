@@ -1,13 +1,15 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { StorageSource, TextureSource, UniformType } from '@use-gpu/core';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
+import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageTexture,
   OrbitCamera, OrbitControls,
   Cursor,
-  Lights, DirectionalLight, PointLight, AmbientLight,
+  DirectionalLight, PointLight, AmbientLight,
   Data, PointLayer,
   makeBoxGeometry, makePlaneGeometry, makeSphereGeometry,
 } from '@use-gpu/workbench';
@@ -36,7 +38,7 @@ const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ 
 const sampler = {
   addressModeU: 'repeat',
   addressModeV: 'repeat',
-};
+} as GPUSamplerDescriptor;
 
 const boxGeometry = makeBoxGeometry({ width: 2 });
 const planeGeometry = makePlaneGeometry({ width: 100, height: 100, axes: 'xz' });
@@ -45,7 +47,7 @@ const sphereGeometry = makeSphereGeometry({ width: 2, tile: [6, 3] });
 const lightFields = [
   ['vec4<f32>', 'position'],
   ['vec4<f32>', 'color'],
-];
+] as [UniformType, string][];
 
 const lightData = [
   {
@@ -77,6 +79,11 @@ export const SceneDeferredPage: LC = (props) => {
         planeMesh,
         sphereMesh,
         texture,
+      ]: [
+        Record<string, StorageSource>,
+        Record<string, StorageSource>,
+        Record<string, StorageSource>,
+        TextureSource,
       ]) => (
         <LinearRGB tonemap="aces" gain={1} samples={1} depthStencil="depth32float-stencil8">
           <Loop>

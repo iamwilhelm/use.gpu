@@ -6,7 +6,7 @@ import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 
 export type PassContextProps = {
   useVariants: (virtual: VirtualDraw, hovered: boolean) => null | LiveComponent | LiveComponent[],
-  buffers: Record<string, UseGPURenderContext>,
+  buffers: Record<string, UseGPURenderContext[]>,
   layout?: GPUBindGroupLayout,
   bind?: (...args: any[]) => (passEncoder: GPURenderPassEncoder) => void,
 };

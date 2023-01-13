@@ -286,7 +286,6 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       unquoted={unquoted}
       depth={styleDepth}
       runCount={runCounts}
-      builtins={builtins}
       onClick={select}
       onMouseEnter={hover}
       onMouseLeave={unhover}

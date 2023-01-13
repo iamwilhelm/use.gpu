@@ -26,8 +26,6 @@ export type FlatProps = {
 
   near?: number,
   far?: number,
-
-  children?: LiveElement,
 };
 
 export const Flat: LiveComponent<FlatProps> = (props) => {

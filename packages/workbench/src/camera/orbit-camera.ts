@@ -37,8 +37,6 @@ export type OrbitCameraProps = {
 
   focus?: number,
   scale?: number | null,
-
-  children?: LiveElement,
 };
 
 let t = 0;

@@ -27,10 +27,10 @@ export const getMVTShapes = (
   const {layers} = mvt;
 
   const shapes = {
-    point: [],
-    line: [],
-    face: [],
-    label: [],
+    point: [] as any[],
+    line: [] as any[],
+    face: [] as any[],
+    label: [] as any[],
   };
   
   const addPoint = (

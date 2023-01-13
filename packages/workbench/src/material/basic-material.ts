@@ -53,7 +53,7 @@ export const BasicMaterial: LC<BasicMaterialProps> = (props: PropsWithChildren<B
   const getFragment = useBoundShader(getBasicMaterial, BASIC_BINDINGS, [c, cm], defines);
 
   return ShaderFlatMaterial({
-    shader: getFragment,
+    fragment: getFragment,
     render,
     children,
   });

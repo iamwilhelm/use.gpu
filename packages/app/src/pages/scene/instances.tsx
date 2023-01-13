@@ -1,6 +1,9 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { StorageSource, TextureSource } from '@use-gpu/core';
+import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
+import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat, Animate, LinearRGB,
@@ -25,7 +28,7 @@ const POSITION_KEYFRAMES = [
   [20, [ 3,  0, 0]],
   [30, [ 0,  3, 0]],
   [40, [-3,  0, 0]],
-];
+] as Keyframe<any>[];
 
 const ROTATION_KEYFRAMES = [
   [ 0, [0,   0, 0]],
@@ -34,7 +37,7 @@ const ROTATION_KEYFRAMES = [
   [ 8, [0,   0, 0]],
   [14, [360, 0, 0]],
   [16, [360, 0, 0]],
-];
+] as Keyframe<any>[];
 
 const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
 
@@ -50,6 +53,9 @@ export const SceneInstancesPage: LC = (props) => {
       then={([
         mesh,
         texture,
+      ]: [
+        Record<string, StorageSource>,
+        TextureSource,
       ]) => (
         <LinearRGB tonemap="aces">
           <Loop>

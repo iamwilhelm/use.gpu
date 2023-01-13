@@ -2,6 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { use } from '@use-gpu/live';
+import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat,

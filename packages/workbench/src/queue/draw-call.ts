@@ -144,7 +144,7 @@ export const drawCall = (props: DrawCallProps) => {
   );
 
   // Flip pipeline winding order for mirrored passes (e.g. cubemap or reflection)
-  const cullMode = propPipeline?.primitive?.cullMode;
+  const cullMode = (propPipeline as any)?.primitive?.cullMode;
   const needsFlip = cullMode === 'front' || cullMode === 'back';
 
   let pipelineFlipped = pipeline;

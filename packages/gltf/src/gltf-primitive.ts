@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { UniformAttribute } from '@use-gpu/core';
+import type { UniformAttribute, DataBounds } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { flattenIndexedArray } from '@use-gpu/core';
@@ -11,7 +11,7 @@ import { vec3, mat3, mat4 } from 'gl-matrix';
 import {
   FaceLayer, FaceLayerProps,
   PBRMaterial,
-  TransformContext, DifferentialContext,
+  TransformContext,
   useBoundSource, useNoBoundSource,
   useBoundShader, useNoBoundShader,
   useRawSource, useNoRawSource,
@@ -116,8 +116,8 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
     const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
     const getBounds = useCallback((bounds: DataBounds) => {
-      vec3.transformMat4(cullBounds.center, bounds.center, t.current);
-      cullBounds.radius = s.current * bounds.radius;
+      vec3.transformMat4(cullBounds.center as any, bounds.center as any, (t as any).current);
+      cullBounds.radius = (s as any).current * bounds.radius;
       return cullBounds;
     });
 

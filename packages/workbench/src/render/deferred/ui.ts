@@ -3,8 +3,8 @@ import type { VirtualDraw } from '../../pass/types';
 
 import { UIRender } from '../forward/ui';
 
-export type UIRenderProps = VirtualDraw;
+export type DeferredUIRenderProps = VirtualDraw;
 
-export const DeferredUIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => {
+export const DeferredUIRender: LiveComponent<DeferredUIRenderProps> = (props: DeferredUIRenderProps) => {
   return UIRender({...props, mode: 'transparent'});
 };

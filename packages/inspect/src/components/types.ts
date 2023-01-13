@@ -14,6 +14,7 @@ export type HoverState = {
 export type OptionState = {
   depth: number,
   counts: boolean,
+  builtins: boolean,
   fullSize: boolean,
 };
 

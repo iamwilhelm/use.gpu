@@ -97,7 +97,7 @@ export const updateMipCubeTextureChain = (
 ) => {
   const {size} = source;
   const [,, depth] = size;
-  seq(depth).map((layer: number) => updateMipTextureChain(device, source, bounds, layer));
+  if (depth) seq(depth).map((layer: number) => updateMipTextureChain(device, source, bounds, layer));
 }
 
 export const updateMipTextureChain = (

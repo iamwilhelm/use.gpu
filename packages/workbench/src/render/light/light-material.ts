@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { LightEnv } from '../pass/types';
-import type { UseLight } from './light/light-data';
+import type { LightEnv } from '../../pass/types';
+import type { UseLight } from './light-data';
 
 import { use, yeet, provide, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';

@@ -1,4 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
+import type { StorageSource } from '@use-gpu/core';
 import { memo, use, useOne } from '@use-gpu/live';
 
 import { ArrowSegments } from './arrow-segments';
@@ -7,7 +8,9 @@ import { ArrowLayer } from './arrow-layer';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type AxisHelperProps = {
+  width?: number,
   size?: number,
+  depth?: number,
 };
 
 const COLORS = new Float32Array([
@@ -45,7 +48,7 @@ export const AxisHelper: LiveComponent<AxisHelperProps> = memo((props: AxisHelpe
   return use(ArrowSegments, {
     chunks: CHUNKS,
     ends: ENDS,
-    render: (segments, anchors, trims) => 
+    render: (segments: StorageSource, anchors: StorageSource, trims: StorageSource) => 
       use(ArrowLayer, {positions, colors, width, depth, segments, anchors, trims})
   });
 }, 'AxisHelper');

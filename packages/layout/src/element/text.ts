@@ -77,7 +77,7 @@ export const Text: LiveComponent<TextProps> = (props) => {
       keyed(Glyphs, id, {
         id,
         font,
-        color,
+        color: color as any,
         opacity,
         size,
         detail,

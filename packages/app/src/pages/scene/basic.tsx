@@ -1,6 +1,9 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { StorageSource, TextureSource } from '@use-gpu/core';
+import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
+import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat, Animate, LinearRGB,
@@ -25,9 +28,15 @@ const KEYFRAMES = [
   [20, [ 3,  0, 0]],
   [30, [ 0,  3, 0]],
   [40, [-3,  0, 0]],
-];
+] as Keyframe<any>[];
 
-const PickableMesh = memo(({id, mesh, texture}) => {
+type PickableMeshProps = {
+  id: string,
+  mesh: Record<string, StorageSource>,
+  texture: TextureSource,
+};
+
+const PickableMesh = memo(({id, mesh, texture}: PickableMeshProps) => {
   return (
     <Pick
       render={({id, hovered, presses}) =>
@@ -57,6 +66,9 @@ export const SceneBasicPage: LC = (props) => {
       then={([
         mesh,
         texture,
+      ]: [
+        Record<string, StorageSource>,
+        TextureSource,
       ]) => (
         <LinearRGB tonemap="aces">
           <Loop>

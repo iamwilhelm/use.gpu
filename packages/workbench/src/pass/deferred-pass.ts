@@ -93,7 +93,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
     const commandEncoder = device.createCommandEncoder();
-    if (!overlay && !merge) renderContext.swap();
+    if (!overlay && !merge) renderContext.swap?.();
 
     {
       const passEncoder = commandEncoder.beginRenderPass(deferredPassDescriptor);

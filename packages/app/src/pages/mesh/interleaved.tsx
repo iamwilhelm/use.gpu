@@ -1,6 +1,8 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { StorageSource, TextureSource, UniformType } from '@use-gpu/core';
 
 import React, { Gather } from '@use-gpu/live';
+import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat,
@@ -17,7 +19,7 @@ const MESH_FIELDS = [
   ['vec4<f32>', 'normal'],
   ['vec4<f32>', 'color'],
   ['vec2<f32>', 'uv'],
-];
+] as [UniformType, string][];
 
 const COLOR_ON = [1, 1, 1, 1];
 const COLOR_OFF = [0.5, 0.5, 0.5, 1.0];
@@ -40,6 +42,9 @@ export const MeshInterleavedPage: LC = (props) => {
       then={([
         positions, normals, colors, uvs,
         texture,
+      ]: [
+        StorageSource, StorageSource, StorageSource, StorageSource,
+        TextureSource,
       ]) => (
         <>
           <Cursor cursor='move' />

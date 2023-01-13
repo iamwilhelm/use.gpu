@@ -13,7 +13,7 @@ export type GLTFTreeProps = {
   node: number,
 };
 
-export const GLTFTree: LC<GLTFNodeProps> = memo((props: GLTFNodeProps) => {
+export const GLTFTree: LC<GLTFTreeProps> = memo((props: GLTFTreeProps) => {
   const {
     gltf,
     node,

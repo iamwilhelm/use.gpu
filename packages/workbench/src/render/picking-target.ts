@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TypedArray, UniformAttribute, TextureSource, UseGPURenderContext } from '@use-gpu/core';
+import type { TypedArray, UniformAttribute, TextureSource, OffscreenTarget } from '@use-gpu/core';
 
 import {
   PICKING_FORMAT,
@@ -134,7 +134,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props) => {
       colorSpace: 'picking',
       version: 0,
       id: Math.floor(Math.random() * 1000),
-    };
+    } as TextureSource;
 
     const context = {
       renderContext: {
@@ -147,7 +147,7 @@ export const PickingTarget: LiveComponent<PickingProps> = (props) => {
         depthStencilAttachment,
         swap,
         source: pickingSource,
-      } as UseGPURenderContext,
+      } as OffscreenTarget,
       captureTexture,
       sampleTexture,
     };

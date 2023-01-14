@@ -17,11 +17,28 @@ import { getShadedFragment } from '@use-gpu/wgsl/instance/fragment/shaded.wgsl';
 const SHADED_BINDINGS = bundleToAttributes(getShadedFragment);
 
 export type ShaderLitMaterialProps = {
-  /** Flat shader, for unlit passes (e.g. shadow map) */
+  /** Flat shader, for unlit passes (e.g. shadow map)
+ 
+  fn getFragment(color: vec4<f32>, uv: vec4<f32>, st: vec4<f32>) -> vec4<f32> 
+  */
   fragment: ShaderModule,
-  /** Surface shader, for material properties */
+
+  /** Surface shader, for material properties
+  
+  fn getSurface(
+    color: vec4<f32>,
+    uv: vec4<f32>,
+    st: vec4<f32>,
+    normal: vec4<f32>,
+    tangent: vec4<f32>,
+    position: vec4<f32>,
+  ) -> SurfaceFragment
+  */
   surface: ShaderModule,
-  /** Material lighting shader, for lighting model */
+
+  /** Material lighting shader, for lighting model. e.g. `applyPBRMaterial`.
+  
+  fn getLight(surface: SurfaceFragment) -> vec4<f32> */
   apply: ShaderModule,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };

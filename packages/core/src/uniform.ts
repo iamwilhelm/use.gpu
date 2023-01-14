@@ -18,7 +18,6 @@ import { makeSampler } from './texture';
 import { alignSizeTo } from './data';
 import { resolve } from './lazy';
 
-const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
 const NO_BINDINGS = {} as any;
 
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
@@ -29,6 +28,8 @@ export const makeGlobalUniforms = (
   device: GPUDevice,
   uniformGroups: UniformAttribute[][],
 ): GlobalAllocation => {
+  const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
+
   const group = uniformGroups.map((_, binding) => ({binding, visibility: VISIBILITY_ALL, buffer: {}}));
   const layout = makeBindGroupLayout(device, group);
 

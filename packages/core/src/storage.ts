@@ -1,12 +1,12 @@
 import type { SharedAllocation, StorageSource, UniformAttribute, DataBinding } from './types';
 import { makeBindGroupLayout } from './bindgroup';
 
-const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
-
 export const makeSharedStorage = (
   device: GPUDevice,
   sources: StorageSource[],
 ): SharedAllocation => {
+  const VISIBILITY_ALL = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE;
+
   const group = sources.map((_, binding) => ({binding, visibility: VISIBILITY_ALL, buffer: {type: 'read-only-storage' as GPUBufferBindingType}}));
   const layout = makeBindGroupLayout(device, group);
 

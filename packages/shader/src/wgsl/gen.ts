@@ -288,12 +288,11 @@ export const makeTextureAccessor = (
   const dims = +m[0];
   const dimsCast = dims === 1 ? 'f32' : `vec${dims}<f32>`;
 
+  const t = layout.match(/<([^>]+)>/)?.[1] ?? 'f32';
   const shaderType = (
-    aspect === 'stencil-only' ? 'vec4<u32>' :
-    aspect === 'depth-only' ? 'f32' :
-    format ? TEXTURE_SHADER_TYPES[format] : type
+    layout.match(/depth/) ? 'f32' : 
+    `vec4<${t}>`
   );
-  if (!shaderType) throw new Error(`Cannot determine shader type for texture format '${format}' with aspect '${aspect}'`);
 
   const hasCast = needsCast(shaderType, type);
 
@@ -369,58 +368,3 @@ fn ${ns}${name}(i: u32) -> ${type} {
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;
-
-export const TEXTURE_SHADER_TYPES = {
-  // 8-bit formats
-  "r8unorm": 'vec4<f32>',
-  "r8snorm": 'vec4<f32>',
-  "r8uint": 'vec4<u32>',  // u8
-  "r8sint": 'vec4<i32>',  // i8
-
-  // 16-bit formats
-  "r16uint": 'vec4<u32>',        // u16
-  "r16sint": 'vec4<i32>',        // i16
-  "r16float": 'vec4<f32>',       // f16
-  "rg8unorm": 'vec4<f32>',
-  "rg8snorm": 'vec4<f32>',
-  "rg8uint": 'vec4<u32>',  // u8
-  "rg8sint": 'vec4<i32>',  // i8
-
-  // 32-bit formats
-  "r32uint": 'vec4<u32>',
-  "r32sint": 'vec4<i32>',
-  "r32float": 'vec4<f32>',
-  "rg16uint": 'vec4<u32>',        // u16
-  "rg16sint": 'vec4<i32>',        // i16
-  "rg16float": 'vec4<f32>',       // f32
-  "rgba8unorm": 'vec4<f32>', 
-  "rgba8unorm-srgb": 'vec4<f32>',
-  "rgba8snorm": 'vec4<f32>',
-  "rgba8uint": 'vec4<u32>',       // u8
-  "rgba8sint": 'vec4<i32>',       // i8
-  "bgra8unorm": 'vec4<f32>',
-  "bgra8unorm-srgb": 'vec4<f32>',
-  // Packed 32-bit formats
-  "rgb9e5ufloat": 'vec4<f32>',
-  "rgb10a2unorm": 'vec4<f32>',
-  "rg11b10ufloat": 'vec4<f32>',
-
-  // 64-bit formats
-  "rg32uint": 'vec4<u32>',
-  "rg32sint": 'vec4<i32>',
-  "rg32float": 'vec4<f32>',
-  "rgba16uint": 'vec4<u32>',
-  "rgba16sint": 'vec4<i32>',
-  "rgba16float": 'vec4<f32>',
-
-  // 128-bit formats
-  "rgba32uint": 'vec4<u32>',
-  "rgba32sint": 'vec4<i32>',
-  "rgba32float": 'vec4<f32>',
-
-  // Depth and stencil formats
-  "stencil8": 'u32',              // u8
-  "depth16unorm": 'f32',
-  "depth24plus": 'f32',
-  "depth32float": 'f32',
-} as Record<string, string>;

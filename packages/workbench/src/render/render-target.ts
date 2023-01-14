@@ -180,14 +180,14 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
     const depth = depthStencil ? {
       texture: depthTexture,
       sampler: {},
-      layout: 'texture_depth_2d',
+      layout: samples > 1 ? 'texture_depth_multisampled_2d' : 'texture_depth_2d',
       format: depthStencil,
       size,
       version: 0,
     } as TextureSource : null;
 
     return [source, sources, depth];
-  }, [targetTexture, depthTexture, width, height, format, history, sampler, depthStencil]);
+  }, [targetTexture, depthTexture, width, height, format, samples, history, sampler, depthStencil]);
 
   const rttContext = useMemo(() => ({
     ...renderContext,

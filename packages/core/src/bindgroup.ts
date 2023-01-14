@@ -6,7 +6,7 @@ const BINDING_TEXTURE_TYPES = {
   'texture_1d': { viewDimension: '1d' },
 
   'texture_2d':                    { viewDimension: '2d' },
-  'texture_multisampled_2d':       { viewDimension: '2d' },
+  'texture_multisampled_2d':       { viewDimension: '2d', multisampled: true },
   'texture_depth_2d':              { viewDimension: '2d', sampleType: 'depth' },
   'texture_depth_multisampled_2d': { viewDimension: '2d', sampleType: 'depth', multisampled: true },
 

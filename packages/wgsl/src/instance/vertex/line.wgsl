@@ -40,9 +40,7 @@ fn trimAnchor(
   both: i32,
   w: f32,
   depth: f32,
-) -> vec3<f32> {
-  var NaN: f32 = bitcast<f32>(0xffffffffu);
-
+) -> vec4<f32> {
   var tangent = normalize(next - anchor);
   var distanceStart = getAnchorDistance(anchor, tangent, center);
   var distanceEnd = getAnchorDistance(anchor, tangent, after);
@@ -51,30 +49,28 @@ fn trimAnchor(
 
   if (distanceStart >= 0.0 && distanceStart < arrowLength) {
     if (distanceEnd >= 0.0 && distanceEnd < arrowLength) {
-      return vec3<f32>(NaN, NaN, NaN);
+      return vec4<f32>(0.0, 0.0, 0.0, 0.0);
     }
     else {
       let ratio = (arrowLength - distanceStart) / (distanceEnd - distanceStart);
-      return mix(center, after, ratio);
+      return vec4<f32>(mix(center, after, ratio), 1.0);
     }
   }
 
-  return center;
+  return vec4<f32>(center, 1.0);
 }
 
 @export fn getLineVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
-  var NaN: f32 = bitcast<f32>(0xffffffffu);
-
   var ij = getStripIndex(vertexIndex);
 
   var segmentLeft = getSegment(instanceIndex);
   if (segmentLeft == 0 || segmentLeft == 2) {
     return SolidVertex(
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
       0u,
     );
   }
@@ -137,17 +133,28 @@ fn trimAnchor(
       var start = worldToClip(startPos);
       if (start.w > 0.0) {
         var nextPos = getPosition(trim.x + 1u);
-        var trimmed = trimAnchor(maxLength, startPos.xyz, nextPos.xyz, centerPos.xyz, afterPos.xyz, width, size, both, start.w, depth);
-        centerPos = vec4<f32>(trimmed, 1.0);
+        centerPos = trimAnchor(maxLength, startPos.xyz, nextPos.xyz, centerPos.xyz, afterPos.xyz, width, size, both, start.w, depth);
       }
     }
     if ((trimMode & 2) != 0) {
       var end = worldToClip(endPos);
       if (end.w > 0.0) {
         var nextPos = getPosition(trim.y - 1u);
-        var trimmed = trimAnchor(maxLength, endPos.xyz, nextPos.xyz, centerPos.xyz, beforePos.xyz, width, size, both, end.w, depth);
-        centerPos = vec4<f32>(trimmed, 1.0);
+        if (centerPos.w != 0.0) {
+          centerPos = trimAnchor(maxLength, endPos.xyz, nextPos.xyz, centerPos.xyz, beforePos.xyz, width, size, both, end.w, depth);
+        }
       }
+    }
+    
+    if (centerPos.w == 0.0) {
+      return SolidVertex(
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        0u,
+      );
     }
   }
 
@@ -170,12 +177,12 @@ fn trimAnchor(
     }
     else {
       return SolidVertex(
-        vec4(NaN, NaN, NaN, NaN),
-        vec4(NaN, NaN, NaN, NaN),
-        vec4(NaN, NaN, NaN, NaN),
-        vec4(NaN, NaN, NaN, NaN),
-        vec4(NaN, NaN, NaN, NaN),
-        instanceIndex,
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        0u,
       );
     }
     center4 = viewToClip(centerV);

@@ -15,8 +15,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
 @optional @link fn getClip(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); }
 
 @export fn getUIRectangleVertex(vertexIndex: u32, instanceIndex: u32) -> UIVertex {
-  var NaN: f32 = bitcast<f32>(0xffffffffu);
-
   // Layout clipping for overflow
   var rectangle = getRectangle(instanceIndex);
   var clip = getClip(instanceIndex);
@@ -28,19 +26,19 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
       rectangle.x > clip.z || rectangle.y > clip.w
     ) {
       return UIVertex(
-        vec4<f32>(NaN, NaN, NaN, NaN),
-        vec2<f32>(NaN, NaN),
-        vec4<f32>(NaN, NaN, NaN, NaN),
-        vec2<f32>(NaN, NaN),
-        vec4<f32>(NaN, NaN, NaN, NaN),
-        vec2<f32>(NaN, NaN),
+        vec4<f32>(0.0),
+        vec2<f32>(0.0),
+        vec4<f32>(0.0),
+        vec2<f32>(0.0),
+        vec4<f32>(0.0),
+        vec2<f32>(0.0),
         0,
         0,
-        vec4<f32>(NaN, NaN, NaN, NaN),
-        vec4<f32>(NaN, NaN, NaN, NaN),
-        vec4<f32>(NaN, NaN, NaN, NaN),
-        vec4<f32>(NaN, NaN, NaN, NaN),
-        vec4<f32>(NaN, NaN, NaN, NaN),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
+        vec4<f32>(0.0),
         0u,
       );
     }

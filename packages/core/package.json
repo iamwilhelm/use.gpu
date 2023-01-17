@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/core",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",

@@ -37,8 +37,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getWorldScale, getViewScale };
 
     let modulus = u32(round(pow(base, ceil(log(trunc)/log(base)))));
     if ((modulus > 1u) && ((instanceIndex % modulus) != 0u)) {
-      var NaN: f32 = bitcast<f32>(0xffffffffu);
-      return vec4<f32>(NaN, NaN, NaN, NaN);
+      return vec4<f32>(0.0, 0.0, 0.0, 0.0);
     }
   }
 

@@ -11,8 +11,7 @@
 
   if (stereoBend > 0.0001) {
     if (position.z == -1.0) {
-      var NaN: f32 = bitcast<f32>(0xffffffffu);
-      return vec4<f32>(NaN, NaN, NaN, NaN);
+      return vec4<f32>(0.0);
     }
 
     let pos = position.xyz;

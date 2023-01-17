@@ -21,8 +21,6 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 @optional @link fn loadInstance(i: u32) { };
 
 @export fn getFaceVertex(vertexIndex: u32, globalInstanceIndex: u32) -> ShadedVertex {
-  let NaN: f32 = bitcast<f32>(0xffffffffu);
-
   var resolvedIndex: u32;
   var instanceIndex: u32;
   if (HAS_INSTANCES) {
@@ -54,14 +52,14 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   else if (segment == 0) {
     // Spacer null triangle
     return ShadedVertex(
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
-      vec4(NaN, NaN, NaN, NaN),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
       0u,
     );
   }

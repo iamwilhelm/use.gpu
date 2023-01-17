@@ -1,3 +1,7 @@
+0.8.1
+- `@use-gpu/core`: Avoid evaluating GPUShaderStage before WebGPU support is confirmed.
+- `@use-gpu/workbench`: NaNs were removed from the WGSL spec. 🤦‍♂️
+
 0.8.0
 - `@use-gpu/app`: Added examples: scene, instancing, shadow, image textures, multiscale RTT
 - `@use-gpu/live`: Allow `<Capture>`/`<Reconcile>` continuation to participate in yeets

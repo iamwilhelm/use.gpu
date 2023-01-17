@@ -10,8 +10,6 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @optional @link fn getScale() -> f32 { return 1.0; };
 
 @export fn getLightVertex(vertexIndex: u32, instanceIndex: u32) -> LightVertex {
-  let NaN: f32 = bitcast<f32>(0xffffffffu);
-
   let instance = getInstance(instanceIndex);
 
   if (IS_FULLSCREEN) {

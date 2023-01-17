@@ -42,13 +42,12 @@ use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
   var c = getVertex(ic, i);
   
   if (a.position.w < 0.0 || b.position.w < 0.0 || c.position.w < 0.0) {
-    var NaN: f32 = bitcast<f32>(0xffffffffu);
     return SolidVertex(
-      vec4<f32>(NaN, NaN, NaN, NaN),
-      vec4<f32>(NaN, NaN, NaN, NaN),
-      vec4<f32>(NaN, NaN, NaN, NaN),
-      vec4<f32>(NaN, NaN, NaN, NaN),
-      vec4<f32>(NaN, NaN, NaN, NaN),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
+      vec4<f32>(0.0),
       0u,
     );
   }

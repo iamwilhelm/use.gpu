@@ -261,6 +261,8 @@ export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {
     call = {f: element.type, key: element.key, args: [element.props], by: fiber?.id ?? 0};
+    if (typeof call.f === 'symbol') call.f = FRAGMENT;
+    if (call.f === FRAGMENT && call.args![0]?.children) call.args = call.args![0]?.children;
   }
   return call ?? null;
 };
@@ -283,7 +285,9 @@ export const updateFiber = <F extends ArrowFunction>(
 
   // If morphing, do before noticing type change
   if (fiberType === MORPH) {
-    const e = call!.args;
+    let e = call!.args;
+    e = reactInterop(e, fiber) as any;
+
     const c = e as any as DeferredCall<any>;
     const cs = e as any as DeferredCall<any>[];
 
@@ -517,6 +521,8 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
     fiber.path = [...fiber.path, 0];
   }
 
+  calls = reactInterop(calls, fiber) as any;
+
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
   else mountFiberCall(fiber, calls as any);
 
@@ -535,6 +541,8 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
     fiber.quote = makeQuoteState(fiber, fiber, fiber.next);
     fiber.next.unquote = fiber.quote;
   }
+
+  calls = reactInterop(calls, fiber) as any;
 
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
   else mountFiberCall(fiber, calls as any);
@@ -917,6 +925,7 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   element: LiveElement,
 ) => {
   if (typeof element === 'string') throw new Error("String is not a valid element");
+  element = reactInterop(element, fiber) as any;
 
   const isArray = !!element && Array.isArray(element);
   const fiberType = isArray ? Array : (element as any)?.f;

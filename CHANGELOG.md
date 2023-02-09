@@ -1,3 +1,6 @@
+0.8.2
+- `@use-gpu/live`: Improved interoperability with React-flavored JSX.
+
 0.8.1
 - `@use-gpu/core`: Avoid evaluating GPUShaderStage before WebGPU support is confirmed.
 - `@use-gpu/wgsl`: NaNs were removed from the WGSL spec. 🤦‍♂️

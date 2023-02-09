@@ -9,6 +9,7 @@ import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
 import { formatNode, formatNodeName, LOGGING } from './debug';
+import { createElement } from './jsx';
 
 import { setCurrentFiber } from './current';
 
@@ -260,9 +261,11 @@ export const pingFiber = <F extends ArrowFunction>(
 export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {
-    call = {f: element.type, key: element.key, args: [element.props], by: fiber?.id ?? 0};
-    if (typeof call.f === 'symbol') call.f = FRAGMENT;
-    if (call.f === FRAGMENT && call.args![0]?.children) call.args = call.args![0]?.children;
+    let {type, key} = element; 
+    const props = {...element.props, key};
+    if (typeof type === 'symbol') type = FRAGMENT;
+
+    call = createElement(type, props);
   }
   return call ?? null;
 };

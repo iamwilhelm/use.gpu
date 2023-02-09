@@ -4,8 +4,6 @@ import { useContext, useMemo, useOne, useResource, useState } from '@use-gpu/liv
 import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
 
-const CAPTURE_EVENT = {capture: true};
-
 const π = Math.PI;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 

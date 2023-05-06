@@ -1,6 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 
 import React, { Gather, yeet, use, useMemo } from '@use-gpu/live';
+import { BLEND_ADDITIVE } from '@use-gpu/core'; 
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
@@ -19,20 +20,21 @@ import { vec3 } from 'gl-matrix';
 
 let t = 0;
 
+const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
+
 // Turn binary buffer into XYZ points for consecutive byte triplets.
-const arrayBufferToXYZ = (buffer: ArrayBuffer, mode: string) => {
+const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
   const data = new Uint8Array(buffer);
   const l = data.length;
 
-  // Allocate space for positions and colors (vec4<u8> = u32)
-  const n = Math.max(1, l - 2);
+  // Allocate space for positions and counts
+  const n = Math.max(4, l - 2);
   const alloc = Math.max(4, Math.min(256 * 256 * 256 * 4, n * 4));
   const positions = new Uint8Array(alloc);
-  const colors = new Uint8Array(alloc);
+  const counts = new Uint32Array(alloc);
 
   // Build 3D histogram of triplets
   const histo = new Uint32Array(256 * 256 * 256);
-  let max = 0;
   for (let i = 0; i < n; ++i) {
     const x = data[i];
     const y = data[i + 1];
@@ -40,56 +42,67 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer, mode: string) => {
     const k = (z << 16) | (y << 8) | x;
 
     const v = histo[k] = histo[k] + 1;
-    max = Math.max(max, v);
   }
 
   // Make data points for non-empty bins
   const h = histo.length;
+
+  const accum = Array.from({ length: 32 }).map(_ => 0);
+
+  let min = Infinity;
+  let max = 0;
+
+  let best = 0;
+  for (let k = 0; k < h; ++k) if (histo[k]) {
+    const v = histo[k];
+    min = Math.min(min, v);
+    max = Math.max(max, v);
+    if (v > best) {
+      const i = accum.findIndex(x => x < v);
+      if (i >= 0) {
+        accum.pop();
+        accum.splice(i, 0, v);
+      }
+      best = accum[accum.length - 1];
+    }
+  }
+  const level = (accum.reduce((a, b) => a + b, 0) / accum.length) || 1;
+
   let bins = 0;
   for (let k = 0, p = 0, c = 0; k < h; ++k) if (histo[k]) {
-    const v = histo[k] / max;
-
     const x = k & 0xFF;
     const y = (k >>> 8) & 0xFF;
     const z = (k >>> 16) & 0xFF;
-
-    const luma = Math.sqrt(v);
 
     positions[p++] = x;
     positions[p++] = y;
     positions[p++] = z;
     positions[p++] = 1;
 
-    if (mode === 'spatial') {
-      colors[c++] = 255 * ((.5 + x * .5) * luma);
-      colors[c++] = 255 * ((.5 + y * .5) * luma);
-      colors[c++] = 255 * ((.5 + z * .5) * luma);
-    }
-    else if (mode === 'histogram') {
-      colors[c++] = 255 * (luma * luma * luma);
-      colors[c++] = 255 * (luma * luma);
-      colors[c++] = 255 * (luma * (1 - luma));
-    }
-    colors[c++] = 255;
+    counts[c++] = histo[k];
 
     bins++;
   }
+  
+  if (min == max) min--;
+  console.log({min, max, level})
 
   return {
+    level,
+    range: [min, max],
     count: bins,
     fields: [
-      ['vec4<u8>', new Uint32Array(positions.buffer)],
-      ['vec4<u8>', new Uint32Array(colors.buffer)],
+      ['vec4<u8>', positions],
+      ['u32', counts],
     ],
   };
 };
 
 // uint8 -> f32 unpack
-// could just use Float32Arrays but we're feeling frugal
-//
-// because u8 doesn't exist in WGSL, vec4<u8> arrives as a vec4<u32>
+// could just use a Float32Array but we're feeling frugal
+// because u8 doesn't exist in WGSL, vec4<u8> arrives as a vec4<u32> after polyfilling
 const positionShader = wgsl`
-  @optional @link fn getData(i: u32) -> vec4<u32>;
+  @link fn getData(i: u32) -> vec4<u32>;
 
   fn main(i: u32) -> vec4<f32> {
     let position = getData(i);
@@ -98,11 +111,51 @@ const positionShader = wgsl`
 `;
 
 const colorShader = wgsl`
-  @optional @link fn getData(i: u32) -> vec4<u32>;
+  @link fn getMode() -> u32;
+  @link fn getTransparent() -> u32;
+  @link fn getRange() -> vec2<f32>;
+  @link fn getLevel() -> f32;
+
+  @link fn getPosition(i: u32) -> vec4<u32>;
+  @link fn getCount(i: u32) -> u32;
+
+  fn remap(f: f32, min: f32, max: f32) -> f32 {
+    return (f - min) / (max - min);
+  }
 
   fn main(i: u32) -> vec4<f32> {
-    let color = getData(i);
-    return vec4<f32>(color) / 255.0;
+    let mode = getMode();
+    let transparent = getTransparent();
+
+    let range = getRange();
+    let level = getLevel();
+    let count = f32(getCount(i));
+
+    let normalized = remap(count, 0.0, range.y);
+    let leveled = count / level;
+    let t = (4.0 + log(leveled) / log(10.0));
+
+    var color: vec4<f32>;
+    if (mode == 1) {
+      let r = sin(t * 4.0) * .5 + .5;
+      let g = sin(t * 4.0 + 2.09) * .5 + .5;
+      let b = sin(t * 4.0 + 4.18) * .5 + .5;
+
+      let tint = vec3<f32>(r, g, b);      
+      let luma = max(0.0, t);
+      color = vec4<f32>(luma * tint, 1.0);
+    }
+    if (mode == 2) {
+      let pos = getPosition(i);
+      let tint = mix(vec3<f32>(pos.xyz) / 255.0, vec3<f32>(1.0), 0.25);
+      let luma = max(0.0, t);
+
+      color = vec4<f32>(luma * tint, 1.0);
+    }
+    if (transparent > 0) {
+      return color * 0.5;
+    }
+    return color;
   }
 `;
 
@@ -113,11 +166,11 @@ export const GeometryBinaryPage: LC = () => {
   return (
     <BinaryControls
       container={root}
-      render={({mode, buffer}) => {
-        const data = useMemo(() => buffer ? arrayBufferToXYZ(buffer, mode) : null, [buffer, mode]);
+      render={({mode, buffer, gamma, transparent}) => {
+        const data = useMemo(() => buffer ? arrayBufferToXYZ(buffer) : null, [buffer]);
         return (
           <Loop>
-            <LinearRGB>
+            <LinearRGB tonemap="aces" colorInput="linear" gain={gamma}>
               <Cursor cursor="move" />
               <Camera>
                 <Pass>
@@ -130,12 +183,19 @@ export const GeometryBinaryPage: LC = () => {
                           fields={data.fields}
                           render={(
                             positions: StorageSource,
-                            colors: StorageSource,
+                            counts: StorageSource,
                           ) => (
                             <Gather
                               children={[
-                                <DataShader shader={positionShader} source={positions} />,
-                                <DataShader shader={colorShader} source={colors} />,
+                                <DataShader
+                                  shader={positionShader}
+                                  source={positions}
+                                />,
+                                <DataShader
+                                  shader={colorShader}
+                                  sources={[positions, counts]}
+                                  args={[mode, transparent, data.range, data.level]}
+                                />,
                               ]}
                               then={([positions, colors]) => (
                                 <PointLayer
@@ -143,8 +203,10 @@ export const GeometryBinaryPage: LC = () => {
                                   positions={positions}
                                   colors={colors}
                                   size={3}
-                                  mode="transparent"
-                                  depth={0.5}
+                                  depth={1}
+                                  mode={transparent ? "transparent" : "opaque"}
+                                  blend={transparent ? "additive" : "none"}
+                                  depthWrite={!transparent}
                                 />
                               )}
                             />
@@ -152,102 +214,35 @@ export const GeometryBinaryPage: LC = () => {
                         />
                       ) : null}
                       <Grid
+                        color="#202020"
                         axes='xy'
                         width={2}
                         first={{ divide: 16, base: 2, end: true }}
                         second={{ divide: 16, base: 2, end: true }}
                         depth={0.5}
-                        zBias={-1}
+                        zBias={-5}
                         auto
                       />
                       <Grid
+                        color="#202020"
                         axes='xz'
                         width={2}
                         first={{ divide: 16, base: 2, end: true }}
                         second={{ divide: 16, base: 2, end: true }}
                         depth={0.5}
-                        zBias={-1}
+                        zBias={-5}
                         auto
                       />
                       <Grid
+                        color="#202020"
                         axes='yz'
                         width={2}
                         first={{ divide: 16, base: 2, end: true }}
                         second={{ divide: 16, base: 2, end: true }}
                         depth={0.5}
-                        zBias={-1}
+                        zBias={-5}
                         auto
                       />
-
-                      <Axis
-                        axis='x'
-                        width={3}
-                        origin={[-1, -1, -1]}
-                        color={[0.75, 0.75, 0.75, 1]}
-                        depth={0.5}
-                      />
-                      <Scale
-                        divide={4}
-                        base={2}
-                        end
-                        axis='x'
-                        origin={[-1, -1, -1]}
-                      >
-                        <Tick
-                          size={10}
-                          width={3}
-                          offset={[0, 1, 0]}
-                          color={[0.75, 0.75, 0.75, 1]}
-                          depth={0.5}
-                        />
-                      </Scale>
-
-                      <Axis
-                        axis='y'
-                        width={3}
-                        origin={[-1, -1, -1]}
-                        color={[0.75, 0.75, 0.75, 1]}
-                        depth={0.5}
-                      />
-                      <Scale
-                        divide={4}
-                        base={2}
-                        end
-                        axis='y'
-                        origin={[-1, -1, -1]}
-                      >
-                        <Tick
-                          size={10}
-                          width={3}
-                          offset={[0, 0, 1]}
-                          color={[0.75, 0.75, 0.75, 1]}
-                          depth={0.5}
-                        />
-                      </Scale>
-
-                      <Axis
-                        axis='z'
-                        width={3}
-                        origin={[-1, -1, -1]}
-                        color={[0.75, 0.75, 0.75, 1]}
-                        depth={0.5}
-                      />
-                      <Scale
-                        divide={4}
-                        base={2}
-                        end
-                        axis='z'
-                        origin={[-1, -1, -1]}
-                      >
-                        <Tick
-                          size={10}
-                          width={3}
-                          offset={[0, 1, 0]}
-                          color={[0.75, 0.75, 0.75, 1]}
-                          depth={0.5}
-                        />
-                      </Scale>
-
                     </Cartesian>
                   </Plot>
                 </Pass>

@@ -21,6 +21,8 @@ const to4 = (type: string) => type.replace(/vec3to4</, 'vec4<');
 const is8to32 = (type: string) => type.match(/^(u|i)8$/);
 const is16to32 = (type: string) => type.match(/^(u|i)16$/);
 const isVec8to32 = (type: string) => type.match(/^vec[234]<(u|i)8>$/);
+const isVec16to32 = (type: string) => type.match(/^vec[234]<(u|i)16>$/);
+
 const to32 = (type: string) => type.replace(/^(vec[234]<)?([ui])[0-9]+/, '$1$232');
 
 const needsCast = (from: string, to: string) => {
@@ -157,17 +159,22 @@ export const makeBindingAccessors = (
         }
         else if (is16to32(format)) {
           const accessor = name + '16to32';
-          const wide = to32(format).replace('i32', 'u32');
           program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
-          program.push(makeStorageAccessor(namespace, set, base, wide, wide, accessor, readWrite));
+          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
           continue;
         }
         else if (isVec8to32(format)) {
           const accessor = name + 'Vec8to32';
           const wide = to32(format).replace('i32', 'u32');
-          console.log({accessor, wide});
           program.push(makeVec8to32Accessor(namespace, type, wide, name, accessor));
-          program.push(makeStorageAccessor(namespace, set, base, wide, wide, accessor, readWrite));
+          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+          continue;
+        }
+        else if (isVec16to32(format)) {
+          const accessor = name + 'Vec16to32';
+          const wide = to32(format).replace('i32', 'u32');
+          program.push(makeVec16to32Accessor(namespace, type, wide, name, accessor));
+          program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
           continue;
         }
       }
@@ -385,10 +392,55 @@ export const makeVec8to32Accessor = (
   format: string,
   name: string,
   accessor: string,
-) => `
+) => {
+  if (format.match(/^vec2/)) {
+    return `
 fn ${ns}${name}(i: u32) -> ${type} {
-  let word = ${ns}${accessor}(i);
-  let v = (word >> vec4<u32>(0, 8, 16, 24)) & vec4<u32>(0xFF);
+  let i2 = i / 2u;
+  let f2 = i & 1u;
+  let word = ${ns}${accessor}(i2);
+  let short = word >> (f2 << 4u);
+  let v = (vec2<u32>(short) >> vec2<u32>(0, 8)) & vec2<u32>(0xFF);
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
 `;
+  }
+  else {
+    return `
+fn ${ns}${name}(i: u32) -> ${type} {
+  let word = ${ns}${accessor}(i);
+  let v = (vec4<u32>(word) >> vec4<u32>(0, 8, 16, 24)) & vec4<u32>(0xFF);
+  return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
+}
+`;
+  }
+}
+
+export const makeVec16to32Accessor = (
+  ns: string,
+  type: string,
+  format: string,
+  name: string,
+  accessor: string,
+) => {
+  if (format.match(/^vec2/)) {
+    return `
+fn ${ns}${name}(i: u32) -> ${type} {
+  let word = ${ns}${accessor}(i);
+  let v = (vec2<u32>(word, word) >> vec2<u32>(0, 16)) & vec2<u32>(0xFFFF);
+  return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
+}
+`;
+  }
+  else {
+    return `
+fn ${ns}${name}(i: u32) -> ${type} {
+  let i2 = i * 2;
+  let word1 = ${ns}${accessor}(i2);
+  let word2 = ${ns}${accessor}(i2 + 1);
+  let v = (vec4<u32>(word1, word1, word2, word2) >> vec4<u32>(0, 16, 0, 16)) & vec4<u32>(0xFFFF);
+  return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
+}
+`;
+  }
+};

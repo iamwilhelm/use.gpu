@@ -12,6 +12,8 @@ const STYLE = {
   bottom: 0,
   padding: '20px',
   background: 'rgba(0, 0, 0, .5)',
+
+  zIndex: 100,
 };
 
 export const makePicker = (container: Element) => ({
@@ -35,7 +37,7 @@ export const PagePicker = (container: Element) => {
       container,
       style: STYLE,
       children: (<div style={{display: 'flex', alignItems: 'center'}}>
-        <button className="round" onClick={handleCode}>{icon}</button>
+        <button className="round" onClick={handleCode} title="Show Source Code">{icon}</button>
         <div style={{width: 16}} />
         <select onChange={handleChange} value={path}>
           {makePages().map(({title, path}) => (

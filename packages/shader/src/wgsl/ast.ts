@@ -82,7 +82,8 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   ////////////////
   
   const getIdentifiers = (node: SyntaxNode, symbol: string, exclude = NO_STRINGS): string[] => {
-    const {cursor, to} = node;
+    const cursor = node.cursor();
+    const {to} = node;
     const ids = new Set<string>();
 
     const visit = () => {
@@ -578,7 +579,7 @@ export const rewriteUsingAST = (
       }
       else {
         // Check if declaration is external or inferred
-        const sub = cursor.node.cursor;
+        const sub = cursor.node.cursor();
         sub.firstChild();
         sub.firstChild();
 
@@ -660,7 +661,7 @@ export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
     // Top level declaration
     else if (type.name === 'LocalDeclaration') {
       // Check if declaration is external
-      const sub = cursor.node.cursor;
+      const sub = cursor.node.cursor();
       sub.firstChild();
       sub.firstChild();
 

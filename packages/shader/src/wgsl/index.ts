@@ -54,6 +54,8 @@ import {
   getBundleKey,
 } from '../util/bundle';
 
+import { parser } from './grammar/wgsl';
+
 export {
   loadModule,
   loadModuleWithCache,
@@ -148,6 +150,10 @@ export const WGSLLinker = {
   getBundleEntry,
   getBundleHash,
   getBundleKey,
+
+  parser,
 };
+
+export { parser } from './grammar/wgsl';
 
 export default WGSLLinker;

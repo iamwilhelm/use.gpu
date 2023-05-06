@@ -507,3 +507,28 @@ Program                                                     ⮐ var foo;⮐ // v
         VariableIdentifier                                  foo
           Identifier                                        foo
 `;
+
+exports[`WGSL grammar snapshots parses a test program 15`] = `
+Program                                                     ⮐ struct __underscore {⮐   foo: f32,⮐   _bar: f32,⮐   __baz: f32,⮐ };⮐ 
+  LocalDeclaration                                          ⮐ struct __underscore {⮐   foo: f32,⮐   _bar: f32,⮐   __baz: f32,⮐ }
+    StructDeclaration                                       ⮐ struct __underscore {⮐   foo: f32,⮐   _bar: f32,⮐   __baz: f32,⮐ }
+      AttributeList                                         
+      struct                                                struct
+      Identifier                                            __underscore
+      StructBodyDeclaration                                 {⮐   foo: f32,⮐   _bar: f32,⮐   __baz: f32,⮐ }
+        StructMember                                        ⮐   foo: f32
+          AttributeList                                     
+          Identifier                                        foo
+          TypeDeclaration                                   f32
+            f32                                             f32
+        StructMember                                        ⮐   _bar: f32
+          AttributeList                                     
+          Identifier                                        _bar
+          TypeDeclaration                                   f32
+            f32                                             f32
+        StructMember                                        ⮐   __baz: f32
+          AttributeList                                     
+          Identifier                                        __baz
+          TypeDeclaration                                   f32
+            f32                                             f32
+`;

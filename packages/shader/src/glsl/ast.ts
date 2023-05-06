@@ -292,13 +292,14 @@ export const makeASTParser = (code: string, tree: Tree) => {
   };
 
   const getIdentifiers = (node: SyntaxNode, exclude: string[] = []): string[] => {
-    const {cursor, to} = node;
+    const cursor = node.cursor();
+    const {to} = node;
     const ids = new Set<string>();
 
     const visit = () => {
       const {type} = cursor;
       if (type.name === 'Field') {
-        const sub = cursor.node.cursor;
+        const sub = cursor.node.cursor();
         do {} while (sub.firstChild());
         const t = getText(sub);
         ids.add(t);
@@ -512,7 +513,7 @@ export const rewriteUsingAST = (
     }
     // Field accessor
     else if (type.name === 'Field') {
-      const sub = cursor.node.cursor;
+      const sub = cursor.node.cursor();
       do {} while (sub.firstChild());
 
       const name = code.slice(sub.from, sub.to);
@@ -567,7 +568,7 @@ export const compressAST = (_: string, tree: Tree): CompressedNode[] => {
       cursor.lastChild();
     }
     else if (type.name === 'Field') {
-      const sub = cursor.node.cursor;
+      const sub = cursor.node.cursor();
       do {} while (sub.firstChild());
       ident(sub.from, sub.to);
       cursor.lastChild();

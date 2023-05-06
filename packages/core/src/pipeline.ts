@@ -67,7 +67,7 @@ export const makeRenderPipelineAsync = (
   } as any, descriptor) as any as GPURenderPipelineDescriptor;
 
   if (!depthStencilState) delete pipelineDescriptor.depthStencil;
-
+  console.log({colorStates, pipelineDescriptor})
   return device.createRenderPipelineAsync(pipelineDescriptor);
 }
 

@@ -2,13 +2,12 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode, DataBounds,
+  VertexData, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
-import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
@@ -21,6 +20,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
+import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -48,26 +48,21 @@ export type RawArrowsProps = {
   detail?: number,
 
   count?: number,
-  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode,
-};
+} & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = bundleToAttributes(getArrowVertex);
 
-const PIPELINE = {
-  primitive: {
-    topology: 'triangle-list',
-  },
-} as DeepPartial<GPURenderPipelineDescriptor>;
-
 export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsProps) => {
   const {
-    pipeline: propPipeline,
+    alphaToCoverage,
+    depthTest,
+    depthWrite,
+    blend,
+    mode = 'opaque',
     detail = 12,
     count = 1,
-    mode = 'opaque',
     id = 0,
   } = props;
   
@@ -77,8 +72,6 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   // Set up draw
   const vertexCount = geometry.count;
   const instanceCount = useDataLength(count, props.anchors);
-
-  const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const a = useShaderRef(props.anchor, props.anchors);
   const p = useShaderRef(props.position, props.positions);
@@ -108,10 +101,16 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
-  const defines = useOne(() => ({
-    HAS_ALPHA_TO_COVERAGE: false,
-    HAS_SCISSOR: !!scissor,
-  }), scissor);
+  const [pipeline, defines] = usePipelineOptions({
+    mode,
+    topology: 'triangle-list',
+    side: 'both',
+    scissor,
+    alphaToCoverage,
+    depthTest,
+    depthWrite,
+    blend,
+  });
 
   return (
      use(Virtual, {

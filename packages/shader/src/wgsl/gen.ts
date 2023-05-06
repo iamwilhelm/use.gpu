@@ -147,7 +147,7 @@ export const makeBindingAccessors = (
       if (typeof format === 'string') {
         if (is3to4(format)) {
           const accessor = name + '3to4';
-          program.push(makeVec3to4Accessor(namespace, type, to32(format), name, accessor));
+          program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
           program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor, readWrite));
           continue;
         }

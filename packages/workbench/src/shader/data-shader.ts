@@ -58,7 +58,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
     });
 
     return getBoundShader(shader, bindings, values);
-  }, [shader, args, source, sources]);
+  }, [shader, args.length, source, sources]);
 
   return useMemo(() => render ? render(getData) : yeet(getData), [render, getData]);
 };

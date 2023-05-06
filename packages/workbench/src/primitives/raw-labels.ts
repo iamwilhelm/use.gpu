@@ -2,13 +2,12 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, LambdaSource, RenderPassMode, DataBounds,
+  VertexData, TextureSource, LambdaSource, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
-import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
@@ -17,9 +16,12 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
+import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
+
+const DEFINES = {DEBUG_SDF: false};
 
 export type RawLabelsProps = {
   index?: number,
@@ -59,67 +61,25 @@ export type RawLabelsProps = {
   lookup?:  number,
   id?:      number,
 
-  alphaToCoverage?: boolean,
   count?: Lazy<number>,
-  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode | string,
-};
+} & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
 
 const VERTEX_BINDINGS = bundleToAttributes(getLabelVertex);
 const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
 
-const DEFINES_ALPHA = {
-  HAS_EDGE_BLEED: true,
-  HAS_ALPHA_TO_COVERAGE: false,
-  DEBUG_SDF: false,
-};
-
-const DEFINES_ALPHA_TO_COVERAGE = {
-  HAS_EDGE_BLEED: true,
-  HAS_ALPHA_TO_COVERAGE: true,
-  DEBUG_SDF: false,
-};
-
-const PIPELINE_ALPHA = {
-  primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
-  },
-} as DeepPartial<GPURenderPipelineDescriptor>;
-
-const PIPELINE_ALPHA_TO_COVERAGE = {
-  fragment: {
-    targets: {
-      0: { blend: {$set: undefined}, },
-    },
-  },
-  multisample: {
-    alphaToCoverageEnabled: true,
-  },
-  primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
-  },
-} as DeepPartial<GPURenderPipelineDescriptor>;
-
 export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsProps) => {
   const {
-    pipeline: propPipeline,
-    alphaToCoverage = true,
     mode = 'opaque',
+    alphaToCoverage = true,
+    depthTest,
+    depthWrite,
+    blend,
     id = 0,
     count = 1,
   } = props;
 
   const vertexCount = 4;
   const instanceCount = useDataLength(count, props.indices);
-
-  const pipeline = useMemo(() =>
-    patch(alphaToCoverage
-      ? PIPELINE_ALPHA_TO_COVERAGE
-      : PIPELINE_ALPHA,
-    propPipeline),
-    [propPipeline, alphaToCoverage]);
 
   const i = useShaderRef(props.index, props.indices);
   const r = useShaderRef(props.rectangle, props.rectangles);
@@ -137,7 +97,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const q  = useShaderRef(props.flip);
 
-  const [xf, scissor, getBounds] = useApplyTransform(p);
+  const [xf,, getBounds] = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -153,17 +113,28 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const getVertex = useBoundShader(getLabelVertex, VERTEX_BINDINGS, [i, r, u, l, a, xf, c, o, z, d, f, e, q]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
+  const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t], DEFINES);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
+  const [pipeline, defines] = usePipelineOptions({
+    mode,
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
+    side: 'both',
+    alphaToCoverage,
+    depthTest: false,
+    depthWrite: false,
+    blend,
+  });
+    
   return use(Virtual, {
     vertexCount,
     instanceCount,
     bounds,
 
     links,
-    defines: alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA,
+    defines,
 
     renderer: 'ui',
     pipeline,

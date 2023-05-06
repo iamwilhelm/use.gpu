@@ -2,13 +2,12 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, LambdaSource, RenderPassMode,
+  VertexData, TextureSource, LambdaSource,
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
-import { patch } from '@use-gpu/state';
 import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
@@ -18,6 +17,7 @@ import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { usePickingShader } from '../providers/picking-provider';
+import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
@@ -47,69 +47,27 @@ export type UIRectanglesProps = {
 
   debugContours?: boolean,
 
-  alphaToCoverage?: boolean,
   count?: Lazy<number>,
-  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode | string,
   id?: number,
-};
+} & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const VERTEX_BINDINGS = bundleToAttributes(getUIRectangleVertex);
 const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
 
-const DEFINES_ALPHA = {
-  HAS_EDGE_BLEED: true,
-  HAS_ALPHA_TO_COVERAGE: false,
-  DEBUG_SDF: false,
-};
-
-const DEFINES_ALPHA_TO_COVERAGE = {
-  HAS_EDGE_BLEED: true,
-  HAS_ALPHA_TO_COVERAGE: true,
-  DEBUG_SDF: false,
-};
-
-const PIPELINE_ALPHA = {
-  primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
-  },
-} as DeepPartial<GPURenderPipelineDescriptor>;
-
-const PIPELINE_ALPHA_TO_COVERAGE = {
-  fragment: {
-    targets: {
-      0: { blend: {$set: undefined}, },
-    },
-  },
-  multisample: {
-    alphaToCoverageEnabled: true,
-  },
-  primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
-  },
-} as DeepPartial<GPURenderPipelineDescriptor>;
-
 export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
   const {
-    pipeline: propPipeline,
-    debugContours = false,
-    alphaToCoverage = false,
-    mode = 'transparent',
     id = 0,
     count = 1,
+    mode = 'transparent',
+    alphaToCoverage = false,
+    depthTest,
+    depthWrite,
+    blend,
+    debugContours = false,
   } = props;
 
   const vertexCount = 4;
   const instanceCount = useDataLength(count, props.rectangles);
-
-  const pipeline = useMemo(() =>
-    patch(alphaToCoverage
-      ? PIPELINE_ALPHA_TO_COVERAGE
-      : PIPELINE_ALPHA,
-    propPipeline),
-    [propPipeline, alphaToCoverage]);
 
   const r = useShaderRef(props.rectangle, props.rectangles);
   const a = useShaderRef(props.radius, props.radiuses);
@@ -131,10 +89,22 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
-  let defines = alphaToCoverage ? DEFINES_ALPHA_TO_COVERAGE : DEFINES_ALPHA;
-  if (debugContours) {
-    defines = {...defines, DEBUG_SDF: true};
-  }
+  const [pipeline, defs] = usePipelineOptions({
+    mode,
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
+    side: 'both',
+    alphaToCoverage,
+    depthTest,
+    depthWrite,
+    blend,
+  });
+
+  const defines: Record<string, any> = useMemo(() => ({
+    ...defs,
+    HAS_EDGE_BLEED: true,
+    DEBUG_SDF: debugContours,
+  }), [defs, debugContours]);
 
   return use(Virtual, {
     vertexCount,

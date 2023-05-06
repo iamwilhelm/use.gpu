@@ -2,13 +2,12 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, RenderPassMode, DataBounds,
+  VertexData, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
-import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
@@ -18,6 +17,8 @@ import { usePickingShader } from '../providers/picking-provider';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+
+import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
 
@@ -56,37 +57,25 @@ export type RawFacesProps = {
   unweldedLookups?: boolean,
 
   shaded?: boolean,
-  shadow?: boolean,
-  side?: 'front' | 'back' | 'both',
-
   count?: Lazy<number>,
-  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode | string,
-};
+} & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
 
 const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
 
-const getPipeline = (side: 'front' | 'back' | 'both') => ({
-  primitive: {
-    topology: 'triangle-list',
-    cullMode: {
-      front: 'back',
-      back: 'front',
-      both: 'none',
-    }[side],
-  },
-} as DeepPartial<GPURenderPipelineDescriptor>);
-
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
-    pipeline: propPipeline,
     shaded = false,
     shadow = true,
     count = 1,
+
     mode = 'opaque',
     side = 'front',
+    alphaToCoverage,
+    depthTest,
+    depthWrite,
+    blend,
 
     unweldedNormals = false,
     unweldedTangents = false,
@@ -126,8 +115,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     useNoCallback();
   }
 
-  const pipeline = useMemo(() => patch(getPipeline(side), propPipeline), [side, propPipeline]);
-
   const p = useShaderRef(props.position, props.positions);
   const n = useShaderRef(props.normal, props.normals);
   const t = useShaderRef(props.tangent, props.tangents);
@@ -159,21 +146,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
 
-  const hasIndices = !!props.indices;
-  const hasSegments = !!props.segments;
-  const defines = useMemo(() => ({
-    HAS_SCISSOR: !!scissor,
-    HAS_SHADOW: shadow,
-    HAS_INDICES: hasIndices,
-    HAS_SEGMENTS: hasSegments,
-    HAS_INSTANCES: hasInstances,
-    HAS_ALPHA_TO_COVERAGE: false,
-    UNWELDED_NORMALS: !!unweldedNormals,
-    UNWELDED_TANGENTS: !!unweldedTangents,
-    UNWELDED_UVS: !!unweldedUVs,
-    UNWELDED_LOOKUPS: !!unweldedLookups,
-  }), [scissor, shadow, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
-
   const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, j, k, l]);
   const getPicking = usePickingShader(props);
 
@@ -189,6 +161,31 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
       ...material,
     }
   }, [getVertex, getPicking, material]);
+
+  const [pipeline, defs] = usePipelineOptions({
+    mode,
+    topology: 'triangle-list',
+    side: 'both',
+    shadow,
+    scissor,
+    alphaToCoverage,
+    depthTest,
+    depthWrite,
+    blend,
+  });
+
+  const hasIndices = !!props.indices;
+  const hasSegments = !!props.segments;
+  const defines = useMemo(() => ({
+    ...defs,
+    HAS_INDICES: hasIndices,
+    HAS_SEGMENTS: hasSegments,
+    HAS_INSTANCES: hasInstances,
+    UNWELDED_NORMALS: !!unweldedNormals,
+    UNWELDED_TANGENTS: !!unweldedTangents,
+    UNWELDED_UVS: !!unweldedUVs,
+    UNWELDED_LOOKUPS: !!unweldedLookups,
+  }), [defs, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
   return (
     use(Virtual, {

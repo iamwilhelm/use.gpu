@@ -70,6 +70,8 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     shape = 'circle',
     mode = 'opaque',
     id = 0,
+
+    ...rest
   } = props;
 
   const s = useShaderRef(size, sizes);
@@ -97,6 +99,9 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
 
     rectangles,
     masks: boundMask,
+
+    alphaToCoverage: true,
+    ...rest,
 
     count,
     mode,

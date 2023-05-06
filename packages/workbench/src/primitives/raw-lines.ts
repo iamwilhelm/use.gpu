@@ -8,15 +8,15 @@ import type { ShaderSource } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
-import { patch } from '@use-gpu/state';
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
-import { RenderPassMode, resolve, makeShaderBindings } from '@use-gpu/core';
+import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
+import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
@@ -48,9 +48,7 @@ export type RawLinesProps = {
   join?: 'miter' | 'round' | 'bevel',
 
   count?: Lazy<number>,
-  pipeline?: DeepPartial<GPURenderPipelineDescriptor>,
-  mode?: RenderPassMode | string,
-};
+} & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
 
@@ -77,13 +75,17 @@ const PIPELINE = {
 
 export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps) => {
   const {
-    pipeline: propPipeline,
-    count = 2,
     mode = 'opaque',
+    alphaToCoverage,
+    depthTest,
+    depthWrite,
+    blend,
+    count = 2,
+    depth = 0,
+    join,
   } = props;
 
   // Customize line shader
-  let {join, depth = 0} = props;
   const j = (join! in LINE_JOIN_SIZE) ? join! : 'bevel';
 
   const style = LINE_JOIN_STYLE[j];
@@ -93,8 +95,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   // Set up draw
   const vertexCount = 2 + tris;
   const instanceCount = useDataLength(count, props.positions, -1);
-
-  const pipeline = useOne(() => patch(PIPELINE, propPipeline), propPipeline);
 
   const p = useShaderRef(props.position, props.positions);
   const g = useShaderRef(props.segment, props.segments);
@@ -124,13 +124,23 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
+  const [pipeline, defs] = usePipelineOptions({
+    mode,
+    topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
+    side: 'both',
+    scissor,
+    alphaToCoverage,
+    depthTest,
+    depthWrite,
+    blend,
+  });
+
   const defines = useMemo(() => ({
-    HAS_SHADOW: false,
-    HAS_SCISSOR: !!scissor,
-    HAS_ALPHA_TO_COVERAGE: false,
+    ...defs,
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
-  }), [j, scissor]);
+  }), [defs, style, segments]);
   
   return use(Virtual, {
     vertexCount,

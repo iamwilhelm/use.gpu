@@ -47,12 +47,13 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
   // Make data points for non-empty bins
   const h = histo.length;
 
-  const accum = Array.from({ length: 32 }).map(_ => 0);
 
   let min = Infinity;
   let max = 0;
 
+  // Determine average of 32 highest bins
   let best = 0;
+  const accum = Array.from({ length: 32 }).map(_ => 0);
   for (let k = 0; k < h; ++k) if (histo[k]) {
     const v = histo[k];
     min = Math.min(min, v);
@@ -68,6 +69,7 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
   }
   const level = (accum.reduce((a, b) => a + b, 0) / accum.length) || 1;
 
+  // Emit data for non-empty bins
   let bins = 0;
   for (let k = 0, p = 0, c = 0; k < h; ++k) if (histo[k]) {
     const x = k & 0xFF;
@@ -85,7 +87,6 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
   }
   
   if (min == max) min--;
-  console.log({min, max, level})
 
   return {
     level,
@@ -98,9 +99,9 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
   };
 };
 
-// uint8 -> f32 unpack
-// could just use a Float32Array but we're feeling frugal
-// because u8 doesn't exist in WGSL, vec4<u8> arrives as a vec4<u32> after polyfilling
+// uint8 -> f32 conversion for positions
+// Could just use a Float32Array but we're feeling frugal.
+// Because u8 doesn't exist in WGSL, vec4<u8> arrives as a vec4<u32> after polyfilling
 const positionShader = wgsl`
   @link fn getData(i: u32) -> vec4<u32>;
 
@@ -110,6 +111,7 @@ const positionShader = wgsl`
   }
 `;
 
+// Colorization shader
 const colorShader = wgsl`
   @link fn getMode() -> u32;
   @link fn getTransparent() -> u32;
@@ -137,6 +139,7 @@ const colorShader = wgsl`
 
     var color: vec4<f32>;
     if (mode == 1) {
+      // Histogram
       let r = sin(t * 4.0) * .5 + .5;
       let g = sin(t * 4.0 + 2.09) * .5 + .5;
       let b = sin(t * 4.0 + 4.18) * .5 + .5;
@@ -146,6 +149,7 @@ const colorShader = wgsl`
       color = vec4<f32>(luma * tint, 1.0);
     }
     if (mode == 2) {
+      // XYZ
       let pos = getPosition(i);
       let tint = mix(vec3<f32>(pos.xyz) / 255.0, vec3<f32>(1.0), 0.25);
       let luma = max(0.0, t);

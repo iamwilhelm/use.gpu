@@ -83,6 +83,7 @@ const FILES = [
   { id: 'doom', url: base + "data/doom.bin", name: 'doom.exe' },
   { id: 'quake', url: base + "data/quake.bin", name: 'quake.exe' },
   { id: 'smw', url: base + "data/smw.sfc", name: 'smw.sfc' },
+  { id: 'wasm', url: base + "data/use-gpu-text.wasm", name: 'use-gpu-text.wasm' },
 ];
 
 const MODES = [
@@ -156,7 +157,7 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
   }, [fileId, customFile]);
   
   useResource((dispose) => {
-    const timer = setTimeout(() => setNote(false), 5000);
+    const timer = setTimeout(() => setNote(false), 10000);
     dispose(() => clearTimeout(timer));
   });
 
@@ -181,6 +182,8 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
       style: STYLE,
       children: (<>
         <div>
+          <p><b>Consecutive bytes as (X,Y,Z) histogram</b></p>
+        
           <label>Show file:</label>
           <select style={{marginLeft: 20}} value={customFile ?? fileId} onChange={(e) => {
             setCustomFile(null);

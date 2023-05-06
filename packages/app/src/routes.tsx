@@ -4,6 +4,7 @@ import { GeometryDataPage } from './pages/geometry/data';
 import { GeometryFacesPage } from './pages/geometry/faces';
 import { GeometryGLTFPage } from './pages/geometry/gltf';
 import { GeometryLinesPage } from './pages/geometry/lines';
+import { GeometryBinaryPage } from './pages/geometry/binary';
 import { DebugAtlasPage } from './pages/debug/atlas';
 import { DebugAxesPage } from './pages/debug/axes';
 import { LayoutDisplayPage } from './pages/layout/display';
@@ -35,6 +36,7 @@ export const makePages = () => [
   {path: "/geometry/faces",        title: "Geometry - 3D Polygons",            element: <GeometryFacesPage />},
   {path: "/geometry/data",         title: "Geometry - Data-driven Layers",     element: <GeometryDataPage />},
   {path: "/geometry/gltf",         title: "Geometry - GLTF",                   element: <GeometryGLTFPage />},
+  {path: "/geometry/binary",       title: "Geometry - Raw Byte Viewer",        element: <GeometryBinaryPage />},
   {path: "/layout/display",        title: "Layout - Box model",                element: <LayoutDisplayPage />},
   {path: "/layout/glyph",          title: "Layout - Glyph Subpixel SDF",       element: <LayoutGlyphPage />},
   {path: "/layout/align",          title: "Layout - Alignment Tests",          element: <LayoutAlignPage />},

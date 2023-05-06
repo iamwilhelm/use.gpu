@@ -11,7 +11,7 @@ import type {
 import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { UNIFORM_BYTE_SETTERS } from './bytes';
 
-import { getObjectKey, toMurmur53 } from '@use-gpu/state';
+import { getObjectKey, toMurmur53, mixBits53 } from '@use-gpu/state';
 import { makeBindGroupLayout, makeBindGroupLayoutEntries } from './bindgroup';
 import { makeUniformBuffer } from './buffer';
 import { makeSampler } from './texture';
@@ -148,18 +148,21 @@ export const makeVolatileUniforms = <T>(
   let depth = depths.length > 1 ? lcm(depths) : depths[0];
   
   if (depth === 1) {
-    let lastVersion = -1;
+    let lastKey = -1;
     let cached: GPUBindGroup | null = null;
   
     const bindGroup = () => {
 
-      let version = 0;
+      let key = 0;
       for (const b of bindings) {
-        if (b.texture) version += b.texture.version;
-        else if (b.storage) version += b.storage.version;
+        let v: any = undefined;
+        if (b.texture) v = b.texture.view ?? b.texture.texture;
+        else if (b.storage) v = b.storage.buffer;
+
+        key = mixBits53(key, getObjectKey(v));
       }
 
-      if (version === lastVersion && cached) return cached;
+      if (key === lastKey && cached) return cached;
 
       const entries = bindings.length ? makeDataBindingsEntries(device, bindings, 0) : [];
       const bindGroup = device.createBindGroup({
@@ -168,7 +171,7 @@ export const makeVolatileUniforms = <T>(
       });
 
       cached = bindGroup;
-      lastVersion = version;
+      lastKey = key;
 
       return bindGroup;
     };
@@ -180,7 +183,6 @@ export const makeVolatileUniforms = <T>(
 
   const ids: number[] = [];
   const bindGroup = () => {
-
     ids.length = 0;
     for (const b of bindings) {
       let v: any = undefined;

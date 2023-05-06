@@ -1,4 +1,4 @@
-import type { DeepPartial } from '@use-gpu/core';
+import type { Update } from '@use-gpu/state';
 import { BLEND_NONE, BLEND_ALPHA, BLEND_PREMULTIPLIED, BLEND_ADDITIVE } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';
 import { $set, $delete } from '@use-gpu/state';
@@ -23,24 +23,23 @@ const BLENDS = {
   premultiplied: BLEND_PREMULTIPLIED,
   additive: BLEND_ADDITIVE,
 };
-console.log({BLENDS})
 
 const CULL_SIDE = {
   front: 'back',
   back: 'front',
   both: 'none',
-};
+} as Record<string, GPUCullMode>;
 
 export const usePipelineOptions = (
   options: Partial<PipelineOptions>,
 ): [
-  DeepPartial<GPURenderPipelineDescriptor>,
+  Update<GPURenderPipelineDescriptor>,
   Record<string, any>,
 ] => {
   const {
     shadow = null,
     scissor = null,
-    mode = opaque,
+    mode = 'opaque',
     topology = 'triangle-list',
     stripIndexFormat = undefined,
     side = 'both',
@@ -66,12 +65,12 @@ export const usePipelineOptions = (
     const fragment = {
       targets: {
         0: {blend: typeof blend === 'object' ? $set(blend) : (BLENDS[blend] ?? $delete())},
-      }
+      } as any
     };
   
     const depthStencil = {
       depthWriteEnabled: depthWrite != null ? depthWrite : undefined,
-      depthCompare: depthTest === false ? "always" : undefined,
+      depthCompare: depthTest === false ? 'always' as GPUCompareFunction : undefined,
     };
 
     return {primitive, multisample, fragment, depthStencil};

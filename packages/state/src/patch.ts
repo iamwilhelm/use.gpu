@@ -230,13 +230,14 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
     const out = {} as Record<string, any>;
 
     if (Array.isArray(a) || isTypedArray(a)) {
-      let aa: Record<string, any> = a as any[];
+      let aa: any[] = a as any;
       for (let k in update) {
-        if (aa.hasOwnProperty(k)) {
-          out[k] = revise(aa[k], update[k]);
+        let i = +k;
+        if (aa.hasOwnProperty(i)) {
+          out[i] = revise(aa[i], update[k]);
         }
         else {
-          out[k] = $DELETE;
+          out[i] = $DELETE;
         }
       }
     }
@@ -318,11 +319,12 @@ export const getUpdateKeys = <T>(update: T): string[] => {
 
   const pick = (b: Update<T>, path: string | null) => {
     if (b && typeof b === 'object') {
+      let bb = b as any;
       if (Array.isArray(b) || isTypedArray(b)) {
         return keys.push(path ?? '');
       }
-      for (let k in b) {
-        recurse((b as any)[k], path != null ? path + '.' + k : k);
+      for (let k in bb) {
+        recurse(bb[k], path != null ? path + '.' + k : k);
       }
     }
     else if (b !== undefined) {

@@ -10,7 +10,7 @@ import { getBoundSource } from '../hooks/useBoundSource';
 import { getBoundShader } from '../hooks/useBoundShader';
 
 export type DataShaderProps = {
-  source: StorageSource,
+  source?: StorageSource,
   shader: ShaderModule,
 
   sources?: ShaderSource[],
@@ -47,7 +47,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
     const bindings = bundleToAttributes(shader);
     const links = {
       getData: s[0],
-      getDataSize: () => source.size,
+      getDataSize: () => source?.size,
     } as Record<string, any>;
 
     const allArgs = [...argRefs, ...sources];

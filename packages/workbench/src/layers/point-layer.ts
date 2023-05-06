@@ -5,6 +5,7 @@ import type {
   VertexData, RenderPassMode,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
+import type { PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { RawQuads } from '../primitives/raw-quads';
 
@@ -44,9 +45,8 @@ export type PointLayerProps = {
   stroke?: number,
 
   count?: Lazy<number>,
-  mode?: RenderPassMode | string,
   id?: number,
-};
+} & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttributeValue;
 const MASK_BINDINGS = bundleToAttributes(circleOutlined);

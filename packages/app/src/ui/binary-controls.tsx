@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import type { LC, LiveElement } from '@use-gpu/live';
 
 import { use, fragment, useCallback, useResource, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 import { useRouterContext } from '@use-gpu/workbench';
 
-const STYLE = {
+const STYLE: CSSProperties = {
   position: 'absolute',
 
   left: 0,
@@ -17,7 +17,7 @@ const STYLE = {
   zIndex: 100,
 };
 
-const NOTE = {
+const NOTE: CSSProperties = {
   position: 'absolute',
 
   bottom: '20px',
@@ -35,7 +35,7 @@ const NOTE = {
   transition: 'opacity 1s ease-out',
 };
 
-const DROP_ZONE = {
+const DROP_ZONE: CSSProperties = {
   position: 'absolute',
 
   left: 0,
@@ -47,7 +47,7 @@ const DROP_ZONE = {
   pointerEvents: 'none',
 };
 
-const DROP_MARKER = {
+const DROP_MARKER: CSSProperties = {
   position: 'absolute',
 
   width: '70%',
@@ -69,8 +69,9 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const base = isDevelopment ? '/' : '/demo/';
 
 type State = {
-  mode: string,
+  mode: number,
   buffer: ArrayBuffer,
+  gamma: number,
   transparent: boolean,
 };
 
@@ -92,13 +93,13 @@ const MODES = [
 ];
 
 export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsProps) => {
-  const {hasNormalize, container, render} = props;
+  const {container, render} = props;
 
   const [dragging, setDragging] = useState(false);
   const [note, setNote] = useState(true);
 
   const [fileId, setFileId] = useState('doom');
-  const [customFile, setCustomFile] = useState<File>();
+  const [customFile, setCustomFile] = useState<string | null>(null);
 
   const [gamma, setGamma] = useState(1);
   const [mode, setMode] = useState(1);
@@ -125,7 +126,8 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
 
     const r = new FileReader();
     r.onload = (e) => {
-      setBuffer(e.target.result);
+      if (!e.target) return;
+      setBuffer(e.target.result as ArrayBuffer);
       setCustomFile(file.name);
     };
     r.readAsArrayBuffer(file);
@@ -135,6 +137,8 @@ export const BinaryControls: LC<BinaryControlsProps> = (props: BinaryControlsPro
 
   useResource((dispose) => {
     const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+
     canvas.addEventListener('dragover', handleDragOver);
     canvas.addEventListener('dragleave', handleDragLeave);
     canvas.addEventListener('drop', handleDrop);

@@ -1,8 +1,8 @@
 0.8.3
-- `@use-gpu/app`: add binary histogram example
-- `@use-gpu/inspect`: syntax highlighting in shader view
+- `@use-gpu/app`: Add binary file histogram example
+- `@use-gpu/inspect`: Syntax highlighting in shader view
 - `@use-gpu/shader`: `vec#<u8>` and `vec#<u16>` storage polyfill
-- `@use-gpu/workbench`: standard pipeline options (depth, side, blend) for layers
+- `@use-gpu/workbench`: Consistent pipeline options (depth, side, blend) for layers
 
 0.8.2
 - `@use-gpu/live`: Improved interoperability with React-flavored JSX.

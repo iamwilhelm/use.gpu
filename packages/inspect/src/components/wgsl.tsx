@@ -137,10 +137,11 @@ export function wgslLang() {
 export const WGSL = (props: WGSLProps) => {
   const {code} = props;
 
-  const editor = useRef();
-  console.log({basicSetup});
+  const editor = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
+    if (!editor.current) return;
+
     const startState = EditorState.create({
       doc: code,
       extensions: [

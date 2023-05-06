@@ -49,11 +49,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     shaded: true,
     color: [1, 1, 1, 1],
     unweldedTangents: true,
-    pipeline: {
-      primitive: {
-        cullMode: pbrMaterial.doubleSided ? 'none' : 'back',
-      },
-    },
+    side: pbrMaterial.doubleSided ? 'both' : 'front',
   };
 
   if (POSITION   != null) faces.positions = storage[POSITION];

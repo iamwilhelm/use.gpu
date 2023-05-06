@@ -16,6 +16,7 @@ export type OptionState = {
   counts: boolean,
   builtins: boolean,
   fullSize: boolean,
+  highlight: boolean,
 };
 
 export type Action = () => void;

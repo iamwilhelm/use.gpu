@@ -1,4 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { DataField, StorageSource } from '@use-gpu/core';
 
 import React, { Gather, yeet, use, useMemo } from '@use-gpu/live';
 import { BLEND_ADDITIVE } from '@use-gpu/core'; 
@@ -95,7 +96,7 @@ const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
     fields: [
       ['vec4<u8>', positions],
       ['u32', counts],
-    ],
+    ] as DataField[],
   };
 };
 
@@ -185,10 +186,7 @@ export const GeometryBinaryPage: LC = () => {
                       {data ? (
                         <Data
                           fields={data.fields}
-                          render={(
-                            positions: StorageSource,
-                            counts: StorageSource,
-                          ) => (
+                          render={(positions, counts) => (
                             <Gather
                               children={[
                                 <DataShader
@@ -201,7 +199,7 @@ export const GeometryBinaryPage: LC = () => {
                                   args={[mode, transparent, data.range, data.level]}
                                 />,
                               ]}
-                              then={([positions, colors]) => (
+                              then={([positions, colors]: StorageSource[]) => (
                                 <PointLayer
                                   count={data.count}
                                   positions={positions}

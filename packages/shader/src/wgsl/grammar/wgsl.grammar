@@ -5,6 +5,7 @@
 
 unit { globalDirective* globalDeclaration* }
 
+b<term> { @specialize[@name='Boolean']<Identifier, term> }
 k<term> { @specialize[@name='Keyword']<Identifier, term> }
 t<term> { @specialize[@name='Type']<Identifier, term> }
 d<term> { @specialize[@name='Directive']<Identifier, term> }
@@ -42,18 +43,19 @@ ImportDeclaration {
 ImportDeclarationList { '{' (ImportDeclarationIdentifier comma)* ImportDeclarationIdentifier comma? '}' }
 ImportDeclarationIdentifier { Identifier ('as' Identifier)? }
 
+FunctionCall<content> { content }
 Value<content> { content }
 
 GlobalVariableDeclaration {
-  AttributeList VariableDeclaration (assign Value<constExpression>)?
+  AttributeList VariableDeclaration (Assign Value<constExpression>)?
 }
 
 GlobalConstantDeclaration {
-  AttributeList k<'const'> VariableIdentifier assign Value<constExpression> |
-  AttributeList k<'override'> VariableIdentifier (assign Value<expression>)?
+  AttributeList k<'const'> VariableIdentifier Assign Value<constExpression> |
+  AttributeList k<'override'> VariableIdentifier (Assign Value<expression>)?
 }
 
-TypeAliasDeclaration { AttributeList k<'type'> Identifier (assign TypeDeclaration)? }
+TypeAliasDeclaration { AttributeList k<'type'> Identifier (Assign TypeDeclaration)? }
 
 StructDeclaration { AttributeList k<'struct'> Identifier StructBodyDeclaration }
 StructBodyDeclaration { '{' ((StructMember comma)* StructMember comma?)? '}' }
@@ -73,8 +75,8 @@ VariableQualifier { template<addressSpace (comma accessMode)?> }
 variableIdentifierDeclaration { Identifier colon TypeDeclaration }
 
 variableStatement {
-  VariableDeclaration (assign Value<expression>)? |
-  k<'let'> VariableIdentifier assign Value<expression>
+  VariableDeclaration (Assign Value<expression>)? |
+  k<'let'> VariableIdentifier Assign Value<expression>
 }
 
 CompoundStatement { '{' Statement* '}' }
@@ -96,7 +98,7 @@ Statement {
 }
 
 assignmentStatement {
-  lhsExpression (assign | compoundAssignmentOperator) expression
+  lhsExpression (Assign | compoundAssignmentOperator) expression
 }
 
 compoundAssignmentOperator {
@@ -161,7 +163,8 @@ constExpression {
 
 primaryExpression {
   Reserved |
-  Identifier ~conflict argumentExpressionList? |
+  Identifier |
+  FunctionCall<Identifier> ~conflict argumentExpressionList |
   TypeDeclaration argumentExpressionList |
   constLiteral |
   parenExpression |
@@ -267,8 +270,8 @@ constLiteral {
   IntLiteral |
   UintLiteral |
   FloatLiteral |
-  k<'true'> |
-  k<'false'>
+  b<'true'> |
+  b<'false'>
 }
 
 elementCountExpression {
@@ -422,7 +425,7 @@ texelFormat {
   at { "@" }
   arrow { "->" }
 
-  assign { "=" }
+  Assign { "=" }
   AddAssign { "+=" }
   SubAssign { "-=" }
   MulAssign { "*=" }

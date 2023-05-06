@@ -14,16 +14,22 @@
     "types:watch": "yarn run types -- --watch"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.2.4",
+    "@codemirror/state": "^6.2.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.11.0",
+    "@lezer/highlight": "^1.1.4",
+    "@radix-ui/react-slider": "^0.1.4",
+    "@radix-ui/react-tabs": "^0.1.5",
+    "@stitches/react": "^1.2.7",
+    "@use-gpu/core": "*",
+    "@use-gpu/layout": "*",
     "@use-gpu/live": "*",
     "@use-gpu/react": "*",
     "@use-gpu/state": "*",
-    "@use-gpu/core": "*",
-    "@use-gpu/workbench": "*",
-    "@use-gpu/layout": "*",
     "@use-gpu/webgpu": "*",
-    "@radix-ui/react-slider": "^0.1.4",
-    "@radix-ui/react-tabs": "^0.1.5",
-    "@stitches/react": "^1.2.7"
+    "@use-gpu/workbench": "*",
+    "codemirror": "^6.0.1"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.0",

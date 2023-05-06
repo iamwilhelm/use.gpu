@@ -4,11 +4,13 @@ import type { Action } from '../types';
 import { formatNode, formatValue } from '@use-gpu/live';
 import { styled as _styled } from '@stitches/react';
 
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import { SplitRow, Label, Selectable, Spacer } from '../layout';
 
 import { inspectObject } from './props';
 import { usePingContext } from '../ping';
+
+import { WGSL } from '../wgsl';
 
 const styled: any = _styled;
 
@@ -88,25 +90,7 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
     </>) : null}
     <div><b>Shader</b> (<code>{shader.hash}</code>)</div>
     <StyledShader><Selectable>
-      {inspectCode(shader.code)}
+      <WGSL code={shader.code} />
     </Selectable></StyledShader>
   </>);
-}
-
-const inspectCode = (code: string) => {
-  const lines = code.split("\n");
-
-  const rows = lines.map((l, i) => <span key={i.toString()}>{l}<br /></span>);
-  const indices = lines.map((_, i) => <div key={i.toString()}>{i + 1}</div>);
-
-  const gutterWidth = Math.ceil(Math.log10(lines.length)) * 14;
-
-  return (<StyledEditor>
-    <StyledGutter style={{width: gutterWidth}}>
-      {indices}
-    </StyledGutter>
-    <StyledCode>
-      {rows}
-    </StyledCode>
-  </StyledEditor>)
 }

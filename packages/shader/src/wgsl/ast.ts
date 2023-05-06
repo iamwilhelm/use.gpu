@@ -217,7 +217,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   }
 
   const getVariable = (node: SyntaxNode): VariableRef => {
-    const [a, b, c] = getNodes(node, 2);
+    const [a, b,, c] = getNodes(node, 2);
     const hasValue = !!c;
 
     const attributes = getAttributes(a);
@@ -233,7 +233,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   const getConstant = (node: SyntaxNode): VariableRef => {
     const nodes = getNodes(node, 2);
     
-    const [a, b, c, d] = nodes;
+    const [a, b, c,, d] = nodes;
     const hasAttributes = a.type.id === T.AttributeList;
     const attributes = hasAttributes ? getAttributes(a) : undefined;
 
@@ -248,7 +248,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
   
   const getTypeAlias = (node: SyntaxNode): TypeAliasRef => {
-    const [a,, b, c] = getNodes(node, 3);
+    const [a,, b,, c] = getNodes(node, 3);
 
     const attributes = getAttributes(a);
     const name = getText(b);

@@ -11,6 +11,7 @@ Program                                                     ⮐ var foo: f32 = 1
           Identifier                                        foo
           TypeDeclaration                                   f32
             Type                                            f32
+      Assign                                                =
       Value                                                 1.0
         FloatLiteral                                        1.0
 `;
@@ -23,8 +24,9 @@ Program                                                     ⮐ const WAT = true
       Keyword                                               const
       VariableIdentifier                                    WAT
         Identifier                                          WAT
+      Assign                                                =
       Value                                                 true
-        Keyword                                             true
+        Boolean                                             true
 `;
 
 exports[`WGSL grammar snapshots parses a test program 3`] = `
@@ -145,6 +147,7 @@ Program                                                     ⮐ const foo: f32 =
         Identifier                                          foo
         TypeDeclaration                                     f32
           Type                                              f32
+      Assign                                                =
       Value                                                 1.0
         FloatLiteral                                        1.0
   LocalDeclaration                                          ⮐ const WAT = true;
@@ -153,8 +156,9 @@ Program                                                     ⮐ const foo: f32 =
       Keyword                                               const
       VariableIdentifier                                    WAT
         Identifier                                          WAT
+      Assign                                                =
       Value                                                 true
-        Keyword                                             true
+        Boolean                                             true
   LocalDeclaration                                          ⮐ struct s { x: i32 }
     StructDeclaration                                       ⮐ struct s { x: i32 }
       AttributeList                                         
@@ -189,8 +193,9 @@ Program                                                     ⮐ const foo: f32 =
               Identifier                                    bar
               TypeDeclaration                               i32
                 Type                                        i32
+          Assign                                            =
           Value                                             wat(5, 6)
-            TypeDeclaration                                 wat
+            FunctionCall                                    wat
               Identifier                                    wat
             IntLiteral                                      5
             IntLiteral                                      6
@@ -200,6 +205,7 @@ Program                                                     ⮐ const foo: f32 =
             Identifier                                      x
             TypeDeclaration                                 i32
               Type                                          i32
+          Assign                                            =
           Value                                             4 + 5 + -6 + (-7)
             IntLiteral                                      4
             Add                                             +
@@ -237,6 +243,7 @@ Program                                                     ⮐ fn main() {⮐  
             Identifier                                      x
             TypeDeclaration                                 i32
               Type                                          i32
+          Assign                                            =
           Value                                             1
             IntLiteral                                      1
         Statement                                           let y: i32 = 2;
@@ -245,6 +252,7 @@ Program                                                     ⮐ fn main() {⮐  
             Identifier                                      y
             TypeDeclaration                                 i32
               Type                                          i32
+          Assign                                            =
           Value                                             2
             IntLiteral                                      2
         Statement                                           if (x) { if (y) { } } else { }
@@ -286,6 +294,7 @@ Program                                                     ⮐ fn main() {⮐  
             Identifier                                      x
             TypeDeclaration                                 i32
               Type                                          i32
+          Assign                                            =
           Value                                             1
             IntLiteral                                      1
         Statement                                           wat();
@@ -429,8 +438,9 @@ Program                                                     ⮐ fn getQuad(verte
               Type                                          vec2
               TypeDeclaration                               f32
                 Type                                        f32
+          Assign                                            =
           Value                                             getQuadUV(vertex)
-            TypeDeclaration                                 getQuadUV
+            FunctionCall                                    getQuadUV
               Identifier                                    getQuadUV
             Identifier                                      vertex
         Statement                                           let position: vec4<f32> = vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0);
@@ -441,6 +451,7 @@ Program                                                     ⮐ fn getQuad(verte
               Type                                          vec4
               TypeDeclaration                               f32
                 Type                                        f32
+          Assign                                            =
           Value                                             vec4<f32>(uv * 2.0 - 1.0, 0.0, 1.0)
             TypeDeclaration                                 vec4<f32>
               Type                                          vec4
@@ -461,6 +472,7 @@ Program                                                     ⮐ fn getQuad(verte
               Type                                          vec4
               TypeDeclaration                               f32
                 Type                                        f32
+          Assign                                            =
           Value                                             vec4<f32>(1.0, 0.0, 1.0, 1.0)
             TypeDeclaration                                 vec4<f32>
               Type                                          vec4
@@ -472,7 +484,7 @@ Program                                                     ⮐ fn getQuad(verte
             FloatLiteral                                    1.0
         Statement                                           return MeshVertex(position, color, uv);
           Keyword                                           return
-          TypeDeclaration                                   MeshVertex
+          FunctionCall                                      MeshVertex
             Identifier                                      MeshVertex
           Identifier                                        position
           Identifier                                        color
@@ -486,6 +498,7 @@ Program                                                     ⮐ type integer = i
       AttributeList                                         
       Keyword                                               type
       Identifier                                            integer
+      Assign                                                =
       TypeDeclaration                                       i32
         Type                                                i32
 `;

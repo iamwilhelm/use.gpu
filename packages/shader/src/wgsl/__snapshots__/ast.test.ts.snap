@@ -1,5 +1,106 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ast filters out noisy comments 1`] = `
+Array [
+  Object {
+    "at": 56,
+    "flags": 2,
+    "symbol": "x",
+    "variable": Object {
+      "attributes": Array [
+        Object {
+          "args": undefined,
+          "name": "link",
+        },
+      ],
+      "identifiers": Array [],
+      "name": "x",
+      "qual": undefined,
+      "type": Object {
+        "args": undefined,
+        "name": "f32",
+      },
+      "value": undefined,
+    },
+  },
+  Object {
+    "at": 90,
+    "flags": 2,
+    "symbol": "y",
+    "variable": Object {
+      "attributes": Array [
+        Object {
+          "args": undefined,
+          "name": "link",
+        },
+      ],
+      "identifiers": Array [],
+      "name": "y",
+      "qual": undefined,
+      "type": Object {
+        "args": undefined,
+        "name": "f32",
+      },
+      "value": undefined,
+    },
+  },
+  Object {
+    "at": 117,
+    "flags": 0,
+    "func": Object {
+      "attributes": undefined,
+      "identifiers": Array [],
+      "inferred": undefined,
+      "name": "getValue",
+      "parameters": Array [
+        Object {
+          "attributes": undefined,
+          "name": "index",
+          "type": Object {
+            "args": undefined,
+            "name": "i32",
+          },
+        },
+      ],
+      "type": Object {
+        "args": undefined,
+        "attributes": undefined,
+        "name": "f32",
+      },
+    },
+    "symbol": "getValue",
+  },
+  Object {
+    "at": 166,
+    "flags": 1,
+    "func": Object {
+      "attributes": undefined,
+      "identifiers": Array [
+        "x",
+        "y",
+        "getValue",
+        "v",
+        "xyz",
+      ],
+      "inferred": undefined,
+      "name": "main",
+      "parameters": undefined,
+      "type": Object {
+        "args": Array [
+          Object {
+            "args": undefined,
+            "name": "f32",
+          },
+        ],
+        "attributes": undefined,
+        "name": "vec3",
+      },
+    },
+    "symbol": "main",
+  },
+]
+`;
+
 exports[`ast gets geometry quad symbol table 1`] = `
 Object {
   "declarations": Array [
@@ -1127,7 +1228,7 @@ Array [
     ],
   ],
   Array [
-    28,
+    26,
     Array [
       "y",
       "getFloat2",
@@ -1135,21 +1236,21 @@ Array [
     ],
   ],
   Array [
-    54,
+    52,
     Array [
       "getFloat1",
       "main",
     ],
   ],
   Array [
-    102,
+    100,
     Array [
       "getFloat2",
       "main",
     ],
   ],
   Array [
-    165,
+    163,
     Array [
       "main",
     ],
@@ -1301,13 +1402,13 @@ Object {
   "declarations": Array [
     Object {
       "at": 7,
-      "flags": 0,
+      "flags": 1,
       "symbol": "x",
       "variable": Object {
         "attributes": Array [
           Object {
             "args": undefined,
-            "name": "exported",
+            "name": "export",
           },
         ],
         "identifiers": Array [],
@@ -1321,7 +1422,7 @@ Object {
       },
     },
     Object {
-      "at": 28,
+      "at": 26,
       "flags": 0,
       "symbol": "y",
       "variable": Object {
@@ -1337,7 +1438,7 @@ Object {
       },
     },
     Object {
-      "at": 46,
+      "at": 44,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -1360,12 +1461,12 @@ Object {
           "name": "i32",
         },
       },
-      "at": 70,
+      "at": 68,
       "flags": 0,
       "symbol": "integer",
     },
     Object {
-      "at": 96,
+      "at": 94,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -1380,13 +1481,13 @@ Object {
       "symbol": "b",
     },
     Object {
-      "at": 127,
-      "flags": 0,
+      "at": 125,
+      "flags": 1,
       "struct": Object {
         "attributes": Array [
           Object {
             "args": undefined,
-            "name": "exported",
+            "name": "export",
           },
         ],
         "members": Array [
@@ -1422,7 +1523,7 @@ Object {
       "symbol": "light",
     },
     Object {
-      "at": 222,
+      "at": 218,
       "constant": Object {
         "attributes": undefined,
         "identifiers": Array [],
@@ -1455,7 +1556,7 @@ Object {
       "symbol": "QUAD",
     },
     Object {
-      "at": 401,
+      "at": 397,
       "flags": 6,
       "func": Object {
         "attributes": Array [
@@ -1481,7 +1582,7 @@ Object {
       "symbol": "getInt",
     },
     Object {
-      "at": 446,
+      "at": 442,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -1504,7 +1605,70 @@ Object {
   ],
   "exports": Array [
     Object {
-      "at": 446,
+      "at": 7,
+      "flags": 1,
+      "symbol": "x",
+      "variable": Object {
+        "attributes": Array [
+          Object {
+            "args": undefined,
+            "name": "export",
+          },
+        ],
+        "identifiers": Array [],
+        "name": "x",
+        "qual": undefined,
+        "type": Object {
+          "args": undefined,
+          "name": "f32",
+        },
+        "value": undefined,
+      },
+    },
+    Object {
+      "at": 125,
+      "flags": 1,
+      "struct": Object {
+        "attributes": Array [
+          Object {
+            "args": undefined,
+            "name": "export",
+          },
+        ],
+        "members": Array [
+          Object {
+            "attributes": undefined,
+            "name": "intensity",
+            "type": Object {
+              "args": undefined,
+              "name": "f32",
+            },
+          },
+          Object {
+            "attributes": Array [
+              Object {
+                "args": undefined,
+                "name": "annotate",
+              },
+            ],
+            "name": "position",
+            "type": Object {
+              "args": Array [
+                Object {
+                  "args": undefined,
+                  "name": "f32",
+                },
+              ],
+              "name": "vec3",
+            },
+          },
+        ],
+        "name": "light",
+      },
+      "symbol": "light",
+    },
+    Object {
+      "at": 442,
       "flags": 1,
       "func": Object {
         "attributes": Array [
@@ -1527,7 +1691,7 @@ Object {
   ],
   "externals": Array [
     Object {
-      "at": 401,
+      "at": 397,
       "flags": 6,
       "func": Object {
         "attributes": Array [
@@ -1570,6 +1734,8 @@ Object {
     "main",
   ],
   "visibles": Array [
+    "x",
+    "light",
     "main",
   ],
 }
@@ -2720,7 +2886,6 @@ Object {
         ],
         "identifiers": Array [
           "ViewUniforms",
-          "ViewUniforms",
         ],
         "name": "viewUniforms",
         "qual": "<uniform>",
@@ -3058,7 +3223,6 @@ Object {
           },
         ],
         "identifiers": Array [
-          "ViewUniforms",
           "ViewUniforms",
         ],
         "name": "viewUniforms",

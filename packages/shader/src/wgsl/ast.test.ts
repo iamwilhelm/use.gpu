@@ -130,13 +130,13 @@ describe('ast', () => {
 
   it('gets symbol table', () => {
     const code = `
-      @exported var x: f32;
+      @export var x: f32;
       var y: f32;
       const a: i32 = 3;
       type integer = i32;
       override b: i32;
 
-      @exported struct light {
+      @export struct light {
         intensity: f32,
         @annotate position: vec3<f32>,
       }
@@ -162,7 +162,7 @@ describe('ast', () => {
 
   it('gets shake table', () => {
     const code = `
-      @exported var x: f32;
+      @export var x: f32;
       var y: f32;
 
       @optional @link fn getFloat1() -> f32 {}
@@ -272,6 +272,30 @@ describe('ast', () => {
 
     const symbolTable = getSymbolTable();
     expect(symbolTable).toMatchSnapshot();
+  });
+  
+  it('filters out noisy comments', () => {
+    const code = `
+      use /* wat */ 'use/types'::{SolidVertex};
+
+      @link /* wat */ var x: f32;
+      @link var y: /* wat */ f32;
+
+      fn getValue(index: /* wat */ i32) -> f32;
+      fn main() -> /* wat */ vec3<f32> {
+        let x = /* wat */ 3.0;
+        let y /* wat */ = getValue(2); // wat
+        // wat
+        let v: vec3<f32> /* wat */ = vec3<f32>(x, y, 0.0);
+        return v.xyz;
+      }
+    `;
+
+    const tree = parseShader(code);
+    const {getDeclarations} = makeGuardedParser(code, tree);
+
+    const declarations = getDeclarations();
+    expect(declarations).toMatchSnapshot();
   });
   
   it('rewrites code using the AST', () => {

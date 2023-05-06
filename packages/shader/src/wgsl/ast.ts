@@ -67,11 +67,13 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     );
   }
 
+  const skipComments = (nodes: SyntaxNode[]) => nodes.filter(n => n.type.name !== 'Comment');
+
   const getNodes = (node: SyntaxNode, min?: number) => {
     const nodes = getChildNodes(node);
     for (const n of nodes) if (node.type.isError) throwError('error', node);
     if (min != null && nodes.length < min) throwError(`not enough tokens (${min})`, node);
-    return nodes;
+    return skipComments(nodes);
   }
 
   const getText = (node: SyntaxNode | TreeCursor) => {
@@ -178,7 +180,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
 
   const getFunction = (node: SyntaxNode): FunctionRef => {
-    const [a, b, c] = getNodes(node, 3);
+    const [a, b, c] = getNodes(node, 2);
 
     const attributes = getAttributes(a);
     const header = getFunctionHeader(b);
@@ -187,7 +189,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const {name, type, parameters} = header;
 
     const exclude = parameters ? parameters.map(p => (p as any).name) : undefined;
-    const identifiers = getIdentifiers(c, name, exclude);
+    const identifiers = c ? getIdentifiers(c, name, exclude) : NO_STRINGS;
 
     return {name, type, attributes, parameters, identifiers, inferred};
   };
@@ -224,7 +226,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const {name, type, qual} = getVariableDeclaration(b);
     const value = hasValue ? getText(c) : undefined; 
 
-    const identifiers = hasValue ? getIdentifiers(c, name) : NO_STRINGS;
+    const identifiers = hasValue ? getIdentifiers(c, name) : [];
     if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
 
     return {name, type, attributes, value, identifiers, qual};
@@ -241,7 +243,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const {name, type} = getVariableIdentifier(c);
     const value = hasValue ? getText(d) : undefined; 
 
-    const identifiers = hasValue ? getIdentifiers(d, name) : NO_STRINGS;
+    const identifiers = hasValue ? getIdentifiers(d, name) : [];
     if (!WGSL_NATIVE_TYPES.has(type.name)) identifiers.push(type.name);
 
     return {name, type, attributes, value, identifiers};

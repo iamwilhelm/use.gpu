@@ -297,6 +297,7 @@ Program                                                     ⮐ fn main() {⮐  
           Assign                                            =
           Value                                             1
             IntLiteral                                      1
+        Comment                                             /*⮐     /*⮐     let y: i32 = 2;⮐     */⮐   if (x) { if (y) { } else { } }⮐   */
         Statement                                           wat();
           Identifier                                        wat
 `;
@@ -512,9 +513,10 @@ Program                                                     ⮐ var foo;⮐ // v
         Keyword                                             var
         VariableIdentifier                                  foo
           Identifier                                        foo
+  AttributeList                                             
   LocalDeclaration                                          ⮐ // var foo;⮐ var foo;
     GlobalVariableDeclaration                               ⮐ // var foo;⮐ var foo
-      AttributeList                                         
+      Comment                                               // var foo;
       VariableDeclaration                                   var foo
         Keyword                                             var
         VariableIdentifier                                  foo

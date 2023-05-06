@@ -1,6 +1,7 @@
 0.8.3
 - `@use-gpu/app`: Add binary file histogram example
 - `@use-gpu/inspect`: Syntax highlighting in shader view
+- `@use-gpu/shader`: Make WGSL grammar suitable for syntax highlighting
 - `@use-gpu/shader`: `vec#<u8>` and `vec#<u16>` storage polyfill
 - `@use-gpu/workbench`: Consistent pipeline options (depth, side, blend) for layers
 

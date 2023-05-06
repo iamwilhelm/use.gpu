@@ -1,5 +1,7 @@
+@dialects { concrete, abstract }
+
 @top Program { unit }
-@skip { space | comment }
+@skip { space | Comment }
 @external tokens untilEOLToken from "./tokens" { untilEOL }
 @external tokens untilCommentCloseToken from "./tokens" { untilCommentClose }
 
@@ -11,7 +13,7 @@ t<term> { @specialize[@name='Type']<Identifier, term> }
 d<term> { @specialize[@name='Directive']<Identifier, term> }
 r<term> { @specialize[@name='Reserved']<Identifier, term> }
 
-comment { commentLine untilEOL | commentOpen untilCommentClose }
+Comment { commentLine untilEOL | commentOpen untilCommentClose }
 template<content> { '<' content '>' }
 
 globalDirective {
@@ -61,7 +63,7 @@ StructDeclaration { AttributeList k<'struct'> Identifier StructBodyDeclaration }
 StructBodyDeclaration { '{' ((StructMember comma)* StructMember comma?)? '}' }
 StructMember { AttributeList variableIdentifierDeclaration }
 
-FunctionDeclaration { AttributeList FunctionHeader CompoundStatement }
+FunctionDeclaration { AttributeList FunctionHeader CompoundStatement? }
 FunctionHeader { k<'fn'> Identifier '(' ParamList ')' ReturnType }
 ReturnType { (arrow AttributeList TypeDeclaration)? }
 

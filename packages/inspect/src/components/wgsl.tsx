@@ -56,6 +56,7 @@ const parserWithMetadata = parser.configure({
       '>': t.operator,
       "ReturnType": t.operator,
 
+      "Comment": t.comment,
       "FunctionHeader/Identifier": t.macroName,
       "FunctionCall/Identifier": t.macroName,
 

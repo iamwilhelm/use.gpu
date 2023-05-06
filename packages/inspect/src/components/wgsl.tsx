@@ -19,7 +19,7 @@ export type WGSLProps = {
 const parserWithMetadata = parser.configure({
   props: [
     styleTags({
-      assign: t.operator,
+      Assign: t.operator,
       AddAssign: t.operator,
       SubAssign: t.operator,
       MulAssign: t.operator,
@@ -57,6 +57,8 @@ const parserWithMetadata = parser.configure({
       "ReturnType": t.operator,
 
       "FunctionHeader/Identifier": t.macroName,
+      "FunctionCall/Identifier": t.macroName,
+
       "Keyword": t.keyword,
       "Type": t.typeName,
       "TypeDeclaration": t.typeName,
@@ -67,8 +69,8 @@ const parserWithMetadata = parser.configure({
       "UintLiteral": t.number,
       "FloatLiteral": t.number,
       "String": t.string,
-      "true": t.bool,
-      "false": t.bool,
+      "true": t.number,
+      "false": t.number,
       //Boolean: t.bool,
       //String: t.string,
       //LineComment: t.lineComment,
@@ -85,7 +87,7 @@ const parserWithMetadata = parser.configure({
   ]
 });
 
-const myTheme = createTheme({
+const colorTheme = createTheme({
   theme: 'dark',
   settings: {
     background: '#000000',
@@ -100,12 +102,12 @@ const myTheme = createTheme({
   styles: [
     { tag: t.comment, color: '#7377ffff' },
     { tag: t.keyword, color: '#5c8dffff' },
-    { tag: t.number, color: '#73d3ffff' },
+    { tag: t.number, color: '#73d3ffff', 'fontWeight': 'bold' },
     { tag: t.string, color: '#73d3ffff' },
     { tag: t.typeName, color: '#79ffdbff' },
     { tag: t.operator, color: '#60c797ff' },
     { tag: t.attributeName, color: '#73d3ffff' },
-    { tag: t.macroName, color: '#fff7fbff', fontWeight: 'bold' },
+    { tag: t.macroName, color: '#fff7fbff', 'fontWeight': 'bold' },
 
     /*
     { tag: t.parameter, color: '#73d3ffff' },
@@ -116,6 +118,12 @@ const myTheme = createTheme({
     { tag: t.removed, background: '#520000ff' },
     */
   ],
+});
+
+const fontTheme = EditorView.theme({
+  "& .cm-scroller": {
+    fontFamily: 'Fira Code, Menlo, Monaco, Consolas, Bitstream Vera Sans, monospace',
+  },
 });
 
 export function wgslLang() {
@@ -138,7 +146,8 @@ export const WGSL = (props: WGSLProps) => {
       extensions: [
         wgslLang(),
         basicSetup,
-        myTheme,
+        colorTheme,
+        fontTheme,
         keymap.of(defaultKeymap),
       ],
     });

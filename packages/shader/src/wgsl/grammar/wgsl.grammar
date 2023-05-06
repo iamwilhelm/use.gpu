@@ -5,10 +5,10 @@
 
 unit { globalDirective* globalDeclaration* }
 
-k<term> { @specialize[@name={term}]<Identifier, term> }
-t<term> { @specialize[@name={term}]<Identifier, term> }
-d<term> { @specialize[@name={term}]<Identifier, term> }
-r<term> { @specialize[@name={term}]<Identifier, term> }
+k<term> { @specialize[@name='Keyword']<Identifier, term> }
+t<term> { @specialize[@name='Type']<Identifier, term> }
+d<term> { @specialize[@name='Directive']<Identifier, term> }
+r<term> { @specialize[@name='Reserved']<Identifier, term> }
 
 comment { commentLine untilEOL | commentOpen untilCommentClose }
 template<content> { '<' content '>' }
@@ -473,7 +473,6 @@ texelFormat {
 Reserved {
   r<'asm'> |
   r<'bf16'> |
-  r<'const'> |
   r<'do'> |
   r<'enum'> |
   r<'f16'> |

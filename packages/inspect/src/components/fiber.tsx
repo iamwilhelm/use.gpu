@@ -21,6 +21,7 @@ type FiberTreeProps = {
   depthLimit: number,
   runCounts: boolean,
   builtins: boolean,
+  highlight: boolean,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
@@ -36,6 +37,7 @@ type FiberNodeProps = {
   depthLimit?: number,
   runCounts?: boolean,
   builtins?: boolean,
+  highlight?: boolean,
   continuation?: boolean,
   siblings?: boolean,
 }
@@ -158,6 +160,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   depthLimit,
   runCounts,
   builtins,
+  highlight,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -171,6 +174,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
+        highlight={highlight}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -187,6 +191,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   depthLimit = Infinity,
   runCounts = false,
   builtins = false,
+  highlight = true,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -287,8 +292,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       depth={styleDepth}
       runCount={runCounts}
       onClick={select}
-      onMouseEnter={hover}
-      onMouseLeave={unhover}
+      onMouseEnter={highlight ? hover : undefined}
+      onMouseLeave={highlight ? unhover : undefined}
       ref={rowRef}
     />
   ) : null;
@@ -305,6 +310,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
+        highlight={highlight}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
@@ -326,6 +332,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             depthLimit={depthLimit}
             runCounts={runCounts}
             builtins={builtins}
+            highlight={highlight}
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
@@ -377,6 +384,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
+        highlight={highlight}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}

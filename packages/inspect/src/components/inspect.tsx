@@ -40,6 +40,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     counts: false,
     fullSize: false,
     builtins: false,
+    highlight: true,
   });
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
@@ -64,6 +65,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const [runCounts] = useOption<boolean>('counts');
   const [fullSize] = useOption<boolean>('fullSize');
   const [builtins] = useOption<boolean>('builtins');
+  const [highlight] = useOption<boolean>('highlight');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
   useLayoutEffect(() => {
@@ -168,6 +170,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
+        highlight={highlight}
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}

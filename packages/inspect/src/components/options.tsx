@@ -13,6 +13,7 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
   const [runCounts, setRunCounts] = useCursor<boolean>('counts');
   const [fullSize, setFullSize] = useCursor<boolean>('fullSize');
   const [builtins, setBuiltins] = useCursor<boolean>('builtins');
+  const [highlight, setHighlight] = useCursor<boolean>('highlight');
   
   return (
     <OptionsContainer>
@@ -24,6 +25,9 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
       </div>
       <div>
         <label><input type="checkbox" checked={builtins} onChange={(e) => setBuiltins(e.target.checked)} /> Show Builtins</label>
+      </div>
+      <div>
+        <label><input type="checkbox" checked={highlight} onChange={(e) => setHighlight(e.target.checked)} /> Hover Highlight</label>
       </div>
     </OptionsContainer>
   );

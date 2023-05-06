@@ -14,7 +14,7 @@
     "build:wgsl": "ts-node build",
     "build:types": "rm tsconfig.tsbuildinfo; tsc --emitDeclarationOnly",
     "build:js": "MODULE_ENV=cjs babel src/index.ts --out-dir ../../build/ts/wgsl/src --extensions \".ts\"; mkdir -p ../../build/packages/wgsl 2>/dev/null",
-    "build:pkg": "cp README.md package.json ../../build/packages/wgsl && cp -r ../../build/ts/wgsl/* ../../build/packages/wgsl/ && cp -r ../../build/packages/wgsl/src/* ../../build/packages/wgsl && ts-node ../../scripts/src-to-root wgsl && rm -rf ../../build/packages/wgsl/src; NPM_PACKAGE=wgsl ts-node ../../scripts/package-json-ts-to-js wgsl"
+    "build:pkg": "cp README.md package.json ../../build/packages/wgsl && cp -r ../../build/ts/wgsl/* ../../build/packages/wgsl/ && cp -r ../../build/packages/wgsl/src/* ../../build/packages/wgsl && ts-node ../../scripts/src-to-root.ts wgsl && rm -rf ../../build/packages/wgsl/src; NPM_PACKAGE=wgsl ts-node ../../scripts/package-json-ts-to-js.ts wgsl"
   },
   "devDependencies": {
     "glob": "^7.2.0"

@@ -76,6 +76,12 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     return skipComments(nodes);
   }
 
+  const getNodesWithAttributes = (node: SyntaxNode, min?: number): [SyntaxNode | null, ...SyntaxNode[]] => {
+    const nodes = getNodes(node, min) as any;
+    if (nodes[0] && nodes[0].type.id !== T.AttributeList) nodes.unshift(null);
+    return nodes;
+  }
+
   const getText = (node: SyntaxNode | TreeCursor) => {
     if (!node) throwError('text');
     return code.slice(node.from, node.to);
@@ -128,9 +134,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
 
   const getParameter = (node: SyntaxNode): ParameterRef => {
-    const [a, b, c] = getNodes(node, 3);
+    const [a, b, c] = getNodesWithAttributes(node, 3);
 
-    const attributes = getAttributes(a);
+    const attributes = a ? getAttributes(a) : undefined;
     const name = getText(b);
     const type = getType(c);
 
@@ -180,10 +186,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
 
   const getFunction = (node: SyntaxNode): FunctionRef => {
-    let [a, b, c] = getNodes(node, 2);
-
-    const hasAttributes = a.type.id === T.AttributeList;
-    if (!hasAttributes) [a, b, c] = [null as any, a, b];
+    const [a, b, c] = getNodesWithAttributes(node, 2);
 
     const attributes = a ? getAttributes(a) : undefined;
     const header = getFunctionHeader(b);
@@ -222,10 +225,10 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   }
 
   const getVariable = (node: SyntaxNode): VariableRef => {
-    const [a, b,, c] = getNodes(node, 2);
+    const [a, b,, c] = getNodesWithAttributes(node, 2);
     const hasValue = !!c;
 
-    const attributes = getAttributes(a);
+    const attributes = a ? getAttributes(a) : undefined;
     const {name, type, qual} = getVariableDeclaration(b);
     const value = hasValue ? getText(c) : undefined; 
 
@@ -236,11 +239,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
 
   const getConstant = (node: SyntaxNode): VariableRef => {
-    const nodes = getNodes(node, 2);
-    
-    const [a, b, c,, d] = nodes;
-    const hasAttributes = a.type.id === T.AttributeList;
-    const attributes = hasAttributes ? getAttributes(a) : undefined;
+    const [a, b, c,, d] = getNodesWithAttributes(node, 2);
+
+    const attributes = a ? getAttributes(a) : undefined;
 
     const hasValue = !!d;
     const {name, type} = getVariableIdentifier(c);
@@ -253,9 +254,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
   
   const getTypeAlias = (node: SyntaxNode): TypeAliasRef => {
-    const [a,, b,, c] = getNodes(node, 3);
+    const [a,, b,, c] = getNodesWithAttributes(node, 3);
 
-    const attributes = getAttributes(a);
+    const attributes = a ? getAttributes(a) : undefined;
     const name = getText(b);
     const type = c ? getType(c) : {name};
 
@@ -263,21 +264,22 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
 
   const getStructMember = (node: SyntaxNode): StructMemberRef => {
-    const [a, b, c] = getNodes(node, 3);
+    const [a, b, c] = getNodesWithAttributes(node, 3);
 
-    const attributes = getAttributes(a);
+    const attributes = a ? getAttributes(a) : undefined;
     const name = getText(b);
     const type = getType(c);
 
     return {name, type, attributes};
   };
 
-  const getStructMembers = (node: SyntaxNode): StructMemberRef[] => getNodes(node).map(getStructMember);
+  const getStructMembers = (node: SyntaxNode): StructMemberRef[] =>
+    getNodes(node).filter(n => getNodes(n).length).map(getStructMember);
 
   const getStruct = (node: SyntaxNode): StructRef => {
-    const [a,, b, c] = getNodes(node, 3);
+    const [a,, b, c] = getNodesWithAttributes(node, 3);
     
-    const attributes = getAttributes(a);
+    const attributes = a ? getAttributes(a) : undefined;
     const name = getText(b);
     const members = getStructMembers(c);
 

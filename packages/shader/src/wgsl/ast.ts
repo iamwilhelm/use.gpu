@@ -72,7 +72,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   const getNodes = (node: SyntaxNode, min?: number) => {
     const nodes = getChildNodes(node);
     for (const n of nodes) if (node.type.isError) throwError('error', node);
-    if (min != null && nodes.length < min) throwError(`not enough tokens (${min})`, node);
+    if (min != null && nodes.length < min) throwError(`not enough tokens (${nodes.length} / ${min})`, node);
     return skipComments(nodes);
   }
 
@@ -180,9 +180,12 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   };
 
   const getFunction = (node: SyntaxNode): FunctionRef => {
-    const [a, b, c] = getNodes(node, 2);
+    let [a, b, c] = getNodes(node, 2);
 
-    const attributes = getAttributes(a);
+    const hasAttributes = a.type.id === T.AttributeList;
+    if (!hasAttributes) [a, b, c] = [null as any, a, b];
+
+    const attributes = a ? getAttributes(a) : undefined;
     const header = getFunctionHeader(b);
 
     const inferred = getInferred(header);

@@ -274,6 +274,22 @@ describe('ast', () => {
     expect(symbolTable).toMatchSnapshot();
   });
   
+  it('parses comment function', () => {
+    const code = `
+    // Append any X/Y/Z edge that crosses the level set
+    fn appendEdge(id: u32) {
+      let nextEdge = atomicAdd(&indirectDraw.instanceCount, 1u);
+      activeEdges[nextEdge] = id;
+    }
+    `;
+
+    const tree = parseShader(code);
+    const {getDeclarations} = makeGuardedParser(code, tree);
+
+    const declarations = getDeclarations();
+    expect(declarations).toMatchSnapshot();
+  });
+
   it('filters out noisy comments', () => {
     const code = `
       use /* wat */ 'use/types'::{SolidVertex};

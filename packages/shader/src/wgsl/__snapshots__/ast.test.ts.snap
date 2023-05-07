@@ -3564,6 +3564,42 @@ Object {
 }
 `;
 
+exports[`ast parses comment function 1`] = `
+Array [
+  Object {
+    "at": 0,
+    "flags": 0,
+    "func": Object {
+      "attributes": null,
+      "identifiers": Array [
+        "nextEdge",
+        "atomicAdd",
+        "indirectDraw",
+        "instanceCount",
+        "activeEdges",
+      ],
+      "inferred": undefined,
+      "name": "appendEdge",
+      "parameters": Array [
+        Object {
+          "attributes": undefined,
+          "name": "id",
+          "type": Object {
+            "args": undefined,
+            "name": "u32",
+          },
+        },
+      ],
+      "type": Object {
+        "attributes": undefined,
+        "name": "void",
+      },
+    },
+    "symbol": "appendEdge",
+  },
+]
+`;
+
 exports[`ast rewrites a lot of code using the compressed AST 1`] = `
 Array [
   Array [

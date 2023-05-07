@@ -12,3 +12,4 @@ test/import/yarn.lock
 packages/glyph/pkg
 scripts/fetch-tiles.mjs
 .env.local
+.npmrc

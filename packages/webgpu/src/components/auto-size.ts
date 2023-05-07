@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import { useResource, useState } from '@use-gpu/live';
+import { useOne, useResource, useState } from '@use-gpu/live';
 
 export type AutoSizeProps = {
   canvas: HTMLCanvasElement,
@@ -9,10 +9,10 @@ export type AutoSizeProps = {
 
 const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number, number] => {
   const pixelRatio = window?.devicePixelRatio ?? 1;
-  const {parentNode} = canvas;
-  if (parentNode) {
-    const {offsetWidth, offsetHeight} = parentNode as any;
-    return [pixelRatio * offsetWidth, pixelRatio * offsetHeight, pixelRatio];
+  const {parentElement} = canvas;
+  if (parentElement) {
+    const {offsetWidth, offsetHeight} = parentElement;
+    return [offsetWidth, offsetHeight, pixelRatio];
   }
   return [pixelRatio * window.innerWidth, pixelRatio * window.innerHeight, pixelRatio];
 }
@@ -29,14 +29,14 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props) => {
   }, [canvas]);
  
   const [[width, height, pixelRatio], setSize] = useState(() => getCanvasSize(window, canvas));
-  if (canvas.width  !==  width) {
-    canvas.width  = width;
-    canvas.style.width = `${width / pixelRatio}px`;
-  }
-  if (canvas.height !== height) {
-    canvas.height = height;
-    canvas.style.height = `${height / pixelRatio}px`;
-  }
+
+  const w = Math.round(width * pixelRatio);
+  const h = Math.round(height * pixelRatio);
+
+  useOne(() => canvas.width = w, w);
+  useOne(() => canvas.height = h, h);
+  useOne(() => canvas.style.width = `${Math.round(width)}px`, width);
+  useOne(() => canvas.style.height = `${Math.round(height)}px`, height);
 
   useResource((dispose) => {
     const resize = () => setSize(getCanvasSize(window, canvas));

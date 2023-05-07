@@ -7,10 +7,8 @@ import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { LRLanguage, LanguageSupport } from "@codemirror/language";
 import { createTheme } from '@uiw/codemirror-themes';
 
-
 import { parser } from '@use-gpu/shader/wgsl';
-import { foldNodeProp, foldInside, indentNodeProp } from "@codemirror/language";
-import { styleTags, tags as t} from "@lezer/highlight";
+import { styleTags, tags as t } from "@lezer/highlight";
 
 export type WGSLProps = {
   code: string,
@@ -72,19 +70,7 @@ const parserWithMetadata = parser.configure({
       "String": t.string,
       "true": t.number,
       "false": t.number,
-      //Boolean: t.bool,
-      //String: t.string,
-      //LineComment: t.lineComment,
-      //"( )": t.paren
     }),
-    /*
-    indentNodeProp.add({
-      Application: context => context.column(context.node.from) + context.unit
-    }),
-    foldNodeProp.add({
-      Application: foldInside
-    })
-    */
   ]
 });
 
@@ -109,15 +95,6 @@ const colorTheme = createTheme({
     { tag: t.operator, color: '#60c797ff' },
     { tag: t.attributeName, color: '#73d3ffff' },
     { tag: t.macroName, color: '#fff7fbff', 'fontWeight': 'bold' },
-
-    /*
-    { tag: t.parameter, color: '#73d3ffff' },
-    { tag: t.argment, color: '#6d7080ff' },
-    
-    { tag: t.added, color: '#ffffff', background: '#0f4808ff' },
-    { tag: t.changed, background: '#5d5900ff' },
-    { tag: t.removed, background: '#520000ff' },
-    */
   ],
 });
 
@@ -164,22 +141,4 @@ export const WGSL = (props: WGSLProps) => {
   }, []);
 
   return <div ref={editor}></div>;
-
-  /*
-  const lines = code.split("\n");
-
-  const rows = lines.map((l, i) => <span key={i.toString()}>{l}<br /></span>);
-  const indices = lines.map((_, i) => <div key={i.toString()}>{i + 1}</div>);
-
-  const gutterWidth = Math.ceil(Math.log10(lines.length)) * 14;
-
-  return (<StyledEditor>
-    <StyledGutter style={{width: gutterWidth}}>
-      {indices}
-    </StyledGutter>
-    <StyledCode>
-      {rows}
-    </StyledCode>
-  </StyledEditor>)
-  */
 };

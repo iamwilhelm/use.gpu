@@ -48,13 +48,8 @@ fn trimAnchor(
   var arrowLength = getArrowSize(maxLength, width, size, both, w, depth) * ARROW_ASPECT;
 
   if (distanceStart >= 0.0 && distanceStart < arrowLength) {
-    if (distanceEnd >= 0.0 && distanceEnd < arrowLength) {
-      return vec4<f32>(0.0, 0.0, 0.0, 0.0);
-    }
-    else {
-      let ratio = (arrowLength - distanceStart) / (distanceEnd - distanceStart);
-      return vec4<f32>(mix(center, after, ratio), 1.0);
-    }
+    let ratio = (arrowLength - distanceStart) / (distanceEnd - distanceStart);
+    return vec4<f32>(mix(center, after, ratio), 1.0);
   }
 
   return vec4<f32>(center, 1.0);
@@ -140,21 +135,8 @@ fn trimAnchor(
       var end = worldToClip(endPos);
       if (end.w > 0.0) {
         var nextPos = getPosition(trim.y - 1u);
-        if (centerPos.w != 0.0) {
-          centerPos = trimAnchor(maxLength, endPos.xyz, nextPos.xyz, centerPos.xyz, beforePos.xyz, width, size, both, end.w, depth);
-        }
+        centerPos = trimAnchor(maxLength, endPos.xyz, nextPos.xyz, centerPos.xyz, beforePos.xyz, width, size, both, end.w, depth);
       }
-    }
-    
-    if (centerPos.w == 0.0) {
-      return SolidVertex(
-        vec4<f32>(0.0),
-        vec4<f32>(0.0),
-        vec4<f32>(0.0),
-        vec4<f32>(0.0),
-        vec4<f32>(0.0),
-        0u,
-      );
     }
   }
 

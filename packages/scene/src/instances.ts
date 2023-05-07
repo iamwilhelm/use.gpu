@@ -117,7 +117,7 @@ const makeInstance = (
     mat3.normalFromMat4(normalMatrix, matrix);
 
     updateInstance({matrix, normalMatrix});
-  }, [p, s, q, r, m]);
+  }, props);
 
   return null;
 }, 'Instance');

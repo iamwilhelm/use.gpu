@@ -5,8 +5,6 @@ import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
 import { LoopContext } from '../providers/loop-provider';
 
-const NOP = () => {};
-
 export type LoopProps = {
   live?: boolean,
   children?: LiveElement,
@@ -56,6 +54,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     const render = (timestamp: number) => {
       ref.frame++;
       pending = false;
+      if (running) request();
 
       if (time.timestamp === -Infinity) time.start = timestamp;
       else time.delta = timestamp - time.timestamp;
@@ -63,12 +62,11 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
       time.elapsed = timestamp - time.start;
       time.timestamp = timestamp;
 
-      for (const fiber of fibers) fiber.host?.schedule(fiber, NOP);
+      for (const fiber of fibers) fiber.host?.schedule(fiber);
       fibers.length = 0;
 
       const {run} = ref;
       if (run) run();
-      if (running) request();
     };
 
     const request = (fiber?: LiveFiber<any>) => {

@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
-import { extend, useMemo, useOne } from '@use-gpu/live';
+import { use, extend, useMemo, useOne, tagFunction } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
@@ -123,35 +123,51 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     children,
   } = props;
 
-  const {
-    timestamp,
-    elapsed,
-    delta,
-  } = useTimeContext();
-
   const script = useMemo(() => (
     tracks ??
     ((keyframes && prop) ? {[prop]: keyframes} : null)
   ), [tracks, keyframes, prop]);
   if (!script) return null;
 
-  const started = useOne(() => elapsed, script);
-  const d = useMemo(() => {
+  const startedRef = useOne(() => ({current: -1}), script);
+  const length = useMemo(() => {
     if (duration) return duration;
     const tracks = Array.from(Object.values(script));
     return tracks.reduce((length, keyframes) => Math.max(length, keyframes[keyframes.length - 1][0]), 0)
   }, [script, duration]);
 
-  let time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
-  let [t, max] = getLoopedTime(time, d, pause, repeat, mirror);
+  const Run = useMemo(() => {
+    let props1 = mapValues(script, () => null);
+    let props2 = mapValues(script, () => null);
+    let flip = false;
 
-  const values = mapValues(script, (keyframes: Keyframe<T>[]) => evaluateKeyframes(keyframes, t, ease));
+    return tagFunction(() => {
+      const {
+        timestamp,
+        elapsed,
+        delta,
+      } = useTimeContext();
 
-  if (time < max) useAnimationFrame();
-  else useNoAnimationFrame();
+      let {current: started} = startedRef;
+      if (started < 0) started = startedRef.current = elapsed;
 
-  if (render) return tracks ? render(values) : (prop ? render(values[prop]) : null);
-  if (children) return extend(children, values);
+      flip = !flip;
+      const props = flip ? props1 : props2;
 
-  return children ?? null;
+      let time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
+      let [t, max] = getLoopedTime(time, length, pause, repeat, mirror);
+
+      for (let k in props) props[k] = evaluateKeyframes(script[k], t, ease);
+
+      if (time < max) useAnimationFrame();
+      else useNoAnimationFrame();
+
+      if (render) return tracks ? render(props) : (prop ? render(props[prop]) : null);
+      if (children) return extend(children, props);
+
+      return children ?? null;
+    }, 'Run');
+  }, [script, length, render, children]);
+
+  return use(Run);
 };

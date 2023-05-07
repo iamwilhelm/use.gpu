@@ -7,13 +7,14 @@ type Q = {
 };
 
 // Priority queue that maintains fibers in tree order.
-// Allows for quick append at head or tail.
+// Allows for quick append at head or tail, or right after last insertion.
 //
 // The queue is typically short and almost always first-in-first-out.
 export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
-  
+
   let queue: Q | null = null;
   let tail: Q | null = null;
+  let hint: Q | null = null;
 
   const set = new Set<LiveFiber<any>>();
 
@@ -38,10 +39,17 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
       return;
     }
 
+    if (!queue.next) return;
+
     let q = queue;
+    if (hint && compareFibers(hint.f, f) < 0) {
+      q = hint;
+    }
+
     while (q.next) {
       if (compareFibers(q.next.f, f) > 0) {
         q.next = {f, next: q.next};
+        hint = q;
         return;
       }
       q = q.next;
@@ -55,19 +63,24 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
 
     let i = 0;
     if (queue.f === f) {
+      if (hint === queue) hint = hint.next;
+
       queue = queue.next;
       if (!queue) tail = null;
+
       return;
     }
 
     let q = queue;
-    while (q) {
-      if (q.next?.f === f) {
-        q.next = q.next.next;
-        if (q.next == null) tail = q;
+    while (q.next) {
+      const qn = q.next;
+      if (qn.f === f) {
+        if (hint === qn) hint = hint.next;
+        q.next = qn.next;
+        if (!q.next) tail = q;
         return;
       }
-      q = q.next as any;
+      q = q.next;
     }
   }
 
@@ -90,8 +103,11 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     if (!queue) return null;
 
     let q = queue;
-    queue = queue.next;
-    if (queue == null) tail = null;
+    queue = q.next;
+
+    if (!queue) hint = tail = null;
+    else if (hint === q) hint = hint.next;
+
     set.delete(q.f);
 
     return q.f;

@@ -1201,7 +1201,7 @@ export const bustFiberDeps = <F extends ArrowFunction>(
 ) => {
   // Bust far caches
   const {host} = fiber;
-  if (host) for (let sub of host.traceDown(fiber)) {
+  if (host) for (const sub of host.traceDown(fiber)) {
     const LOG = LOGGING.fiber;
     LOG && console.log('Invalidating Node', formatNode(sub));
 

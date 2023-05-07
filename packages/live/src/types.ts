@@ -176,7 +176,7 @@ export type FiberQueue = {
 // Live host interface
 export type HostInterface = {
   // Schedule a task on next flush
-  schedule: (fiber: LiveFiber<any>, task: Task) => void,
+  schedule: (fiber: LiveFiber<any>, task?: Task) => void,
   flush: () => void,
 
   // Track a future cleanup on a fiber

@@ -15,7 +15,7 @@ export const makeActionScheduler = (
 
   let pending = false;
 
-  const schedule = (fiber: LiveFiber<any>, task: Task) => {
+  const schedule = (fiber: LiveFiber<any>, task?: Task) => {
     queue.push({fiber, task});
     if (!pending) {
       pending = true;
@@ -30,7 +30,7 @@ export const makeActionScheduler = (
     queue.length = 0;
     pending = false;
 
-    for (const {task} of q) task();
+    for (const {task} of q) if (task) task();
     onFlush(q);
   };
 

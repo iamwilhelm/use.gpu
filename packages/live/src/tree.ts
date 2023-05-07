@@ -111,7 +111,7 @@ export const renderWithDispatch = (
     };
 
     // Make new root
-    ({fiber, host} = makeHostFiber(node, options, dispatch ?? setTimeout, flush));
+    ({fiber, host} = makeHostFiber(node, options, dispatch ?? queueMicrotask, flush));
 
     host.__stats.mounts++;
   }

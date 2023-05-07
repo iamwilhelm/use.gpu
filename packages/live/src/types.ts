@@ -69,7 +69,7 @@ export enum Hook {
 export type Task = () => void;
 export type Action = {
   fiber: LiveFiber<any>,
-  task: Task,
+  task?: Task,
 };
 export type Dispatcher = (as: Action[]) => void;
 

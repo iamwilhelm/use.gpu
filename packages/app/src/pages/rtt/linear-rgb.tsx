@@ -20,7 +20,7 @@ export const RTTLinearRGBPage: LC = () => {
     <LinearRGB>
       <Cursor cursor='move' />
       <Camera>
-        <Pass>
+        <Pass picking>
           <Pick
             render={({id, hovered, presses}) => [
               <RawMesh texture={texture} mesh={mesh} blink={presses.left} />,

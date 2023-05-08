@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/shader",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -20,9 +20,10 @@
   "scripts": {
     "build": "yarn run build:grammar && yarn run build:pkg",
     "build:pkg": "NPM_PACKAGE=shader ../../scripts/build-mjs-cjs.sh",
-    "build:grammar": "yarn run build:grammar:glsl && yarn run build:grammar:wgsl",
+    "build:grammar": "yarn run build:grammar:glsl && yarn run build:grammar:wgsl && yarn run build:grammar:wgsl-highlight",
     "build:grammar:glsl": "yarn run lezer-generator src/glsl/grammar/glsl.grammar -o src/glsl/grammar/glsl.js",
     "build:grammar:wgsl": "yarn run lezer-generator src/wgsl/grammar/wgsl.grammar -o src/wgsl/grammar/wgsl.js",
+    "build:grammar:wgsl-highlight": "ts-node build.ts; yarn run lezer-generator src/wgsl/highlight/wgsl.grammar -o src/wgsl/highlight/wgsl.js",
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",

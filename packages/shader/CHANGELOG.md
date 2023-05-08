@@ -1,3 +1,7 @@
+0.8.x
+- `vec#<u8>` and `vec#<u16>` polyfill
+- export concrete lezer parser for syntax highlighting
+
 0.7.0
 - WGSL grammar: change global `let` to `const`
 - WGSL grammar: add optional parentheses in `if`, `switch`, ...

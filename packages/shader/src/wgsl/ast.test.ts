@@ -294,6 +294,11 @@ describe('ast', () => {
     const code = `
       use /* wat */ 'use/types'::{SolidVertex};
 
+      // wat
+      struct Foo {
+        bar: u32,
+      };
+
       @link /* wat */ var x: f32;
       @link var y: /* wat */ f32;
 
@@ -313,6 +318,28 @@ describe('ast', () => {
     const declarations = getDeclarations();
     expect(declarations).toMatchSnapshot();
   });
+  
+  fit('parses around comment lines with @attributes', () => {
+    const code = `
+use '@use-gpu/wgsl/use/types'::{ LightVertex };
+
+@link fn getVertex(i: u32) -> LightVertex {};
+//@optional @link fn toColorSpace(c: vec4<f32>) -> vec4<f32> { return c; }
+
+struct VertexOutput {
+  @builtin(position) position: vec4<f32>,
+  @location(0) @interpolate(flat) lightIndex: u32,
+};
+    `;
+    
+    const tree = parseShader(code);
+    const rename = new Map<string, string>();
+    rename.set('VertexOutput', 'VertexT');
+    
+    const output = rewriteUsingAST(code, tree, rename);
+    expect(output).toMatchSnapshot();
+    
+  })
   
   it('rewrites code using the AST', () => {
     const code = `

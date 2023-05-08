@@ -3,7 +3,26 @@
 exports[`ast filters out noisy comments 1`] = `
 Array [
   Object {
-    "at": 56,
+    "at": 48,
+    "flags": 0,
+    "struct": Object {
+      "attributes": undefined,
+      "members": Array [
+        Object {
+          "attributes": undefined,
+          "name": "bar",
+          "type": Object {
+            "args": undefined,
+            "name": "u32",
+          },
+        },
+      ],
+      "name": "Foo",
+    },
+    "symbol": "Foo",
+  },
+  Object {
+    "at": 116,
     "flags": 2,
     "symbol": "x",
     "variable": Object {
@@ -24,7 +43,7 @@ Array [
     },
   },
   Object {
-    "at": 90,
+    "at": 150,
     "flags": 2,
     "symbol": "y",
     "variable": Object {
@@ -45,7 +64,7 @@ Array [
     },
   },
   Object {
-    "at": 117,
+    "at": 177,
     "flags": 0,
     "func": Object {
       "attributes": undefined,
@@ -71,7 +90,7 @@ Array [
     "symbol": "getValue",
   },
   Object {
-    "at": 166,
+    "at": 226,
     "flags": 1,
     "func": Object {
       "attributes": undefined,
@@ -3564,13 +3583,24 @@ Object {
 }
 `;
 
+exports[`ast parses around comment lines with @attributes 1`] = `
+"
+//@optional @link fn toColorSpace(c: vec4<f32>) -> vec4<f32> { return c; }
+
+struct VertexT {
+  @builtin(position) position: vec4<f32>,
+  @location(0) @interpolate(flat) lightIndex: u32,
+};
+    "
+`;
+
 exports[`ast parses comment function 1`] = `
 Array [
   Object {
     "at": 0,
     "flags": 0,
     "func": Object {
-      "attributes": null,
+      "attributes": undefined,
       "identifiers": Array [
         "nextEdge",
         "atomicAdd",

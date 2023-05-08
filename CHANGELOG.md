@@ -1,3 +1,6 @@
+0.8.4
+- `@use-gpu/shader`: Use abstract grammar w/o comments internally, concrete grammar externally, to avoid lezer bugs.
+
 0.8.3
 - `@use-gpu/app`: Add binary file histogram example
 - `@use-gpu/inspect`: Syntax highlighting in shader view

@@ -66,13 +66,6 @@ const LINE_JOIN_STYLE = {
   'round': 2,
 } as Record<string, number>;
 
-const PIPELINE = {
-  primitive: {
-    topology: 'triangle-strip',
-    stripIndexFormat: 'uint16',
-  },
-} as DeepPartial<GPURenderPipelineDescriptor>;
-
 export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps) => {
   const {
     mode = 'opaque',

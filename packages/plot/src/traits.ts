@@ -165,17 +165,15 @@ const POINT_DEFAULTS = {
 };
 
 const ROP_TRAIT = {
-  blending: parseBlending,
-  zWrite:   parseBoolean,
-  zTest:    parseBoolean,
-  zBias:    parseNumber,
-  zIndex:   parseInteger,
+  alphaToCoverage: optional(parseBoolean),
+  blend:           optional(parseBlending),
+  depthWrite:      optional(parseBoolean),
+  depthTest:       optional(parseBoolean),
+  zBias:           parseNumber,
+  zIndex:          parseInteger,
 };
 
 const ROP_DEFAULTS = {
-  blending: 'normal',
-  zWrite: true,
-  zTest: true,
   zBias: 0,
   zIndex: 0,
 };

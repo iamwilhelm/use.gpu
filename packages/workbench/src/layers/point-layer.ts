@@ -100,8 +100,8 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     rectangles,
     masks: boundMask,
 
-    alphaToCoverage: true,
     ...rest,
+    alphaToCoverage: rest.alphaToCoverage ?? true,
 
     count,
     mode,

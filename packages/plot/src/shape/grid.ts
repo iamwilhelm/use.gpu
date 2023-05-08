@@ -59,7 +59,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const {width, depth, join, loop} = useLineTrait(props);
 
   const color = useColorTrait(props);
-  const {zBias} = useROPTrait(props);
+  const rop = useROPTrait(props);
 
   const first = useScaleTrait(props.first ?? NO_SCALE_PROPS);
   const second = useScaleTrait(props.second ?? NO_SCALE_PROPS);
@@ -157,7 +157,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
       width,
       depth,
       join,
-      zBias,
+      ...rop,
     }) : null,
     props.second !== null ? use(LineLayer, {
       positions: secondPositions,
@@ -167,7 +167,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
       width,
       depth,
       join,
-      zBias,
+      ...rop,
     }) : null,
   ];
 

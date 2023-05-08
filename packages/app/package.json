@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/app",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",

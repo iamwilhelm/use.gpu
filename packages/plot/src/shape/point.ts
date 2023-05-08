@@ -45,6 +45,8 @@ export const Point: LiveComponent<PointProps> = (props) => {
       colors,
       sizes,
       depths,
+      
+      ...rop,
     })
   );
 };

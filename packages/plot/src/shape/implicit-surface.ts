@@ -34,7 +34,7 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = (props: Impl
   } = props;
   const {loopX, loopY, loopZ, shaded} = useVolumeTrait(props);
   const color = useColorTrait(props);
-  const {zBias} = useROPTrait(props);
+  const rop = useROPTrait(props);
 
   let normals = props.normals;
 
@@ -51,7 +51,7 @@ export const ImplicitSurface: LiveComponent<ImplicitSurfaceProps> = (props: Impl
       loopY,
       loopZ,
       shaded,
-      zBias,
+      ...rop,
     })
   );
 };

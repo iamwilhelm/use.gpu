@@ -94,6 +94,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const [pipeline, defs] = usePipelineOptions({
     mode,
     topology: 'triangle-strip',
+    stripIndexFormat: 'uint16',
     side: 'both',
     alphaToCoverage,
     depthTest,

@@ -44,7 +44,7 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
   const {size, start, end, detail} = useArrowTrait(props);
   const {width, depth, join} = useLineTrait(props);
   const color = useColorTrait(props);
-  const {zBias} = useROPTrait(props);
+  const rop = useROPTrait(props);
 
   const detailExpr = useOne(() => () => ((positions as any)?.size?.[0] || 1) - 1, positions);
   const countExpr = useOne(() => () => ((positions as any)?.length || 0) * (+start + +end) / 2, positions);
@@ -69,12 +69,12 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
       depth,
       join,
       detail,
-      zBias,
 
       colors,
       widths,
       depths,
-      
+
+      ...rop,
       count: countExpr,
     })
   );

@@ -71,6 +71,7 @@ export const Label: LiveComponent<LabelProps> = (props) => {
       color,
       expand,
       flip,
+      ...rop,
     })
   );
 };

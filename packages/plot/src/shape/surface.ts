@@ -37,6 +37,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
       loopX,
       loopY,
       shaded,
+      ...rop,
     })
   );
 };

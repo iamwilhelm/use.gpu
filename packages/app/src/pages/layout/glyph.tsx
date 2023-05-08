@@ -23,7 +23,7 @@ import {
 
 const SIZE = 64;
 const DETAIL = 64;
-const ZBIAS_DATA = 2;
+const ZBIAS_DATA = 4;
 const ZBIAS_GRID = 1;
 const BACKGROUND = [0, 0, 0.09, 1];
 
@@ -38,7 +38,7 @@ export const LayoutGlyphPage: LC = () => {
       hasContours
       hasRelax
       has3D
-      render={({subpixel, contours, preprocess, postprocess, glyph, orbit}) =>       
+      render={({subpixel, contours, preprocess, postprocess, glyph, orbit}) =>
         orbit
         ? [
           <Morph>

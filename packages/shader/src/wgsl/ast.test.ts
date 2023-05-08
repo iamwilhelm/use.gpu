@@ -319,7 +319,7 @@ describe('ast', () => {
     expect(declarations).toMatchSnapshot();
   });
   
-  fit('parses around comment lines with @attributes', () => {
+  it('parses around comment lines with @attributes', () => {
     const code = `
 use '@use-gpu/wgsl/use/types'::{ LightVertex };
 

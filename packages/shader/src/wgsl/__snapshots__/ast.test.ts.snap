@@ -68,7 +68,7 @@ Array [
     "flags": 0,
     "func": Object {
       "attributes": undefined,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": undefined,
       "name": "getValue",
       "parameters": Array [

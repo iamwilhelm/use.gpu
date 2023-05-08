@@ -8,7 +8,7 @@ type TreeIndentProps = { indent?: number };
 
 export const Button = styled('button', {
   border: 0,
-  padding: '10px 20px',
+  padding: '10px 15px',
   background: 'var(--LiveInspect-backgroundInactive)',
   color: 'var(--LiveInspect-colorText)',
   '&:active': {
@@ -51,7 +51,9 @@ export const InspectContainer = styled('div', {
 });
 
 export const OptionsContainer = styled('div', {
-  margin: '8px 0',
+  display: 'flex',
+  flexShrink: 0,
+  alignItems: 'center',
 });
 
 export const Selectable = styled('div', {
@@ -68,21 +70,21 @@ export const InspectToggle = styled('div', {
   right: 0,
   top: 0,
   pointerEvents: 'auto',
+  zIndex: 100,
 });
 
 export const TreeControls = styled('div', {
-  position: 'absolute',
-  padding: '10px 20px',
-  right: '6px',
-  top: 0,
-  width: 160,
   pointerEvents: 'auto',
-  background: 'rgba(0, 0, 0, 0.75)',
+  background: 'rgba(50, 50, 50, 0.75)',
   zIndex: 10,
 
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'end',
+});
+
+export const TreeView = styled('div', {
+  padding: '20px',
+  overflow: 'auto',
+  flexGrow: 1,
 });
 
 export const Muted = styled('span', {
@@ -92,6 +94,10 @@ export const Muted = styled('span', {
 export const Spacer = styled('div', {
   width: '20px',
   height: '20px',
+});
+
+export const Grow = styled('div', {
+  flexGrow: 1,
 });
 
 export const SplitRow = styled('div', {
@@ -146,7 +152,6 @@ export const PanelFull = styled(Panel, {
 });
 
 export const PanelAbsolute = styled(Panel, {
-  overflow: 'auto',
   position: 'absolute',
   left: 0,
   top: 0,
@@ -159,10 +164,9 @@ export const Inset = styled('div', {
 });
 
 export const InsetColumnFull = styled('div', {
-  padding: '20px',
   display: 'flex',
   flexDirection: 'column',
-  minHeight: '100%',
+  height: '100%',
 });
 
 export const Label = styled('div', {

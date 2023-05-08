@@ -27,7 +27,8 @@
 
   --LiveInspect-colorLinkText: rgba(190, 210, 255, 1);
 
-  --LiveInspect-colorTextMuted: rgba(128, 128, 128, 1);
+  --LiveInspect-colorTextMutedSolid: rgba(144, 144, 144, 1);
+  --LiveInspect-colorTextMuted: rgba(255, 255, 255, 0.5);
   --LiveInspect-colorTextSemi: rgba(255, 255, 255, .65);
   --LiveInspect-colorText: #ddd;
   --LiveInspect-colorTextHover: #eee;

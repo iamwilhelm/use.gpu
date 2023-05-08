@@ -2,9 +2,9 @@ import type { LiveFiber } from '@use-gpu/live';
 import type { ExpandState, SelectState, HoverState, OptionState, PingState } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
-import { useUpdateState, useRefineCursor } from '@use-gpu/state';
+import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
 
-import React, { memo, useLayoutEffect, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState } from 'react';
 import { Node } from './node';
 import { FiberTree } from './fiber';
 import { Props } from './panels/props';
@@ -14,11 +14,10 @@ import { Shader } from './panels/shader';
 import { Layout } from './panels/layout';
 import { Output } from './panels/output';
 import {
-  InspectContainer, InspectToggle, Button, SmallButton, TreeControls, Spacer,
+  InspectContainer, InspectToggle, Button, SmallButton, TreeControls, TreeView, Spacer, Grow,
   SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 import { PingProvider } from './ping';
-import { DetailSlider } from './detail';
 import { Options } from './options';
 import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
 
@@ -41,19 +40,12 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     fullSize: false,
     builtins: false,
     highlight: true,
+    inspect: false,
   });
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
   }));
   
-  const [inspect, setInspect] = useState<boolean>(false);
-  const toggleInspect = () => {
-    setInspect(s => {
-      onInspect && onInspect(!s);
-      return !s;
-    });
-  };
-
   const [open, updateOpen] = useUpdateState<boolean>(false);
   const toggleOpen = () => updateOpen(!open);
 
@@ -61,12 +53,22 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
 
   const fibers = new Map<number, LiveFiber<any>>();
   const [selectedFiber, setSelected] = selectedCursor;
-  const [depthLimit, setDepthLimit] = useOption<number>('depth');
+  const [depthLimit] = useOption<number>('depth');
   const [runCounts] = useOption<boolean>('counts');
   const [fullSize] = useOption<boolean>('fullSize');
   const [builtins] = useOption<boolean>('builtins');
   const [highlight] = useOption<boolean>('highlight');
+  const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
+
+  const toggleInspect = useCallback(() => {
+    console.log('toggleInspect')
+    updateInspect($apply(s => {
+      onInspect && onInspect(!s);
+      return !s;
+    }));
+  }, [onInspect]);
+  console.log(optionCursor[0])
 
   useLayoutEffect(() => {
     const el = document.querySelector('#use-gpu .canvas');
@@ -157,24 +159,21 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
   const tree = (
     <InsetColumnFull>
       <TreeControls>
-        <DetailSlider value={depthLimit} onChange={setDepthLimit} />
-        <Options cursor={optionCursor} />
-        <Spacer />
-        <SmallButton className={inspect ? 'active' : ''} onClick={toggleInspect}>
-          <IconItem height={24} top={1}><SVGPickElement size={24} /></IconItem>
-        </SmallButton>
+        <Options cursor={optionCursor} toggleInspect={toggleInspect} />
       </TreeControls>
-      <FiberTree
-        fiber={fiber}
-        fibers={fibers}
-        depthLimit={depthLimit}
-        runCounts={runCounts}
-        builtins={builtins}
-        highlight={highlight}
-        expandCursor={expandCursor}
-        selectedCursor={selectedCursor}
-        hoveredCursor={hoveredCursor}
-      />
+      <TreeView>
+        <FiberTree
+          fiber={fiber}
+          fibers={fibers}
+          depthLimit={depthLimit}
+          runCounts={runCounts}
+          builtins={builtins}
+          highlight={highlight}
+          expandCursor={expandCursor}
+          selectedCursor={selectedCursor}
+          hoveredCursor={hoveredCursor}
+        />
+      </TreeView>
     </InsetColumnFull>
   );
 
@@ -218,7 +217,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
               ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
               : {display: 'flex', height: '100%'}}>
             <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
-              <PanelAbsolute onClick={() => setSelected(null)} className="tree-scroller">
+              <PanelAbsolute onClick={() => setSelected(null)}>
                 {tree}
               </PanelAbsolute>
             </RowPanel>
@@ -234,7 +233,10 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       </PingProvider>
     ) : null}
     <InspectToggle onClick={toggleOpen}>
-      <Button>{open ? <SVGClose /> : <div style={{margin: -4}}><SVGInspect size={24} /></div>}</Button>
+      <Button style={{width: 58, height: 37}}>{open
+        ? <IconItem height={20} top={-2}><SVGClose size={20} /></IconItem>
+        : <IconItem height={20} top={-4}><SVGInspect size={24} /></IconItem>
+      }</Button>
     </InspectToggle>
   </div>);
 }

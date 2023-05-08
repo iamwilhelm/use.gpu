@@ -115,10 +115,24 @@ export function wgslLang() {
 export const WGSL = (props: WGSLProps) => {
   const {code} = props;
 
-  const editor = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<EditorView | null>(null);
 
   useLayoutEffect(() => {
-    if (!editor.current) return;
+    const {current: view} = viewRef;
+    if (!view) return;
+    
+    const currentCode = view.state.doc.toString();
+    if (code !== currentCode) {
+      view.dispatch({
+        changes: [{ from: 0, to: currentCode.length, insert: code }],
+      });
+    }
+  }, [code]);
+
+  useLayoutEffect(() => {
+    const {current: editor} = editorRef;
+    if (!editor) return;
 
     const startState = EditorState.create({
       doc: code,
@@ -133,12 +147,15 @@ export const WGSL = (props: WGSLProps) => {
 
     const view = new EditorView({
       state: startState,
-      parent: editor.current,
+      parent: editor,
     });
+    viewRef.current = view;
+
     return () => {
       view.destroy();
+      viewRef.current = null;
     };
   }, []);
 
-  return <div ref={editor}></div>;
+  return <div ref={editorRef}></div>;
 };

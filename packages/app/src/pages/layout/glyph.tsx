@@ -282,183 +282,184 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           <UI>
             <Layout placement="center">
               <Flex direction="y" anchor={"center"} align={"center"} height={'100%'}>
-
-                <Block margin={20}>
-                  <Inline align={"center"}>
-                    <Text
-                      size={32}
-                      detail={64}
-                      snap={false}
-                      text={subpixel ? "The Subpixel Distance Transform" : "The Euclidean Distance Transform"}
-                      color={[1, 1, 1, 1]}
-                    />
-                  </Inline>
-                </Block>
-                <Flex align={"center"} gap={10}>
-                  <Block width={rgbaTexture.size[0]} height={rgbaTexture.size[1] * 2 + 32}>
-                    <TextureFrame texture={rgbaTexture}>
-                    {subpixel ? <>
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={1}
-                        sparse
-                        centered
-                        index
-                        expr={gridEmitter(outerField)}
-                      >
-                        <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} zBias={ZBIAS_DATA} />
-                      </Sampled>
-
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={1}
-                        sparse
-                        centered
-                        index
-                        expr={pointEmitter(outerField)}
-                      >
-                        <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
-                      </Sampled>
-
-                      {preprocess ? <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={1}
-                        sparse
-                        centered
-                        index
-                        expr={pointEmitter(innerField)}
-                      >
-                        <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
-                      </Sampled> : null}
-
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={2}
-                        sparse
-                        centered
-                        index
-                        expr={arrowEmitter(preprocess ? innerField : outerField)}
-                      >
-                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={ZBIAS_DATA} />
-                      </Sampled>
-                      </> : null}
-                    </TextureFrame>
-
-                    <TextureFrame texture={rgbaTexture}>
-                    {subpixel ? <>
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={1}
-                        sparse
-                        centered
-                        index
-                        expr={shiftedPointEmitter(outer2Field)}
-                      >
-                        <Point size={0.5} depth={1} color={0x4080ff} zBias={ZBIAS_DATA} />
-                      </Sampled>
-
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={1}
-                        sparse
-                        centered
-                        index
-                        expr={shiftedPointEmitter(inner2Field)}
-                      >
-                        <Point size={0.5} depth={1} color={0x40c0ff} zBias={ZBIAS_DATA} />
-                      </Sampled>
-
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={2}
-                        sparse
-                        centered
-                        index
-                        expr={arrowEmitter(outer2Field)}
-                      >
-                        <Arrow width={3} depth={0.05} color={0x4080ff} detail={4} zBias={ZBIAS_DATA} />
-                      </Sampled>
-
-                      <Sampled
-                        axes='xy'
-                        format='vec4<f32>'
-                        size={padded}
-                        items={2}
-                        sparse
-                        centered
-                        index
-                        expr={arrowEmitter(inner2Field)}
-                      >
-                        <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={ZBIAS_DATA} />
-                      </Sampled>
-                      </> : null}
-                    </TextureFrame>
-                    
-                    <Label>Alpha{subpixel ? ' + Offsets' + (preprocess ? ' (Relaxed)' : '') : ''}</Label>
-                  </Block>
-
-                  { debugs.length ? <>
-                    <Block>
-                      {debugFrame(debugs[0])}
-                      <Label>Inside/Outside</Label>
-                    </Block>
-                    <Block>
-                      {debugFrame(debugs[1])}
-                      {debugFrame(debugs[2])}
-                      <Label>{subpixel ? "ESDT Outside" : "EDT Outside"}</Label>
-                    </Block>                
-                    <Block>
-                      {debugFrame(debugs[3])}
-                      {debugFrame(debugs[4])}
-                      <Label>{subpixel ? "ESDT Inside" : "EDT Inside"}</Label>
-                    </Block>                
-                    <Block>
-                      {debugFrame(debugs[5])}
-                      <Label>{subpixel ? "X and Y Offsets" + (postprocess ? '\n(Relaxed)' : '') : "Squared Distance"}</Label>
-                    </Block>                
-                  </> : null}
-
-                  <RawTexture data={sdfTexture} render={(texture) =>
-                    <Block>
-                      <Block width={paddedWidth} height={paddedHeight} fill={[0.0, 0.0, 0.0, 1.0]} image={{
-                        texture,
-                        repeat: 'none',
-                      }} />
-                      <Label>SDF</Label>
-                    </Block>
-                  }/>
-                  <Block>
-                    <TextureFrame texture={gradientTexture} />
-                    <Label>Gradient Error</Label>
-                  </Block>
-
-                  <Block margin={[10, 5]}>
-                    <Inline>
+                <Block width={800}>
+                  <Block margin={20}>
+                    <Inline align={"center"}>
                       <Text
-                        size={SIZE}
-                        detail={DETAIL}
-                        lineHeight={height}
+                        size={32}
+                        detail={64}
                         snap={false}
-                        text={glyph}
+                        text={subpixel ? "The Subpixel Distance Transform" : "The Euclidean Distance Transform"}
                         color={[1, 1, 1, 1]}
                       />
                     </Inline>
                   </Block>
-                </Flex>
+                  <Flex align={"center"} gap={10}>
+                    <Block width={rgbaTexture.size[0]} height={rgbaTexture.size[1] * 2 + 32}>
+                      <TextureFrame texture={rgbaTexture}>
+                      {subpixel ? <>
+                        <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={1}
+                          sparse
+                          centered
+                          index
+                          expr={gridEmitter(outerField)}
+                        >
+                          <Point size={0.5} depth={1} color={'#808080'} shape={'circleOutlined'} zBias={ZBIAS_DATA} />
+                        </Sampled>
+
+                        <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={1}
+                          sparse
+                          centered
+                          index
+                          expr={pointEmitter(outerField)}
+                        >
+                          <Point size={0.5} depth={1} color={preprocess ? '#80808080' : '#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
+                        </Sampled>
+
+                        {preprocess ? <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={1}
+                          sparse
+                          centered
+                          index
+                          expr={pointEmitter(innerField)}
+                        >
+                          <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
+                        </Sampled> : null}
+
+                        <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={2}
+                          sparse
+                          centered
+                          index
+                          expr={arrowEmitter(preprocess ? innerField : outerField)}
+                        >
+                          <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={ZBIAS_DATA} />
+                        </Sampled>
+                        </> : null}
+                      </TextureFrame>
+
+                      <TextureFrame texture={rgbaTexture}>
+                      {subpixel ? <>
+                        <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={1}
+                          sparse
+                          centered
+                          index
+                          expr={shiftedPointEmitter(outer2Field)}
+                        >
+                          <Point size={0.5} depth={1} color={0x4080ff} zBias={ZBIAS_DATA} />
+                        </Sampled>
+
+                        <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={1}
+                          sparse
+                          centered
+                          index
+                          expr={shiftedPointEmitter(inner2Field)}
+                        >
+                          <Point size={0.5} depth={1} color={0x40c0ff} zBias={ZBIAS_DATA} />
+                        </Sampled>
+
+                        <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={2}
+                          sparse
+                          centered
+                          index
+                          expr={arrowEmitter(outer2Field)}
+                        >
+                          <Arrow width={3} depth={0.05} color={0x4080ff} detail={4} zBias={ZBIAS_DATA} />
+                        </Sampled>
+
+                        <Sampled
+                          axes='xy'
+                          format='vec4<f32>'
+                          size={padded}
+                          items={2}
+                          sparse
+                          centered
+                          index
+                          expr={arrowEmitter(inner2Field)}
+                        >
+                          <Arrow width={3} depth={0.05} color={0x40c0ff} detail={4} zBias={ZBIAS_DATA} />
+                        </Sampled>
+                        </> : null}
+                      </TextureFrame>
+                    
+                      <Label>Alpha{subpixel ? ' + Offsets' + (preprocess ? ' (Relaxed)' : '') : ''}</Label>
+                    </Block>
+
+                    { debugs.length ? <>
+                      <Block>
+                        {debugFrame(debugs[0])}
+                        <Label>Inside/Outside</Label>
+                      </Block>
+                      <Block>
+                        {debugFrame(debugs[1])}
+                        {debugFrame(debugs[2])}
+                        <Label>{subpixel ? "ESDT Outside" : "EDT Outside"}</Label>
+                      </Block>                
+                      <Block>
+                        {debugFrame(debugs[3])}
+                        {debugFrame(debugs[4])}
+                        <Label>{subpixel ? "ESDT Inside" : "EDT Inside"}</Label>
+                      </Block>                
+                      <Block>
+                        {debugFrame(debugs[5])}
+                        <Label>{subpixel ? "X and Y Offsets" + (postprocess ? '\n(Relaxed)' : '') : "Squared Distance"}</Label>
+                      </Block>                
+                    </> : null}
+
+                    <RawTexture data={sdfTexture} render={(texture) =>
+                      <Block>
+                        <Block width={paddedWidth} height={paddedHeight} fill={[0.0, 0.0, 0.0, 1.0]} image={{
+                          texture,
+                          repeat: 'none',
+                        }} />
+                        <Label>SDF</Label>
+                      </Block>
+                    }/>
+                    <Block>
+                      <TextureFrame texture={gradientTexture} />
+                      <Label>Gradient Error</Label>
+                    </Block>
+
+                    <Block margin={[10, 5]}>
+                      <Inline>
+                        <Text
+                          size={SIZE}
+                          detail={DETAIL}
+                          lineHeight={height}
+                          snap={false}
+                          text={glyph}
+                          color={[1, 1, 1, 1]}
+                        />
+                      </Inline>
+                    </Block>
+                  </Flex>
+                </Block>
               </Flex>
             </Layout>
           </UI>

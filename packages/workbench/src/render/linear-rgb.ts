@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext, TextureSource, ColorSpace } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
-import { gather, use, useMemo } from '@use-gpu/live';
+import { gather, use, useMemo, useOne } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 
 import { Pass } from './pass';
@@ -10,7 +10,7 @@ import { RenderTarget } from './render-target';
 import { RenderToTexture } from './render-to-texture';
 import { RawFullScreen } from '../primitives';
 
-import { useBoundShader } from '../hooks/useBoundShader';
+import { getBoundShader } from '../hooks/useBoundShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { gainColor } from '@use-gpu/wgsl/fragment/gain.wgsl';
@@ -64,8 +64,13 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
           const {then} = props;
 
           const g = useShaderRef(gain);
-          let filter = useBoundShader(gainColor, GAIN_BINDINGS, [g], {IS_OPAQUE: !overlay});
-          if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
+          const defs = useOne(() => ({IS_OPAQUE: !overlay}), overlay);
+
+          const filter = useMemo(() => {
+            let filter = getBoundShader(gainColor, GAIN_BINDINGS, [g], defs);
+            if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
+            return filter;
+          }, [defs, tonemap]);
 
           const view = useMemo(() =>
             use(Pass, {

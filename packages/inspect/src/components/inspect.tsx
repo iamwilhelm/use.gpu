@@ -68,7 +68,6 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
       return !s;
     }));
   }, [onInspect]);
-  console.log(optionCursor[0])
 
   useLayoutEffect(() => {
     const el = document.querySelector('#use-gpu .canvas');

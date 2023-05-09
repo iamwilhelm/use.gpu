@@ -999,10 +999,13 @@ export const captureFiber = <F extends ArrowFunction>(
 
     const registry = new Map<LiveFiber<any>, any>();
     const reduction = () => registry;
+    const parent = fiber.context;
     fiber.context = makeContextState(fiber, fiber.context, capture, registry);
 
     const Resume = makeFiberReduction(fiber, reduction);
     fiber.next = makeNextFiber(fiber, Resume, 'Resume');
+    fiber.next.context = parent;
+
     fiber.path = [...fiber.path, 0];
   }
 

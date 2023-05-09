@@ -173,82 +173,89 @@ export const GeometryBinaryPage: LC = () => {
       container={root}
       render={({mode, buffer, gamma, transparent}) => {
         const data = useMemo(() => buffer ? arrayBufferToXYZ(buffer) : null, [buffer]);
+
+        const viz = useMemo(() => data ? (
+          <Data
+            fields={data.fields}
+            render={(positions, counts) => (
+              <Gather
+                children={[
+                  <DataShader
+                    shader={positionShader}
+                    source={positions}
+                  />,
+                  <DataShader
+                    shader={colorShader}
+                    sources={[positions, counts]}
+                    args={[mode, transparent, data.range, data.level]}
+                  />,
+                ]}
+                then={([positions, colors]: StorageSource[]) => (
+                  <PointLayer
+                    count={data.count}
+                    positions={positions}
+                    colors={colors}
+                    size={3}
+                    depth={1}
+                    mode={transparent ? "transparent" : "opaque"}
+                    blend={transparent ? "additive" : "none"}
+                    depthWrite={!transparent}
+                  />
+                )}
+              />
+            )}
+          />
+        ) : null, [data, mode, transparent]);
+
+        const view = useMemo(() => (
+          <Camera>
+            <Pass>
+              <Plot>
+                <Cartesian
+                  range={[[0, 256], [0, 256], [0, 256]]}
+                >
+                  {viz}
+                  <Grid
+                    color="#202020"
+                    axes='xy'
+                    width={2}
+                    first={{ divide: 16, base: 2, end: true }}
+                    second={{ divide: 16, base: 2, end: true }}
+                    depth={0.5}
+                    zBias={-5}
+                    auto
+                  />
+                  <Grid
+                    color="#202020"
+                    axes='xz'
+                    width={2}
+                    first={{ divide: 16, base: 2, end: true }}
+                    second={{ divide: 16, base: 2, end: true }}
+                    depth={0.5}
+                    zBias={-5}
+                    auto
+                  />
+                  <Grid
+                    color="#202020"
+                    axes='yz'
+                    width={2}
+                    first={{ divide: 16, base: 2, end: true }}
+                    second={{ divide: 16, base: 2, end: true }}
+                    depth={0.5}
+                    zBias={-5}
+                    auto
+                  />
+                </Cartesian>
+              </Plot>
+            </Pass>
+          </Camera>
+        ), [viz]);
+
         return (
           <Loop>
             <LinearRGB tonemap="aces" colorInput="linear" gain={gamma}>
               <Cursor cursor="move" />
-              <Camera>
-                <Pass>
-                  <Plot>
-                    <Cartesian
-                      range={[[0, 256], [0, 256], [0, 256]]}
-                    >
-                      {data ? (
-                        <Data
-                          fields={data.fields}
-                          render={(positions, counts) => (
-                            <Gather
-                              children={[
-                                <DataShader
-                                  shader={positionShader}
-                                  source={positions}
-                                />,
-                                <DataShader
-                                  shader={colorShader}
-                                  sources={[positions, counts]}
-                                  args={[mode, transparent, data.range, data.level]}
-                                />,
-                              ]}
-                              then={([positions, colors]: StorageSource[]) => (
-                                <PointLayer
-                                  count={data.count}
-                                  positions={positions}
-                                  colors={colors}
-                                  size={3}
-                                  depth={1}
-                                  mode={transparent ? "transparent" : "opaque"}
-                                  blend={transparent ? "additive" : "none"}
-                                  depthWrite={!transparent}
-                                />
-                              )}
-                            />
-                          )}
-                        />
-                      ) : null}
-                      <Grid
-                        color="#202020"
-                        axes='xy'
-                        width={2}
-                        first={{ divide: 16, base: 2, end: true }}
-                        second={{ divide: 16, base: 2, end: true }}
-                        depth={0.5}
-                        zBias={-5}
-                        auto
-                      />
-                      <Grid
-                        color="#202020"
-                        axes='xz'
-                        width={2}
-                        first={{ divide: 16, base: 2, end: true }}
-                        second={{ divide: 16, base: 2, end: true }}
-                        depth={0.5}
-                        zBias={-5}
-                        auto
-                      />
-                      <Grid
-                        color="#202020"
-                        axes='yz'
-                        width={2}
-                        first={{ divide: 16, base: 2, end: true }}
-                        second={{ divide: 16, base: 2, end: true }}
-                        depth={0.5}
-                        zBias={-5}
-                        auto
-                      />
-                    </Cartesian>
-                  </Plot>
-                </Pass>
-              </Camera>
+              {view}
             </LinearRGB>
           </Loop>
         );

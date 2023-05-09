@@ -1,29 +1,18 @@
 {
-  "name": "@use-gpu/app",
+  "name": "@use-gpu/present",
   "version": "0.8.4",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "private": true,
   "dependencies": {
-    "@types/earcut": "^2.1.1",
     "@use-gpu/core": "*",
-    "@use-gpu/layout": "*",
     "@use-gpu/live": "*",
-    "@use-gpu/map": "*",
-    "@use-gpu/inspect": "*",
-    "@use-gpu/present": "*",
-    "@use-gpu/plot": "*",
-    "@use-gpu/scene": "*",
     "@use-gpu/shader": "*",
-    "@use-gpu/state": "*",
-    "@use-gpu/webgpu": "*",
     "@use-gpu/workbench": "*",
-    "@use-gpu/wgsl": "*",
-    "earcut": "^2.2.3"
+    "@use-gpu/layout": "*"
   },
   "scripts": {
-    "build": "NPM_PACKAGE=app ../../scripts/build-mjs-cjs.sh",
+    "build": "NPM_PACKAGE=present ../../scripts/build-mjs-cjs.sh",
     "test": "MODULE_ENV=cjs jest --watch",
     "lint": "eslint src --ext ts",
     "coverage": "echo 'jest --collect-coverage' disabled",
@@ -32,6 +21,6 @@
   },
   "keywords": [
     "use-gpu",
-    "use-gpu-dev"
+    "use-gpu-components"
   ]
 }

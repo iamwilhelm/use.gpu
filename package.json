@@ -132,6 +132,7 @@
     "packages/plot",
     "packages/layout",
     "packages/map",
+    "packages/present",
     "packages/inspect",
     "packages/app"
   ]

@@ -23,6 +23,7 @@ let packages = [
   'layout',
   'live',
   'map',
+  'present',
   'plot',
   'react',
   'scene',

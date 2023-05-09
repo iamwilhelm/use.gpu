@@ -21,6 +21,7 @@
     { "path": "./packages/plot" },
     { "path": "./packages/layout" },
     { "path": "./packages/map" },
+    { "path": "./packages/present" },
     { "path": "./packages/inspect" },
     { "path": "./packages/app" }
   ],

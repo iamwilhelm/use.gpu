@@ -11,6 +11,7 @@
     { "path": "../scene" },
     { "path": "../layout" },
     { "path": "../plot" },
+    { "path": "../present" },
     { "path": "../map" },
     { "path": "../gltf" },
     { "path": "../glyph" },

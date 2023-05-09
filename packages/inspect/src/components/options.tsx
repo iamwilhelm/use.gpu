@@ -67,9 +67,10 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
       </SmallButton>
 
       <Spacer />
-      <div style={{width: 150}}>
+      <div style={{flexGrow: 1, minWidth: 50, maxWidth: 150}}>
         <DetailSlider value={depthLimit} onChange={setDepthLimit} />
       </div>
+      <Spacer />
     </OptionsContainer>
   );
 };

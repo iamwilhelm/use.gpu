@@ -54,6 +54,7 @@ export const OptionsContainer = styled('div', {
   display: 'flex',
   flexShrink: 0,
   alignItems: 'center',
+  width: '100%',
 });
 
 export const Selectable = styled('div', {

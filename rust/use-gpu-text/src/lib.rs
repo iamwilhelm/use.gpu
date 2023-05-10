@@ -8,9 +8,9 @@ use png::{Decoder};
 use ab_glyph::{Font, FontArc, Glyph, GlyphId, Point, PxScale, PxScaleFont, ScaleFont};
 use xi_unicode::LineBreakIterator;
 
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+//#[cfg(feature = "wee_alloc")]
+//#[global_allocator]
+//static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
 extern "C" {

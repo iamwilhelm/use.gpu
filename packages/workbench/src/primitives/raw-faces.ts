@@ -9,7 +9,6 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
 import { useScissorContext } from '../providers/scissor-provider';
@@ -61,8 +60,6 @@ export type RawFacesProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
-
-const VERTEX_BINDINGS = bundleToAttributes(getFaceVertex);
 
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
@@ -146,7 +143,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
 
-  const getVertex = useBoundShader(getFaceVertex, VERTEX_BINDINGS, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, j, k, l]);
+  const getVertex = useBoundShader(getFaceVertex, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, j, k, l]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => {

@@ -6,7 +6,6 @@ import type { ScaleTrait, AxisTrait } from '../types';
 
 import { parseVec4, useProp } from '@use-gpu/traits';
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useRawSource, useBoundShader, useShaderRef } from '@use-gpu/workbench';
 
 import { DataContext, ValuesContext } from '../providers/data-provider';
@@ -18,8 +17,6 @@ import { logarithmic, linear } from '../util/domain';
 import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';
 
 import { vec4 } from 'gl-matrix';
-
-const SCALE_BINDINGS = bundleToAttributes(getScalePosition);
 
 export type ScaleProps = Partial<ScaleTrait> & Partial<AxisTrait> & {
   origin?: VectorLike,
@@ -58,7 +55,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
 
   const o = useShaderRef(og);
   const a = useShaderRef(axis);
-  const bound = useBoundShader(getScalePosition, SCALE_BINDINGS, [data, a, o]);
+  const bound = useBoundShader(getScalePosition, [data, a, o]);
 
   // Expose position source
   const source = useMemo(() => ({

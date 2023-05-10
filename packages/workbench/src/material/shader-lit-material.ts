@@ -4,7 +4,6 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
@@ -13,8 +12,6 @@ import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
 
 import { getShadedFragment } from '@use-gpu/wgsl/instance/fragment/shaded.wgsl';
-
-const SHADED_BINDINGS = bundleToAttributes(getShadedFragment);
 
 export type ShaderLitMaterialProps = {
   /** Flat shader, for unlit passes (e.g. shadow map)
@@ -56,7 +53,7 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
   const applyLights = useMaterial(apply);
 
   const getSurface = surface;
-  const getLight = applyLights ? useBoundShader(getShadedFragment, SHADED_BINDINGS, [applyLights]) : useNoBoundShader();
+  const getLight = applyLights ? useBoundShader(getShadedFragment, [applyLights]) : useNoBoundShader();
   const getFragment = fragment;
 
   const context = useMemo(() => ({

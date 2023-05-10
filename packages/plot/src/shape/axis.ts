@@ -20,10 +20,7 @@ import {
 } from '../traits';
 import { vec4 } from 'gl-matrix';
 
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
-
-const AXIS_BINDINGS = bundleToAttributes(getAxisPosition);
 
 export type AxisProps =
   Partial<AxisTrait> &
@@ -65,7 +62,7 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   // Make axis vertex shader
   const o = useShaderRef(og);
   const s = useShaderRef(step);
-  const positions = useBoundShader(getAxisPosition, AXIS_BINDINGS, [s, o]);
+  const positions = useBoundShader(getAxisPosition, [s, o]);
 
   // Render as 1 arrow chunk
   const n = d + 1;

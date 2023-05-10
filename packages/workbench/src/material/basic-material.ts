@@ -5,7 +5,7 @@ import type { ColorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 import { parseColor, useProp } from '@use-gpu/traits';
-import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
@@ -18,8 +18,6 @@ import { ShaderFlatMaterial } from './shader-flat-material';
 import { getBasicMaterial } from '@use-gpu/wgsl/material/basic-material.wgsl';
 import { getSolidSurface } from '@use-gpu/wgsl/instance/surface/solid.wgsl';
 import { getSolidFragment } from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
-
-const BASIC_BINDINGS = bundleToAttributes(getBasicMaterial);
 
 export type BasicMaterialProps = {
   color?: ColorLike,
@@ -50,7 +48,7 @@ export const BasicMaterial: LC<BasicMaterialProps> = (props: PropsWithChildren<B
     HAS_COLOR_MAP: !!colorMap,
   }), colorMap);
 
-  const getFragment = useBoundShader(getBasicMaterial, BASIC_BINDINGS, [c, cm], defines);
+  const getFragment = useBoundShader(getBasicMaterial, [c, cm], defines);
 
   return ShaderFlatMaterial({
     fragment: getFragment,

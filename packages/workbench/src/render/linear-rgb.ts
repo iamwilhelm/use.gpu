@@ -3,7 +3,7 @@ import type { UseGPURenderContext, TextureSource, ColorSpace } from '@use-gpu/co
 import type { ShaderModule } from '@use-gpu/shader';
 
 import { gather, use, useMemo, useOne } from '@use-gpu/live';
-import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
+import { chainTo } from '@use-gpu/shader/wgsl';
 
 import { Pass } from './pass';
 import { RenderTarget } from './render-target';
@@ -15,8 +15,6 @@ import { useShaderRef } from '../hooks/useShaderRef';
 
 import { gainColor } from '@use-gpu/wgsl/fragment/gain.wgsl';
 import { tonemapACES } from '@use-gpu/wgsl/fragment/aces.wgsl';
-
-const GAIN_BINDINGS = bundleToAttributes(gainColor);
 
 export type LinearRGBProps = {
   width?: number,
@@ -67,7 +65,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) 
           const defs = useOne(() => ({IS_OPAQUE: !overlay}), overlay);
 
           const filter = useMemo(() => {
-            let filter = getBoundShader(gainColor, GAIN_BINDINGS, [g], defs);
+            let filter = getBoundShader(gainColor, [g], defs);
             if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
             return filter;
           }, [defs, tonemap]);

@@ -13,8 +13,6 @@ import { RangeContext } from '../providers/range-provider';
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { mat4, vec3 } from 'gl-matrix';
 
-const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
-
 export type EmbeddedProps = {
   layout?: Rectangle,
 };
@@ -39,7 +37,7 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
   }, layout);
 
   const ref = useShaderRef(matrix);
-  const bound = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [ref]);
+  const bound = useBoundShader(getCartesianPosition, [ref]);
   const context = useCombinedTransform(bound);
 
   return (

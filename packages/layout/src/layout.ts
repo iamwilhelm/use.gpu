@@ -13,14 +13,12 @@ import {
   useBoundShader, useNoBoundShader,
 } from '@use-gpu/workbench';
 
-import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
+import { chainTo } from '@use-gpu/shader/wgsl';
 import { getLayoutPosition } from '@use-gpu/wgsl/layout/layout.wgsl';
 
 import { makeBoxInspectLayout } from './lib/util';
 import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec2, vec3 } from 'gl-matrix';
-
-const LAYOUT_BINDINGS = bundleToAttributes(getLayoutPosition);
 
 export type LayoutProps = {
   width?: number,
@@ -85,7 +83,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   shift[0] = (placement[0] - 1.0) / 2 * into[0];
   shift[1] = (placement[1] - 1.0) / 2 * into[1];
 
-  const bound = useBoundShader(getLayoutPosition, LAYOUT_BINDINGS, [flip, shift]);
+  const bound = useBoundShader(getLayoutPosition, [flip, shift]);
   transform = useMemo(() => transform ? chainTo(transform, bound) : bound, [transform, bound]);
 
   // Render children into root container

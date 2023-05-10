@@ -14,12 +14,10 @@ import { useInspectHoverable } from '@use-gpu/workbench';
 import { INSPECT_STYLE } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
-import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
+import { chainTo } from '@use-gpu/shader/wgsl';
 import { useBoundShader } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
-
-const OFFSET_BINDINGS = bundleToAttributes(getScrolledPosition);
 
 export type ScrollBarProps = {
   direction?: Direction,
@@ -67,7 +65,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
     [scrollRef, sizeRef]
   );
 
-  const thumbTransform = useBoundShader(getScrolledPosition, OFFSET_BINDINGS, [shift]);
+  const thumbTransform = useBoundShader(getScrolledPosition, [shift]);
 
   const fit = (into: FitInto) => {
     let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement => {

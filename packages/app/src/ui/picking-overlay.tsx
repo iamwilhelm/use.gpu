@@ -10,7 +10,7 @@ import {
   UI, Layout, Absolute, Block, Inline, Text,
 } from '@use-gpu/layout';
 import { useContext } from '@use-gpu/live';
-import { wgsl, bindModule, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { wgsl, bindModule } from '@use-gpu/shader/wgsl';
 
 export const PickingOverlay: LC = () => {
 
@@ -38,8 +38,7 @@ export const PickingOverlay: LC = () => {
   
   const size = useOne(() => () => source.size, source);
 
-  const BINDINGS = bundleToAttributes(colorizeShader);
-  const boundShader = useBoundShader(colorizeShader, BINDINGS, [size, source]);
+  const boundShader = useBoundShader(colorizeShader, [size, source]);
   const textureSource = useLambdaSource(boundShader, source);
 
   const scale = 0.5;

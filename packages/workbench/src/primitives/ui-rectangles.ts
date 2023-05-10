@@ -9,7 +9,7 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -51,9 +51,6 @@ export type UIRectanglesProps = {
   id?: number,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
-const VERTEX_BINDINGS = bundleToAttributes(getUIRectangleVertex);
-const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
-
 export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
   const {
     id = 0,
@@ -82,9 +79,9 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const c = props.clip;
   const t = useNativeColorTexture(props.texture);
 
-  const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, xf, c]);
+  const getVertex = useBoundShader(getUIRectangleVertex, [r, a, b, s, f, u, p, d, xf, c]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
+  const getFragment = useBoundShader(getUIFragment, [t]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));

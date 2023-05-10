@@ -9,7 +9,7 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -44,9 +44,6 @@ export type RawQuadsProps = {
   id?: number,
   count?: Lazy<number>,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
-
-const VERTEX_BINDINGS = bundleToAttributes(getQuadVertex);
-const FRAGMENT_BINDINGS = bundleToAttributes(getMaskedColor);
 
 export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps) => {
   const {
@@ -84,9 +81,9 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     useNoCallback();
   }
 
-  const getVertex = useBoundShader(getQuadVertex, VERTEX_BINDINGS, [xf, scissor, r, c, d, z, u, l]);
+  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, l]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getMaskedColor, FRAGMENT_BINDINGS, [m, t]);
+  const getFragment = useBoundShader(getMaskedColor, [m, t]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));

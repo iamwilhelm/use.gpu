@@ -4,7 +4,7 @@ import type { GeographicTrait } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
-import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
+import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   Scissor, TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
@@ -25,7 +25,6 @@ import { getWebMercatorPosition } from '@use-gpu/wgsl/transform/web-mercator.wgs
 const π = Math.PI;
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
-const MERCATOR_BINDINGS = bundleToAttributes(getWebMercatorPosition);
 const MERCATOR_LOOP = [2, 0, 0, 0];
 
 export type WebMercatorProps = Partial<AxesTrait> & Partial<GeographicTrait> & Partial<ObjectTrait> & {
@@ -123,7 +122,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
   const n = useShaderRef(native);
   const e = useShaderRef(epsilon);
   
-  const bound = useBoundShader(getWebMercatorPosition, MERCATOR_BINDINGS, [t, b, o, z, d, c, n]);
+  const bound = useBoundShader(getWebMercatorPosition, [t, b, o, z, d, c, n]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

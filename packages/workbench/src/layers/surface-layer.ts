@@ -37,7 +37,7 @@ export type SurfaceLayerProps = {
   id?: number,
 };
 
-const [SIZE_BINDING, POSITION_BINDING] = bundleToAttributes(getSurfaceIndex);
+const [SIZE_BINDING] = bundleToAttributes(getSurfaceIndex);
 
 /** Draws 2D surfaces across the X and Y data dimension. */
 export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: SurfaceLayerProps) => {
@@ -68,10 +68,10 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   }, sizeExpr);
 
   const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY}), [loopX, loopY]);
-  const indices = useBoundShader(getSurfaceIndex, [SIZE_BINDING], [boundSize], defines);
+  const indices = useBoundShader(getSurfaceIndex, [boundSize], defines);
 
   const p = useShaderRef(props.position, props.positions);
-  const normals = useBoundShader(getSurfaceNormal, [SIZE_BINDING, POSITION_BINDING], [boundSize, p], defines);
+  const normals = useBoundShader(getSurfaceNormal, [boundSize, p], defines);
 
   return use(RawFaces, {
     position,

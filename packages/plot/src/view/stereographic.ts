@@ -3,7 +3,7 @@ import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
-import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
+import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
@@ -18,8 +18,6 @@ import { mat4 } from 'gl-matrix';
 import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getStereographicPosition } from '@use-gpu/wgsl/transform/stereographic.wgsl';
-
-const STEREOGRAPHIC_BINDINGS = bundleToAttributes(getStereographicPosition);
 
 export type StereographicProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
@@ -102,7 +100,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
   const o = useShaderRef(+normalize);
   const e = useShaderRef(epsilon);
   
-  const bound = useBoundShader(getStereographicPosition, STEREOGRAPHIC_BINDINGS, [t, b, o]);
+  const bound = useBoundShader(getStereographicPosition, [t, b, o]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { ObjectTrait } from './types';
 
 import { use, memo, provide, yeet, useCallback, useMemo, useOne, tagFunction } from '@use-gpu/live';
-import { bundleToAttributes, bindEntryPoint } from '@use-gpu/shader/wgsl';
+import { bindEntryPoint } from '@use-gpu/shader/wgsl';
 
 import {
   FaceLayer,
@@ -24,10 +24,6 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
 import { mat3, mat4 } from 'gl-matrix';
-
-const INSTANCE_BINDINGS = bundleToAttributes(loadInstance);
-const MATRIX_BINDINGS   = bundleToAttributes(getCartesianPosition);
-const NORMAL_BINDINGS   = bundleToAttributes(getMatrixDifferential);
 
 export type InstancesProps = {
   mesh: Record<string, ShaderSource>,
@@ -59,12 +55,12 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
 
       const [matrices, normalMatrices] = fieldSources;
 
-      const load = getBoundShader(loadInstance, INSTANCE_BINDINGS, [matrices, normalMatrices]);
+      const load = getBoundShader(loadInstance, [matrices, normalMatrices]);
       const matrix = bindEntryPoint(load, 'getTransformMatrix');
       const normalMatrix = bindEntryPoint(load, 'getNormalMatrix');
 
-      const boundPosition = getBoundShader(getCartesianPosition, MATRIX_BINDINGS, [matrix]);
-      const boundDifferential = getBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [matrix, normalMatrix]);
+      const boundPosition = getBoundShader(getCartesianPosition, [matrix]);
+      const boundDifferential = getBoundShader(getMatrixDifferential, [matrix, normalMatrix]);
 
       const view = use(FaceLayer, {...mesh, instances, load, shaded, side});
       return [view, boundPosition, boundDifferential];

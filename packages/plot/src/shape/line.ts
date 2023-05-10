@@ -39,7 +39,7 @@ export const Line: LiveComponent<LineProps> = (props) => {
   const rop = useROPTrait(props);
 
   const detailExpr = useOne(() => () => ((positions as any)?.size?.[0] || 1) - 1, positions);
-  const segments = useOne(() => useBoundShader(getLineSegment, [LINE_ATTRIBUTE], [detailExpr]), detailExpr);
+  const segments = useOne(() => useBoundShader(getLineSegment, [detailExpr]), detailExpr);
 
   return (
     use(LineLayer, {

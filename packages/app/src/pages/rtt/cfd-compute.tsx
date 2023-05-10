@@ -12,7 +12,6 @@ import {
 import {
   UI, Layout, Absolute, Block, Element, Inline, Text,
 } from '@use-gpu/layout';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { main as generateInitial }  from './cfd-compute/initial.wgsl';
 import { main as pushVelocity }     from './cfd-compute/push.wgsl';
@@ -79,15 +78,12 @@ const debugShader = wgsl`
   }
 `;
 
-const COLOR_BINDINGS = bundleToAttributes(colorizeShader);
-const DEBUG_BINDINGS = bundleToAttributes(debugShader);
-
 export const RTTCFDComputePage: LC = () => {
 
   const dpi = window.devicePixelRatio;
 
-  const advectForwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: 1.0});
-  const advectBackwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: -1.0});
+  const advectForwards = useBoundShader(advectVelocity, [], {TIME_STEP: 1.0});
+  const advectBackwards = useBoundShader(advectVelocity, [], {TIME_STEP: -1.0});
 
   const root = document.querySelector('#use-gpu .canvas');
 
@@ -198,7 +194,7 @@ export const RTTCFDComputePage: LC = () => {
 };
 
 const VisualizeField = ({field}: {field: StorageTarget}) => {
-  const boundShader = useBoundShader(colorizeShader, COLOR_BINDINGS, [field, () => field.size, 1]);
+  const boundShader = useBoundShader(colorizeShader, [field, () => field.size, 1]);
   const textureSource = useLambdaSource(boundShader, field);
   return (
     <RawFullScreen texture={textureSource} />
@@ -207,7 +203,7 @@ const VisualizeField = ({field}: {field: StorageTarget}) => {
 
 const DebugField = ({field, gain}: {field: StorageTarget, gain: number}) => {
   const dpi = window.devicePixelRatio;
-  const boundShader = useBoundShader(debugShader, DEBUG_BINDINGS, [field, () => field.size, gain || 1]);
+  const boundShader = useBoundShader(debugShader, [field, () => field.size, gain || 1]);
   const textureSource = useLambdaSource(boundShader, field);
   return (
     <Element width={field.size[0] / 2 / dpi} height={field.size[1] / 2 / dpi} image={{texture: textureSource, fit: 'scale'}} />

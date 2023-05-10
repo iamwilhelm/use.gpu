@@ -12,7 +12,6 @@ import { Readback } from '../primitives/readback';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, yeet, debug, fragment, useCallback, useMemo, useOne, useRef, useVersion, useNoCallback, incrementVersion } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve, uploadBuffer, toDataBounds } from '@use-gpu/core';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
@@ -69,10 +68,6 @@ export type DualContourLayerProps = {
   mode?: RenderPassMode | string,
   id?: number,
 };
-
-const SCAN_BINDINGS = bundleToAttributes(scanVolume);
-const FIT_BINDINGS = bundleToAttributes(fitContourLinear);
-const VERTEX_BINDINGS = bundleToAttributes(getDualContourVertex);
 
 const DEFINES_ALPHA = {
   HAS_ALPHA_TO_COVERAGE: false,
@@ -188,7 +183,6 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   
   const boundScan = useBoundShader(
     scanVolume,
-    SCAN_BINDINGS,
     [
       indirectStorage, edgeStorage, cellStorage, markStorage, indexStorage,
       v, s, l,
@@ -197,7 +191,6 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const fitContour = method === 'quadratic' ? fitContourQuadratic : fitContourLinear;
   const boundFit = useBoundShader(
     fitContour,
-    FIT_BINDINGS,
     [
       indirectReadout1, cellStorage, vertexStorage, normalStorage,
       v, n, s, l,
@@ -205,7 +198,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
 
   const getVertex = useBoundShader(
     getDualContourVertex,
-    VERTEX_BINDINGS, [
+    [
       edgeReadout, indexReadout, vertexReadout, normalReadout,
       xf, xd, s, p, c, z, min, max,
     ]);

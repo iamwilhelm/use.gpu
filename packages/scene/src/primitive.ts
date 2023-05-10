@@ -14,7 +14,6 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
 const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
-const NORMAL_BINDINGS = bundleToAttributes(getMatrixDifferential);
 
 export type PrimitiveProps = {
   _?: number,
@@ -40,8 +39,8 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
   const matrixScaleRef = useShaderRef(matrixScale);
 
   const boundMatrix = useBoundSource(MATRIX_BINDINGS[0], matrixRef);
-  const boundPosition = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [boundMatrix]);
-  const boundDifferential = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [boundMatrix, normalMatrixRef]);
+  const boundPosition = useBoundShader(getCartesianPosition, [boundMatrix]);
+  const boundDifferential = useBoundShader(getMatrixDifferential, [boundMatrix, normalMatrixRef]);
 
   const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
   const getBounds = useCallback((bounds: DataBounds) => {

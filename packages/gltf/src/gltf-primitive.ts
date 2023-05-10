@@ -22,7 +22,6 @@ import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
 import { useGLTFMaterial } from './gltf-material';
 
 const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
-const NORMAL_BINDINGS = bundleToAttributes(getMatrixDifferential);
 
 export type GLTFPrimitiveProps = {
   gltf: GLTF,
@@ -106,9 +105,10 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     const s = useShaderRef(matrixScale);
 
     // Apply matrix transform
+    // (share uniform between both functions)
     const m     = useBoundSource(MATRIX_BINDINGS[0], t);
-    const xform = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [m]);
-    const dform = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [m, c]);
+    const xform = useBoundShader(getCartesianPosition, [m]);
+    const dform = useBoundShader(getMatrixDifferential, [m, c]);
 
     const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
     const getBounds = useCallback((bounds: DataBounds) => {

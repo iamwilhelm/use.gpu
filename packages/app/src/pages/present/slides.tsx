@@ -13,6 +13,9 @@ import {
 import {
   Present, Slide, Step,
 } from '@use-gpu/present';
+import {
+  UI, Layout, Absolute, Block, Inline, Text,
+} from '@use-gpu/layout';
 import { vec3 } from 'gl-matrix';
 
 let t = 0;
@@ -23,18 +26,25 @@ export const PresentSlidesPage: LC = () => {
     <Loop>
       <LinearRGB>
         <View>
-          <Present>
-            <Slide>
-              <Step />
-              <Step />
-              <Step />
-            </Slide>
-            <Slide>
-              <Step />
-              <Step />
-              <Step />
-            </Slide>
-          </Present>
+          <Pass>
+            <UI>
+              <Present>
+                <Slide>
+                  <Layout>
+                    <Absolute>
+                      <Block><Inline><Text size={24}>Hello</Text></Inline></Block>
+                      <Step>
+                        <Block><Inline><Text size={24}>Hello</Text></Inline></Block>
+                      </Step>
+                      <Step>
+                        <Block><Inline><Text size={24}>Hello</Text></Inline></Block>
+                      </Step>
+                    </Absolute>
+                  </Layout>
+                </Slide>
+              </Present>
+            </UI>
+          </Pass>
         </View>
       </LinearRGB>
     </Loop>

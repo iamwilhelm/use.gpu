@@ -1,12 +1,9 @@
 import type { OffscreenTarget, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 
 import { getPickingID } from '@use-gpu/wgsl/render/pick.wgsl';
-
-const PICKING_BINDINGS = bundleToAttributes(getPickingID);
 
 export type PickingContextProps = {
   renderContext: OffscreenTarget,
@@ -27,4 +24,4 @@ export type PickingSource = {
 }
 
 export const usePickingShader = ({id, ids, lookup, lookups}: PickingSource) => 
-  id ?? ids ? useBoundShader(getPickingID, PICKING_BINDINGS, [id ?? ids, lookup ?? lookups]) : useNoBoundShader();
+  id ?? ids ? useBoundShader(getPickingID, [id ?? ids, lookup ?? lookups]) : useNoBoundShader();

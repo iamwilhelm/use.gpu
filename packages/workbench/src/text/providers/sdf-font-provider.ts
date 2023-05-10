@@ -8,7 +8,6 @@ import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState,
 import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/glyph';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { getBoundShader } from '../../hooks/useBoundShader';
 import { makeInlineCursor } from '../cursor';
@@ -17,8 +16,6 @@ import { DeviceContext } from '../../providers/device-provider';
 import { FontContext } from './font-provider';
 
 import { getLODBiasedTexture } from '@use-gpu/wgsl/fragment/lod-bias.wgsl';
-
-const LOD_BIAS_BINDINGS = bundleToAttributes(getLODBiasedTexture);
 
 export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFontContext');
 export const useSDFFontContext = () => useContext(SDFFontContext);
@@ -93,7 +90,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
     };
 
     const biasedSource = {
-      ...getBoundShader(getLODBiasedTexture, LOD_BIAS_BINDINGS, [biasable, -0.5]),
+      ...getBoundShader(getLODBiasedTexture, [biasable, -0.5]),
       colorSpace: 'srgb',
     };
 

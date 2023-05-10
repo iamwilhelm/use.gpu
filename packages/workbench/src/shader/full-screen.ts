@@ -73,7 +73,7 @@ export const FullScreen: LiveComponent<FullScreenProps> = (props: FullScreenProp
         return links[k] ? links[k] : allArgs.shift();
       });
 
-      t = getBoundShader(shader, bindings, values);
+      t = getBoundShader(shader, values);
     }
 
     return use(RawFullScreen, {

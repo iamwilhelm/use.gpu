@@ -118,6 +118,9 @@ export const formatNodeName = <F extends Function>(_node: LiveElement<F>): strin
   else if (name === 'MORPH') {
     name = `Morph`;
   }
+  else if (name === 'FENCE') {
+    name = `Fence`;
+  }
   else if (name === 'DEBUG') {
     name = `Debug`;
   }

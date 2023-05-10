@@ -139,7 +139,7 @@ export const makeNextFiber = <F extends ArrowFunction>(
   const nextFiber = makeSubFiber(fiber, use(Next), fiber.id, 1);
 
   // Adopt existing yeet context
-  // which will be overwritten.
+  // which will be overwritten on the original fiber.
   if (reyeet && fiber.yeeted) {
     nextFiber.yeeted = fiber.yeeted;
     nextFiber.yeeted.id = nextFiber.id;
@@ -539,8 +539,8 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   calls: LiveElement | LiveElement[],
 ) => {
-  if (!fiber.quote) {
-    fiber.next = makeNextFiber(fiber, Reconcile, 'Reconcile');
+  if (!fiber.quote || fiber.quote.root !== fiber) {
+    fiber.next = makeNextFiber(fiber, () => {}, 'Reconcile');
     fiber.quote = makeQuoteState(fiber, fiber, fiber.next);
     fiber.next.unquote = fiber.quote;
   }

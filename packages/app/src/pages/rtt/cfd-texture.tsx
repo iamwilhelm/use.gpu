@@ -78,8 +78,8 @@ export const RTTCFDTexturePage: LC = () => {
 
   const dpi = window.devicePixelRatio;
 
-  const advectForwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: 1.0});
-  const advectBackwards = useBoundShader(advectVelocity, [], [], {TIME_STEP: -1.0});
+  const advectForwards = useBoundShader(advectVelocity, [], {TIME_STEP: 1.0});
+  const advectBackwards = useBoundShader(advectVelocity, [], {TIME_STEP: -1.0});
 
   const root = document.querySelector('#use-gpu .canvas');
 

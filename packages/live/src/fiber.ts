@@ -8,7 +8,7 @@ import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_RED
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
-import { formatNode, formatNodeName, LOGGING } from './debug';
+import { formatNode, formatNodeName, formatTree, LOGGING } from './debug';
 import { createElement } from './jsx';
 
 import { setCurrentFiber } from './current';
@@ -605,6 +605,9 @@ export const makeFiberReduction = <F extends ArrowFunction, R>(
   if (!next) return null;
   if (!Next) return null;
 
+  const LOG = LOGGING.fiber;
+  LOG && console.log('Reducing', formatNode(fiber));
+
   const ref = useOne(() => ({current: fallback}));
   const value = gather(fiber, true);
   const nextValue = (value === SUSPEND)
@@ -695,7 +698,7 @@ export const reduceFiberValues = <R>(
     const {yeeted, mount, mounts, order} = fiber;
     if (!yeeted) throw new Error("Reduce without aggregator");
 
-    let isFork = (fiber.f === CAPTURE || fiber.f === RECONCILE) && fiber.next;
+    let isFork = (fiber.type === CAPTURE || fiber.type === RECONCILE) && fiber.next;
 
     if (!self) {
       if (fiber.next && !isFork) return reduce(fiber.next);
@@ -759,7 +762,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = (fiber.f === CAPTURE || fiber.f === RECONCILE) && fiber.next;
+  let isFork = (fiber.type === CAPTURE || fiber.type === RECONCILE) && fiber.next;
 
   if (!self) {
     if (fiber.next && !isFork) return gatherFiberValues(fiber.next);
@@ -823,7 +826,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = (fiber.f === CAPTURE || fiber.f === RECONCILE) && fiber.next;
+  let isFork = (fiber.type === CAPTURE || fiber.type === RECONCILE) && fiber.next;
 
   if (!self) {
     if (fiber.next && !isFork) return multiGatherFiberValues(fiber.next) as any;
@@ -1172,7 +1175,7 @@ export const visitYeetRoot = <F extends ArrowFunction>(
     const LOG = LOGGING.fiber;
     const {root} = yeeted;
 
-    LOG && console.log('Reduce', formatNode(fiber), '->', formatNode(root));
+    LOG && console.log('Visit', formatNode(fiber), '->', formatNode(root));
     bustFiberMemo(root);
     if (host) host.visit(root);
   }

@@ -4,12 +4,14 @@ import { reactInterop } from './fiber';
 const {prototype: {hasOwnProperty}} = Object;
 
 export type LoggingOptions = {
+  tick: boolean,
   dispatch: boolean,
   fiber: boolean,
 };
 
 /** @hidden */
 export const LOGGING = {
+  tick: false,
   dispatch: false,
   fiber: false,
 } as Record<string, boolean>;
@@ -23,18 +25,26 @@ export const setLogging = (options: LoggingOptions) => {
   for (let k in options) LOGGING[k] = (options as any)[k];
 };
 
-export const formatSnapshot = (arg: any): string => {
+export const formatSnapshot = (arg: any, depth: number = 0): string => {
   const args = Array.isArray(arg) ? arg : (arg !== undefined ? [arg] : []);
-  return args.map(formatSnapshotArg).join(' ');
+  return args.map(a => formatSnapshotArg(a, depth)).join(' ');
 }
 
-export const formatSnapshotArg = (arg: any): string => {
+export const formatSnapshotArg = (arg: any, depth: number = 0): string => {
+  if (depth > 1) return '…';
+
   if (Array.isArray(arg)) return '[' + arg.map(formatSnapshotArg) + ']';
   if (typeof arg === 'object' && arg) {
     if (arg.f && arg.args && arg.by) {
-      return '<' + formatNodeName(arg) +'> ' + formatSnapshot(arg.args ?? arg.arg);
+      return '<' + formatNodeName(arg) +' ' + formatSnapshot(arg.args ?? arg.arg, depth + 1) + '>';
     }
-    return '{' + Object.keys(arg).map(k => `${k}={${formatSnapshotArg(arg[k])}}`) + '}';
+    return Object.keys(arg).map(k => `${k}={${formatSnapshotArg(arg[k], depth + 1)}}`).join(' ');
+  }
+  if (typeof arg === 'string') {
+    return truncate(arg.replace(/\s+/g, ' '), 40);
+  }
+  if (typeof arg === 'function') {
+    return formatShortValue(arg);
   }
   return `${arg}`;
 }
@@ -45,7 +55,7 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
 
   const prefix = '  '.repeat(depth);
   
-  out.push(prefix + '<' + formatNodeName(root) +'> '+ formatSnapshot(root.args));
+  out.push(prefix + '<' + formatNodeName(root) +' '+ formatSnapshot(root.args)) + '>';
 
   if (mount) {
     out.push(formatTree(mount, depth + 1));
@@ -225,9 +235,9 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
   if (typeof x === 'string') return x;
   if (typeof x === 'function') {
     if (x.name === '' && !x.displayName) x.displayName = '#' + Math.round(Math.random() * 10000);
-    const name = x.displayName ?? x.name;
+    const name = `${x.displayName ?? x.name}(…)`;
     const body = x.toString().split(/=>/)[1];
-    return `${name}(…) ` + truncate(body, 40);
+    return body != null ? name + truncate(body.replace(/\s+/g, ' '), 40) : name;
   }
   if (typeof x === 'object') {
     if (x.constructor.name.match(/Array/)) {

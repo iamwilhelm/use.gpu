@@ -103,7 +103,7 @@ export const renderWithDispatch = (
     const flush = (as: Action[]) => {
       const fibers = dedupe(as.map(({fiber}) => fiber));
 
-      LOG && console.log('----------------------------');
+      (LOG || LOGGING.tick) && console.log('----------------------------');
       LOG && console.log('Dispatch to Roots', fibers.map(formatNode), +new Date() - START, 'ms');
       if (!fibers.length) debugger;
 

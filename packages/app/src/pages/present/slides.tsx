@@ -44,6 +44,7 @@ export const PresentSlidesPage: LC = () => {
                     </Block>
                   </Absolute>
                 </Slide>
+                {/*
                 <Slide effect={{type: 'fade', direction: 'left'}}>
                   <Absolute left={50} top={50} bottom={50} right={50}>
                     <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff">Lorem ipsum 2</Text></Inline></Block>
@@ -60,6 +61,7 @@ export const PresentSlidesPage: LC = () => {
                     </Block>
                   </Absolute>
                 </Slide>
+                */}
               </Present>
 
             </UI>

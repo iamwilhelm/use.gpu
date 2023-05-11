@@ -8,12 +8,13 @@ import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 
 import { memoFit, memoLayout } from '../lib/util';
 
-import { getCombinedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
+import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 
 export type TransformProps = {
   clip?: ShaderModule,
   mask?: ShaderModule,
   transform?: ShaderModule,
+  inverse?: ShaderModule,
 };
 
 export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithChildren<TransformProps>) => {
@@ -21,6 +22,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
     clip,
     mask,
     transform,
+    inverse,
     children,
   } = props;
 
@@ -42,7 +44,8 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
           ) => {
             const xmask = parentMask && mask ? chainTo(parentMask, mask) : parentMask ?? mask;
             const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
-            const xclip = parentClip ? (
+
+            const pclip = (parentClip && clip) ? (
               bindBundle(
                 getCombinedClip,
                 {
@@ -50,7 +53,17 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
                   getSelf: clip ?? null,
                 }
               )
-            ) : clip;
+            ) : (parentClip ?? clip);
+            
+            const xclip = inverse ? (
+              bindBundle(
+                getTransformedClip,
+                {
+                  getParent: pclip,
+                  applyTransform: inverse,
+                }
+              )
+            ) : pclip;
 
             return fit.render(box, box, xclip, xmask, xform);
           })

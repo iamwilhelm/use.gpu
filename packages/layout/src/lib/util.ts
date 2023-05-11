@@ -135,6 +135,7 @@ export const makeBoxLayout = (
   clip?: ShaderModule,
   mask?: ShaderModule,
   transform?: ShaderModule,
+  inverse?: ShaderModule,
 ) => (
   box: Rectangle,
   origin: Rectangle,

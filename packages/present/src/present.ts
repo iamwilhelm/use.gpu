@@ -3,7 +3,8 @@ import type { EffectTrait, TransitionTrait, SlideEase, ResolvedSlides } from './
 
 import { fragment, reconcile, quote, gather, provide, useContext, useNoContext, useMemo, useOne, useRef, useState } from '@use-gpu/live';
 import { useAnimationFrame, useNoAnimationFrame, useShaderRef, useTimeContext, LoopContext, KeyboardContext } from '@use-gpu/workbench';
-import { useBoundShader } from '@use-gpu/workbench';
+import { useBoundShader, useBoundSource } from '@use-gpu/workbench';
+import { bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl'; 
 
 import { resolveSlides } from './lib/slides';
 import { PresentContext, usePresentContext } from './providers/present-provider';
@@ -145,6 +146,8 @@ const merge = (a, b) => {
   return o;
 };
 
+const ATTRIBUTES = bundleToAttributes(getSlidePosition);
+
 export const usePresentTransition = (id: number, props: Partial<TransitionTrait>, origin: Rectangle) => {
   const {effect, enter, exit} = useTransitionTrait(props);
 
@@ -153,8 +156,13 @@ export const usePresentTransition = (id: number, props: Partial<TransitionTrait>
   const v = useRef(0);
   const o = useShaderRef(origin);
 
-  const mask = useBoundShader(getSlideMask, [e, d, v]);
-  const transform = useBoundShader(getSlidePosition, [e, d, v, o]);
+  const es = useBoundSource(ATTRIBUTES[0], e);
+  const ds = useBoundSource(ATTRIBUTES[1], d);
+  const vs = useBoundSource(ATTRIBUTES[2], v);
+
+  const mask = useBoundShader(getSlideMask, [es, ds, vs]);
+  const transform = useBoundShader(getSlidePosition, [es, ds, vs, o]);
+  const inverse = useOne(() => bindEntryPoint(transform, 'getSlideInverse'), transform);
 
   const enterEffect = useOne(() => merge(effect, enter), [effect, enter]);
   const exitEffect = useOne(() => merge(effect, exit), [effect, exit]);
@@ -178,7 +186,7 @@ export const usePresentTransition = (id: number, props: Partial<TransitionTrait>
     return isVisible(id);
   };
 
-  return {mask, transform, useUpdateTransition};
+  return {mask, transform, inverse, useUpdateTransition};
 };
 
 const makeUseTransition = (

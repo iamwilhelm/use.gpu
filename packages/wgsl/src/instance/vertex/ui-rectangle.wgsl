@@ -85,33 +85,38 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
   var xy1 = uv1 * 2.0 - 1.0;
   let box = rectangle.zw - rectangle.xy;
 
-  // Get corner + two adjacent vertices
+  // Get corner
   var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.0, 1.0);
-  var posFlipX = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(1.0 - uv1.x, uv1.y)), 0.0, 1.0);
-  var posFlipY = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(uv1.x, 1.0 - uv1.y)), 0.0, 1.0);
 
   var center4  = worldToClip(applyTransform(position));
-
   var center  = to3D(center4);
-  var centerX = worldToClip3D(applyTransform(posFlipX));
-  var centerY = worldToClip3D(applyTransform(posFlipY));
-
-  // Get side length in screen pixels
-  var size = getViewSize();
-  var dx = (center.xy - centerX.xy) * size;
-  var dy = (center.xy - centerY.xy) * size;
-
-  var stepX = normalize(dx);
-  var stepY = normalize(dy);
 
   var sdfUV: vec2<f32>;
   var conservative: vec3<f32>;
+  // Normal rasterization
   if (mode == -1 || mode == -2) {
     // Rasterize glyphs normally (they are pre-padded)
     conservative = center;
     sdfUV = uv1 * (uv4.zw - uv4.xy);
   }
+  // Conservative rasterization
   else {
+    // Get two adjacent vertices
+    var posFlipX = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(1.0 - uv1.x, uv1.y)), 0.0, 1.0);
+    var posFlipY = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(uv1.x, 1.0 - uv1.y)), 0.0, 1.0);
+
+    var centerX = worldToClip3D(applyTransform(posFlipX));
+    var centerY = worldToClip3D(applyTransform(posFlipY));
+
+    // Get side length in screen pixels
+    var size = getViewSize();
+
+    var dx = (center.xy - centerX.xy) * size;
+    var dy = (center.xy - centerY.xy) * size;
+
+    var stepX = normalize(dx);
+    var stepY = normalize(dy);
+
     // Rasterize shapes conservatively
     conservative = vec3<f32>(center.xy + (stepX + stepY) * getViewResolution(), center.z);
     uv1 = uv1 + xy1 / vec2<f32>(length(dx), length(dy));

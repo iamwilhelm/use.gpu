@@ -35,7 +35,6 @@ export type RenderTargetProps = {
   samples?: number,
   resolution?: number,
 
-  children?: LiveElement,
   render?: (rttContext: OffscreenTarget) => LiveElement,
   then?: (target: TextureTarget) => LiveElement,
 };
@@ -44,7 +43,7 @@ export type RenderTargetProps = {
 
 Place `@{<Pass>}` directly inside, or leave empty to use yielded target with `@{<RenderToTexture>}`.
 */
-export const RenderTarget: LiveComponent<RenderTargetProps> = (props) => {
+export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithChildren<RenderTargetProps>) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

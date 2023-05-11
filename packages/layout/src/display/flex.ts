@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
 
 import { useProp } from '@use-gpu/traits';
@@ -26,10 +26,9 @@ export type FlexProps =
 
   wrap?: boolean,
   snap?: boolean,
-  children?: LiveElement,
 };
 
-export const Flex: LiveComponent<FlexProps> = memo((props: FlexProps) => {
+export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<FlexProps>) => {
   const {
     wrap = false,
     snap = true,

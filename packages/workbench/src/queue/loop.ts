@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement, LiveFiber, Task } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, LiveFiber, Task, PropsWithChildren } from '@use-gpu/live';
 import { use, signal, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
 
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -7,7 +7,6 @@ import { LoopContext } from '../providers/loop-provider';
 
 export type LoopProps = {
   live?: boolean,
-  children?: LiveElement,
 };
 
 export type LoopRef = {
@@ -26,7 +25,7 @@ export type LoopRef = {
 };
 
 /** Provides `useAnimationFrame` and clock to allow for controlled looping and animation. */
-export const Loop: LiveComponent<LoopProps> = (props) => {
+export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProps>) => {
   const {live, children} = props;
 
   const ref: LoopRef = useOne(() => ({
@@ -54,6 +53,7 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
     const render = (timestamp: number) => {
       ref.frame++;
       pending = false;
+
       if (running) request();
 
       if (time.timestamp === -Infinity) time.start = timestamp;
@@ -67,6 +67,8 @@ export const Loop: LiveComponent<LoopProps> = (props) => {
 
       const {run} = ref;
       if (run) run();
+      
+      if (!pending) time.timestamp = -Infinity;
     };
 
     const request = (fiber?: LiveFiber<any>) => {

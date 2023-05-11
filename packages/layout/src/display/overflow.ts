@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core';
 import type { FitInto, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
@@ -38,10 +38,9 @@ export type OverflowProps = {
   scrollBar?: LiveElement,
   
   direction?: Direction,
-  children?: LiveElement,
 };
 
-export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps) => {
+export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChildren<OverflowProps>) => {
   const {
     scrollX = 0,
     scrollY = 0,
@@ -213,7 +212,9 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
           size: outer,
           render: memoLayout((
             box: Rectangle,
+            origin: Rectangle,
             parentClip?: ShaderModule,
+            parentMask?: ShaderModule,
             parentTransform?: ShaderModule,
           ) => {
           
@@ -225,8 +226,8 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
             }
           
             return [
-              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
-              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
+              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, null, transform, inverse)(box, origin, parentClip, parentMask, parentTransform),
+              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, origin, parentClip, parentMask, parentTransform),
             ];
           }),
           pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),

@@ -1,24 +1,34 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { SlideTrait } from './types';
 
-import { useFiber } from '@use-gpu/live';
-import { useSlideCapture } from './present';
-import { resolveSlides } from './lib/slides';
+import { unquote, fence, fragment, yeet, use, useFiber } from '@use-gpu/live';
+import { useLayoutContext } from '@use-gpu/workbench';
+import { Transform } from '@use-gpu/layout';
 
-export type StepProps = Partial<SlideTrait> & {
-  render?: (state: boolean) => LiveElement,
-};
+import { usePresentTransition } from './present';
+import { useSlideTrait } from './traits';
+
+export type StepProps = Partial<SlideTrait> & Partial<TransitionTrait>;
 
 export const Step: LC<StepProps> = (props: PropsWithChildren<StepProps>) => {
-  const {order, steps, stay, render} = props;
+  const {children} = props;
+  const {order, steps, stay} = useSlideTrait(props);
 
   const {id} = useFiber();
-  useSlideCapture({
-    id,
-    order,
-    steps,
-    stay,
-  });
+  const layout = useLayoutContext();
+  const {useUpdateTransition, ...transform} = usePresentTransition(id, props, layout);
 
-  return null;
+  return fence(
+    unquote(yeet({
+      id,
+      order,
+      steps,
+      stay,
+      sticky: true,
+    })),
+    () => {
+      useUpdateTransition();
+      return use(Transform, {...transform, children});
+    },
+  );
 };

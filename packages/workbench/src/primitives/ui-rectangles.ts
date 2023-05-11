@@ -44,6 +44,7 @@ export type UIRectanglesProps = {
   texture?: TextureSource | LambdaSource | ShaderModule,
   transform?: ShaderModule,
   clip?: ShaderModule,
+  mask?: ShaderSource,
 
   debugContours?: boolean,
 
@@ -60,6 +61,12 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     depthTest,
     depthWrite,
     blend,
+    
+    texture,
+    transform,
+    clip,
+    mask,
+    
     debugContours = false,
   } = props;
 
@@ -72,16 +79,18 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const s = useShaderRef(props.strokes, props.strokes);
   const f = useShaderRef(props.fill, props.fills);
   const u = useShaderRef(props.uv, props.uvs);
+  const v = useShaderRef(props.st, props.sts);
   const p = useShaderRef(props.repeat, props.repeats);
   const d = useShaderRef(props.sdf, props.sdfs);
 
-  const {transform: xf} = useCombinedTransform(props.transform);
-  const c = props.clip;
-  const t = useNativeColorTexture(props.texture);
+  const {transform: xf} = useCombinedTransform(transform);
+  const c = clip;
+  const m = mask;
+  const t = useNativeColorTexture(texture);
 
-  const getVertex = useBoundShader(getUIRectangleVertex, [r, a, b, s, f, u, p, d, xf, c]);
+  const getVertex = useBoundShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getUIFragment, [t]);
+  const getFragment = useBoundShader(getUIFragment, [t, m]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
@@ -100,8 +109,9 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const defines: Record<string, any> = useMemo(() => ({
     ...defs,
     HAS_EDGE_BLEED: true,
+    HAS_MASK: !!mask,
     DEBUG_SDF: debugContours,
-  }), [defs, debugContours]);
+  }), [defs, debugContours, mask]);
 
   return use(Virtual, {
     vertexCount,

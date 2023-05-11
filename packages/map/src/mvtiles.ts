@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 
 import { gather, use, keyed, yeet, memo, useAwait, useCallback, useOne, useMemo } from '@use-gpu/live';
 import { VirtualLayers, useLayoutContext, useForceUpdate } from '@use-gpu/workbench';
@@ -23,7 +23,6 @@ const getDownKey = (x: number, y: number, zoom: number, dx: number, dy: number) 
 export type MVTilesProps = {
   minLevel?: number,
   detail?: number,
-  children?: LiveElement,
 };
 
 export type MVTileProps = {
@@ -39,7 +38,7 @@ export type MVTileProps = {
   tesselate?: number,
 };
 
-export const MVTiles: LiveComponent<MVTilesProps> = (props) => {
+export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MVTilesProps>) => {
   const {
     minLevel = 0,
     detail = 1,

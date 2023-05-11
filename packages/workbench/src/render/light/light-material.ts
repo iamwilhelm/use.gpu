@@ -19,7 +19,6 @@ import { applyPointShadow as applyPointShadowWGSL } from '@use-gpu/wgsl/shadow/p
 
 export type LightMaterialProps = {
   shadows?: boolean,
-  children?: LiveElement,
   then?: (light: LightEnv) => LiveElement,
 };
 

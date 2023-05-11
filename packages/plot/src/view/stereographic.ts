@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
@@ -23,11 +23,9 @@ export type StereographicProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   normalize?: number | boolean,
   on?: Axis4,
-
-  children?: LiveElement,
 };
 
-export const Stereographic: LiveComponent<StereographicProps> = (props) => {
+export const Stereographic: LiveComponent<StereographicProps> = (props: PropsWithChildren<StereographicProps>) => {
   const {
     on = 'z',
     bend = 1,

@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale, useProp } from '@use-gpu/traits';
@@ -24,11 +24,9 @@ export type SphericalProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   helix?: number,
   on?: Swizzle,
-
-  children?: LiveElement,
 };
 
-export const Spherical: LiveComponent<SphericalProps> = (props) => {
+export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildren<SphericalProps>) => {
   const {
     bend = 1,
     helix = 0,

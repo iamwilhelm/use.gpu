@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { DataBounds, ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
 import { provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useMemo, useRef } from '@use-gpu/live';
@@ -29,10 +29,9 @@ export type ViewContextProps = {
 export type ViewProviderProps = {
   defs: UniformAttribute[],
   uniforms: ViewUniforms,
-  children?: LiveElement,
 };
 
-export const ViewProvider: LiveComponent<ViewProviderProps> = (props: ViewProviderProps) => {
+export const ViewProvider: LiveComponent<ViewProviderProps> = (props: PropsWithChildren<ViewProviderProps>) => {
   const {defs, uniforms, children} = props;
 
   const device = useDeviceContext();

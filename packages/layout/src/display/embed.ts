@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Rectangle, Point, Point4 } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { FitInto, LayoutElement, Dimension, Margin } from '../types';
@@ -19,11 +19,10 @@ export type EmbedProps = Partial<BoxTrait> &
   width?: Dimension,
   height?: Dimension,
   snap?: boolean,
-  render?: (key: number, layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement,
-  children?: LiveElement,
+  render?: (key: number, layout: Rectangle, origin: Rectangle, clip?: ShaderModule, mask?: ShaderModule, transform?: ShaderModule) => LiveElement,
 };
 
-export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
+export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<EmbedProps>) => {
   const {
     snap = true,
     render,
@@ -60,9 +59,9 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: EmbedProps) => {
 
     return {
       size,
-      render: memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => {
+      render: memoLayout((layout: Rectangle, origin: Rectangle, clip?: ShaderModule, mask?: ShaderModule, transform?: ShaderModule) => {
         const view = render
-          ? render(id, layout, clip, transform)
+          ? render(id, layout, origin, clip, mask, transform)
           : (
             provide(LayoutContext, layout,
               provide(TransformContext, {transform}, children),

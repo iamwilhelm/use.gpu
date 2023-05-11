@@ -1,4 +1,4 @@
-import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction } from '@use-gpu/live';
+import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext, ColorSpace, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, fence, quote, yeet, useCallback, useContext, useFiber, useMemo, useOne, useNoContext, incrementVersion } from '@use-gpu/live';
@@ -21,13 +21,12 @@ const NO_SAMPLER: Partial<GPUSamplerDescriptor> = {};
 
 export type RenderToTextureProps = {
   target?: UseGPURenderContext,
-  children?: LiveElement,
   render?: (texture: TextureTarget) => LiveElement,
   then?: (texture: TextureTarget) => LiveElement,
 };
 
 /** Render to a given off-screen target, or the current target (if inside a `@{<RenderTarget>}`). */
-export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props) => {
+export const RenderToTexture: LiveComponent<RenderToTextureProps> = (props: PropsWithChildren<RenderToTextureProps>) => {
   const device = useContext(DeviceContext);
 
   const {

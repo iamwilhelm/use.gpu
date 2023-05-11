@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext, TextureSource, ColorSpace } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 
@@ -33,12 +33,11 @@ export type LinearRGBProps = {
 
   overlay?: boolean,
 
-  children?: LiveElement,
   then?: (texture: TextureSource) => LiveElement,
 };
 
 /** Sets up a Linear RGB render target and automatically renders it to the screen as sRGB. */
-export const LinearRGB: LiveComponent<LinearRGBProps> = (props: LinearRGBProps) => {
+export const LinearRGB: LiveComponent<LinearRGBProps> = (props: PropsWithChildren<LinearRGBProps>) => {
   const {
     tonemap = 'linear',
     gain = 1,

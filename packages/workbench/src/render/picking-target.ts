@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { TypedArray, UniformAttribute, TextureSource, OffscreenTarget } from '@use-gpu/core';
 
 import {
@@ -34,14 +34,12 @@ export type PickingProps = {
   pickingColor?: GPUColor,
   depthStencilFormat?: GPUTextureFormat,
   resolution?: number,
-
-  children?: LiveElement,
 }
 
 const NOP = () => {};
 
 /** Global picking provider. Provides a screen-sized render target that contains object ID + item index. */
-export const PickingTarget: LiveComponent<PickingProps> = (props) => {
+export const PickingTarget: LiveComponent<PickingProps> = (props: PropsWithChildren<PickingProps>) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

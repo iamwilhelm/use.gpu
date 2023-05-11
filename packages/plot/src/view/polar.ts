@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
@@ -23,11 +23,9 @@ export type PolarProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   helix?: number,
   on?: Axis4,
-
-  children?: LiveElement,
 };
 
-export const Polar: LiveComponent<PolarProps> = (props) => {
+export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarProps>) => {
   const {
     bend = 1,
     helix = 0,

@@ -73,7 +73,13 @@ export const Text: LiveComponent<TextProps> = (props) => {
     spans,
     height,
     inline,
-    render: memoInline((lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule) => (
+    render: memoInline((
+      lines: InlineLine[],
+      origin: Rectangle,
+      clip?: ShaderModule,
+      mask?: ShaderModule,
+      transform?: ShaderModule,
+    ) => (
       keyed(Glyphs, id, {
         id,
         font,
@@ -89,7 +95,9 @@ export const Text: LiveComponent<TextProps> = (props) => {
         snap,
         expand,
 
+        origin,
         clip,
+        mask,
         transform,
       })
     )),

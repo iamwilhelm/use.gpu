@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import { extend, useContext, useMemo, useNoMemo, useOne, useResource, useNoResource } from '@use-gpu/live';
 import { EventContext, MouseContext, MouseEventState } from '../providers/event-provider';
 
@@ -32,7 +32,6 @@ export type PickProps = {
   move?: boolean,
   capture?: boolean,
   render?: (state: PickState) => LiveElement,
-  children?: LiveElement,
   onMouseOver?: (m: MouseEventState, index: number) => void,
   onMouseOut?:  (m: MouseEventState, index: number) => void,
   onMouseDown?: (m: MouseEventState, index: number) => void,
@@ -51,7 +50,7 @@ export const Pick: LiveComponent<PickProps> = ({
   onMouseDown,
   onMouseUp,
   onMouseMove,
-}) => {
+}: PropsWithChildren<PickProps>) => {
   const { useId } = useContext(EventContext);
   const { useMouse, beginCapture, endCapture } = useContext(MouseContext);
 

@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, LambdaSource, UniformType } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
@@ -21,10 +21,9 @@ import { vec4 } from 'gl-matrix';
 export type ScaleProps = Partial<ScaleTrait> & Partial<AxisTrait> & {
   origin?: VectorLike,
   render?: (positions: LambdaSource, values: Float32Array) => LiveElement,
-  children?: LiveElement,
 };
 
-export const Scale: LiveComponent<ScaleProps> = (props) => {
+export const Scale: LiveComponent<ScaleProps> = (props: PropsWithChildren<Scale>) => {
 
   const {
     origin,

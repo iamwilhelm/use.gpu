@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Point, Point4, Rectangle } from '@use-gpu/core';
 import type { Placement } from '@use-gpu/traits';
 import type { FitInto, LayoutElement, LayoutPicker } from './types';
@@ -26,12 +26,11 @@ export type LayoutProps = {
   placement?: Placement,
   inspect?: boolean,
   render?: () => LiveElement,
-  children?: LiveElement,
 };
 
 const DEFAULT_PLACEMENT = vec2.fromValues(1, 1);
 
-export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
+export const Layout: LiveComponent<LayoutProps> = memo((props: PropsWithChildren<LayoutProps>) => {
   const {width, height, render, children} = props;
   const placement = useProp(props.placement, parsePlacement, DEFAULT_PLACEMENT);
 
@@ -98,7 +97,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
     const [w, h] = absolute ? into : size;
     const [ml, mt] = margin;
     const layout = [left + ml, top + mt, left + ml + w, top + mt + h] as Rectangle;
-    const el = render(layout, undefined, transform);
+    const el = render(layout, layout, undefined, undefined, transform);
     
     sizes.push([w, h]);
     offsets.push([left + ml, top + mt]);

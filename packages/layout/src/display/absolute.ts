@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { FitInto, Dimension, Direction, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
@@ -23,10 +23,9 @@ export type AbsoluteProps = Partial<ElementTrait> &
 
   under?: boolean,
   snap?: boolean,
-  children?: LiveElement,
 };
 
-export const Absolute: LiveComponent<AbsoluteProps> = memo((props: AbsoluteProps) => {
+export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChildren<AbsoluteProps>) => {
   const {
     left: l,
     top: t,

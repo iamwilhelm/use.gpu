@@ -7,6 +7,7 @@ import type { InlineLine } from '../types';
 import { use, yeet, useContext, useMemo } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext } from '@use-gpu/workbench';
 import { evaluateDimension } from '../parse';
+import { getOriginProjectionX, getOriginProjectionY } from '../lib/util';
 
 const BLACK = [0, 0, 0, 1];
 
@@ -28,6 +29,7 @@ export type GlyphsProps = {
   lines: InlineLine[],
   
   clip?: ShaderModule,
+  mask?: ShaderModule,
   transform?: ShaderModule,
 };
 
@@ -48,7 +50,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     height,
     lines,
 
+    origin,
     clip,
+    mask,
     transform,
   } = props;
 
@@ -67,6 +71,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   
     const rectangles = [] as number[];
     const uvs = [] as number[];
+    const sts = [] as number[];
     let count = 0;
 
     const bounds = [Infinity, Infinity, -Infinity, -Infinity];
@@ -107,6 +112,12 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
 
               rectangles.push(left, top, right, bottom);
               uvs.push(r * mapping[0], r * mapping[1], r * mapping[2], r * mapping[3]);
+              sts.push(
+                getOriginProjectionX(left, origin),
+                getOriginProjectionY(top, origin),
+                getOriginProjectionX(right, origin),
+                getOriginProjectionY(bottom, origin),
+              );
 
               bounds[0] = Math.min(bounds[0], left);
               bounds[1] = Math.min(bounds[1], top);
@@ -132,6 +143,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       id,
       rectangles,
       uvs,
+      sts,
       // macOS-style font bleed
       border: [expand, Math.min(size / 32, 1.0) * 0.25, 0, 0],
       sdf: [radius, scale, size, 0],
@@ -139,6 +151,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       texture,
       count,
       clip,
+      mask,
       transform,
       bounds,
     } : null;

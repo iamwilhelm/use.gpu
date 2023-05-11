@@ -379,6 +379,13 @@ declare module "@use-gpu/wgsl/mask/scissor.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/mask/slide.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getSlideMask: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/mask/textured.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -688,6 +695,13 @@ declare module "@use-gpu/wgsl/transform/scissor.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getScissorLevel: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/transform/slide.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getSlidePosition: ParsedBundle;
   export default __module;
 }
 

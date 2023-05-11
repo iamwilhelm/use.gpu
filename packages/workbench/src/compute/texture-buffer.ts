@@ -24,13 +24,12 @@ export type TextureBufferProps = {
   resolution?: number,
   filterable?: boolean,
 
-  children?: LiveElement,
   render?: (texture: TextureTarget) => LiveElement,
   then?: (texture: TextureTarget) => LiveElement,
 };
 
 /** Read-write GPU texture buffer for compute. Will perform frame-buffer flipping with N frames of history. */
-export const TextureBuffer: LiveComponent<TextureBufferProps> = (props) => {
+export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWithChildren<TextureBufferProps>) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Atlas, Tuples, Rectangle } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { FontMetrics, GlyphMetrics } from '@use-gpu/glyph';
@@ -36,7 +36,6 @@ export type SDFFontProviderProps = {
   height?: number,
   radius?: number,
   pad?: number,
-  children?: LiveElement,
   then?: (atlas: Atlas, source: ShaderSource, gathered: any) => LiveElement
 };
 
@@ -69,7 +68,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   pad = 0,
   children,
   then,
-}: SDFFontProviderProps) => {
+}: PropsWithChildren<SDFFontProviderProps>) => {
   pad += Math.ceil(radius * 0.75);
 
   const device = useContext(DeviceContext);

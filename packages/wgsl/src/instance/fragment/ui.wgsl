@@ -2,10 +2,12 @@ use '@use-gpu/wgsl/fragment/sdf-2d'::{ SDF, getUVScale, getBoxSDF, getBorderBoxS
 use '@use-gpu/wgsl/use/color'::{ premultiply };
 
 @optional @link fn getTexture(uv: vec2<f32>) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
+@optional @link fn getMask(color: vec4<f32>, uv: vec4<f32>, st: vec4<f32>) -> vec4<f32> { return color; }
 
 @export fn getUIFragment(
   uv: vec2<f32>,
   textureUV: vec2<f32>,
+  textureST: vec2<f32>,
   clipUV: vec4<f32>,
   sdfUV: vec2<f32>,
   sdfConfig: vec4<f32>,
@@ -115,6 +117,10 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
       sdf.inner = sdf.outer - 1.0;
     }
     color = mix(fillColor, strokeColor, reduce * clamp(1.0 - sdf.inner, 0.0, 1.0));
+  }
+
+  if (HAS_MASK) {
+    color = getMask(color, vec4<f32>(textureUV, 0.0, 0.0), vec4<f32>(textureST, 0.0, 0.0));
   }
 
   if (!HAS_ALPHA_TO_COVERAGE) {

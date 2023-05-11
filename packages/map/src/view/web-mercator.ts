@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Swizzle } from '@use-gpu/plot';
 import type { GeographicTrait } from '../types';
 
@@ -34,11 +34,9 @@ export type WebMercatorProps = Partial<AxesTrait> & Partial<GeographicTrait> & P
   native?: boolean,
   scissor?: boolean,
   radius?: number,
-
-  children?: LiveElement,
 };
 
-export const WebMercator: LiveComponent<WebMercatorProps> = (props) => {
+export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChildren<WebMercatorProps>) => {
   const {
     on = 'xyz',
     bend = 1,

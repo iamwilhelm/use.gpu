@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent } from '@use-gpu/live';
 import type { Point, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Base, MarginLike } from '../types';
@@ -22,10 +22,9 @@ export type InlineProps = Partial<BoxTrait> & {
 
   wrap?: boolean,
   snap?: boolean,
-  children?: LiveElement,
 };
 
-export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
+export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren<InlineProps>) => {
   const {
     wrap = true,
     snap = true,
@@ -87,17 +86,19 @@ export const Inline: LiveComponent<InlineProps> = memo((props: InlineProps) => {
             size,
             render: memoLayout((
               box: Rectangle,
+              origin: Rectangle,
               clip?: ShaderModule,
+              mask?: ShaderModule, 
               transform?: ShaderModule,
             ) => {
               if (hovered) {
-                const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders, key)(box, clip, transform);
-                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
+                const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders, key)(box, origin, clip, mask, transform);
+                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, origin, clip, mask, transform));
                 return out;
               }
               else {
-                const out = makeInlineLayout(ranges, sizes, offsets, renders, key)(box, clip, transform);
-                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, clip, transform));
+                const out = makeInlineLayout(ranges, sizes, offsets, renders, key)(box, origin, clip, mask, transform);
+                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, origin, clip, mask, transform));
                 return out;
               }
             }),

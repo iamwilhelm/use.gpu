@@ -8,6 +8,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
 @optional @link fn getStroke(i: u32)    -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); }
 @optional @link fn getFill(i: u32)      -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); }
 @optional @link fn getUV(i: u32)        -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); }
+@optional @link fn getST(i: u32)        -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); }
 @optional @link fn getRepeat(i: u32)    -> i32       { return 0; }
 
 @optional @link fn getSDFConfig(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
@@ -31,6 +32,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
         vec4<f32>(0.0),
         vec2<f32>(0.0),
         vec4<f32>(0.0),
+        vec2<f32>(0.0),
         vec2<f32>(0.0),
         0,
         0,
@@ -62,6 +64,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
   var fill = getFill(instanceIndex);
   var stroke = getStroke(instanceIndex);
   var uv4 = getUV(instanceIndex);
+  var st4 = getST(instanceIndex);
   var repeat = getRepeat(instanceIndex);
   var sdfConfig = getSDFConfig(instanceIndex);
 
@@ -115,8 +118,8 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
     sdfUV = uv1 * box;
   }
 
-  var uv = mix(uv4.xy, uv4.zw, uv1);
-  let textureUV = uv;
+  let textureUV = mix(uv4.xy, uv4.zw, uv1);
+  let textureST = mix(st4.xy, st4.zw, uv1);
   
   return UIVertex(
     vec4<f32>(conservative, 1.0) * center4.w,
@@ -125,6 +128,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
     sdfUV,
     clipUV,
     textureUV,
+    textureST,
     repeat,
     mode,
     vec4<f32>(box, 0.0, 0.0),

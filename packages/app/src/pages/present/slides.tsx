@@ -28,21 +28,40 @@ export const PresentSlidesPage: LC = () => {
         <View>
           <Pass>
             <UI>
+
               <Present>
-                <Slide>
-                  <Layout>
-                    <Absolute>
-                      <Block><Inline><Text size={24}>Hello</Text></Inline></Block>
-                      <Step>
-                        <Block><Inline><Text size={24}>Hello</Text></Inline></Block>
+                <Slide effect={{type: 'fade', direction: 'left'}}>
+                  <Absolute left={50} top={50} bottom={50} right={50}>
+                    <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff">Lorem ipsum</Text></Inline></Block>
+                    
+                    <Block padding={10}>
+                      <Step effect={{type: 'wipe', duration: 0.5}}>
+                        <Block padding={10} fill="#404040"><Inline><Text size={24} color="#fff">Hello</Text></Inline></Block>
                       </Step>
-                      <Step>
-                        <Block><Inline><Text size={24}>Hello</Text></Inline></Block>
+                      <Step effect={{type: 'move', direction: 'left', duration: 1}}>
+                        <Block padding={10} fill="#404040"><Inline><Text size={24} color="#fff">Hello</Text></Inline></Block>
                       </Step>
-                    </Absolute>
-                  </Layout>
+                    </Block>
+                  </Absolute>
+                </Slide>
+                <Slide effect={{type: 'fade', direction: 'left'}}>
+                  <Absolute left={50} top={50} bottom={50} right={50}>
+                    <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff">Lorem ipsum 2</Text></Inline></Block>
+                    
+                    <Block padding={10}>
+                      <Step effect={{type: 'wipe', duration: 0.5}}>
+                        <Block padding={10} fill="#404040"><Inline><Text size={24} color="#fff">Hello</Text></Inline></Block>
+                        <Block padding={10} fill="#404040"><Inline><Text size={24} color="#fff">Hello</Text></Inline></Block>
+                      </Step>
+                      <Step effect={{type: 'move', direction: 'left', duration: 1}}>
+                        <Block padding={10} fill="#404040"><Inline><Text size={24} color="#fff">Hello</Text></Inline></Block>
+                        <Block padding={10} fill="#404040"><Inline><Text size={24} color="#fff">Hello</Text></Inline></Block>
+                      </Step>
+                    </Block>
+                  </Absolute>
                 </Slide>
               </Present>
+
             </UI>
           </Pass>
         </View>

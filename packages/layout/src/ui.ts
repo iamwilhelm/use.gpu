@@ -101,12 +101,14 @@ const makeUIAccumulator = (
   const hasStroke = keys.has('strokes') || keys.has('stroke');
   const hasFill = keys.has('fills') || keys.has('fill');
   const hasUV = keys.has('uvs') || keys.has('uv');
+  const hasST = keys.has('sts') || keys.has('st');
   const hasRepeat = keys.has('repeats') || keys.has('repeat');
   const hasSDF = keys.has('sdfs') || keys.has('sdf');
 
   const hasTexture = keys.has('texture');
   const hasTransform = keys.has('transform');
-  const hasClip = keys.has('clip');
+  const hasClip = keys.has('shaders');
+  const hasMask = keys.has('mask');
 
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasRadius) storage.radiuses = makeAggregateBuffer(device, 'vec4<f32>', count);
@@ -114,6 +116,7 @@ const makeUIAccumulator = (
   if (hasStroke) storage.strokes = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasFill) storage.fills = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasUV) storage.uvs = makeAggregateBuffer(device, 'vec4<f32>', count);
+  if (hasST) storage.sts = makeAggregateBuffer(device, 'vec4<f32>', count);
   if (hasRepeat) storage.repeats = makeAggregateBuffer(device, 'i8', count);
   if (hasSDF) storage.sdfs = makeAggregateBuffer(device, 'vec4<f32>', count);
 
@@ -129,12 +132,14 @@ const makeUIAccumulator = (
     if (hasStroke) props.strokes = updateAggregateBuffer(device, storage.strokes, items, count, 'stroke', 'strokes');
     if (hasFill) props.fills = updateAggregateBuffer(device, storage.fills, items, count, 'fill', 'fills');
     if (hasUV) props.uvs = updateAggregateBuffer(device, storage.uvs, items, count, 'uv', 'uvs');
+    if (hasST) props.sts = updateAggregateBuffer(device, storage.sts, items, count, 'st', 'sts');
     if (hasRepeat) props.repeats = updateAggregateBuffer(device, storage.repeats, items, count, 'repeat', 'repeats');
     if (hasSDF) props.sdfs = updateAggregateBuffer(device, storage.sdfs, items, count, 'sdf', 'sdfs');
 
     if (hasTexture) props.texture = items[0].texture;
     if (hasTransform) props.transform = items[0].transform;
     if (hasClip) props.clip = items[0].clip;
+    if (hasMask) props.mask = items[0].mask;
 
     return use(UIRectangles, props);
   };
@@ -143,8 +148,9 @@ const makeUIAccumulator = (
 const getItemTypeKey = (item: UIAggregate) =>
   (item as any).f ? -1 :
   hashBits53(getObjectKey(item.texture)) ^
-  hashBits53(item.transform ? getBundleKey(item.transform) : 0) ^
-  hashBits53(item.clip ? getBundleKey(item.clip) : 0);
+  (item.transform ? getBundleKey(item.transform) : 0) ^
+  (item.clip ? getBundleKey(item.clip) : 0) ^
+  (item.mask ? getBundleKey(item.mask) : 0);
 
 type Partition = {
   key: number,

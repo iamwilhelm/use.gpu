@@ -1,10 +1,9 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import { useOne, useResource, useState } from '@use-gpu/live';
 
 export type AutoSizeProps = {
   canvas: HTMLCanvasElement,
   render?: (width: number, height: number, pixelRatio: number) => LiveElement,
-  children?: LiveElement,
 }
 
 const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, number, number] => {
@@ -17,7 +16,7 @@ const getCanvasSize = (window: Window, canvas: HTMLCanvasElement): [number, numb
   return [pixelRatio * window.innerWidth, pixelRatio * window.innerHeight, pixelRatio];
 }
 
-export const AutoSize: LiveComponent<AutoSizeProps> = (props) => {
+export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<AutoSizeProps>) => {
   const {canvas, render, children} = props;
 
   useResource(() => {

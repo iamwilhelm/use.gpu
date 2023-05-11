@@ -1,8 +1,6 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 
-export type PlotProps = {
-  children?: LiveElement,
-};
+export type PlotProps = PropsWithChildren<object>;
 
 export const Plot: LiveComponent<PlotProps> = (props) => {
   return props.children ?? null;

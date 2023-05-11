@@ -59,6 +59,7 @@
   sdfUV: vec2<f32>,
   clipUV: vec4<f32>,
   textureUV: vec2<f32>,
+  textureST: vec2<f32>,
   repeat: i32,
 
   mode: i32,

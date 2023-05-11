@@ -30,8 +30,6 @@ export type ScrollBarProps = {
   scrollRef?: Point,
   sizeRef?: Point4,
   transform?: ShaderModule,
-
-  children?: LiveElement,
 };
 
 const NO_POINT: Point = [0, 0];
@@ -48,7 +46,6 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
     overflow = 'scroll',
     scrollRef = NO_POINT,
     sizeRef = NO_POINT4,
-    children,
   } = props;
 
   const {id} = useFiber();
@@ -68,7 +65,13 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   const thumbTransform = useBoundShader(getScrolledPosition, [shift]);
 
   const fit = (into: FitInto) => {
-    let render = (layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement => {
+    let render = (
+      layout: Rectangle,
+      origin: Rectangle,
+      clip?: ShaderModule,
+      mask?: ShaderModule,
+      transform?: ShaderModule,
+    ): LiveElement => {
       const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
 
       const w = isX ? outerWidth : size;
@@ -99,6 +102,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         ...(hovered ? INSPECT_STYLE.parent : undefined),
 
         clip,
+        mask,
         transform,
         count: 1,
       });
@@ -112,6 +116,7 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
         ...(hovered ? INSPECT_STYLE.parent : undefined),
 
         clip,
+        mask,
         transform: transform ? chainTo(transform, thumbTransform) : thumbTransform,
         count: 1,
       });

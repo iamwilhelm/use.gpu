@@ -1,6 +1,6 @@
 import type { SlideInfo, ResolvedSlide } from './types';
 
-export const resolveSlides = (slides: SlideInfo[], sticky: boolean = false) => {
+export const resolveSlides = (slides: SlideInfo[]) => {
   const out: ResolvedSlide[] = [];
   const ordered = slides.slice();
   ordered.sort(({order: a}, {order: b}) => (a ?? 1e8) - (b ?? 1e8));
@@ -17,10 +17,10 @@ export const resolveSlides = (slides: SlideInfo[], sticky: boolean = false) => {
   const last = summed[summed.length - 1];
 
   let i = 0;
-  for (const {id, steps = 1, stay = 0, slides} of ordered) {
+  for (const {id, steps = 1, stay = 0, slides, sticky} of ordered) {
     const from = summed[i];
     const to = stay
-      ? summed[i + stay] ?? last + stay - (n - i)
+      ? summed[i + stay] ?? (last + stay - (n - i))
       : sticky
         ? last
         : summed[i + 1];

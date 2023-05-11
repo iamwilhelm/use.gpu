@@ -55,8 +55,23 @@ export type ImageTrait = {
   align: AnchorLike,
 };
 
-export type LayoutRenderer = (box: Rectangle, clip?: ShaderModule, transform?: ShaderModule) => LiveElement;
-export type InlineRenderer = (lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule, version?: number) => LiveElement;
+export type LayoutRenderer = (
+  box: Rectangle,
+  shaders: LayoutShaders,
+) => LiveElement;
+
+export type InlineRenderer = (
+  lines: InlineLine[],
+  shaders: LayoutShaders,
+  version?: number
+) => LiveElement;
+
+export type LayoutShaders = {
+  texture?: ShaderModule,
+  transform?: ShaderModule,
+  clip?: ShaderModule,
+  mask?: ShaderModule,
+};
 
 export type LayoutScroller = (x: number, y: number) => void;
 export type LayoutPicker = (x: number, y: number, l: number, t: number, r: number, b: number, scroll: boolean) => [number, Rectangle, LayoutScroller] | null;
@@ -129,8 +144,5 @@ export type UIAggregate = {
   fill?: number[],
   radius?: number[],
 
-  texture?: ShaderSource,
-  clip?: ShaderModule,
-  transform?: ShaderModule,
   bounds: Rectangle,
-};
+} & LayoutShaders;

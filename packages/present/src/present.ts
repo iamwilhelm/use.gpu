@@ -1,14 +1,14 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { EffectTrait, TransitionTrait, SlideEase, ResolvedSlides } from './types';
+import type { EffectTrait, SlideEase, ResolvedSlides } from './types';
 
-import { fragment, reconcile, quote, gather, provide, useContext, useNoContext, useMemo, useOne, useRef, useState } from '@use-gpu/live';
-import { useAnimationFrame, useNoAnimationFrame, useShaderRef, useTimeContext, LoopContext, KeyboardContext } from '@use-gpu/workbench';
+import { fragment, reconcile, quote, gather, provide, useContext, useMemo, useOne, useRef, useState } from '@use-gpu/live';
+import { useShaderRef, useTimeContext, LoopContext, KeyboardContext } from '@use-gpu/workbench';
 import { useBoundShader, useBoundSource } from '@use-gpu/workbench';
 import { bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl'; 
 
 import { resolveSlides } from './lib/slides';
 import { PresentContext, usePresentContext } from './providers/present-provider';
-import { useTransitionTrait, SLIDE_EFFECTS } from './traits';
+import { SLIDE_EFFECTS } from './traits';
 
 import { getSlideMask } from '@use-gpu/wgsl/mask/slide.wgsl';
 import { getSlidePosition } from '@use-gpu/wgsl/transform/slide.wgsl';
@@ -17,7 +17,6 @@ const NO_VEC4 = [0, 0, 0, 0];
 
 export type PresentProps = {
   step?: number,
-  keys?: boolean,
 };
 
 const π = Math.PI;
@@ -45,7 +44,6 @@ type Sampler = (t: number) => number;
 export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>) => {
   const {
     step: initialStep = 0,
-    keys = false,
     children,
   } = props;
   
@@ -100,19 +98,6 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     return {goTo, goForward, goBack, isVisible, getVisibleState, useTransition};
   });
 
-  const {keyboard} = keys ? useContext(KeyboardContext) : (useNoContext(KeyboardContext), {});
-  useOne(() => {
-    if (!keys) return;
-
-    const {keys: {arrowLeft, arrowRight, arrowUp, arrowDown}} = keyboard;
-    if (arrowRight || arrowDown) {
-      api.goForward();
-    }
-    if (arrowLeft || arrowUp) {
-      api.goBack();
-    }
-  }, keyboard);
-
   const context = useOne(() => {
     return {
       state,
@@ -148,9 +133,13 @@ const merge = (a, b) => {
 
 const ATTRIBUTES = bundleToAttributes(getSlidePosition);
 
-export const usePresentTransition = (id: number, props: Partial<TransitionTrait>, origin: Rectangle) => {
-  const {effect, enter, exit} = useTransitionTrait(props);
-
+export const usePresentTransition = (
+  id: number,
+  origin: Rectangle,
+  effect: SlideEffect,
+  enter?: Partial<SlideEffect>,
+  exit?: Partial<SlideEffect>,
+) => {
   const e = useRef(0);
   const d = useRef(NO_VEC4);
   const v = useRef(0);
@@ -222,7 +211,8 @@ const makeUseTransition = (
       const {current: time} = timeRef;
       const {current: sampler} = samplerRef;
       if (time != null && sampler != null) {
-        const slope = (sampler(time + EPSILON) - sampler(time)) / EPSILON;
+        from = sampler(time);
+        const slope = (sampler(time + EPSILON) - from) / EPSILON;
         boost = slope - (to - from) / duration;
       }
       

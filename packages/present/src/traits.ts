@@ -79,3 +79,5 @@ const TRANSITION_DEFAULTS = {
 export const useEffectTrait = makeUseTrait<EffectTrait>(EFFECT_TRAIT, EFFECT_DEFAULTS);
 export const useSlideTrait = makeUseTrait<SlideTrait>(SLIDE_TRAIT, SLIDE_DEFAULTS);
 export const useTransitionTrait = makeUseTrait<TransitionTrait>(TRANSITION_TRAIT, TRANSITION_DEFAULTS);
+
+export const makeUseTransitionTrait = (defaults: any) => makeUseTrait<TransitionTrait>(TRANSITION_TRAIT, {...TRANSITION_DEFAULTS, ...defaults});

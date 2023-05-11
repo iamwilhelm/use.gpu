@@ -8,7 +8,7 @@ import { Layout, Transform } from '@use-gpu/layout';
 
 import { resolveSlides } from './lib/slides';
 import { usePresentTransition } from './present';
-import { useSlideTrait } from './traits';
+import { useSlideTrait, makeUseTransitionTrait } from './traits';
 
 import { getSlideMask } from '@use-gpu/wgsl/mask/slide.wgsl';
 
@@ -18,13 +18,16 @@ export type SlideProps = Partial<SlideTrait> & Partial<TransitionTrait> & {
   _foo?: null,
 };
 
+const useTransitionTrait = makeUseTransitionTrait({ effect: { type: 'fade', duration: 0.5 } });
+
 export const Slide: LC<SlideProps> = (props: PropsWithChildren<SlideProps>) => {
   const {children} = props;
   const {order, steps, stay} = useSlideTrait(props);
+  const {effect, enter, exit} = useTransitionTrait(props);
 
   const {id} = useFiber();
   const layout = useLayoutContext();
-  const {useUpdateTransition, ...transform} = usePresentTransition(id, props, layout);
+  const {useUpdateTransition, ...transform} = usePresentTransition(id, layout, effect, enter, exit);
 
   const l = useShaderRef(layout);
   const clip = useBoundSource(GET_CLIP, l);

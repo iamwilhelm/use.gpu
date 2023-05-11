@@ -22,7 +22,7 @@ export const resolveSlides = (slides: SlideInfo[]) => {
     const to = stay
       ? summed[i + stay] ?? (last + stay - (n - i))
       : sticky
-        ? last
+        ? Infinity
         : summed[i + 1];
 
     const shift = from + 1;

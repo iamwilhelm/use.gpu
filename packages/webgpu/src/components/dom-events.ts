@@ -10,6 +10,8 @@ const WHEEL_STEP = 120;
 const PIXEL_STEP = 10;
 const DELTA_MULTIPLIER = [1, 4, 80];
 
+const formatKey = (key: string) => key[0].toLowerCase() + key.slice(1);
+
 export type DOMEventsProps = {
   element: HTMLElement,
   children: LiveElement,
@@ -101,7 +103,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onKeyDown = (event: KeyboardEvent) => {
       onModifiers(event);
       setKeyboard((state) => {
-        const k = event.key.toLowerCase();
+        const k = formatKey(event.key);
         return {
           ...state,
           keys: {
@@ -117,7 +119,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onKeyUp = (event: KeyboardEvent) => {
       onModifiers(event);
       setKeyboard((state) => {
-        const k = event.key.toLowerCase();
+        const k = formatKey(event.key);
         return {
           ...state,
           keys: {

@@ -29,7 +29,7 @@ export const PresentSlidesPage: LC = () => {
           <Pass>
             <UI>
 
-              <Present>
+              <Present keys>
                 <Slide effect={{type: 'fade', direction: 'left'}}>
                   <Absolute left={50} top={50} bottom={50} right={50}>
                     <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff">Lorem ipsum</Text></Inline></Block>

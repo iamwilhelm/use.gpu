@@ -51,6 +51,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
         inspect({
           layout: {
             into,
+            self: [l, t],
             size,
             sizes,
             offsets,

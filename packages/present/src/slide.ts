@@ -1,8 +1,9 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { UniformAttribute } from '@use-gpu/core';
 import type { SlideTrait, TransitionTrait, SlideInfo } from './types';
 
 import { fragment, unquote, quote, gather, fence, yeet, use, wrap, provide, useFiber, useOne, useRef } from '@use-gpu/live';
-import { useBoundShader, useLayoutContext } from '@use-gpu/workbench';
+import { useBoundSource, useLayoutContext, useShaderRef } from '@use-gpu/workbench';
 import { Layout, Transform } from '@use-gpu/layout';
 
 import { resolveSlides } from './lib/slides';
@@ -10,6 +11,8 @@ import { usePresentTransition } from './present';
 import { useSlideTrait } from './traits';
 
 import { getSlideMask } from '@use-gpu/wgsl/mask/slide.wgsl';
+
+const GET_CLIP = {format: 'vec4<f32>', name: 'getClip'} as UniformAttribute;
 
 export type SlideProps = Partial<SlideTrait> & Partial<TransitionTrait> & {
   _foo?: null,
@@ -23,12 +26,15 @@ export const Slide: LC<SlideProps> = (props: PropsWithChildren<SlideProps>) => {
   const layout = useLayoutContext();
   const {useUpdateTransition, ...transform} = usePresentTransition(id, props, layout);
 
+  const l = useShaderRef(layout);
+  const clip = useBoundSource(GET_CLIP, l);
+
   return (
     unquote(
       gather(
         quote(
           fence(
-            wrap(Layout, use(Transform, {...transform, children})),
+            wrap(Layout, use(Transform, {...transform, clip, children})),
             (ops: any) => {
               const visible = useUpdateTransition();
               return visible ? yeet(ops) : null;

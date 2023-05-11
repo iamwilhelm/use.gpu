@@ -107,7 +107,7 @@ const makeUIAccumulator = (
 
   const hasTexture = keys.has('texture');
   const hasTransform = keys.has('transform');
-  const hasClip = keys.has('shaders');
+  const hasClip = keys.has('clip');
   const hasMask = keys.has('mask');
 
   if (hasRectangle) storage.rectangles = makeAggregateBuffer(device, 'vec4<f32>', count);

@@ -6,7 +6,6 @@ import { yeet, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
-import { getBoundSource } from '../hooks/useBoundSource';
 import { getBoundShader } from '../hooks/useBoundShader';
 
 export type TextureShaderProps = {

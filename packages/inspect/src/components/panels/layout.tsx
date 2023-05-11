@@ -17,7 +17,7 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
 
   usePingContext();
 
-  const {into, size, sizes, offsets} = layout;
+  const {into, size, sizes, offsets, self} = layout;
   let n = sizes.length;
   
   const SCALE = 1/2;
@@ -36,8 +36,17 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
     {inspectObject(layout, state, toggleState, 'u')}
     <Spacer />
     <div style={{position: 'relative', width: width * SCALE, height: height * SCALE}}>
-      <DOMMock style={{width: size[0] * SCALE, height: size[1] * SCALE}} />
-      <DOMMock style={{width: (into[0] || 0) * SCALE, height: (into[1] || 0) * SCALE, borderStyle: 'dashed'}} />
+      <DOMMock style={{
+        width: size[0] * SCALE,
+        height: size[1] * SCALE,
+        left: (self?.[0] || 0) * SCALE,
+        top: (self?.[1] || 0) * SCALE,
+      }} />
+      <DOMMock style={{
+        width: (into[0] || 0) * SCALE,
+        height: (into[1] || 0) * SCALE,
+        borderStyle: 'dashed'}
+      } />
       {
         sizes.map((size: [number, number], i: number) =>
           <DOMMock key={i.toString()} style={{

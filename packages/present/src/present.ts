@@ -1,8 +1,8 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { EffectTrait, TransitionTrait, SlideEase, ResolvedSlides } from './types';
 
-import { fragment, reconcile, quote, gather, provide, useContext, useMemo, useOne, useRef, useState } from '@use-gpu/live';
-import { useAnimationFrame, useNoAnimationFrame, useShaderRef, useTimeContext, LoopContext } from '@use-gpu/workbench';
+import { fragment, reconcile, quote, gather, provide, useContext, useNoContext, useMemo, useOne, useRef, useState } from '@use-gpu/live';
+import { useAnimationFrame, useNoAnimationFrame, useShaderRef, useTimeContext, LoopContext, KeyboardContext } from '@use-gpu/workbench';
 import { useBoundShader } from '@use-gpu/workbench';
 
 import { resolveSlides } from './lib/slides';
@@ -16,6 +16,7 @@ const NO_VEC4 = [0, 0, 0, 0];
 
 export type PresentProps = {
   step?: number,
+  keys?: boolean,
 };
 
 const π = Math.PI;
@@ -43,9 +44,9 @@ type Sampler = (t: number) => number;
 export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>) => {
   const {
     step: initialStep = 0,
+    keys = false,
     children,
   } = props;
-  
   
   const [state, setState] = useState(() => ({
     step: initialStep,
@@ -60,8 +61,6 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
   stateRef.current = state;
   mapRef.current = map;
   
-  console.log({step: state.step, map})
-
   useOne(() => {
     if (state.step !== initialStep) setState(s => ({...s, step: initialStep}));
   }, initialStep);
@@ -100,15 +99,18 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     return {goTo, goForward, goBack, isVisible, getVisibleState, useTransition};
   });
 
-  if (!map.size) {
-    setTimeout(api.goForward, 2000);
-    setTimeout(api.goForward, 4000);
-    setTimeout(api.goForward, 6000);
-    setTimeout(api.goForward, 8000);
-    setTimeout(api.goBack, 10000);
-    setTimeout(api.goBack, 12000);
-    setTimeout(api.goBack, 14000);
-  }
+  const {keyboard} = keys ? useContext(KeyboardContext) : (useNoContext(KeyboardContext), {});
+  useOne(() => {
+    if (!keys) return;
+
+    const {keys: {arrowLeft, arrowRight, arrowUp, arrowDown}} = keyboard;
+    if (arrowRight || arrowDown) {
+      api.goForward();
+    }
+    if (arrowLeft || arrowUp) {
+      api.goBack();
+    }
+  }, keyboard);
 
   const context = useOne(() => {
     return {
@@ -162,7 +164,6 @@ export const usePresentTransition = (id: number, props: Partial<TransitionTrait>
 
     const value = useTransition(id, enterEffect, exitEffect);
     v.current = value;
-    console.log('useTransition', id, value);
     
     const isEnter = value <= 0;
     useOne(() => {

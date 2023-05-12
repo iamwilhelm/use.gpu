@@ -20,6 +20,7 @@ import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
+import { getUICopyFragment } from '@use-gpu/wgsl/instance/fragment/ui-copy.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
 
 export type UIRectanglesProps = {
@@ -46,6 +47,7 @@ export type UIRectanglesProps = {
   clip?: ShaderModule,
   mask?: ShaderSource,
 
+  copyOnly?: boolean,
   debugContours?: boolean,
 
   count?: Lazy<number>,
@@ -67,6 +69,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     clip,
     mask,
     
+    copyOnly = false,
     debugContours = false,
   } = props;
 
@@ -76,7 +79,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const r = useShaderRef(props.rectangle, props.rectangles);
   const a = useShaderRef(props.radius, props.radiuses);
   const b = useShaderRef(props.border, props.borders);
-  const s = useShaderRef(props.strokes, props.strokes);
+  const s = useShaderRef(props.stroke, props.strokes);
   const f = useShaderRef(props.fill, props.fills);
   const u = useShaderRef(props.uv, props.uvs);
   const v = useShaderRef(props.st, props.sts);
@@ -90,7 +93,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
 
   const getVertex = useBoundShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getUIFragment, [t, m]);
+  const getFragment = useBoundShader(copyOnly ? getUICopyFragment : getUIFragment, [t, m]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));

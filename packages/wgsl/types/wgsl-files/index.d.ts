@@ -204,6 +204,13 @@ declare module "@use-gpu/wgsl/instance/fragment/solid.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/fragment/ui-copy.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getUICopyFragment: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/fragment/ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -702,6 +709,7 @@ declare module "@use-gpu/wgsl/transform/slide.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getSlidePosition: ParsedBundle;
+  export const getSlideInverse: ParsedBundle;
   export default __module;
 }
 

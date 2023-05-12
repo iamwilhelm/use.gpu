@@ -4,7 +4,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { FontMetrics, GlyphMetrics } from '@use-gpu/glyph';
 import type { Alignment } from '../types';
 
-import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { fence, provide, memo, yeet, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/glyph';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
@@ -185,13 +185,13 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   }, [rustText, atlas, source]);
 
   return rustText ? (
-    gather(
+    fence(
       provide(SDFFontContext, context, children),
       (gathered: any) => {
         const rects = bounds.flush();
         if (rects.length) updateMipTextureChain(device, source, rects);
 
-        return then ? then(atlas, biasedSource, gathered) : null;
+        return then ? then(atlas, biasedSource, gathered) : yeet(gathered);
       },
     )
   ) : null;

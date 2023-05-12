@@ -164,6 +164,11 @@
       "import": "./src/instance/fragment/solid.wgsl",
       "require": "./src/instance/fragment/solid.wgsl"
     },
+    "./instance/fragment/ui-copy.wgsl": {
+      "types": "./src/instance/fragment/ui-copy.wgsl.d.ts",
+      "import": "./src/instance/fragment/ui-copy.wgsl",
+      "require": "./src/instance/fragment/ui-copy.wgsl"
+    },
     "./instance/fragment/ui.wgsl": {
       "types": "./src/instance/fragment/ui.wgsl.d.ts",
       "import": "./src/instance/fragment/ui.wgsl",

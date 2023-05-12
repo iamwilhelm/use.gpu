@@ -8,7 +8,7 @@ import {
   useBufferedSize,
   UIRectangles,
 } from '@use-gpu/workbench';
-import { use, keyed, wrap, fragment, signal, yeet, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, wrap, fragment, signal, yeet, gather, useCallback, useContext, useOne, useMemo } from '@use-gpu/live';
 import { hashBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
@@ -21,10 +21,14 @@ export type UIProps = {
   children: LiveElement,
 };
 
+export type UILayersProps = {
+  items: (UIAggregate | null)[],        
+};
+
 const allCount = (a: number, b: UIAggregate): number => a + b.count + ((b as any).isLoop ? 3 : 0);
 
 const allKeys = (a: Set<string>, b: UIAggregate): Set<string> => {
-  for (let k in b) a.add(k);
+  for (let k in b) if (b[k] != null) a.add(k);
   return a;
 }
 
@@ -32,6 +36,7 @@ const getItemSummary = (items: UIAggregate[]) => {
   const keys = items.reduce(allKeys, new Set());
   const count = items.reduce(allCount, 0);
   const memoKey = Array.from(keys).join('/');
+  if (typeof count === 'string') debugger;
 
   return {keys, count, memoKey};
 }
@@ -40,24 +45,25 @@ export const UI: LiveComponent<UIProps> = (props) => {
   const {children} = props;
 
   return (
-    use(SDFFontProvider, {
-      children,
-      then: Resume,
-    })
+    gather(
+      wrap(SDFFontProvider, children),
+      (items: (UIAggregate | null)[]) => {
+        if (!Array.isArray(items)) items = [items];
+        return UILayers({items});
+      },
+    )
   );
 };
 
-const Resume = (
-  atlas: Atlas,
-  source: TextureSource,
-  items: (UIAggregate | null)[],
-) => {
-  const partitioner = makePartitioner();
+export const UILayers: LC<UILayersProps> = ({
+  items,
+}: UILayersProps) => {
+  if (items.length === 0) return null;
 
+  const partitioner = makePartitioner();
   for (let item of items) if (item) {
     partitioner.push(item);
   }
-
   const layers = partitioner.resolve();
 
   const els = layers.flatMap((layer, i): LiveElement => {
@@ -146,11 +152,12 @@ const makeUIAccumulator = (
 };
 
 const getItemTypeKey = (item: UIAggregate) =>
-  (item as any).f ? -1 :
-  hashBits53(getObjectKey(item.texture)) ^
-  (item.transform ? getBundleKey(item.transform) : 0) ^
-  (item.clip ? getBundleKey(item.clip) : 0) ^
-  (item.mask ? getBundleKey(item.mask) : 0);
+  (item as any).f ? -1 : (
+    hashBits53(getObjectKey(item.texture)) ^
+    (item.transform ? getBundleKey(item.transform) : 0) ^
+    (item.clip ? getBundleKey(item.clip) : 0) ^
+    (item.mask ? getBundleKey(item.mask) : 0)
+  );
 
 type Partition = {
   key: number,

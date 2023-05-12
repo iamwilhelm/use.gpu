@@ -1,5 +1,11 @@
 import type { SlideInfo, ResolvedSlide } from './types';
 
+export const merge = (a: object, b: object) => {
+  const o = {...a};
+  for (const k in b) if (b[k] != null) o[k] = b[k];
+  return o;
+};
+
 export const resolveSlides = (slides: SlideInfo[]) => {
   const out: ResolvedSlide[] = [];
   const ordered = slides.slice();
@@ -12,12 +18,12 @@ export const resolveSlides = (slides: SlideInfo[]) => {
     }
     return list;
   }, [0]);
-  
+
   const n = summed.length;
   const last = summed[summed.length - 1];
 
   let i = 0;
-  for (const {id, steps = 1, stay = 0, slides, sticky} of ordered) {
+  for (const {id, steps = 1, stay = 0, slides, sticky, thread} of ordered) {
     const from = summed[i];
     const to = stay
       ? summed[i + stay] ?? (last + stay - (n - i))
@@ -26,7 +32,7 @@ export const resolveSlides = (slides: SlideInfo[]) => {
         : summed[i + 1];
 
     const shift = from + 1;
-    out.push({id, from, to});
+    out.push({id, from, to, thread});
     if (slides) {
       out.push(...slides.map(({from, to, ...rest}) => ({
         ...rest,

@@ -31,4 +31,12 @@ export type ResolvedSlide = {
   id: number,
   from: number,
   to: number,
+  thread?: boolean,
+};
+
+export type ResolvedLayers = {
+  id; number,
+  enter: SlideEffect,
+  exit: SlideEffect,
+  ops: any,
 };

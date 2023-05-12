@@ -16,7 +16,6 @@ fn ramp(x: f32, t: f32, s: f32) -> f32 { return clamp(x * s + mix(-s, 1, t), 0.0
   }
   // Wipe
   else if (e == 2) {
-
     let direction = getDirection();
     let l = length(direction);
     

@@ -203,6 +203,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     swap: source.swap,
     source: source,
   }), [renderContext, width, height, colorStates, colorAttachments, depthStencilState, depthStencilAttachment, source, sources]);
+  useOne(() => console.log("rttContext changed"), rttContext);
 
   const inspectable = useMemo(() => [
     source,

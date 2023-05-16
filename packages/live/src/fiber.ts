@@ -732,7 +732,7 @@ export const reduceFiberValues = <R>(
     const {yeeted, mount, mounts, order} = fiber;
     if (!yeeted) throw new Error("Reduce without aggregator");
 
-    let isFork = (fiber.type === CAPTURE || fiber.type === RECONCILE) && fiber.next;
+    let isFork = (fiber.f === CAPTURE || fiber.type === RECONCILE) && fiber.next;
 
     if (!self) {
       if (fiber.next && !isFork) return reduce(fiber.next);
@@ -799,7 +799,7 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = (fiber.type === CAPTURE || fiber.type === RECONCILE) && fiber.next;
+  let isFork = (fiber.f === CAPTURE || fiber.type === RECONCILE) && fiber.next;
 
   if (!self) {
     if (fiber.next && !isFork) return gatherFiberValues(fiber.next);
@@ -866,7 +866,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = (fiber.type === CAPTURE || fiber.type === RECONCILE) && fiber.next;
+  let isFork = (fiber.f === CAPTURE || fiber.type === RECONCILE) && fiber.next;
 
   if (!self) {
     if (fiber.next && !isFork) return multiGatherFiberValues(fiber.next) as any;

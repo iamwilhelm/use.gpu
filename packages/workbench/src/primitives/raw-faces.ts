@@ -162,7 +162,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const [pipeline, defs] = usePipelineOptions({
     mode,
     topology: 'triangle-list',
-    side: 'both',
+    side,
     shadow,
     scissor,
     alphaToCoverage,

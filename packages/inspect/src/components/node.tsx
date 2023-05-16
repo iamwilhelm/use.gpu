@@ -82,7 +82,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   classes.push(`depth-${Math.min(4, depth || 0)}`);
   const className = classes.join(' ');
 
-  const handleClick = useCallback((e) => {
+  const handleClick = useCallback((e: any) => {
     e.stopPropagation();
     e.preventDefault();
     onClick && onClick();

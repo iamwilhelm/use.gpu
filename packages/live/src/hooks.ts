@@ -105,7 +105,7 @@ export const memoArgs = <F extends Function>(
     return value;
   };
 
-  const memoName = `Memo(${name ?? f.name})`;
+  const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
   const length = getArgCount(f);
   return new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
@@ -143,7 +143,7 @@ export const memoProps = <F extends Function>(
     return value;
   };
 
-  const memoName = `Memo(${name ?? f.name})`;
+  const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
   const length = getArgCount(f);
   const p = new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;

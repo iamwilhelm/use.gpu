@@ -2,7 +2,7 @@ import type { LiveFiber } from '@use-gpu/live';
 import type { Cursor } from '@use-gpu/state';
 import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
 
-import React, { memo, useMemo, useLayoutEffect, useRef } from 'react';
+import React, { memo, useMemo, useLayoutEffect, useRef, PropsWithChildren } from 'react';
 
 import { useRefineCursor } from '@use-gpu/state';
 import { usePingContext } from './ping';
@@ -49,12 +49,12 @@ type FiberReactNodeProps = {
   first?: boolean,
 }
 
-type TreeExpandProps = {
+type TreeExpandProps = PropsWithChildren<{
   expand: boolean,
   onToggle: (e: any) => void,
   openIcon?: any,
   closedIcon?: any,
-}
+}>;
 
 // Get rendered-by depth by tracing `by` props up the tree
 const getRenderDepth = (fibers: Map<number, LiveFiber<any>>, fiber: LiveFiber<any>) => {

@@ -30,18 +30,10 @@ const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 type SlideMap = Map<number, ResolvedSlide>;
 const NO_MAP: SlideMap = new Map();
 
-type Transition = {
-  from: number,
-  to: number,
-  boost: number,
-};
-
 type State = {
   step: number,
   length: number,
 };
-
-type Sampler = (t: number) => number;
 
 const parseBackground = makeParseColor(parseColor('#000000'));
 

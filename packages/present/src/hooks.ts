@@ -1,4 +1,5 @@
 import type { Rectangle, Point4 } from '@use-gpu/core';
+import type { ParsedEffect } from './types';
 import { SLIDE_EFFECTS } from './traits';
 
 import { useContext, useMemo, useOne, useRef, useFiber } from '@use-gpu/live';
@@ -18,6 +19,8 @@ const τ = π*2;
 
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
+
+type Sampler = (t: number) => number;
 
 // GPU-rendered slide transition
 export const usePresentTransition = (

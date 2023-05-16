@@ -38,6 +38,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
     active ? use(HTML, {
       container: container ?? document.body,
       style: STYLE,
+      inspectable: false,
       children: <Inspect fiber={fiber} onInspect={handleInspect} />,
     }) : null
   ]);

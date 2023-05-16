@@ -1,10 +1,10 @@
-import React, { PropsWithChildren } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { styled as _styled } from '@stitches/react';
 
 // TODO: TS nightly issue?
 const styled: any = _styled;
 
-type TreeIndentProps = { indent?: number };
+type TreeIndentProps = PropsWithChildren<{ indent?: number }>;
 
 export const Button = styled('button', {
   border: 0,
@@ -226,7 +226,7 @@ export const TreeRowOmittedChunk = styled('div', {
   },
 });
 
-export const TreeRow: React.FC<TreeIndentProps> = ({ indent, children }) => (
+export const TreeRow: FC<TreeIndentProps> = ({ indent, children }: TreeIndentProps) => (
   <TreeRowInner css={{
     paddingLeft: indent ? `${indent * 20}px` : 0,
   }}>
@@ -234,7 +234,7 @@ export const TreeRow: React.FC<TreeIndentProps> = ({ indent, children }) => (
   </TreeRowInner>
 );
 
-export const TreeRowOmitted: React.FC<TreeIndentProps> = ({ indent, children }) => (
+export const TreeRowOmitted: FC<TreeIndentProps> = ({ indent, children }: TreeIndentProps) => (
   <TreeRowOmittedChunk css={{
     paddingLeft: indent ? `${indent * 20}px` : 0,
   }}>
@@ -242,7 +242,7 @@ export const TreeRowOmitted: React.FC<TreeIndentProps> = ({ indent, children }) 
   </TreeRowOmittedChunk>
 );
 
-export const TreeIndent: React.FC<TreeIndentProps> = ({ indent, children }) => (
+export const TreeIndent: FC<TreeIndentProps> = ({ indent, children }: TreeIndentProps) => (
   <div style={{
     marginLeft: indent ? `${indent * 20}px` : 0,
   }}>

@@ -36,6 +36,7 @@ export type SDFFontProviderProps = {
   height?: number,
   radius?: number,
   pad?: number,
+  fence?: (c: LiveElement, then: (t: any) => LiveElement) => LiveElement,
   then?: (atlas: Atlas, source: ShaderSource, gathered: any) => LiveElement
 };
 

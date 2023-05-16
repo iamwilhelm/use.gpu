@@ -7,7 +7,7 @@ import { useLayoutContext } from '@use-gpu/workbench';
 import { Transform } from '@use-gpu/layout';
 
 import { merge } from './lib/slides';
-import { usePresentTransition } from './present';
+import { usePresentTransition } from './hooks';
 import { useSlideTrait, makeUseTransitionTrait } from './traits';
 
 export type StepProps = Partial<SlideTrait> & DeepPartial<TransitionTrait>;

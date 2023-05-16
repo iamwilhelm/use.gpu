@@ -166,7 +166,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   hoveredCursor,
 }) => {
 
-  return (<div style={{minWidth: 'fit-content'}}>
+  return (<div style={{minWidth: 'fit-content', position: 'relative'}}>
     <TreeWrapper>
       <FiberNode
         fiber={fiber}
@@ -223,7 +223,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Resolve node omission
   const shouldRender = (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
-  const shouldAbsolute =!shouldRender && (parents || depends || precedes || quoted || unquoted);
+  const shouldAbsolute = !shouldRender && (parents || depends || precedes || quoted || unquoted);
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 
   // Make click/hover handlers
@@ -292,8 +292,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       depth={styleDepth}
       runCount={runCounts}
       onClick={select}
-      onMouseEnter={highlight ? hover : undefined}
-      onMouseLeave={highlight ? unhover : undefined}
+      onMouseEnter={hover}
+      onMouseLeave={unhover}
       ref={rowRef}
     />
   ) : null;

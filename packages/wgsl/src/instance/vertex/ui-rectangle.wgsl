@@ -8,6 +8,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
 @optional @link fn getStroke(i: u32)    -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); }
 @optional @link fn getFill(i: u32)      -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); }
 @optional @link fn getUV(i: u32)        -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); }
+@optional @link fn getST(i: u32)        -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); }
 @optional @link fn getRepeat(i: u32)    -> i32       { return 0; }
 
 @optional @link fn getSDFConfig(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
@@ -31,6 +32,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
         vec4<f32>(0.0),
         vec2<f32>(0.0),
         vec4<f32>(0.0),
+        vec2<f32>(0.0),
         vec2<f32>(0.0),
         0,
         0,
@@ -62,6 +64,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
   var fill = getFill(instanceIndex);
   var stroke = getStroke(instanceIndex);
   var uv4 = getUV(instanceIndex);
+  var st4 = getST(instanceIndex);
   var repeat = getRepeat(instanceIndex);
   var sdfConfig = getSDFConfig(instanceIndex);
 
@@ -82,41 +85,46 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
   var xy1 = uv1 * 2.0 - 1.0;
   let box = rectangle.zw - rectangle.xy;
 
-  // Get corner + two adjacent vertices
+  // Get corner
   var position = vec4<f32>(mix(rectangle.xy, rectangle.zw, uv1), 0.0, 1.0);
-  var posFlipX = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(1.0 - uv1.x, uv1.y)), 0.0, 1.0);
-  var posFlipY = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(uv1.x, 1.0 - uv1.y)), 0.0, 1.0);
 
   var center4  = worldToClip(applyTransform(position));
-
   var center  = to3D(center4);
-  var centerX = worldToClip3D(applyTransform(posFlipX));
-  var centerY = worldToClip3D(applyTransform(posFlipY));
-
-  // Get side length in screen pixels
-  var size = getViewSize();
-  var dx = (center.xy - centerX.xy) * size;
-  var dy = (center.xy - centerY.xy) * size;
-
-  var stepX = normalize(dx);
-  var stepY = normalize(dy);
 
   var sdfUV: vec2<f32>;
   var conservative: vec3<f32>;
+  // Normal rasterization
   if (mode == -1 || mode == -2) {
     // Rasterize glyphs normally (they are pre-padded)
     conservative = center;
     sdfUV = uv1 * (uv4.zw - uv4.xy);
   }
+  // Conservative rasterization
   else {
+    // Get two adjacent vertices
+    var posFlipX = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(1.0 - uv1.x, uv1.y)), 0.0, 1.0);
+    var posFlipY = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(uv1.x, 1.0 - uv1.y)), 0.0, 1.0);
+
+    var flipX = worldToClip3D(applyTransform(posFlipX));
+    var flipY = worldToClip3D(applyTransform(posFlipY));
+
+    // Get side length in screen pixels
+    var size = getViewSize();
+
+    var dx = (center.xy - flipX.xy) * size;
+    var dy = (center.xy - flipY.xy) * size;
+
+    var stepX = normalize(dx);
+    var stepY = normalize(dy);
+
     // Rasterize shapes conservatively
     conservative = vec3<f32>(center.xy + (stepX + stepY) * getViewResolution(), center.z);
     uv1 = uv1 + xy1 / vec2<f32>(length(dx), length(dy));
     sdfUV = uv1 * box;
   }
 
-  var uv = mix(uv4.xy, uv4.zw, uv1);
-  let textureUV = uv;
+  let textureUV = mix(uv4.xy, uv4.zw, uv1);
+  let textureST = mix(st4.xy, st4.zw, uv1);
   
   return UIVertex(
     vec4<f32>(conservative, 1.0) * center4.w,
@@ -125,6 +133,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
     sdfUV,
     clipUV,
     textureUV,
+    textureST,
     repeat,
     mode,
     vec4<f32>(box, 0.0, 0.0),

@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { UniformAttributeValue } from '@use-gpu/core';
 import type { VectorLike } from '@use-gpu/traits';
 import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
@@ -22,13 +22,10 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
 const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
-const NORMAL_BINDINGS = bundleToAttributes(getMatrixDifferential);
 
-export type CartesianProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
-  children?: LiveElement,
-};
+export type CartesianProps = Partial<AxesTrait> & Partial<ObjectTrait>;
 
-export const Cartesian: LiveComponent<CartesianProps> = (props) => {
+export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildren<CartesianProps>) => {
   const {
     children,
   } = props;
@@ -82,8 +79,8 @@ export const Cartesian: LiveComponent<CartesianProps> = (props) => {
   const normalMatrixRef = useShaderRef(normalMatrix);
 
   const boundMatrix = useBoundSource(MATRIX_BINDINGS[0], matrixRef);
-  const boundPosition = useBoundShader(getCartesianPosition, MATRIX_BINDINGS, [boundMatrix]);
-  const boundDifferential = useBoundShader(getMatrixDifferential, NORMAL_BINDINGS, [boundMatrix, normalMatrixRef]);
+  const boundPosition = useBoundShader(getCartesianPosition, [boundMatrix]);
+  const boundDifferential = useBoundShader(getMatrixDifferential, [boundMatrix, normalMatrixRef]);
 
   const context = useCombinedTransform(boundPosition, boundDifferential);
 

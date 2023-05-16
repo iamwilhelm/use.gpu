@@ -5,7 +5,6 @@ import type { GLTF, GLTFAccessorData, GLTFBufferData, GLTFBufferViewData, GLTFIm
 import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
 
 import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/workbench';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { makeDynamicTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
 
 import { toScene, toNode, toMesh, toMaterial } from './parse';

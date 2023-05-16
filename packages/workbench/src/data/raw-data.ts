@@ -16,10 +16,8 @@ import { useBufferedSize } from '../hooks/useBufferedSize';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { getBoundShader } from '../hooks/useBoundShader';
 
-import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
+import { chainTo } from '@use-gpu/shader/wgsl';
 import { getIndex } from '@use-gpu/wgsl/instance/interleave.wgsl';
-
-const INTERLEAVE_BINDINGS = bundleToAttributes(getIndex);
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
 
@@ -97,7 +95,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
     const getData = useBoundSource(binding, source);
     sources = useMemo(() => (
       seq(t).map(i => ({
-        shader: chainTo(getBoundShader(getIndex, INTERLEAVE_BINDINGS, [i, t]), getData),
+        shader: chainTo(getBoundShader(getIndex, [i, t]), getData),
         length: 0,
         size: [0],
         version: 0,

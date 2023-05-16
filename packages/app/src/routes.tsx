@@ -22,6 +22,7 @@ import { PlotImplicitSurfacePage } from './pages/plot/implicit-surface';
 import { PlotPolarPage } from './pages/plot/polar';
 import { PlotSphericalPage } from './pages/plot/spherical';
 import { PlotStereographicPage } from './pages/plot/stereographic';
+import { PresentSlidesPage } from './pages/present/slides';
 import { RTTLinearRGBPage } from './pages/rtt/linear-rgb';
 import { RTTFeedbackPage } from './pages/rtt/feedback';
 import { RTTMultiscalePage } from './pages/rtt/multiscale';
@@ -50,6 +51,7 @@ export const makePages = () => [
   {path: "/plot/spherical",        title: "Plot - Spherical",                  element: <PlotSphericalPage />},
   {path: "/plot/stereographic",    title: "Plot - Stereographic",              element: <PlotStereographicPage />},
   {path: "/plot/implicit-surface", title: "Plot - Implicit Surface",           element: <PlotImplicitSurfacePage />},
+  {path: "/present/slides",        title: "Present - Slides",                  element: <PresentSlidesPage />},
   {path: "/rtt/linear-rgb",        title: "RTT - Linear RGB",                  element: <RTTLinearRGBPage />},
   {path: "/rtt/feedback",          title: "RTT - Feedback",                    element: <RTTFeedbackPage />},
   {path: "/rtt/multiscale",        title: "RTT - Multiscale R-D",              element: <RTTMultiscalePage />},

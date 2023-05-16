@@ -11,7 +11,7 @@ import { RawQuads } from '../primitives/raw-quads';
 
 import { patch } from '@use-gpu/state';
 import { use, memo, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bindBundle, bindingToModule, bundleToAttributes, castTo } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingToModule, castTo } from '@use-gpu/shader/wgsl';
 import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -49,7 +49,6 @@ export type PointLayerProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttributeValue;
-const MASK_BINDINGS = bundleToAttributes(circleOutlined);
 
 /** Draws 2D points with choice of shape. */
 export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLayerProps) => {
@@ -85,7 +84,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     });
   }, s);
   const mask = (MASK_SHADER as any)[shape] ?? MASK_SHADER.circle;
-  const boundMask = useBoundShader(mask, MASK_BINDINGS, [stroke]);
+  const boundMask = useBoundShader(mask, [stroke]);
 
   return use(RawQuads, {
     position,

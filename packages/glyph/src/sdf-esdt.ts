@@ -423,7 +423,7 @@ export const relaxSubpixelOffsets = (
         const dy = ys[j];
         if (!dx && !dy) continue;
 
-        // Step towards target minus 0.5px to find countour
+        // Step towards target minus 0.5px to find contour
         let d = Math.sqrt(dx*dx + dy*dy);
         const ds = (d - 0.5) / d;
         const tx = x + dx * ds;
@@ -616,11 +616,11 @@ export const esdt1d = (
   offset: number,
   stride: number,
   length: number,
-  f: Float32Array,
-  z: Float32Array,
-  b: Float32Array,
-  t: Float32Array,
-  v: Uint16Array,
+  f: Float32Array, // Squared distance
+  z: Float32Array, // Voronoi threshold
+  b: Float32Array, // Subpixel offset parallel
+  t: Float32Array, // Subpixel offset perpendicular
+  v: Uint16Array,  // Array index
   sign: number,
 ) => {
   v[0] = 0;
@@ -630,19 +630,23 @@ export const esdt1d = (
   z[1] = INF;
   f[0] = mask[offset] ? INF : ys[offset] * ys[offset];
 
+  // Scan along array and build list of critical minima
   let k = 0;
   for (let q = 1, s = 0; q < length; q++) {
     const o = offset + q * stride;
 
+    // Perpendicular
     const dx = xs[o];
     const dy = ys[o];    
     const fq = f[q] = mask[o] ? INF : dy * dy;
+    t[q] = dy;
 
+    // Parallel
     const qs = q + dx;
     const q2 = qs * qs;
     b[q] = qs;
-    t[q] = dy;
 
+    // Remove any minima eclipsed by this one
     do {
       const r = v[k];
       const rs = b[r];
@@ -651,29 +655,30 @@ export const esdt1d = (
       s = (fq - f[r] + q2 - r2) / (qs - rs) / 2;
     } while (s <= z[k] && --k > -1);
 
+    // Add to minima list
     k++;
     v[k] = q;
     z[k] = s;
     z[k + 1] = INF;
   }
 
+  // Resample array based on critical minima
   for (let q = 0, k = 0; q < length; q++) {
-    const k1 = k;
+    // Skip eclipsed minima
     while (z[k + 1] < q) k++;
 
     const r = v[k];
     const rs = b[r];
-    const qs = b[q];
     const dy = t[r];
 
+    // Distance from integer index to subpixel location of minimum
     let rq = rs - q;
-    let dq = q - qs;
 
     const o = offset + q * stride;
     xs[o] = rq;
     ys[o] = dy;
-    if (dy === undefined) console.log({q, k, o, r, t})
 
+    // Mark cell as having propagated
     if (r !== q) mask[o] = 0;
   }
 }

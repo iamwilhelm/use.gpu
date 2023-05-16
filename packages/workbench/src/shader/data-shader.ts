@@ -4,9 +4,9 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { yeet, useMemo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
+
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
-import { getBoundSource } from '../hooks/useBoundSource';
 import { getBoundShader } from '../hooks/useBoundShader';
 
 export type DataShaderProps = {
@@ -57,7 +57,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
       return links[k] ? links[k] : allArgs.shift();
     });
 
-    return getBoundShader(shader, bindings, values);
+    return getBoundShader(shader, values);
   }, [shader, args.length, source, sources]);
 
   return useMemo(() => render ? render(getData) : yeet(getData), [render, getData]);

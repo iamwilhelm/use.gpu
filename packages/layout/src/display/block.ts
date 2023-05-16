@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { Point, Point4 } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin } from '../types';
 
@@ -22,11 +22,9 @@ export type BlockProps =
   padding?: MarginLike,
   snap?: boolean,
   contain?: boolean,
-
-  children?: LiveElement,
 };
 
-export const Block: LiveComponent<BlockProps> = memo((props: BlockProps) => {
+export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<BlockProps>) => {
   const {
     snap = true,
     children,

@@ -9,7 +9,6 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { RawLines } from '../primitives/raw-lines';
 
 import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
 import { TransformContext, useTransformContext, DEFAULT_TRANSFORM } from '../providers/transform-provider';
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -46,8 +45,6 @@ export type TickLayerProps = {
   mode?: RenderPassMode | string,
   id?: number,
 };
-
-const TICK_BINDINGS = bundleToAttributes(getTickPosition);
 
 /** Draws tick marks on a scale, oriented along to the local transform at each point. */
 export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerProps) => {
@@ -92,7 +89,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
   const c = useCallback(() => ((positions as any)?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
 
   const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-  const bound = useBoundShader(getTickPosition, TICK_BINDINGS, [xf, xd, p, o, d, s, t, b], defines);
+  const bound = useBoundShader(getTickPosition, [xf, xd, p, o, d, s, t, b], defines);
 
   return (
     provide(TransformContext, DEFAULT_TRANSFORM,

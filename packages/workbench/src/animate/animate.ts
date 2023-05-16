@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement, DeferredCall } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, DeferredCall, PropsWithChildren } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
@@ -12,7 +12,7 @@ export type AnimateProps<T> = {
   loop?: boolean,
   mirror?: boolean,
   repeat?: number,
-  ease?: 'cosine' | 'linear' | 'bezier',
+  ease?: 'ease' | 'cosine' | 'linear' | 'bezier',
 
   delay?: number,
   pause?: number,
@@ -23,7 +23,6 @@ export type AnimateProps<T> = {
   keyframes?: Keyframe<T>[],
   prop?: string,
 
-  children?: LiveElement,
   render?: (value: any) => LiveElement,
 };
 
@@ -103,7 +102,7 @@ const interpolateValue: Interpolator = <T>(a: any, b: any, t: number) => {
 type NestedNumberArray = any[];
 type Numberish = number | TypedArray | NestedNumberArray;
 
-export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Numberish>(props: AnimateProps<T>) => {
+export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Numberish>(props: PropsWithChildren<AnimateProps<T>>) => {
   const {
     loop = false,
     mirror = false,

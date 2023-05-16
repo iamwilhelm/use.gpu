@@ -1,9 +1,9 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale, useProp } from '@use-gpu/traits';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
-import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
+import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
@@ -20,17 +20,13 @@ import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getSphericalPosition } from '@use-gpu/wgsl/transform/spherical.wgsl';
 
-const POLAR_BINDINGS = bundleToAttributes(getSphericalPosition);
-
 export type SphericalProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   helix?: number,
   on?: Swizzle,
-
-  children?: LiveElement,
 };
 
-export const Spherical: LiveComponent<SphericalProps> = (props) => {
+export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildren<SphericalProps>) => {
   const {
     bend = 1,
     helix = 0,
@@ -147,7 +143,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props) => {
   const c = useShaderRef(scaleY);
   const e = useShaderRef(epsilon);
 
-  const bound = useBoundShader(getSphericalPosition, POLAR_BINDINGS, [t, b, f, u, v, c]);
+  const bound = useBoundShader(getSphericalPosition, [t, b, f, u, v, c]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

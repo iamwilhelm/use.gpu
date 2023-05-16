@@ -1,9 +1,9 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
-import { bundleToAttributes, chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
+import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
@@ -19,17 +19,13 @@ import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getStereographicPosition } from '@use-gpu/wgsl/transform/stereographic.wgsl';
 
-const STEREOGRAPHIC_BINDINGS = bundleToAttributes(getStereographicPosition);
-
 export type StereographicProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   normalize?: number | boolean,
   on?: Axis4,
-
-  children?: LiveElement,
 };
 
-export const Stereographic: LiveComponent<StereographicProps> = (props) => {
+export const Stereographic: LiveComponent<StereographicProps> = (props: PropsWithChildren<StereographicProps>) => {
   const {
     on = 'z',
     bend = 1,
@@ -102,7 +98,7 @@ export const Stereographic: LiveComponent<StereographicProps> = (props) => {
   const o = useShaderRef(+normalize);
   const e = useShaderRef(epsilon);
   
-  const bound = useBoundShader(getStereographicPosition, STEREOGRAPHIC_BINDINGS, [t, b, o]);
+  const bound = useBoundShader(getStereographicPosition, [t, b, o]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

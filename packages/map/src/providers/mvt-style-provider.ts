@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ColorLike } from '@use-gpu/traits';
 import type { MVTStyleProperties } from '../types';
 
@@ -54,10 +54,9 @@ export const useNoMVTStyleContext = () => useNoContext(MVTStyleContext);
 
 export type MVTStyleProps = {
   styles: MVTStyleContextProps,
-  children?: LiveElement,
 };
 
-export const MVTStyle: LiveComponent<MVTStyleProps> = (props) => {
+export const MVTStyle: LiveComponent<MVTStyleProps> = (props: PropsWithChildren<MVTStyleProps>) => {
   const {styles, children} = props;
 
   const context = useOne(() => {

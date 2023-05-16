@@ -1,7 +1,7 @@
 import type {
   Initial, Setter, Reducer, Key, Task,
   LiveFunction, LiveFiber, LiveContext, LiveCapture,
-  DeferredCall, HostInterface, RefObject, MutableRefObject,
+  DeferredCall, HostInterface, Ref, RefObject, MutableRefObject,
 } from './types';
 import { Hook } from './types';
 
@@ -547,8 +547,8 @@ export const useNoAsync = () => {
  * Ref emulator
  */
 interface UseRef {
+  <T>(current?: T): Ref<T>;
   <T>(current?: T | null): RefObject<T>;
-  <T>(current?: T): MutableRefObject<T>;
   <T = undefined>(): MutableRefObject<T | undefined>;
 }
 export const useRef: UseRef = (<T>(current?: T | null) => useOne(() => ({current}))) as any;

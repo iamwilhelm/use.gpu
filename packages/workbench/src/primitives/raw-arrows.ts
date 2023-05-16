@@ -9,7 +9,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useOne, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
 
 import { makeArrowGeometry } from './geometry/arrow';
@@ -52,8 +52,6 @@ export type RawArrowsProps = {
 
 const ZERO = [0, 0, 0, 1];
 
-const VERTEX_BINDINGS = bundleToAttributes(getArrowVertex);
-
 export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsProps) => {
   const {
     alphaToCoverage,
@@ -94,7 +92,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     useNoCallback();
   }
 
-  const getVertex = useBoundShader(getArrowVertex, VERTEX_BINDINGS, [g, a, xf, scissor, c, e, w, d, l]);
+  const getVertex = useBoundShader(getArrowVertex, [g, a, xf, scissor, c, e, w, d, l]);
   const getPicking = usePickingShader(props);
   const getFragment = getPassThruColor;
 

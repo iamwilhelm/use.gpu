@@ -1,13 +1,12 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core';
 import type { FitInto, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
 
 import { useProp } from '@use-gpu/traits';
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
-import { makeShaderBinding } from '@use-gpu/core';
-import { bindBundle, bindingToModule, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
-import { useForceUpdate, useInspectable } from '@use-gpu/workbench';
+import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
+import { useForceUpdate, useInspectable, getBoundSource } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';
@@ -38,10 +37,9 @@ export type OverflowProps = {
   scrollBar?: LiveElement,
   
   direction?: Direction,
-  children?: LiveElement,
 };
 
-export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps) => {
+export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChildren<OverflowProps>) => {
   const {
     scrollX = 0,
     scrollY = 0,
@@ -124,10 +122,10 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
       return (isX && before[0] !== after[0]) || (!isX && before[1] !== after[1]);
     };
 
-    const c = bindingToModule(makeShaderBinding<ShaderModule>(CLIP_BINDING, clipRef));
-    const b = bindingToModule(makeShaderBinding<ShaderModule>(OFFSET_BINDING, boxRef));
-    const o = bindingToModule(makeShaderBinding<ShaderModule>(OFFSET_BINDING, offsetRef));
-    const s = bindingToModule(makeShaderBinding<ShaderModule>(OFFSET_BINDING, scrollRef));
+    const c = getBoundSource(CLIP_BINDING, clipRef);
+    const b = getBoundSource(OFFSET_BINDING, boxRef);
+    const o = getBoundSource(OFFSET_BINDING, offsetRef);
+    const s = getBoundSource(OFFSET_BINDING, scrollRef);
 
     const shift = bindBundle(getShiftedRectangle, {getOffset: b});
     const clip = chainTo(c, shift);
@@ -213,8 +211,10 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
           size: outer,
           render: memoLayout((
             box: Rectangle,
-            parentClip?: ShaderModule,
-            parentTransform?: ShaderModule,
+            origin: Rectangle,
+            parentClip: ShaderModule | null,
+            parentMask: ShaderModule | null,
+            parentTransform: ShaderModule | null,
           ) => {
           
             // If scrollbar must appear/disappear, re-fit.
@@ -225,8 +225,8 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: OverflowProps
             }
           
             return [
-              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, transform, inverse)(box, parentClip, parentTransform),
-              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, parentClip, parentTransform),
+              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, undefined, transform, inverse)(box, origin, parentClip, parentMask, parentTransform),
+              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, origin, parentClip, parentMask, parentTransform),
             ];
           }),
           pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),

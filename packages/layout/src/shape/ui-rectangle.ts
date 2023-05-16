@@ -7,6 +7,7 @@ import { use, yeet, memo, useContext, useMemo, useNoContext } from '@use-gpu/liv
 import { LayoutContext, getAlignmentAnchor } from '@use-gpu/workbench';
 
 import { evaluateDimension, parseAnchorXY } from '../parse';
+import { getOriginProjection } from '../lib/util';
 
 const UV_SQUARE = [0, 0, 1, 1] as Rectangle;
 const NO_RECTANGLE = [0, 0, 0, 0] as Rectangle;
@@ -21,6 +22,7 @@ const REPEAT_FLAG = {
 export type UIRectangleProps = {
   id: number,
   layout?: Rectangle,
+  origin?: Rectangle,
 
   image?: Partial<ImageTrait>,
 
@@ -29,8 +31,9 @@ export type UIRectangleProps = {
   border?: Point4,
   radius?: Point4,
 
-  clip?: ShaderModule,
-  transform?: ShaderModule
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
 };
 
 export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
@@ -43,7 +46,9 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     radius,
     border,
 
+    origin = NO_RECTANGLE,
     clip,
+    mask,
     transform,
   } = props;
 
@@ -57,6 +62,8 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
   }
 
   return useMemo(() => {
+    const st = origin ? getOriginProjection(layout, origin) : UV_SQUARE;
+    
     const sampledTexture = useMemo(() => {
       if (!image?.texture) return null;
 
@@ -177,6 +184,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         texture: sampledTexture ?? image?.texture,
         repeat: (repeat != null ? REPEAT_FLAG[repeat] : repeat) ?? 0,
         uv,
+        st,
 
         bounds: layout,
         count: 1,
@@ -191,10 +199,13 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         border,
         stroke,
         fill,
+        
+        st,
 
         bounds: layout,
         count: 1,
         clip,
+        mask,
         transform,
       };
     }
@@ -210,7 +221,9 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     border,
 
     clip,
+    mask,
     transform,
     ...layout,
+    ...origin,
   ]);
 };

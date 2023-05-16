@@ -9,7 +9,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, yeet, memo, useOne, useNoOne, useRef } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -32,8 +32,6 @@ export type RawFullScreenProps = {
 
 const ZERO = [0, 0, 0, 1];
 
-const FRAGMENT_BINDINGS = bundleToAttributes(getTextureColor);
-
 export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: RawFullScreenProps) => {
   const {
     mode = 'opaque',
@@ -50,7 +48,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
 
   const getVertex = getFullScreenVertex;
   const getPicking = usePickingShader({id});
-  const getFragment = useBoundShader(getTextureColor, FRAGMENT_BINDINGS, [t]);
+  const getFragment = useBoundShader(getTextureColor, [t]);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 

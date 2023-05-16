@@ -5,7 +5,7 @@ import type { BoundLight } from '../../light/types';
 
 import { use, yeet, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
 import { uploadBuffer } from '@use-gpu/core';
-import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useBufferedSize } from '../../hooks/useBufferedSize';
 import { useBoundShader } from '../../hooks/useBoundShader';
@@ -28,9 +28,6 @@ import {
   FULLSCREEN_STENCIL_PIPELINE, GEOMETRY_STENCIL_PIPELINE, STENCIL_PIPELINE,
   LightDraw,
 } from './light';
-
-const VERTEX_BINDINGS = bundleToAttributes(getLightVertex);
-const FRAGMENT_BINDINGS = bundleToAttributes(getLightFragment);
 
 export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKindProps) => {
   const {
@@ -72,11 +69,11 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   const getOutside = useRawSource(outsides, 'u16');
   const getInside = useRawSource(insides, 'u16');
 
-  const getInstanceVertex = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getInstance, getPosition, getIndex, getScale], GEOMETRY_DEFS);
-  const getOutsideVertex  = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getOutside, getPosition, getIndex, getScale], GEOMETRY_DEFS);
-  const getInsideVertex   = useBoundShader(getLightVertex, VERTEX_BINDINGS, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
+  const getInstanceVertex = useBoundShader(getLightVertex, [getLight, getInstance, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getOutsideVertex  = useBoundShader(getLightVertex, [getLight, getOutside, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getInsideVertex   = useBoundShader(getLightVertex, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
 
-  const getFragment = useBoundShader(getLightFragment, FRAGMENT_BINDINGS, [...gbuffer, getLight, applyLight]);
+  const getFragment = useBoundShader(getLightFragment, [...gbuffer, getLight, applyLight]);
 
   const stencilLinks = useMemo(() => ({getVertex: getInstanceVertex}), [getInstanceVertex, getFragment]);
   const outsideLinks = useMemo(() => ({getVertex: getOutsideVertex, getFragment}), [getOutsideVertex, getFragment]);

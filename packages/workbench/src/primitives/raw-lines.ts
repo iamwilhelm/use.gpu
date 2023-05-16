@@ -9,7 +9,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -51,8 +51,6 @@ export type RawLinesProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
-
-const VERTEX_BINDINGS = bundleToAttributes(getLineVertex);
 
 const LINE_JOIN_SIZE = {
   'bevel': 1,
@@ -110,7 +108,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     useNoCallback();
   }
 
-  const getVertex = useBoundShader(getLineVertex, VERTEX_BINDINGS, [xf, scissor, g, c, w, d, z, t, e, l]);
+  const getVertex = useBoundShader(getLineVertex, [xf, scissor, g, c, w, d, z, t, e, l]);
   const getPicking = usePickingShader(props);
   const getFragment = getPassThruColor;
 

@@ -1,14 +1,13 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Atlas, Tuples, Rectangle } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { FontMetrics, GlyphMetrics } from '@use-gpu/glyph';
 import type { Alignment } from '../types';
 
-import { gather, provide, memo, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
+import { fence, provide, memo, yeet, useContext, useFiber, useMemo, useOne, useState, makeContext, incrementVersion } from '@use-gpu/live';
 import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/glyph';
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { getBoundShader } from '../../hooks/useBoundShader';
 import { makeInlineCursor } from '../cursor';
@@ -17,8 +16,6 @@ import { DeviceContext } from '../../providers/device-provider';
 import { FontContext } from './font-provider';
 
 import { getLODBiasedTexture } from '@use-gpu/wgsl/fragment/lod-bias.wgsl';
-
-const LOD_BIAS_BINDINGS = bundleToAttributes(getLODBiasedTexture);
 
 export const SDFFontContext = makeContext<SDFFontContextProps>(undefined, 'SDFFontContext');
 export const useSDFFontContext = () => useContext(SDFFontContext);
@@ -39,7 +36,6 @@ export type SDFFontProviderProps = {
   height?: number,
   radius?: number,
   pad?: number,
-  children?: LiveElement,
   then?: (atlas: Atlas, source: ShaderSource, gathered: any) => LiveElement
 };
 
@@ -72,7 +68,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   pad = 0,
   children,
   then,
-}: SDFFontProviderProps) => {
+}: PropsWithChildren<SDFFontProviderProps>) => {
   pad += Math.ceil(radius * 0.75);
 
   const device = useContext(DeviceContext);
@@ -93,7 +89,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
     };
 
     const biasedSource = {
-      ...getBoundShader(getLODBiasedTexture, LOD_BIAS_BINDINGS, [biasable, -0.5]),
+      ...getBoundShader(getLODBiasedTexture, [biasable, -0.5]),
       colorSpace: 'srgb',
     };
 
@@ -189,13 +185,13 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   }, [rustText, atlas, source]);
 
   return rustText ? (
-    gather(
+    fence(
       provide(SDFFontContext, context, children),
       (gathered: any) => {
         const rects = bounds.flush();
         if (rects.length) updateMipTextureChain(device, source, rects);
 
-        return then ? then(atlas, biasedSource, gathered) : null;
+        return then ? then(atlas, biasedSource, gathered) : yeet(gathered);
       },
     )
   ) : null;

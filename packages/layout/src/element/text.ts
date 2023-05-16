@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { Point4 } from '@use-gpu/core';
+import type { Point4, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 import type { Base, InlineLine } from '../types';
@@ -73,7 +73,13 @@ export const Text: LiveComponent<TextProps> = (props) => {
     spans,
     height,
     inline,
-    render: memoInline((lines: InlineLine[], clip?: ShaderModule, transform?: ShaderModule) => (
+    render: memoInline((
+      lines: InlineLine[],
+      origin: Rectangle,
+      clip: ShaderModule | null,
+      mask: ShaderModule | null,
+      transform: ShaderModule | null,
+    ) => (
       keyed(Glyphs, id, {
         id,
         font,
@@ -89,7 +95,9 @@ export const Text: LiveComponent<TextProps> = (props) => {
         snap,
         expand,
 
+        origin,
         clip,
+        mask,
         transform,
       })
     )),

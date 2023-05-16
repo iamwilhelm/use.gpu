@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, LambdaSource, UniformType } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { VectorLike } from '@use-gpu/traits';
@@ -6,7 +6,6 @@ import type { ScaleTrait, AxisTrait } from '../types';
 
 import { parseVec4, useProp } from '@use-gpu/traits';
 import { yeet, provide, useOne, useMemo, useNoMemo, useContext, incrementVersion } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useRawSource, useBoundShader, useShaderRef } from '@use-gpu/workbench';
 
 import { DataContext, ValuesContext } from '../providers/data-provider';
@@ -19,15 +18,12 @@ import { getScalePosition } from '@use-gpu/wgsl/plot/scale.wgsl';
 
 import { vec4 } from 'gl-matrix';
 
-const SCALE_BINDINGS = bundleToAttributes(getScalePosition);
-
 export type ScaleProps = Partial<ScaleTrait> & Partial<AxisTrait> & {
   origin?: VectorLike,
   render?: (positions: LambdaSource, values: Float32Array) => LiveElement,
-  children?: LiveElement,
 };
 
-export const Scale: LiveComponent<ScaleProps> = (props) => {
+export const Scale: LiveComponent<ScaleProps> = (props: PropsWithChildren<ScaleProps>) => {
 
   const {
     origin,
@@ -58,7 +54,7 @@ export const Scale: LiveComponent<ScaleProps> = (props) => {
 
   const o = useShaderRef(og);
   const a = useShaderRef(axis);
-  const bound = useBoundShader(getScalePosition, SCALE_BINDINGS, [data, a, o]);
+  const bound = useBoundShader(getScalePosition, [data, a, o]);
 
   // Expose position source
   const source = useMemo(() => ({

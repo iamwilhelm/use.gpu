@@ -9,8 +9,8 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
+import { getBundleKey } from '@use-gpu/shader/wgsl';
+import { resolve } from '@use-gpu/core';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -29,6 +29,7 @@ export type UIRectanglesProps = {
   stroke?: number[] | TypedArray,
   fill?: number[] | TypedArray,
   uv?: number[] | TypedArray,
+  st?: number[] | TypedArray,
   repeat?: number,
   sdf?: number[] | TypedArray,
 
@@ -38,21 +39,20 @@ export type UIRectanglesProps = {
   strokes?: ShaderSource,
   fills?: ShaderSource,
   uvs?: ShaderSource,
+  sts?: ShaderSource,
   repeats?: ShaderSource,
   sdfs?: ShaderSource,
 
   texture?: TextureSource | LambdaSource | ShaderModule,
   transform?: ShaderModule,
   clip?: ShaderModule,
+  mask?: ShaderSource,
 
   debugContours?: boolean,
 
   count?: Lazy<number>,
   id?: number,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
-
-const VERTEX_BINDINGS = bundleToAttributes(getUIRectangleVertex);
-const FRAGMENT_BINDINGS = bundleToAttributes(getUIFragment);
 
 export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRectanglesProps) => {
   const {
@@ -63,6 +63,12 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     depthTest,
     depthWrite,
     blend,
+    
+    texture,
+    transform,
+    clip,
+    mask,
+    
     debugContours = false,
   } = props;
 
@@ -72,19 +78,21 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const r = useShaderRef(props.rectangle, props.rectangles);
   const a = useShaderRef(props.radius, props.radiuses);
   const b = useShaderRef(props.border, props.borders);
-  const s = useShaderRef(props.strokes, props.strokes);
+  const s = useShaderRef(props.stroke, props.strokes);
   const f = useShaderRef(props.fill, props.fills);
   const u = useShaderRef(props.uv, props.uvs);
+  const v = useShaderRef(props.st, props.sts);
   const p = useShaderRef(props.repeat, props.repeats);
   const d = useShaderRef(props.sdf, props.sdfs);
 
-  const {transform: xf} = useCombinedTransform(props.transform);
-  const c = props.clip;
-  const t = useNativeColorTexture(props.texture);
+  const {transform: xf} = useCombinedTransform(transform);
+  const c = clip;
+  const m = mask;
+  const t = useNativeColorTexture(texture);
 
-  const getVertex = useBoundShader(getUIRectangleVertex, VERTEX_BINDINGS, [r, a, b, s, f, u, p, d, xf, c]);
+  const getVertex = useBoundShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getUIFragment, FRAGMENT_BINDINGS, [t]);
+  const getFragment = useBoundShader(getUIFragment, [t, m]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
@@ -103,8 +111,9 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const defines: Record<string, any> = useMemo(() => ({
     ...defs,
     HAS_EDGE_BLEED: true,
+    HAS_MASK: !!mask,
     DEBUG_SDF: debugContours,
-  }), [defs, debugContours]);
+  }), [defs, debugContours, mask]);
 
   return use(Virtual, {
     vertexCount,

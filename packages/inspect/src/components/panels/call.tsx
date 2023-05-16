@@ -19,9 +19,11 @@ type CallProps = {
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
-  const {id, depth, path, type, state, context, yeeted, quote, unquote, mount, mounts, next, host} = fiber;
+  const {id, depth, path, keys, type, state, context, yeeted, quote, unquote, mount, mounts, next, ...rest} = fiber;
 
-  let props = {id, depth, path, type, context, yeeted, quote, unquote, mount, mounts, next, host, '[raw]': fiber} as Record<string, any>;
+  let props = {id, depth, path, keys, '[internals]': rest} as any;
+  let env = {context, yeeted, quote, unquote} as any;
+  let rendered = {type, mount, mounts, next} as any;
 
   usePingContext();
 
@@ -37,6 +39,12 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
     <div>
       <div><b>Fiber</b></div>
       <div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
+      <Spacer />
+      <div><b>Environment</b></div>
+      <div>{inspectObject(env, expanded, toggleExpanded, '')}</div>
+      <Spacer />
+      <div><b>Rendered</b></div>
+      <div>{inspectObject(rendered, expanded, toggleExpanded, '')}</div>
       <Spacer />
       <div><b>Hooks</b></div>
       <div>

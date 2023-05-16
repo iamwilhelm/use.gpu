@@ -1,18 +1,18 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 
-import { use, memo, useMemo, useResource, useState } from '@use-gpu/live';
+import { use, memo, useMemo, useOne, useResource, useState } from '@use-gpu/live';
 import { EventProvider, MouseState, WheelState, KeyboardState } from '@use-gpu/workbench';//'/providers/event-provider';
-
-const CAPTURE_EVENT = {capture: true};
-const NON_PASSIVE_EVENT = {capture: true, passive: false};
 
 const WHEEL_STEP = 120;
 const PIXEL_STEP = 10;
 const DELTA_MULTIPLIER = [1, 4, 80];
 
+const formatKey = (key: string) => key[0].toLowerCase() + key.slice(1);
+
 export type DOMEventsProps = {
   element: HTMLElement,
-  children: LiveElement,
+  autofocus?: boolean,
+  capture?: boolean,
 };
 
 const toButton = (button: number) => {
@@ -60,7 +60,25 @@ const makeKeyboardState = () => ({
   stopped: false,
 } as KeyboardState);
 
-export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children}: DOMEventsProps) => {
+export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithChildren<DOMEventsProps>) => {
+  const {element, autofocus, capture, children} = props;
+
+  const captureOptions = useOne(() => ({capture: !!capture}), capture);
+
+  useResource((dispose) => {
+    if (element.tabIndex !== -1) return;
+
+    element.setAttribute('tabIndex', '0');
+    element.style.setProperty('outline', 'none');
+
+    if (autofocus) element.focus();
+
+    dispose(() => {
+      element.setAttribute('tabIndex', '-1');
+      element.style.setProperty('outline', '');
+    });
+  }, [autofocus]);
+
   const [mouse, setMouse] = useState<MouseState>(makeMouseState);
   const [wheel, setWheel] = useState<WheelState>(makeWheelState);
   const [keyboard, setKeyboard] = useState<KeyboardState>(makeKeyboardState);
@@ -101,7 +119,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onKeyDown = (event: KeyboardEvent) => {
       onModifiers(event);
       setKeyboard((state) => {
-        const k = event.key.toLowerCase();
+        const k = formatKey(event.key);
         return {
           ...state,
           keys: {
@@ -117,7 +135,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
     const onKeyUp = (event: KeyboardEvent) => {
       onModifiers(event);
       setKeyboard((state) => {
-        const k = event.key.toLowerCase();
+        const k = formatKey(event.key);
         return {
           ...state,
           keys: {
@@ -132,7 +150,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
 
     // Special Firefox-only event. Prefer if available.
     const onDOMWheel = (e: any) => {
-      element.removeEventListener('wheel', onWheel, CAPTURE_EVENT);
+      element.removeEventListener('wheel', onWheel, captureOptions);
       onWheel(e);
     };
 
@@ -249,10 +267,12 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       e.preventDefault();
       e.stopPropagation();
 
-      element.removeEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
-      document.addEventListener('mouseenter', onMouseMove, CAPTURE_EVENT);
-      document.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
-      document.addEventListener('mouseup', onMouseUp, CAPTURE_EVENT);
+      element.focus();
+
+      element.removeEventListener('mousemove', onMouseMove, captureOptions);
+      document.addEventListener('mouseenter', onMouseMove, captureOptions);
+      document.addEventListener('mousemove', onMouseMove, captureOptions);
+      document.addEventListener('mouseup', onMouseUp, captureOptions);
     };
 
     const onMouseMove = (e: MouseEvent) => {
@@ -271,10 +291,10 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
       e.preventDefault();
       e.stopPropagation();
 
-      element.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
-      document.removeEventListener('mouseenter', onMouseMove, CAPTURE_EVENT);
-      document.removeEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
-      document.removeEventListener('mouseup', onMouseUp, CAPTURE_EVENT);
+      element.addEventListener('mousemove', onMouseMove, captureOptions);
+      document.removeEventListener('mouseenter', onMouseMove, captureOptions);
+      document.removeEventListener('mousemove', onMouseMove, captureOptions);
+      document.removeEventListener('mouseup', onMouseUp, captureOptions);
     };
 
     const onContextMenu = (e: MouseEvent) => {
@@ -295,42 +315,42 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo(({element, children
 
     //const onGlobalWheel = (e: WheelEvent) => e.preventDefault();
 
-    element.addEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
-    element.addEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
-    element.addEventListener('contextmenu', onContextMenu, CAPTURE_EVENT);
+    element.addEventListener('mousedown', onMouseDown, captureOptions);
+    element.addEventListener('mousemove', onMouseMove, captureOptions);
+    element.addEventListener('contextmenu', onContextMenu, captureOptions);
 
-    element.addEventListener('touchstart', onTouchStart, CAPTURE_EVENT);
-    element.addEventListener('touchmove', onTouchMove, CAPTURE_EVENT);
-    element.addEventListener('touchend', onTouchEnd, CAPTURE_EVENT);
+    element.addEventListener('touchstart', onTouchStart, captureOptions);
+    element.addEventListener('touchmove', onTouchMove, captureOptions);
+    element.addEventListener('touchend', onTouchEnd, captureOptions);
 
-    document.addEventListener('keydown', onKeyDown, CAPTURE_EVENT);
-    document.addEventListener('keyup', onKeyUp, CAPTURE_EVENT);
+    element.addEventListener('keydown', onKeyDown, captureOptions);
+    element.addEventListener('keyup', onKeyUp, captureOptions);
 
-    element.addEventListener('DOMMouseScroll', onDOMWheel, CAPTURE_EVENT);
-    element.addEventListener('wheel', onWheel, CAPTURE_EVENT);
+    element.addEventListener('DOMMouseScroll', onDOMWheel, captureOptions);
+    element.addEventListener('wheel', onWheel, captureOptions);
 
-    window.addEventListener('blur', onWindowBlur, CAPTURE_EVENT);
+    window.addEventListener('blur', onWindowBlur, captureOptions);
 
     dispose(() => {
-      document.removeEventListener('mouseenter', onMouseUp, CAPTURE_EVENT);
-      document.removeEventListener('mousemove', onMouseUp, CAPTURE_EVENT);
-      document.removeEventListener('mouseup', onMouseUp, CAPTURE_EVENT);
+      document.removeEventListener('mouseenter', onMouseMove, captureOptions);
+      document.removeEventListener('mousemove', onMouseMove, captureOptions);
+      document.removeEventListener('mouseup', onMouseUp, captureOptions);
 
-      element.removeEventListener('mousedown', onMouseDown, CAPTURE_EVENT);
-      element.removeEventListener('mousemove', onMouseMove, CAPTURE_EVENT);
-      element.removeEventListener('contextmenu', onContextMenu, CAPTURE_EVENT);
+      element.removeEventListener('mousedown', onMouseDown, captureOptions);
+      element.removeEventListener('mousemove', onMouseMove, captureOptions);
+      element.removeEventListener('contextmenu', onContextMenu, captureOptions);
 
-      element.removeEventListener('touchstart', onTouchStart, CAPTURE_EVENT);
-      element.removeEventListener('touchmove', onTouchMove, CAPTURE_EVENT);
-      element.removeEventListener('touchend', onTouchEnd, CAPTURE_EVENT);
+      element.removeEventListener('touchstart', onTouchStart, captureOptions);
+      element.removeEventListener('touchmove', onTouchMove, captureOptions);
+      element.removeEventListener('touchend', onTouchEnd, captureOptions);
 
-      document.removeEventListener('keydown', onKeyDown, CAPTURE_EVENT);
-      document.removeEventListener('keyup', onKeyUp, CAPTURE_EVENT);
+      element.removeEventListener('keydown', onKeyDown, captureOptions);
+      element.removeEventListener('keyup', onKeyUp, captureOptions);
 
-      element.removeEventListener('DOMMouseScroll', onDOMWheel, CAPTURE_EVENT);
-      element.removeEventListener('wheel', onWheel, CAPTURE_EVENT);
+      element.removeEventListener('DOMMouseScroll', onDOMWheel, captureOptions);
+      element.removeEventListener('wheel', onWheel, captureOptions);
 
-      window.removeEventListener('blur', onWindowBlur, CAPTURE_EVENT);
+      window.removeEventListener('blur', onWindowBlur, captureOptions);
     });
   }, [element]);
 

@@ -4,7 +4,9 @@ import type { ExpandState, SelectState, HoverState, OptionState, PingState } fro
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
 
-import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState } from 'react';
+import { makeUseLocalState } from '../hooks/useLocalState';
+
+import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState, SetStateAction } from 'react';
 import { Node } from './node';
 import { FiberTree } from './fiber';
 import { Props } from './panels/props';
@@ -22,6 +24,8 @@ import { Options } from './options';
 import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
 
 import * as Tabs from '@radix-ui/react-tabs';
+
+const OPTIONS_KEY = 'live.inspect.options';
 
 type InspectFiber = Record<string, any>;
 type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
@@ -41,7 +45,7 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     builtins: false,
     highlight: true,
     inspect: false,
-  });
+  }, makeUseLocalState(OPTIONS_KEY));
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
   }));
@@ -81,11 +85,11 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
 
   useLayoutEffect(() => {
     const setHovered = hoveredFiber?.__inspect?.setHovered;
-    if (!setHovered) return;
+    if (!setHovered || !highlight) return;
     
     setHovered(true);
     return () => setHovered(false);
-  }, [hoveredFiber])
+  }, [hoveredFiber, highlight])
   
   const {host} = fiber;
   useLayoutEffect(() => {
@@ -239,3 +243,4 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     </InspectToggle>
   </div>);
 }
+

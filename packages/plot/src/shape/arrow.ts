@@ -21,7 +21,6 @@ import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 import { getLineAnchor } from '@use-gpu/wgsl/geometry/anchor.wgsl';
 import { getLineTrim } from '@use-gpu/wgsl/geometry/trim.wgsl';
 
-const LINE_ATTRIBUTES = bundleToAttributes(getLineSegment);
 const ARROW_ATTRIBUTES = bundleToAttributes(getLineAnchor);
 const [, START_ATTRIBUTE, END_ATTRIBUTE] = ARROW_ATTRIBUTES;
 
@@ -53,9 +52,9 @@ export const Arrow: LiveComponent<ArrowProps> = (props) => {
   const boundEnd = useBoundSource(END_ATTRIBUTE, useShaderRef(+end));
   const deps = [detailExpr, boundStart, boundEnd];
 
-  const segments = useOne(() => useBoundShader(getLineSegment, LINE_ATTRIBUTES, [detailExpr]), detailExpr);
-  const anchors = useMemo(() => useBoundShader(getLineAnchor, ARROW_ATTRIBUTES, [detailExpr, boundStart, boundEnd]), deps);
-  const trims = useMemo(() => useBoundShader(getLineTrim, ARROW_ATTRIBUTES, [detailExpr, boundStart, boundEnd]), deps);
+  const segments = useOne(() => useBoundShader(getLineSegment, [detailExpr]), detailExpr);
+  const anchors = useMemo(() => useBoundShader(getLineAnchor, [detailExpr, boundStart, boundEnd]), deps);
+  const trims = useMemo(() => useBoundShader(getLineTrim, [detailExpr, boundStart, boundEnd]), deps);
 
   return (
     use(ArrowLayer, {

@@ -11,7 +11,7 @@ import {
   makeAtlas, makeTexture, seq,
 } from '@use-gpu/core';
 import { mixBits53 } from '@use-gpu/state';
-import { bindBundle, bundleToAttribute, bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
 
 import { LightContext, DEFAULT_LIGHT_CONTEXT } from '../../providers/light-provider';
 import { useDeviceContext } from '../../providers/device-provider';

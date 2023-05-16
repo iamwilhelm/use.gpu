@@ -8,13 +8,12 @@ import { RenderContext } from '../providers/render-provider';
 
 export type QueueProps = {
   live?: boolean,
-  render?: () => LiveElement,
 };
 
 /** Dispatch queue. Used by `<WebGPU>` to reconcile quoted drawing commands (yeeted lambdas). */
 export const Queue: LC<QueueProps> = (props: PropsWithChildren<QueueProps>): DeferredCall<any> => {
-  const {render, children} = props;
-  return reconcile(quote(gather(unquote(render ? render() : children), Resume)));
+  const {children} = props;
+  return reconcile(quote(gather(unquote(children), Resume)));
 };
 
 const Resume = (ts: ArrowFunction[]) => {

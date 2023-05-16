@@ -3,7 +3,7 @@ import type { TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import React, { Gather, memo, useOne } from '@use-gpu/live';
-import { bundleToAttributes, wgsl } from '@use-gpu/shader/wgsl';
+import { wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
 import {
@@ -35,8 +35,6 @@ const cubeMaterial = wgsl`
 }
 `;
 
-const MATERIAL_BINDINGS = bundleToAttributes(cubeMaterial);
-
 export const DebugAxesPage: LC = (props) => {
   const geometry = useOne(() => makeSphereGeometry({ width: 2, uvw: true }));
 
@@ -60,7 +58,7 @@ export const DebugAxesPage: LC = (props) => {
         Record<string, ShaderSource>,
         TextureSource,
       ]) => {
-        const fragment = useBoundShader(cubeMaterial, MATERIAL_BINDINGS, [texture]);
+        const fragment = useBoundShader(cubeMaterial, [texture]);
 
         return (
           <LinearRGB tonemap="aces">

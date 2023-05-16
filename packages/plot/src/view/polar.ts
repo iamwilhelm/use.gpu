@@ -1,9 +1,9 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
-import { bundleToAttributes, swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
+import { swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
@@ -19,17 +19,13 @@ import { useAxesTrait, useObjectTrait } from '../traits';
 
 import { getPolarPosition } from '@use-gpu/wgsl/transform/polar.wgsl';
 
-const POLAR_BINDINGS = bundleToAttributes(getPolarPosition);
-
 export type PolarProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
   bend?: number,
   helix?: number,
   on?: Axis4,
-
-  children?: LiveElement,
 };
 
-export const Polar: LiveComponent<PolarProps> = (props) => {
+export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarProps>) => {
   const {
     bend = 1,
     helix = 0,
@@ -134,7 +130,7 @@ export const Polar: LiveComponent<PolarProps> = (props) => {
   const h = useShaderRef(helix);
   const e = useShaderRef(epsilon);
 
-  const bound = useBoundShader(getPolarPosition, POLAR_BINDINGS, [t, b, f, c, h]);
+  const bound = useBoundShader(getPolarPosition, [t, b, f, c, h]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

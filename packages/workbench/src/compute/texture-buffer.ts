@@ -1,4 +1,4 @@
-import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
+import type { LiveFiber, LiveComponent, LiveElement, Task, PropsWithChildren } from '@use-gpu/live';
 import type { ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, gather, yeet, fence, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
@@ -24,13 +24,12 @@ export type TextureBufferProps = {
   resolution?: number,
   filterable?: boolean,
 
-  children?: LiveElement,
   render?: (texture: TextureTarget) => LiveElement,
   then?: (texture: TextureTarget) => LiveElement,
 };
 
 /** Read-write GPU texture buffer for compute. Will perform frame-buffer flipping with N frames of history. */
-export const TextureBuffer: LiveComponent<TextureBufferProps> = (props) => {
+export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWithChildren<TextureBufferProps>) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

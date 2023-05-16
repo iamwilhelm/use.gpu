@@ -6,7 +6,7 @@ import type {
 } from './types';
 
 import { compareFibers } from './util';
-import { makeFiber, makeImperativeFunction } from './fiber';
+import { makeFiber, makeImperativeFunction, bustFiberMemo } from './fiber';
 import { getCurrentFiberID } from './current';
 
 /** @hidden */

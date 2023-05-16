@@ -4,7 +4,7 @@ import type { LightEnv } from '../../pass/types';
 import type { UseLight } from './light-data';
 
 import { use, yeet, provide, useMemo, useOne } from '@use-gpu/live';
-import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { LightContext } from '../../providers/light-provider';
 import { LightData, SHADOW_PAGE } from './light-data';
@@ -17,12 +17,8 @@ import { applyLights as applyLightsWGSL } from '@use-gpu/wgsl/material/lights.wg
 import { applyDirectionalShadow as applyDirectionalShadowWGSL } from '@use-gpu/wgsl/shadow/directional.wgsl';
 import { applyPointShadow as applyPointShadowWGSL } from '@use-gpu/wgsl/shadow/point.wgsl';
 
-const LIGHT_BINDINGS = bundleToAttributes(applyLightWGSL);
-const LIGHTS_BINDINGS = bundleToAttributes(applyLightsWGSL);
-
 export type LightMaterialProps = {
   shadows?: boolean,
-  children?: LiveElement,
   then?: (light: LightEnv) => LiveElement,
 };
 

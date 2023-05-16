@@ -254,6 +254,11 @@
       "import": "./src/layout/layout.wgsl",
       "require": "./src/layout/layout.wgsl"
     },
+    "./layout/rectangle.wgsl": {
+      "types": "./src/layout/rectangle.wgsl.d.ts",
+      "import": "./src/layout/rectangle.wgsl",
+      "require": "./src/layout/rectangle.wgsl"
+    },
     "./layout/scroll.wgsl": {
       "types": "./src/layout/scroll.wgsl.d.ts",
       "import": "./src/layout/scroll.wgsl",
@@ -358,6 +363,26 @@
       "types": "./src/plot/volume.wgsl.d.ts",
       "import": "./src/plot/volume.wgsl",
       "require": "./src/plot/volume.wgsl"
+    },
+    "./present/fragment.wgsl": {
+      "types": "./src/present/fragment.wgsl.d.ts",
+      "import": "./src/present/fragment.wgsl",
+      "require": "./src/present/fragment.wgsl"
+    },
+    "./present/mask.wgsl": {
+      "types": "./src/present/mask.wgsl.d.ts",
+      "import": "./src/present/mask.wgsl",
+      "require": "./src/present/mask.wgsl"
+    },
+    "./present/motion.wgsl": {
+      "types": "./src/present/motion.wgsl.d.ts",
+      "import": "./src/present/motion.wgsl",
+      "require": "./src/present/motion.wgsl"
+    },
+    "./present/screen.wgsl": {
+      "types": "./src/present/screen.wgsl.d.ts",
+      "import": "./src/present/screen.wgsl",
+      "require": "./src/present/screen.wgsl"
     },
     "./render/fragment/deferred-light.wgsl": {
       "types": "./src/render/fragment/deferred-light.wgsl.d.ts",

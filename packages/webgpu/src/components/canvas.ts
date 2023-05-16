@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { UseGPURenderContext, ColorSpace } from '@use-gpu/core';
 
 import { EventProvider } from '@use-gpu/workbench';//'/event-provider';
@@ -30,13 +30,11 @@ export type CanvasProps = {
   colorInput?: ColorSpace,
   samples?: number,
   pixelRatio?: number,
-
-  children?: LiveElement,
 }
 
 const getPixelRatio = () => typeof window !== 'undefined' ? window.devicePixelRatio : 1;
 
-export const Canvas: LiveComponent<CanvasProps> = imperative((props: CanvasProps) => {
+export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithChildren<CanvasProps>) => {
   const {
     canvas,
     children,

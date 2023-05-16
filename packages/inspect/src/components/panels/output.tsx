@@ -4,7 +4,7 @@ import type { Action } from '../types';
 
 import { memo, use, wrap, provide, signal, useFiber, useMemo, useOne, makeContext } from '@use-gpu/live';
 import { LiveCanvas } from '@use-gpu/react';
-import { wgsl, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { wgsl } from '@use-gpu/shader/wgsl';
 import { Pass, Flat, FontLoader, Queue, DeviceContext, getBoundShader, getLambdaSource } from '@use-gpu/workbench';
 import { AutoCanvas } from '@use-gpu/webgpu';
 import { UI, Layout, Flex, Block, Inline, Text, Overflow, Absolute } from '@use-gpu/layout';
@@ -146,12 +146,6 @@ const depthShader = wgsl`
   }
 `;
 
-const ARRAY_BINDINGS = bundleToAttributes(arrayShader);
-const PICKING_BINDINGS = bundleToAttributes(pickingShader);
-const STENCIL_BINDINGS = bundleToAttributes(stencilShader);
-const DEPTH_BINDINGS = bundleToAttributes(depthShader);
-const DEPTH_CUBE_BINDINGS = bundleToAttributes(depthCubeShader);
-
 type OutputProps = {
   fiber: LiveFiber<any>,
 };
@@ -229,6 +223,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
       use(Block, {
         children: [
           use(Block, {
+            border: 1,
+            stroke: '#808080',
             width, height,
             fill: [0, 0, 0, .5],
             image: {texture, fit: 'contain', align: 'center', repeat: 'none'},
@@ -268,7 +264,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
           else if (layout.match(/cube/)) {
             {
               let texture = {...t, sampler: {}, variant: 'textureSample'} as any;
-              texture = getBoundShader(depthCubeShader, DEPTH_CUBE_BINDINGS, [decodeOctahedral, texture]);
+              texture = getBoundShader(depthCubeShader, [decodeOctahedral, texture]);
               texture = getLambdaSource(texture, t);
               texture.format = t.format;
               texture.layout = t.layout;
@@ -278,8 +274,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
             {
               for (let i = 0; i < 6; ++i) {
                 let texture = {...t, layout: 'texture_2d_array<f32>'} as any;
-                texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, texture]);
-                texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+                texture = getBoundShader(arrayShader, [i, texture]);
+                texture = getBoundShader(depthShader, [() => size, texture]);
                 texture = getLambdaSource(texture, t);
                 texture.format = t.format;
                 texture.layout = t.layout + ` (face ${i + 1})`;
@@ -291,8 +287,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
             const [,, depth] = size;
             for (let i = 0; i < depth!; ++i) {
               let texture = t as any;
-              texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, texture]);
-              texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+              texture = getBoundShader(arrayShader, [i, texture]);
+              texture = getBoundShader(depthShader, [() => size, texture]);
               texture = getLambdaSource(texture, t);
               texture.format = t.format;
               texture.layout = t.layout;
@@ -301,7 +297,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
           }
           else if (layout.match(/multisampled/)) {
             let texture = t as any;
-            texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+            texture = getBoundShader(depthShader, [() => size, texture]);
             texture = getLambdaSource(texture, t);
             texture.format = t.format;
             texture.layout = t.layout;
@@ -309,7 +305,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
           }
           else {
             let texture = t as any;
-            texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+            texture = getBoundShader(depthShader, [() => size, texture]);
             texture = getLambdaSource(texture, t);
             texture.format = t.format;
             texture.layout = t.layout;
@@ -339,7 +335,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
         };
 
         let texture = t as any;
-        texture = getBoundShader(stencilShader, STENCIL_BINDINGS, [() => size, texture]);
+        texture = getBoundShader(stencilShader, [() => size, texture]);
         texture = getLambdaSource(texture, t);
         texture.format = t.format;
         texture.layout = t.layout;
@@ -355,7 +351,7 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
     for (let t of toArray(picking)) {
       const {size} = t;
 
-      let texture = getBoundShader(pickingShader, PICKING_BINDINGS, [() => size, t]) as any;
+      let texture = getBoundShader(pickingShader, [() => size, t]) as any;
       texture = getLambdaSource(texture, t);
 
       out.push(makeView(texture));

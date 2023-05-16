@@ -7,7 +7,6 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useRenderContext } from '../providers/render-provider';
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
-import { getBoundSource } from '../hooks/useBoundSource';
 import { getBoundShader } from '../hooks/useBoundShader';
 import { RawFullScreen } from '../primitives';
 
@@ -73,7 +72,7 @@ export const FullScreen: LiveComponent<FullScreenProps> = (props: FullScreenProp
         return links[k] ? links[k] : allArgs.shift();
       });
 
-      t = getBoundShader(shader, bindings, values);
+      t = getBoundShader(shader, values);
     }
 
     return use(RawFullScreen, {

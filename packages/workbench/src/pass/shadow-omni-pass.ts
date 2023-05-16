@@ -8,7 +8,7 @@ import { use, quote, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
 import {
   makeDepthStencilAttachments, makeFrustumPlanes, makeGlobalUniforms, makeOrthogonalMatrix, makeTexture, uploadBuffer,
 } from '@use-gpu/core';
-import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { usePassContext } from '../providers/pass-provider';
@@ -25,8 +25,6 @@ import { drawToPass, reverseZ } from './util';
 import { getCubeToOmniSample } from '@use-gpu/wgsl/render/sample/cube-to-omni.wgsl';
 
 import { useDepthBlit } from './depth-blit';
-
-const SAMPLE_BINDINGS = bundleToAttributes(getCubeToOmniSample);
 
 export type ShadowOmniPassProps = {
   calls: {
@@ -194,7 +192,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   const border = Math.max(1, Math.min(4, shadowBlur || 1));
   const scaleRef = useShaderRef([width / (width - border * 2), height / (height - border * 2)]);
 
-  const getSample = useBoundShader(getCubeToOmniSample, SAMPLE_BINDINGS, [cubeSource, scaleRef]);
+  const getSample = useBoundShader(getCubeToOmniSample, [cubeSource, scaleRef]);
   const blit = useDepthBlit(renderContext, shadowMapDescriptors[shadowMap!], shadowUV!, SHADOW_PAGE, getSample);
 
   return quote(yeet(() => {

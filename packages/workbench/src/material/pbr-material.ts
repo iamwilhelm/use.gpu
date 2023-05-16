@@ -5,7 +5,6 @@ import type { ColorLike, VectorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 import { parseColor, useProp } from '@use-gpu/traits';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
@@ -19,12 +18,6 @@ import { getNormalMapSurface } from '@use-gpu/wgsl/instance/surface/normal-map.w
 import { getBasicMaterial } from '@use-gpu/wgsl/material/basic-material.wgsl';
 
 import { ShaderLitMaterial } from './shader-lit-material';
-
-const PBR_BINDINGS = bundleToAttributes(getPBRMaterial);
-const SURFACE_BINDINGS = bundleToAttributes(getMaterialSurface);
-const NORMAL_MAP_BINDINGS = bundleToAttributes(getNormalMapSurface);
-
-const BASIC_BINDINGS = bundleToAttributes(getBasicMaterial);
 
 export type PBRMaterialProps = {
   albedo?: ColorLike,
@@ -83,18 +76,18 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     HAS_METALNESS_ROUGHNESS_MAP: !!metalnessRoughnessMap,
   }), [albedoMap, emissiveMap, occlusionMap, metalnessRoughnessMap]);
 
-  const getMaterial = useBoundShader(getPBRMaterial, PBR_BINDINGS, [
+  const getMaterial = useBoundShader(getPBRMaterial, [
     a, e, m, r,
     am, em, om, mrm,
   ], defines);
 
-  const boundSurface = useBoundShader(getMaterialSurface, SURFACE_BINDINGS, [getMaterial]);
+  const boundSurface = useBoundShader(getMaterialSurface, [getMaterial]);
 
   let getSurface = boundSurface;
-  if (normalMap) getSurface = useBoundShader(getNormalMapSurface, NORMAL_MAP_BINDINGS, [boundSurface, normalMap]);
+  if (normalMap) getSurface = useBoundShader(getNormalMapSurface, [boundSurface, normalMap]);
   else useNoBoundShader();
 
-  const getFragment = useBoundShader(getBasicMaterial, BASIC_BINDINGS, [albedo, albedoMap], defines);
+  const getFragment = useBoundShader(getBasicMaterial, [albedo, albedoMap], defines);
 
   return ShaderLitMaterial({
     fragment: getFragment,

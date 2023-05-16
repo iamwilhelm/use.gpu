@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, Emit } from '@use-gpu/core';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne, tagFunction } from '@use-gpu/live';
@@ -26,10 +26,9 @@ export type SampledProps = {
   time?: boolean,
 
   render?: (source: StorageSource) => LiveElement,
-  children?: LiveElement,
 };
 
-export const Sampled: LiveComponent<SampledProps> = (props) => {
+export const Sampled: LiveComponent<SampledProps> = (props: PropsWithChildren<SampledProps>) => {
   const {
     axis,
     axes = 'xyzw',

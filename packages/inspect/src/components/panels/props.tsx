@@ -8,6 +8,11 @@ import React, { useState } from 'react';
 import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from '../layout';
 import { usePingContext } from '../ping';
 import { IconItem, SVGChevronDown, SVGChevronRight } from '../svg';
+import { WGSL } from '../wgsl';
+
+const CODE_HEIGHT = 250;
+
+const ShaderModule = () => {};
 
 const styled: any = _styled;
 
@@ -146,34 +151,18 @@ export const inspectObject = (
     object = o;
   }
 
-  const signature = Object.keys(object).join('/');
-  // @ts-ignore
-  if ((signature === 'f/args/key') && object.f && object.args) {
-    if (!object.f.isLiveBuiltin) {
-      object = Object.assign(Object.create(object.f), {
-        component: object.f,
-        props: object.args[0],
-        key: object.key,
-      });
-    }
-    else {
-      object = Object.assign(Object.create(object.f), {
-        component: object.f,
-        args: object.args,
-        arg: object.arg,
-        key: object.key,
-      });
-    }
-  }
-
   if (object?.constructor?.name?.match(/Array/)) {
-    if (object.length > 100) object = object.slice(0, 100);
+    if (object.length > 100) {
+      object = object.slice(0, 100);
+      object.push('…')
+    }
   }
 
   const fields = Object.keys(object).map((k: string) => {
     const key = path +'/'+ k;
-    const expandable = typeof object[k] === 'object' && object[k];
-    const expanded = !!state[key];
+    const code = (typeof object[k] === 'string' && object[k].length > 80 && object[k].match(/\n/));
+    const expandable = (typeof object[k] === 'object' && object[k]) || code;
+    const expanded = expandable && !!state[key];
 
     const icon = <IconItem height={16} top={2}>{expanded !== false ? <SVGChevronDown /> : <SVGChevronRight />}</IconItem>;
     const prefix = expandable ? icon : '';
@@ -189,17 +178,22 @@ export const inspectObject = (
     </Compact>
 
     const full = expanded ? (
-      <TreeIndent indent={1}>{inspectObject(object[k], state, toggleState, key, seen, depth + 1)}</TreeIndent>
+      <TreeIndent indent={1}>{
+        code
+        ? inspectCode(object[k])
+        : inspectObject(object[k], state, toggleState, key, seen, depth + 1)
+      }</TreeIndent>
     ) : null;
 
     let proto = object[k]?.__proto__ !== Object.prototype
       ? object[k]?.__proto__?.constructor?.name ??
-        object[k]?.__proto__?.displayName
-      : null;
+        object[k]?.__proto__?.displayName ??
+        object[k]?.__proto__?.name
+      : 'Object';
 
-    if (object.length) proto += '(' + object.length + ')';
+    if (object[k]?.length) proto += ' (' + object[k]?.length + ')';
 
-    const showFull = typeof object[k] === 'object' && depth < 20;
+    const showFull = (typeof object[k] === 'object' && depth < 20) || code;
     if (showFull && expanded) {
       return (
         <div key={k} onClick={onClick}>
@@ -234,3 +228,20 @@ const truncate = (s: string, n: number) => {
   if (s.length < n) return s;
   return s.slice(0, n) + '…';
 }
+
+const inspectCode = (code: string) => (
+  <div
+    style={{height: CODE_HEIGHT}}
+    onClick={(e) => e.stopPropagation()}
+  >
+    <div style={{
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      height: CODE_HEIGHT,
+      overflow: 'auto',
+    }}>
+      <WGSL code={code} />
+    </div>
+  </div>
+);

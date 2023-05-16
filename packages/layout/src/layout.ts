@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { Point, Point4, Rectangle } from '@use-gpu/core';
 import type { Placement } from '@use-gpu/traits';
 import type { FitInto, LayoutElement, LayoutPicker } from './types';
@@ -13,14 +13,12 @@ import {
   useBoundShader, useNoBoundShader,
 } from '@use-gpu/workbench';
 
-import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
+import { chainTo } from '@use-gpu/shader/wgsl';
 import { getLayoutPosition } from '@use-gpu/wgsl/layout/layout.wgsl';
 
 import { makeBoxInspectLayout } from './lib/util';
 import { UIRectangle } from './shape/ui-rectangle';
 import { mat4, vec2, vec3 } from 'gl-matrix';
-
-const LAYOUT_BINDINGS = bundleToAttributes(getLayoutPosition);
 
 export type LayoutProps = {
   width?: number,
@@ -28,12 +26,11 @@ export type LayoutProps = {
   placement?: Placement,
   inspect?: boolean,
   render?: () => LiveElement,
-  children?: LiveElement,
 };
 
 const DEFAULT_PLACEMENT = vec2.fromValues(1, 1);
 
-export const Layout: LiveComponent<LayoutProps> = memo((props: LayoutProps) => {
+export const Layout: LiveComponent<LayoutProps> = memo((props: PropsWithChildren<LayoutProps>) => {
   const {width, height, render, children} = props;
   const placement = useProp(props.placement, parsePlacement, DEFAULT_PLACEMENT);
 
@@ -85,7 +82,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   shift[0] = (placement[0] - 1.0) / 2 * into[0];
   shift[1] = (placement[1] - 1.0) / 2 * into[1];
 
-  const bound = useBoundShader(getLayoutPosition, LAYOUT_BINDINGS, [flip, shift]);
+  const bound = useBoundShader(getLayoutPosition, [flip, shift]);
   transform = useMemo(() => transform ? chainTo(transform, bound) : bound, [transform, bound]);
 
   // Render children into root container
@@ -100,7 +97,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
     const [w, h] = absolute ? into : size;
     const [ml, mt] = margin;
     const layout = [left + ml, top + mt, left + ml + w, top + mt + h] as Rectangle;
-    const el = render(layout, undefined, transform);
+    const el = render(layout, layout, null, null, transform);
     
     sizes.push([w, h]);
     offsets.push([left + ml, top + mt]);
@@ -124,7 +121,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       offsets,
     },
   });
-  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0], undefined, transform));
+  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0], [0, 0, 0, 0], null, null, transform));
 
   // Add scroll listener
   out.push(keyed(Scroller, -2, pickers, flip, shift));

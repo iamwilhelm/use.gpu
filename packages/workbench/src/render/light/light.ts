@@ -7,7 +7,7 @@ import type { BoundLight } from '../../light/types';
 
 import { memo, use, yeet, keyed, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
 import { resolve, uploadBuffer, BLEND_ADDITIVE } from '@use-gpu/core';
-import { bindBundle, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 import { $delete } from '@use-gpu/state';
 
 import { drawCall } from '../../queue/draw-call';

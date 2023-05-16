@@ -6,7 +6,6 @@ import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } 
 
 import { parseVec4, useProp } from '@use-gpu/traits';
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import {
   useBoundShader, useViewContext, useRawSource, useShaderRef, useTransformContext, useNoTransformContext,
   Data, LineLayer,
@@ -31,9 +30,6 @@ import { logarithmic, linear } from '../util/domain';
 import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
 import { getGridAutoPosition } from '@use-gpu/wgsl/plot/grid-auto.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
-
-const GRID_BINDINGS = bundleToAttributes(getGridPosition);
-const GRID_AUTO_BINDINGS = bundleToAttributes(getGridAutoPosition);
 
 const NO_POINT4: Point4 = [0, 0, 0, 0];
 
@@ -109,7 +105,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
         }
       });
 
-      autoBound = useBoundShader(getGridAutoPosition, GRID_AUTO_BINDINGS, [xform, autoBase, autoShift]);
+      autoBound = useBoundShader(getGridAutoPosition, [xform, autoBase, autoShift]);
     }
 
     const min = vec4.clone(orig as any);
@@ -125,7 +121,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     const m2 = useShaderRef(max);
 
     const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-    const bound = useBoundShader(getGridPosition, GRID_BINDINGS, [data, a, m1, m2, autoBound], defines);
+    const bound = useBoundShader(getGridPosition, [data, a, m1, m2, autoBound], defines);
 
     // Expose position source
     const source = useMemo(() => ({

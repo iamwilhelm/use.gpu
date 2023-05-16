@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { TextureSource, Point4, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
@@ -20,13 +20,11 @@ export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & {
   snap?: boolean,
   absolute?: boolean,
   under?: boolean,
-
-  children?: LiveElement,
 };
 
 const TRANSPARENT: Point4 = [0, 0, 0, 0];
 
-export const Element: LiveComponent<ElementProps> = (props) => {
+export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<ElementProps>) => {
   const {
     snap = false,
     absolute = false,
@@ -52,10 +50,17 @@ export const Element: LiveComponent<ElementProps> = (props) => {
     const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
     const size = [w ?? 0, h ?? 0];
 
-    let render = memoLayout((layout: Rectangle, clip?: ShaderModule, transform?: ShaderModule): LiveElement => (
+    let render = memoLayout((
+      layout: Rectangle,
+      origin: Rectangle,
+      clip: ShaderModule | null,
+      mask: ShaderModule | null,
+      transform: ShaderModule | null,
+    ): LiveElement => (
       keyed(UIRectangle, id, {
         id,
         layout,
+        origin,
 
         stroke: hovered ? INSPECT_STYLE.parent.stroke : stroke ?? TRANSPARENT,
         fill:   hovered ? INSPECT_STYLE.parent.fill : fill ?? TRANSPARENT,
@@ -64,6 +69,7 @@ export const Element: LiveComponent<ElementProps> = (props) => {
 
         image,
         clip,
+        mask,
         transform,
       })
     ));

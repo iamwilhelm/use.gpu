@@ -1,4 +1,4 @@
-import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
+import type { LiveFiber, LiveComponent, LiveElement, Task, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, StorageTarget, UniformType } from '@use-gpu/core';
 
 import { getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';
@@ -21,13 +21,12 @@ export type ComputeBufferProps = {
   format?: UniformType,
   resolution?: number,
 
-  children?: LiveElement,
   render?: (source: StorageTarget) => LiveElement,
   then?: (source: StorageTarget) => LiveElement,
 };
 
 /** Read-write GPU storage buffer for compute. Will perform frame-buffer flipping with N frames of history. */
-export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props) => {
+export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWithChildren<ComputeBufferProps>) => {
   const device = useContext(DeviceContext);
   const renderContext = useContext(RenderContext);
 

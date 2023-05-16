@@ -4,7 +4,6 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
-import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useLightContext } from '../providers/light-provider';
@@ -12,8 +11,6 @@ import { MaterialContext } from '../providers/material-provider';
 
 import { getSolidSurface } from '@use-gpu/wgsl/instance/surface/solid.wgsl';
 import { getSolidFragment } from '@use-gpu/wgsl/instance/fragment/solid.wgsl';
-
-const SURFACE_BINDINGS = bundleToAttributes(getSolidSurface);
 
 export type ShaderFlatMaterialProps = {
   /** Flat shader, for both lit and unlit passes (e.g. shadow map).
@@ -31,7 +28,7 @@ export const ShaderFlatMaterial: LC<ShaderFlatMaterialProps> = (props: PropsWith
     children,
   } = props;
 
-  const getSurface = useBoundShader(getSolidSurface, SURFACE_BINDINGS, [fragment]);
+  const getSurface = useBoundShader(getSolidSurface, [fragment]);
   const getLight = getSolidFragment;
   const getFragment = fragment;
 

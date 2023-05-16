@@ -18,7 +18,6 @@ use '@use-gpu/wgsl/use/color'::{ premultiply };
   border: vec4<f32>,
   stroke: vec4<f32>,
   fill: vec4<f32>,
-  coord: vec4<f32>,
 ) -> vec4<f32> {
   var fillColor = fill;
   var strokeColor = stroke;

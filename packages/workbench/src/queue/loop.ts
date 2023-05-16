@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement, LiveFiber, Task, PropsWithChildren } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren } from '@use-gpu/live';
 import { use, signal, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
 
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -20,7 +20,7 @@ export type LoopRef = {
   loop: {
     request?: (fiber?: LiveFiber<any>) => void,
   },
-  children?: LiveElement,
+  children?: LiveNode,
   run?: () => void,
 };
 

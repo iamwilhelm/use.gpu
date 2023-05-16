@@ -23,7 +23,7 @@ export type ScaleProps = Partial<ScaleTrait> & Partial<AxisTrait> & {
   render?: (positions: LambdaSource, values: Float32Array) => LiveElement,
 };
 
-export const Scale: LiveComponent<ScaleProps> = (props: PropsWithChildren<Scale>) => {
+export const Scale: LiveComponent<ScaleProps> = (props: PropsWithChildren<ScaleProps>) => {
 
   const {
     origin,

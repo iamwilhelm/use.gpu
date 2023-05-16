@@ -1,4 +1,4 @@
-import type { LiveFiber, LiveComponent, LiveElement, Task } from '@use-gpu/live';
+import type { LiveFiber, LiveComponent, LiveElement, Task, PropsWithChildren } from '@use-gpu/live';
 import type { StorageSource, StorageTarget, UniformType } from '@use-gpu/core';
 
 import { getDataArrayByteLength, makeDataBuffer } from '@use-gpu/core';

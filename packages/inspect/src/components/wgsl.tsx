@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 
 import { basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
-import { EditorView, keymap } from '@codemirror/view';
+import { EditorView, ViewUpdate, keymap } from '@codemirror/view';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { LRLanguage, LanguageSupport } from "@codemirror/language";
 import { createTheme } from '@uiw/codemirror-themes';
@@ -12,6 +12,8 @@ import { styleTags, tags as t } from "@lezer/highlight";
 
 export type WGSLProps = {
   code: string,
+  onChange?: (code: string) => void,
+  onCommit?: (code: string) => void,
 };
 
 const parserWithMetadata = parser.configure({
@@ -113,7 +115,7 @@ export function wgslLang() {
 }
 
 export const WGSL = (props: WGSLProps) => {
-  const {code} = props;
+  const {code, onChange, onCommit} = props;
 
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -134,6 +136,32 @@ export const WGSL = (props: WGSLProps) => {
     const {current: editor} = editorRef;
     if (!editor) return;
 
+    const listener = EditorView.updateListener.of((v: ViewUpdate) => {
+      if (onChange && v.docChanged) {
+        onChange(v.state.doc.toString());
+      }
+    });
+    
+    const handleCommit = (v: EditorView) => {
+      try {
+        if (onCommit) onCommit(v.state.doc.toString());
+      } catch (e) {
+        console.error(e);
+      } 
+      return true;
+    };
+    
+    const commitKeys = [
+      {
+        key: 'Cmd-Enter',
+        run: handleCommit,
+      },
+      {
+        key: 'Ctrl-Enter',
+        run: handleCommit,
+      },
+    ];
+
     const startState = EditorState.create({
       doc: code,
       extensions: [
@@ -141,7 +169,9 @@ export const WGSL = (props: WGSLProps) => {
         basicSetup,
         colorTheme,
         fontTheme,
+        keymap.of(commitKeys),
         keymap.of(defaultKeymap),
+        listener,
       ],
     });
 
@@ -155,7 +185,7 @@ export const WGSL = (props: WGSLProps) => {
       view.destroy();
       viewRef.current = null;
     };
-  }, []);
+  }, [onChange, onCommit]);
 
   return <div ref={editorRef}></div>;
 };

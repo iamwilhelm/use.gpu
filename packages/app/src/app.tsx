@@ -84,6 +84,7 @@ export const App: LC = hot(() => {
       fallback={(error: Error) => <HTML container={inner}>{into(FALLBACK_MESSAGE(error))}</HTML>}
     >
       <AutoCanvas
+        autofocus
         selector={'#use-gpu .canvas'}
         samples={4}
       >

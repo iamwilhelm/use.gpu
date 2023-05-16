@@ -1,7 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle, UniformAttribute } from '@use-gpu/core';
-import type { LayoutFit, FitInto } from '../types';
+import type { LayoutElement, FitInto } from '../types';
 
 import { memo, gather, yeet, useMemo } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
@@ -26,7 +26,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
     children,
   } = props;
 
-  return gather(children, (items: LayoutFit[]) => {
+  return gather(children, (items: LayoutElement[]) => {
     return useMemo(() => yeet(items.map(item => ({
       ...item,
       fit: memoFit((
@@ -38,12 +38,12 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
           render: memoLayout((
             box: Rectangle,
             origin: Rectangle,
-            parentClip?: ShaderModule,
-            parentMask?: ShaderModule,
-            parentTransform?: ShaderModule,
+            parentClip: ShaderModule | null,
+            parentMask: ShaderModule | null,
+            parentTransform: ShaderModule | null,
           ) => {
-            const xmask = parentMask && mask ? chainTo(parentMask, mask) : parentMask ?? mask;
-            const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
+            const xmask = (parentMask && mask ? chainTo(parentMask, mask) : parentMask ?? mask) ?? null;
+            const xform = (parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform) ?? null;
 
             const pclip = (parentClip && clip) ? (
               bindBundle(
@@ -53,7 +53,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
                   getSelf: clip ?? null,
                 }
               )
-            ) : (parentClip ?? clip);
+            ) : (parentClip ?? clip) ?? null;
             
             const xclip = inverse ? (
               bindBundle(

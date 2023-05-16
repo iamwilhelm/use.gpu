@@ -155,37 +155,39 @@ export const isSubNode = (a: LiveFiber<any>, b: LiveFiber<any>) => {
 
 /** Compare of two fibers in depth-first tree order */
 export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
-  const ak = a.path;
-  const bk = b.path;
+  const ap = a.path;
+  const bp = b.path;
+
+  const aks = a.keys;
+  const bks = b.keys;
   
-  const n = Math.min(ak.length, bk.length);
+  let aj = aks ? aks[0] : null;
+  let bj = bks ? bks[0] : null; 
+  let asi = 1;
+  let bsi = 1;
+
+  const n = Math.min(ap.length, bp.length);
   for (let i = 0; i < n; ++i) {
-    const ai = ak[i];
-    const bi = bk[i];
+    let ai = ap[i];
+    let bi = bp[i];
 
-    const an = typeof ai === 'number';
-    const bn = typeof bi === 'number';
-    if (an && bn) {
-      const v = (ai as number) - (bi as number);
-      if (v) return v;
-      continue;
+    if (aj === i) {
+      const ak = aks[asi++] as Key[];
+      ai = ak.indexOf(ai);
+      aj = aks[asi++] as number;
     }
 
-    const at = typeof ai === 'string';
-    const bt = typeof bi === 'string';
-    if (at && bt) {
-      const lt = (ai as string) < (bi as string);
-      const gt = (ai as string) > (bi as string);
-      const v = lt ? -1 : gt ? 1 : 0;
-      if (v) return v;
-      continue;
+    if (bj === i) {
+      const bk = bks[bsi++] as Key[];
+      bi = bk.indexOf(bi);
+      bj = bks[bsi++] as number;
     }
-    
-    if (at && !bt) return 1;
-    if (!at && bt) return -1;
+
+    if (ai < bi) return -1;
+    if (ai > bi) return 1;
   }
 
-  return (ak.length - bk.length) || (a.depth - b.depth);
+  return (ap.length - bp.length) || (a.depth - b.depth);
 }
 
 /** Tag an anonymous function with a random number ID. */

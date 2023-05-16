@@ -212,9 +212,9 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
           render: memoLayout((
             box: Rectangle,
             origin: Rectangle,
-            parentClip?: ShaderModule,
-            parentMask?: ShaderModule,
-            parentTransform?: ShaderModule,
+            parentClip: ShaderModule | null,
+            parentMask: ShaderModule | null,
+            parentTransform: ShaderModule | null,
           ) => {
           
             // If scrollbar must appear/disappear, re-fit.
@@ -225,7 +225,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
             }
           
             return [
-              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, null, transform, inverse)(box, origin, parentClip, parentMask, parentTransform),
+              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, undefined, transform, inverse)(box, origin, parentClip, parentMask, parentTransform),
               ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, origin, parentClip, parentMask, parentTransform),
             ];
           }),

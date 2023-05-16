@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live';
+import type { LC, LiveFunction, LiveElement } from '@use-gpu/live';
 import type { AggregateBuffer, Atlas, Rectangle, TextureSource, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
 import type { UIAggregate } from './types';
 
@@ -28,7 +28,8 @@ export type UILayersProps = {
 const allCount = (a: number, b: UIAggregate): number => a + b.count + ((b as any).isLoop ? 3 : 0);
 
 const allKeys = (a: Set<string>, b: UIAggregate): Set<string> => {
-  for (let k in b) if (b[k] != null) a.add(k);
+  let k: keyof UIAggregate;
+  for (k in b) if (b[k] != null) a.add(k);
   return a;
 }
 
@@ -41,7 +42,7 @@ const getItemSummary = (items: UIAggregate[]) => {
   return {keys, count, memoKey};
 }
 
-export const UI: LiveComponent<UIProps> = (props) => {
+export const UI: LC<UIProps> = (props) => {
   const {children} = props;
 
   return (

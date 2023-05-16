@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { TextureSource, Point4, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
@@ -53,9 +53,9 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
     let render = memoLayout((
       layout: Rectangle,
       origin: Rectangle,
-      clip?: ShaderModule,
-      mask?: ShaderModule,
-      transform?: ShaderModule,
+      clip: ShaderModule | null,
+      mask: ShaderModule | null,
+      transform: ShaderModule | null,
     ): LiveElement => (
       keyed(UIRectangle, id, {
         id,

@@ -93,6 +93,7 @@ export type LiveMap<T> = Map<LiveFiber<any>, T>;
 export type LiveFiber<F extends Function> = FunctionCall<F> & {
   host?: HostInterface,
   path: Key[],
+  keys: (number | Key[])[],
   depth: number,
   id: number,
   by: number,

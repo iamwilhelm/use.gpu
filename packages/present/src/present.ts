@@ -1,12 +1,12 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { EffectTrait, SlideEase, ResolvedSlides } from './types';
+import type { Rectangle, Point4 } from '@use-gpu/core';
+import type { ParsedEffect, SlideInfo, SlideEase, ResolvedSlide } from './types';
 import type { ColorLike } from '@use-gpu/traits';
 
 import { fragment, reconcile, quote, gather, provide, yeet, use, wrap, keyed, useContext, useMemo, useOne, useRef, useState, useFiber } from '@use-gpu/live';
 import {
   useTimeContext,
   LoopContext,
-  KeyboardContext,
   SDFFontProvider,
 
   useBoundShader,
@@ -22,15 +22,17 @@ import { makeParseColor, parseColor, useProp } from '@use-gpu/traits';
 import { resolveSlides } from './lib/slides';
 import { PresentContext, usePresentContext, PresentAPI } from './providers/present-provider';
 import { SLIDE_EFFECTS } from './traits';
-import { Screen } from './screen';
+import { Stage } from './stage';
 
-import { getSlideMask } from '@use-gpu/wgsl/mask/slide.wgsl';
-import { getSlidePosition } from '@use-gpu/wgsl/transform/slide.wgsl';
+import { getSlideMask } from '@use-gpu/wgsl/present/mask.wgsl';
+import { getSlideMotion } from '@use-gpu/wgsl/present/motion.wgsl';
 
-const NO_VEC4 = [0, 0, 0, 0];
+const NO_VEC4: Point4 = [0, 0, 0, 0];
 
 export type PresentProps = {
   step?: number,
+  onChange?: (step: number) => void,
+  backgroundColor?: ColorLike,
 };
 
 const π = Math.PI;
@@ -60,6 +62,7 @@ const parseBackground = makeParseColor(parseColor('#000000'));
 export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>) => {
   const {
     step: initialStep = 0,
+    onChange,
     children,
   } = props;
   
@@ -69,13 +72,12 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
   const [state, setState] = useState(() => ({
     step: initialStep,
     length: 0,
-    direction: 0,
   }));
 
   const [map, setMap] = useState<SlideMap>(NO_MAP);
 
-  const stateRef = useRef(state);
-  const mapRef = useRef(map);
+  const stateRef = useRef<State>(state);
+  const mapRef = useRef<SlideMap>(map);
   stateRef.current = state;
   mapRef.current = map;
 
@@ -85,36 +87,42 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
   }, initialStep);
 
   // Navigation API
-  const api = useOne(() => {
+  const api: PresentAPI = useOne(() => {
     const goTo = (step: number) => setState(s => {
       step = clamp(step, 0, s.length);
-      const direction = (s.step !== step) ? Math.sign(step - s.step) : s.direction;
-      return {...s, step, direction};
+      onChange?.(step);
+      return {...s, step};
     });
 
     const goForward = () => {
-      const {current: {step}} = stateRef;
-      goTo(step + 1);
+      const {current: state} = stateRef;
+      if (!state) return;
+
+      goTo(state.step + 1);
     };
     const goBack = () => {
-      const {current: {step}} = stateRef;
-      goTo(step - 1);
+      const {current: state} = stateRef;
+      if (!state) return;
+
+      goTo(state.step - 1);
     };
 
     const getVisibleState = (id: number) => {
-      const {current: {step}} = stateRef;
+      const {current: state} = stateRef;
       const {current: map} = mapRef;
-
-      if (!map.size) return null;
+      if (!state || !map?.size) return 0;
 
       const slide = map.get(id);
       if (!slide) return -1;
-
+    
+      const {step} = state;
       return step < slide.from ? -1 : step >= slide.to ? 1 : 0;
     };
 
     const isThread = (id: number) => {
       const {current: map} = mapRef;
+      if (!map) return true;
+
       const slide = map.get(id);
       return !!slide?.thread;
     };
@@ -123,9 +131,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     const useTransition = makeUseTransition(getVisibleState);
 
     return {goTo, goForward, goBack, isThread, isVisible, getVisibleState, useTransition};
-  });
-  
-  console.log('step', state.step)
+  }, onChange);
 
   const context = useOne(() => {
     return {
@@ -134,7 +140,12 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     };
   }, [api, state]);
   
-  const view = useViewRenderer(state.step, api, backgroundColor, children);
+  const view = use(Stage, {
+    step: state.step,
+    api,
+    backgroundColor,
+    children,
+  });
 
   return (
     // Reconcile the quoted presentation to extract a gather reduction over only the <Slide> and <Step> nodes, which unquote.
@@ -157,91 +168,25 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
             setMap(map);
           }, [slides])
 
+          return null;
         }
       )
     )
   );
 };
 
-const ATTRIBUTES = bundleToAttributes(getSlidePosition);
-
-// Presentation view renderer
-const useViewRenderer = (
-  step: number,
-  api: PresentAPI,
-  backgroundColor: ColorLike,
-  children: LiveElement,
-) => {
-  return useMemo(
-    () => {
-
-      // Render keyed layers for entering and exiting
-      const renderLayer = ({id, ops}: ResolvedLayer, effect: EffectTrait, opaque: boolean = false) => (
-        keyed(RenderTarget, id, {
-          format: 'rgba16float',
-          colorSpace: 'linear',
-          depthStencil: null,
-          samples: 1,
-          children: wrap(Pass, use(UILayers, {items: ops})),
-          then: (texture) => use(Screen, {id, texture, effect, opaque, fill: opaque ? [1, 0, 1, 1] : [0, 1, 1, 1]})
-        })
-      );
-      
-      return gather(
-        wrap(SDFFontProvider, children),
-        (layers: ResolvedLayer[]) => {
-          // Find main slide thread + extra floats
-          const threads = layers.filter(({id}) =>  api.isThread(id));
-          const floats  = layers.filter(({id}) => !api.isThread(id));
-
-          const threadIds = threads.map(({id}) => id);
-          const floatIds  = floats.map(({id}) => id);
-        
-          // Get entering slide (only one at a time)
-          const entering = threadIds.filter((id) => api.isVisible(id))[0] ?? null;
-
-          // Track exiting state
-          const exitingRef = useRef<number | null>(null);
-          const lastEnteringRef = useRef<number | null>(null);
-
-          let {current: exiting} = exitingRef;
-          let {current: lastEntering} = lastEnteringRef;
-
-          if (lastEntering !== entering) {
-            exitingRef.current = exiting = lastEntering;
-            lastEnteringRef.current = lastEntering = entering;
-          }
-
-          // Merge exit / entering effects
-          const enteringIndex = threadIds.indexOf(entering);
-          const exitingIndex = threadIds.indexOf(exiting);
-
-          const enteringLayer = threads[enteringIndex];
-          const exitingLayer = threads[exitingIndex];
-          
-          const effect = threads[Math.max(enteringIndex, exitingIndex)]?.enter;
-
-          // Layer pair
-          return useMemo(() => [
-            (exitingLayer && exitingLayer !== enteringLayer) ? renderLayer(exitingLayer, effect, !!enteringLayer) : null,
-            enteringLayer ? renderLayer(enteringLayer, effect) : null,
-          ], [enteringLayer, exitingLayer, effect]);
-        }
-      );
-    },
-    [step, api, backgroundColor]
-  );
-};
+const ATTRIBUTES = bundleToAttributes(getSlideMotion);
 
 // GPU-rendered slide transition
 export const usePresentTransition = (
   id: number,
   layout: Rectangle,
-  enter: Partial<EffectTrait>,
-  exit: Partial<EffectTrait>,
+  enter: ParsedEffect,
+  exit: ParsedEffect,
+  initial?: number,
 ) => {
   const e = useRef(0);
-  const d = useRef(NO_VEC4);
+  const d = useRef<Point4>(NO_VEC4);
   const v = useRef(0);
   const l = useShaderRef(layout);
 
@@ -250,19 +195,19 @@ export const usePresentTransition = (
   const vs = useBoundSource(ATTRIBUTES[2], v);
 
   const mask = useBoundShader(getSlideMask, [es, ds, vs]);
-  const transform = useBoundShader(getSlidePosition, [es, ds, vs, l]);
+  const transform = useBoundShader(getSlideMotion, [es, ds, vs, l]);
 
   const useUpdateTransition = () => {
     const {useTransition, isVisible} = usePresentContext();
 
-    const value = useTransition(id, enter, exit);
+    const value = useTransition(id, enter, exit, initial);
     v.current = value;
 
     const isEnter = value <= 0;
     useOne(() => {
       const fx = isEnter ? enter : exit;
       const {type, direction} = fx;
-      const index = SLIDE_EFFECTS.indexOf(type) || 0;
+      const index = SLIDE_EFFECTS.indexOf(type!) || 0;
 
       e.current = index;
       d.current = direction;
@@ -274,57 +219,72 @@ export const usePresentTransition = (
   return {mask, transform, useUpdateTransition};
 };
 
-// CPU-side animator for a transition
+// CPU-side animator for a transition.
+//
+// Animates a value between [-1, 0, 1] for entering vs exiting,
+// either of which can happen in reverse.
+//
+// The animated value scrubs linearly left or right, and smoothly adapts or reverses if interrupted.
+// Easing is applied last, acting between the [-1, 0] and [0, 1] points.
 const makeUseTransition = (
-  getVisibleState: (id: string) => number,
+  getVisibleState: (id: number) => number,
 ) => (
   id: number,
-  enter: EffectTrait,
-  exit: EffectTrait,
-) => {
+  enter: ParsedEffect,
+  exit: ParsedEffect,
+  initial?: number,
+): number => {
   const target = getVisibleState(id);
   const timer = useTimeContext();
 
   const timeRef = useRef<number | null>(null);
   const samplerRef = useRef<Sampler | null>(null);
 
-  const valueRef = useRef<number>(target);
+  const valueRef = useRef<number>(initial ?? target);
   const {request} = useContext(LoopContext);
 
   return useMemo(() => {
+    // Animate in relative time
     const {delta} = timer;
-
     const {current: value} = valueRef;
-    const active = (target + value) / 2 < 0 ? enter : exit;
+
+    // Determine whether entering or exiting
+    const active = (target + (value ?? 0)) / 2 < 0 ? enter : exit;
     const {duration, delay} = active;
 
+    // Trigger animation if target changes
     if (target !== value) {
-      if (value == null) return valueRef.current = target;
+      if (value != null) {
+        let boost = 0;
+        let from = value;
+        let to = target;
 
-      let boost = 0;
-      let from = value;
-      let to = target;
+        // Sample ongoing transition to determine velocity boost
+        const {current: time} = timeRef;
+        const {current: sampler} = samplerRef;
+        if (time != null && sampler != null) {
+          from = sampler(time);
 
-      const {current: time} = timeRef;
-      const {current: sampler} = samplerRef;
-      if (time != null && sampler != null) {
-        from = sampler(time);
-        const slope = (sampler(time + EPSILON) - from) / EPSILON;
-        boost = slope - (to - from) / duration;
+          // Boost correction is relative to linear interpolation from A to B
+          // because easing is applied after sampling
+          const slope = (sampler(time + EPSILON) - from) / EPSILON;
+          boost = slope - (to - from) / duration;
+        }
+
+        samplerRef.current = makeSampler(from, to, boost, duration, delay);
+        timeRef.current = 0;
       }
-
-      samplerRef.current = makeSampler(from, to, boost, duration, delay);
       valueRef.current = target;
-      timeRef.current = 0;
     }
 
     const {current: time} = timeRef;
     const {current: sampler} = samplerRef;
 
-    if (time != null) timeRef.current += delta / 1000;
-    if (time == null || sampler == null) return valueRef.current;
+    if (time != null) timeRef.current! += delta / 1000;
+    if (time == null || sampler == null) return valueRef.current!;
 
-    if (time < delay + duration) request();
+    const fiber = useFiber();
+    if (time < delay + duration) request(fiber);
 
     let offset = sampler(time);
     const {ease} = offset < 0 ? enter : exit;
@@ -334,7 +294,7 @@ const makeUseTransition = (
   }, [timer, target]);
 };
 
-// Linear sampler with non-linear interruption boost
+// Linear sampler with non-linear interruption boost to continue the existing motion.
 const makeSampler = (
   from: number,
   to: number,

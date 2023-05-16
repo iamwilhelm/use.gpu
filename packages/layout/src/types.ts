@@ -57,20 +57,26 @@ export type ImageTrait = {
 
 export type LayoutRenderer = (
   box: Rectangle,
-  shaders: LayoutShaders,
+  origin: Rectangle,
+  clip: ShaderModule | null,
+  mask: ShaderModule | null,
+  transform: ShaderModule | null,
 ) => LiveElement;
 
 export type InlineRenderer = (
   lines: InlineLine[],
-  shaders: LayoutShaders,
+  origin: Rectangle,
+  clip: ShaderModule | null,
+  mask: ShaderModule | null,
+  transform: ShaderModule | null,
   version?: number
 ) => LiveElement;
 
 export type LayoutShaders = {
-  texture?: ShaderModule,
-  transform?: ShaderModule,
-  clip?: ShaderModule,
-  mask?: ShaderModule,
+  texture?: ShaderModule | null,
+  transform?: ShaderModule | null,
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
 };
 
 export type LayoutScroller = (x: number, y: number) => void;

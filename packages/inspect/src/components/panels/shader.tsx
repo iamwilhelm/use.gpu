@@ -4,7 +4,7 @@ import type { Action } from '../types';
 import { formatNode, formatValue } from '@use-gpu/live';
 import { styled as _styled } from '@stitches/react';
 
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { SplitRow, Label, Selectable, Spacer } from '../layout';
 
 import { inspectObject } from './props';
@@ -19,6 +19,14 @@ const StyledShader = styled('div', {
   fontFamily: '"Fira Code", "Bitstream Vera Mono", monospace',
   fontSize: '12px',
   lineHeight: '13px',
+});
+
+const StyledHeader = styled('div', {
+  display: 'flex',
+});
+
+const Grow = styled('div', {
+  flexGrow: 1,
 });
 
 const StyledEditor = styled('div', {
@@ -81,6 +89,11 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
     return out;
   }
 
+  const {hash} = shader;
+  const handleCommit = useCallback((code: string) => {
+    fiber.__inspect?.updateShader?.(hash, code);
+  }, [fiber, hash]);
+
   return (<>
     {uniforms || bindings ? (<>
       {uniforms?.length  ? <><div><b>Constants</b></div>{inspectObject(toObject(uniforms), state, toggleState, 'u')}</> : null}
@@ -88,9 +101,12 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
       {volatiles?.length ? <><div><b>Volatiles</b></div>{inspectObject(toObject(volatiles), state, toggleState, 'v')}</> : null}
       <Spacer />
     </>) : null}
-    <div><b>Shader</b> (<code>{shader.hash}</code>)</div>
+    <StyledHeader>
+      <Grow><b>Shader</b> (<code>{shader.hash}</code>)</Grow>
+      <div><span style={{opacity: 0.5}}>(Ctrl-Enter = Hot Reload)</span></div>
+    </StyledHeader>
     <StyledShader><Selectable>
-      <WGSL code={shader.code} />
+      <WGSL code={shader.code} onCommit={handleCommit} />
     </Selectable></StyledShader>
   </>);
 }

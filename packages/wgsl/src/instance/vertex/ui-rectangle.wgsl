@@ -105,14 +105,14 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, to3D, getViewResolut
     var posFlipX = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(1.0 - uv1.x, uv1.y)), 0.0, 1.0);
     var posFlipY = vec4<f32>(mix(rectangle.xy, rectangle.zw, vec2<f32>(uv1.x, 1.0 - uv1.y)), 0.0, 1.0);
 
-    var centerX = worldToClip3D(applyTransform(posFlipX));
-    var centerY = worldToClip3D(applyTransform(posFlipY));
+    var flipX = worldToClip3D(applyTransform(posFlipX));
+    var flipY = worldToClip3D(applyTransform(posFlipY));
 
     // Get side length in screen pixels
     var size = getViewSize();
 
-    var dx = (center.xy - centerX.xy) * size;
-    var dy = (center.xy - centerY.xy) * size;
+    var dx = (center.xy - flipX.xy) * size;
+    var dy = (center.xy - flipY.xy) * size;
 
     var stepX = normalize(dx);
     var stepY = normalize(dy);

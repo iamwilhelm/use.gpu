@@ -19,7 +19,14 @@ export type EmbedProps = Partial<BoxTrait> &
   width?: Dimension,
   height?: Dimension,
   snap?: boolean,
-  render?: (key: number, layout: Rectangle, origin: Rectangle, clip?: ShaderModule, mask?: ShaderModule, transform?: ShaderModule) => LiveElement,
+  render?: (
+    key: number,
+    layout: Rectangle,
+    origin: Rectangle,
+    clip: ShaderModule | null,
+    mask: ShaderModule | null,
+    transform: ShaderModule | null,
+  ) => LiveElement,
 };
 
 export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<EmbedProps>) => {
@@ -59,7 +66,13 @@ export const Embed: LiveComponent<EmbedProps> = memo((props: PropsWithChildren<E
 
     return {
       size,
-      render: memoLayout((layout: Rectangle, origin: Rectangle, clip?: ShaderModule, mask?: ShaderModule, transform?: ShaderModule) => {
+      render: memoLayout((
+        layout: Rectangle,
+        origin: Rectangle,
+        clip: ShaderModule | null,
+        mask: ShaderModule | null,
+        transform: ShaderModule | null,
+      ) => {
         const view = render
           ? render(id, layout, origin, clip, mask, transform)
           : (

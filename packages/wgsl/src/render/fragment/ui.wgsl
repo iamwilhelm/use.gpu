@@ -28,7 +28,6 @@ fn main(
   @location(10) @interpolate(flat) fragBorder: vec4<f32>,
   @location(11) @interpolate(flat) fragStroke: vec4<f32>,
   @location(12) @interpolate(flat) fragFill: vec4<f32>,
-  @builtin(position)               fragCoord: vec4<f32>,
 ) -> @location(0) vec4<f32> {
 
   return getFragment(
@@ -45,6 +44,5 @@ fn main(
     fragBorder,
     fragStroke,
     fragFill,
-    fragCoord,
   );
 }

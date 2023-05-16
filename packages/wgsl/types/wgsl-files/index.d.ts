@@ -204,13 +204,6 @@ declare module "@use-gpu/wgsl/instance/fragment/solid.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/fragment/ui-copy.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getUICopyFragment: ParsedBundle;
-  export default __module;
-}
-
 declare module "@use-gpu/wgsl/instance/fragment/ui.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -338,6 +331,13 @@ declare module "@use-gpu/wgsl/layout/layout.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/layout/rectangle.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const transformRectangle: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/layout/scroll.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -383,13 +383,6 @@ declare module "@use-gpu/wgsl/mask/scissor.wgsl" {
   const __module: ParsedBundle;
   export const getScissorColor: ParsedBundle;
   export const isScissored: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/mask/slide.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getSlideMask: ParsedBundle;
   export default __module;
 }
 
@@ -497,6 +490,34 @@ declare module "@use-gpu/wgsl/plot/volume.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getVolumeGradient: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/present/fragment.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getScreenFragment: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/present/mask.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getSlideMask: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/present/motion.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getSlideMotion: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/present/screen.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getScreenVertex: ParsedBundle;
   export default __module;
 }
 
@@ -702,14 +723,6 @@ declare module "@use-gpu/wgsl/transform/scissor.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getScissorLevel: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/transform/slide.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getSlidePosition: ParsedBundle;
-  export const getSlideInverse: ParsedBundle;
   export default __module;
 }
 

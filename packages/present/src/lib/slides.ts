@@ -1,8 +1,9 @@
-import type { SlideInfo, ResolvedSlide } from './types';
+import type { SlideInfo, ResolvedSlide } from '../types';
 
 export const merge = (a: object, b: object) => {
-  const o = {...a};
-  for (const k in b) if (b[k] != null) o[k] = b[k];
+  const o = {...a} as any;
+  const bb = b as any;
+  for (const k in bb) if (bb[k] != null) o[k] = bb[k];
   return o;
 };
 

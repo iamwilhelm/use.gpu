@@ -28,7 +28,7 @@ export type SampledProps = {
   render?: (source: StorageSource) => LiveElement,
 };
 
-export const Sampled: LiveComponent<SampledProps> = (props: PropsWithChildren<Sampled>) => {
+export const Sampled: LiveComponent<SampledProps> = (props: PropsWithChildren<SampledProps>) => {
   const {
     axis,
     axes = 'xyzw',

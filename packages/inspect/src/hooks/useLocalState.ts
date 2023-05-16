@@ -1,13 +1,13 @@
-import { useCallback, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 
-export const makeUseLocalState = (key: string) => <T,>(initial: T | (() => T)) => {
+export const makeUseLocalState = (key: string) => <T,>(initial: T | (() => T)): [T, Dispatch<SetStateAction<T>>] => {
   const [state, setState] = useState(() => {
     const item = window.localStorage.getItem(key);
     if (item) try {
       return JSON.parse(item);
     } catch (e) {};
     
-    return typeof initial === 'function' ? initial() : initial;
+    return typeof initial === 'function' ? (initial as any)() : initial;
   });
 
   const [lastKey, setLastKey] = useState(key);
@@ -17,8 +17,8 @@ export const makeUseLocalState = (key: string) => <T,>(initial: T | (() => T)) =
   }
   
   const setLocalState = useCallback((value: SetStateAction<T>) => {
-    setState(state => {
-      state = typeof value === 'function' ? value(state) : value;
+    setState((state: T) => {
+      state = typeof value === 'function' ? (value as any)(state) : value;
       try { window.localStorage.setItem(key, JSON.stringify(state)); } catch (e) {};
       return state;
     });

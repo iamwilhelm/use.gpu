@@ -30,7 +30,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     zoom: initialZoom = 1,
     x: initialX = 0,
     y: initialY = 0,
-    zoomSpeed = 1/100,
+    zoomSpeed = 1/80,
     centered = true,
     active = true,
     anchor = DEFAULT_ANCHOR,
@@ -56,13 +56,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     offsetX = -w * (anchor[0] - 0.5);
     offsetY = -h * (anchor[1] - 0.5);
   }
-
-  useOne(() => {
-    setX(initialX);
-    setY(initialY);
-    setZoom(initialZoom);
-  }, version);
-
+  
   const { useMouse } = useContext(MouseContext);
   const { useWheel } = useContext(WheelContext);
   const { useKeyboard } = useContext(KeyboardContext);
@@ -70,6 +64,17 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const { mouse } = useMouse();
   const { wheel } = useWheel();
   const { keyboard } = useKeyboard();
+
+  let reset = false;
+  useOne(() => {
+    reset = keyboard.modifiers.alt && keyboard.keys.enter;
+  }, keyboard);
+
+  useOne(() => {
+    setX(initialX);
+    setY(initialY);
+    setZoom(initialZoom);
+  }, reset || version);
 
   useOne(() => {
     const { moveX, moveY, buttons, stopped } = mouse;
@@ -94,7 +99,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
       }
     }
     else if (moveY) {
-      const z = zoom * (1 - moveY * zoomSpeed);
+      const z = zoom * Math.pow(2, -moveY * zoomSpeed);
       
       const mx = mouse.x - originX;
       const my = mouse.y - originY;

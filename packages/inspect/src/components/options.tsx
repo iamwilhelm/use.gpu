@@ -29,7 +29,7 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
       <SmallButton
         className={fullSize ? 'active' : ''}
         onClick={() => setFullSize(!fullSize)}
-        title={fullSize ? "Collapse to sidebar" : "Expand to Full Size"}
+        title={fullSize ? "Collapse to sidebar" : "Expand to full size"}
       >
         <IconItem height={24} top={1}>{
           fullSize
@@ -54,14 +54,14 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
       <SmallButton
         className={highlight ? 'active' : ''}
         onClick={() => setHighlight(!highlight)}
-        title="Hover highlight in inspector"
+        title="Highlight objects in view"
       >
         <IconItem height={24} top={1}><SVGHighlightElement size={24} /></IconItem>
       </SmallButton>
       <SmallButton
         className={inspect ? 'active' : ''}
         onClick={toggleInspect}
-        title="Hover highlight in layout"
+        title="Inspect layout"
       >
         <IconItem height={24} top={1}><SVGPickElement size={24} /></IconItem>
       </SmallButton>

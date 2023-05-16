@@ -36,24 +36,24 @@ export const memoFit = <T>(f: Fitter<T>): Fitter<T> => {
 type Layout<T> = (
   box: Rectangle,
   origin: Rectangle,
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule,
+  clip: ShaderModule | null,
+  mask: ShaderModule | null,
+  transform: ShaderModule | null,
 ) => T;
 export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
   let lastBox: Rectangle | undefined;
   let lastOrigin: Rectangle | undefined;
-  let lastClip: ShaderModule | undefined;
-  let lastMask: ShaderModule | undefined;
-  let lastTransform: ShaderModule | undefined;
+  let lastClip: ShaderModule | null | undefined;
+  let lastMask: ShaderModule | null | undefined;
+  let lastTransform: ShaderModule | null | undefined;
 
   let value: T | null = null;
   return (
     box: Rectangle,
-    origin?: Rectangle,
-    clip?: ShaderModule,
-    mask?: ShaderModule,
-    transform?: ShaderModule,
+    origin: Rectangle,
+    clip: ShaderModule | null,
+    mask: ShaderModule | null,
+    transform: ShaderModule | null,
   ) => {
     if (
       lastBox && sameBox(lastBox, box) &&
@@ -77,24 +77,24 @@ export const memoLayout = <T>(f: Layout<T>): Layout<T> => {
 type Inline<T> = (
   lines: InlineLine[],
   origin: Rectangle,
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule,
+  clip: ShaderModule | null,
+  mask: ShaderModule | null,
+  transform: ShaderModule | null,
 ) => T;
 export const memoInline = <T>(f: Inline<T>): Inline<T> => {
   let lastHash: number | undefined;
   let lastOrigin: Rectangle | undefined;
-  let lastClip: ShaderModule | undefined;
-  let lastMask: ShaderModule | undefined;
-  let lastTransform: ShaderModule | undefined;
+  let lastClip: ShaderModule | null | undefined;
+  let lastMask: ShaderModule | null | undefined;
+  let lastTransform: ShaderModule | null | undefined;
 
   let value: T | null = null;
   return (
     lines: InlineLine[],
-    origin?: Rectangle,
-    clip?: ShaderModule,
-    mask?: ShaderModule,
-    transform?: ShaderModule,
+    origin: Rectangle,
+    clip: ShaderModule | null,
+    mask: ShaderModule | null,
+    transform: ShaderModule | null,
     version?: number,
   ) => {
     const hash = version ?? toMurmur53(lines);
@@ -132,23 +132,23 @@ export const makeBoxLayout = (
   sizes: Point[],
   offsets: Point[],
   renders: LayoutRenderer[],
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule,
-  inverse?: ShaderModule,
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
+  inverse?: ShaderModule | null,
 ) => (
   box: Rectangle,
   origin: Rectangle,
-  parentClip?: ShaderModule,
-  parentMask?: ShaderModule,
-  parentTransform?: ShaderModule,
+  parentClip?: ShaderModule | null,
+  parentMask?: ShaderModule | null,
+  parentTransform?: ShaderModule | null,
 ) => {
   const [left, top, right, bottom] = box;
   const out = [] as LiveElement[];
   const n = sizes.length;
 
-  const xmask = parentMask && mask ? chainTo(parentMask, mask) : parentMask ?? mask;
-  const xform = parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform;
+  const xmask = parentMask && mask ? chainTo(parentMask, mask) : (parentMask ?? mask ?? null);
+  const xform = parentTransform && transform ? chainTo(parentTransform, transform) : (parentTransform ?? transform ?? null);
   const xclip = parentClip ? (
     transform
     ? bindBundle(
@@ -159,8 +159,8 @@ export const makeBoxLayout = (
           applyTransform: inverse ?? null,
         }
       )
-    : parentClip
-  ) : clip;
+    : (parentClip ?? null)
+  ) : (clip ?? null);
 
   for (let i = 0; i < n; ++i) {
     const size = sizes[i];
@@ -194,16 +194,16 @@ export const makeBoxInspectLayout = (
   sizes: Point[],
   offsets: Point[],
   renders?: LayoutRenderer[],
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule,
-  inverse?: ShaderModule,
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
+  inverse?: ShaderModule | null,
 ) => (
   box: Rectangle,
   origin: Rectangle,
-  parentClip?: ShaderModule,
-  parentMask?: ShaderModule,
-  parentTransform?: ShaderModule,
+  parentClip?: ShaderModule | null,
+  parentMask?: ShaderModule | null,
+  parentTransform?: ShaderModule | null,
 ) => {
   let out = renders ? makeBoxLayout(sizes, offsets, renders, clip, mask, transform, inverse)(box, origin, parentClip, parentMask, parentTransform) : [];
   
@@ -282,9 +282,9 @@ export const makeInlineLayout = (
 ) => (
   box: Rectangle,
   origin: Rectangle,
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule,
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
 ) => {
   let [left, top, right, bottom] = box;
   const n = ranges.length;
@@ -299,7 +299,7 @@ export const makeInlineLayout = (
 
   const out: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {
-    const el = render(lines, origin, clip, mask, transform, key);
+    const el = render(lines, origin, clip!, mask!, transform!, key);
     if (Array.isArray(el)) out.push(...(el as any[]));
     else out.push(el);
 
@@ -344,9 +344,9 @@ export const makeInlineInspectLayout = (
 ) => (
   box: Rectangle,
   origin: Rectangle,
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule,
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
 ) => {
   let out = renders ? makeInlineLayout(ranges, sizes, offsets, renders, key)(box, origin, clip, mask, transform) : [];
 
@@ -555,12 +555,12 @@ export const getOriginProjection = (box: Rectangle, origin: Rectangle): Rectangl
   return [projX(ll), projY(tt), projX(rr), projY(bb)];
 };
 
-export const getOriginProjectionX = (x: number, origin: Rectangle): Rectangle => {
+export const getOriginProjectionX = (x: number, origin: Rectangle): number => {
   const [l,,r] = origin;
   return (x - l) / (r - l);
 };
 
-export const getOriginProjectionY = (y: number, origin: Rectangle): Rectangle => {
+export const getOriginProjectionY = (y: number, origin: Rectangle): number => {
   const [,t,,b] = origin;
   return (y - t) / (b - t);
 };

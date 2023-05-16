@@ -1,4 +1,4 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { Point, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Base, MarginLike } from '../types';
@@ -87,9 +87,9 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
             render: memoLayout((
               box: Rectangle,
               origin: Rectangle,
-              clip?: ShaderModule,
-              mask?: ShaderModule, 
-              transform?: ShaderModule,
+              clip: ShaderModule | null,
+              mask: ShaderModule | null,
+              transform: ShaderModule | null,
             ) => {
               if (hovered) {
                 const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders, key)(box, origin, clip, mask, transform);

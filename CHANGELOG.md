@@ -1,4 +1,5 @@
 0.8.x
+- `@use-gpu/live`: Quotes/unquotes in keyed sub-trees will now correctly reorder
 - `@use-gpu/plot`: Add pipeline options as full ROP trait to plot layers
 - `@use-gpu/shader`: Allow `chainTo` to chain `(A, ...)->B` with `(B, ...)->C` if the signatures match
 - `@use-gpu/workbench`: `useBoundShader` / `getBoundShader` no longer need BINDINGS passed

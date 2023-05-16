@@ -1,4 +1,4 @@
-import type { LiveComponent } from '@use-gpu/live';
+import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
 
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';

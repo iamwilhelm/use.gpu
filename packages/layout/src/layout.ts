@@ -97,7 +97,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
     const [w, h] = absolute ? into : size;
     const [ml, mt] = margin;
     const layout = [left + ml, top + mt, left + ml + w, top + mt + h] as Rectangle;
-    const el = render(layout, layout, undefined, undefined, transform);
+    const el = render(layout, layout, null, null, transform);
     
     sizes.push([w, h]);
     offsets.push([left + ml, top + mt]);
@@ -121,7 +121,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
       offsets,
     },
   });
-  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0], undefined, transform));
+  if (hovered) out.push(...makeBoxInspectLayout(id, sizes, offsets)([0, 0, 0, 0], [0, 0, 0, 0], null, null, transform));
 
   // Add scroll listener
   out.push(keyed(Scroller, -2, pickers, flip, shift));

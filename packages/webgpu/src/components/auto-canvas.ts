@@ -18,6 +18,7 @@ export type AutoCanvasProps = {
   backgroundColor?: GPUColor,
   samples?: number,
 
+  autofocus?: boolean,
   picking?: boolean,
   children: LiveElement,
 }
@@ -26,6 +27,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   const {
     selector,
     children,
+    autofocus = false,
     picking = true,
     ...rest
   } = props;
@@ -45,6 +47,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
 
   const view = (
     use(DOMEvents, {
+      autofocus,
       element: canvas,
       children:
         use(CursorProvider, {

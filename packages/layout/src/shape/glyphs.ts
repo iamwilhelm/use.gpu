@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { TextureSource, Tuples, Point4 } from '@use-gpu/core';
+import type { Rectangle, TextureSource, Tuples, Point4 } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { FontMetrics } from '@use-gpu/glyph';
 import type { InlineLine } from '../types';
@@ -28,9 +28,10 @@ export type GlyphsProps = {
   height: FontMetrics,
   lines: InlineLine[],
   
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule,
+  origin: Rectangle,
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
 };
 
 export const Glyphs: LiveComponent<GlyphsProps> = (props) => {

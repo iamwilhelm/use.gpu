@@ -31,9 +31,9 @@ export type UIRectangleProps = {
   border?: Point4,
   radius?: Point4,
 
-  clip?: ShaderModule,
-  mask?: ShaderModule,
-  transform?: ShaderModule
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
 };
 
 export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
@@ -46,7 +46,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
     radius,
     border,
 
-    origin,
+    origin = NO_RECTANGLE,
     clip,
     mask,
     transform,

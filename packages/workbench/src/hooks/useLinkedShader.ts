@@ -6,7 +6,8 @@ import { resolveBindings, linkBundle, getBundleHash, getBundleKey } from '@use-g
 import { formatMurmur53, mixBits53, toMurmur53 } from '@use-gpu/state';
 import { makeShaderModuleDescriptor, makeBindGroupLayoutEntries, makeUniformLayoutEntry } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
-import { useInspectable } from './useInspectable'
+import { useForceUpdate } from './useForceUpdate';
+import { useInspectable } from './useInspectable';
 import LRU from 'lru-cache';
 
 const NO_LIBS = {} as Record<string, any>;
@@ -22,6 +23,10 @@ export const useLinkedShader = (
 ) => {
   const fiber = useFiber();
   const inspect = useInspectable();
+
+  // Live shader editing (persistent within mount only)
+  const [version, invalidateFiber] = useForceUpdate();
+  const hot = useOne(() => new Map<string, string | null>());
 
   // Get hash for defines, shader code, shader instance
   const defKey  = toMurmur53(defines);
@@ -83,8 +88,8 @@ export const useLinkedShader = (
 
       let result = MODULE_CACHE.get(key);
       if (result == null) {
-        const linked = linkBundle(module, NO_LIBS, defines);
-        result = makeShaderModuleDescriptor(linked, key);
+        const linked = hot.get(key) ?? linkBundle(module, NO_LIBS, defines);
+        result = makeShaderModuleDescriptor(linked, `${key}-${version}`);
         MODULE_CACHE.set(key, result);
       }
       out.push(result);
@@ -97,6 +102,12 @@ export const useLinkedShader = (
       uniforms,
       bindings,
       volatiles,
+      updateShader: (keyVersion: string, code?: string) => {
+        const key = keyVersion.split('-').slice(0, 2).join('-');
+        hot.set(key, code ?? null);
+        MODULE_CACHE.set(key, null);
+        invalidateFiber();
+      },
     });
 
     // Replace uniforms/bindings/entries as structure changed
@@ -105,7 +116,7 @@ export const useLinkedShader = (
     ref.entries  = entries;
 
     return out;
-  }, structuralKey);
+  }, structuralKey ^ version);
 
   // Update uniform constant values in-place
   useOne(() => {

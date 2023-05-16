@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { UniformAttribute } from '@use-gpu/core';
+import type { DeepPartial, UniformAttribute } from '@use-gpu/core';
 import type { SlideTrait, TransitionTrait, SlideInfo } from './types';
 
 import { fragment, unquote, quote, gather, fence, yeet, use, wrap, provide, useFiber, useMemo, useOne, useRef } from '@use-gpu/live';
@@ -8,7 +8,7 @@ import { Layout } from '@use-gpu/layout';
 import { resolveSlides } from './lib/slides';
 import { useSlideTrait, makeUseTransitionTrait } from './traits';
 
-export type SlideProps = Partial<SlideTrait> & Partial<TransitionTrait> & {
+export type SlideProps = Partial<SlideTrait> & DeepPartial<TransitionTrait> & {
   _foo?: null,
 };
 
@@ -17,7 +17,7 @@ const useTransitionTrait = makeUseTransitionTrait({ effect: { type: 'fade', dura
 export const Slide: LC<SlideProps> = (props: PropsWithChildren<SlideProps>) => {
   const {children} = props;
   const {order, steps, stay} = useSlideTrait(props);
-  const {effect, enter, exit} = useTransitionTrait(props);
+  const {effect, enter, exit} = useTransitionTrait(props as any);
 
   const {id} = useFiber();
 

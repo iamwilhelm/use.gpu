@@ -1,4 +1,4 @@
-import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction } from '@use-gpu/live';
+import type { LiveFiber, LiveComponent, LiveElement, ArrowFunction, PropsWithChildren } from '@use-gpu/live';
 import type { OffscreenTarget, ColorSpace, TextureSource, TextureTarget } from '@use-gpu/core';
 
 import { use, provide, gather, fence, yeet, useCallback, useContext, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
@@ -203,7 +203,6 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     swap: source.swap,
     source: source,
   }), [renderContext, width, height, colorStates, colorAttachments, depthStencilState, depthStencilAttachment, source, sources]);
-  useOne(() => console.log("rttContext changed"), rttContext);
 
   const inspectable = useMemo(() => [
     source,

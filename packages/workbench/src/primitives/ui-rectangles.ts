@@ -9,8 +9,8 @@ import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings, resolve, BLEND_ALPHA } from '@use-gpu/core';
+import { getBundleKey } from '@use-gpu/shader/wgsl';
+import { resolve } from '@use-gpu/core';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
@@ -20,7 +20,6 @@ import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getUIRectangleVertex } from '@use-gpu/wgsl/instance/vertex/ui-rectangle.wgsl';
-import { getUICopyFragment } from '@use-gpu/wgsl/instance/fragment/ui-copy.wgsl';
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
 
 export type UIRectanglesProps = {
@@ -30,6 +29,7 @@ export type UIRectanglesProps = {
   stroke?: number[] | TypedArray,
   fill?: number[] | TypedArray,
   uv?: number[] | TypedArray,
+  st?: number[] | TypedArray,
   repeat?: number,
   sdf?: number[] | TypedArray,
 
@@ -39,6 +39,7 @@ export type UIRectanglesProps = {
   strokes?: ShaderSource,
   fills?: ShaderSource,
   uvs?: ShaderSource,
+  sts?: ShaderSource,
   repeats?: ShaderSource,
   sdfs?: ShaderSource,
 
@@ -47,7 +48,6 @@ export type UIRectanglesProps = {
   clip?: ShaderModule,
   mask?: ShaderSource,
 
-  copyOnly?: boolean,
   debugContours?: boolean,
 
   count?: Lazy<number>,
@@ -69,7 +69,6 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
     clip,
     mask,
     
-    copyOnly = false,
     debugContours = false,
   } = props;
 
@@ -93,7 +92,7 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
 
   const getVertex = useBoundShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(copyOnly ? getUICopyFragment : getUIFragment, [t, m]);
+  const getFragment = useBoundShader(getUIFragment, [t, m]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));

@@ -6,7 +6,7 @@
     { "path": "../live" },
     { "path": "../traits" },
     { "path": "../workbench" },
-    { "path": "../plot" },
+    { "path": "../layout" },
   ],
   "compilerOptions": {
     "rootDir": "..",

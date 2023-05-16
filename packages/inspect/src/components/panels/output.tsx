@@ -223,6 +223,8 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
       use(Block, {
         children: [
           use(Block, {
+            border: 1,
+            stroke: '#808080',
             width, height,
             fill: [0, 0, 0, .5],
             image: {texture, fit: 'contain', align: 'center', repeat: 'none'},

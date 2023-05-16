@@ -29,6 +29,7 @@ export type RawLabelsProps = {
 
   rectangle?: number[] | TypedArray,
   uv?: number[] | TypedArray,
+  st?: number[] | TypedArray,
   layout?: number[] | TypedArray,
   sdf?: number[] | TypedArray,
 
@@ -42,6 +43,7 @@ export type RawLabelsProps = {
 
   rectangles?: ShaderSource,
   uvs?: ShaderSource,
+  sts?: ShaderSource,
   layouts?: ShaderSource,
   sdfs?: ShaderSource,
 
@@ -81,6 +83,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
   const i = useShaderRef(props.index, props.indices);
   const r = useShaderRef(props.rectangle, props.rectangles);
   const u = useShaderRef(props.uv, props.uvs);
+  const s = useShaderRef(props.st, props.sts);
   const l = useShaderRef(props.layout, props.layouts);
   const a = useShaderRef(props.sdf, props.sdfs);
 
@@ -108,13 +111,13 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const t = props.texture;
 
-  const getVertex = useBoundShader(getLabelVertex, [i, r, u, l, a, xf, c, o, z, d, f, e, q]);
+  const getVertex = useBoundShader(getLabelVertex, [i, r, u, s, l, a, xf, c, o, z, d, f, e, q]);
   const getPicking = usePickingShader(props);
   const getFragment = useBoundShader(getUIFragment, [t], DEFINES);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
 
-  const [pipeline, defines] = usePipelineOptions({
+  const [pipeline, defs] = usePipelineOptions({
     mode,
     topology: 'triangle-strip',
     stripIndexFormat: 'uint16',
@@ -124,7 +127,14 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     depthWrite: false,
     blend,
   });
-    
+
+  const defines: Record<string, any> = useMemo(() => ({
+    ...defs,
+    HAS_EDGE_BLEED: true,
+    HAS_MASK: false,
+    DEBUG_SDF: false,
+  }), [defs]);
+
   return use(Virtual, {
     vertexCount,
     instanceCount,

@@ -66,6 +66,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   height = 256,
   radius = 16,
   pad = 0,
+  fence: op = fence,
   children,
   then,
 }: PropsWithChildren<SDFFontProviderProps>) => {
@@ -184,8 +185,10 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
     };
   }, [rustText, atlas, source]);
 
+  const {yeeted} = useFiber();
+
   return rustText ? (
-    fence(
+    op(
       provide(SDFFontContext, context, children),
       (gathered: any) => {
         const rects = bounds.flush();

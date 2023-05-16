@@ -3,7 +3,7 @@ import type { TypedArray, TextureSource, Atlas, Lazy, RenderPassMode } from '@us
 import type { ShaderSource } from '@use-gpu/shader';
 import type { SDFGlyphData } from '../text/types';
 
-import { use, keyed, wrap, memo, debug, fragment, provide, useFiber, useOne, useState, useResource } from '@use-gpu/live';
+import { gather, use, yeet, keyed, wrap, memo, debug, fragment, provide, useFiber, useOne, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -86,6 +86,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
 
   return (
     use(SDFFontProvider, {
+      fence: gather,
       radius: sdfRadius,
       children:
         use(GlyphSource, {
@@ -114,7 +115,7 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
             uvs,
             sdf,
             texture: source,
-        
+
             position,
             positions,
             placement,
@@ -135,7 +136,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
             mode,
             id,
           });
-          //]);
         },
     })
   );

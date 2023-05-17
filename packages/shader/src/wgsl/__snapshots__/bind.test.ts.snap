@@ -9,9 +9,7 @@ exports[`bind binds an external 1`] = `
     
 
     fn colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
-    fn colorNotUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 1.0); }
-
-    fn getColor() -> vec4<f32> {
+fn getColor() -> vec4<f32> {
       return _01_getColor() + colorUsed();
     }
     "
@@ -24,9 +22,7 @@ exports[`bind binds an external 2`] = `
     
 
     fn colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
-    fn colorNotUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 1.0); }
-
-    fn getColor() -> vec4<f32> {
+fn getColor() -> vec4<f32> {
       return _01_getColor() + colorUsed();
     }
     "

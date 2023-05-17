@@ -51,7 +51,7 @@ describe("bind", () => {
     expect(bound.hash).toMatchSnapshot();
   });
   
-  it("binds an external", () => {
+  fit("binds an external", () => {
     
     const codeMain = `
     @link fn getColor() -> vec4<f32> {};
@@ -78,7 +78,7 @@ describe("bind", () => {
     `
 
     const module = loadModule(codeMain, 'main');
-    const sub = loadModule(codeSub, 'sub');
+    const sub = loadModule(codeSub, 'sub', 'getColor');
     const getColor = loadModule(codeColor, 'getColor');
 
     const links = {"getSubColor:getColor": getColor};

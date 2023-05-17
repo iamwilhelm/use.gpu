@@ -239,7 +239,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       root,
       depth: renderDepth,
     } });
-    const unhover = () => updateHoverState({ $set: {
+    const unhover = (e: any) => e.altKey || updateHoverState({ $set: {
       fiber: null,
       by: null,
       deps: [],

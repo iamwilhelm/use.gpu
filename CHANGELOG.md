@@ -1,5 +1,6 @@
 0.9.x
 - `@use-gpu/live`: Quotes/unquotes in keyed sub-trees will now correctly reorder
+- `@use-gpu/inspect`: Allow use without Use.GPU, move GPU viz to `@use-gpu/inspect-gpu`
 - `@use-gpu/plot`: Add pipeline options as full ROP trait to plot layers
 - `@use-gpu/present`: New presentation system on top of `@use-gpu/layout`: `<Present>` / `<Slide>` / `<Step>`
 - `@use-gpu/shader`: Allow `chainTo` to chain `(A, ...)->B` with `(B, ...)->C` if the rest signatures match

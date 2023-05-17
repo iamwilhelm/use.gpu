@@ -62,6 +62,7 @@
   height: 40px;
   border-bottom: 2px solid var(--LiveInspect-backgroundInactive);
   margin-bottom: 10px;
+  overflow: hidden;
 }
 
 .LiveInspect button[role="tab"] {

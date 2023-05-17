@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { LiveFiber } from '@use-gpu/live';
 
 export type ExpandState = Record<number, boolean>;
@@ -21,3 +22,23 @@ export type OptionState = {
 };
 
 export type Action = () => void;
+
+export type InspectExtension = (root: LiveFiber<any>) => InspectAddIns;
+
+export type InspectAddIns = {
+  props: InspectProps[],
+  prop: InspectProp[],
+};
+
+export type InspectProps = {
+  id: string,
+  label: string,
+  enabled: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>) => boolean,
+  render: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>) => ReactNode,
+};
+
+export type InspectProp = {
+  id: string,
+  enabled: (prop: any) => boolean,
+  render: (prop: any) => ReactNode,
+};

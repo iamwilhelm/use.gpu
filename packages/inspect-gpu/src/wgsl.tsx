@@ -114,6 +114,8 @@ export function wgslLang() {
   return new LanguageSupport(language);
 }
 
+export const renderWGSL = (props: WGSLProps) => <WGSL {...props} />;
+
 export const WGSL = (props: WGSLProps) => {
   const {code, onChange, onCommit} = props;
 

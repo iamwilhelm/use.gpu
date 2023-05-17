@@ -1,44 +1,22 @@
 import type { LiveFiber } from '@use-gpu/live';
 import type { Action } from '../types';
 
-import { formatNode, formatValue, formatNodeName, YEET } from '@use-gpu/live';
-import { styled as _styled } from '@stitches/react';
+import { formatNode, formatNodeName, YEET } from '@use-gpu/live';
+import { InspectObject } from '../inspect-object';
+import { Spacer } from '../layout';
 
 import React, { useState } from 'react';
-import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from '../layout';
-import { usePingContext } from '../ping';
-import { IconItem, SVGChevronDown, SVGChevronRight } from '../svg';
-import { WGSL } from '../wgsl';
-
-const CODE_HEIGHT = 250;
-
-const ShaderModule = () => {};
-
-const styled: any = _styled;
 
 type PropsProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
 };
 
-const Prefix = styled('div', {
-  width: '20px',
-  display: 'inline-block',
-  whiteSpace: 'nowrap',
-  lineHeight: 1,
-});
-
-const Compact = styled('span', {
-  whiteSpace: 'nowrap',
-});
-
 export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   // @ts-ignore
   const {id, f, arg, args, yeeted} = fiber;
   const name = formatNodeName(fiber);
   let props = {} as Record<string, any>;
-
-  usePingContext();
 
   const [state, setState] = useState<Record<string, boolean>>({});
   const toggleState = (id: string) => setState((state) => ({
@@ -85,7 +63,12 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
 
   let yt = yeeted?.value != null ? (<>
     <div><b>Yeeted</b></div>
-    <div>{inspectObject({value: yeeted?.value}, state, toggleState, '')}</div>
+    <div><InspectObject
+      object={{value: yeeted?.value}}
+      state={state}
+      toggleState={toggleState}
+      path={''}
+    /></div>
   </>) : null;
 
   let showProps = f !== YEET;
@@ -109,7 +92,12 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
     {showProps ? (
       <>
         <div><b>{name}</b></div>
-        <div>{inspectObject(props, state, toggleState, '')}</div>
+        <div><InspectObject
+          object={props}
+          state={state}
+          toggleState={toggleState}
+          path={''}
+        /></div>
       </>
     ) : null}
     {showProps && yt ? <Spacer /> : null}
@@ -120,128 +108,3 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
   </>);
 }
 
-export const inspectObject = (
-  object: any,
-  state: Record<string, boolean>,
-  toggleState: (id: string) => void,
-  path: string,
-  seen: Set<any> = new Set(),
-  depth: number = 0,
-) => {
-  if (!object) return null;
-
-  if (seen.has(object)) return '{Circular}';
-  seen.add(object);
-
-  if (Array.isArray(object)) {
-    if (object.length > 100) object = object.slice(0, 100);
-    if (object.reduce((b: boolean, o: any) => b && typeof o === 'number', true)) {
-      return `[${object.join(', ')}]`;
-    }
-  }
-  
-  if (object instanceof Map) {
-    const o = {} as Record<string, any>;
-    let i = 0;
-    for (let k of object.keys()) {
-      const v = object.get(k);
-      if (k instanceof Object) k = (i++).toString();
-      o[k] = v;
-    }
-    object = o;
-  }
-
-  if (object?.constructor?.name?.match(/Array/)) {
-    if (object.length > 100) {
-      object = object.slice(0, 100);
-      object.push('…')
-    }
-  }
-
-  const fields = Object.keys(object).map((k: string) => {
-    const key = path +'/'+ k;
-    const code = (typeof object[k] === 'string' && object[k].length > 80 && object[k].match(/\n/));
-    const expandable = (typeof object[k] === 'object' && object[k]) || code;
-    const expanded = expandable && !!state[key];
-
-    const icon = <IconItem height={16} top={2}>{expanded !== false ? <SVGChevronDown /> : <SVGChevronRight />}</IconItem>;
-    const prefix = expandable ? icon : '';
-    
-    const onClick = expandable ? (e: any) => {
-      toggleState(key);
-      e.preventDefault();
-      e.stopPropagation();
-    } : undefined;
-
-    const compact = <Compact>
-      {expanded ? formatValue(object[k]) : truncate(formatValue(object[k]), 80)}
-    </Compact>
-
-    const full = expanded ? (
-      <TreeIndent indent={1}>{
-        code
-        ? inspectCode(object[k])
-        : inspectObject(object[k], state, toggleState, key, seen, depth + 1)
-      }</TreeIndent>
-    ) : null;
-
-    let proto = object[k]?.__proto__ !== Object.prototype
-      ? object[k]?.__proto__?.constructor?.name ??
-        object[k]?.__proto__?.displayName ??
-        object[k]?.__proto__?.name
-      : 'Object';
-
-    if (object[k]?.length) proto += ' (' + object[k]?.length + ')';
-
-    const showFull = (typeof object[k] === 'object' && depth < 20) || code;
-    if (showFull && expanded) {
-      return (
-        <div key={k} onClick={onClick}>
-          <TreeRow>
-            <SplitRow>
-              <Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
-              <div>{proto ?? ''}</div>
-            </SplitRow>
-          </TreeRow>
-          <div>{full}</div>
-        </div>
-      );
-    }
-
-    return (
-      <div key={k} onClick={onClick}>
-        <TreeRow>
-          <SplitRow>
-            <Label><Prefix>{prefix}</Prefix><div>{k}</div></Label>
-            <div>{compact}</div>
-          </SplitRow>
-        </TreeRow>
-      </div>
-    );
-  });
-  
-  return fields;
-}
-
-const truncate = (s: string, n: number) => {
-  s = s.replace(/\s+/g, ' ');
-  if (s.length < n) return s;
-  return s.slice(0, n) + '…';
-}
-
-const inspectCode = (code: string) => (
-  <div
-    style={{height: CODE_HEIGHT}}
-    onClick={(e) => e.stopPropagation()}
-  >
-    <div style={{
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      height: CODE_HEIGHT,
-      overflow: 'auto',
-    }}>
-      <WGSL code={code} />
-    </div>
-  </div>
-);

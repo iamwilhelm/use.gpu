@@ -1,9 +1,11 @@
 {
   "extends": "../../tsconfig.pkg.json",
   "references": [
-    { "path": "../live" },
-    { "path": "../state" },
-    { "path": "../react" },
+    { "path": "../core" },
+    { "path": "../traits" },
+    { "path": "../workbench" },
+    { "path": "../inspect" },
+    { "path": "../layout" },
   ],
   "compilerOptions": {
     "rootDir": "..",
@@ -12,5 +14,5 @@
     "outDir": "../../build/ts",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "types.ts"]
 }

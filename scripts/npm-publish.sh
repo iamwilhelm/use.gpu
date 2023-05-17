@@ -6,6 +6,7 @@ yarn publish --ignore-scripts --access public build/packages/glsl-loader
 yarn publish --ignore-scripts --access public build/packages/gltf
 yarn publish --ignore-scripts --access public build/packages/glyph
 yarn publish --ignore-scripts --access public build/packages/inspect
+yarn publish --ignore-scripts --access public build/packages/inspect-gpu
 yarn publish --ignore-scripts --access public build/packages/layout
 yarn publish --ignore-scripts --access public build/packages/live
 yarn publish --ignore-scripts --access public build/packages/map

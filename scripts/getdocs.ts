@@ -20,6 +20,7 @@ let packages = [
   'gltf',
   'glyph',
   'inspect',
+  'inspect-gpu',
   'layout',
   'live',
   'map',

@@ -1,0 +1,31 @@
+{
+  "name": "@use-gpu/inspect-gpu",
+  "version": "0.8.4",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "dependencies": {
+    "@codemirror/commands": "^6.2.4",
+    "@codemirror/state": "^6.2.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.11.0",
+    "@lezer/highlight": "^1.1.4",
+    "codemirror": "^6.0.1",
+    "@use-gpu/inspect": "*",
+    "@use-gpu/layout": "*",
+    "@use-gpu/webgpu": "*",
+    "@use-gpu/workbench": "*"
+  },
+  "scripts": {
+    "build": "NPM_PACKAGE=inspect-gpu ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch"
+  },
+  "keywords": [
+    "use-gpu",
+    "use-gpu-components"
+  ]
+}

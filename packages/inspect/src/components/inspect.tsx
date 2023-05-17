@@ -1,5 +1,5 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { ExpandState, SelectState, HoverState, OptionState, PingState } from './types';
+import type { ExpandState, SelectState, HoverState, OptionState, PingState, InspectAddIns } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
@@ -9,21 +9,15 @@ import { makeUseLocalState } from '../hooks/useLocalState';
 import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState, SetStateAction } from 'react';
 import { Node } from './node';
 import { FiberTree } from './fiber';
-import { Props } from './panels/props';
-import { Call } from './panels/call';
-import { Geometry } from './panels/geometry';
-import { Shader } from './panels/shader';
-import { Layout } from './panels/layout';
-import { Output } from './panels/output';
 import {
   InspectContainer, InspectToggle, Button, SmallButton, TreeControls, TreeView, Spacer, Grow,
   SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
+import { AddInProvider } from './add-ins';
 import { PingProvider } from './ping';
 import { Options } from './options';
+import { Panels } from './panels';
 import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
-
-import * as Tabs from '@radix-ui/react-tabs';
 
 const OPTIONS_KEY = 'live.inspect.options';
 
@@ -32,10 +26,15 @@ type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
 
 type InspectProps = {
   fiber: LiveFiber<any>,
+  addIns: InspectAddIns,
   onInspect?: (b: boolean) => void,
 }
 
-export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
+export const Inspect: React.FC<InspectProps> = ({
+  fiber,
+  addIns,
+  onInspect,
+}) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
   const optionCursor = useUpdateState<OptionState>({
@@ -128,37 +127,6 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     return () => { host.__highlight = () => {}; }
   }, [host, fibers]);
 
-  let computeTab: React.ReactNode;
-  let vertexTab: React.ReactNode;
-  let fragmentTab: React.ReactNode;
-  let layoutTab: React.ReactNode;
-  let geometryTab: React.ReactNode;
-  let outputTab: React.ReactNode;
-  if (selectedFiber) {
-    const inspect = selectedFiber.__inspect;
-    if (inspect) {
-      const {compute, vertex, fragment, layout, render, output} = inspect;
-      if (compute) {
-        computeTab = <Shader type="compute" fiber={selectedFiber} />;
-      }
-      if (vertex) {
-        vertexTab = <Shader type="vertex" fiber={selectedFiber} />;
-      }
-      if (fragment) {
-        fragmentTab = <Shader type="fragment" fiber={selectedFiber} />;
-      }
-      if (layout) {
-        layoutTab = <Layout fiber={selectedFiber} />;
-      }
-      if (render) {
-        geometryTab = <Geometry fiber={selectedFiber} />;
-      }
-      if (output) {
-        outputTab = <Output fiber={selectedFiber} />;
-      }
-    }
-  }
-
   const tree = (
     <InsetColumnFull>
       <TreeControls>
@@ -180,31 +148,6 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
     </InsetColumnFull>
   );
 
-  const props = (
-    <Inset>
-      <Tabs.Root defaultValue="props">
-        <Tabs.List>
-          <Tabs.Trigger value="props">Props</Tabs.Trigger>
-          <Tabs.Trigger value="fiber">Fiber</Tabs.Trigger>
-          {computeTab ? <Tabs.Trigger value="compute">Compute</Tabs.Trigger> : null}
-          {vertexTab ? <Tabs.Trigger value="vertex">Vertex</Tabs.Trigger> : null}
-          {fragmentTab ? <Tabs.Trigger value="fragment">Fragment</Tabs.Trigger> : null}
-          {layoutTab ? <Tabs.Trigger value="layout">Layout</Tabs.Trigger> : null}
-          {geometryTab ? <Tabs.Trigger value="geometry">Geometry</Tabs.Trigger> : null}
-          {outputTab ? <Tabs.Trigger value="output">Output</Tabs.Trigger> : null}
-        </Tabs.List>
-        <Tabs.Content value="props">{selectedFiber ? <Props fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
-        <Tabs.Content value="fiber">{selectedFiber ? <Call fiber={selectedFiber} fibers={fibers} /> : null}</Tabs.Content>
-        {computeTab ? <Tabs.Content value="compute">{computeTab}</Tabs.Content> : null }
-        {vertexTab ? <Tabs.Content value="vertex">{vertexTab}</Tabs.Content> : null }
-        {fragmentTab ? <Tabs.Content value="fragment">{fragmentTab}</Tabs.Content> : null }
-        {layoutTab ? <Tabs.Content value="layout">{layoutTab}</Tabs.Content> : null }
-        {geometryTab ? <Tabs.Content value="geometry">{geometryTab}</Tabs.Content> : null }
-        {outputTab ? <Tabs.Content value="output">{outputTab}</Tabs.Content> : null }
-      </Tabs.Root>
-    </Inset>
-  );
-
   // Avoid text selection on double click
   const onMouseDown = (e: any) => {
     if (e.detail > 1) {
@@ -214,25 +157,27 @@ export const Inspect: React.FC<InspectProps> = ({fiber, onInspect}) => {
 
   return (<div className="LiveInspect">
     {open ? (
-      <PingProvider fiber={fiber}>  
-        <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
-          <div style={fullSize
-              ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
-              : {display: 'flex', height: '100%'}}>
-            <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
-              <PanelAbsolute onClick={() => setSelected(null)}>
-                {tree}
-              </PanelAbsolute>
-            </RowPanel>
-            {selectedFiber ? (
-              <RowPanel style={fullSize ? {position: 'relative', maxHeight: '30%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
-                <PanelScrollable>
-                  {props}
-                </PanelScrollable>
+      <PingProvider fiber={fiber}>
+        <AddInProvider addIns={addIns}>
+          <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
+            <div style={fullSize
+                ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
+                : {display: 'flex', height: '100%'}}>
+              <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
+                <PanelAbsolute onClick={() => setSelected(null)}>
+                  {tree}
+                </PanelAbsolute>
               </RowPanel>
-            ) : null}
-          </div>
-        </InspectContainer>
+              {selectedFiber ? (
+                <RowPanel style={fullSize ? {position: 'relative', maxHeight: '30%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
+                  <PanelScrollable>
+                    <Panels fiber={selectedFiber} fibers={fibers} />
+                  </PanelScrollable>
+                </RowPanel>
+              ) : null}
+            </div>
+          </InspectContainer>
+        </AddInProvider>
       </PingProvider>
     ) : null}
     <InspectToggle onClick={toggleOpen}>

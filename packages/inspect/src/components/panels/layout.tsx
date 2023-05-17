@@ -2,9 +2,8 @@ import type { LiveFiber } from '@use-gpu/live';
 
 import React, { useState } from 'react';
 import { DOMMock, SplitRow, Label, Spacer } from '../layout';
-import { usePingContext } from '../ping';
 
-import { inspectObject } from './props';
+import { InspectObject } from '../inspect-object';
 
 type LayoutProps = {
   fiber: LiveFiber<any>,
@@ -14,8 +13,6 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
 
   const layout = fiber.__inspect?.layout;
   if (!layout) return null;
-
-  usePingContext();
 
   const {into, size, sizes, offsets, self} = layout;
   let n = sizes.length;
@@ -33,7 +30,7 @@ export const Layout: React.FC<LayoutProps> = ({fiber}) => {
 
   return (<>
     <div><b>Props</b></div>
-    {inspectObject(layout, state, toggleState, 'u')}
+    <InspectObject object={layout} state={state} toggleState={toggleState} />
     <Spacer />
     <div style={{position: 'relative', width: width * SCALE, height: height * SCALE}}>
       <DOMMock style={{

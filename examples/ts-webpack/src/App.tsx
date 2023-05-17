@@ -6,6 +6,7 @@ import { DebugProvider, FontLoader, PanControls, Flat, Pass } from '@use-gpu/wor
 import { UI, Layout, Flex, Block, Inline, Text } from '@use-gpu/layout';
 
 import { UseInspect } from '@use-gpu/inspect';
+import { inspectGPU } from '@use-gpu/inspect-gpu';
 import '@use-gpu/inspect/theme.css';
 
 import { makeFallback } from './Fallback';
@@ -28,7 +29,7 @@ export const App: LC = hot(() => {
   const fiber = useFiber();
 
   return (
-    <UseInspect fiber={fiber} provider={DebugProvider}>
+    <UseInspect fiber={fiber} provider={DebugProvider} extensions={[inspectGPU]}>
 
       {/* WebGPU Canvas with a font */}
       <WebGPU

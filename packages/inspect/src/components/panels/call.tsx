@@ -5,16 +5,13 @@ import { formatNode, formatValue } from '@use-gpu/live';
 import { Hook } from '@use-gpu/live';
 import React, { useState } from 'react';
 import { SplitRow, Label, Spacer } from '../layout';
-import { usePingContext } from '../ping';
-
-import { inspectObject } from './props';
+import { InspectObject } from '../inspect-object';
 import chunk from 'lodash/chunk';
 
 const STATE_SLOTS = 3;
 
 type CallProps = {
   fiber: LiveFiber<any>,
-  fibers: Map<number, LiveFiber<any>>,
 };
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
@@ -24,8 +21,6 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
   let props = {id, depth, path, keys, '[internals]': rest} as any;
   let env = {context, yeeted, quote, unquote} as any;
   let rendered = {type, mount, mounts, next} as any;
-
-  usePingContext();
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const toggleExpanded = (id: string) => setExpanded((state) => ({
@@ -38,17 +33,17 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
   return (
     <div>
       <div><b>Fiber</b></div>
-      <div>{inspectObject(props, expanded, toggleExpanded, '')}</div>
+      <div><InspectObject object={props} state={expanded} toggleState={toggleExpanded} /></div>
       <Spacer />
       <div><b>Environment</b></div>
-      <div>{inspectObject(env, expanded, toggleExpanded, '')}</div>
+      <div><InspectObject object={env} state={expanded} toggleState={toggleExpanded} /></div>
       <Spacer />
       <div><b>Rendered</b></div>
-      <div>{inspectObject(rendered, expanded, toggleExpanded, '')}</div>
+      <div><InspectObject object={rendered} state={expanded} toggleState={toggleExpanded} /></div>
       <Spacer />
       <div><b>Hooks</b></div>
       <div>
-        {inspectObject(hooks.map(hookToObject), expanded, toggleExpanded, '')}
+        <div><InspectObject object={hooks.map(hookToObject)} state={expanded} toggleState={toggleExpanded} /></div>
       </div>
     </div>
   );

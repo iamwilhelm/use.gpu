@@ -15,7 +15,8 @@
     { "path": "../map" },
     { "path": "../gltf" },
     { "path": "../glyph" },
-    { "path": "../inspect" }
+    { "path": "../inspect" },
+    { "path": "../inspect-gpu" }
   ],
   "compilerOptions": {
     "rootDir": "..",

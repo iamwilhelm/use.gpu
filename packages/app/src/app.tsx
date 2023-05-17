@@ -6,6 +6,7 @@ import { AutoCanvas, WebGPU } from '@use-gpu/webgpu';
 import { DebugProvider, FontLoader, Router, Routes } from '@use-gpu/workbench';
 
 import { UseInspect } from '@use-gpu/inspect';
+import { inspectGPU } from '@use-gpu/inspect-gpu';
 import '@use-gpu/inspect/theme.css';
 
 import { makeRoutes } from './routes';
@@ -101,6 +102,7 @@ export const App: LC = hot(() => {
       container={root}
       active={inspect}
       provider={DebugProvider}
+      extensions={[inspectGPU]}
     >
       {view}
     </UseInspect>

@@ -23,6 +23,7 @@
     { "path": "./packages/map" },
     { "path": "./packages/present" },
     { "path": "./packages/inspect" },
+    { "path": "./packages/inspect-gpu" },
     { "path": "./packages/app" }
   ],
   "incremental": true,

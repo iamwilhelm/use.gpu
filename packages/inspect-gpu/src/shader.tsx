@@ -1,18 +1,23 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { Action } from '../types';
 
 import { formatNode, formatValue } from '@use-gpu/live';
+import { InspectObject } from '@use-gpu/inspect';
 import { styled as _styled } from '@stitches/react';
 
 import React, { useCallback, useState } from 'react';
-import { SplitRow, Label, Selectable, Spacer } from '../layout';
 
-import { inspectObject } from './props';
-import { usePingContext } from '../ping';
-
-import { WGSL } from '../wgsl';
+import { WGSL } from './wgsl';
 
 const styled: any = _styled;
+
+export const Selectable = styled('div', {
+  userSelect: 'text',
+});
+
+export const Spacer = styled('div', {
+  width: '20px',
+  height: '20px',
+});
 
 const StyledShader = styled('div', {
   background: 'rgba(255, 255, 255, 0.1)',
@@ -23,6 +28,23 @@ const StyledShader = styled('div', {
 
 const StyledHeader = styled('div', {
   display: 'flex',
+});
+
+const StyledHint = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  opacity: 0.5,
+  '& > span': {
+    marginRight: 10,
+  },
+});
+
+const StyledKey = styled('div', {
+  display: 'inline-block',
+  verticalAlign: 'middle',
+  background: 'rgba(255, 255, 255, 0.2)',
+  borderRadius: 2,
+  padding: '3px 6px',
 });
 
 const Grow = styled('div', {
@@ -55,8 +77,9 @@ type ShaderProps = {
   fiber: LiveFiber<any>,
 };
 
+export const renderShader = (props: any) => <Shader {...props} />;
+
 export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
-  usePingContext();
 
   const shader = fiber.__inspect?.[type];
   const uniforms = fiber.__inspect?.uniforms;
@@ -96,14 +119,23 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
 
   return (<>
     {uniforms || bindings ? (<>
-      {uniforms?.length  ? <><div><b>Constants</b></div>{inspectObject(toObject(uniforms), state, toggleState, 'u')}</> : null}
-      {bindings?.length  ? <><div><b>Bindings</b></div>{inspectObject(toObject(bindings), state, toggleState, 'b')}</> : null}
-      {volatiles?.length ? <><div><b>Volatiles</b></div>{inspectObject(toObject(volatiles), state, toggleState, 'v')}</> : null}
+      {uniforms?.length ? <>
+        <div><b>Constants</b></div>
+        <InspectObject object={toObject(uniforms)} state={state} toggleState={toggleState} path={'u'} />
+      </> : null}
+      {bindings?.length ? <>
+        <div><b>Bindings</b></div>
+        <InspectObject object={toObject(bindings)} state={state} toggleState={toggleState} path={'b'} />
+      </> : null}
+      {volatiles?.length ? <>
+        <div><b>Volatiles</b></div>
+        <InspectObject object={toObject(volatiles)} state={state} toggleState={toggleState} path={'v'} />
+      </> : null}
       <Spacer />
     </>) : null}
     <StyledHeader>
       <Grow><b>Shader</b> (<code>{shader.hash}</code>)</Grow>
-      <div><span style={{opacity: 0.5}}>(Ctrl-Enter = Hot Reload)</span></div>
+      <StyledHint><span>Hot Reload</span><StyledKey>Ctrl</StyledKey>+<StyledKey>Enter</StyledKey></StyledHint>
     </StyledHeader>
     <StyledShader><Selectable>
       <WGSL code={shader.code} onCommit={handleCommit} />

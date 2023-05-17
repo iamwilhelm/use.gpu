@@ -1,6 +1,5 @@
 import type { LiveComponent, LiveFiber, LiveElement } from '@use-gpu/live';
 import type { LambdaSource, TextureSource } from '@use-gpu/core';
-import type { Action } from '../types';
 
 import { memo, use, wrap, provide, signal, useFiber, useMemo, useOne, makeContext } from '@use-gpu/live';
 import { LiveCanvas } from '@use-gpu/react';
@@ -13,9 +12,7 @@ import { styled as _styled } from '@stitches/react';
 
 import React, { Fragment } from 'react';
 
-import { UseInspect } from '../../use-inspect';
-import { inspectObject } from './props';
-import { usePingContext } from '../ping';
+import { UseInspect } from '@use-gpu/inspect';
 
 import { decodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
 
@@ -146,7 +143,7 @@ const depthShader = wgsl`
   }
 `;
 
-type OutputProps = {
+type TargetsProps = {
   fiber: LiveFiber<any>,
 };
 
@@ -161,8 +158,9 @@ type TexturesProps = {
   picking?: TextureSource | TextureSource[],
 };
 
-export const Output: React.FC<OutputProps> = ({fiber}) => {
-  usePingContext();
+export const renderTargets = (props: any) => <Targets {...props} />;
+
+export const Targets: React.FC<TargetsProps> = ({fiber}) => {
   
   const {color, picking, depth} = fiber.__inspect?.output;
   const device = fiber.context.values.get(DeviceContext)?.current;

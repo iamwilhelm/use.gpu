@@ -1,9 +1,9 @@
-import type { InspectAddIns, InspectExtension } from './types';
+import type { InspectAddIns, InspectExtension } from '../components/types';
 import React, { createContext, useContext, PropsWithChildren } from 'react';
 
-import { Props } from './panels/props';
-import { Call } from './panels/call';
-import { Layout } from './panels/layout';
+import { Props } from '../components/panels/props';
+import { Call } from '../components/panels/call';
+import { Layout } from '../components/panels/layout';
 
 const AddInContext = createContext<InspectAddIns>({
   props: [],
@@ -20,7 +20,7 @@ export const AddInProvider = ({
 
 export const useAddIns = () => useContext(AddInContext);
 
-export const defaultPanels: InspectExtension = () => ({
+export const defaultPanels: InspectExtension = (): InspectAddIns => ({
   props: [
     {
       id: 'props',

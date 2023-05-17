@@ -4,7 +4,7 @@ import { InspectProp } from './types';
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { SplitRow, TreeRow, TreeIndent, Label, Spacer } from './layout';
 import { IconItem, SVGChevronDown, SVGChevronRight } from './svg';
-import { useAddIns } from './add-ins';
+import { useAddIns } from '../providers/add-in-provider';
 
 import { styled as _styled } from '@stitches/react';
 

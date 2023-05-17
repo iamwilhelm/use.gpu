@@ -4,20 +4,21 @@ import type { ExpandState, SelectState, HoverState, OptionState, PingState, Insp
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
 
-import { makeUseLocalState } from '../hooks/useLocalState';
-
 import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState, SetStateAction } from 'react';
+
+import { makeUseLocalState } from '../hooks/useLocalState';
+import { AddInProvider } from '../providers/add-in-provider';
+import { PingProvider } from '../providers/ping-provider';
+
 import { Node } from './node';
 import { FiberTree } from './fiber';
+import { Options } from './options';
+import { Panels } from './panels';
+import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
 import {
   InspectContainer, InspectToggle, Button, SmallButton, TreeControls, TreeView, Spacer, Grow,
   SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
-import { AddInProvider } from './add-ins';
-import { PingProvider } from './ping';
-import { Options } from './options';
-import { Panels } from './panels';
-import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
 
 const OPTIONS_KEY = 'live.inspect.options';
 

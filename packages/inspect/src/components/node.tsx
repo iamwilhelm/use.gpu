@@ -5,7 +5,7 @@ import { formatValue, formatNodeName, YEET, QUOTE, SIGNAL } from '@use-gpu/live'
 import { styled, keyframes } from "@stitches/react";
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
-import { usePingContext } from './ping';
+import { usePingContext } from '../providers/ping-provider';
 import { Muted } from './layout';
 import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
 

@@ -3,8 +3,8 @@ import type { InspectAddIns } from './types';
 import React, { FC, useState } from 'react';
 
 import { Inset } from './layout';
-import { useAddIns } from './add-ins';
-import { usePingContext } from './ping';
+import { useAddIns } from '../providers/add-in-provider';
+import { usePingContext } from '../providers/ping-provider';
 import * as Tabs from '@radix-ui/react-tabs';
 
 export type PanelsProps = {

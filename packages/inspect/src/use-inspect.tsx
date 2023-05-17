@@ -5,7 +5,7 @@ import { HTML } from '@use-gpu/react';
 
 import React from 'react';
 import { Inspect } from './components/inspect';
-import { defaultPanels } from './components/add-ins';
+import { defaultPanels } from './providers/add-in-provider';
 
 export type UseInspectProps = {
   fiber: LiveFiber<any>,

@@ -5,7 +5,7 @@ import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
 import React, { memo, useMemo, useLayoutEffect, useRef, PropsWithChildren } from 'react';
 
 import { useRefineCursor } from '@use-gpu/state';
-import { usePingContext } from './ping';
+import { usePingContext } from '../providers/ping-provider';
 import { Node } from './node';
 import { ReactNode } from './react-node';
 import { ExpandState, SelectState, HoverState, Action } from './types';

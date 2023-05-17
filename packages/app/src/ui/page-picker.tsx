@@ -22,8 +22,10 @@ export const makePicker = (container: Element) => ({
 });
 
 export const PagePicker = (container: Element) => {
-  const {route: {path}, push} = useRouterContext();
+  const {route: {path, query}, push} = useRouterContext();
   const handleChange = (e: any) => push(e.target.value);
+
+  if ('iframe' in query) return null;
 
   const icon = ICON("code");
   const handleCode = () => {

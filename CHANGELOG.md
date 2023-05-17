@@ -1,17 +1,12 @@
 0.9.x
-- `@use-gpu/live`: Quotes/unquotes in keyed sub-trees will now correctly reorder
 - `@use-gpu/inspect`: Allow use without Use.GPU, move GPU panels to `@use-gpu/inspect-gpu`
+- `@use-gpu/live`: Quotes/unquotes in keyed sub-trees will now correctly reorder
 - `@use-gpu/plot`: Add pipeline options as full ROP trait to plot layers
 - `@use-gpu/present`: New presentation system on top of `@use-gpu/layout`: `<Present>` / `<Slide>` / `<Step>`
 - `@use-gpu/shader`: Allow `chainTo` to chain `(A, ...)->B` with `(B, ...)->C` if the rest signatures match
-- `@use-gpu/workbench`: `useBoundShader` / `getBoundShader` no longer need BINDINGS passed
-
-{
 - `@use-gpu/shader`: Allow run-time @linking of struct types
-- `@use-gpu/shader`: Make function bodies formally optional
-- `@use-gpu/shader`: Throw early parse errors
 - `@use-gpu/shader`: Tree-shake root module
-}
+- `@use-gpu/workbench`: `useBoundShader` / `getBoundShader` no longer need BINDINGS passed
 
 0.8.4
 - `@use-gpu/shader`: Use abstract grammar w/o comments internally, concrete grammar externally, to avoid lezer bugs.

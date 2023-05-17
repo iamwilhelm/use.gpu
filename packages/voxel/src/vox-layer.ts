@@ -8,7 +8,7 @@ import {
   FaceLayer, GeometryData, ShaderLitMaterial,
   makeBoxGeometry,
 } from '@use-gpu/workbench';
-import { wgsl, bindBundle, bindEntryPoint, bundleToAttributes } from '@use-gpu/shader/wgsl';
+import { wgsl, bindBundle, bindEntryPoint } from '@use-gpu/shader/wgsl';
 
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 import { getViewPosition, worldToDepth } from '@use-gpu/wgsl/use/view.wgsl';
@@ -24,6 +24,7 @@ export type VoxLayerProps = {
   pbr: StorageSource,
 };
 
+// Transform a unit size box to the right dimensions
 const vertexShader = wgsl`
 @link fn getPosition(i: u32) -> vec4<f32>;
 @link fn getSize(i: u32) -> vec3<f32>;
@@ -36,6 +37,7 @@ const vertexShader = wgsl`
 };
 `;
 
+// Surface fragment shader
 const surfaceShader = bindBundle(wgsl`
 @link struct SurfaceFragment {};
 @link struct DepthFragment {};
@@ -308,9 +310,6 @@ fn traceVolumeSteps(
 }
 `, {SurfaceFragment, DepthFragment, getViewPosition, worldToDepth});
 
-const VERTEX_BINDINGS = bundleToAttributes(vertexShader);
-const SURFACE_BINDINGS = bundleToAttributes(surfaceShader);
-
 const INSIDE_PIPELINE = {
   depthStencil: {
     compare: 'always',
@@ -338,6 +337,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       const DEBUG_STEPS = useDebugContext()?.voxel?.iterations;
       const defs = useOne(() => ({DEBUG_STEPS}), DEBUG_STEPS);
 
+      // Get bounding box / ray transform
       const parent = useMatrixContext();
       const [matrix, inverse, ray, normal] = useOne(() => {
         const m = mat4.clone(parent);
@@ -354,6 +354,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       const local3 = vec3.create();
       const origin3 = vec3.create();
 
+      // Determine if camera near plane is inside (lazy)
       const size = useCallback(() => shape[0].size, [shape]);
       const inside = useCallback((uniforms: Record<string, Ref<any>>) => {
         const {size} = shape[0];
@@ -379,6 +380,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         return z + viewNF[0] * 4;
       }, [matrix, inverse])
 
+      // Transform view position into voxel space to use as starting point inside (lazy)
       const origin = useCallback((uniforms: Record<string, Ref<any>>) => {
         const {size} = shape[0];
         const sx = size[0] / 2;
@@ -396,13 +398,13 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         return origin3;
       }, [inverse]);
 
-      const boundPosition = useBoundShader(vertexShader, VERTEX_BINDINGS, [positions, size]);
+      const boundPosition = useBoundShader(vertexShader, [positions, size]);
       const getPosition = useLambdaSource(boundPosition, positions);
 
       const insideRef = useShaderRef(false);
       const originRef = useShaderRef([0, 0, 0]);
 
-      const getSurface = useBoundShader(surfaceShader, SURFACE_BINDINGS, [
+      const getSurface = useBoundShader(surfaceShader, [
         matrix, ray, normal, size, insideRef, originRef,
         ...shape, palette, pbr,
       ], defs);

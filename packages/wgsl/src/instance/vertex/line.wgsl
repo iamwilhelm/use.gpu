@@ -135,13 +135,7 @@ fn trimAnchor(
       var end = worldToClip(endPos);
       if (end.w > 0.0) {
         var nextPos = getPosition(trim.y - 1u);
-<<<<<<< HEAD
         centerPos = trimAnchor(maxLength, endPos.xyz, nextPos.xyz, centerPos.xyz, beforePos.xyz, width, size, both, end.w, depth);
-=======
-        if (centerPos.w != 0.0) {
-          centerPos = trimAnchor(maxLength, endPos.xyz, nextPos.xyz, centerPos.xyz, beforePos.xyz, width, size, both, end.w, depth);
-        }
->>>>>>> 4c179e44 (squash)
       }
     }
     

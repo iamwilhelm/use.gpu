@@ -532,6 +532,7 @@ declare module "@use-gpu/wgsl/render/fragment/deferred-shaded.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
+  export const mainWithDepth: ParsedBundle;
   export default __module;
 }
 
@@ -542,14 +543,21 @@ declare module "@use-gpu/wgsl/render/fragment/deferred-solid.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/render/fragment/depth.wgsl" {
+declare module "@use-gpu/wgsl/render/fragment/depth-copy.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/render/fragment/frag-depth.wgsl" {
+declare module "@use-gpu/wgsl/render/fragment/depth-frag.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const main: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/fragment/depth.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
@@ -567,6 +575,7 @@ declare module "@use-gpu/wgsl/render/fragment/shaded.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
+  export const mainWithDepth: ParsedBundle;
   export default __module;
 }
 
@@ -602,6 +611,7 @@ declare module "@use-gpu/wgsl/render/vertex/virtual-depth.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const main: ParsedBundle;
+  export const mainWithDepth: ParsedBundle;
   export default __module;
 }
 
@@ -819,6 +829,7 @@ declare module "@use-gpu/wgsl/use/types.wgsl" {
   export const SolidVertex: ParsedBundle;
   export const ShadedVertex: ParsedBundle;
   export const UIVertex: ParsedBundle;
+  export const DepthFragment: ParsedBundle;
   export const SurfaceFragment: ParsedBundle;
   export const MeshVertex: ParsedBundle;
   export default __module;
@@ -837,6 +848,7 @@ declare module "@use-gpu/wgsl/use/view.wgsl" {
   export const viewToClip: ParsedBundle;
   export const worldToClip: ParsedBundle;
   export const clipToWorld: ParsedBundle;
+  export const worldToDepth: ParsedBundle;
   export const clipToWorld3D: ParsedBundle;
   export const worldToClip3D: ParsedBundle;
   export const clip3DToScreen: ParsedBundle;

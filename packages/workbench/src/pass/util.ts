@@ -76,11 +76,12 @@ export const drawToPass = (
   calls: Renderable[],
   passEncoder: GPURenderPassEncoder,
   countGeometry: (v: number, t: number) => void,
+  uniforms: Record<string, any>,
   sign: number = 1,
   flip: boolean = false,
 ) => {
   const order = getDrawOrder(cull, calls, sign);
-  for (const i of order) calls[i].draw(passEncoder, countGeometry, flip);
+  for (const i of order) calls[i].draw(passEncoder, countGeometry, uniforms, flip);
 };
 
 const REVERSE_Z = mat4.create();

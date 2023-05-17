@@ -71,7 +71,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     depthTest,
     depthWrite,
     blend,
-    count = 2,
+    count = null,
     depth = 0,
     join,
   } = props;

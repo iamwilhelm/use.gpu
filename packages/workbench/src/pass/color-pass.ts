@@ -44,7 +44,7 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
-  const {bind: bindGlobal, cull} = useViewContext();
+  const {bind: bindGlobal, cull, uniforms} = useViewContext();
   const {bind: makeBindPass} = usePassContext();
 
   const opaques      = toArray(calls['opaque']      as Renderable[]);
@@ -73,9 +73,9 @@ export const ColorPass: LC<ColorPassProps> = memo((props: PropsWithChildren<Colo
     bindGlobal(passEncoder);
     bindPass(passEncoder);
 
-    drawToPass(cull, opaques, passEncoder, countGeometry);
-    drawToPass(cull, transparents, passEncoder, countGeometry, -1);
-    drawToPass(cull, debugs, passEncoder, countGeometry);
+    drawToPass(cull, opaques, passEncoder, countGeometry, uniforms);
+    drawToPass(cull, transparents, passEncoder, countGeometry, uniforms, -1);
+    drawToPass(cull, debugs, passEncoder, countGeometry, uniforms);
 
     passEncoder.end();
 

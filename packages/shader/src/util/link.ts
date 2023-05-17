@@ -188,8 +188,8 @@ export const makeLinker = (
     }
 
     // Replace imported function prototype names with target
-    if (externals) for (const {flags, func, variable} of externals) if (func ?? variable) {
-      const {name, inferred} = func ?? variable;
+    if (externals) for (const {flags, func, variable, struct} of externals) if (func ?? variable ?? struct) {
+      const {name, inferred} = func ?? variable ?? struct;
       const key = importMap?.get(name)!;
       const ns = namespaces.get(key);
 
@@ -284,8 +284,9 @@ export const loadBundlesInOrder = (
   const out: ParsedBundle[] = [];
 
   const {module} = bundle;
-  const {name} = module;
+  const {name, entry} = module;
   const key = getBundleKey(bundle);
+  exported.set(key, new Set([entry ?? 'main']));
 
   // Traverse graph starting from source
   const queue = [{key, name, chunk: bundle as ShaderModule}];
@@ -334,8 +335,8 @@ export const loadBundlesInOrder = (
     }
 
     // Recurse into links
-    if (externals) for (const {flags, func, variable} of externals) if (func ?? variable) {
-      const {name} = func ?? variable;
+    if (externals) for (const {flags, func, variable, struct} of externals) if (func ?? variable ?? struct) {
+      const {name} = func ?? variable ?? struct;
       const chunk = links[name];
       if (!chunk) {
         if (flags & RF.Optional) {

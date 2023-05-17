@@ -501,6 +501,16 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   
   ////////////////
 
+  const cursor = tree.cursor();
+  do {
+    const {type} = cursor;
+    if (type.name === '⚠') {
+      throwError('Parse error', cursor.node);
+    }
+  } while (cursor.next())
+
+  ////////////////
+
   return {
     getImports,
     getDeclarations,

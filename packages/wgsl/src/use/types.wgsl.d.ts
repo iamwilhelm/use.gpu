@@ -7,6 +7,7 @@ declare module "@use-gpu/wgsl/use/types.wgsl" {
   export const SolidVertex: ParsedBundle;
   export const ShadedVertex: ParsedBundle;
   export const UIVertex: ParsedBundle;
+  export const DepthFragment: ParsedBundle;
   export const SurfaceFragment: ParsedBundle;
   export const MeshVertex: ParsedBundle;
   export default __module;

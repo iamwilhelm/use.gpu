@@ -57,6 +57,9 @@ export type RawFacesProps = {
 
   shaded?: boolean,
   count?: Lazy<number>,
+
+  shouldDispatch: (u: Record<string, any>) => bool | number | null,
+  onDispatch: (u: Record<string, any>) => void,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
@@ -65,7 +68,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const {
     shaded = false,
     shadow = true,
-    count = 1,
+    depth = false,
+    count = null,
 
     mode = 'opaque',
     side = 'front',
@@ -78,6 +82,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     unweldedTangents = false,
     unweldedUVs = false,
     unweldedLookups = false,
+
+    shouldDispatch,
+    onDispatch,
   } = props;
 
   // Set up draw as:
@@ -87,6 +94,11 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   // - pre-indexed segmented triangle fans (indices + segments)
   const vertexCount = 3;
   const instanceCount = useCallback(() => {
+    if (count != null) {
+      const c = resolve(count) || 0;
+      return (props.segments != null) ? Math.max(0, c - 2) : c;
+    }
+
     const segments = (props.segments as any)?.length;
     const indices = (props.indices as any)?.length;
     const positions = (props.positions as any)?.length;
@@ -95,8 +107,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     if (indices != null) return indices / 3;
     if (positions != null && !props.indices) return positions / 3;
 
-    const c = resolve(count) || 0;
-    return (props.segments != null) ? Math.max(0, c - 2) : c;
+    return 0;
   }, [props.positions, props.indices, props.segments, count]);
 
   // Instanced draw
@@ -175,6 +186,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const hasSegments = !!props.segments;
   const defines = useMemo(() => ({
     ...defs,
+    HAS_DEPTH: depth,
     HAS_INDICES: hasIndices,
     HAS_SEGMENTS: hasSegments,
     HAS_INSTANCES: hasInstances,
@@ -196,6 +208,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
       pipeline,
       mode,
+
+      shouldDispatch,
+      onDispatch,
     })
   );
 }, 'RawFaces');

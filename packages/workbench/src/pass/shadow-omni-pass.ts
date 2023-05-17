@@ -214,7 +214,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
       const passEncoder = commandEncoder.beginRenderPass(cubeDescriptors[i]);
       passEncoder.setBindGroup(0, bindGroup);
 
-      drawToPass(cull, shadows, passEncoder, countGeometry, 1, true);
+      drawToPass(cull, shadows, passEncoder, countGeometry, uniforms, 1, true);
 
       passEncoder.end();
       

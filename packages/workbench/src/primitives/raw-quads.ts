@@ -53,7 +53,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     blend,
     mode = 'opaque',
     id = 0,
-    count = 1,
+    count = null,
   } = props;
 
   const vertexCount = 4;

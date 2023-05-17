@@ -127,7 +127,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     passEncoder.setScissorRect(x, y, w, h);
     passEncoder.setBindGroup(0, bindGroup);
 
-    drawToPass(cull, shadows, passEncoder, countGeometry);
+    drawToPass(cull, shadows, passEncoder, countGeometry, uniforms);
 
     passEncoder.end();
 

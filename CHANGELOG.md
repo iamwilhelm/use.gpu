@@ -6,6 +6,13 @@
 - `@use-gpu/shader`: Allow `chainTo` to chain `(A, ...)->B` with `(B, ...)->C` if the rest signatures match
 - `@use-gpu/workbench`: `useBoundShader` / `getBoundShader` no longer need BINDINGS passed
 
+{
+- `@use-gpu/shader`: Allow run-time @linking of struct types
+- `@use-gpu/shader`: Make function bodies formally optional
+- `@use-gpu/shader`: Throw early parse errors
+- `@use-gpu/shader`: Tree-shake root module
+}
+
 0.8.4
 - `@use-gpu/shader`: Use abstract grammar w/o comments internally, concrete grammar externally, to avoid lezer bugs.
 

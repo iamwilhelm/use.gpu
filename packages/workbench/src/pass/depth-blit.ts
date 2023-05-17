@@ -12,7 +12,7 @@ import { SHADOW_PAGE } from '../render/light/light-data';
 
 import { getFullScreenVertex } from '@use-gpu/wgsl/instance/vertex/full-screen.wgsl';
 import instanceDrawVirtualDepth from '@use-gpu/wgsl/render/vertex/virtual-depth.wgsl';
-import instanceFragmentDepth from '@use-gpu/wgsl/render/fragment/frag-depth.wgsl';
+import instanceFragmentDepthCopy from '@use-gpu/wgsl/render/fragment/depth-copy.wgsl';
 
 import { drawCall } from '../queue/draw-call';
 
@@ -30,7 +30,7 @@ export const useDepthBlit = (
 
   const [vertex, fragment] = useOne(() => {
     const vertexShader = bindBundle(instanceDrawVirtualDepth, {getVertex: getFullScreenVertex});
-    const fragmentShader = bindBundle(instanceFragmentDepth, {getFragment: getSample});
+    const fragmentShader = bindBundle(instanceFragmentDepthCopy, {getDepth: getSample});
 
     return [vertexShader, fragmentShader];
   }, getSample);

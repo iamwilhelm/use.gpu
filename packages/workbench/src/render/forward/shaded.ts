@@ -8,13 +8,15 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { drawCall } from '../../queue/draw-call';
 import { getNativeColor } from '../../hooks/useNativeColor';
 
-import { useDeviceContext } from '../../providers/device-provider';
 import { useRenderContext } from '../../providers/render-provider';
 import { useViewContext } from '../../providers/view-provider';
 import { usePassContext } from '../../providers/pass-provider';
 
 import instanceDrawVirtualShaded from '@use-gpu/wgsl/render/vertex/virtual-shaded.wgsl';
-import instanceFragmentShaded from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
+import {
+  main as instanceFragmentShaded,
+  mainWithDepth as instanceFragmentShadedDepth,
+} from '@use-gpu/wgsl/render/fragment/shaded.wgsl';
 
 import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
@@ -31,7 +33,6 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
     ...rest
   } = props;
 
-  const device = useDeviceContext();
   const renderContext = useRenderContext();
   const {colorInput, colorSpace} = renderContext;
 
@@ -39,7 +40,7 @@ export const ShadedRender: LiveComponent<ShadedRenderProps> = (props: ShadedRend
   const {layout: passLayout} = usePassContext();
 
   const vertexShader = instanceDrawVirtualShaded;
-  const fragmentShader = instanceFragmentShaded;
+  const fragmentShader = defines?.HAS_DEPTH ? instanceFragmentShadedDepth : instanceFragmentShaded;
 
   // Binds links into shader
   const [v, f] = useMemo(() => {

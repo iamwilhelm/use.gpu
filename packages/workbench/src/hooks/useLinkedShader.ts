@@ -83,13 +83,14 @@ export const useLinkedShader = (
 
     const out: ShaderModuleDescriptor[] = [];
     for (const module of modules) if (module) {
+      const {module: {entry}} = module;
       const codeKey = getBundleHash(module);
       const key = `${formatMurmur53(codeKey)}-${suffix}`;
 
       let result = MODULE_CACHE.get(key);
       if (result == null) {
         const linked = hot.get(key) ?? linkBundle(module, NO_LIBS, defines);
-        result = makeShaderModuleDescriptor(linked, `${key}-${version}`);
+        result = makeShaderModuleDescriptor(linked, `${key}-${version}`, entry);
         MODULE_CACHE.set(key, result);
       }
       out.push(result);

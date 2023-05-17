@@ -9,7 +9,7 @@ use '@use-gpu/wgsl/geometry/normal'::{ getOrthoVector };
 @link fn getVertexPosition(i: u32) -> vec4<f32> { };
 @link fn getVertexNormal(i: u32) -> vec4<f32> { };
 
-@optional @link fn transformPosition(p: vec4<f32>, i: u32) -> vec4<f32> { return p };
+@optional @link fn transformPosition(p: vec4<f32>, i: u32) -> vec4<f32> { return p; };
 @optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool, i: u32) -> vec4<f32> { return v; };
 
 @link fn getVolumeSize(i: u32) -> vec3<u32> { };

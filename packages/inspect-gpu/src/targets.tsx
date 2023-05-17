@@ -262,7 +262,11 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
           else if (layout.match(/cube/)) {
             {
               let texture = {...t, sampler: {}, variant: 'textureSample'} as any;
+<<<<<<< HEAD:packages/inspect-gpu/src/targets.tsx
               texture = getBoundShader(depthCubeShader, [decodeOctahedral, texture]);
+=======
+              texture = getBoundShader(depthCubeShader, DEPTH_CUBE_BINDINGS, [decodeOctahedral, texture]);
+>>>>>>> 4c179e44 (squash):packages/inspect/src/components/panels/output.tsx
               texture = getLambdaSource(texture, t);
               texture.format = t.format;
               texture.layout = t.layout;
@@ -272,8 +276,13 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
             {
               for (let i = 0; i < 6; ++i) {
                 let texture = {...t, layout: 'texture_2d_array<f32>'} as any;
+<<<<<<< HEAD:packages/inspect-gpu/src/targets.tsx
                 texture = getBoundShader(arrayShader, [i, texture]);
                 texture = getBoundShader(depthShader, [() => size, texture]);
+=======
+                texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, texture]);
+                texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+>>>>>>> 4c179e44 (squash):packages/inspect/src/components/panels/output.tsx
                 texture = getLambdaSource(texture, t);
                 texture.format = t.format;
                 texture.layout = t.layout + ` (face ${i + 1})`;
@@ -285,8 +294,13 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
             const [,, depth] = size;
             for (let i = 0; i < depth!; ++i) {
               let texture = t as any;
+<<<<<<< HEAD:packages/inspect-gpu/src/targets.tsx
               texture = getBoundShader(arrayShader, [i, texture]);
               texture = getBoundShader(depthShader, [() => size, texture]);
+=======
+              texture = getBoundShader(arrayShader, ARRAY_BINDINGS, [i, texture]);
+              texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+>>>>>>> 4c179e44 (squash):packages/inspect/src/components/panels/output.tsx
               texture = getLambdaSource(texture, t);
               texture.format = t.format;
               texture.layout = t.layout;
@@ -295,7 +309,11 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
           }
           else if (layout.match(/multisampled/)) {
             let texture = t as any;
+<<<<<<< HEAD:packages/inspect-gpu/src/targets.tsx
             texture = getBoundShader(depthShader, [() => size, texture]);
+=======
+            texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+>>>>>>> 4c179e44 (squash):packages/inspect/src/components/panels/output.tsx
             texture = getLambdaSource(texture, t);
             texture.format = t.format;
             texture.layout = t.layout;
@@ -303,7 +321,11 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
           }
           else {
             let texture = t as any;
+<<<<<<< HEAD:packages/inspect-gpu/src/targets.tsx
             texture = getBoundShader(depthShader, [() => size, texture]);
+=======
+            texture = getBoundShader(depthShader, DEPTH_BINDINGS, [() => size, texture]);
+>>>>>>> 4c179e44 (squash):packages/inspect/src/components/panels/output.tsx
             texture = getLambdaSource(texture, t);
             texture.format = t.format;
             texture.layout = t.layout;
@@ -333,7 +355,11 @@ const TextureViews: LiveComponent<TexturesProps> = memo((props: TexturesProps) =
         };
 
         let texture = t as any;
+<<<<<<< HEAD:packages/inspect-gpu/src/targets.tsx
         texture = getBoundShader(stencilShader, [() => size, texture]);
+=======
+        texture = getBoundShader(stencilShader, STENCIL_BINDINGS, [() => size, texture]);
+>>>>>>> 4c179e44 (squash):packages/inspect/src/components/panels/output.tsx
         texture = getLambdaSource(texture, t);
         texture.format = t.format;
         texture.layout = t.layout;

@@ -42,6 +42,7 @@ export type ShaderLitMaterialProps = {
 
 export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithChildren<ShaderLitMaterialProps>) => {
   const {
+    depth,
     fragment,
     surface,
     apply,
@@ -52,20 +53,22 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
   const {useMaterial} = useLightContext();
   const applyLights = useMaterial(apply);
 
-  const getSurface = surface;
   const getLight = applyLights ? useBoundShader(getShadedFragment, [applyLights]) : useNoBoundShader();
+  const getSurface = surface;
   const getFragment = fragment;
+  const getDepth = depth;
 
   const context = useMemo(() => ({
     solid: {
       getFragment,
     },
     shaded: {
+      getDepth,
       getFragment,
       getSurface,
       getLight,
     },
-  }), [getSurface, getLight]);
+  }), [getSurface, getLight, getDepth, getFragment]);
 
   const view = render ? render(context) : children;
   return render ?? children ? provide(MaterialContext, context, [signal(), view]) : yeet(context);

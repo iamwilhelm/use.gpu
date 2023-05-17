@@ -8,12 +8,15 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
 import { drawCall } from '../../queue/draw-call';
 
-import { useDeviceContext } from '../../providers/device-provider';
 import { usePassContext } from '../../providers/pass-provider';
 import { useViewContext } from '../../providers/view-provider';
 
-import instanceDrawVirtualDepth from '@use-gpu/wgsl/render/vertex/virtual-depth.wgsl';
+import {
+  main as instanceDrawVirtualDepth,
+  mainWithDepth as instanceDrawVirtualDepthDepth,
+} from '@use-gpu/wgsl/render/vertex/virtual-depth.wgsl';
 import instanceFragmentDepth from '@use-gpu/wgsl/render/fragment/depth.wgsl';
+import instanceFragmentDepthDepth from '@use-gpu/wgsl/render/fragment/depth-frag.wgsl';
 
 import { getScissorColor } from '@use-gpu/wgsl/mask/scissor.wgsl';
 
@@ -24,19 +27,19 @@ export const ShadowRender: LiveComponent<ShadowRenderProps> = (props: ShadowRend
     links: {
       getVertex,
       getFragment,
+      getDepth,
     },
     defines,
     pipeline: propPipeline,
     ...rest
   } = props;
 
-  const device = useDeviceContext();
   const {buffers: {shadow: [renderContext]}} = usePassContext();
 
   const {layout: globalLayout} = useViewContext();
 
-  const vertexShader = instanceDrawVirtualDepth;
-  const fragmentShader = instanceFragmentDepth;
+  const vertexShader = defines?.HAS_DEPTH ? instanceDrawVirtualDepthDepth : instanceDrawVirtualDepth;
+  const fragmentShader = defines?.HAS_DEPTH ? instanceFragmentDepthDepth : instanceFragmentDepth;
 
   const pipeline = useOne(() => patch(propPipeline, {
     multisample: { count: 1 },
@@ -48,12 +51,13 @@ export const ShadowRender: LiveComponent<ShadowRenderProps> = (props: ShadowRend
     const links = {
       getVertex,
       getFragment,
+      getDepth,
       getScissor: defines?.HAS_SCISSOR ? getScissorColor : null,
     };
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment]);
+  }, [vertexShader, fragmentShader, getVertex, getFragment, getDepth]);
 
   // Inline the render fiber
   const call = {

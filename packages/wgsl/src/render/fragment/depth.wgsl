@@ -4,7 +4,7 @@
   color: vec4<f32>,
   uv: vec4<f32>,
   st: vec4<f32>,
-) -> @infer(T) T {}
+) -> @infer(T) T {};
 
 @optional @link fn getScissor(color: vec4<f32>, scissor: vec4<f32>) -> vec4<f32> { return color; }
 

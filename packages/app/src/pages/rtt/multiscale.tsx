@@ -202,13 +202,13 @@ const compositeShader = wgsl`
 
     var d = pixelSize * 1.0;
     var gy: vec2<f32>; // green pixel gradient vector
-    gy.x = getTexture(pixel - vec2(1.,0.)*d).y - getTexture(pixel + vec2(1.,0.)*d).y;
-    gy.y = getTexture(pixel - vec2(0.,1.)*d).y - getTexture(pixel + vec2(0.,1.)*d).y;
+    gy.x = getTexture(pixel - vec2<f32>(1.,0.)*d).y - getTexture(pixel + vec2<f32>(1.,0.)*d).y;
+    gy.y = getTexture(pixel - vec2<f32>(0.,1.)*d).y - getTexture(pixel + vec2<f32>(0.,1.)*d).y;
 
     d = pixelSize * 4.0;
     var gz: vec2<f32>; // blue blur2 gradient vector
-    gz.x += getBlur2(pixel - vec2(1.,0.)*d).z - getBlur2(pixel + vec2(1.,0.)*d).z;
-    gz.y += getBlur2(pixel - vec2(0.,1.)*d).z - getBlur2(pixel + vec2(0.,1.)*d).z;
+    gz.x += getBlur2(pixel - vec2<f32>(1.,0.)*d).z - getBlur2(pixel + vec2<f32>(1.,0.)*d).z;
+    gz.y += getBlur2(pixel - vec2<f32>(0.,1.)*d).z - getBlur2(pixel + vec2<f32>(0.,1.)*d).z;
 
     color.y = getTexture(pixel + gz*pixelSize*64.).y*0.4 - (gz.x + gz.y)*0.4 + 0.4; // gradient enhancement and refraction
     color.z = getBlur4(pixel + 4.*gy - gz ).z*1.75 -0.0; // scatter/refract
@@ -220,7 +220,7 @@ const compositeShader = wgsl`
 
     color.y += color.x; // red -> yellow
 
-    let s = vec2(0.75, 1.0) - getBlur4(pixel).z*1.5; // shadow
+    let s = vec2<f32>(0.75, 1.0) - getBlur4(pixel).z*1.5; // shadow
     color.y *= s.x;
     color.z *= s.y;
     color.z += getTexture(pixel).z*1.5; // repaint over shadow

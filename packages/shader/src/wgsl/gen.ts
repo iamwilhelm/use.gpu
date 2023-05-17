@@ -38,9 +38,12 @@ const getTypeKey = (b: DataBinding) =>
   (+!!(b.storage?.volatile || b.texture?.volatile)) * 16;
 
 const getFormatKey = (b: DataBinding) => 
-  toMurmur53(b.storage?.format ?? b.texture?.format) ^
-  toMurmur53(b.texture?.layout) ^
-  toMurmur53(b.texture?.absolute);
+  b.texture ? toMurmur53(b.texture?.format) ^
+              toMurmur53(b.texture?.layout) ^
+              toMurmur53(b.texture?.variant) ^
+              toMurmur53(b.texture?.absolute) :
+  b.storage ? toMurmur53(b.storage?.format) :
+  0;
 
 const getBindingsKey = (bs: DataBinding[]) => scrambleBits(bs.reduce((a, b) => mixBits(a, getTypeKey(b) ^ getFormatKey(b)), 0)) >>> 0;
 const getValueKey = (b: DataBinding) => getObjectKey(b.constant ?? b.storage ?? b.texture);

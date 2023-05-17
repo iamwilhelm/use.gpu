@@ -1,7 +1,12 @@
 import type { LiveFiber, Task } from './types';
-import { use, keyed, detach, provide, gather, yeet, reconcile, quote, unquote, PROVIDE, makeContext } from './builtin';
+import {
+  use, keyed, detach, provide, capture, gather, yeet, reconcile, quote, unquote,
+  PROVIDE,
+  makeContext, makeCapture,
+  captureValues,
+} from './builtin';
 import { renderFiber } from './fiber';
-import { memoArgs, useState, useContext } from './hooks';
+import { memoArgs, useState, useContext, useCapture } from './hooks';
 import { renderSync } from './tree';
 import { formatTree } from './debug';
 
@@ -45,11 +50,11 @@ it("mounts multiple", () => {
 
 it("detaches a subfiber", () => {
 
-  let captureSubFiber: LiveFiber<any> | null = null;
+  let keepSubFiber: LiveFiber<any> | null = null;
 
   const Root = () =>
     detach(use(Sub), (render: () => void, mount: LiveFiber<any>) => {
-      captureSubFiber = mount;
+      keepSubFiber = mount;
       render();
     });
 
@@ -62,11 +67,11 @@ it("detaches a subfiber", () => {
   expect(result.mount).toBeTruthy();
   expect(result.mount!.next).toBeTruthy();
 
-  expect(captureSubFiber).toBeTruthy();
-  if (captureSubFiber != null) {
-    const {mount} = captureSubFiber;
+  expect(keepSubFiber).toBeTruthy();
+  if (keepSubFiber != null) {
+    const {mount} = keepSubFiber;
     // @ts-ignore
-    expect(captureSubFiber.f).toBe(Sub);
+    expect(keepSubFiber.f).toBe(Sub);
     // @ts-ignore
     expect(mount && mount.f).toBe(Node);
   }
@@ -629,6 +634,55 @@ it("gathers yeeted values", () => {
   const {host: {flush}} = result;
   if (flush) flush();
   
+  expect(formatTree(result)).toMatchSnapshot();
+});
+
+it("captures values", () => {
+  
+  const context = makeCapture<number>();
+
+  const Root = () => {
+    return capture(context, [
+      use(Value(1)),
+      use(Value(2)),
+      use(Value(3)),
+    ], (map: LiveMap<number>) => use(Node, captureValues(map)));
+  };
+
+  const Value = (value: number) => () => useCapture(context, value);
+  const Node = () => {};
+
+  const result = renderSync(use(Root));
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  if (flush) flush();
+
+  expect(formatTree(result)).toMatchSnapshot();
+});
+
+it("yeets from capture", () => {
+
+  const context = makeCapture<number>();
+
+  const Root = () => {
+    return gather(capture(context, [
+      yeet(1),
+      yeet(2),
+      use(Value(3)),
+      use(Value(4)),
+    ], (map: LiveMap<number>) => yeet(captureValues(map))), (values: number[]) => use(Node, values));
+  };
+
+  const Value = (value: number) => () => useCapture(context, value);
+  const Node = () => {};
+
+  const result = renderSync(use(Root));
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  if (flush) flush();
+
   expect(formatTree(result)).toMatchSnapshot();
 });
 

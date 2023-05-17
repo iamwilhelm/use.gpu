@@ -1,8 +1,5 @@
-import type { DataTexture, ExternalTexture, DataBinding, TextureSource } from './types';
+import type { DataTexture, ExternalTexture, DataBinding, Point, Point3, TextureSource } from './types';
 import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './constants';
-
-type Point = [number, number];
-type Point3 = [number, number, number];
 
 const NO_OFFSET = [0, 0, 0] as Point3;
 
@@ -121,11 +118,12 @@ export const uploadDataTexture = (
   device: GPUDevice,
   texture: GPUTexture,
   dataTexture: DataTexture,
+  mipLevel: GPUIntegerCoordinate = 0,
 ): void => {
   const {data, size, format} = dataTexture;
 
   const layout = makeTextureDataLayout(size, format ?? 'rgba8unorm');
-  uploadTexture(device, texture, data, layout, size);
+  uploadTexture(device, texture, data, layout, size, undefined, mipLevel);
 }
 
 export const uploadTexture = (

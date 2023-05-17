@@ -1,6 +1,6 @@
 {
   "name": "use.gpu",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "main": "index.js",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -129,10 +129,11 @@
     "packages/scene",
     "packages/webgpu",
     "packages/gltf",
-    "packages/plot",
-    "packages/layout",
     "packages/map",
+    "packages/layout",
+    "packages/plot",
     "packages/present",
+    "packages/voxel",
     "packages/inspect",
     "packages/inspect-gpu",
     "packages/app"

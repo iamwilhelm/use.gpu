@@ -8,7 +8,6 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 import { drawCall } from '../../queue/draw-call';
 import { getNativeColor } from '../../hooks/useNativeColor';
 
-import { useDeviceContext } from '../../providers/device-provider';
 import { useRenderContext } from '../../providers/render-provider';
 import { useViewContext } from '../../providers/view-provider';
 import { usePassContext } from '../../providers/pass-provider';
@@ -27,7 +26,6 @@ export const UIRender: LiveComponent<UIRenderProps> = (props: UIRenderProps) => 
     ...rest
   } = props;
 
-  const device = useDeviceContext();
   const renderContext = useRenderContext();
   const {colorInput, colorSpace} = renderContext;
 

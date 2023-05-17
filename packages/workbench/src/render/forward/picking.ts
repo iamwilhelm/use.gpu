@@ -7,7 +7,6 @@ import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
 
 import { drawCall } from '../../queue/draw-call';
 
-import { useDeviceContext } from '../../providers/device-provider';
 import { usePassContext } from '../../providers/pass-provider';
 import { useViewContext } from '../../providers/view-provider';
 
@@ -27,7 +26,6 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
     ...rest
   } = props;
 
-  const device = useDeviceContext();
   const {buffers: {picking: [renderContext]}} = usePassContext();
 
   const {layout: globalLayout} = useViewContext();

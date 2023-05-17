@@ -18,10 +18,11 @@
     { "path": "./packages/scene" },
     { "path": "./packages/webgpu" },
     { "path": "./packages/gltf" },
-    { "path": "./packages/plot" },
-    { "path": "./packages/layout" },
     { "path": "./packages/map" },
+    { "path": "./packages/layout" },
+    { "path": "./packages/plot" },
     { "path": "./packages/present" },
+    { "path": "./packages/voxel" },
     { "path": "./packages/inspect" },
     { "path": "./packages/inspect-gpu" },
     { "path": "./packages/app" }

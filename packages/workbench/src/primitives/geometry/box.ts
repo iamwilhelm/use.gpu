@@ -6,6 +6,7 @@ type BoxGeometryProps = {
   height?: number,
   depth?: number,
   uvw?: boolean,
+  offset?: [number, number] | [number, number, number],
   tile?: [number, number] | [number, number, number],
 };
 
@@ -14,6 +15,7 @@ export const makeBoxGeometry = ({
   height = width,
   depth = width,
   uvw = false,
+  offset = [0, 0, 0],
   tile = [1, 1, 1],
 }: BoxGeometryProps = {}): Geometry => {
   const count = 36;
@@ -33,10 +35,10 @@ export const makeBoxGeometry = ({
     normalEmitter(x, y, z, 0);
 
   const emitUV = (x: number, y: number) =>
-    uvEmitter(x * tile[0], y * tile[1], 0, 0);
+    uvEmitter(x * tile[0] + offset[0], y * tile[1] + offset[1], 0, 0);
 
   const emitUVW = (x: number, y: number, z: number) =>
-    uvEmitter(x * tile[0], y * tile[1], z * ((tile as any)[2] ?? 1), 0);
+    uvEmitter(x * tile[0] + offset[0], y * tile[1] + offset[1], z * ((tile as any)[2] ?? 1) + ((offset as any)[2] ?? 0), 0);
 
   emitPosition(1, 1, -1);
   emitPosition(-1, -1, -1);

@@ -134,7 +134,7 @@ caseBody {
 }
 
 loopStatement { k<'loop'> '{' Statement* ContinuingStatement? '}' }
-forStatement { k<'for'> '(' forHeader '}' CompoundStatement }
+forStatement { k<'for'> '(' forHeader ')' CompoundStatement }
 forHeader { forInit? semicolon expression? semicolon forUpdate? }
 forInit { variableStatement | assignmentStatement | funcCallStatement }
 forUpdate { incrementStatement | decrementStatement | assignmentStatement | funcCallStatement }
@@ -300,20 +300,20 @@ TypeDeclaration {
   t<'f32'> |
   t<'i32'> |
   t<'u32'> |
-  t<'vec2'> template<TypeDeclaration> |
-  t<'vec3'> template<TypeDeclaration> |
-  t<'vec4'> template<TypeDeclaration> |
+  t<'vec2'> template<TypeDeclaration>? |
+  t<'vec3'> template<TypeDeclaration>? |
+  t<'vec4'> template<TypeDeclaration>? |
   t<'ptr'> template<addressSpace comma TypeDeclaration (comma accessMode)?> |
   arrayTypeDeclaration |
-  t<'mat2x2'> template<TypeDeclaration> |
-  t<'mat2x3'> template<TypeDeclaration> |
-  t<'mat2x4'> template<TypeDeclaration> |
-  t<'mat3x2'> template<TypeDeclaration> |
-  t<'mat3x3'> template<TypeDeclaration> |
-  t<'mat3x4'> template<TypeDeclaration> |
-  t<'mat4x2'> template<TypeDeclaration> |
-  t<'mat4x3'> template<TypeDeclaration> |
-  t<'mat4x4'> template<TypeDeclaration> |
+  t<'mat2x2'> template<TypeDeclaration>? |
+  t<'mat2x3'> template<TypeDeclaration>? |
+  t<'mat2x4'> template<TypeDeclaration>? |
+  t<'mat3x2'> template<TypeDeclaration>? |
+  t<'mat3x3'> template<TypeDeclaration>? |
+  t<'mat3x4'> template<TypeDeclaration>? |
+  t<'mat4x2'> template<TypeDeclaration>? |
+  t<'mat4x3'> template<TypeDeclaration>? |
+  t<'mat4x4'> template<TypeDeclaration>? |
   t<'atomic'> template<TypeDeclaration> |
   textureSamplerTypes
 }

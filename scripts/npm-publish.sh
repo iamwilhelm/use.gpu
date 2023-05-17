@@ -17,6 +17,7 @@ yarn publish --ignore-scripts --access public build/packages/scene
 yarn publish --ignore-scripts --access public build/packages/shader
 yarn publish --ignore-scripts --access public build/packages/state
 yarn publish --ignore-scripts --access public build/packages/traits
+yarn publish --ignore-scripts --access public build/packages/voxel
 yarn publish --ignore-scripts --access public build/packages/webgpu
 yarn publish --ignore-scripts --access public build/packages/wgsl
 yarn publish --ignore-scripts --access public build/packages/wgsl-loader

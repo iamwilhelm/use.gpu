@@ -1,5 +1,15 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`captures values 1`] = `
+"<Root> 
+  <Capture(undefined)> {displayName={undefined},capture={true}} [<Node> ,<Node> ,<Node> ] map => (0, _builtin.use)(Node, (0, _builtin.captureValues)(map))
+    <Node> 
+    <Node> 
+    <Node> 
+    <Resume(undefined)> map => (0, _builtin.use)(Node, (0, _builtin.captureValues)(map))
+      <Node> [1,2,3]"
+`;
+
 exports[`gathers yeeted values 1`] = `
 "<Root> 
   <Yeet> 1
@@ -48,4 +58,16 @@ exports[`renders quoted/unquoted trees 1`] = `
         <Second> <Unquote> <First> <Quote> <Second> <Unquote> <First> <First> <Quote> <Second> 
           <Second> <Unquote> <First> <First> <Quote> <Second> 
             <Second> "
+`;
+
+exports[`yeets from capture 1`] = `
+"<Root> 
+  <Capture(undefined)> {displayName={undefined},capture={true}} [{f={() => {}},arg={1},key={undefined},by={51}},{f={() => {}},arg={2},key={undefined},by={51}},<Node> ,<Node> ] map => (0, _builtin.yeet)((0, _builtin.captureValues)(map))
+    <Yeet> 1
+    <Yeet> 2
+    <Node> 
+    <Node> 
+    <Resume(undefined)> map => (0, _builtin.yeet)((0, _builtin.captureValues)(map))
+  <Resume(Root)> values => (0, _builtin.use)(Node, values)
+    <Node> [1,2,3,4]"
 `;

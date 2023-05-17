@@ -38,6 +38,13 @@ struct ViewUniforms {
   return viewUniforms.inverseProjectionViewMatrix * position;
 }
 
+@export fn worldToDepth(position: vec4<f32>) -> f32 {
+  let pvm = viewUniforms.projectionViewMatrix;
+  let z = dot(vec4<f32>(pvm[0][2], pvm[1][2], pvm[2][2], pvm[3][2]), position);
+  let w = dot(vec4<f32>(pvm[0][3], pvm[1][3], pvm[2][3], pvm[3][3]), position);
+  return z / w;
+}
+
 @export fn clipToWorld3D(position: vec4<f32>) -> vec4<f32> {
   return to3D(clipToWorld(position));
 }

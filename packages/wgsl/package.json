@@ -399,15 +399,20 @@
       "import": "./src/render/fragment/deferred-solid.wgsl",
       "require": "./src/render/fragment/deferred-solid.wgsl"
     },
+    "./render/fragment/depth-copy.wgsl": {
+      "types": "./src/render/fragment/depth-copy.wgsl.d.ts",
+      "import": "./src/render/fragment/depth-copy.wgsl",
+      "require": "./src/render/fragment/depth-copy.wgsl"
+    },
+    "./render/fragment/depth-frag.wgsl": {
+      "types": "./src/render/fragment/depth-frag.wgsl.d.ts",
+      "import": "./src/render/fragment/depth-frag.wgsl",
+      "require": "./src/render/fragment/depth-frag.wgsl"
+    },
     "./render/fragment/depth.wgsl": {
       "types": "./src/render/fragment/depth.wgsl.d.ts",
       "import": "./src/render/fragment/depth.wgsl",
       "require": "./src/render/fragment/depth.wgsl"
-    },
-    "./render/fragment/frag-depth.wgsl": {
-      "types": "./src/render/fragment/frag-depth.wgsl.d.ts",
-      "import": "./src/render/fragment/frag-depth.wgsl",
-      "require": "./src/render/fragment/frag-depth.wgsl"
     },
     "./render/fragment/pick.wgsl": {
       "types": "./src/render/fragment/pick.wgsl.d.ts",

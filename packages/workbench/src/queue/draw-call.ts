@@ -1,4 +1,4 @@
-import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
+import type { LiveComponent, ArrowFunction, Ref } from '@use-gpu/live';
 import type { DataBounds, TypedArray, StorageSource, RenderPassMode, Lazy, UniformLayout, UniformAttribute, UseGPURenderContext, VolatileAllocation } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import type { Update } from '@use-gpu/state';
@@ -43,12 +43,12 @@ export type DrawCallProps = {
 
   globalBinding?: (pipeline: GPURenderPipeline) => VolatileAllocation,
   globalDefs?: UniformAttribute[][],
-  globalUniforms?: Record<string, Lazy<any>>,
+  globalUniforms?: Record<string, Ref<any>>,
 
   renderContext: UseGPURenderContext,
 
-  shouldDispatch?: () => boolean | number | undefined,
-  onDispatch?: () => void,
+  shouldDispatch?: (uniforms: Record<string, Ref<any>>) => boolean | number | undefined,
+  onDispatch?: (uniforms: Record<string, Ref<any>>) => void,
 
   defines?: Record<string, any>,
 };
@@ -210,9 +210,10 @@ export const drawCall = (props: DrawCallProps) => {
   const inner = (
     passEncoder: GPURenderPassEncoder,
     countGeometry: (v: number, t: number) => void,
+    uniforms: Record<string, Ref<any>>,
     flip?: boolean,
   ) => {
-    onDispatch && onDispatch();
+    onDispatch && onDispatch(uniforms);
 
     const v = resolve(vertexCount || 0);
     const i = resolve(instanceCount || 0);
@@ -258,16 +259,17 @@ export const drawCall = (props: DrawCallProps) => {
     draw = (
       passEncoder: GPURenderPassEncoder,
       countGeometry: (v: number, t: number) => void,
+      uniforms: Record<string, Ref<any>>,
       flip?: boolean,
     ) => {
-      const d = shouldDispatch();
+      const d = shouldDispatch(uniforms);
       if (d === false) return;
       if (typeof d === 'number') {
         if (dispatchVersion === d) return;
         dispatchVersion = d;
       }
       
-      return inner(passEncoder, countGeometry, flip);
+      return inner(passEncoder, countGeometry, uniforms, flip);
     };
   }
 

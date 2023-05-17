@@ -1,0 +1,22 @@
+{
+  "name": "@use-gpu/voxel",
+  "version": "0.8.1",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "dependencies": {
+    "@use-gpu/workbench": "*"
+  },
+  "scripts": {
+    "build": "NPM_PACKAGE=voxel ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "echo 'jest --collect-coverage' disabled",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch"
+  },
+  "keywords": [
+    "use-gpu",
+    "use-gpu-components"
+  ]
+}

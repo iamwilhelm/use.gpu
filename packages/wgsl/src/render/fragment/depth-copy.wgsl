@@ -1,4 +1,4 @@
-@optional @link fn getFragment(
+@optional @link fn getDepth(
   color: vec4<f32>,
   uv: vec4<f32>,
   st: vec4<f32>,
@@ -14,5 +14,5 @@ fn main(
 ) -> @builtin(frag_depth) f32 {
 
   var outColor = vec4<f32>(1.0, 1.0, 1.0, fragAlpha);
-  return getFragment(outColor, fragUV, fragST).r;
+  return getDepth(outColor, fragUV, fragST).r;
 }

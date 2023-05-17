@@ -37,7 +37,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
 
   const device = useDeviceContext();
   const pickingContext = usePickingContext();
-  const {cull, bind} = useViewContext();
+  const {cull, bind, uniforms} = useViewContext();
 
   const {renderContext} = pickingContext;
 
@@ -59,7 +59,7 @@ export const PickingPass: LC<PickingPassProps> = memo((props: PropsWithChildren<
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     bind(passEncoder);
 
-    drawToPass(cull, pickings, passEncoder, countGeometry);
+    drawToPass(cull, pickings, passEncoder, countGeometry, uniforms);
 
     passEncoder.end();
 

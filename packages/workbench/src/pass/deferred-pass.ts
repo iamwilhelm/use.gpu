@@ -48,7 +48,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
   const device = useDeviceContext();
   const renderContext = useRenderContext();
   const {width, height, depthTexture} = renderContext;
-  const {bind: bindGlobal, cull} = useViewContext();
+  const {bind: bindGlobal, cull, uniforms} = useViewContext();
   const {bind: makeBindPass, buffers: {gbuffer: [gbuffer]}} = usePassContext();
 
   if (!depthTexture) throw new Error("Deferred renderer requires a depth buffer");
@@ -98,7 +98,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
     {
       const passEncoder = commandEncoder.beginRenderPass(deferredPassDescriptor);
       bindGlobal(passEncoder);
-      drawToPass(cull, opaques, passEncoder, countGeometry);
+      drawToPass(cull, opaques, passEncoder, countGeometry, uniforms);
       passEncoder.end();
     }
 
@@ -113,7 +113,7 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       bindGlobal(passEncoder);
       bindPass(passEncoder);
 
-      drawToPass(cull, stencils, passEncoder, countGeometry);
+      drawToPass(cull, stencils, passEncoder, countGeometry, uniforms);
       passEncoder.end();
     }
 
@@ -122,9 +122,9 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
       bindGlobal(passEncoder);
       bindPass(passEncoder);
 
-      drawToPass(cull, lights, passEncoder, countGeometry);
-      drawToPass(cull, transparents, passEncoder, countGeometry, -1);
-      drawToPass(cull, debugs, passEncoder, countGeometry);
+      drawToPass(cull, lights, passEncoder, countGeometry, uniforms);
+      drawToPass(cull, transparents, passEncoder, countGeometry, uniforms, -1);
+      drawToPass(cull, debugs, passEncoder, countGeometry, uniforms);
       passEncoder.end();
     }
 

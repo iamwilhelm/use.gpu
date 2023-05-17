@@ -73,6 +73,11 @@
 
 ////
 
+@export struct DepthFragment {
+  alpha: f32,
+  depth: f32,
+};
+
 @export struct SurfaceFragment {
   position: vec4<f32>,
   normal: vec4<f32>,

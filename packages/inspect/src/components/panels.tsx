@@ -1,6 +1,6 @@
 import type { LiveFiber } from '@use-gpu/live';
 import type { InspectAddIns } from './types';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 
 import { Inset } from './layout';
 import { useAddIns } from './add-ins';
@@ -21,13 +21,16 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
   const [first] = panels;
   if (!first) return null;
 
-  const active = panels.filter((panel) => panel.enabled(fiber, fibers));
-
   usePingContext();
+
+  const active = panels.filter((panel) => panel.enabled(fiber, fibers));
+  let [tab, setTab] = useState<string>(first.id);
+  
+  if (!active.find((panel) => panel.id === tab)) tab = first.id;
 
   return (
     <Inset>
-      <Tabs.Root defaultValue={first.id}>
+      <Tabs.Root value={tab} onValueChange={setTab}>
         <Tabs.List>
           {active.map((panel) => (
             <Tabs.Trigger key={panel.id} value={panel.id}>

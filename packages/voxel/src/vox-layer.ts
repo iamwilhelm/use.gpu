@@ -103,7 +103,7 @@ fn traceIntoVolume(origin: vec3<f32>, ray: vec3<f32>, size: vec3<i32>) -> VoxelH
     var uvw = vec3<i32>(floor(pos));
     let index = getTexture0(uvw, 0u);
     if (index > 0u) {
-      return VoxelHit(pos, -ray, index, 100);
+      return VoxelHit(pos, -ray, index, 1u);
     }
   }
 
@@ -257,9 +257,8 @@ fn traceVolumeSteps(
   
   if (DEBUG_STEPS) {
     let t = f32(hit.steps) / 64.0;
-    let stripe = f32(hit.steps & 1) * 0.025 * 0.0;
     albedo = vec4<f32>(0.0, 0.0, 0.0, 1.0);
-    emissive = max(vec4<f32>(0.0), vec4<f32>(t * t * t, t, 1.0 - t, 0.0)) + stripe;
+    emissive = max(vec4<f32>(0.0), vec4<f32>(t * t * t, t, 1.0 - t, 0.0));
     emissive = mix(emissive, emissive * emissive, .75);
     material = vec4<f32>(0.0);
   }

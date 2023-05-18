@@ -48,9 +48,9 @@ const ANIMATED_LIGHT = Array(N+1).fill(0).map((_, i) => [
 ]) as Keyframe<any>[];
 
 const STATIC_LIGHTS = [
-  [[-15, 5, -20, 1], [1, .5, .5, 1]],
-  [[-20, 15, 10, 1], [.5, .75, 1, 1]],
-];
+  [[-15, 12, -28, 1], [1, .5, .5, 1], 40*40*.5],
+  [[-20, 15, 10, 1], [.5, .75, 1, 1], 40*40*.25],
+] as [number[], number[], number][];
 
 const WHITE = [1, 1, 1, 1];
 
@@ -61,8 +61,8 @@ export const GeometryVoxelPage: LC = () => {
 
   const planeGeometry = makePlaneGeometry({ width: 100, height: 100, axes: 'yx' });
 
-  const renderLight = (position: number[], color: number[]) => (<>
-    <PointLight position={position} color={color} intensity={40*40*.5} shadowMap={SHADOW_MAP_POINT} />
+  const renderLight = (position: number[], color: number[], intensity: number) => (<>
+    <PointLight position={position} color={color} intensity={intensity} shadowMap={SHADOW_MAP_POINT} />
     <PointLayer count={1} size={20} position={position} color={color} />
   </>);
 
@@ -78,17 +78,14 @@ export const GeometryVoxelPage: LC = () => {
           <Camera>
             <Pass lights shadows>
               <AmbientLight color={[1, 1, 1, 1]} intensity={0.01} />
-              
-              <Animate ease="linear" keyframes={ANIMATED_LIGHT} prop="position" render={(position) => renderLight(position, WHITE)} />
-              {STATIC_LIGHTS.map(([position, color]) => renderLight(position, color))}
-            
+
               <Scene>
                 <Node rotation={[90, 180, 0]}>
                   <Primitive>
                     <Plot>
                       <Cartesian
-                        range={[[-9, 9], [-24, 24], [-10, 10]]}
-                        scale={[9, 24, 10]}
+                        range={[[-9, 9], [-25, 25], [-10, 10]]}
+                        scale={[9, 25, 10]}
                       >
                         <Grid
                           origin={[0, 0, -11]}
@@ -124,7 +121,7 @@ export const GeometryVoxelPage: LC = () => {
                   <Node position={[0, 0, -11]} rotation={[0, 180, 0]}>
                     <GeometryData
                       geometry={planeGeometry}
-                      render={(planeMesh: Record<string, ShaderSource>) => 
+                      render={(planeMesh: Record<string, ShaderSource>) =>
                         <PBRMaterial albedo={0x808080} roughness={0.7}>
                           <Mesh
                             mesh={planeMesh}
@@ -137,20 +134,24 @@ export const GeometryVoxelPage: LC = () => {
                   </Node>
                 </Node>
               </Scene>
+
+              <Animate ease="linear" keyframes={ANIMATED_LIGHT} prop="position" render={(position) => renderLight(position, WHITE, 40*40)} />
+              {STATIC_LIGHTS.map(([position, color, intensity]) => renderLight(position, color, intensity))}
+
             </Pass>
           </Camera>
         </LinearRGB>
       </Loop>
     </DebugProvider>
   );
-  
+
   const root = document.querySelector('#use-gpu .canvas');
-  
+
   return (
     <VoxControls
       container={root}
       hasShowIterations
-      render={({showIterations}) => 
+      render={({showIterations}) =>
         view(showIterations)
       }
     />
@@ -159,8 +160,8 @@ export const GeometryVoxelPage: LC = () => {
 
 const Camera = ({children}: PropsWithChildren<object>) => (
   <OrbitControls
-    radius={55}
-    bearing={-1.0}
+    radius={60}
+    bearing={2.2}
     pitch={0.5}
     render={(radius: number, phi: number, theta: number, target: vec3) =>
       <OrbitCamera

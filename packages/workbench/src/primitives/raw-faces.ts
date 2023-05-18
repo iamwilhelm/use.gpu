@@ -59,8 +59,8 @@ export type RawFacesProps = {
   fragDepth?: boolean,
   count?: Lazy<number>,
 
-  shouldDispatch: (u: Record<string, any>) => boolean | number | null,
-  onDispatch: (u: Record<string, any>) => void,
+  shouldDispatch?: (u: Record<string, any>) => boolean | number | null,
+  onDispatch?: (u: Record<string, any>) => void,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];

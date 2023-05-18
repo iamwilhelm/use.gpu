@@ -22,7 +22,7 @@ export const DEBUG_DEFAULTS = {
 
 export type DebugContextProps = {
   voxel: {
-    iterations: false,
+    iterations: boolean,
   },
   sdf2d: {
     contours: boolean,

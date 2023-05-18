@@ -1,5 +1,6 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Vox } from '@use-gpu/voxel';
+import type { ShaderSource } from '@use-gpu/shader';
 import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { use } from '@use-gpu/live';
@@ -44,7 +45,7 @@ const ANIMATED_LIGHT = Array(N+1).fill(0).map((_, i) => [
     20 + R * Math.sin(i / N * τ),
     1
   ],
-]);
+]) as Keyframe<any>[];
 
 const STATIC_LIGHTS = [
   [[-15, 5, -20, 1], [1, .5, .5, 1]],
@@ -123,7 +124,7 @@ export const GeometryVoxelPage: LC = () => {
                   <Node position={[0, 0, -11]} rotation={[0, 180, 0]}>
                     <GeometryData
                       geometry={planeGeometry}
-                      render={(planeMesh: Record<string, StorageSource>) => 
+                      render={(planeMesh: Record<string, ShaderSource>) => 
                         <PBRMaterial albedo={0x808080} roughness={0.7}>
                           <Mesh
                             mesh={planeMesh}

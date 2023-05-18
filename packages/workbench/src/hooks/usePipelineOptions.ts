@@ -36,6 +36,8 @@ export const usePipelineOptions = (
   Update<GPURenderPipelineDescriptor>,
   Record<string, any>,
 ] => {
+  const {samples} = useRenderContext();
+
   const {
     shadow = null,
     scissor = null,
@@ -46,10 +48,12 @@ export const usePipelineOptions = (
     depthTest = null,
     depthWrite = null,
     alphaToCoverage = false,
-    blend = (mode === 'transparent' && !alphaToCoverage) ? 'premultiplied' : 'none',
+    blend = (
+      (alphaToCoverage && samples === 1) ? 'premultiplied' :
+      (!alphaToCoverage && mode === 'transparent') ? 'premultiplied' : 'none'
+    ),
   } = options;
 
-  const {samples} = useRenderContext();
 
   const pipeline = useMemo(() => {
     const primitive = {

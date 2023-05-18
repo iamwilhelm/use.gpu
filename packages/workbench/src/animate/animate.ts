@@ -164,7 +164,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       if (render) return tracks ? render(props) : (prop ? render(props[prop]) : null);
       if (children) return extend(children, props);
 
-      return children ?? null;
+      return (children as any) ?? null;
     };
   }, [script, length, render, children]);
 

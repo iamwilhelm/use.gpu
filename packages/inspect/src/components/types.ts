@@ -13,6 +13,7 @@ export type HoverState = {
   depth: number,
 };
 export type OptionState = {
+  open: boolean,
   depth: number,
   counts: boolean,
   builtins: boolean,

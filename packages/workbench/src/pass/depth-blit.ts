@@ -22,7 +22,7 @@ const PIPELINE = {
     depthWriteEnabled: true,
     depthCompare: 'always',
   },
-};
+} as Partial<GPURenderPipelineDescriptor>;
 
 export const useDepthBlit = (
   renderContext: UseGPURenderContext,

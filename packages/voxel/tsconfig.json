@@ -5,6 +5,7 @@
     { "path": "../core" },
     { "path": "../live" },
     { "path": "../workbench" },
+    { "path": "../scene" },
   ],
   "compilerOptions": {
     "rootDir": "..",

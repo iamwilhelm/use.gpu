@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { Vox } from './types';
+import type { Vox, VoxNodeTransform } from './types';
 
 import { use, memo } from '@use-gpu/live';
 import { useDeviceContext, Fetch } from '@use-gpu/workbench';
@@ -17,7 +17,8 @@ export const VoxModel: LC<VoxModelProps> = memo((props: VoxModelProps) => {
   const {nodes} = vox;
 
   const node = name ? nodes.find((node) => node.props._name === name) : nodes[0];
-  const id = node.id || node.child;
+  const id = node?.id || (node as VoxNodeTransform).child;
+  if (!id) return null;
 
   if (flat) {
     return nodes.filter((node) => node.type === 'shape').map((node) => use(VoxNode, {vox, id: node.id}));

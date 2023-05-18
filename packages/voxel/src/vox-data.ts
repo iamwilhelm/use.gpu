@@ -1,4 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
+import type { Point, TextureSource } from '@use-gpu/core';
 import type { Vox, VoxShape } from './types';
 
 import { gather, use, yeet, useMemo } from '@use-gpu/live';
@@ -9,6 +10,7 @@ import { parseVox, getMipShape } from './lib/vox';
 
 export type VoxDataProps = {
   url?: string,
+  base?: string,
   data?: ArrayBuffer,
   render?: (vox: Vox) => LiveElement,
 };
@@ -23,7 +25,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
   } = props;
 
   // Relative URL base for .vox
-  const base = props.base ?? new URL(props.url ?? ".", location.href).href;
+  const base = props.base ?? new URL(url ?? ".", location.href).href;
 
   // Resume after loading .vox
   const Resume = ([data]: (ArrayBuffer | null)[]) => {
@@ -75,7 +77,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
     }, [device, s]);
 
     const palette = useMemo(() => {
-      const format = 'rgba8unorm-srgb';
+      const format: GPUTextureFormat = 'rgba8unorm-srgb';
       const layout = 'texture_1d<f32>';
       const variant = 'textureLoad';
       const colorSpace = 'linear';
@@ -83,7 +85,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
 
       const data = p;
       const texture = makeTexture(device, 256, 1, 1, format, usage, 1, 1, '1d');
-      const upload = {data, size: [256, 1], format};
+      const upload = {data, size: [256, 1] as Point, format};
       uploadDataTexture(device, texture, upload);
 
       const source = {

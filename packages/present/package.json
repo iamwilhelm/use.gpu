@@ -1,16 +1,12 @@
 {
   "name": "@use-gpu/present",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
   "dependencies": {
-    "@use-gpu/state": "*",
-    "@use-gpu/core": "*",
-    "@use-gpu/live": "*",
-    "@use-gpu/shader": "*",
-    "@use-gpu/workbench": "*",
-    "@use-gpu/layout": "*"
+    "@use-gpu/layout": "*",
+    "@use-gpu/workbench": "*"
   },
   "scripts": {
     "build": "NPM_PACKAGE=present ../../scripts/build-mjs-cjs.sh",

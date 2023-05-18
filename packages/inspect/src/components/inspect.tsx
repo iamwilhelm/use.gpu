@@ -20,7 +20,7 @@ import {
   SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 
-const getOptionsKey = (id: string, sub?: string = 'root') => `liveInspect[${sub}][${id}]`;
+const getOptionsKey = (id: string, sub: string = 'root') => `liveInspect[${sub}][${id}]`;
 
 type InspectFiber = Record<string, any>;
 type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
@@ -69,7 +69,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
-  const [open, updateOpen] = useOption<number>('open');
+  const [open, updateOpen] = useOption<boolean>('open');
   const toggleOpen = () => updateOpen(!open);
   const toggleInspect = useCallback(() => {
     console.log('toggleInspect')

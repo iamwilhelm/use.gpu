@@ -20,6 +20,16 @@ export type ShaderLitMaterialProps = {
   */
   fragment: ShaderModule,
 
+  /** Depth shader, for shadow passes (optional)
+  fn getDepth(
+    alpha: f32,
+    uv: vec4<f32>,
+    st: vec4<f32>,
+    position: vec4<f32>,
+  ) -> DepthFragment;
+  */
+  depth?: ShaderModule,
+
   /** Surface shader, for material properties
   
   fn getSurface(

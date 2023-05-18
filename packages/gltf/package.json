@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/gltf",
-  "version": "0.8.4",
+  "version": "0.9.0",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",

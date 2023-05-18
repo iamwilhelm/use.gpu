@@ -56,9 +56,10 @@ export type RawFacesProps = {
   unweldedLookups?: boolean,
 
   shaded?: boolean,
+  fragDepth?: boolean,
   count?: Lazy<number>,
 
-  shouldDispatch: (u: Record<string, any>) => bool | number | null,
+  shouldDispatch: (u: Record<string, any>) => boolean | number | null,
   onDispatch: (u: Record<string, any>) => void,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
@@ -68,12 +69,12 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const {
     shaded = false,
     shadow = true,
-    depth = false,
     count = null,
 
     mode = 'opaque',
     side = 'front',
     alphaToCoverage,
+    fragDepth = false,
     depthTest,
     depthWrite,
     blend,
@@ -186,7 +187,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const hasSegments = !!props.segments;
   const defines = useMemo(() => ({
     ...defs,
-    HAS_DEPTH: depth,
+    HAS_DEPTH: fragDepth,
     HAS_INDICES: hasIndices,
     HAS_SEGMENTS: hasSegments,
     HAS_INSTANCES: hasInstances,
@@ -194,7 +195,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     UNWELDED_TANGENTS: !!unweldedTangents,
     UNWELDED_UVS: !!unweldedUVs,
     UNWELDED_LOOKUPS: !!unweldedLookups,
-  }), [defs, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
+  }), [defs, fragDepth, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
   return (
     use(Virtual, {

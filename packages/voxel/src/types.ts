@@ -6,11 +6,11 @@ export type VoxFile = {
   palette: Uint32Array,
   pbr: Float32Array,
 
-  nodes: VoxNode[],
+  nodes: VoxNodeInfo[],
   materials: VoxMeta[],
   layers: VoxMeta[],
-  objects: VoxMeta[],
   cameras: VoxMeta[],
+  objects: VoxProps[],
 };
 
 export type Vox = VoxFile & {
@@ -42,7 +42,7 @@ export type VoxMeta = {
   props: VoxProps,
 };
 
-export type VoxNode = VoxNodeGroup | VoxNodeTransform | VoxNodeShape;
+export type VoxNodeInfo = VoxNodeGroup | VoxNodeTransform | VoxNodeShape;
 
 export type VoxNodeGroup = VoxMeta & {
   type: 'group',

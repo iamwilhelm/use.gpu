@@ -341,7 +341,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
 
   return gather(
     use(GeometryData, {geometry}),
-    ([mesh]: Record<string, StorageSource>) => {
+    ([mesh]: Record<string, StorageSource>[]) => {
       const {positions, normals, uvs} = mesh;
 
       const DEBUG_STEPS = useDebugContext()?.voxel?.iterations;
@@ -350,6 +350,8 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       // Get bounding box / ray transform
       const parent = useMatrixContext();
       const [matrix, inverse, ray, normal] = useOne(() => {
+        if (!parent) return [mat4.create(), mat4.create(), mat3.create(), mat3.create()];
+        
         const m = mat4.clone(parent);
         const i = mat4.clone(m);
         mat4.invert(i, i);
@@ -370,7 +372,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         const {size} = shape[0];
         const sx = size[0] / 2;
         const sy = size[1] / 2;
-        const sz = size[2] / 2;
+        const sz = (size[2] || 1) / 2;
 
         const {inverseViewMatrix, viewMatrix, viewPosition, viewNearFar} = uniforms;
         const {current: iVM} = inverseViewMatrix;
@@ -394,7 +396,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         const {size} = shape[0];
         const sx = size[0] / 2;
         const sy = size[1] / 2;
-        const sz = size[2] / 2;
+        const sz = (size[2] || 1) / 2;
 
         const {viewPosition} = uniforms;
         const {current: viewP} = viewPosition;
@@ -410,8 +412,8 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       const boundPosition = useBoundShader(vertexShader, [positions, size]);
       const getPosition = useLambdaSource(boundPosition, positions);
 
-      const insideRef = useShaderRef(false);
-      const originRef = useShaderRef([0, 0, 0]);
+      const insideRef = useShaderRef(0);
+      const originRef = useShaderRef([0, 0, 0]) as Ref<number[] | vec3>;
 
       const getSurface = useBoundShader(surfaceShader, [
         matrix, ray, normal, size, insideRef, originRef,
@@ -429,7 +431,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               positions: getPosition,
               uvs,
               normals,
-              depth: true,
+              fragDepth: true,
               shaded: true,
               shouldDispatch: (uniforms: Record<string, any>) => {
                 insideRef.current = +inside(uniforms);
@@ -440,7 +442,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               positions: getPosition,
               uvs,
               normals,
-              depth: true,
+              fragDepth: true,
               shaded: true,
               side: 'back',
               depthTest: false,

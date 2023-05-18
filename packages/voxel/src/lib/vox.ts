@@ -1,5 +1,17 @@
 import type { Point3 } from '@use-gpu/core';
-import type { RawVox, RawChunk, VoxShape, VoxNode, VoxMeta, VoxProps, VoxOptions, VoxFile } from '../types';
+import type {
+  RawVox,
+  RawChunk,
+  VoxShape,
+  VoxNodeInfo,
+  VoxNodeShape,
+  VoxNodeGroup,
+  VoxNodeTransform,  
+  VoxMeta,
+  VoxProps,
+  VoxOptions,
+  VoxFile,
+} from '../types';
 
 // Based on:
 // https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
@@ -32,7 +44,7 @@ export const parseVox = (
   data: ArrayBuffer,
   options: Partial<VoxOptions> = DEFAULT_OPTIONS,
 ): VoxFile => {
-  options = {...DEFAULT_OPTIONS, options};
+  options = {...DEFAULT_OPTIONS, ...options};
 
   const shapes: VoxShape[] = [];
   const palette = new Uint32Array(256);
@@ -42,7 +54,7 @@ export const parseVox = (
   const imap = new Uint32Array(256);
   let hasImap = false;
 
-  const nodes:     VoxNode[]  = options.nodes     ? [] : EMPTY_LIST;
+  const nodes:     VoxNodeInfo[]  = options.nodes     ? [] : EMPTY_LIST;
   const layers:    VoxMeta[]  = options.layers    ? [] : EMPTY_LIST;
   const materials: VoxMeta[]  = options.materials ? [] : EMPTY_LIST;
   const cameras:   VoxMeta[]  = options.cameras   ? [] : EMPTY_LIST;
@@ -156,7 +168,7 @@ export const getMipShape = (shape: VoxShape) => {
   }
 
   return {
-    size: [w2, h2, d2],
+    size: [w2, h2, d2] as Point3,
     data: out,
   };
 };
@@ -175,8 +187,8 @@ export const decodeTransform = (frame: VoxProps) => {
     transform[14] = z;
   }
 
-  const index1 = _r ?  (_r & 0x3) : 0;
-  const index2 = _r ? ((_r & 0xc) >> 2) : 1;
+  const index1 = _r ?  (+_r & 0x3) : 0;
+  const index2 = _r ? ((+_r & 0xc) >> 2) : 1;
 
   const min = Math.min(index1, index2);
   const max = Math.max(index1, index2);
@@ -186,9 +198,9 @@ export const decodeTransform = (frame: VoxProps) => {
     1
   );
 
-  const signX = 1 - +!!(_r & (1 << 4)) * 2;
-  const signY = 1 - +!!(_r & (1 << 5)) * 2;
-  const signZ = 1 - +!!(_r & (1 << 6)) * 2;
+  const signX = 1 - +!!(+_r & (1 << 4)) * 2;
+  const signY = 1 - +!!(+_r & (1 << 5)) * 2;
+  const signZ = 1 - +!!(+_r & (1 << 6)) * 2;
 
   transform[index1 * 4    ] = signX;
   transform[index2 * 4 + 1] = signY;
@@ -242,7 +254,7 @@ export const getNextChunk = (view: DataView, ptr: Pointer): RawChunk => {
 
   ptr.offset += length;
 
-  let children: RawChunk[];
+  let children: RawChunk[] | undefined;
   if (childrenSize) {
     children = [];
 
@@ -358,7 +370,7 @@ export const parseNTRNChunk = (view: DataView, chunk: RawChunk): VoxNodeTransfor
   const n = getInt32(view, ptr);
 
   let frame: Float32Array;
-  let frames: Float32Array[];
+  let frames: Float32Array[] | undefined;
   if (n > 1) {
     frames = [];
     for (let i = 0; i < n; ++i) frames.push(decodeTransform(getDict(view, ptr)));
@@ -389,7 +401,7 @@ export const parseNSHPChunk = (view: DataView, chunk: RawChunk): VoxNodeShape =>
   const n = getInt32(view, ptr);
   
   let model: VoxMeta;
-  let models: VoxMeta[];
+  let models: VoxMeta[] | undefined;
   if (n > 1) {
     models = [];
     for (let i = 0; i < n; ++i) {

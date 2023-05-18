@@ -69,7 +69,6 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   for (const map of shadows.values()) {
     const Component = SHADOW_TYPES[map.shadow!.type];
     if (Component) out.push(keyed(Component, map.id, {calls, map, descriptors, texture}));
-    if (Component && map.shadowMap === -1) debugger;
   }
   return out;
 }, 'ShadowPass');

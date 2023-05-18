@@ -4,10 +4,16 @@ import type { Lazy } from '@use-gpu/core';
 
 import { useOne, useNoOne } from '@use-gpu/live';
 
-export const useShaderRef = <T>(
+interface UseShaderRef<T> {
+  <T>(value: T): Ref<NonNullable<T>>;
+  <T>(value?: T): Ref<NonNullable<T>> | null;
+  <T>(value: T, source?: ShaderSource): Ref<NonNullable<T>> | ShaderSource | null;
+};
+
+export const useShaderRef: UseShaderRef<unknown> = (<T>(
   value?: T,
   source?: ShaderSource,
-): ShaderSource | (() => T) | Ref<T> | null => {
+) => {
   if (source) {
     useNoOne();
     return source;
@@ -28,7 +34,7 @@ export const useShaderRef = <T>(
   const ref = useOne(() => ({current: value}));
   ref.current = value;
   return ref;
-};
+}) as any;
 
 export const useNoShaderRef = useNoOne;
 

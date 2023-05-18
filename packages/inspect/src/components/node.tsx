@@ -23,9 +23,9 @@ type NodeProps = {
   parents?: boolean,
   depth?: number,
   runCount?: boolean,
-  onClick?: Action,
-  onMouseEnter?: Action,
-  onMouseLeave?: Action,
+  onClick?: (e: any) => void,
+  onMouseEnter?: (e: any) => void,
+  onMouseLeave?: (e: any) => void,
 };
 
 export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
@@ -85,7 +85,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   const handleClick = useCallback((e: any) => {
     e.stopPropagation();
     e.preventDefault();
-    onClick && onClick();
+    onClick && onClick(e);
   }, [onClick]);
 
   const name = formatNodeName(fiber);

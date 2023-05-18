@@ -1,8 +1,9 @@
 struct ViewUniforms {
-  projectionMatrix: mat4x4<f32>,
   projectionViewMatrix: mat4x4<f32>,
-  inverseProjectionViewMatrix: mat4x4<f32>,
+  projectionMatrix: mat4x4<f32>,
   viewMatrix: mat4x4<f32>,
+  inverseProjectionViewMatrix: mat4x4<f32>,
+  inverseViewMatrix: mat4x4<f32>,
   viewPosition: vec4<f32>,
   viewNearFar: vec2<f32>,
   viewResolution: vec2<f32>,
@@ -17,6 +18,7 @@ struct ViewUniforms {
 @export fn getViewResolution() -> vec2<f32> { return viewUniforms.viewResolution; }
 @export fn getViewSize() -> vec2<f32> { return viewUniforms.viewSize; }
 @export fn getViewNearFar() -> vec2<f32> { return viewUniforms.viewNearFar; }
+@export fn getViewPixelRatio() -> vec2<f32> { return viewUniforms.viewPixelRatio; }
 
 @export fn to3D(position: vec4<f32>) -> vec3<f32> {
   return position.xyz / position.w;

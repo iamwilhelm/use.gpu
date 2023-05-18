@@ -4,11 +4,15 @@ import { mat4, vec3, vec4 } from 'gl-matrix';
 
 export const VIEW_UNIFORMS: UniformAttribute[] = [
   {
+    name: 'projectionViewMatrix',
+    format: 'mat4x4<f32>',
+  },
+  {
     name: 'projectionMatrix',
     format: 'mat4x4<f32>',
   },
   {
-    name: 'projectionViewMatrix',
+    name: 'viewMatrix',
     format: 'mat4x4<f32>',
   },
   {
@@ -16,7 +20,7 @@ export const VIEW_UNIFORMS: UniformAttribute[] = [
     format: 'mat4x4<f32>',
   },
   {
-    name: 'viewMatrix',
+    name: 'inverseViewMatrix',
     format: 'mat4x4<f32>',
   },
   {

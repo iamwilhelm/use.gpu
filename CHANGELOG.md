@@ -5,7 +5,7 @@
 - `@use-gpu/present`: New presentation system on top of `@use-gpu/layout`: `<Present>` / `<Slide>` / `<Step>`
 - `@use-gpu/shader`: Allow `chainTo` to chain `(A, ...)->B` with `(B, ...)->C` if the rest signatures match
 - `@use-gpu/shader`: Allow run-time @linking of struct types
-- `@use-gpu/shader`: Tree-shake root module
+- `@use-gpu/voxel`: Teardown-style raytracer for .vox voxel models
 - `@use-gpu/workbench`: `useBoundShader` / `getBoundShader` no longer need BINDINGS passed
 
 0.8.4

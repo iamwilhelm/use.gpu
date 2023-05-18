@@ -138,7 +138,8 @@ const depthShader = wgsl`
     let iuv = vec2<i32>(uv * getSize());
     let depth = getDepth(iuv, 0).x;
 
-    let d = -log(depth);
+    var d = 0.5;
+    if (depth > 0.0) { d = -log(depth); }
     return vec4<f32>(fract(d), fract(d * 16.0) * .75, fract(d * 256.0), 1.0);
   }
 `;

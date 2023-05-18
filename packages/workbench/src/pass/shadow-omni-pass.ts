@@ -39,7 +39,7 @@ const NO_OPS: any[] = [];
 const toArray = <T>(x?: T[]): T[] => Array.isArray(x) ? x : NO_OPS; 
 const τ = Math.PI * 2; 
 
-const PROJECTION_MATRICES = [
+const VIEW_MATRICES = [
   mat4.fromValues(
     0, 0,-1, 0,
     0, 1, 0, 0,
@@ -169,18 +169,20 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     return [texture, source, descriptors];
   }, [device, size]);
 
-  const matrices = useOne(() =>
-    PROJECTION_MATRICES.map(p => {
+  const projectionMatrix = useOne(() => {
+    const m = mat4.perspectiveZO(mat4.create(), τ/4, 1, near, far);
+    reverseZ(m, m);
+    return m;
+  }, depth);
+
+  const viewMatrices = useOne(() =>
+    VIEW_MATRICES.map(p => {
       const m = mat4.clone(p);
-
-      const s = mat4.perspectiveZO(mat4.create(), τ/4, 1, near, far);
-      mat4.multiply(m, s, m);
-      reverseZ(m, m);
+      mat4.multiply(m, m, into);
       return m;
-    }), depth);
+    }), into);
 
-  const frustums = useOne(() => matrices.map(makeFrustumPlanes), matrices);
-
+  uniforms.projectionMatrix.current = projectionMatrix;
   uniforms.viewMatrix.current = into!;
   uniforms.viewPosition.current = position!;
   uniforms.viewNearFar.current = [ near, far ];
@@ -201,11 +203,22 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
 
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
-    const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
+    const {
+      projectionViewMatrix,
+      projectionViewFrustum,
+      projectionMatrix,
+      viewMatrix,
+      inverseViewMatrix,
+      inverseProjectionViewMatrix,
+    } = uniforms;
+
     for (let i = 0; i < 6; ++i) {
-      projectionMatrix.current = matrices[i];
+      viewMatrix.current = viewMatrices[i];
       projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
       projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);
+
+      mat4.invert(inverseViewMatrix.current, viewMatrix.current);
+      mat4.invert(inverseProjectionViewMatrix.current, projectionViewMatrix.current);
 
       pipe.fill(uniforms);
       uploadBuffer(device, buffer, pipe.data);

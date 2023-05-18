@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement, DeferredCall, PropsWithChildren } from
 import type { TypedArray } from '@use-gpu/core';
 import type { Keyframe } from './types';
 
-import { use, extend, useMemo, useOne, tagFunction } from '@use-gpu/live';
+import { use, extend, fence, useMemo, useOne, useRef } from '@use-gpu/live';
 import { useTimeContext } from '../providers/time-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 
@@ -140,7 +140,7 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
     let props2 = mapValues(script, () => null);
     let flip = false;
 
-    return tagFunction(() => {
+    return () => {
       const {
         timestamp,
         elapsed,
@@ -153,8 +153,8 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       flip = !flip;
       const props = flip ? props1 : props2;
 
-      let time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
-      let [t, max] = getLoopedTime(time, length, pause, repeat, mirror);
+      const time = Math.max(0, (elapsed - started) / 1000 - delay) * speed;
+      const [t, max] = getLoopedTime(time, length, pause, repeat, mirror);
 
       for (let k in props) props[k] = evaluateKeyframes(script[k], t, ease);
 
@@ -165,8 +165,9 @@ export const Animate: LiveComponent<AnimateProps<Numberish>> = <T extends Number
       if (children) return extend(children, props);
 
       return children ?? null;
-    }, 'Run');
+    };
   }, [script, length, render, children]);
 
-  return use(Run);
+  // Fence so that continuation can change closure state
+  return fence(null, Run);
 };

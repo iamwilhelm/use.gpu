@@ -3,17 +3,16 @@ import type { StorageSource, TextureSource } from '@use-gpu/core';
 import type { Light, BoundLight } from '../../light/types';
 import type { LightEnv } from '../../pass/types';
 
-import { provide, capture, yeet, signal, makeCapture, useCallback, useCapture, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
+import { provide, capture, yeet, signal, makeCapture, useCallback, useCapture, useFiber, useMemo, useOne, useRef, useResource, incrementVersion } from '@use-gpu/live';
 import {
   makeIdAllocator,
   makeUniformLayout, makeLayoutData, makeLayoutFiller,
   makeStorageBuffer, uploadBuffer, uploadBufferRange,
   makeAtlas, makeTexture, seq,
 } from '@use-gpu/core';
-import { mixBits53 } from '@use-gpu/state';
+import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 import { bindBundle, bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
 
-import { LightContext, DEFAULT_LIGHT_CONTEXT } from '../../providers/light-provider';
 import { useDeviceContext } from '../../providers/device-provider';
 import { useBufferedSize } from '../../hooks/useBufferedSize';
 
@@ -62,8 +61,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     then,
   } = props;
 
-  const [ids, queue, changed, lights, maps, count] = useOne(() => [
-    makeIdAllocator(0),
+  const [queue, changed, lights, maps, count] = useOne(() => [
     [] as Queued[],
     new Set<number>,
     new Map<number, BoundLight>,
@@ -72,16 +70,13 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
   ]);
 
   const useLight = useCallback((light: Light) => {
-    const id = useResource((dispose) => {
-      const id = ids.obtain();
+    const {id} = useFiber();
+    useResource((dispose) => {
       dispose(() => {
-        ids.release(id);
         lights.delete(id);
         maps.delete(id);
       });
-      return id;
     });
-
     useCapture(LightCapture, null);
 
     queue.push({id, data: light});
@@ -104,10 +99,12 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
           continue;
         }
         else {
-          if (maps.has(id)) maps.delete(id);
+          if (maps.has(id)) {
+            maps.delete(id);
+          }
         }
       }
-      
+
       const d = {shadowMap: -1, ...data};
       if (shadow) {
         lights.set(id, d);
@@ -121,13 +118,14 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     // Check if light / shadow configuration changed
     let lightKey = 0;
     let shadowKey = 0;
+
     for (const key of lights.keys()) lightKey = mixBits53(lightKey, key);
     for (const key of maps.keys()) {
       const {shadow} = maps.get(key)!;
       const {size: [w, h]} = shadow!;
       shadowKey = mixBits53(mixBits53(mixBits53(shadowKey, key), w), h);
     }
-
+    
     const lightCount = lights.size;
     const size = useBufferedSize(Math.max(alloc, lightCount + 1));
     const device = useDeviceContext();
@@ -166,8 +164,8 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       const atlases = [makeAtlasPage()];
       let [atlas] = atlases;
 
-      for (const key of lights.keys()) {
-        const light = lights.get(key)!;
+      for (const key of maps.keys()) {
+        const light = maps.get(key)!;
         const {shadow} = light;
         if (shadow) {
           const {size: [w, h], depth: [near, far], bias, blur} = shadow;
@@ -245,7 +243,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       const keys = [...lights.keys()];
       const order = seq(keys.length);
       const kinds = keys.map(k => lights.get(k)!.kind);
-      order.sort((a, b) => kinds[a] - kinds[b]);
+      order.sort((a, b) => (kinds[a] - kinds[b]) || (a - b));
 
       const map = new Map<number, number>();
       const subranges = new Map<number, [number, number]>();
@@ -260,11 +258,12 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
         ++j;
       }
-      return [map, order, subranges];
+      
+      return [map, order.map(i => keys[i]), subranges];
     }, lightKey);
 
     // Order changed lights by index
-    const ids = [...changed.values()];
+    const ids = needsRefresh ? [...lights.keys()] : [...changed.values()];
     ids.sort((a, b) => indices.get(a)! - indices.get(b)!);
 
     // Update data sparsely while calculating upload ranges

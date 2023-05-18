@@ -20,7 +20,7 @@ import {
   SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 
-const OPTIONS_KEY = 'live.inspect.options';
+const getOptionsKey = (id: string) => `liveInspect[${id}]`;
 
 type InspectFiber = Record<string, any>;
 type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
@@ -38,24 +38,26 @@ export const Inspect: React.FC<InspectProps> = ({
 }) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
-  const optionCursor = useUpdateState<OptionState>({
-    depth: 10,
-    counts: false,
-    fullSize: false,
-    builtins: false,
-    highlight: true,
-    inspect: false,
-  }, makeUseLocalState(OPTIONS_KEY));
+  const optionCursor = useUpdateState<OptionState>(
+    {
+      open: false,
+      depth: 10,
+      counts: false,
+      fullSize: false,
+      builtins: false,
+      highlight: true,
+      inspect: false,
+    },
+    makeUseLocalState(getOptionsKey('state'))
+  );
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
   }));
   
-  const [open, updateOpen] = useUpdateState<boolean>(false);
-  const toggleOpen = () => updateOpen(!open);
-
   const useOption = useRefineCursor(optionCursor);
 
   const fibers = new Map<number, LiveFiber<any>>();
+
   const [selectedFiber, setSelected] = selectedCursor;
   const [depthLimit] = useOption<number>('depth');
   const [runCounts] = useOption<boolean>('counts');
@@ -65,6 +67,8 @@ export const Inspect: React.FC<InspectProps> = ({
   const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
+  const [open, updateOpen] = useOption<number>('open');
+  const toggleOpen = () => updateOpen(!open);
   const toggleInspect = useCallback(() => {
     console.log('toggleInspect')
     updateInspect($apply(s => {

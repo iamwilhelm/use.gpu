@@ -78,18 +78,34 @@ fn traceIntoVolume(origin: vec3<f32>, ray: vec3<f32>, size: vec3<i32>) -> VoxelH
   // Minimum trace distance
   let front = max(vec3<f32>(size) * -signs, vec3<f32>(0.0));
   var front3 = (front - origin) * invAbs * signs;
-  let distMin = max(0.0, max(front3.x, max(front3.y, front3.z))) + 1e-5;
+  let distMin = max(0.0, max(front3.x, max(front3.y, front3.z)));
 
   // Maximum trace distance
   let back = max(vec3<f32>(size) * signs, vec3<f32>(0.0));
   let back3 = (back - origin) * invAbs * signs;
-  let distMax = min(back3.x, min(back3.y, back3.z)) - distMin;
+  let distMax = min(back3.x, min(back3.y, back3.z)) - distMin - 1e-5;
 
-  let pos = origin + ray * distMin;
+  // Ray start
+  var pos: vec3<f32>;
 
   // Initial axis for first hit
-  front3 = (front - pos) * invAbs * signs;
-  let axis = step(front3.yzx, front3) * step(front3.zxy, front3);
+  var axis: vec3<f32>;
+
+  if (distMin > 1e-5) {
+    let offset = (front - pos) * invAbs * signs;
+    axis = step(offset.yzx, offset) * step(offset.zxy, offset);
+    pos = origin + ray * (distMin + 1e-5);
+  }
+  else {
+    axis = vec3<f32>(0.0);
+    pos = origin + ray / 2.0;
+
+    var uvw = vec3<i32>(floor(pos));
+    let index = getTexture0(uvw, 0u);
+    if (index > 0u) {
+      return VoxelHit(pos, -ray, index, 100);
+    }
+  }
 
   return traceVolumeSteps(pos, ray, size, signs, invAbs, axis, distMax);
 }
@@ -135,7 +151,7 @@ fn traceVolumeSteps(
   // Signs for ray direction
   let signI = vec3<i32>(signs);
   let signF = -signs;
-  let baseF = max(vec3<f32>(0.0), -signF);
+  let baseF = max(vec3<f32>(0.0), signs);
 
   var axis = initialAxis;
   for (var i = 0u; i < 8u; i++) {
@@ -310,12 +326,6 @@ fn traceVolumeSteps(
 }
 `, {SurfaceFragment, DepthFragment, getViewPosition, worldToDepth});
 
-const INSIDE_PIPELINE = {
-  depthStencil: {
-    compare: 'always',
-  },
-};
-
 export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
   const {
     shape,
@@ -362,22 +372,21 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         const sy = size[1] / 2;
         const sz = size[2] / 2;
 
-        const {viewPosition, viewMatrix, viewNearFar} = uniforms;
+        const {inverseViewMatrix, viewMatrix, viewPosition, viewNearFar} = uniforms;
+        const {current: iVM} = inverseViewMatrix;
         const {current: viewP} = viewPosition;
         const {current: viewM} = viewMatrix;
         const {current: viewNF} = viewNearFar;
 
-        vec3.copy(local3, viewP);
+        const offset = vec3.fromValues(iVM[8], iVM[9], iVM[10]);
+        vec3.normalize(offset, offset);
+        vec3.scale(offset, offset, -viewNF[0]);
+
+        vec3.add(local3, viewP, offset);
         vec3.transformMat4(local3, local3, inverse);
 
-        local3[0] = clamp(local3[0], -sx, sx);
-        local3[1] = clamp(local3[1], -sy, sy);
-        local3[2] = clamp(local3[2], -sz, sz);
-
-        vec3.transformMat4(local3, local3, matrix);
-        
-        const z = local3[0] * viewM[2] + local3[1] * viewM[6] + local3[2] * viewM[10] + viewM[14];
-        return z + viewNF[0] * 4;
+        const inside = Math.abs(local3[0]) < sx && Math.abs(local3[1]) < sy && Math.abs(local3[2]) < sz;
+        return inside;
       }, [matrix, inverse])
 
       // Transform view position into voxel space to use as starting point inside (lazy)
@@ -423,8 +432,8 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               depth: true,
               shaded: true,
               shouldDispatch: (uniforms: Record<string, any>) => {
-                insideRef.current = inside(uniforms);
-                return insideRef.current < 0;
+                insideRef.current = +inside(uniforms);
+                return !insideRef.current;
               },
             }),
             use(FaceLayer, {
@@ -434,11 +443,11 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               depth: true,
               shaded: true,
               side: 'back',
-              pipeline: INSIDE_PIPELINE,
+              depthTest: false,
               shouldDispatch: (uniforms: Record<string, any>) => {
-                //insideRef.current = inside(uniforms);
+                insideRef.current = +inside(uniforms);
                 originRef.current = origin(uniforms);
-                return insideRef.current >= 0;
+                return !!insideRef.current;
               },
             }),
           ],

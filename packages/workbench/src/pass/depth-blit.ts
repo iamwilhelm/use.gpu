@@ -17,6 +17,12 @@ import instanceFragmentDepthCopy from '@use-gpu/wgsl/render/fragment/depth-copy.
 import { drawCall } from '../queue/draw-call';
 
 const countGeometry = () => {};
+const PIPELINE = {
+  depthStencil: {
+    depthWriteEnabled: true,
+    depthCompare: 'always',
+  },
+};
 
 export const useDepthBlit = (
   renderContext: UseGPURenderContext,
@@ -35,7 +41,15 @@ export const useDepthBlit = (
     return [vertexShader, fragmentShader];
   }, getSample);
 
-  const blitRef = useRef<Renderable | typeof SUSPEND | null>(null);
+  const blit = drawCall({
+    vertexCount: 3,
+    instanceCount: 1,
+    vertex,
+    fragment,
+    renderContext,
+    mode: null,
+    pipeline: PIPELINE,
+  }) as any;
 
   const draw = useCallback((commandEncoder: GPUCommandEncoder) => {
     const passEncoder = commandEncoder.beginRenderPass(descriptor);
@@ -49,20 +63,10 @@ export const useDepthBlit = (
       passEncoder.setViewport(x, y, w, h, 0, 1);
     }
 
-    const {current: blit} = blitRef;
     (blit as any)?.draw && (blit as any).draw(passEncoder, countGeometry);
 
     passEncoder.end();
-  }, [uv, descriptor]);
-
-  blitRef.current = drawCall({
-    vertexCount: 3,
-    instanceCount: 1,
-    vertex,
-    fragment,
-    renderContext,
-    mode: null,
-  }) as any;
+  }, [blit, uv, descriptor]);
 
   return draw;
 };

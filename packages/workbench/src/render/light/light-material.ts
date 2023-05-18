@@ -3,7 +3,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { LightEnv } from '../../pass/types';
 import type { UseLight } from './light-data';
 
-import { use, yeet, provide, useMemo, useOne } from '@use-gpu/live';
+import { use, yeet, provide, fence, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { LightContext } from '../../providers/light-provider';
@@ -55,7 +55,12 @@ export const LightMaterial: LC<LightMaterialProps> = (props: PropsWithChildren<L
         return {useLight, useMaterial};
       }, [useLight, shadows]);
 
-      return provide(LightContext, context, children);
+      // Fence so that lights are never suspended
+      return (
+        provide(LightContext, context,
+          fence(children, (v: any) => yeet(v))
+        )
+      );
     },
     then,
   });

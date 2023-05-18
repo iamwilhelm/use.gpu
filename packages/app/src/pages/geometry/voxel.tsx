@@ -1,5 +1,6 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Vox } from '@use-gpu/voxel';
+import type { Keyframe } from '@use-gpu/workbench';
 
 import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -31,13 +32,34 @@ const SHADOW_MAP_POINT = {
   blur: 2,
 };
 
+const R = 15;
+
+const ANIMATED_LIGHT = [
+  [0, [15, 23, 20, 1]],
+  [50, [15 - R, 23, 20, 1]],
+  [150, [15 - R, 23 - R, 20, 1]],
+  [200, [15, 23 - R, 20, 1]],
+  [250, [15, 23, 20, 1]],
+] as Keyframe<any>[];
+
+const STATIC_LIGHTS = [
+  [[-15, 5, -20, 1], [1, .5, .5, 1]],
+  [[-20, 15, 10, 1], [.5, .75, 1, 1]],
+];
+
+const WHITE = [1, 1, 1, 1];
+
 export const GeometryVoxelPage: LC = () => {
 
   const base = isDevelopment ? '/' : '/demo/';
   const url = base + "voxel/teardown/propanetank.vox";
-  //const url = base + "voxel/teardown/bedroom_modern.vox";
 
   const planeGeometry = makePlaneGeometry({ width: 100, height: 100, axes: 'yx' });
+
+  const renderLight = (position: number[], color: number[]) => (<>
+    <PointLight position={position} color={color} intensity={40*40*.5} shadowMap={SHADOW_MAP_POINT} />
+    <PointLayer count={1} size={20} position={position} color={color} />
+  </>);
 
   const view = (iterations: boolean) => (
     <DebugProvider
@@ -51,13 +73,9 @@ export const GeometryVoxelPage: LC = () => {
           <Camera>
             <Pass lights shadows>
               <AmbientLight color={[1, 1, 1, 1]} intensity={0.01} />
-              <PointLight position={[15, 23, 20]} color={[1.0, 1.0, 1.0]} intensity={40*40*.5} shadowMap={SHADOW_MAP_POINT} />
-              <PointLight position={[-15, 5, -20]} color={[1, .5, .5]} intensity={40*40*.1} shadowMap={SHADOW_MAP_POINT} />
-              <PointLight position={[-20, 15, 10]} color={[.5, .75, 1.0]} intensity={40*40*.1} />
-
-              <PointLayer count={1} size={20} position={[15, 23, 20, 1]} color={[1, 1, 1, 1]} />
-              <PointLayer count={1} size={20} position={[-15, 5, -20, 1]} color={[1, .5, .5, 1]} />
-              <PointLayer count={1} size={20} position={[-20, 15, 10, 1]} color={[.5, .75, 1, 1]} />
+              
+              <Animate delay={3} keyframes={ANIMATED_LIGHT} prop="position" render={(position) => renderLight(position, WHITE)} />
+              {STATIC_LIGHTS.map(([position, color]) => renderLight(position, color))}
             
               <Scene>
                 <Node rotation={[90, 180, 0]}>

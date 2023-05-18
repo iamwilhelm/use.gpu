@@ -69,6 +69,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
     projectionMatrix: { current: null },
     projectionViewMatrix: { current: null },
     projectionViewFrustum: { current: null },
+    inverseViewMatrix: { current: mat4.create() },
     inverseProjectionViewMatrix: { current: mat4.create() },
     viewMatrix: { current: null },
     viewPosition: { current: null },
@@ -92,6 +93,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
 
   const {
     inverseProjectionViewMatrix,
+    inverseViewMatrix,
     projectionMatrix,
     projectionViewMatrix,
     projectionViewFrustum,
@@ -100,6 +102,7 @@ export const OrbitCamera: LiveComponent<OrbitCameraProps> = (props) => {
   projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
   projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);
   mat4.invert(inverseProjectionViewMatrix.current, projectionViewMatrix.current);
+  mat4.invert(inverseViewMatrix.current, viewMatrix.current);
 
   const frame = useOne(() => ({current: 0}));
   frame.current = incrementVersion(frame.current);

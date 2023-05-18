@@ -360,6 +360,7 @@ export type ViewUniforms = {
   projectionMatrix: { current: mat4 },
   projectionViewMatrix: { current: mat4 },
   projectionViewFrustum: { current: vec4[] },
+  inverseViewMatrix: { current: mat4 },
   inverseProjectionViewMatrix: { current: mat4 },
   viewMatrix: { current: mat4 },
   viewPosition: { current: vec4 },

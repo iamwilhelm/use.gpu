@@ -126,19 +126,8 @@ export const parseVox = (
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// MIP mapping
-/*
-export const adjustMipSize = (size: Point3, mips: number): Point3 => {
-  if (mips === 1) return size;
-  let [w, h, d] = size;
-  const round = 1 << (mips - 1);
-  if (w & (w - 1)) w = Math.ceil(w / round) * round;
-  if (h & (h - 1)) h = Math.ceil(h / round) * round;
-  if (d & (d - 1)) d = Math.ceil(d / round) * round;
-  return [w, h, d];
-};
-*/
-
+// MIP mapping downscale
+///////////////////////////////////////////////////////////////////////////////
 export const getMipShape = (shape: VoxShape) => {
   const {size, data} = shape;
   const [w, h, d] = size;
@@ -174,6 +163,7 @@ export const getMipShape = (shape: VoxShape) => {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Decode node transforms to column-major 4x4 matrix
+///////////////////////////////////////////////////////////////////////////////
 export const decodeTransform = (frame: VoxProps) => {
   const {_r = 0, _t} = frame;
 
@@ -209,6 +199,7 @@ export const decodeTransform = (frame: VoxProps) => {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Decode material to standard PBR parameters
+///////////////////////////////////////////////////////////////////////////////
 export const decodeMaterial = (material: VoxMeta, pbr: Float32Array) => {
   const {id, props: {_type, _metal, _rough, _emit, _weight}} = material;
   const offset = id * 4;
@@ -220,6 +211,7 @@ export const decodeMaterial = (material: VoxMeta, pbr: Float32Array) => {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Vox container parser
+///////////////////////////////////////////////////////////////////////////////
 
 export const parseVoxChunks = (data: ArrayBuffer): RawVox => {
   const view = new DataView(data);
@@ -264,6 +256,7 @@ export const getNextChunk = (view: DataView, ptr: Pointer): RawChunk => {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Chunk type parsers
+///////////////////////////////////////////////////////////////////////////////
 
 export const parseSIZEChunk = (view: DataView, chunk: RawChunk): Point3 => {
   const {base} = chunk;
@@ -423,6 +416,7 @@ export const parseNSHPChunk = (view: DataView, chunk: RawChunk): VoxNodeShape =>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Binary parsers
+///////////////////////////////////////////////////////////////////////////////
 
 export const getUint8 = (view: DataView, ptr: Pointer): number =>
   view.getUint8(ptr.offset++);

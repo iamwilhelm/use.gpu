@@ -4,7 +4,7 @@ import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import type { Update } from '@use-gpu/state';
 import type { Culler } from '../pass/types';
 
-import { yeet, memo, useMemo, useOne, useNoOne, useState, SUSPEND } from '@use-gpu/live';
+import { yeet, memo, useMemo, useNoMemo, useOne, useNoOne, useState, SUSPEND } from '@use-gpu/live';
 import { patch, $apply } from '@use-gpu/state';
 import {
   makeMultiUniforms, makeBoundUniforms, makeVolatileUniforms,
@@ -170,8 +170,18 @@ export const drawCall = (props: DrawCallProps) => {
     useNoRenderPipelineAsync();
   }
 
-  if (!pipeline || !pipelineFlipped) return suspense ? SUSPEND : NO_CALL;
-  if (isStale) return SUSPEND;
+  if (!pipeline || !pipelineFlipped) {
+    useNoMemo();
+    useNoMemo();
+    useNoMemo();
+    return suspense ? SUSPEND : NO_CALL;
+  }
+  if (isStale) {
+    useNoMemo();
+    useNoMemo();
+    useNoMemo();
+    return SUSPEND;
+  }
 
   const base = 1 + +!!passLayout;
   

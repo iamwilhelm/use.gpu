@@ -30,6 +30,7 @@ let packages = [
   'scene',
   'state',
   'traits',
+  'voxel',
   'webgpu',
   'workbench',
 ];

@@ -7,7 +7,10 @@ import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } 
 import { parseVec4, useProp } from '@use-gpu/traits';
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
-  useBoundShader, useViewContext, useRawSource, useShaderRef, useTransformContext, useNoTransformContext,
+  useBoundShader, useNoBoundShader,
+  useViewContext, useRawSource,
+  useShaderRef, useNoShaderRef,
+  useTransformContext, useNoTransformContext,
   Data, LineLayer,
 } from '@use-gpu/workbench';
 
@@ -88,24 +91,29 @@ export const Grid: LiveComponent<GridProps> = (props) => {
 
     let autoBound: ShaderModule | null = null;
     if (auto) {
-      const autoBase = NO_POINT4.slice();
-      const autoShift = NO_POINT4.slice();
+      const autoBase = useShaderRef(NO_POINT4.slice());
+      const autoShift = useShaderRef(NO_POINT4.slice());
 
       orig.forEach((_, i) => {
         // Pin to minimum
         orig[i] = parentRange[i][0];
 
         if (i === main || i === cross) {
-          autoBase[i] = (parentRange[i][0] + parentRange[i][1]) / 2;
-          autoShift[i] = 0;
+          autoBase.current[i] = (parentRange[i][0] + parentRange[i][1]) / 2;
+          autoShift.current[i] = 0;
         }
         else {
-          autoBase[i] = orig[i];
-          autoShift[i] = parentRange[i][1] - parentRange[i][0];
+          autoBase.current[i] = orig[i];
+          autoShift.current[i] = parentRange[i][1] - parentRange[i][0];
         }
       });
 
       autoBound = useBoundShader(getGridAutoPosition, [xform, autoBase, autoShift]);
+    }
+    else {
+      useNoShaderRef();
+      useNoShaderRef();
+      useNoBoundShader();
     }
 
     const min = vec4.clone(orig as any);

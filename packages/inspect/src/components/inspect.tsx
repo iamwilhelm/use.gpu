@@ -20,19 +20,21 @@ import {
   SplitRow, RowPanel, Panel, PanelFull, PanelAbsolute, PanelScrollable, Inset, InsetColumnFull,
 } from './layout';
 
-const getOptionsKey = (id: string) => `liveInspect[${id}]`;
+const getOptionsKey = (id: string, sub?: string = 'root') => `liveInspect[${sub}][${id}]`;
 
 type InspectFiber = Record<string, any>;
 type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
 
 type InspectProps = {
   fiber: LiveFiber<any>,
+  sub?: string,
   addIns: InspectAddIns,
   onInspect?: (b: boolean) => void,
 }
 
 export const Inspect: React.FC<InspectProps> = ({
   fiber,
+  sub,
   addIns,
   onInspect,
 }) => {
@@ -48,7 +50,7 @@ export const Inspect: React.FC<InspectProps> = ({
       highlight: true,
       inspect: false,
     },
-    makeUseLocalState(getOptionsKey('state'))
+    makeUseLocalState(getOptionsKey('state', sub))
   );
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,

@@ -32,14 +32,14 @@ const SHADOW_MAP_POINT = {
   blur: 2,
 };
 
-const R = 15;
+const R = 20;
 const N = 50;
 const T = 20;
 const τ = Math.PI * 2;
 
 const ANIMATED_LIGHT = Array(N+1).fill(0).map((_, i) => [
   i / N * T, [
-    15 + R * Math.cos(i / N * τ),
+    15 - R * Math.cos(i / N * τ),
     23,
     20 + R * Math.sin(i / N * τ),
     1
@@ -78,7 +78,7 @@ export const GeometryVoxelPage: LC = () => {
             <Pass lights shadows>
               <AmbientLight color={[1, 1, 1, 1]} intensity={0.01} />
               
-              <Animate delay={3} ease="linear" keyframes={ANIMATED_LIGHT} prop="position" render={(position) => renderLight(position, WHITE)} />
+              <Animate ease="linear" keyframes={ANIMATED_LIGHT} prop="position" render={(position) => renderLight(position, WHITE)} />
               {STATIC_LIGHTS.map(([position, color]) => renderLight(position, color))}
             
               <Scene>
@@ -158,7 +158,7 @@ export const GeometryVoxelPage: LC = () => {
 
 const Camera = ({children}: PropsWithChildren<object>) => (
   <OrbitControls
-    radius={45}
+    radius={55}
     bearing={-1.0}
     pitch={0.5}
     render={(radius: number, phi: number, theta: number, target: vec3) =>

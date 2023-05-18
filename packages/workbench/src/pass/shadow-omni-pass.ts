@@ -122,8 +122,6 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
 
   const {
-    into,
-    position,
     shadow,
     shadowMap,
     shadowUV,
@@ -175,16 +173,8 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     return m;
   }, depth);
 
-  const viewMatrices = useOne(() =>
-    VIEW_MATRICES.map(p => {
-      const m = mat4.clone(p);
-      mat4.multiply(m, m, into);
-      return m;
-    }), into);
-
   uniforms.projectionMatrix.current = projectionMatrix;
-  uniforms.viewMatrix.current = into!;
-  uniforms.viewPosition.current = position!;
+  uniforms.viewMatrix.current = mat4.create();
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
@@ -201,7 +191,10 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     let vs = 0;
     let ts = 0;
 
+    const {position, into} = map;
+
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
+    uniforms.viewPosition.current = position!;
 
     const {
       projectionViewMatrix,
@@ -213,7 +206,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
     } = uniforms;
 
     for (let i = 0; i < 6; ++i) {
-      viewMatrix.current = viewMatrices[i];
+      mat4.multiply(viewMatrix.current, VIEW_MATRICES[i], into!);
       projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);
       projectionViewFrustum.current = makeFrustumPlanes(projectionViewMatrix.current);
 

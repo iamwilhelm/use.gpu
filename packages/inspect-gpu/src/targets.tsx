@@ -177,6 +177,7 @@ export const Targets: React.FC<TargetsProps> = ({fiber}) => {
 
 const View: LiveComponent<ViewProps> = ({canvas, device, color, picking, depth}) => (
   use(UseInspect, {
+    sub: 'targets',
     container: canvas.parentNode,
     active: true,
     fiber: useFiber(),

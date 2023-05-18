@@ -23,6 +23,9 @@ let t = 0;
 
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
+const RANGE = [[0, 256], [0, 256], [0, 256]];
+const GRID = { divide: 16, base: 2, end: true };
+
 // Turn binary buffer into XYZ points for consecutive byte triplets.
 const arrayBufferToXYZ = (buffer: ArrayBuffer) => {
   const data = new Uint8Array(buffer);
@@ -212,15 +215,15 @@ export const GeometryBinaryPage: LC = () => {
             <Pass>
               <Plot>
                 <Cartesian
-                  range={[[0, 256], [0, 256], [0, 256]]}
+                  range={RANGE}
                 >
                   {viz}
                   <Grid
                     color="#202020"
                     axes='xy'
                     width={2}
-                    first={{ divide: 16, base: 2, end: true }}
-                    second={{ divide: 16, base: 2, end: true }}
+                    first={GRID}
+                    second={GRID}
                     depth={0.5}
                     zBias={-5}
                     auto
@@ -229,8 +232,8 @@ export const GeometryBinaryPage: LC = () => {
                     color="#202020"
                     axes='xz'
                     width={2}
-                    first={{ divide: 16, base: 2, end: true }}
-                    second={{ divide: 16, base: 2, end: true }}
+                    first={GRID}
+                    second={GRID}
                     depth={0.5}
                     zBias={-5}
                     auto
@@ -239,8 +242,8 @@ export const GeometryBinaryPage: LC = () => {
                     color="#202020"
                     axes='yz'
                     width={2}
-                    first={{ divide: 16, base: 2, end: true }}
-                    second={{ divide: 16, base: 2, end: true }}
+                    first={GRID}
+                    second={GRID}
                     depth={0.5}
                     zBias={-5}
                     auto

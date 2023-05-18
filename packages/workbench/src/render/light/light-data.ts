@@ -92,10 +92,8 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
       if (lights.has(id)) {
         if (shadow) {
-          const {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur} = lights.get(id)!;
-          const d = {shadowMap, shadowUV, shadowDepth, shadowBias, shadowBlur, ...data};
-          lights.set(id, d);
-          maps.set(id, d);
+          const d = lights.get(id)!;
+          Object.assign(d, data);
           continue;
         }
         else {

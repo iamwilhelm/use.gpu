@@ -10,6 +10,7 @@ import { defaultPanels } from './providers/add-in-provider';
 export type UseInspectProps = {
   fiber: LiveFiber<any>,
   active?: boolean,
+  sub?: string,
   provider: LiveComponent<any>,
   container?: Element,
   extensions?: InspectExtension[],
@@ -26,6 +27,7 @@ const NO_EXT: any[] = [];
 
 export const UseInspect: LiveComponent<UseInspectProps> = ({
   fiber,
+  sub,
   provider,
   container,
   extensions = NO_EXT,
@@ -65,7 +67,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
       container: container ?? document.body,
       style: STYLE,
       inspectable: false,
-      children: <Inspect fiber={fiber} addIns={addIns} onInspect={handleInspect} />,
+      children: <Inspect fiber={fiber} sub={sub} addIns={addIns} onInspect={handleInspect} />,
     }) : null
   ]);
 }

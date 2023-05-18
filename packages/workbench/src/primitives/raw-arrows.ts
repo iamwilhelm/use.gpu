@@ -60,7 +60,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     blend,
     mode = 'opaque',
     detail = 12,
-    count = 1,
+    count = null,
     id = 0,
   } = props;
   
@@ -97,7 +97,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const getFragment = getPassThruColor;
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
-    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
+    getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 
   const [pipeline, defines] = usePipelineOptions({
     mode,

@@ -113,7 +113,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const getFragment = getPassThruColor;
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
-    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
+    getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 
   const [pipeline, defs] = usePipelineOptions({
     mode,

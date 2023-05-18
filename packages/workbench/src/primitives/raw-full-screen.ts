@@ -50,7 +50,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
   const getPicking = usePickingShader({id});
   const getFragment = useBoundShader(getTextureColor, [t]);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
-    getBundleKey(getVertex) + getBundleKey(getFragment) + +(getPicking && getBundleKey(getPicking)));
+    getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 
   const renderContext = initial ? useRenderContext() : useNoRenderContext(); 
   let first = useRef(true);

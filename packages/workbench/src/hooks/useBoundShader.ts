@@ -17,7 +17,11 @@ export const useBoundShader = (
   shader: ShaderModule,
   values: any[],
   defines?: Record<string, any>,
+  _deprecated?: any,
 ) => {
+  if (Array.isArray(defines)) {
+    return useMemo(() => getBoundShader(shader, defines as any, _deprecated), [shader, ...defines, _deprecated]);
+  }
   return useMemo(() => getBoundShader(shader, values, defines), [shader, ...values, defines]);
 }
 

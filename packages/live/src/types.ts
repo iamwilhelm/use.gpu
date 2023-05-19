@@ -160,7 +160,7 @@ export type FiberYeet<A, B> = {
 
 // Fiber quote state
 export type FiberQuote<T extends ArrowFunction> = {
-  root: LiveFiber<T>,
+  root: number,
   from: LiveFiber<T>,
   to: LiveFiber<T>,
 };
@@ -188,10 +188,10 @@ export type HostInterface = {
   dispose: (fiber: LiveFiber<any>) => void,
 
   // Track a long-range dependency for contexts
-  depend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => boolean,
-  undepend: (fiber: LiveFiber<any>, root: LiveFiber<any>) => void,
+  depend: (fiber: LiveFiber<any>, root: number) => boolean,
+  undepend: (fiber: LiveFiber<any>, root: number) => void,
   traceDown: (fiber: LiveFiber<any>) => LiveFiber<any>[],
-  traceUp: (fiber: LiveFiber<any>) => LiveFiber<any>[],
+  traceUp: (fiber: LiveFiber<any>) => number[],
 
   // Fiber update queue
   visit: (fiber: LiveFiber<any>) => void,

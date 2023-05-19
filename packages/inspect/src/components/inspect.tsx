@@ -113,7 +113,7 @@ export const Inspect: React.FC<InspectProps> = ({
         updateHovered({ $set: {
           fiber,
           by: fibers.get(fiber.by) ?? null,
-          deps: host ? Array.from(host.traceDown(fiber)) : [],
+          deps: host ? Array.from(host.traceDown(fiber)).map(f => f.id) : [],
           precs: host ? Array.from(host.traceUp(fiber)) : [],
           root,
           depth: 0,

@@ -176,7 +176,7 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
 
 // Make fiber quote state
 export const makeQuoteState = <F extends ArrowFunction, A, B, C>(
-  root: LiveFiber<F>,
+  root: number,
   fiber: LiveFiber<F>,
   nextFiber: LiveFiber<F>,
 ): FiberQuote<any> => ({
@@ -189,12 +189,13 @@ export const makeQuoteState = <F extends ArrowFunction, A, B, C>(
 export const makeContextState = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   parent: FiberContext,
+  root: LiveFiber<F> | number,
   context: LiveContext<any>,
   value: any,
 ): FiberContext => {
   const values = new Map(parent.values);
   const roots = new Map(parent.roots);
-  roots.set(context, fiber);
+  roots.set(context, root);
   values.set(context, { current: value, memo: null, displayName: context.displayName });
   
   return {values, roots};
@@ -614,9 +615,9 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   calls: LiveElement | LiveElement[],
 ) => {
-  if (!fiber.quote || fiber.quote.root !== fiber) {
+  if (!fiber.quote || fiber.quote.root !== fiber.id) {
     fiber.next = makeNextFiber(fiber, () => {}, 'Reconcile');
-    fiber.quote = makeQuoteState(fiber, fiber, fiber.next);
+    fiber.quote = makeQuoteState(fiber.id, fiber, fiber.next);
     fiber.next.unquote = fiber.quote;
   }
 
@@ -1036,10 +1037,10 @@ export const provideFiber = <F extends ArrowFunction>(
   if (!fiber.args) return;
   let {context: {roots, values}, args: [context, value, calls]} = fiber;
 
-  if (roots.get(context) !== fiber) {
+  if (roots.get(context) !== fiber.id) {
     if (context.capture) throw new Error(`Cannot use capture ${context.displayName} as a context`);
 
-    fiber.context = makeContextState(fiber, fiber.context, context, value);
+    fiber.context = makeContextState(fiber, fiber.context, fiber.id, context, value);
     pingFiber(fiber);
 
     // Remember calls
@@ -1084,13 +1085,11 @@ export const captureFiber = <F extends ArrowFunction>(
 
     const registry = new Map<LiveFiber<any>, any>();
     const reduction = () => registry;
-    const parent = fiber.context;
-    fiber.context = makeContextState(fiber, fiber.context, capture, registry);
 
     const Resume = makeFiberReduction(fiber, reduction);
     fiber.next = makeNextFiber(fiber, Resume, 'Resume');
-    fiber.next.context = parent;
 
+    fiber.context = makeContextState(fiber, fiber.context, fiber.next, capture, registry);
     fiber.path = [...fiber.path, 0];
   }
 

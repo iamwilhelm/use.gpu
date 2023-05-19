@@ -211,8 +211,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const selected = fiber === selectState;
   const hovered  = hoverState.fiber?.id ?? -1;
   const parents  = hoverState.fiber?.by === fiber.id;
-  const depends  = hoverState.deps.indexOf(fiber) >= 0 || (hoverState.root === fiber);
-  const precedes = hoverState.precs.indexOf(fiber) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
+  const depends  = hoverState.deps.indexOf(fiber.id) >= 0 || (hoverState.root === fiber);
+  const precedes = hoverState.precs.indexOf(fiber.id) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
   const quoted   = hoverState.fiber?.quote?.to === fiber || fiber?.quote?.to === hoverState.fiber;
   const unquoted = hoverState.fiber?.unquote?.from === fiber || fiber?.unquote?.from === hoverState.fiber;
 
@@ -228,15 +228,15 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Make click/hover handlers
   const [select, hover, unhover] = useMemo(() => {
-    const root = yeeted && fiber.type === YEET ? yeeted.root : null;
+    const root = () => fiber.yeeted && fiber.type === YEET ? yeeted.root : null;
 
     const select  = () => updateSelectState({ $set: fiber });
     const hover   = () => updateHoverState({ $set: {
       fiber,
       by: fibers.get(fiber.by) ?? null,
-      deps: host ? Array.from(host.traceDown(fiber)) : [],
+      deps: host ? Array.from(host.traceDown(fiber)).map(f => f.id) : [],
       precs: host ? Array.from(host.traceUp(fiber)) : [],
-      root,
+      root: root(),
       depth: renderDepth,
     } });
     const unhover = (e: any) => e.altKey || updateHoverState({ $set: {

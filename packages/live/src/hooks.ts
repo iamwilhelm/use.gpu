@@ -375,7 +375,7 @@ export const useContext = <C>(
 
   const i = pushState(fiber, Hook.CONTEXT);
   const {state, host, context: {values, roots}} = fiber;
-  const root = roots.get(context);
+  const root = roots.get(context) as number;
   if (!root) {
     const {initialValue, displayName} = context;
     if (initialValue === undefined) {
@@ -410,24 +410,23 @@ export const useCapture = <C>(
 
   const i = pushState(fiber, Hook.CAPTURE);
   const {state, host, context: {values, roots}} = fiber;
-  const root = roots.get(context);
-  if (!root || !root.next) throw new Error(`Context '${context.displayName}' was used without being captured.`);
+  const root = roots.get(context) as LiveFiber<any>;
+  if (!root) throw new Error(`Context '${context.displayName}' was used without being captured.`);
 
-  const {next} = root;
   if (host) {
     if (!state![i]) {
       state![i] = true;
       state![i + 1] = context;
       host.track(fiber, () => {
         registry.delete(fiber);
-        host.schedule(next, NOP);
-        host.undepend(next, fiber);
+        host.schedule(root, NOP);
+        host.undepend(root, fiber.id);
       });
 
-      host.depend(next, fiber);
+      host.depend(root, fiber.id);
     }
 
-    host.visit(next);
+    host.visit(root);
   }
 
   const registry = values.get(context).current;
@@ -450,7 +449,7 @@ export const useNoContext = <C>(
 
   const root = roots.get(context)!;
   if (state![i]) {
-    if (host) host.undepend(fiber, root);
+    if (host) host.undepend(fiber, root.id);
     state![i] = false;
   }
 
@@ -472,7 +471,7 @@ export const useNoCapture = <C>(
   const root = roots.get(context)!;
   const next = root.next;
   if (state![i] && next) {
-    if (host) host.undepend(next, fiber);
+    if (host) host.undepend(next, fiber.id);
     state![i] = false;
   }
 

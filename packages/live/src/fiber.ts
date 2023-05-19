@@ -90,7 +90,7 @@ export const makeFiber = <F extends ArrowFunction>(
   let path = parent ? parent.path : ROOT_PATH;
   let keys = parent ? parent.keys : null;
   if (keyed && parent) {
-    keys = [...(keys ?? EMPTY_ARRAY), path.length, parent.order];
+    keys = [...(keys ?? EMPTY_ARRAY), path.length, parent.lookup];
   }
   if (key != null) path = [...path, key];
 
@@ -99,7 +99,7 @@ export const makeFiber = <F extends ArrowFunction>(
     depth, path, keys,
     yeeted, quote, unquote, context,
     state: null, pointer: 0, version: null, memo: null, runs: 0,
-    mount: null, mounts: null, next: null, seen: null, order: null,
+    mount: null, mounts: null, next: null, order: null, lookup: null,
     type: null, id, by,
   } as LiveFiber<F>;
 
@@ -226,7 +226,7 @@ export const renderFiber = <F extends ArrowFunction>(
   if ((f as any).isLiveBuiltin) {
     // Fiber is shape-compatible
     element = fiber as any as LiveElement;
-    // Enter/exit to clear yeet state
+    // Enter/exit to clear state
     bound();
   }
   // Render live function
@@ -404,6 +404,21 @@ export const mountFiberCall = <F extends ArrowFunction>(
   }
 }
 
+// Mount a continuation on a fiber
+export const mountFiberContinuation = <F extends ArrowFunction>(
+  fiber: LiveFiber<F>,
+  call: DeferredCall<any> | null,
+  key?: Key,
+) => {
+  const {next} = fiber;
+
+  const nextMount = updateMount(fiber, next, call, key);
+  if (nextMount !== false) {
+    fiber.next = nextMount;
+    flushMount(nextMount, next, true);
+  }
+}
+
 // Reconcile one call on a fiber as part of an incremental mapped set
 export const reconcileFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
@@ -414,12 +429,12 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   keys?: (number | Key[])[],
   depth?: number,
 ) => {
-  let {mount, mounts, order, seen} = fiber;
+  let {mount, mounts, order, lookup} = fiber;
   if (mount) disposeFiberMounts(fiber);
 
   if (!mounts) mounts = fiber.mounts = new Map();
   if (!order)  order  = fiber.order  = [];
-  if (!seen)   seen   = fiber.seen   = new Set();
+  if (!lookup) lookup = fiber.lookup = new Map();
 
   call = reactInterop(call, fiber) as DeferredCall<any> | null;
   if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
@@ -436,9 +451,11 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
 
         if (nextMount !== mount) {
           const i = order!.findIndex((key) => compareFibers(mounts!.get(key)!, nextMount) > 0);
+
           if (i === -1) order!.push(key);
           else order!.splice(i, 0, key);
 
+          reconcileFiberOrder(order);
           mounts.set(key, nextMount);
         }
       }
@@ -454,92 +471,116 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   }
 }
 
-// Re-order child fibers if order was cleared due to (un)quote invalidation
+// Reconcile multiple calls on a fiber
+export const reconcileFiberCalls = (() => {
+  const seen = new Set<number>();
+
+  return <F extends ArrowFunction>(
+    fiber: LiveFiber<F>,
+    calls: LiveElement[],
+    fenced?: boolean,
+  ) => {
+    let {mount, mounts, order, lookup, runs, quote, unquote} = fiber;
+    if (mount) disposeFiberMounts(fiber);
+
+    if (!mounts) mounts = fiber.mounts = new Map();
+    if (!order)  order  = fiber.order  = [];
+
+    if (!Array.isArray(calls)) calls = [calls];
+
+    seen.clear();
+
+    // Get new key set and order
+    let i = 0;
+    let rekeyed = false;
+    for (let call of calls) {
+      if (call == null) continue;
+      let callKey = (call as any)?.key;
+
+      let key;
+      if (callKey != null) {
+        rekeyed = rekeyed || (order[i] !== callKey);
+        key = callKey;
+      }
+      else {
+        key = i;
+      }
+      if (seen.has(key)) throw new Error(`Duplicate key '${key}' while reconciling ` + formatNode(fiber));
+
+      seen.add(key);
+      order[i++] = key;
+    }
+    order.length = i;
+
+    if (rekeyed) {
+      // Keyed fibers maintain a key lookup
+      if (!lookup) lookup = fiber.lookup = new Map();
+      for (let i = 0, n = order.length; i < n; ++i) {
+        const o = order[i];
+        if (o != null) lookup!.set(o, i);
+      }
+    }
+
+    // Unmount missing keys
+    for (let key of mounts.keys()) if (!seen.has(key)) {
+      const mount = mounts.get(key);
+      mounts.delete(key);
+      lookup?.delete(key);
+
+      updateMount(fiber, mount, null);
+      flushMount(null, mount, fenced);
+    }
+
+    // Mount new / updated keys
+    for (let i = 0, j = 0, n = calls.length; i < n; ++i) {
+      let call = calls[i];
+      if (call == null) continue;
+
+      const key = order[j++];
+      let callKey = (call as any)?.key;
+      call = reactInterop(call, fiber);
+
+      // Array shorthand for nested reconciling
+      if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
+
+      const mount = mounts.get(key);
+      const nextMount = updateMount(fiber, mount, call as any, key, callKey != null);
+      if (nextMount !== false) {
+        if (nextMount) mounts.set(key, nextMount);
+        else mounts.delete(key);
+        flushMount(nextMount, mount, fenced);
+      }
+    }
+
+    // If rekeyed, invalidate quoted order
+    if (rekeyed) bustFiberQuote(fiber);
+  }
+})();
+
+// Re-order child fibers by path, used across quotes to keep both tree shapes the same
 export const reconcileFiberOrder = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
-  const {order, mounts} = fiber;
-  if (!order || !mounts) return;
+  const {order, mounts, lookup, runs} = fiber;
+  if (!order || !mounts || !lookup) return;
+  if (order.length === mounts.size) return;
 
-  if (order.length !== mounts.size) {
-    order.length = 0;
-    for (const k of mounts.keys()) order.push(k);
-    order.sort((a, b) => compareFibers(mounts.get(a)!, mounts.get(b)!));
-
-    pingFiber(fiber);
-  }
-}
-
-// Mount a continuation on a fiber
-export const mountFiberContinuation = <F extends ArrowFunction>(
-  fiber: LiveFiber<F>,
-  call: DeferredCall<any> | null,
-  key?: Key,
-) => {
-  const {next} = fiber;
-
-  const nextMount = updateMount(fiber, next, call, key);
-  if (nextMount !== false) {
-    fiber.next = nextMount;
-    flushMount(nextMount, next, true);
-  }
-}
-
-// Reconcile multiple calls on a fiber
-export const reconcileFiberCalls = <F extends ArrowFunction>(
-  fiber: LiveFiber<F>,
-  calls: LiveElement[],
-  fenced?: boolean,
-) => {
-  let {mount, mounts, order, runs, seen, quote, unquote} = fiber;
-  if (mount) disposeFiberMounts(fiber);
-
-  if (!mounts) mounts = fiber.mounts = new Map();
-  if (!order)  order  = fiber.order  = [];
-  if (!seen)   seen   = fiber.seen   = new Set();
-
-  if (!Array.isArray(calls)) calls = [calls];
-
-  seen.clear();
+  const previous = [...order];
 
   order.length = 0;
-  let i = 0;
+  for (const k of mounts.keys()) order.push(k);
+  order.sort((a, b) => compareFibers(mounts.get(a)!, mounts.get(b)!));
+
   let rekeyed = false;
-  for (let call of calls) {
-    call = reactInterop(call, fiber);
-
-    let callKey = (call as any)?.key;
-    if (callKey != null) {
-      rekeyed = rekeyed || (order[i] !== callKey);
-    }
-
-    let key = callKey ?? i;
-    if (seen.has(key)) throw new Error(`Duplicate key '${key}' while reconciling ` + formatNode(fiber));
-    seen.add(key);
-    order[i++] = key;
-
-    // Array shorthand for nested reconciling
-    if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
-
-    const mount = mounts.get(key);
-    const nextMount = updateMount(fiber, mount, call as any, key, callKey != null);
-    if (nextMount !== false) {
-      if (nextMount) mounts.set(key, nextMount);
-      else mounts.delete(key);
-      flushMount(nextMount, mount, fenced);
-    }
+  for (let i = 0, n = order.length; i < n; ++i) {
+    const o = order[i];
+    if (o != null) lookup.set(o, i);
+    rekeyed = rekeyed || (o !== previous[i]);
   }
 
   // If rekeyed, invalidate quoted order
-  if (rekeyed && runs > 0) bustFiberQuote(fiber);
-
-  for (let key of mounts.keys()) if (!seen.has(key)) {
-    const mount = mounts.get(key);
-    updateMount(fiber, mount, null);
-    mounts.delete(key);
-    flushMount(null, mount, fenced);
-  }
-
+  if (rekeyed) bustFiberQuote(fiber);
+  pingFiber(fiber);
 }
 
 // Generalized mounting of reduction-like continuations
@@ -795,7 +836,6 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   fiber: LiveFiber<F>,
   self: boolean = false,
 ): T | T[] | typeof SUSPEND | undefined => {
-
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 

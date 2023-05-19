@@ -93,7 +93,7 @@ export type LiveMap<T> = Map<LiveFiber<any>, T>;
 export type LiveFiber<F extends Function> = FunctionCall<F> & {
   host?: HostInterface,
   path: Key[],
-  keys: (number | Key[])[],
+  keys: (number | Map<Key, number>)[],
   depth: number,
   id: number,
   by: number,
@@ -113,11 +113,11 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
   type: ArrowFunction | null,
 
   // Mounting state
-  seen: Set<Key> | null,
   mount: LiveFiber<any> | null,
   mounts: FiberMap | null,
-  order: Key[] | null,
   next: LiveFiber<any> | null,
+  order: Key[] | null,
+  lookup: Map<Key, number> | null,
 
   // User-specified context
   context: FiberContext,

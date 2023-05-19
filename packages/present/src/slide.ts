@@ -35,7 +35,7 @@ export const Slide: LC<SlideProps> = (props: PropsWithChildren<SlideProps>) => {
                   enter: {...effect, ...enter},
                   exit: {...effect, ...exit},
                 }),
-                [id, ops]
+                [id, ops, effect, enter, exit]
               );
             }
           )

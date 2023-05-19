@@ -13,6 +13,7 @@ import { styled as _styled } from '@stitches/react';
 import React, { Fragment } from 'react';
 
 import { UseInspect } from '@use-gpu/inspect';
+import { inspectGPU } from '.';
 
 import { decodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
 
@@ -181,6 +182,7 @@ const View: LiveComponent<ViewProps> = ({canvas, device, color, picking, depth})
     container: canvas.parentNode,
     active: true,
     fiber: useFiber(),
+    extensions: useOne(() => [inspectGPU], inspectGPU),
     children: (
       provide(DeviceContext, device,
         wrap(Queue, [

@@ -132,7 +132,6 @@ export const LabelLayer: LiveComponent<LabelLayerProps> = memo((props: LabelLaye
             expands,
 
             flip,
-            count,
             mode,
             id,
           });

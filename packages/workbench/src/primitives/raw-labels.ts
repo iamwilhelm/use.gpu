@@ -74,7 +74,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
     depthWrite,
     blend,
     id = 0,
-    count = 1,
+    count = null,
   } = props;
 
   const vertexCount = 4;

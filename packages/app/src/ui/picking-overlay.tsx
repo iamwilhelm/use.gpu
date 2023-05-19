@@ -42,7 +42,6 @@ export const PickingOverlay: LC = () => {
   const textureSource = useLambdaSource(boundShader, source);
 
   const scale = 0.5;
-  console.log(textureSource.size)
 
   return (
     <UI>

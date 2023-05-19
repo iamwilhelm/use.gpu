@@ -2,7 +2,7 @@ import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { DeepPartial } from '@use-gpu/core';
 import type { ParsedEffect, SlideTrait, TransitionTrait } from './types';
 
-import { unquote, fence, fragment, yeet, use, useMemo, useOne, useFiber } from '@use-gpu/live';
+import { unquote, fence, yeet, use, useMemo, useOne, useFiber } from '@use-gpu/live';
 import { useLayoutContext } from '@use-gpu/workbench';
 import { Transform } from '@use-gpu/layout';
 

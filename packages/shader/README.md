@@ -98,6 +98,8 @@ const glslModule = glsl`
 
 This is equivalent to a `loadModuleWithCache` call, so recent modules are cached by text hash. The default entry point is `main`.
 
+Use `bindEntryPoint(module, 'entryPoint')` to bind different entry points.
+
 Use `f32(x)`, `u32(x)` and `i32(x)` to format JS numbers correctly as WGSL strings (and `float`, ``uint`, `int` for GLSL):
 
 ```tsx
@@ -107,6 +109,20 @@ const module = wgsl`
   fn main()  -> u32 { return ${u32(1)}; } // "1u"
   fn other() -> f32 { return ${f32(1)}; } // "1.0"
 `;
+```
+
+Imports (`use` / `#pragma import`) do not work inside template literals, as they are parsed at run-time. Instead, import the WGSL symbols in JS, and use `bindBundle` to link them to the `wgsl` snippet:
+
+```wgsl
+import { SurfaceFragment } from '@use-gpu/wgsl/use/types.wgsl';
+
+const mainShader = bindBundle(wgsl`
+  @link struct SurfaceFragment {};
+  
+  fn main() -> SurfaceFragment {
+    // ...
+  }
+`, {SurfaceFragment});
 ```
 
 #### Strings
@@ -136,16 +152,18 @@ Shaders parsed at run-time will be cached on a least-recently-used basis, based 
 use "path/to/file"::{ symbol, … };
 use "path/to/file"::{ symbol as symbol, … };
 
-// Function is linked at runtime. Function body is ignored.
-// Will be removed from output.
-@link fn func() { }
+// Function is linked at runtime. Function body is ignored and may be omitted.
+@link fn func();
 
 // Declaration is exported (can be linked to)
-@export fn func() { }
+@export fn func() { };
 
 // Function is linked at runtime but optional.
 // Function body is used if not linked.
 @link @optional fn func() -> f32 { return 1.0; }
+
+// Type is linked at runtime
+@link struct Type { };
 
 // Storage binding is linked at runtime
 @link var<storage> storageVar: array<f32>;

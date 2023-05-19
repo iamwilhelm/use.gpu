@@ -172,14 +172,14 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
     let bi = bp[i];
 
     if (aj === i) {
-      const ak = aks[asi++] as Key[];
-      ai = ak.indexOf(ai);
+      const ak = aks[asi++] as Map<Key, number>;
+      ai = ak.get(ai)!;
       aj = aks[asi++] as number;
     }
 
     if (bj === i) {
-      const bk = bks[bsi++] as Key[];
-      bi = bk.indexOf(bi);
+      const bk = bks[bsi++] as Map<Key, number>;
+      bi = bk.get(bi)!;
       bj = bks[bsi++] as number;
     }
 

@@ -430,12 +430,8 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   keys?: (number | Key[])[],
   depth?: number,
 ) => {
-  let {mount, mounts, order, lookup} = fiber;
-  if (mount) throw new Error();
-
-  if (!mounts) mounts = fiber.mounts = new Map();
-  if (!order)  order  = fiber.order  = [];
-  if (!lookup) lookup = fiber.lookup = new Map();
+  let {mounts, order, lookup} = fiber;
+  if (!mounts || !order || !lookup) throw new Error('Cannot reconcile on uninitialized mounts');
 
   call = reactInterop(call, fiber) as DeferredCall<any> | null;
   if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
@@ -624,9 +620,13 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
       next.version = next.memo = incrementVersion(next.version);
     };
 
-    fiber.next = makeNextFiber(fiber, Resume, 'Reconcile');
+    const next = fiber.next = makeNextFiber(fiber, Resume, 'Reconcile');
     fiber.quote = makeQuoteState(fiber.id, fiber, fiber.next);
-    fiber.next.unquote = makeQuoteState(fiber.id, fiber.next, fiber);
+    next.unquote = makeQuoteState(fiber.id, fiber.next, fiber);
+
+    next.mounts = new Map();
+    next.lookup = new Map();
+    next.order  = [];
   }
 
   calls = reactInterop(calls, fiber) as any;
@@ -644,15 +644,19 @@ export const mountFiberQuote = <F extends ArrowFunction>(
 ) => {
   if (!fiber.quote) throw new Error("Can't quote outside of reconciler in " + formatNode(fiber));
 
-  const key = fiber.id;
+  let {id, quote, mounts, lookup, order} = fiber;
+  const {root, to} = quote;
+
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
-  const {quote: {root, to}} = fiber;
+  reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  reconcileFiberCall(to, call as any, key, true, fiber.path, fiber.keys, fiber.depth + 1);
-
-  const mount = to.mounts!.get(key)!;
-  if (mount.unquote?.to.id !== fiber.id) {
+  const mount = to.mounts!.get(id)!;
+  if (mount.unquote?.to.id !== id) {
     disposeFiberMounts(fiber);
+
+    if (!mounts) mounts = fiber.mounts = new Map();
+    if (!lookup) lookup = fiber.lookup = new Map();
+    if (!order)  order  = fiber.order  = [];
 
     const quote = makeQuoteState(root, mount, fiber);
     mount.unquote = quote;
@@ -666,17 +670,19 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
 ) => {
   if (!fiber.unquote) throw new Error("Can't unquote outside of quote in " + formatNode(fiber));
 
-  const {id, unquote} = fiber;
+  let {id, unquote, mounts, lookup, order} = fiber;
   const {root, to} = unquote;
 
-  const key = fiber.id;
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
+  reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  reconcileFiberCall(to, call as any, key, true, fiber.path, fiber.keys, fiber.depth + 1);
-
-  const mount = to.mounts!.get(key)!;
-  if (mount.quote?.to.id !== fiber.id) {
+  const mount = to.mounts!.get(id)!;
+  if (mount.quote?.to.id !== id) {
     disposeFiberMounts(fiber);
+
+    if (!mounts) mounts = fiber.mounts = new Map();
+    if (!lookup) lookup = fiber.lookup = new Map();
+    if (!order)  order  = fiber.order  = [];
 
     const unquote = makeQuoteState(root, mount, fiber);
     mount.quote = unquote;
@@ -1147,9 +1153,6 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
 export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   const {id, next, quote, unquote, yeeted} = fiber;
 
-  disposeFiberMounts(fiber);
-  if (next) disposeFiber(next);
-
   if (fiber.type === QUOTE) {
     const {to} = quote!;
     reconcileFiberCall(to, null, id, true);
@@ -1160,6 +1163,9 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
     reconcileFiberCall(to, null, id, true);
     pingFiber(to);
   }
+
+  disposeFiberMounts(fiber);
+  if (next) disposeFiber(next);
 
   if (yeeted) {
     bustFiberYeet(fiber, true);

@@ -95,7 +95,7 @@ export const memoArgs = <F extends Function>(
 
     let skip = true;
     const value = useMemo(() => {
-      fiber.memo = -1;
+      fiber.version = Math.max(fiber.version, incrementVersion(fiber.memo));
       skip = false;
       return f(...args);
     }, args);
@@ -133,7 +133,7 @@ export const memoProps = <F extends Function>(
 
     let skip = true;
     const value = useMemo(() => {
-      fiber.memo = -1;
+      fiber.version = Math.max(fiber.version, incrementVersion(fiber.memo));
       skip = false;
       return f(props);
     }, deps);

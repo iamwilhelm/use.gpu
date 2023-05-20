@@ -175,14 +175,14 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
 });
 
 // Make fiber quote state
-export const makeQuoteState = <F extends ArrowFunction, A, B, C>(
+export const makeQuoteState = <F extends ArrowFunction>(
   root: number,
-  fiber: LiveFiber<F>,
-  nextFiber: LiveFiber<F>,
+  from: LiveFiber<F>,
+  to: LiveFiber<F>,
 ): FiberQuote<any> => ({
   root,
-  from: fiber,
-  to: nextFiber,
+  from: from.id,
+  to,
 });
 
 // Make fiber context state
@@ -235,7 +235,7 @@ export const renderFiber = <F extends ArrowFunction>(
   if (typeof element === 'string') throw new Error(`Component may not return a string (${element})`);
 
   // Early exit if memoized and same result
-  if (fiber.memo != null) {
+  if (fiber.version != null) {
     const canExitEarly = !fiber.next;
     if (fiber.version !== fiber.memo) {
       fiber.memo = fiber.version;
@@ -456,8 +456,8 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
           if (i === -1) order!.push(key);
           else order!.splice(i, 0, key);
 
-          reconcileFiberOrder(order);
           mounts.set(key, nextMount);
+          reconcileFiberOrder(fiber);
         }
       }
       else {
@@ -564,6 +564,8 @@ export const reconcileFiberOrder = <F extends ArrowFunction>(
 ) => {
   const {order, mounts, lookup, runs} = fiber;
   if (!order || !mounts || !lookup) return;
+
+  // Tripped by bustFiberQuote(…)
   if (order.length === mounts.size) return;
 
   const previous = [...order];
@@ -616,15 +618,23 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
   calls: LiveElement | LiveElement[],
 ) => {
   if (!fiber.quote || fiber.quote.root !== fiber.id) {
-    fiber.next = makeNextFiber(fiber, () => {}, 'Reconcile');
+    const Resume = () => {
+      const {next} = fiber;
+      reconcileFiberOrder(next);
+      next.version = next.memo = incrementVersion(next.version);
+    };
+
+    fiber.next = makeNextFiber(fiber, Resume, 'Reconcile');
     fiber.quote = makeQuoteState(fiber.id, fiber, fiber.next);
-    fiber.next.unquote = fiber.quote;
+    fiber.next.unquote = makeQuoteState(fiber.id, fiber.next, fiber);
   }
 
   calls = reactInterop(calls, fiber) as any;
 
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
   else mountFiberCall(fiber, calls as any);
+
+  mountFiberContinuation(fiber, use(fiber.next.f));
 }
 
 // Mount quoted calls on a fiber's continuation
@@ -641,8 +651,8 @@ export const mountFiberQuote = <F extends ArrowFunction>(
   reconcileFiberCall(to, call as any, key, true, fiber.path, fiber.keys, fiber.depth + 1);
 
   const mount = to.mounts!.get(key)!;
-  if (mount.unquote?.from !== fiber) {
-    const quote = makeQuoteState(root, fiber, mount);
+  if (mount.unquote?.to.id !== fiber.id) {
+    const quote = makeQuoteState(root, mount, fiber);
     mount.unquote = quote;
   }
 }
@@ -655,15 +665,15 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   if (!fiber.unquote) throw new Error("Can't unquote outside of quote in " + formatNode(fiber));
   
   const {id, unquote} = fiber;
-  const {root, from} = unquote;
+  const {root, to} = unquote;
 
   const key = fiber.id;
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
 
-  reconcileFiberCall(from, call as any, key, true, fiber.path, fiber.keys, fiber.depth + 1);
+  reconcileFiberCall(to, call as any, key, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  const mount = from.mounts!.get(key)!;
-  if (mount.quote?.to !== fiber) {
+  const mount = to.mounts!.get(key)!;
+  if (mount.quote?.to.id !== fiber.id) {
     const unquote = makeQuoteState(root, mount, fiber);
     mount.quote = unquote;
   }

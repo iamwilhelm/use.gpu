@@ -176,13 +176,13 @@ export const compareFibers = (a: LiveFiber<any>, b: LiveFiber<any>) => {
 
     if (aj === i) {
       const ak = aks[asi++] as Map<Key, number>;
-      ai = ak.get(ai)!;
+      ai = ak.get(ai) ?? -1;
       aj = aks[asi++] as number;
     }
 
     if (bj === i) {
       const bk = bks[bsi++] as Map<Key, number>;
-      bi = bk.get(bi)!;
+      bi = bk.get(bi) ?? -1;
       bj = bks[bsi++] as number;
     }
 

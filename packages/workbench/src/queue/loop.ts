@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren } from '@use-gpu/live';
-import { use, signal, detach, provide, useCallback, useOne, useResource, tagFunction } from '@use-gpu/live';
+import { use, signal, detach, provide, useCallback, useOne, useResource, tagFunction, formatNodeName } from '@use-gpu/live';
 
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
@@ -67,7 +67,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
 
       const {run} = ref;
       if (run) run();
-      
+
       if (!pending) time.timestamp = -Infinity;
     };
 
@@ -81,15 +81,16 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
     return loop.request = request;
   }, [live]);
 
+  usePerFrame();
   request!();
 
   const Run = useCallback(tagFunction(() => {
     const {time, loop, children} = ref;
 
-    usePerFrame();
-
-    const trigger = signal();
-    const view = [trigger, provide(LoopContext, loop, children)];
+    const view = [
+      signal(),
+      provide(LoopContext, loop, children),
+    ];
 
     const t = {...time};
     return (

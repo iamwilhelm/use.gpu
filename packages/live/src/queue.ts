@@ -28,13 +28,13 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     }
 
     if (tail) {
-      if (compareFibers(tail.f, f) < 0) {
+      if (compareFibers(tail.f, f) <= 0) {
         tail = tail.next = {f, next: null};
         return;
       }
     }
 
-    if (compareFibers(queue.f, f) > 0) {
+    if (compareFibers(queue.f, f) >= 0) {
       queue = {f, next: queue};
       return;
     }
@@ -42,12 +42,12 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     if (!queue.next) return;
 
     let q = queue;
-    if (hint && compareFibers(hint.f, f) < 0) {
+    if (hint && compareFibers(hint.f, f) <= 0) {
       q = hint;
     }
 
     while (q.next) {
-      if (compareFibers(q.next.f, f) > 0) {
+      if (compareFibers(q.next.f, f) >= 0) {
         q.next = {f, next: q.next};
         hint = q;
         return;

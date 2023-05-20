@@ -238,8 +238,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       const {targetTouches: [touch]} = e as any;
       const {clientX, clientY} = touch;
       onButtons(1, 0);
-      onMove(clientX, clientY);
-      onMove(clientX, clientY);
+      onMove(clientX, clientY, 0, 0);
       e.preventDefault();
       e.stopPropagation();
     }
@@ -262,7 +261,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
     const onMouseDown = (e: MouseEvent) => {
       const {button, buttons, clientX, clientY} = e;
       onButtons(buttons, button);
-      onMove(clientX, clientY);
+      onMove(clientX, clientY, 0, 0);
       onModifiers(e);
       e.preventDefault();
       e.stopPropagation();
@@ -286,7 +285,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
     const onMouseUp = (e: MouseEvent) => {
       const {button, buttons, clientX, clientY} = e;
       onButtons(buttons, button);
-      onMove(clientX, clientY);
+      onMove(clientX, clientY, 0, 0);
       onModifiers(e);
       e.preventDefault();
       e.stopPropagation();

@@ -197,7 +197,7 @@ export const makeContextState = <F extends ArrowFunction>(
   const roots = new Map(parent.roots);
   roots.set(context, root);
   values.set(context, { current: value, memo: null, displayName: context.displayName });
-  
+
   return {values, roots};
 };
 
@@ -269,7 +269,7 @@ export const pingFiber = <F extends ArrowFunction>(
 export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {
-    let {type, key} = element; 
+    let {type, key} = element;
     const props = {...element.props, key};
     if (typeof type === 'symbol') type = FRAGMENT;
 
@@ -431,7 +431,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   depth?: number,
 ) => {
   let {mount, mounts, order, lookup} = fiber;
-  if (mount) disposeFiberMounts(fiber);
+  if (mount) throw new Error();
 
   if (!mounts) mounts = fiber.mounts = new Map();
   if (!order)  order  = fiber.order  = [];
@@ -652,6 +652,8 @@ export const mountFiberQuote = <F extends ArrowFunction>(
 
   const mount = to.mounts!.get(key)!;
   if (mount.unquote?.to.id !== fiber.id) {
+    disposeFiberMounts(fiber);
+
     const quote = makeQuoteState(root, mount, fiber);
     mount.unquote = quote;
   }
@@ -663,7 +665,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   calls: LiveElement | LiveElement[],
 ) => {
   if (!fiber.unquote) throw new Error("Can't unquote outside of quote in " + formatNode(fiber));
-  
+
   const {id, unquote} = fiber;
   const {root, to} = unquote;
 
@@ -674,6 +676,8 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
 
   const mount = to.mounts!.get(key)!;
   if (mount.quote?.to.id !== fiber.id) {
+    disposeFiberMounts(fiber);
+
     const unquote = makeQuoteState(root, mount, fiber);
     mount.quote = unquote;
   }
@@ -723,7 +727,7 @@ export const makeImperativeFunction = (
 }
 
 
-const toArray = <T>(x: T | T[] | undefined): T[] => Array.isArray(x) ? x : x != null ? [x] : []; 
+const toArray = <T>(x: T | T[] | undefined): T[] => Array.isArray(x) ? x : x != null ? [x] : [];
 const NO_ARRAY: any[] = [];
 const NO_RECORD: Record<string, any> = {};
 
@@ -939,7 +943,7 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
 
         multiGatherMergeInto(out, value as any);
       }
-      
+
       if (isFork) {
         const fork = multiGatherFiberValues(fiber.next!);
         if (fork === SUSPEND) return yeeted.reduced = SUSPEND;
@@ -1125,7 +1129,7 @@ export const detachFiber = <F extends ArrowFunction>(
 
   callback(() => {
     if (next && host) {
-      host.schedule(next, NOP);
+      host.schedule(next);
       host.flush();
     }
   }, fiber.next);
@@ -1152,9 +1156,9 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
     pingFiber(to);
   }
   if (fiber.type === UNQUOTE) {
-    const {from} = unquote!;
-    reconcileFiberCall(from, null, id, true);    
-    pingFiber(from);
+    const {to} = unquote!;
+    reconcileFiberCall(to, null, id, true);
+    pingFiber(to);
   }
 
   if (yeeted) {
@@ -1247,7 +1251,7 @@ export const flushMount = <F extends ArrowFunction>(
   if (mounted && mounted !== mount) {
     disposeFiber(mounted);
   }
-  if (mount) { 
+  if (mount) {
     const {host, quote, unquote} = mount;
 
     // Slice into new stack if too deep, or if fenced

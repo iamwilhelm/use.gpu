@@ -234,7 +234,6 @@ export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new We
   if (typeof x === 'symbol') return '(symbol)';
   if (typeof x === 'string') return x;
   if (typeof x === 'function') {
-    if (x.name === '' && !x.displayName) x.displayName = '#' + Math.round(Math.random() * 10000);
     const name = `${x.displayName ?? x.name}(…)`;
     const body = x.toString().split(/=>/)[1];
     return body != null ? name + truncate(body.replace(/\s+/g, ' '), 40) : name;

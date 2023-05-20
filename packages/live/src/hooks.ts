@@ -95,7 +95,7 @@ export const memoArgs = <F extends Function>(
 
     let skip = true;
     const value = useMemo(() => {
-      fiber.version = Math.max(fiber.version, incrementVersion(fiber.memo));
+      fiber.version = Math.max(fiber.version!, incrementVersion(fiber.memo!));
       skip = false;
       return f(...args);
     }, args);
@@ -133,7 +133,7 @@ export const memoProps = <F extends Function>(
 
     let skip = true;
     const value = useMemo(() => {
-      fiber.version = Math.max(fiber.version, incrementVersion(fiber.memo));
+      fiber.version = Math.max(fiber.version!, incrementVersion(fiber.memo!));
       skip = false;
       return f(props);
     }, deps);
@@ -447,9 +447,9 @@ export const useNoContext = <C>(
     throw new Error(`Context is undefined.`);
   }
 
-  const root = roots.get(context)!;
+  const root = roots.get(context)! as number;
   if (state![i]) {
-    if (host) host.undepend(fiber, root.id);
+    if (host) host.undepend(fiber, root);
     state![i] = false;
   }
 
@@ -468,10 +468,9 @@ export const useNoCapture = <C>(
   const {state, host, context: {values, roots}} = fiber;
   if (!context) throw new Error(`Capture is undefined.`);
 
-  const root = roots.get(context)!;
-  const next = root.next;
-  if (state![i] && next) {
-    if (host) host.undepend(next, fiber.id);
+  const root = roots.get(context)! as LiveFiber<any>;
+  if (state![i] && root) {
+    if (host) host.undepend(root, fiber.id);
     state![i] = false;
   }
 

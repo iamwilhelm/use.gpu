@@ -144,7 +144,7 @@ export type FiberContext = {
 };
 
 export type ContextValues = Map<LiveContext<any> | LiveCapture<any>, any>;
-export type ContextRoots = Map<LiveContext<any> | LiveCapture<any>, LiveFiber<any>>;
+export type ContextRoots = Map<LiveContext<any> | LiveCapture<any>, number | LiveFiber<any>>;
 
 // Fiber yeet state
 export type FiberYeet<A, B> = {
@@ -155,14 +155,15 @@ export type FiberYeet<A, B> = {
   value?: A,
   reduced?: B,
   parent?: FiberYeet<A, B>,
-  up?: FiberYeet<any, any>,
+  scope?: FiberYeet<any, any>,
 };
 
 // Fiber quote state
-export type FiberQuote<T extends ArrowFunction> = {
+export type FiberQuote<F extends ArrowFunction> = {
   root: number,
   from: number,
-  to: LiveFiber<T>,
+  to: LiveFiber<F>,
+  scope?: FiberQuote<any>,
 };
 
 // Priority queue

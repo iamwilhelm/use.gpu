@@ -4,7 +4,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { FitInto, LayoutElement, Dimension, Margin } from '../types';
 
 import { useProp } from '@use-gpu/traits';
-import { use, memo, gather, provide, yeet, tagFunction, useContext, useFiber } from '@use-gpu/live';
+import { use, memo, gather, provide, yeet, useContext, useFiber } from '@use-gpu/live';
 import { LayoutContext, TransformContext } from '@use-gpu/workbench';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { memoFit, memoLayout } from '../lib/util';

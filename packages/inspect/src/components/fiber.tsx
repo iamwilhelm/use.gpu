@@ -214,7 +214,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const depends  = hoverState.deps.indexOf(fiber.id) >= 0 || (hoverState.root === fiber);
   const precedes = hoverState.precs.indexOf(fiber.id) >= 0 || (yeeted?.root === hoverState.fiber && yeeted.value !== undefined);
   const quoted   = hoverState.fiber?.quote?.to === fiber || fiber?.quote?.to === hoverState.fiber;
-  const unquoted = hoverState.fiber?.unquote?.from === fiber || fiber?.unquote?.from === hoverState.fiber;
+  const unquoted = hoverState.fiber?.unquote?.from === fiber.id || (hoverState.fiber && fiber?.unquote?.from === hoverState.fiber?.id);
 
   // Resolve depth-highlighting
   const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;

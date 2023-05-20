@@ -82,7 +82,7 @@ export const makeFiber = <F extends ArrowFunction>(
 
   const id = ++ID;
 
-  const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, up: null} : null;
+  const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, scope: null} : null;
   const quote = parent?.quote ?? null;
   const unquote = parent?.unquote ?? null;
   const context = parent?.context ?? NO_CONTEXT;
@@ -171,7 +171,7 @@ export const makeYeetState = <F extends ArrowFunction, A, B, C>(
   reduced: undefined,
   parent: undefined,
   root: nextFiber,
-  up: fiber.yeeted ?? undefined,
+  scope: fiber.yeeted ?? undefined,
 });
 
 // Make fiber quote state
@@ -427,7 +427,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   key: Key,
   fenced?: boolean,
   path?: Key[],
-  keys?: (number | Key[])[],
+  keys?: (number | Map<Key, number>)[],
   depth?: number,
 ) => {
   let {mounts, order, lookup} = fiber;
@@ -470,7 +470,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
 
 // Reconcile multiple calls on a fiber
 export const reconcileFiberCalls = (() => {
-  const seen = new Set<number>();
+  const seen = new Set<Key>();
 
   return <F extends ArrowFunction>(
     fiber: LiveFiber<F>,
@@ -558,7 +558,7 @@ export const reconcileFiberCalls = (() => {
 export const reconcileFiberOrder = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
-  const {order, mounts, lookup, runs} = fiber;
+  const {order, mounts, lookup} = fiber;
   if (!order || !mounts || !lookup) return;
 
   // Tripped by bustFiberQuote(…)
@@ -616,17 +616,19 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
   if (!fiber.quote || fiber.quote.root !== fiber.id) {
     const Resume = () => {
       const {next} = fiber;
-      reconcileFiberOrder(next);
-      next.version = next.memo = incrementVersion(next.version);
+      reconcileFiberOrder(next!);
+      next!.version = next!.memo = incrementVersion(next!.version!);
     };
 
     const next = fiber.next = makeNextFiber(fiber, Resume, 'Reconcile');
-    fiber.quote = makeQuoteState(fiber.id, fiber, fiber.next);
-    next.unquote = makeQuoteState(fiber.id, fiber.next, fiber);
-
     next.mounts = new Map();
     next.lookup = new Map();
     next.order  = [];
+
+    const {quote} = fiber;
+    next.unquote = makeQuoteState(fiber.id, next, fiber);
+    fiber.quote = makeQuoteState(fiber.id, fiber, next);
+    fiber.quote.scope = quote!;
   }
 
   calls = reactInterop(calls, fiber) as any;
@@ -634,7 +636,7 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
   else mountFiberCall(fiber, calls as any);
 
-  mountFiberContinuation(fiber, use(fiber.next.f));
+  mountFiberContinuation(fiber, use(fiber.next!.f));
 }
 
 // Mount quoted calls on a fiber's continuation
@@ -1006,7 +1008,7 @@ export const morphFiberCall = <F extends ArrowFunction>(
     if (
       mount.context === fiber.context &&
       !mount.next &&
-      (!mount.quote || mount.quote.from !== mount) &&
+      (!mount.quote || mount.quote.to !== mount) &&
       (!mount.unquote || mount.unquote.to !== mount)
     ) {
       // Discard all fiber state
@@ -1167,10 +1169,14 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
   disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
 
+  if (fiber.type === RECONCILE) {
+    fiber.quote = fiber.quote!.scope ?? null;
+  }
+
   if (yeeted) {
     bustFiberYeet(fiber, true);
     visitYeetRoot(fiber);
-    if (yeeted.up) fiber.yeeted = yeeted.up;
+    if (yeeted.scope) fiber.yeeted = yeeted.scope;
   }
 
   fiber.next = null;
@@ -1334,11 +1340,11 @@ export const bustFiberQuote = <F extends ArrowFunction>(
     }
   }
   if (unquote) {
-    const {from, from: {order, yeeted}} = unquote;
+    const {to, to: {order, yeeted}} = unquote;
     if (yeeted && order?.length) {
       order.length = 0;
-      bustFiberYeet(from);
-      visitYeetRoot(from);
+      bustFiberYeet(to);
+      visitYeetRoot(to);
     }
   }
 }

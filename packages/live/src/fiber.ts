@@ -409,7 +409,7 @@ export const mountFiberCall = <F extends ArrowFunction>(
 export const mountFiberContinuation = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   call: DeferredCall<any> | null,
-  key?: Key,
+  key: Key = 1,
 ) => {
   const {next} = fiber;
 
@@ -605,7 +605,7 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
   else mountFiberCall(fiber, calls as any);
 
-  mountFiberContinuation(fiber, use(fiber.next.f, Next), 1);
+  mountFiberContinuation(fiber, use(fiber.next.f, Next));
 }
 
 const Reconcile = () => {};
@@ -1094,7 +1094,7 @@ export const captureFiber = <F extends ArrowFunction>(
   }
 
   inlineFiberCall(fiber, calls);
-  mountFiberContinuation(fiber, use(fiber.next.f, Next), 1);
+  mountFiberContinuation(fiber, use(fiber.next.f, Next));
 }
 
 // Detach a fiber by mounting a subcontext manually and delegating the triggering of its execution

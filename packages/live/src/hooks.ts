@@ -225,7 +225,7 @@ export const useMemo = <T>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.MEMO);
-  let {state, host} = fiber;
+  let {state} = fiber;
 
   let value = state![i];
   const deps = state![i + 1];
@@ -250,7 +250,7 @@ export const useOne = <T>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.ONE);
-  let {state, host} = fiber;
+  let {state} = fiber;
 
   let value = state![i];
   const dep = state![i + 1];
@@ -275,7 +275,7 @@ export const useCallback = <T extends Function>(
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.CALLBACK);
-  let {state, host} = fiber;
+  let {state} = fiber;
 
   let value = state![i];
   const deps = state![i + 1];
@@ -297,7 +297,7 @@ export const useVersion = <T>(nextValue: T) => {
   const fiber = useFiber();
 
   const i = pushState(fiber, Hook.VERSION);
-  let {state, host, yeeted} = fiber;
+  let {state, yeeted} = fiber;
 
   let value   = state![i];
   let version = state![i + 1] || 0;

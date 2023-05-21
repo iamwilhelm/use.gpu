@@ -6,8 +6,9 @@ it("schedules actions", () => {
   let fiber = {} as any;
 
   let flushed = 0;
+  let captured = 0;
   let flush = () => {};
-  let actions: any[] = [];
+  let fibers: any[] = [];
 
   const dispatch = (f: any) => { 
     flushed++;
@@ -15,7 +16,8 @@ it("schedules actions", () => {
   };
 
   const capture = (as: any[]) => {
-    actions = as;
+    fibers = as;
+    captured++;
   };
 
   const scheduler = makeActionScheduler(dispatch, capture);
@@ -27,15 +29,16 @@ it("schedules actions", () => {
   expect(run.a).toBe(1);
   expect(run.b).toBe(1);
   expect(flushed).toBe(1);
-  expect(actions.length).toBe(2);
+  expect(captured).toBe(1);
+  expect(fibers.length).toBe(1);
 
+  scheduler.schedule(fiber, () => { run.a++; return false });
   flush();
 
-  actions = [];
-  expect(run.a).toBe(1);
+  expect(run.a).toBe(2);
   expect(run.b).toBe(1);
-  expect(flushed).toBe(1);
-  expect(actions.length).toBe(0);
+  expect(flushed).toBe(2);
+  expect(captured).toBe(1);
 })
 
 it("tracks disposal actions", () => {

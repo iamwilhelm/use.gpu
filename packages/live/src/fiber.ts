@@ -1270,7 +1270,7 @@ export const flushMount = <F extends ArrowFunction>(
     if (host && (fenced || host?.slice(mount))) return host.visit(mount);
 
     const element = renderFiber(mount);
-    if (element !== undefined) updateFiber(mount, element);
+    updateFiber(mount, element);
   }
 }
 
@@ -1336,7 +1336,7 @@ export const bustFiberQuote = <F extends ArrowFunction>(
     if (yeeted && order?.length) {
       order.length = 0;
       bustFiberYeet(to);
-      visitYeetRoot(to);
+      visitYeetRoot(to, true);
     }
   }
   if (unquote) {
@@ -1344,7 +1344,7 @@ export const bustFiberQuote = <F extends ArrowFunction>(
     if (yeeted && order?.length) {
       order.length = 0;
       bustFiberYeet(to);
-      visitYeetRoot(to);
+      visitYeetRoot(to, true);
     }
   }
 }

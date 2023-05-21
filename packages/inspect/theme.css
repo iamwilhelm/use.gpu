@@ -19,7 +19,8 @@
   --LiveInspect-thumbHover: #aaa;
   --LiveInspect-thumbActive: #bbb;
 
-  --LiveInspect-focusShadow: rgba(0, 0, 0, .25);
+  --LiveInspect-depthShadow: rgba(0, 0, 0, .25);
+  --LiveInspect-focusShadow: rgba(30, 90, 120, 0.3);
   --LiveInspect-borderThin: #444;
 
   --LiveInspect-shim: rgba(0, 0, 0, 0.85);
@@ -56,33 +57,6 @@
 
   font: 14px/20px Lato, sans-serif;
   color: var(--LiveInspect-colorText);
-}
-
-.LiveInspect div[role="tablist"] {
-  height: 40px;
-  border-bottom: 2px solid var(--LiveInspect-backgroundInactive);
-  margin-bottom: 10px;
-  overflow: hidden;
-}
-
-.LiveInspect button[role="tab"] {
-  background: none;
-  font: inherit;
-  color: inherit;
-  border: 0;
-  padding: 0px 20px;
-  line-height: 40px;
-  height: 40px;
-  margin-bottom: -2px;
-  border-bottom: 2px solid transparent;
-}
-.LiveInspect button[role="tab"]:hover {
-  border-bottom: 2px solid var(--LiveInspect-backgroundHover);  
-}
-.LiveInspect button[role="tab"][data-state="active"] {
-  font-weight: bold;
-  color: var(--LiveInspect-colorTextActive);
-  border-bottom: 2px solid var(--LiveInspect-backgroundActive);  
 }
 
 html > body .LiveInspect ::-webkit-scrollbar-track {

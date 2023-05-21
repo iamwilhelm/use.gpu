@@ -58,7 +58,7 @@ export const Inspect: React.FC<InspectProps> = ({
   
   const useOption = useRefineCursor(optionCursor);
 
-  const fibers = new Map<number, LiveFiber<any>>();
+  const fibers = useMemo(() => new Map<number, LiveFiber<any>>(), []);
 
   const [selectedFiber, setSelected] = selectedCursor;
   const [depthLimit] = useOption<number>('depth');
@@ -139,7 +139,7 @@ export const Inspect: React.FC<InspectProps> = ({
       <TreeControls>
         <Options cursor={optionCursor} toggleInspect={toggleInspect} />
       </TreeControls>
-      <TreeView>
+      <TreeView onClick={() => setSelected(null)}>
         <FiberTree
           fiber={fiber}
           fibers={fibers}
@@ -171,7 +171,7 @@ export const Inspect: React.FC<InspectProps> = ({
                 ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
                 : {display: 'flex', height: '100%'}}>
               <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
-                <PanelAbsolute onClick={() => setSelected(null)}>
+                <PanelAbsolute>
                   {tree}
                 </PanelAbsolute>
               </RowPanel>

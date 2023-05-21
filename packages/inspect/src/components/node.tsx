@@ -22,6 +22,7 @@ type NodeProps = {
   unquoted?: boolean,
   parents?: boolean,
   depth?: number,
+  ooo?: boolean,
   runCount?: boolean,
   onClick?: (e: any) => void,
   onMouseEnter?: (e: any) => void,
@@ -40,6 +41,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   unquoted,
   parents,
   depth,
+  ooo,
   runCount,
   onClick,
   onMouseEnter,
@@ -59,8 +61,9 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
   const suffix4 = layout ? <SVGDashboard key="dash" title="Layout" /> : null;
   const suffix5 = quote ? <SVGQuote key="quote" title="Quote" /> : null;
   const suffix6 = output ? <SVGViewOutput key="output" title="Output" /> : null;
+  const suffix7 = ooo ? '⚠️' : null;
 
-  const icons = [suffix1, suffix2, suffix3, suffix4, suffix5, suffix6].filter(x => !!x);
+  const icons = [suffix1, suffix2, suffix3, suffix4, suffix5, suffix6, suffix7].filter(x => !!x);
 
   const [version, pinged] = usePingContext(fiber);
 

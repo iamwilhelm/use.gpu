@@ -5,7 +5,7 @@ import { formatNode, formatNodeName, YEET } from '@use-gpu/live';
 import { InspectObject } from '../inspect-object';
 import { Spacer } from '../layout';
 
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 
 type PropsProps = {
   fiber: LiveFiber<any>,
@@ -61,32 +61,49 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
     }
   }
 
-  let yt = yeeted?.value != null ? (<>
+  let yt = (yeeted?.value ?? yeeted?.reduced) != null ? (<>
     <div><b>Yeeted</b></div>
-    <div><InspectObject
-      object={{value: yeeted?.value}}
-      state={state}
-      toggleState={toggleState}
-      path={''}
-    /></div>
+    {yeeted?.value != null ? ( 
+      <div><InspectObject
+        object={{value: yeeted?.value}}
+        state={state}
+        toggleState={toggleState}
+        path={''}
+      /></div>
+    ) : null}
+    {yeeted?.reduced != null ? ( 
+      <div><InspectObject
+        object={{reduced: yeeted?.reduced}}
+        state={state}
+        toggleState={toggleState}
+        path={''}
+      /></div>
+    ) : null}
   </>) : null;
 
   let showProps = f !== YEET;
 
-  let history = null as React.ReactNode | null;
-  let parent = fiber;
-  if (parent.by) {
-    const parents = [] as LiveFiber<any>[];
-    while (parent) {
-      const {by} = parent;
-      const source = fibers.get(by);
-      if (source) parents.push(source);
-      parent = source as any;
+  const getHistory = () => {
+    let parent = fiber;
+    if (parent.by) {
+      const parents = [] as LiveFiber<any>[];
+      while (parent) {
+        const {by} = parent;
+        const source = fibers.get(by);
+        if (source) parents.push(source);
+        else if (by && !source) console.log('missing', by)
+        parent = source as any;
+      }
+      return parents.map((fiber) => <div key={fiber.id}>{formatNode(fiber)}</div>);
     }
-    history = parents.map((fiber) => <div key={fiber.id}>{formatNode(fiber)}</div>)  }
-  else {
-    history = '[Runtime]';
-  }
+    return '[Runtime]';
+  };
+
+  let [history, setHistory] = useState(getHistory);
+  useLayoutEffect(() => {
+    const h = getHistory();
+    if (h.length !== history.length) setHistory(h);
+  });
 
   return (<>
     {showProps ? (

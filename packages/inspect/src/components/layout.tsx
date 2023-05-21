@@ -11,6 +11,12 @@ export const Button = styled('button', {
   padding: '10px 15px',
   background: 'var(--LiveInspect-backgroundInactive)',
   color: 'var(--LiveInspect-colorText)',
+  '&:focus': {
+    position: 'relative',
+    zIndex: 1,
+    outline: 'none',
+    boxShadow: 'inset 0 0 2px 2px rgba(30, 90, 120, 0.3)',
+  },
   '&:active': {
     color: 'var(--LiveInspect-colorTextMuted)',
   },
@@ -25,6 +31,12 @@ export const SmallButton = styled('button', {
   padding: '5px 10px',
   background: 'var(--LiveInspect-backgroundInactive)',
   color: 'var(--LiveInspect-colorText)',
+  '&:focus': {
+    position: 'relative',
+    zIndex: 1,
+    outline: 'none',
+    boxShadow: 'inset 0 0 2px 2px rgba(30, 90, 120, 0.3)',
+  },
   '&:hover': {
     background: 'var(--LiveInspect-backgroundHover)',
     color: 'var(--LiveInspect-colorTextHover)',

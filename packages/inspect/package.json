@@ -14,8 +14,6 @@
     "types:watch": "yarn run types -- --watch"
   },
   "dependencies": {
-    "@radix-ui/react-slider": "^1.1.1",
-    "@radix-ui/react-tabs": "^1.0.3",
     "@stitches/react": "^1.2.8",
     "@use-gpu/core": "*",
     "@use-gpu/live": "*",

@@ -30,10 +30,12 @@ type FiberTreeProps = {
 type FiberNodeProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
+  by?: LiveFiber<any> | null,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
   indent?: number,
+  renderDepth?: number,
   depthLimit?: number,
   runCounts?: boolean,
   builtins?: boolean,
@@ -59,14 +61,12 @@ type TreeExpandProps = PropsWithChildren<{
 // Get rendered-by depth by tracing `by` props up the tree
 const getRenderDepth = (fibers: Map<number, LiveFiber<any>>, fiber: LiveFiber<any>) => {
   let renderDepth = 0;
-  let parent = fiber;
-  if (parent.by) {
-    while (parent) {
-      const {by} = parent;
-      const source = fibers.get(by);
-      if (source && source?.next !== parent) renderDepth++;
-      parent = source as any;
-    }
+  let {by} = fiber;
+  while (by) {
+    const source = fibers.get(by);
+    if (source && source.next?.id !== fiber.id) renderDepth++;
+    else return null;
+    by = source?.by;
   }
   return renderDepth;
 };
@@ -165,12 +165,15 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   selectedCursor,
   hoveredCursor,
 }) => {
-
+  const by = fibers.get(fiber.by);
+  
   return (<div style={{minWidth: 'fit-content', position: 'relative'}}>
     <TreeWrapper>
       <FiberNode
+        by={by}
         fiber={fiber}
         fibers={fibers}
+        renderDepth={0}
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
@@ -186,8 +189,10 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
 
 // One node in the tree
 export const FiberNode: React.FC<FiberNodeProps> = memo(({
+  by,
   fiber,
   fibers,
+  renderDepth = 0,
   depthLimit = Infinity,
   runCounts = false,
   builtins = false,
@@ -199,12 +204,16 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   siblings,
   indent = 0,
 }) => {
-  const {id, mount, mounts, next, order, host, yeeted, __inspect} = fiber;
+  let {id, mount, mounts, next, order, host, yeeted, __inspect} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
   const [hoverState, updateHoverState] = hoveredCursor;
 
   // Hook up ping provider
   fibers.set(id, fiber);
+  useLayoutEffect(() => {
+    fibers.set(id, fiber);
+    return () => { fibers.delete(id); }
+  }, []);
   usePingContext(fiber);
 
   // Resolve hover-state
@@ -218,8 +227,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Resolve depth-highlighting
   const subnode = hoverState.by ? isSubNode(hoverState.by, fiber) : true;
-  const renderDepth = getRenderDepth(fibers, fiber);
   const styleDepth = hoverState.fiber ? (subnode ? Math.max(-1, renderDepth - hoverState.depth) : -1) : 0;
+  renderDepth = getRenderDepth(fibers, fiber) ?? renderDepth;
 
   // Resolve node omission
   const shouldRender = (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
@@ -276,6 +285,14 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       }
     }
   }, [selected]);
+  
+  let ooo = false;
+  if (mounts && order) {
+    if (order.length !== mounts.size) {
+      order = [...mounts.keys()];
+      ooo = true;
+    }
+  }
 
   // Render node itself
   let nodeRender = (shouldRender || shouldAbsolute) ? (
@@ -295,6 +312,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       onMouseEnter={hover}
       onMouseLeave={unhover}
       ref={rowRef}
+      ooo={ooo}
     />
   ) : null;
   if (shouldAbsolute) nodeRender = <div style={{position: 'absolute'}}>{nodeRender}</div>;
@@ -307,6 +325,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         key='mount'
         fiber={mount}
         fibers={fibers}
+        renderDepth={renderDepth}
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
@@ -329,6 +348,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             key={key}
             fiber={sub}
             fibers={fibers}
+            renderDepth={renderDepth}
             depthLimit={depthLimit}
             runCounts={runCounts}
             builtins={builtins}
@@ -381,6 +401,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       <FiberNode
         fiber={next}
         fibers={fibers}
+        renderDepth={renderDepth}
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}

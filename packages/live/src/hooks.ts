@@ -419,7 +419,7 @@ export const useCapture = <C>(
       state![i + 1] = context;
       host.track(fiber, () => {
         registry.delete(fiber);
-        host.schedule(root, NOP);
+        host.schedule(root);
         host.undepend(root, fiber.id);
       });
 

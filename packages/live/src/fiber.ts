@@ -448,7 +448,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
         if (nextMount !== mount) {
           if (order.length) {
             order.length = 0;
-            host.visit(fiber.next);
+            fiber.host?.visit(fiber.next!);
           }
 
           mounts.set(key, nextMount);
@@ -529,7 +529,7 @@ export const reconcileFiberCalls = (() => {
 
     // If rekeyed, reorder queue and invalidate quoted order
     if (rekeyed) {
-      fiber.host?.rekey(fiber);
+      fiber.host?.reorder(fiber);
       bustFiberQuote(fiber);
     }
 
@@ -575,7 +575,7 @@ export const reconcileFiberOrder = <F extends ArrowFunction>(
   }
 
   // If rekeyed, invalidate quoted order
-  fiber.host?.rekey(fiber);
+  fiber.host?.reorder(fiber);
   bustFiberQuote(fiber);
 
   pingFiber(fiber);
@@ -649,9 +649,9 @@ export const mountFiberQuote = <F extends ArrowFunction>(
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  const mount = to.mounts.get(id);
-  if (mount!.unquote?.to !== fiber.id) {
-    mount.unquote = makeQuoteState(root, to, fiber);
+  const mount = to.mounts!.get(id);
+  if (mount!.unquote?.to !== fiber) {
+    mount!.unquote = makeQuoteState(root, to, fiber);
   }
 
   const nextNext = next?.next;
@@ -676,9 +676,9 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  const mount = to.mounts.get(id);
-  if (mount!.quote?.to !== fiber.id) {
-    mount.quote = makeQuoteState(root, to, fiber);
+  const mount = to.mounts!.get(id);
+  if (mount!.quote?.to !== fiber) {
+    mount!.quote = makeQuoteState(root, to, fiber);
   }
 
   const nextNext = next?.next;
@@ -1330,14 +1330,14 @@ export const bustFiberQuote = <F extends ArrowFunction>(
     const {to, to: {next, order}} = quote;
     if (next && order?.length) {
       order.length = 0;
-      host.visit(next);
+      host?.visit(next);
     }
   }
   if (unquote) {
     const {to, to: {next, order}} = unquote;
     if (next && order?.length) {
       order.length = 0;
-      host.visit(next);
+      host?.visit(next);
     }
   }
 }

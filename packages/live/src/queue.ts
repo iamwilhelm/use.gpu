@@ -94,8 +94,8 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
   }
   
   // Re-insert all fibers that descend from fiber
-  const rekey = (fiber: LiveFiber<any>) => {
-    const list: LiveFiber<any> = [];
+  const reorder = (fiber: LiveFiber<any>) => {
+    const list: LiveFiber<any>[] = [];
 
     const {path} = fiber;
     let q = queue;
@@ -166,5 +166,5 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
 
   if (init) for (let i of init) insert(i);
 
-  return {insert, remove, rekey, all, peek, pop} as any;
+  return {insert, remove, reorder, all, peek, pop} as any;
 }

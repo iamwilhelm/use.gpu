@@ -67,11 +67,7 @@ export enum Hook {
 
 // Deferred actions
 export type Task = () => void;
-export type Action = {
-  fiber: LiveFiber<any>,
-  task?: Task,
-};
-export type Dispatcher = (as: Action[]) => void;
+export type MaybeTask = () => boolean;
 
 // Render callbacks
 export type OnFiber<T = any> = (fiber: LiveFiber<any>) => T;
@@ -174,12 +170,13 @@ export type FiberQueue = {
   all: ()=> LiveFiber<any>[],
   peek: () => LiveFiber<any> | null,
   pop: () => LiveFiber<any> | null,
+  reorder: (f: LiveFiber<any>) => void,
 };
 
 // Live host interface
 export type HostInterface = {
   // Schedule a task on next flush
-  schedule: (fiber: LiveFiber<any>, task?: Task) => void,
+  schedule: (fiber: LiveFiber<any>, task?: MaybeTask) => void,
   flush: () => void,
 
   // Track a future cleanup on a fiber
@@ -200,7 +197,7 @@ export type HostInterface = {
   unvisit: (fiber: LiveFiber<any>) => void,
   pop: () => LiveFiber<any> | null,
   peek: () => LiveFiber<any> | null,
-  rekey: (fiber: LiveFiber<any>) => void,
+  reorder: (fiber: LiveFiber<any>) => void,
 
   // Stack slicing
   slice: (fiber: LiveFiber<any>) => boolean,

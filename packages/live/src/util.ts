@@ -1,4 +1,4 @@
-import type { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types';
+import type { LiveFiber, Task, MaybeTask, Key, ArrowFunction } from './types';
 
 const NO_DEPS = [] as any[];
 const dedupe = <T>(list: T[]): T[] => Array.from(new Set<T>(list));
@@ -6,17 +6,22 @@ const dedupe = <T>(list: T[]): T[] => Array.from(new Set<T>(list));
 /** Cyclic 32-bit version number that skips 0 */
 export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
 
+type Action = {
+  fiber: LiveFiber<any>,
+  task?: MaybeTask,
+};
+
 /** Schedules actions to be run immediately after the current thread completes.
 Notifies the bound listener once after running all actions. */
 export const makeActionScheduler = (
   request: (flush: ArrowFunction) => void,
-  onFlush: (fibers: LiveFiber[]) => void,
+  onFlush: (fibers: LiveFiber<any>[]) => void,
 ) => {
   const queue = [] as Action[];
 
   let pending = false;
 
-  const schedule = (fiber: LiveFiber<any>, task?: Task) => {
+  const schedule = (fiber: LiveFiber<any>, task?: MaybeTask) => {
     queue.push({fiber, task});
     if (!pending) {
       pending = true;

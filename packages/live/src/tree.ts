@@ -1,4 +1,4 @@
-import type { Key, Action, Task, LiveFiber, LiveElement, LiveNode, LivePure, DeferredCall, DeferredCallInterop, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction, ReactElementInterop } from './types';
+import type { Key, Task, LiveFiber, LiveElement, LiveNode, LivePure, DeferredCall, DeferredCallInterop, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction, ReactElementInterop } from './types';
 
 import { makeFiber, renderFiber, updateFiber, disposeFiber, reactInterop } from './fiber';
 import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, getOnPaint } from './util';
@@ -19,7 +19,7 @@ const NO_ARGS = [] as any[];
 export const makeHost = (
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
   dispatch: (t: Task) => void,
-  flush: (as: Action[]) => void,
+  flush: (fs: LiveFiber<any>[]) => void,
 ) => {
   const scheduler  = makeActionScheduler(dispatch, flush);
   const disposal   = makeDisposalTracker();
@@ -48,7 +48,7 @@ export const makeHost = (
     unvisit: queue.remove,
     pop: queue.pop,
     peek: queue.peek,
-    rekey: queue.rekey,
+    reorder: queue.reorder,
     all: queue.all,
 
     depth,
@@ -69,7 +69,7 @@ export const makeHostFiber = (
   node: DeferredCall<any>,
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
   dispatch: (t: Task) => void,
-  flush: (as: Action[]) => void,
+  flush: (fibers: LiveFiber<any>[]) => void,
 ) => {
   const {host, scheduler, disposal, dependency} = makeHost(options, dispatch, flush);
   const fiber = makeFiber(node.f, host, null, node.args);
@@ -101,7 +101,7 @@ export const renderWithDispatch = (
     LOG && console.log('Rendering Root', formatNode(node));
 
     // Set up batched flush for all actions
-    const flush = (fibers: LiveFiber[]) => {
+    const flush = (fibers: LiveFiber<any>[]) => {
       (LOG || LOGGING.tick) && console.log('----------------------------');
       LOG && console.log('Dispatch to Roots', fibers.map(formatNode), +new Date() - START, 'ms');
       if (!fibers.length) debugger;

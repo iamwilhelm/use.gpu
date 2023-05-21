@@ -31,12 +31,12 @@ export const StyledTab = styled('button', {
   marginBottom: '-2px',
   borderBottom: '2px solid transparent',
   '&:hover': {
-    borderBottom: '2px solid var(--LiveInspect-backgroundHover)',
+    borderBottom: '3px solid var(--LiveInspect-backgroundHover)',
   },
   '&.active': {
     fontWeight: 'bold',
     color: 'var(--LiveInspect-colorTextActive)',
-    borderBottom: '2px solid var(--LiveInspect-backgroundActive)',
+    borderBottom: '3px solid var(--LiveInspect-backgroundActive)',
   },
 });
 

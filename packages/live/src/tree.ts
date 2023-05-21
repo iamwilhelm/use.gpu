@@ -49,6 +49,8 @@ export const makeHost = (
     unvisit: queue.remove,
     pop: queue.pop,
     peek: queue.peek,
+    rekey: queue.rekey,
+    all: queue.all,
 
     depth,
     slice,

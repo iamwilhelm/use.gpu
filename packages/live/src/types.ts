@@ -124,6 +124,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
 
   // Yeeting state
   yeeted: FiberYeet<any, any> | null,
+  fork: boolean,
 
   // Quoting state
   quote: FiberQuote<any> | null,
@@ -199,6 +200,7 @@ export type HostInterface = {
   unvisit: (fiber: LiveFiber<any>) => void,
   pop: () => LiveFiber<any> | null,
   peek: () => LiveFiber<any> | null,
+  rekey: (fiber: LiveFiber<any>) => void,
 
   // Stack slicing
   slice: (fiber: LiveFiber<any>) => boolean,

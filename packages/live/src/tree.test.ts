@@ -10,6 +10,8 @@ import { memoArgs, useState, useContext, useCapture } from './hooks';
 import { renderSync } from './tree';
 import { formatTree } from './debug';
 
+const seq = (n: number, s: number = 0, d: number = 1): number[] => Array.from({ length: n }).map((_, i: number) => s + d * i);
+
 it("mounts", () => {
 
   const Root = () => use(Node);
@@ -765,4 +767,64 @@ it("renders quote/unquote pairs", () => {
   if (flush) flush();
   
   expect(formatTree(result)).toMatchSnapshot();
+});
+
+it("render reordering", () => {
+  // insert 3 distant fibers in the queue via a context invalidation
+  // then change their order mid-render
+  //
+  // priority queue should be reordered
+  // use stack slice depth 0 to ensure fenced operation
+
+  const context = makeContext<number>(-1);
+
+  const rendered = {
+    root: 0,
+    order: 0,
+    node: 0,
+    ids: [],
+  };
+  let trigger = null as Task | null;
+  const setTrigger = (f: Task) => trigger = f;
+
+  const Root = () => {
+    rendered.root++;
+
+    const [value, setValue] = useState(0);
+    setTrigger(() => setValue(1));
+
+    return provide(context, value, use(Order));
+  };
+
+  const N = 3;
+  const Order = memoArgs(() => {
+    rendered.order++;
+
+    const value = useContext(context);
+    const getKey = (i: number) => (i + value) % N;
+    const order = seq(N).map(getKey);
+
+    return order.map(key => keyed(Node, key, {id: key}));
+  });
+
+  const Node = ({id}) => {
+    rendered.node++;
+    const value = useContext(context);
+    rendered.ids.push(id);
+  };
+
+  const result = renderSync(use(Root), null, {stackSliceDepth: 0});
+  expect(result.host).toBeTruthy();
+  if (!result.host) return;
+
+  const {host: {flush}} = result;
+  expect(formatTree(result)).toMatchSnapshot();
+  expect(rendered.ids).toEqual([0, 1, 2]);
+  
+  if (trigger) trigger();
+  if (flush) flush();
+
+  expect(formatTree(result)).toMatchSnapshot();
+  expect(rendered.ids).toEqual([0, 1, 2, 1, 2, 0]);
+
 });

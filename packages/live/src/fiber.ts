@@ -8,7 +8,7 @@ import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_RED
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
 import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
-import { formatNode, formatNodeName, formatTree, LOGGING } from './debug';
+import { formatNode, formatNodeName, LOGGING } from './debug';
 import { createElement } from './jsx';
 
 import { setCurrentFiber } from './current';
@@ -82,8 +82,8 @@ export const makeFiber = <F extends ArrowFunction>(
 
   const id = ++ID;
 
-  const yeeted = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, scope: null} : null;
-  const quote = parent?.quote ?? null;
+  const yeeted  = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, value: undefined, reduced: undefined, scope: null} : null;
+  const quote   = parent?.quote?.scope ? {...parent.quote, scope: null} : parent?.quote ?? null;
   const unquote = parent?.unquote ?? null;
   const context = parent?.context ?? NO_CONTEXT;
 
@@ -236,13 +236,12 @@ export const renderFiber = <F extends ArrowFunction>(
 
   // Early exit if memoized and same result
   if (fiber.version != null) {
-    const canExitEarly = !fiber.next;
     if (fiber.version !== fiber.memo) {
       fiber.memo = fiber.version;
       bustFiberDeps(fiber);
       pingFiber(fiber);
     }
-    else if (canExitEarly) return;
+    else return;
   }
   else {
     bustFiberDeps(fiber);
@@ -431,7 +430,7 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
   depth?: number,
 ) => {
   let {mounts, order, lookup} = fiber;
-  if (!mounts || !order || !lookup) throw new Error('Cannot reconcile on uninitialized mounts');
+  if (!mounts || !order || !lookup) throw new Error('Cannot reconcile incrementally on uninitialized mounts');
 
   call = reactInterop(call, fiber) as DeferredCall<any> | null;
   if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
@@ -447,19 +446,13 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
         if (depth != null) nextMount.depth = depth;
 
         if (nextMount !== mount) {
-          const i = order!.findIndex((key) => compareFibers(mounts!.get(key)!, nextMount) > 0);
-
-          if (i === -1) order!.push(key);
-          else order!.splice(i, 0, key);
-
           mounts.set(key, nextMount);
-          reconcileFiberOrder(fiber);
         }
       }
       else {
         if (nextMount !== mount) {
-          mounts!.delete(key);
-          order!.splice(order!.indexOf(key), 1);
+          mounts.delete(key);
+          order.splice(order!.indexOf(key), 1);
         }
       }
 
@@ -486,6 +479,7 @@ export const reconcileFiberCalls = (() => {
     if (!Array.isArray(calls)) calls = [calls];
 
     seen.clear();
+    const oo = [...order];
 
     // Get new key set and order
     let i = 0;
@@ -528,6 +522,12 @@ export const reconcileFiberCalls = (() => {
       flushMount(null, mount, fenced);
     }
 
+    // If rekeyed, reorder queue and invalidate quoted order
+    if (rekeyed) {
+      fiber.host?.rekey(fiber);
+      bustFiberQuote(fiber);
+    }
+
     // Mount new / updated keys
     for (let i = 0, j = 0, n = calls.length; i < n; ++i) {
       let call = calls[i];
@@ -548,9 +548,6 @@ export const reconcileFiberCalls = (() => {
         flushMount(nextMount, mount, fenced);
       }
     }
-
-    // If rekeyed, invalidate quoted order
-    if (rekeyed) bustFiberQuote(fiber);
   }
 })();
 
@@ -559,26 +556,23 @@ export const reconcileFiberOrder = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
   const {order, mounts, lookup} = fiber;
-  if (!order || !mounts || !lookup) return;
-
-  // Tripped by bustFiberQuote(…)
+  if (!order || !mounts) return;
   if (order.length === mounts.size) return;
-
-  const previous = [...order];
 
   order.length = 0;
   for (const k of mounts.keys()) order.push(k);
   order.sort((a, b) => compareFibers(mounts.get(a)!, mounts.get(b)!));
+  if (lookup) lookup.clear();
 
-  let rekeyed = false;
   for (let i = 0, n = order.length; i < n; ++i) {
     const o = order[i];
-    if (o != null) lookup.set(o, i);
-    rekeyed = rekeyed || (o !== previous[i]);
+    if (lookup) lookup.set(o, i);
   }
 
   // If rekeyed, invalidate quoted order
-  if (rekeyed) bustFiberQuote(fiber);
+  fiber.host?.rekey(fiber);
+  bustFiberQuote(fiber);
+
   pingFiber(fiber);
 }
 
@@ -606,29 +600,21 @@ export const mountFiberReduction = <F extends ArrowFunction, R, T>(
   mountFiberContinuation(fiber, use(fiber.next.f, Next));
 }
 
-const Reconcile = () => {};
-
 // Mount quoted calls on a fiber's continuation
 export const mountFiberReconciler = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   calls: LiveElement | LiveElement[],
 ) => {
-  if (!fiber.quote || fiber.quote.root !== fiber.id) {
-    const Resume = () => {
-      const {next} = fiber;
-      reconcileFiberOrder(next!);
-      next!.version = next!.memo = incrementVersion(next!.version!);
-    };
+  let {id, next} = fiber;
 
-    const next = fiber.next = makeNextFiber(fiber, Resume, 'Reconcile');
-    next.mounts = new Map();
-    next.lookup = new Map();
-    next.order  = [];
+  if (!fiber.quote || fiber.quote.root !== fiber.id) {
+    // Dummy fiber, never called
+    next = fiber.next = makeNextFiber(fiber, () => { throw new Error(); }, 'Root');
 
     const {quote} = fiber;
-    next.unquote = makeQuoteState(fiber.id, next, fiber);
-    fiber.quote = makeQuoteState(fiber.id, fiber, next);
+    fiber.quote = makeQuoteState(id, fiber, next);
     fiber.quote.scope = quote!;
+    fiber.fork = true;
   }
 
   calls = reactInterop(calls, fiber) as any;
@@ -636,7 +622,8 @@ export const mountFiberReconciler = <F extends ArrowFunction>(
   if (Array.isArray(calls)) reconcileFiberCalls(fiber, calls);
   else mountFiberCall(fiber, calls as any);
 
-  mountFiberContinuation(fiber, use(fiber.next!.f));
+  const nextNext = next?.next;
+  if (nextNext) flushMount(nextNext, nextNext, true);
 }
 
 // Mount quoted calls on a fiber's continuation
@@ -646,23 +633,24 @@ export const mountFiberQuote = <F extends ArrowFunction>(
 ) => {
   if (!fiber.quote) throw new Error("Can't quote outside of reconciler in " + formatNode(fiber));
 
-  let {id, quote, mounts, lookup, order} = fiber;
-  const {root, to} = quote;
+  const {id, quote, mounts, lookup, order} = fiber;
+  let {root, to, to: {next}} = quote;
+
+  if (!next) {
+    next = to.next = makeFiberReconciliation(to);
+    to.fork = true;
+  }
 
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  const mount = to.mounts!.get(id)!;
-  if (mount.unquote?.to.id !== id) {
-    disposeFiberMounts(fiber);
-
-    if (!mounts) mounts = fiber.mounts = new Map();
-    if (!lookup) lookup = fiber.lookup = new Map();
-    if (!order)  order  = fiber.order  = [];
-
-    const quote = makeQuoteState(root, mount, fiber);
-    mount.unquote = quote;
+  const mount = to.mounts.get(id);
+  if (mount!.unquote?.to !== fiber.id) {
+    mount.unquote = makeQuoteState(root, to, fiber);
   }
+
+  const nextNext = next?.next;
+  flushMount(to.next, to.next, true);
 }
 
 // Mount unquoted calls on a fiber's origin
@@ -672,23 +660,24 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
 ) => {
   if (!fiber.unquote) throw new Error("Can't unquote outside of quote in " + formatNode(fiber));
 
-  let {id, unquote, mounts, lookup, order} = fiber;
-  const {root, to} = unquote;
+  const {id, unquote, mounts, lookup, order} = fiber;
+  let {root, to, to: {next}} = unquote;
+  
+  if (!next) {
+    next = to.next = makeFiberReconciliation(to);
+    to.fork = true;
+  }
 
   const call = Array.isArray(calls) ? fragment(calls) : calls ?? EMPTY_FRAGMENT;
   reconcileFiberCall(to, call as any, id, true, fiber.path, fiber.keys, fiber.depth + 1);
 
-  const mount = to.mounts!.get(id)!;
-  if (mount.quote?.to.id !== id) {
-    disposeFiberMounts(fiber);
-
-    if (!mounts) mounts = fiber.mounts = new Map();
-    if (!lookup) lookup = fiber.lookup = new Map();
-    if (!order)  order  = fiber.order  = [];
-
-    const unquote = makeQuoteState(root, mount, fiber);
-    mount.quote = unquote;
+  const mount = to.mounts.get(id);
+  if (mount!.quote?.to !== fiber.id) {
+    mount.quote = makeQuoteState(root, to, fiber);
   }
+
+  const nextNext = next?.next;
+  flushMount(to.next, to.next, true);
 }
 
 // Wrap a live function to act as a reduction continuation of a prior fiber
@@ -715,13 +704,22 @@ export const makeFiberReduction = <F extends ArrowFunction, R>(
   return Next(nextValue);
 }
 
-// Wrap a live function to act as a reconciled continuation on a fiber
+// Make a reconciling tail for a fiber. Used to fix order in case of rekeying.
 export const makeFiberReconciliation = <F extends ArrowFunction, R>(
   fiber: LiveFiber<F>,
-) => (
-  calls?: LiveElement,
+  name: string = 'Reconcile',
 ) => {
-  return calls;
+  // Incrementally reconciled. Pre-initialize these.
+  let {mounts, lookup, order} = fiber;
+  if (!mounts) fiber.mounts = new Map();
+  if (!lookup) fiber.lookup = new Map();
+  if (!order)  fiber.order  = [];
+
+  const Resume = () => {
+    const {next} = fiber;
+    reconcileFiberOrder(fiber);
+  };
+  return makeNextFiber(fiber, Resume, name);
 }
 
 // Tag a component as imperative, always re-rendered from above even if props/state didn't change
@@ -796,16 +794,13 @@ export const reduceFiberValues = <R>(
     const {yeeted, mount, mounts, order} = fiber;
     if (!yeeted) throw new Error("Reduce without aggregator");
 
-    let isFork = (fiber.f === CAPTURE || fiber.type === RECONCILE) && fiber.next;
-
+    let isFork = fiber.fork;
     if (!self) {
       if (fiber.next && !isFork) return reduce(fiber.next);
     }
 
     if (yeeted.reduced !== undefined) return yeeted.reduced;
     if (mounts && order) {
-      reconcileFiberOrder(fiber);
-
       if (mounts.size) {
         const n = mounts.size;
         const first = mounts.get(order[0]);
@@ -862,16 +857,13 @@ export const gatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = (fiber.f === CAPTURE || fiber.type === RECONCILE) && fiber.next;
-
+  let isFork = fiber.fork;
   if (!self) {
     if (fiber.next && !isFork) return gatherFiberValues(fiber.next);
   }
 
   if (yeeted.reduced !== undefined) return yeeted.reduced;
   if (mounts && order) {
-    reconcileFiberOrder(fiber);
-
     if (mounts.size) {
       const items = [] as T[];
       for (let k of order) {
@@ -929,16 +921,13 @@ export const multiGatherFiberValues = <F extends ArrowFunction, T>(
   const {yeeted, mount, mounts, order} = fiber;
   if (!yeeted) throw new Error("Reduce without aggregator");
 
-  let isFork = (fiber.f === CAPTURE || fiber.type === RECONCILE) && fiber.next;
-
+  let isFork = fiber.fork;
   if (!self) {
     if (fiber.next && !isFork) return multiGatherFiberValues(fiber.next) as any;
   }
 
   if (yeeted.reduced !== undefined) return yeeted.reduced;
   if (mounts && order) {
-    reconcileFiberOrder(fiber);
-
     if (mounts.size) {
       const out = {} as Record<string, T[]>;
 
@@ -1113,6 +1102,7 @@ export const captureFiber = <F extends ArrowFunction>(
 
     fiber.context = makeContextState(fiber, fiber.context, fiber.next, capture, registry);
     fiber.path = [...fiber.path, 0];
+    fiber.fork = true;
   }
 
   inlineFiberCall(fiber, calls);
@@ -1168,6 +1158,8 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
 
   disposeFiberMounts(fiber);
   if (next) disposeFiber(next);
+  fiber.next = null;
+  fiber.fork = false;
 
   if (fiber.type === RECONCILE) {
     fiber.quote = fiber.quote!.scope ?? null;
@@ -1178,8 +1170,6 @@ export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) 
     visitYeetRoot(fiber);
     if (yeeted.scope) fiber.yeeted = yeeted.scope;
   }
-
-  fiber.next = null;
 }
 
 // Dispose of a fiber's mounted sub-fibers
@@ -1264,7 +1254,7 @@ export const flushMount = <F extends ArrowFunction>(
     disposeFiber(mounted);
   }
   if (mount) {
-    const {host, quote, unquote} = mount;
+    const {host} = mount;
 
     // Slice into new stack if too deep, or if fenced
     if (host && (fenced || host?.slice(mount))) return host.visit(mount);
@@ -1330,21 +1320,19 @@ export const bustFiberDeps = <F extends ArrowFunction>(
 export const bustFiberQuote = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
 ) => {
-  const {quote, unquote} = fiber;
+  const {host, quote, unquote} = fiber;
   if (quote) {
-    const {to, to: {order, yeeted}} = quote;
+    const {to, to: {next, order, yeeted}} = quote;
     if (yeeted && order?.length) {
       order.length = 0;
-      bustFiberYeet(to);
-      visitYeetRoot(to, true);
+      if (next) host.visit(next);
     }
   }
   if (unquote) {
-    const {to, to: {order, yeeted}} = unquote;
+    const {to, to: {next, order, yeeted}} = unquote;
     if (yeeted && order?.length) {
       order.length = 0;
-      bustFiberYeet(to);
-      visitYeetRoot(to, true);
+      if (next) host.visit(next);
     }
   }
 }

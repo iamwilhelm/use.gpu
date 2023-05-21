@@ -41,7 +41,7 @@ export const formatSnapshotArg = (arg: any, depth: number = 0): string => {
     return Object.keys(arg).map(k => `${k}={${formatSnapshotArg(arg[k], depth + 1)}}`).join(' ');
   }
   if (typeof arg === 'string') {
-    return truncate(arg.replace(/\s+/g, ' '), 40);
+    return truncate(arg.replace(/\s+/g, ' '), 255);
   }
   if (typeof arg === 'function') {
     return formatShortValue(arg);
@@ -55,7 +55,7 @@ export const formatTree = (root: LiveFiber<any>, depth: number = 0): string => {
 
   const prefix = '  '.repeat(depth);
   
-  out.push(prefix + '<' + formatNodeName(root) +' '+ formatSnapshot(root.args)) + '>';
+  out.push(prefix + '<' + formatNodeName(root) +' '+ formatSnapshot(root.args) + '>');
 
   if (mount) {
     out.push(formatTree(mount, depth + 1));

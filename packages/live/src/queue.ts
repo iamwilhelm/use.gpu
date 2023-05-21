@@ -1,8 +1,9 @@
 import type { LiveFiber, FiberQueue } from './types';
-import { compareFibers } from './util';
+import { compareFibers, isSubNode } from './util';
+import { formatNodeName } from './debug';
 
 type Q = {
-  f: LiveFiber<any>
+  fiber: LiveFiber<any>
   next: Q | null,
 };
 
@@ -18,37 +19,37 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
 
   const set = new Set<LiveFiber<any>>();
 
-  const insert = (f: LiveFiber<any>) => {
-    if (set.has(f)) return;
-    set.add(f);
-
+  const insert = (fiber: LiveFiber<any>) => {
+    if (set.has(fiber)) return;
+    set.add(fiber);
+    
     if (!queue) {
-      tail = queue = {f, next: null};
+      tail = queue = {fiber, next: null};
       return;
     }
 
     if (tail) {
-      if (compareFibers(tail.f, f) <= 0) {
-        tail = tail.next = {f, next: null};
+      if (compareFibers(tail.fiber, fiber) <= 0) {
+        tail = tail.next = {fiber, next: null};
         return;
       }
     }
 
-    if (compareFibers(queue.f, f) >= 0) {
-      queue = {f, next: queue};
+    if (compareFibers(queue.fiber, fiber) >= 0) {
+      queue = {fiber, next: queue};
       return;
     }
 
     if (!queue.next) return;
 
     let q = queue;
-    if (hint && compareFibers(hint.f, f) <= 0) {
+    if (hint && compareFibers(hint.fiber, fiber) <= 0) {
       q = hint;
     }
 
     while (q.next) {
-      if (compareFibers(q.next.f, f) >= 0) {
-        q.next = {f, next: q.next};
+      if (compareFibers(q.next.fiber, fiber) >= 0) {
+        q.next = {fiber, next: q.next};
         hint = q;
         return;
       }
@@ -56,13 +57,13 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     }
   }
 
-  const remove = (f: LiveFiber<any>) => {
+  const remove = (fiber: LiveFiber<any>) => {
     if (!queue) return;
-    if (!set.has(f)) return;
-    set.delete(f);
+    if (!set.has(fiber)) return;
+    set.delete(fiber);
 
     let i = 0;
-    if (queue.f === f) {
+    if (queue.fiber === fiber) {
       if (hint === queue) hint = hint.next;
 
       queue = queue.next;
@@ -74,7 +75,7 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     let q = queue;
     while (q.next) {
       const qn = q.next;
-      if (qn.f === f) {
+      if (qn.fiber === fiber) {
         if (hint === qn) hint = hint.next;
         q.next = qn.next;
         if (!q.next) tail = q;
@@ -83,12 +84,50 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
       q = q.next;
     }
   }
+  
+  const rekey = (fiber: LiveFiber<any>) => {
+    const list: LiveFiber<any> = [];
+
+    const {path} = fiber;
+    let q = queue;
+    let qp = null;
+
+    let skipped = 0;
+    let popped = [];
+
+    while (q) {
+      if (compareFibers(fiber, q.fiber) >= 0) {
+        hint = qp = q;
+        q = q.next;
+        skipped++;
+        continue;
+      }
+      if (isSubNode(fiber, q.fiber)) {
+        list.push(q.fiber);
+        popped.push(formatNodeName(q.fiber) + q.fiber.id);
+        if (qp) {
+          qp.next = q.next;
+          q = q.next;
+        }
+        else {
+          pop();
+          q = q.next;
+        }
+      }
+      break;
+    }
+
+    if (list.length) {
+      list.sort(compareFibers);
+      list.forEach(insert);
+    }
+  };
 
   const all = () => {
     const out = [];
     let q = queue;
     while (q) {
-      out.push(q.f);
+      out.push(q.fiber);
       q = q.next;
     }
     return out;
@@ -96,7 +135,7 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
 
   const peek = (): LiveFiber<any> | null => {
     if (!queue) return null;
-    return queue.f;
+    return queue.fiber;
   }
 
   const pop = (): LiveFiber<any> | null => {
@@ -108,12 +147,12 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     if (!queue) hint = tail = null;
     else if (hint === q) hint = hint.next;
 
-    set.delete(q.f);
+    set.delete(q.fiber);
 
-    return q.f;
+    return q.fiber;
   }
 
   if (init) for (let i of init) insert(i);
 
-  return {insert, remove, all, peek, pop} as any;
+  return {insert, remove, rekey, all, peek, pop} as any;
 }

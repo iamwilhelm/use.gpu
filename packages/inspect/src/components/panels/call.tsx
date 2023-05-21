@@ -16,11 +16,11 @@ type CallProps = {
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
-  const {id, depth, path, keys, type, state, context, yeeted, quote, unquote, mount, mounts, next, ...rest} = fiber;
+  const {id, depth, path, order, keys, type, state, context, yeeted, quote, unquote, mount, mounts, next, ...rest} = fiber;
 
   let props = {id, depth, path, keys, '[internals]': rest} as any;
   let env = {context, yeeted, quote, unquote} as any;
-  let rendered = {type, mount, mounts, next} as any;
+  let rendered = {type, mount, mounts, next, order} as any;
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const toggleExpanded = (id: string) => setExpanded((state) => ({

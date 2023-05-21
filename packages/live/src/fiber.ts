@@ -446,6 +446,11 @@ export const reconcileFiberCall = <F extends ArrowFunction>(
         if (depth != null) nextMount.depth = depth;
 
         if (nextMount !== mount) {
+          if (order.length) {
+            order.length = 0;
+            host.visit(fiber.next);
+          }
+
           mounts.set(key, nextMount);
         }
       }
@@ -1322,17 +1327,17 @@ export const bustFiberQuote = <F extends ArrowFunction>(
 ) => {
   const {host, quote, unquote} = fiber;
   if (quote) {
-    const {to, to: {next, order, yeeted}} = quote;
-    if (yeeted && order?.length) {
+    const {to, to: {next, order}} = quote;
+    if (next && order?.length) {
       order.length = 0;
-      if (next) host.visit(next);
+      host.visit(next);
     }
   }
   if (unquote) {
-    const {to, to: {next, order, yeeted}} = unquote;
-    if (yeeted && order?.length) {
+    const {to, to: {next, order}} = unquote;
+    if (next && order?.length) {
       order.length = 0;
-      if (next) host.visit(next);
+      host.visit(next);
     }
   }
 }

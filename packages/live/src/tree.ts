@@ -14,7 +14,6 @@ const START = +new Date();
 
 const NO_NODE = () => null;
 const NO_ARGS = [] as any[];
-const dedupe = <T>(list: T[]): T[] => Array.from(new Set<T>(list));
 
 // Create new runtime host
 export const makeHost = (
@@ -102,9 +101,7 @@ export const renderWithDispatch = (
     LOG && console.log('Rendering Root', formatNode(node));
 
     // Set up batched flush for all actions
-    const flush = (as: Action[]) => {
-      const fibers = dedupe(as.map(({fiber}) => fiber));
-
+    const flush = (fibers: LiveFiber[]) => {
       (LOG || LOGGING.tick) && console.log('----------------------------');
       LOG && console.log('Dispatch to Roots', fibers.map(formatNode), +new Date() - START, 'ms');
       if (!fibers.length) debugger;

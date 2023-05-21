@@ -1,6 +1,7 @@
 import type { LiveFiber, Task, Action, Dispatcher, Key, ArrowFunction } from './types';
 
 const NO_DEPS = [] as any[];
+const dedupe = <T>(list: T[]): T[] => Array.from(new Set<T>(list));
 
 /** Cyclic 32-bit version number that skips 0 */
 export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
@@ -9,7 +10,7 @@ export const incrementVersion = (v: number) => (((v + 1) | 0) >>> 0) || 1;
 Notifies the bound listener once after running all actions. */
 export const makeActionScheduler = (
   request: (flush: ArrowFunction) => void,
-  onFlush: (as: Action[]) => void,
+  onFlush: (fibers: LiveFiber[]) => void,
 ) => {
   const queue = [] as Action[];
 
@@ -30,8 +31,11 @@ export const makeActionScheduler = (
     queue.length = 0;
     pending = false;
 
-    for (const {task} of q) if (task) task();
-    onFlush(q);
+    const acted = [];
+    for (const {fiber, task} of q) if (task?.() !== false) acted.push(fiber);
+
+    const fibers = dedupe(acted);
+    if (fibers.length) onFlush(fibers);
   };
 
   return {schedule, flush};

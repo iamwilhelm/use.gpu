@@ -19,15 +19,18 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
 
   const set = new Set<LiveFiber<any>>();
 
+  // Insert fiber into queue
   const insert = (fiber: LiveFiber<any>) => {
     if (set.has(fiber)) return;
     set.add(fiber);
     
+    // Empty
     if (!queue) {
       tail = queue = {fiber, next: null};
       return;
     }
 
+    // Append
     if (tail) {
       if (compareFibers(tail.fiber, fiber) <= 0) {
         tail = tail.next = {fiber, next: null};
@@ -35,6 +38,7 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
       }
     }
 
+    // Prepend
     if (compareFibers(queue.fiber, fiber) >= 0) {
       queue = {fiber, next: queue};
       return;
@@ -42,11 +46,13 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
 
     if (!queue.next) return;
 
+    // Skip ahead
     let q = queue;
     if (hint && compareFibers(hint.fiber, fiber) <= 0) {
       q = hint;
     }
 
+    // Iterate
     while (q.next) {
       if (compareFibers(q.next.fiber, fiber) >= 0) {
         q.next = {fiber, next: q.next};
@@ -57,11 +63,13 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     }
   }
 
+  // Remove fiber from queue
   const remove = (fiber: LiveFiber<any>) => {
     if (!queue) return;
     if (!set.has(fiber)) return;
     set.delete(fiber);
 
+    // Pop
     let i = 0;
     if (queue.fiber === fiber) {
       if (hint === queue) hint = hint.next;
@@ -85,6 +93,7 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     }
   }
   
+  // Re-insert all fibers that descend from fiber
   const rekey = (fiber: LiveFiber<any>) => {
     const list: LiveFiber<any> = [];
 
@@ -123,6 +132,7 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     }
   };
 
+  // Return entire queue (debug)
   const all = () => {
     const out = [];
     let q = queue;
@@ -133,19 +143,21 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     return out;
   }
 
+  // Return top of queue
   const peek = (): LiveFiber<any> | null => {
     if (!queue) return null;
     return queue.fiber;
   }
 
+  // Pop top of queue
   const pop = (): LiveFiber<any> | null => {
     if (!queue) return null;
 
     let q = queue;
     queue = q.next;
 
-    if (!queue) hint = tail = null;
-    else if (hint === q) hint = hint.next;
+    if (hint === q) hint = hint.next;
+    if (!queue) tail = null;
 
     set.delete(q.fiber);
 

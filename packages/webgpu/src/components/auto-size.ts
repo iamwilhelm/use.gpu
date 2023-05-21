@@ -27,8 +27,9 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<
     canvas.style.height = '100%';
   }, [canvas]);
  
-  const [[width, height, pixelRatio], setSize] = useState(() => getCanvasSize(window, canvas));
+  const [size, setSize] = useState(() => getCanvasSize(window, canvas));
 
+  const [width, height, pixelRatio] = size;
   const w = Math.round(width * pixelRatio);
   const h = Math.round(height * pixelRatio);
 
@@ -38,7 +39,13 @@ export const AutoSize: LiveComponent<AutoSizeProps> = (props: PropsWithChildren<
   useOne(() => canvas.style.height = `${Math.round(height)}px`, height);
 
   useResource((dispose) => {
-    const resize = () => setSize(getCanvasSize(window, canvas));
+    const resize = () => {
+      setSize(state => {
+        const size = getCanvasSize(window, canvas);
+        if (state.every((s, i) => s === size[i])) return state;
+        return size;
+      });
+    };
 
     const observer = new ResizeObserver(resize);
     observer.observe(canvas.parentElement as any);

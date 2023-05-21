@@ -208,7 +208,7 @@ export const renderFiber = <F extends ArrowFunction>(
   const {f, host} = fiber;
   host?.unvisit(fiber);
 
-  // These built-ins that are explicitly mounted as sub-fibers,
+  // These built-ins are explicitly mounted as sub-fibers,
   // so as to not collide with the parent state.
   if      ((f as any) === PROVIDE) return provideFiber(fiber);
   else if ((f as any) === CAPTURE) return captureFiber(fiber);

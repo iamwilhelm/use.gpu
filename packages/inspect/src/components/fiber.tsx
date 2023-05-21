@@ -41,6 +41,8 @@ type FiberNodeProps = {
   builtins?: boolean,
   highlight?: boolean,
   continuation?: boolean,
+  wide?: boolean,
+  indented?: number,
   siblings?: boolean,
 }
 
@@ -201,12 +203,19 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   selectedCursor,
   hoveredCursor,
   continuation,
+  wide,
   siblings,
+  indented = 1,
   indent = 0,
 }) => {
   let {id, mount, mounts, next, order, host, yeeted, __inspect} = fiber;
   const [selectState, updateSelectState] = selectedCursor;
   const [hoverState, updateHoverState] = hoveredCursor;
+
+  // Avoid jumpyness on hover
+  const lockedWide = useMemo(() => (!mount && !mounts && !next), []);
+  wide = wide || lockedWide;
+  indent += (indented * (wide ? 1 : .1));
 
   // Hook up ping provider
   fibers.set(id, fiber);
@@ -333,7 +342,9 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
-        indent={indent + (shouldRender ? ((next || !hasNext || siblings) ? 1 : .1) : 0) + (continuation ? 1 : 0)}
+        indent={indent}
+        indented={+!!shouldRender}
+        wide={!!next || siblings}
       />
     );
   }
@@ -356,7 +367,9 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             expandCursor={expandCursor}
             selectedCursor={selectedCursor}
             hoveredCursor={hoveredCursor}
-            indent={indent + (shouldRender ? 1 : 0) + (continuation ? 1 : 0)}
+            indent={indent}
+            indented={+!!shouldRender}
+            wide={true}
             siblings={order.length > 1}
           />
         );
@@ -388,9 +401,9 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   let nextRender = null as React.ReactElement | null;
   if (next) {
     childRender = shouldRender ? (
-      <TreeIndent indent={indent + .5 + (continuation ? 1 : 0)}>
+      <TreeIndent indent={indent + .5}>
         <TreeLine>
-          <TreeIndent indent={-indent - .5 - (continuation ? 1 : 0)}>
+          <TreeIndent indent={-indent - .5}>
             {out}
           </TreeIndent>
         </TreeLine>
@@ -409,8 +422,10 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         expandCursor={expandCursor}
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
+        indented={0}
+        wide={true}
+        indent={indent}
         continuation
-        indent={indent - +!!out.length + (continuation ? 1 : 0)}
       />
     );
   }
@@ -435,7 +450,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         initialValue={shouldStartOpen}
       >{
         (expand, onToggle) => (<>
-          <TreeRow indent={indent + +!!continuation}>
+          <TreeRow indent={indent}>
             <TreeExpand expand={expand} onToggle={onToggle} openIcon={openIcon} closedIcon={closedIcon}>
               {nodeRender}
             </TreeExpand>
@@ -450,7 +465,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   // Leaf node
   const continuationIcon = <IconItem><SVGNextClosed /></IconItem>;
   return (<>
-    <TreeRow indent={indent + 1}>
+    <TreeRow indent={indent + 1 - +!!continuation}>
       {continuation ? <Muted>{continuationIcon}</Muted> : null}
       {nodeRender}
     </TreeRow>

@@ -211,7 +211,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   const [hoverState, updateHoverState] = hoveredCursor;
 
   // Avoid jumpyness on hover
-  const lockedWide = useMemo(() => (!mount && !mounts && !next), [Math.random]);
+  const lockedWide = useMemo(() => (!mount && !mounts && !next), []);
   wide = wide || lockedWide;
   indent += (indented * (wide ? 1 : .1));
 
@@ -366,7 +366,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             hoveredCursor={hoveredCursor}
             indent={indent}
             indented={+!!shouldRender}
-            wide={order.length > 1}
+            wide={order.length > 1 || !!next}
           />
         );
       }

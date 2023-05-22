@@ -71,6 +71,7 @@ export const GeometryLinesPage: LC = () => {
 
   return (
     <Camera>
+      <Cursor cursor='move' />
       <Pass>
         <CompositeData
           fields={dataFields}

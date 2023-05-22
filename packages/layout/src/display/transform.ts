@@ -3,7 +3,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle, UniformAttribute } from '@use-gpu/core';
 import type { LayoutRenderer, LayoutElement, FitInto } from '../types';
 
-import { memo, gather, yeet, useMemo } from '@use-gpu/live';
+import { use, memo, gather, yeet, useMemo } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 
 import { memoFit, memoLayout } from '../lib/util';
@@ -50,6 +50,7 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
               clip,
               mask,
               transform,
+              inverse,
               fit.render,
             )
           ),
@@ -74,6 +75,7 @@ const TransformLayout = (
   clip: ShaderModule | null,
   mask: ShaderModule | null,
   transform: ShaderModule | null,
+  inverse: ShaderModule | null,
   render: LayoutRenderer
 ): LiveElement => {
 

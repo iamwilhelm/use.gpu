@@ -44,7 +44,7 @@ export const BoxLayout = memoLayout((
   outside: RenderOutside,
   inspect?: boolean,
 ) => {
-  const {sizes, offsets, renders, clip, mask, transform} = inside;
+  const {sizes, offsets, renders, clip, mask, transform, inverse} = inside;
   const {box, origin, clip: parentClip, mask: parentMask, transform: parentTransform} = outside;
   
   const [left, top, right, bottom] = box;

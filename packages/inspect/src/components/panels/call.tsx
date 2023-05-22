@@ -16,9 +16,9 @@ type CallProps = {
 
 export const Call: React.FC<CallProps> = ({fiber}) => {
   // @ts-ignore
-  const {id, depth, path, order, keys, type, state, context, yeeted, quote, unquote, mount, mounts, next, ...rest} = fiber;
+  const {id, depth, runs, path, order, keys, type, state, context, yeeted, quote, unquote, mount, mounts, next, ...rest} = fiber;
 
-  let props = {id, depth, path, keys, '[internals]': rest} as any;
+  let props = {id, runs, depth, path, keys, '[internals]': rest} as any;
   let env = {context, yeeted, quote, unquote} as any;
   let rendered = {type, mount, mounts, next, order} as any;
 

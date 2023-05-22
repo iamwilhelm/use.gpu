@@ -123,6 +123,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     api,
     backgroundColor,
     children,
+    version: map.size,
   });
 
   return (
@@ -144,7 +145,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
             const map = new Map();
             for (const slide of resolved) map.set(slide.id, slide);
             setMap(map);
-          }, [slides])
+          }, [slides]);
 
           return null;
         }

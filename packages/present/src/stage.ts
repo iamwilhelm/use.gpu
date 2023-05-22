@@ -16,6 +16,7 @@ export type StageProps = {
   step: number,
   api: PresentAPI,
   backgroundColor: ColorLike,
+  version: number,
 };
 
 // Presentation view renderer
@@ -49,6 +50,7 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
   return gather(
     wrap(SDFFontProvider, children),
     (layers: ResolvedLayer[]) => {
+
       // Find main slide thread + extra floats
       const threads = layers.filter(({id}) =>  api.isThread(id));
       const floats  = layers.filter(({id}) => !api.isThread(id));
@@ -81,7 +83,7 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
       const effect = threads[Math.max(enteringIndex, exitingIndex)]?.enter;
 
       // Layer pair
-      return useMemo(() => [
+      const stage = useMemo(() => [
         (exitingLayer && exitingLayer !== enteringLayer)
           ? renderLayer(
               exitingLayer,
@@ -98,6 +100,8 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
             )
           : null,
       ], [enteringLayer, exitingLayer, effect]);
+
+      return stage;
     }
   );
 }, 'Stage');

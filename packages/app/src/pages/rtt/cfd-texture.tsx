@@ -90,6 +90,7 @@ export const RTTCFDTexturePage: LC = () => {
       render={({inspect}) =>
 
         <Gather
+          key="cfd-texture"
           children={[
             // Velocity + density field
             <TextureBuffer

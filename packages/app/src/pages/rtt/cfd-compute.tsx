@@ -94,6 +94,7 @@ export const RTTCFDComputePage: LC = () => {
       render={({inspect}) =>
 
         <Gather
+          key="cfd-compute"
           children={[
             // Velocity + density field
             <ComputeBuffer

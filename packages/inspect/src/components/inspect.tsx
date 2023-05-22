@@ -43,7 +43,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const optionCursor = useUpdateState<OptionState>(
     {
       open: false,
-      depth: 10,
+      depth: 1000,
       counts: false,
       fullSize: false,
       builtins: false,

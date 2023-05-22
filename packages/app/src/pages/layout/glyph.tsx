@@ -26,6 +26,9 @@ const DETAIL = 64;
 const ZBIAS_DATA = 4;
 const ZBIAS_GRID = 1;
 const BACKGROUND = [0, 0, 0.09, 1];
+const WHITE = [1, 1, 1, 1];
+const WHITE_TRANSPARENT = [1, 1, 1, 0.75];
+const MARGIN_TOP = [0, 3, 0, 0];
 
 export const LayoutGlyphPage: LC = () => {
 
@@ -290,7 +293,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                         detail={64}
                         snap={false}
                         text={subpixel ? "The Subpixel Distance Transform" : "The Euclidean Distance Transform"}
-                        color={[1, 1, 1, 1]}
+                        color={WHITE}
                       />
                     </Inline>
                   </Block>
@@ -510,13 +513,13 @@ type LabelProps = {
 }
 
 const Label: LC<LabelProps> = (props: PropsWithChildren<LabelProps>) => (
-  <Block margin={[0, 3, 0, 0]}>
+  <Block margin={MARGIN_TOP}>
     <Inline align={"center"}>
       <Text
         size={10}
         snap={false}
         text={Array.isArray(props.children) ? props.children.join('') : props.children}
-        color={[1, 1, 1, 0.75]}
+        color={WHITE_TRANSPARENT}
       />
     </Inline>
   </Block>

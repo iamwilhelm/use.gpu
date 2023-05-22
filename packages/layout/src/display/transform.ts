@@ -1,7 +1,7 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle, UniformAttribute } from '@use-gpu/core';
-import type { LayoutElement, FitInto } from '../types';
+import type { LayoutRenderer, LayoutElement, FitInto } from '../types';
 
 import { memo, gather, yeet, useMemo } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
@@ -27,48 +27,90 @@ export const Transform: LiveComponent<TransformProps> = memo((props: PropsWithCh
   } = props;
 
   return gather(children, (items: LayoutElement[]) => {
-    return useMemo(() => yeet(items.map(item => ({
-      ...item,
-      fit: memoFit((
+    return useMemo(() => yeet(items.map(item => {
+      const fit = (
         into: FitInto
       ) => {
         const fit = item.fit(into);
         return {
           ...fit,
-          render: memoLayout((
+          render: (
             box: Rectangle,
             origin: Rectangle,
             parentClip: ShaderModule | null,
             parentMask: ShaderModule | null,
             parentTransform: ShaderModule | null,
-          ) => {
-            const xmask = (parentMask && mask ? chainTo(parentMask, mask) : parentMask ?? mask) ?? null;
-            const xform = (parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform) ?? null;
-
-            const pclip = (parentClip && clip) ? (
-              bindBundle(
-                getCombinedClip,
-                {
-                  getParent: parentClip,
-                  getSelf: clip ?? null,
-                }
-              )
-            ) : (parentClip ?? clip) ?? null;
-            
-            const xclip = inverse ? (
-              bindBundle(
-                getTransformedClip,
-                {
-                  getParent: pclip,
-                  applyTransform: inverse,
-                }
-              )
-            ) : pclip;
-
-            return fit.render(box, box, xclip, xmask, xform);
-          })
+          ) => (
+            use(TransformLayout,
+              box,
+              origin,
+              parentClip,
+              parentMask,
+              parentTransform,
+              clip,
+              mask,
+              transform,
+              fit.render,
+            )
+          ),
         };
-      }),
-    }))), [items, mask, transform]);
+      };
+      
+      return {
+        ...item,
+        fit: memoFit(fit),
+        prefit: memoFit(fit),
+      };
+    })), [items, mask, transform]);
   });
 }, 'Transform');
+
+const TransformLayout = (
+  box: Rectangle,
+  origin: Rectangle,
+  parentClip: ShaderModule | null,
+  parentMask: ShaderModule | null,
+  parentTransform: ShaderModule | null,
+  clip: ShaderModule | null,
+  mask: ShaderModule | null,
+  transform: ShaderModule | null,
+  render: LayoutRenderer
+): LiveElement => {
+
+  const xmask = useMemo(
+    () => (parentMask && mask ? chainTo(parentMask, mask) : parentMask ?? mask) ?? null,
+    [parentMask, mask],
+  );
+  const xform = useMemo(
+    () => (parentTransform && transform ? chainTo(parentTransform, transform) : parentTransform ?? transform) ?? null,
+    [parentTransform, transform],
+  );
+
+  const pclip = useMemo(
+    () => (parentClip && clip) ? (
+      bindBundle(
+        getCombinedClip,
+        {
+          getParent: parentClip,
+          getSelf: clip ?? null,
+        }
+      )
+    ) : (parentClip ?? clip) ?? null,
+    [parentClip, clip],
+  );
+  
+  const xclip = useMemo(
+    () => inverse ? (
+      bindBundle(
+        getTransformedClip,
+        {
+          getParent: pclip,
+          applyTransform: inverse,
+        }
+      )
+    ) : pclip,
+    [pclip, inverse],
+  );
+
+  return render(box, box, xclip, xmask, xform);
+};

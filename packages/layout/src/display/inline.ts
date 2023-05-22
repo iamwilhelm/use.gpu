@@ -4,10 +4,12 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Base, MarginLike } from '../types';
 
 import { useProp } from '@use-gpu/traits';
-import { memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
+import { use, memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
-import { makeInlineLayout, makeInlineInspectLayout, makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
+import { makeInlineLayout, makeInlineInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
+
+import { BoxLayout, InlineLayout } from '../render';
 
 import type { BoxTrait } from '../types';
 import { useBoxTrait } from '../traits';
@@ -82,6 +84,14 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
           const pickOffsets = blockSizes.length ? [...offsets, ...blockOffsets] : offsets;
           const pickPickers = blockSizes.length ? [...pickers, ...blockPickers] : pickers;
 
+          const inside = {
+            sizes: blockSizes,
+            offsets: blockOffsets,
+            renders: blockRenders,
+          };
+          
+          const inline = {ranges, sizes, offsets, renders, key};
+
           return {
             size,
             render: memoLayout((
@@ -91,16 +101,18 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
               mask: ShaderModule | null,
               transform: ShaderModule | null,
             ) => {
-              if (hovered) {
-                const out = makeInlineInspectLayout(id, ranges, sizes, offsets, renders, key)(box, origin, clip, mask, transform);
-                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, origin, clip, mask, transform));
-                return out;
-              }
-              else {
-                const out = makeInlineLayout(ranges, sizes, offsets, renders, key)(box, origin, clip, mask, transform);
-                if (sizes.length) out.push(...makeBoxLayout(blockSizes, blockOffsets, blockRenders)(box, origin, clip, mask, transform));
-                return out;
-              }
+              const el = use(InlineLayout, inline, {box, origin, clip, mask, transform}, hovered);
+              if (sizes.length) return [
+                el,
+                use(BoxLayout, inside, {
+                  box,
+                  origin,
+                  clip,
+                  mask,
+                  transform,
+                })
+              ];
+              return el;
             }),
             pick: makeBoxPicker(id, pickSizes, pickOffsets as any, pickPickers),
           };

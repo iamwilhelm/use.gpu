@@ -97,16 +97,17 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
     const [w, h] = absolute ? into : size;
     const [ml, mt] = margin;
     const layout = [left + ml, top + mt, left + ml + w, top + mt + h] as Rectangle;
-    const el = render(layout, layout, null, null, transform);
     
     sizes.push([w, h]);
     offsets.push([left + ml, top + mt]);
 
-    if (Array.isArray(el)) out.push(...el);
-    else if (el) out.push(el);
-
     if (pick) pickers.push((x: number, y: number, scroll: boolean = false) =>
       pick(x, y, layout[0], layout[1], layout[2], layout[3], scroll));
+
+    const el = render(layout, layout, null, null, transform);
+
+    if (Array.isArray(el)) out.push(...el);
+    else if (el) out.push(el);
   }
 
   // Picking goes front-to-back

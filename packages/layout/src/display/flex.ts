@@ -4,13 +4,14 @@ import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentL
 import { useProp } from '@use-gpu/traits';
 import { use, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
+import {  makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
 import type { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';
+import { BoxLayout, BoxInspectLayout } from '../render';
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
@@ -79,9 +80,18 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
             },
           });
 
+          const inside = {sizes, offsets, renders};
           return {
             size,
-            render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
+            render: (
+              box: Rectangle,
+              origin: Rectangle,
+              clip?: ShaderModule | null,
+              mask?: ShaderModule | null,
+              transform?: ShaderModule | null,
+            ) => (
+              sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
+            ),
             pick: makeBoxPicker(id, sizes, offsets, pickers),
           };
 

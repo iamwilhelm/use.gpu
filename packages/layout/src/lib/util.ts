@@ -3,7 +3,7 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { Point, Point4, Rectangle } from '@use-gpu/core';
 import type { FitInto, AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
-import { yeet, fragment } from '@use-gpu/live';
+import { yeet, fragment, morph, use } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
@@ -176,7 +176,7 @@ export const makeBoxLayout = (
     const b = t + h;
     
     const layout = [l, t, r, b] as Rectangle;
-    const el = render(layout, origin, xclip, xmask, xform);
+    const el = morph(use(render, layout, origin, xclip, xmask, xform));
 
     if (Array.isArray(el)) {
       if (el.length > 1) out.push(fragment(el as any[]));

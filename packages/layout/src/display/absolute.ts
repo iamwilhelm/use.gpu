@@ -3,12 +3,13 @@ import type { FitInto, Dimension, Direction, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
-import { makeBoxLayout, makeBoxInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
+import { makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
 import type { ElementTrait } from '../types';
 import { useElementTrait } from '../traits';
 import { useImplicitElement } from '../element/element';
+import { BoxLayout, BoxInspectLayout } from '../render';
 
 const NO_POINT4 = [0, 0, 0, 0];
 
@@ -57,10 +58,19 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
             offsets,
           },
         });
-  
+        
+        const inside = {sizes, offsets, renders};
         return {
           size,
-          render: memoLayout(hovered ? makeBoxInspectLayout(id, sizes, offsets, renders) : makeBoxLayout(sizes, offsets, renders)),
+          render: (
+            box: Rectangle,
+            origin: Rectangle,
+            clip?: ShaderModule | null,
+            mask?: ShaderModule | null,
+            transform?: ShaderModule | null,
+          ) => (
+            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
+          ),
           pick: makeBoxPicker(id, sizes, offsets, pickers, undefined, undefined, false),
         };
       };

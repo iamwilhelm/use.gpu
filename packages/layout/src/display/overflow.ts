@@ -13,8 +13,9 @@ import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';
 
 import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
-import { makeBoxLayout, makeBoxPicker, memoFit, memoLayout, isHorizontal } from '../lib/util';
+import { makeBoxPicker, memoFit, memoLayout, isHorizontal } from '../lib/util';
 import { parseOverflow } from '../parse';
+import { BoxLayout, BoxInspectLayout } from '../render';
 import { ScrollBar } from '../element/scrollbar';
 import { Block } from './block';
 import { mat4 } from 'gl-matrix';
@@ -223,10 +224,35 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
               updateScrollRange(box, s, scrollBarWidth, scrollBarHeight);
               if (o[0] !== outer[0] || o[1] !== outer[1]) forceUpdate();
             }
-          
+
+            const outside = {
+              box,
+              origin,
+              clip: parentClip,
+              mask: parentMask,
+              transform: parentTransform,
+            };
+
             return [
-              ...makeBoxLayout([sizes[0]], [offsets[0]], [renders[0]], clip, undefined, transform, inverse)(box, origin, parentClip, parentMask, parentTransform),
-              ...makeBoxLayout(sizes.slice(1), offsets.slice(1), renders.slice(1))(box, origin, parentClip, parentMask, parentTransform),
+              use(BoxLayout,
+                {
+                  sizes: [sizes[0]],
+                  offsets: [offsets[0]],
+                  renders: [renders[0]],
+                  clip,
+                  transform,
+                  inverse,
+                },
+                outside,
+              ),
+              use(BoxLayout,
+                {
+                  sizes: sizes.slice(1),
+                  offsets: offsets.slice(1),
+                  renders: renders.slice(1),
+                },
+                outside,
+              ),
             ];
           }),
           pick: makeBoxPicker(id, sizes, offsets, pickers, scrollRef, scrollBy),

@@ -5,7 +5,7 @@ import type { ColorLike } from '@use-gpu/traits';
 import type { Base, InlineLine } from '../types';
 
 import { useProp, parseColor, parseNumber } from '@use-gpu/traits';
-import { keyed, yeet, useFiber } from '@use-gpu/live';
+import { memo, keyed, yeet, useFiber } from '@use-gpu/live';
 
 import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench';
 import { Glyphs } from '../shape/glyphs';
@@ -44,7 +44,7 @@ const BLACK: Point4 = [0, 0, 0, 1];
 const NO_MARGIN: Point4 = [0, 0, 0, 0];
 const NO_STROKE: Point4 = [0.0, 0.0, 0.0, 0.0];
 
-export const Text: LiveComponent<TextProps> = (props) => {
+export const Text: LiveComponent<TextProps> = memo((props) => {
   const {
     family,
     style,
@@ -102,4 +102,4 @@ export const Text: LiveComponent<TextProps> = (props) => {
       })
     )),
   });
-};
+}, 'Text');

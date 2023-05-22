@@ -63,6 +63,32 @@ export type LayoutRenderer = (
   transform: ShaderModule | null,
 ) => LiveElement;
 
+export type RenderInside = {
+  sizes: Point[],
+  offsets: Point[],
+  renders: LayoutRenderer[],
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
+  inverse?: ShaderModule | null,
+};
+
+export type RenderInline = {
+  ranges: Point[],
+  sizes: Point[],
+  offsets: [number, number, number][],
+  renders: InlineRenderer[],
+  key?: number,
+};
+
+export type RenderOutside = {
+  box: Rectangle,
+  origin: Rectangle,
+  clip?: ShaderModule | null,
+  mask?: ShaderModule | null,
+  transform?: ShaderModule | null,
+};
+
 export type InlineRenderer = (
   lines: InlineLine[],
   origin: Rectangle,

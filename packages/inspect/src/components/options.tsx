@@ -9,7 +9,7 @@ import { IconItem, SVGHighlightElement, SVGLayoutSide, SVGLayoutFull, SVGBuiltin
 
 export type OptionsProps = {
   cursor: Cursor<OptionState>,
-  toggleInspect: () => void,
+  toggleInspect?: () => void,
 };
 
 export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
@@ -58,13 +58,15 @@ export const Options: React.FC<OptionsProps> = (props: OptionsProps) => {
       >
         <IconItem height={24} top={1}><SVGHighlightElement size={24} /></IconItem>
       </SmallButton>
-      <SmallButton
-        className={inspect ? 'active' : ''}
-        onClick={toggleInspect}
-        title="Inspect layout"
-      >
-        <IconItem height={24} top={1}><SVGPickElement size={24} /></IconItem>
-      </SmallButton>
+      { toggleInspect ? (
+        <SmallButton
+          className={inspect ? 'active' : ''}
+          onClick={toggleInspect}
+          title="Inspect layout"
+        >
+          <IconItem height={24} top={1}><SVGPickElement size={24} /></IconItem>
+        </SmallButton>
+      ) : null}
 
       <Spacer />
       <div style={{flexGrow: 1, minWidth: 50, maxWidth: 150}}>

@@ -72,7 +72,6 @@ export const Inspect: React.FC<InspectProps> = ({
   const [open, updateOpen] = useOption<boolean>('open');
   const toggleOpen = () => updateOpen(!open);
   const toggleInspect = useCallback(() => {
-    console.log('toggleInspect')
     updateInspect($apply(s => {
       onInspect && onInspect(!s);
       return !s;
@@ -137,7 +136,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const tree = (
     <InsetColumnFull>
       <TreeControls>
-        <Options cursor={optionCursor} toggleInspect={toggleInspect} />
+        <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
       </TreeControls>
       <TreeView onClick={() => setSelected(null)}>
         <FiberTree

@@ -5,13 +5,13 @@ import { styled as _styled } from '@stitches/react';
 
 import { Inset } from './layout';
 import { useAddIns } from '../providers/add-in-provider';
-import { usePingContext } from '../providers/ping-provider';
+import { usePingTracker, usePingContext } from '../providers/ping-provider';
 
 const styled: any = _styled;
 
 export type PanelsProps = {
   fiber: LiveFiber<any>,
-  fibers: Map<number, LiveFiber<any>>,
+  selectFiber: (fiber?: LiveFiber<any> | null) => void,
 };
 
 export const StyledTabList = styled('div', {
@@ -41,15 +41,16 @@ export const StyledTab = styled('button', {
 });
 
 export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
-  const {fiber, fibers} = props;
+  const {fiber, selectFiber} = props;
   
   const addIns = useAddIns();
+  const {fibers} = usePingContext();
   
   const {props: panels} = addIns;
   const [first] = panels;
   if (!first) return null;
 
-  usePingContext();
+  usePingTracker();
 
   const active = panels.filter((panel) => panel.enabled(fiber, fibers));
   let [tab, setTab] = useState<string>(first.id);
@@ -57,6 +58,11 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
   if (!active.find((panel) => panel.id === tab)) tab = first.id;
   
   const currentTab = active.find((panel) => panel.id === tab);
+
+  const handleSelectFiber = (fiber: number | LiveFiber<any>) => {
+    const f = typeof fiber === 'number' ? fibers.get(fiber) : fiber;
+    selectFiber(f);
+  };
 
   return (
     <Inset>
@@ -67,7 +73,7 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
           </StyledTab>
         ))}
       </StyledTabList>
-      {fiber ? currentTab!.render(fiber, fibers) : null}
+      {fiber ? currentTab!.render(fiber, fibers, handleSelectFiber) : null}
     </Inset>
   );
 };

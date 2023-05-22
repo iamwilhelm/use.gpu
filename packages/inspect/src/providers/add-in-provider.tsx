@@ -26,7 +26,7 @@ export const defaultPanels: InspectExtension = (): InspectAddIns => ({
       id: 'props',
       label: 'Props',
       enabled: (fiber) => true,
-      render: (fiber, fibers) => <Props fiber={fiber} fibers={fibers} />,
+      render: (fiber, fibers, selectFiber) => <Props fiber={fiber} fibers={fibers} selectFiber={selectFiber} />,
     },
     {
       id: 'fiber',

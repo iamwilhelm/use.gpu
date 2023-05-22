@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom';
 const PingContext = createContext<PingContextProps>({
   subscribe: () => {},
   unsubscribe: () => {},
+  fibers: new Map(),
 });
 
 const NO_DEPS: any[] = [];
@@ -14,11 +15,12 @@ const NO_DEPS: any[] = [];
 type PingContextProps = {
   subscribe: (fiber: LiveFiber<any> | null | undefined, f: ArrowFunction) => void,
   unsubscribe: (fiber: LiveFiber<any> | null | undefined, f: ArrowFunction) => void,
+  fibers: Map<number, LiveFiber<any>>,
 };
 
 type PingProviderProps = {
   fiber: LiveFiber<any>,
-  children?: React.ReactElement<any>,
+  children?: React.ReactNode,
 };
 
 type Timer = ReturnType<typeof setTimeout>;
@@ -27,7 +29,8 @@ type PingEntry = [number, number, boolean];
 
 // Track update pings to show highlights in tree
 export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => {
-   const [map, all, api] = useMemo(() => {
+  const [fibers, map, all, api] = useMemo(() => {
+    const fibers = new Map<number, LiveFiber<any>>();
     const map = new Map<number, Set<ArrowFunction>>();
     const all = new Set<ArrowFunction>();
 
@@ -51,8 +54,9 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
         }
       },
       map,
+      fibers,
     };
-    return [map, all, api];
+    return [fibers, map, all, api];
   }, NO_DEPS);
 
   useLayoutEffect(() => {
@@ -129,6 +133,9 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
         if (reset) clearTimeout(reset);
         reset = setTimeout(timeout, 100);
       }
+      
+      if (fiber.bound) { if (!fibers.get(fiber.id)) fibers.set(fiber.id, fiber); }
+      else { fibers.delete(fiber.id); }
     };
     return () => {
       if (fiber.host) fiber.host.__ping = () => {};
@@ -143,7 +150,9 @@ export const PingProvider: React.FC<PingProviderProps> = ({fiber, children}) => 
   );
 }
 
-export const usePingContext = (fiber?: LiveFiber<any>) => {
+export const usePingContext = () => useContext(PingContext);
+
+export const usePingTracker = (fiber?: LiveFiber<any>) => {
   const {subscribe, unsubscribe} = useContext(PingContext);
 
   const [, forceUpdate] = useForceUpdate();

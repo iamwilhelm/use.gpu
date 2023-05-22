@@ -1144,6 +1144,7 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
 
   fiber.bound = undefined;
   if (fiber.host) fiber.host.dispose(fiber);
+  pingFiber(fiber);
 }
 
 // Dispose of a fiber's mounted sub-fibers

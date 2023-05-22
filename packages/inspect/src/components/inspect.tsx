@@ -8,7 +8,7 @@ import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState
 
 import { makeUseLocalState } from '../hooks/useLocalState';
 import { AddInProvider } from '../providers/add-in-provider';
-import { PingProvider } from '../providers/ping-provider';
+import { PingProvider, usePingContext } from '../providers/ping-provider';
 
 import { Node } from './node';
 import { FiberTree } from './fiber';
@@ -55,12 +55,10 @@ export const Inspect: React.FC<InspectProps> = ({
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
   }));
-  
+
   const useOption = useRefineCursor(optionCursor);
 
-  const fibers = useMemo(() => new Map<number, LiveFiber<any>>(), []);
-
-  const [selectedFiber, setSelected] = selectedCursor;
+  const [selectedFiber, updateSelected] = selectedCursor;
   const [depthLimit] = useOption<number>('depth');
   const [runCounts] = useOption<boolean>('counts');
   const [fullSize] = useOption<boolean>('fullSize');
@@ -68,6 +66,10 @@ export const Inspect: React.FC<InspectProps> = ({
   const [highlight] = useOption<boolean>('highlight');
   const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
+
+  const setSelected = useCallback((fiber?: LiveFiber<any> | null) => {
+    updateSelected({ $set: fiber ?? null });
+  }, [updateSelected]);
 
   const [open, updateOpen] = useOption<boolean>('open');
   const toggleOpen = () => updateOpen(!open);
@@ -96,6 +98,79 @@ export const Inspect: React.FC<InspectProps> = ({
     return () => setHovered(false);
   }, [hoveredFiber, highlight])
   
+  const tree = (
+    <InsetColumnFull>
+      <TreeControls>
+        <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
+      </TreeControls>
+      <TreeView onClick={() => updateSelected(null)}>
+        <FiberTree
+          fiber={fiber}
+          depthLimit={depthLimit}
+          runCounts={runCounts}
+          builtins={builtins}
+          highlight={highlight}
+          expandCursor={expandCursor}
+          selectedCursor={selectedCursor}
+          hoveredCursor={hoveredCursor}
+        />
+      </TreeView>
+    </InsetColumnFull>
+  );
+
+  // Avoid text selection on double click
+  const onMouseDown = (e: any) => {
+    if (e.detail > 1) {
+      e.preventDefault();
+    }
+  };
+
+  return (<div className="LiveInspect">
+    {open ? (
+      <PingProvider fiber={fiber}>
+        <HostHighlight fiber={fiber} setSelected={setSelected} toggleInspect={toggleInspect} updateHovered={updateHovered} />
+        <AddInProvider addIns={addIns}>
+          <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
+            <div style={fullSize
+                ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
+                : {display: 'flex', height: '100%'}}>
+              <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
+                <PanelAbsolute>
+                  {tree}
+                </PanelAbsolute>
+              </RowPanel>
+              {selectedFiber ? (
+                <RowPanel style={fullSize ? {position: 'relative', maxHeight: '30%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
+                  <PanelScrollable>
+                    <Panels fiber={selectedFiber} selectFiber={setSelected} />
+                  </PanelScrollable>
+                </RowPanel>
+              ) : null}
+            </div>
+          </InspectContainer>
+        </AddInProvider>
+      </PingProvider>
+    ) : null}
+    <InspectToggle onClick={toggleOpen}>
+      <Button style={{width: 58, height: 37}}>{open
+        ? <IconItem height={20} top={-2}><SVGClose size={20} /></IconItem>
+        : <IconItem height={20} top={-4}><SVGInspect size={24} /></IconItem>
+      }</Button>
+    </InspectToggle>
+  </div>);
+}
+
+type HostHighlightProps = {
+  fiber: LiveFiber<any>,
+  toggleInspect: () => void,
+  setSelected: (fiber?: LiveFiber<any> | null) => void,
+  updateHovered: (hovered: any) => void,
+};
+
+const HostHighlight = (props: HostHighlightProps) => {
+  const {fiber, setSelected, toggleInspect, updateHovered} = props;
+  const {fibers} = usePingContext();
+
   const {host} = fiber;
   useLayoutEffect(() => {
     if (!host) return;
@@ -105,7 +180,7 @@ export const Inspect: React.FC<InspectProps> = ({
       if (fiber) {
         if (active) {
           toggleInspect();
-          return setSelected({ $set: fiber });
+          return setSelected(fiber);
         }
 
         const root = fiber.yeeted && fiber.type === YEET ? fiber.yeeted.root : null;
@@ -131,67 +206,7 @@ export const Inspect: React.FC<InspectProps> = ({
     };
 
     return () => { host.__highlight = () => {}; }
-  }, [host, fibers]);
+  }, [host, fibers, setSelected]);
 
-  const tree = (
-    <InsetColumnFull>
-      <TreeControls>
-        <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
-      </TreeControls>
-      <TreeView onClick={() => setSelected(null)}>
-        <FiberTree
-          fiber={fiber}
-          fibers={fibers}
-          depthLimit={depthLimit}
-          runCounts={runCounts}
-          builtins={builtins}
-          highlight={highlight}
-          expandCursor={expandCursor}
-          selectedCursor={selectedCursor}
-          hoveredCursor={hoveredCursor}
-        />
-      </TreeView>
-    </InsetColumnFull>
-  );
-
-  // Avoid text selection on double click
-  const onMouseDown = (e: any) => {
-    if (e.detail > 1) {
-      e.preventDefault();
-    }
-  };
-
-  return (<div className="LiveInspect">
-    {open ? (
-      <PingProvider fiber={fiber}>
-        <AddInProvider addIns={addIns}>
-          <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
-            <div style={fullSize
-                ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
-                : {display: 'flex', height: '100%'}}>
-              <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
-                <PanelAbsolute>
-                  {tree}
-                </PanelAbsolute>
-              </RowPanel>
-              {selectedFiber ? (
-                <RowPanel style={fullSize ? {position: 'relative', maxHeight: '30%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
-                  <PanelScrollable>
-                    <Panels fiber={selectedFiber} fibers={fibers} />
-                  </PanelScrollable>
-                </RowPanel>
-              ) : null}
-            </div>
-          </InspectContainer>
-        </AddInProvider>
-      </PingProvider>
-    ) : null}
-    <InspectToggle onClick={toggleOpen}>
-      <Button style={{width: 58, height: 37}}>{open
-        ? <IconItem height={20} top={-2}><SVGClose size={20} /></IconItem>
-        : <IconItem height={20} top={-4}><SVGInspect size={24} /></IconItem>
-      }</Button>
-    </InspectToggle>
-  </div>);
-}
-
+  return null;
+};

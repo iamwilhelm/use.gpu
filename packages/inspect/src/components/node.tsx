@@ -5,7 +5,7 @@ import { formatValue, formatNodeName, YEET, QUOTE, SIGNAL } from '@use-gpu/live'
 import { styled, keyframes } from "@stitches/react";
 
 import React, { useCallback, useMemo, useRef, useEffect } from 'react';
-import { usePingContext } from '../providers/ping-provider';
+import { usePingTracker } from '../providers/ping-provider';
 import { Muted } from './layout';
 import { IconRow, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
 
@@ -65,7 +65,7 @@ export const Node = React.forwardRef<HTMLDivElement, NodeProps>(({
 
   const icons = [suffix1, suffix2, suffix3, suffix4, suffix5, suffix6, suffix7].filter(x => !!x);
 
-  const [version, pinged] = usePingContext(fiber);
+  const [version, pinged] = usePingTracker(fiber);
 
   const classes: string[] = version >= 0 ? [version > 1 ? 'pinged' : 'mounted'] : [];
 

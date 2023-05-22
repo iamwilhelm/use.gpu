@@ -35,7 +35,7 @@ export type InspectProps = {
   id: string,
   label: string,
   enabled: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>) => boolean,
-  render: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>) => ReactNode,
+  render: (fiber: LiveFiber<any>, fibers: Map<number, LiveFiber<any>>, selectFiber: (fiber: LiveFiber<any>) => void) => ReactNode,
 };
 
 export type InspectProp = {

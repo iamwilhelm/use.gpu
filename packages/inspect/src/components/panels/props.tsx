@@ -7,12 +7,35 @@ import { Spacer } from '../layout';
 
 import React, { useLayoutEffect, useState } from 'react';
 
+import { styled as _styled } from '@stitches/react';
+
+// TODO: TS nightly issue?
+const styled: any = _styled;
+
 type PropsProps = {
   fiber: LiveFiber<any>,
   fibers: Map<number, LiveFiber<any>>,
+  selectFiber: (fiber: LiveFiber<any>) => void,
 };
 
-export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
+export const FiberName = styled('span', {
+  color: 'var(--LiveInspect-colorTextActive)',
+  marginRight: 10,
+});
+
+export const Fiber = styled('div', {
+  cursor: 'pointer',
+  display: 'flex',
+  '& > div': {
+    margin: '0px -4px',
+    padding: '2px 4px',
+  },
+  '&:hover > div': {
+    background: "#444",
+  },
+});
+
+export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
   // @ts-ignore
   const {id, f, arg, args, yeeted} = fiber;
   const name = formatNodeName(fiber);
@@ -93,7 +116,19 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers}) => {
         if (source) parents.push(source);
         parent = source as any;
       }
-      return parents.map((fiber) => <div key={fiber.id}>{formatNode(fiber)}</div>);
+      return parents.map((fiber) => {
+        const text = formatNode(fiber);
+        const parts = text.split(/(?<=<)| /);
+        return (
+          <Fiber key={fiber.id} onClick={() => {
+            selectFiber(fiber);
+          }}><div>
+            {parts[0]}
+            <FiberName>{parts[1]}</FiberName>
+            {parts.slice(2).join(' ')}
+          </div></Fiber>
+        );
+      });
     }
     return '[Runtime]';
   };

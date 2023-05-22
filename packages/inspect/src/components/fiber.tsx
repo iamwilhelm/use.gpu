@@ -5,7 +5,7 @@ import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
 import React, { memo, useMemo, useLayoutEffect, useRef, PropsWithChildren } from 'react';
 
 import { useRefineCursor } from '@use-gpu/state';
-import { usePingContext } from '../providers/ping-provider';
+import { usePingTracker, usePingContext } from '../providers/ping-provider';
 import { Node } from './node';
 import { ReactNode } from './react-node';
 import { ExpandState, SelectState, HoverState, Action } from './types';
@@ -17,7 +17,6 @@ import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, 
 
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
-  fibers: Map<number, LiveFiber<any>>,
   depthLimit: number,
   runCounts: boolean,
   builtins: boolean,
@@ -157,7 +156,6 @@ export const FiberLegend: React.FC = () => {
 // Fiber tree including legend
 export const FiberTree: React.FC<FiberTreeProps> = ({
   fiber,
-  fibers,
   depthLimit,
   runCounts,
   builtins,
@@ -166,6 +164,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   selectedCursor,
   hoveredCursor,
 }) => {
+  const {fibers} = usePingContext();
   const by = fibers.get(fiber.by);
   
   return (<div style={{minWidth: 'fit-content', position: 'relative'}}>
@@ -216,12 +215,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   indent += (indented * (wide ? 1 : .1));
 
   // Hook up ping provider
-  fibers.set(id, fiber);
-  useLayoutEffect(() => {
-    fibers.set(id, fiber);
-    return () => { fibers.delete(id); }
-  }, []);
-  usePingContext(fiber);
+  fibers.set(fiber.id, fiber);
+  usePingTracker(fiber);
 
   // Resolve hover-state
   const selected = fiber === selectState;

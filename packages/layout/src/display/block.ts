@@ -1,5 +1,6 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { Point, Point4 } from '@use-gpu/core';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Rectangle, Point, Point4 } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin } from '../types';
 
 import { useProp } from '@use-gpu/traits';
@@ -12,7 +13,7 @@ import type { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';
-import { BoxLayout, BoxInspectLayout } from '../render';
+import { BoxLayout } from '../render';
 
 export type BlockProps =
   Partial<BoxTrait> &

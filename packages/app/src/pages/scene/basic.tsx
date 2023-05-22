@@ -31,12 +31,11 @@ const KEYFRAMES = [
 ] as Keyframe<any>[];
 
 type PickableMeshProps = {
-  id: string,
   mesh: Record<string, StorageSource>,
   texture: TextureSource,
 };
 
-const PickableMesh = memo(({id, mesh, texture}: PickableMeshProps) => {
+const PickableMesh = memo(({mesh, texture}: PickableMeshProps) => {
   return (
     <Pick
       render={({id, hovered, presses}) =>

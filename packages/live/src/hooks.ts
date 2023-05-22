@@ -80,8 +80,8 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i + 1] = undefined;
 };
 
-type ShouldMemoArgs<T = any> = (prevArgs: T[], nextArgs: T[]) => boolean;
-type ShouldMemoProps<T = any> = (prevProps: T, nextArgs: T) => boolean;
+type ShouldMemoArgs<T extends Array<any>> = (prevArgs: T, nextArgs: T) => boolean;
+type ShouldMemoProps<T> = (prevProps: T, nextArgs: T) => boolean;
 
 /**
  * Memoize a live function on all its arguments (shallow comparison per arg)

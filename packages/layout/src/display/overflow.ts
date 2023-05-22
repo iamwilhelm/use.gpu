@@ -15,7 +15,7 @@ import { fitAbsoluteBox } from '../lib/absolute';
 import { getBlockMinMax } from '../lib/block';
 import { makeBoxPicker, memoFit, memoLayout, isHorizontal } from '../lib/util';
 import { parseOverflow } from '../parse';
-import { BoxLayout, BoxInspectLayout } from '../render';
+import { BoxLayout } from '../render';
 import { ScrollBar } from '../element/scrollbar';
 import { Block } from './block';
 import { mat4 } from 'gl-matrix';

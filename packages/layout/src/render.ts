@@ -15,20 +15,15 @@ const sameBox = (a: [any, any, any, any], b: [any, any, any, any]) => {
 };
 
 type Layout<T> = (
-  box: Rectangle,
-  origin: Rectangle,
-  clip: ShaderModule | null,
-  mask: ShaderModule | null,
-  transform: ShaderModule | null,
+  inside: RenderInside,
+  outside: RenderOutside,
+  inspect?: boolean,
 ) => T;
 
-type LayoutArgs = [
-  RenderInside,
-  RenderOutside,
-];
+type LayoutArgs<T> = Parameters<Layout<T>>;
 
 export const memoLayout = <T>(f: Layout<T>, name?: string): Layout<T> => {
-  return memoArgs(f, ([ai, ao, an]: LayoutArgs, [bi, bo, bn]: LayoutArgs) => {
+  return memoArgs(f, ([ai, ao, an]: LayoutArgs<T>, [bi, bo, bn]: LayoutArgs<T>) => (
     ai === bi &&
     an === bn &&
     sameBox(ao.box, bo.box) &&
@@ -36,7 +31,7 @@ export const memoLayout = <T>(f: Layout<T>, name?: string): Layout<T> => {
     ao.clip === bo.clip &&
     ao.mask === bo.mask &&
     ao.transform === bo.transform
-  }, name);
+  ), name);
 }
 
 export const BoxLayout = memoLayout((
@@ -163,7 +158,7 @@ export const InlineLayout = (
 
   let last: InlineRenderer | null = null;
   let lines: InlineLine[] = [];
-  let hash = miniHash(key, miniHash(left, top));
+  let hash = miniHash(key || -1, miniHash(left, top));
 
   const out: LiveElement[] = [];
   const flush = (render: InlineRenderer) => {

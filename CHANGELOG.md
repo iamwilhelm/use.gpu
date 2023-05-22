@@ -1,4 +1,8 @@
-0.9.x
+0.9.1
+- `@use-gpu/layout`: Expand render phase into component tree for memoization
+- `@use-gpu/live`: Ensure render order even when rekeying
+
+0.9.0
 - `@use-gpu/inspect`: Allow use without Use.GPU, move GPU panels to `@use-gpu/inspect-gpu`
 - `@use-gpu/live`: Quotes/unquotes in keyed sub-trees will now correctly reorder
 - `@use-gpu/plot`: Add pipeline options as full ROP trait to plot layers

@@ -1,4 +1,6 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Rectangle } from '@use-gpu/core';
 import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
 
 import { useProp } from '@use-gpu/traits';
@@ -11,7 +13,7 @@ import type { BoxTrait, ElementTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';
-import { BoxLayout, BoxInspectLayout } from '../render';
+import { BoxLayout } from '../render';
 
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 

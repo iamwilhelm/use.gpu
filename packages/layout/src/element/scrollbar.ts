@@ -56,64 +56,6 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   const isX = isHorizontal(direction);
 
   const fit = (into: FitInto) => {
-    let render = (
-      layout: Rectangle,
-      origin: Rectangle,
-      clip?: ShaderModule,
-      mask?: ShaderModule,
-      transform?: ShaderModule,
-    ): LiveElement => {
-      const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
-
-      const w = isX ? outerWidth : size;
-      const h = isX ? size : outerHeight;
-
-      const [l, t, r, b] = layout;        
-      const ll = isX ? l : r - w;
-      const tt = isX ? b - h : t;
-
-      const f = Math.min(1, isX ? outerWidth / innerWidth : outerHeight / innerHeight);
-      const rr = isX ? l + (r - l) * f : r;
-      const bb = isX ? b : t + (b - t) * f;
-
-      const trackBox = [ll, tt, r, b] as Rectangle;
-      const thumbBox = [ll, tt, rr, bb] as Rectangle;
-
-      const showTrack = overflow === 'scroll' || f < 1;
-      const showThumb = showTrack && f < 1;
-
-      const yeets: UIAggregate[] = [];
-      if (showTrack) yeets.push({
-        id: id.toString() + '-0',
-        rectangle: trackBox,
-        bounds: trackBox,
-        uv: [0, 0, 1, 1],
-        fill:   track as any,
-        radius: [size/2, size/2, size/2, size/2] as Rectangle,
-        ...(hovered ? INSPECT_STYLE.parent : undefined),
-
-        clip,
-        mask,
-        transform,
-        count: 1,
-      });
-      if (showThumb) yeets.push({
-        id: id.toString() + '-1',
-        rectangle: thumbBox,
-        bounds: thumbBox,
-        uv: [0, 0, 1, 1],
-        fill:   thumb as any,
-        radius: [size/2, size/2, size/2, size/2] as Rectangle,
-        ...(hovered ? INSPECT_STYLE.parent : undefined),
-
-        clip,
-        mask,
-        transform: transform ? chainTo(transform, thumbTransform) : thumbTransform,
-        count: 1,
-      });
-      return yeet(yeets);
-    };
-
     return {
       size: [into[2], into[3]],
       render: (

@@ -1,4 +1,6 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
+import type { ShaderModule } from '@use-gpu/shader';
+import type { Rectangle } from '@use-gpu/core';
 import type { FitInto, Dimension, Direction, LayoutElement } from '../types';
 
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
@@ -9,7 +11,7 @@ import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 import type { ElementTrait } from '../types';
 import { useElementTrait } from '../traits';
 import { useImplicitElement } from '../element/element';
-import { BoxLayout, BoxInspectLayout } from '../render';
+import { BoxLayout } from '../render';
 
 const NO_POINT4 = [0, 0, 0, 0];
 

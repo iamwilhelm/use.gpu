@@ -154,6 +154,12 @@ export type InlineLine = {
   gap: number,
 };
 
+export const ARCHETYPES = {
+  glyphs: 1,
+  textured: 2,
+  solid: 3,
+};
+
 export type UIAggregate = {
   id: string | number,
   count: number,
@@ -161,20 +167,25 @@ export type UIAggregate = {
   rectangles?: number[],
   colors?: number[],
   uvs?: number[],
+  sts?: number[],
   repeats?: number[],
   borders?: number[],
   strokes?: number[],
   fills?: number[],
   radiuses?: number[],
+  sdfs?: number[],
 
   rectangle?: number[],
   color?: number[],
   uv?: number[],
+  st?: number[],
   repeat?: number,
   border?: number[],
   stroke?: number[],
   fill?: number[],
   radius?: number[],
+  sdf?: number[],
 
+  archetype?: number,
   bounds: Rectangle,
 } & LayoutShaders;

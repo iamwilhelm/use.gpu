@@ -8,6 +8,7 @@ import { LayoutContext, getAlignmentAnchor } from '@use-gpu/workbench';
 
 import { evaluateDimension, parseAnchorXY } from '../parse';
 import { getOriginProjection } from '../lib/util';
+import { ARCHETYPES } from '../types';
 
 const UV_SQUARE = [0, 0, 1, 1] as Rectangle;
 const NO_RECTANGLE = [0, 0, 0, 0] as Rectangle;
@@ -189,6 +190,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         bounds: layout,
         count: 1,
         transform,
+        archetype: ARCHETYPES.textured,
       };
     }
     else {
@@ -207,6 +209,7 @@ export const UIRectangle: LiveComponent<UIRectangleProps> = (props) => {
         clip,
         mask,
         transform,
+        archetype: ARCHETYPES.solid,
       };
     }
 

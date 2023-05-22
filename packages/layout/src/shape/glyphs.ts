@@ -8,6 +8,7 @@ import { use, yeet, useContext, useMemo } from '@use-gpu/live';
 import { SDFFontProvider, useSDFFontContext } from '@use-gpu/workbench';
 import { evaluateDimension } from '../parse';
 import { getOriginProjectionX, getOriginProjectionY } from '../lib/util';
+import { ARCHETYPES } from '../types';
 
 const BLACK = [0, 0, 0, 1];
 
@@ -155,6 +156,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       mask,
       transform,
       bounds,
+      archetype: ARCHETYPES.glyphs,
     } : null;
 
     return yeet(render);

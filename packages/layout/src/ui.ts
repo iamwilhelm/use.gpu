@@ -157,7 +157,19 @@ const getItemTypeKey = (item: UIAggregate) =>
     hashBits53(getObjectKey(item.texture)) ^
     (item.transform ? getBundleKey(item.transform) : 0) ^
     (item.clip ? getBundleKey(item.clip) : 0) ^
-    (item.mask ? getBundleKey(item.mask) : 0)
+    (item.mask ? getBundleKey(item.mask) : 0) ^
+
+    (item.archetype != null ? item.archetype : (
+      (+(item.rectangle != null || item.rectangles != null))    |
+      (+(item.radius != null    || item.radiuses != null) << 1) |
+      (+(item.border != null    || item.borders != null) << 2)  |
+      (+(item.stroke != null    || item.strokes != null) << 3)  |
+      (+(item.fill != null      || item.fills != null) << 4)    |
+      (+(item.uv != null        || item.uvs != null) << 5)      |
+      (+(item.st != null        || item.sts != null) << 6)      |
+      (+(item.repeat != null    || item.repeats != null) << 7)  |
+      (+(item.sdf != null       || item.sdfs != null) << 8)
+    ))
   );
 
 type Partition = {

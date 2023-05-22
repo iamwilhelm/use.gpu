@@ -26,7 +26,7 @@ export const LayoutDisplayPage: LC = () => {
                 <Block margin={10} padding={48} radius={5} fill={[0, 0, 0, .9]}>
 
                   <Flex anchor="center">
-                    <Element width={48} height={48} fill={[0, 0, 0, .35]} />
+                    <Element width={48} height={48} fill={[1, 1, 1, .35]} />
                     <Inline margin={[24, 0, 0, 0]}>
                       <Text size={48} weight="bold" lineHeight={56} color={[1, 1, 1, 1]}>Use.GPU</Text>
                     </Inline>
@@ -73,11 +73,11 @@ export const LayoutDisplayPage: LC = () => {
                   <Block padding={[48, 58]}>
 
                     <Inline>
-                      <Text size={48} weight="bold" lineHeight={56} color={[1, 1, 1, 1]}>Use.GPU</Text>
+                      <Text size={48} weight="bold" lineHeight={56} color={[1, 1, 1, 1]} family="Lato, Noto Emoji">Lorem ipsum ⭐️✨🍕</Text>
                     </Inline>
 
                     <Inline margin={[0, 24, 0, 0]} align="justify-start">
-                      <Text size={16} color={[1, 1, 1, 1]} weight="bold" lineHeight={24}>{"Lorem ipsum dolor sit amet,"}</Text>
+                      <Text size={16} color={[1, 1, 1, 1]} weight="bold" lineHeight={24}>{"Dolor sit amet,"}</Text>
                       <Text size={16} color={[1, 1, 1, 0.5]} lineHeight={24}>{" consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>
 
                       <Text size={30} color={[1, 1, 1, 1]} lineHeight={24}>{"Fugiat nulla pariatur"}</Text>
@@ -92,7 +92,7 @@ export const LayoutDisplayPage: LC = () => {
                     <Block margin={[0, 20, 0, 0]} height={2} fill={[1, 1, 1, 1]} />
 
                     <Inline margin={[0, 24, 0, 0]}>
-                      <Text size={16} color={[1, 1, 1, 1]} weight="bold" lineHeight={24} family="Lato, Noto Emoji">{"Lorem ipsum ⭐️✨ dolor sit amet,"}</Text>
+                      <Text size={16} color={[1, 1, 1, 1]} weight="bold" lineHeight={24}>{"Lorem ipsum dolor sit amet,"}</Text>
                       <Text size={16} color={[1, 1, 1, 1]} lineHeight={24}>{" consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>
 
                       <Text size={16} color={[1, 1, 1, 1]} lineHeight={24}>{"Lorem x ipsum dolor sit amet, x consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\n"}</Text>

@@ -180,6 +180,7 @@ export const InsetColumnFull = styled('div', {
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
+  overflow: 'hidden',
 });
 
 export const Label = styled('div', {

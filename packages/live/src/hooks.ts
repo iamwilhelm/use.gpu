@@ -1,5 +1,5 @@
 import type {
-  Initial, Setter, Reducer, Key, Task,
+  Initial, Setter, Reducer, Key, Task, ArrowFunction,
   LiveFunction, LiveFiber, LiveContext, LiveCapture,
   DeferredCall, HostInterface, Ref, RefObject, MutableRefObject,
 } from './types';
@@ -80,13 +80,13 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i + 1] = undefined;
 };
 
-type ShouldMemoArgs  = <T = any>(prevArgs: T[], nextArgs: T[]) => boolean;
-type ShouldMemoProps = <T = any>(prevProps: T, nextArgs: T) => boolean;
+type ShouldMemoArgs<T = any> = (prevArgs: T[], nextArgs: T[]) => boolean;
+type ShouldMemoProps<T = any> = (prevProps: T, nextArgs: T) => boolean;
 
 /**
  * Memoize a live function on all its arguments (shallow comparison per arg)
  */
-export const memoArgs = <F extends Function>(
+export const memoArgs = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   shouldOrName?: ShouldMemoArgs<Parameters<F>> | string,
   name?: string,
@@ -100,7 +100,7 @@ export const memoArgs = <F extends Function>(
 
     if (customMemo) {
       const ref = useRef(args);
-      if (!ref || !customMemo(ref.current, args)) fiber.version = incrementVersion(fiber.version);
+      if (!ref || !customMemo(ref.current, args)) fiber.version = incrementVersion(fiber.version!);
       ref.current = args;
     }
 
@@ -109,7 +109,7 @@ export const memoArgs = <F extends Function>(
 
     let skip = true;
     const value = useMemo(() => {
-      deps[0] = fiber.version = incrementVersion(fiber.version);
+      deps[0] = fiber.version = incrementVersion(fiber.version!);
       skip = false;
       return f(...args);
     }, deps);
@@ -133,7 +133,7 @@ export const memoArgs = <F extends Function>(
 /**
  * Memoize a live function with 1 argument on its object props (shallow comparison per arg)
  */
-export const memoProps = <F extends Function>(
+export const memoProps = <F extends ArrowFunction>(
   f: LiveFunction<F>,
   shouldOrName?: ShouldMemoProps<Parameters<F>[0]> | string,
   name?: string,
@@ -147,7 +147,7 @@ export const memoProps = <F extends Function>(
 
     if (customMemo) {
       const ref = useRef(props);
-      if (!ref || !customMemo(ref.current, props)) fiber.version = incrementVersion(fiber.version);
+      if (!ref || !customMemo(ref.current, props)) fiber.version = incrementVersion(fiber.version!);
       ref.current = props;
     }
 
@@ -159,7 +159,7 @@ export const memoProps = <F extends Function>(
 
     let skip = true;
     const value = useMemo(() => {
-      deps[0] = fiber.version = incrementVersion(fiber.version);
+      deps[0] = fiber.version = incrementVersion(fiber.version!);
       skip = false;
       return f(props);
     }, deps);

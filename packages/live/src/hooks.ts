@@ -80,25 +80,39 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i + 1] = undefined;
 };
 
+type ShouldMemoArgs  = <T = any>(prevArgs: T[], nextArgs: T[]) => boolean;
+type ShouldMemoProps = <T = any>(prevProps: T, nextArgs: T) => boolean;
+
 /**
  * Memoize a live function on all its arguments (shallow comparison per arg)
  */
 export const memoArgs = <F extends Function>(
   f: LiveFunction<F>,
+  shouldOrName?: ShouldMemoArgs<Parameters<F>> | string,
   name?: string,
 ) => {
+  const customMemo = typeof shouldOrName === 'function' ? shouldOrName as ShouldMemoArgs<any> : null;
+  if (typeof shouldOrName === 'string') name = shouldOrName;
+
   const inner = (...args: any[]) => {
     const fiber = useFiber();
     if (!fiber.version) fiber.version = 1;
 
-    args.push(fiber.version);
+    if (customMemo) {
+      const ref = useRef(args);
+      if (!ref || !customMemo(ref.current, args)) fiber.version = incrementVersion(fiber.version);
+      ref.current = args;
+    }
+
+    const deps = [fiber.version] as any[];
+    if (!customMemo) deps.push(...args);
 
     let skip = true;
     const value = useMemo(() => {
-      fiber.version = Math.max(fiber.version!, incrementVersion(fiber.memo!));
+      deps[0] = fiber.version = incrementVersion(fiber.version);
       skip = false;
       return f(...args);
-    }, args);
+    }, deps);
 
     if (skip) fiber.pointer = fiber.state!.length;
 
@@ -107,11 +121,13 @@ export const memoArgs = <F extends Function>(
 
   const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
   const length = getArgCount(f);
+
   return new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
     if (s === 'name') return memoName;
+    if (s === 'argCount') return length;
     return target[s];
-  }});
+  }}) as LiveFunction<F>;
 };
 
 /**
@@ -119,21 +135,31 @@ export const memoArgs = <F extends Function>(
  */
 export const memoProps = <F extends Function>(
   f: LiveFunction<F>,
+  shouldOrName?: ShouldMemoProps<Parameters<F>[0]> | string,
   name?: string,
 ) => {
+  const customMemo = typeof shouldOrName === 'function' ? shouldOrName as ShouldMemoArgs<any> : null;
+  if (typeof shouldOrName === 'string') name = shouldOrName;
+
   const inner = (props: Record<string, any>[]) => {
     const fiber = useFiber();
     if (!fiber.version) fiber.version = 1;
 
+    if (customMemo) {
+      const ref = useRef(props);
+      if (!ref || !customMemo(ref.current, props)) fiber.version = incrementVersion(fiber.version);
+      ref.current = props;
+    }
+
     const deps = [fiber.version] as any[];
-    for (let k in props) {
+    if (!customMemo) for (let k in props) {
       deps.push(k);
       deps.push(props[k]);
     }
 
     let skip = true;
     const value = useMemo(() => {
-      fiber.version = Math.max(fiber.version!, incrementVersion(fiber.memo!));
+      deps[0] = fiber.version = incrementVersion(fiber.version);
       skip = false;
       return f(props);
     }, deps);
@@ -145,13 +171,12 @@ export const memoProps = <F extends Function>(
 
   const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
   const length = getArgCount(f);
-  const p = new Proxy(inner, { get: (target: any, s: string) => {
+
+  return new Proxy(inner, { get: (target: any, s: string) => {
     if (s === 'length') return length;
     if (s === 'name') return memoName;
     return target[s];
-  }});
-  p.displayName = memoName;
-  return p;
+  }}) as LiveFunction<F>;
 }
 
 /**

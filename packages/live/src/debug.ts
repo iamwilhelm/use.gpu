@@ -82,7 +82,7 @@ export const formatNodeName = <F extends Function>(_node: LiveElement<F>): strin
   const {f, arg, args} = node;
 
   // @ts-ignore
-  let name = (f?.displayName ?? f?.name) || 'Node';
+  let name = (f?.displayName ?? f?.name) || 'Fiber';
   if (name === 'PROVIDE' && args) {
     const [context] = args;
     const value = formatValue(context.displayName);
@@ -96,7 +96,7 @@ export const formatNodeName = <F extends Function>(_node: LiveElement<F>): strin
   else if (name === 'DETACH' && args) {
     const [call] = args;
     // @ts-ignore
-    name = `Detach(${(call.f?.displayName ?? call.f?.name) || 'Node'})`;
+    name = `Detach(${(call.f?.displayName ?? call.f?.name) || 'Fiber'})`;
   }
   else if (name === 'GATHER') {
     name = `Gather`;

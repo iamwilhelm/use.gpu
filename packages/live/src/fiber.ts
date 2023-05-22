@@ -1349,6 +1349,8 @@ export const pingFiberCount = <F extends ArrowFunction>(fiber: LiveFiber<F>) => 
 
 // Get argument count for a function, including optional arguments.
 export const getArgCount = <F extends Function>(f: F) => {
+  if (f.argCount != null) return f.argCount;
+
   let s = Function.toString.call(f).split(/\)|=>/)[0];
   if (s == null) return 0;
 

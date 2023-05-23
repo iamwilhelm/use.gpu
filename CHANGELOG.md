@@ -1,4 +1,5 @@
 0.9.1
+- `@use-gpu/inspect`: Improved tree and panel layout
 - `@use-gpu/layout`: Expand render phase into component tree for memoization
 - `@use-gpu/live`: Ensure render order even when rekeying
 - `@use-gpu/live`: Add back a more sensible `useYolo`

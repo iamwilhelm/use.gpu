@@ -116,19 +116,21 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
         if (source) parents.push(source);
         parent = source as any;
       }
-      return parents.map((fiber) => {
-        const text = formatNode(fiber);
-        const parts = text.split(/(?<=<)| /);
-        return (
-          <Fiber key={fiber.id} onClick={() => {
-            selectFiber(fiber);
-          }}><div>
-            {parts[0]}
-            <FiberName>{parts[1]}</FiberName>
-            {parts.slice(2).join(' ')}
-          </div></Fiber>
-        );
-      });
+      if (parents.length) {
+        return parents.map((fiber) => {
+          const text = formatNode(fiber);
+          const parts = text.split(/(?<=<)| /);
+          return (
+            <Fiber key={fiber.id} onClick={() => {
+              selectFiber(fiber);
+            }}><div>
+              {parts[0]}
+              <FiberName>{parts[1]}</FiberName>
+              {parts.slice(2).join(' ')}
+            </div></Fiber>
+          );
+        });
+      }
     }
     return '[Runtime]';
   };

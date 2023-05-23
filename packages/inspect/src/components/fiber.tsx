@@ -10,7 +10,7 @@ import { Node } from './node';
 import { ReactNode } from './react-node';
 import { ExpandState, SelectState, HoverState, Action } from './types';
 
-import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendGroup, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
+import { TreeWrapper, TreeWrapperWithLegend, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendGroup, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
 
 import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
@@ -181,8 +181,10 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   const {fibers} = usePingContext();
   const by = fibers.get(fiber.by);
   
+  const Wrap = legend ? TreeWrapperWithLegend : TreeWrapper;
+  
   return (<>
-    <TreeWrapper>
+    <Wrap>
       <FiberNode
         by={by}
         fiber={fiber}
@@ -198,7 +200,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         hoveredCursor={hoveredCursor}
       />
       {(legend ?? true) ? <FiberLegend /> : null}
-    </TreeWrapper>
+    </Wrap>
   </>);
 }
 

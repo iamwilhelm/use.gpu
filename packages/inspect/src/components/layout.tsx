@@ -195,11 +195,14 @@ export const Label = styled('div', {
 
 export const TreeWrapper = styled('div', {
   flexGrow: 1,
-  minHeight: 'calc(100% - 110px)',
   padding: '20px',
   position: 'relative',
   minWidth: '100%',
   width: 'fit-content',
+});
+
+export const TreeWrapperWithLegend = styled(TreeWrapper, {
+  minHeight: 'calc(100% - 110px)',
 });
 
 export const TreeToggle = styled('div', {

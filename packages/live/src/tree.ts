@@ -8,6 +8,7 @@ import { use, morph } from './builtin';
 
 const DEFAULT_RENDER_OPTIONS = {
   stackSliceDepth: 20,
+  strictQueueOrder: true,
 };
 
 const START = +new Date();
@@ -27,7 +28,7 @@ export const makeHost = (
   const queue      = makeFiberQueue();
 
   let DEPTH = 0;
-  const {stackSliceDepth} = options;
+  const {stackSliceDepth, strictQueueOrder} = {...DEFAULT_RENDER_OPTIONS, options};
   const depth = (depth: number) => DEPTH = depth;
   const slice = (f: LiveFiber<any>) => f.depth - DEPTH > stackSliceDepth;
 
@@ -48,7 +49,7 @@ export const makeHost = (
     unvisit: queue.remove,
     pop: queue.pop,
     peek: queue.peek,
-    reorder: queue.reorder,
+    reorder: strictQueueOrder ? queue.reorder : () => {},
     all: queue.all,
 
     depth,

@@ -1,6 +1,6 @@
 import type {
   Initial, Setter, Reducer, Key, Task,
-  LiveFunction, LiveComponent, LiveFiber, LiveCapture, LiveContext, LiveElement, LiveMap, LiveNode,
+  LiveFunction, LiveComponent, LiveFiber, LiveCapture, LiveContext, LiveElement, LiveNode,
   FunctionCall, DeferredCall, HostInterface, ArrowFunction,
   ReactElementInterop,
 } from './types';
@@ -256,35 +256,3 @@ export const makeCapture = <T>(displayName?: string): LiveCapture<T> => ({
   displayName,
   capture: true,
 });
-
-/** Flatten a captured value map into an ordered array. */
-export const captureFibers = <T>(map: Map<LiveFiber<any>, T>): [LiveFiber<any>, T][] => {
-  const entries = Array.from(map.entries());
-  entries.sort((a, b) => compareFibers(a[0], b[0]));
-  return entries;
-}
-
-/** Flatten a captured value map into an ordered array. */
-export const captureValues = <T>(
-  map: LiveMap<T>,
-): T[] => {
-  const keys = Array.from(map.keys());
-  keys.sort((a, b) => compareFibers(a, b));
-  return keys.map(k => map.get(k)!);
-}
-
-/** Get last node of captured value map. */
-export const captureLastFiber = <T>(
-  map: LiveMap<T>,
-): [LiveFiber<any>, T] | null => {
-  const keys = Array.from(map.keys());
-  keys.sort((a, b) => compareFibers(a, b));
-  
-  const key = keys[keys.length - 1];
-  return key ? [key, map.get(key)!] : null;
-}
-
-/** Get last value yielded from captured value map. */
-export const captureTail = <T>(
-  map: LiveMap<T>
-): T | null => captureLastFiber(map)?.[1] ?? null;

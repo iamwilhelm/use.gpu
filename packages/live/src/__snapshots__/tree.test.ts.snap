@@ -2,11 +2,11 @@
 
 exports[`captures values 1`] = `
 "<Root >
-  <Capture(undefined) displayName={undefined} capture={true} [<Node >,<Node >,…] (…) (0, _builtin.use)(Node, (0, _builtin.ca…>
-    <Node >
-    <Node >
-    <Node >
-    <Resume(undefined) (…) (0, _builtin.use)(Node, (0, _builtin.ca…>
+  <Capture(undefined) displayName={undefined} capture={true} [<Fiber >,<Fiber >,…] (…) (0, _builtin.use)(Node, list)>
+    <Fiber >
+    <Fiber >
+    <Fiber >
+    <Resume(undefined) (…) (0, _builtin.use)(Node, list)>
       <Node [1,2,…]>"
 `;
 
@@ -93,12 +93,12 @@ exports[`renders quoted/unquoted trees 1`] = `
 
 exports[`yeets from capture 1`] = `
 "<Root >
-  <Capture(undefined) displayName={undefined} capture={true} [f={YEET(…) {}} arg={1} key={undefined} by={51},f={…} arg={…} key={…} by={…},…,…] (…) (0, _builtin.yeet)((0, _builtin.capture…>
+  <Capture(undefined) displayName={undefined} capture={true} [f={YEET(…) {}} arg={1} key={undefined} by={51},f={…} arg={…} key={…} by={…},…,…] (…) (0, _builtin.yeet)(list)>
     <Yeet 1>
     <Yeet 2>
-    <Node >
-    <Node >
-    <Resume(undefined) (…) (0, _builtin.yeet)((0, _builtin.capture…>
+    <Fiber >
+    <Fiber >
+    <Resume(undefined) (…) (0, _builtin.yeet)(list)>
   <Resume(Root) (…) (0, _builtin.use)(Node, values)>
     <Node [1,2,…,…]>"
 `;

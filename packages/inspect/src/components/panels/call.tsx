@@ -72,7 +72,7 @@ const hookToObject = (
     return {version: b, value: a};
   }
   if (type === Hook.YOLO) {
-    return {skip: a};
+    return a ? {skip: a} : {scope: b};
   }
   return null;
 }

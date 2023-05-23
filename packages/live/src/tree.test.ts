@@ -3,7 +3,6 @@ import {
   use, keyed, detach, provide, capture, gather, yeet, reconcile, quote, unquote,
   PROVIDE,
   makeContext, makeCapture,
-  captureValues,
 } from './builtin';
 import { renderFiber } from './fiber';
 import { memoArgs, useState, useContext, useCapture } from './hooks';
@@ -648,7 +647,7 @@ it("captures values", () => {
       use(Value(1)),
       use(Value(2)),
       use(Value(3)),
-    ], (map: LiveMap<number>) => use(Node, captureValues(map)));
+    ], (list: number[]) => use(Node, list));
   };
 
   const Value = (value: number) => () => useCapture(context, value);
@@ -673,7 +672,7 @@ it("yeets from capture", () => {
       yeet(2),
       use(Value(3)),
       use(Value(4)),
-    ], (map: LiveMap<number>) => yeet(captureValues(map))), (values: number[]) => use(Node, values));
+    ], (list: number[]) => yeet(list)), (values: number[]) => use(Node, values));
   };
 
   const Value = (value: number) => () => useCapture(context, value);
@@ -813,7 +812,7 @@ it("render reordering", () => {
     rendered.ids.push(id);
   };
 
-  const result = renderSync(use(Root), null, {stackSliceDepth: 0});
+  const result = renderSync(use(Root), null, {stackSliceDepth: 0, strictQueueOrder: true});
   expect(result.host).toBeTruthy();
   if (!result.host) return;
 

@@ -483,6 +483,9 @@ export const useNoCapture = <C>(
 
   const root = roots.get(context)! as LiveFiber<any>;
   if (state![i] && root) {
+    const registry = values.get(context).current;
+    registry.delete(fiber);
+
     if (host) host.undepend(root, fiber.id);
     state![i] = false;
   }
@@ -527,18 +530,40 @@ export const useYolo = <T>(
   dependencies: any[] = NO_DEPS,
 ): T => {
   const fiber = useFiber();
+  const {pointer} = fiber;
 
   const i = pushState(fiber, Hook.YOLO);
-  let {state, pointer} = fiber;
+  let {state} = fiber;
 
-  let skip = true;
-  const value = useMemo(() => {
-    skip = false;
-    return initialState();
-  }, dependencies);
+  let value;
+  if (pointer === 0) {
+    let skip = true;
+    value = useMemo(() => {
+      skip = false;
+      return initialState();
+    }, dependencies);
 
-  if (skip) fiber.pointer = state![i];
-  else state![i] = fiber.pointer;
+    if (skip) fiber.pointer = state![i];
+    else state![i] = fiber.pointer;
+  }
+  else {
+    let scope = state![i + 1];
+
+    let {pointer} = fiber;
+    value = useMemo(() => {
+      try {
+        fiber.pointer = 0;
+        fiber.state = scope;
+        return initialState();
+      }
+      catch (e) { throw e; }
+      finally {
+        state![i + 1] = fiber.state;
+        fiber.pointer = pointer + STATE_SLOTS;
+        fiber.state = state;
+      }
+    }, dependencies);
+  }
 
   return value as unknown as T;
 }

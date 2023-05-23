@@ -263,7 +263,7 @@ export const pingFiber = <F extends ArrowFunction>(
   if (host?.__ping) host.__ping(fiber, active);
 }
 
-const BY_MAP = new WeakMap<any, number>;
+const BY_MAP = new WeakMap<any, number>();
 
 /** React element interop
     @hidden */
@@ -1116,7 +1116,11 @@ export const captureFiber = <F extends ArrowFunction>(
     if (capture.context) throw new Error(`Cannot use context ${capture.displayName} as a capture`);
 
     const registry = new Map<LiveFiber<any>, any>();
-    const reduction = () => registry;
+    const reduction = () => {
+      const keys = Array.from(registry.keys());
+      keys.sort((a, b) => compareFibers(a, b));
+      return keys.map(k => registry.get(k)!);
+    };
 
     const Resume = makeFiberReduction(fiber, reduction);
     fiber.next = makeNextFiber(fiber, Resume, 'Resume');

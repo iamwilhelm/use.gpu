@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { Point, TextureSource } from '@use-gpu/core';
 import type { Vox, VoxShape } from './types';
 
-import { gather, use, yeet, useMemo } from '@use-gpu/live';
+import { gather, use, yeet, useMemo, useYolo } from '@use-gpu/live';
 import { makeTexture, uploadDataTexture } from '@use-gpu/core';
 import { useDeviceContext, useRawSource, Fetch } from '@use-gpu/workbench';
 
@@ -114,7 +114,7 @@ export const VoxData: LC<VoxDataProps> = (props) => {
       },
     }), [parsed, shapes, palette, pbr]);
 
-    return render ? render(vox) : yeet(vox);
+    return useYolo(() => render ? render(vox) : yeet(vox), [render, vox]);
   };
 
   // Load .vox or use inline data

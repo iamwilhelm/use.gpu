@@ -51,6 +51,9 @@ export type Resource<T> = () => (void | Task | [T, Task]);
 export type RenderOptions = {
   // Stack slicing depth
   stackSliceDepth: number,
+
+  // Strict queue reordering
+  strictQueueOrder: boolean,
 };
 
 // Hook types

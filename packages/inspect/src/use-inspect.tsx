@@ -1,4 +1,4 @@
-import type { LiveFiber, LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LiveFiber, LiveComponent, LiveElement, LC } from '@use-gpu/live';
 import type { InspectExtension, InspectAddIns, OptionState } from './components/types';
 import { fragment, use, useMemo, useOne, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
@@ -11,7 +11,7 @@ export type UseInspectProps = {
   fiber: LiveFiber<any>,
   active?: boolean,
   sub?: string,
-  provider: LiveComponent<any>,
+  provider?: LiveComponent<any>,
   container?: Element,
   extensions?: InspectExtension[],
   initialState?: Partial<OptionState>,
@@ -30,8 +30,8 @@ const NO_EXT: any[] = [];
 export const UseInspect: LiveComponent<UseInspectProps> = ({
   fiber,
   sub,
-  provider,
   container,
+  provider,
   extensions = NO_EXT,
   children,
   initialState,

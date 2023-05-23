@@ -16,6 +16,8 @@ export type OptionState = {
   open: boolean,
   close: boolean,
   toolbar: boolean,
+  legend: boolean,
+  skip: number,
   depth: number,
   counts: boolean,
   builtins: boolean,

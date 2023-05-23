@@ -175,6 +175,10 @@ export const Inset = styled('div', {
   padding: '20px',
 });
 
+export const InsetLeftRightBottom = styled('div', {
+  padding: '0 20px 20px 20px',
+});
+
 export const InsetColumnFull = styled('div', {
   display: 'flex',
   flexDirection: 'column',

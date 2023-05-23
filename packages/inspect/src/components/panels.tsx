@@ -3,7 +3,7 @@ import type { InspectAddIns } from './types';
 import React, { FC, useState } from 'react';
 import { styled as _styled } from '@stitches/react';
 
-import { Inset } from './layout';
+import { Inset, InsetLeftRightBottom } from './layout';
 import { useAddIns } from '../providers/add-in-provider';
 import { usePingTracker, usePingContext } from '../providers/ping-provider';
 
@@ -12,6 +12,7 @@ const styled: any = _styled;
 export type PanelsProps = {
   fiber: LiveFiber<any>,
   selectFiber: (fiber?: LiveFiber<any> | null) => void,
+  fullSize?: boolean,
 };
 
 export const StyledTabList = styled('div', {
@@ -41,7 +42,7 @@ export const StyledTab = styled('button', {
 });
 
 export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
-  const {fiber, selectFiber} = props;
+  const {fiber, selectFiber, fullSize} = props;
   
   const addIns = useAddIns();
   const {fibers} = usePingContext();
@@ -64,8 +65,10 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
     selectFiber(f);
   };
 
+  const Wrap = fullSize ? InsetLeftRightBottom : Inset;
+
   return (
-    <Inset>
+    <Wrap>
       <StyledTabList>
         {active.map((panel) => (
           <StyledTab key={panel.id} onClick={() => setTab(panel.id)} className={currentTab === panel ? 'active' : null}>
@@ -74,6 +77,6 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
         ))}
       </StyledTabList>
       {fiber ? currentTab!.render(fiber, fibers, handleSelectFiber) : null}
-    </Inset>
+    </Wrap>
   );
 };

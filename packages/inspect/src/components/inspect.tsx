@@ -51,7 +51,9 @@ export const Inspect: React.FC<InspectProps> = ({
       open: false,
       close: true,
       toolbar: true,
+      legend: true,
       depth: 1000,
+      skip: 0,
       counts: false,
       fullSize: false,
       builtins: false,
@@ -75,6 +77,8 @@ export const Inspect: React.FC<InspectProps> = ({
   const [highlight] = useOption<boolean>('highlight');
   const [toolbar] = useOption<boolean>('toolbar');
   const [close] = useOption<boolean>('close');
+  const [legend] = useOption<boolean>('legend');
+  const [skip] = useOption<number>('skip');
   const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
@@ -111,7 +115,7 @@ export const Inspect: React.FC<InspectProps> = ({
   
   const tree = (
     <InsetColumnFull>
-      {toolbar ? (
+      {(toolbar ?? true)  ? (
         <TreeControls>
           <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
         </TreeControls>
@@ -119,6 +123,8 @@ export const Inspect: React.FC<InspectProps> = ({
       <TreeView onClick={() => updateSelected(null)}>
         <FiberTree
           fiber={fiber}
+          legend={legend}
+          skipDepth={skip}
           depthLimit={depthLimit}
           runCounts={runCounts}
           builtins={builtins}
@@ -153,9 +159,9 @@ export const Inspect: React.FC<InspectProps> = ({
                 </PanelAbsolute>
               </RowPanel>
               {selectedFiber ? (
-                <RowPanel style={fullSize ? {position: 'relative', maxHeight: '30%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
+                <RowPanel style={fullSize ? {position: 'relative', height: '40%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
                   <PanelScrollable>
-                    <Panels fiber={selectedFiber} selectFiber={setSelected} />
+                    <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} />
                   </PanelScrollable>
                 </RowPanel>
               ) : null}
@@ -164,7 +170,7 @@ export const Inspect: React.FC<InspectProps> = ({
         </AddInProvider>
       </PingProvider>
     ) : null}
-    {close ? (
+    {(close ?? true) ? (
       <InspectToggle onClick={toggleOpen}>
         <Button style={{width: 58, height: 37}}>{open
           ? <IconItem height={20} top={-2}><SVGClose size={20} /></IconItem>

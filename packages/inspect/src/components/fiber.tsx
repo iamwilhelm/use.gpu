@@ -17,10 +17,12 @@ import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, 
 
 type FiberTreeProps = {
   fiber: LiveFiber<any>,
+  skipDepth: number,
   depthLimit: number,
   runCounts: boolean,
   builtins: boolean,
   highlight: boolean,
+  legend: boolean,
   expandCursor: Cursor<ExpandState>,
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
@@ -34,6 +36,7 @@ type FiberNodeProps = {
   selectedCursor: Cursor<SelectState>,
   hoveredCursor: Cursor<HoverState>,
   indent?: number,
+  skipDepth?: number,
   renderDepth?: number,
   depthLimit?: number,
   runCounts?: boolean,
@@ -165,10 +168,12 @@ export const FiberLegend: React.FC = () => {
 // Fiber tree including legend
 export const FiberTree: React.FC<FiberTreeProps> = ({
   fiber,
+  skipDepth,
   depthLimit,
   runCounts,
   builtins,
   highlight,
+  legend,
   expandCursor,
   selectedCursor,
   hoveredCursor,
@@ -183,6 +188,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         fiber={fiber}
         fibers={fibers}
         renderDepth={0}
+        skipDepth={skipDepth}
         depthLimit={depthLimit}
         runCounts={runCounts}
         builtins={builtins}
@@ -191,7 +197,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
       />
-      <FiberLegend />
+      {(legend ?? true) ? <FiberLegend /> : null}
     </TreeWrapper>
   </>);
 }
@@ -201,6 +207,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   by,
   fiber,
   fibers,
+  skipDepth = 0,
   renderDepth = 0,
   depthLimit = Infinity,
   runCounts = false,
@@ -220,8 +227,10 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Avoid jumpyness on hover
   const lockedWide = useMemo(() => (!mount && !mounts && !next), []);
-  wide = wide || lockedWide;
-  indent += (indented * (wide ? 1 : .1));
+  if (!skipDepth) {
+    wide = wide || lockedWide;
+    indent += (indented * (wide ? 1 : .1));
+  }
 
   // Hook up ping provider
   fibers.set(fiber.id, fiber);
@@ -242,7 +251,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   renderDepth = getRenderDepth(fibers, fiber) ?? renderDepth;
 
   // Resolve node omission
-  const shouldRender = (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
+  const shouldRender = !skipDepth && (renderDepth < depthLimit) && (builtins || !fiber.f?.isLiveBuiltin);
   const shouldAbsolute = !shouldRender && (parents || depends || precedes || quoted || unquoted);
   const shouldStartOpen = fiber.f !== DEBUG && !fiber.__inspect?.react;
 
@@ -335,6 +344,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
         key='mount'
         fiber={mount}
         fibers={fibers}
+        skipDepth={skipDepth && (skipDepth - 1)}
         renderDepth={renderDepth}
         depthLimit={depthLimit}
         runCounts={runCounts}
@@ -360,6 +370,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
             key={key}
             fiber={sub}
             fibers={fibers}
+            skipDepth={skipDepth && (skipDepth - 1)}
             renderDepth={renderDepth}
             depthLimit={depthLimit}
             runCounts={runCounts}
@@ -414,6 +425,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
       <FiberNode
         fiber={next}
         fibers={fibers}
+        skipDepth={skipDepth && (skipDepth - 1)}
         renderDepth={renderDepth}
         depthLimit={depthLimit}
         runCounts={runCounts}
@@ -432,6 +444,7 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
 
   // Compact omitted row
   if (!shouldRender) {
+    if (skipDepth) return childRender;
     return (<>
       <TreeRowOmitted indent={indent + 1}>{nodeRender}</TreeRowOmitted>
       {childRender}

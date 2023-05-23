@@ -543,10 +543,12 @@ export const reconcileFiberCalls = (() => {
       flushMount(null, mount, fenced);
     }
 
-    // If rekeyed, reorder queue and invalidate quoted order
+    // If rekeyed, reorder queue and invalidate yeeted/quoted order
     if (rekeyed) {
       fiber.host?.reorder(fiber);
       bustFiberQuote(fiber);
+      bustFiberYeet(fiber, true);
+      visitYeetRoot(fiber, true);
     }
 
     // Mount new / updated keys
@@ -590,9 +592,11 @@ export const reconcileFiberOrder = <F extends ArrowFunction>(
     if (lookup) lookup.set(o, i);
   }
 
-  // If rekeyed, invalidate quoted order
+  // Reorder queue and invalidate yeeted/quoted order
   fiber.host?.reorder(fiber);
   bustFiberQuote(fiber);
+  bustFiberYeet(fiber, true);
+  visitYeetRoot(fiber, true);
 
   pingFiber(fiber);
 }
@@ -1283,7 +1287,7 @@ export const flushMount = <F extends ArrowFunction>(
     const {host} = mount;
 
     // Slice into new stack if too deep, or if fenced
-    if (host && (fenced || host?.slice(mount))) return host.visit(mount);
+    if (host && (fenced || host?.slice(mount.depth))) return host.visit(mount);
 
     const element = renderFiber(mount);
     updateFiber(mount, element);

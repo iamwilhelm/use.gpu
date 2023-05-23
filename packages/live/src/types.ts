@@ -204,8 +204,8 @@ export type HostInterface = {
   reorder: (fiber: LiveFiber<any>) => void,
 
   // Stack slicing
-  slice: (fiber: LiveFiber<any>) => boolean,
   depth: (d: number) => void,
+  slice: (d: number) => boolean,
 
   __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
   __ping: (fiber: LiveFiber<any>, active?: boolean) => void,

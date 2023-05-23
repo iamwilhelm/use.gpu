@@ -3,7 +3,7 @@
 - `@use-gpu/live`: Ensure render order even when rekeying
 - `@use-gpu/live`: Add back a more sensible `useYolo`
 - `@use-gpu/live`: Track `fiber.by` rendered IDs correctly for React-flavored JSX
-- `@use-gpu/live`: Captures are now pre-reduced.
+- `@use-gpu/live`: Captures are now pre-reduced
 
 0.9.0
 - `@use-gpu/inspect`: Allow use without Use.GPU, move GPU panels to `@use-gpu/inspect-gpu`

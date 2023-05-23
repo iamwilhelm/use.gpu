@@ -28,9 +28,9 @@ export const makeHost = (
   const queue      = makeFiberQueue();
 
   let DEPTH = 0;
-  const {stackSliceDepth, strictQueueOrder} = {...DEFAULT_RENDER_OPTIONS, options};
+  const {stackSliceDepth, strictQueueOrder} = {...DEFAULT_RENDER_OPTIONS, ...options};
   const depth = (depth: number) => DEPTH = depth;
-  const slice = (f: LiveFiber<any>) => f.depth - DEPTH > stackSliceDepth;
+  const slice = (depth: number) => depth - DEPTH > stackSliceDepth;
 
   const host = {
     schedule: scheduler.schedule,

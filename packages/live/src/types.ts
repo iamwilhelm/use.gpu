@@ -54,6 +54,9 @@ export type RenderOptions = {
 
   // Strict queue reordering
   strictQueueOrder: boolean,
+
+  // Strict stack slice reordering
+  strictSliceOrder: boolean,
 };
 
 // Hook types

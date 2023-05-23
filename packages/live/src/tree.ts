@@ -1,7 +1,7 @@
 import type { Key, Task, LiveFiber, LiveElement, LiveNode, LivePure, DeferredCall, DeferredCallInterop, FiberQueue, HostInterface, RenderCallbacks, RenderOptions, ArrowFunction, ReactElementInterop } from './types';
 
 import { makeFiber, renderFiber, updateFiber, disposeFiber, reactInterop } from './fiber';
-import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, getOnPaint } from './util';
+import { makeActionScheduler, makeDependencyTracker, makeDisposalTracker, makeStackSlicer, getOnPaint } from './util';
 import { makeFiberQueue } from './queue';
 import { LOGGING, formatNode } from './debug';
 import { use, morph } from './builtin';
@@ -9,6 +9,7 @@ import { use, morph } from './builtin';
 const DEFAULT_RENDER_OPTIONS = {
   stackSliceDepth: 20,
   strictQueueOrder: true,
+  strictSliceOrder: true,
 };
 
 const START = +new Date();
@@ -22,15 +23,17 @@ export const makeHost = (
   dispatch: (t: Task) => void,
   flush: (fs: LiveFiber<any>[]) => void,
 ) => {
+  const {
+    stackSliceDepth,
+    strictQueueOrder,
+    strictSliceOrder,
+  } = {...DEFAULT_RENDER_OPTIONS, ...options};
+
   const scheduler  = makeActionScheduler(dispatch, flush);
   const disposal   = makeDisposalTracker();
   const dependency = makeDependencyTracker();
   const queue      = makeFiberQueue();
-
-  let DEPTH = 0;
-  const {stackSliceDepth, strictQueueOrder} = {...DEFAULT_RENDER_OPTIONS, ...options};
-  const depth = (depth: number) => DEPTH = depth;
-  const slice = (depth: number) => depth - DEPTH > stackSliceDepth;
+  const slicer     = makeStackSlicer(stackSliceDepth, strictSliceOrder);
 
   const host = {
     schedule: scheduler.schedule,
@@ -52,8 +55,8 @@ export const makeHost = (
     reorder: strictQueueOrder ? queue.reorder : () => {},
     all: queue.all,
 
-    depth,
-    slice,
+    depth: slicer.depth,
+    slice: slicer.slice,
 
     options,
 

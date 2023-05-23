@@ -127,6 +127,27 @@ export const makeDisposalTracker = () => {
   return {track, untrack, dispose};
 }
 
+/** Slice stack once depth has been exceeded */
+export const makeStackSlicer = (maxDepth: number, strict: boolean = true) => {
+  let DEPTH = 0;
+  let SLICED = false;
+
+  const depth = strict
+    ? (depth: number) => {
+        DEPTH = depth;
+        SLICED = false;
+      }
+    : (depth: number) => {
+        DEPTH = depth;
+      };
+
+  const slice = strict
+    ? (depth: number) => { return SLICED = SLICED || (depth - DEPTH > maxDepth); }
+    : (depth: number) => { return (depth - DEPTH > maxDepth); };
+
+  return {depth, slice};
+};
+
 /** Node-friendly RAF wrapper */
 export const getOnPaint = () => typeof window !== 'undefined' ? window.requestAnimationFrame : setTimeout;
 

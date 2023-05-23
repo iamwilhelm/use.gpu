@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { use, yeet, gather, memo, useMemo } from '@use-gpu/live';
+import { use, yeet, gather, memo, useMemo, useYolo } from '@use-gpu/live';
 import { makeDynamicTexture, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
 import { Fetch } from './fetch';
 
@@ -96,6 +96,6 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
       return source;
     }, [bitmap, sampler]);
 
-    return useMemo(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
+    return useYolo(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
   });
 };

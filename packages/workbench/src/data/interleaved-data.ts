@@ -4,7 +4,7 @@ import type { TypedArray, StorageSource, UniformType, Accessor, DataField, DataB
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { yeet, extend, signal, gather, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
 import {
   makePackedLayout,
   
@@ -144,6 +144,6 @@ export const InterleavedData: LiveComponent<InterleavedDataProps> = (props) => {
 
   const trigger = useOne(() => signal(), fieldSources[0]?.version);
 
-  const view = useMemo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
+  const view = useYolo(() => render ? render(...fieldSources) : yeet(fieldSources), [render, fieldSources]);
   return [trigger, view];
 };

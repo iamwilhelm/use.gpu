@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
-import { useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { useContext, useOne, useResource, useState, useYolo } from '@use-gpu/live';
 import { makeOrbitMatrix } from '@use-gpu/core';
 import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
@@ -113,5 +113,5 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     stop();
   }, wheel);
 
-  return useMemo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
+  return useYolo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
 };

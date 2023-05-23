@@ -3,7 +3,7 @@ import type { TypedArray, DataTexture, TextureSource } from '@use-gpu/core';
 
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
-import { yeet, signal, memo, useOne, useMemo, useNoMemo, useContext, useNoContext, incrementVersion } from '@use-gpu/live';
+import { yeet, signal, memo, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
 import { makeSampler, makeRawTexture, uploadDataTexture } from '@use-gpu/core';
 
 export type RawTextureProps = {
@@ -81,6 +81,6 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
   }
 
   const trigger = useOne(() => signal(), source.version);
-  const view = useMemo(() => render ? render(source) : yeet(source), [render, source]);
+  const view = useYolo(() => render ? render(source) : yeet(source), [render, source]);
   return [trigger, view];
 };

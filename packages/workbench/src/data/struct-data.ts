@@ -4,7 +4,7 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { useDeviceContext } from '../providers/device-provider';
 
-import { yeet, signal, useMemo, useNoMemo, useOne } from '@use-gpu/live';
+import { yeet, signal, useMemo, useNoMemo, useOne, useYolo } from '@use-gpu/live';
 import { bundleToAttribute } from '@use-gpu/shader/wgsl';
 import { incrementVersion } from '@use-gpu/live';
 import { makeUniformLayout, makeLayoutFiller, makeLayoutData, makeStorageBuffer, uploadBuffer } from '@use-gpu/core';
@@ -125,6 +125,6 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
   }
 
   const trigger = useOne(() => signal(), source.version);
-  const view = useMemo(() => render ? render(source) : yeet(source), [render, source]);
+  const view = useYolo(() => render ? render(source) : yeet(source), [render, source]);
   return [trigger, view];
 };

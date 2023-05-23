@@ -3,7 +3,7 @@ import {
   capture, fence, gather, multiGather, mapReduce, morph, provide, yeet, quote, unquote, reconcile, suspend, signal,
   CAPTURE, FENCE, GATHER, MULTI_GATHER, MAP_REDUCE, MORPH, PROVIDE, YEET, FRAGMENT, QUOTE, UNQUOTE, RECONCILE, SUSPEND, SIGNAL,
 } from './builtin';
-import { getCurrentFiberID } from './current';
+import { getCurrentFiberBy } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 
 const NO_PROPS: any[] = [{}];
@@ -34,7 +34,7 @@ export const Quote = QUOTE as AnyF;
 export const Unquote = UNQUOTE as AnyF;
 
 export const createElement = (type: ArrowFunction, props: any, ...children: any[]) => {
-  const by = getCurrentFiberID();
+  const by = getCurrentFiberBy();
 
   if ((type as any)?.isLiveBuiltin) {
     switch (type) {

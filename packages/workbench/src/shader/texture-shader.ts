@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TextureSource, Lazy } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { yeet, useMemo } from '@use-gpu/live';
+import { yeet, useMemo, useYolo } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
@@ -61,5 +61,5 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
     return getBoundShader(shader, bindings, values);
   }, [shader, texture, args, source, sources]);
 
-  return useMemo(() => render ? render(getTexture) : yeet(getTexture), [render, getTexture]);
+  return useYolo(() => render ? render(getTexture) : yeet(getTexture), [render, getTexture]);
 };

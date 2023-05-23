@@ -1,6 +1,8 @@
 0.9.1
 - `@use-gpu/layout`: Expand render phase into component tree for memoization
 - `@use-gpu/live`: Ensure render order even when rekeying
+- `@use-gpu/live`: Add back a more sensible `useYolo`
+- `@use-gpu/live`: Track `fiber.by` rendered IDs correctly for React-flavored JSX
 
 0.9.0
 - `@use-gpu/inspect`: Allow use without Use.GPU, move GPU panels to `@use-gpu/inspect-gpu`

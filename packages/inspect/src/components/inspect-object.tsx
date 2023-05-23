@@ -58,7 +58,11 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
     let i = 0;
     for (let k of object.keys()) {
       const v = object.get(k);
-      if (k instanceof Object) k = (i++).toString();
+      if (k instanceof Object) {
+        if (k?.displayName != null) k = `{${k.displayName}}`;
+        else if (k?.id != null) k = `{${k.id}}`;
+        else k = `{${i++}}`;
+      }
       o[k] = v;
     }
     object = o;
@@ -100,7 +104,7 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
             object={object[k]}
             state={state}
             toggleState={toggleState}
-            key={key}
+            path={key}
             seen={seen}
             depth={depth + 1}
           />

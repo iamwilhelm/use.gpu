@@ -17,6 +17,7 @@ export {
   useResource,
   useState,
   useVersion,
+  useYolo,
 
   useNoAsync,
   useNoFiber,
@@ -31,6 +32,7 @@ export {
   useNoResource,
   useNoState,
   useNoVersion,
+  useNoYolo,
 
   useRef,
   useNoRef,

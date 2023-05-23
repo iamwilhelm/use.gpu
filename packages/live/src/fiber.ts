@@ -11,7 +11,7 @@ import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from
 import { formatNode, formatNodeName, LOGGING } from './debug';
 import { createElement } from './jsx';
 
-import { setCurrentFiber } from './current';
+import { setCurrentFiber, setCurrentFiberBy } from './current';
 
 let ID = 0;
 
@@ -263,16 +263,32 @@ export const pingFiber = <F extends ArrowFunction>(
   if (host?.__ping) host.__ping(fiber, active);
 }
 
+const BY_MAP = new WeakMap<any, number>;
+
 /** React element interop
     @hidden */
 export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {
     let {type, key} = element;
+    const by = BY_MAP.get(element) ?? fiber?.id;
     const props = {...element.props, key};
     if (typeof type === 'symbol') type = FRAGMENT;
 
-    call = createElement(type, props);
+    if (by != null) {
+      const {children} = props;
+      if (children) {
+        if (Array.isArray(children)) children.forEach((c: any) => c ? BY_MAP.set(c, by) : null);
+        else if ('props' in children) BY_MAP.set(props.children, by);
+      }
+
+      setCurrentFiberBy(by);
+      call = createElement(type, props);
+      setCurrentFiberBy(null);
+    }
+    else {
+      call = createElement(type, props);
+    }
   }
   return call ?? null;
 };

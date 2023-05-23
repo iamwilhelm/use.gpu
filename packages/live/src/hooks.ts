@@ -38,11 +38,7 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
     const i = fiber.pointer;
     const type = state[i];
     switch (type) {
-      case Hook.STATE:
-      case Hook.MEMO:
-      case Hook.ONE:
-      case Hook.CALLBACK:
-      case Hook.VERSION:
+      default:
         useNoHook(type)();
         break;
       case Hook.RESOURCE:
@@ -107,14 +103,10 @@ export const memoArgs = <F extends ArrowFunction>(
     const deps = [fiber.version] as any[];
     if (!customMemo) deps.push(...args);
 
-    let skip = true;
-    const value = useMemo(() => {
+    const value = useYolo(() => {
       deps[0] = fiber.version = incrementVersion(fiber.version!);
-      skip = false;
       return f(...args);
     }, deps);
-
-    if (skip) fiber.pointer = fiber.state!.length;
 
     return value;
   };
@@ -157,14 +149,10 @@ export const memoProps = <F extends ArrowFunction>(
       deps.push(props[k]);
     }
 
-    let skip = true;
-    const value = useMemo(() => {
+    const value = useYolo(() => {
       deps[0] = fiber.version = incrementVersion(fiber.version!);
-      skip = false;
       return f(props);
     }, deps);
-
-    if (skip) fiber.pointer = fiber.state!.length;
 
     return value;
   };
@@ -530,6 +518,35 @@ export const useHasCapture = <C>(
 
 export const useNoHasContext = () => {};
 export const useNoHasCapture = () => {};
+
+/**
+ * Memoize a hook with given dependencies
+ */
+export const useYolo = <T>(
+  initialState: () => T,
+  dependencies: any[] = NO_DEPS,
+): T => {
+  const fiber = useFiber();
+
+  const i = pushState(fiber, Hook.YOLO);
+  let {state, pointer} = fiber;
+
+  let skip = true;
+  const value = useMemo(() => {
+    skip = false;
+    return initialState();
+  }, dependencies);
+
+  if (skip) fiber.pointer = state![i];
+  else state![i] = fiber.pointer;
+
+  return value as unknown as T;
+}
+
+export const useNoYolo = () => {
+  useNoHook(Hook.YOLO);
+  useNoHook(Hook.MEMO);
+};
 
 // Togglable hooks
 export const useNoState = useNoHook(Hook.STATE);

@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
-import { useContext, useMemo, useOne, useResource, useState } from '@use-gpu/live';
+import { useContext, useMemo, useOne, useResource, useState, useYolo } from '@use-gpu/live';
 import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
 
@@ -121,5 +121,5 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const panX = centered ? x - originX * (zoom - 1) / zoom + offsetX : x;
   const panY = centered ? y - originY * (zoom - 1) / zoom + offsetY : y;
 
-  return useMemo(() => render(panX, panY, zoom), [render, panX, panY, zoom]);
+  return useYolo(() => render(panX, panY, zoom), [render, panX, panY, zoom]);
 };

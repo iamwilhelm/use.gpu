@@ -1,5 +1,5 @@
 import type { LiveFiber, LiveComponent, LiveElement } from '@use-gpu/live';
-import type { InspectExtension, InspectAddIns } from './components/types';
+import type { InspectExtension, InspectAddIns, OptionState } from './components/types';
 import { fragment, use, useMemo, useOne, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 
@@ -14,6 +14,8 @@ export type UseInspectProps = {
   provider: LiveComponent<any>,
   container?: Element,
   extensions?: InspectExtension[],
+  initialState?: Partial<OptionState>,
+  save?: boolean,
 };
 
 const STYLE = {
@@ -32,6 +34,8 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
   container,
   extensions = NO_EXT,
   children,
+  initialState,
+  save,
   active = true,
 }) => {
   if (!fiber) throw new Error("<UseInspect> Must supply fiber to inspect");
@@ -67,7 +71,15 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
       container: container ?? document.body,
       style: STYLE,
       inspectable: false,
-      children: <Inspect fiber={fiber} sub={sub} addIns={addIns} onInspect={handleInspect} />,
+      children:
+        <Inspect
+          fiber={fiber}
+          sub={sub}
+          addIns={addIns}
+          onInspect={handleInspect}
+          initialState={initialState}
+          save={save}
+        />,
     }) : null
   ]);
 }

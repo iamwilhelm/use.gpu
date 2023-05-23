@@ -28,8 +28,12 @@ type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
 type InspectProps = {
   fiber: LiveFiber<any>,
   sub?: string,
+  
   addIns: InspectAddIns,
   onInspect?: (b: boolean) => void,
+
+  initialState?: Partial<OptionState>,
+  save?: boolean,
 }
 
 export const Inspect: React.FC<InspectProps> = ({
@@ -37,20 +41,25 @@ export const Inspect: React.FC<InspectProps> = ({
   sub,
   addIns,
   onInspect,
+  initialState,
+  save = true,
 }) => {
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
   const optionCursor = useUpdateState<OptionState>(
     {
       open: false,
+      close: true,
+      toolbar: true,
       depth: 1000,
       counts: false,
       fullSize: false,
       builtins: false,
       highlight: true,
       inspect: false,
+      ...initialState,
     },
-    makeUseLocalState(getOptionsKey('state', sub))
+    save ? makeUseLocalState(getOptionsKey('state', sub)) : useState
   );
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
@@ -64,6 +73,8 @@ export const Inspect: React.FC<InspectProps> = ({
   const [fullSize] = useOption<boolean>('fullSize');
   const [builtins] = useOption<boolean>('builtins');
   const [highlight] = useOption<boolean>('highlight');
+  const [toolbar] = useOption<boolean>('toolbar');
+  const [close] = useOption<boolean>('close');
   const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
@@ -100,9 +111,11 @@ export const Inspect: React.FC<InspectProps> = ({
   
   const tree = (
     <InsetColumnFull>
-      <TreeControls>
-        <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
-      </TreeControls>
+      {toolbar ? (
+        <TreeControls>
+          <Options cursor={optionCursor} toggleInspect={onInspect && toggleInspect} />
+        </TreeControls>
+      ) : null}
       <TreeView onClick={() => updateSelected(null)}>
         <FiberTree
           fiber={fiber}
@@ -151,12 +164,14 @@ export const Inspect: React.FC<InspectProps> = ({
         </AddInProvider>
       </PingProvider>
     ) : null}
-    <InspectToggle onClick={toggleOpen}>
-      <Button style={{width: 58, height: 37}}>{open
-        ? <IconItem height={20} top={-2}><SVGClose size={20} /></IconItem>
-        : <IconItem height={20} top={-4}><SVGInspect size={24} /></IconItem>
-      }</Button>
-    </InspectToggle>
+    {close ? (
+      <InspectToggle onClick={toggleOpen}>
+        <Button style={{width: 58, height: 37}}>{open
+          ? <IconItem height={20} top={-2}><SVGClose size={20} /></IconItem>
+          : <IconItem height={20} top={-4}><SVGInspect size={24} /></IconItem>
+        }</Button>
+      </InspectToggle>
+    ) : null}
   </div>);
 }
 

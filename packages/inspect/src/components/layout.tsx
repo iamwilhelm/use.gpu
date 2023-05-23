@@ -95,7 +95,6 @@ export const TreeControls = styled('div', {
 });
 
 export const TreeView = styled('div', {
-  padding: '20px',
   overflow: 'auto',
   flexGrow: 1,
 });
@@ -192,6 +191,11 @@ export const Label = styled('div', {
 
 export const TreeWrapper = styled('div', {
   flexGrow: 1,
+  minHeight: 'calc(100% - 110px)',
+  padding: '20px',
+  position: 'relative',
+  minWidth: '100%',
+  width: 'fit-content',
 });
 
 export const TreeToggle = styled('div', {
@@ -200,13 +204,25 @@ export const TreeToggle = styled('div', {
 });
 
 export const TreeLegend = styled('div', {
-  position: 'sticky',
+  position: 'absolute',
   left: 0,
+  width: '100%',
+  top: '100%',
   color: 'var(--LiveInspect-colorTextSemi)',
-  paddingTop: '30px',
-  display: 'flex',
-  flexWrap: 'wrap',
   fontSize: '0.9em',
+  background: '#000',
+  zIndex: 10,
+  
+  '& > div': {
+    position: 'sticky',
+    left: 0,
+    display: 'flex',
+    width: 'fit-content',
+    padding: '20px',
+  },
+});
+
+export const TreeLegendGroup = styled('div', {
 });
 
 export const TreeLegendItem = styled('div', {

@@ -14,6 +14,8 @@ export type HoverState = {
 };
 export type OptionState = {
   open: boolean,
+  close: boolean,
+  toolbar: boolean,
   depth: number,
   counts: boolean,
   builtins: boolean,

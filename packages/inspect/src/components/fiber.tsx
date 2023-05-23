@@ -10,7 +10,7 @@ import { Node } from './node';
 import { ReactNode } from './react-node';
 import { ExpandState, SelectState, HoverState, Action } from './types';
 
-import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
+import { TreeWrapper, TreeRow, TreeIndent, TreeLine, TreeToggle, TreeLegend, TreeLegendGroup, TreeRowOmitted, TreeLegendItem, SplitColumn, SplitColumnFull, Muted } from './layout';
 import { Expandable } from './expandable';
 
 import { IconItem, SVGChevronDown, SVGChevronRight, SVGNextOpen, SVGNextClosed, SVGAtom, SVGHighlightElement, SVGYeet, SVGQuote, SVGDashboard, SVGViewOutput } from './svg';
@@ -83,73 +83,82 @@ export const FiberLegend: React.FC = () => {
   const fiber = makeFiber(' ');
 
   return (<>
-    <TreeLegend>
-      <TreeLegendItem>
-        <Node
-          fiber={fiber}
-          staticMount={true}
-        />
-        <span>Mounted</span>
-      </TreeLegendItem>
-      <TreeLegendItem>
-        <Node
-          fiber={fiber}
-          staticPing={true}
-        />
-        <span>Updated</span>
-      </TreeLegendItem>
-      <TreeLegendItem>
-        <Node
-          fiber={fiber}
-          hovered={0}
-        />
-        <span>Rendered By</span>
-      </TreeLegendItem>
-      <TreeLegendItem>
-        <Node
-          fiber={fiber}
-          depends={true}
-        />
-        <span>Dependency</span>
-      </TreeLegendItem>
-      <TreeLegendItem>
-        <Node
-          fiber={fiber}
-          quoted={true}
-        />
-        <span>Portal</span>
-      </TreeLegendItem>
+    <TreeLegend><div>
+      <TreeLegendGroup>
+        <TreeLegendItem>
+          <Node
+            fiber={fiber}
+            staticMount={true}
+          />
+          <span>Mounted</span>
+        </TreeLegendItem>
+        <TreeLegendItem>
+          <Node
+            fiber={fiber}
+            staticPing={true}
+          />
+          <span>Updated</span>
+        </TreeLegendItem>
+        <TreeLegendItem>
+          <Node
+            fiber={fiber}
+            hovered={0}
+          />
+          <span>Rendered By</span>
+        </TreeLegendItem>
+      </TreeLegendGroup>
 
-      <TreeLegendItem>
-        <IconItem gap={-5} top={-2}><SVGYeet /></IconItem>
-        <span>Yeet</span>
-      </TreeLegendItem>
+      <TreeLegendGroup>
+        <TreeLegendItem>
+          <Node
+            fiber={fiber}
+            depends={true}
+          />
+          <span>Dependency</span>
+        </TreeLegendItem>
+        <TreeLegendItem>
+          <Node
+            fiber={fiber}
+            quoted={true}
+          />
+          <span>Portal</span>
+        </TreeLegendItem>
+      </TreeLegendGroup>
 
-      <TreeLegendItem>
-        <IconItem gap={-5} top={-2}><SVGQuote /></IconItem>
-        <span>Quote</span>
-      </TreeLegendItem>
+      <TreeLegendGroup>
+        <TreeLegendItem>
+          <IconItem gap={-5} top={-2}><SVGYeet /></IconItem>
+          <span>Yeet</span>
+        </TreeLegendItem>
 
-      <TreeLegendItem>
-        <IconItem gap={-5} top={-2}><SVGHighlightElement /></IconItem>
-        <span>Highlight</span>
-      </TreeLegendItem>
+        <TreeLegendItem>
+          <IconItem gap={-5} top={-2}><SVGQuote /></IconItem>
+          <span>Quote</span>
+        </TreeLegendItem>
 
-      <TreeLegendItem>
-        <IconItem gap={-5} top={-2}><SVGViewOutput /></IconItem>
-        <span>Output</span>
-      </TreeLegendItem>
+        <TreeLegendItem>
+          <IconItem gap={-5} top={-2}><SVGHighlightElement /></IconItem>
+          <span>Highlight</span>
+        </TreeLegendItem>
+      </TreeLegendGroup>
 
-      <TreeLegendItem>
-        <IconItem gap={-5} top={-2}><SVGDashboard /></IconItem>
-        <span>Layout</span>
-      </TreeLegendItem>
+      <TreeLegendGroup>
+        <TreeLegendItem>
+          <IconItem gap={-5} top={-2}><SVGViewOutput /></IconItem>
+          <span>Output</span>
+        </TreeLegendItem>
 
-      <TreeLegendItem>
-        <IconItem gap={-5} top={-2}><SVGAtom /></IconItem>
-        <span>React</span>
-      </TreeLegendItem>
-    </TreeLegend>
+        <TreeLegendItem>
+          <IconItem gap={-5} top={-2}><SVGDashboard /></IconItem>
+          <span>Layout</span>
+        </TreeLegendItem>
+
+        <TreeLegendItem>
+          <IconItem gap={-5} top={-2}><SVGAtom /></IconItem>
+          <span>React</span>
+        </TreeLegendItem>
+      </TreeLegendGroup>
+    </div></TreeLegend>
   </>)
 };
 
@@ -167,7 +176,7 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
   const {fibers} = usePingContext();
   const by = fibers.get(fiber.by);
   
-  return (<div style={{minWidth: 'fit-content', position: 'relative'}}>
+  return (<>
     <TreeWrapper>
       <FiberNode
         by={by}
@@ -182,9 +191,9 @@ export const FiberTree: React.FC<FiberTreeProps> = ({
         selectedCursor={selectedCursor}
         hoveredCursor={hoveredCursor}
       />
+      <FiberLegend />
     </TreeWrapper>
-    <FiberLegend />
-  </div>);
+  </>);
 }
 
 // One node in the tree

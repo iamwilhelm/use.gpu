@@ -7,7 +7,7 @@ import type {
 import { use, fragment, morph, DEBUG as DEBUG_BUILTIN, DETACH, FRAGMENT, MAP_REDUCE, GATHER, MULTI_GATHER, FENCE, YEET, MORPH, PROVIDE, CAPTURE, SUSPEND, RECONCILE, QUOTE, UNQUOTE, SIGNAL, EMPTY_FRAGMENT } from './builtin';
 import { discardState, useOne } from './hooks';
 import { renderFibers } from './tree';
-import { isSameDependencies, incrementVersion, tagFunction, compareFibers } from './util';
+import { isSameDependencies, incrementVersion, compareFibers } from './util';
 import { formatNode, formatNodeName, LOGGING } from './debug';
 import { createElement } from './jsx';
 
@@ -746,17 +746,6 @@ export const makeFiberReconciliation = <F extends ArrowFunction, R>(
   };
   return makeNextFiber(fiber, Resume, name);
 }
-
-// Tag a component as imperative, always re-rendered from above even if props/state didn't change
-export const makeImperativeFunction = (
-  component: LiveFunction<any>,
-  displayName?: string,
-): LiveFunction<any> => {
-  (component as any).isImperativeFunction = true;
-  tagFunction(component, displayName);
-  return component;
-}
-
 
 const toArray = <T>(x: T | T[] | undefined): T[] => Array.isArray(x) ? x : x != null ? [x] : [];
 const NO_ARRAY: any[] = [];

@@ -24,6 +24,7 @@
     "use-gpu",
     "use-gpu-library"
   ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./types/wgsl-files/index.d.ts",

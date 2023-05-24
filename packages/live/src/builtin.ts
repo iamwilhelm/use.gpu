@@ -5,8 +5,8 @@ import type {
   ReactElementInterop,
 } from './types';
 
-import { compareFibers } from './util';
-import { makeFiber, makeImperativeFunction, bustFiberMemo } from './fiber';
+import { compareFibers, tagFunction } from './util';
+import { bustFiberMemo } from './fiber';
 import { getCurrentFiberID } from './current';
 
 /** @hidden */
@@ -226,9 +226,6 @@ export const unquote = <T>(
   key?: Key,
 ): DeferredCall<() => void> => ({f: UNQUOTE, args: calls, key, by: getCurrentFiberID()} as any);
 
-/** Component has side-effects, and will re-render even if props object is identical. */
-export const imperative = makeImperativeFunction;
-
 /** Yeet a suspend symbol. */
 export const suspend = (key?: Key) => yeet(SUSPEND, key);
 
@@ -256,3 +253,16 @@ export const makeCapture = <T>(displayName?: string): LiveCapture<T> => ({
   displayName,
   capture: true,
 });
+
+// Tag a component as imperative, always re-rendered from above even if props/state didn't change
+export const makeImperativeFunction = (
+  component: LiveFunction<any>,
+  displayName?: string,
+): LiveFunction<any> => {
+  (component as any).isImperativeFunction = true;
+  tagFunction(component, displayName);
+  return component;
+}
+
+/** Component has side-effects, and will re-render even if props object is identical. */
+export const imperative = makeImperativeFunction;

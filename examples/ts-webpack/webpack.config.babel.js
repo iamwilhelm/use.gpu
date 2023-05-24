@@ -20,6 +20,9 @@ module.exports =  {
     modules: ['node_modules'],
     extensions: ['.ts', '.tsx', '.js', '.json', '.wgsl']
   },
+  optimization: {
+    usedExports: true,
+  },
   experiments: {
     syncWebAssembly: true,
   },

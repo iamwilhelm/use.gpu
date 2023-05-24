@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/shader",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
@@ -42,5 +42,6 @@
   "keywords": [
     "use-gpu",
     "use-gpu-library"
-  ]
+  ],
+  "sideEffects": false
 }

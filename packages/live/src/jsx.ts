@@ -29,6 +29,7 @@ export const Capture = CAPTURE as AnyF;
 export const Yeet = YEET as AnyF;
 export const Morph = MORPH as AnyF;
 export const Suspend = SUSPEND as AnyF;
+export const Signal = SIGNAL as AnyF;
 export const Reconcile = RECONCILE as AnyF;
 export const Quote = QUOTE as AnyF;
 export const Unquote = UNQUOTE as AnyF;
@@ -111,6 +112,7 @@ export const React = {
   Yeet,
   Morph,
   Suspend,
+  Signal,
   Reconcile,
   Quote,
   Unquote,

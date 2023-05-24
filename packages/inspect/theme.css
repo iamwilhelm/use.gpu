@@ -200,7 +200,7 @@ html > body .LiveInspect ::-webkit-scrollbar {
   background: rgba(75, 70, 200, 1.0);
 }
 .LiveInspect div.fiber-tree-highlight.quoted, .LiveInspect div.fiber-tree-highlight.unquoted {
-  background: rgba(0, 70, 200, 1.0);
+  background: rgba(30, 80, 250, 1.0);
 }
 .LiveInspect div.fiber-tree-highlight.staticMount {
   background: rgba(120, 120, 120, 1.0);

@@ -119,14 +119,15 @@ export const Props: React.FC<PropsProps> = ({fiber, fibers, selectFiber}) => {
       if (parents.length) {
         return parents.map((fiber) => {
           const text = formatNode(fiber);
-          const parts = text.split(/(?<=<)| /);
+          const name = formatNodeName(fiber);
+          const parts = text.split(name);
           return (
             <Fiber key={fiber.id} onClick={() => {
               selectFiber(fiber);
             }}><div>
               {parts[0]}
-              <FiberName>{parts[1]}</FiberName>
-              {parts.slice(2).join(' ')}
+              <FiberName>{name}</FiberName>
+              {parts.slice(1).join(' ')}
             </div></Fiber>
           );
         });

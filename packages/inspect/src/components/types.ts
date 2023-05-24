@@ -14,18 +14,24 @@ export type HoverState = {
 };
 export type OptionState = {
   open: boolean,
-  close: boolean,
-  toolbar: boolean,
-  legend: boolean,
-  skip: number,
   depth: number,
   counts: boolean,
   builtins: boolean,
-  resize: boolean,
   fullSize: boolean,
   highlight: boolean,
   inspect: boolean,
   tab: string,
+};
+
+export type InspectAppearance = {
+  close: boolean,
+  toolbar: boolean,
+  legend: boolean,
+  resize: boolean,
+  tabs: boolean
+  select: boolean,
+  environment: boolean,
+  skip: number,
 };
 
 export type Action = () => void;

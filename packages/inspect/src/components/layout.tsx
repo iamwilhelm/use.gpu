@@ -246,6 +246,7 @@ export const TreeLegendItem = styled('div', {
   },
   '& > span': {
     marginLeft: '10px',
+    whiteSpace: 'nowrap',
   },
 });
 

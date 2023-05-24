@@ -1,5 +1,5 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { ExpandState, SelectState, HoverState, OptionState, PingState, InspectAddIns } from './types';
+import type { ExpandState, SelectState, HoverState, OptionState, PingState, InspectAddIns, InspectAppearance } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
@@ -22,15 +22,21 @@ import {
 } from './layout';
 
 const getOptionsKey = (id: string, sub: string = 'root') => `liveInspect[${sub}][${id}]`;
-const INITIAL_STATE = {
-  open: false,
+const APPEARANCE = {
   close: true,
   toolbar: true,
   legend: true,
-  depth: 1000,
-  skip: 0,
-  counts: false,
   resize: true,
+  tabs: true,
+  select: true,
+  environment: true,
+  skip: 0,
+};
+
+const INITIAL_STATE = {
+  open: false,
+  depth: 1000,
+  counts: false,
   fullSize: false,
   builtins: false,
   highlight: true,
@@ -51,6 +57,7 @@ type InspectProps = {
   onInspect?: (b: boolean) => void,
 
   findFiber?: number,
+  appearance?: Partial<InspectAppearance>,
   initialState?: Partial<OptionState>,
   save?: boolean,
 }
@@ -62,8 +69,12 @@ export const Inspect: React.FC<InspectProps> = ({
   onInspect,
   findFiber,
   initialState,
+  appearance,
   save = true,
 }) => {
+  const appAppearance = useMemo(() => ({...APPEARANCE, ...appearance}), [appearance]);
+  const {close, toolbar, legend, resize, skip, tabs, select, environment} = appAppearance;
+
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
   const optionCursor = useUpdateState<OptionState>(
@@ -88,11 +99,6 @@ export const Inspect: React.FC<InspectProps> = ({
   const [fullSize] = useOption<boolean>('fullSize');
   const [builtins] = useOption<boolean>('builtins');
   const [highlight] = useOption<boolean>('highlight');
-  const [toolbar] = useOption<boolean>('toolbar');
-  const [close] = useOption<boolean>('close');
-  const [legend] = useOption<boolean>('legend');
-  const [skip] = useOption<number>('skip');
-  const [resize] = useOption<number>('resize');
   const [tab, updateTab] = useOption<string>('tab');
   const [splitLeft, setSplitLeft] = useOption<number>('splitLeft');
   const [splitBottom, setSplitBottom] = useOption<number>('splitBottom');
@@ -100,6 +106,8 @@ export const Inspect: React.FC<InspectProps> = ({
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
   const setSelected = useCallback((fiber?: LiveFiber<any> | null) => {
+    if (!select) return;
+
     updateSelected({ $set: fiber ?? null });
   }, [updateSelected]);
 
@@ -184,7 +192,7 @@ export const Inspect: React.FC<InspectProps> = ({
                     : {width: (100 - splitLeft) + '%'}
                   }>
                   <PanelScrollable>
-                    <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} tab={tab} onTab={updateTab} />
+                    <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} tabs={tabs} tab={tab} onTab={updateTab} />
                   </PanelScrollable>
                   {resize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
                 </RowPanel>

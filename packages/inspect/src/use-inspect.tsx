@@ -1,5 +1,5 @@
 import type { LiveFiber, LiveComponent, LiveElement, LC } from '@use-gpu/live';
-import type { InspectExtension, InspectAddIns, OptionState } from './components/types';
+import type { InspectExtension, InspectAppearance, InspectAddIns, OptionState } from './components/types';
 import { fragment, use, useMemo, useOne, useState } from '@use-gpu/live';
 import { HTML } from '@use-gpu/react';
 
@@ -13,6 +13,7 @@ export type UseInspectProps = {
   sub?: string,
   provider?: LiveComponent<any>,
   container?: Element,
+  appearance?: Partial<InspectAppearance>,
   extensions?: InspectExtension[],
 
   findFiber?: number,
@@ -37,6 +38,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
   extensions = NO_EXT,
   children,
   findFiber,
+  appearance,
   initialState,
   save,
   active = true,
@@ -81,6 +83,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
           addIns={addIns}
           onInspect={handleInspect}
           findFiber={findFiber}
+          appearance={appearance}
           initialState={initialState}
           save={save}
         />,

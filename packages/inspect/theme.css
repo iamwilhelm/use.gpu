@@ -22,6 +22,7 @@
   --LiveInspect-depthShadow: rgba(0, 0, 0, .25);
   --LiveInspect-focusShadow: rgba(30, 90, 120, 0.3);
   --LiveInspect-borderThin: #444;
+  --LiveInspect-borderVisible: #606060;
 
   --LiveInspect-shim: rgba(0, 0, 0, 0.85);
   --LiveInspect-shimGray: rgba(255, 255, 255, 0.1);

@@ -35,6 +35,7 @@ const INITIAL_STATE = {
   builtins: false,
   highlight: true,
   inspect: false,
+  tab: 'props',
   splitLeft: 33,
   splitBottom: 50,
 };
@@ -49,6 +50,7 @@ type InspectProps = {
   addIns: InspectAddIns,
   onInspect?: (b: boolean) => void,
 
+  findFiber?: number,
   initialState?: Partial<OptionState>,
   save?: boolean,
 }
@@ -58,6 +60,7 @@ export const Inspect: React.FC<InspectProps> = ({
   sub,
   addIns,
   onInspect,
+  findFiber,
   initialState,
   save = true,
 }) => {
@@ -90,6 +93,7 @@ export const Inspect: React.FC<InspectProps> = ({
   const [legend] = useOption<boolean>('legend');
   const [skip] = useOption<number>('skip');
   const [resize] = useOption<number>('resize');
+  const [tab, updateTab] = useOption<string>('tab');
   const [splitLeft, setSplitLeft] = useOption<number>('splitLeft');
   const [splitBottom, setSplitBottom] = useOption<number>('splitBottom');
   const [inspect, updateInspect] = useOption<boolean>('inspect');
@@ -160,7 +164,7 @@ export const Inspect: React.FC<InspectProps> = ({
   return (<div className="LiveInspect">
     {open ? (
       <PingProvider fiber={fiber}>
-        <HostHighlight fiber={fiber} setSelected={setSelected} toggleInspect={toggleInspect} updateHovered={updateHovered} />
+        <HostHighlight fiber={fiber} findFiber={findFiber} setSelected={setSelected} toggleInspect={toggleInspect} updateHovered={updateHovered} />
         <AddInProvider addIns={addIns}>
           <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
             <div style={fullSize
@@ -180,7 +184,7 @@ export const Inspect: React.FC<InspectProps> = ({
                     : {width: (100 - splitLeft) + '%'}
                   }>
                   <PanelScrollable>
-                    <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} />
+                    <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} tab={tab} onTab={updateTab} />
                   </PanelScrollable>
                   {resize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
                 </RowPanel>
@@ -203,13 +207,14 @@ export const Inspect: React.FC<InspectProps> = ({
 
 type HostHighlightProps = {
   fiber: LiveFiber<any>,
+  findFiber?: number,
   toggleInspect: () => void,
   setSelected: (fiber?: LiveFiber<any> | null) => void,
   updateHovered: (hovered: any) => void,
 };
 
 const HostHighlight = (props: HostHighlightProps) => {
-  const {fiber, setSelected, toggleInspect, updateHovered} = props;
+  const {fiber, findFiber, setSelected, toggleInspect, updateHovered} = props;
   const {fibers} = usePingContext();
 
   const {host} = fiber;
@@ -248,6 +253,11 @@ const HostHighlight = (props: HostHighlightProps) => {
 
     return () => { host.__highlight = () => {}; }
   }, [host, fibers, setSelected]);
+
+  useEffect(() => {
+    const find = fibers.get(findFiber!);
+    if (find) setSelected(find);
+  }, [findFiber]);
 
   return null;
 };

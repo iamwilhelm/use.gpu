@@ -25,6 +25,7 @@ export type OptionState = {
   fullSize: boolean,
   highlight: boolean,
   inspect: boolean,
+  tab: string,
 };
 
 export type Action = () => void;

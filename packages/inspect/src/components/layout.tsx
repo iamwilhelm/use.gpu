@@ -251,7 +251,7 @@ export const TreeLegendItem = styled('div', {
 
 export const TreeLine = styled('div', {
   marginLeft: '-1px',
-  borderLeft: '2px dotted var(--LiveInspect-borderThin)',
+  borderLeft: '2px dotted var(--LiveInspect-borderVisible)',
 });
 
 export const TreeRowOmittedChunk = styled('div', {

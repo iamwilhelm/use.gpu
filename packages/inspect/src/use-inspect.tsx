@@ -14,6 +14,8 @@ export type UseInspectProps = {
   provider?: LiveComponent<any>,
   container?: Element,
   extensions?: InspectExtension[],
+
+  findFiber?: number,
   initialState?: Partial<OptionState>,
   save?: boolean,
 };
@@ -34,6 +36,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
   provider,
   extensions = NO_EXT,
   children,
+  findFiber,
   initialState,
   save,
   active = true,
@@ -77,6 +80,7 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
           sub={sub}
           addIns={addIns}
           onInspect={handleInspect}
+          findFiber={findFiber}
           initialState={initialState}
           save={save}
         />,

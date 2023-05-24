@@ -1,4 +1,5 @@
 import type { LiveFiber } from '@use-gpu/live';
+import type { Update } from '@use-gpu/state';
 import type { InspectAddIns } from './types';
 import React, { FC, useState } from 'react';
 import { styled as _styled } from '@stitches/react';
@@ -13,6 +14,8 @@ export type PanelsProps = {
   fiber: LiveFiber<any>,
   selectFiber: (fiber?: LiveFiber<any> | null) => void,
   fullSize?: boolean,
+  tab: string,
+  onTab: (s: Update<string>) => void,
 };
 
 export const StyledTabList = styled('div', {
@@ -42,7 +45,7 @@ export const StyledTab = styled('button', {
 });
 
 export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
-  const {fiber, selectFiber, fullSize} = props;
+  const {fiber, selectFiber, fullSize, tab, onTab } = props;
   
   const addIns = useAddIns();
   const {fibers} = usePingContext();
@@ -54,11 +57,8 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
   usePingTracker();
 
   const active = panels.filter((panel) => panel.enabled(fiber, fibers));
-  let [tab, setTab] = useState<string>(first.id);
-
-  if (!active.find((panel) => panel.id === tab)) tab = first.id;
-  
-  const currentTab = active.find((panel) => panel.id === tab);
+  const currentTab = active.find((panel) => panel.id === tab) ?? active[0];
+  if (!currentTab) return null;
 
   const handleSelectFiber = (fiber: number | LiveFiber<any>) => {
     const f = typeof fiber === 'number' ? fibers.get(fiber) : fiber;
@@ -71,7 +71,7 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
     <Wrap>
       <StyledTabList>
         {active.map((panel) => (
-          <StyledTab key={panel.id} onClick={() => setTab(panel.id)} className={currentTab === panel ? 'active' : null}>
+          <StyledTab key={panel.id} onClick={() => onTab(panel.id)} className={currentTab === panel ? 'active' : null}>
             {panel.label}
           </StyledTab>
         ))}

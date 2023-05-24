@@ -101,19 +101,14 @@ export const makeFiberQueue = (init?: LiveFiber<any>[]): FiberQueue => {
     let q = queue;
     let qp = null;
 
-    let skipped = 0;
-    let popped = [];
-
     while (q) {
       if (compareFibers(fiber, q.fiber) >= 0) {
         hint = qp = q;
         q = q.next;
-        skipped++;
         continue;
       }
       if (isSubNode(fiber, q.fiber)) {
         list.push(q.fiber);
-        popped.push(formatNodeName(q.fiber) + q.fiber.id);
         if (qp) {
           qp.next = q.next;
           q = q.next;

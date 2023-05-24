@@ -80,7 +80,7 @@ export const makeFiber = <F extends ArrowFunction>(
   const bound = null as any;
   const depth = parent ? parent.depth + 1 : 0;
 
-  const id = ++ID;
+  const id = host?.id() ?? ++ID;
 
   const yeeted  = parent?.yeeted ? {...parent.yeeted, id, parent: parent.yeeted, value: undefined, reduced: undefined, scope: null} : null;
   const quote   = parent?.quote?.scope ? {...parent.quote, scope: null} : parent?.quote ?? null;
@@ -687,7 +687,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
 
   const {id, unquote, mounts, lookup, order} = fiber;
   let {root, to, to: {next}} = unquote;
-  
+
   if (!next) {
     next = to.next = makeFiberReconciliation(to);
     to.fork = true;

@@ -35,6 +35,8 @@ export const makeHost = (
   const queue      = makeFiberQueue();
   const slicer     = makeStackSlicer(stackSliceDepth, strictSliceOrder);
 
+  let ID = 0;
+
   const host = {
     schedule: scheduler.schedule,
     flush: scheduler.flush,
@@ -58,6 +60,7 @@ export const makeHost = (
     depth: slicer.depth,
     slice: slicer.slice,
 
+    id: () => ++ID,
     options,
 
     __ping: () => {},
@@ -184,3 +187,4 @@ export const renderAsync = renderWithDispatch((t: Task) => { setTimeout(t, 0); }
 export const renderOnPaint = renderWithDispatch((t: Task) => { onPaint(t); });
 
 export const render = renderSync;
+export const unmount = (fiber: LiveFiber<any>) => disposeFiber(fiber);

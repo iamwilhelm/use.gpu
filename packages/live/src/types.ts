@@ -103,7 +103,7 @@ export type LiveFiber<F extends Function> = FunctionCall<F> & {
 
   // Instance of F bound to self
   bound?: F,
-  
+
   // State for user hooks
   state: any[] | null,
   pointer: number,
@@ -209,6 +209,9 @@ export type HostInterface = {
   // Stack slicing
   depth: (d: number) => void,
   slice: (d: number) => boolean,
+
+  // Id generator
+  id: () => number,
 
   __stats: {mounts: number, unmounts: number, updates: number, dispatch: number},
   __ping: (fiber: LiveFiber<any>, active?: boolean) => void,

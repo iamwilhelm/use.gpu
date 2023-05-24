@@ -49,6 +49,7 @@ export {
   renderWithDispatch,
   resolveRootNode,
   traverseFiber,
+  unmount,
 } from './tree';
 export * from './types';
 export {

@@ -663,6 +663,7 @@ export const mountFiberQuote = <F extends ArrowFunction>(
 
   if (!next) {
     next = to.next = makeFiberReconciliation(to);
+    next.quote = next.unquote = null;
     to.fork = true;
   }
 
@@ -690,6 +691,7 @@ export const mountFiberUnquote = <F extends ArrowFunction>(
 
   if (!next) {
     next = to.next = makeFiberReconciliation(to);
+    next.quote = next.unquote = null;
     to.fork = true;
   }
 

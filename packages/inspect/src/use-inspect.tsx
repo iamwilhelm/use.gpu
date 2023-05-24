@@ -5,7 +5,8 @@ import { HTML } from '@use-gpu/react';
 
 import React from 'react';
 import { Inspect } from './components/inspect';
-import { defaultPanels } from './providers/add-in-provider';
+import { AddInProvider, defaultPanels } from './providers/add-in-provider';
+import { AppearanceProvider } from './providers/appearance-provider';
 
 export type UseInspectProps = {
   fiber: LiveFiber<any>,
@@ -77,16 +78,18 @@ export const UseInspect: LiveComponent<UseInspectProps> = ({
       style: STYLE,
       inspectable: false,
       children:
-        <Inspect
-          fiber={fiber}
-          sub={sub}
-          addIns={addIns}
-          onInspect={handleInspect}
-          findFiber={findFiber}
-          appearance={appearance}
-          initialState={initialState}
-          save={save}
-        />,
+        <AddInProvider addIns={addIns}>
+          <AppearanceProvider appearance={appearance}>
+            <Inspect
+              fiber={fiber}
+              sub={sub}
+              onInspect={handleInspect}
+              findFiber={findFiber}
+              initialState={initialState}
+              save={save}
+            />
+          </AppearanceProvider>
+        </AddInProvider>
     }) : null
   ]);
 }

@@ -1,5 +1,5 @@
 import type { LiveFiber } from '@use-gpu/live';
-import type { ExpandState, SelectState, HoverState, OptionState, PingState, InspectAddIns, InspectAppearance } from './types';
+import type { ExpandState, SelectState, HoverState, OptionState, PingState, InspectAppearance } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
 import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
@@ -7,8 +7,8 @@ import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
 import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState, SetStateAction } from 'react';
 
 import { makeUseLocalState } from '../hooks/useLocalState';
-import { AddInProvider } from '../providers/add-in-provider';
 import { PingProvider, usePingContext } from '../providers/ping-provider';
+import { useAppearance } from '../providers/appearance-provider';
 
 import { Node } from './node';
 import { FiberTree } from './fiber';
@@ -22,16 +22,6 @@ import {
 } from './layout';
 
 const getOptionsKey = (id: string, sub: string = 'root') => `liveInspect[${sub}][${id}]`;
-const APPEARANCE = {
-  close: true,
-  toolbar: true,
-  legend: true,
-  resize: true,
-  tabs: true,
-  select: true,
-  environment: true,
-  skip: 0,
-};
 
 const INITIAL_STATE = {
   open: false,
@@ -52,8 +42,6 @@ type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
 type InspectProps = {
   fiber: LiveFiber<any>,
   sub?: string,
-  
-  addIns: InspectAddIns,
   onInspect?: (b: boolean) => void,
 
   findFiber?: number,
@@ -62,18 +50,18 @@ type InspectProps = {
   save?: boolean,
 }
 
+const NOP = () => {};
+
 export const Inspect: React.FC<InspectProps> = ({
   fiber,
   sub,
-  addIns,
   onInspect,
   findFiber,
   initialState,
   appearance,
   save = true,
 }) => {
-  const appAppearance = useMemo(() => ({...APPEARANCE, ...appearance}), [appearance]);
-  const {close, toolbar, legend, resize, skip, tabs, select, environment} = appAppearance;
+  const {close, toolbar, legend, resize, skip, select, environment} = useAppearance();
 
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);
@@ -93,7 +81,7 @@ export const Inspect: React.FC<InspectProps> = ({
 
   const useOption = useRefineCursor(optionCursor);
 
-  const [selectedFiber, updateSelected] = selectedCursor;
+  let [selectedFiber, updateSelected] = selectedCursor;
   const [depthLimit] = useOption<number>('depth');
   const [runCounts] = useOption<boolean>('counts');
   const [fullSize] = useOption<boolean>('fullSize');
@@ -105,11 +93,11 @@ export const Inspect: React.FC<InspectProps> = ({
   const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
-  const setSelected = useCallback((fiber?: LiveFiber<any> | null) => {
-    if (!select) return;
+  if (!select) selectedCursor[1] = updateSelected = NOP;
 
+  const setSelected = useCallback((fiber?: LiveFiber<any> | null) => {
     updateSelected({ $set: fiber ?? null });
-  }, [updateSelected]);
+  }, [updateSelected, select]);
 
   const [open, updateOpen] = useOption<boolean>('open');
   const toggleOpen = () => updateOpen(!open);
@@ -173,33 +161,31 @@ export const Inspect: React.FC<InspectProps> = ({
     {open ? (
       <PingProvider fiber={fiber}>
         <HostHighlight fiber={fiber} findFiber={findFiber} setSelected={setSelected} toggleInspect={toggleInspect} updateHovered={updateHovered} />
-        <AddInProvider addIns={addIns}>
-          <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
-            <div style={fullSize
-                ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
-                : {display: 'flex', height: '100%'}}>
+        <InspectContainer onMouseDown={onMouseDown} className="ui inverted">
+          <div style={fullSize
+              ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
+              : {display: 'flex', height: '100%'}}>
+            <RowPanel style={fullSize
+                ? {position: 'relative', flexGrow: 1, minHeight: 0}
+                : {position: 'relative', width: splitLeft + '%'}}>
+              <PanelAbsolute>
+                {tree}
+              </PanelAbsolute>
+              {resize ? <Resizer side="right" value={splitLeft} onChange={setSplitLeft} /> : null}
+            </RowPanel>
+            {selectedFiber ? (
               <RowPanel style={fullSize
-                  ? {position: 'relative', flexGrow: 1, minHeight: 0}
-                  : {position: 'relative', width: splitLeft + '%'}}>
-                <PanelAbsolute>
-                  {tree}
-                </PanelAbsolute>
-                {resize ? <Resizer side="right" value={splitLeft} onChange={setSplitLeft} /> : null}
+                  ? {position: 'relative', height: splitBottom + '%', zIndex: 10, flexShrink: 0, background: '#000', borderTop: '1px solid var(--LiveInspect-borderThin' }
+                  : {width: (100 - splitLeft) + '%'}
+                }>
+                <PanelScrollable>
+                  <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} tab={tab} onTab={updateTab} />
+                </PanelScrollable>
+                {resize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
               </RowPanel>
-              {selectedFiber ? (
-                <RowPanel style={fullSize
-                    ? {position: 'relative', height: splitBottom + '%', zIndex: 10, flexShrink: 0, background: '#000', borderTop: '1px solid var(--LiveInspect-borderThin' }
-                    : {width: (100 - splitLeft) + '%'}
-                  }>
-                  <PanelScrollable>
-                    <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} tabs={tabs} tab={tab} onTab={updateTab} />
-                  </PanelScrollable>
-                  {resize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
-                </RowPanel>
-              ) : null}
-            </div>
-          </InspectContainer>
-        </AddInProvider>
+            ) : null}
+          </div>
+        </InspectContainer>
       </PingProvider>
     ) : null}
     {(close ?? true) ? (

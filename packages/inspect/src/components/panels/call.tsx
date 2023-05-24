@@ -22,6 +22,15 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
   let env = {context, yeeted, quote, unquote} as any;
   let rendered = {type, mount, mounts, next, order} as any;
 
+  if (!mount) delete rendered.mount;
+  if (!mounts) delete rendered.mounts;
+  if (!next) delete rendered.next;
+
+  if (!context.values.size) delete env.context;
+  if (!yeeted) delete env.yeeted;
+  if (!quote) delete env.quote;
+  if (!unquote) delete env.unquote;
+
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const toggleExpanded = (id: string) => setExpanded((state) => ({
     ...expanded,
@@ -35,16 +44,20 @@ export const Call: React.FC<CallProps> = ({fiber}) => {
       <div><b>Fiber</b></div>
       <div><InspectObject object={props} state={expanded} toggleState={toggleExpanded} /></div>
       <Spacer />
-      <div><b>Environment</b></div>
-      <div><InspectObject object={env} state={expanded} toggleState={toggleExpanded} /></div>
-      <Spacer />
       <div><b>Rendered</b></div>
       <div><InspectObject object={rendered} state={expanded} toggleState={toggleExpanded} /></div>
-      <Spacer />
-      <div><b>Hooks</b></div>
-      <div>
-        <div><InspectObject object={hooks.map(hookToObject)} state={expanded} toggleState={toggleExpanded} /></div>
-      </div>
+      {Object.keys(env).length ? (<>
+        <Spacer />
+        <div><b>Environment</b></div>
+        <div><InspectObject object={env} state={expanded} toggleState={toggleExpanded} /></div>        
+      </>) : null}
+      {hooks.length ? (<>
+        <Spacer />
+        <div><b>Hooks</b></div>
+        <div>
+          <div><InspectObject object={hooks.map(hookToObject)} state={expanded} toggleState={toggleExpanded} /></div>
+        </div>
+      </>) : null}
     </div>
   );
 }

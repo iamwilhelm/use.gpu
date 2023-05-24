@@ -30,7 +30,6 @@ export type InspectAppearance = {
   resize: boolean,
   tabs: boolean
   select: boolean,
-  environment: boolean,
   skip: number,
 };
 

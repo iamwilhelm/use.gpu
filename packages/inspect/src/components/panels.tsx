@@ -6,6 +6,7 @@ import { styled as _styled } from '@stitches/react';
 
 import { Inset, InsetLeftRightBottom } from './layout';
 import { useAddIns } from '../providers/add-in-provider';
+import { useAppearance } from '../providers/appearance-provider';
 import { usePingTracker, usePingContext } from '../providers/ping-provider';
 
 const styled: any = _styled;
@@ -15,7 +16,6 @@ export type PanelsProps = {
   selectFiber: (fiber?: LiveFiber<any> | null) => void,
   fullSize?: boolean,
   tab: string,
-  tabs?: boolean,
   onTab: (s: Update<string>) => void,
 };
 
@@ -46,7 +46,7 @@ export const StyledTab = styled('button', {
 });
 
 export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
-  const {fiber, selectFiber, fullSize, tabs, tab, onTab } = props;
+  const {fiber, selectFiber, fullSize, tab, onTab } = props;
   
   const addIns = useAddIns();
   const {fibers} = usePingContext();
@@ -56,6 +56,7 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
   if (!first) return null;
 
   usePingTracker();
+  const {tabs} = useAppearance();
   
   const active = panels.filter((panel) => panel.enabled(fiber, fibers));
   const currentTab = active.find((panel) => panel.id === tab) ?? active[0];

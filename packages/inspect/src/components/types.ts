@@ -21,6 +21,7 @@ export type OptionState = {
   depth: number,
   counts: boolean,
   builtins: boolean,
+  resize: boolean,
   fullSize: boolean,
   highlight: boolean,
   inspect: boolean,

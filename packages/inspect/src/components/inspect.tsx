@@ -14,6 +14,7 @@ import { Node } from './node';
 import { FiberTree } from './fiber';
 import { Options } from './options';
 import { Panels } from './panels';
+import { Resizer } from './resizer';
 import { IconItem, SVGInspect, SVGPickElement, SVGClose } from './svg';
 import {
   InspectContainer, InspectToggle, Button, SmallButton, TreeControls, TreeView, Spacer, Grow,
@@ -21,6 +22,22 @@ import {
 } from './layout';
 
 const getOptionsKey = (id: string, sub: string = 'root') => `liveInspect[${sub}][${id}]`;
+const INITIAL_STATE = {
+  open: false,
+  close: true,
+  toolbar: true,
+  legend: true,
+  depth: 1000,
+  skip: 0,
+  counts: false,
+  resize: true,
+  fullSize: false,
+  builtins: false,
+  highlight: true,
+  inspect: false,
+  splitLeft: 33,
+  splitBottom: 50,
+};
 
 type InspectFiber = Record<string, any>;
 type InspectMap = WeakMap<LiveFiber<any>, InspectFiber>;
@@ -48,20 +65,13 @@ export const Inspect: React.FC<InspectProps> = ({
   const selectedCursor = useUpdateState<SelectState>(null);
   const optionCursor = useUpdateState<OptionState>(
     {
-      open: false,
-      close: true,
-      toolbar: true,
-      legend: true,
-      depth: 1000,
-      skip: 0,
-      counts: false,
-      fullSize: false,
-      builtins: false,
-      highlight: true,
-      inspect: false,
+      ...INITIAL_STATE,
       ...initialState,
     },
-    save ? makeUseLocalState(getOptionsKey('state', sub)) : useState
+    save ? makeUseLocalState(
+      getOptionsKey('state', sub),
+      (obj: any) => ({...INITIAL_STATE, ...obj}),
+    ) : useState
   );
   const hoveredCursor = useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
@@ -79,6 +89,9 @@ export const Inspect: React.FC<InspectProps> = ({
   const [close] = useOption<boolean>('close');
   const [legend] = useOption<boolean>('legend');
   const [skip] = useOption<number>('skip');
+  const [resize] = useOption<number>('resize');
+  const [splitLeft, setSplitLeft] = useOption<number>('splitLeft');
+  const [splitBottom, setSplitBottom] = useOption<number>('splitBottom');
   const [inspect, updateInspect] = useOption<boolean>('inspect');
   const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
 
@@ -99,11 +112,11 @@ export const Inspect: React.FC<InspectProps> = ({
     const el = document.querySelector('#use-gpu .canvas');
     if (!el || !open) return;
     
-    (el as any).style.left = '34%';
+    (el as any).style.left = splitLeft + '%';
     return () => {
       (el as any).style.left = '0';
     };
-  }, [open]);
+  }, [open, splitLeft]);
 
   useLayoutEffect(() => {
     const setHovered = hoveredFiber?.__inspect?.setHovered;
@@ -143,7 +156,7 @@ export const Inspect: React.FC<InspectProps> = ({
       e.preventDefault();
     }
   };
-
+  
   return (<div className="LiveInspect">
     {open ? (
       <PingProvider fiber={fiber}>
@@ -153,16 +166,23 @@ export const Inspect: React.FC<InspectProps> = ({
             <div style={fullSize
                 ? {display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, height: '100%', maxHeight: '100%', flexGrow: 1}
                 : {display: 'flex', height: '100%'}}>
-              <RowPanel style={fullSize ? {position: 'relative', flexGrow: 1, minHeight: 0} : {position: 'relative', width: '34%'}}>
+              <RowPanel style={fullSize
+                  ? {position: 'relative', flexGrow: 1, minHeight: 0}
+                  : {position: 'relative', width: splitLeft + '%'}}>
                 <PanelAbsolute>
                   {tree}
                 </PanelAbsolute>
+                {resize ? <Resizer side="right" value={splitLeft} onChange={setSplitLeft} /> : null}
               </RowPanel>
               {selectedFiber ? (
-                <RowPanel style={fullSize ? {position: 'relative', height: '40%', zIndex: 10, flexShrink: 0, background: '#000'} : {width: '66%'}}>
+                <RowPanel style={fullSize
+                    ? {position: 'relative', height: splitBottom + '%', zIndex: 10, flexShrink: 0, background: '#000', borderTop: '1px solid var(--LiveInspect-borderThin' }
+                    : {width: (100 - splitLeft) + '%'}
+                  }>
                   <PanelScrollable>
                     <Panels fiber={selectedFiber} selectFiber={setSelected} fullSize={fullSize} />
                   </PanelScrollable>
+                  {resize ? <Resizer side="top" value={splitBottom} onChange={setSplitBottom} /> : null}
                 </RowPanel>
               ) : null}
             </div>

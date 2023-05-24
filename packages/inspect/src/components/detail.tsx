@@ -116,10 +116,11 @@ export const DetailSlider: React.FC<DetailProps> = (props: DetailProps) => {
     
     const {width: sliderWidth} = slider.getBoundingClientRect();
     const {width: thumbWidth} = thumb.getBoundingClientRect();
-    const delta = sliderWidth - thumbWidth;
+    const delta = sliderWidth;
 
     const pos = (clamped - min) / (max - min);
-    thumb.style.left = Math.round(pos * delta) + 'px';
+    thumb.style.left = Math.round(pos * 100) + '%';
+    thumb.style.marginLeft = `-${Math.round(thumbWidth / 2)}px`;
   }, [clamped]);
   
   return (

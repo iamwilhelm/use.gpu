@@ -62,7 +62,6 @@ export const makeBasedURL = (base: string, suffix: string, hash?: boolean) => {
 };
 
 export const makeRelativeURL = (base: string, path: string, query?: QueryParams | string, hash?: boolean) => {
-  path = base + path.replace(/^\//, '');
   if (typeof query === 'string') {
     if (query.length) return makeBasedURL(base, path + '?' + query.replace(/^\?/, ''), hash);
     return makeBasedURL(base, path, hash);

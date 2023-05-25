@@ -61,7 +61,7 @@ export const Inspect: React.FC<InspectProps> = ({
   appearance,
   save = true,
 }) => {
-  const {close, toolbar, legend, resize, skip, select, environment} = useAppearance();
+  const {close, toolbar, legend, resize, skip, select} = useAppearance();
 
   const expandCursor = useUpdateState<ExpandState>({});
   const selectedCursor = useUpdateState<SelectState>(null);

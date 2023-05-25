@@ -67,7 +67,7 @@ const hookToObject = (
 ) => {
   const [type, a, b] = state;
   if (type === Hook.STATE) {
-    return {state: a, deps: b};
+    return {state: a, setter: b};
   }
   if (type === Hook.MEMO || type === Hook.ONE || type === Hook.CALLBACK) {
     return {memo: a, deps: b};

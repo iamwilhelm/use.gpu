@@ -71,7 +71,8 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
   if (object?.constructor?.name?.match(/Array/)) {
     if (object.length > 100) {
       object = object.slice(0, 100);
-      object.push('…')
+      object = Array.from(object);
+      object.push('…');
     }
   }
 

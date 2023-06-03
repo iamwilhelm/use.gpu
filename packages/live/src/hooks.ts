@@ -589,12 +589,15 @@ export const useNoLog = useNoOne;
 /**
  * Async wrapper
  */
-export const useAwait = <T, E = Error>(f: () => Promise<T>, deps: any[] = NO_DEPS): [T | undefined, E | undefined] => {
+export const useAwait = <T, E = Error>(
+  f: (cancelled: () => boolean) => Promise<T>,
+  deps: any[] = NO_DEPS,
+): [T | undefined, E | undefined] => {
   const [value, setValue] = useState<[T | undefined, E | undefined]>([undefined, undefined]);
 
   const ref = useResource((dispose) => {
     let cancelled = false;
-    f()
+    f(() => cancelled)
     .then(value => !cancelled && setValue([value, undefined]))
     .catch(error => !cancelled && setValue([undefined, error]));
     dispose(() => { cancelled = true; });

@@ -1,3 +1,8 @@
+0.9.2
+- `@use-gpu/inspect`: Fix inspecting of large typed arrays
+- `@use-gpu/workbench`: Fix `base` handling in router
+- `@use-gpu/workbench`: Add MIP maps and handle non-2D layout in `<RawTexture>`
+
 0.9.1
 - `@use-gpu/*`: Set `sideEffects` to enable tree shaking, fix ES/MJS build
 - `@use-gpu/inspect`: Improved tree and panel layout

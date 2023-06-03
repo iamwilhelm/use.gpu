@@ -31,6 +31,15 @@ for (const file of targets) {
   let data = readFileSync(file).toString();
   let json = JSON.parse(data);
 
+  const {dependencies} = json;
+  if (dependencies) {
+    for (const k in dependencies) {
+      if (k.match(/^@use-gpu\//)) {
+        dependencies[k] = '^' + version;
+      }
+    }
+  }
+
   delete json.scripts;
   delete json.jest;
 

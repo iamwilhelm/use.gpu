@@ -58,8 +58,8 @@ export const TextureShader: LiveComponent<TextureShaderProps> = (props) => {
       return links[k] ? links[k] : allArgs.shift();
     });
 
-    return getBoundShader(shader, bindings, values);
-  }, [shader, texture, args, source, sources]);
+    return getBoundShader(shader, values);
+  }, [shader, texture, args.length, source, sources]);
 
   return useYolo(() => render ? render(getTexture) : yeet(getTexture), [render, getTexture]);
 };

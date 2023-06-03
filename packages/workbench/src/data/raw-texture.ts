@@ -4,11 +4,13 @@ import type { TypedArray, DataTexture, TextureSource } from '@use-gpu/core';
 import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { yeet, signal, memo, useOne, useMemo, useNoMemo, useContext, useNoContext, useYolo, incrementVersion } from '@use-gpu/live';
-import { makeSampler, makeRawTexture, uploadDataTexture } from '@use-gpu/core';
+import { makeSampler, makeRawTexture, uploadDataTexture, updateMipTextureChain, updateMipArrayTextureChain } from '@use-gpu/core';
 
 export type RawTextureProps = {
   /** Texture data */
   data: DataTexture,
+  /** MIPs */
+  mip?: number | boolean,
   /** Texture sampler */
   sampler?: GPUSamplerDescriptor,
   /** Resample data every animation frame */
@@ -21,6 +23,11 @@ export type RawTextureProps = {
   render?: (source: TextureSource) => LiveElement,
 };
 
+const countMips = (width: number, height: number): number => {
+  const max = Math.max(width, height);
+  return Math.floor(Math.log2(max));
+}
+
 /** Use numeric texture data as a 2D texture. */
 export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
   const device = useContext(DeviceContext);
@@ -29,6 +36,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
     data,
     sampler,
     render,
+    mip = false,
     absolute = false,
     live = false,
   } = props;
@@ -43,15 +51,21 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
       format = 'rgba8unorm',
       colorSpace = 'native',
     } = data;
-    const texture = makeRawTexture(device, data);
+
+    const mips = (
+      typeof mip === 'number' ? mip :
+      mip ? countMips(size[0], size[1]) : 1
+    );
+
+    const texture = makeRawTexture(device, data, mips);
     const source = {
       texture,
-      view: texture.createView(),
       sampler: {
         minFilter: 'nearest',
         magFilter: 'nearest',
         ...sampler,
       } as GPUSamplerDescriptor,
+      mips,
       size,
       layout,
       format,
@@ -60,7 +74,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
       version: 0,
     };
     return source;
-  }, [device, memoKey, sampler, absolute]);
+  }, [device, memoKey, sampler, absolute, mip]);
 
   // Refresh and upload data
   const refresh = () => {
@@ -68,6 +82,11 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
 
     uploadDataTexture(device, source.texture, data);
     source.version = incrementVersion(source.version);
+
+    if (source.mips > 1) {
+      if (source.layout.match(/array/)) updateMipArrayTextureChain(device, source);
+      else updateMipTextureChain(device, source);
+    }
   };
 
   if (!live) {

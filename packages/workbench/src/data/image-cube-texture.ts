@@ -3,7 +3,7 @@ import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { use, yeet, gather, memo, useMemo, useYolo } from '@use-gpu/live';
-import { makeDynamicTexture, uploadExternalTexture, updateMipCubeTextureChain } from '@use-gpu/core';
+import { makeDynamicTexture, uploadExternalTexture, updateMipArrayTextureChain } from '@use-gpu/core';
 import { Fetch } from './fetch';
 
 export type ImageCubeTextureProps = {
@@ -94,7 +94,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
         version: 1,
       } as TextureSource;
 
-      updateMipCubeTextureChain(device, source);
+      updateMipArrayTextureChain(device, source);
 
       return source;
     }, [bitmaps, sampler]);

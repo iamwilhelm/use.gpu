@@ -90,7 +90,7 @@ const makeMipMesh = (bounds: Rectangle[], size: Point | Point3): VertexData => {
 const NO_CLEAR = [0, 0, 0, 0] as Rectangle;
 const MIP_PIPELINES = new WeakMap<GPUDevice, Map<string, GPURenderPipeline>>();
 
-export const updateMipCubeTextureChain = (
+export const updateMipArrayTextureChain = (
   device: GPUDevice,
   source: TextureSource,
   bounds: (Rectangle[] | null) = null,
@@ -129,6 +129,7 @@ export const updateMipTextureChain = (
     arrayLayerCount: 1,
     baseMipLevel: mip,
     baseArrayLayer: layer ?? 0,
+    dimension: layer != null ? '2d-array' : '2d',
   }));
   
   const renderPassDescriptors = seq(mips).map(i => ({

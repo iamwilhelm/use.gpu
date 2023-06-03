@@ -211,7 +211,7 @@ export const makeVolatileUniforms = <T>(
   return {bindGroup};
 }
 
-const getTextureDimension = (layout: string): GPUTextureViewDimension | undefined => {
+export const getTextureDimension = (layout: string): GPUTextureViewDimension | undefined => {
   if (!layout) return undefined;
 
   const type = layout.match(/[1-3]d|cube/)?.[0];

@@ -1028,7 +1028,7 @@ export const morphFiberCall = <F extends ArrowFunction>(
       mount.bound = bind(call.f, mount);
       mount.args = undefined;
       mount.memo = null;
-      mount.version = -1;
+      mount.version = null;
     }
   }
 
@@ -1162,7 +1162,7 @@ export const disposeFiber = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   pingFiber(fiber);
 }
 
-// Dispose of a fiber's mounted sub-fibers
+// Dispose of a fiber's state and mounts
 export const disposeFiberState = <F extends ArrowFunction>(fiber: LiveFiber<F>) => {
   const {id, next, quote, unquote, yeeted} = fiber;
 

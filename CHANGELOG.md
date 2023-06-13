@@ -1,5 +1,7 @@
 0.9.2
 - `@use-gpu/inspect`: Fix inspecting of large typed arrays
+- `@use-gpu/present`: Add `<Overlay>` for independent overlays
+- `@use-gpu/state`: Fix `revise` edge case with nulls
 - `@use-gpu/workbench`: Fix `base` handling in router
 - `@use-gpu/workbench`: Add MIP maps and handle non-2D layout in `<RawTexture>`
 

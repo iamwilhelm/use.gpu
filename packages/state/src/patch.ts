@@ -221,7 +221,7 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
   if (a === null) return a as any;
   if (a === undefined) return $DELETE;
 
-  if (Array.isArray(b) || isTypedArray(b)) return $maybeSet(a) as any;
+  if (Array.isArray(b) || isTypedArray(b) || b === null) return $maybeSet(a) as any;
 
   if (typeof b === 'object') {
     let update: Record<string, any> = b as any;

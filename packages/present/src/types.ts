@@ -29,11 +29,12 @@ export type ParsedEffect = {
 
 export type SlideTrait = {
   order?: number,
-  steps?: number,
   stay?: number,
 };
+
 export type SlideInfo = SlideTrait & {
   id: number,
+  steps?: number,
   slides?: ResolvedSlide[],
   sticky?: boolean,
   thread?: boolean,

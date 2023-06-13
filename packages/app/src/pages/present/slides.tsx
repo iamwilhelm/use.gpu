@@ -11,7 +11,7 @@ import {
   LinearRGB,
 } from '@use-gpu/workbench';
 import {
-  Present, Slide, Step, KeyboardControls,
+  Present, Slide, Overlay, Step, KeyboardControls,
 } from '@use-gpu/present';
 import {
   UI, Layout, Absolute, Flex, Block, Inline, Text,
@@ -30,6 +30,13 @@ export const PresentSlidesPage: LC = () => {
 
             <Present>
               <KeyboardControls />
+
+              <Overlay stay={1}>
+                <Absolute left={50} bottom={50} right={50}>
+                  <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff" weight="bold">Lorem Ipsum</Text></Inline></Block>                  
+                </Absolute>
+              </Overlay>
+
               <Slide effect={{type: 'wipe', direction: 'left'}}>
                 <Absolute left={50} top={50} bottom={50} right={50}>
                   <Block padding={[10, 10, 10, 20]} fill="#404040"><Inline><Text size={48} color="#fff" weight="bold">Use.GPU Present</Text></Inline></Block>

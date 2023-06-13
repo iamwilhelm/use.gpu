@@ -99,7 +99,10 @@ export const Stage: LC<StageProps> = memo((props: PropsWithChildren<StageProps>)
               exitingLayer ? Math.sign(exitingIndex - enteringIndex) : undefined,
             )
           : null,
-      ], [enteringLayer, exitingLayer, effect]);
+        floats.map(({id, ops}) => (
+          keyed(UILayers, id, {items: ops})
+        ))
+      ], [enteringLayer, exitingLayer, effect, floats]);
 
       return stage;
     }

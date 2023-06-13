@@ -16,7 +16,7 @@ const useTransitionTrait = makeUseTransitionTrait({ effect: { type: 'wipe', dura
 
 export const Step: LC<StepProps> = (props: PropsWithChildren<StepProps>) => {
   const {children} = props;
-  const {order, steps, stay} = useSlideTrait(props);
+  const {order, stay} = useSlideTrait(props);
   const {effect, enter, exit} = useTransitionTrait(props as any);
 
   const enterEffect = useOne(() => merge(effect, enter) as ParsedEffect, [effect, enter]);
@@ -30,7 +30,7 @@ export const Step: LC<StepProps> = (props: PropsWithChildren<StepProps>) => {
     unquote(yeet({
       id,
       order,
-      steps,
+      steps: 1,
       stay,
       sticky: true,
     })),

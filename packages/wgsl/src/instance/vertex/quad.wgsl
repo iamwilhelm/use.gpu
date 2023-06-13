@@ -52,7 +52,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   center = vec4<f32>(center.xy + 2.0 * offset * center.w, center.zw);
 
   if (zBias != 0.0) {
-    var size = max(abs(xy.x), abs(xy.y)) * vr.y;
+    var size = max(abs(xy.x), abs(xy.y));
     center = applyZBias(center, size * zBias);
   }
 

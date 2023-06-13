@@ -337,7 +337,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
                           index
                           expr={pointEmitter(innerField)}
                         >
-                          <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} zBias={ZBIAS_DATA} />
+                          <Point size={0.5} depth={1} color={'#808080'} shape={'circle'} zBias={ZBIAS_DATA + 1} />
                         </Sampled> : null}
 
                         <Sampled

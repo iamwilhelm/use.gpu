@@ -63,7 +63,6 @@ const parsePartialEffectTrait = makeParseTrait(PARTIAL_EFFECT_TRAIT, {});
 
 const SLIDE_TRAIT = {
   order: optional(parseInteger),
-  step: optional(parseInteger),
   stay: optional(parseInteger),
 };
 

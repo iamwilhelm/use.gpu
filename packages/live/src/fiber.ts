@@ -500,13 +500,15 @@ export const reconcileFiberCalls = (() => {
     if (!Array.isArray(calls)) calls = [calls];
 
     seen.clear();
-    const oo = [...order];
 
     // Get new key set and order
-    let i = 0;
+    let i = 0, j = 0;
     let rekeyed = false;
     for (let call of calls) {
-      if (call == null) continue;
+      if (call == null) {
+        j++;
+        continue;
+      }
       let callKey = (call as any)?.key;
 
       let key;
@@ -515,7 +517,7 @@ export const reconcileFiberCalls = (() => {
         key = callKey;
       }
       else {
-        key = i;
+        key = j++;
       }
       if (seen.has(key)) throw new Error(`Duplicate key '${key}' while reconciling ` + formatNode(fiber));
 

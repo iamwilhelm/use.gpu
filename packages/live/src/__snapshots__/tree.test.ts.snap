@@ -93,7 +93,7 @@ exports[`renders quoted/unquoted trees 1`] = `
 
 exports[`yeets from capture 1`] = `
 "<Root >
-  <Capture(undefined) displayName={undefined} capture={true} [f={YEET(…) {}} arg={1} key={undefined} by={51},f={…} arg={…} key={…} by={…},…,…] (…) (0, _builtin.yeet)(list)>
+  <Capture(undefined) displayName={undefined} capture={true} [f={YEET(…) {}} arg={1} key={undefined} by={1},f={…} arg={…} key={…} by={…},…,…] (…) (0, _builtin.yeet)(list)>
     <Yeet 1>
     <Yeet 2>
     <Fiber >

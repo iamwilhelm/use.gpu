@@ -79,6 +79,72 @@ it("detaches a subfiber", () => {
 
 });
 
+it("renders implicit keys with nulls", () => {
+
+  const rendered = {
+    root: 0,
+    node: 0,
+  };
+  let trigger = null as Task | null;
+  const setTrigger = (f: Task) => trigger = f;
+
+  const Root = () => {
+    const [value, setValue] = useState(0);
+    setTrigger(() => setValue(1));
+
+    rendered.root++;
+    return [
+      use(Node),
+      null,
+      value ? null : use(Node),
+      value ? use(Node) : null,
+      use(Node),
+    ];
+  };
+
+  const Node = (x?: number) => {
+    rendered.node++;
+  };
+
+  const result = renderSync(use(Root));
+  expect(result.host).toBeTruthy();
+  if (!result.host) return;
+
+  const {host: {flush, __stats: stats}} = result;
+
+  expect(result.f).toBe(Root);
+  expect(result.mounts).toBeTruthy();
+  if (result.mounts) {
+    expect(result.order).toEqual([0, 2, 4]);
+  }
+
+  expect(rendered.root).toBe(1);
+  expect(rendered.node).toBe(3);
+
+  expect(stats.mounts).toBe(4);
+  expect(stats.unmounts).toBe(0);
+  expect(stats.updates).toBe(0);
+  expect(stats.dispatch).toBe(1);
+
+  if (trigger) trigger();
+  if (flush) flush();
+
+  expect(result.f).toBe(Root);
+  expect(result.mounts).toBeTruthy();
+  if (result.mounts) {
+    expect(result.order).toEqual([0, 3, 4]);
+  }
+
+  expect(rendered.root).toBe(2);
+  expect(rendered.node).toBe(6);
+
+  expect(stats.mounts).toBe(5);
+  expect(stats.unmounts).toBe(1);
+  expect(stats.updates).toBe(2);
+  expect(stats.dispatch).toBe(2);
+
+});
+
 it("reacts on the root (setter form)", () => {
 
   const rendered = {

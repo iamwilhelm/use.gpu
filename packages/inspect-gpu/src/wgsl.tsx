@@ -155,11 +155,11 @@ export const WGSL = (props: WGSLProps) => {
     
     const commitKeys = [
       {
-        key: 'Cmd-Enter',
+        key: 'Cmd-S',
         run: handleCommit,
       },
       {
-        key: 'Ctrl-Enter',
+        key: 'Ctrl-S',
         run: handleCommit,
       },
     ];

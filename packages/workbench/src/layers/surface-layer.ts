@@ -18,7 +18,7 @@ import { useBoundSource } from '../hooks/useBoundSource';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 
-import { getSurfaceIndex, getSurfaceNormal } from '@use-gpu/wgsl/plot/surface.wgsl';
+import { getSurfaceIndex, getSurfaceNormal, getSurfaceUV } from '@use-gpu/wgsl/plot/surface.wgsl';
 
 export type SurfaceLayerProps = {
   position?: number[] | TypedArray,
@@ -73,6 +73,9 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   const p = useShaderRef(props.position, props.positions);
   const normals = useBoundShader(getSurfaceNormal, [boundSize, p], defines);
 
+  const uvs = useBoundShader(getSurfaceUV, [boundSize]);
+  const sts = positions;
+
   return use(RawFaces, {
     position,
     positions,
@@ -81,6 +84,8 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
 
     indices,
     normals,
+    uvs,
+    sts,
 
     shaded,
     side,

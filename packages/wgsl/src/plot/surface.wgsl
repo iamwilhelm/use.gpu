@@ -28,6 +28,14 @@ use '@use-gpu/wgsl/use/array'::{ sizeToModulus3, packIndex3, unpackIndex3 }
   return packIndex3(xyd, sizeToModulus3(s.xyz));
 }
 
+@export fn getSurfaceUV(index: u32) -> vec4<f32> {
+  let size = getSize();
+  let modulus = sizeToModulus3(size);
+
+  let xyd = unpackIndex3(index, modulus);
+  return vec4<f32>(vec3<f32>(xyd) / vec3<f32>(size - 1), 0.0);
+}
+
 @export fn getSurfaceNormal(index: u32) -> vec4<f32> {
   let size = getSize();
   let modulus = sizeToModulus3(size);

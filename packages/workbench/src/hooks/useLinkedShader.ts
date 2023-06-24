@@ -14,6 +14,7 @@ const NO_LIBS = {} as Record<string, any>;
 
 type RenderShader = [ShaderModuleDescriptor, ShaderModuleDescriptor];
 
+const VERSION_CACHE = new LRU<string, number>();
 const MODULE_CACHE = new LRU<string, any>();
 const LAYOUT_CACHE = new LRU<number, any>();
 
@@ -90,6 +91,8 @@ export const useLinkedShader = (
       let result = MODULE_CACHE.get(key);
       if (result == null) {
         const linked = hot.get(key) ?? linkBundle(module, NO_LIBS, defines);
+        const version = (VERSION_CACHE.get(key) ?? 0) + 1;
+        VERSION_CACHE.set(key, version);
         result = makeShaderModuleDescriptor(linked, `${key}-${version}`, entry);
         MODULE_CACHE.set(key, result);
       }

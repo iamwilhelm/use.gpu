@@ -117,6 +117,9 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
     fiber.__inspect?.updateShader?.(hash, code);
   }, [fiber, hash]);
 
+  const isMac = navigator.platform.match(/^Mac/);
+  const cmd = isMac ? '⌘' : 'Ctrl';
+
   return (<>
     {uniforms || bindings ? (<>
       {uniforms?.length ? <>
@@ -135,7 +138,7 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
     </>) : null}
     <StyledHeader>
       <Grow><b>Shader</b> (<code>{shader.hash}</code>)</Grow>
-      <StyledHint><span>Hot Reload</span><StyledKey>Ctrl</StyledKey>+<StyledKey>Enter</StyledKey></StyledHint>
+      <StyledHint><span>Hot Reload</span><StyledKey>{cmd}</StyledKey>+<StyledKey>S</StyledKey></StyledHint>
     </StyledHeader>
     <StyledShader><Selectable>
       <WGSL code={shader.code} onCommit={handleCommit} />

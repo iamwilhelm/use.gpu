@@ -17,11 +17,12 @@ export type SurfaceProps =
   Partial<LineTrait> &
   Partial<ROPTrait> &
   Partial<SurfaceTrait> & {
+  side?: 'front' | 'back' | 'both',
   colors?: ShaderSource,
 };
 
 export const Surface: LiveComponent<SurfaceProps> = (props) => {
-  const {colors} = props;
+  const {side, colors} = props;
 
   const positions = useContext(DataContext) ?? undefined;
 
@@ -37,6 +38,7 @@ export const Surface: LiveComponent<SurfaceProps> = (props) => {
       loopX,
       loopY,
       shaded,
+      side,
       ...rop,
     })
   );

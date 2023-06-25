@@ -169,6 +169,7 @@ const ROP_TRAIT = {
   blend:           optional(parseBlending),
   depthWrite:      optional(parseBoolean),
   depthTest:       optional(parseBoolean),
+  mode:            optional(parseString),
   zBias:           parseNumber,
   zIndex:          parseInteger,
 };

@@ -167,8 +167,8 @@ export const fitFlex = (
         ? [mainSize, intoY, mainSize, intoY ?? into[3]]
         : [intoX, mainSize, intoX ?? into[2], mainSize]
       ) as FitInto;
-      if (ratioX != null) flex[2] /= ratioX;
-      if (ratioY != null) flex[3] /= ratioY;
+      if (isX && ratioX != null) flex[2] /= ratioX;
+      if (!isX && ratioY != null) flex[3] /= ratioY;
       const {size, render, pick} = fit(flex);
 
       maxCross = Math.max(maxCross, isX ? size[1] + my : size[0] + mx);

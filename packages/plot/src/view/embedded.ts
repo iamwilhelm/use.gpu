@@ -34,21 +34,20 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
     let range;
     let matrix;
     if (normalize) {
-      const sx = 2/w;
-      const sy = 2/h;
+      const sx = w/2;
+      const sy = h/2;
       range = [[-1, 1], [-1, 1], [-1, 1], [-1, 1]] as [number, number][];
       matrix = mat4.fromValues(
-        sx, 0, 0, w/2,
-        0, sy, 0, h/2,
+        sx, 0, 0, 0,
+        0, sy, 0, 0,
         0,  0, 1, 0,
-        0,  0, 0, 1,
+        l + w/2, t + h/2, 0, 1,
       );
     }
     else {
       range = [[0, w], [0, h], [-1, 1], [-1, 1]] as [number, number][];
       matrix = mat4.create();
     }
-    mat4.translate(matrix, matrix, vec3.fromValues(l, t, 0));
 
     return [range, matrix];
   }, [layout, normalize]);

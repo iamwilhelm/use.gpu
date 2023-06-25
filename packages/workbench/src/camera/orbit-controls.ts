@@ -13,6 +13,11 @@ const CAPTURE_EVENT = {capture: true};
 
 const π = Math.PI;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
+const maybeClamp = (x: number, a?: number, b?: number) => {
+  if (a != null) x = Math.max(x, a);
+  if (b != null) x = Math.min(x, b);
+  return x;
+};
 
 export type OrbitControlsProps = {
   radius?: number,
@@ -25,6 +30,13 @@ export type OrbitControlsProps = {
   bearingSpeed?: number,
   pitchSpeed?: number,
   moveSpeed?: number,
+
+  minRadius?: number,
+  maxRadius?: number,
+  minBearing?: number,
+  maxBearing?: number,
+  minPitch?: number,
+  maxPitch?: number,
 
   active?: boolean,
   render: (radius: number, bearing: number, pitch: number, target: vec3) => LiveElement,
@@ -41,7 +53,14 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     bearingSpeed = 5,
     pitchSpeed   = 5,
     moveSpeed    = 1,
-    
+
+    minRadius,
+    maxRadius,
+    minBearing,
+    maxBearing,
+    minPitch,
+    maxPitch,
+
     active = true,
     render,
   } = props;
@@ -92,8 +111,8 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     }
     else if (buttons.left) {
       if (moveX || moveY) {
-        setBearing((phi: number) => phi + moveX * speedX);
-        setPitch((theta: number) => clamp(theta + moveY * speedY, -π/2, π/2));
+        setBearing((phi: number) => maybeClamp(phi + moveX * speedX, minBearing, maxBearing));
+        setPitch((theta: number) => clamp(theta + moveY * speedY, minPitch ?? (-π/2 + 1e-5), maxPitch ?? (π/2 - 1e-5)));
       }
     }
   }, mouse);
@@ -108,10 +127,11 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
         handleMove(moveX, moveY);
       }
     }
-    else if (spinY) setRadius((radius: number) => radius * Math.pow(2, spinY * speedY));
+    else if (spinY) setRadius((radius: number) => maybeClamp(radius * Math.pow(2, spinY * speedY), minRadius, maxRadius));
 
     stop();
   }, wheel);
 
   return useYolo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);
 };
+

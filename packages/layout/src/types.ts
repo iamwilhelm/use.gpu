@@ -38,6 +38,7 @@ export type BoxTrait = {
 export type ElementTrait = {
   width: Dimension,
   height: Dimension,
+  aspect: number | null,
 
   radius: MarginLike,
   border: MarginLike,

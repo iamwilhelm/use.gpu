@@ -32,7 +32,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
     children,
   } = props;
 
-  const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image } = useElementTrait(props);
   const { margin: blockMargin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionY);
@@ -50,8 +50,13 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
-      const w = width != null && width === +width ? width : null;
-      const h = height != null && height === +height ? height : null;
+      let w = width != null && width === +width ? width : null;
+      let h = height != null && height === +height ? height : null;
+
+      if (aspect != null) {
+        if (w != null && h == null) h = w / aspect;
+        else if (h != null && w == null) w = h * aspect;
+      }
 
       const fixed = [w, h] as [number | null, number | null];
 
@@ -64,12 +69,21 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
       if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false);
 
       const fit = (into: FitInto) => {
-        const w = width != null ? evaluateDimension(width, into[2], snap) : null;
-        const h = height != null ? evaluateDimension(height, into[3], snap) : null;
-        const fixed = [
-          width != null ? w : null,
-          height != null ? h : null,
-        ] as [number | number, number | null];
+        let w = width  != null ? evaluateDimension(width,  into[2], snap) : null;
+        let h = height != null ? evaluateDimension(height, into[3], snap) : null;
+
+        if (aspect != null) {
+          if (w != null && h == null) {
+            h = w / aspect;
+            if (snap) h = Math.round(h);
+          }
+          else if (h != null && w == null) {
+            w = h * aspect;
+            if (snap) w = Math.round(w);
+          }
+        }
+
+        const fixed = [w, h] as [number | number, number | null];
 
         const {size, sizes, offsets, renders, pickers} = fitBlock(els, into, fixed, padding, direction, contain);
 

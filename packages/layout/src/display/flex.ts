@@ -38,7 +38,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
     children,
   } = props;
 
-  const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image } = useElementTrait(props);
   const { margin, grow, shrink, inline, flex } = useBoxTrait(props);
 
   const direction = useProp(props.direction, parseDirectionX);
@@ -53,8 +53,13 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
-      const w = width != null && width === +width ? width : null;
-      const h = height != null && height === +height ? height : null;
+      let w = width != null && width === +width ? width : null;
+      let h = height != null && height === +height ? height : null;
+
+      if (aspect != null) {
+        if (w != null && h == null) h = w / aspect;
+        else if (h != null && w == null) w = h * aspect;
+      }
 
       const fixed = [w, h] as [number | null, number | null];
 
@@ -66,39 +71,51 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
       if (typeof height === 'string') ratioY = evaluateDimension(height, 1, false) ?? 1;
 
       const fit = (into: FitInto) => {
-          const w = width  != null ? evaluateDimension(width, into[2], snap) : null;
-          const h = height != null ? evaluateDimension(height, into[3], snap) : null;
-          const fixed = [w, h] as [number | number, number | null];
+        let w = width  != null ? evaluateDimension(width, into[2], snap) : null;
+        let h = height != null ? evaluateDimension(height, into[3], snap) : null;
 
-          const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);
+        if (aspect != null) {
+          if (w != null && h == null) {
+            h = w / aspect;
+            if (snap) h = Math.round(h);
+          }
+          else if (h != null && w == null) {
+            w = h * aspect;
+            if (snap) w = Math.round(w);
+          }
+        }
 
-          inspect({
-            layout: {
-              into,
-              fixed,
-              size,
-              sizes,
-              offsets,
-            },
-          });
+        const fixed = [w, h] as [number | number, number | null];
 
-          const inside = {sizes, offsets, renders};
-          return {
+        const {size, sizes, offsets, renders, pickers} = fitFlex(els, into, fixed, direction, gap, align[0], align[1], anchor, wrap, snap);
+
+        inspect({
+          layout: {
+            into,
+            fixed,
             size,
-            render: (
-              box: Rectangle,
-              origin: Rectangle,
-              clip?: ShaderModule | null,
-              mask?: ShaderModule | null,
-              transform?: ShaderModule | null,
-            ) => (
-              sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
-            ),
-            pick: makeBoxPicker(id, sizes, offsets, pickers),
-          };
+            sizes,
+            offsets,
+          },
+        });
 
-          return self;
+        const inside = {sizes, offsets, renders};
+        return {
+          size,
+          render: (
+            box: Rectangle,
+            origin: Rectangle,
+            clip?: ShaderModule | null,
+            mask?: ShaderModule | null,
+            transform?: ShaderModule | null,
+          ) => (
+            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
+          ),
+          pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
+
+        return self;
+      };
 
       return yeet({
         sizing,

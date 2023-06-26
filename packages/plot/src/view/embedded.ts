@@ -47,6 +47,7 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
     else {
       range = [[0, w], [0, h], [-1, 1], [-1, 1]] as [number, number][];
       matrix = mat4.create();
+      mat4.translate(matrix, matrix, vec3.fromValues(l, t, 0));
     }
 
     return [range, matrix];

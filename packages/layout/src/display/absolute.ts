@@ -40,7 +40,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
     children,
   } = props;
 
-  const { width, height, radius, border, stroke, fill, image } = useElementTrait(props);
+  const { width, height, aspect, radius, border, stroke, fill, image } = useElementTrait(props);
 
   const {id} = useFiber();
   const inspect = useInspectable();
@@ -49,7 +49,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
       const fit = (into: FitInto) => {
-        const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, direction, snap);
+        const {size, sizes, offsets, renders, pickers} = fitAbsoluteBox(els, into, l, t, r, b, width, height, aspect, direction, snap);
 
         inspect({
           layout: {

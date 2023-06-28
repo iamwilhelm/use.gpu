@@ -6,7 +6,7 @@ import {
 import { getCurrentFiberBy } from './current';
 import { DeferredCall, ArrowFunction, LiveNode, LiveElement, ReactElementInterop } from './types';
 
-const NO_PROPS: any[] = [{}];
+const NO_PROPS: any = {};
 
 const toChildren = <T>(t: T | T[]): T | T[] | undefined => {
   if (Array.isArray(t)) {
@@ -96,7 +96,7 @@ export const createElement = (type: ArrowFunction, props: any, ...children: any[
     return {f: type, args: [{children: toChildren(children)}], key: undefined, by};
   }
   else {
-    return {f: type, args: NO_PROPS, key: undefined, by};
+    return {f: type, args: [NO_PROPS], key: undefined, by};
   }
 };
 

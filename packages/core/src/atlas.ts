@@ -64,7 +64,7 @@ export const makeAtlas = (
   const bs: Bins = new Map();
   const slots: Bin = new Set();
 
-  // Place 1 rectnagle
+  // Place 1 rectangle
   const place = (key: number, w: number, h: number): Rectangle => {
     if (map.get(key)) throw new Error("key mapped already: " + key);
     self.version = self.version + 1;

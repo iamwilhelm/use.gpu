@@ -3,6 +3,7 @@
 - `@use-gpu/layout`: Add `aspect` to elements for sizing w/h relative to each other
 - `@use-gpu/workbench`: Add UVs and STs to `<LineLayer>`, `<PointLayer>`, `<SurfaceLayer>`
 - `@use-gpu/workbench`: Use input position as default STs
+- `@use-gpu/workbench`: Allow using basic materials with `<LineLayer>` and `<PointLayer>`
 
 0.9.2
 - `@use-gpu/inspect`: Fix inspecting of large typed arrays

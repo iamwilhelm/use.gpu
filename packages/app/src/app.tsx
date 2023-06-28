@@ -87,7 +87,6 @@ export const App: LC = hot(() => {
         },
       },
     }
-    // */
   ]);
 
   const fiber = useFiber();

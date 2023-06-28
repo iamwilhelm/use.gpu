@@ -40,9 +40,9 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
     id,
     color = BLACK,
     opacity = 1,
-    detail,
     expand = 0,
     size = 16,
+    detail = size,
     snap = false,
 
     font,
@@ -61,11 +61,11 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
   const sdfFont = useSDFFontContext();
 
   return useMemo(() => {
-    const { getGlyph, getScale, getRadius, getTexture } = sdfFont;
+    const { getGlyph, getScale, getRadius, getTexture, warmupGlyph } = sdfFont;
     
-    const adjust = size / (detail ?? size);
+    const adjust = size / detail;
     const radius = getRadius();
-    const scale = getScale(detail ?? size) * adjust;
+    const scale = getScale(detail) * adjust;
     const texture = getTexture();
 
     const fill = color.slice();
@@ -90,7 +90,7 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       let sx = x;
       spans.iterate((_a, trim, _h, index) => {
         glyphs.iterate((fontIndex: number, glyphId: number, isWhiteSpace: number, kerning: number) => {
-          const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail ?? size);
+          const {glyph, mapping} = getGlyph(font[fontIndex], glyphId, detail);
           const {image, layoutBounds, outlineBounds, rgba, scale: glyphScale} = glyph;
           const [ll, lt, lr, lb] = layoutBounds;      
 

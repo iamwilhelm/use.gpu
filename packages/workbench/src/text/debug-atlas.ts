@@ -126,9 +126,11 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     });
   }
 
+  const aspect = h / w;
+
   yeets.push({
     id: next(),
-    rectangle: [width, 0, 500 + width, 500],
+    rectangle: [width, 0, 500 + width, 500 * aspect],
     uv: [0, 0, w, h],
     radius: [0, 0, 0, 0],
     texture: source,

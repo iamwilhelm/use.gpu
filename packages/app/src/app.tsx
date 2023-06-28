@@ -19,6 +19,10 @@ import NOTO_SEQUENCES from '../../../public/fonts/emoji/noto-emoji.json';
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+const base = isDevelopment ? '/' : '/demo/';
+
+const getNotoEmojiURL = (name: string) => `${base}fonts/emoji/emoji_u${name}.png`;
+
 // Toggle inspector with ctrl/cmd-I.
 // Trigger re-render with ctrl/cmd-J.
 const useInspector = () => {
@@ -39,10 +43,6 @@ const useInspector = () => {
 };
 
 export const App: LC = hot(() => {
-  
-  const base = isDevelopment ? '/' : '/demo/';
-
-  const getNotoEmojiURL = (name: string) => `${base}fonts/emoji/emoji_u${name}.png`;
   
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;
@@ -80,6 +80,7 @@ export const App: LC = hot(() => {
       lazy: {
         sequences: NOTO_SEQUENCES,
         fetch: (index: number) => {
+          // name = "XXXX_XXXX_XXXX" where X = codepoint in hex
           const seq = NOTO_SEQUENCES[index];
           const codepoints = [...seq].map(s => s.codePointAt(0));
           const name = codepoints.map(i => i.toString(16)).join('_');

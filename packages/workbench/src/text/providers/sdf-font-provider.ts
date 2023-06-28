@@ -119,6 +119,10 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
 
       // Measure glyph and get image
       let glyph = rustText.measureGlyph(font, id, scale);
+      return mapGlyph(key, glyph);
+    };
+
+    const mapGlyph = (key: number, glyph: GlyphMetrics) => {
       let mapping: Rectangle = NO_MAPPING;
 
       const {image, width: w, height: h, outlineBounds: ob, rgba} = glyph;
@@ -139,7 +143,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         }
         catch (e) {
           mapping = [0, 0, 0, 0];
-          console.warn('atlas place failed', key, width, height);
+          console.warn('atlas place failed', key, width, height, e);
           /*
           debugger;
           throw new Error('atlas place failed', key, width, height);

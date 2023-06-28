@@ -1,3 +1,5 @@
+type ArrowFunction = (...args: any[]) => any;
+
 export type Font = {
   props: FontProps,
   buffer?: ArrayBuffer,
@@ -7,9 +9,9 @@ export type Font = {
 export type LazyFontSource = {
   sequences: string[],
 
-  sync?: (sequence: string) => GlyphImage,
-  async?: (sequence: string) => Promise<GlyphImage>,
-  fetch?: (sequence: string) => string,
+  sync?: (glyph: number) => FontGlyph,
+  async?: (glyph: number) => Promise<FontGlyph>,
+  fetch?: (glyph: number) => string,
 };
 
 export type FontGlyph = {
@@ -37,6 +39,7 @@ export type SpanMetrics = {
   breaks: Uint32Array,
   metrics: Float32Array,
   glyphs: Int32Array,
+  missing: Int32Array,
 };
 
 export type GlyphMetrics = {
@@ -60,6 +63,7 @@ export type RustTextAPI = {
   measureGlyph: (fontId: number, glyphId: number, size: number) => GlyphMetrics,
 
   findGlyph: (fontId: number, char: string) => number;
+  loadMissingGlyph: (fontId: number, glyphId: number, callback: ArrowFunction) => void;
 };
 
 export type Image = {

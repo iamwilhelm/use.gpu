@@ -26,5 +26,5 @@
     "outDir": "../../build/ts",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "../wgsl/**/*.wgsl", "../live/jsx.ts", "../workbench/types.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json", "../wgsl/**/*.wgsl", "../live/jsx.ts", "../workbench/types.ts"]
 }

@@ -25,7 +25,7 @@ export const glyphToESDT = (
   const stage = getSDFStage(sp);
   const {outer, inner, xo, yo, xi, yi, f, z, b, t, v} = stage;
 
-  solidifyAlpha(data, color, w, h);
+  solidifyAlpha(data, w, h);
   paintIntoStage(stage, data, w, h, pad);
   paintSubpixelOffsets(stage, data, w, h, pad, preprocess);
   
@@ -76,7 +76,6 @@ export const glyphToESDT = (
 // Solidify semi-transparent areas
 export const solidifyAlpha = (
   data: Uint8Array | number[],
-  color: Uint8Array | number[],
   w: number,
   h: number,
 ) => {

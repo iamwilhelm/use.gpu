@@ -93,7 +93,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const links = useOne(() => ({
     getVertex,
     getPicking,
-    getFragment: m ? chainTo(applyMask, getFragment) : getFragment,
+    getFragment: getFragment && applyMask ? chainTo(applyMask, getFragment) : getFragment,
     ...material,
   }), [getVertex, getPicking, applyMask, material]);
 

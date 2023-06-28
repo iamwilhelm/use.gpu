@@ -14,7 +14,7 @@ import { makePicker } from './ui/page-picker';
 
 import { FALLBACK_MESSAGE } from './fallback';
 
-import NOTO_SEQUENCES from '../../../public/fonts/emoji/noto-emoji.json';
+import NOTO_SEQUENCES from './noto-emoji.json';
 
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -82,7 +82,7 @@ export const App: LC = hot(() => {
         fetch: (index: number) => {
           // name = "XXXX_XXXX_XXXX" where X = codepoint in hex
           const seq = NOTO_SEQUENCES[index];
-          const codepoints = [...seq].map(s => s.codePointAt(0));
+          const codepoints = [...seq].map(s => s.codePointAt(0)!);
           const name = codepoints.map(i => i.toString(16)).join('_');
           return getNotoEmojiURL(name);
         },

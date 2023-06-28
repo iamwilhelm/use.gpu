@@ -12,7 +12,7 @@ const DEFAULT_FONTS = {
       style: 'normal',
     },
   },
-} as Record<string, FontProps>;
+} as Record<string, Font>;
 
 export const RustText = (): RustTextAPI => {
 
@@ -118,11 +118,11 @@ export const RustText = (): RustTextAPI => {
     const resolve = (glyph: FontGlyph) => {
       const {type, buffer, width, height} = glyph;
 
-      if (type === 'rgba') useRustText.load_image_rgba(fontId, glyphId, new Uint8Array(buffer), width, height);
+      if (type === 'rgba') useRustText.load_image_rgba(fontId, glyphId, new Uint8Array(buffer), width || 1, height || 1);
       else if (type === 'png') useRustText.load_image_png(fontId, glyphId, new Uint8Array(buffer));
       else throw new Error(`Unknown glyph type '${type}' for '${JSON.stringify(props)}'`);
 
-      const list = pendingGlyphs.get(key);
+      const list = pendingGlyphs.get(key)!;
       pendingGlyphs.delete(key);
       for (const cb of list) cb();
     };

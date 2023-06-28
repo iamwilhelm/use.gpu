@@ -119,7 +119,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   const rustText = useFontContext();
   
   glyph = glyph ?? '@';
-  const glyphId = rustText.findGlyph(0, glyph);
+  const [glyphId, loaded] = rustText.findGlyph(0, glyph);
   const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, DETAIL * 1.5);
 
   const {width, height, image} = glyphMetrics;

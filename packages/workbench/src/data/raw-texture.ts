@@ -18,6 +18,8 @@ export type RawTextureProps = {
 
   /** Sample in absolute pixels instead of relative UVs */
   absolute?: boolean,
+  /** Convert RGBA to premultiplied alpha before upload */
+  premultiply?: boolean,
 
   /** Leave empty to yeet source(s) instead. */
   render?: (source: TextureSource) => LiveElement,
@@ -36,6 +38,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
     data,
     sampler,
     render,
+    premultiply = false,
     mip = false,
     absolute = false,
     live = false,
@@ -80,7 +83,20 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
   const refresh = () => {
     if (!source || !data) return;
 
-    uploadDataTexture(device, source.texture, data);
+    const {size, data: upload} = data;
+    if (premultiply) {
+      const pre = upload.slice();
+      for (let i = 0, j = 0, n = size[0] * size[1]; i < n; ++i, j += 4) {
+        const a = pre[j + 3] / 255;
+        pre[j    ] = pre[j    ] * a;
+        pre[j + 1] = pre[j + 1] * a;
+        pre[j + 2] = pre[j + 2] * a;
+      }
+      uploadDataTexture(device, source.texture, {...data, data: pre});
+    }
+    else {
+      uploadDataTexture(device, source.texture, data);
+    }
     source.version = incrementVersion(source.version);
 
     if (source.mips > 1) {
@@ -91,7 +107,7 @@ export const RawTexture: LiveComponent<RawTextureProps> = (props) => {
 
   if (!live) {
     useNoAnimationFrame();
-    useMemo(refresh, [device, source, data]);
+    useMemo(refresh, [device, source, data, premultiply]);
   }
   else {
     useAnimationFrame();

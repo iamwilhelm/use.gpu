@@ -429,7 +429,8 @@ impl UseRustText {
 
     pub fn find_glyph(&mut self, key: f64, utf16: Vec<u16>) -> Result<JsValue, JsValue> {
         let k = key as u64;
-        let mut glyph = 0;
+        let mut glyph: i32 = -1;
+        let mut loaded = false;
 
         if utf16.len() > 0 {
             let text = String::from_utf16_lossy(&utf16);
@@ -438,7 +439,12 @@ impl UseRustText {
                 let (sequence, _) = get_zwj_sequence(&text);
                 let sequence_map = self.sequence_map.get(&k).unwrap();
                 if let Some(g) = sequence_map.get(&sequence) {
-                    glyph = *g;
+                    glyph = *g as i32;
+
+                    let image_map = self.image_map.get(&k).unwrap();
+                    if let Some(_) = image_map[*g as usize] {
+                        loaded = true;
+                    }
                 }
             }
             else {
@@ -450,13 +456,14 @@ impl UseRustText {
 
                     let GlyphId(g) = font.glyph_id(c);
                     if g > 0 {
-                        glyph = g as u32;
+                        glyph = g as i32;
+                        loaded = true;
                     }
                 }
             }
         }
 
-        let js_value = serde_wasm_bindgen::to_value(&glyph)?;
+        let js_value = serde_wasm_bindgen::to_value(&(glyph, loaded))?;
         Ok(js_value)
     }
 
@@ -492,7 +499,9 @@ impl UseRustText {
                 };
             }
             else {
-                panic!("cannot measure unloaded image glyph");
+                let value = "cannot measure unloaded image glyph";
+                let js_value = serde_wasm_bindgen::to_value(&value)?;
+                return Err(js_value);
             }
         }
         else {

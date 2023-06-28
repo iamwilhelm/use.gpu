@@ -30,12 +30,16 @@ const MASK_SHADER = {
 
 export type PointLayerProps = {
   position?: number[] | TypedArray,
+  uv?: number[] | TypedArray,
+  st?: number[] | TypedArray,
   size?: number,
   color?: number[] | TypedArray,
   depth?: number,
   zBias?: number,
 
   positions?: ShaderSource,
+  uvs?: ShaderSource,
+  sts?: ShaderSource,
   sizes?: ShaderSource,
   colors?: ShaderSource,
   depths?: ShaderSource,
@@ -55,6 +59,10 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
   const {
     position,
     positions,
+    uv,
+    uvs,
+    st,
+    sts,
     color,
     colors,
     size,
@@ -89,6 +97,10 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
   return use(RawQuads, {
     position,
     positions,
+    uv,
+    uvs,
+    st,
+    sts,
     color,
     colors,
     depth,

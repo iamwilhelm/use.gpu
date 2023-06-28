@@ -9,7 +9,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -17,13 +17,15 @@ import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
+import { useMaterialContext } from '../providers/material-provider';
 
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
-import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
 export type RawLinesProps = {
   position?: number[] | TypedArray,
   segment?: number,
+  uv?: number[] | TypedArray,
+  st?: number[] | TypedArray,
   color?: number[] | TypedArray,
   width?: number,
   depth?: number,
@@ -33,6 +35,8 @@ export type RawLinesProps = {
 
   positions?: ShaderSource,
   segments?: ShaderSource,
+  uvs?: ShaderSource,
+  sts?: ShaderSource,
   colors?: ShaderSource,
   widths?: ShaderSource,
   depths?: ShaderSource,
@@ -88,6 +92,8 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const instanceCount = useDataLength(count, props.positions, -1);
 
   const p = useShaderRef(props.position, props.positions);
+  const u = useShaderRef(props.uv, props.uvs);
+  const s = useShaderRef(props.st, props.sts ?? props.positions);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
   const w = useShaderRef(props.width, props.widths);
@@ -108,12 +114,16 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     useNoCallback();
   }
 
-  const getVertex = useBoundShader(getLineVertex, [xf, scissor, g, c, w, d, z, t, e, l]);
-  const getPicking = usePickingShader(props);
-  const getFragment = getPassThruColor;
+  const material = useMaterialContext().solid;
 
-  const links = useOne(() => ({getVertex, getFragment, getPicking}),
-    getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
+  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, s, g, c, w, d, z, t, e, l, instanceCount]);
+  const getPicking = usePickingShader(props);
+
+  const links = useMemo(() => ({
+    getVertex,
+    getPicking,
+    ...material,
+  }), [getVertex, getPicking, material]);
 
   const [pipeline, defs] = usePipelineOptions({
     mode,

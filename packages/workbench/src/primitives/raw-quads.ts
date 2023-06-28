@@ -2,21 +2,23 @@ import type { LiveComponent } from '@use-gpu/live';
 import type {
   TypedArray, ViewUniforms, DeepPartial, Lazy,
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
-  VertexData, TextureSource, LambdaSource, DataBounds,
+  VertexData, LambdaSource, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
 import { Virtual } from './virtual';
 
 import { use, memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu/live';
-import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bindBundle, bindingsToLinks, chainTo } from '@use-gpu/shader/wgsl';
 import { makeShaderBindings, resolve } from '@use-gpu/core';
+
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
+import { useMaterialContext } from '../providers/material-provider';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedColor } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -29,6 +31,7 @@ export type RawQuadsProps = {
   zBias?: number,
   mask?: number,
   uv?: number[] | TypedArray,
+  st?: number[] | TypedArray,
 
   positions?: ShaderSource,
   rectangles?: ShaderSource,
@@ -37,9 +40,9 @@ export type RawQuadsProps = {
   zBiases?: ShaderSource,
   masks?: ShaderSource,
   uvs?: ShaderSource,
+  sts?: ShaderSource,
 
   lookups?: ShaderSource,
-  texture?: TextureSource | LambdaSource | ShaderModule,
 
   id?: number,
   count?: Lazy<number>,
@@ -65,11 +68,11 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const d = useShaderRef(props.depth, props.depths);
   const z = useShaderRef(props.zBias, props.zBiases);
   const u = useShaderRef(props.uv, props.uvs);
+  const s = useShaderRef(props.st, props.sts ?? props.positions);
 
   const l = useShaderRef(null, props.lookups);
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
-  const t = props.texture;
   
   const [xf, scissor, getBounds] = useApplyTransform(p);
 
@@ -81,12 +84,18 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     useNoCallback();
   }
 
-  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, l]);
-  const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getMaskedColor, [m, t]);
+  const {getFragment, ...material} = useMaterialContext().solid;
 
-  const links = useOne(() => ({getVertex, getFragment, getPicking}),
-    getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
+  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, s, l, instanceCount]);
+  const getPicking = usePickingShader(props);
+  const applyMask = m ? useBoundShader(getMaskedColor, [m]) : null;
+
+  const links = useOne(() => ({
+    getVertex,
+    getPicking,
+    getFragment: m ? chainTo(applyMask, getFragment) : getFragment,
+    ...material,
+  }), [getVertex, getPicking, applyMask, material]);
 
   const [pipeline, defs] = usePipelineOptions({
     mode,

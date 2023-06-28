@@ -24,5 +24,11 @@ use '@use-gpu/wgsl/use/types'::{ SurfaceFragment };
   //return vec4<f32>(N * .5 + .5, 1.0); 
 
   let alpha = surface.albedo.a;
-  return vec4<f32>(light * alpha, alpha);
+
+  if (HAS_ALPHA_TO_COVERAGE) {
+    return vec4<f32>(light, alpha);
+  }
+  else {
+    return vec4<f32>(light * alpha, alpha);
+  }
 }

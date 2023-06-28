@@ -185,6 +185,7 @@ export const GeometryFacesPage: LC = () => {
               width={3}
               segments={segments}
               depth={0.5}
+              mode="transparent"
             />
           }
         />

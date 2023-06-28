@@ -6,6 +6,8 @@ import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { DEFAULT_LIGHT_CONTEXT } from '../providers/light-provider';
 
+import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
+
 import { getDefaultPBRMaterial } from '@use-gpu/wgsl/material/pbr-default.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 
@@ -20,6 +22,9 @@ const getLight = bindBundle(getShadedFragment, {
   applyLights: DEFAULT_LIGHT_CONTEXT.bindMaterial(applyPBRMaterial),
 });
 export const DEFAULT_MATERIAL_CONTEXT = {
+  solid: {
+    getFragment: getPassThruColor,
+  },
   shaded: {
     getSurface,
     getLight,

@@ -10,6 +10,9 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 @optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
+@optional @link fn getST(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
+
+@optional @link fn getInstanceCount() -> f32 { return 1.0; }
 
 @export fn getQuadVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
 
@@ -19,6 +22,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   var color = getColor(instanceIndex);
   var depth = getDepth(instanceIndex);
   var rectangleUV = getUV(instanceIndex);
+  var st4 = getST(instanceIndex);
   var zBias = getZBias(instanceIndex);
 
   var center = worldToClip(position);
@@ -34,12 +38,13 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
   var uv: vec2<f32>;
   if (HAS_EDGE_BLEED) {
     let bleed = 0.5;
-    var ul = rectangle.xy * pixelScale - bleed;
-    var br = rectangle.zw * pixelScale + bleed;
-    var wh = (rectangle.zw - rectangle.xy) * pixelScale;
+    let ul = rectangle.xy * pixelScale - bleed;
+    let br = rectangle.zw * pixelScale + bleed;
+    let wh = (rectangle.zw - rectangle.xy) * pixelScale;
+    let t = uv1 + xy1 * bleed / wh;
 
     xy = mix(ul, br, uv1);
-    uv = mix(rectangleUV.xy, rectangleUV.zw, uv1 + xy1 * bleed / wh);
+    uv = mix(rectangleUV.xy, rectangleUV.zw, t);
   }
   else {
     xy = mix(rectangle.xy, rectangle.zw, uv1) * pixelScale;
@@ -56,8 +61,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     center = applyZBias(center, size * zBias);
   }
 
-  let uv4 = vec4<f32>(uv, 0.0, 0.0);
-  let st4 = vec4<f32>(0.0);
+  let uv4 = vec4<f32>(uv, f32(instanceIndex) / getInstanceCount(), 0.0);
 
   return SolidVertex(
     center,

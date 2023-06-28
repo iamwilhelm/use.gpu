@@ -25,18 +25,18 @@ export type RawFacesProps = {
   position?: number[] | TypedArray,
   normal?: number[] | TypedArray,
   tangent?: number[] | TypedArray,
+  segment?: number,
   uv?: number[] | TypedArray,
   st?: number[] | TypedArray,
-  segment?: number,
   color?: number[] | TypedArray,
   zBias?: number,
 
   positions?: ShaderSource,
   normals?: ShaderSource,
   tangents?: ShaderSource,
+  segments?: ShaderSource,
   uvs?: ShaderSource,
   sts?: ShaderSource,
-  segments?: ShaderSource,
   colors?: ShaderSource,
   zBiases?: ShaderSource,
 
@@ -128,7 +128,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const n = useShaderRef(props.normal, props.normals);
   const t = useShaderRef(props.tangent, props.tangents);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts);
+  const s = useShaderRef(props.st, props.sts ?? props.positions);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
   const z = useShaderRef(props.zBias, props.zBiases);

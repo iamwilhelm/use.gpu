@@ -11,8 +11,6 @@ import {
 
 import { GlyphControls } from '../../ui/glyph-controls';
 
-console.log([..."❤️‍🔥"].map(s => s.codePointAt(0).toString(16)))
-
 export const DebugAtlasPage: LC = () => {
 
   const view = (

@@ -7,6 +7,9 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getScissor(i: u32) -> vec4<f32> { return vec4<f32>(1.0); };
 
+@optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
+@optional @link fn getST(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
+
 @optional @link fn getSegment(i: u32) -> i32 { return 0; };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
@@ -15,6 +18,8 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
   
 @optional @link fn getTrim(i: u32) -> vec4<u32> { return vec4<u32>(0u, 0u, 0u, 0u); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
+
+@optional @link fn getInstanceCount() -> f32 { return 1.0; }
 
 const ARROW_ASPECT: f32 = 2.5;
 
@@ -70,11 +75,8 @@ fn trimAnchor(
     );
   }
 
-  var uv = vec2<f32>(ij);
-  var xy = uv * 2.0 - 1.0;
-
-  let uv4 = vec4<f32>(uv, 0.0, 0.0);
-  let st4 = vec4<f32>(0.0);
+  var uv1 = vec2<f32>(ij);
+  var xy = uv1 * 2.0 - 1.0;
 
   var cornerIndex: u32;
   var joinIndex: u32;
@@ -89,6 +91,12 @@ fn trimAnchor(
 
   let trim = getTrim(instanceIndex);
   var trimMode = i32(trim.z);
+
+  let rectangleUV = getUV(cornerIndex);
+  let st4 = getST(cornerIndex);
+
+  let uv = mix(rectangleUV.xy, rectangleUV.zw, uv1);
+  let uv4 = vec4<f32>(uv, f32(instanceIndex) / getInstanceCount(), 0.0);
 
   let segment = getSegment(cornerIndex);
   let color = getColor(cornerIndex);

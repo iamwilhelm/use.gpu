@@ -23,9 +23,11 @@ import { getSurfaceIndex, getSurfaceNormal, getSurfaceUV } from '@use-gpu/wgsl/p
 export type SurfaceLayerProps = {
   position?: number[] | TypedArray,
   color?: number[] | TypedArray,
+  st?: number[] | TypedArray,
 
   positions?: ShaderSource,
   colors?: ShaderSource,
+  sts?: ShaderSource,
 
   loopX?: boolean,
   loopY?: boolean,
@@ -46,6 +48,8 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     positions,
     color,
     colors,
+    st,
+    sts,
 
     loopX = false,
     loopY = false,
@@ -74,13 +78,13 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   const normals = useBoundShader(getSurfaceNormal, [boundSize, p], defines);
 
   const uvs = useBoundShader(getSurfaceUV, [boundSize]);
-  const sts = positions;
 
   return use(RawFaces, {
     position,
     positions,
     color,
     colors,
+    st,
 
     indices,
     normals,

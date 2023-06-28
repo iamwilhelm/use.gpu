@@ -2,7 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Rectangle, Emit, DataTexture } from '@use-gpu/core';
 import type { Image } from '@use-gpu/glyph';
 
-import React, { Morph, useState, useResource } from '@use-gpu/live';
+import React, { Morph } from '@use-gpu/live';
 import { memo, fragment } from '@use-gpu/live';
 import { makeRawTexture } from '@use-gpu/core';
 import { padRGBA, glyphToRGBA, glyphToSDF, rgbaToSDF, rgbaToGlyph, sdfToGradient, makeSDFStage, paintSubpixelOffsets } from '@use-gpu/glyph';
@@ -117,14 +117,6 @@ const roundUp2 = (v: number) => {
 const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: GlyphViewProps) => {
   const device = useDeviceContext();
   const rustText = useFontContext();
-  
-  const [state, setState] = useState(0);
-  useResource((dispose) => {
-    const timer = setTimeout(() => setState(1), 1000);
-    dispose(() => clearTimeout(timer));
-  })
-  
-  if (!state) return null;
   
   glyph = glyph ?? '@';
   const glyphId = rustText.findGlyph(0, glyph);

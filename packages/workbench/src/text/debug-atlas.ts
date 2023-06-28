@@ -3,8 +3,11 @@ import type { Atlas, Rectangle } from '@use-gpu/core';
 
 import { debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } from '@use-gpu/live';
 import { TextureSource } from '@use-gpu/core';
+import { useBoundShader, useLambdaSource } from '@use-gpu/workbench';
 
 import { SDFFontContext } from './providers/sdf-font-provider';
+
+import { wgsl } from '@use-gpu/shader/wgsl';
 
 export type DebugAtlasProps = {
   atlas: Atlas,
@@ -35,6 +38,15 @@ const COLORS = [
   [0.5, 1, 0.5, 1],
   [1, .5, 0.5, 1],
 ];
+
+const premultiply = wgsl`
+@link fn getTexture(uv: vec2<f32>) -> vec4<f32>;
+
+fn main(uv: vec2<f32>) -> vec4<f32> {
+  let c = getTexture(uv);
+  return vec4<f32>(pow(c.rgb, vec3<f32>(2.2)) * c.a, c.a);
+}
+`;
 
 export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source}: DebugAtlasProps) => {
   const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;  
@@ -99,6 +111,8 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     });
   }
 
+  const boundSource = useLambdaSource(useBoundShader(premultiply, [source]), source);
+
   for (const anchor of debugValidate()) {
     const {x, y, dx, dy} = anchor;
     yeets.push({
@@ -133,7 +147,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
     rectangle: [width, 0, 500 + width, 500 * aspect],
     uv: [0, 0, w, h],
     radius: [0, 0, 0, 0],
-    texture: source,
+    texture: boundSource,
     fill: [0, 0, 0, 1],
     count: 1,
     repeat: 3,

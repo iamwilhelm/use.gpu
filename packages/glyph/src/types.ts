@@ -62,7 +62,7 @@ export type RustTextAPI = {
   measureSpans: (fontStack: number[], text: Uint16Array, size: number) => SpanMetrics,
   measureGlyph: (fontId: number, glyphId: number, size: number) => GlyphMetrics,
 
-  findGlyph: (fontId: number, char: string) => number;
+  findGlyph: (fontId: number, char: string) => [number, boolean];
   loadMissingGlyph: (fontId: number, glyphId: number, callback: ArrowFunction) => void;
 };
 

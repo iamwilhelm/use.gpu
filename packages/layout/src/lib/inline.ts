@@ -239,7 +239,7 @@ export const fitInline = (
     }
 
     maxMain = Math.max(maxMain, mainPos - gap - t, 0);
-    caretCross += cross;
+    caretCross += lineHeight;
   });
   
   const size = isX ? [into[0] ?? maxMain, caretCross] : [caretCross, into[1] ?? maxMain];

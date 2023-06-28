@@ -142,7 +142,7 @@ export const RustText = (): RustTextAPI => {
     else throw new Error(`No loader defined for lazy font '${JSON.stringify(props)}'`);
   };
 
-  const findGlyph = (fontId: number, char: string): number => {
+  const findGlyph = (fontId: number, char: string): [number, boolean] => {
     return useRustText.find_glyph(fontId, packString(char));
   };
 

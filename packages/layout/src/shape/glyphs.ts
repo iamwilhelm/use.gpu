@@ -129,7 +129,6 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
               count++;
             }
           }
-
           sx += lr * scale;
           x += lr * scale;
         }, breaks[index - 1] || 0, breaks[index]);

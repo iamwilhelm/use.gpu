@@ -108,6 +108,31 @@ export const rgbaToSDF = (
   return {...sdf, data: combineRGBA(sdf.data, color)};
 }
 
+// Pad color image
+export const padRGBA = (data: Uint8Array, w: number, h: number, pad: number = 0): Image => {
+  const wp = w + pad * 2;
+  const hp = h + pad * 2;
+  const out = new Uint8Array(wp * hp * 4);
+
+  let i = 0;
+  let j = (pad + pad * wp) * 4;
+  for (let y = 0; y < h; ++y) {
+    for (let x = 0; x < w; ++x) {
+      const r = data[i++];
+      const g = data[i++];
+      const b = data[i++];
+      const a = data[i++];
+
+      out[j++] = r;
+      out[j++] = g;
+      out[j++] = b;
+      out[j++] = a;
+    }
+    j += pad * 2 * 4;
+  };
+  return {data: out, width: wp, height: hp};
+};
+
 // Convert grayscale glyph to rgba
 export const glyphToRGBA = (data: Uint8Array, w: number, h: number, pad: number = 0): Image => {
   const wp = w + pad * 2;

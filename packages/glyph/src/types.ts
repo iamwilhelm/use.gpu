@@ -1,6 +1,22 @@
 export type Font = {
   props: FontProps,
-  buffer: ArrayBuffer,
+  buffer?: ArrayBuffer,
+  lazy?: LazyFontSource,
+};
+
+export type LazyFontSource = {
+  sequences: string[],
+
+  sync?: (sequence: string) => GlyphImage,
+  async?: (sequence: string) => Promise<GlyphImage>,
+  fetch?: (sequence: string) => string,
+};
+
+export type FontGlyph = {
+  type: 'rgba' | 'png',
+  buffer: ArrayBuffer | Uint8Array | Uint32Array,
+  width?: number,
+  height?: number,
 };
 
 export type FontProps = {

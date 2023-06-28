@@ -30,6 +30,7 @@ export const LayoutDisplayPage: LC = () => {
 
             <Absolute fill={WHITE_TRANSPARENT} left={0} right={0} top={0} bottom={0} />
             <Flex width="100%" height="100%">
+
               <Block width="40%" contain>
                 <Block margin={10} padding={48} radius={5} fill={BLACK_SHADE}>
 
@@ -120,13 +121,12 @@ export const LayoutDisplayPage: LC = () => {
                     </Inline>
 
                     <Block margin={[0, 20, 0, 0]} height={2} fill={WHITE} />
-
                     
                   </Block>
                 </Overflow>
               </Block>
             </Flex>
-                      
+                     
             <Absolute bottom={10} height={40} left={0} right={0}>
               <Flex width="100%" height="100%" align="center">
                 <Flex align="center">
@@ -138,6 +138,7 @@ export const LayoutDisplayPage: LC = () => {
                 </Flex>
               </Flex>
             </Absolute>
+
           </Layout>
         </UI>
       </Pass>

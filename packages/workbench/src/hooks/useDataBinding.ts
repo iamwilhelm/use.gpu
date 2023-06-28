@@ -46,7 +46,7 @@ export const useDataLength = (
   source?: ShaderSource | null,
   extra: number = 0,
 ): Lazy<number> =>
-  useMemo(() => () => Math.max(0,
+  useMemo(() => () => Math.max(0, (
     length != null ? resolve(length) :
     ((source as any)?.length ?? 0)
-  ) + extra, [length, source, extra]);
+  ) + extra), [length, source, extra]);

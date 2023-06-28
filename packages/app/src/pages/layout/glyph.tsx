@@ -2,10 +2,10 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Rectangle, Emit, DataTexture } from '@use-gpu/core';
 import type { Image } from '@use-gpu/glyph';
 
-import React, { Morph } from '@use-gpu/live';
+import React, { Morph, useState, useResource } from '@use-gpu/live';
 import { memo, fragment } from '@use-gpu/live';
 import { makeRawTexture } from '@use-gpu/core';
-import { glyphToRGBA, glyphToSDF, sdfToGradient, makeSDFStage, paintSubpixelOffsets } from '@use-gpu/glyph';
+import { padRGBA, glyphToRGBA, glyphToSDF, rgbaToSDF, rgbaToGlyph, sdfToGradient, makeSDFStage, paintSubpixelOffsets } from '@use-gpu/glyph';
 import { GlyphControls } from '../../ui/glyph-controls';
 import { vec3 } from 'gl-matrix';
 
@@ -117,8 +117,17 @@ const roundUp2 = (v: number) => {
 const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: GlyphViewProps) => {
   const device = useDeviceContext();
   const rustText = useFontContext();
-
-  const glyphId = rustText.findGlyph(0, glyph ?? '@');
+  
+  const [state, setState] = useState(0);
+  useResource((dispose) => {
+    const timer = setTimeout(() => setState(1), 1000);
+    dispose(() => clearTimeout(timer));
+  })
+  
+  if (!state) return null;
+  
+  glyph = glyph ?? '@';
+  const glyphId = rustText.findGlyph(0, glyph);
   const glyphMetrics = rustText.measureGlyph(0, glyphId ?? 5, DETAIL * 1.5);
 
   const {width, height, image} = glyphMetrics;
@@ -129,11 +138,15 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   const padded = [paddedWidth, paddedHeight] as [number, number];
 
   const rgbaData = glyphToRGBA(image, width, height, radius).data;
+  const alpha = image;
+  //const rgbaData = padRGBA(image, width, height, radius).data;
+  //const alpha = rgbaToGlyph(image, width, height).data;
 
   const debugs: Image[] = [];
   const pushDebug = (image: Image) => debugs.push(image);
 
   const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, preprocess, postprocess, pushDebug).data;
+  //const sdfData = rgbaToSDF(image, width, height, radius, radius, undefined, subpixel, preprocess, postprocess, pushDebug).data;
   const gradientData = sdfToGradient(sdfData, width, height, radius, radius).data;
 
   const rgbaTexture = {
@@ -160,8 +173,8 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   const s = Math.max(paddedWidth, paddedHeight);
   const sdf1 = makeSDFStage(s);
   const sdf2 = makeSDFStage(s);
-  paintSubpixelOffsets(sdf1, image, width, height, radius, preprocess, true);
-  paintSubpixelOffsets(sdf2, image, width, height, radius, preprocess, false);
+  paintSubpixelOffsets(sdf1, alpha, width, height, radius, preprocess, true);
+  paintSubpixelOffsets(sdf2, alpha, width, height, radius, preprocess, false);
 
   const {xo, yo, xi, yi} = sdf1;
   const {xo: xo2, yo: yo2, xi: xi2, yi: yi2} = sdf2;
@@ -285,7 +298,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
           <UI>
             <Layout placement="center">
               <Flex direction="y" anchor={"center"} align={"center"} height={'100%'}>
-                <Block width={800}>
+                <Block width={1400}>
                   <Block margin={20}>
                     <Inline align={"center"}>
                       <Text

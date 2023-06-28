@@ -14,6 +14,8 @@ import { makePicker } from './ui/page-picker';
 
 import { FALLBACK_MESSAGE } from './fallback';
 
+import NOTO_SEQUENCES from '../../../public/fonts/emoji/noto-emoji.json';
+
 // @ts-ignore
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -39,6 +41,8 @@ const useInspector = () => {
 export const App: LC = hot(() => {
   
   const base = isDevelopment ? '/' : '/demo/';
+
+  const getNotoEmojiURL = (name: string) => `${base}fonts/emoji/emoji_u${name}.png`;
   
   const root = document.querySelector('#use-gpu')!;
   const inner = document.querySelector('#use-gpu .canvas')!;
@@ -73,8 +77,17 @@ export const App: LC = hot(() => {
       family: 'Noto Emoji',
       weight: 400,
       style: 'normal',
-      src: base + 'fonts/NotoColorEmoji.ttf',
-    },
+      lazy: {
+        sequences: NOTO_SEQUENCES,
+        fetch: (index: number) => {
+          const seq = NOTO_SEQUENCES[index];
+          const codepoints = [...seq].map(s => s.codePointAt(0));
+          const name = codepoints.map(i => i.toString(16)).join('_');
+          return getNotoEmojiURL(name);
+        },
+      },
+    }
+    // */
   ]);
 
   const fiber = useFiber();

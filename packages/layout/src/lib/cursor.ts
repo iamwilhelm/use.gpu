@@ -123,6 +123,7 @@ export const makeInlineCursor = (
   };
   
   const gather = (reduce: InlineReduce) => {
+    spanCount++;
     flush(2);
 
     const s = makeTuples(sizes, 2);

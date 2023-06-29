@@ -35,6 +35,7 @@ type InlineCursor = {
 export const makeInlineCursor = (
   max: number,
   align: Alignment,
+  even?: boolean,
 ): InlineCursor => {
 
   let spanCount = 0;
@@ -140,7 +141,12 @@ export const makeInlineCursor = (
       xHeight: number,
       index: number,
     ) => {
-      const slack = (max || s.get(index, 0)) - advance;
+      let slack;
+      if (even) {
+        slack = (Math.floor((max || s.get(index, 0)) / 2) - Math.floor(advance / 2)) * 2;
+      } else {
+        slack = (max || s.get(index, 0)) - advance;
+      }
       const [gap, lead] = getAlignmentSpacing(slack, count, !!hard, align);
       reduce(start, end, gap, lead, count, cross, ascent, descent, xHeight, index);
     });

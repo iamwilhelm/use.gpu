@@ -76,7 +76,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
   const device = useContext(DeviceContext);
   const rustText = useContext(FontContext);
 
-  const {sdf2d: {subpixel, preprocess, postprocess}} = useContext(DebugContext);
+  const {sdf2d: {subpixel, solidify, preprocess, postprocess}} = useContext(DebugContext);
 
   // Allocate font atlas + backing texture
   const format = "rgba8unorm" as GPUTextureFormat;
@@ -96,7 +96,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
     };
 
     return [glyphs, atlas, source, biasable, biasedSource];
-  }, [width, height, radius, pad, subpixel, preprocess, postprocess]);
+  }, [width, height, radius, pad, subpixel, solidify, preprocess, postprocess]);
 
   const bounds = useMemo(() => makeBoundsTracker());
 
@@ -133,7 +133,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
         let data: Uint8Array;
 
         // Convert to SDF
-        ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, preprocess, postprocess));
+        ({data, width, height} = (rgba ? rgbaToSDF : glyphToSDF)(image, w, h, pad, radius, undefined, subpixel, solidify, preprocess, postprocess));
         glyph.outlineBounds = padRectangle(ob, pad);
         glyph.image = data;
         

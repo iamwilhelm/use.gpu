@@ -4,6 +4,10 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sdf": "./src/sdf.ts"
+  },
   "dependencies": {
     "@use-gpu/state": "*"
   },

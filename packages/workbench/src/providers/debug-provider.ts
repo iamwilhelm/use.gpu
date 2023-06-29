@@ -12,6 +12,7 @@ export const DEBUG_DEFAULTS = {
   sdf2d: {
     contours: false,
     subpixel: true,
+    solidify: true,
     preprocess: false,
     postprocess: false,
   },
@@ -27,6 +28,7 @@ export type DebugContextProps = {
   sdf2d: {
     contours: boolean,
     subpixel: boolean,
+    solidify: boolean,
     preprocess: boolean,
     postprocess: boolean,
   },

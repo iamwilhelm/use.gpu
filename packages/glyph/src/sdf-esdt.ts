@@ -1,5 +1,4 @@
 import type { Image } from './types';
-import { glyphToSDF as glyphToSDFv1 } from './sdf'; 
 import { glyphToRGBA, INF, Rectangle, SDFStage, getSDFStage, isBlack, isWhite, isSolid, sqr } from './sdf';
 
 // Convert grayscale or color glyph to SDF using subpixel distance transform
@@ -25,7 +24,6 @@ export const glyphToESDT = (
   const stage = getSDFStage(sp);
   const {outer, inner, xo, yo, xi, yi, f, z, b, t, v} = stage;
 
-  solidifyAlpha(data, w, h);
   paintIntoStage(stage, data, w, h, pad);
   paintSubpixelOffsets(stage, data, w, h, pad, preprocess);
   
@@ -72,75 +70,6 @@ export const glyphToESDT = (
     return glyphToRGBA(alpha, wp, hp);
   }
 };
-
-// Solidify semi-transparent areas
-export const solidifyAlpha = (
-  data: Uint8Array | number[],
-  w: number,
-  h: number,
-) => {
-  
-  const mask = new Uint8Array(w * h);
-
-  const getData = (x: number, y: number) => (data[y * w + x] ?? 0);
-  const getMask = (x: number, y: number) => (mask[y * w + x] ?? 0);
-  
-  let masked = 0;
-
-  // Mask pixels whose alpha matches their 4 adjacent neighbors (within 16 steps)
-  // and who don't have black or white neighbors.
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let o = x + y * w;
-
-      const a = getData(x, y);
-      if (!a || a >= 254) continue;
-
-      const l = getData(x - 1, y);
-      const r = getData(x + 1, y);
-      const t = getData(x, y - 1);
-      const b = getData(x, y + 1);
-
-      const min = Math.min(a, l, r, t, b);
-      const max = Math.max(a, l, r, t, b);
-
-      if ((max - min) < 16 && min > 0 && max < 254) {
-        // Spread to 4 neighbors with max
-        mask[o - 1] = Math.max(mask[o - 1], a);
-        mask[o - w] = Math.max(mask[o - w], a);
-        mask[o] = a;
-        mask[o + 1] = Math.max(mask[o + 1], a);
-        mask[o + w] = Math.max(mask[o + w], a);
-        masked++;
-      }
-    }
-  }
-  
-  if (!masked) return;
-
-  // Sample 3x3 area for alpha normalization factor
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const a = getData(x, y);
-      if (!a || a >= 254) continue;
-
-      const c = getMask(x, y);
-
-      const l = getMask(x - 1, y);
-      const r = getMask(x + 1, y);
-      const t = getMask(x, y - 1);
-      const b = getMask(x, y + 1);
-
-      const tl = getMask(x - 1, y - 1);
-      const tr = getMask(x + 1, y - 1);
-      const bl = getMask(x - 1, y + 1);
-      const br = getMask(x + 1, y + 1);
-
-      const m = c || l || r || t || b || tl || tr || bl || br;
-      if (m) data[x + y * w] = Math.min(255, data[x + y * w] / m * 255);
-    }
-  }
-}
 
 // Paint alpha channel into SDF stage
 export const paintIntoStage = (

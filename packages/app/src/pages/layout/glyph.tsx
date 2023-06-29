@@ -137,8 +137,8 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   const debugs: Image[] = [];
   const pushDebug = (image: Image) => debugs.push(image);
 
-  const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, preprocess, postprocess, pushDebug).data;
-  //const sdfData = rgbaToSDF(image, width, height, radius, radius, undefined, subpixel, preprocess, postprocess, pushDebug).data;
+  const sdfData = glyphToSDF(image, width, height, radius, radius, undefined, subpixel, true, preprocess, postprocess, pushDebug).data;
+  //const sdfData = rgbaToSDF(image, width, height, radius, radius, undefined, subpixel, true, preprocess, postprocess, pushDebug).data;
   const gradientData = sdfToGradient(sdfData, width, height, radius, radius).data;
 
   const rgbaTexture = {
@@ -284,7 +284,7 @@ const GlyphView = memo(({subpixel, preprocess, postprocess, contours, glyph}: Gl
   );
   
   return (
-    <DebugProvider debug={{sdf2d: {subpixel, contours, preprocess, postprocess}}}>
+    <DebugProvider debug={{sdf2d: {subpixel, contours, preprocess, postprocess, solidify: true}}}>
       <LinearRGB backgroundColor={BACKGROUND}>
         <Pass>
           <UI>

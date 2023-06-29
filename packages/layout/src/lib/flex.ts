@@ -185,7 +185,7 @@ export const fitFlex = (
     for (let i = start; i < end; ++i) {
       const {flex, margin} = flowEls[i];
       const [ml, mt, mr, mb] = margin;
-      const m = isX ? ml + mr : mt + mb;
+      const m = isX ? mt + mb : ml + mr;
 
       const resolvedAnchor = flex ?? anchor;
       const [gap, lead] = getAlignmentSpacing(maxCross - sizes[i][isX ? 1 : 0] - m, 1, false, resolvedAnchor as any);
@@ -206,7 +206,8 @@ export const fitFlex = (
 
       let i = 0;
       for (let offset of offsets) {
-        offset[isX ? 1 : 0] += rowIndex[i++] * gap + lead;
+        const d = rowIndex[i++] * gap + lead;
+        offset[isX ? 1 : 0] += isSnap ? Math.round(d) : d;
       }
     }
     caretCross = spaceCross;

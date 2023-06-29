@@ -82,8 +82,8 @@ export const Glyphs: LiveComponent<GlyphsProps> = (props) => {
       const [l, t] = layout;
 
       const {ascent, lineHeight} = height;
-      let x = l;
-      let y = t + ascent;
+      let x = snap ? Math.round(l) : l;
+      let y = snap ? Math.round(t + ascent) : t + ascent;
       
       let first = true;
 

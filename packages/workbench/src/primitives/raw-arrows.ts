@@ -32,6 +32,7 @@ export type RawArrowsProps = {
   size?: number,
   width?: number,
   depth?: number,
+  zBias?: number,
 
   anchors?:   ShaderSource,
   positions?: ShaderSource,
@@ -39,6 +40,7 @@ export type RawArrowsProps = {
   sizes?:     ShaderSource,
   widths?:    ShaderSource,
   depths?:    ShaderSource,
+  zBiases?:   ShaderSource,
 
   lookups?: ShaderSource,
   ids?:     ShaderSource,
@@ -77,6 +79,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const e = useShaderRef(props.size, props.sizes);
   const w = useShaderRef(props.width, props.widths);
   const d = useShaderRef(props.depth, props.depths);
+  const z = useShaderRef(props.zBias, props.zBiases);
 
   const l = useShaderRef(null, props.lookups);
   
@@ -92,7 +95,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     useNoCallback();
   }
 
-  const getVertex = useBoundShader(getArrowVertex, [g, a, xf, scissor, c, e, w, d, l]);
+  const getVertex = useBoundShader(getArrowVertex, [g, a, xf, scissor, c, e, w, d, z, l]);
   const getPicking = usePickingShader(props);
   const getFragment = getPassThruColor;
 

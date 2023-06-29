@@ -22,10 +22,11 @@ export type PointProps =
   colors?: ShaderSource,
   sizes?: ShaderSource,
   depths?: ShaderSource,
+  stroke?: number,
 };
 
 export const Point: LiveComponent<PointProps> = (props) => {
-  const {colors, sizes, depths} = props;
+  const {colors, sizes, depths, stroke} = props;
 
   const positions = useContext(DataContext) ?? undefined;
 
@@ -45,6 +46,7 @@ export const Point: LiveComponent<PointProps> = (props) => {
       colors,
       sizes,
       depths,
+      stroke,
       
       ...rop,
     })

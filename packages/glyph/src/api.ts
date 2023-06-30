@@ -24,7 +24,7 @@ export const RustText = (): RustTextAPI => {
   for (let k in DEFAULT_FONTS) fontMap.set(+k, DEFAULT_FONTS[k]);
 
   const setFonts = (fonts: Font[]) => {
-    const keys = fonts.map(toMurmur53);
+    const keys = fonts.map(({props}) => toMurmur53(props));
 
     const remove = new Set<number>(fontMap.keys());
     remove.delete(0);

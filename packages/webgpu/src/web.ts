@@ -48,7 +48,7 @@ export const makePresentationContext = (
   return gpuContext;
 }
 
-// Given a DOM selector, adopt a <canvas>, or create on inside any other tag.
+// Given a DOM selector, adopt a <canvas>, or create one inside any other tag.
 export const makeOrAdoptCanvas = (selector: string): [HTMLCanvasElement, () => void] => {
 
   const el = document.querySelector(selector);

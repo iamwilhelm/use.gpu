@@ -41,9 +41,18 @@ export const Canvas: React.FC<CanvasProps> = ({fiber}) => {
   if (!canvas) return null;
 
   const save = () => {
-    const png = canvas.element.toBlob((blob: Blob) => {
-      saveAs(blob, 'canvas.png');
-    });
+    const {args, host} = fiber;
+    if (args?.[0]) args[0].backgroundColor = [...(args[0].backgroundColor ?? [0, 0, 0, 1])];
+    if (host) {
+      host.schedule(fiber);
+      host.flush();
+    }
+
+    setTimeout(() => {
+      const png = canvas.element.toBlob((blob: Blob) => {
+        saveAs(blob, 'canvas.png');
+      });
+    }, 100);
   };
 
   return (<>

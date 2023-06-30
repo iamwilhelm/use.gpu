@@ -5,7 +5,7 @@ import { EventProvider } from '@use-gpu/workbench';//'/event-provider';
 import { RenderContext } from '@use-gpu/workbench';//'/providers/render-provider';
 import { LayoutContext } from '@use-gpu/workbench';//'/providers/layout-provider';
 import { DeviceContext } from '@use-gpu/workbench';//'/providers/device-provider';
-import { provide, use, imperative, useCallback, useContext, useMemo, useOne } from '@use-gpu/live';
+import { provide, use, signal, imperative, useCallback, useContext, useMemo, useOne, useFiber } from '@use-gpu/live';
 import {
   makeColorState,
   makeColorAttachment,
@@ -134,10 +134,22 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
 
     swap,
   ]);
+  
+  useOne(() => console.log('renderContext changed'), renderContext);
 
-  return (
+  const fiber = useFiber();
+  fiber.__inspect = fiber.__inspect ?? {};
+  fiber.__inspect.canvas = {
+    element: canvas,
+    context: gpuContext,
+    device,
+    renderTexture,
+  };
+
+  return [
+    signal(),
     provide(RenderContext, renderContext,
       provide(LayoutContext, layout, children)
     )
-  );
+  ];
 }, 'Canvas')

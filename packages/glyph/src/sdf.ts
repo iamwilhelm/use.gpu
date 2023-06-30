@@ -101,7 +101,7 @@ export const rgbaToSDF = (
   debug?: (image: Image) => void,
 ): Image => {
   const alpha = rgbaToGlyph(data, w, h).data;
-  if (solidify) solidifyAlpha(data, w, h);
+  if (solidify) solidifyAlpha(alpha, w, h);
 
   // ESDT can resolve RGBA directly
   if (subpixel) return glyphToESDT(alpha, data, w, h, pad, radius, cutoff, preprocess, postprocess, debug);

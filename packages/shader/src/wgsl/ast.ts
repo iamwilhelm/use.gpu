@@ -100,7 +100,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
   
   ////////////////
   
-  const getIdentifiers = (node: SyntaxNode, symbol: string, exclude = NO_STRINGS): string[] => {
+  const getIdentifiers = (node: SyntaxNode, symbol: string, exclude = NO_STRINGS): string[] | undefined => {
     const cursor = node.cursor();
     const {to} = node;
     const ids = new Set<string>();
@@ -120,7 +120,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       if (!cursor.next()) break;
     } while (cursor.from < to);
 
-    return Array.from(ids);
+    return ids.size ? Array.from(ids) : undefined;
   };
     
   ////////////////
@@ -251,9 +251,12 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const {name, type, qual} = getVariableDeclaration(b);
     const value = hasValue ? getText(c) : undefined; 
 
-    const identifiers = hasValue ? getIdentifiers(c, name) : [];
+    let identifiers = hasValue ? getIdentifiers(c, name) : undefined;
     const typeName = getTypeName(type);
-    if (!WGSL_NATIVE_TYPES.has(typeName)) identifiers.push(typeName);
+    if (!WGSL_NATIVE_TYPES.has(typeName)) {
+      if (!identifiers) identifiers = [];
+      identifiers!.push(typeName);
+    }
 
     return {name, type, attr, value, identifiers, qual};
   };
@@ -269,9 +272,12 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const {name, type} = getVariableIdentifier(c);
     const value = hasValue ? getText(d) : undefined; 
 
-    const identifiers = hasValue ? getIdentifiers(d, name) : [];
+    let identifiers = hasValue ? getIdentifiers(d, name) : undefined;
     const typeName = getTypeName(type);
-    if (!WGSL_NATIVE_TYPES.has(typeName)) identifiers.push(typeName);
+    if (!WGSL_NATIVE_TYPES.has(typeName)) {
+      if (!identifiers) identifiers = [];
+      identifiers!.push(typeName);
+    }
 
     return {name, type, attr, value, identifiers};
   };

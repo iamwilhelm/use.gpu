@@ -189,7 +189,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const at = node.from;
 
     const symbols = [func.name];
-    const identifiers = b ? getIdentifiers(b, symbols) : [];
+    const identifiers = b ? getIdentifiers(b, symbols) : undefined;
 
     return {at, symbols, identifiers, flags, func};
   };
@@ -247,7 +247,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
       const variable = getQualifiedDeclaration(a);
       const {type} = variable;
       const symbols = [type.name];
-      return {at, symbols, identifiers: [], flags};
+      return {at, symbols, flags};
     }
     
     throw throwError('declaration', node);

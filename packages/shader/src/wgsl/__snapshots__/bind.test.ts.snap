@@ -78,8 +78,8 @@ fn _VT_1_getSize(a: i32) -> vec2<f32> {
 exports[`bind makes deterministic links for data bindings 1`] = `
 Object {
   "base": undefined,
-  "code": "@access [getColor getSize] [rzekwzgitk]",
-  "name": "_VT_t06y5a",
+  "code": "@access [getColor getSize] [bxd6ge0qaz]",
+  "name": "_VT_171w40",
   "storages": Array [
     Object {
       "storage": Object {

@@ -1180,7 +1180,7 @@ Array [
 ]
 `;
 
-exports[`ast gets shake information for instance/vertex/quad AST 1`] = `
+exports[`ast gets shake information for getQuadVertex AST 1`] = `
 Array [
   Array [
     183,

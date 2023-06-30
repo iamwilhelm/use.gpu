@@ -64,7 +64,7 @@ describe('ast', () => {
   });
 
   it('gets quad vertex imports', () => {
-    const code = GLSLModules['instance/vertex/quad'];
+    const code = GLSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const {getImports} = makeGuardedParser(code, tree);
@@ -74,7 +74,7 @@ describe('ast', () => {
   });
   
   it('gets quad vertex functions', () => {
-    const code = GLSLModules['instance/vertex/quad'];
+    const code = GLSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const {getFunctions} = makeGuardedParser(code, tree);
@@ -84,7 +84,7 @@ describe('ast', () => {
   });
 
   it('gets quad vertex declarations', () => {
-    const code = GLSLModules['instance/vertex/quad'];
+    const code = GLSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const {getDeclarations} = makeGuardedParser(code, tree);
@@ -114,7 +114,7 @@ describe('ast', () => {
   });
 
   it('gets quad vertex symbol table', () => {
-    const code = GLSLModules['instance/vertex/quad'];
+    const code = GLSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const {getSymbolTable} = makeGuardedParser(code, tree);
@@ -341,8 +341,8 @@ float getB() {
     expect(code2).toEqual(code1);
   });
 
-  it('gets shake information for instance/vertex/quad AST', () => {
-    const code = GLSLModules['instance/vertex/quad'];
+  it('gets shake information for getQuadVertex AST', () => {
+    const code = GLSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const table = makeGuardedParser(code, tree).getShakeTable();

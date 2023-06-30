@@ -195,7 +195,7 @@ describe('ast', () => {
   });
 
   it('gets quad vertex imports', () => {
-    const code = WGSLModules['instance/vertex/quad'];
+    const code = WGSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const {getImports} = makeGuardedParser(code, tree);
@@ -205,7 +205,7 @@ describe('ast', () => {
   });
 
   it('gets quad vertex declarations', () => {
-    const code = WGSLModules['instance/vertex/quad'];
+    const code = WGSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const {getDeclarations} = makeGuardedParser(code, tree);
@@ -235,7 +235,7 @@ describe('ast', () => {
   });
 
   it('gets quad vertex symbol table', () => {
-    const code = WGSLModules['instance/vertex/quad'];
+    const code = WGSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const {getSymbolTable} = makeGuardedParser(code, tree);
@@ -534,8 +534,8 @@ const x: f32 = 1.0;
     expect(code2).toEqual(code1);
   });
 
-  it('gets shake information for instance/vertex/quad AST', () => {
-    const code = WGSLModules['instance/vertex/quad'];
+  it('gets shake information for getQuadVertex AST', () => {
+    const code = WGSLModules['getQuadVertex'];
 
     const tree = parseShader(code);
     const table = makeGuardedParser(code, tree).getShakeTable();

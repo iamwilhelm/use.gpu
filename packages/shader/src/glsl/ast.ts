@@ -485,7 +485,8 @@ export const rewriteUsingAST = (
   const cursor = tree.cursor();
   do {
     const {type, from, to} = cursor;
-    // Injected by compressed AST only: Skip, Shake, Id
+
+    // Injected by compressed AST only: Skip, Shake
     if (type.name === 'Skip') skip(from, to);
     
     // Top level declaration

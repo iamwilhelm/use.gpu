@@ -28,10 +28,10 @@ export const formatAST = (node: SyntaxNode, code?: string, depth: number = 0) =>
   const prefix = '  '.repeat(depth);
 
   let child = node.firstChild;
-  
+
   const text = code != null ? code.slice(node.from, node.to).replace(/\n/g, "⮐ ") : '';
   let out = [] as string[];
-  
+
   let line = `${prefix}${type.name}`;
   const n = line.length;
   line += ' '.repeat(60 - n);
@@ -62,34 +62,52 @@ export const formatASTNode = (node: SyntaxNode) => {
 export const makeASTEmitter = (
   out: any[],
   ops: Record<string, string>
-) => (
-  type: string,
-  from: number,
-  to: number,
-  arg?: any,
 ) => {
-  const row = [ops[type], from, to];
-  if (arg != null) row.push(arg);
-  out.push(row);
+  let offset = 0;
+  const encode = (x: number) => x - offset;
+
+  return (
+    type: string,
+    from: number,
+    to: number,
+    arg?: any,
+  ) => {
+
+    const row = [ops[type], encode(from), encode(to)];
+    if (arg != null) row.push(arg);
+
+    offset = from;
+    out.push(row);
+  };
 };
 
 // Decompress a compressed AST on the fly by returning a pseudo-tree-cursor.
 export const makeASTDecompressor = (ops: Record<string, string>) => (nodes: CompressedNode[]): Tree => {
+
   const tree = {
     __nodes: () => nodes,
     cursor: () => {
+      let offset = 0;
+      const decode = (d: number) => d + offset;
+
       let i = -1;
       const n = nodes.length;
 
       const next = () => {
         const hasNext = ++i < n;
         if (!hasNext) return false;
-        
+
         const node = nodes[i];
 
         let op: string;
-        [op, self.from, self.to, self.arg] = node;
+        let d1: number;
+        let d2: number;
+        [op, d1, d2, self.arg] = node;
+
         self.type.name = ops[op];
+        self.from = decode(d1);
+        self.to = decode(d2);
+        offset = self.from;
 
         return true;
       };
@@ -98,7 +116,7 @@ export const makeASTDecompressor = (ops: Record<string, string>) => (nodes: Comp
         const {to} = self;
         do {
           const node = nodes[i + 1];
-          if (node && node[1] >= to) return false;
+          if (node && decode(node[1]) >= to) return false;
         } while (next());
         return false;
       }

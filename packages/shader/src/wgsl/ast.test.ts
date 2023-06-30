@@ -361,6 +361,27 @@ struct VertexOutput {
     expect(output).toMatchSnapshot();
   });
 
+  it('rewrites code with inferred types using the AST', () => {
+    const code = `
+    @infer type T;
+    @link fn getValue(index: i32) -> @infer(T) T;
+    fn main() -> vec3<f32> {
+      let x = 3.0;
+      let y = getValue(2);
+      let v: vec3<f32> = vec3<f32>(x, y, 0.0);
+      return v.xyz;
+    }
+    `;
+
+    const tree = parseShader(code);
+    const rename = new Map<string, string>();
+    rename.set('main', 'entryPoint');
+    rename.set('getValue', '_zz_getValue');
+    
+    const output = rewriteUsingAST(code, tree, rename);
+    expect(output).toMatchSnapshot();
+  });
+
   it('rewrites code using the compressed AST', () => {
     const code = `
     fn getValue(index: i32) -> f32;

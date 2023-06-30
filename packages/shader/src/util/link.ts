@@ -215,7 +215,7 @@ export const makeLinker = (
         for (const {name, at} of inferred) {
           const resolved = at < 0 ? type : parameters[at];
 
-          let imp = ns + (resolved.type?.name ?? resolved.name);
+          let imp = ns + (resolved.type ?? resolved.name ?? resolved);
           let i = imp;
           while (i = infers.get(imp)) { imp = i; }
 

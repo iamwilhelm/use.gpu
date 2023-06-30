@@ -86,11 +86,11 @@ export const makeChainTo = (
     return makeChainAccessor(toFormat, name, args ?? [], from, to, 1);
   }
 
-  const declarations = makeDeclarations(toFormat, fromArgs);
+  const exports = makeDeclarations(toFormat, fromArgs);
 
   const chain = loadVirtualModule(
     { render },
-    { symbols: SYMBOLS, declarations, exports: declarations, externals: EXTERNALS },
+    { symbols: SYMBOLS, exports, externals: EXTERNALS },
     entry,
     rehash,
     code,

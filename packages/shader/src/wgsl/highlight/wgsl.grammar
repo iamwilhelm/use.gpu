@@ -258,15 +258,8 @@ AttributeList { Attribute* }
 
 Attribute {
   at Identifier (
-    '(' (literalOrIdentifier comma)* literalOrIdentifier ')'
+    '(' (expression comma)* expression ')'
   )?
-}
-
-literalOrIdentifier {
-  IntLiteral |
-  UintLiteral |
-  FloatLiteral |
-  Identifier
 }
 
 constLiteral {

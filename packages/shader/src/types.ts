@@ -13,10 +13,13 @@ export type SymbolTableT = {
   linkable?: Record<string, true>,
 };
 
-export type TypeLike = {
+export type TypeLike = string | {
   name: string,
-  type?: TypeLike,
   args?: TypeLike[],
+};
+
+export type ParameterLike = string | {
+  type: TypeLike,
 };
 
 export type ParsedModuleCache<T extends SymbolTableT = any> = LRU<number, ParsedModule<T>>;

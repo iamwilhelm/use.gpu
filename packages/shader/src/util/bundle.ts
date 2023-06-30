@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, RefFlags as RF } from '../types';
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, ParameterLike, RefFlags as RF } from '../types';
 
 const NO_LIBS: Record<string, any> = {};
 const NO_ARGS: any[] = [];
@@ -41,8 +41,8 @@ export const toModule = (bundle: ShaderModule) => {
 // Parse escaped C-style string
 export const parseString = (s: string) => s.slice(1, -1).replace(/\\(.)/g, '$1');
 
-type ToTypeString = (t: TypeLike | string) => string;
-type ToArgTypes = (t: (TypeLike | string)[]) => string[];
+type ToTypeString = (t: TypeLike) => string;
+type ToArgTypes = (t: ParameterLike[]) => string[];
 
 export const makeDeclarationToAttribute = (
   toTypeString: ToTypeString,
@@ -51,21 +51,21 @@ export const makeDeclarationToAttribute = (
   d: any,
 ) => {
   if (d.func) {
-    const {type, name, parameters, attributes} = d.func;
-    return {name, format: toTypeString(type), args: toArgTypes(parameters), attr: attributes};
+    const {type, name, parameters, attr} = d.func;
+    return {name, format: toTypeString(type), args: toArgTypes(parameters), attr};
   }
   if (d.variable) {
-    const {type, name, parameters, attributes} = d.variable;
-    return {name, format: toTypeString(type), args: null, attr: attributes};
+    const {type, name, parameters, attr} = d.variable;
+    return {name, format: toTypeString(type), args: null, attr};
   }
   if (d.struct) {
-    const {name, members, attributes} = d.struct;
+    const {name, members, attr} = d.struct;
     const ms = members?.map(({name, type}: any) => ({
       name,
       format: toTypeString(type),
     }));
     const args = ms?.map(({format}: any) => format);
-    return {name, format: name, args, members: ms, attr: attributes};
+    return {name, format: name, args, members: ms, attr};
   }
   throw new Error(`Cannot convert declaration to attribute: ${JSON.stringify(d)}`);
 }
@@ -102,14 +102,12 @@ export const makeBundleToAttributes = (
     bundle: ShaderModule,
   ): UniformAttribute[] => {
     const module = toModule(bundle);
-    const {table: {declarations}} = module;
+    const {table: {externals}} = module;
 
     const out: UniformAttribute[] = [];
-    for (const d of declarations) if (d.func ?? d.variable) {
-      if (d.flags & RF.External) {
-        const attr = toAttribute(d);
-        if (!(bundle as any).links?.[attr.name]) out.push(resolveBundleType(bundle, attr));
-      }
+    for (const d of externals) if (d.func ?? d.variable) {
+      const attr = toAttribute(d);
+      if (!(bundle as any).links?.[attr.name]) out.push(resolveBundleType(bundle, attr));
     }
 
     return out;
@@ -128,11 +126,21 @@ export const makeBundleToAttribute = (
     name?: string,
   ): UniformAttribute => {
     const module = toModule(bundle);
-    const {table: {declarations}} = module;
+    const {table: {exports, externals}} = module;
 
     const entry = name ?? bundle.entry ?? module.entry;
 
-    for (const d of declarations) {
+    if (name != null) for (const d of externals) {
+      if (
+        d.func?.name === entry ||
+        d.variable?.name === entry
+      ) return resolveBundleType(bundle, toAttribute(d));
+      if (d.struct?.name === entry) {
+        return toAttribute(d);
+      }
+    }
+
+    for (const d of exports) {
       if (
         d.func?.name === entry ||
         d.variable?.name === entry

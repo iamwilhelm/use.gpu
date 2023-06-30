@@ -135,8 +135,6 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
     swap,
   ]);
   
-  useOne(() => console.log('renderContext changed'), renderContext);
-
   const fiber = useFiber();
   fiber.__inspect = fiber.__inspect ?? {};
   fiber.__inspect.canvas = {

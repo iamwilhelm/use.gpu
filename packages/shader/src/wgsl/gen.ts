@@ -62,15 +62,13 @@ export const makeBindingAccessors = (
   const virtuals = [...constants, ...storages, ...textures];
   const symbols = virtuals.map(({uniform}) => uniform.name);
   const types = virtuals.map(({uniform}) => uniform.format);
-  const declarations = virtuals.map(({uniform}) => ({
-    at: 0,
-    symbol: uniform.name,
+  const exports = virtuals.map(({uniform}) => ({
     func: {
       name: uniform.name,
       type: {name: uniform.format},
       parameters: uniform.args ?? INT_PARAMS,
     },
-    flags: 0,
+    flags: RF.Exported,
   }));
 
   // Handle struct types for storage
@@ -205,7 +203,7 @@ export const makeBindingAccessors = (
     render,
   }, {
     symbols,
-    declarations,
+    exports,
     modules: modules.length ? modules : undefined,
   }, undefined, hash, code, key);
 

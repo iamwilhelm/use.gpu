@@ -43,7 +43,7 @@ const CAST_EXTERNALS = [{
 const makeDeclarations = (name: string, type: any, parameters: any) => [{
   func: {name, type, parameters},
   flags: RF.Exported,
-}];
+}] as any[];
 
 export const makeSwizzleTo = (
   makeSwizzleAccessor: MakeSwizzleAccessor,

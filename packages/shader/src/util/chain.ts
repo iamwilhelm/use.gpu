@@ -35,7 +35,7 @@ const EXTERNALS = [
 const makeDeclarations = (type: any, parameters: any) => [{
   func: {name: 'chain', type, parameters},
   flags: RF.Exported,
-}];
+}] as any[];
 
 export const makeChainTo = (
   makeChainAccessor: MakeChainAccessor,

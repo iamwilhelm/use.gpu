@@ -69,7 +69,7 @@ export const makeBindingAccessors = (
       parameters: uniform.args ?? INT_PARAMS,
     },
     flags: RF.Exported,
-  }));
+  })) as any[];
 
   // Handle struct types for storage
   const libs: Record<string, ShaderModule> = {};

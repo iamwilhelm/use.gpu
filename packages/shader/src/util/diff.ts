@@ -22,7 +22,7 @@ export type MakeDiffAccessor = (
 const EXTERNALS = [{
   func: {name: 'getValue'},
   flags: 0,
-}];
+}] as any[];
 
 export const makeDiffBy = (
   makeDiffAccessor: MakeDiffAccessor,

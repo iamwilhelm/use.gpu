@@ -65,7 +65,7 @@ export type RawFacesProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
-const POSITION = { format: 'vec4<f32>', name: 'getPosition' };
+const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {

@@ -56,7 +56,7 @@ export type RawLinesProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
-const POSITION = { format: 'vec4<f32>', name: 'getPosition' };
+const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 const LINE_JOIN_SIZE = {
   'bevel': 1,

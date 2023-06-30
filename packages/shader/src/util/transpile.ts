@@ -25,8 +25,8 @@ export const makeTranspile = (
   const name = resourcePath.split('/').pop()!.replace(new RegExp('\\.' + extension + '$'), '');
   const module = loadModule(source, name);
 
-  // Emit module data
-  const {code, hash, table, tree, shake} = module;
+  // Emit module data (without declarations, which is repeated in externals/exports)
+  const {code, hash, table: {declarations, ...table}, tree, shake} = module;
   const def = `const data = {
     "name": ${stringify(name)},
     "code": ${stringify(code)},

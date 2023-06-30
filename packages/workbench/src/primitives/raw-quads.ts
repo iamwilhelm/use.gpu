@@ -49,7 +49,7 @@ export type RawQuadsProps = {
   count?: Lazy<number>,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
-const POSITION = { format: 'vec4<f32>', name: 'getPosition' };
+const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps) => {
   const {

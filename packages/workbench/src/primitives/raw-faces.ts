@@ -16,6 +16,7 @@ import { usePickingShader } from '../providers/picking-provider';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
@@ -64,6 +65,7 @@ export type RawFacesProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
+const POSITION = { format: 'vec4<f32>', name: 'getPosition' };
 
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
@@ -128,7 +130,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const n = useShaderRef(props.normal, props.normals);
   const t = useShaderRef(props.tangent, props.tangents);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts ?? props.positions);
+  const s = useShaderRef(props.st, props.sts);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
   const z = useShaderRef(props.zBias, props.zBiases);
@@ -144,6 +146,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
 
+  const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
+
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
     bounds = useCallback(() => getBounds((props.positions! as any).bounds), [props.positions, getBounds]);
@@ -155,7 +159,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
 
-  const getVertex = useBoundShader(getFaceVertex, [xf, xd, scissor, p, n, t, u, s, g, c, z, i, j, k, l]);
+  const getVertex = useBoundShader(getFaceVertex, [xf, xd, scissor, ps ?? p, n, t, u, ps ?? s, g, c, z, i, j, k, l]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => {

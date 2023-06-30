@@ -14,6 +14,7 @@ import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -55,6 +56,7 @@ export type RawLinesProps = {
 } & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
+const POSITION = { format: 'vec4<f32>', name: 'getPosition' };
 
 const LINE_JOIN_SIZE = {
   'bevel': 1,
@@ -93,7 +95,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const p = useShaderRef(props.position, props.positions);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts ?? props.positions);
+  const s = useShaderRef(props.st, props.sts);
   const g = useShaderRef(props.segment, props.segments);
   const c = useShaderRef(props.color, props.colors);
   const w = useShaderRef(props.width, props.widths);
@@ -104,7 +106,9 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   
   const l = useShaderRef(null, props.lookups);
 
-  const [xf, scissor, getBounds] = useApplyTransform(p);
+  const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
+
+  const [xf, scissor, getBounds] = useApplyTransform(ps ?? p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -116,7 +120,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, s, g, c, w, d, z, t, e, l, instanceCount]);
+  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, ps ?? s, g, c, w, d, z, t, e, l, instanceCount]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => ({

@@ -15,6 +15,7 @@ import { makeShaderBindings, resolve } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -48,6 +49,8 @@ export type RawQuadsProps = {
   count?: Lazy<number>,
 } & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
+const POSITION = { format: 'vec4<f32>', name: 'getPosition' };
+
 export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps) => {
   const {
     alphaToCoverage,
@@ -68,13 +71,15 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const d = useShaderRef(props.depth, props.depths);
   const z = useShaderRef(props.zBias, props.zBiases);
   const u = useShaderRef(props.uv, props.uvs);
-  const s = useShaderRef(props.st, props.sts ?? props.positions);
+  const s = useShaderRef(props.st, props.sts);
 
   const l = useShaderRef(null, props.lookups);
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   
-  const [xf, scissor, getBounds] = useApplyTransform(p);
+  const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
+
+  const [xf, scissor, getBounds] = useApplyTransform(ps ?? p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -86,7 +91,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const {getFragment, ...material} = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, s, l, instanceCount]);
+  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, ps ?? s, l, instanceCount]);
   const getPicking = usePickingShader(props);
   const applyMask = m ? useBoundShader(getMaskedColor, [m]) : null;
 

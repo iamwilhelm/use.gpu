@@ -10,11 +10,13 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.11.0",
     "@lezer/highlight": "^1.1.4",
-    "codemirror": "^6.0.1",
+    "@uiw/codemirror-themes": "^4.21.7",
     "@use-gpu/inspect": "*",
     "@use-gpu/layout": "*",
     "@use-gpu/webgpu": "*",
-    "@use-gpu/workbench": "*"
+    "@use-gpu/workbench": "*",
+    "codemirror": "^6.0.1",
+    "file-saver": "^2.0.5"
   },
   "scripts": {
     "build": "NPM_PACKAGE=inspect-gpu ../../scripts/build-mjs-cjs.sh",
@@ -28,5 +30,8 @@
     "use-gpu",
     "use-gpu-components"
   ],
-  "sideEffects": false
+  "sideEffects": false,
+  "devDependencies": {
+    "@types/file-saver": "^2.0.5"
+  }
 }

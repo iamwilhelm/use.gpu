@@ -1,6 +1,7 @@
 import type { LiveFiber } from '@use-gpu/live';
 import type { InspectExtension, InspectAddIns } from '@use-gpu/inspect';
 
+import { renderCanvas } from './canvas';
 import { renderGeometry } from './geometry';
 import { renderShader } from './shader';
 import { renderTargets } from './targets';
@@ -8,6 +9,12 @@ import { renderWGSL } from './wgsl';
 
 export const inspectGPU: InspectExtension = (): InspectAddIns => ({
   props: [
+    {
+      id: 'canvas',
+      label: 'Canvas',
+      enabled: (fiber: LiveFiber<any>) => fiber.__inspect?.canvas,
+      render: (fiber: LiveFiber<any>) => renderCanvas({fiber}),
+    },
     {
       id: 'compute',
       label: 'Compute',

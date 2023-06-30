@@ -12,11 +12,12 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 export type DebugAtlasProps = {
   atlas: Atlas,
   source: TextureSource,
+  size?: number,
   version: number,
 };
 
 export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (props: Partial<DebugAtlasProps> = {}) => {
-  let {atlas, source} = props;
+  let {atlas, source, size} = props;
   if (!atlas && !source) {
     let getTexture;
     ({__debug: {atlas, source}} = useContext(SDFFontContext) as any);
@@ -27,6 +28,7 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = (
     atlas: atlas!,
     source: source!,
     version: atlas!.version,
+    size,
   }));
 };
 
@@ -48,17 +50,19 @@ fn main(uv: vec2<f32>) -> vec4<f32> {
 }
 `;
 
-export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source}: DebugAtlasProps) => {
+export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, source, size = 500}: DebugAtlasProps) => {
   const {map, width: w, height: h, debugPlacements, debugSlots, debugValidate, debugUploads} = atlas as any;  
   const {id} = useFiber();
 
   const yeets = [];
   const pos = [] as number[];
   
-  const width = w / 2;
-  const height = h / 2;
-  const fit = ([l, t, r, b]: Rectangle) => [l / 2, t / 2, r / 2, b / 2];
-  
+  const width = size * w / h;
+  const height = size;
+  const sx = width / w;
+  const sy = height / h;
+  const fit = ([l, t, r, b]: Rectangle) => [l * sx, t * sy, r * sx, b * sy];
+
   let ID = 0;
   const next = () => `${id}-${ID++}`;
 
@@ -144,7 +148,7 @@ export const DebugAtlasView: LiveComponent<DebugAtlasProps> = memo(({atlas, sour
 
   yeets.push({
     id: next(),
-    rectangle: [width, 0, 500 + width, 500 * aspect],
+    rectangle: [width, 0, width + width, height],
     uv: [0, 0, w, h],
     radius: [0, 0, 0, 0],
     texture: boundSource,

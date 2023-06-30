@@ -1,7 +1,6 @@
 import { Tree } from '@lezer/common';
 import { ASTParser, VirtualTable, SymbolTableT, ParsedBundle, ParsedModule, ParsedModuleCache, CompressedNode } from '../types';
 import { formatMurmur53, toMurmur53 } from './hash';
-import { decompressAST } from './tree';
 import { PREFIX_VIRTUAL } from '../constants';
 
 const EMPTY_LIST = [] as any[];
@@ -13,6 +12,7 @@ export const makeLoadModule = <T extends SymbolTableT = any>(
   parseShader: (code: string) => Tree,
   makeASTParser: (code: string, tree: Tree, name?: string) => ASTParser<T>,
   compressAST: (code: string, tree: Tree) => CompressedNode[],
+  decompressAST: (nodes: CompressedNode[]) => Tree,
 ) => (
   code: string,
   name: string = 'main',

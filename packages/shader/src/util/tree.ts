@@ -58,9 +58,23 @@ export const formatASTNode = (node: SyntaxNode) => {
   return `(${type.name}${space}${inner.join(" ")})`;
 }
 
+// Compress AST node
+export const makeASTEmitter = (
+  out: any[],
+  ops: Record<string, string>
+) => (
+  type: string,
+  from: number,
+  to: number,
+  arg?: any,
+) => {
+  const row = [ops[type], from, to];
+  if (arg != null) row.push(arg);
+  out.push(row);
+};
 
 // Decompress a compressed AST on the fly by returning a pseudo-tree-cursor.
-export const decompressAST = (nodes: CompressedNode[]) => {
+export const makeASTDecompressor = (ops: Record<string, string>) => (nodes: CompressedNode[]): Tree => {
   const tree = {
     __nodes: () => nodes,
     cursor: () => {
@@ -72,7 +86,10 @@ export const decompressAST = (nodes: CompressedNode[]) => {
         if (!hasNext) return false;
         
         const node = nodes[i];
-        [self.type.name, self.from, self.to, self.arg] = node;
+
+        let op: string;
+        [op, self.from, self.to, self.arg] = node;
+        self.type.name = ops[op];
 
         return true;
       };

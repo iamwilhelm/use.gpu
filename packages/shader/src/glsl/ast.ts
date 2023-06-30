@@ -21,13 +21,22 @@ import {
 import * as T from './grammar/glsl.terms';
 import { GLSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
-import { getChildNodes, hasErrorNode, formatAST, formatASTNode, decompressAST } from '../util/tree';
+import { getChildNodes, hasErrorNode, formatAST, formatASTNode, makeASTEmitter, makeASTDecompressor } from '../util/tree';
 import uniq from 'lodash/uniq';
-
-export { decompressAST } from '../util/tree';
 
 const NO_DEPS = [] as string[];
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
+const AST_OPS = {
+  "S": "Shake",
+  "K": "Skip",
+  "I": "Identifier",
+
+  "Shake": "S",
+  "Skip": "K",
+  "Identifier": "I",
+};
+
+export const decompressAST = makeASTDecompressor(AST_OPS);
 
 const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
 
@@ -489,7 +498,7 @@ export const rewriteUsingAST = (
       }
     }
     // Any identifier
-    else if (type.name === 'Identifier' || type.name === 'Id') {
+    else if (type.name === 'Identifier') {
       const name = code.slice(from, to);
       const replace = rename.get(name);
 
@@ -533,14 +542,15 @@ export const rewriteUsingAST = (
 // Compress an AST to only the info needed to do symbol replacement and tree shaking
 export const compressAST = (_: string, tree: Tree): CompressedNode[] => {
   const out = [] as any[]
+  const emit = makeASTEmitter(out, AST_OPS);
 
   // Pass through nodes from pre-compressed tree immediately
   // @ts-ignore
   if (tree.__nodes) return tree.__nodes();
 
-  const shake = (from: number, to: number) => out.push(["Shake", from, to]);
-  const skip = (from: number, to: number) => out.push(["Skip", from, to]);
-  const ident = (from: number, to: number) => out.push(["Id", from, to]);
+  const shake = (from: number, to: number) => emit('Shake',      from, to);
+  const skip  = (from: number, to: number) => emit('Skip',       from, to);
+  const ident = (from: number, to: number) => emit('Identifier', from, to);
 
   const cursor = tree.cursor();
   do {

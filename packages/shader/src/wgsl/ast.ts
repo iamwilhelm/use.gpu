@@ -26,16 +26,29 @@ import {
 import * as T from './grammar/wgsl.terms';
 import { WGSL_NATIVE_TYPES } from './constants';
 import { parseString } from '../util/bundle';
-import { getChildNodes, hasErrorNode, formatAST, formatASTNode, decompressAST } from '../util/tree';
+import { getChildNodes, hasErrorNode, formatAST, formatASTNode, makeASTEmitter, makeASTDecompressor } from '../util/tree';
 import { getTypeName, getAttributeName, getAttributeArgs } from './type';
 import uniq from 'lodash/uniq';
-
-export { decompressAST } from '../util/tree';
 
 const NO_STRINGS = [] as string[];
 const VOID_TYPE = 'void';
 const AUTO_TYPE = 'auto';
 const PRIVATE_ATTRIBUTES = new Set(['@export', '@link', '@global', '@optional', '@infer']);
+const AST_OPS = {
+  "S": "Shake",
+  "K": "Skip",
+  "I": "Identifier",
+  "A": "Attribute",
+  "O": "Optional",
+
+  "Shake": "S",
+  "Skip": "K",
+  "Identifier": "I",
+  "Attribute": "A",
+  "Optional": "O",
+};
+
+export const decompressAST = makeASTDecompressor(AST_OPS);
 
 const orNone = <T>(list: T[]): T[] | undefined => list.length ? list : undefined;
 
@@ -581,9 +594,9 @@ export const rewriteUsingAST = (
   do {
     const {type, from, to, arg} = cursor as any;
 
-    // Injected by compressed AST only: Skip, Shake, Id, Attr, Opt
+    // Injected by compressed AST only: Skip, Shake, Optional
     if (type.name === 'Skip') skip(from, to);
-    if (type.name === 'Opt') {
+    if (type.name === 'Optional') {
       if (!optionals || !optionals.has(arg)) {
         skip(from, to);
         while (cursor.lastChild()) {};
@@ -600,7 +613,7 @@ export const rewriteUsingAST = (
     }
 
     // Any identifier (both full and compressed AST)
-    else if (type.name === 'Identifier' || type.name === 'Id') {
+    else if (type.name === 'Identifier') {
       const name = code.slice(from, to);
       const replace = rename.get(name);
 
@@ -648,7 +661,7 @@ export const rewriteUsingAST = (
       }
     }
     // Public or private attributes (both full and compressed AST)
-    else if (type.name === 'Attribute' || type.name === 'Attr') {
+    else if (type.name === 'Attribute') {
       const name = code.slice(from, to);
       if (PRIVATE_ATTRIBUTES.has(name)) {
         const {from, to} = cursor;
@@ -677,16 +690,17 @@ export const rewriteUsingAST = (
 // Compress an AST to only the info needed to do symbol replacement and tree shaking
 export const compressAST = (code: string, tree: Tree): CompressedNode[] => {
   const out = [] as any[]
+  const emit = makeASTEmitter(out, AST_OPS);
 
   // Pass through nodes from pre-compressed tree immediately
   // @ts-ignore
   if (tree.__nodes) return tree.__nodes();
 
-  const shake = (from: number, to: number) => out.push(["Shake", from, to]);
-  const skip  = (from: number, to: number) => out.push(["Skip",  from, to]);
-  const ident = (from: number, to: number) => out.push(["Id",    from, to]);
-  const attr  = (from: number, to: number) => out.push(["Attr",  from, to]);
-  const opt   = (from: number, to: number, symbol: string) => out.push(["Opt", from, to, symbol]);
+  const shake = (from: number, to: number) => emit('Shake',      from, to);
+  const skip  = (from: number, to: number) => emit('Skip',       from, to);
+  const ident = (from: number, to: number) => emit('Identifier', from, to);
+  const attr  = (from: number, to: number) => emit('Attribute',  from, to);
+  const opt   = (from: number, to: number, symbol: string) => emit('Optional', from, to, symbol);
 
   const cursor = tree.cursor();
   do {

@@ -255,12 +255,18 @@ AttributeList { Attribute* }
 
 Attribute {
   at Identifier (
-    '(' (expression comma)* expression ')'
+    '(' (literalOrIdentifier comma)* literalOrIdentifier ')'
   )?
 }
 
-constLiteral {
+literalOrIdentifier {
   IntLiteral |
+  UintLiteral |
+  FloatLiteral |
+  Identifier
+}
+
+constLiteral {  IntLiteral |
   UintLiteral |
   FloatLiteral |
   b<'true'> |

@@ -105,10 +105,9 @@ Object {
     },
   ],
   "table": Object {
-    "declarations": Array [
+    "exports": Array [
       Object {
-        "at": 0,
-        "flags": 0,
+        "flags": 1,
         "func": Object {
           "name": "getColor",
           "parameters": Array [
@@ -118,11 +117,9 @@ Object {
             "name": "vec4<f32>",
           },
         },
-        "symbol": "getColor",
       },
       Object {
-        "at": 0,
-        "flags": 0,
+        "flags": 1,
         "func": Object {
           "name": "getSize",
           "parameters": Array [
@@ -132,7 +129,6 @@ Object {
             "name": "vec2<f32>",
           },
         },
-        "symbol": "getSize",
       },
     ],
     "modules": undefined,

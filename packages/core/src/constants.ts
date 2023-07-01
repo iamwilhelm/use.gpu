@@ -816,7 +816,7 @@ export const BLEND_ALPHA = {
   },
 } as any as GPUBlendState;
 
-export const BLEND_PREMULTIPLIED = {
+export const BLEND_PREMULTIPLY = {
   color: {
     operation: "add",
     srcFactor: "one",
@@ -829,7 +829,7 @@ export const BLEND_PREMULTIPLIED = {
   },
 } as any as GPUBlendState;
 
-export const BLEND_ADDITIVE = {
+export const BLEND_ADD = {
   color: {
     operation: "add",
     srcFactor: "one",
@@ -838,6 +838,32 @@ export const BLEND_ADDITIVE = {
   alpha: {
     operation: "add",
     srcFactor: "one",
+    dstFactor: "one-minus-src-alpha",      
+  },
+} as any as GPUBlendState;
+
+export const BLEND_SUBTRACT = {
+  color: {
+    operation: "subtract",
+    srcFactor: "one",
     dstFactor: "one",
+  },
+  alpha: {
+    operation: "add",
+    srcFactor: "one",
+    dstFactor: "one-minus-src-alpha",      
+  },
+} as any as GPUBlendState;
+
+export const BLEND_MULTIPLY = {
+  color: {
+    operation: "add",
+    srcFactor: "zero",
+    dstFactor: "src",
+  },
+  alpha: {
+    operation: "add",
+    srcFactor: "one",
+    dstFactor: "one-minus-src-alpha",      
   },
 } as any as GPUBlendState;

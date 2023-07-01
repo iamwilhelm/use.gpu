@@ -12,7 +12,7 @@ import {
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
-  BLEND_PREMULTIPLIED,
+  BLEND_PREMULTIPLY,
 } from '@use-gpu/core';
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);

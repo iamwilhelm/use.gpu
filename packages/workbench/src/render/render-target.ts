@@ -15,7 +15,7 @@ import {
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
-  BLEND_PREMULTIPLIED,
+  BLEND_PREMULTIPLY,
 } from '@use-gpu/core';
 
 const seq = (n: number, start: number = 0, step: number = 1) => Array.from({length: n}).map((_, i) => start + i * step);
@@ -106,7 +106,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
   
   const targetTexture = resolveTexture ?? renderTexture;
 
-  const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLIED)], format);
+  const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLY)], format);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, resolveTexture, backgroundColor)],
     [renderTexture, resolveTexture, backgroundColor]

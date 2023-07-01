@@ -14,7 +14,7 @@ import {
   makeDepthTexture,
   makeDepthStencilState,
   makeDepthStencilAttachment,
-  BLEND_PREMULTIPLIED,
+  BLEND_PREMULTIPLY,
 } from '@use-gpu/core';
 
 import { DEPTH_STENCIL_FORMAT, COLOR_SPACE, BACKGROUND_COLOR } from '../constants';
@@ -67,7 +67,7 @@ export const Canvas: LiveComponent<CanvasProps> = imperative((props: PropsWithCh
     [device, width, height, format, samples]
   );
   
-  const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLIED)], format);
+  const colorStates      = useOne(() => [makeColorState(format, BLEND_PREMULTIPLY)], format);
   const colorAttachments = useMemo(() =>
     [makeColorAttachment(renderTexture, null, backgroundColor)],
     [backgroundColor, renderTexture]

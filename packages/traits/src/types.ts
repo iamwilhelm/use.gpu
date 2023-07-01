@@ -20,7 +20,7 @@ export type PropDefTypes<T extends Record<string, ArrowFunction>> = {
 
 export type UseTrait<I, O> = (props?: Partial<I>) => O;
 
-export type Blending = 'none' | 'normal' | 'add' | 'subtract' | 'multiply' | 'custom';
+export type Blending = 'none' | 'alpha' | 'premultiply' | 'add' | 'subtract' | 'multiply';
 export type Join = 'miter' | 'round' | 'bevel';
 export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
 export type Domain = 'linear' | 'log';

@@ -2,7 +2,6 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { DataField, StorageSource } from '@use-gpu/core';
 
 import React, { Gather, yeet, use, useMemo } from '@use-gpu/live';
-import { BLEND_ADDITIVE } from '@use-gpu/core'; 
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
@@ -201,7 +200,7 @@ export const GeometryBinaryPage: LC = () => {
                     size={3}
                     depth={1}
                     mode={transparent ? "transparent" : "opaque"}
-                    blend={transparent ? "additive" : "none"}
+                    blend={transparent ? "add" : "none"}
                     depthWrite={!transparent}
                   />
                 )}

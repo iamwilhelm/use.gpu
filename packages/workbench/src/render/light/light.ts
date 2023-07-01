@@ -6,7 +6,7 @@ import type { VirtualDraw } from '../../pass/types';
 import type { BoundLight } from '../../light/types';
 
 import { memo, use, yeet, keyed, useCallback, useMemo, useOne, useRef } from '@use-gpu/live';
-import { resolve, uploadBuffer, BLEND_ADDITIVE } from '@use-gpu/core';
+import { resolve, uploadBuffer, BLEND_ADD } from '@use-gpu/core';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 import { $delete } from '@use-gpu/state';
 
@@ -70,7 +70,7 @@ export const FULLSCREEN_PIPELINE = {
   fragment: {
     targets: {
       0: {
-        blend: BLEND_ADDITIVE,
+        blend: BLEND_ADD,
       },
     },
   },
@@ -87,7 +87,7 @@ export const GEOMETRY_PIPELINE = {
   fragment: {
     targets: {
       0: {
-        blend: BLEND_ADDITIVE,
+        blend: BLEND_ADD,
       },
     },
   },
@@ -122,7 +122,7 @@ export const FULLSCREEN_STENCIL_PIPELINE = {
   fragment: {
     targets: {
       0: {
-        blend: BLEND_ADDITIVE,
+        blend: BLEND_ADD,
       },
     },
   },
@@ -142,7 +142,7 @@ export const GEOMETRY_STENCIL_PIPELINE = {
   fragment: {
     targets: {
       0: {
-        blend: BLEND_ADDITIVE,
+        blend: BLEND_ADD,
       },
     },
   },

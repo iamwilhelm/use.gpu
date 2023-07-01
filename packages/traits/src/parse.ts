@@ -238,7 +238,7 @@ export const parseScale      = makeParseVec3(vec3.fromValues(1, 1, 1));
 export const parseMatrix     = makeParseMat4();
 
 export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
-export const parseBlending   = makeParseEnum<Blending>(['none', 'normal', 'add', 'subtract', 'multiply', 'custom']);
+export const parseBlending   = makeParseEnum<Blending>(['none', 'premultiply', 'alpha', 'add', 'subtract', 'multiply']);
 
 export const parsePlacement  = makeParseMap({
   'center':      vec2.fromValues( 0,  0),

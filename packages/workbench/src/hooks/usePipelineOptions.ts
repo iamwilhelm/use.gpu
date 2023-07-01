@@ -1,12 +1,12 @@
 import type { Update } from '@use-gpu/state';
-import { BLEND_NONE, BLEND_ALPHA, BLEND_PREMULTIPLIED, BLEND_ADDITIVE } from '@use-gpu/core';
+import { BLEND_NONE, BLEND_ALPHA, BLEND_PREMULTIPLY, BLEND_ADD, BLEND_SUBTRACT, BLEND_MULTIPLY } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';
 import { $set, $delete } from '@use-gpu/state';
 import { useRenderContext } from '../providers/render-provider';
 
 export type PipelineOptions = {
   mode: string,
-  blend: 'none' | 'alpha' | 'premultiplied' | 'additive' | GPUBlendState,
+  blend: 'none' | 'alpha' | 'premultiply' | 'add' | 'subtract' | 'multiply' | GPUBlendState,
   side: 'front' | 'back' | 'both',
   shadow: boolean,
   scissor: any,
@@ -18,10 +18,12 @@ export type PipelineOptions = {
 };
 
 const BLENDS = {
-  none: BLEND_NONE,
-  alpha: BLEND_ALPHA,
-  premultiplied: BLEND_PREMULTIPLIED,
-  additive: BLEND_ADDITIVE,
+  none:        BLEND_NONE,
+  alpha:       BLEND_ALPHA,
+  premultiply: BLEND_PREMULTIPLY,
+  add:         BLEND_ADD,
+  subtract:    BLEND_SUBTRACT,
+  multiply:    BLEND_MULTIPLY,
 };
 
 const CULL_SIDE = {
@@ -49,8 +51,8 @@ export const usePipelineOptions = (
     depthWrite = null,
     alphaToCoverage = false,
     blend = (
-      (alphaToCoverage && samples === 1) ? 'premultiplied' :
-      (!alphaToCoverage && mode === 'transparent') ? 'premultiplied' : 'none'
+      (alphaToCoverage && samples === 1) ? 'premultiply' :
+      (!alphaToCoverage && mode === 'transparent') ? 'premultiply' : 'none'
     ),
   } = options;
 

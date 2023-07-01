@@ -477,6 +477,10 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       if      (func?.identifiers)     func    .identifiers = func    .identifiers.filter(s => scope.has(s));
       else if (variable?.identifiers) variable.identifiers = variable.identifiers.filter(s => scope.has(s));
       else if (constant?.identifiers) constant.identifiers = constant.identifiers.filter(s => scope.has(s));
+
+      if      (func?.identifiers?.length     === 0)     func.identifiers = undefined;
+      else if (variable?.identifiers?.length === 0) variable.identifiers = undefined;
+      else if (constant?.identifiers?.length === 0) constant.identifiers = undefined;
     }
 
     const linkable = {} as Record<string, true>;

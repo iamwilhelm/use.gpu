@@ -386,6 +386,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const scope = new Set(symbols ?? []);
     for (let ref of refs) if (ref.identifiers) {
       ref.identifiers = ref.identifiers.filter(s => scope.has(s));
+      if (ref.identifiers?.length === 0) ref.identifiers = undefined;
     }
 
     const linkable = {} as Record<string, true>;

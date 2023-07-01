@@ -69,7 +69,7 @@ export type DataBinding<T extends SymbolTableT = any> = {
   constant?: any,
 };
 
-export type CompressedNode = [string, number, number] | [string, number, number, string];
+export type CompressedNode = [number, number, number] | [number, number, number, number];
 
 export type ImportRef = {
   name: string,
@@ -94,7 +94,7 @@ export enum RefFlags {
 export type ShaderDefine = string | number | boolean | null | undefined;
 
 export type ShakeTable = ShakeOp[];
-export type ShakeOp = [number, string[]];
+export type ShakeOp = [number, number[]];
 
 export type StorageSource = {
   buffer: GPUBuffer,

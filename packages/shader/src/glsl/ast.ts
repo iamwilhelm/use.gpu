@@ -26,15 +26,7 @@ import uniq from 'lodash/uniq';
 
 const NO_DEPS = [] as string[];
 const IGNORE_IDENTIFIERS = new Set(['location', 'set', 'binding']);
-const AST_OPS = {
-  "S": "Shake",
-  "K": "Skip",
-  "I": "Identifier",
-
-  "Shake": "S",
-  "Skip": "K",
-  "Identifier": "I",
-};
+const AST_OPS = ["Shake", "Skip", "Identifier"];
 
 export const decompressAST = makeASTDecompressor(AST_OPS);
 
@@ -413,7 +405,8 @@ export const makeASTParser = (code: string, tree: Tree) => {
   }
 
   const getShakeTable = (table: SymbolTable = getSymbolTable()): ShakeTable | undefined => {
-    const {declarations: refs} = table;
+    const {declarations: refs, symbols} = table;
+    const lookup = new Map(symbols ? symbols.map((s, i) => [s, i]) : undefined);
     if (!refs) return undefined;
 
     const graph = new Map<string, string[]>();
@@ -430,11 +423,14 @@ export const makeASTParser = (code: string, tree: Tree) => {
       }
     }
 
-    const getAll = (ss: string[], accum: Set<string>): Set<string> => {
-      for (let s of ss) if (!accum.has(s)) {
-        accum.add(s);
-        const deps = graph.get(s);
-        if (deps?.length) getAll(deps, accum);
+    const getAll = (ss: string[], accum: Set<number> = new Set()): Set<number> => {
+      for (let symbol of ss) {
+        let s = lookup.get(symbol)!;
+        if (!accum.has(s)) {
+          accum.add(s);
+          const deps = graph.get(symbol);
+          if (deps?.length) getAll(deps, accum);
+        }
       }
       return accum;
     }
@@ -442,7 +438,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const out = [] as ShakeOp[];
     for (const ref of refs) {
       const {at, symbols} = ref;
-      const deps = getAll(symbols, new Set());
+      const deps = getAll(symbols);
       if (deps.size) out.push([at, Array.from(deps)]);
     }
 
@@ -541,9 +537,13 @@ export const rewriteUsingAST = (
 }
 
 // Compress an AST to only the info needed to do symbol replacement and tree shaking
-export const compressAST = (_: string, tree: Tree): CompressedNode[] => {
+export const compressAST = (
+  _: string,
+  tree: Tree,
+  symbols: string[] = [],
+): CompressedNode[] => {
   const out = [] as any[]
-  const emit = makeASTEmitter(out, AST_OPS);
+  const emit = makeASTEmitter(out, AST_OPS, symbols);
 
   // Pass through nodes from pre-compressed tree immediately
   // @ts-ignore

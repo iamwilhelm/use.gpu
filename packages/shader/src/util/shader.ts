@@ -11,8 +11,8 @@ const EMPTY_TABLE = {} as any;
 export const makeLoadModule = <T extends SymbolTableT = any>(
   parseShader: (code: string) => Tree,
   makeASTParser: (code: string, tree: Tree, name?: string) => ASTParser<T>,
-  compressAST: (code: string, tree: Tree) => CompressedNode[],
-  decompressAST: (nodes: CompressedNode[]) => Tree,
+  compressAST: (code: string, tree: Tree, symbols?: string[]) => CompressedNode[],
+  decompressAST: (nodes: CompressedNode[], symbols?: string[]) => Tree,
 ) => (
   code: string,
   name: string = 'main',
@@ -27,7 +27,10 @@ export const makeLoadModule = <T extends SymbolTableT = any>(
   const table = astParser.getSymbolTable();
   const shake = astParser.getShakeTable(table);
 
-  if (compressed) tree = decompressAST(compressAST(code, tree));
+  if (compressed) {
+    const {symbols} = table;
+    tree = decompressAST(compressAST(code, tree, symbols), symbols);
+  }
   const hash = toMurmur53(code);
 
   return bindEntryPoint({name, code, hash, table, shake, tree}, entry);

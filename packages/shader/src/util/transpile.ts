@@ -7,7 +7,7 @@ export const makeTranspile = (
   type: string,
   extension: string,
   loadModule: (code: string, name?: string, entry?: string, compressed?: boolean) => ParsedModule,
-  compressAST: (s: string, tree: Tree) => CompressedNode[],
+  compressAST: (s: string, tree: Tree, symbols?: string[]) => CompressedNode[],
   minifyCode: (code: string) => string,
 ) => (
   source: string,
@@ -30,14 +30,15 @@ export const makeTranspile = (
 
   // Emit module data (without declarations, which is repeated in externals/exports)
   const {code, hash, table: {declarations, ...table}, tree, shake} = module;
-  const def = `const data = {
-    "name": ${stringify(name)},
-    "code": ${stringify(code)},
-    "hash": ${stringify(hash)},
-    "table": ${stringify(table)},
-    "shake": ${stringify(shake)},
-    "tree": decompressAST(${stringify(compressAST(code, tree!))}),
-  };`
+  const def = `const t = ${stringify(table)}; const data = {
+  "name": ${stringify(name)},
+  "code": ${stringify(code)},
+  "hash": ${stringify(hash)},
+  "table": t,
+  "shake": ${stringify(shake)},
+  "tree": decompressAST(${stringify(compressAST(code, tree!, table.symbols))}, t.symbols),
+};
+`;
 
   // Emit dependency imports
   let i = 0;

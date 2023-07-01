@@ -246,7 +246,7 @@ export const makeLinker = (
     else if (tree) {
       // Shake tree ops based on which symbols were exported
       const keep = exported.get(key);
-      const ops = shake && keep ? resolveShakeOps(shake, keep) : null;
+      const ops = shake && keep ? resolveShakeOps(shake, keep, symbols) : null;
 
       // Rename symbols using AST while tree shaking
       const recode = rewriteUsingAST(code, tree, rename, ops, optionals);

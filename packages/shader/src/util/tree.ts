@@ -58,13 +58,25 @@ export const formatASTNode = (node: SyntaxNode) => {
   return `(${type.name}${space}${inner.join(" ")})`;
 }
 
+const getOpsMap = (ops: string[]) => {
+  const opToIndex = new Map<string, number>();
+  const indexToOp = new Map<number, string>();
+  ops.forEach((op, i) => {
+    opToIndex.set(op, i);
+    indexToOp.set(i, op);
+  });
+  return {opToIndex, indexToOp};
+};
+
 // Compress AST node
 export const makeASTEmitter = (
   out: any[],
-  ops: Record<string, string>
+  ops: string[],
+  symbols: string[] = [],
 ) => {
   let offset = 0;
   const encode = (x: number) => x - offset;
+  const {opToIndex} = getOpsMap(ops);
 
   return (
     type: string,
@@ -73,8 +85,9 @@ export const makeASTEmitter = (
     arg?: any,
   ) => {
 
-    const row = [ops[type], encode(from), encode(to)];
-    if (arg != null) row.push(arg);
+    const i = opToIndex.get(type)!;
+    const row = [i, encode(from), encode(to)];
+    if (arg != null) row.push(symbols.indexOf(arg));
 
     offset = from;
     out.push(row);
@@ -82,7 +95,13 @@ export const makeASTEmitter = (
 };
 
 // Decompress a compressed AST on the fly by returning a pseudo-tree-cursor.
-export const makeASTDecompressor = (ops: Record<string, string>) => (nodes: CompressedNode[]): Tree => {
+export const makeASTDecompressor = (
+  ops: string[]
+) => (
+  nodes: CompressedNode[],
+  symbols: string[] = [],
+): Tree => {
+  const {indexToOp} = getOpsMap(ops);
 
   const tree = {
     __nodes: () => nodes,
@@ -98,15 +117,12 @@ export const makeASTDecompressor = (ops: Record<string, string>) => (nodes: Comp
         if (!hasNext) return false;
 
         const node = nodes[i];
+        const [op, d1, d2, arg] = node;
 
-        let op: string;
-        let d1: number;
-        let d2: number;
-        [op, d1, d2, self.arg] = node;
-
-        self.type.name = ops[op];
+        self.type.name = indexToOp.get(op)!;
         self.from = decode(d1);
         self.to = decode(d2);
+        self.arg = arg != null ? symbols[arg] : null;
         offset = self.from;
 
         return true;

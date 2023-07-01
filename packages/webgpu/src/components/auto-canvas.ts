@@ -20,6 +20,7 @@ export type AutoCanvasProps = {
 
   autofocus?: boolean,
   picking?: boolean,
+  iframe?: boolean,
   children: LiveElement,
 }
 
@@ -29,6 +30,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
     children,
     autofocus = false,
     picking = true,
+    iframe = false,
     ...rest
   } = props;
 
@@ -48,6 +50,7 @@ export const AutoCanvas: LiveComponent<AutoCanvasProps> = (props) => {
   const view = (
     use(DOMEvents, {
       autofocus,
+      iframe,
       element: canvas,
       children:
         use(CursorProvider, {

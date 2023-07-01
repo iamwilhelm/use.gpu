@@ -13,6 +13,7 @@ export type DOMEventsProps = {
   element: HTMLElement,
   autofocus?: boolean,
   capture?: boolean,
+  iframe?: boolean,
 };
 
 const toButton = (button: number) => {
@@ -61,7 +62,7 @@ const makeKeyboardState = () => ({
 } as KeyboardState);
 
 export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithChildren<DOMEventsProps>) => {
-  const {element, autofocus, capture, children} = props;
+  const {element, autofocus, capture, iframe, children} = props;
 
   const captureOptions = useOne(() => ({capture: !!capture}), capture);
 
@@ -258,23 +259,27 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       e.stopPropagation();
     }
 
-    const onMouseDown = (e: MouseEvent) => {
+    const onMouseDown = (e: PointerEvent) => {
       const {button, buttons, clientX, clientY} = e;
+      if (e.target) (e.target as HTMLElement).setPointerCapture(e.pointerId);
+
       onButtons(buttons, button);
       onMove(clientX, clientY, 0, 0);
       onModifiers(e);
-      e.preventDefault();
+
+      // https://bugs.chromium.org/p/chromium/issues/detail?id=1300622
+      if (!iframe) e.preventDefault();
       e.stopPropagation();
 
       element.focus();
 
-      element.removeEventListener('mousemove', onMouseMove, captureOptions);
-      document.addEventListener('mouseenter', onMouseMove, captureOptions);
-      document.addEventListener('mousemove', onMouseMove, captureOptions);
-      document.addEventListener('mouseup', onMouseUp, captureOptions);
+      element.removeEventListener('pointermove', onMouseMove, captureOptions);
+      document.addEventListener('pointerenter', onMouseMove, captureOptions);
+      document.addEventListener('pointermove', onMouseMove, captureOptions);
+      document.addEventListener('pointerup', onMouseUp, captureOptions);
     };
 
-    const onMouseMove = (e: MouseEvent) => {
+    const onMouseMove = (e: PointerEvent) => {
       const {clientX, clientY, movementX, movementY} = e;
       onMove(clientX, clientY, movementX, movementY);
       onModifiers(e);
@@ -282,7 +287,7 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       e.stopPropagation();
     };
 
-    const onMouseUp = (e: MouseEvent) => {
+    const onMouseUp = (e: PointerEvent) => {
       const {button, buttons, clientX, clientY} = e;
       onButtons(buttons, button);
       onMove(clientX, clientY, 0, 0);
@@ -290,10 +295,10 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
       e.preventDefault();
       e.stopPropagation();
 
-      element.addEventListener('mousemove', onMouseMove, captureOptions);
-      document.removeEventListener('mouseenter', onMouseMove, captureOptions);
-      document.removeEventListener('mousemove', onMouseMove, captureOptions);
-      document.removeEventListener('mouseup', onMouseUp, captureOptions);
+      element.addEventListener('pointermove', onMouseMove, captureOptions);
+      document.removeEventListener('pointerenter', onMouseMove, captureOptions);
+      document.removeEventListener('pointermove', onMouseMove, captureOptions);
+      document.removeEventListener('pointerup', onMouseUp, captureOptions);
     };
 
     const onContextMenu = (e: MouseEvent) => {
@@ -314,8 +319,8 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
 
     //const onGlobalWheel = (e: WheelEvent) => e.preventDefault();
 
-    element.addEventListener('mousedown', onMouseDown, captureOptions);
-    element.addEventListener('mousemove', onMouseMove, captureOptions);
+    element.addEventListener('pointerdown', onMouseDown, captureOptions);
+    element.addEventListener('pointermove', onMouseMove, captureOptions);
     element.addEventListener('contextmenu', onContextMenu, captureOptions);
 
     element.addEventListener('touchstart', onTouchStart, captureOptions);
@@ -331,12 +336,12 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
     window.addEventListener('blur', onWindowBlur, captureOptions);
 
     dispose(() => {
-      document.removeEventListener('mouseenter', onMouseMove, captureOptions);
-      document.removeEventListener('mousemove', onMouseMove, captureOptions);
-      document.removeEventListener('mouseup', onMouseUp, captureOptions);
+      document.removeEventListener('pointerenter', onMouseMove, captureOptions);
+      document.removeEventListener('pointermove', onMouseMove, captureOptions);
+      document.removeEventListener('pointerup', onMouseUp, captureOptions);
 
-      element.removeEventListener('mousedown', onMouseDown, captureOptions);
-      element.removeEventListener('mousemove', onMouseMove, captureOptions);
+      element.removeEventListener('pointerdown', onMouseDown, captureOptions);
+      element.removeEventListener('pointermove', onMouseMove, captureOptions);
       element.removeEventListener('contextmenu', onContextMenu, captureOptions);
 
       element.removeEventListener('touchstart', onTouchStart, captureOptions);

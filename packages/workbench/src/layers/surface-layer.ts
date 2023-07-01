@@ -5,6 +5,7 @@ import type {
   VertexData, RenderPassMode,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
+import type { PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { RawFaces } from '../primitives/raw-faces';
 
@@ -35,9 +36,8 @@ export type SurfaceLayerProps = {
 
   size?: Lazy<[number, number] | [number, number, number] | [number, number, number, number]>,
   side?: 'front' | 'back' | 'both',
-  mode?: RenderPassMode | string,
   id?: number,
-};
+} & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const [SIZE_BINDING] = bundleToAttributes(getSurfaceIndex);
 
@@ -59,6 +59,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     size,
     mode = 'opaque',
     id = 0,
+    ...rest
   } = props;
 
   const sizeExpr = useMemo(() => () =>
@@ -96,5 +97,6 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
     count: countExpr,
     mode,
     id,
+    ...rest,
   });
 }, 'SurfaceLayer');

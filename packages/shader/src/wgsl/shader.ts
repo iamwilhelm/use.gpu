@@ -7,7 +7,9 @@ import { makeTranspile } from '../util/transpile';
 
 import { makeASTParser, compressAST, decompressAST } from './ast';
 import { toTypeString, toTypeArgs } from './type';
+import { removeComments, removeWhiteSpace, renameLocals } from './minify';
 import { parser } from './grammar/wgsl';
+
 import LRU from 'lru-cache';
 import zip from 'lodash/zip';
 
@@ -43,8 +45,16 @@ export const bundleToAttribute = makeBundleToAttribute(toTypeString, toTypeArgs)
 /** Convert a bundle to a definition for all its attributes. */
 export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArgs);
 
+// Simple whitespace / comment removal
+const minifyCode = (code: string) => {
+  code = removeComments(code);
+  code = renameLocals(code);
+  code = removeWhiteSpace(code);
+  return code;
+};
+
 /** ES/CommonJS Transpiler */
-export const transpileWGSL = makeTranspile('wgsl', 'wgsl', loadModule, compressAST);
+export const transpileWGSL = makeTranspile('wgsl', 'wgsl', loadModule, compressAST, minifyCode);
 
 /** Templated literal syntax:
 

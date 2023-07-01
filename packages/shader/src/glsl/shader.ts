@@ -43,8 +43,15 @@ export const bundleToAttribute = makeBundleToAttribute(toTypeString, toTypeArgs)
 /** Convert a bundle to a definition for all its attributes. */
 export const bundleToAttributes = makeBundleToAttributes(toTypeString, toTypeArgs);
 
+// Simple whitespace removal
+const minifyCode = (code: string) => {
+  code = code.replace(/ +/g, ' ');
+  code = code.replace(/\n+/g, '\n');
+  return code;
+};
+
 /** ES/CommonJS Transpiler */
-export const transpileGLSL = makeTranspile('glsl', 'glsl', loadModule, compressAST);
+export const transpileGLSL = makeTranspile('glsl', 'glsl', loadModule, compressAST, minifyCode);
 
 /** Templated literal syntax:
 

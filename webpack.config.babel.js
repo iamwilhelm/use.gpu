@@ -64,7 +64,10 @@ export default {
       },
       {
         test: /\.wgsl$/i,
-        use: [path.resolve('./packages/wgsl-loader/src/index.ts')],
+        use: [{
+          loader: path.resolve('./packages/wgsl-loader/src/index.ts'),
+          options: {minify: !isDevelopment},
+        }],
       },
       {
         test: /\.css$/i,

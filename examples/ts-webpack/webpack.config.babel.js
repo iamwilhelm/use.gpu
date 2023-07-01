@@ -35,7 +35,10 @@ module.exports =  {
       },
       {
         test: /\.wgsl$/i,
-        use: ['@use-gpu/wgsl-loader'],
+        use: [{
+          loader: '@use-gpu/wgsl-loader',
+          options: {minify: !isDevelopment},
+        }],
       },
       {
         test: /\.css$/i,

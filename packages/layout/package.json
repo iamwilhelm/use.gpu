@@ -1,6 +1,6 @@
 {
   "name": "@use-gpu/layout",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",

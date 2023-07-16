@@ -2,7 +2,7 @@
 - `@use-gpu/glyph`: Support loading emoji PNGs on-demand
 - `@use-gpu/layout`: Add `aspect` to elements for sizing w/h relative to each other
 - `@use-gpu/shader`: Add `minify` option to WGSL/GLSL transpiler
-- `@use-gpu/shader`: Reduce size of shader metadata
+- `@use-gpu/shader`: Reduce size of shader/AST metadata in builds
 - `@use-gpu/workbench`: Add UVs and STs to `<LineLayer>`, `<PointLayer>`, `<SurfaceLayer>`
 - `@use-gpu/workbench`: Use input position as default STs
 - `@use-gpu/workbench`: Allow using basic materials with `<LineLayer>` and `<PointLayer>`

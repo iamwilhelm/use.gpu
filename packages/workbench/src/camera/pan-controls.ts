@@ -92,6 +92,18 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   }, reset || version);
 
   useOne(() => {
+    setX(initialX);
+  }, initialX);
+
+  useOne(() => {
+    setY(initialY);
+  }, initialY);
+
+  useOne(() => {
+    setZoom(initialZoom);
+  }, initialZoom);
+
+  useOne(() => {
     const { moveX, moveY, buttons, stopped } = mouse;
     if (!active || stopped) return;
 

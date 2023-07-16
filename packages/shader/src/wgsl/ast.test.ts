@@ -507,14 +507,16 @@ const x: f32 = 1.0;
     `;
 
     const tree = parseShader(code);
-    const table = makeGuardedParser(code, tree).getShakeTable();
+    const ast = makeGuardedParser(code, tree);
+    const {symbols} = ast.getSymbolTable();
+    const shake = ast.getShakeTable();
 
-    expect(table).toBeTruthy();
-    expect(table).toMatchSnapshot();
-    if (!table) return;
+    expect(shake).toBeTruthy();
+    expect(shake).toMatchSnapshot();
+    if (!shake) return;
     
     const keep = new Set(['getA']);
-    const ops = resolveShakeOps(table, keep);
+    const ops = resolveShakeOps(shake, keep, symbols);
     expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
   });
   
@@ -522,14 +524,16 @@ const x: f32 = 1.0;
     const code = WGSLModules['@use-gpu/wgsl/use/view'];
 
     const tree = parseShader(code);
-    const table = makeGuardedParser(code, tree).getShakeTable();
+    const ast = makeGuardedParser(code, tree);
+    const {symbols} = ast.getSymbolTable();
+    const shake = ast.getShakeTable();
 
-    expect(table).toBeTruthy();
-    expect(table).toMatchSnapshot();
-    if (!table) return;
+    expect(shake).toBeTruthy();
+    expect(shake).toMatchSnapshot();
+    if (!shake) return;
     
     const keep = new Set(['worldToClip']);
-    const ops = resolveShakeOps(table, keep);
+    const ops = resolveShakeOps(shake, keep, symbols);
     expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
   });
 
@@ -537,15 +541,17 @@ const x: f32 = 1.0;
     const code = WGSLModules['@use-gpu/wgsl/use/view'];
 
     const tree = parseShader(code);
-    const table = makeGuardedParser(code, tree).getShakeTable();
+    const ast = makeGuardedParser(code, tree);
+    const {symbols} = ast.getSymbolTable();
+    const shake = ast.getShakeTable();
 
-    expect(table).toBeTruthy();
-    expect(table).toMatchSnapshot();
-    if (!table) return;
+    expect(shake).toBeTruthy();
+    expect(shake).toMatchSnapshot();
+    if (!shake) return;
     
     const keep = new Set(['worldToClip']);
-    const ops = resolveShakeOps(table, keep);
-    
+    const ops = resolveShakeOps(shake, keep, symbols);    
+
     const tree1 = tree;
     const tree2 = decompressAST(compressAST(code, tree1));
 

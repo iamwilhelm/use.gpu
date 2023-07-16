@@ -6,7 +6,7 @@ Object {
     Object {
       "at": 0,
       "flags": 0,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "QUAD",
       ],
@@ -319,7 +319,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getPosition",
       ],
@@ -337,7 +337,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getColor",
       ],
@@ -355,7 +355,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getSize",
       ],
@@ -373,7 +373,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getDepth",
       ],
@@ -443,7 +443,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getPosition",
       ],
@@ -461,7 +461,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getColor",
       ],
@@ -479,7 +479,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getSize",
       ],
@@ -497,7 +497,7 @@ Object {
           "qualifiers": Array [],
         },
       },
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "getDepth",
       ],
@@ -579,22 +579,22 @@ Array [
   Array [
     0,
     Array [
-      "QUAD",
-      "getQuadIndex",
-      "getQuadUV",
+      0,
+      1,
+      2,
     ],
   ],
   Array [
     102,
     Array [
-      "getQuadIndex",
-      "getQuadUV",
+      1,
+      2,
     ],
   ],
   Array [
     176,
     Array [
-      "getQuadUV",
+      2,
     ],
   ],
 ]
@@ -605,35 +605,35 @@ Array [
   Array [
     175,
     Array [
-      "getPosition",
-      "getQuadVertex",
+      0,
+      4,
     ],
   ],
   Array [
     198,
     Array [
-      "getColor",
-      "getQuadVertex",
+      1,
+      4,
     ],
   ],
   Array [
     218,
     Array [
-      "getSize",
-      "getQuadVertex",
+      2,
+      4,
     ],
   ],
   Array [
     237,
     Array [
-      "getDepth",
-      "getQuadVertex",
+      3,
+      4,
     ],
   ],
   Array [
     274,
     Array [
-      "getQuadVertex",
+      4,
     ],
   ],
 ]
@@ -644,13 +644,13 @@ Array [
   Array [
     15,
     Array [
-      "SolidVertex",
+      0,
     ],
   ],
   Array [
     97,
     Array [
-      "MeshVertex",
+      1,
     ],
   ],
 ]
@@ -892,7 +892,6 @@ Array [
   Object {
     "at": 7,
     "flags": 0,
-    "identifiers": Array [],
     "symbols": Array [
       "unknown",
     ],
@@ -922,7 +921,7 @@ Object {
     Object {
       "at": 15,
       "flags": 1,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "SolidVertex",
       ],
@@ -957,7 +956,7 @@ Object {
     Object {
       "at": 97,
       "flags": 1,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "MeshVertex",
       ],
@@ -1000,7 +999,7 @@ Object {
     Object {
       "at": 15,
       "flags": 1,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "SolidVertex",
       ],
@@ -1035,7 +1034,7 @@ Object {
     Object {
       "at": 97,
       "flags": 1,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "symbols": Array [
         "MeshVertex",
       ],
@@ -1175,7 +1174,7 @@ Object {
     Object {
       "at": 15,
       "flags": 1,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "struct": Object {
         "name": "viewUniforms",
         "struct": Object {
@@ -1391,7 +1390,7 @@ Object {
     Object {
       "at": 15,
       "flags": 1,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "struct": Object {
         "name": "viewUniforms",
         "struct": Object {
@@ -1635,162 +1634,162 @@ Object {
 exports[`ast rewrites a lot of code using the compressed AST 1`] = `
 Array [
   Array [
-    "K",
+    1,
     1,
     46,
   ],
   Array [
-    "S",
+    0,
     47,
     79,
   ],
   Array [
-    "I",
+    2,
     0,
     11,
   ],
   Array [
-    "I",
+    2,
     12,
     21,
   ],
   Array [
-    "S",
+    0,
     40,
     85,
   ],
   Array [
-    "I",
+    2,
     7,
     15,
   ],
   Array [
-    "I",
+    2,
     28,
     37,
   ],
   Array [
-    "S",
+    0,
     17,
     57,
   ],
   Array [
-    "I",
+    2,
     7,
     15,
   ],
   Array [
-    "I",
+    2,
     23,
     32,
   ],
   Array [
-    "S",
+    0,
     11,
     48,
   ],
   Array [
-    "I",
+    2,
     7,
     15,
   ],
   Array [
-    "I",
+    2,
     23,
     29,
   ],
   Array [
-    "S",
+    0,
     16,
     300,
   ],
   Array [
-    "I",
+    2,
     5,
     9,
   ],
   Array [
-    "I",
+    2,
     15,
     26,
   ],
   Array [
-    "I",
+    2,
     14,
     28,
   ],
   Array [
-    "I",
+    2,
     22,
     35,
   ],
   Array [
-    "I",
+    2,
     16,
     32,
   ],
   Array [
-    "I",
+    2,
     21,
     32,
   ],
   Array [
-    "I",
+    2,
     12,
     13,
   ],
   Array [
-    "I",
+    2,
     4,
     13,
   ],
   Array [
-    "I",
+    2,
     10,
     21,
   ],
   Array [
-    "I",
+    2,
     13,
     26,
   ],
   Array [
-    "I",
+    2,
     19,
     30,
   ],
   Array [
-    "I",
+    2,
     14,
     15,
   ],
   Array [
-    "I",
+    2,
     32,
     41,
   ],
   Array [
-    "I",
+    2,
     17,
     30,
   ],
   Array [
-    "I",
+    2,
     24,
     33,
   ],
   Array [
-    "I",
+    2,
     12,
     13,
   ],
   Array [
-    "I",
+    2,
     11,
     17,
   ],
   Array [
-    "I",
+    2,
     9,
     10,
   ],
@@ -1817,52 +1816,52 @@ exports[`ast rewrites code using the AST 1`] = `
 exports[`ast rewrites code using the compressed AST 1`] = `
 Array [
   Array [
-    "S",
+    0,
     5,
     31,
   ],
   Array [
-    "I",
+    2,
     6,
     14,
   ],
   Array [
-    "I",
+    2,
     13,
     18,
   ],
   Array [
-    "S",
+    0,
     12,
     108,
   ],
   Array [
-    "I",
+    2,
     5,
     9,
   ],
   Array [
-    "I",
+    2,
     21,
     22,
   ],
   Array [
-    "I",
+    2,
     21,
     22,
   ],
   Array [
-    "I",
+    2,
     4,
     12,
   ],
   Array [
-    "I",
+    2,
     24,
     25,
   ],
   Array [
-    "I",
+    2,
     9,
     10,
   ],
@@ -1881,21 +1880,21 @@ Array [
   Array [
     1,
     Array [
-      "x",
-      "getA",
-      "getB",
+      0,
+      1,
+      2,
     ],
   ],
   Array [
     38,
     Array [
-      "getA",
+      1,
     ],
   ],
   Array [
     83,
     Array [
-      "getB",
+      2,
     ],
   ],
 ]
@@ -1917,61 +1916,61 @@ Array [
   Array [
     15,
     Array [
-      "viewUniforms",
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "getPerspectiveScale",
-      "ViewUniforms",
+      0,
+      2,
+      4,
+      7,
+      3,
+      5,
+      6,
+      8,
+      1,
     ],
   ],
   Array [
     276,
     Array [
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
+      2,
+      4,
+      7,
     ],
   ],
   Array [
     373,
     Array [
-      "viewToClip",
-      "worldToClip",
-      "worldToClip3D",
+      3,
+      4,
+      7,
     ],
   ],
   Array [
     475,
     Array [
-      "worldToClip",
+      4,
     ],
   ],
   Array [
     571,
     Array [
-      "clipToScreen3D",
+      5,
     ],
   ],
   Array [
     690,
     Array [
-      "screenToClip3D",
+      6,
     ],
   ],
   Array [
     815,
     Array [
-      "worldToClip3D",
+      7,
     ],
   ],
   Array [
     953,
     Array [
-      "getPerspectiveScale",
+      8,
     ],
   ],
 ]
@@ -2008,61 +2007,61 @@ Array [
   Array [
     15,
     Array [
-      "viewUniforms",
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "getPerspectiveScale",
-      "ViewUniforms",
+      0,
+      2,
+      4,
+      7,
+      3,
+      5,
+      6,
+      8,
+      1,
     ],
   ],
   Array [
     276,
     Array [
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
+      2,
+      4,
+      7,
     ],
   ],
   Array [
     373,
     Array [
-      "viewToClip",
-      "worldToClip",
-      "worldToClip3D",
+      3,
+      4,
+      7,
     ],
   ],
   Array [
     475,
     Array [
-      "worldToClip",
+      4,
     ],
   ],
   Array [
     571,
     Array [
-      "clipToScreen3D",
+      5,
     ],
   ],
   Array [
     690,
     Array [
-      "screenToClip3D",
+      6,
     ],
   ],
   Array [
     815,
     Array [
-      "worldToClip3D",
+      7,
     ],
   ],
   Array [
     953,
     Array [
-      "getPerspectiveScale",
+      8,
     ],
   ],
 ]

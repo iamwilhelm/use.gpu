@@ -311,6 +311,8 @@ float getB() {
   });
   
   it('shakes use/view AST', () => {
+    const code = GLSLModules['use/view'];
+
     const tree = parseShader(code);
     const ast = makeGuardedParser(code, tree);
     const {symbols} = ast.getSymbolTable();
@@ -319,9 +321,9 @@ float getB() {
     expect(shake).toBeTruthy();
     expect(shake).toMatchSnapshot();
     if (!shake) return;
-    
+
     const keep = new Set(['worldToClip']);
-    const ops = resolveShakeOps(table, keep, symbols);
+    const ops = resolveShakeOps(shake, keep, symbols);
     expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
   });
 
@@ -338,7 +340,7 @@ float getB() {
     if (!shake) return;
     
     const keep = new Set(['worldToClip']);
-    const ops = resolveShakeOps(shake, keep);
+    const ops = resolveShakeOps(shake, keep, symbols);
     
     const tree1 = tree;
     const tree2 = decompressAST(compressAST(code, tree1, symbols), symbols);

@@ -26,7 +26,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "x",
       "qual": undefined,
       "type": "f32",
@@ -41,7 +41,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "y",
       "qual": undefined,
       "type": "f32",
@@ -96,7 +96,7 @@ Object {
       "at": 0,
       "constant": Object {
         "attr": undefined,
-        "identifiers": Array [],
+        "identifiers": undefined,
         "name": "QUAD",
         "type": "array<vec2<i32>, 4>",
         "value": "array<vec2<i32>, 4>(
@@ -241,7 +241,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": Array [
         Object {
           "at": -1,
@@ -272,7 +272,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "x",
       "qual": undefined,
       "type": "f32",
@@ -287,7 +287,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "y",
       "qual": undefined,
       "type": "f32",
@@ -300,7 +300,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "a",
       "type": "i32",
       "value": "3",
@@ -320,7 +320,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": undefined,
       "name": "getPosition",
       "parameters": Array [
@@ -341,7 +341,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": undefined,
       "name": "getColor",
       "parameters": Array [
@@ -362,7 +362,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": undefined,
       "name": "getSize",
       "parameters": Array [
@@ -383,7 +383,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": undefined,
       "name": "getDepth",
       "parameters": Array [
@@ -512,7 +512,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getPosition",
         "parameters": Array [
@@ -533,7 +533,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getColor",
         "parameters": Array [
@@ -554,7 +554,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getSize",
         "parameters": Array [
@@ -575,7 +575,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getDepth",
         "parameters": Array [
@@ -662,7 +662,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getPosition",
         "parameters": Array [
@@ -683,7 +683,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getColor",
         "parameters": Array [
@@ -704,7 +704,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getSize",
         "parameters": Array [
@@ -725,7 +725,7 @@ Object {
         "attr": Array [
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getDepth",
         "parameters": Array [
@@ -816,22 +816,22 @@ Array [
   Array [
     0,
     Array [
-      "QUAD",
-      "getQuadIndex",
-      "getQuadUV",
+      0,
+      1,
+      2,
     ],
   ],
   Array [
     137,
     Array [
-      "getQuadIndex",
-      "getQuadUV",
+      1,
+      2,
     ],
   ],
   Array [
     215,
     Array [
-      "getQuadUV",
+      2,
     ],
   ],
 ]
@@ -842,35 +842,35 @@ Array [
   Array [
     183,
     Array [
-      "getPosition",
-      "getQuadVertex",
+      0,
+      4,
     ],
   ],
   Array [
     229,
     Array [
-      "getColor",
-      "getQuadVertex",
+      1,
+      4,
     ],
   ],
   Array [
     272,
     Array [
-      "getSize",
-      "getQuadVertex",
+      2,
+      4,
     ],
   ],
   Array [
     314,
     Array [
-      "getDepth",
-      "getQuadVertex",
+      3,
+      4,
     ],
   ],
   Array [
     352,
     Array [
-      "getQuadVertex",
+      4,
     ],
   ],
 ]
@@ -881,13 +881,13 @@ Array [
   Array [
     1,
     Array [
-      "SolidVertex",
+      0,
     ],
   ],
   Array [
     94,
     Array [
-      "MeshVertex",
+      1,
     ],
   ],
 ]
@@ -898,37 +898,37 @@ Array [
   Array [
     7,
     Array [
-      "x",
-      "getFloat2",
-      "main",
+      0,
+      3,
+      4,
     ],
   ],
   Array [
     26,
     Array [
-      "y",
-      "getFloat2",
-      "main",
+      1,
+      3,
+      4,
     ],
   ],
   Array [
     52,
     Array [
-      "getFloat1",
-      "main",
+      2,
+      4,
     ],
   ],
   Array [
     100,
     Array [
-      "getFloat2",
-      "main",
+      3,
+      4,
     ],
   ],
   Array [
     163,
     Array [
-      "main",
+      4,
     ],
   ],
 ]
@@ -943,7 +943,7 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": undefined,
       "name": "getFragment",
       "parameters": Array [
@@ -1016,7 +1016,7 @@ Object {
         "attr": Array [
           "export",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "name": "x",
         "qual": undefined,
         "type": "f32",
@@ -1029,7 +1029,7 @@ Object {
       "symbol": "y",
       "variable": Object {
         "attr": undefined,
-        "identifiers": Array [],
+        "identifiers": undefined,
         "name": "y",
         "qual": undefined,
         "type": "f32",
@@ -1040,7 +1040,7 @@ Object {
       "at": 44,
       "constant": Object {
         "attr": undefined,
-        "identifiers": Array [],
+        "identifiers": undefined,
         "name": "a",
         "type": "i32",
         "value": "3",
@@ -1062,7 +1062,7 @@ Object {
       "at": 94,
       "constant": Object {
         "attr": undefined,
-        "identifiers": Array [],
+        "identifiers": undefined,
         "name": "b",
         "type": "i32",
         "value": undefined,
@@ -1099,7 +1099,7 @@ Object {
       "at": 218,
       "constant": Object {
         "attr": undefined,
-        "identifiers": Array [],
+        "identifiers": undefined,
         "name": "QUAD",
         "type": "array<vec2<i32>, 4>",
         "value": "array<vec2<i32>, 4>(
@@ -1120,7 +1120,7 @@ Object {
           "optional",
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getInt",
         "parameters": undefined,
@@ -1135,7 +1135,7 @@ Object {
         "attr": Array [
           "export",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "main",
         "parameters": undefined,
@@ -1153,7 +1153,7 @@ Object {
         "attr": Array [
           "export",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "name": "x",
         "qual": undefined,
         "type": "f32",
@@ -1192,7 +1192,7 @@ Object {
         "attr": Array [
           "export",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "main",
         "parameters": undefined,
@@ -1210,7 +1210,7 @@ Object {
           "optional",
           "link",
         ],
-        "identifiers": Array [],
+        "identifiers": undefined,
         "inferred": undefined,
         "name": "getInt",
         "parameters": undefined,
@@ -1249,7 +1249,7 @@ Array [
     "at": 0,
     "constant": Object {
       "attr": undefined,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "QUAD",
       "type": "array<vec2<i32>, 4>",
       "value": "array<vec2<i32>, 4>(
@@ -1274,7 +1274,7 @@ Array [
       "attr": Array [
         "export",
       ],
-      "identifiers": Array [],
+      "identifiers": undefined,
       "inferred": undefined,
       "name": "main",
       "parameters": undefined,
@@ -1416,7 +1416,7 @@ Array [
     "symbol": "x",
     "variable": Object {
       "attr": undefined,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "x",
       "qual": undefined,
       "type": "f32",
@@ -1429,7 +1429,7 @@ Array [
     "symbol": "y",
     "variable": Object {
       "attr": undefined,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "y",
       "qual": undefined,
       "type": "f32",
@@ -1440,7 +1440,7 @@ Array [
     "at": 36,
     "constant": Object {
       "attr": undefined,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "a",
       "type": "i32",
       "value": "3",
@@ -1462,7 +1462,7 @@ Array [
     "at": 86,
     "constant": Object {
       "attr": undefined,
-      "identifiers": Array [],
+      "identifiers": undefined,
       "name": "b",
       "type": "i32",
       "value": undefined,
@@ -2371,227 +2371,227 @@ Array [
 exports[`ast rewrites a lot of code using the compressed AST 1`] = `
 Array [
   Array [
-    "K",
+    1,
     1,
     31,
   ],
   Array [
-    "K",
+    1,
     33,
     47,
   ],
   Array [
-    "K",
+    1,
     16,
     68,
   ],
   Array [
-    "S",
+    0,
     53,
     231,
   ],
   Array [
-    "I",
+    2,
     9,
     21,
   ],
   Array [
-    "A",
+    3,
     17,
     25,
   ],
   Array [
-    "I",
+    2,
     1,
     8,
   ],
   Array [
-    "I",
+    2,
     8,
     16,
   ],
   Array [
-    "A",
+    3,
     23,
     35,
   ],
   Array [
-    "I",
+    2,
     1,
     9,
   ],
   Array [
-    "I",
+    2,
     12,
     21,
   ],
   Array [
-    "A",
+    3,
     24,
     36,
   ],
   Array [
-    "I",
+    2,
     1,
     9,
   ],
   Array [
-    "I",
+    2,
     12,
     18,
   ],
   Array [
-    "A",
+    3,
     21,
     33,
   ],
   Array [
-    "I",
+    2,
     1,
     9,
   ],
   Array [
-    "A",
+    3,
     12,
     30,
   ],
   Array [
-    "I",
+    2,
     1,
     12,
   ],
   Array [
-    "I",
+    2,
     12,
     16,
   ],
   Array [
-    "I",
+    2,
     6,
     15,
   ],
   Array [
-    "S",
+    0,
     20,
     298,
   ],
   Array [
-    "A",
+    3,
     0,
     7,
   ],
   Array [
-    "I",
+    2,
     1,
     7,
   ],
   Array [
-    "I",
+    2,
     10,
     14,
   ],
   Array [
-    "A",
+    3,
     8,
     30,
   ],
   Array [
-    "I",
+    2,
     1,
     8,
   ],
   Array [
-    "I",
+    2,
     8,
     20,
   ],
   Array [
-    "I",
+    2,
     14,
     25,
   ],
   Array [
-    "A",
+    3,
     20,
     44,
   ],
   Array [
-    "I",
+    2,
     1,
     8,
   ],
   Array [
-    "I",
+    2,
     8,
     22,
   ],
   Array [
-    "I",
+    2,
     16,
     29,
   ],
   Array [
-    "I",
+    2,
     25,
     37,
   ],
   Array [
-    "I",
+    2,
     18,
     29,
   ],
   Array [
-    "I",
+    2,
     16,
     25,
   ],
   Array [
-    "I",
+    2,
     10,
     21,
   ],
   Array [
-    "I",
+    2,
     13,
     26,
   ],
   Array [
-    "I",
+    2,
     26,
     38,
   ],
   Array [
-    "I",
+    2,
     18,
     19,
   ],
   Array [
-    "I",
+    2,
     2,
     10,
   ],
   Array [
-    "I",
+    2,
     14,
     15,
   ],
   Array [
-    "I",
+    2,
     2,
     7,
   ],
   Array [
-    "I",
+    2,
     11,
     12,
   ],
   Array [
-    "I",
+    2,
     2,
     4,
   ],
   Array [
-    "I",
+    2,
     12,
     25,
   ],
@@ -2647,67 +2647,67 @@ exports[`ast rewrites code using the AST 1`] = `
 exports[`ast rewrites code using the compressed AST 1`] = `
 Array [
   Array [
-    "S",
+    0,
     0,
     35,
   ],
   Array [
-    "I",
+    2,
     8,
     16,
   ],
   Array [
-    "I",
+    2,
     9,
     14,
   ],
   Array [
-    "S",
+    0,
     19,
     167,
   ],
   Array [
-    "I",
+    2,
     8,
     12,
   ],
   Array [
-    "I",
+    2,
     32,
     33,
   ],
   Array [
-    "I",
+    2,
     19,
     20,
   ],
   Array [
-    "I",
+    2,
     4,
     12,
   ],
   Array [
-    "I",
+    2,
     23,
     24,
   ],
   Array [
-    "I",
+    2,
     25,
     26,
   ],
   Array [
-    "I",
+    2,
     3,
     4,
   ],
   Array [
-    "I",
+    2,
     22,
     23,
   ],
   Array [
-    "I",
+    2,
     2,
     5,
   ],
@@ -2737,21 +2737,21 @@ Array [
   Array [
     0,
     Array [
-      "x",
-      "getA",
-      "getB",
+      0,
+      1,
+      2,
     ],
   ],
   Array [
     22,
     Array [
-      "getA",
+      1,
     ],
   ],
   Array [
     64,
     Array [
-      "getB",
+      2,
     ],
   ],
 ]
@@ -2773,74 +2773,74 @@ Array [
   Array [
     0,
     Array [
-      "ViewUniforms",
-      "viewUniforms",
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "getPerspectiveScale",
+      0,
+      1,
+      2,
+      4,
+      7,
+      3,
+      5,
+      6,
+      8,
     ],
   ],
   Array [
     212,
     Array [
-      "viewUniforms",
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "getPerspectiveScale",
+      1,
+      2,
+      4,
+      7,
+      3,
+      5,
+      6,
+      8,
     ],
   ],
   Array [
     290,
     Array [
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
+      2,
+      4,
+      7,
     ],
   ],
   Array [
     397,
     Array [
-      "viewToClip",
-      "worldToClip",
-      "worldToClip3D",
+      3,
+      4,
+      7,
     ],
   ],
   Array [
     509,
     Array [
-      "worldToClip",
+      4,
     ],
   ],
   Array [
     615,
     Array [
-      "clipToScreen3D",
+      5,
     ],
   ],
   Array [
     749,
     Array [
-      "screenToClip3D",
+      6,
     ],
   ],
   Array [
     889,
     Array [
-      "worldToClip3D",
+      7,
     ],
   ],
   Array [
     1026,
     Array [
-      "getPerspectiveScale",
+      8,
     ],
   ],
 ]
@@ -2880,74 +2880,74 @@ Array [
   Array [
     0,
     Array [
-      "ViewUniforms",
-      "viewUniforms",
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "getPerspectiveScale",
+      0,
+      1,
+      2,
+      4,
+      7,
+      3,
+      5,
+      6,
+      8,
     ],
   ],
   Array [
     212,
     Array [
-      "viewUniforms",
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
-      "viewToClip",
-      "clipToScreen3D",
-      "screenToClip3D",
-      "getPerspectiveScale",
+      1,
+      2,
+      4,
+      7,
+      3,
+      5,
+      6,
+      8,
     ],
   ],
   Array [
     290,
     Array [
-      "worldToView",
-      "worldToClip",
-      "worldToClip3D",
+      2,
+      4,
+      7,
     ],
   ],
   Array [
     397,
     Array [
-      "viewToClip",
-      "worldToClip",
-      "worldToClip3D",
+      3,
+      4,
+      7,
     ],
   ],
   Array [
     509,
     Array [
-      "worldToClip",
+      4,
     ],
   ],
   Array [
     615,
     Array [
-      "clipToScreen3D",
+      5,
     ],
   ],
   Array [
     749,
     Array [
-      "screenToClip3D",
+      6,
     ],
   ],
   Array [
     889,
     Array [
-      "worldToClip3D",
+      7,
     ],
   ],
   Array [
     1026,
     Array [
-      "getPerspectiveScale",
+      8,
     ],
   ],
 ]

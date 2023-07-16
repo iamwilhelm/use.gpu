@@ -211,9 +211,11 @@ Program                                                     ⮐ const foo: f32 =
             Add                                             +
             IntLiteral                                      5
             Add                                             +
-            IntLiteral                                      -6
+            Sub                                             -
+            IntLiteral                                      6
             Add                                             +
-            IntLiteral                                      -7
+            Sub                                             -
+            IntLiteral                                      7
         Statement                                           return vec4<f32>(0.1, 0.2, 0.3, 1.0);
           Keyword                                           return
           TypeDeclaration                                   vec4<f32>

@@ -42,7 +42,7 @@ export const ShadowRender: LiveComponent<ShadowRenderProps> = (props: ShadowRend
   const fragmentShader = defines?.HAS_DEPTH ? instanceFragmentDepthDepth : instanceFragmentDepth;
 
   const pipeline = useOne(() => patch(propPipeline, {
-    multisample: { count: 1 },
+    multisample: { count: 1, alphaToCoverageEnabled: false },
     fragment: { targets: [] },
   }), propPipeline);
 

@@ -123,9 +123,12 @@ fn trimAnchor(
     var endIndex = trim.y;
     var midIndex = (startIndex + endIndex) / 2u;
 
-    var startPos = getPosition(startIndex);
+    var startPos = centerPos;
     var midPos = getPosition(midIndex);
-    var endPos = getPosition(endIndex);
+    var endPos = centerPos;
+
+    if (startIndex != cornerIndex) { startPos = getPosition(startIndex); }
+    if (endIndex != cornerIndex) { endPos = getPosition(endIndex); }
 
     let maxLength = length(endPos.xyz - midPos.xyz) + length(midPos.xyz - startPos.xyz);
 

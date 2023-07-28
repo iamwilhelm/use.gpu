@@ -7,11 +7,11 @@ import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, use
 import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/workbench';
 import { makeDynamicTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
 
-import { toScene, toNode, toMesh, toMaterial } from './parse';
+import { parseBinaryGLTF, parseTextGLTF, toScene, toNode, toMesh, toMaterial } from './parse';
 import { generateTangents } from 'mikktspace';
 
-const GLTF_MAGIC = 0x46546C67;
 const STORAGE_ALIGNMENT = 256;
+const SIZE_ALIGNMENT = 16;
 const NO_BINDINGS: any[] = [];
 const NO_SAMPLER: any = {};
 
@@ -25,7 +25,14 @@ export type GLTFDataProps = {
   render?: (gltf: GLTF) => LiveElement,
 };
 
+type ParsedGLTF = {
+  json: any,
+  bin?: ArrayBuffer,
+};
+
 const resolveURL = (base: string, url: string) => new URL(url, base).href;
+
+const alignTo = (size: number, align: number) => Math.ceil(size / align) * align;
 
 export const GLTFData: LC<GLTFDataProps> = (props) => {
   const device = useContext(DeviceContext);
@@ -43,30 +50,28 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
   const Resume = ([data]: any[]) => {
 
     // Extract JSON
-    const json = useOne(() => {
+    const parsed = useOne((): ParsedGLTF | null => {
       try {
-        if (typeof data === 'string') return JSON.parse(data);
-
-        if (data instanceof ArrayBuffer) {
-          const u32 = new Uint32Array(data.slice(0, 4));
-          if (u32[0] === GLTF_MAGIC) throw new Error("binary gltf unimplemented");
-
-          return JSON.parse(new TextDecoder().decode(data));
-        }
-        return data;
+        if (typeof data === 'string') return {json: JSON.parse(data)};
+        if (data instanceof ArrayBuffer) return parseBinaryGLTF(data) || parseTextGLTF(data);
+        return {json: data};
       } catch (e) {
         console.error(e)
         return null;
       }
     }, data);
-    if (!json) return null;
+    if (!parsed) return null;
 
     // Parse JSON into native types
+    const {json, bin} = parsed;
     const {gltf, buffers, images, bufferAssets, imageAssets} = useOne(() => {
+      const version = json?.asset?.version;
+      if (version != null && parseFloat(version) !== 2) throw new Error(`Unsupported GLTF version '${version}'`);
+
       const buffers = (json?.buffers ?? []) as GLTFBufferData[];
       const images  = (json?.images ?? []) as GLTFImageData[];
 
-      const bufferAssets = buffers.filter(({uri}) => uri != null);
+      const bufferAssets = buffers.filter(({uri}, i) => (uri != null) || i === 0);
       const imageAssets  = images.filter(({uri}) => uri != null);
 
       const scenes:    GLTFSceneData    = (json?.scenes    ?? []).map(toScene);
@@ -129,6 +134,8 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
           // If GLTF alignment is too loose, slice and re-upload.
           if (byteOffset != null && ((byteOffset % STORAGE_ALIGNMENT) !== 0)) {
+            if (byteLength != null) byteLength = Math.min(arrayBuffer.byteLength - byteOffset, alignTo(byteLength, SIZE_ALIGNMENT));
+
             const arraySlice = arrayBuffer.slice(byteOffset, byteLength != null ? byteOffset + byteLength : undefined);
             const b = makeStorageBuffer(device, arraySlice);
 
@@ -137,6 +144,9 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             byteOffset = 0;
 
             arrayBuffer = arraySlice;
+          }
+          else {
+            if (byteLength != null) byteLength = Math.min(arrayBuffer.byteLength, alignTo(byteLength, SIZE_ALIGNMENT));
           }
 
           return {
@@ -259,11 +269,11 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
     return bufferAssets.length + imageAssets.length ? (
       gather(use(Throttle, [
 
-        ...bufferAssets.map(({uri}) => uri ? use(Fetch, {
+        ...bufferAssets.map(({uri}, i) => uri ? use(Fetch, {
           url: resolveURL(base, uri),
           type: 'arrayBuffer',
           loading: null,
-        }) : yeet(null)),
+        }) : yeet(i === 0 ? bin : null)),
 
         ...imageAssets.map(({uri}) => uri ? use(Fetch, {
           url: resolveURL(base, uri),

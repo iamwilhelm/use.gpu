@@ -58,7 +58,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   if (indices    != null) faces.indices   = storage[indices];
 
   // Generate mikkTSpace tangents
-  if (faces.positions && faces.normals && faces.uvs && !faces.tangents) {
+  if (TANGENT != null && (faces.positions && faces.normals && faces.uvs && !faces.tangents)) {
     let ps = gltf.bound.data[POSITION];
     let ns = gltf.bound.data[NORMAL];
     let ts = gltf.bound.data[TEXCOORD_0];

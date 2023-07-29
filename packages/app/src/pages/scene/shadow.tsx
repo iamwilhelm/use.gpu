@@ -21,7 +21,7 @@ import {
 const SHADOW_MAP_DIRECTIONAL = {
   size: [2048, 2048],
   span: [50, 50],
-  depth: [0, 250],
+  depth: [0, 100],
   bias: [1/2048, 1/32],
   blur: 4,
 };
@@ -43,11 +43,6 @@ const sampler = {
 const boxGeometry = makeBoxGeometry({ width: 2 });
 const planeGeometry = makePlaneGeometry({ width: 100, height: 100, axes: 'xz' });
 const sphereGeometry = makeSphereGeometry({ width: 2, tile: [6, 3] });
-
-const lightFields = [
-  ['vec4<f32>', 'position'],
-  ['vec4<f32>', 'color'],
-] as [UniformType, string][];
 
 const lightData = [
   {
@@ -91,9 +86,9 @@ export const SceneShadowPage: LC = (props) => {
             <Camera>
               <Pass lights shadows>
                 <AmbientLight intensity={0.25} />
-                <DirectionalLight position={lightData[0].position} intensity={1}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
-                <DirectionalLight position={lightData[1].position} intensity={0.5} color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} />
-                <PointLight       position={lightData[2].position} intensity={100} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} />
+                <DirectionalLight position={lightData[0].position} intensity={1}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} debug />
+                <DirectionalLight position={lightData[1].position} intensity={0.5} color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} debug />
+                <PointLight       position={lightData[2].position} intensity={100} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} debug />
 
                 <Scene>
 
@@ -141,14 +136,6 @@ export const SceneShadowPage: LC = (props) => {
                   </PBRMaterial>
               
                 </Scene>
-
-                <Data
-                  fields={lightFields}
-                  data={lightData}
-                  render={(positions: StorageSource, colors: StorageSource) => (
-                    <PointLayer positions={positions} colors={colors} size={50} depth={0.5} />
-                  )}
-                />
 
               </Pass>
             </Camera>

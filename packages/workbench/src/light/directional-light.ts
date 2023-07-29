@@ -3,7 +3,7 @@ import type { ColorLike, VectorLike } from '@use-gpu/traits';
 import type { ShadowMapLike } from './types';
 
 import { optional, parseColor, parseNumber, parsePosition, parseVec2, parseVec3, useProp } from '@use-gpu/traits';
-import { memo, useMemo, useOne } from '@use-gpu/live';
+import { memo, use, useMemo, useOne } from '@use-gpu/live';
 
 import { useLightContext } from '../providers/light-provider';
 import { useMatrixContext } from '../providers/matrix-provider';
@@ -11,6 +11,9 @@ import { useMatrixContext } from '../providers/matrix-provider';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 
 import { DIRECTIONAL_LIGHT } from './types';
+import { PointHelper } from '../helpers/point-helper';
+import { VectorHelper } from '../helpers/vector-helper';
+import { AABBHelper } from '../helpers/aabb-helper';
 
 export type DirectionalLightProps = {
   position?: VectorLike,
@@ -18,6 +21,7 @@ export type DirectionalLightProps = {
   color?: ColorLike,
   intensity?: number,
   shadowMap?: ShadowMapLike,
+  debug?: boolean,
 };
 
 const DEFAULT_DIRECTION = vec3.fromValues(1, 3, 2);
@@ -49,8 +53,8 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
   const {shadowMap} = props;
   const parent = useMatrixContext();
 
-  const [into, shadow] = useMemo(() => {
-    if (!shadowMap) return [null, null];
+  const [into, shadow, near, far] = useMemo(() => {
+    if (!shadowMap) return [null, null, 0, 0];
 
     const size  = parseVec2(shadowMap.size  ?? DEFAULT_SHADOW_MAP.size);
     const depth = parseVec2(shadowMap.depth ?? DEFAULT_SHADOW_MAP.depth);
@@ -84,7 +88,7 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
     matrix[14] += far / (far - near);
 
     const shadow = {type: 'ortho', size, depth, bias, blur};
-    return [matrix, shadow];
+    return [matrix, shadow, near, far];
   }, [position, normal, shadowMap, parent]);
 
   const light = useMemo(() => {
@@ -112,5 +116,16 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
   const {useLight} = useLightContext();
   useLight(light);
 
-  return null;
+  if (!props.debug) return;
+
+  return [
+    use(PointHelper, { position, color }),
+    use(VectorHelper, { position, tangent: normal, color, length: far || 100 }),
+    shadow ? use(AABBHelper, {
+      into,
+      min: [-1, -1, 0],
+      max: [1, 1, 1],
+      color
+    }) : null,
+  ];
 }, 'DirectionalLight');

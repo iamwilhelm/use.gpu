@@ -2,8 +2,8 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 import { memo, use, useOne } from '@use-gpu/live';
 
-import { ArrowSegments } from './arrow-segments';
-import { ArrowLayer } from './arrow-layer';
+import { ArrowSegments } from '../layers/arrow-segments';
+import { ArrowLayer } from '../layers/arrow-layer';
 
 import { useRawSource } from '../hooks/useRawSource';
 

@@ -1,5 +1,3 @@
-export * from './axis-helper';
-
 export * from './arrow-segments';
 export * from './face-segments';
 export * from './line-segments';

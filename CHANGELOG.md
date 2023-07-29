@@ -1,3 +1,8 @@
+0.9.4
+- `@use-gpu/gltf`: `.glb` binary GLTF support
+- `@use-gpu/workbench`: Add point/vector/AABB helpers for debug viz
+- `@use-gpu/workbench`: Add `debug` flag to lights to visualize lights/frustums
+
 0.9.3
 - `@use-gpu/glyph`: Support loading emoji PNGs on-demand
 - `@use-gpu/layout`: Add `aspect` to elements for sizing w/h relative to each other

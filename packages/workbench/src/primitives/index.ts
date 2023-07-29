@@ -1,3 +1,4 @@
+export * from './geometry/aabb';
 export * from './geometry/arrow';
 export * from './geometry/box';
 export * from './geometry/plane';

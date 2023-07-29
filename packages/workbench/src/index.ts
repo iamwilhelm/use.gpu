@@ -5,6 +5,7 @@ export * from './data';
 export * from './hooks';
 export * from './layers';
 export * from './light';
+export * from './helpers';
 export * from './interact';
 export * from './material';
 export * from './primitives';

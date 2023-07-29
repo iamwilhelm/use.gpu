@@ -3,7 +3,7 @@ import type { ColorLike, VectorLike } from '@use-gpu/traits';
 import type { ShadowMapLike } from './types';
 
 import { parseColor, parseNumber, parseMatrix, parsePosition, parseVec2, useProp } from '@use-gpu/traits';
-import { memo, useMemo } from '@use-gpu/live';
+import { memo, use, useMemo } from '@use-gpu/live';
 
 import { useLightContext } from '../providers/light-provider';
 import { useMatrixContext } from '../providers/matrix-provider';
@@ -11,6 +11,7 @@ import { useMatrixContext } from '../providers/matrix-provider';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 
 import { POINT_LIGHT } from './types';
+import { PointHelper } from '../helpers/point-helper';
 
 export type PointLightProps = {
   position?: VectorLike,
@@ -18,6 +19,7 @@ export type PointLightProps = {
   intensity?: number,
   cutoff?: number,
   shadowMap?: ShadowMapLike,
+  debug?: boolean,
 };
 
 const DEFAULT_SHADOW_MAP = {
@@ -76,5 +78,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
   const {useLight} = useLightContext();
   useLight(light);
 
-  return null;
+  if (!props.debug) return;
+
+  return use(PointHelper, { position, color });
 }, 'PointLight');

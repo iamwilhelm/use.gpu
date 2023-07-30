@@ -12,7 +12,7 @@ struct ViewUniforms {
   viewPixelRatio: f32,
 };
 
-@export @group(VIEW) @binding(0) var<uniform> viewUniforms: ViewUniforms;
+@export @group(GLOBAL) @binding(0) var<uniform> viewUniforms: ViewUniforms;
 
 @export fn getViewPosition() -> vec4<f32> { return viewUniforms.viewPosition; }
 @export fn getViewResolution() -> vec2<f32> { return viewUniforms.viewResolution; }

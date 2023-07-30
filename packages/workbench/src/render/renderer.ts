@@ -15,7 +15,7 @@ import { ReadbackPass } from '../pass/readback-pass';
 import { ShadowPass } from '../pass/shadow-pass';
 
 export type RendererProps = {
-  lights?: boolean,
+  entries?: GPUBindGroupLayoutEntry[],
   overlay?: boolean,
   merge?: boolean,
 
@@ -28,7 +28,7 @@ const HOVERED_VARIANT = 'debug';
 
 export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<RendererProps>) => {
   const {
-    lights = false,
+    entries = [],
     overlay = false,
     merge = false,
 
@@ -44,20 +44,10 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
     const {shadow, picking} = buffers;
 
     // Prepare shared bind group for forward/deferred lighting
-    const entries: GPUBindGroupLayoutEntry[] = [];
-    if (lights) entries.push({binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: {type: 'read-only-storage'}});
-    if (shadow) {
-      entries.push({binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {viewDimension: '2d-array', sampleType: 'depth'}});
-      entries.push({binding: 2, visibility: GPUShaderStage.FRAGMENT, sampler: {type: 'comparison'}});
-    }
-
     const layout = makeBindGroupLayout(device, entries);
-    const bind = (storage?: StorageSource, texture?: TextureSource) => {
-      const bindings = [];
-      if (storage) bindings.push({storage});
-      if (shadow && texture) bindings.push({texture});
-
-      const entries = makeDataBindingsEntries(device, bindings);
+    const bind = (args: any[]) => {
+      console.log({args})
+      const entries = makeDataBindingsEntries(device, args);
       const bindGroup = makeBindGroup(device, layout, entries);
 
       return (passEncoder: GPURenderPassEncoder) => {
@@ -67,7 +57,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
 
     // Provide draw call variants for sub-passes
     const getRender = (mode: string, render: string | null = null) =>
-      components.modes[mode] ?? components.renders[render!][mode];
+      components.modes[mode] ?? components.renders[render!]?.[mode];
 
     const getVariants = (!shadow && !picking)
        ? (virtual: VirtualDraw, hovered: boolean) =>
@@ -93,7 +83,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
     return {useVariants, buffers, layout, bind};
-  }, [device, buffers]);
+  }, [device, buffers, entries]);
 
   // Pass aggregrated calls to pass runners
   const Resume = (

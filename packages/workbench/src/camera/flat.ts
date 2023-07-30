@@ -77,19 +77,19 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
   }, [scale, width, height, pixelRatio]);
 
   const uniforms = useOne(() => ({
-    projectionMatrix: { current: null },
-    projectionViewMatrix: { current: null },
-    projectionViewFrustum: { current: null },
+    projectionMatrix: { current: null as any },
+    projectionViewMatrix: { current: null as any },
+    projectionViewFrustum: { current: null as any },
     inverseViewMatrix: { current: mat4.create() },
     inverseProjectionViewMatrix: { current: mat4.create() },
     viewMatrix: { current: mat4.create() },
-    viewPosition: { current: null },
-    viewNearFar: { current: null },
-    viewResolution: { current: null },
-    viewSize: { current: null },
-    viewWorldDepth: { current: null },
-    viewPixelRatio: { current: null },
-  })) as any as ViewUniforms;
+    viewPosition: { current: null as any },
+    viewNearFar: { current: null as any },
+    viewResolution: { current: null as any },
+    viewSize: { current: null as any },
+    viewWorldDepth: { current: null as any },
+    viewPixelRatio: { current: null as any },
+  })) as ViewUniforms;
 
   const panned = useMemo(() => {
     if (!x && !y && (zoom == 1)) return matrix;

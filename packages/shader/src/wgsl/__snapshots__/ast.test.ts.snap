@@ -91,6 +91,7 @@ Array [
 
 exports[`ast gets geometry quad symbol table 1`] = `
 Object {
+  "bindings": undefined,
   "declarations": Array [
     Object {
       "at": 0,
@@ -504,6 +505,7 @@ Array [
 
 exports[`ast gets quad vertex symbol table 1`] = `
 Object {
+  "bindings": undefined,
   "declarations": Array [
     Object {
       "at": 183,
@@ -1007,6 +1009,7 @@ Array [
 
 exports[`ast gets symbol table 1`] = `
 Object {
+  "bindings": undefined,
   "declarations": Array [
     Object {
       "at": 7,
@@ -1475,6 +1478,7 @@ Array [
 
 exports[`ast gets use types symbol table 1`] = `
 Object {
+  "bindings": undefined,
   "declarations": Array [
     Object {
       "at": 1,
@@ -1666,7 +1670,7 @@ Array [
   },
   Object {
     "at": 212,
-    "flags": 1,
+    "flags": 33,
     "symbol": "viewUniforms",
     "variable": Object {
       "attr": Array [
@@ -1875,6 +1879,27 @@ Array [
 
 exports[`ast gets use view symbol table 1`] = `
 Object {
+  "bindings": Array [
+    Object {
+      "at": 212,
+      "flags": 33,
+      "symbol": "viewUniforms",
+      "variable": Object {
+        "attr": Array [
+          "export",
+          "group(VIEW)",
+          "binding(VIEW)",
+        ],
+        "identifiers": Array [
+          "ViewUniforms",
+        ],
+        "name": "viewUniforms",
+        "qual": "<uniform>",
+        "type": "ViewUniforms",
+        "value": undefined,
+      },
+    },
+  ],
   "declarations": Array [
     Object {
       "at": 0,
@@ -1924,7 +1949,7 @@ Object {
     },
     Object {
       "at": 212,
-      "flags": 1,
+      "flags": 33,
       "symbol": "viewUniforms",
       "variable": Object {
         "attr": Array [
@@ -2113,7 +2138,7 @@ Object {
   "exports": Array [
     Object {
       "at": 212,
-      "flags": 1,
+      "flags": 33,
       "symbol": "viewUniforms",
       "variable": Object {
         "attr": Array [

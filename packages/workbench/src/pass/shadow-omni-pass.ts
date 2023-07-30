@@ -7,12 +7,12 @@ import { mat4, vec3 } from 'gl-matrix';
 import { use, quote, yeet, wrap, memo, useMemo, useOne } from '@use-gpu/live';
 import {
   makeDepthStencilAttachments, makeFrustumPlanes, makeGlobalUniforms, makeOrthogonalMatrix, makeTexture, uploadBuffer,
+  VIEW_UNIFORMS,
 } from '@use-gpu/core';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
 import { usePassContext } from '../providers/pass-provider';
-import { useViewContext } from '../providers/view-provider';
 
 import { useFrustumCuller } from '../hooks/useFrustumCuller';
 import { useInspectable } from '../hooks/useInspectable';
@@ -94,29 +94,29 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
 
   const device = useDeviceContext();
   const {buffers: {shadow: [renderContext]}} = usePassContext();
-  const {defs, uniforms: viewUniforms} = useViewContext();
 
   const shadows = toArray(calls['shadow'] as Renderable[]);
 
   const binding = useMemo(() =>
-    makeGlobalUniforms(device, [defs]),
-    [device, defs]);
+    makeGlobalUniforms(device, [VIEW_UNIFORMS]),
+    [device]);
 
   const {bindGroup, buffer, pipe} = binding;
 
-  const uniforms = useOne(() => ({
-    ...viewUniforms,
+  const uniforms: ViewUniforms = useOne(() => ({
     projectionMatrix: { current: mat4.fromValues(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1) },
     projectionViewMatrix: { current: mat4.create() },
-    projectionViewFrustum: { current: null },
+    projectionViewFrustum: { current: null as any },
+    inverseViewMatrix: { current: mat4.create() },
+    inverseProjectionViewMatrix: { current: mat4.create() },
     viewMatrix: { current: mat4.create() },
-    viewPosition: { current: [0, 0] },
-    viewNearFar: { current: [0, 0] },
-    viewResolution: { current: [0, 0] },
-    viewSize: { current: [0, 0] },
-    viewWorldDepth: { current: 1 },
+    viewPosition: { current: null as any },
+    viewNearFar: { current: null as any },
+    viewResolution: { current: null as any },
+    viewSize: { current: null as any },
+    viewWorldDepth: { current: [1, 1] },
     viewPixelRatio: { current: 1 },
-  }), viewUniforms) as any as ViewUniforms;
+  }));
 
   const {viewPosition, projectionViewFrustum} = uniforms;
   const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
@@ -174,12 +174,9 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   }, depth);
 
   uniforms.projectionMatrix.current = projectionMatrix;
-  uniforms.viewMatrix.current = mat4.create();
   uniforms.viewNearFar.current = [ near, far ];
   uniforms.viewResolution.current = [ 1 / width, 1 / height ];
   uniforms.viewSize.current = [ width, height ];
-  uniforms.viewWorldDepth.current = [1, 1];
-  uniforms.viewPixelRatio.current = 1;
 
   const border = Math.max(1, Math.min(4, shadowBlur || 1));
   const scaleRef = useShaderRef([width / (width - border * 2), height / (height - border * 2)]);

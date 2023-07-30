@@ -3,6 +3,7 @@ import type { UseGPURenderContext } from '@use-gpu/core';
 import type { LightEnv, RenderComponents, VirtualDraw } from '../pass/types';
 
 import { use, yeet, memo, useMemo, useOne } from '@use-gpu/live';
+import { extractBindings } from '@use-gpu/shader/wgsl';
 
 import { DebugRender } from './forward/debug';
 import { PickingRender } from './forward/picking';
@@ -20,6 +21,9 @@ import { DeferredUIRender } from './deferred/ui';
 import { Renderer } from './renderer';
 import { LightRender } from './light/light';
 import { LightMaterial } from './light/light-material';
+
+import lightBinding from '@use-gpu/wgsl/use/light.wgsl';
+import shadowBinding from '@use-gpu/wgsl/use/shadow.wgsl';
 
 const DEFAULT_PASSES = [
   use(DeferredPass, {}),
@@ -78,5 +82,12 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
       ], [light, shadows]),
   });
 
-  return Renderer({ buffers, children: view, components, passes, lights: true, overlay, merge });
+  // Prepare bind group layout for lighting/shadows
+  const entries = useMemo(() => {
+    const vertex   = [lightBinding];
+    const fragment = [lightBinding, shadows && shadowBinding];
+    return extractBindings([vertex, fragment], 'PASS');
+  }, [shadows]);
+
+  return Renderer({ buffers, children: view, components, passes, entries, overlay, merge });
 }, 'DeferredRenderer');

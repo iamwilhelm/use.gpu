@@ -29,6 +29,7 @@ export const ShadowBuffer: LC<ShadowBufferProps> = memo((props: PropsWithChildre
     colorStates: [],
     colorAttachments: [],
     depthStencilState: makeDepthStencilState(SHADOW_FORMAT),
+    swap: () => {},
   };
 
   return yeet({ shadow: context });

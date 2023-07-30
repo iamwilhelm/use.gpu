@@ -62,8 +62,13 @@ export const DeferredPass: LC<DeferredPassProps> = memo((props: PropsWithChildre
 
   const bindPass = useOne(() => {
     if (!light || !makeBindPass) return () => {};
-    const {storage, texture} = light;
-    return makeBindPass(storage, texture); 
+    const args = [];
+    if (light) {
+      const {storage, texture} = light;
+      if (storage) args.push({storage});
+      if (texture) args.push({texture});
+    }
+    return makeBindPass(args);
   }, light);
 
   const deferredPassDescriptor = useMemo(() =>

@@ -88,8 +88,7 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
   // Defines
   const toColorSpace = useNativeColor(colorInput, colorSpace);
   const defines = {
-    '@group(VIEW)': '@group(0)',
-    '@binding(VIEW)': '@binding(0)',
+    '@group(GLOBAL)': '@group(0)',
     '@group(LIGHT)': '@group(0)',
     '@binding(LIGHT)': '@binding(1)',
     'PICKING_ID': id,

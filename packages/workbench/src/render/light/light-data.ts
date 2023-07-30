@@ -57,6 +57,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
   const {
     alloc = 1,
     deferred = false,
+    shadows = false,
     render,
     then,
   } = props;
@@ -158,6 +159,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
 
     // Make shadow texture atlas
     const texture = useMemo(() => {
+      if (!shadows) return null;
 
       const atlases = [makeAtlasPage()];
       let [atlas] = atlases;
@@ -228,7 +230,7 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
       } as TextureSource;
       
       return source;
-    }, [device, shadowKey]);
+    }, [device, shadows, shadowKey]);
 
     let needsRefresh = prevDataRef.current !== data;
     prevDataRef.current = data;
@@ -300,7 +302,8 @@ export const LightData: LiveComponent<LightDataProps> = (props: LightDataProps) 
     }
 
     storage.size[0] = storage.length = lightCount + 1;
-    storage.version = texture.version = incrementVersion(storage.version);
+    storage.version = incrementVersion(storage.version);
+    if (texture) texture.version = incrementVersion(texture.version);
 
     queue.length = 0;
     changed.clear();

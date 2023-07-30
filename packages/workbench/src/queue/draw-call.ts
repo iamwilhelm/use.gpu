@@ -54,14 +54,14 @@ export type DrawCallProps = {
 };
 
 const GLOBAL_DEFINES = {
-  '@group(VIEW)': '@group(0)',
+  '@group(GLOBAL)': '@group(0)',
   '@group(VIRTUAL)': '@group(1)',
   '@group(VOLATILE)': '@group(2)',
 };
 
 const PASS_DEFINES = {
-  '@group(VIEW)': '@group(0)',
-  '@group(LIGHT)': '@group(1)',
+  '@group(GLOBAL)': '@group(0)',
+  '@group(PASS)': '@group(1)',
   '@group(VIRTUAL)': '@group(2)',
   '@group(VOLATILE)': '@group(3)',
 };

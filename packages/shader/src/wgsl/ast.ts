@@ -356,13 +356,15 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const isOptional = hasAttribute(ref.attr, 'optional');
     const isGlobal   = hasAttribute(ref.attr, 'global');
     const isInfer    = hasAttribute(ref.attr, 'infer')
+    const isBinding  = hasAttribute(ref.attr, 'group')
 
     return (
       (isExported ? RF.Exported : 0) |
       (isExternal ? RF.External : 0) |
       (isOptional ? RF.Optional : 0) |
       (isGlobal   ? RF.Global   : 0) |
-      (isInfer    ? RF.Infer    : 0)
+      (isInfer    ? RF.Infer    : 0) |
+      (isBinding  ? RF.Binding  : 0)
     );
   }
 
@@ -466,6 +468,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const externals = declarations.filter(d => d.flags & RF.External);
     const exported  = declarations.filter(d => d.flags & RF.Exported);
     const globalled = declarations.filter(d => d.flags & RF.Global);
+    const bound     = declarations.filter(d => d.flags & RF.Binding);
 
     const symbols  = uniq(declarations.map(r => r.symbol));
     const visibles = uniq(exported.map(r => r.symbol));
@@ -493,6 +496,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       modules: orNone(modules),
       externals: orNone(externals),
       exports: orNone(exported),
+      bindings: orNone(bound),
 
       declarations: orNone(declarations),
       linkable: externals.length ? linkable : undefined,

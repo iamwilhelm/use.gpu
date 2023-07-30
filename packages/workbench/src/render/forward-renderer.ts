@@ -2,7 +2,8 @@ import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
 import type { UseGPURenderContext } from '@use-gpu/core';
 import type { LightEnv, RenderComponents } from '../pass/types';
 
-import { use, yeet, memo, useOne } from '@use-gpu/live';
+import { use, yeet, memo, useMemo, useOne } from '@use-gpu/live';
+import { extractBindings } from '@use-gpu/shader/wgsl';
 
 import { DebugRender } from './forward/debug';
 import { ShadedRender } from './forward/shaded';
@@ -15,6 +16,9 @@ import { ColorPass } from '../pass/color-pass';
 
 import { Renderer } from './renderer';
 import { LightMaterial } from './light/light-material';
+
+import lightBinding from '@use-gpu/wgsl/use/light.wgsl';
+import shadowBinding from '@use-gpu/wgsl/use/shadow.wgsl';
 
 const DEFAULT_PASSES = [
   use(ColorPass, {}),
@@ -70,5 +74,12 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
       useOne(() => yeet({ env: { light }}), light),
   }) : children;
 
-  return Renderer({ buffers, children: view, components, passes, lights, overlay, merge });
+  // Prepare bind group layout for lighting/shadows
+  const entries = useMemo(() => {
+    const vertex   = [lights && lightBinding];
+    const fragment = [lights && lightBinding, shadows && shadowBinding];
+    return extractBindings([vertex, fragment], 'PASS');
+  }, [lights, shadows]);
+
+  return Renderer({ buffers, children: view, components, passes, entries, overlay, merge });
 }, 'ForwardRenderer');

@@ -89,6 +89,7 @@ export enum RefFlags {
   Optional = 1 << 2,
   Global   = 1 << 3,
   Infer    = 1 << 4,
+  Binding  = 1 << 5,
 };
 
 export type ShaderDefine = string | number | boolean | null | undefined;

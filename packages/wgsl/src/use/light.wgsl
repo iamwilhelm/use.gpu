@@ -5,7 +5,7 @@ struct LightUniforms {
   lights: array<Light>,
 };
 
-@group(LIGHT) @binding(0) var<storage> lightUniforms: LightUniforms;
+@group(PASS) @binding(0) var<storage> lightUniforms: LightUniforms;
 
 @export fn getLightCount() -> u32 { return lightUniforms.count; }
 @export fn getLight(index: u32) -> Light { return lightUniforms.lights[index]; }

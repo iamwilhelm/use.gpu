@@ -31,6 +31,7 @@ export const LightMaterial: LC<LightMaterialProps> = (props: PropsWithChildren<L
 
   // Provide forward-lit material
   return use(LightData, {
+    shadows,
     render: (
       useLight: UseLight,
     ) => {

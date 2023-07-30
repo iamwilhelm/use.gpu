@@ -43,7 +43,7 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
   } = props;
   if (!object) return null;
 
-  if (seen.has(object)) return <span>{`{Circular}`}</span>;
+  if (seen.has(object)) return <span>{`{Repeated}`}</span>;
   seen.add(object);
 
   if (Array.isArray(object)) {
@@ -162,7 +162,18 @@ type InspectCodeProps = {
 
 export const InspectCode = (props: InspectCodeProps) => {
   const {code} = props;
+  const render = (code: string) => <div
+    style={{
+      background: '#404040',
+      padding: '3px 5px',
+      font: '11px monospace',
+      lineHeight: '14px',
+      whiteSpace: 'pre',
+      minHeight: '100%',
+    }}>{code}</div>;
+
   const addIns = useAddIns();
+  const addIn = addIns.prop.find((addIn) => addIn.enabled(code)) ?? {render};
 
   return (
     <div
@@ -175,10 +186,9 @@ export const InspectCode = (props: InspectCodeProps) => {
         right: 0,
         height: CODE_HEIGHT,
         overflow: 'auto',
+        userSelect: 'text',
       }}>
-        {
-          addIns.prop.find((addIn) => addIn.enabled(code))?.render({code})
-        }
+        {addIn.render(code)}
       </div>
     </div>
   );

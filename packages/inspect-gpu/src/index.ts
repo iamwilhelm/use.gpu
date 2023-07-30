@@ -49,7 +49,7 @@ export const inspectGPU: InspectExtension = (): InspectAddIns => ({
   prop: [
     {
       id: 'wgsl',
-      enabled: (code: string) => code.length > 100 && !!code.slice(0, 100).match(/\b(@link|@optional|@export|fn)\b/),
+      enabled: (code: string) => !!code.slice(0, 200).match(/\b(::{|@link|@optional|@export|fn)\b/),
       render: (code: string) => renderWGSL({code}),
     },
   ],

@@ -70,7 +70,7 @@ export const Panels: FC<PanelsProps> = (props: PanelsProps) => {
   const Wrap = fullSize ? InsetLeftRightBottom : Inset;
 
   return (
-    <Wrap>
+    <Wrap style={{position: 'relative'}}>
       { tabs !== false ? (
         <StyledTabList>
           {active.map((panel) => (

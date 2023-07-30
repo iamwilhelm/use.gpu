@@ -19,6 +19,13 @@ export const Spacer = styled('div', {
   height: '20px',
 });
 
+export const StyledCompactShader = styled('div', {
+  background: 'rgba(255, 255, 255, 0.1)',
+  fontFamily: '"Fira Code", "Bitstream Vera Mono", monospace',
+  fontSize: '11px',
+  lineHeight: '12px',
+});
+
 const StyledShader = styled('div', {
   background: 'rgba(255, 255, 255, 0.1)',
   fontFamily: '"Fira Code", "Bitstream Vera Mono", monospace',

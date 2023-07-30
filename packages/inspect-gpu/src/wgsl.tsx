@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react';
 
+import { StyledCompactShader } from './shader';
 import { basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import { EditorView, ViewUpdate, keymap } from '@codemirror/view';
@@ -114,7 +115,7 @@ export function wgslLang() {
   return new LanguageSupport(language);
 }
 
-export const renderWGSL = (props: WGSLProps) => <WGSL {...props} />;
+export const renderWGSL = (props: WGSLProps) => <StyledCompactShader><WGSL {...props} /></StyledCompactShader>;
 
 export const WGSL = (props: WGSLProps) => {
   const {code, onChange, onCommit} = props;

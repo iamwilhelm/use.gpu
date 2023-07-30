@@ -55,6 +55,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
           device,
           width,
           height,
+          1,
           format,
           samples,
         );
@@ -64,6 +65,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
           device,
           width,
           height,
+          1,
           format,
         )
       ) : null;

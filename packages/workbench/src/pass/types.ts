@@ -11,7 +11,7 @@ export type LightEnv = {
   order: number[],
   subranges: Map<number, [number, number]>,
   storage: StorageSource,
-  texture: TextureSource,
+  texture: TextureSource | null,
 };
 
 export type Culler = (center: vec3, radius: number) => number | boolean;

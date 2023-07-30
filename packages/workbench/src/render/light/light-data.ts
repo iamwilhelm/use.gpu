@@ -45,6 +45,7 @@ export type UseLight = (l: Light) => void;
 export type LightDataProps = {
   alloc?: number,
   deferred?: boolean,
+  shadows?: boolean,
   render?: (
     useLight: (l: Light) => void,
   ) => LiveElement,

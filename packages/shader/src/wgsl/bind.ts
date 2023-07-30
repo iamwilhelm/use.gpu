@@ -48,7 +48,9 @@ const BINDING_SAMPLE_TYPES = {
   i: 'sint',
 } as Record<string, GPUTextureSampleType>;
 
-export const extractBindings = (stages: ShaderModule[][], pass: string) => {
+type MaybeModule = ShaderModule | false | null | undefined;
+
+export const extractBindings = (stages: MaybeModule[][], pass: string) => {
   
   const key = `group(${pass})`;
   const n = stages.length;

@@ -48,9 +48,9 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
   const {shadows, texture} = light;
 
   const descriptors = useMemo(() => {
-    const layers = texture.size[2];
+    const layers = texture!.size[2];
 
-    const attachments = makeDepthStencilAttachments(texture.texture, SHADOW_FORMAT, layers || 1, 0.0, 'load');
+    const attachments = makeDepthStencilAttachments(texture!.texture, SHADOW_FORMAT, layers || 1, 0.0, 'load');
     const descriptors = attachments.map(depthStencilAttachment => ({
       colorAttachments: [],
       depthStencilAttachment,
@@ -61,14 +61,14 @@ export const ShadowPass: LC<ShadowPassProps> = memo((props: PropsWithChildren<Sh
 
   inspect({
     output: {
-      depth: texture,
+      depth: texture!,
     },
   });
 
   const out: LiveElement[] = [];
   for (const map of shadows.values()) {
     const Component = SHADOW_TYPES[map.shadow!.type];
-    if (Component) out.push(keyed(Component, map.id, {calls, map, descriptors, texture}));
+    if (Component) out.push(keyed(Component, map.id, {calls, map, descriptors, texture: texture!}));
   }
   return out;
 }, 'ShadowPass');

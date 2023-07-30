@@ -194,7 +194,9 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
           if (!ctor) return null;
 
           const {arrayBuffer, byteOffset, byteLength} = source;
-          return arrayBuffer ? new ctor(arrayBuffer.slice(byteOffset ?? 0, byteLength)) : null;
+          const s = byteOffset ?? 0;
+          const e = byteLength != null ? s + byteLength : undefined;
+          return arrayBuffer ? new ctor(arrayBuffer.slice(s, e)) : null;
         },
         (source) => source,
         []);

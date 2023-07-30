@@ -548,7 +548,7 @@ export const compressAST = (
 
   // Pass through nodes from pre-compressed tree immediately
   // @ts-ignore
-  if (tree.__nodes) return tree.__nodes();
+  if (tree.__nodes) return tree.__nodes;
 
   const shake = (from: number, to: number) => emit('Shake',      from, to);
   const skip  = (from: number, to: number) => emit('Skip',       from, to);

@@ -2625,7 +2625,233 @@ Array [
 
 exports[`ast rewrites a lot of code using the compressed AST 2`] = `
 Object {
-  "__nodes": [Function],
+  "__nodes": Array [
+    Array [
+      1,
+      1,
+      31,
+    ],
+    Array [
+      1,
+      33,
+      47,
+    ],
+    Array [
+      1,
+      16,
+      68,
+    ],
+    Array [
+      0,
+      53,
+      231,
+    ],
+    Array [
+      2,
+      9,
+      21,
+    ],
+    Array [
+      3,
+      17,
+      25,
+    ],
+    Array [
+      2,
+      1,
+      8,
+    ],
+    Array [
+      2,
+      8,
+      16,
+    ],
+    Array [
+      3,
+      23,
+      35,
+    ],
+    Array [
+      2,
+      1,
+      9,
+    ],
+    Array [
+      2,
+      12,
+      21,
+    ],
+    Array [
+      3,
+      24,
+      36,
+    ],
+    Array [
+      2,
+      1,
+      9,
+    ],
+    Array [
+      2,
+      12,
+      18,
+    ],
+    Array [
+      3,
+      21,
+      33,
+    ],
+    Array [
+      2,
+      1,
+      9,
+    ],
+    Array [
+      3,
+      12,
+      30,
+    ],
+    Array [
+      2,
+      1,
+      12,
+    ],
+    Array [
+      2,
+      12,
+      16,
+    ],
+    Array [
+      2,
+      6,
+      15,
+    ],
+    Array [
+      0,
+      20,
+      298,
+    ],
+    Array [
+      3,
+      0,
+      7,
+    ],
+    Array [
+      2,
+      1,
+      7,
+    ],
+    Array [
+      2,
+      10,
+      14,
+    ],
+    Array [
+      3,
+      8,
+      30,
+    ],
+    Array [
+      2,
+      1,
+      8,
+    ],
+    Array [
+      2,
+      8,
+      20,
+    ],
+    Array [
+      2,
+      14,
+      25,
+    ],
+    Array [
+      3,
+      20,
+      44,
+    ],
+    Array [
+      2,
+      1,
+      8,
+    ],
+    Array [
+      2,
+      8,
+      22,
+    ],
+    Array [
+      2,
+      16,
+      29,
+    ],
+    Array [
+      2,
+      25,
+      37,
+    ],
+    Array [
+      2,
+      18,
+      29,
+    ],
+    Array [
+      2,
+      16,
+      25,
+    ],
+    Array [
+      2,
+      10,
+      21,
+    ],
+    Array [
+      2,
+      13,
+      26,
+    ],
+    Array [
+      2,
+      26,
+      38,
+    ],
+    Array [
+      2,
+      18,
+      19,
+    ],
+    Array [
+      2,
+      2,
+      10,
+    ],
+    Array [
+      2,
+      14,
+      15,
+    ],
+    Array [
+      2,
+      2,
+      7,
+    ],
+    Array [
+      2,
+      11,
+      12,
+    ],
+    Array [
+      2,
+      2,
+      4,
+    ],
+    Array [
+      2,
+      12,
+      25,
+    ],
+  ],
   "cursor": [Function],
 }
 `;
@@ -2741,7 +2967,73 @@ Array [
 
 exports[`ast rewrites code using the compressed AST 2`] = `
 Object {
-  "__nodes": [Function],
+  "__nodes": Array [
+    Array [
+      0,
+      0,
+      35,
+    ],
+    Array [
+      2,
+      8,
+      16,
+    ],
+    Array [
+      2,
+      9,
+      14,
+    ],
+    Array [
+      0,
+      19,
+      167,
+    ],
+    Array [
+      2,
+      8,
+      12,
+    ],
+    Array [
+      2,
+      32,
+      33,
+    ],
+    Array [
+      2,
+      19,
+      20,
+    ],
+    Array [
+      2,
+      4,
+      12,
+    ],
+    Array [
+      2,
+      23,
+      24,
+    ],
+    Array [
+      2,
+      25,
+      26,
+    ],
+    Array [
+      2,
+      3,
+      4,
+    ],
+    Array [
+      2,
+      22,
+      23,
+    ],
+    Array [
+      2,
+      2,
+      5,
+    ],
+  ],
   "cursor": [Function],
 }
 `;

@@ -104,7 +104,7 @@ export const makeASTDecompressor = (
   const {indexToOp} = getOpsMap(ops);
 
   const tree = {
-    __nodes: () => nodes,
+    __nodes: nodes,
     cursor: () => {
       let offset = 0;
       const decode = (d: number) => d + offset;

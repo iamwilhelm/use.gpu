@@ -61,19 +61,19 @@ export const extractBindings = (stages: ShaderModule[][], pass: string) => {
     const module = toModule(bundle);
     const {table: {bindings}} = module;
 
-    const list = [];
+    const list: GPUBindGroupLayoutEntry[] = [];
     byModule.set(module, list);
 
     for (const {variable} of bindings) if (variable) {
       const {attr, name, type: format, qual} = variable;
       if (attr.includes(key)) {
-        const location = attr.find(k => k.match(/^binding\(/));
+        const location = attr.find((k: string) => k.match(/^binding\(/));
         const index = parseInt(location.split(/[()]/g)[1], 10);
 
         const [layout, type] = format.split(/[<>,]/);
         const parts = layout.split('_');
 
-        let binding: GPUBindGroupLayoutEntry;
+        let binding: GPUBindGroupLayoutEntry | null = null;
 
         if (qual?.match(/\bstorage\b/)) {
           const readWrite = !!qual.match(/\bread_write\b/);
@@ -86,7 +86,7 @@ export const extractBindings = (stages: ShaderModule[][], pass: string) => {
         }
         
         else if (parts.includes('texture')) {
-          const viewDimension = parts.filter(f => f.match(/[1-3]d|array|cube/)).join('-');
+          const viewDimension = parts.filter((k: string) => k.match(/[1-3]d|array|cube/)).join('-');
           const multisampled = parts.includes('multisampled');
           const depth = parts.includes('depth');
           const storage = parts.includes('storage');
@@ -136,7 +136,7 @@ export const extractBindings = (stages: ShaderModule[][], pass: string) => {
 
     for (const bundle of stage) if (bundle) {
       const module = toModule(bundle);
-      const list = byModule.get(module);
+      const list = byModule.get(module)!;
       for (const binding of list) binding.visibility = binding.visibility | visibility;
     }
     ++i;

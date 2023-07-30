@@ -10,7 +10,7 @@ import {
   LinearRGB, Pass, Fetch,
   CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
-  Cursor, PointLayer, LineLayer,
+  Cursor, LineLayer,
   AmbientLight, DirectionalLight, PointLight, DomeLight,
   PBRMaterial, GeometryData,
   Loop, Animate, DebugProvider,
@@ -60,11 +60,6 @@ export const GeometryVoxelPage: LC = () => {
   const url = base + "voxel/teardown/propanetank.vox";
 
   const planeGeometry = makePlaneGeometry({ width: 100, height: 100, axes: 'yx' });
-
-  const renderLight = (position: number[], color: number[], intensity: number) => (<>
-    <PointLight position={position} color={color} intensity={intensity} shadowMap={SHADOW_MAP_POINT} />
-    <PointLayer count={1} size={20} position={position} color={color} />
-  </>);
 
   const view = (iterations: boolean) => (
     <DebugProvider
@@ -135,8 +130,12 @@ export const GeometryVoxelPage: LC = () => {
                 </Node>
               </Scene>
 
-              <Animate ease="linear" keyframes={ANIMATED_LIGHT} prop="position" render={(position) => renderLight(position, WHITE, 40*40)} />
-              {STATIC_LIGHTS.map(([position, color, intensity]) => renderLight(position, color, intensity))}
+              <Animate ease="linear" keyframes={ANIMATED_LIGHT} prop="position" render={(position) =>
+                <PointLight position={position} color={WHITE} intensity={40*40} shadowMap={SHADOW_MAP_POINT} debug />
+              } />
+              {STATIC_LIGHTS.map(([position, color, intensity]) =>
+                <PointLight position={position} color={color} intensity={intensity} shadowMap={SHADOW_MAP_POINT} debug />
+              )}
 
             </Pass>
           </Camera>

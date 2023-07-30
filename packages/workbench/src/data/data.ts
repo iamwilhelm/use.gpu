@@ -72,8 +72,8 @@ export const Data: LiveComponent<DataProps> = (props) => {
   // Refresh and upload data
   const refresh = () => {
     for (const {buffer, array, source, dims, accessor, raw} of fieldBuffers) if (raw || data) {
-      if (raw) copyNumberArray(raw, array, dims);
-      else if (data) copyDataArray(data, array, dims, accessor as Accessor);
+      if (raw?.length) copyNumberArray(raw, array, dims);
+      else if (data?.length) copyDataArray(data, array, dims, accessor as Accessor);
 
       uploadBuffer(device, buffer, array.buffer);
 

@@ -224,12 +224,12 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
       const o = isIndex ? layout.offsets : undefined;
 
       if (composite) {
-        if (raw) copyNumberArraysComposite(raw, array, dims, c, l, o);
-        else if (data) copyDataArraysComposite(data, array, dims, a, c, l, o);
+        if (raw?.length) copyNumberArraysComposite(raw, array, dims, c, l, o);
+        else if (data?.length) copyDataArraysComposite(data, array, dims, a, c, l, o);
       }
       else {
-        if (raw) copyNumberArrayChunked(raw, array, dims, c, l, layout.indexed);
-        else if (data) copyDataArrayChunked(data, array, dims, a, c, l, o);
+        if (raw?.length) copyNumberArrayChunked(raw, array, dims, c, l, layout.indexed);
+        else if (data?.length) copyDataArrayChunked(data, array, dims, a, c, l, o);
       }
       uploadBuffer(device, buffer, array.buffer);
 

@@ -46,7 +46,6 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
     // Prepare shared bind group for forward/deferred lighting
     const layout = makeBindGroupLayout(device, entries);
     const bind = (args: any[]) => {
-      console.log({args})
       const entries = makeDataBindingsEntries(device, args);
       const bindGroup = makeBindGroup(device, layout, entries);
 

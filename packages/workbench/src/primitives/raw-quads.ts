@@ -89,17 +89,17 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     useNoCallback();
   }
 
-  const {getFragment, ...material} = useMaterialContext().solid;
+  const material = useMaterialContext().solid;
 
   const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, ps ?? s, l, instanceCount]);
   const getPicking = usePickingShader(props);
   const applyMask = m ? useBoundShader(getMaskedColor, [m]) : null;
 
-  const links = useOne(() => ({
+  const links = useMemo(() => ({
     getVertex,
     getPicking,
-    getFragment: getFragment && applyMask ? chainTo(applyMask, getFragment) : getFragment,
     ...material,
+    getFragment: material.getFragment && applyMask ? chainTo(applyMask, material.getFragment) : material.getFragment,
   }), [getVertex, getPicking, applyMask, material]);
 
   const [pipeline, defs] = usePipelineOptions({

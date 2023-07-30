@@ -39,15 +39,51 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 
   var cornerIndex: u32;
   var unweldedIndex: u32;
+
+  var beforeIndex: u32;
+  var afterIndex: u32;
+
   if (HAS_INDICES && !HAS_SEGMENTS) {
     // Indexed geometry
     cornerIndex = getIndex(index);
     unweldedIndex = index;
+
+    if (FLAT_NORMALS) {
+      if (vertexIndex == 0u) {
+        beforeIndex = index + 2;
+        afterIndex = index + 1;
+      }
+      else if (vertexIndex == 1u) {
+        beforeIndex = index - 1;
+        afterIndex = index + 1;
+      }
+      else {
+        beforeIndex = index - 1;
+        afterIndex = index - 2;
+      }
+      beforeIndex = getIndex(beforeIndex);
+      afterIndex = getIndex(afterIndex);
+    }
   }
   else if (segment == -1) {
     // Loose triangles
     cornerIndex = index;
     unweldedIndex = index;
+
+    if (FLAT_NORMALS) {
+      if (vertexIndex == 0u) {
+        beforeIndex = index + 2;
+        afterIndex = index + 1;
+      }
+      else if (vertexIndex == 1u) {
+        beforeIndex = index - 1;
+        afterIndex = index + 1;
+      }
+      else {
+        beforeIndex = index - 1;
+        afterIndex = index - 2;
+      }
+    }
   }
   else if (segment == 0) {
     // Spacer null triangle
@@ -65,12 +101,36 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   }
   else {
     // Triangle fan
-    if (vertexIndex == 0u) { cornerIndex = instanceIndex - u32(segment - 1); }
-    else if (vertexIndex == 1u) { cornerIndex = instanceIndex + 1u; }
-    else { cornerIndex = instanceIndex + 2u; }
+    if (vertexIndex == 0u) {
+      cornerIndex = instanceIndex - u32(segment - 1);
+      if (FLAT_NORMALS) {
+        beforeIndex = instanceIndex + 2u;
+        afterIndex = instanceIndex + 1u;
+      }
+    }
+    else if (vertexIndex == 1u) {
+      cornerIndex = instanceIndex + 1u;
+      if (FLAT_NORMALS) {
+        beforeIndex = instanceIndex - u32(segment - 1);
+        afterIndex = instanceIndex + 2u;
+      }
+    }
+    else {
+      cornerIndex = instanceIndex + 2u;
+      if (FLAT_NORMALS) {
+        beforeIndex = instanceIndex + 1u;
+        afterIndex = instanceIndex - u32(segment - 1);
+      }
+    }
 
     unweldedIndex = cornerIndex;
-    if (HAS_INDICES) { cornerIndex = getIndex(cornerIndex); }
+    if (HAS_INDICES) {
+      cornerIndex = getIndex(cornerIndex);
+      if (FLAT_NORMALS) {
+        beforeIndex = getIndex(beforeIndex);
+        afterIndex = getIndex(afterIndex);
+      }
+    }
   }
 
   var normalIndex = cornerIndex;
@@ -84,10 +144,19 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   if (UNWELDED_LOOKUPS) { lookupIndex = unweldedIndex; }
 
   let vertex = getPosition(cornerIndex);
-  let normal = getNormal(normalIndex);
   let tangent = getTangent(tangentIndex);
   let uv = getUV(uvIndex);
   let st = getST(uvIndex);
+
+  var normal: vec4<f32>;
+  if (FLAT_NORMALS) {
+    let b = getPosition(beforeIndex).xyz;
+    let a = getPosition(afterIndex).xyz;
+    normal = vec4<f32>(normalize(cross(vertex.xyz - a, vertex.xyz - b)), 1.0);
+  }
+  else {
+    normal = getNormal(normalIndex);
+  }
 
   let color = getColor(cornerIndex);
   let zBias = getZBias(cornerIndex);

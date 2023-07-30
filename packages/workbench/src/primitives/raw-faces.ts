@@ -56,6 +56,7 @@ export type RawFacesProps = {
   unweldedUVs?: boolean,
   unweldedLookups?: boolean,
 
+  flat?: boolean,
   shaded?: boolean,
   fragDepth?: boolean,
   count?: Lazy<number>,
@@ -69,6 +70,7 @@ const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
 
 export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps) => {
   const {
+    flat = false,
     shaded = false,
     shadow = true,
     count = null,
@@ -195,11 +197,12 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     HAS_INDICES: hasIndices,
     HAS_SEGMENTS: hasSegments,
     HAS_INSTANCES: hasInstances,
+    FLAT_NORMALS: flat,
     UNWELDED_NORMALS: !!unweldedNormals,
     UNWELDED_TANGENTS: !!unweldedTangents,
     UNWELDED_UVS: !!unweldedUVs,
     UNWELDED_LOOKUPS: !!unweldedLookups,
-  }), [defs, fragDepth, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
+  }), [defs, flat, fragDepth, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
 
   return (
     use(Virtual, {

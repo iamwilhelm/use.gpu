@@ -32,6 +32,7 @@ export type ForwardRendererProps = {
   merge?: boolean,
 
   buffers?: Record<string, UseGPURenderContext[]>,
+  context?: Record<string, any>,
   passes?: LiveElement[],
   components?: RenderComponents,
 };
@@ -60,6 +61,7 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     merge = false,
     passes = DEFAULT_PASSES,
     buffers = NO_BUFFERS,
+    context,
     children,
   } = props;
 
@@ -81,5 +83,5 @@ export const ForwardRenderer: LC<ForwardRendererProps> = memo((props: PropsWithC
     return extractBindings([vertex, fragment], 'PASS');
   }, [lights, shadows]);
 
-  return Renderer({ buffers, children: view, components, passes, entries, overlay, merge });
+  return Renderer({ buffers, context, children: view, components, passes, entries, overlay, merge });
 }, 'ForwardRenderer');

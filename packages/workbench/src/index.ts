@@ -8,6 +8,7 @@ export * from './light';
 export * from './helpers';
 export * from './interact';
 export * from './material';
+export * from './pass';
 export * from './primitives';
 export * from './providers';
 export * from './queue';

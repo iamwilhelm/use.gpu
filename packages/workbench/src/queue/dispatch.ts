@@ -21,6 +21,7 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
 export type DispatchProps = {
+  mode?: string,
   size?: Lazy<number[]>,
   shader: ParsedBundle,
   defines?: Record<string, any>,
@@ -45,6 +46,7 @@ export const Dispatch = (props: DispatchProps) => {
 // Inlined into <Component>
 export const dispatch = (props: DispatchProps) => {
   const {
+    mode = 'compute',
     size = NO_SIZE,
     indirect,
     shader: computeShader,
@@ -134,7 +136,7 @@ export const dispatch = (props: DispatchProps) => {
   
   if (shouldDispatch) {
     return {
-      compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
+      [mode]: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
         const d = shouldDispatch();
         if (d === false) return;
         if (typeof d === 'number') {
@@ -147,5 +149,5 @@ export const dispatch = (props: DispatchProps) => {
     };
   }
  
-  return {compute};
+  return {[mode]: compute};
 };

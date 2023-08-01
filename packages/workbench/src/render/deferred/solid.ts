@@ -49,7 +49,7 @@ export const DeferredSolidRender: LiveComponent<DeferredSolidRenderProps> = (pro
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment, colorInput, colorSpace]);
+  }, [vertexShader, fragmentShader, getVertex, getFragment, defines, colorInput, colorSpace]);
 
   const defs = useOne(() => ({...defines, HAS_ALPHA_TO_COVERAGE: true}), defines);
 

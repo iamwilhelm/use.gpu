@@ -10,7 +10,7 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 @optional @link fn getTangent(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 0.0, 0.0, 1.0); };
 @optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
 @optional @link fn getST(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
-@optional @link fn getSegment(i: u32) -> i32 { return -1; };
+@optional @link fn getSegment(i: u32) -> i32 { return 0; };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 1.0, 1.0, 1.0); };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
@@ -49,40 +49,18 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
     unweldedIndex = index;
 
     if (FLAT_NORMALS) {
-      if (vertexIndex == 0u) {
-        beforeIndex = index + 2;
-        afterIndex = index + 1;
-      }
-      else if (vertexIndex == 1u) {
-        beforeIndex = index - 1;
-        afterIndex = index + 1;
-      }
-      else {
-        beforeIndex = index - 1;
-        afterIndex = index - 2;
-      }
-      beforeIndex = getIndex(beforeIndex);
-      afterIndex = getIndex(afterIndex);
+      beforeIndex = getIndex(select(index + 2, index - 1, vertexIndex > 0));
+      afterIndex = getIndex(select(index - 2, index + 1, vertexIndex < 2));
     }
   }
-  else if (segment == -1) {
+  else if (!HAS_SEGMENTS) {
     // Loose triangles
     cornerIndex = index;
     unweldedIndex = index;
 
     if (FLAT_NORMALS) {
-      if (vertexIndex == 0u) {
-        beforeIndex = index + 2;
-        afterIndex = index + 1;
-      }
-      else if (vertexIndex == 1u) {
-        beforeIndex = index - 1;
-        afterIndex = index + 1;
-      }
-      else {
-        beforeIndex = index - 1;
-        afterIndex = index - 2;
-      }
+      beforeIndex = select(index + 2, index - 1, vertexIndex > 0);
+      afterIndex = select(index - 2, index + 1, vertexIndex < 2);
     }
   }
   else if (segment == 0) {

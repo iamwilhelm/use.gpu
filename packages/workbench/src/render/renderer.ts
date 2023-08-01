@@ -16,6 +16,7 @@ import { ShadowPass } from '../pass/shadow-pass';
 
 export type RendererProps = {
   entries?: GPUBindGroupLayoutEntry[],
+  context?: Record<string, any>,
   overlay?: boolean,
   merge?: boolean,
 
@@ -25,10 +26,13 @@ export type RendererProps = {
 };
 
 const HOVERED_VARIANT = 'debug';
+const NO_ENTRIES: any[] = [];
+const NO_CONTEXT: Record<string, any> = {};
 
 export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<RendererProps>) => {
   const {
-    entries = [],
+    entries = NO_ENTRIES,
+    context: passContext = NO_CONTEXT,
     overlay = false,
     merge = false,
 
@@ -44,15 +48,16 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
     const {shadow, picking} = buffers;
 
     // Prepare shared bind group for forward/deferred lighting
-    const layout = makeBindGroupLayout(device, entries);
-    const bind = (args: any[]) => {
+    const hasEntries = !!entries.length;
+    const layout = hasEntries ? makeBindGroupLayout(device, entries) : null;
+    const bind = layout ? (args: any[]) => {
       const entries = makeDataBindingsEntries(device, args);
       const bindGroup = makeBindGroup(device, layout, entries);
 
       return (passEncoder: GPURenderPassEncoder) => {
         passEncoder.setBindGroup(1, bindGroup);
       };
-    };
+    } : () => () => {};
 
     // Provide draw call variants for sub-passes
     const getRender = (mode: string, render: string | null = null) =>
@@ -81,8 +86,8 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
     const useVariants = (virtual: VirtualDraw, hovered: boolean) => 
       useMemo(() => getVariants(virtual, hovered), [getVariants, virtual, hovered]);
 
-    return {useVariants, buffers, layout, bind};
-  }, [device, buffers, entries]);
+    return {useVariants, buffers, layout, bind, context: passContext};
+  }, [device, buffers, entries, passContext]);
 
   // Pass aggregrated calls to pass runners
   const Resume = (

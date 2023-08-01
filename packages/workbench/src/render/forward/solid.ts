@@ -49,7 +49,7 @@ export const SolidRender: LiveComponent<SolidRenderProps> = (props: SolidRenderP
     const v = bindBundle(vertexShader, links, undefined);
     const f = bindBundle(fragmentShader, links, undefined);
     return [v, f];
-  }, [vertexShader, fragmentShader, getVertex, getFragment, colorInput, colorSpace]);
+  }, [vertexShader, fragmentShader, getVertex, getFragment, defines, colorInput, colorSpace]);
 
   // Inline the render fiber
   const call = {

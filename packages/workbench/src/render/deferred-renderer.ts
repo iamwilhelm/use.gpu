@@ -36,6 +36,7 @@ export type DeferredRendererProps = {
   merge?: boolean,
 
   buffers?: Record<string, UseGPURenderContext[]>,
+  context?: Record<string, any>,
   passes?: LiveElement[],
   components?: RenderComponents,
 };
@@ -65,6 +66,7 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
     merge = false,
     passes = DEFAULT_PASSES,
     buffers = NO_BUFFERS,
+    context,
     children,
   } = props;
 
@@ -89,5 +91,5 @@ export const DeferredRenderer: LC<DeferredRendererProps> = memo((props: PropsWit
     return extractBindings([vertex, fragment], 'PASS');
   }, [shadows]);
 
-  return Renderer({ buffers, children: view, components, passes, entries, overlay, merge });
+  return Renderer({ buffers, context, children: view, components, passes, entries, overlay, merge });
 }, 'DeferredRenderer');

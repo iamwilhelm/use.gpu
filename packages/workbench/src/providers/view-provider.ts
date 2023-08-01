@@ -10,7 +10,7 @@ import { mat4, vec3 } from 'gl-matrix';
 
 const DEFAULT_VIEW_CONTEXT = {
   defs: [] as any,
-  uniforms: [] as any,
+  uniforms: {} as any,
   layout: null as any,
   cull: () => true,
   bind: (() => {}) as any,

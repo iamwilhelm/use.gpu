@@ -97,7 +97,8 @@ export const bindBundle = (
     hash: rehash,
     key: rekey,
     virtuals: revirtuals,
-  };
+    attributes: undefined,
+  } as any;
 };
 
 export const bindModule = bindBundle;

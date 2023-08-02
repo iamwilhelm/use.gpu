@@ -78,7 +78,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
 
   const {
     into,
-    position,
+    normal,
     shadow,
     shadowMap,
     shadowUV,
@@ -102,7 +102,7 @@ export const ShadowOrthoPass: LC<ShadowOrthoPassProps> = memo((props: PropsWithC
     const countGeometry = (v: number, t: number) => { vs += v; ts += t; };
 
     uniforms.viewMatrix.current = into!;
-    uniforms.viewPosition.current = position!;
+    uniforms.viewPosition.current = [-normal![0], -normal![1], -normal![2], 0];
 
     const {projectionViewMatrix, projectionViewFrustum, projectionMatrix, viewMatrix} = uniforms;
     projectionViewMatrix.current = mat4.multiply(mat4.create(), projectionMatrix.current, viewMatrix.current);

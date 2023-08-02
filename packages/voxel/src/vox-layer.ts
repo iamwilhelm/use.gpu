@@ -55,10 +55,10 @@ const surfaceShader = bindBundle(wgsl`
 @link fn getIsInside() -> f32;
 @link fn getInsideOrigin() -> vec3<f32>;
 
-@link fn getTexture0(uvw: vec3<i32>, level: u32) -> u32;
-@optional @link fn getTexture1(uvw: vec3<i32>, level: u32) -> u32 { return 0; };
-@optional @link fn getTexture2(uvw: vec3<i32>, level: u32) -> u32 { return 0; };
-@optional @link fn getTexture3(uvw: vec3<i32>, level: u32) -> u32 { return 0; };
+@link fn getTexture0(uvw: vec3<u32>, level: u32) -> u32;
+@optional @link fn getTexture1(uvw: vec3<u32>, level: u32) -> u32 { return 0; };
+@optional @link fn getTexture2(uvw: vec3<u32>, level: u32) -> u32 { return 0; };
+@optional @link fn getTexture3(uvw: vec3<u32>, level: u32) -> u32 { return 0; };
 
 @link fn getPalette(i: u32, level: u32) -> vec4<f32>;
 @link fn getPBR(i: u32) -> vec4<f32>;
@@ -104,7 +104,7 @@ fn traceIntoVolume(origin: vec3<f32>, ray: vec3<f32>, size: vec3<i32>) -> VoxelH
     pos = origin + ray / 2.0;
 
     var uvw = clamp(vec3<i32>(floor(pos)), vec3<i32>(0), size - 1);
-    let index = getTexture0(uvw, 0u);
+    let index = getTexture0(vec3<u32>(uvw), 0u);
     if (index > 0u) {
       return VoxelHit(pos, -ray, index, 1u);
     }
@@ -179,9 +179,9 @@ fn traceVolumeSteps(
         }
 
         var index: u32;
-        if (MIP_LEVELS > 3 && mip == 3) { index = getTexture3(uvw, 0u); }
-        else if (MIP_LEVELS > 2 && mip == 2) { index = getTexture2(uvw, 0u); }
-        else { index = getTexture1(uvw, 0u); }
+        if (MIP_LEVELS > 3 && mip == 3) { index = getTexture3(vec3<u32>(uvw), 0u); }
+        else if (MIP_LEVELS > 2 && mip == 2) { index = getTexture2(vec3<u32>(uvw), 0u); }
+        else { index = getTexture1(vec3<u32>(uvw), 0u); }
 
         if (index > 0u) {
           mip--;
@@ -207,7 +207,7 @@ fn traceVolumeSteps(
       for (var j = 0u; j < 12u; j++) {
         steps++;
 
-        let index = getTexture0(uvw, 0u);
+        let index = getTexture0(vec3<u32>(uvw), 0u);
         if (index > 0u) {
           return VoxelHit(pos + dist * ray, axis * signF, index, steps);
         }
@@ -237,9 +237,9 @@ fn traceVolumeSteps(
   tangent: vec4<f32>,
   position: vec4<f32>,
 ) -> SurfaceFragment {
-  let viewPosition = getViewPosition().xyz;
+  let viewPosition = getViewPosition();
   let surfacePosition = position.xyz;
-  let toSurface = surfacePosition - viewPosition;
+  let toSurface = surfacePosition * viewPosition.w - viewPosition.xyz;
 
   let r = getRayMatrix();
   let s = getSize();
@@ -301,9 +301,9 @@ fn traceVolumeSteps(
   st: vec4<f32>,
   position: vec4<f32>,
 ) -> DepthFragment {
-  let viewPosition = getViewPosition().xyz;
+  let viewPosition = getViewPosition();
   let surfacePosition = position.xyz;
-  let toSurface = surfacePosition - viewPosition;
+  let toSurface = surfacePosition * viewPosition.w - viewPosition.xyz;
 
   let r = getRayMatrix();
   let s = getSize();

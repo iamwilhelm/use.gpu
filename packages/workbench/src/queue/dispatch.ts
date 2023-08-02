@@ -1,5 +1,5 @@
 import type { LiveComponent, ArrowFunction } from '@use-gpu/live';
-import type { TypedArray, StorageSource, RenderPassMode, DeepPartial, Lazy } from '@use-gpu/core';
+import type { TypedArray, StorageSource, DeepPartial, Lazy } from '@use-gpu/core';
 import type { ShaderModule, ParsedBundle, ParsedModule } from '@use-gpu/shader';
 import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource, SUSPEND } from '@use-gpu/live';
 
@@ -21,7 +21,6 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
 export type DispatchProps = {
-  mode?: string,
   size?: Lazy<number[]>,
   shader: ParsedBundle,
   defines?: Record<string, any>,
@@ -46,7 +45,6 @@ export const Dispatch = (props: DispatchProps) => {
 // Inlined into <Component>
 export const dispatch = (props: DispatchProps) => {
   const {
-    mode = 'compute',
     size = NO_SIZE,
     indirect,
     shader: computeShader,
@@ -136,7 +134,7 @@ export const dispatch = (props: DispatchProps) => {
   
   if (shouldDispatch) {
     return {
-      [mode]: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
+      compute: (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
         const d = shouldDispatch();
         if (d === false) return;
         if (typeof d === 'number') {
@@ -149,5 +147,5 @@ export const dispatch = (props: DispatchProps) => {
     };
   }
  
-  return {[mode]: compute};
+  return {compute};
 };

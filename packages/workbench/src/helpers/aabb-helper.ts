@@ -8,6 +8,7 @@ import { GeometryData } from '../data/geometry-data';
 import { makeAABBGeometry } from '../primitives/geometry/aabb';
 import { TransformContext } from '../providers/transform-provider';
 import { useBoundShader } from '../hooks/useBoundShader';
+import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
@@ -46,7 +47,7 @@ export const AABBHelper: LC<AABBHelperProps> = memo((props: AABBHelperProps) => 
 
   const m = useShaderRef(combined);
   const transform = useBoundShader(getCartesianPosition, [m]);
-  const context = useOne(() => ({transform}), transform);
+  const context = useCombinedTransform(transform);
 
   return use(GeometryData, {
     geometry,

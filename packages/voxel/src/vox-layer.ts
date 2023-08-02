@@ -1,7 +1,9 @@
 import type { LC, LiveElement, Ref } from '@use-gpu/live';
-import type { TextureSource, StorageSource } from '@use-gpu/core';
+import type { TextureSource, StorageSource, LambdaSource } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
-import { gather, use, quote, yeet, memo, useCallback, useOne } from '@use-gpu/live';
+import { seq } from '@use-gpu/core';
+import { gather, use, quote, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import {
   useMatrixContext,
   useBoundShader, useLambdaSource, useDebugContext, useShaderRef,
@@ -19,9 +21,9 @@ import { vec3, mat3, mat4 } from 'gl-matrix';
 const clamp = (x: number, min: number, max: number) => Math.max(min, Math.min(max, x));
 
 export type VoxLayerProps = {
-  shape: TextureSource[],
-  palette: StorageSource,
-  pbr: StorageSource,
+  shape: (TextureSource | StorageSource | LambdaSource)[],
+  palette: ShaderSource,
+  pbr: ShaderSource,
 };
 
 // Transform a unit size box to the right dimensions
@@ -54,8 +56,9 @@ const surfaceShader = bindBundle(wgsl`
 @link fn getInsideOrigin() -> vec3<f32>;
 
 @link fn getTexture0(uvw: vec3<i32>, level: u32) -> u32;
-@link fn getTexture1(uvw: vec3<i32>, level: u32) -> u32;
-@link fn getTexture2(uvw: vec3<i32>, level: u32) -> u32;
+@optional @link fn getTexture1(uvw: vec3<i32>, level: u32) -> u32 { return 0; };
+@optional @link fn getTexture2(uvw: vec3<i32>, level: u32) -> u32 { return 0; };
+@optional @link fn getTexture3(uvw: vec3<i32>, level: u32) -> u32 { return 0; };
 
 @link fn getPalette(i: u32, level: u32) -> vec4<f32>;
 @link fn getPBR(i: u32) -> vec4<f32>;
@@ -100,7 +103,7 @@ fn traceIntoVolume(origin: vec3<f32>, ray: vec3<f32>, size: vec3<i32>) -> VoxelH
     axis = vec3<f32>(0.0);
     pos = origin + ray / 2.0;
 
-    var uvw = vec3<i32>(floor(pos));
+    var uvw = clamp(vec3<i32>(floor(pos)), vec3<i32>(0), size - 1);
     let index = getTexture0(uvw, 0u);
     if (index > 0u) {
       return VoxelHit(pos, -ray, index, 1u);
@@ -145,7 +148,7 @@ fn traceVolumeSteps(
   distMax: f32,
 ) -> VoxelHit {
   var steps = 0u;
-  var mip: u32 = 2;
+  var mip: u32 = MIP_LEVELS - 1;
   var dist: f32 = 0.0;
 
   // Signs for ray direction
@@ -156,7 +159,7 @@ fn traceVolumeSteps(
   var axis = initialAxis;
   for (var i = 0u; i < 8u; i++) {
 
-    if (mip > 0) {
+    if (MIP_LEVELS > 1 && mip > 0) {
       let level = f32(1 << mip);
       let maxSteps = 12 + (mip - 1) * 128;
       let invAbsL = invAbs * level;
@@ -176,7 +179,8 @@ fn traceVolumeSteps(
         }
 
         var index: u32;
-        if (mip == 2) { index = getTexture2(uvw, 0u); }
+        if (MIP_LEVELS > 3 && mip == 3) { index = getTexture3(uvw, 0u); }
+        else if (MIP_LEVELS > 2 && mip == 2) { index = getTexture2(uvw, 0u); }
         else { index = getTexture1(uvw, 0u); }
 
         if (index > 0u) {
@@ -216,7 +220,7 @@ fn traceVolumeSteps(
         if (dist >= distMax) { break; }
       }
 
-      mip = 2;
+      mip = MIP_LEVELS - 1;
     }
 
     if (dist >= distMax) { break; }
@@ -342,9 +346,13 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
     use(GeometryData, {geometry}),
     ([mesh]: Record<string, StorageSource>[]) => {
       const {positions, normals, uvs} = mesh;
+      const mips = shape.length;
 
       const DEBUG_STEPS = useDebugContext()?.voxel?.iterations;
-      const defs = useOne(() => ({DEBUG_STEPS}), DEBUG_STEPS);
+      const defs = useMemo(() => ({
+        DEBUG_STEPS,
+        MIP_LEVELS: mips,
+      }), [DEBUG_STEPS, shape.length]);
 
       // Get bounding box / ray transform
       const parent = useMatrixContext();
@@ -414,9 +422,11 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       const insideRef = useShaderRef(0);
       const originRef = useShaderRef([0, 0, 0]) as Ref<number[] | vec3>;
 
+      const sources = seq(4).map(i => shape[i] ?? null);
+
       const getSurface = useBoundShader(surfaceShader, [
         matrix, ray, normal, size, insideRef, originRef,
-        ...shape, palette, pbr,
+        ...sources, palette, pbr,
       ], defs);
       const getDepth = bindEntryPoint(getSurface, "mainDepthOnly");
 

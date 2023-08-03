@@ -28,8 +28,8 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 
 const SHADOW_MAP_POINT = {
   size: [1024, 1024],
-  depth: [0.1, 100],
-  bias: [2, 1/4],
+  depth: [0.5, 100],
+  bias: [1/64, 1/64, 1/16],
   blur: 2,
 };
 

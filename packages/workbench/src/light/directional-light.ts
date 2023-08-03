@@ -32,7 +32,7 @@ const DEFAULT_SHADOW_MAP = {
   span: [1000, 1000],
   up: [0, 1, 0],
 
-  bias: [1/4096, 1/32],
+  bias: [0, 1/4096, 1/32],
   blur: 4,
 };
 
@@ -58,7 +58,7 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
 
     const size  = parseVec2(shadowMap.size  ?? DEFAULT_SHADOW_MAP.size);
     const depth = parseVec2(shadowMap.depth ?? DEFAULT_SHADOW_MAP.depth);
-    const bias  = parseVec2(shadowMap.bias  ?? DEFAULT_SHADOW_MAP.bias);
+    const bias  = parseVec3(shadowMap.bias  ?? DEFAULT_SHADOW_MAP.bias);
     const span  = parseVec2(shadowMap.span  ?? DEFAULT_SHADOW_MAP.span);
     const up    = parseVec3(shadowMap.up    ?? DEFAULT_SHADOW_MAP.up);
     const blur  = parseNumber(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);

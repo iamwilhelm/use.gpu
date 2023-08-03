@@ -21,15 +21,15 @@ import {
 const SHADOW_MAP_DIRECTIONAL = {
   size: [2048, 2048],
   span: [50, 50],
-  depth: [0, 250],
-  bias: [1/2048, 1/32],
+  depth: [0, 100],
+  bias: [1/4096, 1/512, 0],
   blur: 4,
 };
 
 const SHADOW_MAP_POINT = {
   size: [2048, 2048],
   depth: [0.1, 50],
-  bias: [1, 1/32],
+  bias: [1/128, 1/64, 1/16],
   blur: 4,
 };
 

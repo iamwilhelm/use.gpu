@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
 import type { ShadowMapLike } from './types';
 
-import { parseColor, parseNumber, parseMatrix, parsePosition, parseVec2, useProp } from '@use-gpu/traits';
+import { parseColor, parseNumber, parseMatrix, parsePosition, parseVec2, parseVec3, useProp } from '@use-gpu/traits';
 import { memo, use, useMemo } from '@use-gpu/live';
 
 import { useLightContext } from '../providers/light-provider';
@@ -26,7 +26,7 @@ const DEFAULT_SHADOW_MAP = {
   size: [2048, 2048],
   depth: [0.1, 1000],
 
-  bias: [1/2, 1/32],
+  bias: [1/4096, 1/512, 0],
   blur: 4,
 };
 
@@ -45,7 +45,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
 
     const size  = parseVec2(shadowMap.size  ?? DEFAULT_SHADOW_MAP.size);
     const depth = parseVec2(shadowMap.depth ?? DEFAULT_SHADOW_MAP.depth);
-    const bias  = parseVec2(shadowMap.bias  ?? DEFAULT_SHADOW_MAP.bias);
+    const bias  = parseVec3(shadowMap.bias  ?? DEFAULT_SHADOW_MAP.bias);
     const blur  = parseNumber(shadowMap.blur ?? DEFAULT_SHADOW_MAP.blur);
 
     const matrix = mat4.create();

@@ -9,14 +9,14 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral };
 ) -> f32 {
   let index = u32(light.shadowMap);
 
-  let pos = light.into * vec4<f32>(surface.position.xyz + surface.normal.xyz * light.shadowBias.y, 1.0);
+  let pos = light.into * vec4<f32>(surface.position.xyz + surface.normal.xyz * light.shadowBias.z, 1.0);
   let dir = normalize(pos.xyz);
 
   let n = dot(surface.normal.xyz, dir);
   let slope = (1.0 - abs(n));
 
   let a = abs(pos.xyz);
-  let z = max(max(a.x, a.y), a.z) - slope * light.shadowBias.x;
+  let z = max(max(a.x, a.y), a.z) * (1.0 - light.shadowBias.x) - slope * light.shadowBias.y;
 
   let depth = dot(vec2<f32>(1.0, 1.0/z), light.shadowDepth);
 

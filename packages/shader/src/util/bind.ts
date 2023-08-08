@@ -59,7 +59,7 @@ export const bindBundle = (
   // External key
   external = 0;
   for (const k in links) if (links[k]) external = mixBits53(external, getBundleKey(links[k]!));
-  const rekey = scrambleBits53(mixBits53(key, mixBits53(external, defs)));
+  const rekey = scrambleBits53(mixBits53(mixBits53(hash, key), mixBits53(external, defs)));
 
   const relinks = bundle.links ? {
     ...bundle.links,

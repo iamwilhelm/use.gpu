@@ -27,7 +27,7 @@ export type BoundLight = Light & {
   shadowType?: 'ortho',
   shadowMap?: number,
   shadowUV?: vec4,
-  shadowBias?: vec2,
+  shadowBias?: vec3,
   shadowDepth?: vec2,
   shadowBlur?: number,
 };
@@ -36,7 +36,7 @@ export type ShadowMapProps = {
   type: string,
   size: vec2,
   depth: vec2,
-  bias: vec2,
+  bias: vec3,
   blur: number,
 };
 

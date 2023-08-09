@@ -127,7 +127,7 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
   const isMac = navigator.platform.match(/^Mac/);
   const cmd = isMac ? '⌘' : 'Ctrl';
 
-  return (<div style="max-height: 80vh">
+  return (<div style={{maxHeight: '80vh'}}>
     {uniforms || bindings ? (<>
       {uniforms?.length ? <>
         <div><b>Constants</b></div>

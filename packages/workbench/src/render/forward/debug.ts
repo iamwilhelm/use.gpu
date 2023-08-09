@@ -1,9 +1,9 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../../pass/types';
 
-import { memo, use, fragment, yeet, useContext, useNoContext, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
-import { resolve } from '@use-gpu/core';
-import { bindBundle, bindingToModule } from '@use-gpu/shader/wgsl';
+import { memo, use, fragment, yeet, useContext, useMemo, useOne } from '@use-gpu/live';
+import { patch } from '@use-gpu/state';
+import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { DrawCall, drawCall } from '../../queue/draw-call';
 import { Dispatch } from '../../queue/dispatch';
@@ -29,12 +29,12 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
       getVertex: gV,
     },
 
-    pipeline,
+    pipeline: propPipeline,
     defines,
     ...rest
   } = props;
 
-  const topology = (pipeline as any)?.primitive?.topology ?? 'triangle-list';
+  const topology = (propPipeline as any)?.primitive?.topology ?? 'triangle-list';
 
   const device = useDeviceContext();
   const renderContext = useRenderContext();
@@ -44,6 +44,8 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
 
   const vertexShader = instanceDrawVirtualSolid;
   const fragmentShader = instanceFragmentSolid;
+  
+  const pipeline = useOne(() => patch(propPipeline, {primitive: {topology: 'triangle-strip'}}), propPipeline);
 
   // Binds links into shader
   const [v, f, vertexCount, instanceCount, wireframeCommand, wireframeIndirect] = useMemo(() => {
@@ -55,9 +57,17 @@ export const DebugRender: LiveComponent<DebugRenderProps> = (props: DebugRenderP
 
     // Decorate vertex shader with wireframe operator
     if (indirect) {
-      ({getVertex, wireframeCommand, wireframeIndirect} = getWireframeIndirect(device, gV, indirect, topology));
+      ({
+        getVertex,
+        wireframeCommand,
+        wireframeIndirect,
+      } = getWireframeIndirect(device, gV, indirect, topology));
     } else  {
-      ({getVertex, vertexCount, instanceCount} = getWireframe(gV, vC, iC, topology));
+      ({
+        getVertex,
+        vertexCount,
+        instanceCount,
+      } = getWireframe(gV, vC, iC, topology));
     }
 
     const links = {getVertex};

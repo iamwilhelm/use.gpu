@@ -18,7 +18,7 @@ struct ViewUniforms {
 @export fn getViewResolution() -> vec2<f32> { return viewUniforms.viewResolution; }
 @export fn getViewSize() -> vec2<f32> { return viewUniforms.viewSize; }
 @export fn getViewNearFar() -> vec2<f32> { return viewUniforms.viewNearFar; }
-@export fn getViewPixelRatio() -> vec2<f32> { return viewUniforms.viewPixelRatio; }
+@export fn getViewPixelRatio() -> f32 { return viewUniforms.viewPixelRatio; }
 
 @export fn to3D(position: vec4<f32>) -> vec3<f32> {
   return position.xyz / position.w;

@@ -43,6 +43,7 @@ export const getWireframe = (
     getVertex: bound,
     vertexCount,
     instanceCount,
+    topology,
   };
 }
 

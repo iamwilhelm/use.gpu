@@ -54,8 +54,9 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     const entry = getBundleEntry(shader);
     const symbol = bundleToAttribute(shader, entry);
 
-    const workgroupAttr = symbol.attr?.find(({name}) => name === 'workgroup_size')?.args ?? [];
-    const workgroupSize = workgroupAttr.map(s => parseInt(s) || 1);
+    const workgroupAttr = symbol.attr?.find((attr) => attr.match(/^workgroup_size\(/));
+    const workgroupArgs = workgroupAttr?.split(/[()]/g)[1] ?? '';
+    const workgroupSize = workgroupArgs.split(',').map(s => parseInt(s) || 1);
 
     const dataSize = () => resolve(size) ?? targets[0]?.size;
     const dispatchSize = () => {

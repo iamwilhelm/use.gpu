@@ -57,7 +57,7 @@ export const makeAtlas = (
   maxHeight: number = 4096,
   snap: number = 1,
 ) => {
-  
+
   const ls: Bins = new Map();
   const rs: Bins = new Map();
   const ts: Bins = new Map();
@@ -66,7 +66,9 @@ export const makeAtlas = (
 
   // Place 1 rectangle
   const place = (key: number, w: number, h: number): Rectangle => {
-    if (map.get(key)) throw new Error("key mapped already: " + key);
+    if (!w || !h) throw new Error(`cannot map empty rectangle ${w}x${h} for '${key}'`)
+
+    if (map.get(key)) throw new Error(`key mapped already: ${key}`);
     self.version = self.version + 1;
 
     // Snap to minimum modulus
@@ -189,7 +191,7 @@ export const makeAtlas = (
     const rsb = getBin(rs, r);
     const tsb = getBin(ts, t);
     const bsb = getBin(bs, b);
-    
+
     slots.delete(slot);
     lsb.delete(slot);
     rsb.delete(slot);
@@ -201,11 +203,11 @@ export const makeAtlas = (
     if (tsb.size === 0) ts.delete(t);
     if (bsb.size === 0) bs.delete(b);
   };
-  
+
   const map = new Map<number, Rectangle>();
-  
+
   const slotFit = (x: number, near: number, far: number, full: number) => {
-    
+
     // Must not exceed near, unless already close to full
     const f1 = x <= near ? x / near : x / full;
 
@@ -222,7 +224,7 @@ export const makeAtlas = (
 
     for (const s of slots.values()) {
       const [l, t, r, b] = s;
-      
+
       const x = l;
       const y = t;
       const cw = r - l;
@@ -248,7 +250,7 @@ export const makeAtlas = (
 
     return slot;
   }
-  
+
   const stats = {
     slots: 0,
     checks: 0,
@@ -275,7 +277,7 @@ export const makeAtlas = (
         stats.clips++;
       }
     };
-    
+
     for (const s of remove) removeSlot(s);
     for (const s of add) addSlot(s);
   };
@@ -286,9 +288,9 @@ export const makeAtlas = (
   const debugValidate = () => {
     const rects = debugPlacements();
     let n = rects.length;
-    
+
     const out: any[] = [];
-    
+
     const box: Rectangle = [Infinity, Infinity, -Infinity, -Infinity];
 
     for (let i = 0; i < n; ++i) {
@@ -342,8 +344,8 @@ export const uploadAtlasMapping = (
 
   const offset = [l, t] as Point;
   const size = [r - l, b - t] as Point;
-    
-  const layout = makeTextureDataLayout(size, format);  
+
+  const layout = makeTextureDataLayout(size, format);
   uploadTexture(device, texture, data, layout, size, offset);
 }
 
@@ -378,7 +380,7 @@ const intersectRectangle = (a: RectLike, b: RectLike): boolean => {
 const subtractSlot = (a: Slot, b: RectLike): Slot[] => {
   const [al, at, ar, ab, nearX, nearY, farX, farY, corner] = a;
   const [bl, bt, br, bb] = b;
-  
+
   const out: Slot[] = [];
 
   const push = (l: number, t: number, r: number, b: number, nx: number, ny: number, fx: number, fy: number, corner: number) => {

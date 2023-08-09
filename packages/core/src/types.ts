@@ -171,13 +171,17 @@ export type UniformType =
 ;
 
 // Simple backing-agnostic mesh geometry
-export type Geometry = {
-  count: number,
+export type GeometryArray = {
+  topology?: GPUPrimitiveTopology,
+  count?: number,
   attributes: {
     [s: string]: TypedArray,
   },
   formats: {
     [s: string]: UniformType,
+  },
+  unwelded?: {
+    [s: string]: boolean,
   },
 };
 

@@ -23,4 +23,3 @@ export const useFrustumCuller = (
 }, [positionRef, frustumRef]);
 
 export const useNoFrustumCuller = useNoCallback;
-

@@ -1,4 +1,4 @@
-import type { Geometry } from '@use-gpu/core';
+import type { GeometryArray } from '@use-gpu/core';
 import { makeDataEmitter } from '@use-gpu/core';
 
 const τ = Math.PI * 2;
@@ -21,7 +21,7 @@ export const makeSphereGeometry = ({
   uvw = false,
   detail: [detailAxis, detailAround] = [16, 32],
   tile = [1, 1, 1],
-}: SphereGeometryProps = {}): Geometry => {
+}: SphereGeometryProps = {}): GeometryArray => {
   const verts = (detailAxis + 1) * (detailAround + 1);
   const tris = detailAxis * detailAround * 2;
   const count = tris * 3;

@@ -1,0 +1,100 @@
+import type { LC, LiveElement } from '@use-gpu/live';
+import type { TypedArray, UniformAttribute, GeometryArray } from '@use-gpu/core';
+import type { GLTF, GLTFPrimitiveData } from './types';
+
+import { unweldIndexedArray, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
+import { useMemo } from '@use-gpu/live';
+import { patch, $nop } from '@use-gpu/state';
+import { transformPositions, transformNormals } from '@use-gpu/workbench';
+import { generateTangents } from 'mikktspace';
+import { vec3, mat3, mat4 } from 'gl-matrix';
+
+export const useGLTFGeometry = (
+  gltf: GLTF,
+  primitive: GLTFPrimitiveData,
+
+  transform?: mat4,
+) => {
+  const {data: {arrays, formats: fmts}, materials} = gltf;
+  const {
+    attributes: {POSITION, NORMAL, TANGENT, TEXCOORD_0},
+    indices,
+    material,
+    mode,
+  } = primitive;
+
+  const side = !!materials?.[material!]?.doubleSided ? 'both' : 'front';
+
+  const geometry = useMemo(() => {
+    const attributes: Record<string, TypedArray> = {};
+    const formats: Record<string, string> = {};
+
+    if (POSITION   != null) {
+      attributes.positions = arrays[POSITION];
+      formats.positions    = fmts[POSITION];
+    }
+    if (NORMAL     != null) {
+      attributes.normals   = arrays[NORMAL];
+      formats.normals      = fmts[NORMAL];
+    }
+    if (TANGENT    != null) {
+      attributes.tangents  = arrays[TANGENT];
+      formats.tangents     = fmts[TANGENT];
+    }
+    if (TEXCOORD_0 != null) {
+      attributes.uvs       = arrays[TEXCOORD_0];
+      formats.uvs          = fmts[TEXCOORD_0];
+    }
+    if (indices    != null) {
+      attributes.indices   = arrays[indices];
+      formats.indices      = fmts[indices];
+    }
+
+    // Generate mikkTSpace tangents
+    if (TANGENT != null && (attributes.positions && attributes.normals && attributes.uvs && !attributes.tangents)) {
+      let ps = arrays[POSITION];
+      let ns = arrays[NORMAL];
+      let ts = arrays[TEXCOORD_0];
+
+      if (indices != null) {
+        // Unweld mesh
+        const inds = arrays[indices] as any;
+        if (inds) {
+          ps = unweldIndexedArray(ps as any, inds, 3);
+          ns = unweldIndexedArray(ns as any, inds, 3);
+          ts = unweldIndexedArray(ts as any, inds, 2);
+        }
+      }
+
+      const tangents = generateTangents(ps as any, ns as any, ts as any);
+      const n = tangents.length;
+      for (let i = 0; i < n; i += 4) tangents[i + 3] *= -1;
+
+      attributes.tangents = tangents;
+      formats.tangents = 'vec4<f32>';
+    }
+
+    const dims = Math.floor((UNIFORM_ARRAY_DIMS as any)[formats.positions]) || 1;
+    return {
+      count: attributes.indices?.length ?? (attributes.positions.length / dims),
+      attributes,
+      formats,
+      unwelded: {tangents: true},
+      side,
+    };
+  }, [gltf, primitive]);
+
+  const transformed = useMemo(() => {
+    if (!transform) return geometry;
+
+    const {attributes: {positions, normals, tangents}, formats} = geometry;
+
+    const ps = positions ? transformPositions(positions, formats.positions, transform) : $nop();
+    const ns = normals ? transformNormals(normals, formats.normals, transform) : $nop();
+    const ts = tangents ? transformNormals(tangents, formats.tangents, transform) : $nop();
+
+    return patch(geometry, {attributes: {positions: ps, normals: ns, tangents: ts}});
+  }, [geometry]);
+
+  return transformed;
+};

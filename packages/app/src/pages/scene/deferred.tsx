@@ -69,9 +69,9 @@ export const SceneDeferredPage: LC = (props) => {
   return (
     <Gather
       children={[
-        <GeometryData geometry={boxGeometry} />,
-        <GeometryData geometry={planeGeometry} />,
-        <GeometryData geometry={sphereGeometry} />,
+        <GeometryData {...boxGeometry} />,
+        <GeometryData {...planeGeometry} />,
+        <GeometryData {...sphereGeometry} />,
         <ImageTexture url="/textures/test.png" sampler={sampler} />,
       ]}
       then={([

@@ -12,7 +12,7 @@ export type GLTFNodeProps = {
   matrix?: mat4,
 };
 
-export const GLTFNode: LC<GLTFNodeProps> = memo((props: GLTFNodeProps) => {
+export const GLTFNode: LC<GLTFNodeProps> = (props: GLTFNodeProps) => {
   const {
     gltf,
     node,
@@ -51,7 +51,7 @@ export const GLTFNode: LC<GLTFNodeProps> = memo((props: GLTFNodeProps) => {
   }
 
   return self;
-}, 'GLTFNode');
+};
 
 const makeComposeTransform = () => {
 

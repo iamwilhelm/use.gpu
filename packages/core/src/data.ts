@@ -133,7 +133,7 @@ export const emitIntoMultiNumberArray = <T>(expr: Emitter, to: NumberArray, dims
   return emitIntoNumberArray(nest, to, dims);
 }
 
-export const flattenIndexedArray = (from: NumberArray, indices: NumberArray, dims: number = 1) => {
+export const unweldIndexedArray = (from: NumberArray, indices: NumberArray, dims: number = 1) => {
   const n = indices.length;
   const flat = new Float32Array(n * Math.ceil(dims));
 

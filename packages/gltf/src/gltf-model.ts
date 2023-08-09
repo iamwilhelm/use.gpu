@@ -3,7 +3,8 @@ import type { TypedArray } from '@use-gpu/core';
 import { GLTF, GLTFNodeData } from './types';
 
 import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
-import { GLTFTree } from './gltf-tree';
+import { GLTFNode } from './gltf-node';
+import { useMatrixContext } from '@use-gpu/workbench';
 
 export type GLTFModelProps = {
   gltf: GLTF,
@@ -26,7 +27,9 @@ export const GLTFModel: LC<GLTFModelProps> = memo((props: GLTFModelProps) => {
     nodes: propNodes,
   } = props;
 
-  return useMemo(() => {
+  const matrix = useMatrixContext();
+
+  const roots = useMemo(() => {
     const {scenes, nodes} = gltf;
 
     const getNodeIndex = (id: number | string): number | null => {
@@ -47,7 +50,8 @@ export const GLTFModel: LC<GLTFModelProps> = memo((props: GLTFModelProps) => {
       else roots = seq(nodes?.length || 0);
     }
 
-    // Render as GLTFTree
-    return Array.from(roots).map(root => root != null ? use(GLTFTree, {gltf, node: root}) : null);
+    return Array.from(roots);
   }, [gltf, propNode, propScene]);
+  
+  return roots.map(root => root != null ? use(GLTFNode, {gltf, node: root, matrix}) : null);
 }, 'GLTFModel');

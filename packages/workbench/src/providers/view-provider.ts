@@ -4,7 +4,7 @@ import type { DataBounds, ViewUniforms, UniformAttribute } from '@use-gpu/core';
 import { provide, signal, yeet, makeContext, useCallback, useContext, useNoContext, useMemo, useRef } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeGlobalUniforms, uploadBuffer, makeBindGroupLayout } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
-import { useFrustumCuller } from '../hooks/useFrustumCuller';
+import { useFrustumCuller, useNoFrustumCuller } from '../hooks/useFrustumCuller';
 
 import { mat4, vec3 } from 'gl-matrix';
 
@@ -29,10 +29,16 @@ export type ViewContextProps = {
 export type ViewProviderProps = {
   defs: UniformAttribute[],
   uniforms: ViewUniforms,
+  cull?: boolean,
 };
 
 export const ViewProvider: LiveComponent<ViewProviderProps> = (props: PropsWithChildren<ViewProviderProps>) => {
-  const {defs, uniforms, children} = props;
+  const {
+    defs,
+    uniforms,
+    cull: cullProp,
+    children,
+  } = props;
 
   const device = useDeviceContext();
 
@@ -49,7 +55,9 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = (props: PropsWithC
   }, [bindGroup]);
 
   const {projectionViewFrustum, viewPosition} = uniforms;
-  const cull = useFrustumCuller(viewPosition, projectionViewFrustum);
+  const cull = !cullProp
+    ? useFrustumCuller(viewPosition, projectionViewFrustum)
+    : (useNoFrustumCuller(), cullProp);
 
   const context = useMemo(() => ({
     bind,
@@ -57,7 +65,7 @@ export const ViewProvider: LiveComponent<ViewProviderProps> = (props: PropsWithC
     layout,
     defs,
     uniforms,
-  }), [bindGroup, layout, defs, uniforms]);
+  }), [bindGroup, cull, layout, defs, uniforms]);
 
   return [
     signal(),

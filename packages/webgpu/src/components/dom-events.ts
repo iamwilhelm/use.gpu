@@ -261,7 +261,9 @@ export const DOMEvents: LiveComponent<DOMEventsProps> = memo((props: PropsWithCh
 
     const onMouseDown = (e: PointerEvent) => {
       const {button, buttons, clientX, clientY} = e;
-      if (e.target) (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      if (e.target) try {
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      } catch (e) {}
 
       onButtons(buttons, button);
       onMove(clientX, clientY, 0, 0);

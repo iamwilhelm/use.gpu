@@ -127,7 +127,7 @@ fn traceOnVolume(origin: vec3<f32>, ray: vec3<f32>, size: vec3<i32>) -> VoxelHit
   let axis = step(front3.yzx, front3) * step(front3.zxy, front3);
 
   // Start just inside surface voxels
-  var pos = origin + ray * 1e-5;
+  var pos = origin + ray * 1e-4;
   var uvw = vec3<i32>(floor(pos));
 
   // Maximum trace distance
@@ -343,7 +343,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
   }));
 
   return gather(
-    use(GeometryData, {geometry}),
+    use(GeometryData, geometry),
     ([mesh]: Record<string, StorageSource>[]) => {
       const {positions, normals, uvs} = mesh;
       const mips = shape.length;

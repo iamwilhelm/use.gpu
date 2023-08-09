@@ -127,7 +127,7 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
   const isMac = navigator.platform.match(/^Mac/);
   const cmd = isMac ? '⌘' : 'Ctrl';
 
-  return (<>
+  return (<div style="max-height: 80vh">
     {uniforms || bindings ? (<>
       {uniforms?.length ? <>
         <div><b>Constants</b></div>
@@ -150,5 +150,5 @@ export const Shader: React.FC<ShaderProps> = ({type, fiber}) => {
     <StyledShader><Selectable>
       <WGSL code={shader.code} onCommit={handleCommit} />
     </Selectable></StyledShader>
-  </>);
+  </div>);
 }

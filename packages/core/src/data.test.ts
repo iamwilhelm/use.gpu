@@ -1,5 +1,5 @@
 import {
-  flattenIndexedArray,
+  unweldIndexedArray,
   copyNumberArray,
   copyNumberArrays, copyNumberArrayChunked,
   copyNestedNumberArray,
@@ -15,21 +15,21 @@ describe('data', () => {
   it('flattens indexed array', () => {
     const data = [1, 2, 3, 4, 5, 6, 7, 8];
     const inds = [0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 5, 7];
-    const dst = flattenIndexedArray(data, inds);
+    const dst = unweldIndexedArray(data, inds);
     expect(Array.from(dst)).toEqual([1, 2, 3, 3, 2, 4, 5, 6, 7, 7, 6, 8]);
   });
 
   it('flattens indexed vec3 array', () => {
     const data = [1, 10, 2, 2, 20, 4, 3, 30, 6, 4, 40, 8, 5, 50, 10, 6, 60, 12, 7, 70, 14, 8, 80, 16];
     const inds = [0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 5, 7];
-    const dst = flattenIndexedArray(data, inds, 3);
+    const dst = unweldIndexedArray(data, inds, 3);
     expect(Array.from(dst)).toEqual([1, 10, 2, 2, 20, 4, 3, 30, 6, 3, 30, 6, 2, 20, 4, 4, 40, 8, 5, 50, 10, 6, 60, 12, 7, 70, 14, 7, 70, 14, 6, 60, 12, 8, 80, 16]);
   });
 
   it('flattens indexed vec3to4 array', () => {
     const data = [1, 10, 2, 2, 20, 4, 3, 30, 6, 4, 40, 8, 5, 50, 10, 6, 60, 12, 7, 70, 14, 8, 80, 16];
     const inds = [0, 1, 2, 2, 1, 3, 4, 5, 6, 6, 5, 7];
-    const dst = flattenIndexedArray(data, inds, 3.5);
+    const dst = unweldIndexedArray(data, inds, 3.5);
     expect(Array.from(dst)).toEqual([1, 10, 2, 0, 2, 20, 4, 0, 3, 30, 6, 0, 3, 30, 6, 0, 2, 20, 4, 0, 4, 40, 8, 0, 5, 50, 10, 0, 6, 60, 12, 0, 7, 70, 14, 0, 7, 70, 14, 0, 6, 60, 12, 0, 8, 80, 16, 0]);
   });
 

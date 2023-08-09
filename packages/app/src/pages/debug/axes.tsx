@@ -41,7 +41,7 @@ export const DebugAxesPage: LC = (props) => {
   return (
     <Gather
       children={[
-        <GeometryData geometry={geometry} />,
+        <GeometryData {...geometry} />,
         <ImageCubeTexture urls={[
           "/textures/cube/uv/px.png",
           "/textures/cube/uv/nx.png",

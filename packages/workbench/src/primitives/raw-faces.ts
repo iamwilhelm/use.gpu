@@ -51,10 +51,13 @@ export type RawFacesProps = {
   instances?: ShaderSource,
   load?: ShaderSource,
 
-  unweldedNormals?: boolean,
-  unweldedTangents?: boolean,
-  unweldedUVs?: boolean,
-  unweldedLookups?: boolean,
+  unwelded?: {
+    colors?: boolean,
+    normals?: boolean,
+    tangents?: boolean,
+    uvs?: boolean,
+    lookups?: boolean,
+  },
 
   flat?: boolean,
   shaded?: boolean,
@@ -83,11 +86,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     depthWrite,
     blend,
 
-    unweldedNormals = false,
-    unweldedTangents = false,
-    unweldedUVs = false,
-    unweldedLookups = false,
-
+    unwelded,
     shouldDispatch,
     onDispatch,
   } = props;
@@ -198,11 +197,12 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     HAS_SEGMENTS: hasSegments,
     HAS_INSTANCES: hasInstances,
     FLAT_NORMALS: flat,
-    UNWELDED_NORMALS: !!unweldedNormals,
-    UNWELDED_TANGENTS: !!unweldedTangents,
-    UNWELDED_UVS: !!unweldedUVs,
-    UNWELDED_LOOKUPS: !!unweldedLookups,
-  }), [defs, flat, fragDepth, hasIndices, hasSegments, hasInstances, unweldedNormals, unweldedTangents, unweldedUVs, unweldedLookups]);
+    UNWELDED_COLORS: !!unwelded?.colors,
+    UNWELDED_NORMALS: !!unwelded?.normals,
+    UNWELDED_TANGENTS: !!unwelded?.tangents,
+    UNWELDED_UVS: !!unwelded?.uvs,
+    UNWELDED_LOOKUPS: !!unwelded?.lookups,
+  }), [defs, flat, fragDepth, hasIndices, hasSegments, hasInstances, unwelded]);
 
   return (
     use(Virtual, {

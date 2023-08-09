@@ -1,5 +1,10 @@
 0.9.4
+- `@use-gpu/core`: extend `Geometry` struct to `GeometryArray` as generic mesh representation
 - `@use-gpu/gltf`: `.glb` binary GLTF support
+- `@use-gpu/gltf`: allow CPU-only load with `<GLTFData unbound>`
+- `@use-gpu/scene`: add CPU-only `<Geometry>` for geometry gathering
+- `@use-gpu/workbench`: `<Geometry>` props can take `{...GeometryArray}`
+- `@use-gpu/workbench`: Group `unwelded` options on `<FaceLayer>`
 - `@use-gpu/workbench`: Add point/vector/AABB helpers for debug viz
 - `@use-gpu/workbench`: Add `debug` flag to lights to visualize lights/frustums
 

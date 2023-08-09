@@ -115,7 +115,7 @@ export const GeometryVoxelPage: LC = () => {
 
                   <Node position={[0, 0, -11]} rotation={[0, 180, 0]}>
                     <GeometryData
-                      geometry={planeGeometry}
+                      {...planeGeometry}
                       render={(planeMesh: Record<string, ShaderSource>) =>
                         <PBRMaterial albedo={0x808080} roughness={0.7}>
                           <Mesh

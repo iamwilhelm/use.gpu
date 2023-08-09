@@ -1,4 +1,4 @@
-import type { Geometry } from '@use-gpu/core';
+import type { GeometryArray } from '@use-gpu/core';
 import { makeDataEmitter } from '@use-gpu/core';
 
 type PlaneGeometryProps = {
@@ -13,7 +13,7 @@ export const makePlaneGeometry = ({
   height = width,
   axes = 'xy',
   tile = [1, 1],
-}: PlaneGeometryProps = {}): Geometry => {
+}: PlaneGeometryProps = {}): GeometryArray => {
   const count = 6;
 
   const positions = new Float32Array(count * 4);

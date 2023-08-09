@@ -5,7 +5,7 @@ import type { GLTF, GLTFAccessorData, GLTFBufferData, GLTFBufferViewData, GLTFIm
 import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
 
 import { DeviceContext, Fetch, getBoundShader } from '@use-gpu/workbench';
-import { makeDynamicTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES } from '@use-gpu/core';
+import { makeDynamicTexture, makeStorageBuffer, uploadBuffer, uploadExternalTexture, toDataBounds, UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 
 import { parseBinaryGLTF, parseTextGLTF, toScene, toNode, toMesh, toMaterial } from './parse';
 import { generateTangents } from 'mikktspace';
@@ -21,7 +21,8 @@ export type GLTFDataProps = {
   url?: string,
   data?: ArrayBuffer | string | Record<string, any>,
   base?: string,
-  
+  unbound?: boolean,
+
   render?: (gltf: GLTF) => LiveElement,
 };
 
@@ -40,6 +41,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
   const {
     data,
     url,
+    unbound,
     render
   } = props;
 
@@ -64,7 +66,15 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
     // Parse JSON into native types
     const {json, bin} = parsed;
-    const {gltf, buffers, images, bufferAssets, imageAssets} = useOne(() => {
+    const {
+      gltf,
+      buffers,
+      images,
+      bufferAssets,
+      bufferAssetIndices,
+      imageAssets,
+      imageAssetIndices,
+    } = useOne(() => {
       const version = json?.asset?.version;
       if (version != null && parseFloat(version) !== 2) throw new Error(`Unsupported GLTF version '${version}'`);
 
@@ -73,6 +83,9 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
       const bufferAssets = buffers.filter(({uri}, i) => (uri != null) || i === 0);
       const imageAssets  = images.filter(({uri}) => uri != null);
+
+      const bufferAssetIndices = buffers.map(b => bufferAssets.indexOf(b));
+      const imageAssetIndices = images.map(i => imageAssets.indexOf(i));
 
       const scenes:    GLTFSceneData    = (json?.scenes    ?? []).map(toScene);
       const nodes:     GLTFNodeData     = (json?.nodes     ?? []).map(toNode);
@@ -87,15 +100,20 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         materials,
       };
 
-      return {gltf, buffers, images, bufferAssets, imageAssets};
+      return {
+        gltf,
+        buffers,
+        images,
+        bufferAssets,
+        bufferAssetIndices,
+        imageAssets,
+        imageAssetIndices,
+      };
     }, json);
   
     // Resume after loading resources
     const Resume = (resources: (ArrayBuffer | ImageBitmap | null)[]) => {
       const n = bufferAssets.length;
-
-      const bufferAssetIndices = buffers.map(b => bufferAssets.indexOf(b));
-      const imageAssetIndices = images.map(i => imageAssets.indexOf(i));
 
       // Gather raw arraybuffers / image resources
       const [bufferResources, imageResources] = useOne(() => [
@@ -105,9 +123,43 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
       const { accessors, bufferViews, samplers, textures } = gltf;
 
+      // Expose native typed arrays for further processing before upload
+      const typedFormats = useMap<GLTFAccessorData, string>(accessors,
+        ({type, componentType}, index) => {
+          return accessorToType(type, componentType);
+        },
+        (accessor) => accessor,
+        [accessors]);
+
+      const typedArrays = useMap<GLTFAccessorData, TypedArray | null>(accessors,
+        ({bufferView, componentType, count, min, max, type, sparse}, index) => {
+          if (sparse) throw new Error("sparse GLTF accessors not implemented");
+
+          const format = accessorToType(type, componentType);
+          const ctor = (UNIFORM_ARRAY_TYPES as any)[format];
+          const dims = (UNIFORM_ARRAY_DIMS as any)[format];
+          if (!ctor) return null;
+
+          if (!bufferView) return new ctor(count * Math.floor(dims));
+
+          const {buffer, byteLength, byteOffset} = bufferViews[bufferView];
+          const arrayBuffer = bufferResources[bufferAssetIndices[buffer]];
+          if (!arrayBuffer) return null;
+
+          const s = byteOffset ?? 0;
+          const e = byteLength != null ? s + byteLength : undefined;
+          return new ctor(arrayBuffer.slice(s, e));
+        },
+        ({bufferView}) => bufferView != null
+          ? bufferResources[bufferAssetIndices[bufferViews[bufferView].buffer]]
+          : null,
+        [accessors]);
+
       // Upload all buffers as-is
       const gpuBuffers = useMap<GLTFBufferData, GPUBuffer | null>(buffers,
         (buffer, index) => {
+          if (unbound) return null;
+
           const i = bufferAssetIndices[index];
           if (i >= 0) {
             if (!bufferResources[i]) return null;
@@ -119,7 +171,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
           else throw new Error('GLTF buffer without data');
         },
         (buffer, index) => bufferResources[bufferAssetIndices[index]],
-        [buffers]);
+        [buffers, unbound]);
 
       // Convert bufferviews to storage source templates
       const bufferSources = useMap<GLTFBufferViewData, GLTFStorageSource | null>(bufferViews,
@@ -164,7 +216,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         },
         ({buffer}, index) => gpuBuffers[buffer],
         [bufferViews]);
-      
+
       // Convert accessors to storage sources
       const storageSources = useMap<GLTFAccessorData, GLTFStorageSource | null>(accessors,
         ({bufferView, componentType, count, min, max, type}, index) => {
@@ -176,7 +228,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
 
           return {
             ...bufferSource,
-            format: accessorToType(type, componentType),
+            format,
             length: count,
             size: [count],
             bounds: min && max ? toDataBounds([min, max]) : undefined,
@@ -185,25 +237,11 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         ({bufferView}) => bufferSources[bufferView ?? -1],
         [accessors]);
 
-      // Expose native typed arrays for further processing before upload
-      const typedData = useMap<GLTFStorageSource | null, TypedArray | null>(storageSources,
-        (source, index) => {
-          if (!source) return null;
-
-          const ctor = (UNIFORM_ARRAY_TYPES as any)[source.format];
-          if (!ctor) return null;
-
-          const {arrayBuffer, byteOffset, byteLength} = source;
-          const s = byteOffset ?? 0;
-          const e = byteLength != null ? s + byteLength : undefined;
-          return arrayBuffer ? new ctor(arrayBuffer.slice(s, e)) : null;
-        },
-        (source) => source,
-        []);
-
       // Convert images to external textures
       const imageSources = useMap<GLTFImageData | null, TextureSource | null>(images,
         (image, index) => {
+          if (unbound) return null;
+
           const i = imageAssetIndices[index];
           if (i >= 0) {
             const bitmap = imageResources[i];
@@ -246,22 +284,19 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
         ({source}, index) => imageSources[source as any],
         [textures]);
 
-      const bound = {
-        data: typedData,
-        storage: storageSources,
-        texture: textureSources,
+      const data = {
+        arrays: typedArrays,
+        formats: typedFormats,
       };
 
-      /*
-      console.log('re-render gltf', gltf, bound);
-      console.log({
-        bufR: bufferResources.slice().filter(x => !!x),
-        imgR: imageResources.slice().filter(x => !!x),
-      })
-      */
+      const bound = !unbound ? {
+        storage: storageSources,
+        texture: textureSources,
+      } : undefined;
 
       const gltfBound = {
         ...gltf,
+        data,
         bound,
       };
       return render ? render(gltfBound) : yeet(gltfBound);

@@ -1,4 +1,4 @@
-import type { Geometry } from '@use-gpu/core';
+import type { GeometryArray } from '@use-gpu/core';
 import { makeDataEmitter } from '@use-gpu/core';
 
 type AABBGeometryProps = {
@@ -11,7 +11,7 @@ const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 export const makeAABBGeometry = ({
   min = [-1, -1, -1],
   max = [1, 1, 1],
-}: AABBGeometryProps = {}): Geometry => {
+}: AABBGeometryProps = {}): GeometryArray => {
   const count = 7 * 6;
 
   const positions = new Float32Array(count * 4);

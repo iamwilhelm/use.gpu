@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { UniformAttribute, DataBounds } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
-import { flattenIndexedArray } from '@use-gpu/core';
+import { unweldIndexedArray } from '@use-gpu/core';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { use, provide, useCallback, useOne, useNoOne, useMemo, useNoMemo, useVersion, useNoCallback, useNoVersion } from '@use-gpu/live';
 import { generateTangents } from 'mikktspace';
@@ -36,18 +36,23 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     primitive,
     transform,
   } = props;
-  if (!gltf.bound) throw new Error("GLTF bound data is missing. Load GLTF using <GLTFData>.");
+  if (!gltf.bound) throw new Error("GLTF bound data is missing. Load GLTF using <GLTFData unbound={false}>.");
 
-  const {bound: {storage}} = gltf;
-  const {attributes, indices, material, mode} = primitive;
-  const {POSITION, NORMAL, TANGENT, TEXCOORD_0} = attributes;
+  const {data: {arrays}, bound: {storage}} = gltf;
+  const {
+    attributes: {POSITION, NORMAL, TANGENT, TEXCOORD_0},
+    indices,
+    material,
+    mode,
+  } = primitive;
 
   const pbrMaterial = useGLTFMaterial(gltf, material);  
 
   const faces: Partial<FaceLayerProps> = {
+    flat: NORMAL == null,
     shaded: true,
     color: [1, 1, 1, 1],
-    unweldedTangents: true,
+    unwelded: {tangents: true},
     side: pbrMaterial.doubleSided ? 'both' : 'front',
   };
 
@@ -59,18 +64,18 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
   // Generate mikkTSpace tangents
   if (TANGENT != null && (faces.positions && faces.normals && faces.uvs && !faces.tangents)) {
-    let ps = gltf.bound.data[POSITION];
-    let ns = gltf.bound.data[NORMAL];
-    let ts = gltf.bound.data[TEXCOORD_0];
+    let ps = arrays[POSITION];
+    let ns = arrays[NORMAL];
+    let ts = arrays[TEXCOORD_0];
 
     const tangents = useMemo(() => {
       if (indices != null) {
         // Unweld mesh
-        const inds = gltf.bound?.data?.[indices] as any;
+        const inds = arrays[indices];
         if (inds) {
-          ps = flattenIndexedArray(ps as any, inds, 3);
-          ns = flattenIndexedArray(ns as any, inds, 3);
-          ts = flattenIndexedArray(ts as any, inds, 2);
+          ps = unweldIndexedArray(ps as any, inds, 3);
+          ns = unweldIndexedArray(ns as any, inds, 3);
+          ts = unweldIndexedArray(ts as any, inds, 2);
         }
       }
 

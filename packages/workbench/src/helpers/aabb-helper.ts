@@ -50,7 +50,7 @@ export const AABBHelper: LC<AABBHelperProps> = memo((props: AABBHelperProps) => 
   const context = useCombinedTransform(transform);
 
   return use(GeometryData, {
-    geometry,
+    ...geometry,
     render: (mesh: Record<string, ShaderSource>) => 
       provide(TransformContext, context,
         use(LineLayer, { ...mesh, color, width })

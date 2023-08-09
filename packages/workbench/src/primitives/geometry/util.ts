@@ -51,6 +51,7 @@ export const transformPositions = (pos: TypedArray, format: string, matrix: mat4
     const x = pos[j];
     const y = pos[j + 1];
     const z = pos[j + 2];
+    const w = step === 4 ? pos[j + 3] : 1;
 
     vec3.set(v, x, y, z);
     if (matrix) vec3.transformMat4(v, v, matrix);
@@ -58,7 +59,7 @@ export const transformPositions = (pos: TypedArray, format: string, matrix: mat4
     out[k    ] = v[0];
     out[k + 1] = v[1];
     out[k + 2] = v[2];
-    out[k + 3] = 1;
+    out[k + 3] = w;
   }
 
   return out;
@@ -73,12 +74,13 @@ export const transformNormals = (norms: TypedArray, format: string, matrix: mat4
   const m = matrix ? mat3.normalFromMat4(mat3.create(), matrix) : mat3.create();
   const v = vec3.create();
 
-  const n = Math.floor(norms.length / 3);
+  const n = Math.floor(norms.length / step);
   const out = new Float32Array(n * 4);
-  for (let i = 0, j = 0, k = 0; i < n; ++i, j += 3, k += 4) {
+  for (let i = 0, j = 0, k = 0; i < n; ++i, j += step, k += 4) {
     const x = norms[j];
     const y = norms[j + 1];
     const z = norms[j + 2];
+    const w = step === 4 ? norms[j + 3] : 0;
 
     vec3.set(v, x, y, z);
     if (matrix) vec3.transformMat3(v, v, m);
@@ -86,7 +88,7 @@ export const transformNormals = (norms: TypedArray, format: string, matrix: mat4
     out[k    ] = v[0];
     out[k + 1] = v[1];
     out[k + 2] = v[2];
-    out[k + 3] = 0;
+    out[k + 3] = w;
   }
 
   return out;

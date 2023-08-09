@@ -148,7 +148,7 @@ export type UniformAttribute = {
   attr?: UniformShaderAttribute[],
 };
 
-export type UniformShaderAttribute = { name: string, args: string[] };
+export type UniformShaderAttribute = string;
 
 export type UniformAttributeValue = UniformAttribute & {
   value: any,

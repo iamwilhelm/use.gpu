@@ -1,4 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
+import type { GPUGeometry } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { ObjectTrait } from './types';
 import { memo, use, wrap, useOne } from '@use-gpu/live';
@@ -9,7 +10,7 @@ import { Primitive } from './primitive';
 
 export type MeshProps = {
   id?: number,
-  mesh: Record<string, ShaderSource>,
+  mesh: GPUGeometry,
   shaded?: boolean,
   side?: 'front' | 'back' | 'both',
 };

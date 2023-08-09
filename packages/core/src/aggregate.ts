@@ -10,6 +10,12 @@ import {
   generateChunkSegments,
   generateChunkFaces,
 } from './data';
+import { toMurmur53, mixBits53 } from '@use-gpu/state';
+
+export const getAggregateArchetype = (
+  formats: Record<string, string>,
+  unwelded?: Record<string, boolean>,
+) => mixBits53(toMurmur53(formats), toMurmur53(unwelded));
 
 export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number): AggregateBuffer => {
   const {array, dims} = makeDataArray(format, length);

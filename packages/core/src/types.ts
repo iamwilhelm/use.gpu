@@ -174,6 +174,7 @@ export type UniformType =
 export type GeometryArray = {
   topology?: GPUPrimitiveTopology,
   count?: number,
+  archetype?: number,
   attributes: {
     [s: string]: TypedArray,
   },
@@ -183,6 +184,25 @@ export type GeometryArray = {
   unwelded?: {
     [s: string]: boolean,
   },
+};
+
+export type GPUGeometry = {
+  topology?: GPUPrimitiveTopology,
+  count?: number,
+  archetype?: number,
+  unwelded?: {
+    [s: string]: boolean,
+  },
+
+  positions?: StorageSource,
+  indices?: StorageSource,
+  normals?: StorageSource,
+  tangents?: StorageSource,
+  uvs?: StorageSource,
+  sts?: StorageSource,
+  lookups?: StorageSource,
+
+  [s: string]: any, // StorageSource,
 };
 
 // Classic vertex attributes
@@ -208,7 +228,7 @@ export type UniformAttribute = {
   attr?: UniformShaderAttribute[],
 };
 
-export type UniformShaderAttribute = { name: string, args: string[] };
+export type UniformShaderAttribute = string;
 
 export type UniformAttributeValue = UniformAttribute & {
   value: any,

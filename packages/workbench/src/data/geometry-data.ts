@@ -1,36 +1,44 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { StorageSource, GeometryArray } from '@use-gpu/core';
+import type { StorageSource, GeometryArray, GPUGeometry } from '@use-gpu/core';
 
-import { use, yeet, useOne } from '@use-gpu/live';
+import { use, yeet, useMemo } from '@use-gpu/live';
 import zipObject from 'lodash/zipObject';
 
 import { Data } from './data';
 
 export type GeometryDataProps = GeometryArray & {
-  render?: (sources: Record<string, ShaderSource>) => LiveElement,
+  render?: (sources: GPUGeometry) => LiveElement,
 };
 
 export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDataProps) => {
   const {
+    count,
+    topology,
     attributes,
     formats,
+    unwelded,
     render,
   } = props;
 
-  const fields = useOne(() =>
+  const fields = useMemo(() =>
     Object.keys(attributes).map(k => [
       formats[k],
       attributes[k],
     ]),
-    attributes
+    [attributes, formats],
   );
 
   return (
     use(Data, {
       fields,
       render: (...sources: StorageSource[]) => {
-        const out = zipObject(Object.keys(attributes), sources);
+        const out = {
+          ...zipObject(Object.keys(attributes), sources),
+          count,
+          topology,
+          unwelded,
+        };
         return render ? render(out) : yeet(out);
       },
     })

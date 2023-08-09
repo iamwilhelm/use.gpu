@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { TypedArray, UniformAttribute, GeometryArray } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
-import { unweldIndexedArray, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
+import { unweldIndexedArray, getAggregateArchetype, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 import { useMemo } from '@use-gpu/live';
 import { patch, $nop } from '@use-gpu/state';
 import { transformPositions, transformNormals } from '@use-gpu/workbench';
@@ -74,12 +74,14 @@ export const useGLTFGeometry = (
       formats.tangents = 'vec4<f32>';
     }
 
+    const unwelded = formats.tangents ? {tangents: true} : undefined;
     const dims = Math.floor((UNIFORM_ARRAY_DIMS as any)[formats.positions]) || 1;
     return {
       count: attributes.indices?.length ?? (attributes.positions.length / dims),
       attributes,
       formats,
-      unwelded: {tangents: true},
+      archetype: getAggregateArchetype(formats, unwelded),
+      unwelded,
       side,
     };
   }, [gltf, primitive]);
@@ -93,7 +95,10 @@ export const useGLTFGeometry = (
     const ns = normals ? transformNormals(normals, formats.normals, transform) : $nop();
     const ts = tangents ? transformNormals(tangents, formats.tangents, transform) : $nop();
 
-    return patch(geometry, {attributes: {positions: ps, normals: ns, tangents: ts}});
+    return patch(geometry, {
+      attributes: {positions: ps, normals: ns, tangents: ts},
+      formats: {positions: 'vec4<f32>', normals: 'vec4<f32>', tangents: 'vec4<f32>'}
+    });
   }, [geometry]);
 
   return transformed;

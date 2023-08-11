@@ -47,7 +47,7 @@ export const makeAtlasSource = (
 /**
  * Tight 2D packing texture atlas.
  *
- * For optimal performance, feed items that are sorted large to small, e.g. first Y then X.
+ * For optimal performance, feed items that are sorted large to small, e.g. by area.
  * Will still produce high quality packing otherwise, but performance will degrade significantly.
  */
 export const makeAtlas = (

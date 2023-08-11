@@ -15,7 +15,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
-import { usePickingShader } from '../providers/picking-provider';
+import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getLabelVertex } from '@use-gpu/wgsl/instance/vertex/label.wgsl';
@@ -58,13 +58,8 @@ export type RawLabelsProps = {
   texture?: TextureSource | LambdaSource | ShaderModule,
   flip?: [number, number],
 
-  lookups?: ShaderSource,
-  ids?:     ShaderSource,
-  lookup?:  number,
-  id?:      number,
-
   count?: Lazy<number>,
-} & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
+} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
 
 export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsProps) => {
   const {

@@ -6,8 +6,9 @@ use '@use-gpu/wgsl/use/types'::{ PickVertex };
 struct VertexOutput {
   @builtin(position) position: vec4<f32>,
   @location(0) fragScissor: vec4<f32>,
-  @location(1) @interpolate(flat) fragId: u32,
-  @location(2) @interpolate(flat) fragIndex: u32,
+  @location(1) fragUV: vec2<f32>,
+  @location(2) @interpolate(flat) fragId: u32,
+  @location(3) @interpolate(flat) fragIndex: u32,
 };
 
 @vertex
@@ -21,6 +22,7 @@ fn main(
   return VertexOutput(
     v.position,
     v.scissor,
+    v.uv.xy,
     p.x,
     p.y,
   );

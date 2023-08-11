@@ -40,7 +40,7 @@ export const PickingRender: LiveComponent<PickingRenderProps> = (props: PickingR
       getPicking,
     };
     const v = bindBundle(vertexShader, links, undefined);
-    const f = fragmentShader;
+    const f = bindBundle(fragmentShader, {}, (getPicking as any).defines);
     return [v, f];
   }, [vertexShader, fragmentShader, getVertex, getPicking]);
 

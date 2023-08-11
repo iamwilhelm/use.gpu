@@ -19,7 +19,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 import { useDataLength } from '../hooks/useDataBinding';
-import { usePickingShader } from '../providers/picking-provider';
+import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
@@ -42,15 +42,10 @@ export type RawArrowsProps = {
   depths?:    ShaderSource,
   zBiases?:   ShaderSource,
 
-  lookups?: ShaderSource,
-  ids?:     ShaderSource,
-  lookup?:  number,
-  id?:      number,
-
   detail?: number,
 
   count?: number,
-} & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
+} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
 

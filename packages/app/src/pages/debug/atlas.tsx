@@ -20,7 +20,7 @@ export const DebugAtlasPage: LC = () => {
           <Gather then={
             (layout: any) => [
               <Yeet>{layout}</Yeet>,
-              <DebugAtlas />,
+              <Layout><DebugAtlas /></Layout>
             ]
           }>
             <Layout>
@@ -62,21 +62,21 @@ export const DebugAtlasPage: LC = () => {
       container={root}
       hasContours
       render={({subpixel, contours}) =>
-        <PanControls
-          key="atlas"
-          active={true}
-          render={(x, y, zoom) =>
-            <Flat x={x} y={y} zoom={zoom}>
-              <DebugProvider
-                debug={{
-                  sdf2d: { subpixel, contours },
-                }}
-              >
+        <DebugProvider
+          debug={{
+            sdf2d: { subpixel, contours },
+          }}
+        >
+          <PanControls
+            key="atlas"
+            active={true}
+            render={(x, y, zoom) =>
+              <Flat x={x} y={y} zoom={zoom}>
                 {view}
-              </DebugProvider>
-            </Flat>
-          }
-        />
+              </Flat>
+            }
+          />
+        </DebugProvider>
     } />
   )
 };

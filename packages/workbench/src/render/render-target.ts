@@ -34,6 +34,8 @@ export type RenderTargetProps = {
   colorInput?: ColorSpace,
   samples?: number,
   resolution?: number,
+  absolute?: boolean,
+  variant?: string,
 
   render?: (rttContext: OffscreenTarget) => LiveElement,
   then?: (target: TextureTarget) => LiveElement,
@@ -61,6 +63,8 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     backgroundColor = EMPTY_COLOR,
     colorSpace = COLOR_SPACE,
     colorInput = COLOR_SPACE,
+    variant = 'textureSample',
+    absolute = false,
     render,
     children,
     then,
@@ -164,6 +168,8 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
       sampler,
       layout,
       format,
+      variant,
+      absolute,
       colorSpace,
       size,
       volatile,
@@ -186,7 +192,7 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     } as TextureSource : null;
 
     return [source, sources, depth];
-  }, [targetTexture, depthTexture, width, height, format, samples, history, sampler, depthStencil]);
+  }, [targetTexture, depthTexture, width, height, format, variant, absolute, samples, history, sampler, depthStencil]);
 
   const rttContext = useMemo(() => ({
     ...renderContext,

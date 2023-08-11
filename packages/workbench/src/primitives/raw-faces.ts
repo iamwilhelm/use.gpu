@@ -12,7 +12,7 @@ import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback 
 import { resolve, makeShaderBindings } from '@use-gpu/core';
 import { useMaterialContext } from '../providers/material-provider';
 import { useScissorContext } from '../providers/scissor-provider';
-import { usePickingShader } from '../providers/picking-provider';
+import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
@@ -43,11 +43,6 @@ export type RawFacesProps = {
 
   indices?: ShaderSource,
 
-  lookups?: ShaderSource,
-  ids?:     ShaderSource,
-  lookup?:  number,
-  id?:      number,
-
   instances?: ShaderSource,
   load?: ShaderSource,
 
@@ -66,7 +61,7 @@ export type RawFacesProps = {
 
   shouldDispatch?: (u: Record<string, any>) => boolean | number | null,
   onDispatch?: (u: Record<string, any>) => void,
-} & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
+} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
 const ZERO = [0, 0, 0, 1];
 const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };

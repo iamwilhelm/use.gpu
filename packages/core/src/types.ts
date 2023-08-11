@@ -175,6 +175,7 @@ export type GeometryArray = {
   topology?: GPUPrimitiveTopology,
   count?: number,
   archetype?: number,
+  bounds?: DataBounds,
   attributes: {
     [s: string]: TypedArray,
   },

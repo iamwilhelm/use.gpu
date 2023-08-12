@@ -29,6 +29,10 @@ export type DefineConstants = (
   defines: Record<string, ShaderDefine>
 ) => string;
 
+export type DefineEnables = (
+  enabled: string[],
+) => string;
+
 export type RewriteUsingAST = (
   code: string,
   tree: Tree,
@@ -100,6 +104,7 @@ export const makeLinker = (
   getPreambles: GetPreambles,
   getRenames: GetRenames,
   defineConstants: DefineConstants,
+  defineEnables: DefineEnables,
   rewriteUsingAST: RewriteUsingAST,
 ) => (
   source: ShaderModule,
@@ -111,9 +116,16 @@ export const makeLinker = (
   const {bundles, exported, imported, aliased} = loadBundlesInOrder(bundle, libraries);
   const program = getPreambles();
 
-  // Gather defines
+  // Gather defines/enables
   const defs: Record<string, ShaderDefine> = {};
-  for (const {defines} of bundles) if (defines) for (let k in defines) defs[k] = defines[k];
+  const enabled: string[] = [];
+  for (const {defines, module: {table: {enables}}} of bundles) {
+    if (enables) for (let k of enables) enabled.push(k);
+    if (defines) for (let k in defines) defs[k] = defines[k];
+  }
+
+  const en = defineEnables(enabled)
+  if (en.length) program.push(en);
 
   const staticRename = getRenames(defs);
   const def = defineConstants(defs);

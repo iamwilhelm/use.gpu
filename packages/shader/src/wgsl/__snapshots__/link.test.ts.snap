@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`link hoists an enable directive 1`] = `
+"enable f16;
+
+    fn _01_main() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
+    
+
+    fn main() -> @location(0) vec4<f32> {
+      return _01_main();
+    }
+    "
+`;
+
 exports[`link lifts recursive dependency 1`] = `
 "
     // Lifted Code

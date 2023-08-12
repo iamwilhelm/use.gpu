@@ -1,7 +1,7 @@
 import { Tree } from '@lezer/common';
 import { ShaderDefine } from '../types';
 
-import { defineConstants, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
+import { defineConstants, defineEnables, loadModule, loadModuleWithCache, DEFAULT_CACHE } from './shader';
 import { rewriteUsingAST } from './ast';
 import { makeLinker, makeLinkCode, makeLinkBundle, makeLinkModule } from '../util/link';
 
@@ -17,7 +17,7 @@ const getRenames = (
   return rename;
 }
 
-export const linker     = makeLinker(getPreambles, getRenames, defineConstants, rewriteUsingAST);
+export const linker     = makeLinker(getPreambles, getRenames, defineConstants, defineEnables, rewriteUsingAST);
 export const linkBundle = makeLinkBundle(linker);
 export const linkModule = makeLinkModule(linker);
 export const linkCode   = makeLinkCode(linker, loadModuleWithCache, DEFAULT_CACHE);

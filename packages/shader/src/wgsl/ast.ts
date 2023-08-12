@@ -409,6 +409,11 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     throw throwError('declaration', node);
   };
 
+  const getEnable = (node: SyntaxNode): string[] => {
+    const [, ...rest] = getNodes(node);
+    return rest.map(getText);
+  };
+
   ////////////////
 
   const getImports = (): ModuleRef[] => {
@@ -458,12 +463,18 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const children = tree.topNode.getChildren(T.LocalDeclaration);
     return children.map(getDeclaration);
   };
+
+  const getEnables = (): string[] => {
+    const children = tree.topNode.getChildren(T.EnableDirective);
+    return children.flatMap(getEnable);
+  };
   
   ////////////////
 
   const getSymbolTable = (): SymbolTable => {
     const modules = getImports();
     const declarations = getDeclarations();
+    const enables = getEnables();
 
     const externals = declarations.filter(d => d.flags & RF.External);
     const exported  = declarations.filter(d => d.flags & RF.Exported);
@@ -497,6 +508,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       externals: orNone(externals),
       exports: orNone(exported),
       bindings: orNone(bound),
+      enables: orNone(enables),
 
       declarations: orNone(declarations),
       linkable: externals.length ? linkable : undefined,
@@ -680,7 +692,8 @@ export const rewriteUsingAST = (
       }
     }
     // Import declaration (full AST only)
-    else if (type.name === 'ImportDeclaration') {
+    // Enable declaration (full AST only)
+    else if (type.name === 'ImportDeclaration' || type.name == 'EnableDirective') {
       const {from, to} = cursor;
       skip(from, to);
       while (cursor.lastChild()) {};
@@ -764,7 +777,8 @@ export const compressAST = (
       }
     }
     // Import declaration
-    else if (type.name === 'ImportDeclaration') {
+    // Enable directive
+    else if (type.name === 'ImportDeclaration' || type.name == 'EnableDirective') {
       const {from, to} = cursor;
       skip(from, to);
       while (cursor.lastChild()) {};

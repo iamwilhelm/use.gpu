@@ -19,6 +19,20 @@ describe('ast', () => {
     
     return makeASTParser(code, tree);
   }
+  
+  it('gets test enables', () => {
+    const code = `
+    enable f16, f64;
+
+    @export fn main() {}
+    `;
+
+    const tree = parseShader(code);
+    const {getSymbolTable} = makeGuardedParser(code, tree);
+
+    const {enables} = getSymbolTable();
+    expect(enables).toMatchSnapshot();
+  });
 
   it('gets test imports', () => {
     const code = `

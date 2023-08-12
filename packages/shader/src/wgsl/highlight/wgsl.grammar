@@ -35,8 +35,10 @@ LocalDeclaration {
   FunctionDeclaration
 }
 
+EnableExtension { TypeDeclaration | Reserved }
+
 EnableDirective {
-  d<'enable'> Identifier semicolon
+  d<'enable'> EnableExtension (comma EnableExtension)* comma? semicolon
 }
 
 ImportDeclaration {
@@ -271,7 +273,8 @@ literalOrIdentifier {
   Identifier
 }
 
-constLiteral {  IntLiteral |
+constLiteral {
+  IntLiteral |
   UintLiteral |
   FloatLiteral |
   b<'true'> |
@@ -301,6 +304,7 @@ accessMode {
 TypeDeclaration {
   Identifier ~conflict |
   t<'bool'> |
+  t<'f16'> |
   t<'f32'> |
   t<'i32'> |
   t<'u32'> |
@@ -483,7 +487,6 @@ Reserved {
   r<'bf16'> |
   r<'do'> |
   r<'enum'> |
-  r<'f16'> |
   r<'f64'> |
   r<'handle'> |
   r<'i8'> |

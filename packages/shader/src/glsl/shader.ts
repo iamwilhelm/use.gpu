@@ -37,6 +37,9 @@ export const defineConstants = (defs: Record<string, ShaderDefine>): string => {
   return out.join("\n");
 }
 
+/** Make GLSL enable definitions */
+export const defineEnables = (enabled: string[]) => enabled.map(e => `#extension ${e}​ : enable`).join('\n');
+
 /** Convert a bundle with a defined entry point to a definition for that attribute or type. */
 export const bundleToAttribute = makeBundleToAttribute(toTypeString, toTypeArgs);
 

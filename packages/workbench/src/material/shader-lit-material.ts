@@ -11,7 +11,8 @@ import { useShaderRef } from '../hooks/useShaderRef';
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
 
-import { getShadedFragment } from '@use-gpu/wgsl/instance/fragment/shaded.wgsl';
+import { getLitFragment } from '@use-gpu/wgsl/instance/fragment/lit.wgsl';
+import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 
 export type ShaderLitMaterialProps = {
   /** Flat shader, for unlit passes (e.g. shadow map)
@@ -20,7 +21,7 @@ export type ShaderLitMaterialProps = {
   */
   fragment: ShaderModule,
 
-  /** Depth shader, for shadow passes (optional)
+  /** Depth-only shader, for optimized shadow passes (optional)
   fn getDepth(
     alpha: f32,
     uv: vec4<f32>,
@@ -43,10 +44,20 @@ export type ShaderLitMaterialProps = {
   */
   surface: ShaderModule,
 
+  /** Environment shader, for reflections
+
+  fn getEnvironment(
+    N: vec3<f32>,
+    V: vec3<f32>,
+    surface: SurfaceFragment,
+  ) -> vec3<f32>
+  */
+  environment?: ShaderModule,
+
   /** Material lighting shader, for lighting model. e.g. `applyPBRMaterial`.
   
   fn getLight(surface: SurfaceFragment) -> vec4<f32> */
-  apply: ShaderModule,
+  apply?: ShaderModule,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };
 
@@ -55,7 +66,8 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
     depth,
     fragment,
     surface,
-    apply,
+    environment,
+    apply = applyPBRMaterial,
     render,
     children,
   } = props;
@@ -63,7 +75,7 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
   const {useMaterial} = useLightContext();
   const applyLights = useMaterial(apply);
 
-  const getLight = applyLights ? useBoundShader(getShadedFragment, [applyLights]) : useNoBoundShader();
+  const getLight = applyLights ? useBoundShader(getLitFragment, [applyLights, environment]) : useNoBoundShader();
   const getSurface = surface;
   const getFragment = fragment;
   const getDepth = depth;

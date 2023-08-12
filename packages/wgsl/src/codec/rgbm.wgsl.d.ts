@@ -1,6 +1,6 @@
-declare module "@use-gpu/wgsl/instance/fragment/light.wgsl" {
+declare module "@use-gpu/wgsl/codec/rgbm.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getLightFragment: ParsedBundle;
+  export const decodeRGBM16: ParsedBundle;
   export default __module;
 }

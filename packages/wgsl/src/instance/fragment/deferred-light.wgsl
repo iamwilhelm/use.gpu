@@ -16,7 +16,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
   surface: SurfaceFragment,
 ) -> vec3<f32>;
 
-@export fn getLightFragment(
+@export fn getDeferredLightFragment(
   uv: vec2<f32>,
   index: u32,
 ) -> vec4<f32> {

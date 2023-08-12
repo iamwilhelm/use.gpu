@@ -80,6 +80,19 @@ export const makeTextureReadbackBuffer = (
   return [buffer, bytesPerRow, itemsPerRow, dimsPerItem];
 }
 
+export const clearBuffer = (
+  device: GPUDevice,
+  buffer: GPUBuffer,
+  offset: number = 0,
+  size?: number,
+): void => {
+  const commandEncoder = device.createCommandEncoder();
+  commandEncoder.clearBuffer(buffer, offset, size);
+
+  const command = commandEncoder.finish();
+  device.queue.submit([command]);
+}
+
 export const uploadBuffer = (
   device: GPUDevice,
   buffer: GPUBuffer,

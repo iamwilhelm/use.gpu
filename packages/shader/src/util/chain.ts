@@ -62,8 +62,8 @@ export const makeChainTo = (
   }
   
   // Other arguments of `from` and `to` must match
-  const fromRest = fromArgs?.slice(1) ?? [];
   const toRest = toArgs?.slice(1) ?? [];
+  const fromRest = fromArgs?.slice(1).slice(0, toRest.length) ?? [];
   if (fromRest.join('/') !== toRest.join('/')) {
     throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain remainder (..., ${fromRest.join(', ')}) to args (..., ${toRest.join(', ')}).`);
   }

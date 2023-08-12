@@ -92,7 +92,7 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   var F = fresnelSchlickVec3(dotLH, F0);
   var D = ndfGGX(dotNH, alpha);
   var G = smithGGXCorrelated(dotNL, dotNV, alpha);
-  //float G2 = geometricGGX(dotNL, dotNV, alpha);
+  //var G = geometricGGX(dotNL, dotNV, alpha);
   
   var Fd = diffuseColor * fdBurley(dotNL, dotNV, dotLH, alpha);
   var Fs = F * D * G;

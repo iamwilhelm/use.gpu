@@ -8,7 +8,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
 @link fn getEmissive(uv: vec2<f32>) -> vec4<f32>;
 @link fn getDepth(uv: vec2<f32>) -> f32;
 
-@export fn getEmissiveFragment(
+@export fn getDeferredEmissiveFragment(
   uv: vec2<f32>,
   index: u32,
 ) -> vec4<f32> {

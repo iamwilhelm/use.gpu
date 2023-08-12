@@ -17,8 +17,8 @@ import { useViewContext } from '../../providers/view-provider';
 import { makeSphereGeometry } from '../../primitives/geometry/sphere';
 import { forMeshTriangles } from '../../primitives/geometry/util';
 
-import { getLightVertex } from '@use-gpu/wgsl/instance/vertex/light.wgsl';
-import { getLightFragment } from '@use-gpu/wgsl/instance/fragment/light.wgsl';
+import { getDeferredLightVertex } from '@use-gpu/wgsl/instance/vertex/deferred-light.wgsl';
+import { getDeferredLightFragment } from '@use-gpu/wgsl/instance/fragment/deferred-light.wgsl';
 
 import { vec3 } from 'gl-matrix';
 
@@ -69,11 +69,11 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   const getOutside = useRawSource(outsides, 'u16');
   const getInside = useRawSource(insides, 'u16');
 
-  const getInstanceVertex = useBoundShader(getLightVertex, [getLight, getInstance, getPosition, getIndex, getScale], GEOMETRY_DEFS);
-  const getOutsideVertex  = useBoundShader(getLightVertex, [getLight, getOutside, getPosition, getIndex, getScale], GEOMETRY_DEFS);
-  const getInsideVertex   = useBoundShader(getLightVertex, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
+  const getInstanceVertex = useBoundShader(getDeferredLightVertex, [getLight, getInstance, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getOutsideVertex  = useBoundShader(getDeferredLightVertex, [getLight, getOutside, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getInsideVertex   = useBoundShader(getDeferredLightVertex, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
 
-  const getFragment = useBoundShader(getLightFragment, [...gbuffer, getLight, applyLight]);
+  const getFragment = useBoundShader(getDeferredLightFragment, [...gbuffer, getLight, applyLight]);
 
   const stencilLinks = useMemo(() => ({getVertex: getInstanceVertex}), [getInstanceVertex, getFragment]);
   const outsideLinks = useMemo(() => ({getVertex: getOutsideVertex, getFragment}), [getOutsideVertex, getFragment]);

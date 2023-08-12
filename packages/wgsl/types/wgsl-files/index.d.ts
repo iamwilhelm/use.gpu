@@ -31,6 +31,13 @@ declare module "@use-gpu/wgsl/codec/octahedral.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/codec/rgbm.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const decodeRGBM16: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/contour/fit-linear.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -176,24 +183,24 @@ declare module "@use-gpu/wgsl/geometry/trim.wgsl" {
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/fragment/emissive.wgsl" {
+declare module "@use-gpu/wgsl/instance/fragment/deferred-emissive.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getEmissiveFragment: ParsedBundle;
+  export const getDeferredEmissiveFragment: ParsedBundle;
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/fragment/light.wgsl" {
+declare module "@use-gpu/wgsl/instance/fragment/deferred-light.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getLightFragment: ParsedBundle;
+  export const getDeferredLightFragment: ParsedBundle;
   export default __module;
 }
 
-declare module "@use-gpu/wgsl/instance/fragment/shaded.wgsl" {
+declare module "@use-gpu/wgsl/instance/fragment/lit.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const getShadedFragment: ParsedBundle;
+  export const getLitFragment: ParsedBundle;
   export default __module;
 }
 
@@ -253,6 +260,13 @@ declare module "@use-gpu/wgsl/instance/vertex/arrow.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/vertex/deferred-light.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getDeferredLightVertex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/vertex/dual-contour.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -278,13 +292,6 @@ declare module "@use-gpu/wgsl/instance/vertex/label.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getLabelVertex: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/instance/vertex/light.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const getLightVertex: ParsedBundle;
   export default __module;
 }
 

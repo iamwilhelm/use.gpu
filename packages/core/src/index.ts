@@ -9,6 +9,7 @@ export * from './color';
 export * from './constants';
 export * from './data';
 export * from './depth';
+export * from './float16';
 export * from './id';
 export * from './lazy';
 export * from './mip';

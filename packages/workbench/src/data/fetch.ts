@@ -46,11 +46,12 @@ export const Fetch: LiveComponent<FetchProps<any>> = (props: FetchProps<any>) =>
 
     let go = (url ?? request) ? (slow ? () => delay(f(), slow) : f) : async () => null;
     return then ? async () => go().then(then) : go;
-  }, [url, request, JSON.stringify(options), type, version]);
+  }, [url, request, JSON.stringify(options), type, then, version]);
 
   const [resolved, error] = useAwait(run, [run]);
+  useOne(() => error && console.warn(error), error);
+
   const result = resolved !== undefined ? resolved : (error !== undefined ? fallback : loading);
-  
   return result !== undefined ? (render ? render(result) : yeet(result)) : (suspense ? suspend() : null);
 };
 

@@ -9,7 +9,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @optional @link fn getIndex(index: u32) -> u32 { return index; };
 @optional @link fn getScale() -> f32 { return 1.0; };
 
-@export fn getLightVertex(vertexIndex: u32, instanceIndex: u32) -> LightVertex {
+@export fn getDeferredLightVertex(vertexIndex: u32, instanceIndex: u32) -> LightVertex {
   let instance = getInstance(instanceIndex);
 
   if (IS_FULLSCREEN) {

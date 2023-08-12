@@ -1,14 +1,19 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 
-import { useDeviceContext } from '../providers/device-provider';
 import { use, yeet, gather, memo, useMemo, useYolo } from '@use-gpu/live';
-import { makeDynamicTexture, uploadExternalTexture, updateMipArrayTextureChain } from '@use-gpu/core';
-import { Fetch } from './fetch';
+import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMipArrayTextureChain } from '@use-gpu/core';
+import { useDeviceContext } from '../providers/device-provider';
+
+import { ImageLoader } from './image-loader';
 
 export type ImageCubeTextureProps = {
   /** URLs to 6 images (+x, -x, +y, -y, +z, -z) */
   urls: string[],
+  /** Type hint */
+  format?: string,
+  /** Premultiply alpha */
+  premultiply?: boolean,
   /** Color space to tag texture as. Does not convert input data. */
   colorSpace?: ColorSpace,
   /** MIPs */
@@ -30,49 +35,37 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
   const {
     urls,
     sampler,
-    mip = true,
+    format,
+    premultiply,
     colorSpace = 'srgb',
+    mip = true,
     render,
   } = props;
 
-  const fetch = urls.map((url: string) =>
-    use(Fetch, {
-      url,
-      type: 'blob',
-      loading: null,
-      then: (blob: Blob | null) => {
-        if (blob == null) return null;
+  const fetch = urls.map((url: string) => use(ImageLoader, {url, format, colorSpace}));
 
-        return createImageBitmap(blob, {
-          premultiplyAlpha: 'default',
-          colorSpaceConversion: 'none',
-        });
-      },
-    })
-  );
-
-  return gather(fetch, (bitmaps: ImageBitmap[]) => {
-    if (bitmaps.filter(x => !!x).length !== 6) return null;
+  return gather(fetch, (resources: any[]) => {
+    if (resources.filter(x => !!x).length !== 6) return null;
 
     const source = useMemo(() => {
-      const [{width, height}] = bitmaps;
-      const size = [width, height] as Point;
+      const [resource] = resources;
+      const format = resource.data?.format;
 
-      let format: GPUTextureFormat = 'rgba8unorm';
-      let cs = colorSpace;
-      if (colorSpace === 'srgb') {
-        format = 'rgba8unorm-srgb';
-        cs = 'linear';
-      }
+      let size: Point = [0, 0];
+      if ('bitmap' in resource) size = [resource.bitmap.width, resource.bitmap.height];
+      else if ('data' in resource) size = resource.data.size;
 
+      const [width, height] = size;
       const mips = (
         typeof mip === 'number' ? mip :
         mip ? countMips(width, height) : 1
       );
 
-      const texture = makeDynamicTexture(device, width, height, 6, format, 1, mips);
-      bitmaps.forEach((bitmap: ImageBitmap, i: number) =>
-        uploadExternalTexture(device, texture, bitmap, size, [0, 0, i]));
+      const texture = makeDynamicTexture(device, width, height, 6, format ?? 'rgba8unorm', 1, mips);
+      resources.forEach((resource, i: number) => {
+        if ('bitmap' in resource) uploadExternalTexture(device, texture, resource.bitmap, [width, height, 1], [0, 0, i]);
+        if ('data' in resource) uploadDataTexture(device, texture, resource.data, [width, height, 1], [0, 0, i]);
+      });        
 
       const source = {
         texture,
@@ -90,14 +83,14 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
         mips,
         format,
         size: [width, height, 6],
-        colorSpace: cs,
+        colorSpace: resource.colorSpace,
         version: 1,
       } as TextureSource;
 
       updateMipArrayTextureChain(device, source);
 
       return source;
-    }, [bitmaps, sampler]);
+    }, [resources, sampler]);
 
     return useYolo(() => render ? (source ? render(source) : null) : yeet(source), [render, source]);
   });

@@ -50,6 +50,11 @@
       "import": "./src/codec/octahedral.wgsl",
       "require": "./src/codec/octahedral.wgsl"
     },
+    "./codec/rgbm.wgsl": {
+      "types": "./src/codec/rgbm.wgsl.d.ts",
+      "import": "./src/codec/rgbm.wgsl",
+      "require": "./src/codec/rgbm.wgsl"
+    },
     "./contour/fit-linear.wgsl": {
       "types": "./src/contour/fit-linear.wgsl.d.ts",
       "import": "./src/contour/fit-linear.wgsl",
@@ -145,20 +150,20 @@
       "import": "./src/geometry/trim.wgsl",
       "require": "./src/geometry/trim.wgsl"
     },
-    "./instance/fragment/emissive.wgsl": {
-      "types": "./src/instance/fragment/emissive.wgsl.d.ts",
-      "import": "./src/instance/fragment/emissive.wgsl",
-      "require": "./src/instance/fragment/emissive.wgsl"
+    "./instance/fragment/deferred-emissive.wgsl": {
+      "types": "./src/instance/fragment/deferred-emissive.wgsl.d.ts",
+      "import": "./src/instance/fragment/deferred-emissive.wgsl",
+      "require": "./src/instance/fragment/deferred-emissive.wgsl"
     },
-    "./instance/fragment/light.wgsl": {
-      "types": "./src/instance/fragment/light.wgsl.d.ts",
-      "import": "./src/instance/fragment/light.wgsl",
-      "require": "./src/instance/fragment/light.wgsl"
+    "./instance/fragment/deferred-light.wgsl": {
+      "types": "./src/instance/fragment/deferred-light.wgsl.d.ts",
+      "import": "./src/instance/fragment/deferred-light.wgsl",
+      "require": "./src/instance/fragment/deferred-light.wgsl"
     },
-    "./instance/fragment/shaded.wgsl": {
-      "types": "./src/instance/fragment/shaded.wgsl.d.ts",
-      "import": "./src/instance/fragment/shaded.wgsl",
-      "require": "./src/instance/fragment/shaded.wgsl"
+    "./instance/fragment/lit.wgsl": {
+      "types": "./src/instance/fragment/lit.wgsl.d.ts",
+      "import": "./src/instance/fragment/lit.wgsl",
+      "require": "./src/instance/fragment/lit.wgsl"
     },
     "./instance/fragment/solid.wgsl": {
       "types": "./src/instance/fragment/solid.wgsl.d.ts",
@@ -200,6 +205,11 @@
       "import": "./src/instance/vertex/arrow.wgsl",
       "require": "./src/instance/vertex/arrow.wgsl"
     },
+    "./instance/vertex/deferred-light.wgsl": {
+      "types": "./src/instance/vertex/deferred-light.wgsl.d.ts",
+      "import": "./src/instance/vertex/deferred-light.wgsl",
+      "require": "./src/instance/vertex/deferred-light.wgsl"
+    },
     "./instance/vertex/dual-contour.wgsl": {
       "types": "./src/instance/vertex/dual-contour.wgsl.d.ts",
       "import": "./src/instance/vertex/dual-contour.wgsl",
@@ -219,11 +229,6 @@
       "types": "./src/instance/vertex/label.wgsl.d.ts",
       "import": "./src/instance/vertex/label.wgsl",
       "require": "./src/instance/vertex/label.wgsl"
-    },
-    "./instance/vertex/light.wgsl": {
-      "types": "./src/instance/vertex/light.wgsl.d.ts",
-      "import": "./src/instance/vertex/light.wgsl",
-      "require": "./src/instance/vertex/light.wgsl"
     },
     "./instance/vertex/line.wgsl": {
       "types": "./src/instance/vertex/line.wgsl.d.ts",

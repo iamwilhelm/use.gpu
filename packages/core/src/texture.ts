@@ -120,12 +120,13 @@ export const uploadDataTexture = (
   device: GPUDevice,
   texture: GPUTexture,
   dataTexture: DataTexture,
+  size?: Point | Point3,
+  offset: Point | Point3 = NO_OFFSET,
   mipLevel: GPUIntegerCoordinate = 0,
 ): void => {
-  const {data, size, format} = dataTexture;
-
-  const layout = makeTextureDataLayout(size, format ?? 'rgba8unorm');
-  uploadTexture(device, texture, data, layout, size, undefined, mipLevel);
+  const {data, size: s, format} = dataTexture;
+  const layout = makeTextureDataLayout(size ?? s, format ?? 'rgba8unorm');
+  uploadTexture(device, texture, data, layout, size ?? s, offset, mipLevel);
 }
 
 export const uploadTexture = (

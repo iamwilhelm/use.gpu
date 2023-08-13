@@ -13,7 +13,7 @@ export type WebGPUProps = {
 };
 
 export const WebGPU: LC<WebGPUProps> = ({fallback, children}: PropsWithChildren<WebGPUProps>) => {
-  const [result, error] = useAwait(() => mountGPUDevice([], ["rg11b10ufloat-renderable", "depth32float-stencil8"]));
+  const [result, error] = useAwait(() => mountGPUDevice([], ["rg11b10ufloat-renderable", "depth32float-stencil8", "shader-f16"]));
   return (
     result ? provide(DeviceContext, result.device, wrap(Queue, children)) :
     error ? (typeof fallback === 'function' ? fallback(error) : fallback) : null

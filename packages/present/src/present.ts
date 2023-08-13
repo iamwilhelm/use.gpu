@@ -12,6 +12,7 @@ import {
 } from '@use-gpu/workbench';
 import { UI, UILayers } from '@use-gpu/layout';
 import { makeParseColor, parseColor, useProp } from '@use-gpu/traits';
+import { clamp } from '@use-gpu/core';
 
 import { resolveSlides } from './lib/slides';
 import { PresentContext, PresentAPI } from './providers/present-provider';
@@ -23,9 +24,6 @@ export type PresentProps = {
   onChange?: (step: number) => void,
   backgroundColor?: ColorLike,
 };
-
-const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
-const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
 type SlideMap = Map<number, ResolvedSlide>;
 const NO_MAP: SlideMap = new Map();

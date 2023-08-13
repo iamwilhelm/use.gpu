@@ -22,6 +22,16 @@ declare module "@use-gpu/wgsl/app/vertex/mesh.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/codec/f16.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const toF16u: ParsedBundle;
+  export const fromF16u: ParsedBundle;
+  export const toF16u4: ParsedBundle;
+  export const fromF16u4: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/codec/octahedral.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -498,6 +508,20 @@ declare module "@use-gpu/wgsl/plot/volume.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getVolumeGradient: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/pmrem/pmrem-read.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const sampleCubeMap: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/pmrem/pmrem.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const sampleBlur: ParsedBundle;
   export default __module;
 }
 

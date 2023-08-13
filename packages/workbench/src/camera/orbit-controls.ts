@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/traits';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
 import { useContext, useOne, useResource, useState, useYolo } from '@use-gpu/live';
-import { makeOrbitMatrix } from '@use-gpu/core';
+import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
 import { useDerivedState } from '../hooks/useDerivedState';
@@ -12,7 +12,6 @@ import { mat4, vec3 } from 'gl-matrix';
 const CAPTURE_EVENT = {capture: true};
 
 const π = Math.PI;
-const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 const maybeClamp = (x: number, a?: number, b?: number) => {
   if (a != null) x = Math.max(x, a);
   if (b != null) x = Math.min(x, b);
@@ -129,7 +128,7 @@ export const OrbitControls: LiveComponent<OrbitControlsProps> = (props) => {
     }
     else if (spinY) setRadius((radius: number) => maybeClamp(radius * Math.pow(2, spinY * speedY), minRadius, maxRadius));
 
-    stop();
+    if (active) stop();
   }, wheel);
 
   return useYolo(() => render(radius, bearing, pitch, target), [render, radius, bearing, pitch, target]);

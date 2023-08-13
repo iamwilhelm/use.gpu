@@ -18,8 +18,6 @@ import { Scene, Node, Mesh, Primitive } from '@use-gpu/scene';
 // Prefab geometry
 const boxGeometry = makeBoxGeometry();
 
-const seq = (n: number, s: number = 0, d: number = 1) => Array.from({ length: n }).map((_, i: number) => s + d * i);
-
 export const DebugWireframePage: LC = () => {
 
   return (

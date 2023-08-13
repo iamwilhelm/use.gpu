@@ -43,8 +43,8 @@ export const DebugAtlas: LiveComponent<Partial<DebugAtlasProps> | undefined> = m
   if (!atlas) return;
 
   const {width: w, height: h} = atlas;
-  const width = size * w / h;
-  const height = size;
+  const width = size;
+  const height = size * h / w;
 
   const shape = useMemo(() => ({
     atlas: atlas!,
@@ -116,8 +116,8 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
   const yeets = [];
   const pos = [] as number[];
   
-  const width = size * w / h;
-  const height = size;
+  const width = size;
+  const height = size * h / w;
   const sx = width / w;
   const sy = height / h;
 
@@ -127,7 +127,6 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
   const inset = ([l, t, r, b]: Rectangle, v: number): Rectangle => [l + v * dpi, t + v * dpi, r - v * dpi, b - v * dpi];
 
   const border = [dpi, dpi, dpi, dpi];
-  const border2 = [2*dpi, 2*dpi, 2*dpi, 2*dpi];
   const border5 = [5*dpi, 5*dpi, 5*dpi, 5*dpi];
 
   let ID = 0;
@@ -135,17 +134,19 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
 
   const boundSource = useLambdaSource(useBoundShader(premultiply, [source]), source);
 
-  yeets.push({
-    id: next(),
-    rectangle: [left + (compact ? 0 : width), top, left + width + (compact ? 0 : width), top + height],
-    uv: [0, 0, w, h],
-    radius: [0, 0, 0, 0],
-    texture: boundSource,
-    fill: [0, 0, 0, 1],
-    count: 1,
-    repeat: 3,
-    clip, mask, transform,
-  });
+  if (source) {
+    yeets.push({
+      id: next(),
+      rectangle: [left + (compact ? 0 : width), top, left + width + (compact ? 0 : width), top + height],
+      uv: [0, 0, w, h],
+      radius: [0, 0, 0, 0],
+      texture: boundSource,
+      fill: [0, 0, 0, 1],
+      count: 1,
+      repeat: 3,
+      clip, mask, transform,
+    });
+  }
 
   for (const rect of debugPlacements()) {
     yeets.push({
@@ -167,39 +168,44 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
   for (const [l, t, r, b, nearX, nearY, farX, farY, corner] of debugSlots()) {
     yeets.push({
       id: next(),
-      rectangle: fit(inset([l, t, r, b], 4)),
+      rectangle: inset(fit([l, t, r, b]), 1),
       uv: [0, 0, 1, 1],
       fill: [0, 0, 0.25, 0.25],
       stroke: [0, 0.45, 0.95, 1],
-      border: border2,
-      count: 1,
-      repeat: 0,
-      clip, mask, transform,
-    });
-    yeets.push({
-      id: next(),
-      rectangle: fit(inset([l, t, l + nearX, t + nearY], 8)),
-      uv: [0, 0, 1, 1],
-      fill: [0, 0, 0, 0.5],
-      stroke: [1, 1, 0.2, 1],
-      border: border2,
-      count: 1,
-      repeat: 0,
-      clip, mask, transform,
-    });
-    yeets.push({
-      id: next(),
-      rectangle: fit(inset([l, t, l + farX, t + farY], 6)),
-      uv: [0, 0, 1, 1],
-      fill: [0, 0, 0, 0.5],
-      stroke: [0.2, 0.5, 1.0, 1],
-      border: border2,
+      border,
       count: 1,
       repeat: 0,
       clip, mask, transform,
     });
   }
 
+  for (const [l, t, r, b, nearX, nearY, farX, farY, corner] of debugSlots()) {
+    if (l + farX !== r || t + farY !== b)
+    yeets.push({
+      id: next(),
+      rectangle: inset(fit([l, t, l + farX, t + farY]), 3),
+      uv: [0, 0, 1, 1],
+      fill: [0, 0, 0, 0],
+      stroke: [0, 0.95, 0.75, 1],
+      border,
+      count: 1,
+      repeat: 0,
+      clip, mask, transform,
+    });
+
+    yeets.push({
+      id: next(),
+      rectangle: inset(fit([l, t, l + nearX, t + nearY]), 2),
+      uv: [0, 0, 1, 1],
+      fill: [0, 0, 0, 0],
+      stroke: [0, 0.75, 0.95, 1],
+      border,
+      count: 1,
+      repeat: 0,
+      clip, mask, transform,
+    });
+  }
+  
   for (const anchor of debugValidate()) {
     const {x, y, dx, dy} = anchor;
     yeets.push({

@@ -2,7 +2,7 @@ import type { LC, LiveElement, Ref } from '@use-gpu/live';
 import type { TextureSource, StorageSource, LambdaSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { seq } from '@use-gpu/core';
+import { seq, clamp } from '@use-gpu/core';
 import { gather, use, quote, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import {
   useMatrixContext,
@@ -17,8 +17,6 @@ import { getViewPosition, worldToDepth } from '@use-gpu/wgsl/use/view.wgsl';
 import { SurfaceFragment, DepthFragment } from '@use-gpu/wgsl/use/types.wgsl';
 
 import { vec3, mat3, mat4 } from 'gl-matrix';
-
-const clamp = (x: number, min: number, max: number) => Math.max(min, Math.min(max, x));
 
 export type VoxLayerProps = {
   shape: (TextureSource | StorageSource | LambdaSource)[],

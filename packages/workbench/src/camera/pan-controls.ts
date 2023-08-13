@@ -5,7 +5,6 @@ import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-
 import { LayoutContext } from '../providers/layout-provider';
 
 const π = Math.PI;
-const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 export type PanControlsProps = {
   x?: number,

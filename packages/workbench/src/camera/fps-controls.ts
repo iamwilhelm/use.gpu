@@ -3,7 +3,7 @@ import type { VectorLike } from '@use-gpu/traits';
 
 import { parsePosition, useProp } from '@use-gpu/traits';
 import { useContext, useYolo, useOne, useRef, useResource, useState } from '@use-gpu/live';
-import { makeOrbitMatrix } from '@use-gpu/core';
+import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { KeyboardContext, MouseContext } from '../providers/event-provider';
 import { usePerFrame } from '../providers/frame-provider';
@@ -14,7 +14,6 @@ import { mat4, vec3 } from 'gl-matrix';
 const CAPTURE_EVENT = {capture: true};
 
 const π = Math.PI;
-const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 export type FPSControlsProps = {
   position?: VectorLike,

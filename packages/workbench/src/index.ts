@@ -1,5 +1,6 @@
 export * from './animate';
 export * from './camera';
+export * from './codec';
 export * from './compute';
 export * from './data';
 export * from './hooks';

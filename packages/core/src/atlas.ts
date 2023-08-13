@@ -1,5 +1,6 @@
 import type { Atlas, TextureSource } from './types';
 
+import { clamp, lerp } from './tuple';
 import { makeTextureDataLayout, makeDynamicTexture, uploadTexture } from './texture';
 import uniq from 'lodash/uniq';
 
@@ -12,8 +13,6 @@ type Bins = Map<number, Set<Slot>>;
 
 const EMPTY: any[] = [];
 const sqr = (x: number) => x * x;
-const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
-const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 export const makeAtlasSource = (
   device: GPUDevice,

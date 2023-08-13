@@ -3,6 +3,7 @@ import type { DataField, StorageSource } from '@use-gpu/core';
 
 import React, { Gather, yeet, use, useMemo } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
+import { clamp } from '@use-gpu/core';
 
 import {
   Loop, Pass, Flat,
@@ -19,8 +20,6 @@ import { BinaryControls } from '../../ui/binary-controls';
 import { vec3 } from 'gl-matrix';
 
 let t = 0;
-
-const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 const RANGE = [[0, 256], [0, 256], [0, 256]];
 const GRID = { divide: 16, base: 2, end: true };

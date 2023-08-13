@@ -1,6 +1,6 @@
 import type { Point3 } from '@use-gpu/core';
 
-import { toFloat16, toFloat32 } from '@use-gpu/core';
+import { toFloat16 } from '@use-gpu/core';
 import zipObject from 'lodash/zipObject';
 
 // Based on:
@@ -141,18 +141,6 @@ export const getUint8 = (view: DataView, ptr: Pointer): number =>
 export const getUint16 = (view: DataView, ptr: Pointer): number => {
   const int = view.getUint16(ptr.offset, true);
   ptr.offset += 2;
-  return int;
-};
-
-export const getUint32 = (view: DataView, ptr: Pointer): number => {
-  const int = view.getUint32(ptr.offset, true);
-  ptr.offset += 4;
-  return int;
-};
-
-export const getInt32 = (view: DataView, ptr: Pointer): number => {
-  const int = view.getInt32(ptr.offset, true);
-  ptr.offset += 4;
   return int;
 };
 

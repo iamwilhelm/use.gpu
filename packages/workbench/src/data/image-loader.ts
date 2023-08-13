@@ -5,8 +5,8 @@ import { use, yeet, gather, memo, useMemo, useYolo } from '@use-gpu/live';
 import { Await } from '../queue/await';
 import { Fetch } from './fetch';
 
-import { parseHDR } from '../material/hdr';
-import { parseRGBM16 } from '../material/rgbm16';
+import { parseHDR } from '../codec/hdr';
+import { parseRGBM16 } from '../codec/rgbm16';
 
 const MIME_TYPES = {
   'png': 'image/png',

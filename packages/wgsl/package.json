@@ -45,6 +45,11 @@
       "import": "./src/app/vertex/mesh.wgsl",
       "require": "./src/app/vertex/mesh.wgsl"
     },
+    "./codec/f16.wgsl": {
+      "types": "./src/codec/f16.wgsl.d.ts",
+      "import": "./src/codec/f16.wgsl",
+      "require": "./src/codec/f16.wgsl"
+    },
     "./codec/octahedral.wgsl": {
       "types": "./src/codec/octahedral.wgsl.d.ts",
       "import": "./src/codec/octahedral.wgsl",
@@ -369,6 +374,16 @@
       "types": "./src/plot/volume.wgsl.d.ts",
       "import": "./src/plot/volume.wgsl",
       "require": "./src/plot/volume.wgsl"
+    },
+    "./pmrem/pmrem-read.wgsl": {
+      "types": "./src/pmrem/pmrem-read.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem-read.wgsl",
+      "require": "./src/pmrem/pmrem-read.wgsl"
+    },
+    "./pmrem/pmrem.wgsl": {
+      "types": "./src/pmrem/pmrem.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem.wgsl",
+      "require": "./src/pmrem/pmrem.wgsl"
     },
     "./present/fragment.wgsl": {
       "types": "./src/present/fragment.wgsl.d.ts",

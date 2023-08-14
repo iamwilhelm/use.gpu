@@ -27,51 +27,45 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
   var band7 = vec4<f32>(0.0);
   var band8 = vec4<f32>(0.0);
   var bandW = 0.0;
+  
+  let s1 = size - 1;
 
   let x = i32(globalId.x);
-  if (x <= size.x - 1) {
+  if (x < size.x - 1) {
     for (var y = 0; y < MAX_HEIGHT; y++) {
-      if (y > size.y - 1) { break; }
+      if (y >= size.y - 1) { break; }
 
-      // sample between texels to avoid double-counting wrapped edges,
-      // because octahedral map goes edge to edge
       let xy = vec2<f32>(vec2<i32>(x, y));
-      let uv = vec2<f32>(xy) / vec2<f32>(size - 1);
+      let uv = (xy + .5) / vec2<f32>(s1);
 
       // texture starts at uv .5 (absolute coords)
       let uv2 = xy + .5;
       var sample = getScratchTexture(uv2, 0.0);
-      sample = sample * 0.0 + vec4<f32>(0.5, 0.5, 0.5, 1.0);
       
       let uvo = uv * 2.0 - 1.0;
       let ray = decodeOctahedral(uvo);
-      
-      /*
+
       let dx = (
-        decodeOctahedral(uv + vec2<f32>(1e-4, 0.0)) -
-        decodeOctahedral(uv + vec2<f32>(-1e-4, 0.0))
-      ) * 2e4;
+        decodeOctahedral(uvo + vec2<f32>(1e-4, 0.0)) -
+        decodeOctahedral(uvo + vec2<f32>(-1e-4, 0.0))
+      ) * 5e3;
       let dy = (
-        decodeOctahedral(uv + vec2<f32>(0.0, 1e-4)) -
-        decodeOctahedral(uv + vec2<f32>(0.0, -1e-4))
-      ) * 2e4;
+        decodeOctahedral(uvo + vec2<f32>(0.0, 1e-4)) -
+        decodeOctahedral(uvo + vec2<f32>(0.0, -1e-4))
+      ) * 5e3;
       
       let weight = length(cross(dx, dy));
-      */
-
-      let weight = 1.0;
-
       let s = sample * weight;
 
       band0 += s;
-      band1 += s * ray.y;
-      band2 += s * ray.z;
-      band3 += s * ray.x;
-      band4 += s * ray.y * ray.x;
-      band5 += s * ray.y * ray.z;
-      band6 += s * (3.0 * sqr(ray.z) - 1.0);
-      band7 += s * ray.x * ray.z;
-      band8 += s * (sqr(ray.x) - sqr(ray.y));
+      band1 += s * 1.7320508076 * ray.y;
+      band2 += s * 1.7320508076 * ray.z;
+      band3 += s * 1.7320508076 * ray.x;
+      band4 += s * 3.8729833462 * ray.y * ray.x;
+      band5 += s * 3.8729833462 * ray.y * ray.z;
+      band6 += s * 1.1180339887 * (3.0 * sqr(ray.z) - 1.0);
+      band7 += s * 3.8729833462 * ray.x * ray.z;
+      band8 += s * 1.9364916731 * (sqr(ray.x) - sqr(ray.y));
       bandW += weight;
     }
 
@@ -92,7 +86,7 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
 
   if (x > 0) { return; }
   
-  for (var x = 1; x < size.x; x++) {
+  for (var x = 1; x < size.x - 1; x++) {
     let index = x * 10;
     band0 += shScratch[index + 0];
     band1 += shScratch[index + 1];

@@ -117,6 +117,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
 
     // Lambertian diffuse
     sizes.push(DIFFUSE_MIP, DIFFUSE_MIP);
+    sizes.push(DIFFUSE_MIP, DIFFUSE_MIP);
 
     // Allocate in atlas
     const area = sizes.reduce((a, b) => a + b*b, 0);

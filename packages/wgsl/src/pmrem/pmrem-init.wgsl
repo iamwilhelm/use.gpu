@@ -22,7 +22,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ wrapOctahedral, decodeOctahedral };
   let uv = vec2<f32>(xyi) / vec2<f32>(size - 1);
   let uvo = (uv * 2.0 - 1.0);
 
-  let ray = decodeOctahedral(uvo) * vec3<f32>(-1.0, 1.0, 1.0);
+  let ray = decodeOctahedral(uvo);
   let sample = getCubeMap(ray, 0.0);
 
   textureStore(atlasTexture, xyi + mapping.xy, sample);

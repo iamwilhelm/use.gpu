@@ -48,6 +48,13 @@ declare module "@use-gpu/wgsl/codec/rgbm.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/compute/memo2.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const memoSample: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/contour/fit-linear.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -511,10 +518,32 @@ declare module "@use-gpu/wgsl/plot/volume.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/pmrem/pmrem-blur.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const pmremBlur: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/pmrem/pmrem-copy.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const pmremCopy: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/pmrem/pmrem-init.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const pmremInit: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/pmrem/pmrem-read.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const sampleCubeMap: ParsedBundle;
+  export const sampleTextureMap: ParsedBundle;
   export default __module;
 }
 

@@ -22,6 +22,7 @@ import mapValues from 'lodash/mapValues';
 
 export type DispatchProps = {
   size?: Lazy<number[]>,
+  group?: Lazy<number[]>,
   shader: ParsedBundle,
   defines?: Record<string, any>,
   indirect?: StorageSource,
@@ -46,6 +47,7 @@ export const Dispatch = (props: DispatchProps) => {
 export const dispatch = (props: DispatchProps) => {
   const {
     size = NO_SIZE,
+    group,
     indirect,
     shader: computeShader,
     defines: propDefines,
@@ -106,6 +108,7 @@ export const dispatch = (props: DispatchProps) => {
     onDispatch && onDispatch();
 
     const s = resolve(size ?? NO_SIZE);
+    const m = resolve(group ?? null);
     const d = s.reduce((a: number, b: number) => a * (b || 1), 1);
 
     inspected.render.dispatches = d;
@@ -129,7 +132,18 @@ export const dispatch = (props: DispatchProps) => {
     if (volatile.bindGroup) passEncoder.setBindGroup(1, volatile.bindGroup());
 
     if (indirect) passEncoder.dispatchWorkgroupsIndirect(indirect.buffer, indirect.byteOffset ?? 0);
-    else passEncoder.dispatchWorkgroups(s[0], s[1] || 1, s[2] || 1);
+    else {
+      if (m) {
+        passEncoder.dispatchWorkgroups(
+          Math.ceil(s[0] / m[0]),
+          Math.ceil((s[1] || 1) / (m[1] || 1)),
+          Math.ceil((s[2] || 1) / (m[2] || 1))
+        );
+      }
+      else {
+        passEncoder.dispatchWorkgroups(s[0], s[1] || 1, s[2] || 1);
+      }
+    }
   };
   
   if (shouldDispatch) {

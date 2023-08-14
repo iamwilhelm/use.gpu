@@ -98,10 +98,10 @@ export const makeAtlas = (
   // Expand atlas by doubling width or height
   const expand = () => {
     // First height, then width
-    const w = width !== height ? width * 2 : width;
-    const h = width !== height ? height : height * 2;
+    const w = (width  < height && width < maxWidth) ? width * 2 : width;
+    const h = (width >= height || w == width) && height < maxHeight ? height * 2 : height;
 
-    if (w > maxWidth || h > maxHeight) {
+    if (w == width && h == height) {
       throw new Error(`Atlas is full and can't expand any more (${maxWidth}x${maxHeight})`);
     }
 

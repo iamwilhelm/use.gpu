@@ -106,6 +106,8 @@ export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWit
     source.swap = swap;
     source.history = sources;
 
+    swap();
+
     return [source, sources];
   }, [targetBuffer, width, height, depth, format, history]);
 

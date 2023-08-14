@@ -1,21 +1,34 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { TextureSource } from '@use-gpu/core';
+import type { TextureSource, TextureTarget } from '@use-gpu/core';
 
-import { use, useMemo } from '@use-gpu/live';
+import { gather, use, useMemo } from '@use-gpu/live';
 import { makeAtlas, makeDataBuffer, clamp, seq, lerp } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { DebugAtlas } from '../text/debug-atlas';
 import { Queue } from '../queue/queue';
 import { Dispatch } from '../queue/dispatch';
 import { Compute } from '../compute/compute';
+import { TextureBuffer } from '../compute/texture-buffer';
 import { useBoundShader, getBoundShader } from '../hooks/useBoundShader';
 import { useDerivedSource, getDerivedSource } from '../hooks/useDerivedSource';
+import { useInspectable } from '../hooks/useInspectable'
 
-import { sampleBlur } from '@use-gpu/wgsl/pmrem/pmrem.wgsl';
+import { pmremInit } from '@use-gpu/wgsl/pmrem/pmrem-init.wgsl';
+import { pmremCopy } from '@use-gpu/wgsl/pmrem/pmrem-copy.wgsl';
+import { pmremBlur } from '@use-gpu/wgsl/pmrem/pmrem-blur.wgsl';
+
 import { sampleCubeMap, sampleTextureMap } from '@use-gpu/wgsl/pmrem/pmrem-read.wgsl';
 
 const π = Math.PI;
+const τ = 2*π;
 const sqr = (x: number) => x * x;
+
+const MAX_SAMPLES = 20;
+
+const LINEAR_SAMPLER: GPUSamplerDescriptor = {
+  minFilter: 'linear',
+  magFilter: 'linear',
+};
 
 export type PrefilteredEnvMapProps = {
   texture: TextureSource,
@@ -34,14 +47,22 @@ const getVarianceForRoughness = (roughness: number) => {
   return 0.312 * r + 0.027;
 };
 
-const MIN_SIGMA = 0.05;
+const MIN_SIGMA = 0.01;
 const MAX_SIGMA = Math.sqrt(getVarianceForRoughness(1));
 const PIXEL_PER_SIGMA = 5;
 
+const WEIGHT_CUTOFF = 0.05;
+const SIGMA_CUTOFF = Math.sqrt(-Math.log(WEIGHT_CUTOFF));
+
+const CRISP_SIGMA = 0.3989422804; // 1/sqrt(2π) - normalizes to p(0) == 1
+
+const FIRST_MIP = Math.ceil(PIXEL_PER_SIGMA * (π / 2) / MIN_SIGMA) + 2;
+console.log({FIRST_MIP})
+
 export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: PrefilteredEnvMapProps) => {
   const {
-    levels = 9,
-    size = 512,
+    levels = 8,
+    size = 1024,
     texture,
     render,
   } = props;
@@ -49,122 +70,163 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
   if (!texture) return;
   
   const device = useDeviceContext();
+  const inspect = useInspectable();
 
-  const {atlas, sigmas, sizes, radii, mappings, buffer, target} = useMemo(() => {
-    const radiansPerPixel = (π / 2) / size;
+  const {atlas, mappings, mips, sigmas, dsigmas, sizes, radii} = useMemo(() => {
 
-    const sigmas = seq(levels).map(i => i
-      ? Math.pow(2, lerp(Math.log2(MIN_SIGMA), Math.log2(MAX_SIGMA), (i - 1) / (levels - 2)))
-      : 0);
+    const sigmas = [];
+    const dsigmas = [];
+    const sizes = [];
+    const radii = [];
 
-    const sizes = sigmas.map((sigma, i) => sigma
-      ? Math.round(size * Math.min(1, PIXEL_PER_SIGMA / (sigma / radiansPerPixel)))
-      : size);
+    // MIP downscale
+    const mips = Math.max(1, Math.ceil(Math.log2(size / FIRST_MIP)));
+    for (let i = 0; i < mips; ++i) {
+      sigmas.push(0);
+      dsigmas.push(0);
+      sizes.push(size >> i);
+      radii.push(0);
+    }
 
-    const radii = sigmas.map((sigma, i) => (sigma / (π / 2)) * sizes[i]);
+    // Blur downscale
+    for (let i = 0; i < levels; ++i) {
+      const sigma = Math.pow(2, lerp(Math.log2(MIN_SIGMA), Math.log2(MAX_SIGMA), i / (levels - 1)));
+      const size = Math.ceil(PIXEL_PER_SIGMA * (τ / 4) / sigma) + 1;
+      
+      const last = sigmas[sigmas.length - 1] || 0;
+      const dsigma = Math.sqrt(sigma*sigma - last*last);
+      const radius = Math.ceil(SIGMA_CUTOFF * dsigma * (size - 1) / (τ / 4));
 
-    const w = sizes[0];
-    const h = sizes[0] + sizes[1] + sizes[2];
-    const atlas = makeAtlas(w, h);
-  
+      if (radius > MAX_SAMPLES) console.warn(`PMREM radius too big: ${radius} > MAX_SAMPLES ${MAX_SAMPLES}`);
+
+      sigmas.push(sigma);
+      dsigmas.push(dsigma);
+      sizes.push(size);
+      radii.push(radius);
+    }
+
+    // Allocate in atlas
+    const area = sizes.reduce((a, b) => a + b*b, 0);
+    const w = Math.max(sizes[0], FIRST_MIP);
+    const h = Math.max(sizes[0], FIRST_MIP) + Math.max(sizes[1], sizes[mips] + sizes[mips + 1]);
+    const atlas = makeAtlas(w, h, w*2);
+
     const mappings = [];
     for (const [i, size] of sizes.entries()) {
       mappings.push(atlas.place(i, size, size));
     }
 
-    const storageFlags = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
-
-    const {width, height} = atlas;
-    const bufferLength = width * height;
-    const buffer = makeDataBuffer(device, bufferLength * 8, storageFlags);
-    const target = {
-      buffer: buffer,
-      format: 'vec2<u32>',
-      length: bufferLength,
-      size: [width, height],
-      version: 0,
-      readWrite: true,
-    } as StorageSource;
-
-    return {atlas, sigmas, sizes, radii, mappings, buffer, target};
-  }, [size, levels]);
-
-  const dispatches = useMemo(() => {
-    
-    const out = [];
-    
-    const cubeMap = getDerivedSource(texture, {
-      variant: 'textureSampleGrad',
-    });
-
-    const makeDispatch = (i: number) => {
-      const bound = getBoundShader(sampleBlur, [
-        mappings[i],
-        mappings[i - 1] ?? [0,0,0,0],
-        cubeMap,
-        target,
-      ], {PMREM_PASS: i});
-
-      const size = sizes[i];
-      const dispatchSize = [Math.ceil(size / 8), Math.ceil(size / 8), 1];
-
-      const dispatch = (
-        use(Dispatch, {
-          size: dispatchSize,
-          shader: bound,
-          onDispatch: () => console.log('dispatch', texture.size)
-        })
-      );
-      return dispatch;
-    };
-    
-    out.push(makeDispatch(0));
-    console.log({out})
-    return out;
-  }, [sigmas, radii, mappings, texture, target]);
+    console.log({atlas, mappings, mips, sigmas, dsigmas, sizes, radii})
+    return {atlas, mappings, mips, sigmas, dsigmas, sizes, radii};
+  });
 
   const {width, height} = atlas;
-  const boundCubeMap = useBoundShader(sampleCubeMap, [mappings[0], target]);
-  const boundTexture = useDerivedSource(
-    useBoundShader(sampleTextureMap, [mappings[0], target]),
-    {
-      length: width * height,
-      size: [width, height],
-    }
-  );
+  return (
+    gather([
+      use(TextureBuffer, {
+        width,
+        height,
+        sampler: LINEAR_SAMPLER,
+        format: 'rgba16float',
+        filterable: true,
+      }),
+      use(TextureBuffer, {
+        width: Math.max(size, FIRST_MIP),
+        height: Math.max(size, FIRST_MIP),
+        sampler: LINEAR_SAMPLER,
+        format: 'rgba16float',
+        filterable: true,
+        history: 1,
+      }),
+    ], ([target, scratch]: TextureTarget[]) => {
 
-  return [
-    use(DebugAtlas, {atlas}),
-    use(Queue, {nested: true, children: use(Compute, {children: dispatches}) }),
-    render ? render(boundCubeMap, boundTexture) : yeet(boundCubeMap),
-  ];
-  /*
-    seq(mappings).map(i => {
+      const scratchOut = useDerivedSource(scratch, {
+        sampler: null,
+      });
+      
+      const scratchIn = getDerivedSource(scratch.history[0], {
+        variant: 'textureSampleGrad',
+        absolute: true,
+      });
+
+      const dispatches = useMemo(() => {
     
-    }),
-  ];
-  */
-  
-  /*
-  const computeBuffers = seq(mips).map((_, i) => makeDataBuffer(device, bufferLengths[i], storageFlags));
-  const [computeBuffer] = computeBuffers;
+        const out = [];
 
-  const clear = () => {
-    const commandEncoder = device.createCommandEncoder();
-    commandEncoder.clearBuffer(computeBuffer);
-    const command = commandEncoder.finish();
-    device.queue.submit([command]);
-  };
+        const cubeMap = getDerivedSource(texture, {
+          variant: 'textureSampleGrad',
+        });
+    
+        const makeInitShader = () =>
+          getBoundShader(pmremInit, [
+            mappings[0],
+            cubeMap,
+            scratchOut,
+            target,
+          ]);
 
-  const computeTargets = computeBuffers.map((computeBuffer, i) => ({
-    buffer: computeBuffer,
-    format: 'u32',
-    length: bufferLengths[i] / 4,
-    size: bufferSizes[i].map((x, i) => i ? x : x / 4),
-    version: 0,
-    readWrite: true,
-  } as StorageSource));
+        const makeCopyShader = (i: number) =>
+          getBoundShader(pmremCopy, [
+            mappings[i],
+            mappings[i - 1],
+            scratchIn,
+            scratchOut,
+            target,
+          ]);
+
+        const makeBlurShader = (i: number, pass: number) =>
+          getBoundShader(pmremBlur, [
+            mappings[i],
+            pass ? mappings[i] : mappings[i - 1],
+            dsigmas[i],
+            radii[i],
+            scratchIn,
+            scratchOut,
+            target,
+          ], {
+            BLUR_PASS: pass,
+            SIGMA_CUTOFF,
+            MAX_SAMPLES,
+          });
+
+        const makeDispatch = (shader: ShaderModule, i: number) => 
+          use(Dispatch, {
+            shader,
+            size: [sizes[i], sizes[i]],
+            group: [8, 8],
+            onDispatch: scratch.swap,
+          });
+
+        out.push(makeDispatch(makeInitShader(), 0));
+        for (let i = 1; i < mips; ++i) out.push(makeDispatch(makeCopyShader(i), i));
+        for (let i = 0; i < levels; ++i) for (let j = 0; j < 4; ++j) out.push(makeDispatch(makeBlurShader(i + mips, j), i + mips));
+
+        return out;
+      }, [sigmas, sizes, radii, mappings, texture, target, scratch]);
+
+      const boundCubeMap = useBoundShader(sampleCubeMap, [mappings[1], target, target.size]);
+      const boundTexture = useDerivedSource(
+        useBoundShader(sampleTextureMap, [[0, 0, width, height], target, target.size]),
+        {
+          layout: 'texture_2d<f32>',
+          format: 'rgba16float',
+          length: target.length,
+          size: target.size,
+        }
+      );
+
+
+      inspect({
+        output: {
+          color: boundTexture,
+        },
+      });
   
-  */
-  return null;
+      return [
+        use(DebugAtlas, {atlas}),
+        use(Queue, {nested: true, children: use(Compute, {children: dispatches}) }),
+        render ? render(boundCubeMap, boundTexture) : yeet(boundCubeMap),
+      ];      
+    })
+  );
 };

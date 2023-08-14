@@ -50,7 +50,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
   const targets = useComputeContext();
   const argRefs = useShaderRefs(...args);
 
-  const [dispatchKernel, dispatchSize] = useMemo(() => {
+  const [dispatchKernel, dataSize, workgroupSize] = useMemo(() => {
     const entry = getBundleEntry(shader);
     const symbol = bundleToAttribute(shader, entry);
 
@@ -81,7 +81,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
     const values = [dataSize, ...argRefs, ...sources, ...s, ...targets, ...f];
 
     const kernel = getBoundShader(shader, values);
-    return [kernel, dispatchSize];
+    return [kernel, dataSize, workgroupSize];
   }, [shader, targets, source, sources, argRefs, history]);
 
   let first = useRef(true);
@@ -98,7 +98,8 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
 
   return yeet(dispatch({
     shader: dispatchKernel,
-    size: dispatchSize,
+    size: dataSize,
+    group: workgroupSize,
     shouldDispatch,
     onDispatch,
   }));

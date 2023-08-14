@@ -60,6 +60,11 @@
       "import": "./src/codec/rgbm.wgsl",
       "require": "./src/codec/rgbm.wgsl"
     },
+    "./compute/memo2.wgsl": {
+      "types": "./src/compute/memo2.wgsl.d.ts",
+      "import": "./src/compute/memo2.wgsl",
+      "require": "./src/compute/memo2.wgsl"
+    },
     "./contour/fit-linear.wgsl": {
       "types": "./src/contour/fit-linear.wgsl.d.ts",
       "import": "./src/contour/fit-linear.wgsl",
@@ -374,6 +379,21 @@
       "types": "./src/plot/volume.wgsl.d.ts",
       "import": "./src/plot/volume.wgsl",
       "require": "./src/plot/volume.wgsl"
+    },
+    "./pmrem/pmrem-blur.wgsl": {
+      "types": "./src/pmrem/pmrem-blur.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem-blur.wgsl",
+      "require": "./src/pmrem/pmrem-blur.wgsl"
+    },
+    "./pmrem/pmrem-copy.wgsl": {
+      "types": "./src/pmrem/pmrem-copy.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem-copy.wgsl",
+      "require": "./src/pmrem/pmrem-copy.wgsl"
+    },
+    "./pmrem/pmrem-init.wgsl": {
+      "types": "./src/pmrem/pmrem-init.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem-init.wgsl",
+      "require": "./src/pmrem/pmrem-init.wgsl"
     },
     "./pmrem/pmrem-read.wgsl": {
       "types": "./src/pmrem/pmrem-read.wgsl.d.ts",

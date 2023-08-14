@@ -1,18 +1,4 @@
 // F32 -> F16 as U16
-@export fn xtoF16u(value: f32) -> u32 {
-  let s = select(0u, 0x8000u, value < 0.0);
-  let a = clamp(abs(value), 0.0, 4.0) / 4.0;
-  return s | u32(a * 0x7fff);
-};
-
-@export fn xfromF16u(h: u32) -> f32 {
-  let s = h & 0x8000;
-  let v = h & 0x7fff;
-  let a = f32(v) / 0x7fff;
-  return select(a, -a, s != 0) * 4.0;
-};
-
-// F32 -> F16 as U16
 @export fn toF16u(value: f32) -> u32 {
   let s = select(0u, 0x80000000u, value < 0.0);
   let f = frexp(value);
@@ -37,12 +23,12 @@
     );
   }
   else {
-    return s | 0x7c00; // +/- inf
+    return s | 0x7C00; // +/- inf
   }
 };
 
 @export fn fromF16u(h: u32) -> f32 {
-  let sem = vec3<u32>(0x8000, 0x7c00, 0x3ff) & vec3<u32>(h);
+  let sem = vec3<u32>(0x8000, 0x7C00, 0x3FF) & vec3<u32>(h);
   let s = sem.x << 16u;
   let e = sem.y;
   let m = sem.z;
@@ -54,14 +40,14 @@
       select(
         select(
           // Subnormal
-          s | ((103u + l) << 23u) | ((m << (23u - l)) & 0x7fffffu),
+          s | ((103u + l) << 23u) | ((m << (23u - l)) & 0x7FFFFFu),
           // Normal
-          s | ((e + 0x1c000u) << 13u) | (m << 13u),
+          s | ((e + 0x1C000u) << 13u) | (m << 13u),
           e != 0,
         ),
         // NaN or +-Inf
-        select(s | 0x7f800000u, 0x7fc00000u, m != 0u),
-        e == 0x7c00u
+        select(s | 0x7F800000u, 0x7FC00000u, m != 0u),
+        e == 0x7C00u
       ),
       (e | m) != 0u
     )

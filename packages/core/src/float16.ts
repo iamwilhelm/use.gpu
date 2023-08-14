@@ -13,39 +13,36 @@ export const toFloat16 = (f32: number) => {
     // Zero
     !(e | m) ? 0 :
     // NaN or +-Inf
-    e == 0x7f800000 ? (m ? 0x7e00 : (s | 0x7c00)) :
+    e == 0x7f800000 ? (m ? 0x7E00 : (s | 0x7C00)) :
     // Overflow (Inf)
-    e > 0x47000000 ? (s | 0x7c00) :
+    e > 0x47000000 ? (s | 0x7C00) :
     // Normal
-    e > 0x38000000 ? (s | (((e - 0x38000000) >> 13) & 0x7c00) | (m >> 13)) :
+    e > 0x38000000 ? (s | (((e - 0x38000000) >> 13) & 0x7C00) | (m >> 13)) :
     // Subnormal or underflow
-    e > 0x33000000 ? (s | ((m | (1<<23)) >> (126 - (e >> 23)))) : 0
+    e > 0x33000000 ? (s | ((m | (1 << 23)) >> (126 - (e >> 23)))) : 0
   );
 
   return h;
 };
 
-const fromFloat16 = (f16: number) => {
+export const fromFloat16 = (f16: number) => {
   let l;
 
   const h = f16;
   const s = (h & 0x8000) << 16;
-  const e = (h & 0x7c00);
-  const m = (h & 0x3ff);
+  const e = (h & 0x7C00);
+  const m = (h & 0x3FF);
   const f = (
     // Zero
     !(e | m) ? 0 :
     // NaN or +-Inf
-    e == 0x7c00 ? (m ? 0x7fc00000 : (s | 0x7f800000)) :
+    e == 0x7c00 ? (m ? 0x7FC00000 : (s | 0x7F800000)) :
     // Normal
-    e != 0 ? (s | ((e + 0x1c000) << 13) | (m << 13)) :
+    e != 0 ? (s | ((e + 0x1C000) << 13) | (m << 13)) :
     // Subnormal
-    (l = Math.floor(Math.log2(m)), s | ((103 + l) << 23) | ((m << (23 - l)) & 0x7fffff))
+    (l = Math.floor(Math.log2(m)), s | ((103 + l) << 23) | ((m << (23 - l)) & 0x7FFFFF))
   );
+
   asUint32[0] = f;
   return asFloat32[0];
 };
-
-console.log(toFloat16(1.0).toString(16))
-console.log(toFloat16(0.75).toString(16))
-console.log(toFloat16(0.25).toString(16))

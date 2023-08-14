@@ -94,6 +94,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
 
     const swap = () => {
       if (!history) return;
+
       const {current: index} = counter;
       const n = bufferViews!.length;
 
@@ -130,6 +131,8 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
     const source = makeSource() as any as TextureTarget;
     source.swap = swap;
     source.history = sources;
+
+    swap();
 
     return [source, sources];
   }, [targetTexture, width, height, format, history, sampler]);

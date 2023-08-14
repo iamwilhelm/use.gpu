@@ -182,6 +182,8 @@ export const RenderTarget: LiveComponent<RenderTargetProps> = (props: PropsWithC
     source.history = sources;
     source.swap = swap;
 
+    swap();
+
     const depth = depthStencil ? {
       texture: depthTexture,
       sampler: {},

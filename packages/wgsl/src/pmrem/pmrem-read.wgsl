@@ -1,12 +1,8 @@
-use '@use-gpu/wgsl/use/array'::{ sizeToModulus2, packIndex2 };
-use '@use-gpu/wgsl/codec/f16'::{ fromF16u4 };
 use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral };
 
-@link fn getMapping() -> vec4<u32> {};
-
-@link var<storage> computeBuffer: array<vec2<u32>>; // vec4<f16>
-
-const ZERO_D = vec3<f32>(0.0);
+@link fn getMapping() -> vec4<f32> {};
+@link fn getTexture(uv: vec2<f32>) -> vec4<f32>;
+@link fn getTextureSize() -> vec2<f32>;
 
 @export fn sampleCubeMap(
   uvw: vec3<f32>,
@@ -15,15 +11,10 @@ const ZERO_D = vec3<f32>(0.0);
   let size = mapping.zw - mapping.xy;
 
   let uv = encodeOctahedral(uvw);
-  let xy = (uv * .5 + .5) * vec2<f32>(size);
+  let xy = (uv * .5 + .5) * (size - 1) + 0.5;
 
-  let ixy = floor(xy);
-  let dxy = xy - ixy;
-
-  let modulus = sizeToModulus2(size);
-  let index = packIndex2(vec2<u32>(ixy) + mapping.xy, modulus);
-
-  return fromF16u4(computeBuffer[index]);
+  let uvt = (xy + mapping.xy) / getTextureSize();
+  return getTexture(uvt);
 }
 
 @export fn sampleTextureMap(
@@ -32,15 +23,7 @@ const ZERO_D = vec3<f32>(0.0);
   let mapping = getMapping();
   let size = mapping.zw - mapping.xy;
 
-  let xy = uv * vec2<f32>(size);
-
-  let ixy = floor(xy);
-  let dxy = xy - ixy;
-
-  let modulus = sizeToModulus2(size);
-  let index = packIndex2(vec2<u32>(ixy) + mapping.xy, modulus);
-
-  return fromF16u4(computeBuffer[index]);
+  let xy = uv * size;
+  let uvt = (xy + mapping.xy) / getTextureSize();
+  return getTexture(uvt);
 }
-
-

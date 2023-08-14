@@ -8,14 +8,19 @@ import { DebugAtlas } from '../text/debug-atlas';
 import { Queue } from '../queue/queue';
 import { Dispatch } from '../queue/dispatch';
 import { Compute } from '../compute/compute';
+import { Readback } from '../primitives/readback';
 import { TextureBuffer } from '../compute/texture-buffer';
 import { useBoundShader, getBoundShader } from '../hooks/useBoundShader';
 import { useDerivedSource, getDerivedSource } from '../hooks/useDerivedSource';
+import { useRawSource } from '../hooks/useRawSource';
+import { useScratchSource } from '../hooks/useScratchSource';
 import { useInspectable } from '../hooks/useInspectable'
 
 import { pmremInit } from '@use-gpu/wgsl/pmrem/pmrem-init.wgsl';
 import { pmremCopy } from '@use-gpu/wgsl/pmrem/pmrem-copy.wgsl';
 import { pmremBlur } from '@use-gpu/wgsl/pmrem/pmrem-blur.wgsl';
+import { pmremDiffuseSH } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-sh.wgsl';
+import { pmremDiffuseRender } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-render.wgsl';
 
 import { sampleCubeMap, sampleTextureMap } from '@use-gpu/wgsl/pmrem/pmrem-read.wgsl';
 
@@ -47,17 +52,22 @@ const getVarianceForRoughness = (roughness: number) => {
   return 0.312 * r + 0.027;
 };
 
-const MIN_SIGMA = 0.01;
+const MIN_SIGMA = 0.025;
 const MAX_SIGMA = Math.sqrt(getVarianceForRoughness(1));
 const PIXEL_PER_SIGMA = 5;
 
-const WEIGHT_CUTOFF = 0.05;
+const WEIGHT_CUTOFF = 0.0125;
 const SIGMA_CUTOFF = Math.sqrt(-Math.log(WEIGHT_CUTOFF));
+
+const FIX_BILINEAR_SEAM = true;
 
 const CRISP_SIGMA = 0.3989422804; // 1/sqrt(2π) - normalizes to p(0) == 1
 
 const FIRST_MIP = Math.ceil(PIXEL_PER_SIGMA * (π / 2) / MIN_SIGMA) + 2;
-console.log({FIRST_MIP})
+const DIFFUSE_MIP = 128;
+
+const hasWebGPU = typeof GPUBufferUsage !== 'undefined';
+const READ_WRITE_SOURCE = hasWebGPU ? { readWrite: true, flags: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC } : {};
 
 export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: PrefilteredEnvMapProps) => {
   const {
@@ -91,8 +101,8 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
     // Blur downscale
     for (let i = 0; i < levels; ++i) {
       const sigma = Math.pow(2, lerp(Math.log2(MIN_SIGMA), Math.log2(MAX_SIGMA), i / (levels - 1)));
-      const size = Math.ceil(PIXEL_PER_SIGMA * (τ / 4) / sigma) + 1;
-      
+      const size = (Math.ceil(PIXEL_PER_SIGMA * (τ / 4) / sigma) + 1) | 1;
+
       const last = sigmas[sigmas.length - 1] || 0;
       const dsigma = Math.sqrt(sigma*sigma - last*last);
       const radius = Math.ceil(SIGMA_CUTOFF * dsigma * (size - 1) / (τ / 4));
@@ -104,6 +114,9 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       sizes.push(size);
       radii.push(radius);
     }
+
+    // Lambertian diffuse
+    sizes.push(DIFFUSE_MIP, DIFFUSE_MIP);
 
     // Allocate in atlas
     const area = sizes.reduce((a, b) => a + b*b, 0);
@@ -129,6 +142,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         sampler: LINEAR_SAMPLER,
         format: 'rgba16float',
         filterable: true,
+        colorSpace: 'linear',
       }),
       use(TextureBuffer, {
         width: Math.max(size, FIRST_MIP),
@@ -136,16 +150,25 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         sampler: LINEAR_SAMPLER,
         format: 'rgba16float',
         filterable: true,
+        colorSpace: 'linear',
         history: 1,
       }),
     ], ([target, scratch]: TextureTarget[]) => {
+
+      const diffuseInput = sizes.findIndex(s => s <= 64);
+      const [diffuseSHBuffer, allocate] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
+      allocate(10);
+
+      const targetIn = getDerivedSource(target, {
+        variant: 'textureSampleLevel',
+      });
 
       const scratchOut = useDerivedSource(scratch, {
         sampler: null,
       });
       
       const scratchIn = getDerivedSource(scratch.history[0], {
-        variant: 'textureSampleGrad',
+        variant: 'textureSampleLevel',
         absolute: true,
       });
 
@@ -154,7 +177,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         const out = [];
 
         const cubeMap = getDerivedSource(texture, {
-          variant: 'textureSampleGrad',
+          variant: 'textureSampleLevel',
         });
     
         const makeInitShader = () =>
@@ -197,15 +220,42 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             onDispatch: scratch.swap,
           });
 
+        const makeDiffuseDispatch = (i: number, j: number) => [
+          use(Dispatch, {
+            shader: getBoundShader(pmremDiffuseSH, [
+              mappings[i],
+              scratchIn,
+              diffuseSHBuffer,
+            ]),
+            size: [1, 1],
+          }),
+          use(Dispatch, {
+            shader: getBoundShader(pmremDiffuseRender, [
+              mappings[j],
+              diffuseSHBuffer,
+              target,
+            ]),
+            size: [sizes[j], sizes[j]],
+            group: [8, 8],
+          }),
+          use(Readback, {
+            source: diffuseSHBuffer,
+            then: (data: TypedArray) => console.log(data),
+          }),
+        ];
+
         out.push(makeDispatch(makeInitShader(), 0));
         for (let i = 1; i < mips; ++i) out.push(makeDispatch(makeCopyShader(i), i));
         for (let i = 0; i < levels; ++i) for (let j = 0; j < 4; ++j) out.push(makeDispatch(makeBlurShader(i + mips, j), i + mips));
+        out.push(...makeDiffuseDispatch(diffuseInput, mips + levels));
 
         return out;
       }, [sigmas, sizes, radii, mappings, texture, target, scratch]);
 
-      const boundCubeMap = useBoundShader(sampleCubeMap, [mappings[1], target, target.size]);
-      const boundTexture = useDerivedSource(
+      const mappingData = new Uint16Array(mappings.flatMap(m => m));
+      const boundMappings = useRawSource(mappingData, 'vec4<u16>');
+      const boundCubeMap = useBoundShader(sampleCubeMap, [boundMappings, targetIn, target.size], {FIX_BILINEAR_SEAM});
+      const boundTexture = target;/*useDerivedSource(
         useBoundShader(sampleTextureMap, [[0, 0, width, height], target, target.size]),
         {
           layout: 'texture_2d<f32>',
@@ -213,7 +263,8 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
           length: target.length,
           size: target.size,
         }
-      );
+      );*/
+      console.log({target})
 
 
       inspect({

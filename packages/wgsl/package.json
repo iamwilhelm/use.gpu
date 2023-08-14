@@ -390,6 +390,16 @@
       "import": "./src/pmrem/pmrem-copy.wgsl",
       "require": "./src/pmrem/pmrem-copy.wgsl"
     },
+    "./pmrem/pmrem-diffuse-render.wgsl": {
+      "types": "./src/pmrem/pmrem-diffuse-render.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem-diffuse-render.wgsl",
+      "require": "./src/pmrem/pmrem-diffuse-render.wgsl"
+    },
+    "./pmrem/pmrem-diffuse-sh.wgsl": {
+      "types": "./src/pmrem/pmrem-diffuse-sh.wgsl.d.ts",
+      "import": "./src/pmrem/pmrem-diffuse-sh.wgsl",
+      "require": "./src/pmrem/pmrem-diffuse-sh.wgsl"
+    },
     "./pmrem/pmrem-init.wgsl": {
       "types": "./src/pmrem/pmrem-init.wgsl.d.ts",
       "import": "./src/pmrem/pmrem-init.wgsl",
@@ -399,11 +409,6 @@
       "types": "./src/pmrem/pmrem-read.wgsl.d.ts",
       "import": "./src/pmrem/pmrem-read.wgsl",
       "require": "./src/pmrem/pmrem-read.wgsl"
-    },
-    "./pmrem/pmrem.wgsl": {
-      "types": "./src/pmrem/pmrem.wgsl.d.ts",
-      "import": "./src/pmrem/pmrem.wgsl",
-      "require": "./src/pmrem/pmrem.wgsl"
     },
     "./present/fragment.wgsl": {
       "types": "./src/present/fragment.wgsl.d.ts",

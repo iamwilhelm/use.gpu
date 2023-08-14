@@ -532,6 +532,20 @@ declare module "@use-gpu/wgsl/pmrem/pmrem-copy.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/pmrem/pmrem-diffuse-render.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const pmremDiffuseRender: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/pmrem/pmrem-diffuse-sh.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const pmremDiffuseSH: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/pmrem/pmrem-init.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -544,13 +558,6 @@ declare module "@use-gpu/wgsl/pmrem/pmrem-read.wgsl" {
   const __module: ParsedBundle;
   export const sampleCubeMap: ParsedBundle;
   export const sampleTextureMap: ParsedBundle;
-  export default __module;
-}
-
-declare module "@use-gpu/wgsl/pmrem/pmrem.wgsl" {
-  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
-  const __module: ParsedBundle;
-  export const sampleBlur: ParsedBundle;
   export default __module;
 }
 

@@ -1,4 +1,4 @@
-use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral, decodeOctahedral };
+use '@use-gpu/wgsl/codec/octahedral'::{ wrapOctahedral, encodeOctahedral, decodeOctahedral };
 
 @link fn getTargetMapping() -> vec4<u32> {};
 @link fn getSourceMapping() -> vec4<u32> {};
@@ -6,7 +6,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral, decodeOctahedral };
 @link fn getSigma() -> f32 {};
 @link fn getSamples() -> i32 {};
 
-@link fn getScratchTexture(uv: vec2<f32>, ddx: vec2<f32>, ddy: vec2<f32>) -> vec4<f32>;
+@link fn getScratchTexture(uv: vec2<f32>, level: f32) -> vec4<f32>;
 
 @link var scratchTexture: texture_storage_2d<rgba16float, write>;
 @link var atlasTexture: texture_storage_2d<rgba16float, write>;
@@ -22,14 +22,15 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral, decodeOctahedral };
 
   let xyi = vec2<u32>(globalId.xy);
   let uv = vec2<f32>(xyi) / vec2<f32>(size - 1);
+  let uvo = (uv * 2.0 - 1.0);
 
   var sample: vec4<f32>;
   if (BLUR_PASS == 0) {
     let mapping = getSourceMapping();
     let size = mapping.zw - mapping.xy;
 
-    let uv2 = uv * vec2<f32>(size - 1) + .5;
-    sample = getScratchTexture(uv2, vec2<f32>(0.0), vec2<f32>(0.0));
+    let uv2 = uv * vec2<f32>(size - 1) + 0.5;
+    sample = getScratchTexture(uv2, 0.0);
   }
   else {
     let mapping = getSourceMapping();
@@ -49,15 +50,17 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral, decodeOctahedral };
 
     // Project variance onto tangent plane
     let proj = length(cross(ray, on));
-    let dr = proj * sigma / f32(samples - 1) * SIGMA_CUTOFF;
+    let dn = SIGMA_CUTOFF / f32(samples - 1);
+    let dr = proj * sigma;
 
     var accum: vec4<f32> = vec4<f32>(0.0);
     var weight = 0.0;
     for (var i = 0; i < MAX_SAMPLES; i++) {
       if (i >= samples) { break; }
 
-      let r = (f32(i) + .5) * dr;
-      let w = exp(-sqr(r) / 2.0);
+      let f = (f32(i) + .5) * dn;
+      let r = f * dr;
+      let w = exp(-sqr(f) / 2.0);
 
       // Axis-angle rotation +/- r radians
       let c = cos(r);
@@ -69,11 +72,12 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral, decodeOctahedral };
 
       let uvl = encodeOctahedral(dir1) * .5 + .5;
       let uvr = encodeOctahedral(dir2) * .5 + .5;
-      let uvls = uvl * vec2<f32>(size - 1) + .5;
-      let uvrs = uvr * vec2<f32>(size - 1) + .5;
 
-      accum += w * getScratchTexture(uvls, vec2<f32>(0.0), vec2<f32>(0.0));
-      accum += w * getScratchTexture(uvrs, vec2<f32>(0.0), vec2<f32>(0.0));
+      let uvls = uvl * vec2<f32>(size - 1) + 0.5;
+      let uvrs = uvr * vec2<f32>(size - 1) + 0.5;
+
+      accum += w * getScratchTexture(uvls, 0.0);
+      accum += w * getScratchTexture(uvrs, 0.0);
       weight += w * 2.0;
     }
     sample = accum / weight;

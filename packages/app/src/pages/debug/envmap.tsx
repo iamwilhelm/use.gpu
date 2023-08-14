@@ -65,7 +65,7 @@ const getEnvironment = bindBundle(wgsl`
   @link struct SurfaceFragment {};
   @link fn encodeOctahedral(xyz: vec3<f32>) -> vec2<f32>;
 
-  @optional @link fn getEnvironmentMap(uvw: vec3<f32>) -> vec4<f32> { return vec4<f32>(1.0); };
+  @optional @link fn getEnvironmentMap(uvw: vec3<f32>, level: u32) -> vec4<f32> { return vec4<f32>(1.0); };
 
   fn main(
     N: vec3<f32>,
@@ -73,14 +73,13 @@ const getEnvironment = bindBundle(wgsl`
     surface: SurfaceFragment,
   ) -> vec3<f32> {
     let R = 2.0 * dot(N, V) * N - V;
-    let indirect = getEnvironmentMap(R).xyz;
-    //let indirect = getEnvironmentMap(N).xyz;
+    let indirect = getEnvironmentMap(N, 10u).xyz;
     
     let uv = encodeOctahedral(surface.normal.xyz);
     let grid = fract(uv * 64.0 + .25);
     let xy = select(vec2<f32>(0.0), vec2<f32>(1.0), grid > vec2<f32>(0.5));
     let dots = (xy.x * xy.y);
-    return indirect + 0.25 * dots * vec3<f32>(uv * .5 + .5, 0.0);
+    return indirect + 0.0 * 0.025 * dots * vec3<f32>(uv * .5 + .5, 0.0);
   };
 `, {SurfaceFragment, encodeOctahedral});
 

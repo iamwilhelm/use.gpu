@@ -4,7 +4,7 @@ const MAX_HEIGHT = 64;
 
 @link fn getSourceMapping() -> vec4<i32> {};
 
-@link fn getScratchTexture(uv: vec2<f32>, level: f32) -> vec4<f32>;
+@link fn getAtlasTexture(uv: vec2<f32>, level: f32) -> vec4<f32>;
 
 @link var<storage, read_write> shCoefficients: array<vec4<f32>>;
 
@@ -39,8 +39,8 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
       let uv = (xy + .5) / vec2<f32>(s1);
 
       // texture starts at uv .5 (absolute coords)
-      let uv2 = xy + .5;
-      var sample = getScratchTexture(uv2, 0.0);
+      let uv2 = xy + 1.0 + vec2<f32>(mapping.xy);
+      var sample = getAtlasTexture(uv2, 0.0);
       
       let uvo = uv * 2.0 - 1.0;
       let ray = decodeOctahedral(uvo);

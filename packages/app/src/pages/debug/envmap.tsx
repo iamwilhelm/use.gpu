@@ -16,7 +16,7 @@ import {
   ShaderLitMaterial, KeyboardContext,
 
   makeSphereGeometry,
-  useBoundShader,
+  useBoundShader, useShaderRef,
 } from '@use-gpu/workbench';
 
 import {
@@ -66,6 +66,8 @@ const getEnvironment = bindBundle(wgsl`
   @link fn encodeOctahedral(xyz: vec3<f32>) -> vec2<f32>;
 
   @optional @link fn getEnvironmentMap(uvw: vec3<f32>, level: u32) -> vec4<f32> { return vec4<f32>(1.0); };
+  @optional @link fn getSigma() -> f32 { return 0.0; }
+  fn sqr(x: f32) -> f32 { return x * x; }
 
   fn main(
     N: vec3<f32>,
@@ -73,8 +75,8 @@ const getEnvironment = bindBundle(wgsl`
     surface: SurfaceFragment,
   ) -> vec3<f32> {
     let R = 2.0 * dot(N, V) * N - V;
-    let indirect = getEnvironmentMap(N, 10u).xyz;
-    
+    let indirect = getEnvironmentMap(R, sqr(getSigma())).xyz;
+
     let uv = encodeOctahedral(surface.normal.xyz);
     let grid = fract(uv * 64.0 + .25);
     let xy = select(vec2<f32>(0.0), vec2<f32>(1.0), grid > vec2<f32>(0.5));
@@ -87,6 +89,11 @@ export const DebugEnvMapPage: LC = (props) => {
   const geometry = useOne(() => makeSphereGeometry({ width: 2, uvw: true }));
 
   let HDR = false;
+
+  const { useKeyboard } = useContext(KeyboardContext);
+  const { keyboard } = useKeyboard();
+  const {keys} = keyboard;
+  const panning = !!keys.alt;
 
   return (
     <Gather
@@ -124,7 +131,7 @@ export const DebugEnvMapPage: LC = (props) => {
           <LinearRGB tonemap="aces" gain={1}>
             <Loop>
               <Cursor cursor='move' />
-              <Camera>
+              <Camera active={!panning}>
                 <Pass >
                 
                   <AxisHelper size={2} width={3} />
@@ -132,24 +139,38 @@ export const DebugEnvMapPage: LC = (props) => {
                   <Scene>
                     <PrefilteredEnvMap
                       texture={texture}
-                      render={(cubeMap) => {
-                        const environment = useBoundShader(getEnvironment, [cubeMap]);
-                        return (
-                          <ShaderLitMaterial
-                            surface={surface}
-                            environment={environment}
-                          >
-                            <Mesh mesh={mesh} shaded />
-                          </ShaderLitMaterial>
-                        );
-                      }}
+                      render={(cubeMap) => (
+                        <Animate
+                          loop
+                          keyframes={[
+                            [0, 0],
+                            [5, 0.336],
+                            [10, 0],
+                          ]}
+                          prop="variance"
+                          render={(variance) => {
+                            const varRef = useShaderRef(variance);
+                            const environment = useBoundShader(getEnvironment, [cubeMap, varRef]);
+                            return (
+                              <ShaderLitMaterial
+                                surface={surface}
+                                environment={environment}
+                              >
+                                <Mesh mesh={mesh} shaded />
+                              </ShaderLitMaterial>
+                            );                            
+                          }}
+                        />
+                      )}
                     />
                   </Scene>
 
                 </Pass>
               </Camera>
               <PanControls
-                active={true}
+                x={-600} y={200}
+                zoom={0.5}
+                active={panning}
                 render={(x, y, zoom) =>
                   <Flat x={x} y={y} zoom={zoom}>
                     <Pass overlay>
@@ -161,8 +182,8 @@ export const DebugEnvMapPage: LC = (props) => {
                               render={(cubeMap, texture) => texture ? (
                                 <Absolute left={520} top={0}>
                                   <Block
-                                    width={texture.size[0] * 500 / 512}
-                                    height={texture.size[1] * 500 / 512}
+                                    width={500}
+                                    height={texture.size[1] / texture.size[0] * 500}
                                     fill={[0, 0, 0, .25]}
                                     image={{texture, fit: 'scale'}}
                                   />
@@ -184,14 +205,14 @@ export const DebugEnvMapPage: LC = (props) => {
   );
 };
 
-const Camera: LC = ({children}: PropsWithChildren<object>) => {
-  const { useKeyboard } = useContext(KeyboardContext);
-  const { keyboard } = useKeyboard();
-  const {keys} = keyboard;
+type CameraProps = {
+  active: boolean,
+};
 
+const Camera: LC<CameraProps> = ({active, children}: PropsWithChildren<CameraProps>) => {
   return (
     <OrbitControls
-      active={!keys['alt']}
+      active={active}
       radius={5}
       bearing={0.5}
       pitch={0.3}

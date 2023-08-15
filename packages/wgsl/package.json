@@ -340,6 +340,11 @@
       "import": "./src/material/pbr-default.wgsl",
       "require": "./src/material/pbr-default.wgsl"
     },
+    "./material/pbr-environment.wgsl": {
+      "types": "./src/material/pbr-environment.wgsl.d.ts",
+      "import": "./src/material/pbr-environment.wgsl",
+      "require": "./src/material/pbr-environment.wgsl"
+    },
     "./material/pbr-material.wgsl": {
       "types": "./src/material/pbr-material.wgsl.d.ts",
       "import": "./src/material/pbr-material.wgsl",

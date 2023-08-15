@@ -22,7 +22,7 @@ import { pmremBlur } from '@use-gpu/wgsl/pmrem/pmrem-blur.wgsl';
 import { pmremDiffuseSH } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-sh.wgsl';
 import { pmremDiffuseRender } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-render.wgsl';
 
-import { sampleCubeMap } from '@use-gpu/wgsl/pmrem/pmrem-read.wgsl';
+import { sampleEnvMap } from '@use-gpu/wgsl/pmrem/pmrem-read.wgsl';
 
 const π = Math.PI;
 const τ = 2*π;
@@ -242,12 +242,10 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             size: [sizes[j], sizes[j]],
             group: [8, 8],
           }),
-          /*
           use(Readback, {
             source: diffuseSHBuffer,
             then: (data: TypedArray) => console.log(data),
           }),
-          */
         ];
 
         out.push(makeDispatch(makeInitShader(), 0));
@@ -263,7 +261,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
 
       const boundMappings = useRawSource(mappingData, 'vec4<u16>');
       const boundVariances = useRawSource(varianceData, 'f32');
-      const boundCubeMap = useBoundShader(sampleCubeMap, [
+      const boundCubeMap = useBoundShader(sampleEnvMap, [
         () => sigmas2.length,
         boundMappings,
         boundVariances,

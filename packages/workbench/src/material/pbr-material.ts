@@ -12,6 +12,7 @@ import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getPBRMaterial } from '@use-gpu/wgsl/material/pbr-material.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
+import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
 
 import { getMaterialSurface } from '@use-gpu/wgsl/instance/surface/material.wgsl';
 import { getNormalMapSurface } from '@use-gpu/wgsl/instance/surface/normal-map.wgsl';
@@ -29,8 +30,10 @@ export type PBRMaterialProps = {
   metalnessRoughnessMap?: ShaderSource,  
   emissiveMap?: ShaderSource,
   occlusionMap?: ShaderSource,
+  environmentMap?: ShaderSource,
   normalMap?: ShaderSource,
 
+  pmrem?: boolean,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };
 
@@ -48,8 +51,10 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     emissiveMap,
     occlusionMap,
     metalnessRoughnessMap,
+    environmentMap,
     normalMap,
 
+    pmrem,
     render,
     children,
   } = props;
@@ -87,11 +92,16 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   if (normalMap) getSurface = useBoundShader(getNormalMapSurface, [boundSurface, normalMap]);
   else useNoBoundShader();
 
+  let getEnvironment = null;
+  if (environmentMap) getEnvironment = useBoundShader(applyPBREnvironment, [environmentMap]);
+  else useNoBoundShader();
+
   const getFragment = useBoundShader(getBasicMaterial, [albedo, albedoMap], defines);
 
   return ShaderLitMaterial({
     fragment: getFragment,
     surface: getSurface,
+    environment: getEnvironment,
     apply: applyPBRMaterial,
     render,
     children,

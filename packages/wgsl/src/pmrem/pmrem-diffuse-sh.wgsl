@@ -2,6 +2,10 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
 
 const MAX_HEIGHT = 64;
 
+const CONV_COS0 = 3.1415926536; // π     //0.8862269255;//0.2499987930059433/0.2820947918;
+const CONV_COS1 = 2.09439510239;// π*2/3 //1.02332670795;//0.2888830900192261/0.2820947918;
+const CONV_COS2 = 0.7853981634; // π/4   //0.4954159122;//0.1400941610336303/0.2820947918;
+
 @link fn getSourceMapping() -> vec4<i32> {};
 
 @link fn getAtlasTexture(uv: vec2<f32>, level: f32) -> vec4<f32>;
@@ -57,15 +61,15 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
       let weight = length(cross(dx, dy));
       let s = sample * weight;
 
-      band0 += s;
-      band1 += s * 1.7320508076 * ray.y;
-      band2 += s * 1.7320508076 * ray.z;
-      band3 += s * 1.7320508076 * ray.x;
-      band4 += s * 3.8729833462 * ray.y * ray.x;
-      band5 += s * 3.8729833462 * ray.y * ray.z;
-      band6 += s * 1.1180339887 * (3.0 * sqr(ray.z) - 1.0);
-      band7 += s * 3.8729833462 * ray.x * ray.z;
-      band8 += s * 1.9364916731 * (sqr(ray.x) - sqr(ray.y));
+      band0 += s        * CONV_COS0;
+      band1 += s *  3.0 * CONV_COS1 * ray.y; // sqrt(3)
+      band2 += s *  3.0 * CONV_COS1 * ray.z;
+      band3 += s *  3.0 * CONV_COS1 * ray.x;
+      band4 += s * 15.0 * CONV_COS2 * ray.y * ray.x; // sqrt(15)
+      band5 += s * 15.0 * CONV_COS2 * ray.y * ray.z;
+      band6 += s * 1.25 * CONV_COS2 * (3.0 * sqr(ray.z) - 1.0); // sqrt(5) / 2
+      band7 += s * 15.0 * CONV_COS2 * ray.x * ray.z;
+      band8 += s * 3.75 * CONV_COS2 * (sqr(ray.x) - sqr(ray.y)); // sqrt(15) / 2
       bandW += weight;
     }
 

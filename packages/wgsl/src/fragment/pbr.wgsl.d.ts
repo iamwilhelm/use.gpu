@@ -3,5 +3,6 @@ declare module "@use-gpu/wgsl/fragment/pbr.wgsl" {
   const __module: ParsedBundle;
   export const PBRParams: ParsedBundle;
   export const PBR: ParsedBundle;
+  export const IBL: ParsedBundle;
   export default __module;
 }

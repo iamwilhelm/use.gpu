@@ -1,6 +1,6 @@
-declare module "@use-gpu/wgsl/pmrem/pmrem-read.wgsl" {
+declare module "@use-gpu/wgsl/material/pbr-environment.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const sampleCubeMap: ParsedBundle;
+  export const applyPBREnvironment: ParsedBundle;
   export default __module;
 }

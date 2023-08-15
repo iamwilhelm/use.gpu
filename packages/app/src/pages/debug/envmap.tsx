@@ -37,6 +37,12 @@ import { encodeOctahedral } from '@use-gpu/wgsl/codec/octahedral.wgsl';
 const π = Math.PI;
 const τ = π * 2;
 
+const keyframes = [
+  [0, 0],
+  [5, 1.0],
+  [10, 0],
+] as any[];
+
 const getSurface = bindBundle(wgsl`
   @link struct SurfaceFragment {};
 
@@ -132,7 +138,7 @@ export const DebugEnvMapPage: LC = (props) => {
             <Loop>
               <Cursor cursor='move' />
               <Camera active={!panning}>
-                <Pass >
+                <Pass lights>
                 
                   <AxisHelper size={2} width={3} />
 
@@ -142,22 +148,28 @@ export const DebugEnvMapPage: LC = (props) => {
                       render={(cubeMap) => (
                         <Animate
                           loop
-                          keyframes={[
-                            [0, 0],
-                            [5, 0.336],
-                            [10, 0],
-                          ]}
-                          prop="variance"
-                          render={(variance) => {
-                            const varRef = useShaderRef(variance);
-                            const environment = useBoundShader(getEnvironment, [cubeMap, varRef]);
+                          keyframes={keyframes}
+                          prop="roughness"
+                          render={(roughness) => {
+                            const environment = useBoundShader(getEnvironment, [cubeMap]);
                             return (
+                            
+                              <PBRMaterial
+                                metalness={0.8}
+                                roughness={roughness}
+                                environmentMap={cubeMap}
+                                pmrem
+                              >
+                                <Mesh mesh={mesh} shaded />
+                              </PBRMaterial>
+                              /*
                               <ShaderLitMaterial
                                 surface={surface}
                                 environment={environment}
                               >
                                 <Mesh mesh={mesh} shaded />
                               </ShaderLitMaterial>
+                              */
                             );                            
                           }}
                         />

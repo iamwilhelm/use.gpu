@@ -20,14 +20,14 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
 
   let sample = (
     shCoefficients[0] + 
-    shCoefficients[1] * 1.7320508076 * ray.y +
-    shCoefficients[2] * 1.7320508076 * ray.z +
-    shCoefficients[3] * 1.7320508076 * ray.x +
-    shCoefficients[4] * 3.8729833462 * ray.y * ray.x +
-    shCoefficients[5] * 3.8729833462 * ray.y * ray.z +
-    shCoefficients[6] * 1.1180339887 * (3.0 * sqr(ray.z) - 1.0) +
-    shCoefficients[7] * 3.8729833462 * ray.x * ray.z +
-    shCoefficients[8] * 1.9364916731 * (sqr(ray.x) - sqr(ray.y))
+    shCoefficients[1] * ray.y +
+    shCoefficients[2] * ray.z +
+    shCoefficients[3] * ray.x +
+    shCoefficients[4] * ray.y * ray.x +
+    shCoefficients[5] * ray.y * ray.z +
+    shCoefficients[6] * (3.0 * sqr(ray.z) - 1.0) +
+    shCoefficients[7] * ray.x * ray.z +
+    shCoefficients[8] * (sqr(ray.x) - sqr(ray.y))
   );
 
   textureStore(atlasTexture, xyi + mapping.xy, sample);

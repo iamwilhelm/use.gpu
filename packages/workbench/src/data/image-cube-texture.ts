@@ -49,7 +49,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
 
     const source = useMemo(() => {
       const [resource] = resources;
-      const fmt = format ?? resource.data?.format ?? 'rgba8unorm' as GPUTextureFormat;
+      const {format, colorSpace} = resource;
 
       let size: Point = [0, 0];
       if ('bitmap' in resource) size = [resource.bitmap.width, resource.bitmap.height];
@@ -61,7 +61,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
         mip ? countMips(width, height) : 1
       );
 
-      const texture = makeDynamicTexture(device, width, height, 6, fmt, 1, mips);
+      const texture = makeDynamicTexture(device, width, height, 6, format, 1, mips);
       resources.forEach((resource, i: number) => {
         if ('bitmap' in resource) uploadExternalTexture(device, texture, resource.bitmap, [width, height, 1], [0, 0, i]);
         if ('data' in resource) uploadDataTexture(device, texture, resource.data, [width, height, 1], [0, 0, i]);
@@ -81,7 +81,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
         } as GPUSamplerDescriptor,
         layout: 'texture_cube<f32>',
         mips,
-        format: fmt,
+        format,
         size: [width, height, 6],
         colorSpace: resource.colorSpace,
         version: 1,

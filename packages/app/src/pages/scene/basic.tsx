@@ -60,7 +60,7 @@ export const SceneBasicPage: LC = (props) => {
     <Gather
       children={[
         <GeometryData {...geometry} />,
-        <ImageTexture url="/textures/test.png" />,
+        <ImageTexture url="/textures/test.png" colorSpace="srgb" />,
       ]}
       then={([
         mesh,

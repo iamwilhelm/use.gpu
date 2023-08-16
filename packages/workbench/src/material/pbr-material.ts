@@ -10,6 +10,7 @@ import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useShaderRef } from '../hooks/useShaderRef';
 
+import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
 import { getPBRMaterial } from '@use-gpu/wgsl/material/pbr-material.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
@@ -91,7 +92,9 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   else useNoBoundShader();
 
   let getEnvironment = undefined;
-  if (environmentMap) getEnvironment = useBoundShader(applyPBREnvironment, [environmentMap]);
+  if (environmentMap || environmentMap === undefined) {
+    getEnvironment = useBoundShader(applyPBREnvironment, [environmentMap ?? getDefaultEnvironment]);
+  }
   else useNoBoundShader();
 
   const getFragment = useBoundShader(getBasicMaterial, [albedo, albedoMap], defines);

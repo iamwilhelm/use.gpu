@@ -253,11 +253,11 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             size: [sizes[j], sizes[j]],
             group: [8, 8],
           }),
+          */
           use(Readback, {
             source: shCoefficients,
-            then: (data: any) => console.log(data),
+            then: (data: any) => console.log(JSON.stringify(Array.from(data), null, 2)),
           }),
-          */
         ];
 
         out.push(makeDispatch(makeInitShader(), 0));

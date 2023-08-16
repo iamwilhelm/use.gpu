@@ -320,6 +320,11 @@
       "import": "./src/material/light.wgsl",
       "require": "./src/material/light.wgsl"
     },
+    "./material/lights-default-env.wgsl": {
+      "types": "./src/material/lights-default-env.wgsl.d.ts",
+      "import": "./src/material/lights-default-env.wgsl",
+      "require": "./src/material/lights-default-env.wgsl"
+    },
     "./material/lights-default.wgsl": {
       "types": "./src/material/lights-default.wgsl.d.ts",
       "import": "./src/material/lights-default.wgsl",

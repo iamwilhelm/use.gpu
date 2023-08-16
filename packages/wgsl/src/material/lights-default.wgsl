@@ -22,7 +22,7 @@ use '@use-gpu/wgsl/use/types'::{ Light };
     vec4<f32>(-0.267, -3*0.267, -2*0.267, 0.0),
     vec4<f32>(1.0),
     vec4<f32>(0.0),
-    2.0,
+    0.8,
     0.0,
     1,
     -1,
@@ -32,5 +32,5 @@ use '@use-gpu/wgsl/use/types'::{ Light };
     vec4<f32>(0.0),
   );
 
-  return 0.05 * surface.occlusion * surface.albedo.rgb + applyLight(N, V, light, surface);
+  return applyLight(N, V, light, surface);
 }

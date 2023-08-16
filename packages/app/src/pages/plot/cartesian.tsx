@@ -23,7 +23,7 @@ export const PlotCartesianPage: LC = () => {
   
   return (
     <Loop>
-      <LinearRGB backgroundColor={BACKGROUND}>
+      <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>
         <Cursor cursor="move" />
         <Camera>
           <Pass>

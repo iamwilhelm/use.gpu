@@ -8,8 +8,10 @@ import { DEFAULT_LIGHT_CONTEXT } from '../providers/light-provider';
 
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
-import { getDefaultPBRMaterial } from '@use-gpu/wgsl/material/pbr-default.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
+import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
+import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
+import { getDefaultPBRMaterial } from '@use-gpu/wgsl/material/pbr-default.wgsl';
 
 import { getLitFragment } from '@use-gpu/wgsl/instance/fragment/lit.wgsl';
 import { getMaterialSurface } from '@use-gpu/wgsl/instance/surface/material.wgsl';
@@ -20,6 +22,9 @@ const getSurface = bindBundle(getMaterialSurface, {
 });
 const getLight = bindBundle(getLitFragment, {
   applyLights: DEFAULT_LIGHT_CONTEXT.bindMaterial(applyPBRMaterial),
+  applyEnvironment: bindBundle(applyPBREnvironment, {
+    sampleEnvironment: getDefaultEnvironment,
+  }),
 });
 export const DEFAULT_MATERIAL_CONTEXT = {
   solid: {

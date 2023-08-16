@@ -300,6 +300,7 @@ accessMode {
 
 TypeDeclaration {
   Identifier ~conflict |
+  t<'array'> |
   t<'bool'> |
   t<'f16'> |
   t<'f32'> |

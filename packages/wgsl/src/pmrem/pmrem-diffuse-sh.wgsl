@@ -70,6 +70,20 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
       band6 += s * 1.25 * CONV_COS2 * (3.0 * sqr(ray.z) - 1.0); // sqrt(5) / 2
       band7 += s * 15.0 * CONV_COS2 * ray.x * ray.z;
       band8 += s * 3.75 * CONV_COS2 * (sqr(ray.x) - sqr(ray.y)); // sqrt(15) / 2
+
+      /*
+      let xx = sqr(ray.x);
+      let yy = sqr(ray.y);
+      let zz = sqr(ray.z);
+      band9  += s * sqrt(70.0)/4.0 * ray.y * (3 * xx - yy);
+      band10 += s * sqrt(105.0)    * ray.x * ray.y * ray.z;
+      band11 += s * sqrt(42.0)/4.0 * ray.y * (5 * zz - 1);
+      band12 += s * sqrt(7.0)/2.0  * ray.z * (5 * zz - 3);
+      band13 += s * sqrt(42.0)/4.0 * ray.x * (5 * zz - 1);
+      band14 += s * sqrt(105)/2.0  * ray.z * (xx - yy);
+      band15 += s * sqrt(70.0)/4.0 * ray.x * (xx - 3 * yy);
+      */
+
       bandW += weight;
     }
 

@@ -65,7 +65,7 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
           cs = 'linear';
         }
 
-        return {format, colorSpace};
+        return {format, colorSpace: cs};
       };
 
       let resource;
@@ -117,7 +117,7 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
       }
       else {
         const blob = await response.blob();
-        const {format: f, colorSpace} = resolveFormat(format);
+        const {format: f, colorSpace} = resolveFormat('rgba8unorm');
         return {
           format: f,
           colorSpace,

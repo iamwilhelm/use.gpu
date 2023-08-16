@@ -1,6 +1,6 @@
 import type { LC, LiveElement } from '@use-gpu/live';
 import type { UniformAttribute, DataBounds } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { ShaderSource } from '@use-gpu/shader';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { unweldIndexedArray } from '@use-gpu/core';

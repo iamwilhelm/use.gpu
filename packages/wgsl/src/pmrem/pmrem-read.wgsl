@@ -3,6 +3,7 @@ use '@use-gpu/wgsl/codec/octahedral'::{ encodeOctahedral };
 const MAX_LAYERS_LOG = 8;
 
 @link fn getLayerCount() -> u32;
+@link fn getGain() -> f32;
 @link fn getMapping(i: u32) -> vec4<u32>;
 @link fn getSigma(i: u32) -> f32;
 
@@ -16,7 +17,10 @@ const MAX_LAYERS_LOG = 8;
   ddx: vec3<f32>,
   ddy: vec3<f32>,
 ) -> vec4<f32> {
-  if (sigma < 0.0) { return sampleDiffuse(uvw); }
+  let gain = getGain();
+  if (sigma < 0.0) {
+    return vec4<f32>(gain * sampleDiffuse(uvw), 1.0);
+  }
 
   let df = abs(ddx) + abs(ddy);
   let dr = dot(uvw, normalize(uvw + df));
@@ -24,7 +28,9 @@ const MAX_LAYERS_LOG = 8;
   //var s = max(sigma, acos(dr) * 2.0);
 
   let uv = encodeOctahedral(uvw) * .5 + .5;
-  if (s == 0) { return sampleCubeMapLevel(uv, 0u); }
+  if (s == 0) {
+    return vec4<f32>(gain * sampleCubeMapLevel(uv, 0u), 1.0);
+  }
 
   let count = getLayerCount();
   var start = 0u;
@@ -52,23 +58,24 @@ const MAX_LAYERS_LOG = 8;
 
   let s1 = sampleCubeMapLevel(uv, level);
   let s2 = sampleCubeMapLevel(uv, level + 1);
-  return mix(s1, s2, f);
+  
+  return vec4<f32>(gain * mix(s1, s2, f), 1.0);
 }
 
 fn sampleDiffuse(
   ray: vec3<f32>,
-) -> vec4<f32> {
+) -> vec3<f32> {
   let sample = max(
-    vec4<f32>(0.0),
-    shCoefficients[0] + 
-    shCoefficients[1] * ray.y +
-    shCoefficients[2] * ray.z +
-    shCoefficients[3] * ray.x +
-    shCoefficients[4] * ray.y * ray.x +
-    shCoefficients[5] * ray.y * ray.z +
-    shCoefficients[6] * (3.0 * sqr(ray.z) - 1.0) +
-    shCoefficients[7] * ray.x * ray.z +
-    shCoefficients[8] * (sqr(ray.x) - sqr(ray.y))
+    vec3<f32>(0.0),
+    shCoefficients[0].xyz + 
+    shCoefficients[1].xyz * ray.y +
+    shCoefficients[2].xyz * ray.z +
+    shCoefficients[3].xyz * ray.x +
+    shCoefficients[4].xyz * ray.y * ray.x +
+    shCoefficients[5].xyz * ray.y * ray.z +
+    shCoefficients[6].xyz * (3.0 * sqr(ray.z) - 1.0) +
+    shCoefficients[7].xyz * ray.x * ray.z +
+    shCoefficients[8].xyz * (sqr(ray.x) - sqr(ray.y))
   );
 
   return sample;
@@ -77,7 +84,7 @@ fn sampleDiffuse(
 fn sampleCubeMapLevel(
   uv: vec2<f32>,
   level: u32,
-) -> vec4<f32> {
+) -> vec3<f32> {
   let mapping = vec4<f32>(getMapping(level));
   let size = mapping.zw - mapping.xy;
 
@@ -98,10 +105,10 @@ fn sampleCubeMapLevel(
       let inv = max(vec2<f32>(0.0), -signs);
       let xy = uvd * signs + inv;
 
-      let tl = getTexture(uvb +                               inv, 0.0);
-      let tr = getTexture(uvb + vec2<f32>(1.0, 0.0) * signs + inv, 0.0);
-      let bl = getTexture(uvb + vec2<f32>(0.0, 1.0) * signs + inv, 0.0);
-      let br = getTexture(uvb + vec2<f32>(1.0, 1.0) * signs + inv, 0.0);
+      let tl = getTexture(uvb +                               inv, 0.0).xyz;
+      let tr = getTexture(uvb + vec2<f32>(1.0, 0.0) * signs + inv, 0.0).xyz;
+      let bl = getTexture(uvb + vec2<f32>(0.0, 1.0) * signs + inv, 0.0).xyz;
+      let br = getTexture(uvb + vec2<f32>(1.0, 1.0) * signs + inv, 0.0).xyz;
     
       let x = xy.x;
       let y = xy.y;
@@ -113,12 +120,13 @@ fn sampleCubeMapLevel(
       let corner = select(tl, br, sum > 1.0);
       let top = bl;
       let bottom = tr;
+
       return mix(corner, mix(top, bottom, bf), af);
     }
   }
 
   let uvt = xy + mapping.xy;
-  return getTexture(uvt, 0.0);
+  return getTexture(uvt, 0.0).xyz;
 }
 
 fn sqr(x: f32) -> f32 { return x * x; }

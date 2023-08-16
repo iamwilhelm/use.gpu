@@ -74,8 +74,9 @@ export const MaterialEnvMapPage: LC = (props) => {
       ]) => (
         <PrefilteredEnvMap
           texture={texture}
+          gain={1}
           render={(cubeMap, texture) =>          
-            <LinearRGB tonemap="aces" gain={3}>
+            <LinearRGB tonemap="aces" gain={2}>
               <Loop>
                 <Cursor cursor='move' />
                 <Camera active={!panning}>
@@ -93,7 +94,6 @@ export const MaterialEnvMapPage: LC = (props) => {
                                 metalness={i / 7}
                                 roughness={j / 7}
                                 environmentMap={cubeMap}
-                                pmrem
                               >
                                 <Mesh mesh={mesh} shaded />
                               </PBRMaterial>
@@ -114,7 +114,7 @@ export const MaterialEnvMapPage: LC = (props) => {
                         <UI>
                           <Layout>
                             <Block margin={[0, 0, 0, 0]}>
-                              <Absolute left={520} top={0}>
+                              <Absolute left={0} top={0}>
                                 <Block
                                   width={500}
                                   height={texture.size[1] / texture.size[0] * 500}

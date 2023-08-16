@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LC, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
 import type { ShadowMapLike } from './types';
 
@@ -30,7 +30,7 @@ const DEFAULT_SHADOW_MAP = {
   blur: 4,
 };
 
-export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLightProps) => {
+export const PointLight: LC<PointLightProps> = memo((props: PointLightProps) => {
   
   const position = useProp(props.position, parsePosition);
   const color = useProp(props.color, parseColor);
@@ -78,7 +78,7 @@ export const PointLight: LiveComponent<PointLightProps> = memo((props: PointLigh
   const {useLight} = useLightContext();
   useLight(light);
 
-  if (!props.debug) return;
+  if (!props.debug) return null;
 
   return use(PointHelper, { position, color });
 }, 'PointLight');

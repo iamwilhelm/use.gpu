@@ -228,11 +228,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     if (method === 'quadratic') allocateNormals(d * 3);
     else allocateNormals(d);
 
-    return [
-      Math.ceil((sx - 1) / 4),
-      Math.ceil((sy - 1) / 4),
-      Math.ceil((sz - 1) / 4),
-    ];
+    return [sx - 1, sy - 1, sz - 1];
   };
 
   const device = useDeviceContext();
@@ -300,10 +296,12 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     use(Dispatch, {
       shader: boundScan,
       size: edgePassSize,
+      group: [4, 4, 4],
       shouldDispatch,
       onDispatch: dispatchEdgePass,
     }),
     use(Dispatch, {
+      group: [1],
       shader: boundFit,
       indirect: indirectReadout2,
       shouldDispatch,

@@ -1,4 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
+import type { TextureSource } from '@use-gpu/core';
 import type { GLTF } from '@use-gpu/gltf';
 
 import React, { use, Gather } from '@use-gpu/live';
@@ -40,7 +41,7 @@ export const GeometryGLTFPage: LC = () => {
           format={"hdr"}
         />
       ]}
-      then={([cubeMap]) => (
+      then={([cubeMap]: TextureSource[]) => (
         <Loop>
           <LinearRGB>
             <Cursor cursor='move' />

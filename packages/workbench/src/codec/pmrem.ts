@@ -1,13 +1,15 @@
 import type { LC, LiveElement } from '@use-gpu/live';
 import type { TextureSource, TextureTarget } from '@use-gpu/core';
+import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { gather, use, useMemo } from '@use-gpu/live';
+import { gather, yeet, use, useMemo } from '@use-gpu/live';
 import { makeAtlas, makeDataBuffer, clamp, seq, lerp } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { DebugAtlas } from '../text/debug-atlas';
 import { Queue } from '../queue/queue';
 import { Dispatch } from '../queue/dispatch';
 import { Compute } from '../compute/compute';
+import { Readback } from '../primitives/readback';
 import { TextureBuffer } from '../compute/texture-buffer';
 import { useBoundShader, getBoundShader } from '../hooks/useBoundShader';
 import { useDerivedSource, getDerivedSource } from '../hooks/useDerivedSource';
@@ -38,8 +40,9 @@ export type PrefilteredEnvMapProps = {
   texture: TextureSource,
   size?: number,
   levels?: number,
+  gain?: number,
   debug?: boolean,
-  render: (cubeMap: TextureSource, textureMap: TextureSource) => LiveElement,
+  render?: (cubeMap: ShaderSource, textureMap: TextureSource) => LiveElement,
 };
 
 // Based on
@@ -73,6 +76,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
   const {
     levels = 8,
     size = 1024,
+    gain = 1,
     texture,
     debug,
     render,
@@ -177,7 +181,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         sampler: null,
       });
       
-      const scratchIn = useDerivedSource(scratch.history[0], {
+      const scratchIn = useDerivedSource(scratch.history![0], {
         variant: 'textureSampleLevel',
         absolute: true,
       });
@@ -249,6 +253,10 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             size: [sizes[j], sizes[j]],
             group: [8, 8],
           }),
+          use(Readback, {
+            source: shCoefficients,
+            then: (data: any) => console.log(data),
+          }),
           */
         ];
 
@@ -267,6 +275,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       const boundVariances = useRawSource(varianceData, 'f32');
       const boundCubeMap = useBoundShader(sampleEnvMap, [
         () => sigmas2.length,
+        () => gain,
         boundMappings,
         boundVariances,
         targetIn,

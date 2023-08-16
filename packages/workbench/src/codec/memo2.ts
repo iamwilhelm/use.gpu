@@ -1,11 +1,12 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { TextureSource } from '@use-gpu/core';
+import type { StorageSource, UniformType } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader';
 
 import { wgsl } from '@use-gpu/shader/wgsl';
 import { use, yeet, useMemo } from '@use-gpu/live';
 import { Dispatch } from '../queue/dispatch';
 
-import { useBoundShader } from '../hooks/useBoundShader';
+import { getBoundShader, useBoundShader } from '../hooks/useBoundShader';
 import { useScratchSource } from '../hooks/useScratchSource';
 
 import { memoSample } from '@use-gpu/wgsl/compute/memo2.wgsl';
@@ -26,8 +27,9 @@ export const Memo2: LC<Memo2Props> = (props: Memo2Props) => {
     render,
   } = props;
 
-  const reserve = shader.length ?? 16;
-  const buffer = useScratchSource(format, {readWrite: true, reserve});
+  const [w, h] = size ?? [0, 0];
+  const reserve = (shader as any)?.length ?? ((w * h) || 16);
+  const [buffer] = useScratchSource(format, {readWrite: true, reserve});
   
   const setter = useMemo(() =>
     getBoundShader(wgsl`
@@ -40,7 +42,7 @@ export const Memo2: LC<Memo2Props> = (props: Memo2Props) => {
   );
 
   const bound = useBoundShader(memoSample, [
-    () => size ?? shader.size,
+    () => size ?? (shader as any)?.size ?? [0, 0],
     buffer,
     setter,
   ]);
@@ -48,10 +50,8 @@ export const Memo2: LC<Memo2Props> = (props: Memo2Props) => {
   return [
     use(Dispatch, {
       shader: bound,
-      size: () => {
-        const s = size ?? shader.size ?? [0, 0];
-        return [Math.ceil(s[0] / 8, s[1] / 8)];
-      },
+      size: () => size ?? (shader as any)?.size ?? [0, 0],
+      group: [8, 8],
     }),
     render ? render(buffer) : yeet(buffer),
   ];

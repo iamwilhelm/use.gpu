@@ -1,4 +1,4 @@
-import type { LiveComponent, LiveElement } from '@use-gpu/live';
+import type { LC, LiveElement } from '@use-gpu/live';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
 import type { ShadowMapLike } from './types';
 
@@ -38,7 +38,7 @@ const DEFAULT_SHADOW_MAP = {
 
 const parseOptionalPosition = optional(parsePosition);
 
-export const DirectionalLight = memo((props: DirectionalLightProps) => {
+export const DirectionalLight: LC<DirectionalLightProps> = memo((props: DirectionalLightProps) => {
   
   const position = useProp(props.position, parsePosition, DEFAULT_DIRECTION);
   const direction = useProp(props.direction, parseOptionalPosition);
@@ -116,7 +116,7 @@ export const DirectionalLight = memo((props: DirectionalLightProps) => {
   const {useLight} = useLightContext();
   useLight(light);
 
-  if (!props.debug) return;
+  if (!props.debug) return null;
 
   return [
     use(PointHelper, { position, color }),

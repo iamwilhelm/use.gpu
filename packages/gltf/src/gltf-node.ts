@@ -1,6 +1,6 @@
 import type { LC, LiveElement } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { ShaderSource } from '@use-gpu/shader';
 import type { GLTF } from './types';
 import { vec3, mat4, quat } from 'gl-matrix';
 

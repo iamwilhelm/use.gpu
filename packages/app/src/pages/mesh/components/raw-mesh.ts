@@ -92,6 +92,7 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
     '@group(LIGHT)': '@group(0)',
     '@binding(LIGHT)': '@binding(1)',
     'PICKING_ID': id,
+    'UV_PICKING': false,
   };
 
   // Shader

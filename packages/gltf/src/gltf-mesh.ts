@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { ShaderSource } from '@use-gpu/shader/wgsl';
+import type { ShaderSource } from '@use-gpu/shader';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { use, yeet, memo, useMemo } from '@use-gpu/live';
@@ -33,6 +33,6 @@ export const GLTFMesh: LC<GLTFMeshProps> = (props: GLTFMeshProps) => {
   return useMemo(() =>
     gltf.bound
     ? primitives.map((primitive: GLTFPrimitiveData) => use(GLTFPrimitive, {gltf, environment, primitive, transform}))
-    : yeet(primitives.map((primitive: GLTFPrimitiveData) => useGLTFGeometry(gltf, environment, primitive, transform))),
+    : yeet(primitives.map((primitive: GLTFPrimitiveData) => useGLTFGeometry(gltf, primitive, transform))),
     [gltf, environment, primitives, transform]);
 };

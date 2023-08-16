@@ -104,16 +104,28 @@ export const dispatch = (props: DispatchProps) => {
   
   let dispatchVersion: number | null = null;
 
-  let compute = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number) => void) => {
+  let compute = (passEncoder: GPUComputePassEncoder, countDispatch: (d: number, s: number) => void) => {
     onDispatch && onDispatch();
 
     const s = resolve(size ?? NO_SIZE);
     const m = resolve(group ?? null);
-    const d = s.reduce((a: number, b: number) => a * (b || 1), 1);
 
+    let sx = s[0] || 1;
+    let sy = s[1] || 1;
+    let sz = s[2] || 1;
+
+    let n = sx * sy * sz;
+    if (m) {
+      sx = Math.ceil(sx / m[0]);
+      sy = Math.ceil(sy / (m[1] || 1));
+      sz = Math.ceil(sz / (m[2] || 1));
+    }
+    let d = sx * sy * sz;
+
+    inspected.render.samples = m ? n : 0;
     inspected.render.dispatches = d;
     inspected.render.version = dispatchVersion;
-    countDispatch(d);
+    countDispatch(d, m ? n : 0);
 
     /*
     const bs = [];
@@ -133,16 +145,7 @@ export const dispatch = (props: DispatchProps) => {
 
     if (indirect) passEncoder.dispatchWorkgroupsIndirect(indirect.buffer, indirect.byteOffset ?? 0);
     else {
-      if (m) {
-        passEncoder.dispatchWorkgroups(
-          Math.ceil(s[0] / m[0]),
-          Math.ceil((s[1] || 1) / (m[1] || 1)),
-          Math.ceil((s[2] || 1) / (m[2] || 1))
-        );
-      }
-      else {
-        passEncoder.dispatchWorkgroups(s[0], s[1] || 1, s[2] || 1);
-      }
+      passEncoder.dispatchWorkgroups(sx, sy, sz);
     }
   };
   

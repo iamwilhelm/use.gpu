@@ -34,7 +34,7 @@ export type RenderToPass = (
   flip?: boolean,
 ) => void;
 
-export type ComputeCounter = (d: number) => void;
+export type ComputeCounter = (d: number, s: number) => void;
 export type ComputeToPass = (
   passEncoder: GPUComputePassEncoder,
   countDispatch: ComputeCounter,

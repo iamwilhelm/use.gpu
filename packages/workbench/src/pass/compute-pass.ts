@@ -43,8 +43,9 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
 
   const run = () => {
     let ds = 0;
-    
-    const countDispatch = (d: number) => { ds += d; };
+    let ss = 0;
+
+    const countDispatch = (d: number, s: number) => { ds += d; ss += s; };
 
     if (computes.length) {
       const commandEncoder = device.createCommandEncoder();
@@ -56,7 +57,8 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
 
     inspect({
       render: {
-        dispatchCount: ds,
+        dispatches: ds,
+        samples: ss,
       },
     });
 

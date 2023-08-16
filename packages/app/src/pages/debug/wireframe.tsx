@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
-import type { DataField } from '@use-gpu/core';
+import type { GPUGeometry, DataField } from '@use-gpu/core';
 
 import React, { use } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
@@ -30,8 +30,7 @@ export const DebugWireframePage: LC = () => {
               {...boxGeometry}
               render={(mesh: GPUGeometry) => 
                 <Mesh
-                  {...mesh}
-                  mode="debug"
+                  {...({...mesh, mode: 'debug'} as any)}
                 />
               }
             />

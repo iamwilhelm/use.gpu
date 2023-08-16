@@ -135,7 +135,7 @@ export const makeAtlas = (
     let h = 0;
 
     for (const k of map.keys()) {
-      const [,, r, b] = map.get(k);
+      const [,, r, b] = map.get(k)!;
       w = Math.max(r, w);
       h = Math.max(b, h);
     }

@@ -90,7 +90,7 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   if (normalMap) getSurface = useBoundShader(getNormalMapSurface, [boundSurface, normalMap]);
   else useNoBoundShader();
 
-  let getEnvironment = null;
+  let getEnvironment = undefined;
   if (environmentMap) getEnvironment = useBoundShader(applyPBREnvironment, [environmentMap]);
   else useNoBoundShader();
 

@@ -106,7 +106,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                         axes='xy'
                         width={2}
                         first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                        second={{ detail: 32, divide: 5, end: true }}
+                        second={{ detail: 64, divide: 5, end: true }}
                         depth={0.5}
                         zBias={-1}
                       />
@@ -114,14 +114,14 @@ export const PlotImplicitSurfacePage: LC = () => {
                         axes='xz'
                         width={2}
                         first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                        second={{ unit: π, base: 2, detail: 32, divide: 5, end: true }}
+                        second={{ unit: π, base: 2, detail: 64, divide: 5, end: true }}
                         depth={0.5}
                         zBias={-1}
                       />
 
                       <Axis
                         axis='x'
-                        detail={32}
+                        detail={64}
                         width={5}
                         color={[0.75, 0.75, 0.75, 1]}
                         depth={0.5}

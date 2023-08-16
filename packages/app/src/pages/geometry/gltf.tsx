@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { GLTF } from '@use-gpu/gltf';
 
-import React, { use } from '@use-gpu/live';
+import React, { use, Gather } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
@@ -9,7 +9,8 @@ import {
   CompositeData, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Cursor, PointLayer, LineLayer,
-  AmbientLight, DirectionalLight, PointLight, DomeLight,
+  ImageCubeTexture, PrefilteredEnvMap,
+  DirectionalLight, PointLight, DomeLight,
   Loop, Animate,
 } from '@use-gpu/workbench';
 
@@ -25,58 +26,78 @@ export const GeometryGLTFPage: LC = () => {
   const url = base + "gltf/DamagedHelmet/DamagedHelmet.gltf";
 
   return (
-    <Loop>
-      <LinearRGB>
-        <Cursor cursor='move' />
-        <Camera>
-          <Pass lights>
-            <AmbientLight color={[1, 1, 1]} intensity={0.005} />
+    <Gather
+      children={[
+        <ImageCubeTexture
+          urls={[
+            "/textures/cube/pisaHDR/px.hdr",
+            "/textures/cube/pisaHDR/nx.hdr",
+            "/textures/cube/pisaHDR/py.hdr",
+            "/textures/cube/pisaHDR/ny.hdr",
+            "/textures/cube/pisaHDR/pz.hdr",
+            "/textures/cube/pisaHDR/nz.hdr",
+          ]}
+          format={"hdr"}
+        />
+      ]}
+      then={([cubeMap]) => (
+        <Loop>
+          <LinearRGB>
+            <Cursor cursor='move' />
+            <Camera>
+              <Pass lights>
+                <Animate
+                  loop
+                  delay={0}
+                  keyframes={[
+                    [0, [30, 20, 10]],
+                    [4, [20, 10, 40]],
+                    [8, [-5, 20, 20]],
+                    [12, [30, 20, 10]],
+                  ]}
+                  prop='position'
+                >
+                  <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} intensity={40*40} />
+                </Animate>
 
-            <Animate
-              loop
-              delay={0}
-              keyframes={[
-                [0, [30, 20, 10]],
-                [4, [20, 10, 40]],
-                [8, [-5, 20, 20]],
-                [12, [30, 20, 10]],
-              ]}
-              prop='position'
-            >
-              <PointLight position={[10, 20, 30]} color={[0.5, 0.0, 0.25]} intensity={40*40} />
-            </Animate>
+                <Animate
+                  loop
+                  delay={0}
+                  keyframes={[
+                    [0, [10, 20, 30]],
+                    [3, [20, 30, 10]],
+                    [6, [40, 10, 20]],
+                    [9, [10, 20, 40]],
+                  ]}
+                  prop='position'
+                >
+                  <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
+                </Animate>
 
-            <Animate
-              loop
-              delay={0}
-              keyframes={[
-                [0, [10, 20, 30]],
-                [3, [20, 30, 10]],
-                [6, [40, 10, 20]],
-                [9, [10, 20, 40]],
-              ]}
-              prop='position'
-            >
-              <PointLight position={[10, 20, 30]} color={[1, 0.5, 0.25]} />
-            </Animate>
-        
-            <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
-            <DomeLight intensity={0.5} />
-          
-            <Scene>
-              <Node position={[0, -0.1, 0]}>
-                <GLTFData
-                  url={url}
-                  render={(gltf: GLTF) =>
-                    <GLTFModel gltf={gltf} />
-                  }
-                />
-              </Node>
-            </Scene>
-          </Pass>
-        </Camera>
-      </LinearRGB>
-    </Loop>
+                <DirectionalLight position={[-30, -10, 10]} color={[0, 0.5, 1.0]} />
+                <DomeLight intensity={0.15} />
+
+                <Scene>
+                  <Node position={[0, -0.1, 0]}>
+                    <GLTFData
+                      url={url}
+                      render={(gltf: GLTF) =>
+                        <PrefilteredEnvMap
+                          texture={cubeMap}
+                          render={(cubeMap) => (
+                            <GLTFModel gltf={gltf} environment={cubeMap} />
+                          )}
+                        />
+                      }
+                    />
+                  </Node>
+                </Scene>
+              </Pass>
+            </Camera>
+          </LinearRGB>
+        </Loop>
+      )}
+    />
   );
 };
 

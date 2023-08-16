@@ -16,8 +16,8 @@ const MAX_LAYERS_LOG = 8;
   ddx: vec3<f32>,
   ddy: vec3<f32>,
 ) -> vec4<f32> {
-  if (sigma < 0.0) { return sampleDiffuse(uvw); }
-  
+  if (sigma < 0.0) { return vec4<f32>(0.0); }
+
   let df = abs(ddx) + abs(ddy);
   let dr = dot(uvw, normalize(uvw + df));
   var s = max(sigma, sqrt(2.0 * (1.0 - dr)) * 2.0);
@@ -58,7 +58,8 @@ const MAX_LAYERS_LOG = 8;
 fn sampleDiffuse(
   ray: vec3<f32>,
 ) -> vec4<f32> {
-  let sample = (
+  let sample = max(
+    vec4<f32>(0.0),
     shCoefficients[0] + 
     shCoefficients[1] * ray.y +
     shCoefficients[2] * ray.z +

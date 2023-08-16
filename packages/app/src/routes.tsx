@@ -8,11 +8,11 @@ import { GeometryBinaryPage } from './pages/geometry/binary';
 import { GeometryVoxelPage } from './pages/geometry/voxel';
 import { DebugAtlasPage } from './pages/debug/atlas';
 import { DebugAxesPage } from './pages/debug/axes';
-import { DebugEnvMapPage } from './pages/debug/envmap';
 import { DebugWireframePage } from './pages/debug/wireframe';
 import { LayoutDisplayPage } from './pages/layout/display';
 import { LayoutGlyphPage } from './pages/layout/glyph';
 import { LayoutAlignPage } from './pages/layout/align';
+import { MaterialEnvMapPage } from './pages/material/envmap';
 import { MapWebMercatorPage } from './pages/map/webmercator';
 import { MeshRawPage } from './pages/mesh/raw';
 import { MeshInterleavedPage } from './pages/mesh/interleaved';
@@ -42,6 +42,7 @@ export const makePages = () => [
   {path: "/geometry/gltf",         title: "Geometry - GLTF",                   element: <GeometryGLTFPage />},
   {path: "/geometry/voxel",        title: "Geometry - Voxels",                 element: <GeometryVoxelPage />},
   {path: "/geometry/binary",       title: "Geometry - Byte Histogram",         element: <GeometryBinaryPage />},
+  {path: "/material/envmap",       title: "Material - Environment Map",        element: <MaterialEnvMapPage />},
   {path: "/layout/display",        title: "Layout - Box model",                element: <LayoutDisplayPage />},
   {path: "/layout/glyph",          title: "Layout - Glyph Subpixel SDF",       element: <LayoutGlyphPage />},
   {path: "/layout/align",          title: "Layout - Alignment Tests",          element: <LayoutAlignPage />},
@@ -65,7 +66,6 @@ export const makePages = () => [
   {path: "/mesh/interleaved",      title: "Raw Mesh - Native Components",      element: <MeshInterleavedPage />},
   {path: "/debug/atlas",           title: "Debug - Text Atlas",                element: <DebugAtlasPage />},
   {path: "/debug/axes",            title: "Debug - Axes",                      element: <DebugAxesPage />},
-  {path: "/debug/envmap",          title: "Debug - Environment Map",           element: <DebugEnvMapPage />},
   {path: "/debug/wireframe",       title: "Debug - Wireframe",                 element: <DebugWireframePage />},
 
   {path: "/", title: "Index", element: <HomePage container={document.querySelector('#use-gpu')} />},

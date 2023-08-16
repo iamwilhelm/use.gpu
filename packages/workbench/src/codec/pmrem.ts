@@ -8,7 +8,6 @@ import { DebugAtlas } from '../text/debug-atlas';
 import { Queue } from '../queue/queue';
 import { Dispatch } from '../queue/dispatch';
 import { Compute } from '../compute/compute';
-import { Readback } from '../primitives/readback';
 import { TextureBuffer } from '../compute/texture-buffer';
 import { useBoundShader, getBoundShader } from '../hooks/useBoundShader';
 import { useDerivedSource, getDerivedSource } from '../hooks/useDerivedSource';
@@ -20,7 +19,7 @@ import { pmremInit } from '@use-gpu/wgsl/pmrem/pmrem-init.wgsl';
 import { pmremCopy } from '@use-gpu/wgsl/pmrem/pmrem-copy.wgsl';
 import { pmremBlur } from '@use-gpu/wgsl/pmrem/pmrem-blur.wgsl';
 import { pmremDiffuseSH } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-sh.wgsl';
-import { pmremDiffuseRender } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-render.wgsl';
+//import { pmremDiffuseRender } from '@use-gpu/wgsl/pmrem/pmrem-diffuse-render.wgsl';
 
 import { sampleEnvMap } from '@use-gpu/wgsl/pmrem/pmrem-read.wgsl';
 
@@ -39,6 +38,7 @@ export type PrefilteredEnvMapProps = {
   texture: TextureSource,
   size?: number,
   levels?: number,
+  debug?: boolean,
   render: (cubeMap: TextureSource, textureMap: TextureSource) => LiveElement,
 };
 
@@ -74,6 +74,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
     levels = 8,
     size = 1024,
     texture,
+    debug,
     render,
   } = props;
   
@@ -237,6 +238,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             ]),
             size: [1, 1],
           }),
+          /*
           use(Dispatch, {
             shader: getBoundShader(pmremDiffuseRender, [
               mappings[j],
@@ -246,10 +248,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             size: [sizes[j], sizes[j]],
             group: [8, 8],
           }),
-          use(Readback, {
-            source: diffuseSHBuffer,
-            then: (data: TypedArray) => console.log(data),
-          }),
+          */
         ];
 
         out.push(makeDispatch(makeInitShader(), 0));
@@ -280,7 +279,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       });
   
       return [
-        use(DebugAtlas, {atlas}),
+        debug ? use(DebugAtlas, {atlas}) : null,
         use(Queue, {nested: true, children: use(Compute, {children: dispatches}) }),
         render ? render(boundCubeMap, target) : yeet(boundCubeMap),
       ];      

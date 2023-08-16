@@ -1,4 +1,5 @@
 import type { LC, PropsWithChildren, LiveElement } from '@use-gpu/live';
+import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { GLTF } from './types';
 
 import { use, provide, useMemo } from '@use-gpu/live';
@@ -12,6 +13,7 @@ type Props = PBRMaterialProps & {
 
 export const useGLTFMaterial = (
   gltf: GLTF,
+  environment?: ShaderSource,
   material?: number,
 ) => {
   if (!gltf.bound) throw new Error("GLTF bound data is missing. Load GLTF using <GLTFData>.");
@@ -107,6 +109,7 @@ export const useGLTFMaterial = (
   props.normalMap = useNativeColorTexture(props.normalMap);
   props.occlusionMap = useNativeColorTexture(props.occlusionMap);
   props.emissiveMap = useNativeColorTexture(props.emissiveMap);
+  props.environmentMap = environment;
   props.doubleSided = !!doubleSided;
 
   return props;

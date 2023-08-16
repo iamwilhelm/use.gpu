@@ -20,6 +20,7 @@ import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 import { useMaterialContext } from '../providers/material-provider';
 
+import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
 
 export type RawLinesProps = {
@@ -91,7 +92,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const p = useShaderRef(props.position, props.positions);
   const u = useShaderRef(props.uv, props.uvs);
   const s = useShaderRef(props.st, props.sts);
-  const g = useShaderRef(props.segment, props.segments);
+  const g = useShaderRef(null, props.segments);
   const c = useShaderRef(props.color, props.colors);
   const w = useShaderRef(props.width, props.widths);
   const d = useShaderRef(props.depth, props.depths);
@@ -100,6 +101,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const e = useShaderRef(props.size, props.sizes);
   
   const l = useShaderRef(null, props.lookups);
+  const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
 
   const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
 
@@ -115,7 +117,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, ps ?? s, g, c, w, d, z, t, e, l, instanceCount]);
+  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, ps ?? s, g ?? auto, c, w, d, z, t, e, l, instanceCount]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => ({

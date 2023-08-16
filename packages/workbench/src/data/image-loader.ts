@@ -97,22 +97,17 @@ export const ImageLoader: LiveComponent<ImageLoaderProps> = (props) => {
         let decoded: GPUTextureFormat = 'rgba8unorm';
         if (image.format.slice(0, 3) === 'BGR') decoded = 'bgra8unorm';
 
-        let out: TypedArray = buffer;
-        if (format === 'rgbm16') {
-          const flip = !!decoded.match(/^bgr/);
-          out = parseRGBM16(buffer, w, h, flip);
-          decoded = 'rgba16float';
-        }
+        const flip = !!decoded.match(/^bgr/);
+        const out = parseRGBM16(buffer, w, h, flip);
 
-        const {format: f, colorSpace} = resolveFormat(decoded);
         return {
           data: {
             data: out,
             size: [w, h],
-            format: f,
+            format: 'rgba16float',
           },
-          format: f,
-          colorSpace,
+          format: 'rgba16float',
+          colorSpace: 'linear',
         };
       }
       else {

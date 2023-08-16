@@ -88,7 +88,7 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   let dotNH = saturate(dot(N, H));
   let dotLH = saturate(dot(L, H));
 
-  let F = fresnelSchlick3(dotLH, F0, vec3<f32>(1.0 - roughness));
+  let F = fresnelSchlick3(dotLH, F0, max(F0, vec3<f32>(1.0 - roughness)));
   let D = ndfGGX(dotNH, alpha);
   let G = smithGGXCorrelated(dotNL, dotNV, alpha);
   //let G = geometricGGX(dotNL, dotNV, alpha);
@@ -103,6 +103,7 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
 @export struct IBLResult {
   diffuse: vec3<f32>,
   specular: vec3<f32>,
+  dotNV: f32,
 }
 
 // N, V must be normalized
@@ -120,9 +121,20 @@ fn geometricGGX(dotNL: f32, dotNV: f32, alpha: f32) -> f32 {
   let alpha = roughness * roughness;
   let dotNV = saturate(dot(N, V));
 
-  let F = fresnelSchlick3(dotNV, F0, vec3<f32>(1.0 - roughness));
+  let F = fresnelSchlick3(dotNV, F0, max(F0, vec3<f32>(1.0 - roughness)));
   let Fd = diffuseColor / PI * (1.0 - F);
   let Fs = F;
 
-  return IBLResult(Fd, Fs);
+  return IBLResult(Fd, Fs, dotNV);
+}
+
+// https://blog.selfshadow.com/publications/s2013-shading-course/lazarov/s2013_pbs_black_ops_2_slides_v2.pdf
+@export fn environmentBRDF(g: f32, dotNV: f32) -> vec2<f32> {
+  let t = vec4<f32>(1/0.96, 0.475, (0.0275 - 0.25*0.04)/0.96, 0.25) * g + vec4<f32>(0.0, 0.0, (0.015 - 0.75*0.04)/0.96, 0.75);
+  let a0 = t.x * min(t.y, exp2(-9.28 * dotNV)) + t.z;
+  let a1 = t.w;
+  return vec2<f32>(
+    a0,
+    a1 - a0,
+  );
 }

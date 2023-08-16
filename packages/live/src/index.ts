@@ -19,7 +19,7 @@ export {
   useVersion,
   useYolo,
 
-  useNoAsync,
+  useNoAwait,
   useNoFiber,
   useNoCallback,
   useNoContext,

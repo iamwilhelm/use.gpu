@@ -3,6 +3,7 @@ import type { TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import React, { Gather, memo, useContext, useOne } from '@use-gpu/live';
+import { seq } from '@use-gpu/core';
 import { bindBundle, wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
@@ -92,7 +93,7 @@ const getEnvironment = bindBundle(wgsl`
 `, {SurfaceFragment, encodeOctahedral});
 
 export const DebugEnvMapPage: LC = (props) => {
-  const geometry = useOne(() => makeSphereGeometry({ width: 2, uvw: true }));
+  const geometry = useOne(() => makeSphereGeometry({ width: 2, uvw: true, detail: [32, 64] }));
 
   let HDR = false;
 
@@ -140,40 +141,31 @@ export const DebugEnvMapPage: LC = (props) => {
               <Camera active={!panning}>
                 <Pass lights>
                 
-                  <AxisHelper size={2} width={3} />
+                  {/*<AxisHelper size={2} width={3} />*/}
 
                   <Scene>
                     <PrefilteredEnvMap
                       texture={texture}
-                      render={(cubeMap) => (
-                        <Animate
-                          loop
-                          keyframes={keyframes}
-                          prop="roughness"
-                          render={(roughness) => {
-                            const environment = useBoundShader(getEnvironment, [cubeMap]);
-                            return (
-                            
-                              <PBRMaterial
-                                metalness={0.8}
-                                roughness={roughness}
-                                environmentMap={cubeMap}
-                                pmrem
-                              >
-                                <Mesh mesh={mesh} shaded />
-                              </PBRMaterial>
-                              /*
-                              <ShaderLitMaterial
-                                surface={surface}
-                                environment={environment}
-                              >
-                                <Mesh mesh={mesh} shaded />
-                              </ShaderLitMaterial>
-                              */
-                            );                            
-                          }}
-                        />
-                      )}
+                      render={(cubeMap) => {
+                        const environment = useBoundShader(getEnvironment, [cubeMap]);
+                        return (
+                          seq(4).flatMap(i => 
+                            seq(6).map(j => (
+                              <Node position={[i - 1.5, 0, j - 2.5]} scale={[0.25, 0.25, 0.25]}>
+                                <PBRMaterial
+                                  albedo={[0.5, 0.75, 1.0, 1.0]}
+                                  metalness={i / 3}
+                                  roughness={j / 5}
+                                  environmentMap={cubeMap}
+                                  pmrem
+                                >
+                                  <Mesh mesh={mesh} shaded />
+                                </PBRMaterial>
+                              </Node>
+                            ))
+                          )
+                        );                            
+                      }}
                     />
                   </Scene>
 

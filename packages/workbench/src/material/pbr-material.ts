@@ -33,7 +33,6 @@ export type PBRMaterialProps = {
   environmentMap?: ShaderSource,
   normalMap?: ShaderSource,
 
-  pmrem?: boolean,
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };
 
@@ -54,7 +53,6 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     environmentMap,
     normalMap,
 
-    pmrem,
     render,
     children,
   } = props;

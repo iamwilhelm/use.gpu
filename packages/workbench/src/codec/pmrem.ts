@@ -162,7 +162,11 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       const [diffuseSHBuffer, allocate] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
       allocate(10);
 
-      const targetIn = getDerivedSource(target, {
+      const shCoefficients = useDerivedSource(diffuseSHBuffer, {
+        readWrite: false,
+      });
+
+      const targetIn = useDerivedSource(target, {
         variant: 'textureSampleLevel',
         absolute: true,
       });
@@ -171,7 +175,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         sampler: null,
       });
       
-      const scratchIn = getDerivedSource(scratch.history[0], {
+      const scratchIn = useDerivedSource(scratch.history[0], {
         variant: 'textureSampleLevel',
         absolute: true,
       });
@@ -266,7 +270,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         boundMappings,
         boundVariances,
         targetIn,
-        diffuseSHBuffer,
+        shCoefficients,
       ], {FIX_BILINEAR_SEAM});
 
       inspect({

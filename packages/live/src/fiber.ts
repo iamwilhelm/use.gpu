@@ -279,7 +279,7 @@ export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
       const {children} = props;
       if (children) {
         if (Array.isArray(children)) children.forEach((c: any) => c ? BY_MAP.set(c, by) : null);
-        else if ('props' in children) BY_MAP.set(props.children, by);
+        else if (typeof children === 'object' && 'props' in children) BY_MAP.set(props.children, by);
       }
 
       setCurrentFiberBy(by);

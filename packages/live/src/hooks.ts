@@ -606,7 +606,7 @@ export const useAwait = <T, E = Error>(
   return value;
 };
 
-export const useNoAsync = () => {
+export const useNoAwait = () => {
   useNoState();
   useNoResource();
 };

@@ -1,7 +1,7 @@
-use '@use-gpu/wgsl/fragment/pbr'::{ IBL, IBLResult };
+use '@use-gpu/wgsl/fragment/pbr'::{ IBL, IBLResult, environmentBRDF };
 use '@use-gpu/wgsl/use/types'::{ SurfaceFragment };
 
-@link fn sampleEnvMap(uvw: vec3<f32>, sigma: f32) -> vec4<f32>;
+@link fn sampleEnvMap(uvw: vec3<f32>, sigma: f32, ddx: vec3<f32>, ddy: vec3<f32>) -> vec4<f32>;
 
 fn sqr(x: f32) -> f32 { return x * x; }
 
@@ -25,9 +25,16 @@ fn varianceForRoughness(roughness: f32) -> f32 {
 
   let R = reflect(-V, N);
 
-  let diffuse = ibl.diffuse * sampleEnvMap(N, -1.0).xyz;
-  let specular = ibl.specular * sampleEnvMap(R, sigma).xyz;
+  let Fd = ibl.diffuse;
+  let Fs = ibl.specular;
+  let dotNV = ibl.dotNV;
 
-  return sampleEnvMap(N, -1.0).xyz;
-  return diffuse + specular * 0.0;
+  let dfx = dpdx(N);
+  let dfy = dpdy(N);
+
+  let brdf = environmentBRDF(roughness, dotNV);
+  let diffuse = Fd * sampleEnvMap(N, -1.0, dfx, dfy).xyz;
+  let specular = max(vec3<f32>(0.0), brdf.x + Fs * brdf.y) * sampleEnvMap(R, sigma, dfx, dfy).xyz;
+
+  return diffuse + specular;
 }

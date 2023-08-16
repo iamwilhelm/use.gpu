@@ -13,11 +13,18 @@ const MAX_LAYERS_LOG = 8;
 @export fn sampleEnvMap(
   uvw: vec3<f32>,
   sigma: f32,
-) -> vec4<f32> {  
+  ddx: vec3<f32>,
+  ddy: vec3<f32>,
+) -> vec4<f32> {
   if (sigma < 0.0) { return sampleDiffuse(uvw); }
+  
+  let df = abs(ddx) + abs(ddy);
+  let dr = dot(uvw, normalize(uvw + df));
+  var s = max(sigma, sqrt(2.0 * (1.0 - dr)) * 2.0);
+  //var s = max(sigma, acos(dr) * 2.0);
 
   let uv = encodeOctahedral(uvw) * .5 + .5;
-  if (sigma == 0) { return sampleCubeMapLevel(uv, 0u); }
+  if (s == 0) { return sampleCubeMapLevel(uv, 0u); }
 
   let count = getLayerCount();
   var start = 0u;
@@ -25,7 +32,7 @@ const MAX_LAYERS_LOG = 8;
   for (var i = 0u; i < MAX_LAYERS_LOG; i++) {
     var mid = start + length / 2u;
     var v = getSigma(mid);
-    if (sigma > v) {
+    if (s > v) {
       length -= mid - start;
       start = mid;
     }
@@ -41,7 +48,7 @@ const MAX_LAYERS_LOG = 8;
 
   let a = max(getSigma(level), 1e-5);
   let b = getSigma(level + 1);
-  let f = max(0.0, (sigma - a) / (b - a));
+  let f = max(0.0, (s - a) / (b - a));
 
   let s1 = sampleCubeMapLevel(uv, level);
   let s2 = sampleCubeMapLevel(uv, level + 1);

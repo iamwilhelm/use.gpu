@@ -135,7 +135,7 @@ export const DebugEnvMapPage: LC = (props) => {
         const surface = getSurface;
 
         return (
-          <LinearRGB tonemap="aces" gain={1}>
+          <LinearRGB tonemap="aces" gain={4}>
             <Loop>
               <Cursor cursor='move' />
               <Camera active={!panning}>
@@ -172,15 +172,14 @@ export const DebugEnvMapPage: LC = (props) => {
                 </Pass>
               </Camera>
               <PanControls
-                x={-600} y={200}
-                zoom={0.5}
+                x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
                 active={panning}
                 render={(x, y, zoom) =>
                   <Flat x={x} y={y} zoom={zoom}>
                     <Pass overlay>
                       <UI>
                         <Layout>
-                          <Block margin={[0, 600, 0, 0]}>
+                          <Block margin={[0, 0, 0, 0]}>
                             <PrefilteredEnvMap
                               texture={texture}
                               render={(cubeMap, texture) => texture ? (

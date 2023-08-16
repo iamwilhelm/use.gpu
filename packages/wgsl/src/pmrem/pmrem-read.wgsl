@@ -23,7 +23,7 @@ const MAX_LAYERS_LOG = 8;
   }
 
   let df = abs(ddx) + abs(ddy);
-  let dr = dot(uvw, normalize(uvw + df));
+  let dr = dot(uvw, normalize(uvw + df / 1.414));
   var s = max(sigma, sqrt(2.0 * (1.0 - dr)) * 2.0);
   //var s = max(sigma, acos(dr) * 2.0);
 

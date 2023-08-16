@@ -9,12 +9,11 @@ import { vec3 } from 'gl-matrix';
 
 import {
   Loop, Pass, Flat, Animate, LinearRGB,
-  GeometryData, PBRMaterial, ImageCubeTexture,
+  GeometryData, PBRMaterial, ImageCubeTexture, PrefilteredEnvMap, ShaderLitMaterial,
   OrbitCamera, OrbitControls, PanControls,
   Pick, Cursor, Data, PointLayer, LineLayer,
   LineSegments, CompositeData,
-  AxisHelper, PrefilteredEnvMap,
-  ShaderLitMaterial, KeyboardContext,
+  AxisHelper, KeyboardContext,
 
   makeSphereGeometry,
   useBoundShader, useShaderRef,
@@ -76,7 +75,7 @@ export const MaterialEnvMapPage: LC = (props) => {
           texture={texture}
           gain={1}
           render={(cubeMap, texture) =>          
-            <LinearRGB tonemap="aces" gain={2}>
+            <LinearRGB tonemap="aces" gain={3}>
               <Loop>
                 <Cursor cursor='move' />
                 <Camera active={!panning}>
@@ -90,7 +89,7 @@ export const MaterialEnvMapPage: LC = (props) => {
                           seq(8).map(j => (
                             <Node position={[i - 3.5, 0, j - 3.5]} scale={[0.35, 0.35, 0.35]}>
                               <PBRMaterial
-                                albedo={[0.5, 0.75, 1.0, 1.0]}
+                                albedo={[0.6, 0.85, 1.0, 1.0]}
                                 metalness={i / 7}
                                 roughness={j / 7}
                                 environmentMap={cubeMap}

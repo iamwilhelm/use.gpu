@@ -145,7 +145,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                           <Sampled
                             axes='xyz'
                             format='vec3<f32>'
-                            size={[36, 24, 36]}
+                            size={[42, 28, 42]}
                             padding={1}
                             expr={EXPR_POSITION}
                             time
@@ -154,7 +154,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                           <Sampled
                             axes='xyz'
                             format='vec3<f32>'
-                            size={[36, 24, 36]}
+                            size={[42, 28, 42]}
                             padding={1}
                             expr={EXPR_NORMAL}
                             time
@@ -163,7 +163,7 @@ export const PlotImplicitSurfacePage: LC = () => {
                           <Sampled
                             axes='xyz'
                             format='f32'
-                            size={[36, 24, 36]}
+                            size={[42, 28, 42]}
                             padding={1}
                             expr={EXPR_VALUE}
                             time

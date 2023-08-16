@@ -31,14 +31,14 @@ export const GeometryGLTFPage: LC = () => {
       children={[
         <ImageCubeTexture
           urls={[
-            "/textures/cube/pisaHDR/px.hdr",
-            "/textures/cube/pisaHDR/nx.hdr",
-            "/textures/cube/pisaHDR/py.hdr",
-            "/textures/cube/pisaHDR/ny.hdr",
-            "/textures/cube/pisaHDR/pz.hdr",
-            "/textures/cube/pisaHDR/nz.hdr",
+            "/textures/cube/park2/px.jpg",
+            "/textures/cube/park2/nx.jpg",
+            "/textures/cube/park2/py.jpg",
+            "/textures/cube/park2/ny.jpg",
+            "/textures/cube/park2/pz.jpg",
+            "/textures/cube/park2/nz.jpg",
           ]}
-          format={"hdr"}
+          format={"jpg"}
         />
       ]}
       then={([cubeMap]: TextureSource[]) => (

@@ -313,7 +313,7 @@ export const loadBundlesInOrder = (
   while (queue.length) {
     const next = queue.shift()!;
     const {key, name, chunk} = next;
-    if (chunk == null) throw new Error(`Shader module ${name} is undefined`);
+    if (chunk == null) throw new Error(`Module '${name}' is undefined`);
 
     const bundle = toBundle(chunk);
     const {module, libs, links: linkDefs} = bundle;
@@ -329,7 +329,7 @@ export const loadBundlesInOrder = (
     // Recurse into imports
     if (modules) for (const {at, name, imports} of modules) {
       const chunk = libs?.[name] ?? libraries[name];
-      if (!chunk) throw new Error(`Unknown module '${name}' in ${getContext(module)}`);
+      if (!chunk) throw new Error(`Module '${name}' in ${getContext(module)} is unknown`);
 
       const key = getBundleKey(chunk);
       if (!seen.has(key)) queue.push({key, name, chunk});
@@ -354,7 +354,7 @@ export const loadBundlesInOrder = (
         if (flags & RF.Optional) {
           continue;
         }
-        throw new Error(`Unlinked function/variable '${name}' in ${getContext(module)}`);
+        throw new Error(`Link '${name}' in ${getContext(module)} is not linked`);
       }
 
       const key = getBundleKey(chunk);

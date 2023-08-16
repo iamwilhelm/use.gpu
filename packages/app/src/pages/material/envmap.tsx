@@ -145,9 +145,9 @@ const Camera: LC<CameraProps> = ({active, children}: PropsWithChildren<CameraPro
   return (
     <OrbitControls
       active={active}
-      radius={5}
-      bearing={0.5}
-      pitch={0.3}
+      radius={6.5}
+      bearing={-2.4}
+      pitch={0.2}
       render={(radius: number, phi: number, theta: number, target: vec3) =>
         <OrbitCamera
           radius={radius}

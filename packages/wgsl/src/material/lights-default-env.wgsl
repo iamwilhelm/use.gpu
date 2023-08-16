@@ -32,7 +32,7 @@ const SH_SPECULAR = array(
   vec3<f32>(0.0456550307571888, 0.014412368647754192, -0.013487264513969421)
 );
 
-const GAIN = 1.5;
+const GAIN = 1.0;
 
 @export fn getDefaultEnvironment(
   uvw: vec3<f32>,

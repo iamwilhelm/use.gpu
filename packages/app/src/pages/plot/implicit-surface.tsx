@@ -173,15 +173,13 @@ export const PlotImplicitSurfacePage: LC = () => {
                         then={
                           ([positions, normals, values]: StorageSource[]) => <>
                             <Provide context={DataContext} value={values}>
-                              <Animate prop='roughness' keyframes={keyframes} pause={1} mirror>
-                                <ImplicitSurface
-                                  normals={normals}
-                                  level={level}
-                                  method="linear"
-                                  padding={1}
-                                  color={[0.8, 0.8, 1.0, 1.0]}
-                                />
-                              </Animate>
+                              <ImplicitSurface
+                                normals={normals}
+                                level={level}
+                                method="linear"
+                                padding={1}
+                                color={[0.8, 0.8, 1.0, 1.0]}
+                              />
                             </Provide>
                             {inspect ? (
                               <DataShader

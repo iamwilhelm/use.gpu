@@ -16,7 +16,7 @@ const MAX_LAYERS_LOG = 8;
   ddx: vec3<f32>,
   ddy: vec3<f32>,
 ) -> vec4<f32> {
-  if (sigma < 0.0) { return vec4<f32>(0.0); }
+  if (sigma < 0.0) { return sampleDiffuse(uvw); }
 
   let df = abs(ddx) + abs(ddy);
   let dr = dot(uvw, normalize(uvw + df));

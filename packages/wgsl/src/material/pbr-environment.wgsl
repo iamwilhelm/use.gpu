@@ -34,7 +34,7 @@ fn varianceForRoughness(roughness: f32) -> f32 {
 
   let brdf = environmentBRDF(roughness, dotNV);
   let diffuse = Fd * sampleEnvMap(N, -1.0, dfx, dfy).xyz;
-  let specular = (brdf.x + Fs * brdf.y) * sampleEnvMap(R, sigma, dfx, dfy).xyz;
+  let specular = max(vec3<f32>(0.0), brdf.x + Fs * brdf.y) * sampleEnvMap(R, sigma, dfx, dfy).xyz;
 
-  return diffuse + specular;
+  return (diffuse + specular) * surface.occlusion;
 }

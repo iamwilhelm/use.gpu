@@ -72,19 +72,19 @@ export const MaterialEnvMapPage: LC = (props) => {
         Record<string, ShaderSource>,
         TextureSource,
       ]) => (
-        <LinearRGB tonemap="aces" gain={3}>
-          <Loop>
-            <Cursor cursor='move' />
-            <Camera active={!panning}>
-              <Pass lights>
+        <PrefilteredEnvMap
+          texture={texture}
+          render={(cubeMap, texture) =>          
+            <LinearRGB tonemap="aces" gain={3}>
+              <Loop>
+                <Cursor cursor='move' />
+                <Camera active={!panning}>
+                  <Pass lights>
             
-                {/*<AxisHelper size={2} width={3} />*/}
+                    {/*<AxisHelper size={2} width={3} />*/}
 
-                <Scene>
-                  <PrefilteredEnvMap
-                    texture={texture}
-                    render={(cubeMap) => {
-                      return (
+                    <Scene>
+                      {
                         seq(8).flatMap(i => 
                           seq(8).map(j => (
                             <Node position={[i - 3.5, 0, j - 3.5]} scale={[0.35, 0.35, 0.35]}>
@@ -100,26 +100,20 @@ export const MaterialEnvMapPage: LC = (props) => {
                             </Node>
                           ))
                         )
-                      );                            
-                    }}
-                  />
-                </Scene>
+                      }
+                    </Scene>
 
-              </Pass>
-            </Camera>
-            <PanControls
-              x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
-              active={panning}
-              render={(x, y, zoom) =>
-                <Flat x={x} y={y} zoom={zoom}>
-                  <Pass overlay>
-                    <UI>
-                      <Layout>
-                        <Block margin={[0, 0, 0, 0]}>
-                          <PrefilteredEnvMap
-                            debug
-                            texture={texture}
-                            render={(cubeMap, texture) => texture ? (
+                  </Pass>
+                </Camera>
+                <PanControls
+                  x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
+                  active={panning}
+                  render={(x, y, zoom) =>
+                    <Flat x={x} y={y} zoom={zoom}>
+                      <Pass overlay>
+                        <UI>
+                          <Layout>
+                            <Block margin={[0, 0, 0, 0]}>
                               <Absolute left={520} top={0}>
                                 <Block
                                   width={500}
@@ -128,17 +122,16 @@ export const MaterialEnvMapPage: LC = (props) => {
                                   image={{texture, fit: 'scale'}}
                                 />
                               </Absolute>
-                            ) : null}
-                          />
-                        </Block>
-                      </Layout>
-                    </UI>
-                  </Pass>
-                </Flat>
-              }
-            />
-          </Loop>
-        </LinearRGB>
+                            </Block>
+                          </Layout>
+                        </UI>
+                      </Pass>
+                    </Flat>
+                  }
+                />
+              </Loop>
+            </LinearRGB>
+        } />
       )}
     />
   );

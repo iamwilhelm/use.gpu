@@ -129,6 +129,48 @@ export const makeAtlas = (
     self.height = height = h;
   };
 
+  const snug = () => {
+    const {width, height} = self;
+    let w = 0;
+    let h = 0;
+
+    for (const k of map.keys()) {
+      const [,, r, b] = map.get(k);
+      w = Math.max(r, w);
+      h = Math.max(b, h);
+    }
+    self.width = w;
+    self.height = h;
+
+    if (w !== width || h !== height) {
+      const remove: Slot[] = [];
+      const add: Slot[] = [];
+      for (const s of slots.values()) {
+        const [l, t, r, b, nearX, nearY, farX, farY, corner] = s;
+        if (l >= w || t >= h) {
+          remove.push(s);
+        }
+        else if (r > w || b > h) {
+          const rr = Math.min(r, w);
+          const bb = Math.min(b, h);
+          remove.push(s);
+          add.push([
+            l, t, rr, bb,
+            Math.min(nearX, rr - l),
+            Math.min(nearY, bb - t),
+            Math.min(farX, rr - l),
+            Math.min(farY, bb - t),
+            corner,
+          ]);
+        }
+      }
+      for (const s of remove) removeSlot(s);
+      for (const s of add) addSlot(s);
+    }
+
+    return {width: w, height: h};
+  };
+
   // Lazily allocate bin for a particular coordinate
   const getBin = (xs: Bins, x: number) => {
     let vs = xs.get(x);
@@ -324,7 +366,7 @@ export const makeAtlas = (
   addSlot(slot);
 
   const self = {
-    place, map, expand,
+    place, map, expand, snug,
     width, height, version: 0,
     debugPlacements, debugSlots, debugValidate,
   } as Atlas;

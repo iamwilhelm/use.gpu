@@ -133,6 +133,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
     for (const [i, size] of sizes.entries()) {
       mappings.push(atlas.place(i, size, size));
     }
+    atlas.snug();
 
     return {atlas, mappings, mips, sigmas, sigmas2, dsigmas, sizes, radii};
   });

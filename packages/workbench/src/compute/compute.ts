@@ -26,4 +26,4 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
     ], calls);
 
   return multiGather(children, Resume);
-}, 'Pass');
+}, 'Compute');

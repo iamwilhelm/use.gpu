@@ -16,9 +16,9 @@ use '@use-gpu/wgsl/use/types'::{ SurfaceFragment };
 @export fn getLitFragment(
   surface: SurfaceFragment,
 ) -> vec4<f32> {
-  let viewPosition = getViewPosition().xyz;
+  let viewPosition = getViewPosition();
   let surfacePosition = surface.position.xyz;
-  let toView: vec3<f32> = viewPosition - surfacePosition;
+  let toView = viewPosition.xyz - surfacePosition * viewPosition.w;
 
   let N: vec3<f32> = normalize(surface.normal.xyz);
   let V: vec3<f32> = normalize(toView);

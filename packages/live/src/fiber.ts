@@ -505,7 +505,7 @@ export const reconcileFiberCalls = (() => {
     let i = 0, j = 0;
     let rekeyed = false;
     for (let call of calls) {
-      if (call == null) {
+      if (call == null || call == false) {
         j++;
         continue;
       }

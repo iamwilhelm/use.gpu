@@ -37,9 +37,9 @@ use '@use-gpu/wgsl/codec/octahedral'::{ decodeOctahedral };
     0.0,
   );
 
-  let viewPosition = getViewPosition().xyz;
+  let viewPosition = getViewPosition();
   let surfacePosition = surface.position.xyz;
-  let toView: vec3<f32> = viewPosition - surfacePosition;
+  let toView = viewPosition.xyz - surfacePosition * viewPosition.w;
 
   let N: vec3<f32> = normalize(surface.normal.xyz);
   let V: vec3<f32> = normalize(toView);

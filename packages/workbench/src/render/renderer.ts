@@ -108,7 +108,7 @@ export const Renderer: LC<RendererProps> = memo((props: PropsWithChildren<Render
 
       return [
         calls.dispatch ? use(DispatchPass, props) : null,
-        calls.compute ? use(ComputePass, props) : null,
+        calls.pre || calls.compute ? use(ComputePass, props) : null,
         shadow && calls.shadow ? use(ShadowPass, props) : null,
         ...passes.map(element => extend(element, props)),
         calls.post || calls.readback ? use(ReadbackPass, props) : null,

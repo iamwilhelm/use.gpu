@@ -1,5 +1,5 @@
 import type { LC, PropsWithChildren, LiveFiber, LiveElement, ArrowFunction } from '@use-gpu/live';
-import type { ComputeToPass, ComputeCounter } from './types';
+import type { ComputeToPass, CommandToBuffer, ComputeCounter } from './types';
 
 import { quote, yeet, memo } from '@use-gpu/live';
 import { useDeviceContext } from '../providers/device-provider';
@@ -7,6 +7,7 @@ import { useInspectable } from '../hooks/useInspectable'
 
 export type ComputePassProps = {
   calls: {
+    pre?: CommandToBuffer[],
     compute?: ComputeToPass[],
   },
   immediate?: boolean,
@@ -39,6 +40,7 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
 
   const device = useDeviceContext();
 
+  const pres = toArray(calls['pre'] as CommandToBuffer[]);
   const computes = toArray(calls['compute'] as ComputeToPass[]);
 
   const run = () => {
@@ -47,13 +49,20 @@ export const ComputePass: LC<ComputePassProps> = memo((props: PropsWithChildren<
 
     const countDispatch = (d: number, s: number) => { ds += d; ss += s; };
 
+    const queue: GPUCommandBuffer[] = []
+    for (const f of pres) {
+      const q = f();
+      if (q) queue.push(q);
+    }
+
     if (computes.length) {
       const commandEncoder = device.createCommandEncoder();
       computeToContext(commandEncoder, computes, countDispatch);
 
       const command = commandEncoder.finish();
-      device.queue.submit([command]);
+      queue.push(command);
     }
+    device.queue.submit(queue);
 
     inspect({
       render: {

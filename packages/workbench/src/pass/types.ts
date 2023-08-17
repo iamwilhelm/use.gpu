@@ -46,6 +46,7 @@ export type AggregatedCalls = {
   env?: any[],
 
   dispatch?: ArrowFunction[],
+  pre?: CommandToBuffer[],
   compute?: ComputeToPass[],
   opaque?: Renderable[],
   transparent?: Renderable[],

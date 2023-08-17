@@ -21,7 +21,7 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
 
   const Resume = (calls: AggregatedCalls) =>
     useOne(() => [
-      calls.compute ? use(ComputePass, {immediate, calls}) : null,
+      calls.pre || calls.compute ? use(ComputePass, {immediate, calls}) : null,
       calls.post || calls.readback ? use(ReadbackPass, {calls}) : null,
     ], calls);
 

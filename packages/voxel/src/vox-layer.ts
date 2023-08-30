@@ -1,6 +1,7 @@
 import type { LC, LiveElement, Ref } from '@use-gpu/live';
 import type { TextureSource, StorageSource, LambdaSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
+import type { PipelineOptions } from '@use-gpu/workbench';
 
 import { seq, clamp } from '@use-gpu/core';
 import { gather, use, quote, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
@@ -18,10 +19,11 @@ import { SurfaceFragment, DepthFragment } from '@use-gpu/wgsl/use/types.wgsl';
 
 import { vec3, mat3, mat4 } from 'gl-matrix';
 
-export type VoxLayerProps = {
+export type VoxLayerProps = Pick<PipelineOptions, 'blend' | 'mode'> & {
   shape: (TextureSource | StorageSource | LambdaSource)[],
   palette: ShaderSource,
   pbr: ShaderSource,
+  sdf?: boolean,
 };
 
 // Transform a unit size box to the right dimensions
@@ -53,13 +55,15 @@ const surfaceShader = bindBundle(wgsl`
 @link fn getIsInside() -> f32;
 @link fn getInsideOrigin() -> vec3<f32>;
 
+@optional @link fn getSDF(uvw: vec3<f32>, level: u32) -> f32 { return 0.0; };
+
+@link fn getPalette(i: u32, level: u32) -> vec4<f32>;
+@link fn getPBR(i: u32) -> vec4<f32>;
+
 @link fn getTexture0(uvw: vec3<u32>, level: u32) -> u32;
 @optional @link fn getTexture1(uvw: vec3<u32>, level: u32) -> u32 { return 0; };
 @optional @link fn getTexture2(uvw: vec3<u32>, level: u32) -> u32 { return 0; };
 @optional @link fn getTexture3(uvw: vec3<u32>, level: u32) -> u32 { return 0; };
-
-@link fn getPalette(i: u32, level: u32) -> vec4<f32>;
-@link fn getPBR(i: u32) -> vec4<f32>;
 
 struct VoxelHit {
   position: vec3<f32>,
@@ -157,7 +161,32 @@ fn traceVolumeSteps(
   var axis = initialAxis;
   for (var i = 0u; i < 8u; i++) {
 
-    if (MIP_LEVELS > 1 && mip > 0) {
+    if (SDF_LEVEL >= 0 && mip == SDF_LEVEL) {
+      let level = f32(1 << mip);
+      let maxSteps = 64u;
+
+      var current = (pos + dist * ray) / level;
+      for (var j = 0u; j <= maxSteps; j++) {
+        steps++;
+
+        let d = getSDF(current, 0u) - .5;
+        if (d < 1.0) {
+          if (SDF_LEVEL == 0) {
+            return VoxelHit(current * level, vec3<f32>(0.0), 1u, steps);
+          }
+          else {
+            mip--;
+            break;
+          }
+        }
+        dist += d * level;
+        current += ray * d;
+
+        if (dist >= distMax) { break; }
+      }
+    }
+
+    else if (MIP_LEVELS > 1 && mip > 0) {
       let level = f32(1 << mip);
       let maxSteps = 12 + (mip - 1) * 128;
       let invAbsL = invAbs * level;
@@ -171,7 +200,7 @@ fn traceVolumeSteps(
       for (var j = 0u; j <= maxSteps; j++) {
         steps++;
 
-        if (j == maxSteps) {
+        if (j == maxSteps && mip < MIP_LEVELS - 1) {
           mip++;
           break;
         }
@@ -332,6 +361,9 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
     shape,
     palette,
     pbr,
+    sdf,
+    blend,
+    mode,
   } = props;
 
   const geometry = useOne(() => makeBoxGeometry({
@@ -350,6 +382,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       const defs = useMemo(() => ({
         DEBUG_STEPS,
         MIP_LEVELS: mips,
+        SDF_LEVEL: sdf ? mips - 1 : -1,
       }), [DEBUG_STEPS, shape.length]);
 
       // Get bounding box / ray transform
@@ -424,7 +457,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
 
       const getSurface = useBoundShader(surfaceShader, [
         matrix, ray, normal, size, insideRef, originRef,
-        ...sources, palette, pbr,
+        sdf, palette, pbr, ...sources
       ], defs);
       const getDepth = bindEntryPoint(getSurface, "mainDepthOnly");
 
@@ -440,6 +473,8 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               normals,
               fragDepth: true,
               shaded: true,
+              blend,
+              mode,
               shouldDispatch: (uniforms: Record<string, any>) => {
                 insideRef.current = +inside(uniforms);
                 return !insideRef.current;
@@ -453,6 +488,8 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
               shaded: true,
               side: 'back',
               depthTest: false,
+              blend,
+              mode,
               shouldDispatch: (uniforms: Record<string, any>) => {
                 insideRef.current = +inside(uniforms);
                 originRef.current = origin(uniforms);

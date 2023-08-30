@@ -68,7 +68,7 @@ All dependencies will be parsed at build-time and deduplicated, using the normal
 
 #### Closures
 
-Bind shaders to each other using `bindBundle`. This returns a new module instead of immediately producing the linked shader code. The result acts as a GLSL closure that you can use as a first-class value in your program:
+Bind shaders to each other using `bindBundle`. This returns a new module instead of immediately producing the linked shader code. The result acts as a WGSL / GLSL closure that you can use as a first-class value in your program:
 
 ```ts
 const bound = bindBundle(bundle, {moduleA, moduleB});
@@ -100,7 +100,7 @@ This is equivalent to a `loadModuleWithCache` call, so recent modules are cached
 
 Use `bindEntryPoint(module, 'entryPoint')` to bind different entry points.
 
-Use `f32(x)`, `u32(x)` and `i32(x)` to format JS numbers correctly as WGSL strings (and `float`, ``uint`, `int` for GLSL):
+Use `f32(x)`, `u32(x)` and `i32(x)` to format JS numbers correctly as WGSL strings (and `float`, `uint`, `int` for GLSL):
 
 ```tsx
 import { wgsl, u32 } from '@use-gpu/shader/wgsl`;
@@ -113,7 +113,7 @@ const module = wgsl`
 
 Imports (`use` / `#pragma import`) do not work inside template literals, as they are parsed at run-time. Instead, import the WGSL symbols in JS, and use `bindBundle` to link them to the `wgsl` snippet:
 
-```wgsl
+```tsx
 import { SurfaceFragment } from '@use-gpu/wgsl/use/types.wgsl';
 
 const mainShader = bindBundle(wgsl`
@@ -140,8 +140,6 @@ const linked = linkCode(moduleC, {moduleA, moduleB});
 ```
 
 Shaders parsed at run-time will be cached on a least-recently-used basis, based on content hash.
-
-```
 
 ## Syntax (WGSL)
 
@@ -173,7 +171,7 @@ use "path/to/file"::{ symbol as symbol, … };
 @global var name : i32;
 ```
 
-#### Type Inference
+#### Type Inference (WGSL only)
 
 ```wgsl
 // Inferred type T

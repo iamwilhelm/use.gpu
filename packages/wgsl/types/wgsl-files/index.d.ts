@@ -91,6 +91,14 @@ declare module "@use-gpu/wgsl/contour/types.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/debug/line-helper.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const emitPoint: ParsedBundle;
+  export const emitLine: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/fragment/aces.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;

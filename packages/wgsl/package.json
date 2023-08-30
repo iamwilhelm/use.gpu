@@ -90,6 +90,11 @@
       "import": "./src/contour/types.wgsl",
       "require": "./src/contour/types.wgsl"
     },
+    "./debug/line-helper.wgsl": {
+      "types": "./src/debug/line-helper.wgsl.d.ts",
+      "import": "./src/debug/line-helper.wgsl",
+      "require": "./src/debug/line-helper.wgsl"
+    },
     "./fragment/aces.wgsl": {
       "types": "./src/fragment/aces.wgsl.d.ts",
       "import": "./src/fragment/aces.wgsl",

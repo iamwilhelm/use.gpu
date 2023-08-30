@@ -15,14 +15,14 @@ yarn add @use-gpu/inspect
 Wrap your app's contents in `<UseInspect>`:
 
 ```tsx
-import { LC } from '@use-gpu/live/types';
-
-import { DebugProvider } from '@use-gpu/workbench';
-import { UseInspect } from '@use-gpu/inspect';
 import { useFiber } from '@use-gpu/live';
+import { UseInspect } from '@use-gpu/inspect';
+import { DebugProvider } from '@use-gpu/workbench';
 import '@use-gpu/inspect/theme.css';
 
-export const App: LC = () => {
+const Component = () => null;
+
+export const App = () => {
 
   // HTML target to render inspector into
   const root = document.querySelector('#use-gpu')!;
@@ -40,7 +40,6 @@ export const App: LC = () => {
     <UseInspect
       fiber={fiber}
       container={root}
-      active={true}
       provider={DebugProvider}
     >
       {view}

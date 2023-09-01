@@ -15,7 +15,7 @@ type UseUpdateState<T> = <T>(
 ) => Pair<T>;
 
 /**
-Make a cursor from a getter/updater pair.
+Make a cursor from a `[value, updater]` pair, as returned by `@{useUpdateState}`.
 
 - Traverse `cursor.foo.bar` to get a new cursor.
 - Call `cursor.foo.bar()` to get a new getter/updater pair.
@@ -27,9 +27,13 @@ to permanently insert them, and allow a clean patch to be made.
 export const useCursor: UseCursor<unknown> = makeUseCursor(useMemo, useRef);
 
 /**
-`useState` variant which has an `updateState` instead of a `setState` and does automatic patching of updates.
+`useState` with an `updateState` instead of a `setState`. Uses `patch` to apply updates.
 
-When combined with `${useCursor}`, this allows for zero-hassle state management.
+```tsx
+const [state, updateState] = useUpdateState({ ... });
+```
+
+When combined with `@{useCursor}`, this allows for zero-hassle state management.
 
 Compose this hook with other `useState` variants using `useStateHook`, e.g. the classic `useLocalStorage` that saves to browser local storage.
 */

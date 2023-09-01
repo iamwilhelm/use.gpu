@@ -21,7 +21,7 @@ export type ImageCubeTextureProps = {
   /** Texture sampler */
   sampler?: GPUSamplerDescriptor,
   /** Leave empty to yeet texture instead. */
-  render?: (source: TextureSource) => LiveElement,
+  render?: (source: TextureSource | null) => LiveElement,
 };
 
 const countMips = (width: number, height: number): number => {
@@ -45,7 +45,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
   const fetch = urls.map((url: string) => use(ImageLoader, {url, format, colorSpace}));
 
   return gather(fetch, (resources: any[]) => {
-    if (resources.filter(x => !!x).length !== 6) return null;
+    if (resources.filter(x => !!x).length !== 6) return render ? render(null) : yeet(null);
 
     const source = useMemo(() => {
       const [resource] = resources;

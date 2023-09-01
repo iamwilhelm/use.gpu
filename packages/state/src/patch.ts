@@ -129,7 +129,14 @@ const $maybeSet = <T>(v: T): Update<T> => {
 
 /** Patch value A with update B.
 
-Supported operators: $set, $merge, $delete, $nop, $apply, $patch.
+Supported operators:
+- `@{$apply}`
+- `@{$delete}`
+- `@{$merge}`
+- `@{$nop}`
+- `@{$patch}`
+- `@{$set}`
+
 */
 export const patch = <T>(a: T, b: Update<T>): T => {
   if (b && typeof b === 'object') {
@@ -200,7 +207,14 @@ const merge = <T>(a: T, b: Merge<T>): T => {
 
 /** Revise update B with values from A.
 
-Supported operators: $set, $merge, $delete, $nop, $apply, $patch.
+Supported operators:
+- `@{$apply}`
+- `@{$delete}`
+- `@{$merge}`
+- `@{$nop}`
+- `@{$patch}`
+- `@{$set}`
+
 */
 export const revise = <T>(a: T, b: Update<T>): Update<T> => {
   if (b && typeof b === 'object') {
@@ -262,6 +276,9 @@ const pick = <T>(a: T, b: Update<T>): Update<T> => {
 }
 
 /** Diff values A and B
+
+Ensures `patch(A, diff(A, B))` equals `B`.
+
 */
 export const diff = <T>(a: T, b: T): Update<T> => {
   if (a === b) return undefined;

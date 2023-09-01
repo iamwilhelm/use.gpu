@@ -51,10 +51,10 @@ export const DebugLineHelper: LC<DebugLineHelperProps> = (props: DebugLineHelper
   
   const helper = useMemo(() => {
     const swap = () => {
-      clearBuffer(device, atomicStorage.buffer);
       clearBuffer(device, debugPositions.buffer);
       clearBuffer(device, debugColors.buffer);
       clearBuffer(device, debugSegments.buffer);
+      clearBuffer(device, atomicStorage.buffer);
     }
 
     const mesh = {

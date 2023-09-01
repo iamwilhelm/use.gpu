@@ -102,9 +102,9 @@ expect(patch(A, update)).toEqual(B);
 
 ...patching A with it equals the value B (though not the same object(s) as B).
 
-Note that diff may contain empty updates such as `{ }` if an object was cloned. Use `@{getUpdateKeys}` to check whether an update contains real changes.
-
 If you `diff(A, B)` after a `patch(A, ...)`, you get a pure update, without `$apply` or `$patch`. This can be serialized to JSON.
+
+Note that a diff may contain empty updates such as `{ }` if an object was cloned. Use `@{getUpdateKeys}` to check whether an update contains real changes.
 
 ## Revise
 

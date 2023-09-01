@@ -4,8 +4,10 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "peerDependencies": {
-    "react": "*"
+  "exports": {
+    ".": "./src/index.ts",
+    "./live": "./src/hooks-live.ts",
+    "./react": "./src/hooks-react.ts"
   },
   "scripts": {
     "build": "NPM_PACKAGE=state ../../scripts/build-mjs-cjs.sh",

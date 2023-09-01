@@ -39,7 +39,7 @@ let files = [
   ...packages.map(pkg => [pkg, [`./packages/${pkg}/src/index.ts`]]),
   ['app', ['./packages/app/src/index.tsx']],
   ['shader', ['./packages/shader/src/docs.ts']],
-  ['state', ['./packages/shader/src/hooks-live.ts']],
+  ['state', ['./packages/state/src/hooks-react.ts']],
 ] as [string, string[]][];
 
 const map: Record<string, any> = {};

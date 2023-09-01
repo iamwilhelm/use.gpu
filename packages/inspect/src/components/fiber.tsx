@@ -4,7 +4,6 @@ import { formatValue, isSubNode, YEET, DEBUG } from '@use-gpu/live';
 
 import React, { memo, useMemo, useLayoutEffect, useRef, PropsWithChildren } from 'react';
 
-import { useRefineCursor } from '@use-gpu/state';
 import { usePingTracker, usePingContext } from '../providers/ping-provider';
 import { Node } from './node';
 import { ReactNode } from './react-node';
@@ -224,8 +223,8 @@ export const FiberNode: React.FC<FiberNodeProps> = memo(({
   indent = 0,
 }) => {
   let {id, mount, mounts, next, order, host, yeeted, __inspect} = fiber;
-  const [selectState, updateSelectState] = selectedCursor;
-  const [hoverState, updateHoverState] = hoveredCursor;
+  const [selectState, updateSelectState] = selectedCursor();
+  const [hoverState, updateHoverState] = hoveredCursor();
 
   // Avoid jumpyness on hover
   const lockedWide = useMemo(() => (!mount && !mounts && !next), []);

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { LiveFiber } from '@use-gpu/live';
 
-export type ExpandState = Record<number, boolean>;
+export type ExpandState = Record<string | number, boolean>;
 export type PingState = Record<number, number>;
 export type SelectState = LiveFiber<any> | null;
 export type HoverState = {
@@ -21,6 +21,8 @@ export type OptionState = {
   highlight: boolean,
   inspect: boolean,
   tab: string,
+  splitLeft: number,
+  splitBottom: number,
 };
 
 export type InspectAppearance = {

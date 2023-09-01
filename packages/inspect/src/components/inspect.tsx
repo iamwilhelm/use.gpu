@@ -2,7 +2,8 @@ import type { LiveFiber } from '@use-gpu/live';
 import type { ExpandState, SelectState, HoverState, OptionState, PingState, InspectAppearance } from './types';
 
 import { formatNode, formatValue, YEET } from '@use-gpu/live';
-import { useUpdateState, useRefineCursor, $apply } from '@use-gpu/state';
+import { useUpdateState, useCursor } from '@use-gpu/state/react';
+import { Cursor, $apply } from '@use-gpu/state';
 
 import React, { memo, useCallback, useLayoutEffect, useEffect, useMemo, useState, SetStateAction } from 'react';
 
@@ -63,9 +64,9 @@ export const Inspect: React.FC<InspectProps> = ({
 }) => {
   const {close, toolbar, legend, resize, skip, select} = useAppearance();
 
-  const expandCursor = useUpdateState<ExpandState>({});
-  const selectedCursor = useUpdateState<SelectState>(null);
-  const optionCursor = useUpdateState<OptionState>(
+  const expandCursor = useCursor(useUpdateState<ExpandState>({}));
+  const selectedCursor = useCursor(useUpdateState<SelectState>(null));
+  const optionCursor = useCursor(useUpdateState<OptionState>(
     {
       ...INITIAL_STATE,
       ...initialState,
@@ -74,32 +75,30 @@ export const Inspect: React.FC<InspectProps> = ({
       getOptionsKey('state', sub),
       (obj: any) => ({...INITIAL_STATE, ...obj}),
     ) : useState
-  );
-  const hoveredCursor = useUpdateState<HoverState>(() => ({
+  ));
+  const hoveredCursor = useCursor(useUpdateState<HoverState>(() => ({
     fiber: null, by: null, deps: [], precs: [], root: null, depth: 0,
-  }));
+  })));
 
-  const useOption = useRefineCursor(optionCursor);
+  let [selectedFiber, updateSelected] = selectedCursor();
+  const [depthLimit] = optionCursor.depth();
+  const [runCounts] = optionCursor.counts();
+  const [fullSize] = optionCursor.fullSize();
+  const [builtins] = optionCursor.builtins();
+  const [highlight] = optionCursor.highlight();
+  const [tab, updateTab] = optionCursor.tab();
+  const [splitLeft, setSplitLeft] = optionCursor.splitLeft();
+  const [splitBottom, setSplitBottom] = optionCursor.splitBottom();
+  const [inspect, updateInspect] = optionCursor.inspect();
+  const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor();
 
-  let [selectedFiber, updateSelected] = selectedCursor;
-  const [depthLimit] = useOption<number>('depth');
-  const [runCounts] = useOption<boolean>('counts');
-  const [fullSize] = useOption<boolean>('fullSize');
-  const [builtins] = useOption<boolean>('builtins');
-  const [highlight] = useOption<boolean>('highlight');
-  const [tab, updateTab] = useOption<string>('tab');
-  const [splitLeft, setSplitLeft] = useOption<number>('splitLeft');
-  const [splitBottom, setSplitBottom] = useOption<number>('splitBottom');
-  const [inspect, updateInspect] = useOption<boolean>('inspect');
-  const [{fiber: hoveredFiber}, updateHovered] = hoveredCursor;
-
-  if (!select) selectedCursor[1] = updateSelected = NOP;
+  if (!select) selectedCursor()[1] = updateSelected = NOP;
 
   const setSelected = useCallback((fiber?: LiveFiber<any> | null) => {
     updateSelected({ $set: fiber ?? null });
   }, [updateSelected, select]);
 
-  const [open, updateOpen] = useOption<boolean>('open');
+  const [open, updateOpen] = optionCursor.open();
   const toggleOpen = () => updateOpen(!open);
   const toggleInspect = useCallback(() => {
     updateInspect($apply(s => {

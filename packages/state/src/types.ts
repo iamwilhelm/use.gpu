@@ -27,7 +27,7 @@ export type UpdateKey = string | number;
 /** Cursors
 
 - Traverse: `const barCursor = cursor.foo.bar;`
-- Resolve: `let [value, updateValue] = cursor.foo.bar();`
+- Resolve: `const [value, updateValue] = cursor.foo.bar();`
 */
 export type Cursor<T> = (() => Pair<T>) & DeepCursor<T>;
 

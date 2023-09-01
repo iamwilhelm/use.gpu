@@ -57,13 +57,12 @@ export const makeCursor = <T>(
 };
 
 /**
-Refine a getter/updater pair to traverse its `value` along `keys` and produce new cursors.
+Refine a getter/updater pair to traverse its `value[key]` and produce new pair.
 
 If `defaults` are supplied, the cursor will merge them in.
+
 When the first update is made, it will dispatch a $set operation first
 to permanently insert them, and allow a clean patch to be made.
-
-The first part of the higher-order function can be called once and then reused for different paths.
 */
 export const refinePair = <T, K extends keyof T>(
   pair: Pair<T>,

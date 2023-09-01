@@ -5,11 +5,12 @@ import { makeCursor, CursorMap } from './cursor';
 /**
 Make a cursor from a getter/updater pair.
 
-If `defaults` are supplied, the cursor will merge them in.
-When the first update is made, it will dispatch a $set operation first
-to permanently insert them, and allow a clean patch to be made.
+- Traverse `cursor.foo.bar` to get a new cursor.
+- Call `cursor.foo.bar()` to get a new getter/updater pair.
 
-The first part of the higher-order function returns a a new hook, `useCursor`, which must obey the rules of hooks.
+If `defaults` are supplied, the cursor will merge them in.
+When the first update is made, it will dispatch a `$set` operation first
+to permanently insert them, and allow a clean patch to be made.
 */
 export const makeUseCursor = (
   useMemo: UseMemo,

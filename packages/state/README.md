@@ -12,7 +12,9 @@ yarn add @use-gpu/state
 
 # Live - State management helpers
 
-Helper library for doing `patch` and `diff`-based state management. Manipulate JSON state declaratively.
+Manipulate JS state declaratively.
+
+Helper library for doing `patch` and `diff`-based state management.
 
 Can be used to drive undo/redo. Includes cursor hooks for React/Live.
 

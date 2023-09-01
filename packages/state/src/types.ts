@@ -1,4 +1,10 @@
-// State patching
+/** Mutation-as-value
+
+- An update is a `DeepPartial<T>`, i.e. recursive `Partial<T>`
+- Allows for deep `Update<T>`
+- With extra `$ops`
+- Apply functions with `$apply` or `$patch`
+*/
 export type Update<T = any> = T
   | {$set: T}
   | {$merge: Merge<T>}
@@ -18,8 +24,13 @@ export type DeepUpdate<T = any> = T extends (infer E)[]
 
 export type UpdateKey = string | number;
 
-// Cursors
+/** Cursors
+
+- Traverse: `const barCursor = cursor.foo.bar;`
+- Resolve: `let [value, updateValue] = cursor.foo.bar();`
+*/
 export type Cursor<T> = (() => Pair<T>) & DeepCursor<T>;
+
 export type DeepCursor<T = any> = T extends (infer E)[]
   ? {[n: number]: Cursor<E>}
   : {[P in keyof T]: Cursor<T[P]>};

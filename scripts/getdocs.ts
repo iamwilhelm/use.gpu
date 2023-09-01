@@ -39,7 +39,7 @@ let files = [
   ...packages.map(pkg => [pkg, [`./packages/${pkg}/src/index.ts`]]),
   ['app', ['./packages/app/src/index.tsx']],
   ['shader', ['./packages/shader/src/docs.ts']],
-  ['state', ['./packages/state/src/hooks-react.ts']],
+  ['state', ['./packages/state/src/hooks-live.ts']],
 ] as [string, string[]][];
 
 const map: Record<string, any> = {};
@@ -78,7 +78,10 @@ try {
     const target = join(DOCS_PKG, pkg + '.readme');
     writeFileSync(target, readFileSync(file));
   }
+  
+  console.log("✅ 📄")
 } catch (e) {
+  console.log("❌")
   console.error(e);
   process.exit(1)
 }

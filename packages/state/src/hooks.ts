@@ -1,4 +1,4 @@
-import type { Cursor, Pair, Initial, Update, UseCallback, UseMemo, UseRef, UseState } from './types';
+import type { Cursor, Pair, Initial, Update, Updater, UseCallback, UseMemo, UseRef, UseState } from './types';
 import { patch } from './patch';
 import { makeCursor, CursorMap } from './cursor';
 
@@ -19,13 +19,21 @@ export const makeUseCursor = (
   pair: Pair<T>,
   defaults?: T
 ): Cursor<T> => {
+  const [value, updater] = pair;
+
   // Keep map of prop -> cursor from last cursor
   const keepRef = useRef<CursorMap<T> | null>(null);
+  const updaterRef = useRef<Updater<T> | null>(null);
 
   // Refresh cursor if any component changed
-  // (but re-use keepRef cursors if unchanged)
-  const [cursor, map] = useMemo(() => makeCursor(pair, defaults, keepRef.current), [pair[0], pair[1], defaults]);
+  // (but re-use keepRef cursors if updater unchanged)
+  const [cursor, map] = useMemo(() => {
+    const keep = updaterRef.current === updater ? keepRef.current : null;
+    return makeCursor(pair, defaults, keep);
+  }, [value, updater, defaults]);
+
   keepRef.current = map;
+  updaterRef.current = updater;
 
   return cursor;
 };

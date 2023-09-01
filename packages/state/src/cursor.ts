@@ -6,6 +6,11 @@ export type CursorMap<T> = Map<string | symbol, CursorEntry<any>>;
 
 const NO_ENTRY = [null, null];
 
+/** Make a `Cursor<T>` from a `[value, updater]` pair.
+
+- Also returns mutable `map` of cached cursors. This is filled in whenever `cursor.foo.…` is accessed.
+- When creating a replacement cursor, pass `map` as `keep` to preserve child cursors for unchanged parts.
+*/
 export const makeCursor = <T>(
   pair: Pair<T>,
   defaults?: T,

@@ -15,7 +15,7 @@ type UseUpdateState<T> = <T>(
 ) => Pair<T>;
 
 /**
-Make a cursor from a getter/updater pair.
+Make a cursor from a `[value, updater]` pair, as returned by `@{useUpdateState}`.
 
 - Traverse `cursor.foo.bar` to get a new cursor.
 - Call `cursor.foo.bar()` to get a new getter/updater pair.

@@ -208,7 +208,16 @@ fn other(arg: T) -> T {
 
 #### Static Import
 
-**Imports from other files** are declared using an ES-style directive referencing the filesystem:
+**Imports from other files** are declared using a Rust or ES-style directive referencing the filesystem:
+
+**main.wgsl**
+```wgsl
+use 'path/to/color'::{ getColor };
+
+fn main() -> vec4<f32> {
+  return getColor();
+}
+```
 
 **main.glsl**
 ```glsl
@@ -220,6 +229,21 @@ void main() {
 ```
 
 Only exported symbols may be imported:
+
+**path/to/color.wgsl**
+```wgsl
+@export fn getColor() -> vec4<f32> {
+  return vec4<f32>(used(), 0.5, 0.0, 1.0);
+}
+
+fn used() -> f32 {
+  return 1.0;
+}
+
+fn unused() {
+  // ...
+}
+```
 
 **path/to/color.glsl**
 ```glsl
@@ -240,6 +264,21 @@ void unused() {
 When passed to `linkBundle`, the result is:
 
 **Linked result**
+
+```wgsl
+fn _u4_getColor() -> vec4<f32> {
+  return vec4(_u4_used(), 0.5, 0.0, 1.0);
+}
+
+fn _u4_used() -> f32 {
+  return 1.0;
+}
+
+fn main() -> vec4<f32> {
+  return _u4_getColor();
+}
+```
+
 ```glsl
 #version 450
 
@@ -250,7 +289,6 @@ vec4 _u4_getColor() {
 float _u4_used() {
   return 1.0;
 }
-
 
 void main() {
   gl_FragColor = _u4_getColor();
@@ -263,6 +301,15 @@ All top-level symbols outside the main module are namespaced with a prefix like 
 
 For **dynamic linking at run-time**, you link up with a function prototype instead:
 
+**main.wgsl**
+```wgsl
+@link fn getColor() -> vec4<f32>;
+
+fn main() -> vec4<f32> {
+  return getColor();
+}
+```
+
 **main.glsl**
 ```glsl
 vec4 getColor();
@@ -272,7 +319,14 @@ void main() {
 }
 ```
 
-Import named symbols from `.glsl` files in JS/TS, and use them directly as links:
+Import named symbols from `.wgsl` or `.glsl` files in JS/TS, and use them directly as links:
+
+```ts
+import mainShader from 'path/to/main.wgsl';
+import { getColor } from 'path/to/color.wgsl';
+
+const wgslCode = linkBundle(mainShader, {getColor});
+```
 
 ```ts
 import mainShader from 'path/to/main.glsl';
@@ -286,17 +340,17 @@ The linking mechanism works the same.
 
 ## Q&A
 
-**Does this interpret pre-processor directives? (GLSL)**
+**Which 'version' of WGSL is supported?**
+
+Best-effort compatibility with the current dialect of WGSL supported in the wild. If there are gaps in the grammar, let me know.
+
+**Does this interpret GLSL pre-processor directives? (GLSL)**
 
 No. It ignores and passes through all other `#directives`. This is done to avoid having to re-parse when definitions change.
 
 This means the linker sees all top-level declarations regardless of `#if`s, and resolves all imports.
 
 Mark prototypes as `#pragma optional` if it is ok to leave them unlinked.
-
-**Which 'version' of WGSL is supported?**
-
-Best-effort compatibility with the current dialect of WGSL supported in the wild. If there are gaps in the grammar, let me know.
 
 **Isn't it silly to ship and work with strings instead of byte code?**
 
@@ -312,7 +366,7 @@ Returns linked GLSL code by assembling:
   - `code` / `module` / `bundle`: Main module.
   - `modules`: Dictionary of modules to import manually from. `{ [path]: T }`
   - `links`: Dictionary of modules to link specific prototypes to. `{ [name]: T }`
-  - `defines`: Dictionary of key/values to `#define` at the start.
+  - `defines`: Dictionary of key/values to `const` / `#define` at the start.
   - `cache`: Override the internal cache or disable it.
 
   Use `from:to` as the link name to link two differently named functions.

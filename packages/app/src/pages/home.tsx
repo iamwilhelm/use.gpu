@@ -35,9 +35,10 @@ const PANEL_STYLE = {
 
 export const HomePage: LiveComponent<HomePageProps> = (props) => {
   const {container} = props;
-  const {linkTo} = useRouterContext();
+  const {linkTo, replace} = useRouterContext();
 
   const PAGES = makePages();
+  replace('/geometry/gltf');
 
   return (
     use(HTML, {

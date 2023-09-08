@@ -13,8 +13,8 @@ import {
   Cursor, LineLayer,
   AmbientLight, DirectionalLight, PointLight, DomeLight,
   PBRMaterial, GeometryData,
-  Loop, Animate, DebugProvider,
-  makePlaneGeometry,
+  Loop, Animate, DebugProvider, Environment,
+  makePlaneGeometry, 
 } from '@use-gpu/workbench';
 
 import { VoxData, VoxModel } from '@use-gpu/voxel';
@@ -74,61 +74,63 @@ export const GeometryVoxelPage: LC = () => {
             <Pass lights shadows>
               <AmbientLight color={[1, 1, 1, 1]} intensity={0.01} />
 
-              <Scene>
-                <Node rotation={[90, 180, 0]}>
-                  <Primitive>
-                    <Plot>
-                      <Cartesian
-                        range={[[-9, 9], [-25, 25], [-10, 10]]}
-                        scale={[9, 25, 10]}
-                      >
-                        <Grid
-                          origin={[0, 0, -11]}
-                          axes='xy'
-                          width={2}
-                          first={{ detail: 3, divide: 18, end: true }}
-                          second={{ detail: 3, divide: 48, end: true }}
-                          depth={0.5}
-                          zBias={1}
-                          color={0x404040}
-                        />
-                        <Grid
-                          origin={[0, 0, 0]}
-                          axes='xy'
-                          width={2}
-                          first={{ detail: 3, divide: 18, end: true }}
-                          second={{ detail: 3, divide: 48, end: true }}
-                          depth={0.5}
-                          zBias={1}
-                          color={0x404040}
-                        />
-                      </Cartesian>
-                    </Plot>
-                  </Primitive>
-
-                  <VoxData
-                    url={url}
-                    render={(vox: Vox) =>
-                      <VoxModel vox={vox} flat />
-                    }
-                  />
-
-                  <Node position={[0, 0, -11]} rotation={[0, 180, 0]}>
-                    <GeometryData
-                      {...planeGeometry}
-                      render={(planeMesh: Record<string, ShaderSource>) =>
-                        <PBRMaterial albedo={0x808080} roughness={0.7}>
-                          <Mesh
-                            mesh={planeMesh}
-                            side="both"
-                            shaded
+              <Environment preset="none">
+                <Scene>
+                  <Node rotation={[90, 180, 0]}>
+                    <Primitive>
+                      <Plot>
+                        <Cartesian
+                          range={[[-9, 9], [-25, 25], [-10, 10]]}
+                          scale={[9, 25, 10]}
+                        >
+                          <Grid
+                            origin={[0, 0, -11]}
+                            axes='xy'
+                            width={2}
+                            first={{ detail: 3, divide: 18, end: true }}
+                            second={{ detail: 3, divide: 48, end: true }}
+                            depth={0.5}
+                            zBias={1}
+                            color={0x404040}
                           />
-                        </PBRMaterial>
+                          <Grid
+                            origin={[0, 0, 0]}
+                            axes='xy'
+                            width={2}
+                            first={{ detail: 3, divide: 18, end: true }}
+                            second={{ detail: 3, divide: 48, end: true }}
+                            depth={0.5}
+                            zBias={1}
+                            color={0x404040}
+                          />
+                        </Cartesian>
+                      </Plot>
+                    </Primitive>
+
+                    <VoxData
+                      url={url}
+                      render={(vox: Vox) =>
+                        <VoxModel vox={vox} flat />
                       }
                     />
+
+                    <Node position={[0, 0, -11]} rotation={[0, 180, 0]}>
+                      <GeometryData
+                        {...planeGeometry}
+                        render={(planeMesh: Record<string, ShaderSource>) =>
+                          <PBRMaterial albedo={0x808080} roughness={0.7}>
+                            <Mesh
+                              mesh={planeMesh}
+                              side="both"
+                              shaded
+                            />
+                          </PBRMaterial>
+                        }
+                      />
+                    </Node>
                   </Node>
-                </Node>
-              </Scene>
+                </Scene>
+              </Environment>
 
               <Animate ease="linear" keyframes={ANIMATED_LIGHT} prop="position" render={(position) =>
                 <PointLight position={position} color={WHITE} intensity={40*40} shadowMap={SHADOW_MAP_POINT} debug />

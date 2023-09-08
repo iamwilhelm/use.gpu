@@ -320,6 +320,26 @@
       "import": "./src/material/basic-material.wgsl",
       "require": "./src/material/basic-material.wgsl"
     },
+    "./material/env/field.wgsl": {
+      "types": "./src/material/env/field.wgsl.d.ts",
+      "import": "./src/material/env/field.wgsl",
+      "require": "./src/material/env/field.wgsl"
+    },
+    "./material/env/park.wgsl": {
+      "types": "./src/material/env/park.wgsl.d.ts",
+      "import": "./src/material/env/park.wgsl",
+      "require": "./src/material/env/park.wgsl"
+    },
+    "./material/env/pisa.wgsl": {
+      "types": "./src/material/env/pisa.wgsl.d.ts",
+      "import": "./src/material/env/pisa.wgsl",
+      "require": "./src/material/env/pisa.wgsl"
+    },
+    "./material/env/road.wgsl": {
+      "types": "./src/material/env/road.wgsl.d.ts",
+      "import": "./src/material/env/road.wgsl",
+      "require": "./src/material/env/road.wgsl"
+    },
     "./material/light.wgsl": {
       "types": "./src/material/light.wgsl.d.ts",
       "import": "./src/material/light.wgsl",
@@ -504,6 +524,11 @@
       "types": "./src/render/sample/cube-to-omni.wgsl.d.ts",
       "import": "./src/render/sample/cube-to-omni.wgsl",
       "require": "./src/render/sample/cube-to-omni.wgsl"
+    },
+    "./render/sample/equi-to-cube.wgsl": {
+      "types": "./src/render/sample/equi-to-cube.wgsl.d.ts",
+      "import": "./src/render/sample/equi-to-cube.wgsl",
+      "require": "./src/render/sample/equi-to-cube.wgsl"
     },
     "./render/vertex/virtual-depth.wgsl": {
       "types": "./src/render/vertex/virtual-depth.wgsl.d.ts",

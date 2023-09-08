@@ -1,12 +1,18 @@
-0.9.4
+0.10.0
 - `@use-gpu/core`: extend `Geometry` struct to `GeometryArray` as generic mesh representation
 - `@use-gpu/gltf`: `.glb` binary GLTF support
 - `@use-gpu/gltf`: allow CPU-only load with `<GLTFData unbound>`
 - `@use-gpu/scene`: add CPU-only `<Geometry>` for geometry gathering
+- `@use-gpu/state`: new state `useCursor` hook with transparent `object.foo.bar` traversal
 - `@use-gpu/workbench`: `<Geometry>` props can take `{...GeometryArray}`
 - `@use-gpu/workbench`: Group `unwelded` options on `<FaceLayer>`
-- `@use-gpu/workbench`: Add point/vector/AABB helpers for debug viz
-- `@use-gpu/workbench`: Add `debug` flag to lights to visualize lights/frustums
+- `@use-gpu/workbench`: Add point/vector/AABB helpers for quick debug viz
+- `@use-gpu/workbench`: Add `debug` flag to lights to visualize light and shadow frustums
+- `@use-gpu/workbench`: Add support for image-based lighting to `<PBRMaterial>`
+- `@use-gpu/workbench`: Add support for .HDR and RGBM16 to `<ImageTexture>` and `<ImageCubeTexture>`
+- `@use-gpu/workbench`: Add `<Environment>` to apply environment maps to scenes, or use built-in presets
+- `@use-gpu/workbench`: Add `<PrefilteredEnvMap>` to generate a PMREM environment map from a cube map
+- `@use-gpu/workbench`: Add `<PanoramaMap>` to read equirectangular environment maps
 
 0.9.3
 - `@use-gpu/glyph`: Support loading emoji PNGs on-demand

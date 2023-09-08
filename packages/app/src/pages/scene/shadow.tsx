@@ -85,7 +85,7 @@ export const SceneShadowPage: LC = (props) => {
             <Cursor cursor='move' />
             <Camera>
               <Pass lights shadows>
-                <AmbientLight intensity={0.25} />
+                <AmbientLight intensity={0.025} />
                 <DirectionalLight position={lightData[0].position} intensity={1}   color={lightData[0].color} shadowMap={SHADOW_MAP_DIRECTIONAL} debug />
                 <DirectionalLight position={lightData[1].position} intensity={0.5} color={lightData[1].color} shadowMap={SHADOW_MAP_DIRECTIONAL} debug />
                 <PointLight       position={lightData[2].position} intensity={100} color={lightData[2].color} shadowMap={SHADOW_MAP_POINT} debug />

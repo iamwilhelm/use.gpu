@@ -1,5 +1,5 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Point4 } from '@use-gpu/core';
+import type { Lazy, Point4 } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
 
@@ -8,9 +8,9 @@ import { parseColor, useProp } from '@use-gpu/traits';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
+import { useEnvironmentContext } from '../providers/environment-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
 
-import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
 import { getPBRMaterial } from '@use-gpu/wgsl/material/pbr-material.wgsl';
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
 import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
@@ -23,15 +23,14 @@ import { ShaderLitMaterial } from './shader-lit-material';
 
 export type PBRMaterialProps = {
   albedo?: ColorLike,
-  metalness?: number,
-  roughness?: number,
+  metalness?: Lazy<number>,
+  roughness?: Lazy<number>,
   emissive?: VectorLike,
 
   albedoMap?: ShaderSource,
   metalnessRoughnessMap?: ShaderSource,  
   emissiveMap?: ShaderSource,
   occlusionMap?: ShaderSource,
-  environmentMap?: ShaderSource,
   normalMap?: ShaderSource,
 
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
@@ -51,7 +50,6 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     emissiveMap,
     occlusionMap,
     metalnessRoughnessMap,
-    environmentMap,
     normalMap,
 
     render,
@@ -91,11 +89,10 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
   if (normalMap) getSurface = useBoundShader(getNormalMapSurface, [boundSurface, normalMap]);
   else useNoBoundShader();
 
-  let getEnvironment = undefined;
-  if (environmentMap || environmentMap === undefined) {
-    getEnvironment = useBoundShader(applyPBREnvironment, [environmentMap ?? getDefaultEnvironment]);
-  }
-  else useNoBoundShader();
+  const environmentMap = useEnvironmentContext();
+  const getEnvironment = environmentMap
+    ? useBoundShader(applyPBREnvironment, [environmentMap])
+    : (useNoBoundShader(), undefined);
 
   const getFragment = useBoundShader(getBasicMaterial, [albedo, albedoMap], defines);
 

@@ -85,7 +85,7 @@ export const SceneDeferredPage: LC = (props) => {
         Record<string, StorageSource>,
         TextureSource,
       ]) => (
-        <LinearRGB tonemap="aces" gain={1} samples={1} depthStencil="depth32float-stencil8">
+        <LinearRGB tonemap="aces" gain={1} samples={1}>
           <Loop>
             <Cursor cursor='move' />
             <Camera>

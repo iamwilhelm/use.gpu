@@ -6,6 +6,8 @@ import { use, yeet, gather, memo, useMemo, useYolo } from '@use-gpu/live';
 import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
 import { ImageLoader } from './image-loader';
 
+import { getEquiToCubeSample } from '@use-gpu/wgsl/render/sample/equi-to-cube.wgsl';
+
 export type ImageTextureProps = {
   /** URL to image */
   url: string,

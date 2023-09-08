@@ -12,6 +12,8 @@ const CONV_COS2 = 0.7853981634; // π/4   //0.4954159122;//0.1400941610336303/0.
 
 @link var<storage, read_write> shCoefficients: array<vec4<f32>>;
 
+const SPECULAR_SH = 0;
+
 var<workgroup> shScratch: array<vec4<f32>, 640>;
 
 @compute @workgroup_size(64, 1)
@@ -45,7 +47,7 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
       // texture starts at uv .5 (absolute coords)
       let uv2 = xy + 1.0 + vec2<f32>(mapping.xy);
       var sample = getAtlasTexture(uv2, 0.0);
-      
+
       let uvo = uv * 2.0 - 1.0;
       let ray = decodeOctahedral(uvo);
 
@@ -60,29 +62,56 @@ var<workgroup> shScratch: array<vec4<f32>, 640>;
       
       let weight = length(cross(dx, dy));
       let s = sample * weight;
+      //let s = weight * vec4<f32>(ray.x, ray.y, ray.z, 1.0);
+      
+      // 0-2nd order specular (for capture)
+      if (SPECULAR_SH == 1) {
+        let ss = s;
 
-      band0 += s        * CONV_COS0;
-      band1 += s *  3.0 * CONV_COS1 * ray.y; // sqrt(3)
-      band2 += s *  3.0 * CONV_COS1 * ray.z;
-      band3 += s *  3.0 * CONV_COS1 * ray.x;
-      band4 += s * 15.0 * CONV_COS2 * ray.y * ray.x; // sqrt(15)
-      band5 += s * 15.0 * CONV_COS2 * ray.y * ray.z;
-      band6 += s * 1.25 * CONV_COS2 * (3.0 * sqr(ray.z) - 1.0); // sqrt(5) / 2
-      band7 += s * 15.0 * CONV_COS2 * ray.x * ray.z;
-      band8 += s * 3.75 * CONV_COS2 * (sqr(ray.x) - sqr(ray.y)); // sqrt(15) / 2
+        // 0-2nd order specular
+        band0 += ss      ;
+        band1 += ss *    3 * ray.y; // sqrt(3)
+        band2 += ss *    3 * ray.z;
+        band3 += ss *    3 * ray.x;
+        band4 += ss *   15 * ray.y * ray.x; // sqrt(15)
+        band5 += ss *   15 * ray.y * ray.z;
+        band6 += ss *  5/4 * (3.0 * sqr(ray.z) - 1.0); // sqrt(5) / 2
+        band7 += ss *   15 * ray.x * ray.z;
+        band8 += ss * 15/4 * (sqr(ray.x) - sqr(ray.y)); // sqrt(15) / 2
+      }
+      else if (SPECULAR_SH == 2) {
+        let ss = s;
 
-      /*
-      let xx = sqr(ray.x);
-      let yy = sqr(ray.y);
-      let zz = sqr(ray.z);
-      band9  += s * sqrt(70.0)/4.0 * ray.y * (3 * xx - yy);
-      band10 += s * sqrt(105.0)    * ray.x * ray.y * ray.z;
-      band11 += s * sqrt(42.0)/4.0 * ray.y * (5 * zz - 1);
-      band12 += s * sqrt(7.0)/2.0  * ray.z * (5 * zz - 3);
-      band13 += s * sqrt(42.0)/4.0 * ray.x * (5 * zz - 1);
-      band14 += s * sqrt(105)/2.0  * ray.z * (xx - yy);
-      band15 += s * sqrt(70.0)/4.0 * ray.x * (xx - 3 * yy);
-      */
+        let xx = sqr(ray.x);
+        let yy = sqr(ray.y);
+        let zz = sqr(ray.z);
+
+        // 3rd order
+        band0 += ss *  7/16 * ray.y * (3 * xx - yy); // sqrt(7)/4
+        band1 += ss *   105 * ray.x * ray.y * ray.z; // sqrt(105)
+        band2 += ss * 42/16 * ray.y * (5 * zz - 1);  // sqrt(42)/4
+        band3 += ss *   7/4 * ray.z * (5 * zz - 3);  // sqrt(7)/2
+        band4 += ss * 42/16 * ray.x * (5 * zz - 1);  // sqrt(42)/4
+        band5 += ss * 105/4 * ray.z * (xx - yy);     // sqrt(105)/2
+        band6 += ss * 70/16 * ray.x * (xx - 3 * yy); // sqrt(70)/4
+
+        // Extra
+        //band7 += ss * 11/64    * ray.z * ((63 * zz - 70) * zz + 15);
+        //band8 += ss * 1386/256 * ray.y * ((5 * xx - 10 * yy) * xx + yy * yy);
+        //band8 += ss * 1386/256 * ray.x * (xx * xx + (5 * yy - 10 * xx) * yy);
+      }
+      else {
+        // 0-2nd order diffuse
+        band0 += s        * CONV_COS0;
+        band1 += s *  3.0 * CONV_COS1 * ray.y; // sqrt(3)
+        band2 += s *  3.0 * CONV_COS1 * ray.z;
+        band3 += s *  3.0 * CONV_COS1 * ray.x;
+        band4 += s * 15.0 * CONV_COS2 * ray.y * ray.x; // sqrt(15)
+        band5 += s * 15.0 * CONV_COS2 * ray.y * ray.z;
+        band6 += s * 1.25 * CONV_COS2 * (3.0 * sqr(ray.z) - 1.0); // sqrt(5) / 2
+        band7 += s * 15.0 * CONV_COS2 * ray.x * ray.z;
+        band8 += s * 3.75 * CONV_COS2 * (sqr(ray.x) - sqr(ray.y)); // sqrt(15) / 2
+      }
 
       bandW += weight;
     }

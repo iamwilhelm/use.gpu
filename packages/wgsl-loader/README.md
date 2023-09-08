@@ -74,7 +74,7 @@ To allow shader imports to type check, create a `wgsl-files.d.ts` with:
 
 ```ts
 declare module '*.wgsl' {
-  type ParsedBundle = import('@use-gpu/shader/types').ParsedBundle;
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export default __module;
 }

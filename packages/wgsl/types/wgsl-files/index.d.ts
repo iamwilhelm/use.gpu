@@ -435,6 +435,38 @@ declare module "@use-gpu/wgsl/material/basic-material.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/material/env/field.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SH_DIFFUSE: ParsedBundle;
+  export const SH_SPECULAR: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/env/park.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SH_DIFFUSE: ParsedBundle;
+  export const SH_SPECULAR: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/env/pisa.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SH_DIFFUSE: ParsedBundle;
+  export const SH_SPECULAR: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/material/env/road.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const SH_DIFFUSE: ParsedBundle;
+  export const SH_SPECULAR: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/material/light.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
@@ -696,6 +728,13 @@ declare module "@use-gpu/wgsl/render/sample/cube-to-omni.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
   export const getCubeToOmniSample: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/render/sample/equi-to-cube.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getEquiToCubeSample: ParsedBundle;
   export default __module;
 }
 

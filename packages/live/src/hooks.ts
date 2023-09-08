@@ -409,7 +409,8 @@ export const useContext = <C>(
     host.depend(fiber, root);
   }
 
-  return values.get(context).current ?? context.initialValue;
+  const value = values.get(context).current;
+  return value !== undefined ? value : context.initialValue;
 }
 
 /**

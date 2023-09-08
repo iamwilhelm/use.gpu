@@ -13,6 +13,8 @@ import {
   Animate, Keyframe,
   LinearRGB, DirectionalLight,
   PointLayer, DataShader,
+  Environment, PBRMaterial, PrefilteredEnvMap,
+  useShaderRef,
 } from '@use-gpu/workbench';
 import {
   Plot, Cartesian, Polar, Axis, Grid, Sampled, ImplicitSurface, DataContext,
@@ -88,124 +90,137 @@ export const PlotImplicitSurfacePage: LC = () => {
     <SurfaceControls
       container={root}
       hasInspect
-      render={({inspect, mode, level}) =>
-        <Loop>
-          <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>
-            <Cursor cursor="move" />
-            <Camera>
-              <Pass lights>
-                <DirectionalLight position={[10, 30, 20]} color={[1, 1, 1]} intensity={1} />
-                <Plot>
-                  <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
-                    <Polar
-                      bend={0}
-                      range={[[-π, π], [1, 5], [-π, π]]}
-                      scale={[π/2, 1, π/2]}
-                    >
-                      <Grid
-                        axes='xy'
-                        width={2}
-                        first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                        second={{ detail: 64, divide: 5, end: true }}
-                        depth={0.5}
-                        zBias={-1}
-                      />
-                      <Grid
-                        axes='xz'
-                        width={2}
-                        first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
-                        second={{ unit: π, base: 2, detail: 64, divide: 5, end: true }}
-                        depth={0.5}
-                        zBias={-1}
-                      />
+      render={({inspect, mode, level, env, roughness, metalness, envMap}) => {
+        const r = useShaderRef(roughness);
+        const m = useShaderRef(metalness);
+        return (
+          <Gather children={
+            <Gather children={envMap} then={([texture]: TextureSource[]) => <PrefilteredEnvMap texture={texture} />} />
+          } then={([envMap]: ShaderSource[]) => (
+            <Loop>
+              <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>
+                <Cursor cursor="move" />
+                <Camera>
+                  <Pass lights>
+                    <DirectionalLight position={[10, 30, 20]} color={[1, 1, 1]} intensity={1} />
+                    <Plot>
+                      <Animate prop='bend' keyframes={keyframes} pause={1} mirror>
+                        <Polar
+                          bend={0}
+                          range={[[-π, π], [1, 5], [-π, π]]}
+                          scale={[π/2, 1, π/2]}
+                        >
+                          <Grid
+                            axes='xy'
+                            width={2}
+                            first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                            second={{ detail: 64, divide: 5, end: true }}
+                            depth={0.5}
+                            zBias={-1}
+                          />
+                          <Grid
+                            axes='xz'
+                            width={2}
+                            first={{ unit: π, base: 2, detail: 3, divide: 5, end: true }}
+                            second={{ unit: π, base: 2, detail: 64, divide: 5, end: true }}
+                            depth={0.5}
+                            zBias={-1}
+                          />
 
-                      <Axis
-                        axis='x'
-                        detail={64}
-                        width={5}
-                        color={[0.75, 0.75, 0.75, 1]}
-                        depth={0.5}
-                      />
-                      <Axis
-                        axis='y'
-                        width={5}
-                        color={[0.75, 0.75, 0.75, 1]}
-                        detail={8}
-                        depth={0.5}
-                      />
-                      <Axis
-                        axis='z'
-                        width={5}
-                        color={[0.75, 0.75, 0.75, 1]}
-                        detail={8}
-                        depth={0.5}
-                      />
-                      <Gather
-                        children={<>
-                          <Sampled
-                            axes='xyz'
-                            format='vec3<f32>'
-                            size={[42, 28, 42]}
-                            padding={1}
-                            expr={EXPR_POSITION}
-                            time
-                            live
+                          <Axis
+                            axis='x'
+                            detail={64}
+                            width={5}
+                            color={[0.75, 0.75, 0.75, 1]}
+                            depth={0.5}
                           />
-                          <Sampled
-                            axes='xyz'
-                            format='vec3<f32>'
-                            size={[42, 28, 42]}
-                            padding={1}
-                            expr={EXPR_NORMAL}
-                            time
-                            live
+                          <Axis
+                            axis='y'
+                            width={5}
+                            color={[0.75, 0.75, 0.75, 1]}
+                            detail={8}
+                            depth={0.5}
                           />
-                          <Sampled
-                            axes='xyz'
-                            format='f32'
-                            size={[42, 28, 42]}
-                            padding={1}
-                            expr={EXPR_VALUE}
-                            time
-                            live
+                          <Axis
+                            axis='z'
+                            width={5}
+                            color={[0.75, 0.75, 0.75, 1]}
+                            detail={8}
+                            depth={0.5}
                           />
-                        </>}
-                        then={
-                          ([positions, normals, values]: StorageSource[]) => <>
-                            <Provide context={DataContext} value={values}>
-                              <ImplicitSurface
-                                normals={normals}
-                                level={level}
-                                method="linear"
+                          <Gather
+                            children={<>
+                              <Sampled
+                                axes='xyz'
+                                format='vec3<f32>'
+                                size={[42, 28, 42]}
                                 padding={1}
-                                color={[0.8, 0.8, 1.0, 1.0]}
+                                expr={EXPR_POSITION}
+                                time
+                                live
                               />
-                            </Provide>
-                            {inspect ? (
-                              <DataShader
-                                shader={colorizeShader}
-                                source={values}
-                                render={(colorizedValues: ShaderModule) => (
-                                  <PointLayer
-                                    positions={positions}
-                                    colors={mode === 'normal' ? normals : colorizedValues}
-                                    size={3}
-                                    depth={1}
+                              <Sampled
+                                axes='xyz'
+                                format='vec3<f32>'
+                                size={[42, 28, 42]}
+                                padding={1}
+                                expr={EXPR_NORMAL}
+                                time
+                                live
+                              />
+                              <Sampled
+                                axes='xyz'
+                                format='f32'
+                                size={[42, 28, 42]}
+                                padding={1}
+                                expr={EXPR_VALUE}
+                                time
+                                live
+                              />
+                            </>}
+                            then={
+                              ([positions, normals, values]: StorageSource[]) => <>
+                                <Provide context={DataContext} value={values}>
+                                  <Environment map={envMap} preset={env}>
+                                    <PBRMaterial roughness={r} metalness={m}>
+                                      <ImplicitSurface
+                                        normals={normals}
+                                        level={level}
+                                        method="linear"
+                                        padding={1}
+                                        color={[0.8, 0.8, 1.0, 1.0]}
+                                      />
+                                    </PBRMaterial>
+                                  </Environment>
+                                </Provide>
+                                {inspect ? (
+                                  <DataShader
+                                    shader={colorizeShader}
+                                    source={values}
+                                    render={(colorizedValues: ShaderModule) => (
+                                      <PointLayer
+                                        positions={positions}
+                                        colors={mode === 'normal' ? normals : colorizedValues}
+                                        size={3}
+                                        depth={1}
+                                      />
+                                    )}
                                   />
-                                )}
-                              />
-                            ) : null}
-                          </>
-                        }
-                      />
-                    </Polar>
-                  </Animate>
-                </Plot>
-              </Pass>
-            </Camera>
-          </LinearRGB>
-        </Loop>
-    } />
+                                ) : null}
+                              </>
+                            }
+                          />
+                        </Polar>
+                      </Animate>
+                    </Plot>
+                  </Pass>
+                </Camera>
+              </LinearRGB>
+            </Loop>
+          )} />
+        );
+      }}
+    />
   );
 };
 

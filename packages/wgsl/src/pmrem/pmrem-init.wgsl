@@ -7,6 +7,8 @@ use '@use-gpu/wgsl/codec/octahedral'::{ wrapOctahedral, decodeOctahedral };
 @link var scratchTexture: texture_storage_2d<rgba16float, write>;
 @link var atlasTexture: texture_storage_2d<rgba16float, write>;
 
+@link var<storage, read_write> textureDump: array<vec4<f32>>;
+
 //@link fn getScratchTexture(uv: vec2<f32>) -> vec4<f32>;
 
 @compute @workgroup_size(8, 8)
@@ -24,6 +26,10 @@ use '@use-gpu/wgsl/codec/octahedral'::{ wrapOctahedral, decodeOctahedral };
 
   let ray = decodeOctahedral(uvo);
   let sample = getCubeMap(ray, 0.0);
+  
+  let xyi4 = xyi / 4;
+  let index = xyi4.x + xyi4.y * 256;
+  textureDump[index] = sample;
 
   textureStore(atlasTexture, xyi + mapping.xy, sample);
   textureStore(scratchTexture, xyi, sample);

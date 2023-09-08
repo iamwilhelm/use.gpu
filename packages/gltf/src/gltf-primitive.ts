@@ -1,6 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
 import type { UniformAttribute, DataBounds } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { unweldIndexedArray } from '@use-gpu/core';
@@ -28,7 +27,6 @@ export type GLTFPrimitiveProps = {
   gltf: GLTF,
   primitive: GLTFPrimitiveData,
 
-  environment?: ShaderSource,
   transform?: mat4,
 };
 
@@ -36,7 +34,6 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
   const {
     gltf,
     primitive,
-    environment,
     transform,
   } = props;
   if (!gltf.bound) throw new Error("GLTF bound data is missing. Load GLTF using <GLTFData unbound={false}>.");
@@ -49,7 +46,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     mode,
   } = primitive;
 
-  const pbrMaterial = useGLTFMaterial(gltf, environment, material);  
+  const pbrMaterial = useGLTFMaterial(gltf, material);  
 
   const faces: Partial<FaceLayerProps> = {
     flat: NORMAL == null,

@@ -70,7 +70,7 @@ export const bindBundle = (
     ...defines,
   } : defines ?? bundle.defines ?? undefined;
 
-  const revirtuals = bundle.virtuals ? bundle.virtuals.slice() : [];
+  let revirtuals = bundle.virtuals ? bundle.virtuals.slice() : [];
 
   const {module: {table: {linkable}}} = bundle;
   if (links && linkable) for (const k in links) if (links[k]) {
@@ -88,6 +88,15 @@ export const bindBundle = (
     if (chunk.module?.virtual) revirtuals.push(chunk.module);
 
     relinks[k] = links[k]!;
+  } else if (relinks[k]) {
+    const chunk = relinks[k] as any;
+
+    if (chunk.virtuals) revirtuals = revirtuals.filter(f => !chunk.virtuals.includes(f));
+
+    if (chunk.virtual) revirtuals = revirtuals.filter(f => f !== chunk);
+    if (chunk.module?.virtual) revirtuals = revirtuals.filter(f => f !== chunk.module);
+
+    delete relinks[k];
   }
 
   return {

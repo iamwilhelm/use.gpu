@@ -1,6 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
 import { GLTF, GLTFNodeData } from './types';
 
 import { use, gather, memo, useMemo, useOne } from '@use-gpu/live';
@@ -9,7 +8,6 @@ import { useMatrixContext } from '@use-gpu/workbench';
 
 export type GLTFModelProps = {
   gltf: GLTF,
-  environment?: ShaderSource,
 
   scene?: number,
   node?: number | string,
@@ -24,7 +22,6 @@ const seq = (n: number, start: number = 0, step: number = 1) => Array.from({leng
 export const GLTFModel: LC<GLTFModelProps> = memo((props: GLTFModelProps) => {
   const {
     gltf,
-    environment,
     scene: propScene,
     node: propNode,
     nodes: propNodes,
@@ -56,5 +53,5 @@ export const GLTFModel: LC<GLTFModelProps> = memo((props: GLTFModelProps) => {
     return Array.from(roots);
   }, [gltf, propNode, propScene]);
   
-  return roots.map(root => root != null ? use(GLTFNode, {gltf, environment, node: root, matrix}) : null);
+  return roots.map(root => root != null ? use(GLTFNode, {gltf, node: root, matrix}) : null);
 }, 'GLTFModel');

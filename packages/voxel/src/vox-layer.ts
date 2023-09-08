@@ -7,13 +7,15 @@ import { seq, clamp } from '@use-gpu/core';
 import { gather, use, quote, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import {
   useMatrixContext,
-  useBoundShader, useLambdaSource, useDebugContext, useShaderRef,
+  useBoundShader, useNoBoundShader, useLambdaSource, useDebugContext, useShaderRef,
+  useEnvironmentContext,
   FaceLayer, GeometryData, ShaderLitMaterial,
   makeBoxGeometry,
 } from '@use-gpu/workbench';
 import { wgsl, bindBundle, bindEntryPoint } from '@use-gpu/shader/wgsl';
 
 import { applyPBRMaterial } from '@use-gpu/wgsl/material/pbr-apply.wgsl';
+import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
 import { getViewPosition, worldToDepth } from '@use-gpu/wgsl/use/view.wgsl';
 import { SurfaceFragment, DepthFragment } from '@use-gpu/wgsl/use/types.wgsl';
 
@@ -461,11 +463,18 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       ], defs);
       const getDepth = bindEntryPoint(getSurface, "mainDepthOnly");
 
+      const environmentMap = useEnvironmentContext();
+      const getEnvironment = environmentMap
+        ? useBoundShader(applyPBREnvironment, [environmentMap])
+        : useNoBoundShader();
+        console.log({environmentMap})
+
       return [
         use(ShaderLitMaterial, {
           depth: getDepth,
           surface: getSurface,
           apply: applyPBRMaterial,
+          environment: getEnvironment,
           children: [
             use(FaceLayer, {
               positions: getPosition,

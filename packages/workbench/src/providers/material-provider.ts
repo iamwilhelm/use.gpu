@@ -13,6 +13,8 @@ import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl
 import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
 import { getDefaultPBRMaterial } from '@use-gpu/wgsl/material/pbr-default.wgsl';
 
+import { SH_DIFFUSE, SH_SPECULAR } from '@use-gpu/wgsl/material/env/park.wgsl';
+
 import { getLitFragment } from '@use-gpu/wgsl/instance/fragment/lit.wgsl';
 import { getMaterialSurface } from '@use-gpu/wgsl/instance/surface/material.wgsl';
 
@@ -23,7 +25,7 @@ const getSurface = bindBundle(getMaterialSurface, {
 const getLight = bindBundle(getLitFragment, {
   applyLights: DEFAULT_LIGHT_CONTEXT.bindMaterial(applyPBRMaterial),
   applyEnvironment: bindBundle(applyPBREnvironment, {
-    sampleEnvironment: getDefaultEnvironment,
+    sampleEnvironment: bindBundle(getDefaultEnvironment, { SH_DIFFUSE, SH_SPECULAR }),
   }),
 });
 export const DEFAULT_MATERIAL_CONTEXT = {

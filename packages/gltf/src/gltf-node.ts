@@ -1,6 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
 import type { TypedArray } from '@use-gpu/core';
-import type { ShaderSource } from '@use-gpu/shader';
 import type { GLTF } from './types';
 import { vec3, mat4, quat } from 'gl-matrix';
 
@@ -11,7 +10,6 @@ export type GLTFNodeProps = {
   gltf: GLTF,
   node: number,
 
-  environment?: ShaderSource,
   matrix?: mat4,
 };
 
@@ -19,7 +17,6 @@ export const GLTFNode: LC<GLTFNodeProps> = (props: GLTFNodeProps) => {
   const {
     gltf,
     node,
-    environment,
     matrix: parent,
   } = props;
   if (!gltf.nodes) return null;
@@ -43,14 +40,14 @@ export const GLTFNode: LC<GLTFNodeProps> = (props: GLTFNodeProps) => {
   }, [matrix, translation, rotation, scale]);
 
   const self = mesh != null ? (
-    use(GLTFMesh, {gltf, environment, mesh, transform})
+    use(GLTFMesh, {gltf, mesh, transform})
   ) : null;
 
   if (children) {
     const out: LiveElement[] = [];
 
     if (self) out.push(self);
-    out.push(...Array.from(children).map((node: number) => use(GLTFNode, {gltf, environment, node, matrix: transform})));
+    out.push(...Array.from(children).map((node: number) => use(GLTFNode, {gltf, node, matrix: transform})));
     return out;
   }
 

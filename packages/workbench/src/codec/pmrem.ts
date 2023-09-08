@@ -42,7 +42,7 @@ export type PrefilteredEnvMapProps = {
   levels?: number,
   gain?: number,
   debug?: boolean,
-  render?: (cubeMap: ShaderSource, textureMap: TextureSource) => LiveElement,
+  render?: (cubeMap: ShaderSource | null, textureMap: TextureSource | null) => LiveElement,
 };
 
 // Based on
@@ -82,7 +82,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
     render,
   } = props;
   
-  if (!texture) return;
+  if (!texture) return render ? render(null, null) : yeet(null);
   
   const device = useDeviceContext();
   const inspect = useInspectable();
@@ -164,9 +164,16 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       }),
     ], ([target, scratch]: TextureTarget[]) => {
 
+      const [textureDump, allocateT] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
+      allocateT(256 * 256 * 4);
+
       const diffuseInput = sizes.findIndex(s => s <= 64);
       const [diffuseSHBuffer, allocate] = useScratchSource('vec4<f32>', READ_WRITE_SOURCE);
-      allocate(10);
+      allocate(16);
+
+      const textureRead = useDerivedSource(textureDump, {
+        readWrite: false,
+      });
 
       const shCoefficients = useDerivedSource(diffuseSHBuffer, {
         readWrite: false,
@@ -200,6 +207,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             cubeMap,
             scratchOut,
             target,
+            textureDump,
           ]);
 
         const makeCopyShader = (i: number) =>
@@ -254,8 +262,30 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
             group: [8, 8],
           }),
           use(Readback, {
+            source: textureRead,
+            then: (data: any) => {
+              const n = 256*256*4;
+              const out = [];
+              const fmt = (x: number) => (x >= 0 ? ' ' : '') + x.toFixed(6);
+              for (let i = 0; i < n; i++) {
+                out.push(data[i]);
+              }
+              const norm = data[3];
+              console.log(n, JSON.stringify(out), {norm});
+            },
+          }),
+          use(Readback, {
             source: shCoefficients,
-            then: (data: any) => console.log(JSON.stringify(Array.from(data), null, 2)),
+            then: (data: any) => {
+              const n = data.length;
+              const out = [];
+              const fmt = (x: number) => (x >= 0 ? ' ' : '') + x.toFixed(6);
+              for (let i = 0; i < n; i += 4) {
+                out.push(`vec3<f32>(${fmt(data[i])}, ${fmt(data[i+1])}, ${fmt(data[i+2])}),`);
+              }
+              const norm = data[3];
+              console.log(out.join("\n"), {norm});
+            },
           }),
           */
         ];

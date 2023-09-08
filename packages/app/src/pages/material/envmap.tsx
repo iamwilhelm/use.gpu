@@ -8,7 +8,7 @@ import { bindBundle, wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, Flat, Animate, LinearRGB,
+  Loop, Pass, Flat, Animate, LinearRGB, Environment,
   GeometryData, PBRMaterial, ImageCubeTexture, PrefilteredEnvMap, ShaderLitMaterial,
   OrbitCamera, OrbitControls, PanControls,
   Pick, Cursor, Data, PointLayer, LineLayer,
@@ -29,6 +29,8 @@ import {
   UI, Layout, Absolute, Block, Embed,
 } from '@use-gpu/layout';
 
+import { EnvMapControls } from '../../ui/envmap-controls';
+
 const π = Math.PI;
 const τ = π * 2;
 
@@ -41,98 +43,91 @@ const keyframes = [
 export const MaterialEnvMapPage: LC = (props) => {
   const geometry = useOne(() => makeSphereGeometry({ width: 2, uvw: true, detail: [32, 64] }));
 
-  let HDR = false;
-
   const { useKeyboard } = useContext(KeyboardContext);
   const { keyboard } = useKeyboard();
   const {keys} = keyboard;
   const panning = !!keys.alt;
 
   return (
-    <Gather
-      children={[
-        <GeometryData {...geometry} />,
-        <ImageCubeTexture
-          urls={[
-            "/textures/cube/pisaRGBM16/px.png",
-            "/textures/cube/pisaRGBM16/nx.png",
-            "/textures/cube/pisaRGBM16/py.png",
-            "/textures/cube/pisaRGBM16/ny.png",
-            "/textures/cube/pisaRGBM16/pz.png",
-            "/textures/cube/pisaRGBM16/nz.png",
-          ]}
-          format={"rgbm16"}
-        />,
-      ]}
-      then={([
-        mesh,
-        texture,
-      ]: [
-        Record<string, ShaderSource>,
-        TextureSource,
-      ]) => (
-        <PrefilteredEnvMap
-          texture={texture}
-          gain={1}
-          render={(cubeMap, texture) =>          
-            <LinearRGB tonemap="aces" gain={3}>
-              <Loop>
-                <Cursor cursor='move' />
-                <Camera active={!panning}>
-                  <Pass lights>
+    <EnvMapControls render={(envPreset, envMap) => (
+      <Gather
+        children={[
+          <GeometryData {...geometry} />,
+          envMap,
+        ]}
+        then={([
+          mesh,
+          texture,
+        ]: [
+          Record<string, ShaderSource>,
+          TextureSource,
+        ]) => (
+          <PrefilteredEnvMap
+            texture={texture}
+            gain={1}
+            render={(cubeMap, texture) =>          
+              <LinearRGB tonemap="aces" gain={3}>
+                <Loop>
+                  <Cursor cursor='move' />
+                  <Camera active={!panning}>
+                    <Pass lights>
             
-                    {/*<AxisHelper size={2} width={3} />*/}
+                      {/*<AxisHelper size={2} width={3} />*/}
 
-                    <Scene>
-                      {
-                        seq(8).flatMap(i => 
-                          seq(8).map(j => (
-                            <Node position={[i - 3.5, 0, j - 3.5]} scale={[0.35, 0.35, 0.35]}>
-                              <PBRMaterial
-                                albedo={[0.6, 0.85, 1.0, 1.0]}
-                                metalness={i / 7}
-                                roughness={j / 7}
-                                environmentMap={cubeMap}
-                              >
-                                <Mesh mesh={mesh} shaded />
-                              </PBRMaterial>
-                            </Node>
-                          ))
-                        )
-                      }
-                    </Scene>
+                      <Environment map={cubeMap} preset={envPreset}>
+                        <Scene>
+                          {
+                            seq(8).flatMap(i => 
+                              seq(8).map(j => (
+                                <Node position={[i - 3.5, 0, j - 3.5]} scale={[0.35, 0.35, 0.35]}>
+                                  <PBRMaterial
+                                    albedo={[0.6, 0.85, 1.0, 1.0]}
+                                    metalness={i / 7}
+                                    roughness={j / 7}
+                                  >
+                                    <Mesh mesh={mesh} shaded />
+                                  </PBRMaterial>
+                                </Node>
+                              ))
+                            )
+                          }
+                        </Scene>
+                      </Environment>
 
-                  </Pass>
-                </Camera>
-                <PanControls
-                  x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
-                  active={panning}
-                  render={(x, y, zoom) =>
-                    <Flat x={x} y={y} zoom={zoom}>
-                      <Pass overlay>
-                        <UI>
-                          <Layout>
-                            <Block margin={[0, 0, 0, 0]}>
-                              <Absolute left={0} top={0}>
-                                <Block
-                                  width={500}
-                                  height={texture.size[1] / texture.size[0] * 500}
-                                  fill={[0, 0, 0, .25]}
-                                  image={{texture, fit: 'scale'}}
-                                />
-                              </Absolute>
-                            </Block>
-                          </Layout>
-                        </UI>
-                      </Pass>
-                    </Flat>
-                  }
-                />
-              </Loop>
-            </LinearRGB>
-        } />
-      )}
-    />
+                    </Pass>
+                  </Camera>
+                  <PanControls
+                    x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
+                    active={panning}
+                    render={(x, y, zoom) =>
+                      texture ? (
+                        <Flat x={x} y={y} zoom={zoom}>
+                          <Pass overlay>
+                            <UI>
+                              <Layout>
+                                <Block margin={[0, 0, 0, 0]}>
+                                  <Absolute left={0} top={0}>
+                                    <Block
+                                      width={512}
+                                      height={texture.size[1] / texture.size[0] * 512}
+                                      fill={[0, 0, 0, .25]}
+                                      image={{texture, fit: 'scale'}}
+                                    />
+                                  </Absolute>
+                                </Block>
+                              </Layout>
+                            </UI>
+                          </Pass>
+                        </Flat>
+                      ) : null
+                    }
+                  />
+                </Loop>
+              </LinearRGB>
+          } />
+        )}
+      />
+    )} />
   );
 };
 

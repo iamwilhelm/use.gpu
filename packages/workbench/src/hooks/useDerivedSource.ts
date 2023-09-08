@@ -14,6 +14,6 @@ export const getDerivedSource = <T extends TextureSource | StorageSource | Lambd
   source: T,
   override: Record<string, any>,
 ): T => {
-  return proxy(source, override);
+  return source ? proxy(source, override) : null as any;
 };
 

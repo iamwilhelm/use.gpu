@@ -1,4 +1,4 @@
-0.10.0
+0.10.1
 - `@use-gpu/core`: extend `Geometry` struct to `GeometryArray` as generic mesh representation
 - `@use-gpu/gltf`: `.glb` binary GLTF support
 - `@use-gpu/gltf`: allow CPU-only load with `<GLTFData unbound>`

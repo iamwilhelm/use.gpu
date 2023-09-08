@@ -129,7 +129,7 @@ export const morph = (
 
 The callback is invoked with a render function, which it can call repeatedly to render the detached fiber. */
 export const detach = <F extends ArrowFunction>(
-  call: DeferredCall<F>,
+  call: DeferredCall<F> | DeferredCall<F>[],
   callback: (render: () => void, fiber: LiveFiber<F>) => void,
   key?: Key,
 ): DeferredCall<() => void> => ({f: DETACH, args: [call, callback], key, by: getCurrentFiberID()} as any);

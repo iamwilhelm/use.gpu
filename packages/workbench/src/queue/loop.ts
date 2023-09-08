@@ -1,5 +1,5 @@
-import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren } from '@use-gpu/live';
-import { use, signal, detach, provide, useCallback, useOne, useResource, tagFunction, formatNodeName } from '@use-gpu/live';
+import type { LiveComponent, LiveElement, LiveNode, LiveFiber, Task, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
+import { use, signal, detach, provide, reconcile, quote, unquote, yeet, gather, useCallback, useOne, useResource, tagFunction, formatNodeName } from '@use-gpu/live';
 
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
 import { TimeContext } from '../providers/time-provider';
@@ -16,12 +16,17 @@ export type LoopRef = {
     elapsed: number,
     start: number,
   },
-  frame: number,
+  version: {
+    frame: number,
+    rendered: number,
+  },
   loop: {
     request?: (fiber?: LiveFiber<any>) => void,
   },
   children?: LiveNode,
+
   run?: () => void,
+  dispatch?: () => void,
 };
 
 /** Provides `useAnimationFrame` and clock to allow for controlled looping and animation. */
@@ -35,7 +40,10 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       elapsed: 0,
       delta: 0,
     },
-    frame: 0,
+    version: {
+      frame: 0,
+      rendered: 0,
+    },
     loop: {
       request: () => {},
     },
@@ -44,14 +52,16 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
 
   ref.children = children;
 
+  // Request animation frame wrapper
+  // for looped component re-rendering.
   const request = useResource((dispose) => {
-    const {time, frame, loop} = ref;
+    const {time, version, loop} = ref;
     let running = live;
     let pending = false;
     let fibers: LiveFiber<any>[] = [];
 
     const render = (timestamp: number) => {
-      ref.frame++;
+      version.frame++;
       pending = false;
 
       if (running) request();
@@ -84,21 +94,62 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
   usePerFrame();
   request!();
 
-  const Run = useCallback(tagFunction(() => {
-    const {time, loop, children} = ref;
+  // Intercept asynchronous renders
+  // and requote towards <Queue>
+  const Resume = (ts: ArrowFunction[]) => {
+    const {version} = ref;
 
-    const view = [
+    const next = useOne(() => [
       signal(),
-      provide(LoopContext, loop, children),
-    ];
+      quote(yeet(ts)),
+    ], ts);
+
+    let pending = false;
+    return detach(next, (dispatch: Task) => {
+      // In animation frame - sync
+      if (version.frame > version.rendered) {
+        version.rendered = version.frame;
+        dispatch();
+      }
+      // Outside animation frame - async
+      else if (!pending) {
+        pending = true;
+        let {rendered} = version;
+        requestAnimationFrame(() => {
+          pending = false;
+          // If no loop frame requested since, dispatch
+          if (rendered === version.rendered) dispatch();
+        });
+      }
+    });
+  };
+
+  const Run = useCallback(tagFunction(() => {
+    const {time, version, loop, children} = ref;
+
+    const view = useOne(() => [
+      signal(),
+      provide(LoopContext, ref.loop, children),
+    ], children);
 
     const t = {...time};
     return (
-      provide(FrameContext, ref.frame,
+      provide(FrameContext, ref.version.frame,
         provide(TimeContext, t, view)
       )
     );
   }, 'Run'));
 
-  return detach(use(Run), (render: Task) => ref.run = render);
+  return (
+    reconcile(
+      quote(
+        gather(
+          unquote(
+            detach(use(Run), (render: Task) => ref.run = render)
+          ),
+          Resume,
+        )
+      )
+    )
+  );
 }

@@ -1,3 +1,7 @@
+0.10.2
+- `@use-gpu/live`: allow `detach()` to work on fragments, allow immediate render
+- `@use-gpu/live`: ensure steady render clock in `<Loop>` without double renders
+
 0.10.1
 - `@use-gpu/core`: extend `Geometry` struct to `GeometryArray` as generic mesh representation
 - `@use-gpu/gltf`: `.glb` binary GLTF support

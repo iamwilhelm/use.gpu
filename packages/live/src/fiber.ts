@@ -369,7 +369,6 @@ export const updateFiber = <F extends ArrowFunction>(
   else if (fiberType === SIGNAL) {
     if (fiber.quote) {
       const {quote: {to}} = fiber;
-      bustFiberYeet(to, true);
       visitYeetRoot(to, true);
     }
   }
@@ -1141,18 +1140,27 @@ export const detachFiber = <F extends ArrowFunction>(
   bustFiberDeps(fiber);
   pingFiber(fiber);
 
+  if (Array.isArray(call)) call = {f: FRAGMENT, args: call} as any;
+
   if (!next || (next.f !== call.f)) {
     if (next) disposeFiber(next);
     next = fiber.next = makeSubFiber(fiber, call);
   }
   next.args = call.args;
 
+  let immediate = true;
   callback(() => {
     if (next && host) {
-      host.schedule(next);
-      host.flush();
+      if (immediate) {
+        host.visit(next);
+      }
+      else {
+        host.schedule(next);
+        host.flush();
+      }
     }
   }, fiber.next);
+  immediate = false;
 }
 
 // Dispose of a fiber's resources and all its mounted sub-fibers

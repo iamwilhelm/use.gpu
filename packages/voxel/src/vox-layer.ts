@@ -467,7 +467,6 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
       const getEnvironment = environmentMap
         ? useBoundShader(applyPBREnvironment, [environmentMap])
         : useNoBoundShader();
-        console.log({environmentMap})
 
       return [
         use(ShaderLitMaterial, {

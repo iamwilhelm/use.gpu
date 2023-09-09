@@ -369,6 +369,7 @@ export const updateFiber = <F extends ArrowFunction>(
   else if (fiberType === SIGNAL) {
     if (fiber.quote) {
       const {quote: {to}} = fiber;
+      bustFiberYeet(fiber);
       visitYeetRoot(to, true);
     }
   }

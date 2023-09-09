@@ -14,6 +14,7 @@ import {
   LinearRGB, DirectionalLight,
   PointLayer, DataShader,
   Environment, PBRMaterial, PrefilteredEnvMap,
+  Suspense,
   useShaderRef,
 } from '@use-gpu/workbench';
 import {
@@ -95,7 +96,7 @@ export const PlotImplicitSurfacePage: LC = () => {
         const m = useShaderRef(metalness);
         return (
           <Gather children={
-            <Gather children={envMap} then={([texture]: TextureSource[]) => <PrefilteredEnvMap texture={texture} />} />
+            <Gather children={<Suspense>{envMap}</Suspense>} then={([texture]: TextureSource[]) => <PrefilteredEnvMap texture={texture} />} />
           } then={([envMap]: ShaderSource[]) => (
             <Loop>
               <LinearRGB backgroundColor={BACKGROUND} tonemap="aces" gain={2}>

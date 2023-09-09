@@ -31,7 +31,7 @@ type SurfaceControlsProps = {
     roughness: number,
     metalness: number,
     env: string,
-    envMap: ShaderSource,
+    envMap: LiveElement,
   }) => LiveElement
 };
 

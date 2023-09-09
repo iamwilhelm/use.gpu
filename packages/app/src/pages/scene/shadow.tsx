@@ -80,8 +80,8 @@ export const SceneShadowPage: LC = (props) => {
         Record<string, StorageSource>,
         TextureSource,
       ]) => (
-        <LinearRGB tonemap="aces" gain={1}>
-          <Loop>
+        <Loop>
+          <LinearRGB tonemap="aces" gain={1}>
             <Cursor cursor='move' />
             <Camera>
               <Pass lights shadows>
@@ -141,8 +141,8 @@ export const SceneShadowPage: LC = (props) => {
 
               </Pass>
             </Camera>
-          </Loop>
-        </LinearRGB>
+          </LinearRGB>
+        </Loop>
       )}
     />
   );

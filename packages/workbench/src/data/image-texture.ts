@@ -1,10 +1,12 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 
-import { useDeviceContext } from '../providers/device-provider';
-import { use, yeet, gather, memo, useMemo, useYolo } from '@use-gpu/live';
+import { use, yeet, gather, memo, suspend, useMemo, useYolo } from '@use-gpu/live';
 import { makeDynamicTexture, uploadDataTexture, uploadExternalTexture, updateMipTextureChain } from '@use-gpu/core';
 import { ImageLoader } from './image-loader';
+
+import { useDeviceContext } from '../providers/device-provider';
+import { useSuspenseContext } from '../providers/suspense-provider';
 
 import { getEquiToCubeSample } from '@use-gpu/wgsl/render/sample/equi-to-cube.wgsl';
 
@@ -43,10 +45,11 @@ export const ImageTexture: LiveComponent<ImageTextureProps> = (props) => {
     render,
   } = props;
 
+  const suspense = useSuspenseContext();
   const fetch = use(ImageLoader, {url, format, colorSpace});
 
   return gather(fetch, ([resource]: any[]) => {
-    if (!resource) return render ? render(null) : yeet(null);
+    if (!resource) return suspense ? suspend() : render ? render(null) : yeet(null);
 
     const source = useMemo(() => {
       const {format, colorSpace} = resource;

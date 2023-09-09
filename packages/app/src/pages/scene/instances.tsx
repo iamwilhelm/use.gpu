@@ -57,8 +57,8 @@ export const SceneInstancesPage: LC = (props) => {
         Record<string, StorageSource>,
         TextureSource,
       ]) => (
-        <LinearRGB tonemap="aces">
-          <Loop>
+        <Loop>
+          <LinearRGB tonemap="aces">
             <Cursor cursor='move' />
             <Camera>
               <Pass lights>
@@ -109,8 +109,8 @@ export const SceneInstancesPage: LC = (props) => {
                 </Scene>
               </Pass>
             </Camera>
-          </Loop>
-        </LinearRGB>
+          </LinearRGB>
+        </Loop>
       )}
     />
   );

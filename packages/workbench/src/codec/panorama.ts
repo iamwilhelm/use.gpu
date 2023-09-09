@@ -2,14 +2,14 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { use, yeet, useYolo } from '@use-gpu/live';
-import { useBoundShader } from '../hooks/useBoundShader';
-import { useDerivedSource } from '../hooks/useDerivedSource';
+import { use, yeet, useMemo, useYolo } from '@use-gpu/live';
+import { getBoundShader } from '../hooks/useBoundShader';
+import { getDerivedSource } from '../hooks/useDerivedSource';
 
 import { getEquiToCubeSample } from '@use-gpu/wgsl/render/sample/equi-to-cube.wgsl';
 
 export type PanoramaMapProps = {
-  texture: TextureSource,
+  texture?: TextureSource | null,
   projection?: keyof typeof PROJECTIONS,
   gain?: number,
 
@@ -32,14 +32,20 @@ export const PanoramaMap: LiveComponent<PanoramaMapProps> = (props) => {
   const shader = PROJECTIONS[projection];
   if (!shader) throw new Error(`Unsupported projection '${projection}'`);
 
-  const derived = useDerivedSource(texture, { variant: 'textureSampleLevel' });
+  const source = useMemo(() => {
+    if (!texture) return null;
 
-  const bound = useBoundShader(shader, [derived, gain]);
-  const source = useDerivedSource({ shader: bound } as any, {
-    size: () => source.size,
-    length: () => (source as any).length,
-    version: () => source.version,
-  });
+    const derived = getDerivedSource(texture, { variant: 'textureSampleLevel' });
+
+    const bound = getBoundShader(shader, [derived, gain]);
+    const source = getDerivedSource({ shader: bound } as any, {
+      size: () => texture?.size,
+      length: () => (texture as any)?.length,
+      version: () => texture?.version,
+    });
+
+    return source;
+  }, [texture]);
 
   return useYolo(() => render ? render(source) : yeet(source), [render, source]);
 };

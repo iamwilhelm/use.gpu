@@ -85,8 +85,8 @@ export const SceneDeferredPage: LC = (props) => {
         Record<string, StorageSource>,
         TextureSource,
       ]) => (
-        <LinearRGB tonemap="aces" gain={1} samples={1}>
-          <Loop>
+        <Loop>
+          <LinearRGB tonemap="aces" gain={1} samples={1}>
             <Cursor cursor='move' />
             <Camera>
               <Pass lights shadows mode="deferred">
@@ -154,8 +154,8 @@ export const SceneDeferredPage: LC = (props) => {
 
               </Pass>
             </Camera>
-          </Loop>
-        </LinearRGB>
+          </LinearRGB>
+        </Loop>
       )}
     />
   );

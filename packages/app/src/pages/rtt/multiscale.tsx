@@ -260,8 +260,8 @@ export const RTTMultiscalePage: LC = () => {
         OffscreenTarget,
         OffscreenTarget,
       ]) => (
-        <Flat>
-          <Loop live>
+        <Loop live>
+          <Flat>
             <Pick all move render={({x, y}) => {
               mouseRef.current = [x * dpi, y * dpi];
               return null;
@@ -355,8 +355,8 @@ export const RTTMultiscalePage: LC = () => {
                 </Layout>
               </UI>
             </Pass>
-          </Loop>
-        </Flat>
+          </Flat>
+        </Loop>
       )}
     />
   );

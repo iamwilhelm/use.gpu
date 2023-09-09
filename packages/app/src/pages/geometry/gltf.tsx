@@ -12,7 +12,7 @@ import {
   Cursor, PointLayer, LineLayer,
   ImageCubeTexture, PrefilteredEnvMap, Environment,
   DirectionalLight, PointLight, DomeLight,
-  Loop, Animate,
+  Loop, Animate, Suspense,
 } from '@use-gpu/workbench';
 
 import { GLTFData, GLTFModel } from '@use-gpu/gltf';
@@ -28,12 +28,14 @@ export const GeometryGLTFPage: LC = () => {
   const base = isDevelopment ? '/' : '/demo/';
   const url = base + "gltf/DamagedHelmet/DamagedHelmet.gltf";
 
+  const root = document.querySelector('#use-gpu .canvas');
+
   return (
-    <EnvMapControls render={(envPreset, envMap) => (
+    <EnvMapControls container={root} render={(envPreset, envMap) => (
       <Gather
         children={[
           <Gather
-            children={envMap}
+            children={<Suspense>{envMap}</Suspense>}
             then={([texture]: TextureSource[]) => (
               <PrefilteredEnvMap
                 texture={texture}

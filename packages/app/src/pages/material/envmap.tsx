@@ -10,7 +10,7 @@ import { vec3 } from 'gl-matrix';
 import {
   Loop, Pass, Flat, Animate, LinearRGB, Environment,
   GeometryData, PBRMaterial, ImageCubeTexture, PrefilteredEnvMap, ShaderLitMaterial,
-  OrbitCamera, OrbitControls, PanControls,
+  OrbitCamera, OrbitControls, PanControls, Suspense,
   Pick, Cursor, Data, PointLayer, LineLayer,
   LineSegments, CompositeData,
   AxisHelper, KeyboardContext,
@@ -48,12 +48,14 @@ export const MaterialEnvMapPage: LC = (props) => {
   const {keys} = keyboard;
   const panning = !!keys.alt;
 
+  const root = document.querySelector('#use-gpu .canvas');
+
   return (
-    <EnvMapControls render={(envPreset, envMap) => (
+    <EnvMapControls container={root} render={(envPreset, envMap) => (
       <Gather
         children={[
           <GeometryData {...geometry} />,
-          envMap,
+          <Suspense>{envMap}</Suspense>,
         ]}
         then={([
           mesh,
@@ -66,8 +68,8 @@ export const MaterialEnvMapPage: LC = (props) => {
             texture={texture}
             gain={1}
             render={(cubeMap, texture) =>          
-              <LinearRGB tonemap="aces" gain={3}>
-                <Loop>
+              <Loop>
+                <LinearRGB tonemap="aces" gain={3}>
                   <Cursor cursor='move' />
                   <Camera active={!panning}>
                     <Pass lights>
@@ -122,8 +124,8 @@ export const MaterialEnvMapPage: LC = (props) => {
                       ) : null
                     }
                   />
-                </Loop>
               </LinearRGB>
+            </Loop>
           } />
         )}
       />

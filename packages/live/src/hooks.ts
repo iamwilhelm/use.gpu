@@ -62,7 +62,7 @@ export const discardState = <F extends Function>(fiber: LiveFiber<F>) => {
  */
 export const useFiber = () => {
   const fiber = getCurrentFiber();
-  if (!fiber) throw new Error("Live Hook called outside of rendering cycle.\n\nMake sure you are not accidentally running two copies of the Live run-time side-by-side.");
+  if (!fiber) throw new Error("Live Hook called outside of rendering cycle.\n\nMake sure you are not accidentally running two copies of `@use-gpu/live` side-by-side.");
   return fiber;
 }
 export const useNoFiber = () => {};

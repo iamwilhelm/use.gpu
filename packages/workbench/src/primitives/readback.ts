@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TypedArray } from '@use-gpu/core';
 
-import { use, memo, yeet, useMemo, useOne } from '@use-gpu/live';
+import { use, memo, yeet, useMemo, useOne, useRef } from '@use-gpu/live';
 import { getDataArrayByteLength, getDataArrayConstructor } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
@@ -14,10 +14,18 @@ const READBACK_SOURCE = hasWebGPU ? { flags: GPUBufferUsage.COPY_DST | GPUBuffer
 export type ReadbackProps = {
   source: StorageSource,
   then?: (data: TypedArray) => LiveElement,
+
+  shouldDispatch?: () => boolean | number | undefined,
+  onDispatch?: () => void,
 };
 
 export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps) => {
-  const {source, then} = props;
+  const {
+    source,
+    then,
+    shouldDispatch,
+    onDispatch,
+  } = props;
 
   const device = useDeviceContext();
 
@@ -30,8 +38,24 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
   const mapped = useOne(() => [false, false, false]);
   let requested = -1;
 
+  let dispatchVersion: number | null = null;
+  let dispatched = false;
+
   return yeet({
     post: () => {
+      dispatched = false;
+
+      if (shouldDispatch) {
+        const d = shouldDispatch();
+        if (d === false) return;
+        if (typeof d === 'number') {
+          if (dispatchVersion === d) return;
+          dispatchVersion = d;
+        }
+      }
+      onDispatch?.();
+      dispatched = true;
+
       const i = requested = mapped.indexOf(false);
       if (i >= 0) {
         const [storage, allocate] = storages[i];
@@ -44,6 +68,8 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
       }
     },
     readback: async () => {
+      if (!dispatched) return;
+
       const i = requested;
       if (i >= 0) {
         const [storage] = storages[i];

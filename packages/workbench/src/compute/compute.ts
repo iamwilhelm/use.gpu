@@ -2,7 +2,6 @@ import type { LC, PropsWithChildren, ArrowFunction } from '@use-gpu/live';
 import type { AggregatedCalls } from '../pass/types';
 
 import { use, memo, multiGather, useOne } from '@use-gpu/live';
-import { useInspectable } from '../hooks/useInspectable'
 
 import { ComputePass } from '../pass/compute-pass';
 import { ReadbackPass } from '../pass/readback-pass';
@@ -16,8 +15,6 @@ export const Compute: LC<ComputeProps> = memo((props: PropsWithChildren<ComputeP
     immediate,
     children,
   } = props;
-
-  const inspect = useInspectable();
 
   const Resume = (calls: AggregatedCalls) =>
     useOne(() => [

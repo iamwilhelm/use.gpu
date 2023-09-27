@@ -15,6 +15,8 @@ export type ComputeLoopProps = {
   continued?: boolean,
   /** Batch # of dispatches together */
   batch?: number,
+  /** Limit # of dispatches */
+  limit?: number,
 
   then?: (count: number) => LiveElement,
 };
@@ -25,6 +27,7 @@ export const ComputeLoop: LC<ComputeLoopProps> = memo((props: PropsWithChildren<
     live = false,
     continued = false,
     batch = 100,
+    limit,
     then,
     children,
   } = props;
@@ -55,6 +58,10 @@ export const ComputeLoop: LC<ComputeLoopProps> = memo((props: PropsWithChildren<
               const runBatch = () => {
                 for (let i = 0; i < batch; ++i) run();
                 countRef.current += batch;
+
+                if (limit != null && countRef.current >= limit) {
+                  running = false;
+                }
               };
 
               if (running) {

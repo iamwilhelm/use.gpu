@@ -8,7 +8,7 @@ export type IterateProps = {
   count: Lazy<number>,
 };
 
-/** Iteration combinator for multi-gathered lambdas */
+/** Iteration combinator for multi-gathered compute lambdas */
 export const Iterate: LiveComponent<IterateProps> = (props: PropsWithChildren<IterateProps>) => {
   const {
     count,
@@ -20,9 +20,14 @@ export const Iterate: LiveComponent<IterateProps> = (props: PropsWithChildren<It
     return useMemo(() => {
       if (!values.compute) return yeet(values);
 
-      const compute = values.compute.map(f => (...args: any[]) => {
-        for (let i = 0; i < c; ++i) f(...args);
-      });
+      const compute = (...args: any[]) => {
+        for (let i = 0; i < c; ++i) {
+          for (const f of values.compute) {
+            f(...args);
+          }
+        }
+      };
+
       return yeet({...values, compute});
     }, [c, values]);
   });

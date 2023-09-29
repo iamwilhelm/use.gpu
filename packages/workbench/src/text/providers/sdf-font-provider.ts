@@ -95,6 +95,8 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
       colorSpace: 'srgb',
     };
 
+    source.texture.label = 'Font Atlas';
+
     return [glyphs, atlas, source, biasable, biasedSource];
   }, [width, height, radius, pad, subpixel, solidify, preprocess, postprocess]);
 

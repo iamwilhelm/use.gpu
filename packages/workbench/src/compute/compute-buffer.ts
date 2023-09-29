@@ -20,6 +20,7 @@ export type ComputeBufferProps = {
   history?: number,
   format?: UniformType,
   resolution?: number,
+  label?: string,
 
   render?: (source: StorageTarget) => LiveElement,
   then?: (source: StorageTarget) => LiveElement,
@@ -37,6 +38,7 @@ export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWit
     depth = 1,
     format = 'f32',
     history = 0,
+    label,
     render,
     children,
     then,
@@ -49,15 +51,15 @@ export const ComputeBuffer: LiveComponent<ComputeBufferProps> = (props: PropsWit
       const flags = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
       const byteLength = getDataArrayByteLength(format, length);
       const buffer = makeDataBuffer(device, byteLength, flags);
-      
+
       const buffers = history > 0 ? seq(history).map(() =>
         makeDataBuffer(device, byteLength, flags)
       ) : undefined;
       if (buffers) buffers.push(buffer);
 
       let i = 0;
-      if (buffers) for (const b of buffers) b.label = 'history-' + ++i;
-      buffer.label = 'target';
+      if (buffers) for (const b of buffers) b.label = [label, 'history', ++i].filter(s => s != null).join(' ');
+      buffer.label = [label, 'target'].filter(s => s != null).join(' ');
 
       const counter = { current: 0 };
       return [buffer, buffers, counter];

@@ -32,6 +32,7 @@ export const makeRenderPipeline = (
   layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
+    label: [vertexShader.entryPoint, fragmentShader?.entryPoint].filter(s => s != null).join('/'),
     layout: layout ?? 'auto',
     depthStencil: depthStencilState,
     multisample: { count: samples },
@@ -57,6 +58,7 @@ export const makeRenderPipelineAsync = (
   layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPURenderPipelineDescriptor = patch({
+    label: [vertexShader.entryPoint, fragmentShader?.entryPoint].filter(s => s != null).join('/'),
     layout: layout ?? 'auto',
     depthStencil: depthStencilState,
     multisample: { count: samples },
@@ -76,6 +78,7 @@ export const makeComputePipeline = (
   layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPUComputePipelineDescriptor = {
+    label: shader.entryPoint,
     layout: layout ?? 'auto',
     compute: makeShaderStage(device, shader),
   };
@@ -88,6 +91,7 @@ export const makeComputePipelineAsync = (
   layout?: GPUPipelineLayout,
 ) => {
   const pipelineDescriptor: GPUComputePipelineDescriptor = {
+    label: shader.entryPoint,
     layout: layout ?? 'auto',
     compute: makeShaderStage(device, shader),
   };

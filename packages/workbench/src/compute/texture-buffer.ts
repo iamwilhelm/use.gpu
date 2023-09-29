@@ -23,6 +23,7 @@ export type TextureBufferProps = {
   samples?: number,
   resolution?: number,
   filterable?: boolean,
+  label?: string,
 
   render?: (texture: TextureTarget) => LiveElement,
   then?: (texture: TextureTarget) => LiveElement,
@@ -43,6 +44,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
     filterable = false,
     sampler = DEFAULT_SAMPLER,
     colorSpace = COLOR_SPACE,
+    label,
     children,
     render,
     then,
@@ -69,8 +71,12 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
           format,
         )
       ) : null;
-      if (buffers) buffers.push(buffer);      
 
+      let i = 0;
+      if (buffers) for (const b of buffers) b.label = [label, 'history', ++i].filter(s => s != null).join(' ');
+      buffer.label = [label, 'target'].filter(s => s != null).join(' ');
+
+      if (buffers) buffers.push(buffer);
       const views = buffers ? buffers.map(b => b.createView()) : undefined;
 
       const counter = { current: 0 };
@@ -112,7 +118,7 @@ export const TextureBuffer: LiveComponent<TextureBufferProps> = (props: PropsWit
 
       counter.current = (index + 1) % n;
     };
-    
+
     const makeSource = () => ({
       texture: targetTexture,
       view,

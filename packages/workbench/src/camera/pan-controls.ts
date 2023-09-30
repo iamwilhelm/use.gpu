@@ -143,7 +143,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     const {moveX, moveY, stop, stopped} = wheel;
     if (!active || stopped) return;
 
-    if (!!scroll !== keyboard.modifiers.shift) {
+    if (!!scroll !== (keyboard.modifiers.shift || keyboard.modifiers.alt)) {
       if (moveX || moveY) {
         setX(x => clampX(x - moveX / zoom, zoom));
         setY(y => clampY(y - moveY / zoom, zoom));

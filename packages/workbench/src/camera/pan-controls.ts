@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
-import { useContext, useMemo, useOne, useResource, useState, useYolo } from '@use-gpu/live';
+import { useCallback, useContext, useMemo, useOne, useResource, useState, useYolo } from '@use-gpu/live';
 import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';
 import { LayoutContext } from '../providers/layout-provider';
 
@@ -12,6 +12,7 @@ export type PanControlsProps = {
   zoom?: number,
   zoomSpeed?: number,
   anchor?: [number, number],
+  scroll?: boolean,
   active?: boolean,
   centered?: boolean,
   version?: number,
@@ -46,6 +47,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     minZoom,
     maxZoom,
 
+    scroll = false,
     active = true,
     anchor = DEFAULT_ANCHOR,
     version,
@@ -61,16 +63,16 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   let offsetX = 0;
   let offsetY = 0;
 
+  const w = Math.abs(r - l);
+  const h = Math.abs(b - t);
   if (centered) {
-    const w = Math.abs(r - l);
-    const h = Math.abs(b - t);
     originX = w / 2;
     originY = h / 2;
-    
+
     offsetX = -w * (anchor[0] - 0.5);
     offsetY = -h * (anchor[1] - 0.5);
   }
-  
+
   const { useMouse } = useContext(MouseContext);
   const { useWheel } = useContext(WheelContext);
   const { useKeyboard } = useContext(KeyboardContext);
@@ -102,24 +104,37 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     setZoom(initialZoom);
   }, initialZoom);
 
+  const clampX = useCallback((x: number, zoom: number) => {
+    let minXZ = minX != null ? minX - w * (zoom - 1) / zoom / 2 : null;
+    let maxXZ = maxX != null ? maxX - w * (zoom + 1) / zoom / 2 : null;
+
+    if (minXZ != null && maxXZ != null && minXZ >= maxXZ) minXZ = maxXZ = (minXZ + maxXZ) / 2;
+
+    if (minXZ != null) x = -Math.max(minXZ, -x);
+    if (maxXZ != null) x = -Math.min(maxXZ, -x);
+
+    return x;
+  }, [minX, maxX, w]);
+
+  const clampY = useCallback((y: number, zoom: number) => {
+    let minYZ = minY != null ? minY - h * (zoom - 1) / zoom / 2 : null;
+    let maxYZ = maxY != null ? maxY - h * (zoom + 1) / zoom / 2 : null;
+
+    if (minYZ != null && maxYZ != null && minYZ >= maxYZ) minYZ = maxYZ = (minYZ + maxYZ) / 2;
+
+    if (minYZ != null) y = -Math.max(minYZ, -y);
+    if (maxYZ != null) y = -Math.min(maxYZ, -y);
+    return y;
+  }, [minY, maxY, h]);
+
   useOne(() => {
     const { moveX, moveY, buttons, stopped } = mouse;
     if (!active || stopped) return;
 
     if (buttons.left) {
       if (moveX || moveY) {
-        setX(x => {
-          x += moveX / zoom;
-          if (minX != null) x = Math.max(minX, x);
-          if (maxX != null) x = Math.min(maxX, x);
-          return x;
-        });
-        setY(y => {
-          y += moveY / zoom;
-          if (minY != null) y = Math.max(minY, y);
-          if (maxY != null) y = Math.min(maxY, y);
-          return y;
-        });
+        setX(x => clampX(x + moveX / zoom, zoom));
+        setY(y => clampY(y + moveY / zoom, zoom));
       }
     }
   }, mouse);
@@ -127,21 +142,11 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   useOne(() => {
     const {moveX, moveY, stop, stopped} = wheel;
     if (!active || stopped) return;
-    
-    if (keyboard.modifiers.shift) {
+
+    if (!!scroll !== keyboard.modifiers.shift) {
       if (moveX || moveY) {
-        setX(x => {
-          x -= moveX / zoom;
-          if (minX != null) x = Math.max(minX, x);
-          if (maxX != null) x = Math.min(maxX, x);
-          return x;
-        });
-        setY(y => {
-          y -= moveY / zoom;
-          if (minY != null) y = Math.max(minY, y);
-          if (maxY != null) y = Math.min(maxY, y);
-          return y;
-        });
+        setX(x => clampX(x - moveX / zoom, zoom));
+        setY(y => clampY(y - moveY / zoom, zoom));
       }
     }
     else if (moveY) {
@@ -157,18 +162,12 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
         const px = (mx / zoom) - x;
         const py = (my / zoom) - y;
 
-        let dx = (mx / z) - px;
-        let dy = (my / z) - py;
-
-        if (minX != null) dx = Math.max(minX, dx);
-        if (maxX != null) dx = Math.min(maxX, dx);
-
-        if (minY != null) dy = Math.max(minY, dy);
-        if (maxY != null) dy = Math.min(maxY, dy);
+        let xx = (mx / z) - px;
+        let yy = (my / z) - py;
 
         setZoom(z);
-        setX(dx);
-        setY(dy);
+        setX(clampX(xx, z));
+        setY(clampY(yy, z));
       }
     }
 

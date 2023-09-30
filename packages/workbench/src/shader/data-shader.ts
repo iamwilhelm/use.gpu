@@ -57,7 +57,10 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
       return links[k] ? links[k] : allArgs.shift();
     });
 
-    return getBoundShader(shader, values);
+    return getDerivedSource(
+      { shader: getBoundShader(shader, values) } as any,
+      { size: () => (source as any)?.size ?? null, length: () => (source as any)?.length ?? null }
+    );
   }, [shader, args.length, source, sources]);
 
   return useYolo(() => render ? render(getData) : yeet(getData), [render, getData]);

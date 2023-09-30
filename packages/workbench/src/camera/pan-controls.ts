@@ -1,10 +1,18 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
-import { useCallback, useContext, useMemo, useOne, useResource, useState, useYolo } from '@use-gpu/live';
+import { lerp } from '@use-gpu/core';
+import { useCallback, useContext, useMemo, useOne, useRef, useResource, useState, useYolo } from '@use-gpu/live';
 import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';
+import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
+import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
 import { LayoutContext } from '../providers/layout-provider';
 
 const π = Math.PI;
+const SOFT_LERP = 0.35;
+const EASE_LERP = 0.05;
+const SNAP_WAIT = 66;
+
+const identity = (x: number) => x;
 
 export type PanControlsProps = {
   x?: number,
@@ -17,12 +25,14 @@ export type PanControlsProps = {
   centered?: boolean,
   version?: number,
 
+  soft?: boolean,
   minX?: number,
   maxX?: number,
   minY?: number,
   maxY?: number,
   minZoom?: number,
   maxZoom?: number,
+  snapZoom?: number,
 
   render: (x: number, y: number, zoom: number) => LiveElement,
 };
@@ -40,13 +50,15 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     zoomSpeed = 1/80,
     centered = true,
 
-    minX,
-    maxX,
-    minY,
-    maxY,
-    minZoom,
-    maxZoom,
+    minX = null,
+    maxX = null,
+    minY = null,
+    maxY = null,
+    minZoom = null,
+    maxZoom = null,
+    snapZoom = null,
 
+    soft = false,
     scroll = false,
     active = true,
     anchor = DEFAULT_ANCHOR,
@@ -54,9 +66,9 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     render,
   } = props;
 
-  const [x, setX]       = useState<number>(initialX);
-  const [y, setY]       = useState<number>(initialY);
-  const [zoom, setZoom] = useState<number>(initialZoom);
+  let [x, setX]       = useState<number>(initialX);
+  let [y, setY]       = useState<number>(initialY);
+  let [zoom, setZoom] = useState<number>(initialZoom);
 
   let originX = 0;
   let originY = 0;
@@ -104,28 +116,73 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
     setZoom(initialZoom);
   }, initialZoom);
 
-  const clampX = useCallback((x: number, zoom: number) => {
-    let minXZ = minX != null ? minX - w * (zoom - 1) / zoom / 2 : null;
-    let maxXZ = maxX != null ? maxX - w * (zoom + 1) / zoom / 2 : null;
+  const clampX = useCallback((x: number, zoom: number, factor: number = 0) => {
+    let xx = x;
 
-    if (minXZ != null && maxXZ != null && minXZ >= maxXZ) minXZ = maxXZ = (minXZ + maxXZ) / 2;
-
+    const [minXZ, maxXZ] = adjustRange(minX, maxX, zoom, w);
     if (minXZ != null) x = -Math.max(minXZ, -x);
     if (maxXZ != null) x = -Math.min(maxXZ, -x);
 
-    return x;
+    return factor ? lerp(xx, x, factor) : x;
   }, [minX, maxX, w]);
 
-  const clampY = useCallback((y: number, zoom: number) => {
-    let minYZ = minY != null ? minY - h * (zoom - 1) / zoom / 2 : null;
-    let maxYZ = maxY != null ? maxY - h * (zoom + 1) / zoom / 2 : null;
+  const clampY = useCallback((y: number, zoom: number, factor: number = 0) => {
+    let yy = y;
 
-    if (minYZ != null && maxYZ != null && minYZ >= maxYZ) minYZ = maxYZ = (minYZ + maxYZ) / 2;
-
+    const [minYZ, maxYZ] = adjustRange(minY, maxY, zoom, h);
     if (minYZ != null) y = -Math.max(minYZ, -y);
     if (maxYZ != null) y = -Math.min(maxYZ, -y);
-    return y;
+
+    return factor ? lerp(yy, y, factor) : y;
   }, [minY, maxY, h]);
+
+  const clampZ = useCallback((z: number, factor: number = 0) => {
+    let zz = z;
+    if (minZoom != null) z = Math.max(minZoom, z);
+    if (maxZoom != null) z = Math.min(maxZoom, z);
+    return factor ? lerp(zz, z, factor) : z;
+  }, [minZoom, maxZoom]);
+
+  const EPS = 1e-3 / zoom;
+  const outOfBoundsX = Math.abs(clampX(x, zoom) - x) > EPS;
+  const outOfBoundsY = Math.abs(clampY(y, zoom) - y) > EPS;
+  const outOfBoundsZ = Math.abs(clampZ(zoom) - zoom) > EPS;
+  const outOfBounds = outOfBoundsX || outOfBoundsY || outOfBoundsZ;
+
+  const unitSnap = Math.min(zoom, 1/zoom);
+  const nearUnitSnap = snapZoom && (unitSnap > 1 - snapZoom && unitSnap < 0.999);
+  const needsAnimation = outOfBounds || nearUnitSnap;
+
+  let delta = 0;
+  if (soft && needsAnimation) {
+    ({delta} = useAnimationFrame());
+  }
+  else useNoAnimationFrame();
+
+  const [minXZ, maxXZ] = adjustRange(minX, maxX, zoom, w);
+  const [minYZ, maxYZ] = adjustRange(minY, maxY, zoom, h);
+  const limitX = soft && !(minXZ != null && maxXZ != null && Math.abs(minXZ - maxXZ) < 1/zoom && !outOfBoundsX) ? identity : clampX;
+  const limitY = soft && !(minYZ != null && maxYZ != null && Math.abs(minYZ - maxYZ) < 1/zoom && !outOfBoundsY) ? identity : clampY;
+
+  const lastZoomRef = useRef(0);
+  const frame = soft ? usePerFrame() : useNoPerFrame();
+  useOne(() => {
+    if (!active || !soft) return;
+
+    if (outOfBounds) {
+      const factor = Math.pow(SOFT_LERP, delta / (1000/60));
+      setZoom(zoom = clampZ(zoom, factor));
+      setX(x = clampX(x, zoom, factor));
+      setY(y = clampY(y, zoom, factor));
+    }
+    else if (nearUnitSnap) {
+      const snapTime = +new Date() - lastZoomRef.current;
+      if (snapTime > SNAP_WAIT) {
+        const factor = Math.pow(EASE_LERP, delta / (1000/60));
+        setZoom(zoom = lerp(zoom, 1, factor));
+      }
+    }
+  }, frame);
 
   useOne(() => {
     const { moveX, moveY, buttons, stopped } = mouse;
@@ -133,8 +190,8 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
 
     if (buttons.left) {
       if (moveX || moveY) {
-        setX(x => clampX(x + moveX / zoom, zoom));
-        setY(y => clampY(y + moveY / zoom, zoom));
+        setX(x => limitX(x + moveX / zoom, zoom));
+        setY(y => limitY(y + moveY / zoom, zoom));
       }
     }
   }, mouse);
@@ -145,29 +202,29 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
 
     if (!!scroll !== (keyboard.modifiers.shift || keyboard.modifiers.alt)) {
       if (moveX || moveY) {
-        setX(x => clampX(x - moveX / zoom, zoom));
-        setY(y => clampY(y - moveY / zoom, zoom));
+        setX(x => limitX(x - moveX / zoom, zoom));
+        setY(y => limitY(y - moveY / zoom, zoom));
       }
     }
     else if (moveY) {
-      let z = zoom * Math.pow(2, -moveY * zoomSpeed);
-
-      if (minZoom != null) z = Math.max(minZoom, z);
-      if (maxZoom != null) z = Math.min(maxZoom, z);
+      const z = (soft ? identity : clampZ)(zoom * Math.pow(2, -moveY * zoomSpeed));
 
       if (z !== zoom) {
         const mx = mouse.x - originX;
         const my = mouse.y - originY;
-
-        const px = (mx / zoom) - x;
-        const py = (my / zoom) - y;
-
-        let xx = (mx / z) - px;
-        let yy = (my / z) - py;
+        lastZoomRef.current = +new Date();
 
         setZoom(z);
-        setX(clampX(xx, z));
-        setY(clampY(yy, z));
+        setX(x => {
+          const px = (mx / zoom) - x;
+          const xx = (mx / z) - px;
+          return limitX(xx, z);
+        });
+        setY(xy=> {
+          const py = (my / zoom) - y;
+          const yy = (my / z) - py;
+          return limitY(yy, z);
+        });
       }
     }
 
@@ -178,4 +235,11 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const panY = centered ? y - originY * (zoom - 1) / zoom + offsetY : y;
 
   return useYolo(() => render(panX, panY, zoom), [render, panX, panY, zoom]);
+};
+
+const adjustRange = (a: number | null, b: number | null, zoom: number, size: number) => {
+  let min = a != null ? a - size * (zoom - 1) / zoom / 2 : null;
+  let max = b != null ? b - size * (zoom + 1) / zoom / 2 : null;
+  if (min != null && max != null && min > max) min = max = (min + max) / 2;
+  return [min, max];
 };

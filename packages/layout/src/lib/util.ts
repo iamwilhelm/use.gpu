@@ -81,6 +81,7 @@ type Inline<T> = (
   mask: ShaderModule | null,
   transform: ShaderModule | null,
 ) => T;
+
 export const memoInline = <T>(f: Inline<T>): Inline<T> => {
   let lastHash: number | undefined;
   let lastOrigin: Rectangle | undefined;
@@ -128,6 +129,7 @@ export const mergeMargin = (a: number, b: number) => {
   return Math.min(a, b);
 }
 
+// DEPRECATED (tests only)
 export const makeBoxLayout = (
   sizes: Point[],
   offsets: Point[],

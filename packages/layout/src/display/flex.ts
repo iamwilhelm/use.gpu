@@ -6,10 +6,10 @@ import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentL
 import { useProp } from '@use-gpu/traits';
 import { use, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
-import {  makeBoxPicker, memoFit, memoLayout } from '../lib/util';
+import { makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
-import type { BoxTrait, ElementTrait } from '../types';
+import type { BoxTrait, ElementTrait, RefTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';
@@ -19,7 +19,7 @@ const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
 export type FlexProps =
   Partial<BoxTrait> &
-  Partial<ElementTrait> &
+  Partial<ElementTrait> & Partial<RefTrait> &
 {
   direction?: Direction,
 
@@ -35,6 +35,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
   const {
     wrap = false,
     snap = true,
+    ref,
     children,
   } = props;
 
@@ -109,7 +110,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
+            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform, ref}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
@@ -129,7 +130,7 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered]);
+    }, [props, els, hovered, ref]);
   };
 
   const c = useImplicitElement(id, radius, border, stroke, fill, image, children);

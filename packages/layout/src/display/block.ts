@@ -6,10 +6,10 @@ import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin }
 import { useProp } from '@use-gpu/traits';
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
-import { isHorizontal, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
+import { isHorizontal, makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
-import type { BoxTrait, ElementTrait } from '../types';
+import type { BoxTrait, ElementTrait, RefTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';
@@ -17,7 +17,7 @@ import { BoxLayout } from '../render';
 
 export type BlockProps =
   Partial<BoxTrait> &
-  Partial<ElementTrait> &
+  Partial<ElementTrait> & Partial<RefTrait> &
 {
   direction?: Direction,
   
@@ -29,6 +29,7 @@ export type BlockProps =
 export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<BlockProps>) => {
   const {
     snap = true,
+    ref,
     children,
   } = props;
 
@@ -107,7 +108,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
+            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform, ref}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
@@ -125,7 +126,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered]);
+    }, [props, els, hovered, ref]);
   };
 
   const c = useImplicitElement(id, radius, border, stroke, fill, image, children);

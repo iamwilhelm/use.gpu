@@ -6,16 +6,16 @@ import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, A
 import { useProp } from '@use-gpu/traits';
 import { use, memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
-import { makeInlineLayout, makeInlineInspectLayout, makeBoxPicker, memoFit, memoLayout } from '../lib/util';
+import { makeBoxPicker, memoFit, memoLayout } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
 import { BoxLayout, InlineLayout } from '../render';
 
-import type { BoxTrait } from '../types';
+import type { BoxTrait, RefTrait } from '../types';
 import { useBoxTrait } from '../traits';
 import { parseAlignment, parseBase, parseDirectionX, parseMargin } from '../parse';
 
-export type InlineProps = Partial<BoxTrait> & {
+export type InlineProps = Partial<BoxTrait> & Partial<RefTrait> & {
   direction?: Direction,
 
   align?: Alignment,
@@ -30,6 +30,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
   const {
     wrap = true,
     snap = true,
+    ref,
     children,
   } = props;
 
@@ -101,7 +102,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
               mask: ShaderModule | null,
               transform: ShaderModule | null,
             ) => {
-              const el = use(InlineLayout, inline, {box, origin, clip, mask, transform}, hovered);
+              const el = use(InlineLayout, inline, {box, origin, clip, mask, transform, ref}, hovered);
               if (sizes.length) return [
                 el,
                 use(BoxLayout, inside, {
@@ -128,7 +129,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered]);
+    }, [props, els, hovered, ref]);
   };
   
   return children ? gather(children, Resume) : null;

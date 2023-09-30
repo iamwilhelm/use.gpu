@@ -8,14 +8,14 @@ import { use, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';
 import { useInspectHoverable } from '@use-gpu/workbench';
 
-import type { BoxTrait, ElementTrait } from '../types';
+import type { BoxTrait, ElementTrait, RefTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { INSPECT_STYLE } from '../lib/constants';
 import { memoLayout } from '../lib/util';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 
-export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & {
+export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & Partial<RefTrait> & {
   id?: number,
   snap?: boolean,
   absolute?: boolean,

@@ -10,7 +10,7 @@ import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { memoFit, memoLayout } from '../lib/util';
 import { evaluateDimension } from '../parse';
 
-import type { BoxTrait, ElementTrait } from '../types';
+import type { BoxTrait, ElementTrait, RefTrait } from '../types';
 import { useBoxTrait, useElementTrait } from '../traits';
 import { parseDimension, parseMargin } from '../parse';
 

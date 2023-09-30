@@ -5,6 +5,8 @@ import type { LayoutRenderer, LayoutPicker, RenderInside, RenderOutside, RenderI
 
 import { memoArgs, yeet, fragment, use, useFiber, useMemo, useNoMemo } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
+import { toMurmur53 } from '@use-gpu/state';
+
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 import { INSPECT_STYLE } from './lib/constants';
 
@@ -14,33 +16,34 @@ const sameBox = (a: [any, any, any, any], b: [any, any, any, any]) => {
   return (a[0] === b[0]) && (a[1] === b[1]) && (a[2] === b[2]) && (a[3] === b[3]);
 };
 
-type Layout<T> = (
+type Render<T> = (
   inside: RenderInside,
   outside: RenderOutside,
   inspect?: boolean,
 ) => T;
 
-type LayoutArgs<T> = Parameters<Layout<T>>;
+type RenderArgs<T> = Parameters<Render<T>>;
 
-export const memoLayout = <T>(f: Layout<T>, name?: string): Layout<T> => {
-  return memoArgs(f, ([ai, ao, an]: LayoutArgs<T>, [bi, bo, bn]: LayoutArgs<T>) => (
+export const memoRender = <T>(f: Render<T>, name?: string): Render<T> => {
+  return memoArgs(f, ([ai, ao, an]: RenderArgs<T>, [bi, bo, bn]: RenderArgs<T>) => (
     ai === bi &&
     an === bn &&
     sameBox(ao.box, bo.box) &&
     sameBox(ao.origin, bo.origin) &&
     ao.clip === bo.clip &&
     ao.mask === bo.mask &&
-    ao.transform === bo.transform
+    ao.transform === bo.transform &&
+    ao.ref === bo.ref
   ), name);
-}
+};
 
-export const BoxLayout = memoLayout((
+export const BoxLayout = memoRender((
   inside: RenderInside,
   outside: RenderOutside,
   inspect?: boolean,
 ) => {
   const {sizes, offsets, renders, clip, mask, transform, inverse} = inside;
-  const {box, origin, clip: parentClip, mask: parentMask, transform: parentTransform} = outside;
+  const {box, origin, clip: parentClip, mask: parentMask, transform: parentTransform, ref} = outside;
   
   const [left, top, right, bottom] = box;
   const out = [] as LiveElement[];
@@ -71,6 +74,9 @@ export const BoxLayout = memoLayout((
       )
     : (useNoMemo(), parentClip ?? null)
   ) : (useNoMemo(), clip ?? null);
+  
+  const render = ref?.(box, origin);
+  if (render) out.push(render);
 
   for (let i = 0; i < n; ++i) {
     const size = sizes[i];
@@ -139,7 +145,7 @@ export const BoxLayout = memoLayout((
 
     out.push(yeet(yeets));
   }
-  
+
   if (out.length === 1 && Array.isArray(out[0])) return out[0];
   return out;
 }, 'BoxLayout');
@@ -150,7 +156,7 @@ export const InlineLayout = (
   inspect?: boolean,
 ) => {
   let {ranges, sizes, offsets, renders, key} = inline;
-  const {box, origin, clip, mask, transform} = outside;
+  const {box, origin, clip, mask, transform, ref} = outside;
 
   let [left, top, right, bottom] = box;
   
@@ -167,7 +173,10 @@ export const InlineLayout = (
     else out.push(el);
     lines = [];
   };
-  
+
+  const render = ref?.(box, origin);
+  if (render) out.push(render);
+
   for (let i = 0; i < n; ++i) {
     const range = ranges[i];
     const size = sizes[i];

@@ -6,7 +6,7 @@ import type { LayoutRenderer, LayoutElement, FitInto } from '../types';
 import { use, memo, gather, yeet, useMemo } from '@use-gpu/live';
 import { bindBundle, chainTo } from '@use-gpu/shader/wgsl';
 
-import { memoFit, memoLayout } from '../lib/util';
+import { memoFit } from '../lib/util';
 
 import { getCombinedClip, getTransformedClip } from '@use-gpu/wgsl/layout/clip.wgsl';
 

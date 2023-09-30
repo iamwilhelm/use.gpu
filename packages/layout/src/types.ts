@@ -35,6 +35,10 @@ export type BoxTrait = {
   flex: Anchor,
 };
 
+export type RefTrait = {
+  ref: (rectangle: Rectangle, origin: Point) => void,
+};
+
 export type ElementTrait = {
   width: Dimension,
   height: Dimension,
@@ -88,6 +92,7 @@ export type RenderOutside = {
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
   transform?: ShaderModule | null,
+  ref?: (rectangle: Rectangle, origin: Rectangle) => LiveElement,
 };
 
 export type InlineRenderer = (

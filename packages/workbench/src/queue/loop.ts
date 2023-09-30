@@ -3,7 +3,7 @@ import { use, signal, detach, provide, reconcile, quote, unquote, yeet, gather, 
 
 import { useRenderContext } from '../providers/render-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
-import { TimeContext } from '../providers/time-provider';
+import { TimeContext, TimeContextProps } from '../providers/time-provider';
 import { LoopContext } from '../providers/loop-provider';
 
 export type LoopProps = {
@@ -22,7 +22,7 @@ export type LoopRef = {
     rendered: number,
   },
   loop: {
-    request?: (fiber?: LiveFiber<any>) => void,
+    request?: (fiber?: LiveFiber<any>) => TimeContextProps,
   },
   children?: LiveNode,
 
@@ -46,7 +46,7 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       rendered: 0,
     },
     loop: {
-      request: () => {},
+      request: () => ref.time,
     },
     children,
   }));
@@ -88,6 +88,8 @@ export const Loop: LiveComponent<LoopProps> = (props: PropsWithChildren<LoopProp
       if (!pending) requestAnimationFrame(render);
       if (fiber && fibers.indexOf(fiber) < 0) fibers.push(fiber);
       pending = true;
+
+      return ref.time;
     };
     dispose(() => running = false);
 

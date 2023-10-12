@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 
 import { lerp } from '@use-gpu/core';
-import { useCallback, useContext, useMemo, useOne, useRef, useResource, useState, useYolo } from '@use-gpu/live';
+import { use, useCallback, useContext, useMemo, useOne, useRef, useResource, useState, useYolo } from '@use-gpu/live';
 import { MouseContext, WheelContext, KeyboardContext } from '../providers/event-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { usePerFrame, useNoPerFrame } from '../providers/frame-provider';
@@ -93,28 +93,35 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const { wheel } = useWheel();
   const { keyboard } = useKeyboard();
 
+  const now = +new Date();
+  const lastZoomRef = useRef(now);
+
   let reset = false;
   useOne(() => {
-    reset = keyboard.modifiers.alt && keyboard.keys.enter;
+    reset = !!(keyboard.modifiers.alt && keyboard.keys.enter);
   }, keyboard);
 
   useOne(() => {
     setX(initialX);
     setY(initialY);
     setZoom(initialZoom);
-  }, reset || version);
+    lastZoomRef.current = now;
+  }, reset);
 
   useOne(() => {
     setX(initialX);
-  }, initialX);
+    lastZoomRef.current = now;
+  }, version ?? initialX);
 
   useOne(() => {
     setY(initialY);
-  }, initialY);
+    lastZoomRef.current = now;
+  }, version ?? initialY);
 
   useOne(() => {
     setZoom(initialZoom);
-  }, initialZoom);
+    lastZoomRef.current = now;
+  }, version ?? initialZoom);
 
   const clampX = useCallback((x: number, zoom: number, factor: number = 0) => {
     let xx = x;
@@ -161,10 +168,24 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
 
   const [minXZ, maxXZ] = adjustRange(minX, maxX, zoom, w);
   const [minYZ, maxYZ] = adjustRange(minY, maxY, zoom, h);
-  const limitX = soft && !(minXZ != null && maxXZ != null && Math.abs(minXZ - maxXZ) < 1/zoom && !outOfBoundsX) ? identity : clampX;
-  const limitY = soft && !(minYZ != null && maxYZ != null && Math.abs(minYZ - maxYZ) < 1/zoom && !outOfBoundsY) ? identity : clampY;
 
-  const lastZoomRef = useRef(0);
+  const onEdgeX = !outOfBounds && Math.min(
+    minXZ != null ? Math.abs(x - minXZ) : Infinity,
+    maxXZ != null ? Math.abs(x - maxXZ) : Infinity
+  ) < 1/100;
+  const onEdgeY = !outOfBounds && Math.min(
+    minYZ != null ? Math.abs(y - minYZ) : Infinity,
+    maxYZ != null ? Math.abs(y - maxYZ) : Infinity
+  ) < 1/100;
+  const onEdgeZ = !outOfBounds && Math.min(
+    minZoom != null ? Math.abs(zoom - minZoom) / minZoom : Infinity,
+    maxZoom != null ? Math.abs(zoom - maxZoom) / maxZoom : Infinity
+  ) < 1/100;
+
+  const limitX = (!onEdgeX && soft) && !(minXZ != null && maxXZ != null && Math.abs(minXZ - maxXZ) < 1/zoom && !outOfBoundsX) ? identity : clampX;
+  const limitY = (!onEdgeY && soft) && !(minYZ != null && maxYZ != null && Math.abs(minYZ - maxYZ) < 1/zoom && !outOfBoundsY) ? identity : clampY;
+  const limitZ = (!onEdgeZ && soft && !outOfBoundsZ) ? identity : clampZ;
+
   const frame = soft ? usePerFrame() : useNoPerFrame();
   useOne(() => {
     if (!active || !soft) return;
@@ -176,7 +197,7 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
       setY(y = clampY(y, zoom, factor));
     }
     else if (nearUnitSnap) {
-      const snapTime = +new Date() - lastZoomRef.current;
+      const snapTime = now - lastZoomRef.current;
       if (snapTime > SNAP_WAIT) {
         const factor = Math.pow(EASE_LERP, delta / (1000/60));
         setZoom(zoom = lerp(zoom, 1, factor));
@@ -207,12 +228,12 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
       }
     }
     else if (moveY) {
-      const z = (soft ? identity : clampZ)(zoom * Math.pow(2, -moveY * zoomSpeed));
+      const z = limitZ(zoom * Math.pow(2, -moveY * zoomSpeed));
 
       if (z !== zoom) {
         const mx = mouse.x - originX;
         const my = mouse.y - originY;
-        lastZoomRef.current = +new Date();
+        lastZoomRef.current = now;
 
         setZoom(z);
         setX(x => {
@@ -234,8 +255,17 @@ export const PanControls: LiveComponent<PanControlsProps> = (props) => {
   const panX = centered ? x - originX * (zoom - 1) / zoom + offsetX : x;
   const panY = centered ? y - originY * (zoom - 1) / zoom + offsetY : y;
 
-  return useYolo(() => render(panX, panY, zoom), [render, panX, panY, zoom]);
+  return useMemo(() => render ? use(Inner, panX, panY, zoom, x, y, render) : null, [render, panX, panY, zoom]);
 };
+
+const Inner = (
+  panX: number,
+  panY: number,
+  zoom: number,
+  ox: number,
+  oy: number,
+  render: (x: number, y: number, zoom: number, ox: number, oy: number) => LiveElement,
+) => render(panX, panY, zoom, ox, oy);
 
 const adjustRange = (a: number | null, b: number | null, zoom: number, size: number) => {
   let min = a != null ? a - size * (zoom - 1) / zoom / 2 : null;

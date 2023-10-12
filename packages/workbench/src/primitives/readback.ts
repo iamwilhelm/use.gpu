@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource, TypedArray } from '@use-gpu/core';
 
-import { use, memo, yeet, useMemo, useOne, useRef } from '@use-gpu/live';
+import { use, memo, yeet, useMemo, useOne, useRef, useResource } from '@use-gpu/live';
 import { getDataArrayByteLength, getDataArrayConstructor } from '@use-gpu/core';
 
 import { useDeviceContext } from '../providers/device-provider';
@@ -41,8 +41,12 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
   let dispatchVersion: number | null = null;
   let dispatched = false;
 
+  let cancelled = false;
+  useResource((dispose) => dispose(() => cancelled = true));
+
   return yeet({
     post: () => {
+      if (cancelled) return null;
       dispatched = false;
 
       if (shouldDispatch) {
@@ -68,6 +72,7 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
       }
     },
     readback: async () => {
+      if (cancelled) return null;
       if (!dispatched) return;
 
       const i = requested;
@@ -77,6 +82,8 @@ export const Readback: LiveComponent<ReadbackProps> = memo((props: ReadbackProps
 
         mapped[i] = true;
         await buffer.mapAsync(GPUMapMode.READ);
+
+        if (cancelled) return null;
 
         const ctor = getDataArrayConstructor(source.format);
         const array = new ctor(buffer.getMappedRange());

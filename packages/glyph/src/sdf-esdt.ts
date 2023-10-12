@@ -219,23 +219,23 @@ export const paintSubpixelOffsets = (
         const b = getData(x, y + 1);
         
         if (isBlack(l)) {
-          xo[j - 1] = 0.5;
+          xo[j - 1] = 0.4999;
           outer[j - 1] = 0;
           inner[j - 1] = 0;
         }
         if (isBlack(r)) {
-          xo[j + 1] = -0.5;
+          xo[j + 1] = -0.4999;
           outer[j + 1] = 0;
           inner[j + 1] = 0;
         }
 
         if (isBlack(t)) {
-          yo[j - wp] = 0.5;
+          yo[j - wp] = 0.4999;
           outer[j - wp] = 0;
           inner[j - wp] = 0;
         }
         if (isBlack(b)) {
-          yo[j + wp] = -0.5;
+          yo[j + wp] = -0.4999;
           outer[j + wp] = 0;
           inner[j + wp] = 0;
         }

@@ -24,7 +24,7 @@ export const glsl = (userOptions = {}) => {
       const code = transpileGLSL(source, id, true);
       const magicString = new MagicString(code);
 
-      let result = { code: magicString.toString() };
+      let result = magicString.toString();
       return { code: result, map: { mappings: '' }};
     }
   };

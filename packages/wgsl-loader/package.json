@@ -10,6 +10,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./esbuild": "./src/esbuild.ts",
     "./node": "./src/node.ts",
     "./rollup": "./src/rollup.ts",
     "./webpack": "./src/webpack.ts"

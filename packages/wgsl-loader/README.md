@@ -10,7 +10,7 @@ yarn add @use-gpu/wgsl-loader
 
 **Docs**: https://usegpu.live/docs/reference-loader-@use-gpu-wgsl-loader
 
-# Loader - WGSL (webpack / node / rollup)
+# Loader - WGSL (webpack / node / rollup / esbuild)
 
 This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
 
@@ -49,6 +49,14 @@ For rollup, import the plugin as:
 
 ```js
 import rollupWGSL from "@use-gpu/wgsl-loader/rollup";
+```
+
+#### Esbuild
+
+For esbuild, import the plugin as:
+
+```js
+import wgslPlugin from "@use-gpu/wgsl-loader/esbuild";
 ```
 
 #### Import

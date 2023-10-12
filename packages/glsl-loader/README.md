@@ -10,7 +10,7 @@ yarn add @use-gpu/glsl-loader
 
 **Docs**: https://usegpu.live/docs/reference-loader-@use-gpu-glsl-loader
 
-# Loader - GLSL (webpack / node / rollup)
+# Loader - GLSL (webpack / node / rollup / esbuild)
 
 This is a webpack and node loader which enables easy use of `@use-gpu/shader`.
 
@@ -49,6 +49,14 @@ For rollup, import the plugin as:
 
 ```js
 import rollupGLSL from "@use-gpu/glsl-loader/rollup";
+```
+
+#### Esbuild
+
+For esbuild, import the plugin as:
+
+```js
+import glslPlugin from "@use-gpu/glsl-loader/esbuild";
 ```
 
 #### Import

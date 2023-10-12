@@ -1,4 +1,4 @@
-import { esdt, esdt1d, resolveSDF } from './sdf-esdt';
+import { esdt, esdt1d, resolveSDF, glyphToESDT } from './sdf-esdt';
 import { makeSDFStage } from './sdf';
 
 const INF = 1e10;
@@ -246,5 +246,44 @@ describe('edt', () => {
     
     expect(xs).toEqual([0, 0, 0,-1,  -1, 0, 0,   1, 1, 0, 0, 0])
     expect(ys).toEqual([0, 0, 0, 0,-1.1,-2,-2,-1.1, 0, 0, 0, 0])
+  });
+  
+  it('glyphToESDT handles checker-board patterns correctly', () => {
+    
+    const w = 8;
+    const h = 4;
+    const image = [
+      [0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 1, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0],
+    ];
+    const imageUint8 = Uint8Array.from(image.flat().map(x => x * 255));
+    expect(imageUint8.length).toEqual(w * h);
+
+    const pad = 1;
+    const result = glyphToESDT(imageUint8, null, 8, 4, pad, 4, 0.5)
+    expect(result.width).toEqual(w + pad*2);
+    expect(result.height).toEqual(h + pad*2);
+
+    const withoutPadding: number[][] = []
+    for (let y = 0; y < h; y++) {
+      const slice: number[] = [];
+      withoutPadding.push(slice);
+
+      for (let x = 0; x < w; x++) {
+        const i = (x + pad) + (y + pad) * result.width
+        slice.push(result.data[i * 4])
+      }
+    }
+    
+    const expected = [
+      [ 69,  96,  69,  24,   0,   0,   0,   0],
+      [ 96, 141, 114,  69,  17,   0,   0,   0],
+      [ 69, 114, 141,  96,  32,   0,   0,   0],
+      [ 24,  69,  96,  69,  17,   0,   0,   0]
+    ];
+    console.log(withoutPadding)
+    expect(withoutPadding).toEqual(expected)
   });
 });

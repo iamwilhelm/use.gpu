@@ -556,7 +556,7 @@ export const reconcileFiberCalls = (() => {
     // Mount new / updated keys
     for (let i = 0, j = 0, n = calls.length; i < n; ++i) {
       let call = calls[i];
-      if (call == null) continue;
+      if (call == null || (call as any) === false) continue;
 
       const key = order[j++];
       let callKey = (call as any)?.key;

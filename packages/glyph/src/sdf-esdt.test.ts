@@ -283,7 +283,7 @@ describe('edt', () => {
       [ 69, 114, 141,  96,  32,   0,   0,   0],
       [ 24,  69,  96,  69,  17,   0,   0,   0]
     ];
-    console.log(withoutPadding)
+
     expect(withoutPadding).toEqual(expected)
   });
 });

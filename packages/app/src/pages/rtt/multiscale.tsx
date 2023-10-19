@@ -6,7 +6,7 @@ import React, { Gather, useRef } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
-  Loop, Pass, Flat, Pick,
+  Loop, Pass, Flat, Pick, Cursor,
   RawTexture, RenderTarget, RenderToTexture, FullScreen,
 } from '@use-gpu/workbench';
 import {
@@ -114,6 +114,7 @@ const feedbackShader = wgsl`
 
   @link fn getRandomSeed() -> vec4<f32>;
   @link fn getMouse() -> vec2<f32>;
+  @link fn getPaint() -> f32;
 
   @link fn getBlur1(uv: vec2<f32>) -> vec4<f32>;
   @link fn getBlur2(uv: vec2<f32>) -> vec4<f32>;
@@ -126,8 +127,11 @@ const feedbackShader = wgsl`
     var color = vec4<f32>(0.0, 0.0, 0.0, 1.0);
 
     let mouse = getMouse();
+    let paint = getPaint();
     let rnd = getRandomSeed();
-    let pixelSize = 1.0 / getTextureSize();
+    let size = getTextureSize();
+    let pixelSize = 1.0 / size;
+    let aspect = size.y / size.x;
 
     let dq   = pixelSize / 4.0;
     let d4   = pixelSize * 4.0;
@@ -185,6 +189,27 @@ const feedbackShader = wgsl`
     color.x += (getTexture(uv).x - getBlur3(uv).x) * 0.11; // reaction diffusion
 
     color.x -= ((1 - color.y) - 0.02) * 0.025;
+    
+    if (paint > 0.0) {
+      // Random paint splotch
+      let xy = (uv - center) * vec2<f32>(1.0, aspect);
+      let d = length(xy);
+      let r = max(0.0, 1.0 - d * 24.0);
+      let a = atan2(xy.y, xy.x) + noise.z;
+      let ca = cos(a * 8.0);
+      let sa = sin(a * 8.0);
+
+      let level = paint * noise.w * r;
+      let boost = vec4<f32>(
+        r * (1.0 - r) * max(0.0, sa) * sa * 2.0,
+        (1.0 - r) * (1.0 - r) * max(0.0, ca),
+        (1.0 - r) * 2.0,
+        0.0
+      );
+
+      // Tweak color to create opposing colors
+      color += level * boost - r * r * (color.r - r * r * color.b);
+    }
 
     return color;
   };
@@ -233,6 +258,7 @@ const compositeShader = wgsl`
 export const RTTMultiscalePage: LC = () => {
   const dpi = window.devicePixelRatio;
   const mouseRef = useRef([window.innerWidth / 2 * dpi, window.innerHeight / 2 * dpi]);
+  const paintRef = useRef(0);
   const getRandomSeed = () => [Math.random(), Math.random(), Math.random(), Math.random()];
 
   return (
@@ -261,9 +287,11 @@ export const RTTMultiscalePage: LC = () => {
         OffscreenTarget,
       ]) => (
         <Loop live>
+          <Cursor cursor="pointer" />
           <Flat>
-            <Pick all move render={({x, y}) => {
+            <Pick all move render={({x, y, pressed}) => {
               mouseRef.current = [x * dpi, y * dpi];
+              paintRef.current = +!!pressed.left;
               return null;
             }} />
             <RenderToTexture target={feedbackTarget}>
@@ -273,6 +301,7 @@ export const RTTMultiscalePage: LC = () => {
                   args={[
                     getRandomSeed,
                     mouseRef,
+                    paintRef,
                   ]}
                   sources={[
                     blurTarget1.source,

@@ -46,7 +46,8 @@ export const MaterialEnvMapPage: LC = (props) => {
   const { useKeyboard } = useContext(KeyboardContext);
   const { keyboard } = useKeyboard();
   const {keys} = keyboard;
-  const panning = !!keys.alt;
+  const zooming = !!keys.alt;
+  const panning = !!keys.shift;
 
   const root = document.querySelector('#use-gpu .canvas');
 
@@ -71,7 +72,7 @@ export const MaterialEnvMapPage: LC = (props) => {
               <Loop>
                 <LinearRGB tonemap="aces" gain={3}>
                   <Cursor cursor='move' />
-                  <Camera active={!panning}>
+                  <Camera active={!zooming && !panning}>
                     <Pass lights>
             
                       {/*<AxisHelper size={2} width={3} />*/}
@@ -100,7 +101,8 @@ export const MaterialEnvMapPage: LC = (props) => {
                   </Camera>
                   <PanControls
                     x={-window.innerWidth/2} y={-window.innerHeight/2} zoom={1/2}
-                    active={panning}
+                    active={panning || zooming}
+                    scroll={zooming}
                     render={(x, y, zoom) =>
                       texture ? (
                         <Flat x={x} y={y} zoom={zoom}>

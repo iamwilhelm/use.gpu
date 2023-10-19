@@ -46,7 +46,11 @@ export const useShaderRefs = <T>(...values: (Lazy<T>)[]): (Ref<T> | (() => T))[]
     current.current != null ? current :
     {current}
   ), values.length);
-  for (const ref of refs) ref.current = values[i++];
+
+  for (const ref of refs) {
+    const v = values[i++];
+    if (v !== ref) ref.current = v;
+  }
 
   return refs;
 };

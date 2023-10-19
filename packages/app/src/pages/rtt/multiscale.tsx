@@ -67,7 +67,7 @@ const initializeShader = wgsl`
 const blurXShader = wgsl`
   @link fn getTextureSize() -> vec2<f32>;
   @link fn getTexture(uv: vec2<f32>) -> vec4<f32>;
-  
+
   @export fn main(uv: vec2<f32>) -> vec4<f32> {
     let h = 1.0 / getTextureSize().x;
 
@@ -128,7 +128,7 @@ const feedbackShader = wgsl`
     let mouse = getMouse();
     let rnd = getRandomSeed();
     let pixelSize = 1.0 / getTextureSize();
-  
+
     let dq   = pixelSize / 4.0;
     let d4   = pixelSize * 4.0;
     let d8   = pixelSize * 8.0;
@@ -136,7 +136,7 @@ const feedbackShader = wgsl`
     let d32  = pixelSize * 32.0;
     let d128 = pixelSize * 128.0;
 
-    let noise = getNoise(pixel + rnd.xy) - 0.5; // the noise texture itself is static. adding randomizing 
+    let noise = getNoise(pixel + rnd.xy) - 0.5; // the noise texture itself is static. adding randomizing
 
     // overall plane deformation vector (zoom-in on the mouse position)
 
@@ -234,7 +234,7 @@ export const RTTMultiscalePage: LC = () => {
   const dpi = window.devicePixelRatio;
   const mouseRef = useRef([window.innerWidth / 2 * dpi, window.innerHeight / 2 * dpi]);
   const getRandomSeed = () => [Math.random(), Math.random(), Math.random(), Math.random()];
-  
+
   return (
     <Gather
       children={[

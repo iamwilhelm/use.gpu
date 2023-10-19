@@ -49,6 +49,18 @@ exports[`link links a global across a module 1`] = `
     "
 `;
 
+exports[`link links a struct and field 1`] = `
+"
+    struct _01_Foo { bar: f32 };
+    fn _01_access(foo: _01_Foo) -> f32 { return foo.bar; }
+
+
+    fn main() {
+      var a = getPosition(0);
+    }
+    "
+`;
+
 exports[`link links an external 1`] = `
 "
     fn _01_main() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }

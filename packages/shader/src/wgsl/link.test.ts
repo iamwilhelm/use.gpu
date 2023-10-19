@@ -245,6 +245,37 @@ describe("link", () => {
     expect(linked).toMatch(/fn _[A-Za-z0-9]{2,}_getPosition\(\)/);
 
   });
+  
+  it("links a struct and field", () => {
+
+    const sub1 = `
+    @export struct Foo { bar: f32 };
+    @export fn access(foo: Foo) -> f32 { return foo.bar; }
+    fn bar() -> Foo { return Foo(1.0); }
+    `
+
+    const main = `
+    @link struct Foo;
+    @link fn access(foo: Foo) -> f32;
+
+    fn main() {
+      var a = getPosition(0);
+    }
+    `
+
+    const modMain = loadModule(main, 'main');
+    const modSub1 = loadModule(sub1, 'sub1');
+
+    const Foo = {...modSub1, entry: 'Foo'};
+    const access = {...modSub1, entry: 'access'};
+
+    const linked = linkModule(modMain, {}, {Foo, access});
+    expect(linked).toMatchSnapshot();
+
+    expect(linked).toMatch(/Foo { bar: f32 }/);
+    expect(linked).not.toMatch(/fn _[A-Za-z0-9]{2,}bar\(\)/);
+
+  });
 
   it("hoists an enable directive", () => {
     

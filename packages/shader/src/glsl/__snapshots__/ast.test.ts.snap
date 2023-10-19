@@ -222,6 +222,9 @@ Array [
       },
     },
     "identifiers": Array [
+      "SolidVertex",
+      "vertexIndex",
+      "instanceIndex",
       "position",
       "getPosition",
       "instanceIndex",
@@ -1096,13 +1099,6 @@ Array [
     "identifiers": Array [
       "VIEW_BINDGROUP",
       "VIEW_BINDING",
-      "projectionMatrix",
-      "viewMatrix",
-      "viewPosition",
-      "viewResolution",
-      "viewSize",
-      "viewWorldDepth",
-      "viewPixelRatio",
     ],
     "struct": Object {
       "name": "viewUniforms",
@@ -1765,8 +1761,13 @@ Array [
   ],
   Array [
     2,
-    32,
-    41,
+    2,
+    10,
+  ],
+  Array [
+    2,
+    30,
+    39,
   ],
   Array [
     2,
@@ -1785,13 +1786,23 @@ Array [
   ],
   Array [
     2,
-    11,
-    17,
+    2,
+    7,
+  ],
+  Array [
+    2,
+    9,
+    15,
   ],
   Array [
     2,
     9,
     10,
+  ],
+  Array [
+    2,
+    2,
+    4,
   ],
 ]
 `;
@@ -1931,8 +1942,13 @@ Object {
     ],
     Array [
       2,
-      32,
-      41,
+      2,
+      10,
+    ],
+    Array [
+      2,
+      30,
+      39,
     ],
     Array [
       2,
@@ -1951,13 +1967,23 @@ Object {
     ],
     Array [
       2,
-      11,
-      17,
+      2,
+      7,
+    ],
+    Array [
+      2,
+      9,
+      15,
     ],
     Array [
       2,
       9,
       10,
+    ],
+    Array [
+      2,
+      2,
+      4,
     ],
   ],
   "cursor": [Function],
@@ -2026,6 +2052,11 @@ Array [
     9,
     10,
   ],
+  Array [
+    2,
+    2,
+    5,
+  ],
 ]
 `;
 
@@ -2082,6 +2113,11 @@ Object {
       9,
       10,
     ],
+    Array [
+      2,
+      2,
+      5,
+    ],
   ],
   "cursor": [Function],
 }
@@ -2121,6 +2157,34 @@ float getA() {
 }
 
 "
+`;
+
+exports[`ast shakes struct type args 1`] = `
+Array [
+  Array [
+    1,
+    Array [
+      0,
+      1,
+    ],
+  ],
+  Array [
+    57,
+    Array [
+      1,
+    ],
+  ],
+]
+`;
+
+exports[`ast shakes struct type args 2`] = `
+"
+struct VertexOutput {
+  vec4 position;
+  vec4 color;
+};
+vec4 main(VertexOutput arg) { return arg.color; }
+    "
 `;
 
 exports[`ast shakes use/view AST 1`] = `

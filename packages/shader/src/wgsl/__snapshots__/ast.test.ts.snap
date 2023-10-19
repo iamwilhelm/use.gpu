@@ -77,7 +77,6 @@ Array [
         "y",
         "getValue",
         "v",
-        "xyz",
       ],
       "inferred": undefined,
       "name": "main",
@@ -243,7 +242,9 @@ Array [
       "attr": Array [
         "link",
       ],
-      "identifiers": undefined,
+      "identifiers": Array [
+        "T",
+      ],
       "inferred": Array [
         Object {
           "at": -1,
@@ -407,6 +408,7 @@ Array [
         "export",
       ],
       "identifiers": Array [
+        "SolidVertex",
         "position",
         "getPosition",
         "color",
@@ -422,11 +424,8 @@ Array [
         "xy",
         "pixelScale",
         "getPerspectiveScale",
-        "w",
         "HAS_EDGE_BLEED",
         "viewUniforms",
-        "viewResolution",
-        "zw",
         "SolidVertex",
       ],
       "inferred": undefined,
@@ -975,8 +974,6 @@ Array [
       ],
       "identifiers": Array [
         "outColor",
-        "xyz",
-        "a",
         "getFragment",
       ],
       "inferred": undefined,
@@ -1308,6 +1305,7 @@ Array [
         "fragment",
       ],
       "identifiers": Array [
+        "A",
         "foo",
       ],
       "inferred": undefined,
@@ -1707,7 +1705,6 @@ Array [
       ],
       "identifiers": Array [
         "viewUniforms",
-        "viewMatrix",
       ],
       "inferred": undefined,
       "name": "worldToView",
@@ -1731,7 +1728,6 @@ Array [
       ],
       "identifiers": Array [
         "viewUniforms",
-        "projectionMatrix",
       ],
       "inferred": undefined,
       "name": "viewToClip",
@@ -1778,10 +1774,7 @@ Array [
         "export",
       ],
       "identifiers": Array [
-        "xy",
         "viewUniforms",
-        "viewSize",
-        "z",
       ],
       "inferred": undefined,
       "name": "clipToScreen3D",
@@ -1804,10 +1797,7 @@ Array [
         "export",
       ],
       "identifiers": Array [
-        "xy",
         "viewUniforms",
-        "viewResolution",
-        "z",
       ],
       "inferred": undefined,
       "name": "screenToClip3D",
@@ -1833,8 +1823,6 @@ Array [
         "pos",
         "viewToClip",
         "worldToView",
-        "xyz",
-        "w",
       ],
       "inferred": undefined,
       "name": "worldToClip3D",
@@ -1859,13 +1847,10 @@ Array [
       "identifiers": Array [
         "m",
         "viewUniforms",
-        "projectionMatrix",
         "worldScale",
-        "viewWorldDepth",
         "clipScale",
         "mix",
         "pixelScale",
-        "viewPixelRatio",
       ],
       "inferred": undefined,
       "name": "getPerspectiveScale",
@@ -2386,7 +2371,6 @@ Array [
         "nextEdge",
         "atomicAdd",
         "indirectDraw",
-        "instanceCount",
         "activeEdges",
       ],
       "inferred": undefined,
@@ -2443,14 +2427,9 @@ Array [
     8,
   ],
   Array [
-    2,
-    8,
-    16,
-  ],
-  Array [
     3,
-    23,
-    35,
+    31,
+    43,
   ],
   Array [
     2,
@@ -2458,14 +2437,9 @@ Array [
     9,
   ],
   Array [
-    2,
-    12,
-    21,
-  ],
-  Array [
     3,
-    24,
     36,
+    48,
   ],
   Array [
     2,
@@ -2473,14 +2447,9 @@ Array [
     9,
   ],
   Array [
-    2,
-    12,
-    18,
-  ],
-  Array [
     3,
-    21,
     33,
+    45,
   ],
   Array [
     2,
@@ -2503,14 +2472,9 @@ Array [
     16,
   ],
   Array [
-    2,
-    6,
-    15,
-  ],
-  Array [
     0,
-    20,
-    298,
+    26,
+    304,
   ],
   Array [
     3,
@@ -2604,33 +2568,18 @@ Array [
   ],
   Array [
     2,
+    16,
+    17,
+  ],
+  Array [
     2,
-    10,
+    13,
+    14,
   ],
   Array [
     2,
     14,
-    15,
-  ],
-  Array [
-    2,
-    2,
-    7,
-  ],
-  Array [
-    2,
-    11,
-    12,
-  ],
-  Array [
-    2,
-    2,
-    4,
-  ],
-  Array [
-    2,
-    12,
-    25,
+    27,
   ],
 ]
 `;
@@ -2674,14 +2623,9 @@ Object {
       8,
     ],
     Array [
-      2,
-      8,
-      16,
-    ],
-    Array [
       3,
-      23,
-      35,
+      31,
+      43,
     ],
     Array [
       2,
@@ -2689,14 +2633,9 @@ Object {
       9,
     ],
     Array [
-      2,
-      12,
-      21,
-    ],
-    Array [
       3,
-      24,
       36,
+      48,
     ],
     Array [
       2,
@@ -2704,14 +2643,9 @@ Object {
       9,
     ],
     Array [
-      2,
-      12,
-      18,
-    ],
-    Array [
       3,
-      21,
       33,
+      45,
     ],
     Array [
       2,
@@ -2734,14 +2668,9 @@ Object {
       16,
     ],
     Array [
-      2,
-      6,
-      15,
-    ],
-    Array [
       0,
-      20,
-      298,
+      26,
+      304,
     ],
     Array [
       3,
@@ -2835,33 +2764,18 @@ Object {
     ],
     Array [
       2,
+      16,
+      17,
+    ],
+    Array [
       2,
-      10,
+      13,
+      14,
     ],
     Array [
       2,
       14,
-      15,
-    ],
-    Array [
-      2,
-      2,
-      7,
-    ],
-    Array [
-      2,
-      11,
-      12,
-    ],
-    Array [
-      2,
-      2,
-      4,
-    ],
-    Array [
-      2,
-      12,
-      25,
+      27,
     ],
   ],
   "cursor": [Function],
@@ -2969,11 +2883,6 @@ Array [
     22,
     23,
   ],
-  Array [
-    2,
-    2,
-    5,
-  ],
 ]
 `;
 
@@ -3040,11 +2949,6 @@ Object {
       22,
       23,
     ],
-    Array [
-      2,
-      2,
-      5,
-    ],
   ],
   "cursor": [Function],
 }
@@ -3095,6 +2999,34 @@ fn getA() -> f32 {
 }
 
 "
+`;
+
+exports[`ast shakes struct type args 1`] = `
+Array [
+  Array [
+    0,
+    Array [
+      0,
+      1,
+    ],
+  ],
+  Array [
+    79,
+    Array [
+      1,
+    ],
+  ],
+]
+`;
+
+exports[`ast shakes struct type args 2`] = `
+"
+struct VertexOutput {
+  @builtin(position) position: vec4f,
+  color: vec4f,
+}
+@fragment fn main(arg: VertexOutput) -> @location(0) vec4f { return arg.color; }
+    "
 `;
 
 exports[`ast shakes use/view AST 1`] = `

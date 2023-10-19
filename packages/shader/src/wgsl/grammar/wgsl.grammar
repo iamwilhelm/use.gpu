@@ -49,8 +49,9 @@ FunctionCall<content> { content }
 Value<content> { content }
 
 GlobalVariableDeclaration {
-  AttributeList VariableDeclaration (Assign Value<constExpression>)?
+  AttributeList GlobalVariable (Assign Value<constExpression>)?
 }
+GlobalVariable { k<'var'> VariableQualifier? VariableIdentifier }
 
 GlobalConstantDeclaration {
   AttributeList k<'const'> VariableIdentifier Assign Value<constExpression> |
@@ -59,25 +60,22 @@ GlobalConstantDeclaration {
 
 TypeAliasDeclaration { AttributeList k<'type'> Identifier (Assign TypeDeclaration)? }
 
-StructDeclaration { AttributeList k<'struct'> Identifier StructBodyDeclaration }
+StructDeclaration { AttributeList k<'struct'> Identifier StructBodyDeclaration? }
 StructBodyDeclaration { '{' ((StructMember comma)* StructMember comma?)? '}' }
-StructMember { AttributeList variableIdentifierDeclaration }
+StructMember { AttributeList PrivateIdentifier colon TypeDeclaration }
 
 FunctionDeclaration { AttributeList FunctionHeader CompoundStatement? }
 FunctionHeader { k<'fn'> Identifier '(' ParamList ')' ReturnType }
 ReturnType { (arrow AttributeList TypeDeclaration)? }
 
 ParamList { ((Param comma)* Param comma?)? }
-Param { AttributeList variableIdentifierDeclaration }
+Param { AttributeList Identifier colon TypeDeclaration }
 
-VariableIdentifier { Identifier | variableIdentifierDeclaration }
-
-VariableDeclaration { k<'var'> VariableQualifier? VariableIdentifier }
+VariableIdentifier { Identifier | Identifier colon TypeDeclaration }
 VariableQualifier { template<addressSpace (comma accessMode)?> }
-variableIdentifierDeclaration { Identifier colon TypeDeclaration }
 
 variableStatement {
-  VariableDeclaration (Assign Value<expression>)? |
+  k<'var'> VariableQualifier? VariableIdentifier (Assign Value<expression>)? |
   k<'let'> VariableIdentifier Assign Value<expression>
 }
 
@@ -181,7 +179,8 @@ postfixExpression {
   FieldAccess postfixExpression?
 }
 
-FieldAccess { '.' Identifier }
+FieldAccess { '.' PrivateIdentifier }
+PrivateIdentifier { Identifier }
 
 unaryExpression {
   singularExpression |
@@ -309,6 +308,18 @@ TypeDeclaration {
   t<'vec2'> template<TypeDeclaration>? |
   t<'vec3'> template<TypeDeclaration>? |
   t<'vec4'> template<TypeDeclaration>? |
+  t<'vec2i'> |
+  t<'vec3i'> |
+  t<'vec4i'> |
+  t<'vec2u'> |
+  t<'vec3u'> |
+  t<'vec4u'> |
+  t<'vec2f'> |
+  t<'vec3f'> |
+  t<'vec4f'> |
+  t<'vec2h'> |
+  t<'vec3h'> |
+  t<'vec4h'> |
   t<'ptr'> template<addressSpace comma TypeDeclaration (comma accessMode)?> |
   arrayTypeDeclaration |
   t<'mat2x2'> template<TypeDeclaration>? |

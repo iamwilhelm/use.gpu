@@ -533,6 +533,29 @@ const x: f32 = 1.0;
     const ops = resolveShakeOps(shake, keep, symbols);
     expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
   });
+
+  it('shakes struct type args', () => {
+    const code = `
+struct VertexOutput {
+  @builtin(position) position: vec4f,
+  color: vec4f,
+}
+@fragment fn main(arg: VertexOutput) -> @location(0) vec4f { return arg.color; }
+    `;
+
+    const tree = parseShader(code);
+    const ast = makeGuardedParser(code, tree);
+    const {symbols} = ast.getSymbolTable();
+    const shake = ast.getShakeTable();
+
+    expect(shake).toBeTruthy();
+    expect(shake).toMatchSnapshot();
+    if (!shake) return;
+    
+    const keep = new Set(['main']);
+    const ops = resolveShakeOps(shake, keep, symbols);
+    expect(rewriteUsingAST(code, tree, new Map(), ops)).toMatchSnapshot();
+  });
   
   it('shakes use/view AST', () => {
     const code = WGSLModules['@use-gpu/wgsl/use/view'];

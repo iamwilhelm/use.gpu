@@ -5,7 +5,7 @@ Program                                                     ⮐ var foo: f32 = 1
   LocalDeclaration                                          ⮐ var foo: f32 = 1.0;
     GlobalVariableDeclaration                               ⮐ var foo: f32 = 1.0
       AttributeList                                         
-      VariableDeclaration                                   var foo: f32
+      GlobalVariable                                        var foo: f32
         Keyword                                             var
         VariableIdentifier                                  foo: f32
           Identifier                                        foo
@@ -39,12 +39,14 @@ Program                                                     ⮐ struct light {�
       StructBodyDeclaration                                 {⮐   intensity: f32,⮐   position: vec3<f32>,⮐ }
         StructMember                                        ⮐   intensity: f32
           AttributeList                                     
-          Identifier                                        intensity
+          PrivateIdentifier                                 intensity
+            Identifier                                      intensity
           TypeDeclaration                                   f32
             Type                                            f32
         StructMember                                        ⮐   position: vec3<f32>
           AttributeList                                     
-          Identifier                                        position
+          PrivateIdentifier                                 position
+            Identifier                                      position
           TypeDeclaration                                   vec3<f32>
             Type                                            vec3
             TypeDeclaration                                 f32
@@ -92,7 +94,8 @@ Program                                                     ⮐ struct A {⮐   
             Attribute                                       @location(0)
               Identifier                                    location
               IntLiteral                                    0
-          Identifier                                        x
+          PrivateIdentifier                                 x
+            Identifier                                      x
           TypeDeclaration                                   f32
             Type                                            f32
         StructMember                                        @location(1) y: f32
@@ -100,7 +103,8 @@ Program                                                     ⮐ struct A {⮐   
             Attribute                                       @location(1)
               Identifier                                    location
               IntLiteral                                    1
-          Identifier                                        y
+          PrivateIdentifier                                 y
+            Identifier                                      y
           TypeDeclaration                                   f32
             Type                                            f32
   LocalDeclaration                                          @fragment⮐ fn fragShader(in1: A, @location(2) in2: f32) -> @location(0) vec4<f32> {⮐ }
@@ -167,7 +171,8 @@ Program                                                     ⮐ const foo: f32 =
       StructBodyDeclaration                                 { x: i32 }
         StructMember                                         x: i32
           AttributeList                                     
-          Identifier                                        x
+          PrivateIdentifier                                 x
+            Identifier                                      x
           TypeDeclaration                                   i32
             Type                                            i32
   LocalDeclaration                                          ⮐ fn main() -> @builtin vec4<f32> {⮐   var bar: i32 = wat(5, 6);⮐   let x: i32 = 4 + 5 + -6 + (-7);⮐   return vec4<f32>(0.1, 0.2, 0.3, 1.0);⮐ }
@@ -187,12 +192,11 @@ Program                                                     ⮐ const foo: f32 =
               Type                                          f32
       CompoundStatement                                     {⮐   var bar: i32 = wat(5, 6);⮐   let x: i32 = 4 + 5 + -6 + (-7);⮐   return vec4<f32>(0.1, 0.2, 0.3, 1.0);⮐ }
         Statement                                           var bar: i32 = wat(5, 6);
-          VariableDeclaration                               var bar: i32
-            Keyword                                         var
-            VariableIdentifier                              bar: i32
-              Identifier                                    bar
-              TypeDeclaration                               i32
-                Type                                        i32
+          Keyword                                           var
+          VariableIdentifier                                bar: i32
+            Identifier                                      bar
+            TypeDeclaration                                 i32
+              Type                                          i32
           Assign                                            =
           Value                                             wat(5, 6)
             FunctionCall                                    wat
@@ -510,14 +514,14 @@ Program                                                     ⮐ var foo;⮐ // v
   LocalDeclaration                                          ⮐ var foo;
     GlobalVariableDeclaration                               ⮐ var foo
       AttributeList                                         
-      VariableDeclaration                                   var foo
+      GlobalVariable                                        var foo
         Keyword                                             var
         VariableIdentifier                                  foo
           Identifier                                        foo
   LocalDeclaration                                          ⮐ // var foo;⮐ var foo;
     GlobalVariableDeclaration                               ⮐ // var foo;⮐ var foo
       AttributeList                                         
-      VariableDeclaration                                   var foo
+      GlobalVariable                                        var foo
         Keyword                                             var
         VariableIdentifier                                  foo
           Identifier                                        foo
@@ -533,17 +537,52 @@ Program                                                     ⮐ struct __undersc
       StructBodyDeclaration                                 {⮐   foo: f32,⮐   _bar: f32,⮐   __baz: f32,⮐ }
         StructMember                                        ⮐   foo: f32
           AttributeList                                     
-          Identifier                                        foo
+          PrivateIdentifier                                 foo
+            Identifier                                      foo
           TypeDeclaration                                   f32
             Type                                            f32
         StructMember                                        ⮐   _bar: f32
           AttributeList                                     
-          Identifier                                        _bar
+          PrivateIdentifier                                 _bar
+            Identifier                                      _bar
           TypeDeclaration                                   f32
             Type                                            f32
         StructMember                                        ⮐   __baz: f32
           AttributeList                                     
-          Identifier                                        __baz
+          PrivateIdentifier                                 __baz
+            Identifier                                      __baz
           TypeDeclaration                                   f32
             Type                                            f32
+`;
+
+exports[`WGSL grammar snapshots parses a test program 16`] = `
+Program                                                     ⮐ @fragment fn main(arg: VertexOutput) -> @location(0) vec4f { return arg.color; }⮐ 
+  LocalDeclaration                                          @fragment fn main(arg: VertexOutput) -> @location(0) vec4f { return arg.color; }
+    FunctionDeclaration                                     @fragment fn main(arg: VertexOutput) -> @location(0) vec4f { return arg.color; }
+      AttributeList                                         @fragment
+        Attribute                                           @fragment
+          Identifier                                        fragment
+      FunctionHeader                                        fn main(arg: VertexOutput) -> @location(0) vec4f
+        Keyword                                             fn
+        Identifier                                          main
+        ParamList                                           arg: VertexOutput
+          Param                                             arg: VertexOutput
+            AttributeList                                   
+            Identifier                                      arg
+            TypeDeclaration                                 VertexOutput
+              Identifier                                    VertexOutput
+        ReturnType                                          -> @location(0) vec4f
+          AttributeList                                     @location(0)
+            Attribute                                       @location(0)
+              Identifier                                    location
+              IntLiteral                                    0
+          TypeDeclaration                                   vec4f
+            Type                                            vec4f
+      CompoundStatement                                     { return arg.color; }
+        Statement                                           return arg.color;
+          Keyword                                           return
+          Identifier                                        arg
+          FieldAccess                                       .color
+            PrivateIdentifier                               color
+              Identifier                                    color
 `;

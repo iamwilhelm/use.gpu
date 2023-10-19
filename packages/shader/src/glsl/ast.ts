@@ -38,13 +38,28 @@ const isSpace = (s: string, i: number) => {
 };
 
 // Parse AST for given code string
-export const makeASTParser = (code: string, tree: Tree) => {
+export const makeASTParser = (code: string, tree: Tree, name?: string) => {
 
   const throwError = (t: string, n?: SyntaxNode) => {
     if (!n) throw new Error(`Missing node`);
-    console.log(formatAST(tree.topNode, code));
-    const loc = name != null ? ` in ${name}` : '';
-    throw new Error(`Error parsing: ${t} node '${code.slice(n.from, n.to)}'${loc}\n${formatAST(n, code)}`);
+
+    while (n.parent) {
+      if (n.from !== n.to) break;
+      n = n.parent;
+    }
+    
+    let start = n.from;
+    let end = n.to;
+    while (start > 0 && code.charAt(start - 1) !== "\n") start--;
+    while (end < code.length - 1 && code.charAt(end + 1) !== "\n") end++;
+
+    const loc = name != null ? ` '${name}'` : '';
+    throw new Error(
+      `Error parsing${loc}: ${t} in '${code.slice(n.from, n.to)}'\n`+
+      `${code.slice(start, end)}\n`+
+      `${" ".repeat(n.from - start)}^\n\n`+
+      formatAST(n, code)
+    );
   }
 
   const getNodes = (node: SyntaxNode, min?: number) => {
@@ -181,7 +196,9 @@ export const makeASTParser = (code: string, tree: Tree) => {
     const at = node.from;
 
     const symbols = [func.name];
-    const identifiers = b ? getIdentifiers(b, symbols) : undefined;
+    const ids1 = getIdentifiers(a, symbols);
+    const ids2 = b ? getIdentifiers(b, symbols) : undefined;
+    const identifiers = ids1 && ids2 ? [...ids1, ...ids2] : ids1 ?? ids2;
 
     return {at, symbols, identifiers, flags, func};
   };
@@ -299,19 +316,18 @@ export const makeASTParser = (code: string, tree: Tree) => {
 
     const visit = () => {
       const {type} = cursor;
-      if (type.name === 'Field') {
-        const sub = cursor.node.cursor();
-        do {} while (sub.firstChild());
-        const t = getText(sub);
-        ids.add(t);
-        cursor.lastChild();
+      if (type.name === 'PrivateIdentifier') {
+        return false;
       }
-      else if (type.name === 'Identifier' || type.name === 'Id') {
+      else if (type.name === 'Identifier') {
         const t = getText(cursor);
         if (!IGNORE_IDENTIFIERS.has(t)) ids.add(t);
       }
     }
-    do { visit(); } while (cursor.next() && cursor.from < to);
+    do {
+      if (visit() === false) cursor.lastChild();
+      if (!cursor.next()) break;
+    } while (cursor.from < to);
 
     return Array.from(ids).filter(s => exclude.indexOf(s) < 0);
   };
@@ -361,7 +377,7 @@ export const makeASTParser = (code: string, tree: Tree) => {
   }
 
   const getDeclarations = (): DeclarationRef[] => {
-    const children = tree.topNode.getChildren(T.Declaration);
+    const children = tree.topNode.getChildren(T.GlobalDeclaration);
     return children.map(getDeclaration);
   };
 
@@ -487,7 +503,7 @@ export const rewriteUsingAST = (
     if (type.name === 'Skip') skip(from, to);
     
     // Top level declaration
-    else if (type.name === 'Declaration' || type.name === 'FunctionDefinition' || type.name === 'Shake') {
+    else if (type.name === 'GlobalDeclaration' || type.name === 'FunctionDefinition' || type.name === 'Shake') {
       if (cursor.node.parent?.type.name !== 'Program') continue;
       if (!shakes) continue;
       if (shakes.has(from)) {
@@ -558,7 +574,7 @@ export const compressAST = (
   do {
     const {type, from, to} = cursor;
 
-    if (type.name === 'Declaration' || type.name === 'FunctionDefinition') {
+    if (type.name === 'GlobalDeclaration' || type.name === 'FunctionDefinition') {
       if (cursor.node.parent?.type.name === 'Program') shake(from, to);
     }
     else if (type.name === 'Identifier') {

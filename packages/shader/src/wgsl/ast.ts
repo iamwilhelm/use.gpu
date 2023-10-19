@@ -31,6 +31,7 @@ import { getTypeName, getAttributeName, getAttributeArgs } from './type';
 import uniq from 'lodash/uniq';
 
 const NO_STRINGS = [] as string[];
+const NO_MEMBERS = [] as StructMemberRef[];
 const VOID_TYPE = 'void';
 const AUTO_TYPE = 'auto';
 const PRIVATE_ATTRIBUTES = new Set(['@export', '@link', '@global', '@optional', '@infer']);
@@ -96,6 +97,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const visit = () => {
       const {type} = cursor;
       if (type.id === T.Attribute) {
+        return false;
+      }
+      if (type.id === T.PrivateIdentifier) {
         return false;
       }
       if (type.id === T.Identifier) {
@@ -202,7 +206,10 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const {name, type, parameters} = header;
 
     const exclude = parameters ? parameters.map(p => (p as any).name) : undefined;
-    const identifiers = c ? getIdentifiers(c, name, exclude) : undefined;
+
+    const ids1 = getIdentifiers(b, name, exclude);
+    const ids2 = c ? getIdentifiers(c, name, exclude) : undefined;
+    const identifiers = ids1 && ids2 ? [...ids1, ...ids2] : ids1 ?? ids2;
 
     return {name, type, attr, parameters, identifiers, inferred};
   };
@@ -297,7 +304,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     
     const attr = getAttributes(a);
     const name = getText(b);
-    const members = getStructMembers(c);
+    const members = c ? getStructMembers(c) : NO_MEMBERS;
 
     return {name, attr, members};
   };
@@ -630,6 +637,10 @@ export const rewriteUsingAST = (
       }
     }
 
+    else if (type.name === 'PrivateIdentifier') {
+      while (cursor.lastChild()) {};
+    }
+
     // Any identifier (both full and compressed AST)
     else if (type.name === 'Identifier') {
       const name = code.slice(from, to);
@@ -729,8 +740,13 @@ export const compressAST = (
   do {
     const {type, from, to} = cursor;
 
+    // Preserve private identifiers
+    if (type.name === 'PrivateIdentifier') {
+      while (cursor.lastChild()) {};
+    }
+    
     // Any identifier
-    if (type.name === 'Identifier') {
+    else if (type.name === 'Identifier') {
       ident(from, to);
     }
 

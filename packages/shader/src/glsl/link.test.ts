@@ -108,14 +108,14 @@ describe("link", () => {
     vec4 getColor() {
       return colorUsed;
     }
-    `
+    `;
 
     const main = `
     vec4 getColor();
     void main() {
       vec4 a = getColor();
     }
-    `
+    `;
 
     for (let compressed of [false, true]) {
       const modMain = loadModule(main, 'main', undefined, compressed);

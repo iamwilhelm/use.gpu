@@ -61,8 +61,8 @@ export const DebugAxesPage: LC = (props) => {
         const fragment = useBoundShader(cubeMaterial, [texture]);
 
         return (
-          <LinearRGB tonemap="aces">
-            <Loop>
+          <Loop>
+            <LinearRGB tonemap="aces">
               <Cursor cursor='move' />
               <Camera>
                 <Pass lights>
@@ -79,8 +79,8 @@ export const DebugAxesPage: LC = (props) => {
 
                 </Pass>
               </Camera>
-            </Loop>
-          </LinearRGB>
+            </LinearRGB>
+          </Loop>
         );
       }}
     />

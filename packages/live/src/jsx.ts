@@ -64,7 +64,7 @@ export const createElement = (type: ArrowFunction, props: any, ...children: any[
         return capture(props?.context, toChildren(props?.children ?? children), props?.then, props?.key);
 
       case YEET:
-        return yeet((props?.children ?? children)[0], props?.key);
+        return yeet(toChildren(props?.children ?? children), props?.key);
 
       case SIGNAL:
         return signal(props?.key);

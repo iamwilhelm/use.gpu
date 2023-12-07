@@ -4,6 +4,8 @@ import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, Fa
 
 import { DeviceContext } from '../providers/device-provider';
 import { use, keyed, signal, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
+import { toMurmur53, hashBits53 } from '@use-gpu/state';
+import { getBundleKey } from '@use-gpu/shader';
 import {
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -45,7 +47,9 @@ const gatherItemChunks = (items: LayerAggregate[]) => {
 };
 
 const getItemSummary = (items: LayerAggregate[]) => {
-  const keys = items.reduce(allKeys, new Set());
+  const keys = new Set<string>();
+  if (items.length) allKeys(keys, items[0]);
+
   const count = items.reduce(allCount, 0);
   const indices = items.reduce(allIndices, 0);
   const memoKey = Array.from(keys).join('/');
@@ -54,28 +58,37 @@ const getItemSummary = (items: LayerAggregate[]) => {
 }
 
 /** Aggregate (point / line / face) geometry from children to produce merged layers. */
-export const VirtualLayers: LiveComponent<VirtualLayersProps> = memo((props: VirtualLayersProps) => {
+export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualLayersProps) => {
   const {items, children} = props;
   return items ? Resume(items) : children ? multiGather(children, Resume) : null;
-}, 'VirtualLayers');
+};
 
 const Resume = (
   aggregates: Record<string, LayerAggregate[]>,
-) => {
+) => useOne(() => {
   const els: LiveElement[] = [];
 
   for (const type in aggregates) {
     const items = aggregates[type];
     if (!items.length) continue;
 
+    const partitioner = makePartitioner();
+    for (let item of items) if (item) {
+      partitioner.push(item);
+    }
+    const layers = partitioner.resolve();
+
+    const group = [];
     const makeAggregator = AGGREGATORS[type]!;
-    els.push(keyed(Layer, type, makeAggregator, aggregates[type]));
+    for (const layer of layers) {
+      group.push(keyed(Layer, layer.key, makeAggregator, layer.items));
+    }
+
+    els.push(group);
   }
 
-  els.push(signal());
-
   return els;
-};
+}, aggregates);
 
 const Layer: LiveFunction<any> = (
   makeAggregator: LayerAggregator,
@@ -91,7 +104,7 @@ const Layer: LiveFunction<any> = (
     makeAggregator(device, items, keys, allocCount, allocIndices),
     [memoKey, allocCount, allocIndices]
   );
-  
+
   return render(items, count, indices);
 };
 
@@ -172,7 +185,7 @@ const makeLineAccumulator = (
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
     if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
     if (hasWidth) props.widths = updateAggregateBuffer(device, storage.widths, items, count, 'width', 'widths');
-    if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depths, items, count, 'depth', 'depths');    
+    if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depths, items, count, 'depth', 'depths');
     if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
     if (hasID) props.ids = updateAggregateBuffer(device, storage.ids, items, count, 'id', 'ids');
     if (hasLookup) props.lookups = updateAggregateBuffer(device, storage.lookups, items, count, 'lookup', 'lookups');
@@ -216,6 +229,7 @@ const makeFaceAccumulator = (
     const offsets = accumulate(chunks);
 
     if (hasIndex) {
+      props.count = indices / 3;
       props.indices = updateAggregateIndex(device, storage.indices, items, indices, offsets, 'index', 'indices');
     }
     else {
@@ -251,4 +265,49 @@ const accumulate = (xs: number[]): number[] => {
     accum += xs[i];
   }
   return out;
+}
+
+const getItemTypeKey = (item: LayerAggregate) =>
+  (item as any).f ? -1 : (
+    ('transform' in item && item.transform ? getBundleKey(item.transform) : 0) ^
+    ('cullMode' in item ? toMurmur53(item.cullMode) : 0) ^
+    ('shape' in item ? toMurmur53(item.shape) : 0) ^
+    (item.archetype != null ? item.archetype : (
+      (+((item as any).position != null  || (item as any).positions != null))     |
+      (+((item as any).segment != null   || (item as any).segments != null) << 1) |
+      (+((item as any).color != null     || (item as any).colors != null) << 2)   |
+      (+((item as any).width != null     || (item as any).widths != null) << 3)   |
+      (+((item as any).depth != null     || (item as any).depths != null) << 4)   |
+      (+((item as any).zBias != null     || (item as any).zBias != null) << 5)    |
+      (+((item as any).id != null        || (item as any).ids != null) << 6)      |
+      (+((item as any).lookup != null    || (item as any).lookups != null) << 7)  |
+      (+((item as any).size != null      || (item as any).size != null) << 8)     |
+      (+((item as any).index != null     || (item as any).indices != null) << 9)
+    ))
+  );
+
+type Partition = {
+  key: number,
+  items: LayerAggregate[],
+};
+
+const makePartitioner = () => {
+  const layers: Partition[] = [];
+  const map = new Map<number, Partition>();
+
+  const push = (item: LayerAggregate) => {
+    const key = getItemTypeKey(item);
+    const existing = map.get(key);
+    if (existing) {
+      existing.items.push(item);
+    }
+    else {
+      const partition = {key, items: [item]};
+      map.set(key, partition);
+      layers.push(partition);
+    }
+  };
+
+  const resolve = () => layers;
+  return {push, resolve};
 }

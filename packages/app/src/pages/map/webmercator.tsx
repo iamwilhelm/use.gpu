@@ -1,7 +1,7 @@
 import type { LC, PropsWithChildren } from '@use-gpu/live';
 import type { Tracks } from '@use-gpu/workbench';
 
-import React, { use } from '@use-gpu/live';
+import React, { use, useContext } from '@use-gpu/live';
 
 import {
   Loop, Pass, Flat,
@@ -46,7 +46,7 @@ export const MapWebMercatorPage: LC = () => {
 
   const base = isDevelopment ? '/' : '/demo/';
   const url = base + "tiles/:zoom-:x-:y.mvt";
-  
+
   const tracks = {
     zoom: [
       [ 0, 1],
@@ -106,7 +106,7 @@ export const MapWebMercatorPage: LC = () => {
                 duration={75}
               >
                 <WebMercator
-                  bend={1}
+                  bend={0}
                   range={[[-1.5, 1.5], [-.5 - 2/3, .5 + 2/3]]}
                   long={90}
                   lat={20}
@@ -127,7 +127,7 @@ export const MapWebMercatorPage: LC = () => {
                   )}
                 </WebMercator>
                 <WebMercator
-                  bend={1}
+                  bend={0}
                   range={[[-1, 1], [-2/3, 2/3]]}
                   long={90}
                   lat={20}
@@ -191,7 +191,7 @@ export const MapWebMercatorPage: LC = () => {
                       depth={0.5}
                     />
                   </Scale>
-                
+
                 </WebMercator>
               </Animate>
             </Plot>

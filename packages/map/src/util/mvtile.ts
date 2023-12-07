@@ -22,7 +22,7 @@ export const getMVTShapes = (
   const iz = 1 / z
 
   const ox = x * iz;
-  const oy = y * iz;  
+  const oy = y * iz;
 
   const {layers} = mvt;
 
@@ -32,7 +32,7 @@ export const getMVTShapes = (
     face: [] as any[],
     label: [] as any[],
   };
-  
+
   const addPoint = (
     geometry: Vec2[],
     properties: Record<string, any>,
@@ -88,7 +88,7 @@ export const getMVTShapes = (
       });
     }
   }
-  
+
   const addPolygon = (
     geometry: XY[][][],
     properties: Record<string, any>,
@@ -160,20 +160,25 @@ export const getMVTShapes = (
   if (style) {
     addPolygon([[[[0, 0], [256, 0], [256, 256], [0, 256]]]], {}, style, 256, toPoint4);
   }
-  
+
+  //const unstyled: string[] = [];
+
   for (const k in layers) {
     const layer = layers[k];
     const {length, extent, name} = layer;
-    
+
     //console.log("layer", name, layer, length)
 
     for (let i = 0; i < length; ++i) {
       const feature = layer.feature(i);
       const {type: t, properties, extent} = feature;
-    
+
       const klass = properties['class'] as any as string;
 
-      const style = styles[name + '/'+ klass] ?? styles[name] ?? styles[klass] ?? styles.default;
+      const ownStyles = styles[name + '/'+ klass] ?? styles[name] ?? styles[klass];
+      const style = ownStyles ?? styles.default;
+
+      //if (!ownStyles) unstyled.push(`${klass}/${name} ${t}`);
 
       const toPoint = ({x, y}: Vec2): XY => [x, y];
       const toPoint4 = ([x, y]: XY): XYZW => [
@@ -210,13 +215,15 @@ export const getMVTShapes = (
     }
   }
 
-  return shapes;    
+  //console.log({unstyled})
+
+  return shapes;
 };
 
 const tesselateGeometry = (polygons: XY[][][], [l, t, r, b]: XYZW, limit: number = 1, depth: number = 0): XY[][][] => {
   const x = (l + r) / 2;
   const y = (t + b) / 2;
-  
+
   const ll: XY[][][] = cutPolygons(polygons, -1, 0, -x);
   const rr: XY[][][] = cutPolygons(polygons,  1, 0,  x);
 

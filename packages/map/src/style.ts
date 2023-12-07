@@ -18,6 +18,14 @@ export const DEFAULT_STYLE_SHEET = {
       zBias: 2,
     },
   },
+  road: {
+    line: {
+      color: parseColor('#50579f'),
+      width: 2,
+      depth: 0.5,
+      zBias: 2,
+    },
+  },
   background: {
     face: {
       fill: parseColor('#0a0a10'),

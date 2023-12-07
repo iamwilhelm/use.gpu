@@ -61,7 +61,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
 
   const dx = Math.abs(maxX - minX) / 2;
   const dy = Math.abs(maxY - minY) / 2;
-  
+
   const zoom = Math.max(minLevel, Math.ceil(-Math.log2(Math.min(dx, dy) / detail)));
   const tile = Math.pow(2, zoom);
 
@@ -70,14 +70,14 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
 
   const maxIX = Math.ceil((maxX * .5 + .5) * tile);
   const maxIY = Math.ceil((maxY * .5 + .5) * tile);
-  
+
   const out: LiveElement[] = [];
-  
+
   const w = maxIX - minIX;
   const h = maxIY - minIY;
 
   seen.clear();
-  
+
   const tesselate = 5 - zoom;
   const gz = 1 << (zoom);
 
@@ -94,7 +94,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
 
       const key = getKey(xx, yy, zoom);
       if (seen.has(key)) continue;
-      
+
       const upKey = getUpKey(xx, yy, zoom);
       const upLoaded = loaded.get(upKey) || 0;
       const upCount = upX * upY;
@@ -115,7 +115,7 @@ export const MVTiles: LiveComponent<MVTilesProps> = (props: PropsWithChildren<MV
     }
   }
 
-  return useOne(() => use(VirtualLayers, { children: out }));
+  return use(VirtualLayers, { children: out });
 };
 
 const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
@@ -140,7 +140,7 @@ const MVTile: LiveComponent<MVTileProps> = memo((props: MVTileProps) => {
 
         return shapes;
       })
-      .catch(e => console.error(e))
+      .catch(e => console.error('Tile', {x, y, zoom}, e))
   ), [key, styles, flipY]);
 
   let s: any;

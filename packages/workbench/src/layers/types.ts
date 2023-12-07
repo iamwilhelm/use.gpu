@@ -17,9 +17,12 @@ export type LayerAggregator = (
 ) => LiveElement;
 
 export type PointAggregate = {
-  type: 'point',
   id: number,
   count: number,
+  archetype?: number,
+  transform?: any,
+
+  shape?: PointShape,
 
   positions?: number[],
   colors?: number[],
@@ -33,10 +36,11 @@ export type PointAggregate = {
 };
 
 export type LineAggregate = {
-  type: 'line',
   id: number,
   count: number,
   isLoop?: boolean,
+  archetype?: number,
+  transform?: any,
 
   positions?: number[],
   segments?: number[],
@@ -52,9 +56,10 @@ export type LineAggregate = {
 };
 
 export type FaceAggregate = {
-  type: 'face',
   id: number,
   count: number,
+  archetype?: number,
+  transform?: any,
 
   cullMode?: 'front' | 'back' | 'none',
 

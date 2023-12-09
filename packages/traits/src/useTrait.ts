@@ -50,7 +50,7 @@ export const makeParseTrait = <A, B>(
 ): UseTrait<A, B> => (props) => parseTrait(props, t);
 
 const useTrait = <A, B>(
-  props: A,
+  props: Partial<A>,
   t: Trait<A, B>,
 ): B => {
   const parsed: any = useOne(makeObject);
@@ -59,7 +59,7 @@ const useTrait = <A, B>(
 };
 
 const parseTrait = <A, B>(
-  props: A,
+  props: Partial<A>,
   t: Trait<A, B>,
 ): B => {
   const parsed: any = {};

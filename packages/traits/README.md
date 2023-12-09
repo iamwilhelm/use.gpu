@@ -12,14 +12,56 @@ yarn add @use-gpu/text
 
 # Live - Component Traits
 
-- Smart input parsers for 'common uncommon' types (enums, colors, vectors, quaternions, ...)
-- Define a type and parser for a set of props
-- Use as prop mix-ins for a family of related components
+Solves the problem of adding the same props to many components, with sensible default handling.
+
+- Define a parser and a default value for a set of props
+- Use as a type safe mix-in for a family of related components
+
+Using many mix-ins together is encouraged and optimized.
+
+See `@use-gpu/core` for useful parsers (e.g. colors).
+
+#### Example
+
+```tsx
+import { trait, combine, TraitProps, makeUseTrait } from '@use-gpu/traits';
+import { parseNumber, parseBoolean, parseColor } from '@use-gpu/core';
+
+// Define a mix-in of 3 props
+const StyleTrait = trait({
+  // A parser is any function `(value?: A) => B`.
+  size:    parseNumber,
+  rounded: parseBoolean,
+  color:   optional(parseColor),
+}, {
+  // Specify defaults
+  size: 1,
+  rounded: true,
+});
+
+// Make an invokable hook out of a trait
+const useTraits = makeUseTrait(StyleTrait);
+
+// OR Combine multiple traits
+const traits = combine(StyleTrait, ...);
+const useTraits = makeUseTrait(traits);
+
+// Infer complete component type
+type ComponentProps = TraitProps<typeof traits>;
+
+// Use in a component
+const MyComponent = (props: ComponentProps) => {
+  const {color, opacity} = useTraits(props);
+};
+
 
 #### Parsers
 
+Parsers can be used on individual props with `useProp`:
+
 ```tsx
-import { parseColor } from '@use-gpu/traits';
+import { parseColor } from '@use-gpu/core';
+import { useProp, optional } from '@use-gpu/traits';
 
 // Required prop: Color
 const value = useProp(props.value, parseColor);
@@ -35,8 +77,13 @@ Here, `parseColor` will parse CSS colors like `#123456` or `rgba(…)` and retur
 #### Traits
 
 ```tsx
-const parsers = {...};
-const defaults = {...};
+import { trait,  } from '@use-gpu/traits';
+
+const ColorTrait = trait({
+  color: parseColor,
+}, {
+  color: '#808080',
+});
 
 // Outside a component
 const useTrait = makeUseTrait(parsers, defaults);

@@ -1,3 +1,4 @@
+export * from './archetype';
 export * from './aggregate';
 export * from './atlas';
 export * from './attribute';
@@ -9,10 +10,12 @@ export * from './color';
 export * from './constants';
 export * from './data';
 export * from './depth';
+export * from './flatten';
 export * from './float16';
 export * from './id';
 export * from './lazy';
 export * from './mip';
+export * from './parse';
 export * from './pipeline';
 export * from './storage';
 export * from './texture';

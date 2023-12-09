@@ -1,4 +1,4 @@
-import type { Point } from './types';
+import type { XY } from './types';
 import { cubicBezier, cubicBezierDt, cubicBezierInverse, makeDistanceMap, queryDistanceMap } from './ease';
 
 describe('ease', () => {
@@ -17,12 +17,12 @@ describe('ease', () => {
   it('distance maps', () => {
 
     const sqr = (x: number) => x * x;
-    const distance = ([x1, y1]: Point, [x2, y2]: Point) => Math.sqrt(sqr(x1 - x2) + sqr(y1 - y2));
+    const distance = ([x1, y1]: XY, [x2, y2]: XY) => Math.sqrt(sqr(x1 - x2) + sqr(y1 - y2));
 
     const point = (t: number) => [
       cubicBezier(t, 0, 3, -1, 1),
       cubicBezier(t, 0, 0, 1, 1),
-    ] as Point;
+    ] as XY;
 
     const measure = (t1: number, t2: number) => {
       return distance(point(t1), point(t2))

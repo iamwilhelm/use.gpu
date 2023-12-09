@@ -1,32 +1,32 @@
-import type { ArrowFunction } from '@use-gpu/live';
-import { vec4 } from 'gl-matrix';
+export type ArrowFunction = (...args: any[]) => any;
 
-export type TypedArray =
-  Int8Array |
-  Uint8Array |
-  Int16Array |
-  Uint16Array |
-  Int32Array |
-  Uint32Array |
-  Uint8ClampedArray |
-  Float32Array |
-  Float64Array;
+export type Props = Record<string, any>;
+export type Parser<A, B> = (t?: A) => B;
 
-export type PropParser<A, B> = (t?: A) => B;
-export type PropDef = Record<string, PropParser<any, any>>;
-export type PropDefTypes<T extends Record<string, ArrowFunction>> = {
-  [P in keyof T]?: ReturnType<T[P]>;
+export type TraitDefinition = Record<string, Parser<any, any>>;
+export type InputTypes<T extends TraitDefinition> = {
+  [P in keyof T]?: Parameters<T[P]>[0];
+};
+export type OutputTypes<T extends TraitDefinition> = {
+  [P in keyof T]: ReturnType<T[P]>;
 };
 
-export type UseTrait<I, O> = (props?: Partial<I>) => O;
+export type Trait<A, B> = (input: Partial<A>, output: B) => void;
+export type UseTrait<I, O> = (props: I) => O;
 
-export type Blending = 'none' | 'alpha' | 'premultiply' | 'add' | 'subtract' | 'multiply';
-export type Join = 'miter' | 'round' | 'bevel';
-export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
-export type Domain = 'linear' | 'log';
+export type TraitProps<T> = T extends Trait<infer A, any> ? Partial<A> : never;
 
-export type Color = vec4;
-export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;
-
-export type VectorLike = TypedArray | number[];
-export type ArrayLike<T = any> = TypedArray | T[];
+export type TraitCombinator = {
+  <A, B, C, D>(a: Trait<A, B>, b: Trait<C, D>): Trait<A & C, B & D>;
+  <A, B, C, D, E, F>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>): Trait<A & C & E, B & D & F>;
+  <A, B, C, D, E, F, G, H>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>): Trait<A & C & E & G, B & D & F & H>;
+  <A, B, C, D, E, F, G, H, I, J>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>): Trait<A & C & E & G & I, B & D & F & H & J>;
+  <A, B, C, D, E, F, G, H, I, J, K, L>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>): Trait<A & C & E & G & I & K, B & D & F & H & J & L>;
+  <A, B, C, D, E, F, G, H, I, J, K, L, M, N>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>): Trait<A & C & E & G & I & K & M, B & D & F & H & J & L & N>;
+  <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>): Trait<A & C & E & G & I & K & M & O, B & D & F & H & J & L & N & P>;
+  <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>): Trait<A & C & E & G & I & K & M & O & Q, B & D & F & H & J & L & N & P & R>;
+  <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>, j: Trait<S, T>): Trait<A & C & E & G & I & K & M & O & Q & S, B & D & F & H & J & L & N & P & R & T>;
+  <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>, j: Trait<S, T>, k: Trait<U, V>): Trait<A & C & E & G & I & K & M & O & Q & S & U, B & D & F & H & J & L & N & P & R & T & V>;
+  <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>, j: Trait<S, T>, k: Trait<U, V>, l: Trait<W, X>): Trait<A & C & E & G & I & K & M & O & Q & S & U & W, B & D & F & H & J & L & N & P & R & T & V & X>;
+  <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>, j: Trait<S, T>, k: Trait<U, V>, l: Trait<W, X>, m: Trait<Y, Z>): Trait<A & C & E & G & I & K & M & O & Q & S & U & W & Y, B & D & F & H & J & L & N & P & R & T & V & X & Z>;
+};

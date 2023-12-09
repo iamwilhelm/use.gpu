@@ -1,66 +1,68 @@
-import type { ArrowFunction } from '@use-gpu/live';
 import { useOne } from '@use-gpu/live';
 import { useProp, getProp } from './useProp';
-import { PropDef, PropDefTypes, UseTrait } from './types'; 
+import { ArrowFunction, TraitDefinition, Trait, TraitCombinator, InputTypes, OutputTypes, UseTrait } from './types'; 
 
-export const makeUseTrait = <
-  T extends Record<string, any>,
-  P extends PropDef = any,
+const makeObject = () => ({});
+
+// Make parsed value optional
+export const optional = <A, B>(parse: (t?: A) => B) => (t?: A): B | undefined => t !== undefined ? parse(t) : undefined;
+
+// Make derived trait from prop definition + defaults
+export const trait = <
+  P extends TraitDefinition,
 >(
   propDef: P,
-  defaultValues: Record<string, any>
-): UseTrait<T, PropDefTypes<P>> => {
+  defaultValues?: Partial<InputTypes<P>>,
+): Trait<InputTypes<P>, OutputTypes<P>> => {
+  // Parse default inputs to default outputs
   const defaults: Record<string, any> = {};
-  for (const k in propDef) defaults[k] = propDef[k](defaultValues[k]);
-  return (props: Partial<T> | undefined) => useTrait(props, propDef, defaults);
+  if (defaultValues) for (const k in propDef) defaults[k] = (propDef as any)[k]((defaultValues as any)[k]);
+
+  // Parse input and save to output
+  return (
+    input: Partial<InputTypes<P>>,
+    output: OutputTypes<P>,
+  ) => {
+    for (const k in propDef) {
+      const v = (input as any)[k];
+      const p = useProp(v, (propDef as any)[k], defaults ? defaults[k] : undefined);
+      (output as any)[k] = p;
+    }
+  };
 };
 
-export const makeParseTrait = <
-  T extends Record<string, any>,
-  P extends PropDef = any,
->(
-  propDef: P,
-  defaultValues: Record<string, any>
-): UseTrait<T, PropDefTypes<P>> => {
-  const defaults: Record<string, any> = {};
-  for (const k in propDef) defaults[k] = propDef[k](defaultValues[k]);
-  return (props: Partial<T> | undefined) => parseTrait(props, propDef, defaults);
+// Combine traits into new trait
+export const combine: TraitCombinator = (
+  ...traits: Trait<any, any>[]
+): Trait<any, any> => (
+  input: any,
+  output: any,
+) => {
+  for (const parse of traits) parse(input, output);
 };
 
-const useTrait = <
-  T extends Record<string, any>,
-  P extends PropDef = any,
->(
-  props: Partial<T> | undefined,
-  propDef: P,
-  defaults: Record<string, any>,
-): PropDefTypes<P> => {
-  const parsed: Record<string, any> = useOne(() => ({}));
-  if (!props) return defaults;
+export const makeUseTrait = <A, B>(
+  t: Trait<A, B>,
+): UseTrait<A, B> => (props) => useTrait(props, t);
 
-  for (const k in propDef) {
-    const v = props[k];
-    parsed[k] = useProp(v, propDef[k], defaults ? defaults[k] : undefined);
-  }
+export const makeParseTrait = <A, B>(
+  t: Trait<A, B>,
+): UseTrait<A, B> => (props) => parseTrait(props, t);
 
-  return parsed as T;
+const useTrait = <A, B>(
+  props: A,
+  t: Trait<A, B>,
+): B => {
+  const parsed: any = useOne(makeObject);
+  t(props, parsed);
+  return parsed as B;
 };
 
-const parseTrait = <
-  T extends Record<string, any>,
-  P extends PropDef = any,
->(
-  props: Partial<T> | undefined,
-  propDef: P,
-  defaults: Record<string, any>,
-): PropDefTypes<P> => {
-  const parsed: Record<string, any> = {};
-  if (!props) return defaults;
-
-  for (let k in propDef) {
-    const v = props[k];
-    parsed[k] = getProp(v, propDef[k], defaults ? defaults[k] : undefined);
-  }
-
-  return parsed as T;
+const parseTrait = <A, B>(
+  props: A,
+  t: Trait<A, B>,
+): B => {
+  const parsed: any = {};
+  t(props, parsed);
+  return parsed as B;
 };

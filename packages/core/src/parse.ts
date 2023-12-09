@@ -1,6 +1,7 @@
-import type { ArrowFunction } from '@use-gpu/live';
-import type { TypedArray, Join, Blending, Placement, ColorLike, VectorLike, ArrayLike, Domain } from './types';
+import type { ArrowFunction, TypedArray, TypedArrayConstructor, Join, Blending, Placement, PointShape, ColorLike, VectorLike, ArrayLike, ColorLikes, VectorLikes, Domain } from './types';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
+import { toScalarArray, toVectorArray } from './flatten';
+import { isTypedArray } from './data';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
 const NO_VEC3 = vec3.fromValues(0, 0, 0);
@@ -18,10 +19,6 @@ const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
 
 const AXIS_NUMBERS = {'x': 0, 'y': 1, 'z': 2, 'w': 3} as Record<string, number>;
 const AXIS_LETTERS = ['x', 'y', 'z', 'w'];
-
-///////////////////////////
-
-export const optional = <A, B>(parse: (t?: A) => B) => (t?: A): B | undefined => t !== undefined ? parse(t) : undefined;
 
 ///////////////////////////
 
@@ -73,6 +70,18 @@ export const makeParseVec4 = (defaults: vec4 = NO_VEC4) => (vec?: VectorLike): v
   }
   return defaults;
 };
+
+export const makeParseBooleanArray = () => (vec?: VectorLike): Uint8Array =>
+  vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
+
+export const makeParseTypedArray = <T extends TypedArray>(
+  dims: number,
+  constructor: TypedArrayConstructor = Float32Array,
+) => (
+  vecs?: VectorLikes
+): T => {
+  return (vecs ? toVectorArray(vecs, dims, constructor) : new constructor()) as T;
+}
 
 export const makeParseMat4 = () => (matrix?: VectorLike): mat4 => {
   if (matrix != null) {
@@ -212,6 +221,12 @@ export const makeParseColor = (def: vec4 = GRAY) => (color?: ColorLike): vec4 =>
   return def;
 };
 
+export const parseColors = (colors?: ColorLikes): Float32Array => {
+  if (isTypedArray(colors)) return colors as Float32Array;
+  const parsed = (colors as any[]).map(parseColor);
+  return parseVec4Array(parsed);
+};
+
 //////////////////
 
 export const parseNumber     = makeParseNumber();
@@ -224,7 +239,14 @@ export const parseString          = makeParseString();
 export const parseStringFormatter = makeParseStringFormatter();
 export const parseStringArray     = makeParseArray(NO_STRINGS, parseString);
 
-export const parseVector     = makeParseArray(NO_VECTOR, parseNumber);
+export const parseVector = makeParseArray(NO_VECTOR, parseNumber);
+
+export const parseScalarArray  = makeParseTypedArray<Float32Array>(1);
+export const parseVec2Array    = makeParseTypedArray<Float32Array>(2);
+export const parseVec3Array    = makeParseTypedArray<Float32Array>(3);
+export const parseVec4Array    = makeParseTypedArray<Float32Array>(4);
+export const parseBooleanArray = makeParseBooleanArray();
+export const parseColorArray   = makeParseColor();
 
 export const parseColor      = makeParseColor();
 export const parseVec4       = makeParseVec4();
@@ -274,3 +296,13 @@ export const parseRange  = makeParseVec2(NO_RANGE);
 export const parseRanges = makeParseArray(NO_RANGES, parseRange);
 
 export const parseDomain = makeParseEnum<Domain>(['linear', 'log']);
+
+export const parsePointShape = makeParseEnum<PointShape>([
+  'circle',
+  'diamond',
+  'square',
+  'up',
+  'down',
+  'left',
+  'right',
+]);

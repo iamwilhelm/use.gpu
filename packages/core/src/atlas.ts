@@ -5,7 +5,7 @@ import { makeTextureDataLayout, makeDynamicTexture, uploadTexture } from './text
 import uniq from 'lodash/uniq';
 
 type Rectangle = [number, number, number, number];
-type Point = [number, number];
+type XY = [number, number];
 
 type Slot = [number, number, number, number, number, number, number, number, number];
 type Bin = Set<Slot>;
@@ -383,8 +383,8 @@ export const uploadAtlasMapping = (
 ): void => {
   const [l, t, r, b] = rect;
 
-  const offset = [l, t] as Point;
-  const size = [r - l, b - t] as Point;
+  const offset = [l, t] as XY;
+  const size = [r - l, b - t] as XY;
 
   const layout = makeTextureDataLayout(size, format);
   uploadTexture(device, texture, data, layout, size, offset);

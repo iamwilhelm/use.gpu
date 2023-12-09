@@ -1,15 +1,60 @@
 import { vec2, vec3, vec4, mat4 } from 'gl-matrix';
 
-export type Point = [number, number];
-export type Point3 = [number, number, number];
-export type Point4 = [number, number, number, number];
+// Common vector types
+
+export type XY = [number, number];
+export type XYZ = [number, number, number];
+export type XYZW = [number, number, number, number];
 export type Rectangle = [number, number, number, number];
 
-export type Dictionary<T = string> = Record<string, T>;
+export type ArrayLike<T = any> = TypedArray | T[];
+export type VectorLike = TypedArray | number[];
+export type VectorLikes = TypedArray | VectorLike[];
+
+export type Color = vec4;
+export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;
+export type ColorLikes = TypedArray | ColorLike[];
+
+// Common enums
+
+export type Blending = 'none' | 'alpha' | 'premultiply' | 'add' | 'subtract' | 'multiply';
+export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';
+export type Domain = 'linear' | 'log';
+export type Join = 'miter' | 'round' | 'bevel';
+export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+export type PointShape = 'circle' | 'diamond' | 'square' | 'up' | 'down' | 'left' | 'right';
+
+// JS utility types
+
+export type ArrowFunction = (...args: any[]) => any;
+
+export type TypedArray =
+  Int8Array |
+  Uint8Array |
+  Int16Array |
+  Uint16Array |
+  Int32Array |
+  Uint32Array |
+  Uint8ClampedArray |
+  Float32Array |
+  Float64Array;
+
+export type TypedArrayConstructor =
+  Int8ArrayConstructor |
+  Uint8ArrayConstructor |
+  Int16ArrayConstructor |
+  Uint16ArrayConstructor |
+  Int32ArrayConstructor |
+  Uint32ArrayConstructor |
+  Uint8ClampedArrayConstructor |
+  Float32ArrayConstructor |
+  Float64ArrayConstructor;
 
 export type DeepPartial<T> = T | {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
+
+// Rendering
 
 export type UseGPURenderContext = {
   width: number,
@@ -35,30 +80,6 @@ export type UseGPURenderContext = {
 export type OffscreenTarget = UseGPURenderContext & {
   source: TextureTarget,
 };
-
-export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';
-
-export type TypedArray =
-  Int8Array |
-  Uint8Array |
-  Int16Array |
-  Uint16Array |
-  Int32Array |
-  Uint32Array |
-  Uint8ClampedArray |
-  Float32Array |
-  Float64Array;
-
-export type TypedArrayConstructor =
-  Int8ArrayConstructor |
-  Uint8ArrayConstructor |
-  Int16ArrayConstructor |
-  Uint16ArrayConstructor |
-  Int32ArrayConstructor |
-  Uint32ArrayConstructor |
-  Uint8ClampedArrayConstructor |
-  Float32ArrayConstructor |
-  Float64ArrayConstructor;
 
 export type UniformType =
   | "bool"
@@ -171,39 +192,23 @@ export type UniformType =
 ;
 
 // Simple backing-agnostic mesh geometry
-export type GeometryArray = {
-  topology?: GPUPrimitiveTopology,
-  count?: number,
+export type CPUGeometry = {
   archetype?: number,
+  topology: GPUPrimitiveTopology,
+  count: number,
   bounds?: DataBounds,
-  attributes: {
-    [s: string]: TypedArray,
-  },
-  formats: {
-    [s: string]: UniformType,
-  },
-  unwelded?: {
-    [s: string]: boolean,
-  },
+  attributes: Record<string, TypedArray>,
+  formats: Record<string, UniformType>,
+  unwelded?: Record<string, boolean>,
 };
 
 export type GPUGeometry = {
+  archetype?: number,
   topology?: GPUPrimitiveTopology,
   count?: number,
-  archetype?: number,
-  unwelded?: {
-    [s: string]: boolean,
-  },
-
-  positions?: StorageSource,
-  indices?: StorageSource,
-  normals?: StorageSource,
-  tangents?: StorageSource,
-  uvs?: StorageSource,
-  sts?: StorageSource,
-  lookups?: StorageSource,
-
-  [s: string]: any, // StorageSource,
+  bounds?: DataBounds,
+  attributes?: Record<string, StorageSource>,
+  unwelded?: Record<string, boolean>,
 };
 
 // Classic vertex attributes
@@ -446,10 +451,15 @@ export type Time = {
   delta: number,
 };
 
-export type ArrayLike = any[] | TypedArray;
-
-export type AccessorSpec = string | Accessor | ArrayLike;
+export type AccessorSpec = string | Accessor | TypedArray | number[];
 export type AccessorType = 'index' | 'unwelded';
+
+export type AccessorField = {format: string, accessor?: AccessorSpec, type?: AccessorType};
+export type AccessorSchema = Record<string, string | AccessorField>;
+
+export type ArchetypeField = {format: string, plural?: string};
+export type ArchetypeSchema = Record<string, string | ArchetypeField>;
+
 export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];
 export type DataBinding<T = any, S = any> = {
   uniform: UniformAttribute,

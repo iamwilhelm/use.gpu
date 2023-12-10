@@ -188,9 +188,9 @@ export type UniformType =
 // Simple backing-agnostic mesh geometry
 export type CPUGeometry = {
   archetype?: number,
-  topology: GPUPrimitiveTopology,
-  count: number,
+  topology?: GPUPrimitiveTopology,
   bounds?: DataBounds,
+  count: number,
   attributes: Record<string, TypedArray>,
   formats: Record<string, UniformType>,
   unwelded?: Record<string, boolean>,
@@ -199,9 +199,9 @@ export type CPUGeometry = {
 export type GPUGeometry = {
   archetype?: number,
   topology?: GPUPrimitiveTopology,
-  count?: number,
   bounds?: DataBounds,
-  attributes?: Record<string, StorageSource>,
+  count?: number,
+  attributes: Record<string, StorageSource>,
   unwelded?: Record<string, boolean>,
 };
 

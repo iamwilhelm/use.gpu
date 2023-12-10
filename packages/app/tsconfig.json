@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.pkg.json",
   "references": [
     { "path": "../live" },
+    { "path": "../parse" },
     { "path": "../traits" },
     { "path": "../core" },
     { "path": "../shader" },

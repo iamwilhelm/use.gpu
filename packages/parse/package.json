@@ -1,0 +1,28 @@
+{
+  "name": "@use-gpu/parse",
+  "version": "0.10.1",
+  "main": "src/index.ts",
+  "author": "Steven Wittens <steven@acko.net>",
+  "license": "MIT",
+  "dependencies": {
+    "gl-matrix": "^3.3.0"
+  },
+  "scripts": {
+    "build": "NPM_PACKAGE=parse ../../scripts/build-mjs-cjs.sh",
+    "test": "MODULE_ENV=cjs jest --watch",
+    "lint": "eslint src --ext ts",
+    "coverage": "jest --collect-coverage",
+    "types": "tsc --noEmit",
+    "types:watch": "yarn run types -- --watch"
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "debug.ts"
+    ]
+  },
+  "keywords": [
+    "use-gpu",
+    "use-gpu-library"
+  ],
+  "sideEffects": false
+}

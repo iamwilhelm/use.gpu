@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.pkg.json",
+  "references": [
+    { "path": "../core" },
+    { "path": "../state" }
+  ],
+  "compilerOptions": {
+    "rootDir": "..",
+    "baseUrl": "src",
+    "typeRoots": ["../../node_modules/@types"],
+    "outDir": "../../build/ts",
+    "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts", "jsx.ts", "types.ts"]
+}

@@ -2,7 +2,7 @@ import type { LC, LiveElement } from '@use-gpu/live';
 import type { TextureSource, TextureTarget } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 
-import { gather, yeet, use, useMemo } from '@use-gpu/live';
+import { gather, yeet, use, useMemo, useOne } from '@use-gpu/live';
 import { makeAtlas, makeDataBuffer, clamp, seq, lerp } from '@use-gpu/core';
 import { useDeviceContext } from '../providers/device-provider';
 import { DebugAtlas } from '../text/debug-atlas';
@@ -37,7 +37,7 @@ const LINEAR_SAMPLER: GPUSamplerDescriptor = {
 };
 
 export type PrefilteredEnvMapProps = {
-  texture: TextureSource,
+  texture?: TextureSource | null,
   size?: number,
   levels?: number,
   gain?: number,
@@ -140,7 +140,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
     atlas.snug();
 
     return {atlas, mappings, mips, sigmas, sigmas2, dsigmas, sizes, radii};
-  });
+  }, [size, levels]);
 
   const {width, height} = atlas;
   return (
@@ -156,7 +156,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
       use(TextureBuffer, {
         width: Math.max(size, FIRST_MIP),
         height: Math.max(size, FIRST_MIP),
-        sampler: LINEAR_SAMPLER,
+        sampler: null,
         format: 'rgba16float',
         filterable: true,
         colorSpace: 'linear',
@@ -184,13 +184,11 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         absolute: true,
       });
 
-      const scratchOut = useDerivedSource(scratch, {
-        sampler: null,
-      });
-      
+      const scratchOut = scratch;
       const scratchIn = useDerivedSource(scratch.history![0], {
         variant: 'textureSampleLevel',
         absolute: true,
+        sampler: LINEAR_SAMPLER,
       });
 
       const dispatches = useMemo(() => {
@@ -200,7 +198,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         const cubeMap = getDerivedSource(texture, {
           variant: 'textureSampleLevel',
         });
-    
+
         const makeInitShader = () =>
           getBoundShader(pmremInit, [
             mappings[0],
@@ -298,8 +296,8 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         return out;
       }, [sigmas, sizes, radii, mappings, texture, target, scratch]);
 
-      const mappingData = new Uint16Array(mappings.flatMap(m => m));
-      const varianceData = new Float32Array(sigmas);
+      const mappingData = useOne(() => new Uint16Array(mappings.flatMap(m => m)), mappings);
+      const varianceData = useOne(() => new Float32Array(sigmas), sigmas);
 
       const boundMappings = useRawSource(mappingData, 'vec4<u16>');
       const boundVariances = useRawSource(varianceData, 'f32');

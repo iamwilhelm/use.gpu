@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { UniformType, Rectangle, Point, Point4 } from '@use-gpu/core';
+import type { UniformType, Rectangle, XY, XYZW } from '@use-gpu/core';
 import type { FitInto, Direction, Margin, OverflowMode, LayoutElement, LayoutPicker, LayoutRenderer } from '../types';
 
 import { useProp } from '@use-gpu/traits';
@@ -21,7 +21,7 @@ import { Block } from './block';
 import { mat4 } from 'gl-matrix';
 
 const NO_FIXED: [null, null] = [null, null];
-const NO_POINT4: Point4 = [0, 0, 0, 0];
+const NO_POINT4: XYZW = [0, 0, 0, 0];
 
 const OFFSET_BINDING = bundleToAttribute(getScrolledPosition, 'getOffset');
 const CLIP_BINDING = {name: 'getClip', format: 'vec4<f32>' as UniformType};
@@ -61,15 +61,15 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
 
   const api = useOne(() => {
     // Scroll distance
-    const scrollRef = [0, 0] as Point;
+    const scrollRef = [0, 0] as XY;
     // Inverted scroll distance
-    const offsetRef = [0, 0] as Point;
+    const offsetRef = [0, 0] as XY;
     // Size of scroll area + content (outer w/h, inner w/h)
-    const sizeRef = [0, 0, 0, 0] as Point4;
+    const sizeRef = [0, 0, 0, 0] as XYZW;
     // Visible viewport in content coordinates
-    const clipRef = [0, 0, 0, 0] as Point4;
+    const clipRef = [0, 0, 0, 0] as XYZW;
     // Top-left position of outer box
-    const boxRef = [0, 0] as Point;
+    const boxRef = [0, 0] as XY;
 
     const scrollTo = (x?: number | null, y?: number | null) => {
       const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;
@@ -103,7 +103,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
       return [outerWidth < innerWidth, outerHeight < innerHeight];
     };
     
-    const updateScrollRange = (layout: Rectangle, size: Point, scrollBarWidth: number, scrollBarHeight: number) => {
+    const updateScrollRange = (layout: Rectangle, size: XY, scrollBarWidth: number, scrollBarHeight: number) => {
       const before = shouldScroll();
       const [l, t, r, b] = layout;
       boxRef[0] = l;
@@ -155,8 +155,8 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
       const scrollBarHeight = hasScrollX ? scrollBars[0].sizing[3] : 0;
 
       const fitInto = (into: FitInto) => {
-        const sizes   = [] as Point[];
-        const offsets = [] as Point[];
+        const sizes   = [] as XY[];
+        const offsets = [] as XY[];
         const renders = [] as (LayoutRenderer[]);
         const pickers = [] as (LayoutPicker | null | undefined)[];
           
@@ -199,7 +199,7 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
             },
           });
           
-          const outer = size.slice() as Point;
+          const outer = size.slice() as XY;
           if (shouldScrollY) outer[0] += scrollBarWidth;
           if (shouldScrollX) outer[1] += scrollBarHeight;
           

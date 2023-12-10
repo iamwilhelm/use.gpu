@@ -1,7 +1,7 @@
 import type { LiveElement } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Point, Point4, Rectangle } from '@use-gpu/core';
-import type { FitInto, AutoPoint, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
+import type { XY, XYZW, Rectangle } from '@use-gpu/core';
+import type { FitInto, AutoXY, Direction, Gap, MarginLike, Margin, Alignment, Anchor, Dimension, LayoutRenderer, LayoutPicker, InlineRenderer, InlineLine, UIAggregate } from '../types';
 
 import { yeet, fragment, morph, use } from '@use-gpu/live';
 import { toMurmur53 } from '@use-gpu/state';
@@ -118,7 +118,7 @@ export const memoInline = <T>(f: Inline<T>): Inline<T> => {
   };
 }
 
-export const mergePadding = (a: Point4, b: Point4) => {
+export const mergePadding = (a: XYZW, b: XYZW) => {
   return [a[0] + b[0], a[1] + b[1], a[2] + b[2], a[3] + b[3]];
 }
 
@@ -131,8 +131,8 @@ export const mergeMargin = (a: number, b: number) => {
 
 // DEPRECATED (tests only)
 export const makeBoxLayout = (
-  sizes: Point[],
-  offsets: Point[],
+  sizes: XY[],
+  offsets: XY[],
   renders: LayoutRenderer[],
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
@@ -193,8 +193,8 @@ export const makeBoxLayout = (
 
 export const makeBoxInspectLayout = (
   id: number,
-  sizes: Point[],
-  offsets: Point[],
+  sizes: XY[],
+  offsets: XY[],
   renders?: LayoutRenderer[],
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
@@ -276,8 +276,8 @@ export const makeBoxInspectLayout = (
 }
 
 export const makeInlineLayout = (
-  ranges: Point[],
-  sizes: Point[],
+  ranges: XY[],
+  sizes: XY[],
   offsets: [number, number, number][],
   renders: InlineRenderer[],
   key?: number,
@@ -338,8 +338,8 @@ export const makeInlineLayout = (
 
 export const makeInlineInspectLayout = (
   id: number,
-  ranges: Point[],
-  sizes: Point[],
+  ranges: XY[],
+  sizes: XY[],
   offsets: [number, number, number][],
   renders?: InlineRenderer[],
   key?: number,
@@ -403,10 +403,10 @@ export const makeInlineInspectLayout = (
 
 export const makeBoxPicker = (
   id: number,
-  sizes: Point[],
-  offsets: Point[],
+  sizes: XY[],
+  offsets: XY[],
   pickers: (LayoutPicker | null | undefined)[],
-  scrollPos?: Point,
+  scrollPos?: XY,
   onScroll?: (dx: number, dy: number) => void,
   pickable: boolean = true,
 ) => (

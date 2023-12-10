@@ -1,5 +1,5 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Rectangle, Point4 } from '@use-gpu/core';
+import type { Rectangle, XYZW } from '@use-gpu/core';
 import type { ParsedEffect, SlideInfo, SlideEase, ResolvedSlide } from './types';
 import type { ColorLike } from '@use-gpu/traits';
 

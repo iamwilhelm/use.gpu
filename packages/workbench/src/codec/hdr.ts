@@ -1,4 +1,4 @@
-import type { Point3 } from '@use-gpu/core';
+import type { XYZ } from '@use-gpu/core';
 
 import { toFloat16 } from '@use-gpu/core';
 import zipObject from 'lodash/zipObject';

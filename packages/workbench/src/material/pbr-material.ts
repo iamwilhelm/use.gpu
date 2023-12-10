@@ -1,5 +1,5 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Lazy, Point4 } from '@use-gpu/core';
+import type { Lazy, XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike, VectorLike } from '@use-gpu/traits';
 
@@ -36,8 +36,8 @@ export type PBRMaterialProps = {
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };
 
-const WHITE = [1, 1, 1, 1] as Point4;
-const BLACK = [0, 0, 0, 0] as Point4;
+const WHITE = [1, 1, 1, 1] as XYZW;
+const BLACK = [0, 0, 0, 0] as XYZW;
 
 export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMaterialProps>) => {
   const {

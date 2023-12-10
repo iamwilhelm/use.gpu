@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
+import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { use, yeet, useMemo, useYolo } from '@use-gpu/live';

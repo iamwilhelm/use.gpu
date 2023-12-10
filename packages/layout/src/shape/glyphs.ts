@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { Rectangle, TextureSource, Tuples, Point4 } from '@use-gpu/core';
+import type { Rectangle, TextureSource, Tuples, XYZW } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { FontMetrics } from '@use-gpu/glyph';
 import type { InlineLine } from '../types';
@@ -15,7 +15,7 @@ const BLACK = [0, 0, 0, 1];
 export type GlyphsProps = {
   id: number,
 
-  color?: Point4,
+  color?: XYZW,
   opacity?: number,
   size?: number,
   detail?: number,

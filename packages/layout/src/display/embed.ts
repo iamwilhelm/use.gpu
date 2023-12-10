@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Rectangle, Point, Point4 } from '@use-gpu/core';
+import type { Rectangle, XY, XYZW } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { FitInto, LayoutElement, Dimension, Margin } from '../types';
 

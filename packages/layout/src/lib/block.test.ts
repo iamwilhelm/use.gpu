@@ -1,4 +1,4 @@
-import type { Rectangle, Point } from '@use-gpu/core';
+import type { Rectangle, XY } from '@use-gpu/core';
 import type { Sizing, Margin } from '../types';
 
 describe('', () => { it("", () => {})});
@@ -23,7 +23,7 @@ describe('block layout', () => {
       sizing,
       margin,
       fit: () => ({
-        size: [width, height] as Point,
+        size: [width, height] as XY,
         render: (layout: Rectangle) => ({layout}) as any,
       }),
     };
@@ -110,7 +110,7 @@ describe('block layout', () => {
       makeElement(20, 20, 20),
     ];
 
-    const size = [110, 80] as Point;
+    const size = [110, 80] as XY;
     const {sizes, offsets, renders} = fitBlock(els, size, [0, 0], [0, 0, 0, 0], 'x', false);
 
     expect(offsets).toEqual([[0, 10], [70, 20]]);
@@ -127,7 +127,7 @@ describe('block layout', () => {
       makeElement(20, 20, 20),
     ];
 
-    const size = [110, 80] as Point;
+    const size = [110, 80] as XY;
     const {sizes, offsets, renders} = fitBlock(els, size, [0, 0], [0, 0, 0, 0], 'y', false);
 
     expect(offsets).toEqual([[10, 0], [20, 70]]);

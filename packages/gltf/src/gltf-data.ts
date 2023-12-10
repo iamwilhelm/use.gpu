@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { Point, StorageSource, TextureSource, TypedArray, UniformType } from '@use-gpu/core';
+import type { XY, StorageSource, TextureSource, TypedArray, UniformType } from '@use-gpu/core';
 import type { GLTF, GLTFAccessorData, GLTFBufferData, GLTFBufferViewData, GLTFImageData, GLTFNodeData, GLTFMeshData, GLTFMaterialData, GLTFSceneData, GLTFTextureData } from './types';
 
 import { use, gather, fence, suspend, yeet, useCallback, useContext, useOne, useMemo, useState } from '@use-gpu/live';
@@ -247,7 +247,7 @@ export const GLTFData: LC<GLTFDataProps> = (props) => {
             const bitmap = imageResources[i];
             if (!bitmap) return null;
 
-            const size = [bitmap.width, bitmap.height] as Point;
+            const size = [bitmap.width, bitmap.height] as XY;
             const format = 'rgba8unorm';
             const colorSpace = 'auto';
 

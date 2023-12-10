@@ -2,7 +2,10 @@ import type { StorageSource, LambdaSource, TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import { makeContext, useContext } from '@use-gpu/live';
 
-export type DataContextProps = StorageSource | LambdaSource | ShaderModule | null;
+export type DataContextProps = {
+  attributes: Record<string, StorageSource | LambdaSource | ShaderModule>,
+};
+
 export type ValuesContextProps = number[] | TypedArray;
 
 /**

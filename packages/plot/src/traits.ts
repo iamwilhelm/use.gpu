@@ -1,19 +1,23 @@
-import { useOne } from '@use-gpu/live';
+import type { ColorLike } from '@use-gpu/core';
+
+import { trait, optional, UseHooks } from '@use-gpu/traits/live';
 import {
-  makeUseTrait,
-  useProp,
   parseNumber,
   parseInteger,
   parseBoolean,
   parseString,
   parseStringArray,
   parseStringFormatter,
+  parseBooleanArray,
+  parseScalarArray,
   parseVector,
   parseVec4,
+  parseVec4Array,
   parsePosition,
   parseRotation,
   parseQuaternion,
   parseColor,
+  parseColorArray,
   parseScale,
   parseMatrix,
   parseJoin,
@@ -26,249 +30,290 @@ import {
   parseAxis,
   parseIntegerPositive,
   parseDomain,
-  optional,
-} from '@use-gpu/traits';
-import {
   parsePointShape,
-} from '@use-gpu/workbench';
-import type {
-  AnchorTrait,
-  ArrowTrait,
-  AxesTrait,
-  AxisTrait,
-  ColorTrait,
-  FontTrait,
-  GridTrait,
-  LabelTrait,
-  LineTrait,
-  ObjectTrait,
-  PointTrait,
-  ROPTrait,
-  ScaleTrait,
-  SurfaceTrait,
-} from './types';
+} from '@use-gpu/parse';
 
 import { vec4 } from 'gl-matrix';
 
 const EMPTY: any[] = [];
 const WHITE = [1, 1, 1, 1];
 
-const ANCHOR_TRAIT = {
-  placement:  parsePlacement,
-  offset:     parseNumber,
-};
+export const AnchorTrait = trait(
+  {
+    placement:  parsePlacement,
+    offset:     parseNumber,
+  },
+  {
+    placement: 'center',
+    offset: 5,
+  },
+);
 
-const ANCHOR_DEFAULTS = {
-  placement: 'center',
-  offset: 5,
-};
+export const ArrowTrait = trait(
+  {
+    size: parseNumber,
+    start: parseBoolean,
+    end: parseBoolean,
+    detail: parseIntegerPositive,
+  },
+  {
+    size: 3,
+    start: false,
+    end: true,
+    detail: 12,
+  },
+);
 
-const ARROW_TRAIT = {
-  size: parseNumber,
-  start: parseBoolean,
-  end: parseBoolean,
-  detail: parseIntegerPositive,
-};
+export const ArrowsTrait = trait(
+  {
+    sizes: optional(parseScalarArray),
+    starts: optional(parseBooleanArray),
+    ends: optional(parseBooleanArray),
+  },
+);
 
-const ARROW_DEFAULTS = {
-  size: 3,
-  start: false,
-  end: true,
-  detail: 12,
-};
+export const AxesTrait = trait(
+  {
+    axes:  parseAxes,
+    range: parseRanges,
+  },
+  {
+    axes: 'xyzw',
+  },
+);
 
-const AXES_TRAIT = {
-  axes:  parseAxes,
-  range: parseRanges,
-};
+export const AxisTrait = trait(
+  {
+    axis:  parseAxis,
+    range: optional(parseRange),
+  },
+  {
+    axis: 'x',
+  }
+);
 
-const AXES_DEFAULTS = {
-  axes: 'xyzw',
-  range: null,
-};
+export const ColorTrait = (
+  props: {color?: ColorLike, opacity?: number},
+  parsed: {color: vec4},
+  {useMemo, useProp}: UseHooks,
+) => {
+  const {color, opacity} = props;
 
-const AXIS_TRAIT = {
-  axis:  parseAxis,
-  range: optional(parseRange),
-};
-
-const AXIS_DEFAULTS = {
-  axis: 'x',
-};
-
-const FONT_TRAIT = {
-  family: optional(parseString),
-  weight: optional(parseWeight),
-  style: optional(parseString),
-};
-
-const FONT_DEFAULTS = {};
-
-const GRID_TRAIT = {
-  axes:  parseAxes,
-  range: optional(parseRanges),
-};
-
-const GRID_DEFAULTS = {
-  axes: 'xy',
-};
-
-const LABEL_TRAIT = {
-  labels:     optional(parseStringArray),
-  format:     optional(parseStringFormatter),
-  size:       parseNumber,
-  depth:      parseNumber,
-  expand:     parseNumber,
-};
-
-const LABEL_DEFAULTS = {
-  size: 16,
-};
-
-const LINE_TRAIT = {
-  width:     parseNumber,
-  depth:     parseNumber,
-  join:      parseJoin,
-  loop:      parseBoolean,
-  dash:      parseVector,
-  proximity: parseNumber,
-};
-
-const LINE_DEFAULTS = {
-  width: 1,
-  depth: 0,
-  join: 'bevel',
-  loop: false,
-  proximity: 0,
-};
-
-const OBJECT_TRAIT = {
-  position:   optional(parsePosition),
-  scale:      optional(parseScale),
-  quaternion: optional(parseQuaternion),
-  rotation:   optional(parseRotation),
-  matrix:     optional(parseMatrix),
-};
-
-const OBJECT_DEFAULTS = {};
-
-const POINT_TRAIT = {
-  size:  parseNumber,
-  depth: parseNumber,
-  shape: parsePointShape,
-};
-
-const POINT_DEFAULTS = {
-  size: 1,
-  depth: 0,
-  shape: 'circle',
-};
-
-const ROP_TRAIT = {
-  alphaToCoverage: optional(parseBoolean),
-  blend:           optional(parseBlending),
-  depthWrite:      optional(parseBoolean),
-  depthTest:       optional(parseBoolean),
-  mode:            optional(parseString),
-  zBias:           parseNumber,
-  zIndex:          parseInteger,
-};
-
-const ROP_DEFAULTS = {
-  zBias: 0,
-  zIndex: 0,
-};
-
-const SCALE_TRAIT = {
-  mode:   parseDomain,
-  divide: parseNumber,
-  unit:   parseNumber,
-  base:   parseNumber,
-  start:  parseBoolean,
-  end:    parseBoolean,
-  zero:   parseBoolean,
-  factor: parseNumber,
-  nice:   parseBoolean,
-};
-
-const SCALE_DEFAULTS = {
-  mode: 'linear',
-  divide: 10,
-  unit: 1,
-  base: 10,
-  start: true,
-  end: false,
-  zero: true,
-  factor: 1,
-  nice: true,
-};
-
-const SURFACE_TRAIT = {
-  loopX: parseBoolean,
-  loopY: parseBoolean,
-  shaded: parseBoolean,
-};
-
-const SURFACE_DEFAULTS = {
-  loopX: false,
-  loopY: false,
-  shaded: true,
-};
-
-const VOLUME_TRAIT = {
-  loopX: parseBoolean,
-  loopY: parseBoolean,
-  loopZ: parseBoolean,
-  shaded: parseBoolean,
-};
-
-const VOLUME_DEFAULTS = {
-  loopX: false,
-  loopY: false,
-  loopZ: false,
-  shaded: true,
-};
-
-/** @category Traits */
-export const useAnchorTrait  = makeUseTrait<AnchorTrait>(ANCHOR_TRAIT, ANCHOR_DEFAULTS);
-/** @category Traits */
-export const useArrowTrait   = makeUseTrait<ArrowTrait>(ARROW_TRAIT, ARROW_DEFAULTS);
-/** @category Traits */
-export const useAxesTrait    = makeUseTrait<AxesTrait>(AXES_TRAIT, AXES_DEFAULTS);
-/** @category Traits */
-export const useAxisTrait    = makeUseTrait<AxisTrait>(AXIS_TRAIT, AXIS_DEFAULTS);
-/** @category Traits */
-export const useFontTrait    = makeUseTrait<FontTrait>(FONT_TRAIT, FONT_DEFAULTS);
-/** @category Traits */
-export const useGridTrait    = makeUseTrait<GridTrait>(GRID_TRAIT, GRID_DEFAULTS);
-/** @category Traits */
-export const useLabelTrait   = makeUseTrait<LabelTrait>(LABEL_TRAIT, LABEL_DEFAULTS);
-/** @category Traits */
-export const useLineTrait    = makeUseTrait<LineTrait>(LINE_TRAIT, LINE_DEFAULTS);
-/** @category Traits */
-export const useObjectTrait  = makeUseTrait<ObjectTrait>(OBJECT_TRAIT, OBJECT_DEFAULTS);
-/** @category Traits */
-export const usePointTrait   = makeUseTrait<PointTrait>(POINT_TRAIT, POINT_DEFAULTS);
-/** @category Traits */
-export const useROPTrait     = makeUseTrait<ROPTrait>(ROP_TRAIT, ROP_DEFAULTS);
-/** @category Traits */
-export const useScaleTrait   = makeUseTrait<ScaleTrait>(SCALE_TRAIT, SCALE_DEFAULTS);
-/** @category Traits */
-export const useSurfaceTrait = makeUseTrait<SurfaceTrait>(SURFACE_TRAIT, SURFACE_DEFAULTS);
-/** @category Traits */
-export const useVolumeTrait = makeUseTrait<SurfaceTrait>(VOLUME_TRAIT, VOLUME_DEFAULTS);
-
-/** @category Traits */
-export const useColorTrait = (props: Partial<ColorTrait>): vec4 => {
-  const {
-    color = [0.5, 0.5, 0.5, 1],
-    opacity = 1,
-  } = props;
-
-  const vec = useOne(() => vec4.create());
   const c = useProp(color, parseColor);
   const o = useProp(opacity, parseNumber);
 
-  if (o === 1) return vec4.copy(vec, c);
-  return vec4.set(vec, c[0], c[1], c[2], c[3] * o);
+  const rgba = useMemo(() => (
+    o === 1
+      ? c
+      : vec4.set(vec4.create(), c[0], c[1], c[2], c[3] * o)
+  ), [c, o]);
+
+  parsed.color = rgba;
 };
+
+export const ColorsTrait = trait(
+  {
+    colors: optional(parseScalarArray),
+  },
+);
+  
+export const FontTrait = trait(
+  {
+    family: optional(parseString),
+    weight: optional(parseWeight),
+    style: optional(parseString),
+  },
+);
+
+export const GridTrait = trait(
+  {
+    axes:  parseAxes,
+    range: optional(parseRanges),
+  },
+  {
+    axes: 'xy',
+  },
+);
+
+export const LabelTrait = trait(
+  {
+    size:   parseNumber,
+    depth:  parseNumber,
+    expand: parseNumber,
+  },
+  {
+    size: 16,
+  },
+);
+
+export const LabelsTrait = trait(
+  {
+    format:     optional(parseStringFormatter),
+    sizes:      optional(parseScalarArray),
+    depths:     optional(parseScalarArray),
+  },
+);
+
+export const LineTrait = trait(
+  {
+    width:     parseNumber,
+    depth:     parseNumber,
+    loop:      parseBoolean,
+    join:      parseJoin,
+    dash:      parseVector,
+    proximity: parseNumber,
+  },
+  {
+    width: 1,
+    depth: 0,
+    join: 'bevel',
+    loop: false,
+    proximity: 0,
+  },
+);
+
+export const LinesTrait = trait(
+  {
+    widths: optional(parseScalarArray),
+    depths: optional(parseScalarArray),
+    loops:  optional(parseBooleanArray),
+  },
+);
+
+export const ObjectTrait = trait(
+  {
+    position:   optional(parsePosition),
+    scale:      optional(parseScale),
+    quaternion: optional(parseQuaternion),
+    rotation:   optional(parseRotation),
+    matrix:     optional(parseMatrix),
+  },
+);
+
+export const PointTrait = trait(
+  {
+    size:  parseNumber,
+    depth: parseNumber,
+    shape: parsePointShape,
+    hollow: parseBoolean,
+    outline: parseNumber,
+  },
+  {
+    size: 1,
+    depth: 0,
+    shape: 'circle',
+    hollow: false,
+    outline: 0,
+  },
+);
+
+export const PointsTrait = trait(
+  {
+    sizes: optional(parseScalarArray),
+    depths: optional(parseScalarArray),
+  },
+);
+
+export const PositionTrait = trait(
+  {
+    position: optional(parseVec4),
+  }
+);
+
+export const PositionsTrait = trait(
+  {
+    positions: optional(parseVec4Array),
+  },
+);
+
+export const ROPTrait = trait(
+  {
+    alphaToCoverage: optional(parseBoolean),
+    blend:           optional(parseBlending),
+    depthWrite:      optional(parseBoolean),
+    depthTest:       optional(parseBoolean),
+    mode:            optional(parseString),
+  },
+);
+
+export const ScaleTrait = trait(
+  {
+    mode:   parseDomain,
+    divide: parseNumber,
+    unit:   parseNumber,
+    base:   parseNumber,
+    start:  parseBoolean,
+    end:    parseBoolean,
+    zero:   parseBoolean,
+    factor: parseNumber,
+    nice:   parseBoolean,
+  },
+  {
+    mode: 'linear',
+    divide: 10,
+    unit: 1,
+    base: 10,
+    start: true,
+    end: false,
+    zero: true,
+    factor: 1,
+    nice: true,
+  },
+);
+
+export const StringTrait = trait(
+  {
+    label: optional(parseString),
+  }
+);
+
+export const StringsTrait = trait(
+  {
+    labels: optional(parseStringArray),
+  }
+);
+
+export const SurfaceTrait = trait(
+  {
+    loopX: parseBoolean,
+    loopY: parseBoolean,
+    shaded: parseBoolean,
+  },
+  {
+    loopX: false,
+    loopY: false,
+    shaded: true,
+  },
+);
+
+export const VolumeTrait = trait(
+  {
+    loopX: parseBoolean,
+    loopY: parseBoolean,
+    loopZ: parseBoolean,
+    shaded: parseBoolean,
+  },
+  {
+    loopX: false,
+    loopY: false,
+    loopZ: false,
+    shaded: true,
+  },
+);
+
+export const ZBiasTrait = trait(
+  {
+    zBias:  parseNumber,
+    zIndex: parseInteger,
+  },
+  {
+    zIndex: 0,
+    zBias: 0,
+  },
+);
+
+export const ZBiasesTrait = trait(
+  {
+    zBiases: optional(parseScalarArray),
+  },
+);

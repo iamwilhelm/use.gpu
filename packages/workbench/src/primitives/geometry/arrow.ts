@@ -1,4 +1,4 @@
-import type { GeometryArray } from '@use-gpu/core';
+import type { CPUGeometry } from '@use-gpu/core';
 import { makeVertexAttributeLayout } from '@use-gpu/core';
 
 const τ = Math.PI * 2;
@@ -6,7 +6,7 @@ const τ = Math.PI * 2;
 export const makeArrowGeometry = (
   detail: number = 8,
   width: number = 2.5
-): GeometryArray => {
+): CPUGeometry => {
   const positions = makeArrowVertices(detail, width);
 
   return {

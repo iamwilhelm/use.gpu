@@ -1,5 +1,5 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Point4 } from '@use-gpu/core';
+import type { XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 

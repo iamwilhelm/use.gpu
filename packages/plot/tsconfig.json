@@ -4,6 +4,7 @@
     { "path": "../state" },
     { "path": "../core" },
     { "path": "../live" },
+    { "path": "../parse" },
     { "path": "../traits" },
     { "path": "../workbench" },
   ],

@@ -3,7 +3,7 @@ import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@u
 import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, FaceAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
-import { use, keyed, signal, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, fragment, signal, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
 import { toMurmur53, hashBits53 } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
@@ -84,7 +84,7 @@ const Resume = (
       group.push(keyed(Layer, layer.key, makeAggregator, layer.items));
     }
 
-    els.push(group);
+    els.push(fragment(group, type));
   }
 
   return els;

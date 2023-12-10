@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { TextureSource, Rectangle, Point4 } from '@use-gpu/core';
+import type { TextureSource, Rectangle, XYZW } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ImageTrait, Fit, Repeat, Anchor } from '../types';
 
@@ -27,10 +27,10 @@ export type UIRectangleProps = {
 
   image?: Partial<ImageTrait>,
 
-  fill?: Point4,
-  stroke?: Point4,
-  border?: Point4,
-  radius?: Point4,
+  fill?: XYZW,
+  stroke?: XYZW,
+  border?: XYZW,
+  radius?: XYZW,
 
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,

@@ -1,5 +1,5 @@
 import type { LC } from '@use-gpu/live';
-import type { Point4 } from '@use-gpu/core';
+import type { XYZW } from '@use-gpu/core';
 
 import React from '@use-gpu/live';
 import { LayoutControls } from '../../ui/layout-controls';
@@ -13,9 +13,9 @@ import {
   UI, Layout, Absolute, Block, Flex, Inline, Overflow, Text, Element,
 } from '@use-gpu/layout';
 
-const TRANSPARENT = [1, 1, 1, 0.1] as Point4;
-const BACKGROUND = [0.0, 0.0, 0.09, 1.0] as Point4;
-const FILL = [0.4, 0.7, 1, 0.5] as Point4;
+const TRANSPARENT = [1, 1, 1, 0.1] as XYZW;
+const BACKGROUND = [0.0, 0.0, 0.09, 1.0] as XYZW;
+const FILL = [0.4, 0.7, 1, 0.5] as XYZW;
 
 export const LayoutAlignPage: LC = () => {
 

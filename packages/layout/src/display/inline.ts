@@ -1,5 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { Point, Rectangle } from '@use-gpu/core';
+import type { XY, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Base, MarginLike } from '../types';
 
@@ -56,8 +56,8 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
           const {size, sizes, ranges, offsets, anchors, renders, pickers, key} =
             fitInline(inlineEls, into, direction, align, anchor, wrap, snap);
 
-          const blockSizes: Point[] = [];
-          const blockOffsets: Point[] = [];
+          const blockSizes: XY[] = [];
+          const blockOffsets: XY[] = [];
           const blockRenders: LayoutRenderer[] = [];
           const blockPickers: (LayoutPicker | null | undefined)[] = [];
 

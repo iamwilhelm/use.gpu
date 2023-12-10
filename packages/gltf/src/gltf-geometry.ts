@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { TypedArray, UniformAttribute, GeometryArray } from '@use-gpu/core';
+import type { TypedArray, UniformAttribute } from '@use-gpu/core';
 import type { GLTF, GLTFPrimitiveData } from './types';
 
 import { unweldIndexedArray, getAggregateArchetype, UNIFORM_ARRAY_DIMS } from '@use-gpu/core';

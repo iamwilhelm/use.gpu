@@ -1,8 +1,8 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { TextureSource, Point4, Rectangle } from '@use-gpu/core';
+import type { TextureSource, XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
-import type { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoPoint, ImageTrait } from '../types';
+import type { Dimension, Margin, MarginLike, Base, Fit, Repeat, Anchor, AutoXY, ImageTrait } from '../types';
 
 import { use, keyed, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { evaluateDimension } from '../parse';
@@ -22,7 +22,7 @@ export type ElementProps = Partial<BoxTrait> & Partial<ElementTrait> & Partial<R
   under?: boolean,
 };
 
-const TRANSPARENT: Point4 = [0, 0, 0, 0];
+const TRANSPARENT: XYZW = [0, 0, 0, 0];
 
 export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<ElementProps>) => {
   const {
@@ -45,7 +45,7 @@ export const Element: LiveComponent<ElementProps> = (props: PropsWithChildren<El
 
   const hovered = useInspectHoverable();
 
-  const fit = (into: AutoPoint) => {
+  const fit = (into: AutoXY) => {
     const w = width != null ? evaluateDimension(width, into[0] || 0, snap) : into[0] || 0;
     const h = height != null ? evaluateDimension(height, into[1] || 0, snap) : into[1] || 0;
     const size = [w ?? 0, h ?? 0];

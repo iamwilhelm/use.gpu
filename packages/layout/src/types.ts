@@ -1,14 +1,14 @@
-import type { Tuples, Point, Point4, Rectangle } from '@use-gpu/core';
+import type { Tuples, XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { LiveElement, Key } from '@use-gpu/live';
 import type { FontMetrics } from '@use-gpu/glyph';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
 import type { Color, ColorLike } from '@use-gpu/traits';
 import { mat4 } from 'gl-matrix';
 
-export type AutoPoint = [number | null, number | null];
+export type AutoXY = [number | null, number | null];
 export type AutoRectangle = [number | null, number | null, number | null, number | null];
-export type Gap = Point;
-export type Margin = Point4;
+export type Gap = XY;
+export type Margin = XYZW;
 export type Sizing = [number | null, number | null, number, number];
 
 export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'between' | 'evenly';
@@ -36,7 +36,7 @@ export type BoxTrait = {
 };
 
 export type RefTrait = {
-  ref: (rectangle: Rectangle, origin: Point) => void,
+  ref: (rectangle: Rectangle, origin: XY) => void,
 };
 
 export type ElementTrait = {
@@ -69,8 +69,8 @@ export type LayoutRenderer = (
 ) => LiveElement;
 
 export type RenderInside = {
-  sizes: Point[],
-  offsets: Point[],
+  sizes: XY[],
+  offsets: XY[],
   renders: LayoutRenderer[],
   clip?: ShaderModule | null,
   mask?: ShaderModule | null,
@@ -79,8 +79,8 @@ export type RenderInside = {
 };
 
 export type RenderInline = {
-  ranges: Point[],
-  sizes: Point[],
+  ranges: XY[],
+  sizes: XY[],
   offsets: [number, number, number][],
   renders: InlineRenderer[],
   key?: number,
@@ -115,14 +115,14 @@ export type LayoutScroller = (x: number, y: number) => void;
 export type LayoutPicker = (x: number, y: number, l: number, t: number, r: number, b: number, scroll: boolean) => [number, Rectangle, LayoutScroller] | null;
 
 export type LayoutFit = {
-  size: Point,
+  size: XY,
   render: LayoutRenderer,
   pick?: LayoutPicker | null,
   transform?: ShaderModule,
 };
 
 export type LayoutElement = {
-  size?: AutoPoint,
+  size?: AutoXY,
 
   sizing: Sizing,
   margin: Margin,

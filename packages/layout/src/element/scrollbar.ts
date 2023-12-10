@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TextureSource, Point, Point4, Rectangle } from '@use-gpu/core';
+import type { TextureSource, XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 import type { Direction, OverflowMode, FitInto, UIAggregate } from '../types';
@@ -27,16 +27,16 @@ export type ScrollBarProps = {
   thumb?: ColorLike,
 
   overflow?: OverflowMode,
-  scrollRef?: Point,
-  sizeRef?: Point4,
+  scrollRef?: XY,
+  sizeRef?: XYZW,
   transform?: ShaderModule,
 };
 
-const NO_POINT: Point = [0, 0];
+const NO_POINT: XY = [0, 0];
 
-const NO_POINT4: Point4 = [0, 0, 0, 0];
-const TRACK: Point4 = [0, 0, 0, .5];
-const THUMB: Point4 = [1, 1, 1, .5];
+const NO_POINT4: XYZW = [0, 0, 0, 0];
+const TRACK: XYZW = [0, 0, 0, .5];
+const THUMB: XYZW = [1, 1, 1, .5];
 
 export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
   const {
@@ -86,8 +86,8 @@ export const ScrollBar: LiveComponent<ScrollBarProps> = (props) => {
 };
 
 const Render = (
-  sizeRef: Point4,
-  scrollRef: Point,
+  sizeRef: XYZW,
+  scrollRef: XY,
 
   overflow: OverflowMode,
   size: number,

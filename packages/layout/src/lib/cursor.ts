@@ -1,4 +1,4 @@
-import type { Point } from '@use-gpu/core';
+import type { XY } from '@use-gpu/core';
 import type { Alignment } from '../types';
 
 import { makeTuples } from '@use-gpu/core';

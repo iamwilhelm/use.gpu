@@ -1,5 +1,5 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { GeometryArray, TypedArray } from '@use-gpu/core';
+import type { CPUGeometry, TypedArray } from '@use-gpu/core';
 
 import { memo, yeet, useOne } from '@use-gpu/live';
 import { getAggregateArchetype } from '@use-gpu/core';
@@ -8,7 +8,7 @@ import { vec3, mat3, mat4 } from 'gl-matrix';
 
 import { transformPositions, transformNormals, useMatrixContext } from '@use-gpu/workbench';
 
-export type GeometryProps = GeometryArray & {
+export type GeometryProps = CPUGeometry & {
   _u?: null,
 };
 

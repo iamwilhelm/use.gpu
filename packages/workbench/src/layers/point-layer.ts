@@ -16,16 +16,18 @@ import { makeShaderBinding, makeShaderBindings } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader } from '../hooks/useBoundShader';
 
-import { circle, diamond, square, circleOutlined, diamondOutlined, squareOutlined } from '@use-gpu/wgsl/mask/point.wgsl';
+import { circleSDF, diamondSDF, squareSDF, upSDF, downSDF, leftSDF, rightSDF } from '@use-gpu/wgsl/mask/sdf.wgsl';
+import { getFilledMask, getOutlinedMask } from '@use-gpu/wgsl/mask/point.wgsl';
 import { PointShape } from './types';
 
 const MASK_SHADER = {
-  'circle': circle,
-  'diamond': diamond, 
-  'square': square, 
-  'circleOutlined': circleOutlined, 
-  'diamondOutlined': diamondOutlined, 
-  'squareOutlined': squareOutlined, 
+  'circle': circleSDF,
+  'diamond': diamondSDF, 
+  'square': squareSDF,
+  'up': upSDF,
+  'down': downSDF,
+  'left': leftSDF,
+  'right': rightSDF,
 };
 
 export type PointLayerProps = {
@@ -46,7 +48,8 @@ export type PointLayerProps = {
   zBiases?: ShaderSource,
 
   shape?: PointShape,
-  stroke?: number,
+  hollow?: boolean,
+  outline?: number,
 
   count?: Lazy<number>,
   id?: number,
@@ -73,7 +76,8 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
     zBiases,
 
     count,
-    stroke = 0,
+    hollow = false,
+    outline = 0,
     shape = 'circle',
     mode = 'opaque',
     id = 0,
@@ -82,6 +86,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
   } = props;
 
   const s = useShaderRef(size, sizes);
+  const o = useShaderRef(outline);
 
   const rectangles = useOne(() => {
     const getSizeFloat = bindingToModule(makeShaderBinding(SIZE_BINDING, s));
@@ -91,8 +96,10 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
       gain: 0.5,
     });
   }, s);
-  const mask = (MASK_SHADER as any)[shape] ?? MASK_SHADER.circle;
-  const boundMask = useBoundShader(mask, [stroke]);
+
+  const sdf = (MASK_SHADER as any)[shape] ?? MASK_SHADER.circle;
+  const mask = hollow ? getOutlinedMask : getFilledMask;
+  const boundMask = useBoundShader(mask, [sdf, o]);
 
   return use(RawQuads, {
     position,

@@ -1,7 +1,7 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ViewUniforms, Rectangle } from '@use-gpu/core';
 
-import { use, provide, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
+import { use, provide, deprecated, useContext, useOne, useMemo, incrementVersion } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeOrthogonalMatrix, makeFrustumPlanes } from '@use-gpu/core';
 import { LayoutContext } from '../providers/layout-provider';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';
@@ -15,7 +15,7 @@ const DEFAULT_FLAT_CAMERA = {
   focus: 1,
 };
 
-export type FlatProps = {
+export type FlatCameraProps = {
   x?: number,
   y?: number,
   zoom?: number,
@@ -28,7 +28,7 @@ export type FlatProps = {
   far?: number,
 };
 
-export const Flat: LiveComponent<FlatProps> = (props) => {
+export const FlatCamera: LiveComponent<FlatCameraProps> = (props) => {
   const {
     x = 0,
     y = 0,
@@ -136,3 +136,5 @@ export const Flat: LiveComponent<FlatProps> = (props) => {
     })
   );
 };
+
+export const Flat = deprecated(FlatCamera, 'Flat');

@@ -1,4 +1,4 @@
-import type { Point3 } from '@use-gpu/core';
+import type { XYZ } from '@use-gpu/core';
 import type {
   RawVox,
   RawChunk,
@@ -168,7 +168,7 @@ export const getMipShape = (shape: VoxShape) => {
   }
 
   return {
-    size: [w2, h2, d2] as Point3,
+    size: [w2, h2, d2] as XYZ,
     data: out,
   };
 };
@@ -270,7 +270,7 @@ export const getNextChunk = (view: DataView, ptr: Pointer): RawChunk => {
 // Chunk type parsers
 ///////////////////////////////////////////////////////////////////////////////
 
-export const parseSIZEChunk = (view: DataView, chunk: RawChunk): Point3 => {
+export const parseSIZEChunk = (view: DataView, chunk: RawChunk): XYZ => {
   const {base} = chunk;
   const ptr = {offset: base};
 

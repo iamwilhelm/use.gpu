@@ -1,4 +1,4 @@
-import type { Point4 } from '@use-gpu/core';
+import type { XYZW } from '@use-gpu/core';
 import type {
   EffectTrait,
   SlideTrait,
@@ -24,7 +24,7 @@ import mapValues from 'lodash/mapValues';
 
 export const SLIDE_EFFECTS: SlideEffect[] = ['none', 'fade', 'wipe', 'move'];
 
-export const SLIDE_DIRECTIONS: Record<SlideDirection, Point4> = {
+export const SLIDE_DIRECTIONS: Record<SlideDirection, XYZW> = {
   left: [-1, 0, 0, 0],
   right: [1, 0, 0, 0],
   up: [0, -1, 0, 0],
@@ -34,7 +34,7 @@ export const SLIDE_DIRECTIONS: Record<SlideDirection, Point4> = {
   none: [0, 0, 0, 0],
 };
 
-const parseSlideDirection = (s: any): Point4 => {
+const parseSlideDirection = (s: any): XYZW => {
   if (s in SLIDE_DIRECTIONS) return SLIDE_DIRECTIONS[s as SlideDirection];
   if (s.length) return s;
   return SLIDE_DIRECTIONS['right'];

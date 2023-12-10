@@ -1,40 +1,34 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
+import type { VectorLike } from '@use-gpu/traits';
+import type { XY } from '@use-gpu/core';
+import type { ColorTrait, ColorsTrait, PointTrait, PointsTrait, ROPTrait } from '../types';
 
-import { TraitProps, makeUseTrait, deep, combine } from '@use-gpu/traits/live';
 import { getPluralArchetype } from '@use-gpu/core';
-import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
-import { vec4 } from 'gl-matrix';
+import { memo, use, useOne, useMemo } from '@use-gpu/live';
+import { deep } from '@use-gpu/traits';
 
 //import { PointLayer } from '@use-gpu/workbench';
 //import { DataContext } from '../providers/data-provider';
 
 import {
-  ColorTrait,
-  ColorsTrait,
-  PositionTrait,
-  PositionsTrait,
-  PointTrait,
-  PointsTrait,
-  ROPTrait,
-  ZBiasTrait,
-  ZBiasesTrait,
+  useColorTrait,
+  useColorsTrait,
+  usePointTrait,
+  usePointsTrait,
+  useROPTrait,
 } from '../traits';
+import { vec4 } from 'gl-matrix';
 
-const traits = combine(
-  ColorTrait,
-  ColorsTrait,
-  PositionTrait,
-  PositionsTrait,
-  PointTrait,
-  PointsTrait,
-  ROPTrait,
-  ZBiasTrait,
-  ZBiasesTrait,
-);
-const useTraits = makeUseTrait(traits);
+export type PointProps =
+  Partial<ColorTrait> &
+  Partial<ColorsTrait> &
+  Partial<PointTrait> &
+  Partial<PointsTrait> &
+  Partial<ROPTrait> & {
 
-export type PointProps = TraitProps<typeof traits>;
+  stroke?: number,
+};
 
 const POINT_SCHEMA = {
   position:  {format: 'vec4<f32>', plural: 'positions'},
@@ -45,21 +39,13 @@ const POINT_SCHEMA = {
 };
 
 export const Point: LiveComponent<PointProps> = memo((props) => {
-  const {
-    position,
-    positions,
-    color,
-    colors,
-    size,
-    sizes,
-    depth,
-    depths,
-    zBias,
-    zBiases,
-    shape,
+  const {stroke} = props;
 
-    ...flags
-  } = useTraits(props);
+  const {size, depth, shape} = usePointTrait(props);
+  const {point: position, points: positions, sizes, depths} = usePointsTrait(props);
+  const color = useColorTrait(props);
+  const colors = useColorsTrait(props);
+  const rop = useROPTrait(props);
 
   const attributes = {
     position,
@@ -73,7 +59,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
     zBias,
     zBiases,
   };
-
+  const flags = {stroke, ...rop};
   const archetype = getPluralArchetype(POINT_SCHEMA, props, flags);
 
   const shapes = {

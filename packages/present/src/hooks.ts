@@ -1,4 +1,4 @@
-import type { Rectangle, Point4 } from '@use-gpu/core';
+import type { Rectangle, XYZW } from '@use-gpu/core';
 import type { ParsedEffect } from './types';
 import { SLIDE_EFFECTS } from './traits';
 
@@ -12,7 +12,7 @@ import { getSlideMask } from '@use-gpu/wgsl/present/mask.wgsl';
 import { getSlideMotion } from '@use-gpu/wgsl/present/motion.wgsl';
 
 const ATTRIBUTES = bundleToAttributes(getSlideMotion);
-const NO_VEC4: Point4 = [0, 0, 0, 0];
+const NO_VEC4: XYZW = [0, 0, 0, 0];
 const EPSILON = 1e-3;
 
 const π = Math.PI;
@@ -29,7 +29,7 @@ export const usePresentTransition = (
   initial?: number,
 ) => {
   const e = useRef(0);
-  const d = useRef<Point4>(NO_VEC4);
+  const d = useRef<XYZW>(NO_VEC4);
   const v = useRef(0);
   const l = useShaderRef(layout);
 

@@ -310,6 +310,11 @@
       "import": "./src/mask/scissor.wgsl",
       "require": "./src/mask/scissor.wgsl"
     },
+    "./mask/sdf.wgsl": {
+      "types": "./src/mask/sdf.wgsl.d.ts",
+      "import": "./src/mask/sdf.wgsl",
+      "require": "./src/mask/sdf.wgsl"
+    },
     "./mask/textured.wgsl": {
       "types": "./src/mask/textured.wgsl.d.ts",
       "import": "./src/mask/textured.wgsl",

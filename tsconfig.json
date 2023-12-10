@@ -7,6 +7,7 @@
     { "path": "./packages/state" },
     { "path": "./packages/wgsl" },
     { "path": "./packages/live" },
+    { "path": "./packages/parse" },
     { "path": "./packages/traits" },
     { "path": "./packages/core" },
     { "path": "./packages/shader" },

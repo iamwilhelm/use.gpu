@@ -1,4 +1,4 @@
-import type { Point, Point4, Rectangle } from '@use-gpu/core';
+import type { XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { InlineElement, LayoutElement, InlineRenderer, LayoutRenderer, LayoutPicker, Direction, FitInto, Margin, Alignment, Anchor, Base } from '../types';
 
 import { makeTuples } from '@use-gpu/core';
@@ -6,7 +6,7 @@ import { makeInlineCursor } from './cursor';
 import { getAlignmentSpacing, isHorizontal, makeMiniHash } from './util';
 
 const NO_RENDER = () => null;
-const NO_MARGIN: Point4 = [0, 0, 0, 0];
+const NO_MARGIN: XYZW = [0, 0, 0, 0];
 
 export const resolveInlineBlockElements = (els: (InlineElement | LayoutElement)[], direction: Direction) => {
 
@@ -123,10 +123,10 @@ export const fitInline = (
 
   const n = els.length;
 
-  const ranges  = [] as Point[];
-  const sizes   = [] as Point[];
+  const ranges  = [] as XY[];
+  const sizes   = [] as XY[];
   const offsets = [] as [number, number, number][];
-  const anchors = [] as Point[];
+  const anchors = [] as XY[];
   const renders = [] as InlineRenderer[];
   const pickers = [] as (LayoutPicker | null)[];
 
@@ -222,7 +222,7 @@ export const fitInline = (
       mainPos += indentEnd;
 
       deduct = count === last ? 0 : gap + t;
-      const size = (isX ? [accum - deduct, lh] : [lh, accum - deduct]) as Point;
+      const size = (isX ? [accum - deduct, lh] : [lh, accum - deduct]) as XY;
 
       ranges.push([s, e]);
       sizes.push(size);
@@ -234,7 +234,7 @@ export const fitInline = (
       n -= count;
       
       if (count === last) {
-        if (block) anchors.push(offset as number[] as Point);
+        if (block) anchors.push(offset as number[] as XY);
         i++;
         span = 0;
       }

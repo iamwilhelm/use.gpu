@@ -1,5 +1,5 @@
-import type { Point, Point4, Rectangle } from '@use-gpu/core';
-import type { LayoutElement, LayoutRenderer, LayoutPicker, Direction, FitInto, AutoPoint, Margin, Alignment, Anchor } from '../types';
+import type { XY, XYZW, Rectangle } from '@use-gpu/core';
+import type { LayoutElement, LayoutRenderer, LayoutPicker, Direction, FitInto, AutoXY, Margin, Alignment, Anchor } from '../types';
 
 import { makeFlexCursor } from './cursor';
 import { isHorizontal, getAlignmentAnchor, getAlignmentSpacing } from './util';
@@ -8,7 +8,7 @@ export const getFlexMinMax = (
   els: LayoutElement[],
   fixed: [number | null, number | null],
   direction: Direction,
-  gap: Point,
+  gap: XY,
   wrap: boolean,
   snap: boolean,
 ) => {
@@ -71,9 +71,9 @@ export const getFlexMinMax = (
 export const fitFlex = (
   els: LayoutElement[],
   into: FitInto,
-  fixed: AutoPoint,
+  fixed: AutoXY,
   direction: Direction,
-  gap: Point,
+  gap: XY,
   alignX: Alignment,
   alignY: Alignment,
   anchor: Anchor,
@@ -101,8 +101,8 @@ export const fitFlex = (
   const isMainFixed = spaceMain != null;
   const isCrossFixed = spaceCross != null;
 
-  const sizes   = [] as Point[];
-  const offsets = [] as Point[];
+  const sizes   = [] as XY[];
+  const offsets = [] as XY[];
   const renders = [] as LayoutRenderer[];
   const pickers = [] as (LayoutPicker | null | undefined)[];
 
@@ -216,13 +216,13 @@ export const fitFlex = (
   const size = [
     isX ? (containX ?? maxMain) : caretCross,
     isX ? caretCross : (containY ?? maxMain),
-  ] as Point;
+  ] as XY;
 
   for (const el of els) if (el.absolute) {
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const absolute = [size[0], size[1], 0, 0] as Point4;
+    const absolute = [size[0], size[1], 0, 0] as XYZW;
     absolute[0] -= ml + mr;
     absolute[1] -= mt + mb;
     absolute[2] = absolute[0];

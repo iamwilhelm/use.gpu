@@ -235,6 +235,23 @@ export const signal = (key?: Key) => ({f: SIGNAL, args: null, key, by: getCurren
 /** LOL. Look, _you_ go try to make JSX.Element polymorphic. */
 export const into = (children: any): any => children;
 
+/** Make deprecated warning for component. */
+export const deprecated = <F extends ArrowFunction>(
+  f: LiveFunction<F>,
+  oldName: string,
+  newName?: string,
+): LiveFunction<F> => {
+  let warning = false;
+
+  return ((props: any) => {
+    if (!warning) {
+      console.warn(`<${oldName}> is deprecated. Use <${newName ?? (f as any).displayName ?? f.name}> instead.`);
+      warning = true;
+    }
+    return f(props);
+  }) as any;
+};
+
 export interface MakeContext<T> {
   <T>(initialValue: T, displayName?: string): LiveContext<T>;
   <T>(initialValue: undefined, displayName?: string): LiveContext<T>;

@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Point, Point4, Rectangle } from '@use-gpu/core';
+import type { XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { Placement } from '@use-gpu/traits';
 import type { FitInto, LayoutElement, LayoutPicker } from './types';
 
@@ -63,22 +63,22 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   const top = Math.min(t, b);
   const w = Math.abs(r - l);
   const h = Math.abs(b - t);
-  const into = [w, h, w, h] as Point4;
+  const into = [w, h, w, h] as XYZW;
 
   const {id} = useFiber();  
   const pickers: any[] = [];
-  const sizes: Point[] = [];
-  const offsets: Point[] = [];
+  const sizes: XY[] = [];
+  const offsets: XY[] = [];
 
   let {transform} = useTransformContext();
 
   // Global X/Y flip
-  const flip = useOne(() => [0, 0] as Point);
+  const flip = useOne(() => [0, 0] as XY);
   flip[0] = (l > r) ? l + r : 0;
   flip[1] = (t > b) ? b + t : 0;
 
   // Global X/Y shift
-  const shift = useOne(() => [0, 0] as Point);
+  const shift = useOne(() => [0, 0] as XY);
   shift[0] = (placement[0] - 1.0) / 2 * into[0];
   shift[1] = (placement[1] - 1.0) / 2 * into[1];
 

@@ -1,4 +1,4 @@
-import type { GeometryArray, TypedArray } from '@use-gpu/core';
+import type { CPUGeometry, TypedArray } from '@use-gpu/core';
 import { vec3, mat3, mat4 } from 'gl-matrix';
 import { UNIFORM_ARRAY_DIMS } from '@use-gpu/core';
 
@@ -8,7 +8,7 @@ export const forMeshTriangles = (() => {
   const v3 = vec3.create();
 
   return (
-    mesh: GeometryArray,
+    mesh: CPUGeometry,
     callback: (
       v1: vec3,
       v2: vec3,
@@ -41,7 +41,7 @@ export const transformPositions = (pos: TypedArray, format: string, matrix: mat4
   let step = 0;
   if (format === 'vec3to4<f32>') step = 3;
   if (format === 'vec4<f32>') step = 4;
-  if (!step) throw new Error(`unimplemented GeometryArray positions format '${format}'`);
+  if (!step) throw new Error(`unimplemented CPUGeometry positions format '${format}'`);
 
   const v = vec3.create();
 
@@ -69,7 +69,7 @@ export const transformNormals = (norms: TypedArray, format: string, matrix: mat4
   let step = 0;
   if (format === 'vec3to4<f32>') step = 3;
   if (format === 'vec4<f32>') step = 4;
-  if (!step) throw new Error(`unimplemented GeometryArray normals format '${format}'`);
+  if (!step) throw new Error(`unimplemented CPUGeometry normals format '${format}'`);
 
   const m = matrix ? mat3.normalFromMat4(mat3.create(), matrix) : mat3.create();
   const v = vec3.create();

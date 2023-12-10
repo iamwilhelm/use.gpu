@@ -118,6 +118,7 @@
     "packages/state",
     "packages/wgsl",
     "packages/live",
+    "packages/parse",
     "packages/traits",
     "packages/core",
     "packages/shader",

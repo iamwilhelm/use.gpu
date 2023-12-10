@@ -1,7 +1,5 @@
 import type { LiveFunction, LiveElement } from '@use-gpu/live';
 
-export type PointShape = 'circle' | 'diamond' | 'square' | 'circleOutlined' | 'diamondOutlined' | 'squareOutlined';
-
 export type LayerType = 'point' | 'line';
 
 export type LayerAggregator = (

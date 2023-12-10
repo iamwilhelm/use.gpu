@@ -12,6 +12,4 @@ export * from './surface-layer';
 export * from './tick-layer';
 
 export * from './virtual-layers';
-
-export * from './parse';
 export * from './types';

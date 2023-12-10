@@ -1,5 +1,5 @@
-import type { Point, Point4, Rectangle } from '@use-gpu/core';
-import type { FitInto, AutoPoint, Direction, LayoutElement, LayoutRenderer, LayoutPicker, Margin } from '../types';
+import type { XY, XYZW, Rectangle } from '@use-gpu/core';
+import type { FitInto, AutoXY, Direction, LayoutElement, LayoutRenderer, LayoutPicker, Margin } from '../types';
 
 import { isHorizontal, mergeMargin } from './util';
 
@@ -116,8 +116,8 @@ export const getBlockMargin = (
 export const fitBlock = (
   els: LayoutElement[],
   into: FitInto,
-  fixed: AutoPoint,
-  padding: Point4,
+  fixed: AutoXY,
+  padding: XYZW,
   direction: Direction,
   contain: boolean,
   shrinkWrap?: boolean,
@@ -133,7 +133,7 @@ export const fitBlock = (
   let m = 0;
 
   // Resolved fit size
-  const resolved = fixed.slice() as Point;
+  const resolved = fixed.slice() as XY;
   
   if (shrinkWrap) {
     if (!isX && fixed[0] == null) resolved[0] = Math.min(into[0] ?? Infinity, els.reduce((a, b) => Math.max(a, b.sizing[2]), 0));
@@ -154,8 +154,8 @@ export const fitBlock = (
     (fixed[1] ?? into[3]) - (pt + pb),
   ] as FitInto;
 
-  const sizes = [] as Point[];
-  const offsets = [] as Point[];
+  const sizes = [] as XY[];
+  const offsets = [] as XY[];
   const renders = [] as LayoutRenderer[];
   const pickers = [] as (LayoutPicker | null | undefined)[];
 
@@ -237,7 +237,7 @@ export const fitBlock = (
     const {margin, fit, under} = el;
     const [ml, mt, mr, mb] = margin;
 
-    const size = [resolved[0]!, resolved[1]!, 0, 0] as Point4;
+    const size = [resolved[0]!, resolved[1]!, 0, 0] as XYZW;
     size[0] -= ml + mr;
     size[1] -= mt + mb;
     size[2] = size[0];

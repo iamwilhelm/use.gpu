@@ -1,13 +1,13 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { StorageSource, GeometryArray, GPUGeometry } from '@use-gpu/core';
+import type { StorageSource, CPUGeometry, GPUGeometry } from '@use-gpu/core';
 
 import { use, yeet, useMemo } from '@use-gpu/live';
 import zipObject from 'lodash/zipObject';
 
 import { Data } from './data';
 
-export type GeometryDataProps = GeometryArray & {
+export type GeometryDataProps = CPUGeometry & {
   render?: (sources: GPUGeometry) => LiveElement,
 };
 

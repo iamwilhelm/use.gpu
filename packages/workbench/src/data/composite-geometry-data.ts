@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { GPUGeometry, DataField, StorageSource, GeometryArray } from '@use-gpu/core';
+import type { GPUGeometry, DataField, StorageSource, CPUGeometry } from '@use-gpu/core';
 
 import { keyed, yeet, gather, useMemo, useYolo } from '@use-gpu/live';
 import { getAggregateArchetype } from '@use-gpu/core';
@@ -10,7 +10,7 @@ import groupBy from 'lodash/groupBy';
 import { CompositeData } from './composite-data';
 
 export type CompositeGeometryDataProps = {
-  data: GeometryArray[],
+  data: CPUGeometry[],
   render?: (meshes: GPUGeometry[]) => LiveElement,
 };
 
@@ -20,7 +20,7 @@ export const CompositeGeometryData: LiveComponent<CompositeGeometryDataProps> = 
     render,
   } = props;
 
-  const partitions = groupBy(data, (geometry: GeometryArray) => {
+  const partitions = groupBy(data, (geometry: CPUGeometry) => {
     const {archetype, formats, unwelded} = geometry;
     return archetype ?? (geometry.archetype = getAggregateArchetype(formats, unwelded));
   });

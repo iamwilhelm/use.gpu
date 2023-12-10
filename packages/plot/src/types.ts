@@ -1,9 +1,21 @@
-import type { VectorLike, ColorLike, Placement, Blending, Domain, Join } from '@use-gpu/traits';
-import type { PointShape } from '@use-gpu/workbench';
+import type { VectorLike, VectorLikes, ColorLike, Blending } from '@use-gpu/core';
+import type { PointShape, Placement, Domain, Join } from '@use-gpu/parse';
 
 export type Axis4 = 'x' | 'y' | 'z' | 'w';
 export type Swizzle = string;
 
+export type DomainOptions = {
+  divide: number,
+  unit: number,
+  base: number,
+  start: boolean,
+  end: boolean,
+  zero: boolean,
+  factor: number,
+  nice: boolean,
+};
+
+/*
 export type AnchorTrait = {
   placement: Placement,
   offset: number,
@@ -23,12 +35,21 @@ export type ArrowTrait = {
   size: number,
   start: boolean,
   end: boolean,
-  detail: number,
+};
+
+export type ArrowsTrait = {
+  sizes: number[],
+  starts: boolean[],
+  ends: boolean[],
 };
 
 export type ColorTrait = {
   color: ColorLike,
   opacity: number,
+};
+
+export type ColorsTrait = {
+  colors: ColorLike[],
 };
 
 export type FontTrait = {
@@ -43,22 +64,37 @@ export type GridTrait = {
 };
 
 export type LabelTrait = {
-  labels?: string[],
+  label?: string,
   format?: (v: number, i: number) => string,
+
   size: number,
   depth: number,
-  expand: number,
+
   background: ColorLike,
+  expand: number,
   box: number | [number, number],
+};
+
+export type LabelsTrait = {
+  labels?: string[],
 };
 
 export type LineTrait = {
   width: number,
   depth: number,
-  join: Join,
   loop: boolean,
+
+  join: Join,
   dash: number[] | null,
   proximity: number,
+};
+
+export type LinesTrait = {
+  line?: VectorLikes,
+  lines?: VectorLikes[],
+  widths: number[],
+  depths: number[],
+  loops: boolean[],
 };
 
 export type ObjectTrait = {
@@ -71,31 +107,31 @@ export type ObjectTrait = {
 
 export type PointTrait = {
   size: number,
+  sizes: number[],
   depth: number,
+  depths: number[],
+
   shape: PointShape,
 };
 
+export type PointsTrait = {
+  point?: VectorLike,
+  points?: VectorLikes,
+
+  sizes: number[],
+  depths: number[],
+};
+
 export type ROPTrait = {
-  blending: Blending,
-  zWrite: boolean,
-  zTest: boolean,
-  zBias: number,
-  zIndex: number,
+  alphaToCoverage: boolean,
+  blend:           Blending,
+  depthWrite:      boolean,
+  depthTest:       boolean,
+  mode:            string,
 };
 
 export type ScaleTrait = DomainOptions & {
   mode: Domain,
-};
-
-export type DomainOptions = {
-  divide: number,
-  unit: number,
-  base: number,
-  start: boolean,
-  end: boolean,
-  zero: boolean,
-  factor: number,
-  nice: boolean,
 };
 
 export type SurfaceTrait = {
@@ -110,3 +146,13 @@ export type VolumeTrait = {
   loopZ: boolean,
   shaded: boolean,
 };
+
+export type ZBiasTrait = {
+  zBias: number,
+  zIndex: number,
+};
+
+export type ZBiasesTrait = {
+  zBiases: VectorLike,
+};
+*/

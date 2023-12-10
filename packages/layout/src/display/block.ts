@@ -1,6 +1,6 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Rectangle, Point, Point4 } from '@use-gpu/core';
+import type { Rectangle, XY, XYZW } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin } from '../types';
 
 import { useProp } from '@use-gpu/traits';

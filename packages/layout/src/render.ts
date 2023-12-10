@@ -1,6 +1,6 @@
 import type { LiveElement } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Point, Point4, Rectangle } from '@use-gpu/core';
+import type { XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { LayoutRenderer, LayoutPicker, RenderInside, RenderOutside, RenderInline, InlineRenderer, InlineLine, UIAggregate } from './types';
 
 import { memoArgs, yeet, fragment, use, useFiber, useMemo, useNoMemo } from '@use-gpu/live';

@@ -1,5 +1,5 @@
-import type { Point, Rectangle } from '@use-gpu/core';
-import type { LayoutElement, LayoutRenderer, LayoutPicker, FitInto, AutoPoint, AutoRectangle, Direction } from '../types';
+import type { XY, Rectangle } from '@use-gpu/core';
+import type { LayoutElement, LayoutRenderer, LayoutPicker, FitInto, AutoXY, AutoRectangle, Direction } from '../types';
 
 import { evaluateDimension } from '../parse';
 import { fitBlock } from './block';
@@ -27,7 +27,7 @@ export const fitAbsoluteBox = (
   const fixed = [
     left != null && right != null ? right - left : null,
     top != null && bottom != null ? bottom - top : null,
-  ] as AutoPoint;
+  ] as AutoXY;
 
   const isX = isHorizontal(direction);
   const shrinkWrap = isX ? fixed[0] === null : fixed[1] === null;

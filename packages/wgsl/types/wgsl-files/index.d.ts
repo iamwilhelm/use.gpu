@@ -404,12 +404,8 @@ declare module "@use-gpu/wgsl/mask/passthru.wgsl" {
 declare module "@use-gpu/wgsl/mask/point.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;
-  export const circle: ParsedBundle;
-  export const diamond: ParsedBundle;
-  export const square: ParsedBundle;
-  export const circleOutlined: ParsedBundle;
-  export const diamondOutlined: ParsedBundle;
-  export const squareOutlined: ParsedBundle;
+  export const getFilledMask: ParsedBundle;
+  export const getOutlinedMask: ParsedBundle;
   export default __module;
 }
 
@@ -418,6 +414,20 @@ declare module "@use-gpu/wgsl/mask/scissor.wgsl" {
   const __module: ParsedBundle;
   export const getScissorColor: ParsedBundle;
   export const isScissored: ParsedBundle;
+  export default __module;
+}
+
+declare module "@use-gpu/wgsl/mask/sdf.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const circleSDF: ParsedBundle;
+  export const diamondSDF: ParsedBundle;
+  export const squareSDF: ParsedBundle;
+  export const triangleSDF: ParsedBundle;
+  export const upSDF: ParsedBundle;
+  export const downSDF: ParsedBundle;
+  export const leftSDF: ParsedBundle;
+  export const rightSDF: ParsedBundle;
   export default __module;
 }
 

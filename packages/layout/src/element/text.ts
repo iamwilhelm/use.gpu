@@ -1,5 +1,5 @@
 import type { LiveComponent } from '@use-gpu/live';
-import type { Point4, Rectangle } from '@use-gpu/core';
+import type { XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 import type { Base, InlineLine } from '../types';
@@ -18,8 +18,8 @@ export type TextProps = {
   radius?: Margin | number,
 
   border?: Margin | number,
-  stroke?: Point4,
-  fill?: Point4,
+  stroke?: XYZW,
+  fill?: XYZW,
   */
   
   opacity?: number,
@@ -40,9 +40,9 @@ export type TextProps = {
   children?: string,
 };
 
-const BLACK: Point4 = [0, 0, 0, 1];
-const NO_MARGIN: Point4 = [0, 0, 0, 0];
-const NO_STROKE: Point4 = [0.0, 0.0, 0.0, 0.0];
+const BLACK: XYZW = [0, 0, 0, 1];
+const NO_MARGIN: XYZW = [0, 0, 0, 0];
+const NO_STROKE: XYZW = [0.0, 0.0, 0.0, 0.0];
 
 export const Text: LiveComponent<TextProps> = memo((props) => {
   const {

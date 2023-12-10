@@ -1,4 +1,4 @@
-import type { Point4 } from '@use-gpu/core';
+import type { XYZW } from '@use-gpu/core';
 
 export type SlideEffect = 'none' | 'fade' | 'wipe' | 'move';
 export type SlideEase = 'cosine' | 'linear';
@@ -21,7 +21,7 @@ export type TransitionTrait = {
 
 export type ParsedEffect = {
   type: SlideEffect,
-  direction: Point4,
+  direction: XYZW,
   delay: number,
   duration: number,
   ease: 'cosine' | 'linear',

@@ -1,5 +1,5 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Point4 } from '@use-gpu/core';
+import type { XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 
@@ -26,7 +26,7 @@ export type BasicMaterialProps = {
   render?: (material: Record<string, Record<string, ShaderSource | null | undefined | void>>) => LiveElement,
 };
 
-const WHITE = [1, 1, 1, 1] as Point4;
+const WHITE = [1, 1, 1, 1] as XYZW;
 
 export const BasicMaterial: LC<BasicMaterialProps> = (props: PropsWithChildren<BasicMaterialProps>) => {
   const {

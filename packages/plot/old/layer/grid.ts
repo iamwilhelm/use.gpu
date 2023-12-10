@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { Point4 } from '@use-gpu/core';
+import type { XYZW } from '@use-gpu/core';
 import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } from '../types';
 
 import { parseVec4, useProp } from '@use-gpu/traits';
@@ -34,7 +34,7 @@ import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
 import { getGridAutoPosition } from '@use-gpu/wgsl/plot/grid-auto.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 
-const NO_POINT4: Point4 = [0, 0, 0, 0];
+const NO_POINT4: XYZW = [0, 0, 0, 0];
 
 export type GridProps =
   Partial<GridTrait> &

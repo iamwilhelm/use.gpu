@@ -76,19 +76,19 @@ export const useNoHook = (hookType: Hook) => () => {
   state![i + 1] = undefined;
 };
 
-type ShouldMemoArgs<T extends Array<any>> = (prevArgs: T, nextArgs: T) => boolean;
-type ShouldMemoProps<T> = (prevProps: T, nextArgs: T) => boolean;
+type IsEqualMemoArgs<T extends Array<any>> = (prevArgs: T, nextArgs: T) => boolean;
+type IsEqualMemoProps<T> = (prevProps: T, nextArgs: T) => boolean;
 
 /**
  * Memoize a live function on all its arguments (shallow comparison per arg)
  */
 export const memoArgs = <F extends ArrowFunction>(
   f: LiveFunction<F>,
-  shouldOrName?: ShouldMemoArgs<Parameters<F>> | string,
+  isEqualOrName?: IsEqualMemoArgs<Parameters<F>> | string,
   name?: string,
 ) => {
-  const customMemo = typeof shouldOrName === 'function' ? shouldOrName as ShouldMemoArgs<any> : null;
-  if (typeof shouldOrName === 'string') name = shouldOrName;
+  const customMemo = typeof isEqualOrName === 'function' ? isEqualOrName as IsEqualMemoArgs<any> : null;
+  if (typeof isEqualOrName === 'string') name = isEqualOrName;
 
   const inner = (...args: any[]) => {
     const fiber = useFiber();
@@ -127,11 +127,11 @@ export const memoArgs = <F extends ArrowFunction>(
  */
 export const memoProps = <F extends ArrowFunction>(
   f: LiveFunction<F>,
-  shouldOrName?: ShouldMemoProps<Parameters<F>[0]> | string,
+  isEqualOrName?: IsEqualMemoProps<Parameters<F>[0]> | string,
   name?: string,
 ) => {
-  const customMemo = typeof shouldOrName === 'function' ? shouldOrName as ShouldMemoArgs<any> : null;
-  if (typeof shouldOrName === 'string') name = shouldOrName;
+  const customMemo = typeof isEqualOrName === 'function' ? isEqualOrName as IsEqualMemoArgs<any> : null;
+  if (typeof isEqualOrName === 'string') name = isEqualOrName;
 
   const inner = (props: Record<string, any>[]) => {
     const fiber = useFiber();

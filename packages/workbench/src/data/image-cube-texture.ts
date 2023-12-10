@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { Point, ColorSpace, TextureSource } from '@use-gpu/core';
+import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 
 import { use, yeet, gather, keyed, wrap, suspend, useMemo, useYolo } from '@use-gpu/live';
 import { Suspense } from '@use-gpu/workbench';
@@ -54,7 +54,7 @@ export const ImageCubeTexture: LiveComponent<ImageCubeTextureProps> = (props) =>
       const [resource] = resources;
       const {format, colorSpace} = resource;
 
-      let size: Point = [0, 0];
+      let size: XY = [0, 0];
       if ('bitmap' in resource) size = [resource.bitmap.width, resource.bitmap.height];
       else if ('data' in resource) size = resource.data.size;
 

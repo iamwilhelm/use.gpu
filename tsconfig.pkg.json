@@ -3,7 +3,7 @@
     "composite": true,
     "incremental": true,
     "target": "esnext",
-    "module": "nodenext",
+    "module": "esnext",
     "lib": ["esnext", "dom"],
     "allowJs": true,
     "checkJs": false,
@@ -14,7 +14,7 @@
     "rootDir": "./",
     "isolatedModules": true,
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "baseUrl": "./",
     "paths": {
       "@use-gpu/wgsl/*": ["./packages/wgsl/src/*", "../../wgsl/src/*"],
@@ -26,7 +26,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "typeRoots": [
+       "./node_modules/@types",
+       "./node_modules",
+    ],
   },
   "exclude": [
     "babel.config.*",

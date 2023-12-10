@@ -1,7 +1,7 @@
 import type { LambdaSource, TextureSource, StorageSource } from '@use-gpu/core';
 
 import { proxy, proxyRef } from '@use-gpu/core';
-import { useOne, useNoOne } from '@use-gpu/live';
+import { useOne, useNoOne, useRef, useNoRef } from '@use-gpu/live';
 
 export const useDerivedSource = <T extends TextureSource | StorageSource | LambdaSource>(
   source: T,
@@ -20,4 +20,7 @@ export const getDerivedSource = <T extends TextureSource | StorageSource | Lambd
   return source ? proxy(source, override) : null as any;
 };
 
-export const useNoDerivedSource = useNoOne;
+export const useNoDerivedSource = () => {
+  useNoRef();
+  useNoOne();
+};

@@ -1,5 +1,5 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { GPUGeometry } from '@use-gpu/core';
+import type { StorageSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { yeet, useMemo, useOne } from '@use-gpu/live';
@@ -14,12 +14,12 @@ import { useRawSource } from '../hooks/useRawSource';
 import debugWGSL from '@use-gpu/wgsl/debug/line-helper.wgsl';
 
 export type DebugHelper = {
-  target: GPUGeometry,
-  mesh: GPUGeometry,
+  target: Record<string, StorageSource>,
+  attributes: Record<string, StorageSource>,
   swap: () => void,
-  emit: {
-    point: ShaderSource,
-    line: ShaderSource,
+  shaders: {
+    emitPoint: ShaderSource,
+    emitLine: ShaderSource,
   },
 };
 
@@ -57,7 +57,7 @@ export const DebugLineHelper: LC<DebugLineHelperProps> = (props: DebugLineHelper
       clearBuffer(device, atomicStorage.buffer);
     }
 
-    const mesh = {
+    const attributes = {
       counter: getDerivedSource(atomicStorage, { readWrite: false, format: 'u32' }),
       positions: getDerivedSource(debugPositions, { readWrite: false }),
       colors: getDerivedSource(debugColors, { readWrite: false }),
@@ -72,11 +72,11 @@ export const DebugLineHelper: LC<DebugLineHelperProps> = (props: DebugLineHelper
     };
 
     const boundEmitter = getBoundShader(debugWGSL, [target.counter, target.positions, target.colors, target.segments]);
-    const point = bindEntryPoint(boundEmitter, 'emitPoint');
-    const line = bindEntryPoint(boundEmitter, 'emitLine');
-    const emit = {point, line};
+    const emitPoint = bindEntryPoint(boundEmitter, 'emitPoint');
+    const emitLine = bindEntryPoint(boundEmitter, 'emitLine');
+    const shaders = {emitPoint, emitLine};
 
-    return {target, mesh, swap, emit};
+    return {target, attributes, shaders, swap};
   }, [device, atomicStorage, atomicArray, debugPositions, debugSegments]);
 
   return render ? render(helper) : yeet(helper);

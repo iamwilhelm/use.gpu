@@ -33,8 +33,6 @@ type State = {
   length: number,
 };
 
-const parseBackground = makeParseColor(parseColor('#000000'));
-
 export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>) => {
   const {
     step: initialStep = 0,
@@ -42,7 +40,7 @@ export const Present: LC<PresentProps> = (props: PropsWithChildren<PresentProps>
     children,
   } = props;
   
-  const backgroundColor = useProp(props.backgroundColor, parseBackground);
+  const backgroundColor = useProp(props.backgroundColor, parseBackground, '#000000');
 
   // Presentation state starts out empty
   const [state, setState] = useState(() => ({

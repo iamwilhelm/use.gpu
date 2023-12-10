@@ -1,10 +1,10 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { XYZW } from '@use-gpu/core';
+import type { ColorLike, XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
-import type { ColorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
-import { parseColor, useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
+import { parseColor } from '@use-gpu/parse';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';

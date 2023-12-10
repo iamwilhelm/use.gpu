@@ -2,7 +2,8 @@ import type {
   ArrowFunction, TypedArray, TypedArrayConstructor,
   Blending, VectorLike, ArrayLike, ColorLike, ColorLikes, VectorLikes,
 } from '@use-gpu/core';
-import type { Join, Placement, PointShape, Domain } from './types';
+import type { Parser, Join, Placement, PointShape, Domain } from './types';
+import { seq } from '@use-gpu/core';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
 import { toScalarArray, toVectorArray } from './flatten';
 
@@ -21,7 +22,10 @@ const NO_RANGE = vec2.fromValues(-1, 1);
 const NO_RANGES = [NO_RANGE, NO_RANGE, NO_RANGE, NO_RANGE];
 
 const AXIS_NUMBERS = {'x': 0, 'y': 1, 'z': 2, 'w': 3} as Record<string, number>;
-const AXIS_LETTERS = ['x', 'y', 'z', 'w'];
+
+const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
+const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
+const strToFloat = (s: string) => s.match('%') ? +s / 100 : +s;
 
 ///////////////////////////
 
@@ -30,74 +34,7 @@ export const isTypedArray = (() => {
   return (obj: any) => obj instanceof TypedArray;
 })();
 
-export const makeParseObject = <T>(def: object) => (value?: T) => value ?? def;
-
-export const makeParseNumber = (def: number = 0, min?: number, max?: number) => (value?: number) => {
-  if (value != null) {
-    if (min != null) value = Math.max(min, value);
-    if (max != null) value = Math.min(max, value);
-    return +value || 0;
-  }
-  return def;
-};
-
-export const makeParseInt = (def: number = 0, min?: number, max?: number) => (value?: number) => {
-  if (value != null) {
-    value = Math.round(value);
-    if (min != null) value = Math.max(min, value);
-    if (max != null) value = Math.min(max, value);
-    return value;
-  }
-  return def;
-};
-
-export const makeParseBoolean = (def: boolean = false) => (value?: number | boolean) => {
-  if (value != null) {
-    return !!value;
-  }
-  return def;
-};
-
-export const makeParseVec2 = (defaults: vec2 = NO_VEC2) => (vec?: VectorLike): vec2 => {
-  if (vec != null) {
-    return vec2.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1]);
-  }
-  return defaults;
-};
-
-export const makeParseVec3 = (defaults: vec3 = NO_VEC3) => (vec?: VectorLike): vec3 => {
-  if (vec != null) {
-    return vec3.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2]);
-  }
-  return defaults;
-};
-
-export const makeParseVec4 = (defaults: vec4 = NO_VEC4) => (vec?: VectorLike): vec4 => {
-  if (vec != null) {
-    return vec4.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2], vec[3] ?? defaults[3]);
-  }
-  return defaults;
-};
-
-export const makeParseBooleanArray = () => (vec?: VectorLike): Uint8Array =>
-  vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
-
-export const makeParseTypedArray = <T extends TypedArray>(
-  dims: number,
-  constructor: TypedArrayConstructor = Float32Array,
-) => (
-  vecs?: VectorLikes
-): T => {
-  return (vecs ? toVectorArray(vecs, dims, constructor) : new constructor()) as T;
-}
-
-export const makeParseMat4 = () => (matrix?: VectorLike): mat4 => {
-  if (matrix != null) {
-    // @ts-ignore
-    return mat4.fromValues(...matrix);
-  }
-  return NO_MAT4;
-};
+///////////////////////////
 
 export const makeParseArray = <T>(
   defaults: T[],
@@ -120,7 +57,10 @@ export const makeParseEnum = <T>(
   const [def] = options;
 
   return (s?: string): T => {
-    if (s != null && hash.has(s as any)) return s as any as T;
+    if (s != null) {
+      if (hash.has(s as any)) return s as any as T;
+      else console.warn(`Unknown enum value '${s}'`);
+    }
     return def;
   };
 };
@@ -133,34 +73,52 @@ export const makeParseMapOrValue = <T>(map: Record<string, T>, def: string): ((s
   return (s?: string | T) => map[s as any] ?? (s as any as T) ?? map[def]!;
 };
 
-export const makeParseString = (
-  defaults: string = '',
-) => {
-  return (s?: string): string => {
-    if (s != null) return s;
-    return defaults;
-  };
+///////////////////////////
+
+export const makeParseVec2 = (defaults: vec2 = NO_VEC2) => (vec?: VectorLike): vec2 => {
+  if (vec != null) {
+    return vec2.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1]);
+  }
+  return defaults;
 };
 
-export const makeParseStringFormatter = (
-  defaults: string = '',
-) => {
-  return (s?: ArrowFunction): ArrowFunction => {
-    if (typeof s === 'function') return s;
-    return (s?: string) => '' + s;
-  };
+export const makeParseVec3 = (defaults: vec3 = NO_VEC3) => (vec?: VectorLike): vec3 => {
+  if (vec != null) {
+    return vec3.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2]);
+  }
+  return defaults;
 };
 
-export const makeParseAxis = (def: number) => (s?: string) => {
-  if (s != null) return AXIS_NUMBERS[s] ?? def;
-  return def;
+export const makeParseVec4 = (defaults: vec4 = NO_VEC4) => (vec?: VectorLike): vec4 => {
+  if (vec != null) {
+    return vec4.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2], vec[3] ?? defaults[3]);
+  }
+  return defaults;
 };
+
+export const makeParseMat4 = (defaults: mat4 = NO_MAT4) => (matrix?: VectorLike): mat4 => {
+  if (matrix != null) {
+    // @ts-ignore
+    return mat4.fromValues(...matrix);
+  }
+  return defaults;
+};
+
+export const makeParseTypedArray = <T extends TypedArray>(
+  dims: number,
+  constructor: TypedArrayConstructor = Float32Array,
+) => (
+  vecs: VectorLikes
+): T => {
+  return toVectorArray(vecs, dims, constructor) as T;
+}
 
 export const makeParseBasis = (defaults: string) => {
   const axes = defaults.split('');
-  const order = [0, 1, 2, 3];
+  const order = seq(axes.length);
 
   const getOrder = (s: string) => {
+    // Fill out incomplete basis, e.g. 'yx' -> 'yxzw'
     order.sort((a, b) => {
       const ai = s.indexOf(axes[a]);
       const bi = s.indexOf(axes[b]);
@@ -168,22 +126,62 @@ export const makeParseBasis = (defaults: string) => {
       if (ai < 0 && bi < 0) return a - b;
       return (ai < 0) ? 1 : -1;
     });
-    return order.map(x => AXIS_LETTERS[x]).join('');
+    return order.map(x => axes[x]).join('');
   };
 
   return (s?: string) => {
     if (s != null) return getOrder(s);
     return defaults;
-  }
+  };
 };
 
-const u4ToFloat = (s: string) => parseInt(s, 16) / 15;
-const u8ToFloat = (s: string) => parseInt(s, 16) / 255;
-const strToFloat = (s: string) => s.match('%') ? +s / 100 : +s;
+///////////////////////////
 
-export const makeParseColor = (def: vec4 = GRAY) => (color?: ColorLike): vec4 => {
+export const clampNumber = (
+  min: number | null,
+  max: number | null,
+) => (
+  parse: Parser<number | undefined, number>,
+) => (
+  value?: number,
+) => {
+  let v = parse(value);
+  if (min != null) v = Math.max(min, v);
+  if (max != null) v = Math.min(max, v);
+  return v;
+};
+
+///////////////////////////
+
+export const parseObject = <T>(value?: T) => typeof value === 'object' && value != null ? value : {};
+export const parseString = (s?: string) => s ?? '';
+export const parseNumber = (value?: number) => +(value || 0);
+export const parseInteger = (value?: number) => Math.round(+(value || 0));
+export const parseBoolean = (value?: boolean) => !!value;
+
+export const parseNumberUnsigned = clampNumber(0, null)(parseNumber);
+export const parseNumberPositive = clampNumber(1, null)(parseNumber);
+export const parseIntegerPositive = clampNumber(1, null)(parseInteger);
+
+export const parseVec2 = makeParseVec2();
+export const parseVec3 = makeParseVec3();
+export const parseVec4 = makeParseVec4();
+
+export const parseStringFormatter = (s: ArrowFunction | string): ArrowFunction => {
+  if (typeof s === 'function') return s;
+  return (s?: string) => '' + s;
+};
+
+export const parseAxis = (s?: string) => {
+  if (s != null) return AXIS_NUMBERS[s] ?? 0;
+  return 0;
+};
+
+export const parseColor = (color?: ColorLike): vec4 => {
+  const def = GRAY;
+  if (!color) return def;
+
   const c = color as any;
-  if (c == null) return def;
 
   if (c === +c) {
     const r = ((c >> 16) & 255) / 255;
@@ -226,8 +224,16 @@ export const makeParseColor = (def: vec4 = GRAY) => (color?: ColorLike): vec4 =>
   if (c.length) {
     return vec4.fromValues(c[0] ?? def[0], c[1] ?? def[1], c[2] ?? def[2], c[3] ?? def[3]);
   }
+
   return def;
 };
+
+//////////////////
+
+export const parseStringArray = makeParseArray(NO_STRINGS, parseString);
+
+export const parseBooleanArray = (vec: VectorLike): Uint8Array =>
+  vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
 
 export const parseColorArray = (colors?: ColorLikes): Float32Array => {
   if (isTypedArray(colors)) return colors as Float32Array;
@@ -235,30 +241,12 @@ export const parseColorArray = (colors?: ColorLikes): Float32Array => {
   return parseVec4Array(parsed);
 };
 
-//////////////////
-
-export const parseNumber     = makeParseNumber();
-export const parseInteger    = makeParseInt();
-export const parseBoolean    = makeParseBoolean();
-
-export const parseIntegerPositive = makeParseInt(1, 1, 1e15);
-
-export const parseString          = makeParseString();
-export const parseStringFormatter = makeParseStringFormatter();
-export const parseStringArray     = makeParseArray(NO_STRINGS, parseString);
-
-export const parseVector = makeParseArray(NO_VECTOR, parseNumber);
-
 export const parseScalarArray  = makeParseTypedArray<Float32Array>(1);
 export const parseVec2Array    = makeParseTypedArray<Float32Array>(2);
 export const parseVec3Array    = makeParseTypedArray<Float32Array>(3);
 export const parseVec4Array    = makeParseTypedArray<Float32Array>(4);
-export const parseBooleanArray = makeParseBooleanArray();
 
-export const parseColor      = makeParseColor();
-export const parseVec4       = makeParseVec4();
-export const parseVec3       = makeParseVec3();
-export const parseVec2       = makeParseVec2();
+//////////////////
 
 export const parsePosition   = makeParseVec3();
 export const parseRotation   = makeParseVec3();
@@ -295,15 +283,10 @@ export const parseWeight = makeParseMapOrValue({
 }, 'normal');
 
 export const parseAxes   = makeParseBasis('xyzw');
-
-export const parseAxis   = makeParseAxis(0);
-
 export const parseRange  = makeParseVec2(NO_RANGE);
-
 export const parseRanges = makeParseArray(NO_RANGES, parseRange);
 
 export const parseDomain = makeParseEnum<Domain>(['linear', 'log']);
-
 export const parsePointShape = makeParseEnum<PointShape>([
   'circle',
   'diamond',

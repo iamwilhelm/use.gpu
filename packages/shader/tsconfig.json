@@ -3,7 +3,6 @@
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "src",
-    "typeRoots": ["../node_modules/@types"],
     "outDir": "../../build/ts",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
@@ -15,5 +14,10 @@
     "node_modules",
     "build"
   ],
-  "include": ["src/**/*.ts", "src/**/*.js", "glsl.ts", "wgsl.ts", "types.ts"]
+  "include": ["src/**/*.ts", "src/**/*.js", "glsl.ts", "wgsl.ts", "types.ts"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }

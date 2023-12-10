@@ -33,8 +33,9 @@ export const GeometryData: LiveComponent<GeometryDataProps> = (props: GeometryDa
     use(Data, {
       fields,
       render: (...sources: StorageSource[]) => {
+        const attr = zipObject(Object.keys(attributes), sources);
         const out = {
-          ...zipObject(Object.keys(attributes), sources),
+          attributes: attr,
           count,
           topology,
           unwelded,

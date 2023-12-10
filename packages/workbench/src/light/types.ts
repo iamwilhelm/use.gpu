@@ -1,4 +1,4 @@
-import type { VectorLike } from '@use-gpu/traits';
+import type { VectorLike } from '@use-gpu/core';
 import type { TypedArray } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 

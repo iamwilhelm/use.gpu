@@ -1,20 +1,14 @@
 export type ArrowFunction = (...args: any[]) => any;
 
 export type Props = Record<string, any>;
-export type Parser<A, B> = (t?: A) => B;
+export type Parser<A, B> = (t: A) => B;
 
 export type TraitDefinition = Record<string, Parser<any, any>>;
-export type InputTypes<T extends TraitDefinition> = {
-  [P in keyof T]?: Parameters<T[P]>[0];
-};
-export type OutputTypes<T extends TraitDefinition> = {
-  [P in keyof T]: ReturnType<T[P]>;
-};
 
-export type Trait<A, B> = (input: Partial<A>, output: B, hooks: UseHooks) => void;
-export type UseTrait<I, O> = (props: Partial<I>) => O;
+export type Trait<A, B> = (input: A, output: B, hooks: UseHooks) => void;
+export type UseTrait<I, O> = (props: I) => O;
 
-export type TraitProps<T> = T extends Trait<infer A, any> ? Partial<A> : never;
+export type TraitProps<T> = T extends Trait<infer A, any> ? A : never;
 
 export type TraitCombinator = {
   <A, B, C, D>(a: Trait<A, B>, b: Trait<C, D>): Trait<A & C, B & D>;
@@ -32,6 +26,19 @@ export type TraitCombinator = {
   <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, _A, _B>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>, j: Trait<S, T>, k: Trait<U, V>, l: Trait<W, X>, m: Trait<Y, Z>, n: Trait<_A, _B>): Trait<A & C & E & G & I & K & M & O & Q & S & U & W & Y & _A, B & D & F & H & J & L & N & P & R & T & V & X & Z & _B>;
   <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, _A, _B, _C, _D>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>, j: Trait<S, T>, k: Trait<U, V>, l: Trait<W, X>, m: Trait<Y, Z>, n: Trait<_A, _B>, o: Trait<_C, _D>): Trait<A & C & E & G & I & K & M & O & Q & S & U & W & Y & _A & _C, B & D & F & H & J & L & N & P & R & T & V & X & Z & _B & _D>;
   <A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, _A, _B, _C, _D, _E, _F>(a: Trait<A, B>, b: Trait<C, D>, c: Trait<E, F>, d: Trait<G, H>, e: Trait<I, J>, f: Trait<K, L>, g: Trait<M, N>, h: Trait<O, P>, i: Trait<Q, R>, j: Trait<S, T>, k: Trait<U, V>, l: Trait<W, X>, m: Trait<Y, Z>, n: Trait<_A, _B>, o: Trait<_C, _D>, p: Trait<_E, _F>): Trait<A & C & E & G & I & K & M & O & Q & S & U & W & Y & _A & _C & _E, B & D & F & H & J & L & N & P & R & T & V & X & Z & _B & _D & _F>;
+};
+
+type IfUndefined<A, B> = undefined extends A ? B : never;
+type IfDefined<A, B> = undefined extends A ? never : B;
+
+export type InputTypes<T extends TraitDefinition> = {
+  [P in keyof T as IfUndefined<Parameters<T[P]>[0], P>]?: Parameters<T[P]>[0];
+} & {
+  [P in keyof T as IfDefined<Parameters<T[P]>[0], P>]: Parameters<T[P]>[0];
+};
+
+export type OutputTypes<T extends TraitDefinition> = {
+  [P in keyof T]: ReturnType<T[P]>;
 };
 
 /*
@@ -68,6 +75,10 @@ console.log(chunks.join("\n"));
 
 export type UseMemo = <T>(memoValue: () => T, deps: any[]) => T;
 export type UseOne = <T>(memoValue: () => T, deps?: any) => T;
-export type UseProp = <A, B>(value: A | undefined, parse: (t?: A) => B, def?: B) => B;
+export type UseProp = {
+    <A, B>(value: A | undefined, parse: (t: A) => B, def: B): B;
+    <A, B>(value: A | undefined, parse: (t?: A) => B): B;
+    <A, B>(value: A, parse: (t: A) => B): B;
+};
 
 export type UseHooks = {useMemo: UseMemo, useOne: UseOne, useProp: UseProp};

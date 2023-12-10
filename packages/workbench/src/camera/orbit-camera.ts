@@ -1,8 +1,9 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/traits';
+import type { VectorLike } from '@use-gpu/core';
 import { ViewUniforms, UniformAttribute } from '@use-gpu/core';
 
-import { parsePosition, useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
+import { parsePosition } from '@use-gpu/parse';
 import { provide, use, useContext, useOne, incrementVersion } from '@use-gpu/live';
 import { VIEW_UNIFORMS, makeProjectionMatrix, makeOrbitMatrix, makeOrbitPosition, makeFrustumPlanes } from '@use-gpu/core';
 import { FrameContext, usePerFrame } from '../providers/frame-provider';

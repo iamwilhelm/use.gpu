@@ -1,23 +1,27 @@
 import type { XYZW } from '@use-gpu/core';
 import type {
-  EffectTrait,
-  SlideTrait,
-  TransitionTrait,
   SlideDirection,
   SlideEase,
   SlideEffect,
 } from './types';
+import {
+  EffectTrait,
+  SlideTrait,
+  TransitionTrait,
+} from './traits';
 
 import { useOne } from '@use-gpu/live';
 import {
   makeUseTrait,
   makeParseTrait,
-  makeParseEnum,
   useProp,
+  optional,
+} from '@use-gpu/traits/live';
+import {
+  makeParseEnum,
   parseInteger,
   parseNumber,
-  optional,
-} from '@use-gpu/traits';
+} from '@use-gpu/parse';
 
 import { vec4 } from 'gl-matrix';
 import mapValues from 'lodash/mapValues';
@@ -58,8 +62,11 @@ const EFFECT_DEFAULTS = {
 
 const PARTIAL_EFFECT_TRAIT = mapValues(EFFECT_TRAIT, (t: any) => optional(t));
 
-const parseEffectTrait = makeParseTrait(EFFECT_TRAIT, EFFECT_DEFAULTS);
-const parsePartialEffectTrait = makeParseTrait(PARTIAL_EFFECT_TRAIT, {});
+const EffectTrait = trait(EFFECT_TRAIT, EFFECT_DEFAULTS);
+const PartialEffectTrait = trait(PARTIAL_EFFECT_TRAIT, {});
+
+const parseEffectTrait = makeParseTrait(EffectTrait);
+const parsePartialEffectTrait = makeParseTrait(PartialEffectTrait);
 
 const SLIDE_TRAIT = {
   order: optional(parseInteger),
@@ -78,8 +85,9 @@ const TRANSITION_DEFAULTS = {
   effect: {},
 };
 
-export const useEffectTrait = makeUseTrait<EffectTrait>(EFFECT_TRAIT, EFFECT_DEFAULTS);
-export const useSlideTrait = makeUseTrait<SlideTrait>(SLIDE_TRAIT, SLIDE_DEFAULTS);
-export const useTransitionTrait = makeUseTrait<TransitionTrait>(TRANSITION_TRAIT, TRANSITION_DEFAULTS);
+export const useEffectTrait = makeUseTrait(EffectTrait);
+export const useSlideTrait = makeUseTrait(SlideTrait);
+export const useTransitionTrait = makeUseTrait(TransitionTrait);
 
-export const makeUseTransitionTrait = (defaults: any) => makeUseTrait<TransitionTrait>(TRANSITION_TRAIT, {...TRANSITION_DEFAULTS, ...defaults});
+export const makeUseTransitionTrait = (defaults: any) =>
+  makeUseTrait(trait(TRANSITION_TRAIT, {...TRANSITION_DEFAULTS, ...defaults}));

@@ -1,7 +1,13 @@
 {
   "extends": "./tsconfig.pkg.json",
   "compilerOptions": {
-    "types": ["@webgpu/types", "jest", "node"]
+    "types": ["@webgpu/types", "jest", "node"],
+    "typeRoots": [
+       "./node_modules/@types",
+       "./node_modules",
+    ],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
   },
   "references": [
     { "path": "./packages/state" },
@@ -38,6 +44,8 @@
     "build",
   ],
   "ts-node": {
-    "esm": true
-  }
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
 }

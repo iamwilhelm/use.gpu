@@ -86,3 +86,8 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
 
   return yeet(shapes);
 }, deep('point', 'color'), 'Point');
+
+Point({
+  size: 5,
+  color: '#ffffff',
+});

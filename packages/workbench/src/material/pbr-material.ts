@@ -1,10 +1,10 @@
 import type { LC, LiveElement, PropsWithChildren } from '@use-gpu/live';
-import type { Lazy, XYZW } from '@use-gpu/core';
+import type { ColorLike, VectorLike, Lazy, XYZW } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
-import type { ColorLike, VectorLike } from '@use-gpu/traits';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
-import { parseColor, useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
+import { parseColor } from '@use-gpu/parse';
 
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';

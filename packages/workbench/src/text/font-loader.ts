@@ -3,7 +3,7 @@ import type { Font, LazyFontSource } from '@use-gpu/glyph';
 
 import { use, gather, keyed, yeet, useOne } from '@use-gpu/live';
 import { toHash } from '@use-gpu/state';
-import { parseWeight } from '@use-gpu/traits';
+import { parseWeight } from '@use-gpu/parse';
 import { Fetch } from '../data';
 import { FontProvider } from './providers/font-provider';
 

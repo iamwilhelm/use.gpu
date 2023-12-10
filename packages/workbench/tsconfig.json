@@ -4,6 +4,7 @@
     { "path": "../wgsl" },
     { "path": "../state" },
     { "path": "../live" },
+    { "path": "../parse" },
     { "path": "../traits" },
     { "path": "../core" },
     { "path": "../shader" },
@@ -14,7 +15,6 @@
   "compilerOptions": {
     "rootDir": "..",
     "baseUrl": "src",
-    "typeRoots": ["../../node_modules/@types"],
     "outDir": "../../build/ts",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },

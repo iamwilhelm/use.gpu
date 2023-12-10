@@ -4,6 +4,7 @@ import type {
   UniformPipe, UniformAttribute, UniformAttributeValue, UniformType,
   VertexData, RenderPassMode,
 } from '@use-gpu/core';
+import type { PointShape } from '@use-gpu/parse';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { PipelineOptions } from '../hooks/usePipelineOptions';
 
@@ -18,7 +19,6 @@ import { useBoundShader } from '../hooks/useBoundShader';
 
 import { circleSDF, diamondSDF, squareSDF, upSDF, downSDF, leftSDF, rightSDF } from '@use-gpu/wgsl/mask/sdf.wgsl';
 import { getFilledMask, getOutlinedMask } from '@use-gpu/wgsl/mask/point.wgsl';
-import { PointShape } from './types';
 
 const MASK_SHADER = {
   'circle': circleSDF,

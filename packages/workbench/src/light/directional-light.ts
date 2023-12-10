@@ -1,8 +1,10 @@
 import type { LC, LiveElement } from '@use-gpu/live';
-import type { ColorLike, VectorLike } from '@use-gpu/traits';
+import type { ColorLike, VectorLike } from '@use-gpu/core';
 import type { ShadowMapLike } from './types';
 
-import { optional, parseColor, parseNumber, parsePosition, parseVec2, parseVec3, useProp } from '@use-gpu/traits';
+import { optional, useProp } from '@use-gpu/traits/live';
+import { parseColor, parseNumber, parsePosition, parseVec2, parseVec3 } from '@use-gpu/parse';
+
 import { memo, use, useMemo, useOne } from '@use-gpu/live';
 
 import { useLightContext } from '../providers/light-provider';

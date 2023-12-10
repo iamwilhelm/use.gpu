@@ -10,7 +10,7 @@ import { merge, resolveSlides } from './lib/slides';
 import { useSlideTrait, makeUseTransitionTrait } from './traits';
 import { usePresentTransition } from './hooks';
 
-export type OverlayProps = Partial<SlideTrait> & DeepPartial<TransitionTrait> & {
+export type OverlayProps = TraitProps<typeof SlideTrait> & TraitProps<typeof TransitionTrait> & {
   _foo?: null,
 };
 

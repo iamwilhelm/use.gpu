@@ -1,4 +1,5 @@
 import type { LiveFunction, LiveElement } from '@use-gpu/live';
+import type { PointShape } from '@use-gpu/parse';
 
 export type LayerType = 'point' | 'line';
 

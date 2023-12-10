@@ -1,7 +1,8 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { VectorLike } from '@use-gpu/traits';
+import type { VectorLike } from '@use-gpu/core';
 
-import { parsePosition, useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
+import { parsePosition } from '@use-gpu/parse';
 import { useContext, useOne, useResource, useState, useYolo } from '@use-gpu/live';
 import { makeOrbitMatrix, clamp } from '@use-gpu/core';
 import { KeyboardContext, MouseContext, WheelContext } from '../providers/event-provider';

@@ -2287,10 +2287,10 @@
     "@webassemblyjs/ast" "1.11.1"
     "@xtuc/long" "4.2.2"
 
-"@webgpu/types@^0.1.34":
-  version "0.1.34"
-  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.34.tgz#4537c9cae874a63ef79d7afdc2c36a792581d4ad"
-  integrity sha512-9mXtH+CC8q+Ku7Z+1XazNIte81FvfdXwR2lLRO7Ykzjd/hh1J1krJa0gtnkF1kvP11psUmKEPKo7iMTeEcUpNA==
+"@webgpu/types@^0.1.40":
+  version "0.1.40"
+  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.40.tgz#cf72d1df6f9f8adc5d39556041f20ff2e8a58885"
+  integrity sha512-/BBkHLS6/eQjyWhY2H7Dx5DHcVrS2ICj9owvSRdgtQT6KcafLZA86tPze0xAOsd4FbsYKCUBUQyNi87q7gV7kw==
 
 "@webpack-cli/configtest@^1.2.0":
   version "1.2.0"
@@ -7537,10 +7537,10 @@ typescript@^4.6.3:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
   integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
 
-typescript@^4.8.0-dev.20220709:
-  version "4.8.0-dev.20220711"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.0-dev.20220711.tgz#3d4f68161716cb6cb1ea42fd0c6cc4b842f150b1"
-  integrity sha512-Nz1HlAkzZJ/OYZxqDEdoNV9GMq61xUss3JjveQqtdTiwhouLMa6D69C5K+P/fZD/hfrkMf/iqaF7xqVtX5KvPg==
+typescript@^5.3.3:
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.3.3.tgz#b3ce6ba258e72e6305ba66f5c9b452aaee3ffe37"
+  integrity sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"

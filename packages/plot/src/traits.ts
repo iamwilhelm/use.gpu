@@ -10,14 +10,13 @@ import {
   parseStringFormatter,
   parseBooleanArray,
   parseScalarArray,
-  parseVector,
+  parseColorArray,
   parseVec4,
   parseVec4Array,
   parsePosition,
   parseRotation,
   parseQuaternion,
   parseColor,
-  parseColorArray,
   parseScale,
   parseMatrix,
   parseJoin,
@@ -105,7 +104,7 @@ export const ColorTrait = (
   const rgba = useMemo(() => (
     o === 1
       ? c
-      : vec4.set(vec4.create(), c[0], c[1], c[2], c[3] * o)
+      : vec4.fromValues(c[0], c[1], c[2], c[3] * o)
   ), [c, o]);
 
   parsed.color = rgba;
@@ -113,7 +112,7 @@ export const ColorTrait = (
 
 export const ColorsTrait = trait(
   {
-    colors: optional(parseScalarArray),
+    colors: optional(parseColorArray),
   },
 );
   
@@ -160,7 +159,7 @@ export const LineTrait = trait(
     depth:     parseNumber,
     loop:      parseBoolean,
     join:      parseJoin,
-    dash:      parseVector,
+    dash:      optional(parseScalarArray),
     proximity: parseNumber,
   },
   {

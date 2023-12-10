@@ -10,7 +10,7 @@ import {
 const makeObject = () => ({});
 
 // Make parsed value optional
-export const optional = <A, B>(parse: (t?: A) => B) => (t?: A): B | undefined => t !== undefined ? parse(t) : undefined;
+export const optional = <A, B>(parse: (t: A) => B) => (t?: A): B | undefined | void => t !== undefined ? parse(t) : undefined;
 
 // Make derived trait from prop definition + defaults
 export const trait = <
@@ -25,7 +25,7 @@ export const trait = <
 
   // Parse input and save to output
   return (
-    input: Partial<InputTypes<P>>,
+    input: InputTypes<P>,
     output: OutputTypes<P>,
     {useProp}: UseHooks,
   ) => {
@@ -76,7 +76,7 @@ export const injectUseTrait = (
   hooks: UseHooks,
 ) => {
   return (<A, B>(
-    props: Partial<A>,
+    props: A,
     t: Trait<A, B>,
   ): B => {
     const parsed: any = useOne(makeObject);
@@ -94,7 +94,7 @@ const NO_HOOKS = {useMemo: apply, useOne: apply, useProp: getProp};
  * Returns new object instance.
  */
 export const parseTrait = <A, B>(
-  props: Partial<A>,
+  props: A,
   t: Trait<A, B>,
 ): B => {
   const parsed: any = {};

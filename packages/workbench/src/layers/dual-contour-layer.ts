@@ -5,7 +5,7 @@ import type {
   VertexData, RenderPassMode, StorageSource, DataBounds,
 } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { VectorLike } from '@use-gpu/traits';
+import type { VectorLike } from '@use-gpu/core';
 
 import { Virtual } from '../primitives/virtual';
 import { Readback } from '../primitives/readback';

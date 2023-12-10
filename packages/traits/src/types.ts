@@ -82,3 +82,5 @@ export type UseProp = {
 };
 
 export type UseHooks = {useMemo: UseMemo, useOne: UseOne, useProp: UseProp};
+
+export type MemoCompare = <T>(oldProps: T, newProps: T) => boolean;

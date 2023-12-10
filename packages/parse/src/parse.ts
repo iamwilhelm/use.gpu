@@ -36,6 +36,8 @@ export const isTypedArray = (() => {
 
 ///////////////////////////
 
+export const makeParseObject = <T>() => (value?: T) => typeof value === 'object' && value != null ? value : {};
+
 export const makeParseArray = <T>(
   defaults: T[],
   parse: (v: any) => T

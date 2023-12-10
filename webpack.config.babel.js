@@ -59,10 +59,6 @@ export default {
         loader: 'babel-loader',
       },
       {
-        test: /\.glsl$/i,
-        use: [path.resolve('./packages/glsl-loader/src/index.ts')],
-      },
-      {
         test: /\.wgsl$/i,
         use: [{
           loader: path.resolve('./packages/wgsl-loader/src/index.ts'),

@@ -4,11 +4,6 @@ import type {
   SlideEase,
   SlideEffect,
 } from './types';
-import {
-  EffectTrait,
-  SlideTrait,
-  TransitionTrait,
-} from './traits';
 
 import { useOne } from '@use-gpu/live';
 import {

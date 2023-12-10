@@ -2,22 +2,22 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle, XY, XYZW } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp } from '@use-gpu/traits';
+import { useProp, shouldEqual, sameArray, sameAny } from '@use-gpu/traits/live';
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { isHorizontal, makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
-import type { BoxTrait, ElementTrait, RefTrait } from '../types';
-import { useBoxTrait, useElementTrait } from '../traits';
+import { BoxTrait, ElementTrait, useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseDirectionY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';
 import { BoxLayout } from '../render';
 
 export type BlockProps =
-  Partial<BoxTrait> &
-  Partial<ElementTrait> & Partial<RefTrait> &
+  TraitProps<typeof BoxTrait> &
+  TraitProps<typeof ElementTrait> &
 {
   direction?: Direction,
   
@@ -29,7 +29,6 @@ export type BlockProps =
 export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<BlockProps>) => {
   const {
     snap = true,
-    ref,
     children,
   } = props;
 
@@ -48,6 +47,8 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
 
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
+
+  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -108,7 +109,7 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform, ref}, hovered) : null
+            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers),
         };
@@ -126,9 +127,15 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered, ref]);
+    }, [props, els, hovered]);
   };
 
-  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
   return gather(c, Resume);
-}, 'Block');
+}, shouldEqual({
+  padding: sameArray,
+  margin:  sameArray,
+  radius:  sameArray,
+  border:  sameArray,
+  stroke:  sameAny,
+  fill:    sameAny,
+}), 'Block');

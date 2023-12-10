@@ -2,7 +2,7 @@ import type { LiveFiber, LiveComponent, LiveElement, LiveMap } from '@use-gpu/li
 
 import { memo, capture, makeCapture, useCapture, useOne, useMemo } from '@use-gpu/live';
 
-export const CursorState = makeCapture('CursorState');
+export const CursorState = makeCapture<string>('CursorState');
 
 export type CursorProps = {
   cursor?: string,

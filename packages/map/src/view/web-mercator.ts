@@ -1,8 +1,8 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { AxesTrait, ObjectTrait, Swizzle } from '@use-gpu/plot';
-import type { GeographicTrait } from '../types';
+import type { Swizzle } from '@use-gpu/plot';
 
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
+import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
@@ -13,21 +13,24 @@ import {
 import {
   RangeContext,
   composeTransform, swizzleMatrix, toBasis, toOrder, rotateBasis, invertBasis,
-  useAxesTrait, useObjectTrait,
+  AxesTrait, ObjectTrait,
 } from '@use-gpu/plot';
 import { mat4 } from 'gl-matrix';
 
-import { useGeographicTrait } from '../traits';
+import { GeographicTrait } from '../traits';
 import { EARTH_CIRCUMFERENCE, toRad } from '../util/tiles';
 
 import { getWebMercatorPosition } from '@use-gpu/wgsl/transform/web-mercator.wgsl';
+
+const Traits = combine(AxesTrait, GeographicTrait, ObjectTrait);
+const useTraits = makeUseTrait(Traits);
 
 const π = Math.PI;
 const lerp = (a: number, b: number, t: number) => a * (1 - t) + b * t;
 
 const MERCATOR_LOOP = [2, 0, 0, 0];
 
-export type WebMercatorProps = Partial<AxesTrait> & Partial<GeographicTrait> & Partial<ObjectTrait> & {
+export type WebMercatorProps = TraitProps<typeof Traits> & {
   bend?: number,
   on?: Swizzle,
   centered?: boolean,

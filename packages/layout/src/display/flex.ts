@@ -2,15 +2,15 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle } from '@use-gpu/core';
 import type { LayoutElement, Margin, Dimension, Direction, Alignment, AlignmentLike, GapLike, Anchor, FitInto } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
 import { use, yeet, memo, gather, useFiber, useMemo } from '@use-gpu/live';
 import { getFlexMinMax, fitFlex } from '../lib/flex';
 import { makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
-import type { BoxTrait, ElementTrait, RefTrait } from '../types';
-import { useBoxTrait, useElementTrait } from '../traits';
+import { BoxTrait, ElementTrait, useBoxTrait, useElementTrait } from '../traits';
 import { evaluateDimension, parseAlignmentXY, parseAnchor, parseDirectionX, parseGapXY, parseMargin } from '../parse';
 import { useImplicitElement } from '../element/element';
 import { BoxLayout } from '../render';
@@ -18,8 +18,8 @@ import { BoxLayout } from '../render';
 const NO_MARGIN = [0, 0, 0, 0] as Margin;
 
 export type FlexProps =
-  Partial<BoxTrait> &
-  Partial<ElementTrait> & Partial<RefTrait> &
+  TraitProps<typeof BoxTrait> &
+  TraitProps<typeof ElementTrait> &
 {
   direction?: Direction,
 
@@ -51,6 +51,8 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
 
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
+
+  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -133,6 +135,5 @@ export const Flex: LiveComponent<FlexProps> = memo((props: PropsWithChildren<Fle
     }, [props, els, hovered, ref]);
   };
 
-  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
   return c ? gather(c, Resume) : null;
 }, 'Flex');

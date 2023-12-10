@@ -1,4 +1,4 @@
-import { parseColor } from '@use-gpu/traits';
+import { parseColor } from '@use-gpu/parse';
 
 export const DEFAULT_STYLE_SHEET = {
   water: {

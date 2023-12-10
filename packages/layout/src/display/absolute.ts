@@ -1,21 +1,22 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { Rectangle } from '@use-gpu/core';
-import type { FitInto, Dimension, Direction, LayoutElement } from '../types';
+import type { LayoutElement, FitInto, Dimension, Direction } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { fitAbsoluteBox } from '../lib/absolute';
 import { makeBoxPicker, memoFit } from '../lib/util';
 import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
-import type { ElementTrait, RefTrait } from '../types';
-import { useElementTrait } from '../traits';
+import { ElementTrait, useElementTrait } from '../traits';
 import { useImplicitElement } from '../element/element';
 import { BoxLayout } from '../render';
 
 const NO_POINT4 = [0, 0, 0, 0];
 
-export type AbsoluteProps = Partial<ElementTrait> & Partial<RefTrait> &
+export type AbsoluteProps =
+  TraitProps<typeof ElementTrait> &
 {
   left?: Dimension,
   top?: Dimension,
@@ -37,7 +38,6 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
     direction = 'y',
     under = false,
     snap = true,
-    ref,
     children,
   } = props;
 
@@ -46,6 +46,8 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
   const {id} = useFiber();
   const inspect = useInspectable();
   const hovered = useInspectHoverable();
+
+  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
 
   const Resume = (els: LayoutElement[]) => {
     return useMemo(() => {
@@ -72,7 +74,7 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
             mask?: ShaderModule | null,
             transform?: ShaderModule | null,
           ) => (
-            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform, ref}, hovered) : null
+            sizes.length ? use(BoxLayout, inside, {box, origin, clip, mask, transform}, hovered) : null
           ),
           pick: makeBoxPicker(id, sizes, offsets, pickers, undefined, undefined, false),
         };
@@ -86,9 +88,8 @@ export const Absolute: LiveComponent<AbsoluteProps> = memo((props: PropsWithChil
         fit: memoFit(fit),
         prefit: memoFit(fit),
       });
-    }, [props, els, hovered, ref]);
+    }, [props, els, hovered]);
   };
 
-  const c = useImplicitElement(id, radius, border, stroke, fill, image, children);
   return gather(c, Resume);
 }, 'Absolute');

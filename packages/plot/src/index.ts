@@ -1,7 +1,8 @@
 export * from './plot';
+
+export * from './providers/range-provider';
 /*
 export * from './providers/data-provider';
-export * from './providers/range-provider';
 
 export * from './source/scale';
 export * from './source/sampled';

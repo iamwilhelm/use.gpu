@@ -1,7 +1,7 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 
-import { TraitProps, makeUseTrait, deep, combine } from '@use-gpu/traits/live';
+import { makeUseTrait, combine, shouldEqual, sameArray, sameAny } from '@use-gpu/traits/live';
 import { getPluralArchetype } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
@@ -21,7 +21,7 @@ import {
   ZBiasesTrait,
 } from '../traits';
 
-const traits = combine(
+const Traits = combine(
   ColorTrait,
   ColorsTrait,
   PositionTrait,
@@ -32,9 +32,9 @@ const traits = combine(
   ZBiasTrait,
   ZBiasesTrait,
 );
-const useTraits = makeUseTrait(traits);
+const useTraits = makeUseTrait(Traits);
 
-export type PointProps = TraitProps<typeof traits>;
+export type PointProps = TraitProps<typeof Traits>;
 
 const POINT_SCHEMA = {
   position:  {format: 'vec4<f32>', plural: 'positions'},
@@ -85,9 +85,7 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   };
 
   return yeet(shapes);
-}, deep('point', 'color'), 'Point');
-
-Point({
-  size: 5,
-  color: '#ffffff',
-});
+}, shouldEqual({
+  point: sameArray,
+  color: sameAny,
+}), 'Point');

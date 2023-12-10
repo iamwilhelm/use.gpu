@@ -1,10 +1,10 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { TextureSource, XY, XYZW, Rectangle } from '@use-gpu/core';
+import type { ColorLike, TextureSource, XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
-import type { ColorLike } from '@use-gpu/traits';
 import type { Direction, OverflowMode, FitInto, UIAggregate } from '../types';
 
-import { parseColor, useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
+import { parseColor } from '@use-gpu/parse';
 import { keyed, yeet, use, useFiber, useMemo } from '@use-gpu/live';
 import { makeShaderBinding } from '@use-gpu/core';
 import { evaluateDimension } from '../parse';

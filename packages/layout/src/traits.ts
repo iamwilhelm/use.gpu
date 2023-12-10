@@ -1,20 +1,18 @@
-import type {
-  BoxTrait,
-  ElementTrait,
-  ImageTrait,
-} from './types';
 import {
   makeUseTrait,
   makeParseTrait,
   optional,
+  trait,
+} from '@use-gpu/traits/live';
+import {
   parseNumber,
   parseColor,
-} from '@use-gpu/traits';
+} from '@use-gpu/parse';
 import {
   parseAlignmentXY,
   parseAnchor,
   parseAnchorXY,
-  parseBase,
+  parseBaseline,
   parseDimension,
   parseFit,
   parseMargin,
@@ -22,30 +20,26 @@ import {
   parseTexture,
 } from './parse';
 
-const BOX_TRAIT = {
+const BoxTrait = trait({
   grow: parseNumber,
   shrink: parseNumber,
   margin: parseMargin,
-  inline: optional(parseBase),
+  inline: optional(parseBaseline),
   flex: optional(parseAnchor),
-};
-
-const BOX_DEFAULTS = {
+}, {
   shrink: 1,
-};
+});
 
-const IMAGE_TRAIT = {
+const ImageTrait = trait({
+  texture: optional(parseTexture),
   width: optional(parseDimension),
   height: optional(parseDimension),
-  texture: optional(parseTexture),
   fit: parseFit,
   repeat: parseRepeat,
   align: parseAnchorXY,
-};
+});
 
-const IMAGE_DEFAULTS = {};
-
-const ELEMENT_TRAIT = {
+const ElementTrait = {
   width: optional(parseDimension),
   height: optional(parseDimension),
   aspect: optional(parseNumber),
@@ -55,11 +49,11 @@ const ELEMENT_TRAIT = {
   stroke: optional(parseColor),
   fill: optional(parseColor),
 
-  image: optional(makeParseTrait(IMAGE_TRAIT, IMAGE_DEFAULTS)),
+  image: optional(makeParseTrait(ImageTrait)),
 };
 
 const ELEMENT_DEFAULTS = {};
 
-export const useBoxTrait     = makeUseTrait<BoxTrait>(BOX_TRAIT, BOX_DEFAULTS);
-export const useElementTrait = makeUseTrait<ElementTrait>(ELEMENT_TRAIT, ELEMENT_DEFAULTS);
-export const useImageTrait   = makeUseTrait<ImageTrait>(IMAGE_TRAIT, IMAGE_DEFAULTS);
+export const useBoxTrait     = makeUseTrait(BoxTrait);
+export const useElementTrait = makeUseTrait(ElementTrait);
+export const useImageTrait   = makeUseTrait(ImageTrait);

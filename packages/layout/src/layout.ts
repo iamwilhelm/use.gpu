@@ -3,7 +3,8 @@ import type { XY, XYZW, Rectangle } from '@use-gpu/core';
 import type { Placement } from '@use-gpu/traits';
 import type { FitInto, LayoutElement, LayoutPicker } from './types';
 
-import { parsePlacement, useProp } from '@use-gpu/traits';
+import { parsePlacement } from '@use-gpu/parse';
+import { useProp } from '@use-gpu/traits/live';
 import { memo, signal, provide, gather, use, keyed, fragment, useContext, useCapture, useFiber, useMemo, useOne, incrementVersion } from '@use-gpu/live';
 
 import {

@@ -2,8 +2,9 @@ import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
 import type { XY, Rectangle } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { InlineElement, LayoutPicker, LayoutRenderer, FitInto, Direction, Alignment, Base, MarginLike } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
 import { use, memo, gather, yeet, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { getInlineMinMax, fitInline, resolveInlineBlockElements } from '../lib/inline';
 import { makeBoxPicker, memoFit, memoLayout } from '../lib/util';
@@ -11,11 +12,12 @@ import { useInspectable, useInspectHoverable } from '@use-gpu/workbench';
 
 import { BoxLayout, InlineLayout } from '../render';
 
-import type { BoxTrait, RefTrait } from '../types';
-import { useBoxTrait } from '../traits';
-import { parseAlignment, parseBase, parseDirectionX, parseMargin } from '../parse';
+import { BoxTrait, useBoxTrait } from '../traits';
+import { parseAlignment, parseBaseline, parseDirectionX, parseMargin } from '../parse';
 
-export type InlineProps = Partial<BoxTrait> & Partial<RefTrait> & {
+export type InlineProps = 
+  TraitProps<typeof BoxTrait> &
+{
   direction?: Direction,
 
   align?: Alignment,
@@ -38,7 +40,7 @@ export const Inline: LiveComponent<InlineProps> = memo((props: PropsWithChildren
 
   const direction = useProp(props.direction, parseDirectionX);
   const padding = useProp(props.padding, parseMargin);
-  const anchor = useProp(props.anchor, parseBase, 'base');
+  const anchor = useProp(props.anchor, parseBaseline, 'base');
   const align = useProp(props.align, parseAlignment);
 
   const {id} = useFiber();

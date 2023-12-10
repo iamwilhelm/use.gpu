@@ -11,6 +11,7 @@ import {
   makeParseTrait,
   useProp,
   optional,
+  trait,
 } from '@use-gpu/traits/live';
 import {
   makeParseEnum,
@@ -60,15 +61,13 @@ const PARTIAL_EFFECT_TRAIT = mapValues(EFFECT_TRAIT, (t: any) => optional(t));
 const EffectTrait = trait(EFFECT_TRAIT, EFFECT_DEFAULTS);
 const PartialEffectTrait = trait(PARTIAL_EFFECT_TRAIT, {});
 
-const parseEffectTrait = makeParseTrait(EffectTrait);
-const parsePartialEffectTrait = makeParseTrait(PartialEffectTrait);
-
-const SLIDE_TRAIT = {
+const SlideTrait = trait({
   order: optional(parseInteger),
   stay: optional(parseInteger),
-};
+});
 
-const SLIDE_DEFAULTS = {};
+const parseEffectTrait = makeParseTrait(EffectTrait);
+const parsePartialEffectTrait = makeParseTrait(PartialEffectTrait);
 
 const TRANSITION_TRAIT = {
   effect: parseEffectTrait,
@@ -79,6 +78,8 @@ const TRANSITION_TRAIT = {
 const TRANSITION_DEFAULTS = {
   effect: {},
 };
+
+const TransitionTrait = trait(TRANSITION_TRAIT, TRANSITION_DEFAULTS);
 
 export const useEffectTrait = makeUseTrait(EffectTrait);
 export const useSlideTrait = makeUseTrait(SlideTrait);

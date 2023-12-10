@@ -7,36 +7,33 @@ import { mat4 } from 'gl-matrix';
 
 export type AutoXY = [number | null, number | null];
 export type AutoRectangle = [number | null, number | null, number | null, number | null];
+export type FitInto = [number | null, number | null, number, number];
+
 export type Gap = XY;
 export type Margin = XYZW;
 export type Sizing = [number | null, number | null, number, number];
 
 export type Alignment = 'start' | 'center' | 'end' | 'justify' | 'justify-start' | 'justify-center' | 'justify-end' | 'between' | 'evenly';
 export type Anchor = 'start' | 'center' | 'end';
-export type Base = 'start' | 'base' | 'base-center' | 'center' | 'end';
+export type Baseline = 'start' | 'base' | 'base-center' | 'center' | 'end';
 export type Dimension = number | string;
 export type Direction = 'x' | 'y' | 'lr' | 'rl' | 'tb' | 'bt';
 export type Fit = 'contain' | 'cover' | 'scale' | 'none';
 export type OverflowMode = 'visible' | 'scroll' | 'hidden' | 'auto';
 export type Repeat = 'x' | 'y' | 'xy' | 'none';
 
-export type FitInto = [number | null, number | null, number, number];
-
 export type MarginLike = number | number[];
 export type GapLike = number | number[];
 export type AlignmentLike = Alignment | Alignment[];
 export type AnchorLike = Anchor | Anchor[];
 
+/*
 export type BoxTrait = {
   grow: number,
   shrink: number,
   margin: MarginLike,
   inline: Base,
   flex: Anchor,
-};
-
-export type RefTrait = {
-  ref: (rectangle: Rectangle, origin: XY) => void,
 };
 
 export type ElementTrait = {
@@ -48,17 +45,20 @@ export type ElementTrait = {
   border: MarginLike,
   stroke: ColorLike,
   fill: ColorLike,
+
+  image: ShaderSource,
   image: Partial<ImageTrait>,
 };
 
 export type ImageTrait = {
-  texture: ShaderSource,
+  image: ShaderSource,
   width: Dimension,
   height: Dimension,
   fit: Fit,
   repeat: Repeat,
   align: AnchorLike,
 };
+*/
 
 export type LayoutRenderer = (
   box: Rectangle,
@@ -135,7 +135,7 @@ export type LayoutElement = {
   absolute?: boolean,
   under?: boolean,
   stretch?: boolean,
-  inline?: Base,
+  inline?: Baseline,
   flex?: Anchor,
 
   fit: (size: FitInto) => LayoutFit,
@@ -146,7 +146,7 @@ export type InlineElement = {
   spans: Tuples<4>,
   height: FontMetrics,
   margin?: Margin,
-  inline?: Base,
+  inline?: Baseline,
   block?: LayoutFit,
   absolute?: boolean,
   render: InlineRenderer,

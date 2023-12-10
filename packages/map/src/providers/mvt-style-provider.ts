@@ -1,9 +1,9 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { ColorLike } from '@use-gpu/traits';
+import type { ColorLike } from '@use-gpu/core';
 import type { MVTStyleProperties } from '../types';
 
 import { patch } from '@use-gpu/state';
-import { parseNumber, parseColor } from '@use-gpu/traits';
+import { parseNumber, parseColor } from '@use-gpu/parse';
 import { provide, makeContext, useContext, useNoContext, useOne } from '@use-gpu/live';
 
 import { DEFAULT_STYLE_SHEET } from '../style';

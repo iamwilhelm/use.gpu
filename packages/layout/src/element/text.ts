@@ -4,7 +4,8 @@ import type { ShaderModule } from '@use-gpu/shader';
 import type { ColorLike } from '@use-gpu/traits';
 import type { Base, InlineLine } from '../types';
 
-import { useProp, parseColor, parseNumber } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
+import { parseColor, parseNumber } from '@use-gpu/parse';
 import { memo, keyed, yeet, useFiber } from '@use-gpu/live';
 
 import { useFontFamily, useFontText, useFontHeight } from '@use-gpu/workbench';

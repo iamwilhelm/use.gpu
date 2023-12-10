@@ -2,19 +2,20 @@ import type { LiveComponent, LiveElement, PropsWithChildren } from '@use-gpu/liv
 import type { Rectangle, XY, XYZW } from '@use-gpu/core';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { FitInto, LayoutElement, Dimension, Margin } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp } from '@use-gpu/traits';
+import { useProp } from '@use-gpu/traits/live';
 import { use, memo, gather, provide, yeet, useContext, useFiber } from '@use-gpu/live';
 import { LayoutContext, TransformContext } from '@use-gpu/workbench';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { memoFit, memoLayout } from '../lib/util';
 import { evaluateDimension } from '../parse';
 
-import type { BoxTrait, ElementTrait, RefTrait } from '../types';
-import { useBoxTrait, useElementTrait } from '../traits';
+import { BoxTrait, useBoxTrait } from '../traits';
 import { parseDimension, parseMargin } from '../parse';
 
-export type EmbedProps = Partial<BoxTrait> &
+export type EmbedProps =
+  TraitProps<typeof BoxTrait> &
 {
   width?: Dimension,
   height?: Dimension,

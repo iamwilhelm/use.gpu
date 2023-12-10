@@ -6,8 +6,8 @@
   "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
-    "./live": "./src/hooks-live.ts",
-    "./react": "./src/hooks-react.ts"
+    "./live": "./live.ts",
+    "./react": "./react.ts"
   },
   "scripts": {
     "build": "NPM_PACKAGE=state ../../scripts/build-mjs-cjs.sh",

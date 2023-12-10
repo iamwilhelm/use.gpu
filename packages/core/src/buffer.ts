@@ -3,6 +3,11 @@ import { TYPED_ARRAYS, TEXTURE_FORMAT_SIZES, TEXTURE_FORMAT_DIMS } from './const
 
 type BufferArray = TypedArray | number[] | ArrayBuffer | number;
 
+export const isTypedArray = (() => {
+  const TypedArray = Object.getPrototypeOf(Uint8Array);
+  return (obj: any) => obj instanceof TypedArray;
+})();
+
 export const getByteSize = (data: BufferArray): number => {
   if (+data === data) return +data;
   return (data as any).byteLength as number;

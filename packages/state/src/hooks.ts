@@ -12,7 +12,7 @@ If `defaults` are supplied, the cursor will merge them in.
 When the first update is made, it will dispatch a `$set` operation first
 to permanently insert them, and allow a clean patch to be made.
 */
-export const makeUseCursor = (
+export const injectUseCursor = (
   useMemo: UseMemo,
   useRef: UseRef,
 ) => <T>(
@@ -49,7 +49,7 @@ When combined with `@{useCursor}`, this allows for zero-hassle state management.
 
 Compose this hook with other `useState` variants using `useStateHook`, e.g. the classic `useLocalState` that saves to Local Storage.
 */
-export const makeUseUpdateState = (
+export const injectUseUpdateState = (
   useCallback: UseCallback,
   useMemo: UseMemo,
   useState: UseState,

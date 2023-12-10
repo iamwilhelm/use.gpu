@@ -85,7 +85,7 @@ export const makeAtlas = (
     const rect = [x, y, x + w, y + h] as Rectangle;
 
     // Clip out occupied area from slots
-    if (snap) {
+    if (snap > 1) {
       const clip = [x, y, x + cw, y + ch] as Rectangle;
       clipRectangle(clip);
     }

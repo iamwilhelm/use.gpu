@@ -10,7 +10,7 @@ yarn add @use-gpu/text
 
 **Docs**: https://usegpu.live/docs/reference-live-@use-gpu-traits
 
-# Live - Component Traits
+# React/Live - Component Traits
 
 Solves the problem of adding the same props to many components, with sensible default handling.
 
@@ -19,7 +19,7 @@ Solves the problem of adding the same props to many components, with sensible de
 
 Using many mix-ins together is encouraged and optimized.
 
-See `@use-gpu/core` for useful parsers (e.g. colors).
+See `@use-gpu/parse` for useful parsers (e.g. colors).
 
 #### Example
 

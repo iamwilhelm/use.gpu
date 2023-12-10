@@ -1,5 +1,6 @@
 import type { TypedArray, VectorLike, UniformType, UniformAttribute, Emitter, Emit, Accessor, AccessorSpec, DataBoundingBox, DataBounds } from './types';
 import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
+import { isTypedArray } from './buffer';
 import { seq } from './tuple';
 
 import { vec4 } from 'gl-matrix';
@@ -8,11 +9,6 @@ type NumberArray = VectorLike;
 
 const NO_LOOPS = [] as boolean[];
 const NO_ENDS = [] as [boolean, boolean][];
-
-export const isTypedArray = (() => {
-  const TypedArray = Object.getPrototypeOf(Uint8Array);
-  return (obj: any) => obj instanceof TypedArray;
-})();
 
 export const toDims3 = (dims: number) => {
   if (dims === Math.round(dims)) return dims;

@@ -10,7 +10,7 @@ yarn add @use-gpu/state
 
 **Docs**: https://usegpu.live/docs/reference-live-@use-gpu-state
 
-# Live - State management helpers
+# React/Live - State management helpers
 
 Manipulate JS state declaratively.
 

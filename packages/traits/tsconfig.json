@@ -10,5 +10,5 @@
     "outDir": "../../build/ts",
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo"
   },
-  "include": ["src/**/*.ts", "types.ts"]
+  "include": ["src/**/*.ts", "./*.ts", "types.ts"]
 }

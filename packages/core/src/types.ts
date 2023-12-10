@@ -7,22 +7,16 @@ export type XYZ = [number, number, number];
 export type XYZW = [number, number, number, number];
 export type Rectangle = [number, number, number, number];
 
-export type ArrayLike<T = any> = TypedArray | T[];
-export type VectorLike = TypedArray | number[];
-export type VectorLikes = TypedArray | VectorLike[];
-
 export type Color = vec4;
 export type ColorLike = number | VectorLike | {rgb: VectorLike} | {rgba: VectorLike} | string;
 export type ColorLikes = TypedArray | ColorLike[];
 
-// Common enums
+export type ArrayLike<T = any> = TypedArray | T[];
+export type VectorLike = TypedArray | number[];
+export type VectorLikes = TypedArray | VectorLike[];
 
 export type Blending = 'none' | 'alpha' | 'premultiply' | 'add' | 'subtract' | 'multiply';
 export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';
-export type Domain = 'linear' | 'log';
-export type Join = 'miter' | 'round' | 'bevel';
-export type Placement = 'center' | 'left' | 'top' | 'right' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
-export type PointShape = 'circle' | 'diamond' | 'square' | 'up' | 'down' | 'left' | 'right';
 
 // JS utility types
 

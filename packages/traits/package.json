@@ -4,9 +4,10 @@
   "main": "src/index.ts",
   "author": "Steven Wittens <steven@acko.net>",
   "license": "MIT",
-  "dependencies": {
-    "gl-matrix": "^3.3.0",
-    "@use-gpu/live": "*"
+  "exports": {
+    ".": "./src/index.ts",
+    "./live": "./live.ts",
+    "./react": "./react.ts"
   },
   "scripts": {
     "build": "NPM_PACKAGE=traits ../../scripts/build-mjs-cjs.sh",

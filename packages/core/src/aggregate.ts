@@ -10,6 +10,7 @@ import {
   generateChunkSegments,
   generateChunkFaces,
 } from './data';
+import { incrementVersion } from './id';
 import { toMurmur53, mixBits53 } from '@use-gpu/state';
 
 export const getAggregateArchetype = (
@@ -55,7 +56,7 @@ export const updateAggregateBuffer = (
   uploadBuffer(device, buffer, array.buffer);
   source.length = count;
   source.size = [count];
-  source.version = (source.version + 1) & 0xFFFFFFFF;
+  source.version = incrementVersion(source.version);
 
   return source;
 }
@@ -86,7 +87,7 @@ export const updateAggregateIndex = (
   uploadBuffer(device, buffer, array.buffer);
   source.length = count;
   source.size = [count];
-  source.version = (source.version + 1) & 0xFFFFFFFF;
+  source.version = incrementVersion(source.version);
 
   return source;
 }
@@ -105,7 +106,7 @@ export const updateAggregateSegments = (
 
   source.length = count;
   source.size = [count];
-  source.version = (source.version + 1) & 0xFFFFFFFF;
+  source.version = incrementVersion(source.version);
 
   return source;
 }
@@ -124,7 +125,7 @@ export const updateAggregateFaces = (
 
   source.length = count;
   source.size = [count];
-  source.version = (source.version + 1) & 0xFFFFFFFF;
+  source.version = incrementVersion(source.version);
 
   return source;
 }

@@ -1,6 +1,11 @@
 import { useOne } from '@use-gpu/live';
-import { useProp, getProp } from './useProp';
-import { ArrowFunction, TraitDefinition, Trait, TraitCombinator, InputTypes, OutputTypes, UseTrait } from './types'; 
+import { getProp } from './useProp';
+import {
+  ArrowFunction,
+  TraitDefinition, Trait, TraitCombinator,
+  InputTypes, OutputTypes,
+  UseHooks, UseMemo, UseOne, UseProp, UseTrait,
+} from './types'; 
 
 const makeObject = () => ({});
 
@@ -22,6 +27,7 @@ export const trait = <
   return (
     input: Partial<InputTypes<P>>,
     output: OutputTypes<P>,
+    {useProp}: UseHooks,
   ) => {
     for (const k in propDef) {
       const v = (input as any)[k];
@@ -37,32 +43,61 @@ export const combine: TraitCombinator = (
 ): Trait<any, any> => (
   input: any,
   output: any,
+  hooks: UseHooks,
 ) => {
-  for (const parse of traits) parse(input, output);
+  for (const parse of traits) parse(input, output, hooks);
 };
 
-export const makeUseTrait = <A, B>(
-  t: Trait<A, B>,
-): UseTrait<A, B> => (props) => useTrait(props, t);
-
+/**
+ * Make a parser for the given trait.
+ */
 export const makeParseTrait = <A, B>(
   t: Trait<A, B>,
 ): UseTrait<A, B> => (props) => parseTrait(props, t);
 
-const useTrait = <A, B>(
-  props: Partial<A>,
+/**
+ * Make a hook to extract props for the given trait. (Live/React polyglot)
+ */
+export const injectMakeUseTrait = (
+  hooks: UseHooks,
+) => <A, B>(
   t: Trait<A, B>,
-): B => {
-  const parsed: any = useOne(makeObject);
-  t(props, parsed);
-  return parsed as B;
+): UseTrait<A, B> => {
+  const useTrait = injectUseTrait(hooks);
+  return (props) => useTrait(props, t);
 };
 
-const parseTrait = <A, B>(
+/**
+ * useTrait() implementation. (Live/React polyglot)
+ *
+ * Note: Always returns the same object. Unpack/clone it before memoizing.
+ */
+export const injectUseTrait = (
+  hooks: UseHooks,
+) => {
+  return (<A, B>(
+    props: Partial<A>,
+    t: Trait<A, B>,
+  ): B => {
+    const parsed: any = useOne(makeObject);
+    t(props, parsed, hooks);
+    return parsed as B;
+  });
+};
+
+const apply = (f: ArrowFunction) => f();
+const NO_HOOKS = {useMemo: apply, useOne: apply, useProp: getProp};
+
+/**
+ * Parse a trait from given props.
+ *
+ * Returns new object instance.
+ */
+export const parseTrait = <A, B>(
   props: Partial<A>,
   t: Trait<A, B>,
 ): B => {
   const parsed: any = {};
-  t(props, parsed);
+  t(props, parsed, NO_HOOKS);
   return parsed as B;
 };

@@ -458,9 +458,9 @@ export const copyDataArrays = (from: any[], to: NumberArray, dims: number, acces
   }
 }
 
-export const getChunkCount = (
+export const accumulateChunks = (
   chunks: number[],
-  loops: boolean[] = NO_LOOPS,
+  loops: boolean[] | boolean = false,
 ) => {
   let length = 0;
   let n = chunks.length;
@@ -468,7 +468,7 @@ export const getChunkCount = (
   let count = 0;
   for (let i = 0; i < n; ++i) {
     const c = chunks[i];
-    const l = loops[i];
+    const l = (loops as any)[i] ?? !!loops;
     count += c + (l ? 3 : 0);
   }
 
@@ -479,7 +479,7 @@ export const generateChunkSegments = (
   to: NumberArray,
   lookup: NumberArray | null | undefined,
   chunks: number[],
-  loops: boolean[] = NO_LOOPS,
+  loops: boolean[] | boolean = false,
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
 ) => {
@@ -488,7 +488,7 @@ export const generateChunkSegments = (
 
   for (let i = 0; i < n; ++i) {
     const c = chunks[i];
-    const l = loops[i];
+    const l = (loops as any)[i] ?? !!loops;
     const s = starts === true || (starts as any)[i];
     const e = ends === true || (ends as any)[i];
 

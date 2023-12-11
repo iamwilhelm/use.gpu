@@ -3,7 +3,8 @@ import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@u
 import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, FaceAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
-import { use, keyed, fragment, signal, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
+import { TransformContext } from '../providers/transform-provider';
+import { use, keyed, fragment, signal, provide, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
 import { toMurmur53, scrambleBits53, mixBits53 } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
@@ -22,7 +23,7 @@ import { FaceLayer } from './face-layer';
 import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
 
-import { POINT_SCHEMA } from './schemas';
+import { LINE_SCHEMA, POINT_SCHEMA } from './schemas';
 
 export type VirtualLayersProps = {
   items?: Record<string, LayerAggregate[]>,
@@ -119,18 +120,18 @@ const makePointAccumulator = (
   keys: Set<string>,
   alloc: number,
 ) => {
-  const storage = {} as Record<string, AggregateBuffer>;
-
   const [{attributes}] = items;
   const aggregate = schemaToAggregate(device, POINT_SCHEMA, attributes, alloc);
 
   return (items: PointAggregate[], count: number) => {
     const [item] = items;
+    const {transform} = item;
     const props = {count, ...item.flags} as Record<string, any>;
-    console.log({items})
 
     updateAggregateFromSchema(device, POINT_SCHEMA, aggregate, items, props, count);
-    return use(PointLayer, props);
+    
+    const layer = use(PointLayer, props);
+    return transform?.transform ? provide(TransformContext, transform, layer) : layer;
   };
 }
 
@@ -140,44 +141,18 @@ const makeLineAccumulator = (
   keys: Set<string>,
   alloc: number,
 ) => {
-  const storage = {} as Record<string, AggregateBuffer>;
+  const [{attributes}] = items;
+  const aggregate = schemaToAggregate(device, LINE_SCHEMA, attributes, alloc);
 
-  const hasPosition = keys.has('positions') || keys.has('position');
-  const hasSegment = keys.has('segments') || keys.has('segment');
-  const hasColor = keys.has('colors') || keys.has('color');
-  const hasWidth = keys.has('widths') || keys.has('width');
-  const hasDepth = keys.has('depths') || keys.has('depth');
-  const hasZBias = keys.has('zBiases') || keys.has('zBias');
-  const hasID = keys.has('id') || keys.has('ids');
-  const hasLookup = keys.has('lookup') || keys.has('lookups');
+  return (items: PointAggregate[], count: number) => {
+    const [item] = items;
+    const {transform} = item;
+    const props = {count, ...item.flags} as Record<string, any>;
 
-  storage.segments = makeAggregateBuffer(device, 'i32', alloc);
-
-  if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', alloc);
-  if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', alloc);
-  if (hasWidth) storage.widths = makeAggregateBuffer(device, 'f32', alloc);
-  if (hasDepth) storage.depths = makeAggregateBuffer(device, 'f32', alloc);
-  if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', alloc);
-  if (hasID) storage.ids = makeAggregateBuffer(device, 'u32', alloc);
-  if (hasLookup) storage.lookups = makeAggregateBuffer(device, 'u32', alloc);
-
-  return (items: LineAggregate[], count: number) => {
-    const props = {count, join: 'bevel'} as Record<string, any>;
-
-    const {chunks, loops} = gatherItemChunks(items);
-
-    if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
-    else props.segments = updateAggregateSegments(device, storage.segments, chunks, loops, count);
-
-    if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
-    if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
-    if (hasWidth) props.widths = updateAggregateBuffer(device, storage.widths, items, count, 'width', 'widths');
-    if (hasDepth) props.depths = updateAggregateBuffer(device, storage.depths, items, count, 'depth', 'depths');
-    if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
-    if (hasID) props.ids = updateAggregateBuffer(device, storage.ids, items, count, 'id', 'ids');
-    if (hasLookup) props.lookups = updateAggregateBuffer(device, storage.lookups, items, count, 'lookup', 'lookups');
-
-    return use(LineLayer, props);
+    updateAggregateFromSchema(device, LINE_SCHEMA, aggregate, items, props, count);
+    
+    const layer = use(PointLayer, props);
+    return transform?.transform ? provide(TransformContext, transform, layer) : layer;
   };
 };
 
@@ -254,7 +229,7 @@ const accumulate = (xs: number[]): number[] => {
 }
 
 const getItemTypeKey = (item: LayerAggregate) =>
-  ('transform' in item && item.transform != null ? getBundleKey(item.transform) : 0) ^
+  ('transform' in item && item.transform?.transform != null ? getBundleKey(item.transform.transform) : 0) ^
   mixBits53(item.archetype, item.zIndex ?? 0);
 
 type Partition = {

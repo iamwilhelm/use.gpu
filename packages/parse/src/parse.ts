@@ -5,7 +5,7 @@ import type {
 import type { Parser, Join, Placement, PointShape, Domain } from './types';
 import { seq } from '@use-gpu/core';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
-import { toScalarArray, toVectorArray } from './flatten';
+import { toScalarArray, toVectorArray, toMultiVectorArray, toMultiScalarArray } from './flatten';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
 const NO_VEC3 = vec3.fromValues(0, 0, 0);
@@ -108,7 +108,32 @@ export const makeParseMat4 = (defaults: mat4 = NO_MAT4) => (matrix?: VectorLike)
   return defaults;
 };
 
-export const makeParseTypedArray = <T extends TypedArray>(
+export const makeParseScalarArray = <T extends TypedArray>(
+  constructor: TypedArrayConstructor = Float32Array,
+) => (
+  vec: VectorLike
+): T => {
+  return toScalarArray(vec, constructor) as T;
+};
+
+export const makeParseScalarArrayLike = <T extends TypedArray>(
+  constructor: TypedArrayConstructor = Float32Array,
+) => (
+  vec: number | VectorLike,
+): T | number => {
+  if (typeof vec === 'number') return vec;
+  return toScalarArray(vec, constructor) as T;
+};
+
+export const makeParseMultiScalarArray = <T extends TypedArray>(
+  constructor: TypedArrayConstructor = Float32Array,
+) => (
+  vecs: VectorLikes
+): T => {
+  return toMultiScalarArray(vecs, constructor) as T;
+};
+
+export const makeParseVectorArray = <T extends TypedArray>(
   dims: number,
   w: number = 0,
   constructor: TypedArrayConstructor = Float32Array,
@@ -116,7 +141,17 @@ export const makeParseTypedArray = <T extends TypedArray>(
   vecs: VectorLikes
 ): T => {
   return toVectorArray(vecs, dims, w, constructor) as T;
-}
+};
+
+export const makeParseMultiVectorArray = <T extends TypedArray>(
+  dims: number,
+  w: number = 0,
+  constructor: TypedArrayConstructor = Float32Array,
+) => (
+  vecs: VectorLikes
+): T => {
+  return toMultiVectorArray(vecs, dims, w, constructor) as T;
+};
 
 export const makeParseBasis = (defaults: string) => {
   const axes = defaults.split('');
@@ -182,55 +217,56 @@ export const parseAxis = (s?: string) => {
   return 0;
 };
 
-export const parseColor = (color?: ColorLike): vec4 => {
+export const parseColor = (color?: ColorLike, opacity: number = 1): vec4 => {
   const def = GRAY;
-  if (!color) return def;
 
   const c = color as any;
-
-  if (c === +c) {
+  if (c == null) {}
+  else if (c === +c) {
+    const a = ((c >> 24) & 255) / 255;
     const r = ((c >> 16) & 255) / 255;
     const g = ((c >> 8) & 255) / 255;
     const b = ((c & 255)) / 255;
-    return vec4.fromValues(r, g, b, 1);
+    return vec4.fromValues(r, g, b, a * opacity);
   }
-  if (typeof c === 'string') {
+  else if (typeof c === 'string') {
     if (c[0] === '#') {
       if (c.length === 4) {
         const r = u4ToFloat(c[1]);
         const g = u4ToFloat(c[2]);
         const b = u4ToFloat(c[3]);
-        return vec4.fromValues(r, g, b, 1);
+        return vec4.fromValues(r, g, b, opacity);
       }
       if (c.length === 7) {
         const r = u8ToFloat(c.slice(1, 3));
         const g = u8ToFloat(c.slice(3, 5));
         const b = u8ToFloat(c.slice(5, 7));
-        return vec4.fromValues(r, g, b, 1);
+        return vec4.fromValues(r, g, b, opacity);
       }
       if (c.length === 9) {
         const r = u8ToFloat(c.slice(1, 3));
         const g = u8ToFloat(c.slice(3, 5));
         const b = u8ToFloat(c.slice(5, 7));
         const a = u8ToFloat(c.slice(7, 9));
-        return vec4.fromValues(r, g, b, a);
+        return vec4.fromValues(r, g, b, a * opacity);
       }
     }
     if (c[0] === 'r') {
       const cs = c.split('(')[1].split(')')[0].split(',').map(strToFloat);
-      if (c[3] === 'a') return vec4.fromValues(cs[0] / 255, cs[1] / 255, cs[2] / 255, cs[3]);
-      else return vec4.fromValues(cs[0] / 255, cs[1] / 255, cs[2] / 255, 1);
+      if (c[3] === 'a') return vec4.fromValues(cs[0] / 255, cs[1] / 255, cs[2] / 255, cs[3] * opacity);
+      else return vec4.fromValues(cs[0] / 255, cs[1] / 255, cs[2] / 255, opacity);
     }
   }
-  if (c.rgba ?? c.rgb) {
+  else if (c.rgba ?? c.rgb) {
     const [r, g, b, a] = c.rgba ?? c.rgb;
-    return vec4.fromValues(r / 255, g / 255, b / 255, a ? a / 255 : 1);
+    return vec4.fromValues(r / 255, g / 255, b / 255, (a ? a / 255 : 1) * opacity);
   }
-  if (c.length) {
-    return vec4.fromValues(c[0] ?? def[0], c[1] ?? def[1], c[2] ?? def[2], c[3] ?? def[3]);
+  else if (c.length) {
+    return vec4.fromValues(c[0] ?? def[0], c[1] ?? def[1], c[2] ?? def[2], (c[3] ?? def[3]) * opacity);
   }
 
-  return def;
+  if (opacity === 1) return def;
+  return vec4.fromValues(def[0], def[1], def[2], def[3] * opacity);
 };
 
 //////////////////
@@ -240,16 +276,23 @@ export const parseStringArray = makeParseArray(NO_STRINGS, parseString);
 export const parseBooleanArray = (vec: VectorLike): Uint8Array =>
   vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
 
+export const parseBooleanArrayLike = (vec: VectorLike): Uint8Array =>
+typeof 
+  vec ? toScalarArray(vec, Uint8Array) as Uint8Array : new Uint8Array();
+
 export const parseColorArray = (colors?: ColorLikes): Float32Array => {
   if (isTypedArray(colors)) return colors as Float32Array;
   const parsed = (colors as any[]).map(parseColor);
   return parseVec4Array(parsed);
 };
 
-export const parseScalarArray  = makeParseTypedArray<Float32Array>(1);
-export const parseVec2Array    = makeParseTypedArray<Float32Array>(2);
-export const parseVec3Array    = makeParseTypedArray<Float32Array>(3);
-export const parseVec4Array    = makeParseTypedArray<Float32Array>(4);
+export const parseScalarArray     = makeParseScalarArray<Float32Array>();
+export const parseScalarArrayLike = makeParseScalarArrayLike<Float32Array>();
+export const parseScalarMultiArray = makeParseMultiScalarArray<Float32Array>(0);
+
+export const parseVec2Array = makeParseVectorArray<Float32Array>(2);
+export const parseVec3Array = makeParseVectorArray<Float32Array>(3);
+export const parseVec4Array = makeParseVectorArray<Float32Array>(4);
 
 //////////////////
 
@@ -259,7 +302,8 @@ export const parseQuaternion = makeParseVec4();
 export const parseScale      = makeParseVec3(vec3.fromValues(1, 1, 1));
 export const parseMatrix     = makeParseMat4();
 
-export const parsePositionArray = makeParseTypedArray<Float32Array>(4, 1);
+export const parsePositionArray = makeParseVectorArray<Float32Array>(4, 1);
+export const parsePositionMultiArray = makeParseMultiVectorArray<Float32Array>(4, 1);
 
 export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
 export const parseBlending   = makeParseEnum<Blending>(['none', 'premultiply', 'alpha', 'add', 'subtract', 'multiply']);

@@ -1,6 +1,6 @@
 import type { ColorLike } from '@use-gpu/core';
 
-import { trait, optional, UseHooks } from '@use-gpu/traits/live';
+import { trait, combine, optional, UseHooks } from '@use-gpu/traits/live';
 import {
   parseNumber,
   parseInteger,
@@ -9,12 +9,15 @@ import {
   parseStringArray,
   parseStringFormatter,
   parseBooleanArray,
-  parseScalarArray,
   parseColorArray,
   parseVec4,
   parseVec4Array,
+  parseScalarArray,
+  parseScalarArrayLike,
+  parseScalarMultiArray,
   parsePosition,
   parsePositionArray,
+  parsePositionMultiArray,
   parseRotation,
   parseQuaternion,
   parseColor,
@@ -92,31 +95,6 @@ export const AxisTrait = trait(
   }
 );
 
-export const ColorTrait = (
-  props: {color?: ColorLike, opacity?: number},
-  parsed: {color: vec4},
-  {useMemo, useProp}: UseHooks,
-) => {
-  const {color, opacity} = props;
-
-  const c = useProp(color, parseColor);
-  const o = useProp(opacity, parseNumber, 1);
-
-  const rgba = useMemo(() => (
-    o === 1
-      ? c
-      : vec4.fromValues(c[0], c[1], c[2], c[3] * o)
-  ), [c, o]);
-
-  parsed.color = rgba;
-};
-
-export const ColorsTrait = trait(
-  {
-    colors: optional(parseColorArray),
-  },
-);
-  
 export const FontTrait = trait(
   {
     family: optional(parseString),
@@ -156,27 +134,22 @@ export const LabelsTrait = trait(
 
 export const LineTrait = trait(
   {
-    width:     parseNumber,
-    depth:     parseNumber,
-    loop:      parseBoolean,
-    join:      parseJoin,
-    dash:      optional(parseScalarArray),
-    proximity: parseNumber,
+    width: parseNumber,
+    depth: parseNumber,
+    loop: parseBoolean,
   },
   {
     width: 1,
     depth: 0,
-    join: 'bevel',
     loop: false,
-    proximity: 0,
   },
 );
 
-export const LinesTrait = trait(
+export const MarkerTrait = trait(
   {
-    widths: optional(parseScalarArray),
-    depths: optional(parseScalarArray),
-    loops:  optional(parseBooleanArray),
+    shape: optional(parsePointShape),
+    hollow: optional(parseBoolean),
+    outline: optional(parseNumber),
   },
 );
 
@@ -193,20 +166,10 @@ export const ObjectTrait = trait(
 export const PointTrait = trait(
   {
     size: parseNumber,
-    shape: optional(parsePointShape),
     depth: optional(parseNumber),
-    hollow: optional(parseBoolean),
-    outline: optional(parseNumber),
   },
   {
     size: 1,
-  },
-);
-
-export const PointsTrait = trait(
-  {
-    sizes: optional(parseScalarArray),
-    depths: optional(parseScalarArray),
   },
 );
 
@@ -214,12 +177,6 @@ export const PositionTrait = trait(
   {
     position: optional(parsePosition),
   }
-);
-
-export const PositionsTrait = trait(
-  {
-    positions: optional(parsePositionArray),
-  },
 );
 
 export const ROPTrait = trait(
@@ -269,6 +226,19 @@ export const StringsTrait = trait(
   }
 );
 
+export const StrokeTrait = trait(
+  {
+    join:      parseJoin,
+    dash:      optional(parseScalarArray),
+    proximity: parseNumber,
+  },
+  {
+    join: 'bevel',
+    loop: false,
+    proximity: 0,
+  },
+);
+
 export const SurfaceTrait = trait(
   {
     loopX: parseBoolean,
@@ -297,9 +267,8 @@ export const VolumeTrait = trait(
   },
 );
 
-export const ZBiasTrait = trait(
+export const ZIndexTrait = trait(
   {
-    zBias:  optional(parseNumber),
     zIndex: parseInteger,
   },
   {
@@ -307,8 +276,80 @@ export const ZBiasTrait = trait(
   },
 );
 
-export const ZBiasesTrait = trait(
-  {
-    zBiases: optional(parseScalarArray),
+// Composite attributes
+
+export const ColorTrait = (
+  props: {
+    color?: number,
+    opacity?: number,
   },
+  parsed: {
+    color: TypedArray
+  },
+  {useMemo}: UseHooks,
+) => {
+  const {color, opacity = 1} = props;
+  const c = useMemo(() => parseColor(color, opacity), [color, opacity]);
+  parsed.color = c != null ? c : undefined;
+};
+
+export const ColorsTrait = (
+  props: {
+    color?: number,
+    opacity?: number,
+  },
+  parsed: {
+    color: TypedArray
+  },
+  {useMemo, useProp}: UseHooks,
+) => {
+  const {colors, opacity = 1} = props;
+  const rgba = useProp(colors, optional(parseColorArray));
+
+  parsed.colors = useMemo(() => {
+    if (!colors) return null;
+    if (opacity == 1) return rgba;
+
+    const copy = rgba.slice();
+    const n = copy.length;
+    for (let i = 3; i < n; i += 4) copy[i] *= opacity;
+    return copy;
+  }, [parsed, opacity]);
+};
+
+export const PointsTrait = combine(
+  ColorTrait,
+  ColorsTrait,
+  trait(
+    {
+      position: optional(parsePosition),
+      positions: optional(parsePositionArray),
+      size: optional(parseNumber),
+      sizes: optional(parseScalarArray),
+      depth: optional(parseNumber),
+      depths: optional(parseScalarArray),
+      zBias: optional(parseNumber),
+      zBiases: optional(parseScalarArray),
+    },
+  ),
+);
+
+export const LinesTrait = combine(
+  ColorTrait,
+  ColorsTrait,
+  trait({
+    position: optional(parsePositionArray),
+    positions: optional(parsePositionMultiArray),
+    size: optional(parseScalarArrayLike),
+    sizes: optional(parseScalarMultiArray),
+    depth: optional(parseScalarArrayLike),
+    depths: optional(parseScalarMultiArray),
+    zBias: optional(parseScalarArrayLike),
+    zBiases: optional(parseScalarMultiArray),
+    loop: optional(parseBoolean),
+    loops: optional(parseBooleanArray),
+  }),
+  trait({
+    
+  }),
 );

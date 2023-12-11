@@ -1,96 +1,157 @@
-import type { Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
-import { isTypedArray, emitIntoNumberArray } from '@use-gpu/core';
+import type { ArchetypeSchema, Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
+import { isTypedArray, copyNumberArray2, copyNestedNumberArray2 } from '@use-gpu/core';
 
-export const toScalarArray = (x: VectorLike, constructor: TypedArrayConstructor = Float32Array) => new constructor(x);
+const NO_CHUNKS: number[] = [];
 
-export const toVectorArray = (xs: VectorLikes, dims: number, w: number = 0, constructor: TypedArrayConstructor = Float32Array) => {
+const maybeTypedArray = (
+  x: VectorLike | VectorLikes | VectorLikes[]
+) => isTypedArray(x) ? x : null;
+
+const maybeEmptyArray = (
+  x: VectorLike | VectorLikes | VectorLikes[],
+  constructor: TypedArrayConstructor,
+) => !x.length ? new constructor(0) : null;
+
+// Array of scalars
+const maybeScalarArray = (
+  xs: VectorLike | VectorLikes | VectorLikes[],
+  constructor: TypedArrayConstructor,
+) => typeof xs[0] === 'number' ? new constructor(x) : null
+
+// Array of vectors
+const maybeVectorArray = (
+  xs: VectorLike | VectorLikes | VectorLikes[],
+  dims: number,
+  w: number,
+  constructor: TypedArrayConstructor,
+) => {
+  const d = (xs[0] as any)?.length;
+  if (d == null) return null;
+
+  if (typeof xs[0][0] !== 'number') return null;
+  if (d > dims) throw new Error(`Data point cannot be larger than ${dims}-vector`);
+
   const n = xs.length;
-  if (!n) return new constructor(0);
-
-  const scalar = typeof xs[0] === 'number';
-  if (scalar && dims === 1) {
-    return new constructor(xs as any as number[]);
-  }
-  else if (scalar) {
-    throw new Error("Data point is a scalar when vector is expected");
-  }
-
-  if (isTypedArray(xs)) return xs;
-
-  const d = (xs[0] as any)?.length || 0;
-  if (!d) throw new Error("Data point cannot be empty array or vector");
-  if (d > 4) throw new Error("Data point cannot be larger than 4D");
-
-  const vs = xs as any as number[][];
 
   const to = new constructor(n * dims);
-  if (dims === 1) {
-    emitIntoNumberArray((emit: Emit, i: number) => {
-      const [a] = vs[i];
-      emit(a);
-    }, to, dims);
+  copyNestedNumberArray2(xs as any, to, d, dims, 0, 0, n, w);
+  return to;
+}
+
+// Array of ragged scalar arrays
+const maybeMultiScalarArray = (
+  xs: VectorLike | VectorLikes | VectorLikes[],
+  constructor: TypedArrayConstructor,
+) => {
+  const d = (xs[0] as any)?.length;
+  if (d == null) return null;
+
+  if (typeof xs[0][0] !== 'number') return null;
+
+  const chunks = xs.length;
+
+  let n = 0;
+  for (let i = 0; i < chunks; i++) n += xs[i].length;
+
+  const to = new constructor(n);
+  let o = 0;
+  for (let i = 0; i < chunks; i++) {
+    const x = xs[i];
+    const l = x.length;
+    copyNumberArray2(x, to, 0, o, l);
+    o += l;
   }
-  else if (dims === 2) {
-    if (d === 1) {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a] = vs[i];
-        emit(a, 0);
-      }, to, dims);
-    }
-    else {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a, b] = vs[i];
-        emit(a, b);
-      }, to, dims);
-    }
+  return to;
+}
+
+// Array of ragged vector arrays
+const maybeMultiVectorArray = (
+  xs: VectorLike | VectorLikes | VectorLikes[],
+  dims: number,
+  w: number,
+  constructor: TypedArrayConstructor,
+) => {
+  const d = (xs[0]?.[0] as any)?.length;
+  if (d == null) return null;
+
+  if (typeof xs[0][0][0] !== 'number') return null;
+  if (d > dims) throw new Error(`Data point cannot be larger than ${dims}-vector`);
+
+  const chunks = xs.length;
+
+  let n = 0;
+  for (let i = 0; i < chunks; i++) n += xs[i].length;
+
+  const to = new constructor(n * dims);
+  let o = 0;
+  for (let i = 0; i < chunks; i++) {
+    const x = xs[i];
+    const l = x.length;
+
+    copyNestedNumberArray2(x, to, d, dims, 0, o, l);
+    o += l;
   }
-  else if (dims === 3) {
-    if (d === 1) {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a] = vs[i];
-        emit(a, 0, 0);
-      }, to, dims);
-    }
-    else if (d === 2) {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a, b] = vs[i];
-        emit(a, b, 0);
-      }, to, dims);
-    }
-    else {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a, b, c] = vs[i];
-        emit(a, b, c);
-      }, to, dims);
-    }
-  }
-  else if (dims === 4) {
-    if (d === 1) {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a] = vs[i];
-        emit(a, 0, 0, w);
-      }, to, dims);
-    }
-    else if (d === 2) {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a, b] = vs[i];
-        emit(a, b, 0, w);
-      }, to, dims);
-    }
-    else if (d === 3) {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a, b, c] = vs[i];
-        emit(a, b, c, w);
-      }, to, dims);
-    }
-    else {
-      emitIntoNumberArray((emit: Emit, i: number) => {
-        const [a, b, c, d] = vs[i];
-        emit(a, b, c, d);
-      }, to, dims);
-    }
-  }
-  else {
-    throw new Error(`Unsupported dims ${dims}`);
-  }
+  return to;
+}
+
+export const toCompositeChunks = (
+  x: VectorLike | VectorLikes | VectorLikes[],
+  dims: number,
+  w: number,
+  constructor: TypedArrayConstructor,
+) => {
+  if (!x.length) return NO_CHUNKS;
+  if (isTypedArray(x)) return [x.length];
+  if (typeof x[0] === 'number') return [x.length];
+  if (typeof x[0]?.[0] === 'number') return [x.length];
+  if (typeof x[0]?.[0]?.[0] === 'number') return x[0].map(x => x.length);
+  return NO_CHUNKS;
 };
+
+export const toScalarArray = (
+  x: VectorLike,
+  constructor: TypedArrayConstructor = Float32Array
+) => (
+  maybeTypedArray(x) ||
+  maybeEmptyArray(x, constructor) ||
+  maybeScalarArray(x, constructor) ||
+  new constructor(0)
+);
+
+export const toVectorArray = (
+  x: VectorLikes,
+  dims: number,
+  w: number = 0,
+  constructor: TypedArrayConstructor = Float32Array,
+) => (
+  maybeTypedArray(x) ||
+  maybeEmptyArray(x, constructor) ||
+  maybeScalarArray(x, constructor) ||
+  maybeVectorArray(x, dims, w, constructor) ||
+  new constructor(0)
+);
+
+export const toMultiScalarArray = (
+  x: VectorLike,
+  constructor: TypedArrayConstructor = Float32Array
+) => (
+  maybeTypedArray(x) ||
+  maybeEmptyArray(x, constructor) ||
+  maybeScalarArray(x, constructor) ||
+  maybeMultiScalarArray(x, constructor) ||
+  new constructor(0)
+);
+
+export const toMultiVectorArray = (
+  x: VectorLikes | VectorLikes[],
+  dims: number,
+  w: number = 0,
+  constructor: TypedArrayConstructor = Float32Array
+) => (
+  maybeTypedArray(x) ||
+  maybeEmptyArray(x, constructor) ||
+  maybeScalarArray(x, constructor) ||
+  maybeVectorArray(x, dims, w, constructor) ||
+  maybeMultiVectorArray(x, dims, w, constructor) ||
+  new constructor(0)
+);

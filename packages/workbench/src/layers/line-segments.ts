@@ -2,12 +2,12 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
-import { getChunkCount, generateChunkSegments, alignSizeTo } from '@use-gpu/core';
+import { accumulateChunks, generateChunkSegments, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type LineSegmentsProps = {
   chunks?: number[],
-  loops?: boolean[],
+  loops?: boolean[] | boolean,
 
   render?: (segments: StorageSource, lookups: StorageSource) => LiveElement,
 };
@@ -19,7 +19,7 @@ export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
   const {chunks, loops, render} = props;
   if (!chunks) return null;
   
-  const count = getChunkCount(chunks, loops);
+  const count = accumulateChunks(chunks, loops);
 
   // Make index data for line segments/anchor/trim data
   const [segmentBuffer, lookupBuffer] = useMemo(() => {

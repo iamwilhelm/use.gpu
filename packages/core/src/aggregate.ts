@@ -47,8 +47,8 @@ export const updateAggregateBuffer = (
   for (const item of items) {
     const {count, attributes: {[key]: single, [keys]: multiple}} = item as any;
 
-    if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count);
-    else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count);
+    if (multiple != null) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count);
+    else if (single != null) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count);
 
     pos += count * dims;
   }

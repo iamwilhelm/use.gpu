@@ -2,6 +2,7 @@ export * from './plot';
 
 export * from './providers/range-provider';
 
+export * from './shape/line';
 export * from './shape/point';
 /*
 export * from './providers/data-provider';
@@ -12,7 +13,6 @@ export * from './source/transpose';
 
 export * from './shape/arrow';
 export * from './shape/label';
-export * from './shape/line';
 
 
 export * from './layer/axis';

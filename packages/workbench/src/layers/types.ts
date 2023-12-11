@@ -3,6 +3,7 @@ import type { PointShape } from '@use-gpu/parse';
 import type { LineLayerFlags } from '../line-layer';
 import type { FaceLayerFlags } from '../face-layer';
 import type { PointLayerFlags } from './point-layer';
+import type { TransformContextProps } from '../providers/transform-provider';
 
 export type LayerType = 'point' | 'line' | 'face';
 
@@ -22,7 +23,7 @@ export type ShapeAggregate = {
   archetype: number,
   count: number,
   indices?: number,
-  transform?: any,
+  transform?: TransformContextProps,
   zIndex?: number,
 };
 

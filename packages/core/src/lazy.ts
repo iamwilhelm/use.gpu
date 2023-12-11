@@ -27,3 +27,16 @@ export const proxyRef = <T extends object>(target: T, overrideRef: {current: Rec
     },
   }) as T;
 };
+
+export const pick = <A, B>(
+  items: A[],
+  accessor: (a: A) => B,
+) => {
+  return proxy(items, {
+    get: (target, prop) => {
+      if (typeof prop === 'number') return accessor(items[i]);
+      return target[prop];
+    },
+  });
+};
+

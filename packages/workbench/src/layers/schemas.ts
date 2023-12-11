@@ -1,25 +1,39 @@
 export const SHAPE_SCHEMA = {
-  position:  {format: 'vec4<f32>', plural: 'positions'},
-  color:     {format: 'vec4<f32>', plural: 'colors'},
-  depth:     {format: 'f32', plural: 'depths'},
-  zBias:     {format: 'f32', plural: 'zBiases'},
-  id:        {format: 'u32', plural: 'ids'},
-  lookup:    {format: 'u32', plural: 'lookups'},
+  colors:     {format: 'vec4<f32>', single: 'color'},
+  depths:     {format: 'f32', single: 'depth'},
+  zBiases:    {format: 'f32', single: 'zBias'},
+  ids:        {format: 'u32', single: 'id'},
+  lookups:    {format: 'u32', single: 'lookup'},
 };
 
 export const POINT_SCHEMA = {
   ...SHAPE_SCHEMA,
-  size:      {format: 'f32', plural: 'sizes'},
+  positions: {format: 'vec4<f32>', single: 'position'},
+  sizes:     {format: 'f32', single: 'size'},
 };
 
 export const LINE_SCHEMA = {
   ...SHAPE_SCHEMA,
-  segment:   {format: 'u32', plural: 'segments'},
-  width:     {format: 'f32', plural: 'widths'},
+  positions: {format: 'vec4<f32>', composite: true},
+  widths:    {format: 'f32', single: 'width'},
+
+  segments:  {format: 'i8', segment: true},
+  order:     {format: 'u32', order: true},
+};
+
+export const ARROW_SCHEMA = {
+  ...SHAPE_SCHEMA,
+  positions: {format: 'vec4<f32>', composite: true},
+  widths:    {format: 'f32', single: 'width'},
+  sizes:     {format: 'f32', single: 'size'},
+  segments:  {format: 'i8', segment: true},
+  anchors:   {format: 'vec4<u32>', segment: true},
+  trims:     {format: 'vec4<u32>', segment: true},
 };
 
 export const FACE_SCHEMA = {
   ...SHAPE_SCHEMA,
-  segment:   {format: 'u32', plural: 'segments'},
-  index:     {format: 'u32', plural: 'indices', index: true},
+  position:  {format: 'vec4<f32>', composite: true},
+  indices:   {format: 'u32', index: true},
+  segments:  {format: 'i8', segment: true},
 };

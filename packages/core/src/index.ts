@@ -9,6 +9,7 @@ export * from './bytes';
 export * from './color';
 export * from './constants';
 export * from './data';
+export * from './data2';
 export * from './depth';
 export * from './float16';
 export * from './id';

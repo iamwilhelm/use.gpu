@@ -10,7 +10,7 @@ import {
   Animate,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Point,
+  Plot, Cartesian, Axis, Grid, Point, Line, Transform,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -26,6 +26,28 @@ export const Plot2DPage: LC = () => {
       <Camera>
         <Pass>
           <Plot>
+
+            <Point
+              position={[50, 50]}
+              size={20}
+              color={'#ffffff'}
+            />
+
+            <Transform position={[50, 100]} rotation={[0, 0, 90]}>
+              <Point
+                positions={[[0, 0], [10, 0], [20, 0], [30, 0], [40, 0]]}
+                size={10}
+                color={'#3090ff'}
+              />
+            </Transform>
+            
+            {/*
+            <Line
+              position={[[50, 150], [150, 150]]}
+              width={5}
+              color={'#c00040'}
+            />
+
             <Cartesian
               scale={[2, 1, 1]}
             >
@@ -50,14 +72,8 @@ export const Plot2DPage: LC = () => {
                 width={5}
                 color="#a0a0a0"
               />
-
-              <Point
-                position={[0, 0]}
-                size={20}
-                color={'#ffffff'}
-              />
-
             </Cartesian>
+            */}
           </Plot>
         </Pass>
       </Camera>

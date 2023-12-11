@@ -419,9 +419,9 @@ export type Tuples<N extends number, T = number> = {
   length: number,
 };
 
-export interface Emitter<T = Time> {
-  (emit: Emit, ...args: any[]): any;
-}
+export type Emitter<T extends Array = any[]> = {
+  (emit: Emit, ...args: T): void;
+};
 
 /*
 export interface Emitter<T = Time> {

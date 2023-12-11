@@ -13,7 +13,7 @@ import {
   copyDataArrays, copyNumberArrays,
   copyDataArraysComposite, copyNumberArraysComposite,
   copyDataArrayChunked, copyNumberArrayChunked,
-  getChunkCount,
+  accumulateChunks,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
 } from '@use-gpu/core';

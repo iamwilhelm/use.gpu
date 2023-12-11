@@ -11,7 +11,7 @@ import {
   copyDataArrays, copyNumberArrays,
   copyDataArraysComposite, copyNumberArraysComposite,
   copyDataArrayChunked, copyNumberArrayChunked,
-  getChunkCount,
+  accumulateChunks,
   makeStorageBuffer, uploadBuffer, UNIFORM_ARRAY_DIMS,
   getBoundingBox, toDataBounds,
 } from '@use-gpu/core';
@@ -158,8 +158,8 @@ export const CompositeData: LiveComponent<CompositeDataProps> = (props) => {
     const chunks = indexChunks ?? dataChunks;
     const indexed = indexChunks && dataChunks;
 
-    const dataCount = getChunkCount(dataChunks, loops);
-    const indexCount = indexChunks ? getChunkCount(indexChunks, loops) : 0;
+    const dataCount = accumulateChunks(dataChunks, loops);
+    const indexCount = indexChunks ? accumulateChunks(indexChunks, loops) : 0;
     const offsets = indexed && accumulate(indexed);
 
     return {

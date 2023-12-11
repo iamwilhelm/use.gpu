@@ -6,7 +6,7 @@ import { schemaToArchetype, schemaToAttributes } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { POINT_SCHEMA } from '@use-gpu/workbench';
+import { useTransformContext, POINT_SCHEMA } from '@use-gpu/workbench';
 
 //import { PointLayer } from '@use-gpu/workbench';
 //import { DataContext } from '../providers/data-provider';
@@ -53,19 +53,22 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       zBiases,
       zIndex,
       shape,
+
       ...flags
   } = parsed;
 
-  console.log({parsed})
+  const transform = useTransformContext();
+
   const archetype = schemaToArchetype(POINT_SCHEMA, parsed, flags);
   const attributes = schemaToAttributes(POINT_SCHEMA, parsed);
 
   const shapes = {
     point: {
-      count: 1,
+      count: attributes.positions?.length ?? 1,
       archetype,
       attributes,
       flags,
+      transform,
       zIndex,
     },
   };

@@ -50,9 +50,11 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
     children,
   } = props;
 
-  const {axes: a, range: g} = useAxesTrait(props);
-  const {long, lat, zoom} = useGeographicTrait(props);
-  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {
+    axes: a, range: g,
+    long, lat, zoom,
+    position: p, scale: s, quaternion: q, rotation: r, matrix: m,
+  } = useTraits(props);
 
   const [matrix, swizzle, origin, range, epsilon] = useMemo(() => {
     const matrix = mat4.create();

@@ -22,6 +22,12 @@ import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
 
+export type RawFacesFlags = {
+  flat?: boolean,
+  shaded?: boolean,
+  fragDepth?: boolean,
+} & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>
+
 export type RawFacesProps = {
   position?: number[] | TypedArray,
   normal?: number[] | TypedArray,
@@ -54,14 +60,11 @@ export type RawFacesProps = {
     lookups?: boolean,
   },
 
-  flat?: boolean,
-  shaded?: boolean,
-  fragDepth?: boolean,
   count?: Lazy<number>,
 
   shouldDispatch?: (u: Record<string, any>) => boolean | number | null,
   onDispatch?: (u: Record<string, any>) => void,
-} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'side' | 'shadow' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
+} & PickingSource & RawFacesFlags;
 
 const ZERO = [0, 0, 0, 1];
 const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };

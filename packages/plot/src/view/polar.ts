@@ -1,6 +1,8 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
+import type { Axis4, Swizzle } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
+import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { swizzleTo, chainTo } from '@use-gpu/shader/wgsl';
@@ -15,11 +17,14 @@ import { recenterAxis } from '../util/axis';
 import { swizzleMatrix, toBasis, invertBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
-import { useAxesTrait, useObjectTrait } from '../traits';
+import { AxesTrait, ObjectTrait } from '../traits';
 
 import { getPolarPosition } from '@use-gpu/wgsl/transform/polar.wgsl';
 
-export type PolarProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
+const Traits = combine(AxesTrait, ObjectTrait);
+const useTraits = makeUseTrait(Traits);
+
+export type PolarProps = TraitProps<typeof Traits> & {
   bend?: number,
   helix?: number,
   on?: Axis4,
@@ -33,8 +38,10 @@ export const Polar: LiveComponent<PolarProps> = (props: PropsWithChildren<PolarP
     children,
   } = props;
 
-  const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {
+    range: g, axes: a,
+    position: p, scale: s, quaternion: q, rotation: r, matrix: m,
+  } = useTraits(props);
 
   const [focus, aspect, matrix, swizzle, range, epsilon] = useMemo(() => {
     const x = g[0][0];

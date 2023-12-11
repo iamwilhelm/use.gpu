@@ -52,8 +52,8 @@ export const Plot2DPage: LC = () => {
               />
 
               <Point
-                point={[0, 0]}
-                size={10}
+                position={[0, 0]}
+                size={20}
                 color={'#ffffff'}
               />
 

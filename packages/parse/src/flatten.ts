@@ -3,7 +3,7 @@ import { isTypedArray, emitIntoNumberArray } from '@use-gpu/core';
 
 export const toScalarArray = (x: VectorLike, constructor: TypedArrayConstructor = Float32Array) => new constructor(x);
 
-export const toVectorArray = (xs: VectorLikes, dims: number, constructor: TypedArrayConstructor = Float32Array) => {
+export const toVectorArray = (xs: VectorLikes, dims: number, w: number = 0, constructor: TypedArrayConstructor = Float32Array) => {
   const n = xs.length;
   if (!n) return new constructor(0);
 
@@ -68,19 +68,19 @@ export const toVectorArray = (xs: VectorLikes, dims: number, constructor: TypedA
     if (d === 1) {
       emitIntoNumberArray((emit: Emit, i: number) => {
         const [a] = vs[i];
-        emit(a, 0, 0, 1);
+        emit(a, 0, 0, w);
       }, to, dims);
     }
     else if (d === 2) {
       emitIntoNumberArray((emit: Emit, i: number) => {
         const [a, b] = vs[i];
-        emit(a, b, 0, 1);
+        emit(a, b, 0, w);
       }, to, dims);
     }
     else if (d === 3) {
       emitIntoNumberArray((emit: Emit, i: number) => {
         const [a, b, c] = vs[i];
-        emit(a, b, c, 1);
+        emit(a, b, c, w);
       }, to, dims);
     }
     else {

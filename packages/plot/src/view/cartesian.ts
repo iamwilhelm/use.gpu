@@ -1,9 +1,10 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { UniformAttributeValue } from '@use-gpu/core';
-import type { VectorLike } from '@use-gpu/traits';
-import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
+import type { UniformAttributeValue, VectorLike } from '@use-gpu/core';
+import type { Swizzle } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
+import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
@@ -16,22 +17,27 @@ import { composeTransform } from '../util/compose';
 import { swizzleMatrix } from '../util/swizzle';
 import { mat3, mat4 } from 'gl-matrix';
 
-import { useAxesTrait, useObjectTrait } from '../traits';
+import { AxesTrait, ObjectTrait } from '../traits';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
 const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
 
-export type CartesianProps = Partial<AxesTrait> & Partial<ObjectTrait>;
+const Traits = combine(AxesTrait, ObjectTrait);
+const useTraits = makeUseTrait(Traits);
+
+export type CartesianProps = TraitProps<typeof Traits>;
 
 export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildren<CartesianProps>) => {
   const {
     children,
   } = props;
 
-  const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {
+    range: g, axes: a,
+    position: p, scale: s, quaternion: q, rotation: r, matrix: m,
+  } = useTraits(props);
 
   const [matrix, normalMatrix] = useMemo(() => {
     const x = g[0][0];

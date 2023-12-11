@@ -23,6 +23,10 @@ import { useMaterialContext } from '../providers/material-provider';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
 
+export type RawLinesFlags = {
+  join?: 'miter' | 'round' | 'bevel',
+} & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
+
 export type RawLinesProps = {
   position?: number[] | TypedArray,
   segment?: number,
@@ -46,10 +50,8 @@ export type RawLinesProps = {
   trims?: ShaderSource,
   sizes?: ShaderSource,
 
-  join?: 'miter' | 'round' | 'bevel',
-
   count?: Lazy<number>,
-} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
+} & PickingSource & RawLinesFlags;
 
 const ZERO = [0, 0, 0, 1];
 const POSITION: UniformAttribute = { format: 'vec4<f32>', name: 'getPosition' };
@@ -100,7 +102,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const t = useShaderRef(props.trim, props.trims);
   const e = useShaderRef(props.size, props.sizes);
   
-  const l = useShaderRef(null, props.lookups);
+  const l = useShaderRef(props.lookup, props.lookups);
   const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
 
   const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();

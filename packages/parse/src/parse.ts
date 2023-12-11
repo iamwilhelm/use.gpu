@@ -13,6 +13,8 @@ const NO_VEC4 = vec4.fromValues(0, 0, 0, 0);
 const NO_QUAT = quat.create();
 const NO_MAT4 = mat4.create();
 
+const NO_POSITION = vec4.fromValues(0, 0, 0, 1);
+
 const GRAY = vec4.fromValues(0.5, 0.5, 0.5, 1);
 
 const NO_VECTOR: number[] = [];
@@ -95,7 +97,7 @@ export const makeParseVec4 = (defaults: vec4 = NO_VEC4) => (vec?: VectorLike): v
   if (vec != null) {
     return vec4.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2], vec[3] ?? defaults[3]);
   }
-  return defaults;
+  return vec4.copy(defaults);
 };
 
 export const makeParseMat4 = (defaults: mat4 = NO_MAT4) => (matrix?: VectorLike): mat4 => {
@@ -108,11 +110,12 @@ export const makeParseMat4 = (defaults: mat4 = NO_MAT4) => (matrix?: VectorLike)
 
 export const makeParseTypedArray = <T extends TypedArray>(
   dims: number,
+  w: number = 0,
   constructor: TypedArrayConstructor = Float32Array,
 ) => (
   vecs: VectorLikes
 ): T => {
-  return toVectorArray(vecs, dims, constructor) as T;
+  return toVectorArray(vecs, dims, w, constructor) as T;
 }
 
 export const makeParseBasis = (defaults: string) => {
@@ -250,11 +253,13 @@ export const parseVec4Array    = makeParseTypedArray<Float32Array>(4);
 
 //////////////////
 
-export const parsePosition   = makeParseVec3();
+export const parsePosition   = makeParseVec4(NO_POSITION);
 export const parseRotation   = makeParseVec3();
-export const parseQuaternion = makeParseVec3();
+export const parseQuaternion = makeParseVec4();
 export const parseScale      = makeParseVec3(vec3.fromValues(1, 1, 1));
 export const parseMatrix     = makeParseMat4();
+
+export const parsePositionArray = makeParseTypedArray<Float32Array>(4, 1);
 
 export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
 export const parseBlending   = makeParseEnum<Blending>(['none', 'premultiply', 'alpha', 'add', 'subtract', 'multiply']);

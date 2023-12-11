@@ -1,7 +1,9 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { AxesTrait, ObjectTrait, Axis4, Swizzle } from '../types';
+import type { Axis4, Swizzle } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/traits';
+import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
+import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
@@ -15,11 +17,14 @@ import { composeTransform } from '../util/compose';
 import { swizzleMatrix, toBasis, rotateBasis, invertBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
-import { useAxesTrait, useObjectTrait } from '../traits';
+import { AxesTrait, ObjectTrait } from '../traits';
 
 import { getStereographicPosition } from '@use-gpu/wgsl/transform/stereographic.wgsl';
 
-export type StereographicProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
+const Traits = combine(AxesTrait, ObjectTrait);
+const useTraits = makeUseTrait(Traits);
+
+export type StereographicProps = TraitProps<typeof Traits> & {
   bend?: number,
   normalize?: number | boolean,
   on?: Axis4,
@@ -33,8 +38,10 @@ export const Stereographic: LiveComponent<StereographicProps> = (props: PropsWit
     children,
   } = props;
 
-  const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {
+    range: g, axes: a,
+    position: p, scale: s, quaternion: q, rotation: r, matrix: m,
+  } = useTraits(props);
 
   const [matrix, swizzle, epsilon] = useMemo(() => {
     const x = g[0][0];

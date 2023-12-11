@@ -1,14 +1,15 @@
 import type { LiveComponent, PropsWithChildren } from '@use-gpu/live';
-import type { AxesTrait, ObjectTrait, Swizzle } from '../types';
+import type { Swizzle } from '../types';
+import type { TraitProps } from '@use-gpu/traits';
 
-import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale, useProp } from '@use-gpu/traits';
+import { trait, combine, makeUseTrait, useProp } from '@use-gpu/traits/live';
+import { parseAxes, parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext,
   useShaderRef, useBoundShader, useCombinedTransform,
 } from '@use-gpu/workbench';
-import { parseAxes } from '@use-gpu/traits';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -16,11 +17,14 @@ import { recenterAxis } from '../util/axis';
 import { swizzleMatrix, invertBasis, toBasis } from '../util/swizzle';
 import { mat4 } from 'gl-matrix';
 
-import { useAxesTrait, useObjectTrait } from '../traits';
+import { AxesTrait, ObjectTrait } from '../traits';
 
 import { getSphericalPosition } from '@use-gpu/wgsl/transform/spherical.wgsl';
 
-export type SphericalProps = Partial<AxesTrait> & Partial<ObjectTrait> & {
+const Traits = combine(AxesTrait, ObjectTrait);
+const useTraits = makeUseTrait(Traits);
+
+export type SphericalProps = TraitProps<typeof Traits> & {
   bend?: number,
   helix?: number,
   on?: Swizzle,
@@ -34,8 +38,10 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
   } = props;
 
   const on = useProp(props.on, parseAxes);
-  const {range: g, axes: a} = useAxesTrait(props);
-  const {position: p, scale: s, quaternion: q, rotation: r, matrix: m} = useObjectTrait(props);
+  const {
+    range: g, axes: a,
+    position: p, scale: s, quaternion: q, rotation: r, matrix: m,
+  } = useTraits(props);
 
   const [focus, aspectX, aspectY, scaleY, matrix, swizzle, range, epsilon] = useMemo(() => {
     const x = g[0][0];

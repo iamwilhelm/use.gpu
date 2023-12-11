@@ -451,7 +451,7 @@ export type AccessorType = 'index' | 'unwelded';
 export type AccessorField = {format: string, accessor?: AccessorSpec, type?: AccessorType};
 export type AccessorSchema = Record<string, string | AccessorField>;
 
-export type ArchetypeField = {format: string, plural?: string};
+export type ArchetypeField = {format: string, plural?: string, index?: boolean};
 export type ArchetypeSchema = Record<string, string | ArchetypeField>;
 
 export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];

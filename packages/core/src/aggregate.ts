@@ -45,7 +45,7 @@ export const updateAggregateBuffer = (
 
   let pos = 0;
   for (const item of items) {
-    const {count, [key]: single, [keys]: multiple} = item as any;
+    const {count, attributes: {[key]: single, [keys]: multiple}} = item as any;
 
     if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count);
     else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count);
@@ -74,8 +74,8 @@ export const updateAggregateIndex = (
 
   let pos = 0, i = 0;
   for (const item of items) {
-    const {indices, [key]: single, [keys]: multiple} = item as any;
-    const count = indices.length;
+    const {attributes: {[key]: single, [keys]: multiple}} = item as any;
+    const count = multiple?.length ?? 1;
 
     if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count, false, offsets[i]);
     else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count, false, offsets[i]);

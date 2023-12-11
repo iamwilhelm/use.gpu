@@ -14,6 +14,7 @@ import {
   parseVec4,
   parseVec4Array,
   parsePosition,
+  parsePositionArray,
   parseRotation,
   parseQuaternion,
   parseColor,
@@ -99,7 +100,7 @@ export const ColorTrait = (
   const {color, opacity} = props;
 
   const c = useProp(color, parseColor);
-  const o = useProp(opacity, parseNumber);
+  const o = useProp(opacity, parseNumber, 1);
 
   const rgba = useMemo(() => (
     o === 1
@@ -191,18 +192,14 @@ export const ObjectTrait = trait(
 
 export const PointTrait = trait(
   {
-    size:  parseNumber,
-    depth: parseNumber,
-    shape: parsePointShape,
-    hollow: parseBoolean,
-    outline: parseNumber,
+    size: parseNumber,
+    shape: optional(parsePointShape),
+    depth: optional(parseNumber),
+    hollow: optional(parseBoolean),
+    outline: optional(parseNumber),
   },
   {
     size: 1,
-    depth: 0,
-    shape: 'circle',
-    hollow: false,
-    outline: 0,
   },
 );
 
@@ -215,13 +212,13 @@ export const PointsTrait = trait(
 
 export const PositionTrait = trait(
   {
-    position: optional(parseVec4),
+    position: optional(parsePosition),
   }
 );
 
 export const PositionsTrait = trait(
   {
-    positions: optional(parseVec4Array),
+    positions: optional(parsePositionArray),
   },
 );
 
@@ -302,12 +299,11 @@ export const VolumeTrait = trait(
 
 export const ZBiasTrait = trait(
   {
-    zBias:  parseNumber,
+    zBias:  optional(parseNumber),
     zIndex: parseInteger,
   },
   {
     zIndex: 0,
-    zBias: 0,
   },
 );
 

@@ -30,6 +30,12 @@ const MASK_SHADER = {
   'right': rightSDF,
 };
 
+export type PointLayerFlags = {
+  shape?: PointShape,
+  hollow?: boolean,
+  outline?: number,
+} & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
+
 export type PointLayerProps = {
   position?: number[] | TypedArray,
   uv?: number[] | TypedArray,
@@ -47,13 +53,9 @@ export type PointLayerProps = {
   depths?: ShaderSource,
   zBiases?: ShaderSource,
 
-  shape?: PointShape,
-  hollow?: boolean,
-  outline?: number,
-
   count?: Lazy<number>,
   id?: number,
-} & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
+} & PointLayerFlags;
 
 const SIZE_BINDING = { name: 'getSize', format: 'f32', value: 1, args: ['u32'] } as UniformAttributeValue;
 

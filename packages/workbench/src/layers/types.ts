@@ -1,7 +1,10 @@
 import type { LiveFunction, LiveElement } from '@use-gpu/live';
 import type { PointShape } from '@use-gpu/parse';
+import type { LineLayerFlags } from '../line-layer';
+import type { FaceLayerFlags } from '../face-layer';
+import type { PointLayerFlags } from './point-layer';
 
-export type LayerType = 'point' | 'line';
+export type LayerType = 'point' | 'line' | 'face';
 
 export type LayerAggregator = (
   device: GPUDevice,
@@ -15,67 +18,63 @@ export type LayerAggregator = (
   indices?: number,
 ) => LiveElement;
 
-export type PointAggregate = {
-  id: number,
+export type ShapeAggregate = {
+  archetype: number,
   count: number,
-  archetype?: number,
+  indices?: number,
   transform?: any,
+  zIndex?: number,
+};
 
-  shape?: PointShape,
-
+type ShapeAttributes = {
   positions?: number[],
   colors?: number[],
-  sizes?: number[],
   depths?: number[],
+  zBiases?: number[],
+  ids?: number[],
+  lookups?: number[],
 
   position?: number[],
   color?: number[],
-  size?: number[],
   depth?: number,
+  zBias?: number,
+  id?: number,
+  lookup?: number,
 };
 
-export type LineAggregate = {
-  id: number,
-  count: number,
-  isLoop?: boolean,
-  archetype?: number,
-  transform?: any,
+export type PointAggregate = ShapeAggregate & {
+  flags: PointLayerFlags,
+  attributes: ShapeAttributes & {
+    sizes?: number[],
 
-  positions?: number[],
-  segments?: number[],
-  colors?: number[],
-  sizes?: number[],
-  depths?: number[],
-
-  position?: number[],
-  segment?: number[],
-  color?: number[],
-  size?: number[],
-  depth?: number,
+    size?: number,
+  },
 };
 
-export type FaceAggregate = {
-  id: number,
-  count: number,
-  archetype?: number,
-  transform?: any,
+export type LineAggregate = ShapeAggregate & {
+  flags: LineLayerFlags,
+  attributes: {
+    segments?: number[],
+    sizes?: number[],
 
-  cullMode?: 'front' | 'back' | 'none',
-
-  positions?: number[],
-  indices?: number[],
-  colors?: number[],
-  sizes?: number[],
-  depths?: number[],
-
-  position?: number[],
-  index?: number[],
-  color?: number[],
-  size?: number[],
-  depth?: number,
+    segment?: number,
+    size?: number,
+  },
 };
 
-export type LayerAggregate =
-  | PointAggregate
-  | LineAggregate
-  | FaceAggregate;
+export type FaceAggregate = ShapeAggregate & {
+  flags: FaceLayerFlags,
+  attributes: {
+    indices?: number[],
+    segments?: number[],
+
+    index?: number,
+    segment?: number,
+  },
+};
+
+export type LayerAggregate = {
+  point: PointAggregate | PointAggregate[],
+  line: LineAggregate | LineAggregate[],
+  face: FaceAggregate | FaceAggregate[],
+};

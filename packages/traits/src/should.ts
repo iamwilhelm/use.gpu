@@ -12,8 +12,8 @@ export const shouldEqual = (spec: Record<string, MemoCompare>) => {
 };
 
 export const sameArray = (a: any, b: any) => {
-  const isA = 'length' in a;
-  const isB = 'length' in b;
+  const isA = typeof a === 'object' && 'length' in a;
+  const isB = typeof b === 'object' && 'length' in b;
 
   if (isA && isB) {
     const an = a.length;

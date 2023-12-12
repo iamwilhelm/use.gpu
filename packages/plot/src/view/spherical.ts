@@ -157,7 +157,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
     return chainTo(swizzleTo('vec4<f32>', 'vec4<f32>', swizzle), bound);
   }, [bound, swizzle]);
 
-  const context = useCombinedTransform(xform, null, null, e);
+  const context = useCombinedTransform({ transform: xform }, e);
 
   const rangeMemo = useOne(() => range, JSON.stringify(range));
 

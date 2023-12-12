@@ -72,9 +72,10 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   
-  const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ss = props.sts == null ? ps : s;
 
-  const [xf, scissor, getBounds] = useApplyTransform(ps ?? p);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -86,7 +87,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, ps ?? s, instanceCount]);
+  const getVertex = useBoundShader(getQuadVertex, [positions, scissor, r, c, d, z, u, s, instanceCount]);
   const getPicking = usePickingShader(props);
   const applyMask = m ? useBoundShader(getMaskedColor, [m]) : null;
 

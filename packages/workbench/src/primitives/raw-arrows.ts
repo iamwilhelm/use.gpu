@@ -78,7 +78,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
 
   const g = useRawSource(geometry.attributes.positions, 'vec4<f32>');
 
-  const [xf, scissor, getBounds] = useApplyTransform(p);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -88,7 +88,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     useNoCallback();
   }
 
-  const getVertex = useBoundShader(getArrowVertex, [g, a, xf, scissor, c, e, w, d, z]);
+  const getVertex = useBoundShader(getArrowVertex, [g, a, positions, scissor, c, e, w, d, z]);
   const getPicking = usePickingShader(props);
   const getFragment = getPassThruColor;
 

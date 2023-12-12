@@ -142,7 +142,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
 
-  const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ss = props.sts == null ? ps : props.sts;
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -155,7 +156,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
 
-  const getVertex = useBoundShader(getFaceVertex, [xf, xd, scissor, ps ?? p, n, t, u, ps ?? s, g, c, z, i, j, k, l]);
+  const getVertex = useBoundShader(getFaceVertex, [xf, xd, scissor, ps, n, t, u, ss, g, c, z, i, j, k, l]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => {

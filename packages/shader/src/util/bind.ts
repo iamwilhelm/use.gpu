@@ -2,7 +2,7 @@ import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding } f
 
 import { parseLinkAliases } from '../util/link';
 import { toHash, formatMurmur53, toMurmur53, scrambleBits53, mixBits53 } from '../util/hash';
-import { toBundle, toModule, getBundleHash, getBundleKey } from '../util/bundle';
+import { toBundle, toModule, getBundleHash, getBundleKey, getBundleEntry } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
 import { PREFIX_CLOSURE, PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
 

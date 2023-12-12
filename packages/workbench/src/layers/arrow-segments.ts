@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
-import { accumulateChunks, generateChunkSegments, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
+import { accumulateChunks, generateChunkSegments2, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type ArrowSegmentsProps = {
@@ -41,11 +41,11 @@ export const useArrowSegments = (
     const lookups = new Uint32Array(count);
     const scatters = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
 
-    generateChunkSegments(segments, lookups, scatters, chunks, loops, starts, ends);
+    generateChunkSegments2(segments, lookups, scatters, chunks, loops, starts, ends);
     const anchorCount = generateChunkAnchors(anchors, trims, chunks, loops, starts, ends);
 
     return {
-      segmentCount,
+      segmentCount: count,
       anchorCount,
       segments,
       anchors,

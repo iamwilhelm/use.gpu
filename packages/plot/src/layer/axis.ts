@@ -2,7 +2,7 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
 import type { TraitProps } from '@use-gpu/traits/live';
 
-import { makeUseTrait, combine, shouldEqual, sameArray, sameAny, useProp } from '@use-gpu/traits/live';
+import { makeUseTrait, optional, combine, shouldEqual, sameArray, sameAny, useProp } from '@use-gpu/traits/live';
 import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
 import {
   useBoundShader, useBoundSource, useShaderRef,
@@ -32,7 +32,7 @@ const Traits = combine(
   ROPTrait,
 );
 
-const useTraits = makeUseTrait
+const useTraits = makeUseTrait(Traits);
 
 export type AxisProps =
   TraitProps<typeof Traits>
@@ -86,12 +86,6 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
         anchors,
         trims,
         count: n,
-
-        color,
-        width,
-        depth,
-        size,
-        join,
 
         ...flags,
       })

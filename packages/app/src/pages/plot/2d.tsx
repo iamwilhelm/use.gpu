@@ -27,12 +27,6 @@ export const Plot2DPage: LC = () => {
         <Pass>
           <Plot>
 
-            <Point
-              position={[50, 50]}
-              size={20}
-              color={'#ffffff'}
-            />
-
             <Transform position={[50, 100]} rotation={[0, 0, 90]}>
               <Point
                 positions={[[0, 0], [10, 0], [20, 0], [30, 0], [40, 0]]}
@@ -40,6 +34,12 @@ export const Plot2DPage: LC = () => {
                 color={'#3090ff'}
               />
             </Transform>
+
+            <Point
+              position={[50, 50]}
+              size={20}
+              color={'#ffffff'}
+            />
 
             <Line
               position={[[100, 50], [150, 150]]}
@@ -62,6 +62,18 @@ export const Plot2DPage: LC = () => {
               color={'#40c000'}
             />
 
+            <Transform position={[0, 400]}>
+              <Line
+                positions={[
+                  [[300, 50], [350, 150], [400, 50], [450, 150]],
+                  [[300, 150], [350, 250], [400, 150], [450, 250]],
+                ]}
+                width={10}
+                color={['#ffa040', '#7f40a0']}
+                join="miter"
+              />
+            </Transform>
+
             <Line
               positions={[
                 [[300, 250], [350, 350], [400, 250], [450, 350]],
@@ -83,7 +95,20 @@ export const Plot2DPage: LC = () => {
               loop
             />
 
-            {/*
+            <Transform position={[0, 400]}>
+              <Line
+                positions={[
+                  [[550, 50], [500, 150], [600, 150]],
+                  [[550, 250], [500, 350], [600, 350]],
+                ]}
+                width={10}
+                depth={1}
+                color={['#a040ff', '#40a07f']}
+                join="round"
+                loop
+              />
+            </Transform>
+
             <Cartesian
               range={[[0, 100], [0, 100]]}
               position={[300, 500, 1]}
@@ -111,7 +136,6 @@ export const Plot2DPage: LC = () => {
                 color="#a0a0a0"
               />
             </Cartesian>
-            */}
 
           </Plot>
         </Pass>

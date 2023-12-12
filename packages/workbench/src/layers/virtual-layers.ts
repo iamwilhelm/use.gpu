@@ -5,7 +5,7 @@ import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, Fa
 import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
 import { use, keyed, fragment, signal, provide, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
-import { toMurmur53, scrambleBits53, mixBits53 } from '@use-gpu/state';
+import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
   schemaToAggregate,
@@ -131,10 +131,10 @@ const makePointAccumulator = (
     const props = {count, ...item.flags} as Record<string, any>;
 
     updateAggregateFromSchema(device, POINT_SCHEMA, aggregate, items, props, count);
-    console.log({props, aggregate});
+    console.log('point', {props, aggregate});
     
     const layer = use(PointLayer, props);
-    return transform?.transform ? provide(TransformContext, transform, layer) : layer;
+    return transform?.key ? provide(TransformContext, transform, layer) : layer;
   };
 }
 
@@ -152,10 +152,11 @@ const makeLineAccumulator = (
     const props = {count, ...item.flags} as Record<string, any>;
 
     updateAggregateFromSchema(device, LINE_SCHEMA, aggregate, items, props, count);
-    console.log({props, aggregate});
+    console.log('line', {props, aggregate});
     
     const layer = use(LineLayer, props);
-    return transform?.transform ? provide(TransformContext, transform, layer) : layer;
+    const hasTransform = (transform?.transform || transform?.matrix);
+    return transform?.key ? provide(TransformContext, transform, layer) : layer;
   };
 };
 
@@ -233,7 +234,9 @@ const accumulate = (xs: number[]): number[] => {
 }
 
 const getItemTypeKey = (item: LayerAggregate) =>
-  ('transform' in item && item.transform?.transform != null ? getBundleKey(item.transform.transform) : 0) ^
+  ('transform' in item
+    ? (item.transform?.key || 0)
+    : 0) ^
   mixBits53(item.archetype, item.zIndex ?? 0);
 
 type Partition = {

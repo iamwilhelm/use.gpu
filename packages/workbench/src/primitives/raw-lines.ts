@@ -104,9 +104,10 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   
   const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
 
-  const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ss = props.sts == null ? ps : s;
 
-  const [xf, scissor, getBounds] = useApplyTransform(ps ?? p);
+  const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -118,7 +119,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, ps ?? s, g ?? auto, c, w, d, z, t, e, instanceCount]);
+  const getVertex = useBoundShader(getLineVertex, [positions, scissor, u, ss, g ?? auto, c, w, d, z, t, e, instanceCount]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => ({

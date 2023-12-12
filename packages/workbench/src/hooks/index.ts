@@ -12,6 +12,7 @@ export * from './useFrustumCuller';
 export * from './useInspectable';
 export * from './useLambdaSource';
 export * from './useLinkedShader';
+export * from './useMatrixTransform';
 export * from './useMemoKey';
 export * from './useNativeColor';
 export * from './usePipelineLayout';

@@ -61,7 +61,6 @@ export const schemaToAggregate = (
   count: number,
   indices: number,
 ): Record<string, AggregateBuffer> => {
-  console.log({count, indices})
   const out: Record<string, any> = {};
   for (const key in schema) {
     const {single, format, index} = schema[key];

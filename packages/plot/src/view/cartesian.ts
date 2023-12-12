@@ -8,21 +8,15 @@ import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale 
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
-  TransformContext,
-  useShaderRef, useBoundShader, useBoundSource, useCombinedTransform,
+  TransformContext, useCombinedMatrixTransform,
 } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
 import { swizzleMatrix } from '../util/swizzle';
-import { mat3, mat4 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 
 import { AxesTrait, ObjectTrait } from '../traits';
-
-import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
-import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
-
-const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
 
 const Traits = combine(AxesTrait, ObjectTrait);
 const useTraits = makeUseTrait(Traits);
@@ -39,7 +33,7 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
     position: p, scale: s, quaternion: q, rotation: r, matrix: m,
   } = useTraits(props);
 
-  const [matrix, normalMatrix] = useMemo(() => {
+  const matrix = useMemo(() => {
     const x = g[0][0];
     const y = g[1][0];
     const z = g[2][0];
@@ -76,19 +70,10 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
       mat4.multiply(matrix, t, matrix);
     }
 
-    const normalMatrix = mat3.normalFromMat4(mat3.create(), matrix);
-
-    return [matrix, normalMatrix];
+    return matrix;
   }, [g, a, p, r, q, s, m]);
 
-  const matrixRef = useShaderRef(matrix);
-  const normalMatrixRef = useShaderRef(normalMatrix);
-
-  const boundMatrix = useBoundSource(MATRIX_BINDINGS[0], matrixRef);
-  const boundPosition = useBoundShader(getCartesianPosition, [boundMatrix]);
-  const boundDifferential = useBoundShader(getMatrixDifferential, [boundMatrix, normalMatrixRef]);
-
-  const context = useCombinedTransform(boundPosition, boundDifferential);
+  const context = useCombinedMatrixTransform(matrix);
 
   return [
     signal(),

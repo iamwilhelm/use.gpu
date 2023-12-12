@@ -98,7 +98,7 @@ export const makeParseVec4 = (defaults: vec4 = NO_VEC4) => (vec?: VectorLike): v
   if (vec != null) {
     return vec4.fromValues(vec[0] ?? defaults[0], vec[1] ?? defaults[1], vec[2] ?? defaults[2], vec[3] ?? defaults[3]);
   }
-  return vec4.copy(defaults);
+  return defaults;
 };
 
 export const makeParseMat4 = (defaults: mat4 = NO_MAT4) => (matrix?: VectorLike): mat4 => {
@@ -204,9 +204,9 @@ export const parseNumberUnsigned = clampNumber(0, null)(parseNumber);
 export const parseNumberPositive = clampNumber(1, null)(parseNumber);
 export const parseIntegerPositive = clampNumber(1, null)(parseInteger);
 
-export const parseVec2 = makeParseVec2(Float32Array);
-export const parseVec3 = makeParseVec3(Float32Array);
-export const parseVec4 = makeParseVec4(Float32Array);
+export const parseVec2 = makeParseVec2();
+export const parseVec3 = makeParseVec3();
+export const parseVec4 = makeParseVec4();
 
 export const parseStringFormatter = (s: ArrowFunction | string): ArrowFunction => {
   if (typeof s === 'function') return s;

@@ -92,7 +92,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const q  = useShaderRef(props.flip);
 
-  const [xf,, getBounds] = useApplyTransform(p);
+  const {positions, bounds: getBounds} = useApplyTransform(p);
 
   let bounds: Lazy<DataBounds> | null = null;
   if (getBounds && (props.positions as any)?.bounds) {
@@ -106,7 +106,7 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const t = props.texture;
 
-  const getVertex = useBoundShader(getLabelVertex, [i, r, u, s, l, a, xf, c, o, z, d, f, e, q]);
+  const getVertex = useBoundShader(getLabelVertex, [i, r, u, s, l, a, positions, c, o, z, d, f, e, q]);
   const getPicking = usePickingShader(props);
   const getFragment = useBoundShader(getUIFragment, [t], DEFINES);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),

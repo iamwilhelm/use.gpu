@@ -36,8 +36,6 @@ export const useShaderRef: UseShaderRef<unknown> = (<T>(
   return ref;
 }) as any;
 
-export const useNoShaderRef = useNoOne;
-
 export const useShaderRefs = <T>(...values: (Lazy<T>)[]): (Ref<T> | (() => T))[] => {
   let i = 0;
 
@@ -54,3 +52,6 @@ export const useShaderRefs = <T>(...values: (Lazy<T>)[]): (Ref<T> | (() => T))[]
 
   return refs;
 };
+
+export const useNoShaderRef = useNoOne;
+export const useNoShaderRefs = useNoOne;

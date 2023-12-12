@@ -17,7 +17,6 @@ import { resolve } from '@use-gpu/core';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundSource } from '../hooks/useBoundSource';
 import { useBoundShader } from '../hooks/useBoundShader';
-import { useApplyTransform } from '../hooks/useApplyTransform';
 
 import { getSurfaceIndex, getSurfaceNormal, getSurfaceUV } from '@use-gpu/wgsl/plot/surface.wgsl';
 

@@ -51,6 +51,7 @@ export type RawFacesProps = {
 
   instances?: ShaderSource,
   load?: ShaderSource,
+  mapped?: boolean,
 
   unwelded?: {
     colors?: boolean,
@@ -117,8 +118,11 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   let instanceSize = null;
   let totalCount = null;
   if (hasInstances) {
-    instanceSize = useOne(() => hasInstances ? instanceCount : null, hasInstances);
-    totalCount = useCallback(() => (props.instances as any)?.length * resolve(instanceCount), [props.instances, instanceCount]);
+    instanceSize = useOne(() => hasInstances && !mapped ? instanceCount : null, hasInstances);
+    totalCount = useCallback(() => {
+      const l = (props.instances as any)?.length;
+      return mapped ? l : l * resolve(instanceCount);
+    }, [props.instances, instanceCount, mapped]);
   }
   else {
     useNoOne();

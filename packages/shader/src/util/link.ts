@@ -2,6 +2,7 @@ import { Tree } from '@lezer/common';
 import { ShaderModule, ParsedBundle, ParsedModule, ParsedModuleCache, ShaderDefine, ImportRef, RefFlags as RF } from '../types';
 import { VIRTUAL_BINDINGS } from '../constants';
 
+import { formatMurmur53 } from './hash';
 import { bindBundle, bindModule } from './bind';
 import { toBundle, getBundleKey } from './bundle';
 import { resolveShakeOps } from './shake';
@@ -129,7 +130,7 @@ export const makeLinker = (
 
   const staticRename = getRenames(defs);
   const def = defineConstants(defs);
-  if (def.length) program.push(def);
+  if (def.length) program.push(def, "");
 
   // Namespace by module key
   const namespaces = new Map<number, string>();
@@ -180,6 +181,8 @@ export const makeLinker = (
         }
       }
     }
+
+    program.push(`//// @link ${virtual?.render ? code : name} ${scope}\n`);
 
     // Replace imported symbol names with target
     if (modules) for (const {name: module, imports} of modules) {

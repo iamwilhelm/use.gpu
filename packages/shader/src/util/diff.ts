@@ -2,7 +2,6 @@ import { UniformAttribute, ShaderModule, ParsedBundle } from '../types';
 import { loadVirtualModule } from './shader';
 import { formatMurmur53, toMurmur53 } from './hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from './bundle';
-import { PREFIX_CAST } from '../constants';
 
 const NO_SYMBOLS = [] as string[];
 

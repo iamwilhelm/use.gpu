@@ -25,8 +25,14 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   var instanceIndex: u32;
   if (HAS_INSTANCES) {
     let size = getInstanceSize();
-    resolvedIndex = getInstance(globalInstanceIndex / size);
-    instanceIndex = globalInstanceIndex % size;
+    if (size > 0u) {
+      resolvedIndex = getInstance(globalInstanceIndex / size);
+      instanceIndex = globalInstanceIndex % size;
+    }
+    else {
+      resolvedIndex = globalInstanceIndex;
+      instanceIndex = globalInstanceIndex;
+    }
 
     loadInstance(resolvedIndex);
   }

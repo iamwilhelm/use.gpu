@@ -24,8 +24,8 @@ export const makeTranspile = (
   ].join("\n");
 
   // Parse module source code
-  const name = resourcePath.split('/').pop()!.replace(new RegExp('\\.' + extension + '$'), '');
-  const input = minify ? minifyCode(source) : source;
+  const name = resourcePath.split('/').slice(-2).join('/');
+  const input = trimCode(minify ? minifyCode(source) : source);
   const module = loadModule(input, name);
 
   // Emit module data (without declarations, which is repeated in externals/exports)
@@ -84,3 +84,5 @@ exports.default = __default;
 
   return output;
 }
+
+const trimCode = (s: string) => s.replace(/\s+$/, '') + "\n";

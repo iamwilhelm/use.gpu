@@ -17,7 +17,7 @@
   shadowUV: vec4<f32>,
 };
 
-////
+
 
 @export struct PickVertex {
   position: vec4<f32>,
@@ -71,7 +71,7 @@
   index: u32,
 };
 
-////
+
 
 @export struct DepthFragment {
   alpha: f32,
@@ -88,7 +88,7 @@
   depth: f32,
 };
 
-////
+
 
 @export struct MeshVertex {
   position: vec4<f32>,

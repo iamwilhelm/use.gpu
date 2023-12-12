@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { TypedArray, StorageSource, UniformType, DataField } from '@use-gpu/core';
-import { capture, yeet, makeContext, useCapture, useContext, useNoContext, useMemo, useOne, useRef, useResource, incrementVersion, makeCapture } from '@use-gpu/live';
+import { capture, yeet, useCapture, useNoCapture, useMemo, useOne, useRef, useResource, useNoResource, incrementVersion, makeCapture } from '@use-gpu/live';
 import {
   makeIdAllocator,
   makeDataArray, copyNumberArrayRange,
@@ -26,6 +26,12 @@ export type InstanceDataProps = {
 
   render?: (useInstance: () => (data: Record<string, any>) => void) => LiveElement,
   then?: (indices: StorageSource, data: StorageSource[]) => LiveElement,
+};
+
+export const useNoInstance = () => {
+  useNoResource();
+  useNoCapture();
+  useNoOne();
 };
 
 export const InstanceData: LiveComponent<InstanceDataProps> = (props) => {

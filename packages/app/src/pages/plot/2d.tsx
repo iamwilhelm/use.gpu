@@ -62,18 +62,6 @@ export const Plot2DPage: LC = () => {
               color={'#40c000'}
             />
 
-            <Transform position={[0, 400]}>
-              <Line
-                positions={[
-                  [[300, 50], [350, 150], [400, 50], [450, 150]],
-                  [[300, 150], [350, 250], [400, 150], [450, 250]],
-                ]}
-                width={10}
-                color={['#ffa040', '#7f40a0']}
-                join="miter"
-              />
-            </Transform>
-
             <Line
               positions={[
                 [[300, 250], [350, 350], [400, 250], [450, 350]],
@@ -83,6 +71,19 @@ export const Plot2DPage: LC = () => {
               color={['#ffa040', '#7f40a0']}
               join="miter"
             />
+
+            <Transform position={[0, 400]}>
+              <Line
+                positions={[
+                  [[300, 50], [350, 150], [400, 50], [450, 150]],
+                  [[300, 150], [350, 250], [400, 150], [450, 250]],
+                ]}
+                width={10}
+                color={['#ffa040', '#7f40a0']}
+                join="miter"
+                depth={1}
+              />
+            </Transform>
 
             <Line
               positions={[

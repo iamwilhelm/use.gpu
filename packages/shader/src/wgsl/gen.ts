@@ -236,12 +236,12 @@ export const makeUniformBlockLayout = (
   set: number | string,
   binding: number | string,
   members: string[],
-) => `
-struct ${ns}Type {
+) => (
+`struct ${ns}Type {
   ${members.map(m => `${m},`).join('\n  ')}
 };
 @group(${set}) @binding(${binding}) var<uniform> ${ns}Uniform: ${ns}Type;
-`;
+`);
 
 export const makeUniformFieldAccessor = (
   uniform: string,
@@ -251,11 +251,11 @@ export const makeUniformFieldAccessor = (
   args: string[] | null = INT_ARG,
 ) => {
   if (args == null) throw new Error("Constants cannot be bound directly to storage/textures");
-  return `
-fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
+  return (
+`fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   return ${uniform}Uniform.${ns}${name};
 }
-`;
+`);
 };
 
 export const makeStorageAccessor = (
@@ -275,14 +275,14 @@ export const makeStorageAccessor = (
   }
 
   const hasCast = needsCast(format, type);
-  return `
-@group(${set}) @binding(${binding}) var<${access}> ${ns}${name}Storage: array<${format}>;
+  return (
+`@group(${set}) @binding(${binding}) var<${access}> ${ns}${name}Storage: array<${format}>;
 
 fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   ${hasCast ? 'let v =' : 'return'} ${ns}${name}Storage[${args.length ? arg(0) : '0u'}];
 ${hasCast ? `  return ${makeSwizzle(format, type, 'v')};\n` : ''
 }}
-`;
+`);
 }
 
 export const makeTextureAccessor = (
@@ -316,8 +316,8 @@ export const makeTextureAccessor = (
 
   const hasCast = needsCast(shaderType, type);
 
-  return `
-@group(${set}) @binding(${binding}) var ${ns}${name}Texture: ${layout};
+  return (
+`@group(${set}) @binding(${binding}) var ${ns}${name}Texture: ${layout};
 ${sampler ? `@group(${set}) @binding(${binding + 1}) var ${ns}${name}Sampler: ${comparison ? 'sampler_comparison' : 'sampler'};\n` : ''}
 fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} {
   ${absolute ?
@@ -325,7 +325,7 @@ fn ${ns}${name}(${args.map((t, i) => `${arg(i)}: ${t}`).join(', ')}) -> ${type} 
   }${hasCast ? 'let v =' : 'return'} ${variant}(${ns}${name}Texture, ${sampler ? `${ns}${name}Sampler, ` : ''}${args.map((_, i) => `${i === 0 && absolute ? 'relUV' : arg(i)}`).join(', ')});
 ${hasCast ? '  return ' + makeSwizzle(shaderType, type, 'v') + ';\n' : ''
 }}
-`
+`)
 };
 
 export const makeVec3to4Accessor = (
@@ -334,8 +334,8 @@ export const makeVec3to4Accessor = (
   format: string,
   name: string,
   accessor: string,
-) => `
-fn ${ns}${name}(i: u32) -> ${type} {
+) => (
+`fn ${ns}${name}(i: u32) -> ${type} {
   let i3 = i * 3u;
   let b = i3 / 4u;
 
@@ -353,7 +353,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
   
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
-`;
+`);
 
 export const make8to32Accessor = (
   ns: string,
@@ -361,8 +361,8 @@ export const make8to32Accessor = (
   format: string,
   name: string,
   accessor: string,
-) => `
-fn ${ns}${name}(i: u32) -> ${type} {
+) => (
+`fn ${ns}${name}(i: u32) -> ${type} {
   let b2 = i >> 2u;
   let f4 = i & 3u;
 
@@ -370,7 +370,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
   var v: ${format} = ${format}((word >> (f4 << 3u)) & 0xFFu);
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
-`;
+`);
 
 export const make16to32Accessor = (
   ns: string,
@@ -378,8 +378,8 @@ export const make16to32Accessor = (
   format: string,
   name: string,
   accessor: string,
-) => `
-fn ${ns}${name}(i: u32) -> ${type} {
+) => (
+`fn ${ns}${name}(i: u32) -> ${type} {
   let b2 = i >> 1u;
   let f2 = i & 1u;
 
@@ -387,7 +387,7 @@ fn ${ns}${name}(i: u32) -> ${type} {
   var v: ${format} = ${format}((word >> (f2 << 4u)) & 0xFFFFu);  
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
-`;
+`);
 
 export const makeVec8to32Accessor = (
   ns: string,
@@ -397,8 +397,8 @@ export const makeVec8to32Accessor = (
   accessor: string,
 ) => {
   if (format.match(/^vec2/)) {
-    return `
-fn ${ns}${name}(i: u32) -> ${type} {
+    return (
+`fn ${ns}${name}(i: u32) -> ${type} {
   let i2 = i / 2u;
   let f2 = i & 1u;
   let word = ${ns}${accessor}(i2);
@@ -406,16 +406,16 @@ fn ${ns}${name}(i: u32) -> ${type} {
   let v = (vec2<u32>(short) >> vec2<u32>(0, 8)) & vec2<u32>(0xFF);
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
-`;
+`);
   }
   else {
-    return `
-fn ${ns}${name}(i: u32) -> ${type} {
+    return (
+`fn ${ns}${name}(i: u32) -> ${type} {
   let word = ${ns}${accessor}(i);
   let v = (vec4<u32>(word) >> vec4<u32>(0, 8, 16, 24)) & vec4<u32>(0xFF);
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
-`;
+`);
   }
 }
 
@@ -427,23 +427,23 @@ export const makeVec16to32Accessor = (
   accessor: string,
 ) => {
   if (format.match(/^vec2/)) {
-    return `
-fn ${ns}${name}(i: u32) -> ${type} {
+    return (
+`fn ${ns}${name}(i: u32) -> ${type} {
   let word = ${ns}${accessor}(i);
   let v = (vec2<u32>(word, word) >> vec2<u32>(0, 16)) & vec2<u32>(0xFFFF);
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
-`;
+`);
   }
   else {
-    return `
-fn ${ns}${name}(i: u32) -> ${type} {
+    return (
+`fn ${ns}${name}(i: u32) -> ${type} {
   let i2 = i * 2;
   let word1 = ${ns}${accessor}(i2);
   let word2 = ${ns}${accessor}(i2 + 1);
   let v = (vec4<u32>(word1, word1, word2, word2) >> vec4<u32>(0, 16, 0, 16)) & vec4<u32>(0xFFFF);
   return ${needsCast(format, type) ? makeSwizzle(format, type, 'v') : 'v'};
 }
-`;
+`);
   }
 };

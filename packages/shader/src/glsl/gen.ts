@@ -124,11 +124,11 @@ export const makeUniformBlockLayout = (
   set: number | string,
   binding: number | string,
   members: string[],
-) => `
-layout (set = ${set}, binding = ${binding}) uniform ${ns}Type {
+) => (
+`layout (set = ${set}, binding = ${binding}) uniform ${ns}Type {
   ${members.map(m => `${m};`).join('\n  ')}
 } ${ns}Uniform;
-`;
+`);
 
 export const makeUniformFieldAccessor = (
   uniform: string,
@@ -136,11 +136,11 @@ export const makeUniformFieldAccessor = (
   type: string,
   name: string,
   args: any[] | null = INT_ARG,
-) => `
-${type} ${ns}${name}(${args ? args.join(', ') : ''}) {
+) => (
+`${type} ${ns}${name}(${args ? args.join(', ') : ''}) {
   return ${uniform}Uniform.${ns}${name};
 }
-`;
+`);
 
 export const makeStorageAccessor = (
   ns: string,
@@ -150,8 +150,8 @@ export const makeStorageAccessor = (
   format: string,
   name: string,
   args: string[] = INT_ARG,
-) => `
-layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}Type {
+) => (
+`layout (std430, set = ${set}, binding = ${binding}) readonly buffer ${ns}${name}Type {
   ${format} data[];
 } ${ns}${name}Storage;
 
@@ -159,7 +159,7 @@ ${type} ${ns}${name}(int index) {
   ${format !== type ? `${format} v =` : 'return'} ${ns}${name}Storage.data[index];
 ${format !== type ? `  return ${makeSwizzle(format, type, 'v')};` : ''
 }}
-`;
+`);
 
 export const makeTextureAccessor = (
   ns: string,
@@ -172,8 +172,8 @@ export const makeTextureAccessor = (
   variant: string = 'sampler2D',
   absolute: boolean = false,
   args: string[] = UV_ARG,
-) => `
-layout (set = ${set}, binding = ${binding}) uniform ${layout} ${ns}${name}Texture;
+) => (
+`layout (set = ${set}, binding = ${binding}) uniform ${layout} ${ns}${name}Texture;
 layout (set = ${set}, binding = ${binding + 1}) uniform sampler ${ns}${name}Sampler;
 
 ${type} ${ns}${name}(vec2 uv) {
@@ -182,4 +182,4 @@ ${type} ${ns}${name}(vec2 uv) {
   ${format !== type ? `${format} v =` : 'return'} texture(${variant}(${ns}${name}Texture, ${ns}${name}Sampler), uv);
 ${format !== type ? `  return ${makeSwizzle(format, type, 'v')};` : ''
 }}
-`;
+`);

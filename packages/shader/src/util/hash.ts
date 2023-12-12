@@ -1,7 +1,11 @@
+// Keys. Don't make more than 2^53 of these.
 let KEY = 0;
 const KEYS = new WeakMap<object, number>();
 
+/** Get new unique key */
 export const makeKey = (): number => ++KEY;
+
+/** Get unique key for object */
 export const getObjectKey = (v: any) => {
   if (v && typeof v === 'object') {
     const c = KEYS.get(v);
@@ -14,7 +18,10 @@ export const getObjectKey = (v: any) => {
   return 0;
 }
 
-const HASH_KEY = 0xf1c3a587;
+/** Set global hashing key. Default `0xf1c3a587` */
+export const setGlobalHashKey = (k?: number) => HASH_KEY = (k ?? DEFAULT_HASH_KEY);
+const DEFAULT_HASH_KEY = 0xf1c3a587;
+let HASH_KEY = DEFAULT_HASH_KEY;
 
 const C1 = 0xcc9e2d51;
 const C2 = 0x1b873593;
@@ -26,16 +33,20 @@ const add = (a: number, b: number) => ((a|0) + (b|0)) >>> 0;
 const rot = (a: number, b: number) => ((a << b) | (a >>> (32 - b))) >>> 0;
 const mul = Math.imul;
 
+/** Pack 2 uint32's into one uint53 / float64. B is truncated. */
 export const toUint53 = (a: number, b: number) => {
   return a + ((b & 0x1fffff) * 0x100000000);
 }
 
+/** Format murmur53 value as a base64 string. */
 export const formatMurmur53 = (uint: number) => {
   return uint.toString(36).slice(-10);
 }
 
+/** Hash value and return a base64 string. */
 export const toHash = <T>(t: T) => formatMurmur53(toMurmur53(t));
 
+/** Hash value and return a uint53. */
 export const toMurmur53 = (s: any) => {
   if (typeof s === 'string') return getStringHash(s);
   if (typeof s === 'number') return getNumberHash(s);

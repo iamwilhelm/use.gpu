@@ -452,7 +452,7 @@ export type AccessorField = {format: string, accessor?: AccessorSpec, type?: Acc
 export type AccessorSchema = Record<string, string | AccessorField>;
 
 export type ArchetypeField = {format: string, plural?: string, index?: boolean};
-export type ArchetypeSchema = Record<string, string | ArchetypeField>;
+export type ArchetypeSchema = Record<string, ArchetypeField>;
 
 export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];
 export type DataBinding<T = any, S = any> = {

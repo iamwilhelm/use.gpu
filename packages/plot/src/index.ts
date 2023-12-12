@@ -2,6 +2,8 @@ export * from './plot';
 
 export * from './providers/range-provider';
 
+export * from './layer/axis';
+
 export * from './shape/line';
 export * from './shape/point';
 /*
@@ -15,7 +17,6 @@ export * from './shape/arrow';
 export * from './shape/label';
 
 
-export * from './layer/axis';
 export * from './layer/grid';
 export * from './layer/tick';
 export * from './layer/implicit-surface';

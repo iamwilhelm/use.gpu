@@ -17,37 +17,21 @@ export const formatToArchetype = (
   return toMurmur53(tokens);
 };
 
-export const forSchema = (
-  schema: ArchetypeSchema,
-  callback: (key: string, format: string, single?: string, index?: boolean, composite?: boolean) => void,
-): ArchetypeSchema => {
-  const out = {};
-  for (const k in schema) {
-    const s = schema[k];
-    
-    let format, single, index, composite;
-    if (typeof s === 'string') format = s;
-    else ({format, single, index, composite} = s);
-
-    callback(k, format, single, index);
-  }
-  return out;
-};
-
 export const schemaToArchetype = (
   schema: ArchetypeSchema,
   props: Record<string, any>,
   flags: Record<string, any>,
 ) => {
   const tokens = [];
-  forSchema(schema, (key, format, single) => {
+  for (const key in schema) {
+    const {single, format} = schema[key];
     if (
       props[key] != null || 
       (single != null && props[single] != null)
     ) {
       tokens.push(key, format);
     }
-  });
+  }
   tokens.push(flags);
 
   return toMurmur53(tokens);
@@ -58,14 +42,15 @@ export const schemaToAttributes = (
   props: Record<string, any>,
 ): Record<string, any> => {
   const out: Record<string, any> = {};
-  forSchema(schema, (key, format, single, index) => {
+  for (const key in schema) {
+    const {single} = schema[key];
     if (props[key] != null) {
       out[key] = props[key];
     }
     else if (single != null && props[single] != null) {
       out[single] = props[single];
     }
-  });
+  }
   return out;
 };
 
@@ -76,15 +61,17 @@ export const schemaToAggregate = (
   count: number,
   indices: number,
 ): Record<string, AggregateBuffer> => {
+  console.log({count, indices})
   const out: Record<string, any> = {};
-  forSchema(schema, (key, format, single, index) => {
+  for (const key in schema) {
+    const {single, format, index} = schema[key];
     if (
       props[key] != null || 
       (single != null && props[single] != null)
     ) {
       out[key] = makeAggregateBuffer(device, format as any, index ? indices : count);
     }
-  });
+  }
   return out;
 };
 
@@ -98,15 +85,16 @@ export const updateAggregateFromSchema = (
   indices: number = 0,
   offsets: number[] = NO_OFFSETS,
 ) => {
-  forSchema(schema, (key, _, single, index) => {
+  for (const key in schema) {
+    const {single, index, segment, composite} = schema[key];
     if (aggregate[key]) {
       const k = single ?? '';
       if (index) {
-        props[key] = updateAggregateIndex(device, aggregate[key], items, indices, offsets, k, key);
+        props[key] = updateAggregateIndex(device, aggregate[key], items, indices, offsets, k, key, segment, composite);
       }
       else {
-        props[key] = updateAggregateBuffer(device, aggregate[key], items, count, k, key);;
+        props[key] = updateAggregateBuffer(device, aggregate[key], items, count, k, key, segment, composite);
       }
     }
-  });
+  }
 };

@@ -70,8 +70,6 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   const u = useShaderRef(props.uv, props.uvs);
   const s = useShaderRef(props.st, props.sts);
 
-  const l = useShaderRef(null, props.lookups);
-
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   
   const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
@@ -88,7 +86,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, ps ?? s, l, instanceCount]);
+  const getVertex = useBoundShader(getQuadVertex, [xf, scissor, r, c, d, z, u, ps ?? s, instanceCount]);
   const getPicking = usePickingShader(props);
   const applyMask = m ? useBoundShader(getMaskedColor, [m]) : null;
 

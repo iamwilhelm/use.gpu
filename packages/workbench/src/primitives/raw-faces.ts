@@ -139,9 +139,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const k = useShaderRef(instanceSize);
   const l = useShaderRef(null, props.load);
 
-  const lookups = useShaderRef(null, props.lookups);
-  const ids = useShaderRef(null, props.ids);
-
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
 

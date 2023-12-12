@@ -1,7 +1,8 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
+import type { TraitProps } from '@use-gpu/traits/live';
 
-import { makeUseTrait, combine, shouldEqual, sameArray, sameAny } from '@use-gpu/traits/live';
+import { makeUseTrait, combine, shouldEqual, sameAny } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToAttributes, accumulateChunks, generateChunkSegments } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
@@ -16,6 +17,7 @@ import {
 
   LineTrait,
   ROPTrait,
+  StrokeTrait,
   ZIndexTrait,
 } from '../traits';
 
@@ -24,6 +26,7 @@ const Traits = combine(
 
   LineTrait,
   ROPTrait,
+  StrokeTrait,
   ZIndexTrait,
 );
 const useTraits = makeUseTrait(Traits);
@@ -46,19 +49,23 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       zBias,
       zBiases,
       zIndex,
-
+      count,
+      chunks,
+      id,
+      ids,
+      lookup,
+      lookups,
       ...flags
   } = parsed;
 
   console.log('line', {parsed});
-  return;
 
   const transform = useTransformContext();
 
   const archetype = schemaToArchetype(LINE_SCHEMA, parsed, flags);
   const attributes = schemaToAttributes(LINE_SCHEMA, parsed);
 
-  const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
+  console.log('line', {count, attributes});
 
   const shapes = {
     line: {

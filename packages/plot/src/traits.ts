@@ -1,6 +1,7 @@
-import type { ColorLike } from '@use-gpu/core';
+import type { ColorLike, VectorLike, VectorLikes } from '@use-gpu/core';
 
-import { trait, combine, optional, UseHooks } from '@use-gpu/traits/live';
+import { useMemo } from '@use-gpu/live';
+import { trait, combine, optional, useProp } from '@use-gpu/traits/live';
 import {
   parseNumber,
   parseInteger,
@@ -9,7 +10,11 @@ import {
   parseStringArray,
   parseStringFormatter,
   parseBooleanArray,
+  parseColor,
+  parseColorOpacity,
   parseColorArray,
+  parseColorArrayLike,
+  parseColorMultiArray,
   parseVec4,
   parseVec4Array,
   parseScalarArray,
@@ -18,9 +23,9 @@ import {
   parsePosition,
   parsePositionArray,
   parsePositionMultiArray,
+  parseChunks,
   parseRotation,
   parseQuaternion,
-  parseColor,
   parseScale,
   parseMatrix,
   parseJoin,
@@ -35,6 +40,12 @@ import {
   parseDomain,
   parsePointShape,
 } from '@use-gpu/parse';
+import {
+  generateChunkSegments2,
+} from '@use-gpu/core';
+import {
+  useLineSegments
+} from '@use-gpu/workbench';
 
 import { vec4 } from 'gl-matrix';
 
@@ -57,13 +68,11 @@ export const ArrowTrait = trait(
     size: parseNumber,
     start: parseBoolean,
     end: parseBoolean,
-    detail: parseIntegerPositive,
   },
   {
     size: 3,
     start: false,
     end: true,
-    detail: 12,
   },
 );
 
@@ -115,8 +124,8 @@ export const GridTrait = trait(
 
 export const LabelTrait = trait(
   {
-    size:   parseNumber,
-    depth:  parseNumber,
+    size:   optional(parseNumber),
+    depth:  optional(parseNumber),
     expand: parseNumber,
   },
   {
@@ -134,14 +143,8 @@ export const LabelsTrait = trait(
 
 export const LineTrait = trait(
   {
-    width: parseNumber,
-    depth: parseNumber,
-    loop: parseBoolean,
-  },
-  {
-    width: 1,
-    depth: 0,
-    loop: false,
+    width: optional(parseNumber),
+    depth: optional(parseNumber),
   },
 );
 
@@ -234,7 +237,6 @@ export const StrokeTrait = trait(
   },
   {
     join: 'bevel',
-    loop: false,
     proximity: 0,
   },
 );
@@ -286,40 +288,117 @@ export const ColorTrait = (
   parsed: {
     color: TypedArray
   },
-  {useMemo}: UseHooks,
 ) => {
   const {color, opacity = 1} = props;
-  const c = useMemo(() => parseColor(color, opacity), [color, opacity]);
-  parsed.color = c != null ? c : undefined;
+  const rgba = useMemo(() => parseColorOpacity(color, opacity), [color, opacity]);
+  parsed.color = rgba != null ? rgba : undefined;
 };
 
-export const ColorsTrait = (
-  props: {
-    color?: number,
-    opacity?: number,
-  },
-  parsed: {
-    color: TypedArray
-  },
-  {useMemo, useProp}: UseHooks,
-) => {
-  const {colors, opacity = 1} = props;
-  const rgba = useProp(colors, optional(parseColorArray));
+export const ColorsTrait = ({composite}: {composite?: boolean} = {}) => {
+  const parseColorProp = optional(composite ? parseColorArrayLike : parseColor);
+  const parseColorsProp = optional(composite ? parseColorMultiArray : parseColorArray);
 
-  parsed.colors = useMemo(() => {
-    if (!colors) return null;
-    if (opacity == 1) return rgba;
+  return (
+    props: {
+      color?: number,
+      colors?: number,
+      opacity?: number,
+    },
+    parsed: {
+      color?: TypedArray,
+      colors?: TypedArray
+    },
+  ) => {
+    const {color, colors, opacity = 1} = props;
 
-    const copy = rgba.slice();
-    const n = copy.length;
-    for (let i = 3; i < n; i += 4) copy[i] *= opacity;
-    return copy;
-  }, [parsed, opacity]);
-};
+    const c = useProp(color, parseColorProp);
+    const cs = useProp(colors, parseColorsProp);
+
+    const rgba = useMemo(() => applyOpacity(c, opacity), [c, opacity]);
+    const rgbas = useMemo(() => applyOpacity(cs, opacity), [cs, opacity]);
+
+    parsed.color = rgba != null ? rgba : undefined;
+    parsed.colors = rgbas != null ? rgbas : undefined;
+  };
+}
+
+const applyOpacity = (colors?: TypedArray, opacity: number = 1) => {
+  if (!colors) return undefined;
+  if (opacity == 1) return colors;
+
+  const copy = colors.slice();
+  const n = copy.length;
+  for (let i = 3; i < n; i += 4) copy[i] *= opacity;
+  return copy;
+}
+
+// Chunking
+
+export const SegmentsTrait = combine(
+  trait({
+    segments: optional(parseScalarArray),
+  }),
+  (
+    props: {
+      position?: VectorLike | VectorLikes,
+      positions?: VectorLikes | VectorLikes[],
+      segments?: VectorLikes | VectorLikes[],
+    },
+    parsed: {
+      chunks?: TypedArray,
+    },
+  ) => {
+    parsed.chunks = useProp(
+      props.positions ?? props.position,
+      (pos) => !props.segments ? parseChunks(pos) : undefined,
+    );
+  },
+);
+
+export const LoopTrait = trait({
+  loop: optional(parseBoolean),
+});
+
+export const LoopsTrait = trait({
+  loop: optional(parseBoolean),
+  loops: optional(parseBooleanArray),
+});
+
+export const DirectedTrait = trait({
+  start: optional(parseBoolean),
+  starts: optional(parseBooleanArray),
+  end: optional(parseBoolean),
+  ends: optional(parseBooleanArray),
+});
+
+export const LineSegmentsTrait = combine(
+  SegmentsTrait,
+  LoopsTrait,
+  (
+    props: {
+      lookups?: VectorLikes | VectorLikes[],
+    },
+    parsed: {
+      chunks?: TypedArray,
+      loop?: boolean | TypedArray,
+      loops?: TypedArray,
+
+      count?: number,
+      segments?: TypedArray,
+      scatter?: TypedArray,
+      lookups?: TypedArray,
+    },
+  ) => {
+    const {chunks, loop, loops} = parsed;
+    if (!chunks) return;
+
+    const line = useLineSegments(chunks, loop || loops);
+    for (const k in line) parsed[k] = line[k];
+  },
+);
 
 export const PointsTrait = combine(
-  ColorTrait,
-  ColorsTrait,
+  ColorsTrait(),
   trait(
     {
       position: optional(parsePosition),
@@ -330,13 +409,17 @@ export const PointsTrait = combine(
       depths: optional(parseScalarArray),
       zBias: optional(parseNumber),
       zBiases: optional(parseScalarArray),
+
+      id: optional(parseNumber),
+      ids: optional(parseScalarArray),
+      lookup: optional(parseNumber),
+      lookups: optional(parseScalarArray),
     },
   ),
 );
 
 export const LinesTrait = combine(
-  ColorTrait,
-  ColorsTrait,
+  ColorsTrait({ composite: true }),
   trait({
     position: optional(parsePositionArray),
     positions: optional(parsePositionMultiArray),
@@ -346,10 +429,11 @@ export const LinesTrait = combine(
     depths: optional(parseScalarMultiArray),
     zBias: optional(parseScalarArrayLike),
     zBiases: optional(parseScalarMultiArray),
-    loop: optional(parseBoolean),
-    loops: optional(parseBooleanArray),
+
+    id: optional(parseNumber),
+    ids: optional(parseScalarArray),
+    lookup: optional(parseNumber),
+    lookups: optional(parseScalarArray),
   }),
-  trait({
-    
-  }),
+  LineSegmentsTrait,  
 );

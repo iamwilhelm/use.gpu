@@ -10,7 +10,6 @@ export type LayerType = 'point' | 'line' | 'face';
 export type LayerAggregator = (
   device: GPUDevice,
   items: LayerAggregate[],
-  keys: Set<string>,
   count: number,
   indices?: number,
 ) => (
@@ -78,4 +77,5 @@ export type LayerAggregate = {
   point: PointAggregate | PointAggregate[],
   line: LineAggregate | LineAggregate[],
   face: FaceAggregate | FaceAggregate[],
+  layer: LiveElement,
 };

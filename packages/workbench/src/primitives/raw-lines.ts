@@ -102,7 +102,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const t = useShaderRef(props.trim, props.trims);
   const e = useShaderRef(props.size, props.sizes);
   
-  const l = useShaderRef(props.lookup, props.lookups);
   const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
 
   const ps = p && props.sts == null ? useBoundSource(POSITION, p) : useNoBoundSource();
@@ -119,7 +118,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, ps ?? s, g ?? auto, c, w, d, z, t, e, l, instanceCount]);
+  const getVertex = useBoundShader(getLineVertex, [xf, scissor, u, ps ?? s, g ?? auto, c, w, d, z, t, e, instanceCount]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => ({

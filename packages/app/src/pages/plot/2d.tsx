@@ -40,16 +40,54 @@ export const Plot2DPage: LC = () => {
                 color={'#3090ff'}
               />
             </Transform>
-            
-            {/*
+
             <Line
-              position={[[50, 150], [150, 150]]}
+              position={[[100, 50], [150, 150]]}
               width={5}
               color={'#c00040'}
             />
 
+            <Line
+              position={[[150, 50], [200, 150], [250, 50]]}
+              width={5}
+              color={'#c04000'}
+            />
+
+            <Line
+              positions={[
+                [[300, 50], [350, 150], [400, 50], [450, 150]],
+                [[300, 150], [350, 250], [400, 150], [450, 250]],
+              ]}
+              width={5}
+              color={'#40c000'}
+            />
+
+            <Line
+              positions={[
+                [[300, 250], [350, 350], [400, 250], [450, 350]],
+                [[300, 350], [350, 450], [400, 350], [450, 450]],
+              ]}
+              width={10}
+              color={['#ffa040', '#7f40a0']}
+              join="miter"
+            />
+
+            <Line
+              positions={[
+                [[550, 50], [500, 150], [600, 150]],
+                [[550, 250], [500, 350], [600, 350]],
+              ]}
+              width={10}
+              color={['#40a0ff', '#a0407f']}
+              join="round"
+              loop
+            />
+
+            {/*
             <Cartesian
-              scale={[2, 1, 1]}
+              range={[[0, 100], [0, 100]]}
+              position={[300, 500, 1]}
+              scale={[200, 100, 1]}
             >
               <Grid
                 axes='xy'
@@ -74,6 +112,7 @@ export const Plot2DPage: LC = () => {
               />
             </Cartesian>
             */}
+
           </Plot>
         </Pass>
       </Camera>

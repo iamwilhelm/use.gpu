@@ -14,8 +14,6 @@ import {
   makeAggregateBuffer,
   updateAggregateBuffer,
   updateAggregateIndex,
-  updateAggregateSegments,
-  updateAggregateFaces,
 } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 
@@ -78,6 +76,11 @@ const Resume = (
     const items = aggregates[type];
     if (!items.length) continue;
 
+    if (type === 'layer') {
+      els.push(items);
+      continue;
+    }
+
     const partitioner = makePartitioner();
     for (let item of items) if (item) {
       partitioner.push(item);
@@ -87,7 +90,7 @@ const Resume = (
     const group = [];
     const makeAggregator = AGGREGATORS[type]!;
     for (const layer of layers) {
-      group.push(keyed(Layer, layer.key, makeAggregator, layer.items));
+      group.push(keyed(Aggregate, layer.key, makeAggregator, layer.items));
     }
 
     els.push(fragment(group, type));
@@ -96,7 +99,7 @@ const Resume = (
   return els;
 }, aggregates);
 
-const Layer: LiveFunction<any> = (
+const Aggregate: LiveFunction<any> = (
   makeAggregator: LayerAggregator,
   items: LayerAggregate[],
 ) => {
@@ -117,7 +120,6 @@ const Layer: LiveFunction<any> = (
 const makePointAccumulator = (
   device: GPUDevice,
   items: PointAggregate[],
-  keys: Set<string>,
   alloc: number,
 ) => {
   const [{attributes}] = items;
@@ -129,6 +131,7 @@ const makePointAccumulator = (
     const props = {count, ...item.flags} as Record<string, any>;
 
     updateAggregateFromSchema(device, POINT_SCHEMA, aggregate, items, props, count);
+    console.log({props, aggregate});
     
     const layer = use(PointLayer, props);
     return transform?.transform ? provide(TransformContext, transform, layer) : layer;
@@ -138,7 +141,6 @@ const makePointAccumulator = (
 const makeLineAccumulator = (
   device: GPUDevice,
   items: LineAggregate[],
-  keys: Set<string>,
   alloc: number,
 ) => {
   const [{attributes}] = items;
@@ -150,8 +152,9 @@ const makeLineAccumulator = (
     const props = {count, ...item.flags} as Record<string, any>;
 
     updateAggregateFromSchema(device, LINE_SCHEMA, aggregate, items, props, count);
+    console.log({props, aggregate});
     
-    const layer = use(PointLayer, props);
+    const layer = use(LineLayer, props);
     return transform?.transform ? provide(TransformContext, transform, layer) : layer;
   };
 };
@@ -159,10 +162,10 @@ const makeLineAccumulator = (
 const makeFaceAccumulator = (
   device: GPUDevice,
   items: LineAggregate[],
-  keys: Set<string>,
   allocCount: number,
   allocIndices: number,
 ) => {
+  /*
   const storage = {} as Record<string, AggregateBuffer>;
 
   const hasPosition = keys.has('positions') || keys.has('position');
@@ -195,7 +198,7 @@ const makeFaceAccumulator = (
     }
     else {
       if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
-      else props.segments = updateAggregateFaces(device, storage.segments, chunks, loops, count);
+      //else props.segments = updateAggregateFaces(device, storage.segments, chunks, loops, count);
     }
 
     if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
@@ -208,6 +211,7 @@ const makeFaceAccumulator = (
 
     return use(FaceLayer, props);
   };
+  */
 };
 
 const AGGREGATORS = {

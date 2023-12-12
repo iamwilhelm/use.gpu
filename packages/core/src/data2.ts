@@ -94,20 +94,189 @@ export const emitIntoMultiNumberArray2 = <T>(expr: Emitter, to: NumberArray, dim
 export const copyNumberArray2 = (
   from: number[] | TypedArray,
   to: TypedArray,
+  dims: number = 1,
   fromIndex: number = 0,
   toIndex: number = 0,
-  length: number = from.length,
+  length?: number,
 ) => {
-  const n = length;
+  const n = length != null ? length * dims : from.length;
 
-  let s = fromIndex;
-  let o = toIndex * toDims;
+  let s = fromIndex * dims;
+  let o = toIndex * dims;
 
   for (let i = 0; i < n; ++i) {
     to[o++] = from[s + i];
   }
 };
   
+export const scatterNumberArray2 = (
+  from: number[] | TypedArray,
+  to: TypedArray,
+  scatter: TypedArray,
+  dims: number = 1,
+  fromIndex: number = 0,
+  toIndex: number = 0,
+  length?: number,
+) => {
+  const n = length != null ? length : scatter.length;
+
+  let s = fromIndex * dims;
+  let o = toIndex * dims;
+
+  if (dims === 1) {
+    for (let i = 0; i < n; ++i) {
+      to[o++] = from[scatter[s + i]];
+    }
+  }
+  else if (dims === 2) {
+    for (let i = 0; i < n; ++i) {
+      let b = scatter[s + i] * dims;
+      to[o    ] = from[b];
+      to[o + 1] = from[b + 1];
+      o += 2;
+    }
+  }
+  else if (dims === 3) {
+    for (let i = 0; i < n; ++i) {
+      let b = scatter[s + i] * dims;
+      to[o    ] = from[b];
+      to[o + 1] = from[b + 1];
+      to[o + 2] = from[b + 2];
+      o += 3;
+    }
+  }
+  else if (dims === 4) {
+    for (let i = 0; i < n; ++i) {
+      let b = scatter[s + i] * dims;
+      to[o    ] = from[b];
+      to[o + 1] = from[b + 1];
+      to[o + 2] = from[b + 2];
+      to[o + 3] = from[b + 3];
+      o += 4;
+    }
+  }
+};
+  
+export const fillNumberArray2 = (
+  from: NumberArray | number,
+  to: NumberArray,
+  dims: number = 1, 
+  fromIndex: number = 0,
+  toIndex: number = 0,
+  count: number,
+  offset: number = 0,
+) => {
+  let pos = toIndex * dims;
+  const read = fromIndex * dims;
+
+  const array = from as NumberArray;
+
+  if (typeof from === 'number') {
+    if (dims === 1) {
+      for (let j = 0; j < count; ++j) {
+        to[pos++] = from + offset;
+      }
+    }
+    else {
+      for (let j = 0; j < count; ++j) {
+        to[pos++] = from + offset;
+        for (let k = 0; k < skip; ++k) to[pos++] = 0;
+      }
+    }
+  }
+  else if (dims === 1) {
+    for (let j = 0; j < count; ++j) {
+      to[pos++] = array[read] + offset;
+    }
+  }
+  else if (dims === 2) {
+    for (let j = 0; j < count; ++j) {
+      to[pos    ] = array[read] + offset;
+      to[pos + 1] = array[read + 1] + offset;
+      pos += 2;
+    }
+  }
+  else if (dims === 3) {
+    for (let j = 0; j < count; ++j) {
+      to[pos    ] = array[read] + offset;
+      to[pos + 1] = array[read + 1] + offset;
+      to[pos + 2] = array[read + 2] + offset;
+      pos += 3;
+    }
+  }
+  else if (dims === 4) {
+    for (let j = 0; j < count; ++j) {
+      to[pos    ] = array[read] + offset;
+      to[pos + 1] = array[read + 1] + offset;
+      to[pos + 2] = array[read + 2] + offset;
+      to[pos + 3] = array[read + 3] + offset;
+      pos += 4;
+    }
+  }
+  else {
+    // TBD
+    console.warn('Dims > 4 not supported');
+    for (let j = 0; j < count; ++j) {
+      for (let k = 0; k < dims; ++k) {
+        to[pos + k] = array[read + k] + offset;
+      }
+      pos += k;
+    }
+  }
+}
+
+export const unweldIndexedArray2 = (
+  from: NumberArray,
+  indices: NumberArray,
+  dims: number = 1,
+) => {
+  const n = indices.length;
+  const flat = new Float32Array(n * Math.ceil(dims));
+
+  let o = 0;
+  if (dims === 1) {
+    for (let i = 0; i < n; ++i) {
+      const j = indices[i];
+      flat[o++] = from[j];
+    }
+  }
+  else if (dims === 2) {
+    for (let i = 0; i < n; ++i) {
+      const j = indices[i] * 2;
+      flat[o++] = from[j];
+      flat[o++] = from[j + 1];
+    }
+  }
+  else if (dims === 3) {
+    for (let i = 0; i < n; ++i) {
+      const j = indices[i] * 3;
+      flat[o++] = from[j];
+      flat[o++] = from[j + 1];
+      flat[o++] = from[j + 2];
+    }
+  }
+  else if (dims === 4) {
+    for (let i = 0; i < n; ++i) {
+      const j = indices[i] * 4;
+      flat[o++] = from[j];
+      flat[o++] = from[j + 1];
+      flat[o++] = from[j + 2];
+      flat[o++] = from[j + 3];
+    }
+  }
+  else {
+    for (let i = 0; i < n; ++i) {
+      const j = indices[i] * dims;
+      for (let k = 0; k < dims; ++k) {
+        flat[o++] = from[j + k];
+      }
+      j += dims;
+    }
+  }
+
+  return flat;
+};
+
 export const copyNestedNumberArray2 = (
   from: number[][] | TypedArray[],
   to: TypedArray,
@@ -223,115 +392,152 @@ export const copyNestedNumberArray2 = (
   }
 };
 
-export const copyNumberArrayRepeated2 = (
-  from: NumberArray | number, to: NumberArray,
-  fromIndex: number, toIndex: number,
-  dims: number, count: number, offset: number = 0,
+export const generateChunkSegments2 = (
+  to: NumberArray,
+  lookup: NumberArray | null | undefined,
+  scatter: NumberArray | null | undefined,
+  chunks: TypedArray | number[],
+  loops: TypedArray | boolean[] | boolean = false,
+  starts: TypedArray | boolean[] | boolean = false,
+  ends: TypedArray | boolean[] | boolean = false,
 ) => {
-  let pos = toIndex;
-  const read = fromIndex;
+  let pos = 0;
+  let n = chunks.length;
+  let o = 0;
 
-  const array = from as NumberArray;
+  for (let i = 0; i < n; ++i) {
+    const c = chunks[i];
+    const l = (loops as any)[i] ?? !!loops;
+    const s = starts === true || (starts as any)[i];
+    const e = ends === true || (ends as any)[i];
 
-  if (typeof from === 'number') {
-    if (dims === 1) {
-      for (let j = 0; j < count; ++j) {
-        to[pos++] = from + offset;
+    const b = pos;
+
+    if (l) to[pos++] = 0;
+    if (c) {
+      if (c === 1) to[pos++] = 0;
+      else {
+        if (l && !s && !e) {
+          for (let i = 0; i < c; ++i) to[pos++] = 3;
+          if (l) to[pos++] = 0;
+        }
+        else if (l) {
+          to[pos++] = 1;
+          for (let i = 1; i < c; ++i) to[pos++] = 3;
+          to[pos++] = 2;
+        }
+        else {
+          to[pos++] = 1;
+          for (let i = 2; i < c; ++i) to[pos++] = 3;
+          to[pos++] = 2;
+        }
       }
     }
-    else {
-      for (let j = 0; j < count; ++j) {
-        to[pos++] = from + offset;
-        for (let k = 0; k < skip; ++k) to[pos++] = 0;
+    if (l) to[pos++] = 0;
+
+    if (lookup) for (let j = b; j < pos; ++j) lookup[j] = i;
+    if (scatter) {
+      const n = pos - b;
+      const z = l ? c - 1 : 0;
+      for (let j = 0; j < n; ++j) {
+        scatter[j + b] = o + (j + z + c) % c;
       }
     }
+
+    o += c;
   }
-  else if (dims === 1) {
-    for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read] + offset;
-    }
-  }
-  else if (dims === 2) {
-    for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read] + offset;
-      to[pos++] = array[read + 1] + offset;
-    }
-  }
-  else if (dims === 3) {
-    for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read] + offset;
-      to[pos++] = array[read + 1] + offset;
-      to[pos++] = array[read + 2] + offset;
-    }
-  }
-  else if (dims === 4) {
-    for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read] + offset;
-      to[pos++] = array[read + 1] + offset;
-      to[pos++] = array[read + 2] + offset;
-      to[pos++] = array[read + 3] + offset;
-    }
-  }
-  else {
-    // TBD
-    console.warn('Dims > 4 not supported');
-    for (let j = 0; j < count; ++j) {
-      for (let k = 0; k < dims; ++k) {
-        to[pos++] = array[read + k] + offset;
-      }
-    }
-  }
+
+  while (pos < to.length) to[pos++] = 0;
 }
 
-export const unweldIndexedArray2 = (
-  from: NumberArray,
-  indices: NumberArray,
-  dims: number = 1,
+export const generateChunkAnchors2 = (
+  anchors: NumberArray,
+  trims: NumberArray,
+  chunks: number[],
+  loops: boolean[] = NO_LOOPS,
+  starts: boolean[] | boolean = false,
+  ends: boolean[] | boolean = false,
 ) => {
-  const n = indices.length;
-  const flat = new Float32Array(n * Math.ceil(dims));
+
+  const n = chunks.length;
+  for (let i = 0; i < trims.length; ++i) trims[i] = 0;
+
+  const hasStart = !!starts;
+  const hasEnd = !!ends;
 
   let o = 0;
-  if (dims === 1) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i];
-      flat[o++] = from[j];
+  let pos = 0;
+  if (hasStart || hasEnd) for (let i = 0; i < n; ++i) {
+    const c = chunks[i];
+    const l = loops[i];
+
+    const s = hasStart && (starts === true || starts[i]);
+    const e = hasEnd && (ends === true || ends[i]);
+
+    const both = s && e ? 1 : 0;
+    const bits = +s + (+e << 1);
+
+    const start = pos + (l ? 1 : 0);
+    const end = pos + c - 1 + (l ? 2 : 0);
+    pos += c + (l ? 3 : 0);
+
+    for (let j = start; j <= end; ++j) {
+      trims[j * 4] = start;
+      trims[j * 4 + 1] = end;
+      trims[j * 4 + 2] = bits;
+      trims[j * 4 + 3] = 0;
     }
-  }
-  else if (dims === 2) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * 2;
-      flat[o++] = from[j];
-      flat[o++] = from[j + 1];
+
+    if (s) {
+      anchors[o++] = start;
+      anchors[o++] = start + 1;
+      anchors[o++] = end;
+      anchors[o++] = both;
     }
-  }
-  else if (dims === 3) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * 3;
-      flat[o++] = from[j];
-      flat[o++] = from[j + 1];
-      flat[o++] = from[j + 2];
-    }
-  }
-  else if (dims === 4) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * 4;
-      flat[o++] = from[j];
-      flat[o++] = from[j + 1];
-      flat[o++] = from[j + 2];
-      flat[o++] = from[j + 3];
-    }
-  }
-  else {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * dims;
-      for (let k = 0; k < dims; ++k) {
-        flat[o++] = from[j + k];
-      }
-      j += dims;
+    if (e) {
+      anchors[o++] = end;
+      anchors[o++] = end - 1;
+      anchors[o++] = start;
+      anchors[o++] = both;
     }
   }
 
-  return flat;
-};
+  return o / 4;
+}
+
+export const generateChunkFaces2 = (
+  to: NumberArray,
+  lookup: NumberArray | null | undefined,
+  chunks: number[],
+  loops: boolean[] = NO_LOOPS,
+) => {
+  let pos = 0;
+  let n = chunks.length;
+
+  for (let i = 0; i < n; ++i) {
+    const c = chunks[i];
+    const l = loops[i];
+
+    const b = pos;
+    if (l) to[pos++] = 0;
+    if (c) {
+      if (c < 3) {
+        for (let i = 0; i < c; ++i) to[pos++] = 0;
+      }
+      else {
+        for (let i = 0; i < c - 2; ++i) to[pos++] = i + 1;
+        to[pos++] = 0;
+        to[pos++] = 0;
+      }
+    }
+    if (l) {
+      to[pos++] = 0;
+      to[pos++] = 0;
+    }
+    
+    if (lookup) for (let j = b; j < pos; ++j) lookup[j] = i;
+  }
+
+  while (pos < to.length) to[pos++] = 0;
+}
 

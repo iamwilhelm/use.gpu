@@ -1,29 +1,29 @@
 import type { ArchetypeSchema, Emit, TypedArrayConstructor, VectorLike, VectorLikes } from '@use-gpu/core';
 import { isTypedArray, copyNumberArray2, copyNestedNumberArray2 } from '@use-gpu/core';
 
-const NO_CHUNKS: number[] = [];
+const NO_CHUNKS = new Uint16Array(0);
 
 const maybeTypedArray = (
   x: VectorLike | VectorLikes | VectorLikes[]
 ) => isTypedArray(x) ? x : null;
 
-const maybeEmptyArray = (
+const maybeEmptyArray = <T extends TypedArrayConstructor>(
   x: VectorLike | VectorLikes | VectorLikes[],
-  constructor: TypedArrayConstructor,
+  constructor: T,
 ) => !x.length ? new constructor(0) : null;
 
 // Array of scalars
-const maybeScalarArray = (
+const maybeScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
-  constructor: TypedArrayConstructor,
+  constructor: T,
 ) => typeof xs[0] === 'number' ? new constructor(x) : null
 
 // Array of vectors
-const maybeVectorArray = (
+const maybeVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
   dims: number,
   w: number,
-  constructor: TypedArrayConstructor,
+  constructor: T,
 ) => {
   const d = (xs[0] as any)?.length;
   if (d == null) return null;
@@ -39,9 +39,9 @@ const maybeVectorArray = (
 }
 
 // Array of ragged scalar arrays
-const maybeMultiScalarArray = (
+const maybeMultiScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
-  constructor: TypedArrayConstructor,
+  constructor: T,
 ) => {
   const d = (xs[0] as any)?.length;
   if (d == null) return null;
@@ -58,18 +58,18 @@ const maybeMultiScalarArray = (
   for (let i = 0; i < chunks; i++) {
     const x = xs[i];
     const l = x.length;
-    copyNumberArray2(x, to, 0, o, l);
+    copyNumberArray2(x, to, l, 0, o);
     o += l;
   }
   return to;
 }
 
 // Array of ragged vector arrays
-const maybeMultiVectorArray = (
+const maybeMultiVectorArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
   dims: number,
   w: number,
-  constructor: TypedArrayConstructor,
+  constructor: T,
 ) => {
   const d = (xs[0]?.[0] as any)?.length;
   if (d == null) return null;
@@ -88,41 +88,27 @@ const maybeMultiVectorArray = (
     const x = xs[i];
     const l = x.length;
 
-    copyNestedNumberArray2(x, to, d, dims, 0, o, l);
+    copyNestedNumberArray2(x, to, d, dims, 0, o, l, w);
     o += l;
   }
   return to;
 }
 
-export const toCompositeChunks = (
-  x: VectorLike | VectorLikes | VectorLikes[],
-  dims: number,
-  w: number,
-  constructor: TypedArrayConstructor,
-) => {
-  if (!x.length) return NO_CHUNKS;
-  if (isTypedArray(x)) return [x.length];
-  if (typeof x[0] === 'number') return [x.length];
-  if (typeof x[0]?.[0] === 'number') return [x.length];
-  if (typeof x[0]?.[0]?.[0] === 'number') return x[0].map(x => x.length);
-  return NO_CHUNKS;
-};
-
-export const toScalarArray = (
+export const toScalarArray = <T extends TypedArrayConstructor>(
   x: VectorLike,
-  constructor: TypedArrayConstructor = Float32Array
-) => (
+  constructor?: T = Float32Array
+): T => (
   maybeTypedArray(x) ||
   maybeEmptyArray(x, constructor) ||
   maybeScalarArray(x, constructor) ||
   new constructor(0)
 );
 
-export const toVectorArray = (
+export const toVectorArray = <T extends TypedArrayConstructor>(
   x: VectorLikes,
   dims: number,
   w: number = 0,
-  constructor: TypedArrayConstructor = Float32Array,
+  constructor: T = Float32Array,
 ) => (
   maybeTypedArray(x) ||
   maybeEmptyArray(x, constructor) ||
@@ -131,9 +117,9 @@ export const toVectorArray = (
   new constructor(0)
 );
 
-export const toMultiScalarArray = (
+export const toMultiScalarArray = <T extends TypedArrayConstructor>(
   x: VectorLike,
-  constructor: TypedArrayConstructor = Float32Array
+  constructor: T = Float32Array
 ) => (
   maybeTypedArray(x) ||
   maybeEmptyArray(x, constructor) ||
@@ -142,11 +128,11 @@ export const toMultiScalarArray = (
   new constructor(0)
 );
 
-export const toMultiVectorArray = (
+export const toMultiVectorArray = <T extends TypedArrayConstructor>(
   x: VectorLikes | VectorLikes[],
   dims: number,
   w: number = 0,
-  constructor: TypedArrayConstructor = Float32Array
+  constructor: T = Float32Array
 ) => (
   maybeTypedArray(x) ||
   maybeEmptyArray(x, constructor) ||
@@ -155,3 +141,23 @@ export const toMultiVectorArray = (
   maybeMultiVectorArray(x, dims, w, constructor) ||
   new constructor(0)
 );
+
+export const toCompositeChunks = (x: VectorLike | VectorLikes | VectorLikes[]) => {
+  if (!x.length) return NO_CHUNKS;
+  if (
+    isTypedArray(x) ||
+    typeof x[0] === 'number' ||
+    typeof x[0]?.[0] === 'number'
+  ) {
+    const to = new Uint16Array(1);
+    to[0] = x.length;
+    return to;
+  }
+  if (typeof x[0]?.[0]?.[0] === 'number') {
+    const n = x.length;
+    const to = new Uint16Array(n);
+    for (let i = 0; i < n; ++i) to[i] = x[i].length;
+    return to;
+  }
+  return NO_CHUNKS;
+};

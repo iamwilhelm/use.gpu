@@ -38,11 +38,11 @@ export const useLineSegments = (
 
     const segments = new Int8Array(alignSizeTo(count, 4));
     const lookups = new Uint16Array(alignSizeTo(count, 2));
-    const scatters = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
+    const unwelds = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
 
-    generateChunkSegments2(segments, lookups, scatters, chunks, loops);
+    generateChunkSegments2(segments, lookups, unwelds, chunks, loops);
 
-    return {count, segments, lookups, scatters};
+    return {count, segments, lookups, unwelds};
   }, [chunks, loops, starts, ends]);
 };
 

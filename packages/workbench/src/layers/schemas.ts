@@ -16,7 +16,7 @@ export const LINE_SCHEMA = {
   positions: {format: 'vec4<f32>', single: 'position', composite: true},
   widths:    {format: 'f32', single: 'width'},
 
-  scatters:  {format: 'u16', scatter: true},
+  unwelds:   {format: 'u16', unweld: true},
   segments:  {format: 'i8',  segment: true},
   lookups:   {format: 'u16', segment: true},
 };
@@ -27,7 +27,7 @@ export const ARROW_SCHEMA = {
   widths:    {format: 'f32', single: 'width'},
   sizes:     {format: 'f32', single: 'size'},
 
-  scatters:  {format: 'u32', scatter: true},
+  unwelds:   {format: 'u32', unweld: true},
   segments:  {format: 'i8', segment: true},
   anchors:   {format: 'vec4<u32>', segment: true},
   trims:     {format: 'vec4<u32>', segment: true},

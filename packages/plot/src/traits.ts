@@ -385,7 +385,7 @@ export const LineSegmentsTrait = combine(
 
       count?: number,
       segments?: TypedArray,
-      scatter?: TypedArray,
+      unwelds?: TypedArray,
       lookups?: TypedArray,
     },
   ) => {

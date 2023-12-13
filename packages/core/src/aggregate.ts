@@ -3,12 +3,10 @@ import type { AggregateBuffer, UniformType } from './types';
 import { makeStorageBuffer, uploadBuffer } from './buffer';
 import {
   alignSizeTo,
-  makeDataArray,
-} from './data';
-import {
+  makeDataArray2,
   copyNumberArray2,
   fillNumberArray2,
-  scatterNumberArray2,
+  unweldNumberArray2,
 } from './data2';
 import { incrementVersion } from './id';
 import { toMurmur53, mixBits53 } from '@use-gpu/state';
@@ -19,7 +17,7 @@ export const getAggregateArchetype = (
 ) => mixBits53(toMurmur53(formats), toMurmur53(unwelded));
 
 export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number): AggregateBuffer => {
-  const {array, dims} = makeDataArray(format, length);
+  const {array, dims} = makeDataArray2(format, length);
 
   const buffer = makeStorageBuffer(device, array.byteLength);
   const source = {
@@ -53,43 +51,18 @@ export const updateAggregateBuffer = (
       attributes: {
         [key]: single,
         [keys]: multiple,
-        scatters,
-        lookups,
       },
     } = item as any;
 
-    const needsScatter = !segment && scatters;
-    
+    //if (key === 'color' && 'width' in item.attributes) debugger;
     if (multiple != null) {
-      if (needsScatter) {
-        scatterNumberArray2(multiple, array, scatters, dims, 0, base, count);
-      }
-      else {
-        copyNumberArray2(multiple, array, dims, 0, base, count);
-      }
+      if (typeof multiple === 'function') multiple(array, base, count);
+      else copyNumberArray2(multiple, array, dims, 0, base, count);
     }
     else if (single != null) {
-      if (composite) {
-        if (needsScatter) {
-          scatterNumberArray2(single, array, scatters, dims, 0, base, count);
-        }
-        else {
-          copyNumberArray2(single, array, dims, 0, base, count);
-        }
-      }
-      else {
-        const n = Math.floor(single.length / dims);
-        if (single.length > dims) {
-          scatterNumberArray2(single, array, lookups, dims, 0, base, count)
-        }
-        else {
-          fillNumberArray2(single, array, dims, 0, base, count);
-        }
-      }
+      if (typeof single === 'function') single(array, base, count);
+      else fillNumberArray2(single, array, dims, 0, base, count);
     }
-
-    //if (multiple != null) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count);
-    //else if (single != null) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count);
 
     base += count;
     i++;

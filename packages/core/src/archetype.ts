@@ -1,6 +1,7 @@
 import type { AggregateBuffer, ArchetypeSchema, UniformType } from './types';
 import { toMurmur53, scrambleBits53, mixBits53 } from '@use-gpu/state';
 import { makeAggregateBuffer, updateAggregateBuffer, updateAggregateIndex } from './aggregate';
+import { getUniformDims2, makeCopyEmitter2, makeUnweldEmitter2 } from './data2';
 
 type Item = Record<string, any>;
 
@@ -43,12 +44,57 @@ export const schemaToAttributes = (
 ): Record<string, any> => {
   const out: Record<string, any> = {};
   for (const key in schema) {
-    const {single} = schema[key];
+    const {single, unweld, composite} = schema[key];
+    if (unweld || composite) throw new Error("Can't make attributes from composite schema. Use schemaToEmitters.");
     if (props[key] != null) {
       out[key] = props[key];
     }
     else if (single != null && props[single] != null) {
       out[single] = props[single];
+    }
+  }
+  return out;
+};
+
+export const schemaToEmitters = (
+  schema: ArchetypeSchema,
+  props: Record<string, any>,
+): Record<string, any> => {
+  const out: Record<string, any> = {};
+  const {unwelds, lookups} = props;
+  for (const key in schema) {
+    const {format, segment, single, unweld, composite} = schema[key];
+    if (unweld) continue;
+
+    const values = props[key];
+    if (values != null) {
+      const dims = getUniformDims2(format);
+
+      if (!segment && unwelds) {
+        out[key] = makeUnweldEmitter2(values, unwelds, dims);
+      }
+      else {
+        out[key] = values;
+      }
+    }
+    else if (single != null && props[single] != null) {
+      const dims = getUniformDims2(format);
+      const value = props[single];
+
+      if (composite) {
+        if (unwelds) {
+          out[single] = makeUnweldEmitter2(values, unwelds, dims);
+        }
+        else {
+          out[single] = makeCopyEmitter2(value, dims);
+        }
+      }
+      else if (value.length > dims) {
+        out[single] = makeUnweldEmitter2(value, lookups, dims);
+      }
+      else {
+        out[single] = value;
+      }
     }
   }
   return out;

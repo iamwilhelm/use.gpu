@@ -1,95 +1,27 @@
 import type { TypedArray, VectorLike, UniformType, UniformAttribute, Emitter, Emit } from './types';
+import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
 
 import { isTypedArray } from './buffer';
 import { seq } from './tuple';
 
 type NumberArray = VectorLike;
 
-/*
-export const makeDataEmitter2 = (
-  to: NumberArray,
-  dims: number,
-): {
-  emit: Emit,
-  emitted: () => number,
-  reset: () => void,
-} => {
-  let i = 0;
-  const emitted = () => i / Math.ceil(dims);
-  const reset = () => i = 0;
-
-  if (dims === 1)   return {reset, emitted, emit: (a: number) => { to[i++] = a; }};
-  if (dims === 2)   return {reset, emitted, emit: (a: number, b: number) => { to[i++] = a; to[i++] = b; }};
-  if (dims === 3)   return {reset, emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; }};
-  if (dims === 3.5) return {reset, emitted, emit: (a: number, b: number, c: number) => { to[i++] = a; to[i++] = b; to[i++] = c; i++; }}; // !
-  if (dims === 4)   return {reset, emitted, emit: (a: number, b: number, c: number, d: number) => { to[i++] = a; to[i++] = b; to[i++] = c; to[i++] = d; }};
-  return {
-    reset,
-    emitted,
-    emit: (...args: number[]) => {
-      const n = args.length;
-      for (let j = 0; j < n; ++j) to[i++] = args[j];
-    },
-  };
-}
-
-export const emitIntoNumberArray2 = <T>(expr: Emitter, to: NumberArray, dims: number, props?: T) => {
-  const {emit, emitted} = makeDataEmitter(to, dims);
-  const n = to.length / Math.ceil(dims);
-  for (let i = 0; i < n; i++) expr(emit, i, props);
-  return emitted();
+export const alignSizeTo2 = (n: number, s: number) => {
+  let f = n % s;
+  return f === 0 ? n : n + (s - f);
 };
 
-export const emitIntoMultiNumberArray2 = <T>(expr: Emitter, to: NumberArray, dims: number, size: number[], props?: T) => {
-  const n = size.length;
+export const getUniformDims2 = (type: UniformType) => UNIFORM_ARRAY_DIMS[type];
 
-  const index = size.map(_ => 0);
-  const increment = () => {
-    for (let i = 0; i < n; ++i) {
-      let c = index[i];
-      if (c === size[i] - 1) index[i] = 0;
-      else {
-        index[i] = c + 1;
-        break;
-      }
-    }
-  };
+export const makeDataArray2 = (type: UniformType, length: number) => {
+  const ctor = UNIFORM_ARRAY_TYPES[type];
+  const dims = UNIFORM_ARRAY_DIMS[type];
 
-  let nest: Emitter;
-  if (n === 1) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], props);
-      increment();
-    };
-  }
-  else if (n === 2) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], props);
-      increment();
-    };
-  }
-  else if (n === 3) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], index[2], props);
-      increment();
-    };
-  }
-  else if (n === 4) {
-    nest = (emit: Emit) => {
-      expr(emit, index[0], index[1], index[2], index[3], props);
-      increment();
-    };
-  }
-  else {
-    nest = (emit: Emit) => {
-      expr(emit, ...index, props);
-      increment();
-    };
-  }
-  
-  return emitIntoNumberArray(nest, to, dims);
+  const n = alignSizeTo2(length * Math.ceil(dims), 4);
+
+  const array = new ctor(n);
+  return {array, dims};
 };
-*/
 
 export const copyNumberArray2 = (
   from: number[] | TypedArray,
@@ -108,29 +40,48 @@ export const copyNumberArray2 = (
     to[o++] = from[s + i];
   }
 };
-  
-export const scatterNumberArray2 = (
+
+export const offsetNumberArray2 = (
   from: number[] | TypedArray,
   to: TypedArray,
-  scatter: TypedArray,
+  dims: number = 1,
+  fromIndex: number = 0,
+  toIndex: number = 0,
+  length?: number,
+  offset?: number,
+) => {
+  const n = length != null ? length * dims : from.length;
+
+  let s = fromIndex * dims;
+  let o = toIndex * dims;
+
+  for (let i = 0; i < n; ++i) {
+    to[o++] = from[s + i] + offset;
+  }
+};
+  
+export const unweldNumberArray2 = (
+  from: number[] | TypedArray,
+  to: TypedArray,
+  indices: TypedArray,
   dims: number = 1,
   fromIndex: number = 0,
   toIndex: number = 0,
   length?: number,
 ) => {
-  const n = length != null ? length : scatter.length;
+  const n = length != null ? length : indices.length;
 
   let s = fromIndex * dims;
   let o = toIndex * dims;
 
   if (dims === 1) {
     for (let i = 0; i < n; ++i) {
-      to[o++] = from[scatter[s + i]];
+      to[o++] = from[indices[s + i]];
     }
   }
   else if (dims === 2) {
     for (let i = 0; i < n; ++i) {
-      let b = scatter[s + i] * dims;
+      let b = indices[s + i] * 2;
       to[o    ] = from[b];
       to[o + 1] = from[b + 1];
       o += 2;
@@ -138,7 +89,7 @@ export const scatterNumberArray2 = (
   }
   else if (dims === 3) {
     for (let i = 0; i < n; ++i) {
-      let b = scatter[s + i] * dims;
+      let b = indices[s + i] * 3;
       to[o    ] = from[b];
       to[o + 1] = from[b + 1];
       to[o + 2] = from[b + 2];
@@ -147,12 +98,21 @@ export const scatterNumberArray2 = (
   }
   else if (dims === 4) {
     for (let i = 0; i < n; ++i) {
-      let b = scatter[s + i] * dims;
+      let b = indices[s + i] * 4;
       to[o    ] = from[b];
       to[o + 1] = from[b + 1];
       to[o + 2] = from[b + 2];
       to[o + 3] = from[b + 3];
       o += 4;
+    }
+  }
+  else {
+    for (let i = 0; i < n; ++i) {
+      let b = indices[s + i] * n;
+      for (let k = 0; k < dims; ++k) {
+        to[o + k] = from[b + k];
+      }
+      o += dims;
     }
   }
 };
@@ -214,8 +174,6 @@ export const fillNumberArray2 = (
     }
   }
   else {
-    // TBD
-    console.warn('Dims > 4 not supported');
     for (let j = 0; j < count; ++j) {
       for (let k = 0; k < dims; ++k) {
         to[pos + k] = array[read + k] + offset;
@@ -224,58 +182,6 @@ export const fillNumberArray2 = (
     }
   }
 }
-
-export const unweldIndexedArray2 = (
-  from: NumberArray,
-  indices: NumberArray,
-  dims: number = 1,
-) => {
-  const n = indices.length;
-  const flat = new Float32Array(n * Math.ceil(dims));
-
-  let o = 0;
-  if (dims === 1) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i];
-      flat[o++] = from[j];
-    }
-  }
-  else if (dims === 2) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * 2;
-      flat[o++] = from[j];
-      flat[o++] = from[j + 1];
-    }
-  }
-  else if (dims === 3) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * 3;
-      flat[o++] = from[j];
-      flat[o++] = from[j + 1];
-      flat[o++] = from[j + 2];
-    }
-  }
-  else if (dims === 4) {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * 4;
-      flat[o++] = from[j];
-      flat[o++] = from[j + 1];
-      flat[o++] = from[j + 2];
-      flat[o++] = from[j + 3];
-    }
-  }
-  else {
-    for (let i = 0; i < n; ++i) {
-      const j = indices[i] * dims;
-      for (let k = 0; k < dims; ++k) {
-        flat[o++] = from[j + k];
-      }
-      j += dims;
-    }
-  }
-
-  return flat;
-};
 
 export const copyNestedNumberArray2 = (
   from: number[][] | TypedArray[],
@@ -392,10 +298,43 @@ export const copyNestedNumberArray2 = (
   }
 };
 
+export const makeCopyEmitter2 = (
+  from: number[] | TypedArray,
+  dims: number = 1,
+  fromIndex: number = 0,
+) => (
+  to: TypedArray,
+  toIndex: number = 0,
+  length?: number,
+  offset?: number,
+) => copyNumberArray2(from, to, dims, fromIndex, toIndex, length);
+
+export const makeFillEmitter2 = (
+  from: NumberArray | number,
+  dims: number = 1, 
+  fromIndex: number = 0,
+) => (
+  to: NumberArray,
+  toIndex: number = 0,
+  count: number = 0,
+  offset: number = 0,
+) => fillNumberArray2(from, to, dims, fromIndex, toIndex, length);
+
+export const makeUnweldEmitter2 = (
+  from: number[] | TypedArray,
+  indices: number[] | TypedArray,
+  dims: number = 1,
+  fromIndex: number = 0,
+) => (
+  to: TypedArray,
+  toIndex: number = 0,
+  length?: number,
+) => unweldNumberArray2(from, to, indices, dims, fromIndex, toIndex, length);
+
 export const generateChunkSegments2 = (
   to: NumberArray,
   lookup: NumberArray | null | undefined,
-  scatter: NumberArray | null | undefined,
+  unweld: NumberArray | null | undefined,
   chunks: TypedArray | number[],
   loops: TypedArray | boolean[] | boolean = false,
   starts: TypedArray | boolean[] | boolean = false,
@@ -436,11 +375,11 @@ export const generateChunkSegments2 = (
     if (l) to[pos++] = 0;
 
     if (lookup) for (let j = b; j < pos; ++j) lookup[j] = i;
-    if (scatter) {
+    if (unweld) {
       const n = pos - b;
       const z = l ? c - 1 : 0;
       for (let j = 0; j < n; ++j) {
-        scatter[j + b] = o + (j + z + c) % c;
+        unweld[j + b] = o + (j + z + c) % c;
       }
     }
 

@@ -3,7 +3,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits/live';
 
 import { makeUseTrait, combine, shouldEqual, sameAny } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToAttributes, accumulateChunks, generateChunkSegments } from '@use-gpu/core';
+import { schemaToArchetype, schemaToAttributes, schemaToEmitters, accumulateChunks, generateChunkSegments } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
@@ -63,7 +63,7 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   const transform = useTransformContext();
 
   const archetype = schemaToArchetype(LINE_SCHEMA, parsed, flags);
-  const attributes = schemaToAttributes(LINE_SCHEMA, parsed);
+  const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
 
   console.log('line', {count, attributes});
 

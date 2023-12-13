@@ -39,9 +39,9 @@ export const useArrowSegments = (
     const anchors = new Uint32Array(count * 4);
     const trims = new Uint32Array(count * 4);
     const lookups = new Uint32Array(count);
-    const scatters = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
+    const unwelds = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
 
-    generateChunkSegments2(segments, lookups, scatters, chunks, loops, starts, ends);
+    generateChunkSegments2(segments, lookups, unwelds, chunks, loops, starts, ends);
     const anchorCount = generateChunkAnchors(anchors, trims, chunks, loops, starts, ends);
 
     return {
@@ -51,7 +51,7 @@ export const useArrowSegments = (
       anchors,
       trims,
       lookups,
-      scatters,
+      unwelds,
     };
   }, [chunks, loops, starts, ends]);
 }

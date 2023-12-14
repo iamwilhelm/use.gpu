@@ -132,10 +132,10 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
 
   return gather(c, Resume);
 }, shouldEqual({
-  padding: sameShallow,
-  margin:  sameShallow,
-  radius:  sameShallow,
-  border:  sameShallow,
-  stroke:  sameShallow,
-  fill:    sameShallow,
+  padding: sameShallow(),
+  margin:  sameShallow(),
+  radius:  sameShallow(),
+  border:  sameShallow(),
+  stroke:  sameShallow(),
+  fill:    sameShallow(),
 }), 'Block');

@@ -152,7 +152,7 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
-            <Transform position={[300, 700]}>
+            <Transform position={[300, 700]} scale={[0.8, 0.8]}>
               <Face
                 position={[[0, 0], [50, 0], [100, 100], [50, 100]]}
                 color={"#823456"}
@@ -166,8 +166,8 @@ export const Plot2DPage: LC = () => {
 
             <Cartesian
               range={[[0, 100], [0, 100]]}
-              position={[300, 500, 1]}
-              scale={[200, 100, 1]}
+              position={[400, 400, 0]}
+              scale={[400, 400, 1]}
             >
             {/*
               <Grid
@@ -182,15 +182,19 @@ export const Plot2DPage: LC = () => {
             */}
 
               <Axis
+                origin={[100, 100]}
                 axis='x'
                 width={5}
                 color="#a0a0a0"
+                end
               />
 
               <Axis
+                origin={[100, 100]}
                 axis='y'
                 width={5}
                 color="#a0a0a0"
+                end
               />
             </Cartesian>
 

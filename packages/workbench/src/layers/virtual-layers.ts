@@ -1,6 +1,6 @@
 import type { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live';
 import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
-import type { LayerAggregator, LayerAggregate, PointAggregate, LineAggregate, FaceAggregate } from './types';
+import type { LayerAggregator, VirtualLayerAggregate, LayerAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
@@ -27,20 +27,20 @@ import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA } from './schemas'
 const DEBUG = true;
 
 export type VirtualLayersProps = {
-  items?: Record<string, LayerAggregate[]>,
+  items?: Record<string, VirtualLayerAggregate[]>,
   children: LiveElement,
 };
 
-const allCount = (a: number, b: LayerAggregate): number => a + b.count;
+const allCount = (a: number, b: VirtualLayerAggregate): number => a + b.count;
 
-const allIndices = (a: number, b: LayerAggregate): number => a + (b.indices || 0);
+const allIndices = (a: number, b: VirtualLayerAggregate): number => a + (b.indices || 0);
 
-const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
+const allKeys = (a: Set<string>, b: VirtualLayerAggregate): Set<string> => {
   for (let k in b) a.add(k);
   return a;
 }
 
-const getItemSummary = (items: LayerAggregate[]) => {
+const getItemSummary = (items: VirtualLayerAggregate[]) => {
   const n = items.length;
   const archetype = items[0]?.archetype ?? 0;
 
@@ -62,7 +62,7 @@ export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualL
 };
 
 const Resume = (
-  aggregates: Record<string, LayerAggregate[]>,
+  aggregates: Record<string, VirtualLayerAggregate[]>,
 ) => useOne(() => {
   const els: LiveElement[] = [];
 
@@ -71,7 +71,11 @@ const Resume = (
     if (!items.length) continue;
 
     if (type === 'layer') {
-      els.push(items);
+      for (const item of items) {
+        const {transform, element} = item;
+        const hasTransform = transform?.key;
+        els.push(hasTransform ? provide(TransformContext, transform, element, element.key) : element);
+      }
       continue;
     }
 
@@ -95,7 +99,7 @@ const Resume = (
 
 const Aggregate: LiveFunction<any> = (
   makeAggregator: LayerAggregator,
-  items: LayerAggregate[],
+  items: VirtualLayerAggregate[],
 ) => {
   const device = useContext(DeviceContext);
   const {archetype, count, indices} = getItemSummary(items);
@@ -156,7 +160,7 @@ const accumulate = (xs: number[]): number[] => {
   return out;
 }
 
-const getItemTypeKey = (item: LayerAggregate) =>
+const getItemTypeKey = (item: VirtualLayerAggregate) =>
   ('transform' in item
     ? (item.transform?.key || 0)
     : 0) ^
@@ -164,14 +168,14 @@ const getItemTypeKey = (item: LayerAggregate) =>
 
 type Partition = {
   key: number,
-  items: LayerAggregate[],
+  items: VirtualLayerAggregate[],
 };
 
 const makePartitioner = () => {
   const layers: Partition[] = [];
   const map = new Map<number, Partition>();
 
-  const push = (item: LayerAggregate) => {
+  const push = (item: VirtualLayerAggregate) => {
     const {zIndex = 0} = item;
     const key = getItemTypeKey(item);
     const existing = map.get(key);

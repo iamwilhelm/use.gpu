@@ -2,10 +2,10 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
 import type { ShaderModule } from '@use-gpu/shader';
 import type { XYZW } from '@use-gpu/core';
-import type { ColorTrait, GridTrait, LineTrait, ROPTrait, ScaleTrait, Swizzle } from '../types';
 
-import { parseVec4, useProp } from '@use-gpu/traits';
-import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { makeUseTrait, optional, combine, useProp } from '@use-gpu/traits/live';
+import { parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
+import { yeet, memo, use, fragment, gather, provide, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
 import {
   useBoundShader, useNoBoundShader,
   useViewContext, useRawSource,
@@ -15,17 +15,7 @@ import {
 } from '@use-gpu/workbench';
 
 import { useRangeContext } from '../providers/range-provider';
-import {
-  parseIntegerPositive,
-  parseAxis,
-} from '@use-gpu/traits';
-import {
-  useColorTrait,
-  useGridTrait,
-  useLineTrait,
-  useROPTrait,
-  useScaleTrait,
-} from '../traits';
+
 import { vec4 } from 'gl-matrix';
 
 import { logarithmic, linear } from '../util/domain';
@@ -34,13 +24,29 @@ import { getGridPosition } from '@use-gpu/wgsl/plot/grid.wgsl';
 import { getGridAutoPosition } from '@use-gpu/wgsl/plot/grid-auto.wgsl';
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 
+import {
+  ColorTrait,
+  GridTrait,
+  LineTrait,
+  ROPTrait,
+  ScaleTrait,
+} from '../traits';
+
+const Traits = combine(
+  ColorTrait,
+  GridTrait,
+  LineTrait,
+  ROPTrait,
+);
+
+const useScaleTrait = makeUseTrait(ScaleTrait);
+const useTraits = makeUseTrait(Traits);
+
 const NO_POINT4: XYZW = [0, 0, 0, 0];
 
 export type GridProps =
-  Partial<GridTrait> &
-  Partial<LineTrait> &
-  Partial<ColorTrait> &
-  Partial<ROPTrait> & {
+  TraitProps<typeof Traits>
+& {
   first?: Partial<ScaleTrait> & { detail?: number },
   second?: Partial<ScaleTrait> & { detail?: number },
   origin?: VectorLike,
@@ -54,11 +60,10 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     auto = false,
   } = props;
 
-  const {axes, range} = useGridTrait(props);
-  const {width, depth, join, loop} = useLineTrait(props);
-
-  const color = useColorTrait(props);
-  const rop = useROPTrait(props);
+  const {
+    axes, range, loop,
+    ...flags
+  } = useTraits(props);
 
   const first = useScaleTrait(props.first ?? NO_SCALE_PROPS);
   const second = useScaleTrait(props.second ?? NO_SCALE_PROPS);
@@ -69,7 +74,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   const origin = useProp(props.origin, parseVec4);
 
   const parentRange = useRangeContext();
-  const xform = auto ? useTransformContext().transform : useNoTransformContext();
+  const transform = useTransformContext().transform;
 
   const getGrid = (options: ScaleTrait, detail: number, index: number, other: number) => {
     const main  = parseAxis(axes[index]);
@@ -152,28 +157,24 @@ export const Grid: LiveComponent<GridProps> = (props) => {
   // const firstLoop = loop || props.first?.loop;
   // const secondLoop = loop || props.second?.loop;
 
-  const view = [
+  const {id} = useFiber();
+  const view = fragment([
     props.first !== null ? use(LineLayer, {
       positions: firstPositions,
       segments: getLineSegment,
-
-      color,
-      width,
-      depth,
-      join,
-      ...rop,
+      ...flags,
     }) : null,
     props.second !== null ? use(LineLayer, {
       positions: secondPositions,
       segments: getLineSegment,
-
-      color,
-      width,
-      depth,
-      join,
-      ...rop,
+      ...flags,
     }) : null,
-  ];
+  ], id);
 
-  return view;
+  return yeet({
+    layer: {
+      transform,
+      element: view,
+    },
+  });
 };

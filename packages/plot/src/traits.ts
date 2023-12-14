@@ -229,9 +229,9 @@ export const StringsTrait = trait(
 
 export const StrokeTrait = trait(
   {
-    join:      parseJoin,
+    join:      optional(parseJoin),
     dash:      optional(parseScalarArray),
-    proximity: parseNumber,
+    proximity: optional(parseNumber),
   },
 );
 

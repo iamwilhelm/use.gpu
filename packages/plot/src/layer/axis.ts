@@ -2,20 +2,22 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { VectorLike } from '@use-gpu/traits';
 import type { TraitProps } from '@use-gpu/traits/live';
 
-import { makeUseTrait, optional, combine, shouldEqual, sameArray, sameAny, useProp } from '@use-gpu/traits/live';
-import { memo, use, gather, provide, useContext, useOne, useMemo } from '@use-gpu/live';
+import { makeUseTrait, optional, combine, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
+import { yeet, memo, use, keyed, gather, provide, useContext, useOne, useFiber, useMemo } from '@use-gpu/live';
 import {
   useBoundShader, useBoundSource, useShaderRef,
   LineLayer, ArrowLayer, useArrowSegmentsSource,
+  useTransformContext,
 } from '@use-gpu/workbench';
 import { parseVec4, parseIntegerPositive } from '@use-gpu/parse';
 
-import { RangeContext } from '../providers/range-provider';
+import { useRangeContext } from '../providers/range-provider';
 import { vec4 } from 'gl-matrix';
 
 import {
   ArrowTrait,
   AxisTrait,
+  DirectedTrait,
   LineTrait,
   LoopTrait,
   ColorTrait,
@@ -26,6 +28,7 @@ import { getAxisPosition } from '@use-gpu/wgsl/plot/axis.wgsl';
 const Traits = combine(
   ArrowTrait,
   AxisTrait,
+  DirectedTrait,
   LineTrait,
   LoopTrait,
   ColorTrait,
@@ -41,23 +44,26 @@ export type AxisProps =
   detail?: number,
 };
 
-export const Axis: LiveComponent<AxisProps> = (props) => {
+export const Axis: LiveComponent<AxisProps> = memo((props) => {
   const {
     origin,
     detail,
   } = props;
+  
+  const parsed = useTraits(props);
 
   const {
     axis, range,
     loop, start, end,
-    color,
     ...flags
-  } = useTraits(props);
+  } = parsed;
+
+  console.log('axis', {parsed, flags})
 
   const p = useProp(origin, parseVec4);
   const d = useProp(detail, parseIntegerPositive);
 
-  const parentRange = useContext(RangeContext);
+  const parentRange = useRangeContext();
   const r = range ?? parentRange[axis];
 
   // Calculate line origin + step
@@ -78,18 +84,28 @@ export const Axis: LiveComponent<AxisProps> = (props) => {
   const [chunks, loops] = useMemo(() => [[n], loop], [n, loop]);
   const {segments, anchors, trims} = useArrowSegmentsSource(chunks, loops, start, end);
 
-  return ({
-    layer: (
-      use(start || end ? ArrowLayer : LineLayer, {
-        positions,
-        segments,
-        anchors,
-        trims,
-        count: n,
+  const transform = useTransformContext();
 
-        ...flags,
-      })
-    ),
+  const {id} = useFiber();
+  const element = (
+    keyed(start || end ? ArrowLayer : LineLayer, id, {
+      positions,
+      segments,
+      anchors,
+      trims,
+      count: n,
+
+      ...flags,
+    })
+  );
+
+  return yeet({
+    layer: {
+      transform,
+      element,
+    },
   });
-};
-
+}, shouldEqual({
+  origin: sameShallow(),
+  range: sameShallow(sameShallow()),
+}), 'Axis');

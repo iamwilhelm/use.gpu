@@ -5,16 +5,17 @@ import type { FaceLayerFlags } from '../face-layer';
 import type { PointLayerFlags } from './point-layer';
 import type { ArrowLayerFlags } from './arrow-layer';
 import type { TransformContextProps } from '../providers/transform-provider';
+import type { MaterialContextProps } from '../providers/material-provider';
 
-export type LayerType = 'point' | 'line' | 'face';
+export type VirtualLayerType = 'point' | 'line' | 'arrow' | 'face' | 'layer';
 
-export type LayerAggregator = (
+export type VirtualLayerAggregator = (
   device: GPUDevice,
-  items: LayerAggregate[],
+  items: VirtualLayerAggregate[],
   count: number,
   indices?: number,
 ) => (
-  items: LayerAggregate[],
+  items: VirtualLayerAggregate[],
   count: number,
   indices?: number,
 ) => LiveElement;
@@ -24,10 +25,11 @@ export type ShapeAggregate = {
   count: number,
   indices?: number,
   transform?: TransformContextProps,
+  material?: MaterialContextProps,
   zIndex?: number,
 };
 
-export type PointAggregate = {
+export type PointAggregate = ShapeAggregate & {
   flags: PointLayerFlags,
   attributes: {
     position?: TypedArray,
@@ -49,7 +51,7 @@ export type PointAggregate = {
   },
 };
 
-export type LineAggregate = {
+export type LineAggregate = ShapeAggregate & {
   flags: LineLayerFlags,
   attributes: {
     position?: TypedArray,
@@ -74,7 +76,7 @@ export type LineAggregate = {
   },
 };
 
-export type ArrowAggregate = {
+export type ArrowAggregate = ShapeAggregate & {
   flags: ArrowLayerFlags,
   attributes: {
     position?: TypedArray,
@@ -101,7 +103,7 @@ export type ArrowAggregate = {
   },
 };
 
-export type FaceAggregate = {
+export type FaceAggregate = ShapeAggregate & {
   flags: FaceLayerFlags,
   attributes: {
     position?: TypedArray,
@@ -127,9 +129,15 @@ export type FaceAggregate = {
 };
 
 export type LayerAggregate = {
+  transform?: TransformContextProps,
+  material?: MaterialContextProps,
+  element: LiveElement,
+};
+
+export type VirtualLayerAggregate = {
   point: PointAggregate | PointAggregate[],
   line: LineAggregate | LineAggregate[],
   arrow: ArrowAggregate | ArrowAggregate[],
   face: FaceAggregate | FaceAggregate[],
-  layer: LiveElement,
+  layer: LayerAggregate | LayerAggregrate[],
 };

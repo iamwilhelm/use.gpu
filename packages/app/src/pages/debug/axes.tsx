@@ -7,7 +7,7 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, Flat, Animate, LinearRGB,
+  Loop, Pass, FlatCamera, Animate, LinearRGB,
   GeometryData, PBRMaterial, ImageCubeTexture,
   OrbitCamera, OrbitControls,
   Pick, Cursor,

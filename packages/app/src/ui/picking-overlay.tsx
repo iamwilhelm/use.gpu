@@ -2,8 +2,7 @@ import type { LC } from '@use-gpu/live';
 import React, { useOne } from '@use-gpu/live';
 
 import {
-  Flat,
-  PickingContext,
+  FlatCamera, PickingContext,
   useBoundShader, useLambdaSource,
 } from '@use-gpu/workbench';
 import {

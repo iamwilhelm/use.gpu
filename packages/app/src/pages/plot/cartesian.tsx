@@ -3,8 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Loop, Pass, Flat,
-  ArrayData, Data, RawData,
+  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
   Animate,

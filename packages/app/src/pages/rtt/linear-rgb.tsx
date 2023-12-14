@@ -2,7 +2,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React from '@use-gpu/live';
 
 import {
-  Pass, Flat,
+  Pass, FlatCamera,
   OrbitCamera, OrbitControls,
   Pick, Cursor, LinearRGB,
 } from '@use-gpu/workbench';
@@ -30,7 +30,7 @@ export const RTTLinearRGBPage: LC = () => {
           />
         </Pass>
       </Camera>
-      <Flat>
+      <FlatCamera>
         <Pass overlay>
           <UI>
             <Layout>
@@ -59,7 +59,7 @@ export const RTTLinearRGBPage: LC = () => {
             </Layout>
           </UI>
         </Pass>
-      </Flat>
+      </FlatCamera>
     </LinearRGB>
   );
 };

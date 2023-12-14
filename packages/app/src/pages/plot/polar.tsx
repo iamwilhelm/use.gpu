@@ -3,8 +3,7 @@ import type { LC } from '@use-gpu/live';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Loop, Pass, Flat,
-  ArrayData, Data, RawData,
+  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
   Animate,
@@ -29,7 +28,7 @@ export const PlotPolarPage: LC = () => {
   
   return (
     <Loop>
-      <Flat relative>
+      <FlatCamera relative>
         <Pass>
           <Plot>
             <Animate
@@ -127,7 +126,7 @@ export const PlotPolarPage: LC = () => {
             </Animate>
           </Plot>
         </Pass>
-      </Flat>
+      </FlatCamera>
     </Loop>
   );
 };

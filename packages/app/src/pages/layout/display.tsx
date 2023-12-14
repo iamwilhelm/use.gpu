@@ -4,8 +4,7 @@ import React from '@use-gpu/live';
 import { LayoutControls } from '../../ui/layout-controls';
 
 import {
-  LinearRGB, Pass, Flat,
-  PanControls,
+  LinearRGB, Pass, FlatCamera, PanControls,
   DebugProvider,
 } from '@use-gpu/workbench';
 import {
@@ -159,9 +158,9 @@ export const LayoutDisplayPage: LC = () => {
           <PanControls
             active={mode !== 'inspect'}
             render={(x, y, zoom) =>
-              <Flat x={x} y={y} zoom={zoom}>
+              <FlatCamera x={x} y={y} zoom={zoom}>
                 {view}
-              </Flat>
+              </FlatCamera>
             }
         />
       </DebugProvider>

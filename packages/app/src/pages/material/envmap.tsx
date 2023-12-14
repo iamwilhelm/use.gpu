@@ -8,7 +8,7 @@ import { bindBundle, wgsl } from '@use-gpu/shader/wgsl';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, Flat, Animate, LinearRGB, Environment,
+  Loop, Pass, FlatCamera, Animate, LinearRGB, Environment,
   GeometryData, PBRMaterial, ImageCubeTexture, PrefilteredEnvMap, ShaderLitMaterial,
   OrbitCamera, OrbitControls, PanControls, Suspense,
   Pick, Cursor, Data, PointLayer, LineLayer,
@@ -105,7 +105,7 @@ export const MaterialEnvMapPage: LC = (props) => {
                     scroll={zooming}
                     render={(x, y, zoom) =>
                       texture ? (
-                        <Flat x={x} y={y} zoom={zoom}>
+                        <FlatCamera x={x} y={y} zoom={zoom}>
                           <Pass overlay>
                             <UI>
                               <Layout>
@@ -122,7 +122,7 @@ export const MaterialEnvMapPage: LC = (props) => {
                               </Layout>
                             </UI>
                           </Pass>
-                        </Flat>
+                        </FlatCamera>
                       ) : null
                     }
                   />

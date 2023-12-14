@@ -10,7 +10,7 @@ import { GlyphControls } from '../../ui/glyph-controls';
 import { vec3 } from 'gl-matrix';
 
 import {
-  LinearRGB, Pass, Flat, RawTexture,
+  LinearRGB, Pass, FlatCamera, RawTexture,
   OrbitCamera, OrbitControls, PanControls,
   useDeviceContext, useFontContext, LayoutContext, DebugProvider,
 } from '@use-gpu/workbench';
@@ -75,9 +75,9 @@ export const LayoutGlyphPage: LC = () => {
               anchor={[0, 0]}
               render={(x, y, zoom) =>
                 <Morph>
-                  <Flat x={x} y={y} zoom={zoom} focus={1/3}>
+                  <FlatCamera x={x} y={y} zoom={zoom} focus={1/3}>
                     <GlyphView subpixel={subpixel} contours={contours} preprocess={preprocess} postprocess={postprocess} glyph={glyph} />
-                  </Flat>
+                  </FlatCamera>
                 </Morph>
               }
             />

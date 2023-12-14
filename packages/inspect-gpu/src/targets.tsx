@@ -4,7 +4,7 @@ import type { LambdaSource, TextureSource } from '@use-gpu/core';
 import { memo, use, wrap, provide, signal, useFiber, useMemo, useOne, makeContext } from '@use-gpu/live';
 import { LiveCanvas } from '@use-gpu/react';
 import { wgsl } from '@use-gpu/shader/wgsl';
-import { Pass, Flat, FontLoader, Queue, DeviceContext, getBoundShader, getLambdaSource } from '@use-gpu/workbench';
+import { Pass, FlatCamera, FontLoader, Queue, DeviceContext, getBoundShader, getLambdaSource } from '@use-gpu/workbench';
 import { AutoCanvas } from '@use-gpu/webgpu';
 import { UI, Layout, Flex, Block, Inline, Text, Overflow, Absolute } from '@use-gpu/layout';
 
@@ -200,7 +200,7 @@ const Inner: LiveComponent<ViewProps> = memo(({canvas, color, picking, depth}: V
     canvas,
     children: [
       wrap(FontLoader,
-        wrap(Flat,
+        wrap(FlatCamera,
           wrap(Pass,
             wrap(UI,
               wrap(Layout,

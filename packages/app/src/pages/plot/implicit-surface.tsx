@@ -6,8 +6,7 @@ import React, { Gather, Provide } from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, Flat,
-  ArrayData, Data, RawData,
+  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor,
   Animate, Keyframe,

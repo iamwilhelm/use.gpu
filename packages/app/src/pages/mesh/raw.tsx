@@ -4,8 +4,7 @@ import React from '@use-gpu/live';
 import { vec3 } from 'gl-matrix';
 
 import {
-  Loop, Pass, Flat,
-  Data, RawData, Raw, LineSegments,
+  Loop, Pass, FlatCamera, Data, RawData, Raw, LineSegments,
   OrbitCamera, OrbitControls,
   Pick, Cursor, PointLayer, LineLayer,
   RenderToTexture,

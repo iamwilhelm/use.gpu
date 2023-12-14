@@ -243,12 +243,19 @@ export const deprecated = <F extends ArrowFunction>(
 ): LiveFunction<F> => {
   let warning = false;
 
-  return ((props: any) => {
+  const wrapped = (props: any) => {
     if (!warning) {
       console.warn(`<${oldName}> is deprecated. Use <${newName ?? (f as any).displayName ?? f.name}> instead.`);
       warning = true;
     }
     return f(props);
+  };
+  
+  return new Proxy(wrapped, {
+    get: (target, s) => {
+      if (s === 'name') return oldName;
+      return (target as any)[s];
+    },
   }) as any;
 };
 

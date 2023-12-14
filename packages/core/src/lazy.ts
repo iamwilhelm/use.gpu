@@ -18,16 +18,6 @@ export const proxy = <T extends object>(target: T, override: Record<string, any>
   }) as T;
 };
 
-export const proxyRef = <T extends object>(target: T, overrideRef: {current: Record<string, any>}) => {
-  return new Proxy(target, {
-    get: (target, s) => {
-      const {current: override} = overrideRef;
-      if (override != null && Object.hasOwn(override, s)) return resolve((override as any)[s]);
-      return (target as any)[s];
-    },
-  }) as T;
-};
-
 export const pick = <A, B>(
   items: A[],
   accessor: (a: A) => B,

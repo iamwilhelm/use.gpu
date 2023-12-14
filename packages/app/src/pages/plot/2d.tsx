@@ -3,8 +3,7 @@ import type { LC, PropsWithChildren } from '@use-gpu/live';
 import React, { use } from '@use-gpu/live';
 
 import {
-  Loop, Pass, Flat,
-  ArrayData, Data, RawData,
+  Loop, Pass, FlatCamera, ArrayData, Data, RawData,
   PanControls,
   Pick, Cursor,
   Animate,
@@ -209,9 +208,9 @@ const Camera = ({children}: PropsWithChildren<object>) => (
   <PanControls
     active={true}
     render={(x, y, zoom) =>
-      <Flat x={x} y={y} zoom={zoom}>
+      <FlatCamera x={x} y={y} zoom={zoom}>
         {children}
-      </Flat>
+      </FlatCamera>
     }
   />
 );

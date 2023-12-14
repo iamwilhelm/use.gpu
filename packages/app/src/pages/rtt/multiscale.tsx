@@ -6,7 +6,7 @@ import React, { Gather, useRef } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
-  Loop, Pass, Flat, Pick, Cursor,
+  Loop, Pass, FlatCamera, Pick, Cursor,
   RawTexture, RenderTarget, RenderToTexture, FullScreen,
 } from '@use-gpu/workbench';
 import {
@@ -288,7 +288,7 @@ export const RTTMultiscalePage: LC = () => {
       ]) => (
         <Loop live>
           <Cursor cursor="pointer" />
-          <Flat>
+          <FlatCamera>
             <Pick all move render={({x, y, pressed}) => {
               mouseRef.current = [x * dpi, y * dpi];
               paintRef.current = +!!pressed.left;
@@ -384,7 +384,7 @@ export const RTTMultiscalePage: LC = () => {
                 </Layout>
               </UI>
             </Pass>
-          </Flat>
+          </FlatCamera>
         </Loop>
       )}
     />

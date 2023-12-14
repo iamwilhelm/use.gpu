@@ -2,8 +2,7 @@ import type { LC } from '@use-gpu/live';
 import React, { Gather, Yeet } from '@use-gpu/live';
 
 import {
-  LinearRGB, Pass, PanControls, Flat,
-  DebugAtlas, RawTexture, DebugProvider,
+  LinearRGB, Pass, PanControls, FlatCamera, DebugAtlas, RawTexture, DebugProvider,
 } from '@use-gpu/workbench';
 import {
   UI, Layout, Absolute, Inline, Text,
@@ -71,9 +70,9 @@ export const DebugAtlasPage: LC = () => {
             key="atlas"
             active={true}
             render={(x, y, zoom) =>
-              <Flat x={x} y={y} zoom={zoom}>
+              <FlatCamera x={x} y={y} zoom={zoom}>
                 {view}
-              </Flat>
+              </FlatCamera>
             }
           />
         </DebugProvider>

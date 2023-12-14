@@ -7,8 +7,7 @@ import { PickingOverlay } from '../../ui/picking-overlay';
 import earcut from 'earcut';
 
 import {
-  Pass, Flat,
-  Cursor, Pick, Raw,
+  Pass, FlatCamera, Cursor, Pick, Raw,
   CompositeData, LineSegments, FaceSegments,
   OrbitCamera, OrbitControls,
   LineLayer, FaceLayer,
@@ -192,11 +191,11 @@ export const GeometryFacesPage: LC = () => {
       </Pass>
     </Camera>
 
-    <Flat>
+    <FlatCamera>
       <Pass overlay>
         <PickingOverlay />
       </Pass>
-    </Flat>
+    </FlatCamera>
   </>);
 
   return [

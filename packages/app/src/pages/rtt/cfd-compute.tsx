@@ -5,7 +5,7 @@ import React, { Gather, use, useMemo } from '@use-gpu/live';
 import { wgsl } from '@use-gpu/shader/wgsl';
 
 import {
-  Loop, Flat, Pass, OrbitCamera, RawData, PointLayer, Pick,
+  Loop, FlatCamera, Pass, OrbitCamera, RawData, PointLayer, Pick,
   ComputeBuffer, Compute, Stage, Iterate, Kernel, Suspense, RawFullScreen,
   useBoundShader, useLambdaSource, useShaderRefs,
 } from '@use-gpu/workbench';
@@ -156,7 +156,7 @@ export const RTTCFDComputePage: LC = () => {
                 </Suspense>
               </Compute>
 
-              <Flat>
+              <FlatCamera>
                 <Pass>
 
                   <VisualizeField field={velocity} />
@@ -185,7 +185,7 @@ export const RTTCFDComputePage: LC = () => {
                   ) : null}
 
                 </Pass>
-              </Flat>
+              </FlatCamera>
 
             </Loop>
           </>)}

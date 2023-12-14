@@ -20,7 +20,7 @@ How to center text inside a centered box. Yes, horizontally and vertically. Wow.
 
 ```tsx
 return (
-  <Flat>
+  <FlatCamera>
 
     <Pass>
       <UI>
@@ -38,7 +38,7 @@ return (
       </UI>
     </Pass>
 
-  </Flat>
+  </FlatCamera>
 );
 ```
 

@@ -6,8 +6,7 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import { clamp } from '@use-gpu/core';
 
 import {
-  Loop, Pass, Flat,
-  ArrayData, Data, DataShader, RawData,
+  Loop, Pass, FlatCamera, ArrayData, Data, DataShader, RawData,
   OrbitCamera, OrbitControls,
   Pick, Cursor, Fetch,
   PointLayer,

@@ -94,7 +94,7 @@ export const chainTransform = (
   const combinedPos  = chainTo(transformA, transformB);
 
   const combinedDiff = differentialA && differentialB
-      ? getBoundShader(getChainDifferential, [transform, differentialA, differentialB])
+      ? getBoundShader(getChainDifferential, [transformA, differentialA, differentialB])
       : null;
 
   const combinedBounds = boundsB && boundsA

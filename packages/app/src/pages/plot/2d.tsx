@@ -85,6 +85,20 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
+            <Transform position={[190, 400]}>
+              <Transform rotation={[0, 0, 60]}>
+                <Line
+                  positions={[
+                    [[-50, -50], [50, -50], [50, 50], [-50, 50]],
+                  ]}
+                  width={10}
+                  color={['#ffa040']}
+                  depth={1}
+                  loop
+                />
+              </Transform>
+            </Transform>
+
             <Line
               positions={[
                 [[550, 50], [500, 150], [600, 150]],

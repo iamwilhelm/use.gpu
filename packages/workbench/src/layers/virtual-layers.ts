@@ -24,6 +24,8 @@ import { ArrowLayer } from './arrow-layer';
 
 import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA } from './schemas';
 
+const DEBUG = true;
+
 export type VirtualLayersProps = {
   items?: Record<string, LayerAggregate[]>,
   children: LiveElement,
@@ -109,133 +111,37 @@ const Aggregate: LiveFunction<any> = (
   return render(items, count, indices);
 };
 
-const makePointAccumulator = (
-  device: GPUDevice,
-  items: PointAggregate[],
-  alloc: number,
-) => {
-  const [{attributes}] = items;
-  const aggregate = schemaToAggregate(device, POINT_SCHEMA, attributes, alloc);
-
-  return (items: PointAggregate[], count: number) => {
-    const [item] = items;
-    const {transform} = item;
-    const props = {count, ...item.flags} as Record<string, any>;
-
-    updateAggregateFromSchema(device, POINT_SCHEMA, aggregate, items, props, count);
-    console.log('point', {props, aggregate});
-    
-    const layer = use(PointLayer, props);
-
-    const hasTransform = transform?.key;
-    return hasTransform ? provide(TransformContext, transform, layer) : layer;
-  };
-}
-
-const makeLineAccumulator = (
+const makeSchemaAccumulator = (
+  schema: AggregateSchema,
+  Component: LiveComponent,
+) => (
   device: GPUDevice,
   items: LineAggregate[],
-  alloc: number,
+  allocCount: number,
+  allocIndices: number,
 ) => {
   const [{attributes}] = items;
-  const aggregate = schemaToAggregate(device, LINE_SCHEMA, attributes, alloc);
-
-  return (items: LineAggregate[], count: number) => {
-    const [item] = items;
-    const {transform} = item;
-    const props = {count, ...item.flags} as Record<string, any>;
-
-    updateAggregateFromSchema(device, LINE_SCHEMA, aggregate, items, props, count);
-    console.log('line', {props, aggregate});
-    
-    const layer = use(LineLayer, props);
-    const hasTransform = transform?.key;
-    return hasTransform ? provide(TransformContext, transform, layer) : layer;
-  };
-};
-
-const makeArrowAccumulator = (
-  device: GPUDevice,
-  items: LineAggregate[],
-  alloc: number,
-) => {
-  const [{attributes}] = items;
-  const aggregate = schemaToAggregate(device, ARROW_SCHEMA, attributes, alloc);
+  const aggregate = schemaToAggregate(device, schema, attributes, allocCount, allocIndices);
 
   return (items: ArrowAggregate[], count: number) => {
     const [item] = items;
     const {transform} = item;
     const props = {count, ...item.flags} as Record<string, any>;
 
-    updateAggregateFromSchema(device, ARROW_SCHEMA, aggregate, items, props, count);
-    console.log('arrow', {props, aggregate});
+    updateAggregateFromSchema(device, schema, aggregate, items, props, count);
+    DEBUG && console.log(Component.name, {props, aggregate});
     
-    const layer = use(ArrowLayer, props);
+    const layer = use(Component, props);
     const hasTransform = transform?.key;
     return hasTransform ? provide(TransformContext, transform, layer) : layer;
   };
 };
 
-const makeFaceAccumulator = (
-  device: GPUDevice,
-  items: LineAggregate[],
-  allocCount: number,
-  allocIndices: number,
-) => {
-  /*
-  const storage = {} as Record<string, AggregateBuffer>;
-
-  const hasPosition = keys.has('positions') || keys.has('position');
-  const hasIndex = keys.has('indices') || keys.has('index');
-  const hasSegment = keys.has('segments') || keys.has('segment');
-  const hasColor = keys.has('colors') || keys.has('color');
-  const hasZBias = keys.has('zBiases') || keys.has('zBias');
-  const hasID = keys.has('id') || keys.has('ids');
-  const hasLookup = keys.has('lookup') || keys.has('lookups');
-  const hasCullMode = keys.has('cullMode');
-
-  if (hasIndex) storage.indices = makeAggregateBuffer(device, 'u32', allocIndices);
-  else storage.segments = makeAggregateBuffer(device, 'i32', allocCount);
-
-  if (hasPosition) storage.positions = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
-  if (hasColor) storage.colors = makeAggregateBuffer(device, 'vec4<f32>', allocCount);
-  if (hasZBias) storage.zBiases = makeAggregateBuffer(device, 'f32', allocCount);
-  if (hasID) storage.ids = makeAggregateBuffer(device, 'u32', allocCount);
-  if (hasLookup) storage.lookups = makeAggregateBuffer(device, 'u32', allocCount);
-
-  return (items: FaceAggregate[], count: number, indices: number) => {
-    const props = {count} as Record<string, any>;
-
-    const {chunks, loops} = gatherItemChunks(items);
-    const offsets = accumulate(chunks);
-
-    if (hasIndex) {
-      props.count = indices / 3;
-      props.indices = updateAggregateIndex(device, storage.indices, items, indices, offsets, 'index', 'indices');
-    }
-    else {
-      if (hasSegment) props.segments = updateAggregateBuffer(device, storage.segments, items, count, 'segment', 'segments');
-      //else props.segments = updateAggregateFaces(device, storage.segments, chunks, loops, count);
-    }
-
-    if (hasPosition) props.positions = updateAggregateBuffer(device, storage.positions, items, count, 'position', 'positions');
-    if (hasColor) props.colors = updateAggregateBuffer(device, storage.colors, items, count, 'color', 'colors');
-    if (hasZBias) props.zBiases = updateAggregateBuffer(device, storage.zBiases, items, count, 'zBias', 'zBiases');
-    if (hasID) props.ids = updateAggregateBuffer(device, storage.ids, items, count, 'id', 'ids');
-    if (hasLookup) props.lookups = updateAggregateBuffer(device, storage.lookups, items, count, 'lookup', 'lookups');
-
-    if (hasCullMode) props.pipeline = {primitive: {cullMode: items[0]?.cullMode}};
-
-    return use(FaceLayer, props);
-  };
-  */
-};
-
 const AGGREGATORS = {
-  'arrow': makeArrowAccumulator,
-  'face': makeFaceAccumulator,
-  'line': makeLineAccumulator,
-  'point': makePointAccumulator,
+  'arrow': makeSchemaAccumulator(ARROW_SCHEMA, ArrowLayer),
+  'face': makeSchemaAccumulator(FACE_SCHEMA, FaceLayer),
+  'line': makeSchemaAccumulator(LINE_SCHEMA, LineLayer),
+  'point': makeSchemaAccumulator(POINT_SCHEMA, PointLayer),
   'label': () => () => {},
 } as Record<string, LayerAggregator>;
 

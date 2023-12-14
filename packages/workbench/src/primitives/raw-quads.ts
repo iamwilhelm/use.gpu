@@ -14,7 +14,7 @@ import { makeShaderBindings, resolve } from '@use-gpu/core';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
@@ -89,7 +89,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const getVertex = useBoundShader(getQuadVertex, [positions, scissor, r, c, d, z, u, s, instanceCount]);
   const getPicking = usePickingShader(props);
-  const applyMask = m ? useBoundShader(getMaskedColor, [m]) : null;
+  const applyMask = m ? useBoundShader(getMaskedColor, [m]) : useNoBoundShader();
 
   const links = useMemo(() => ({
     getVertex,

@@ -344,11 +344,15 @@ export const generateChunkSegments2 = (
   let n = chunks.length;
   let o = 0;
 
+  const hasLoop = !!loops;
+  const hasStart = !!starts;
+  const hasEnd = !!ends;
+
   for (let i = 0; i < n; ++i) {
     const c = chunks[i];
-    const l = (loops as any)[i] ?? !!loops;
-    const s = starts === true || (starts as any)[i];
-    const e = ends === true || (ends as any)[i];
+    const l = hasLoop && (loops === true || loops[i]);
+    const s = hasStart && (starts === true || starts[i]);
+    const e = hasEnd && (ends === true || ends[i]);
 
     const b = pos;
 
@@ -393,7 +397,7 @@ export const generateChunkAnchors2 = (
   anchors: NumberArray,
   trims: NumberArray,
   chunks: number[],
-  loops: boolean[] = NO_LOOPS,
+  loops: boolean[] | boolean = false,
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
 ) => {
@@ -401,6 +405,7 @@ export const generateChunkAnchors2 = (
   const n = chunks.length;
   for (let i = 0; i < trims.length; ++i) trims[i] = 0;
 
+  const hasLoop = !!loops;
   const hasStart = !!starts;
   const hasEnd = !!ends;
 
@@ -408,8 +413,7 @@ export const generateChunkAnchors2 = (
   let pos = 0;
   if (hasStart || hasEnd) for (let i = 0; i < n; ++i) {
     const c = chunks[i];
-    const l = loops[i];
-
+    const l = hasLoop && (loops === true || loops[i]);
     const s = hasStart && (starts === true || starts[i]);
     const e = hasEnd && (ends === true || ends[i]);
 
@@ -448,29 +452,17 @@ export const generateChunkFaces2 = (
   to: NumberArray,
   lookup: NumberArray | null | undefined,
   chunks: number[],
-  loops: boolean[] = NO_LOOPS,
 ) => {
   let pos = 0;
   let n = chunks.length;
 
   for (let i = 0; i < n; ++i) {
     const c = chunks[i];
-    const l = loops[i];
 
     const b = pos;
-    if (l) to[pos++] = 0;
     if (c) {
-      if (c < 3) {
-        for (let i = 0; i < c; ++i) to[pos++] = 0;
-      }
-      else {
-        for (let i = 0; i < c - 2; ++i) to[pos++] = i + 1;
-        to[pos++] = 0;
-        to[pos++] = 0;
-      }
-    }
-    if (l) {
-      to[pos++] = 0;
+      for (let i = 0; i < c - 2; ++i) to[pos++] = i + 1;
+      if (c > 1) to[pos++] = 0;
       to[pos++] = 0;
     }
     

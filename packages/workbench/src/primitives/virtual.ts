@@ -1,6 +1,6 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { VirtualDraw } from '../pass/types';
-import { memo, use, useMemo } from '@use-gpu/live';
+import { memo, use, useMemo, useRef } from '@use-gpu/live';
 
 import { useInspectHoverable } from '../hooks/useInspectable';
 import { usePassContext } from '../providers/pass-provider';
@@ -21,7 +21,11 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     return variants.map(component => use(component, props));
   }
   else if (variants) {
+    // Inline static virtuals
     const component = variants;
-    return component(props);
+    const componentRef = useRef(component);
+
+    if (component === componentRef) return component(props);
+    else return use(component, props);
   }
 }, 'Virtual');

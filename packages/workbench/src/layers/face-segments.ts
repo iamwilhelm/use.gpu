@@ -1,13 +1,12 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 
-import { memo, yeet, useMemo } from '@use-gpu/live';
-import { accumulateChunks, generateChunkFaces } from '@use-gpu/core';
+import { memo, yeet, useOne } from '@use-gpu/live';
+import { generateChunkFaces2, alignSizeTo2 } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type FaceSegmentsProps = {
   chunks?: number[],
-  loops?: boolean[],
 
   render?: (segments: StorageSource, lookups: StorageSource) => LiveElement,
 };
@@ -16,24 +15,38 @@ export type FaceSegmentsProps = {
 export const FaceSegments: LiveComponent<FaceSegmentsProps> = memo((
   props: FaceSegmentsProps,
 ) => {
-  const {chunks, loops, render} = props;
+  const {chunks, render} = props;
   if (!chunks) return null;
   
-  const count = accumulateChunks(chunks, loops);
-
-  // Make segment/lookup data for face segments data
-  const [segmentBuffer, lookupBuffer] = useMemo(() => {
-    const segmentBuffer = new Int32Array(count);
-    const lookupBuffer = new Uint32Array(count);
-
-    generateChunkFaces(segmentBuffer, lookupBuffer, chunks, loops);
-
-    return [segmentBuffer, lookupBuffer];
-  }, [chunks, loops, count]);
-
-  // Bind as shader storage
-  const segments = useRawSource(segmentBuffer, 'i32');
-  const lookups = useRawSource(lookupBuffer, 'u32');
-
+  const {segments, lookups} = useFaceSegmentsSource(chunks);
   return render ? render(segments, lookups) : yeet([segments, lookups]);
 }, 'FaceSegments');
+
+export const useFaceSegments = (
+  chunks: number[] | TypedArray,
+) => {
+  return useOne(() => {
+    const count = (
+      chunks.reduce((a, b, i) => a + b, 0)
+    );
+
+    const segments = new Int8Array(alignSizeTo2(count, 4));
+    const lookups = new Uint16Array(alignSizeTo2(count, 2));
+
+    generateChunkFaces2(segments, lookups, chunks);
+
+    return {count, segments, lookups};
+  }, chunks);
+};
+
+export const useFaceSegmentsSource = (
+  chunks: number[] | TypedArray,
+) => {
+  const {count, segments, lookups} = useFaceSegments(chunks);
+
+  // Bind as shader storage
+  const s = useRawSource(segmentBuffer, 'i8');
+  const l = useRawSource(lookupBuffer, 'u32');
+
+  return {count, segments: s, lookups: l};
+};

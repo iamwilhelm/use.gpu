@@ -41,7 +41,7 @@ import {
   parsePointShape,
 } from '@use-gpu/parse';
 import { generateChunkSegments2 } from '@use-gpu/core';
-import { useLineSegments, useArrowSegments } from '@use-gpu/workbench';
+import { useArrowSegments, useFaceSegments, useLineSegments } from '@use-gpu/workbench';
 
 import { vec4 } from 'gl-matrix';
 
@@ -86,6 +86,14 @@ export const AxisTrait = trait(
   {
     axis: 'x',
   }
+);
+
+export const FaceTrait = trait(
+  {
+    flat: optional(parseBoolean),
+    fragDepth: optional(parseBoolean),
+    shaded: optional(parseBoolean),
+  },
 );
 
 export const FontTrait = trait(
@@ -417,6 +425,39 @@ export const ArrowSegmentsTrait = combine(
   },
 );
 
+export const FaceSegmentsTrait = combine(
+  SegmentsTrait,
+  LoopsTrait,
+  DirectedsTrait,
+  (
+    props: {},
+    parsed: {
+      chunks?: TypedArray,
+      loop?: boolean | TypedArray,
+      loops?: TypedArray,
+      start?: boolean | TypedArray,
+      starts?: TypedArray,
+      end?: boolean | TypedArray,
+      ends?: TypedArray,
+
+      count?: number,
+      sparse?: number,
+      segments?: TypedArray,
+      anchors?: TypedArray,
+      trims?: TypedArray,
+      unwelds?: TypedArray,
+      lookups?: TypedArray,
+    },
+  ) => {
+    const {chunks, loop, loops, start, starts, end, ends} = parsed;
+    console.log({chunks, loop, loops, start, starts, end, ends})
+    if (!chunks) return;
+
+    const arrow = useFaceSegments(chunks, loop || loops, start || starts, end || ends);
+    for (const k in arrow) parsed[k] = arrow[k];
+  },
+);
+
 export const PointsTrait = combine(
   ColorsTrait(),
   trait({
@@ -474,4 +515,24 @@ export const ArrowsTrait = combine(
     lookups: optional(parseScalarArray),
   }),
   ArrowSegmentsTrait,  
+);
+
+export const FacesTrait = combine(
+  ColorsTrait({ composite: true }),
+  trait({
+    position: optional(parsePositionArray),
+    positions: optional(parsePositionMultiArray),
+    size: optional(parseScalarArrayLike),
+    sizes: optional(parseScalarMultiArray),
+    depth: optional(parseScalarArrayLike),
+    depths: optional(parseScalarMultiArray),
+    zBias: optional(parseScalarArrayLike),
+    zBiases: optional(parseScalarMultiArray),
+
+    id: optional(parseNumber),
+    ids: optional(parseScalarArray),
+    lookup: optional(parseNumber),
+    lookups: optional(parseScalarArray),
+  }),
+  FaceSegmentsTrait,  
 );

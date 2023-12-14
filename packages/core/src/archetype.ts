@@ -105,7 +105,7 @@ export const schemaToAggregate = (
   schema: ArchetypeSchema,
   props: Record<string, any>,
   count: number,
-  indices: number,
+  indices: number = 0,
 ): Record<string, AggregateBuffer> => {
   const out: Record<string, any> = {};
   for (const key in schema) {

@@ -5,6 +5,7 @@ export * from './providers/range-provider';
 export * from './layer/axis';
 
 export * from './shape/arrow';
+export * from './shape/face';
 export * from './shape/line';
 export * from './shape/point';
 /*

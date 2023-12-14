@@ -10,7 +10,7 @@ import {
   Animate,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Point, Line, Arrow, Transform,
+  Plot, Cartesian, Axis, Grid, Point, Line, Arrow, Face, Transform,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -27,19 +27,19 @@ export const Plot2DPage: LC = () => {
         <Pass>
           <Plot>
 
-            <Transform position={[50, 100]} rotation={[0, 0, 90]}>
+            <Point
+              position={[50, 50]}
+              size={20}
+              color={'#ffffff'}
+            />
+
+            <Transform position={[50, 100]} rotation={[0, 0, 90]} scale={[2, 1]}>
               <Point
                 positions={[[0, 0], [10, 0], [20, 0], [30, 0], [40, 0]]}
                 size={10}
                 color={'#3090ff'}
               />
             </Transform>
-
-            <Point
-              position={[50, 50]}
-              size={20}
-              color={'#ffffff'}
-            />
 
             <Line
               position={[[100, 50], [150, 150]]}
@@ -125,10 +125,29 @@ export const Plot2DPage: LC = () => {
             </Transform>
             
             <Arrow
-              position={[[100, 200], [150, 250], [100, 300], [150, 350]]}
+              position={[[100, 200], [150, 350]]}
               width={10}
               color={"#3090ff"}
               end
+            />
+
+            <Transform position={[150, 450]} rotation={[0, 0, 20]}>
+              <Arrow
+                positions={[
+                  [[-50, -50], [0, 0], [-50, 50], [0, 100]],
+                  [[50, 50], [100, 100], [50, 150], [100, 200]],
+                ]}
+                width={10}
+                color={"#40a030"}
+                start={true}
+                ends={[false, true]}
+                depth={1}
+              />
+            </Transform>
+            
+            <Face
+              position={[[0, 0], [50, 0], [100, 100], [50, 100]]}
+              color={"#123456"}
             />
 
             <Cartesian

@@ -1,49 +1,47 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { TraitProps } from '@use-gpu/traits/live';
+import type { VectorLike } from '@use-gpu/traits';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
-import { schemaToArchetype, schemaToAttributes } from '@use-gpu/core';
+import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { useInspectHoverable, useTransformContext, POINT_SCHEMA } from '@use-gpu/workbench';
-
-//import { PointLayer } from '@use-gpu/workbench';
-//import { DataContext } from '../providers/data-provider';
+import { getFaceSegments, useInspectHoverable, useTransformContext, FACE_SCHEMA } from '@use-gpu/workbench';
 
 import {
-  PointsTrait,
+  FacesTrait,
 
-  MarkerTrait,
-  PositionTrait,
-  PointTrait,
+  FaceTrait,
+  LineTrait,
   ROPTrait,
+  StrokeTrait,
   ZIndexTrait,
 } from '../traits';
 
 const Traits = combine(
-  PointsTrait,
+  FacesTrait,
 
-  MarkerTrait,
-  PositionTrait,
-  PointTrait,
+  FaceTrait,
+  LineTrait,
   ROPTrait,
+  StrokeTrait,
   ZIndexTrait,
 );
 const useTraits = makeUseTrait(Traits);
 
-export type PointProps = TraitProps<typeof Traits>;
+export type FaceProps = TraitProps<typeof Traits>;
 
-export const Point: LiveComponent<PointProps> = memo((props) => {
+export const Face: LiveComponent<FaceProps> = memo((props) => {
+
   const parsed = useTraits(props);
   const {
       position,
       positions,
       color,
       colors,
-      size,
-      sizes,
+      width,
+      widths,
       depth,
       depths,
       zBias,
@@ -55,25 +53,38 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       lookup,
       lookups,
 
+      count,
+      sparse,
+      chunks,
+      loop,
+      loops,
+      start,
+      starts,
+      end,
+      ends,
+
+      segments,
+      anchors,
+      trims,
+      unwelds,
       ...flags
   } = parsed;
 
-  console.log('point', {parsed, flags});
-  
+  console.log('face', {parsed, flags});
+
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
   const transform = useTransformContext();
 
-  const archetype = schemaToArchetype(POINT_SCHEMA, parsed, flags);
-  const attributes = schemaToAttributes(POINT_SCHEMA, parsed);
+  const archetype = schemaToArchetype(FACE_SCHEMA, parsed, flags);
+  const attributes = schemaToEmitters(FACE_SCHEMA, parsed);
 
-  const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
   console.log({count, attributes});
-  if (Number.isNaN(count)) debugger;
+  if (!count || Number.isNaN(count)) debugger;
 
   const shapes = {
-    point: {
+    face: {
       count,
       archetype,
       attributes,
@@ -87,4 +98,5 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
 }, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),
-}), 'Point');
+}), 'Face');
+

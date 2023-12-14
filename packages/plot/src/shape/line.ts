@@ -7,7 +7,7 @@ import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { getLineSegments, useTransformContext, LINE_SCHEMA } from '@use-gpu/workbench';
+import { getLineSegments, useInspectHoverable, useTransformContext, LINE_SCHEMA } from '@use-gpu/workbench';
 
 //import { PointLayer } from '@use-gpu/workbench';
 //import { DataContext } from '../providers/data-provider';
@@ -64,6 +64,9 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
   } = parsed;
 
   console.log('line', {parsed, flags});
+
+  const hovered = useInspectHoverable();
+  if (hovered) flags.mode = "debug";
 
   const transform = useTransformContext();
 

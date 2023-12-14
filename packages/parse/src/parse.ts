@@ -176,6 +176,14 @@ export const makeParseBasis = (defaults: string) => {
   };
 };
 
+export const parseRotation = (vec?: VectorLike | number): vec3 => {
+  if (vec != null) {
+    if (typeof vec === 'number') return vec3.fromValues(0, 0, vec);
+    return vec3.fromValues(vec[0] ?? 0, vec[1] ?? 0, vec[2] ?? 0);
+  }
+  return defaults;
+};
+
 ///////////////////////////
 
 export const clampNumber = (
@@ -318,8 +326,7 @@ export const parseChunks = toCompositeChunks;
 //////////////////
 
 export const parsePosition   = makeParseVec4(NO_POSITION);
-export const parseRotation   = makeParseVec3();
-export const parseQuaternion = makeParseVec4();
+export const parseQuaternion = makeParseVec4(NO_QUAT);
 export const parseScale      = makeParseVec3(NO_SCALE);
 export const parseMatrix     = makeParseMat4();
 

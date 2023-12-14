@@ -7,7 +7,7 @@ import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import { MatrixContext, TransformContext, useCombinedMatrixTransform } from '@use-gpu/workbench';
+import { MatrixContext, TransformContext, useCombinedMatrixTransform, useCombinedMatrix, useNoCombinedMatrix } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -30,6 +30,8 @@ export const Transform: LiveComponent<TransformProps> = (props: PropsWithChildre
   const {
     children,
   } = props;
+
+  if (!children) return;
 
   const {
     axes: a,
@@ -60,12 +62,22 @@ export const Transform: LiveComponent<TransformProps> = (props: PropsWithChildre
     return matrix;
   }, [a, p, r, q, s, m]);
 
-  const [context, combined] = useCombinedMatrixTransform(matrix);
+  const isArray = Array.isArray(children)
+  const nested = isArray ? !children.find(c => c.f !== Transform) : children.f === Transform;
+  
+  if (false && nested) {
+    const combined = useCombinedMatrix(matrix);
+    return provide(MatrixContext, combined, children);
+  }
+  else {
+    useNoCombinedMatrix();
+    const [context, combined] = useCombinedMatrixTransform(matrix);
 
-  return [
-    signal(),
-    provide(MatrixContext, combined,
-      provide(TransformContext, context, children ?? []),
-    ),
-  ];
+    return [
+      signal(),
+      provide(MatrixContext, combined,
+        provide(TransformContext, context, children),
+      ),
+    ];
+  }
 };

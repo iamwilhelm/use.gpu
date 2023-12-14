@@ -63,7 +63,7 @@ export const useCombinedMatrixTransform = (
 
   const context = useMemo(() => {
     const chained = chainTransform(props, parent.matrix ?? parent);
-    return {...chained, matrix: parent.matrix};
+    return {...chained, matrix: parent.matrix ?? {}};
   }, [props, parent]);
 
   return [context, combined];

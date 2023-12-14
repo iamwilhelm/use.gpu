@@ -85,7 +85,7 @@ export const PlotImplicitSurfacePage: LC = () => {
   `;
 
   const root = document.querySelector('#use-gpu .canvas');
-  const keyframes = [[0, 0], [23, 1.0]] as Keyframe<number>[];
+  const keyframes = [[0, 0], [23, 1.0]] as Keyframe[];
 
   return (
     <SurfaceControls

@@ -25,7 +25,7 @@ export const Virtual: LiveComponent<VirtualProps> = memo((props: VirtualProps) =
     const component = variants;
     const componentRef = useRef(component);
 
-    if (component === componentRef) return component(props);
+    if (component === componentRef.current) return component(props);
     else return use(component, props);
   }
 }, 'Virtual');

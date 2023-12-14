@@ -18,6 +18,11 @@ let t = 0;
 
 const BACKGROUND = [0, 0, 0.09, 1];
 
+const KEYFRAMES = [
+  [ 0, 0],
+  [10, 360],
+] as Keyframe[];
+
 export const Plot2DPage: LC = () => {
   
   return (
@@ -26,7 +31,7 @@ export const Plot2DPage: LC = () => {
       <Camera>
         <Pass>
           <Plot>
-
+            
             <Point
               position={[50, 50]}
               size={20}
@@ -85,20 +90,6 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
-            <Transform position={[190, 400]}>
-              <Transform rotation={[0, 0, 60]}>
-                <Line
-                  positions={[
-                    [[-50, -50], [50, -50], [50, 50], [-50, 50]],
-                  ]}
-                  width={10}
-                  color={['#ffa040']}
-                  depth={1}
-                  loop
-                />
-              </Transform>
-            </Transform>
-
             <Line
               positions={[
                 [[550, 50], [500, 150], [600, 150]],
@@ -123,15 +114,33 @@ export const Plot2DPage: LC = () => {
                 loop
               />
             </Transform>
+
+            <Transform scale={[1.5, 1.5]}>
+              <Transform position={[100, 450]}>
+                <Animate keyframes={KEYFRAMES} prop="rotation" ease="linear">
+                  <Transform rotation={30}>
+                    <Line
+                      positions={[
+                        [[-50, -50], [50, -50], [50, 50], [-50, 50]],
+                      ]}
+                      width={10}
+                      color={['#ffa040']}
+                      depth={1}
+                      loop
+                    />
+                  </Transform>
+                </Animate>
+              </Transform>
+            </Transform>
             
             <Arrow
-              position={[[100, 200], [150, 350]]}
+              position={[[100, 200], [250, 300]]}
               width={10}
               color={"#3090ff"}
               end
             />
 
-            <Transform position={[150, 450]} rotation={[0, 0, 20]}>
+            <Transform position={[100, 350]} rotation={-20}>
               <Arrow
                 positions={[
                   [[-50, -50], [0, 0], [-50, 50], [0, 100]],
@@ -155,6 +164,7 @@ export const Plot2DPage: LC = () => {
               position={[300, 500, 1]}
               scale={[200, 100, 1]}
             >
+            {/*
               <Grid
                 axes='xy'
                 width={2}
@@ -164,6 +174,7 @@ export const Plot2DPage: LC = () => {
                 zBias={-1}
                 auto
               />
+            */}
 
               <Axis
                 axis='x'

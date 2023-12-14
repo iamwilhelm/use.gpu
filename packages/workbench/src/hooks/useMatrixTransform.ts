@@ -55,8 +55,8 @@ export const useMatrixTransform = (
 
   useOne(() => {
     const m = matrix ?? NO_MATRIX;
-    refs.matrix = m;
-    mat3.normalFromMat4(refs.normalMatrix, m);
+    refs.matrix.current = m;
+    mat3.normalFromMat4(refs.normalMatrix.current, m);
   }, matrix);
 
   return useOne(() => {

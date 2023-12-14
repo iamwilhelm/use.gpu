@@ -45,7 +45,7 @@ const ANIMATED_LIGHT = Array(N+1).fill(0).map((_, i) => [
     20 + R * Math.sin(i / N * τ),
     1
   ],
-]) as Keyframe<any>[];
+]) as Keyframe[];
 
 const STATIC_LIGHTS = [
   [[-15, 12, -28, 1], [1, .5, .5, 1], 40*40*.5],

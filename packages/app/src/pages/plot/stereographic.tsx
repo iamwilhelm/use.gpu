@@ -38,7 +38,7 @@ export const PlotStereographicPage: LC = () => {
     [1, 0],
     [10, 1],
     [11, 1],
-  ] as Keyframe<number>[];
+  ] as Keyframe[];
 
   const view = (normalize: number) => (
     <Loop>

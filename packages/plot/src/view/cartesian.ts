@@ -7,9 +7,7 @@ import { trait, combine, makeUseTrait } from '@use-gpu/traits/live';
 import { parseMatrix, parsePosition, parseRotation, parseQuaternion, parseScale } from '@use-gpu/parse';
 import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
-import {
-  TransformContext, useCombinedMatrixTransform,
-} from '@use-gpu/workbench';
+import { TransformContext, MatrixContext, useCombinedMatrixTransform } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
 import { composeTransform } from '../util/compose';
@@ -73,14 +71,14 @@ export const Cartesian: LiveComponent<CartesianProps> = (props: PropsWithChildre
     return matrix;
   }, [g, a, p, r, q, s, m]);
 
-  const context = useCombinedMatrixTransform(matrix);
+  const [context, combined] = useCombinedMatrixTransform(matrix);
 
   return [
     signal(),
     provide(TransformContext, context,
-      provide(RangeContext, g, children ?? [])
+      provide(MatrixContext, combined,
+        provide(RangeContext, g, children ?? [])
+      )
     )
   ];
 };
-
-

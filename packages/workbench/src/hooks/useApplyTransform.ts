@@ -26,11 +26,8 @@ export const useApplyTransform = (
   const context = useTransformContext();
   const scissor = useScissorContext();
   
-  const {matrix, transform, bounds} = context;
-  const version = useVersion(matrix) + useVersion(positions) + useVersion(transform) + useVersion(scissor) + useVersion(bounds);
-
-  const matrixBounds = matrix && bounds ? useMatrixBounds(matrix) : useNoMatrixBounds();
-  const matrixTransform = matrix ? useMatrixTransform(matrix, matrixBounds) : useNoMatrixTransform();
+  const {transform, bounds} = context;
+  const version = useVersion(positions) + useVersion(transform) + useVersion(scissor) + useVersion(bounds);
 
   return useOne(() => {
     if (positions == null) return {
@@ -40,17 +37,15 @@ export const useApplyTransform = (
     };
 
     const getPosition = sourceToModule(positions) ?? bindingToModule(makeShaderBinding(TRANSFORM_BINDING, positions));
-    if (matrix == null && transform == null && scissor == null) return {
+    if (transform == null && scissor == null) return {
       positions: getPosition,
       scissor: null,
       bounds,
     };
 
     let xform = context;
-    if (matrixTransform) xform = chainTransform(matrixTransform, xform);
-
     return {
-      positions: xform?.transform ? chainTo(getPosition, xform.transform) : getPosition,
+      positions: transform ? chainTo(getPosition, transform) : getPosition,
       scissor: scissor ? chainTo(getPosition, scissor) : null,
       bounds,
     };

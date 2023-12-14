@@ -7,17 +7,15 @@ export type TransformBounds = (bounds: DataBounds) => DataBounds;
 
 export type TransformContextProps = {
   key: number,
-  matrix: mat4 | null,
-  normalMatrix: mat4 | null,
   transform: ShaderModule | null,
   differential: ShaderModule | null,
   bounds: TransformBounds,
+
+  matrix?: TransformContextProps,
 };
 
 export const DEFAULT_TRANSFORM = {
   key: 0,
-  matrix: null,
-  normalMatrix: null,
   transform: null,
   differential: null,
   bounds: (b: DataBounds) => b,

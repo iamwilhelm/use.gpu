@@ -7,7 +7,7 @@ import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   Scissor, TransformContext,
-  useShaderRef, useBoundShader, useCombinedTransform,
+  useShaderRef, useBoundShader, useCombinedEpsilonTransform,
 } from '@use-gpu/workbench';
 
 import {
@@ -133,7 +133,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
     return chainTo(swizzleTo('vec4<f32>', 'vec4<f32>', swizzle), bound);
   }, [bound, swizzle]);
 
-  const context = useCombinedTransform({ transform: xform }, e);
+  const context = useCombinedEpsilonTransform(xform, e);
 
   const view = scissor ? use(Scissor, {range: scissorRange, loop: MERCATOR_LOOP, children}) : children;
 

@@ -55,7 +55,7 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
 
   const ref = useShaderRef(matrix);
   const bound = useBoundShader(getCartesianPosition, [ref]);
-  const context = useCombinedTransform({ transform: bound });
+  const context = useCombinedTransform(bound);
 
   return (
     provide(TransformContext, context,

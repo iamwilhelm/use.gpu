@@ -134,7 +134,9 @@ const makePointAccumulator = (
     console.log('point', {props, aggregate});
     
     const layer = use(PointLayer, props);
-    return transform?.key ? provide(TransformContext, transform, layer) : layer;
+
+    const hasTransform = transform?.key;
+    return hasTransform ? provide(TransformContext, transform, layer) : layer;
   };
 }
 
@@ -155,8 +157,8 @@ const makeLineAccumulator = (
     console.log('line', {props, aggregate});
     
     const layer = use(LineLayer, props);
-    const hasTransform = (transform?.transform || transform?.matrix);
-    return transform?.key ? provide(TransformContext, transform, layer) : layer;
+    const hasTransform = transform?.key;
+    return hasTransform ? provide(TransformContext, transform, layer) : layer;
   };
 };
 

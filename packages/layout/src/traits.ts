@@ -39,7 +39,7 @@ const ImageTrait = trait({
   align: parseAnchorXY,
 });
 
-const ElementTrait = {
+const ElementTrait = trait({
   width: optional(parseDimension),
   height: optional(parseDimension),
   aspect: optional(parseNumber),
@@ -50,9 +50,7 @@ const ElementTrait = {
   fill: optional(parseColor),
 
   image: optional(makeParseTrait(ImageTrait)),
-};
-
-const ELEMENT_DEFAULTS = {};
+});
 
 export const useBoxTrait     = makeUseTrait(BoxTrait);
 export const useElementTrait = makeUseTrait(ElementTrait);

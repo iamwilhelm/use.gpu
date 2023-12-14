@@ -4,7 +4,7 @@ import type { Rectangle, XY, XYZW } from '@use-gpu/core';
 import type { LayoutElement, FitInto, Dimension, Direction, MarginLike, Margin } from '../types';
 import type { TraitProps } from '@use-gpu/traits';
 
-import { useProp, shouldEqual, sameArray, sameAny } from '@use-gpu/traits/live';
+import { useProp, shouldEqual, sameArray, sameShallow } from '@use-gpu/traits/live';
 import { use, memo, gather, yeet, useFiber, useMemo } from '@use-gpu/live';
 import { getBlockMinMax, getBlockMargin, fitBlock } from '../lib/block';
 import { isHorizontal, makeBoxPicker, memoFit } from '../lib/util';
@@ -132,10 +132,10 @@ export const Block: LiveComponent<BlockProps> = memo((props: PropsWithChildren<B
 
   return gather(c, Resume);
 }, shouldEqual({
-  padding: sameArray,
-  margin:  sameArray,
-  radius:  sameArray,
-  border:  sameArray,
-  stroke:  sameAny,
-  fill:    sameAny,
+  padding: sameShallow,
+  margin:  sameShallow,
+  radius:  sameShallow,
+  border:  sameShallow,
+  stroke:  sameShallow,
+  fill:    sameShallow,
 }), 'Block');

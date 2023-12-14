@@ -160,9 +160,14 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
             
+            <Line
+              position={[[0, 0], [50, 0], [100, 100], [50, 100], [0, 0]]}
+              color={"#a25476"}
+              width={3}
+            />
             <Face
-              position={[[0, 0], [50, 0], [100, 100], [50, 100]]}
-              color={"#123456"}
+              position={[[0, 0], [50, 0], [100, 100], [50, 100], [0, 0]]}
+              color={"#823456"}
             />
 
             <Cartesian

@@ -38,6 +38,12 @@ export const Plot2DPage: LC = () => {
               color={'#ffffff'}
             />
 
+            <Point
+              positions={[[0, 0], [10, 0], [20, 0], [30, 0], [40, 0]]}
+              size={10}
+              color={'#3090ff'}
+            />
+
             <Transform position={[50, 100]} rotation={[0, 0, 90]} scale={[2, 1]}>
               <Point
                 positions={[[0, 0], [10, 0], [20, 0], [30, 0], [40, 0]]}

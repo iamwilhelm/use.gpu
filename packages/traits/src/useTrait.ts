@@ -45,7 +45,9 @@ export const combine: TraitCombinator = (
   output: any,
   hooks: UseHooks,
 ) => {
-  for (const parse of traits) parse(input, output, hooks);
+  for (const parse of traits) {
+    parse(input, output, hooks);
+  }
 };
 
 /**

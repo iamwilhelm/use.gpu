@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
-import { accumulateChunks, generateChunkSegments, generateChunkSegments2, alignSizeTo } from '@use-gpu/core';
+import { accumulateChunks, generateChunkSegments, generateChunkSegments2, alignSizeTo2 } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type LineSegmentsProps = {
@@ -36,9 +36,9 @@ export const useLineSegments = (
       chunks.reduce((a, b, i) => a + b, 0)
     );
 
-    const segments = new Int8Array(alignSizeTo(count, 4));
-    const lookups = new Uint16Array(alignSizeTo(count, 2));
-    const unwelds = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
+    const segments = new Int8Array(alignSizeTo2(count, 4));
+    const lookups = new Uint16Array(alignSizeTo2(count, 2));
+    const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
 
     generateChunkSegments2(segments, lookups, unwelds, chunks, loops);
 

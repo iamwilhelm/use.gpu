@@ -2,7 +2,7 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
 import type { TraitProps } from '@use-gpu/traits/live';
 
-import { makeUseTrait, combine, shouldEqual, sameArray, sameAny } from '@use-gpu/traits/live';
+import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToAttributes } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
@@ -50,9 +50,15 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       zBiases,
       zIndex,
 
+      id,
+      ids,
+      lookup,
+      lookups,
+
       ...flags
   } = parsed;
-  console.log('point', {parsed});
+
+  console.log('point', {parsed, flags});
   
   const transform = useTransformContext();
 
@@ -60,6 +66,8 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
   const attributes = schemaToAttributes(POINT_SCHEMA, parsed);
 
   const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
+  console.log({count, attributes});
+  if (Number.isNaN(count)) debugger;
 
   const shapes = {
     point: {
@@ -74,6 +82,6 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
 
   return yeet(shapes);
 }, shouldEqual({
-  position: sameArray,
-  color: sameAny,
+  position: sameShallow(sameShallow()),
+  color: sameShallow(),
 }), 'Point');

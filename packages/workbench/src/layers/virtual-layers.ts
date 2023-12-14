@@ -20,8 +20,9 @@ import { useBufferedSize } from '../hooks/useBufferedSize';
 import { FaceLayer } from './face-layer';
 import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
+import { ArrowLayer } from './arrow-layer';
 
-import { LINE_SCHEMA, POINT_SCHEMA } from './schemas';
+import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA } from './schemas';
 
 export type VirtualLayersProps = {
   items?: Record<string, LayerAggregate[]>,
@@ -36,15 +37,6 @@ const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
   for (let k in b) a.add(k);
   return a;
 }
-
-const gatherItemChunks = (items: LayerAggregate[]) => {
-  const chunks = [] as number[];
-  for (const item of items) {
-    const {count} = item as any;
-    chunks.push(count);
-  }
-  return chunks;
-};
 
 const getItemSummary = (items: LayerAggregate[]) => {
   const n = items.length;
@@ -148,7 +140,7 @@ const makeLineAccumulator = (
   const [{attributes}] = items;
   const aggregate = schemaToAggregate(device, LINE_SCHEMA, attributes, alloc);
 
-  return (items: PointAggregate[], count: number) => {
+  return (items: LineAggregate[], count: number) => {
     const [item] = items;
     const {transform} = item;
     const props = {count, ...item.flags} as Record<string, any>;
@@ -157,6 +149,28 @@ const makeLineAccumulator = (
     console.log('line', {props, aggregate});
     
     const layer = use(LineLayer, props);
+    const hasTransform = transform?.key;
+    return hasTransform ? provide(TransformContext, transform, layer) : layer;
+  };
+};
+
+const makeArrowAccumulator = (
+  device: GPUDevice,
+  items: LineAggregate[],
+  alloc: number,
+) => {
+  const [{attributes}] = items;
+  const aggregate = schemaToAggregate(device, ARROW_SCHEMA, attributes, alloc);
+
+  return (items: ArrowAggregate[], count: number) => {
+    const [item] = items;
+    const {transform} = item;
+    const props = {count, ...item.flags} as Record<string, any>;
+
+    updateAggregateFromSchema(device, ARROW_SCHEMA, aggregate, items, props, count);
+    console.log('arrow', {props, aggregate});
+    
+    const layer = use(ArrowLayer, props);
     const hasTransform = transform?.key;
     return hasTransform ? provide(TransformContext, transform, layer) : layer;
   };
@@ -218,6 +232,7 @@ const makeFaceAccumulator = (
 };
 
 const AGGREGATORS = {
+  'arrow': makeArrowAccumulator,
   'face': makeFaceAccumulator,
   'line': makeLineAccumulator,
   'point': makePointAccumulator,

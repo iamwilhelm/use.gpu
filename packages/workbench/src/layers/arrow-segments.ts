@@ -2,7 +2,7 @@ import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 
 import { memo, yeet, useMemo } from '@use-gpu/live';
-import { accumulateChunks, generateChunkSegments2, generateChunkAnchors, alignSizeTo } from '@use-gpu/core';
+import { accumulateChunks, generateChunkSegments2, generateChunkAnchors2, alignSizeTo2 } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type ArrowSegmentsProps = {
@@ -35,18 +35,18 @@ export const useArrowSegments = (
   return useMemo(() => {
     const count = accumulateChunks(chunks, loops);
 
-    const segments = new Int8Array(alignSizeTo(count, 4));
+    const segments = new Int8Array(alignSizeTo2(count, 4));
     const anchors = new Uint32Array(count * 4);
     const trims = new Uint32Array(count * 4);
     const lookups = new Uint32Array(count);
-    const unwelds = loops ? new Uint16Array(alignSizeTo(count, 2)) : undefined;
+    const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
 
     generateChunkSegments2(segments, lookups, unwelds, chunks, loops, starts, ends);
-    const anchorCount = generateChunkAnchors(anchors, trims, chunks, loops, starts, ends);
+    const sparse = generateChunkAnchors2(anchors, trims, chunks, loops, starts, ends);
 
     return {
-      segmentCount: count,
-      anchorCount,
+      count,
+      sparse,
       segments,
       anchors,
       trims,
@@ -62,7 +62,7 @@ export const useArrowSegmentsSource = (
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
 ) => {
-  const {count, anchorCount, segments, anchors, trims, lookups} = useArrowSegments(chunks, loops, starts, ends);
+  const {count, sparse, segments, anchors, trims, lookups} = useArrowSegments(chunks, loops, starts, ends);
 
   // Bind as shader storage
   const s = useRawSource(segments, 'i8');
@@ -70,12 +70,12 @@ export const useArrowSegmentsSource = (
   const t = useRawSource(trims, 'vec4<u32>');
   const l = useRawSource(lookups, 'u32');
 
-  a.length = anchorCount;
-  a.size[0] = anchorCount;
+  a.length = sparse;
+  a.size[0] = sparse;
 
   return {
     count,
-    anchorCount,
+    sparse,
     segments: s,
     anchors: a,
     trims: t,

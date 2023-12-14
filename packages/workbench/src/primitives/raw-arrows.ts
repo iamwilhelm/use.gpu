@@ -25,6 +25,10 @@ import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions
 import { getArrowVertex } from '@use-gpu/wgsl/instance/vertex/arrow.wgsl';
 import { getPassThruColor } from '@use-gpu/wgsl/mask/passthru.wgsl';
 
+export type RawArrowsFlags = {
+  detail?: number,
+} & Pick<Partial<PipelineOptions>, 'mode' | 'alphaToCoverage' | 'depthTest' | 'depthWrite' | 'blend'>;
+
 export type RawArrowsProps = {
   anchor?: number[] | TypedArray,
   position?: number[] | TypedArray,
@@ -42,10 +46,8 @@ export type RawArrowsProps = {
   depths?:    ShaderSource,
   zBiases?:   ShaderSource,
 
-  detail?: number,
-
   count?: number,
-} & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
+} & PickingSource & RawArrowsProps;
 
 const ZERO = [0, 0, 0, 1];
 

@@ -40,12 +40,8 @@ import {
   parseDomain,
   parsePointShape,
 } from '@use-gpu/parse';
-import {
-  generateChunkSegments2,
-} from '@use-gpu/core';
-import {
-  useLineSegments
-} from '@use-gpu/workbench';
+import { generateChunkSegments2 } from '@use-gpu/core';
+import { useLineSegments, useArrowSegments } from '@use-gpu/workbench';
 
 import { vec4 } from 'gl-matrix';
 
@@ -66,21 +62,9 @@ export const AnchorTrait = trait(
 export const ArrowTrait = trait(
   {
     size: parseNumber,
-    start: parseBoolean,
-    end: parseBoolean,
   },
   {
     size: 3,
-    start: false,
-    end: true,
-  },
-);
-
-export const ArrowsTrait = trait(
-  {
-    sizes: optional(parseScalarArray),
-    starts: optional(parseBooleanArray),
-    ends: optional(parseBooleanArray),
   },
 );
 
@@ -366,8 +350,13 @@ export const LoopsTrait = trait({
 
 export const DirectedTrait = trait({
   start: optional(parseBoolean),
-  starts: optional(parseBooleanArray),
   end: optional(parseBoolean),
+});
+
+export const DirectedsTrait = trait({
+  start: optional(parseBoolean),
+  end: optional(parseBoolean),
+  starts: optional(parseBooleanArray),
   ends: optional(parseBooleanArray),
 });
 
@@ -375,9 +364,7 @@ export const LineSegmentsTrait = combine(
   SegmentsTrait,
   LoopsTrait,
   (
-    props: {
-      lookups?: VectorLikes | VectorLikes[],
-    },
+    props: {},
     parsed: {
       chunks?: TypedArray,
       loop?: boolean | TypedArray,
@@ -397,25 +384,56 @@ export const LineSegmentsTrait = combine(
   },
 );
 
+export const ArrowSegmentsTrait = combine(
+  SegmentsTrait,
+  LoopsTrait,
+  DirectedsTrait,
+  (
+    props: {},
+    parsed: {
+      chunks?: TypedArray,
+      loop?: boolean | TypedArray,
+      loops?: TypedArray,
+      start?: boolean | TypedArray,
+      starts?: TypedArray,
+      end?: boolean | TypedArray,
+      ends?: TypedArray,
+
+      count?: number,
+      sparse?: number,
+      segments?: TypedArray,
+      anchors?: TypedArray,
+      trims?: TypedArray,
+      unwelds?: TypedArray,
+      lookups?: TypedArray,
+    },
+  ) => {
+    const {chunks, loop, loops, start, starts, end, ends} = parsed;
+    console.log({chunks, loop, loops, start, starts, end, ends})
+    if (!chunks) return;
+
+    const arrow = useArrowSegments(chunks, loop || loops, start || starts, end || ends);
+    for (const k in arrow) parsed[k] = arrow[k];
+  },
+);
+
 export const PointsTrait = combine(
   ColorsTrait(),
-  trait(
-    {
-      position: optional(parsePosition),
-      positions: optional(parsePositionArray),
-      size: optional(parseNumber),
-      sizes: optional(parseScalarArray),
-      depth: optional(parseNumber),
-      depths: optional(parseScalarArray),
-      zBias: optional(parseNumber),
-      zBiases: optional(parseScalarArray),
+  trait({
+    position: optional(parsePosition),
+    positions: optional(parsePositionArray),
+    size: optional(parseNumber),
+    sizes: optional(parseScalarArray),
+    depth: optional(parseNumber),
+    depths: optional(parseScalarArray),
+    zBias: optional(parseNumber),
+    zBiases: optional(parseScalarArray),
 
-      id: optional(parseNumber),
-      ids: optional(parseScalarArray),
-      lookup: optional(parseNumber),
-      lookups: optional(parseScalarArray),
-    },
-  ),
+    id: optional(parseNumber),
+    ids: optional(parseScalarArray),
+    lookup: optional(parseNumber),
+    lookups: optional(parseScalarArray),
+  }),
 );
 
 export const LinesTrait = combine(
@@ -436,4 +454,24 @@ export const LinesTrait = combine(
     lookups: optional(parseScalarArray),
   }),
   LineSegmentsTrait,  
+);
+
+export const ArrowsTrait = combine(
+  ColorsTrait({ composite: true }),
+  trait({
+    position: optional(parsePositionArray),
+    positions: optional(parsePositionMultiArray),
+    size: optional(parseScalarArrayLike),
+    sizes: optional(parseScalarMultiArray),
+    depth: optional(parseScalarArrayLike),
+    depths: optional(parseScalarMultiArray),
+    zBias: optional(parseScalarArrayLike),
+    zBiases: optional(parseScalarMultiArray),
+
+    id: optional(parseNumber),
+    ids: optional(parseScalarArray),
+    lookup: optional(parseNumber),
+    lookups: optional(parseScalarArray),
+  }),
+  ArrowSegmentsTrait,  
 );

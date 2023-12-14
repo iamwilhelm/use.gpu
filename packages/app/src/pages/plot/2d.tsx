@@ -10,7 +10,7 @@ import {
   Animate,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Point, Line, Transform,
+  Plot, Cartesian, Axis, Grid, Point, Line, Arrow, Transform,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -123,6 +123,13 @@ export const Plot2DPage: LC = () => {
                 loop
               />
             </Transform>
+            
+            <Arrow
+              position={[[100, 200], [150, 250], [100, 300], [150, 350]]}
+              width={10}
+              color={"#3090ff"}
+              end
+            />
 
             <Cartesian
               range={[[0, 100], [0, 100]]}

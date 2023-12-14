@@ -4,6 +4,7 @@ export * from './providers/range-provider';
 
 export * from './layer/axis';
 
+export * from './shape/arrow';
 export * from './shape/line';
 export * from './shape/point';
 /*
@@ -13,7 +14,6 @@ export * from './source/scale';
 export * from './source/sampled';
 export * from './source/transpose';
 
-export * from './shape/arrow';
 export * from './shape/label';
 
 

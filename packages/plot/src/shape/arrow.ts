@@ -1,20 +1,18 @@
 import type { LiveComponent } from '@use-gpu/live';
 import type { ShaderSource } from '@use-gpu/shader';
-import type { TraitProps } from '@use-gpu/traits/live';
+import type { VectorLike } from '@use-gpu/traits';
 
 import { makeUseTrait, combine, shouldEqual, sameShallow } from '@use-gpu/traits/live';
 import { schemaToArchetype, schemaToEmitters } from '@use-gpu/core';
 import { yeet, memo, use, useOne, useMemo } from '@use-gpu/live';
 import { vec4 } from 'gl-matrix';
 
-import { getLineSegments, useTransformContext, LINE_SCHEMA } from '@use-gpu/workbench';
-
-//import { PointLayer } from '@use-gpu/workbench';
-//import { DataContext } from '../providers/data-provider';
+import { getArrowSegments, useTransformContext, ARROW_SCHEMA } from '@use-gpu/workbench';
 
 import {
-  LinesTrait,
+  ArrowsTrait,
 
+  ArrowTrait,
   LineTrait,
   ROPTrait,
   StrokeTrait,
@@ -22,8 +20,9 @@ import {
 } from '../traits';
 
 const Traits = combine(
-  LinesTrait,
+  ArrowsTrait,
 
+  ArrowTrait,
   LineTrait,
   ROPTrait,
   StrokeTrait,
@@ -31,9 +30,10 @@ const Traits = combine(
 );
 const useTraits = makeUseTrait(Traits);
 
-export type LineProps = TraitProps<typeof Traits>;
+export type ArrowProps = TraitProps<typeof Traits>;
 
-export const Line: LiveComponent<LineProps> = memo((props) => {
+export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
+
   const parsed = useTraits(props);
   const {
       position,
@@ -54,27 +54,34 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       lookups,
 
       count,
+      sparse,
       chunks,
       loop,
       loops,
+      start,
+      starts,
+      end,
+      ends,
 
       segments,
+      anchors,
+      trims,
       unwelds,
       ...flags
   } = parsed;
 
-  console.log('line', {parsed, flags});
+  console.log('arrow', {parsed, flags});
 
   const transform = useTransformContext();
 
-  const archetype = schemaToArchetype(LINE_SCHEMA, parsed, flags);
-  const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
+  const archetype = schemaToArchetype(ARROW_SCHEMA, parsed, flags);
+  const attributes = schemaToEmitters(ARROW_SCHEMA, parsed);
 
   console.log({count, attributes});
   if (!count || Number.isNaN(count)) debugger;
 
   const shapes = {
-    line: {
+    arrow: {
       count,
       archetype,
       attributes,
@@ -88,4 +95,5 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
 }, shouldEqual({
   position: sameShallow(sameShallow()),
   color: sameShallow(),
-}), 'Line');
+}), 'Arrow');
+

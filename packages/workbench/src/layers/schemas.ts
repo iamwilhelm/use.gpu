@@ -35,7 +35,7 @@ export const ARROW_SCHEMA = {
 
 export const FACE_SCHEMA = {
   ...SHAPE_SCHEMA,
-  position:  {format: 'vec4<f32>', single: 'position', composite: true},
+  positions: {format: 'vec4<f32>', single: 'position', composite: true},
   indices:   {format: 'u32', index: true},
   segments:  {format: 'i8', segment: true},
 };

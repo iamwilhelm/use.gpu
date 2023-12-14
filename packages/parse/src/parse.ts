@@ -1,6 +1,6 @@
 import type {
   ArrowFunction, TypedArray, TypedArrayConstructor,
-  Blending, VectorLike, ArrayLike, ColorLike, ColorLikes, VectorLikes,
+  Blending, VectorLike, ArrayLike, ColorLike, ColorLikes, Side, VectorLikes,
 } from '@use-gpu/core';
 import type { Parser, Join, Placement, PointShape, Domain } from './types';
 import { seq } from '@use-gpu/core';
@@ -332,6 +332,8 @@ export const parseMatrix     = makeParseMat4();
 
 export const parsePositionArray = makeParseVectorArray(4, 1, Float32Array);
 export const parsePositionMultiArray = makeParseMultiVectorArray(4, 1, Float32Array);
+
+export const parseSide       = makeParseEnum<Side>(['front', 'back', 'both']);
 
 export const parseJoin       = makeParseEnum<Join>(['bevel', 'miter', 'round']);
 export const parseBlending   = makeParseEnum<Blending>(['none', 'premultiply', 'alpha', 'add', 'subtract', 'multiply']);

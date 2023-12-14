@@ -15,6 +15,7 @@ export type ArrayLike<T = any> = TypedArray | T[];
 export type VectorLike = TypedArray | number[];
 export type VectorLikes = TypedArray | VectorLike[];
 
+export type Side = 'front' | 'back' | 'both';
 export type Blending = 'none' | 'alpha' | 'premultiply' | 'add' | 'subtract' | 'multiply';
 export type ColorSpace = 'linear' | 'srgb' | 'p3' | 'native' | 'picking' | 'auto';
 

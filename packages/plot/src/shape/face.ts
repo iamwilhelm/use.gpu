@@ -13,9 +13,7 @@ import {
   FacesTrait,
 
   FaceTrait,
-  LineTrait,
   ROPTrait,
-  StrokeTrait,
   ZIndexTrait,
 } from '../traits';
 
@@ -23,9 +21,7 @@ const Traits = combine(
   FacesTrait,
 
   FaceTrait,
-  LineTrait,
   ROPTrait,
-  StrokeTrait,
   ZIndexTrait,
 );
 const useTraits = makeUseTrait(Traits);

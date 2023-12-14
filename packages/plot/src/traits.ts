@@ -28,6 +28,7 @@ import {
   parseQuaternion,
   parseScale,
   parseMatrix,
+  parseSide,
   parseJoin,
   parseBlending,
   parsePlacement,
@@ -93,6 +94,11 @@ export const FaceTrait = trait(
     flat: optional(parseBoolean),
     fragDepth: optional(parseBoolean),
     shaded: optional(parseBoolean),
+    side: optional(parseSide),
+    shadow: optional(parseBoolean),
+  },
+  {
+    side: 'both',
   },
 );
 
@@ -226,10 +232,6 @@ export const StrokeTrait = trait(
     join:      parseJoin,
     dash:      optional(parseScalarArray),
     proximity: parseNumber,
-  },
-  {
-    join: 'bevel',
-    proximity: 0,
   },
 );
 

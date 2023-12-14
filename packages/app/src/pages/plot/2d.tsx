@@ -39,18 +39,10 @@ export const Plot2DPage: LC = () => {
             />
 
             <Point
-              positions={[[0, 0], [10, 0], [20, 0], [30, 0], [40, 0]]}
+              positions={[[50, 100], [50, 130], [50, 160], [50, 190], [50, 220]]}
               size={10}
               color={'#3090ff'}
             />
-
-            <Transform position={[50, 100]} rotation={[0, 0, 90]} scale={[2, 1]}>
-              <Point
-                positions={[[0, 0], [10, 0], [20, 0], [30, 0], [40, 0]]}
-                size={10}
-                color={'#3090ff'}
-              />
-            </Transform>
 
             <Line
               position={[[100, 50], [150, 150]]}
@@ -159,16 +151,18 @@ export const Plot2DPage: LC = () => {
                 depth={1}
               />
             </Transform>
-            
-            <Line
-              position={[[0, 0], [50, 0], [100, 100], [50, 100], [0, 0]]}
-              color={"#a25476"}
-              width={3}
-            />
-            <Face
-              position={[[0, 0], [50, 0], [100, 100], [50, 100], [0, 0]]}
-              color={"#823456"}
-            />
+
+            <Transform position={[300, 700]}>
+              <Face
+                position={[[0, 0], [50, 0], [100, 100], [50, 100]]}
+                color={"#823456"}
+              />
+
+              <Face
+                position={[[100, 0], [150, 0], [200, 100], [150, 100]]}
+                color={"#823456"}
+              />
+            </Transform>
 
             <Cartesian
               range={[[0, 100], [0, 100]]}

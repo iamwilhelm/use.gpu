@@ -6,27 +6,31 @@ import type { PointLayerFlags } from './point-layer';
 import type { ArrowLayerFlags } from './arrow-layer';
 import type { TransformContextProps } from '../providers/transform-provider';
 import type { MaterialContextProps } from '../providers/material-provider';
+import { mat3, mat4 } from 'gl-matrix';
 
-export type VirtualLayerType = 'point' | 'line' | 'arrow' | 'face' | 'layer';
+export type LayerType = 'point' | 'line' | 'arrow' | 'face' | 'element';
 
-export type VirtualLayerAggregator = (
+export type LayerAggregator = (
   device: GPUDevice,
-  items: VirtualLayerAggregate[],
+  items: LayerAggregate[],
   count: number,
   indices?: number,
 ) => (
-  items: VirtualLayerAggregate[],
+  items: LayerAggregate[],
   count: number,
   indices?: number,
 ) => LiveElement;
 
-export type ShapeAggregate = {
+export type BaseAggregate = {
   archetype: number,
-  count: number,
-  indices?: number,
   transform?: TransformContextProps,
   material?: MaterialContextProps,
   zIndex?: number,
+};
+
+export type ShapeAggregate = BaseAggregate & {
+  count: number,
+  indices?: number,
 };
 
 export type PointAggregate = ShapeAggregate & {
@@ -128,16 +132,14 @@ export type FaceAggregate = ShapeAggregate & {
   },
 };
 
-export type LayerAggregate = {
-  transform?: TransformContextProps,
-  material?: MaterialContextProps,
+export type ElementAggregate = BaseAggregate & {
   element: LiveElement,
 };
 
-export type VirtualLayerAggregate = {
+export type LayerAggregate = {
   point: PointAggregate | PointAggregate[],
   line: LineAggregate | LineAggregate[],
   arrow: ArrowAggregate | ArrowAggregate[],
   face: FaceAggregate | FaceAggregate[],
-  layer: LayerAggregate | LayerAggregrate[],
+  element: ElementAggregate | ElementAggregrate[],
 };

@@ -11,7 +11,7 @@ export type ArrowSegmentsProps = {
   starts?: boolean[],
   ends?: boolean[],
 
-  render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource, lookups: StorageSource) => LiveElement,
+  render?: (segments: StorageSource, anchors: StorageSource, trim: StorageSource) => LiveElement,
 };
 
 /** Produces `segments`, `anchors`, `trims` composite data for `@{ArrowLayer}`. */
@@ -21,8 +21,8 @@ export const ArrowSegments: LiveComponent<ArrowSegmentsProps> = memo((
   const {chunks, loops, starts, ends, render} = props;
   if (!chunks) return null;
 
-  const {segments, anchors, trims, lookups} = useArrowSegmentsSource(chunks, loops, starts, ends);
-  return render ? render(segments, anchors, trims, lookups) : yeet([segments, anchors, trims, lookups]);
+  const {segments, anchors, trims} = useArrowSegmentsSource(chunks, loops, starts, ends);
+  return render ? render(segments, anchors, trims) : yeet([segments, anchors, trims]);
 }, 'ArrowSegments');
 
 export const useArrowSegments = (
@@ -38,10 +38,10 @@ export const useArrowSegments = (
     const segments = new Int8Array(alignSizeTo2(count, 4));
     const anchors = new Uint32Array(count * 4);
     const trims = new Uint32Array(count * 4);
-    const lookups = new Uint32Array(count);
+    const slices = new Uint32Array(chunks.length);
     const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
 
-    generateChunkSegments2(segments, lookups, unwelds, chunks, loops, starts, ends);
+    generateChunkSegments2(segments, slices, unwelds, chunks, loops, starts, ends);
     const sparse = generateChunkAnchors2(anchors, trims, chunks, loops, starts, ends);
 
     return {
@@ -50,7 +50,7 @@ export const useArrowSegments = (
       segments,
       anchors,
       trims,
-      lookups,
+      slices,
       unwelds,
     };
   }, [chunks, loops, starts, ends]);
@@ -62,13 +62,12 @@ export const useArrowSegmentsSource = (
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
 ) => {
-  const {count, sparse, segments, anchors, trims, lookups} = useArrowSegments(chunks, loops, starts, ends);
+  const {count, sparse, segments, anchors, trims, slices} = useArrowSegments(chunks, loops, starts, ends);
 
   // Bind as shader storage
   const s = useRawSource(segments, 'i8');
   const a = useRawSource(anchors, 'vec4<u32>');
   const t = useRawSource(trims, 'vec4<u32>');
-  const l = useRawSource(lookups, 'u32');
 
   a.length = sparse;
   a.size[0] = sparse;
@@ -79,6 +78,5 @@ export const useArrowSegmentsSource = (
     segments: s,
     anchors: a,
     trims: t,
-    lookups: l,
   };
 }

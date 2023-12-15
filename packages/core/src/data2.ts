@@ -1,4 +1,4 @@
-import type { TypedArray, VectorLike, UniformType, UniformAttribute, Emitter, Emit } from './types';
+import type { Lazy, NumberEmitter, TypedArray, VectorLike, UniformType, UniformAttribute, Emitter, Emit } from './types';
 import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
 
 import { isTypedArray } from './buffer';
@@ -59,7 +59,27 @@ export const offsetNumberArray2 = (
     to[o++] = from[s + i] + offset;
   }
 };
-  
+
+export const expandNumberArray2 = (
+  from: number[] | TypedArray,
+  to: TypedArray,
+  slices: TypedArray,
+  dims: number = 1,
+  fromIndex: number = 0,
+  toIndex: number = 0,
+  length?: number,
+) => {
+  const n = slices.length;
+  let f = fromIndex;
+  let t = toIndex;
+  for (let i = 0; i < n; ++i) {
+    const l = slices[i];
+    fillNumberArray2(from, to, dims, f, t, l);
+    f++;
+    t += l;
+  }
+}
+    
 export const unweldNumberArray2 = (
   from: number[] | TypedArray,
   to: TypedArray,
@@ -309,6 +329,48 @@ export const makeCopyEmitter2 = (
   offset?: number,
 ) => copyNumberArray2(from, to, dims, fromIndex, toIndex, length);
 
+export const makeRefEmitter2 = (
+  fromRef: Lazy<number | number[] | TypedArray>,
+  dims: number = 1,
+  fromIndex: number = 0,
+) => (
+  to: TypedArray,
+  toIndex: number = 0,
+  length?: number,
+  offset?: number,
+) => {
+  const from = resolve(fromRef);
+  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length);
+  else copyNumberArray2(from, to, dims, fromIndex, toIndex, length);
+}
+
+export const makePartialRefEmitter2 = (
+  dims: number = 1,
+  fromIndex: number = 0,
+) => (
+  fromRef: Lazy<number | number[] | TypedArray>,
+  to: TypedArray,
+  toIndex: number = 0,
+  length?: number,
+  offset?: number,
+) => {
+  const from = resolve(fromRef);
+  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length);
+  else copyNumberArray2(from, to, dims, fromIndex, toIndex, length);
+}
+
+export const makeExpandEmitter2 = (
+  from: NumberArray | number,
+  slices: number[] | TypedArray,
+  dims: number = 1, 
+  fromIndex: number = 0,
+) => (
+  to: NumberArray,
+  toIndex: number = 0,
+  count: number = 0,
+  offset: number = 0,
+) => expandNumberArray2(from, to, slices, dims, fromIndex, toIndex, length);
+
 export const makeFillEmitter2 = (
   from: NumberArray | number,
   dims: number = 1, 
@@ -333,8 +395,8 @@ export const makeUnweldEmitter2 = (
 
 export const generateChunkSegments2 = (
   to: NumberArray,
-  lookup: NumberArray | null | undefined,
-  unweld: NumberArray | null | undefined,
+  slices: NumberArray | null | undefined,
+  unwelds: NumberArray | null | undefined,
   chunks: TypedArray | number[],
   loops: TypedArray | boolean[] | boolean = false,
   starts: TypedArray | boolean[] | boolean = false,
@@ -378,12 +440,12 @@ export const generateChunkSegments2 = (
     }
     if (l) to[pos++] = 0;
 
-    if (lookup) for (let j = b; j < pos; ++j) lookup[j] = i;
-    if (unweld) {
+    if (slices) slices[i] = pos - b;
+    if (unwelds) {
       const n = pos - b;
       const z = l ? c - 1 : 0;
       for (let j = 0; j < n; ++j) {
-        unweld[j + b] = o + (j + z + c) % c;
+        unwelds[j + b] = o + (j + z + c) % c;
       }
     }
 
@@ -450,7 +512,6 @@ export const generateChunkAnchors2 = (
 
 export const generateChunkFaces2 = (
   to: NumberArray,
-  lookup: NumberArray | null | undefined,
   chunks: number[],
 ) => {
   let pos = 0;
@@ -465,10 +526,7 @@ export const generateChunkFaces2 = (
       if (c > 1) to[pos++] = 0;
       to[pos++] = 0;
     }
-    
-    if (lookup) for (let j = b; j < pos; ++j) lookup[j] = i;
   }
 
   while (pos < to.length) to[pos++] = 0;
 }
-

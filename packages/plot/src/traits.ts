@@ -383,7 +383,7 @@ export const LineSegmentsTrait = combine(
       count?: number,
       segments?: TypedArray,
       unwelds?: TypedArray,
-      lookups?: TypedArray,
+      slices?: TypedArray,
     },
   ) => {
     const {chunks, loop, loops} = parsed;

@@ -44,9 +44,9 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       widths,
       depth,
       depths,
+      zIndex,
       zBias,
       zBiases,
-      zIndex,
 
       id,
       ids,
@@ -64,20 +64,24 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       ends,
 
       segments,
+      slices,
       anchors,
       trims,
       unwelds,
       ...flags
   } = parsed;
 
+  if (zIndex && !zBias) parsed.zBias = zIndex;
+
   console.log('arrow', {parsed, flags});
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
-  const transform = useTransformContext();
+  const context = useTransformContext();
+  const {transform, nonlinear, matrix: refs} = context;
 
-  const archetype = schemaToArchetype(ARROW_SCHEMA, parsed, flags);
+  const archetype = schemaToArchetype(ARROW_SCHEMA, parsed, flags, refs);
   const attributes = schemaToEmitters(ARROW_SCHEMA, parsed);
 
   console.log({count, attributes});
@@ -89,7 +93,8 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       archetype,
       attributes,
       flags,
-      transform,
+      refs,
+      transform: nonlinear ?? context,
       zIndex,
     },
   };

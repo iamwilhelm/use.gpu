@@ -40,9 +40,9 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
       widths,
       depth,
       depths,
+      zIndex,
       zBias,
       zBiases,
-      zIndex,
 
       id,
       ids,
@@ -60,20 +60,22 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
       ends,
 
       segments,
-      anchors,
-      trims,
+      slices,
       unwelds,
       ...flags
   } = parsed;
+
+  if (zIndex && !zBias) parsed.zBias = zIndex;
 
   console.log('face', {parsed, flags});
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
-  const transform = useTransformContext();
+  const context = useTransformContext();
+  const {transform, nonlinear, matrix: refs} = context;
 
-  const archetype = schemaToArchetype(FACE_SCHEMA, parsed, flags);
+  const archetype = schemaToArchetype(FACE_SCHEMA, parsed, flags, refs);
   const attributes = schemaToEmitters(FACE_SCHEMA, parsed);
 
   console.log({count, attributes});
@@ -85,7 +87,8 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
       archetype,
       attributes,
       flags,
-      transform,
+      refs,
+      transform: nonlinear ?? context,
       zIndex,
     },
   };

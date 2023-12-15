@@ -420,6 +420,9 @@ export type Tuples<N extends number, T = number> = {
   length: number,
 };
 
+export type NumberEmitter = (to: TypedArray, count: number, toIndex?: number) => void;
+export type NumberRefEmitter = (from: Lazy<number | number[] | TypedArray>, to: TypedArray, count: number, toIndex?: number) => void;
+
 export type Emitter<T extends Array = any[]> = {
   (emit: Emit, ...args: T): void;
 };

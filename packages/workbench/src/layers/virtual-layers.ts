@@ -1,15 +1,17 @@
 import type { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live';
 import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
-import type { LayerAggregator, VirtualLayerAggregate, LayerAggregate } from './types';
+import type { LayerAggregator, LayerAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
-import { use, keyed, fragment, signal, provide, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
 import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
+  filterSchema,
   schemaToAggregate,
   updateAggregateFromSchema,
+  updateAggregateFromSchemaRefs,
   
   makeAggregateBuffer,
   updateAggregateBuffer,
@@ -26,21 +28,25 @@ import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA } from './schemas'
 
 const DEBUG = true;
 
+type AccumulatorOptions = {
+  _unused?: boolean,
+};
+
 export type VirtualLayersProps = {
-  items?: Record<string, VirtualLayerAggregate[]>,
+  items?: Record<string, LayerAggregate[]>,
   children: LiveElement,
 };
 
-const allCount = (a: number, b: VirtualLayerAggregate): number => a + b.count;
+const allCount = (a: number, b: LayerAggregate): number => a + b.count;
 
-const allIndices = (a: number, b: VirtualLayerAggregate): number => a + (b.indices || 0);
+const allIndices = (a: number, b: LayerAggregate): number => a + (b.indices || 0);
 
-const allKeys = (a: Set<string>, b: VirtualLayerAggregate): Set<string> => {
+const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
   for (let k in b) a.add(k);
   return a;
 }
 
-const getItemSummary = (items: VirtualLayerAggregate[]) => {
+const getItemSummary = (items: LayerAggregate[]) => {
   const n = items.length;
   const archetype = items[0]?.archetype ?? 0;
 
@@ -57,14 +63,28 @@ const getItemSummary = (items: VirtualLayerAggregate[]) => {
 
 /** Aggregate (point / line / face) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualLayersProps) => {
-  const {items, children} = props;
-  return items ? Resume(items) : children ? multiGather(children, Resume) : null;
+  const {zBias, items, children} = props;
+  const options = {zBias};
+  return items ? Resume(options)(items) : children ? multiGather(children, Resume(options)) : null;
+};
+
+const provideTransform = (element: LiveElement, transform?: TransformContextProps) => {
+  if (!element) return null;
+
+  const hasTransform = transform?.key;
+  let view = element;
+  if (hasTransform) {
+    view = provide(TransformContext, transform, view, element.key);
+  }
+  return view;
 };
 
 const Resume = (
-  aggregates: Record<string, VirtualLayerAggregate[]>,
+  options: VirtualLayersOptions,
+) => (
+  aggregates: Record<string, LayerAggregate[]>,
 ) => useOne(() => {
-  const els: LiveElement[] = [];
+  const els: LiveElement[] = [signal()];
 
   for (const type in aggregates) {
     const items = aggregates[type];
@@ -73,8 +93,8 @@ const Resume = (
     if (type === 'layer') {
       for (const item of items) {
         const {transform, element} = item;
-        const hasTransform = transform?.key;
-        els.push(hasTransform ? provide(TransformContext, transform, element, element.key) : element);
+        const layer = provideTransform(element, transform);
+        els.push(layer);
       }
       continue;
     }
@@ -88,7 +108,7 @@ const Resume = (
     const group = [];
     const makeAggregator = AGGREGATORS[type]!;
     for (const layer of layers) {
-      group.push(keyed(Aggregate, layer.key, makeAggregator, layer.items));
+      group.push(keyed(Aggregate, layer.key, makeAggregator(options), layer.items));
     }
 
     els.push(fragment(group, type));
@@ -99,53 +119,71 @@ const Resume = (
 
 const Aggregate: LiveFunction<any> = (
   makeAggregator: LayerAggregator,
-  items: VirtualLayerAggregate[],
+  items: LayerAggregate[],
 ) => {
   const device = useContext(DeviceContext);
   const {archetype, count, indices} = getItemSummary(items);
 
+  const allocItems = useBufferedSize(items.length);
   const allocCount = useBufferedSize(count);
   const allocIndices = useBufferedSize(indices);
 
   const render = useMemo(() =>
-    makeAggregator(device, items, allocCount, allocIndices),
-    [archetype, allocCount, allocIndices]
+    makeAggregator(device, items, allocItems, allocCount, allocIndices),
+    [archetype, allocItems, allocCount, allocIndices]
   );
 
   return render(items, count, indices);
 };
 
-const makeSchemaAccumulator = (
+const makeSchemaAggregator = (
   schema: AggregateSchema,
   Component: LiveComponent,
 ) => (
+  options: AccumulatorOptions,
+) => (
   device: GPUDevice,
   items: LineAggregate[],
+  allocItems: number,
   allocCount: number,
   allocIndices: number,
 ) => {
-  const [{attributes}] = items;
-  const aggregate = schemaToAggregate(device, schema, attributes, allocCount, allocIndices);
+  const [item] = items;
+  const {attributes, refs} = item;
 
-  return (items: ArrowAggregate[], count: number) => {
+  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocCount, allocIndices);
+
+  const refSchema = filterSchema(schema, (f) => f.ref);
+  const refCount = Object.keys(refSchema).length;
+
+  const uploadRefs = () => {
+    console.log('update aggregator refs', Component.name, refSchema, aggregate);
+    updateAggregateFromSchemaRefs(device, refSchema, aggregate);
+  };
+  
+  const upload = quote(yeet(uploadRefs));
+
+  return (items: ArrowAggregate[], count: number, indices: number) => {
     const [item] = items;
     const {transform} = item;
     const props = {count, ...item.flags} as Record<string, any>;
 
-    updateAggregateFromSchema(device, schema, aggregate, items, props, count);
-    DEBUG && console.log(Component.name, {props, aggregate});
-    
-    const layer = use(Component, props);
-    const hasTransform = transform?.key;
-    return hasTransform ? provide(TransformContext, transform, layer) : layer;
+    updateAggregateFromSchema(device, schema, aggregate, props, items, count, indices);
+    DEBUG && console.log(Component.name, {props, items, aggregate});
+
+    const element = use(Component, props);
+    const layer = provideTransform(element, transform);
+
+    if (refCount) return [upload, layer];
+    return layer;
   };
 };
 
 const AGGREGATORS = {
-  'arrow': makeSchemaAccumulator(ARROW_SCHEMA, ArrowLayer),
-  'face': makeSchemaAccumulator(FACE_SCHEMA, FaceLayer),
-  'line': makeSchemaAccumulator(LINE_SCHEMA, LineLayer),
-  'point': makeSchemaAccumulator(POINT_SCHEMA, PointLayer),
+  'arrow': makeSchemaAggregator(ARROW_SCHEMA, ArrowLayer),
+  'face': makeSchemaAggregator(FACE_SCHEMA, FaceLayer),
+  'line': makeSchemaAggregator(LINE_SCHEMA, LineLayer),
+  'point': makeSchemaAggregator(POINT_SCHEMA, PointLayer),
   'label': () => () => {},
 } as Record<string, LayerAggregator>;
 
@@ -160,7 +198,7 @@ const accumulate = (xs: number[]): number[] => {
   return out;
 }
 
-const getItemTypeKey = (item: VirtualLayerAggregate) =>
+const getItemTypeKey = (item: LayerAggregate) =>
   ('transform' in item
     ? (item.transform?.key || 0)
     : 0) ^
@@ -168,14 +206,14 @@ const getItemTypeKey = (item: VirtualLayerAggregate) =>
 
 type Partition = {
   key: number,
-  items: VirtualLayerAggregate[],
+  items: LayerAggregate[],
 };
 
 const makePartitioner = () => {
   const layers: Partition[] = [];
   const map = new Map<number, Partition>();
 
-  const push = (item: VirtualLayerAggregate) => {
+  const push = (item: LayerAggregate) => {
     const {zIndex = 0} = item;
     const key = getItemTypeKey(item);
     const existing = map.get(key);

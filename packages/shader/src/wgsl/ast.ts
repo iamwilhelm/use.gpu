@@ -62,9 +62,9 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     while (start > 0 && code.charAt(start - 1) !== "\n") start--;
     while (end < code.length - 1 && code.charAt(end + 1) !== "\n") end++;
 
-    const loc = name != null ? ` '${name}'` : '';
+    const loc = name != null ? `in '${name}'` : '';
     throw new Error(
-      `Error parsing${loc}: ${t} in '${code.slice(n.from, n.to)}'\n`+
+      `${loc}\n${t} in '${code.slice(n.from, n.to)}'\n\n`+
       `${code.slice(start, end)}\n`+
       `${" ".repeat(n.from - start)}^\n\n`+
       formatAST(n, code)

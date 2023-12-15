@@ -1,7 +1,8 @@
 import type { DataBounds, StorageSource, LambdaSource, TextureSource, TypedArray, UniformAttributeValue } from '@use-gpu/core';
 import type { ShaderSource, ShaderModule } from '@use-gpu/shader';
-import type { Ref } from '@use-gpu/live';
+import type { RefObject } from '@use-gpu/live';
 import type { TransformContextProps, TransformBounds } from '../providers/transform-provider';
+import type { MatrixRefs } from '../layers/types';
 
 import { useCallback, useMemo, useOne, useVersion, useNoCallback, useNoMemo, useNoOne, useNoVersion } from '@use-gpu/live';
 import { bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
@@ -47,8 +48,11 @@ export const useNoCombinedMatrix = () => {
 export const useMatrixTransform = (
   matrix?: mat4 | null,
   bounds?: TransformBounds | null,
-): TransformContextProps => {
-  const refs = useOne(() => ({
+): [
+  TransformContextProps,
+  MatrixRefs,
+] => {
+  const refs: RefObject<MatrixRefs> = useOne(() => ({
     matrix: {current: matrix ?? NO_MATRIX},
     normalMatrix: {current: mat3.create()},
   }));
@@ -66,7 +70,7 @@ export const useMatrixTransform = (
     const differential = getBoundShader(getMatrixDifferential, [boundMatrix, refs.normalMatrix]);
 
     const key = getBundleKey(transform) ^ getBundleKey(differential);
-    return {key, transform, differential};
+    return [{key, transform, differential}, refs];
   });
 };
 
@@ -99,7 +103,7 @@ export const useMatrixBounds = (
     vec3.transformMat4(bounds.center as any, b.center as any, matrix);
     bounds.radius = scale * b.radius;
 
-    // Bounds checking is ephemeral so return same ref every time
+    // Bounds checking is ephemeral so return same object every time
     return bounds;
   });
 

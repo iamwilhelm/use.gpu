@@ -5,8 +5,13 @@ exports[`bind bind produces a bound bundle 1`] = `1068531536290827`;
 exports[`bind binds an external 1`] = `
 "const TEST = true;
 
+//// @link getColor _01_
+
+
     fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
+//// @link sub 
+
 
     fn colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
 fn getColor() -> vec4<f32> {
@@ -18,8 +23,13 @@ fn getColor() -> vec4<f32> {
 exports[`bind binds an external 2`] = `
 "const TEST = true;
 
+//// @link getColor _01_
+
+
     fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
+//// @link sub 
+
 
     fn colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
 fn getColor() -> vec4<f32> {
@@ -31,14 +41,21 @@ fn getColor() -> vec4<f32> {
 exports[`bind binds an external 3`] = `
 "const TEST = true;
 
+//// @link getColor _01_
+
+
     fn _01_getColor() -> vec4<f32> { return vec4<f32>(1.0, 0.0, 1.0, 1.0); }
     
+//// @link sub _02_
+
 
     fn _02_colorUsed() -> vec4<f32> { return vec4<f32>(0.0, 0.1, 0.2, 0.0); }
 fn _02_getColor() -> vec4<f32> {
       return _01_getColor() + _02_colorUsed();
     }
     
+//// @link main 
+
 
     fn main() {
       var v: vec4<f32>;
@@ -49,23 +66,26 @@ fn _02_getColor() -> vec4<f32> {
 `;
 
 exports[`bind links data bindings 1`] = `
-"
+"//// @link @virtual _01_
+
 struct _VT_Type {
   _VT_1_getColor: vec4<f32>,
 };
 @group(0) @binding(1) var<uniform> _VT_Uniform: _VT_Type;
 
+//// @link @access [getColor getSize] [bxd6ge0qaz] _VT_1_
 
 fn _VT_1_getColor(a: i32) -> vec4<f32> {
   return _VT_Uniform._VT_1_getColor;
 }
-
 
 @group(0) @binding(0) var<storage> _VT_1_getSizeStorage: array<vec2<f32>>;
 
 fn _VT_1_getSize(a: i32) -> vec2<f32> {
   return _VT_1_getSizeStorage[a];
 }
+
+//// @link code 
 
 
     fn main() {

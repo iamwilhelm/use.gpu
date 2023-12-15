@@ -87,7 +87,7 @@ export const loadVirtualModule = <T extends SymbolTableT = any>(
     visibles: symbols,
     ...initTable,
   };
-  return { name, code, hash, table, entry, virtual, key };
+  return { name, code, hash, table, entry, virtual, key, label: code };
 }
 
 // Set entry point of a module, returns new bundle/module.

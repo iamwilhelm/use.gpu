@@ -61,6 +61,15 @@ export type VirtualTable<T extends SymbolTableT = any> = {
   namespace?: string,
 };
 
+export type BundleSummary = {
+  link?: string,
+  lib?: string,
+  name: string,
+  key: number,
+  hash: number,
+  depth: number,
+};
+
 export type DataBinding<T extends SymbolTableT = any> = {
   uniform: UniformAttribute,
   storage?: StorageSource,

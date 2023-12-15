@@ -2,7 +2,6 @@
 @link fn getGridDirection() -> i32;
 @link fn getGridMin() -> vec4<f32>;
 @link fn getGridMax() -> vec4<f32>;
-@optional @link fn getGridShift() -> vec4<f32> { return vec4<f32>(0.0); };
 
 const STEP = vec2<f32>(0.0, 1.0);
 
@@ -12,7 +11,7 @@ const STEP = vec2<f32>(0.0, 1.0);
   let i = index / n;
   let v = f32(index % n) / f32(n - 1u);
 
-  let base = mix(getGridMin(), getGridMax(), v) + getGridShift();
+  let base = mix(getGridMin(), getGridMax(), v);
 
   let dir = getGridDirection();
   var step: vec4<f32>;

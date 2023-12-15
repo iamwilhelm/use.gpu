@@ -1,4 +1,4 @@
-import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, ParameterLike, RefFlags as RF } from '../types';
+import { UniformAttribute, ShaderModule, ParsedBundle, ParsedModule, TypeLike, ParameterLike, BundleSummary, RefFlags as RF } from '../types';
 
 const NO_LIBS: Record<string, any> = {};
 const NO_ARGS: any[] = [];
@@ -14,6 +14,20 @@ export const getBundleHash = (bundle: ShaderModule): number => {
 export const getBundleEntry = (bundle: ShaderModule) => {
   return ('module' in bundle) ? bundle.entry ?? bundle.module.entry : bundle.entry;
 };
+
+export const getBundleName = (bundle: ShaderModule) => {
+  return ('module' in bundle) ? bundle.module.label ?? bundle.module.name ?? bundle.name : bundle.label ?? bundle.name;
+};
+
+export const getBundleLabel = (bundle: ShaderModule) => {
+  const [name, links, libs] = getBundleSummary(bundle, 5);
+
+  const imports: string[] = [
+    ...links.map(formatSummary),
+    ...libs.map(formatSummary),
+  ];
+  return `${name}\n\n${name}\n${imports.join("\n")}`;
+}
 
 // Force module/bundle to bundle
 export const toBundle = (bundle: ShaderModule): ParsedBundle => {
@@ -153,3 +167,67 @@ export const makeBundleToAttribute = (
     throw new Error(`Unknown attribute ${entry}`);
   };
 };
+
+// Shader module printing for debug/info
+export const getBundleSummary = (bundle: ShaderModule, maxDepth?: number = Infinity) => {
+  const allLinks: Partial<BundleSummary> = [];
+  const allLibs: Partial<BundleSummary> = [];
+
+  const libMap = new Map<number, BundleSummary>();
+
+  const recurse = (
+    bundle: ShaderModule,
+    out: Partial<BundleSummary>,
+    key: string,
+    depth: number = 0,
+  ) => {
+    const module = toModule(bundle);
+    const {libs, links} = bundle;
+
+    out.name  = (
+      out.lib ??
+      getBundleName(bundle) ??
+      getBundleEntry(bundle) ??
+      'Unknown module'
+    );
+    out.key   = getBundleKey(bundle);
+    out.hash  = getBundleHash(bundle);
+    out.depth = out.link ? depth : 0;
+    if (out.name === undefined) debugger;
+
+    if (depth < maxDepth) {
+      for (const k in libs) if (libs[k]) {
+        const key = getBundleKey(libs[k]);
+        if (libMap.has(key)) continue;
+
+        const sub = {lib: k};
+        allLibs.push(sub);
+        libMap.set(key, sub);
+
+        recurse(libs[k], sub, k, depth + 1);
+      }
+
+      for (const k in links) if (links[k]) {
+        const sub = {link: k};
+        allLinks.push(sub);
+      
+        recurse(links[k], sub, k, depth + 1);
+      }
+    }
+
+    return out;
+  };
+
+  const out = recurse(bundle, {}, 'main', 0);
+
+  return [getBundleName(bundle), allLinks as BundleSummary[], allLibs as BundleSummary[]];
+};
+
+
+const SPACE = '  ';
+export const formatSummary = (summary: BundleSummary) => {
+  const {lib, link, name, depth} = summary;
+  const indent = SPACE.repeat(depth);
+  return `${indent}${lib ? lib : `${link}: ${name}`}`;
+};
+

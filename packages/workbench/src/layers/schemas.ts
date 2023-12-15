@@ -5,14 +5,21 @@ export const SHAPE_SCHEMA = {
   zBiases:    {format: 'f32', single: 'zBias'},
 };
 
+export const MATRIX_SCHEMA = {
+  matrices: {format: 'mat4x4<f32>', single: 'matrix', ref: true},
+  normalMatrices: {format: 'mat3x3<f32>', single: 'normalMatrix', ref: true},
+};
+
 export const POINT_SCHEMA = {
   ...SHAPE_SCHEMA,
+  ...MATRIX_SCHEMA,
   positions: {format: 'vec4<f32>', single: 'position'},
   sizes:     {format: 'f32', single: 'size'},
 };
 
 export const LINE_SCHEMA = {
   ...SHAPE_SCHEMA,
+  ...MATRIX_SCHEMA,
   positions: {format: 'vec4<f32>', single: 'position', composite: true},
   widths:    {format: 'f32', single: 'width'},
 
@@ -23,6 +30,7 @@ export const LINE_SCHEMA = {
 
 export const ARROW_SCHEMA = {
   ...SHAPE_SCHEMA,
+  ...MATRIX_SCHEMA,
   positions: {format: 'vec4<f32>', single: 'position', composite: true},
   widths:    {format: 'f32', single: 'width'},
   sizes:     {format: 'f32', single: 'size'},
@@ -35,6 +43,7 @@ export const ARROW_SCHEMA = {
 
 export const FACE_SCHEMA = {
   ...SHAPE_SCHEMA,
+  ...MATRIX_SCHEMA,
   positions: {format: 'vec4<f32>', single: 'position', composite: true},
   indices:   {format: 'u32', index: true},
   segments:  {format: 'i8', segment: true},

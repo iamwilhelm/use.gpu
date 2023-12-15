@@ -46,9 +46,9 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       sizes,
       depth,
       depths,
+      zIndex,
       zBias,
       zBiases,
-      zIndex,
 
       id,
       ids,
@@ -58,14 +58,17 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       ...flags
   } = parsed;
 
+  if (zIndex && !zBias) parsed.zBias = zIndex;
+
   console.log('point', {parsed, flags});
   
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
-  const transform = useTransformContext();
+  const context = useTransformContext();
+  const {transform, nonlinear, matrix: refs} = context;
 
-  const archetype = schemaToArchetype(POINT_SCHEMA, parsed, flags);
+  const archetype = schemaToArchetype(POINT_SCHEMA, parsed, flags, refs);
   const attributes = schemaToAttributes(POINT_SCHEMA, parsed);
 
   const count = positions ? (attributes.positions?.length / 4) || 0 : 1;
@@ -78,7 +81,8 @@ export const Point: LiveComponent<PointProps> = memo((props) => {
       archetype,
       attributes,
       flags,
-      transform,
+      refs,
+      transform: nonlinear ?? context,
       zIndex,
     },
   };

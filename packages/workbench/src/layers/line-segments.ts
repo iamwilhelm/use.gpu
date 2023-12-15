@@ -9,7 +9,7 @@ export type LineSegmentsProps = {
   chunks?: number[],
   loops?: boolean[] | boolean,
 
-  render?: (segments: StorageSource, lookups: StorageSource) => LiveElement,
+  render?: (segments: StorageSource) => LiveElement,
 };
 
 /** Produces `segments` composite data for `@{LineLayer}`. */
@@ -19,8 +19,8 @@ export const LineSegments: LiveComponent<LineSegmentsProps> = memo((
   const {chunks, loops, render} = props;
   if (!chunks) return null;
 
-  const {segments, lookups} = useLineSegmentsSource(chunks, loops);
-  return render ? render(segments, lookups) : yeet([segments, lookups]);
+  const {segments} = useLineSegmentsSource(chunks, loops);
+  return render ? render(segments) : yeet([segments]);
 }, 'LineSegments');
 
 export const useLineSegments = (
@@ -37,12 +37,12 @@ export const useLineSegments = (
     );
 
     const segments = new Int8Array(alignSizeTo2(count, 4));
-    const lookups = new Uint16Array(alignSizeTo2(count, 2));
+    const slices = new Uint16Array(chunks.length);
     const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
 
-    generateChunkSegments2(segments, lookups, unwelds, chunks, loops);
+    generateChunkSegments2(segments, slices, unwelds, chunks, loops);
 
-    return {count, segments, lookups, unwelds};
+    return {count, segments, slices, unwelds};
   }, [chunks, loops, starts, ends]);
 };
 
@@ -52,11 +52,11 @@ export const useLineSegmentsSource = (
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
 ) => {
-  const {count, segments, lookups} = useLineSegments(chunks, loops, starts, ends);
+  const {count, segments, slices} = useLineSegments(chunks, loops, starts, ends);
 
   // Bind as shader storage
   const s = useRawSource(segmentBuffer, 'i8');
   const l = useRawSource(lookupBuffer, 'u32');
 
-  return {count, segments: s, lookups: l};
+  return {count, segments: s, slices: l};
 };

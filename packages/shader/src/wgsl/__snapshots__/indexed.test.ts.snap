@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`indexed loads two indexed values 1`] = `
+"//// @link index _01_
+
+
+    fn _01_getIndex(i: u32) -> u32 { return i * 2u + 1u; }
+    
+//// @link value1 _02_
+
+
+    fn _02_getValue1(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 2.0, 3.0, 4.0); }
+    
+//// @link value2 _03_
+
+
+    fn _03_getValue2(i: u32) -> vec2<u32> { return vec2<u32>(1u, 2u); }
+    
+//// @link @indexed [getIndex / getValue1 getValue2] _04_
+
+var<private> _04_a: vec4<f32>;
+var<private> _04_b: vec2<u32>;
+fn _04_getIndex(index: u32) {
+  let mapped = _01_getIndex(index);
+  _04_a = _02_getValue1(mapped);
+  _04_b = _03_getValue2(mapped);
+}
+
+fn getValue1(index: u32) { return a; }
+fn getValue2(index: u32) { return b; }
+
+//// @link main 
+
+
+    fn main(i: u32) -> vec4<f32> {
+      let loaded = _04_getIndex(i);
+    }
+    "
+`;

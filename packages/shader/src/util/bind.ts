@@ -2,7 +2,7 @@ import { ParsedBundle, ParsedModule, ShaderModule, ShaderDefine, DataBinding } f
 
 import { parseLinkAliases } from '../util/link';
 import { toHash, formatMurmur53, toMurmur53, scrambleBits53, mixBits53 } from '../util/hash';
-import { toBundle, toModule, getBundleHash, getBundleKey, getBundleEntry } from '../util/bundle';
+import { toBundle, toModule, getBundleName, getBundleHash, getBundleKey, getBundleEntry } from '../util/bundle';
 import { loadStaticModule } from '../util/shader';
 import { PREFIX_VIRTUAL, VIRTUAL_BINDINGS } from '../constants';
 
@@ -53,7 +53,7 @@ export const bindBundle = (
   for (const k in links) if (links[k]) external = mixBits53(external, getBundleHash(links[k]!));
 
   const defs = defines ? toMurmur53(defines) : 0;
-  const code = `@closure`;
+  const code = `@closure [${getBundleName(bundle)}]`;
   const rehash = scrambleBits53(mixBits53(hash, mixBits53(external, defs)));
 
   // External key

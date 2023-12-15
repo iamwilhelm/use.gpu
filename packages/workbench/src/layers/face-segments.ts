@@ -8,18 +8,18 @@ import { useRawSource } from '../hooks/useRawSource';
 export type FaceSegmentsProps = {
   chunks?: number[],
 
-  render?: (segments: StorageSource, lookups: StorageSource) => LiveElement,
+  render?: (segments: StorageSource) => LiveElement,
 };
 
-/** Produces `segments` and `lookups` composite data for `@{FaceLayer}`. */
+/** Produces `segments` composite data for `@{FaceLayer}`. */
 export const FaceSegments: LiveComponent<FaceSegmentsProps> = memo((
   props: FaceSegmentsProps,
 ) => {
   const {chunks, render} = props;
   if (!chunks) return null;
   
-  const {segments, lookups} = useFaceSegmentsSource(chunks);
-  return render ? render(segments, lookups) : yeet([segments, lookups]);
+  const {segments} = useFaceSegmentsSource(chunks);
+  return render ? render(segments) : yeet([segments]);
 }, 'FaceSegments');
 
 export const useFaceSegments = (
@@ -31,22 +31,21 @@ export const useFaceSegments = (
     );
 
     const segments = new Int8Array(alignSizeTo2(count, 4));
-    const lookups = new Uint16Array(alignSizeTo2(count, 2));
+    const slices = new Uint16Array(chunks.length);
 
-    generateChunkFaces2(segments, lookups, chunks);
+    generateChunkFaces2(segments, slices, chunks);
 
-    return {count, segments, lookups};
+    return {count, segments, slices};
   }, chunks);
 };
 
 export const useFaceSegmentsSource = (
   chunks: number[] | TypedArray,
 ) => {
-  const {count, segments, lookups} = useFaceSegments(chunks);
+  const {count, segments} = useFaceSegments(chunks);
 
   // Bind as shader storage
   const s = useRawSource(segmentBuffer, 'i8');
-  const l = useRawSource(lookupBuffer, 'u32');
 
-  return {count, segments: s, lookups: l};
+  return {count, segments};
 };

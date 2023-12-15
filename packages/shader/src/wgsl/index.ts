@@ -37,6 +37,10 @@ import {
 } from './diff';
 
 import {
+  indexWith,
+} from './index';
+
+import {
   linkBundle,
   linkModule,
   linkCode,
@@ -53,6 +57,7 @@ import {
   getBundleEntry,
   getBundleHash,
   getBundleKey,
+  getBundleLabel,
 } from '../util/bundle';
 
 import { parser } from './highlight/wgsl';
@@ -96,6 +101,10 @@ export {
 } from './diff';
 
 export {
+  indexWith
+} from './indexed';
+
+export {
   linkBundle,
   linkModule,
   linkCode,
@@ -112,6 +121,7 @@ export {
   getBundleEntry,
   getBundleHash,
   getBundleKey,
+  getBundleLabel,
 } from '../util/bundle';
 
 export const WGSLLinker = {
@@ -141,6 +151,7 @@ export const WGSLLinker = {
   castTo,
   chainTo,
   diffBy,
+  indexWith,
   swizzleTo,
 
   makeASTParser,
@@ -153,6 +164,7 @@ export const WGSLLinker = {
   getBundleEntry,
   getBundleHash,
   getBundleKey,
+  getBundleLabel,
 
   parser,
 };

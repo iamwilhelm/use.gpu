@@ -2,7 +2,7 @@ import type { Lazy, DataBounds } from '@use-gpu/core';
 import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import type { TransformContextProps } from '../providers/transform-provider';
 
-import { useMemo } from '@use-gpu/live';
+import { useMemo, useRef } from '@use-gpu/live';
 import { chainTo, getBundleKey } from '@use-gpu/shader/wgsl';
 import { useTransformContext, TransformBounds } from '../providers/transform-provider';
 import { getBoundShader } from '../hooks/useBoundShader';
@@ -57,13 +57,14 @@ export const useCombinedMatrixTransform = (
   const combined = useCombinedMatrix(matrix);
 
   const bounds = useMatrixBounds(combined);
-  const props = useMatrixTransform(combined, bounds);
+  const [props, refs] = useMatrixTransform(combined, bounds);
 
   const parent = useTransformContext();
 
   const context = useMemo(() => {
-    const chained = chainTransform(props, parent.matrix ?? parent);
-    return {...chained, matrix: parent.matrix ?? {}};
+    const prev = parent.nonlinear ?? parent;
+    const chained = chainTransform(props, prev);
+    return {...chained, nonlinear: prev, matrix: refs};
   }, [props, parent]);
 
   return [context, combined];

@@ -60,7 +60,7 @@ export const Plot2DPage: LC = () => {
                 [[300, 50], [350, 150], [400, 50], [450, 150]],
                 [[300, 150], [350, 250], [400, 150], [450, 250]],
               ]}
-              width={5}
+              width={10}
               color={'#40c000'}
             />
 
@@ -80,13 +80,13 @@ export const Plot2DPage: LC = () => {
                   [[300, 50], [350, 150], [400, 50], [450, 150]],
                   [[300, 150], [350, 250], [400, 150], [450, 250]],
                 ]}
-                width={10}
+                width={12}
                 color={['#ffa040', '#7f40a0']}
-                join="miter"
-                depth={1}
+                join="round"
               />
             </Transform>
 
+            {/*
             <Line
               positions={[
                 [[550, 50], [500, 150], [600, 150]],
@@ -151,7 +151,7 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
-            <Transform position={[300, 700]} scale={[0.8, 0.8]}>
+            <Transform position={[620, 50]} scale={[0.8, 0.8]}>
               <Face
                 position={[[0, 0], [50, 0], [100, 100], [50, 100]]}
                 color={"#823456"}
@@ -163,22 +163,26 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
+            <Transform position={[650, 200]} scale={[0.8, 0.8]}>
+              <Face
+                position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
+                color={"#823456"}
+              />
+              <Line
+                position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
+                color={"#ffffff"}
+                width={2}
+                zIndex={2}
+                loop
+              />
+            </Transform>
+
             <Cartesian
               range={[[0, 100], [0, 100]]}
               position={[400, 400, 0]}
               scale={[400, 400, 1]}
             >
-            {/*
-              <Grid
-                axes='xy'
-                width={2}
-                first={{ detail: 3, divide: 5 }}
-                second={{ detail: 3, divide: 5 }}
-                depth={0.5}
-                zBias={-1}
-                auto
-              />
-            */}
+            
 
               <Axis
                 origin={[100, 100]}
@@ -196,6 +200,7 @@ export const Plot2DPage: LC = () => {
                 end
               />
             </Cartesian>
+            */}
 
           </Plot>
         </Pass>
@@ -203,6 +208,18 @@ export const Plot2DPage: LC = () => {
     </Loop>
   );
 }
+
+/*
+              <Grid
+                axes='xy'
+                width={2}
+                first={{ detail: 3, divide: 5 }}
+                second={{ detail: 3, divide: 5 }}
+                depth={0.5}
+                zBias={-1}
+                auto
+              />
+*/
 
 const Camera = ({children}: PropsWithChildren<object>) => (
   <PanControls

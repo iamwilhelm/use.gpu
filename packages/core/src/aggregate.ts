@@ -1,5 +1,6 @@
 import type { AggregateBuffer, UniformType } from './types';
 
+import { resolve } from './lazy';
 import { makeStorageBuffer, uploadBuffer } from './buffer';
 import {
   alignSizeTo,
@@ -31,6 +32,18 @@ export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, leng
   return {buffer, array, source, dims};
 }
 
+export const uploadSource = (
+  device: GPUDevice,
+  source: StorageStorage,
+  arrayBuffer: ArrayBuffer,
+  count: number,
+) => {
+  uploadBuffer(device, source.buffer, arrayBuffer);
+  source.length = count;
+  source.size = [count];
+  source.version = incrementVersion(source.version);
+};
+
 export const updateAggregateBuffer = (
   device: GPUDevice,
   aggregate: AggregateBuffer,
@@ -38,8 +51,6 @@ export const updateAggregateBuffer = (
   count: number,
   key: string,
   keys: string,
-  segment?: boolean,
-  composite?: boolean,
 ) => {
   const {buffer, array, source, dims} = aggregate;
 
@@ -60,7 +71,9 @@ export const updateAggregateBuffer = (
       else copyNumberArray2(multiple, array, dims, 0, base, count);
     }
     else if (single != null) {
-      if (typeof single === 'function') single(array, base, count);
+      if (typeof single === 'function') {
+        single(array, base, count);
+      }
       else fillNumberArray2(single, array, dims, 0, base, count);
     }
 
@@ -68,11 +81,27 @@ export const updateAggregateBuffer = (
     i++;
   }
 
-  uploadBuffer(device, buffer, array.buffer);
-  source.length = count;
-  source.size = [count];
-  source.version = incrementVersion(source.version);
+  uploadSource(device, source, array.buffer, count);
+  return source;
+}
 
+export const updateAggregateRefs = (
+  device: GPUDevice,
+  aggregate: AggregateBuffer,
+  refs: Lazy<any>[],
+  count: number,
+) => {
+  const {buffer, array, source, dims} = aggregate;
+
+  let i = 0;
+  let base = 0;
+  for (const ref of refs) {
+    copyNumberArray2(resolve(ref), array, dims, 0, base, 1);
+    base++;
+    i++;
+  }
+
+  uploadSource(device, source, array.buffer, count);
   return source;
 }
 
@@ -99,11 +128,7 @@ export const updateAggregateIndex = (
     i++;
   }
 
-  uploadBuffer(device, buffer, array.buffer);
-  source.length = count;
-  source.size = [count];
-  source.version = incrementVersion(source.version);
-
+  uploadSource(device, source, array.buffer, count);
   return source;
 }
 

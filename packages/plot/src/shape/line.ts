@@ -44,9 +44,9 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       widths,
       depth,
       depths,
+      zIndex,
       zBias,
       zBiases,
-      zIndex,
 
       id,
       ids,
@@ -59,18 +59,22 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       loops,
 
       segments,
+      slices,
       unwelds,
       ...flags
   } = parsed;
 
-  console.log('line', {parsed, flags});
+  if (zIndex && !zBias) parsed.zBias = zIndex;
 
   const hovered = useInspectHoverable();
   if (hovered) flags.mode = "debug";
 
-  const transform = useTransformContext();
+  const context = useTransformContext();
+  const {transform, nonlinear, matrix: refs} = context;
 
-  const archetype = schemaToArchetype(LINE_SCHEMA, parsed, flags);
+  console.log('line', {parsed, flags, refs});
+
+  const archetype = schemaToArchetype(LINE_SCHEMA, parsed, flags, refs);
   const attributes = schemaToEmitters(LINE_SCHEMA, parsed);
 
   console.log({count, attributes});
@@ -82,7 +86,8 @@ export const Line: LiveComponent<LineProps> = memo((props) => {
       archetype,
       attributes,
       flags,
-      transform,
+      refs,
+      transform: nonlinear ?? context,
       zIndex,
     },
   };

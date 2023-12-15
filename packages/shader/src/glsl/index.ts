@@ -54,6 +54,7 @@ import {
   getBundleEntry,
   getBundleHash,
   getBundleKey,
+  getBundleLabel,
 } from '../util/bundle';
 
 import { parser } from './grammar/glsl';
@@ -114,6 +115,7 @@ export {
   getBundleEntry,
   getBundleHash,
   getBundleKey,
+  getBundleLabel,
 } from '../util/bundle';
 
 export const GLSLLinker = {
@@ -156,6 +158,7 @@ export const GLSLLinker = {
   getBundleEntry,
   getBundleHash,
   getBundleKey,
+  getBundleLabel,
 
   parser,
 };

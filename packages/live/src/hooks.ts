@@ -425,7 +425,7 @@ export const useCapture = <C>(
   const i = pushState(fiber, Hook.CAPTURE);
   const {state, host, context: {values, roots}} = fiber;
   const root = roots.get(context) as LiveFiber<any>;
-  if (!root) throw new Error(`Context '${context.displayName}' was used without being captured.`);
+  if (!root) throw new Error(`Capture '${context.displayName}' was used without being provided.`);
 
   if (host) {
     if (!state![i]) {

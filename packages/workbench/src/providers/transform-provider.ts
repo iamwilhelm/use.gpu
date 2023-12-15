@@ -3,6 +3,11 @@ import type { DataBounds } from '@use-gpu/core';
 import { makeContext, useContext, useNoContext } from '@use-gpu/live';
 import { mat4, vec4 } from 'gl-matrix';
 
+export type MatrixRefs = {
+  matrix: RefObject<mat4>,
+  normalMatrix: RefObject<mat3>,
+};
+
 export type TransformBounds = (bounds: DataBounds) => DataBounds;
 
 export type TransformContextProps = {
@@ -11,7 +16,8 @@ export type TransformContextProps = {
   differential: ShaderModule | null,
   bounds: TransformBounds,
 
-  matrix?: TransformContextProps,
+  nonlinear?: TransformContextProps,
+  matrix?: MatrixRefs,
 };
 
 export const DEFAULT_TRANSFORM = {

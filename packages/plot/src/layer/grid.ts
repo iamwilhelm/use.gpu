@@ -113,7 +113,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
         }
       });
 
-      autoBound = useBoundShader(getGridAutoPosition, [xform, autoBase, autoShift]);
+      //autoBound = useBoundShader(getGridAutoPosition, [xform, autoBase, autoShift]);
     }
     else {
       useNoShaderRef();
@@ -134,7 +134,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     const m2 = useShaderRef(max);
 
     const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-    const bound = useBoundShader(getGridPosition, [data, a, m1, m2, autoBound], defines);
+    const bound = useBoundShader(getGridPosition, [data, a, m1, m2], defines);
 
     // Expose position source
     const source = useMemo(() => ({

@@ -4,9 +4,11 @@ import { VirtualLayers } from '@use-gpu/workbench';
 
 export type PlotProps = PropsWithChildren<object>;
 
+const OPTIONS = {};
+
 export const Plot: LiveComponent<PlotProps> = (props) => {
   const {children} = props;
-  return children ? use(VirtualLayers, { children }) : null;
+  return children ? use(VirtualLayers, { ...OPTIONS, children }) : null;
 };
 
 

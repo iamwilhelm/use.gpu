@@ -9,14 +9,16 @@ import { patch, $delete } from '@use-gpu/state';
 export const makeShaderModuleDescriptor = (
   code: TypedArray | string,
   hash: string | number,
-  entryPoint: string = 'main'
-): ShaderModuleDescriptor => ({code, hash, entryPoint});
+  entryPoint: string = 'main',
+  label?: string,
+): ShaderModuleDescriptor => ({code, hash, entryPoint, label});
 
 export const makeShaderStage = (device: GPUDevice, descriptor: ShaderModuleDescriptor, extra: any = {}): ShaderStageDescriptor => {
-  const {code, entryPoint} = descriptor;
+  const {code, entryPoint, label} = descriptor;
 
   const gpuDescriptor = {code} as GPUShaderModuleDescriptor;
   const module = device.createShaderModule(gpuDescriptor);
+  if (label) module.label = label;
 
   return {module, entryPoint, ...extra};
 }

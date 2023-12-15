@@ -144,8 +144,8 @@ export const updateMipTextureChain = (
   if (!pipeline) {
     const shader = layer != null ? MIP_SHADER_2D_ARRAY : MIP_SHADER_2D;
 
-    const vertex = makeShaderModuleDescriptor(shader, 'mip-v', 'vertexMain');
-    const fragment = makeShaderModuleDescriptor(shader, 'mip-f', 'fragmentMain');
+    const vertex = makeShaderModuleDescriptor(shader, 'mip-v', 'vertexMain', 'builtin/mip');
+    const fragment = makeShaderModuleDescriptor(shader, 'mip-f', 'fragmentMain', 'builtin/mip');
     const colorStates = [makeColorState(format as GPUTextureFormat)];
 
     pipeline = makeRenderPipeline(device, vertex, fragment, colorStates, undefined, 1, {

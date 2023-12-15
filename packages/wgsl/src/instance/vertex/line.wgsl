@@ -4,6 +4,10 @@ use '@use-gpu/wgsl/geometry/strip'::{ getStripIndex };
 use '@use-gpu/wgsl/geometry/line'::{ getLineJoin };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
 
+@optional @link fn loadInstance(i: u32) { };
+@optional @link fn getMappedIndex(i: u32) -> vec2<u32> { return vec2<u32>(i, i); };
+@optional @link fn getSegmentCount() -> f32 { return 1.0; }
+
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
 @optional @link fn getScissor(i: u32) -> vec4<f32> { return vec4<f32>(1.0); };
 
@@ -18,8 +22,6 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize };
   
 @optional @link fn getTrim(i: u32) -> vec4<u32> { return vec4<u32>(0u, 0u, 0u, 0u); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
-
-@optional @link fn getInstanceCount() -> f32 { return 1.0; }
 
 const ARROW_ASPECT: f32 = 2.5;
 
@@ -61,9 +63,22 @@ fn trimAnchor(
 }
 
 @export fn getLineVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
+  var geometryIndex: u32;
+
+  if (HAS_INSTANCES) {
+    let mappedIndex = getMappedIndex(instanceIndex);
+    geometryIndex = mappedIndex.x;
+
+    let uniformIndex = mappedIndex.y;
+    loadInstance(uniformIndex);
+  }
+  else {
+    geometryIndex = instanceIndex;
+  }
+
   var ij = getStripIndex(vertexIndex);
 
-  var segmentLeft = getSegment(instanceIndex);
+  var segmentLeft = getSegment(geometryIndex);
   if (segmentLeft == 0 || segmentLeft == 2) {
     return SolidVertex(
       vec4<f32>(0.0),
@@ -82,21 +97,21 @@ fn trimAnchor(
   var joinIndex: u32;
   if (ij.x == 0u) {
     joinIndex = u32(LINE_JOIN_SIZE);
-    cornerIndex = instanceIndex;
+    cornerIndex = geometryIndex;
   }
   else {
     joinIndex = ij.x - 1u;
-    cornerIndex = instanceIndex + 1u;
+    cornerIndex = geometryIndex + 1u;
   }
 
-  let trim = getTrim(instanceIndex);
+  let trim = getTrim(geometryIndex);
   var trimMode = i32(trim.z);
 
   let rectangleUV = getUV(cornerIndex);
   let st4 = getST(cornerIndex);
 
   let uv = mix(rectangleUV.xy, rectangleUV.zw, uv1);
-  let uv4 = vec4<f32>(uv, f32(instanceIndex) / getInstanceCount(), 0.0);
+  let uv4 = vec4<f32>(uv, f32(geometryIndex) / getSegmentCount(), 0.0);
 
   let segment = getSegment(cornerIndex);
   let color = getColor(cornerIndex);

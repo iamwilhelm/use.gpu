@@ -195,6 +195,11 @@
       "import": "./src/instance/identity.wgsl",
       "require": "./src/instance/identity.wgsl"
     },
+    "./instance/instanced-index.wgsl": {
+      "types": "./src/instance/instanced-index.wgsl.d.ts",
+      "import": "./src/instance/instanced-index.wgsl",
+      "require": "./src/instance/instanced-index.wgsl"
+    },
     "./instance/interleave.wgsl": {
       "types": "./src/instance/interleave.wgsl.d.ts",
       "import": "./src/instance/interleave.wgsl",

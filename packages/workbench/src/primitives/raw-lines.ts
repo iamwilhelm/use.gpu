@@ -11,17 +11,21 @@ import { Virtual } from './virtual';
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
+
+import { useMaterialContext } from '../providers/material-provider';
+import { PickingSource, usePickingShader } from '../providers/picking-provider';
+
 import { useApplyTransform } from '../hooks/useApplyTransform';
-import { useShaderRef } from '../hooks/useShaderRef';
-import { getBoundShader, useBoundShader } from '../hooks/useBoundShader';
+import { getBoundShader, useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useDataLength } from '../hooks/useDataBinding';
-import { PickingSource, usePickingShader } from '../providers/picking-provider';
+import { useInstanceCount, useNoInstanceCount } from '../hooks/useInstanceCount';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
-import { useMaterialContext } from '../providers/material-provider';
+import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getLineSegment } from '@use-gpu/wgsl/geometry/segment.wgsl';
 import { getLineVertex } from '@use-gpu/wgsl/instance/vertex/line.wgsl';
+import { getInstancedIndex } from '@use-gpu/wgsl/instance/instanced-index.wgsl';
 
 export type RawLinesFlags = {
   join?: 'miter' | 'round' | 'bevel',
@@ -50,6 +54,9 @@ export type RawLinesProps = {
   trims?: ShaderSource,
   sizes?: ShaderSource,
 
+  instances?: ShaderSource,
+  mappedInstances?: boolean,
+
   count?: Lazy<number>,
 } & PickingSource & RawLinesFlags;
 
@@ -75,6 +82,10 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     depthTest,
     depthWrite,
     blend,
+
+    instances,
+    mappedInstances,
+
     count = null,
     depth = 0,
     join,
@@ -91,6 +102,12 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const vertexCount = 2 + tris;
   const instanceCount = useDataLength(count, props.positions, -1);
 
+  // Instanced draw (repeated or random access)
+  const [instanceSize, totalCount] = useInstanceCount(instances, instanceCount, mappedInstances);
+  const mappedIndex = instances
+    ? useBoundShader(getInstancedIndex, [instanceSize])
+    : useNoBoundShader();
+
   const p = useShaderRef(props.position, props.positions);
   const u = useShaderRef(props.uv, props.uvs);
   const s = useShaderRef(props.st, props.sts);
@@ -102,6 +119,10 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const t = useShaderRef(props.trim, props.trims);
   const e = useShaderRef(props.size, props.sizes);
   
+  const i = useShaderRef(null, props.indices);
+  const l = useShaderRef(null, props.instances);
+  const k = useShaderRef(instanceSize);
+
   const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
 
   const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
@@ -119,7 +140,13 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getLineVertex, [positions, scissor, u, ss, g ?? auto, c, w, d, z, t, e, instanceCount]);
+  const getVertex = useBoundShader(getLineVertex, [
+    l, mappedIndex, instanceCount,
+    positions, scissor,
+    u, ss,
+    g ?? auto, c, w, d, z,
+    t, e,
+  ]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => ({
@@ -140,11 +167,13 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     blend,
   });
 
+  const hasInstances = !!props.instances;
   const defines = useMemo(() => ({
     ...defs,
+    HAS_INSTANCES: hasInstances,
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
-  }), [defs, style, segments]);
+  }), [defs, hasInstances, style, segments]);
   
   return use(Virtual, {
     vertexCount,

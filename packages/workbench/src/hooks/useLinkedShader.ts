@@ -2,7 +2,7 @@ import type { ShaderModuleDescriptor } from '@use-gpu/core';
 import type { ParsedModule, ParsedBundle, ShaderDefine } from '@use-gpu/shader';
 
 import { toHash } from '@use-gpu/state';
-import { resolveBindings, linkBundle, getBundleHash, getBundleKey } from '@use-gpu/shader/wgsl';
+import { resolveBindings, linkBundle, getBundleHash, getBundleKey, getBundleLabel } from '@use-gpu/shader/wgsl';
 import { formatMurmur53, mixBits53, toMurmur53 } from '@use-gpu/state';
 import { makeShaderModuleDescriptor, makeBindGroupLayoutEntries, makeUniformLayoutEntry } from '@use-gpu/core';
 import { useFiber, useMemo, useOne } from '@use-gpu/live';
@@ -90,10 +90,11 @@ export const useLinkedShader = (
 
       let result = MODULE_CACHE.get(key);
       if (result == null) {
+        const label = getBundleLabel(module);
         const linked = hot.get(key) ?? linkBundle(module, NO_LIBS, defines);
         const version = (VERSION_CACHE.get(key) ?? 0) + 1;
         VERSION_CACHE.set(key, version);
-        result = makeShaderModuleDescriptor(linked, `${key}-${version}`, entry);
+        result = makeShaderModuleDescriptor(linked, `${key}-${version}`, entry, label);
         MODULE_CACHE.set(key, result);
       }
       out.push(result);

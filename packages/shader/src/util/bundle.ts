@@ -16,11 +16,11 @@ export const getBundleEntry = (bundle: ShaderModule) => {
 };
 
 export const getBundleName = (bundle: ShaderModule) => {
-  return ('module' in bundle) ? bundle.module.label ?? bundle.module.name ?? bundle.name : bundle.label ?? bundle.name;
+  return ('module' in bundle) ? bundle.module.label ?? bundle.module.name : bundle.label ?? bundle.entry;
 };
 
 export const getBundleLabel = (bundle: ShaderModule) => {
-  const [name, links, libs] = getBundleSummary(bundle, 5);
+  const {name, links, libs} = getBundleSummary(bundle, 5);
 
   const imports: string[] = [
     ...links.map(formatSummary),
@@ -169,11 +169,11 @@ export const makeBundleToAttribute = (
 };
 
 // Shader module printing for debug/info
-export const getBundleSummary = (bundle: ShaderModule, maxDepth?: number = Infinity) => {
-  const allLinks: Partial<BundleSummary> = [];
-  const allLibs: Partial<BundleSummary> = [];
+export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infinity) => {
+  const allLinks: Partial<BundleSummary>[] = [];
+  const allLibs: Partial<BundleSummary>[] = [];
 
-  const libMap = new Map<number, BundleSummary>();
+  const libMap = new Map<number, Partial<BundleSummary>>();
 
   const recurse = (
     bundle: ShaderModule,
@@ -182,7 +182,7 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth?: number = Infin
     depth: number = 0,
   ) => {
     const module = toModule(bundle);
-    const {libs, links} = bundle;
+    const {libs, links} = bundle as ParsedBundle;
 
     out.name  = (
       out.lib ??
@@ -220,7 +220,11 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth?: number = Infin
 
   const out = recurse(bundle, {}, 'main', 0);
 
-  return [getBundleName(bundle), allLinks as BundleSummary[], allLibs as BundleSummary[]];
+  return {
+    name: getBundleName(bundle),
+    links: allLinks as BundleSummary[],
+    libs: allLibs as BundleSummary[]
+  };
 };
 
 

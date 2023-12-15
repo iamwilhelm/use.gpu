@@ -19,7 +19,7 @@ fn ${name}(index: ${args}) {
 `  ${fields.map((f, i) => `${ns}${arg(i)} = ${valueAccessors[i]}(${indexAccessor ? 'mapped' : 'index'});`).join("\n  ")}
 }
 
-${fields.map((f, i) => `fn ${ns}${f.name}(index: ${f.args?.[0] ?? 'u32'}) { return ${ns}${arg(i)}; }`).join("\n")}
+${fields.map((f, i) => `fn ${ns}${f.name}(index: ${f.args?.[0] ?? 'u32'}) -> ${f.format} { return ${ns}${arg(i)}; }`).join("\n")}
 `
   );
 }

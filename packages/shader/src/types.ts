@@ -48,6 +48,7 @@ export type ParsedModule<T extends SymbolTableT = any> = {
   shake?: ShakeTable,
   virtual?: VirtualTable<T>,
   entry?: string,
+  label?: string,
   key?: number,
 };
 

@@ -153,9 +153,12 @@ export const schemaToAggregate = (
 
       if (ref && single) {
         if (!aggregate.instances) {
-          aggregate.instances = makeAggregateBuffer(device, format as any, allocCount);
+          aggregate.instances = makeAggregateBuffer(device, 'u32', allocCount);
         };
-        aggregate[single] = [];
+        aggregate[single] = {
+          refs: [],
+          source: null,
+        };
       }
 
       const size = (
@@ -167,6 +170,19 @@ export const schemaToAggregate = (
     }
   }
   return aggregate;
+};
+
+export const mapSchema = <T>(
+  schema: ArchetypeSchema,
+  callback: (field: ArchetypeField) => T,
+): ArchetypeSchema => {
+  const out: T[] = [];
+  for (const key in schema) {
+    const field = schema[key];
+    const v = callback(field, key);
+    if (v !== undefined) out.push(v);
+  }
+  return out;
 };
 
 export const filterSchema = (
@@ -195,8 +211,7 @@ export const updateAggregateFromSchema = (
     const {single, index, segment, composite, ref} = schema[key];
 
     if (ref && single && aggregate[single]) {
-      aggregate[single] = items.map(item => item.refs?.[single]);
-      props[key] = aggregate[key].source;
+      aggregate[single].refs = items.map(item => item.refs?.[single]);
       continue;
     }
 
@@ -222,7 +237,7 @@ export const updateAggregateFromSchemaRefs = (
     if (!ref || !single) continue;
     if (aggregate[key]) {
       const k = single;
-      updateAggregateRefs(device, aggregate[key], aggregate[single], 1);
+      updateAggregateRefs(device, aggregate[key], aggregate[single].refs, 1);
     }
   }
 };

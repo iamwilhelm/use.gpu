@@ -371,6 +371,7 @@ export type ExternalTexture = {
 // Shaders
 export type ShaderModuleDescriptor = {
   code: TypedArray | string,
+  label?: string,
   entryPoint: string,
   hash: string | number,
 };

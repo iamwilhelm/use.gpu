@@ -80,6 +80,25 @@ export const useNoMatrixTransform = () => {
   useNoOne();
 };
 
+export const useMatrixTransformSources = (
+  matrix: ShaderSource,
+  normalMatrix: ShaderSource,
+): [
+  TransformContextProps,
+] => {
+  return useOne(() => {
+    const transform = getBoundShader(getCartesianPosition, [matrix]);
+    const differential = getBoundShader(getMatrixDifferential, [matrix, normalMatrix]);
+
+    const key = getBundleKey(transform) ^ getBundleKey(differential);
+    return {key, transform, differential};
+  }, [matrix, normalMatrix]);
+};
+
+export const useNoMatrixTransformSources = () => {
+  useNoOne();
+};
+
 export const useMatrixBounds = (
   matrix: mat4,
   bounds?: TransformBounds | null,

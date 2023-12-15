@@ -86,7 +86,6 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
-            {/*
             <Line
               positions={[
                 [[550, 50], [500, 150], [600, 150]],
@@ -200,7 +199,6 @@ export const Plot2DPage: LC = () => {
                 end
               />
             </Cartesian>
-            */}
 
           </Plot>
         </Pass>

@@ -1,6 +1,6 @@
 import type { LambdaSource, TextureSource, StorageSource } from '@use-gpu/core';
 
-import { proxy, proxyRef } from '@use-gpu/core';
+import { proxy, lazy } from '@use-gpu/core';
 import { useOne, useNoOne, useRef, useNoRef } from '@use-gpu/live';
 
 export const useDerivedSource = <T extends TextureSource | StorageSource | LambdaSource>(
@@ -10,7 +10,7 @@ export const useDerivedSource = <T extends TextureSource | StorageSource | Lambd
   const overrideRef = useRef(override);
   overrideRef.current = override;
 
-  return useOne(() => source ? proxyRef(source, overrideRef) : null as any, source);
+  return useOne(() => source ? lazy(source, overrideRef) : null as any, source);
 };
 
 export const getDerivedSource = <T extends TextureSource | StorageSource | LambdaSource>(

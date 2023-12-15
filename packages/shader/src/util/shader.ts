@@ -33,7 +33,7 @@ export const makeLoadModule = <T extends SymbolTableT = any>(
   }
   const hash = toMurmur53(code);
 
-  return bindEntryPoint({name, code, hash, table, shake, tree}, entry);
+  return bindEntryPoint({name, code, hash, table, shake, tree} as ParsedModule, entry);
 }
 
 // Use cache to load modules

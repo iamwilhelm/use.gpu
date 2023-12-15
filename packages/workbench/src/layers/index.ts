@@ -11,6 +11,8 @@ export * from './point-layer';
 export * from './surface-layer';
 export * from './tick-layer';
 
+export * from './indexed-transform';
+
 export * from './schemas';
 export * from './virtual-layers';
 export * from './types';

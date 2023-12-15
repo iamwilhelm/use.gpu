@@ -1,14 +1,16 @@
 import type { LiveComponent, LiveFunction, LiveElement } from '@use-gpu/live';
 import type { AggregateBuffer, UniformType, TypedArray, StorageSource } from '@use-gpu/core';
+import type { ShaderSource } from '@use-gpu/shader/wgsl';
 import type { LayerAggregator, LayerAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
-import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, memo, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, memo, extend, useContext, useOne, useMemo } from '@use-gpu/live';
 import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 import {
   filterSchema,
+  mapSchema,
   schemaToAggregate,
   updateAggregateFromSchema,
   updateAggregateFromSchemaRefs,
@@ -18,6 +20,9 @@ import {
   updateAggregateIndex,
 } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
+import { getIndexedSources } from '../hooks/useIndexedSources';
+
+import { IndexedTransform } from './indexed-transform';
 
 import { FaceLayer } from './face-layer';
 import { LineLayer } from './line-layer';
@@ -68,11 +73,22 @@ export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualL
   return items ? Resume(options)(items) : children ? multiGather(children, Resume(options)) : null;
 };
 
-const provideTransform = (element: LiveElement, transform?: TransformContextProps) => {
+const provideTransform = (
+  element: LiveElement,
+  transform?: TransformContextProps,
+  loadInstance?: ShaderSource | null,
+  refSources?: Record<string, ShaderSource>,
+) => {
   if (!element) return null;
 
+  const hasRefTransform = loadInstance && refSources;
   const hasTransform = transform?.key;
+
   let view = element;
+  if (hasRefTransform) {
+    view = extend(view, {instances: loadInstance});
+    view = use(IndexedTransform, {...refSources, children: view});
+  }
   if (hasTransform) {
     view = provide(TransformContext, transform, view, element.key);
   }
@@ -154,14 +170,39 @@ const makeSchemaAggregator = (
   const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocCount, allocIndices);
 
   const refSchema = filterSchema(schema, (f) => f.ref);
-  const refCount = Object.keys(refSchema).length;
-
-  const uploadRefs = () => {
-    console.log('update aggregator refs', Component.name, refSchema, aggregate);
-    updateAggregateFromSchemaRefs(device, refSchema, aggregate);
-  };
+  const refKeys = mapSchema(refSchema, (f, key) => key);
+  const refCount = refKeys.length;
   
-  const upload = quote(yeet(uploadRefs));
+  const {instances} = aggregate;
+
+  let loadInstance: ShaderSource | null = null;
+  let refSources: Record<string, ShaderSource> | null = null;
+  if (instances) {
+    const uniforms = refKeys.map(k => {
+      const {format} = refSchema[k];
+      return {name: k, format, args: ['u32']};
+    });
+
+    const sources = {};
+    for (const k in aggregate) sources[k] = aggregate[k].source;
+
+    const index = {name: 'instances', format: 'u32', args: ['u32']};
+    [loadInstance, refSources] = getIndexedSources(uniforms, index, sources, instances.source);
+  }
+
+  /*
+  const sources = Object.keys(refSchema).map(k => {
+    const {refSchema[k])
+      for (const k in refSchema) {
+    const 
+  }
+  */
+
+  const uploadRefs = refCount ? () => {
+    updateAggregateFromSchemaRefs(device, refSchema, aggregate);
+  } : null;
+
+  const upload = uploadRefs ? quote(yeet(uploadRefs)) : null;
 
   return (items: ArrowAggregate[], count: number, indices: number) => {
     const [item] = items;
@@ -169,10 +210,12 @@ const makeSchemaAggregator = (
     const props = {count, ...item.flags} as Record<string, any>;
 
     updateAggregateFromSchema(device, schema, aggregate, props, items, count, indices);
-    DEBUG && console.log(Component.name, {props, items, aggregate});
+    DEBUG && console.log(Component.name, {props, items, aggregate, refSources});
+
+    if (instances) props.instances = instances?.source;
 
     const element = use(Component, props);
-    const layer = provideTransform(element, transform);
+    const layer = provideTransform(element, transform, loadInstance, refSources);
 
     if (refCount) return [upload, layer];
     return layer;

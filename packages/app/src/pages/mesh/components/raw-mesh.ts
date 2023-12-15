@@ -107,8 +107,18 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
     const vertexLinked = linkBundle(vertexShader, {toColorSpace}, defines);
     const fragmentLinked = linkBundle(fragmentShader, {toColorSpace}, defines);
 
-    const vertex = makeShaderModuleDescriptor(vertexLinked, vertexShader.hash ?? 0);
-    const fragment = makeShaderModuleDescriptor(fragmentLinked, fragmentShader.hash ?? 0);
+    const vertex = makeShaderModuleDescriptor(
+      vertexLinked,
+      vertexShader.hash ?? 0,
+      'main',
+      getBundleLabel(vertexShader)
+    );
+    const fragment = makeShaderModuleDescriptor(
+      fragmentLinked,
+      fragmentShader.hash ?? 0,
+      'main',
+      getBundleLabel(fragmentShader)
+    );
     
     inspect({vertex});
     inspect({fragment});

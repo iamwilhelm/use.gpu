@@ -10,17 +10,20 @@ import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback } from '@use-gpu/live';
 import { resolve, makeShaderBindings } from '@use-gpu/core';
+
 import { useMaterialContext } from '../providers/material-provider';
-import { useScissorContext } from '../providers/scissor-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
-import { useCombinedTransform } from '../hooks/useCombinedTransform';
-import { useShaderRef } from '../hooks/useShaderRef';
+import { useScissorContext } from '../providers/scissor-provider';
+
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
-
+import { useCombinedTransform } from '../hooks/useCombinedTransform';
+import { useInstanceCount, useNoInstanceCount } from '../hooks/useInstanceCount';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
+import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
+import { getInstancedIndex } from '@use-gpu/wgsl/instance/instanced-index.wgsl';
 
 export type RawFacesFlags = {
   flat?: boolean,
@@ -50,8 +53,7 @@ export type RawFacesProps = {
   indices?: ShaderSource,
 
   instances?: ShaderSource,
-  load?: ShaderSource,
-  mapped?: boolean,
+  mappedInstances?: boolean,
 
   unwelded?: {
     colors?: boolean,
@@ -85,6 +87,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     depthWrite,
     blend,
 
+    instances,
+    mappedInstances,
+
     unwelded,
     shouldDispatch,
     onDispatch,
@@ -113,21 +118,11 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     return 0;
   }, [props.positions, props.indices, props.segments, count]);
 
-  // Instanced draw
-  const hasInstances = !!props.instances;
-  let instanceSize = null;
-  let totalCount = null;
-  if (hasInstances) {
-    instanceSize = useOne(() => hasInstances && !mapped ? instanceCount : null, hasInstances);
-    totalCount = useCallback(() => {
-      const l = (props.instances as any)?.length;
-      return mapped ? l : l * resolve(instanceCount);
-    }, [props.instances, instanceCount, mapped]);
-  }
-  else {
-    useNoOne();
-    useNoCallback();
-  }
+  // Instanced draw (repeated or random access)
+  const [instanceSize, totalCount] = useInstanceCount(instances, instanceCount, mappedInstances);
+  const mappedIndex = instances
+    ? useBoundShader(getInstancedIndex, [instanceSize])
+    : useNoBoundShader();
 
   const p = useShaderRef(props.position, props.positions);
   const n = useShaderRef(props.normal, props.normals);
@@ -139,9 +134,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const z = useShaderRef(props.zBias, props.zBiases);
 
   const i = useShaderRef(null, props.indices);
-  const j = useShaderRef(null, props.instances);
-  const k = useShaderRef(instanceSize);
-  const l = useShaderRef(null, props.load);
+  const l = useShaderRef(null, props.instances);
 
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
@@ -160,7 +153,11 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
 
-  const getVertex = useBoundShader(getFaceVertex, [xf, xd, scissor, ps, n, t, u, ss, g, c, z, i, j, k, l]);
+  const getVertex = useBoundShader(getFaceVertex, [
+    l, mappedIndex, i,
+    xf, xd, scissor,
+    ps, n, t, u, ss, g, c, z,
+  ]);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => {
@@ -188,6 +185,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     blend,
   });
 
+  const hasInstances = !!props.instances;
   const hasIndices = !!props.indices;
   const hasSegments = !!props.segments;
   const defines = useMemo(() => ({

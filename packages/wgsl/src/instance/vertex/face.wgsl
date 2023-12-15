@@ -1,6 +1,10 @@
 use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
 use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 
+@optional @link fn loadInstance(i: u32) { };
+@optional @link fn getMappedIndex(instanceIndex: u32) -> vec2<u32> { return vec2<u32>(0, 0); };
+@optional @link fn getIndex(i: u32) -> u32 { return 0u; };
+
 @optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p; };
 @optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
 @optional @link fn getScissor(pos: vec4<f32>) -> vec4<f32> { return vec4<f32>(1.0); };
@@ -14,34 +18,22 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 1.0, 1.0, 1.0); };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
-@optional @link fn getIndex(i: u32) -> u32 { return 0u; };
+@export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> ShadedVertex {
+  var geometryIndex: u32;
 
-@optional @link fn getInstance(i: u32) -> u32 { return 0u; };
-@optional @link fn getInstanceSize() -> u32 { return 0u; };
-@optional @link fn loadInstance(i: u32) { };
-
-@export fn getFaceVertex(vertexIndex: u32, globalInstanceIndex: u32) -> ShadedVertex {
-  var resolvedIndex: u32;
-  var instanceIndex: u32;
   if (HAS_INSTANCES) {
-    let size = getInstanceSize();
-    if (size > 0u) {
-      resolvedIndex = getInstance(globalInstanceIndex / size);
-      instanceIndex = globalInstanceIndex % size;
-    }
-    else {
-      resolvedIndex = globalInstanceIndex;
-      instanceIndex = globalInstanceIndex;
-    }
+    let mappedIndex = getMappedIndex(instanceIndex);
+    geometryIndex = mappedIndex.x;
 
-    loadInstance(resolvedIndex);
+    let uniformIndex = mappedIndex.y;
+    loadInstance(uniformIndex);
   }
   else {
-    instanceIndex = globalInstanceIndex;
+    geometryIndex = instanceIndex;
   }
 
-  let segment = getSegment(instanceIndex);
-  let index = instanceIndex * 3u + vertexIndex;
+  let segment = getSegment(geometryIndex);
+  let index = geometryIndex * 3u + vertexIndex;
 
   var cornerIndex: u32;
   var unweldedIndex: u32;
@@ -86,24 +78,24 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   else {
     // Triangle fan
     if (vertexIndex == 0u) {
-      cornerIndex = instanceIndex - u32(segment - 1);
+      cornerIndex = geometryIndex - u32(segment - 1);
       if (FLAT_NORMALS) {
-        beforeIndex = instanceIndex + 2u;
-        afterIndex = instanceIndex + 1u;
+        beforeIndex = geometryIndex + 2u;
+        afterIndex = geometryIndex + 1u;
       }
     }
     else if (vertexIndex == 1u) {
-      cornerIndex = instanceIndex + 1u;
+      cornerIndex = geometryIndex + 1u;
       if (FLAT_NORMALS) {
-        beforeIndex = instanceIndex - u32(segment - 1);
-        afterIndex = instanceIndex + 2u;
+        beforeIndex = geometryIndex - u32(segment - 1);
+        afterIndex = geometryIndex + 2u;
       }
     }
     else {
-      cornerIndex = instanceIndex + 2u;
+      cornerIndex = geometryIndex + 2u;
       if (FLAT_NORMALS) {
-        beforeIndex = instanceIndex + 1u;
-        afterIndex = instanceIndex - u32(segment - 1);
+        beforeIndex = geometryIndex + 1u;
+        afterIndex = geometryIndex - u32(segment - 1);
       }
     }
 

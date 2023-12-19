@@ -1,6 +1,6 @@
-import { loadModule } from './shader';
-import { bindBundle } from './bind';
-import { linkBundle } from './link';
+import { loadModule } from '../shader';
+import { bindBundle } from '../bind';
+import { linkBundle } from '../link';
 import { indexWith } from './indexed';
 
 describe('indexed', () => {

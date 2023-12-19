@@ -79,7 +79,7 @@ export const makeDeclarationToAttribute = (
       format: toTypeString(type),
     }));
     const args = ms?.map(({format}: any) => format);
-    return {name, format: name, args, members: ms, attr};
+    return {name, format: ms, args, attr};
   }
   throw new Error(`Cannot convert declaration to attribute: ${JSON.stringify(d)}`);
 }
@@ -226,7 +226,6 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
     libs: allLibs as BundleSummary[]
   };
 };
-
 
 const SPACE = '  ';
 export const formatSummary = (summary: BundleSummary) => {

@@ -43,17 +43,16 @@ export type SymbolTable = {
   declarations?: DeclarationRef[],
   externals?: DeclarationRef[],
   exports?: DeclarationRef[],
-  symbols?: SymbolRef[],
-  visibles?: SymbolRef[],
-  globals?: SymbolRef[],
+  symbols?: string[],
+  types?: string[],
+  visibles?: string[],
+  globals?: string[],
   linkable?: Record<string, true>,
 };
 
-export type SymbolRef = string;
-
 export type SymbolsRef = {
   at: number,
-  symbols: SymbolRef[],
+  symbols: string[],
 }
 
 export type ModuleRef = SymbolsRef & {

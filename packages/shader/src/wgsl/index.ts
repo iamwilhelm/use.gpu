@@ -23,22 +23,27 @@ import {
   extractBindings,
 } from './bind';
 
+
 import {
   castTo,
   swizzleTo,
-} from './cast';
+} from './operators/cast';
 
 import {
   chainTo,
-} from './chain';
+} from './operators/chain';
 
 import {
   diffBy,
-} from './diff';
+} from './operators/diff';
 
 import {
   indexWith,
-} from './index';
+} from './operators/indexed';
+
+import {
+  structType,
+} from './operators/struct';
 
 import {
   linkBundle,
@@ -90,19 +95,23 @@ export {
 export {
   castTo,
   swizzleTo,
-} from './cast';
+} from './operators/cast';
 
 export {
   chainTo,
-} from './chain';
+} from './operators/chain';
 
 export {
   diffBy,
-} from './diff';
+} from './operators/diff';
 
 export {
-  indexWith
-} from './indexed';
+  indexWith,
+} from './operators/indexed';
+
+export {
+  structType,
+} from './operators/struct';
 
 export {
   linkBundle,
@@ -153,6 +162,7 @@ export const WGSLLinker = {
   diffBy,
   indexWith,
   swizzleTo,
+  structType,
 
   makeASTParser,
   compressAST,

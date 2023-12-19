@@ -40,6 +40,7 @@ export type SymbolTable = {
   externals?: DeclarationRef[],
   exports?: DeclarationRef[],
   bindings?: DeclarationRef[],
+  types?: string[],
   symbols?: string[],
   visibles?: string[],
   globals?: string[],

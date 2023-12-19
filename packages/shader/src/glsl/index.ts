@@ -25,15 +25,19 @@ import {
 import {
   castTo,
   swizzleTo,
-} from './cast';
+} from './operators/cast';
 
 import {
   chainTo,
-} from './chain';
+} from './operators/chain';
 
 import {
   diffBy,
-} from './diff';
+} from './operators/diff';
+
+import {
+  structType,
+} from './operators/struct';
 
 import {
   linkBundle,
@@ -86,15 +90,19 @@ export {
 export {
   castTo,
   swizzleTo,
-} from './cast';
+} from './operators/cast';
 
 export {
   chainTo,
-} from './chain';
+} from './operators/chain';
 
 export {
   diffBy,
-} from './diff';
+} from './operators/diff';
+
+export {
+  structType,
+} from './operators/struct';
 
 export {
   linkBundle,
@@ -147,6 +155,7 @@ export const GLSLLinker = {
   chainTo,
   diffBy,
   swizzleTo,
+  structType,
 
   makeASTParser,
   compressAST,

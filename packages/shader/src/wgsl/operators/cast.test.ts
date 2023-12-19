@@ -1,5 +1,5 @@
-import { loadModule } from './shader';
-import { linkBundle } from './link';
+import { loadModule } from '../shader';
+import { linkBundle } from '../link';
 import { castTo, swizzleTo } from './cast';
 
 describe('cast', () => {

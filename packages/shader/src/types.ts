@@ -9,6 +9,7 @@ export type ASTParser<T extends SymbolTableT = any> = {
 };
 
 export type SymbolTableT = {
+  types?: string[],
   symbols?: string[],
   linkable?: Record<string, true>,
 };
@@ -150,9 +151,11 @@ export type TextureSource = {
 
 export type ShaderSource = StorageSource | LambdaSource<ShaderModule> | TextureSource | ShaderModule;
 
+export type UniformFormat = string | UniformAttribute[] | ShaderModule;
+
 export type UniformAttribute = {
   name: string,
-  format: any,
+  format: UniformFormat,
   args?: any[] | null,
   members?: UniformAttribute[],
   attr?: UniformShaderAttribute[],

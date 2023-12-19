@@ -4,7 +4,7 @@ import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from 
 import { getBundleHash, getBundleEntry, toModule } from '../util/bundle';
 import { getBindingArgument } from '../util/bind';
 import { loadVirtualModule } from './shader';
-import { makeSwizzle } from './cast';
+import { makeSwizzle } from './operators/cast';
 import { PREFIX_VIRTUAL } from '../constants';
 import { VIRTUAL_BINDGROUP, VOLATILE_BINDGROUP } from './constants';
 

@@ -26,8 +26,8 @@ fn _04_getIndex(index: u32) {
   _04_b = _03_getValue2(mapped);
 }
 
-fn getValue1(index: u32) { return a; }
-fn getValue2(index: u32) { return b; }
+fn _04_getValue1(index: u32) -> vec4<f32> { return _04_a; }
+fn _04_getValue2(index: u32) -> vec2<u32> { return _04_b; }
 
 //// @link main 
 

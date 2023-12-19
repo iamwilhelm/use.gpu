@@ -1,7 +1,7 @@
-import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../types';
-import { loadVirtualModule } from './shader';
-import { toMurmur53, scrambleBits53, mixBits53 } from './hash';
-import { toBundle, getBundleHash, getBundleKey } from './bundle';
+import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '../../types';
+import { loadVirtualModule } from '../shader';
+import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
+import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 
 export type BundleToAttribute = (
   bundle: ShaderModule,

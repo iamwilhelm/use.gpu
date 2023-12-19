@@ -1,5 +1,5 @@
-import { makeCastTo, makeSwizzleTo, parseSwizzle, CastTo } from '../util/cast';
-import { bundleToAttribute } from './shader';
+import { makeCastTo, makeSwizzleTo, parseSwizzle, CastTo } from '../../util/operators/cast';
+import { bundleToAttribute } from '../shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
@@ -37,8 +37,8 @@ export const makeCastAccessor = (
 
   const ret = makeSwizzle(from, to, 'v', swizzle);
 
-  return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${to} {
-  let v = ${accessor}(${symbols.join(', ')});
+  return `${to} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
+  ${to} v = ${accessor}(${symbols.join(', ')});
   return ${ret};
 }
 `;
@@ -51,7 +51,7 @@ export const makeSwizzleAccessor = (
   swizzle: string | CastTo,
 ) => {
   const ret = makeSwizzle(from, to, arg(0), swizzle);
-  return `fn ${name}(${arg(0)}: ${from}) -> ${to} {
+  return `${to} ${name}(${from} ${arg(0)}) {
   return ${ret};
 }
 `;
@@ -65,10 +65,9 @@ export const makeSwizzle = (
 ) => {
   const sz = (swizzle == null) ? makeAutoSwizzle(from, to) : swizzle;
 
-  const isFloat = !!from.match(/(^|<)f/);
-  const isScalar = !from.match(/(vec[0-9]|mat[0-9]x[0-9])</);
+  const isFloat = !!from.match(/^(float|vec2|vec3|vec4|double|dvec2|dvec3|dvec4)$/);
 
-  if (!isScalar && typeof sz === 'string' && sz.match(/^[xyzw]+$/)) {
+  if (typeof sz === 'string' && sz.match(/^[xyzw]+$/)) {
     return name + '.' + sz;
   }
 
@@ -77,9 +76,9 @@ export const makeSwizzle = (
     const neg = !!(signs && signs[i] === '-');
     
     if (v.match(/[0-9]/)) return literal(+v, neg, isFloat);
-    else return (neg ? '-' : '') + (isScalar ? `${name}` : `${name}.${v}`);
+    else return (neg ? '-' : '') + `${name}.${v}`;
   });
-
+  
   const compact: string[] = [];
   let compat = true;
   for (let c of out) {
@@ -92,7 +91,7 @@ export const makeSwizzle = (
       compat = simple;
     }
   }
-  
+
   let ret = `${to}(${compact.join(', ')})`;
   if (gain != null) ret = `${ret} * ${literal(gain, false, isFloat)}`;
 

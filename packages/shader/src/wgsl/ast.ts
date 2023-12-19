@@ -404,6 +404,10 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
       const alias = getTypeAlias(a);
       const flags = getFlags(alias);
       const symbol = alias.name;
+
+      if (flags & RF.External) {
+        throw throwError('Cannot @link a type alias. Use `@link struct`.', node);
+      }
       return {at, symbol, flags, alias};
     }
     if (a.type.id === T.StructDeclaration) {
@@ -492,9 +496,11 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const visibles = uniq(exported.map(r => r.symbol));
     const globals  = uniq(globalled.map(r => r.symbol));
 
+    const types = exported.filter(d => d.alias || d.struct).map(t => t.symbol);
+
     const scope = new Set(symbols ?? []);
     for (let ref of declarations) {
-      const {func, variable, constant} = ref;
+      const {func, variable, constant, alias, struct} = ref;
       if      (func?.identifiers)     func    .identifiers = func    .identifiers.filter(s => scope.has(s));
       else if (variable?.identifiers) variable.identifiers = variable.identifiers.filter(s => scope.has(s));
       else if (constant?.identifiers) constant.identifiers = constant.identifiers.filter(s => scope.has(s));
@@ -508,6 +514,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     for (const {symbol} of externals) linkable[symbol] = true;
 
     return {
+      types: orNone(types),
       symbols: orNone(symbols),
       visibles: orNone(visibles),
       globals: orNone(globals),

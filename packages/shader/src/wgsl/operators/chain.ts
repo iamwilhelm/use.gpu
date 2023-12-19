@@ -1,5 +1,5 @@
-import { makeChainTo } from '../util/chain';
-import { bundleToAttribute } from './shader';
+import { makeChainTo } from '../../util/operators/chain';
+import { bundleToAttribute } from '../shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
@@ -14,7 +14,7 @@ export const makeChainAccessor = (
   const symbols = args.map((t, i) => `${arg(i)}`);
   const tail = rest ? symbols.slice(rest) : null;
 
-  return `${type} ${name}(${symbols.map((s, i) => `${args[i]} ${s}`).join(', ')}) {
+  return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${type} {
   return ${to}(${from}(${symbols.join(', ')})${tail?.length ? ['', ...tail].join(', ') : ''});
 }
 `;   

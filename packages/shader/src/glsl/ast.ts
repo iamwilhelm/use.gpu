@@ -2,7 +2,7 @@ import { SyntaxNode, TreeCursor, Tree } from '@lezer/common';
 import {
   CompressedNode,
   SymbolTable,
-  SymbolRef,
+  string,
   ModuleRef,
   ImportRef,
   PrototypeRef,
@@ -156,7 +156,6 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const type = getQualifiedType(a);
     const name = getText(b);
     const parameters = c ? getNodes(c).map(getText) : [];
-    const symbols = [{name}];
 
     return {name, type, parameters};
   };
@@ -399,6 +398,8 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     const globals = uniq(globalled.flatMap(r => r.symbols));
     const symbols = uniq(refs.flatMap(r => r.symbols));
 
+    const types = exported.filter(d => d.struct).flatMap(t => t.symbols);
+
     const scope = new Set(symbols ?? []);
     for (let ref of refs) if (ref.identifiers) {
       ref.identifiers = ref.identifiers.filter(s => scope.has(s));
@@ -409,6 +410,7 @@ export const makeASTParser = (code: string, tree: Tree, name?: string) => {
     for (const {symbols} of externals) for (const symbol of symbols) linkable[symbol] = true;
 
     return {
+      types: orNone(types),
       symbols: orNone(symbols),
       visibles: orNone(visibles),
       globals: orNone(globals),

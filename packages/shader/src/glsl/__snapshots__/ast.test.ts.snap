@@ -121,6 +121,7 @@ Object {
     "getQuadIndex",
     "getQuadUV",
   ],
+  "types": undefined,
   "visibles": Array [
     "getQuadIndex",
     "getQuadUV",
@@ -571,6 +572,7 @@ Object {
     "getDepth",
     "getQuadVertex",
   ],
+  "types": undefined,
   "visibles": Array [
     "getQuadVertex",
   ],
@@ -1084,6 +1086,7 @@ Object {
     "SolidVertex",
     "MeshVertex",
   ],
+  "types": undefined,
   "visibles": Array [
     "SolidVertex",
     "MeshVertex",
@@ -1612,6 +1615,10 @@ Object {
     "screenToClip3D",
     "worldToClip3D",
     "getPerspectiveScale",
+  ],
+  "types": Array [
+    "viewUniforms",
+    "ViewUniforms",
   ],
   "visibles": Array [
     "viewUniforms",

@@ -2,9 +2,9 @@ import { ShaderModule, ParsedBundle, ParsedModule, DataBinding, ModuleRef, RefFl
 
 import { formatMurmur53, toMurmur53, getObjectKey, mixBits, scrambleBits } from '../util/hash';
 import { getBundleHash } from '../util/bundle';
-import { loadVirtualModule } from './shader';
-import { makeSwizzle } from './cast';
 import { PREFIX_VIRTUAL } from '../constants';
+import { loadVirtualModule } from './shader';
+import { makeSwizzle } from './operators/cast';
 
 const NO_SYMBOLS = [] as string[];
 const INT_ARG = ['int'];

@@ -1,7 +1,7 @@
-import { UniformAttribute, ShaderModule, ParsedBundle, RefFlags as RF } from '../types';
-import { loadVirtualModule } from './shader';
-import { toMurmur53, scrambleBits53, mixBits53 } from './hash';
-import { toBundle, getBundleHash, getBundleKey } from './bundle';
+import { UniformAttribute, ShaderModule, ParsedBundle, RefFlags as RF } from '../../types';
+import { loadVirtualModule } from '../shader';
+import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
+import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 
 const NO_SYMBOLS = [] as string[];
 

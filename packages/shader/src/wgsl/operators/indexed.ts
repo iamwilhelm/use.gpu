@@ -1,6 +1,6 @@
-import { UniformAttribute } from '../types';
-import { makeIndexWith } from '../util/indexed';
-import { bundleToAttribute } from './shader';
+import { UniformAttribute } from '../../types';
+import { makeIndexWith } from '../../util/operators/indexed';
+import { bundleToAttribute } from '../shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 

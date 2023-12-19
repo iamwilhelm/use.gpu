@@ -115,6 +115,13 @@ const Resume = (
       continue;
     }
 
+    // Pass on unknown types, probably raw draw calls
+    const makeAggregator = AGGREGATORS[type];
+    if (!makeAggregator) {
+      els.push(yeet({[type]: items}));
+      continue;
+    }
+
     const partitioner = makePartitioner();
     for (let item of items) if (item) {
       partitioner.push(item);
@@ -122,7 +129,6 @@ const Resume = (
     const layers = partitioner.resolve();
 
     const group = [];
-    const makeAggregator = AGGREGATORS[type]!;
     for (const layer of layers) {
       group.push(keyed(Aggregate, layer.key, makeAggregator(options), layer.items));
     }

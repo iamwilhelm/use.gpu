@@ -138,7 +138,12 @@ export const schemaToAggregate = (
   allocCount: number = 0,
   allocIndices: number = 0,
 ): Record<string, AggregateBuffer> => {
+  const byItems = [];
+  const byCount = [];
+  const byIndices = [];
+
   const aggregate: Record<string, any> = {};
+
   for (const key in schema) {
     const {ref, single, format, index} = schema[key];
     if (
@@ -150,25 +155,36 @@ export const schemaToAggregate = (
         )
       )
     ) {
-
       if (ref && single) {
-        if (!aggregate.instances) {
-          aggregate.instances = makeAggregateBuffer(device, 'u32', allocCount);
-        };
         aggregate[single] = {
           refs: [],
           source: null,
         };
       }
 
-      const size = (
-        ref ? allocItems :
-        index ? allocIndices :
-        allocCount
-      );
-      aggregate[key] = makeAggregateBuffer(device, format as any, size);
+      if (ref) byItems.push(key);
+      else if (index) byIndices.push(key);
+      else byCount.push(key);
     }
   }
+
+  if (byItems.length) {
+    aggregate.instances = makeAggregateBuffer(device, 'u32', allocCount);
+  }
+  
+  for (const key of byItems) {
+    const f = schema[key].format as any;
+    aggregate[key] = makeAggregateBuffer(device, f, allocItems);
+  }
+  for (const key of byCount) {
+    const f = schema[key].format as any;
+    aggregate[key] = makeAggregateBuffer(device, f, allocCount);
+  }
+  for (const key of byIndices) {
+    const f = schema[key].format as any;
+    aggregate[key] = makeAggregateBuffer(device, f, allocIndices);
+  }
+
   return aggregate;
 };
 

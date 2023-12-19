@@ -37,7 +37,7 @@ export const useLineSegments = (
     );
 
     const segments = new Int8Array(alignSizeTo2(count, 4));
-    const slices = new Uint16Array(chunks.length);
+    const slices = new Uint16Array(alignSizeTo2(chunks.length, 2));
     const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
 
     generateChunkSegments2(segments, slices, unwelds, chunks, loops);
@@ -55,8 +55,8 @@ export const useLineSegmentsSource = (
   const {count, segments, slices} = useLineSegments(chunks, loops, starts, ends);
 
   // Bind as shader storage
-  const s = useRawSource(segmentBuffer, 'i8');
-  const l = useRawSource(lookupBuffer, 'u32');
+  const s = useRawSource(segments, 'i8');
+  const l = useRawSource(slices, 'u32');
 
   return {count, segments: s, slices: l};
 };

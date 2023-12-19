@@ -31,7 +31,7 @@ export const useFaceSegments = (
     );
 
     const segments = new Int8Array(alignSizeTo2(count, 4));
-    const slices = new Uint16Array(chunks.length);
+    const slices = new Uint16Array(alignSizeTo2(chunks.length, 2));
 
     generateChunkFaces2(segments, slices, chunks);
 
@@ -45,7 +45,7 @@ export const useFaceSegmentsSource = (
   const {count, segments} = useFaceSegments(chunks);
 
   // Bind as shader storage
-  const s = useRawSource(segmentBuffer, 'i8');
+  const s = useRawSource(segments, 'i8');
 
   return {count, segments};
 };

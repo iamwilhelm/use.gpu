@@ -38,7 +38,7 @@ export const useArrowSegments = (
     const segments = new Int8Array(alignSizeTo2(count, 4));
     const anchors = new Uint32Array(count * 4);
     const trims = new Uint32Array(count * 4);
-    const slices = new Uint32Array(chunks.length);
+    const slices = new Uint16Array(alignSizeTo2(chunks.length, 2));
     const unwelds = loops ? new Uint16Array(alignSizeTo2(count, 2)) : undefined;
 
     generateChunkSegments2(segments, slices, unwelds, chunks, loops, starts, ends);

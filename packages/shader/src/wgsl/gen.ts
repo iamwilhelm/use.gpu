@@ -78,8 +78,8 @@ export const makeBindingAccessors = (
     const {format: type} = storage!;
 
     const object = (
-      typeof type === 'object' ? type :
-      typeof format === 'object' ? format :
+      typeof type === 'object' && !Array.isArray(type) ? type :
+      typeof format === 'object' && !Array.isArray(format) ? format :
       null
     );
 
@@ -124,6 +124,7 @@ export const makeBindingAccessors = (
     const volatileSet = getBindingArgument(rename.get(VOLATILE_BINDGROUP));
 
     for (const {uniform: {name, format: type, args}} of constants) {
+      if (typeof type !== 'string') throw new Error(`Cannot make uniform for struct type`);
       program.push(makeUniformFieldAccessor(PREFIX_VIRTUAL, namespace, type, name, args as any));
     }
 
@@ -133,11 +134,11 @@ export const makeBindingAccessors = (
       const base = volatile ? volatileBase++ : bindingBase++;
 
       const object = (
-        typeof type === 'object' ? type :
-        typeof format === 'object' ? format :
+        typeof type === 'object' && !Array.isArray(type) ? type :
+        typeof format === 'object' && !Array.isArray(format) ? format :
         null
       );
-
+      
       if (object) {
         const entry = getBundleEntry(object);
         const t = (entry ? rename.get(entry) : null) ?? entry ?? 'unknown';
@@ -147,7 +148,7 @@ export const makeBindingAccessors = (
         continue;
       }
 
-      if (typeof format === 'string') {
+      if (typeof format === 'string' && typeof type === 'string') {
         if (is3to4(format)) {
           const accessor = name + '3to4';
           program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
@@ -182,7 +183,7 @@ export const makeBindingAccessors = (
         }
       }
 
-      program.push(makeStorageAccessor(namespace, set, base, type, format as string, name, readWrite, args));
+      program.push(makeStorageAccessor(namespace, set, base, type as string, format as string, name, readWrite, args));
     }
 
     for (const {uniform: {name, format: type, args}, texture} of textures) {
@@ -190,6 +191,8 @@ export const makeBindingAccessors = (
       const set = volatile ? volatileSet : bindingSet;
       const base = volatile ? volatileBase++ : bindingBase++;
       if (sampler && args !== null) volatile ? volatileBase++ : bindingBase++;
+      if (typeof type !== 'string') throw new Error(`Texture format cannot be a struct ${type}`);
+      if (typeof format !== 'string') throw new Error(`Texture format cannot be a struct ${type}`);
       program.push(makeTextureAccessor(namespace, set, base, type, format, name, layout, variant, aspect, absolute, !!sampler, !!comparison, args));
     }
 
@@ -271,6 +274,7 @@ export const makeStorageAccessor = (
   const access = readWrite ? 'storage, read_write' : 'storage';
   
   if (args === null) {
+    if (!type.match(/^array</)) type = `array<${type}>`;
     return `@group(${set}) @binding(${binding}) var<${access}> ${ns}${name}: ${type};\n`;
   }
 

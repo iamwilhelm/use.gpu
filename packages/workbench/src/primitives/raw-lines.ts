@@ -10,7 +10,7 @@ import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks } from '@use-gpu/shader/wgsl';
-import { resolve, makeShaderBindings } from '@use-gpu/core';
+import { resolve } from '@use-gpu/core';
 
 import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';

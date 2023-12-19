@@ -9,7 +9,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useMemo, useOne, useNoOne, useNoCallback } from '@use-gpu/live';
-import { resolve, makeShaderBindings } from '@use-gpu/core';
+import { resolve } from '@use-gpu/core';
 
 import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';

@@ -54,9 +54,9 @@ export const StructData: LC<StructDataProps> = (props: PropsWithChildren<StructD
   // Make struct uniform layout
   const [bindings, layout] = useOne(() => {
     const bindings = bundleToAttribute(format);
-    if (!bindings.members) throw new Error("<StructData> format is not a shader struct");
+    if (!Array.isArray(bindings.format)) throw new Error("<StructData> format is not a shader struct type");
 
-    const layout = makeUniformLayout(bindings.members);
+    const layout = makeUniformLayout(bindings.format);
     return [bindings, layout];
   }, format);
   

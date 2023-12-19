@@ -36,7 +36,7 @@ export const sourceToModule = <T>(
 
   const s = source as any;
   if (s.shader) return s.shader as ShaderModule;
-  else if (s.table || s.libs) return source as ShaderModule;
+  else if (s.module || s.table) return source as ShaderModule;
   return null;
 }
 

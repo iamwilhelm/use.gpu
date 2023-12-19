@@ -90,7 +90,7 @@ export const memoArgs = <F extends ArrowFunction>(
   const customMemo = typeof isEqualOrName === 'function' ? isEqualOrName as IsEqualMemoArgs<any> : null;
   if (typeof isEqualOrName === 'string') name = isEqualOrName;
 
-  const inner = (...args: any[]) => {
+  const memoized = (...args: any[]) => {
     const fiber = useFiber();
     if (!fiber.version) fiber.version = 1;
 
@@ -114,7 +114,7 @@ export const memoArgs = <F extends ArrowFunction>(
   const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
   const length = getArgCount(f);
 
-  return new Proxy(inner, { get: (target: any, s: string) => {
+  return new Proxy(memoized, { get: (target: any, s: string) => {
     if (s === 'length') return length;
     if (s === 'name') return memoName;
     if (s === 'argCount') return length;
@@ -133,7 +133,7 @@ export const memoProps = <F extends ArrowFunction>(
   const customMemo = typeof isEqualOrName === 'function' ? isEqualOrName as IsEqualMemoArgs<any> : null;
   if (typeof isEqualOrName === 'string') name = isEqualOrName;
 
-  const inner = (props: Record<string, any>[]) => {
+  const memoized = (props: Record<string, any>[]) => {
     const fiber = useFiber();
     if (!fiber.version) fiber.version = 1;
 
@@ -160,7 +160,7 @@ export const memoProps = <F extends ArrowFunction>(
   const memoName = `Memo(${name ?? f.name ?? 'Component'})`;
   const length = getArgCount(f);
 
-  return new Proxy(inner, { get: (target: any, s: string) => {
+  return new Proxy(memoized, { get: (target: any, s: string) => {
     if (s === 'length') return length;
     if (s === 'name') return memoName;
     return target[s];

@@ -10,7 +10,6 @@ import { Virtual } from './virtual';
 
 import { use, yeet, memo, useOne, useNoOne, useRef } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings } from '@use-gpu/core';
 
 import { useBoundShader } from '../hooks/useBoundShader';
 import { usePickingShader } from '../providers/picking-provider';

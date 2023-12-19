@@ -36,6 +36,10 @@ import {
 } from './operators/diff';
 
 import {
+  explode,
+} from './operators/explode';
+
+import {
   structType,
 } from './operators/struct';
 
@@ -99,6 +103,10 @@ export {
 export {
   diffBy,
 } from './operators/diff';
+
+export {
+  explode,
+} from './operators/explode';
 
 export {
   structType,

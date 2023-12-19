@@ -21,7 +21,7 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl'
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl'
 import { useGLTFMaterial } from './gltf-material';
 
-const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
+const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition, 'getTransformMatrix');
 
 export type GLTFPrimitiveProps = {
   gltf: GLTF,
@@ -111,7 +111,7 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
     // Apply matrix transform
     // (share uniform between both functions)
-    const m     = useBoundSource(MATRIX_BINDINGS[0], t);
+    const m     = useBoundSource(MATRIX_BINDING, t);
     const xform = useBoundShader(getCartesianPosition, [m]);
     const dform = useBoundShader(getMatrixDifferential, [m, c]);
 

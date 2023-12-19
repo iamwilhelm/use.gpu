@@ -4,8 +4,8 @@ import type { TransformBounds } from '../providers/transform-provider';
 import type { Ref } from '@use-gpu/live';
 
 import { useOne, useVersion, useNoOne, useNoVersion } from '@use-gpu/live';
-import { makeShaderBinding } from '@use-gpu/core';
-import { chainTo, sourceToModule, bindingToModule } from '@use-gpu/shader/wgsl';
+import { chainTo } from '@use-gpu/shader/wgsl';
+import { getBoundSource } from '../hooks/useBoundSource';
 import { useTransformContext, useNoTransformContext } from '../providers/transform-provider';
 import { useScissorContext, useNoScissorContext } from '../providers/scissor-provider';
 
@@ -36,7 +36,7 @@ export const useApplyTransform = (
       bounds: null
     };
 
-    const getPosition = sourceToModule(positions) ?? bindingToModule(makeShaderBinding(TRANSFORM_BINDING, positions));
+    const getPosition = getBoundSource(TRANSFORM_BINDING, positions);
     if (transform == null && scissor == null) return {
       positions: getPosition,
       scissor: null,

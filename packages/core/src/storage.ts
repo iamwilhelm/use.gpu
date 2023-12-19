@@ -79,8 +79,11 @@ export const checkStorageType = (
   
   let f = fromName;
   let t = toName;
-  
+
+  if (Array.isArray(f) || Array.isArray(t)) return;
+
   if (link && t != null && f !== t) {
+
     // Remove array<atomic<..>>
     f = f.replace(/array?/, '').replace(/^<|>$/g, '');
     f = f.replace(/atomic?/, '').replace(/^<|>$/g, '');

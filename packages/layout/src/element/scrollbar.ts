@@ -6,7 +6,6 @@ import type { Direction, OverflowMode, FitInto, UIAggregate } from '../types';
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor } from '@use-gpu/parse';
 import { keyed, yeet, use, useFiber, useMemo } from '@use-gpu/live';
-import { makeShaderBinding } from '@use-gpu/core';
 import { evaluateDimension } from '../parse';
 import { isHorizontal, memoFit } from '../lib/util';
 import { useInspectHoverable } from '@use-gpu/workbench';

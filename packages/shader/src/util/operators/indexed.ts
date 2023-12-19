@@ -2,6 +2,7 @@ import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '..
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
+import { formatFormat } from '../format';
 
 export type BundleToAttribute = (
   bundle: ShaderModule,
@@ -60,7 +61,7 @@ export const makeIndexWith = (
     const {module: vModule, virtuals: vVirtuals} = vBundle;
     const v = bundleToAttribute(vBundle);
 
-    const f = i.format.entry ?? i.format;
+    const f = formatFormat(i.format);
     if (v.args?.[0] !== f) {
       throw new Error(`Type Error: ${i.name} -> ${v.name}.\nCannot chain output ${f} to args (${v.args?.join(', ')}).`);
     }

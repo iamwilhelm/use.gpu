@@ -10,7 +10,7 @@ import { Virtual } from './virtual';
 
 import { use, yeet, memo, useCallback, useOne, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings, resolve } from '@use-gpu/core';
+import { resolve } from '@use-gpu/core';
 
 import { makeArrowGeometry } from './geometry/arrow';
 import { RawData } from '../data/raw-data';

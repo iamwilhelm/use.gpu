@@ -1,5 +1,5 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
-import type { StorageSource, TextureSource } from '@use-gpu/core';
+import type { StorageSource, TextureSource, UniformAttribute } from '@use-gpu/core';
 import type { Light, BoundLight } from '../../light/types';
 import type { LightEnv } from '../../pass/types';
 
@@ -28,7 +28,7 @@ export const SHADOW_PAGE = 4096;
 export const SHADOW_FORMAT = "depth32float";
 
 const LIGHT_ATTRIBUTE = bundleToAttribute(WGSLLight);
-const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.members!);
+const LIGHT_LAYOUT = makeUniformLayout(LIGHT_ATTRIBUTE.format as UniformAttribute[]);
 const LIGHT_BYTE_OFFSET = 16;
 
 const makeAtlasPage = () => makeAtlas(

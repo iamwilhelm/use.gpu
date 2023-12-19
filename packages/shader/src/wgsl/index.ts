@@ -38,6 +38,10 @@ import {
 } from './operators/diff';
 
 import {
+  explode,
+} from './operators/explode';
+
+import {
   indexWith,
 } from './operators/indexed';
 
@@ -106,6 +110,10 @@ export {
 } from './operators/diff';
 
 export {
+  explode,
+} from './operators/explode';
+
+export {
   indexWith,
 } from './operators/indexed';
 
@@ -160,6 +168,7 @@ export const WGSLLinker = {
   castTo,
   chainTo,
   diffBy,
+  explode,
   indexWith,
   swizzleTo,
   structType,

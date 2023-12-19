@@ -1,4 +1,4 @@
-import { makeDiffBy } from '../../util/diff';
+import { makeDiffBy } from '../../util/operators/diff';
 import { bundleToAttribute } from '../shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);

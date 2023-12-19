@@ -5,7 +5,6 @@ import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 import { flattenFormat } from '../format';
 
 export type MakeStructDefinition = (
-  ns: string,
   name: string,
   fields: UniformAttribute[],
 ) => string;
@@ -29,7 +28,7 @@ export const makeStructType = (
   const types = fields.map(({format}) => flattenFormat(format)).join(' ');
 
   const unique = `@struct [${name ?? ''}] [${readable}] [${types}]`;
-  const code   = `@struct [${name ?? ''}] [${readable}]`;
+  const code   = `@struct ${name ?? ''}`;
   const hash   = toMurmur53(unique);
   const key    = hash;
 
@@ -43,6 +42,7 @@ export const makeStructType = (
   }
 
   const exports = [{
+    format: fields,
     struct: {
       name: entry,
       type: {name: entry},

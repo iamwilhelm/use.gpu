@@ -1,5 +1,5 @@
 import { UniformAttribute } from '../../types';
-import { makeStructType } from '../../util/struct';
+import { makeStructType } from '../../util/operators/struct';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 

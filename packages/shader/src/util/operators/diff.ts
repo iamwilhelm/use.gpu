@@ -2,6 +2,7 @@ import { UniformAttribute, ShaderModule, ParsedBundle } from '../../types';
 import { loadVirtualModule } from '../shader';
 import { formatMurmur53, toMurmur53 } from '../hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from '../bundle';
+import { formatFormat } from '../format';
 
 const NO_SYMBOLS = [] as string[];
 
@@ -66,7 +67,7 @@ export const makeDiffBy = (
     const name = rename.get(entry) ?? 'entry';
     const accessor = rename.get('getValue') ?? 'getValue';
     const sizes = getSizes.map(getSize => rename.get(getSize) ?? getSize);
-    return makeDiffAccessor(name, accessor, sizes, args ?? [], format, offsets);
+    return makeDiffAccessor(name, accessor, sizes, args ?? [], formatFormat(format), offsets);
   }
 
   const diff = loadVirtualModule(

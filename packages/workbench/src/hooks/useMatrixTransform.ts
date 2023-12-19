@@ -5,7 +5,7 @@ import type { TransformContextProps, TransformBounds } from '../providers/transf
 import type { MatrixRefs } from '../layers/types';
 
 import { useCallback, useMemo, useOne, useVersion, useNoCallback, useNoMemo, useNoOne, useNoVersion } from '@use-gpu/live';
-import { bundleToAttributes, getBundleKey } from '@use-gpu/shader/wgsl';
+import { bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
 import { useMatrixContext, useNoMatrixContext } from '../providers/matrix-provider';
 import { getBoundShader } from './useBoundShader';
 import { getBoundSource } from './useBoundSource';
@@ -18,7 +18,7 @@ import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
 import { getMatrixDifferential } from '@use-gpu/wgsl/transform/diff-matrix.wgsl';
 
 const NO_MATRIX = mat4.create();
-const MATRIX_BINDINGS = bundleToAttributes(getCartesianPosition);
+const MATRIX_BINDING = bundleToAttribute(getCartesianPosition, 'getTransformMatrix');
 
 const TRANSFORM_BINDING = { name: 'getPosition', format: 'vec4<f32>', args: ['u32'], value: [0, 0, 0, 0] } as UniformAttributeValue;
 
@@ -64,7 +64,7 @@ export const useMatrixTransform = (
   }, matrix);
 
   return useOne(() => {
-    const boundMatrix = getBoundSource(MATRIX_BINDINGS[0], refs.matrix);
+    const boundMatrix = getBoundSource(MATRIX_BINDING, refs.matrix);
 
     const transform = getBoundShader(getCartesianPosition, [boundMatrix]);
     const differential = getBoundShader(getMatrixDifferential, [boundMatrix, refs.normalMatrix]);

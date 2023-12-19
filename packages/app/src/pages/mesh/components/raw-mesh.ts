@@ -2,13 +2,13 @@ import type { LiveComponent } from '@use-gpu/live';
 import type { ViewUniforms, UniformPipe, UniformAttribute, UniformType, VertexData, RenderPassMode, DataTexture } from '@use-gpu/core';
 
 import { useViewContext, useDeviceContext, useRenderContext, usePickingContext } from '@use-gpu/workbench';
-import { yeet, memo, useContext, useNoContext, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
+import { yeet, memo, useContext, useNoContext, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import {
   makeVertexBuffers, makeRawTexture, makeMultiUniforms,
   makeRenderPipeline, makeShaderModuleDescriptor, makeShaderBinding, makeSampler, makeTextureBinding,
   uploadBuffer, uploadDataTexture,
 } from '@use-gpu/core';
-import { linkBundle, bindingToModule, bundleToAttribute } from '@use-gpu/shader/wgsl';
+import { linkBundle } from '@use-gpu/shader/wgsl';
 import { useInspectable, useNativeColor } from '@use-gpu/workbench';
 
 import instanceDrawMesh from '@use-gpu/wgsl/app/vertex/mesh.wgsl';
@@ -99,7 +99,6 @@ export const RawMesh: LiveComponent<RawMeshProps> = memo((props: RawMeshProps) =
   const vertexShader   = isPicking ? instanceDrawMeshPick         : instanceDrawMesh;
   const fragmentShader = isPicking ? instanceFragmentPickGeometry : instanceFragmentMesh;
 
-  const fiber = useFiber();
   const inspect = useInspectable();
 
   // Rendering pipeline

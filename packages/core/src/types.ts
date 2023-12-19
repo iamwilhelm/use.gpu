@@ -221,11 +221,12 @@ export type VertexAttribute = {
 };
 
 // Uniform buffers
+export type UniformFormat = UniformType | UniformAttribute[] | ShaderModule;
+
 export type UniformAttribute = {
   name: string,
-  format: UniformType | ShaderStructType,
-  args?: (UniformType | ShaderStructType)[] | null,
-  members?: UniformAttribute[],
+  format: UniformFormat,
+  args?: UniformFormat[] | null,
   attr?: UniformShaderAttribute[],
 };
 
@@ -243,8 +244,18 @@ export type UniformAttributeDescriptor = {
 
 export type UniformLayout = {
   length: number,
-  attributes: UniformAttributeDescriptor[],
+  
+  uniforms: UniformAttribute[],
   offsets: number[],
+  groups: number[],
+};
+
+export type InterleavedLayout = {
+  length: number,
+  
+  uniforms: UniformAttribute[],
+  offsets: number[],
+  groups: number[],
 };
 
 export type ShaderStructType = {
@@ -472,8 +483,23 @@ export type Lazy<T> = T | (() => T) | {expr: () => T} | {current: T};
 
 export type AggregateBuffer = {
   buffer: GPUBuffer,
-  array: TypedArray,
+  array?: TypedArray,
+  raw?: ArrayBuffer,
   source: StorageSource,
+  dims: number,
+};
+
+export type MultiAggregateBuffer = {
+  buffer: GPUBuffer,
+  raw?: ArrayBuffer,
+  source: StorageSource,
+  layout?: UniformLayout,
+};
+
+export type VirtualAggregateBuffer = {
+  array: TypedArray,
+  base: number,
+  stride: number,
   dims: number,
 };
 

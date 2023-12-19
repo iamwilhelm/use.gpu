@@ -13,6 +13,8 @@ export const alignSizeTo2 = (n: number, s: number) => {
 
 export const getUniformDims2 = (type: UniformType) => UNIFORM_ARRAY_DIMS[type];
 
+export const makeRawArray2 = (byteSize: number, count: number) => new ArrayBuffer(byteSize);
+
 export const makeDataArray2 = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
   const dims = UNIFORM_ARRAY_DIMS[type];
@@ -22,6 +24,13 @@ export const makeDataArray2 = (type: UniformType, length: number) => {
   const array = new ctor(n);
   return {array, dims};
 };
+export const castRawArray2 = (buffer: ArrayBuffer | TypedArray, type: UniformType) => {
+  const ctor = UNIFORM_ARRAY_TYPES[type];
+  const dims = UNIFORM_ARRAY_DIMS[type];
+
+  const array = new ctor(buffer.buffer ?? buffer);
+  return {array, dims};
+};
 
 export const copyNumberArray2 = (
   from: number[] | TypedArray,
@@ -29,7 +38,8 @@ export const copyNumberArray2 = (
   dims: number = 1,
   fromIndex: number = 0,
   toIndex: number = 0,
-  length?: number,
+  length: number = 0,
+  stride: number = 1,
 ) => {
   const n = length != null ? length * dims : from.length;
 
@@ -37,7 +47,8 @@ export const copyNumberArray2 = (
   let o = toIndex * dims;
 
   for (let i = 0; i < n; ++i) {
-    to[o++] = from[s + i];
+    to[o] = from[s + i];
+    o += stride;
   }
 };
 
@@ -48,7 +59,8 @@ export const offsetNumberArray2 = (
   fromIndex: number = 0,
   toIndex: number = 0,
   length?: number,
-  offset?: number,
+  offset: number = 0,
+  stride: number = 1,
 ) => {
   const n = length != null ? length * dims : from.length;
 
@@ -56,7 +68,8 @@ export const offsetNumberArray2 = (
   let o = toIndex * dims;
 
   for (let i = 0; i < n; ++i) {
-    to[o++] = from[s + i] + offset;
+    to[o] = from[s + i] + offset;
+    o += stride;
   }
 };
 
@@ -67,16 +80,16 @@ export const expandNumberArray2 = (
   dims: number = 1,
   fromIndex: number = 0,
   toIndex: number = 0,
-  length?: number,
+  stride: number = 1,
 ) => {
   const n = slices.length;
   let f = fromIndex;
   let t = toIndex;
   for (let i = 0; i < n; ++i) {
     const l = slices[i];
-    fillNumberArray2(from, to, dims, f, t, l);
+    fillNumberArray2(from, to, dims, f, t, l, stride);
     f++;
-    t += l;
+    t += l * stride;
   }
 }
     
@@ -88,6 +101,7 @@ export const unweldNumberArray2 = (
   fromIndex: number = 0,
   toIndex: number = 0,
   length?: number,
+  stride: number = 1,
 ) => {
   const n = length != null ? length : indices.length;
 
@@ -96,43 +110,44 @@ export const unweldNumberArray2 = (
 
   if (dims === 1) {
     for (let i = 0; i < n; ++i) {
-      to[o++] = from[indices[s + i]];
+      to[o] = from[indices[s + i]];
+      o += stride;
     }
   }
   else if (dims === 2) {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * 2;
-      to[o    ] = from[b];
-      to[o + 1] = from[b + 1];
-      o += 2;
+      to[o         ] = from[b];
+      to[o + stride] = from[b + 1];
+      o += stride * 2;
     }
   }
   else if (dims === 3) {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * 3;
-      to[o    ] = from[b];
-      to[o + 1] = from[b + 1];
-      to[o + 2] = from[b + 2];
-      o += 3;
+      to[o             ] = from[b];
+      to[o + stride    ] = from[b + 1];
+      to[o + stride * 2] = from[b + 2];
+      o += stride * 3;
     }
   }
   else if (dims === 4) {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * 4;
       to[o    ] = from[b];
-      to[o + 1] = from[b + 1];
-      to[o + 2] = from[b + 2];
-      to[o + 3] = from[b + 3];
-      o += 4;
+      to[o + stride    ] = from[b + 1];
+      to[o + stride * 2] = from[b + 2];
+      to[o + stride * 3] = from[b + 3];
+      o += stride * 4;
     }
   }
   else {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * n;
       for (let k = 0; k < dims; ++k) {
-        to[o + k] = from[b + k];
+        to[o + stride * k] = from[b + k];
       }
-      o += dims;
+      o += stride * dims;
     }
   }
 };
@@ -144,7 +159,7 @@ export const fillNumberArray2 = (
   fromIndex: number = 0,
   toIndex: number = 0,
   count: number,
-  offset: number = 0,
+  stride: number = 1,
 ) => {
   let pos = toIndex * dims;
   const read = fromIndex * dims;
@@ -154,51 +169,57 @@ export const fillNumberArray2 = (
   if (typeof from === 'number') {
     if (dims === 1) {
       for (let j = 0; j < count; ++j) {
-        to[pos++] = from + offset;
+        to[pos] = from;
+        pos += stride;
       }
     }
     else {
       for (let j = 0; j < count; ++j) {
-        to[pos++] = from + offset;
-        for (let k = 0; k < skip; ++k) to[pos++] = 0;
+        to[pos] = from;
+        pos += stride;
+        for (let k = 0; k < skip; ++k) {
+          to[pos] = 0;
+          pos += stride;
+        }
       }
     }
   }
   else if (dims === 1) {
     for (let j = 0; j < count; ++j) {
-      to[pos++] = array[read] + offset;
+      to[pos] = array[read];
+      pos += stride;
     }
   }
   else if (dims === 2) {
     for (let j = 0; j < count; ++j) {
-      to[pos    ] = array[read] + offset;
-      to[pos + 1] = array[read + 1] + offset;
-      pos += 2;
+      to[pos         ] = array[read];
+      to[pos + stride] = array[read + 1];
+      pos += stride * 2;
     }
   }
   else if (dims === 3) {
     for (let j = 0; j < count; ++j) {
-      to[pos    ] = array[read] + offset;
-      to[pos + 1] = array[read + 1] + offset;
-      to[pos + 2] = array[read + 2] + offset;
-      pos += 3;
+      to[pos             ] = array[read];
+      to[pos + stride    ] = array[read + 1];
+      to[pos + stride * 2] = array[read + 2];
+      pos += stride * 3;
     }
   }
   else if (dims === 4) {
     for (let j = 0; j < count; ++j) {
-      to[pos    ] = array[read] + offset;
-      to[pos + 1] = array[read + 1] + offset;
-      to[pos + 2] = array[read + 2] + offset;
-      to[pos + 3] = array[read + 3] + offset;
-      pos += 4;
+      to[pos             ] = array[read];
+      to[pos + stride    ] = array[read + 1];
+      to[pos + stride * 2] = array[read + 2];
+      to[pos + stride * 3] = array[read + 3];
+      pos += stride * 4;
     }
   }
   else {
     for (let j = 0; j < count; ++j) {
       for (let k = 0; k < dims; ++k) {
-        to[pos + k] = array[read + k] + offset;
+        to[pos + stride * k] = array[read + k];
       }
-      pos += k;
+      pos += stride * dims;
     }
   }
 }
@@ -326,8 +347,8 @@ export const makeCopyEmitter2 = (
   to: TypedArray,
   toIndex: number = 0,
   length?: number,
-  offset?: number,
-) => copyNumberArray2(from, to, dims, fromIndex, toIndex, length);
+  stride?: number,
+) => copyNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 
 export const makeRefEmitter2 = (
   fromRef: Lazy<number | number[] | TypedArray>,
@@ -337,11 +358,11 @@ export const makeRefEmitter2 = (
   to: TypedArray,
   toIndex: number = 0,
   length?: number,
-  offset?: number,
+  stride?: number,
 ) => {
   const from = resolve(fromRef);
-  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length);
-  else copyNumberArray2(from, to, dims, fromIndex, toIndex, length);
+  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
+  else copyNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 }
 
 export const makePartialRefEmitter2 = (
@@ -352,11 +373,11 @@ export const makePartialRefEmitter2 = (
   to: TypedArray,
   toIndex: number = 0,
   length?: number,
-  offset?: number,
+  stride?: number,
 ) => {
   const from = resolve(fromRef);
-  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length);
-  else copyNumberArray2(from, to, dims, fromIndex, toIndex, length);
+  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
+  else copyNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 }
 
 export const makeExpandEmitter2 = (
@@ -368,8 +389,8 @@ export const makeExpandEmitter2 = (
   to: NumberArray,
   toIndex: number = 0,
   count: number = 0,
-  offset: number = 0,
-) => expandNumberArray2(from, to, slices, dims, fromIndex, toIndex, length);
+  stride?: number,
+) => expandNumberArray2(from, to, slices, dims, fromIndex, toIndex, length, stride);
 
 export const makeFillEmitter2 = (
   from: NumberArray | number,
@@ -379,8 +400,8 @@ export const makeFillEmitter2 = (
   to: NumberArray,
   toIndex: number = 0,
   count: number = 0,
-  offset: number = 0,
-) => fillNumberArray2(from, to, dims, fromIndex, toIndex, length);
+  stride?: number,
+) => fillNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 
 export const makeUnweldEmitter2 = (
   from: number[] | TypedArray,
@@ -391,7 +412,8 @@ export const makeUnweldEmitter2 = (
   to: TypedArray,
   toIndex: number = 0,
   length?: number,
-) => unweldNumberArray2(from, to, indices, dims, fromIndex, toIndex, length);
+  stride?: number,
+) => unweldNumberArray2(from, to, indices, dims, fromIndex, toIndex, length, stride);
 
 export const generateChunkSegments2 = (
   to: NumberArray,

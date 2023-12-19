@@ -2,6 +2,7 @@ import { UniformAttribute, ShaderModule, ParsedBundle, RefFlags as RF } from '..
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
+import { formatFormat } from '../format';
 
 const NO_SYMBOLS = [] as string[];
 
@@ -55,9 +56,11 @@ export const makeChainTo = (
   const entry = 'chain';
   const args = fromArgs;
 
+  const fromType = formatFormat(fromFormat);
+
   // Return value of `from` must match 1st argument of `to`
-  if (toArgs?.[0] !== (fromFormat.entry ?? fromFormat)) {
-    throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain output ${fromFormat.entry ?? fromFormat} to args (${toArgs?.join(', ')}).`);
+  if (toArgs?.[0] !== fromType) {
+    throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain output ${fromType} to args (${toArgs?.join(', ')}).`);
   }
   
   // Other arguments of `from` and `to` must match
@@ -82,7 +85,7 @@ export const makeChainTo = (
     const name = rename.get(entry) ?? entry;
     const from = rename.get('from') ?? 'from';
     const to = rename.get('to') ?? 'to';
-    return makeChainAccessor(toFormat, name, args ?? [], from, to, 1);
+    return makeChainAccessor(formatFormat(toFormat), name, args ?? [], from, to, 1);
   }
 
   const exports = makeDeclarations(toFormat, fromArgs);

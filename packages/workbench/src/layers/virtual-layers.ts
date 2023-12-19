@@ -21,6 +21,7 @@ import {
 } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getIndexedSources } from '../hooks/useIndexedSources';
+import { getStructSources } from '../hooks/useStructSources';
 
 import { IndexedTransform } from './indexed-transform';
 
@@ -147,12 +148,12 @@ const Aggregate: LiveFunction<any> = (
   const {archetype, count, indices} = getItemSummary(items);
 
   const allocItems = useBufferedSize(items.length);
-  const allocCount = useBufferedSize(count);
+  const allocCounts = useBufferedSize(count);
   const allocIndices = useBufferedSize(indices);
 
   const render = useMemo(() =>
-    makeAggregator(device, items, allocItems, allocCount, allocIndices),
-    [archetype, allocItems, allocCount, allocIndices]
+    makeAggregator(device, items, allocItems, allocCounts, allocIndices),
+    [archetype, allocItems, allocCounts, allocIndices]
   );
 
   return render(items, count, indices);
@@ -167,19 +168,29 @@ const makeSchemaAggregator = (
   device: GPUDevice,
   items: LineAggregate[],
   allocItems: number,
-  allocCount: number,
+  allocCounts: number,
   allocIndices: number,
 ) => {
   const [item] = items;
   const {attributes, refs} = item;
 
-  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocCount, allocIndices);
+  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocCounts, allocIndices);
+  const keys = Object.keys(aggregate);
 
   const refSchema = filterSchema(schema, (f) => f.ref);
   const refKeys = mapSchema(refSchema, (f, key) => key);
   const refCount = refKeys.length;
   
-  const {instances} = aggregate;
+  const {instances, byCounts, byItems, byIndices} = aggregate;
+  const sources = {
+    ...(byItems   ? getStructSources(byItems.layout.attributes, byItems.source) : undefined),
+    ...(byCounts  ? getStructSources(byCounts.layout.attributes, byCounts.source) : undefined),
+    ...(byIndices ? getStructSources(byIndices.layout.attributes, byIndices.source) : undefined),
+  };
+  for (const k of keys) {
+    const s = aggregate[k].source;
+    if (s) sources[k] = s;
+  }
 
   let loadInstance: ShaderSource | null = null;
   let refSources: Record<string, ShaderSource> | null = null;
@@ -189,20 +200,9 @@ const makeSchemaAggregator = (
       return {name: k, format, args: ['u32']};
     });
 
-    const sources = {};
-    for (const k in aggregate) sources[k] = aggregate[k].source;
-
     const index = {name: 'instances', format: 'u32', args: ['u32']};
     [loadInstance, refSources] = getIndexedSources(uniforms, index, sources, instances.source);
   }
-
-  /*
-  const sources = Object.keys(refSchema).map(k => {
-    const {refSchema[k])
-      for (const k in refSchema) {
-    const 
-  }
-  */
 
   const uploadRefs = refCount ? () => {
     updateAggregateFromSchemaRefs(device, refSchema, aggregate);
@@ -213,9 +213,9 @@ const makeSchemaAggregator = (
   return (items: ArrowAggregate[], count: number, indices: number) => {
     const [item] = items;
     const {transform} = item;
-    const props = {count, ...item.flags} as Record<string, any>;
+    const props = {count, ...item.flags, ...sources} as Record<string, any>;
 
-    updateAggregateFromSchema(device, schema, aggregate, props, items, count, indices);
+    updateAggregateFromSchema(device, schema, aggregate, items, count, indices);
     DEBUG && console.log(Component.name, {props, items, aggregate, refSources});
 
     if (instances) props.instances = instances?.source;

@@ -1,4 +1,4 @@
-import type { DataBinding, StorageSource } from './types';
+import type { DataBinding, StorageSource, ShaderStructType, UniformType } from './types';
 import { UNIFORM_ATTRIBUTE_SIZES, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 import { makeUniformLayout } from './uniform';
 
@@ -131,7 +131,7 @@ export const makeBindGroup = (
   });
 }
 
-export const getMinBindingSize = (format: string | any) => {
+export const getMinBindingSize = (format: UniformType | UniformAttribute[] | ShaderStructType) => {
   if (typeof format === 'string') {
     format = format.replace(/^array<([^>]+)>$/, '$1');
     format = format.replace(/^vec3to4</, 'vec4<');
@@ -140,6 +140,12 @@ export const getMinBindingSize = (format: string | any) => {
     const align = (UNIFORM_ATTRIBUTE_ALIGNS as any)[format] ?? 0;
     return align ? Math.ceil(size / align) * align : size;
   }
+  
+  if (Array.isArray(format)) {
+    const layout = makeUniformLayout(format);
+    return layout.length;
+  }
+
   if (!format) return 0;
 
   const {module} = format;
@@ -147,23 +153,7 @@ export const getMinBindingSize = (format: string | any) => {
   const {struct} = declarations.find((d: any) => d.struct?.name === entry);
   if (!struct) return 0;
 
-  const members = struct.members.map((m: any) => ({name: m.name, format: toTypeString(m.type)}));
+  const members = struct.members.map((m: any) => ({name: m.name, format: m.type}));
   const layout = makeUniformLayout(members);
   return layout.length;
 };
-
-export const toTypeString = (t: any | string): string => {
-  if (typeof t === 'object') {
-    if (t.type) return toTypeString(t.type);
-    if (t.args) return `${t.name}<${t.args.map((t: any) => toTypeString(t)).join(',')}>`;
-    else return t.name;
-  }
-  return t;
-}
-
-export const toTypeArgs = (t: (any | string)[]): string[] => {
-  return t?.map(toTypeString) ?? [];
-}
-
-const maximum = (a: number, b: number) => Math.max(a, b);
-const alignAdd = (a: number, b: number) => Math.ceil(a / b) * b + b;

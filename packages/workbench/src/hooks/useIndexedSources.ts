@@ -11,7 +11,7 @@ export const useIndexedSources = (
   values: Record<string, StorageSource>,
   indices: StorageSource,
 ) => (
-  useMemo(() => getIndexedSource(uniforms, index, values, indices), [uniforms, index, values, indices])
+  useMemo(() => getIndexedSources(uniforms, index, values, indices), [uniforms, index, values, indices])
 );
 
 export const getIndexedSources = (

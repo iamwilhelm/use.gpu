@@ -3,7 +3,10 @@ import type { NumberEmitter, NumberRefEmitter } from './data2';
 import { toMurmur53, scrambleBits53, mixBits53 } from '@use-gpu/state';
 import {
   makeAggregateBuffer,
+  makeMultiAggregateBuffer,
+  makeMultiAggregateFields,
   updateAggregateBuffer,
+  updateMultiAggregateBuffer,
   updateAggregateRefs,
   updateAggregateIndex,
 } from './aggregate';
@@ -15,6 +18,9 @@ import {
   makePartialRefEmitter2,
   makeUnweldEmitter2,
 } from './data2';
+import {
+  getUniformAttributeAlign
+} from './uniform';
 
 type Item = Record<string, any>;
 
@@ -135,11 +141,11 @@ export const schemaToAggregate = (
   props: Record<string, any>,
   refs?: Record<string, RefObject<any>>,
   allocItems: number = 0,
-  allocCount: number = 0,
+  allocCounts: number = 0,
   allocIndices: number = 0,
 ): Record<string, AggregateBuffer> => {
   const byItems = [];
-  const byCount = [];
+  const byCounts = [];
   const byIndices = [];
 
   const aggregate: Record<string, any> = {};
@@ -162,28 +168,49 @@ export const schemaToAggregate = (
         };
       }
 
-      if (ref) byItems.push(key);
-      else if (index) byIndices.push(key);
-      else byCount.push(key);
+      const separate = getUniformAttributeAlign(format) === 0;
+      if (separate) {
+        let alloc;
+        if (ref) alloc = allocItems;
+        else if (index) alloc = allocCounts;
+        else alloc = allocIndices;
+
+        const f = format as any;
+        aggregate[key] = makeAggregateBuffer(device, f, alloc);        
+      }
+      else {
+        if (ref) byItems.push(key);
+        else if (index) byIndices.push(key);
+        else byCounts.push(key);
+      }
     }
   }
 
-  if (byItems.length) {
-    aggregate.instances = makeAggregateBuffer(device, 'u32', allocCount);
-  }
-  
-  for (const key of byItems) {
-    const f = schema[key].format as any;
-    aggregate[key] = makeAggregateBuffer(device, f, allocItems);
-  }
-  for (const key of byCount) {
-    const f = schema[key].format as any;
-    aggregate[key] = makeAggregateBuffer(device, f, allocCount);
-  }
-  for (const key of byIndices) {
-    const f = schema[key].format as any;
-    aggregate[key] = makeAggregateBuffer(device, f, allocIndices);
-  }
+  const build = (name: string, keys: string[], alloc: number) => {
+    if (keys.length === 0) return;
+
+    if (keys.length === 1) {
+      const [k] = keys;
+      const f = schema[k].format as any;
+      aggregate[key] = makeAggregateBuffer(device, f, alloc);
+    }
+    else {
+      const uniforms = keys.map(k => ({name: k, format: schema[k].format as ay}));
+      uniforms.sort((a, b) => getUniformAttributeAlign(b.format) - getUniformAttributeAlign(a.format));
+
+      const aggregateBuffer = aggregate[name] = makeMultiAggregateBuffer(device, uniforms, alloc);
+      const fields = makeMultiAggregateFields(aggregateBuffer);
+      for (const k in fields) aggregate[k] = fields[k];
+    }
+  };
+
+  if (byItems.length) aggregate.instances = makeAggregateBuffer(device, 'u32', allocCounts);
+
+  build('byItems', byItems, allocItems);
+  build('byCounts', byCounts, allocCounts);
+  build('byIndices', byIndices, allocIndices);
+
+  console.warn('aggregate', aggregate);
 
   return aggregate;
 };
@@ -217,7 +244,6 @@ export const updateAggregateFromSchema = (
   device: GPUDevice,
   schema: ArchetypeSchema,
   aggregate: Record<string, AggregateBuffer>,
-  props: Record<string, any>,
   items: Item[],
   count: number,
   indices: number = 0,
@@ -232,15 +258,22 @@ export const updateAggregateFromSchema = (
     }
 
     if (aggregate[key]) {
-      const k = single ?? '';
-      if (index) {
-        props[key] = updateAggregateIndex(device, aggregate[key], items, indices, offsets, k, key);
-      }
-      else {
-        props[key] = updateAggregateBuffer(device, aggregate[key], items, count, k, key);
+      const agg = aggregate[key];
+      if (agg.buffer) {
+        const k = single ?? '';
+        if (index) {
+          updateAggregateIndex(device, aggregate[key], items, indices, offsets, k, key);
+        }
+        else {
+          updateAggregateBuffer(device, aggregate[key], items, count, k, key);
+        }
       }
     }
   }
+  
+  if (aggregate.byItems) updateMultiAggregateBuffer(device, aggregate.byItems, items.length);
+  if (aggregate.byCounts) updateMultiAggregateBuffer(device, aggregate.byCounts, count);
+  if (aggregate.byIndices) updateMultiAggregateBuffer(device, aggregate.byIndices, indices);
 };
 
 export const updateAggregateFromSchemaRefs = (

@@ -92,16 +92,17 @@ export const loadVirtualModule = <T extends SymbolTableT = any>(
 
 // Set entry point of a module, returns new bundle/module.
 // Is the same instance as the original (key = old key/hash), so it merges with copies of itself.
-// But is structurally different (hash = new key), so differences in links are reflected in the shader hash.
+// But is structurally different (hash = new entry), so differences in links are reflected in the shader hash.
 export const bindEntryPoint = <T extends ParsedBundle | ParsedModule>(bundle: T, entry?: string): T => {
   let {key, hash, module, table} = bundle as any;
 
   table = table ?? module?.table;
   hash = hash ?? module?.hash;
+  key = key ?? module?.key;
 
   if (entry == null && table.symbols?.includes('main')) entry = 'main';
   if (entry == null) return bundle;
 
-  const structural = toMurmur53([hash, entry]);
+  const structural = hash ^ toMurmur53(entry);
   return {...bundle, entry, hash: structural, key: key ?? hash};
 };

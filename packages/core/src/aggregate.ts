@@ -1,15 +1,18 @@
-import type { AggregateBuffer, UniformType } from './types';
+import type { AggregateBuffer, MultiAggregateBuffer, UniformType, VirtualAggregateBuffer } from './types';
 
 import { resolve } from './lazy';
 import { makeStorageBuffer, uploadBuffer } from './buffer';
+import { incrementVersion } from './id';
 import {
   alignSizeTo,
+  castRawArray2,
+  makeRawArray2,
   makeDataArray2,
   copyNumberArray2,
   fillNumberArray2,
   unweldNumberArray2,
 } from './data2';
-import { incrementVersion } from './id';
+import { makeUniformLayout } from './uniform';
 import { toMurmur53, mixBits53 } from '@use-gpu/state';
 
 export const getAggregateArchetype = (
@@ -32,6 +35,47 @@ export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, leng
   return {buffer, array, source, dims};
 }
 
+export const makeMultiAggregateBuffer = (device: GPUDevice, uniforms: UniformAttribute[], length: number): MultiAggregateBuffer => {
+  const layout = makeUniformLayout(uniforms);
+
+  const {length: bytes} = layout;
+  const raw = makeRawArray2(bytes, length);
+
+  const buffer = makeStorageBuffer(device, bytes);
+  const source = {
+    buffer,
+    format: uniforms,
+    length,
+    size: [length],
+    version: 0,
+  };
+
+  return {buffer, raw, source, layout};
+}
+
+export const makeMultiAggregateFields = (aggregateBuffer: AggregateBuffer) => {
+  const {layout: {length, attributes}, buffer, raw} = aggregateBuffer;
+
+  const out: Record<string, VirtualAggregateBuffer> = {};
+  for (const {name, offset, format} of attributes) {
+    const {array, dims} = castRawArray2(raw, format);
+
+    const elementSize = array.byteLength / array.length;
+    const base = offset / elementSize;
+    const stride = length / elementSize;
+
+    if (base !== (base|0) || stride !== (stride|0)) throw new Error('Unaligned field data');
+
+    out[name] = {
+      array,
+      base,
+      stride,
+      dims,
+    };
+  }
+  return out;
+};
+
 export const uploadSource = (
   device: GPUDevice,
   source: StorageStorage,
@@ -46,16 +90,16 @@ export const uploadSource = (
 
 export const updateAggregateBuffer = (
   device: GPUDevice,
-  aggregate: AggregateBuffer,
+  aggregate: AggregateBuffer | VirtualAggregateBuffer,
   items: Record<string, any>[],
   count: number,
   key: string,
   keys: string,
 ) => {
-  const {buffer, array, source, dims} = aggregate;
+  const {buffer, array, source, dims, base, stride} = aggregate;
 
   let i = 0;
-  let base = 0;
+  let b = base;
   for (const item of items) {
     const {
       count,
@@ -67,21 +111,30 @@ export const updateAggregateBuffer = (
 
     //if (key === 'color' && 'width' in item.attributes) debugger;
     if (multiple != null) {
-      if (typeof multiple === 'function') multiple(array, base, count);
-      else copyNumberArray2(multiple, array, dims, 0, base, count);
+      if (typeof multiple === 'function') multiple(array, b, count, stride);
+      else copyNumberArray2(multiple, array, dims, 0, b, count, stride);
     }
     else if (single != null) {
       if (typeof single === 'function') {
-        single(array, base, count);
+        single(array, b, count);
       }
-      else fillNumberArray2(single, array, dims, 0, base, count);
+      else fillNumberArray2(single, array, dims, 0, b, count, stride);
     }
 
-    base += count;
+    b += count;
     i++;
   }
 
-  uploadSource(device, source, array.buffer, count);
+  if (buffer) uploadSource(device, source, array.buffer, count);
+}
+
+export const updateMultiAggregateBuffer = (
+  device: GPUDevice,
+  aggregate: AggregateBuffer,
+  count: number,
+) => {
+  const {buffer, raw, source, layout} = aggregate;
+  uploadSource(device, source, raw, count);
   return source;
 }
 
@@ -101,8 +154,7 @@ export const updateAggregateRefs = (
     i++;
   }
 
-  uploadSource(device, source, array.buffer, count);
-  return source;
+  if (buffer) uploadSource(device, source, array.buffer, count);
 }
 
 export const updateAggregateIndex = (
@@ -128,7 +180,6 @@ export const updateAggregateIndex = (
     i++;
   }
 
-  uploadSource(device, source, array.buffer, count);
-  return source;
+  if (buffer) uploadSource(device, source, array.buffer, count);
 }
 

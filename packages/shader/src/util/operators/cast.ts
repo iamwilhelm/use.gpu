@@ -106,6 +106,7 @@ export const makeCastTo = (
   const render = (namespace: string, rename: Map<string, string>) => {
     const name = rename.get(entry) ?? entry;
     const accessor = rename.get('getValue') ?? 'getValue';
+    if (typeof format !== 'string') throw new Error(`Cannot cast to struct type`);
     return makeCastAccessor(name, accessor, args ?? [], format, type, swizzle);
   }
 

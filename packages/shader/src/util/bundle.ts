@@ -64,6 +64,7 @@ export const makeDeclarationToAttribute = (
 ) => (
   d: any,
 ) => {
+  if (d.format) return d;
   if (d.func) {
     const {type, name, parameters, attr} = d.func;
     return {name, format: toTypeString(type), args: toArgTypes(parameters), attr};
@@ -78,8 +79,7 @@ export const makeDeclarationToAttribute = (
       name,
       format: toTypeString(type),
     }));
-    const args = ms?.map(({format}: any) => format);
-    return {name, format: ms, args, attr};
+    return {name, format: ms, args: null, attr};
   }
   throw new Error(`Cannot convert declaration to attribute: ${JSON.stringify(d)}`);
 }
@@ -87,6 +87,7 @@ export const makeDeclarationToAttribute = (
 // Replace custom types with a reference to the bundle
 const resolveBundleType = (bundle: ShaderModule, attribute: UniformAttribute) => {
   const {format} = attribute;
+  if (typeof format !== 'string') return attribute;
   if (!format.match(/[A-Z]/)) return attribute;
   
   const {libs, module} = bundle as any as ParsedBundle;

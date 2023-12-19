@@ -10,7 +10,7 @@ import { Virtual } from './virtual';
 
 import { use, memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, chainTo } from '@use-gpu/shader/wgsl';
-import { makeShaderBindings, resolve } from '@use-gpu/core';
+import { resolve } from '@use-gpu/core';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';

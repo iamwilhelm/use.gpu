@@ -109,7 +109,9 @@ export const updateAggregateBuffer = (
       },
     } = item as any;
 
+    //if (stride > 1) debugger;
     //if (key === 'color' && 'width' in item.attributes) debugger;
+
     if (multiple != null) {
       if (typeof multiple === 'function') multiple(array, b, count, stride);
       else copyNumberArray2(multiple, array, dims, 0, b, count, stride);

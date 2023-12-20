@@ -119,6 +119,17 @@ export const Resizer: FC<ResizerProps> = (props: ResizerProps) => {
     onPointerMove: dragging ? onPointerMove : undefined,
   };
 
+  useLayoutEffect(() => {
+      if (!dragging) return;
+
+      // Add workaround for chrome bug - macOS pointerUp while moving mouse does not fire when pointer capture is active
+      // https://bugs.chromium.org/p/chromium/issues/detail?id=1459632&q=pointerup%20event&can=2
+      document.addEventListener('pointerup', onPointerUp as any);
+      return () => {
+          document.removeEventListener('pointerup', onPointerUp as any);
+      };
+  }, [dragging, onPointerUp]);
+
   return (
     <div
       ref={outerRef}

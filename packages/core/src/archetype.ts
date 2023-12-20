@@ -259,14 +259,13 @@ export const updateAggregateFromSchema = (
 
     if (aggregate[key]) {
       const agg = aggregate[key];
-      if (agg.buffer) {
-        const k = single ?? '';
-        if (index) {
-          updateAggregateIndex(device, aggregate[key], items, indices, offsets, k, key);
-        }
-        else {
-          updateAggregateBuffer(device, aggregate[key], items, count, k, key);
-        }
+
+      const k = single ?? '';
+      if (index) {
+        updateAggregateIndex(device, aggregate[key], items, indices, offsets, k, key);
+      }
+      else {
+        updateAggregateBuffer(device, aggregate[key], items, count, k, key);
       }
     }
   }

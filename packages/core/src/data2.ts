@@ -13,7 +13,7 @@ export const alignSizeTo2 = (n: number, s: number) => {
 
 export const getUniformDims2 = (type: UniformType) => UNIFORM_ARRAY_DIMS[type];
 
-export const makeRawArray2 = (byteSize: number, count: number) => new ArrayBuffer(byteSize);
+export const makeRawArray2 = (byteSize: number, count: number) => new ArrayBuffer(byteSize * count);
 
 export const makeDataArray2 = (type: UniformType, length: number) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
@@ -39,7 +39,7 @@ export const copyNumberArray2 = (
   fromIndex: number = 0,
   toIndex: number = 0,
   length: number = 0,
-  stride: number = 1,
+  stride?: number,
 ) => {
   const n = length != null ? length * dims : from.length;
 
@@ -60,7 +60,7 @@ export const offsetNumberArray2 = (
   toIndex: number = 0,
   length?: number,
   offset: number = 0,
-  stride: number = 1,
+  stride?: number,
 ) => {
   const n = length != null ? length * dims : from.length;
 
@@ -80,7 +80,7 @@ export const expandNumberArray2 = (
   dims: number = 1,
   fromIndex: number = 0,
   toIndex: number = 0,
-  stride: number = 1,
+  stride: number = dims,
 ) => {
   const n = slices.length;
   let f = fromIndex;
@@ -92,7 +92,7 @@ export const expandNumberArray2 = (
     t += l * stride;
   }
 }
-    
+
 export const unweldNumberArray2 = (
   from: number[] | TypedArray,
   to: TypedArray,
@@ -101,9 +101,10 @@ export const unweldNumberArray2 = (
   fromIndex: number = 0,
   toIndex: number = 0,
   length?: number,
-  stride: number = 1,
+  stride?: number,
 ) => {
   const n = length != null ? length : indices.length;
+  const step = stride || dims;
 
   let s = fromIndex * dims;
   let o = toIndex * dims;
@@ -111,43 +112,43 @@ export const unweldNumberArray2 = (
   if (dims === 1) {
     for (let i = 0; i < n; ++i) {
       to[o] = from[indices[s + i]];
-      o += stride;
+      o += step;
     }
   }
   else if (dims === 2) {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * 2;
-      to[o         ] = from[b];
-      to[o + stride] = from[b + 1];
-      o += stride * 2;
+      to[o    ] = from[b];
+      to[o + 1] = from[b + 1];
+      o += step;
     }
   }
   else if (dims === 3) {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * 3;
-      to[o             ] = from[b];
-      to[o + stride    ] = from[b + 1];
-      to[o + stride * 2] = from[b + 2];
-      o += stride * 3;
+      to[o    ] = from[b];
+      to[o + 1] = from[b + 1];
+      to[o + 2] = from[b + 2];
+      o += step;
     }
   }
   else if (dims === 4) {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * 4;
       to[o    ] = from[b];
-      to[o + stride    ] = from[b + 1];
-      to[o + stride * 2] = from[b + 2];
-      to[o + stride * 3] = from[b + 3];
-      o += stride * 4;
+      to[o + 1] = from[b + 1];
+      to[o + 2] = from[b + 2];
+      to[o + 3] = from[b + 3];
+      o += step;
     }
   }
   else {
     for (let i = 0; i < n; ++i) {
       let b = indices[s + i] * n;
       for (let k = 0; k < dims; ++k) {
-        to[o + stride * k] = from[b + k];
+        to[o + k] = from[b + k];
       }
-      o += stride * dims;
+      o += step;
     }
   }
 };
@@ -159,67 +160,70 @@ export const fillNumberArray2 = (
   fromIndex: number = 0,
   toIndex: number = 0,
   count: number,
-  stride: number = 1,
+  stride?: number,
 ) => {
   let pos = toIndex * dims;
   const read = fromIndex * dims;
 
   const array = from as NumberArray;
+  const step = stride || dims;
 
   if (typeof from === 'number') {
     if (dims === 1) {
       for (let j = 0; j < count; ++j) {
         to[pos] = from;
-        pos += stride;
+        pos += step;
       }
     }
     else {
+      const skip = dims - 1;
+
+      let o = pos;
       for (let j = 0; j < count; ++j) {
-        to[pos] = from;
-        pos += stride;
+        to[o++] = from;
         for (let k = 0; k < skip; ++k) {
-          to[pos] = 0;
-          pos += stride;
+          to[o++] = 0;
         }
       }
+      pos += step;
     }
   }
   else if (dims === 1) {
     for (let j = 0; j < count; ++j) {
       to[pos] = array[read];
-      pos += stride;
+      pos += step;
     }
   }
   else if (dims === 2) {
     for (let j = 0; j < count; ++j) {
-      to[pos         ] = array[read];
-      to[pos + stride] = array[read + 1];
-      pos += stride * 2;
+      to[pos    ] = array[read];
+      to[pos + 1] = array[read + 1];
+      pos += step;
     }
   }
   else if (dims === 3) {
     for (let j = 0; j < count; ++j) {
-      to[pos             ] = array[read];
-      to[pos + stride    ] = array[read + 1];
-      to[pos + stride * 2] = array[read + 2];
-      pos += stride * 3;
+      to[pos    ] = array[read];
+      to[pos + 1] = array[read + 1];
+      to[pos + 2] = array[read + 2];
+      pos += step;
     }
   }
   else if (dims === 4) {
     for (let j = 0; j < count; ++j) {
-      to[pos             ] = array[read];
-      to[pos + stride    ] = array[read + 1];
-      to[pos + stride * 2] = array[read + 2];
-      to[pos + stride * 3] = array[read + 3];
-      pos += stride * 4;
+      to[pos    ] = array[read];
+      to[pos + 1] = array[read + 1];
+      to[pos + 2] = array[read + 2];
+      to[pos + 3] = array[read + 3];
+      pos += step;
     }
   }
   else {
     for (let j = 0; j < count; ++j) {
       for (let k = 0; k < dims; ++k) {
-        to[pos + stride * k] = array[read + k];
+        to[pos + k] = array[read + k];
       }
-      pos += stride * dims;
+      pos += step;
     }
   }
 }

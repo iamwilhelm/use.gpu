@@ -329,26 +329,6 @@ export const loadBundlesInOrder = (
     let aliasMap: Map<string, string> | null = null;
     let importMap: Map<string, number> | null = null;
 
-    // Recurse into imports
-    if (modules) for (const {at, name, imports} of modules) {
-      const chunk = libs?.[name] ?? libraries[name];
-      if (!chunk) throw new Error(`Module '${name}' in ${getContext(module)} is unknown`);
-
-      const key = getBundleKey(chunk);
-      if (!seen.has(key)) queue.push({key, name, chunk});
-      seen.add(key);
-      deps.push(key);
-
-      if (!importMap) importMap = new Map();
-      importMap!.set(name, key);
-
-      if (at < 0) hoist.add(key);
-
-      let list = exported.get(key);
-      if (!list) exported.set(key, list = new Set());
-      imports.forEach((i: ImportRef) => list!.add(i.imported));
-    }
-
     // Recurse into links
     if (externals) for (const {flags, func, variable, struct} of externals) if (func ?? variable ?? struct) {
       const {name} = func ?? variable ?? struct;
@@ -379,6 +359,26 @@ export const loadBundlesInOrder = (
       let list = exported.get(key);
       if (!list) exported.set(key, list = new Set());
       list.add(symbol);
+    }
+
+    // Recurse into imports
+    if (modules) for (const {at, name, imports} of modules) {
+      const chunk = libs?.[name] ?? libraries[name];
+      if (!chunk) throw new Error(`Module '${name}' in ${getContext(module)} is unknown`);
+
+      const key = getBundleKey(chunk);
+      if (!seen.has(key)) queue.push({key, name, chunk});
+      seen.add(key);
+      deps.push(key);
+
+      if (!importMap) importMap = new Map();
+      importMap!.set(name, key);
+
+      if (at < 0) hoist.add(key);
+
+      let list = exported.get(key);
+      if (!list) exported.set(key, list = new Set());
+      imports.forEach((i: ImportRef) => list!.add(i.imported));
     }
 
     // Build module-to-module dependency graph

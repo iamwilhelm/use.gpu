@@ -104,7 +104,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   // Instanced draw (repeated or random access)
   const [instanceSize, totalCount] = useInstanceCount(instances, instanceCount, mappedInstances);
-  const mappedIndex = instances
+  const mappedIndex = instanceSize
     ? useBoundShader(getInstancedIndex, [instanceSize])
     : useNoBoundShader();
 
@@ -121,7 +121,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   
   const i = useShaderRef(null, props.indices);
   const l = useShaderRef(null, props.instances);
-  const k = useShaderRef(instanceSize);
 
   const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
 

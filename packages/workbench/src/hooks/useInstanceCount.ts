@@ -20,7 +20,7 @@ export const useInstanceCount = (
     return [null, geometryCount];
   }
 
-  const instanceSize = useShaderRef(mappedInstances ? null : geometryCount);
+  const instanceSize = mappedInstances ? useShaderRef(geometryCount) : useNoShaderRef();
   const totalCount = useCallback(() => {
     const l = (instances as any)?.length || 0;
     return mappedInstances ? l : l * resolve(geometryCount);

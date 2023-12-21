@@ -5,14 +5,8 @@
   var uniformIndex: u32;
 
   let size = getInstanceSize();
-  if (size > 0u) {
-    geometryIndex = instanceIndex % size;
-    uniformIndex = instanceIndex / size;
-  }
-  else {
-    geometryIndex = instanceIndex;
-    uniformIndex = instanceIndex;
-  }
+  geometryIndex = instanceIndex % size;
+  uniformIndex = instanceIndex / size;
   
   return vec2<u32>(geometryIndex, uniformIndex);
 };

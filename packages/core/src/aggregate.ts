@@ -11,6 +11,7 @@ import {
   copyNumberArray2,
   fillNumberArray2,
   unweldNumberArray2,
+  expandNumberArray2,
 } from './data2';
 import { makeUniformLayout } from './uniform';
 import { toMurmur53, mixBits53 } from '@use-gpu/state';
@@ -39,9 +40,9 @@ export const makeMultiAggregateBuffer = (device: GPUDevice, uniforms: UniformAtt
   const layout = makeUniformLayout(uniforms);
 
   const {length: bytes} = layout;
-  const raw = makeRawArray2(bytes, length);
+  const raw = makeRawArray2(bytes * length);
 
-  const buffer = makeStorageBuffer(device, bytes);
+  const buffer = makeStorageBuffer(device, bytes * length);
   const source = {
     buffer,
     format: uniforms,
@@ -97,9 +98,9 @@ export const updateAggregateBuffer = (
   keys: string,
 ) => {
   const {buffer, array, source, dims, base, stride} = aggregate;
+  const step = stride || dims;
 
-  let i = 0;
-  let b = base;
+  let b = base || 0;
   for (const item of items) {
     const {
       count,
@@ -117,17 +118,27 @@ export const updateAggregateBuffer = (
       else copyNumberArray2(multiple, array, dims, 0, b, count, stride);
     }
     else if (single != null) {
-      if (typeof single === 'function') {
-        single(array, b, count);
-      }
+      if (typeof single === 'function') single(array, b, count, stride);
       else fillNumberArray2(single, array, dims, 0, b, count, stride);
     }
 
-    b += count;
-    i++;
+    b += count * step;
   }
 
   if (buffer) uploadSource(device, source, array.buffer, count);
+}
+
+export const updateAggregateInstances = (
+  device: GPUDevice,
+  aggregate: AggregateBuffer,
+  items: Record<string, any>[],
+  count: number,
+) => {
+  const {array, source, layout} = aggregate;
+  const slices = items.map(item => item.count);
+  expandNumberArray2(null, array, slices);
+  uploadSource(device, source, array.buffer, count);
+  return source;
 }
 
 export const updateMultiAggregateBuffer = (
@@ -146,14 +157,13 @@ export const updateAggregateRefs = (
   refs: Lazy<any>[],
   count: number,
 ) => {
-  const {buffer, array, source, dims} = aggregate;
+  const {buffer, array, source, dims, base, stride} = aggregate;
+  const step = stride || dims;
 
-  let i = 0;
-  let base = 0;
+  let b = base || 0;
   for (const ref of refs) {
-    copyNumberArray2(resolve(ref), array, dims, 0, base, 1);
-    base++;
-    i++;
+    copyNumberArray2(resolve(ref), array, dims, 0, b, 1, stride);
+    b += step;
   }
 
   if (buffer) uploadSource(device, source, array.buffer, count);

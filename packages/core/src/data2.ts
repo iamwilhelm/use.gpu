@@ -1,10 +1,11 @@
-import type { Lazy, NumberEmitter, TypedArray, VectorLike, UniformType, UniformAttribute, Emitter, Emit } from './types';
-import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_SIZES } from './constants';
+import type { Lazy, VectorEmitter, TypedArray, VectorLike, UniformType, UniformAttribute, Emitter, Emit } from './types';
+import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_ALIGNS } from './constants';
 
 import { isTypedArray } from './buffer';
 import { seq } from './tuple';
 
 type NumberArray = VectorLike;
+type NumberMapper = (x: number) => number;
 
 export const alignSizeTo2 = (n: number, s: number) => {
   let f = n % s;
@@ -13,17 +14,19 @@ export const alignSizeTo2 = (n: number, s: number) => {
 
 export const getUniformDims2 = (type: UniformType) => UNIFORM_ARRAY_DIMS[type];
 
-export const makeRawArray2 = (byteSize: number, count: number) => new ArrayBuffer(byteSize * count);
+export const makeRawArray2 = (byteSize: number) => new ArrayBuffer(byteSize);
 
 export const makeDataArray2 = (type: UniformType, length: number) => {
-  const ctor = UNIFORM_ARRAY_TYPES[type];
-  const dims = UNIFORM_ARRAY_DIMS[type];
+  const ctor  = UNIFORM_ARRAY_TYPES[type];
+  const dims  = UNIFORM_ARRAY_DIMS[type];
+  const align = UNIFORM_ATTRIBUTE_ALIGNS[type];
 
-  const n = alignSizeTo2(length * Math.ceil(dims), 4);
+  const n = alignSizeTo2(length * Math.ceil(dims), align || 4);
 
   const array = new ctor(n);
   return {array, dims};
 };
+
 export const castRawArray2 = (buffer: ArrayBuffer | TypedArray, type: UniformType) => {
   const ctor = UNIFORM_ARRAY_TYPES[type];
   const dims = UNIFORM_ARRAY_DIMS[type];
@@ -32,202 +35,236 @@ export const castRawArray2 = (buffer: ArrayBuffer | TypedArray, type: UniformTyp
   return {array, dims};
 };
 
-export const copyNumberArray2 = (
+// Copy packed scalar/vec2/vec3/vec4 with vec3to4 extension for WGSL
+export const makeCopyPipe = ({
+  index = (x => x),
+  map = (x => x),
+}: {
+  index?: NumberMapper,
+  map?: NumberMapper,
+} = {}) => (
   from: number[] | TypedArray,
   to: TypedArray,
   dims: number = 1,
   fromIndex: number = 0,
   toIndex: number = 0,
-  length: number = 0,
+  count: number = 0,
   stride?: number,
 ) => {
-  const n = length != null ? length * dims : from.length;
 
-  let s = fromIndex * dims;
-  let o = toIndex * dims;
+  // vec3/mat3 to vec4/mat4 extension
+  // 3.5 = 3to4, 7.5 = 6to8, 11.5 = 9to12, 15.5 = 12to16
+  const dimsIn = Math.round(dims) !== dims ? Math.ceil(dims) * 3 / 4 : dims;
+  const dimsOut = Math.ceil(dims);
 
-  for (let i = 0; i < n; ++i) {
-    to[o] = from[s + i];
-    o += stride;
+  const n = count ?? from.length / dimsIn;
+  const step = stride || dimsOut;
+
+  let f = fromIndex;
+  let t = toIndex;
+
+  if (step !== dimsOut || dimsIn !== dimsOut || index || map)  {
+
+    // repeat n writes of a vec4
+    const dims4 = Math.min(Math.ceil(dims), 4);
+    const repeat = Math.ceil(dims / 4);
+
+    if (dims4 === 1) {
+      for (let i = 0; i < n; ++i) {
+        for (let j = 0; j < repeat; ++j) {
+          let b = f + index(i);
+          to[t + j] = map(from[b]);
+        }
+        t += step;
+      }
+    }
+    else if (dims4 === 2) {
+      for (let i = 0; i < n; ++i) {
+        let b = f + index(i) * 2;
+        to[t    ] = map(from[b]);
+        to[t + 1] = map(from[b + 1]);
+        t += step;
+      }
+    }
+    else if (dims4 === 3) {
+      for (let i = 0; i < n; ++i) {
+        let b = f + index(i) * 3;
+        to[t    ] = map(from[b]);
+        to[t + 1] = map(from[b + 1]);
+        to[t + 2] = map(from[b + 2]);
+        t += step;
+      }
+    }
+    else if (dims4 === 4) {
+      if (dimsIn !== dims) {
+        // vec3to4 extension
+        if (repeat > 1) {
+          for (let i = 0; i < n; ++i) {
+            let b = f + index(i) * 3 * repeat; // !
+            for (let j = 0; j < repeat; ++j) {
+              let bb = b + j * 3;
+              let tt = t + j * 4;
+              to[tt    ] = map(from[bb]);
+              to[tt + 1] = map(from[bb + 1]);
+              to[tt + 2] = map(from[bb + 2]);
+              to[tt + 3] = 0; // unused
+            }
+            t += step;
+          }
+        }
+        else {
+          for (let i = 0; i < n; ++i) {
+            let b = f + index(i) * 3; // !
+            to[t    ] = map(from[b]);
+            to[t + 1] = map(from[b + 1]);
+            to[t + 2] = map(from[b + 2]);
+            to[t + 3] = 0; // unused
+            t += step;
+          }
+        }
+      }
+      else {
+        if (repeat > 1) {
+          for (let i = 0; i < n; ++i) {
+            let b = f + index(i) * 4 * repeat;
+            for (let j = 0; j < repeat; ++j) {
+              let j4 = j * 4;
+              let tt = t + j4;
+              let bb = b + j4;
+              to[tt    ] = map(from[bb]);
+              to[tt + 1] = map(from[bb + 1]);
+              to[tt + 2] = map(from[bb + 2]);
+              to[tt + 3] = map(from[bb + 3]);
+            }
+            t += step;
+          }
+        }
+        else {
+          for (let i = 0; i < n; ++i) {
+            let b = f + index(i) * 4;
+            to[t    ] = map(from[b]);
+            to[t + 1] = map(from[b + 1]);
+            to[t + 2] = map(from[b + 2]);
+            to[t + 3] = map(from[b + 3]);
+            t += step;
+          }
+        }
+      }
+    }
+  }
+  else {
+    const n = count != null ? count * dims : from.length;
+    for (let i = 0; i < n; ++i) {
+      to[o] = from[s + i];
+      o++;
+    }
   }
 };
 
-export const offsetNumberArray2 = (
-  from: number[] | TypedArray,
-  to: TypedArray,
-  dims: number = 1,
-  fromIndex: number = 0,
-  toIndex: number = 0,
-  length?: number,
-  offset: number = 0,
-  stride?: number,
-) => {
-  const n = length != null ? length * dims : from.length;
+export const copyNumberArray2 = makeCopyPipe();
 
-  let s = fromIndex * dims;
-  let o = toIndex * dims;
+export const unweldNumberArray2 = (() => {
+  let arg;
+  const index = (i: number) => arg[i];
+  const copyWithIndex = makeCopyPipe({index});
+  return (
+    from: number[] | TypedArray,
+    to: TypedArray,
+    indices: TypedArray,
+    dims: number = 1,
+    fromIndex: number = 0,
+    toIndex: number = 0,
+    count?: number,
+    stride?: number,
+  ) => {
+    arg = indices;
+    return copyWithIndex(from, to, dims, fromIndex, toIndex, count, stride);
+  }  
+})();
 
-  for (let i = 0; i < n; ++i) {
-    to[o] = from[s + i] + offset;
-    o += stride;
+export const offsetNumberArray2 = (() => {
+  let arg;
+  const map = (x: number) => x + arg;
+  const copyWithOffset = makeCopyPipe({map});
+  return (
+    from: number[] | TypedArray,
+    to: TypedArray,
+    offset: number = 0,
+    dims: number = 1,
+    fromIndex: number = 0,
+    toIndex: number = 0,
+    count?: number,
+    stride?: number,
+  ) => {
+    arg = offset;
+    return copyWithOffset(from, to, dims, fromIndex, toIndex, count, stride);
+  };
+})();
+
+export const fillNumberArray2 = (() => {
+  const index = (i: number) => 0;
+  const copyWithNoIndex = makeCopyPipe({index});
+  return (
+    from: NumberArray | number,
+    to: NumberArray,
+    dims: number = 1, 
+    fromIndex: number = 0,
+    toIndex: number = 0,
+    count: number,
+    stride?: number,
+  ) => {
+    if (typeof from === 'number') {
+      const step = stride || dims;
+
+      let f = fromIndex;
+      let t = toIndex;
+
+      dims = Math.ceil(dims);
+      if (dims === 1) {
+        for (let j = 0; j < count; ++j) {
+          to[t] = from;
+          t += step;
+        }
+      }
+      else {
+        const skip = dims - 1;
+
+        for (let j = 0; j < count; ++j) {
+          to[t] = from;
+          for (let k = 1; k <= skip; ++k) to[t + k] = 0;
+          t += step;
+        }
+      }
+    }
+    else {
+      return copyWithNoIndex(from, to, dims, fromIndex, toIndex, count, stride); 
+    }
   }
-};
+})();
 
 export const expandNumberArray2 = (
-  from: number[] | TypedArray,
+  from: number[] | TypedArray | null,
   to: TypedArray,
   slices: TypedArray,
   dims: number = 1,
   fromIndex: number = 0,
   toIndex: number = 0,
-  stride: number = dims,
+  stride?: number,
 ) => {
+  const step = stride || dims;
+
   const n = slices.length;
   let f = fromIndex;
   let t = toIndex;
   for (let i = 0; i < n; ++i) {
     const l = slices[i];
-    fillNumberArray2(from, to, dims, f, t, l, stride);
+    fillNumberArray2(from ?? i, to, dims, f, t, l, stride);
     f++;
-    t += l * stride;
+    t += l * step;
   }
 }
 
-export const unweldNumberArray2 = (
-  from: number[] | TypedArray,
-  to: TypedArray,
-  indices: TypedArray,
-  dims: number = 1,
-  fromIndex: number = 0,
-  toIndex: number = 0,
-  length?: number,
-  stride?: number,
-) => {
-  const n = length != null ? length : indices.length;
-  const step = stride || dims;
-
-  let s = fromIndex * dims;
-  let o = toIndex * dims;
-
-  if (dims === 1) {
-    for (let i = 0; i < n; ++i) {
-      to[o] = from[indices[s + i]];
-      o += step;
-    }
-  }
-  else if (dims === 2) {
-    for (let i = 0; i < n; ++i) {
-      let b = indices[s + i] * 2;
-      to[o    ] = from[b];
-      to[o + 1] = from[b + 1];
-      o += step;
-    }
-  }
-  else if (dims === 3) {
-    for (let i = 0; i < n; ++i) {
-      let b = indices[s + i] * 3;
-      to[o    ] = from[b];
-      to[o + 1] = from[b + 1];
-      to[o + 2] = from[b + 2];
-      o += step;
-    }
-  }
-  else if (dims === 4) {
-    for (let i = 0; i < n; ++i) {
-      let b = indices[s + i] * 4;
-      to[o    ] = from[b];
-      to[o + 1] = from[b + 1];
-      to[o + 2] = from[b + 2];
-      to[o + 3] = from[b + 3];
-      o += step;
-    }
-  }
-  else {
-    for (let i = 0; i < n; ++i) {
-      let b = indices[s + i] * n;
-      for (let k = 0; k < dims; ++k) {
-        to[o + k] = from[b + k];
-      }
-      o += step;
-    }
-  }
-};
-  
-export const fillNumberArray2 = (
-  from: NumberArray | number,
-  to: NumberArray,
-  dims: number = 1, 
-  fromIndex: number = 0,
-  toIndex: number = 0,
-  count: number,
-  stride?: number,
-) => {
-  let pos = toIndex * dims;
-  const read = fromIndex * dims;
-
-  const array = from as NumberArray;
-  const step = stride || dims;
-
-  if (typeof from === 'number') {
-    if (dims === 1) {
-      for (let j = 0; j < count; ++j) {
-        to[pos] = from;
-        pos += step;
-      }
-    }
-    else {
-      const skip = dims - 1;
-
-      let o = pos;
-      for (let j = 0; j < count; ++j) {
-        to[o++] = from;
-        for (let k = 0; k < skip; ++k) {
-          to[o++] = 0;
-        }
-      }
-      pos += step;
-    }
-  }
-  else if (dims === 1) {
-    for (let j = 0; j < count; ++j) {
-      to[pos] = array[read];
-      pos += step;
-    }
-  }
-  else if (dims === 2) {
-    for (let j = 0; j < count; ++j) {
-      to[pos    ] = array[read];
-      to[pos + 1] = array[read + 1];
-      pos += step;
-    }
-  }
-  else if (dims === 3) {
-    for (let j = 0; j < count; ++j) {
-      to[pos    ] = array[read];
-      to[pos + 1] = array[read + 1];
-      to[pos + 2] = array[read + 2];
-      pos += step;
-    }
-  }
-  else if (dims === 4) {
-    for (let j = 0; j < count; ++j) {
-      to[pos    ] = array[read];
-      to[pos + 1] = array[read + 1];
-      to[pos + 2] = array[read + 2];
-      to[pos + 3] = array[read + 3];
-      pos += step;
-    }
-  }
-  else {
-    for (let j = 0; j < count; ++j) {
-      for (let k = 0; k < dims; ++k) {
-        to[pos + k] = array[read + k];
-      }
-      pos += step;
-    }
-  }
-}
-
+// read from 1d/2d/3d/4d number[][] into 1d/2d/3d/4d typed array
 export const copyNestedNumberArray2 = (
   from: number[][] | TypedArray[],
   to: TypedArray,
@@ -235,13 +272,13 @@ export const copyNestedNumberArray2 = (
   toDims: number,
   fromIndex: number = 0,
   toIndex: number = 0,
-  length: number,
+  count: number,
   w: number = 0,
 ) => {
-  const n = length ?? from.length;
+  const n = count ?? from.length;
 
   let s = fromIndex;
-  let o = toIndex * toDims;
+  let o = toIndex;
 
   if (toDims === 1) {
     for (let i = 0; i < n; ++i) {
@@ -361,11 +398,11 @@ export const makeRefEmitter2 = (
 ) => (
   to: TypedArray,
   toIndex: number = 0,
-  length?: number,
+  count?: number,
   stride?: number,
 ) => {
   const from = resolve(fromRef);
-  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
+  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, count, stride);
   else copyNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 }
 
@@ -376,11 +413,11 @@ export const makePartialRefEmitter2 = (
   fromRef: Lazy<number | number[] | TypedArray>,
   to: TypedArray,
   toIndex: number = 0,
-  length?: number,
+  count?: number,
   stride?: number,
 ) => {
   const from = resolve(fromRef);
-  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
+  if (typeof from === 'number') fillNumberArray2(from, to, dims, fromIndex, toIndex, count, stride);
   else copyNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 }
 
@@ -394,7 +431,7 @@ export const makeExpandEmitter2 = (
   toIndex: number = 0,
   count: number = 0,
   stride?: number,
-) => expandNumberArray2(from, to, slices, dims, fromIndex, toIndex, length, stride);
+) => expandNumberArray2(from, to, slices, dims, fromIndex, toIndex, stride);
 
 export const makeFillEmitter2 = (
   from: NumberArray | number,
@@ -405,7 +442,7 @@ export const makeFillEmitter2 = (
   toIndex: number = 0,
   count: number = 0,
   stride?: number,
-) => fillNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
+) => fillNumberArray2(from, to, dims, fromIndex, toIndex, count, stride);
 
 export const makeUnweldEmitter2 = (
   from: number[] | TypedArray,
@@ -415,9 +452,9 @@ export const makeUnweldEmitter2 = (
 ) => (
   to: TypedArray,
   toIndex: number = 0,
-  length?: number,
+  count?: number,
   stride?: number,
-) => unweldNumberArray2(from, to, indices, dims, fromIndex, toIndex, length, stride);
+) => unweldNumberArray2(from, to, indices, dims, fromIndex, toIndex, count, stride);
 
 export const generateChunkSegments2 = (
   to: NumberArray,

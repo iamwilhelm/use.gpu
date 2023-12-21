@@ -12,6 +12,7 @@ import {
   filterSchema,
   mapSchema,
   schemaToAggregate,
+  schemaToUniform,
   updateAggregateFromSchema,
   updateAggregateFromSchemaRefs,
   
@@ -30,7 +31,7 @@ import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
 import { ArrowLayer } from './arrow-layer';
 
-import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA } from './schemas';
+import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA, INSTANCE_SCHEMA } from './schemas';
 
 const DEBUG = true;
 
@@ -59,7 +60,7 @@ const getItemSummary = (items: LayerAggregate[]) => {
   let allCount = 0;
   let allIndices = 0;
   for (let i = 0; i < n; ++i) {
-    const {count, indices} = items[i];
+    const {count, indices = 0} = items[i];
     allCount += count;
     allIndices += indices;
   }
@@ -148,12 +149,12 @@ const Aggregate: LiveFunction<any> = (
   const {archetype, count, indices} = getItemSummary(items);
 
   const allocItems = useBufferedSize(items.length);
-  const allocCounts = useBufferedSize(count);
+  const allocVertices = useBufferedSize(count);
   const allocIndices = useBufferedSize(indices);
 
   const render = useMemo(() =>
-    makeAggregator(device, items, allocItems, allocCounts, allocIndices),
-    [archetype, allocItems, allocCounts, allocIndices]
+    makeAggregator(device, items, allocItems, allocVertices, allocIndices),
+    [archetype, allocItems, allocVertices, allocIndices]
   );
 
   return render(items, count, indices);
@@ -168,44 +169,38 @@ const makeSchemaAggregator = (
   device: GPUDevice,
   items: LineAggregate[],
   allocItems: number,
-  allocCounts: number,
+  allocVertices: number,
   allocIndices: number,
 ) => {
   const [item] = items;
   const {attributes, refs} = item;
 
-  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocCounts, allocIndices);
-  const keys = Object.keys(aggregate);
+  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocVertices, allocIndices);
+  const {aggregateBuffers, refBuffers, bySelfs, byRefs, byVertices, byIndices} = aggregate;
 
-  const refSchema = filterSchema(schema, (f) => f.ref);
-  const refKeys = mapSchema(refSchema, (f, key) => key);
-  const refCount = refKeys.length;
-  
-  const {instances, byCounts, byItems, byIndices} = aggregate;
   const sources = {
-    ...(byItems   ? getStructSources(byItems.layout.attributes, byItems.source) : undefined),
-    ...(byCounts  ? getStructSources(byCounts.layout.attributes, byCounts.source) : undefined),
-    ...(byIndices ? getStructSources(byIndices.layout.attributes, byIndices.source) : undefined),
+    ...(byRefs     ? getStructSources(byRefs.layout.attributes, byRefs.source) : undefined),
+    ...(byVertices ? getStructSources(byVertices.layout.attributes, byVertices.source) : undefined),
+    ...(byIndices  ? getStructSources(byIndices.layout.attributes, byIndices.source) : undefined),
+    ...bySelfs,
   };
-  for (const k of keys) {
-    const s = aggregate[k].source;
-    if (s) sources[k] = s;
-  }
+
+  const refKeys = Object.keys(refBuffers);
+  const refCount = refKeys.length;
+  const {instances} = aggregateBuffers;
 
   let loadInstance: ShaderSource | null = null;
   let refSources: Record<string, ShaderSource> | null = null;
-  if (instances) {
-    const uniforms = refKeys.map(k => {
-      const {format} = refSchema[k];
-      return {name: k, format, args: ['u32']};
-    });
-
-    const index = {name: 'instances', format: 'u32', args: ['u32']};
+  if (instances && refCount) {
+    const uniforms = refKeys.map(k => schemaToUniform(schema, k));
+    const index = schemaToUniform(INSTANCE_SCHEMA, 'instances');
     [loadInstance, refSources] = getIndexedSources(uniforms, index, sources, instances.source);
   }
 
+  let itemCount = items.length;
+
   const uploadRefs = refCount ? () => {
-    updateAggregateFromSchemaRefs(device, refSchema, aggregate);
+    updateAggregateFromSchemaRefs(device, schema, aggregate, itemCount);
   } : null;
 
   const upload = uploadRefs ? quote(yeet(uploadRefs)) : null;
@@ -218,12 +213,15 @@ const makeSchemaAggregator = (
     updateAggregateFromSchema(device, schema, aggregate, items, count, indices);
     DEBUG && console.log(Component.name, {props, items, aggregate, refSources});
 
-    if (instances) props.instances = instances?.source;
+    if (instances && refCount) {
+      props.instances = instances.source;
+      itemCount = items.length;
+    } 
 
     const element = use(Component, props);
     const layer = provideTransform(element, transform, loadInstance, refSources);
 
-    if (refCount) return [upload, layer];
+    if (upload) return [upload, layer];
     return layer;
   };
 };

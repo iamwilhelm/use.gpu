@@ -1,3 +1,7 @@
+export const INSTANCE_SCHEMA = {
+  instances:  {format: 'u32'},
+};
+
 export const SHAPE_SCHEMA = {
   ids:        {format: 'u32', single: 'id'},
   colors:     {format: 'vec4<f32>', single: 'color'},

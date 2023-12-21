@@ -120,7 +120,7 @@ export const Plot2DPage: LC = () => {
                         [[-50, -50], [50, -50], [50, 50], [-50, 50]],
                       ]}
                       width={10}
-                      color={['#ffa040']}
+                      color={['#40a0ff']}
                       depth={1}
                       loop
                     />
@@ -128,7 +128,26 @@ export const Plot2DPage: LC = () => {
                 </Animate>
               </Transform>
             </Transform>
-            
+
+            <Transform scale={[1.5, 1.5]}>
+              <Transform position={[150, 500]} scale={0.75}>
+                <Animate keyframes={KEYFRAMES} speed={0.5} prop="rotation" ease="linear">
+                  <Transform rotation={30}>
+                    <Line
+                      positions={[
+                        [[-50, -50], [50, -50], [50, 50], [-50, 50]],
+                      ]}
+                      width={10}
+                      color={['#9f40a0']}
+                      depth={1}
+                      loop
+                    />
+                  </Transform>
+                </Animate>
+              </Transform>
+            </Transform>
+
+            {/*
             <Arrow
               position={[[100, 200], [250, 300]]}
               width={10}
@@ -199,6 +218,7 @@ export const Plot2DPage: LC = () => {
                 end
               />
             </Cartesian>
+            */}
 
           </Plot>
         </Pass>

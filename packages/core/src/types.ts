@@ -432,8 +432,8 @@ export type Tuples<N extends number, T = number> = {
   length: number,
 };
 
-export type NumberEmitter = (to: TypedArray, count: number, toIndex?: number) => void;
-export type NumberRefEmitter = (from: Lazy<number | number[] | TypedArray>, to: TypedArray, count: number, toIndex?: number) => void;
+export type VectorEmitter = (to: TypedArray, count: number, toIndex?: number, stride?: number) => void;
+export type VectorRefEmitter = (from: Lazy<number | number[] | TypedArray>, to: TypedArray, count: number, toIndex?: number, stride?: number) => void;
 
 export type Emitter<T extends Array = any[]> = {
   (emit: Emit, ...args: T): void;
@@ -470,6 +470,16 @@ export type AccessorSchema = Record<string, string | AccessorField>;
 export type ArchetypeField = {format: string, plural?: string, index?: boolean};
 export type ArchetypeSchema = Record<string, ArchetypeField>;
 
+export type Aggregate = {
+  aggregateBuffers: Record<string, AggregateBuffer | VirtualAggregateBuffer>,
+  refBuffers: Record<string, Lazy<any>[]>,
+  bySelf?: Record<string, StorageSource>,
+  byItems?: MultiAggregateBuffer,
+  byVertices?: MultiAggregateBuffer,
+  byIndices?: MultiAggregateBuffer,
+  byRefs?: MultiAggregateBuffer,
+};
+
 export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];
 export type DataBinding<T = any, S = any> = {
   uniform: UniformAttribute,
@@ -484,7 +494,6 @@ export type Lazy<T> = T | (() => T) | {expr: () => T} | {current: T};
 export type AggregateBuffer = {
   buffer: GPUBuffer,
   array?: TypedArray,
-  raw?: ArrayBuffer,
   source: StorageSource,
   dims: number,
 };
@@ -493,14 +502,14 @@ export type MultiAggregateBuffer = {
   buffer: GPUBuffer,
   raw?: ArrayBuffer,
   source: StorageSource,
-  layout?: UniformLayout,
+  layout: UniformLayout,
 };
 
 export type VirtualAggregateBuffer = {
   array: TypedArray,
   base: number,
-  stride: number,
   dims: number,
+  stride: number,
 };
 
 export type Atlas = {

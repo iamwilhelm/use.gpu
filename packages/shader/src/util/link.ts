@@ -393,7 +393,7 @@ export const loadBundlesInOrder = (
 
   // Sort by graph depth
   const order = getGraphOrder(graph, key, hoist);
-  const out = order.map(key => bundleMap.get(key));
+  const out = order.map(key => bundleMap.get(key)!);
 
   return {
     bundles: out,
@@ -431,7 +431,7 @@ export const getGraphOrder = (
   }
 
   const keys = [...depths.keys()];
-  keys.sort((a, b) => (depths.get(b) - depths.get(a)) || (a - b));
+  keys.sort((a, b) => (depths.get(b)! - depths.get(a)!) || (a - b));
 
   return keys;
 }

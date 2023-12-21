@@ -22,7 +22,7 @@ export const getIndexedSources = (
 ) => {
 
   const boundValues = uniforms.map((uniform) => getBoundSource(uniform, values[uniform.name]));
-  const boundIndices = getBoundSource(index, values[index.name]);
+  const boundIndices = getBoundSource(index, indices);
 
   const indexed = indexWith(boundValues, boundIndices);
   const loadInstance = getBoundShader(indexed, boundValues);

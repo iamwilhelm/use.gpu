@@ -268,6 +268,7 @@ const BY_MAP = new WeakMap<any, number>();
 /** React element interop
     @hidden */
 export const reactInterop = (element: any, fiber?: LiveFiber<any>) => {
+  if (typeof element === 'string') throw new Error(`String "${element}" is not a valid JSX element`);
   let call = element as DeferredCall<any> | DeferredCall<any>[] | null;
   if (element && ('props' in element)) {
     let {type, key} = element;
@@ -1042,7 +1043,6 @@ export const inlineFiberCall = <F extends ArrowFunction>(
   fiber: LiveFiber<F>,
   element: LiveElement,
 ) => {
-  if (typeof element === 'string') throw new Error("String is not a valid element");
   element = reactInterop(element, fiber) as any;
 
   const isArray = !!element && Array.isArray(element);

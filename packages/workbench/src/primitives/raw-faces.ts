@@ -120,7 +120,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   // Instanced draw (repeated or random access)
   const [instanceSize, totalCount] = useInstanceCount(instances, instanceCount, mappedInstances);
-  const mappedIndex = instances
+  const mappedIndex = instanceSize
     ? useBoundShader(getInstancedIndex, [instanceSize])
     : useNoBoundShader();
 

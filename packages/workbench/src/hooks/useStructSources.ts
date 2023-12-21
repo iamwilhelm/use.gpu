@@ -5,6 +5,8 @@ import { explode, structType, bindEntryPoint } from '@use-gpu/shader/wgsl';
 import { getBoundShader } from './useBoundShader';
 import { getBoundSource } from './useBoundSource';
 
+const toTitleCase = (s: string) => s.slice(0, 1).toUpperCase() + s.slice(1);
+
 export const useStructSources = (
   uniforms: UniformAttribute[],
   source: StorageSource,
@@ -18,9 +20,11 @@ export const getStructSources = (
   source: StorageSource,
   name?: string,
 ) => {
-  
+
+  name = name ?? 'get' + uniforms.map(u => toTitleCase(u.name)).join('');
+
   const type = structType(uniforms, name);
-  const bound = getBoundSource({name: 'storage', format: type, args: null}, source);
+  const bound = getBoundSource({name: name ?? 'storage', format: type, args: null}, source);
   const exploded = explode(type, bound);
 
   const sources = {};

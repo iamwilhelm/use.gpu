@@ -45,11 +45,12 @@ export const makeExplode = (
   const {module: tModule, virtuals: tVirtuals} = tBundle;
   const {module: sModule, virtuals: sVirtuals} = sBundle;
 
-  const {format: fields} = bundleToAttribute(tBundle);
+  const attribute = bundleToAttribute(tBundle);
+  const {format: fields} = attribute;
 
-  const entry = getBundleEntry(source);
-  if (!Array.isArray(fields)) throw new Error(`Cannot explode non-struct type '${entry}: ${fields}' of ${getBundleName(bundle)}`);
-  if (tVirtuals?.length) throw new Error(`Cannot explode virtual '${entry}' of ${getBundleName(bundle)}`);
+  const entry = getBundleEntry(source) ?? 'explode';
+  if (!Array.isArray(fields)) throw new Error(`Cannot explode non-struct type '${entry}: ${fields}' of ${getBundleName(tBundle)}`);
+  if (tVirtuals?.length) throw new Error(`Cannot explode virtual '${entry}' of ${getBundleName(tBundle)}`);
 
   let hash = getBundleHash(tBundle) ^ getBundleHash(sBundle);
   let key = getBundleKey(tBundle) ^ getBundleKey(sBundle);
@@ -63,7 +64,7 @@ export const makeExplode = (
   if (sModule.virtual) revirtuals.push(sModule);
 
   const externals = EXPLODE_EXTERNALS;
-  const args = source.args ?? ['u32'];
+  const args = attribute.args ?? ['u32'];
   if (args.length > 1) throw new Error(`Cannot explode getter for more than 1 index arg`);
 
   const code   = `@explode [${tModule.name}] [${sModule.name}]`;
@@ -88,7 +89,7 @@ export const makeExplode = (
   const exploded = loadVirtualModule(
     { render },
     { symbols, exports, externals },
-    null,
+    undefined,
     rehash,
     code,
     rekey,

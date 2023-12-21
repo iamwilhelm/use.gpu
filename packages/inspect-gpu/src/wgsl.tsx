@@ -83,9 +83,7 @@ const colorTheme = createTheme({
     background: '#000000',
     foreground: '#aedaff',
     caret: '#6a7eff',
-    selection: '#afcfff7a',
-    selectionMatch: '#036dd626',
-    lineHighlight: '#1f201dff',
+    lineHighlight: '#ffffff00',
     gutterBackground: '#303030',
     gutterForeground: '#8090A0',
   },
@@ -104,6 +102,29 @@ const colorTheme = createTheme({
 const fontTheme = EditorView.theme({
   "& .cm-scroller": {
     fontFamily: 'Fira Code, Menlo, Monaco, Consolas, Bitstream Vera Sans, monospace',
+  },
+  "& .cm-search": {
+    fontSize: '16px',
+    overflowX: 'auto',
+  },
+  "& .cm-search input": {
+    fontSize: '15px',
+  },
+  "& .cm-search button": {
+    fontSize: '14px',
+  },
+  "& .cm-search label": {
+    display: 'inline-flex',
+    direction: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    top: '2px',
+  },
+  "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground": {
+    background: "#4377ff80"
+  },
+  '& .cm-selectionMatch': {
+    background: "#4377ff40"
   },
 });
 

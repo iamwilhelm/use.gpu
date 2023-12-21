@@ -89,7 +89,7 @@ const maybeMultiVectorArray = <T extends TypedArrayConstructor>(
     const l = x.length;
 
     copyNestedNumberArray2(x, to, d, dims, 0, o, l, w);
-    o += l;
+    o += l * dims;
   }
   return to;
 }

@@ -17,7 +17,7 @@ export type MakeIndexedAccessor = (
   indexAccessor: string,
 ) => string;
 
-const INDEX_ENTRY = 'getIndex';
+const INDEX_ENTRY = 'loadIndex';
 const INDEX_LINK = 'getIndexed';
 const INDEX_SYMBOLS = [INDEX_ENTRY, INDEX_LINK];
 const INDEX_EXTERNALS = [{

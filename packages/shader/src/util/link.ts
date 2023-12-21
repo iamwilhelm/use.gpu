@@ -296,7 +296,7 @@ export const loadBundlesInOrder = (
   const imported = new Map<number, Map<string, number>>();
   const aliased  = new Map<number, Map<string, string>>();
 
-  const out: ParsedBundle[] = [];
+  const bundleMap: Map<number, ParsedBundle> = new Map();
 
   const {module} = bundle;
   const {name, entry} = module;
@@ -388,13 +388,12 @@ export const loadBundlesInOrder = (
     if (aliasMap) aliased.set(key, aliasMap);
     if (importMap) imported.set(key, importMap);
 
-    out.push(bundle);
+    bundleMap.set(getBundleKey(bundle), bundle);
   }
 
   // Sort by graph depth
-  const order = getGraphOrder(graph, key);
-  for (let [k, v] of order.entries()) if (hoist.has(k)) order.set(k, v + 1e5);
-  out.sort((a, b) => order.get(getBundleKey(b))! - order.get(getBundleKey(a))! || a.module.name.localeCompare(b.module.name));
+  const order = getGraphOrder(graph, key, hoist);
+  const out = order.map(key => bundleMap.get(key));
 
   return {
     bundles: out,
@@ -404,6 +403,38 @@ export const loadBundlesInOrder = (
   };
 };
 
+// Get depth for each item in a graph, so its dependencies resolve correctly
+export const getGraphOrder = (
+  graph: Map<number, number[]>,
+  key: number,
+  hoist?: Set<number>
+) => {
+  const queue = [{key, depth: 0, path: [key]}];
+  const depths = new Map<number, number>();
+
+  while (queue.length) {
+    const {key, depth, path} = queue.shift()!;
+    const d = hoist?.has(key) ? (1e5 + depth) : depth;
+    depths.set(key, Math.max(depths.get(key) || 0, d));
+
+    const modules = graph.get(key);
+    if (!modules) continue;
+
+    const n = modules.length;
+    const deps = modules.map((key, branch) => {
+      const i = path.indexOf(key);
+      if (i >= 0) throw new Error("Cycle detected in module dependency graph: " + path.slice(i));
+      return {key, depth: d + 1 + (n - branch) * 100, path: [...path, key]};
+    });
+
+    queue.push(...deps);
+  }
+
+  const keys = [...depths.keys()];
+  keys.sort((a, b) => (depths.get(b) - depths.get(a)) || (a - b));
+
+  return keys;
+}
 
 // Generate a new namespace
 export const reserveNamespace = (
@@ -414,33 +445,6 @@ export const reserveNamespace = (
   let namespace = force ?? '_' + ('00' + (namespaces.size + 1).toString(36)).slice(-2) + '_';
   namespaces.set(key, namespace);
   return namespace;
-}
-
-// Get depth for each item in a graph, so its dependencies resolve correctly
-export const getGraphOrder = (
-  graph: Map<number, number[]>,
-  name: number,
-  depth: number = 0,
-) => {
-  const queue = [{name, depth: 0, path: [name]}];
-  const depths = new Map<number, number>();
-
-  while (queue.length) {
-    const {name, depth, path} = queue.shift()!;
-    depths.set(name, depth);
-
-    const module = graph.get(name);
-    if (!module) continue;
-
-    const deps = module.map(name => {
-      const i = path.indexOf(name);
-      if (i >= 0) throw new Error("Cycle detected in module dependency graph: " + path.slice(i));
-      return {name, depth: depth + 1, path: [...path, name]};
-    });
-
-    queue.push(...deps);
-  }
-  return depths;
 }
 
 // Parse run-time specified keys `from:to` into a map of aliases

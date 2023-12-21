@@ -151,34 +151,34 @@ export const makeBindingAccessors = (
       if (typeof format === 'string' && typeof type === 'string') {
         if (is3to4(format)) {
           const accessor = name + '3to4';
-          program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
           program.push(makeStorageAccessor(namespace, set, base, to4(format), to4(format), accessor, readWrite));
+          program.push(makeVec3to4Accessor(namespace, type, to3(format), name, accessor));
           continue;
         }
         else if (is8to32(format)) {
           const accessor = name + '8to32';
-          program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
           program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+          program.push(make8to32Accessor(namespace, type, to32(format), name, accessor));
           continue;
         }
         else if (is16to32(format)) {
           const accessor = name + '16to32';
-          program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
           program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+          program.push(make16to32Accessor(namespace, type, to32(format), name, accessor));
           continue;
         }
         else if (isVec8to32(format)) {
           const accessor = name + 'Vec8to32';
           const wide = to32(format).replace('i32', 'u32');
-          program.push(makeVec8to32Accessor(namespace, type, wide, name, accessor));
           program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+          program.push(makeVec8to32Accessor(namespace, type, wide, name, accessor));
           continue;
         }
         else if (isVec16to32(format)) {
           const accessor = name + 'Vec16to32';
           const wide = to32(format).replace('i32', 'u32');
-          program.push(makeVec16to32Accessor(namespace, type, wide, name, accessor));
           program.push(makeStorageAccessor(namespace, set, base, 'u32', 'u32', accessor, readWrite));
+          program.push(makeVec16to32Accessor(namespace, type, wide, name, accessor));
           continue;
         }
       }

@@ -19,7 +19,7 @@ import { useApplyTransform } from '../hooks/useApplyTransform';
 import { getBoundShader, useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useDataLength } from '../hooks/useDataBinding';
-import { useInstanceCount, useNoInstanceCount } from '../hooks/useInstanceCount';
+import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 import { useShaderRef } from '../hooks/useShaderRef';
 
@@ -54,8 +54,8 @@ export type RawLinesProps = {
   trims?: ShaderSource,
   sizes?: ShaderSource,
 
+  instance?: number,
   instances?: ShaderSource,
-  mappedInstances?: boolean,
 
   count?: Lazy<number>,
 } & PickingSource & RawLinesFlags;
@@ -83,8 +83,8 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     depthWrite,
     blend,
 
+    instance,
     instances,
-    mappedInstances,
 
     count = null,
     depth = 0,
@@ -103,11 +103,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const instanceCount = useDataLength(count, props.positions, -1);
 
   // Instanced draw (repeated or random access)
-  const [instanceSize, totalCount] = useInstanceCount(instances, instanceCount, mappedInstances);
-  const mappedIndex = instanceSize
-    ? useBoundShader(getInstancedIndex, [instanceSize])
-    : useNoBoundShader();
-
   const p = useShaderRef(props.position, props.positions);
   const u = useShaderRef(props.uv, props.uvs);
   const s = useShaderRef(props.st, props.sts);
@@ -120,7 +115,6 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   const e = useShaderRef(props.size, props.sizes);
   
   const i = useShaderRef(null, props.indices);
-  const l = useShaderRef(null, props.instances);
 
   const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
 
@@ -139,13 +133,14 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getLineVertex, [
-    l, mappedIndex, instanceCount,
+  const boundVertex = useBoundShader(getLineVertex, [
     positions, scissor,
     u, ss,
     g ?? auto, c, w, d, z,
     t, e,
+    instanceCount,
   ]);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, instance, instances, instanceCount);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => ({
@@ -166,17 +161,16 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
     blend,
   });
 
-  const hasInstances = !!props.instances;
   const defines = useMemo(() => ({
     ...defs,
-    HAS_INSTANCES: hasInstances,
+    ...instanceDefs,
     LINE_JOIN_STYLE: style,
     LINE_JOIN_SIZE: segments,
-  }), [defs, hasInstances, style, segments]);
+  }), [defs, instanceDefs, style, segments]);
   
   return use(Virtual, {
     vertexCount,
-    instanceCount,
+    instanceCount: totalCount,
     bounds,
 
     links,

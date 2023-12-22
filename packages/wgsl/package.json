@@ -245,6 +245,11 @@
       "import": "./src/instance/vertex/full-screen.wgsl",
       "require": "./src/instance/vertex/full-screen.wgsl"
     },
+    "./instance/vertex/instanced.wgsl": {
+      "types": "./src/instance/vertex/instanced.wgsl.d.ts",
+      "import": "./src/instance/vertex/instanced.wgsl",
+      "require": "./src/instance/vertex/instanced.wgsl"
+    },
     "./instance/vertex/label.wgsl": {
       "types": "./src/instance/vertex/label.wgsl.d.ts",
       "import": "./src/instance/vertex/label.wgsl",

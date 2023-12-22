@@ -455,86 +455,70 @@ export const FaceSegmentsTrait = combine(
     console.log({chunks, loop, loops, start, starts, end, ends})
     if (!chunks) return;
 
-    const arrow = useFaceSegments(chunks, loop || loops, start || starts, end || ends);
+    const arrows = useFaceSegments(chunks, loop || loops, start || starts, end || ends);
     for (const k in arrow) parsed[k] = arrow[k];
   },
 );
 
+export const VerticesTrait = trait({
+  position: optional(parsePosition),
+  positions: optional(parsePositionArray),
+  depth: optional(parseNumber),
+  depths: optional(parseScalarArray),
+  zBias: optional(parseNumber),
+  zBiases: optional(parseScalarArray),
+
+  id: optional(parseNumber),
+  ids: optional(parseScalarArray),
+  lookup: optional(parseNumber),
+  lookups: optional(parseScalarArray),
+});
+
+export const SegmentedVerticesTrait = trait({
+  position: optional(parsePositionArray),
+  positions: optional(parsePositionMultiArray),
+  depth: optional(parseScalarArrayLike),
+  depths: optional(parseScalarMultiArray),
+  zBias: optional(parseScalarArrayLike),
+  zBiases: optional(parseScalarMultiArray),
+
+  id: optional(parseNumber),
+  ids: optional(parseScalarArray),
+  lookup: optional(parseNumber),
+  lookups: optional(parseScalarArray),
+});
+
 export const PointsTrait = combine(
   ColorsTrait(),
+  VerticesTrait,
   trait({
-    position: optional(parsePosition),
-    positions: optional(parsePositionArray),
     size: optional(parseNumber),
     sizes: optional(parseScalarArray),
-    depth: optional(parseNumber),
-    depths: optional(parseScalarArray),
-    zBias: optional(parseNumber),
-    zBiases: optional(parseScalarArray),
-
-    id: optional(parseNumber),
-    ids: optional(parseScalarArray),
-    lookup: optional(parseNumber),
-    lookups: optional(parseScalarArray),
   }),
 );
 
 export const LinesTrait = combine(
   ColorsTrait({ composite: true }),
+  SegmentedVerticesTrait,
   trait({
-    position: optional(parsePositionArray),
-    positions: optional(parsePositionMultiArray),
-    size: optional(parseScalarArrayLike),
-    sizes: optional(parseScalarMultiArray),
-    depth: optional(parseScalarArrayLike),
-    depths: optional(parseScalarMultiArray),
-    zBias: optional(parseScalarArrayLike),
-    zBiases: optional(parseScalarMultiArray),
-
-    id: optional(parseNumber),
-    ids: optional(parseScalarArray),
-    lookup: optional(parseNumber),
-    lookups: optional(parseScalarArray),
+    width: optional(parseScalarArrayLike),
+    widths: optional(parseScalarMultiArray),
   }),
   LineSegmentsTrait,  
 );
 
 export const ArrowsTrait = combine(
   ColorsTrait({ composite: true }),
+  SegmentedVerticesTrait,
   trait({
-    position: optional(parsePositionArray),
-    positions: optional(parsePositionMultiArray),
     size: optional(parseScalarArrayLike),
     sizes: optional(parseScalarMultiArray),
-    depth: optional(parseScalarArrayLike),
-    depths: optional(parseScalarMultiArray),
-    zBias: optional(parseScalarArrayLike),
-    zBiases: optional(parseScalarMultiArray),
-
-    id: optional(parseNumber),
-    ids: optional(parseScalarArray),
-    lookup: optional(parseNumber),
-    lookups: optional(parseScalarArray),
   }),
   ArrowSegmentsTrait,  
 );
 
 export const FacesTrait = combine(
   ColorsTrait({ composite: true }),
-  trait({
-    position: optional(parsePositionArray),
-    positions: optional(parsePositionMultiArray),
-    size: optional(parseScalarArrayLike),
-    sizes: optional(parseScalarMultiArray),
-    depth: optional(parseScalarArrayLike),
-    depths: optional(parseScalarMultiArray),
-    zBias: optional(parseScalarArrayLike),
-    zBiases: optional(parseScalarMultiArray),
-
-    id: optional(parseNumber),
-    ids: optional(parseScalarArray),
-    lookup: optional(parseNumber),
-    lookups: optional(parseScalarArray),
-  }),
+  SegmentedVerticesTrait,
   FaceSegmentsTrait,  
 );

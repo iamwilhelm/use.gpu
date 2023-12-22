@@ -1,10 +1,6 @@
 use '@use-gpu/wgsl/use/types'::{ ShadedVertex };
 use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 
-@optional @link fn loadInstance(i: u32) { };
-@optional @link fn getMappedIndex(instanceIndex: u32) -> vec2<u32> { return vec2<u32>(0, 0); };
-@optional @link fn getIndex(i: u32) -> u32 { return 0u; };
-
 @optional @link fn transformPosition(p: vec4<f32>) -> vec4<f32> { return p; };
 @optional @link fn transformDifferential(v: vec4<f32>, b: vec4<f32>, c: bool) -> vec4<f32> { return v; };
 @optional @link fn getScissor(pos: vec4<f32>) -> vec4<f32> { return vec4<f32>(1.0); };
@@ -18,22 +14,9 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 1.0, 1.0, 1.0); };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
-@export fn getFaceVertex(vertexIndex: u32, instanceIndex: u32) -> ShadedVertex {
-  var geometryIndex: u32;
-
-  if (HAS_INSTANCES) {
-    let mappedIndex = getMappedIndex(instanceIndex);
-    geometryIndex = mappedIndex.x;
-
-    let uniformIndex = mappedIndex.y;
-    loadInstance(uniformIndex);
-  }
-  else {
-    geometryIndex = instanceIndex;
-  }
-
-  let segment = getSegment(geometryIndex);
-  let index = geometryIndex * 3u + vertexIndex;
+@export fn getFaceVertex(vertexIndex: u32, elementIndex: u32) -> ShadedVertex {
+  let segment = getSegment(elementIndex);
+  let index = elementIndex * 3u + vertexIndex;
 
   var cornerIndex: u32;
   var unweldedIndex: u32;
@@ -78,24 +61,24 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
   else {
     // Triangle fan
     if (vertexIndex == 0u) {
-      cornerIndex = geometryIndex - u32(segment - 1);
+      cornerIndex = elementIndex - u32(segment - 1);
       if (FLAT_NORMALS) {
-        beforeIndex = geometryIndex + 2u;
-        afterIndex = geometryIndex + 1u;
+        beforeIndex = elementIndex + 2u;
+        afterIndex = elementIndex + 1u;
       }
     }
     else if (vertexIndex == 1u) {
-      cornerIndex = geometryIndex + 1u;
+      cornerIndex = elementIndex + 1u;
       if (FLAT_NORMALS) {
-        beforeIndex = geometryIndex - u32(segment - 1);
-        afterIndex = geometryIndex + 2u;
+        beforeIndex = elementIndex - u32(segment - 1);
+        afterIndex = elementIndex + 2u;
       }
     }
     else {
-      cornerIndex = geometryIndex + 2u;
+      cornerIndex = elementIndex + 2u;
       if (FLAT_NORMALS) {
-        beforeIndex = geometryIndex + 1u;
-        afterIndex = geometryIndex - u32(segment - 1);
+        beforeIndex = elementIndex + 1u;
+        afterIndex = elementIndex - u32(segment - 1);
       }
     }
 

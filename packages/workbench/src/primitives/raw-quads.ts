@@ -12,14 +12,16 @@ import { use, memo, useCallback, useOne, useMemo, useNoCallback } from '@use-gpu
 import { bindBundle, bindingsToLinks, chainTo } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
 
+import { useMaterialContext } from '../providers/material-provider';
+import { PickingSource, usePickingShader } from '../providers/picking-provider';
+
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useDataLength } from '../hooks/useDataBinding';
-import { PickingSource, usePickingShader } from '../providers/picking-provider';
+import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
-import { useMaterialContext } from '../providers/material-provider';
 
 import { getQuadVertex } from '@use-gpu/wgsl/instance/vertex/quad.wgsl';
 import { getMaskedColor } from '@use-gpu/wgsl/mask/masked.wgsl';
@@ -43,6 +45,9 @@ export type RawQuadsProps = {
   uvs?: ShaderSource,
   sts?: ShaderSource,
 
+  instance?: number,
+  instances?: ShaderSource,
+
   count?: Lazy<number>,
 } & PickingSource & Pick<Partial<PipelineOptions>, 'mode' | 'depthTest' | 'depthWrite' | 'alphaToCoverage' | 'blend'>;
 
@@ -55,6 +60,10 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
     depthWrite,
     blend,
     mode = 'opaque',
+    
+    instance,
+    instances,
+
     id = 0,
     count = null,
   } = props;
@@ -87,7 +96,13 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const material = useMaterialContext().solid;
 
-  const getVertex = useBoundShader(getQuadVertex, [positions, scissor, r, c, d, z, u, s, instanceCount]);
+  const boundVertex = useBoundShader(getQuadVertex, [
+    positions, scissor,
+    r, 
+    c, d, z, u, s,
+    instanceCount,
+  ]);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, instance, instances, instanceCount);
   const getPicking = usePickingShader(props);
   const applyMask = m ? useBoundShader(getMaskedColor, [m]) : useNoBoundShader();
 
@@ -111,8 +126,9 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const defines: Record<string, any> = useMemo(() => ({
     ...defs,
+    ...instanceDefs,
     HAS_EDGE_BLEED: true,
-  }), [defs]);
+  }), [defs, instanceDefs]);
 
   return use(Virtual, {
     vertexCount,

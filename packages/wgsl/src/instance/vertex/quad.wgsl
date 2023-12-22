@@ -12,18 +12,18 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
 @optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 1.0, 1.0); };
 @optional @link fn getST(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
 
-@optional @link fn getInstanceCount() -> f32 { return 1.0; }
+@optional @link fn getPointCount() -> f32 { return 1.0; }
 
-@export fn getQuadVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
+@export fn getQuadVertex(vertexIndex: u32, elementIndex: u32) -> SolidVertex {
 
-  var position = getPosition(instanceIndex);
-  var scissor = getScissor(instanceIndex);
-  var rectangle = getRectangle(instanceIndex);
-  var color = getColor(instanceIndex);
-  var depth = getDepth(instanceIndex);
-  var rectangleUV = getUV(instanceIndex);
-  var st4 = getST(instanceIndex);
-  var zBias = getZBias(instanceIndex);
+  var position = getPosition(elementIndex);
+  var scissor = getScissor(elementIndex);
+  var rectangle = getRectangle(elementIndex);
+  var color = getColor(elementIndex);
+  var depth = getDepth(elementIndex);
+  var rectangleUV = getUV(elementIndex);
+  var st4 = getST(elementIndex);
+  var zBias = getZBias(elementIndex);
 
   var center = worldToClip(position);
 
@@ -61,7 +61,7 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     center = applyZBias(center, size * zBias);
   }
 
-  let uv4 = vec4<f32>(uv, f32(instanceIndex) / getInstanceCount(), 0.0);
+  let uv4 = vec4<f32>(uv, f32(elementIndex) / getPointCount(), 0.0);
 
   return SolidVertex(
     center,
@@ -69,6 +69,6 @@ use '@use-gpu/wgsl/geometry/quad'::{ getQuadUV };
     uv4,
     st4,
     scissor,
-    instanceIndex,
+    elementIndex,
   );
 }

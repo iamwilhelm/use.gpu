@@ -24,7 +24,6 @@ import {
 const Traits = combine(
   LinesTrait,
 
-  LineTrait,
   ROPTrait,
   StrokeTrait,
   ZIndexTrait,

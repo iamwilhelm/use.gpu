@@ -18,12 +18,11 @@ import { useScissorContext } from '../providers/scissor-provider';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
 import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
-import { useInstanceCount, useNoInstanceCount } from '../hooks/useInstanceCount';
+import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getFaceVertex } from '@use-gpu/wgsl/instance/vertex/face.wgsl';
-import { getInstancedIndex } from '@use-gpu/wgsl/instance/instanced-index.wgsl';
 
 export type RawFacesFlags = {
   flat?: boolean,
@@ -52,8 +51,8 @@ export type RawFacesProps = {
 
   indices?: ShaderSource,
 
+  instance?: number,
   instances?: ShaderSource,
-  mappedInstances?: boolean,
 
   unwelded?: {
     colors?: boolean,
@@ -87,8 +86,8 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     depthWrite,
     blend,
 
+    instance,
     instances,
-    mappedInstances,
 
     unwelded,
     shouldDispatch,
@@ -118,12 +117,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     return 0;
   }, [props.positions, props.indices, props.segments, count]);
 
-  // Instanced draw (repeated or random access)
-  const [instanceSize, totalCount] = useInstanceCount(instances, instanceCount, mappedInstances);
-  const mappedIndex = instanceSize
-    ? useBoundShader(getInstancedIndex, [instanceSize])
-    : useNoBoundShader();
-
   const p = useShaderRef(props.position, props.positions);
   const n = useShaderRef(props.normal, props.normals);
   const t = useShaderRef(props.tangent, props.tangents);
@@ -152,12 +145,12 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
-
-  const getVertex = useBoundShader(getFaceVertex, [
-    l, mappedIndex, i,
+  const boundVertex = useBoundShader(getFaceVertex, [
+    l, i,
     xf, xd, scissor,
     ps, n, t, u, ss, g, c, z,
   ]);
+  const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, props.instance, props.instances, instanceCount);
   const getPicking = usePickingShader(props);
 
   const links = useMemo(() => {
@@ -185,27 +178,26 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     blend,
   });
 
-  const hasInstances = !!props.instances;
   const hasIndices = !!props.indices;
   const hasSegments = !!props.segments;
   const defines = useMemo(() => ({
     ...defs,
+    ...instanceDefs,
     HAS_DEPTH: fragDepth,
     HAS_INDICES: hasIndices,
     HAS_SEGMENTS: hasSegments,
-    HAS_INSTANCES: hasInstances,
     FLAT_NORMALS: flat,
     UNWELDED_COLORS: !!unwelded?.colors,
     UNWELDED_NORMALS: !!unwelded?.normals,
     UNWELDED_TANGENTS: !!unwelded?.tangents,
     UNWELDED_UVS: !!unwelded?.uvs,
     UNWELDED_LOOKUPS: !!unwelded?.lookups,
-  }), [defs, flat, fragDepth, hasIndices, hasSegments, hasInstances, unwelded]);
+  }), [defs, flat, fragDepth, instanceDefs, hasSegments, hasInstances, unwelded]);
 
   return (
     use(Virtual, {
       vertexCount,
-      instanceCount: totalCount ?? instanceCount,
+      instanceCount: totalCount,
       bounds,
 
       links,

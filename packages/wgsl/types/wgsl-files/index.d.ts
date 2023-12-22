@@ -323,6 +323,13 @@ declare module "@use-gpu/wgsl/instance/vertex/full-screen.wgsl" {
   export default __module;
 }
 
+declare module "@use-gpu/wgsl/instance/vertex/instanced.wgsl" {
+  type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
+  const __module: ParsedBundle;
+  export const getInstancedVertex: ParsedBundle;
+  export default __module;
+}
+
 declare module "@use-gpu/wgsl/instance/vertex/label.wgsl" {
   type ParsedBundle = import('@use-gpu/shader').ParsedBundle;
   const __module: ParsedBundle;

@@ -147,12 +147,12 @@ export const Plot2DPage: LC = () => {
               </Transform>
             </Transform>
 
-            {/*
             <Arrow
               position={[[100, 200], [250, 300]]}
               width={10}
               color={"#3090ff"}
               end
+              flat
             />
 
             <Transform position={[100, 350]} rotation={-20}>
@@ -169,6 +169,7 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
+            {/*
             <Transform position={[620, 50]} scale={[0.8, 0.8]}>
               <Face
                 position={[[0, 0], [50, 0], [100, 100], [50, 100]]}

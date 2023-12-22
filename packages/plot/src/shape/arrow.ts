@@ -42,6 +42,8 @@ export const Arrow: LiveComponent<ArrowProps> = memo((props) => {
       colors,
       width,
       widths,
+      size,
+      sizes,
       depth,
       depths,
       zIndex,

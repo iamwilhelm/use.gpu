@@ -1,5 +1,6 @@
 export * from './geometry/aabb';
 export * from './geometry/arrow';
+export * from './geometry/arrow-flat';
 export * from './geometry/box';
 export * from './geometry/plane';
 export * from './geometry/sphere';

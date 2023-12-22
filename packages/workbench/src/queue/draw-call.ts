@@ -261,7 +261,10 @@ export const drawCall = (props: DrawCallProps) => {
     if (volatile.bindGroup) passEncoder.setBindGroup(base + 1, volatile.bindGroup());
 
     if (indirect) passEncoder.drawIndirect(indirect.buffer, indirect.byteOffset ?? 0);
-    else passEncoder.draw(v, i, fv, fi);
+    else {
+      if (Number.isNaN(v * i * fv * fi)) debugger;
+      passEncoder.draw(v, i, fv, fi);
+    }
   };
 
   let draw = inner;

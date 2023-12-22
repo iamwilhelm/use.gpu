@@ -9,18 +9,23 @@ use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 @optional @link fn getPosition(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 0.0); };
 @optional @link fn getScissor(i: u32) -> vec4<f32> { return vec4<f32>(1.0); };
 
+@optional @link fn getUV(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
+@optional @link fn getST(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.0, 0.0); };
+
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(0.5, 0.5, 0.5, 1.0); };
 @optional @link fn getSize(i: u32) -> f32 { return 3.0; };
 @optional @link fn getWidth(i: u32) -> f32 { return 1.0; };
 @optional @link fn getDepth(i: u32) -> f32 { return 0.0; };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
+@optional @link fn getSegmentCount() -> f32 { return 1.0; }
+
 const ARROW_ASPECT: f32 = 2.5;
 
-@export fn getArrowVertex(vertexIndex: u32, instanceIndex: u32) -> SolidVertex {
+@export fn getArrowVertex(vertexIndex: u32, elementIndex: u32) -> SolidVertex {
   let meshPosition = getVertex(vertexIndex);
   
-  let anchor = getAnchor(instanceIndex);
+  let anchor = getAnchor(elementIndex);
   let anchorIndex = anchor.x;
   let nextIndex = anchor.y;
   let endIndex = anchor.z;
@@ -68,8 +73,10 @@ const ARROW_ASPECT: f32 = 2.5;
     arrowRadius = getArrowCorrection(cap.w, center.w, depth);
   }
 
-  let uv = vec4<f32>(f32(anchorIndex), 0.0, 0.0, 0.0);
-  let st = uv;
+  let rectangleUV = getUV(anchorIndex);
+  let uv = mix(rectangleUV.xy, rectangleUV.zw, select(1.0, 0.0, nextIndex > anchorIndex));
+  let uv4 = vec4<f32>(uv, f32(anchorIndex) / getSegmentCount(), 0.0);
+  let st4 = getST(anchorIndex);
 
   let orientedPos = m * vec4<f32>(vec3<f32>(meshPosition.x, meshPosition.yz * arrowRadius) * arrowSize, 1.0);
   let finalPos = vec4<f32>(orientedPos.xyz + startPos.xyz, 1.0);
@@ -82,8 +89,8 @@ const ARROW_ASPECT: f32 = 2.5;
   return SolidVertex(
     position,
     color,
-    uv,
-    st,
+    uv4,
+    st4,
     scissor,
     anchorIndex,
   );

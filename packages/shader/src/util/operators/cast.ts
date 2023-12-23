@@ -2,6 +2,7 @@ import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '..
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
+import { mergeBindings } from '../bind';
 
 const NO_SYMBOLS = [] as string[];
 
@@ -88,8 +89,6 @@ export const makeCastTo = (
   swizzle: string | CastTo,
 ): ParsedBundle => {
   const bundle = toBundle(source);
-
-  const {module, virtuals} = bundle;
   const {name, format, args} = bundleToAttribute(bundle);
 
   const entry = 'cast';
@@ -121,16 +120,16 @@ export const makeCastTo = (
     rekey,
   );
 
-  const revirtuals = module.virtual
-    ? (virtuals ? [...virtuals, module] : [module])
-    : virtuals;
+  // Don't reuse bundle.bindings because source may be virtual
+  const rebound = new Set();
+  mergeBindings(rebound, bundle);
 
   return {
     module: cast,
     links: {
       getValue: bundle,
     },
-    virtuals: revirtuals,
+    bound: rebound,
   };
 }
 

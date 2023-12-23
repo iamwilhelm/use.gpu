@@ -1,11 +1,11 @@
 import { loadModule } from '../shader';
 import { bindBundle } from '../bind';
 import { linkBundle } from '../link';
-import { indexWith } from './indexed';
+import { instanceWith } from './instanced';
 
-describe('indexed', () => {
+describe('instanced', () => {
 
-  it('loads two indexed values', () => {
+  it('loads two instanced values', () => {
     
     const value1 = `
     @export fn getValue1(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 2.0, 3.0, 4.0); }
@@ -31,7 +31,7 @@ describe('indexed', () => {
 
     const main = loadModule(code, 'main');
 
-    const loadIndex = indexWith({ value1: sub1, value2: sub2 }, ind);
+    const loadIndex = instanceWith({ value1: sub1, value2: sub2 }, ind);
     const bound = bindBundle(main, {loadIndex});
 
     const recode = linkBundle(bound);

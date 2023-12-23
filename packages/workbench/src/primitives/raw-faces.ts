@@ -192,7 +192,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
     UNWELDED_TANGENTS: !!unwelded?.tangents,
     UNWELDED_UVS: !!unwelded?.uvs,
     UNWELDED_LOOKUPS: !!unwelded?.lookups,
-  }), [defs, flat, fragDepth, instanceDefs, hasSegments, hasInstances, unwelded]);
+  }), [defs, flat, fragDepth, instanceDefs, hasSegments, unwelded]);
 
   return (
     use(Virtual, {

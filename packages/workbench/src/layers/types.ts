@@ -1,4 +1,4 @@
-import type { LiveFunction, LiveElement } from '@use-gpu/live';
+import type { LiveFunction, LiveComponent, LiveElement } from '@use-gpu/live';
 import type { PointShape } from '@use-gpu/parse';
 import type { LineLayerFlags } from '../line-layer';
 import type { FaceLayerFlags } from '../face-layer';
@@ -10,27 +10,21 @@ import { mat3, mat4 } from 'gl-matrix';
 
 export type LayerType = 'point' | 'line' | 'arrow' | 'face' | 'element';
 
-export type LayerAggregator = (
-  device: GPUDevice,
-  items: LayerAggregate[],
-  count: number,
-  indices?: number,
-) => (
-  items: LayerAggregate[],
-  count: number,
-  indices?: number,
-) => LiveElement;
+export type LayerAggregator = {
+  schema: AggregateSchema,
+  component: LiveComponent,
+};
 
 export type BaseAggregate = {
   archetype: number,
-  transform?: TransformContextProps,
-  material?: MaterialContextProps,
-  zIndex?: number,
+  count: number,
+  indices?: number,
 };
 
 export type ShapeAggregate = BaseAggregate & {
-  count: number,
-  indices?: number,
+  transform?: TransformContextProps,
+  material?: MaterialContextProps,
+  zIndex?: number,
 };
 
 export type PointAggregate = ShapeAggregate & {

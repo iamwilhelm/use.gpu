@@ -20,7 +20,7 @@ export const getBundleName = (bundle: ShaderModule) => {
 };
 
 export const getBundleLabel = (bundle: ShaderModule) => {
-  const {name, links, libs} = getBundleSummary(bundle, 5);
+  const {name, links, libs} = getBundleSummary(bundle, 10);
 
   const imports: string[] = [
     ...links.map(formatSummary),

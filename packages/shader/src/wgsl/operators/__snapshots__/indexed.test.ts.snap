@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`indexed loads two indexed values 1`] = `
+exports[`instanced loads two instanced values 1`] = `
 "//// @link index _01_
 
 
@@ -16,7 +16,7 @@ exports[`indexed loads two indexed values 1`] = `
 
     fn _03_getValue2(i: u32) -> vec2<u32> { return vec2<u32>(1u, 2u); }
     
-//// @link @indexed [getIndex / getValue1 getValue2] _04_
+//// @link @instanced [getIndex / getValue1 getValue2] _04_
 
 var<private> _04_a: vec4<f32>;
 var<private> _04_b: vec2<u32>;

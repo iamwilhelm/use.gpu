@@ -36,7 +36,7 @@ export type ParsedBundle<T extends SymbolTableT = any> = {
   hash?: number,
   key?: number,
   defines?: Record<string, any>,
-  virtuals?: ParsedModule<T>[],
+  bound?: Set<ParsedModule<T>>,
 };
 
 export type ParsedModule<T extends SymbolTableT = any> = {

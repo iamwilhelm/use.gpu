@@ -1,4 +1,4 @@
-import type { AggregateBuffer, MultiAggregateBuffer, UniformType, VirtualAggregateBuffer } from './types';
+import type { AggregateBuffer, AggregateValue, MultiAggregateBuffer, UniformType, VirtualAggregateBuffer } from './types';
 
 import { resolve } from './lazy';
 import { makeStorageBuffer, uploadBuffer } from './buffer';
@@ -92,7 +92,7 @@ export const uploadSource = (
 export const updateAggregateBuffer = (
   device: GPUDevice,
   aggregate: AggregateBuffer | VirtualAggregateBuffer,
-  items: Record<string, any>[],
+  items: AggregateItem[],
   count: number,
   key: string,
   keys: string,
@@ -108,7 +108,7 @@ export const updateAggregateBuffer = (
         [key]: single,
         [keys]: multiple,
       },
-    } = item as any;
+    } = item;
 
     //if (stride > 1) debugger;
     //if (key === 'color' && 'width' in item.attributes) debugger;
@@ -131,7 +131,7 @@ export const updateAggregateBuffer = (
 export const updateAggregateInstances = (
   device: GPUDevice,
   aggregate: AggregateBuffer,
-  items: Record<string, any>[],
+  items: AggregateItem[],
   count: number,
 ) => {
   const {array, source, layout} = aggregate;
@@ -172,7 +172,7 @@ export const updateAggregateRefs = (
 export const updateAggregateIndex = (
   device: GPUDevice,
   aggregate: AggregateBuffer,
-  items: Record<string, any>[],
+  items: AggregateItem[],
   count: number,
   offsets: number[],
   key: string,
@@ -193,5 +193,20 @@ export const updateAggregateIndex = (
   }
 
   if (buffer) uploadSource(device, source, array.buffer, count);
+}
+
+export const getAggregateSummary = (items: AggregateItem[]) => {
+  const n = items.length;
+  const archetype = items[0]?.archetype ?? 0;
+
+  let allCount = 0;
+  let allIndices = 0;
+  for (let i = 0; i < n; ++i) {
+    const {count, indices = 0} = items[i];
+    allCount += count;
+    allIndices += indices;
+  }
+  
+  return {archetype, count: allCount, indices: allIndices};
 }
 

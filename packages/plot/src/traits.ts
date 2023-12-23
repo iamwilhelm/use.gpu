@@ -63,6 +63,7 @@ export const AnchorTrait = trait(
 export const ArrowTrait = trait(
   {
     size: parseNumber,
+    flat: optional(parseBoolean),
   },
   {
     size: 3,
@@ -455,8 +456,8 @@ export const FaceSegmentsTrait = combine(
     console.log({chunks, loop, loops, start, starts, end, ends})
     if (!chunks) return;
 
-    const arrows = useFaceSegments(chunks, loop || loops, start || starts, end || ends);
-    for (const k in arrow) parsed[k] = arrow[k];
+    const face = useFaceSegments(chunks, loop || loops, start || starts, end || ends);
+    for (const k in face) parsed[k] = face[k];
   },
 );
 

@@ -4,6 +4,7 @@ export const INSTANCE_SCHEMA = {
 
 export const SHAPE_SCHEMA = {
   ids:        {format: 'u32', single: 'id'},
+  lookups:    {format: 'u32', single: 'lookup'},
   colors:     {format: 'vec4<f32>', single: 'color'},
   depths:     {format: 'f32', single: 'depth'},
   zBiases:    {format: 'f32', single: 'zBias'},
@@ -27,9 +28,7 @@ export const LINE_SCHEMA = {
   positions: {format: 'vec4<f32>', single: 'position', composite: true},
   widths:    {format: 'f32', single: 'width'},
 
-  unwelds:   {format: 'u16', unweld: true},
-  segments:  {format: 'i8',  segment: true},
-  lookups:   {format: 'u16', segment: true},
+  segments:  {format: 'i8', unwelded: true},
 };
 
 export const ARROW_SCHEMA = {
@@ -39,10 +38,9 @@ export const ARROW_SCHEMA = {
   widths:    {format: 'f32', single: 'width'},
   sizes:     {format: 'f32', single: 'size'},
 
-  unwelds:   {format: 'u32', unweld: true},
-  segments:  {format: 'i8', segment: true},
-  anchors:   {format: 'vec4<u32>', segment: true},
-  trims:     {format: 'vec4<u32>', segment: true},
+  segments:  {format: 'i8', unwelded: true},
+  anchors:   {format: 'vec4<u32>', unwelded: true},
+  trims:     {format: 'vec4<u32>', unwelded: true},
 };
 
 export const FACE_SCHEMA = {
@@ -50,5 +48,5 @@ export const FACE_SCHEMA = {
   ...MATRIX_SCHEMA,
   positions: {format: 'vec4<f32>', single: 'position', composite: true},
   indices:   {format: 'u32', index: true},
-  segments:  {format: 'i8', segment: true},
+  segments:  {format: 'i8', unwelded: true},
 };

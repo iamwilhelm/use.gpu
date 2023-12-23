@@ -1,5 +1,5 @@
 use '@use-gpu/wgsl/use/types'::{ SolidVertex };
-use '@use-gpu/wgsl/use/view'::{ worldToClip, worldToClip3D, applyZBias };
+use '@use-gpu/wgsl/use/view'::{ getViewVector, worldToClip, worldToView, viewToClip, worldToClip3D, applyZBias, getViewPosition };
 use '@use-gpu/wgsl/geometry/arrow'::{ getArrowSize, getArrowCorrection };
 
 @optional @link fn getVertex(i: u32) -> vec4<f32> { return vec4<f32>(0.0, 0.0, 0.0, 1.0); };
@@ -50,10 +50,15 @@ const ARROW_ASPECT: f32 = 2.5;
   let arrowSize = getArrowSize(maxLength, width, size, both, center.w, depth);
 
   let t = normalize(nextPos.xyz - startPos.xyz);
+  let viewPos = getViewPosition();
 
   var u: vec3<f32>;
-  if (abs(t.z) > 0.5) { u = vec3<f32>(1.0, 0.0, 0.0); }
-  else { u = vec3<f32>(0.0, 0.0, 1.0); };
+  if (FLAT_ARROWS) {
+    u = getViewVector(startPos.xyz);
+  }
+  else {
+    u = select(vec3<f32>(1.0, 0.0, 0.0), vec3<f32>(0.0, 0.0, 1.0), abs(t.z) > 0.5);
+  }
 
   let n = normalize(cross(t, u));
   let b = cross(t, n);

@@ -403,7 +403,7 @@ export const makeVec8to32Accessor = (
   if (format.match(/^vec2/)) {
     return (
 `fn ${ns}${name}(i: u32) -> ${type} {
-  let i2 = i / 2u;
+  let i2 = i >> 1u;
   let f2 = i & 1u;
   let word = ${ns}${accessor}(i2);
   let short = word >> (f2 << 4u);

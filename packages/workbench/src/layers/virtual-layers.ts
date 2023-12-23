@@ -5,27 +5,13 @@ import type { LayerAggregator, LayerAggregate } from './types';
 
 import { DeviceContext } from '../providers/device-provider';
 import { TransformContext } from '../providers/transform-provider';
-import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, memo, extend, useContext, useOne, useMemo } from '@use-gpu/live';
+import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, extend, useMemo, useOne } from '@use-gpu/live';
 import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
-import {
-  filterSchema,
-  mapSchema,
-  schemaToAggregate,
-  schemaToUniform,
-  updateAggregateFromSchema,
-  updateAggregateFromSchemaRefs,
-  
-  makeAggregateBuffer,
-  updateAggregateBuffer,
-  updateAggregateIndex,
-} from '@use-gpu/core';
-import { useBufferedSize } from '../hooks/useBufferedSize';
-import { getIndexedSources } from '../hooks/useIndexedSources';
-import { getStructSources } from '../hooks/useStructSources';
+
+import { Aggregator } from '../primitives/aggregator';
 
 import { IndexedTransform } from './indexed-transform';
-
 import { FaceLayer } from './face-layer';
 import { LineLayer } from './line-layer';
 import { PointLayer } from './point-layer';
@@ -35,60 +21,37 @@ import { LINE_SCHEMA, POINT_SCHEMA, ARROW_SCHEMA, FACE_SCHEMA, INSTANCE_SCHEMA }
 
 const DEBUG = true;
 
-type AccumulatorOptions = {
-  _unused?: boolean,
-};
-
 export type VirtualLayersProps = {
   items?: Record<string, LayerAggregate[]>,
   children: LiveElement,
 };
 
-const allCount = (a: number, b: LayerAggregate): number => a + b.count;
-
-const allIndices = (a: number, b: LayerAggregate): number => a + (b.indices || 0);
-
-const allKeys = (a: Set<string>, b: LayerAggregate): Set<string> => {
-  for (let k in b) a.add(k);
-  return a;
-}
-
-const getItemSummary = (items: LayerAggregate[]) => {
-  const n = items.length;
-  const archetype = items[0]?.archetype ?? 0;
-
-  let allCount = 0;
-  let allIndices = 0;
-  for (let i = 0; i < n; ++i) {
-    const {count, indices = 0} = items[i];
-    allCount += count;
-    allIndices += indices;
-  }
-  
-  return {archetype, count: allCount, indices: allIndices};
-}
+const AGGREGATORS = {
+  'arrow': { schema: ARROW_SCHEMA, component: ArrowLayer },
+  'face':  { schema: FACE_SCHEMA,  component: FaceLayer  },
+  'line':  { schema: LINE_SCHEMA,  component: LineLayer  },
+  'point': { schema: POINT_SCHEMA, component: PointLayer },
+  //'label': () => () => {},
+} as Record<string, LayerAggregator>;
 
 /** Aggregate (point / line / face) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualLayersProps) => {
   const {zBias, items, children} = props;
-  const options = {zBias};
-  return items ? Resume(options)(items) : children ? multiGather(children, Resume(options)) : null;
+  return items ? Resume(items) : children ? multiGather(children, Resume) : null;
 };
 
 const provideTransform = (
   element: LiveElement,
   transform?: TransformContextProps,
-  loadInstance?: ShaderSource | null,
   refSources?: Record<string, ShaderSource>,
 ) => {
   if (!element) return null;
 
-  const hasRefTransform = loadInstance && refSources;
-  const hasTransform = transform?.key;
+  const hasRefTransform = !!refSources?.matrices;
+  const hasTransform = !!transform?.key;
 
   let view = element;
   if (hasRefTransform) {
-    view = extend(view, {instances: loadInstance});
     view = use(IndexedTransform, {...refSources, children: view});
   }
   if (hasTransform) {
@@ -98,8 +61,6 @@ const provideTransform = (
 };
 
 const Resume = (
-  options: VirtualLayersOptions,
-) => (
   aggregates: Record<string, LayerAggregate[]>,
 ) => useOne(() => {
   const els: LiveElement[] = [signal()];
@@ -118,8 +79,8 @@ const Resume = (
     }
 
     // Pass on unknown types, probably raw draw calls
-    const makeAggregator = AGGREGATORS[type];
-    if (!makeAggregator) {
+    const layerAggregator = AGGREGATORS[type];
+    if (!layerAggregator) {
       els.push(yeet({[type]: items}));
       continue;
     }
@@ -132,7 +93,7 @@ const Resume = (
 
     const group = [];
     for (const layer of layers) {
-      group.push(keyed(Aggregate, layer.key, makeAggregator(options), layer.items));
+      group.push(keyed(Aggregate, layer.key, layerAggregator, layer.items));
     }
 
     els.push(fragment(group, type));
@@ -142,108 +103,36 @@ const Resume = (
 }, aggregates);
 
 const Aggregate: LiveFunction<any> = (
-  makeAggregator: LayerAggregator,
+  layerAggregator: LayerAggregator,
   items: LayerAggregate[],
 ) => {
-  const device = useContext(DeviceContext);
-  const {archetype, count, indices} = getItemSummary(items);
+  const {schema, component} = layerAggregator;
 
-  const allocItems = useBufferedSize(items.length);
-  const allocVertices = useBufferedSize(count);
-  const allocIndices = useBufferedSize(indices);
+  return use(Aggregator, {
+    schema, items,
+    render: (
+      count: number,
+      sources: Record<string, ShaderSource>,
+      item: LayerAggregate,
+      uploadRefs?: () => void,
+    ) => {
+      const {transform, flags} = item;
 
-  const render = useMemo(() =>
-    makeAggregator(device, items, allocItems, allocVertices, allocIndices),
-    [archetype, allocItems, allocVertices, allocIndices]
-  );
+      return useMemo(() => {
+        const {matrices, normalMatrices, ...rest} = sources;
+        const props = {count, ...rest, ...flags};
 
-  return render(items, count, indices);
+        DEBUG && console.log(component.name, {props, items, sources});
+
+        const element = use(component, props);
+        const layer = provideTransform(element, transform, sources);
+
+        const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
+        return upload ? [upload, layer] : layer;
+      }, [count, sources, transform, flags, uploadRefs]);
+    }
+  });
 };
-
-const makeSchemaAggregator = (
-  schema: AggregateSchema,
-  Component: LiveComponent,
-) => (
-  options: AccumulatorOptions,
-) => (
-  device: GPUDevice,
-  items: LineAggregate[],
-  allocItems: number,
-  allocVertices: number,
-  allocIndices: number,
-) => {
-  const [item] = items;
-  const {attributes, refs} = item;
-
-  const aggregate = schemaToAggregate(device, schema, attributes, refs, allocItems, allocVertices, allocIndices);
-  const {aggregateBuffers, refBuffers, bySelfs, byRefs, byVertices, byIndices} = aggregate;
-
-  const sources = {
-    ...(byRefs     ? getStructSources(byRefs.layout.attributes, byRefs.source) : undefined),
-    ...(byVertices ? getStructSources(byVertices.layout.attributes, byVertices.source) : undefined),
-    ...(byIndices  ? getStructSources(byIndices.layout.attributes, byIndices.source) : undefined),
-    ...bySelfs,
-  };
-
-  const refKeys = Object.keys(refBuffers);
-  const refCount = refKeys.length;
-  const {instances} = aggregateBuffers;
-
-  let loadInstance: ShaderSource | null = null;
-  let refSources: Record<string, ShaderSource> | null = null;
-  if (instances && refCount) {
-    const uniforms = refKeys.map(k => schemaToUniform(schema, k));
-    const index = schemaToUniform(INSTANCE_SCHEMA, 'instances');
-    [loadInstance, refSources] = getIndexedSources(uniforms, index, sources, instances.source);
-  }
-
-  let itemCount = items.length;
-
-  const uploadRefs = refCount ? () => {
-    updateAggregateFromSchemaRefs(device, schema, aggregate, itemCount);
-  } : null;
-
-  const upload = uploadRefs ? quote(yeet(uploadRefs)) : null;
-
-  return (items: ArrowAggregate[], count: number, indices: number) => {
-    const [item] = items;
-    const {transform} = item;
-    const props = {count, ...item.flags, ...sources} as Record<string, any>;
-
-    updateAggregateFromSchema(device, schema, aggregate, items, count, indices);
-    DEBUG && console.log(Component.name, {props, items, aggregate, refSources});
-
-    if (instances && refCount) {
-      props.instances = instances.source;
-      itemCount = items.length;
-    } 
-
-    const element = use(Component, props);
-    const layer = provideTransform(element, transform, loadInstance, refSources);
-
-    if (upload) return [upload, layer];
-    return layer;
-  };
-};
-
-const AGGREGATORS = {
-  'arrow': makeSchemaAggregator(ARROW_SCHEMA, ArrowLayer),
-  'face': makeSchemaAggregator(FACE_SCHEMA, FaceLayer),
-  'line': makeSchemaAggregator(LINE_SCHEMA, LineLayer),
-  'point': makeSchemaAggregator(POINT_SCHEMA, PointLayer),
-  'label': () => () => {},
-} as Record<string, LayerAggregator>;
-
-const accumulate = (xs: number[]): number[] => {
-  let out: number[] = [];
-  let n = xs.length;
-  let accum = 0;
-  for (let i = 0; i < n; ++i) {
-    out.push(accum);
-    accum += xs[i];
-  }
-  return out;
-}
 
 const getItemTypeKey = (item: LayerAggregate) =>
   ('transform' in item

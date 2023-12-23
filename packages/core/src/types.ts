@@ -236,18 +236,14 @@ export type UniformAttributeValue = UniformAttribute & {
   value: any,
 };
 
-export type UniformAttributeDescriptor = {
-  name: string,
+export type UniformAttributeDescriptor = UniformAttribute & {
   offset: number,
-  format: UniformType,
 };
 
 export type UniformLayout = {
   length: number,
-  
-  uniforms: UniformAttribute[],
+  attributes: UniformAttributeDescriptor[],
   offsets: number[],
-  groups: number[],
 };
 
 export type InterleavedLayout = {
@@ -464,11 +460,22 @@ export type Time = {
 export type AccessorSpec = string | Accessor | TypedArray | number[];
 export type AccessorType = 'index' | 'unwelded';
 
-export type AccessorField = {format: string, accessor?: AccessorSpec, type?: AccessorType};
 export type AccessorSchema = Record<string, string | AccessorField>;
+export type AccessorField = {
+  format: string,
+  accessor?: AccessorSpec,
+  type?: AccessorType,
+};
 
-export type ArchetypeField = {format: string, plural?: string, index?: boolean};
 export type ArchetypeSchema = Record<string, ArchetypeField>;
+export type ArchetypeField = {
+  format: string,
+  single?: string,
+  composite?: boolean,
+  ref?: boolean,
+  index?: boolean,
+  unwelded?: boolean,
+};
 
 export type Aggregate = {
   aggregateBuffers: Record<string, AggregateBuffer | VirtualAggregateBuffer>,
@@ -478,6 +485,16 @@ export type Aggregate = {
   byVertices?: MultiAggregateBuffer,
   byIndices?: MultiAggregateBuffer,
   byRefs?: MultiAggregateBuffer,
+};
+
+export type AggregateValue = number | number[] | TypedArray | VectorEmitter | VectorRefEmitter;
+
+export type AggregateItem = {
+  archetype: number,
+  count: number,
+  indices?: number,
+  attributes?: Record<string, AggregateValue>,
+  flags?: Record<string, any>,
 };
 
 export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];

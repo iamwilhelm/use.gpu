@@ -113,6 +113,7 @@ export const makeLinker = (
 ) => {
   const bundle = toBundle(source);
   const main = getBundleKey(source);
+  console.log({source})
 
   const {bundles, exported, imported, aliased} = loadBundlesInOrder(bundle, libraries);
   const program = getPreambles();
@@ -144,7 +145,7 @@ export const makeLinker = (
   const signatures = new Map<string, any>();
   const infers = new Map<string, string>();
 
-  let hasBoundVirtuals = false;
+  let hasBoundBindings = false;
 
   for (const bundle of bundles) {
     const {module, defines} = bundle;
@@ -243,11 +244,12 @@ export const makeLinker = (
     // Copy over static renames
     for (let k of staticRename.keys()) rename.set(k, staticRename.get(k)!);
 
-    if (name === VIRTUAL_BINDINGS) hasBoundVirtuals = true;
+    if (name === VIRTUAL_BINDINGS) hasBoundBindings = true;
 
+    const ns = namespaces.get(key)!;
     if (virtual) {
       const {uniforms, storages, textures} = virtual;
-      if ((uniforms || storages || textures) && (!hasBoundVirtuals)) {
+      if ((uniforms || storages || textures) && (!hasBoundBindings)) {
         const id = code.replace('@virtual ', '');
         throw new Error(`Virtual module ${id} has unresolved data bindings`);
       }
@@ -321,7 +323,7 @@ export const loadBundlesInOrder = (
     const bundle = toBundle(chunk);
     const {module, libs, links: linkDefs} = bundle;
     const {table: {modules, externals}} = module;
-    const deps = [] as number[];
+    const deps = graph.get(key) ?? [] as number[];
 
     const [links, aliases] = parseLinkAliases(linkDefs);
 
@@ -388,7 +390,7 @@ export const loadBundlesInOrder = (
     if (aliasMap) aliased.set(key, aliasMap);
     if (importMap) imported.set(key, importMap);
 
-    bundleMap.set(getBundleKey(bundle), bundle);
+    if (!bundleMap.has(key)) bundleMap.set(getBundleKey(bundle), bundle);
   }
 
   // Sort by graph depth

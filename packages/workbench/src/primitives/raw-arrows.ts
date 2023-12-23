@@ -19,7 +19,7 @@ import { useRawSource } from '../hooks/useRawSource';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
-import { useBoundSource } from '../hooks/useBoundSource';
+import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -141,10 +141,11 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     blend,
   });
 
-  const defines = instanceDefs ? useMemo(() => ({
+  const defines = useMemo(() => ({
     ...defs,
     ...instanceDefs,
-  }), [defs, instanceDefs]) : (useNoMemo(), defs);
+    FLAT_ARROWS: flat,
+  }), [defs, instanceDefs, flat]);
 
   return (
      use(Virtual, {

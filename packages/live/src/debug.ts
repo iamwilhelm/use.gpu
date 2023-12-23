@@ -184,7 +184,7 @@ export const formatNode = <F extends Function>(_node: LiveElement<F>): string =>
 
 export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return '' + x;
-  if (Array.isArray(x)) {
+  if (Array.isArray(x) || x?.constructor?.name?.match(/Array/)) {
     if (seen.get(x)) return '[Repeated]';
     seen.set(x, true);
 
@@ -221,7 +221,7 @@ export const formatValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap
 
 export const formatShortValue = (x: any, seen: WeakMap<object, boolean> = new WeakMap()): string => {
   if (!x) return '' + x;
-  if (Array.isArray(x)) {
+  if (Array.isArray(x) || x?.constructor?.name?.match(/Array/)) {
     let extra = '';
     if (x.length > 100) {
       x = x.slice(0, 100);

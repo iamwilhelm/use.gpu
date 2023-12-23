@@ -47,9 +47,21 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
   seen.add(object);
 
   if (Array.isArray(object)) {
-    if (object.length > 100) object = object.slice(0, 100);
+    let n = object.length;
+    if (n > 100) {
+      object = object.slice(0, 100);
+    }
     if (object.reduce((b: boolean, o: any) => b && typeof o === 'number', true)) {
-      return <span>{`[${object.join(', ')}]`}</span>;
+      return <span>{`[${object.join(', ')}${n > 100 ? '…' : ''}]`}</span>;
+    }
+    if (n > 100) object.push('…');
+  }
+
+  if (object?.constructor?.name?.match(/Array/)) {
+    if (object.length > 100) {
+      object = object.slice(0, 100);
+      object = Array.from(object);
+      object.push('…');
     }
   }
   
@@ -66,14 +78,6 @@ export const InspectObject: FC<InspectObjectProps> = (props: InspectObjectProps)
       o[k] = v;
     }
     object = o;
-  }
-
-  if (object?.constructor?.name?.match(/Array/)) {
-    if (object.length > 100) {
-      object = object.slice(0, 100);
-      object = Array.from(object);
-      object.push('…');
-    }
   }
 
   const fields = Object.keys(object).map((k: string) => {

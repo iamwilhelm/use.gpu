@@ -20,6 +20,11 @@ struct ViewUniforms {
 @export fn getViewNearFar() -> vec2<f32> { return viewUniforms.viewNearFar; }
 @export fn getViewPixelRatio() -> f32 { return viewUniforms.viewPixelRatio; }
 
+@export fn getViewVector(world: vec3<f32>) -> vec3<f32> {
+  let pos = viewUniforms.viewPosition;
+  return pos.xyz - world * pos.w;
+}
+
 @export fn to3D(position: vec4<f32>) -> vec3<f32> {
   return position.xyz / position.w;
 }

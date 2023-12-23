@@ -105,7 +105,7 @@ export const FlatCamera: LiveComponent<FlatCameraProps> = (props) => {
   const viewHeight = Math.abs(layout[3] - layout[1]);
 
   uniforms.projectionMatrix.current = panned;
-  uniforms.viewPosition.current = vec4.fromValues(0, 0, 1, 1);
+  uniforms.viewPosition.current = vec4.fromValues(0, 0, 1, 0);
   uniforms.viewNearFar.current = vec2.fromValues(near, far);
   uniforms.viewResolution.current = vec2.fromValues(1 / width, 1 / height);
   uniforms.viewSize.current = vec2.fromValues(width, height);

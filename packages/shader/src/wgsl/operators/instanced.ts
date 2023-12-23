@@ -1,10 +1,10 @@
 import { UniformAttribute } from '../../types';
-import { makeIndexWith } from '../../util/operators/indexed';
+import { makeInstanceWith } from '../../util/operators/instanced';
 import { bundleToAttribute } from '../shader';
 
 const arg = (x: number) => String.fromCharCode(97 + x);
 
-export const makeIndexedAccessor = (
+export const makeInstancedAccessor = (
   ns: string,
   name: string,
   args: string,
@@ -24,4 +24,4 @@ ${fields.map((f, i) => `fn ${ns}${f.name}(index: ${f.args?.[0] ?? 'u32'}) -> ${f
   );
 }
 
-export const indexWith = makeIndexWith(makeIndexedAccessor, bundleToAttribute);
+export const instanceWith = makeInstanceWith(makeInstancedAccessor, bundleToAttribute);

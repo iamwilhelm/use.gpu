@@ -49,11 +49,11 @@ export const schemaToArchetype = (
   const tokens = [];
   for (const key in schema) {
     const {single, format} = schema[key];
-    if (
-      props[key] != null || 
-      (single != null && props[single] != null)
-    ) {
+    if (props[key] != null) {
       tokens.push(key, format);
+    }
+    else if (single != null && props[single] != null) {
+      tokens.push(single, format);
     }
   }
   tokens.push(flags);
@@ -76,9 +76,9 @@ export const schemaToAttributes = (
 ): Record<string, any> => {
   const attributes: Record<string, any> = {};
   for (const key in schema) {
-    const {single, unweld, composite, ref} = schema[key];
+    const {single, composite, ref} = schema[key];
     if (ref) continue;
-    if (unweld || composite) throw new Error("Can't make attributes from composite schema. Use schemaToEmitters.");
+    if (composite) throw new Error("Can't make attributes from composite schema. Use schemaToEmitters.");
     if (props[key] != null) {
       attributes[key] = props[key];
     }
@@ -97,8 +97,7 @@ export const schemaToEmitters = (
   const attributes: Record<string, any> = {};
   const {unwelds, slices} = props;
   for (const key in schema) {
-    const {format, segment, single, unweld, composite, ref} = schema[key];
-    if (unweld) continue;
+    const {format, unwelded, single, composite, ref} = schema[key];
 
     if (ref) {
       if (!refs) continue;
@@ -114,7 +113,7 @@ export const schemaToEmitters = (
     if (values != null) {
       const dims = getUniformDims2(format);
       
-      if (!segment && unwelds) {
+      if (!unwelded && unwelds) {
         attributes[key] = makeUnweldEmitter2(values, unwelds, dims);
       }
       else {
@@ -165,16 +164,13 @@ export const schemaToAggregate = (
   const refBuffers: Record<string, any> = {};
 
   for (const key in schema) {
-    const {ref, single, format, index} = schema[key];
-    if (
-      props[key] != null || 
-      (
-        (single != null) && (
-          (props[single] != null) ||
-          (ref && refs && refs[single] != null)
-        )
-      )
-    ) {
+    const {composite, ref, single, format, index} = schema[key];
+    
+    const hasSingle = single && props[single] != null;
+    const hasValues = props[key] != null;
+    const hasRef = ref && refs && single && refs[single] != null;
+    
+    if (hasValues || hasSingle || hasRef) {
       const alloc = (
         ref   ? allocItems :
         index ? allocIndices :
@@ -182,16 +178,23 @@ export const schemaToAggregate = (
       );
       const attr = [key, alloc];
 
-      if (ref && single) {
-        refBuffers[key] = {
-          refs: [],
-        };
+      const align = getUniformAttributeAlign(format);
+      const dims = getUniformDims2(format);
+
+      let uniform = false;
+      
+      if (hasRef) {
+        refBuffers[key] = refs;
+      }
+      else if (hasSingle && !composite) {
+        uniform = typeof props[single] !== 'function';
       }
 
       const separate = getUniformAttributeAlign(format) === 0;
       if (separate) bySelf.push([key, alloc]);
       else {
         const list = (
+          uniform ? byItem :
           ref   ? byRef :
           index ? byIndex :
           byVertex
@@ -227,14 +230,19 @@ export const schemaToAggregate = (
     }
   };
 
-  if (byItem.length || byRef.length) aggregateBuffers.instances = makeAggregateBuffer(device, 'u32', allocVertices);
-
   for (const desc of bySelf) buildOne(...desc);
 
-  const byRefs = buildGroup(byRef, allocItems);
-  const byItems = buildGroup(byItem, allocItems);
-  const byVertices = buildGroup(byVertex, allocVertices);
-  const byIndices = buildGroup(byIndex, allocIndices);
+  let byRefs = buildGroup(byRef, allocItems);
+  let byItems = buildGroup(byItem, allocItems);
+  let byVertices = buildGroup(byVertex, allocVertices);
+  let byIndices = buildGroup(byIndex, allocIndices);
+
+  if (byItems && !byRefs && !byVertices && !byIndices) {
+    byVertices = byItems;
+    byItems = undefined;
+  }
+
+  if (byItems || byRefs) aggregateBuffers.instances = makeAggregateBuffer(device, 'u32', allocVertices);
 
   const aggregate = {aggregateBuffers, refBuffers, bySelfs, byRefs, byItems, byVertices, byIndices};
 
@@ -280,7 +288,7 @@ export const updateAggregateFromSchema = (
   const {aggregateBuffers, refBuffers, byRefs, byItems, byVertices, byIndices} = aggregate;
 
   for (const key in schema) {
-    const {single, index, segment, composite, ref} = schema[key];
+    const {single, index, ref} = schema[key];
 
     if (aggregateBuffers[key]) {
       const aggregateBuffer = aggregateBuffers[key];
@@ -296,7 +304,7 @@ export const updateAggregateFromSchema = (
     }
 
     if (ref && single && refBuffers[key]) {
-      refBuffers[key].refs = items.map(item => item.refs?.[single]);
+      refBuffers[key] = items.map(item => item.refs?.[single]);
       continue;
     }
   }
@@ -306,6 +314,7 @@ export const updateAggregateFromSchema = (
     updateAggregateInstances(device, instances, items, count);
   }
 
+  if (byItems) updateMultiAggregateBuffer(device, byItems, count);
   if (byVertices) updateMultiAggregateBuffer(device, byVertices, count);
   if (byIndices) updateMultiAggregateBuffer(device, byIndices, indices);
 };
@@ -316,13 +325,13 @@ export const updateAggregateFromSchemaRefs = (
   aggregate: Aggregate,
   count: number,
 ) => {
-  const {aggregateBuffers, refBuffers, byRefs, byItems, byVertices, byIndices} = aggregate;
+  const {aggregateBuffers, refBuffers, byRefs} = aggregate;
   for (const key in schema) {
-    const {single, index, segment, composite, ref} = schema[key];
+    const {single, ref} = schema[key];
     if (!ref || !single) continue;
     if (aggregateBuffers[key]) {
       const k = single;
-      updateAggregateRefs(device, aggregateBuffers[key], refBuffers[key].refs, 1);
+      updateAggregateRefs(device, aggregateBuffers[key], refBuffers[key], 1);
     }
   }
 

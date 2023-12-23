@@ -90,7 +90,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
   const s = useShaderRef(size, sizes);
   const o = useShaderRef(outline);
 
-  const getSize = useBoundSource(SIZE_BINDING, s);
+  const getSize = useBoundSource(SIZE_BINDING, s ?? 1);
 
   const rectangles = useMemo(() => {
     return castTo(getSize, 'vec4<f32>', {

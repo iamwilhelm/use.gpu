@@ -3,6 +3,7 @@ import { loadVirtualModule } from '../shader';
 import { formatMurmur53, toMurmur53 } from '../hash';
 import { toBundle, toModule, getBundleHash, getBundleKey } from '../bundle';
 import { formatFormat } from '../format';
+import { mergeBindings } from '../bind';
 
 const NO_SYMBOLS = [] as string[];
 
@@ -33,8 +34,6 @@ export const makeDiffBy = (
   size: null | ShaderModule | (null | ShaderModule)[],
 ): ParsedBundle => {
   const bundle = toBundle(source);
-
-  const {module, virtuals} = bundle;
   const {name, format, args} = bundleToAttribute(bundle);
 
   const entry = 'diff';
@@ -79,18 +78,17 @@ export const makeDiffBy = (
     rekey,
   );
 
-  const revirtuals = module.virtual
-    ? (virtuals ? [...virtuals, module] : [module])
-    : (virtuals ? [...virtuals] : []) ?? [];
+  const rebound = new Set();
+  mergeBindings(rebound, bundle);
 
   for (const m of sizes) if (m) {
-    const v = toModule(m);
-    if (v?.virtual) revirtuals.push(v);
+    const v = toBundle(m);
+    mergeBindings(rebound, v);
   }
 
   return {
     module: diff,
     links,
-    virtuals: revirtuals,
+    bound: rebound,
   };
 }

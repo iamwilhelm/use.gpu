@@ -3,12 +3,13 @@ import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 import { formatFormat } from '../format';
+import { mergeBindings } from '../bind';
 
 export type BundleToAttribute = (
   bundle: ShaderModule,
 ) => UniformAttribute;
 
-export type MakeIndexedAccessor = (
+export type MakeInstancedAccessor = (
   ns: string,
   name: string,
   args: string,
@@ -18,7 +19,7 @@ export type MakeIndexedAccessor = (
 ) => string;
 
 const INDEX_ENTRY = 'loadIndex';
-const INDEX_LINK = 'getIndexed';
+const INDEX_LINK = 'getInstanced';
 const INDEX_SYMBOLS = [INDEX_ENTRY, INDEX_LINK];
 const INDEX_EXTERNALS = [{
   func: {name: INDEX_LINK},
@@ -30,8 +31,8 @@ const makeDeclarations = (name: string, type: any, parameters: any) => [{
   flags: RF.Exported,
 }] as any[];
 
-export const makeIndexWith = (
-  makeIndexedAccessor: MakeIndexedAccessor,
+export const makeInstanceWith = (
+  makeInstancedAccessor: MakeInstancedAccessor,
   bundleToAttribute: BundleToAttribute,
 ) => (
   values: Record<string, ShaderModule>,
@@ -39,7 +40,6 @@ export const makeIndexWith = (
 ): ParsedBundle => {
 
   const iBundle = toBundle(indices);
-  const {module: iModule, virtuals: iVirtuals} = iBundle;
   const i = bundleToAttribute(iBundle);
 
   const fields: UniformAttribute[] = [];
@@ -50,15 +50,18 @@ export const makeIndexWith = (
   const symbols = [...INDEX_SYMBOLS];
   const externals = [...INDEX_EXTERNALS];
   const links: Record<string, ParsedBundle> = {[INDEX_LINK]: iBundle};
-  const revirtuals = [];
-  if (iVirtuals) revirtuals.push(...iVirtuals);
-  if (iModule.virtual) revirtuals.push(iModule);
+
+  const entry = INDEX_ENTRY;
+  const arg = i.args?.[0] ?? 'u32';
+  const exports = makeDeclarations(entry, 'never', [arg]);
+
+  const rebound = new Set();
+  mergeBindings(rebound, iBundle);
 
   const keys = Object.keys(values);
   for (const k in values) {
     const value = values[k];
     const vBundle = toBundle(value);
-    const {module: vModule, virtuals: vVirtuals} = vBundle;
     const v = bundleToAttribute(vBundle);
 
     const f = formatFormat(i.format);
@@ -71,19 +74,20 @@ export const makeIndexWith = (
 
     fields.push(v);
     symbols.push(v.name);
+    exports.push({
+      func: {name: v.name, type: v.format, parameters: [arg]},
+      flags: RF.Exported,
+    });
     externals.push({
       func: {name: v.name},
       flags: RF.External,
     });
     links[v.name] = vBundle;
-    if (vVirtuals) revirtuals.push(...vVirtuals);
-    if (vModule.virtual) revirtuals.push(vModule);
+
+    mergeBindings(rebound, vBundle);
   }
 
-  const entry = INDEX_ENTRY;
-  const arg = i.args?.[0] ?? 'u32';
-
-  const code   = `@indexed [${i.name} / ${fields.map(f => f.name).join(' ')}]`;
+  const code   = `@instanced [${i.name} / ${fields.map(f => f.name).join(' ')}]`;
   const rehash = scrambleBits53(mixBits53(toMurmur53(code), hash));
   const rekey  = scrambleBits53(mixBits53(rehash, key));
 
@@ -93,7 +97,7 @@ export const makeIndexWith = (
     const valueAccessors = fields.map(f => rename.get(f.name) ?? f.name);
     const indexAccessor = rename.get(INDEX_LINK) ?? INDEX_LINK;
 
-    return makeIndexedAccessor(
+    return makeInstancedAccessor(
       namespace,
       name,
       arg,
@@ -102,10 +106,8 @@ export const makeIndexWith = (
       indexAccessor,
     );
   }
-  
-  const exports = makeDeclarations(entry, 'never', [arg]);
 
-  const indexed = loadVirtualModule(
+  const instanced = loadVirtualModule(
     { render },
     { symbols, exports, externals },
     entry,
@@ -115,8 +117,8 @@ export const makeIndexWith = (
   );
 
   return {
-    module: indexed,
+    module: instanced,
     links,
-    virtuals: revirtuals,
+    bound: rebound,
   };
 };

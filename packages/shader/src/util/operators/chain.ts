@@ -3,6 +3,7 @@ import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleHash, getBundleKey } from '../bundle';
 import { formatFormat } from '../format';
+import { mergeBindings } from '../bind';
 
 const NO_SYMBOLS = [] as string[];
 
@@ -47,9 +48,6 @@ export const makeChainTo = (
   const fBundle = toBundle(from);
   const tBundle = toBundle(to);
   
-  const {module: fromModule, virtuals: fromVirtuals} = fBundle;
-  const {module: toModule, virtuals: toVirtuals} = tBundle;
-
   const {name: fromName, format: fromFormat, args: fromArgs} = bundleToAttribute(from);
   const {name: toName, format: toFormat, args: toArgs} = bundleToAttribute(to);
 
@@ -99,11 +97,9 @@ export const makeChainTo = (
     rekey,
   );
 
-  const revirtuals = [];
-  if (fromVirtuals) revirtuals.push(...fromVirtuals);
-  if (toVirtuals) revirtuals.push(...toVirtuals);
-  if (fromModule.virtual) revirtuals.push(fromModule);
-  if (toModule.virtual) revirtuals.push(toModule);
+  const rebound = new Set();
+  mergeBindings(rebound, fBundle);
+  mergeBindings(rebound, tBundle);
 
   return {
     module: chain,
@@ -111,6 +107,6 @@ export const makeChainTo = (
       from: fBundle,
       to: tBundle,
     },
-    virtuals: revirtuals,
+    bound: rebound,
   };
 }

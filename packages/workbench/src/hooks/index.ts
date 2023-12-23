@@ -10,7 +10,7 @@ export * from './useDerivedState';
 export * from './useForceUpdate';
 export * from './useFrustumCuller';
 export * from './useInspectable';
-export * from './useIndexedSources';
+export * from './useInstancedSources';
 export * from './useLambdaSource';
 export * from './useLinkedShader';
 export * from './useMatrixTransform';

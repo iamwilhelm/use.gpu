@@ -2,6 +2,7 @@ import { ShaderModule, ParsedBundle, UniformAttribute, RefFlags as RF } from '..
 import { loadVirtualModule } from '../shader';
 import { toMurmur53, scrambleBits53, mixBits53 } from '../hash';
 import { toBundle, getBundleEntry, getBundleHash, getBundleKey, getBundleName } from '../bundle';
+import { mergeBindings } from '../bind';
 
 export type BundleToAttribute = (
   bundle: ShaderModule,
@@ -42,15 +43,12 @@ export const makeExplode = (
   const tBundle = toBundle(struct);
   const sBundle = toBundle(source);
 
-  const {module: tModule, virtuals: tVirtuals} = tBundle;
-  const {module: sModule, virtuals: sVirtuals} = sBundle;
-
   const attribute = bundleToAttribute(tBundle);
   const {format: fields} = attribute;
 
   const entry = getBundleEntry(source) ?? 'explode';
   if (!Array.isArray(fields)) throw new Error(`Cannot explode non-struct type '${entry}: ${fields}' of ${getBundleName(tBundle)}`);
-  if (tVirtuals?.length) throw new Error(`Cannot explode virtual '${entry}' of ${getBundleName(tBundle)}`);
+  if (tBundle.bindings?.length) throw new Error(`Cannot explode virtual '${entry}' of ${getBundleName(tBundle)}`);
 
   let hash = getBundleHash(tBundle) ^ getBundleHash(sBundle);
   let key = getBundleKey(tBundle) ^ getBundleKey(sBundle);
@@ -58,16 +56,12 @@ export const makeExplode = (
   const symbols = fields.map(({name}) => name);
 
   const links: Record<string, ParsedBundle> = {[STRUCT_LINK]: tBundle, [SOURCE_LINK]: sBundle};
-  const revirtuals = [];
-  if (sVirtuals?.length) revirtuals.push(...sVirtuals);
-  if (tModule.virtual) revirtuals.push(tModule);
-  if (sModule.virtual) revirtuals.push(sModule);
 
   const externals = EXPLODE_EXTERNALS;
   const args = attribute.args ?? ['u32'];
   if (args.length > 1) throw new Error(`Cannot explode getter for more than 1 index arg`);
 
-  const code   = `@explode [${tModule.name}] [${sModule.name}]`;
+  const code   = `@explode`;
   const rehash = scrambleBits53(mixBits53(toMurmur53(code), hash));
   const rekey  = scrambleBits53(mixBits53(rehash, key));
 
@@ -95,9 +89,13 @@ export const makeExplode = (
     rekey,
   );
 
+  const rebound = new Set();
+  mergeBindings(rebound, tBundle);
+  mergeBindings(rebound, sBundle);
+
   return {
     module: exploded,
     links,
-    virtuals: revirtuals,
+    bound: rebound,
   };
 };

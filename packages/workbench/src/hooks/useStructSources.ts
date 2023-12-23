@@ -1,6 +1,6 @@
 import type { StorageSource, UniformAttribute } from '@use-gpu/core';
 
-import { useMemo } from '@use-gpu/live';
+import { useMemo, useOne } from '@use-gpu/live';
 import { explode, structType, bindEntryPoint } from '@use-gpu/shader/wgsl';
 import { getBoundShader } from './useBoundShader';
 import { getBoundSource } from './useBoundSource';
@@ -34,3 +34,18 @@ export const getStructSources = (
 
   return sources;
 };
+
+export const useStructAggregate = (
+  aggregateBuffer: MultiAggregateBuffer,
+) => {
+  return useOne(() => getStructAggregate(aggregateBuffer), aggregateBuffer)
+};
+
+export const getStructAggregate = (
+  aggregateBuffer: MultiAggregateBuffer,
+) => {
+  const {layout: {attributes}, source} = aggregateBuffer;
+  const sources = getStructSources(attributes, source);
+  return sources;
+};
+

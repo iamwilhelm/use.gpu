@@ -42,8 +42,8 @@ import {
 } from './operators/explode';
 
 import {
-  indexWith,
-} from './operators/indexed';
+  instanceWith,
+} from './operators/instanced';
 
 import {
   structType,
@@ -114,8 +114,8 @@ export {
 } from './operators/explode';
 
 export {
-  indexWith,
-} from './operators/indexed';
+  instanceWith,
+} from './operators/instanced';
 
 export {
   structType,
@@ -169,7 +169,7 @@ export const WGSLLinker = {
   chainTo,
   diffBy,
   explode,
-  indexWith,
+  instanceWith,
   swizzleTo,
   structType,
 

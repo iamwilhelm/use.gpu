@@ -20,6 +20,7 @@ import { resolve } from './lazy';
 
 const NO_BINDINGS = {} as any;
 
+export const getUniformArrayDims = (format: UniformType): number => UNIFORM_ARRAY_DIMS[format];
 export const getUniformAttributeSize = (format: UniformType): number => UNIFORM_ATTRIBUTE_SIZES[format];
 export const getUniformAttributeAlign = (format: UniformType): number => UNIFORM_ATTRIBUTE_ALIGNS[format];
 export const getUniformByteSetter = (format: UniformType): UniformByteSetter => UNIFORM_BYTE_SETTERS[format];

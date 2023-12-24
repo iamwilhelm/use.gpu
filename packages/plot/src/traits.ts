@@ -420,7 +420,6 @@ export const ArrowSegmentsTrait = combine(
     },
   ) => {
     const {chunks, loop, loops, start, starts, end, ends} = parsed;
-    console.log({chunks, loop, loops, start, starts, end, ends})
     if (!chunks) return;
 
     const arrow = useArrowSegments(chunks, loop || loops, start || starts, end || ends);
@@ -453,7 +452,6 @@ export const FaceSegmentsTrait = combine(
     },
   ) => {
     const {chunks, loop, loops, start, starts, end, ends} = parsed;
-    console.log({chunks, loop, loops, start, starts, end, ends})
     if (!chunks) return;
 
     const face = useFaceSegments(chunks, loop || loops, start || starts, end || ends);

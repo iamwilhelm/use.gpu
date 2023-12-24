@@ -575,6 +575,7 @@ export const generateChunkAnchors2 = (
 
 export const generateChunkFaces2 = (
   to: NumberArray,
+  slices: NumberArray | null | undefined,
   chunks: number[],
 ) => {
   let pos = 0;
@@ -589,6 +590,8 @@ export const generateChunkFaces2 = (
       if (c > 1) to[pos++] = 0;
       to[pos++] = 0;
     }
+
+    if (slices) slices[i] = pos - b;
   }
 
   while (pos < to.length) to[pos++] = 0;

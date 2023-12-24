@@ -5,7 +5,7 @@ import { bindingToModule, bundleToAttribute, chainTo } from '@use-gpu/shader/wgs
 import { useContext, useMemo, useNoContext, useNoMemo } from '@use-gpu/live';
 
 import { RenderContext } from '../providers/render-provider';
-import { getBoundSource } from '../hooks/useBoundSource';
+import { getSource } from '../hooks/useSource';
 
 import { getUIFragment } from '@use-gpu/wgsl/instance/fragment/ui.wgsl';
 import { toLinear4, toGamma4 } from '@use-gpu/wgsl/use/gamma.wgsl';
@@ -24,7 +24,7 @@ export const useNativeColorTexture = (
 
   const { colorSpace } = useContext(RenderContext);
   const getTexture = useMemo(() => {
-    let getTexture = getBoundSource(TEXTURE_BINDING, texture);
+    let getTexture = getSource(TEXTURE_BINDING, texture);
     if (filter) getTexture = chainTo(getTexture, filter);
 
     const {colorSpace: colorInput} = (texture as any);

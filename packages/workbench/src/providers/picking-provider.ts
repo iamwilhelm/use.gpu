@@ -1,7 +1,7 @@
 import type { OffscreenTarget, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 import { makeContext, useOne, useContext, useNoContext } from '@use-gpu/live';
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useShader, useNoShader } from '../hooks/useShader';
 
 import { getPickingID } from '@use-gpu/wgsl/render/pick.wgsl';
 
@@ -26,5 +26,5 @@ export type PickingSource = {
 
 export const usePickingShader = ({id, ids, lookup, lookups, uvPicking}: PickingSource) => {
   const defs = useOne(() => ({UV_PICKING: !!uvPicking}), uvPicking);
-  return id ?? ids ? useBoundShader(getPickingID, [id ?? ids, lookup ?? lookups], defs) : useNoBoundShader();
+  return id ?? ids ? useShader(getPickingID, [id ?? ids, lookup ?? lookups], defs) : useNoShader();
 };

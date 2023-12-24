@@ -7,7 +7,7 @@ import { makeUseTrait, optional, combine, useProp } from '@use-gpu/traits/live';
 import { parseIntegerPositive, parseAxis, parseVec4 } from '@use-gpu/parse';
 import { yeet, memo, use, fragment, gather, provide, useContext, useFiber, useOne, useMemo } from '@use-gpu/live';
 import {
-  useBoundShader, useNoBoundShader,
+  useShader, useNoShader,
   useViewContext, useRawSource,
   useShaderRef, useNoShaderRef,
   useTransformContext, useNoTransformContext,
@@ -113,12 +113,12 @@ export const Grid: LiveComponent<GridProps> = (props) => {
         }
       });
 
-      //autoBound = useBoundShader(getGridAutoPosition, [xform, autoBase, autoShift]);
+      //autoBound = useShader(getGridAutoPosition, [xform, autoBase, autoShift]);
     }
     else {
       useNoShaderRef();
       useNoShaderRef();
-      useNoBoundShader();
+      useNoShader();
     }
 
     const min = vec4.clone(orig as any);
@@ -134,7 +134,7 @@ export const Grid: LiveComponent<GridProps> = (props) => {
     const m2 = useShaderRef(max);
 
     const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-    const bound = useBoundShader(getGridPosition, [data, a, m1, m2], defines);
+    const bound = useShader(getGridPosition, [data, a, m1, m2], defines);
 
     // Expose position source
     const source = useMemo(() => ({

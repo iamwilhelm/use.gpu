@@ -14,7 +14,7 @@ import { INSPECT_STYLE } from '../lib/constants';
 
 import { UIRectangle } from '../shape/ui-rectangle';
 import { chainTo } from '@use-gpu/shader/wgsl';
-import { useBoundShader } from '@use-gpu/workbench';
+import { useShader } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 
@@ -110,7 +110,7 @@ const Render = (
     [scrollRef, sizeRef]
   );
 
-  const thumbTransform = useBoundShader(getScrolledPosition, [shift]);
+  const thumbTransform = useShader(getScrolledPosition, [shift]);
 
   return useMemo(() => {
     const [outerWidth, outerHeight, innerWidth, innerHeight] = sizeRef;

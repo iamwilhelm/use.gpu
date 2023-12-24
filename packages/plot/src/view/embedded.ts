@@ -5,7 +5,7 @@ import { provide, useContext, useNoContext, useMemo } from '@use-gpu/live';
 import { bundleToAttributes, chainTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext, LayoutContext,
-  useShaderRef, useBoundShader, useCombinedTransform,
+  useShaderRef, useShader, useCombinedTransform,
 } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
@@ -54,7 +54,7 @@ export const Embedded: LiveComponent<EmbeddedProps> = (props: PropsWithChildren<
   }, [layout, normalize]);
 
   const ref = useShaderRef(matrix);
-  const bound = useBoundShader(getCartesianPosition, [ref]);
+  const bound = useShader(getCartesianPosition, [ref]);
   const context = useCombinedTransform(bound);
 
   return (

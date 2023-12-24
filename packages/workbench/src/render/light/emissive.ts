@@ -5,7 +5,7 @@ import type { LightKindProps } from './light';
 
 import { yeet, useMemo } from '@use-gpu/live';
 
-import { useBoundShader } from '../../hooks/useBoundShader';
+import { useShader } from '../../hooks/useShader';
 
 import { getDeferredLightVertex } from '@use-gpu/wgsl/instance/vertex/deferred-light.wgsl';
 import { getDeferredEmissiveFragment } from '@use-gpu/wgsl/instance/fragment/deferred-emissive.wgsl';
@@ -23,8 +23,8 @@ export const EmissiveLightRender: LiveComponent<EmissiveLightRenderProps> = (pro
     getLight,
   } = props;
 
-  const getVertex = useBoundShader(getDeferredLightVertex, [getLight], FULLSCREEN_DEFS);
-  const getFragment = useBoundShader(getDeferredEmissiveFragment, gbuffer);
+  const getVertex = useShader(getDeferredLightVertex, [getLight], FULLSCREEN_DEFS);
+  const getFragment = useShader(getDeferredEmissiveFragment, gbuffer);
 
   const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
 

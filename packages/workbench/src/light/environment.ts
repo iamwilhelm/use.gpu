@@ -9,8 +9,8 @@ import { bindBundle } from '@use-gpu/shader/wgsl';
 import { EnvironmentContext } from '../providers/environment-provider';
 import { useMaterialContext, MaterialContext } from '../providers/material-provider';
 
-import { getBoundShader, useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
-import { getBoundSource } from '../hooks/useBoundSource';
+import { getShader, useShader, useNoShader } from '../hooks/useShader';
+import { getSource } from '../hooks/useSource';
 
 import { applyPBREnvironment } from '@use-gpu/wgsl/material/pbr-environment.wgsl';
 import { getDefaultEnvironment } from '@use-gpu/wgsl/material/lights-default-env.wgsl';
@@ -54,8 +54,8 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
   const {map, preset, children} = props;
 
   const environment = map || !((preset as any) in PRESETS)
-    ? (useNoBoundShader(), map ?? null)
-    : useBoundShader(getDefaultEnvironment, PRESETS[preset as any] ?? [SH_DIFFUSE_PARK, SH_SPECULAR_PARK]);
+    ? (useNoShader(), map ?? null)
+    : useShader(getDefaultEnvironment, PRESETS[preset as any] ?? [SH_DIFFUSE_PARK, SH_SPECULAR_PARK]);
 
   const parent = useMaterialContext();
   const material = useMemo(() => {
@@ -63,7 +63,7 @@ export const Environment: LC<EnvironmentProps> = (props: PropsWithChildren<Envir
 
     const applyEnvironment = environment
       ? bindBundle(applyPBREnvironment, {
-          sampleEnvironment: getBoundSource(SAMPLE_ENVIRONMENT, environment),
+          sampleEnvironment: getSource(SAMPLE_ENVIRONMENT, environment),
         })
       : null;
 

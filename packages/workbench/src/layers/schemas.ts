@@ -1,5 +1,5 @@
 export const INSTANCE_SCHEMA = {
-  instances:  {format: 'u32'},
+  instances:  {format: 'u16'},
 };
 
 export const SHAPE_SCHEMA = {

@@ -13,8 +13,8 @@ import { DeviceContext } from '../providers/device-provider';
 import { useAnimationFrame, useNoAnimationFrame } from '../providers/loop-provider';
 import { useTimeContext, useNoTimeContext } from '../providers/time-provider';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
-import { getBoundShader } from '../hooks/useBoundShader';
+import { useSource, useNoSource } from '../hooks/useSource';
+import { getShader } from '../hooks/useShader';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
 import { getIndex } from '@use-gpu/wgsl/instance/interleave.wgsl';
@@ -92,10 +92,10 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   let sources: LambdaSource[] | undefined;
   if (interleaved) {
     const binding = useOne(() => ({name: 'getData', format: format as any as UniformType}), format);
-    const getData = useBoundSource(binding, source);
+    const getData = useSource(binding, source);
     sources = useMemo(() => (
       seq(t).map(i => ({
-        shader: chainTo(getBoundShader(getIndex, [i, t]), getData),
+        shader: chainTo(getShader(getIndex, [i, t]), getData),
         length: 0,
         size: [0],
         version: 0,
@@ -105,7 +105,7 @@ export const RawData: LiveComponent<RawDataProps> = (props) => {
   }
   else {
     useNoOne();
-    useNoBoundSource();
+    useNoSource();
     useNoMemo();
   }
 

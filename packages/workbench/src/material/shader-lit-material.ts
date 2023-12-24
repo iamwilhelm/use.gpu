@@ -4,7 +4,7 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useShader, useNoShader } from '../hooks/useShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useLightContext } from '../providers/light-provider';
@@ -74,7 +74,7 @@ export const ShaderLitMaterial: LC<ShaderLitMaterialProps> = (props: PropsWithCh
   const {useMaterial} = useLightContext();
   const applyLights = useMaterial(apply);
 
-  const getLight = applyLights ? useBoundShader(getLitFragment, [applyLights, environment]) : useNoBoundShader();
+  const getLight = applyLights ? useShader(getLitFragment, [applyLights, environment]) : useNoShader();
   const getSurface = surface;
   const getFragment = fragment;
   const getDepth = depth;

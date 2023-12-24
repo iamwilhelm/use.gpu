@@ -15,8 +15,8 @@ import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { useScissorContext } from '../providers/scissor-provider';
 
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
-import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
+import { useShader, useNoShader } from '../hooks/useShader';
+import { useSource, useNoSource } from '../hooks/useSource';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -131,7 +131,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
 
-  const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ps = p ? useSource(POSITION, p) : useNoSource();
   const ss = props.sts == null ? ps : props.sts;
 
   let bounds: Lazy<DataBounds> | null = null;
@@ -144,7 +144,7 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
 
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
-  const boundVertex = useBoundShader(getFaceVertex, [
+  const boundVertex = useShader(getFaceVertex, [
     xf, xd, scissor,
     ps, n, t, u, ss, g, c, z,
     i,

@@ -17,8 +17,8 @@ import { PickingSource, usePickingShader } from '../providers/picking-provider';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
-import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
+import { useShader, useNoShader } from '../hooks/useShader';
+import { useSource, useNoSource } from '../hooks/useSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -81,7 +81,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const m = (mode !== 'debug') ? (props.masks ?? props.mask) : null;
   
-  const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ps = p ? useSource(POSITION, p) : useNoSource();
   const ss = props.sts == null ? ps : s;
 
   const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
@@ -96,7 +96,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
 
   const material = useMaterialContext().solid;
 
-  const boundVertex = useBoundShader(getQuadVertex, [
+  const boundVertex = useShader(getQuadVertex, [
     positions, scissor,
     r, 
     c, d, z, u, s,
@@ -104,7 +104,7 @@ export const RawQuads: LiveComponent<RawQuadsProps> = memo((props: RawQuadsProps
   ]);
   const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, instance, instances, instanceCount);
   const getPicking = usePickingShader(props);
-  const applyMask = m ? useBoundShader(getMaskedColor, [m]) : useNoBoundShader();
+  const applyMask = m ? useShader(getMaskedColor, [m]) : useNoShader();
 
   const links = useMemo(() => ({
     getVertex,

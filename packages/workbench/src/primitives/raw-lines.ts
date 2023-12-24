@@ -16,8 +16,8 @@ import { useMaterialContext } from '../providers/material-provider';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 
 import { useApplyTransform } from '../hooks/useApplyTransform';
-import { getBoundShader, useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
-import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
+import { getShader, useShader, useNoShader } from '../hooks/useShader';
+import { useSource, useNoSource } from '../hooks/useSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -116,9 +116,9 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
   
   const i = useShaderRef(null, props.indices);
 
-  const auto = useOne(() => props.segment != null ? getBoundShader(getLineSegment, [props.segment]) : null, props.segment);
+  const auto = useOne(() => props.segment != null ? getShader(getLineSegment, [props.segment]) : null, props.segment);
 
-  const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ps = p ? useSource(POSITION, p) : useNoSource();
   const ss = props.sts == null ? ps : s;
 
   const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
@@ -133,7 +133,7 @@ export const RawLines: LiveComponent<RawLinesProps> = memo((props: RawLinesProps
 
   const material = useMaterialContext().solid;
 
-  const boundVertex = useBoundShader(getLineVertex, [
+  const boundVertex = useShader(getLineVertex, [
     positions, scissor,
     u, ss,
     g ?? auto, c, w, d, z,

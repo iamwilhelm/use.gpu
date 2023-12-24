@@ -14,7 +14,7 @@ import { patch } from '@use-gpu/state';
 import { use, memo, yeet, debug, fragment, useCallback, useMemo, useOne, useRef, useVersion, useNoCallback, incrementVersion } from '@use-gpu/live';
 import { resolve, uploadBuffer, toDataBounds } from '@use-gpu/core';
 
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useShader, useNoShader } from '../hooks/useShader';
 import { useComputePipeline } from '../hooks/useComputePipeline';
 import { useDataSize } from '../hooks/useDataBinding';
 import { useDerivedSource } from '../hooks/useDerivedSource';
@@ -181,7 +181,7 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
   const vertexReadout    = useDerivedSource(vertexStorage, READ_ONLY_SOURCE);
   const normalReadout    = useDerivedSource(normalStorage, READ_ONLY_SOURCE);
   
-  const boundScan = useBoundShader(
+  const boundScan = useShader(
     scanVolume,
     [
       indirectStorage, edgeStorage, cellStorage, markStorage, indexStorage,
@@ -189,14 +189,14 @@ export const DualContourLayer: LiveComponent<DualContourLayerProps> = memo((prop
     ]);
 
   const fitContour = method === 'quadratic' ? fitContourQuadratic : fitContourLinear;
-  const boundFit = useBoundShader(
+  const boundFit = useShader(
     fitContour,
     [
       indirectReadout1, cellStorage, vertexStorage, normalStorage,
       v, n, s, l,
     ]);
 
-  const getVertex = useBoundShader(
+  const getVertex = useShader(
     getDualContourVertex,
     [
       edgeReadout, indexReadout, vertexReadout, normalReadout,

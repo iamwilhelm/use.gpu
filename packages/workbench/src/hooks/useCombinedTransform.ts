@@ -5,7 +5,7 @@ import type { TransformContextProps } from '../providers/transform-provider';
 import { useMemo, useRef } from '@use-gpu/live';
 import { chainTo, getBundleKey } from '@use-gpu/shader/wgsl';
 import { useTransformContext, TransformBounds } from '../providers/transform-provider';
-import { getBoundShader } from '../hooks/useBoundShader';
+import { getShader } from '../hooks/useShader';
 import { useCombinedMatrix, useMatrixBounds, useNoMatrixBounds, useMatrixTransform, useNoMatrixTransform } from './useMatrixTransform';
 
 import { getChainDifferential } from '@use-gpu/wgsl/transform/diff-chain.wgsl';
@@ -44,7 +44,7 @@ export const useCombinedEpsilonTransform = (
     const k = getBundleKey(t);
 
     const chained = chainTransform({key: k, transform}, parent);
-    const differential = getBoundShader(getEpsilonDifferential, [chained.transform, epsilon]);
+    const differential = getShader(getEpsilonDifferential, [chained.transform, epsilon]);
 
     const key = k ^ getBundleKey(differential);
     return {...chained, key, differential};
@@ -95,7 +95,7 @@ export const chainTransform = (
   const combinedPos  = chainTo(transformA, transformB);
 
   const combinedDiff = differentialA && differentialB
-      ? getBoundShader(getChainDifferential, [transformA, differentialA, differentialB])
+      ? getShader(getChainDifferential, [transformA, differentialA, differentialB])
       : null;
 
   const combinedBounds = boundsB && boundsA

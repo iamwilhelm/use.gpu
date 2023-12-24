@@ -16,7 +16,7 @@ import { usePassContext } from '../providers/pass-provider';
 
 import { useFrustumCuller } from '../hooks/useFrustumCuller';
 import { useInspectable } from '../hooks/useInspectable';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useShader } from '../hooks/useShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { SHADOW_FORMAT, SHADOW_PAGE } from '../render/light/light-data';
@@ -181,7 +181,7 @@ export const ShadowOmniPass: LC<ShadowOmniPassProps> = memo((props: PropsWithChi
   const border = Math.max(1, Math.min(4, shadowBlur || 1));
   const scaleRef = useShaderRef([width / (width - border * 2), height / (height - border * 2)]);
 
-  const getSample = useBoundShader(getCubeToOmniSample, [cubeSource, scaleRef]);
+  const getSample = useShader(getCubeToOmniSample, [cubeSource, scaleRef]);
   const blit = useDepthBlit(renderContext, shadowMapDescriptors[shadowMap!], shadowUV!, SHADOW_PAGE, getSample);
 
   return quote(yeet(() => {

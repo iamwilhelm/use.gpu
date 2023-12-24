@@ -3,7 +3,7 @@ import type { XY, ColorSpace, TextureSource } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader';
 
 import { use, yeet, useMemo, useYolo } from '@use-gpu/live';
-import { getBoundShader } from '../hooks/useBoundShader';
+import { getShader } from '../hooks/useShader';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 
 import { getEquiToCubeSample } from '@use-gpu/wgsl/render/sample/equi-to-cube.wgsl';
@@ -37,7 +37,7 @@ export const PanoramaMap: LiveComponent<PanoramaMapProps> = (props) => {
 
     const derived = getDerivedSource(texture, { variant: 'textureSampleLevel' });
 
-    const bound = getBoundShader(shader, [derived, gain]);
+    const bound = getShader(shader, [derived, gain]);
     const source = getDerivedSource({ shader: bound } as any, {
       size: () => texture?.size,
       length: () => (texture as any)?.length,

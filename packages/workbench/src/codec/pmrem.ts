@@ -11,7 +11,7 @@ import { Dispatch } from '../queue/dispatch';
 import { Compute } from '../compute/compute';
 import { Readback } from '../primitives/readback';
 import { TextureBuffer } from '../compute/texture-buffer';
-import { useBoundShader, getBoundShader } from '../hooks/useBoundShader';
+import { useShader, getShader } from '../hooks/useShader';
 import { useDerivedSource, getDerivedSource } from '../hooks/useDerivedSource';
 import { useRawSource } from '../hooks/useRawSource';
 import { useScratchSource } from '../hooks/useScratchSource';
@@ -200,7 +200,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
         });
 
         const makeInitShader = () =>
-          getBoundShader(pmremInit, [
+          getShader(pmremInit, [
             mappings[0],
             cubeMap,
             scratchOut,
@@ -209,7 +209,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
           ]);
 
         const makeCopyShader = (i: number) =>
-          getBoundShader(pmremCopy, [
+          getShader(pmremCopy, [
             mappings[i],
             mappings[i - 1],
             scratchIn,
@@ -218,7 +218,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
           ]);
 
         const makeBlurShader = (i: number, pass: number) =>
-          getBoundShader(pmremBlur, [
+          getShader(pmremBlur, [
             mappings[i],
             pass ? mappings[i] : mappings[i - 1],
             dsigmas[i],
@@ -242,7 +242,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
 
         const makeDiffuseDispatch = (i: number, j: number) => [
           use(Dispatch, {
-            shader: getBoundShader(pmremDiffuseSH, [
+            shader: getShader(pmremDiffuseSH, [
               mappings[i],
               targetIn,
               diffuseSHBuffer,
@@ -251,7 +251,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
           }),
           /*
           use(Dispatch, {
-            shader: getBoundShader(pmremDiffuseRender, [
+            shader: getShader(pmremDiffuseRender, [
               mappings[j],
               diffuseSHBuffer,
               target,
@@ -301,7 +301,7 @@ export const PrefilteredEnvMap: LC<PrefilteredEnvMapProps> = (props: Prefiltered
 
       const boundMappings = useRawSource(mappingData, 'vec4<u16>');
       const boundVariances = useRawSource(varianceData, 'f32');
-      const boundCubeMap = useBoundShader(sampleEnvMap, [
+      const boundCubeMap = useShader(sampleEnvMap, [
         () => sigmas2.length,
         () => gain,
         boundMappings,

@@ -14,8 +14,8 @@ import { patch } from '@use-gpu/state';
 import { use, memo, useMemo, useState, useResource } from '@use-gpu/live';
 import { bindBundle, bindingToModule, castTo } from '@use-gpu/shader/wgsl';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader } from '../hooks/useBoundShader';
-import { useBoundSource } from '../hooks/useBoundSource';
+import { useShader } from '../hooks/useShader';
+import { useSource } from '../hooks/useSource';
 
 import { circleSDF, diamondSDF, squareSDF, upSDF, downSDF, leftSDF, rightSDF } from '@use-gpu/wgsl/mask/sdf.wgsl';
 import { getFilledMask, getOutlinedMask } from '@use-gpu/wgsl/mask/point.wgsl';
@@ -90,7 +90,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
   const s = useShaderRef(size, sizes);
   const o = useShaderRef(outline);
 
-  const getSize = useBoundSource(SIZE_BINDING, s ?? 1);
+  const getSize = useSource(SIZE_BINDING, s ?? 1);
 
   const rectangles = useMemo(() => {
     return castTo(getSize, 'vec4<f32>', {
@@ -102,7 +102,7 @@ export const PointLayer: LiveComponent<PointLayerProps> = memo((props: PointLaye
 
   const sdf = (MASK_SHADER as any)[shape] ?? MASK_SHADER.circle;
   const mask = hollow ? getOutlinedMask : getFilledMask;
-  const boundMask = useBoundShader(mask, [sdf, o]);
+  const boundMask = useShader(mask, [sdf, o]);
 
   return use(RawQuads, {
     position,

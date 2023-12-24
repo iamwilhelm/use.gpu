@@ -10,16 +10,16 @@ type Ref<T> = { current: T };
 const NO_SOURCES: any[] = [];
 
 // Bind shader sources/constants/lambdas to a loaded shader module
-export const useBoundShader = (
+export const useShader = (
   shader: ShaderModule,
   values: any[],
   defines?: Record<string, any>,
   _deprecated?: any,
 ) => {
-  return useMemo(() => getBoundShader(shader, values, defines), [shader, ...values, defines]);
+  return useMemo(() => getShader(shader, values, defines), [shader, ...values, defines]);
 }
 
-export const getBoundShader = (
+export const getShader = (
   shader: ShaderModule,
   values: any[],
   defines?: Record<string, any>,
@@ -32,4 +32,4 @@ export const getBoundShader = (
   return bindBundle(shader, links, defines);
 }
 
-export const useNoBoundShader = useNoMemo;
+export const useNoShader = useNoMemo;

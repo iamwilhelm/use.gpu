@@ -13,7 +13,7 @@ import {
   MatrixContext,
   useMatrixContext,
   useCombinedTransform,
-  getBoundShader,
+  getShader,
 } from '@use-gpu/workbench';
 
 import { useObjectTrait } from './traits';
@@ -55,12 +55,12 @@ export const Instances: LiveComponent<InstancesProps> = (props: PropsWithChildre
 
       const [matrices, normalMatrices] = fieldSources;
 
-      const load = getBoundShader(loadInstance, [matrices, normalMatrices]);
+      const load = getShader(loadInstance, [matrices, normalMatrices]);
       const matrix = bindEntryPoint(load, 'getTransformMatrix');
       const normalMatrix = bindEntryPoint(load, 'getNormalMatrix');
 
-      const boundPosition = getBoundShader(getCartesianPosition, [matrix]);
-      const boundDifferential = getBoundShader(getMatrixDifferential, [matrix, normalMatrix]);
+      const boundPosition = getShader(getCartesianPosition, [matrix]);
+      const boundDifferential = getShader(getMatrixDifferential, [matrix, normalMatrix]);
 
       const view = use(FaceLayer, {...mesh, instances, load, shaded, side});
       return [view, boundPosition, boundDifferential];

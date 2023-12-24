@@ -2,8 +2,8 @@ import type { StorageSource, UniformAttribute } from '@use-gpu/core';
 
 import { useMemo, useOne } from '@use-gpu/live';
 import { explode, structType, bindEntryPoint } from '@use-gpu/shader/wgsl';
-import { getBoundShader } from './useBoundShader';
-import { getBoundSource } from './useBoundSource';
+import { getShader } from './useShader';
+import { getSource } from './useSource';
 
 const toTitleCase = (s: string) => s.slice(0, 1).toUpperCase() + s.slice(1);
 
@@ -24,7 +24,7 @@ export const getStructSources = (
   name = name ?? 'get' + uniforms.map(u => toTitleCase(u.name)).join('');
 
   const type = structType(uniforms, name);
-  const bound = getBoundSource({name: name ?? 'storage', format: type, args: null}, source);
+  const bound = getSource({name: name ?? 'storage', format: type, args: null}, source);
   const exploded = explode(type, bound);
 
   const sources = {};

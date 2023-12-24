@@ -6,7 +6,7 @@ import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 import { useProp } from '@use-gpu/traits/live';
 import { parseColor } from '@use-gpu/parse';
 
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useShader, useNoShader } from '../hooks/useShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useEnvironmentContext } from '../providers/environment-provider';
 import { useShaderRef } from '../hooks/useShaderRef';
@@ -78,23 +78,23 @@ export const PBRMaterial: LC<PBRMaterialProps> = (props: PropsWithChildren<PBRMa
     HAS_METALNESS_ROUGHNESS_MAP: !!metalnessRoughnessMap,
   }), [albedoMap, emissiveMap, occlusionMap, metalnessRoughnessMap]);
 
-  const getMaterial = useBoundShader(getPBRMaterial, [
+  const getMaterial = useShader(getPBRMaterial, [
     a, e, m, r,
     am, em, om, mrm,
   ], defines);
 
-  const boundSurface = useBoundShader(getMaterialSurface, [getMaterial]);
+  const boundSurface = useShader(getMaterialSurface, [getMaterial]);
 
   let getSurface = boundSurface;
-  if (normalMap) getSurface = useBoundShader(getNormalMapSurface, [boundSurface, normalMap]);
-  else useNoBoundShader();
+  if (normalMap) getSurface = useShader(getNormalMapSurface, [boundSurface, normalMap]);
+  else useNoShader();
 
   const environmentMap = useEnvironmentContext();
   const getEnvironment = environmentMap
-    ? useBoundShader(applyPBREnvironment, [environmentMap])
-    : (useNoBoundShader(), undefined);
+    ? useShader(applyPBREnvironment, [environmentMap])
+    : (useNoShader(), undefined);
 
-  const getFragment = useBoundShader(getBasicMaterial, [albedo, albedoMap], defines);
+  const getFragment = useShader(getBasicMaterial, [albedo, albedoMap], defines);
 
   return ShaderLitMaterial({
     fragment: getFragment,

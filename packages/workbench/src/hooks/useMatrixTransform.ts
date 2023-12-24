@@ -7,8 +7,8 @@ import type { MatrixRefs } from '../layers/types';
 import { useCallback, useMemo, useOne, useVersion, useNoCallback, useNoMemo, useNoOne, useNoVersion } from '@use-gpu/live';
 import { bundleToAttribute, getBundleKey } from '@use-gpu/shader/wgsl';
 import { useMatrixContext, useNoMatrixContext } from '../providers/matrix-provider';
-import { getBoundShader } from './useBoundShader';
-import { getBoundSource } from './useBoundSource';
+import { getShader } from './useShader';
+import { getSource } from './useSource';
 
 import { useCombinedTransform } from './useCombinedTransform';
 
@@ -64,10 +64,10 @@ export const useMatrixTransform = (
   }, matrix);
 
   return useOne(() => {
-    const boundMatrix = getBoundSource(MATRIX_BINDING, refs.matrix);
+    const boundMatrix = getSource(MATRIX_BINDING, refs.matrix);
 
-    const transform = getBoundShader(getCartesianPosition, [boundMatrix]);
-    const differential = getBoundShader(getMatrixDifferential, [boundMatrix, refs.normalMatrix]);
+    const transform = getShader(getCartesianPosition, [boundMatrix]);
+    const differential = getShader(getMatrixDifferential, [boundMatrix, refs.normalMatrix]);
 
     const key = getBundleKey(transform) ^ getBundleKey(differential);
     return [{key, transform, differential}, refs];
@@ -87,8 +87,8 @@ export const useMatrixTransformSources = (
   TransformContextProps,
 ] => {
   return useOne(() => {
-    const transform = getBoundShader(getCartesianPosition, [matrix]);
-    const differential = getBoundShader(getMatrixDifferential, [matrix, normalMatrix]);
+    const transform = getShader(getCartesianPosition, [matrix]);
+    const differential = getShader(getMatrixDifferential, [matrix, normalMatrix]);
 
     const key = getBundleKey(transform) ^ getBundleKey(differential);
     return {key, transform, differential};

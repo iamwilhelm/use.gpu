@@ -5,7 +5,7 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 import { yeet, useMemo, useNoMemo, useOne, useRef } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 import { bundleToAttribute, getBundleEntry } from '@use-gpu/shader/wgsl';
-import { getBoundShader } from '../hooks/useBoundShader';
+import { getShader } from '../hooks/useShader';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 import { useShaderRefs } from '../hooks/useShaderRef';
 
@@ -80,7 +80,7 @@ export const Kernel: LiveComponent<KernelProps> = (props) => {
 
     const values = [dataSize, ...argRefs, ...sources, ...s, ...targets, ...f];
 
-    const kernel = getBoundShader(shader, values);
+    const kernel = getShader(shader, values);
     return [kernel, dataSize, workgroupSize];
   }, [shader, targets, source, sources, argRefs, history]);
 

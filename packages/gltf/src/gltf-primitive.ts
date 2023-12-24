@@ -12,8 +12,8 @@ import {
   FaceLayer, FaceLayerProps,
   PBRMaterial,
   TransformContext,
-  useBoundSource, useNoBoundSource,
-  useBoundShader, useNoBoundShader,
+  useSource, useNoSource,
+  useShader, useNoShader,
   useRawSource, useNoRawSource,
   useShaderRef, useNoShaderRef,
 } from '@use-gpu/workbench';
@@ -111,9 +111,9 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
 
     // Apply matrix transform
     // (share uniform between both functions)
-    const m     = useBoundSource(MATRIX_BINDING, t);
-    const xform = useBoundShader(getCartesianPosition, [m]);
-    const dform = useBoundShader(getMatrixDifferential, [m, c]);
+    const m     = useSource(MATRIX_BINDING, t);
+    const xform = useShader(getCartesianPosition, [m]);
+    const dform = useShader(getMatrixDifferential, [m, c]);
 
     const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
     const getBounds = useCallback((bounds: DataBounds) => {
@@ -131,8 +131,8 @@ export const GLTFPrimitive: LC<GLTFPrimitiveProps> = (props) => {
     useNoShaderRef();
     useNoShaderRef();
     useNoShaderRef();
-    useNoBoundShader();
-    useNoBoundShader();
+    useNoShader();
+    useNoShader();
     useNoOne();
     useNoCallback();
     useNoOne();

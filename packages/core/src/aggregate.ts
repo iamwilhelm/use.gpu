@@ -94,7 +94,8 @@ export const updateAggregateBuffer = (
   aggregate: AggregateBuffer | VirtualAggregateBuffer,
   items: AggregateItem[],
   count: number,
-  key: string,
+  limit: number | null,
+  key: string | undefined,
   keys: string,
 ) => {
   const {buffer, array, source, dims, base, stride} = aggregate;
@@ -105,24 +106,26 @@ export const updateAggregateBuffer = (
     const {
       count,
       attributes: {
-        [key]: single,
+        [key as any]: single,
         [keys]: multiple,
       },
     } = item;
 
     //if (stride > 1) debugger;
     //if (key === 'color' && 'width' in item.attributes) debugger;
+    
+    const c = limit ?? count;
 
     if (multiple != null) {
-      if (typeof multiple === 'function') multiple(array, b, count, stride);
-      else copyNumberArray2(multiple, array, dims, 0, b, count, stride);
+      if (typeof multiple === 'function') multiple(array, b, c, stride);
+      else copyNumberArray2(multiple, array, dims, 0, b, c, stride);
     }
     else if (single != null) {
-      if (typeof single === 'function') single(array, b, count, stride);
-      else fillNumberArray2(single, array, dims, 0, b, count, stride);
+      if (typeof single === 'function') single(array, b, c, stride);
+      else fillNumberArray2(single, array, dims, 0, b, c, stride);
     }
 
-    b += count * step;
+    b += c * step;
   }
 
   if (buffer) uploadSource(device, source, array.buffer, count);
@@ -202,7 +205,7 @@ export const getAggregateSummary = (items: AggregateItem[]) => {
   let allCount = 0;
   let allIndices = 0;
   for (let i = 0; i < n; ++i) {
-    const {count, indices = 0} = items[i];
+    const {count, indices = count} = items[i];
     allCount += count;
     allIndices += indices;
   }

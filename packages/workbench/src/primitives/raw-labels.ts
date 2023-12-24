@@ -13,7 +13,7 @@ import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl'
 import { resolve, BLEND_ALPHA } from '@use-gpu/core';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useShader } from '../hooks/useShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { PickingSource, usePickingShader } from '../providers/picking-provider';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -106,9 +106,9 @@ export const RawLabels: LiveComponent<RawLabelsProps> = memo((props: RawLabelsPr
 
   const t = props.texture;
 
-  const getVertex = useBoundShader(getLabelVertex, [i, r, u, s, l, a, positions, c, o, z, d, f, e, q]);
+  const getVertex = useShader(getLabelVertex, [i, r, u, s, l, a, positions, c, o, z, d, f, e, q]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getUIFragment, [t], DEFINES);
+  const getFragment = useShader(getUIFragment, [t], DEFINES);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 

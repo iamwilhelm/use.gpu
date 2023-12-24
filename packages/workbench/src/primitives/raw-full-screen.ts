@@ -11,7 +11,7 @@ import { Virtual } from './virtual';
 import { use, yeet, memo, useOne, useNoOne, useRef } from '@use-gpu/live';
 import { bindBundle, bindingsToLinks, getBundleKey } from '@use-gpu/shader/wgsl';
 
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useShader } from '../hooks/useShader';
 import { usePickingShader } from '../providers/picking-provider';
 import { useRenderContext, useNoRenderContext } from '../providers/render-provider';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
@@ -47,7 +47,7 @@ export const RawFullScreen: LiveComponent<RawFullScreenProps> = memo((props: Raw
 
   const getVertex = getFullScreenVertex;
   const getPicking = usePickingShader({id});
-  const getFragment = useBoundShader(getTextureColor, [t]);
+  const getFragment = useShader(getTextureColor, [t]);
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));
 

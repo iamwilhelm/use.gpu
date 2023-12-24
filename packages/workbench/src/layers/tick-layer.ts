@@ -11,7 +11,7 @@ import { RawLines } from '../primitives/raw-lines';
 import { use, memo, provide, useCallback, useFiber, useMemo, useOne, useState, useResource } from '@use-gpu/live';
 import { resolve } from '@use-gpu/core';
 import { TransformContext, useTransformContext, DEFAULT_TRANSFORM } from '../providers/transform-provider';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useShader } from '../hooks/useShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { getTickPosition } from '@use-gpu/wgsl/instance/vertex/tick.wgsl';
@@ -89,7 +89,7 @@ export const TickLayer: LiveComponent<TickLayerProps> = memo((props: TickLayerPr
   const c = useCallback(() => ((positions as any)?.length ?? resolve(count) ?? 1) * (detail + 1), [positions, count, detail]);
 
   const defines = useOne(() => ({ LINE_DETAIL: detail }), detail);
-  const bound = useBoundShader(getTickPosition, [xf, xd, p, o, d, s, t, b], defines);
+  const bound = useShader(getTickPosition, [xf, xd, p, o, d, s, t, b], defines);
 
   return (
     provide(TransformContext, DEFAULT_TRANSFORM,

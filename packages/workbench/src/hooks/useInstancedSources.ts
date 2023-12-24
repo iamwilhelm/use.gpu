@@ -1,14 +1,12 @@
-import type { ArchetypeSchema, StorageSource, UniformAttribute } from '@use-gpu/core';
+import type { StorageSource, UniformAttribute } from '@use-gpu/core';
 
 import { useMemo } from '@use-gpu/live';
-import { schemaToUniform } from '@use-gpu/core';
 import { instanceWith, bindEntryPoint } from '@use-gpu/shader/wgsl';
-import { getBoundShader } from './useBoundShader';
-import { getBoundSource } from './useBoundSource';
+import { getShader } from './useShader';
+import { getSource } from './useSource';
 import { getStructAggregate } from './useStructSources';
-import { INSTANCE_SCHEMA } from '../layers/schemas';
 
-const INDEX = schemaToUniform(INSTANCE_SCHEMA, 'instances');
+const INDEX = {name: 'instances', format: 'u32'};
 
 export const useInstancedSources = (
   uniforms: UniformAttribute[],
@@ -25,8 +23,8 @@ export const getInstancedSources = (
   values: Record<string, StorageSource>,
   indices: StorageSource,
 ) => {
-  const boundValues = uniforms.map((uniform) => getBoundSource(uniform, values[uniform.name]));
-  const boundIndices = getBoundSource(index, indices);
+  const boundValues = uniforms.map((uniform) => getSource(uniform, values[uniform.name]));
+  const boundIndices = getSource(index, indices);
 
   const instances = instanceWith(boundValues, boundIndices);
 
@@ -42,7 +40,7 @@ export const useInstancedAggregate = (
   aggregateBuffer: MultiAggregateBuffer,
   instances?: StorageSource,
 ) => {
-  return useMemo(() => getInstancedAggregate(aggregateBuffer, values), [aggregateBuffer, values])
+  return useMemo(() => getInstancedAggregate(aggregateBuffer, instances), [aggregateBuffer, instances]);
 };
 
 export const getInstancedAggregate = (

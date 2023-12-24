@@ -7,7 +7,7 @@ import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   Scissor, TransformContext,
-  useShaderRef, useBoundShader, useCombinedEpsilonTransform,
+  useShaderRef, useShader, useCombinedEpsilonTransform,
 } from '@use-gpu/workbench';
 
 import {
@@ -125,7 +125,7 @@ export const WebMercator: LiveComponent<WebMercatorProps> = (props: PropsWithChi
   const n = useShaderRef(native);
   const e = useShaderRef(epsilon);
   
-  const bound = useBoundShader(getWebMercatorPosition, [t, b, o, z, d, c, n]);
+  const bound = useShader(getWebMercatorPosition, [t, b, o, z, d, c, n]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

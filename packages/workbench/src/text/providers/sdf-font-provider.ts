@@ -9,7 +9,7 @@ import { glyphToRGBA, glyphToSDF, rgbaToSDF, padRectangle } from '@use-gpu/glyph
 import { makeAtlas, makeAtlasSource, resizeTextureSource, uploadAtlasMapping, updateMipTextureChain } from '@use-gpu/core';
 import { scrambleBits53, mixBits53 } from '@use-gpu/state';
 
-import { getBoundShader } from '../../hooks/useBoundShader';
+import { getShader } from '../../hooks/useShader';
 import { makeInlineCursor } from '../cursor';
 import { DebugContext } from '../../providers/debug-provider';
 import { DeviceContext } from '../../providers/device-provider';
@@ -91,7 +91,7 @@ export const SDFFontProvider: LiveComponent<SDFFontProviderProps> = memo(({
     };
 
     const biasedSource = {
-      ...getBoundShader(getLODBiasedTexture, [biasable, -0.5]),
+      ...getShader(getLODBiasedTexture, [biasable, -0.5]),
       colorSpace: 'srgb',
     };
 

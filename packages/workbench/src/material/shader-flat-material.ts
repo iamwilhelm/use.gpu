@@ -4,7 +4,7 @@ import type { ShaderModule, ShaderSource } from '@use-gpu/shader';
 
 import { provide, yeet, signal, useMemo, useOne } from '@use-gpu/live';
 
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useShader } from '../hooks/useShader';
 import { useLightContext } from '../providers/light-provider';
 import { MaterialContext } from '../providers/material-provider';
 
@@ -27,7 +27,7 @@ export const ShaderFlatMaterial: LC<ShaderFlatMaterialProps> = (props: PropsWith
     children,
   } = props;
 
-  const getSurface = useBoundShader(getSolidSurface, [fragment]);
+  const getSurface = useShader(getSolidSurface, [fragment]);
   const getLight = getSolidFragment;
   const getFragment = fragment;
 

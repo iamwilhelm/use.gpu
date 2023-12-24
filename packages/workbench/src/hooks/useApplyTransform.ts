@@ -5,7 +5,7 @@ import type { Ref } from '@use-gpu/live';
 
 import { useOne, useVersion, useNoOne, useNoVersion } from '@use-gpu/live';
 import { chainTo } from '@use-gpu/shader/wgsl';
-import { getBoundSource } from '../hooks/useBoundSource';
+import { getSource } from '../hooks/useSource';
 import { useTransformContext, useNoTransformContext } from '../providers/transform-provider';
 import { useScissorContext, useNoScissorContext } from '../providers/scissor-provider';
 
@@ -36,7 +36,7 @@ export const useApplyTransform = (
       bounds: null
     };
 
-    const getPosition = getBoundSource(TRANSFORM_BINDING, positions);
+    const getPosition = getSource(TRANSFORM_BINDING, positions);
     if (transform == null && scissor == null) return {
       positions: getPosition,
       scissor: null,

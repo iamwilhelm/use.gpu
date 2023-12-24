@@ -16,7 +16,7 @@ import {
   AxisHelper, KeyboardContext,
 
   makeSphereGeometry,
-  useBoundShader, useShaderRef,
+  useShader, useShaderRef,
 } from '@use-gpu/workbench';
 
 import {

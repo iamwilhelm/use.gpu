@@ -15,8 +15,8 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
 
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundSource } from '../hooks/useBoundSource';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useSource } from '../hooks/useSource';
+import { useShader } from '../hooks/useShader';
 
 import { getSurfaceIndex, getSurfaceNormal, getSurfaceUV } from '@use-gpu/wgsl/plot/surface.wgsl';
 
@@ -64,7 +64,7 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   const sizeExpr = useMemo(() => () =>
     (props.positions as any)?.size ?? resolve(size),
     [props.positions, size]);
-  const boundSize = useBoundSource(SIZE_BINDING, sizeExpr);
+  const boundSize = useSource(SIZE_BINDING, sizeExpr);
 
   const countExpr = useOne(() => () => {
     const s = resolve(sizeExpr);
@@ -72,12 +72,12 @@ export const SurfaceLayer: LiveComponent<SurfaceLayerProps> = memo((props: Surfa
   }, sizeExpr);
 
   const defines = useMemo(() => ({LOOP_X: !!loopX, LOOP_Y: !!loopY}), [loopX, loopY]);
-  const indices = useBoundShader(getSurfaceIndex, [boundSize], defines);
+  const indices = useShader(getSurfaceIndex, [boundSize], defines);
 
   const p = useShaderRef(props.position, props.positions);
-  const normals = useBoundShader(getSurfaceNormal, [boundSize, p], defines);
+  const normals = useShader(getSurfaceNormal, [boundSize, p], defines);
 
-  const uvs = useBoundShader(getSurfaceUV, [boundSize]);
+  const uvs = useShader(getSurfaceUV, [boundSize]);
 
   return use(RawFaces, {
     position,

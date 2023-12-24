@@ -3,7 +3,7 @@ import type { LambdaSource } from '@use-gpu/core';
 
 import { yeet, use, gather, provide, useContext, useMemo, useOne } from '@use-gpu/live';
 import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
-import { useBoundSource, useDataBinding, useLambdaSource } from '@use-gpu/workbench';
+import { useSource, useDataBinding, useLambdaSource } from '@use-gpu/workbench';
 
 import { DataContext } from '../providers/data-provider';
 import { parseAxes, parseAxis } from '@use-gpu/traits';
@@ -33,8 +33,8 @@ export const Transpose: LiveComponent<TransposeProps> = (props) => {
   const swizzle = useOne(() => parseAxes(axes), axes);
 
   // Construct size + index swizzle shader
-  const getSizeIn = useBoundSource(SIZE_BINDING, size);
-  const getDataIn = useBoundSource(binding, data);
+  const getSizeIn = useSource(SIZE_BINDING, size);
+  const getDataIn = useSource(binding, data);
   const getDataOut = useMemo(() => {
     const getSizeOut = castTo(getSizeIn, 'vec4<u32>', swizzle);
 

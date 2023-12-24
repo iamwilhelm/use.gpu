@@ -5,7 +5,7 @@ import { SLIDE_EFFECTS } from './traits';
 import { clamp, lerp } from '@use-gpu/core';
 import { useContext, useMemo, useOne, useRef, useFiber } from '@use-gpu/live';
 import { bundleToAttributes } from '@use-gpu/shader/wgsl';
-import { useTimeContext, LoopContext, useBoundSource, useBoundShader, useShaderRef } from '@use-gpu/workbench';
+import { useTimeContext, LoopContext, useSource, useShader, useShaderRef } from '@use-gpu/workbench';
 import { usePresentContext } from './providers/present-provider';
 
 import { getSlideMask } from '@use-gpu/wgsl/present/mask.wgsl';
@@ -33,12 +33,12 @@ export const usePresentTransition = (
   const v = useRef(0);
   const l = useShaderRef(layout);
 
-  const es = useBoundSource(ATTRIBUTES[0], e);
-  const ds = useBoundSource(ATTRIBUTES[1], d);
-  const vs = useBoundSource(ATTRIBUTES[2], v);
+  const es = useSource(ATTRIBUTES[0], e);
+  const ds = useSource(ATTRIBUTES[1], d);
+  const vs = useSource(ATTRIBUTES[2], v);
 
-  const mask = useBoundShader(getSlideMask, [es, ds, vs]);
-  const transform = useBoundShader(getSlideMotion, [es, ds, vs, l]);
+  const mask = useShader(getSlideMask, [es, ds, vs]);
+  const transform = useShader(getSlideMotion, [es, ds, vs, l]);
 
   const useUpdateTransition = () => {
     const {useTransition, isVisible} = usePresentContext();

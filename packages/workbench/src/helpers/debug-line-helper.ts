@@ -8,7 +8,7 @@ import { bindEntryPoint } from '@use-gpu/shader/wgsl';
 import { useDeviceContext } from '../providers/device-provider';
 import { getDerivedSource } from '../hooks/useDerivedSource';
 import { useScratchSource } from '../hooks/useScratchSource';
-import { getBoundShader } from '../hooks/useBoundShader';
+import { getShader } from '../hooks/useShader';
 import { useRawSource } from '../hooks/useRawSource';
 
 import debugWGSL from '@use-gpu/wgsl/debug/line-helper.wgsl';
@@ -71,7 +71,7 @@ export const DebugLineHelper: LC<DebugLineHelperProps> = (props: DebugLineHelper
       segments: debugSegments,
     };
 
-    const boundEmitter = getBoundShader(debugWGSL, [target.counter, target.positions, target.colors, target.segments]);
+    const boundEmitter = getShader(debugWGSL, [target.counter, target.positions, target.colors, target.segments]);
     const emitPoint = bindEntryPoint(boundEmitter, 'emitPoint');
     const emitLine = bindEntryPoint(boundEmitter, 'emitLine');
     const shaders = {emitPoint, emitLine};

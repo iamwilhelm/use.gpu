@@ -8,7 +8,7 @@ import { use, provide, signal, useContext, useOne, useMemo } from '@use-gpu/live
 import { chainTo, swizzleTo } from '@use-gpu/shader/wgsl';
 import {
   TransformContext,
-  useShaderRef, useBoundShader, useCombinedEpsilonTransform,
+  useShaderRef, useShader, useCombinedEpsilonTransform,
 } from '@use-gpu/workbench';
 
 import { RangeContext } from '../providers/range-provider';
@@ -149,7 +149,7 @@ export const Spherical: LiveComponent<SphericalProps> = (props: PropsWithChildre
   const c = useShaderRef(scaleY);
   const e = useShaderRef(epsilon);
 
-  const bound = useBoundShader(getSphericalPosition, [t, b, f, u, v, c]);
+  const bound = useShader(getSphericalPosition, [t, b, f, u, v, c]);
 
   // Apply input basis as a cast
   const xform = useMemo(() => {

@@ -11,7 +11,7 @@ import {
   DebugContext, MouseContext, WheelContext, ViewContext,
   LayoutContext, useTransformContext,
   useInspectable, useInspectHoverable, useInspectorSelect, Inspector,
-  useBoundShader, useNoBoundShader,
+  useShader, useNoShader,
 } from '@use-gpu/workbench';
 
 import { chainTo } from '@use-gpu/shader/wgsl';
@@ -83,7 +83,7 @@ const Resume = (placement: vec2, inspect: Inspector, hovered: boolean) => (els: 
   shift[0] = (placement[0] - 1.0) / 2 * into[0];
   shift[1] = (placement[1] - 1.0) / 2 * into[1];
 
-  const bound = useBoundShader(getLayoutPosition, [flip, shift]);
+  const bound = useShader(getLayoutPosition, [flip, shift]);
   transform = useMemo(() => transform ? chainTo(transform, bound) : bound, [transform, bound]);
 
   // Render children into root container

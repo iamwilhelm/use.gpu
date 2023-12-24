@@ -18,8 +18,8 @@ import { RawData } from '../data/raw-data';
 import { useRawSource } from '../hooks/useRawSource';
 import { useApplyTransform } from '../hooks/useApplyTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
-import { useBoundSource, useNoBoundSource } from '../hooks/useBoundSource';
+import { useShader, useNoShader } from '../hooks/useShader';
+import { useSource, useNoSource } from '../hooks/useSource';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useInstancedVertex } from '../hooks/useInstancedVertex';
 import { usePipelineOptions, PipelineOptions } from '../hooks/usePipelineOptions';
@@ -104,7 +104,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
   const g = useRawSource(geometry.attributes.positions, 'vec4<f32>');
   const l = useShaderRef(null, props.instances);
 
-  const ps = p ? useBoundSource(POSITION, p) : useNoBoundSource();
+  const ps = p ? useSource(POSITION, p) : useNoSource();
   const ss = props.sts == null ? ps : s;
 
   const {positions, scissor, bounds: getBounds} = useApplyTransform(ps);
@@ -117,7 +117,7 @@ export const RawArrows: LiveComponent<RawArrowsProps> = memo((props: RawArrowsPr
     useNoCallback();
   }
 
-  const boundVertex = useBoundShader(getArrowVertex, [
+  const boundVertex = useShader(getArrowVertex, [
     g, a, positions, scissor,
     u, ss,
     c, e, w, d, z,

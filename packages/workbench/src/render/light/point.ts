@@ -8,7 +8,7 @@ import { uploadBuffer } from '@use-gpu/core';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
 import { useBufferedSize } from '../../hooks/useBufferedSize';
-import { useBoundShader } from '../../hooks/useBoundShader';
+import { useShader } from '../../hooks/useShader';
 import { useRawSource } from '../../hooks/useRawSource';
 
 import { useDeviceContext } from '../../providers/device-provider';
@@ -69,11 +69,11 @@ export const PointLightRender: LiveComponent<LightKindProps> = (props: LightKind
   const getOutside = useRawSource(outsides, 'u16');
   const getInside = useRawSource(insides, 'u16');
 
-  const getInstanceVertex = useBoundShader(getDeferredLightVertex, [getLight, getInstance, getPosition, getIndex, getScale], GEOMETRY_DEFS);
-  const getOutsideVertex  = useBoundShader(getDeferredLightVertex, [getLight, getOutside, getPosition, getIndex, getScale], GEOMETRY_DEFS);
-  const getInsideVertex   = useBoundShader(getDeferredLightVertex, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
+  const getInstanceVertex = useShader(getDeferredLightVertex, [getLight, getInstance, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getOutsideVertex  = useShader(getDeferredLightVertex, [getLight, getOutside, getPosition, getIndex, getScale], GEOMETRY_DEFS);
+  const getInsideVertex   = useShader(getDeferredLightVertex, [getLight, getInside,  getPosition, getIndex], FULLSCREEN_DEFS);
 
-  const getFragment = useBoundShader(getDeferredLightFragment, [...gbuffer, getLight, applyLight]);
+  const getFragment = useShader(getDeferredLightFragment, [...gbuffer, getLight, applyLight]);
 
   const stencilLinks = useMemo(() => ({getVertex: getInstanceVertex}), [getInstanceVertex, getFragment]);
   const outsideLinks = useMemo(() => ({getVertex: getOutsideVertex, getFragment}), [getOutsideVertex, getFragment]);

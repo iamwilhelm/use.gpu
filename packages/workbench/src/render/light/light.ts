@@ -12,7 +12,7 @@ import { $delete } from '@use-gpu/state';
 
 import { drawCall } from '../../queue/draw-call';
 import { useBufferedSize } from '../../hooks/useBufferedSize';
-import { useBoundShader } from '../../hooks/useBoundShader';
+import { useShader } from '../../hooks/useShader';
 import { useRawSource } from '../../hooks/useRawSource';
 
 import { useDeviceContext } from '../../providers/device-provider';

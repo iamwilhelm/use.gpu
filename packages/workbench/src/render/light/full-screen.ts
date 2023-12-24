@@ -3,7 +3,7 @@ import type { LightKindProps } from './light';
 
 import { yeet, useMemo } from '@use-gpu/live';
 
-import { useBoundShader } from '../../hooks/useBoundShader';
+import { useShader } from '../../hooks/useShader';
 
 import { getDeferredLightVertex } from '@use-gpu/wgsl/instance/vertex/deferred-light.wgsl';
 import { getDeferredLightFragment } from '@use-gpu/wgsl/instance/fragment/deferred-light.wgsl';
@@ -20,8 +20,8 @@ export const FullScreenLightRender: LiveComponent<LightKindProps> = (props: Ligh
     applyLight,
   } = props;
 
-  const getVertex = useBoundShader(getDeferredLightVertex, [getLight], FULLSCREEN_DEFS);
-  const getFragment = useBoundShader(getDeferredLightFragment, [...gbuffer, getLight, applyLight]);
+  const getVertex = useShader(getDeferredLightVertex, [getLight], FULLSCREEN_DEFS);
+  const getFragment = useShader(getDeferredLightFragment, [...gbuffer, getLight, applyLight]);
 
   const links = useMemo(() => ({getVertex, getFragment}), [getVertex, getFragment]);
 

@@ -7,7 +7,7 @@ import { vec3, mat3, mat4 } from 'gl-matrix';
 
 import {
   TransformContext, useMatrixContext,
-  useShaderRef, useBoundShader, useBoundSource, useCombinedTransform,
+  useShaderRef, useShader, useSource, useCombinedTransform,
  } from '@use-gpu/workbench';
 
 import { getCartesianPosition } from '@use-gpu/wgsl/transform/cartesian.wgsl';
@@ -38,9 +38,9 @@ export const Primitive: LiveComponent<PrimitiveProps> = memo((props: PropsWithCh
   const normalMatrixRef = useShaderRef(normalMatrix);
   const matrixScaleRef = useShaderRef(matrixScale);
 
-  const boundMatrix = useBoundSource(MATRIX_BINDING, matrixRef);
-  const boundPosition = useBoundShader(getCartesianPosition, [boundMatrix]);
-  const boundDifferential = useBoundShader(getMatrixDifferential, [boundMatrix, normalMatrixRef]);
+  const boundMatrix = useSource(MATRIX_BINDING, matrixRef);
+  const boundPosition = useShader(getCartesianPosition, [boundMatrix]);
+  const boundDifferential = useShader(getMatrixDifferential, [boundMatrix, normalMatrixRef]);
 
   const cullBounds = useOne(() => ({ center: [], radius: 0, min: [], max: [] } as DataBounds));
   const getBounds = useCallback((bounds: DataBounds) => {

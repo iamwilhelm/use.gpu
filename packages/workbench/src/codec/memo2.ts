@@ -6,7 +6,7 @@ import { wgsl } from '@use-gpu/shader/wgsl';
 import { use, yeet, useMemo } from '@use-gpu/live';
 import { Dispatch } from '../queue/dispatch';
 
-import { getBoundShader, useBoundShader } from '../hooks/useBoundShader';
+import { getShader, useShader } from '../hooks/useShader';
 import { useScratchSource } from '../hooks/useScratchSource';
 
 import { memoSample } from '@use-gpu/wgsl/compute/memo2.wgsl';
@@ -32,7 +32,7 @@ export const Memo2: LC<Memo2Props> = (props: Memo2Props) => {
   const [buffer] = useScratchSource(format, {readWrite: true, reserve});
   
   const setter = useMemo(() =>
-    getBoundShader(wgsl`
+    getShader(wgsl`
       @link var<storage, read_write> memoBuffer: array<${format}>;
       @export fn main(i: u32, v: ${format}) -> {
         memoBuffer[i] = v;
@@ -41,7 +41,7 @@ export const Memo2: LC<Memo2Props> = (props: Memo2Props) => {
     [format, buffer]
   );
 
-  const bound = useBoundShader(memoSample, [
+  const bound = useShader(memoSample, [
     () => size ?? (shader as any)?.size ?? [0, 0],
     buffer,
     setter,

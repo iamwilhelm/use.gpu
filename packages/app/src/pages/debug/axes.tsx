@@ -16,7 +16,7 @@ import {
   ShaderFlatMaterial,
 
   makeSphereGeometry,
-  useBoundShader,
+  useShader,
 } from '@use-gpu/workbench';
 
 import {
@@ -58,7 +58,7 @@ export const DebugAxesPage: LC = (props) => {
         Record<string, ShaderSource>,
         TextureSource,
       ]) => {
-        const fragment = useBoundShader(cubeMaterial, [texture]);
+        const fragment = useShader(cubeMaterial, [texture]);
 
         return (
           <Loop>

@@ -10,7 +10,7 @@ import { RenderTarget } from './render-target';
 import { RenderToTexture } from './render-to-texture';
 import { RawFullScreen } from '../primitives';
 
-import { getBoundShader } from '../hooks/useBoundShader';
+import { getShader } from '../hooks/useShader';
 import { useShaderRef } from '../hooks/useShaderRef';
 
 import { gainColor } from '@use-gpu/wgsl/fragment/gain.wgsl';
@@ -64,7 +64,7 @@ export const LinearRGB: LiveComponent<LinearRGBProps> = (props: PropsWithChildre
           const defs = useOne(() => ({IS_OPAQUE: !overlay}), overlay);
 
           const filter = useMemo(() => {
-            let filter = getBoundShader(gainColor, [g], defs);
+            let filter = getShader(gainColor, [g], defs);
             if (tonemap === 'aces') filter = chainTo(filter, tonemapACES);
             return filter;
           }, [defs, tonemap]);

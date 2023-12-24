@@ -6,7 +6,7 @@ import type { FitInto, Direction, Margin, OverflowMode, LayoutElement, LayoutPic
 import { useProp } from '@use-gpu/traits/live';
 import { memo, use, gather, yeet, extend, useFiber, useOne, useMemo } from '@use-gpu/live';
 import { bindBundle, bundleToAttribute, castTo, chainTo } from '@use-gpu/shader/wgsl';
-import { useForceUpdate, useInspectable, getBoundSource } from '@use-gpu/workbench';
+import { useForceUpdate, useInspectable, getSource } from '@use-gpu/workbench';
 
 import { getScrolledPosition } from '@use-gpu/wgsl/layout/scroll.wgsl';
 import { getShiftedRectangle } from '@use-gpu/wgsl/layout/shift.wgsl';
@@ -123,10 +123,10 @@ export const Overflow: LiveComponent<OverflowProps> = memo((props: PropsWithChil
       return (isX && before[0] !== after[0]) || (!isX && before[1] !== after[1]);
     };
 
-    const c = getBoundSource(CLIP_BINDING, clipRef);
-    const b = getBoundSource(OFFSET_BINDING, boxRef);
-    const o = getBoundSource(OFFSET_BINDING, offsetRef);
-    const s = getBoundSource(OFFSET_BINDING, scrollRef);
+    const c = getSource(CLIP_BINDING, clipRef);
+    const b = getSource(OFFSET_BINDING, boxRef);
+    const o = getSource(OFFSET_BINDING, offsetRef);
+    const s = getSource(OFFSET_BINDING, scrollRef);
 
     const shift = bindBundle(getShiftedRectangle, {getOffset: b});
     const clip = chainTo(c, shift);

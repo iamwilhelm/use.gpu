@@ -5,7 +5,7 @@ import type { TraitProps } from '@use-gpu/traits/live';
 import { makeUseTrait, optional, combine, shouldEqual, sameShallow, useProp } from '@use-gpu/traits/live';
 import { yeet, memo, use, keyed, gather, provide, useContext, useOne, useFiber, useMemo } from '@use-gpu/live';
 import {
-  useBoundShader, useBoundSource, useShaderRef,
+  useShader, useSource, useShaderRef,
   LineLayer, ArrowLayer, useArrowSegmentsSource,
   useTransformContext,
 } from '@use-gpu/workbench';
@@ -77,7 +77,7 @@ export const Axis: LiveComponent<AxisProps> = memo((props) => {
   // Make axis vertex shader
   const o = useShaderRef(og);
   const s = useShaderRef(step);
-  const positions = useBoundShader(getAxisPosition, [s, o]);
+  const positions = useShader(getAxisPosition, [s, o]);
 
   // Render as 1 arrow chunk
   const n = d + 1;

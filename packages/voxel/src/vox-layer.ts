@@ -7,7 +7,7 @@ import { seq, clamp } from '@use-gpu/core';
 import { gather, use, quote, yeet, memo, useCallback, useMemo, useOne } from '@use-gpu/live';
 import {
   useMatrixContext,
-  useBoundShader, useNoBoundShader, useLambdaSource, useDebugContext, useShaderRef,
+  useShader, useNoShader, useLambdaSource, useDebugContext, useShaderRef,
   useEnvironmentContext,
   FaceLayer, GeometryData, ShaderLitMaterial,
   makeBoxGeometry,
@@ -449,7 +449,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
         return origin3;
       }, [inverse]);
 
-      const boundPosition = useBoundShader(vertexShader, [positions, size]);
+      const boundPosition = useShader(vertexShader, [positions, size]);
       const getPosition = useLambdaSource(boundPosition, positions);
 
       const insideRef = useShaderRef(0);
@@ -457,7 +457,7 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
 
       const sources = seq(4).map(i => shape[i] ?? null);
 
-      const getSurface = useBoundShader(surfaceShader, [
+      const getSurface = useShader(surfaceShader, [
         matrix, ray, normal, size, insideRef, originRef,
         sdf, palette, pbr, ...sources
       ], defs);
@@ -465,8 +465,8 @@ export const VoxLayer: LC<VoxLayerProps> = memo((props: VoxLayerProps) => {
 
       const environmentMap = useEnvironmentContext();
       const getEnvironment = environmentMap
-        ? useBoundShader(applyPBREnvironment, [environmentMap])
-        : useNoBoundShader();
+        ? useShader(applyPBREnvironment, [environmentMap])
+        : useNoShader();
 
       return [
         use(ShaderLitMaterial, {

@@ -10,15 +10,15 @@ type Ref<T> = { current: T };
 const NO_SOURCES: any[] = [];
 
 // Turn a shader source/constant/lambda into a virtual shader module
-export const useBoundSource = <T = any>(
+export const useSource = <T = any>(
   def: UniformAttribute | UniformAttributeValue,
   source: ShaderSource | T,
 ) => {
-  return useMemo(() => getBoundSource(def, source), [def, source]);
+  return useMemo(() => getSource(def, source), [def, source]);
 }
 
 // Turn a shader source/constant/lambda into a virtual shader module
-export const getBoundSource = <T = any>(
+export const getSource = <T = any>(
   def: UniformAttribute | UniformAttributeValue,
   source: ShaderSource | T,
 ) => {
@@ -34,5 +34,5 @@ export const getBoundSource = <T = any>(
   return bindingToModule(binding);
 }
 
-export const useNoBoundSource = useNoMemo;
+export const useNoSource = useNoMemo;
 

@@ -7,7 +7,7 @@ import { useProp } from '@use-gpu/traits/live';
 import { parseColor } from '@use-gpu/parse';
 import { bindBundle } from '@use-gpu/shader/wgsl';
 
-import { useBoundShader, useNoBoundShader } from '../hooks/useBoundShader';
+import { useShader, useNoShader } from '../hooks/useShader';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { useShaderRef } from '../hooks/useShaderRef';
 import { useLightContext } from '../providers/light-provider';
@@ -48,7 +48,7 @@ export const BasicMaterial: LC<BasicMaterialProps> = (props: PropsWithChildren<B
     HAS_COLOR_MAP: !!colorMap,
   }), colorMap);
 
-  const getFragment = useBoundShader(getBasicMaterial, [c, cm], defines);
+  const getFragment = useShader(getBasicMaterial, [c, cm], defines);
 
   return ShaderFlatMaterial({
     fragment: getFragment,

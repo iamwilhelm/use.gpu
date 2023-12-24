@@ -4,7 +4,7 @@ import type { ParsedEffect } from './types';
 import type { ColorLike } from '@use-gpu/traits';
 
 import { memo, use, useOne, useMemo } from '@use-gpu/live';
-import { useBoundShader, useCombinedTransform, useLayoutContext, usePipelineOptions, useShaderRef, UIRectangles, Virtual } from '@use-gpu/workbench';
+import { useShader, useCombinedTransform, useLayoutContext, usePipelineOptions, useShaderRef, UIRectangles, Virtual } from '@use-gpu/workbench';
 import { getBundleKey } from '@use-gpu/shader/wgsl';
 
 import { usePresentTransition } from './hooks';
@@ -45,8 +45,8 @@ export const Screen: LC<ScreenProps> = memo((props: ScreenProps) => {
 
   const {transform: xf} = useCombinedTransform();
 
-  const getVertex = useBoundShader(getScreenVertex, [r, f, transform, xf]);
-  const getFragment = useBoundShader(getScreenFragment, [texture, mask]);
+  const getVertex = useShader(getScreenVertex, [r, f, transform, xf]);
+  const getFragment = useShader(getScreenFragment, [texture, mask]);
 
   const links = useOne(() => ({getVertex, getFragment}),
     getBundleKey(getVertex) + getBundleKey(getFragment));

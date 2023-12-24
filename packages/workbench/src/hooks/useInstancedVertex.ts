@@ -3,7 +3,7 @@ import type { ShaderSource } from '@use-gpu/shader';
 import { resolve } from '@use-gpu/core';
 import { useMemo, useNoMemo, useCallback, useNoCallback } from '@use-gpu/live';
 import { useShaderRef, useNoShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader, useNoBoundShader, getBoundShader } from '../hooks/useBoundShader';
+import { useShader, useNoShader, getShader } from '../hooks/useShader';
 
 import { getInstancedIndex } from '@use-gpu/wgsl/instance/instanced-index.wgsl';
 import { getInstancedVertex } from '@use-gpu/wgsl/instance/vertex/instanced.wgsl';
@@ -29,10 +29,10 @@ export const useInstancedVertex = (
   return useMemo(() => {
 
     const mappedIndex = instanceSize
-      ? getBoundShader(getInstancedIndex, [instanceSize])
+      ? getShader(getInstancedIndex, [instanceSize])
       : null;
 
-    const boundInstance = getBoundShader(getInstancedVertex, [getVertex, instances, mappedIndex]);
+    const boundInstance = getShader(getInstancedVertex, [getVertex, instances, mappedIndex]);
 
     const totalCount = () => {
       const l = resolve(elementCount) || 0;

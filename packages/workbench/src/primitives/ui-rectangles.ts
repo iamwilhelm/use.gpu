@@ -13,7 +13,7 @@ import { getBundleKey } from '@use-gpu/shader/wgsl';
 import { resolve } from '@use-gpu/core';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useShader } from '../hooks/useShader';
 import { useDataLength } from '../hooks/useDataBinding';
 import { useNativeColorTexture } from '../hooks/useNativeColor';
 import { usePickingShader } from '../providers/picking-provider';
@@ -90,9 +90,9 @@ export const UIRectangles: LiveComponent<UIRectanglesProps> = memo((props: UIRec
   const m = mask;
   const t = useNativeColorTexture(texture);
 
-  const getVertex = useBoundShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
+  const getVertex = useShader(getUIRectangleVertex, [r, a, b, s, f, u, v, p, d, xf, c]);
   const getPicking = usePickingShader(props);
-  const getFragment = useBoundShader(getUIFragment, [t, m]);
+  const getFragment = useShader(getUIFragment, [t, m]);
 
   const links = useOne(() => ({getVertex, getFragment, getPicking}),
     getBundleKey(getVertex) + getBundleKey(getFragment) + (getPicking ? getBundleKey(getPicking) : 0));

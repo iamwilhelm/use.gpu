@@ -17,8 +17,6 @@ import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getInstancedAggregate } from '../hooks/useInstancedSources';
 import { getStructAggregate } from '../hooks/useStructSources';
 
-const DEBUG = true;
-
 export type AggregatorProps = {
   schema: AggregateSchema,
   items: Record<string, AggregateValue>[],
@@ -94,7 +92,6 @@ export const makeAggregator = (
 
     updateAggregateFromSchema(device, schema, aggregate, items, count, indices);
 
-    DEBUG && console.warn('aggregate', {aggregate});
     return {count, sources, item, uploadRefs};
   };
 };

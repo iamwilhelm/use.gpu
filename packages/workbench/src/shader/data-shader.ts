@@ -7,7 +7,7 @@ import { bundleToAttributes } from '@use-gpu/shader/wgsl';
 
 import { useShaderRefs } from '../hooks/useShaderRef';
 import { getDerivedSource } from '../hooks/useDerivedSource';
-import { getBoundShader } from '../hooks/useBoundShader';
+import { getShader } from '../hooks/useShader';
 
 export type DataShaderProps = {
   source?: StorageSource,
@@ -58,7 +58,7 @@ export const DataShader: LiveComponent<DataShaderProps> = (props) => {
     });
 
     return getDerivedSource(
-      { shader: getBoundShader(shader, values) } as any,
+      { shader: getShader(shader, values) } as any,
       { size: () => (source as any)?.size ?? null, length: () => (source as any)?.length ?? null }
     );
   }, [shader, args.length, source, sources]);

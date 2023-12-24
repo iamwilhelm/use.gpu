@@ -7,7 +7,7 @@ import { LineLayer } from '../layers/line-layer';
 import { GeometryData } from '../data/geometry-data';
 import { makeAABBGeometry } from '../primitives/geometry/aabb';
 import { TransformContext } from '../providers/transform-provider';
-import { useBoundShader } from '../hooks/useBoundShader';
+import { useShader } from '../hooks/useShader';
 import { useCombinedTransform } from '../hooks/useCombinedTransform';
 import { useShaderRef } from '../hooks/useShaderRef';
 
@@ -46,7 +46,7 @@ export const AABBHelper: LC<AABBHelperProps> = memo((props: AABBHelperProps) => 
   })
 
   const m = useShaderRef(combined);
-  const transform = useBoundShader(getCartesianPosition, [m]);
+  const transform = useShader(getCartesianPosition, [m]);
   const context = useCombinedTransform(transform);
 
   return use(GeometryData, {

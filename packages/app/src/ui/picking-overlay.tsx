@@ -3,7 +3,7 @@ import React, { useOne } from '@use-gpu/live';
 
 import {
   FlatCamera, PickingContext,
-  useBoundShader, useLambdaSource,
+  useShader, useLambdaSource,
 } from '@use-gpu/workbench';
 import {
   UI, Layout, Absolute, Block, Inline, Text,
@@ -37,7 +37,7 @@ export const PickingOverlay: LC = () => {
   
   const size = useOne(() => () => source.size, source);
 
-  const boundShader = useBoundShader(colorizeShader, [size, source]);
+  const boundShader = useShader(colorizeShader, [size, source]);
   const textureSource = useLambdaSource(boundShader, source);
 
   const scale = 0.5;

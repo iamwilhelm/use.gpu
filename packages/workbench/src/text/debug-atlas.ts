@@ -4,7 +4,7 @@ import type { Atlas, Rectangle } from '@use-gpu/core';
 
 import { debug, memo, use, yeet, useContext, useNoContext, useFiber, useMemo } from '@use-gpu/live';
 import { TextureSource } from '@use-gpu/core';
-import { useBoundShader, useLambdaSource } from '@use-gpu/workbench';
+import { useShader, useLambdaSource } from '@use-gpu/workbench';
 
 import { SDFFontContext } from './providers/sdf-font-provider';
 
@@ -132,7 +132,7 @@ export const DebugAtlasShape: LiveComponent<DebugAtlasShapeProps> = memo((props:
   let ID = 0;
   const next = () => `${id}-${ID++}`;
 
-  const boundSource = useLambdaSource(useBoundShader(premultiply, [source]), source);
+  const boundSource = useLambdaSource(useShader(premultiply, [source]), source);
 
   if (source) {
     yeets.push({

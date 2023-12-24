@@ -19,11 +19,13 @@ import {
   parseVec4Array,
   parseScalarArray,
   parseScalarArrayLike,
-  parseScalarMultiArray,
+  parseMultiScalarArray,
   parsePosition,
   parsePositionArray,
   parsePositionMultiArray,
+  parsePositionMultiMultiArray,
   parseChunks,
+  parseMultiChunks,
   parseRotation,
   parseQuaternion,
   parseScale,
@@ -42,7 +44,7 @@ import {
   parsePointShape,
 } from '@use-gpu/parse';
 import { generateChunkSegments2 } from '@use-gpu/core';
-import { useArrowSegments, useFaceSegments, useLineSegments } from '@use-gpu/workbench';
+import { useArrowSegments, useFaceSegments, useNoFaceSegments, useLineSegments, useConcaveFaceSegments, useNoConcaveFaceSegments } from '@use-gpu/workbench';
 
 import { vec4 } from 'gl-matrix';
 
@@ -331,13 +333,13 @@ const applyOpacity = (colors?: TypedArray, opacity: number = 1) => {
 
 export const SegmentsTrait = combine(
   trait({
-    segments: optional(parseScalarArray),
+    segments: optional(parseScalarArrayLike),
   }),
   (
     props: {
       position?: VectorLike | VectorLikes,
       positions?: VectorLikes | VectorLikes[],
-      segments?: VectorLikes | VectorLikes[],
+      segments?: VectorLikes,
     },
     parsed: {
       chunks?: TypedArray,
@@ -349,6 +351,36 @@ export const SegmentsTrait = combine(
     );
   },
 );
+
+export const FacetedTrait = combine(
+  trait({
+    segments: optional(parseScalarArrayLike),
+    indices: optional(parseScalarArrayLike),
+  }),
+  (
+    props: {
+      position?: VectorLike | VectorLikes,
+      positions?: VectorLikes | VectorLikes[],
+      segments?: VectorLikes,
+      indices?: VectorLikes,
+    },
+    parsed: {
+      chunks?: TypedArray,
+      groups?: TypedArray,
+    },
+  ) => {
+    const [chunks, groups] = useProp(
+      props.positions ?? props.position,
+      (pos) => !props.segments && !props.indices ? parseMultiChunks(pos) : [],
+    );
+    parsed.chunks = chunks;
+    parsed.groups = groups;
+  },
+);
+
+export const ConcaveTrait = trait({
+  concave: optional(parseBoolean),
+});
 
 export const LoopTrait = trait({
   loop: optional(parseBoolean),
@@ -416,7 +448,6 @@ export const ArrowSegmentsTrait = combine(
       anchors?: TypedArray,
       trims?: TypedArray,
       unwelds?: TypedArray,
-      lookups?: TypedArray,
     },
   ) => {
     const {chunks, loop, loops, start, starts, end, ends} = parsed;
@@ -428,34 +459,39 @@ export const ArrowSegmentsTrait = combine(
 );
 
 export const FaceSegmentsTrait = combine(
-  SegmentsTrait,
-  LoopsTrait,
-  DirectedsTrait,
+  FacetedTrait,
+  ConcaveTrait,
   (
-    props: {},
+    _,
     parsed: {
       chunks?: TypedArray,
-      loop?: boolean | TypedArray,
-      loops?: TypedArray,
-      start?: boolean | TypedArray,
-      starts?: TypedArray,
-      end?: boolean | TypedArray,
-      ends?: TypedArray,
+      groups?: TypedArray,
+      concave?: boolean,
+
+      position?: TypedArray,
+      positions?: TypedArray,
 
       count?: number,
-      sparse?: number,
+      indexed?: number,
       segments?: TypedArray,
-      anchors?: TypedArray,
-      trims?: TypedArray,
-      unwelds?: TypedArray,
-      lookups?: TypedArray,
+      indices?: TypedArray,
     },
   ) => {
-    const {chunks, loop, loops, start, starts, end, ends} = parsed;
+    const {chunks, groups, concave, position, positions} = parsed;
     if (!chunks) return;
 
-    const face = useFaceSegments(chunks, loop || loops, start || starts, end || ends);
-    for (const k in face) parsed[k] = face[k];
+    if (concave) {
+      const face = useConcaveFaceSegments(position ?? positions, chunks, groups);
+      for (const k in face) parsed[k] = face[k];
+
+      useNoFaceSegments();
+    }
+    else {
+      useNoConcaveFaceSegments();
+
+      const face = useFaceSegments(chunks);
+      for (const k in face) parsed[k] = face[k];
+    }
   },
 );
 
@@ -473,18 +509,32 @@ export const VerticesTrait = trait({
   lookups: optional(parseScalarArray),
 });
 
-export const SegmentedVerticesTrait = trait({
+export const CompositeVerticesTrait = trait({
   position: optional(parsePositionArray),
   positions: optional(parsePositionMultiArray),
   depth: optional(parseScalarArrayLike),
-  depths: optional(parseScalarMultiArray),
+  depths: optional(parseMultiScalarArray),
   zBias: optional(parseScalarArrayLike),
-  zBiases: optional(parseScalarMultiArray),
+  zBiases: optional(parseMultiScalarArray),
 
-  id: optional(parseNumber),
-  ids: optional(parseScalarArray),
-  lookup: optional(parseNumber),
-  lookups: optional(parseScalarArray),
+  id: optional(parseScalarArrayLike),
+  ids: optional(parseMultiScalarArray),
+  lookup: optional(parseScalarArrayLike),
+  lookups: optional(parseMultiScalarArray),
+});
+
+export const FacetedVerticesTrait = trait({
+  position: optional(parsePositionArray),
+  positions: optional(parsePositionMultiMultiArray),
+  depth: optional(parseScalarArrayLike),
+  depths: optional(parseMultiScalarArray),
+  zBias: optional(parseScalarArrayLike),
+  zBiases: optional(parseMultiScalarArray),
+
+  id: optional(parseScalarArrayLike),
+  ids: optional(parseMultiScalarArray),
+  lookup: optional(parseScalarArrayLike),
+  lookups: optional(parseMultiScalarArray),
 });
 
 export const PointsTrait = combine(
@@ -498,26 +548,26 @@ export const PointsTrait = combine(
 
 export const LinesTrait = combine(
   ColorsTrait({ composite: true }),
-  SegmentedVerticesTrait,
+  CompositeVerticesTrait,
   trait({
     width: optional(parseScalarArrayLike),
-    widths: optional(parseScalarMultiArray),
+    widths: optional(parseMultiScalarArray),
   }),
   LineSegmentsTrait,  
 );
 
 export const ArrowsTrait = combine(
   ColorsTrait({ composite: true }),
-  SegmentedVerticesTrait,
+  CompositeVerticesTrait,
   trait({
     size: optional(parseScalarArrayLike),
-    sizes: optional(parseScalarMultiArray),
+    sizes: optional(parseMultiScalarArray),
   }),
   ArrowSegmentsTrait,  
 );
 
 export const FacesTrait = combine(
   ColorsTrait({ composite: true }),
-  SegmentedVerticesTrait,
+  FacetedVerticesTrait,
   FaceSegmentsTrait,  
 );

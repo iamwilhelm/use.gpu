@@ -34,6 +34,9 @@ const AGGREGATORS = {
   //'label': () => () => {},
 } as Record<string, LayerAggregator>;
 
+const ORDER = {};
+['face', 'line', 'arrow', 'point'].forEach((type, i) => ORDER[type] = i);
+
 /** Aggregate (point / line / face) geometry from children to produce merged layers. */
 export const VirtualLayers: LiveComponent<VirtualLayersProps> = (props: VirtualLayersProps) => {
   const {zBias, items, children} = props;
@@ -65,7 +68,12 @@ const Resume = (
 ) => useOne(() => {
   const els: LiveElement[] = [signal()];
 
-  for (const type in aggregates) {
+  const types = Object.keys(aggregates);
+  types.sort((a, b) => (ORDER[a] || 0) - (ORDER[b] || 0));
+
+  const partitioner = makePartitioner();
+
+  for (const type of types) {
     const items = aggregates[type];
     if (!items.length) continue;
 
@@ -85,20 +93,16 @@ const Resume = (
       continue;
     }
 
-    const partitioner = makePartitioner();
     for (let item of items) if (item) {
-      partitioner.push(item);
+      partitioner.push(item, type);
     }
-    const layers = partitioner.resolve();
-
-    const group = [];
-    for (const layer of layers) {
-      group.push(keyed(Aggregate, layer.key, layerAggregator, layer.items));
-    }
-
-    els.push(fragment(group, type));
   }
 
+  const layers = partitioner.resolve();
+  for (const {key, type, items} of layers) {
+    const layerAggregator = AGGREGATORS[type];
+    els.push(keyed(Aggregate, key, layerAggregator, items));
+  }
   return els;
 }, aggregates);
 
@@ -133,6 +137,7 @@ const getItemTypeKey = (item: LayerAggregate) =>
 
 type Partition = {
   key: number,
+  type: string,
   items: LayerAggregate[],
 };
 
@@ -140,7 +145,7 @@ const makePartitioner = () => {
   const layers: Partition[] = [];
   const map = new Map<number, Partition>();
 
-  const push = (item: LayerAggregate) => {
+  const push = (item: LayerAggregate, type: string) => {
     const {zIndex = 0} = item;
     const key = getItemTypeKey(item);
     const existing = map.get(key);
@@ -148,7 +153,7 @@ const makePartitioner = () => {
       existing.items.push(item);
     }
     else {
-      const partition = {key, zIndex, items: [item]};
+      const partition = {key, type, zIndex, items: [item]};
       map.set(key, partition);
       layers.push(partition);
     }

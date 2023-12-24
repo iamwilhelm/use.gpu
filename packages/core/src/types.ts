@@ -410,16 +410,6 @@ export type PickingUniforms = {
 
 // Data
 
-export type ChunkLayout = {
-  chunks: number[],
-  indexed?: number[],
-  offsets?: number[],
-  loops?: boolean[],
-  starts?: boolean[],
-  ends?: boolean[],
-  count: number,
-};
-
 export type Tuples<N extends number, T = number> = {
   array: T[],
   get: (i: number, j: number) => T,
@@ -492,7 +482,7 @@ export type AggregateValue = number | number[] | TypedArray | VectorEmitter | Ve
 export type AggregateItem = {
   archetype: number,
   count: number,
-  indices?: number,
+  indexed?: number,
   attributes?: Record<string, AggregateValue>,
   flags?: Record<string, any>,
 };

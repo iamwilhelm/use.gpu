@@ -22,18 +22,18 @@ export const useAggregator = (
   items: Record<string, AggregateValue>[],
 ) => {
   const device = useDeviceContext();
-  const {archetype, count, indices} = getAggregateSummary(items);
+  const {archetype, count, indexed, offsets} = getAggregateSummary(items);
 
   const allocItems = useBufferedSize(items.length);
   const allocVertices = useBufferedSize(count);
-  const allocIndices = useBufferedSize(indices);
+  const allocIndices = useBufferedSize(indexed);
 
   const aggregate = useMemo(() =>
     makeAggregator(schema)(device, items, allocItems, allocVertices, allocIndices),
     [archetype, allocItems, allocVertices, allocIndices]
   );
 
-  return aggregate(items, count, indices);
+  return aggregate(items, count, indexed, offsets);
 };
 
 export const makeAggregator = (
@@ -68,12 +68,12 @@ export const makeAggregator = (
     updateAggregateFromSchemaRefs(device, schema, aggregate, itemCount);
   } : null;
 
-  return (items: ArrowAggregate[], count: number, indices: number) => {
+  return (items: ArrowAggregate[], count: number, indexed: number, offsets: number[]) => {
     const [item] = items;
     itemCount = items.length;
 
-    updateAggregateFromSchema(device, schema, aggregate, items, count, indices);
+    updateAggregateFromSchema(device, schema, aggregate, items, count, indexed, offsets);
 
-    return {count, sources, item, uploadRefs};
+    return {count: indexed, sources, item, uploadRefs};
   };
 };

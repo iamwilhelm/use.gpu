@@ -50,18 +50,15 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
       lookups,
 
       count,
-      sparse,
+      indexed,
       chunks,
-      loop,
-      loops,
-      start,
-      starts,
-      end,
-      ends,
+      groups,
+      concave,
 
       segments,
+      indices,
       slices,
-      unwelds,
+
       ...flags
   } = parsed;
 
@@ -84,6 +81,7 @@ export const Face: LiveComponent<FaceProps> = memo((props) => {
   const shapes = {
     face: {
       count,
+      indexed,
       archetype,
       attributes,
       flags,

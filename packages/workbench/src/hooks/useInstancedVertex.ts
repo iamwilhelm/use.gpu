@@ -17,6 +17,7 @@ export const useInstancedVertex = (
   instance?: Lazy<number>,
   instances?: ShaderSource,
   elementCount?: Lazy<number>,
+  instanceStride?: number,
 ): [ShaderSource, Lazy<number>, Record<string, boolean>] => {
 
   if (!(instance != null || instances)) {
@@ -32,7 +33,7 @@ export const useInstancedVertex = (
       ? getShader(getInstancedIndex, [instanceSize])
       : null;
 
-    const boundInstance = getShader(getInstancedVertex, [getVertex, instances, mappedIndex]);
+    const boundInstance = getShader(getInstancedVertex, [getVertex, instances, mappedIndex], {INSTANCE_STRIDE: instanceStride ?? 1});
 
     const totalCount = () => {
       const l = resolve(elementCount) || 0;

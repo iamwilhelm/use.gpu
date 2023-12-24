@@ -1,8 +1,8 @@
 import type { LiveComponent, LiveElement } from '@use-gpu/live';
 import type { StorageSource } from '@use-gpu/core';
 
-import { memo, yeet, useOne } from '@use-gpu/live';
-import { generateChunkFaces2, alignSizeTo2 } from '@use-gpu/core';
+import { memo, yeet, useMemo, useNoMemo, useOne, useNoOne } from '@use-gpu/live';
+import { generateChunkFaces2, generateConcaveIndices2, alignSizeTo2 } from '@use-gpu/core';
 import { useRawSource } from '../hooks/useRawSource';
 
 export type FaceSegmentsProps = {
@@ -39,6 +39,8 @@ export const useFaceSegments = (
   }, chunks);
 };
 
+export const useNoFaceSegments = useNoOne;
+
 export const useFaceSegmentsSource = (
   chunks: number[] | TypedArray,
 ) => {
@@ -49,3 +51,24 @@ export const useFaceSegmentsSource = (
 
   return {count, segments};
 };
+
+export const useConcaveFaceSegments = (
+  positions: TypedArray,
+  chunks: number[] | TypedArray,
+  groups: number[] | TypedArray,
+) => {
+  return useMemo(() => {
+    const count = (
+      chunks.reduce((a, b, i) => a + b, 0)
+    );
+
+    const indices = new Uint32Array(count * 3);
+    const slices = new Uint16Array(alignSizeTo2(groups.length, 2));
+
+    const indexed = generateConcaveIndices2(indices, slices, chunks, groups, positions);
+
+    return {count, indexed, indices, slices};
+  }, [positions, chunks, groups]);
+};
+
+export const useNoConcaveFaceSegments = () => useNoMemo();

@@ -3,6 +3,8 @@ import { UNIFORM_ARRAY_TYPES, UNIFORM_ARRAY_DIMS, UNIFORM_ATTRIBUTE_ALIGNS } fro
 
 import { isTypedArray } from './buffer';
 import { seq } from './tuple';
+import { vec3 } from 'gl-matrix';
+import earcut from 'earcut';
 
 type NumberArray = VectorLike;
 type NumberMapper = (x: number) => number;
@@ -155,7 +157,7 @@ export const makeCopyPipe = ({
   else {
     const n = count != null ? count * dims : from.length;
     for (let i = 0; i < n; ++i) {
-      to[o] = from[s + i];
+      to[o] = map(from[s + i]);
       o++;
     }
   }
@@ -521,7 +523,7 @@ export const generateChunkSegments2 = (
 export const generateChunkAnchors2 = (
   anchors: NumberArray,
   trims: NumberArray,
-  chunks: number[],
+  chunks: TypedArray | number[],
   loops: boolean[] | boolean = false,
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
@@ -576,7 +578,7 @@ export const generateChunkAnchors2 = (
 export const generateChunkFaces2 = (
   to: NumberArray,
   slices: NumberArray | null | undefined,
-  chunks: number[],
+  chunks: TypedArray | number[],
 ) => {
   let pos = 0;
   let n = chunks.length;
@@ -595,4 +597,87 @@ export const generateChunkFaces2 = (
   }
 
   while (pos < to.length) to[pos++] = 0;
+}
+
+export const generateConcaveIndices2 = (
+  to: NumberArray,
+  slices: NumberArray | null | undefined,
+  chunks: TypedArray | number[],
+  groups: TypedArray | number[],
+  positions: TypedArray,
+) => {
+  let g = groups.length;
+
+  // Convert XYZ to dominant 2D plane
+  const scratch = [];
+
+  const p1 = vec3.fromValues(positions[0], positions[1], positions[2]);
+  const p2 = vec3.fromValues(positions[4], positions[5], positions[6]);
+  const p3 = vec3.fromValues(positions[8], positions[9], positions[10]);
+  
+  vec3.sub(p1, p2, p1);
+  vec3.sub(p2, p3, p1);
+  vec3.cross(p3, p1, p2);
+
+  const nx = Math.abs(p3[0]);
+  const ny = Math.abs(p3[1]);
+  const nz = Math.abs(p3[2]);
+
+  const max = Math.max(nx, ny, nz);
+  const holes: number[] = [];
+
+  let baseChunk = 0;
+  let baseVertex = 0;
+  let baseIndex = 0;
+  for (let i = 0; i < g; ++i) {
+    let n = 0;
+    for (let j = 0; j < groups[i]; ++j) {
+      n += chunks[baseChunk + j];
+      holes.push(n);
+    }
+    holes.pop();
+
+    let o = 0;
+    if (max === nz) {
+      const n4 = n * 4;
+      for (let i = 0; i < n4; i += 4) {
+        let f = baseVertex + i;
+        scratch[o]     = positions[f];
+        scratch[o + 1] = positions[f + 1];
+        o += 2;
+      }
+    }
+    else if (max === ny) {
+      const n4 = n * 4;
+      for (let i = 0; i < n4; i += 4) {
+        let f = baseVertex + i;
+        scratch[o]     = positions[f + 2];
+        scratch[o + 1] = positions[f];
+        o += 2;
+      }
+    }
+    else {
+      const n4 = n * 4;
+      for (let i = 0; i < n4; i += 4) {
+        let f = baseVertex + i;
+        scratch[o]     = positions[f + 1];
+        scratch[o + 1] = positions[f + 2];
+        o += 2;
+      }
+    }
+
+    const indices = earcut(scratch, holes);
+    offsetNumberArray2(indices, to, baseVertex, 1, 0, baseIndex, indices.length);
+
+    scratch.length = 0;
+    holes.length = 0;
+
+    slices[i] = n;
+
+    baseChunk += groups[i];
+    baseVertex += n;
+    baseIndex += indices.length;
+  }
+
+  return baseIndex;
 }

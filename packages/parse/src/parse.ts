@@ -5,7 +5,7 @@ import type {
 import type { Parser, Join, Placement, PointShape, Domain } from './types';
 import { seq } from '@use-gpu/core';
 import { mat4, vec4, vec3, vec2, quat } from 'gl-matrix';
-import { toScalarArray, toVectorArray, toMultiVectorArray, toMultiScalarArray, toCompositeChunks } from './flatten';
+import { toScalarArray, toVectorArray, toMultiVectorArray, toMultiScalarArray, toMultiMultiVectorArray, toCompositeChunks, toMultiCompositeChunks } from './flatten';
 
 const NO_VEC2 = vec2.fromValues(0, 0);
 const NO_VEC3 = vec3.fromValues(0, 0, 0);
@@ -152,6 +152,16 @@ export const makeParseMultiVectorArray = <T extends TypedArrayConstructor>(
   vecs: VectorLikes
 ): InstanceType<T> => {
   return toMultiVectorArray(vecs, dims, w, constructor) as T;
+};
+
+export const makeParseMultiMultiVectorArray = <T extends TypedArrayConstructor>(
+  dims: number,
+  w: number = 0,
+  constructor: T,
+) => (
+  vecs: VectorLikes
+): InstanceType<T> => {
+  return toMultiMultiVectorArray(vecs, dims, w, constructor) as T;
 };
 
 export const makeParseBasis = (defaults: string) => {
@@ -321,7 +331,7 @@ export const parseIntegerArray    = makeParseScalarArray(Int32Array);
 
 export const parseScalarArray     = makeParseScalarArray(Float32Array)
 export const parseScalarArrayLike = makeParseScalarArrayLike(Float32Array);
-export const parseScalarMultiArray = makeParseMultiScalarArray(Float32Array);
+export const parseMultiScalarArray = makeParseMultiScalarArray(Float32Array);
 
 export const parseVec2Array = makeParseVectorArray(2, 0, Float32Array);
 export const parseVec3Array = makeParseVectorArray(3, 0, Float32Array);
@@ -330,6 +340,7 @@ export const parseVec4Array = makeParseVectorArray(4, 0, Float32Array);
 export const parseVec4MultiArray = makeParseVectorArray(4, 0, Float32Array);
 
 export const parseChunks = toCompositeChunks;
+export const parseMultiChunks = toMultiCompositeChunks;
 
 //////////////////
 
@@ -339,6 +350,7 @@ export const parseMatrix     = makeParseMat4();
 
 export const parsePositionArray = makeParseVectorArray(4, 1, Float32Array);
 export const parsePositionMultiArray = makeParseMultiVectorArray(4, 1, Float32Array);
+export const parsePositionMultiMultiArray = makeParseMultiMultiVectorArray(4, 1, Float32Array);
 
 export const parseSide       = makeParseEnum<Side>(['front', 'back', 'both']);
 

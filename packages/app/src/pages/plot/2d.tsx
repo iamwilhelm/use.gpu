@@ -43,6 +43,12 @@ export const Plot2DPage: LC = () => {
               color={'#3090ff'}
             />
 
+            <Point
+              positions={[[50, 250], [50, 280]]}
+              size={10}
+              color={'#30ff90'}
+            />
+
             <Line
               position={[[100, 50], [150, 150]]}
               width={5}
@@ -185,6 +191,7 @@ export const Plot2DPage: LC = () => {
               <Face
                 position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
                 color={"#823456"}
+                concave
               />
               <Line
                 position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
@@ -193,6 +200,41 @@ export const Plot2DPage: LC = () => {
                 zIndex={2}
                 loop
               />
+              <Transform position={[0, 120]}>
+                <Face
+                  position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
+                  color={"#348256"}
+                  concave
+                />
+                <Line
+                  position={[[0, 0], [150, 0], [100, 50], [150, 100], [0, 100], [50, 50]]}
+                  color={"#ffffff"}
+                  width={2}
+                  zIndex={2}
+                  loop
+                />
+              </Transform>
+
+              <Transform position={[0, 240]}>
+                <Face
+                  positions={[[
+                    [[0, 0], [150, 0], [150, 150], [0, 150]],
+                    [[75, 45], [105, 75], [75, 105], [45, 75]],
+                  ]]}
+                  color={"#348256"}
+                  concave
+                />
+                <Line
+                  positions={[
+                    [[0, 0], [150, 0], [150, 150], [0, 150]],
+                    [[75, 45], [105, 75], [75, 105], [45, 75]],
+                  ]}
+                  color={"#ffffff"}
+                  width={2}
+                  zIndex={2}
+                  loop
+                />
+              </Transform>
             </Transform>
 
             <Cartesian

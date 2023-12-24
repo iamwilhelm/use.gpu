@@ -10,6 +10,7 @@ import {
   makeDataArray2,
   copyNumberArray2,
   fillNumberArray2,
+  offsetNumberArray2,
   unweldNumberArray2,
   expandNumberArray2,
 } from './data2';
@@ -93,31 +94,32 @@ export const updateAggregateBuffer = (
   device: GPUDevice,
   aggregate: AggregateBuffer | VirtualAggregateBuffer,
   items: AggregateItem[],
-  count: number,
   limit: number | null,
   key: string | undefined,
   keys: string,
+  unwelded?: boolean,
+  offsets?: number[],
 ) => {
   const {buffer, array, source, dims, base, stride} = aggregate;
   const step = stride || dims;
 
+  let i = 0;
   let b = base || 0;
   for (const item of items) {
     const {
       count,
+      indexed,
       attributes: {
         [key as any]: single,
         [keys]: multiple,
       },
     } = item;
 
-    //if (stride > 1) debugger;
-    //if (key === 'color' && 'width' in item.attributes) debugger;
-    
-    const c = limit ?? count;
+    const c = limit ?? (unwelded ? indexed ?? count : count);
 
     if (multiple != null) {
       if (typeof multiple === 'function') multiple(array, b, c, stride);
+      else if (offsets && offsets !== true) offsetNumberArray2(multiple, array, offsets[i], dims, 0, b, c, stride);
       else copyNumberArray2(multiple, array, dims, 0, b, c, stride);
     }
     else if (single != null) {
@@ -126,9 +128,10 @@ export const updateAggregateBuffer = (
     }
 
     b += c * step;
+    i++;
   }
 
-  if (buffer) uploadSource(device, source, array.buffer, count);
+  if (buffer) uploadSource(device, source, array.buffer, b);
 }
 
 export const updateAggregateInstances = (
@@ -138,7 +141,7 @@ export const updateAggregateInstances = (
   count: number,
 ) => {
   const {array, source, layout} = aggregate;
-  const slices = items.map(item => item.count);
+  const slices = items.map(({indexed, count}) => indexed ?? count);
   expandNumberArray2(null, array, slices);
   uploadSource(device, source, array.buffer, count);
   return source;
@@ -172,44 +175,20 @@ export const updateAggregateRefs = (
   if (buffer) uploadSource(device, source, array.buffer, count);
 }
 
-export const updateAggregateIndex = (
-  device: GPUDevice,
-  aggregate: AggregateBuffer,
-  items: AggregateItem[],
-  count: number,
-  offsets: number[],
-  key: string,
-  keys: string,
-) => {
-  const {buffer, array, source, dims} = aggregate;
-
-  let pos = 0, i = 0;
-  for (const item of items) {
-    const {attributes: {[key]: single, [keys]: multiple}} = item as any;
-    const count = multiple?.length ?? 1;
-
-    //if (multiple) copyNumberArrayCompositeRange(multiple, array, 0, pos, dims, count, false, offsets[i]);
-    //else if (single) copyNumberArrayRepeatedRange(single, array, 0, pos, dims, count, false, offsets[i]);
-
-    pos += count * dims;
-    i++;
-  }
-
-  if (buffer) uploadSource(device, source, array.buffer, count);
-}
-
 export const getAggregateSummary = (items: AggregateItem[]) => {
   const n = items.length;
   const archetype = items[0]?.archetype ?? 0;
 
+  let offsets = [];
   let allCount = 0;
-  let allIndices = 0;
+  let allIndexed = 0;
   for (let i = 0; i < n; ++i) {
-    const {count, indices = count} = items[i];
+    const {count, indexed} = items[i];
+    if (indexed != null) offsets.push(allCount);
     allCount += count;
-    allIndices += indices;
+    allIndexed += indexed ?? count;
   }
   
-  return {archetype, count: allCount, indices: allIndices};
+  return {archetype, count: allCount, indexed: allIndexed, offsets};
 }
 

@@ -196,9 +196,9 @@ export const makeResolveBindings = (
         allVirtuals.set(key, m.virtual);
 
         // Mutate virtual modules as they are ephemeral
-        const namespace = `${PREFIX_VIRTUAL}${++index}_`;
+        const namespace = uniforms.length ? `${PREFIX_VIRTUAL}${++index}_` : undefined;
         if (!lazy) {
-          m.virtual.namespace = namespace;
+          if (uniforms.length) m.virtual.namespace = namespace;
           m.virtual.bindingBase = bindingBase;
           m.virtual.volatileBase = volatileBase;
         }

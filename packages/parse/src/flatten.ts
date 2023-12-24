@@ -4,19 +4,19 @@ import { isTypedArray, copyNumberArray2, copyNestedNumberArray2 } from '@use-gpu
 const NO_CHUNKS = new Uint16Array(0);
 
 const maybeTypedArray = (
-  x: VectorLike | VectorLikes | VectorLikes[]
-) => isTypedArray(x) ? x : null;
+  xs: VectorLike | VectorLikes | VectorLikes[]
+) => isTypedArray(xs) ? xs : null;
 
 const maybeEmptyArray = <T extends TypedArrayConstructor>(
-  x: VectorLike | VectorLikes | VectorLikes[],
+  xs: VectorLike | VectorLikes | VectorLikes[],
   constructor: T,
-) => !x.length ? new constructor(0) : null;
+) => !xs.length ? new constructor(0) : null;
 
 // Array of scalars
 const maybeScalarArray = <T extends TypedArrayConstructor>(
   xs: VectorLike | VectorLikes | VectorLikes[],
   constructor: T,
-) => typeof xs[0] === 'number' ? new constructor(x) : null
+) => typeof xs[0] === 'number' ? new constructor(xs) : null
 
 // Array of vectors
 const maybeVectorArray = <T extends TypedArrayConstructor>(

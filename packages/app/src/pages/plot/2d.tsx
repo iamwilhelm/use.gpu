@@ -9,7 +9,7 @@ import {
   Animate,
 } from '@use-gpu/workbench';
 import {
-  Plot, Cartesian, Axis, Grid, Point, Line, Arrow, Face, Transform,
+  Plot, Layer, Cartesian, Axis, Grid, Point, Line, Arrow, Face, Transform,
 } from '@use-gpu/plot';
 import { vec3 } from 'gl-matrix';
 
@@ -153,13 +153,15 @@ export const Plot2DPage: LC = () => {
               </Animate>
             </Transform>
 
-            <Arrow
-              position={[[100, 200], [250, 300]]}
-              width={10}
-              color={"#3090ff"}
-              end
-              flat
-            />
+            <Transform>
+              <Arrow
+                position={[[100, 200], [250, 300]]}
+                width={10}
+                color={"#3090ff"}
+                end
+                flat
+              />
+            </Transform>
 
             <Transform position={[100, 350]} rotation={-20}>
               <Arrow
@@ -235,6 +237,14 @@ export const Plot2DPage: LC = () => {
                   loop
                 />
               </Transform>
+            </Transform>
+
+            <Transform position={[0, 240]}>
+              <Line
+                position={[0, 0], [100, 0]}
+                width={10}
+                color={'#ffffff'}
+              />
             </Transform>
 
             <Cartesian

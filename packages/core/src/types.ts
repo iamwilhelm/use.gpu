@@ -450,17 +450,19 @@ export type Time = {
 export type AccessorSpec = string | Accessor | TypedArray | number[];
 export type AccessorType = 'index' | 'unwelded';
 
-export type AccessorSchema = Record<string, string | AccessorField>;
-export type AccessorField = {
+export type DataSchema = Record<string, DataField>;
+export type DataField = {
   format: string,
-  accessor?: AccessorSpec,
-  type?: AccessorType,
+  accessor: AccessorSpec,
+  ref?: boolean,
+  index?: boolean,
+  unwelded?: boolean,
 };
 
 export type ArchetypeSchema = Record<string, ArchetypeField>;
 export type ArchetypeField = {
   format: string,
-  single?: string,
+  single?: string | boolean,
   composite?: boolean,
   ref?: boolean,
   index?: boolean,
@@ -487,7 +489,6 @@ export type AggregateItem = {
   flags?: Record<string, any>,
 };
 
-export type DataField = [string, AccessorSpec] | [string, AccessorSpec, AccessorType];
 export type DataBinding<T = any, S = any> = {
   uniform: UniformAttribute,
   storage?: StorageSource,

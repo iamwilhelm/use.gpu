@@ -22,6 +22,23 @@ export const getAggregateArchetype = (
   unwelded?: Record<string, boolean>,
 ) => mixBits53(toMurmur53(formats), toMurmur53(unwelded));
 
+export const getAggregateSummary = (items: AggregateItem[]) => {
+  const n = items.length;
+  const archetype = items[0]?.archetype ?? 0;
+
+  let offsets = [];
+  let allCount = 0;
+  let allIndexed = 0;
+  for (let i = 0; i < n; ++i) {
+    const {count, indexed} = items[i];
+    if (indexed != null) offsets.push(allCount);
+    allCount += count;
+    allIndexed += indexed ?? count;
+  }
+  
+  return {archetype, count: allCount, indexed: allIndexed, offsets};
+};
+
 export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number): AggregateBuffer => {
   const {array, dims} = makeDataArray2(format, length);
 
@@ -78,18 +95,6 @@ export const makeMultiAggregateFields = (aggregateBuffer: AggregateBuffer) => {
   return out;
 };
 
-export const uploadSource = (
-  device: GPUDevice,
-  source: StorageStorage,
-  arrayBuffer: ArrayBuffer,
-  count: number,
-) => {
-  uploadBuffer(device, source.buffer, arrayBuffer);
-  source.length = count;
-  source.size = [count];
-  source.version = incrementVersion(source.version);
-};
-
 export const updateAggregateBuffer = (
   device: GPUDevice,
   aggregate: AggregateBuffer | VirtualAggregateBuffer,
@@ -131,7 +136,7 @@ export const updateAggregateBuffer = (
     i++;
   }
 
-  if (buffer) uploadSource(device, source, array.buffer, b);
+  if (buffer) uploadStorage(device, source, array.buffer, b);
 }
 
 export const updateAggregateInstances = (
@@ -143,7 +148,7 @@ export const updateAggregateInstances = (
   const {array, source, layout} = aggregate;
   const slices = items.map(({indexed, count}) => indexed ?? count);
   expandNumberArray2(null, array, slices);
-  uploadSource(device, source, array.buffer, count);
+  uploadStorage(device, source, array.buffer, count);
   return source;
 }
 
@@ -153,7 +158,7 @@ export const updateMultiAggregateBuffer = (
   count: number,
 ) => {
   const {buffer, raw, source, layout} = aggregate;
-  uploadSource(device, source, raw, count);
+  uploadStorage(device, source, raw, count);
   return source;
 }
 
@@ -172,23 +177,17 @@ export const updateAggregateRefs = (
     b += step;
   }
 
-  if (buffer) uploadSource(device, source, array.buffer, count);
+  if (buffer) uploadStorage(device, source, array.buffer, count);
 }
 
-export const getAggregateSummary = (items: AggregateItem[]) => {
-  const n = items.length;
-  const archetype = items[0]?.archetype ?? 0;
-
-  let offsets = [];
-  let allCount = 0;
-  let allIndexed = 0;
-  for (let i = 0; i < n; ++i) {
-    const {count, indexed} = items[i];
-    if (indexed != null) offsets.push(allCount);
-    allCount += count;
-    allIndexed += indexed ?? count;
-  }
-  
-  return {archetype, count: allCount, indexed: allIndexed, offsets};
-}
-
+export const uploadStorage = (
+  device: GPUDevice,
+  source: StorageStorage,
+  arrayBuffer: ArrayBuffer,
+  count: number,
+) => {
+  uploadBuffer(device, source.buffer, arrayBuffer);
+  source.length = count;
+  source.size = [count];
+  source.version = incrementVersion(source.version);
+};

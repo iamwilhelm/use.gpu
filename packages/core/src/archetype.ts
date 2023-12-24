@@ -10,7 +10,7 @@ import {
   updateAggregateRefs,
   updateAggregateIndex,
   updateAggregateInstances,
-  uploadSource,
+  uploadStorage,
 } from './aggregate';
 import {
   getUniformDims2,
@@ -135,17 +135,17 @@ export const schemaToEmitters = (
 
       if (composite) {
         // Unweld welded attribute
-        if (unwelds) {
-          attributes[single] = makeUnweldEmitter2(value, unwelds, dims);
+        if (!(unwelded || index) && unwelds) {
+          attributes[key] = makeUnweldEmitter2(value, unwelds, dims);
         }
         // Direct attribute
         else {
-          attributes[single] = makeCopyEmitter2(value, dims);
+          attributes[key] = value;
         }
       }
       // Single per slice
       else if (value.length > dims) {
-        attributes[single] = makeExpandEmitter2(value, slices, dims);
+        attributes[key] = makeExpandEmitter2(value, slices, dims);
       }
       // Single per item
       else {
@@ -159,8 +159,8 @@ export const schemaToEmitters = (
 export const schemaToAggregate = (
   device: GPUDevice,
   schema: ArchetypeSchema,
-  props: Record<string, any>,
-  refs?: Record<string, RefObject<any>>,
+  attributes: Record<string, TypedArray | VectorEmitter>,
+  refs?: Record<string, RefObject<TypedArray | number>>,
   allocItems: number = 0,
   allocVertices: number = 0,
   allocIndices: number = 0,
@@ -178,8 +178,8 @@ export const schemaToAggregate = (
   for (const key in schema) {
     const {format, unwelded, index, single, composite, ref} = schema[key];
   
-    const hasSingle = single && props[single] != null;
-    const hasValues = props[key] != null;
+    const hasValues = attributes[key] != null;
+    const hasSingle = single && attributes[single] != null;
     const hasRef = ref && refs && single && refs[single] != null;
 
     if (hasValues || hasSingle || hasRef) {
@@ -191,12 +191,8 @@ export const schemaToAggregate = (
       );
       const attr = [key, alloc];
 
-      let uniform = false;
       if (hasRef) {
         refBuffers[key] = [];
-      }
-      else if (hasSingle && !composite) {
-        uniform = typeof props[single] !== 'function';
       }
 
       // Separate emulated types like u8/u16
@@ -206,10 +202,10 @@ export const schemaToAggregate = (
       if (separate) bySelf.push([key, alloc]);
       else {
         const list = (
-          // Uniform per item
-          uniform ? byItem :
           // Uniform with lazy ref
-          ref   ? byRef :
+          hasRef ? byRef :
+          // Uniform per item
+          hasSingle ? byItem :
           // Per index
           index ? byIndex :
           // Per unwelded vertex

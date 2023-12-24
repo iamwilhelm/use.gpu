@@ -12,7 +12,7 @@ import {
   fillNumberArray2,
   offsetNumberArray2,
   unweldNumberArray2,
-  expandNumberArray2,
+  spreadNumberArray2,
 } from './data2';
 import { makeUniformLayout } from './uniform';
 import { toMurmur53, mixBits53 } from '@use-gpu/state';
@@ -39,7 +39,11 @@ export const getAggregateSummary = (items: AggregateItem[]) => {
   return {archetype, count: allCount, indexed: allIndexed, offsets};
 };
 
-export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, length: number): AggregateBuffer => {
+export const makeAggregateBuffer = (
+  device: GPUDevice,
+  format: UniformType,
+  length: number,
+): AggregateBuffer => {
   const {array, dims} = makeDataArray2(format, length);
 
   const buffer = makeStorageBuffer(device, array.byteLength);
@@ -54,7 +58,12 @@ export const makeAggregateBuffer = (device: GPUDevice, format: UniformType, leng
   return {buffer, array, source, dims};
 }
 
-export const makeMultiAggregateBuffer = (device: GPUDevice, uniforms: UniformAttribute[], length: number): MultiAggregateBuffer => {
+export const makeMultiAggregateBuffer = (
+  device: GPUDevice,
+  uniforms: UniformAttribute[],
+  length: number,
+  keys?: string[],
+): MultiAggregateBuffer => {
   const layout = makeUniformLayout(uniforms);
 
   const {length: bytes} = layout;
@@ -69,7 +78,9 @@ export const makeMultiAggregateBuffer = (device: GPUDevice, uniforms: UniformAtt
     version: 0,
   };
 
-  return {buffer, raw, source, layout};
+  keys = keys ?? layout.attributes.map(({name}) => name);
+
+  return {buffer, raw, source, layout, keys};
 }
 
 export const makeMultiAggregateFields = (aggregateBuffer: AggregateBuffer) => {
@@ -100,8 +111,7 @@ export const updateAggregateBuffer = (
   aggregate: AggregateBuffer | VirtualAggregateBuffer,
   items: AggregateItem[],
   limit: number | null,
-  key: string | undefined,
-  keys: string,
+  key: string,
   unwelded?: boolean,
   offsets?: number[],
 ) => {
@@ -115,22 +125,16 @@ export const updateAggregateBuffer = (
       count,
       indexed,
       attributes: {
-        [key as any]: single,
-        [keys]: multiple,
+        [key]: values,
       },
     } = item;
 
     const c = limit ?? (unwelded ? indexed ?? count : count);
 
-    if (multiple != null) {
-      if (typeof multiple === 'function') multiple(array, b, c, stride);
-      else if (offsets && offsets !== true) offsetNumberArray2(multiple, array, offsets[i], dims, 0, b, c, stride);
-      else copyNumberArray2(multiple, array, dims, 0, b, c, stride);
-    }
-    else if (single != null) {
-      if (typeof single === 'function') single(array, b, c, stride);
-      else fillNumberArray2(single, array, dims, 0, b, c, stride);
-    }
+    if (typeof values === 'function') values(array, b, c, stride);
+    else if (offsets && offsets !== true) offsetNumberArray2(values, array, offsets[i], dims, 0, b, c, stride);
+    else if (!limit) copyNumberArray2(values, array, dims, 0, b, c, stride);
+    else fillNumberArray2(values, array, dims, 0, b, c, stride);
 
     b += c * step;
     i++;
@@ -147,7 +151,7 @@ export const updateAggregateInstances = (
 ) => {
   const {array, source, layout} = aggregate;
   const slices = items.map(({indexed, count}) => indexed ?? count);
-  expandNumberArray2(null, array, slices);
+  spreadNumberArray2(null, array, slices);
   uploadStorage(device, source, array.buffer, count);
   return source;
 }

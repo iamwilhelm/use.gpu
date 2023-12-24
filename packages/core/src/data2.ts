@@ -9,12 +9,18 @@ import earcut from 'earcut';
 type NumberArray = VectorLike;
 type NumberMapper = (x: number) => number;
 
+const IDENTITY = (x: number) => x;
+
 export const alignSizeTo2 = (n: number, s: number) => {
   let f = n % s;
   return f === 0 ? n : n + (s - f);
 };
 
 export const getUniformDims2 = (type: UniformType) => UNIFORM_ARRAY_DIMS[type];
+
+export const toArrayElementType2 = (type: string) => type.replace(/^array<(.*)>$/, '$1');
+
+export const isArrayUniform2 = (type: string) => !!type.match(/^array</);
 
 export const makeRawArray2 = (byteSize: number) => new ArrayBuffer(byteSize);
 
@@ -39,13 +45,13 @@ export const castRawArray2 = (buffer: ArrayBuffer | TypedArray, type: UniformTyp
 
 // Copy packed scalar/vec2/vec3/vec4 with vec3to4 extension for WGSL
 export const makeCopyPipe = ({
-  index = (x => x),
-  map = (x => x),
+  index = IDENTITY,
+  map = IDENTITY,
 }: {
   index?: NumberMapper,
   map?: NumberMapper,
 } = {}) => (
-  from: number[] | TypedArray,
+  from: NumberArray | number,
   to: TypedArray,
   dims: number = 1,
   fromIndex: number = 0,
@@ -59,17 +65,27 @@ export const makeCopyPipe = ({
   const dimsIn = Math.round(dims) !== dims ? Math.ceil(dims) * 3 / 4 : dims;
   const dimsOut = Math.ceil(dims);
 
-  const n = count ?? from.length / dimsIn;
+  const n = count ?? (from.length ?? 1) / dimsIn;
   const step = stride || dimsOut;
 
   let f = fromIndex;
   let t = toIndex;
 
-  if (step !== dimsOut || dimsIn !== dimsOut || index || map)  {
+  if (step !== dimsOut || dimsIn !== dimsOut || index != IDENTITY)  {
 
     // repeat n writes of a vec4
     const dims4 = Math.min(Math.ceil(dims), 4);
     const repeat = Math.ceil(dims / 4);
+
+    if (typeof from === 'number') {
+      const skip = repeat * dims4;
+      for (let i = 0; i < n; ++i) {
+        to[t] = from;
+        for (let j = 1; j < skip; ++j) to[t + j] = 0;
+        t += step;
+      }
+      return;
+    }
 
     if (dims4 === 1) {
       for (let i = 0; i < n; ++i) {
@@ -155,10 +171,18 @@ export const makeCopyPipe = ({
     }
   }
   else {
-    const n = count != null ? count * dims : from.length;
+    const n = count != null ? count * dims : (from?.length ?? 1);
+
+    if (typeof from === 'number') {
+      for (let i = 0; i < n; ++i) {
+        to[t] = map(from);
+        t++;
+      }
+    }
+
     for (let i = 0; i < n; ++i) {
-      to[o] = map(from[s + i]);
-      o++;
+      to[t] = map(from[f + i]);
+      t++;
     }
   }
 };
@@ -170,7 +194,7 @@ export const unweldNumberArray2 = (() => {
   const index = (i: number) => arg[i];
   const copyWithIndex = makeCopyPipe({index});
   return (
-    from: number[] | TypedArray,
+    from: NumberArray | number,
     to: TypedArray,
     indices: TypedArray,
     dims: number = 1,
@@ -189,7 +213,7 @@ export const offsetNumberArray2 = (() => {
   const map = (x: number) => x + arg;
   const copyWithOffset = makeCopyPipe({map});
   return (
-    from: number[] | TypedArray,
+    from: NumberArray | number,
     to: TypedArray,
     offset: number = 0,
     dims: number = 1,
@@ -244,8 +268,8 @@ export const fillNumberArray2 = (() => {
   }
 })();
 
-export const expandNumberArray2 = (
-  from: number[] | TypedArray | null,
+export const spreadNumberArray2 = (
+  from: NumberArray | null,
   to: TypedArray,
   slices: TypedArray,
   dims: number = 1,
@@ -383,7 +407,7 @@ export const copyNestedNumberArray2 = (
 };
 
 export const makeCopyEmitter2 = (
-  from: number[] | TypedArray,
+  from: NumberArray,
   dims: number = 1,
   fromIndex: number = 0,
 ) => (
@@ -394,7 +418,7 @@ export const makeCopyEmitter2 = (
 ) => copyNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 
 export const makeRefEmitter2 = (
-  fromRef: Lazy<number | number[] | TypedArray>,
+  fromRef: Lazy<number | NumberArray>,
   dims: number = 1,
   fromIndex: number = 0,
 ) => (
@@ -412,7 +436,7 @@ export const makePartialRefEmitter2 = (
   dims: number = 1,
   fromIndex: number = 0,
 ) => (
-  fromRef: Lazy<number | number[] | TypedArray>,
+  fromRef: Lazy<number | NumberArray>,
   to: TypedArray,
   toIndex: number = 0,
   count?: number,
@@ -423,9 +447,9 @@ export const makePartialRefEmitter2 = (
   else copyNumberArray2(from, to, dims, fromIndex, toIndex, length, stride);
 }
 
-export const makeExpandEmitter2 = (
+export const makeSpreadEmitter2 = (
   from: NumberArray | number,
-  slices: number[] | TypedArray,
+  slices: NumberArray,
   dims: number = 1, 
   fromIndex: number = 0,
 ) => (
@@ -433,7 +457,7 @@ export const makeExpandEmitter2 = (
   toIndex: number = 0,
   count: number = 0,
   stride?: number,
-) => expandNumberArray2(from, to, slices, dims, fromIndex, toIndex, stride);
+) => spreadNumberArray2(from, to, slices, dims, fromIndex, toIndex, stride);
 
 export const makeFillEmitter2 = (
   from: NumberArray | number,
@@ -447,8 +471,8 @@ export const makeFillEmitter2 = (
 ) => fillNumberArray2(from, to, dims, fromIndex, toIndex, count, stride);
 
 export const makeUnweldEmitter2 = (
-  from: number[] | TypedArray,
-  indices: number[] | TypedArray,
+  from: NumberArray,
+  indices: NumberArray,
   dims: number = 1,
   fromIndex: number = 0,
 ) => (
@@ -462,10 +486,10 @@ export const generateChunkSegments2 = (
   to: NumberArray,
   slices: NumberArray | null | undefined,
   unwelds: NumberArray | null | undefined,
-  chunks: TypedArray | number[],
-  loops: TypedArray | boolean[] | boolean = false,
-  starts: TypedArray | boolean[] | boolean = false,
-  ends: TypedArray | boolean[] | boolean = false,
+  chunks: NumberArray,
+  loops: NumberArray | boolean[] | boolean = false,
+  starts: NumberArray | boolean[] | boolean = false,
+  ends: NumberArray | boolean[] | boolean = false,
 ) => {
   let pos = 0;
   let n = chunks.length;
@@ -523,7 +547,7 @@ export const generateChunkSegments2 = (
 export const generateChunkAnchors2 = (
   anchors: NumberArray,
   trims: NumberArray,
-  chunks: TypedArray | number[],
+  chunks: NumberArray,
   loops: boolean[] | boolean = false,
   starts: boolean[] | boolean = false,
   ends: boolean[] | boolean = false,
@@ -578,7 +602,7 @@ export const generateChunkAnchors2 = (
 export const generateChunkFaces2 = (
   to: NumberArray,
   slices: NumberArray | null | undefined,
-  chunks: TypedArray | number[],
+  chunks: NumberArray,
 ) => {
   let pos = 0;
   let n = chunks.length;
@@ -602,9 +626,9 @@ export const generateChunkFaces2 = (
 export const generateConcaveIndices2 = (
   to: NumberArray,
   slices: NumberArray | null | undefined,
-  chunks: TypedArray | number[],
-  groups: TypedArray | number[],
-  positions: TypedArray,
+  chunks: NumberArray,
+  groups: NumberArray,
+  positions: NumberArray,
 ) => {
   let g = groups.length;
 

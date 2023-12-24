@@ -48,7 +48,7 @@ export const Plot2DPage: LC = () => {
               size={10}
               color={'#30ff90'}
             />
-
+            
             <Line
               position={[[100, 50], [150, 150]]}
               width={5}

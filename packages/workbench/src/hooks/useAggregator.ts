@@ -59,7 +59,7 @@ export const makeAggregator = (
     ...combineInstances(refSources, itemSources),
     ...(byVertices ? getStructAggregate(byVertices) : undefined),
     ...(byIndices  ? getStructAggregate(byIndices)  : undefined),
-    ...bySelfs,
+    ...bySelfs.sources,
   };
 
   let itemCount = initialItems;

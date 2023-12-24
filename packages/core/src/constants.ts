@@ -1,4 +1,4 @@
-import type {TypedArrayConstructor, UniformType} from './types';
+import type { TypedArrayConstructor, UniformType } from './types';
 
 export const TYPED_ARRAYS: TypedArrayConstructor[] = [
   Int8Array, Uint8Array,
@@ -74,7 +74,12 @@ export const VERTEX_TO_UNIFORM = {
   "sint32x4": "vec4<i32>",
 };
 
-export const UNIFORM_ATTRIBUTE_SIZES: {[t in UniformType]: number} = {
+const arrayify = <A, B>(sizes: Record<A, B>): Record<A, B> => {
+  for (const k of Object.keys(sizes)) (sizes as any)[`array<${k}>` as any] = sizes[k];
+  return sizes;
+};
+
+export const UNIFORM_ATTRIBUTE_SIZES = arrayify({
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3,
@@ -183,9 +188,9 @@ export const UNIFORM_ATTRIBUTE_SIZES: {[t in UniformType]: number} = {
   "vec3to4<u32>": 12,
   "vec3to4<i32>": 12,
   "vec3to4<f32>": 12,
-};
+} as Record<UniformType, number>);
 
-export const UNIFORM_ATTRIBUTE_ALIGNS: {[t in UniformType]: number} = {
+export const UNIFORM_ATTRIBUTE_ALIGNS = arrayify({
   ...UNIFORM_ATTRIBUTE_SIZES,
 
   "bool":         0, // Not host-shareable
@@ -280,9 +285,9 @@ export const UNIFORM_ATTRIBUTE_ALIGNS: {[t in UniformType]: number} = {
   "vec3to4<u32>": 0,
   "vec3to4<i32>": 0,
   "vec3to4<f32>": 0,
-};
+} as Record<UniformType, number>);
 
-export const UNIFORM_ARRAY_DIMS = {
+export const UNIFORM_ARRAY_DIMS = arrayify({
   "bool":         1,
   "vec2<bool>":   2,
   "vec3<bool>":   3.5,
@@ -391,9 +396,9 @@ export const UNIFORM_ARRAY_DIMS = {
   "vec3to4<u32>": 3,
   "vec3to4<i32>": 3,
   "vec3to4<f32>": 3,
-};
+} as Record<UniformType, number>);
 
-export const UNIFORM_ARRAY_TYPES = {
+export const UNIFORM_ARRAY_TYPES = arrayify({
   "bool":         Uint32Array,
   "vec2<bool>":   Uint32Array,
   "vec3<bool>":   Uint32Array,
@@ -502,7 +507,7 @@ export const UNIFORM_ARRAY_TYPES = {
   "vec3to4<u32>": Uint32Array,
   "vec3to4<i32>": Int32Array,
   "vec3to4<f32>": Float32Array,
-};
+} as Record<UniformType, TypedArrayConstructor>);
 
 export const TEXTURE_FORMAT_SIZES = {
   // 8-bit formats

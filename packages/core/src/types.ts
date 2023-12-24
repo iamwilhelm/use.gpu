@@ -76,116 +76,6 @@ export type OffscreenTarget = UseGPURenderContext & {
   source: TextureTarget,
 };
 
-export type UniformType =
-  | "bool"
-  | "vec2<bool>"
-  | "vec3<bool>"
-  | "vec4<bool>"
-
-  | "u32"
-  | "vec2<u32>"
-  | "vec3<u32>"
-  | "vec4<u32>"
-
-  | "i32"
-  | "vec2<i32>"
-  | "vec3<i32>"
-  | "vec4<i32>"
-
-  | "f16"
-  | "vec2<f16>"
-  | "vec3<f16>"
-  | "vec4<f16>"
-
-  | "f32"
-  | "vec2<f32>"
-  | "vec3<f32>"
-  | "vec4<f32>"
-
-  | "f64"
-  | "vec2<f64>"
-  | "vec3<f64>"
-  | "vec4<f64>"
-
-  | "mat2x2<u32>"
-  | "mat3x2<u32>"
-  | "mat2x3<u32>"
-  | "mat2x4<u32>"
-  | "mat4x2<u32>"
-  | "mat3x3<u32>"
-  | "mat3x4<u32>"
-  | "mat4x3<u32>"
-  | "mat4x4<u32>"
-
-  | "mat2x2<i32>"
-  | "mat3x2<i32>"
-  | "mat2x3<i32>"
-  | "mat2x4<i32>"
-  | "mat4x2<i32>"
-  | "mat3x3<i32>"
-  | "mat3x4<i32>"
-  | "mat4x3<i32>"
-  | "mat4x4<i32>"
-
-  | "mat2x2<f16>"
-  | "mat3x2<f16>"
-  | "mat2x3<f16>"
-  | "mat2x4<f16>"
-  | "mat4x2<f16>"
-  | "mat3x3<f16>"
-  | "mat3x4<f16>"
-  | "mat4x3<f16>"
-  | "mat4x4<f16>"
-
-  | "mat2x2<f32>"
-  | "mat3x2<f32>"
-  | "mat2x3<f32>"
-  | "mat2x4<f32>"
-  | "mat4x2<f32>"
-  | "mat3x3<f32>"
-  | "mat3x4<f32>"
-  | "mat4x3<f32>"
-  | "mat4x4<f32>"
-
-  | "mat2x2<f64>"
-  | "mat3x2<f64>"
-  | "mat2x3<f64>"
-  | "mat2x4<f64>"
-  | "mat4x2<f64>"
-  | "mat3x3<f64>"
-  | "mat3x4<f64>"
-  | "mat4x3<f64>"
-  | "mat4x4<f64>"
-  
-  | "atomic<u32>"
-  | "atomic<i32>"
-
-  // Virtual types
-  | "u8"
-  | "i8"
-  | "u16"
-  | "i16"
-  | "vec2<u8>"
-  | "vec2<i8>"
-  | "vec2<u16>"
-  | "vec2<i16>"
-  | "vec3<u8>"
-  | "vec3<i8>"
-  | "vec3<u16>"
-  | "vec3<i16>"
-  | "vec4<u8>"
-  | "vec4<i8>"
-  | "vec4<u16>"
-  | "vec4<i16>"
-  | "vec3to4<u8>"
-  | "vec3to4<i8>"
-  | "vec3to4<u16>"
-  | "vec3to4<i16>"
-  | "vec3to4<u32>"
-  | "vec3to4<i32>"
-  | "vec3to4<f32>"
-;
-
 // Simple backing-agnostic mesh geometry
 export type CPUGeometry = {
   archetype?: number,
@@ -454,6 +344,7 @@ export type DataSchema = Record<string, DataField>;
 export type DataField = {
   format: string,
   accessor: AccessorSpec,
+  spread?: string,
   ref?: boolean,
   index?: boolean,
   unwelded?: boolean,
@@ -462,8 +353,8 @@ export type DataField = {
 export type ArchetypeSchema = Record<string, ArchetypeField>;
 export type ArchetypeField = {
   format: string,
-  single?: string | boolean,
-  composite?: boolean,
+  name?: string,
+  spread?: string,
   ref?: boolean,
   index?: boolean,
   unwelded?: boolean,
@@ -471,12 +362,12 @@ export type ArchetypeField = {
 
 export type Aggregate = {
   aggregateBuffers: Record<string, AggregateBuffer | VirtualAggregateBuffer>,
-  refBuffers: Record<string, Lazy<any>[]>,
-  bySelf?: Record<string, StorageSource>,
+  bySelf?: { keys: string[], sources: Record<string, StorageSource> },
   byItems?: MultiAggregateBuffer,
   byVertices?: MultiAggregateBuffer,
   byIndices?: MultiAggregateBuffer,
   byRefs?: MultiAggregateBuffer,
+  refBuffers: Record<string, Lazy<any>[]>,
 };
 
 export type AggregateValue = number | number[] | TypedArray | VectorEmitter | VectorRefEmitter;
@@ -511,6 +402,7 @@ export type MultiAggregateBuffer = {
   raw?: ArrayBuffer,
   source: StorageSource,
   layout: UniformLayout,
+  keys: string[],
 };
 
 export type VirtualAggregateBuffer = {
@@ -532,3 +424,115 @@ export type Atlas = {
 // Passes
 
 export type RenderPassMode = 'opaque' | 'transparent' | 'picking' | 'debug' | 'shadow';
+
+// Uniform types
+
+export type UniformType =
+  | "bool"
+  | "vec2<bool>"
+  | "vec3<bool>"
+  | "vec4<bool>"
+
+  | "u32"
+  | "vec2<u32>"
+  | "vec3<u32>"
+  | "vec4<u32>"
+
+  | "i32"
+  | "vec2<i32>"
+  | "vec3<i32>"
+  | "vec4<i32>"
+
+  | "f16"
+  | "vec2<f16>"
+  | "vec3<f16>"
+  | "vec4<f16>"
+
+  | "f32"
+  | "vec2<f32>"
+  | "vec3<f32>"
+  | "vec4<f32>"
+
+  | "f64"
+  | "vec2<f64>"
+  | "vec3<f64>"
+  | "vec4<f64>"
+
+  | "mat2x2<u32>"
+  | "mat3x2<u32>"
+  | "mat2x3<u32>"
+  | "mat2x4<u32>"
+  | "mat4x2<u32>"
+  | "mat3x3<u32>"
+  | "mat3x4<u32>"
+  | "mat4x3<u32>"
+  | "mat4x4<u32>"
+
+  | "mat2x2<i32>"
+  | "mat3x2<i32>"
+  | "mat2x3<i32>"
+  | "mat2x4<i32>"
+  | "mat4x2<i32>"
+  | "mat3x3<i32>"
+  | "mat3x4<i32>"
+  | "mat4x3<i32>"
+  | "mat4x4<i32>"
+
+  | "mat2x2<f16>"
+  | "mat3x2<f16>"
+  | "mat2x3<f16>"
+  | "mat2x4<f16>"
+  | "mat4x2<f16>"
+  | "mat3x3<f16>"
+  | "mat3x4<f16>"
+  | "mat4x3<f16>"
+  | "mat4x4<f16>"
+
+  | "mat2x2<f32>"
+  | "mat3x2<f32>"
+  | "mat2x3<f32>"
+  | "mat2x4<f32>"
+  | "mat4x2<f32>"
+  | "mat3x3<f32>"
+  | "mat3x4<f32>"
+  | "mat4x3<f32>"
+  | "mat4x4<f32>"
+
+  | "mat2x2<f64>"
+  | "mat3x2<f64>"
+  | "mat2x3<f64>"
+  | "mat2x4<f64>"
+  | "mat4x2<f64>"
+  | "mat3x3<f64>"
+  | "mat3x4<f64>"
+  | "mat4x3<f64>"
+  | "mat4x4<f64>"
+  
+  | "atomic<u32>"
+  | "atomic<i32>"
+
+  // Virtual types
+  | "u8"
+  | "i8"
+  | "u16"
+  | "i16"
+  | "vec2<u8>"
+  | "vec2<i8>"
+  | "vec2<u16>"
+  | "vec2<i16>"
+  | "vec3<u8>"
+  | "vec3<i8>"
+  | "vec3<u16>"
+  | "vec3<i16>"
+  | "vec4<u8>"
+  | "vec4<i8>"
+  | "vec4<u16>"
+  | "vec4<i16>"
+  | "vec3to4<u8>"
+  | "vec3to4<i8>"
+  | "vec3to4<u16>"
+  | "vec3to4<i16>"
+  | "vec3to4<u32>"
+  | "vec3to4<i32>"
+  | "vec3to4<f32>"
+;

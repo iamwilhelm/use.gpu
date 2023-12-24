@@ -55,15 +55,17 @@ export const makeChainTo = (
   const args = fromArgs;
 
   const fromType = formatFormat(fromFormat);
+  const isVoid = fromType === 'void';
+  const restIndex = isVoid ? 0 : 1;
 
   // Return value of `from` must match 1st argument of `to`
-  if (toArgs?.[0] !== fromType) {
+  if (!isVoid && toArgs?.[0] !== fromType) {
     throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain output ${fromType} to args (${toArgs?.join(', ')}).`);
   }
   
   // Other arguments of `from` and `to` must match
-  const toRest = toArgs?.slice(1) ?? [];
-  const fromRest = fromArgs?.slice(1).slice(0, toRest.length) ?? [];
+  const toRest = toArgs?.slice(restIndex) ?? [];
+  const fromRest = fromArgs?.slice(restIndex, restIndex + toRest.length) ?? [];
   if (fromRest.join('/') !== toRest.join('/')) {
     throw new Error(`Type Error: ${fromName} -> ${toName}.\nCannot chain remainder (..., ${fromRest.join(', ')}) to args (..., ${toRest.join(', ')}).`);
   }
@@ -83,7 +85,7 @@ export const makeChainTo = (
     const name = rename.get(entry) ?? entry;
     const from = rename.get('from') ?? 'from';
     const to = rename.get('to') ?? 'to';
-    return makeChainAccessor(formatFormat(toFormat), name, args ?? [], from, to, 1);
+    return makeChainAccessor(formatFormat(toFormat), name, args ?? [], from, to, restIndex);
   }
 
   const exports = makeDeclarations(toFormat, fromArgs);

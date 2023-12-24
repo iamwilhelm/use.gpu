@@ -53,7 +53,7 @@ export const makeInstanceWith = (
 
   const entry = INDEX_ENTRY;
   const arg = i.args?.[0] ?? 'u32';
-  const exports = makeDeclarations(entry, 'never', [arg]);
+  const exports = makeDeclarations(entry, 'void', [arg]);
 
   const rebound = new Set();
   mergeBindings(rebound, iBundle);

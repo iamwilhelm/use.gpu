@@ -185,6 +185,32 @@ struct __underscore {
 @fragment fn main(arg: VertexOutput) -> @location(0) vec4f { return arg.color; }
 `,
 
+/*
+
+//////////////////////////////////////////////////////////////////////
+
+*/
+
+`
+
+fn _0n_getInstancedVertex(vertexIndex: u32, instanceIndex: u32) -> _0h_SolidVertex {
+  var elementIndex: u32;
+
+  if (HAS_INSTANCES) {
+    let mappedIndex = _0n_getMappedIndex(instanceIndex);
+    elementIndex = mappedIndex.x;
+
+    let uniformIndex = mappedIndex.y;
+    _0g_loadIndex(uniformIndex);
+  }
+  else {
+    elementIndex = instanceIndex;
+  }
+
+  return _0m_getLineVertex(vertexIndex, elementIndex);
+};
+`
+
 ];
 
 

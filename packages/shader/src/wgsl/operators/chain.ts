@@ -12,7 +12,15 @@ export const makeChainAccessor = (
   rest: number = 0,
 ) => {
   const symbols = args.map((t, i) => `${arg(i)}`);
-  const tail = rest ? symbols.slice(rest) : null;
+  const tail = rest != null ? symbols.slice(rest) : null;
+
+  if (type === 'void') {
+    return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) {
+  ${from}(${symbols.join(', ')});
+  ${to}(${tail.join(', ')});
+}
+`;   
+  }
 
   return `fn ${name}(${symbols.map((s, i) => `${s}: ${args[i]}`).join(', ')}) -> ${type} {
   return ${to}(${from}(${symbols.join(', ')})${tail?.length ? ['', ...tail].join(', ') : ''});

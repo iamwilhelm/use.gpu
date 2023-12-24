@@ -167,8 +167,6 @@ export const makeResolveBindings = (
       ? (stage ? GPUShaderStage.FRAGMENT : GPUShaderStage.VERTEX)
       : GPUShaderStage.COMPUTE;
 
-    console.log({m, bound});
-
     if (bound) for (const m of bound) {
       const key = getBundleKey(m);
 

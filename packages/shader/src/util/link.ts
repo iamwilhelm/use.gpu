@@ -113,7 +113,6 @@ export const makeLinker = (
 ) => {
   const bundle = toBundle(source);
   const main = getBundleKey(source);
-  console.log({source})
 
   const {bundles, exported, imported, aliased} = loadBundlesInOrder(bundle, libraries);
   const program = getPreambles();

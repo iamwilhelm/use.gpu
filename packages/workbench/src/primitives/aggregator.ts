@@ -14,7 +14,7 @@ import {
   updateAggregateIndex,
 } from '@use-gpu/core';
 import { useBufferedSize } from '../hooks/useBufferedSize';
-import { getInstancedAggregate } from '../hooks/useInstancedSources';
+import { getInstancedAggregate, combineInstances } from '../hooks/useInstancedSources';
 import { getStructAggregate } from '../hooks/useStructSources';
 
 export type AggregatorProps = {
@@ -72,9 +72,11 @@ export const makeAggregator = (
   const {aggregateBuffers, refBuffers, byRefs, byItems, byVertices, byIndices, bySelfs} = aggregate;
   const {instances} = aggregateBuffers;
 
+  const refSources  = byRefs && getInstancedAggregate(byRefs, instances);
+  const itemSources = byItems && getInstancedAggregate(byItems, instances);
+
   const sources = {
-    ...(byRefs     ? getInstancedAggregate(byRefs, instances)  : undefined),
-    ...(byItems    ? getInstancedAggregate(byItems, instances) : undefined),
+    ...combineInstances(refSources, itemSources),
     ...(byVertices ? getStructAggregate(byVertices) : undefined),
     ...(byIndices  ? getStructAggregate(byIndices)  : undefined),
     ...bySelfs,

@@ -12,7 +12,7 @@ struct _01_struct {
 
 var<storage> _02_source: array<_01_struct>;
 
-//// @link @explode [_VT_c5eb21] [source] _03_
+//// @link @explode _03_
 
 fn _03_foo(i: u32) -> vec2<f32> {
   return _02_source[i].foo;

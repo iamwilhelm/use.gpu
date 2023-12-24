@@ -250,7 +250,7 @@ export const schemaToAggregate = (
   let byVertices = buildGroup(byVertex, allocVertices);
   let byIndices = buildGroup(byIndex, allocIndices);
 
-  if (byItems && !byRefs && !byVertices && !byIndices && bySelfs.length === 0) {
+  if (byItems && !byRefs && !byVertices && !byIndices && bySelf.length === 0) {
     byVertices = byItems;
     byItems = undefined;
   }

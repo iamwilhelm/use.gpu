@@ -86,18 +86,20 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
-            <Line
-              positions={[
-                [[550, 50], [500, 150], [600, 150]],
-                [[550, 250], [500, 350], [600, 350]],
-              ]}
-              width={10}
-              color={['#40a0ff', '#a0407f']}
-              join="round"
-              loop
-            />
+            <Transform position={[10, 0]}>
+              <Line
+                positions={[
+                  [[550, 50], [500, 150], [600, 150]],
+                  [[550, 250], [500, 350], [600, 350]],
+                ]}
+                width={10}
+                color={['#40a0ff', '#a0407f']}
+                join="round"
+                loop
+              />
+            </Transform>
 
-            <Transform position={[0, 400]}>
+            <Transform position={[10, 400]}>
               <Line
                 positions={[
                   [[550, 50], [500, 150], [600, 150]],
@@ -111,8 +113,7 @@ export const Plot2DPage: LC = () => {
               />
             </Transform>
 
-            <Transform scale={[1.5, 1.5]}>
-              <Transform position={[100, 450]}>
+            <Transform position={[150, 650]} scale={1.2}>
                 <Animate keyframes={KEYFRAMES} prop="rotation" ease="linear">
                   <Transform rotation={30}>
                     <Line
@@ -125,26 +126,23 @@ export const Plot2DPage: LC = () => {
                       loop
                     />
                   </Transform>
-                </Animate>
-              </Transform>
+              </Animate>
             </Transform>
 
-            <Transform scale={[1.5, 1.5]}>
-              <Transform position={[150, 500]} scale={0.75}>
-                <Animate keyframes={KEYFRAMES} speed={0.5} prop="rotation" ease="linear">
-                  <Transform rotation={30}>
-                    <Line
-                      positions={[
-                        [[-50, -50], [50, -50], [50, 50], [-50, 50]],
-                      ]}
-                      width={10}
-                      color={['#9f40a0']}
-                      depth={1}
-                      loop
-                    />
-                  </Transform>
-                </Animate>
-              </Transform>
+            <Transform position={[150, 600]} scale={0.75}>
+              <Animate keyframes={KEYFRAMES} speed={0.5} prop="rotation" ease="linear">
+                <Transform rotation={30}>
+                  <Line
+                    positions={[
+                      [[-50, -50], [50, -50], [50, 50], [-50, 50]],
+                    ]}
+                    width={10}
+                    color={['#9f40a0']}
+                    depth={1}
+                    loop
+                  />
+                </Transform>
+              </Animate>
             </Transform>
 
             <Arrow

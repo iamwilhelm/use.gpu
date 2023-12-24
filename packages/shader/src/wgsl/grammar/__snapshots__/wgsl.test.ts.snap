@@ -304,7 +304,8 @@ Program                                                     ⮐ fn main() {⮐  
           Value                                             1
             IntLiteral                                      1
         Statement                                           wat();
-          Identifier                                        wat
+          FunctionCall                                      wat
+            Identifier                                      wat
 `;
 
 exports[`WGSL grammar snapshots parses a test program 10`] = `
@@ -585,4 +586,82 @@ Program                                                     ⮐ @fragment fn mai
           FieldAccess                                       .color
             PrivateIdentifier                               color
               Identifier                                    color
+`;
+
+exports[`WGSL grammar snapshots parses a test program 17`] = `
+Program                                                     ⮐ ⮐ fn _0n_getInstancedVertex(vertexIndex: u32, instanceIndex: u32) -> _0h_SolidVertex {⮐   var elementIndex: u32;⮐ ⮐   if (HAS_INSTANCES) {⮐     let mappedIndex = _0n_getMappedIndex(instanceIndex);⮐     elementIndex = mappedIndex.x;⮐ ⮐     let uniformIndex = mappedIndex.y;⮐     _0g_loadIndex(uniformIndex);⮐   }⮐   else {⮐     elementIndex = instanceIndex;⮐   }⮐ ⮐   return _0m_getLineVertex(vertexIndex, elementIndex);⮐ };⮐ 
+  LocalDeclaration                                          ⮐ ⮐ fn _0n_getInstancedVertex(vertexIndex: u32, instanceIndex: u32) -> _0h_SolidVertex {⮐   var elementIndex: u32;⮐ ⮐   if (HAS_INSTANCES) {⮐     let mappedIndex = _0n_getMappedIndex(instanceIndex);⮐     elementIndex = mappedIndex.x;⮐ ⮐     let uniformIndex = mappedIndex.y;⮐     _0g_loadIndex(uniformIndex);⮐   }⮐   else {⮐     elementIndex = instanceIndex;⮐   }⮐ ⮐   return _0m_getLineVertex(vertexIndex, elementIndex);⮐ }
+    FunctionDeclaration                                     ⮐ ⮐ fn _0n_getInstancedVertex(vertexIndex: u32, instanceIndex: u32) -> _0h_SolidVertex {⮐   var elementIndex: u32;⮐ ⮐   if (HAS_INSTANCES) {⮐     let mappedIndex = _0n_getMappedIndex(instanceIndex);⮐     elementIndex = mappedIndex.x;⮐ ⮐     let uniformIndex = mappedIndex.y;⮐     _0g_loadIndex(uniformIndex);⮐   }⮐   else {⮐     elementIndex = instanceIndex;⮐   }⮐ ⮐   return _0m_getLineVertex(vertexIndex, elementIndex);⮐ }
+      AttributeList                                         
+      FunctionHeader                                        fn _0n_getInstancedVertex(vertexIndex: u32, instanceIndex: u32) -> _0h_SolidVertex
+        Keyword                                             fn
+        Identifier                                          _0n_getInstancedVertex
+        ParamList                                           vertexIndex: u32, instanceIndex: u32
+          Param                                             vertexIndex: u32
+            AttributeList                                   
+            Identifier                                      vertexIndex
+            TypeDeclaration                                 u32
+              Type                                          u32
+          Param                                              instanceIndex: u32
+            AttributeList                                   
+            Identifier                                      instanceIndex
+            TypeDeclaration                                 u32
+              Type                                          u32
+        ReturnType                                          -> _0h_SolidVertex
+          AttributeList                                     
+          TypeDeclaration                                   _0h_SolidVertex
+            Identifier                                      _0h_SolidVertex
+      CompoundStatement                                     {⮐   var elementIndex: u32;⮐ ⮐   if (HAS_INSTANCES) {⮐     let mappedIndex = _0n_getMappedIndex(instanceIndex);⮐     elementIndex = mappedIndex.x;⮐ ⮐     let uniformIndex = mappedIndex.y;⮐     _0g_loadIndex(uniformIndex);⮐   }⮐   else {⮐     elementIndex = instanceIndex;⮐   }⮐ ⮐   return _0m_getLineVertex(vertexIndex, elementIndex);⮐ }
+        Statement                                           var elementIndex: u32;
+          Keyword                                           var
+          VariableIdentifier                                elementIndex: u32
+            Identifier                                      elementIndex
+            TypeDeclaration                                 u32
+              Type                                          u32
+        Statement                                           if (HAS_INSTANCES) {⮐     let mappedIndex = _0n_getMappedIndex(instanceIndex);⮐     elementIndex = mappedIndex.x;⮐ ⮐     let uniformIndex = mappedIndex.y;⮐     _0g_loadIndex(uniformIndex);⮐   }⮐   else {⮐     elementIndex = instanceIndex;⮐   }
+          Keyword                                           if
+          Identifier                                        HAS_INSTANCES
+          CompoundStatement                                 {⮐     let mappedIndex = _0n_getMappedIndex(instanceIndex);⮐     elementIndex = mappedIndex.x;⮐ ⮐     let uniformIndex = mappedIndex.y;⮐     _0g_loadIndex(uniformIndex);⮐   }
+            Statement                                       let mappedIndex = _0n_getMappedIndex(instanceIndex);
+              Keyword                                       let
+              VariableIdentifier                            mappedIndex
+                Identifier                                  mappedIndex
+              Assign                                        =
+              Value                                         _0n_getMappedIndex(instanceIndex)
+                FunctionCall                                _0n_getMappedIndex
+                  Identifier                                _0n_getMappedIndex
+                Identifier                                  instanceIndex
+            Statement                                       elementIndex = mappedIndex.x;
+              Identifier                                    elementIndex
+              Assign                                        =
+              Identifier                                    mappedIndex
+              FieldAccess                                   .x
+                PrivateIdentifier                           x
+                  Identifier                                x
+            Statement                                       let uniformIndex = mappedIndex.y;
+              Keyword                                       let
+              VariableIdentifier                            uniformIndex
+                Identifier                                  uniformIndex
+              Assign                                        =
+              Value                                         mappedIndex.y
+                Identifier                                  mappedIndex
+                FieldAccess                                 .y
+                  PrivateIdentifier                         y
+                    Identifier                              y
+            Statement                                       _0g_loadIndex(uniformIndex);
+              FunctionCall                                  _0g_loadIndex
+                Identifier                                  _0g_loadIndex
+              Identifier                                    uniformIndex
+          Keyword                                           else
+          CompoundStatement                                 {⮐     elementIndex = instanceIndex;⮐   }
+            Statement                                       elementIndex = instanceIndex;
+              Identifier                                    elementIndex
+              Assign                                        =
+              Identifier                                    instanceIndex
+        Statement                                           return _0m_getLineVertex(vertexIndex, elementIndex);
+          Keyword                                           return
+          FunctionCall                                      _0m_getLineVertex
+            Identifier                                      _0m_getLineVertex
+          Identifier                                        vertexIndex
+          Identifier                                        elementIndex
 `;

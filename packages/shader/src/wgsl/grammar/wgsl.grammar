@@ -143,7 +143,7 @@ ContinuingStatement { k<'continuing'> CompoundStatement }
 returnStatement { k<'return'> expression? }
 keywordStatement { (k<'break'> | k<'continue'> | k<'discard'>) }
 
-funcCallStatement { Identifier argumentExpressionList }
+funcCallStatement { FunctionCall<Identifier> argumentExpressionList }
 
 
 

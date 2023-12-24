@@ -19,7 +19,7 @@ export const WebGPU: LC<WebGPUProps> = ({fallback, children}: PropsWithChildren<
 
     const {device} = result;
     const handler = (event: any) => {
-      console.error(event.error.message);
+      console.error(event.error);
     };
 
     device.addEventListener('uncapturederror', handler);

@@ -127,7 +127,6 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const z = useShaderRef(props.zBias, props.zBiases);
 
   const i = useShaderRef(null, props.indices);
-  const l = useShaderRef(null, props.instances);
 
   const {transform: xf, differential: xd, bounds: getBounds} = useCombinedTransform();
   const scissor = useScissorContext();
@@ -146,9 +145,9 @@ export const RawFaces: LiveComponent<RawFacesProps> = memo((props: RawFacesProps
   const renderer = shaded ? 'shaded' : 'solid';
   const material = useMaterialContext()[renderer];
   const boundVertex = useBoundShader(getFaceVertex, [
-    l, i,
     xf, xd, scissor,
     ps, n, t, u, ss, g, c, z,
+    i,
   ]);
   const [getVertex, totalCount, instanceDefs] = useInstancedVertex(boundVertex, props.instance, props.instances, instanceCount);
   const getPicking = usePickingShader(props);

@@ -14,6 +14,8 @@ use '@use-gpu/wgsl/use/view'::{ worldToClip, getViewResolution, applyZBias };
 @optional @link fn getColor(i: u32) -> vec4<f32> { return vec4<f32>(1.0, 1.0, 1.0, 1.0); };
 @optional @link fn getZBias(i: u32) -> f32 { return 0.0; };
 
+@optional @link fn getIndex(i: u32) -> u32 { return i; };
+
 @export fn getFaceVertex(vertexIndex: u32, elementIndex: u32) -> ShadedVertex {
   let segment = getSegment(elementIndex);
   let index = elementIndex * 3u + vertexIndex;

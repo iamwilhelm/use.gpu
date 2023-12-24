@@ -186,7 +186,6 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
     const {libs, links} = bundle as ParsedBundle;
 
     out.name  = (
-      out.lib ??
       getBundleName(bundle) ??
       getBundleEntry(bundle) ??
       'Unknown module'
@@ -194,7 +193,8 @@ export const getBundleSummary = (bundle: ShaderModule, maxDepth: number = Infini
     out.key   = getBundleKey(bundle);
     out.hash  = getBundleHash(bundle);
     out.depth = out.link ? depth : 0;
-    if (out.name === undefined) debugger;
+    
+    if (out.lib?.match(/^_VT_/)) out.lib = out.name;
 
     if (depth < maxDepth) {
       for (const k in libs) if (libs[k]) {

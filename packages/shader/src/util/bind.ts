@@ -220,7 +220,6 @@ export const makeResolveBindings = (
     const virtualBindGroup = getVirtualBindGroup(defines);
     const code = makeUniformBlock(allUniforms, virtualBindGroup, bindingBase);
     const lib = loadStaticModule(code, VIRTUAL_BINDINGS);
-    console.log({lib})
 
     const imported = {at: -1, symbols: NO_SYMBOLS, name: VIRTUAL_BINDINGS, imports: NO_SYMBOLS};
 

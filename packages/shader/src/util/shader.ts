@@ -62,7 +62,7 @@ export const makeLoadModuleWithCache = (
 // Load a static (inert) module
 export const loadStaticModule = (code: string, name: string, entry?: string) => {
   const hash = toMurmur53([code, entry]);
-  return ({ name, code, hash, table: EMPTY_TABLE, label: code });
+  return ({ name, code, hash, table: EMPTY_TABLE, label: '@static ' + (entry ?? name) });
 }
 
 // Load a virtual (generated) module

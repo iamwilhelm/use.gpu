@@ -3,7 +3,7 @@ import type { AggregateValue } from '@use-gpu/core';
 import type { ShaderSource } from '@use-gpu/shader/wgsl';
 
 import { useDeviceContext } from '../providers/device-provider';
-import { quote, yeet, useMemo, useRef } from '@use-gpu/live';
+import { useMemo } from '@use-gpu/live';
 import {
   schemaToAggregate,
   updateAggregateFromSchema,
@@ -17,20 +17,10 @@ import { useBufferedSize } from '../hooks/useBufferedSize';
 import { getInstancedAggregate, combineInstances } from '../hooks/useInstancedSources';
 import { getStructAggregate } from '../hooks/useStructSources';
 
-export type AggregatorProps = {
+export const useAggregator = (
   schema: AggregateSchema,
   items: Record<string, AggregateValue>[],
-  render: (
-    count: number,
-    sources: Record<string, ShaderSource>,
-    item: Record<string, AggregateValue>,
-    uploadRefs: () => void,
-  ) => LiveElement,
-};
-
-export const Aggregator: LC<AggregatorProps> = (props: AggregatorProps) => {
-  const {schema, items, render} = props;
-
+) => {
   const device = useDeviceContext();
   const {archetype, count, indices} = getAggregateSummary(items);
 
@@ -38,22 +28,12 @@ export const Aggregator: LC<AggregatorProps> = (props: AggregatorProps) => {
   const allocVertices = useBufferedSize(count);
   const allocIndices = useBufferedSize(indices);
 
-  const renderRef = useRef(render);
-  renderRef.current = render;
-
   const aggregate = useMemo(() =>
     makeAggregator(schema)(device, items, allocItems, allocVertices, allocIndices),
     [archetype, allocItems, allocVertices, allocIndices]
   );
 
-  const {
-    count: total,
-    sources,
-    item,
-    uploadRefs
-  } = aggregate(items, count, indices);
-  
-  return render(total, sources, item, uploadRefs);
+  return aggregate(items, count, indices);
 };
 
 export const makeAggregator = (

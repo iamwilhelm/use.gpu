@@ -106,26 +106,27 @@ export const Plot2DPage: LC = () => {
                   [[550, 250], [500, 350], [600, 350]],
                 ]}
                 width={10}
-                depth={1}
                 color={['#a040ff', '#40a07f']}
                 join="round"
+                depth={1}
                 loop
               />
             </Transform>
 
             <Transform position={[150, 650]} scale={1.2}>
-                <Animate keyframes={KEYFRAMES} prop="rotation" ease="linear">
-                  <Transform rotation={30}>
-                    <Line
-                      positions={[
-                        [[-50, -50], [50, -50], [50, 50], [-50, 50]],
-                      ]}
-                      width={10}
-                      color={['#40a0ff']}
-                      depth={1}
-                      loop
-                    />
-                  </Transform>
+              <Animate keyframes={KEYFRAMES} prop="rotation" ease="linear">
+                <Transform rotation={30}>
+                  <Line
+                    positions={[
+                      [[-50, -50], [50, -50], [50, 50], [-50, 50]],
+                    ]}
+                    width={10}
+                    color={['#40a0ff']}
+                    join="round"
+                    depth={1}
+                    loop
+                  />
+                </Transform>
               </Animate>
             </Transform>
 
@@ -138,6 +139,7 @@ export const Plot2DPage: LC = () => {
                     ]}
                     width={10}
                     color={['#9f40a0']}
+                    join="round"
                     depth={1}
                     loop
                   />

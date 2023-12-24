@@ -9,7 +9,7 @@ import { use, keyed, fragment, quote, yeet, provide, signal, multiGather, extend
 import { toMurmur53, scrambleBits53, mixBits53, getObjectKey } from '@use-gpu/state';
 import { getBundleKey } from '@use-gpu/shader';
 
-import { Aggregator } from '../primitives/aggregator';
+import { useAggregator } from '../hooks/useAggregator';
 
 import { IndexedTransform } from './indexed-transform';
 import { FaceLayer } from './face-layer';
@@ -108,30 +108,21 @@ const Aggregate: LiveFunction<any> = (
 ) => {
   const {schema, component} = layerAggregator;
 
-  return use(Aggregator, {
-    schema, items,
-    render: (
-      count: number,
-      sources: Record<string, ShaderSource>,
-      item: LayerAggregate,
-      uploadRefs?: () => void,
-    ) => {
-      const {transform, flags} = item;
+  const {count, sources, item, uploadRefs} = useAggregator(schema, items);
+  const {transform, flags} = item;
 
-      return useMemo(() => {
-        const {matrices, normalMatrices, ...rest} = sources;
-        const props = {count, ...rest, ...flags};
+  return useMemo(() => {
+    const {matrices, normalMatrices, ...rest} = sources;
+    const props = {count, ...rest, ...flags};
 
-        DEBUG && console.log(component.name, {props, items, sources});
+    DEBUG && console.log(component.name, {props, items, sources});
 
-        const element = use(component, props);
-        const layer = provideTransform(element, transform, sources);
+    const element = use(component, props);
+    const layer = provideTransform(element, transform, sources);
 
-        const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
-        return upload ? [upload, layer] : layer;
-      }, [count, sources, transform, flags, uploadRefs]);
-    }
-  });
+    const upload = useOne(() => uploadRefs ? quote(yeet(uploadRefs)) : null, uploadRefs);
+    return upload ? [upload, layer] : layer;
+  }, [count, sources, transform, flags, uploadRefs]);
 };
 
 const getItemTypeKey = (item: LayerAggregate) =>
